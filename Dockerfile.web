@@ -19,12 +19,14 @@ RUN npm ci --omit=dev --workspace=web
 FROM node:24-alpine AS builder
 WORKDIR /app
 
-# Copy dependencies from deps stage
-# Note: npm workspaces hoists all dependencies to root node_modules
-COPY --from=deps /app/node_modules ./node_modules
+# Copy package files
+COPY package*.json ./
+COPY web/package*.json ./web/
+
+# Install ALL dependencies (including dev dependencies needed for build)
+RUN npm ci --workspace=web
 
 # Copy source code
-COPY package*.json ./
 COPY tsconfig.json ./
 COPY web/ ./web/
 
@@ -56,8 +58,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/web/.next ./web/.next
 COPY --from=builder --chown=nextjs:nodejs /app/web/next.config.js ./web/next.config.js
 
 # Copy node_modules (needed for Next.js runtime)
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/web/node_modules ./web/node_modules
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=deps --chown=nextjs:nodejs /app/web/node_modules ./web/node_modules
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing

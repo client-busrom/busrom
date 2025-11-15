@@ -19,12 +19,14 @@ RUN npm ci --omit=dev --workspace=cms
 FROM node:24-alpine AS builder
 WORKDIR /app
 
-# Copy dependencies from deps stage
-# Note: npm workspaces hoists all dependencies to root node_modules
-COPY --from=deps /app/node_modules ./node_modules
+# Copy package files
+COPY package*.json ./
+COPY cms/package*.json ./cms/
+
+# Install ALL dependencies (including dev dependencies needed for build)
+RUN npm ci --workspace=cms
 
 # Copy source code
-COPY package*.json ./
 COPY tsconfig.json ./
 COPY cms/ ./cms/
 
@@ -45,7 +47,7 @@ RUN adduser --system --uid 1001 keystone
 
 # Copy necessary files
 COPY --from=builder --chown=keystone:nodejs /app/package*.json ./
-COPY --from=builder --chown=keystone:nodejs /app/node_modules ./node_modules
+COPY --from=deps --chown=keystone:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=keystone:nodejs /app/cms ./cms
 
 # Switch to non-root user
