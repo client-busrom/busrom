@@ -44,8 +44,8 @@ export function SimplifiedInquiryForm({
 
   // Only show required fields
   const requiredFields = allFields
-    .filter((field) => field.required)
-    .sort((a, b) => a.order - b.order)
+    .filter((field: FormField) => field.required)
+    .sort((a: FormField, b: FormField) => a.order - b.order)
 
   const [formData, setFormData] = useState<Record<string, any>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -64,7 +64,7 @@ export function SimplifiedInquiryForm({
   const validate = () => {
     const newErrors: Record<string, string> = {}
 
-    requiredFields.forEach((field) => {
+    requiredFields.forEach((field: FormField) => {
       const value = formData[field.fieldName]
       if (!value || (typeof value === "string" && !value.trim())) {
         newErrors[field.fieldName] = `${field.label} is required`
@@ -138,7 +138,7 @@ export function SimplifiedInquiryForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {requiredFields.map((field) => (
+      {requiredFields.map((field: FormField) => (
         <div key={field.fieldName}>
           <label htmlFor={field.fieldName} className="block text-sm font-medium text-gray-700 mb-1">
             {field.label}

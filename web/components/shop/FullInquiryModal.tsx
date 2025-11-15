@@ -100,7 +100,7 @@ export function FullInquiryModal({
 
     sortedFields.forEach((field) => {
       if (field.fieldType === 'checkbox' && field.options) {
-        field.options.forEach((option) => {
+        field.options.forEach((option: { label: string; value: string }) => {
           const isCustomize = option.value.toLowerCase().includes('customize') ||
                              option.value.toLowerCase().includes('custom') ||
                              option.value.toLowerCase() === 'others' ||
