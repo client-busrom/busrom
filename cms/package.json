@@ -27,6 +27,7 @@
     "@types/speakeasy": "^2.0.10",
     "dotenv": "^16.4.7",
     "graphql": "^16.10.0",
+    "lucide-react": "^0.552.0",
     "multer": "^2.0.2",
     "nodemailer": "^6.9.15",
     "qrcode": "^1.5.4",
