@@ -78,10 +78,14 @@ function parseContentSections(content: ContentNode[]) {
     // Before form: collect blockquote sections
     if (!foundForm) {
       // Check if this is a blockquote with code (section title)
+      const firstChild = node.children[0]
       if (
         node.type === "blockquote" &&
-        node.children[0]?.type === "code" &&
-        node.children[0].children[0]?.text
+        firstChild &&
+        'type' in firstChild &&
+        firstChild.type === "code" &&
+        firstChild.children[0] &&
+        'text' in firstChild.children[0]
       ) {
         // Save previous section if exists
         if (currentSection) {
@@ -89,7 +93,7 @@ function parseContentSections(content: ContentNode[]) {
         }
 
         // Start new section
-        const titleText = (node.children[0].children[0] as TextNode).text
+        const titleText = (firstChild.children[0] as TextNode).text
         currentSection = {
           title: titleText,
           content: [],
@@ -139,7 +143,7 @@ function renderContentNode(node: ContentNode, index: number): React.ReactNode {
       return (
         <p key={index} className="mb-4 text-gray-700 leading-relaxed">
           {node.children.map((child, i) =>
-            typeof child === "object" && "text" in child ? renderTextNode(child, i) : renderContentNode(child, i)
+            typeof child === "object" && "text" in child ? renderTextNode(child, i) : renderContentNode(child as ContentNode, i)
           )}
         </p>
       )
@@ -147,7 +151,7 @@ function renderContentNode(node: ContentNode, index: number): React.ReactNode {
     case "blockquote":
       return (
         <blockquote key={index} className="border-l-4 border-brand-secondary pl-4 italic text-gray-600 mb-4">
-          {node.children.map((child, i) => renderContentNode(child, i))}
+          {node.children.map((child, i) => renderContentNode(child as ContentNode, i))}
         </blockquote>
       )
 
@@ -155,7 +159,7 @@ function renderContentNode(node: ContentNode, index: number): React.ReactNode {
       return (
         <code key={index} className="bg-gray-100 px-2 py-1 rounded text-sm font-mono">
           {node.children.map((child, i) =>
-            typeof child === "object" && "text" in child ? child.text : renderContentNode(child, i)
+            typeof child === "object" && "text" in child ? child.text : renderContentNode(child as ContentNode, i)
           )}
         </code>
       )
