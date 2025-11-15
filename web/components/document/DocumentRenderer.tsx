@@ -1,5 +1,6 @@
 "use client"
 
+import type { JSX } from 'react'
 import { DynamicForm } from "@/components/forms/DynamicForm"
 import type { Locale } from "@/i18n.config"
 
