@@ -7,27 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import type { MainFormData } from "@/lib/content-data";
 
 // ------------------------------------------------------------------
-// 类型定义 (保持不变)
+// 类型定义
 // ------------------------------------------------------------------
-type MainFormData = {
-  placeholders: {
-    name: string;
-    email: string;
-    whatsapp: string;
-    company: string;
-    message: string;
-    verify: string;
-  };
-  buttonText: string;
-  designText: {
-    left: string;
-    right: string;
-  };
-  images: string[];
-};
-
 type Props = {
   data: MainFormData;
 };
