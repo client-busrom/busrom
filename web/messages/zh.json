@@ -1,0 +1,31 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "error": "错误",
+    "viewAll": "查看全部",
+    "learnMore": "了解更多",
+    "contactUs": "联系我们"
+  },
+  "nav": {
+    "home": "首页",
+    "products": "产品",
+    "services": "服务",
+    "about": "关于我们",
+    "contact": "联系",
+    "viewAllProducts": "查看所有产品"
+  },
+  "ContactPage": {
+    "title": "联系我们",
+    "subtitle": "获取高品质不锈钢玻璃五金解决方案，请与我们联系",
+    "formTitle": "发送消息",
+    "formDescription": "填写下面的表单，我们会尽快回复您。",
+    "infoTitle": "联系信息",
+    "address": "地址",
+    "email": "邮箱",
+    "phone": "电话",
+    "businessHours": "营业时间",
+    "businessHoursValue": "周一至周五：上午9:00 - 下午6:00 (GMT+8)",
+    "mapPlaceholder": "地图将在此处集成",
+    "followUs": "关注我们"
+  }
+}

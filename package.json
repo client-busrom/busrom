@@ -1,0 +1,27 @@
+{
+  "name": "busrom-project",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Busrom - International B2B Glass Hardware Product Website",
+  "workspaces": [
+    "cms",
+    "web"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:cms\" \"npm run dev:web\"",
+    "dev:cms": "npm run dev --workspace=cms",
+    "dev:web": "npm run dev --workspace=web",
+    "build": "npm run build --workspaces",
+    "build:cms": "npm run build --workspace=cms",
+    "build:web": "npm run build --workspace=web",
+    "postinstall": "echo '\n✅ Installation complete! Next steps:\n1. Start PostgreSQL: docker-compose up -d\n2. Configure environment: cp cms/.env.example cms/.env && cp web/.env.example web/.env\n3. Start development: npm run dev\n'"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=24.11.0",
+    "npm": ">=10.0.0"
+  }
+}

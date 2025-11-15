@@ -1,0 +1,1026 @@
+# Busrom GraphQL 查询示例集合
+# 可以直接在 GraphQL Playground 中使用
+# Playground地址: http://localhost:3000/api/graphql
+
+# ============================================================
+# 1. 导航菜单相关查询
+# ============================================================
+
+# 1.1 获取完整导航菜单(含所有层级)
+query GetCompleteNavigation {
+  navigationMenus(
+    where: { visible: { equals: true } }
+    orderBy: { order: asc }
+  ) {
+    id
+    slug
+    name
+    type
+    icon
+    link
+    order
+
+    parent {
+      id
+      slug
+    }
+
+    children(orderBy: { order: asc }) {
+      id
+      slug
+      name
+      type
+      icon
+      link
+      mediaTags {
+        id
+        name
+      }
+      randomImage {
+        id
+        filename
+        url
+      }
+    }
+  }
+}
+
+# 1.2 仅获取顶级菜单
+query GetTopLevelMenu {
+  navigationMenus(
+    where: {
+      visible: { equals: true }
+      parent: { equals: null }
+    }
+    orderBy: { order: asc }
+  ) {
+    id
+    slug
+    name
+    link
+  }
+}
+
+# ============================================================
+# 2. 首页内容区块查询
+# ============================================================
+
+# 2.1 Hero Banner轮播图
+query GetHeroBanner {
+  heroBannerItems(
+    where: { visible: { equals: true } }
+    orderBy: { order: asc }
+  ) {
+    id
+    title
+    subtitle
+    ctaText
+    ctaLink
+    backgroundImage {
+      file { url }
+      variants { large xlarge webp }
+    }
+    backgroundVideo
+    order
+  }
+}
+
+# 2.2 产品系列轮播
+query GetProductCarousel {
+  productSeriesCarousels(take: 1) {
+    id
+    title
+    subtitle
+    featuredSeries {
+      id
+      slug
+      name
+      description
+      featuredImage {
+        file { url }
+        variants { medium webp }
+      }
+    }
+    showViewAllButton
+    viewAllButtonText
+    viewAllButtonLink
+  }
+}
+
+# 2.3 服务特点
+query GetServiceFeatures {
+  serviceFeaturesConfigs(take: 1) {
+    id
+    title
+    subtitle
+    features
+    layout
+  }
+}
+
+# 2.4 精选产品
+query GetFeaturedProducts {
+  featuredProducts(take: 1) {
+    id
+    title
+    subtitle
+    products {
+      id
+      sku
+      slug
+      name
+      shortDescription
+      images(take: 1) {
+        file { url }
+        variants { medium webp }
+      }
+      price
+      compareAtPrice
+    }
+  }
+}
+
+# 2.5 品牌优势
+query GetBrandAdvantages {
+  brandAdvantages(take: 1) {
+    id
+    title
+    subtitle
+    advantages
+    ctaText
+    ctaLink
+  }
+}
+
+# 2.6 案例展示
+query GetCaseStudies {
+  caseStudies(take: 1) {
+    id
+    title
+    subtitle
+    applications {
+      id
+      title
+      featuredImage {
+        file { url }
+        variants { medium webp }
+      }
+    }
+    showViewAllButton
+    viewAllButtonText
+    viewAllButtonLink
+  }
+}
+
+# 2.7 OEM/ODM服务
+query GetOemOdm {
+  oemOdms(take: 1) {
+    id
+    title
+    subtitle
+    content
+    features
+    ctaText
+    ctaLink
+    backgroundImage {
+      file { url }
+      variants { large webp }
+    }
+  }
+}
+
+# 2.8 报价步骤
+query GetQuoteSteps {
+  quoteSteps(take: 1) {
+    id
+    title
+    subtitle
+    steps
+    ctaText
+    ctaLink
+  }
+}
+
+# 2.9 3D球体展示
+query GetSphere3d {
+  sphere3ds(take: 1) {
+    id
+    title
+    subtitle
+    tags
+  }
+}
+
+# 2.10 主表单配置
+query GetMainForm {
+  mainForms(take: 1) {
+    id
+    title
+    subtitle
+    fields
+    submitButtonText
+  }
+}
+
+# 2.11 为什么选择Busrom
+query GetWhyChoose {
+  whyChooseBusroms(take: 1) {
+    id
+    title
+    subtitle
+    reasons
+  }
+}
+
+# 2.12 品牌价值观
+query GetBrandValue {
+  brandValues(take: 1) {
+    id
+    title
+    values
+  }
+}
+
+# 2.13 页脚配置
+query GetFooter {
+  footers(take: 1) {
+    id
+    companyInfo
+    quickLinks
+    socialLinks
+    bottomLinks
+    copyrightText
+    newsletter
+  }
+}
+
+# ============================================================
+# 3. 产品系列相关查询
+# ============================================================
+
+# 3.1 获取所有产品系列(带分页)
+query GetProductSeries($take: Int = 12, $skip: Int = 0) {
+  productSeries(
+    where: { status: { equals: "PUBLISHED" } }
+    orderBy: { order: asc }
+    take: $take
+    skip: $skip
+  ) {
+    id
+    slug
+    name
+    description
+    featuredImage {
+      file { url }
+      variants { medium webp }
+      altText
+    }
+    category {
+      id
+      name
+    }
+    products {
+      id
+    }
+    order
+  }
+
+  productSeriesCount(where: { status: { equals: "PUBLISHED" } })
+}
+
+# 3.2 获取单个产品系列详情
+query GetProductSeriesDetail($slug: String!, $locale: String = "en") {
+  productSeries(where: { slug: { equals: $slug } }) {
+    id
+    slug
+    name
+    description
+
+    featuredImage {
+      id
+      filename
+      file {
+        url
+        width
+        height
+      }
+      altText
+      variants {
+        thumbnail
+        small
+        medium
+        large
+        xlarge
+        webp
+      }
+    }
+
+    category {
+      id
+      name
+    }
+
+    products(
+      where: { status: { equals: "PUBLISHED" } }
+      orderBy: { order: asc }
+    ) {
+      id
+      sku
+      slug
+      name
+      shortDescription
+      images(take: 1) {
+        file { url }
+        altText
+      }
+      price
+      compareAtPrice
+      inStock
+    }
+
+    contentTranslations(where: { locale: { equals: $locale } }) {
+      locale
+      content
+    }
+
+    seoTitle
+    seoDescription
+    seoKeywords
+
+    createdAt
+    updatedAt
+  }
+}
+
+# ============================================================
+# 4. 产品SKU相关查询
+# ============================================================
+
+# 4.1 获取产品列表(支持筛选)
+query GetProducts(
+  $take: Int = 20
+  $skip: Int = 0
+  $categoryId: ID
+  $seriesId: ID
+  $search: String
+) {
+  products(
+    where: {
+      status: { equals: "PUBLISHED" }
+      category: { id: { equals: $categoryId } }
+      series: { id: { equals: $seriesId } }
+      OR: [
+        { name: { contains: $search, mode: insensitive } }
+        { sku: { contains: $search, mode: insensitive } }
+      ]
+    }
+    take: $take
+    skip: $skip
+    orderBy: { order: asc }
+  ) {
+    id
+    sku
+    slug
+    name
+    shortDescription
+    images(take: 1) {
+      file { url }
+      altText
+    }
+    category {
+      id
+      name
+    }
+    series {
+      id
+      slug
+      name
+    }
+    price
+    compareAtPrice
+    inStock
+    tags {
+      id
+      name
+    }
+  }
+
+  productsCount(
+    where: {
+      status: { equals: "PUBLISHED" }
+      category: { id: { equals: $categoryId } }
+      series: { id: { equals: $seriesId } }
+    }
+  )
+}
+
+# 4.2 获取产品详情
+query GetProductDetail($sku: String!, $locale: String = "en") {
+  product(where: { sku: { equals: $sku } }) {
+    id
+    sku
+    slug
+    name
+    shortDescription
+    description
+
+    images(orderBy: { order: asc }) {
+      id
+      filename
+      file {
+        url
+        width
+        height
+      }
+      altText
+      variants {
+        thumbnail
+        small
+        medium
+        large
+        xlarge
+        webp
+      }
+      order
+    }
+
+    category {
+      id
+      name
+    }
+
+    series {
+      id
+      slug
+      name
+      products(
+        where: {
+          status: { equals: "PUBLISHED" }
+          sku: { not: { equals: $sku } }
+        }
+        take: 4
+      ) {
+        id
+        sku
+        slug
+        name
+        images(take: 1) {
+          file { url }
+        }
+        price
+      }
+    }
+
+    price
+    compareAtPrice
+    inStock
+    stockQuantity
+
+    specifications
+
+    tags {
+      id
+      name
+    }
+
+    contentTranslations(where: { locale: { equals: $locale } }) {
+      locale
+      content
+    }
+
+    seoTitle
+    seoDescription
+    seoKeywords
+
+    status
+    createdAt
+    updatedAt
+  }
+}
+
+# ============================================================
+# 5. 博客相关查询
+# ============================================================
+
+# 5.1 获取博客列表
+query GetBlogs(
+  $take: Int = 20
+  $skip: Int = 0
+  $categoryId: ID
+  $tagId: ID
+) {
+  blogs(
+    where: {
+      status: { equals: "PUBLISHED" }
+      category: { id: { equals: $categoryId } }
+      tags: { some: { id: { equals: $tagId } } }
+    }
+    orderBy: { publishedAt: desc }
+    take: $take
+    skip: $skip
+  ) {
+    id
+    slug
+    title
+    excerpt
+    featuredImage {
+      file { url }
+      variants { medium webp }
+      altText
+    }
+    category {
+      id
+      name
+    }
+    author {
+      id
+      name
+    }
+    tags {
+      id
+      name
+    }
+    publishedAt
+    readingTime
+    viewCount
+  }
+
+  blogsCount(where: { status: { equals: "PUBLISHED" } })
+}
+
+# 5.2 获取博客详情
+query GetBlogDetail($slug: String!, $locale: String = "en") {
+  blog(where: { slug: { equals: $slug } }) {
+    id
+    slug
+    title
+    excerpt
+
+    featuredImage {
+      id
+      filename
+      file {
+        url
+        width
+        height
+      }
+      altText
+      variants {
+        medium
+        large
+        webp
+      }
+    }
+
+    category {
+      id
+      name
+    }
+
+    author {
+      id
+      name
+      email
+    }
+
+    tags {
+      id
+      name
+    }
+
+    contentTranslations(where: { locale: { equals: $locale } }) {
+      locale
+      content
+    }
+
+    seoTitle
+    seoDescription
+    seoKeywords
+
+    publishedAt
+    updatedAt
+    readingTime
+    viewCount
+    status
+  }
+}
+
+# ============================================================
+# 6. 应用案例相关查询
+# ============================================================
+
+# 6.1 获取案例列表
+query GetApplications($take: Int = 20, $skip: Int = 0) {
+  applications(
+    where: { status: { equals: "PUBLISHED" } }
+    orderBy: { order: asc }
+    take: $take
+    skip: $skip
+  ) {
+    id
+    title
+    featuredImage {
+      file { url }
+      variants { medium webp }
+      altText
+    }
+    category {
+      id
+      name
+    }
+    relatedProducts {
+      id
+      sku
+      name
+    }
+    order
+  }
+
+  applicationsCount(where: { status: { equals: "PUBLISHED" } })
+}
+
+# 6.2 获取案例详情
+query GetApplicationDetail($id: ID!, $locale: String = "en") {
+  application(where: { id: $id }) {
+    id
+    title
+
+    featuredImage {
+      id
+      filename
+      file {
+        url
+        width
+        height
+      }
+      altText
+      variants {
+        medium
+        large
+        webp
+      }
+    }
+
+    gallery {
+      id
+      filename
+      file { url }
+      altText
+      variants { medium webp }
+    }
+
+    category {
+      id
+      name
+    }
+
+    relatedProducts {
+      id
+      sku
+      slug
+      name
+      images(take: 1) {
+        file { url }
+      }
+      price
+    }
+
+    contentTranslations(where: { locale: { equals: $locale } }) {
+      locale
+      content
+    }
+
+    seoTitle
+    seoDescription
+
+    order
+    status
+    createdAt
+    updatedAt
+  }
+}
+
+# ============================================================
+# 7. 媒体库相关查询
+# ============================================================
+
+# 7.1 搜索媒体
+query SearchMedia(
+  $categoryId: ID
+  $tagIds: [ID!]
+  $take: Int = 20
+  $skip: Int = 0
+) {
+  media(
+    where: {
+      status: { equals: "ACTIVE" }
+      category: { id: { equals: $categoryId } }
+      tags: { some: { id: { in: $tagIds } } }
+    }
+    take: $take
+    skip: $skip
+    orderBy: { createdAt: desc }
+  ) {
+    id
+    filename
+    file {
+      url
+      filesize
+      width
+      height
+    }
+    altText
+    variants {
+      thumbnail
+      small
+      medium
+      large
+      xlarge
+      webp
+    }
+    category {
+      id
+      name
+    }
+    tags {
+      id
+      name
+    }
+    status
+    createdAt
+  }
+
+  mediaCount(
+    where: {
+      status: { equals: "ACTIVE" }
+      category: { id: { equals: $categoryId } }
+      tags: { some: { id: { in: $tagIds } } }
+    }
+  )
+}
+
+# 7.2 获取媒体分类(树形)
+query GetMediaCategories {
+  mediaCategories(orderBy: { order: asc }) {
+    id
+    name
+    slug
+    description
+    icon
+    order
+    parent {
+      id
+      name
+    }
+    children {
+      id
+      name
+      slug
+      order
+    }
+    media {
+      id
+    }
+  }
+}
+
+# 7.3 获取媒体标签
+query GetMediaTags {
+  mediaTags(orderBy: { order: asc }) {
+    id
+    name
+    slug
+    description
+    color
+    order
+    media {
+      id
+    }
+  }
+}
+
+# ============================================================
+# 8. FAQ相关查询
+# ============================================================
+
+# 8.1 获取FAQ列表
+query GetFaqItems {
+  faqItems(
+    where: { status: { equals: "PUBLISHED" } }
+    orderBy: { order: asc }
+  ) {
+    id
+    question
+    answer
+    category {
+      id
+      name
+    }
+    order
+  }
+}
+
+# ============================================================
+# 9. 站点配置相关查询
+# ============================================================
+
+# 9.1 获取站点配置
+query GetSiteConfig {
+  siteConfigs(take: 1) {
+    id
+    siteName
+    siteUrl
+    defaultLocale
+    supportedLocales
+    contactEmail
+    contactPhone
+    socialMedia
+    businessHours
+    address
+    maintenanceMode
+    createdAt
+    updatedAt
+  }
+}
+
+# ============================================================
+# 10. SEO相关查询
+# ============================================================
+
+# 10.1 获取SEO设置
+query GetSeoSettings($page: String, $locale: String = "en") {
+  seoSettings(
+    where: {
+      page: { equals: $page }
+      locale: { equals: $locale }
+    }
+    take: 1
+  ) {
+    id
+    page
+    locale
+    title
+    description
+    keywords
+    ogImage {
+      file { url }
+    }
+    noIndex
+    noFollow
+    canonicalUrl
+  }
+}
+
+# 10.2 获取Sitemap数据
+query GetSitemapData {
+  productSeries(where: { status: { equals: "PUBLISHED" } }) {
+    slug
+    updatedAt
+  }
+
+  products(where: { status: { equals: "PUBLISHED" } }) {
+    sku
+    updatedAt
+  }
+
+  blogs(where: { status: { equals: "PUBLISHED" } }) {
+    slug
+    updatedAt
+  }
+
+  applications(where: { status: { equals: "PUBLISHED" } }) {
+    id
+    updatedAt
+  }
+}
+
+# ============================================================
+# 11. 表单提交Mutation
+# ============================================================
+
+# 11.1 提交联系表单
+mutation SubmitContactForm($data: ContactFormCreateInput!) {
+  createContactForm(data: $data) {
+    id
+    name
+    email
+    phone
+    company
+    message
+    source
+    locale
+    status
+    createdAt
+  }
+}
+
+# Variables示例:
+# {
+#   "data": {
+#     "name": "张三",
+#     "email": "zhang@example.com",
+#     "phone": "+86 138 0000 0000",
+#     "company": "ABC公司",
+#     "message": "我想了解Glass Standoff产品",
+#     "source": "website",
+#     "locale": "zh"
+#   }
+# }
+
+# 11.2 查询表单提交记录(管理员)
+query GetContactFormSubmissions(
+  $status: String
+  $take: Int = 50
+  $skip: Int = 0
+) {
+  contactForms(
+    where: { status: { equals: $status } }
+    orderBy: { createdAt: desc }
+    take: $take
+    skip: $skip
+  ) {
+    id
+    name
+    email
+    phone
+    company
+    message
+    source
+    locale
+    status
+    createdAt
+    respondedAt
+  }
+
+  contactFormsCount(where: { status: { equals: $status } })
+}
+
+# ============================================================
+# 12. 综合查询示例 - 首页完整数据
+# ============================================================
+
+query GetCompleteHomePage {
+  # Hero Banner
+  heroBannerItems(where: { visible: { equals: true } }, orderBy: { order: asc }) {
+    id
+    title
+    subtitle
+    ctaText
+    ctaLink
+    backgroundImage {
+      file { url }
+      variants { xlarge webp }
+    }
+  }
+
+  # 产品系列轮播
+  productSeriesCarousels(take: 1) {
+    id
+    title
+    subtitle
+    featuredSeries {
+      id
+      slug
+      name
+      featuredImage {
+        file { url }
+        variants { medium webp }
+      }
+    }
+  }
+
+  # 精选产品
+  featuredProducts(take: 1) {
+    id
+    title
+    products {
+      id
+      sku
+      name
+      images(take: 1) {
+        file { url }
+      }
+      price
+    }
+  }
+
+  # 案例展示
+  caseStudies(take: 1) {
+    id
+    title
+    applications {
+      id
+      title
+      featuredImage {
+        file { url }
+      }
+    }
+  }
+
+  # 品牌优势
+  brandAdvantages(take: 1) {
+    id
+    title
+    advantages
+  }
+}

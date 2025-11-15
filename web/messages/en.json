@@ -1,0 +1,31 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "viewAll": "View All",
+    "learnMore": "Learn More",
+    "contactUs": "Contact Us"
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "services": "Services",
+    "about": "About Us",
+    "contact": "Contact",
+    "viewAllProducts": "View All Products"
+  },
+  "ContactPage": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch with us for high-quality stainless steel glass hardware solutions",
+    "formTitle": "Send Us a Message",
+    "formDescription": "Fill out the form below and we'll get back to you as soon as possible.",
+    "infoTitle": "Contact Information",
+    "address": "Address",
+    "email": "Email",
+    "phone": "Phone",
+    "businessHours": "Business Hours",
+    "businessHoursValue": "Monday - Friday: 9:00 AM - 6:00 PM (GMT+8)",
+    "mapPlaceholder": "Map will be integrated here",
+    "followUs": "Follow Us"
+  }
+}

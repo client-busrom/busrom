@@ -1,0 +1,27 @@
+/**
+ * DEPRECATED: Upload Media API Endpoint
+ *
+ * ⚠️ THIS FILE IS DEPRECATED AND NO LONGER USED ⚠️
+ *
+ * The batch media upload feature now uses Keystone's native GraphQL mutation
+ * instead of this custom REST API endpoint.
+ *
+ * New implementation:
+ * - Uses GraphQL multipart request spec
+ * - Endpoint: POST /api/graphql
+ * - Mutation: createMedia
+ * - Files: cms/admin/pages/batch-media-upload.tsx
+ *          cms/custom-fields/BatchMediaUpload.tsx
+ *
+ * Benefits of the new approach:
+ * ✅ Consistent with Keystone's standard upload mechanism
+ * ✅ Automatically triggers all hooks (image optimization, variants)
+ * ✅ Type-safe through GraphQL schema
+ * ✅ No need to maintain custom upload logic
+ *
+ * Date deprecated: 2025-11-13
+ * Reason: Refactored to use Keystone native image field upload
+ */
+
+// Original implementation preserved below for reference:
+// [See git history if needed]

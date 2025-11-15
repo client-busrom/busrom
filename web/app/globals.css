@@ -1,0 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* 品牌颜色映射 (来自你的Figma规范) 
+    */
+
+    /* 主背景: #F6F4ED (主选色) */
+    --background: 48 27% 95%;
+    
+    /* 主文字: #3C3C3C (来自第5点，比纯黑更柔和) */
+    --foreground: 0 0% 24%;
+    
+    /* 卡片/弹出框背景: #FFFFFF */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 24%; /* (卡片上的文字) */
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 24%;
+
+    /* 主要交互色 (按钮): 
+      - BG: #756F3F (来自第5点 "按钮背景色")
+      - Text: #FFFFFF (来自第5点 "按钮文字")
+    */
+    --primary: 55 18% 44%;
+    --primary-foreground: 0 0% 100%;
+
+    /* 次要交互色: 
+      - BG: #A08745 (来自第10点 "特殊强调文字")
+      - Text: #FFFFFF (白色文字在金色上很清晰)
+    */
+    --secondary: 44 38% 45%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* 柔和/禁用状态: 
+      - BG: #DAC99E (来自第6点 "副标题")
+      - Text: #756F3F (来自第3点 "描述")
+    */
+    --muted: 44 46% 76%;
+    --muted-foreground: 55 18% 44%;
+
+    /* 悬停/强调状态: (使用与 muted 相同的颜色)
+    */
+    --accent: 44 46% 76%;
+    --accent-foreground: 0 0% 24%; /* (悬停时文字变为深色) */
+
+    /* 破坏性/错误色: (保持 shadcn 默认) */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* 边框/输入框:
+      - Border: #CDC094 (来自第3点 "图片边框")
+      - Input: 使用 #FFFFFF (默认输入框为白色背景更常见)
+    */
+    --border: 48 30% 72%;
+    --input: 0 0% 100%; /* (保持白色，而不是 #BFB672，因为那太特殊了) */
+    
+    /* 焦点环: #756F3F (使用主交互色) */
+    --ring: 55 18% 44%;
+
+    /* 圆角: (保持不变) */
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* (暗黑模式保持你的 shadcn 默认值不变) */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    /* 这里是关键！
+      你的 body 会自动使用你的主选色 #F6F4ED 
+      和你的主要文字颜色 #3C3C3C
+    */
+    @apply bg-background text-foreground;
+  }
+}
+
+html, body {
+  /* 在加载完成前，我们依然禁用滚动条，避免布局问题 */
+  overflow: hidden;
+}
+
+/* 添加用于文字光泽扫过效果的动画 */
+@layer utilities {
+  @keyframes shine {
+    to {
+      background-position-x: -250%;
+    }
+  }
+}
+
+/* 将动画应用封装成一个工具类 */
+.animate-shine {
+  animation: shine 2s linear infinite;
+}
+
+.text-stroke-black {
+  color: hsl(var(--background)) !important;
+  /* 兼容性更好的描边模拟：四向无模糊阴影 */
+  text-shadow: 
+    -1px -1px 0 #000, 
+     1px -1px 0 #000, 
+    -1px  1px 0 #000, 
+     1px  1px 0 #000; 
+     
+  /* WebKit 浏览器 (Chrome/Safari) 专用，提供更清晰的描边效果 */
+
+}
+
+.text-stroke-custom {
+  -webkit-text-stroke: 0.04em #443D05;
+  text-stroke: 0.04em #443D05;
+}
+
+.text-stroke-custom-light {
+  -webkit-text-stroke: 0.03em #FDF6C2;
+  text-stroke: 0.03em #FDF6C2;
+  
+}
+
+.text-stroke-custom-orange {
+  -webkit-text-stroke: 0.04em #75703F;
+  text-stroke: 0.04em #75703F;
+}
+
+.text-stroke-custom-white {
+  -webkit-text-stroke: 0.04em#6B4E00;
+  text-stroke: 0.04em#6B4E00;
+}
+
+.text-stroke-custom-gold {
+  -webkit-text-stroke: 0.04em#565020;
+  text-stroke: 0.04em#565020;
+}
+/* Skeleton shimmer animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+  background-size: 1000px 100%;
+}
