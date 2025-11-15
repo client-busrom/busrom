@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import type { HomeContent } from "@/lib/content-data";
+import type { HomeContent, FeaturedProduct } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,11 @@ import { Button } from "../ui/button";
 type Props = {
   data: HomeContent["featuredProducts"];
   locale: Locale;
+};
+
+type ProductCardProps = {
+  product: FeaturedProduct;
+  stepTransform: string;
 };
 
 // --- 阶梯错位映射 (应用到卡片本身) ---
@@ -24,7 +29,7 @@ const CARD_MAX_WIDTH = "max-w-xs"; // ⬅️ 限制图片宽度，使其比现�
 
 
 // --- 辅助组件：产品卡片 ---
-const ProductCard = ({ product, stepTransform }) => ( 
+const ProductCard = ({ product, stepTransform }: ProductCardProps) => ( 
   // ⬅️ 关键修改：添加 hover:scale-105 和 transition/duration
   <div 
     className={cn(
