@@ -11,7 +11,14 @@ type Props = {
 };
 
 // --- 辅助占位符组件（使用 Padding Hack 确保高度）---
-const ImagePlaceholder = ({ ratio, src, alt, className }) => {
+type ImagePlaceholderProps = {
+  ratio: string;
+  src: string;
+  alt: string;
+  className: string | undefined;
+};
+
+const ImagePlaceholder = ({ ratio, src, alt, className }: ImagePlaceholderProps) => {
   const [w, h] = ratio.split("/").map(Number);
   const paddingBottom = ((h / w) * 100).toFixed(2) + "%";
 
