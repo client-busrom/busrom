@@ -31,12 +31,12 @@ const GET_FORM_CONFIG = gql`
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { name: string } }
+  { params }: { params: Promise<{ name: string }> }
 ) {
   try {
     const searchParams = request.nextUrl.searchParams
     const locale = searchParams.get('locale') || 'en'
-    const formName = params.name
+    const { name: formName } = await params
 
     // Execute GraphQL query
     const { data, error } = await keystoneClient.query({
