@@ -7,6 +7,7 @@
  */
 
 import React from 'react'
+import type { JSX } from 'react'
 import { DocumentRendererProps } from '@keystone-6/document-renderer'
 import { NoticeBox } from './NoticeBox'
 import { ContactFormBlock } from '../ContactFormBlock'
