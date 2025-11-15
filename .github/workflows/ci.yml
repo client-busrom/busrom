@@ -62,7 +62,7 @@ jobs:
         env:
           # Mock environment variables for build
           DATABASE_URL: postgresql://test:test@localhost:5432/test
-          SESSION_SECRET: test-secret-for-ci-build-only
+          SESSION_SECRET: ci-build-test-secret-32chars-min-required-for-keystone-security
 
   # ==================== Build Web ====================
   build-web:
