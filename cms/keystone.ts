@@ -28,10 +28,10 @@ import {
   verify2FALoginHandler,
   check2FARequiredHandler,
 } from './routes/verify-2fa-login'
-import { seedMediaSystem } from './migrations/seed-media-system'
-import { seedProductSystem } from './migrations/seed-product-system'
-import { seedNavigationSystem } from './migrations/seed-navigation-system'
-import { seedPermissionsSystem } from './migrations/seed-permissions-system'
+import { seedMediaSystem } from './scripts/seed-media-system'
+import { seedProductSystem } from './scripts/seed-product-system'
+import { seedNavigationSystem } from './scripts/seed-navigation-system'
+import { seedPermissionsSystem } from './scripts/seed-permissions-system'
 import { startActivityLogCleanup } from './lib/cleanup-activity-logs'
 import dotenv from 'dotenv'
 
