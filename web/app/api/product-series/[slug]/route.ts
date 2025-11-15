@@ -34,12 +34,12 @@ const GET_PRODUCT_SERIES_BY_SLUG = gql`
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const searchParams = request.nextUrl.searchParams
     const locale = searchParams.get('locale') || 'en'
-    const slug = params.slug
+    const { slug } = await params
 
     // Execute GraphQL query
     const { data, error } = await keystoneClient.query({
