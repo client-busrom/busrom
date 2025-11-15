@@ -1,28 +1,12 @@
 ﻿"use client";
 
-import type { HomeContent } from "@/lib/content-data";
+import type { BrandValueData } from "@/lib/content-data";
 import Image from "next/image";
-import { cn } from "@/lib/utils"; // 导入 cn
+import { cn } from "@/lib/utils";
 
 // ---
-// 1. 类型定义 (保持不变)
+// 1. 类型定义
 // ---
-type BrandValueItem = {
-  title: string;
-  description: string;
-  image: string;
-};
-
-type BrandValueData = {
-  title: string;
-  subtitle: string;
-  param1: BrandValueItem;
-  param2: BrandValueItem;
-  slogan: BrandValueItem;
-  value: BrandValueItem;
-  vision: BrandValueItem;
-};
-
 type Props = {
   data: BrandValueData;
 };
