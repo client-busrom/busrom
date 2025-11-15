@@ -46,7 +46,8 @@ export function FullInquiryModal({
   productSeries,
   initialData = {},
 }: FullInquiryModalProps) {
-  const configData = formConfig?.data || formConfig
+  type ConfigData = FormConfig['data'] & Partial<FormConfig>
+  const configData = (formConfig?.data || formConfig) as ConfigData
   const allFields = configData?.fields?.[locale] || configData?.fields?.["en"] || []
   const sortedFields = [...allFields].sort((a, b) => a.order - b.order)
 
@@ -57,7 +58,7 @@ export function FullInquiryModal({
   const [lastActivity, setLastActivity] = useState(Date.now())
   const [showCustomizeFields, setShowCustomizeFields] = useState<Record<string, boolean>>({})
 
-  const inactivityTimerRef = useRef<NodeJS.Timeout>()
+  const inactivityTimerRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const beforeUnloadHandlerRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null)
   const modalContentRef = useRef<HTMLDivElement>(null)
 

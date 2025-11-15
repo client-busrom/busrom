@@ -5,7 +5,8 @@
  */
 
 import { gql } from '@apollo/client'
-import { getClient } from '@keystone-6/core/admin-ui/apollo'
+// TODO: Fix Keystone client import when admin UI is properly configured
+// import { getClient } from '@keystone-6/core/admin-ui/apollo'
 
 /**
  * GraphQL Query for FeaturedProducts
@@ -142,6 +143,11 @@ function parseSpecifications(specs: any, locale: string = 'en'): Array<{ label: 
  * ```
  */
 export async function getFeaturedProducts(locale: string = 'en'): Promise<FeaturedProductsConfig | null> {
+  // TODO: Implement when Keystone client is properly configured
+  console.warn('getFeaturedProducts: Keystone client not yet configured')
+  return null
+
+  /* Temporarily disabled until getClient is available
   const client = getClient()
 
   try {
@@ -211,6 +217,7 @@ export async function getFeaturedProducts(locale: string = 'en'): Promise<Featur
     console.error('Error fetching featured products:', error)
     return null
   }
+  */
 }
 
 /**

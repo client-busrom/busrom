@@ -39,7 +39,8 @@ export function SimplifiedInquiryForm({
   productSeries,
   onOpenFullForm,
 }: SimplifiedInquiryFormProps) {
-  const configData = formConfig?.data || formConfig
+  type ConfigData = FormConfig['data'] & Partial<FormConfig>
+  const configData = (formConfig?.data || formConfig) as ConfigData
   const allFields = configData?.fields?.[locale] || configData?.fields?.["en"] || []
 
   // Only show required fields

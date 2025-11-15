@@ -136,16 +136,16 @@ export function ProductCard({ product, locale }: ProductCardProps) {
         </Link>
 
         {/* Series */}
-        {product.series && (
+        {product.series && 'slug' in product.series && (
           <Link
             href={`/${locale}/products/${product.series.slug}`}
             className="text-xs text-brand-accent-gold hover:text-brand-secondary transition-colors font-medium uppercase tracking-wider"
           >
-            {/* @ts-ignore */}
-            {product.series.localizedName ||
+            {'name' in product.series && (
               product.series.name?.[locale] ||
               product.series.name?.["en"] ||
-              "View Series"}
+              "View Series"
+            )}
           </Link>
         )}
 

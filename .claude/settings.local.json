@@ -41,7 +41,22 @@
       "Bash(/opt/homebrew/bin/psql:*)",
       "Bash(rm:*)",
       "Bash(gh:*)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(ssh-keygen:*)",
+      "Bash(ssh:*)",
+      "Bash(GIT_SSH_COMMAND=\"ssh -i ~/.ssh/id_ed25519_busrom\" git push:*)",
+      "Bash(git add:*)",
+      "Bash(git reset:*)",
+      "Bash(git commit:*)",
+      "Bash(openssl rand:*)",
+      "Bash(for file in web/components/home/*.tsx)",
+      "Bash(npm info:*)",
+      "Bash(/opt/homebrew/bin/gh --version)",
+      "Bash(git remote:*)"
     ],
     "deny": [],
     "ask": []
