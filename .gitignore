@@ -60,3 +60,10 @@ coverage/
 
 # Claude Code
 .claude/
+
+# AWS Configuration (sensitive)
+.aws-infrastructure-*.env
+github-secrets-values.txt
+github-secrets-checklist.txt
+*.pem
+*.key
