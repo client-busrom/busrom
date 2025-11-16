@@ -92,6 +92,7 @@ jobs:
           fi
 
       - name: Build and push CMS Docker image
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -107,7 +108,13 @@ jobs:
       - name: Output image URI
         id: image
         run: |
-          echo "uri=${{ steps.login-ecr.outputs.registry }}/${{ steps.repo.outputs.name }}:${{ github.sha }}" >> $GITHUB_OUTPUT
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ steps.repo.outputs.name }}:${{ github.sha }}"
+          echo "uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
+          echo "Image URI: ${IMAGE_URI}"
+          if [ -z "${IMAGE_URI}" ]; then
+            echo "ERROR: Image URI is empty!"
+            exit 1
+          fi
 
     outputs:
       image-uri: ${{ steps.image.outputs.uri }}
