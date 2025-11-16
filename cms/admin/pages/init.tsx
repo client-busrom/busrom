@@ -23,16 +23,29 @@ export default function CustomInitPage() {
   const [createUser, { error, loading }] = useMutation(
     gql`
       mutation KsAuthInit($name: String!, $email: String!, $password: String!) {
-        createInitialUser(data: { name: $name, email: $email, password: $password }) {
+        createInitialUser(
+          data: {
+            name: $name
+            email: $email
+            password: $password
+          }
+        ) {
           sessionToken
           item {
             id
+            email
+            isAdmin
+            status
           }
         }
       }
     `,
     {
       variables: { name, email, password },
+      onCompleted: (data) => {
+        // Log for debugging - ensure user was created with admin privileges
+        console.log('User created:', data.createInitialUser?.item);
+      },
     }
   );
 
