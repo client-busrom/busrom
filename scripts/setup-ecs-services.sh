@@ -49,11 +49,31 @@ register_task_definition() {
 
   echo -e "${GREEN}Registering task definition for ${service_type}...${NC}"
 
+  # Get actual secret ARNs from Secrets Manager
+  local DATABASE_URL_ARN=$(aws secretsmanager describe-secret --secret-id "busrom/${ENVIRONMENT}/DATABASE_URL" --region "$AWS_REGION" --query 'ARN' --output text 2>/dev/null || echo "")
+  local SESSION_SECRET_ARN=$(aws secretsmanager describe-secret --secret-id "busrom/${ENVIRONMENT}/SESSION_SECRET" --region "$AWS_REGION" --query 'ARN' --output text 2>/dev/null || echo "")
+  local S3_ACCESS_KEY_ID_ARN=$(aws secretsmanager describe-secret --secret-id "busrom/${ENVIRONMENT}/S3_ACCESS_KEY_ID" --region "$AWS_REGION" --query 'ARN' --output text 2>/dev/null || echo "")
+  local S3_SECRET_ACCESS_KEY_ARN=$(aws secretsmanager describe-secret --secret-id "busrom/${ENVIRONMENT}/S3_SECRET_ACCESS_KEY" --region "$AWS_REGION" --query 'ARN' --output text 2>/dev/null || echo "")
+  local WEB_URL_ARN=$(aws secretsmanager describe-secret --secret-id "busrom/${ENVIRONMENT}/WEB_URL" --region "$AWS_REGION" --query 'ARN' --output text 2>/dev/null || echo "")
+  local CDN_DOMAIN_ARN=$(aws secretsmanager describe-secret --secret-id "busrom/${ENVIRONMENT}/CDN_DOMAIN" --region "$AWS_REGION" --query 'ARN' --output text 2>/dev/null || echo "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:busrom/${ENVIRONMENT}/CDN_DOMAIN")
+  local API_URL_ARN=$(aws secretsmanager describe-secret --secret-id "busrom/${ENVIRONMENT}/NEXT_PUBLIC_API_URL" --region "$AWS_REGION" --query 'ARN' --output text 2>/dev/null || echo "")
+
   # Replace placeholders in template
-  sed -e "s/ENVIRONMENT/${ENVIRONMENT}/g" \
-      -e "s/AWS_ACCOUNT_ID/${AWS_ACCOUNT_ID}/g" \
-      -e "s/AWS_REGION/${AWS_REGION}/g" \
+  sed -e "s|ENVIRONMENT|${ENVIRONMENT}|g" \
+      -e "s|AWS_ACCOUNT_ID|${AWS_ACCOUNT_ID}|g" \
+      -e "s|AWS_REGION|${AWS_REGION}|g" \
+      -e "s|arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/DATABASE_URL|${DATABASE_URL_ARN}|g" \
+      -e "s|arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/SESSION_SECRET|${SESSION_SECRET_ARN}|g" \
+      -e "s|arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/S3_ACCESS_KEY_ID|${S3_ACCESS_KEY_ID_ARN}|g" \
+      -e "s|arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/S3_SECRET_ACCESS_KEY|${S3_SECRET_ACCESS_KEY_ARN}|g" \
+      -e "s|arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/CDN_DOMAIN|${CDN_DOMAIN_ARN}|g" \
+      -e "s|arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/WEB_URL|${WEB_URL_ARN}|g" \
       "$template_file" > "$output_file"
+
+  # For web task definition, also replace NEXT_PUBLIC_API_URL if present
+  if [ "$service_type" == "web" ] && [ -n "$API_URL_ARN" ]; then
+    sed -i.bak "s|arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/NEXT_PUBLIC_API_URL|${API_URL_ARN}|g" "$output_file"
+  fi
 
   # Register task definition
   aws ecs register-task-definition \
