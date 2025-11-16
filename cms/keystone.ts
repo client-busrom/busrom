@@ -29,6 +29,9 @@ import {
   check2FARequiredHandler,
 } from './routes/verify-2fa-login'
 import { fixAdminUserHandler } from './routes/fix-admin-user'
+import resetUsersHandler from './routes/reset-users'
+import clearStagingUsersHandler from './routes/api/clear-staging-users'
+import forceClearUsersHandler from './routes/force-clear-users'
 import { seedMediaSystem } from './scripts/seed-media-system'
 import { seedProductSystem } from './scripts/seed-product-system'
 import { seedNavigationSystem } from './scripts/seed-navigation-system'
@@ -188,6 +191,11 @@ export default withAuth(
 
         // Temporary fix endpoint - set first user as admin
         app.get('/api/fix-admin-user', fixAdminUserHandler)
+
+        // Emergency user management endpoints (non-production only)
+        app.get('/reset-users', resetUsersHandler)
+        app.get('/api/clear-staging-users', clearStagingUsersHandler)
+        app.get('/force-clear-users', forceClearUsersHandler)
 
         console.log('✅ Static files served from public/')
         console.log('✅ Translation API registered at POST /api/translate')
