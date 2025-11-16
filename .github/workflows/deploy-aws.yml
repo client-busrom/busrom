@@ -105,19 +105,11 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/amd64
 
-      - name: Output image URI
-        id: image
+      - name: Verify image push
         run: |
-          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ steps.repo.outputs.name }}:${{ github.sha }}"
-          echo "uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
-          echo "Image URI: ${IMAGE_URI}"
-          if [ -z "${IMAGE_URI}" ]; then
-            echo "ERROR: Image URI is empty!"
-            exit 1
-          fi
-
-    outputs:
-      image-uri: ${{ steps.image.outputs.uri }}
+          echo "✅ CMS Docker image built and pushed successfully"
+          echo "Repository: ${{ steps.repo.outputs.name }}"
+          echo "Tag: ${{ github.sha }}"
 
   # =============================================================================
   # Build and Push Web Docker Image
@@ -173,19 +165,11 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=${{ needs.setup.outputs.environment == 'production' && secrets.NEXT_PUBLIC_API_URL_PRODUCTION || secrets.NEXT_PUBLIC_API_URL_STAGING }}
 
-      - name: Output image URI
-        id: image
+      - name: Verify image push
         run: |
-          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ steps.repo.outputs.name }}:${{ github.sha }}"
-          echo "uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
-          echo "Image URI: ${IMAGE_URI}"
-          if [ -z "${IMAGE_URI}" ]; then
-            echo "ERROR: Image URI is empty!"
-            exit 1
-          fi
-
-    outputs:
-      image-uri: ${{ steps.image.outputs.uri }}
+          echo "✅ Web Docker image built and pushed successfully"
+          echo "Repository: ${{ steps.repo.outputs.name }}"
+          echo "Tag: ${{ github.sha }}"
 
   # =============================================================================
   # Deploy CMS to ECS
@@ -197,18 +181,6 @@ jobs:
     environment: ${{ needs.setup.outputs.environment }}
 
     steps:
-      - name: Debug - Print image URI
-        run: |
-          echo "=== Debugging image URI ==="
-          echo "Image URI from build-cms output: '${{ needs.build-cms.outputs.image-uri }}'"
-          echo "Length: ${#IMAGE_URI}"
-          if [ -z "${{ needs.build-cms.outputs.image-uri }}" ]; then
-            echo "ERROR: Image URI is empty!"
-            echo "Available outputs from build-cms job:"
-            echo "${{ toJSON(needs.build-cms.outputs) }}"
-            exit 1
-          fi
-
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -218,6 +190,24 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build image URI
+        id: image-uri
+        env:
+          ENVIRONMENT: ${{ needs.setup.outputs.environment }}
+        run: |
+          if [ "$ENVIRONMENT" == "production" ]; then
+            REPO_NAME="${{ secrets.ECR_REPOSITORY_CMS_PRODUCTION || 'busrom-cms-production' }}"
+          else
+            REPO_NAME="${{ secrets.ECR_REPOSITORY_CMS_STAGING || 'busrom-cms-staging' }}"
+          fi
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${REPO_NAME}:${{ github.sha }}"
+          echo "uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
+          echo "Built image URI: ${IMAGE_URI}"
 
       - name: Get ECS cluster and service names
         id: ecs
@@ -244,7 +234,7 @@ jobs:
         with:
           task-definition: task-definition-cms.json
           container-name: busrom-cms
-          image: ${{ needs.build-cms.outputs.image-uri }}
+          image: ${{ steps.image-uri.outputs.uri }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
@@ -270,18 +260,6 @@ jobs:
     environment: ${{ needs.setup.outputs.environment }}
 
     steps:
-      - name: Debug - Print image URI
-        run: |
-          echo "=== Debugging image URI ==="
-          echo "Image URI from build-web output: '${{ needs.build-web.outputs.image-uri }}'"
-          echo "Length: ${#IMAGE_URI}"
-          if [ -z "${{ needs.build-web.outputs.image-uri }}" ]; then
-            echo "ERROR: Image URI is empty!"
-            echo "Available outputs from build-web job:"
-            echo "${{ toJSON(needs.build-web.outputs) }}"
-            exit 1
-          fi
-
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -291,6 +269,24 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build image URI
+        id: image-uri
+        env:
+          ENVIRONMENT: ${{ needs.setup.outputs.environment }}
+        run: |
+          if [ "$ENVIRONMENT" == "production" ]; then
+            REPO_NAME="${{ secrets.ECR_REPOSITORY_WEB_PRODUCTION || 'busrom-web-production' }}"
+          else
+            REPO_NAME="${{ secrets.ECR_REPOSITORY_WEB_STAGING || 'busrom-web-staging' }}"
+          fi
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${REPO_NAME}:${{ github.sha }}"
+          echo "uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
+          echo "Built image URI: ${IMAGE_URI}"
 
       - name: Get ECS cluster and service names
         id: ecs
@@ -317,7 +313,7 @@ jobs:
         with:
           task-definition: task-definition-web.json
           container-name: busrom-web
-          image: ${{ needs.build-web.outputs.image-uri }}
+          image: ${{ steps.image-uri.outputs.uri }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
