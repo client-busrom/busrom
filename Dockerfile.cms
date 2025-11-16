@@ -55,6 +55,9 @@ RUN adduser --system --uid 1001 keystone
 COPY --from=builder --chown=keystone:nodejs /app/package*.json ./
 COPY --from=builder --chown=keystone:nodejs /app/cms ./cms
 
+# Explicitly copy migrations folder (ensure it's included)
+COPY --chown=keystone:nodejs cms/migrations ./cms/migrations
+
 # Copy node_modules and regenerate Prisma client for Debian
 COPY --from=deps --chown=keystone:nodejs /app/node_modules ./node_modules
 WORKDIR /app/cms
