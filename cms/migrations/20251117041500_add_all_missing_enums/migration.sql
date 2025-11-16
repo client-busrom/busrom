@@ -1,0 +1,22 @@
+-- AlterEnum: Add ALL resource types that might be missing
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'User';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'Role';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'Permission';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'ActivityLog';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'NavigationMenu';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'Media';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'MediaCategory';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'MediaTag';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'ProductSeries';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'Product';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'Category';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'Blog';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'Application';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'Page';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'FaqItem';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'DocumentTemplate';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'ReusableBlock';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'FormConfig';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'CustomScript';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'SeoSetting';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'SiteConfig';
