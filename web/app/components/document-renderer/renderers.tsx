@@ -19,7 +19,11 @@ import Link from 'next/link'
 // Temporary type definition to replace DocumentRendererProps
 type DocumentRendererProps = {
   componentBlocks?: Record<string, (props: any) => JSX.Element | null>
-  renderers?: Record<string, (props: any) => JSX.Element | null>
+  renderers?: {
+    block?: Record<string, (props: any) => JSX.Element | null>
+    inline?: Record<string, (props: any) => JSX.Element | null>
+    [key: string]: any
+  }
 }
 
 /**
