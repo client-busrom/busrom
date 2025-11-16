@@ -157,6 +157,11 @@ export default withAuth(
           next()
         })
 
+        // Health check endpoint for ECS/ALB
+        app.get('/api/health', (req, res) => {
+          res.status(200).json({ status: 'ok', service: 'cms', timestamp: new Date().toISOString() })
+        })
+
         // Translation API endpoint
         app.post('/api/translate', translateHandler)
 
