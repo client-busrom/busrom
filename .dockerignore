@@ -18,7 +18,8 @@ dist/
 
 # Keystone
 .keystone/
-migrations/
+# Keep CMS migrations - needed for prisma migrate deploy
+# migrations/
 
 # Database
 *.db
