@@ -1,0 +1,26 @@
+-- AlterEnum: Add new resource types to PermissionResourceType
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'HomeContent';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'HeroBannerItem';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'ProductSeriesCarousel';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'ServiceFeaturesConfig';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'Sphere3d';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'SimpleCta';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'SeriesIntro';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'FeaturedProducts';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'BrandAdvantages';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'OemOdm';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'QuoteSteps';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'MainForm';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'WhyChooseBusrom';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'CaseStudies';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'BrandAnalysis';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'BrandValue';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'Footer';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'ReusableBlockVersion';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'ReusableBlockContentTranslation';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'ProductSeriesContentTranslation';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'ProductContentTranslation';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'ApplicationContentTranslation';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'PageContentTranslation';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'BlogContentTranslation';
+ALTER TYPE "PermissionResourceType" ADD VALUE IF NOT EXISTS 'FormSubmission';
