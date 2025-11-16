@@ -1,10 +1,14 @@
 /**
  * Document Renderer Component
  *
- * Wrapper component for @keystone-6/document-renderer with custom renderers.
- * Use this component to render document field content from Keystone CMS.
+ * DEPRECATED: This component is not currently in use.
+ * Use @/components/document/DocumentRenderer instead.
+ *
+ * TODO: Remove this file or install @keystone-6/document-renderer when React 19 compatibility is available
+ * @keystone-6/document-renderer currently only supports React 16/17/18
  */
 
+/* Temporarily disabled due to React 19 incompatibility
 import React from 'react'
 import { DocumentRenderer as KeystoneDocumentRenderer } from '@keystone-6/document-renderer'
 import type { DocumentRendererProps } from '@keystone-6/document-renderer'
@@ -27,4 +31,11 @@ export function DocumentRenderer({ document, className }: CustomDocumentRenderer
       />
     </div>
   )
+}
+*/
+
+// Placeholder export to prevent import errors
+export function DocumentRenderer() {
+  console.warn('DocumentRenderer: Keystone document renderer not available with React 19')
+  return null
 }
