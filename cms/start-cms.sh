@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+echo "Running database migrations..."
+cd /app/cms
+npx prisma migrate deploy
+
+echo "Starting Keystone CMS..."
+npm start
