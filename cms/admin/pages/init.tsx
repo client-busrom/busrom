@@ -24,13 +24,9 @@ export default function CustomInitPage() {
     gql`
       mutation KsAuthInit($name: String!, $email: String!, $password: String!) {
         createInitialUser(data: { name: $name, email: $email, password: $password }) {
-          ... on UserAuthenticationWithPasswordSuccess {
-            item {
-              id
-            }
-          }
-          ... on UserAuthenticationWithPasswordFailure {
-            message
+          sessionToken
+          item {
+            id
           }
         }
       }
@@ -168,7 +164,7 @@ export default function CustomInitPage() {
             onSubmit={async (e) => {
               e.preventDefault();
               const result = await createUser();
-              if (result.data?.createInitialUser?.__typename === 'UserAuthenticationWithPasswordSuccess') {
+              if (result.data?.createInitialUser?.item) {
                 // Reload the page to refresh admin metadata
                 window.location.href = '/';
               }
