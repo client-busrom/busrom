@@ -53,8 +53,12 @@ RUN adduser --system --uid 1001 keystone
 
 # Copy necessary files
 COPY --from=builder --chown=keystone:nodejs /app/package*.json ./
-COPY --from=deps --chown=keystone:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=keystone:nodejs /app/cms ./cms
+
+# Copy node_modules and regenerate Prisma client for Debian
+COPY --from=deps --chown=keystone:nodejs /app/node_modules ./node_modules
+WORKDIR /app/cms
+RUN npx prisma generate
 
 # Switch to non-root user
 USER keystone
