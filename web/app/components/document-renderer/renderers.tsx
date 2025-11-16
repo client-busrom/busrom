@@ -1,19 +1,26 @@
 /**
  * Document Renderer Configuration
  *
- * Defines how to render all component blocks from Keystone CMS.
- * Each component block has a custom renderer that transforms CMS data
- * into frontend React components.
+ * DEPRECATED: This file is not currently in use due to React 19 incompatibility.
+ *
+ * TODO: Re-enable when @keystone-6/document-renderer supports React 19
  */
 
 import React from 'react'
 import type { JSX } from 'react'
-import { DocumentRendererProps } from '@keystone-6/document-renderer'
+// Commented out due to React 19 incompatibility
+// import { DocumentRendererProps } from '@keystone-6/document-renderer'
 import { NoticeBox } from './NoticeBox'
 import { ContactFormBlock } from '../ContactFormBlock'
 import Image from 'next/image'
 import * as LucideIcons from 'lucide-react'
 import Link from 'next/link'
+
+// Temporary type definition to replace DocumentRendererProps
+type DocumentRendererProps = {
+  componentBlocks?: Record<string, (props: any) => JSX.Element | null>
+  renderers?: Record<string, (props: any) => JSX.Element | null>
+}
 
 /**
  * Helper function to get Lucide icon component
