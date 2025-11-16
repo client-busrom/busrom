@@ -158,6 +158,7 @@ jobs:
           fi
 
       - name: Build and push Web Docker image
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -175,7 +176,13 @@ jobs:
       - name: Output image URI
         id: image
         run: |
-          echo "uri=${{ steps.login-ecr.outputs.registry }}/${{ steps.repo.outputs.name }}:${{ github.sha }}" >> $GITHUB_OUTPUT
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ steps.repo.outputs.name }}:${{ github.sha }}"
+          echo "uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
+          echo "Image URI: ${IMAGE_URI}"
+          if [ -z "${IMAGE_URI}" ]; then
+            echo "ERROR: Image URI is empty!"
+            exit 1
+          fi
 
     outputs:
       image-uri: ${{ steps.image.outputs.uri }}
@@ -190,6 +197,18 @@ jobs:
     environment: ${{ needs.setup.outputs.environment }}
 
     steps:
+      - name: Debug - Print image URI
+        run: |
+          echo "=== Debugging image URI ==="
+          echo "Image URI from build-cms output: '${{ needs.build-cms.outputs.image-uri }}'"
+          echo "Length: ${#IMAGE_URI}"
+          if [ -z "${{ needs.build-cms.outputs.image-uri }}" ]; then
+            echo "ERROR: Image URI is empty!"
+            echo "Available outputs from build-cms job:"
+            echo "${{ toJSON(needs.build-cms.outputs) }}"
+            exit 1
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -251,6 +270,18 @@ jobs:
     environment: ${{ needs.setup.outputs.environment }}
 
     steps:
+      - name: Debug - Print image URI
+        run: |
+          echo "=== Debugging image URI ==="
+          echo "Image URI from build-web output: '${{ needs.build-web.outputs.image-uri }}'"
+          echo "Length: ${#IMAGE_URI}"
+          if [ -z "${{ needs.build-web.outputs.image-uri }}" ]; then
+            echo "ERROR: Image URI is empty!"
+            echo "Available outputs from build-web job:"
+            echo "${{ toJSON(needs.build-web.outputs) }}"
+            exit 1
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v4
 
