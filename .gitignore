@@ -20,7 +20,7 @@ dist/
 
 # Keystone
 .keystone/
-migrations/
+# Keep cms/migrations tracked for Prisma schema changes
 
 # Database
 *.db
