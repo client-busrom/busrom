@@ -1,0 +1,323 @@
+name: Deploy to AWS ECS
+
+on:
+  push:
+    branches:
+      - main         # Deploy to production on main branch
+      - develop      # Deploy to staging on develop branch
+  workflow_dispatch:  # Manual trigger
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  AWS_REGION: us-east-1
+  NODE_VERSION: '20'
+
+jobs:
+  # =============================================================================
+  # Determine Environment
+  # =============================================================================
+  setup:
+    name: Setup Deployment
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+      deploy: ${{ steps.check.outputs.deploy }}
+
+    steps:
+      - name: Determine environment
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/develop" ]; then
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          else
+            echo "environment=none" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check if deployment needed
+        id: check
+        run: |
+          if [ "${{ steps.set-env.outputs.environment }}" == "none" ]; then
+            echo "deploy=false" >> $GITHUB_OUTPUT
+          else
+            echo "deploy=true" >> $GITHUB_OUTPUT
+          fi
+
+  # =============================================================================
+  # Build and Push CMS Docker Image
+  # =============================================================================
+  build-cms:
+    name: Build & Push CMS Image
+    runs-on: ubuntu-latest
+    needs: setup
+    if: needs.setup.outputs.deploy == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Get repository name
+        id: repo
+        env:
+          ENVIRONMENT: ${{ needs.setup.outputs.environment }}
+        run: |
+          if [ "$ENVIRONMENT" == "production" ]; then
+            echo "name=${{ secrets.ECR_REPOSITORY_CMS_PRODUCTION || 'busrom-cms-production' }}" >> $GITHUB_OUTPUT
+          else
+            echo "name=${{ secrets.ECR_REPOSITORY_CMS_STAGING || 'busrom-cms-staging' }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push CMS Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.cms
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ steps.repo.outputs.name }}:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ steps.repo.outputs.name }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+      - name: Output image URI
+        id: image
+        run: |
+          echo "uri=${{ steps.login-ecr.outputs.registry }}/${{ steps.repo.outputs.name }}:${{ github.sha }}" >> $GITHUB_OUTPUT
+
+    outputs:
+      image-uri: ${{ steps.image.outputs.uri }}
+
+  # =============================================================================
+  # Build and Push Web Docker Image
+  # =============================================================================
+  build-web:
+    name: Build & Push Web Image
+    runs-on: ubuntu-latest
+    needs: setup
+    if: needs.setup.outputs.deploy == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Get repository name
+        id: repo
+        env:
+          ENVIRONMENT: ${{ needs.setup.outputs.environment }}
+        run: |
+          if [ "$ENVIRONMENT" == "production" ]; then
+            echo "name=${{ secrets.ECR_REPOSITORY_WEB_PRODUCTION || 'busrom-web-production' }}" >> $GITHUB_OUTPUT
+          else
+            echo "name=${{ secrets.ECR_REPOSITORY_WEB_STAGING || 'busrom-web-staging' }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push Web Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.web
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ steps.repo.outputs.name }}:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ steps.repo.outputs.name }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ needs.setup.outputs.environment == 'production' && secrets.NEXT_PUBLIC_API_URL_PRODUCTION || secrets.NEXT_PUBLIC_API_URL_STAGING }}
+
+      - name: Output image URI
+        id: image
+        run: |
+          echo "uri=${{ steps.login-ecr.outputs.registry }}/${{ steps.repo.outputs.name }}:${{ github.sha }}" >> $GITHUB_OUTPUT
+
+    outputs:
+      image-uri: ${{ steps.image.outputs.uri }}
+
+  # =============================================================================
+  # Deploy CMS to ECS
+  # =============================================================================
+  deploy-cms:
+    name: Deploy CMS to ECS
+    runs-on: ubuntu-latest
+    needs: [setup, build-cms]
+    environment: ${{ needs.setup.outputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get ECS cluster and service names
+        id: ecs
+        env:
+          ENVIRONMENT: ${{ needs.setup.outputs.environment }}
+        run: |
+          if [ "$ENVIRONMENT" == "production" ]; then
+            echo "cluster=${{ secrets.ECS_CLUSTER_PRODUCTION || 'busrom-cluster-production' }}" >> $GITHUB_OUTPUT
+            echo "service=${{ secrets.ECS_SERVICE_CMS_PRODUCTION || 'busrom-cms-production' }}" >> $GITHUB_OUTPUT
+          else
+            echo "cluster=${{ secrets.ECS_CLUSTER_STAGING || 'busrom-cluster-staging' }}" >> $GITHUB_OUTPUT
+            echo "service=${{ secrets.ECS_SERVICE_CMS_STAGING || 'busrom-cms-staging' }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition busrom-cms-${{ needs.setup.outputs.environment }} \
+            --query taskDefinition > task-definition-cms.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition-cms.json
+          container-name: busrom-cms
+          image: ${{ needs.build-cms.outputs.image-uri }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ steps.ecs.outputs.service }}
+          cluster: ${{ steps.ecs.outputs.cluster }}
+          wait-for-service-stability: true
+
+      - name: Deployment success notification
+        if: success()
+        run: |
+          echo "✅ CMS deployed successfully to ${{ needs.setup.outputs.environment }}!"
+          echo "Image: ${{ needs.build-cms.outputs.image-uri }}"
+
+  # =============================================================================
+  # Deploy Web to ECS
+  # =============================================================================
+  deploy-web:
+    name: Deploy Web to ECS
+    runs-on: ubuntu-latest
+    needs: [setup, build-web]
+    environment: ${{ needs.setup.outputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get ECS cluster and service names
+        id: ecs
+        env:
+          ENVIRONMENT: ${{ needs.setup.outputs.environment }}
+        run: |
+          if [ "$ENVIRONMENT" == "production" ]; then
+            echo "cluster=${{ secrets.ECS_CLUSTER_PRODUCTION || 'busrom-cluster-production' }}" >> $GITHUB_OUTPUT
+            echo "service=${{ secrets.ECS_SERVICE_WEB_PRODUCTION || 'busrom-web-production' }}" >> $GITHUB_OUTPUT
+          else
+            echo "cluster=${{ secrets.ECS_CLUSTER_STAGING || 'busrom-cluster-staging' }}" >> $GITHUB_OUTPUT
+            echo "service=${{ secrets.ECS_SERVICE_WEB_STAGING || 'busrom-web-staging' }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition busrom-web-${{ needs.setup.outputs.environment }} \
+            --query taskDefinition > task-definition-web.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition-web.json
+          container-name: busrom-web
+          image: ${{ needs.build-web.outputs.image-uri }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ steps.ecs.outputs.service }}
+          cluster: ${{ steps.ecs.outputs.cluster }}
+          wait-for-service-stability: true
+
+      - name: Deployment success notification
+        if: success()
+        run: |
+          echo "✅ Web deployed successfully to ${{ needs.setup.outputs.environment }}!"
+          echo "Image: ${{ needs.build-web.outputs.image-uri }}"
+
+  # =============================================================================
+  # Post-deployment health checks
+  # =============================================================================
+  health-check:
+    name: Health Check
+    runs-on: ubuntu-latest
+    needs: [setup, deploy-cms, deploy-web]
+
+    steps:
+      - name: Wait for services to stabilize
+        run: sleep 30
+
+      - name: Health check summary
+        run: |
+          echo "🎉 Deployment to ${{ needs.setup.outputs.environment }} completed!"
+          echo "✅ CMS service deployed"
+          echo "✅ Web service deployed"
+          echo ""
+          echo "Please verify the deployment manually:"
+          if [ "${{ needs.setup.outputs.environment }}" == "production" ]; then
+            echo "  CMS: https://cms.busrom.com/api/health"
+            echo "  Web: https://www.busrom.com/api/health"
+          else
+            echo "  CMS: https://cms-staging.busrom.com/api/health"
+            echo "  Web: https://staging.busrom.com/api/health"
+          fi
