@@ -26,7 +26,7 @@ if [ -d "migrations" ] && [ ! -d "prisma/migrations" ]; then
 fi
 
 echo "=== ABOUT TO RUN MIGRATIONS ==="
-npx keystone prisma migrate deploy
+npx prisma migrate deploy --schema=./schema.prisma
 echo "=== MIGRATIONS COMPLETED ==="
 
 echo "=== CHECKING ENVIRONMENT ==="
