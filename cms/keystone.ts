@@ -28,6 +28,7 @@ import {
   verify2FALoginHandler,
   check2FARequiredHandler,
 } from './routes/verify-2fa-login'
+import { fixAdminUserHandler } from './routes/fix-admin-user'
 import { seedMediaSystem } from './scripts/seed-media-system'
 import { seedProductSystem } from './scripts/seed-product-system'
 import { seedNavigationSystem } from './scripts/seed-navigation-system'
@@ -184,6 +185,9 @@ export default withAuth(
         app.post('/api/2fa/regenerate-backup-codes', regenerateBackupCodesHandler)
         app.post('/api/2fa/verify', verify2FALoginHandler)
         app.post('/api/2fa/check-required', check2FARequiredHandler)
+
+        // Temporary fix endpoint - set first user as admin
+        app.get('/api/fix-admin-user', fixAdminUserHandler)
 
         console.log('✅ Static files served from public/')
         console.log('✅ Translation API registered at POST /api/translate')
