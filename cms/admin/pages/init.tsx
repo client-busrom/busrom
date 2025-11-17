@@ -178,6 +178,9 @@ export default function CustomInitPage() {
               e.preventDefault();
               const result = await createUser();
               if (result.data?.createInitialUser?.item) {
+                // Wait a moment for the session cookie to be set before redirecting
+                // This is critical for AWS ALB environments where cookie processing may be slower
+                await new Promise(resolve => setTimeout(resolve, 500));
                 // Reload the page to refresh admin metadata
                 window.location.href = '/';
               }
