@@ -317,9 +317,43 @@ export const User = list({
 
   hooks: {
     /**
-     * Log user changes to ActivityLog
+     * Auto-assign super_admin role to initial admin user
+     * Also log user changes to ActivityLog
      */
     afterOperation: async ({ operation, item, originalItem, context }) => {
+      // Auto-assign super_admin role to admin users without roles
+      if (operation === 'create' && item && item.isAdmin) {
+        try {
+          // Check if user has any roles
+          const user = await context.sudo().query.User.findOne({
+            where: { id: String(item.id) },
+            query: 'id roles { id }',
+          })
+
+          // If user has no roles, assign super_admin role
+          if (!user?.roles || user.roles.length === 0) {
+            const superAdminRole = await context.sudo().query.Role.findOne({
+              where: { code: 'super_admin' },
+              query: 'id',
+            })
+
+            if (superAdminRole) {
+              await context.sudo().query.User.updateOne({
+                where: { id: String(item.id) },
+                data: {
+                  roles: { connect: [{ id: String(superAdminRole.id) }] },
+                },
+              })
+              console.log(`✅ Auto-assigned super_admin role to user: ${item.email}`)
+            }
+          }
+        } catch (error) {
+          console.error('❌ Failed to auto-assign super_admin role:', error)
+          // Don't throw - user creation should still succeed
+        }
+      }
+
+      // Log user changes to ActivityLog
       if (['create', 'update', 'delete'].includes(operation) && item) {
         const { logActivity } = await import('../lib/activity-logger')
         await logActivity(context, operation as any, 'User', item, undefined, originalItem)
