@@ -7,11 +7,6 @@
 import type { Request, Response } from 'express';
 
 export async function forceClearUsersHandler(req: Request, res: Response) {
-  // Security: Only allow in non-production
-  if (process.env.NODE_ENV === 'production') {
-    return res.status(403).send('Not available in production');
-  }
-
   try {
     const context = (req as any).context;
 
