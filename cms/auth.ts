@@ -53,10 +53,14 @@ if (!sessionSecret && process.env.NODE_ENV === 'production') {
  *
  * - maxAge: Session duration in seconds (30 days)
  * - secret: Secret key for signing session tokens
+ * - sameSite: 'lax' to allow cookies in redirects (important for init page)
+ * - secure: false in development, true in production with HTTPS
  */
 const sessionConfig = statelessSessions({
   maxAge: 60 * 60 * 24 * 30, // 30 days
   secret: sessionSecret || 'default-dev-secret-change-in-production',
+  sameSite: 'lax',
+  secure: process.env.NODE_ENV === 'production' && process.env.USE_SECURE_COOKIES === 'true',
 })
 
 export { withAuth, sessionConfig as session }
