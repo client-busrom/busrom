@@ -148,6 +148,10 @@ export default withAuth(
         const express = require('express')
         const path = require('path')
 
+        // Trust proxy - Required for cookies to work correctly behind ALB
+        // This ensures Express sees the correct client IP and protocol
+        app.set('trust proxy', true)
+
         // Serve static files from public directory
         // Note: __dirname points to .keystone/ after compilation, so we need to go up one level
         app.use(express.static(path.join(__dirname, '..', 'public')))
