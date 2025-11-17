@@ -27,6 +27,9 @@ const { withAuth } = createAuth({
     itemData: {
       isAdmin: true,
       status: 'ACTIVE',
+      twoFactorEnabled: false,
+      twoFactorSecret: '',
+      backupCodes: [],
     },
   },
 })
