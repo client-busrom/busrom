@@ -279,6 +279,11 @@ export default withAuth(
           component: './admin/pages/signin',
         },
         {
+          label: 'Initialize',
+          path: 'init',
+          component: './admin/pages/init',
+        },
+        {
           label: '📤 Batch Upload Media',
           path: 'batch-upload',
           component: './admin/pages/batch-media-upload',
