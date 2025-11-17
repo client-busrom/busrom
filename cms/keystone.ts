@@ -31,7 +31,7 @@ import {
 import { fixAdminUserHandler } from './routes/fix-admin-user'
 import resetUsersHandler from './routes/reset-users'
 import clearStagingUsersHandler from './routes/api/clear-staging-users'
-import forceClearUsersHandler from './routes/force-clear-users'
+import { forceClearUsersHandler } from './routes/force-clear-users'
 import { seedMediaSystem } from './scripts/seed-media-system'
 import { seedProductSystem } from './scripts/seed-product-system'
 import { seedNavigationSystem } from './scripts/seed-navigation-system'
