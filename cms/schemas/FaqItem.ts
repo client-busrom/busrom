@@ -9,8 +9,9 @@
  * - Display order
  */
 
-import { list } from '@keystone-6/core'
-import { text, json, select, relationship, timestamp, integer } from '@keystone-6/core/fields'
+import { list, graphql } from '@keystone-6/core'
+import { text, json, select, relationship, timestamp, integer, virtual } from '@keystone-6/core/fields'
+import { publicReadAccess } from '../lib/permissions/access-control'
 
 export const FaqItem = list({
   fields: {
@@ -117,6 +118,25 @@ export const FaqItem = list({
       label: 'Updated At (更新时间)',
       db: { updatedAt: true },
     }),
+
+    /**
+     * Duplicate Action Button
+     */
+    duplicate: virtual({
+      label: 'Duplicate (复制)',
+      field: graphql.field({
+        type: graphql.String,
+        resolve() {
+          return null
+        },
+      }),
+      ui: {
+        createView: { fieldMode: 'hidden' },
+        listView: { fieldMode: 'read' },
+        itemView: { fieldMode: 'read' },
+        views: './custom-fields/DuplicateItemButton',
+      },
+    }),
   },
 
   /**
@@ -127,16 +147,10 @@ export const FaqItem = list({
   },
 
   /**
-   * Access Control - Disable physical deletion
+   * Access Control - RBAC System
+   * Requires FaqItem:create, FaqItem:read, FaqItem:update, FaqItem:delete permissions
    */
-  access: {
-    operation: {
-      query: () => true,
-      create: () => true,
-      update: () => true,
-      delete: () => false, // Use status: ARCHIVED instead
-    },
-  },
+  access: publicReadAccess('FaqItem'),
 
   /**
    * UI Configuration

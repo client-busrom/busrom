@@ -28,22 +28,10 @@ export const Media = list({
       label: 'File (文件)',
       storage: 's3_images',
       ui: {
+        // Custom cell view for list display (batch uploaded images)
         views: './custom-views/media-file-cell',
-        // Also include variants in the list query so batch uploaded images can display
         listView: {
           fieldMode: 'read',
-        },
-        itemView: {
-          fieldMode: 'read',
-        },
-      },
-      graphql: {
-        // Customize the GraphQL selection to include variants for the Cell view
-        read: {
-          resolve: async (item: any, args: any, context: any, info: any) => {
-            // Return the file field as-is, but ensure variants are available
-            return item.file
-          },
         },
       },
     }),

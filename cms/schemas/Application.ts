@@ -232,6 +232,25 @@ export const Application = list({
       label: 'Updated At (更新时间)',
       db: { updatedAt: true },
     }),
+
+    /**
+     * Duplicate Action Button
+     */
+    duplicate: virtual({
+      label: 'Duplicate (复制)',
+      field: graphql.field({
+        type: graphql.String,
+        resolve() {
+          return null
+        },
+      }),
+      ui: {
+        createView: { fieldMode: 'hidden' },
+        listView: { fieldMode: 'read' },
+        itemView: { fieldMode: 'read' },
+        views: './custom-fields/DuplicateItemButton',
+      },
+    }),
   },
 
   /**

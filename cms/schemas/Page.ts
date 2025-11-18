@@ -378,6 +378,25 @@ export const Page = list({
     }),
 
     /**
+     * Duplicate Action Button
+     */
+    duplicate: virtual({
+      label: 'Duplicate (复制)',
+      field: graphql.field({
+        type: graphql.String,
+        resolve() {
+          return null
+        },
+      }),
+      ui: {
+        createView: { fieldMode: 'hidden' },
+        listView: { fieldMode: 'read' },
+        itemView: { fieldMode: 'read' },
+        views: './custom-fields/DuplicateItemButton',
+      },
+    }),
+
+    /**
      * Author (作者)
      */
     author: relationship({
