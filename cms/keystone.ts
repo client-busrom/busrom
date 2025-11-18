@@ -32,6 +32,8 @@ import { fixAdminUserHandler } from './routes/fix-admin-user'
 import resetUsersHandler from './routes/reset-users'
 import clearStagingUsersHandler from './routes/api/clear-staging-users'
 import { forceClearUsersHandler } from './routes/force-clear-users'
+import { duplicateProductHandler } from './routes/duplicate-product'
+import { duplicateItemHandler } from './routes/duplicate-item'
 import { seedMediaSystem } from './scripts/seed-media-system'
 import { seedProductSystem } from './scripts/seed-product-system'
 import { seedNavigationSystem } from './scripts/seed-navigation-system'
@@ -200,6 +202,12 @@ export default withAuth(
         app.get('/reset-users', resetUsersHandler)
         app.get('/api/clear-staging-users', clearStagingUsersHandler)
         app.get('/force-clear-users', forceClearUsersHandler)
+
+        // Duplicate product API endpoint
+        app.post('/api/duplicate-product', duplicateProductHandler)
+
+        // Generic duplicate item API endpoint (Page, Blog, Application, FaqItem)
+        app.post('/api/duplicate-item', duplicateItemHandler)
 
         console.log('✅ Static files served from public/')
         console.log('✅ Translation API registered at POST /api/translate')

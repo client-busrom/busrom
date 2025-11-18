@@ -988,6 +988,7 @@ type Page {
   order: Int
   createdAt: DateTime
   updatedAt: DateTime
+  duplicate: String
   author: User
 }
 
@@ -3339,6 +3340,7 @@ type Product {
   status: String
   createdAt: DateTime
   updatedAt: DateTime
+  duplicate: String
 }
 
 type ProductContentByLocale {
@@ -3523,6 +3525,7 @@ type Blog {
   publishedAt: DateTime
   createdAt: DateTime
   updatedAt: DateTime
+  duplicate: String
 }
 
 type BlogContentByLocale {
@@ -3694,6 +3697,7 @@ type Application {
   status: String
   createdAt: DateTime
   updatedAt: DateTime
+  duplicate: String
 }
 
 type ApplicationContentByLocale {
@@ -3855,6 +3859,7 @@ type FaqItem {
   status: String
   createdAt: DateTime
   updatedAt: DateTime
+  duplicate: String
 }
 
 input FaqItemWhereUniqueInput {

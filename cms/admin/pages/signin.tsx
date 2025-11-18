@@ -6,7 +6,6 @@ import { gql, useMutation } from '@keystone-6/core/admin-ui/apollo';
 import { useRouter } from '@keystone-6/core/admin-ui/router';
 import { useRawKeystone } from '@keystone-6/core/admin-ui/context';
 import { Button } from '@keystone-ui/button';
-import { Notice } from '@keystone-ui/notice';
 import { TextInput } from '@keystone-ui/fields';
 
 /**
@@ -214,9 +213,19 @@ export default function CustomSigninPage() {
 
           {/* Error Message */}
           {errorMessage && (
-            <Notice tone="critical" css={{ marginBottom: '1rem' }}>
+            <div
+              css={{
+                marginBottom: '1rem',
+                padding: '12px 16px',
+                backgroundColor: '#fef2f2',
+                border: '1px solid #fecaca',
+                borderRadius: '8px',
+                color: '#dc2626',
+                fontSize: '14px',
+              }}
+            >
               {errorMessage}
-            </Notice>
+            </div>
           )}
 
           {/* Password Login Form */}
