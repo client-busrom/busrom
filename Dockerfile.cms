@@ -68,6 +68,8 @@ COPY --chown=keystone:nodejs cms/migrations ./cms/migrations
 # Copy node_modules and regenerate Prisma client for Debian
 COPY --from=deps --chown=keystone:nodejs /app/node_modules ./node_modules
 WORKDIR /app/cms
+# Skip Prisma checksum verification (workaround for Prisma CDN issues)
+ENV PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
 RUN npx prisma generate
 
 # Copy startup script
