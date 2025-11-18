@@ -248,7 +248,8 @@ export default withAuth(
           forcePathStyle: true, // Required for MinIO
         }),
 
-        signed: { expiry: 5000 },
+        // Use unsigned URLs - requires bucket policy to allow public read
+        // signed: { expiry: 5000 },
       },
     },
 
