@@ -222,13 +222,13 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
               )}
             </div>
 
-            {/* Short Description */}
-            {product.localizedShortDescription && (
+            {/* Description */}
+            {product.localizedDescription && (
               <div className="text-brand-text-main prose prose-sm md:prose-base max-w-none">
-                {typeof product.localizedShortDescription === "string" ? (
-                  <p className="text-sm md:text-base leading-relaxed">{product.localizedShortDescription}</p>
+                {typeof product.localizedDescription === "string" ? (
+                  <p className="text-sm md:text-base leading-relaxed">{product.localizedDescription}</p>
                 ) : (
-                  <div>{JSON.stringify(product.localizedShortDescription)}</div>
+                  <div>{JSON.stringify(product.localizedDescription)}</div>
                 )}
               </div>
             )}
