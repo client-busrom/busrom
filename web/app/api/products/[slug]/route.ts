@@ -250,13 +250,18 @@ async function resolveSingleMedia(mediaId: string) {
 
     const media = data.media
 
+    // Convert variants URLs to CDN URLs
+    const convertedVariants = media.variants ? Object.fromEntries(
+      Object.entries(media.variants).map(([key, value]) => [key, convertToCDNUrl(value as string)])
+    ) : null
+
     // Transform to ImageObject format expected by frontend
     return {
       id: media.id,
       url: convertToCDNUrl(media.file?.url || ''),
       altText: media.filename || '',
       filename: media.filename,
-      variants: media.variants,
+      variants: convertedVariants,
       cropFocalPoint: media.cropFocalPoint || null,
     }
   } catch (err) {
