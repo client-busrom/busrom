@@ -192,10 +192,10 @@ function CarouselBlock({ props }: any) {
                 <div className="space-y-4">
                   {/* Image - Square with rounded corners, separate from text */}
                   {/* Mobile: 256x256, MD+: 488x488 */}
-                  {item.media?.url && (
+                  {(item.media?.variants?.large || item.media?.url) && (
                     <div className="relative w-64 h-64 md:w-[488px] md:h-[488px] rounded-2xl overflow-hidden">
                       <Image
-                        src={item.media.url}
+                        src={item.media.variants?.large || item.media.url}
                         alt={item.title || ''}
                         width={488}
                         height={488}
