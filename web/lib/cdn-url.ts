@@ -12,9 +12,11 @@
  * - CDN:   https://cdn.example.com/bucket/filename.jpg
  */
 
-const CDN_DOMAIN = process.env.NEXT_PUBLIC_CDN_DOMAIN || 'http://localhost:8080'
+// Support both client-side (NEXT_PUBLIC_) and server-side (CDN_DOMAIN) env vars
+const CDN_DOMAIN = process.env.NEXT_PUBLIC_CDN_DOMAIN || process.env.CDN_DOMAIN || 'http://localhost:8080'
 const MINIO_ENDPOINT = 'http://localhost:9000'
 const S3_PATTERN = /https?:\/\/[^\/]+\.amazonaws\.com/
+const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME || 'busrom-media'
 
 /**
  * Convert a MinIO or S3 signed URL to a CDN URL
