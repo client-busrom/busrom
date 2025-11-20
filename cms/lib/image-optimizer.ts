@@ -49,7 +49,12 @@ function getS3BucketName(): string {
 }
 
 function getCDNDomain(): string {
-  return process.env.CDN_DOMAIN || process.env.S3_ENDPOINT || 'http://localhost:9000'
+  const domain = process.env.CDN_DOMAIN || process.env.S3_ENDPOINT || 'http://localhost:9000'
+  // Add https:// for CloudFront domains that don't have protocol
+  if (domain && !domain.startsWith('http') && domain.includes('cloudfront.net')) {
+    return `https://${domain}`
+  }
+  return domain
 }
 
 /**
@@ -213,8 +218,17 @@ async function uploadToS3(
     )
 
     // Return CDN URL
-    // Format: http://localhost:8080/busrom-media/variants/thumbnail/xxx.jpg
-    return `${getCDNDomain()}/${getS3BucketName()}/${key}`
+    // For CloudFront (production): https://cdn.domain/key (no bucket name needed)
+    // For MinIO/Nginx (development): http://localhost:8080/busrom-media/key
+    const cdnDomain = getCDNDomain()
+
+    // Check if using CloudFront (production) - no bucket name in URL
+    if (cdnDomain.includes('cloudfront.net')) {
+      return `${cdnDomain}/${key}`
+    }
+
+    // For MinIO/local development - include bucket name
+    return `${cdnDomain}/${getS3BucketName()}/${key}`
   } catch (error) {
     console.error(`Error uploading to S3 (${key}):`, error)
     throw error
