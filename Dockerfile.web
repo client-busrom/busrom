@@ -36,6 +36,10 @@ WORKDIR /app/web
 # Set build-time environment variables (public variables only)
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# CDN domain for production (CloudFront)
+ARG NEXT_PUBLIC_CDN_DOMAIN=https://d2kqew3hn5wphn.cloudfront.net
+ENV NEXT_PUBLIC_CDN_DOMAIN=$NEXT_PUBLIC_CDN_DOMAIN
+
 RUN npm run build
 
 # ============ Stage 3: Runner ============
