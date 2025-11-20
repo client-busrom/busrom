@@ -251,7 +251,12 @@ export default withAuth(
         // Use CDN URL if CDN_DOMAIN is configured (production with CloudFront)
         // Otherwise fall back to default S3 URL
         ...(process.env.CDN_DOMAIN && process.env.CDN_DOMAIN !== 'NONE' && {
-          generateUrl: (path: string) => `https://${process.env.CDN_DOMAIN}/${path}`,
+          generateUrl: (path: string) => {
+            // path may be a full S3 URL or just the filename
+            // Extract the filename from the path
+            const filename = path.includes('/') ? path.split('/').pop() : path;
+            return `https://${process.env.CDN_DOMAIN}/${filename}`;
+          },
         }),
 
         // Use unsigned URLs - requires bucket policy to allow public read
