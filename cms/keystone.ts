@@ -248,6 +248,12 @@ export default withAuth(
           forcePathStyle: true, // Required for MinIO
         }),
 
+        // Use CDN URL if CDN_DOMAIN is configured (production with CloudFront)
+        // Otherwise fall back to default S3 URL
+        ...(process.env.CDN_DOMAIN && process.env.CDN_DOMAIN !== 'NONE' && {
+          generateUrl: (path: string) => `https://${process.env.CDN_DOMAIN}/${path}`,
+        }),
+
         // Use unsigned URLs - requires bucket policy to allow public read
         // signed: { expiry: 5000 },
       },
