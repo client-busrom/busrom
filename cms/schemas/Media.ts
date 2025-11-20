@@ -394,7 +394,19 @@ export const Media = list({
         }
 
         // Construct the file URL
-        const fileUrl = `${process.env.CDN_DOMAIN || process.env.S3_ENDPOINT || 'http://localhost:9000'}/${process.env.S3_BUCKET_NAME || 'busrom-media'}/${mediaItem.file_id}.${mediaItem.file_extension}`
+        // For CloudFront (production): https://cdn.domain/filename (no bucket name)
+        // For MinIO (development): http://localhost:9000/bucket/filename
+        let cdnDomain = process.env.CDN_DOMAIN || process.env.S3_ENDPOINT || 'http://localhost:9000'
+
+        // Add https:// for CloudFront domains without protocol
+        if (cdnDomain && !cdnDomain.startsWith('http') && cdnDomain.includes('cloudfront.net')) {
+          cdnDomain = `https://${cdnDomain}`
+        }
+
+        // CloudFront doesn't need bucket name in URL
+        const fileUrl = cdnDomain.includes('cloudfront.net')
+          ? `${cdnDomain}/${mediaItem.file_id}.${mediaItem.file_extension}`
+          : `${cdnDomain}/${process.env.S3_BUCKET_NAME || 'busrom-media'}/${mediaItem.file_id}.${mediaItem.file_extension}`
 
         console.log(`🔄 Processing image optimization for: ${mediaItem.filename}`)
         console.log(`📁 File URL: ${fileUrl}`)
