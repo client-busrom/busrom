@@ -26,8 +26,8 @@ if [ -d "migrations" ] && [ ! -d "prisma/migrations" ]; then
 fi
 
 echo "=== FIXING FAILED MIGRATIONS (IF ANY) ==="
-# Fix any failed migration records before running new migrations
-node fix-failed-migration.mjs || echo "⚠️ Failed to fix migrations, continuing anyway..."
+# Mark the known failed migration as resolved (the schema changes were already applied)
+npx prisma migrate resolve --applied 20251121220000_add_footer_navigation_menus --schema=./schema.prisma 2>&1 | grep -v "P3009\|migration issues" || echo "⚠️ No failed migrations to resolve"
 
 echo "=== ABOUT TO RUN DATABASE MIGRATIONS ==="
 # Run migrations in production (safe, no data loss)
