@@ -252,10 +252,18 @@ interface FooterNotice {
   lines: string[];
 }
 
+interface FooterNavigationMenu {
+  slug: string;
+  name: string;
+  link: string;
+}
+
 interface FooterData {
   form: FooterFormConfig;
   contact: FooterContactInfo;
   notice: FooterNotice;
+  column3Menus?: FooterNavigationMenu[];
+  column4Menus?: FooterNavigationMenu[];
 }
 
 interface HomeContentData {
