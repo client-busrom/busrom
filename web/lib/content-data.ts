@@ -292,10 +292,18 @@ export interface FooterNotice {
   lines: string[]
 }
 
+export interface FooterNavigationMenu {
+  slug: string
+  name: string
+  link: string
+}
+
 export interface FooterData {
   form: FooterFormConfig
   contact: FooterContactInfo
   notice: FooterNotice
+  column3Menus?: FooterNavigationMenu[]
+  column4Menus?: FooterNavigationMenu[]
 }
 
 /**

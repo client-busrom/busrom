@@ -1182,5 +1182,14 @@ export const homeContent_ZH: HomeContentData = {
         'Busrom 团队',
       ],
     },
+    column3Menus: [
+      { slug: 'product', name: '产品', link: '/product' },
+      { slug: 'service', name: '服务', link: '/service' },
+      { slug: 'about-us', name: '关于我们', link: '/about-us' },
+    ],
+    column4Menus: [
+      { slug: 'contact-us', name: '联系我们', link: '/contact-us' },
+      { slug: 'shop', name: '商店', link: '/shop' },
+    ],
   },
 };

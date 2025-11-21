@@ -271,6 +271,42 @@ export const Footer = list({
     }),
 
     // ==================================================================
+    // 🔗 Navigation Links (导航链接配置) - 用于非首页页脚
+    // ==================================================================
+
+    /**
+     * Column 3 Navigation Menus (第三列导航菜单)
+     *
+     * 选择要在非首页页脚第三列显示的导航菜单项
+     */
+    column3Menus: relationship({
+      ref: 'NavigationMenu',
+      many: true,
+      label: 'Column 3 Navigation Menus (第三列导航菜单)',
+      ui: {
+        displayMode: 'select',
+        labelField: 'slug',
+        description: '选择要在非首页页脚第三列显示的导航菜单（必须是有实际页面的菜单）',
+      },
+    }),
+
+    /**
+     * Column 4 Navigation Menus (第四列导航菜单)
+     *
+     * 选择要在非首页页脚第四列显示的导航菜单项
+     */
+    column4Menus: relationship({
+      ref: 'NavigationMenu',
+      many: true,
+      label: 'Column 4 Navigation Menus (第四列导航菜单)',
+      ui: {
+        displayMode: 'select',
+        labelField: 'slug',
+        description: '选择要在非首页页脚第四列显示的导航菜单（必须是有实际页面的菜单）',
+      },
+    }),
+
+    // ==================================================================
     // 🎛️ Settings (设置)
     // ==================================================================
 
@@ -372,10 +408,10 @@ export const Footer = list({
   ui: {
     labelField: 'internalLabel',
     listView: {
-      initialColumns: ['internalLabel', 'formConfig', 'enabled', 'status', 'publishedAt', 'updatedAt'],
+      initialColumns: ['internalLabel', 'formConfig', 'column3Menus', 'column4Menus', 'enabled', 'status', 'publishedAt', 'updatedAt'],
       defaultFieldMode: 'read',
     },
-    description: '页脚配置 - Singleton + 草稿发布模式。现在支持关联 FormConfig 来动态配置表单字段。修改后将状态改为"已发布"才会在前端显示。',
+    description: '页脚配置 - Singleton + 草稿发布模式。支持关联 FormConfig 配置表单字段，支持选择导航菜单项用于非首页页脚的第三、第四列显示。修改后将状态改为"已发布"才会在前端显示。',
   },
 
   /**
