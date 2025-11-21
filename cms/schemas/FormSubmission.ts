@@ -289,6 +289,8 @@ export const FormSubmission = list({
     singular: 'Form Submission',
     plural: 'Form Submissions',
     description: '动态表单提交记录 - 存储所有通过 FormConfig 配置的表单数据',
+    // Hide create button in admin UI - submissions should only be created via API
+    hideCreate: true,
   },
 
   /**
