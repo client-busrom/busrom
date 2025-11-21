@@ -103,6 +103,7 @@ const FIELD_TYPES = [
   { value: 'text', label: 'Text (单行文本)' },
   { value: 'email', label: 'Email (邮箱)' },
   { value: 'tel', label: 'Tel (电话)' },
+  { value: 'url', label: 'URL (网址)' },
   { value: 'textarea', label: 'Textarea (多行文本)' },
   { value: 'number', label: 'Number (数字)' },
   { value: 'select', label: 'Select (下拉选择)' },
@@ -357,7 +358,7 @@ function FieldEditorModal({
           </div>
 
           {/* Validation - Min/Max Length for text fields */}
-          {['text', 'textarea', 'email', 'tel'].includes(editingField.fieldType) && (
+          {['text', 'textarea', 'email', 'tel', 'url'].includes(editingField.fieldType) && (
             <div>
               <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
                 Validation (验证规则)
@@ -615,34 +616,86 @@ function FieldEditorModal({
                 File Upload Options (文件上传选项)
               </label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {/* Accept File Types */}
+                {/* Accept File Types - Checkboxes */}
                 <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '13px', color: '#6b7280' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', color: '#6b7280' }}>
                     Accept File Types (接受的文件类型)
                   </label>
-                  <input
-                    type="text"
-                    value={(editingField.validation as any)?.accept || ''}
-                    onChange={(e) =>
-                      setEditingField({
-                        ...editingField,
-                        validation: {
-                          ...editingField.validation,
-                          accept: e.target.value || undefined,
-                        } as any,
-                      })
-                    }
-                    placeholder="e.g., image/*, .pdf, .doc, .docx"
-                    style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      fontSize: '14px',
-                      border: '1px solid #cbd5e0',
-                      borderRadius: '6px',
-                    }}
-                  />
-                  <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '2px' }}>
-                    Examples: image/* (所有图片), .pdf (PDF文件), .doc,.docx (Word文档)
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '8px',
+                    padding: '12px',
+                    background: '#f9fafb',
+                    borderRadius: '6px',
+                    border: '1px solid #e5e7eb'
+                  }}>
+                    {[
+                      { value: 'image/*', label: '🖼️ All Images (所有图片)', desc: 'jpg, png, gif, webp, bmp' },
+                      { value: '.pdf', label: '📄 PDF Documents', desc: 'Portable Document Format' },
+                      { value: '.doc,.docx', label: '📝 Word Documents', desc: 'Microsoft Word files' },
+                      { value: '.xls,.xlsx', label: '📊 Excel Files', desc: 'Microsoft Excel files' },
+                      { value: '.txt', label: '📃 Text Files', desc: 'Plain text documents' },
+                      { value: '.md', label: '📋 Markdown Files', desc: 'Markdown documents' },
+                    ].map((fileType) => {
+                      const currentAccept = (editingField.validation as any)?.accept || ''
+                      const acceptTypes = currentAccept.split(',').map((t: string) => t.trim()).filter(Boolean)
+                      const isChecked = fileType.value.split(',').some((v: string) => acceptTypes.includes(v.trim()))
+
+                      return (
+                        <div
+                          key={fileType.value}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            padding: '8px',
+                            background: 'white',
+                            borderRadius: '4px',
+                            border: isChecked ? '2px solid #10b981' : '1px solid #e5e7eb',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s'
+                          }}
+                          onClick={() => {
+                            const currentAccept = (editingField.validation as any)?.accept || ''
+                            let acceptTypes = currentAccept.split(',').map((t: string) => t.trim()).filter(Boolean)
+
+                            const fileTypeValues = fileType.value.split(',').map((v: string) => v.trim())
+
+                            if (isChecked) {
+                              // Remove all values from this file type
+                              acceptTypes = acceptTypes.filter((t: string) => !fileTypeValues.includes(t))
+                            } else {
+                              // Add all values from this file type
+                              acceptTypes = [...acceptTypes, ...fileTypeValues]
+                            }
+
+                            setEditingField({
+                              ...editingField,
+                              validation: {
+                                ...editingField.validation,
+                                accept: acceptTypes.join(', ') || undefined,
+                              } as any,
+                            })
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => {}} // Handled by parent div onClick
+                              style={{ cursor: 'pointer' }}
+                            />
+                            <span style={{ fontSize: '13px', fontWeight: 500 }}>{fileType.label}</span>
+                          </div>
+                          <div style={{ fontSize: '11px', color: '#6b7280', marginLeft: '22px' }}>
+                            {fileType.desc}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '6px' }}>
+                    Selected: {(editingField.validation as any)?.accept || 'None'}
                   </div>
                 </div>
 

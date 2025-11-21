@@ -257,6 +257,43 @@ export const FormConfig = list({
     }),
 
     // ==================================================================
+    // 📎 文件上传限制配置 (File Upload Limits)
+    // ==================================================================
+
+    /**
+     * Max Total File Size per Submission (单次提交文件总大小限制)
+     */
+    maxTotalFileSize: integer({
+      label: 'Max Total File Size per Submission (MB)',
+      defaultValue: 10,
+      ui: {
+        description: '单次提交所有文件的总大小限制(MB)，0表示不限制',
+      },
+    }),
+
+    /**
+     * Max Files per Submission (单次提交文件数量限制)
+     */
+    maxFilesPerSubmission: integer({
+      label: 'Max Files per Submission',
+      defaultValue: 3,
+      ui: {
+        description: '单次提交最多允许上传的文件数量，0表示不限制',
+      },
+    }),
+
+    /**
+     * Max File Uploads per Day (每日文件上传数量限制)
+     */
+    maxFileUploadsPerDay: integer({
+      label: 'Max File Uploads per Day (per IP)',
+      defaultValue: 10,
+      ui: {
+        description: '同一IP每日最多上传文件数量，0表示不限制。注意：此限制是基于文件数量，不是表单提交次数',
+      },
+    }),
+
+    // ==================================================================
     // 📋 发布状态
     // ==================================================================
 

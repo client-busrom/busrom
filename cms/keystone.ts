@@ -39,6 +39,7 @@ import { seedProductSystem } from './scripts/seed-product-system'
 import { seedNavigationSystem } from './scripts/seed-navigation-system'
 import { seedPermissionsSystem } from './scripts/seed-permissions-system'
 import { startActivityLogCleanup } from './lib/cleanup-activity-logs'
+import { startOrphanFileCleanup } from './lib/cleanup-orphan-files'
 import dotenv from 'dotenv'
 
 // Load environment variables
@@ -117,6 +118,9 @@ export default withAuth(
 
           // 5. Start ActivityLog auto-cleanup
           startActivityLogCleanup(context.prisma)
+
+          // 6. Start orphan file cleanup (runs every 6 hours)
+          startOrphanFileCleanup(context.prisma)
         } catch (error) {
           console.error('\n❌ Failed to seed systems:', error)
         }
@@ -378,7 +382,7 @@ export default withAuth(
         ],
 
         // 表单
-        'Forms': ['FormConfig', 'FormSubmission'],
+        'Forms': ['FormConfig', 'FormSubmission', 'TempFileUpload'],
 
         // 高级功能
         'Advanced': ['CustomScript', 'SeoSetting'],

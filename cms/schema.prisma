@@ -136,20 +136,22 @@ model SiteConfig {
 }
 
 model NavigationMenu {
-  id          String                 @id @default(uuid()) @postgresql.Uuid
-  slug        String                 @unique @default("")
-  name        Json?                  @default("{}")
-  type        NavigationMenuTypeType @default(STANDARD)
-  icon        String                 @default("")
-  mediaTags   MediaTag[]             @relation("NavigationMenu_mediaTags")
-  parent      NavigationMenu?        @relation("NavigationMenu_parent", fields: [parentId], references: [id])
-  parentId    String?                @map("parent") @postgresql.Uuid
-  children    NavigationMenu[]       @relation("NavigationMenu_parent")
-  link        String                 @default("")
-  inquiryLink String                 @default("")
-  order       Int?                   @default(1)
-  isSystem    Boolean                @default(false)
-  visible     Boolean                @default(true)
+  id                       String                 @id @default(uuid()) @postgresql.Uuid
+  slug                     String                 @unique @default("")
+  name                     Json?                  @default("{}")
+  type                     NavigationMenuTypeType @default(STANDARD)
+  icon                     String                 @default("")
+  mediaTags                MediaTag[]             @relation("NavigationMenu_mediaTags")
+  parent                   NavigationMenu?        @relation("NavigationMenu_parent", fields: [parentId], references: [id])
+  parentId                 String?                @map("parent") @postgresql.Uuid
+  children                 NavigationMenu[]       @relation("NavigationMenu_parent")
+  link                     String                 @default("")
+  inquiryLink              String                 @default("")
+  order                    Int?                   @default(1)
+  isSystem                 Boolean                @default(false)
+  visible                  Boolean                @default(true)
+  from_Footer_column3Menus Footer[]               @relation("Footer_column3Menus")
+  from_Footer_column4Menus Footer[]               @relation("Footer_column4Menus")
 
   @@index([parentId])
 }
@@ -494,31 +496,33 @@ model BrandValue {
 }
 
 model Footer {
-  id                     Int         @id
-  internalLabel          String      @unique @default("Footer Configuration")
-  formConfig             FormConfig? @relation("Footer_formConfig", fields: [formConfigId], references: [id])
-  formConfigId           String?     @map("formConfig") @postgresql.Uuid
-  formTitle              Json?       @default("{}")
-  formPlaceholderName    Json?       @default("{}")
-  formPlaceholderEmail   Json?       @default("{}")
-  formPlaceholderMessage Json?       @default("{}")
-  formButtonText         Json?       @default("{}")
-  contactTitle           Json?       @default("{}")
-  contactEmailLabel      Json?       @default("{}")
-  contactEmail           Json?       @default("{}")
-  afterSalesLabel        Json?       @default("{}")
-  afterSalesEmail        Json?       @default("{}")
-  whatsappLabel          Json?       @default("{}")
-  whatsappNumber         Json?       @default("{}")
-  officialNoticeTitle    Json?       @default("{}")
-  officialNoticeLine1    Json?       @default("{}")
-  officialNoticeLine2    Json?       @default("{}")
-  officialNoticeLine3    Json?       @default("{}")
-  officialNoticeLine4    Json?       @default("{}")
-  enabled                Boolean     @default(true)
-  status                 String      @default("DRAFT")
+  id                     Int              @id
+  internalLabel          String           @unique @default("Footer Configuration")
+  formConfig             FormConfig?      @relation("Footer_formConfig", fields: [formConfigId], references: [id])
+  formConfigId           String?          @map("formConfig") @postgresql.Uuid
+  formTitle              Json?            @default("{}")
+  formPlaceholderName    Json?            @default("{}")
+  formPlaceholderEmail   Json?            @default("{}")
+  formPlaceholderMessage Json?            @default("{}")
+  formButtonText         Json?            @default("{}")
+  contactTitle           Json?            @default("{}")
+  contactEmailLabel      Json?            @default("{}")
+  contactEmail           Json?            @default("{}")
+  afterSalesLabel        Json?            @default("{}")
+  afterSalesEmail        Json?            @default("{}")
+  whatsappLabel          Json?            @default("{}")
+  whatsappNumber         Json?            @default("{}")
+  officialNoticeTitle    Json?            @default("{}")
+  officialNoticeLine1    Json?            @default("{}")
+  officialNoticeLine2    Json?            @default("{}")
+  officialNoticeLine3    Json?            @default("{}")
+  officialNoticeLine4    Json?            @default("{}")
+  column3Menus           NavigationMenu[] @relation("Footer_column3Menus")
+  column4Menus           NavigationMenu[] @relation("Footer_column4Menus")
+  enabled                Boolean          @default(true)
+  status                 String           @default("DRAFT")
   publishedAt            DateTime?
-  updatedAt              DateTime?   @updatedAt
+  updatedAt              DateTime?        @updatedAt
 
   @@index([formConfigId])
 }
@@ -821,6 +825,9 @@ model FormConfig {
   autoReplyContent               Json?                  @default("{}")
   enableCaptcha                  Boolean                @default(false)
   maxSubmissionsPerDay           Int?                   @default(10)
+  maxTotalFileSize               Int?                   @default(10)
+  maxFilesPerSubmission          Int?                   @default(3)
+  maxFileUploadsPerDay           Int?                   @default(10)
   status                         String                 @default("DRAFT")
   publishedAt                    DateTime?
   createdAt                      DateTime?              @default(now())
@@ -831,24 +838,44 @@ model FormConfig {
 }
 
 model FormSubmission {
-  id            String                           @id @default(uuid()) @postgresql.Uuid
-  formConfig    FormConfig?                      @relation("FormSubmission_formConfig", fields: [formConfigId], references: [id])
-  formConfigId  String?                          @map("formConfig") @postgresql.Uuid
-  formName      String                           @default("")
-  data          Json?
-  status        FormSubmissionStatusType         @default(UNREAD)
-  autoSubmitted FormSubmissionAutoSubmittedType? @default(MANUAL)
-  locale        String                           @default("")
-  sourcePage    String                           @default("")
-  ipAddress     String                           @default("")
-  userAgent     String                           @default("")
-  adminNotes    String                           @default("")
-  emailSent     Boolean                          @default(false)
-  submittedAt   DateTime?                        @default(now())
-  readAt        DateTime?
-  updatedAt     DateTime?                        @updatedAt
+  id                  String                           @id @default(uuid()) @postgresql.Uuid
+  formConfig          FormConfig?                      @relation("FormSubmission_formConfig", fields: [formConfigId], references: [id])
+  formConfigId        String?                          @map("formConfig") @postgresql.Uuid
+  formName            String                           @default("")
+  data                Json?
+  attachments         Json?                            @default("[]")
+  totalAttachmentSize Int?                             @default(0)
+  status              FormSubmissionStatusType         @default(UNREAD)
+  autoSubmitted       FormSubmissionAutoSubmittedType? @default(MANUAL)
+  locale              String                           @default("")
+  sourcePage          String                           @default("")
+  ipAddress           String                           @default("")
+  userAgent           String                           @default("")
+  adminNotes          String                           @default("")
+  emailSent           Boolean                          @default(false)
+  submittedAt         DateTime?                        @default(now())
+  readAt              DateTime?
+  updatedAt           DateTime?                        @updatedAt
 
   @@index([formConfigId])
+}
+
+model TempFileUpload {
+  id           String    @id @default(uuid()) @postgresql.Uuid
+  fileUrl      String    @default("")
+  fileName     String    @default("")
+  fileSize     Int
+  fileType     String    @default("")
+  formConfigId String    @default("")
+  fieldName    String    @default("")
+  ipAddress    String    @default("")
+  status       String    @default("PENDING")
+  uploadedAt   DateTime? @default(now())
+  usedAt       DateTime?
+  orphanedAt   DateTime?
+
+  @@index([fileUrl])
+  @@index([ipAddress])
 }
 
 model CustomScript {

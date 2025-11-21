@@ -32,13 +32,95 @@ const getFieldLabel = (key: string): string => {
   return FIELD_LABELS[key] || key
 }
 
+// 检查是否是 URL
+const isUrl = (str: string): boolean => {
+  try {
+    const url = new URL(str)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+// 从 URL 中提取文件名
+const getFileNameFromUrl = (url: string): string => {
+  try {
+    const pathname = new URL(url).pathname
+    const parts = pathname.split('/')
+    return parts[parts.length - 1] || url
+  } catch {
+    return url
+  }
+}
+
 // 渲染单个字段值
-const renderValue = (val: any): React.ReactNode => {
+const renderValue = (val: any, fieldKey?: string): React.ReactNode => {
   // 数组类型 - 显示为标签组
   if (Array.isArray(val)) {
     if (val.length === 0) {
       return <span style={{ color: '#999', fontStyle: 'italic' }}>—</span>
     }
+
+    // 检查是否是文件 URL 数组
+    const isFileArray = val.every(item => typeof item === 'string' && isUrl(item))
+
+    if (isFileArray) {
+      // 显示为文件链接列表
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {val.map((url, idx) => {
+            const fileName = getFileNameFromUrl(url)
+            const isImage = /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(fileName)
+
+            return (
+              <div
+                key={idx}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 12px',
+                  background: '#f8f9fa',
+                  border: '1px solid #e9ecef',
+                  borderRadius: '6px',
+                }}
+              >
+                <span style={{ fontSize: '20px' }}>
+                  {isImage ? '🖼️' : '📎'}
+                </span>
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    flex: 1,
+                    fontSize: '13px',
+                    color: '#0066cc',
+                    textDecoration: 'none',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.textDecoration = 'underline'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.textDecoration = 'none'
+                  }}
+                >
+                  {fileName}
+                </a>
+                <span style={{ fontSize: '11px', color: '#6c757d' }}>
+                  #{idx + 1}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      )
+    }
+
+    // 普通数组 - 显示为标签组
     return (
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
         {val.map((item, idx) => (
@@ -167,7 +249,10 @@ export const Field = ({ field, value }: FieldProps<typeof controller>) => {
               gap: '16px',
             }}
           >
-            {Object.entries(parsedValue).map(([key, val]) => (
+            {Object.entries(parsedValue)
+              // 过滤掉文件字段（file, files, attachment, attachments）
+              .filter(([key]) => !['file', 'files', 'attachment', 'attachments'].includes(key.toLowerCase()))
+              .map(([key, val]) => (
               <div
                 key={key}
                 style={{
@@ -222,7 +307,7 @@ export const Field = ({ field, value }: FieldProps<typeof controller>) => {
                 userSelect: 'none',
               }}
             >
-              🔍 查看原始 JSON 数据
+              🔍 查看原始 JSON 数据（不含附件字段）
             </summary>
             <pre
               style={{
@@ -238,7 +323,15 @@ export const Field = ({ field, value }: FieldProps<typeof controller>) => {
                 fontFamily: "'Fira Code', 'Consolas', monospace",
               }}
             >
-              {JSON.stringify(parsedValue, null, 2)}
+              {JSON.stringify(
+                Object.fromEntries(
+                  Object.entries(parsedValue).filter(
+                    ([key]) => !['file', 'files', 'attachment', 'attachments'].includes(key.toLowerCase())
+                  )
+                ),
+                null,
+                2
+              )}
             </pre>
           </details>
         </div>

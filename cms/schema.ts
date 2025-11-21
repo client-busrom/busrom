@@ -25,6 +25,7 @@ import { ApplicationContentTranslation } from './schemas/ApplicationContentTrans
 import { FaqItem } from './schemas/FaqItem'
 import { FormConfig } from './schemas/FormConfig'
 import { FormSubmission } from './schemas/FormSubmission'
+import { TempFileUpload } from './schemas/TempFileUpload'
 import { CustomScript } from './schemas/CustomScript'
 import { SeoSetting } from './schemas/SeoSetting'
 import { SiteConfig } from './schemas/SiteConfig'
@@ -157,6 +158,7 @@ export const lists = {
   // Forms
   FormConfig,
   FormSubmission,
+  TempFileUpload,
 
   // Advanced Features
   CustomScript,

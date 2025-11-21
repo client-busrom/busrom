@@ -25,11 +25,11 @@ if [ -d "migrations" ] && [ ! -d "prisma/migrations" ]; then
   echo "✓ Created symlink: prisma/migrations -> ../migrations"
 fi
 
-echo "=== ABOUT TO SYNC DATABASE SCHEMA ==="
-# Use db push instead of migrate deploy for automatic schema sync
-# This ensures any new fields added to Keystone models are automatically added to the database
-npx prisma db push --schema=./schema.prisma --accept-data-loss
-echo "=== DATABASE SCHEMA SYNC COMPLETED ==="
+echo "=== ABOUT TO RUN DATABASE MIGRATIONS ==="
+# Run migrations in production (safe, no data loss)
+# This applies all pending migrations from the migrations/ directory
+npx prisma migrate deploy --schema=./schema.prisma
+echo "=== DATABASE MIGRATIONS COMPLETED ==="
 
 echo "=== CHECKING ENVIRONMENT ==="
 echo "Current directory: $(pwd)"
