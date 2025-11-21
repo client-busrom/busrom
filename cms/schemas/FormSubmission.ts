@@ -12,7 +12,7 @@
  */
 
 import { list } from '@keystone-6/core'
-import { text, select, timestamp, json, relationship, checkbox } from '@keystone-6/core/fields'
+import { text, select, timestamp, json, relationship, checkbox, integer } from '@keystone-6/core/fields'
 import { queueFormSubmissionNotification } from '../lib/email-queue'
 
 export const FormSubmission = list({
@@ -29,7 +29,9 @@ export const FormSubmission = list({
       label: 'Form Configuration',
       ui: {
         displayMode: 'select',
-        description: '关联的表单配置',
+        createView: { fieldMode: 'hidden' },
+        itemView: { fieldMode: 'read' },
+        description: '关联的表单配置（自动设置，不可修改）',
       },
     }),
 
@@ -69,6 +71,46 @@ export const FormSubmission = list({
       ui: {
         views: './custom-fields/JSONField',
         description: '表单提交的所有字段数据',
+      },
+    }),
+
+    /**
+     * Attachments (附件)
+     * 存储上传的文件信息
+     *
+     * 示例:
+     * [
+     *   {
+     *     fieldName: "resume",
+     *     fileName: "resume.pdf",
+     *     fileUrl: "https://cdn.example.com/form-attachments/abc123/1234567890-hash.pdf",
+     *     fileSize: 1024000,
+     *     fileType: "application/pdf",
+     *     uploadedAt: "2025-11-21T12:00:00Z"
+     *   }
+     * ]
+     */
+    attachments: json({
+      label: 'Attachments (附件)',
+      defaultValue: [],
+      ui: {
+        views: './custom-fields/AttachmentsField',
+        description: '表单附件文件列表',
+      },
+    }),
+
+    /**
+     * Total Attachment Size (附件总大小)
+     * 用于统计和限制检查
+     */
+    totalAttachmentSize: integer({
+      label: 'Total Attachment Size (附件总大小)',
+      defaultValue: 0,
+      ui: {
+        views: './custom-fields/FileSizeField',
+        createView: { fieldMode: 'hidden' },
+        itemView: { fieldMode: 'read' },
+        description: '所有附件的总大小',
       },
     }),
 

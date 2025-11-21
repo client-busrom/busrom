@@ -2623,6 +2623,10 @@ type Footer {
   officialNoticeLine2: JSON
   officialNoticeLine3: JSON
   officialNoticeLine4: JSON
+  column3Menus(where: NavigationMenuWhereInput! = {}, orderBy: [NavigationMenuOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: NavigationMenuWhereUniqueInput): [NavigationMenu!]
+  column3MenusCount(where: NavigationMenuWhereInput! = {}): Int
+  column4Menus(where: NavigationMenuWhereInput! = {}, orderBy: [NavigationMenuOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: NavigationMenuWhereUniqueInput): [NavigationMenu!]
+  column4MenusCount(where: NavigationMenuWhereInput! = {}): Int
   enabled: Boolean
   status: String
   publishedAt: DateTime
@@ -2641,6 +2645,8 @@ input FooterWhereInput {
   id: IDFilter
   internalLabel: StringFilter
   formConfig: FormConfigWhereInput
+  column3Menus: NavigationMenuManyRelationFilter
+  column4Menus: NavigationMenuManyRelationFilter
   enabled: BooleanFilter
   status: StringFilter
   publishedAt: DateTimeNullableFilter
@@ -2676,6 +2682,8 @@ input FooterUpdateInput {
   officialNoticeLine2: JSON
   officialNoticeLine3: JSON
   officialNoticeLine4: JSON
+  column3Menus: NavigationMenuRelateToManyForUpdateInput
+  column4Menus: NavigationMenuRelateToManyForUpdateInput
   enabled: Boolean
   status: String
   publishedAt: DateTime
@@ -2707,6 +2715,8 @@ input FooterCreateInput {
   officialNoticeLine2: JSON
   officialNoticeLine3: JSON
   officialNoticeLine4: JSON
+  column3Menus: NavigationMenuRelateToManyForCreateInput
+  column4Menus: NavigationMenuRelateToManyForCreateInput
   enabled: Boolean
   status: String
   publishedAt: DateTime
@@ -4175,6 +4185,9 @@ type FormConfig {
   autoReplyContent: JSON
   enableCaptcha: Boolean
   maxSubmissionsPerDay: Int
+  maxTotalFileSize: Int
+  maxFilesPerSubmission: Int
+  maxFileUploadsPerDay: Int
   status: String
   publishedAt: DateTime
   createdAt: DateTime
@@ -4206,6 +4219,9 @@ input FormConfigWhereInput {
   enableAutoReply: BooleanFilter
   enableCaptcha: BooleanFilter
   maxSubmissionsPerDay: IntNullableFilter
+  maxTotalFileSize: IntNullableFilter
+  maxFilesPerSubmission: IntNullableFilter
+  maxFileUploadsPerDay: IntNullableFilter
   status: StringFilter
   publishedAt: DateTimeNullableFilter
   createdAt: DateTimeNullableFilter
@@ -4228,6 +4244,9 @@ input FormConfigOrderByInput {
   enableAutoReply: OrderDirection
   enableCaptcha: OrderDirection
   maxSubmissionsPerDay: OrderDirection
+  maxTotalFileSize: OrderDirection
+  maxFilesPerSubmission: OrderDirection
+  maxFileUploadsPerDay: OrderDirection
   status: OrderDirection
   publishedAt: OrderDirection
   createdAt: OrderDirection
@@ -4250,6 +4269,9 @@ input FormConfigUpdateInput {
   autoReplyContent: JSON
   enableCaptcha: Boolean
   maxSubmissionsPerDay: Int
+  maxTotalFileSize: Int
+  maxFilesPerSubmission: Int
+  maxFileUploadsPerDay: Int
   status: String
   publishedAt: DateTime
   createdAt: DateTime
@@ -4277,6 +4299,9 @@ input FormConfigCreateInput {
   autoReplyContent: JSON
   enableCaptcha: Boolean
   maxSubmissionsPerDay: Int
+  maxTotalFileSize: Int
+  maxFilesPerSubmission: Int
+  maxFileUploadsPerDay: Int
   status: String
   publishedAt: DateTime
   createdAt: DateTime
@@ -4288,6 +4313,8 @@ type FormSubmission {
   formConfig: FormConfig
   formName: String
   data: JSON
+  attachments: JSON
+  totalAttachmentSize: Int
   status: FormSubmissionStatusType
   autoSubmitted: FormSubmissionAutoSubmittedType
   locale: String
@@ -4323,6 +4350,7 @@ input FormSubmissionWhereInput {
   id: IDFilter
   formConfig: FormConfigWhereInput
   formName: StringFilter
+  totalAttachmentSize: IntNullableFilter
   status: FormSubmissionStatusTypeNullableFilter
   autoSubmitted: FormSubmissionAutoSubmittedTypeNullableFilter
   locale: StringFilter
@@ -4353,6 +4381,7 @@ input FormSubmissionAutoSubmittedTypeNullableFilter {
 input FormSubmissionOrderByInput {
   id: OrderDirection
   formName: OrderDirection
+  totalAttachmentSize: OrderDirection
   status: OrderDirection
   autoSubmitted: OrderDirection
   locale: OrderDirection
@@ -4370,6 +4399,8 @@ input FormSubmissionUpdateInput {
   formConfig: FormConfigRelateToOneForUpdateInput
   formName: String
   data: JSON
+  attachments: JSON
+  totalAttachmentSize: Int
   status: FormSubmissionStatusType
   autoSubmitted: FormSubmissionAutoSubmittedType
   locale: String
@@ -4392,6 +4423,8 @@ input FormSubmissionCreateInput {
   formConfig: FormConfigRelateToOneForCreateInput
   formName: String
   data: JSON
+  attachments: JSON
+  totalAttachmentSize: Int
   status: FormSubmissionStatusType
   autoSubmitted: FormSubmissionAutoSubmittedType
   locale: String
@@ -4403,6 +4436,91 @@ input FormSubmissionCreateInput {
   submittedAt: DateTime
   readAt: DateTime
   updatedAt: DateTime
+}
+
+type TempFileUpload {
+  id: ID!
+  fileUrl: String
+  fileName: String
+  fileSize: Int
+  fileType: String
+  formConfigId: String
+  fieldName: String
+  ipAddress: String
+  status: String
+  uploadedAt: DateTime
+  usedAt: DateTime
+  orphanedAt: DateTime
+}
+
+input TempFileUploadWhereUniqueInput {
+  id: ID
+}
+
+input TempFileUploadWhereInput {
+  AND: [TempFileUploadWhereInput!]
+  OR: [TempFileUploadWhereInput!]
+  NOT: [TempFileUploadWhereInput!]
+  id: IDFilter
+  fileUrl: StringFilter
+  fileName: StringFilter
+  fileSize: IntFilter
+  fileType: StringFilter
+  formConfigId: StringFilter
+  fieldName: StringFilter
+  ipAddress: StringFilter
+  status: StringFilter
+  uploadedAt: DateTimeNullableFilter
+  usedAt: DateTimeNullableFilter
+  orphanedAt: DateTimeNullableFilter
+}
+
+input TempFileUploadOrderByInput {
+  id: OrderDirection
+  fileUrl: OrderDirection
+  fileName: OrderDirection
+  fileSize: OrderDirection
+  fileType: OrderDirection
+  formConfigId: OrderDirection
+  fieldName: OrderDirection
+  ipAddress: OrderDirection
+  status: OrderDirection
+  uploadedAt: OrderDirection
+  usedAt: OrderDirection
+  orphanedAt: OrderDirection
+}
+
+input TempFileUploadUpdateInput {
+  fileUrl: String
+  fileName: String
+  fileSize: Int
+  fileType: String
+  formConfigId: String
+  fieldName: String
+  ipAddress: String
+  status: String
+  uploadedAt: DateTime
+  usedAt: DateTime
+  orphanedAt: DateTime
+}
+
+input TempFileUploadUpdateArgs {
+  where: TempFileUploadWhereUniqueInput!
+  data: TempFileUploadUpdateInput!
+}
+
+input TempFileUploadCreateInput {
+  fileUrl: String
+  fileName: String
+  fileSize: Int
+  fileType: String
+  formConfigId: String
+  fieldName: String
+  ipAddress: String
+  status: String
+  uploadedAt: DateTime
+  usedAt: DateTime
+  orphanedAt: DateTime
 }
 
 type CustomScript {
@@ -5057,6 +5175,12 @@ type Mutation {
   updateFormSubmissions(data: [FormSubmissionUpdateArgs!]!): [FormSubmission]
   deleteFormSubmission(where: FormSubmissionWhereUniqueInput!): FormSubmission
   deleteFormSubmissions(where: [FormSubmissionWhereUniqueInput!]!): [FormSubmission]
+  createTempFileUpload(data: TempFileUploadCreateInput!): TempFileUpload
+  createTempFileUploads(data: [TempFileUploadCreateInput!]!): [TempFileUpload]
+  updateTempFileUpload(where: TempFileUploadWhereUniqueInput!, data: TempFileUploadUpdateInput!): TempFileUpload
+  updateTempFileUploads(data: [TempFileUploadUpdateArgs!]!): [TempFileUpload]
+  deleteTempFileUpload(where: TempFileUploadWhereUniqueInput!): TempFileUpload
+  deleteTempFileUploads(where: [TempFileUploadWhereUniqueInput!]!): [TempFileUpload]
   createCustomScript(data: CustomScriptCreateInput!): CustomScript
   createCustomScripts(data: [CustomScriptCreateInput!]!): [CustomScript]
   updateCustomScript(where: CustomScriptWhereUniqueInput!, data: CustomScriptUpdateInput!): CustomScript
@@ -5221,6 +5345,9 @@ type Query {
   formSubmission(where: FormSubmissionWhereUniqueInput!): FormSubmission
   formSubmissions(where: FormSubmissionWhereInput! = {}, orderBy: [FormSubmissionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: FormSubmissionWhereUniqueInput): [FormSubmission!]
   formSubmissionsCount(where: FormSubmissionWhereInput! = {}): Int
+  tempFileUpload(where: TempFileUploadWhereUniqueInput!): TempFileUpload
+  tempFileUploads(where: TempFileUploadWhereInput! = {}, orderBy: [TempFileUploadOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TempFileUploadWhereUniqueInput): [TempFileUpload!]
+  tempFileUploadsCount(where: TempFileUploadWhereInput! = {}): Int
   customScript(where: CustomScriptWhereUniqueInput!): CustomScript
   customScripts(where: CustomScriptWhereInput! = {}, orderBy: [CustomScriptOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: CustomScriptWhereUniqueInput): [CustomScript!]
   customScriptsCount(where: CustomScriptWhereInput! = {}): Int

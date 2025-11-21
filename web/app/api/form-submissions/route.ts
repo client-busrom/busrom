@@ -8,6 +8,8 @@ const CREATE_FORM_SUBMISSION_WITH_CONFIG = gql`
     $formId: ID!
     $formName: String
     $data: JSON!
+    $attachments: JSON
+    $totalAttachmentSize: Int
     $locale: String
     $sourcePage: String
     $ipAddress: String
@@ -19,6 +21,8 @@ const CREATE_FORM_SUBMISSION_WITH_CONFIG = gql`
         formConfig: { connect: { id: $formId } }
         formName: $formName
         data: $data
+        attachments: $attachments
+        totalAttachmentSize: $totalAttachmentSize
         locale: $locale
         sourcePage: $sourcePage
         ipAddress: $ipAddress
@@ -40,6 +44,8 @@ const CREATE_FORM_SUBMISSION_WITHOUT_CONFIG = gql`
   mutation CreateFormSubmissionWithoutConfig(
     $formName: String!
     $data: JSON!
+    $attachments: JSON
+    $totalAttachmentSize: Int
     $locale: String
     $sourcePage: String
     $ipAddress: String
@@ -50,6 +56,8 @@ const CREATE_FORM_SUBMISSION_WITHOUT_CONFIG = gql`
       data: {
         formName: $formName
         data: $data
+        attachments: $attachments
+        totalAttachmentSize: $totalAttachmentSize
         locale: $locale
         sourcePage: $sourcePage
         ipAddress: $ipAddress
@@ -73,6 +81,7 @@ export async function POST(request: NextRequest) {
       formId,
       formName,
       data,
+      attachments = [],
       locale,
       autoSubmitted = false,
     } = body
@@ -84,6 +93,11 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // 计算附件总大小
+    const totalAttachmentSize = Array.isArray(attachments)
+      ? attachments.reduce((sum: number, file: any) => sum + (file.fileSize || 0), 0)
+      : 0
 
     // 获取请求元数据
     const ipAddress = request.headers.get('x-forwarded-for') ||
@@ -98,6 +112,8 @@ export async function POST(request: NextRequest) {
     const variables: any = {
       formName: formName || 'Unknown Form',
       data,
+      attachments: Array.isArray(attachments) && attachments.length > 0 ? attachments : [],
+      totalAttachmentSize,
       locale: locale || 'en',
       sourcePage: referer,
       ipAddress,
@@ -121,6 +137,57 @@ export async function POST(request: NextRequest) {
         { error: 'Failed to submit form', details: errors },
         { status: 500 }
       )
+    }
+
+    // 标记上传的文件为已使用
+    if (Array.isArray(attachments) && attachments.length > 0) {
+      try {
+        const cmsUrl = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3000'
+        for (const attachment of attachments) {
+          // Find and update temp file upload record
+          await fetch(`${cmsUrl}/api/graphql`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query: `
+                query FindAndUpdateTempFile($fileUrl: String!) {
+                  tempFileUploads(where: { fileUrl: { equals: $fileUrl } }) {
+                    id
+                  }
+                }
+              `,
+              variables: { fileUrl: attachment.fileUrl },
+            }),
+          }).then(async (res) => {
+            const data = await res.json()
+            if (data.data?.tempFileUploads?.[0]?.id) {
+              const tempFileId = data.data.tempFileUploads[0].id
+              // Mark as USED
+              await fetch(`${cmsUrl}/api/graphql`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  query: `
+                    mutation UpdateTempFile($id: ID!) {
+                      updateTempFileUpload(
+                        where: { id: $id }
+                        data: { status: USED, usedAt: "${new Date().toISOString()}" }
+                      ) {
+                        id
+                      }
+                    }
+                  `,
+                  variables: { id: tempFileId },
+                }),
+              })
+              console.log(`✅ Marked file as USED: ${attachment.fileName}`)
+            }
+          })
+        }
+      } catch (error) {
+        console.error('⚠️ Failed to mark files as used:', error)
+        // Don't fail the submission if marking fails
+      }
     }
 
     // 返回成功响应

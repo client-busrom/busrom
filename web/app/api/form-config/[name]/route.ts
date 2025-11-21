@@ -17,6 +17,7 @@ const GET_FORM_CONFIG = gql`
       errorMessage
       enableCaptcha
       maxSubmissionsPerDay
+      maxTotalFileSize
     }
   }
 `
@@ -101,6 +102,7 @@ export async function GET(
       errorMessage: extractLocalizedText(formConfig.errorMessage),
       enableCaptcha: formConfig.enableCaptcha,
       maxSubmissionsPerDay: formConfig.maxSubmissionsPerDay,
+      maxTotalFileSize: formConfig.maxTotalFileSize,
     }
 
     return NextResponse.json(transformedConfig)
