@@ -25,6 +25,10 @@ if [ -d "migrations" ] && [ ! -d "prisma/migrations" ]; then
   echo "✓ Created symlink: prisma/migrations -> ../migrations"
 fi
 
+echo "=== FIXING FAILED MIGRATIONS (IF ANY) ==="
+# Fix any failed migration records before running new migrations
+node fix-failed-migration.mjs || echo "⚠️ Failed to fix migrations, continuing anyway..."
+
 echo "=== ABOUT TO RUN DATABASE MIGRATIONS ==="
 # Run migrations in production (safe, no data loss)
 # This applies all pending migrations from the migrations/ directory
