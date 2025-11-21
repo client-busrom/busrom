@@ -1284,5 +1284,14 @@ export const homeContent_EN: HomeContentData = {
         'Busrom Team',
       ],
     },
+    column3Menus: [
+      { slug: 'product', name: 'Product', link: '/product' },
+      { slug: 'service', name: 'Service', link: '/service' },
+      { slug: 'about-us', name: 'About Us', link: '/about-us' },
+    ],
+    column4Menus: [
+      { slug: 'contact-us', name: 'Contact Us', link: '/contact-us' },
+      { slug: 'shop', name: 'Shop', link: '/shop' },
+    ],
   },
 };
