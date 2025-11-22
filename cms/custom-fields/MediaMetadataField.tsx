@@ -42,7 +42,7 @@ export const Field = ({ field, value, onChange, autoFocus }: FieldProps<typeof c
   // Update metadata
   const updateMetadata = (updates: Partial<MediaMetadata>) => {
     const newMetadata = { ...metadata, ...updates }
-    onChange(newMetadata)
+    onChange(JSON.stringify(newMetadata))
   }
 
   // Scene type options

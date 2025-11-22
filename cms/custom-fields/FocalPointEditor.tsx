@@ -454,7 +454,7 @@ export const Field = ({ field, value, onChange, autoFocus }: FieldProps<typeof c
   }, [value])
 
   const handleSave = (focalPoint: FocalPoint) => {
-    onChange(focalPoint)
+    onChange(JSON.stringify(focalPoint))
   }
 
   return (
@@ -469,7 +469,7 @@ export const Field = ({ field, value, onChange, autoFocus }: FieldProps<typeof c
             value={currentFocalPoint.x.toString()}
             onChange={(e) => {
               const num = parseInt(e.target.value) || 0
-              onChange({ ...currentFocalPoint, x: Math.max(0, Math.min(100, num)) })
+              onChange(JSON.stringify({ ...currentFocalPoint, x: Math.max(0, Math.min(100, num)) }))
             }}
             autoFocus={autoFocus}
             placeholder="0-100"
@@ -486,7 +486,7 @@ export const Field = ({ field, value, onChange, autoFocus }: FieldProps<typeof c
             value={currentFocalPoint.y.toString()}
             onChange={(e) => {
               const num = parseInt(e.target.value) || 0
-              onChange({ ...currentFocalPoint, y: Math.max(0, Math.min(100, num)) })
+              onChange(JSON.stringify({ ...currentFocalPoint, y: Math.max(0, Math.min(100, num)) }))
             }}
             placeholder="0-100"
           />
