@@ -559,14 +559,14 @@ export const controller = (config: any) => {
     serialize: (value: any) => {
       console.log('[GroupedTagsField] serialize:', { value, path: config.path, type: typeof value })
 
-      // For relationship many fields, return the value directly
-      // Keystone will handle the correct operation (connect/set/disconnect) based on context
+      // For relationship many fields, we need to return an object with 'connect' for create/update
+      // GraphQL expects: { connect: [{ id: '...' }] }
       if (!value || !Array.isArray(value)) {
-        return { [config.path]: [] }
+        return { [config.path]: { connect: [] } }
       }
 
-      // Return array of {id} objects
-      return { [config.path]: value.map((item: any) => ({ id: item.id })) }
+      // Use 'connect' operation for relationships
+      return { [config.path]: { connect: value.map((item: any) => ({ id: item.id })) } }
     },
     validate: (value: any) => {
       // No validation errors
