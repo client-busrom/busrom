@@ -240,90 +240,99 @@ export default function BatchMediaUploadPage() {
   }, [])
 
   /**
-   * Upload all images using Keystone's native GraphQL mutation
+   * Upload a single image
+   */
+  const uploadSingleImage = async (image: ImageItem) => {
+    try {
+      updateImage(image.id, { status: 'uploading' })
+
+      // Use Keystone's native GraphQL mutation for creating Media with file upload
+      const operations = {
+        query: `
+          mutation CreateMedia($data: MediaCreateInput!) {
+            createMedia(data: $data) {
+              id
+              filename
+              file {
+                url
+              }
+            }
+          }
+        `,
+        variables: {
+          data: {
+            filename: image.filename,
+            file: { upload: null }, // Will be replaced by the actual file
+            altText: image.altText || {},
+            ...(image.primaryCategory && {
+              primaryCategory: { connect: { id: image.primaryCategory } },
+            }),
+            ...(image.tags && image.tags.length > 0 && {
+              tags: { connect: image.tags.map((id) => ({ id })) },
+            }),
+            metadata: image.metadata || {},
+            status: 'ACTIVE',
+          },
+        },
+      }
+
+      // Create FormData for multipart upload
+      const formData = new FormData()
+      formData.append('operations', JSON.stringify(operations))
+
+      // Map tells GraphQL where to put the uploaded file
+      const map = {
+        '0': ['variables.data.file.upload'],
+      }
+      formData.append('map', JSON.stringify(map))
+
+      // Append the actual file
+      formData.append('0', image.file, image.filename)
+
+      // Send to Keystone's GraphQL endpoint
+      const uploadResponse = await fetch('/api/graphql', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include', // Important for session cookies
+        headers: {
+          'apollo-require-preflight': 'true', // Required to bypass CSRF protection
+        },
+      })
+
+      if (!uploadResponse.ok) {
+        throw new Error(`HTTP error! status: ${uploadResponse.status}`)
+      }
+
+      const result = await uploadResponse.json()
+
+      if (result.errors) {
+        throw new Error(result.errors[0]?.message || 'GraphQL error')
+      }
+
+      console.log('Upload success:', result.data.createMedia)
+      updateImage(image.id, { status: 'success' })
+    } catch (error) {
+      console.error('Upload error:', error)
+      updateImage(image.id, {
+        status: 'error',
+        error: error instanceof Error ? error.message : 'Upload failed',
+      })
+    }
+  }
+
+  /**
+   * Upload all images with controlled concurrency (parallel upload)
    */
   const uploadAllImages = useCallback(async () => {
     setIsUploading(true)
 
-    for (const image of images) {
-      if (image.status === 'success') continue
+    const pendingImages = images.filter((img) => img.status !== 'success')
+    const concurrency = 3 // Upload 3 images at a time
 
-      try {
-        updateImage(image.id, { status: 'uploading' })
-
-        // Use Keystone's native GraphQL mutation for creating Media with file upload
-        const operations = {
-          query: `
-            mutation CreateMedia($data: MediaCreateInput!) {
-              createMedia(data: $data) {
-                id
-                filename
-                file {
-                  url
-                }
-              }
-            }
-          `,
-          variables: {
-            data: {
-              filename: image.filename,
-              file: { upload: null }, // Will be replaced by the actual file
-              altText: image.altText || {},
-              ...(image.primaryCategory && {
-                primaryCategory: { connect: { id: image.primaryCategory } },
-              }),
-              ...(image.tags && image.tags.length > 0 && {
-                tags: { connect: image.tags.map((id) => ({ id })) },
-              }),
-              metadata: image.metadata || {},
-              status: 'ACTIVE',
-            },
-          },
-        }
-
-        // Create FormData for multipart upload
-        const formData = new FormData()
-        formData.append('operations', JSON.stringify(operations))
-
-        // Map tells GraphQL where to put the uploaded file
-        const map = {
-          '0': ['variables.data.file.upload'],
-        }
-        formData.append('map', JSON.stringify(map))
-
-        // Append the actual file
-        formData.append('0', image.file, image.filename)
-
-        // Send to Keystone's GraphQL endpoint
-        const uploadResponse = await fetch('/api/graphql', {
-          method: 'POST',
-          body: formData,
-          credentials: 'include', // Important for session cookies
-          headers: {
-            'apollo-require-preflight': 'true', // Required to bypass CSRF protection
-          },
-        })
-
-        if (!uploadResponse.ok) {
-          throw new Error(`HTTP error! status: ${uploadResponse.status}`)
-        }
-
-        const result = await uploadResponse.json()
-
-        if (result.errors) {
-          throw new Error(result.errors[0]?.message || 'GraphQL error')
-        }
-
-        console.log('Upload success:', result.data.createMedia)
-
-        updateImage(image.id, { status: 'success' })
-      } catch (error) {
-        console.error('Upload error:', error)
-        updateImage(image.id, {
-          status: 'error',
-          error: error instanceof Error ? error.message : 'Upload failed',
-        })
-      }
+    // Process images in batches
+    for (let i = 0; i < pendingImages.length; i += concurrency) {
+      const batch = pendingImages.slice(i, i + concurrency)
+      await Promise.all(batch.map((image) => uploadSingleImage(image)))
     }
 
     setIsUploading(false)
