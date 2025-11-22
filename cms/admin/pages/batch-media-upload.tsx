@@ -28,9 +28,9 @@ interface ImageItem {
   primaryCategory?: string
   tags?: string[]
   metadata?: {
-    sceneNumber?: number
-    sceneType?: string
     seriesNumber?: number
+    combinationNumber?: number
+    sceneNumber?: number
     specs?: string[]
     colors?: string[]
     notes?: string
@@ -45,9 +45,9 @@ interface BatchFields {
   altTextEn?: string
   primaryCategory?: string
   tags?: string[]
-  sceneType?: string
-  sceneNumber?: number
   seriesNumber?: number
+  combinationNumber?: number
+  sceneNumber?: number
   specs?: string[]
   colors?: string[]
   notes?: string
@@ -208,9 +208,9 @@ export default function BatchMediaUploadPage() {
           tags: batchFields.tags && batchFields.tags.length > 0 ? batchFields.tags : img.tags,
           metadata: {
             ...(img.metadata || {}),
-            sceneType: batchFields.sceneType || img.metadata?.sceneType,
-            sceneNumber: batchFields.sceneNumber || img.metadata?.sceneNumber,
             seriesNumber: batchFields.seriesNumber || img.metadata?.seriesNumber,
+            combinationNumber: batchFields.combinationNumber || img.metadata?.combinationNumber,
+            sceneNumber: batchFields.sceneNumber || img.metadata?.sceneNumber,
             specs: batchFields.specs && batchFields.specs.length > 0 ? batchFields.specs : img.metadata?.specs,
             colors:
               batchFields.colors && batchFields.colors.length > 0 ? batchFields.colors : img.metadata?.colors,
@@ -340,13 +340,6 @@ export default function BatchMediaUploadPage() {
     acc[type].push(tag)
     return acc
   }, {})
-
-  const sceneTypeOptions = [
-    { label: '请选择', value: '' },
-    { label: '单独', value: '单独' },
-    { label: '组合', value: '组合' },
-    { label: '系列', value: '系列' },
-  ]
 
   return (
     <PageContainer header={<Heading type="h3">📤 批量上传媒体文件</Heading>}>
@@ -533,34 +526,6 @@ export default function BatchMediaUploadPage() {
                   </h4>
 
                   <div css={{ display: 'grid', gap: '12px' }}>
-                    {/* Scene Number */}
-                    <FieldContainer>
-                      <FieldLabel>场景编号 (Scene Number)</FieldLabel>
-                      <TextInput
-                        type="number"
-                        value={batchFields.sceneNumber?.toString() || ''}
-                        onChange={(e) =>
-                          setBatchFields({
-                            ...batchFields,
-                            sceneNumber: e.target.value ? parseInt(e.target.value) : undefined,
-                          })
-                        }
-                        placeholder="例如: 1, 2, 3..."
-                      />
-                    </FieldContainer>
-
-                    {/* Scene Type */}
-                    <FieldContainer>
-                      <FieldLabel>场景类型 (Scene Type)</FieldLabel>
-                      <Select
-                        value={sceneTypeOptions.find((opt) => opt.value === batchFields.sceneType) || null}
-                        onChange={(option: any) =>
-                          setBatchFields({ ...batchFields, sceneType: option?.value || '' })
-                        }
-                        options={sceneTypeOptions}
-                      />
-                    </FieldContainer>
-
                     {/* Series Number */}
                     <FieldContainer>
                       <FieldLabel>系列编号 (Series Number)</FieldLabel>
@@ -571,6 +536,38 @@ export default function BatchMediaUploadPage() {
                           setBatchFields({
                             ...batchFields,
                             seriesNumber: e.target.value ? parseInt(e.target.value) : undefined,
+                          })
+                        }
+                        placeholder="例如: 1, 2, 3..."
+                      />
+                    </FieldContainer>
+
+                    {/* Combination Number */}
+                    <FieldContainer>
+                      <FieldLabel>组合编号 (Combination Number)</FieldLabel>
+                      <TextInput
+                        type="number"
+                        value={batchFields.combinationNumber?.toString() || ''}
+                        onChange={(e) =>
+                          setBatchFields({
+                            ...batchFields,
+                            combinationNumber: e.target.value ? parseInt(e.target.value) : undefined,
+                          })
+                        }
+                        placeholder="例如: 1, 2, 3..."
+                      />
+                    </FieldContainer>
+
+                    {/* Scene Number */}
+                    <FieldContainer>
+                      <FieldLabel>场景编号 (Scene Number)</FieldLabel>
+                      <TextInput
+                        type="number"
+                        value={batchFields.sceneNumber?.toString() || ''}
+                        onChange={(e) =>
+                          setBatchFields({
+                            ...batchFields,
+                            sceneNumber: e.target.value ? parseInt(e.target.value) : undefined,
                           })
                         }
                         placeholder="例如: 1, 2, 3..."
@@ -914,43 +911,6 @@ export default function BatchMediaUploadPage() {
                     </h4>
 
                     <div css={{ display: 'grid', gap: '12px' }}>
-                      {/* Individual Scene Number */}
-                      <FieldContainer>
-                        <FieldLabel>场景编号 (Scene Number)</FieldLabel>
-                        <TextInput
-                          type="number"
-                          value={selectedImage.metadata?.sceneNumber?.toString() || ''}
-                          onChange={(e) =>
-                            updateImage(selectedImage.id, {
-                              metadata: {
-                                ...selectedImage.metadata,
-                                sceneNumber: e.target.value ? parseInt(e.target.value) : undefined,
-                              },
-                            })
-                          }
-                          placeholder="例如: 1, 2, 3..."
-                        />
-                      </FieldContainer>
-
-                      {/* Individual Scene Type */}
-                      <FieldContainer>
-                        <FieldLabel>场景类型 (Scene Type)</FieldLabel>
-                        <Select
-                          value={
-                            sceneTypeOptions.find((opt) => opt.value === selectedImage.metadata?.sceneType) || null
-                          }
-                          onChange={(option: any) =>
-                            updateImage(selectedImage.id, {
-                              metadata: {
-                                ...selectedImage.metadata,
-                                sceneType: option?.value || '',
-                              },
-                            })
-                          }
-                          options={sceneTypeOptions}
-                        />
-                      </FieldContainer>
-
                       {/* Individual Series Number */}
                       <FieldContainer>
                         <FieldLabel>系列编号 (Series Number)</FieldLabel>
@@ -962,6 +922,42 @@ export default function BatchMediaUploadPage() {
                               metadata: {
                                 ...selectedImage.metadata,
                                 seriesNumber: e.target.value ? parseInt(e.target.value) : undefined,
+                              },
+                            })
+                          }
+                          placeholder="例如: 1, 2, 3..."
+                        />
+                      </FieldContainer>
+
+                      {/* Individual Combination Number */}
+                      <FieldContainer>
+                        <FieldLabel>组合编号 (Combination Number)</FieldLabel>
+                        <TextInput
+                          type="number"
+                          value={selectedImage.metadata?.combinationNumber?.toString() || ''}
+                          onChange={(e) =>
+                            updateImage(selectedImage.id, {
+                              metadata: {
+                                ...selectedImage.metadata,
+                                combinationNumber: e.target.value ? parseInt(e.target.value) : undefined,
+                              },
+                            })
+                          }
+                          placeholder="例如: 1, 2, 3..."
+                        />
+                      </FieldContainer>
+
+                      {/* Individual Scene Number */}
+                      <FieldContainer>
+                        <FieldLabel>场景编号 (Scene Number)</FieldLabel>
+                        <TextInput
+                          type="number"
+                          value={selectedImage.metadata?.sceneNumber?.toString() || ''}
+                          onChange={(e) =>
+                            updateImage(selectedImage.id, {
+                              metadata: {
+                                ...selectedImage.metadata,
+                                sceneNumber: e.target.value ? parseInt(e.target.value) : undefined,
                               },
                             })
                           }
