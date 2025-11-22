@@ -267,6 +267,13 @@ export default withAuth(
               cdnDomain = `https://${cdnDomain}`;
             }
 
+            // For MinIO (local), include bucket name in URL
+            // For CloudFront (production), bucket name is not needed
+            const bucketName = process.env.S3_BUCKET_NAME || 'busrom-media';
+            if (process.env.USE_MINIO === 'true') {
+              return `${cdnDomain}/${bucketName}/${filename}`;
+            }
+
             return `${cdnDomain}/${filename}`;
           },
         }),
