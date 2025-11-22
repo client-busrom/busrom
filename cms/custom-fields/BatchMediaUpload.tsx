@@ -36,9 +36,9 @@ interface ImageItem {
   primaryCategory?: string
   tags?: string[]
   metadata?: {
-    sceneNumber?: number
-    sceneType?: string
     seriesNumber?: number
+    combinationNumber?: number
+    sceneNumber?: number
     specs?: string[]
     colors?: string[]
     notes?: string
@@ -55,7 +55,9 @@ interface BatchFields {
   altText?: string // Will be used for zh locale
   primaryCategory?: string
   tags?: string[]
-  sceneType?: string
+  seriesNumber?: string
+  combinationNumber?: string
+  sceneNumber?: string
   specs?: string[]
   colors?: string[]
   notes?: string
@@ -142,7 +144,9 @@ export const Field = ({ field, value, onChange }: FieldProps<typeof controller>)
         tags: batchFields.tags && batchFields.tags.length > 0 ? batchFields.tags : img.tags,
         metadata: {
           ...img.metadata,
-          sceneType: batchFields.sceneType || img.metadata?.sceneType,
+          seriesNumber: batchFields.seriesNumber ? parseInt(batchFields.seriesNumber) : img.metadata?.seriesNumber,
+          combinationNumber: batchFields.combinationNumber ? parseInt(batchFields.combinationNumber) : img.metadata?.combinationNumber,
+          sceneNumber: batchFields.sceneNumber ? parseInt(batchFields.sceneNumber) : img.metadata?.sceneNumber,
           specs: batchFields.specs && batchFields.specs.length > 0 ? batchFields.specs : img.metadata?.specs,
           colors: batchFields.colors && batchFields.colors.length > 0 ? batchFields.colors : img.metadata?.colors,
           notes: batchFields.notes || img.metadata?.notes,
@@ -273,12 +277,6 @@ export const Field = ({ field, value, onChange }: FieldProps<typeof controller>)
   }, {})
 
   const selectedImage = images.find((img) => img.id === selectedImageId)
-  const sceneTypeOptions = [
-    { label: '请选择', value: '' },
-    { label: '单独', value: '单独' },
-    { label: '组合', value: '组合' },
-    { label: '系列', value: '系列' },
-  ]
 
   return (
     <FieldContainer>
@@ -359,15 +357,42 @@ export const Field = ({ field, value, onChange }: FieldProps<typeof controller>)
                   />
                 </div>
 
-                {/* Batch Scene Type */}
+                {/* Batch Series Number */}
                 <div>
                   <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
-                    场景类型
+                    系列编号 (Series Number)
                   </label>
-                  <Select
-                    value={sceneTypeOptions.find((opt) => opt.value === batchFields.sceneType)}
-                    onChange={(option: any) => setBatchFields({ ...batchFields, sceneType: option?.value })}
-                    options={sceneTypeOptions}
+                  <TextInput
+                    type="number"
+                    value={batchFields.seriesNumber || ''}
+                    onChange={(e) => setBatchFields({ ...batchFields, seriesNumber: e.target.value })}
+                    placeholder="例如: 1, 2, 3..."
+                  />
+                </div>
+
+                {/* Batch Combination Number */}
+                <div>
+                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
+                    组合编号 (Combination Number)
+                  </label>
+                  <TextInput
+                    type="number"
+                    value={batchFields.combinationNumber || ''}
+                    onChange={(e) => setBatchFields({ ...batchFields, combinationNumber: e.target.value })}
+                    placeholder="例如: 1, 2, 3..."
+                  />
+                </div>
+
+                {/* Batch Scene Number */}
+                <div>
+                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
+                    场景编号 (Scene Number)
+                  </label>
+                  <TextInput
+                    type="number"
+                    value={batchFields.sceneNumber || ''}
+                    onChange={(e) => setBatchFields({ ...batchFields, sceneNumber: e.target.value })}
+                    placeholder="例如: 1, 2, 3..."
                   />
                 </div>
 
@@ -565,28 +590,10 @@ export const Field = ({ field, value, onChange }: FieldProps<typeof controller>)
                     />
                   </div>
 
-                  {/* Individual Scene Number */}
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
-                      场景编号
-                    </label>
-                    <TextInput
-                      type="number"
-                      value={selectedImage.metadata?.sceneNumber?.toString() || ''}
-                      onChange={(e) => updateImage(selectedImage.id, {
-                        metadata: {
-                          ...selectedImage.metadata,
-                          sceneNumber: e.target.value ? parseInt(e.target.value) : undefined,
-                        },
-                      })}
-                      placeholder="例如: 1, 2, 3..."
-                    />
-                  </div>
-
                   {/* Individual Series Number */}
                   <div>
                     <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
-                      系列编号
+                      系列编号 (Series Number)
                     </label>
                     <TextInput
                       type="number"
@@ -595,6 +602,42 @@ export const Field = ({ field, value, onChange }: FieldProps<typeof controller>)
                         metadata: {
                           ...selectedImage.metadata,
                           seriesNumber: e.target.value ? parseInt(e.target.value) : undefined,
+                        },
+                      })}
+                      placeholder="例如: 1, 2, 3..."
+                    />
+                  </div>
+
+                  {/* Individual Combination Number */}
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
+                      组合编号 (Combination Number)
+                    </label>
+                    <TextInput
+                      type="number"
+                      value={selectedImage.metadata?.combinationNumber?.toString() || ''}
+                      onChange={(e) => updateImage(selectedImage.id, {
+                        metadata: {
+                          ...selectedImage.metadata,
+                          combinationNumber: e.target.value ? parseInt(e.target.value) : undefined,
+                        },
+                      })}
+                      placeholder="例如: 1, 2, 3..."
+                    />
+                  </div>
+
+                  {/* Individual Scene Number */}
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
+                      场景编号 (Scene Number)
+                    </label>
+                    <TextInput
+                      type="number"
+                      value={selectedImage.metadata?.sceneNumber?.toString() || ''}
+                      onChange={(e) => updateImage(selectedImage.id, {
+                        metadata: {
+                          ...selectedImage.metadata,
+                          sceneNumber: e.target.value ? parseInt(e.target.value) : undefined,
                         },
                       })}
                       placeholder="例如: 1, 2, 3..."

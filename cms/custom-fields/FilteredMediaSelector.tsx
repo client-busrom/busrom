@@ -558,9 +558,9 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
                 <button
                   type="button"
                   onClick={() => setMetadataSearch({
-                    sceneNumber: '',
-                    sceneType: '',
                     seriesNumber: '',
+                    combinationNumber: '',
+                    sceneNumber: '',
                     specs: '',
                     colors: '',
                     notes: '',
