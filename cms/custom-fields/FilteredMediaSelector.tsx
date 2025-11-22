@@ -103,7 +103,7 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
   const { data: categoriesData } = useQuery(GET_MEDIA_CATEGORIES, { skip: !isOpen })
   const { data: tagsData } = useQuery(GET_MEDIA_TAGS, { skip: !isOpen })
 
-  // Build where clause dynamically
+  // Build where clause dynamically (only for non-metadata filters)
   const buildWhereClause = () => {
     const conditions: any[] = []
 
@@ -119,40 +119,7 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
       conditions.push({ tags: { some: { id: { in: selectedTags } } } })
     }
 
-    // Add metadata filters to server-side query
-    if (metadataSearch.seriesNumber) {
-      const searchNum = parseInt(metadataSearch.seriesNumber)
-      if (!isNaN(searchNum)) {
-        conditions.push({ metadata: { path: ['seriesNumber'], equals: searchNum } })
-      }
-    }
-
-    if (metadataSearch.combinationNumber) {
-      const searchNum = parseInt(metadataSearch.combinationNumber)
-      if (!isNaN(searchNum)) {
-        conditions.push({ metadata: { path: ['combinationNumber'], equals: searchNum } })
-      }
-    }
-
-    if (metadataSearch.sceneNumber) {
-      const searchNum = parseInt(metadataSearch.sceneNumber)
-      if (!isNaN(searchNum)) {
-        conditions.push({ metadata: { path: ['sceneNumber'], equals: searchNum } })
-      }
-    }
-
-    if (metadataSearch.specs) {
-      conditions.push({ metadata: { path: ['specs'], array_contains: [metadataSearch.specs] } })
-    }
-
-    if (metadataSearch.colors) {
-      conditions.push({ metadata: { path: ['colors'], array_contains: [metadataSearch.colors] } })
-    }
-
-    if (metadataSearch.notes) {
-      conditions.push({ metadata: { path: ['notes'], string_contains: metadataSearch.notes } })
-    }
-
+    // Note: Metadata filters are handled client-side because Keystone doesn't support JSON path queries
     return conditions.length > 0 ? { AND: conditions } : {}
   }
 
@@ -176,9 +143,61 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
     }
   }, [isOpen, searchTerm, selectedCategory, selectedTags, metadataSearch, page])
 
-  // Metadata filtering is now handled server-side in buildWhereClause
-  // No need for client-side filtering
-  const filteredMediaItems = data?.mediaFiles || []
+  // Client-side metadata filtering (Keystone doesn't support JSON path queries in GraphQL)
+  const filteredMediaItems = React.useMemo(() => {
+    const items = data?.mediaFiles || []
+
+    return items.filter((item: any) => {
+      const metadata = item.metadata || {}
+
+      // Filter by series number
+      if (metadataSearch.seriesNumber) {
+        const searchNum = parseInt(metadataSearch.seriesNumber)
+        if (!isNaN(searchNum) && metadata.seriesNumber !== searchNum) {
+          return false
+        }
+      }
+
+      // Filter by combination number
+      if (metadataSearch.combinationNumber) {
+        const searchNum = parseInt(metadataSearch.combinationNumber)
+        if (!isNaN(searchNum) && metadata.combinationNumber !== searchNum) {
+          return false
+        }
+      }
+
+      // Filter by scene number
+      if (metadataSearch.sceneNumber) {
+        const searchNum = parseInt(metadataSearch.sceneNumber)
+        if (!isNaN(searchNum) && metadata.sceneNumber !== searchNum) {
+          return false
+        }
+      }
+
+      // Filter by specs
+      if (metadataSearch.specs) {
+        if (!metadata.specs || !Array.isArray(metadata.specs) || !metadata.specs.includes(metadataSearch.specs)) {
+          return false
+        }
+      }
+
+      // Filter by colors
+      if (metadataSearch.colors) {
+        if (!metadata.colors || !Array.isArray(metadata.colors) || !metadata.colors.includes(metadataSearch.colors)) {
+          return false
+        }
+      }
+
+      // Filter by notes
+      if (metadataSearch.notes) {
+        if (!metadata.notes || !metadata.notes.toLowerCase().includes(metadataSearch.notes.toLowerCase())) {
+          return false
+        }
+      }
+
+      return true
+    })
+  }, [data?.mediaFiles, metadataSearch])
 
   // Parse tag names
   const getTagName = (tag: any): string => {
