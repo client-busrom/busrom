@@ -259,7 +259,15 @@ export default withAuth(
             // path may be a full S3 URL or just the filename
             // Extract the filename from the path
             const filename = path.includes('/') ? path.split('/').pop() : path;
-            return `https://${process.env.CDN_DOMAIN}/${filename}`;
+
+            // Handle CDN_DOMAIN with or without protocol
+            let cdnDomain = process.env.CDN_DOMAIN || '';
+            if (!cdnDomain.startsWith('http://') && !cdnDomain.startsWith('https://')) {
+              // No protocol specified, assume HTTPS (for CloudFront)
+              cdnDomain = `https://${cdnDomain}`;
+            }
+
+            return `${cdnDomain}/${filename}`;
           },
         }),
 
