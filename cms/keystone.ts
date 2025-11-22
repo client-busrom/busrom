@@ -150,13 +150,22 @@ export default withAuth(
         credentials: true,
       },
       port: 3000,
+      maxFileSize: 50 * 1024 * 1024, // 50MB max file size
       extendExpressApp: (app, commonContext) => {
         const express = require('express')
         const path = require('path')
+        const http = require('http')
 
         // Trust proxy - Required for cookies to work correctly behind ALB
         // This ensures Express sees the correct client IP and protocol
         app.set('trust proxy', true)
+
+        // Increase timeout for large file uploads (5 minutes)
+        app.use((req, res, next) => {
+          req.setTimeout(300000) // 5 minutes
+          res.setTimeout(300000) // 5 minutes
+          next()
+        })
 
         // Serve static files from public directory
         // Note: __dirname points to .keystone/ after compilation, so we need to go up one level
