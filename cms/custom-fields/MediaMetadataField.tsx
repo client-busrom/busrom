@@ -19,11 +19,18 @@ import { controller } from '@keystone-6/core/fields/types/json/views'
 
 /**
  * Metadata Structure
+ *
+ * For organizing scene photos in a 3-level hierarchy:
+ * - seriesNumber: Which series (系列 1, 2, 3...)
+ * - combinationNumber: Which combination within the series (组合 1, 2, 3...)
+ * - sceneNumber: Which scene within the combination (场景 1, 2, 3...)
+ * - specs: Technical specifications (e.g., "50mm", "不锈钢")
+ * - colors: Color variants (e.g., "黑色", "银色")
  */
 interface MediaMetadata {
-  sceneNumber?: number
-  sceneType?: string
-  seriesNumber?: number
+  seriesNumber?: number       // 系列编号
+  combinationNumber?: number  // 组合编号
+  sceneNumber?: number        // 场景编号
   specs?: string[]
   colors?: string[]
   notes?: string
@@ -45,44 +52,11 @@ export const Field = ({ field, value, onChange, autoFocus }: FieldProps<typeof c
     onChange(JSON.stringify(newMetadata))
   }
 
-  // Scene type options
-  const sceneTypeOptions = [
-    { label: '请选择', value: '' },
-    { label: '单独', value: '单独' },
-    { label: '组合', value: '组合' },
-    { label: '系列', value: '系列' },
-  ]
-
   return (
     <FieldContainer>
       <FieldLabel>{`${field.label}（用于CMS筛选）`}</FieldLabel>
 
       <div style={{ display: 'grid', gap: '16px', marginTop: '8px' }}>
-        {/* Scene Number */}
-        <div>
-          <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
-            场景编号 (Scene Number)
-          </label>
-          <TextInput
-            type="number"
-            value={metadata.sceneNumber?.toString() || ''}
-            onChange={(e) => updateMetadata({ sceneNumber: e.target.value ? parseInt(e.target.value) : undefined })}
-            placeholder="例如: 1, 2, 3..."
-          />
-        </div>
-
-        {/* Scene Type */}
-        <div>
-          <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
-            场景类型 (Scene Type)
-          </label>
-          <Select
-            value={sceneTypeOptions.find(opt => opt.value === metadata.sceneType)}
-            onChange={(option) => updateMetadata({ sceneType: option?.value })}
-            options={sceneTypeOptions}
-          />
-        </div>
-
         {/* Series Number */}
         <div>
           <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
@@ -94,6 +68,41 @@ export const Field = ({ field, value, onChange, autoFocus }: FieldProps<typeof c
             onChange={(e) => updateMetadata({ seriesNumber: e.target.value ? parseInt(e.target.value) : undefined })}
             placeholder="例如: 1, 2, 3..."
           />
+          <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+            这张图片属于哪个系列? (留空表示不属于任何系列)
+          </div>
+        </div>
+
+        {/* Combination Number */}
+        <div>
+          <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
+            组合编号 (Combination Number)
+          </label>
+          <TextInput
+            type="number"
+            value={metadata.combinationNumber?.toString() || ''}
+            onChange={(e) => updateMetadata({ combinationNumber: e.target.value ? parseInt(e.target.value) : undefined })}
+            placeholder="例如: 1, 2, 3..."
+          />
+          <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+            这是该系列中的第几个组合?
+          </div>
+        </div>
+
+        {/* Scene Number */}
+        <div>
+          <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
+            场景编号 (Scene Number)
+          </label>
+          <TextInput
+            type="number"
+            value={metadata.sceneNumber?.toString() || ''}
+            onChange={(e) => updateMetadata({ sceneNumber: e.target.value ? parseInt(e.target.value) : undefined })}
+            placeholder="例如: 1, 2, 3, 4, 5..."
+          />
+          <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+            这是该组合中的第几个场景?
+          </div>
         </div>
 
         {/* Specs */}
@@ -193,9 +202,10 @@ export const Cell = ({ item, field }: any) => {
   const metadata = value as MediaMetadata
   const parts: string[] = []
 
-  if (metadata.sceneNumber) parts.push(`场景${metadata.sceneNumber}`)
-  if (metadata.sceneType) parts.push(metadata.sceneType)
+  // Build hierarchical display: Series → Combination → Scene
   if (metadata.seriesNumber) parts.push(`系列${metadata.seriesNumber}`)
+  if (metadata.combinationNumber) parts.push(`组合${metadata.combinationNumber}`)
+  if (metadata.sceneNumber) parts.push(`场景${metadata.sceneNumber}`)
 
   if (parts.length === 0) {
     return <div style={{ color: '#999', fontSize: '13px' }}>未设置</div>
@@ -203,7 +213,7 @@ export const Cell = ({ item, field }: any) => {
 
   return (
     <div style={{ fontSize: '13px', color: '#4a5568' }}>
-      {parts.join(' · ')}
+      {parts.join(' - ')}
     </div>
   )
 }
