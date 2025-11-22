@@ -119,6 +119,37 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
       conditions.push({ tags: { some: { id: { in: selectedTags } } } })
     }
 
+    // Add metadata filters to server-side query
+    if (metadataSearch.sceneNumber) {
+      const searchNum = parseInt(metadataSearch.sceneNumber)
+      if (!isNaN(searchNum)) {
+        conditions.push({ metadata: { path: ['sceneNumber'], equals: searchNum } })
+      }
+    }
+
+    if (metadataSearch.sceneType) {
+      conditions.push({ metadata: { path: ['sceneType'], string_contains: metadataSearch.sceneType } })
+    }
+
+    if (metadataSearch.seriesNumber) {
+      const searchNum = parseInt(metadataSearch.seriesNumber)
+      if (!isNaN(searchNum)) {
+        conditions.push({ metadata: { path: ['seriesNumber'], equals: searchNum } })
+      }
+    }
+
+    if (metadataSearch.specs) {
+      conditions.push({ metadata: { path: ['specs'], array_contains: [metadataSearch.specs] } })
+    }
+
+    if (metadataSearch.colors) {
+      conditions.push({ metadata: { path: ['colors'], array_contains: [metadataSearch.colors] } })
+    }
+
+    if (metadataSearch.notes) {
+      conditions.push({ metadata: { path: ['notes'], string_contains: metadataSearch.notes } })
+    }
+
     return conditions.length > 0 ? { AND: conditions } : {}
   }
 
@@ -131,69 +162,20 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
     skip: !isOpen,
   })
 
+  // Reset page to 0 when filters change
+  useEffect(() => {
+    setPage(0)
+  }, [searchTerm, selectedCategory, selectedTags, metadataSearch])
+
   useEffect(() => {
     if (isOpen) {
       refetch()
     }
-  }, [isOpen, searchTerm, selectedCategory, selectedTags, page])
+  }, [isOpen, searchTerm, selectedCategory, selectedTags, metadataSearch, page])
 
-  // Client-side metadata filtering
-  const filteredMediaItems = React.useMemo(() => {
-    const items = data?.mediaFiles || []
-
-    // Check if any metadata filter is active
-    const hasMetadataFilter = Object.values(metadataSearch).some(v => v !== '')
-
-    if (!hasMetadataFilter) {
-      return items
-    }
-
-    return items.filter((media: any) => {
-      if (!media.metadata) return false
-
-      const metadata = typeof media.metadata === 'string'
-        ? JSON.parse(media.metadata)
-        : media.metadata
-
-      // Scene Number filter
-      if (metadataSearch.sceneNumber) {
-        const searchNum = parseInt(metadataSearch.sceneNumber)
-        if (metadata.sceneNumber !== searchNum) return false
-      }
-
-      // Scene Type filter
-      if (metadataSearch.sceneType) {
-        if (!metadata.sceneType?.includes(metadataSearch.sceneType)) return false
-      }
-
-      // Series Number filter
-      if (metadataSearch.seriesNumber) {
-        const searchNum = parseInt(metadataSearch.seriesNumber)
-        if (metadata.seriesNumber !== searchNum) return false
-      }
-
-      // Specs filter (check if any spec contains the search term)
-      if (metadataSearch.specs) {
-        if (!metadata.specs || !metadata.specs.some((spec: string) =>
-          spec.toLowerCase().includes(metadataSearch.specs.toLowerCase())
-        )) return false
-      }
-
-      // Colors filter (check if any color contains the search term)
-      if (metadataSearch.colors) {
-        if (!metadata.colors || !metadata.colors.some((color: string) =>
-          color.toLowerCase().includes(metadataSearch.colors.toLowerCase())
-        )) return false
-      }
-
-      // Notes filter
-      if (metadataSearch.notes) {
-        if (!metadata.notes?.toLowerCase().includes(metadataSearch.notes.toLowerCase())) return false
-      }
-
-      return true
-    })
-  }, [data, metadataSearch])
+  // Metadata filtering is now handled server-side in buildWhereClause
+  // No need for client-side filtering
+  const filteredMediaItems = data?.mediaFiles || []
 
   // Parse tag names
   const getTagName = (tag: any): string => {
