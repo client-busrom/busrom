@@ -89,9 +89,9 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [metadataSearch, setMetadataSearch] = useState({
-    sceneNumber: '',
-    sceneType: '',
     seriesNumber: '',
+    combinationNumber: '',
+    sceneNumber: '',
     specs: '',
     colors: '',
     notes: '',
@@ -120,21 +120,24 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
     }
 
     // Add metadata filters to server-side query
-    if (metadataSearch.sceneNumber) {
-      const searchNum = parseInt(metadataSearch.sceneNumber)
-      if (!isNaN(searchNum)) {
-        conditions.push({ metadata: { path: ['sceneNumber'], equals: searchNum } })
-      }
-    }
-
-    if (metadataSearch.sceneType) {
-      conditions.push({ metadata: { path: ['sceneType'], string_contains: metadataSearch.sceneType } })
-    }
-
     if (metadataSearch.seriesNumber) {
       const searchNum = parseInt(metadataSearch.seriesNumber)
       if (!isNaN(searchNum)) {
         conditions.push({ metadata: { path: ['seriesNumber'], equals: searchNum } })
+      }
+    }
+
+    if (metadataSearch.combinationNumber) {
+      const searchNum = parseInt(metadataSearch.combinationNumber)
+      if (!isNaN(searchNum)) {
+        conditions.push({ metadata: { path: ['combinationNumber'], equals: searchNum } })
+      }
+    }
+
+    if (metadataSearch.sceneNumber) {
+      const searchNum = parseInt(metadataSearch.sceneNumber)
+      if (!isNaN(searchNum)) {
+        conditions.push({ metadata: { path: ['sceneNumber'], equals: searchNum } })
       }
     }
 
@@ -439,12 +442,12 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
             }}>
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, marginBottom: '4px', color: '#374151' }}>
-                  Scene Number (场景编号)
+                  Series Number (系列编号)
                 </label>
                 <input
                   type="number"
-                  value={metadataSearch.sceneNumber}
-                  onChange={(e) => setMetadataSearch({ ...metadataSearch, sceneNumber: e.target.value })}
+                  value={metadataSearch.seriesNumber}
+                  onChange={(e) => setMetadataSearch({ ...metadataSearch, seriesNumber: e.target.value })}
                   placeholder="例如: 1, 2, 3..."
                   style={{
                     width: '100%',
@@ -458,13 +461,13 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
 
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, marginBottom: '4px', color: '#374151' }}>
-                  Scene Type (场景类型)
+                  Combination Number (组合编号)
                 </label>
                 <input
-                  type="text"
-                  value={metadataSearch.sceneType}
-                  onChange={(e) => setMetadataSearch({ ...metadataSearch, sceneType: e.target.value })}
-                  placeholder="单独、组合、系列"
+                  type="number"
+                  value={metadataSearch.combinationNumber}
+                  onChange={(e) => setMetadataSearch({ ...metadataSearch, combinationNumber: e.target.value })}
+                  placeholder="例如: 1, 2, 3..."
                   style={{
                     width: '100%',
                     padding: '6px',
@@ -477,12 +480,12 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
 
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, marginBottom: '4px', color: '#374151' }}>
-                  Series Number (系列编号)
+                  Scene Number (场景编号)
                 </label>
                 <input
                   type="number"
-                  value={metadataSearch.seriesNumber}
-                  onChange={(e) => setMetadataSearch({ ...metadataSearch, seriesNumber: e.target.value })}
+                  value={metadataSearch.sceneNumber}
+                  onChange={(e) => setMetadataSearch({ ...metadataSearch, sceneNumber: e.target.value })}
                   placeholder="例如: 1, 2, 3..."
                   style={{
                     width: '100%',
