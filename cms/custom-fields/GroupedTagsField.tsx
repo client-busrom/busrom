@@ -559,14 +559,14 @@ export const controller = (config: any) => {
     serialize: (value: any) => {
       console.log('[GroupedTagsField] serialize:', { value, path: config.path, type: typeof value })
 
-      // For relationship many fields, we need to return { set: [...] } format
-      // This tells Keystone to replace all relationships with the new set
+      // For relationship many fields, return the value directly
+      // Keystone will handle the correct operation (connect/set/disconnect) based on context
       if (!value || !Array.isArray(value)) {
-        return { [config.path]: { set: [] } }
+        return { [config.path]: [] }
       }
 
-      // Use 'set' to replace all relationships
-      return { [config.path]: { set: value.map((item: any) => ({ id: item.id })) } }
+      // Return array of {id} objects
+      return { [config.path]: value.map((item: any) => ({ id: item.id })) }
     },
     validate: (value: any) => {
       // No validation errors
