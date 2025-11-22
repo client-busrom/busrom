@@ -103,6 +103,16 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
   const { data: categoriesData } = useQuery(GET_MEDIA_CATEGORIES, { skip: !isOpen })
   const { data: tagsData } = useQuery(GET_MEDIA_TAGS, { skip: !isOpen })
 
+  // Check if any metadata filters are active
+  const hasMetadataFilters = !!(
+    metadataSearch.seriesNumber ||
+    metadataSearch.combinationNumber ||
+    metadataSearch.sceneNumber ||
+    metadataSearch.specs ||
+    metadataSearch.colors ||
+    metadataSearch.notes
+  )
+
   // Build where clause dynamically (only for non-metadata filters)
   const buildWhereClause = () => {
     const conditions: any[] = []
@@ -123,11 +133,12 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
     return conditions.length > 0 ? { AND: conditions } : {}
   }
 
+  // When metadata filters are active, fetch all items; otherwise use server-side pagination
   const { data, loading, error, refetch } = useQuery(GET_MEDIA_LIST, {
     variables: {
       where: buildWhereClause(),
-      take: pageSize,
-      skip: page * pageSize,
+      take: hasMetadataFilters ? 1000 : pageSize,
+      skip: hasMetadataFilters ? 0 : page * pageSize,
     },
     skip: !isOpen,
   })
@@ -144,7 +155,7 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
   }, [isOpen, searchTerm, selectedCategory, selectedTags, metadataSearch, page])
 
   // Client-side metadata filtering (Keystone doesn't support JSON path queries in GraphQL)
-  const filteredMediaItems = React.useMemo(() => {
+  const allFilteredItems = React.useMemo(() => {
     const items = data?.mediaFiles || []
 
     return items.filter((item: any) => {
@@ -199,6 +210,21 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
     })
   }, [data?.mediaFiles, metadataSearch])
 
+  // Apply client-side pagination when metadata filters are active
+  const filteredMediaItems = React.useMemo(() => {
+    if (hasMetadataFilters) {
+      const startIndex = page * pageSize
+      const endIndex = startIndex + pageSize
+      return allFilteredItems.slice(startIndex, endIndex)
+    }
+    return allFilteredItems
+  }, [allFilteredItems, hasMetadataFilters, page, pageSize])
+
+  // Calculate total pages based on filtered results
+  const totalPages = hasMetadataFilters
+    ? Math.ceil(allFilteredItems.length / pageSize)
+    : Math.ceil((data?.mediaFilesCount || 0) / pageSize)
+
   // Parse tag names
   const getTagName = (tag: any): string => {
     try {
@@ -242,10 +268,6 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
   if (!isOpen) return null
 
   const mediaItems = filteredMediaItems
-
-  // Use server-side total count for pagination (not client-filtered count)
-  const serverTotalCount = data?.mediaFilesCount || 0
-  const totalPages = Math.ceil(serverTotalCount / pageSize)
 
   return (
     <div
