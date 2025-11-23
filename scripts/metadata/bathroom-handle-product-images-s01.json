@@ -1,0 +1,10 @@
+{
+  "s3Prefix": "08-bathroom-handle/product-images/s01/",
+  "primaryCategory": "product-image",
+  "tags": [
+    "series-bathroom-handle"
+  ],
+  "defaultMetadata": {
+    "seriesNumber": 1
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "s3Prefix": "08-bathroom-handle/scene-images/group-04/",
+  "primaryCategory": "scene-image",
+  "tags": [
+    "series-bathroom-handle"
+  ],
+  "defaultMetadata": {
+    "combinationNumber": 4
+  }
+}

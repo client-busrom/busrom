@@ -1,0 +1,9 @@
+{
+  "s3Prefix": "05-bathroom-glass-clip/scene-images/indoor/",
+  "primaryCategory": "scene-image",
+  "tags": [
+    "series-bathroom-glass-clip",
+    "scene-indoor"
+  ],
+  "defaultMetadata": {}
+}

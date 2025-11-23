@@ -265,9 +265,20 @@ export default withAuth(
         // Otherwise fall back to default S3 URL
         ...(process.env.CDN_DOMAIN && process.env.CDN_DOMAIN !== 'NONE' && {
           generateUrl: (path: string) => {
-            // path may be a full S3 URL or just the filename
-            // Extract the filename from the path
-            const filename = path.includes('/') ? path.split('/').pop() : path;
+            // path can be either:
+            // 1. A full URL like "http://localhost:9000/busrom-media/path/to/file.jpg"
+            // 2. Just the S3 key like "path/to/file.jpg"
+            let s3Key = path;
+
+            // If path is a full URL, extract the S3 key
+            if (path.startsWith('http://') || path.startsWith('https://')) {
+              const bucketName = process.env.S3_BUCKET_NAME || 'busrom-media';
+              // Extract everything after the bucket name
+              const parts = path.split(`/${bucketName}/`);
+              if (parts.length > 1) {
+                s3Key = parts[1];
+              }
+            }
 
             // Handle CDN_DOMAIN with or without protocol
             let cdnDomain = process.env.CDN_DOMAIN || '';
@@ -280,10 +291,10 @@ export default withAuth(
             // For CloudFront (production), bucket name is not needed
             const bucketName = process.env.S3_BUCKET_NAME || 'busrom-media';
             if (process.env.USE_MINIO === 'true') {
-              return `${cdnDomain}/${bucketName}/${filename}`;
+              return `${cdnDomain}/${bucketName}/${s3Key}`;
             }
 
-            return `${cdnDomain}/${filename}`;
+            return `${cdnDomain}/${s3Key}`;
           },
         }),
 

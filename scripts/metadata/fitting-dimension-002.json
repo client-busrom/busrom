@@ -1,0 +1,15 @@
+{
+  "s3Keys": [
+    "fitting-dimension-002.jpg"
+  ],
+  "primaryCategory": "dimension-image",
+  "tags": [
+    "series-glass-connected-fitting",
+    "spec-combined-elbow-fixed"
+  ],
+  "defaultMetadata": {
+    "specs": ["尺寸图", "技术规格", "固定款"],
+    "colors": ["无"],
+    "notes": "玻璃连接件尺寸图 - 组合款弯头固定"
+  }
+}

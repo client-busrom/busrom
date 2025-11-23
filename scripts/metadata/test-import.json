@@ -1,0 +1,13 @@
+{
+  "s3Keys": [
+    "test/02-fitting-dimension-001.jpg"
+  ],
+  "primaryCategory": "dimension-image",
+  "tags": [
+    "series-glass-connected-fitting"
+  ],
+  "defaultMetadata": {
+    "specs": ["尺寸图"],
+    "colors": ["银色"]
+  }
+}

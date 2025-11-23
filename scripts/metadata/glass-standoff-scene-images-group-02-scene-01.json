@@ -1,0 +1,11 @@
+{
+  "s3Prefix": "01-glass-standoff/scene-images/group-02/scene-01/",
+  "primaryCategory": "scene-image",
+  "tags": [
+    "series-glass-standoff"
+  ],
+  "defaultMetadata": {
+    "combinationNumber": 2,
+    "sceneNumber": 1
+  }
+}

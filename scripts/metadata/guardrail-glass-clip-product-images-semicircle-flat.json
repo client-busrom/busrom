@@ -1,0 +1,9 @@
+{
+  "s3Prefix": "04-guardrail-glass-clip/product-images/semicircle-flat/",
+  "primaryCategory": "product-image",
+  "tags": [
+    "series-guardrail-glass-clip",
+    "spec-semicircle-flat"
+  ],
+  "defaultMetadata": {}
+}
