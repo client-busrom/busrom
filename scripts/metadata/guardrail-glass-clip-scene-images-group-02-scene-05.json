@@ -1,0 +1,11 @@
+{
+  "s3Prefix": "04-guardrail-glass-clip/scene-images/group-02/scene-05/",
+  "primaryCategory": "scene-image",
+  "tags": [
+    "series-guardrail-glass-clip"
+  ],
+  "defaultMetadata": {
+    "combinationNumber": 2,
+    "sceneNumber": 5
+  }
+}

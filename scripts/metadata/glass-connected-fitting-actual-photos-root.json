@@ -1,0 +1,8 @@
+{
+  "s3Prefix": "02-glass-connected-fitting/actual-photos/",
+  "primaryCategory": "actual-photo",
+  "tags": [
+    "series-glass-connected-fitting"
+  ],
+  "defaultMetadata": {}
+}

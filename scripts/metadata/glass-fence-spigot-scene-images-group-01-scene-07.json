@@ -1,0 +1,11 @@
+{
+  "s3Prefix": "03-glass-fence-spigot/scene-images/group-01/scene-07/",
+  "primaryCategory": "scene-image",
+  "tags": [
+    "series-glass-fence-spigot"
+  ],
+  "defaultMetadata": {
+    "combinationNumber": 1,
+    "sceneNumber": 7
+  }
+}

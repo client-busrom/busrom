@@ -1,0 +1,9 @@
+{
+  "s3Prefix": "10-hidden-hook/product-images/single-hook-economy/",
+  "primaryCategory": "product-image",
+  "tags": [
+    "series-hidden-hook",
+    "spec-single-hook-economy"
+  ],
+  "defaultMetadata": {}
+}

@@ -1,0 +1,9 @@
+{
+  "s3Prefix": "09-door-handle/product-images/featured-glass-door/",
+  "primaryCategory": "product-image",
+  "tags": [
+    "series-door-handle",
+    "spec-featured-glass-door"
+  ],
+  "defaultMetadata": {}
+}

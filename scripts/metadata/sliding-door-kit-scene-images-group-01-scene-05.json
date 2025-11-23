@@ -1,0 +1,11 @@
+{
+  "s3Prefix": "07-sliding-door-kit/scene-images/group-01/scene-05/",
+  "primaryCategory": "scene-image",
+  "tags": [
+    "series-sliding-door-kit"
+  ],
+  "defaultMetadata": {
+    "combinationNumber": 1,
+    "sceneNumber": 5
+  }
+}

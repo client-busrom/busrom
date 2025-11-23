@@ -1,0 +1,27 @@
+{
+  "s3Keys": [
+    "fitting-actual-black-001.jpg",
+    "fitting-actual-silver-001.jpg"
+  ],
+  "primaryCategory": "actual-photo",
+  "tags": [
+    "series-glass-connected-fitting",
+    "spec-combined-elbow-adjustable"
+  ],
+  "defaultMetadata": {
+    "specs": ["90度", "可调节", "弯头"],
+    "colors": ["混合"]
+  },
+  "fileMetadata": {
+    "fitting-actual-black-001.jpg": {
+      "specs": ["90度", "可调节", "弯头"],
+      "colors": ["黑色", "拉丝"],
+      "notes": "黑色拉丝款 - 实拍展示图"
+    },
+    "fitting-actual-silver-001.jpg": {
+      "specs": ["90度", "可调节", "弯头"],
+      "colors": ["银色", "抛光"],
+      "notes": "银色抛光款 - 实拍展示图"
+    }
+  }
+}

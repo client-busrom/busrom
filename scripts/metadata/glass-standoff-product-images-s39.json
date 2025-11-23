@@ -1,0 +1,10 @@
+{
+  "s3Prefix": "01-glass-standoff/product-images/s39/",
+  "primaryCategory": "product-image",
+  "tags": [
+    "series-glass-standoff"
+  ],
+  "defaultMetadata": {
+    "seriesNumber": 39
+  }
+}

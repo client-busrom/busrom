@@ -1,0 +1,20 @@
+{
+  "s3Keys": [
+    "01-glass-standoff/scene-images/scene-001.jpg",
+    "01-glass-standoff/scene-images/scene-002.jpg",
+    "01-glass-standoff/scene-images/scene-003.jpg"
+  ],
+  "primaryCategory": "scene-image",
+  "tags": [
+    "series-glass-standoff",
+    "scene-normal"
+  ],
+  "defaultMetadata": {
+    "sceneNumber": 1
+  },
+  "fileMetadata": {
+    "scene-001.jpg": { "sceneNumber": 1 },
+    "scene-002.jpg": { "sceneNumber": 2 },
+    "scene-003.jpg": { "sceneNumber": 3 }
+  }
+}

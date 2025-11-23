@@ -1,0 +1,9 @@
+{
+  "s3Prefix": "09-door-handle/product-images/main-cylinder/",
+  "primaryCategory": "product-image",
+  "tags": [
+    "series-door-handle",
+    "spec-main-cylinder"
+  ],
+  "defaultMetadata": {}
+}
