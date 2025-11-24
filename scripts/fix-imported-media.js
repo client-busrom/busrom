@@ -24,13 +24,20 @@ if (!savedEnv.DATABASE_URL) {
   })
 }
 
+// 动态加载Prisma Client和utils
 let PrismaClient, extractImageMetadata, generateImageVariants
-try {
+
+const fs = require('fs')
+const isDocker = fs.existsSync('/app/cms')
+
+if (isDocker) {
+  console.log('🐳 Docker环境')
   PrismaClient = require('/app/cms/node_modules/.prisma/client').PrismaClient
   const utils = require('/app/cms/utils/imageProcessing')
   extractImageMetadata = utils.extractImageMetadata
   generateImageVariants = utils.generateImageVariants
-} catch (e) {
+} else {
+  console.log('💻 本地环境')
   PrismaClient = require('/Users/cerfbaleine/workspace/busrom-work/cms/node_modules/.prisma/client').PrismaClient
   const utils = require('/Users/cerfbaleine/workspace/busrom-work/cms/utils/imageProcessing')
   extractImageMetadata = utils.extractImageMetadata
