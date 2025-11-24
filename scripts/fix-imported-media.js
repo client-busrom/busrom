@@ -33,13 +33,13 @@ const isDocker = fs.existsSync('/app/cms')
 if (isDocker) {
   console.log('🐳 Docker环境')
   PrismaClient = require('/app/cms/node_modules/.prisma/client').PrismaClient
-  const utils = require('/app/cms/utils/imageProcessing')
+  const utils = require('/app/cms/lib/image-optimizer')
   extractImageMetadata = utils.extractImageMetadata
   generateImageVariants = utils.generateImageVariants
 } else {
   console.log('💻 本地环境')
   PrismaClient = require('/Users/cerfbaleine/workspace/busrom-work/cms/node_modules/.prisma/client').PrismaClient
-  const utils = require('/Users/cerfbaleine/workspace/busrom-work/cms/utils/imageProcessing')
+  const utils = require('/Users/cerfbaleine/workspace/busrom-work/cms/lib/image-optimizer')
   extractImageMetadata = utils.extractImageMetadata
   generateImageVariants = utils.generateImageVariants
 }
