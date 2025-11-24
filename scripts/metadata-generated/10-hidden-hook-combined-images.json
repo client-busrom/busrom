@@ -1,0 +1,8 @@
+{
+  "s3Prefix": "10-hidden-hook/combined-images/",
+  "primaryCategory": "combined-image",
+  "tags": [
+    "series-hidden-hook"
+  ],
+  "defaultMetadata": {}
+}

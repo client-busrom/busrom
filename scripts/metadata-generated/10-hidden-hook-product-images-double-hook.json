@@ -1,0 +1,9 @@
+{
+  "s3Prefix": "10-hidden-hook/product-images/double-hook/",
+  "primaryCategory": "product-image",
+  "tags": [
+    "series-hidden-hook",
+    "spec-double-hook"
+  ],
+  "defaultMetadata": {}
+}

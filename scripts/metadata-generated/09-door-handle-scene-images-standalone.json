@@ -1,0 +1,9 @@
+{
+  "s3Prefix": "09-door-handle/scene-images/standalone/",
+  "primaryCategory": "scene-image",
+  "tags": [
+    "series-door-handle",
+    "scene-standalone"
+  ],
+  "defaultMetadata": {}
+}

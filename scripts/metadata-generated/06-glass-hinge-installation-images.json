@@ -1,0 +1,8 @@
+{
+  "s3Prefix": "",
+  "primaryCategory": "installation-image",
+  "tags": [
+    "series-glass-hinge"
+  ],
+  "defaultMetadata": {}
+}

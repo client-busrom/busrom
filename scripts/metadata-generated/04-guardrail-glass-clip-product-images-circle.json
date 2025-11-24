@@ -1,0 +1,9 @@
+{
+  "s3Prefix": "04-guardrail-glass-clip/product-images/circle/",
+  "primaryCategory": "product-image",
+  "tags": [
+    "series-guardrail-glass-clip",
+    "spec-circle"
+  ],
+  "defaultMetadata": {}
+}

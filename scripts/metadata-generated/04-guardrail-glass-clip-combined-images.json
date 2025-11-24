@@ -1,0 +1,8 @@
+{
+  "s3Prefix": "04-guardrail-glass-clip/combined-images/",
+  "primaryCategory": "combined-image",
+  "tags": [
+    "series-guardrail-glass-clip"
+  ],
+  "defaultMetadata": {}
+}
