@@ -143,7 +143,7 @@ export const Media = list({
       many: true,
       ui: {
         displayMode: 'select',
-        labelField: 'name',
+        labelField: 'slug',
         description: 'Use this field to filter media by tags | 用于按标签筛选媒体（此字段自动与Tags字段同步）',
         // Hide in item view since we edit via the main tags field
         itemView: {
