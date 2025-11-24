@@ -33,8 +33,8 @@ if (!savedEnv.DATABASE_URL && !savedEnv.S3_BUCKET_NAME) {
 // 动态加载Prisma Client
 let PrismaClient
 try {
-  // 尝试从/app加载 (Docker容器)
-  PrismaClient = require('/app/node_modules/.prisma/client').PrismaClient
+  // 尝试从/app/cms加载 (Docker容器)
+  PrismaClient = require('/app/cms/node_modules/.prisma/client').PrismaClient
 } catch (e) {
   // 回退到本地路径
   PrismaClient = require('/Users/cerfbaleine/workspace/busrom-work/cms/node_modules/.prisma/client').PrismaClient
