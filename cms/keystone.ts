@@ -266,17 +266,24 @@ export default withAuth(
         ...(process.env.CDN_DOMAIN && process.env.CDN_DOMAIN !== 'NONE' && {
           generateUrl: (path: string) => {
             // path can be either:
-            // 1. A full URL like "http://localhost:9000/busrom-media/path/to/file.jpg"
-            // 2. Just the S3 key like "path/to/file.jpg"
+            // 1. A full S3 URL like "https://bucket.s3.region.amazonaws.com/file.jpg"
+            // 2. A MinIO URL like "http://localhost:9000/bucket/file.jpg"
+            // 3. Just the S3 key like "file.jpg"
             let s3Key = path;
 
-            // If path is a full URL, extract the S3 key
+            // If path is a full URL, extract the S3 key (filename)
             if (path.startsWith('http://') || path.startsWith('https://')) {
               const bucketName = process.env.S3_BUCKET_NAME || 'busrom-media';
-              // Extract everything after the bucket name
-              const parts = path.split(`/${bucketName}/`);
-              if (parts.length > 1) {
-                s3Key = parts[1];
+
+              // Handle AWS S3 URL format: https://bucket.s3.region.amazonaws.com/file.jpg
+              if (path.includes('.s3.')) {
+                const urlParts = path.split('/');
+                s3Key = urlParts[urlParts.length - 1]; // Get last part (filename)
+              }
+              // Handle MinIO URL format: http://localhost:9000/bucket/file.jpg
+              else if (path.includes(`/${bucketName}/`)) {
+                const parts = path.split(`/${bucketName}/`);
+                s3Key = parts.length > 1 ? parts[1] : s3Key;
               }
             }
 
