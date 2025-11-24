@@ -129,7 +129,7 @@ async function generateImageVariants(buffer, fileId, fileExtension) {
           Key: s3Key,
           Body: variantBuffer,
           ContentType: `image/${fileExtension}`,
-          ACL: 'public-read',
+          // ACL removed - bucket uses policy for public access
         })
       )
 
@@ -158,7 +158,7 @@ async function generateImageVariants(buffer, fileId, fileExtension) {
         Key: s3Key,
         Body: webpBuffer,
         ContentType: 'image/webp',
-        ACL: 'public-read',
+        // ACL removed - bucket uses policy for public access
       })
     )
 
