@@ -1,0 +1,9 @@
+{
+  "s3Prefix": "02-glass-connected-fitting/product-images/combined-elbow-fixed/",
+  "primaryCategory": "product-image",
+  "tags": [
+    "series-glass-connected-fitting",
+    "spec-combined-elbow-fixed"
+  ],
+  "defaultMetadata": {}
+}

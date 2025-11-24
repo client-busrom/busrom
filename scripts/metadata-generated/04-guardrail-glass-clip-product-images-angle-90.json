@@ -1,0 +1,9 @@
+{
+  "s3Prefix": "04-guardrail-glass-clip/product-images/angle-90/",
+  "primaryCategory": "product-image",
+  "tags": [
+    "series-guardrail-glass-clip",
+    "spec-angle-90"
+  ],
+  "defaultMetadata": {}
+}
