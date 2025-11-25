@@ -58,7 +58,19 @@ export default function BatchMediaUploadPage() {
   const [batchFields, setBatchFields] = useState<BatchFields>({})
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
+  const [uploadConfig, setUploadConfig] = useState<{
+    accelerationEnabled: boolean
+    maxFileSize: number
+  } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Fetch upload configuration on mount
+  React.useEffect(() => {
+    fetch('/api/upload-config', { credentials: 'include' })
+      .then((res) => res.json())
+      .then((config) => setUploadConfig(config))
+      .catch((err) => console.error('Failed to fetch upload config:', err))
+  }, [])
 
   // Fetch categories and tags
   const { data: categoriesData } = useQuery(gql`
@@ -240,29 +252,70 @@ export default function BatchMediaUploadPage() {
   }, [])
 
   /**
-   * Upload a single image
+   * Upload a single image using presigned URL (direct S3 upload with acceleration)
    */
   const uploadSingleImage = async (image: ImageItem) => {
     try {
       updateImage(image.id, { status: 'uploading' })
 
-      // Use Keystone's native GraphQL mutation for creating Media with file upload
+      // Step 1: Get presigned URL from server
+      const presignedResponse = await fetch('/api/presigned-upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          files: [
+            {
+              filename: image.filename,
+              contentType: image.file.type,
+              size: image.file.size,
+            },
+          ],
+        }),
+      })
+
+      if (!presignedResponse.ok) {
+        throw new Error(`Failed to get presigned URL: ${presignedResponse.status}`)
+      }
+
+      const { urls, accelerationEnabled } = await presignedResponse.json()
+      const { uploadUrl, key, cdnUrl } = urls[0]
+
+      console.log(`📤 Uploading ${image.filename} directly to S3${accelerationEnabled ? ' (accelerated)' : ''}`)
+
+      // Step 2: Upload file directly to S3 using presigned URL
+      const s3Response = await fetch(uploadUrl, {
+        method: 'PUT',
+        body: image.file,
+        headers: {
+          'Content-Type': image.file.type,
+        },
+      })
+
+      if (!s3Response.ok) {
+        throw new Error(`S3 upload failed: ${s3Response.status}`)
+      }
+
+      console.log(`✅ File uploaded to S3: ${key}`)
+
+      // Step 3: Create Media record in database with the S3 URL
       const operations = {
         query: `
           mutation CreateMedia($data: MediaCreateInput!) {
             createMedia(data: $data) {
               id
               filename
-              file {
-                url
-              }
+              fileUrl
             }
           }
         `,
         variables: {
           data: {
             filename: image.filename,
-            file: { upload: null }, // Will be replaced by the actual file
+            fileUrl: cdnUrl,
+            fileKey: key,
             altText: image.altText || {},
             ...(image.primaryCategory && {
               primaryCategory: { connect: { id: image.primaryCategory } },
@@ -276,40 +329,27 @@ export default function BatchMediaUploadPage() {
         },
       }
 
-      // Create FormData for multipart upload
-      const formData = new FormData()
-      formData.append('operations', JSON.stringify(operations))
-
-      // Map tells GraphQL where to put the uploaded file
-      const map = {
-        '0': ['variables.data.file.upload'],
-      }
-      formData.append('map', JSON.stringify(map))
-
-      // Append the actual file
-      formData.append('0', image.file, image.filename)
-
-      // Send to Keystone's GraphQL endpoint
-      const uploadResponse = await fetch('/api/graphql', {
+      const graphqlResponse = await fetch('/api/graphql', {
         method: 'POST',
-        body: formData,
-        credentials: 'include', // Important for session cookies
         headers: {
-          'apollo-require-preflight': 'true', // Required to bypass CSRF protection
+          'Content-Type': 'application/json',
+          'apollo-require-preflight': 'true',
         },
+        credentials: 'include',
+        body: JSON.stringify(operations),
       })
 
-      if (!uploadResponse.ok) {
-        throw new Error(`HTTP error! status: ${uploadResponse.status}`)
+      if (!graphqlResponse.ok) {
+        throw new Error(`GraphQL error: ${graphqlResponse.status}`)
       }
 
-      const result = await uploadResponse.json()
+      const result = await graphqlResponse.json()
 
       if (result.errors) {
         throw new Error(result.errors[0]?.message || 'GraphQL error')
       }
 
-      console.log('Upload success:', result.data.createMedia)
+      console.log('✅ Media record created:', result.data.createMedia)
       updateImage(image.id, { status: 'success' })
     } catch (error) {
       console.error('Upload error:', error)
@@ -379,6 +419,11 @@ export default function BatchMediaUploadPage() {
           <div css={{ fontSize: '14px', color: '#718096' }}>
             支持批量上传多张图片 • 支持拖拽文件夹，自动提取所有图片
           </div>
+          {uploadConfig?.accelerationEnabled && (
+            <div css={{ fontSize: '13px', color: '#38a169', marginTop: '8px', fontWeight: 500 }}>
+              🚀 S3 Transfer Acceleration 已启用 - 国内上传加速
+            </div>
+          )}
           <input
             ref={fileInputRef}
             type="file"

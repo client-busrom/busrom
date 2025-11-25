@@ -35,6 +35,10 @@
         {
           "name": "S3_BUCKET_NAME",
           "value": "busrom-media-ENVIRONMENT"
+        },
+        {
+          "name": "S3_USE_ACCELERATION",
+          "value": "true"
         }
       ],
       "secrets": [
