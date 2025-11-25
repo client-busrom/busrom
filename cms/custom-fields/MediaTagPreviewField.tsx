@@ -11,6 +11,7 @@ import React, { useState } from 'react'
 import { FieldContainer, FieldLabel } from '@keystone-ui/fields'
 import { FieldController, FieldProps } from '@keystone-6/core/types'
 import { gql, useQuery } from '@keystone-6/core/admin-ui/apollo'
+import { getCdnUrl } from '../lib/cdn-url'
 
 // GraphQL query to get media by tag IDs
 const GET_MEDIA_BY_TAGS = gql`
@@ -164,7 +165,7 @@ export function Field({ field, value }: MediaTagPreviewFieldProps) {
                             background: '#f3f4f6',
                           }}>
                             <img
-                              src={thumbnailUrl}
+                              src={getCdnUrl(thumbnailUrl)}
                               alt={altText}
                               style={{
                                 position: 'absolute',

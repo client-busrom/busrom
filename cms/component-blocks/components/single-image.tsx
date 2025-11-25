@@ -9,6 +9,7 @@ import React, { useState } from 'react'
 import { component, fields } from '@keystone-6/fields-document/component-blocks'
 import { gql, useQuery } from '@keystone-6/core/admin-ui/apollo'
 import { FilteredMediaSelector } from '../../custom-fields/FilteredMediaSelector'
+import { getCdnUrl } from '../../lib/cdn-url'
 
 // GraphQL query to get media details
 const GET_MEDIA_DETAIL = gql`
@@ -68,7 +69,7 @@ function createMediaIdField() {
               }}>
                 {(selectedMedia.variants?.thumbnail || selectedMedia.file?.url) && (
                   <img
-                    src={selectedMedia.variants?.thumbnail || selectedMedia.file?.url}
+                    src={getCdnUrl(selectedMedia.variants?.thumbnail || selectedMedia.file?.url)}
                     alt={selectedMedia.filename}
                     style={{
                       width: '100%',
@@ -224,7 +225,7 @@ export const singleImage = component({
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}>
               <img
-                src={media.variants?.medium || media.file?.url}
+                src={getCdnUrl(media.variants?.medium || media.file?.url)}
                 alt={caption || media.filename}
                 style={{
                   width: '100%',

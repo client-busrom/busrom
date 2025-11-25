@@ -8,6 +8,7 @@
 import React, { useState, useEffect } from 'react'
 import { TextInput } from '@keystone-ui/fields'
 import { gql, useQuery } from '@keystone-6/core/admin-ui/apollo'
+import { getCdnUrl } from '../lib/cdn-url'
 
 // GraphQL Queries
 const GET_MEDIA_LIST = gql`
@@ -694,7 +695,7 @@ export const FilteredMediaSelector: React.FC<FilteredMediaSelectorProps> = ({
                     >
                       {thumbnailUrl && (
                         <img
-                          src={thumbnailUrl}
+                          src={getCdnUrl(thumbnailUrl)}
                           alt={media.filename}
                           style={{
                             position: 'absolute',

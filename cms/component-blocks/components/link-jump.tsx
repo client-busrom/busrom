@@ -11,6 +11,7 @@ import React, { useState } from 'react'
 import { component, fields } from '@keystone-6/fields-document/component-blocks'
 import { gql, useQuery } from '@keystone-6/core/admin-ui/apollo'
 import { FilteredMediaSelector } from '../../custom-fields/FilteredMediaSelector'
+import { getCdnUrl } from '../../lib/cdn-url'
 import * as LucideIcons from 'lucide-react'
 
 // GraphQL query to get media details
@@ -77,7 +78,7 @@ function createMediaIconField() {
               }}>
                 {(selectedMedia.variants?.thumbnail || selectedMedia.file?.url) && (
                   <img
-                    src={selectedMedia.variants?.thumbnail || selectedMedia.file?.url}
+                    src={getCdnUrl(selectedMedia.variants?.thumbnail || selectedMedia.file?.url)}
                     alt={selectedMedia.filename}
                     style={{
                       width: '100%',
@@ -336,7 +337,7 @@ function MediaIconPreview({ mediaIconId, size }: any) {
       flexShrink: 0,
     }}>
       <img
-        src={media.variants?.thumbnail || media.file?.url}
+        src={getCdnUrl(media.variants?.thumbnail || media.file?.url)}
         alt={media.filename}
         style={{
           width: '100%',

@@ -31,6 +31,7 @@ import React, { useState, useEffect } from 'react'
 import { FieldContainer, FieldLabel, TextInput } from '@keystone-ui/fields'
 import { FieldController, FieldProps } from '@keystone-6/core/types'
 import { gql, useQuery } from '@keystone-6/core/admin-ui/apollo'
+import { getCdnUrl } from '../lib/cdn-url'
 import {
   DndContext,
   closestCenter,
@@ -515,7 +516,7 @@ const MediaSelectorModal: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onS
                     >
                       {thumbnailUrl && (
                         <img
-                          src={thumbnailUrl}
+                          src={getCdnUrl(thumbnailUrl)}
                           alt={media.filename}
                           style={{
                             position: 'absolute',
@@ -670,7 +671,7 @@ const ImagePreview: React.FC<{ mediaId: string }> = ({ mediaId }) => {
     }}>
       {thumbnailUrl && (
         <img
-          src={thumbnailUrl}
+          src={getCdnUrl(thumbnailUrl)}
           alt={media.filename}
           style={{
             width: '100%',
