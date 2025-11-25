@@ -11,14 +11,39 @@
 import React from 'react'
 import { gql, useQuery } from '@keystone-6/core/admin-ui/apollo'
 
-// Import necessary types and hooks
-import { FieldProps } from '@keystone-6/core/types'
-
 // Re-export the controller from Keystone's image field to enable upload functionality
 export { controller } from '@keystone-6/core/fields/types/image/views'
 
 // Import Keystone's default Field component
 import { Field as KeystoneImageField } from '@keystone-6/core/fields/types/image/views'
+
+/**
+ * Custom Field wrapper that logs props data for debugging
+ * This helps us understand what data is available in the Field view
+ */
+export const Field = (props: any) => {
+  // Log all props to console for debugging on AWS production
+  React.useEffect(() => {
+    console.log('=== [MediaFileField] Field Props Debug ===')
+    console.log('[MediaFileField] Full props:', props)
+    console.log('[MediaFileField] props.value:', props.value)
+    console.log('[MediaFileField] props.itemValue:', props.itemValue)
+    console.log('[MediaFileField] props.field:', props.field)
+    console.log('[MediaFileField] props.forceValidation:', props.forceValidation)
+    console.log('[MediaFileField] All prop keys:', Object.keys(props))
+
+    // Try to get item ID from URL
+    if (typeof window !== 'undefined') {
+      const urlMatch = window.location.pathname.match(/\/media\/([^/]+)/)
+      console.log('[MediaFileField] URL pathname:', window.location.pathname)
+      console.log('[MediaFileField] Item ID from URL:', urlMatch ? urlMatch[1] : 'not found')
+    }
+    console.log('=== [MediaFileField] End Debug ===')
+  }, [props])
+
+  // Use Keystone's default Field component
+  return <KeystoneImageField {...props} />
+}
 
 /**
  * Convert a relative path or signed URL to a CDN URL
@@ -149,125 +174,6 @@ export const Cell = ({ item, field }: any) => {
   }
 
   return <div style={{ color: '#999', fontSize: '13px' }}>Loading...</div>
-}
-
-/**
- * Custom Field view for item/detail page
- *
- * For batch uploaded images (with file_id but no Keystone file data),
- * show a preview instead of the upload button.
- */
-export const Field = (props: FieldProps<typeof controller>) => {
-  const { item } = props as any
-
-  // Query for file data and variants
-  const { data, loading } = useQuery(
-    gql`
-      query GetMediaFileData($id: ID!) {
-        media(where: { id: $id }) {
-          file_id
-          file_extension
-          file {
-            url
-          }
-          variants
-        }
-      }
-    `,
-    {
-      variables: { id: item.id },
-      skip: !item || !item.id,
-    }
-  )
-
-  const mediaData = data?.media
-
-  // If we have Keystone file data, use the default field for upload functionality
-  if (mediaData?.file?.url) {
-    return <KeystoneImageField {...props} />
-  }
-
-  // For batch uploaded images: show a read-only preview
-  if (!loading && mediaData) {
-    // Try variants first
-    if (mediaData.variants && typeof mediaData.variants === 'object') {
-      const imageUrl = mediaData.variants.medium || mediaData.variants.small || mediaData.variants.thumbnail
-      if (imageUrl) {
-        const fullUrl = buildFullUrl(imageUrl)
-        return (
-          <div style={{ marginTop: '8px' }}>
-            <div style={{
-              background: '#f7fafc',
-              border: '1px solid #e2e8f0',
-              borderRadius: '8px',
-              padding: '16px',
-              marginBottom: '12px'
-            }}>
-              <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: '#2d3748' }}>
-                File Preview (文件预览)
-              </div>
-              <div style={{ fontSize: '13px', color: '#718096', marginBottom: '12px' }}>
-                This image was batch uploaded. The file is stored in S3 and cannot be replaced through the UI.
-                <br />
-                此图片为批量导入，文件存储在 S3 中，无法通过界面替换。
-              </div>
-              <img
-                src={fullUrl}
-                alt="Media preview"
-                style={{
-                  maxWidth: '100%',
-                  maxHeight: '400px',
-                  objectFit: 'contain',
-                  borderRadius: '4px',
-                  border: '1px solid #e2e8f0',
-                }}
-              />
-            </div>
-          </div>
-        )
-      }
-    }
-
-    // Fallback to file_id/file_extension
-    if (mediaData.file_id && mediaData.file_extension) {
-      const s3Key = `${mediaData.file_id}.${mediaData.file_extension}`
-      const fullUrl = buildFullUrl(s3Key)
-      return (
-        <div style={{ marginTop: '8px' }}>
-          <div style={{
-            background: '#f7fafc',
-            border: '1px solid #e2e8f0',
-            borderRadius: '8px',
-            padding: '16px',
-            marginBottom: '12px'
-          }}>
-            <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: '#2d3748' }}>
-              File Preview (文件预览)
-            </div>
-            <div style={{ fontSize: '13px', color: '#718096', marginBottom: '12px' }}>
-              This image was batch uploaded. The file is stored in S3 and cannot be replaced through the UI.
-              <br />
-              此图片为批量导入，文件存储在 S3 中，无法通过界面替换。
-            </div>
-            <img
-              src={fullUrl}
-              alt="Media preview"
-              style={{
-                maxWidth: '100%',
-                maxHeight: '400px',
-                objectFit: 'contain',
-                borderRadius: '4px',
-                border: '1px solid #e2e8f0',
-              }}
-            />
-          </div>
-        </div>
-      )
-    }
-  }
-
-  // Default: use Keystone's field for upload functionality
-  return <KeystoneImageField {...props} />
 }
 
 // CardValue view for cards
