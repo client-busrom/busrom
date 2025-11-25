@@ -102,7 +102,32 @@ export const Field = (props: any) => {
     )
   }
 
-  // Default: use Keystone's field for upload functionality (for new items)
+  // For batch uploaded images without variants: show a message instead of upload button
+  // This happens when itemId exists but no variants were generated
+  if (itemId && !imageUrl) {
+    return (
+      <div style={{ marginTop: '8px' }}>
+        <div style={{
+          background: '#fffbeb',
+          border: '1px solid #fbbf24',
+          borderRadius: '8px',
+          padding: '16px',
+          marginBottom: '12px'
+        }}>
+          <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: '#92400e' }}>
+            No Preview Available (无法预览)
+          </div>
+          <div style={{ fontSize: '13px', color: '#b45309' }}>
+            This image was batch uploaded but no variants were generated. The original file is stored in S3.
+            <br />
+            此图片为批量导入，但未生成预览变体。原始文件存储在 S3 中。
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Default: use Keystone's field for upload functionality (for new items / create page)
   return <KeystoneImageField {...props} />
 }
 
