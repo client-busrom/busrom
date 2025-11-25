@@ -36,12 +36,12 @@ export const Field = (props: any) => {
   }, [])
 
   // Query for variants data (itemValue may not include variants in the initial load)
+  // Note: file_id and file_extension are internal Keystone image field properties,
+  // not exposed in GraphQL. We only query the 'variants' JSON field.
   const { data } = useQuery(
     gql`
       query GetMediaVariants($id: ID!) {
         media(where: { id: $id }) {
-          file_id
-          file_extension
           variants
         }
       }
@@ -61,17 +61,11 @@ export const Field = (props: any) => {
   // For batch uploaded images: show a read-only preview
   const mediaData = data?.media
 
-  // Try to get image URL from variants
-  let imageUrl: string | null = null
-
-  if (mediaData?.variants && typeof mediaData.variants === 'object') {
-    imageUrl = mediaData.variants.medium || mediaData.variants.small || mediaData.variants.thumbnail
-  }
-
-  // Fallback to file_id/file_extension
-  if (!imageUrl && mediaData?.file_id && mediaData?.file_extension) {
-    imageUrl = `${mediaData.file_id}.${mediaData.file_extension}`
-  }
+  // Get image URL from variants (the only reliable source for batch uploaded images)
+  const variants = mediaData?.variants
+  const imageUrl = variants && typeof variants === 'object'
+    ? (variants.medium || variants.small || variants.thumbnail)
+    : null
 
   if (imageUrl) {
     const fullUrl = buildFullUrl(imageUrl)
