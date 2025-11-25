@@ -51,6 +51,36 @@ export const Media = list({
     }),
 
     /**
+     * File URL (for direct S3 uploads)
+     *
+     * CDN URL for files uploaded via presigned URL (direct S3 upload).
+     * Used when bypassing Keystone's built-in image field for faster uploads.
+     */
+    fileUrl: text({
+      label: 'File URL (文件URL)',
+      ui: {
+        createView: { fieldMode: 'hidden' },
+        itemView: { fieldMode: 'read' },
+        description: 'CDN URL for directly uploaded files | 直接上传文件的CDN地址',
+      },
+    }),
+
+    /**
+     * File Key (S3 object key)
+     *
+     * S3 object key for files uploaded via presigned URL.
+     * Used for file management and deletion.
+     */
+    fileKey: text({
+      label: 'File Key (S3路径)',
+      ui: {
+        createView: { fieldMode: 'hidden' },
+        itemView: { fieldMode: 'read' },
+        description: 'S3 object key for directly uploaded files | 直接上传文件的S3路径',
+      },
+    }),
+
+    /**
      * Status - Soft Delete Implementation
      *
      * ACTIVE: Visible in media library

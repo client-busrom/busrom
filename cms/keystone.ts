@@ -34,6 +34,7 @@ import clearStagingUsersHandler from './routes/api/clear-staging-users'
 import { forceClearUsersHandler } from './routes/force-clear-users'
 import { duplicateProductHandler } from './routes/duplicate-product'
 import { duplicateItemHandler } from './routes/duplicate-item'
+import { presignedUploadHandler, uploadConfigHandler } from './routes/presigned-upload'
 import { seedMediaSystem } from './scripts/seed-media-system'
 import { seedProductSystem } from './scripts/seed-product-system'
 import { seedNavigationSystem } from './scripts/seed-navigation-system'
@@ -221,6 +222,10 @@ export default withAuth(
 
         // Generic duplicate item API endpoint (Page, Blog, Application, FaqItem)
         app.post('/api/duplicate-item', duplicateItemHandler)
+
+        // S3 Presigned URL upload endpoints (for direct upload with acceleration)
+        app.post('/api/presigned-upload', presignedUploadHandler)
+        app.get('/api/upload-config', uploadConfigHandler)
 
         console.log('✅ Static files served from public/')
         console.log('✅ Translation API registered at POST /api/translate')
