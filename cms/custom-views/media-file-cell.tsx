@@ -18,30 +18,97 @@ export { controller } from '@keystone-6/core/fields/types/image/views'
 import { Field as KeystoneImageField } from '@keystone-6/core/fields/types/image/views'
 
 /**
- * Custom Field wrapper that logs props data for debugging
- * This helps us understand what data is available in the Field view
+ * Custom Field view for item/detail page
+ *
+ * For batch uploaded images (with file_id but no Keystone file data),
+ * show a preview instead of the upload button.
+ *
+ * Key insight: props.itemValue contains the full item data including variants!
  */
 export const Field = (props: any) => {
-  // Log all props to console for debugging on AWS production
-  React.useEffect(() => {
-    console.log('=== [MediaFileField] Field Props Debug ===')
-    console.log('[MediaFileField] Full props:', props)
-    console.log('[MediaFileField] props.value:', props.value)
-    console.log('[MediaFileField] props.itemValue:', props.itemValue)
-    console.log('[MediaFileField] props.field:', props.field)
-    console.log('[MediaFileField] props.forceValidation:', props.forceValidation)
-    console.log('[MediaFileField] All prop keys:', Object.keys(props))
+  const { value, itemValue } = props
 
-    // Try to get item ID from URL
-    if (typeof window !== 'undefined') {
-      const urlMatch = window.location.pathname.match(/\/media\/([^/]+)/)
-      console.log('[MediaFileField] URL pathname:', window.location.pathname)
-      console.log('[MediaFileField] Item ID from URL:', urlMatch ? urlMatch[1] : 'not found')
+  // Get item ID from URL for GraphQL query
+  const itemId = React.useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const match = window.location.pathname.match(/\/media\/([^/]+)/)
+    return match && match[1] !== 'create' ? match[1] : null
+  }, [])
+
+  // Query for variants data (itemValue may not include variants in the initial load)
+  const { data } = useQuery(
+    gql`
+      query GetMediaVariants($id: ID!) {
+        media(where: { id: $id }) {
+          file_id
+          file_extension
+          variants
+        }
+      }
+    `,
+    {
+      variables: { id: itemId },
+      skip: !itemId || (value && value.kind !== 'empty'),
     }
-    console.log('=== [MediaFileField] End Debug ===')
-  }, [props])
+  )
 
-  // Use Keystone's default Field component
+  // Check if we have Keystone file data (value.kind !== 'empty')
+  // If yes, use the default Keystone field for upload functionality
+  if (value && value.kind !== 'empty') {
+    return <KeystoneImageField {...props} />
+  }
+
+  // For batch uploaded images: show a read-only preview
+  const mediaData = data?.media
+
+  // Try to get image URL from variants
+  let imageUrl: string | null = null
+
+  if (mediaData?.variants && typeof mediaData.variants === 'object') {
+    imageUrl = mediaData.variants.medium || mediaData.variants.small || mediaData.variants.thumbnail
+  }
+
+  // Fallback to file_id/file_extension
+  if (!imageUrl && mediaData?.file_id && mediaData?.file_extension) {
+    imageUrl = `${mediaData.file_id}.${mediaData.file_extension}`
+  }
+
+  if (imageUrl) {
+    const fullUrl = buildFullUrl(imageUrl)
+    return (
+      <div style={{ marginTop: '8px' }}>
+        <div style={{
+          background: '#f7fafc',
+          border: '1px solid #e2e8f0',
+          borderRadius: '8px',
+          padding: '16px',
+          marginBottom: '12px'
+        }}>
+          <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: '#2d3748' }}>
+            File Preview (文件预览)
+          </div>
+          <div style={{ fontSize: '13px', color: '#718096', marginBottom: '12px' }}>
+            This image was batch uploaded. The file is stored in S3 and cannot be replaced through the UI.
+            <br />
+            此图片为批量导入，文件存储在 S3 中，无法通过界面替换。
+          </div>
+          <img
+            src={fullUrl}
+            alt="Media preview"
+            style={{
+              maxWidth: '100%',
+              maxHeight: '400px',
+              objectFit: 'contain',
+              borderRadius: '4px',
+              border: '1px solid #e2e8f0',
+            }}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  // Default: use Keystone's field for upload functionality (for new items)
   return <KeystoneImageField {...props} />
 }
 
