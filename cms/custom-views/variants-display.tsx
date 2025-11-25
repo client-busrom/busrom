@@ -36,13 +36,72 @@ interface ImageVariants {
   webp?: string
 }
 
+/**
+ * Convert a relative path or signed URL to a CDN URL
+ * This follows the same logic as web/lib/cdn-url.ts
+ *
+ * @param urlOrPath - Can be a relative path (variants/thumbnail/xxx.jpg) or full URL
+ * @returns The CDN URL
+ */
+function buildFullUrl(urlOrPath: string): string {
+  if (!urlOrPath) return urlOrPath
+
+  try {
+    // If already a full URL (starts with http:// or https://)
+    if (urlOrPath.startsWith('http://') || urlOrPath.startsWith('https://')) {
+      const urlObj = new URL(urlOrPath)
+
+      // Check if it's a MinIO or S3 signed URL - extract just the pathname
+      const isMinIO = urlOrPath.includes('localhost:9000')
+      const isS3 = /https?:\/\/[^\/]+\.amazonaws\.com/.test(urlOrPath)
+
+      if (isMinIO || isS3) {
+        // Strip query parameters (signatures) and use pathname only
+        urlOrPath = urlObj.pathname
+        // Remove leading slash for consistency
+        if (urlOrPath.startsWith('/')) {
+          urlOrPath = urlOrPath.slice(1)
+        }
+      } else {
+        // Already a clean URL (maybe from CDN), return as-is
+        return urlOrPath
+      }
+    }
+
+    // Get CDN domain based on current environment
+    // This runs in the browser, so we detect based on window.location
+    // For production (cms.busromhouse.com): https://d2kqew3hn5wphn.cloudfront.net
+    // For development (localhost:3000): http://localhost:8080
+    //
+    // TODO: After configuring DNS (cdn.busromhouse.com → d2kqew3hn5wphn.cloudfront.net),
+    //       update this to use: 'https://cdn.busromhouse.com'
+    const isLocalhost = typeof window !== 'undefined' &&
+                        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    const cdnDomain = isLocalhost
+      ? 'http://localhost:8080'
+      : 'https://d2kqew3hn5wphn.cloudfront.net'
+
+    // Remove leading slash if present
+    const cleanPath = urlOrPath.startsWith('/') ? urlOrPath.slice(1) : urlOrPath
+
+    // Build full CDN URL
+    return `${cdnDomain}/${cleanPath}`
+  } catch (error) {
+    console.error('Error building CDN URL:', error)
+    return urlOrPath
+  }
+}
+
 function VariantCard({ variantKey, url }: { variantKey: VariantKey; url: string }) {
   const [copied, setCopied] = React.useState(false)
   const [previewOpen, setPreviewOpen] = React.useState(false)
   const info = VARIANT_INFO[variantKey]
 
+  // Build full URL for display and copying
+  const fullUrl = buildFullUrl(url)
+
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(url)
+    navigator.clipboard.writeText(fullUrl)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -219,7 +278,7 @@ function VariantCard({ variantKey, url }: { variantKey: VariantKey; url: string 
               ×
             </button>
             <img
-              src={url}
+              src={fullUrl}
               alt={`${info.label} preview`}
               style={{
                 maxWidth: '100%',
@@ -238,7 +297,7 @@ function VariantCard({ variantKey, url }: { variantKey: VariantKey; url: string 
                 wordBreak: 'break-all',
               }}
             >
-              {url}
+              {fullUrl}
             </div>
           </div>
         </div>
