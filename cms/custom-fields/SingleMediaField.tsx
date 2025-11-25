@@ -11,6 +11,7 @@ import { FieldContainer, FieldLabel } from '@keystone-ui/fields'
 import { FieldController, FieldProps } from '@keystone-6/core/types'
 import { gql, useQuery } from '@keystone-6/core/admin-ui/apollo'
 import { FilteredMediaSelector } from './FilteredMediaSelector'
+import { getCdnUrl } from '../lib/cdn-url'
 
 // GraphQL query to get media details
 const GET_MEDIA_DETAIL = gql`
@@ -63,7 +64,7 @@ export const Field = ({ field, value, onChange }: FieldProps<typeof controller>)
             }}>
               {(selectedMedia.variants?.thumbnail || selectedMedia.file?.url) && (
                 <img
-                  src={selectedMedia.variants?.thumbnail || selectedMedia.file?.url}
+                  src={getCdnUrl(selectedMedia.variants?.thumbnail || selectedMedia.file?.url)}
                   alt={selectedMedia.filename}
                   style={{
                     width: '100%',
@@ -182,7 +183,7 @@ export const Cell = ({ item, field }: any) => {
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       {(media.variants?.thumbnail || media.file?.url) && (
         <img
-          src={media.variants?.thumbnail || media.file?.url}
+          src={getCdnUrl(media.variants?.thumbnail || media.file?.url)}
           alt={media.filename}
           style={{
             width: '40px',

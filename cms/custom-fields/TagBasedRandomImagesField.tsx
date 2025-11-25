@@ -16,6 +16,7 @@ import { FieldContainer, FieldLabel } from '@keystone-ui/fields'
 import { FieldController, FieldProps } from '@keystone-6/core/types'
 import { gql, useQuery } from '@keystone-6/core/admin-ui/apollo'
 import { Button } from '@keystone-ui/button'
+import { getCdnUrl } from '../lib/cdn-url'
 
 // GraphQL query to get all MediaTags
 const GET_MEDIA_TAGS = gql`
@@ -388,7 +389,7 @@ export const Field = ({ field, value, onChange }: FieldProps<typeof controller>)
                     }}>
                       {thumbnailUrl && (
                         <img
-                          src={thumbnailUrl}
+                          src={getCdnUrl(thumbnailUrl)}
                           alt={media.filename}
                           style={{
                             position: 'absolute',

@@ -11,6 +11,7 @@ import { FieldContainer, FieldLabel } from '@keystone-ui/fields'
 import { FieldController, FieldProps } from '@keystone-6/core/types'
 import { gql, useQuery } from '@keystone-6/core/admin-ui/apollo'
 import { FilteredMediaSelector } from './FilteredMediaSelector'
+import { getCdnUrl } from '../lib/cdn-url'
 import {
   DndContext,
   closestCenter,
@@ -126,7 +127,7 @@ function SortableMediaItem({ id, media, onRemove }: { id: string; media: any; on
         }}>
           {thumbnailUrl && (
             <img
-              src={thumbnailUrl}
+              src={getCdnUrl(thumbnailUrl)}
               alt={media.filename}
               style={{
                 position: 'absolute',

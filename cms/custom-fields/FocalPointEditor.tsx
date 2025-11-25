@@ -13,6 +13,7 @@ import { controller } from '@keystone-6/core/fields/types/json/views'
 import { gql, useQuery } from '@keystone-6/core/admin-ui/apollo'
 import { useRouter } from '@keystone-6/core/admin-ui/router'
 import { FieldContainer, FieldLabel, TextInput } from '@keystone-ui/fields'
+import { getCdnUrl } from '../lib/cdn-url'
 
 // GraphQL query to get Media file URL
 const GET_MEDIA_FILE = gql`
@@ -439,7 +440,7 @@ export const Field = ({ field, value, onChange, autoFocus }: FieldProps<typeof c
     skip: !itemId,
   })
 
-  const imageUrl = data?.media?.file?.url
+  const imageUrl = getCdnUrl(data?.media?.file?.url)
 
   // Parse current focal point value
   const currentFocalPoint: FocalPoint = React.useMemo(() => {
