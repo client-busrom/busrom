@@ -58,6 +58,7 @@ export const Media = list({
      */
     fileUrl: text({
       label: 'File URL (文件URL)',
+      db: { isNullable: true },
       ui: {
         createView: { fieldMode: 'hidden' },
         itemView: { fieldMode: 'read' },
@@ -73,6 +74,7 @@ export const Media = list({
      */
     fileKey: text({
       label: 'File Key (S3路径)',
+      db: { isNullable: true },
       ui: {
         createView: { fieldMode: 'hidden' },
         itemView: { fieldMode: 'read' },
