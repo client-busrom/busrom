@@ -58,7 +58,7 @@ function normalizeImage(image: UniversalImage | string): MediaImage | null {
       filename: '',
       file: { url: image },
       fileUrl: image,
-      variants: null,
+      variants: undefined,
       altText: null,
     }
   }
