@@ -1,9 +1,10 @@
-﻿// components/HeroBanner/HeroBanner7.tsx
-import Image from "next/image";
+// components/HeroBanner/HeroBanner7.tsx
 import type { FC } from "react";
-import type { HomeContent } from "@/lib/content-data"; // Ensure path is correct
-import { Locale } from "@/i18n.config"; // Ensure path is correct
-import { cn, getObjectPosition } from "@/lib/utils"; // Import cn and getObjectPosition
+import Image from "next/image";
+import type { HomeContent } from "@/lib/content-data";
+import { Locale } from "@/i18n.config";
+import { cn, getObjectPosition } from "@/lib/utils";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // --- BannerProps Definition ---
 type BannerData = HomeContent["heroBanner"][number];
@@ -14,12 +15,7 @@ type BannerProps = {
 
 // --- HeroBanner7 Component ---
 const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
-  const imageUrl: string = data.images[0]?.url || "/placeholder.jpg";
-  const svgUrl: string = "/HeroBanner7.svg"; // <-- Using 6 as specified, confirm if correct
-  // Placeholder paths for the three rotated images
-  const imageTopUrl = data.images[1]?.url || "/placeholder.jpg";
-  const imageMiddleUrl = data.images[2]?.url || "/placeholder.jpg";
-  const imageBottomUrl = data.images[3]?.url || "/placeholder.jpg";
+  const svgUrl: string = "/HeroBanner7.svg";
 
   // --- Split Feature[0] ---
   const feature0Text = data.features[0] || "";
@@ -50,14 +46,12 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
         </defs>
       </svg>
       {/* Layer 1: Background Image (z-0) */}
-      <Image
-        src={imageUrl}
+      <OptimizedImage
+        image={data.images[0]}
         alt="Background"
-        fill
-        sizes="100vw"
-        quality={90}
-        className="object-cover z-0"
-        style={{ objectPosition: getObjectPosition(data.images[0]) }}
+        size="xlarge"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        objectPosition={getObjectPosition(data.images[0])}
         priority
       />
       {/* Layer 2: SVG Mask (z-10) */}
@@ -71,40 +65,40 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
       />
 
       {/* Layer 3: Rotated Image Divs (z-20) */}
-      {/* Top Rotated Div (around 50% left, partially off top) */}
+      {/* Top Rotated Div */}
       <div
         className={cn(
           rotatedDivBaseClasses,
           rotatedDivSizeClasses,
-          "rounded-[60px] top-[-8%] left-[38%] transform -translate-x-1/2" // Adjust top/left %
+          "rounded-[60px] top-[-8%] left-[38%] transform -translate-x-1/2"
         )}
       >
         <div className="relative w-full h-full">
-          <Image src={imageTopUrl} alt="Top rotated image" fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover -rotate-45 scale-150" />
+          <OptimizedImage image={data.images[1]} alt="Top rotated image" size="large" className="absolute inset-0 w-full h-full object-cover -rotate-45 scale-150" />
         </div>
       </div>
-      {/* Bottom Rotated Div (around 50% left, partially off bottom) */}
+      {/* Bottom Rotated Div */}
       <div
         className={cn(
           rotatedDivBaseClasses,
           rotatedDivSizeClasses,
-          "rounded-[60px] bottom-[-6%] left-[39%] transform -translate-x-1/2" // Adjust bottom/left %
+          "rounded-[60px] bottom-[-6%] left-[39%] transform -translate-x-1/2"
         )}
       >
          <div className="relative w-full h-full">
-          <Image src={imageBottomUrl} alt="Bottom rotated image" fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover -rotate-45 scale-150" />
+          <OptimizedImage image={data.images[3]} alt="Bottom rotated image" size="large" className="absolute inset-0 w-full h-full object-cover -rotate-45 scale-150" />
         </div>
       </div>
-      {/* Middle Rotated Div (around 55% left, centered vertically) */}
+      {/* Middle Rotated Div */}
       <div
         className={cn(
           rotatedDivBaseClasses,
           "w-48 h-48 rounded-[60px]",
-          "top-[49%] left-[48%] transform -translate-x-1/2 -translate-y-1/2" // Adjust left %
+          "top-[49%] left-[48%] transform -translate-x-1/2 -translate-y-1/2"
         )}
       >
          <div className="relative w-full h-full">
-          <Image src={imageMiddleUrl} alt="Middle rotated image" fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover -rotate-45 scale-150" />
+          <OptimizedImage image={data.images[2]} alt="Middle rotated image" size="medium" className="absolute inset-0 w-full h-full object-cover -rotate-45 scale-150" />
         </div>
       </div>
 

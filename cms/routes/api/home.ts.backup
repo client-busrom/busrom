@@ -1,0 +1,646 @@
+/**
+ * Home Content API
+ *
+ * Provides all home page content in a single API call
+ * Transforms CMS data to match frontend expectations
+ */
+
+import { Request, Response } from 'express'
+
+/**
+ * GET /api/home?locale=en
+ *
+ * Returns all home page content for the specified locale
+ */
+export async function homeContentHandler(req: Request, res: Response) {
+  try {
+    const locale = (req.query.locale as string) || 'en'
+    const context = (req as any).context.sudo()
+
+    // Helper function to extract localized value
+    const getLocalized = (field: any, fallback = '') => {
+      if (!field) return fallback
+      if (typeof field === 'string') return field
+      return field[locale] || field['en'] || fallback
+    }
+
+    // Helper function to extract media URL from Media object
+    // Supports both new (fileUrl) and old (file.url) upload methods
+    const getMediaUrl = (media: any) => {
+      if (!media) return null
+      if (typeof media === 'string') return media // If already a string URL
+      // New direct upload method
+      if (media.fileUrl) return media.fileUrl
+      // Old Keystone image field method
+      if (media.file?.url) return media.file.url
+      return null
+    }
+
+    // 1. Fetch Hero Banner Items
+    const heroBannerItems = await context.query.HeroBannerItem.findMany({
+      where: {
+        status: { equals: 'PUBLISHED' },
+        enabled: { equals: true },
+      },
+      orderBy: { order: 'asc' },
+      query: `
+        id
+        title
+        feature1
+        feature2
+        feature3
+        feature4
+        feature5
+        image1 {
+          fileUrl
+          file {
+            url
+          }
+        }
+        image2 {
+          fileUrl
+          file {
+            url
+          }
+        }
+        image3 {
+          fileUrl
+          file {
+            url
+          }
+        }
+        image4 {
+          fileUrl
+          file {
+            url
+          }
+        }
+      `,
+    })
+
+    const heroBanner = heroBannerItems.map((item: any) => ({
+      id: item.id,
+      title: getLocalized(item.title),
+      features: [
+        getLocalized(item.feature1),
+        getLocalized(item.feature2),
+        getLocalized(item.feature3),
+        getLocalized(item.feature4),
+        getLocalized(item.feature5),
+      ].filter(Boolean),
+      images: [
+        getMediaUrl(item.image1),
+        getMediaUrl(item.image2),
+        getMediaUrl(item.image3),
+        getMediaUrl(item.image4),
+      ].filter(Boolean),
+    }))
+
+    // 2. Fetch Product Series Carousel
+    const carouselData = await context.query.ProductSeriesCarousel.findOne({
+      where: { internalLabel: 'Product Series Carousel Configuration' },
+      query: `
+        internalLabel
+        items
+        autoPlay
+        autoPlaySpeed
+        status
+      `,
+    })
+
+    const productSeriesCarousel = carouselData ? {
+      items: carouselData.items || {},
+      autoPlay: carouselData.autoPlay,
+      autoPlaySpeed: carouselData.autoPlaySpeed,
+    } : null
+
+    // 3. Fetch Service Features Config
+    const serviceFeaturesData = await context.query.ServiceFeaturesConfig.findMany({
+      where: { status: { equals: 'PUBLISHED' } },
+      take: 1,
+      query: `
+        title
+        subtitle
+        feature1Title
+        feature1ShortTitle
+        feature1Description
+        feature1Image1 {
+          fileUrl
+        }
+        feature1Image2 {
+          fileUrl
+        }
+        feature1Image3 {
+          fileUrl
+        }
+        feature1Image4 {
+          fileUrl
+        }
+        feature2Title
+        feature2ShortTitle
+        feature2Description
+        feature2Image1 {
+          fileUrl
+        }
+        feature2Image2 {
+          fileUrl
+        }
+        feature3Title
+        feature3ShortTitle
+        feature3Description
+        feature3Image1 {
+          fileUrl
+        }
+        feature3Image2 {
+          fileUrl
+        }
+        feature3Image3 {
+          fileUrl
+        }
+        feature3Image4 {
+          fileUrl
+        }
+        feature3Image5 {
+          fileUrl
+        }
+        feature3Image6 {
+          fileUrl
+        }
+        feature4Title
+        feature4ShortTitle
+        feature4Description
+        feature4Image1 {
+          fileUrl
+        }
+        feature4Image2 {
+          fileUrl
+        }
+        feature5Title
+        feature5ShortTitle
+        feature5Description
+        feature5Image1 {
+          fileUrl
+        }
+        feature5Image2 {
+          fileUrl
+        }
+      `,
+    })
+
+    const serviceFeatures = serviceFeaturesData[0] ? {
+      title: getLocalized(serviceFeaturesData[0].title),
+      subtitle: getLocalized(serviceFeaturesData[0].subtitle),
+      features: [
+        {
+          title: getLocalized(serviceFeaturesData[0].feature1Title),
+          shortTitle: getLocalized(serviceFeaturesData[0].feature1ShortTitle),
+          description: getLocalized(serviceFeaturesData[0].feature1Description),
+          images: [
+            getMediaUrl(serviceFeaturesData[0].feature1Image1),
+            getMediaUrl(serviceFeaturesData[0].feature1Image2),
+            getMediaUrl(serviceFeaturesData[0].feature1Image3),
+            getMediaUrl(serviceFeaturesData[0].feature1Image4),
+          ].filter(Boolean),
+        },
+        {
+          title: getLocalized(serviceFeaturesData[0].feature2Title),
+          shortTitle: getLocalized(serviceFeaturesData[0].feature2ShortTitle),
+          description: getLocalized(serviceFeaturesData[0].feature2Description),
+          images: [
+            getMediaUrl(serviceFeaturesData[0].feature2Image1),
+            getMediaUrl(serviceFeaturesData[0].feature2Image2),
+          ].filter(Boolean),
+        },
+        {
+          title: getLocalized(serviceFeaturesData[0].feature3Title),
+          shortTitle: getLocalized(serviceFeaturesData[0].feature3ShortTitle),
+          description: getLocalized(serviceFeaturesData[0].feature3Description),
+          images: [
+            getMediaUrl(serviceFeaturesData[0].feature3Image1),
+            getMediaUrl(serviceFeaturesData[0].feature3Image2),
+            getMediaUrl(serviceFeaturesData[0].feature3Image3),
+            getMediaUrl(serviceFeaturesData[0].feature3Image4),
+            getMediaUrl(serviceFeaturesData[0].feature3Image5),
+            getMediaUrl(serviceFeaturesData[0].feature3Image6),
+          ].filter(Boolean),
+        },
+        {
+          title: getLocalized(serviceFeaturesData[0].feature4Title),
+          shortTitle: getLocalized(serviceFeaturesData[0].feature4ShortTitle),
+          description: getLocalized(serviceFeaturesData[0].feature4Description),
+          images: [
+            getMediaUrl(serviceFeaturesData[0].feature4Image1),
+            getMediaUrl(serviceFeaturesData[0].feature4Image2),
+          ].filter(Boolean),
+        },
+        {
+          title: getLocalized(serviceFeaturesData[0].feature5Title),
+          shortTitle: getLocalized(serviceFeaturesData[0].feature5ShortTitle),
+          description: getLocalized(serviceFeaturesData[0].feature5Description),
+          images: [
+            getMediaUrl(serviceFeaturesData[0].feature5Image1),
+            getMediaUrl(serviceFeaturesData[0].feature5Image2),
+          ].filter(Boolean),
+        },
+      ],
+    } : null
+
+    // 4. Fetch Simple CTA
+    const simpleCtaData = await context.query.SimpleCta.findMany({
+      where: { status: { equals: 'PUBLISHED' } },
+      take: 1,
+      query: `
+        title
+        title2
+        subtitle
+        description
+        buttonText
+        image1 {
+          fileUrl
+        }
+        image2 {
+          fileUrl
+        }
+        image3 {
+          fileUrl
+        }
+      `,
+    })
+
+    const simpleCta = simpleCtaData[0] ? {
+      title: getLocalized(simpleCtaData[0].title),
+      title2: getLocalized(simpleCtaData[0].title2),
+      subtitle: getLocalized(simpleCtaData[0].subtitle),
+      description: getLocalized(simpleCtaData[0].description),
+      buttonText: getLocalized(simpleCtaData[0].buttonText),
+      images: [
+        getMediaUrl(simpleCtaData[0].image1),
+        getMediaUrl(simpleCtaData[0].image2),
+        getMediaUrl(simpleCtaData[0].image3),
+      ].filter(Boolean),
+    } : null
+
+    // 5. Fetch Series Intro
+    const seriesIntroData = await context.query.SeriesIntro.findMany({
+      where: { status: { equals: 'PUBLISHED' } },
+      query: `
+        id
+        internalLabel
+        title
+        description
+        images
+        productSeries {
+          id
+          slug
+        }
+      `,
+    })
+
+    const seriesIntro = seriesIntroData.map((item: any) => ({
+      id: item.id,
+      title: getLocalized(item.title),
+      description: getLocalized(item.description),
+      images: item.images?.images || [],
+      productSeriesSlug: item.productSeries?.slug,
+    }))
+
+    // 6. Fetch Featured Products
+    const featuredProductsData = await context.query.FeaturedProducts.findMany({
+      where: { status: { equals: 'PUBLISHED' } },
+      take: 1,
+      query: `
+        title
+        description
+        viewAllButtonText
+        categories
+      `,
+    })
+
+    const featuredProducts = featuredProductsData[0] ? {
+      title: getLocalized(featuredProductsData[0].title),
+      description: getLocalized(featuredProductsData[0].description),
+      viewAllButtonText: getLocalized(featuredProductsData[0].viewAllButtonText),
+      categories: featuredProductsData[0].categories || [],
+    } : null
+
+    // 7. Fetch Brand Advantages
+    const brandAdvantagesData = await context.query.BrandAdvantages.findMany({
+      where: { status: { equals: 'PUBLISHED' } },
+      take: 1,
+      query: `
+        advantage1
+        icon1
+        advantage2
+        icon2
+        advantage3
+        icon3
+        advantage4
+        icon4
+        advantage5
+        icon5
+        advantage6
+        icon6
+        advantage7
+        icon7
+        advantage8
+        icon8
+        advantage9
+        icon9
+      `,
+    })
+
+    const brandAdvantages = brandAdvantagesData[0] ? {
+      advantages: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+        text: getLocalized(brandAdvantagesData[0][`advantage${i}`]),
+        icon: getMediaUrl(brandAdvantagesData[0][`icon${i}`]),
+      })).filter(item => item.text),
+    } : null
+
+    // 8. Fetch OEM/ODM
+    const oemOdmData = await context.query.OemOdm.findMany({
+      where: { status: { equals: 'PUBLISHED' } },
+      take: 1,
+      query: `
+        oemTitle
+        oemBgImage
+        oemImage
+        oemDescription1
+        oemDescription2
+        odmTitle
+        odmBgImage
+        odmImage
+        odmDescription1
+        odmDescription2
+      `,
+    })
+
+    const oemOdm = oemOdmData[0] ? {
+      oem: {
+        title: getLocalized(oemOdmData[0].oemTitle),
+        bgImage: getMediaUrl(oemOdmData[0].oemBgImage),
+        image: getMediaUrl(oemOdmData[0].oemImage),
+        description: [
+          getLocalized(oemOdmData[0].oemDescription1),
+          getLocalized(oemOdmData[0].oemDescription2),
+        ].filter(Boolean),
+      },
+      odm: {
+        title: getLocalized(oemOdmData[0].odmTitle),
+        bgImage: getMediaUrl(oemOdmData[0].odmBgImage),
+        image: getMediaUrl(oemOdmData[0].odmImage),
+        description: [
+          getLocalized(oemOdmData[0].odmDescription1),
+          getLocalized(oemOdmData[0].odmDescription2),
+        ].filter(Boolean),
+      },
+    } : null
+
+    // 9. Fetch Quote Steps
+    const quoteStepsData = await context.query.QuoteSteps.findMany({
+      where: { status: { equals: 'PUBLISHED' } },
+      take: 1,
+      query: `
+        title
+        title2
+        subtitle
+        description
+        step1Text
+        step1Image
+        step2Text
+        step2Image
+        step3Text
+        step3Image
+        step4Text
+        step4Image
+        step5Text
+        step5Image
+      `,
+    })
+
+    const quoteSteps = quoteStepsData[0] ? {
+      title: getLocalized(quoteStepsData[0].title),
+      title2: getLocalized(quoteStepsData[0].title2),
+      subtitle: getLocalized(quoteStepsData[0].subtitle),
+      description: getLocalized(quoteStepsData[0].description),
+      steps: [1, 2, 3, 4, 5].map(i => ({
+        text: getLocalized(quoteStepsData[0][`step${i}Text`]),
+        image: getMediaUrl(quoteStepsData[0][`step${i}Image`]),
+      })).filter(step => step.text),
+    } : null
+
+    // 10. Fetch Main Form
+    const mainFormData = await context.query.MainForm.findMany({
+      where: { status: { equals: 'PUBLISHED' } },
+      take: 1,
+      query: `
+        placeholderName
+        placeholderEmail
+        placeholderWhatsapp
+        placeholderCompany
+        placeholderMessage
+        placeholderVerify
+        buttonText
+        designTextLeft
+        designTextRight
+        image1
+        image2
+      `,
+    })
+
+    const mainForm = mainFormData[0] ? {
+      placeholders: {
+        name: getLocalized(mainFormData[0].placeholderName),
+        email: getLocalized(mainFormData[0].placeholderEmail),
+        whatsapp: getLocalized(mainFormData[0].placeholderWhatsapp),
+        company: getLocalized(mainFormData[0].placeholderCompany),
+        message: getLocalized(mainFormData[0].placeholderMessage),
+        verify: getLocalized(mainFormData[0].placeholderVerify),
+      },
+      buttonText: getLocalized(mainFormData[0].buttonText),
+      designText: {
+        left: getLocalized(mainFormData[0].designTextLeft),
+        right: getLocalized(mainFormData[0].designTextRight),
+      },
+      images: [
+        getMediaUrl(mainFormData[0].image1),
+        getMediaUrl(mainFormData[0].image2),
+      ].filter(Boolean),
+    } : null
+
+    // 11. Fetch Why Choose Busrom
+    const whyChooseData = await context.query.WhyChooseBusrom.findMany({
+      where: { status: { equals: 'PUBLISHED' } },
+      take: 1,
+      query: `
+        title
+        title2
+        viewMoreButtonText
+        viewMoreButtonUrl
+        reason1Title
+        reason1Description
+        reason1Image
+        reason2Title
+        reason2Description
+        reason2Image
+        reason3Title
+        reason3Description
+        reason3Image
+        reason4Title
+        reason4Description
+        reason4Image
+        reason5Title
+        reason5Description
+        reason5Image
+      `,
+    })
+
+    const whyChoose = whyChooseData[0] ? {
+      title: getLocalized(whyChooseData[0].title),
+      title2: getLocalized(whyChooseData[0].title2),
+      viewMoreButtonText: getLocalized(whyChooseData[0].viewMoreButtonText),
+      viewMoreButtonUrl: whyChooseData[0].viewMoreButtonUrl,
+      reasons: [1, 2, 3, 4, 5].map(i => ({
+        title: getLocalized(whyChooseData[0][`reason${i}Title`]),
+        description: getLocalized(whyChooseData[0][`reason${i}Description`]),
+        image: getMediaUrl(whyChooseData[0][`reason${i}Image`]),
+      })).filter(reason => reason.title),
+    } : null
+
+    // 12. Fetch Case Studies
+    const caseStudiesData = await context.query.CaseStudies.findMany({
+      where: { status: { equals: 'PUBLISHED' } },
+      take: 1,
+      query: `
+        title
+        description
+        categories
+      `,
+    })
+
+    const caseStudies = caseStudiesData[0] ? {
+      title: getLocalized(caseStudiesData[0].title),
+      description: getLocalized(caseStudiesData[0].description),
+      categories: caseStudiesData[0].categories || [],
+    } : null
+
+    // 13. Fetch Brand Analysis
+    const brandAnalysisData = await context.query.BrandAnalysis.findMany({
+      where: { status: { equals: 'PUBLISHED' } },
+      take: 1,
+      query: `
+        analysisTitle
+        analysisTitle2
+        analysisText
+        analysisText2
+        brandCenterTitle
+        brandCenterDescription
+        projectCenterTitle
+        projectCenterDescription
+        serviceCenterTitle
+        serviceCenterDescription
+      `,
+    })
+
+    const brandAnalysis = brandAnalysisData[0] ? {
+      analysisTitle: getLocalized(brandAnalysisData[0].analysisTitle),
+      analysisTitle2: getLocalized(brandAnalysisData[0].analysisTitle2),
+      analysisText: getLocalized(brandAnalysisData[0].analysisText),
+      analysisText2: getLocalized(brandAnalysisData[0].analysisText2),
+      centers: [
+        {
+          title: getLocalized(brandAnalysisData[0].brandCenterTitle),
+          description: getLocalized(brandAnalysisData[0].brandCenterDescription),
+        },
+        {
+          title: getLocalized(brandAnalysisData[0].projectCenterTitle),
+          description: getLocalized(brandAnalysisData[0].projectCenterDescription),
+        },
+        {
+          title: getLocalized(brandAnalysisData[0].serviceCenterTitle),
+          description: getLocalized(brandAnalysisData[0].serviceCenterDescription),
+        },
+      ],
+    } : null
+
+    // 14. Fetch Brand Value
+    const brandValueData = await context.query.BrandValue.findMany({
+      where: { status: { equals: 'PUBLISHED' } },
+      take: 1,
+      query: `
+        title
+        subtitle
+        param1Title
+        param1Description
+        param1Image
+        param2Title
+        param2Description
+        param2Image
+        sloganTitle
+        sloganDescription
+        sloganImage
+        valueTitle
+        valueDescription
+        valueImage
+        visionTitle
+        visionDescription
+        visionImage
+      `,
+    })
+
+    const brandValue = brandValueData[0] ? {
+      title: getLocalized(brandValueData[0].title),
+      subtitle: getLocalized(brandValueData[0].subtitle),
+      items: [
+        {
+          title: getLocalized(brandValueData[0].param1Title),
+          description: getLocalized(brandValueData[0].param1Description),
+          image: getMediaUrl(brandValueData[0].param1Image),
+        },
+        {
+          title: getLocalized(brandValueData[0].param2Title),
+          description: getLocalized(brandValueData[0].param2Description),
+          image: getMediaUrl(brandValueData[0].param2Image),
+        },
+        {
+          title: getLocalized(brandValueData[0].sloganTitle),
+          description: getLocalized(brandValueData[0].sloganDescription),
+          image: getMediaUrl(brandValueData[0].sloganImage),
+        },
+        {
+          title: getLocalized(brandValueData[0].valueTitle),
+          description: getLocalized(brandValueData[0].valueDescription),
+          image: getMediaUrl(brandValueData[0].valueImage),
+        },
+        {
+          title: getLocalized(brandValueData[0].visionTitle),
+          description: getLocalized(brandValueData[0].visionDescription),
+          image: getMediaUrl(brandValueData[0].visionImage),
+        },
+      ].filter(item => item.title),
+    } : null
+
+    // Return complete home content
+    const homeContent = {
+      locale,
+      heroBanner,
+      productSeriesCarousel,
+      serviceFeatures,
+      simpleCta,
+      seriesIntro,
+      featuredProducts,
+      brandAdvantages,
+      oemOdm,
+      quoteSteps,
+      mainForm,
+      whyChoose,
+      caseStudies,
+      brandAnalysis,
+      brandValue,
+    }
+
+    res.json(homeContent)
+  } catch (error: any) {
+    console.error('Home Content API Error:', error)
+    res.status(500).json({ error: 'Failed to fetch home content', message: error.message })
+  }
+}

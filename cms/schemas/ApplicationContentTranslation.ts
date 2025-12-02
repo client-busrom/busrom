@@ -112,7 +112,14 @@ export const ApplicationContentTranslation = list({
    * Access Control
    * - 使用 publicReadAccess: 前端可公开读取,后台操作需要权限
    */
-  access: publicReadAccess('ApplicationContentTranslation'),
+  access: {
+    operation: {
+      query: () => true,
+      create: () => true, // Allow creation for seeding
+      update: ({ session }) => !!session,
+      delete: ({ session }) => !!session,
+    },
+  },
 
   /**
    * UI Configuration

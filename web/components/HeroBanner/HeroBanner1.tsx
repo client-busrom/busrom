@@ -1,9 +1,10 @@
-﻿// components/HeroBanner/HeroBanner1.tsx
-import Image from "next/image";
+// components/HeroBanner/HeroBanner1.tsx
 import type { FC } from "react";
-import type { HomeContent } from "@/lib/content-data"; // 确保路径正确
-import { Locale } from "@/i18n.config"; // 确保路径正确
-import { cn, getObjectPosition } from "@/lib/utils"; // 导入 cn 和 getObjectPosition
+import Image from "next/image";
+import type { HomeContent } from "@/lib/content-data";
+import { Locale } from "@/i18n.config";
+import { cn, getObjectPosition } from "@/lib/utils";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // --- BannerProps 定义 ---
 type BannerData = HomeContent["heroBanner"][number];
@@ -14,44 +15,36 @@ type BannerProps = {
 
 // --- HeroBanner1 组件 ---
 const HeroBanner1: FC<BannerProps> = ({ data, locale }) => {
-  console.log(data);
-  const imageUrl: string = data.images[0]?.url || "/placeholder.jpg"; // <-- 使用ImageObject.url
-  const svgUrl: string = data.images[1]?.url || "/HeroBanner1.svg"; // 使用 data.images[1] 作为 SVG
-
-  // 【新增】额外的图片路径
-  const topLeftImageUrl: string = data.images[2]?.url || "/placeholder.jpg";
+  const svgUrl: string = "/HeroBanner1.svg";
 
   return (
     <section className="relative w-full h-full overflow-hidden font-sans flex items-center justify-center text-center">
       {/* 背景图 */}
-      <Image
-        src={imageUrl}
+      <OptimizedImage
+        image={data.images[0]}
         alt="背景图"
-        fill
-        sizes="100vw"
-        quality={90}
-        className="object-cover z-0"
-        style={{ objectPosition: getObjectPosition(data.images[0]) }}
+        size="xlarge"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        objectPosition={getObjectPosition(data.images[0])}
         priority
       />
       {/* SVG 遮罩 */}
       <Image
         src={svgUrl}
         alt="mask"
-        fill // 使用 fill
+        fill
         sizes="100vw"
-        className="object-cover z-10" // object-cover
+        className="object-cover z-10"
         style={{ objectPosition: getObjectPosition(data.images[1]) }}
       />
 
       {/* 示例尺寸，请根据需要调整 */}
-      <Image
-        src={topLeftImageUrl}
+      <OptimizedImage
+        image={data.images[1]}
         alt="Decorative Top Left"
-        fill
-        sizes="100vw"
-        className="object-cover z-10" // object-cover
-        style={{ objectPosition: getObjectPosition(data.images[2]) }}
+        size="xlarge"
+        className="absolute inset-0 w-full h-full object-cover z-10"
+        objectPosition={getObjectPosition(data.images[2])}
       />
 
       {/* 内容容器 */}

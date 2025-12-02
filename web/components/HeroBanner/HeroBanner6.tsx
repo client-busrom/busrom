@@ -1,9 +1,10 @@
-﻿// components/HeroBanner/HeroBanner1.tsx
-import Image from "next/image";
+// components/HeroBanner/HeroBanner6.tsx
 import type { FC, ReactNode } from "react";
-import type { HomeContent } from "@/lib/content-data"; // 确保路径正确
-import { Locale } from "@/i18n.config"; // 确保路径正确
-import { cn, getObjectPosition } from "@/lib/utils"; // 导入 cn 和 getObjectPosition
+import Image from "next/image";
+import type { HomeContent } from "@/lib/content-data";
+import { Locale } from "@/i18n.config";
+import { cn, getObjectPosition } from "@/lib/utils";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // --- BannerProps 定义 ---
 // 假设 data prop 接收 homeContent.heroBanner 数组中的一项
@@ -33,42 +34,34 @@ const FeaturePill: FC<FeaturePillProps> = ({ children }) => (
   </div>
 );
 
-// --- HeroBanner1 组件 ---
+// --- HeroBanner6 组件 ---
 const HeroBanner6: FC<BannerProps> = ({ data, locale }) => {
-  // 【已修改】从 data 获取图片路径 (假设需要添加基础路径)
-  const imageUrl: string = data.images[0]?.url || "/placeholder.jpg";
-  const svgUrl: string = "HeroBanner6.svg"; // 保持不变
+  const svgUrl: string = "/HeroBanner6.svg";
 
   // --- 拆分标题 ---
-  // 简单的按第一个空格拆分，如果标题格式固定
-  const fullFeatureTitle = data.features[0] || ""; // 获取第一个 feature 字符串
-  const words = fullFeatureTitle.split("\n");     // 分割成所有单词
-  const titleLine1 = words[0] || "";             // 第一个单词作为第一行
-  // 从第二个单词开始，获取剩余所有单词，并用空格连接
-  const titleLine2 = words.slice(1).join(" ");   // 剩余单词作为第二行
-  // 如果需要更复杂的拆分，可以在这里添加逻辑
+  const fullFeatureTitle = data.features[0] || "";
+  const words = fullFeatureTitle.split("\n");
+  const titleLine1 = words[0] || "";
+  const titleLine2 = words.slice(1).join(" ");
 
   return (
-    // 【已修改】移除 absolute, 使用 h-full w-full
     <section className="relative w-full h-full overflow-hidden font-sans">
       {/* 背景图 */}
-      <Image
-        src={imageUrl}
+      <OptimizedImage
+        image={data.images[0]}
         alt="背景图"
-        fill // 使用 fill 替代 layout="fill" objectFit="cover"
-        sizes="100vw" // fill 时建议提供 sizes
-        quality={90}
-        className="object-cover z-0" // object-cover
-        style={{ objectPosition: getObjectPosition(data.images[0]) }}
-        priority // 首屏 Banner 建议添加 priority
+        size="xlarge"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        objectPosition={getObjectPosition(data.images[0])}
+        priority
       />
       {/* SVG 遮罩 */}
       <Image
         src={svgUrl}
         alt="mask"
-        fill // 使用 fill
+        fill
         sizes="100vw"
-        className="object-cover z-10" // object-cover
+        className="object-cover z-10"
         style={{ objectPosition: getObjectPosition(data.images[0]) }}
       />
 

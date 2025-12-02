@@ -547,6 +547,8 @@ model Media {
   file_height                        Int?
   file_extension                     String?
   filename                           String             @default("")
+  fileUrl                            String?
+  fileKey                            String?
   status                             String?            @default("ACTIVE")
   altText                            Json?              @default("{}")
   primaryCategory                    MediaCategory?     @relation("Media_primaryCategory", fields: [primaryCategoryId], references: [id])

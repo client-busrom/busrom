@@ -71,6 +71,8 @@ export interface ProductSeriesItem {
   order: number
   name: string
   image: ImageObject
+  sceneImage: ImageObject
+  buttonText: string
   href: string
 }
 
@@ -238,6 +240,8 @@ export interface BrandAnalysisInfo {
 export interface BrandCenter {
   title: string
   description: string
+  largeImage?: string | null
+  smallImage?: string | null
 }
 
 export interface BrandAnalysisData {

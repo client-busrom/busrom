@@ -18,6 +18,13 @@ import { gql, useMutation, useQuery } from '@keystone-6/core/admin-ui/apollo'
 
 /**
  * Image item structure
+ *
+ * Metadata fields:
+ * - group: 场景分组编号 (用于场景图)
+ * - sceneNumber: 场景编号
+ * - imageNumber: 图片编号 (用于白底图系列编号)
+ * - specs: 规格信息
+ * - notes: 备注
  */
 interface ImageItem {
   id: string
@@ -28,12 +35,11 @@ interface ImageItem {
   primaryCategory?: string
   tags?: string[]
   metadata?: {
-    seriesNumber?: number
-    combinationNumber?: number
-    sceneNumber?: number
-    specs?: string[]
-    colors?: string[]
-    notes?: string
+    group?: number          // 场景分组编号
+    sceneNumber?: number    // 场景编号
+    imageNumber?: number    // 图片编号 (白底图系列编号)
+    specs?: string[]        // 规格信息
+    notes?: string          // 备注
   }
   status: 'pending' | 'uploading' | 'success' | 'error'
   error?: string
@@ -45,12 +51,11 @@ interface BatchFields {
   altTextEn?: string
   primaryCategory?: string
   tags?: string[]
-  seriesNumber?: number
-  combinationNumber?: number
-  sceneNumber?: number
-  specs?: string[]
-  colors?: string[]
-  notes?: string
+  group?: number            // 场景分组编号
+  sceneNumber?: number      // 场景编号
+  imageNumber?: number      // 图片编号 (白底图系列编号)
+  specs?: string[]          // 规格信息
+  notes?: string            // 备注
 }
 
 export default function BatchMediaUploadPage() {
@@ -199,10 +204,12 @@ export default function BatchMediaUploadPage() {
     setImages((prev) =>
       prev.map((img, index) => {
         // Generate filename with numbering if baseFilename is provided
+        // Format: xxx-001, xxx-002, xxx-003...
         let newFilename = img.filename
         if (batchFields.baseFilename && prev.length > 1) {
           const extension = img.filename.split('.').pop()
-          newFilename = `${batchFields.baseFilename}_${index + 1}.${extension}`
+          const paddedNumber = String(index + 1).padStart(3, '0')
+          newFilename = `${batchFields.baseFilename}-${paddedNumber}.${extension}`
         } else if (batchFields.baseFilename) {
           const extension = img.filename.split('.').pop()
           newFilename = `${batchFields.baseFilename}.${extension}`
@@ -220,12 +227,10 @@ export default function BatchMediaUploadPage() {
           tags: batchFields.tags && batchFields.tags.length > 0 ? batchFields.tags : img.tags,
           metadata: {
             ...(img.metadata || {}),
-            seriesNumber: batchFields.seriesNumber || img.metadata?.seriesNumber,
-            combinationNumber: batchFields.combinationNumber || img.metadata?.combinationNumber,
+            group: batchFields.group || img.metadata?.group,
             sceneNumber: batchFields.sceneNumber || img.metadata?.sceneNumber,
+            imageNumber: batchFields.imageNumber || img.metadata?.imageNumber,
             specs: batchFields.specs && batchFields.specs.length > 0 ? batchFields.specs : img.metadata?.specs,
-            colors:
-              batchFields.colors && batchFields.colors.length > 0 ? batchFields.colors : img.metadata?.colors,
             notes: batchFields.notes || img.metadata?.notes,
           },
         }
@@ -382,6 +387,36 @@ export default function BatchMediaUploadPage() {
   const tags = tagsData?.mediaTags || []
   const selectedImage = images.find((img) => img.id === selectedImageId)
 
+  // Helper function to get category display name (handles multilingual JSON objects)
+  // Format: "English (中文)" or single language if only one available
+  const getCategoryLabel = (cat: any): string => {
+    if (!cat) return ''
+    const nameObj = typeof cat.name === 'object' ? cat.name : null
+    if (nameObj) {
+      const en = nameObj.en || ''
+      const zh = nameObj.zh || ''
+      if (en && zh) return `${en} (${zh})`
+      return en || zh || cat.slug || ''
+    }
+    if (cat.displayName) return cat.displayName
+    return cat.name || cat.slug || ''
+  }
+
+  // Helper function to get tag display name (handles multilingual JSON objects)
+  // Format: "English (中文)" or single language if only one available
+  const getTagLabel = (tag: any): string => {
+    if (!tag) return ''
+    const nameObj = typeof tag.name === 'object' ? tag.name : null
+    if (nameObj) {
+      const en = nameObj.en || ''
+      const zh = nameObj.zh || ''
+      if (en && zh) return `${en} (${zh})`
+      return en || zh || tag.slug || ''
+    }
+    if (tag.displayName) return tag.displayName
+    return tag.name || tag.slug || ''
+  }
+
   // Group tags by type
   const tagsByType = tags.reduce((acc: Record<string, any[]>, tag: any) => {
     const type = tag.type || 'Other'
@@ -461,7 +496,7 @@ export default function BatchMediaUploadPage() {
                   />
                   <div css={{ fontSize: '12px', color: '#718096', marginTop: '4px' }}>
                     {images.length > 1
-                      ? '多张图片将自动编号: xxx_1, xxx_2, xxx_3...'
+                      ? '多张图片将自动编号: xxx-001, xxx-002, xxx-003...'
                       : '单张图片将使用此文件名'}
                   </div>
                 </FieldContainer>
@@ -493,10 +528,7 @@ export default function BatchMediaUploadPage() {
                     value={
                       batchFields.primaryCategory
                         ? {
-                            label:
-                              categories.find((c: any) => c.id === batchFields.primaryCategory)?.displayName ||
-                              categories.find((c: any) => c.id === batchFields.primaryCategory)?.name ||
-                              '',
+                            label: getCategoryLabel(categories.find((c: any) => c.id === batchFields.primaryCategory)),
                             value: batchFields.primaryCategory,
                           }
                         : null
@@ -507,7 +539,7 @@ export default function BatchMediaUploadPage() {
                     options={[
                       { label: '请选择', value: '' },
                       ...categories.map((c: any) => ({
-                        label: c.displayName || c.name,
+                        label: getCategoryLabel(c),
                         value: c.id,
                       })),
                     ]}
@@ -553,7 +585,7 @@ export default function BatchMediaUploadPage() {
                                   },
                                 }}
                               >
-                                {tag.name}
+                                {getTagLabel(tag)}
                               </button>
                             )
                           })}
@@ -580,35 +612,19 @@ export default function BatchMediaUploadPage() {
                   </h4>
 
                   <div css={{ display: 'grid', gap: '12px' }}>
-                    {/* Series Number */}
+                    {/* Group Number */}
                     <FieldContainer>
-                      <FieldLabel>系列编号 (Series Number)</FieldLabel>
+                      <FieldLabel>分组编号 (Group Number)</FieldLabel>
                       <TextInput
                         type="number"
-                        value={batchFields.seriesNumber?.toString() || ''}
+                        value={batchFields.group?.toString() || ''}
                         onChange={(e) =>
                           setBatchFields({
                             ...batchFields,
-                            seriesNumber: e.target.value ? parseInt(e.target.value) : undefined,
+                            group: e.target.value ? parseInt(e.target.value) : undefined,
                           })
                         }
-                        placeholder="例如: 1, 2, 3..."
-                      />
-                    </FieldContainer>
-
-                    {/* Combination Number */}
-                    <FieldContainer>
-                      <FieldLabel>组合编号 (Combination Number)</FieldLabel>
-                      <TextInput
-                        type="number"
-                        value={batchFields.combinationNumber?.toString() || ''}
-                        onChange={(e) =>
-                          setBatchFields({
-                            ...batchFields,
-                            combinationNumber: e.target.value ? parseInt(e.target.value) : undefined,
-                          })
-                        }
-                        placeholder="例如: 1, 2, 3..."
+                        placeholder="例如: 1, 2, 3... (用于场景图分组)"
                       />
                     </FieldContainer>
 
@@ -628,6 +644,22 @@ export default function BatchMediaUploadPage() {
                       />
                     </FieldContainer>
 
+                    {/* Image Number */}
+                    <FieldContainer>
+                      <FieldLabel>图片编号 (Image Number)</FieldLabel>
+                      <TextInput
+                        type="number"
+                        value={batchFields.imageNumber?.toString() || ''}
+                        onChange={(e) =>
+                          setBatchFields({
+                            ...batchFields,
+                            imageNumber: e.target.value ? parseInt(e.target.value) : undefined,
+                          })
+                        }
+                        placeholder="例如: 1, 2, 3... (用于白底图系列编号)"
+                      />
+                    </FieldContainer>
+
                     {/* Specs */}
                     <FieldContainer>
                       <FieldLabel>规格 (Specifications)</FieldLabel>
@@ -637,20 +669,7 @@ export default function BatchMediaUploadPage() {
                           const specs = e.target.value.split(',').map((s) => s.trim()).filter(Boolean)
                           setBatchFields({ ...batchFields, specs })
                         }}
-                        placeholder="例如: 50mm, 不锈钢 (用逗号分隔)"
-                      />
-                    </FieldContainer>
-
-                    {/* Colors */}
-                    <FieldContainer>
-                      <FieldLabel>颜色 (Colors)</FieldLabel>
-                      <TextInput
-                        value={batchFields.colors?.join(', ') || ''}
-                        onChange={(e) => {
-                          const colors = e.target.value.split(',').map((s) => s.trim()).filter(Boolean)
-                          setBatchFields({ ...batchFields, colors })
-                        }}
-                        placeholder="例如: 黑色, 银色 (用逗号分隔)"
+                        placeholder="例如: 12x25mm, 不锈钢 (用逗号分隔)"
                       />
                     </FieldContainer>
 
@@ -880,10 +899,7 @@ export default function BatchMediaUploadPage() {
                       value={
                         selectedImage.primaryCategory
                           ? {
-                              label:
-                                categories.find((c: any) => c.id === selectedImage.primaryCategory)?.displayName ||
-                                categories.find((c: any) => c.id === selectedImage.primaryCategory)?.name ||
-                                '',
+                              label: getCategoryLabel(categories.find((c: any) => c.id === selectedImage.primaryCategory)),
                               value: selectedImage.primaryCategory,
                             }
                           : null
@@ -894,7 +910,7 @@ export default function BatchMediaUploadPage() {
                       options={[
                         { label: '请选择', value: '' },
                         ...categories.map((c: any) => ({
-                          label: c.displayName || c.name,
+                          label: getCategoryLabel(c),
                           value: c.id,
                         })),
                       ]}
@@ -940,7 +956,7 @@ export default function BatchMediaUploadPage() {
                                     },
                                   }}
                                 >
-                                  {tag.name}
+                                  {getTagLabel(tag)}
                                 </button>
                               )
                             })}
@@ -965,39 +981,21 @@ export default function BatchMediaUploadPage() {
                     </h4>
 
                     <div css={{ display: 'grid', gap: '12px' }}>
-                      {/* Individual Series Number */}
+                      {/* Individual Group Number */}
                       <FieldContainer>
-                        <FieldLabel>系列编号 (Series Number)</FieldLabel>
+                        <FieldLabel>分组编号 (Group Number)</FieldLabel>
                         <TextInput
                           type="number"
-                          value={selectedImage.metadata?.seriesNumber?.toString() || ''}
+                          value={selectedImage.metadata?.group?.toString() || ''}
                           onChange={(e) =>
                             updateImage(selectedImage.id, {
                               metadata: {
                                 ...selectedImage.metadata,
-                                seriesNumber: e.target.value ? parseInt(e.target.value) : undefined,
+                                group: e.target.value ? parseInt(e.target.value) : undefined,
                               },
                             })
                           }
-                          placeholder="例如: 1, 2, 3..."
-                        />
-                      </FieldContainer>
-
-                      {/* Individual Combination Number */}
-                      <FieldContainer>
-                        <FieldLabel>组合编号 (Combination Number)</FieldLabel>
-                        <TextInput
-                          type="number"
-                          value={selectedImage.metadata?.combinationNumber?.toString() || ''}
-                          onChange={(e) =>
-                            updateImage(selectedImage.id, {
-                              metadata: {
-                                ...selectedImage.metadata,
-                                combinationNumber: e.target.value ? parseInt(e.target.value) : undefined,
-                              },
-                            })
-                          }
-                          placeholder="例如: 1, 2, 3..."
+                          placeholder="例如: 1, 2, 3... (用于场景图分组)"
                         />
                       </FieldContainer>
 
@@ -1019,6 +1017,24 @@ export default function BatchMediaUploadPage() {
                         />
                       </FieldContainer>
 
+                      {/* Individual Image Number */}
+                      <FieldContainer>
+                        <FieldLabel>图片编号 (Image Number)</FieldLabel>
+                        <TextInput
+                          type="number"
+                          value={selectedImage.metadata?.imageNumber?.toString() || ''}
+                          onChange={(e) =>
+                            updateImage(selectedImage.id, {
+                              metadata: {
+                                ...selectedImage.metadata,
+                                imageNumber: e.target.value ? parseInt(e.target.value) : undefined,
+                              },
+                            })
+                          }
+                          placeholder="例如: 1, 2, 3... (用于白底图系列编号)"
+                        />
+                      </FieldContainer>
+
                       {/* Individual Specs */}
                       <FieldContainer>
                         <FieldLabel>规格 (Specifications)</FieldLabel>
@@ -1033,25 +1049,7 @@ export default function BatchMediaUploadPage() {
                               },
                             })
                           }}
-                          placeholder="例如: 50mm, 不锈钢 (用逗号分隔)"
-                        />
-                      </FieldContainer>
-
-                      {/* Individual Colors */}
-                      <FieldContainer>
-                        <FieldLabel>颜色 (Colors)</FieldLabel>
-                        <TextInput
-                          value={selectedImage.metadata?.colors?.join(', ') || ''}
-                          onChange={(e) => {
-                            const colors = e.target.value.split(',').map((s) => s.trim()).filter(Boolean)
-                            updateImage(selectedImage.id, {
-                              metadata: {
-                                ...selectedImage.metadata,
-                                colors: colors.length > 0 ? colors : undefined,
-                              },
-                            })
-                          }}
-                          placeholder="例如: 黑色, 银色 (用逗号分隔)"
+                          placeholder="例如: 12x25mm, 不锈钢 (用逗号分隔)"
                         />
                       </FieldContainer>
 

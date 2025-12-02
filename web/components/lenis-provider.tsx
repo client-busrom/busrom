@@ -22,13 +22,13 @@ export function LenisProvider({ easingKey }: LenisProviderProps) {
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
 
     const lenis = new Lenis({
-      duration: 1,        // 尾部缓动时间略长
+      duration: 1,          // 尾部缓动时间略长
       easing: selected.fn,
       lerp: 0.05,           // 桌面端尾部跟随慢一点
       syncTouch: true,
-      syncTouchLerp: isTouchDevice ? 0.1 : undefined,  // 移动端平滑跟随，加快响应速度
-      touchMultiplier: isTouchDevice ? 2 : 1,    // 增加移动端滑动距离，提升滚动速度
-      wheelMultiplier: 1,
+      syncTouchLerp: isTouchDevice ? 0.15 : undefined,  // 移动端更快响应
+      touchMultiplier: isTouchDevice ? 1.5 : 1,    // 降低移动端滑动距离
+      wheelMultiplier: 0.8,  // 降低滚轮灵敏度，减少滑过头
       smoothWheel: true,
     })
 

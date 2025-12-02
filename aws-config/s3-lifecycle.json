@@ -1,0 +1,20 @@
+{
+  "Rules": [
+    {
+      "Id": "DeleteOldFormAttachments",
+      "Status": "Enabled",
+      "Filter": {
+        "Prefix": "form-attachments/"
+      },
+      "Expiration": {
+        "Days": 90
+      },
+      "Transitions": [
+        {
+          "Days": 30,
+          "StorageClass": "STANDARD_IA"
+        }
+      ]
+    }
+  ]
+}

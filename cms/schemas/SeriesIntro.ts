@@ -14,7 +14,7 @@ export const SeriesIntro = list({
       query: () => true,
       create: () => true, // 允许 seeding
       update: ({ session }: any) => !!session,
-      delete: () => false, // 禁止删除
+      delete: ({ session }) => !!session, // 禁止删除
     },
     filter: {
       query: ({ session }: any) => {

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "description": "Batch Upload Metadata Template - 批量上传元数据模板",
+
+  "primaryCategory": "scene-photo",
+  "tags": ["glass-standoff", "50mm", "stainless-steel"],
+
+  "defaultMetadata": {
+    "seriesNumber": 1,
+    "combinationNumber": null,
+    "sceneNumber": null,
+    "specs": ["50mm", "不锈钢"],
+    "colors": ["银色", "黑色"],
+    "notes": ""
+  },
+
+  "fileMetadata": {
+    "01-standoff-scene-001.jpg": {
+      "sceneNumber": 1,
+      "notes": "主视图"
+    },
+    "01-standoff-scene-002.jpg": {
+      "sceneNumber": 2,
+      "notes": "侧视图"
+    },
+    "01-standoff-scene-003.jpg": {
+      "sceneNumber": 3,
+      "notes": "细节图"
+    }
+  }
+}

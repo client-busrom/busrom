@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 type Props = {
   data: HomeContent["seriesIntro"];
@@ -11,125 +11,162 @@ type Props = {
 
 // --- 常量定义 ---
 const SERIES_AUTO_SCROLL_INTERVAL = 30000; // 系列轮播: 30秒
-const IMAGE_AUTO_SCROLL_INTERVAL = 3000;   // 图片轮播: 3秒
+const IMAGE_AUTO_SCROLL_INTERVAL = 5000;   // 图片轮播: 5秒
 const VISIBLE_WINDOW_SIZE = 7;
-
-// 卡片轮播所需的计算常量
-const VISIBLE_CARDS_IN_ROW = 1.2;
-const CARD_ASPECT_RATIO = 5 / 3;
-const CARD_GUTTER = 16;
+const SWIPE_THRESHOLD = 50; // 滑动阈值
 
 export default function SeriesIntro({ data }: Props) {
   const seriesData = data || [];
   const totalSeries = seriesData.length;
 
-  // 系列轮播索引 (30s切换)
+  // 系列轮播索引
   const [activeSeriesIndex, setActiveSeriesIndex] = useState(0);
-  // 当前系列的图片轮播索引 (3s切换)
+  // 当前系列的图片轮播索引
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const seriesIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const imageIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 拖拽状态
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   // 当前激活的系列
   const activeSeries = seriesData[activeSeriesIndex];
   const currentImages = activeSeries?.images || [];
   const totalImages = currentImages.length;
 
-  // 卡片尺寸状态
-  const [cardDimensions, setCardDimensions] = useState({
-    width: 0,
-    height: 0,
-    minHeight: 400,
-    isInitialized: false,
-  });
-
-  const carouselContainerRef = useRef<HTMLDivElement | null>(null);
-
   const VISIBLE_ITEMS_CENTER_OFFSET = Math.floor(VISIBLE_WINDOW_SIZE / 2);
 
   // --- 系列轮播控制 ---
   const handleSeriesNext = useCallback(() => {
     setActiveSeriesIndex((prevIndex) => (prevIndex + 1) % totalSeries);
-    setActiveImageIndex(0); // 切换系列时重置图片索引
+    setActiveImageIndex(0);
   }, [totalSeries]);
 
   const handleSeriesPrev = useCallback(() => {
     setActiveSeriesIndex((prevIndex) => (prevIndex - 1 + totalSeries) % totalSeries);
-    setActiveImageIndex(0); // 切换系列时重置图片索引
+    setActiveImageIndex(0);
   }, [totalSeries]);
 
-  // --- 图片轮播控制 ---
+  // 是否正在进行循环跳转（用于禁用动画）
+  const [isLooping, setIsLooping] = useState(false);
+
+  // --- 图片轮播控制 (循环) ---
   const handleImageNext = useCallback(() => {
-    if (totalImages > 0) {
-      setActiveImageIndex((prevIndex) => (prevIndex + 1) % totalImages);
+    if (totalImages <= 0) return;
+
+    const nextIndex = activeImageIndex + 1;
+
+    if (nextIndex >= totalImages) {
+      // 到达末尾，先滑动到克隆的第一张(索引=totalImages)
+      setActiveImageIndex(totalImages);
+      // 动画完成后瞬间跳回真正的第一张
+      setTimeout(() => {
+        setIsLooping(true);
+        setActiveImageIndex(0);
+        setTimeout(() => setIsLooping(false), 50);
+      }, 500);
+    } else {
+      setActiveImageIndex(nextIndex);
     }
-  }, [totalImages]);
+  }, [totalImages, activeImageIndex]);
 
-  // --- 系列自动轮播 (30秒) ---
-  useEffect(() => {
-    const startInterval = () => {
-      seriesIntervalRef.current = setInterval(handleSeriesNext, SERIES_AUTO_SCROLL_INTERVAL);
-    };
-    const stopInterval = () => {
-      if (seriesIntervalRef.current) {
-        clearInterval(seriesIntervalRef.current);
-      }
-    };
-    startInterval();
-    return () => stopInterval();
-  }, [handleSeriesNext]);
+  const handleImagePrev = useCallback(() => {
+    if (totalImages <= 0) return;
 
-  // --- 图片自动轮播 (3秒) ---
-  useEffect(() => {
-    if (totalImages <= 1) return; // 如果只有一张图片,不需要轮播
-
-    const startInterval = () => {
-      imageIntervalRef.current = setInterval(handleImageNext, IMAGE_AUTO_SCROLL_INTERVAL);
-    };
-    const stopInterval = () => {
-      if (imageIntervalRef.current) {
-        clearInterval(imageIntervalRef.current);
-      }
-    };
-    startInterval();
-    return () => stopInterval();
-  }, [handleImageNext, totalImages]);
-
-  // 尺寸计算逻辑
-  const calculateCardDimensions = useCallback(() => {
-    if (carouselContainerRef.current) {
-      const containerWidth = carouselContainerRef.current.clientWidth;
-      const newCardWidth = containerWidth / VISIBLE_CARDS_IN_ROW;
-      const newCardHeight = newCardWidth / CARD_ASPECT_RATIO;
-
-      setCardDimensions({
-        width: newCardWidth,
-        height: newCardHeight,
-        minHeight: cardDimensions.minHeight,
-        isInitialized: true,
-      });
+    if (activeImageIndex === 0) {
+      // 在第一张，直接循环到最后一张
+      setActiveImageIndex(totalImages - 1);
+    } else {
+      setActiveImageIndex(activeImageIndex - 1);
     }
-  }, [cardDimensions.minHeight]);
+  }, [totalImages, activeImageIndex]);
 
-  // 监听窗口尺寸变化
+  // --- 系列自动轮播 ---
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      calculateCardDimensions();
-    }, 50);
+    if (isDragging) return;
 
-    window.addEventListener("resize", calculateCardDimensions);
-
+    seriesIntervalRef.current = setInterval(handleSeriesNext, SERIES_AUTO_SCROLL_INTERVAL);
     return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener("resize", calculateCardDimensions);
+      if (seriesIntervalRef.current) clearInterval(seriesIntervalRef.current);
     };
-  }, [calculateCardDimensions]);
+  }, [handleSeriesNext, isDragging]);
+
+  // --- 图片自动轮播 ---
+  useEffect(() => {
+    if (totalImages <= 1 || isDragging) return;
+
+    imageIntervalRef.current = setInterval(handleImageNext, IMAGE_AUTO_SCROLL_INTERVAL);
+    return () => {
+      if (imageIntervalRef.current) clearInterval(imageIntervalRef.current);
+    };
+  }, [handleImageNext, totalImages, isDragging]);
+
+  // --- 拖拽/滑动处理 ---
+  const handleDragStart = (clientX: number) => {
+    setIsDragging(true);
+    setDragStartX(clientX);
+    setDragOffset(0);
+  };
+
+  const handleDragMove = (clientX: number) => {
+    if (!isDragging) return;
+    const offset = clientX - dragStartX;
+    setDragOffset(offset);
+  };
+
+  const handleDragEnd = () => {
+    if (!isDragging) return;
+
+    // 判断滑动方向并切换
+    if (dragOffset > SWIPE_THRESHOLD) {
+      handleImagePrev();
+    } else if (dragOffset < -SWIPE_THRESHOLD) {
+      handleImageNext();
+    }
+
+    setIsDragging(false);
+    setDragOffset(0);
+  };
+
+  // 鼠标事件
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    handleDragStart(e.clientX);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    handleDragMove(e.clientX);
+  };
+
+  const handleMouseUp = () => {
+    handleDragEnd();
+  };
+
+  const handleMouseLeave = () => {
+    if (isDragging) handleDragEnd();
+  };
+
+  // 触摸事件
+  const handleTouchStart = (e: React.TouchEvent) => {
+    handleDragStart(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    handleDragMove(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    handleDragEnd();
+  };
 
   // 竖形列表透明度计算
   const getOpacity = (distance: number) => {
     const opacity = 1.0 - distance * 0.2;
-    return Math.max(0, opacity);
+    return Math.max(0.2, opacity);
   };
 
   // 准备固定窗口的渲染数据
@@ -139,6 +176,7 @@ export default function SeriesIntro({ data }: Props) {
       description: string;
       distanceFromCenter: number;
       isCurrent: boolean;
+      originalIndex: number;
     }[] = [];
 
     const startIndex = activeSeriesIndex - VISIBLE_ITEMS_CENTER_OFFSET;
@@ -153,6 +191,7 @@ export default function SeriesIntro({ data }: Props) {
           ...item,
           distanceFromCenter: Math.abs(i - VISIBLE_ITEMS_CENTER_OFFSET),
           isCurrent: dataIndex === activeSeriesIndex,
+          originalIndex: dataIndex,
         });
       }
     }
@@ -161,162 +200,255 @@ export default function SeriesIntro({ data }: Props) {
 
   const renderWindow = getRenderWindow();
 
-  // 使用动态计算的尺寸
-  const currentCardWidth = cardDimensions.width || 0;
-  const currentCardHeight = cardDimensions.height || cardDimensions.minHeight;
-  const containerTotalWidth = totalImages * currentCardWidth;
-
-  // 控制按钮
-  const ControlButtons = (
-    <div className="flex flex-row space-x-16 justify-center w-full mt-2">
-      <button
-        onClick={handleSeriesPrev}
-        className="text-brand-cream/80 hover:text-brand-cream transition"
-        aria-label="Previous series"
-      >
-        <img
-          src="/btnLeft1.svg"
-          alt="Previous"
-          className="w-10 h-10 md:w-16 md:h-16 transition-opacity group-hover:opacity-80"
-        />
-      </button>
-
-      <button
-        onClick={handleSeriesNext}
-        className="text-brand-cream/80 hover:text-brand-cream transition"
-        aria-label="Next series"
-      >
-        <img
-          src="/btnRight1.svg"
-          alt="Next"
-          className="w-10 h-10 md:w-16 md:h-16 transition-opacity group-hover:opacity-80"
-        />
-      </button>
-    </div>
-  );
+  // Guard: if no data, don't render
+  if (!data || totalSeries === 0) {
+    return null;
+  }
 
   return (
-    <section className="py-8 bg-brand-main" data-header-theme="transparent">
-      <div className="container mx-auto p-6 md:p-8 lg:p-10 bg-brand-secondary rounded-xl border border-brand-cream">
-        {/* --- 上半部分：文字/导航 --- */}
-        <div className="flex flex-col md:flex-row gap-8 md:gap-16">
-          {/* 左侧：介绍文本 */}
-          <div className="w-full md:w-2/3 text-brand-cream space-y-4 md:h-[16rem] md:flex md:flex-col">
-            <p className="text-xs text-brand-cream-dark font-anaheim font-medium">
-              Product Series Introduction copy Product Series Introduction
-            </p>
-            <h3 className="text-3xl md:text-4xl font-anaheim font-extrabold">
-              Product Series Introduction
-            </h3>
-            {activeSeries && (
-              <p className="text-md font-light text-brand-text-inverse">
-                {activeSeries.description}
-              </p>
-            )}
-          </div>
+    <section className="py-6 lg:py-8 bg-brand-main" data-header-theme="transparent">
+      <div className="container mx-auto px-4 lg:px-8">
+        <div className="bg-brand-secondary rounded-2xl lg:rounded-3xl p-6 lg:p-10 overflow-hidden">
 
-          {/* 右侧：竖形系列导航 */}
-          <div className="w-full md:w-1/3 h-[12rem] md:h-[16rem] overflow-hidden relative">
-            <div className="flex flex-col absolute w-full top-1/2 left-0 -translate-y-1/2">
-              {renderWindow.map((item) => (
-                <button
-                  key={item.title}
-                  className="w-full text-left py-2 transition-opacity duration-500 h-8 md:h-12 flex items-center"
-                  style={{ opacity: getOpacity(item.distanceFromCenter) }}
-                  onClick={() => {
-                    const newIndex = seriesData.findIndex((s) => s.title === item.title);
-                    setActiveSeriesIndex(newIndex);
-                    setActiveImageIndex(0); // 重置图片索引
-                  }}
-                >
-                  <span
-                    className={cn(
-                      "text-sm md:text-md font-bold transition-colors duration-500",
-                      item.isCurrent
-                        ? "text-brand-cream"
-                        : "text-brand-cream/80 hover:text-brand-cream"
-                    )}
-                  >
-                    {item.title}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+          {/* ===== 桌面端布局 (lg+) ===== */}
+          <div className="hidden lg:block">
+            {/* 上半部分: 标题+描述 | 系列列表 */}
+            <div className="flex gap-12 mb-8">
+              {/* 左侧: 标题+描述 */}
+              <div className="flex-1">
+                <h2 className="text-4xl xl:text-5xl font-anaheim font-extrabold mb-6" style={{ color: '#FFFAD3' }}>
+                  Product Series Introduction
+                </h2>
+                {activeSeries && (
+                  <p className="text-base xl:text-lg leading-relaxed text-white max-w-2xl">
+                    {activeSeries.description}
+                  </p>
+                )}
+              </div>
 
-        {/* --- 下半部分：图片轮播 + 标题 + 按钮 --- */}
-        <div className="flex flex-col mt-2 md:mt-16">
-          <div
-            className="flex md:flex-row items-center relative"
-            style={{ minHeight: `${currentCardHeight}px` }}
-          >
-            {/* 1. 左侧：旋转标题容器 (桌面端) */}
-            <div
-              className={cn(
-                "flex-shrink-0 relative h-full",
-                "hidden md:flex md:w-1/3 md:flex-col md:justify-start md:items-end",
-                "w-full bottom-[50px] right-[-100px]"
-              )}
-            >
-              <div className="absolute right-[100px] bottom-4 -translate-y-1 transform -rotate-90 origin-right z-10 pl-8">
-                <span className="text-xl font-anaheim font-regular text-brand-cream whitespace-nowrap">
-                  {activeSeries ? activeSeries.title : "Series Title"}
-                </span>
+              {/* 右侧: 系列列表轮播 */}
+              <div className="w-80 flex-shrink-0">
+                <div className="h-64 overflow-hidden relative">
+                  <div className="flex flex-col absolute w-full top-1/2 left-0 -translate-y-1/2">
+                    {renderWindow.map((item, idx) => (
+                      <button
+                        key={`${item.title}-${idx}`}
+                        className="w-full text-right py-2 transition-all duration-300 h-9"
+                        style={{ opacity: getOpacity(item.distanceFromCenter) }}
+                        onClick={() => {
+                          setActiveSeriesIndex(item.originalIndex);
+                          setActiveImageIndex(0);
+                        }}
+                      >
+                        <span
+                          className={cn(
+                            "text-lg font-anaheim font-bold transition-colors duration-300",
+                            item.isCurrent
+                              ? "text-brand-cream"
+                              : "text-brand-cream/70 hover:text-brand-cream"
+                          )}
+                        >
+                          {item.title}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* 2. 右侧：图片轮播容器 */}
+            {/* 下半部分: 按钮+竖排标题 | 图片轮播 */}
+            <div className="flex gap-6 items-stretch">
+              {/* 左侧: 竖排标题 + 按钮 (横向排列) */}
+              <div className="w-36 flex-shrink-0 flex flex-col justify-between py-2">
+                {/* 竖排标题 */}
+                <div className="flex-1 flex items-center justify-center">
+                  <span
+                    className="text-xl font-anaheim text-brand-cream whitespace-nowrap"
+                    style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+                  >
+                    {activeSeries?.title || "Series Title"}
+                  </span>
+                </div>
+
+                {/* 切换按钮 - 横向排列 */}
+                <div className="flex gap-3 justify-center">
+                  <button
+                    onClick={handleSeriesPrev}
+                    className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                    aria-label="Previous series"
+                  >
+                    <svg className="w-5 h-5 text-brand-cream" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={handleSeriesNext}
+                    className="w-12 h-12 rounded-full bg-white flex items-center justify-center transition-colors hover:bg-white/90"
+                    aria-label="Next series"
+                  >
+                    <svg className="w-5 h-5 text-brand-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* 右侧: 图片轮播 (循环) */}
+              <div
+                ref={carouselRef}
+                className="flex-1 overflow-hidden rounded-2xl cursor-grab active:cursor-grabbing select-none aspect-[16/9]"
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseLeave}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
+                <div
+                  className={cn(
+                    "flex gap-4 h-full transition-transform",
+                    (isDragging || isLooping) ? "duration-0" : "duration-500 ease-out"
+                  )}
+                  style={{
+                    // 78% = 75% 卡片宽度 + 3% gap
+                    transform: `translateX(calc(-${activeImageIndex * 78}% + ${dragOffset}px))`,
+                  }}
+                >
+                  {/*
+                    循环渲染: 在原图后面追加克隆图实现无缝循环
+                    结构: [原图1, 原图2, ..., 原图N, 克隆1, 克隆2]
+                  */}
+                  {[...currentImages, ...currentImages.slice(0, Math.min(2, totalImages))].map((imageObj, idx) => (
+                    <div
+                      key={`${activeSeries?.title}-img-${idx}`}
+                      className="flex-shrink-0 w-[75%] aspect-[3/2] relative rounded-2xl overflow-hidden"
+                    >
+                      <OptimizedImage
+                        image={imageObj}
+                        alt={imageObj?.altText || `${activeSeries?.title} - Image ${(idx % totalImages) + 1}`}
+                        size="large"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== 移动端布局 (<lg) ===== */}
+          <div className="lg:hidden">
+            {/* 标题 */}
+            <h2 className="text-2xl md:text-3xl font-anaheim font-extrabold mb-4" style={{ color: '#FFFAD3' }}>
+              Product Series Introduction
+            </h2>
+
+            {/* 当前系列名称 */}
+            <div className="mb-4">
+              <span className="text-lg font-anaheim font-bold text-brand-cream">
+                {activeSeries?.title}
+              </span>
+            </div>
+
+            {/* 图片轮播 */}
             <div
-              ref={carouselContainerRef}
-              className={cn("w-full md:w-2/3 md:ml-4 overflow-hidden")}
-              style={{ minHeight: `${currentCardHeight}px` }}
+              className="overflow-hidden rounded-xl mb-4 cursor-grab active:cursor-grabbing select-none"
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseLeave}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
             >
               <div
-                className="flex transition-transform duration-500 ease-in-out h-full"
+                className={cn(
+                  "flex gap-3 transition-transform",
+                  isDragging ? "duration-0" : "duration-500 ease-out"
+                )}
                 style={{
-                  width: `${containerTotalWidth + totalImages * CARD_GUTTER}px`,
-                  transform: `translateX(-${activeImageIndex * (currentCardWidth + CARD_GUTTER) + CARD_GUTTER}px)`,
+                  transform: `translateX(calc(-${activeImageIndex * 88}% + ${dragOffset}px))`,
                 }}
               >
                 {currentImages.map((imageObj, idx) => (
                   <div
-                    key={`${activeSeries?.title}-${idx}`}
-                    className="flex-shrink-0 relative h-full ml-4"
-                    style={{
-                      width: `${currentCardWidth}px`,
-                      maxHeight: `${currentCardHeight}px`,
-                    }}
+                    key={`${activeSeries?.title}-mobile-img-${idx}`}
+                    className="flex-shrink-0 w-[85%] aspect-[4/3] relative rounded-xl overflow-hidden"
                   >
-                    <div
-                      className="shadow-xl relative"
-                      style={{
-                        height: `${currentCardHeight}px`,
-                        width: `${currentCardWidth}px`,
-                      }}
-                    >
-                      <Image
-                        src={imageObj?.url || "/placeholder.jpg"}
-                        alt={imageObj?.altText || activeSeries?.title || "Series image"}
-                        fill
-                        className="rounded-lg object-cover"
-                      />
-                    </div>
+                    <OptimizedImage
+                      image={imageObj}
+                      alt={imageObj?.altText || `${activeSeries?.title} - Image ${idx + 1}`}
+                      size="medium"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 ))}
               </div>
             </div>
+
+            {/* 图片指示器 */}
+            {totalImages > 1 && (
+              <div className="flex justify-center gap-2 mb-4">
+                {currentImages.map((_, idx) => (
+                  <button
+                    key={idx}
+                    className={cn(
+                      "w-2 h-2 rounded-full transition-colors",
+                      idx === activeImageIndex ? "bg-brand-cream" : "bg-brand-cream/30"
+                    )}
+                    onClick={() => setActiveImageIndex(idx)}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* 描述 */}
+            <p className="text-sm text-white leading-relaxed mb-6">
+              {activeSeries?.description}
+            </p>
+
+            {/* 系列切换按钮 */}
+            <div className="flex justify-center gap-6">
+              <button
+                onClick={handleSeriesPrev}
+                className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"
+                aria-label="Previous series"
+              >
+                <svg className="w-5 h-5 text-brand-cream" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                onClick={handleSeriesNext}
+                className="w-12 h-12 rounded-full bg-white flex items-center justify-center"
+                aria-label="Next series"
+              >
+                <svg className="w-5 h-5 text-brand-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+
+            {/* 系列指示器 */}
+            <div className="flex justify-center gap-1.5 mt-4">
+              {seriesData.map((_, idx) => (
+                <button
+                  key={idx}
+                  className={cn(
+                    "w-1.5 h-1.5 rounded-full transition-colors",
+                    idx === activeSeriesIndex ? "bg-brand-cream" : "bg-brand-cream/30"
+                  )}
+                  onClick={() => {
+                    setActiveSeriesIndex(idx);
+                    setActiveImageIndex(0);
+                  }}
+                />
+              ))}
+            </div>
           </div>
 
-          {/* --- 3. 移动端标题 --- */}
-          <div className="mt-2 text-center md:hidden">
-            <span className="text-2xl font-anaheim font-extrabold text-brand-cream">
-              {activeSeries ? activeSeries.title : "Series Title"}
-            </span>
-          </div>
-
-          {/* --- 4. 系列切换按钮 --- */}
-          {ControlButtons}
         </div>
       </div>
     </section>

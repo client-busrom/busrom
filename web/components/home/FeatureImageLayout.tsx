@@ -1,9 +1,8 @@
-﻿// components/home/FeatureImageLayout.tsx
 "use client";
 
-import Image from "next/image";
 import { motion, AnimatePresence, Transition } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 interface FeatureImageLayoutProps {
   activeFeature: any;
@@ -12,204 +11,184 @@ interface FeatureImageLayoutProps {
 
 const layoutTransition = { duration: 0.5, ease: "easeInOut" } as Transition;
 
-// 基础样式：保持不变，包含背景、边框（现在用 outline）、阴影
+// 图片容器基础样式
 const imageContainerBaseStyle =
-  "relative block overflow-hidden rounded-lg outline outline-4 outline-[#CDC094] outline-offset-[-4px] shadow-[0_5px_15px_rgba(0,0,0,0.3)] bg-gray-100";
-// 非梯形布局的圆角和边框（使用 outline）
-const nonTrapezoidStyle = "rounded-lg outline outline-4 outline-[#CDC094] outline-offset-[-4px]"; // 使用 outline
+  "relative block overflow-hidden bg-gray-100";
+
+// 普通矩形图片样式（带圆角和边框）- 4px 边框
+const rectangleImageStyle =
+  "rounded-[12px] lg:rounded-[16px] border-[4px] border-[#CDC094] shadow-[0_4px_7px_rgba(0,0,0,0.25)]";
+
+// 平行四边形 SVG viewBox 尺寸
+const TRAPEZOID_WIDTH = 300;
+const TRAPEZOID_HEIGHT = 500;
+const CORNER_RADIUS = 16; // 圆角更小
+const SLANT = 54; // 向右倾斜量
+
+// 平行四边形：整体向右倾斜
+// 左上角钝角，右上角锐角，左下角锐角，右下角钝角
+//     ________
+//    /       /
+//   /       /
+//  /       /
+// /_______/
+
+const parallelogramPath = `
+  M ${SLANT + CORNER_RADIUS} 0
+  L ${TRAPEZOID_WIDTH - CORNER_RADIUS} 0
+  Q ${TRAPEZOID_WIDTH} 0 ${TRAPEZOID_WIDTH} ${CORNER_RADIUS}
+  L ${TRAPEZOID_WIDTH - SLANT} ${TRAPEZOID_HEIGHT - CORNER_RADIUS}
+  Q ${TRAPEZOID_WIDTH - SLANT} ${TRAPEZOID_HEIGHT} ${TRAPEZOID_WIDTH - SLANT - CORNER_RADIUS} ${TRAPEZOID_HEIGHT}
+  L ${CORNER_RADIUS} ${TRAPEZOID_HEIGHT}
+  Q 0 ${TRAPEZOID_HEIGHT} 0 ${TRAPEZOID_HEIGHT - CORNER_RADIUS}
+  L ${SLANT} ${CORNER_RADIUS}
+  Q ${SLANT} 0 ${SLANT + CORNER_RADIUS} 0
+  Z
+`;
+
+// 两张图都用同样的平行四边形
+const trapezoidLeftPath = parallelogramPath;
+const trapezoidRightPath = parallelogramPath;
 
 export default function FeatureImageLayout({ activeFeature, activeIndex }: FeatureImageLayoutProps) {
-  // --- (数据检查逻辑保持不变) ---
   if (!activeFeature || !activeFeature.images || activeFeature.images.length === 0) {
-    return <div className={cn(imageContainerBaseStyle, nonTrapezoidStyle, "w-full h-full flex ...")}>Image Data Missing</div>;
+    return (
+      <div className={cn(imageContainerBaseStyle, rectangleImageStyle, "w-full h-[400px] flex items-center justify-center")}>
+        <span className="text-gray-400">Image Data Missing</span>
+      </div>
+    );
   }
+
   const layoutType = activeIndex % 5;
   const images = activeFeature.images;
-  const requiredImages =
-    layoutType === 0 ? 4 : layoutType === 1 ? 2 : layoutType === 2 ? 6 : layoutType === 3 ? 2 : layoutType === 4 ? 2 : 0; // 索引 4 也需要 2 张图 (与索引 3 相同)
-  const hasEnoughImages = images.length >= requiredImages;
-  if (!hasEnoughImages && requiredImages > 0) {
-    return <div className={cn(imageContainerBaseStyle, nonTrapezoidStyle, "w-full h-full flex ...")}>Incorrect Image Count...</div>;
+  const requiredImages = layoutType === 0 ? 4 : layoutType === 1 ? 2 : layoutType === 2 ? 6 : 2;
+
+  if (images.length < requiredImages) {
+    return (
+      <div className={cn(imageContainerBaseStyle, rectangleImageStyle, "w-full h-[400px] flex items-center justify-center")}>
+        <span className="text-gray-400">Need {requiredImages} images, got {images.length}</span>
+      </div>
+    );
   }
 
-  // --- (SVG 定义保持不变) ---
-  const borderColor = "#CDC094";
-  const borderWidth = "4px"; // 现在只用于梯形布局
-  const clipPathIdLeft = `trapezoidClipLeft`;
-  const clipPathIdRight = `trapezoidClipRight`;
-  const svgPathData =
-    "M122.8 2H338.8C356.38 2 369.27 18.5401 364.98 35.5901L271.39 407.59C268.37 419.59 257.58 428 245.2 428H29.1999C11.6199 428 -1.27 411.46 3.02 394.41L96.61 22.4099C99.59 10.5999 110.09 2.26001 122.22 2.01001L122.8 2Z";
-  const svgPathDataRight =
-    "M122.8 2H338.8C356.38 2 369.27 18.5401 364.98 35.5901L271.39 407.59C268.37 419.59 257.58 428 245.2 428H29.1999C11.6199 428 -1.27 411.46 3.02 394.41L96.61 22.4099C99.59 10.5999 110.09 2.26001 122.22 2.01001L122.8 2Z";
+  // 统一的图片区域高度 - 增大图片，留出阴影空间
+  const containerHeight = "h-[210px] lg:h-[280px] xl:h-[320px] 2xl:h-[370px]";
+  const containerWidth = "w-full max-w-[280px] lg:max-w-[360px] xl:max-w-[420px] 2xl:max-w-[500px]";
 
   return (
-    // 👇 外层容器：使用 padding 来控制整体大小和居中，移除 h-full
-    <div className="w-full h-auto flex items-center justify-center p-4 md:p-8">
-      {/* SVG Defs (保持不变) */}
-      <svg width="0" height="0" className="absolute">
-        <defs>
-          <clipPath id={clipPathIdLeft} clipPathUnits="objectBoundingBox">
-            <path d={svgPathData} transform="scale(0.002717, 0.002325)" />
-          </clipPath>
-          <clipPath id={clipPathIdRight} clipPathUnits="objectBoundingBox">
-            <path d={svgPathDataRight} transform="scale(0.002717, 0.002325)" />
-          </clipPath>
-        </defs>
-      </svg>
-
+    <div className={cn("w-full flex items-start justify-center", containerHeight)}>
       <AnimatePresence mode="wait">
-        {/* 👇 motion.div: 移除 absolute inset-0，让它由内容撑开 */}
         <motion.div
           key={activeIndex}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={layoutTransition}
-          className="w-full h-full flex items-center justify-center"
+          className="w-full h-full flex items-start justify-center"
         >
-          {/* Layout 1: 2x2 Asymmetric */}
+          {/* Layout 0: 2x2 不规则网格 (4张图) */}
           {layoutType === 0 && (
-            <div
-              className={cn(
-                "flex flex-col gap-y-2 w-full",
-                "aspect-[728/400]",
-                "md:gap-y-4 md:w-full md:max-w-[400px] md:h-[400px] md:aspect-auto"
-              )}
-            >
-              {/* --- 第一行 Div --- */}
-              <div
-                className={cn(
-                  "flex gap-x-2 items-start grow",
-                  "lg:gap-x-4"
-                )}
-              >
-                {/* 左上角图片：原宽度比例 242 / (242+350) ≈ 41% */}
-                <div
-                  className={cn(
-                    imageContainerBaseStyle,
-                    nonTrapezoidStyle,
-                    "h-full flex-shrink grow-[242] basis-0",
-                    "lg:aspect-auto"
-                  )}
-                >
-                  <FeatureImage src={images[0]?.url || "/placeholder.jpg"} alt={images[0]?.altText || `${activeFeature.title} 1`} sizes="(max-width: 1024px) 45vw, 242px" />
+            <div className={cn(containerWidth, "h-full pb-2")}>
+              <div className="flex flex-col gap-[6px] lg:gap-[8px] xl:gap-[10px] 2xl:gap-[12px] h-full">
+                {/* 第一行 - 42% 高度 */}
+                <div className="flex gap-[6px] lg:gap-[8px] xl:gap-[10px] 2xl:gap-[12px]" style={{ height: "42%" }}>
+                  <div
+                    className={cn(imageContainerBaseStyle, rectangleImageStyle, "h-full")}
+                    style={{ flex: "242 1 0" }}
+                  >
+                    <FeatureImage
+                      image={images[0]}
+                      alt={images[0]?.altText || `${activeFeature.title} 1`}
+                    />
+                  </div>
+                  <div
+                    className={cn(imageContainerBaseStyle, rectangleImageStyle, "h-full")}
+                    style={{ flex: "350 1 0" }}
+                  >
+                    <FeatureImage
+                      image={images[1]}
+                      alt={images[1]?.altText || `${activeFeature.title} 2`}
+                    />
+                  </div>
                 </div>
-                {/* 右上角图片：原宽度比例 350 / (242+350) ≈ 59% */}
-                <div
-                  className={cn(
-                    imageContainerBaseStyle,
-                    nonTrapezoidStyle,
-                    "h-full flex-shrink grow-[350] basis-0",
-                    "lg:aspect-auto"
-                  )}
-                >
-                  <FeatureImage src={images[1]?.url || "/placeholder.jpg"} alt={images[1]?.altText || `${activeFeature.title} 2`} sizes="(max-width: 1024px) 45vw, 350px" />
-                </div>
-              </div>
-
-              {/* --- 第二行 Div --- */}
-              <div
-                className={cn(
-                  "flex gap-x-2 items-start grow",
-                  "lg:gap-x-4"
-                )}
-              >
-                <div
-                  className={cn(
-                    imageContainerBaseStyle,
-                    nonTrapezoidStyle,
-                    "h-full flex-shrink grow-[412] basis-0",
-                    "lg:aspect-auto"
-                  )}
-                >
-                  <FeatureImage src={images[2]?.url || "/placeholder.jpg"} alt={images[2]?.altText || `${activeFeature.title} 3`} sizes="(max-width: 1024px) 45vw, 412px" />
-                </div>
-                <div
-                  className={cn(
-                    imageContainerBaseStyle,
-                    nonTrapezoidStyle,
-                    "h-full flex-shrink grow-[181] basis-0",
-                    "lg:aspect-auto"
-                  )}
-                >
-                  <FeatureImage src={images[3]?.url || "/placeholder.jpg"} alt={images[3]?.altText || `${activeFeature.title} 4`} sizes="(max-width: 1024px) 45vw, 181px" />
+                {/* 第二行 - 58% 高度 */}
+                <div className="flex gap-[6px] lg:gap-[8px] xl:gap-[10px] 2xl:gap-[12px]" style={{ height: "55%" }}>
+                  <div
+                    className={cn(imageContainerBaseStyle, rectangleImageStyle, "h-full")}
+                    style={{ flex: "412 1 0" }}
+                  >
+                    <FeatureImage
+                      image={images[2]}
+                      alt={images[2]?.altText || `${activeFeature.title} 3`}
+                    />
+                  </div>
+                  <div
+                    className={cn(imageContainerBaseStyle, rectangleImageStyle, "h-full")}
+                    style={{ flex: "181 1 0" }}
+                  >
+                    <FeatureImage
+                      image={images[3]}
+                      alt={images[3]?.altText || `${activeFeature.title} 4`}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Layout 2: 1x2 */}
+          {/* Layout 1: 1x2 垂直并排 (2张图) */}
           {layoutType === 1 && (
-            <div className="grid grid-cols-2 gap-2 md:gap-4 w-full max-w-md md:max-w-xl lg:max-w-2xl">
-              {" "}
-              <div className={cn(imageContainerBaseStyle, nonTrapezoidStyle, "aspect-[290/483]")}>
-                <FeatureImage src={images[0]?.url || "/placeholder.jpg"} alt={images[0]?.altText || `${activeFeature.title} 1`} sizes="(max-width: 768px) 45vw, 290px" />
+            <div className={cn(containerWidth, "h-full pb-2 flex gap-[6px] lg:gap-[8px] xl:gap-[10px] 2xl:gap-[12px]")}>
+              <div className={cn(imageContainerBaseStyle, rectangleImageStyle, "flex-1 h-full")}>
+                <FeatureImage
+                  image={images[0]}
+                  alt={images[0]?.altText || `${activeFeature.title} 1`}
+                />
               </div>
-              <div className={cn(imageContainerBaseStyle, nonTrapezoidStyle, "aspect-[290/483]")}>
-                <FeatureImage src={images[1]?.url || "/placeholder.jpg"} alt={images[1]?.altText || `${activeFeature.title} 2`} sizes="(max-width: 768px) 45vw, 290px" />
+              <div className={cn(imageContainerBaseStyle, rectangleImageStyle, "flex-1 h-full")}>
+                <FeatureImage
+                  image={images[1]}
+                  alt={images[1]?.altText || `${activeFeature.title} 2`}
+                />
               </div>
             </div>
           )}
 
-          {/* Layout 3: 2x3 */}
+          {/* Layout 2: 2x3 网格 (6张图) */}
           {layoutType === 2 && (
-            // 使用 Grid
-            <div className="grid grid-cols-3 gap-2 md:gap-4 w-full max-w-md md:max-w-xl lg:max-w-2xl">
-              {" "}
-              <div className={cn(imageContainerBaseStyle, nonTrapezoidStyle, "aspect-[180/199]")}>
-                <FeatureImage src={images[0]?.url || "/placeholder.jpg"} alt={images[0]?.altText || `${activeFeature.title} 1`} sizes="(max-width: 768px) 30vw, 180px" />
-              </div>
-              <div className={cn(imageContainerBaseStyle, nonTrapezoidStyle, "aspect-[180/199]")}>
-                <FeatureImage src={images[1]?.url || "/placeholder.jpg"} alt={images[1]?.altText || `${activeFeature.title} 2`} sizes="(max-width: 768px) 30vw, 180px" />
-              </div>
-              <div className={cn(imageContainerBaseStyle, nonTrapezoidStyle, "aspect-[180/199]")}>
-                <FeatureImage src={images[2]?.url || "/placeholder.jpg"} alt={images[2]?.altText || `${activeFeature.title} 3`} sizes="(max-width: 768px) 30vw, 180px" />
-              </div>
-              <div className={cn(imageContainerBaseStyle, nonTrapezoidStyle, "aspect-[180/199]")}>
-                <FeatureImage src={images[3]?.url || "/placeholder.jpg"} alt={images[3]?.altText || `${activeFeature.title} 4`} sizes="(max-width: 768px) 30vw, 180px" />
-              </div>
-              <div className={cn(imageContainerBaseStyle, nonTrapezoidStyle, "aspect-[180/199]")}>
-                <FeatureImage src={images[4]?.url || "/placeholder.jpg"} alt={images[4]?.altText || `${activeFeature.title} 5`} sizes="(max-width: 768px) 30vw, 180px" />
-              </div>
-              <div className={cn(imageContainerBaseStyle, nonTrapezoidStyle, "aspect-[180/199]")}>
-                <FeatureImage src={images[5]?.url || "/placeholder.jpg"} alt={images[5]?.altText || `${activeFeature.title} 6`} sizes="(max-width: 768px) 30vw, 180px" />
-              </div>
+            <div className={cn(containerWidth, "h-full pb-2 grid grid-cols-3 grid-rows-2 gap-[6px] lg:gap-[8px] xl:gap-[10px] 2xl:gap-[12px]")}>
+              {[0, 1, 2, 3, 4, 5].map((idx) => (
+                <div
+                  key={idx}
+                  className={cn(imageContainerBaseStyle, rectangleImageStyle)}
+                >
+                  <FeatureImage
+                    image={images[idx]}
+                    alt={images[idx]?.altText || `${activeFeature.title} ${idx + 1}`}
+                  />
+                </div>
+              ))}
             </div>
           )}
 
-          {/* Layout 4: 1x2 Trapezoid */}
+          {/* Layout 3 & 4: 平行四边形布局 (2张图) */}
           {(layoutType === 3 || layoutType === 4) && (
-            <div
-              className={cn(
-                "grid grid-cols-2 w-full max-w-lg", // 移动端
-                "md:max-w-2xl",
-                "lg:max-w-3xl" // 桌面端
-              )}
-            >
-              <div
-                className="relative shadow-[...] aspect-[368/430] -mr-4"
-                style={{ backgroundColor: borderColor, clipPath: `url(#${clipPathIdLeft})` }}
-              >
-                <div className="absolute overflow-hidden bg-gray-100" style={{ inset: borderWidth, clipPath: `url(#${clipPathIdLeft})` }}>
-                  <FeatureImage
-                    src={images[0]?.url || "/placeholder.jpg"}
-                    alt={images[0]?.altText || `${activeFeature.title} 1`}
-                    sizes="(max-width: 768px) 48vw, (max-width: 1024px) 45vw, 450px"
-                  />
-                </div>
+            <div className={cn(containerWidth, "h-full pb-2 flex items-start")}>
+              {/* 左侧平行四边形 */}
+              <div className="relative h-full flex-1 -mr-[5px] lg:-mr-[9px] xl:-mr-[13px] 2xl:-mr-[17px]">
+                <TrapezoidImage
+                  image={images[0]}
+                  alt={images[0]?.altText || `${activeFeature.title} 1`}
+                  direction="left"
+                />
               </div>
-              {/* --- 右侧梯形 --- */}
-              <div
-                className={cn("relative shadow-[...] aspect-[368/430]", "-ml-4")}
-                style={{ backgroundColor: borderColor, clipPath: `url(#${clipPathIdRight})` }}
-              >
-                <div className="absolute overflow-hidden bg-gray-100" style={{ inset: borderWidth, clipPath: `url(#${clipPathIdRight})` }}>
-                  <FeatureImage
-                    src={images[1]?.url || "/placeholder.jpg"}
-                    alt={images[1]?.altText || `${activeFeature.title} 2`}
-                    sizes="(max-width: 768px) 48vw, (max-width: 1024px) 45vw, 450px"
-                  />
-                </div>
+              {/* 右侧平行四边形 */}
+              <div className="relative h-full flex-1 -ml-[5px] lg:-ml-[9px] xl:-ml-[13px] 2xl:-ml-[17px]">
+                <TrapezoidImage
+                  image={images[1]}
+                  alt={images[1]?.altText || `${activeFeature.title} 2`}
+                  direction="right"
+                />
               </div>
             </div>
           )}
@@ -219,17 +198,88 @@ export default function FeatureImageLayout({ activeFeature, activeIndex }: Featu
   );
 }
 
-const FeatureImage = ({ src, alt, sizes }: { src: string; alt: string; sizes: string }) => (
-  <Image
-    src={src}
+// 普通图片组件
+const FeatureImage = ({ image, alt }: { image: any; alt: string }) => (
+  <OptimizedImage
+    image={image}
     alt={alt}
-    fill
-    sizes={sizes}
-    className="object-cover"
-    priority={false}
-    loading="lazy"
-    onError={(e) => {
-      console.error(`Failed to load image: ${src}`);
-    }}
+    size="medium"
+    className="object-cover absolute inset-0 w-full h-full"
   />
 );
+
+// 平行四边形图片组件（SVG 实现带圆角）
+// 倾斜比例：约 15% 的宽度
+const TrapezoidImage = ({
+  image,
+  alt,
+  direction
+}: {
+  image: any;
+  alt: string;
+  direction: "left" | "right"
+}) => {
+  const clipPathId = `trapezoid-${direction}-${Math.random().toString(36).substring(2, 11)}`;
+
+  // 使用百分比坐标的 SVG path，倾斜 15%
+  // viewBox 100x100 便于百分比计算
+  const r = 8; // 圆角半径（相对于100的比例）
+  const slant = 15; // 倾斜量 15%
+
+  // 平行四边形向右倾斜
+  // 左上(slant,0) -> 右上(100,0) -> 右下(100-slant,100) -> 左下(0,100)
+  const path = `
+    M ${slant + r} 0
+    L ${100 - r} 0
+    Q 100 0 100 ${r}
+    L ${100 - slant} ${100 - r}
+    Q ${100 - slant} 100 ${100 - slant - r} 100
+    L ${r} 100
+    Q 0 100 0 ${100 - r}
+    L ${slant} ${r}
+    Q ${slant} 0 ${slant + r} 0
+    Z
+  `;
+
+  return (
+    <div
+      className="h-full w-full relative"
+      style={{
+        filter: "drop-shadow(0px 4px 7px rgba(0,0,0,0.25))"
+      }}
+    >
+      <svg
+        viewBox="0 0 100 100"
+        className="absolute inset-0 w-full h-full"
+        preserveAspectRatio="none"
+      >
+        <defs>
+          <clipPath id={clipPathId} clipPathUnits="objectBoundingBox" transform="scale(0.01)">
+            <path d={path} />
+          </clipPath>
+        </defs>
+        {/* 边框背景 */}
+        <path d={path} fill="#CDC094" />
+      </svg>
+
+      {/* 图片层 */}
+      <div
+        className="absolute bg-gray-100 overflow-hidden"
+        style={{
+          clipPath: `url(#${clipPathId})`,
+          top: "4px",
+          left: "4px",
+          right: "4px",
+          bottom: "4px"
+        }}
+      >
+        <OptimizedImage
+          image={image}
+          alt={alt}
+          size="medium"
+          className="object-cover w-full h-full"
+        />
+      </div>
+    </div>
+  );
+};

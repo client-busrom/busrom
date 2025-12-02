@@ -5,8 +5,8 @@
  */
 
 import { gql } from '@apollo/client'
-// TODO: Fix Keystone client import when admin UI is properly configured
-// import { getClient } from '@keystone-6/core/admin-ui/apollo'
+import { keystoneClient } from '@/lib/keystone-client'
+import type { FeaturedProductsData, FeaturedProduct, ImageObject } from '@/lib/content-data'
 
 /**
  * GraphQL Query for FeaturedProducts
@@ -33,152 +33,139 @@ const GET_PRODUCT_SERIES_BY_IDS = gql`
       id
       slug
       name
-      description
-      featuredImage
       status
       products(where: { status: { equals: "PUBLISHED" } }, take: 3) {
         id
-        slug
         name
-        thumbnail
-        specifications
+        primaryImage
+        combination {
+          id
+          spec1Value
+          spec2Value
+          spec3Value
+        }
       }
     }
   }
 `
 
 /**
- * Featured Product Item (frontend format)
+ * GraphQL Query to fetch Media by ID
  */
-export interface FeaturedProductItem {
-  id: string
-  slug: string
-  name: string
-  thumbnail?: string
-  specifications: Array<{
-    label: string
-    value: string
-  }>
-}
-
-/**
- * Featured Series (frontend format)
- */
-export interface FeaturedSeries {
-  id: string
-  slug: string
-  name: string
-  description?: string
-  featuredImage?: string
-  products: FeaturedProductItem[]
-}
-
-/**
- * Featured Products Config (frontend format)
- */
-export interface FeaturedProductsConfig {
-  title: string
-  description: string
-  viewAllButtonText: string
-  series: FeaturedSeries[]
-}
-
-/**
- * Parse multilingual JSON field
- */
-function parseMultilingualField(field: any, locale: string = 'en'): string {
-  if (!field) return ''
-
-  try {
-    const parsed = typeof field === 'string' ? JSON.parse(field) : field
-    return parsed[locale] || parsed['en'] || parsed['zh'] || ''
-  } catch {
-    return ''
+const GET_MEDIA = gql`
+  query GetMedia($id: ID!) {
+    media(where: { id: $id }) {
+      id
+      filename
+      file {
+        url
+      }
+      variants
+      altText
+    }
   }
+`
+
+/**
+ * Extract locale value from multilingual field
+ */
+function extractLocale(
+  field: Record<string, string> | null | undefined,
+  locale: string,
+  fallback: string = 'en'
+): string {
+  if (!field) return ''
+  return field[locale] || field[fallback] || ''
 }
 
 /**
- * Parse product specifications
+ * Fetch media information by ID
  */
-function parseSpecifications(specs: any, locale: string = 'en'): Array<{ label: string; value: string }> {
-  if (!specs) return []
+async function fetchMedia(mediaId: string, locale: string): Promise<ImageObject | null> {
+  if (!mediaId) return null
 
   try {
-    const parsed = typeof specs === 'string' ? JSON.parse(specs) : specs
-    const localeSpecs = parsed[locale] || parsed['en'] || []
+    const { data } = await keystoneClient.query({
+      query: GET_MEDIA,
+      variables: { id: mediaId },
+    })
 
-    // Take first 3 specs
-    return localeSpecs.slice(0, 3).map((spec: any) => ({
-      label: spec.label || '',
-      value: spec.value || '',
-    }))
-  } catch {
-    return []
+    const media = data?.media
+    if (!media) return null
+
+    const altText = extractLocale(media.altText, locale) || media.filename || ''
+
+    return {
+      url: media.variants?.large || media.variants?.medium || media.file?.url || '',
+      altText,
+      thumbnailUrl: media.variants?.thumbnail || media.file?.url || '',
+      variants: media.variants || undefined,
+    }
+  } catch (error) {
+    console.error(`Error fetching media ${mediaId}:`, error)
+    return null
   }
 }
 
 /**
  * Fetch Featured Products Configuration
  *
+ * According to docs/HOME_API_FIELD_MAPPING.md:
+ * - Reads FeaturedProducts config (singleton)
+ * - Gets categories (ProductSeries IDs)
+ * - For each series: fetches 3 random products
+ * - For each product: gets 3 specs from combination
+ *
  * @param locale - Language locale (default: 'en')
- * @returns Featured products configuration with series and products
+ * @returns Featured products data
  *
  * @example
  * ```typescript
- * // In Server Component
- * import { getFeaturedProducts } from '@/lib/api/featured-products'
- *
- * const config = await getFeaturedProducts('zh')
- * ```
- *
- * @example
- * ```typescript
- * // In Client Component
- * 'use client'
- * import { useQuery, gql } from '@apollo/client'
- *
- * const { data, loading } = useQuery(GET_FEATURED_PRODUCTS, {
- *   variables: { locale: 'zh' }
- * })
+ * const featuredProducts = await getFeaturedProducts('en')
  * ```
  */
-export async function getFeaturedProducts(locale: string = 'en'): Promise<FeaturedProductsConfig | null> {
-  // TODO: Implement when Keystone client is properly configured
-  console.warn('getFeaturedProducts: Keystone client not yet configured')
-  return null
-
-  /* Temporarily disabled until getClient is available
-  const client = getClient()
-
+export async function getFeaturedProducts(locale: string = 'en'): Promise<FeaturedProductsData> {
   try {
     // Step 1: Fetch FeaturedProducts config
-    const { data: configData } = await client.query({
+    const { data: configData } = await keystoneClient.query({
       query: GET_FEATURED_PRODUCTS,
-      variables: { locale },
     })
 
     const config = configData?.featuredProductsConfigs?.[0]
 
     if (!config || config.status !== 'PUBLISHED') {
-      return null
+      console.warn('FeaturedProducts config not found or not published')
+      return {
+        title: '',
+        description: '',
+        viewAllButton: '',
+        categories: '',
+        series: [],
+      }
     }
 
-    // Step 2: Parse category IDs
+    // Step 2: Extract config fields
+    const title = extractLocale(config.title, locale)
+    const description = extractLocale(config.description, locale)
+    const viewAllButton = extractLocale(config.viewAllButtonText, locale)
+
+    // Step 3: Parse category IDs (ProductSeries IDs)
     const categoryIds: string[] = Array.isArray(config.categories)
       ? config.categories
       : []
 
     if (categoryIds.length === 0) {
       return {
-        title: parseMultilingualField(config.title, locale),
-        description: parseMultilingualField(config.description, locale),
-        viewAllButtonText: parseMultilingualField(config.viewAllButtonText, locale),
+        title,
+        description,
+        viewAllButton,
+        categories: '',
         series: [],
       }
     }
 
-    // Step 3: Fetch ProductSeries by IDs (preserving order)
-    const { data: seriesData } = await client.query({
+    // Step 4: Fetch ProductSeries by IDs (preserving order)
+    const { data: seriesData } = await keystoneClient.query({
       query: GET_PRODUCT_SERIES_BY_IDS,
       variables: { ids: categoryIds },
     })
@@ -187,37 +174,67 @@ export async function getFeaturedProducts(locale: string = 'en'): Promise<Featur
       (seriesData?.productSeriesItems || []).map((s: any) => [s.id, s])
     )
 
-    // Step 4: Map series in the correct order
-    const series: FeaturedSeries[] = categoryIds
-      .map(id => seriesMap.get(id))
-      .filter(Boolean)
-      .filter((s: any) => s.status === 'PUBLISHED')
-      .map((s: any) => ({
-        id: s.id,
-        slug: s.slug,
-        name: parseMultilingualField(s.name, locale),
-        description: parseMultilingualField(s.description, locale),
-        featuredImage: s.featuredImage,
-        products: (s.products || []).map((p: any) => ({
-          id: p.id,
-          slug: p.slug,
-          name: parseMultilingualField(p.name, locale),
-          thumbnail: p.thumbnail,
-          specifications: parseSpecifications(p.specifications, locale),
-        })),
-      }))
+    // Step 5: Transform to frontend format
+    const series = await Promise.all(
+      categoryIds
+        .map(id => seriesMap.get(id))
+        .filter(Boolean)
+        .filter((s: any) => s.status === 'PUBLISHED')
+        .map(async (s: any) => {
+          const seriesTitle = extractLocale(s.name, locale)
+
+          // Transform products
+          const products: FeaturedProduct[] = await Promise.all(
+            (s.products || []).map(async (p: any) => {
+              // Fetch product image
+              const image = await fetchMedia(p.primaryImage, locale)
+
+              // Extract 3 specs from combination
+              const features: string[] = []
+              if (p.combination) {
+                if (p.combination.spec1Value) {
+                  features.push(extractLocale(p.combination.spec1Value, locale))
+                }
+                if (p.combination.spec2Value) {
+                  features.push(extractLocale(p.combination.spec2Value, locale))
+                }
+                if (p.combination.spec3Value) {
+                  features.push(extractLocale(p.combination.spec3Value, locale))
+                }
+              }
+
+              return {
+                image: image || { url: '', altText: '' },
+                title: extractLocale(p.name, locale),
+                features,
+              }
+            })
+          )
+
+          return {
+            seriesTitle,
+            products: products.filter(p => p.image.url), // Filter out products without images
+          }
+        })
+    )
 
     return {
-      title: parseMultilingualField(config.title, locale),
-      description: parseMultilingualField(config.description, locale),
-      viewAllButtonText: parseMultilingualField(config.viewAllButtonText, locale),
-      series,
+      title,
+      description,
+      viewAllButton,
+      categories: series.map(s => s.seriesTitle).join(', '),
+      series: series.filter(s => s.products.length > 0), // Filter out series without products
     }
   } catch (error) {
     console.error('Error fetching featured products:', error)
-    return null
+    return {
+      title: '',
+      description: '',
+      viewAllButton: '',
+      categories: '',
+      series: [],
+    }
   }
-  */
 }
 
 /**

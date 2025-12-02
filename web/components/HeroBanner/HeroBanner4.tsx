@@ -1,10 +1,10 @@
-﻿// components/HeroBanner/HeroBanner4.tsx
-import Image from "next/image";
+// components/HeroBanner/HeroBanner4.tsx
 import type { FC } from "react";
-// 确保 HomeContent 和 Locale 的导入路径正确
+import Image from "next/image";
 import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
-import { cn, getObjectPosition } from "@/lib/utils"; // 导入 cn 和 getObjectPosition
+import { cn, getObjectPosition } from "@/lib/utils";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // --- BannerProps 定义 ---
 type BannerData = HomeContent["heroBanner"][number];
@@ -16,11 +16,7 @@ type BannerProps = {
 // --- HeroBanner4 组件 ---
 const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
   // --- 图片路径 ---
-  const imageUrl: string = data.images[0]?.url || "/placeholder.jpg";
-  const svgUrl: string = "/HeroBanner4.svg"; // 假设的 SVG 遮罩
-  const image1Url = data.images[1]?.url || "/placeholder.jpg";
-  const image2Url = data.images[2]?.url || "/placeholder.jpg";
-  const image3Url = data.images[3]?.url || "/placeholder.jpg";
+  const svgUrl: string = "/HeroBanner4.svg";
 
   // --- 拆分 Feature[0] (保持不变) ---
   const feature0Text = data.features[0] || "";
@@ -71,14 +67,12 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
         </defs>
       </svg>
       {/* 背景图 (z-0) */}
-      <Image
-        src={imageUrl}
+      <OptimizedImage
+        image={data.images[0]}
         alt="背景图"
-        fill
-        sizes="100vw"
-        quality={90}
-        className="object-cover z-0"
-        style={{ objectPosition: getObjectPosition(data.images[0]) }}
+        size="xlarge"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        objectPosition={getObjectPosition(data.images[0])}
         priority
       />
       {/* SVG 遮罩 (z-10) */}
@@ -92,35 +86,32 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
       />
       <div className="absolute inset-y-0 right-0 w-[1000px] h-full hidden lg:block z-20 pointer-events-none">
         {/* --- 图片 1 (高) --- */}
-        {/* 【已修改】移除 inset-y-0, 添加 top-0 bottom-[10%] */}
         <div
           className="absolute left-0 w-[40%] top-[5%] bottom-[25%]"
           style={{ backgroundColor: borderColor, clipPath: `url(#${clipPathId})` }}
         >
           <div className="absolute overflow-hidden" style={{ inset: borderWidth, clipPath: `url(#${clipPathId})` }}>
-            <Image src={image1Url} alt="Feature image 1" fill sizes="200px" className="object-cover" />
+            <OptimizedImage image={data.images[1]} alt="Feature image 1" size="large" className="absolute inset-0 w-full h-full object-cover" />
           </div>
         </div>
 
         {/* --- 图片 2 (低) --- */}
-        {/* 【已修改】移除 inset-y-0, 添加 top-[15%] bottom-0 */}
         <div
           className="absolute left-[30%] w-[40%] top-[20%] bottom-[10%] z-10"
           style={{ backgroundColor: borderColor, clipPath: `url(#${clipPathId})` }}
         >
           <div className="absolute overflow-hidden" style={{ inset: borderWidth, clipPath: `url(#${clipPathId})` }}>
-            <Image src={image2Url} alt="Feature image 2" fill sizes="200px" className="object-cover" />
+            <OptimizedImage image={data.images[2]} alt="Feature image 2" size="large" className="absolute inset-0 w-full h-full object-cover" />
           </div>
         </div>
 
         {/* --- 图片 3 (高) --- */}
-        {/* 【已修改】移除 inset-y-0, 添加 top-0 bottom-[10%] */}
         <div
           className="absolute left-[50%] w-[40%] top-[5%] bottom-[25%]"
           style={{ backgroundColor: borderColor, clipPath: `url(#${clipPathId})` }}
         >
           <div className="absolute overflow-hidden" style={{ inset: borderWidth, clipPath: `url(#${clipPathId})` }}>
-            <Image src={image3Url} alt="Feature image 3" fill sizes="200px" className="object-cover" />
+            <OptimizedImage image={data.images[3]} alt="Feature image 3" size="large" className="absolute inset-0 w-full h-full object-cover" />
           </div>
         </div>
       </div>

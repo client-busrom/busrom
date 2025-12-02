@@ -250,13 +250,13 @@ const seriesConfig = [
   },
   {
     seriesId: 'ec3c3299-f70f-4d33-974f-4e3b9e628c19',
-    seriesNameEn: 'Bathroom Handle',
+    seriesNameEn: 'Bathroom & Door Handle',
     seriesNameZh: '浴室&大门拉手',
-    skuPrefix: 'BH',
-    namePrefix: { en: 'Bathroom Handle', zh: '浴室拉手' },
+    skuPrefix: 'BDH',
+    namePrefix: { en: 'Bathroom & Door Handle', zh: '浴室&大门拉手' },
     shortDesc: {
-      en: 'Modern minimalist bathroom handle with ergonomic design.',
-      zh: '现代极简浴室拉手,符合人体工学设计。'
+      en: 'Modern minimalist bathroom and door handle with ergonomic design.',
+      zh: '现代极简浴室及大门拉手,符合人体工学设计。'
     },
     content: {
       en: [
@@ -264,7 +264,7 @@ const seriesConfig = [
         { type: 'blockquote', children: [{ type: 'code', children: [{ text: 'Product Description' }] }] },
         {
           type: 'paragraph',
-          children: [{ text: 'Busrom Bathroom Handle combines clean lines and exquisite details to create a minimalist and luxurious handle experience.' }]
+          children: [{ text: 'Busrom Bathroom & Door Handle combines clean lines and exquisite details to create a minimalist and luxurious handle experience for bathroom spaces and main doors.' }]
         }
       ],
       zh: [
@@ -272,36 +272,7 @@ const seriesConfig = [
         { type: 'blockquote', children: [{ type: 'code', children: [{ text: '产品描述' }] }] },
         {
           type: 'paragraph',
-          children: [{ text: 'Busrom浴室拉手结合简洁的线条和精致的细节,打造极简奢华的拉手体验。' }]
-        }
-      ]
-    }
-  },
-  {
-    seriesId: '97d4f30f-92b6-4a05-904b-76b51417efc4',
-    seriesNameEn: 'Door Handle',
-    seriesNameZh: '大门拉手',
-    skuPrefix: 'DH',
-    namePrefix: { en: 'Door Handle', zh: '大门拉手' },
-    shortDesc: {
-      en: 'Modern minimalist door handle for all types of doors.',
-      zh: '现代极简大门拉手,适用于各种类型的门。'
-    },
-    content: {
-      en: [
-        { type: 'paragraph', children: [{ text: '' }] },
-        { type: 'blockquote', children: [{ type: 'code', children: [{ text: 'Product Description' }] }] },
-        {
-          type: 'paragraph',
-          children: [{ text: 'Busrom Door Handle combines clean lines and exquisite details for all types of doors.' }]
-        }
-      ],
-      zh: [
-        { type: 'paragraph', children: [{ text: '' }] },
-        { type: 'blockquote', children: [{ type: 'code', children: [{ text: '产品描述' }] }] },
-        {
-          type: 'paragraph',
-          children: [{ text: 'Busrom大门拉手结合简洁的线条和精致的细节,适用于各种类型的门。' }]
+          children: [{ text: 'Busrom浴室&大门拉手结合简洁的线条和精致的细节,为浴室空间及大门打造极简奢华的拉手体验。' }]
         }
       ]
     }

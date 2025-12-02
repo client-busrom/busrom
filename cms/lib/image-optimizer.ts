@@ -13,7 +13,7 @@
  */
 
 import sharp from 'sharp'
-import { S3Client, PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3'
+import { S3Client, PutObjectCommand, HeadObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Readable } from 'stream'
 
 // S3/MinIO Client - Lazy initialization to ensure env vars are loaded
@@ -111,15 +111,31 @@ async function downloadImage(url: string): Promise<Buffer> {
 
 /**
  * Extract S3 key from URL
+ *
+ * Handles both CloudFront and MinIO URLs
  */
-function extractS3KeyFromUrl(url: string): string {
+function extractS3KeyFromUrl(url: string): string | null {
   try {
-    const urlObj = new URL(url)
-    // Remove leading slash
-    return urlObj.pathname.substring(1)
-  } catch {
-    // If URL parsing fails, assume it's already a key
-    return url
+    const parsedUrl = new URL(url)
+    const pathname = parsedUrl.pathname
+
+    // For CloudFront: https://xxx.cloudfront.net/key
+    if (parsedUrl.hostname.includes('cloudfront.net')) {
+      return pathname.replace(/^\//, '') // Remove leading slash
+    }
+
+    // For MinIO/S3: http://localhost:9000/bucket/key or https://bucket.s3.region.amazonaws.com/key
+    const parts = pathname.split('/').filter(Boolean)
+    if (parts.length >= 2) {
+      // Remove bucket name, keep the rest as key
+      parts.shift()
+      return parts.join('/')
+    }
+
+    return pathname.replace(/^\//, '')
+  } catch (error) {
+    console.error('Failed to extract S3 key from URL:', url, error)
+    return null
   }
 }
 
@@ -127,7 +143,7 @@ function extractS3KeyFromUrl(url: string): string {
  * Get filename from URL
  */
 function getFilename(url: string): string {
-  const key = extractS3KeyFromUrl(url)
+  const key = extractS3KeyFromUrl(url) || url
   const parts = key.split('/')
   return parts[parts.length - 1]
 }
@@ -345,5 +361,96 @@ export async function optimizeImage(
   } catch (error) {
     console.error('Error optimizing image:', error)
     throw error
+  }
+}
+
+/**
+ * Delete a single file from S3
+ */
+async function deleteFromS3(key: string): Promise<boolean> {
+  try {
+    await getS3Client().send(
+      new DeleteObjectCommand({
+        Bucket: getS3BucketName(),
+        Key: key,
+      })
+    )
+    console.log(`🗑️  Deleted from S3: ${key}`)
+    return true
+  } catch (error) {
+    console.error(`❌ Failed to delete from S3: ${key}`, error)
+    return false
+  }
+}
+
+/**
+ * Delete Media Files from S3
+ *
+ * Deletes the original file and all generated variants
+ *
+ * @param fileId - The Keystone file ID (e.g., "abc123") - for Keystone image field uploads
+ * @param fileExtension - The file extension (e.g., "jpg", "png")
+ * @param variants - The variants object containing URLs to all variants
+ * @param fileKey - The S3 key for batch uploaded files (e.g., "uploads/xxx.jpg")
+ */
+export async function deleteMediaFiles(
+  fileId: string | null | undefined,
+  fileExtension: string | null | undefined,
+  variants: Record<string, string> | null | undefined,
+  fileKey?: string | null | undefined
+): Promise<{ success: boolean; deletedCount: number; errors: string[] }> {
+  const errors: string[] = []
+  let deletedCount = 0
+
+  console.log(`🗑️  Starting deletion of media files...`)
+  console.log(`   fileId: ${fileId}, extension: ${fileExtension}, fileKey: ${fileKey}`)
+  console.log(`   variants: ${variants ? Object.keys(variants).join(', ') : 'none'}`)
+
+  // 1. Delete original file (uploaded via Keystone's image field)
+  if (fileId && fileExtension) {
+    const originalKey = `${fileId}.${fileExtension}`
+    const success = await deleteFromS3(originalKey)
+    if (success) {
+      deletedCount++
+    } else {
+      errors.push(`Failed to delete original: ${originalKey}`)
+    }
+  }
+
+  // 2. Delete original file (uploaded via batch upload / presigned URL)
+  if (fileKey) {
+    const success = await deleteFromS3(fileKey)
+    if (success) {
+      deletedCount++
+    } else {
+      errors.push(`Failed to delete batch uploaded file: ${fileKey}`)
+    }
+  }
+
+  // 3. Delete all variants
+  if (variants && typeof variants === 'object') {
+    for (const [variantName, variantUrl] of Object.entries(variants)) {
+      if (!variantUrl || typeof variantUrl !== 'string') continue
+
+      const variantKey = extractS3KeyFromUrl(variantUrl)
+      if (variantKey) {
+        const success = await deleteFromS3(variantKey)
+        if (success) {
+          deletedCount++
+        } else {
+          errors.push(`Failed to delete variant ${variantName}: ${variantKey}`)
+        }
+      } else {
+        errors.push(`Could not extract key for variant ${variantName}: ${variantUrl}`)
+      }
+    }
+  }
+
+  console.log(`✅ Deletion complete. Deleted: ${deletedCount}, Errors: ${errors.length}`)
+
+  return {
+    success: errors.length === 0,
+    deletedCount,
+    errors,
   }
 }

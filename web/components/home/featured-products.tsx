@@ -3,9 +3,9 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import type { HomeContent, FeaturedProduct } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 type Props = {
   data: HomeContent["featuredProducts"];
@@ -39,19 +39,18 @@ const ProductCard = ({ product, stepTransform }: ProductCardProps) => (
     )}
   > 
     {/* 图片容器 - 统一尺寸 */}
-    <div 
+    <div
       className={cn(
         "relative w-full rounded-xl overflow-hidden shadow-lg mb-4",
-        IMAGE_ASPECT_RATIO, 
-        CARD_MAX_WIDTH 
+        IMAGE_ASPECT_RATIO,
+        CARD_MAX_WIDTH
       )}
     >
-      <Image
-        src={product.image?.url || "/placeholder.jpg"}
+      <OptimizedImage
+        image={product.image}
         alt={product.image?.altText || product.title}
-        fill
-        sizes="(max-width: 768px) 90vw, 30vw"
-        className="object-cover"
+        size="medium"
+        className="object-cover absolute inset-0 w-full h-full"
       />
     </div>
     
@@ -75,13 +74,11 @@ const ProductCard = ({ product, stepTransform }: ProductCardProps) => (
 // --- 产品卡片结束 ---
 
 export default function FeaturedProducts({ data, locale }: Props) {
-  const [activeSeriesIndex, setActiveSeriesIndex] = useState(0); 
-
+  const [activeSeriesIndex, setActiveSeriesIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
-
 
   // --- 拖拽滚动处理函数 ---
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -116,13 +113,18 @@ export default function FeaturedProducts({ data, locale }: Props) {
     };
   }, [handleMouseUp, handleMouseMove]);
 
-  const productSeries = data.series || []; 
-  
+  const productSeries = data?.series || [];
+
   const featuredItems = useMemo(() => {
     return productSeries[activeSeriesIndex]?.products || [];
   }, [activeSeriesIndex, productSeries]);
 
   const itemsToDisplay = featuredItems.slice(0, 3);
+
+  // Guard: if no data, don't render
+  if (!data || !data.series || data.series.length === 0) {
+    return null;
+  }
 
 
   return (

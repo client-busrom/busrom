@@ -30,7 +30,18 @@ const GET_MEDIA_TAGS = gql`
   }
 `
 
-// GraphQL query to get Media by tags
+// GraphQL query to get all MediaCategories
+const GET_MEDIA_CATEGORIES = gql`
+  query GetMediaCategories {
+    mediaCategories(orderBy: { order: asc }) {
+      id
+      slug
+      name
+    }
+  }
+`
+
+// GraphQL query to get Media by tags (without category filter)
 const GET_MEDIA_BY_TAGS = gql`
   query GetMediaByTags($tagIds: [ID!]!) {
     mediaFiles(
@@ -49,6 +60,46 @@ const GET_MEDIA_BY_TAGS = gql`
       }
       variants
       tags {
+        id
+      }
+      primaryCategory {
+        id
+      }
+    }
+  }
+`
+
+// GraphQL query to get Media by tags and category
+const GET_MEDIA_BY_TAGS_AND_CATEGORY = gql`
+  query GetMediaByTagsAndCategory($tagIds: [ID!]!, $categoryId: ID!) {
+    mediaFiles(
+      where: {
+        AND: [
+          {
+            tags: {
+              some: {
+                id: { in: $tagIds }
+              }
+            }
+          }
+          {
+            primaryCategory: {
+              id: { equals: $categoryId }
+            }
+          }
+        ]
+      }
+    ) {
+      id
+      filename
+      file {
+        url
+      }
+      variants
+      tags {
+        id
+      }
+      primaryCategory {
         id
       }
     }
@@ -71,6 +122,7 @@ const GET_MEDIA_BY_IDS = gql`
 
 interface FieldValue {
   tags: string[]
+  category?: string
   images: string[]
 }
 
@@ -93,11 +145,29 @@ export const Field = ({ field, value, onChange }: FieldProps<typeof controller>)
   // Fetch all tags
   const { data: tagsData } = useQuery(GET_MEDIA_TAGS)
 
-  // Fetch media matching selected tags
-  const { data: mediaData, refetch: refetchMedia } = useQuery(GET_MEDIA_BY_TAGS, {
-    variables: { tagIds: fieldValue.tags },
-    skip: fieldValue.tags.length === 0,
+  // Fetch all categories
+  const { data: categoriesData } = useQuery(GET_MEDIA_CATEGORIES)
+
+  // Fetch media matching selected tags (without category)
+  const { data: mediaDataAll, refetch: refetchMediaAll } = useQuery(GET_MEDIA_BY_TAGS, {
+    variables: {
+      tagIds: fieldValue.tags
+    },
+    skip: fieldValue.tags.length === 0 || !!fieldValue.category,
   })
+
+  // Fetch media matching selected tags and category
+  const { data: mediaDataWithCategory, refetch: refetchMediaWithCategory } = useQuery(GET_MEDIA_BY_TAGS_AND_CATEGORY, {
+    variables: {
+      tagIds: fieldValue.tags,
+      categoryId: fieldValue.category
+    },
+    skip: fieldValue.tags.length === 0 || !fieldValue.category,
+  })
+
+  // Use the appropriate data based on whether category is selected
+  const mediaData = fieldValue.category ? mediaDataWithCategory : mediaDataAll
+  const refetchMedia = fieldValue.category ? refetchMediaWithCategory : refetchMediaAll
 
   // Fetch selected images details
   const { data: selectedImagesData } = useQuery(GET_MEDIA_BY_IDS, {
@@ -112,6 +182,16 @@ export const Field = ({ field, value, onChange }: FieldProps<typeof controller>)
       return nameObj.zh || nameObj.en || tag.slug
     } catch {
       return tag.slug
+    }
+  }
+
+  // Parse category names
+  const getCategoryName = (category: any): string => {
+    try {
+      const nameObj = typeof category.name === 'string' ? JSON.parse(category.name) : category.name
+      return nameObj.zh || nameObj.en || category.slug
+    } catch {
+      return category.slug
     }
   }
 
@@ -136,6 +216,18 @@ export const Field = ({ field, value, onChange }: FieldProps<typeof controller>)
     const order = ['PRODUCT_SERIES', 'FUNCTION_TYPE', 'SCENE_TYPE', 'SPEC', 'COLOR', 'CUSTOM']
     return order.indexOf(a) - order.indexOf(b)
   })
+
+  // Select category
+  const selectCategory = (categoryId: string | undefined) => {
+    onChange?.(
+      JSON.stringify({
+        ...fieldValue,
+        category: categoryId,
+        // Clear images when category changes
+        images: [],
+      })
+    )
+  }
 
   // Toggle tag selection
   const toggleTag = (tagId: string) => {
@@ -200,7 +292,7 @@ export const Field = ({ field, value, onChange }: FieldProps<typeof controller>)
 
   // Clear all
   const clearAll = () => {
-    onChange?.(JSON.stringify({ tags: [], images: [] }))
+    onChange?.(JSON.stringify({ tags: [], category: undefined, images: [] }))
   }
 
   const selectedImages = selectedImagesData?.mediaFiles || []
@@ -214,6 +306,68 @@ export const Field = ({ field, value, onChange }: FieldProps<typeof controller>)
       <FieldLabel>{field.label}</FieldLabel>
 
       <div style={{ marginTop: '12px' }}>
+        {/* Category Selection */}
+        <div style={{
+          border: '2px solid #e5e7eb',
+          borderRadius: '8px',
+          padding: '16px',
+          marginBottom: '16px',
+          background: '#fef3c7',
+        }}>
+          <h3 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: 600 }}>
+            Select Category (选择分类) {fieldValue.category ? '- 1 selected' : ''}
+          </h3>
+
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '6px',
+          }}>
+            {/* "All" option */}
+            <button
+              type="button"
+              onClick={() => selectCategory(undefined)}
+              style={{
+                padding: '6px 14px',
+                fontSize: '12px',
+                border: `2px solid ${!fieldValue.category ? '#f59e0b' : '#d1d5db'}`,
+                borderRadius: '6px',
+                background: !fieldValue.category ? '#fef3c7' : 'white',
+                color: !fieldValue.category ? '#92400e' : '#4b5563',
+                cursor: 'pointer',
+                fontWeight: !fieldValue.category ? 600 : 400,
+              }}
+            >
+              All (全部)
+            </button>
+
+            {categoriesData?.mediaCategories?.map((category: any) => {
+              const isSelected = fieldValue.category === category.id
+              const categoryName = getCategoryName(category)
+
+              return (
+                <button
+                  key={category.id}
+                  type="button"
+                  onClick={() => selectCategory(category.id)}
+                  style={{
+                    padding: '6px 14px',
+                    fontSize: '12px',
+                    border: `2px solid ${isSelected ? '#f59e0b' : '#d1d5db'}`,
+                    borderRadius: '6px',
+                    background: isSelected ? '#fef3c7' : 'white',
+                    color: isSelected ? '#92400e' : '#4b5563',
+                    cursor: 'pointer',
+                    fontWeight: isSelected ? 600 : 400,
+                  }}
+                >
+                  {categoryName}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
         {/* Tag Selection */}
         <div style={{
           border: '2px solid #e5e7eb',

@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { MainFormData } from "@/lib/content-data";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // ------------------------------------------------------------------
 // 类型定义
@@ -48,6 +49,11 @@ export default function MainForm({ data }: Props) {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Guard: if no data, don't render
+  if (!data) {
+    return null;
+  }
 
   // 【已修改】简化了 cardContainerClass，因为 p-8 在你的代码中被覆盖了
   const cardContainerClass = `bg-brand-form-bg rounded-2xl px-8 py-16`;
@@ -98,7 +104,7 @@ export default function MainForm({ data }: Props) {
                   right: "3.6%",
                 }}
               >
-                <Image src={data.image1?.url || "/placeholder.jpg"} alt={data.image1?.altText || data.designTextLeft} fill className="object-cover w-full h-full" />
+                <OptimizedImage image={data.image1} alt={data.image1?.altText || data.designTextLeft} size="large" className="object-cover w-full h-full absolute inset-0" />
               </div>
 
               {/* 2. 顶层手机框 (z-20) */}
@@ -183,7 +189,7 @@ export default function MainForm({ data }: Props) {
                   right: "3.6%",
                 }}
               >
-                <Image src={data.image2?.url || "/placeholder.jpg"} alt={data.image2?.altText || data.designTextRight} fill className="object-cover w-full h-full" />
+                <OptimizedImage image={data.image2} alt={data.image2?.altText || data.designTextRight} size="large" className="object-cover w-full h-full absolute inset-0" />
               </div>
 
               {/* 2. 顶层手机框 (z-20) */}

@@ -35,6 +35,7 @@ import { forceClearUsersHandler } from './routes/force-clear-users'
 import { duplicateProductHandler } from './routes/duplicate-product'
 import { duplicateItemHandler } from './routes/duplicate-item'
 import { presignedUploadHandler, uploadConfigHandler } from './routes/presigned-upload'
+import { homeContentHandler } from './routes/api/home'
 import { seedMediaSystem } from './scripts/seed-media-system'
 import { seedProductSystem } from './scripts/seed-product-system'
 import { seedNavigationSystem } from './scripts/seed-navigation-system'
@@ -227,6 +228,9 @@ export default withAuth(
         app.post('/api/presigned-upload', presignedUploadHandler)
         app.get('/api/upload-config', uploadConfigHandler)
 
+        // Home content API endpoint
+        app.get('/api/home', homeContentHandler)
+
         console.log('✅ Static files served from public/')
         console.log('✅ Translation API registered at POST /api/translate')
         console.log('✅ Regenerate Variants API registered at POST /api/regenerate-variants')
@@ -234,6 +238,7 @@ export default withAuth(
         console.log('✅ Export Form Submissions API registered at POST /api/export-form-submissions')
         console.log('✅ Update Password API registered at POST /api/update-password')
         console.log('✅ 2FA API registered at POST /api/2fa/*')
+        console.log('✅ Home Content API registered at GET /api/home')
       },
     },
 

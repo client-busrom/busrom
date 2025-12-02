@@ -1,0 +1,65 @@
+[
+  {
+    "name": {"en": "Glass Standoff", "zh": "广告螺丝"},
+    "slug": "glass-standoff",
+    "type": "APPLICATION",
+    "order": 1,
+    "status": "PUBLISHED"
+  },
+  {
+    "name": {"en": "Glass Connected Fitting", "zh": "玻璃栏杆扶手连接件"},
+    "slug": "glass-connected-fitting",
+    "type": "APPLICATION",
+    "order": 2,
+    "status": "PUBLISHED"
+  },
+  {
+    "name": {"en": "Glass Fence Spigot", "zh": "玻璃护栏支架底座"},
+    "slug": "glass-fence-spigot",
+    "type": "APPLICATION",
+    "order": 3,
+    "status": "PUBLISHED"
+  },
+  {
+    "name": {"en": "Guardrail Glass Clip", "zh": "护栏系列"},
+    "slug": "guardrail-glass-clip",
+    "type": "APPLICATION",
+    "order": 4,
+    "status": "PUBLISHED"
+  },
+  {
+    "name": {"en": "Bathroom Glass Clip", "zh": "浴室系列"},
+    "slug": "bathroom-glass-clip",
+    "type": "APPLICATION",
+    "order": 5,
+    "status": "PUBLISHED"
+  },
+  {
+    "name": {"en": "Glass Hinge", "zh": "浴室夹"},
+    "slug": "glass-hinge",
+    "type": "APPLICATION",
+    "order": 6,
+    "status": "PUBLISHED"
+  },
+  {
+    "name": {"en": "Sliding Door Kit", "zh": "移门滑轮套装"},
+    "slug": "sliding-door-kit",
+    "type": "APPLICATION",
+    "order": 7,
+    "status": "PUBLISHED"
+  },
+  {
+    "name": {"en": "Bathroom & Door Handle", "zh": "浴室&大门拉手"},
+    "slug": "bathroom-door-handle",
+    "type": "APPLICATION",
+    "order": 8,
+    "status": "PUBLISHED"
+  },
+  {
+    "name": {"en": "Hidden Hook", "zh": "挂钩"},
+    "slug": "hidden-hook",
+    "type": "APPLICATION",
+    "order": 9,
+    "status": "PUBLISHED"
+  }
+]

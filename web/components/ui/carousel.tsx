@@ -153,8 +153,11 @@ const CarouselContent = React.forwardRef<
 >(({ className, ...props }, ref) => {
   const { carouselRef, orientation } = useCarousel()
 
+  // 检查是否需要全高度模式（通过 className 中是否包含 h-full 判断）
+  const needsFullHeight = className?.includes("h-full")
+
   return (
-    <div ref={carouselRef} className="overflow-hidden">
+    <div ref={carouselRef} className={cn("overflow-hidden", needsFullHeight && "h-full")}>
       <div
         ref={ref}
         className={cn(

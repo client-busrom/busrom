@@ -1,9 +1,10 @@
-﻿// components/HeroBanner/HeroBanner5.tsx
-import Image from "next/image";
+// components/HeroBanner/HeroBanner5.tsx
 import type { FC } from "react";
-import type { HomeContent } from "@/lib/content-data"; // Ensure path is correct
-import { Locale } from "@/i18n.config"; // Ensure path is correct
-import { cn, getObjectPosition } from "@/lib/utils"; // Import cn and getObjectPosition
+import Image from "next/image";
+import type { HomeContent } from "@/lib/content-data";
+import { Locale } from "@/i18n.config";
+import { cn, getObjectPosition } from "@/lib/utils";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // --- BannerProps Definition ---
 type BannerData = HomeContent["heroBanner"][number];
@@ -14,8 +15,7 @@ type BannerProps = {
 
 // --- HeroBanner5 Component ---
 const HeroBanner5: FC<BannerProps> = ({ data, locale }) => {
-  const imageUrl: string = data.images[0]?.url || "/placeholder.jpg";
-  const svgUrl: string = "/HeroBanner5.svg"; // <-- Confirm path
+  const svgUrl: string = "/HeroBanner5.svg";
 
   // --- Split Feature[0] ---
   const feature0Text = data.features[0] || "";
@@ -24,7 +24,6 @@ const HeroBanner5: FC<BannerProps> = ({ data, locale }) => {
   const titleLine2 = words.slice(1).join(" ");
 
   // --- Gradient Mask for Feature Stack ---
-  // Left (#A4940C) solid -> Right (#847B2C) transparent
   const featureMaskStyle = {
     maskImage: 'linear-gradient(to right, black 0%, transparent 80%)',
     WebkitMaskImage: 'linear-gradient(to right, black 0%, transparent 80%)',
@@ -33,14 +32,12 @@ const HeroBanner5: FC<BannerProps> = ({ data, locale }) => {
   return (
     <section className="relative w-full h-full overflow-hidden font-sans">
       {/* Layer 1: Background Image (z-0) */}
-      <Image
-        src={imageUrl}
+      <OptimizedImage
+        image={data.images[0]}
         alt="Background"
-        fill
-        sizes="100vw"
-        quality={90}
-        className="object-cover z-0"
-        style={{ objectPosition: getObjectPosition(data.images[0]) }}
+        size="xlarge"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        objectPosition={getObjectPosition(data.images[0])}
         priority
       />
 
@@ -50,49 +47,46 @@ const HeroBanner5: FC<BannerProps> = ({ data, locale }) => {
         alt="Mask"
         fill
         sizes="100vw"
-        className="object-cover z-10 pointer-events-none" // Adjust object-position if needed
+        className="object-cover z-10 pointer-events-none"
         style={{ objectPosition: getObjectPosition(data.images[0]) }}
       />
 
       {/* Layer 3: Rotated Image Divs (z-20) */}
-      {/* Positioned slightly left of center */}
       {/* Top Rotated Div */}
       <div
         className={cn(
-          "absolute top-[-5%] left-[45%] transform -translate-x-1/2", // Position top-left of center
-          "w-56 h-56 md:w-72 md:h-72 lg:w-96 lg:h-96", // Responsive size
+          "absolute top-[-5%] left-[45%] transform -translate-x-1/2",
+          "w-56 h-56 md:w-72 md:h-72 lg:w-96 lg:h-96",
           "border-[7px] md:border-[13px] lg:border-[19px] border-[#756F3F]",
-          "rounded-[50px] md:rounded-[75px] lg:rounded-[100px]", // Border & rounding
-          "rotate-45 overflow-hidden z-20" // Rotation & clipping
+          "rounded-[50px] md:rounded-[75px] lg:rounded-[100px]",
+          "rotate-45 overflow-hidden z-20"
         )}
       >
         <div className="relative w-full h-full">
-          <Image
-            src={data.images[1]?.url || "/placeholder.jpg"} // <-- Replace with actual image path
+          <OptimizedImage
+            image={data.images[1]}
             alt="Top rotated image"
-            fill
-            sizes="(max-width: 768px) 50vw, 33vw"
-            className="object-cover -rotate-45 scale-150" // Counter-rotate image
+            size="large"
+            className="absolute inset-0 w-full h-full object-cover -rotate-45 scale-150"
           />
         </div>
       </div>
       {/* Bottom Rotated Div */}
       <div
         className={cn(
-          "absolute bottom-[-5%] left-[45%] transform -translate-x-1/2", // Position bottom-right of center (adjust left % slightly)
-          "w-56 h-56 md:w-72 md:h-72 lg:w-96 lg:h-96", // Responsive size
+          "absolute bottom-[-5%] left-[45%] transform -translate-x-1/2",
+          "w-56 h-56 md:w-72 md:h-72 lg:w-96 lg:h-96",
           "border-[7px] md:border-[13px] lg:border-[19px] border-[#756F3F]",
-          "rounded-[50px] md:rounded-[75px] lg:rounded-[100px]", // Border & rounding
-          "rotate-45 overflow-hidden z-20" // Rotation & clipping
+          "rounded-[50px] md:rounded-[75px] lg:rounded-[100px]",
+          "rotate-45 overflow-hidden z-20"
         )}
       >
          <div className="relative w-full h-full">
-          <Image
-            src={data.images[2]?.url || "/placeholder.jpg"} // <-- Replace with actual image path
+          <OptimizedImage
+            image={data.images[2]}
             alt="Bottom rotated image"
-            fill
-            sizes="(max-width: 768px) 50vw, 33vw"
-            className="object-cover -rotate-45 scale-150" // Counter-rotate image
+            size="large"
+            className="absolute inset-0 w-full h-full object-cover -rotate-45 scale-150"
           />
         </div>
       </div>

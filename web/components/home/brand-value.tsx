@@ -1,8 +1,8 @@
 ﻿"use client";
 
 import type { BrandValueData } from "@/lib/content-data";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // ---
 // 1. 类型定义
@@ -12,6 +12,11 @@ type Props = {
 };
 
 export default function BrandValue({ data }: Props) {
+  // Guard: if no data, don't render
+  if (!data || !data.param1 || !data.param2 || !data.slogan || !data.value || !data.vision) {
+    return null;
+  }
+
   // ---
   // 2. 将数据对象转换为数组 (保持不变)
   // ---
@@ -52,12 +57,11 @@ export default function BrandValue({ data }: Props) {
               )}
             >
               {/* 背景图片 */}
-              <Image
-                src={item.image.url}
-                alt={item.image.altText || item.title || item.description}
-                fill
-                sizes="(max-width: 1200px) 20vw, 250px"
-                className="object-cover z-0 transition-transform duration-500 group-hover:scale-105"
+              <OptimizedImage
+                image={item.image}
+                alt={item.image?.altText || item.title || item.description}
+                size="medium"
+                className="object-cover z-0 transition-transform duration-500 group-hover:scale-105 absolute inset-0 w-full h-full"
               />
               {/* 渐变遮罩 */}
               <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 to-transparent" />
@@ -90,12 +94,11 @@ export default function BrandValue({ data }: Props) {
               className="md:py-0 py-16 relative w-full aspect-video rounded-lg overflow-hidden shadow-lg"
             >
               {/* 背景图片 */}
-              <Image
-                src={item.image.url}
-                alt={item.image.altText || item.title || item.description}
-                fill
-                sizes="100vw"
-                className="object-cover object-center z-0"
+              <OptimizedImage
+                image={item.image}
+                alt={item.image?.altText || item.title || item.description}
+                size="large"
+                className="object-cover object-center z-0 absolute inset-0 w-full h-full"
               />
               {/* 渐变遮罩 */}
               <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 to-transparent" />

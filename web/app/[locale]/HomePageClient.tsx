@@ -3,7 +3,7 @@
 import useSWR from 'swr';
 import type { Locale } from "@/i18n.config";
 // 1. 导入我们刚刚创建的 HomeContent 类型
-import type { HomeContent } from "@/lib/content-data"; 
+import type { HomeContent } from "@/lib/content-data";
 
 // --- 2. 导入所有 15 个模块组件 ---
 // (你需要确保这些文件都创建在 components/home/ 目录下)
@@ -24,25 +24,30 @@ import BrandAnalysis from "@/components/home/brand-analysis";
 import BrandValue from "@/components/home/brand-value";
 
 // 接收从服务端传来的初始数据和语言
-export function HomePageClient({ 
-  initialContent, 
-  currentLanguage 
-}: { 
+export function HomePageClient({
+  initialContent,
+  currentLanguage
+}: {
   initialContent: HomeContent, // 3. 使用严格类型
   currentLanguage: Locale
 }) {
 
-  // 4. SWR 逻辑 (保持不变)
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  const swrKey = `/home?lang=${currentLanguage}`;
-  const { data: content, error } = useSWR<HomeContent>(`${apiUrl}/dd/${swrKey}`, { // 5. 为 SWR 添加类型
-    fallbackData: initialContent,
-  });
+  // 4. SWR 逻辑 - 使用 initialContent 作为数据源，不再重复请求
+  // 因为 SWR 直接获取的是原始 CMS 数据，没有经过 getHomeContent() 转换
+  // 所以我们禁用 SWR 的自动刷新，只使用服务端渲染的数据
+  const { data: content } = useSWR<HomeContent>(
+    `home-${currentLanguage}`, // 只作为缓存 key，不是真正的 URL
+    null, // 不需要 fetcher
+    {
+      fallbackData: initialContent,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
+    }
+  );
 
-  if (error) {
-    console.error("SWR failed to re-fetch home content:", error);
-  }
-  
+
+
   if (!content) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -61,7 +66,7 @@ export function HomePageClient({
       </div>
 
       {/* 模块 2: 产品系列轮播 (浅色背景) */}
-      <div data-header-theme="dark">
+      <div data-header-theme="transparent">
         <ProductSeriesCarousel data={content.productSeriesCarousel} locale={currentLanguage} /> 
       </div>
 

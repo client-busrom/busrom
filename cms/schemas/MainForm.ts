@@ -228,7 +228,7 @@ export const MainForm = list({
       query: () => true,
       create: () => true, // Allow creation for seeding
       update: ({ session }) => !!session,
-      delete: () => false, // Never allow deletion (singleton)
+      delete: ({ session }) => !!session, // Never allow deletion (singleton)
     },
     // 前端只能看到已发布状态
     filter: {

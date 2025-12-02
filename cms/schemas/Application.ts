@@ -261,9 +261,26 @@ export const Application = list({
   },
 
   /**
-   * Access Control - Disable physical deletion
+   * Access Control - Allow creation for seeding
    */
-  access: publicReadAccess('Application'),
+  access: {
+    operation: {
+      query: () => true,
+      create: () => true, // Allow creation for seeding
+      update: ({ session }) => !!session,
+      delete: ({ session }) => !!session,
+    },
+    filter: {
+      query: ({ session }) => {
+        // Public can only see PUBLISHED applications
+        if (!session) {
+          return { status: { equals: 'PUBLISHED' } }
+        }
+        // Authenticated users can see all
+        return true
+      },
+    },
+  },
 
   /**
    * Hooks - IndexNow Integration & ActivityLog

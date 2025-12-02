@@ -9,8 +9,8 @@
  *
  * Menu Structure:
  * - Home
- * - Product（产品系列）- 10个子菜单
- * - Shop（产品）- 10个子菜单
+ * - Product（产品系列）- 9个子菜单
+ * - Shop（产品）- 9个子菜单
  * - Service - 4个子菜单
  * - About Us - 5个子菜单
  * - Contact Us
@@ -42,8 +42,8 @@ export async function seedNavigationSystem(context: Context) {
     console.log('🎉 Navigation System Initialization Complete!')
     console.log('\n📊 Summary:')
     console.log('   - Navigation Menu: 6 top-level items')
-    console.log('   - Product children: 10 series')
-    console.log('   - Shop children: 10 series')
+    console.log('   - Product children: 9 series')
+    console.log('   - Shop children: 9 series')
     console.log('   - Service children: 4 items')
     console.log('   - About Us children: 5 items')
   } catch (error) {
@@ -77,7 +77,7 @@ async function createNavigationMenus(context: Context) {
 
   console.log(`  → Found ${productSeriesTags.length} product series tags`)
 
-  // Product Series Data (10 series)
+  // Product Series Data (9 series)
   const productSeriesData = [
     { slug: 'glass-standoff', name: { en: 'Glass Standoff', zh: '广告螺丝' } },
     { slug: 'glass-connected-fitting', name: { en: 'Glass Connected Fitting', zh: '玻璃栏杆扶手连接件' } },
@@ -86,8 +86,7 @@ async function createNavigationMenus(context: Context) {
     { slug: 'bathroom-glass-clip', name: { en: 'Bathroom Glass Clip', zh: '浴室系列' } },
     { slug: 'glass-hinge', name: { en: 'Glass Hinge', zh: '浴室夹' } },
     { slug: 'sliding-door-kit', name: { en: 'Sliding Door Kit', zh: '移门滑轮套装' } },
-    { slug: 'bathroom-handle', name: { en: 'Bathroom Handle', zh: '浴室&大门拉手' } },
-    { slug: 'door-handle', name: { en: 'Door Handle', zh: '大门拉手' } },
+    { slug: 'bathroom-door-handle', name: { en: 'Bathroom & Door Handle', zh: '浴室&大门拉手' } },
     { slug: 'hidden-hook', name: { en: 'Hidden Hook', zh: '挂钩' } },
   ]
 

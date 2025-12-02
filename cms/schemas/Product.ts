@@ -16,6 +16,55 @@ import { text, json, select, relationship, timestamp, checkbox, integer, virtual
 import { submitUrlToIndexNow, buildFullUrl } from '../lib/indexnow'
 import { publicReadAccess } from '../lib/permissions/access-control'
 
+// Helper function to generate slug from product name or SKU
+function generateSlugFromName(nameJson: any, sku: string): string {
+  try {
+    let nameEn = ''
+
+    // Handle different formats of name field
+    if (nameJson) {
+      if (typeof nameJson === 'string') {
+        try {
+          const parsed = JSON.parse(nameJson)
+          nameEn = parsed?.en || ''
+        } catch {
+          // If not valid JSON, use the string directly
+          nameEn = nameJson
+        }
+      } else if (typeof nameJson === 'object') {
+        nameEn = nameJson?.en || ''
+      }
+    }
+
+    if (nameEn && nameEn.trim()) {
+      // Clean the English name to create URL-friendly slug
+      return nameEn
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '')
+    }
+
+    // Fallback to SKU if no English name
+    if (sku && sku.trim()) {
+      return sku
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '')
+    }
+
+    return ''
+  } catch (e) {
+    console.error('Error generating slug:', e)
+    return ''
+  }
+}
+
 export const Product = list({
   fields: {
     /**
@@ -332,6 +381,34 @@ export const Product = list({
    * Hooks - IndexNow Integration & ActivityLog
    */
   hooks: {
+    resolveInput: async ({ resolvedData, item, operation }) => {
+      // Auto-generate slug if not manually provided or is empty
+      const currentSlug = resolvedData.slug
+      const hasManualSlug = currentSlug && typeof currentSlug === 'string' && currentSlug.trim() !== ''
+
+      console.log('[Product resolveInput] operation:', operation)
+      console.log('[Product resolveInput] currentSlug:', currentSlug, 'hasManualSlug:', hasManualSlug)
+
+      if (!hasManualSlug) {
+        const itemData = item as any
+        const name = resolvedData.name ?? itemData?.name
+        const sku = resolvedData.sku ?? itemData?.sku ?? ''
+
+        console.log('[Product resolveInput] name:', JSON.stringify(name))
+        console.log('[Product resolveInput] sku:', sku)
+
+        if (name || sku) {
+          const generatedSlug = generateSlugFromName(name, sku)
+          console.log('[Product resolveInput] generatedSlug:', generatedSlug)
+          if (generatedSlug) {
+            resolvedData.slug = generatedSlug
+          }
+        }
+      }
+
+      return resolvedData
+    },
+
     afterOperation: async ({ operation, item, originalItem, context }) => {
       // IndexNow: Only submit on create or update of PUBLISHED products
       if ((operation === 'create' || operation === 'update') && item?.status === 'PUBLISHED') {
