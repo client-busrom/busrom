@@ -238,9 +238,10 @@ export interface BrandAnalysisInfo {
 }
 
 export interface BrandCenter {
-  number: string
-  text: string
-  image: ImageObject
+  title: string
+  description: string
+  largeImage?: string | null
+  smallImage?: string | null
 }
 
 export interface BrandAnalysisData {
