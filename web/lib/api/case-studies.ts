@@ -10,7 +10,6 @@
 import { gql } from '@apollo/client'
 import { keystoneClient } from '@/lib/keystone-client'
 import type { CaseStudiesData, ImageObject } from '@/lib/content-data'
-import { resolveMediaUrl } from '@/lib/image-utils'
 
 const GET_CASE_STUDIES_CONFIG = gql`
   query GetCaseStudiesConfig {
@@ -79,9 +78,9 @@ async function fetchMedia(mediaId: string, locale: string): Promise<ImageObject 
     const baseUrl = media.fileUrl || media.file?.url || ''
 
     return {
-      url: resolveMediaUrl(media.variants?.large || media.variants?.medium || baseUrl),
+      url: media.variants?.large || media.variants?.medium || baseUrl,
       altText: extractLocale(media.altText, locale) || media.filename || '',
-      thumbnailUrl: resolveMediaUrl(media.variants?.thumbnail || baseUrl),
+      thumbnailUrl: media.variants?.thumbnail || baseUrl,
       variants: media.variants || undefined,
     }
   } catch (error) {
