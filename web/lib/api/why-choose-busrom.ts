@@ -78,11 +78,11 @@ export async function getWhyChooseBusrom(locale: string = 'en'): Promise<WhyChoo
     ])
 
     const reasons = [
-      { text: extractLocale(config.reason1, locale), image: images[0] || { url: '', altText: '' } },
-      { text: extractLocale(config.reason2, locale), image: images[1] || { url: '', altText: '' } },
-      { text: extractLocale(config.reason3, locale), image: images[2] || { url: '', altText: '' } },
-      { text: extractLocale(config.reason4, locale), image: images[3] || { url: '', altText: '' } },
-      { text: extractLocale(config.reason5, locale), image: images[4] || { url: '', altText: '' } },
+      { title: '', description: extractLocale(config.reason1, locale), image: images[0] || { url: '', altText: '' } },
+      { title: '', description: extractLocale(config.reason2, locale), image: images[1] || { url: '', altText: '' } },
+      { title: '', description: extractLocale(config.reason3, locale), image: images[2] || { url: '', altText: '' } },
+      { title: '', description: extractLocale(config.reason4, locale), image: images[3] || { url: '', altText: '' } },
+      { title: '', description: extractLocale(config.reason5, locale), image: images[4] || { url: '', altText: '' } },
     ]
 
     return {

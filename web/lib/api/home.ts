@@ -62,11 +62,11 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
     }))
 
     // Transform Brand Advantages from {advantages: [{text, icon}]} to {advantages: string[], icons: string[], image}
-    const brandAdvantages = data.brandAdvantages ? {
-      advantages: data.brandAdvantages.advantages?.map((item: any) => item.text) || [],
-      icons: data.brandAdvantages.advantages?.map((item: any) => item.icon) || [],
+    const brandAdvantages = {
+      advantages: data.brandAdvantages?.advantages?.map((item: any) => item.text) || [],
+      icons: data.brandAdvantages?.advantages?.map((item: any) => item.icon) || [],
       image: { url: '', altText: '' }, // Backend doesn't provide this yet
-    } : null
+    }
 
     // Transform SimpleCta images from Media ID[] to ImageObject[]
     const simpleCta = data.simpleCta ? {
@@ -75,20 +75,20 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
     } : null
 
     // Transform OemOdm images from Media IDs to ImageObjects
-    const oemOdm = data.oemOdm ? {
+    const oemOdm = {
       oem: {
-        title: data.oemOdm.oem.title,
-        bgImage: toImageObject(data.oemOdm.oem.bgImage, 'OEM Background'),
-        image: toImageObject(data.oemOdm.oem.image, 'OEM'),
-        description: data.oemOdm.oem.description || [],
+        title: data.oemOdm?.oem?.title || '',
+        bgImage: toImageObject(data.oemOdm?.oem?.bgImage, 'OEM Background'),
+        image: toImageObject(data.oemOdm?.oem?.image, 'OEM'),
+        description: data.oemOdm?.oem?.description || [],
       },
       odm: {
-        title: data.oemOdm.odm.title,
-        bgImage: toImageObject(data.oemOdm.odm.bgImage, 'ODM Background'),
-        image: toImageObject(data.oemOdm.odm.image, 'ODM'),
-        description: data.oemOdm.odm.description || [],
+        title: data.oemOdm?.odm?.title || '',
+        bgImage: toImageObject(data.oemOdm?.odm?.bgImage, 'ODM Background'),
+        image: toImageObject(data.oemOdm?.odm?.image, 'ODM'),
+        description: data.oemOdm?.odm?.description || [],
       },
-    } : null
+    }
 
     // Transform SeriesIntro images
     // Backend already returns URLs in the images array, just need to wrap them in ImageObject
@@ -119,45 +119,46 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
     } : null
 
     // Transform MainForm - map images array to image1/image2 and placeholders to flat fields
-    const mainForm = data.mainForm ? {
-      placeholderName: data.mainForm.placeholders?.name || '',
-      placeholderEmail: data.mainForm.placeholders?.email || '',
-      placeholderWhatsapp: data.mainForm.placeholders?.whatsapp || '',
-      placeholderCompany: data.mainForm.placeholders?.company || '',
-      placeholderMessage: data.mainForm.placeholders?.message || '',
-      placeholderVerify: data.mainForm.placeholders?.verify || '',
-      buttonText: data.mainForm.buttonText || '',
-      designTextLeft: data.mainForm.designText?.left || '',
-      designTextRight: data.mainForm.designText?.right || '',
-      image1: data.mainForm.images?.[0] ? toImageObject(data.mainForm.images[0], 'Main Form Left') : null,
-      image2: data.mainForm.images?.[1] ? toImageObject(data.mainForm.images[1], 'Main Form Right') : null,
-    } : null
+    const mainForm = {
+      placeholderName: data.mainForm?.placeholders?.name || '',
+      placeholderEmail: data.mainForm?.placeholders?.email || '',
+      placeholderWhatsapp: data.mainForm?.placeholders?.whatsapp || '',
+      placeholderCompany: data.mainForm?.placeholders?.company || '',
+      placeholderMessage: data.mainForm?.placeholders?.message || '',
+      placeholderVerify: data.mainForm?.placeholders?.verify || '',
+      buttonText: data.mainForm?.buttonText || '',
+      designTextLeft: data.mainForm?.designText?.left || '',
+      designTextRight: data.mainForm?.designText?.right || '',
+      image1: data.mainForm?.images?.[0] ? toImageObject(data.mainForm.images[0], 'Main Form Left') : null,
+      image2: data.mainForm?.images?.[1] ? toImageObject(data.mainForm.images[1], 'Main Form Right') : null,
+    }
 
     // Transform BrandValue from items array to named properties
-    const brandValue = data.brandValue ? {
-      title: data.brandValue.title || '',
-      subtitle: data.brandValue.subtitle || '',
-      param1: data.brandValue.items?.[0] ? {
+    const defaultValueItem = { title: '', description: '', image: { url: '', altText: '' } }
+    const brandValue = {
+      title: data.brandValue?.title || '',
+      subtitle: data.brandValue?.subtitle || '',
+      param1: data.brandValue?.items?.[0] ? {
         ...data.brandValue.items[0],
         image: toImageObject(data.brandValue.items[0].image, data.brandValue.items[0].title),
-      } : { title: '', description: '', image: { url: '', altText: '' } },
-      param2: data.brandValue.items?.[1] ? {
+      } : defaultValueItem,
+      param2: data.brandValue?.items?.[1] ? {
         ...data.brandValue.items[1],
         image: toImageObject(data.brandValue.items[1].image, data.brandValue.items[1].title),
-      } : { title: '', description: '', image: { url: '', altText: '' } },
-      slogan: data.brandValue.items?.[2] ? {
+      } : defaultValueItem,
+      slogan: data.brandValue?.items?.[2] ? {
         ...data.brandValue.items[2],
         image: toImageObject(data.brandValue.items[2].image, data.brandValue.items[2].title),
-      } : { title: '', description: '', image: { url: '', altText: '' } },
-      value: data.brandValue.items?.[3] ? {
+      } : defaultValueItem,
+      value: data.brandValue?.items?.[3] ? {
         ...data.brandValue.items[3],
         image: toImageObject(data.brandValue.items[3].image, data.brandValue.items[3].title),
-      } : { title: '', description: '', image: { url: '', altText: '' } },
-      vision: data.brandValue.items?.[4] ? {
+      } : defaultValueItem,
+      vision: data.brandValue?.items?.[4] ? {
         ...data.brandValue.items[4],
         image: toImageObject(data.brandValue.items[4].image, data.brandValue.items[4].title),
-      } : { title: '', description: '', image: { url: '', altText: '' } },
-    } : null
+      } : defaultValueItem,
+    }
 
     // Transform ServiceFeatures images
     const serviceFeatures = data.serviceFeatures ? {
@@ -174,21 +175,71 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
       images: (item.images || []).map((id: string) => toImageObject(id, item.title)),
     }))
 
+    // Default empty structures for non-nullable fields
+    const defaultFeaturedProducts = {
+      title: '',
+      description: '',
+      viewAllButton: '',
+      categories: '',
+      series: []
+    }
+    const defaultCaseStudies = {
+      title: '',
+      description: '',
+      applications: []
+    }
+    const defaultBrandAnalysis = {
+      analysis: { title: '', title2: '', text: '', text2: '' },
+      centers: []
+    }
+    const defaultServiceFeatures = {
+      title: '',
+      subtitle: '',
+      features: []
+    }
+    const defaultSimpleCta = {
+      title: '',
+      title2: '',
+      subtitle: '',
+      description: '',
+      buttonText: '',
+      images: []
+    }
+    const defaultQuoteSteps = {
+      title: '',
+      title2: '',
+      subtitle: '',
+      description: '',
+      steps: []
+    }
+    const defaultWhyChooseBusrom = {
+      title: '',
+      title2: '',
+      reasons: []
+    }
+    const defaultFooter = {
+      form: { title: '', placeholders: { name: '', email: '', message: '' }, buttonText: '' },
+      contact: { title: '', emailLabel: '', email: '', afterSalesLabel: '', afterSales: '', whatsappLabel: '', whatsapp: '' },
+      notice: { title: '', lines: [] },
+      column3Menus: [],
+      column4Menus: []
+    }
+
     return {
       locale: data.locale,
       heroBanner,
       productSeriesCarousel: carouselItems,
-      serviceFeatures,
+      serviceFeatures: serviceFeatures || defaultServiceFeatures,
       sphere3d: {}, // Empty object as per spec
-      simpleCta,
+      simpleCta: simpleCta || defaultSimpleCta,
       seriesIntro,
-      featuredProducts: data.featuredProducts || null,
+      featuredProducts: data.featuredProducts || defaultFeaturedProducts,
       brandAdvantages,
       oemOdm,
-      quoteSteps,
+      quoteSteps: quoteSteps || defaultQuoteSteps,
       mainForm,
-      whyChooseBusrom,
-      caseStudies: data.caseStudies || null,
+      whyChooseBusrom: whyChooseBusrom || defaultWhyChooseBusrom,
+      caseStudies: data.caseStudies || defaultCaseStudies,
       brandAnalysis: data.brandAnalysis ? {
         analysis: {
           title: data.brandAnalysis.analysisTitle || '',
@@ -202,24 +253,9 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
           largeImage: getMediaUrl(center.largeImage),
           smallImage: getMediaUrl(center.smallImage),
         })),
-      } : null,
+      } : defaultBrandAnalysis,
       brandValue,
-      // TODO: Add Footer API
-      footer: {
-        logo: { url: '', altText: '' },
-        description: '',
-        columns: [],
-        bottomLinks: [],
-        certifications: [],
-        contact: {
-          address: '',
-          email: '',
-          phone: '',
-          whatsapp: '',
-        },
-        copyright: '',
-        locale,
-      },
+      footer: defaultFooter,
     }
   } catch (error) {
     console.error('Error fetching home content:', error)
