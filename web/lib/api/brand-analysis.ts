@@ -4,7 +4,14 @@
 
 import { gql } from '@apollo/client'
 import { keystoneClient } from '@/lib/keystone-client'
-import type { BrandAnalysisData, ImageObject } from '@/lib/content-data'
+import type { BrandAnalysisData } from '@/lib/content-data'
+
+interface ImageObject {
+  url: string
+  altText: string
+  thumbnailUrl?: string
+  variants?: Record<string, string>
+}
 
 const GET_BRAND_ANALYSIS = gql`
   query GetBrandAnalysis {
@@ -85,24 +92,28 @@ export async function getBrandAnalysis(locale: string = 'en'): Promise<BrandAnal
 
     const centers = [
       {
-        number: extractLocale(config.center1Number, locale),
-        text: extractLocale(config.center1Text, locale),
-        image: images[0] || { url: '', altText: '' },
+        title: extractLocale(config.center1Number, locale),
+        description: extractLocale(config.center1Text, locale),
+        largeImage: images[0]?.url || null,
+        smallImage: images[0]?.thumbnailUrl || images[0]?.url || null,
       },
       {
-        number: extractLocale(config.center2Number, locale),
-        text: extractLocale(config.center2Text, locale),
-        image: images[1] || { url: '', altText: '' },
+        title: extractLocale(config.center2Number, locale),
+        description: extractLocale(config.center2Text, locale),
+        largeImage: images[1]?.url || null,
+        smallImage: images[1]?.thumbnailUrl || images[1]?.url || null,
       },
       {
-        number: extractLocale(config.center3Number, locale),
-        text: extractLocale(config.center3Text, locale),
-        image: images[2] || { url: '', altText: '' },
+        title: extractLocale(config.center3Number, locale),
+        description: extractLocale(config.center3Text, locale),
+        largeImage: images[2]?.url || null,
+        smallImage: images[2]?.thumbnailUrl || images[2]?.url || null,
       },
       {
-        number: extractLocale(config.center4Number, locale),
-        text: extractLocale(config.center4Text, locale),
-        image: images[3] || { url: '', altText: '' },
+        title: extractLocale(config.center4Number, locale),
+        description: extractLocale(config.center4Text, locale),
+        largeImage: images[3]?.url || null,
+        smallImage: images[3]?.thumbnailUrl || images[3]?.url || null,
       },
     ]
 
