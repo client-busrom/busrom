@@ -1,0 +1,16 @@
+{
+  "source": "local",
+  "localPath": "./images/glass-standoff",
+  "primaryCategory": "product-images",
+  "tags": ["series-glass-standoff", "material-stainless-steel"],
+  "defaultMetadata": {
+    "series": "glass-standoff",
+    "material": "stainless-steel"
+  },
+  "fileMetadata": {
+    "gold-finish-01.jpg": {
+      "color": "gold",
+      "finish": "pvd"
+    }
+  }
+}

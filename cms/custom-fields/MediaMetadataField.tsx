@@ -20,20 +20,19 @@ import { controller } from '@keystone-6/core/fields/types/json/views'
 /**
  * Metadata Structure
  *
- * For organizing scene photos in a 3-level hierarchy:
- * - seriesNumber: Which series (系列 1, 2, 3...)
- * - combinationNumber: Which combination within the series (组合 1, 2, 3...)
- * - sceneNumber: Which scene within the combination (场景 1, 2, 3...)
- * - specs: Technical specifications (e.g., "50mm", "不锈钢")
- * - colors: Color variants (e.g., "黑色", "银色")
+ * For organizing media files:
+ * - group: Scene group number (场景分组编号)
+ * - sceneNumber: Scene number within the group (场景编号)
+ * - imageNumber: Image number for white background series (图片编号/白底图系列编号)
+ * - specs: Technical specifications (e.g., "12x25mm", "不锈钢")
+ * - notes: Additional notes
  */
 interface MediaMetadata {
-  seriesNumber?: number       // 系列编号
-  combinationNumber?: number  // 组合编号
-  sceneNumber?: number        // 场景编号
-  specs?: string[]
-  colors?: string[]
-  notes?: string
+  group?: number          // 场景分组编号
+  sceneNumber?: number    // 场景编号
+  imageNumber?: number    // 图片编号 (白底图系列编号)
+  specs?: string[]        // 规格信息
+  notes?: string          // 备注
 }
 
 export const Field = ({ field, value, onChange, autoFocus }: FieldProps<typeof controller>) => {
@@ -57,35 +56,19 @@ export const Field = ({ field, value, onChange, autoFocus }: FieldProps<typeof c
       <FieldLabel>{`${field.label}（用于CMS筛选）`}</FieldLabel>
 
       <div style={{ display: 'grid', gap: '16px', marginTop: '8px' }}>
-        {/* Series Number */}
+        {/* Group Number */}
         <div>
           <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
-            系列编号 (Series Number)
+            分组编号 (Group Number)
           </label>
           <TextInput
             type="number"
-            value={metadata.seriesNumber?.toString() || ''}
-            onChange={(e) => updateMetadata({ seriesNumber: e.target.value ? parseInt(e.target.value) : undefined })}
+            value={metadata.group?.toString() || ''}
+            onChange={(e) => updateMetadata({ group: e.target.value ? parseInt(e.target.value) : undefined })}
             placeholder="例如: 1, 2, 3..."
           />
           <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-            这张图片属于哪个系列? (留空表示不属于任何系列)
-          </div>
-        </div>
-
-        {/* Combination Number */}
-        <div>
-          <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
-            组合编号 (Combination Number)
-          </label>
-          <TextInput
-            type="number"
-            value={metadata.combinationNumber?.toString() || ''}
-            onChange={(e) => updateMetadata({ combinationNumber: e.target.value ? parseInt(e.target.value) : undefined })}
-            placeholder="例如: 1, 2, 3..."
-          />
-          <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-            这是该系列中的第几个组合?
+            这张图片属于哪个场景分组? (用于场景图)
           </div>
         </div>
 
@@ -101,7 +84,23 @@ export const Field = ({ field, value, onChange, autoFocus }: FieldProps<typeof c
             placeholder="例如: 1, 2, 3, 4, 5..."
           />
           <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-            这是该组合中的第几个场景?
+            这是该分组中的第几个场景?
+          </div>
+        </div>
+
+        {/* Image Number */}
+        <div>
+          <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
+            图片编号 (Image Number)
+          </label>
+          <TextInput
+            type="number"
+            value={metadata.imageNumber?.toString() || ''}
+            onChange={(e) => updateMetadata({ imageNumber: e.target.value ? parseInt(e.target.value) : undefined })}
+            placeholder="例如: 1, 2, 3..."
+          />
+          <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+            白底图系列编号 (用于白底产品图)
           </div>
         </div>
 
@@ -119,31 +118,10 @@ export const Field = ({ field, value, onChange, autoFocus }: FieldProps<typeof c
                 .filter(Boolean)
               updateMetadata({ specs: specs.length > 0 ? specs : undefined })
             }}
-            placeholder="例如: 50mm, 不锈钢, 拉丝 (用逗号分隔)"
+            placeholder="例如: 12x25mm, 不锈钢 (用逗号分隔)"
           />
           <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
             多个规格请用逗号分隔
-          </div>
-        </div>
-
-        {/* Colors */}
-        <div>
-          <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
-            颜色 (Colors)
-          </label>
-          <TextInput
-            value={metadata.colors?.join(', ') || ''}
-            onChange={(e) => {
-              const colors = e.target.value
-                .split(',')
-                .map(s => s.trim())
-                .filter(Boolean)
-              updateMetadata({ colors: colors.length > 0 ? colors : undefined })
-            }}
-            placeholder="例如: 黑色, 银色, 金色 (用逗号分隔)"
-          />
-          <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-            多个颜色请用逗号分隔
           </div>
         </div>
 
@@ -202,10 +180,10 @@ export const Cell = ({ item, field }: any) => {
   const metadata = value as MediaMetadata
   const parts: string[] = []
 
-  // Build hierarchical display: Series → Combination → Scene
-  if (metadata.seriesNumber) parts.push(`系列${metadata.seriesNumber}`)
-  if (metadata.combinationNumber) parts.push(`组合${metadata.combinationNumber}`)
+  // Build display: Group → Scene → Image
+  if (metadata.group) parts.push(`分组${metadata.group}`)
   if (metadata.sceneNumber) parts.push(`场景${metadata.sceneNumber}`)
+  if (metadata.imageNumber) parts.push(`图片${metadata.imageNumber}`)
 
   if (parts.length === 0) {
     return <div style={{ color: '#999', fontSize: '13px' }}>未设置</div>

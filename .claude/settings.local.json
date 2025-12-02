@@ -1,11 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(DATABASE_URL=\"postgresql://busrom_dev_user:busrom_dev_password@database-staging.cuvyzljvzrxy.us-east-1.rds.amazonaws.com:5432/busrom_cms\" node:*)",
-      "Bash(docker system prune:*)",
-      "Bash(docker builder prune:*)",
-      "Bash(/tmp/fix-admin-ecs.sh:*)",
-      "Bash(docker system:*)"
+      "Bash(CMS_SESSION_COOKIE=\"keystonejs-session=Fe26.2**cbede11d846f3865277a4b2eb0255ec825f62c246d299cd5bd55c1e51a0143c9*w8_Jsv1fNP35z0IApN043g*3ZXf18avEK1owRF0Y3eAduiqB20qd3zqFVVsI7rrZZCyTO19ECqhyN5UX9gLZDKryIYelphlu9PHBeD03-R1FUmGRFQdwFVgE9J4vd1ephM*1766413290561*14509f316cfc9f7e6e2943788d8e95ec4f602dd75e0acf8ff3029430c84b67e2*Ek2n1ZeUlUjzI8hRe6gNoVccbbVfECCNoOifaeK1K9U\" node scripts/delete-nav-menus.js:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []

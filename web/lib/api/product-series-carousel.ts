@@ -71,7 +71,12 @@ const GET_MEDIA = gql`
 /**
  * Fetch media information by ID
  */
-async function fetchMedia(mediaId: string) {
+async function fetchMedia(mediaId: string): Promise<{
+  url: string
+  altText: string
+  thumbnailUrl?: string
+  variants?: Record<string, string>
+} | null> {
   if (!mediaId) return null
 
   try {
@@ -87,6 +92,7 @@ async function fetchMedia(mediaId: string) {
       url: media.variants?.medium || media.file?.url || '',
       altText: media.filename || '',
       thumbnailUrl: media.variants?.thumbnail || media.file?.url || '',
+      variants: media.variants || undefined,
     }
   } catch (error) {
     console.error(`Error fetching media ${mediaId}:`, error)
@@ -111,11 +117,20 @@ async function transformCarouselItem(
     return null
   }
 
+  // Fetch scene image data
+  const sceneImage = await fetchMedia(item.sceneImage)
+  if (!sceneImage) {
+    console.warn(`Missing scene image for carousel item at index ${index}`)
+    return null
+  }
+
   return {
     key: `${locale}-carousel-${index}`,
     order: index,
     name: item.title,
     image: image,
+    sceneImage: sceneImage,
+    buttonText: item.buttonText,
     href: item.linkUrl || '#',
   }
 }

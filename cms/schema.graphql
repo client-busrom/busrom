@@ -2794,6 +2794,8 @@ type Media {
   id: ID!
   file: ImageFieldOutput
   filename: String
+  fileUrl: String
+  fileKey: String
   status: String
   altText: JSON
   primaryCategory: MediaCategory
@@ -2839,6 +2841,8 @@ input MediaWhereInput {
   NOT: [MediaWhereInput!]
   id: IDFilter
   filename: StringFilter
+  fileUrl: StringNullableFilter
+  fileKey: StringNullableFilter
   status: StringNullableFilter
   primaryCategory: MediaCategoryWhereInput
   tags: MediaTagManyRelationFilter
@@ -2855,6 +2859,8 @@ input MediaWhereInput {
 input MediaOrderByInput {
   id: OrderDirection
   filename: OrderDirection
+  fileUrl: OrderDirection
+  fileKey: OrderDirection
   status: OrderDirection
   width: OrderDirection
   height: OrderDirection
@@ -2867,6 +2873,8 @@ input MediaOrderByInput {
 input MediaUpdateInput {
   file: ImageFieldInput
   filename: String
+  fileUrl: String
+  fileKey: String
   status: String
   altText: JSON
   primaryCategory: MediaCategoryRelateToOneForUpdateInput
@@ -2905,6 +2913,8 @@ input MediaUpdateArgs {
 input MediaCreateInput {
   file: ImageFieldInput
   filename: String
+  fileUrl: String
+  fileKey: String
   status: String
   altText: JSON
   primaryCategory: MediaCategoryRelateToOneForCreateInput

@@ -1,0 +1,120 @@
+{
+  "internalLabel": "Product Series Carousel Configuration",
+  "autoPlay": true,
+  "autoPlaySpeed": 5000,
+  "status": "ACTIVE",
+  "items": {
+    "en": [
+      {
+        "isShow": true,
+        "title": "Glass Standoff",
+        "buttonText": "Learn More",
+        "linkUrl": "/product/glass-standoff"
+      },
+      {
+        "isShow": true,
+        "title": "Glass Connected Fitting",
+        "buttonText": "Learn More",
+        "linkUrl": "/product/glass-connected-fitting"
+      },
+      {
+        "isShow": true,
+        "title": "Glass Fence Spigot",
+        "buttonText": "Learn More",
+        "linkUrl": "/product/glass-fence-spigot"
+      },
+      {
+        "isShow": true,
+        "title": "Glass Clip (Railing)",
+        "buttonText": "Learn More",
+        "linkUrl": "/product/glass-clip"
+      },
+      {
+        "isShow": true,
+        "title": "Glass Clip (Bathroom)",
+        "buttonText": "Learn More",
+        "linkUrl": "/product/glass-clip"
+      },
+      {
+        "isShow": true,
+        "title": "Glass Hinge",
+        "buttonText": "Learn More",
+        "linkUrl": "/product/glass-hinge"
+      },
+      {
+        "isShow": true,
+        "title": "Sliding Door Kit",
+        "buttonText": "Learn More",
+        "linkUrl": "/product/sliding-door-kit"
+      },
+      {
+        "isShow": true,
+        "title": "Bathroom & Door Handle",
+        "buttonText": "Learn More",
+        "linkUrl": "/product/bathroom-door-handle"
+      },
+      {
+        "isShow": true,
+        "title": "Hidden Hook",
+        "buttonText": "Learn More",
+        "linkUrl": "/product/hidden-hook"
+      }
+    ],
+    "zh": [
+      {
+        "isShow": true,
+        "title": "玻璃广告螺丝",
+        "buttonText": "了解更多",
+        "linkUrl": "/product/glass-standoff"
+      },
+      {
+        "isShow": true,
+        "title": "玻璃连接件",
+        "buttonText": "了解更多",
+        "linkUrl": "/product/glass-connected-fitting"
+      },
+      {
+        "isShow": true,
+        "title": "玻璃立柱",
+        "buttonText": "了解更多",
+        "linkUrl": "/product/glass-fence-spigot"
+      },
+      {
+        "isShow": true,
+        "title": "玻璃夹(护栏系列)",
+        "buttonText": "了解更多",
+        "linkUrl": "/product/glass-clip"
+      },
+      {
+        "isShow": true,
+        "title": "玻璃夹(浴室系列)",
+        "buttonText": "了解更多",
+        "linkUrl": "/product/glass-clip"
+      },
+      {
+        "isShow": true,
+        "title": "玻璃合页",
+        "buttonText": "了解更多",
+        "linkUrl": "/product/glass-hinge"
+      },
+      {
+        "isShow": true,
+        "title": "推拉门套件",
+        "buttonText": "了解更多",
+        "linkUrl": "/product/sliding-door-kit"
+      },
+      {
+        "isShow": true,
+        "title": "浴室及大门拉手",
+        "buttonText": "了解更多",
+        "linkUrl": "/product/bathroom-door-handle"
+      },
+      {
+        "isShow": true,
+        "title": "隐藏式挂钩",
+        "buttonText": "了解更多",
+        "linkUrl": "/product/hidden-hook"
+      }
+    ]
+  }
+}

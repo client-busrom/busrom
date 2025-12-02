@@ -4,8 +4,8 @@
  * 产品系统初始化数据迁移
  *
  * This script creates:
- * 1. Product Categories (10 flat categories, 1-to-1 with ProductSeries)
- * 2. ProductSeries (10 predefined product series)
+ * 1. Product Categories (9 flat categories, 1-to-1 with ProductSeries)
+ * 2. ProductSeries (9 predefined product series)
  * 3. Links ProductSeries to their categories (1-to-1 mapping)
  *
  * Usage:
@@ -34,8 +34,8 @@ export async function seedProductSystem(context: Context) {
     console.log('🎉 产品系统初始化完成！')
     console.log('🎉 Product System Initialization Complete!')
     console.log('\n📊 Summary:')
-    console.log('   - Categories: 10 flat categories')
-    console.log('   - ProductSeries: 10 series (1-to-1 mapping)')
+    console.log('   - Categories: 9 flat categories')
+    console.log('   - ProductSeries: 9 series (1-to-1 mapping)')
   } catch (error) {
     console.error('❌ 初始化失败:', error)
     console.error('❌ Initialization Failed:', error)
@@ -61,7 +61,7 @@ async function createCategoriesAndSeries(context: Context) {
     return
   }
 
-  // 10 Categories and ProductSeries (1-to-1 mapping)
+  // 9 Categories and ProductSeries (1-to-1 mapping)
   const data = [
     {
       slug: 'glass-standoff',
@@ -127,22 +127,13 @@ async function createCategoriesAndSeries(context: Context) {
       order: 7,
     },
     {
-      slug: 'bathroom-handle',
-      name: { en: 'Bathroom Handle', zh: '浴室&大门拉手' },
+      slug: 'bathroom-door-handle',
+      name: { en: 'Bathroom & Door Handle', zh: '浴室&大门拉手' },
       description: {
-        en: 'Bathroom and door handles, mainly used on bathroom glass doors',
-        zh: '浴室及大门拉手，主要用于浴室玻璃门',
+        en: 'Bathroom and door handles, mainly used on bathroom glass doors and main doors',
+        zh: '浴室及大门拉手，主要用于浴室玻璃门及大门',
       },
       order: 8,
-    },
-    {
-      slug: 'door-handle',
-      name: { en: 'Door Handle', zh: '大门拉手' },
-      description: {
-        en: 'Door handles mainly used on main doors, including glass doors and solid doors',
-        zh: '大门拉手，主要用于大门，包括玻璃大门和实体大门',
-      },
-      order: 9,
     },
     {
       slug: 'hidden-hook',
@@ -151,7 +142,7 @@ async function createCategoriesAndSeries(context: Context) {
         en: 'Hooks including rotating or non-rotating hidden hooks',
         zh: '挂钩，主要包含旋转式或非旋转式隐藏挂钩',
       },
-      order: 10,
+      order: 9,
     },
   ]
 

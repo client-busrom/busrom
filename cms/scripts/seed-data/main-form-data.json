@@ -1,0 +1,13 @@
+{
+  "internalLabel": "Main Form Configuration",
+  "placeholderName": {"en": "Your Name", "zh": "您的姓名"},
+  "placeholderEmail": {"en": "Email Address", "zh": "电子邮件地址"},
+  "placeholderWhatsapp": {"en": "WhatsApp Number", "zh": "WhatsApp 号码"},
+  "placeholderCompany": {"en": "Company Name", "zh": "公司名称"},
+  "placeholderMessage": {"en": "Tell us about your project...", "zh": "告诉我们您的项目..."},
+  "placeholderVerify": {"en": "Verification Code", "zh": "验证码"},
+  "buttonText": {"en": "Send Inquiry", "zh": "发送询价"},
+  "designTextLeft": {"en": "Premium", "zh": "高端"},
+  "designTextRight": {"en": "Hardware", "zh": "五金"},
+  "status": "PUBLISHED"
+}

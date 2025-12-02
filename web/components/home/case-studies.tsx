@@ -2,10 +2,10 @@
 
 import * as React from "react";
 import type { HomeContent } from "@/lib/content-data";
-import Image from "next/image";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 type Props = {
   data: HomeContent["caseStudies"];
@@ -42,6 +42,11 @@ export default function CaseStudies({ data }: Props) {
   const scrollNext = () => {
     api?.scrollNext();
   };
+
+  // Guard: if no data, don't render
+  if (!data || !data.applications || data.applications.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-16 bg-brand-main" data-header-theme="light">
@@ -105,11 +110,11 @@ export default function CaseStudies({ data }: Props) {
                   {/* 1. 主图 (z-0) - 使用 items[0] */}
                   {/* 【已修改】宽度 70%, 高度 100% (相对于 wrapper) */}
                   <div className="absolute left-0 top-0 w-[75%] h-full">
-                    <Image
-                      src={application.items[0]?.image.url || "/case-studies/1.jpg"}
-                      alt={application.items[0]?.image.altText || application.items[0]?.series || "Case study main"}
-                      fill
-                      className="object-cover rounded-lg"
+                    <OptimizedImage
+                      image={application.items[0]?.image}
+                      alt={application.items[0]?.image?.altText || application.items[0]?.series || "Case study main"}
+                      size="xlarge"
+                      className="object-cover rounded-lg absolute inset-0 w-full h-full"
                     />
                   </div>
 
@@ -127,21 +132,21 @@ export default function CaseStudies({ data }: Props) {
                     {/* 小图 1 - 使用 items[1] */}
                     {/* 【已修改】让图片去填充一个具有正确比例的盒子 */}
                     <div className="relative w-full h-1/2 shadow-lg">
-                      <Image
-                        src={application.items[1]?.image.url || "/case-studies/2.jpg"}
-                        alt={application.items[1]?.image.altText || application.items[1]?.series || "Case study detail 1"}
-                        fill
-                        className="object-cover rounded-lg"
+                      <OptimizedImage
+                        image={application.items[1]?.image}
+                        alt={application.items[1]?.image?.altText || application.items[1]?.series || "Case study detail 1"}
+                        size="medium"
+                        className="object-cover rounded-lg absolute inset-0 w-full h-full"
                       />
                     </div>
 
                     {/* 小图 2 - 使用 items[2] */}
                     <div className="relative w-full h-1/2 shadow-lg">
-                      <Image
-                        src={application.items[2]?.image.url || "/case-studies/3.jpg"}
-                        alt={application.items[2]?.image.altText || application.items[2]?.series || "Case study detail 2"}
-                        fill
-                        className="object-cover rounded-lg"
+                      <OptimizedImage
+                        image={application.items[2]?.image}
+                        alt={application.items[2]?.image?.altText || application.items[2]?.series || "Case study detail 2"}
+                        size="medium"
+                        className="object-cover rounded-lg absolute inset-0 w-full h-full"
                       />
                     </div>
                   </div>

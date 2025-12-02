@@ -202,7 +202,7 @@ export const SimpleCta = list({
         return count === 0 // Singleton: only allow if no records exist
       },
       update: ({ session }) => !!session,
-      delete: () => false, // Never allow deletion
+      delete: ({ session }) => !!session, // Never allow deletion
     },
     // 前端只能看到已发布状态
     filter: {

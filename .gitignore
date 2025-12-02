@@ -67,3 +67,4 @@ github-secrets-values.txt
 github-secrets-checklist.txt
 *.pem
 *.key
+MEDIA_REIMPORT_PLAN.md

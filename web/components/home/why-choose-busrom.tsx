@@ -3,16 +3,27 @@
 import { useState, useEffect, useRef } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import { LucideIcon, HelpCircle } from "lucide-react";
+import { LucideIcon, HelpCircle, Lightbulb, ShieldCheck, Factory, Globe, Users } from "lucide-react";
 import { cn } from "@/lib/utils"; // 导入 cn
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 type Props = {
   data: HomeContent["whyChooseBusrom"];
 };
 
-// 占位符图标映射
+// 图标映射 - 根据 reason title 匹配对应图标
 const iconMap: { [key: string]: LucideIcon } = {
+  "Original & Proprietary Design": Lightbulb,
+  "Relentless Quality & Integration": ShieldCheck,
+  "Factory-direct Production": Factory,
+  "Years of Global Expertise": Globe,
+  "Collaborative R&D Partnership": Users,
+  // 中文映射
+  "原创与专有设计": Lightbulb,
+  "严格质量与整合": ShieldCheck,
+  "工厂直接生产": Factory,
+  "多年全球专业经验": Globe,
+  "合作研发伙伴关系": Users,
   default: HelpCircle,
 };
 
@@ -24,9 +35,11 @@ export default function WhyChooseBusrom({ data }: Props) {
   const [isHovering, setIsHovering] = useState<boolean>(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const reasonsLength = data?.reasons?.length || 0;
+
   // 自动轮播的核心逻辑 (保持不变)
   useEffect(() => {
-    if (isHovering) {
+    if (isHovering || reasonsLength === 0) {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -34,14 +47,19 @@ export default function WhyChooseBusrom({ data }: Props) {
       return;
     }
     timerRef.current = setInterval(() => {
-      setActiveIndex((prevIndex) => (prevIndex + 1) % data.reasons.length);
+      setActiveIndex((prevIndex) => (prevIndex + 1) % reasonsLength);
     }, CAROUSEL_INTERVAL_MS);
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
     };
-  }, [isHovering, data.reasons.length]);
+  }, [isHovering, reasonsLength]);
+
+  // Guard: if no data, don't render
+  if (!data || !data.reasons || data.reasons.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-16 bg-brand-main" data-header-theme="light">
@@ -89,11 +107,11 @@ export default function WhyChooseBusrom({ data }: Props) {
                 onMouseEnter={() => setActiveIndex(index)}
               >
                 {/* 1. 背景图 (保持不变) */}
-                <Image
-                  src={data.reasons[index].image.url}
-                  alt={data.reasons[index].image.altText || reason.title}
-                  fill
-                  className="object-cover object-center z-0 transition-transform duration-500 ease-in-out group-hover:scale-105"
+                <OptimizedImage
+                  image={data.reasons[index].image}
+                  alt={data.reasons[index].image?.altText || reason.title}
+                  size="large"
+                  className="object-cover object-center z-0 transition-transform duration-500 ease-in-out group-hover:scale-105 absolute inset-0 w-full h-full"
                 />
 
                 {/* 2. 阴影渐变 (z-10) */}
@@ -142,11 +160,11 @@ export default function WhyChooseBusrom({ data }: Props) {
                 key={reason.title}
                 className="relative w-full aspect-video rounded-lg overflow-hidden shadow-lg"
               >
-                <Image
-                  src={data.reasons[index].image.url}
-                  alt={data.reasons[index].image.altText || reason.title}
-                  fill
-                  className="object-cover object-center z-0"
+                <OptimizedImage
+                  image={data.reasons[index].image}
+                  alt={data.reasons[index].image?.altText || reason.title}
+                  size="large"
+                  className="object-cover object-center z-0 absolute inset-0 w-full h-full"
                 />
                 <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                 <div className="relative z-20 h-full p-6 flex flex-col items-center justify-end text-center">

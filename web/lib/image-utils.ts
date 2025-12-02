@@ -29,13 +29,66 @@ export interface ImageVariants {
 export interface MediaImage {
   id: string
   filename: string
-  file: {
+  file?: {
     url: string
     width?: number
     height?: number
-  }
+  } | null
+  /** Direct file URL (used by batch uploads via presigned URL) */
+  fileUrl?: string | null
   variants?: ImageVariants
   altText?: Record<string, string> | null  // Multilingual alt text
+}
+
+/**
+ * CDN Domain configuration
+ *
+ * - Local (MinIO via Nginx): http://localhost:8080/busrom-media/...
+ * - Production (CloudFront): https://xxx.cloudfront.net/...
+ */
+const CDN_DOMAIN = process.env.NEXT_PUBLIC_CDN_DOMAIN || 'http://localhost:8080'
+
+/**
+ * Normalize image URL to use CDN domain
+ *
+ * Handles different URL formats:
+ * - Already CDN URL: return as-is
+ * - MinIO URL (http://localhost:9000/...): convert to CDN
+ * - S3 URL (https://xxx.s3.amazonaws.com/...): convert to CDN
+ * - Relative path: prepend CDN domain
+ */
+function normalizeToCDN(url: string): string {
+  if (!url) return url
+
+  // Already using CDN domain
+  if (url.includes(CDN_DOMAIN) || url.includes('cloudfront.net')) {
+    return url
+  }
+
+  try {
+    const urlObj = new URL(url)
+
+    // MinIO URL: http://localhost:9000/busrom-media/...
+    if (url.includes('localhost:9000')) {
+      return `${CDN_DOMAIN}${urlObj.pathname}`
+    }
+
+    // S3 URL: https://xxx.s3.amazonaws.com/bucket/...
+    if (urlObj.hostname.includes('amazonaws.com')) {
+      // CloudFront doesn't need bucket name in path
+      const pathParts = urlObj.pathname.split('/').filter(Boolean)
+      // Remove bucket name if present (first part)
+      if (pathParts.length > 1) {
+        pathParts.shift()
+      }
+      return `${CDN_DOMAIN}/${pathParts.join('/')}`
+    }
+
+    return url
+  } catch {
+    // If URL parsing fails, return as-is
+    return url
+  }
 }
 
 /**
@@ -61,20 +114,26 @@ export function getOptimizedImageUrl(
   preferWebP: boolean = true
 ): string {
   // If no image, return placeholder
-  if (!image || !image.file?.url) {
+  if (!image) {
     return '/images/placeholder.jpg'
   }
 
-  const { variants, file } = image
+  // Get the original URL (support both file.url and fileUrl)
+  const originalUrl = image.file?.url || image.fileUrl
+  if (!originalUrl) {
+    return '/images/placeholder.jpg'
+  }
+
+  const { variants } = image
 
   // 1. Try WebP format first (if enabled and available)
   if (preferWebP && variants?.webp) {
-    return variants.webp
+    return normalizeToCDN(variants.webp)
   }
 
   // 2. Try requested size variant
   if (variants && variants[size]) {
-    return variants[size]!
+    return normalizeToCDN(variants[size]!)
   }
 
   // 3. Fallback strategy: try other sizes from large to small
@@ -84,12 +143,12 @@ export function getOptimizedImageUrl(
 
   for (const fallbackSize of fallbackOrder) {
     if (variants && variants[fallbackSize]) {
-      return variants[fallbackSize]!
+      return normalizeToCDN(variants[fallbackSize]!)
     }
   }
 
-  // 4. Last resort: return original URL
-  return file.url
+  // 4. Last resort: return original URL (normalized to CDN)
+  return normalizeToCDN(originalUrl)
 }
 
 /**
@@ -116,10 +175,10 @@ export function getImageSrcSet(
   const { variants } = image
   const srcset: string[] = []
 
-  if (variants.small) srcset.push(`${variants.small} 400w`)
-  if (variants.medium) srcset.push(`${variants.medium} 800w`)
-  if (variants.large) srcset.push(`${variants.large} 1200w`)
-  if (variants.xlarge) srcset.push(`${variants.xlarge} 1920w`)
+  if (variants.small) srcset.push(`${normalizeToCDN(variants.small)} 400w`)
+  if (variants.medium) srcset.push(`${normalizeToCDN(variants.medium)} 800w`)
+  if (variants.large) srcset.push(`${normalizeToCDN(variants.large)} 1200w`)
+  if (variants.xlarge) srcset.push(`${normalizeToCDN(variants.xlarge)} 1920w`)
 
   return srcset.join(', ')
 }

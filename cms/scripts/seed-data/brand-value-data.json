@@ -1,0 +1,16 @@
+{
+  "internalLabel": "Brand Value Configuration",
+  "title": {"en": "Brand value", "zh": "品牌价值"},
+  "subtitle": {"en": "embodiment", "zh": "体现"},
+  "param1Title": {"en": "", "zh": ""},
+  "param1Description": {"en": "More Than Glass Hardware", "zh": "不仅仅是玻璃五金"},
+  "param2Title": {"en": "", "zh": ""},
+  "param2Description": {"en": "Precision details for every glass space", "zh": "为每个玻璃空间提供精密细节"},
+  "sloganTitle": {"en": "Our Slogan", "zh": "我们的口号"},
+  "sloganDescription": {"en": "Craft Your Glass Details", "zh": "精雕您的玻璃细节"},
+  "valueTitle": {"en": "Our Value", "zh": "我们的价值"},
+  "valueDescription": {"en": "Precision · Safety · Design — Support That Protects Both Form and Function", "zh": "精密 · 安全 · 设计 — 兼顾形式与功能的支撑"},
+  "visionTitle": {"en": "Our Vision", "zh": "我们的愿景"},
+  "visionDescription": {"en": "Millions of Spaces — Safer and More Opening to Enjoy Our Products", "zh": "百万空间 — 更安全、更开放地享受我们的产品"},
+  "status": "PUBLISHED"
+}

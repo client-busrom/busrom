@@ -1,9 +1,10 @@
-﻿// components/HeroBanner/HeroBanner2.tsx
-import Image from "next/image";
+// components/HeroBanner/HeroBanner2.tsx
 import type { FC } from "react";
-import type { HomeContent } from "@/lib/content-data"; // Ensure path is correct
-import { Locale } from "@/i18n.config"; // Ensure path is correct
-import { getObjectPosition } from "@/lib/utils"; // Import getObjectPosition
+import Image from "next/image";
+import type { HomeContent } from "@/lib/content-data";
+import { Locale } from "@/i18n.config";
+import { getObjectPosition } from "@/lib/utils";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 type BannerData = HomeContent["heroBanner"][number];
 type BannerProps = {
@@ -13,33 +14,28 @@ type BannerProps = {
 
 // --- HeroBanner2 Component ---
 const HeroBanner2: FC<BannerProps> = ({ data, locale }) => {
-  const imageUrl: string = data.images[0]?.url || "/placeholder.jpg";
-  const svgUrl: string = "HeroBanner2.svg";
-  const imageLargeUrl = data.images[1]?.url || "/placeholder.jpg";
-  const imageSmallUrl = data.images[2]?.url || "/placeholder.jpg";
+  const svgUrl: string = "/HeroBanner2.svg";
 
   const parallelogramClipPath = "polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%)";
 
   return (
     <section className="relative w-full h-full overflow-hidden font-sans">
       {/* Background Image */}
-      <Image
-        src={imageUrl}
+      <OptimizedImage
+        image={data.images[0]}
         alt="Background"
-        fill
-        sizes="100vw"
-        quality={90}
-        className="object-cover z-0"
-        style={{ objectPosition: getObjectPosition(data.images[0]) }}
+        size="xlarge"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        objectPosition={getObjectPosition(data.images[0])}
         priority
       />
       {/* SVG 遮罩 */}
       <Image
         src={svgUrl}
         alt="mask"
-        fill // 使用 fill
+        fill
         sizes="100vw"
-        className="object-cover z-10" // object-cover
+        className="object-cover z-10"
         style={{ objectPosition: getObjectPosition(data.images[0]) }}
       />
 
@@ -87,25 +83,23 @@ const HeroBanner2: FC<BannerProps> = ({ data, locale }) => {
             {data.features[1]}
           </h1>
 
-          <div className="relative w-full max-w-lg h-64 md:h-80 lg:h-96"> 
+          <div className="relative w-full max-w-lg h-64 md:h-80 lg:h-96">
             {/* Large Image (Bottom Left) */}
             <div className="absolute bottom-0 right-[0%] w-4/5 h-4/5 rounded-xl overflow-hidden shadow-lg z-10 border-8 border-white">
-              <Image
-                src={imageLargeUrl}
+              <OptimizedImage
+                image={data.images[1]}
                 alt="Large feature image"
-                fill
-                sizes="(max-width: 768px) 70vw, 30vw"
-                className="object-cover"
+                size="large"
+                className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
             {/* Small Image (Top Right, Overlapping) */}
-            <div className="absolute top-1/3 left-[0%] w-1/2 h-1/2 rounded-xl overflow-hidden shadow-lg z-20 border-8 border-white"> {/* Optional border */}
-              <Image
-                src={imageSmallUrl}
+            <div className="absolute top-1/3 left-[0%] w-1/2 h-1/2 rounded-xl overflow-hidden shadow-lg z-20 border-8 border-white">
+              <OptimizedImage
+                image={data.images[2]}
                 alt="Small feature image"
-                fill
-                sizes="(max-width: 768px) 45vw, 20vw"
-                className="object-cover"
+                size="medium"
+                className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
           </div>

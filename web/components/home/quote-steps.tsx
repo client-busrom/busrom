@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 type Props = {
   data: HomeContent["quoteSteps"];
@@ -96,6 +96,11 @@ export default function QuoteSteps({ data }: Props) {
     }
     setHoveredIndex(-1);
   };
+
+  // Guard: if no data, don't render
+  if (!data || !data.steps || data.steps.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-16 bg-brand-main" data-header-theme="light">
@@ -218,12 +223,11 @@ export default function QuoteSteps({ data }: Props) {
                     transitionDuration: '500ms',
                   }}
                 >
-                    <Image
-                        src={step.image.url}
-                        alt={step.image.altText || step.text}
-                        fill
-                        sizes="150px"
-                        className="object-cover"
+                    <OptimizedImage
+                        image={step.image}
+                        alt={step.image?.altText || step.text}
+                        size="medium"
+                        className="object-cover absolute inset-0 w-full h-full"
                     />
                 </div>
               </li>

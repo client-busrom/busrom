@@ -3,12 +3,18 @@
 // 假设 HomeContent["oemOdm"] 的类型现在是这样
 import type { HomeContent } from "@/lib/content-data";
 import Image from "next/image";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 type Props = {
   data: HomeContent["oemOdm"]; // 旧类型
 };
 
 export default function OemOdm({ data }: Props) {
+  // Guard: if no data, don't render
+  if (!data || !data.oem || !data.odm) {
+    return null;
+  }
+
   const { oem: OEM, odm: ODM } = data;
 
   // --- 定义 clip-path 变量 ---
@@ -25,12 +31,11 @@ export default function OemOdm({ data }: Props) {
       {/* OEM 背景 (左侧 60%) */}
       {/* 【已修改】添加 w-[60%] 和 clip-path */}
       <div className="absolute inset-y-0 left-0 w-[100%] z-0" style={{ clipPath: clipPathLeft }}>
-        <Image
-          src={OEM.bgImage.url}
-          alt={OEM.bgImage.altText || "OEM Background"}
-          fill
-          sizes="60vw" // 调整 sizes
-          className="object-cover"
+        <OptimizedImage
+          image={OEM.bgImage}
+          alt={OEM.bgImage?.altText || "OEM Background"}
+          size="xlarge"
+          className="object-cover absolute inset-0 w-full h-full"
         />
         {/* 黑色遮罩层 */}
         <div className="absolute inset-0 bg-black/50 z-1"></div>
@@ -42,12 +47,11 @@ export default function OemOdm({ data }: Props) {
         className="absolute inset-y-0 right-0 w-[100%] z-10" // z-10 确保它在视觉上覆盖左侧的重叠部分
         style={{ clipPath: clipPathRight }}
       >
-        <Image
-          src={ODM.bgImage.url}
-          alt={ODM.bgImage.altText || "ODM Background"}
-          fill
-          sizes="60vw" // 调整 sizes
-          className="object-cover"
+        <OptimizedImage
+          image={ODM.bgImage}
+          alt={ODM.bgImage?.altText || "ODM Background"}
+          size="xlarge"
+          className="object-cover absolute inset-0 w-full h-full"
         />
         {/* 黑色遮罩层 */}
         <div className="absolute inset-0 bg-black/50 z-1"></div>
@@ -69,7 +73,7 @@ export default function OemOdm({ data }: Props) {
           <div className="relative mt-24 w-full aspect-video aspect-[4/3] rounded-2xl mt-auto overflow-hidden border-[7px] border-[#FFFAD3]">
             {" "}
             {/* Added overflow-hidden */}
-            <Image src={OEM.image.url} alt={OEM.image.altText || OEM.title} fill sizes="(max-width: 768px) 90vw, 40vw" className="object-cover" />
+            <OptimizedImage image={OEM.image} alt={OEM.image?.altText || OEM.title} size="large" className="object-cover absolute inset-0 w-full h-full" />
           </div>
         </div>
 
@@ -77,7 +81,7 @@ export default function OemOdm({ data }: Props) {
         <div className="flex flex-col w-[60%] h-full justify-self-end">
           {/* Image Container */}
           <div className="relative w-full aspect-video aspect-[4/3] rounded-2xl mb-24 overflow-hidden border-[7px] border-[#FFFAD3]">
-            <Image src={ODM.image.url} alt={ODM.image.altText || ODM.title} fill sizes="(max-width: 768px) 90vw, 40vw" className="object-cover" />
+            <OptimizedImage image={ODM.image} alt={ODM.image?.altText || ODM.title} size="large" className="object-cover absolute inset-0 w-full h-full" />
           </div>
           <h2 className="text-6xl md:text-8xl font-extrabold font-anaheim mb-6">{ODM.title}</h2>
           <div className="space-y-4 text-base md:text-sm flex-grow">

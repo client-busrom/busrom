@@ -1,0 +1,22 @@
+{
+  "internalLabel": "Brand Advantages Configuration",
+  "advantage1": {"en": "Performance & Innovation & Refined Design", "zh": "性能与创新与精致设计"},
+  "icon1": "Sparkles",
+  "advantage2": {"en": "Ultra Pursue", "zh": "极致追求"},
+  "icon2": "Target",
+  "advantage3": {"en": "Carefully Developed Structure & Parts", "zh": "精心开发的结构与零件"},
+  "icon3": "Component",
+  "advantage4": {"en": "Strictly Selected Aviation-grade Materials", "zh": "严格筛选的航空级材料"},
+  "icon4": "ShieldCheck",
+  "advantage5": {"en": "Precision Performance & Premium Finishes", "zh": "精密性能与高端表面处理"},
+  "icon5": "Gauge",
+  "advantage6": {"en": "Clean Aesthetics & Hidden Fixings", "zh": "简洁美学与隐藏式固定"},
+  "icon6": "EyeOff",
+  "advantage7": {"en": "IP-rated Components and Water or Electrical Separation for Wet Areas", "zh": "IP防护等级组件及水电分离"},
+  "icon7": "Waves",
+  "advantage8": {"en": "From Customization to Batch Delivery", "zh": "从定制到批量交付"},
+  "icon8": "Package",
+  "advantage9": {"en": "Worry-free After-sales & Project Support", "zh": "无忧售后与项目支持"},
+  "icon9": "HeadphonesIcon",
+  "status": "PUBLISHED"
+}

@@ -13,7 +13,7 @@
 
 import { list } from '@keystone-6/core'
 import { text, json, select, image, relationship, timestamp, integer } from '@keystone-6/core/fields'
-import { extractImageMetadata, generateImageVariants } from '../lib/image-optimizer'
+import { extractImageMetadata, generateImageVariants, deleteMediaFiles } from '../lib/image-optimizer'
 import { publicReadAccess } from '../lib/permissions/access-control'
 
 export const Media = list({
@@ -395,6 +395,49 @@ export const Media = list({
       return resolvedData
     },
 
+    // Delete S3 files before deleting Media record
+    beforeOperation: async ({ operation, item }) => {
+      // Only run on delete operation
+      if (operation !== 'delete' || !item) return
+
+      console.log(`🗑️  [Media Hook] beforeOperation(delete) triggered for: ${item.filename}`)
+
+      try {
+        // Get file info from the item
+        // For Keystone image field uploads
+        const fileId = item.file_id as string | null
+        const fileExtension = item.file_extension as string | null
+        // For batch uploads via presigned URL
+        const fileKey = item.fileKey as string | null
+        const variants = item.variants as Record<string, string> | null
+
+        if (!fileId && !fileKey && !variants) {
+          console.log(`[Media Hook] No files to delete for: ${item.filename}`)
+          return
+        }
+
+        // Delete original file and all variants from S3
+        // Pass fileKey for batch uploads, or fileId.extension for Keystone uploads
+        const result = await deleteMediaFiles(
+          fileId,
+          fileExtension,
+          variants,
+          fileKey // Additional param for batch uploaded files
+        )
+
+        if (result.success) {
+          console.log(`✅ [Media Hook] Successfully deleted ${result.deletedCount} files from S3 for: ${item.filename}`)
+        } else {
+          console.warn(`⚠️  [Media Hook] Partial deletion for ${item.filename}:`)
+          console.warn(`   Deleted: ${result.deletedCount} files`)
+          console.warn(`   Errors: ${result.errors.join(', ')}`)
+        }
+      } catch (error) {
+        // Log error but don't block deletion
+        console.error(`❌ [Media Hook] Error deleting S3 files for ${item.filename}:`, error)
+      }
+    },
+
     afterOperation: async ({ operation, item, originalItem, context }) => {
       // Log all operations for debugging
       console.log(`[Media Hook] Triggered! operation=${operation}, hasItem=${!!item}`)
@@ -420,25 +463,35 @@ export const Media = list({
           fileId: mediaItem?.file_id,
         })
 
-        if (!mediaItem?.file_id) {
-          console.log(`[Media Hook] No file uploaded, skipping optimization`)
+        // Check if we have either file_id (Keystone upload) or fileUrl (batch upload via presigned URL)
+        if (!mediaItem?.file_id && !mediaItem?.fileUrl) {
+          console.log(`[Media Hook] No file uploaded (no file_id or fileUrl), skipping optimization`)
           return
         }
 
-        // Construct the file URL
-        // For CloudFront (production): https://cdn.domain/filename (no bucket name)
-        // For MinIO (development): http://localhost:9000/bucket/filename
-        let cdnDomain = process.env.CDN_DOMAIN || process.env.S3_ENDPOINT || 'http://localhost:9000'
+        let fileUrl: string
 
-        // Add https:// for CloudFront domains without protocol
-        if (cdnDomain && !cdnDomain.startsWith('http') && cdnDomain.includes('cloudfront.net')) {
-          cdnDomain = `https://${cdnDomain}`
+        if (mediaItem?.fileUrl) {
+          // Batch upload via presigned URL: use fileUrl directly
+          fileUrl = mediaItem.fileUrl
+          console.log(`[Media Hook] Using fileUrl from batch upload: ${fileUrl}`)
+        } else {
+          // Keystone image field upload: construct URL from file_id
+          // For CloudFront (production): https://cdn.domain/filename (no bucket name)
+          // For MinIO (development): http://localhost:9000/bucket/filename
+          let cdnDomain = process.env.CDN_DOMAIN || process.env.S3_ENDPOINT || 'http://localhost:9000'
+
+          // Add https:// for CloudFront domains without protocol
+          if (cdnDomain && !cdnDomain.startsWith('http') && cdnDomain.includes('cloudfront.net')) {
+            cdnDomain = `https://${cdnDomain}`
+          }
+
+          // CloudFront doesn't need bucket name in URL
+          fileUrl = cdnDomain.includes('cloudfront.net')
+            ? `${cdnDomain}/${mediaItem.file_id}.${mediaItem.file_extension}`
+            : `${cdnDomain}/${process.env.S3_BUCKET_NAME || 'busrom-media'}/${mediaItem.file_id}.${mediaItem.file_extension}`
+          console.log(`[Media Hook] Using constructed fileUrl from file_id: ${fileUrl}`)
         }
-
-        // CloudFront doesn't need bucket name in URL
-        const fileUrl = cdnDomain.includes('cloudfront.net')
-          ? `${cdnDomain}/${mediaItem.file_id}.${mediaItem.file_extension}`
-          : `${cdnDomain}/${process.env.S3_BUCKET_NAME || 'busrom-media'}/${mediaItem.file_id}.${mediaItem.file_extension}`
 
         console.log(`🔄 Processing image optimization for: ${mediaItem.filename}`)
         console.log(`📁 File URL: ${fileUrl}`)

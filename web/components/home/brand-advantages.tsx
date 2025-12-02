@@ -53,13 +53,10 @@ export default function BrandAdvantages({ data }: Props) {
   const isMobile = useIsMobile(); // ⬅️ 引入移动端判断
 
   const [isSticky, setIsSticky] = useState(false);
-
   const [isHidden, setIsHidden] = useState(false);
-
   const [contentOpacity, setContentOpacity] = useState(0);
 
   const sectionRef = useRef<HTMLElement>(null);
-
   const imageWrapperRef = useRef<HTMLDivElement>(null);
 
   const svgSrc = isMobile ? "BusromBandMobile.svg" : "BusromBand.svg";
@@ -145,6 +142,11 @@ export default function BrandAdvantages({ data }: Props) {
   const imageSpacerStyle = {
     height: isSticky ? imageWrapperRef.current?.offsetHeight : "auto",
   };
+
+  // Guard: if no data, don't render
+  if (!data || !data.advantages || !data.icons) {
+    return null;
+  }
 
   return (
     <section

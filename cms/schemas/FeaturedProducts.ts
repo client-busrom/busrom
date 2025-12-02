@@ -14,7 +14,7 @@ export const FeaturedProducts = list({
       query: () => true,
       create: () => true, // 用于初始化
       update: ({ session }: any) => !!session,
-      delete: () => false, // 禁止删除 singleton
+      delete: ({ session }) => !!session, // 禁止删除 singleton
     },
     filter: {
       query: ({ session }: any) => {

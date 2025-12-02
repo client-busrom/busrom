@@ -1,9 +1,10 @@
-﻿// components/HeroBanner/HeroBanner3.tsx
-import Image from "next/image";
+// components/HeroBanner/HeroBanner3.tsx
 import type { FC } from "react";
-import type { HomeContent } from "@/lib/content-data"; // Ensure path is correct
-import { Locale } from "@/i18n.config"; // Ensure path is correct
-import { cn, getObjectPosition } from "@/lib/utils"; // Import cn and getObjectPosition
+import Image from "next/image";
+import type { HomeContent } from "@/lib/content-data";
+import { Locale } from "@/i18n.config";
+import { cn, getObjectPosition } from "@/lib/utils";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // --- BannerProps Definition ---
 type BannerData = HomeContent["heroBanner"][number];
@@ -14,12 +15,6 @@ type BannerProps = {
 
 // --- HeroBanner3 Component ---
 const HeroBanner3: FC<BannerProps> = ({ data, locale }) => {
-  const imageUrl: string = data.images[0]?.url || "/placeholder.jpg"; // <-- Confirm base path
-  // Image paths for the right column
-  const image1Url = data.images[1]?.url || "/placeholder.jpg";// Adjust paths - ensure base path if necessary
-  const image2Url = data.images[2]?.url || "/placeholder.jpg";
-  const image3Url = data.images[3]?.url || "/placeholder.jpg";
-
   // --- Split Feature[1] ---
   const feature1Text = data.features[1] || "";
   const feature1Words = feature1Text.split(" ");
@@ -33,19 +28,17 @@ const HeroBanner3: FC<BannerProps> = ({ data, locale }) => {
   return (
     <section className="relative w-full h-full overflow-hidden font-sans">
       {/* 背景图 (z-0) */}
-      <Image
-        src={imageUrl}
+      <OptimizedImage
+        image={data.images[0]}
         alt="Background"
-        fill
-        sizes="100vw"
-        quality={90}
-        className="object-cover z-0"
-        style={{ objectPosition: getObjectPosition(data.images[0]) }}
+        size="xlarge"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        objectPosition={getObjectPosition(data.images[0])}
         priority
       />
       {/* SVG 遮罩 (z-10) */}
       <Image
-        src="/HeroBanner3.svg" // Changed SVG name
+        src="/HeroBanner3.svg"
         alt="mask"
         fill
         sizes="100vw"
@@ -53,15 +46,15 @@ const HeroBanner3: FC<BannerProps> = ({ data, locale }) => {
         style={{ objectPosition: getObjectPosition(data.images[0]) }}
       />
 
-      <div className="absolute inset-y-0 right-0 w-[650px] h-full hidden lg:block z-20 pointer-events-none"> {/* 示例宽度 */}
+      <div className="absolute inset-y-0 right-0 w-[650px] h-full hidden lg:block z-20 pointer-events-none">
         <div className="absolute inset-y-0 left-0 w-[31%] rounded-b-full overflow-hidden">
-           <Image src={image1Url} alt="Feature image 1" fill sizes="238px" className="object-cover" /> {/* 768 * 0.31 */}
+           <OptimizedImage image={data.images[1]} alt="Feature image 1" size="large" className="absolute inset-0 w-full h-full object-cover" />
         </div>
         <div className="absolute inset-y-0 left-[34.5%] w-[31%] rounded-t-full overflow-hidden z-10">
-           <Image src={image2Url} alt="Feature image 2" fill sizes="238px" className="object-cover" /> {/* 768 * 0.31 */}
+           <OptimizedImage image={data.images[2]} alt="Feature image 2" size="large" className="absolute inset-0 w-full h-full object-cover" />
         </div>
         <div className="absolute inset-y-0 right-0 w-[31%] rounded-b-full overflow-hidden">
-           <Image src={image3Url} alt="Feature image 3" fill sizes="238px" className="object-cover" /> {/* 768 * 0.31 */}
+           <OptimizedImage image={data.images[3]} alt="Feature image 3" size="large" className="absolute inset-0 w-full h-full object-cover" />
         </div>
       </div>
 

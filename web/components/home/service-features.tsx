@@ -1,8 +1,7 @@
-﻿"use client";
+"use client";
 
-import { useState, useEffect, useRef } from "react"; // 导入 Hooks
-import Image from "next/image";
-import { motion, AnimatePresence, Transition } from "framer-motion"; // 导入 Framer Motion
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, Transition } from "framer-motion";
 import type { HomeContent } from "@/lib/content-data";
 import { cn } from "@/lib/utils";
 import FeatureImageLayout from "./FeatureImageLayout";
@@ -12,157 +11,359 @@ type Props = {
 };
 
 const featureTransition = { duration: 0.5, ease: "easeInOut" };
+const CAROUSEL_DURATION = 5000; // 轮播间隔时间（毫秒）
 
 export default function ServiceFeatures({ data }: Props) {
-  const [activeIndex, setActiveIndex] = useState(0); // 当前激活的 feature 索引
-  const intervalRef = useRef<NodeJS.Timeout | null>(null); // 用于存储轮播定时器
-  const progressBarRef = useRef<HTMLDivElement>(null); // Ref for progress bar container
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [progress, setProgress] = useState(0); // 进度 0-100
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const progressRef = useRef<NodeJS.Timeout | null>(null);
 
-  const features = data.features; // 类型断言（如果 image 是可选的）
+  const features = data?.features || [];
+  const featuresLength = features.length;
+
+  // --- 进度条动画逻辑 ---
+  const startProgress = () => {
+    setProgress(0);
+    const startTime = Date.now();
+
+    const updateProgress = () => {
+      const elapsed = Date.now() - startTime;
+      const newProgress = Math.min((elapsed / CAROUSEL_DURATION) * 100, 100);
+      setProgress(newProgress);
+
+      if (newProgress < 100) {
+        progressRef.current = setTimeout(updateProgress, 16); // ~60fps
+      }
+    };
+
+    progressRef.current = setTimeout(updateProgress, 16);
+  };
+
+  const stopProgress = () => {
+    if (progressRef.current) {
+      clearTimeout(progressRef.current);
+      progressRef.current = null;
+    }
+  };
 
   // --- 自动轮播逻辑 ---
   useEffect(() => {
-    // 启动定时器
+    if (featuresLength === 0) return;
+
     const startInterval = () => {
+      startProgress();
       intervalRef.current = setInterval(() => {
-        setActiveIndex((prevIndex) => (prevIndex + 1) % features.length);
-      }, 5000); // 每 5 秒切换一次
+        setActiveIndex((prevIndex) => (prevIndex + 1) % featuresLength);
+        startProgress();
+      }, CAROUSEL_DURATION);
     };
 
-    // 清除定时器
     const stopInterval = () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
+      stopProgress();
     };
 
-    startInterval(); // 组件加载时启动
-
-    // 组件卸载时清除定时器
+    startInterval();
     return () => stopInterval();
-  }, [features.length]); // 依赖项为 features 长度
+  }, [featuresLength]);
 
-  // --- 处理悬停 ---
-  const handleHover = (index: number) => {
-    // 清除自动轮播定时器
+  // --- 处理点击导航点 ---
+  const handleDotClick = (index: number) => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    // 设置当前激活索引
+    stopProgress();
     setActiveIndex(index);
+    startProgress();
+    // 重新启动定时器
+    intervalRef.current = setInterval(() => {
+      setActiveIndex((prevIndex) => (prevIndex + 1) % featuresLength);
+      startProgress();
+    }, CAROUSEL_DURATION);
   };
 
-  // --- 处理鼠标离开进度条区域 ---
-  const handleMouseLeave = () => {
-    // 如果没有定时器在运行，则重新启动
-    if (!intervalRef.current) {
-      intervalRef.current = setInterval(() => {
-        setActiveIndex((prevIndex) => (prevIndex + 1) % features.length);
-      }, 5000);
-    }
-  };
+  if (!data || !data.features || data.features.length === 0) {
+    return null;
+  }
 
-  // 获取当前激活的 feature
   const activeFeature = features[activeIndex];
 
   return (
-    <section className="py-16 bg-brand-main" data-header-theme="light">
-      <div className="container mx-auto">
-        {/* --- 主体 Flex 布局 --- */}
-        <div className="flex flex-col lg:flex-row lg:gap-16">
-          {/* --- 左侧 Title/Subtitle --- */}
-          <div className="w-full lg:w-1/4 mb-8 lg:mb-0 flex flex-col justify-center">
-            {/* 确保字体类名正确 */}
-            <h2 className="font-anaheim font-extrabold text-3xl lg:text-4xl text-brand-text-black mb-4">{data.title}</h2>
-            {/* 确保字体类名正确 */}
-            <p className="font-anaheim font-medium text-muted-foreground text-sm">{data.subtitle}</p>
-          </div>
+    <section className="py-16 lg:py-24 bg-brand-main" data-header-theme="light">
+      <div className="container mx-auto px-4">
+        {/* 主容器：米色圆角背景 */}
+        <div
+          className={cn(
+            "relative overflow-hidden rounded-[20px] lg:rounded-[30px]",
+            "bg-[#F0EBDB]", // 米色背景
+            "w-full max-w-[1860px] mx-auto"
+          )}
+        >
+          {/* 装饰性模糊椭圆 - 只在桌面端显示 */}
+          <div
+            className="hidden lg:block absolute pointer-events-none"
+            style={{
+              left: "62px",
+              top: "197px",
+              width: "1571px",
+              height: "392px",
+              background:
+                "linear-gradient(to bottom, rgba(255,255,255,1), rgba(218,201,142,1))",
+              filter: "blur(67px)",
+              borderRadius: "50%",
+            }}
+          />
 
-          {/* --- 右侧内容区域 --- */}
-          <div className="w-full lg:w-3/4">
-            {/* 白色圆角背景框 */}
-            <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 lg:p-10 flex flex-col min-h-[450px] lg:min-h-[500px]">
-              {/* --- 上方：Feature 内容 + 图片 --- */}
-              <div className="flex flex-col md:flex-row flex-grow gap-6 md:gap-8">
-                {/* 左侧：文字内容 */}
-                <div className="w-full md:w-1/3 flex flex-col justify-start">
-                  <AnimatePresence mode="wait">
-                    {/* 检查 activeFeature 是否存在 */}
-                    {activeFeature && (
-                      <motion.div
-                        key={activeIndex}
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        transition={featureTransition as Transition}
-                      >
-                        {/* 👇 新增方块，直接使用颜色值 */}
-                        <div className="bg-[#7E7A4F] w-[73px] h-[13px] mb-5"></div>
+          {/* 内容布局：桌面左右，移动上下 */}
+          <div className="relative z-10 flex flex-col lg:flex-row py-8 lg:py-12">
+            {/* === 左侧固定内容区域 === */}
+            <div
+              className={cn(
+                "flex flex-col justify-center",
+                "px-6 py-8",
+                "lg:px-10 lg:py-0 lg:w-[340px] lg:flex-shrink-0",
+                "xl:px-14 xl:w-[400px]",
+                "2xl:px-[80px] 2xl:w-[480px]"
+              )}
+            >
+              {/* 主标题 */}
+              <h2
+                className={cn(
+                  "font-anaheim font-extrabold text-black",
+                  "text-2xl leading-tight",
+                  "lg:text-[32px] lg:leading-[42px]",
+                  "xl:text-[40px] xl:leading-[52px]",
+                  "2xl:text-[48px] 2xl:leading-[62px]"
+                )}
+              >
+                {data.title.split("\n").map((line, i) => (
+                  <span key={i}>
+                    {line}
+                    {i < data.title.split("\n").length - 1 && <br />}
+                  </span>
+                ))}
+              </h2>
 
-                        {/* 调整标题下方间距 */}
-                        <h3 className="text-2xl font-anaheim font-extrabold text-brand-text-black mb-5">{activeFeature.title}</h3>
-                        <p className="font-anaheim font-medium text-brand-text-main leading-relaxed">{activeFeature.description}</p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-                {/* 右侧：图片 */}
-                <div className="w-full md:w-2/3 relative aspect-video md:aspect-auto rounded-md">
+              {/* 副标题 */}
+              <p
+                className={cn(
+                  "font-anaheim font-medium text-[#756F3F]",
+                  "text-sm leading-relaxed mt-4",
+                  "lg:text-[14px] lg:leading-[22px] lg:mt-4",
+                  "xl:text-[16px] xl:leading-[24px]",
+                  "2xl:text-[18px] 2xl:leading-[28px]",
+                  "max-w-[320px]"
+                )}
+              >
+                {data.subtitle}
+              </p>
+            </div>
+
+            {/* === 右侧轮播区域 === */}
+            <div
+              className={cn(
+                "flex-1 flex items-stretch",
+                "px-4 lg:px-0",
+                "lg:pr-4 xl:pr-6 2xl:pr-10"
+              )}
+            >
+              {/* 白色圆角卡片 - 桌面端固定高度 */}
+              <div
+                className={cn(
+                  "bg-white rounded-[20px] lg:rounded-[24px]",
+                  "w-full",
+                  "lg:h-[420px] xl:h-[480px] 2xl:h-[560px]",
+                  "flex flex-col",
+                  "shadow-lg"
+                )}
+              >
+                {/* 卡片内容区域 */}
+                <div className="flex-1 flex flex-col lg:flex-row p-4 lg:p-0">
+                  {/* 文字内容区 */}
                   <div
                     className={cn(
-                      "w-full relative rounded-md", // 保持 relative
-                      "min-h-[250px] md:min-h-[450px] md:max-h-[450px]"
+                      "flex flex-col justify-start flex-shrink-0",
+                      "lg:w-[340px] lg:pt-[50px] lg:pl-[30px] lg:pr-4",
+                      "xl:w-[380px] xl:pt-[60px] xl:pl-[40px]",
+                      "2xl:w-[440px] 2xl:pt-[70px] 2xl:pl-[50px]"
                     )}
                   >
-                    <FeatureImageLayout activeFeature={activeFeature} activeIndex={activeIndex} />
+                    <AnimatePresence mode="wait">
+                      {activeFeature && (
+                        <motion.div
+                          key={activeIndex}
+                          initial={{ opacity: 0, y: -20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 20 }}
+                          transition={featureTransition as Transition}
+                        >
+                          {/* 装饰线条 */}
+                          <div className="bg-[#7E7A4F] w-[50px] h-[10px] lg:w-[60px] lg:h-[11px] 2xl:w-[73px] 2xl:h-[13px] mb-4 lg:mb-6" />
+
+                          {/* 标题 */}
+                          <h3
+                            className={cn(
+                              "font-anaheim font-extrabold text-black",
+                              "text-xl leading-tight mb-3",
+                              "lg:text-[22px] lg:leading-[28px] lg:mb-3",
+                              "xl:text-[26px] xl:leading-[32px]",
+                              "2xl:text-[32px] 2xl:leading-[40px] 2xl:mb-4"
+                            )}
+                          >
+                            {activeFeature.title}
+                          </h3>
+
+                          {/* 描述 */}
+                          <p
+                            className={cn(
+                              "font-anaheim font-medium text-black",
+                              "text-sm leading-relaxed",
+                              "lg:text-[14px] lg:leading-[21px]",
+                              "xl:text-[16px] xl:leading-[24px]",
+                              "2xl:text-[18px] 2xl:leading-[27px]"
+                            )}
+                          >
+                            {activeFeature.description}
+                          </p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* 图片区域 - 顶部与左侧装饰线对齐 */}
+                  <div
+                    className={cn(
+                      "flex-1 flex items-start justify-center",
+                      "mt-4 lg:mt-0",
+                      "lg:pt-[50px] lg:pr-[16px] lg:pb-[8px]",
+                      "xl:pt-[60px] xl:pr-[20px] xl:pb-[10px]",
+                      "2xl:pt-[70px] 2xl:pr-[24px] 2xl:pb-[12px]"
+                    )}
+                  >
+                    <FeatureImageLayout
+                      activeFeature={activeFeature}
+                      activeIndex={activeIndex}
+                    />
                   </div>
                 </div>
-              </div>
 
-              <div
-                // 进度条外层容器 (负边距和内边距的修正方案不变)
-                className={cn(
-                  "mt-auto pt-6", // 垂直间距不变
-                  "px-8 md:px-12 lg:px-14",
-                )}
-                ref={progressBarRef}
-                onMouseLeave={handleMouseLeave}
-              >
-                <div className="flex items-end justify-between relative">
-                  <div className="absolute left-0 right-0 -mx-8 bottom-4 h-[2px] bg-[#D9D9D9] z-0"></div>
-                  {features &&
-                    features.map((feature, index) => (
-                      <button
-                        key={feature.title}
-                        className="flex-shrink-0 group relative pb-4" // 【修正 1】：移除 flex-1
-                        onMouseEnter={() => handleHover(index)}
-                      >
-                        {/* 节点标题 (文字不占流内空间) */}
-                        <span
-                          className={cn(
-                            "text-xs font-medium transition-colors duration-300 block truncate mb-2",
-                            "absolute left-1/2 -translate-x-1/2 bottom-full whitespace-nowrap", // bottom-full 定位到按钮上方
+                {/* 底部导航指示器 */}
+                <div className="flex-shrink-0 px-4 lg:px-[30px] xl:px-[40px] 2xl:px-[50px] pb-6 lg:pb-12">
+                  {/*
+                    进度条设计：7个点，显示中间5个（点2-6），隐藏点1和点7
+                    6段线段：第1段和第6段各占10%，中间4段各占20%
+                    点的位置：10%, 30%, 50%, 70%, 90%
 
-                            activeIndex === index
-                              ? "text-brand-text-main" // 激活时显示
-                              : "text-transparent group-hover:text-brand-text-main" // 默认透明，悬停时变色
-                          )}
-                        >
-                          {feature.shortTitle}
-                        </span>
+                    进度流程：
+                    - item 0: 进度从10%走到30%
+                    - item 1: 进度从30%走到50%
+                    - item 2: 进度从50%走到70%
+                    - item 3: 进度从70%走到90%
+                    - item 4: 进度从90%走到100%，然后重置到0%走到10%（回到item 0）
+                  */}
+                  <div className="relative h-[36px] lg:h-[40px] flex items-end">
+                    {/* 背景线 */}
+                    <div className="absolute left-0 right-0 bottom-[5px] h-[2px] bg-[#D9D9D9]" />
 
-                        <div className="relative h-[2px] w-2">
-                          <div
-                            className={cn(
-                              "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full transition-colors duration-300 z-10",
-                              activeIndex === index ? "bg-brand-secondary" : "bg-[#D9D9D9] group-hover:bg-brand-secondary"
-                            )}
-                          />
-                        </div>
-                      </button>
-                    ))}
+                    {/* 进度填充线 */}
+                    <div
+                      className="absolute bottom-[5px] h-[2px] bg-[#756F3F] transition-none"
+                      style={{
+                        left: 0,
+                        width: (() => {
+                          // 每个点的位置：10%, 30%, 50%, 70%, 90%
+                          // 每段20%（除了首尾各10%）
+                          const dotPositions = [10, 30, 50, 70, 90];
+                          const segmentSize = 20; // 每段20%
+
+                          // 当前点的位置
+                          const currentDotPos = dotPositions[activeIndex];
+                          // 下一个点的位置（最后一个item特殊处理）
+                          const nextDotPos = activeIndex === featuresLength - 1 ? 100 : dotPositions[activeIndex + 1];
+                          // 当前段的长度
+                          const currentSegmentLength = nextDotPos - currentDotPos;
+
+                          // 进度条宽度 = 当前点位置 + 当前段进度
+                          const progressWidth = currentDotPos + (progress / 100) * currentSegmentLength;
+                          return `${progressWidth}%`;
+                        })()
+                      }}
+                    />
+
+                    {/* 导航点 - 使用绝对定位放置在正确位置 */}
+                    <div className="relative w-full h-full">
+                      {features.map((feature, index) => {
+                        const isActive = activeIndex === index;
+                        const isPassed = index < activeIndex;
+                        // 点的位置：10%, 30%, 50%, 70%, 90%
+                        const dotPosition = 10 + index * 20;
+
+                        return (
+                          <button
+                            key={feature.title}
+                            onClick={() => handleDotClick(index)}
+                            className="absolute bottom-0 flex flex-col items-center group"
+                            style={{
+                              left: `${dotPosition}%`,
+                              transform: "translateX(-50%)"
+                            }}
+                          >
+                            {/* 标签文字 - 移动端隐藏，桌面端活跃时有上下浮动动画 */}
+                            <motion.span
+                              className={cn(
+                                "hidden lg:block",
+                                "text-[12px] xl:text-[14px] font-anaheim font-semibold",
+                                "whitespace-nowrap mb-2",
+                                "text-[#756F3F]"
+                              )}
+                              initial={false}
+                              animate={
+                                isActive
+                                  ? {
+                                      opacity: 1,
+                                      y: [0, -3, 0],
+                                    }
+                                  : {
+                                      opacity: 0,
+                                      y: 0,
+                                    }
+                              }
+                              whileHover={{ opacity: 1 }}
+                              transition={
+                                isActive
+                                  ? {
+                                      opacity: { duration: 0.3 },
+                                      y: {
+                                        duration: 1.5,
+                                        repeat: Infinity,
+                                        ease: "easeInOut",
+                                      },
+                                    }
+                                  : { duration: 0.3 }
+                              }
+                            >
+                              {feature.shortTitle}
+                            </motion.span>
+
+                            {/* 圆点 */}
+                            <div
+                              className={cn(
+                                "w-2.5 h-2.5 lg:w-3 lg:h-3 rounded-full transition-colors duration-300",
+                                isActive || isPassed
+                                  ? "bg-[#756F3F]"
+                                  : "bg-[#D9D9D9] group-hover:bg-[#756F3F]"
+                              )}
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

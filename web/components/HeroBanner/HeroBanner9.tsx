@@ -4,6 +4,7 @@ import { Locale } from "@/i18n.config";
 import { FC } from "react";
 import Image from "next/image";
 import { cn, getObjectPosition } from "@/lib/utils"; // 假设您有 cn 实用工具
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // ------------------------------------------------------------------
 // 类型定义
@@ -47,11 +48,10 @@ const FeatureBlock: FC<FeatureBlockProps> = ({ feature, bgColor, textColor, clas
         {/* 背景 SVG 遮罩/图 (如果存在) */}
         {bgImageUrl && (
             <div className="absolute inset-0 z-0">
-                <Image
+                <img
                     src={bgImageUrl}
                     alt="Background Block"
-                    fill
-                    className="object-fit"
+                    className="absolute inset-0 w-full h-full object-cover"
                 />
             </div>
         )}
@@ -74,22 +74,19 @@ const HeroBanner9: FC<BannerProps> = ({ data, locale, className }) => {
   const words = data.features[0].split("\n");
 
   // 假设 data.image 包含背景图 URL，data.mask 包含遮罩 SVG URL
-  const imageUrl: string = data.images[0]?.url || "/placeholder.jpg";
-  const svgUrl: string = "HeroBanner9.svg";
+  const svgUrl: string = "/HeroBanner9.svg";
 
   return (
     // 确保根元素 w-full h-full 继承父组件 HeroBanner 的尺寸
     <div className={cn("relative w-full h-full overflow-hidden", className)}>
 
       {/* Layer 1: Background Image (z-0) */}
-      <Image
-        src={imageUrl}
+      <OptimizedImage
+        image={data.images[0]}
         alt="Background"
-        fill
-        sizes="100vw"
-        quality={90}
-        className="object-cover z-0"
-        style={{ objectPosition: getObjectPosition(data.images[0]) }}
+        size="xlarge"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        objectPosition={getObjectPosition(data.images[0])}
         priority
       />
 
@@ -134,11 +131,11 @@ const HeroBanner9: FC<BannerProps> = ({ data, locale, className }) => {
         <div className="relative w-[320px] h-[320px] transform -rotate-45 origin-bottom-left
                       rounded-[80px] shadow-2xl overflow-hidden flex-shrink-0">
             {/* ⬅️ 图片本身：应用 rotate-45 抵消外部容器的旋转，使其保持正直 */}
-            <Image
-                src={data.images[1]?.url || "/placeholder.jpg"}
+            <OptimizedImage
+                image={data.images[1]}
                 alt="Product Focus"
-                fill
-                className="object-cover transform rotate-45 scale-[1.4]" // 旋转45度抵消，并略微放大以覆盖边缘
+                size="large"
+                className="absolute inset-0 w-full h-full object-cover transform rotate-45 scale-[1.4]"
             />
               {/* 底部遮挡：由于 origin-bottom-left，图片上半部分会被外部 div 裁剪，符合需求 */}
         </div>

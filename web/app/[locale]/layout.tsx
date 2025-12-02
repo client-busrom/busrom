@@ -1,76 +1,78 @@
 import type React from "react";
 import { Suspense } from "react";
-import { Anaheim, Bebas_Neue, Inter, Montserrat, Oswald, Pavanam, Paytone_One, Phudu, Poller_One } from "next/font/google";
+import localFont from "next/font/local";
 import "../globals.css";
-// 注意：你这里使用了 dir, 可能是为 next-intl 准备的，但你的 page.tsx 没用，我们暂时保持原样
 import ScrollToTop from "@/components/ScrollToTop";
 import ScrollToTopOnRouteChange from "@/components/ScrollToTopOnRouteChange";
 import { isValidLocale, defaultLocale } from "@/i18n.config";
 import Header from "@/components/layout/header";
 import ConditionalFooter from "@/components/layout/conditional-footer";
-// 👈 导入我们新创建的 Wrapper
 import { ClientLayoutWrapper } from "@/components/ClientLayoutWrapper";
 import { LenisProvider } from "@/components/lenis-provider";
 
-// --- 配置所有 Google Fonts ---
-const paytoneOne = Paytone_One({
+// --- 配置所有本地字体 ---
+const paytoneOne = localFont({
+  src: "../../public/fonts/PaytoneOne-Regular.ttf",
   weight: "400",
-  subsets: ["latin"],
   variable: "--font-paytone-one",
   display: "swap",
 });
 
-const pollerOne = Poller_One({
+const pollerOne = localFont({
+  src: "../../public/fonts/PollerOne-Regular.ttf",
   weight: "400",
-  subsets: ["latin"],
   variable: "--font-poller-one",
   display: "swap",
 });
 
-const pavanam = Pavanam({
+const pavanam = localFont({
+  src: "../../public/fonts/Pavanam-Regular.ttf",
   weight: "400",
-  subsets: ["latin"],
   variable: "--font-pavanam",
   display: "swap",
 });
 
-const phudu = Phudu({
-  weight: "600",
-  subsets: ["latin"],
+const phudu = localFont({
+  src: "../../public/fonts/Phudu-VariableFont_wght.ttf",
+  weight: "100 900",
   variable: "--font-phudu",
   display: "swap",
 });
 
-const anaheim = Anaheim({
-  // [核心] 加载 Anaheim 需要的所有字重
-  weight: ["400", "500", "600", "700", "800"],
-  subsets: ["latin"],
+const anaheim = localFont({
+  src: "../../public/fonts/Anaheim-VariableFont_wght.ttf",
+  weight: "100 900",
   variable: "--font-anaheim",
   display: "swap",
 });
 
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+const montserrat = localFont({
+  src: "../../public/fonts/Montserrat-VariableFont_wght.ttf",
+  weight: "100 900",
   variable: "--font-montserrat",
   display: "swap",
 });
 
-const bebasNeue = Bebas_Neue({
+const bebasNeue = localFont({
+  src: "../../public/fonts/BebasNeue-Regular.ttf",
   weight: "400",
-  subsets: ["latin"],
   variable: "--font-bebas-neue",
   display: "swap",
 });
 
-const oswald = Oswald({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const oswald = localFont({
+  src: "../../public/fonts/Oswald-VariableFont_wght.ttf",
+  weight: "100 900",
   variable: "--font-oswald",
   display: "swap",
 });
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = localFont({
+  src: "../../public/fonts/Inter-VariableFont.ttf",
+  weight: "100 900",
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export function generateStaticParams() {
   return [{ locale: "en" }, { locale: "zh" }, { locale: "es" }, { locale: "fr" }, { locale: "de" }];
@@ -98,14 +100,15 @@ export default async function RootLayout({
       ${montserrat.variable}
       ${bebasNeue.variable}
       ${oswald.variable}
+      ${inter.variable}
       font-sans
     `}
     >
-      <body className={inter.className}>
+      <body className={`${inter.className} overflow-x-hidden`}>
         {/* 👇 使用 ClientLayoutWrapper 包裹你的所有内容 */}
         <ClientLayoutWrapper>
           <LenisProvider easingKey={"easeOutQuad"} />
-          <div className="flex flex-col min-h-screen">
+          <div className="flex flex-col min-h-screen overflow-x-hidden">
             <Header locale={validLocale} />
             {children}
             <Suspense fallback={null}>
