@@ -163,7 +163,7 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/amd64
           build-args: |
-            NEXT_PUBLIC_API_URL=${{ needs.setup.outputs.environment == 'production' && secrets.NEXT_PUBLIC_API_URL_PRODUCTION || secrets.NEXT_PUBLIC_API_URL_STAGING }}
+            NEXT_PUBLIC_CMS_URL=${{ needs.setup.outputs.environment == 'production' && secrets.NEXT_PUBLIC_CMS_URL_PRODUCTION || secrets.NEXT_PUBLIC_CMS_URL_STAGING }}
 
       - name: Verify image push
         run: |
