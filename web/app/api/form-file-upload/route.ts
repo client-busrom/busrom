@@ -193,7 +193,8 @@ export async function POST(request: NextRequest) {
     console.log(`📎 Uploading file: ${file.name} (${file.size} bytes) for field: ${fieldName}`)
 
     // 4. Fetch form configuration to get file upload limits
-    const cmsUrl = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3000'
+    const cmsUrl = process.env.CMS_URL ||
+      (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : 'http://localhost:3000')
     const formConfigResponse = await fetch(`${cmsUrl}/api/graphql`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -339,7 +340,8 @@ export async function POST(request: NextRequest) {
 
     // 11. Record upload in TempFileUpload table (for orphan file cleanup)
     try {
-      const cmsUrl = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3000'
+      const cmsUrl = process.env.CMS_URL ||
+        (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : 'http://localhost:3000')
       await fetch(`${cmsUrl}/api/graphql`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
