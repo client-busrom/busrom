@@ -8,7 +8,10 @@
 import type { HomeContent } from '@/lib/content-data'
 import { convertToCDNUrl } from '@/lib/cdn-url'
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3000'
+// Use runtime environment variable for server-side API calls
+// CMS_URL is set in ECS task definition, falls back to CMS_GRAPHQL_URL base, then localhost
+const CMS_URL = process.env.CMS_URL ||
+  (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : 'http://localhost:3000')
 
 // Helper function to convert Media URL to CDN URL
 function getMediaUrl(fileUrl: string | null | undefined): string {

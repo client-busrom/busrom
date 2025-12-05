@@ -142,7 +142,8 @@ export async function POST(request: NextRequest) {
     // 标记上传的文件为已使用
     if (Array.isArray(attachments) && attachments.length > 0) {
       try {
-        const cmsUrl = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3000'
+        const cmsUrl = process.env.CMS_URL ||
+          (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : 'http://localhost:3000')
         for (const attachment of attachments) {
           // Find and update temp file upload record
           await fetch(`${cmsUrl}/api/graphql`, {
