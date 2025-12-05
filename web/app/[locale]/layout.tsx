@@ -19,29 +19,29 @@ const paytoneOne = localFont({
 });
 
 const pollerOne = localFont({
-  src: "../../public/fonts/PollerOne-Regular.ttf",
+  src: "../../public/fonts/PollerOne-Regular.woff2",
   weight: "400",
   variable: "--font-poller-one",
   display: "swap",
 });
 
 const pavanam = localFont({
-  src: "../../public/fonts/Pavanam-Regular.ttf",
+  src: "../../public/fonts/Pavanam-Regular.woff2",
   weight: "400",
   variable: "--font-pavanam",
   display: "swap",
 });
 
 const phudu = localFont({
-  src: "../../public/fonts/Phudu-VariableFont_wght.ttf",
-  weight: "100 900",
+  src: "../../public/fonts/Phudu-Variable.woff2",
+  weight: "400 900",
   variable: "--font-phudu",
   display: "swap",
 });
 
 const anaheim = localFont({
-  src: "../../public/fonts/Anaheim-VariableFont_wght.ttf",
-  weight: "100 900",
+  src: "../../public/fonts/Anaheim-Variable.woff2",
+  weight: "400 800",
   variable: "--font-anaheim",
   display: "swap",
 });
@@ -54,7 +54,7 @@ const montserrat = localFont({
 });
 
 const bebasNeue = localFont({
-  src: "../../public/fonts/BebasNeue-Regular.ttf",
+  src: "../../public/fonts/BebasNeue-Regular.woff2",
   weight: "400",
   variable: "--font-bebas-neue",
   display: "swap",
