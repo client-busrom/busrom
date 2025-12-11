@@ -110,8 +110,12 @@ export const Permission = list({
         { label: 'CustomScript (自定义脚本)', value: 'CustomScript' },
         { label: 'SeoSetting (SEO设置)', value: 'SeoSetting' },
 
-        // Site Config
-        { label: 'SiteConfig (站点配置)', value: 'SiteConfig' },
+        // Site Config (拆分后)
+        { label: 'SiteConfig (站点基础配置)', value: 'SiteConfig' },
+        { label: 'ContactConfig (联系信息配置)', value: 'ContactConfig' },
+        { label: 'SocialConfig (社交媒体配置)', value: 'SocialConfig' },
+        { label: 'EmailConfig (邮件服务配置)', value: 'EmailConfig' },
+        { label: 'SeoConfig (SEO配置)', value: 'SeoConfig' },
       ],
       validation: { isRequired: true },
       label: 'Resource | 资源类型',
