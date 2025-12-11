@@ -526,7 +526,8 @@ Busrom 团队`
       query: () => true, // Frontend needs to read configuration
       create: ({ session }) => !!session,
       update: ({ session }) => !!session,
-      delete: () => false, // Prevent deletion of singleton config
+      // Allow super admin to delete (for resetting/migrating config)
+      delete: ({ session }) => session?.data?.isAdmin === true,
     },
   },
 
