@@ -10,16 +10,16 @@
  * - nodemailer: Email sending
  *
  * Configuration:
- * - SMTP settings are fetched from SiteConfig in CMS
+ * - SMTP settings are fetched from EmailConfig in CMS (previously SiteConfig)
  */
 
 import nodemailer from 'nodemailer'
 import type { Transporter } from 'nodemailer'
 
 /**
- * Site Config Interface (subset)
+ * Email Config Interface (from EmailConfig model)
  */
-interface SiteConfig {
+interface EmailConfigData {
   smtpHost?: string | null
   smtpPort?: string | null
   smtpUser?: string | null
@@ -30,6 +30,9 @@ interface SiteConfig {
   enableAutoReply?: boolean | null
   autoReplyTemplate?: any // JSON object with { en, zh } or string
 }
+
+// Keep old interface name for backward compatibility in function parameters
+type SiteConfig = EmailConfigData
 
 /**
  * Helper function to extract text from multilingual field
@@ -84,17 +87,18 @@ export interface FormSubmissionData {
 }
 
 /**
- * Fetch Site Config from Database
+ * Fetch Email Config from Database (from new EmailConfig model)
  */
 async function getSiteConfig(context: any): Promise<SiteConfig | null> {
   try {
-    const siteConfig = await context.db.SiteConfig.findMany({
+    // Use new EmailConfig model instead of SiteConfig
+    const emailConfig = await context.db.EmailConfig.findMany({
       take: 1,
     })
 
-    return siteConfig[0] || null
+    return emailConfig[0] || null
   } catch (error) {
-    console.error('Error fetching site config:', error)
+    console.error('Error fetching email config:', error)
     return null
   }
 }

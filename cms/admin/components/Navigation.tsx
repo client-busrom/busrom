@@ -290,10 +290,10 @@ export function CustomNavigation({ lists, authenticatedItem }: NavigationProps) 
         </CollapsibleGroup>
       )}
 
-      {/* Site Configuration */}
-      {hasVisibleLists(["SiteConfig"]) && (
+      {/* Site Configuration - Split into multiple configs */}
+      {hasVisibleLists(["SiteConfig", "ContactConfig", "SocialConfig", "EmailConfig", "SeoConfig"]) && (
         <CollapsibleGroup title="站点配置">
-          <ListNavItems lists={lists} include={["SiteConfig"]} />
+          <ListNavItems lists={lists} include={["SiteConfig", "ContactConfig", "SocialConfig", "EmailConfig", "SeoConfig"]} />
         </CollapsibleGroup>
       )}
       </CustomNavigationContainer>

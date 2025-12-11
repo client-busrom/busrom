@@ -29,6 +29,10 @@ import { TempFileUpload } from './schemas/TempFileUpload'
 import { CustomScript } from './schemas/CustomScript'
 import { SeoSetting } from './schemas/SeoSetting'
 import { SiteConfig } from './schemas/SiteConfig'
+import { ContactConfig } from './schemas/ContactConfig'
+import { SocialConfig } from './schemas/SocialConfig'
+import { EmailConfig } from './schemas/EmailConfig'
+import { SeoConfig } from './schemas/SeoConfig'
 import { NavigationMenu } from './schemas/NavigationMenu'
 import { HomeContent } from './schemas/HomeContent'
 import { Footer } from './schemas/Footer'
@@ -102,8 +106,12 @@ export const lists = {
   Permission,
   ActivityLog,
 
-  // Site Configuration
-  SiteConfig,
+  // Site Configuration (拆分为多个配置)
+  SiteConfig,        // 基础配置：公司信息、安全设置
+  ContactConfig,     // 联系信息配置
+  SocialConfig,      // 社交媒体配置
+  EmailConfig,       // 邮件服务配置
+  SeoConfig,         // SEO和搜索引擎配置
   NavigationMenu,
 
   // Pages (统一页面管理)
