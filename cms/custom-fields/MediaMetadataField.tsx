@@ -23,14 +23,16 @@ import { controller } from '@keystone-6/core/fields/types/json/views'
  * For organizing media files:
  * - group: Scene group number (场景分组编号)
  * - sceneNumber: Scene number within the group (场景编号)
- * - imageNumber: Image number for white background series (图片编号/白底图系列编号)
+ * - seriesNumber: Series number for white background images (白底图系列编号)
+ * - imageNumber: Image number (图片编号)
  * - specs: Technical specifications (e.g., "12x25mm", "不锈钢")
  * - notes: Additional notes
  */
 interface MediaMetadata {
   group?: number          // 场景分组编号
   sceneNumber?: number    // 场景编号
-  imageNumber?: number    // 图片编号 (白底图系列编号)
+  seriesNumber?: number   // 白底图系列编号
+  imageNumber?: number    // 图片编号
   specs?: string[]        // 规格信息
   notes?: string          // 备注
 }
@@ -84,7 +86,23 @@ export const Field = ({ field, value, onChange, autoFocus }: FieldProps<typeof c
             placeholder="例如: 1, 2, 3, 4, 5..."
           />
           <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-            这是该分组中的第几个场景?
+            这是该分组中的第几个场景? (用于场景图)
+          </div>
+        </div>
+
+        {/* Series Number */}
+        <div>
+          <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
+            系列编号 (Series Number)
+          </label>
+          <TextInput
+            type="number"
+            value={metadata.seriesNumber?.toString() || ''}
+            onChange={(e) => updateMetadata({ seriesNumber: e.target.value ? parseInt(e.target.value) : undefined })}
+            placeholder="例如: 1, 2, 3..."
+          />
+          <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+            白底产品图的系列编号 (s-X)
           </div>
         </div>
 
@@ -100,7 +118,7 @@ export const Field = ({ field, value, onChange, autoFocus }: FieldProps<typeof c
             placeholder="例如: 1, 2, 3..."
           />
           <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-            白底图系列编号 (用于白底产品图)
+            同一组图片中的序号
           </div>
         </div>
 
@@ -180,9 +198,10 @@ export const Cell = ({ item, field }: any) => {
   const metadata = value as MediaMetadata
   const parts: string[] = []
 
-  // Build display: Group → Scene → Image
+  // Build display
   if (metadata.group) parts.push(`分组${metadata.group}`)
   if (metadata.sceneNumber) parts.push(`场景${metadata.sceneNumber}`)
+  if (metadata.seriesNumber) parts.push(`系列${metadata.seriesNumber}`)
   if (metadata.imageNumber) parts.push(`图片${metadata.imageNumber}`)
 
   if (parts.length === 0) {
