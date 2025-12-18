@@ -7,17 +7,16 @@
 
 # ============ Stage 1: Dependencies ============
 FROM node:20-slim AS deps
-WORKDIR /app
+WORKDIR /app/payload-cms
 
 # Install production dependencies
-COPY package*.json ./
-COPY payload-cms/package*.json ./payload-cms/
+COPY payload-cms/package*.json ./
 
-RUN npm ci --omit=dev --workspace=payload-cms
+RUN npm ci --omit=dev
 
 # ============ Stage 2: Builder ============
 FROM node:20-slim AS builder
-WORKDIR /app
+WORKDIR /app/payload-cms
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -25,19 +24,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy package files
-COPY package*.json ./
-COPY payload-cms/package*.json ./payload-cms/
+COPY payload-cms/package*.json ./
 
 # Install ALL dependencies (including dev dependencies)
-RUN npm ci --workspace=payload-cms
+RUN npm ci
 
 # Copy source code
-COPY tsconfig.json ./
-COPY payload-cms/ ./payload-cms/
-COPY scripts/ ./scripts/
+COPY payload-cms/ ./
 
 # Build Payload CMS (Next.js build)
-WORKDIR /app/payload-cms
 RUN npm run build
 
 # ============ Stage 3: Runner ============
@@ -59,17 +54,14 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 payloaduser
 
 # Copy built application
-COPY --from=builder --chown=payloaduser:nodejs /app/package*.json ./
 COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/.next ./payload-cms/.next
 COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/public ./payload-cms/public
 COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/package.json ./payload-cms/
 COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/next.config.mjs ./payload-cms/
 COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/payload.config.ts ./payload-cms/
 COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/src ./payload-cms/src
-COPY --from=builder --chown=payloaduser:nodejs /app/scripts ./scripts
 
 # Copy production node_modules
-COPY --from=deps --chown=payloaduser:nodejs /app/node_modules ./node_modules
 COPY --from=deps --chown=payloaduser:nodejs /app/payload-cms/node_modules ./payload-cms/node_modules
 
 # Copy startup script
