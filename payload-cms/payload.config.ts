@@ -263,8 +263,9 @@ export default buildConfig({
         },
       }),
     },
-    // Push schema to database - enabled in dev or when PAYLOAD_DB_PUSH=true
-    push: process.env.NODE_ENV !== 'production' || process.env.PAYLOAD_DB_PUSH === 'true',
+    // Push schema to database - always enabled for initial deployment
+    // TODO: Set to false after tables are created in production
+    push: true,
   }),
 
   // ==================================================================
