@@ -1,10 +1,11 @@
 // components/HeroBanner/HeroBanner8.tsx
 import type { FC } from "react";
-import Image from "next/image";
 import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
-import { cn, getObjectPosition } from "@/lib/utils";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+
+// --- 响应式尺寸函数 ---
+const rpxHero = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
 
 // --- BannerProps Definition ---
 type BannerData = HomeContent["heroBanner"][number];
@@ -13,62 +14,445 @@ type BannerProps = {
   locale: Locale;
 };
 
-// --- HeroBanner8 Component ---
-const HeroBanner8: FC<BannerProps> = ({ data, locale }) => {
-  const svgUrl: string = "/HeroBanner8.svg";
+// --- 桌面端配置 (基于 Figma 设计稿 1920x1080) ---
+const DESKTOP_CONFIG = {
+  // 背景色
+  backgroundColor: '#544F22',
 
-  // --- Split Feature[0] ---
+  // SVG 遮罩图片配置 (黑色区域用于填充 data.images[0])
+  // SVG viewBox 1920x1080，黑色路径从 x≈865 到右边缘
+  maskImage: {
+    // 用宽高比来计算，这样不受地址栏影响
+    aspectRatio: 1055 / 1080,  // 遮罩可见区域宽高比
+    svgAspectRatio: 1920 / 1080,  // 完整 SVG 宽高比
+  },
+
+  // 左侧内容区域
+  leftContent: {
+    left: '6%',            // 左边距（百分比）
+    top: 120,              // 顶部距离
+  },
+
+  // 标题配置
+  title: {
+    fontSize: 100,         // 字体大小 - xl及以上
+    fontSizeSmall: 72,     // 字体大小 - lg到xl
+    lineHeight: 1.1,
+  },
+
+  // Feature 胶囊配置 [2,3,4]
+  featureCards: {
+    bottom: 100,           // 底部距离（固定像素）
+    width: 500,            // 卡片宽度（固定像素） - xl及以上
+    widthSmall: 340,       // 卡片宽度（固定像素） - lg到xl
+    height: 80,            // 卡片高度（固定像素）
+    heightSmall: 56,       // 卡片高度 - lg到xl
+    gap: 20,               // 卡片间距（固定像素）
+    gapSmall: 12,          // 卡片间距 - lg到xl
+    fontSize: 36,          // 字体大小（固定像素）
+    fontSizeSmall: 24,     // 字体大小 - lg到xl
+    borderRadius: 16,      // 圆角
+    borderWidth: 2,
+  },
+
+  // 右上角 Feature[1] 胶囊
+  feature1: {
+    top: 120,              // 顶部距离
+    paddingX: 48,          // 水平内边距
+    paddingY: 24,          // 垂直内边距
+    fontSize: 48,          // 字体大小
+    borderRadius: 100,     // 左侧圆角 (rounded-l-full)
+  },
+
+  // 底部三张图片
+  bottomImages: {
+    bottom: 100,           // 底部距离
+    right: 80,             // 右边距
+    gap: 24,               // 图片间距
+    width: 280,            // 单张图片宽度
+    height: 220,           // 单张图片高度
+    borderRadius: 34,      // 圆角
+    borderWidth: 6,        // 边框宽度
+  },
+};
+
+// --- 移动端配置 ---
+const MOBILE_CONFIG = {
+  // 顶部内容区域
+  topPadding: 120,
+
+  // 标题
+  title: {
+    fontSize: 'text-4xl',
+  },
+
+  // Feature 胶囊
+  featureCards: {
+    marginTop: 24,
+    fontSize: 'text-lg',
+  },
+
+  // Feature[1] 右上角
+  feature1: {
+    top: 60,
+    fontSize: 'text-xl',
+  },
+
+  // 底部图片
+  bottomImages: {
+    height: 140,
+    borderRadius: 20,
+    borderWidth: 3,
+    gap: 8,
+  },
+};
+
+// --- HeroBanner8 Component ---
+const HeroBanner8: FC<BannerProps> = ({ data }) => {
+  // --- Split Feature[0] (支持换行: \n, \\n, /n) ---
   const feature0Text = data.features[0] || "";
-  const words = feature0Text.split("\n");
+  const feature0Lines = feature0Text.split(/\n|\\n|\/n/);
 
   return (
-    <section className="relative w-full h-full overflow-hidden font-sans">
-      {/* Layer 1: Background Image (z-0) */}
-      <OptimizedImage
-        image={data.images[0]}
-        alt="Background"
-        size="xlarge"
-        className="absolute inset-0 w-full h-full object-cover z-0"
-        objectPosition={getObjectPosition(data.images[0])}
-        priority
+    <section
+      className="relative w-full h-full overflow-hidden font-sans"
+      style={{ backgroundColor: DESKTOP_CONFIG.backgroundColor }}
+    >
+      {/* Layer 1: 背景图片 (data.images[0]) - 桌面端 */}
+      {/* 图片容器只覆盖遮罩可见区域，这样图片中心在遮罩中心 */}
+      <div
+        className="hidden md:block absolute right-0 top-0 h-full z-0"
+        style={{
+          // 宽度 = 高度 × 遮罩区域宽高比 (1055/1080)
+          aspectRatio: DESKTOP_CONFIG.maskImage.aspectRatio,
+          maskImage: 'url(/hero-banner-8-mask.svg)',
+          WebkitMaskImage: 'url(/hero-banner-8-mask.svg)',
+          // 遮罩大小：SVG 原始比例 (1920/1080)，高度 100%
+          maskSize: `${100 * (1920 / 1055)}% 100%`,
+          WebkitMaskSize: `${100 * (1920 / 1055)}% 100%`,
+          // 遮罩右对齐，让黑色区域和容器对齐
+          maskPosition: 'right center',
+          WebkitMaskPosition: 'right center',
+          maskRepeat: 'no-repeat',
+          WebkitMaskRepeat: 'no-repeat',
+        }}
+      >
+        <OptimizedImage
+          image={data.images[0]}
+          alt="Background"
+          size="xlarge"
+          className="w-full h-full object-cover"
+          priority
+        />
+      </div>
+
+      {/* Layer 1.5: SVG 装饰层（白边 + 装饰元素）- 桌面端 */}
+      <div
+        className="hidden md:block absolute inset-0 z-10 pointer-events-none"
+        style={{
+          backgroundImage: 'url(/hero-banner-8-1.svg?v=2)',
+          backgroundSize: 'auto 100%',
+          backgroundPosition: 'right center',
+          backgroundRepeat: 'no-repeat',
+        }}
       />
 
-      {/* Layer 2: SVG Mask (z-10) */}
-      <Image
-        src={svgUrl}
-        alt="Mask"
-        fill
-        sizes="100vw"
-        className="object-cover z-10 pointer-events-none"
-        style={{ objectPosition: getObjectPosition(data.images[0]) }}
-      />
-
-      <div className="absolute top-16 md-24 lg:top-36 right-0 z-20"> {/* 控制垂直位置 */}
-        <div className="bg-[#665F1F] text-[#FEFFD8] rounded-l-full px-6 py-3 md:py-6 w-full text-right"> {/* 限制最大宽度 */}
-          <p className="text-2xl md:text-4xl font-paytone-one font-regular">
+      {/* Layer 2: 右上角 Feature[1] 胶囊 - 桌面端 */}
+      <div
+        className="hidden md:block absolute right-0 z-20"
+        style={{ top: rpxHero(DESKTOP_CONFIG.feature1.top) }}
+      >
+        <div
+          className="bg-[#665F1F] text-[#FEFFD8]"
+          style={{
+            paddingLeft: rpxHero(DESKTOP_CONFIG.feature1.paddingX),
+            paddingRight: rpxHero(DESKTOP_CONFIG.feature1.paddingX),
+            paddingTop: rpxHero(DESKTOP_CONFIG.feature1.paddingY),
+            paddingBottom: rpxHero(DESKTOP_CONFIG.feature1.paddingY),
+            borderTopLeftRadius: rpxHero(DESKTOP_CONFIG.feature1.borderRadius),
+            borderBottomLeftRadius: rpxHero(DESKTOP_CONFIG.feature1.borderRadius),
+            fontSize: rpxHero(DESKTOP_CONFIG.feature1.fontSize),
+          }}
+        >
+          <p className="font-paytone-one font-regular">
             {data.features[1]}
           </p>
         </div>
       </div>
 
-      {/* Layer 3: Content Grid (z-20) */}
-      <div className="relative z-20 grid grid-cols-1 md:grid-cols-[40%_60%] h-full w-full items-stretch px-8 md:px-16 lg:px-24">
+      {/* Layer 3: 标题 - md到lg 用 rpxHero 缩放 */}
+      <div
+        className="hidden md:block lg:hidden absolute z-20"
+        style={{
+          left: DESKTOP_CONFIG.leftContent.left,
+          top: rpxHero(DESKTOP_CONFIG.leftContent.top),
+        }}
+      >
+        <h1
+          className="font-paytone-one font-regular leading-tight"
+          style={{
+            fontSize: rpxHero(DESKTOP_CONFIG.title.fontSize),
+            lineHeight: DESKTOP_CONFIG.title.lineHeight,
+          }}
+        >
+          {feature0Lines.map((line, index) => {
+            const isLastLine = feature0Lines.length > 1 && index === feature0Lines.length - 1;
+            return (
+              <div
+                key={index}
+                className={isLastLine ? 'text-[#FDF6C2]' : 'text-black'}
+                style={{
+                  WebkitTextStroke: isLastLine ? '2px #000000' : '2px #FDF6C2',
+                }}
+              >
+                {line}
+              </div>
+            );
+          })}
+        </h1>
+      </div>
 
-        {/* --- Left Column (40%) --- */}
-        <div className="flex flex-col justify-center items-start h-full py-8 md:py-16">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-regular font-paytone-one leading-tight text-stroke-custom-light">
-              <div className="text-[#433E12]">{words[0]}</div>
-              <div className="text-white">{words[1]}</div>
+      {/* Layer 3: 标题 - lg到xl 缩小版固定像素 */}
+      <div
+        className="hidden lg:block xl:hidden absolute z-20"
+        style={{
+          left: DESKTOP_CONFIG.leftContent.left,
+          top: DESKTOP_CONFIG.leftContent.top,
+        }}
+      >
+        <h1
+          className="font-paytone-one font-regular leading-tight"
+          style={{
+            fontSize: DESKTOP_CONFIG.title.fontSizeSmall,
+            lineHeight: DESKTOP_CONFIG.title.lineHeight,
+          }}
+        >
+          {feature0Lines.map((line, index) => {
+            const isLastLine = feature0Lines.length > 1 && index === feature0Lines.length - 1;
+            return (
+              <div
+                key={index}
+                className={isLastLine ? 'text-[#FDF6C2]' : 'text-black'}
+                style={{
+                  WebkitTextStroke: isLastLine ? '2px #000000' : '2px #FDF6C2',
+                }}
+              >
+                {line}
+              </div>
+            );
+          })}
+        </h1>
+      </div>
+
+      {/* Layer 3: 标题 - xl及以上 固定像素 */}
+      <div
+        className="hidden xl:block absolute z-20"
+        style={{
+          left: DESKTOP_CONFIG.leftContent.left,
+          top: DESKTOP_CONFIG.leftContent.top,
+        }}
+      >
+        <h1
+          className="font-paytone-one font-regular leading-tight"
+          style={{
+            fontSize: DESKTOP_CONFIG.title.fontSize,
+            lineHeight: DESKTOP_CONFIG.title.lineHeight,
+          }}
+        >
+          {feature0Lines.map((line, index) => {
+            const isLastLine = feature0Lines.length > 1 && index === feature0Lines.length - 1;
+            return (
+              <div
+                key={index}
+                className={isLastLine ? 'text-[#FDF6C2]' : 'text-black'}
+                style={{
+                  WebkitTextStroke: isLastLine ? '2px #000000' : '2px #FDF6C2',
+                }}
+              >
+                {line}
+              </div>
+            );
+          })}
+        </h1>
+      </div>
+
+      {/* Layer 3.5: Feature 卡片 - md到lg 用 rpxHero 缩放 */}
+      <div
+        className="hidden md:flex lg:hidden absolute z-20 flex-col"
+        style={{
+          left: DESKTOP_CONFIG.leftContent.left,
+          bottom: rpxHero(DESKTOP_CONFIG.featureCards.bottom),
+          gap: rpxHero(DESKTOP_CONFIG.featureCards.gap),
+        }}
+      >
+        {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
+          <div
+            key={index}
+            className="bg-[#FFFB1B]/20 border border-[#CFBC37] flex items-center"
+            style={{
+              width: rpxHero(DESKTOP_CONFIG.featureCards.width),
+              height: rpxHero(DESKTOP_CONFIG.featureCards.height),
+              borderRadius: rpxHero(DESKTOP_CONFIG.featureCards.borderRadius),
+              borderWidth: rpxHero(DESKTOP_CONFIG.featureCards.borderWidth),
+              paddingLeft: rpxHero(24),
+              paddingRight: rpxHero(24),
+            }}
+          >
+            <p
+              className="font-phudu font-semibold text-[#CFBC37] text-stroke-custom-gold text-left"
+              style={{ fontSize: rpxHero(DESKTOP_CONFIG.featureCards.fontSize) }}
+            >
+              {feature}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Layer 3.5: Feature 卡片 - lg到xl 缩小版固定像素 */}
+      <div
+        className="hidden lg:flex xl:hidden absolute z-20 flex-col"
+        style={{
+          left: DESKTOP_CONFIG.leftContent.left,
+          bottom: DESKTOP_CONFIG.featureCards.bottom,
+          gap: DESKTOP_CONFIG.featureCards.gapSmall,
+        }}
+      >
+        {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
+          <div
+            key={index}
+            className="bg-[#FFFB1B]/20 border border-[#CFBC37] flex items-center"
+            style={{
+              width: DESKTOP_CONFIG.featureCards.widthSmall,
+              height: DESKTOP_CONFIG.featureCards.heightSmall,
+              borderRadius: DESKTOP_CONFIG.featureCards.borderRadius,
+              borderWidth: DESKTOP_CONFIG.featureCards.borderWidth,
+              paddingLeft: 16,
+              paddingRight: 16,
+            }}
+          >
+            <p
+              className="font-phudu font-semibold text-[#CFBC37] text-stroke-custom-gold text-left"
+              style={{ fontSize: DESKTOP_CONFIG.featureCards.fontSizeSmall }}
+            >
+              {feature}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Layer 3.5: Feature 卡片 - xl及以上 固定像素 */}
+      <div
+        className="hidden xl:flex absolute z-20 flex-col"
+        style={{
+          left: DESKTOP_CONFIG.leftContent.left,
+          bottom: DESKTOP_CONFIG.featureCards.bottom,
+          gap: DESKTOP_CONFIG.featureCards.gap,
+        }}
+      >
+        {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
+          <div
+            key={index}
+            className="bg-[#FFFB1B]/20 border border-[#CFBC37] flex items-center"
+            style={{
+              width: DESKTOP_CONFIG.featureCards.width,
+              height: DESKTOP_CONFIG.featureCards.height,
+              borderRadius: DESKTOP_CONFIG.featureCards.borderRadius,
+              borderWidth: DESKTOP_CONFIG.featureCards.borderWidth,
+              paddingLeft: 24,
+              paddingRight: 24,
+            }}
+          >
+            <p
+              className="font-phudu font-semibold text-[#CFBC37] text-stroke-custom-gold text-left"
+              style={{ fontSize: DESKTOP_CONFIG.featureCards.fontSize }}
+            >
+              {feature}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Layer 4: 底部三张图片 - 桌面端 */}
+      <div
+        className="hidden md:flex absolute z-20"
+        style={{
+          bottom: rpxHero(DESKTOP_CONFIG.bottomImages.bottom),
+          right: rpxHero(DESKTOP_CONFIG.bottomImages.right),
+          gap: rpxHero(DESKTOP_CONFIG.bottomImages.gap),
+        }}
+      >
+        {[data.images[1], data.images[2], data.images[3]].map((image, index) => (
+          <div
+            key={index}
+            className="relative overflow-hidden border-white"
+            style={{
+              width: rpxHero(DESKTOP_CONFIG.bottomImages.width),
+              height: rpxHero(DESKTOP_CONFIG.bottomImages.height),
+              borderRadius: rpxHero(DESKTOP_CONFIG.bottomImages.borderRadius),
+              borderWidth: rpxHero(DESKTOP_CONFIG.bottomImages.borderWidth),
+              borderStyle: 'solid',
+            }}
+          >
+            <OptimizedImage
+              image={image}
+              alt={`Feature image ${index + 1}`}
+              size="medium"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* ==================== 移动端布局 ==================== */}
+
+      {/* 移动端: 右上角 Feature[1] */}
+      <div
+        className="md:hidden absolute right-0 z-20"
+        style={{ top: MOBILE_CONFIG.feature1.top }}
+      >
+        <div className="bg-[#665F1F] text-[#FEFFD8] rounded-l-full px-6 py-3">
+          <p className={`${MOBILE_CONFIG.feature1.fontSize} font-paytone-one font-regular`}>
+            {data.features[1]}
+          </p>
+        </div>
+      </div>
+
+      {/* 移动端: 主内容区域 */}
+      <div className="md:hidden relative z-20 flex flex-col h-full px-6">
+        {/* 上部：标题 + Feature 卡片 */}
+        <div
+          className="flex flex-col justify-center"
+          style={{ paddingTop: MOBILE_CONFIG.topPadding }}
+        >
+          {/* 标题 */}
+          <h1 className={`${MOBILE_CONFIG.title.fontSize} font-paytone-one font-regular leading-tight`}>
+            {feature0Lines.map((line, index) => {
+              const isLastLine = feature0Lines.length > 1 && index === feature0Lines.length - 1;
+              return (
+                <div
+                  key={index}
+                  className={isLastLine ? 'text-[#FDF6C2]' : 'text-black'}
+                  style={{
+                    WebkitTextStroke: isLastLine ? '1.5px #000000' : '1.5px #FDF6C2',
+                  }}
+                >
+                  {line}
+                </div>
+              );
+            })}
           </h1>
 
-          {/* Bottom: Feature Stack [2,3,4] */}
-          <div className="space-y-3 w-full max-w-sm mt-8 md:mt-24">
+          {/* Feature 卡片 */}
+          <div
+            className="flex flex-col gap-3 w-full max-w-sm"
+            style={{ marginTop: MOBILE_CONFIG.featureCards.marginTop }}
+          >
             {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
               <div
                 key={index}
                 className="bg-[#FFFB1B]/20 border border-[#CFBC37] rounded-lg px-4 py-2"
               >
-                <p className="text-lg md:text-2xl font-phudu font-semibold text-[#CFBC37] text-stroke-custom-gold text-left">
+                <p className={`${MOBILE_CONFIG.featureCards.fontSize} font-phudu font-semibold text-[#CFBC37] text-stroke-custom-gold text-left`}>
                   {feature}
                 </p>
               </div>
@@ -76,28 +460,51 @@ const HeroBanner8: FC<BannerProps> = ({ data, locale }) => {
           </div>
         </div>
 
-        {/* --- Right Column (60%) --- */}
-         {/* (内部 padding 可能需要微调) */}
-        <div className="relative flex flex-col justify-between items-end h-full py-8 md:py-16">
+        {/* 下部：横图 + 三张小图 */}
+        <div className="flex-1 flex flex-col mt-6 gap-3 pb-4">
+          {/* 横向大图 16:9 */}
+          <div
+            className="relative w-full rounded-2xl overflow-hidden border-white"
+            style={{
+              aspectRatio: '16/9',
+              borderWidth: MOBILE_CONFIG.bottomImages.borderWidth,
+              borderStyle: 'solid',
+            }}
+          >
+            <OptimizedImage
+              image={data.images[0]}
+              alt="Background"
+              size="large"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </div>
 
-          {/* Bottom: Three Images */}
-          {/* (现在会更靠近右边缘) */}
-          <div className="absolute md:right-[-10%] bottom-[15%] flex gap-2 md:gap-4 w-full mt-8">
-            {/* Image 1 Wrapper */}
-            <div className="relative flex-1 w-64 h-56 rounded-[34px] border-[3px] lg:border-[6px] border-white overflow-hidden">
-              <OptimizedImage image={data.images[1]} alt="Feature image 1" size="medium" className="absolute inset-0 w-full h-full object-cover" />
-            </div>
-             {/* Image 2 Wrapper */}
-            <div className="relative flex-1 w-64 h-56 rounded-[34px] border-[3px] lg:border-[6px] border-white overflow-hidden">
-              <OptimizedImage image={data.images[2]} alt="Feature image 2" size="medium" className="absolute inset-0 w-full h-full object-cover" />
-            </div>
-             {/* Image 3 Wrapper */}
-            <div className="relative flex-1 w-64 h-56 rounded-[34px] border-[3px] lg:border-[6px] border-white overflow-hidden">
-              <OptimizedImage image={data.images[3]} alt="Feature image 3" size="medium" className="absolute inset-0 w-full h-full object-cover" />
-            </div>
+          {/* 底部三张图片 */}
+          <div
+            className="flex justify-center"
+            style={{ gap: MOBILE_CONFIG.bottomImages.gap }}
+          >
+            {[data.images[1], data.images[2], data.images[3]].map((image, index) => (
+              <div
+                key={index}
+                className="relative flex-1 overflow-hidden border-white"
+                style={{
+                  height: MOBILE_CONFIG.bottomImages.height,
+                  borderRadius: MOBILE_CONFIG.bottomImages.borderRadius,
+                  borderWidth: MOBILE_CONFIG.bottomImages.borderWidth,
+                  borderStyle: 'solid',
+                }}
+              >
+                <OptimizedImage
+                  image={image}
+                  alt={`Feature image ${index + 1}`}
+                  size="small"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </div>
+            ))}
           </div>
         </div>
-
       </div>
     </section>
   );

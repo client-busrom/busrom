@@ -132,9 +132,9 @@ export const TempFileUpload = list({
       initialColumns: ['fileName', 'status', 'fileSize', 'ipAddress', 'uploadedAt'],
       initialSort: { field: 'uploadedAt', direction: 'DESC' },
     },
-    label: 'Temp File Uploads',
-    singular: 'Temp File Upload',
-    plural: 'Temp File Uploads',
+    label: 'Temp File Uploads | 临时文件上传',
+    singular: 'Temp File Upload | 临时文件上传',
+    plural: 'Temp File Uploads | 临时文件上传',
     description: '临时文件上传记录 - 用于跟踪和清理未使用的文件',
   },
 

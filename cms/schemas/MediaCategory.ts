@@ -201,6 +201,9 @@ export const MediaCategory = list({
       initialSort: { field: 'order', direction: 'ASC' },
     },
     labelField: 'displayName',
-    description: 'Media category - Flat structure for image purpose classification',
+    label: 'Media Categories | 媒体分类',
+    singular: 'Media Category | 媒体分类',
+    plural: 'Media Categories | 媒体分类',
+    description: 'Media category - Flat structure for image purpose classification | 媒体分类 - 扁平结构的图片用途分类',
   },
 })

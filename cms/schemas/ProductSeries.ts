@@ -303,5 +303,8 @@ export const ProductSeries = list({
       initialSort: { field: "order", direction: "ASC" },
     },
     labelField: "slug",
+    label: 'Product Series | 产品系列',
+    singular: 'Product Series | 产品系列',
+    plural: 'Product Series | 产品系列',
   },
 });

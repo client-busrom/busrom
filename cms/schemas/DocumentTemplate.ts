@@ -175,7 +175,10 @@ export const DocumentTemplate = list({
       pageSize: 50,
     },
     labelField: 'name',
-    description: '📋 Document Templates - Pre-made content templates that can be inserted into documents',
+    label: 'Document Templates | 文档模板',
+    singular: 'Document Template | 文档模板',
+    plural: 'Document Templates | 文档模板',
+    description: 'Document Templates - Pre-made content templates that can be inserted into documents | 文档模板 - 可插入文档的预制内容模板',
   },
 
   access: publicReadAccess('DocumentTemplate'),

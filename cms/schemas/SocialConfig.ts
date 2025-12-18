@@ -143,8 +143,8 @@ export const SocialConfig = list({
   ui: {
     labelField: 'identifier',
     label: 'Social Config | 社交媒体配置',
-    singular: 'Social Config',
-    plural: 'Social Config',
+    singular: 'Social Config | 社交媒体配置',
+    plural: 'Social Config | 社交媒体配置',
     description: 'Social media links settings | 社交媒体链接设置',
   },
 })

@@ -178,5 +178,8 @@ export const WhyChooseBusrom = list({
   ui: {
     labelField: 'internalLabel',
     listView: { defaultFieldMode: 'read' },
+    label: 'Why Choose Busrom | 为什么选择Busrom',
+    singular: 'Why Choose Busrom | 为什么选择Busrom',
+    plural: 'Why Choose Busrom | 为什么选择Busrom',
   },
 });

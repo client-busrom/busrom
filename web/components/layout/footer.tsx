@@ -18,6 +18,7 @@ type Props = {
   showForm?: boolean; // true表示首页（显示表单），false表示其他页面（显示四列布局）
 };
 
+// Note: fontSize is applied via inline style below to use rpx()
 const formInputClasses = `
   mt-1 block w-full bg-transparent text-brand-form-input-text font-anaheim font-semibold
   placeholder:text-brand-text-inverse
@@ -30,6 +31,9 @@ const formButtonClasses = `
   text-brand-footer-button-text font-anaheim font-semibold
   hover:bg-brand-footer-button-bg/90 pt-2 pb-2 mt-8
 `;
+
+// Responsive px based on 1920px design width
+const rpx = (designValue: number) => `calc(var(--rpx) * ${designValue})`;
 // ---
 
 export default function Footer({ locale, showForm = true }: Props) {
@@ -57,37 +61,53 @@ export default function Footer({ locale, showForm = true }: Props) {
         {/* 卡片容器 (自定义底部距离) */}
         <div
           className="
-            relative z-10 bg-brand-secondary rounded-lg p-16 w-[80%]
-            mx-auto mb-16 mt-8
+            relative z-10 bg-brand-secondary
+            p-6 sm:p-8 md:p-12 lg:p-16
+            w-[92%] sm:w-[88%] md:w-[85%] lg:w-[80%]
+            mx-auto mb-8 md:mb-16 mt-8
           "
+          style={{
+            borderRadius: 'calc(var(--rpx) * 84)', // Figma: 84px cornerRadius
+          }}
         >
           {/* 使用 Flex 布局 + 垂直分隔线 */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
 
             {/* 左侧：占 55% */}
-            <div className="w-full md:w-[55%]">
+            <div className="w-full lg:w-[55%]">
               {/* Logo */}
-              <div className="mb-8">
+              <div className="mb-6 md:mb-8">
                 <Image
                   src="/Busrom2.svg"
                   alt="Busrom Logo"
                   width={150}
                   height={40}
-                  className="object-contain"
+                  className="object-contain w-[120px] md:w-[150px]"
                 />
               </div>
 
               {/* 联系信息 */}
-              <ul className="space-y-2 mb-8 font-anaheim font-medium text-brand-text-inverse">
+              <ul
+                className="space-y-2 mb-6 md:mb-8 font-anaheim font-medium text-brand-text-inverse"
+                style={{ fontSize: rpx(32), lineHeight: rpx(61) }} // Figma: 32px
+              >
                 <li>Email: {content.contact.email}</li>
                 <li>After-sales: {content.contact.afterSales}</li>
                 <li>WhatsApp: {content.contact.whatsapp}</li>
               </ul>
 
               {/* 官方声明 */}
-              <div className="w-[80%] bg-brand-footer-emphasis-bg text-brand-footer-emphasis-text font-anaheim font-semibold p-4 rounded-lg">
-                <h4 className="font-bold mb-2">{content.notice.title}</h4>
-                <div className="text-xs space-y-2">
+              <div className="w-full lg:w-[80%] bg-brand-footer-emphasis-bg text-brand-footer-emphasis-text font-anaheim font-semibold p-3 md:p-4 rounded-lg">
+                <h4
+                  className="font-bold mb-2"
+                  style={{ fontSize: rpx(28), lineHeight: rpx(49) }} // Figma: 28px
+                >
+                  {content.notice.title}
+                </h4>
+                <div
+                  className="space-y-1 md:space-y-2"
+                  style={{ fontSize: rpx(20), lineHeight: rpx(26) }} // Figma: 20px
+                >
                   {content.notice.lines.map((line, index) => (
                     <p key={index}>{line}</p>
                   ))}
@@ -95,14 +115,26 @@ export default function Footer({ locale, showForm = true }: Props) {
               </div>
             </div>
 
-            {/* 白色的垂直分隔线 */}
-            <div className="hidden md:block w-px bg-white/50 h-64"></div>
+            {/* 白色的垂直分隔线 - 仅桌面端显示 */}
+            <div className="hidden lg:block w-px bg-white/50 h-64"></div>
+
+            {/* 水平分隔线 - 仅移动端显示 */}
+            <div className="lg:hidden w-full h-px bg-white/30 my-6"></div>
 
             {/* 右侧：占 40% - 表单 */}
-            <div className="w-full md:w-2/5 px-4 md:mt-0 mt-8">
-              <h3 className="text-4xl font-bold mb-8 font-anaheim">{content.form.title}</h3>
+            <div className="w-full lg:w-2/5 lg:px-4">
+              <h3
+                className="font-bold font-anaheim text-white"
+                style={{
+                  fontSize: rpx(80), // Figma: 80px
+                  lineHeight: rpx(49), // Figma: 49px
+                  marginBottom: rpx(32),
+                }}
+              >
+                {content.form.title}
+              </h3>
 
-              <form className="space-y-4">
+              <form className="space-y-3 md:space-y-4">
                 {/* Name */}
                 <div>
                   <Input
@@ -110,6 +142,7 @@ export default function Footer({ locale, showForm = true }: Props) {
                     id="footer-name"
                     placeholder={content.form.placeholders.name}
                     className={formInputClasses}
+                    style={{ fontSize: rpx(32), lineHeight: rpx(46) }} // Figma: 32px
                   />
                 </div>
 
@@ -120,6 +153,7 @@ export default function Footer({ locale, showForm = true }: Props) {
                     id="footer-email"
                     placeholder={content.form.placeholders.email}
                     className={formInputClasses}
+                    style={{ fontSize: rpx(32), lineHeight: rpx(46) }} // Figma: 32px
                   />
                 </div>
 
@@ -129,12 +163,17 @@ export default function Footer({ locale, showForm = true }: Props) {
                     id="footer-message"
                     placeholder={content.form.placeholders.message}
                     className={cn(formInputClasses, "min-h-[40px]")}
+                    style={{ fontSize: rpx(32), lineHeight: rpx(46) }} // Figma: 32px
                   />
                 </div>
 
                 {/* Submit Button */}
-                <div className="mt-16">
-                  <Button type="submit" className={formButtonClasses}>
+                <div className="mt-6 md:mt-8 lg:mt-16">
+                  <Button
+                    type="submit"
+                    className={cn(formButtonClasses, "w-full sm:w-1/2 lg:w-1/3")}
+                    style={{ fontSize: rpx(32), lineHeight: rpx(46) }} // Figma: 32px
+                  >
                     {content.form.buttonText}
                   </Button>
                 </div>

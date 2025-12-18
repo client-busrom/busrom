@@ -1,10 +1,12 @@
 // components/HeroBanner/HeroBanner7.tsx
 import type { FC } from "react";
-import Image from "next/image";
 import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
-import { cn, getObjectPosition } from "@/lib/utils";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+
+// --- 响应式尺寸函数 ---
+// 使用 --rpx-hero 来适应实际视口高度
+const rpxHero = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
 
 // --- BannerProps Definition ---
 type BannerData = HomeContent["heroBanner"][number];
@@ -13,28 +15,290 @@ type BannerProps = {
   locale: Locale;
 };
 
+// --- 桌面端 Feature[1] 文字配置 (基于 Figma 设计稿 1920x1080) ---
+const DESKTOP_FEATURE1_CONFIG = {
+  left: 118,              // 左边距 (设计稿像素)
+  bottom: 220,             // 底部距离 (设计稿像素)
+  fontSize: 64,           // 字体大小 (设计稿像素)
+};
+
+// --- 桌面端右侧内容配置 (基于 Figma 设计稿 1920x1080) ---
+const DESKTOP_RIGHT_CONTENT_CONFIG = {
+  titleFontSize: 100,     // 标题字体大小 (设计稿像素)
+  right: 160,             // 右边距 (设计稿像素)
+  // Feature 胶囊配置
+  featureFontSize: 40,    // Feature 字体大小 (设计稿像素)
+  featureWidth: 455,      // 椭圆宽度 (设计稿像素)
+  featureHeight: 111,     // 椭圆高度 (设计稿像素)
+  featureOffsetLeft: 60,  // 胶囊左偏移 (与标题第二个字母对齐)
+};
+
+// --- 遮罩图片配置 (基于 Figma 设计稿 1920x1080) ---
+const MASK_IMAGE_CONFIG = {
+  // 遮罩容器位置和尺寸 (SVG viewBox: 0 0 865 1080)
+  width: 865,
+  height: 1080,
+  left: 0,
+  centerY: true,          // 垂直居中
+  // 图片在遮罩内的缩放和偏移
+  imageScale: 1.2,          // 图片缩放比例
+  imageOffsetX: -70,     // 图片水平偏移 (设计稿像素)
+  imageOffsetY: 0,        // 图片垂直偏移 (设计稿像素)
+  imagePositionX: 50,     // object-position X (%)
+  imagePositionY: 50,     // object-position Y (%)
+  useCMSFocalPoint: true, // 是否使用 CMS 的焦点
+};
+
+// --- 菱形图片配置 (基于 Figma 设计稿 1920x1080) ---
+// 顶部菱形 (data.images[1])
+const DIAMOND_TOP_CONFIG = {
+  // 位置 (设计稿像素)
+  left: 540,              // 左边距
+  centerY: true,          // 垂直居中
+  offsetY: -440,          // 居中后的垂直偏移 (设计稿像素，负值往上)
+  // 尺寸
+  size: 420,              // 菱形边长
+  // 边框
+  borderWidth: 11,        // 边框宽度
+  borderColor: '#756F3F', // 边框颜色
+  borderRadius: 97,       // 圆角大小
+  // 图片
+  imageScale: 1.42,        // 图片缩放比例
+  imageOffsetX: 0,        // 图片水平偏移 (设计稿像素)
+  imageOffsetY: 0,        // 图片垂直偏移 (设计稿像素)
+  imagePositionX: 50,     // object-position X (%)
+  imagePositionY: 50,     // object-position Y (%)
+  useCMSFocalPoint: true,
+  zIndex: 20,
+};
+
+// 中间菱形 (data.images[2])
+const DIAMOND_MIDDLE_CONFIG = {
+  // 位置 (设计稿像素)
+  left: 800,              // 左边距
+  centerY: true,          // 垂直居中
+  offsetY: -10,             // 居中后的垂直偏移 (设计稿像素)
+  // 尺寸
+  size: 288,              // 菱形边长
+  // 边框
+  borderWidth: 11,        // 边框宽度
+  borderColor: '#756F3F', // 边框颜色
+  borderRadius: 88,       // 圆角大小
+  // 图片
+  imageScale: 1.5,        // 图片缩放比例
+  imageOffsetX: 0,        // 图片水平偏移 (设计稿像素)
+  imageOffsetY: 0,        // 图片垂直偏移 (设计稿像素)
+  imagePositionX: 50,     // object-position X (%)
+  imagePositionY: 50,     // object-position Y (%)
+  useCMSFocalPoint: true,
+  zIndex: 20,
+};
+
+// 底部菱形 (data.images[3])
+const DIAMOND_BOTTOM_CONFIG = {
+  // 位置 (设计稿像素)
+  left: 550,              // 左边距
+  centerY: true,          // 垂直居中
+  offsetY: 440,           // 居中后的垂直偏移 (设计稿像素，正值往下)
+  // 尺寸
+  size: 420,              // 菱形边长
+  // 边框
+  borderWidth: 11,        // 边框宽度
+  borderColor: '#756F3F', // 边框颜色
+  borderRadius: 97,       // 圆角大小
+  // 图片
+  imageScale: 1.42,        // 图片缩放比例
+  imageOffsetX: 0,        // 图片水平偏移 (设计稿像素)
+  imageOffsetY: 0,        // 图片垂直偏移 (设计稿像素)
+  imagePositionX: 50,     // object-position X (%)
+  imagePositionY: 50,     // object-position Y (%)
+  useCMSFocalPoint: true,
+  zIndex: 20,
+};
+
+// --- 光柱配置 (4条斜向渐变光柱，45度旋转) ---
+// 基于 Figma 设计稿 1920x1080
+// 注意：Figma 的 -45 度在 CSS 中是 45 度（方向相反）
+const LIGHT_BEAMS = [
+  // Rectangle 181 - 最长最粗的光柱
+  {
+    left: 700,
+    top: -160,
+    width: 1538,
+    height: 192,
+    rotation: 45,
+    opacity: 0.44,
+    gradientFrom: 'rgba(255, 237, 91, 1)',      // #FFED5B
+    gradientTo: 'rgba(211, 205, 153, 0)',       // 透明
+    zIndex: 5,
+  },
+  // Rectangle 178 - 第二粗的光柱
+  {
+    left: 1050,
+    top: -170,
+    width: 942,
+    height: 192,
+    rotation: 45,
+    opacity: 0.44,
+    gradientFrom: 'rgba(255, 237, 91, 1)',
+    gradientTo: 'rgba(211, 205, 153, 0)',
+    zIndex: 5,
+  },
+  // Rectangle 179 - 细光柱
+  {
+    left: 1320,
+    top: -100,
+    width: 1040,
+    height: 72,
+    rotation: 45,
+    opacity: 0.44,
+    gradientFrom: 'rgba(255, 237, 91, 1)',
+    gradientTo: 'rgba(211, 205, 153, 0)',
+    zIndex: 5,
+  },
+  // Rectangle 180 - 细光柱
+  {
+    left: 1500,
+    top: -100,
+    width: 942,
+    height: 72,
+    rotation: 45,
+    opacity: 0.44,
+    gradientFrom: 'rgba(255, 237, 91, 1)',
+    gradientTo: 'rgba(211, 205, 153, 0)',
+    zIndex: 5,
+  },
+];
+
+// --- 移动端光柱配置 (从右上角斜向左下) ---
+const MOBILE_LIGHT_BEAMS = [
+  {
+    left: 20,              // 最长最粗的光柱
+    top: -80,
+    width: 500,
+    height: 50,
+    rotation: 45,
+    opacity: 0.44,
+    gradientFrom: 'rgba(255, 237, 91, 1)',
+    gradientTo: 'rgba(211, 205, 153, 0)',
+  },
+  {
+    left: 130,              // 第二粗的光柱
+    top: -60,
+    width: 350,
+    height: 50,
+    rotation: 45,
+    opacity: 0.44,
+    gradientFrom: 'rgba(255, 237, 91, 1)',
+    gradientTo: 'rgba(211, 205, 153, 0)',
+  },
+  {
+    left: 215,              // 细光柱
+    top: -30,
+    width: 400,
+    height: 20,
+    rotation: 45,
+    opacity: 0.44,
+    gradientFrom: 'rgba(255, 237, 91, 1)',
+    gradientTo: 'rgba(211, 205, 153, 0)',
+  },
+  {
+    left: 255,              // 细光柱
+    top: -40,
+    width: 250,
+    height: 20,
+    rotation: 45,
+    opacity: 0.44,
+    gradientFrom: 'rgba(255, 237, 91, 1)',
+    gradientTo: 'rgba(211, 205, 153, 0)',
+  },
+];
+
+// --- 移动端配置 (md以下) ---
+const MOBILE_CONFIG = {
+  // 顶部内容区域
+  topPadding: 340,          // 顶部留白 (px)
+
+  // SVG 遮罩图片
+  // 高度100%，宽度按比例自动，贴左下角，但内容从右侧对齐
+  svg: {
+    height: '100%',           // 高度100%
+    aspectRatio: 865 / 1080,  // SVG 宽高比
+    maskSize: '100% 100%',    // 遮罩撑满
+    maskPosition: 'left bottom',
+    imagePosition: 'right center',
+    imageScale: 1.2,          // 图片缩放比例
+  },
+
+  // 顶部菱形 (固定位置，不随缩放移动)
+  diamondTop: {
+    left: 310,              // 左边距 (px) - 固定
+    top: -50,               // 顶部距离 (px) - 固定
+    size: 240,              // 尺寸 (px) - 固定
+    borderWidth: 8,         // 边框宽度 (px)
+    borderRadius: 60,       // 圆角 (px)
+    imageScale: 1.4,        // 图片缩放
+  },
+
+  // 中间菱形 (百分比定位，随缩放移动)
+  diamondMiddle: {
+    left: '63%',            // 左边距 (%)
+    top: '49%',             // 顶部距离 (%) - 会居中
+    size: '32%',            // 尺寸 (%)
+    borderWidth: 6,         // 边框宽度 (px)
+    borderRadius: '25%',    // 圆角 (%)
+    imageScale: 1.5,        // 图片缩放
+  },
+
+  // 底部菱形 (固定位置，不随缩放移动)
+  diamondBottom: {
+    left: 320,              // 左边距 (px) - 固定
+    bottom: -50,            // 底部距离 (px) - 固定
+    size: 240,              // 尺寸 (px) - 固定
+    borderWidth: 6,         // 边框宽度 (px)
+    borderRadius: 60,       // 圆角 (px)
+    imageScale: 1.4,        // 图片缩放
+  },
+
+  // 底部文字
+  featureText: {
+    left: 32,               // 左边距 (px)
+    bottom: 220,             // 底部距离 (px)
+    fontSize: 'text-2xl',  // 字体大小 class
+  },
+};
+
+// --- 计算图片位置的辅助函数 ---
+const getImagePosition = (
+  config: { useCMSFocalPoint: boolean; imagePositionX: number; imagePositionY: number },
+  image?: BannerData['images'][number]
+) => {
+  if (config.useCMSFocalPoint && image?.cropFocalPoint) {
+    return `${image.cropFocalPoint.x}% ${image.cropFocalPoint.y}%`;
+  }
+  return `${config.imagePositionX}% ${config.imagePositionY}%`;
+};
+
 // --- HeroBanner7 Component ---
 const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
-  const svgUrl: string = "/HeroBanner7.svg";
+  // --- 计算各图片位置 ---
+  const maskImagePosition = getImagePosition(MASK_IMAGE_CONFIG, data.images[0]);
+  const diamondTopPosition = getImagePosition(DIAMOND_TOP_CONFIG, data.images[1]);
+  const diamondMiddlePosition = getImagePosition(DIAMOND_MIDDLE_CONFIG, data.images[2]);
+  const diamondBottomPosition = getImagePosition(DIAMOND_BOTTOM_CONFIG, data.images[3]);
 
-  // --- Split Feature[0] ---
+  // --- Split Feature[0] (支持换行: \n, \\n, /n，支持多行) ---
   const feature0Text = data.features[0] || "";
-  const words = feature0Text.split("\n");
-  const titleLine1 = words[0];
-  const titleLine2 = words[1];
+  const feature0Lines = feature0Text.split(/\n|\\n|\/n/);
 
-  // --- Common styles for rotated divs ---
-  // Responsive border and rounding from previous example
-  const rotatedDivBaseClasses = cn(
-    "absolute overflow-hidden z-20 rotate-45",
-    "border-[4px] md:border-[7px] lg:border-[10px] border-[#756F3F]",
-  );
-  // Responsive sizing (example, adjust as needed)
-  const rotatedDivSizeClasses = "w-80 h-80";
+  // --- Split Feature[1] (支持换行: \n, \\n, /n) ---
+  const feature1Text = data.features[1] || "";
+  const feature1Lines = feature1Text.split(/\n|\\n|\/n/);
+
   const ovalClipId = "ovalClipHero7"; // 唯一 ID
 
   return (
-    <section className="relative w-full h-full overflow-hidden font-sans">
+    <section className="relative w-full h-full overflow-hidden font-sans bg-[#99935f]">
       <svg width="0" height="0" style={{ position: 'absolute' }}>
         <defs>
           {/* 【新增】椭圆 clipPath */}
@@ -45,95 +309,413 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           </clipPath>
         </defs>
       </svg>
-      {/* Layer 1: Background Image (z-0) */}
-      <OptimizedImage
-        image={data.images[0]}
-        alt="Background"
-        size="xlarge"
-        className="absolute inset-0 w-full h-full object-cover z-0"
-        objectPosition={getObjectPosition(data.images[0])}
-        priority
-      />
-      {/* Layer 2: SVG Mask (z-10) */}
-      <Image
-        src={svgUrl}
-        alt="Mask"
-        fill
-        sizes="100vw"
-        className="object-cover z-10 pointer-events-none"
-        style={{ objectPosition: getObjectPosition(data.images[0]) }}
-      />
+      {/* Layer 0.5: Light Beams (光柱，在背景之上，图片文字之下) - 桌面端 */}
+      {LIGHT_BEAMS.map((beam, index) => (
+        <div
+          key={`light-beam-${index}`}
+          className="hidden md:block absolute pointer-events-none"
+          style={{
+            left: rpxHero(beam.left),
+            top: rpxHero(beam.top),
+            transform: `rotate(${beam.rotation}deg)`,
+            transformOrigin: 'left center',
+            width: rpxHero(beam.width),
+            height: rpxHero(beam.height),
+            opacity: beam.opacity,
+            background: `linear-gradient(to right, ${beam.gradientFrom}, ${beam.gradientTo})`,
+            zIndex: beam.zIndex,
+          }}
+        />
+      ))}
 
-      {/* Layer 3: Rotated Image Divs (z-20) */}
-      {/* Top Rotated Div */}
+      {/* Layer 1: Background Image with mask (z-0) - 桌面端 */}
       <div
-        className={cn(
-          rotatedDivBaseClasses,
-          rotatedDivSizeClasses,
-          "rounded-[60px] top-[-8%] left-[38%] transform -translate-x-1/2"
-        )}
+        className="hidden md:block absolute z-0"
+        style={{
+          width: rpxHero(MASK_IMAGE_CONFIG.width),
+          height: rpxHero(MASK_IMAGE_CONFIG.height),
+          left: rpxHero(MASK_IMAGE_CONFIG.left),
+          top: '50%',
+          transform: 'translateY(-50%)',
+          maskImage: 'url(/hero-banner-7-1.svg)',
+          WebkitMaskImage: 'url(/hero-banner-7-1.svg)',
+          maskSize: '100% 100%',
+          WebkitMaskSize: '100% 100%',
+          maskRepeat: 'no-repeat',
+          WebkitMaskRepeat: 'no-repeat',
+        }}
       >
-        <div className="relative w-full h-full">
-          <OptimizedImage image={data.images[1]} alt="Top rotated image" size="large" className="absolute inset-0 w-full h-full object-cover -rotate-45 scale-150" />
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            transform: `scale(${MASK_IMAGE_CONFIG.imageScale}) translate(${rpxHero(MASK_IMAGE_CONFIG.imageOffsetX)}, ${rpxHero(MASK_IMAGE_CONFIG.imageOffsetY)})`,
+            transformOrigin: 'center center',
+          }}
+        >
+          <OptimizedImage
+            image={data.images[0]}
+            alt="Background"
+            size="xlarge"
+            className="w-full h-full object-cover"
+            objectPosition={maskImagePosition}
+            priority
+          />
         </div>
       </div>
-      {/* Bottom Rotated Div */}
+
+      {/* Layer 3: Rotated Image Divs (菱形图片) - 桌面端 */}
+      {/* 顶部菱形 (data.images[1]) */}
       <div
-        className={cn(
-          rotatedDivBaseClasses,
-          rotatedDivSizeClasses,
-          "rounded-[60px] bottom-[-6%] left-[39%] transform -translate-x-1/2"
-        )}
+        className="hidden md:block absolute overflow-hidden"
+        style={{
+          left: rpxHero(DIAMOND_TOP_CONFIG.left),
+          top: '50%',
+          transform: `translateY(-50%) translateY(${rpxHero(DIAMOND_TOP_CONFIG.offsetY)}) rotate(45deg)`,
+          width: rpxHero(DIAMOND_TOP_CONFIG.size),
+          height: rpxHero(DIAMOND_TOP_CONFIG.size),
+          borderWidth: rpxHero(DIAMOND_TOP_CONFIG.borderWidth),
+          borderColor: DIAMOND_TOP_CONFIG.borderColor,
+          borderStyle: 'solid',
+          borderRadius: rpxHero(DIAMOND_TOP_CONFIG.borderRadius),
+          zIndex: DIAMOND_TOP_CONFIG.zIndex,
+        }}
       >
-         <div className="relative w-full h-full">
-          <OptimizedImage image={data.images[3]} alt="Bottom rotated image" size="large" className="absolute inset-0 w-full h-full object-cover -rotate-45 scale-150" />
+        <div
+          className="relative w-full h-full"
+          style={{
+            transform: `scale(${DIAMOND_TOP_CONFIG.imageScale}) translate(${rpxHero(DIAMOND_TOP_CONFIG.imageOffsetX)}, ${rpxHero(DIAMOND_TOP_CONFIG.imageOffsetY)})`,
+            transformOrigin: 'center center',
+          }}
+        >
+          <OptimizedImage
+            image={data.images[1]}
+            alt="Top rotated image"
+            size="large"
+            className="absolute inset-0 w-full h-full object-cover -rotate-45"
+            objectPosition={diamondTopPosition}
+          />
         </div>
       </div>
-      {/* Middle Rotated Div */}
+
+      {/* 中间菱形 (data.images[2]) */}
       <div
-        className={cn(
-          rotatedDivBaseClasses,
-          "w-48 h-48 rounded-[60px]",
-          "top-[49%] left-[48%] transform -translate-x-1/2 -translate-y-1/2"
-        )}
+        className="hidden md:block absolute overflow-hidden"
+        style={{
+          left: rpxHero(DIAMOND_MIDDLE_CONFIG.left),
+          top: '50%',
+          transform: `translateY(-50%) translateY(${rpxHero(DIAMOND_MIDDLE_CONFIG.offsetY)}) rotate(45deg)`,
+          width: rpxHero(DIAMOND_MIDDLE_CONFIG.size),
+          height: rpxHero(DIAMOND_MIDDLE_CONFIG.size),
+          borderWidth: rpxHero(DIAMOND_MIDDLE_CONFIG.borderWidth),
+          borderColor: DIAMOND_MIDDLE_CONFIG.borderColor,
+          borderStyle: 'solid',
+          borderRadius: rpxHero(DIAMOND_MIDDLE_CONFIG.borderRadius),
+          zIndex: DIAMOND_MIDDLE_CONFIG.zIndex,
+        }}
       >
-         <div className="relative w-full h-full">
-          <OptimizedImage image={data.images[2]} alt="Middle rotated image" size="medium" className="absolute inset-0 w-full h-full object-cover -rotate-45 scale-150" />
+        <div
+          className="relative w-full h-full"
+          style={{
+            transform: `scale(${DIAMOND_MIDDLE_CONFIG.imageScale}) translate(${rpxHero(DIAMOND_MIDDLE_CONFIG.imageOffsetX)}, ${rpxHero(DIAMOND_MIDDLE_CONFIG.imageOffsetY)})`,
+            transformOrigin: 'center center',
+          }}
+        >
+          <OptimizedImage
+            image={data.images[2]}
+            alt="Middle rotated image"
+            size="medium"
+            className="absolute inset-0 w-full h-full object-cover -rotate-45"
+            objectPosition={diamondMiddlePosition}
+          />
+        </div>
+      </div>
+
+      {/* 底部菱形 (data.images[3]) */}
+      <div
+        className="hidden md:block absolute overflow-hidden"
+        style={{
+          left: rpxHero(DIAMOND_BOTTOM_CONFIG.left),
+          top: '50%',
+          transform: `translateY(-50%) translateY(${rpxHero(DIAMOND_BOTTOM_CONFIG.offsetY)}) rotate(45deg)`,
+          width: rpxHero(DIAMOND_BOTTOM_CONFIG.size),
+          height: rpxHero(DIAMOND_BOTTOM_CONFIG.size),
+          borderWidth: rpxHero(DIAMOND_BOTTOM_CONFIG.borderWidth),
+          borderColor: DIAMOND_BOTTOM_CONFIG.borderColor,
+          borderStyle: 'solid',
+          borderRadius: rpxHero(DIAMOND_BOTTOM_CONFIG.borderRadius),
+          zIndex: DIAMOND_BOTTOM_CONFIG.zIndex,
+        }}
+      >
+        <div
+          className="relative w-full h-full"
+          style={{
+            transform: `scale(${DIAMOND_BOTTOM_CONFIG.imageScale}) translate(${rpxHero(DIAMOND_BOTTOM_CONFIG.imageOffsetX)}, ${rpxHero(DIAMOND_BOTTOM_CONFIG.imageOffsetY)})`,
+            transformOrigin: 'center center',
+          }}
+        >
+          <OptimizedImage
+            image={data.images[3]}
+            alt="Bottom rotated image"
+            size="large"
+            className="absolute inset-0 w-full h-full object-cover -rotate-45"
+            objectPosition={diamondBottomPosition}
+          />
         </div>
       </div>
 
 
-      {/* Layer 4: Content Grid (z-30) */}
-      <div className="relative z-30 container mx-auto grid grid-cols-1 md:grid-cols-2 h-full w-full items-center p-8 md:p-16 lg:px-16">
-
-        {/* --- Left Column (Feature[1] at bottom) --- */}
-        <div className="flex flex-col justify-end items-start h-full pb-8 md:pb-16 w-2/3">
-          <p className="text-2xl md:text-4xl font-paytone-one font-regular text-white text-stroke-custom-white">
-            {data.features[1]}
+      {/* Layer 4: Desktop Content (md及以上) */}
+      <div className="hidden md:block relative z-30 h-full w-full">
+        {/* Feature[1] - 绝对定位到板块左下角 */}
+        <div
+          className="absolute"
+          style={{
+            left: rpxHero(DESKTOP_FEATURE1_CONFIG.left),
+            bottom: rpxHero(DESKTOP_FEATURE1_CONFIG.bottom),
+          }}
+        >
+          <p
+            className="font-paytone-one font-regular text-white text-stroke-custom-white text-left"
+            style={{ fontSize: rpxHero(DESKTOP_FEATURE1_CONFIG.fontSize) }}
+          >
+            {feature1Lines.map((line, index) => (
+              <span key={index}>
+                {line}
+                {index < feature1Lines.length - 1 && <br />}
+              </span>
+            ))}
           </p>
         </div>
 
-        <div className="flex flex-col justify-center h-full items-center py-8 md:py-16 md:pl-16 lg:pl-36"> 
+        {/* 右侧内容区域 - 垂直居中 */}
+        <div
+          className="absolute top-1/2 -translate-y-1/2 flex flex-col items-start"
+          style={{ right: rpxHero(DESKTOP_RIGHT_CONTENT_CONFIG.right) }}
+        >
 
-          {/* Top: Feature[0] */}
-          <h1 className="text-left text-4xl md:text-6xl font-paytone-one font-regular text-stroke-black text-[#FFFFFF] leading-tight"> 
-            <div>{titleLine1}</div>
-            <div className="text-[#433E12]">{titleLine2}</div>
+          {/* Top: Feature[0] - 支持多行，第一行白色，其他行深色 */}
+          <h1
+            className="text-left font-paytone-one font-regular text-stroke-black leading-tight"
+            style={{ fontSize: rpxHero(DESKTOP_RIGHT_CONTENT_CONFIG.titleFontSize) }}
+          >
+            {feature0Lines.map((line, index) => (
+              <div key={index} className={index === 0 ? 'text-[#FFFFFF]' : 'text-[#433E12]'}>
+                {line}
+              </div>
+            ))}
           </h1>
 
           {/* Bottom: Feature Stack (Oval shapes) */}
-          <div className="space-y-6 w-fit mt-16"> 
+          <div
+            className="space-y-6 w-fit mt-16"
+            style={{ marginLeft: rpxHero(DESKTOP_RIGHT_CONTENT_CONFIG.featureOffsetLeft) }}
+          >
             {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
               <div
                 key={index}
-                className="bg-[#E9E2A0] px-10 py-5 flex items-center justify-center" 
-                style={{ clipPath: `url(#${ovalClipId})` }} 
+                className="bg-[#E9E2A0] flex items-center justify-center"
+                style={{
+                  width: rpxHero(DESKTOP_RIGHT_CONTENT_CONFIG.featureWidth),
+                  height: rpxHero(DESKTOP_RIGHT_CONTENT_CONFIG.featureHeight),
+                  clipPath: `url(#${ovalClipId})`,
+                }}
               >
-                <p className="text-sm md:text-base font-pingfang font-semibold text-[#000000]">
+                <p
+                  className="font-pingfang font-semibold text-[#000000]"
+                  style={{ fontSize: rpxHero(DESKTOP_RIGHT_CONTENT_CONFIG.featureFontSize) }}
+                >
                   {feature}
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Layer 4: Mobile Content (md以下) - 上下布局 */}
+      <div className="md:hidden relative z-30 flex flex-col h-full">
+        {/* 移动端光柱 */}
+        {MOBILE_LIGHT_BEAMS.map((beam, index) => (
+          <div
+            key={`mobile-light-beam-${index}`}
+            className="absolute pointer-events-none"
+            style={{
+              left: beam.left,
+              top: beam.top,
+              transform: `rotate(${beam.rotation}deg)`,
+              transformOrigin: 'left center',
+              width: beam.width,
+              height: beam.height,
+              opacity: beam.opacity,
+              background: `linear-gradient(to right, ${beam.gradientFrom}, ${beam.gradientTo})`,
+              zIndex: 1,
+            }}
+          />
+        ))}
+
+        {/* 上部：标题 + Features - 使用配置的顶部留白 */}
+        <div
+          className="relative z-10 flex flex-col items-center justify-center px-6 pb-4"
+          style={{ minHeight: MOBILE_CONFIG.topPadding }}
+        >
+          {/* 标题 - 支持多行，第一行白色，其他行深色 */}
+          <h1 className="text-center text-3xl sm:text-4xl font-paytone-one font-regular text-stroke-black leading-tight mb-4">
+            {feature0Lines.map((line, index) => (
+              <div key={index} className={index === 0 ? 'text-[#FFFFFF]' : 'text-[#433E12]'}>
+                {line}
+              </div>
+            ))}
+          </h1>
+
+          {/* Feature 胶囊 */}
+          <div className="flex flex-wrap justify-center gap-2">
+            {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
+              <div
+                key={index}
+                className="bg-[#E9E2A0] px-4 py-2 flex items-center justify-center rounded-full"
+              >
+                <p className="text-xs font-pingfang font-semibold text-[#000000]">
+                  {feature}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 下部：图片组合区域（撑满剩余空间） */}
+        <div className="flex-1 relative w-full overflow-visible">
+          {/* SVG 遮罩图片 - 贴左下角 */}
+          <div
+            className="absolute left-0 bottom-0"
+            style={{
+              height: MOBILE_CONFIG.svg.height,
+              aspectRatio: MOBILE_CONFIG.svg.aspectRatio,
+              maskImage: 'url(/hero-banner-7-1.svg)',
+              WebkitMaskImage: 'url(/hero-banner-7-1.svg)',
+              maskSize: MOBILE_CONFIG.svg.maskSize,
+              WebkitMaskSize: MOBILE_CONFIG.svg.maskSize,
+              maskRepeat: 'no-repeat',
+              WebkitMaskRepeat: 'no-repeat',
+              maskPosition: MOBILE_CONFIG.svg.maskPosition,
+              WebkitMaskPosition: MOBILE_CONFIG.svg.maskPosition,
+            }}
+          >
+            <div
+              className="w-full h-full"
+              style={{
+                transform: `scale(${MOBILE_CONFIG.svg.imageScale})`,
+                transformOrigin: 'center center',
+              }}
+            >
+              <OptimizedImage
+                image={data.images[0]}
+                alt="Background"
+                size="large"
+                className="w-full h-full object-cover"
+                objectPosition={MOBILE_CONFIG.svg.imagePosition}
+              />
+            </div>
+          </div>
+
+          {/* 菱形图片 */}
+          {/* 顶部菱形 - 固定位置 */}
+          <div
+            className="absolute overflow-hidden"
+            style={{
+              left: MOBILE_CONFIG.diamondTop.left,
+              top: MOBILE_CONFIG.diamondTop.top,
+              width: MOBILE_CONFIG.diamondTop.size,
+              height: MOBILE_CONFIG.diamondTop.size,
+              borderWidth: MOBILE_CONFIG.diamondTop.borderWidth,
+              borderColor: DIAMOND_TOP_CONFIG.borderColor,
+              borderStyle: 'solid',
+              borderRadius: MOBILE_CONFIG.diamondTop.borderRadius,
+              transform: 'rotate(45deg)',
+              zIndex: 20,
+            }}
+          >
+            <div className="relative w-full h-full" style={{ transform: `scale(${MOBILE_CONFIG.diamondTop.imageScale})` }}>
+              <OptimizedImage
+                image={data.images[1]}
+                alt="Top rotated image"
+                size="medium"
+                className="absolute inset-0 w-full h-full object-cover -rotate-45"
+                objectPosition={diamondTopPosition}
+              />
+            </div>
+          </div>
+
+          {/* 中间菱形 */}
+          <div
+            className="absolute overflow-hidden"
+            style={{
+              left: MOBILE_CONFIG.diamondMiddle.left,
+              top: MOBILE_CONFIG.diamondMiddle.top,
+              transform: 'translateY(-50%) rotate(45deg)',
+              width: MOBILE_CONFIG.diamondMiddle.size,
+              aspectRatio: '1',
+              borderWidth: MOBILE_CONFIG.diamondMiddle.borderWidth,
+              borderColor: DIAMOND_MIDDLE_CONFIG.borderColor,
+              borderStyle: 'solid',
+              borderRadius: MOBILE_CONFIG.diamondMiddle.borderRadius,
+              zIndex: 20,
+            }}
+          >
+            <div className="relative w-full h-full" style={{ transform: `scale(${MOBILE_CONFIG.diamondMiddle.imageScale})` }}>
+              <OptimizedImage
+                image={data.images[2]}
+                alt="Middle rotated image"
+                size="small"
+                className="absolute inset-0 w-full h-full object-cover -rotate-45"
+                objectPosition={diamondMiddlePosition}
+              />
+            </div>
+          </div>
+
+          {/* 底部菱形 - 固定位置 */}
+          <div
+            className="absolute overflow-hidden"
+            style={{
+              left: MOBILE_CONFIG.diamondBottom.left,
+              bottom: MOBILE_CONFIG.diamondBottom.bottom,
+              width: MOBILE_CONFIG.diamondBottom.size,
+              height: MOBILE_CONFIG.diamondBottom.size,
+              borderWidth: MOBILE_CONFIG.diamondBottom.borderWidth,
+              borderColor: DIAMOND_BOTTOM_CONFIG.borderColor,
+              borderStyle: 'solid',
+              borderRadius: MOBILE_CONFIG.diamondBottom.borderRadius,
+              transform: 'rotate(45deg)',
+              zIndex: 20,
+            }}
+          >
+            <div className="relative w-full h-full" style={{ transform: `scale(${MOBILE_CONFIG.diamondBottom.imageScale})` }}>
+              <OptimizedImage
+                image={data.images[3]}
+                alt="Bottom rotated image"
+                size="medium"
+                className="absolute inset-0 w-full h-full object-cover -rotate-45"
+                objectPosition={diamondBottomPosition}
+              />
+            </div>
+          </div>
+
+          {/* Feature[1] 文字 - 放在SVG区域内左下角 */}
+          <div
+            className="absolute z-30"
+            style={{
+              left: MOBILE_CONFIG.featureText.left,
+              bottom: MOBILE_CONFIG.featureText.bottom,
+            }}
+          >
+            <p className={`${MOBILE_CONFIG.featureText.fontSize} font-paytone-one font-regular text-white text-stroke-custom-white text-left`}>
+              {feature1Lines.map((line, index) => (
+                <span key={index}>
+                  {line}
+                  {index < feature1Lines.length - 1 && <br />}
+                </span>
+              ))}
+            </p>
           </div>
         </div>
       </div>

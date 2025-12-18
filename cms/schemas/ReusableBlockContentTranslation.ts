@@ -128,9 +128,9 @@ export const ReusableBlockContentTranslation = list({
       initialSort: { field: 'updatedAt', direction: 'DESC' },
     },
     labelField: 'locale',
-    label: 'Reusable Block Translations',
-    singular: 'Reusable Block Translation',
-    plural: 'Reusable Block Translations',
+    label: 'Reusable Block Translations | 可复用块翻译',
+    singular: 'Reusable Block Translation | 可复用块翻译',
+    plural: 'Reusable Block Translations | 可复用块翻译',
     description: '复用块的多语言内容翻译',
   },
 })

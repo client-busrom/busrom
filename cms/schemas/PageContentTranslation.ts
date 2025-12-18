@@ -142,7 +142,9 @@ export const PageContentTranslation = list({
       initialSort: { field: 'locale', direction: 'ASC' },
     },
     labelField: 'locale',
-
+    label: 'Page Translations | 页面翻译',
+    singular: 'Page Translation | 页面翻译',
+    plural: 'Page Translations | 页面翻译',
     // Hidden from main menu (only accessible through Page)
     isHidden: true,
   },

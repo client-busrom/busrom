@@ -116,6 +116,9 @@ export default function BrandAnalysis({ data }: Props) {
             setApi={setMobileApi}
             className="w-full h-full"
             plugins={[fadePluginMobile.current]}
+            opts={{
+              loop: true,
+            }}
           >
             <CarouselContent className="h-full m-0">
               {data.centers.map((center, index) => (

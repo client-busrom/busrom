@@ -337,7 +337,7 @@ export const NavigationMenu = list({
       pageSize: 50,
     },
     labelField: 'slug',
-    label: 'Navigation Menus',
+    label: 'Navigation Menus | 导航菜单',
     description: '🔀 Navigation Manager: reorder menu(重新排序菜单) ',
   },
 

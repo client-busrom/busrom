@@ -247,9 +247,9 @@ export const MainForm = list({
     listView: {
       initialColumns: ['status', 'publishedAt', 'updatedAt'],
     },
-    label: 'Main Form',
-    singular: 'Main Form',
-    plural: 'Main Forms',
+    label: 'Main Form | 主表单配置',
+    singular: 'Main Form | 主表单配置',
+    plural: 'Main Form | 主表单配置',
     description: '主表单配置 - Singleton。包含表单字段占位符、按钮文字、设计文字、图片。',
     hideCreate: async ({ context }) => {
       const count = await context.query.MainForm.count()

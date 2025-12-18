@@ -24,22 +24,35 @@ export async function homeContentHandler(req: Request, res: Response) {
       return field[locale] || field['en'] || fallback
     }
 
-    // Helper to fetch Media URL by ID
-    const fetchMediaUrl = async (mediaId: string): Promise<string | null> => {
+    // Helper to fetch Media data by ID (includes URL and cropFocalPoint)
+    const fetchMediaData = async (mediaId: string): Promise<{ url: string; cropFocalPoint?: { x: number; y: number } } | null> => {
       if (!mediaId) return null
-      // If already a URL, return as-is
-      if (mediaId.startsWith('http://') || mediaId.startsWith('https://')) return mediaId
+      // If already a URL, return as-is (no focal point)
+      if (mediaId.startsWith('http://') || mediaId.startsWith('https://')) {
+        return { url: mediaId }
+      }
 
       try {
         const media = await context.query.Media.findOne({
           where: { id: mediaId },
-          query: 'fileUrl file { url }',
+          query: 'fileUrl file { url } cropFocalPoint',
         })
-        return media?.fileUrl || media?.file?.url || null
+        const url = media?.fileUrl || media?.file?.url || null
+        if (!url) return null
+        return {
+          url,
+          cropFocalPoint: media?.cropFocalPoint || undefined,
+        }
       } catch (error) {
         console.error(`Failed to fetch media ${mediaId}:`, error)
         return null
       }
+    }
+
+    // Helper to fetch Media URL by ID (backward compatible)
+    const fetchMediaUrl = async (mediaId: string): Promise<string | null> => {
+      const data = await fetchMediaData(mediaId)
+      return data?.url || null
     }
 
     // Helper to extract Media ID from JSON field
@@ -71,15 +84,15 @@ export async function homeContentHandler(req: Request, res: Response) {
       `,
     })
 
-    // Convert HeroBanner with Media URL resolution
+    // Convert HeroBanner with Media data resolution (includes cropFocalPoint)
     const heroBanner = await Promise.all(
       heroBannerItems.map(async (item: any) => {
         const imageIds = [item.image1, item.image2, item.image3, item.image4]
           .map(getMediaId)
           .filter(Boolean)
 
-        const imageUrls = await Promise.all(
-          imageIds.map(id => fetchMediaUrl(id!))
+        const imageDataList = await Promise.all(
+          imageIds.map(id => fetchMediaData(id!))
         )
 
         return {
@@ -92,7 +105,7 @@ export async function homeContentHandler(req: Request, res: Response) {
             getLocalized(item.feature4),
             getLocalized(item.feature5),
           ].filter(Boolean),
-          images: imageUrls.filter(Boolean),
+          images: imageDataList.filter(Boolean),
         }
       })
     )
@@ -321,7 +334,7 @@ export async function homeContentHandler(req: Request, res: Response) {
       })
     )
 
-    // 6. Fetch Featured Products
+    // 6. Fetch Featured Products with actual product data
     const featuredProductsData = await context.query.FeaturedProducts.findMany({
       where: { status: { equals: 'PUBLISHED' } },
       take: 1,
@@ -333,12 +346,138 @@ export async function homeContentHandler(req: Request, res: Response) {
       `,
     })
 
-    const featuredProducts = featuredProductsData[0] ? {
-      title: getLocalized(featuredProductsData[0].title),
-      description: getLocalized(featuredProductsData[0].description),
-      viewAllButtonText: getLocalized(featuredProductsData[0].viewAllButtonText),
-      categories: featuredProductsData[0].categories || [],
-    } : null
+    const featuredProducts = featuredProductsData[0] ? await (async () => {
+      const config = featuredProductsData[0]
+      const categoryIds: string[] = config.categories || []
+
+      if (categoryIds.length === 0) {
+        return {
+          title: getLocalized(config.title),
+          description: getLocalized(config.description),
+          viewAllButton: getLocalized(config.viewAllButtonText),
+          categories: '',
+          series: [],
+        }
+      }
+
+      // Fetch ProductSeries by IDs
+      const seriesData = await context.query.ProductSeries.findMany({
+        where: {
+          id: { in: categoryIds },
+          status: { equals: 'PUBLISHED' },
+        },
+        query: 'id name slug',
+      })
+
+      // Create a map for series lookup
+      const seriesMap = new Map(seriesData.map((s: any) => [s.id, s]))
+
+      // Build series array with products
+      const series = await Promise.all(
+        categoryIds
+          .map(id => seriesMap.get(id))
+          .filter(Boolean)
+          .map(async (s: any) => {
+            const seriesTitle = getLocalized(s.name)
+
+            // Fetch featured products for this series (isFeatured=true, take 3)
+            const products = await context.query.Product.findMany({
+              where: {
+                series: { id: { equals: s.id } },
+                status: { equals: 'PUBLISHED' },
+                isFeatured: { equals: true },
+              },
+              take: 3,
+              orderBy: { order: 'asc' },
+              query: 'id sku slug name mainImage specifications',
+            })
+
+            // Transform products to frontend format
+            const transformedProducts = await Promise.all(
+              products.map(async (p: any) => {
+                // Get mainImage URL (场景图) - randomly pick one from the array
+                let imageUrl: string | null = null
+                if (p.mainImage && Array.isArray(p.mainImage) && p.mainImage.length > 0) {
+                  // Random pick one image from mainImage array
+                  const randomIndex = Math.floor(Math.random() * p.mainImage.length)
+                  const imageId = getMediaId(p.mainImage[randomIndex])
+                  imageUrl = imageId ? await fetchMediaUrl(imageId) : null
+                }
+
+                // Extract 3 random features from specifications
+                // specifications format: { material: {en, zh}, finish: {en, zh}, glassThickness: string, ... }
+                const features: string[] = []
+                if (p.specifications && typeof p.specifications === 'object') {
+                  const specs = p.specifications
+
+                  // Label mapping for known specification keys
+                  const labelMap: Record<string, { en: string; zh: string }> = {
+                    material: { en: 'Material', zh: '材质' },
+                    finish: { en: 'Finish', zh: '表面处理' },
+                    glassThickness: { en: 'Glass Thickness', zh: '玻璃厚度' },
+                    loadCapacity: { en: 'Load Capacity', zh: '承重能力' },
+                    warranty: { en: 'Warranty', zh: '质保' },
+                    origin: { en: 'Origin', zh: '产地' },
+                  }
+
+                  // Collect all valid spec entries
+                  const allFeatures: string[] = []
+                  for (const [key, value] of Object.entries(specs)) {
+                    if (!value) continue
+
+                    // Get localized value
+                    let specValue: string
+                    if (typeof value === 'object' && value !== null) {
+                      specValue = (value as any)[locale] || (value as any)['en'] || ''
+                    } else {
+                      specValue = String(value)
+                    }
+
+                    if (!specValue) continue
+
+                    // Get label (use mapping or capitalize key)
+                    const label = labelMap[key]
+                      ? (locale === 'zh' ? labelMap[key].zh : labelMap[key].en)
+                      : key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')
+
+                    allFeatures.push(`${label}: ${specValue}`)
+                  }
+
+                  // Shuffle and take 3
+                  const shuffled = allFeatures.sort(() => Math.random() - 0.5)
+                  features.push(...shuffled.slice(0, 3))
+                }
+
+                return {
+                  slug: p.slug,
+                  image: imageUrl ? { url: imageUrl, altText: getLocalized(p.name) || p.sku } : { url: '', altText: '' },
+                  title: getLocalized(p.name) || p.sku,
+                  features,
+                }
+              })
+            )
+
+            // Filter out products without images
+            const validProducts = transformedProducts.filter(p => p.image.url)
+
+            return {
+              seriesTitle,
+              products: validProducts,
+            }
+          })
+      )
+
+      // Filter out series without products
+      const validSeries = series.filter(s => s.products.length > 0)
+
+      return {
+        title: getLocalized(config.title),
+        description: getLocalized(config.description),
+        viewAllButton: getLocalized(config.viewAllButtonText),
+        categories: validSeries.map(s => s.seriesTitle).join(', '),
+        series: validSeries,
+      }
+    })() : null
 
     // 7. Fetch Brand Advantages
     const brandAdvantagesData = await context.query.BrandAdvantages.findMany({
@@ -363,34 +502,24 @@ export async function homeContentHandler(req: Request, res: Response) {
         icon8
         advantage9
         icon9
+        image
       `,
     })
 
     const brandAdvantages = brandAdvantagesData[0] ? await (async () => {
       const data = brandAdvantagesData[0]
 
-      // Collect all icon IDs
-      const iconIds = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-        .map(i => getMediaId(data[`icon${i}`]))
-        .filter(Boolean)
-
-      // Batch fetch icon URLs
-      const iconUrls = await Promise.all(
-        iconIds.map(id => fetchMediaUrl(id!))
-      )
-
-      // Map icons back to their positions
-      let iconIndex = 0
+      // Map advantages with their icon names (lucide-react icon names, not Media IDs)
       const advantages = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => {
         const text = getLocalized(data[`advantage${i}`])
-        const hasIcon = getMediaId(data[`icon${i}`])
-        return {
-          text,
-          icon: hasIcon ? iconUrls[iconIndex++] : null,
-        }
+        const icon = data[`icon${i}`] || null // icon is a text field with lucide-react icon name
+        return { text, icon }
       }).filter(item => item.text)
 
-      return { advantages }
+      // Fetch main image URL
+      const imageUrl = await fetchMediaUrl(getMediaId(data.image))
+
+      return { advantages, image: imageUrl }
     })() : null
 
     // 8. Fetch OEM/ODM

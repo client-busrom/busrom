@@ -85,5 +85,8 @@ export const SeriesIntro = list({
       initialColumns: ['internalLabel', 'productSeries', 'status', 'updatedAt'],
       defaultFieldMode: 'read',
     },
+    label: 'Series Intro | 系列介绍',
+    singular: 'Series Intro | 系列介绍',
+    plural: 'Series Intro | 系列介绍',
   },
 });

@@ -162,5 +162,8 @@ export const BrandValue = list({
   ui: {
     labelField: 'internalLabel',
     listView: { defaultFieldMode: 'read' },
+    label: 'Brand Value | 品牌价值',
+    singular: 'Brand Value | 品牌价值',
+    plural: 'Brand Value | 品牌价值',
   },
 });

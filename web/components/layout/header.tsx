@@ -49,6 +49,8 @@ export default function Header({ locale }: { locale: string }) {
           const headerHeight = headerRef.current?.offsetHeight || 80;
 
           // 找到与 header 底部相交或已经通过 header 的元素中，最靠近顶部的那个
+          // 触发点：header 底边位置（元素顶部到达这里时切换）
+          const triggerPoint = headerHeight;
           let activeSection: Element | null = null;
           let minTop = Infinity;
 
@@ -56,7 +58,7 @@ export default function Header({ locale }: { locale: string }) {
             const rect = section.getBoundingClientRect();
 
             // 元素的顶部已经到达或通过了 header 底部，且元素底部还在视口中
-            const hasPassedHeader = rect.top <= headerHeight && rect.bottom > 0;
+            const hasPassedHeader = rect.top <= triggerPoint && rect.bottom > 0;
 
             if (hasPassedHeader && rect.top < minTop) {
               minTop = rect.top;
@@ -71,8 +73,10 @@ export default function Header({ locale }: { locale: string }) {
           }
         },
         {
-          rootMargin: "0px",
-          threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+          // 顶部往下扩展，当元素顶部距离视口顶部还有这个距离时就触发
+          // 负值 = 检测区域下移（header底边位置），元素到达header底边时触发
+          rootMargin: "0px 0px -90% 0px",
+          threshold: [0],
         }
       );
 

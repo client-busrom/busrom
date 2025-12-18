@@ -214,8 +214,8 @@ export const SeoConfig = list({
   ui: {
     labelField: 'identifier',
     label: 'SEO Config | SEO配置',
-    singular: 'SEO Config',
-    plural: 'SEO Config',
+    singular: 'SEO Config | SEO配置',
+    plural: 'SEO Config | SEO配置',
     description: 'SEO, analytics and search engine notification settings | SEO、数据分析和搜索引擎通知设置',
   },
 })

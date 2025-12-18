@@ -80,6 +80,9 @@ export const FeaturedProducts = list({
   ui: {
     labelField: 'internalLabel',
     listView: { defaultFieldMode: 'read' },
+    label: 'Featured Products | 精选产品',
+    singular: 'Featured Products | 精选产品',
+    plural: 'Featured Products | 精选产品',
     description: 'Configure featured products section. API automatically selects 3 random products per series with 3 specs each.',
   },
 });

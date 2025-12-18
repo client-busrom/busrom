@@ -163,6 +163,9 @@ export const Category = list({
       initialSort: { field: 'order', direction: 'ASC' },
     },
     labelField: 'slug',
+    label: 'Categories | 分类',
+    singular: 'Category | 分类',
+    plural: 'Categories | 分类',
   },
 
   /**

@@ -235,9 +235,9 @@ export const OemOdm = list({
     listView: {
       initialColumns: ['status', 'publishedAt', 'updatedAt'],
     },
-    label: 'OEM/ODM',
-    singular: 'OEM/ODM',
-    plural: 'OEM/ODMs',
+    label: 'OEM/ODM | OEM/ODM服务',
+    singular: 'OEM/ODM | OEM/ODM服务',
+    plural: 'OEM/ODM | OEM/ODM服务',
     description: 'OEM/ODM配置 - Singleton。包含OEM和ODM两个部分，各有标题、背景图、主图、2行描述。',
     hideCreate: async ({ context }) => {
       const count = await context.query.OemOdm.count()

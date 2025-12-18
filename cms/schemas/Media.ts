@@ -371,6 +371,9 @@ export const Media = list({
       pageSize: 50,
     },
     labelField: 'filename',
+    label: 'Media | 媒体库',
+    singular: 'Media | 媒体',
+    plural: 'Media | 媒体库',
     // Explicitly define searchable fields for better search experience
     searchFields: ['filename'],
   },

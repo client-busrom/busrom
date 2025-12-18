@@ -17,6 +17,7 @@
     "seed:navigation": "tsx scripts/reseed-navigation.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-ecs": "^3.943.0",
     "@aws-sdk/client-s3": "^3.705.0",
     "@aws-sdk/s3-request-presigner": "^3.705.0",
     "@keystone-6/auth": "^8.0.0",

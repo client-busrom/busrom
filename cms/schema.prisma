@@ -92,27 +92,52 @@ model ActivityLog {
 }
 
 model SiteConfig {
+  id                 Int       @id
+  identifier         String    @default("site-config")
+  siteName           Json?     @default("{\"en\":\"Busrom\",\"zh\":\"Busrom\"}")
+  companyName        Json?     @default("{\"en\":\"Busrom Hardware Co., Ltd.\",\"zh\":\"Busrom 五金有限公司\"}")
+  logo               Media?    @relation("SiteConfig_logo", fields: [logoId], references: [id])
+  logoId             String?   @map("logo") @postgresql.Uuid
+  favicon            Media?    @relation("SiteConfig_favicon", fields: [faviconId], references: [id])
+  faviconId          String?   @map("favicon") @postgresql.Uuid
+  defaultLanguage    String?   @default("en")
+  maintenanceMode    Boolean   @default(false)
+  enableCaptcha      Boolean   @default(true)
+  recaptchaSiteKey   String    @default("")
+  recaptchaSecretKey String    @default("")
+  updatedAt          DateTime? @updatedAt
+
+  @@index([logoId])
+  @@index([faviconId])
+}
+
+model ContactConfig {
+  id         Int       @id
+  identifier String    @default("contact-config")
+  email      String    @default("")
+  phone      String    @default("")
+  whatsapp   String    @default("")
+  wechat     String    @default("")
+  address    String    @default("")
+  updatedAt  DateTime? @updatedAt
+}
+
+model SocialConfig {
+  id           Int       @id
+  identifier   String    @default("social-config")
+  facebookUrl  String    @default("")
+  instagramUrl String    @default("")
+  linkedinUrl  String    @default("")
+  youtubeUrl   String    @default("")
+  twitterUrl   String    @default("")
+  tiktokUrl    String    @default("")
+  pinterestUrl String    @default("")
+  updatedAt    DateTime? @updatedAt
+}
+
+model EmailConfig {
   id                     Int       @id
-  identifier             String    @default("site-config")
-  siteName               Json?     @default("{\"en\":\"Busrom\",\"zh\":\"Busrom\"}")
-  companyName            Json?     @default("{\"en\":\"Busrom Hardware Co., Ltd.\",\"zh\":\"Busrom 五金有限公司\"}")
-  logo                   Media?    @relation("SiteConfig_logo", fields: [logoId], references: [id])
-  logoId                 String?   @map("logo") @postgresql.Uuid
-  favicon                Media?    @relation("SiteConfig_favicon", fields: [faviconId], references: [id])
-  faviconId              String?   @map("favicon") @postgresql.Uuid
-  email                  String    @default("")
-  phone                  String    @default("")
-  whatsapp               String    @default("")
-  wechat                 String    @default("")
-  address                String    @default("")
-  facebookUrl            String    @default("")
-  instagramUrl           String    @default("")
-  linkedinUrl            String    @default("")
-  youtubeUrl             String    @default("")
-  twitterUrl             String    @default("")
-  googleAnalyticsId      String    @default("")
-  googleSearchConsoleKey String    @default("")
-  tiktokPixelId          String    @default("")
+  identifier             String    @default("email-config")
   smtpHost               String    @default("")
   smtpPort               String    @default("")
   smtpUser               String    @default("")
@@ -122,17 +147,24 @@ model SiteConfig {
   formNotificationEmails String    @default("")
   enableAutoReply        Boolean   @default(false)
   autoReplyTemplate      Json?     @default("{\"en\":\"Dear {name},\\n\\nThank you for contacting Busrom. We have received your message and will get back to you within 24 hours.\\n\\nBest regards,\\nBusrom Team\",\"zh\":\"尊敬的 {name}，\\n\\n感谢您联系 Busrom。我们已收到您的留言，将在 24 小时内回复您。\\n\\n此致\\nBusrom 团队\"}")
-  maintenanceMode        Boolean   @default(false)
-  enableCaptcha          Boolean   @default(true)
-  recaptchaSiteKey       String    @default("")
-  recaptchaSecretKey     String    @default("")
-  defaultLanguage        String?   @default("en")
-  enableIndexNow         Boolean   @default(true)
-  indexNowKey            String    @default("")
   updatedAt              DateTime? @updatedAt
+}
 
-  @@index([logoId])
-  @@index([faviconId])
+model SeoConfig {
+  id                     Int       @id
+  identifier             String    @default("seo-config")
+  googleAnalyticsId      String    @default("")
+  googleSearchConsoleKey String    @default("")
+  bingWebmasterKey       String    @default("")
+  tiktokPixelId          String    @default("")
+  facebookPixelId        String    @default("")
+  enableIndexNow         Boolean   @default(false)
+  indexNowKey            String    @default("")
+  seoPingMode            String?   @default("disabled")
+  seoPingRateLimit       String?   @default("3600")
+  lastSeoPingTime        DateTime?
+  seoPingQueueCount      String    @default("0")
+  updatedAt              DateTime? @updatedAt
 }
 
 model NavigationMenu {
@@ -723,21 +755,20 @@ model BlogContentTranslation {
 }
 
 model Application {
-  id                                   String                          @id @default(uuid()) @postgresql.Uuid
-  slug                                 String                          @unique @default("")
-  name                                 Json?                           @default("{}")
-  shortDescription                     Json?                           @default("{}")
-  description                          Json?                           @default("{}")
-  contentTranslations                  ApplicationContentTranslation[] @relation("ApplicationContentTranslation_application")
-  mainImage                            Json?
-  images                               Json?
-  category                             Category?                       @relation("Application_category", fields: [categoryId], references: [id])
-  categoryId                           String?                         @map("category") @postgresql.Uuid
-  status                               String?                         @default("DRAFT")
-  createdAt                            DateTime?                       @default(now())
-  updatedAt                            DateTime?                       @updatedAt
-  from_CustomScript_relatedApplication CustomScript[]                  @relation("CustomScript_relatedApplication")
-  from_SeoSetting_relatedApplication   SeoSetting[]                    @relation("SeoSetting_relatedApplication")
+  id                                             String                          @id @default(uuid()) @postgresql.Uuid
+  slug                                           String                          @unique @default("")
+  name                                           Json?                           @default("{}")
+  shortDescription                               Json?                           @default("{}")
+  description                                    Json?                           @default("{}")
+  sceneGallery                                   Json?                           @default("[]")
+  category                                       Category?                       @relation("Application_category", fields: [categoryId], references: [id])
+  categoryId                                     String?                         @map("category") @postgresql.Uuid
+  status                                         String?                         @default("DRAFT")
+  createdAt                                      DateTime?                       @default(now())
+  updatedAt                                      DateTime?                       @updatedAt
+  from_ApplicationContentTranslation_application ApplicationContentTranslation[] @relation("ApplicationContentTranslation_application")
+  from_CustomScript_relatedApplication           CustomScript[]                  @relation("CustomScript_relatedApplication")
+  from_SeoSetting_relatedApplication             SeoSetting[]                    @relation("SeoSetting_relatedApplication")
 
   @@index([categoryId])
 }
@@ -1008,6 +1039,10 @@ enum PermissionResourceType {
   CustomScript
   SeoSetting
   SiteConfig
+  ContactConfig
+  SocialConfig
+  EmailConfig
+  SeoConfig
 }
 
 enum PermissionActionType {

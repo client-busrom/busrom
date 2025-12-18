@@ -200,9 +200,9 @@ export const ReusableBlock = list({
       pageSize: 50,
     },
     labelField: 'key',
-    label: 'Reusable Blocks',
-    singular: 'Reusable Block',
-    plural: 'Reusable Blocks',
+    label: 'Reusable Blocks | 可复用块',
+    singular: 'Reusable Block | 可复用块',
+    plural: 'Reusable Blocks | 可复用块',
     description: '🔗 Reusable Blocks - Content blocks that can be referenced across multiple documents',
   },
 })

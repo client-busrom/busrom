@@ -133,7 +133,9 @@ export const BlogContentTranslation = list({
       initialSort: { field: 'locale', direction: 'ASC' },
     },
     labelField: 'locale',
-
+    label: 'Blog Translations | 博客翻译',
+    singular: 'Blog Translation | 博客翻译',
+    plural: 'Blog Translations | 博客翻译',
     // Hidden from main menu (only accessible through Blog)
     isHidden: true,
   },

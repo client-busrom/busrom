@@ -1,78 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { keystoneClient } from '@/lib/keystone-client'
-import { gql } from '@apollo/client'
 
-// GraphQL Mutation - Create Form Submission (with formConfig)
-const CREATE_FORM_SUBMISSION_WITH_CONFIG = gql`
-  mutation CreateFormSubmissionWithConfig(
-    $formId: ID!
-    $formName: String
-    $data: JSON!
-    $attachments: JSON
-    $totalAttachmentSize: Int
-    $locale: String
-    $sourcePage: String
-    $ipAddress: String
-    $userAgent: String
-    $autoSubmitted: FormSubmissionAutoSubmittedType
-  ) {
-    createFormSubmission(
-      data: {
-        formConfig: { connect: { id: $formId } }
-        formName: $formName
-        data: $data
-        attachments: $attachments
-        totalAttachmentSize: $totalAttachmentSize
-        locale: $locale
-        sourcePage: $sourcePage
-        ipAddress: $ipAddress
-        userAgent: $userAgent
-        autoSubmitted: $autoSubmitted
-        status: UNREAD
-      }
-    ) {
-      id
-      formName
-      status
-      submittedAt
-    }
-  }
-`
-
-// GraphQL Mutation - Create Form Submission (without formConfig)
-const CREATE_FORM_SUBMISSION_WITHOUT_CONFIG = gql`
-  mutation CreateFormSubmissionWithoutConfig(
-    $formName: String!
-    $data: JSON!
-    $attachments: JSON
-    $totalAttachmentSize: Int
-    $locale: String
-    $sourcePage: String
-    $ipAddress: String
-    $userAgent: String
-    $autoSubmitted: FormSubmissionAutoSubmittedType
-  ) {
-    createFormSubmission(
-      data: {
-        formName: $formName
-        data: $data
-        attachments: $attachments
-        totalAttachmentSize: $totalAttachmentSize
-        locale: $locale
-        sourcePage: $sourcePage
-        ipAddress: $ipAddress
-        userAgent: $userAgent
-        autoSubmitted: $autoSubmitted
-        status: UNREAD
-      }
-    ) {
-      id
-      formName
-      status
-      submittedAt
-    }
-  }
-`
+const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3002'
 
 export async function POST(request: NextRequest) {
   try {
@@ -86,7 +14,14 @@ export async function POST(request: NextRequest) {
       autoSubmitted = false,
     } = body
 
-    // 验证必需字段
+    console.log('[Form Submission API] Received submission:', {
+      formId,
+      formName,
+      locale,
+      dataKeys: Object.keys(data || {}),
+    })
+
+    // Validate required fields
     if (!data || typeof data !== 'object') {
       return NextResponse.json(
         { error: 'Form data is required' },
@@ -94,96 +29,86 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 计算附件总大小
+    // Calculate total attachment size
     const totalAttachmentSize = Array.isArray(attachments)
       ? attachments.reduce((sum: number, file: any) => sum + (file.fileSize || 0), 0)
       : 0
 
-    // 获取请求元数据
+    // Get request metadata
     const ipAddress = request.headers.get('x-forwarded-for') ||
                      request.headers.get('x-real-ip') ||
                      'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'
     const referer = request.headers.get('referer') || 'unknown'
 
-    // 执行 GraphQL Mutation - 根据是否有 formId 选择不同的 mutation
-    const mutation = formId ? CREATE_FORM_SUBMISSION_WITH_CONFIG : CREATE_FORM_SUBMISSION_WITHOUT_CONFIG
-
-    const variables: any = {
+    // Prepare submission data for Payload CMS
+    const submissionData: any = {
       formName: formName || 'Unknown Form',
       data,
-      attachments: Array.isArray(attachments) && attachments.length > 0 ? attachments : [],
-      totalAttachmentSize,
       locale: locale || 'en',
       sourcePage: referer,
       ipAddress,
       userAgent,
-      autoSubmitted: autoSubmitted ? 'AUTO' : 'MANUAL',
+      submissionType: autoSubmitted ? 'AUTO' : 'MANUAL',
+      status: 'UNREAD',
     }
 
-    // 只有当 formId 存在时才添加
+    // Add formConfig relationship if formId exists
     if (formId) {
-      variables.formId = formId
+      // Convert to number if it's a string
+      submissionData.formConfig = typeof formId === 'string' ? parseInt(formId, 10) : formId
     }
 
-    const { data: result, errors } = await keystoneClient.mutate({
-      mutation,
-      variables,
+    // Add attachments if present
+    if (Array.isArray(attachments) && attachments.length > 0) {
+      submissionData.attachments = attachments
+      submissionData.totalAttachmentSize = totalAttachmentSize
+    }
+
+    console.log('[Form Submission API] Submitting to Payload:', CMS_URL + '/api/form-submissions')
+
+    // Submit to Payload CMS REST API
+    const response = await fetch(`${CMS_URL}/api/form-submissions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(submissionData),
     })
 
-    if (errors) {
-      console.error('❌ GraphQL errors:', JSON.stringify(errors, null, 2))
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      console.error('[Form Submission API] Payload CMS error:', response.status, errorData)
       return NextResponse.json(
-        { error: 'Failed to submit form', details: errors },
-        { status: 500 }
+        { error: 'Failed to submit form to CMS', details: errorData },
+        { status: response.status }
       )
     }
 
-    // 标记上传的文件为已使用
+    const result = await response.json()
+    console.log('[Form Submission API] Submission successful:', result.id)
+
+    // Mark uploaded files as used if present
     if (Array.isArray(attachments) && attachments.length > 0) {
       try {
-        const cmsUrl = process.env.CMS_URL ||
-          (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : 'http://localhost:3000')
         for (const attachment of attachments) {
           // Find and update temp file upload record
-          await fetch(`${cmsUrl}/api/graphql`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              query: `
-                query FindAndUpdateTempFile($fileUrl: String!) {
-                  tempFileUploads(where: { fileUrl: { equals: $fileUrl } }) {
-                    id
-                  }
-                }
-              `,
-              variables: { fileUrl: attachment.fileUrl },
-            }),
-          }).then(async (res) => {
-            const data = await res.json()
-            if (data.data?.tempFileUploads?.[0]?.id) {
-              const tempFileId = data.data.tempFileUploads[0].id
-              // Mark as USED
-              await fetch(`${cmsUrl}/api/graphql`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  query: `
-                    mutation UpdateTempFile($id: ID!) {
-                      updateTempFileUpload(
-                        where: { id: $id }
-                        data: { status: USED, usedAt: "${new Date().toISOString()}" }
-                      ) {
-                        id
-                      }
-                    }
-                  `,
-                  variables: { id: tempFileId },
-                }),
-              })
-              console.log(`✅ Marked file as USED: ${attachment.fileName}`)
-            }
-          })
+          const findResponse = await fetch(`${CMS_URL}/api/temp-file-uploads?where[fileUrl][equals]=${encodeURIComponent(attachment.fileUrl)}`)
+          const findData = await findResponse.json()
+
+          if (findData.docs && findData.docs.length > 0) {
+            const tempFileId = findData.docs[0].id
+            // Mark as USED
+            await fetch(`${CMS_URL}/api/temp-file-uploads/${tempFileId}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                status: 'used',
+                usedAt: new Date().toISOString(),
+              }),
+            })
+            console.log(`✅ Marked file as USED: ${attachment.fileName}`)
+          }
         }
       } catch (error) {
         console.error('⚠️ Failed to mark files as used:', error)
@@ -191,21 +116,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 返回成功响应
+    // Return success response
     return NextResponse.json({
       success: true,
-      submission: result.createFormSubmission,
+      submission: result,
     })
   } catch (error) {
     console.error('💥 Form submission API error:', error)
-
-    // 如果是 ApolloError,提取更详细的信息
-    if (error && typeof error === 'object' && 'networkError' in error) {
-      const networkError = (error as any).networkError
-      if (networkError && networkError.result && networkError.result.errors) {
-        console.error('📝 Detailed GraphQL errors:', JSON.stringify(networkError.result.errors, null, 2))
-      }
-    }
 
     return NextResponse.json(
       {

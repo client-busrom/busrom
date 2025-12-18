@@ -295,5 +295,8 @@ export const Blog = list({
       initialSort: { field: 'publishedAt', direction: 'DESC' },
     },
     labelField: 'slug',
+    label: 'Blogs | 博客',
+    singular: 'Blog | 博客',
+    plural: 'Blogs | 博客',
   },
 })

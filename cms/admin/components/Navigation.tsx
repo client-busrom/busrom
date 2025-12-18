@@ -187,7 +187,7 @@ export function CustomNavigation({ lists, authenticatedItem }: NavigationProps) 
       {hasVisibleLists(["NavigationMenu"]) && (
         <CollapsibleGroup title="导航管理">
           <ListNavItems lists={lists} include={["NavigationMenu"]} />
-          <NavItem href="/navigation-manager">Navigation Manager</NavItem>
+          <NavItem href="/navigation-manager">Navigation Manager | 导航管理器</NavItem>
         </CollapsibleGroup>
       )}
 
@@ -239,7 +239,7 @@ export function CustomNavigation({ lists, authenticatedItem }: NavigationProps) 
       {hasVisibleLists(["Media", "MediaCategory", "MediaTag"]) && (
         <CollapsibleGroup title="媒体库 (AWS S3)">
           <ListNavItems lists={lists} include={["Media", "MediaCategory", "MediaTag"]} />
-          <NavItem href="/batch-media-upload">Batch Media Upload</NavItem>
+          <NavItem href="/batch-media-upload">Batch Media Upload | 批量上传</NavItem>
         </CollapsibleGroup>
       )}
 
@@ -261,13 +261,12 @@ export function CustomNavigation({ lists, authenticatedItem }: NavigationProps) 
       )}
 
       {/* Component Block */}
-      {hasVisibleLists(["ProductSeriesContentTranslation", "ProductContentTranslation", "ApplicationContentTranslation", "PageContentTranslation", "BlogContentTranslation", "DocumentTemplate", "ReusableBlock", "ReusableBlockContentTranslation"]) && (
+      {hasVisibleLists(["ProductSeriesContentTranslation", "ProductContentTranslation", "PageContentTranslation", "BlogContentTranslation", "DocumentTemplate", "ReusableBlock", "ReusableBlockContentTranslation"]) && (
         <CollapsibleGroup title="组件块管理" defaultOpen={false}>
-          <NavItem href="/product-series-content-translations">ProductSeries Component</NavItem>
-          <NavItem href="/product-content-translations">Product Component</NavItem>
-          <NavItem href="/application-content-translations">Application Component</NavItem>
-          <NavItem href="/page-content-translations">Page Component</NavItem>
-          <NavItem href="/blog-content-translations">Blog Component</NavItem>
+          <NavItem href="/product-series-content-translations">ProductSeries Component | 产品系列组件</NavItem>
+          <NavItem href="/product-content-translations">Product Component | 产品组件</NavItem>
+          <NavItem href="/page-content-translations">Page Component | 页面组件</NavItem>
+          <NavItem href="/blog-content-translations">Blog Component | 博客组件</NavItem>
           <ListNavItems
             lists={lists}
             include={["DocumentTemplate", "ReusableBlock", "ReusableBlockContentTranslation"]}
@@ -279,7 +278,7 @@ export function CustomNavigation({ lists, authenticatedItem }: NavigationProps) 
       {hasVisibleLists(["FormConfig", "FormSubmission"]) && (
         <CollapsibleGroup title="表单">
           <ListNavItems lists={lists} include={["FormConfig", "FormSubmission"]} />
-          <NavItem href="/export-form-submissions">📊 Export Form Submissions</NavItem>
+          <NavItem href="/export-form-submissions">Export Form Submissions | 导出表单提交</NavItem>
         </CollapsibleGroup>
       )}
 

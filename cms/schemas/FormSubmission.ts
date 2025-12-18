@@ -285,9 +285,9 @@ export const FormSubmission = list({
       defaultFieldMode: 'read',
       initialSort: { field: 'submittedAt', direction: 'DESC' },
     },
-    label: 'Form Submissions',
-    singular: 'Form Submission',
-    plural: 'Form Submissions',
+    label: 'Form Submissions | 表单提交',
+    singular: 'Form Submission | 表单提交',
+    plural: 'Form Submissions | 表单提交',
     description: '动态表单提交记录 - 存储所有通过 FormConfig 配置的表单数据',
     // Hide create button in admin UI - submissions should only be created via API
     hideCreate: true,

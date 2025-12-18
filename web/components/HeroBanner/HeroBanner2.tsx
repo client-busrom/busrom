@@ -2,107 +2,311 @@
 import type { FC } from "react";
 import Image from "next/image";
 import type { HomeContent } from "@/lib/content-data";
-import { Locale } from "@/i18n.config";
 import { getObjectPosition } from "@/lib/utils";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 type BannerData = HomeContent["heroBanner"][number];
 type BannerProps = {
   data: BannerData;
-  locale: Locale;
+};
+
+// --- 响应式尺寸函数 ---
+// 使用 CSS 变量 --rpx-hero，在宽屏幕上按宽度缩放，在高屏幕上按高度缩放
+const rpx = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
+
+// 背景图片配置
+const BACKGROUND_CONFIG = {
+  backgroundColor: '#756f3f',  // 背景颜色
+  imageOpacity: 0.59,          // 背景图片透明度
+  blurAmount: 5,               // 模糊程度 (px)
+};
+
+// SVG装饰元素配置 (左下角)
+const SVG_CONFIG = {
+  width: 1135,
+  zIndex: 5,
+};
+
+// 左侧文字内容配置 (左下定位)
+const LEFT_CONTENT_CONFIG = {
+  left: '10.4%',      // 200/1920
+  bottom: '16.7%',    // 从底部定位
+  titleFontSize: 80,
+  titleMaxWidth: 720,
+  titleMarginBottom: 120,
+  itemFontSize: 32,
+  itemGap: 16,
+  itemPaddingX: 36,
+  itemPaddingY: 14,
+};
+
+// 3个角落装饰元素配置 (只有一个角是圆角)
+// 颜色: rgba(255, 236, 130, 0.85) - #FFEC82 85%透明度
+const CORNER_COLOR = 'rgba(255, 236, 130, 0.85)';
+const CORNER_RADIUS = 34;
+
+// 角落装饰配置
+const CORNER_TOP_RIGHT = { width: 60, height: 220 };
+const CORNER_BOTTOM_RIGHT = { width: 550, height: 60 };
+const CORNER_BOTTOM_LEFT = { width: 60, height: 460 };
+const CORNER_TOP_CENTER = { left: '25.5%', width: '49%', height: 70 }; // 百分比居中
+
+// 右侧内容配置 (右上定位)
+const RIGHT_CONTENT_CONFIG = {
+  // 整个右侧内容区域定位
+  contentRight: '5.4%',
+  contentTop: '10%',
+  // 标题
+  titleFontSize: 54,
+  titleMarginBottom: 40,       // 标题和图片的间距 (px)
+  // 小图 (前景，左上) - 相对大图偏移
+  smallImageOffsetRight: 350,  // 相对大图往左偏移 (加大间距)
+  smallImageOffsetTop: 140,    // 相对大图往上偏移
+  smallImageWidth: 360,
+  smallImageHeight: 329,
+  // 大图尺寸
+  largeImageWidth: 616,
+  largeImageHeight: 563,
+  // 共用
+  borderRadius: 34,
+  borderWidth: 10,
 };
 
 // --- HeroBanner2 Component ---
-const HeroBanner2: FC<BannerProps> = ({ data, locale }) => {
-  const svgUrl: string = "/HeroBanner2.svg";
+const HeroBanner2: FC<BannerProps> = ({ data }) => {
+  const svgUrl: string = "/hero-banner-2-1.svg";
 
   const parallelogramClipPath = "polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%)";
 
   return (
     <section className="relative w-full h-full overflow-hidden font-sans">
-      {/* Background Image */}
-      <OptimizedImage
-        image={data.images[0]}
-        alt="Background"
-        size="xlarge"
-        className="absolute inset-0 w-full h-full object-cover z-0"
-        objectPosition={getObjectPosition(data.images[0])}
-        priority
-      />
-      {/* SVG 遮罩 */}
-      <Image
-        src={svgUrl}
-        alt="mask"
-        fill
-        sizes="100vw"
-        className="object-cover z-10"
-        style={{ objectPosition: getObjectPosition(data.images[0]) }}
+      {/* 背景颜色层 */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{ backgroundColor: BACKGROUND_CONFIG.backgroundColor }}
       />
 
-      {/* Content Grid Container */}
-      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 h-full items-center gap-8 p-16 md:p-24">
-        
-        {/* --- Left Column --- */}
-        <div className="flex flex-col justify-center h-full text-left">
-          {/* Feature[1] - Top Text */}
-          <p className="text-3xl lg:text-6xl md:text-5xl font-paytone-one font-regular text-[#000000] text-stroke-custom-light mb-8">
-            {data.features[0]}
-          </p>
+      {/* Background Image - 带透明度和模糊 */}
+      <div
+        className="absolute inset-0 z-[1]"
+        style={{
+          opacity: BACKGROUND_CONFIG.imageOpacity,
+          filter: `blur(${BACKGROUND_CONFIG.blurAmount}px)`,
+        }}
+      >
+        <OptimizedImage
+          image={data.images[0]}
+          alt="Background"
+          size="xlarge"
+          className="absolute inset-0 w-full h-full object-cover"
+          objectPosition={getObjectPosition(data.images[0])}
+          priority
+        />
+      </div>
 
-          {/* Feature Stack (Parallelograms with Transparency Gradient) */}
-          <div className="space-y-4">
-            {[data.features[2], data.features[3], data.features[4]].map((feature, index) => {
-              // 定义透明度蒙版的样式
-              const transparencyMaskStyle = {
-                maskImage: 'linear-gradient(to right, black 0%, transparent 100%)', // 左黑 (不透明) -> 右透明
-                WebkitMaskImage: 'linear-gradient(to right, black 0%, transparent 100%)', // Safari 兼容
-              };
+      {/* SVG 装饰元素 - 左下角，撑满高度 */}
+      <div
+        className="absolute"
+        style={{
+          left: 0,
+          bottom: 0,
+          width: rpx(SVG_CONFIG.width),
+          height: '100%',
+          zIndex: SVG_CONFIG.zIndex,
+        }}
+      >
+        <Image
+          src={svgUrl}
+          alt="decoration"
+          fill
+          sizes={rpx(SVG_CONFIG.width)}
+          className="object-contain object-left-bottom"
+        />
+      </div>
 
-              return (
-                <div
-                  key={index}
-                  className="bg-gradient-to-r from-[#5A4F0E] to-[#C0A91D] px-6 py-3" // 保留颜色渐变
+      {/* 左侧文字内容 - 左下定位 */}
+      <div
+        className="absolute flex flex-col"
+        style={{
+          left: LEFT_CONTENT_CONFIG.left,
+          bottom: LEFT_CONTENT_CONFIG.bottom,
+          zIndex: 6,
+        }}
+      >
+        {/* 标题文字 */}
+        <p
+          className="font-paytone-one font-regular text-[#000000] text-stroke-custom-light"
+          style={{
+            fontSize: rpx(LEFT_CONTENT_CONFIG.titleFontSize),
+            lineHeight: 1.15,
+            marginBottom: rpx(LEFT_CONTENT_CONFIG.titleMarginBottom),
+            maxWidth: rpx(LEFT_CONTENT_CONFIG.titleMaxWidth),
+          }}
+        >
+          {data.features[0]}
+        </p>
+
+        {/* 三个平行四边形条目 */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: rpx(LEFT_CONTENT_CONFIG.itemGap),
+          }}
+        >
+          {[data.features[2], data.features[3], data.features[4]].map((feature, index) => {
+            const transparencyMaskStyle = {
+              maskImage: 'linear-gradient(to right, black 0%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, black 0%, transparent 100%)',
+            };
+
+            return (
+              <div
+                key={index}
+                className="bg-gradient-to-r from-[#5A4F0E] to-[#C0A91D]"
+                style={{
+                  clipPath: parallelogramClipPath,
+                  ...transparencyMaskStyle,
+                  paddingLeft: rpx(LEFT_CONTENT_CONFIG.itemPaddingX),
+                  paddingRight: rpx(LEFT_CONTENT_CONFIG.itemPaddingX * 2),
+                  paddingTop: rpx(LEFT_CONTENT_CONFIG.itemPaddingY),
+                  paddingBottom: rpx(LEFT_CONTENT_CONFIG.itemPaddingY),
+                }}
+              >
+                <p
+                  className="font-medium text-[#FFF5AD]"
                   style={{
-                    clipPath: parallelogramClipPath, // 保留形状
-                    ...transparencyMaskStyle        // 应用透明度蒙版
-                  }} 
+                    fontSize: rpx(LEFT_CONTENT_CONFIG.itemFontSize),
+                    paddingLeft: rpx(16),
+                    textShadow: `0 ${rpx(4)} ${rpx(12.6)} #565020`,
+                  }}
                 >
-                  <p className="text-base md:text-lg font-medium text-[#FFF5AD] pl-4">
-                    {feature}
-                  </p>
-                </div>
-              );
-            })}
+                  {feature}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 右上角装饰 */}
+      <div
+        className="absolute top-0 right-0 z-[4]"
+        style={{
+          width: rpx(CORNER_TOP_RIGHT.width),
+          height: rpx(CORNER_TOP_RIGHT.height),
+          backgroundColor: CORNER_COLOR,
+          borderRadius: `0 0 0 ${CORNER_RADIUS}px`,
+        }}
+      />
+
+      {/* 右下角装饰 */}
+      <div
+        className="absolute bottom-0 right-0 z-[4]"
+        style={{
+          width: rpx(CORNER_BOTTOM_RIGHT.width),
+          height: rpx(CORNER_BOTTOM_RIGHT.height),
+          backgroundColor: CORNER_COLOR,
+          borderRadius: `${CORNER_RADIUS}px 0 0 0`,
+        }}
+      />
+
+      {/* 左下角装饰 */}
+      <div
+        className="absolute bottom-0 left-0 z-[4]"
+        style={{
+          width: rpx(CORNER_BOTTOM_LEFT.width),
+          height: rpx(CORNER_BOTTOM_LEFT.height),
+          backgroundColor: CORNER_COLOR,
+          borderRadius: `0 ${CORNER_RADIUS}px 0 0`,
+        }}
+      />
+
+      {/* 顶部居中装饰 */}
+      <div
+        className="absolute top-0 z-[4]"
+        style={{
+          left: CORNER_TOP_CENTER.left,
+          width: CORNER_TOP_CENTER.width,
+          height: rpx(CORNER_TOP_CENTER.height),
+          backgroundColor: CORNER_COLOR,
+          borderRadius: `0 0 ${CORNER_RADIUS}px ${CORNER_RADIUS}px`,
+        }}
+      />
+
+      {/* 右侧内容区域 - 标题+图片作为整体 */}
+      <div
+        className="absolute z-10 flex flex-col items-end"
+        style={{
+          right: RIGHT_CONTENT_CONFIG.contentRight,
+          top: RIGHT_CONTENT_CONFIG.contentTop,
+        }}
+      >
+        {/* 右侧标题 */}
+        <h1
+          className="font-paytone-one font-regular text-white text-left"
+          style={{
+            fontSize: rpx(RIGHT_CONTENT_CONFIG.titleFontSize),
+            textShadow: '0 2px 4px rgba(117, 112, 63, 0.5)',
+            marginBottom: rpx(RIGHT_CONTENT_CONFIG.titleMarginBottom),
+          }}
+        >
+          {data.features[1]}
+        </h1>
+
+        {/* 右侧图片组 */}
+        <div className="relative">
+        {/* 大图 (背景) */}
+        <div
+          className="overflow-hidden shadow-lg bg-white"
+          style={{
+            width: rpx(RIGHT_CONTENT_CONFIG.largeImageWidth),
+            height: rpx(RIGHT_CONTENT_CONFIG.largeImageHeight),
+            padding: rpx(RIGHT_CONTENT_CONFIG.borderWidth),
+            borderRadius: rpx(RIGHT_CONTENT_CONFIG.borderRadius),
+          }}
+        >
+          <div
+            className="relative w-full h-full overflow-hidden"
+            style={{
+              borderRadius: rpx(RIGHT_CONTENT_CONFIG.borderRadius - RIGHT_CONTENT_CONFIG.borderWidth),
+            }}
+          >
+            <OptimizedImage
+              image={data.images[1]}
+              alt="Large feature image"
+              size="large"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
           </div>
         </div>
 
-        {/* --- Right Column --- */}
-        <div className="flex flex-col justify-center h-full text-left md:text-right items-end">
-          {/* Feature[0] - Top Title */}
-          <h1 className="text-2xl md:text-4xl font-paytone-one font-regular text-white mb-4 md:mb-6">
-            {data.features[1]}
-          </h1>
-
-          <div className="relative w-full max-w-lg h-64 md:h-80 lg:h-96">
-            {/* Large Image (Bottom Left) */}
-            <div className="absolute bottom-0 right-[0%] w-4/5 h-4/5 rounded-xl overflow-hidden shadow-lg z-10 border-8 border-white">
-              <OptimizedImage
-                image={data.images[1]}
-                alt="Large feature image"
-                size="large"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            </div>
-            {/* Small Image (Top Right, Overlapping) */}
-            <div className="absolute top-1/3 left-[0%] w-1/2 h-1/2 rounded-xl overflow-hidden shadow-lg z-20 border-8 border-white">
-              <OptimizedImage
-                image={data.images[2]}
-                alt="Small feature image"
-                size="medium"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            </div>
+        {/* 小图 (前景，相对大图偏移) */}
+        <div
+          className="absolute overflow-hidden shadow-lg bg-white z-20"
+          style={{
+            right: rpx(RIGHT_CONTENT_CONFIG.smallImageOffsetRight),
+            top: rpx(RIGHT_CONTENT_CONFIG.smallImageOffsetTop),
+            width: rpx(RIGHT_CONTENT_CONFIG.smallImageWidth),
+            height: rpx(RIGHT_CONTENT_CONFIG.smallImageHeight),
+            padding: rpx(RIGHT_CONTENT_CONFIG.borderWidth),
+            borderRadius: rpx(RIGHT_CONTENT_CONFIG.borderRadius),
+          }}
+        >
+          <div
+            className="relative w-full h-full overflow-hidden"
+            style={{
+              borderRadius: rpx(RIGHT_CONTENT_CONFIG.borderRadius - RIGHT_CONTENT_CONFIG.borderWidth),
+            }}
+          >
+            <OptimizedImage
+              image={data.images[2]}
+              alt="Small feature image"
+              size="medium"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
           </div>
+        </div>
         </div>
       </div>
     </section>

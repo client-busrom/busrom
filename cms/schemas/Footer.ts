@@ -411,6 +411,9 @@ export const Footer = list({
       initialColumns: ['internalLabel', 'formConfig', 'column3Menus', 'column4Menus', 'enabled', 'status', 'publishedAt', 'updatedAt'],
       defaultFieldMode: 'read',
     },
+    label: 'Footer | 页脚配置',
+    singular: 'Footer | 页脚配置',
+    plural: 'Footer | 页脚配置',
     description: '页脚配置 - Singleton + 草稿发布模式。支持关联 FormConfig 配置表单字段，支持选择导航菜单项用于非首页页脚的第三、第四列显示。修改后将状态改为"已发布"才会在前端显示。',
   },
 
