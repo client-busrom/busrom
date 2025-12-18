@@ -54,10 +54,10 @@ jobs:
           fi
 
   # =============================================================================
-  # Build and Push CMS Docker Image
+  # Build and Push Payload CMS Docker Image
   # =============================================================================
-  build-cms:
-    name: Build & Push CMS Image
+  build-payload-cms:
+    name: Build & Push Payload CMS Image
     runs-on: ubuntu-latest
     needs: setup
     if: needs.setup.outputs.deploy == 'true'
@@ -86,17 +86,17 @@ jobs:
           ENVIRONMENT: ${{ needs.setup.outputs.environment }}
         run: |
           if [ "$ENVIRONMENT" == "production" ]; then
-            echo "name=${{ secrets.ECR_REPOSITORY_CMS_PRODUCTION || 'busrom-cms-production' }}" >> $GITHUB_OUTPUT
+            echo "name=${{ secrets.ECR_REPOSITORY_PAYLOAD_CMS_PRODUCTION || 'busrom-payload-cms-production' }}" >> $GITHUB_OUTPUT
           else
-            echo "name=${{ secrets.ECR_REPOSITORY_CMS_STAGING || 'busrom-cms-staging' }}" >> $GITHUB_OUTPUT
+            echo "name=${{ secrets.ECR_REPOSITORY_PAYLOAD_CMS_STAGING || 'busrom-payload-cms-staging' }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Build and push CMS Docker image
+      - name: Build and push Payload CMS Docker image
         id: build
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile.cms
+          file: ./Dockerfile.payload-cms
           push: true
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/${{ steps.repo.outputs.name }}:latest
@@ -107,7 +107,7 @@ jobs:
 
       - name: Verify image push
         run: |
-          echo "✅ CMS Docker image built and pushed successfully"
+          echo "✅ Payload CMS Docker image built and pushed successfully"
           echo "Repository: ${{ steps.repo.outputs.name }}"
           echo "Tag: ${{ github.sha }}"
 
@@ -172,12 +172,12 @@ jobs:
           echo "Tag: ${{ github.sha }}"
 
   # =============================================================================
-  # Deploy CMS to ECS
+  # Deploy Payload CMS to ECS
   # =============================================================================
-  deploy-cms:
-    name: Deploy CMS to ECS
+  deploy-payload-cms:
+    name: Deploy Payload CMS to ECS
     runs-on: ubuntu-latest
-    needs: [setup, build-cms]
+    needs: [setup, build-payload-cms]
     environment: ${{ needs.setup.outputs.environment }}
 
     steps:
@@ -201,9 +201,9 @@ jobs:
           ENVIRONMENT: ${{ needs.setup.outputs.environment }}
         run: |
           if [ "$ENVIRONMENT" == "production" ]; then
-            REPO_NAME="${{ secrets.ECR_REPOSITORY_CMS_PRODUCTION || 'busrom-cms-production' }}"
+            REPO_NAME="${{ secrets.ECR_REPOSITORY_PAYLOAD_CMS_PRODUCTION || 'busrom-payload-cms-production' }}"
           else
-            REPO_NAME="${{ secrets.ECR_REPOSITORY_CMS_STAGING || 'busrom-cms-staging' }}"
+            REPO_NAME="${{ secrets.ECR_REPOSITORY_PAYLOAD_CMS_STAGING || 'busrom-payload-cms-staging' }}"
           fi
           IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${REPO_NAME}:${{ github.sha }}"
           echo "uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
@@ -216,24 +216,24 @@ jobs:
         run: |
           if [ "$ENVIRONMENT" == "production" ]; then
             echo "cluster=${{ secrets.ECS_CLUSTER_PRODUCTION || 'busrom-cluster-production' }}" >> $GITHUB_OUTPUT
-            echo "service=${{ secrets.ECS_SERVICE_CMS_PRODUCTION || 'busrom-cms-production' }}" >> $GITHUB_OUTPUT
+            echo "service=${{ secrets.ECS_SERVICE_PAYLOAD_CMS_PRODUCTION || 'busrom-payload-cms-production' }}" >> $GITHUB_OUTPUT
           else
             echo "cluster=${{ secrets.ECS_CLUSTER_STAGING || 'busrom-cluster-staging' }}" >> $GITHUB_OUTPUT
-            echo "service=${{ secrets.ECS_SERVICE_CMS_STAGING || 'busrom-cms-staging' }}" >> $GITHUB_OUTPUT
+            echo "service=${{ secrets.ECS_SERVICE_PAYLOAD_CMS_STAGING || 'busrom-payload-cms-staging' }}" >> $GITHUB_OUTPUT
           fi
 
       - name: Download task definition
         run: |
           aws ecs describe-task-definition \
-            --task-definition busrom-cms-${{ needs.setup.outputs.environment }} \
-            --query taskDefinition > task-definition-cms.json
+            --task-definition busrom-payload-cms-${{ needs.setup.outputs.environment }} \
+            --query taskDefinition > task-definition-payload-cms.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: task-definition-cms.json
-          container-name: busrom-cms
+          task-definition: task-definition-payload-cms.json
+          container-name: busrom-payload-cms
           image: ${{ steps.image-uri.outputs.uri }}
 
       - name: Deploy Amazon ECS task definition
@@ -247,8 +247,8 @@ jobs:
       - name: Deployment success notification
         if: success()
         run: |
-          echo "✅ CMS deployed successfully to ${{ needs.setup.outputs.environment }}!"
-          echo "Image: ${{ needs.build-cms.outputs.image-uri }}"
+          echo "✅ Payload CMS deployed successfully to ${{ needs.setup.outputs.environment }}!"
+          echo "Image: ${{ steps.image-uri.outputs.uri }}"
 
   # =============================================================================
   # Deploy Web to ECS
@@ -335,7 +335,7 @@ jobs:
   health-check:
     name: Health Check
     runs-on: ubuntu-latest
-    needs: [setup, deploy-cms, deploy-web]
+    needs: [setup, deploy-payload-cms, deploy-web]
 
     steps:
       - name: Wait for services to stabilize
@@ -344,14 +344,16 @@ jobs:
       - name: Health check summary
         run: |
           echo "🎉 Deployment to ${{ needs.setup.outputs.environment }} completed!"
-          echo "✅ CMS service deployed"
+          echo "✅ Payload CMS service deployed"
           echo "✅ Web service deployed"
           echo ""
           echo "Please verify the deployment manually:"
           if [ "${{ needs.setup.outputs.environment }}" == "production" ]; then
-            echo "  CMS: https://cms.busrom.com/api/health"
+            echo "  Payload CMS: https://cms.busrom.com/api/health"
+            echo "  Payload Admin: https://cms.busrom.com/admin"
             echo "  Web: https://www.busrom.com/api/health"
           else
-            echo "  CMS: https://cms-staging.busrom.com/api/health"
+            echo "  Payload CMS: https://cms-staging.busrom.com/api/health"
+            echo "  Payload Admin: https://cms-staging.busrom.com/admin"
             echo "  Web: https://staging.busrom.com/api/health"
           fi

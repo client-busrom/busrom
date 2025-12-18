@@ -1,0 +1,3463 @@
+{
+  "globals": {
+    "service-features": {
+      "id": 1,
+      "status": "published",
+      "title": {
+        "en": "{\"en\":\"Premium Architectural Glass Hardware\",\"zh\":\"高端建筑玻璃五金\"}",
+        "zh": "高端建筑玻璃五金"
+      },
+      "subtitle": {
+        "en": "{\"en\":\"Fully Customized Glass Hardware by Busrom (Serving USA, CA, UK, AU, KSA, UAE, and clients worldwide to create the ideal indoor & outdoor space.)\",\"zh\":\"Busrom 提供全定制玻璃五金(服务美国、加拿大、英国、澳大利亚、沙特阿拉伯、阿联酋及全球客户,打造理想的室内外空间。)\"}",
+        "zh": "Busrom 提供全定制玻璃五金(服务美国、加拿大、英国、澳大利亚、沙特阿拉伯、阿联酋及全球客户,打造理想的室内外空间。)"
+      },
+      "feature01Title": {
+        "en": "{\"en\":\"Any Size, Any Structure, Any Shape\",\"zh\":\"任意尺寸、任意结构、任意形状\"}",
+        "zh": "任意尺寸、任意结构、任意形状"
+      },
+      "feature01ShortTitle": {
+        "en": "{\"en\":\"Any Size\",\"zh\":\"任意尺寸\"}",
+        "zh": "任意尺寸"
+      },
+      "feature01Description": {
+        "en": "{\"en\":\"Whether it's framed or frameless partitions, or even load-bearing curtain walls, we can customize glass hardware to match any size and structure.\",\"zh\":\"无论是带框还是无框隔断,甚至是承重幕墙,我们都能定制匹配任意尺寸和结构的玻璃五金。\"}",
+        "zh": "无论是带框还是无框隔断,甚至是承重幕墙,我们都能定制匹配任意尺寸和结构的玻璃五金。"
+      },
+      "feature01Image1": null,
+      "feature01Image2": null,
+      "feature01Image3": null,
+      "feature01Image4": null,
+      "feature02Title": {
+        "en": "{\"en\":\"Flexible Installation\",\"zh\":\"灵活安装\"}",
+        "zh": "灵活安装"
+      },
+      "feature02ShortTitle": {
+        "en": "{\"en\":\"Flexible Installation\",\"zh\":\"灵活安装\"}",
+        "zh": "灵活安装"
+      },
+      "feature02Description": {
+        "en": "{\"en\":\"Whether it's frameless glass, tiled walls, metal frames, or renovation projects, Busrom's glass hardware adapts to every setting. From indoor bathrooms to poolside decks, our solutions install quickly and with minimal fuss.\",\"zh\":\"无论是无框玻璃、瓷砖墙面、金属框架还是翻新项目,Busrom 的玻璃五金都能适应各种环境。从室内浴室到池畔露台,我们的解决方案安装快捷,麻烦最少。\"}",
+        "zh": "无论是无框玻璃、瓷砖墙面、金属框架还是翻新项目,Busrom 的玻璃五金都能适应各种环境。从室内浴室到池畔露台,我们的解决方案安装快捷,麻烦最少。"
+      },
+      "feature02Image1": null,
+      "feature02Image2": null,
+      "feature03Title": {
+        "en": "{\"en\":\"A Color That's So You\",\"zh\":\"专属色彩\"}",
+        "zh": "专属色彩"
+      },
+      "feature03ShortTitle": {
+        "en": "{\"en\":\"A Color That's So You\",\"zh\":\"专属色彩\"}",
+        "zh": "专属色彩"
+      },
+      "feature03Description": {
+        "en": "{\"en\":\"From classic brushed stainless steel and matte black to any RAL color or custom PVD finish, Busrom's bespoke craftsmanship elevates projects into the crowning touch of any space. Durable coatings resist corrosion and wear, maintaining their aesthetic appeal for years to come.\",\"zh\":\"从经典的拉丝不锈钢和哑光黑,到任意 RAL 颜色或定制 PVD 表面,Busrom 的定制工艺将项目提升为点睛之笔。耐用的涂层抗腐蚀和磨损,长久保持美观。\"}",
+        "zh": "从经典的拉丝不锈钢和哑光黑,到任意 RAL 颜色或定制 PVD 表面,Busrom 的定制工艺将项目提升为点睛之笔。耐用的涂层抗腐蚀和磨损,长久保持美观。"
+      },
+      "feature03Image1": null,
+      "feature03Image2": null,
+      "feature03Image3": null,
+      "feature03Image4": null,
+      "feature03Image5": null,
+      "feature03Image6": null,
+      "feature04Title": {
+        "en": "{\"en\":\"OEM / ODM & Project Customization\",\"zh\":\"OEM / ODM 及项目定制\"}",
+        "zh": "OEM / ODM 及项目定制"
+      },
+      "feature04ShortTitle": {
+        "en": "{\"en\":\"OEM / ODM\",\"zh\":\"OEM / ODM\"}",
+        "zh": "OEM / ODM"
+      },
+      "feature04Description": {
+        "en": "{\"en\":\"From prototype to mass production, we support drawing-based customization, small-batch runs, and full OEM/ODM services.\",\"zh\":\"从原型到批量生产,我们支持来图定制、小批量试产以及完整的 OEM/ODM 服务。\"}",
+        "zh": "从原型到批量生产,我们支持来图定制、小批量试产以及完整的 OEM/ODM 服务。"
+      },
+      "feature04Image1": null,
+      "feature04Image2": null,
+      "feature05Title": {
+        "en": "{\"en\":\"Global Quality Standards & After-Sales Support\",\"zh\":\"全球质量标准与售后支持\"}",
+        "zh": "全球质量标准与售后支持"
+      },
+      "feature05ShortTitle": {
+        "en": "{\"en\":\"Global Quality Standards\",\"zh\":\"全球质量标准\"}",
+        "zh": "全球质量标准"
+      },
+      "feature05Description": {
+        "en": "{\"en\":\"Strict QC, worldwide shipping, and responsive spare-part and technical support for project continuity.\",\"zh\":\"严格的质量控制,全球配送,以及响应迅速的备件和技术支持,确保项目连续性。\"}",
+        "zh": "严格的质量控制,全球配送,以及响应迅速的备件和技术支持,确保项目连续性。"
+      },
+      "feature05Image1": null,
+      "feature05Image2": null,
+      "updatedAt": "2025-12-16T12:35:38.559Z",
+      "createdAt": "2025-12-14T08:42:31.417Z",
+      "globalType": "service-features"
+    },
+    "sphere-3d": {
+      "id": 1,
+      "status": "published",
+      "enabled": false,
+      "title": {
+        "en": "{}"
+      },
+      "modelUrl": null,
+      "backgroundColor": "#000000",
+      "updatedAt": "2025-12-16T12:35:38.586Z",
+      "createdAt": "2025-12-16T04:20:59.865Z",
+      "globalType": "sphere-3d"
+    },
+    "simple-cta": {
+      "id": 1,
+      "status": "published",
+      "title": {
+        "en": "{\"en\":\"Ready to Start\",\"zh\":\"准备好开始\"}",
+        "zh": "准备好开始"
+      },
+      "subtitle": {
+        "en": "{\"en\":\"Let's Build Something Exceptional!\",\"zh\":\"让我们共筑卓越!\"}",
+        "zh": "让我们共筑卓越!"
+      },
+      "ctaText": {
+        "en": "{\"en\":\"Contact Us Now！\",\"zh\":\"联系我们\"}",
+        "zh": "联系我们"
+      },
+      "ctaLink": "/contact",
+      "image1": null,
+      "image2": null,
+      "image3": null,
+      "updatedAt": "2025-12-16T12:35:38.599Z",
+      "createdAt": "2025-12-14T08:42:31.549Z",
+      "globalType": "simple-cta"
+    },
+    "featured-products": {
+      "id": 1,
+      "status": "published",
+      "title": {
+        "en": "{\"en\":\"Featured Products\",\"zh\":\"精选产品\"}",
+        "zh": "精选产品"
+      },
+      "description": {
+        "en": "{\"en\":\"Explore our premium glass hardware collections\",\"zh\":\"探索我们的高端玻璃五金系列\"}",
+        "zh": "探索我们的高端玻璃五金系列"
+      },
+      "viewAllButtonText": {
+        "en": "{\"en\":\"View All Products\",\"zh\":\"查看所有产品\"}",
+        "zh": "查看所有产品"
+      },
+      "categories": [
+        {
+          "id": 1,
+          "slug": "glass-standoff",
+          "name": {
+            "en": "Glass Standoff",
+            "zh": "广告螺丝"
+          },
+          "description": {
+            "en": "Premium glass standoff hardware",
+            "zh": "高端广告螺丝五金"
+          },
+          "category": {
+            "id": 6,
+            "name": {
+              "en": "Glass Standoff",
+              "zh": "广告螺丝"
+            },
+            "slug": "glass-standoff",
+            "type": "PRODUCT",
+            "parent": null,
+            "description": {
+              "en": "Glass standoffs for signage and display applications",
+              "zh": "用于标识和展示应用的广告螺丝"
+            },
+            "order": 1,
+            "status": "published",
+            "updatedAt": "2025-12-16T02:34:37.415Z",
+            "createdAt": "2025-12-16T02:34:37.395Z"
+          },
+          "contentTranslation": {
+            "en": null,
+            "zh": null
+          },
+          "featuredImage": null,
+          "products": {
+            "docs": [
+              3
+            ],
+            "hasNextPage": false
+          },
+          "status": "published",
+          "order": 1,
+          "isFeatured": false,
+          "updatedAt": "2025-12-16T05:05:58.595Z",
+          "createdAt": "2025-12-14T08:42:30.377Z"
+        },
+        {
+          "id": 2,
+          "slug": "glass-connected-fitting",
+          "name": {
+            "en": "Glass Connected Fitting",
+            "zh": "玻璃栏杆扶手连接件"
+          },
+          "description": {
+            "en": "Glass railing handrail connectors",
+            "zh": "玻璃栏杆扶手连接件"
+          },
+          "category": {
+            "id": 7,
+            "name": {
+              "en": "Glass Connected Fitting",
+              "zh": "玻璃栏杆扶手连接件"
+            },
+            "slug": "glass-connected-fitting",
+            "type": "PRODUCT",
+            "parent": null,
+            "description": {
+              "en": "Glass railing and handrail connection fittings covering various types of railing connection accessories",
+              "zh": "玻璃栏杆扶手连接件，覆盖多种栏杆连接类配件"
+            },
+            "order": 2,
+            "status": "published",
+            "updatedAt": "2025-12-16T02:34:37.435Z",
+            "createdAt": "2025-12-16T02:34:37.426Z"
+          },
+          "contentTranslation": {
+            "en": null,
+            "zh": null
+          },
+          "featuredImage": null,
+          "products": {
+            "docs": [],
+            "hasNextPage": false
+          },
+          "status": "published",
+          "order": 2,
+          "isFeatured": false,
+          "updatedAt": "2025-12-16T05:05:58.634Z",
+          "createdAt": "2025-12-14T08:42:30.413Z"
+        },
+        {
+          "id": 3,
+          "slug": "glass-fence-spigot",
+          "name": {
+            "en": "Glass Fence Spigot",
+            "zh": "玻璃护栏支架底座"
+          },
+          "description": {
+            "en": "Glass fence spigot base",
+            "zh": "玻璃护栏支架底座"
+          },
+          "category": {
+            "id": 8,
+            "name": {
+              "en": "Glass Fence Spigot",
+              "zh": "玻璃护栏支架底座"
+            },
+            "slug": "glass-fence-spigot",
+            "type": "PRODUCT",
+            "parent": null,
+            "description": {
+              "en": "Glass fence spigot base supports, also known as pool spigots",
+              "zh": "玻璃护栏支架底座，又称泳池夹"
+            },
+            "order": 3,
+            "status": "published",
+            "updatedAt": "2025-12-16T02:34:37.457Z",
+            "createdAt": "2025-12-16T02:34:37.444Z"
+          },
+          "contentTranslation": {
+            "en": null,
+            "zh": null
+          },
+          "featuredImage": null,
+          "products": {
+            "docs": [],
+            "hasNextPage": false
+          },
+          "status": "published",
+          "order": 3,
+          "isFeatured": false,
+          "updatedAt": "2025-12-16T05:05:58.658Z",
+          "createdAt": "2025-12-14T08:42:30.440Z"
+        },
+        {
+          "id": 4,
+          "slug": "guardrail-glass-clip",
+          "name": {
+            "en": "Guardrail Glass Clip",
+            "zh": "护栏系列"
+          },
+          "description": {
+            "en": "Guardrail glass clip series",
+            "zh": "护栏玻璃夹系列"
+          },
+          "category": {
+            "id": 9,
+            "name": {
+              "en": "Guardrail Glass Clip",
+              "zh": "护栏系列"
+            },
+            "slug": "guardrail-glass-clip",
+            "type": "PRODUCT",
+            "parent": null,
+            "description": {
+              "en": "Guardrail series mainly used for railings and glass connections",
+              "zh": "护栏系列，主要用于护栏或玻璃连接"
+            },
+            "order": 4,
+            "status": "published",
+            "updatedAt": "2025-12-16T02:34:37.487Z",
+            "createdAt": "2025-12-16T02:34:37.470Z"
+          },
+          "contentTranslation": {
+            "en": null,
+            "zh": null
+          },
+          "featuredImage": null,
+          "products": {
+            "docs": [],
+            "hasNextPage": false
+          },
+          "status": "published",
+          "order": 4,
+          "isFeatured": false,
+          "updatedAt": "2025-12-16T05:05:58.689Z",
+          "createdAt": "2025-12-14T08:42:30.456Z"
+        },
+        {
+          "id": 5,
+          "slug": "bathroom-glass-clip",
+          "name": {
+            "en": "Bathroom Glass Clip",
+            "zh": "浴室系列"
+          },
+          "description": {
+            "en": "Bathroom glass clip series",
+            "zh": "浴室玻璃夹系列"
+          },
+          "category": {
+            "id": 10,
+            "name": {
+              "en": "Bathroom Glass Clip",
+              "zh": "浴室系列"
+            },
+            "slug": "bathroom-glass-clip",
+            "type": "PRODUCT",
+            "parent": null,
+            "description": {
+              "en": "Bathroom series mainly used for bathroom glass connections",
+              "zh": "浴室系列，主要用于浴室玻璃连接"
+            },
+            "order": 5,
+            "status": "published",
+            "updatedAt": "2025-12-16T02:34:37.509Z",
+            "createdAt": "2025-12-16T02:34:37.497Z"
+          },
+          "contentTranslation": {
+            "en": null,
+            "zh": null
+          },
+          "featuredImage": null,
+          "products": {
+            "docs": [],
+            "hasNextPage": false
+          },
+          "status": "published",
+          "order": 5,
+          "isFeatured": false,
+          "updatedAt": "2025-12-16T05:05:58.713Z",
+          "createdAt": "2025-12-14T08:42:30.473Z"
+        },
+        {
+          "id": 6,
+          "slug": "glass-hinge",
+          "name": {
+            "en": "Glass Hinge",
+            "zh": "浴室夹"
+          },
+          "description": {
+            "en": "Glass hinge series",
+            "zh": "玻璃铰链系列"
+          },
+          "category": {
+            "id": 11,
+            "name": {
+              "en": "Glass Hinge",
+              "zh": "浴室夹"
+            },
+            "slug": "glass-hinge",
+            "type": "PRODUCT",
+            "parent": null,
+            "description": {
+              "en": "Glass hinges, also known as bathroom clips, mainly used for glass doors and glass-to-wall connections",
+              "zh": "玻璃合页，又称浴室夹，主要用于玻璃门/玻璃与墙连接"
+            },
+            "order": 6,
+            "status": "published",
+            "updatedAt": "2025-12-16T02:34:37.531Z",
+            "createdAt": "2025-12-16T02:34:37.521Z"
+          },
+          "contentTranslation": {
+            "en": null,
+            "zh": null
+          },
+          "featuredImage": null,
+          "products": {
+            "docs": [],
+            "hasNextPage": false
+          },
+          "status": "published",
+          "order": 6,
+          "isFeatured": false,
+          "updatedAt": "2025-12-16T05:05:58.735Z",
+          "createdAt": "2025-12-14T08:42:30.490Z"
+        },
+        {
+          "id": 7,
+          "slug": "sliding-door-kit",
+          "name": {
+            "en": "Sliding Door Kit",
+            "zh": "移门滑轮套装"
+          },
+          "description": {
+            "en": "Sliding door hardware kit",
+            "zh": "移门滑轮套装"
+          },
+          "category": {
+            "id": 12,
+            "name": {
+              "en": "Sliding Door Kit",
+              "zh": "移门滑轮套装"
+            },
+            "slug": "sliding-door-kit",
+            "type": "PRODUCT",
+            "parent": null,
+            "description": {
+              "en": "Sliding door roller kits mainly used for glass sliding doors, typically sold as complete sets",
+              "zh": "移门滑轮套装，主要用于玻璃推拉门，通常为整套套装"
+            },
+            "order": 7,
+            "status": "published",
+            "updatedAt": "2025-12-16T02:34:37.552Z",
+            "createdAt": "2025-12-16T02:34:37.541Z"
+          },
+          "contentTranslation": {
+            "en": null,
+            "zh": null
+          },
+          "featuredImage": null,
+          "products": {
+            "docs": [],
+            "hasNextPage": false
+          },
+          "status": "published",
+          "order": 7,
+          "isFeatured": false,
+          "updatedAt": "2025-12-16T05:05:58.759Z",
+          "createdAt": "2025-12-14T08:42:30.509Z"
+        },
+        {
+          "id": 8,
+          "slug": "bathroom-door-handle",
+          "name": {
+            "en": "Bathroom & Door Handle",
+            "zh": "浴室&大门拉手"
+          },
+          "description": {
+            "en": "Bathroom and door handle series",
+            "zh": "浴室及大门拉手系列"
+          },
+          "category": {
+            "id": 13,
+            "name": {
+              "en": "Bathroom & Door Handle",
+              "zh": "浴室&大门拉手"
+            },
+            "slug": "bathroom-door-handle",
+            "type": "PRODUCT",
+            "parent": null,
+            "description": {
+              "en": "Bathroom and door handles, mainly used on bathroom glass doors and main doors",
+              "zh": "浴室及大门拉手，主要用于浴室玻璃门及大门"
+            },
+            "order": 8,
+            "status": "published",
+            "updatedAt": "2025-12-16T02:34:37.573Z",
+            "createdAt": "2025-12-16T02:34:37.565Z"
+          },
+          "contentTranslation": {
+            "en": null,
+            "zh": null
+          },
+          "featuredImage": null,
+          "products": {
+            "docs": [],
+            "hasNextPage": false
+          },
+          "status": "published",
+          "order": 8,
+          "isFeatured": false,
+          "updatedAt": "2025-12-16T05:05:58.784Z",
+          "createdAt": "2025-12-14T08:42:30.526Z"
+        },
+        {
+          "id": 9,
+          "slug": "hidden-hook",
+          "name": {
+            "en": "Hidden Hook",
+            "zh": "挂钩"
+          },
+          "description": {
+            "en": "Hidden hook series",
+            "zh": "隐藏式挂钩系列"
+          },
+          "category": {
+            "id": 14,
+            "name": {
+              "en": "Hidden Hook",
+              "zh": "挂钩"
+            },
+            "slug": "hidden-hook",
+            "type": "PRODUCT",
+            "parent": null,
+            "description": {
+              "en": "Hooks including rotating or non-rotating hidden hooks",
+              "zh": "挂钩，主要包含旋转式或非旋转式隐藏挂钩"
+            },
+            "order": 9,
+            "status": "published",
+            "updatedAt": "2025-12-16T02:34:37.589Z",
+            "createdAt": "2025-12-16T02:34:37.581Z"
+          },
+          "contentTranslation": {
+            "en": null,
+            "zh": null
+          },
+          "featuredImage": null,
+          "products": {
+            "docs": [],
+            "hasNextPage": false
+          },
+          "status": "published",
+          "order": 9,
+          "isFeatured": false,
+          "updatedAt": "2025-12-16T05:05:58.813Z",
+          "createdAt": "2025-12-14T08:42:30.545Z"
+        }
+      ],
+      "updatedAt": "2025-12-16T12:35:38.617Z",
+      "createdAt": "2025-12-16T04:20:59.642Z",
+      "globalType": "featured-products"
+    },
+    "brand-advantages": {
+      "id": 1,
+      "status": "published",
+      "image": null,
+      "advantage01Text": {
+        "en": "{\"en\":\"Precision Engineering\",\"zh\":\"精密工程\"}",
+        "zh": "精密工程"
+      },
+      "advantage01Icon": "Sparkles",
+      "advantage02Text": {
+        "en": "{\"en\":\"Certified Quality\",\"zh\":\"认证质量\"}",
+        "zh": "认证质量"
+      },
+      "advantage02Icon": "Target",
+      "advantage03Text": {
+        "en": "{\"en\":\"Modular Design\",\"zh\":\"模块化设计\"}",
+        "zh": "模块化设计"
+      },
+      "advantage03Icon": "Component",
+      "advantage04Text": {
+        "en": "{\"en\":\"Advanced Manufacturing\",\"zh\":\"先进制造\"}",
+        "zh": "先进制造"
+      },
+      "advantage04Icon": "Gauge",
+      "advantage05Text": {
+        "en": "{\"en\":\"Weatherproof Solutions\",\"zh\":\"防水解决方案\"}",
+        "zh": "防水解决方案"
+      },
+      "advantage05Icon": "Waves",
+      "advantage06Text": {
+        "en": "{\"en\":\"Safety Certified\",\"zh\":\"安全认证\"}",
+        "zh": "安全认证"
+      },
+      "advantage06Icon": "ShieldCheck",
+      "advantage07Text": {
+        "en": "{\"en\":\"Minimal Hardware\",\"zh\":\"极简硬件\"}",
+        "zh": "极简硬件"
+      },
+      "advantage07Icon": "EyeOff",
+      "advantage08Text": {
+        "en": "{\"en\":\"Factory Direct\",\"zh\":\"工厂直销\"}",
+        "zh": "工厂直销"
+      },
+      "advantage08Icon": "Factory",
+      "advantage09Text": {
+        "en": "{\"en\":\"Smart Engineering\",\"zh\":\"智能工程\"}",
+        "zh": "智能工程"
+      },
+      "advantage09Icon": "Cpu",
+      "updatedAt": "2025-12-16T12:35:38.653Z",
+      "createdAt": "2025-12-14T08:42:31.392Z",
+      "globalType": "brand-advantages"
+    },
+    "oem-odm": {
+      "id": 1,
+      "status": "published",
+      "oemTitle": {
+        "en": "{\"en\":\"OEM\",\"zh\":\"OEM\"}",
+        "zh": "OEM"
+      },
+      "oemBgImage": null,
+      "oemImage": null,
+      "oemDescription1": {
+        "en": "{\"en\":\"At Busrom, we work closely with designers, retailers, and manufacturers to deliver end-to-end OEM/ODM services. We seamlessly integrate your ideas into glass hardware and provide bespoke glass solutions tailored to your needs.\",\"zh\":\"在 Busrom，我们与设计师、零售商和制造商紧密合作，提供端到端的 OEM/ODM 服务。我们将您的想法无缝融入玻璃五金，并提供量身定制的玻璃解决方案。\"}",
+        "zh": "在 Busrom，我们与设计师、零售商和制造商紧密合作，提供端到端的 OEM/ODM 服务。我们将您的想法无缝融入玻璃五金，并提供量身定制的玻璃解决方案。"
+      },
+      "oemDescription2": {
+        "en": "{\"en\":\"Ready to turn your concept into a producible product? Send us your vision — the Busrom team will get back to you within 24 hours with a personalized partnership proposal.\",\"zh\":\"准备好将您的概念转化为可生产的产品了吗？向我们发送您的愿景——Busrom 团队将在 24 小时内回复您个性化的合作提案。\"}",
+        "zh": "准备好将您的概念转化为可生产的产品了吗？向我们发送您的愿景——Busrom 团队将在 24 小时内回复您个性化的合作提案。"
+      },
+      "odmTitle": {
+        "en": "{\"en\":\"ODM\",\"zh\":\"ODM\"}",
+        "zh": "ODM"
+      },
+      "odmBgImage": null,
+      "odmImage": null,
+      "odmDescription1": {
+        "en": "{\"en\":\"Fully Customized Structure & Size & Color\",\"zh\":\"完全定制的结构、尺寸和颜色\"}",
+        "zh": "完全定制的结构、尺寸和颜色"
+      },
+      "odmDescription2": {
+        "en": "{\"en\":\"Complete Solution - Just The Way You Want Them\",\"zh\":\"完整的解决方案 - 正是您想要的\"}",
+        "zh": "完整的解决方案 - 正是您想要的"
+      },
+      "updatedAt": "2025-12-16T12:35:38.670Z",
+      "createdAt": "2025-12-14T08:42:31.477Z",
+      "globalType": "oem-odm"
+    },
+    "quote-steps": {
+      "id": 1,
+      "status": "published",
+      "headerTitle": {
+        "en": "{\"en\":\"Design Project Solutions\",\"zh\":\"设计项目解决方案\"}",
+        "zh": "设计项目解决方案"
+      },
+      "headerTitle2": {
+        "en": "{\"en\":\"Just Easy 5 Steps\",\"zh\":\"仅需简单5步\"}",
+        "zh": "仅需简单5步"
+      },
+      "headerSubtitle": {
+        "en": "{\"en\":\"From concept to reality, made simple.\",\"zh\":\"从概念到现实，简单实现。\"}",
+        "zh": "从概念到现实，简单实现。"
+      },
+      "headerDescription": {
+        "en": "{\"en\":\"We offer both standard and fully customized services, along with design recommendations and expert support, so you can easily visualize and refine your project's glass hardware before manufacturing begins — ensuring the final result is every bit as stunning as you imagined.\",\"zh\":\"我们提供标准和完全定制的服务，以及设计建议和专业支持，让您在生产开始前轻松可视化和完善项目的玻璃五金——确保最终效果与您想象的一样惊艳。\"}",
+        "zh": "我们提供标准和完全定制的服务，以及设计建议和专业支持，让您在生产开始前轻松可视化和完善项目的玻璃五金——确保最终效果与您想象的一样惊艳。"
+      },
+      "step01Text": {
+        "en": "{\"en\":\"Send Details \\\\n (Size & Structure & Color)\",\"zh\":\"发送详情（尺寸、结构、颜色）\"}",
+        "zh": "发送详情（尺寸、结构、颜色）"
+      },
+      "step01Image": null,
+      "step02Text": {
+        "en": "{\"en\":\"Get A Free Quote\",\"zh\":\"获取免费报价\"}",
+        "zh": "获取免费报价"
+      },
+      "step02Image": null,
+      "step03Text": {
+        "en": "{\"en\":\"Confirm The Final Plan\",\"zh\":\"确认最终方案\"}",
+        "zh": "确认最终方案"
+      },
+      "step03Image": null,
+      "step04Text": {
+        "en": "{\"en\":\"Production Begins\",\"zh\":\"开始生产\"}",
+        "zh": "开始生产"
+      },
+      "step04Image": null,
+      "step05Text": {
+        "en": "{\"en\":\"Worldwide Delivery\",\"zh\":\"全球配送\"}",
+        "zh": "全球配送"
+      },
+      "step05Image": null,
+      "updatedAt": "2025-12-16T12:35:38.695Z",
+      "createdAt": "2025-12-14T08:42:31.441Z",
+      "globalType": "quote-steps"
+    },
+    "main-form": {
+      "id": 1,
+      "status": "published",
+      "formConfig": null,
+      "designTextLeft": {
+        "en": "{\"en\":\"Premium Architectural Glass Hardware\",\"zh\":\"高端建筑玻璃五金\"}",
+        "zh": "高端建筑玻璃五金"
+      },
+      "designTextRight": {
+        "en": "{\"en\":\"Customized Structure and Color\",\"zh\":\"定制结构与颜色\"}",
+        "zh": "定制结构与颜色"
+      },
+      "image1": null,
+      "image2": null,
+      "updatedAt": "2025-12-16T12:35:38.712Z",
+      "createdAt": "2025-12-14T08:42:31.857Z",
+      "globalType": "main-form"
+    },
+    "why-choose-busrom": {
+      "id": 1,
+      "status": "published",
+      "title": {
+        "en": "{\"en\":\"Why Choose\",\"zh\":\"为什么选择 Busrom\"}",
+        "zh": "为什么选择 Busrom"
+      },
+      "title2": {
+        "en": "{\"en\":\"Busrom\",\"zh\":\"Busrom\"}",
+        "zh": "Busrom"
+      },
+      "viewMoreButtonText": {
+        "en": "{\"en\":\"VIEW MORE INFORMATION\",\"zh\":\"查看更多信息\"}",
+        "zh": "查看更多信息"
+      },
+      "viewMoreButtonUrl": null,
+      "reason01Title": {
+        "en": "{\"en\":\"Original & Proprietary Design\",\"zh\":\"原创与专有设计\"}",
+        "zh": "原创与专有设计"
+      },
+      "reason01Description": {
+        "en": "{\"en\":\"Exclusive hardware that blends form and function.\",\"zh\":\"融合形式与功能的独家五金配件。\"}",
+        "zh": "融合形式与功能的独家五金配件。"
+      },
+      "reason01Icon": "Sparkles",
+      "reason01Image": null,
+      "reason02Title": {
+        "en": "{\"en\":\"Relentless Quality & Integration\",\"zh\":\"严格质量与整合\"}",
+        "zh": "严格质量与整合"
+      },
+      "reason02Description": {
+        "en": "{\"en\":\"Strict material selection, testing, and smart-home readiness for reliable safety, function, and finish.\",\"zh\":\"严格的材料选择、测试和智能家居就绪，确保可靠的安全性、功能性和表面处理。\"}",
+        "zh": "严格的材料选择、测试和智能家居就绪，确保可靠的安全性、功能性和表面处理。"
+      },
+      "reason02Icon": "ShieldCheck",
+      "reason02Image": null,
+      "reason03Title": {
+        "en": "{\"en\":\"Factory-direct Production\",\"zh\":\"工厂直接生产\"}",
+        "zh": "工厂直接生产"
+      },
+      "reason03Description": {
+        "en": "{\"en\":\"Full vertical manufacturing for tighter quality control, faster lead times, and better pricing.\",\"zh\":\"全垂直制造，更严格的质量控制、更快的交货时间和更优惠的价格。\"}",
+        "zh": "全垂直制造，更严格的质量控制、更快的交货时间和更优惠的价格。"
+      },
+      "reason03Icon": "Factory",
+      "reason03Image": null,
+      "reason04Title": {
+        "en": "{\"en\":\"Years of Global Expertise\",\"zh\":\"多年全球专业经验\"}",
+        "zh": "多年全球专业经验"
+      },
+      "reason04Description": {
+        "en": "{\"en\":\"Experienced teams and market insight that deliver durable, high-performance components.\",\"zh\":\"经验丰富的团队和市场洞察力，提供耐用、高性能的组件。\"}",
+        "zh": "经验丰富的团队和市场洞察力，提供耐用、高性能的组件。"
+      },
+      "reason04Icon": "Target",
+      "reason04Image": null,
+      "reason05Title": {
+        "en": "{\"en\":\"Collaborative R&D Partnership\",\"zh\":\"合作研发伙伴关系\"}",
+        "zh": "合作研发伙伴关系"
+      },
+      "reason05Description": {
+        "en": "{\"en\":\"Co-engineer custom solutions that turn your concepts into production-ready reality.\",\"zh\":\"共同设计定制解决方案，将您的概念变为可投入生产的现实。\"}",
+        "zh": "共同设计定制解决方案，将您的概念变为可投入生产的现实。"
+      },
+      "reason05Icon": "Cpu",
+      "reason05Image": null,
+      "updatedAt": "2025-12-16T12:35:38.749Z",
+      "createdAt": "2025-12-14T08:42:31.463Z",
+      "globalType": "why-choose-busrom"
+    },
+    "case-studies": {
+      "id": 1,
+      "status": "published",
+      "title": {
+        "en": "{\"en\":\"Application Case Studies\",\"zh\":\"应用案例研究\"}",
+        "zh": "应用案例研究"
+      },
+      "description": {
+        "en": "{\"en\":\"See how Busrom hardware brings ambitious architectural visions to life across the globe.\",\"zh\":\"了解 Busrom 五金如何在全球范围内实现雄心勃勃的建筑愿景。\"}",
+        "zh": "了解 Busrom 五金如何在全球范围内实现雄心勃勃的建筑愿景。"
+      },
+      "categories": [],
+      "updatedAt": "2025-12-16T12:35:38.769Z",
+      "createdAt": "2025-12-16T04:20:59.708Z",
+      "globalType": "case-studies"
+    },
+    "brand-analysis": {
+      "id": 1,
+      "status": "published",
+      "brandNameAnalysis": {
+        "titlePart1": {
+          "en": "{\"en\":\"Bus\",\"zh\":\"Bus\"}",
+          "zh": "Bus"
+        },
+        "titlePart2": {
+          "en": "{\"en\":\"rom\",\"zh\":\"rom\"}",
+          "zh": "rom"
+        },
+        "textPart1": {
+          "en": "{\"en\":\"Buffer & Bridge\",\"zh\":\"缓冲与桥梁\"}",
+          "zh": "缓冲与桥梁"
+        },
+        "textPart2": {
+          "en": "{\"en\":\"Room & Space\",\"zh\":\"房间与空间\"}",
+          "zh": "房间与空间"
+        }
+      },
+      "brandCenter": {
+        "title": {
+          "en": "{\"en\":\"Brand Center\",\"zh\":\"品牌中心\"}",
+          "zh": "品牌中心"
+        },
+        "description": {
+          "en": "{\"en\":\"At Busrom, we don't just create structures — we turn dreams into reality. Our vision is to make every glass installation safe without sacrificing elegance, so you'll never have to worry about finding the right solution again.\",\"zh\":\"在 Busrom，我们不仅仅是创建结构——我们将梦想变为现实。我们的愿景是让每一次玻璃安装都安全而不失优雅，让您再也不用担心找不到合适的解决方案。\"}",
+          "zh": "在 Busrom，我们不仅仅是创建结构——我们将梦想变为现实。我们的愿景是让每一次玻璃安装都安全而不失优雅，让您再也不用担心找不到合适的解决方案。"
+        },
+        "largeImage": null,
+        "smallImage": null
+      },
+      "projectCenter": {
+        "title": {
+          "en": "{\"en\":\"Project Center\",\"zh\":\"项目中心\"}",
+          "zh": "项目中心"
+        },
+        "description": {
+          "en": "{\"en\":\"Here we bring together Busrom's selected engineering cases from around the world. whether it is a commercial, residential or public project, we are committed to providing professional, efficient and customized indoor & outdoor space solutions.\",\"zh\":\"在这里，我们汇集了 Busrom 在全球精选的工程案例。无论是商业、住宅还是公共项目，我们致力于提供专业、高效和定制化的室内外空间解决方案。\"}",
+          "zh": "在这里，我们汇集了 Busrom 在全球精选的工程案例。无论是商业、住宅还是公共项目，我们致力于提供专业、高效和定制化的室内外空间解决方案。"
+        },
+        "largeImage": null,
+        "smallImage": null
+      },
+      "serviceCenter": {
+        "title": {
+          "en": "{\"en\":\"Service Center\",\"zh\":\"服务中心\"}",
+          "zh": "服务中心"
+        },
+        "description": {
+          "en": "{\"en\":\"On journey to excellence, Busrom is always your trusted partner. Our professional Team deliver worry-free service experience, saving your time, energy, and money.\",\"zh\":\"在追求卓越的旅程中，Busrom 始终是您值得信赖的合作伙伴。我们专业的团队提供无忧的服务体验，为您节省时间、精力和金钱。\"}",
+          "zh": "在追求卓越的旅程中，Busrom 始终是您值得信赖的合作伙伴。我们专业的团队提供无忧的服务体验，为您节省时间、精力和金钱。"
+        },
+        "largeImage": null,
+        "smallImage": null
+      },
+      "updatedAt": "2025-12-16T12:35:38.792Z",
+      "createdAt": "2025-12-14T08:42:31.489Z",
+      "globalType": "brand-analysis"
+    },
+    "brand-value": {
+      "id": 1,
+      "status": "published",
+      "title": {
+        "en": "{\"en\":\"Brand value\",\"zh\":\"品牌价值\"}",
+        "zh": "品牌价值"
+      },
+      "subtitle": {
+        "en": "{\"en\":\"embodiment\",\"zh\":\"体现\"}",
+        "zh": "体现"
+      },
+      "param1Title": {
+        "en": "{\"en\":\"\",\"zh\":\"\"}",
+        "zh": ""
+      },
+      "param1Description": {
+        "en": "{\"en\":\"More Than Glass Hardware\",\"zh\":\"不仅仅是玻璃五金\"}",
+        "zh": "不仅仅是玻璃五金"
+      },
+      "param1Image": null,
+      "param2Title": {
+        "en": "{\"en\":\"\",\"zh\":\"\"}",
+        "zh": ""
+      },
+      "param2Description": {
+        "en": "{\"en\":\"Precision details for every glass space\",\"zh\":\"为每个玻璃空间提供精密细节\"}",
+        "zh": "为每个玻璃空间提供精密细节"
+      },
+      "param2Image": null,
+      "sloganTitle": {
+        "en": "{\"en\":\"Our Slogan\",\"zh\":\"我们的口号\"}",
+        "zh": "我们的口号"
+      },
+      "sloganDescription": {
+        "en": "{\"en\":\"Craft Your Glass Details\",\"zh\":\"精雕您的玻璃细节\"}",
+        "zh": "精雕您的玻璃细节"
+      },
+      "sloganImage": null,
+      "valueTitle": {
+        "en": "{\"en\":\"Our Value\",\"zh\":\"我们的价值\"}",
+        "zh": "我们的价值"
+      },
+      "valueDescription": {
+        "en": "{\"en\":\"Precision · Safety · Design — Support That Protects Both Form and Function\",\"zh\":\"精密 · 安全 · 设计 — 兼顾形式与功能的支撑\"}",
+        "zh": "精密 · 安全 · 设计 — 兼顾形式与功能的支撑"
+      },
+      "valueImage": null,
+      "visionTitle": {
+        "en": "{\"en\":\"Our Vision\",\"zh\":\"我们的愿景\"}",
+        "zh": "我们的愿景"
+      },
+      "visionDescription": {
+        "en": "{\"en\":\"Millions of Spaces — Safer and More Opening to Enjoy Our Products\",\"zh\":\"百万空间 — 更安全、更开放地享受我们的产品\"}",
+        "zh": "百万空间 — 更安全、更开放地享受我们的产品"
+      },
+      "visionImage": null,
+      "updatedAt": "2025-12-16T12:35:38.818Z",
+      "createdAt": "2025-12-14T08:42:31.513Z",
+      "globalType": "brand-value"
+    },
+    "footer": {
+      "id": 1,
+      "formConfig": null,
+      "formTitle": {
+        "en": "{\"en\":\"Contact Us\",\"zh\":\"联系我们\"}",
+        "zh": "联系我们"
+      },
+      "formPlaceholderName": {
+        "en": "{\"en\":\"Your Name\",\"zh\":\"您的姓名\"}",
+        "zh": "您的姓名"
+      },
+      "formPlaceholderEmail": {
+        "en": "{\"en\":\"Your Email\",\"zh\":\"您的邮箱\"}",
+        "zh": "您的邮箱"
+      },
+      "formPlaceholderMessage": {
+        "en": "{\"en\":\"Your Message\",\"zh\":\"您的留言\"}",
+        "zh": "您的留言"
+      },
+      "submitButtonText": {
+        "en": "{\"en\":\"Submit\",\"zh\":\"提交\"}",
+        "zh": "提交"
+      },
+      "contactTitle": {
+        "en": "{\"en\":\"Get In Touch\",\"zh\":\"联系方式\"}",
+        "zh": "联系方式"
+      },
+      "contactEmailLabel": {
+        "en": "{\"en\":null,\"zh\":\"电子邮箱\"}",
+        "zh": "电子邮箱"
+      },
+      "contactEmail": null,
+      "afterSalesLabel": {
+        "en": "{\"en\":null,\"zh\":\"售后服务\"}",
+        "zh": "售后服务"
+      },
+      "afterSalesEmail": null,
+      "whatsappLabel": {
+        "en": "{\"en\":null,\"zh\":\"WhatsApp\"}",
+        "zh": "WhatsApp"
+      },
+      "whatsappNumber": null,
+      "email": "info@busrom.com",
+      "phone": "+86 123 4567 8900",
+      "whatsapp": null,
+      "address": {
+        "en": "{\"en\":\"Shenzhen, Guangdong, China\",\"zh\":\"中国广东省深圳市\"}",
+        "zh": "中国广东省深圳市"
+      },
+      "workingHours": {
+        "en": "{\"en\":\"Mon-Fri: 9:00-18:00\",\"zh\":\"周一至周五：9:00-18:00\"}",
+        "zh": "周一至周五：9:00-18:00"
+      },
+      "officialNoticeTitle": {
+        "en": "{\"en\":\"Official Notice\",\"zh\":\"官方声明\"}",
+        "zh": "官方声明"
+      },
+      "officialNoticeLine1": {
+        "en": "{\"en\":null,\"zh\":\"官方邮箱联系方式：xxx@busromhouse.com。\"}",
+        "zh": "官方邮箱联系方式：xxx@busromhouse.com。"
+      },
+      "officialNoticeLine2": {
+        "en": "{\"en\":null,\"zh\":\"任何来自非官方来源的联系均为未经授权且可能存在欺诈行为——请勿参与或付款。\"}",
+        "zh": "任何来自非官方来源的联系均为未经授权且可能存在欺诈行为——请勿参与或付款。"
+      },
+      "officialNoticeLine3": {
+        "en": "{\"en\":null,\"zh\":\"如需验证或有任何疑问，请通过官方邮箱或访问我们的网站 www.busromhouse.com 联系我们\"}",
+        "zh": "如需验证或有任何疑问，请通过官方邮箱或访问我们的网站 www.busromhouse.com 联系我们"
+      },
+      "officialNoticeLine4": {
+        "en": "{\"en\":null,\"zh\":\"Busrom 团队\"}",
+        "zh": "Busrom 团队"
+      },
+      "officialNoticeContent": {
+        "en": {
+          "en": null,
+          "zh": null
+        },
+        "zh": null
+      },
+      "socialLinks": [],
+      "column3Menus": [],
+      "column4Menus": [],
+      "copyrightText": {
+        "en": "{\"en\":\"© 2024 Busrom. All rights reserved.\",\"zh\":\"© 2024 Busrom. 保留所有权利。\"}",
+        "zh": "© 2024 Busrom. 保留所有权利。"
+      },
+      "legalLinks": [],
+      "updatedAt": "2025-12-16T12:35:38.862Z",
+      "createdAt": "2025-12-16T04:20:59.992Z",
+      "globalType": "footer"
+    },
+    "product-series-carousel": {
+      "id": 1,
+      "status": "published",
+      "title": {
+        "en": "{\"en\":\"Product Series\",\"zh\":\"我们的产品系列\"}",
+        "zh": "我们的产品系列"
+      },
+      "items": {
+        "ar": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "bn": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "da": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "de": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "en": [
+          {
+            "image": null,
+            "title": "Glass Standoff",
+            "isShow": true,
+            "linkUrl": "/product/glass-standoff",
+            "buttonText": "Learn More",
+            "sceneImage": null
+          },
+          {
+            "title": "Glass Connected Fitting",
+            "isShow": true,
+            "linkUrl": "/product/glass-connected-fitting",
+            "buttonText": "Learn More"
+          },
+          {
+            "title": "Glass Fence Spigot",
+            "isShow": true,
+            "linkUrl": "/product/glass-fence-spigot",
+            "buttonText": "Learn More"
+          },
+          {
+            "title": "Glass Clip (Railing)",
+            "isShow": true,
+            "linkUrl": "/product/glass-clip",
+            "buttonText": "Learn More"
+          },
+          {
+            "title": "Glass Clip (Bathroom)",
+            "isShow": true,
+            "linkUrl": "/product/glass-clip",
+            "buttonText": "Learn More"
+          },
+          {
+            "title": "Glass Hinge",
+            "isShow": true,
+            "linkUrl": "/product/glass-hinge",
+            "buttonText": "Learn More"
+          },
+          {
+            "title": "Sliding Door Kit",
+            "isShow": true,
+            "linkUrl": "/product/sliding-door-kit",
+            "buttonText": "Learn More"
+          },
+          {
+            "title": "Bathroom & Door Handle",
+            "isShow": true,
+            "linkUrl": "/product/bathroom-door-handle",
+            "buttonText": "Learn More"
+          },
+          {
+            "title": "Hidden Hook",
+            "isShow": true,
+            "linkUrl": "/product/hidden-hook",
+            "buttonText": "Learn More"
+          }
+        ],
+        "es": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "fi": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "fr": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "hi": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "it": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "ja": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "ko": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "ms": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "nl": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "no": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "pl": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "pt": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "ru": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "sv": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "th": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "tr": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "vi": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ],
+        "zh": [
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          },
+          {
+            "title": "",
+            "isShow": true,
+            "linkUrl": "",
+            "buttonText": ""
+          }
+        ]
+      },
+      "autoplay": true,
+      "autoplaySpeed": 3000,
+      "updatedAt": "2025-12-16T12:35:38.914Z",
+      "createdAt": "2025-12-16T04:20:59.959Z",
+      "globalType": "product-series-carousel"
+    }
+  },
+  "collections": {
+    "navigation-menus": [
+      {
+        "id": 34,
+        "slug": "contact-us",
+        "name": {
+          "en": "Contact Us",
+          "zh": "联系我们"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": null,
+        "link": "/contact",
+        "inquiryLink": null,
+        "order": 6,
+        "isSystem": true,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:39.048Z",
+        "createdAt": "2025-12-14T08:42:31.128Z"
+      },
+      {
+        "id": 33,
+        "slug": "fraud-notice",
+        "name": {
+          "en": "Fraud Notice",
+          "zh": "防诈骗声明"
+        },
+        "type": "standard",
+        "icon": "AlertTriangle",
+        "mediaTags": [],
+        "parent": {
+          "id": 28,
+          "slug": "about-us",
+          "name": {
+            "en": "About Us",
+            "zh": "关于我们"
+          },
+          "type": "submenu",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": null,
+          "inquiryLink": null,
+          "order": 5,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.250Z",
+          "createdAt": "2025-12-14T08:42:31.035Z"
+        },
+        "link": "/fraud-notice",
+        "inquiryLink": null,
+        "order": 5,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.189Z",
+        "createdAt": "2025-12-14T08:42:31.113Z"
+      },
+      {
+        "id": 32,
+        "slug": "privacy-policy",
+        "name": {
+          "en": "Privacy Policy",
+          "zh": "隐私政策"
+        },
+        "type": "standard",
+        "icon": "Shield",
+        "mediaTags": [],
+        "parent": {
+          "id": 28,
+          "slug": "about-us",
+          "name": {
+            "en": "About Us",
+            "zh": "关于我们"
+          },
+          "type": "submenu",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": null,
+          "inquiryLink": null,
+          "order": 5,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.250Z",
+          "createdAt": "2025-12-14T08:42:31.035Z"
+        },
+        "link": "/privacy-policy",
+        "inquiryLink": null,
+        "order": 4,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.200Z",
+        "createdAt": "2025-12-14T08:42:31.096Z"
+      },
+      {
+        "id": 31,
+        "slug": "support",
+        "name": {
+          "en": "Support",
+          "zh": "技术支持"
+        },
+        "type": "standard",
+        "icon": "Headphones",
+        "mediaTags": [],
+        "parent": {
+          "id": 28,
+          "slug": "about-us",
+          "name": {
+            "en": "About Us",
+            "zh": "关于我们"
+          },
+          "type": "submenu",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": null,
+          "inquiryLink": null,
+          "order": 5,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.250Z",
+          "createdAt": "2025-12-14T08:42:31.035Z"
+        },
+        "link": "/support",
+        "inquiryLink": null,
+        "order": 2,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.210Z",
+        "createdAt": "2025-12-14T08:42:31.079Z"
+      },
+      {
+        "id": 30,
+        "slug": "blog",
+        "name": {
+          "en": "Blog",
+          "zh": "博客"
+        },
+        "type": "standard",
+        "icon": "FileText",
+        "mediaTags": [],
+        "parent": {
+          "id": 28,
+          "slug": "about-us",
+          "name": {
+            "en": "About Us",
+            "zh": "关于我们"
+          },
+          "type": "submenu",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": null,
+          "inquiryLink": null,
+          "order": 5,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.250Z",
+          "createdAt": "2025-12-14T08:42:31.035Z"
+        },
+        "link": "/blog",
+        "inquiryLink": null,
+        "order": 3,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.222Z",
+        "createdAt": "2025-12-14T08:42:31.063Z"
+      },
+      {
+        "id": 29,
+        "slug": "our-story",
+        "name": {
+          "en": "Our Story",
+          "zh": "我们的故事"
+        },
+        "type": "standard",
+        "icon": "BookOpen",
+        "mediaTags": [],
+        "parent": {
+          "id": 28,
+          "slug": "about-us",
+          "name": {
+            "en": "About Us",
+            "zh": "关于我们"
+          },
+          "type": "submenu",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": null,
+          "inquiryLink": null,
+          "order": 5,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.250Z",
+          "createdAt": "2025-12-14T08:42:31.035Z"
+        },
+        "link": "/about/story",
+        "inquiryLink": null,
+        "order": 1,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.233Z",
+        "createdAt": "2025-12-14T08:42:31.048Z"
+      },
+      {
+        "id": 28,
+        "slug": "about-us",
+        "name": {
+          "en": "About Us",
+          "zh": "关于我们"
+        },
+        "type": "submenu",
+        "icon": null,
+        "mediaTags": [],
+        "parent": null,
+        "link": null,
+        "inquiryLink": null,
+        "order": 5,
+        "isSystem": true,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:39.250Z",
+        "createdAt": "2025-12-14T08:42:31.035Z"
+      },
+      {
+        "id": 27,
+        "slug": "application",
+        "name": {
+          "en": "Application",
+          "zh": "应用案例"
+        },
+        "type": "standard",
+        "icon": "Lightbulb",
+        "mediaTags": [],
+        "parent": {
+          "id": 22,
+          "slug": "service",
+          "name": {
+            "en": "Service",
+            "zh": "服务"
+          },
+          "type": "submenu",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": null,
+          "inquiryLink": null,
+          "order": 4,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.597Z",
+          "createdAt": "2025-12-14T08:42:30.938Z"
+        },
+        "link": "/applications",
+        "inquiryLink": null,
+        "order": 5,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.243Z",
+        "createdAt": "2025-12-14T08:42:31.020Z"
+      },
+      {
+        "id": 26,
+        "slug": "faq",
+        "name": {
+          "en": "FAQ",
+          "zh": "常见问题"
+        },
+        "type": "standard",
+        "icon": "HelpCircle",
+        "mediaTags": [],
+        "parent": {
+          "id": 22,
+          "slug": "service",
+          "name": {
+            "en": "Service",
+            "zh": "服务"
+          },
+          "type": "submenu",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": null,
+          "inquiryLink": null,
+          "order": 4,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.597Z",
+          "createdAt": "2025-12-14T08:42:30.938Z"
+        },
+        "link": "/service/faq",
+        "inquiryLink": null,
+        "order": 4,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.256Z",
+        "createdAt": "2025-12-14T08:42:31.005Z"
+      },
+      {
+        "id": 25,
+        "slug": "oem-odm",
+        "name": {
+          "en": "OEM/ODM",
+          "zh": "OEM/ODM定制"
+        },
+        "type": "standard",
+        "icon": "Settings",
+        "mediaTags": [],
+        "parent": {
+          "id": 22,
+          "slug": "service",
+          "name": {
+            "en": "Service",
+            "zh": "服务"
+          },
+          "type": "submenu",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": null,
+          "inquiryLink": null,
+          "order": 4,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.597Z",
+          "createdAt": "2025-12-14T08:42:30.938Z"
+        },
+        "link": "/service/oem-odm",
+        "inquiryLink": null,
+        "order": 3,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.268Z",
+        "createdAt": "2025-12-14T08:42:30.987Z"
+      },
+      {
+        "id": 24,
+        "slug": "one-stop-shop",
+        "name": {
+          "en": "One-Stop Shop",
+          "zh": "一站式服务"
+        },
+        "type": "standard",
+        "icon": "Package",
+        "mediaTags": [],
+        "parent": {
+          "id": 22,
+          "slug": "service",
+          "name": {
+            "en": "Service",
+            "zh": "服务"
+          },
+          "type": "submenu",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": null,
+          "inquiryLink": null,
+          "order": 4,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.597Z",
+          "createdAt": "2025-12-14T08:42:30.938Z"
+        },
+        "link": "/service/one-stop",
+        "inquiryLink": null,
+        "order": 2,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.278Z",
+        "createdAt": "2025-12-14T08:42:30.968Z"
+      },
+      {
+        "id": 23,
+        "slug": "service-overview",
+        "name": {
+          "en": "Service Overview",
+          "zh": "服务概览"
+        },
+        "type": "standard",
+        "icon": "LayoutDashboard",
+        "mediaTags": [],
+        "parent": {
+          "id": 22,
+          "slug": "service",
+          "name": {
+            "en": "Service",
+            "zh": "服务"
+          },
+          "type": "submenu",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": null,
+          "inquiryLink": null,
+          "order": 4,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.597Z",
+          "createdAt": "2025-12-14T08:42:30.938Z"
+        },
+        "link": "/service/overview",
+        "inquiryLink": null,
+        "order": 1,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.293Z",
+        "createdAt": "2025-12-14T08:42:30.952Z"
+      },
+      {
+        "id": 22,
+        "slug": "service",
+        "name": {
+          "en": "Service",
+          "zh": "服务"
+        },
+        "type": "submenu",
+        "icon": null,
+        "mediaTags": [],
+        "parent": null,
+        "link": null,
+        "inquiryLink": null,
+        "order": 4,
+        "isSystem": true,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:39.597Z",
+        "createdAt": "2025-12-14T08:42:30.938Z"
+      },
+      {
+        "id": 21,
+        "slug": "shop-hidden-hook",
+        "name": {
+          "en": "Hidden Hook",
+          "zh": "挂钩"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 12,
+          "slug": "shop",
+          "name": {
+            "en": "Shop",
+            "zh": "商城"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/shop",
+          "inquiryLink": null,
+          "order": 3,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.890Z",
+          "createdAt": "2025-12-14T08:42:30.763Z"
+        },
+        "link": "/shop/hidden-hook",
+        "inquiryLink": null,
+        "order": 9,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.307Z",
+        "createdAt": "2025-12-14T08:42:30.922Z"
+      },
+      {
+        "id": 20,
+        "slug": "shop-bathroom-door-handle",
+        "name": {
+          "en": "Bathroom & Door Handle",
+          "zh": "浴室&大门拉手"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 12,
+          "slug": "shop",
+          "name": {
+            "en": "Shop",
+            "zh": "商城"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/shop",
+          "inquiryLink": null,
+          "order": 3,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.890Z",
+          "createdAt": "2025-12-14T08:42:30.763Z"
+        },
+        "link": "/shop/bathroom-door-handle",
+        "inquiryLink": null,
+        "order": 8,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.319Z",
+        "createdAt": "2025-12-14T08:42:30.901Z"
+      },
+      {
+        "id": 19,
+        "slug": "shop-sliding-door-kit",
+        "name": {
+          "en": "Sliding Door Kit",
+          "zh": "移门滑轮套装"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 12,
+          "slug": "shop",
+          "name": {
+            "en": "Shop",
+            "zh": "商城"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/shop",
+          "inquiryLink": null,
+          "order": 3,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.890Z",
+          "createdAt": "2025-12-14T08:42:30.763Z"
+        },
+        "link": "/shop/sliding-door-kit",
+        "inquiryLink": null,
+        "order": 7,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.331Z",
+        "createdAt": "2025-12-14T08:42:30.884Z"
+      },
+      {
+        "id": 18,
+        "slug": "shop-glass-hinge",
+        "name": {
+          "en": "Glass Hinge",
+          "zh": "浴室夹"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 12,
+          "slug": "shop",
+          "name": {
+            "en": "Shop",
+            "zh": "商城"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/shop",
+          "inquiryLink": null,
+          "order": 3,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.890Z",
+          "createdAt": "2025-12-14T08:42:30.763Z"
+        },
+        "link": "/shop/glass-hinge",
+        "inquiryLink": null,
+        "order": 6,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.344Z",
+        "createdAt": "2025-12-14T08:42:30.866Z"
+      },
+      {
+        "id": 17,
+        "slug": "shop-bathroom-glass-clip",
+        "name": {
+          "en": "Bathroom Glass Clip",
+          "zh": "浴室系列"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 12,
+          "slug": "shop",
+          "name": {
+            "en": "Shop",
+            "zh": "商城"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/shop",
+          "inquiryLink": null,
+          "order": 3,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.890Z",
+          "createdAt": "2025-12-14T08:42:30.763Z"
+        },
+        "link": "/shop/bathroom-glass-clip",
+        "inquiryLink": null,
+        "order": 5,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.356Z",
+        "createdAt": "2025-12-14T08:42:30.847Z"
+      },
+      {
+        "id": 16,
+        "slug": "shop-guardrail-glass-clip",
+        "name": {
+          "en": "Guardrail Glass Clip",
+          "zh": "护栏系列"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 12,
+          "slug": "shop",
+          "name": {
+            "en": "Shop",
+            "zh": "商城"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/shop",
+          "inquiryLink": null,
+          "order": 3,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.890Z",
+          "createdAt": "2025-12-14T08:42:30.763Z"
+        },
+        "link": "/shop/guardrail-glass-clip",
+        "inquiryLink": null,
+        "order": 4,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.366Z",
+        "createdAt": "2025-12-14T08:42:30.830Z"
+      },
+      {
+        "id": 15,
+        "slug": "shop-glass-fence-spigot",
+        "name": {
+          "en": "Glass Fence Spigot",
+          "zh": "玻璃护栏支架底座"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 12,
+          "slug": "shop",
+          "name": {
+            "en": "Shop",
+            "zh": "商城"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/shop",
+          "inquiryLink": null,
+          "order": 3,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.890Z",
+          "createdAt": "2025-12-14T08:42:30.763Z"
+        },
+        "link": "/shop/glass-fence-spigot",
+        "inquiryLink": null,
+        "order": 3,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.376Z",
+        "createdAt": "2025-12-14T08:42:30.815Z"
+      },
+      {
+        "id": 14,
+        "slug": "shop-glass-connected-fitting",
+        "name": {
+          "en": "Glass Connected Fitting",
+          "zh": "玻璃栏杆扶手连接件"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 12,
+          "slug": "shop",
+          "name": {
+            "en": "Shop",
+            "zh": "商城"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/shop",
+          "inquiryLink": null,
+          "order": 3,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.890Z",
+          "createdAt": "2025-12-14T08:42:30.763Z"
+        },
+        "link": "/shop/glass-connected-fitting",
+        "inquiryLink": null,
+        "order": 2,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.387Z",
+        "createdAt": "2025-12-14T08:42:30.798Z"
+      },
+      {
+        "id": 13,
+        "slug": "shop-glass-standoff",
+        "name": {
+          "en": "Glass Standoff",
+          "zh": "广告螺丝"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 12,
+          "slug": "shop",
+          "name": {
+            "en": "Shop",
+            "zh": "商城"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/shop",
+          "inquiryLink": null,
+          "order": 3,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:39.890Z",
+          "createdAt": "2025-12-14T08:42:30.763Z"
+        },
+        "link": "/shop/glass-standoff",
+        "inquiryLink": null,
+        "order": 1,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.398Z",
+        "createdAt": "2025-12-14T08:42:30.777Z"
+      },
+      {
+        "id": 12,
+        "slug": "shop",
+        "name": {
+          "en": "Shop",
+          "zh": "商城"
+        },
+        "type": "product_cards",
+        "icon": null,
+        "mediaTags": [],
+        "parent": null,
+        "link": "/shop",
+        "inquiryLink": null,
+        "order": 3,
+        "isSystem": true,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:39.890Z",
+        "createdAt": "2025-12-14T08:42:30.763Z"
+      },
+      {
+        "id": 11,
+        "slug": "product-hidden-hook",
+        "name": {
+          "en": "Hidden Hook",
+          "zh": "挂钩"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 2,
+          "slug": "product",
+          "name": {
+            "en": "Product",
+            "zh": "产品系列"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/products",
+          "inquiryLink": null,
+          "order": 2,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:40.158Z",
+          "createdAt": "2025-12-14T08:42:30.578Z"
+        },
+        "link": "/products/hidden-hook",
+        "inquiryLink": null,
+        "order": 9,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.410Z",
+        "createdAt": "2025-12-14T08:42:30.745Z"
+      },
+      {
+        "id": 10,
+        "slug": "product-bathroom-door-handle",
+        "name": {
+          "en": "Bathroom & Door Handle",
+          "zh": "浴室&大门拉手"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 2,
+          "slug": "product",
+          "name": {
+            "en": "Product",
+            "zh": "产品系列"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/products",
+          "inquiryLink": null,
+          "order": 2,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:40.158Z",
+          "createdAt": "2025-12-14T08:42:30.578Z"
+        },
+        "link": "/products/bathroom-door-handle",
+        "inquiryLink": null,
+        "order": 8,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.421Z",
+        "createdAt": "2025-12-14T08:42:30.729Z"
+      },
+      {
+        "id": 9,
+        "slug": "product-sliding-door-kit",
+        "name": {
+          "en": "Sliding Door Kit",
+          "zh": "移门滑轮套装"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 2,
+          "slug": "product",
+          "name": {
+            "en": "Product",
+            "zh": "产品系列"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/products",
+          "inquiryLink": null,
+          "order": 2,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:40.158Z",
+          "createdAt": "2025-12-14T08:42:30.578Z"
+        },
+        "link": "/products/sliding-door-kit",
+        "inquiryLink": null,
+        "order": 7,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.432Z",
+        "createdAt": "2025-12-14T08:42:30.709Z"
+      },
+      {
+        "id": 8,
+        "slug": "product-glass-hinge",
+        "name": {
+          "en": "Glass Hinge",
+          "zh": "浴室夹"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 2,
+          "slug": "product",
+          "name": {
+            "en": "Product",
+            "zh": "产品系列"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/products",
+          "inquiryLink": null,
+          "order": 2,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:40.158Z",
+          "createdAt": "2025-12-14T08:42:30.578Z"
+        },
+        "link": "/products/glass-hinge",
+        "inquiryLink": null,
+        "order": 6,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.445Z",
+        "createdAt": "2025-12-14T08:42:30.689Z"
+      },
+      {
+        "id": 7,
+        "slug": "product-bathroom-glass-clip",
+        "name": {
+          "en": "Bathroom Glass Clip",
+          "zh": "浴室系列"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 2,
+          "slug": "product",
+          "name": {
+            "en": "Product",
+            "zh": "产品系列"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/products",
+          "inquiryLink": null,
+          "order": 2,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:40.158Z",
+          "createdAt": "2025-12-14T08:42:30.578Z"
+        },
+        "link": "/products/bathroom-glass-clip",
+        "inquiryLink": null,
+        "order": 5,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.456Z",
+        "createdAt": "2025-12-14T08:42:30.671Z"
+      },
+      {
+        "id": 6,
+        "slug": "product-guardrail-glass-clip",
+        "name": {
+          "en": "Guardrail Glass Clip",
+          "zh": "护栏系列"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 2,
+          "slug": "product",
+          "name": {
+            "en": "Product",
+            "zh": "产品系列"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/products",
+          "inquiryLink": null,
+          "order": 2,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:40.158Z",
+          "createdAt": "2025-12-14T08:42:30.578Z"
+        },
+        "link": "/products/guardrail-glass-clip",
+        "inquiryLink": null,
+        "order": 4,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.468Z",
+        "createdAt": "2025-12-14T08:42:30.652Z"
+      },
+      {
+        "id": 5,
+        "slug": "product-glass-fence-spigot",
+        "name": {
+          "en": "Glass Fence Spigot",
+          "zh": "玻璃护栏支架底座"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 2,
+          "slug": "product",
+          "name": {
+            "en": "Product",
+            "zh": "产品系列"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/products",
+          "inquiryLink": null,
+          "order": 2,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:40.158Z",
+          "createdAt": "2025-12-14T08:42:30.578Z"
+        },
+        "link": "/products/glass-fence-spigot",
+        "inquiryLink": null,
+        "order": 3,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.478Z",
+        "createdAt": "2025-12-14T08:42:30.630Z"
+      },
+      {
+        "id": 4,
+        "slug": "product-glass-connected-fitting",
+        "name": {
+          "en": "Glass Connected Fitting",
+          "zh": "玻璃栏杆扶手连接件"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 2,
+          "slug": "product",
+          "name": {
+            "en": "Product",
+            "zh": "产品系列"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/products",
+          "inquiryLink": null,
+          "order": 2,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:40.158Z",
+          "createdAt": "2025-12-14T08:42:30.578Z"
+        },
+        "link": "/products/glass-connected-fitting",
+        "inquiryLink": null,
+        "order": 2,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.490Z",
+        "createdAt": "2025-12-14T08:42:30.610Z"
+      },
+      {
+        "id": 3,
+        "slug": "product-glass-standoff",
+        "name": {
+          "en": "Glass Standoff",
+          "zh": "广告螺丝"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": {
+          "id": 2,
+          "slug": "product",
+          "name": {
+            "en": "Product",
+            "zh": "产品系列"
+          },
+          "type": "product_cards",
+          "icon": null,
+          "mediaTags": [],
+          "parent": null,
+          "link": "/products",
+          "inquiryLink": null,
+          "order": 2,
+          "isSystem": true,
+          "visible": true,
+          "updatedAt": "2025-12-16T12:35:40.158Z",
+          "createdAt": "2025-12-14T08:42:30.578Z"
+        },
+        "link": "/products/glass-standoff",
+        "inquiryLink": null,
+        "order": 1,
+        "isSystem": false,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.502Z",
+        "createdAt": "2025-12-14T08:42:30.593Z"
+      },
+      {
+        "id": 2,
+        "slug": "product",
+        "name": {
+          "en": "Product",
+          "zh": "产品系列"
+        },
+        "type": "product_cards",
+        "icon": null,
+        "mediaTags": [],
+        "parent": null,
+        "link": "/products",
+        "inquiryLink": null,
+        "order": 2,
+        "isSystem": true,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.158Z",
+        "createdAt": "2025-12-14T08:42:30.578Z"
+      },
+      {
+        "id": 1,
+        "slug": "home",
+        "name": {
+          "en": "Home",
+          "zh": "首页"
+        },
+        "type": "standard",
+        "icon": null,
+        "mediaTags": [],
+        "parent": null,
+        "link": "/",
+        "inquiryLink": null,
+        "order": 1,
+        "isSystem": true,
+        "visible": true,
+        "updatedAt": "2025-12-16T12:35:40.179Z",
+        "createdAt": "2025-12-14T08:42:30.562Z"
+      }
+    ]
+  },
+  "exportedAt": "2025-12-16T12:46:05.369Z"
+}

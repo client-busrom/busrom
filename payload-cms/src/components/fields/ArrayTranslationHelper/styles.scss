@@ -1,0 +1,51 @@
+// 复用 GlobalTranslationCenter 的样式
+@import '../GlobalTranslationCenter/styles.scss';
+
+// ArrayTranslationHelper 特有样式
+.array-translation-helper {
+  padding: 1rem;
+  background: var(--theme-elevation-50);
+  border: 2px dashed var(--theme-elevation-400);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  text-align: center;
+
+  .array-translation-button {
+    background: linear-gradient(135deg, var(--theme-success-500), var(--theme-success-600));
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  .array-translation-hint {
+    margin: 0.5rem 0 0;
+    font-size: 13px;
+    color: var(--theme-elevation-800);
+    opacity: 0.7;
+  }
+}
+
+// 更大的 modal 以容纳更多内容
+.array-translation-modal {
+  max-width: 1000px;
+  max-height: 90vh;
+
+  .translation-center-body {
+    max-height: calc(90vh - 180px);
+  }
+}

@@ -1,0 +1,25 @@
+diff --git a/node_modules/@payloadcms/drizzle/dist/queries/sanitizeQueryValue.js b/node_modules/@payloadcms/drizzle/dist/queries/sanitizeQueryValue.js
+index ea09651..5e07d37 100644
+--- a/node_modules/@payloadcms/drizzle/dist/queries/sanitizeQueryValue.js
++++ b/node_modules/@payloadcms/drizzle/dist/queries/sanitizeQueryValue.js
+@@ -31,7 +31,19 @@ export const sanitizeQueryValue = ({ adapter, columns, field, isUUID, operator:
+                 allPossibleIDTypes.push(val, String(val));
+             }
+         });
+-        formattedValue = allPossibleIDTypes;
++        // PATCHED: Deduplicate values to prevent PostgreSQL "invalid input syntax for type integer" error
++        // See: https://github.com/payloadcms/payload/issues/12252
++        formattedValue = [...new Set(allPossibleIDTypes.map(v => typeof v === 'number' ? v : (isNaN(Number(v)) ? v : Number(v))))];
++
++        // PATCHED: Handle equals operator with array value (from Admin UI hasMany filter)
++        // When equals receives an array, extract single value or convert to 'in' operator
++        if (operator === 'equals') {
++            if (formattedValue.length === 1) {
++                formattedValue = formattedValue[0];
++            } else if (formattedValue.length > 1) {
++                operator = 'in';
++            }
++        }
+     }
+     // Cast incoming values as proper searchable types
+     if (field.type === 'checkbox' && typeof val === 'string') {

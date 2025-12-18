@@ -1,0 +1,235 @@
+.nav-menu-sortable {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  &__header {
+    margin-bottom: 24px;
+
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+    }
+  }
+
+  &__description {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+  }
+
+  &__error {
+    background: #fee;
+    color: #c00;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+
+  &__success {
+    background: #efe;
+    color: #060;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+
+  &__loading,
+  &__saving {
+    text-align: center;
+    padding: 48px;
+    color: #666;
+    font-size: 14px;
+  }
+
+  &__list {
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    transition: opacity 0.2s ease;
+
+    &--saving {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+  }
+
+  &__item-wrapper {
+    border-bottom: 1px solid #e8e8e8;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background: #fff;
+    cursor: grab;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    border-radius: 4px;
+
+    &:hover {
+      background: #f8f8f8;
+    }
+
+    &--dragging {
+      opacity: 0.4;
+      background: #f0f0f0;
+    }
+
+    &--overlay {
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      border: 1px solid #e0e0e0;
+      cursor: grabbing;
+    }
+  }
+
+  &__group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__tree-node {
+    // Each node contains item + its children
+  }
+
+  &__drag-handle {
+    color: #999;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  &__content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  &__slug {
+    font-weight: 600;
+    color: #333;
+    min-width: 120px;
+  }
+
+  &__name {
+    color: #666;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__type {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+
+    &--standard {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    &--product_cards {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    &--submenu {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+  }
+
+  &__order {
+    color: #999;
+    font-size: 12px;
+    min-width: 30px;
+    text-align: right;
+  }
+
+  &__hidden {
+    color: #f44336;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 6px;
+    background: #ffebee;
+    border-radius: 4px;
+  }
+
+  &__edit-link {
+    margin-left: 16px;
+    padding: 6px 12px;
+    background: #1976d2;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+
+    &:hover {
+      background: #1565c0;
+    }
+  }
+
+  &__children {
+    background: #fafafa;
+  }
+
+  &__empty {
+    padding: 48px;
+    text-align: center;
+    color: #666;
+  }
+
+  &__footer {
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+  }
+
+  &__back-link,
+  &__create-link {
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  &__back-link {
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #e0e0e0;
+
+    &:hover {
+      background: #e8e8e8;
+    }
+  }
+
+  &__create-link {
+    background: #4caf50;
+    color: #fff;
+
+    &:hover {
+      background: #43a047;
+    }
+  }
+}

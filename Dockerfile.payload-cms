@@ -1,0 +1,91 @@
+# ====================================
+# Busrom Payload CMS Dockerfile
+# ====================================
+# Multi-stage build for production deployment
+# Target: AWS ECS Fargate
+# Based on Next.js 15 + Payload CMS 3
+
+# ============ Stage 1: Dependencies ============
+FROM node:20-slim AS deps
+WORKDIR /app
+
+# Install production dependencies
+COPY package*.json ./
+COPY payload-cms/package*.json ./payload-cms/
+
+RUN npm ci --omit=dev --workspace=payload-cms
+
+# ============ Stage 2: Builder ============
+FROM node:20-slim AS builder
+WORKDIR /app
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy package files
+COPY package*.json ./
+COPY payload-cms/package*.json ./payload-cms/
+
+# Install ALL dependencies (including dev dependencies)
+RUN npm ci --workspace=payload-cms
+
+# Copy source code
+COPY tsconfig.json ./
+COPY payload-cms/ ./payload-cms/
+COPY scripts/ ./scripts/
+
+# Build Payload CMS (Next.js build)
+WORKDIR /app/payload-cms
+RUN npm run build
+
+# ============ Stage 3: Runner ============
+FROM node:20-slim AS runner
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set production environment
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Create non-root user for security
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 payloaduser
+
+# Copy built application
+COPY --from=builder --chown=payloaduser:nodejs /app/package*.json ./
+COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/.next ./payload-cms/.next
+COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/public ./payload-cms/public
+COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/package.json ./payload-cms/
+COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/next.config.mjs ./payload-cms/
+COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/payload.config.ts ./payload-cms/
+COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/src ./payload-cms/src
+COPY --from=builder --chown=payloaduser:nodejs /app/scripts ./scripts
+
+# Copy production node_modules
+COPY --from=deps --chown=payloaduser:nodejs /app/node_modules ./node_modules
+COPY --from=deps --chown=payloaduser:nodejs /app/payload-cms/node_modules ./payload-cms/node_modules
+
+# Copy startup script
+COPY --chown=payloaduser:nodejs payload-cms/start-payload.sh /app/payload-cms/start-payload.sh
+RUN chmod +x /app/payload-cms/start-payload.sh
+
+# Switch to non-root user
+USER payloaduser
+
+# Expose port
+EXPOSE 3002
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3002/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# Start Payload CMS
+WORKDIR /app/payload-cms
+CMD ["/bin/sh", "/app/payload-cms/start-payload.sh"]
