@@ -13,6 +13,10 @@
  */
 
 import { NextResponse } from 'next/server'
+import { SITEMAP_LOCALES } from '@/lib/api/sitemap'
+
+// Force dynamic rendering - this route fetches from CMS at runtime
+export const dynamic = 'force-dynamic'
 
 const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT || 'http://localhost:3000/api/graphql'
 
@@ -48,8 +52,14 @@ async function getRobotsTxtFromCMS(): Promise<string | null> {
  * Get default robots.txt content
  */
 function getDefaultRobotsTxt(siteUrl: string): string {
+  // Generate sitemap entries for all locales
+  const localeSitemaps = (SITEMAP_LOCALES as unknown as string[])
+    .map((locale) => `Sitemap: ${siteUrl}/sitemap/${locale}`)
+    .join('\n')
+
   return `# Busrom Robots.txt
 # Updated: ${new Date().toISOString()}
+# Multi-language B2B industrial hardware website
 
 User-agent: *
 Allow: /
@@ -62,10 +72,16 @@ Disallow: /api/
 Disallow: /_next/
 Disallow: /static/
 
-# Crawl-delay for all bots
+# Crawl-delay for polite crawling
 Crawl-delay: 1
 
-# Sitemap
+# Sitemap Index (contains all language-specific sitemaps)
+Sitemap: ${siteUrl}/sitemaps.xml
+
+# Language-specific sitemaps
+${localeSitemaps}
+
+# Main sitemap (for backward compatibility)
 Sitemap: ${siteUrl}/sitemap.xml
 `
 }
