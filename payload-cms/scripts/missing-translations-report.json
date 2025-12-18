@@ -1,0 +1,308 @@
+{
+  "missing": [
+    {
+      "global": "featured-products",
+      "field": "categories[0].contentTranslation",
+      "enValue": null,
+      "zhValue": null,
+      "path": "categories[0].contentTranslation"
+    },
+    {
+      "global": "featured-products",
+      "field": "categories[1].contentTranslation",
+      "enValue": null,
+      "zhValue": null,
+      "path": "categories[1].contentTranslation"
+    },
+    {
+      "global": "featured-products",
+      "field": "categories[2].contentTranslation",
+      "enValue": null,
+      "zhValue": null,
+      "path": "categories[2].contentTranslation"
+    },
+    {
+      "global": "featured-products",
+      "field": "categories[3].contentTranslation",
+      "enValue": null,
+      "zhValue": null,
+      "path": "categories[3].contentTranslation"
+    },
+    {
+      "global": "featured-products",
+      "field": "categories[4].contentTranslation",
+      "enValue": null,
+      "zhValue": null,
+      "path": "categories[4].contentTranslation"
+    },
+    {
+      "global": "featured-products",
+      "field": "categories[5].contentTranslation",
+      "enValue": null,
+      "zhValue": null,
+      "path": "categories[5].contentTranslation"
+    },
+    {
+      "global": "featured-products",
+      "field": "categories[6].contentTranslation",
+      "enValue": null,
+      "zhValue": null,
+      "path": "categories[6].contentTranslation"
+    },
+    {
+      "global": "featured-products",
+      "field": "categories[7].contentTranslation",
+      "enValue": null,
+      "zhValue": null,
+      "path": "categories[7].contentTranslation"
+    },
+    {
+      "global": "featured-products",
+      "field": "categories[8].contentTranslation",
+      "enValue": null,
+      "zhValue": null,
+      "path": "categories[8].contentTranslation"
+    },
+    {
+      "global": "why-choose-busrom",
+      "field": "title2",
+      "enValue": "Busrom",
+      "zhValue": null,
+      "path": "title2"
+    },
+    {
+      "global": "why-choose-busrom",
+      "field": "viewMoreButtonText",
+      "enValue": "VIEW MORE INFORMATION",
+      "zhValue": null,
+      "path": "viewMoreButtonText"
+    },
+    {
+      "global": "brand-value",
+      "field": "param1Title",
+      "enValue": "",
+      "zhValue": "",
+      "path": "param1Title"
+    },
+    {
+      "global": "brand-value",
+      "field": "param2Title",
+      "enValue": "",
+      "zhValue": "",
+      "path": "param2Title"
+    },
+    {
+      "global": "footer",
+      "field": "contactEmailLabel",
+      "enValue": null,
+      "zhValue": null,
+      "path": "contactEmailLabel"
+    },
+    {
+      "global": "footer",
+      "field": "afterSalesLabel",
+      "enValue": null,
+      "zhValue": null,
+      "path": "afterSalesLabel"
+    },
+    {
+      "global": "footer",
+      "field": "whatsappLabel",
+      "enValue": null,
+      "zhValue": null,
+      "path": "whatsappLabel"
+    },
+    {
+      "global": "footer",
+      "field": "officialNoticeLine1",
+      "enValue": null,
+      "zhValue": null,
+      "path": "officialNoticeLine1"
+    },
+    {
+      "global": "footer",
+      "field": "officialNoticeLine2",
+      "enValue": null,
+      "zhValue": null,
+      "path": "officialNoticeLine2"
+    },
+    {
+      "global": "footer",
+      "field": "officialNoticeLine3",
+      "enValue": null,
+      "zhValue": null,
+      "path": "officialNoticeLine3"
+    },
+    {
+      "global": "footer",
+      "field": "officialNoticeLine4",
+      "enValue": null,
+      "zhValue": null,
+      "path": "officialNoticeLine4"
+    },
+    {
+      "global": "footer",
+      "field": "officialNoticeContent",
+      "enValue": null,
+      "zhValue": null,
+      "path": "officialNoticeContent"
+    }
+  ],
+  "byGlobal": {
+    "featured-products": [
+      {
+        "global": "featured-products",
+        "field": "categories[0].contentTranslation",
+        "enValue": null,
+        "zhValue": null,
+        "path": "categories[0].contentTranslation"
+      },
+      {
+        "global": "featured-products",
+        "field": "categories[1].contentTranslation",
+        "enValue": null,
+        "zhValue": null,
+        "path": "categories[1].contentTranslation"
+      },
+      {
+        "global": "featured-products",
+        "field": "categories[2].contentTranslation",
+        "enValue": null,
+        "zhValue": null,
+        "path": "categories[2].contentTranslation"
+      },
+      {
+        "global": "featured-products",
+        "field": "categories[3].contentTranslation",
+        "enValue": null,
+        "zhValue": null,
+        "path": "categories[3].contentTranslation"
+      },
+      {
+        "global": "featured-products",
+        "field": "categories[4].contentTranslation",
+        "enValue": null,
+        "zhValue": null,
+        "path": "categories[4].contentTranslation"
+      },
+      {
+        "global": "featured-products",
+        "field": "categories[5].contentTranslation",
+        "enValue": null,
+        "zhValue": null,
+        "path": "categories[5].contentTranslation"
+      },
+      {
+        "global": "featured-products",
+        "field": "categories[6].contentTranslation",
+        "enValue": null,
+        "zhValue": null,
+        "path": "categories[6].contentTranslation"
+      },
+      {
+        "global": "featured-products",
+        "field": "categories[7].contentTranslation",
+        "enValue": null,
+        "zhValue": null,
+        "path": "categories[7].contentTranslation"
+      },
+      {
+        "global": "featured-products",
+        "field": "categories[8].contentTranslation",
+        "enValue": null,
+        "zhValue": null,
+        "path": "categories[8].contentTranslation"
+      }
+    ],
+    "why-choose-busrom": [
+      {
+        "global": "why-choose-busrom",
+        "field": "title2",
+        "enValue": "Busrom",
+        "zhValue": null,
+        "path": "title2"
+      },
+      {
+        "global": "why-choose-busrom",
+        "field": "viewMoreButtonText",
+        "enValue": "VIEW MORE INFORMATION",
+        "zhValue": null,
+        "path": "viewMoreButtonText"
+      }
+    ],
+    "brand-value": [
+      {
+        "global": "brand-value",
+        "field": "param1Title",
+        "enValue": "",
+        "zhValue": "",
+        "path": "param1Title"
+      },
+      {
+        "global": "brand-value",
+        "field": "param2Title",
+        "enValue": "",
+        "zhValue": "",
+        "path": "param2Title"
+      }
+    ],
+    "footer": [
+      {
+        "global": "footer",
+        "field": "contactEmailLabel",
+        "enValue": null,
+        "zhValue": null,
+        "path": "contactEmailLabel"
+      },
+      {
+        "global": "footer",
+        "field": "afterSalesLabel",
+        "enValue": null,
+        "zhValue": null,
+        "path": "afterSalesLabel"
+      },
+      {
+        "global": "footer",
+        "field": "whatsappLabel",
+        "enValue": null,
+        "zhValue": null,
+        "path": "whatsappLabel"
+      },
+      {
+        "global": "footer",
+        "field": "officialNoticeLine1",
+        "enValue": null,
+        "zhValue": null,
+        "path": "officialNoticeLine1"
+      },
+      {
+        "global": "footer",
+        "field": "officialNoticeLine2",
+        "enValue": null,
+        "zhValue": null,
+        "path": "officialNoticeLine2"
+      },
+      {
+        "global": "footer",
+        "field": "officialNoticeLine3",
+        "enValue": null,
+        "zhValue": null,
+        "path": "officialNoticeLine3"
+      },
+      {
+        "global": "footer",
+        "field": "officialNoticeLine4",
+        "enValue": null,
+        "zhValue": null,
+        "path": "officialNoticeLine4"
+      },
+      {
+        "global": "footer",
+        "field": "officialNoticeContent",
+        "enValue": null,
+        "zhValue": null,
+        "path": "officialNoticeContent"
+      }
+    ]
+  }
+}

@@ -1,0 +1,451 @@
+.ml-richtext-field {
+  margin-bottom: 16px;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  &__label {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--theme-text);
+
+    .required {
+      color: var(--theme-error-500);
+      margin-left: 4px;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__count {
+    font-size: 11px;
+    color: var(--theme-elevation-500);
+    background: var(--theme-elevation-100);
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  &__description {
+    font-size: 12px;
+    color: var(--theme-elevation-500);
+    margin: 0 0 8px 0;
+  }
+
+  // Locale tabs - matches MultiLocaleField style
+  &__locale-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  // Copy panel
+  &__copy-panel {
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 8px;
+
+    .copy-panel__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: var(--theme-elevation-700);
+    }
+
+    .copy-panel__quick-select {
+      display: flex;
+      gap: 4px;
+    }
+
+    .copy-panel__mode-toggle {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 10px;
+      padding: 4px;
+      background: var(--theme-elevation-100);
+      border-radius: 6px;
+      width: fit-content;
+
+      .mode-btn {
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        color: var(--theme-elevation-600);
+        transition: all 0.15s ease;
+
+        &:hover:not(&--active) {
+          background: var(--theme-elevation-150);
+        }
+
+        &--active {
+          background: var(--theme-elevation-0);
+          color: var(--theme-elevation-900);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+      }
+    }
+
+    .copy-panel__locales {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .copy-panel__locale {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      background: var(--theme-elevation-0);
+      border: 1px solid var(--theme-elevation-150);
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &:hover {
+        border-color: var(--theme-elevation-300);
+      }
+
+      &--filled {
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+      }
+
+      &--selected {
+        border-color: var(--theme-elevation-500);
+        background: var(--theme-elevation-100);
+      }
+
+      input[type="checkbox"] {
+        margin: 0;
+        width: 12px;
+        height: 12px;
+      }
+
+      .filled-dot {
+        color: #22c55e;
+        font-size: 8px;
+      }
+    }
+
+    .copy-panel__actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .copy-panel__overwrite {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--theme-elevation-600);
+      cursor: pointer;
+
+      input {
+        margin: 0;
+      }
+    }
+  }
+
+  // Editing indicator
+  &__editing-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--theme-elevation-800);
+    color: var(--theme-elevation-0);
+    border-radius: 4px 4px 0 0;
+    font-size: 12px;
+    font-weight: 500;
+
+    &--other {
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    }
+  }
+
+  &__auto-save-hint {
+    font-weight: 400;
+    opacity: 0.8;
+    margin-left: 4px;
+    font-size: 11px;
+  }
+}
+
+// Locale tab styles - button-based like MultiLocaleField
+.locale-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  text-decoration: none;
+  color: var(--theme-elevation-500);
+  background: var(--theme-elevation-0);
+  border: 1px solid var(--theme-elevation-150);
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: var(--theme-elevation-300);
+    color: var(--theme-elevation-700);
+  }
+
+  &__flag {
+    font-size: 12px;
+  }
+
+  &__code {
+    font-weight: 500;
+  }
+
+  &__dot {
+    color: #22c55e;
+    font-size: 8px;
+    margin-left: 2px;
+  }
+
+  // Currently active tab (being viewed/edited)
+  &--active {
+    background: var(--theme-elevation-800);
+    color: var(--theme-elevation-0);
+    border-color: var(--theme-elevation-800);
+
+    .locale-tab__dot {
+      color: #86efac;
+    }
+  }
+
+  // Tab has content
+  &--has-content:not(&--active) {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #166534;
+  }
+
+  // The Payload current locale (where rich text editor saves to)
+  &--payload-current:not(&--active) {
+    border-color: var(--theme-elevation-400);
+    border-width: 2px;
+  }
+}
+
+// Shared button styles
+.ml-richtext-field .ml-btn {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+
+  &--primary {
+    background: var(--theme-elevation-800);
+    color: var(--theme-elevation-0);
+
+    &:hover:not(:disabled) {
+      background: var(--theme-elevation-900);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &--secondary {
+    background: var(--theme-elevation-100);
+    color: var(--theme-elevation-700);
+    border: 1px solid var(--theme-elevation-200);
+
+    &:hover {
+      background: var(--theme-elevation-150);
+    }
+  }
+
+  &--text {
+    background: transparent;
+    color: var(--theme-elevation-500);
+    padding: 2px 6px;
+
+    &:hover {
+      color: var(--theme-elevation-800);
+      text-decoration: underline;
+    }
+  }
+
+  &--translate {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Spinner animation
+.ml-richtext-field .spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Editor container and wrapper
+.ml-richtext-field__editor-container {
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 0 0 6px 6px;
+  background: var(--theme-elevation-0);
+  min-height: 200px;
+}
+
+.ml-richtext-field__editor-wrapper {
+  position: relative;
+}
+
+.ml-richtext-field__editor {
+  min-height: 180px;
+  padding: 12px 16px;
+  outline: none;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--theme-text);
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.ml-richtext-field__placeholder {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  color: var(--theme-elevation-400);
+  pointer-events: none;
+  font-size: 14px;
+}
+
+.ml-richtext-field__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  color: var(--theme-elevation-500);
+  font-size: 14px;
+}
+
+// Editor theme classes
+.ml-editor-paragraph {
+  margin: 0 0 8px 0;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.ml-editor-bold {
+  font-weight: 700;
+}
+
+.ml-editor-italic {
+  font-style: italic;
+}
+
+.ml-editor-underline {
+  text-decoration: underline;
+}
+
+.ml-editor-h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+}
+
+.ml-editor-h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+}
+
+.ml-editor-h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.ml-editor-ul,
+.ml-editor-ol {
+  margin: 0 0 8px 0;
+  padding-left: 24px;
+}
+
+.ml-editor-listitem {
+  margin: 4px 0;
+}
+
+// Toolbar styles (if needed later)
+.ml-richtext-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--theme-elevation-150);
+  background: var(--theme-elevation-50);
+  border-radius: 6px 6px 0 0;
+
+  button {
+    padding: 4px 8px;
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: 4px;
+    background: var(--theme-elevation-0);
+    cursor: pointer;
+    font-size: 12px;
+
+    &:hover {
+      background: var(--theme-elevation-100);
+    }
+
+    &.active {
+      background: var(--theme-elevation-200);
+    }
+  }
+}

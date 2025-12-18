@@ -1,0 +1,250 @@
+/* Busrom Brand Theme for Payload CMS Admin */
+
+/* ============================================
+   Brand Color Palette (from Figma/Tailwind)
+   ============================================
+   Main:      #F6F4ED (cream)
+   Secondary: #756F3F (olive gold)
+   Gold:      #A08745 (accent)
+   Gold Light: #978350
+   Border:    #CDC094
+   Text:      #3C3C3C (soft black)
+   Cream:     #FFFAD3
+   Cream Dark: #DAC99E
+   Button:    #684D07 (dark gold)
+   ============================================ */
+
+:root {
+  /* Override base colors with Busrom cream/gold palette */
+  --color-base-0: #FFFFFF;
+  --color-base-50: #FDFCF9;
+  --color-base-100: #F6F4ED;
+  --color-base-150: #EDE9DC;
+  --color-base-200: #E4DFCF;
+  --color-base-250: #DAD4C1;
+  --color-base-300: #CDC094;
+  --color-base-350: #BFB672;
+  --color-base-400: #A08745;
+  --color-base-450: #978350;
+  --color-base-500: #8B7A4A;
+  --color-base-550: #7E6E44;
+  --color-base-600: #756F3F;
+  --color-base-650: #625D2F;
+  --color-base-700: #4F4A25;
+  --color-base-750: #3C3C3C;
+  --color-base-800: #2B2B2B;
+  --color-base-850: #1F1F1F;
+  --color-base-900: #141414;
+  --color-base-950: #0A0A0A;
+  --color-base-1000: #000000;
+
+  /* Override success colors - use gold tones */
+  --color-success-50: #FDFCF5;
+  --color-success-100: #FAF7E8;
+  --color-success-150: #F5EFD5;
+  --color-success-200: #EFE6C0;
+  --color-success-250: #E5D9A5;
+  --color-success-300: #D9CB89;
+  --color-success-350: #CBBA6D;
+  --color-success-400: #BBA854;
+  --color-success-450: #A89540;
+  --color-success-500: #A08745;
+  --color-success-550: #8E7639;
+  --color-success-600: #7C6632;
+  --color-success-650: #6B572B;
+  --color-success-700: #5A4925;
+  --color-success-750: #4A3C1F;
+  --color-success-800: #3A2F19;
+  --color-success-850: #2B2314;
+  --color-success-900: #1C170E;
+  --color-success-950: #0E0C07;
+
+  /* Keep error colors (red) but warm them up slightly */
+  --color-error-50: #FDF5F4;
+  --color-error-100: #FCE8E6;
+  --color-error-150: #F9D5D1;
+  --color-error-200: #F5BFBA;
+  --color-error-250: #F0A8A1;
+  --color-error-300: #E88F86;
+  --color-error-350: #DE756B;
+  --color-error-400: #D35C52;
+  --color-error-450: #C5453B;
+  --color-error-500: #B53A30;
+  --color-error-550: #A33329;
+  --color-error-600: #912C24;
+  --color-error-650: #7F261F;
+  --color-error-700: #6D201A;
+  --color-error-750: #5B1A16;
+  --color-error-800: #4A1512;
+  --color-error-850: #38100E;
+  --color-error-900: #270B09;
+  --color-error-950: #150605;
+
+  /* Warm warning colors (orange-gold) */
+  --color-warning-50: #FDF8F0;
+  --color-warning-100: #FCF0DC;
+  --color-warning-150: #F9E3C0;
+  --color-warning-200: #F5D4A0;
+  --color-warning-250: #F0C480;
+  --color-warning-300: #E9B260;
+  --color-warning-350: #E19F42;
+  --color-warning-400: #D68C28;
+  --color-warning-450: #C47A18;
+  --color-warning-500: #AF6B12;
+  --color-warning-550: #9A5D0F;
+  --color-warning-600: #86500D;
+  --color-warning-650: #72440B;
+  --color-warning-700: #5F380A;
+  --color-warning-750: #4C2D08;
+  --color-warning-800: #3A2307;
+  --color-warning-850: #291905;
+  --color-warning-900: #191003;
+  --color-warning-950: #0A0702;
+
+  /* Blue accent - keep but warm up */
+  --color-blue-50: #F5F8FA;
+  --color-blue-100: #E8F0F5;
+  --color-blue-150: #D5E4ED;
+  --color-blue-200: #BFD6E4;
+  --color-blue-250: #A8C7DA;
+  --color-blue-300: #90B7CF;
+  --color-blue-350: #78A6C3;
+  --color-blue-400: #6095B6;
+  --color-blue-450: #4B84A7;
+  --color-blue-500: #3A7398;
+  --color-blue-550: #2E6488;
+  --color-blue-600: #255578;
+  --color-blue-650: #1E4768;
+  --color-blue-700: #183A58;
+  --color-blue-750: #132E48;
+  --color-blue-800: #0F2338;
+  --color-blue-850: #0B1929;
+  --color-blue-900: #07101A;
+  --color-blue-950: #03080D;
+}
+
+/* Dark mode adjustments */
+html[data-theme='dark'] {
+  --color-base-0: #1A1916;
+  --color-base-50: #232118;
+  --color-base-100: #2D2A1F;
+  --color-base-150: #373326;
+  --color-base-200: #423D2E;
+  --color-base-250: #4D4736;
+  --color-base-300: #58513E;
+  --color-base-350: #645C47;
+  --color-base-400: #756F3F;
+  --color-base-450: #8B7A4A;
+  --color-base-500: #978350;
+  --color-base-550: #A08745;
+  --color-base-600: #BFB672;
+  --color-base-650: #CDC094;
+  --color-base-700: #DAD4C1;
+  --color-base-750: #E4DFCF;
+  --color-base-800: #EDE9DC;
+  --color-base-850: #F6F4ED;
+  --color-base-900: #FDFCF9;
+  --color-base-950: #FFFFFF;
+  --color-base-1000: #FFFFFF;
+}
+
+/* Custom Admin Styles */
+.payload-admin {
+  /* Sidebar styling */
+  .nav {
+    background: var(--theme-elevation-50);
+  }
+
+  /* Header accent bar */
+  .app-header {
+    border-bottom: 2px solid #A08745;
+  }
+
+  /* Button primary styling - Busrom gold */
+  .btn--style-primary {
+    background: #756F3F !important;
+    border-color: #756F3F !important;
+
+    &:hover {
+      background: #625D2F !important;
+      border-color: #625D2F !important;
+    }
+  }
+
+  /* Links and accent colors */
+  a:not(.btn) {
+    color: #756F3F;
+
+    &:hover {
+      color: #A08745;
+    }
+  }
+
+  /* Focus ring color */
+  *:focus-visible {
+    outline-color: #A08745;
+  }
+
+  /* Checkbox and radio accent */
+  input[type="checkbox"]:checked,
+  input[type="radio"]:checked {
+    background-color: #756F3F;
+    border-color: #756F3F;
+  }
+
+  /* Tab active state */
+  .tabs-field__tab-button--active {
+    border-bottom-color: #A08745 !important;
+    color: #756F3F;
+  }
+
+  /* Card borders */
+  .card {
+    border-color: #CDC094;
+  }
+
+  /* Collapsible headers */
+  .collapsible__toggle {
+    &:hover {
+      background: rgba(160, 135, 69, 0.1);
+    }
+  }
+
+  /* Publish button accent */
+  .doc-controls__save {
+    .btn--style-primary {
+      background: #684D07 !important;
+      border-color: #684D07 !important;
+
+      &:hover {
+        background: #4F3A05 !important;
+        border-color: #4F3A05 !important;
+      }
+    }
+  }
+
+  /* Status indicators */
+  .status-indicator--published {
+    background: #A08745;
+  }
+
+  /* Nav group active */
+  .nav-group__toggle--active {
+    color: #756F3F;
+  }
+
+  /* Selection/highlight colors */
+  ::selection {
+    background: rgba(160, 135, 69, 0.3);
+  }
+}
+
+/* Sidebar nav hover effects */
+.nav a:hover {
+  background: rgba(117, 111, 63, 0.1) !important;
+}
+
+.nav a.active {
+  background: rgba(160, 135, 69, 0.15) !important;
+  border-left: 3px solid #A08745;
+}

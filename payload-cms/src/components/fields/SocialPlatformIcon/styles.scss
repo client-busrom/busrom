@@ -1,0 +1,38 @@
+.social-platform-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: var(--theme-elevation-50);
+  border-radius: 6px;
+  margin-top: 0.5rem;
+
+  &--empty {
+    opacity: 0.5;
+  }
+
+  &__preview {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  &__name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--theme-elevation-800);
+  }
+
+  &__placeholder {
+    font-size: 0.75rem;
+    color: var(--theme-elevation-400);
+    font-style: italic;
+  }
+}
