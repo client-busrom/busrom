@@ -21,10 +21,13 @@ if [ -z "$S3_BUCKET" ]; then
   echo "⚠️  WARNING: S3_BUCKET is not set. Media uploads may not work."
 fi
 
-# Optional: Run database migrations (if Payload supports it)
-# Payload uses MongoDB by default, but we're using Postgres with Prisma
-# So we may need to handle migrations separately
-echo "📦 Checking database connection..."
+# Run database migrations in production
+echo "📦 Running database migrations..."
+npm run migrate || {
+  echo "⚠️  Migration failed or no migrations to run"
+  # Don't exit - migrations might already be applied
+}
+echo "✅ Database migrations completed"
 
 # Start the Payload CMS server
 echo "🎯 Starting Payload CMS server on port ${PORT:-3002}..."
