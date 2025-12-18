@@ -76,8 +76,8 @@ async function exportHomepageData() {
     console.log(`  ✅ navigation-menus (${navMenus.docs.length} items)`)
 
     // Log a sample to verify mediaTags are included
-    const sampleWithTags = navMenus.docs.find(m => m.mediaTags && m.mediaTags.length > 0)
-    if (sampleWithTags) {
+    const sampleWithTags = navMenus.docs.find((m: any) => m.mediaTags && m.mediaTags.length > 0) as any
+    if (sampleWithTags?.mediaTags?.length) {
       console.log(`     Sample with mediaTags: ${sampleWithTags.slug} has ${sampleWithTags.mediaTags.length} tags`)
     }
   } catch (error: any) {
