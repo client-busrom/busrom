@@ -24,7 +24,8 @@ COPY package*.json ./
 COPY web/package*.json ./web/
 
 # Install ALL dependencies (including dev dependencies needed for build)
-RUN npm ci --workspace=web
+# Use --workspace=web to install web dependencies, node_modules will be in /app/node_modules
+RUN npm ci
 
 # Copy source code
 COPY tsconfig.json ./
