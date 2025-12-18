@@ -56,8 +56,8 @@ async function exportHomepageData() {
 
       exportData.globals[globalSlug] = data
       console.log(`  ✅ ${globalSlug}`)
-    } catch (error) {
-      console.log(`  ❌ ${globalSlug}: ${error.message}`)
+    } catch (error: any) {
+      console.log(`  ❌ ${globalSlug}: ${error?.message || error}`)
     }
   }
 
@@ -80,8 +80,8 @@ async function exportHomepageData() {
     if (sampleWithTags) {
       console.log(`     Sample with mediaTags: ${sampleWithTags.slug} has ${sampleWithTags.mediaTags.length} tags`)
     }
-  } catch (error) {
-    console.log(`  ❌ navigation-menus: ${error.message}`)
+  } catch (error: any) {
+    console.log(`  ❌ navigation-menus: ${error?.message || error}`)
   }
 
   // Save to file
