@@ -2,21 +2,51 @@
  * Sitemap Data Fetcher
  *
  * This module fetches all dynamic routes from the CMS for sitemap generation
+ * Supports multi-language sitemaps for global search engine indexing
+ *
+ * Targets:
+ * - Google (Google Search Console)
+ * - Bing (Bing Webmaster Tools)
+ * - Yandex (Yandex.Webmaster)
+ * - Naver (Naver Search Advisor) - Korean
+ * - Yahoo Japan (Yahoo Japan Webmaster) - Japanese
+ * - Seznam (Seznam Webmaster) - Czech
+ * - And other search engines that crawl Google/Bing index
  */
 
-const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT || 'http://localhost:3000/api/graphql'
+import { locales, defaultLocale } from '@/i18n.config'
 
-interface SitemapUrl {
+const GRAPHQL_ENDPOINT = process.env.CMS_GRAPHQL_URL || 'http://localhost:3000/api/graphql'
+
+// Supported languages for sitemap
+export const SITEMAP_LOCALES = locales
+
+// Language to region mapping for hreflang
+export const LOCALE_REGIONS: Record<string, string[]> = {
+  en: ['en', 'en-US', 'en-GB', 'en-AU', 'en-CA'],
+  zh: ['zh', 'zh-CN', 'zh-TW', 'zh-HK'],
+  es: ['es', 'es-ES', 'es-MX'],
+  fr: ['fr', 'fr-FR', 'fr-CA'],
+  de: ['de', 'de-DE', 'de-AT', 'de-CH'],
+  ar: ['ar', 'ar-SA', 'ar-AE'],
+  ja: ['ja', 'ja-JP'],
+  ko: ['ko', 'ko-KR'],
+  ru: ['ru', 'ru-RU'],
+  pt: ['pt', 'pt-BR', 'pt-PT'],
+}
+
+export interface SitemapUrl {
   url: string
   lastmod: string
   changefreq: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never'
   priority: number
+  alternates?: { locale: string; url: string }[]
 }
 
 /**
  * Fetch all products for sitemap
  */
-async function fetchProducts(): Promise<SitemapUrl[]> {
+async function fetchProducts(): Promise<{ slug: string; updatedAt: string }[]> {
   try {
     const response = await fetch(GRAPHQL_ENDPOINT, {
       method: 'POST',
@@ -25,7 +55,7 @@ async function fetchProducts(): Promise<SitemapUrl[]> {
         query: `
           query GetProductsForSitemap {
             products(where: { status: { equals: "PUBLISHED" } }) {
-              sku
+              slug
               updatedAt
             }
           }
@@ -35,14 +65,7 @@ async function fetchProducts(): Promise<SitemapUrl[]> {
     })
 
     const { data } = await response.json()
-    if (!data?.products) return []
-
-    return data.products.map((product: any) => ({
-      url: `/shop/${product.sku}`,
-      lastmod: product.updatedAt,
-      changefreq: 'weekly' as const,
-      priority: 0.8,
-    }))
+    return data?.products || []
   } catch (error) {
     console.error('Error fetching products for sitemap:', error)
     return []
@@ -52,7 +75,7 @@ async function fetchProducts(): Promise<SitemapUrl[]> {
 /**
  * Fetch all product series for sitemap
  */
-async function fetchProductSeries(): Promise<SitemapUrl[]> {
+async function fetchProductSeries(): Promise<{ slug: string; updatedAt: string }[]> {
   try {
     const response = await fetch(GRAPHQL_ENDPOINT, {
       method: 'POST',
@@ -71,14 +94,7 @@ async function fetchProductSeries(): Promise<SitemapUrl[]> {
     })
 
     const { data } = await response.json()
-    if (!data?.productSeries) return []
-
-    return data.productSeries.map((series: any) => ({
-      url: `/product/${series.slug}`,
-      lastmod: series.updatedAt,
-      changefreq: 'weekly' as const,
-      priority: 0.9,
-    }))
+    return data?.productSeries || []
   } catch (error) {
     console.error('Error fetching product series for sitemap:', error)
     return []
@@ -88,7 +104,7 @@ async function fetchProductSeries(): Promise<SitemapUrl[]> {
 /**
  * Fetch all blogs for sitemap
  */
-async function fetchBlogs(): Promise<SitemapUrl[]> {
+async function fetchBlogs(): Promise<{ slug: string; updatedAt: string }[]> {
   try {
     const response = await fetch(GRAPHQL_ENDPOINT, {
       method: 'POST',
@@ -107,14 +123,7 @@ async function fetchBlogs(): Promise<SitemapUrl[]> {
     })
 
     const { data } = await response.json()
-    if (!data?.blogs) return []
-
-    return data.blogs.map((blog: any) => ({
-      url: `/about-us/blog/${blog.slug}`,
-      lastmod: blog.updatedAt,
-      changefreq: 'monthly' as const,
-      priority: 0.6,
-    }))
+    return data?.blogs || []
   } catch (error) {
     console.error('Error fetching blogs for sitemap:', error)
     return []
@@ -124,7 +133,7 @@ async function fetchBlogs(): Promise<SitemapUrl[]> {
 /**
  * Fetch all applications (case studies) for sitemap
  */
-async function fetchApplications(): Promise<SitemapUrl[]> {
+async function fetchApplications(): Promise<{ slug: string; updatedAt: string }[]> {
   try {
     const response = await fetch(GRAPHQL_ENDPOINT, {
       method: 'POST',
@@ -133,7 +142,7 @@ async function fetchApplications(): Promise<SitemapUrl[]> {
         query: `
           query GetApplicationsForSitemap {
             applications(where: { status: { equals: "PUBLISHED" } }) {
-              id
+              slug
               updatedAt
             }
           }
@@ -143,14 +152,7 @@ async function fetchApplications(): Promise<SitemapUrl[]> {
     })
 
     const { data } = await response.json()
-    if (!data?.applications) return []
-
-    return data.applications.map((app: any) => ({
-      url: `/service/application/${app.id}`,
-      lastmod: app.updatedAt,
-      changefreq: 'monthly' as const,
-      priority: 0.7,
-    }))
+    return data?.applications || []
   } catch (error) {
     console.error('Error fetching applications for sitemap:', error)
     return []
@@ -158,88 +160,337 @@ async function fetchApplications(): Promise<SitemapUrl[]> {
 }
 
 /**
- * Get all static routes
+ * Fetch all CMS pages for sitemap
+ * These are custom pages created by operators -> /page/[slug]
  */
-function getStaticRoutes(): SitemapUrl[] {
-  const now = new Date().toISOString()
-
-  return [
-    // Home
-    { url: '/', lastmod: now, changefreq: 'daily', priority: 1.0 },
-
-    // Product pages
-    { url: '/product', lastmod: now, changefreq: 'weekly', priority: 0.9 },
-
-    // Shop pages
-    { url: '/shop', lastmod: now, changefreq: 'weekly', priority: 0.9 },
-
-    // Service pages
-    { url: '/service', lastmod: now, changefreq: 'monthly', priority: 0.8 },
-    { url: '/service/one-stop-shop', lastmod: now, changefreq: 'monthly', priority: 0.7 },
-    { url: '/service/faq', lastmod: now, changefreq: 'monthly', priority: 0.7 },
-    { url: '/service/application', lastmod: now, changefreq: 'weekly', priority: 0.8 },
-
-    // About Us pages
-    { url: '/about-us/story', lastmod: now, changefreq: 'monthly', priority: 0.6 },
-    { url: '/about-us/blog', lastmod: now, changefreq: 'weekly', priority: 0.7 },
-    { url: '/about-us/support', lastmod: now, changefreq: 'monthly', priority: 0.6 },
-
-    // Legal pages
-    { url: '/privacy-policy', lastmod: now, changefreq: 'yearly', priority: 0.3 },
-    { url: '/fraud-notice', lastmod: now, changefreq: 'yearly', priority: 0.3 },
-
-    // Contact
-    { url: '/contact-us', lastmod: now, changefreq: 'monthly', priority: 0.7 },
-  ]
-}
-
-/**
- * Get all URLs for sitemap
- */
-export async function getAllSitemapUrls(): Promise<SitemapUrl[]> {
+async function fetchPages(): Promise<{ slug: string; updatedAt: string }[]> {
   try {
-    // Fetch all dynamic routes in parallel
-    const [products, productSeries, blogs, applications] = await Promise.all([
-      fetchProducts(),
-      fetchProductSeries(),
-      fetchBlogs(),
-      fetchApplications(),
-    ])
+    const response = await fetch(GRAPHQL_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `
+          query GetPagesForSitemap {
+            pages(where: {
+              status: { equals: "PUBLISHED" }
+              isSystem: { equals: false }
+            }) {
+              slug
+              updatedAt
+            }
+          }
+        `,
+      }),
+      cache: 'no-store',
+    })
 
-    // Combine all routes
-    const allUrls = [
-      ...getStaticRoutes(),
-      ...productSeries,
-      ...products,
-      ...blogs,
-      ...applications,
-    ]
-
-    return allUrls
+    const { data } = await response.json()
+    return data?.pages || []
   } catch (error) {
-    console.error('Error generating sitemap URLs:', error)
-    // Return at least static routes
-    return getStaticRoutes()
+    console.error('Error fetching pages for sitemap:', error)
+    return []
   }
 }
 
 /**
- * Generate XML sitemap
+ * Get all static routes with their configuration
+ * These must match actual frontend routes in /app/[locale]/
+ */
+function getStaticRoutes(): { path: string; changefreq: SitemapUrl['changefreq']; priority: number }[] {
+  return [
+    // Home - highest priority
+    { path: '', changefreq: 'daily', priority: 1.0 },
+
+    // Product pages (ProductSeries)
+    { path: '/products', changefreq: 'weekly', priority: 0.9 },
+
+    // Shop pages (Product items)
+    { path: '/shop', changefreq: 'weekly', priority: 0.9 },
+
+    // Blog list page
+    { path: '/blog', changefreq: 'weekly', priority: 0.8 },
+
+    // Applications list page
+    { path: '/applications', changefreq: 'weekly', priority: 0.8 },
+
+    // Service pages
+    { path: '/service/overview', changefreq: 'monthly', priority: 0.7 },
+    { path: '/service/one-stop', changefreq: 'monthly', priority: 0.7 },
+    { path: '/service/oem-odm', changefreq: 'monthly', priority: 0.7 },
+    { path: '/service/faq', changefreq: 'monthly', priority: 0.6 },
+
+    // About pages
+    { path: '/about/story', changefreq: 'monthly', priority: 0.6 },
+
+    // Support
+    { path: '/support', changefreq: 'monthly', priority: 0.6 },
+
+    // Contact
+    { path: '/contact-us', changefreq: 'monthly', priority: 0.7 },
+
+    // Legal pages - lowest priority
+    { path: '/privacy-policy', changefreq: 'yearly', priority: 0.3 },
+    { path: '/fraud-notice', changefreq: 'yearly', priority: 0.3 },
+  ]
+}
+
+/**
+ * Generate URLs for a specific locale with hreflang alternates
+ */
+function generateUrlWithAlternates(
+  path: string,
+  lastmod: string,
+  changefreq: SitemapUrl['changefreq'],
+  priority: number,
+  locale: string,
+  baseUrl: string
+): SitemapUrl {
+  // Generate alternate URLs for all locales
+  const alternates: { locale: string; url: string }[] = SITEMAP_LOCALES.map((loc) => ({
+    locale: loc as string,
+    url: `${baseUrl}/${loc}${path}`,
+  }))
+
+  // Add x-default (points to default locale)
+  alternates.push({
+    locale: 'x-default',
+    url: `${baseUrl}/${defaultLocale}${path}`,
+  })
+
+  return {
+    url: `/${locale}${path}`,
+    lastmod,
+    changefreq,
+    priority,
+    alternates,
+  }
+}
+
+/**
+ * Get all URLs for sitemap for a specific locale
+ */
+export async function getSitemapUrlsForLocale(locale: string, baseUrl: string): Promise<SitemapUrl[]> {
+  const now = new Date().toISOString()
+
+  try {
+    // Fetch all dynamic routes
+    const [products, productSeries, blogs, pages] = await Promise.all([
+      fetchProducts(),
+      fetchProductSeries(),
+      fetchBlogs(),
+      fetchPages(),
+    ])
+
+    const urls: SitemapUrl[] = []
+
+    // Add static routes
+    for (const route of getStaticRoutes()) {
+      urls.push(generateUrlWithAlternates(route.path, now, route.changefreq, route.priority, locale, baseUrl))
+    }
+
+    // Add product series -> /products/[slug]
+    for (const series of productSeries) {
+      urls.push(
+        generateUrlWithAlternates(
+          `/products/${series.slug}`,
+          series.updatedAt,
+          'weekly',
+          0.9,
+          locale,
+          baseUrl
+        )
+      )
+    }
+
+    // Add products (shop items) -> /shop/[slug]
+    for (const product of products) {
+      urls.push(
+        generateUrlWithAlternates(
+          `/shop/${product.slug}`,
+          product.updatedAt,
+          'weekly',
+          0.8,
+          locale,
+          baseUrl
+        )
+      )
+    }
+
+    // Add blogs -> /blog/[slug]
+    for (const blog of blogs) {
+      urls.push(
+        generateUrlWithAlternates(
+          `/blog/${blog.slug}`,
+          blog.updatedAt,
+          'weekly',
+          0.7,
+          locale,
+          baseUrl
+        )
+      )
+    }
+
+    // Add CMS pages -> /page/[slug]
+    for (const page of pages) {
+      urls.push(
+        generateUrlWithAlternates(
+          `/page/${page.slug}`,
+          page.updatedAt,
+          'monthly',
+          0.6,
+          locale,
+          baseUrl
+        )
+      )
+    }
+
+    return urls
+  } catch (error) {
+    console.error('Error generating sitemap URLs:', error)
+    // Return at least static routes
+    return getStaticRoutes().map((route) =>
+      generateUrlWithAlternates(route.path, now, route.changefreq, route.priority, locale, baseUrl)
+    )
+  }
+}
+
+/**
+ * Get all URLs for legacy sitemap (without locale prefix, for backward compatibility)
+ */
+export async function getAllSitemapUrls(): Promise<SitemapUrl[]> {
+  const now = new Date().toISOString()
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busrom.com'
+
+  try {
+    const [products, productSeries, blogs, pages] = await Promise.all([
+      fetchProducts(),
+      fetchProductSeries(),
+      fetchBlogs(),
+      fetchPages(),
+    ])
+
+    const urls: SitemapUrl[] = []
+
+    // Add static routes (without locale prefix)
+    for (const route of getStaticRoutes()) {
+      urls.push({
+        url: route.path || '/',
+        lastmod: now,
+        changefreq: route.changefreq,
+        priority: route.priority,
+      })
+    }
+
+    // Add product series -> /products/[slug]
+    for (const series of productSeries) {
+      urls.push({
+        url: `/products/${series.slug}`,
+        lastmod: series.updatedAt,
+        changefreq: 'weekly',
+        priority: 0.9,
+      })
+    }
+
+    // Add products (shop items) -> /shop/[slug]
+    for (const product of products) {
+      urls.push({
+        url: `/shop/${product.slug}`,
+        lastmod: product.updatedAt,
+        changefreq: 'weekly',
+        priority: 0.8,
+      })
+    }
+
+    // Add blogs -> /blog/[slug]
+    for (const blog of blogs) {
+      urls.push({
+        url: `/blog/${blog.slug}`,
+        lastmod: blog.updatedAt,
+        changefreq: 'weekly',
+        priority: 0.7,
+      })
+    }
+
+    // Add CMS pages -> /page/[slug]
+    for (const page of pages) {
+      urls.push({
+        url: `/page/${page.slug}`,
+        lastmod: page.updatedAt,
+        changefreq: 'monthly',
+        priority: 0.6,
+      })
+    }
+
+    return urls
+  } catch (error) {
+    console.error('Error generating sitemap URLs:', error)
+    return getStaticRoutes().map((route) => ({
+      url: route.path || '/',
+      lastmod: now,
+      changefreq: route.changefreq,
+      priority: route.priority,
+    }))
+  }
+}
+
+/**
+ * Generate XML sitemap with hreflang support
  */
 export function generateSitemapXML(urls: SitemapUrl[], baseUrl: string = 'https://busrom.com'): string {
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  const hasAlternates = urls.some((url) => url.alternates && url.alternates.length > 0)
+
+  const xmlHeader = hasAlternates
+    ? `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">`
+    : `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`
+
+  const xml = `${xmlHeader}
 ${urls
-  .map(
-    (item) => `  <url>
+  .map((item) => {
+    const alternateLinks = item.alternates
+      ? item.alternates
+          .map(
+            (alt) =>
+              `    <xhtml:link rel="alternate" hreflang="${alt.locale}" href="${alt.url}"/>`
+          )
+          .join('\n')
+      : ''
+
+    return `  <url>
     <loc>${baseUrl}${item.url}</loc>
     <lastmod>${item.lastmod}</lastmod>
     <changefreq>${item.changefreq}</changefreq>
     <priority>${item.priority}</priority>
+${alternateLinks}
   </url>`
-  )
+  })
   .join('\n')}
 </urlset>`
 
   return xml
+}
+
+/**
+ * Generate sitemap index XML
+ */
+export function generateSitemapIndexXML(locales: string[], baseUrl: string = 'https://busrom.com'): string {
+  const now = new Date().toISOString()
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${locales
+  .map(
+    (locale) => `  <sitemap>
+    <loc>${baseUrl}/sitemap/${locale}</loc>
+    <lastmod>${now}</lastmod>
+  </sitemap>`
+  )
+  .join('\n')}
+  <sitemap>
+    <loc>${baseUrl}/sitemap.xml</loc>
+    <lastmod>${now}</lastmod>
+  </sitemap>
+</sitemapindex>`
 }

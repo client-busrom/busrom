@@ -50,7 +50,7 @@ async function exportHomepageData() {
   for (const globalSlug of globalsToExport) {
     try {
       const data = await payload.findGlobal({
-        slug: globalSlug,
+        slug: globalSlug as any,
         locale: 'all' as any, // Get all locales
       })
 
