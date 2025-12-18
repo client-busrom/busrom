@@ -16,6 +16,9 @@
 import { NextResponse } from 'next/server'
 import { getAllSitemapUrls, generateSitemapXML } from '@/lib/api/sitemap'
 
+// Force dynamic rendering - this route fetches from CMS at runtime
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     // Get base URL from environment or default
