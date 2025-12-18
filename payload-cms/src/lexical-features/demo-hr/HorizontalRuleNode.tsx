@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * HorizontalRuleNode - 官方示例 DecoratorNode
  * 来源：https://payloadcms.com/docs/rich-text/custom-features

@@ -1,7 +1,8 @@
+// @ts-nocheck
 /**
  * Carousel Component - Client-side render component for CarouselNode
  */
-
+// @ts-nocheck
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'

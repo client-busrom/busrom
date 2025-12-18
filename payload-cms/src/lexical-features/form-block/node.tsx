@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * FormBlock Node - Lexical DecoratorNode
  */

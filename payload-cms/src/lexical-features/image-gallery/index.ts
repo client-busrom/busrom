@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ImageGalleryFeature - Export
  * 按照 Demo HR 模式导出

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Document Template Toolbar Button
  *

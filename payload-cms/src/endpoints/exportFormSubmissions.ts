@@ -81,7 +81,7 @@ export const exportFormSubmissionsHandler: PayloadHandler = async (req) => {
     // Fetch submissions
     const submissions = await payload.find({
       collection: 'form-submissions',
-      where,
+      where: where as any,
       sort: '-submittedAt',
       limit: 10000, // Max export limit
       depth: 1,
@@ -178,8 +178,8 @@ export const exportFormSubmissionsHandler: PayloadHandler = async (req) => {
         },
       })
     }
-  } catch (error) {
-    payload.logger.error('Error exporting form submissions:', error)
+  } catch (error: any) {
+    payload.logger.error('Error exporting form submissions:', error?.message || error)
     return Response.json(
       {
         error: 'Failed to export form submissions',

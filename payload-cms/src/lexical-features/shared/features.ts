@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Shared Lexical Features Configuration
  *

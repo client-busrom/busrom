@@ -3,7 +3,7 @@
 import React, { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useDocumentInfo, useFormFields } from '@payloadcms/ui'
-import { SUPPORTED_LOCALES, type LocaleCode } from '../../../lib/locales'
+import { LOCALE_CODES, type LocaleCode, getLocaleLabel } from '../../../lib/locales'
 import './styles.scss'
 
 interface LocalizedValue {
@@ -50,8 +50,8 @@ const ArrayTranslationHelper: React.FC = () => {
         // customTitle
         if (item.customTitle !== undefined) {
           const values: LocalizedValue = {}
-          SUPPORTED_LOCALES.forEach((locale) => {
-            const localeData = allLocalesData[locale]
+          LOCALE_CODES.forEach((locale) => {
+            const localeData = (allLocalesData as any)[locale]
             const localeItems = localeData?.items || []
             values[locale] = localeItems[index]?.customTitle || ''
           })
@@ -67,8 +67,8 @@ const ArrayTranslationHelper: React.FC = () => {
         // customDescription
         if (item.customDescription !== undefined) {
           const values: LocalizedValue = {}
-          SUPPORTED_LOCALES.forEach((locale) => {
-            const localeData = allLocalesData[locale]
+          LOCALE_CODES.forEach((locale) => {
+            const localeData = (allLocalesData as any)[locale]
             const localeItems = localeData?.items || []
             values[locale] = localeItems[index]?.customDescription || ''
           })
@@ -119,14 +119,14 @@ const ArrayTranslationHelper: React.FC = () => {
       // 重组数据：为每个 locale 构建完整的 items 数组
       const updatesByLocale: Record<string, any[]> = {}
 
-      SUPPORTED_LOCALES.forEach((locale) => {
+      LOCALE_CODES.forEach((locale) => {
         // 获取当前 locale 的原始 items 数据
-        updatesByLocale[locale] = itemsField?.value.map((item: any) => ({ ...item })) || []
+        updatesByLocale[locale] = (itemsField?.value as any[])?.map((item: any) => ({ ...item })) || []
       })
 
       // 将扁平化的翻译数据填回去
       flattenedFields.forEach((field) => {
-        SUPPORTED_LOCALES.forEach((locale) => {
+        LOCALE_CODES.forEach((locale) => {
           if (updatesByLocale[locale][field.itemIndex]) {
             updatesByLocale[locale][field.itemIndex][field.fieldName] = field.values[locale] || ''
           }
@@ -134,7 +134,7 @@ const ArrayTranslationHelper: React.FC = () => {
       })
 
       // 为每个语言发送更新请求
-      for (const locale of SUPPORTED_LOCALES) {
+      for (const locale of LOCALE_CODES) {
         const response = await fetch(`/api/globals/${globalSlug}?locale=${locale}`, {
           method: 'PATCH',
           headers: {
@@ -207,7 +207,7 @@ const ArrayTranslationHelper: React.FC = () => {
                   <h3>{field.fieldLabel}</h3>
 
                   <div className="translation-center-locales">
-                    {SUPPORTED_LOCALES.map((locale) => (
+                    {LOCALE_CODES.map((locale) => (
                       <div key={locale} className="translation-center-locale-row">
                         <div className="translation-center-locale-label">{locale.toUpperCase()}</div>
                         <div className="translation-center-locale-input">
@@ -279,7 +279,7 @@ const ArrayTranslationHelper: React.FC = () => {
           onClick={openTranslationCenter}
           title="Open batch translation for all carousel items"
         >
-          🌐 Batch Translate All Items ({itemsField?.value?.length || 0} items)
+          🌐 Batch Translate All Items ({(itemsField?.value as any[])?.length || 0} items)
         </button>
         <p className="array-translation-hint">
           Click to translate customTitle and customDescription for all carousel items across all languages

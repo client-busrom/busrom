@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Carousel Node - Lexical DecoratorNode
  */

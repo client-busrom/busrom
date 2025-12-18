@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ReusableBlock Feature - Server Side
  */

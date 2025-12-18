@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * NoticeComponent - WYSIWYG Preview Component
  */

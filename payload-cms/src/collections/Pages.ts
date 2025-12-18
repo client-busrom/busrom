@@ -87,7 +87,7 @@ export const Pages: CollectionConfig = {
               admin: {
                 description: 'CMS internal identifier. e.g.: service-overview, faq, summer-promotion-2024',
               },
-              validate: (value) => {
+              validate: (value: any) => {
                 if (!value) return true
                 const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
                 if (!slugRegex.test(value)) {
@@ -108,7 +108,7 @@ export const Pages: CollectionConfig = {
               admin: {
                 description: 'Full URL path for frontend routing. e.g.: /service/one-stop-shop, /about-us/story',
               },
-              validate: (value) => {
+              validate: (value: any) => {
                 if (!value) return true
                 if (!value.startsWith('/')) {
                   return 'Path must start with / (e.g., /service/one-stop-shop)'

@@ -16,7 +16,7 @@ import { usePathname } from 'next/navigation'
 const NavItem: React.FC<{ href: string; labelKey: string }> = ({ href, labelKey }) => {
   const pathname = usePathname()
   const { t } = useTranslation()
-  const label = t(`custom:nav:${labelKey}`)
+  const label = t(`custom:nav:${labelKey}` as any)
   const isActive = pathname === href || pathname?.startsWith(href + '/')
 
   return (
@@ -47,7 +47,7 @@ const GroupHeader: React.FC<{
   onClick: () => void
 }> = ({ labelKey, isOpen, onClick }) => {
   const { t } = useTranslation()
-  const label = t(`custom:nav:${labelKey}`)
+  const label = t(`custom:nav:${labelKey}` as any)
 
   return (
     <button

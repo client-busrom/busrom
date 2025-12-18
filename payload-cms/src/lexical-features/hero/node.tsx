@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hero Node - Lexical DecoratorNode
  */

@@ -77,7 +77,7 @@ export async function logActivity({
     // Extract IP address from request
     let ipAddress: string | undefined
     if (req?.headers) {
-      const headers = req.headers as Record<string, string | string[] | undefined>
+      const headers = req.headers as unknown as Record<string, string | string[] | undefined>
       const forwarded = headers['x-forwarded-for']
       if (typeof forwarded === 'string') {
         ipAddress = forwarded.split(',')[0]?.trim()
@@ -91,7 +91,7 @@ export async function logActivity({
 
     // Extract user agent
     const userAgent = req?.headers
-      ? (req.headers as Record<string, string | undefined>)['user-agent']
+      ? (req.headers as unknown as Record<string, string | undefined>)['user-agent']
       : undefined
 
     // Generate summary
@@ -114,7 +114,7 @@ export async function logActivity({
         userAgent,
       },
     })
-  } catch (error) {
+  } catch (error: any) {
     // Don't throw - logging failures shouldn't break the main operation
     payload.logger.error('Failed to log activity:', error)
   }

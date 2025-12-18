@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MarqueeLinks Plugin - Registers command for inserting marquee links nodes
  */

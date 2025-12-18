@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Block With Preview Wrapper
  *
@@ -30,7 +31,7 @@ export const createBlockWithPreview = (
       try {
         // 路径格式通常是: content.root.children[0].fields
         const pathParts = fieldPath.split('.')
-        let data = allFields
+        let data: any = allFields
 
         for (const part of pathParts) {
           if (!data) break

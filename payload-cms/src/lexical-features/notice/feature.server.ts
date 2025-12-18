@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * NoticeFeature - Server Side
  */

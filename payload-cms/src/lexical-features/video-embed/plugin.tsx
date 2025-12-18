@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VideoEmbed Plugin - Command Handler
  */

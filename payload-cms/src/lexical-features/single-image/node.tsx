@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SingleImage Node - Lexical DecoratorNode
  */

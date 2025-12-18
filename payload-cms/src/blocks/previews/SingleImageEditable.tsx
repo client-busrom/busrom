@@ -6,7 +6,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useFormFields, RenderFields, FieldTypes } from '@payloadcms/ui'
+import { useFormFields, RenderFields } from '@payloadcms/ui'
 
 export const SingleImageEditable: React.FC<any> = (props) => {
   const [isEditing, setIsEditing] = useState(false)
@@ -107,12 +107,12 @@ export const SingleImageEditable: React.FC<any> = (props) => {
         <div>
           {props.field && props.field.fields ? (
             <RenderFields
-              fieldTypes={props.field.admin?.components?.FieldTypes || {}}
-              fieldSchema={props.field.fields}
-              path={props.path}
+              fields={props.field.fields}
+              parentIndexPath={props.path}
+              parentPath={props.path}
+              parentSchemaPath={props.schemaPath || props.path}
               permissions={props.permissions}
               readOnly={props.readOnly}
-              schemaPath={props.schemaPath}
             />
           ) : (
             <div style={{ padding: '1rem', color: '#999' }}>

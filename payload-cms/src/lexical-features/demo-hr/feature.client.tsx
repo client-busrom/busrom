@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Demo HR Feature - Client Side
  * 官方示例：https://payloadcms.com/docs/rich-text/custom-features

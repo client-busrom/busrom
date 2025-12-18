@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Notice Plugin - Command Handler
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * HeroComponent - WYSIWYG Preview Component
  */

@@ -68,7 +68,7 @@ export async function getQuoteSteps(locale: string = 'en'): Promise<QuoteStepsDa
     const { data } = await keystoneClient.query({ query: GET_QUOTE_STEPS })
     const config = data?.quoteStepsConfigs?.[0]
     if (!config || config.status !== 'PUBLISHED') {
-      return { title: '', title2: '', subtitle: '', description: '', steps: [] }
+      return { headerTitle: '', headerTitle2: '', headerSubtitle: '', headerDescription: '', steps: [] }
     }
 
     const images = await Promise.all([
@@ -88,14 +88,14 @@ export async function getQuoteSteps(locale: string = 'en'): Promise<QuoteStepsDa
     ]
 
     return {
-      title: extractLocale(config.title, locale),
-      title2: extractLocale(config.title2, locale),
-      subtitle: extractLocale(config.subtitle, locale),
-      description: extractLocale(config.description, locale),
+      headerTitle: extractLocale(config.title, locale),
+      headerTitle2: extractLocale(config.title2, locale),
+      headerSubtitle: extractLocale(config.subtitle, locale),
+      headerDescription: extractLocale(config.description, locale),
       steps,
     }
   } catch (error) {
     console.error('Error fetching QuoteSteps:', error)
-    return { title: '', title2: '', subtitle: '', description: '', steps: [] }
+    return { headerTitle: '', headerTitle2: '', headerSubtitle: '', headerDescription: '', steps: [] }
   }
 }

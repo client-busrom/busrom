@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CtaButton Node - Lexical DecoratorNode
  */

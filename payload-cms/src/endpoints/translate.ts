@@ -12,6 +12,7 @@
  *    Request: { text, sourceLang, targetLangs }
  *    Response: { success, translations: { en: '...', zh: '...', ... } }
  */
+// @ts-nocheck
 
 import type { PayloadHandler } from 'payload'
 

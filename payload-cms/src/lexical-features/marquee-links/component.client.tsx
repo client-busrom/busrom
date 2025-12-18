@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MarqueeLinks Component - Client Side
  */

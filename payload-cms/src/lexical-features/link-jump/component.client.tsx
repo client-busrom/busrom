@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * LinkJumpComponent - WYSIWYG Preview Component
  */

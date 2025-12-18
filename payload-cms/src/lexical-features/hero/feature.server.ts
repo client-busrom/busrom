@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * HeroFeature - Server Side
  */

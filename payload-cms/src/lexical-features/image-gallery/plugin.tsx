@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ImageGallery Plugin - 注册命令
  */

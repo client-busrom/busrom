@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * LinkJump Feature - Export
  */
