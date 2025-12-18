@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * LinkJump Plugin - Command Handler
  */

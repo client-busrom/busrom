@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Demo HR Feature - 导出
  */

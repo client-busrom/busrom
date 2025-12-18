@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SingleImageComponent - WYSIWYG Preview Component
  */

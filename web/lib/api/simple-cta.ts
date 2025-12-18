@@ -135,7 +135,7 @@ export async function getSimpleCta(
         title2: '',
         subtitle: '',
         description: '',
-        buttonText: '',
+        ctaText: '',
         images: [],
       }
     }
@@ -148,7 +148,7 @@ export async function getSimpleCta(
         title2: '',
         subtitle: '',
         description: '',
-        buttonText: '',
+        ctaText: '',
         images: [],
       }
     }
@@ -177,7 +177,7 @@ export async function getSimpleCta(
       title2,
       subtitle,
       description,
-      buttonText,
+      ctaText: buttonText,
       images: validImages,
     }
   } catch (error) {
@@ -187,7 +187,7 @@ export async function getSimpleCta(
       title2: '',
       subtitle: '',
       description: '',
-      buttonText: '',
+      ctaText: '',
       images: [],
     }
   }

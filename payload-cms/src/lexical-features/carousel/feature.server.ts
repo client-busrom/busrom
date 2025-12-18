@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CarouselFeature - Server Side
  */

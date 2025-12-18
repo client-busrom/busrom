@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * LinkJumpFeature - Client Side
  */

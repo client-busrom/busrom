@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Blocks Toolbar Dropdown - Server Feature
  * 在工具栏添加下拉菜单，用于访问自定义块

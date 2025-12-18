@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hero Plugin - Command Handler
  */

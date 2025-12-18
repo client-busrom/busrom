@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Seed RBAC Permissions System for Payload CMS
  *

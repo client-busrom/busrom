@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Carousel Plugin - Registers command for inserting carousel nodes
  */

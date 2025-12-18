@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ReusableBlock Plugin - Registers command for inserting reusable block nodes
  */

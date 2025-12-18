@@ -1,75 +1,111 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { keystoneClient } from '@/lib/keystone-client';
-import { gql } from '@apollo/client';
-import type { NavItem, NavItemRaw } from '@/types/navigation';
+import { NavigationMenuType, type NavItem } from '@/types/navigation';
 
-// GraphQL 查询 - 获取所有可见菜单
-const GET_NAVIGATION = gql`
-  query GetNavigation {
-    navigationMenus(
-      where: { visible: { equals: true } }
-      orderBy: { order: asc }
-    ) {
-      id
-      name
-      type
-      icon
-      link
-      inquiryLink
-      order
-      parent {
-        id
-      }
-      children(
-        where: { visible: { equals: true } }
-        orderBy: { order: asc }
-      ) {
-        id
-        name
-        type
-        icon
-        link
-        inquiryLink
-        order
-        randomImage {
-          url
-          filename
-        }
-      }
-    }
-  }
-`;
+// Payload CMS API 基础地址
+const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3002';
 
 /**
- * 转换函数：将多语言 GraphQL 数据转换为单语言 REST API 格式
+ * Payload CMS 导航菜单数据类型
  */
-function transformNavigationItem(item: NavItemRaw, locale: string): NavItem {
+interface PayloadNavMenu {
+  id: string;
+  name: string; // 已经是单语言（通过 locale 参数获取）
+  type: string;
+  icon?: string;
+  link?: string;
+  inquiryLink?: string;
+  order: number;
+  parent?: { id: string } | string | null;
+  mediaTags?: Array<{
+    id: string;
+    name: string;
+  }>;
+}
+
+/**
+ * 从媒体标签获取随机图片
+ */
+async function getRandomImageFromMediaTags(mediaTags: Array<{ id: string; name: string }>, locale: string): Promise<{ url: string; filename: string } | null> {
+  if (!mediaTags || mediaTags.length === 0) return null;
+
+  try {
+    // 使用第一个 mediaTag 的 ID 查询图片
+    const tagId = mediaTags[0].id;
+    const response = await fetch(
+      `${CMS_URL}/api/media?where[mediaTags][in]=${tagId}&limit=1&locale=${locale}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        next: { revalidate: 60 }, // 缓存 60 秒
+      }
+    );
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    if (data.docs && data.docs.length > 0) {
+      const media = data.docs[0];
+      return {
+        url: media.url,
+        filename: media.filename,
+      };
+    }
+  } catch (error) {
+    console.error('[Navigation API] Error fetching media:', error);
+  }
+
+  return null;
+}
+
+/**
+ * 转换函数：将 Payload CMS 数据转换为前端期望的格式
+ */
+async function transformNavigationItem(item: PayloadNavMenu, locale: string, allMenus: PayloadNavMenu[]): Promise<NavItem> {
+  // 转换类型：小写转大写下划线
+  const typeMap: Record<string, NavigationMenuType> = {
+    'standard': NavigationMenuType.STANDARD,
+    'product_cards': NavigationMenuType.PRODUCT_CARDS,
+    'submenu': NavigationMenuType.SUBMENU,
+  };
+
   const result: NavItem = {
     id: item.id,
-    label: item.name[locale] || item.name['en'] || 'Untitled',
-    url: item.link,
-    type: item.type as any,
+    label: item.name || 'Untitled',
+    url: item.link || '#',
+    type: typeMap[item.type] || NavigationMenuType.STANDARD,
     icon: item.icon,
     openInNewTab: false,
     order: item.order,
   };
 
-  // 添加询单链接（如果存在）
+  // 添加询单链接
   if (item.inquiryLink) {
     result.inquiryLink = item.inquiryLink;
   }
 
-  // 添加图片（如果存在）
-  if (item.randomImage) {
-    result.image = {
-      url: item.randomImage.url,
-      filename: item.randomImage.filename,
-    };
+  // 如果是 product_cards 类型且有 mediaTags，获取随机图片
+  if (item.type === 'product_cards' && item.mediaTags && item.mediaTags.length > 0) {
+    const image = await getRandomImageFromMediaTags(item.mediaTags, locale);
+    if (image) {
+      result.image = image;
+    }
   }
 
+  // 查找子菜单
+  const children = allMenus.filter(menu => {
+    if (!menu.parent) return false;
+    const parentId = typeof menu.parent === 'string' ? menu.parent : menu.parent.id;
+    return parentId === item.id;
+  });
+
   // 递归转换子菜单
-  if (item.children && item.children.length > 0) {
-    result.childMenus = item.children.map(child => transformNavigationItem(child, locale));
+  if (children.length > 0) {
+    result.childMenus = await Promise.all(
+      children
+        .sort((a, b) => a.order - b.order)
+        .map(child => transformNavigationItem(child, locale, allMenus))
+    );
   }
 
   return result;
@@ -80,33 +116,52 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const locale = searchParams.get('locale') || 'en';
 
-    // 查询 GraphQL
-    const { data, error } = await keystoneClient.query({
-      query: GET_NAVIGATION,
-    });
+    console.log('[Navigation API] Fetching navigation from Payload CMS for locale:', locale);
 
-    if (error) {
-      console.error('GraphQL error:', error);
+    // 从 Payload CMS 获取所有可见的导航菜单
+    const response = await fetch(
+      `${CMS_URL}/api/navigation-menus?where[visible][equals]=true&limit=1000&locale=${locale}&depth=2`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        next: { revalidate: 60 }, // 缓存 60 秒
+      }
+    );
+
+    if (!response.ok) {
+      console.error('[Navigation API] Payload CMS error:', response.status, response.statusText);
       return NextResponse.json(
-        { error: 'Failed to fetch navigation data' },
-        { status: 500 }
+        { error: 'Failed to fetch navigation data from CMS' },
+        { status: response.status }
       );
     }
 
-    // 过滤出顶级菜单（parent === null）
-    const navigationMenus = data.navigationMenus as NavItemRaw[];
-    const topLevelMenus = navigationMenus.filter(menu => !menu.parent);
+    const data = await response.json();
+    const allMenus = data.docs as PayloadNavMenu[];
 
-    // 转换数据：提取对应语言的文本
-    const transformedData = topLevelMenus.map(item =>
-      transformNavigationItem(item, locale)
+    console.log('[Navigation API] Payload CMS response received, total menus:', allMenus.length);
+
+    // 过滤出顶级菜单（parent 为 null 或不存在）
+    const topLevelMenus = allMenus.filter(menu => !menu.parent);
+
+    console.log('[Navigation API] Top level menus:', topLevelMenus.length);
+
+    // 转换数据：组装父子关系并转换格式
+    const transformedData = await Promise.all(
+      topLevelMenus
+        .sort((a, b) => a.order - b.order)
+        .map(item => transformNavigationItem(item, locale, allMenus))
     );
 
+    console.log('[Navigation API] Transformed data:', transformedData.length);
+
     return NextResponse.json(transformedData);
-  } catch (error) {
-    console.error('Navigation API error:', error);
+  } catch (error: any) {
+    console.error('[Navigation API] Error:', error);
+    console.error('[Navigation API] Error stack:', error?.stack);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error?.message },
       { status: 500 }
     );
   }

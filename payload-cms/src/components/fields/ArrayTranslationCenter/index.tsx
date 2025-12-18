@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useDocumentInfo, useLocale, useTranslation } from '@payloadcms/ui'
-import { SUPPORTED_LOCALES, type LocaleCode } from '../../../lib/locales'
+import { LOCALE_CODES, type LocaleCode, getLocaleLabel } from '../../../lib/locales'
 import './styles.scss'
 
 // 定义数组项中可翻译字段的配置
@@ -119,7 +119,7 @@ export const ArrayTranslationCenter: React.FC<ArrayTranslationCenterProps> = ({ 
 
       // 为每个可翻译字段构建数据
       const newFieldsData: ArrayItemFieldData[] = translatableFields.map((fieldConfig) => {
-        const values: FieldValue[] = SUPPORTED_LOCALES.map((localeCode) => {
+        const values: FieldValue[] = LOCALE_CODES.map((localeCode) => {
           const localeData = data[localeCode]
           const arrayData = localeData?.[arrayFieldName]
           const itemData = Array.isArray(arrayData) ? arrayData[selectedItemIndex] : null
@@ -158,18 +158,18 @@ export const ArrayTranslationCenter: React.FC<ArrayTranslationCenterProps> = ({ 
       if (!globalSlug) throw new Error('Cannot determine global slug')
 
       // 为每个语言保存数据
-      for (const localeCode of SUPPORTED_LOCALES) {
+      for (const locale of LOCALE_CODES) {
         const updates: any = {}
 
         fieldsData.forEach((fieldData) => {
-          const localeValue = fieldData.values.find((v) => v.locale === localeCode)
+          const localeValue = fieldData.values.find((v) => v.locale === locale)
           if (localeValue) {
             updates[fieldData.config.name] = localeValue.value
           }
         })
 
         // 更新该语言的数组项
-        const response = await fetch(`/api/globals/${globalSlug}?locale=${localeCode}`, {
+        const response = await fetch(`/api/globals/${globalSlug}?locale=${locale}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -186,7 +186,7 @@ export const ArrayTranslationCenter: React.FC<ArrayTranslationCenterProps> = ({ 
         })
 
         if (!response.ok) {
-          throw new Error(`Failed to save ${localeCode} translation`)
+          throw new Error(`Failed to save ${locale} translation`)
         }
       }
 

@@ -68,8 +68,8 @@ export const FormSubmissions: CollectionConfig = {
             if (formConfig) {
               data.formName = formConfig.name
             }
-          } catch (error) {
-            req.payload.logger.error('Error fetching form config:', error)
+          } catch (error: any) {
+            req.payload.logger.error('Error fetching form config:', error?.message || error)
           }
         }
 

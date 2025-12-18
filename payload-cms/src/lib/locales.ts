@@ -33,6 +33,9 @@ export const SUPPORTED_LOCALES = [
 
 export type LocaleCode = typeof SUPPORTED_LOCALES[number]['code']
 
+// Simple array of locale codes for iteration
+export const LOCALE_CODES: LocaleCode[] = SUPPORTED_LOCALES.map(l => l.code)
+
 export const DEFAULT_LOCALE: LocaleCode = 'en'
 
 export const getLocaleLabel = (code: string): string => {

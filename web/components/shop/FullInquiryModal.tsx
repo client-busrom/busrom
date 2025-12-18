@@ -1,16 +1,17 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import type { Locale } from "@/i18n.config"
 
 interface FormField {
   label: string
   fieldName: string
-  fieldType: "text" | "email" | "tel" | "textarea" | "checkbox" | "select"
+  fieldType: "text" | "email" | "tel" | "textarea" | "checkbox" | "radio" | "select"
   placeholder?: string
   required: boolean
   order: number
   options?: Array<{ label: string; value: string }>
+  allowMultiple?: boolean // For checkbox: true = multiple selections, false/undefined = single selection (acts like radio)
 }
 
 interface FormConfig {
@@ -48,19 +49,36 @@ export function FullInquiryModal({
 }: FullInquiryModalProps) {
   type ConfigData = FormConfig['data'] & Partial<FormConfig>
   const configData = (formConfig?.data || formConfig) as ConfigData
-  const allFields = configData?.fields?.[locale] || configData?.fields?.["en"] || []
-  const sortedFields = [...allFields].sort((a, b) => a.order - b.order)
+
+  // Handle both array format (Payload) and object format (legacy)
+  // Use useMemo to avoid re-creating the array on every render
+  const sortedFields = useMemo(() => {
+    let allFields: any[] = []
+    if (Array.isArray(configData?.fields)) {
+      // Payload format: fields is an array
+      allFields = configData.fields
+    } else if (configData?.fields) {
+      // Legacy format: fields is an object with locale keys
+      allFields = configData.fields[locale] || configData.fields["en"] || []
+    }
+    return [...allFields].sort((a, b) => a.order - b.order)
+  }, [configData?.fields, locale])
 
   const [formData, setFormData] = useState<Record<string, any>>(initialData)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [lastActivity, setLastActivity] = useState(Date.now())
-  const [showCustomizeFields, setShowCustomizeFields] = useState<Record<string, boolean>>({})
 
   const inactivityTimerRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const beforeUnloadHandlerRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null)
   const modalContentRef = useRef<HTMLDivElement>(null)
+  const formDataRef = useRef(formData)
+
+  // Keep formDataRef in sync with formData
+  useEffect(() => {
+    formDataRef.current = formData
+  }, [formData])
 
   // Prevent Lenis from capturing scroll events inside modal
   useEffect(() => {
@@ -93,39 +111,64 @@ export function FullInquiryModal({
     }
   }, [initialData])
 
-  // Initialize showCustomizeFields when modal opens
-  useEffect(() => {
-    if (!isOpen) return
+  // Helper function to check if a customize field should be shown
+  const shouldShowCustomizeField = (fieldName: string): boolean => {
+    // Find the field that controls this customize field (e.g., InquiryProduct)
+    const controllingFieldName = 'InquiryProduct' // Hard-coded for now, could be made dynamic
+    const controllingField = sortedFields.find(f => f.fieldName === controllingFieldName)
 
-    const customizeStates: Record<string, boolean> = {}
+    if (!controllingField || !controllingField.options) {
+      console.log('[shouldShowCustomizeField] No controlling field found or no options')
+      return false
+    }
 
-    sortedFields.forEach((field) => {
-      if (field.fieldType === 'checkbox' && field.options) {
-        field.options.forEach((option: { label: string; value: string }) => {
-          const isCustomize = option.value.toLowerCase().includes('customize') ||
-                             option.value.toLowerCase().includes('custom') ||
-                             option.value.toLowerCase() === 'others' ||
-                             option.value.toLowerCase() === 'other'
-          if (isCustomize) {
-            const currentValues = formData[field.fieldName] || []
-            customizeStates[field.fieldName] = currentValues.includes(option.value)
-          }
-        })
+    const fieldValue = formData[controllingFieldName]
+    console.log('[shouldShowCustomizeField] Current InquiryProduct value:', fieldValue)
+    console.log('[shouldShowCustomizeField] Available options:', controllingField.options.map((o: any) => o.value))
+
+    // Check if any "Others"/"Customize" option is selected
+    const hasCustomizeSelected = controllingField.options.some((option: any) => {
+      const isCustomize = option.value.toLowerCase().includes('customize') ||
+                         option.value.toLowerCase().includes('custom') ||
+                         option.value.toLowerCase() === 'others' ||
+                         option.value.toLowerCase() === 'other'
+
+      if (!isCustomize) return false
+
+      console.log('[shouldShowCustomizeField] Found customize option:', option.value)
+
+      // Check if this option is selected
+      if (Array.isArray(fieldValue)) {
+        const isSelected = fieldValue.includes(option.value)
+        console.log('[shouldShowCustomizeField] Array check:', option.value, 'selected:', isSelected)
+        return isSelected
+      } else {
+        const isSelected = fieldValue === option.value
+        console.log('[shouldShowCustomizeField] String check:', option.value, 'selected:', isSelected)
+        return isSelected
       }
     })
 
-    setShowCustomizeFields(customizeStates)
-  }, [isOpen])
+    console.log('[shouldShowCustomizeField] Final result:', hasCustomizeSelected)
+    return hasCustomizeSelected
+  }
 
   // Set product series in form data
   useEffect(() => {
     if (productSeries) {
+      // Check if InquiryProduct field is radio or single-select checkbox
+      const inquiryField = sortedFields.find(f => f.fieldName === 'InquiryProduct')
+      const isRadioOrSingleCheckbox = inquiryField?.fieldType === 'radio' ||
+                                      (inquiryField?.fieldType === 'checkbox' && inquiryField?.allowMultiple === false)
+
       setFormData((prev) => ({
         ...prev,
-        InquiryProduct: prev.InquiryProduct || [productSeries],
+        // For radio or single-select checkbox: use string value
+        // For multi-select checkbox: use array with single value
+        InquiryProduct: prev.InquiryProduct || (isRadioOrSingleCheckbox ? productSeries : [productSeries]),
       }))
     }
-  }, [productSeries])
+  }, [productSeries, sortedFields])
 
   // Track user activity
   const resetActivityTimer = () => {
@@ -153,15 +196,15 @@ export function FullInquiryModal({
         clearInterval(inactivityTimerRef.current)
       }
     }
-  }, [isOpen, lastActivity, submitSuccess, formData])
+  }, [isOpen, lastActivity, submitSuccess])
 
   // Auto-submit on page unload
   useEffect(() => {
     if (!isOpen || submitSuccess) return
 
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      // Auto-submit if form has data
-      if (Object.keys(formData).length > 0) {
+      // Auto-submit if form has data (use ref to get latest value)
+      if (Object.keys(formDataRef.current).length > 0) {
         handleAutoSubmit()
       }
     }
@@ -174,7 +217,7 @@ export function FullInquiryModal({
         window.removeEventListener("beforeunload", beforeUnloadHandlerRef.current)
       }
     }
-  }, [isOpen, submitSuccess, formData])
+  }, [isOpen, submitSuccess])
 
   const handleChange = (fieldName: string, value: any) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }))
@@ -189,27 +232,28 @@ export function FullInquiryModal({
     }
   }
 
-  const handleCheckboxChange = (fieldName: string, value: string, checked: boolean) => {
+  const handleCheckboxChange = (fieldName: string, value: string, checked: boolean, allowMultiple: boolean = true) => {
     setFormData((prev) => {
-      const currentValues = prev[fieldName] || []
-      if (checked) {
-        return { ...prev, [fieldName]: [...currentValues, value] }
+      if (!allowMultiple) {
+        // Single selection mode (like radio)
+        return { ...prev, [fieldName]: checked ? [value] : [] }
       } else {
-        return { ...prev, [fieldName]: currentValues.filter((v: string) => v !== value) }
+        // Multiple selection mode
+        const currentValues = prev[fieldName] || []
+        if (checked) {
+          return { ...prev, [fieldName]: [...currentValues, value] }
+        } else {
+          return { ...prev, [fieldName]: currentValues.filter((v: string) => v !== value) }
+        }
       }
     })
+
     resetActivityTimer()
+  }
 
-    // Handle "Customize" option - show/hide custom input field
-    // Check for "customize", "custom", "others", or "other"
-    const isCustomizeOption = value.toLowerCase().includes('customize') ||
-                             value.toLowerCase().includes('custom') ||
-                             value.toLowerCase() === 'others' ||
-                             value.toLowerCase() === 'other'
-
-    if (isCustomizeOption) {
-      setShowCustomizeFields((prev) => ({ ...prev, [fieldName]: checked }))
-    }
+  const handleRadioChange = (fieldName: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [fieldName]: value }))
+    resetActivityTimer()
   }
 
   const validateForm = () => {
@@ -309,6 +353,7 @@ export function FullInquiryModal({
         )
 
       case "checkbox":
+        const allowMultiple = field.allowMultiple !== false // Default to true if not specified
         return (
           <div className="space-y-3">
             {field.options?.map((option) => {
@@ -325,24 +370,39 @@ export function FullInquiryModal({
                       name={field.fieldName}
                       value={option.value}
                       checked={formData[field.fieldName]?.includes(option.value) || false}
-                      onChange={(e) => handleCheckboxChange(field.fieldName, option.value, e.target.checked)}
+                      onChange={(e) => handleCheckboxChange(field.fieldName, option.value, e.target.checked, allowMultiple)}
                       className="w-5 h-5 text-brand-secondary border-2 border-brand-accent-border rounded focus:ring-2 focus:ring-brand-secondary"
                     />
                     <span className="text-brand-text-black font-medium group-hover:text-brand-secondary transition-colors">{option.label}</span>
                   </label>
+                </div>
+              )
+            })}
+          </div>
+        )
 
-                  {/* Show custom input field when "Customize" is checked */}
-                  {isCustomize && showCustomizeFields[field.fieldName] && (
-                    <div className="mt-2 ml-8">
-                      <input
-                        type="text"
-                        placeholder="Please specify your custom requirements..."
-                        value={formData[`${field.fieldName}_custom`] || ''}
-                        onChange={(e) => handleChange(`${field.fieldName}_custom`, e.target.value)}
-                        className="w-full px-4 py-2 border-2 border-brand-secondary rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-brand-secondary transition-colors bg-white font-medium text-brand-text-black placeholder:text-gray-400"
-                      />
-                    </div>
-                  )}
+      case "radio":
+        return (
+          <div className="space-y-3">
+            {field.options?.map((option) => {
+              const isCustomize = option.value.toLowerCase().includes('customize') ||
+                                 option.value.toLowerCase().includes('custom') ||
+                                 option.value.toLowerCase() === 'others' ||
+                                 option.value.toLowerCase() === 'other'
+
+              return (
+                <div key={option.value}>
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="radio"
+                      name={field.fieldName}
+                      value={option.value}
+                      checked={formData[field.fieldName] === option.value}
+                      onChange={(e) => handleRadioChange(field.fieldName, e.target.value)}
+                      className="w-5 h-5 text-brand-secondary border-2 border-brand-accent-border focus:ring-2 focus:ring-brand-secondary"
+                    />
+                    <span className="text-brand-text-black font-medium group-hover:text-brand-secondary transition-colors">{option.label}</span>
+                  </label>
                 </div>
               )
             })}
@@ -450,10 +510,12 @@ export function FullInquiryModal({
               return null
             }
 
-            // Hide "Customize" field if "InquiryProduct" doesn't have "others" selected
-            // This assumes the Customize field has fieldName="Customize"
-            if (field.fieldName === 'Customize' && !showCustomizeFields['InquiryProduct']) {
-              return null
+            // Hide "customize" field if "InquiryProduct" doesn't have "others" selected
+            // This assumes the Customize field has fieldName="customize" (lowercase)
+            if (field.fieldName === 'customize') {
+              if (!shouldShowCustomizeField(field.fieldName)) {
+                return null
+              }
             }
 
             return (

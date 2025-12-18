@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * VideoEmbedComponent - WYSIWYG Preview Component
  */

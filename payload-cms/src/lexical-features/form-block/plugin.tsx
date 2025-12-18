@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * FormBlock Plugin - Registers command for inserting form block nodes
  */

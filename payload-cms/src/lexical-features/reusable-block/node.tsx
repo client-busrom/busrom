@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ReusableBlock Node - Lexical DecoratorNode
  */

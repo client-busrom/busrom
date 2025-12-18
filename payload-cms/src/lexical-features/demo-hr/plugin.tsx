@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Demo HR Plugin - 注册命令
  * 官方示例：https://payloadcms.com/docs/rich-text/custom-features

@@ -100,7 +100,7 @@ export interface SimpleCtaData {
   title2: string
   subtitle: string
   description: string
-  buttonText: string
+  ctaText: string
   images: ImageObject[]
 }
 
@@ -118,6 +118,7 @@ export interface SeriesIntroItem {
  * Module 7: Featured Products
  */
 export interface FeaturedProduct {
+  slug: string
   image: ImageObject
   title: string
   features: string[]
@@ -169,10 +170,10 @@ export interface QuoteStep {
 }
 
 export interface QuoteStepsData {
-  title: string
-  title2: string
-  subtitle: string
-  description: string
+  headerTitle: string
+  headerTitle2: string
+  headerSubtitle: string
+  headerDescription: string
   steps: QuoteStep[]
 }
 
@@ -205,6 +206,8 @@ export interface WhyChooseReason {
 export interface WhyChooseBusromData {
   title: string
   title2: string
+  viewMoreButtonText?: string
+  viewMoreButtonUrl?: string
   reasons: WhyChooseReason[]
 }
 

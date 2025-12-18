@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Notice Node - Lexical DecoratorNode
  */

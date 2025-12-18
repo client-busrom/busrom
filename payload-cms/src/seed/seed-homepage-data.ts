@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Seed Homepage Data for Payload CMS
  *

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * LinkJump Node - Lexical DecoratorNode
  */

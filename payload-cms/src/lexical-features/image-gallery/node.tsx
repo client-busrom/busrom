@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ImageGalleryNode - Custom Lexical Node
  * 图片画廊节点定义

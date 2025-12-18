@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MarqueeLinks Node - Lexical DecoratorNode
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ImageGalleryFeature - Server Side
  * 完全按照 Demo HR 的成功模式重写

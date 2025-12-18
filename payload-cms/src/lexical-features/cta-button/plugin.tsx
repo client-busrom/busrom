@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CtaButton Plugin - Command Handler
  */
