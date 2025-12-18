@@ -44,8 +44,8 @@ async function checkGlobals() {
           issues.push(`${slug}.${key} (EN locale)`)
         }
       }
-    } catch (error) {
-      console.log(`⚠️  Skip ${slug}: ${error}`)
+    } catch (error: any) {
+      console.log(`⚠️  Skip ${slug}: ${error?.message || error}`)
     }
   }
 
