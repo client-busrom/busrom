@@ -6,15 +6,8 @@
 # Based on Next.js 15 + Payload CMS 3
 
 # ============ Stage 1: Dependencies ============
-FROM node:20-slim AS deps
+FROM node:20 AS deps
 WORKDIR /app/payload-cms
-
-# Install build dependencies for native modules (sharp, etc.)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    make \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
 
 # Install production dependencies
 COPY payload-cms/package*.json ./
@@ -22,16 +15,8 @@ COPY payload-cms/package*.json ./
 RUN npm ci --omit=dev
 
 # ============ Stage 2: Builder ============
-FROM node:20-slim AS builder
+FROM node:20 AS builder
 WORKDIR /app/payload-cms
-
-# Install build dependencies for native modules and Next.js build
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    make \
-    g++ \
-    openssl \
-    && rm -rf /var/lib/apt/lists/*
 
 # Copy package files
 COPY payload-cms/package*.json ./
