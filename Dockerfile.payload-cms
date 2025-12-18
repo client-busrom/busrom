@@ -10,19 +10,19 @@ FROM node:20 AS deps
 WORKDIR /app/payload-cms
 
 # Install production dependencies
-COPY payload-cms/package*.json ./
+COPY payload-cms/package.json payload-cms/package-lock.json ./
 
-RUN npm ci --omit=dev
+RUN npm install --production --frozen-lockfile
 
 # ============ Stage 2: Builder ============
 FROM node:20 AS builder
 WORKDIR /app/payload-cms
 
 # Copy package files
-COPY payload-cms/package*.json ./
+COPY payload-cms/package.json payload-cms/package-lock.json ./
 
 # Install ALL dependencies (including dev dependencies)
-RUN npm ci
+RUN npm install --frozen-lockfile
 
 # Copy source code
 COPY payload-cms/ ./
