@@ -561,25 +561,23 @@ export default buildConfig({
   // Initialization Hook - Seed data and create default admin
   // ==================================================================
   onInit: async (payload) => {
-    // Step 1: Seed permissions and roles (idempotent - only creates if not exists)
+    // Skip initialization if database tables don't exist yet
+    // This happens on first deployment when push:true hasn't run yet
     try {
+      // Step 1: Seed permissions and roles (idempotent - only creates if not exists)
       await seedPermissionsSystem(payload)
-    } catch (error) {
-      payload.logger.error(`❌ Failed to seed permissions system: ${error}`)
-    }
 
-    // Step 2: Create default admin user if no users exist
-    const existingUsers = await payload.find({
-      collection: 'users',
-      limit: 1,
-    })
+      // Step 2: Create default admin user if no users exist
+      const existingUsers = await payload.find({
+        collection: 'users',
+        limit: 1,
+      })
 
-    if (existingUsers.totalDocs === 0) {
-      const defaultEmail = process.env.ADMIN_EMAIL || 'admin@busrom.com'
-      const defaultPassword = process.env.ADMIN_PASSWORD || 'Admin123456'
-      const defaultName = process.env.ADMIN_NAME || 'Admin'
+      if (existingUsers.totalDocs === 0) {
+        const defaultEmail = process.env.ADMIN_EMAIL || 'admin@busrom.com'
+        const defaultPassword = process.env.ADMIN_PASSWORD || 'Admin123456'
+        const defaultName = process.env.ADMIN_NAME || 'Admin'
 
-      try {
         // Find super_admin role
         const superAdminRole = await payload.find({
           collection: 'roles',
@@ -599,8 +597,14 @@ export default buildConfig({
           },
         })
         payload.logger.info(`✅ Default admin user created: ${defaultEmail}`)
-      } catch (error) {
-        payload.logger.error(`❌ Failed to create default admin user: ${error instanceof Error ? error.message : String(error)}`)
+      }
+    } catch (error: any) {
+      // If error is "relation does not exist", tables haven't been created yet
+      // This is expected on first run - Payload will create tables via push:true
+      if (error?.cause?.code === '42P01' || error?.message?.includes('does not exist')) {
+        payload.logger.warn('⚠️ Database tables not initialized yet. They will be created by Payload.')
+      } else {
+        payload.logger.error(`❌ Error in onInit: ${error instanceof Error ? error.message : String(error)}`)
       }
     }
   },
