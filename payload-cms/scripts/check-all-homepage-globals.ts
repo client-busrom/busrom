@@ -29,7 +29,7 @@ async function checkGlobals() {
   for (const slug of globalsToCheck) {
     try {
       const enData = await payload.findGlobal({
-        slug,
+        slug: slug as any,
         locale: 'en',
       })
 
