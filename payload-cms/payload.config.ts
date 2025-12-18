@@ -263,7 +263,8 @@ export default buildConfig({
         },
       }),
     },
-    push: process.env.NODE_ENV !== 'production', // Auto-sync schema in development
+    // Push schema to database - enabled in dev or when PAYLOAD_DB_PUSH=true
+    push: process.env.NODE_ENV !== 'production' || process.env.PAYLOAD_DB_PUSH === 'true',
   }),
 
   // ==================================================================
