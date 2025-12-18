@@ -77,6 +77,9 @@ export const CaseStudies = list({
   ui: {
     labelField: 'internalLabel',
     listView: { defaultFieldMode: 'read' },
+    label: 'Case Studies | 应用案例',
+    singular: 'Case Studies | 应用案例',
+    plural: 'Case Studies | 应用案例',
     description: 'Configure case studies section. Select application categories (type=APPLICATION) and API will return 3 random case study items per category.',
   },
 });

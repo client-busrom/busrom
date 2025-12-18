@@ -38,6 +38,8 @@ export interface MediaImage {
   fileUrl?: string | null
   variants?: ImageVariants
   altText?: Record<string, string> | null  // Multilingual alt text
+  /** Focal point for image cropping ({ x: 0-100, y: 0-100 }) */
+  cropFocalPoint?: { x: number; y: number } | null
 }
 
 /**

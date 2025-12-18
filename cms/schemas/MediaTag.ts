@@ -245,6 +245,9 @@ export const MediaTag = list({
       initialSort: { field: 'order', direction: 'ASC' },
     },
     labelField: 'slug',
-    description: 'Media tags - Flat multi-dimensional tag system',
+    label: 'Media Tags | 媒体标签',
+    singular: 'Media Tag | 媒体标签',
+    plural: 'Media Tags | 媒体标签',
+    description: 'Media tags - Flat multi-dimensional tag system | 媒体标签 - 扁平多维度标签系统',
   },
 })

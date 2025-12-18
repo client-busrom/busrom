@@ -11,7 +11,8 @@
  */
 
 const { S3Client, ListObjectsV2Command, HeadObjectCommand } = require('@aws-sdk/client-s3');
-const { PrismaClient } = require('.prisma/client');
+// Load Prisma from cms directory
+const { PrismaClient } = require('../cms/node_modules/.prisma/client');
 const path = require('path');
 const crypto = require('crypto');
 
@@ -116,6 +117,31 @@ function generateCuid() {
 }
 
 /**
+ * Get tag type from slug prefix
+ */
+function getTagTypeFromSlug(slug) {
+  if (slug.startsWith('series-')) return 'PRODUCT_SERIES';
+  if (slug.startsWith('type-')) return 'FUNCTION_TYPE';
+  if (slug.startsWith('func-')) return 'FUNCTION_TYPE';
+  if (slug.startsWith('scene-')) return 'SCENE_TYPE';
+  if (slug.startsWith('spec-')) return 'SPEC';
+  if (slug.startsWith('color-')) return 'COLOR';
+  return 'CUSTOM';
+}
+
+/**
+ * Get display name from slug
+ */
+function getDisplayNameFromSlug(slug) {
+  // Remove prefix and convert to title case
+  const name = slug
+    .replace(/^(series|type|func|scene|spec|color)-/, '')
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
+  return name;
+}
+
+/**
  * Create or find tag filter IDs
  */
 async function ensureTagFilters(tags) {
@@ -129,11 +155,15 @@ async function ensureTagFilters(tags) {
 
     if (!tag) {
       // Create tag if not exists
-      console.log(`Creating tag: ${tagSlug}`);
+      const tagType = getTagTypeFromSlug(tagSlug);
+      const displayName = getDisplayNameFromSlug(tagSlug);
+
+      console.log(`Creating tag: ${tagSlug} (type: ${tagType}, name: ${displayName})`);
       tag = await prisma.mediaTag.create({
         data: {
           slug: tagSlug,
-          name: tagSlug.replace(/-/g, ' ').replace(/^(series|type) /, ''),
+          name: { en: displayName },
+          type: tagType,
         },
       });
     }
@@ -173,14 +203,23 @@ async function createMediaRecord(s3Object) {
   // Generate fileUrl
   const fileUrl = `https://${CDN_DOMAIN}/${key}`;
 
+  // Get mime type
+  const mimeTypes = {
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'png': 'image/png',
+    'webp': 'image/webp',
+    'gif': 'image/gif',
+  };
+
   // Create record
   const record = await prisma.media.create({
     data: {
       filename,
       fileUrl,
       fileKey: key,
-      filesize: s3Object.Size || 0,
-      file_extension: ext,
+      fileSize: s3Object.Size || 0,
+      mimeType: mimeTypes[ext] || 'image/jpeg',
       tags: { connect: tagIds.map(id => ({ id })) },
       tagsFilter: tags,
     },

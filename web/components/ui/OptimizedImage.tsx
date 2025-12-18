@@ -77,6 +77,7 @@ function normalizeImage(image: UniversalImage | string): MediaImage | null {
     fileUrl: imgObj.url,
     variants: imgObj.variants,
     altText: imgObj.altText ? { en: imgObj.altText, zh: imgObj.altText } : null,
+    cropFocalPoint: imgObj.cropFocalPoint,
   }
 }
 
@@ -188,6 +189,14 @@ export function OptimizedImage({
   // Get alt text
   const altText = alt || getImageAlt(normalizedMedia?.altText, locale) || normalizedMedia?.filename || ''
 
+  // Calculate object position from cropFocalPoint (if not explicitly set)
+  // cropFocalPoint: { x: 0-100, y: 0-100 } -> objectPosition: "x% y%"
+  const calculatedObjectPosition = objectPosition !== 'center'
+    ? objectPosition
+    : normalizedMedia?.cropFocalPoint
+      ? `${normalizedMedia.cropFocalPoint.x}% ${normalizedMedia.cropFocalPoint.y}%`
+      : objectPosition
+
   // Check if media has a valid URL (support both file.url and fileUrl)
   const hasValidUrl = normalizedMedia?.file?.url || normalizedMedia?.fileUrl
 
@@ -204,7 +213,7 @@ export function OptimizedImage({
           src={placeholder}
           alt={altText || 'Placeholder'}
           className={`${className} ${objectFit ? `object-${objectFit}` : ''}`}
-          style={{ objectPosition }}
+          style={{ objectPosition: calculatedObjectPosition }}
           loading={loadingStrategy}
         />
       </ImageContainer>
@@ -238,7 +247,7 @@ export function OptimizedImage({
           src={placeholder}
           alt={altText}
           className={`${className} ${objectFit ? `object-${objectFit}` : ''}`}
-          style={{ objectPosition }}
+          style={{ objectPosition: calculatedObjectPosition }}
           loading={loadingStrategy}
         />
       </ImageContainer>
@@ -280,7 +289,7 @@ export function OptimizedImage({
             className={`${className} ${objectFit ? `object-${objectFit}` : ''} ${
               showBlurPlaceholder && !isLoaded ? 'opacity-0' : 'opacity-100'
             } transition-opacity duration-300`}
-            style={{ objectPosition }}
+            style={{ objectPosition: calculatedObjectPosition }}
             loading={loadingStrategy}
             fetchPriority={priority ? 'high' : undefined}
             onLoad={handleLoad}
@@ -322,7 +331,7 @@ export function OptimizedImage({
           className={`${className} ${objectFit ? `object-${objectFit}` : ''} ${
             showBlurPlaceholder && !isLoaded ? 'opacity-0' : 'opacity-100'
           } transition-opacity duration-300`}
-          style={{ objectPosition }}
+          style={{ objectPosition: calculatedObjectPosition }}
           loading={loadingStrategy}
           fetchPriority={priority ? 'high' : undefined}
           onLoad={handleLoad}

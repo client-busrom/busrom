@@ -2,6 +2,7 @@
 "use client";
 
 import * as React from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
 import { type CarouselApi } from "@/components/ui/carousel";
@@ -13,6 +14,7 @@ import {
   CarouselNext,     // 内置的右按钮
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
+import Autoplay from "embla-carousel-autoplay";
 
 // 动态导入所有 Banner 组件 (或直接 import)
 // --- 确保这些路径是正确的 ---
@@ -45,12 +47,52 @@ const BannerComponents = [
   HeroBanner9,
 ];
 
-export default function HeroBanner({ data, locale }: Props) {
-  // --- 确认传入的数据 ---
+// 自动轮播间隔（毫秒）
+const AUTOPLAY_DELAY = 6000;
 
+export default function HeroBanner({ data, locale }: Props) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = React.useState(0);
   const [scrollSnaps, setScrollSnaps] = React.useState<number[]>([]);
+  const [isVisible, setIsVisible] = useState(true);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Autoplay 插件实例
+  const autoplayPlugin = useRef(
+    Autoplay({
+      delay: AUTOPLAY_DELAY,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+    })
+  );
+
+  // 视口检测 - 不在视口时暂停轮播省电
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  // 根据视口可见性控制自动播放
+  useEffect(() => {
+    if (!api) return;
+
+    const autoplay = autoplayPlugin.current;
+    if (isVisible) {
+      autoplay.play();
+    } else {
+      autoplay.stop();
+    }
+  }, [api, isVisible]);
 
   // --- 获取轮播图 API 并设置监听器 (使用 reInit 事件) ---
   React.useEffect(() => {
@@ -112,13 +154,14 @@ export default function HeroBanner({ data, locale }: Props) {
 
   return (
     // 根容器: 确保它定义了高度
-    <section className="relative w-full h-screen min-h-[800px]">
+    <section ref={sectionRef} className="relative w-full h-screen min-h-[800px]">
       <Carousel
         setApi={setApi}
+        plugins={[autoplayPlugin.current]}
         // Carousel 容器: 继承 section 的高度
         className="w-full h-screen min-h-[800px]"
         opts={{
-          loop: true, 
+          loop: true,
           align: "start",
         }}
       >

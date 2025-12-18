@@ -10,12 +10,13 @@ import { convertToCDNUrl } from '@/lib/cdn-url'
 
 // Use runtime environment variable for server-side API calls
 // CMS_URL is set in ECS task definition, falls back to CMS_GRAPHQL_URL base, then localhost
+// For Payload CMS, default port is 3002 in development
 const CMS_URL = process.env.CMS_URL ||
-  (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : 'http://localhost:3000')
+  (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : 'http://localhost:3002')
 
 // Helper function to convert Media URL to CDN URL
 function getMediaUrl(fileUrl: string | null | undefined): string {
-  if (!fileUrl) return ''
+  if (!fileUrl) return '/images/placeholder.jpg'
   // Convert the fileUrl to CDN URL (handles both MinIO and S3)
   return convertToCDNUrl(fileUrl)
 }
@@ -43,17 +44,30 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
 
     const data = await response.json()
 
-    // Helper function to convert media ID to ImageObject
-    const toImageObject = (mediaId: string | null | undefined, alt: string = ''): { url: string; altText: string } => {
+    // Helper function to convert media data to ImageObject
+    // Supports both string URL (legacy) and object with url + cropFocalPoint (new format)
+    const toImageObject = (mediaData: string | { url: string; cropFocalPoint?: { x: number; y: number } } | null | undefined, alt: string = ''): { url: string; altText: string; cropFocalPoint?: { x: number; y: number } } => {
+      if (!mediaData) {
+        return { url: '/images/placeholder.jpg', altText: alt }
+      }
+      // Handle string URL (legacy format)
+      if (typeof mediaData === 'string') {
+        return {
+          url: getMediaUrl(mediaData),
+          altText: alt
+        }
+      }
+      // Handle object with url and cropFocalPoint
       return {
-        url: getMediaUrl(mediaId),
-        altText: alt
+        url: getMediaUrl(mediaData.url),
+        altText: alt,
+        cropFocalPoint: mediaData.cropFocalPoint
       }
     }
 
     // Transform API response to match HomeContent type
-    // Extract carousel items from the locale-specific items object
-    const rawCarouselItems = data.productSeriesCarousel?.items?.[locale] || []
+    // Extract carousel items - backend returns already filtered by locale
+    const rawCarouselItems = data.productSeriesCarousel?.items || []
     const carouselItems = rawCarouselItems.map((item: any, index: number) => ({
       key: item.linkUrl || `item-${index}`,
       order: index,
@@ -64,11 +78,11 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
       href: item.linkUrl || '#',
     }))
 
-    // Transform Brand Advantages from {advantages: [{text, icon}]} to {advantages: string[], icons: string[], image}
+    // Transform Brand Advantages from {advantages: [{text, icon}], image} to {advantages: string[], icons: string[], image}
     const brandAdvantages = {
       advantages: data.brandAdvantages?.advantages?.map((item: any) => item.text) || [],
       icons: data.brandAdvantages?.advantages?.map((item: any) => item.icon) || [],
-      image: { url: '', altText: '' }, // Backend doesn't provide this yet
+      image: data.brandAdvantages?.image ? { url: data.brandAdvantages.image, altText: 'Brand Advantages' } : { url: '', altText: '' },
     }
 
     // Transform SimpleCta images from Media ID[] to ImageObject[]
@@ -104,9 +118,9 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
     }))
 
     // Transform WhyChooseBusrom images
-    const whyChooseBusrom = data.whyChoose ? {
-      ...data.whyChoose,
-      reasons: (data.whyChoose.reasons || []).map((reason: any) => ({
+    const whyChooseBusrom = data.whyChooseBusrom ? {
+      ...data.whyChooseBusrom,
+      reasons: (data.whyChooseBusrom.reasons || []).map((reason: any) => ({
         ...reason,
         image: toImageObject(reason.image, reason.title),
       })),
@@ -121,17 +135,18 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
       })),
     } : null
 
-    // Transform MainForm - map images array to image1/image2 and placeholders to flat fields
+    // Transform MainForm - map images array to image1/image2
+    // Note: Placeholders are now handled by frontend i18n, not from CMS
     const mainForm = {
-      placeholderName: data.mainForm?.placeholders?.name || '',
-      placeholderEmail: data.mainForm?.placeholders?.email || '',
-      placeholderWhatsapp: data.mainForm?.placeholders?.whatsapp || '',
-      placeholderCompany: data.mainForm?.placeholders?.company || '',
-      placeholderMessage: data.mainForm?.placeholders?.message || '',
-      placeholderVerify: data.mainForm?.placeholders?.verify || '',
-      buttonText: data.mainForm?.buttonText || '',
-      designTextLeft: data.mainForm?.designText?.left || '',
-      designTextRight: data.mainForm?.designText?.right || '',
+      placeholderName: '', // Handled by frontend i18n
+      placeholderEmail: '', // Handled by frontend i18n
+      placeholderWhatsapp: '', // Handled by frontend i18n
+      placeholderCompany: '', // Handled by frontend i18n
+      placeholderMessage: '', // Handled by frontend i18n
+      placeholderVerify: '', // Handled by frontend i18n
+      buttonText: '', // Handled by frontend i18n
+      designTextLeft: data.mainForm?.designTextLeft || '',
+      designTextRight: data.mainForm?.designTextRight || '',
       image1: data.mainForm?.images?.[0] ? toImageObject(data.mainForm.images[0], 'Main Form Left') : null,
       image2: data.mainForm?.images?.[1] ? toImageObject(data.mainForm.images[1], 'Main Form Right') : null,
     }
@@ -172,10 +187,10 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
       })),
     } : null
 
-    // Transform HeroBanner images
+    // Transform HeroBanner images (now receives { url, cropFocalPoint } objects from CMS)
     const heroBanner = (data.heroBanner || []).map((item: any) => ({
       ...item,
-      images: (item.images || []).map((id: string) => toImageObject(id, item.title)),
+      images: (item.images || []).map((imgData: any) => toImageObject(imgData, item.title)),
     }))
 
     // Default empty structures for non-nullable fields
@@ -220,7 +235,33 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
       title2: '',
       reasons: []
     }
-    const defaultFooter = {
+    // Transform Footer
+    const footer = data.footer ? {
+      form: {
+        title: data.footer.form?.title || '',
+        placeholders: {
+          name: data.footer.form?.placeholders?.name || '',
+          email: data.footer.form?.placeholders?.email || '',
+          message: data.footer.form?.placeholders?.message || '',
+        },
+        buttonText: data.footer.form?.buttonText || '',
+      },
+      contact: {
+        title: data.footer.contact?.title || '',
+        emailLabel: 'Email', // Static label
+        email: data.footer.contact?.email || '',
+        afterSalesLabel: 'Phone', // Static label
+        afterSales: data.footer.contact?.phone || '',
+        whatsappLabel: 'WhatsApp', // Static label
+        whatsapp: data.footer.contact?.whatsapp || '',
+      },
+      notice: {
+        title: data.footer.notice?.title || '',
+        lines: data.footer.notice?.text ? [data.footer.notice.text] : [],
+      },
+      column3Menus: [], // Navigation menus handled separately
+      column4Menus: [], // Navigation menus handled separately
+    } : {
       form: { title: '', placeholders: { name: '', email: '', message: '' }, buttonText: '' },
       contact: { title: '', emailLabel: '', email: '', afterSalesLabel: '', afterSales: '', whatsappLabel: '', whatsapp: '' },
       notice: { title: '', lines: [] },
@@ -245,20 +286,20 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
       caseStudies: data.caseStudies || defaultCaseStudies,
       brandAnalysis: data.brandAnalysis ? {
         analysis: {
-          title: data.brandAnalysis.analysisTitle || '',
-          title2: data.brandAnalysis.analysisTitle2 || '',
-          text: data.brandAnalysis.analysisText || '',
-          text2: data.brandAnalysis.analysisText2 || '',
+          title: data.brandAnalysis.brandNameAnalysis?.titlePart1 || '',
+          title2: data.brandAnalysis.brandNameAnalysis?.titlePart2 || '',
+          text: data.brandAnalysis.brandNameAnalysis?.textPart1 || '',
+          text2: data.brandAnalysis.brandNameAnalysis?.textPart2 || '',
         },
         centers: (data.brandAnalysis.centers || []).map((center: any) => ({
           title: center.title || '',
           description: center.description || '',
-          largeImage: getMediaUrl(center.largeImage),
-          smallImage: getMediaUrl(center.smallImage),
+          largeImage: toImageObject(center.largeImage, center.title).url,
+          smallImage: toImageObject(center.smallImage, center.title).url,
         })),
       } : defaultBrandAnalysis,
       brandValue,
-      footer: defaultFooter,
+      footer,
     }
   } catch (error) {
     console.error('Error fetching home content:', error)

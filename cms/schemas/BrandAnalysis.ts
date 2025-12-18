@@ -310,9 +310,9 @@ export const BrandAnalysis = list({
     listView: {
       initialColumns: ['status', 'publishedAt', 'updatedAt'],
     },
-    label: 'Brand Analysis',
-    singular: 'Brand Analysis',
-    plural: 'Brand Analyses',
+    label: 'Brand Analysis | 品牌分析',
+    singular: 'Brand Analysis | 品牌分析',
+    plural: 'Brand Analysis | 品牌分析',
     description: '品牌分析配置 - Singleton。包含品牌名称分析和3个中心介绍。',
     hideCreate: async ({ context }) => {
       const count = await context.query.BrandAnalysis.count()

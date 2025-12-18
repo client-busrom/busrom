@@ -214,8 +214,8 @@ export const SiteConfig = list({
   ui: {
     labelField: 'identifier',
     label: 'Site Config | 站点基础配置',
-    singular: 'Site Config',
-    plural: 'Site Config',
+    singular: 'Site Config | 站点基础配置',
+    plural: 'Site Config | 站点基础配置',
     description: 'Basic site settings (company info, security) | 基础站点设置（公司信息、安全）',
   },
 })

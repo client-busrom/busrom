@@ -288,9 +288,9 @@ export const BrandAdvantages = list({
     listView: {
       initialColumns: ['status', 'publishedAt', 'updatedAt'],
     },
-    label: 'Brand Advantages',
-    singular: 'Brand Advantages Config',
-    plural: 'Brand Advantages Configs',
+    label: 'Brand Advantages | 品牌优势',
+    singular: 'Brand Advantages | 品牌优势',
+    plural: 'Brand Advantages | 品牌优势',
     description: '品牌优势配置 - Singleton。9个优势，每个有对应的lucide-react图标，加1张主图。',
     hideCreate: async ({ context }) => {
       const count = await context.query.BrandAdvantages.count()

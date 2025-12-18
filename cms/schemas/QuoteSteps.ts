@@ -253,9 +253,9 @@ export const QuoteSteps = list({
     listView: {
       initialColumns: ['status', 'publishedAt', 'updatedAt'],
     },
-    label: 'Quote Steps',
-    singular: 'Quote Steps',
-    plural: 'Quote Steps',
+    label: 'Quote Steps | 报价五步曲',
+    singular: 'Quote Steps | 报价五步曲',
+    plural: 'Quote Steps | 报价五步曲',
     description: '报价步骤配置 - Singleton。固定5个步骤，每个步骤包含文字和图片。',
     hideCreate: async ({ context }) => {
       const count = await context.query.QuoteSteps.count()

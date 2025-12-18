@@ -272,6 +272,9 @@ export const HomeContent = list({
       pageSize: 20,
     },
     labelField: 'section',
+    label: 'Home Content | 首页内容',
+    singular: 'Home Content | 首页内容',
+    plural: 'Home Content | 首页内容',
     description: '首页内容配置 - 草稿-发布流程：编辑 draftContent → 改状态为 Published → 自动发布到线上',
     itemView: {
       defaultFieldMode: 'edit',

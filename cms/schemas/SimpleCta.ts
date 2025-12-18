@@ -221,9 +221,9 @@ export const SimpleCta = list({
     listView: {
       initialColumns: ['status', 'publishedAt', 'updatedAt'],
     },
-    label: 'Simple CTA',
-    singular: 'Simple CTA',
-    plural: 'Simple CTAs',
+    label: 'Simple CTA | 简单CTA',
+    singular: 'Simple CTA | 简单CTA',
+    plural: 'Simple CTA | 简单CTA',
     description: 'Simple CTA 配置 - Singleton。包含标题(2部分)、副标题、描述、按钮文字、3张图片。',
     hideCreate: async ({ context }) => {
       const count = await context.query.SimpleCta.count()

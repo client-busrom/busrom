@@ -442,6 +442,9 @@ export const Product = list({
       pageSize: 50,
     },
     labelField: 'sku',
+    label: 'Products | 产品',
+    singular: 'Product | 产品',
+    plural: 'Products | 产品',
     searchFields: ['sku', 'slug'],
     // Enable card view in list (user can toggle between table and card view)
     itemView: {

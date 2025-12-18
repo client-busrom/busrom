@@ -1,293 +1,287 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { keystoneClient } from '@/lib/keystone-client'
-import { gql } from '@apollo/client'
-import { convertToCDNUrl } from '@/lib/cdn-url'
 
-// GraphQL query to get a single product by slug
-const GET_PRODUCT_BY_SLUG = gql`
-  query GetProductBySlug($slug: String!) {
-    products(where: { slug: { equals: $slug }, status: { equals: "PUBLISHED" } }, take: 1) {
-      id
-      sku
-      slug
-      name
-      shortDescription
-      description
-      contentTranslations {
-        locale
-        content {
-          document
-        }
-      }
-      attributes
-      specifications
-      showImage
-      mainImage
-      series {
-        id
-        slug
-        name
-        description
-      }
-      isFeatured
-      order
-      status
-      createdAt
-      updatedAt
-    }
-  }
-`
+// Payload CMS API 基础地址
+const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3002'
 
-// GraphQL query to get single media
-const GET_SINGLE_MEDIA = gql`
-  query GetSingleMedia($id: ID!) {
-    media(where: { id: $id }) {
-      id
-      filename
-      file {
-        url
-      }
-      variants
-      cropFocalPoint
-    }
-  }
-`
-
-// GraphQL query to get related products (same series)
-const GET_RELATED_PRODUCTS = gql`
-  query GetRelatedProducts($seriesId: ID!, $currentProductId: ID!) {
-    products(
-      where: {
-        series: { id: { equals: $seriesId } }
-        id: { not: { equals: $currentProductId } }
-        status: { equals: "PUBLISHED" }
-      }
-      take: 4
-      orderBy: { order: asc }
-    ) {
-      id
-      sku
-      slug
-      name
-      showImage
-      mainImage
-      isFeatured
-    }
-  }
-`
-
-// GraphQL query to get form config
-const GET_FORM_CONFIG = gql`
-  query GetFormConfig($id: ID!) {
-    formConfig(where: { id: $id }) {
-      id
-      name
-      location
-      fields
-    }
-  }
-`
+// CDN Domain configuration
+const CDN_DOMAIN = process.env.NEXT_PUBLIC_CDN_DOMAIN || 'http://localhost:8080'
 
 /**
- * Helper function to resolve FormConfig from document
+ * Normalize image URL to use CDN domain
+ * Converts MinIO URLs (localhost:9000) to CDN URLs (localhost:8080)
  */
-async function resolveFormConfigsInDocument(document: any[]) {
-  if (!document || !Array.isArray(document)) return document
+function normalizeToCDN(url: string): string {
+  if (!url) return url
 
-  const updatedDocument = await Promise.all(
-    document.map(async (node) => {
-      if (node.type === 'component-block' && node.component === 'formBlock') {
-        const formConfigId = node.props?.formConfig?.id
-        if (formConfigId) {
-          try {
-            const { data } = await keystoneClient.query({
-              query: GET_FORM_CONFIG,
-              variables: { id: formConfigId },
-            })
-            if (data?.formConfig) {
-              return {
-                ...node,
-                props: {
-                  ...node.props,
-                  formConfig: {
-                    ...node.props.formConfig,
-                    value: data.formConfig,
-                  },
-                },
-              }
-            }
-          } catch (err) {
-            console.error(`Failed to fetch formConfig ${formConfigId}:`, err)
-          }
-        }
-      }
-      return node
-    })
-  )
+  // Already using CDN domain
+  if (url.includes(CDN_DOMAIN) || url.includes('cloudfront.net')) {
+    return url
+  }
 
-  return updatedDocument
-}
-
-/**
- * Helper function to resolve media IDs in component blocks
- */
-async function resolveMediaInDocument(document: any[]): Promise<any[]> {
-  if (!document || !Array.isArray(document)) return document
-
-  const updatedDocument = await Promise.all(
-    document.map(async (node) => {
-      // Handle component-block types
-      if (node.type === 'component-block') {
-        // Link Jump component
-        if (node.component === 'linkJump') {
-          const mediaIconId = node.props?.mediaIconId
-          if (mediaIconId) {
-            const media = await resolveSingleMedia(mediaIconId)
-            return {
-              ...node,
-              props: {
-                ...node.props,
-                mediaIcon: media,
-              },
-            }
-          }
-        }
-
-        // Marquee Links component
-        if (node.component === 'marqueeLinks') {
-          const items = node.props?.items
-          if (items && Array.isArray(items)) {
-            const resolvedItems = await Promise.all(
-              items.map(async (item: any) => {
-                if (item.mediaIconId) {
-                  const media = await resolveSingleMedia(item.mediaIconId)
-                  return {
-                    ...item,
-                    mediaIcon: media,
-                  }
-                }
-                return item
-              })
-            )
-            return {
-              ...node,
-              props: {
-                ...node.props,
-                items: resolvedItems,
-              },
-            }
-          }
-        }
-
-        // Carousel component
-        if (node.component === 'carousel') {
-          const items = node.props?.items
-          if (items && Array.isArray(items)) {
-            const resolvedItems = await Promise.all(
-              items.map(async (item: any) => {
-                if (item.mediaId) {
-                  const media = await resolveSingleMedia(item.mediaId)
-                  return {
-                    ...item,
-                    media,
-                  }
-                }
-                return item
-              })
-            )
-            return {
-              ...node,
-              props: {
-                ...node.props,
-                items: resolvedItems,
-              },
-            }
-          }
-        }
-      }
-
-      // Handle layout type (recursively process layout-area children)
-      if (node.type === 'layout' && node.children) {
-        const resolvedChildren = await Promise.all(
-          node.children.map(async (child: any) => {
-            if (child.type === 'layout-area' && child.children) {
-              const resolvedLayoutChildren = await resolveMediaInDocument(child.children)
-              return {
-                ...child,
-                children: resolvedLayoutChildren,
-              }
-            }
-            return child
-          })
-        )
-        return {
-          ...node,
-          children: resolvedChildren,
-        }
-      }
-
-      return node
-    })
-  )
-
-  return updatedDocument
-}
-
-/**
- * Helper function to resolve a single media ID
- */
-async function resolveSingleMedia(mediaId: string) {
   try {
-    const { data, error} = await keystoneClient.query({
-      query: GET_SINGLE_MEDIA,
-      variables: { id: mediaId },
-    })
+    const urlObj = new URL(url)
 
-    if (error || !data?.media) {
-      console.error(`Failed to fetch media ${mediaId}:`, error)
-      return null
+    // MinIO URL: http://localhost:9000/busrom-media/...
+    if (url.includes('localhost:9000')) {
+      return `${CDN_DOMAIN}${urlObj.pathname}`
     }
 
-    const media = data.media
-
-    // Convert variants URLs to CDN URLs
-    const convertedVariants = media.variants ? Object.fromEntries(
-      Object.entries(media.variants).map(([key, value]) => [key, convertToCDNUrl(value as string)])
-    ) : null
-
-    // Transform to ImageObject format expected by frontend
-    return {
-      id: media.id,
-      url: convertToCDNUrl(media.file?.url || ''),
-      altText: media.filename || '',
-      filename: media.filename,
-      variants: convertedVariants,
-      cropFocalPoint: media.cropFocalPoint || null,
+    // S3 URL: https://xxx.s3.amazonaws.com/bucket/...
+    if (urlObj.hostname.includes('amazonaws.com')) {
+      const pathParts = urlObj.pathname.split('/').filter(Boolean)
+      if (pathParts.length > 1) {
+        pathParts.shift() // Remove bucket name
+      }
+      return `${CDN_DOMAIN}/${pathParts.join('/')}`
     }
-  } catch (err) {
-    console.error(`Error fetching media ${mediaId}:`, err)
-    return null
+
+    return url
+  } catch {
+    return url
   }
 }
 
 /**
- * Helper function to resolve media IDs to full media objects
+ * Transform image variants to use CDN URLs
  */
-async function resolveMediaIds(showImageId: string | null, mainImageIds: Array<{ id: string }> | null) {
-  const results = await Promise.all([
-    // Resolve showImage
-    showImageId ? resolveSingleMedia(showImageId) : Promise.resolve(null),
-    // Resolve mainImage array
-    mainImageIds && Array.isArray(mainImageIds)
-      ? Promise.all(mainImageIds.map((img) => (img?.id ? resolveSingleMedia(img.id) : Promise.resolve(null))))
-      : Promise.resolve(null),
-  ])
+function transformImageVariants(variants: any) {
+  if (!variants) return null
 
-  const [showImage, mainImageArray] = results
+  const transformed: any = {}
+  for (const [key, value] of Object.entries(variants)) {
+    if (value && typeof value === 'object' && 'url' in value) {
+      transformed[key] = {
+        ...value,
+        url: normalizeToCDN((value as any).url)
+      }
+    } else if (typeof value === 'string') {
+      transformed[key] = normalizeToCDN(value)
+    } else {
+      transformed[key] = value
+    }
+  }
+  return transformed
+}
 
-  const mainImage = mainImageArray ? mainImageArray.filter(Boolean) : null
+/**
+ * Transform a media object to include CDN URLs
+ */
+function transformMediaObject(media: any) {
+  if (!media || typeof media !== 'object') return media
+  if (typeof media === 'string' || typeof media === 'number') return media
 
-  return { showImage, mainImage }
+  return {
+    ...media,
+    url: media.url ? normalizeToCDN(media.url) : undefined,
+    variants: transformImageVariants(media.sizes || media.variants),
+  }
+}
+
+/**
+ * Recursively populate image references in Lexical content
+ * Fetches media objects by ID and replaces them in the content tree
+ */
+async function populateLexicalImages(node: any, mediaCache: Map<string, any>, depth = 0): Promise<any> {
+  if (!node || typeof node !== 'object') return node
+
+  // Handle arrays
+  if (Array.isArray(node)) {
+    return Promise.all(node.map(item => populateLexicalImages(item, mediaCache, depth)))
+  }
+
+  // Clone the node
+  const populated = { ...node }
+
+  // Check if this node has image data that needs population
+  if (populated.data && typeof populated.data === 'object') {
+    // Handle single image field
+    if (populated.data.image) {
+      const imageId = typeof populated.data.image === 'object' ? populated.data.image.id : populated.data.image
+      if (imageId && !mediaCache.has(String(imageId))) {
+        try {
+          const mediaRes = await fetch(`${CMS_URL}/api/media/${imageId}`)
+          if (mediaRes.ok) {
+            const mediaData = await mediaRes.json()
+            mediaCache.set(String(imageId), transformMediaObject(mediaData))
+          }
+        } catch (err) {
+          console.error(`[populateLexicalImages] Failed to fetch media ${imageId}:`, err)
+        }
+      }
+      if (mediaCache.has(String(imageId))) {
+        populated.data.image = mediaCache.get(String(imageId))
+      }
+    }
+
+    // Handle images array (for gallery)
+    if (Array.isArray(populated.data.images)) {
+      populated.data.images = await Promise.all(
+        populated.data.images.map(async (item: any) => {
+          if (!item || typeof item !== 'object') return item
+
+          const imageId = typeof item.image === 'object' ? item.image.id : item.image
+          if (imageId && !mediaCache.has(String(imageId))) {
+            try {
+              const mediaRes = await fetch(`${CMS_URL}/api/media/${imageId}`)
+              if (mediaRes.ok) {
+                const mediaData = await mediaRes.json()
+                mediaCache.set(String(imageId), transformMediaObject(mediaData))
+              }
+            } catch (err) {
+              console.error(`[populateLexicalImages] Failed to fetch media ${imageId}:`, err)
+            }
+          }
+
+          return {
+            ...item,
+            image: mediaCache.has(String(imageId)) ? mediaCache.get(String(imageId)) : item.image
+          }
+        })
+      )
+    }
+
+    // Handle media icon
+    if (populated.data.mediaIcon) {
+      const iconId = typeof populated.data.mediaIcon === 'object' ? populated.data.mediaIcon.id : populated.data.mediaIcon
+      if (iconId && !mediaCache.has(String(iconId))) {
+        try {
+          const mediaRes = await fetch(`${CMS_URL}/api/media/${iconId}`)
+          if (mediaRes.ok) {
+            const mediaData = await mediaRes.json()
+            mediaCache.set(String(iconId), transformMediaObject(mediaData))
+          }
+        } catch (err) {
+          console.error(`[populateLexicalImages] Failed to fetch media icon ${iconId}:`, err)
+        }
+      }
+      if (mediaCache.has(String(iconId))) {
+        populated.data.mediaIcon = mediaCache.get(String(iconId))
+      }
+    }
+
+    // Handle backgroundImage
+    if (populated.data.backgroundImage) {
+      const bgId = typeof populated.data.backgroundImage === 'object' ? populated.data.backgroundImage.id : populated.data.backgroundImage
+      if (bgId && !mediaCache.has(String(bgId))) {
+        try {
+          const mediaRes = await fetch(`${CMS_URL}/api/media/${bgId}`)
+          if (mediaRes.ok) {
+            const mediaData = await mediaRes.json()
+            mediaCache.set(String(bgId), transformMediaObject(mediaData))
+          }
+        } catch (err) {
+          console.error(`[populateLexicalImages] Failed to fetch background image ${bgId}:`, err)
+        }
+      }
+      if (mediaCache.has(String(bgId))) {
+        populated.data.backgroundImage = mediaCache.get(String(bgId))
+      }
+    }
+
+    // Handle carousel/marquee items with media
+    if (Array.isArray(populated.data.items)) {
+      populated.data.items = await Promise.all(
+        populated.data.items.map(async (item: any) => {
+          if (!item || typeof item !== 'object') return item
+
+          const result = { ...item }
+
+          // Handle item.media
+          if (result.media) {
+            const mediaId = typeof result.media === 'object' ? result.media.id : result.media
+            if (mediaId && !mediaCache.has(String(mediaId))) {
+              try {
+                const mediaRes = await fetch(`${CMS_URL}/api/media/${mediaId}`)
+                if (mediaRes.ok) {
+                  const mediaData = await mediaRes.json()
+                  mediaCache.set(String(mediaId), transformMediaObject(mediaData))
+                }
+              } catch (err) {
+                console.error(`[populateLexicalImages] Failed to fetch item media ${mediaId}:`, err)
+              }
+            }
+            if (mediaCache.has(String(mediaId))) {
+              result.media = mediaCache.get(String(mediaId))
+            }
+          }
+
+          // Handle item.mediaIcon
+          if (result.mediaIcon) {
+            const iconId = typeof result.mediaIcon === 'object' ? result.mediaIcon.id : result.mediaIcon
+            if (iconId && !mediaCache.has(String(iconId))) {
+              try {
+                const mediaRes = await fetch(`${CMS_URL}/api/media/${iconId}`)
+                if (mediaRes.ok) {
+                  const mediaData = await mediaRes.json()
+                  mediaCache.set(String(iconId), transformMediaObject(mediaData))
+                }
+              } catch (err) {
+                console.error(`[populateLexicalImages] Failed to fetch item icon ${iconId}:`, err)
+              }
+            }
+            if (mediaCache.has(String(iconId))) {
+              result.mediaIcon = mediaCache.get(String(iconId))
+            }
+          }
+
+          return result
+        })
+      )
+    }
+
+    // Handle carousel slides with images
+    if (Array.isArray(populated.data.slides)) {
+      populated.data.slides = await Promise.all(
+        populated.data.slides.map(async (slide: any) => {
+          if (!slide || typeof slide !== 'object') return slide
+
+          const result = { ...slide }
+
+          // Handle slide.image
+          if (result.image) {
+            const imageId = typeof result.image === 'object' ? result.image.id : result.image
+            if (imageId && !mediaCache.has(String(imageId))) {
+              try {
+                const mediaRes = await fetch(`${CMS_URL}/api/media/${imageId}`)
+                if (mediaRes.ok) {
+                  const mediaData = await mediaRes.json()
+                  mediaCache.set(String(imageId), transformMediaObject(mediaData))
+                }
+              } catch (err) {
+                console.error(`[populateLexicalImages] Failed to fetch slide image ${imageId}:`, err)
+              }
+            }
+            if (mediaCache.has(String(imageId))) {
+              result.image = mediaCache.get(String(imageId))
+            }
+          }
+
+          return result
+        })
+      )
+    }
+  }
+
+  // Recursively process root (top level of Lexical content)
+  if (populated.root && typeof populated.root === 'object') {
+    populated.root = await populateLexicalImages(populated.root, mediaCache, depth + 1)
+  }
+
+  // Recursively process children
+  if (populated.children && Array.isArray(populated.children)) {
+    populated.children = await populateLexicalImages(populated.children, mediaCache, depth + 1)
+  }
+
+  // Recursively process fields (for blocks)
+  if (populated.fields && typeof populated.fields === 'object') {
+    for (const [key, value] of Object.entries(populated.fields)) {
+      if (value && typeof value === 'object') {
+        populated.fields[key] = await populateLexicalImages(value, mediaCache, depth + 1)
+      }
+    }
+  }
+
+  return populated
 }
 
 /**
@@ -305,91 +299,171 @@ export async function GET(
     const searchParams = request.nextUrl.searchParams
     const locale = searchParams.get('locale') || 'en'
 
-    // Fetch product
-    const { data, error } = await keystoneClient.query({
-      query: GET_PRODUCT_BY_SLUG,
-      variables: { slug },
+    console.log('[Product Detail API] Fetching product from Payload CMS:', { slug, locale })
+
+    // 从 Payload CMS 获取单个产品
+    // TODO: Re-enable status filter after setting product status to 'published' in Payload CMS
+    // const productUrl = `${CMS_URL}/api/products?where[slug][equals]=${slug}&where[status][equals]=published&limit=1&locale=${locale}&depth=3`
+    const productUrl = `${CMS_URL}/api/products?where[slug][equals]=${slug}&limit=1&locale=${locale}&depth=3`
+    console.log('[Product Detail API] Request URL:', productUrl)
+
+    const productResponse = await fetch(productUrl, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      next: { revalidate: 60 },
     })
 
-    if (error) {
-      console.error('GraphQL error:', error)
-      return NextResponse.json({ error: 'Failed to fetch product' }, { status: 500 })
+    if (!productResponse.ok) {
+      console.error('[Product Detail API] Payload CMS error:', productResponse.status)
+      return NextResponse.json(
+        { error: 'Failed to fetch product from CMS' },
+        { status: productResponse.status }
+      )
     }
 
-    const product = data.products[0]
+    const productData = await productResponse.json()
 
-    if (!product) {
+    if (!productData.docs || productData.docs.length === 0) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
-    // Resolve media IDs to full media objects
-    const { showImage, mainImage } = await resolveMediaIds(product.showImage, product.mainImage)
+    const product = productData.docs[0]
+    console.log('[Product Detail API] Product found:', product.id)
 
-    // Fetch related products if series exists
+    // Populate image references in Lexical content
+    const mediaCache = new Map<string, any>()
+    if (product.contentTranslation) {
+      console.log('[Product Detail API] Populating Lexical images...')
+      product.contentTranslation = await populateLexicalImages(product.contentTranslation, mediaCache)
+      console.log('[Product Detail API] Populated', mediaCache.size, 'unique images')
+    }
+
+    // 获取同系列的相关产品
     let relatedProducts = []
     if (product.series?.id) {
-      const relatedData = await keystoneClient.query({
-        query: GET_RELATED_PRODUCTS,
-        variables: {
-          seriesId: product.series.id,
-          currentProductId: product.id,
-        },
-      })
+      // TODO: Re-enable status filter after setting product status to 'published' in Payload CMS
+      // const relatedUrl = `${CMS_URL}/api/products?where[series][equals]=${product.series.id}&where[id][not_equals]=${product.id}&where[status][equals]=published&limit=4&sort=order&locale=${locale}&depth=2`
+      const relatedUrl = `${CMS_URL}/api/products?where[series][equals]=${product.series.id}&where[id][not_equals]=${product.id}&limit=4&sort=order&locale=${locale}&depth=2`
 
-      if (!relatedData.error) {
-        // Resolve media for related products
-        const relatedProductsWithMedia = await Promise.all(
-          relatedData.data.products.map(async (p: any) => {
-            const media = await resolveMediaIds(p.showImage, p.mainImage)
-            return {
-              ...p,
-              localizedName: p.name?.[locale] || p.name?.['en'] || p.sku,
-              showImage: media.showImage,
-              mainImage: media.mainImage,
-            }
-          })
-        )
-        relatedProducts = relatedProductsWithMedia
+      try {
+        const relatedResponse = await fetch(relatedUrl, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          next: { revalidate: 60 },
+        })
+
+        if (relatedResponse.ok) {
+          const relatedData = await relatedResponse.json()
+          relatedProducts = relatedData.docs.map((p: any) => ({
+            id: p.id,
+            sku: p.sku,
+            slug: p.slug,
+            name: p.name,
+            localizedName: p.name,
+            showImage: p.showImage
+              ? {
+                  id: p.showImage.id,
+                  url: normalizeToCDN(p.showImage.url),
+                  altText: p.showImage.alt || '',
+                  filename: p.showImage.filename,
+                  variants: transformImageVariants(p.showImage.sizes),
+                  cropFocalPoint: p.showImage.focalPoint,
+                }
+              : null,
+            mainImage: p.mainImage && Array.isArray(p.mainImage)
+              ? p.mainImage.map((img: any) => ({
+                  id: img.id,
+                  url: normalizeToCDN(img.url),
+                  altText: img.alt || '',
+                  filename: img.filename,
+                  variants: transformImageVariants(img.sizes),
+                  cropFocalPoint: img.focalPoint,
+                }))
+              : [],
+            isFeatured: p.featured || false,
+          }))
+          console.log('[Product Detail API] Found related products:', relatedProducts.length)
+        }
+      } catch (error) {
+        console.error('[Product Detail API] Failed to fetch related products:', error)
       }
     }
 
-    // Resolve FormConfigs and Media in content document
-    const contentTranslation = product.contentTranslations?.find((t: any) => t.locale === locale) || product.contentTranslations?.find((t: any) => t.locale === 'en')
-    if (contentTranslation?.content?.document) {
-      contentTranslation.content.document = await resolveFormConfigsInDocument(contentTranslation.content.document)
-      contentTranslation.content.document = await resolveMediaInDocument(contentTranslation.content.document)
-    }
-
-    // Transform product data
+    // Transform product data to match frontend expectations
     const transformedProduct = {
-      ...product,
-      showImage,
-      mainImage,
-      localizedName: product.name?.[locale] || product.name?.['en'] || product.sku,
-      localizedShortDescription:
-        product.shortDescription?.[locale] || product.shortDescription?.['en'] || null,
-      localizedDescription: product.description?.[locale] || product.description?.['en'] || null,
-      // Use content translation with resolved FormConfigs
-      contentTranslation,
-      // Transform series
-      series: product.series
+      id: product.id,
+      sku: product.sku,
+      slug: product.slug,
+      name: product.name,
+      localizedName: product.name,
+      shortDescription: product.shortDescription,
+      localizedShortDescription: product.shortDescription,
+      description: product.description,
+      localizedDescription: product.description,
+      // Content (rich text from Payload)
+      content: product.contentTranslation, // Lexical rich text content
+      contentTranslation: product.contentTranslation
         ? {
-            ...product.series,
-            localizedName:
-              product.series.name?.[locale] || product.series.name?.['en'] || product.series.slug,
-            localizedDescription:
-              product.series.description?.[locale] ||
-              product.series.description?.['en'] ||
-              null,
+            locale,
+            content: {
+              document: product.contentTranslation, // Payload rich text content
+            },
           }
         : null,
-      // Add related products
+      // Attributes and specifications (JSON fields)
+      attributes: product.attributes || null,
+      specifications: product.specifications || null,
+      // Images (with CDN URL transformation)
+      showImage: product.showImage
+        ? {
+            id: product.showImage.id,
+            url: normalizeToCDN(product.showImage.url),
+            altText: product.showImage.alt || '',
+            filename: product.showImage.filename,
+            variants: transformImageVariants(product.showImage.sizes),
+            cropFocalPoint: product.showImage.focalPoint,
+          }
+        : null,
+      mainImage: product.mainImage && Array.isArray(product.mainImage)
+        ? product.mainImage.map((img: any) => ({
+            id: img.id,
+            url: normalizeToCDN(img.url),
+            altText: img.alt || '',
+            filename: img.filename,
+            variants: transformImageVariants(img.sizes),
+            cropFocalPoint: img.focalPoint,
+          }))
+        : [],
+      // Series
+      series: product.series
+        ? {
+            id: product.series.id,
+            slug: product.series.slug,
+            name: product.series.name,
+            localizedName: product.series.name,
+            description: product.series.description,
+            localizedDescription: product.series.description,
+          }
+        : null,
+      // Metadata
+      isFeatured: product.featured || false,
+      order: product.order || 0,
+      status: product.status === 'published' ? 'PUBLISHED' : 'DRAFT',
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
+      // Related products
       relatedProducts,
     }
 
     return NextResponse.json(transformedProduct)
   } catch (error: any) {
-    console.error('Product detail API error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('[Product Detail API] Error:', error)
+    console.error('[Product Detail API] Error stack:', error?.stack)
+    return NextResponse.json(
+      { error: 'Internal server error', details: error?.message },
+      { status: 500 }
+    )
   }
 }

@@ -503,6 +503,9 @@ export const SeoSetting = list({
       pageSize: 50,
     },
     labelField: 'identifier',
+    label: 'SEO Settings | SEO设置',
+    singular: 'SEO Setting | SEO设置',
+    plural: 'SEO Settings | SEO设置',
   },
 
   /**

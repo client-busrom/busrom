@@ -376,9 +376,9 @@ export const FormConfig = list({
       initialColumns: ['name', 'location', 'status', 'publishedAt', 'updatedAt'],
       defaultFieldMode: 'read',
     },
-    label: 'Form Configurations',
-    singular: 'Form Configuration',
-    plural: 'Form Configurations',
+    label: 'Form Configurations | 表单配置',
+    singular: 'Form Configuration | 表单配置',
+    plural: 'Form Configurations | 表单配置',
     description: '动态表单配置系统 - 可灵活配置各处表单的字段、验证规则、行为等',
   },
 

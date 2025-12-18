@@ -403,6 +403,9 @@ export const CustomScript = list({
       pageSize: 50,
     },
     labelField: 'name',
+    label: 'Custom Scripts | 自定义脚本',
+    singular: 'Custom Script | 自定义脚本',
+    plural: 'Custom Scripts | 自定义脚本',
   },
 
   /**

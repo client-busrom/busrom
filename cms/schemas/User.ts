@@ -317,6 +317,28 @@ export const User = list({
 
   hooks: {
     /**
+     * Validate deletion - prevent deleting self or last admin
+     */
+    validateDelete: async ({ item, context, addValidationError }) => {
+      // Prevent deleting yourself
+      if (context.session?.itemId === item.id) {
+        addValidationError('Cannot delete your own account | 不能删除自己的账号')
+        return
+      }
+
+      // If deleting an admin, check if it's the last one
+      if (item.isAdmin) {
+        const adminCount = await context.sudo().query.User.count({
+          where: { isAdmin: { equals: true } },
+        })
+
+        if (adminCount <= 1) {
+          addValidationError('Cannot delete the last super admin | 不能删除最后一个超级管理员')
+        }
+      }
+    },
+
+    /**
      * Auto-assign super_admin role to initial admin user
      * Also log user changes to ActivityLog
      */

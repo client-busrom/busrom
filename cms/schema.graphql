@@ -449,6 +449,10 @@ enum PermissionResourceType {
   CustomScript
   SeoSetting
   SiteConfig
+  ContactConfig
+  SocialConfig
+  EmailConfig
+  SeoConfig
 }
 
 enum PermissionActionType {
@@ -624,35 +628,11 @@ type SiteConfig {
   companyName: JSON
   logo: Media
   favicon: Media
-  email: String
-  phone: String
-  whatsapp: String
-  wechat: String
-  address: String
-  facebookUrl: String
-  instagramUrl: String
-  linkedinUrl: String
-  youtubeUrl: String
-  twitterUrl: String
-  googleAnalyticsId: String
-  googleSearchConsoleKey: String
-  tiktokPixelId: String
-  smtpHost: String
-  smtpPort: String
-  smtpUser: String
-  smtpPassword: String
-  emailFromAddress: String
-  emailFromName: JSON
-  formNotificationEmails: String
-  enableAutoReply: Boolean
-  autoReplyTemplate: JSON
+  defaultLanguage: String
   maintenanceMode: Boolean
   enableCaptcha: Boolean
   recaptchaSiteKey: String
   recaptchaSecretKey: String
-  defaultLanguage: String
-  enableIndexNow: Boolean
-  indexNowKey: String
   updatedAt: DateTime
 }
 
@@ -668,66 +648,22 @@ input SiteConfigWhereInput {
   identifier: StringFilter
   logo: MediaWhereInput
   favicon: MediaWhereInput
-  email: StringFilter
-  phone: StringFilter
-  whatsapp: StringFilter
-  wechat: StringFilter
-  address: StringFilter
-  facebookUrl: StringFilter
-  instagramUrl: StringFilter
-  linkedinUrl: StringFilter
-  youtubeUrl: StringFilter
-  twitterUrl: StringFilter
-  googleAnalyticsId: StringFilter
-  googleSearchConsoleKey: StringFilter
-  tiktokPixelId: StringFilter
-  smtpHost: StringFilter
-  smtpPort: StringFilter
-  smtpUser: StringFilter
-  smtpPassword: StringFilter
-  emailFromAddress: StringFilter
-  formNotificationEmails: StringFilter
-  enableAutoReply: BooleanFilter
+  defaultLanguage: StringNullableFilter
   maintenanceMode: BooleanFilter
   enableCaptcha: BooleanFilter
   recaptchaSiteKey: StringFilter
   recaptchaSecretKey: StringFilter
-  defaultLanguage: StringNullableFilter
-  enableIndexNow: BooleanFilter
-  indexNowKey: StringFilter
   updatedAt: DateTimeNullableFilter
 }
 
 input SiteConfigOrderByInput {
   id: OrderDirection
   identifier: OrderDirection
-  email: OrderDirection
-  phone: OrderDirection
-  whatsapp: OrderDirection
-  wechat: OrderDirection
-  address: OrderDirection
-  facebookUrl: OrderDirection
-  instagramUrl: OrderDirection
-  linkedinUrl: OrderDirection
-  youtubeUrl: OrderDirection
-  twitterUrl: OrderDirection
-  googleAnalyticsId: OrderDirection
-  googleSearchConsoleKey: OrderDirection
-  tiktokPixelId: OrderDirection
-  smtpHost: OrderDirection
-  smtpPort: OrderDirection
-  smtpUser: OrderDirection
-  smtpPassword: OrderDirection
-  emailFromAddress: OrderDirection
-  formNotificationEmails: OrderDirection
-  enableAutoReply: OrderDirection
+  defaultLanguage: OrderDirection
   maintenanceMode: OrderDirection
   enableCaptcha: OrderDirection
   recaptchaSiteKey: OrderDirection
   recaptchaSecretKey: OrderDirection
-  defaultLanguage: OrderDirection
-  enableIndexNow: OrderDirection
-  indexNowKey: OrderDirection
   updatedAt: OrderDirection
 }
 
@@ -737,35 +673,11 @@ input SiteConfigUpdateInput {
   companyName: JSON
   logo: MediaRelateToOneForUpdateInput
   favicon: MediaRelateToOneForUpdateInput
-  email: String
-  phone: String
-  whatsapp: String
-  wechat: String
-  address: String
-  facebookUrl: String
-  instagramUrl: String
-  linkedinUrl: String
-  youtubeUrl: String
-  twitterUrl: String
-  googleAnalyticsId: String
-  googleSearchConsoleKey: String
-  tiktokPixelId: String
-  smtpHost: String
-  smtpPort: String
-  smtpUser: String
-  smtpPassword: String
-  emailFromAddress: String
-  emailFromName: JSON
-  formNotificationEmails: String
-  enableAutoReply: Boolean
-  autoReplyTemplate: JSON
+  defaultLanguage: String
   maintenanceMode: Boolean
   enableCaptcha: Boolean
   recaptchaSiteKey: String
   recaptchaSecretKey: String
-  defaultLanguage: String
-  enableIndexNow: Boolean
-  indexNowKey: String
   updatedAt: DateTime
 }
 
@@ -780,19 +692,157 @@ input SiteConfigCreateInput {
   companyName: JSON
   logo: MediaRelateToOneForCreateInput
   favicon: MediaRelateToOneForCreateInput
+  defaultLanguage: String
+  maintenanceMode: Boolean
+  enableCaptcha: Boolean
+  recaptchaSiteKey: String
+  recaptchaSecretKey: String
+  updatedAt: DateTime
+}
+
+type ContactConfig {
+  id: ID!
+  identifier: String
   email: String
   phone: String
   whatsapp: String
   wechat: String
   address: String
+  updatedAt: DateTime
+}
+
+input ContactConfigWhereUniqueInput {
+  id: ID
+}
+
+input ContactConfigWhereInput {
+  AND: [ContactConfigWhereInput!]
+  OR: [ContactConfigWhereInput!]
+  NOT: [ContactConfigWhereInput!]
+  id: IDFilter
+  identifier: StringFilter
+  email: StringFilter
+  phone: StringFilter
+  whatsapp: StringFilter
+  wechat: StringFilter
+  address: StringFilter
+  updatedAt: DateTimeNullableFilter
+}
+
+input ContactConfigOrderByInput {
+  id: OrderDirection
+  identifier: OrderDirection
+  email: OrderDirection
+  phone: OrderDirection
+  whatsapp: OrderDirection
+  wechat: OrderDirection
+  address: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input ContactConfigUpdateInput {
+  identifier: String
+  email: String
+  phone: String
+  whatsapp: String
+  wechat: String
+  address: String
+  updatedAt: DateTime
+}
+
+input ContactConfigUpdateArgs {
+  where: ContactConfigWhereUniqueInput! = {id: 1}
+  data: ContactConfigUpdateInput!
+}
+
+input ContactConfigCreateInput {
+  identifier: String
+  email: String
+  phone: String
+  whatsapp: String
+  wechat: String
+  address: String
+  updatedAt: DateTime
+}
+
+type SocialConfig {
+  id: ID!
+  identifier: String
   facebookUrl: String
   instagramUrl: String
   linkedinUrl: String
   youtubeUrl: String
   twitterUrl: String
-  googleAnalyticsId: String
-  googleSearchConsoleKey: String
-  tiktokPixelId: String
+  tiktokUrl: String
+  pinterestUrl: String
+  updatedAt: DateTime
+}
+
+input SocialConfigWhereUniqueInput {
+  id: ID
+}
+
+input SocialConfigWhereInput {
+  AND: [SocialConfigWhereInput!]
+  OR: [SocialConfigWhereInput!]
+  NOT: [SocialConfigWhereInput!]
+  id: IDFilter
+  identifier: StringFilter
+  facebookUrl: StringFilter
+  instagramUrl: StringFilter
+  linkedinUrl: StringFilter
+  youtubeUrl: StringFilter
+  twitterUrl: StringFilter
+  tiktokUrl: StringFilter
+  pinterestUrl: StringFilter
+  updatedAt: DateTimeNullableFilter
+}
+
+input SocialConfigOrderByInput {
+  id: OrderDirection
+  identifier: OrderDirection
+  facebookUrl: OrderDirection
+  instagramUrl: OrderDirection
+  linkedinUrl: OrderDirection
+  youtubeUrl: OrderDirection
+  twitterUrl: OrderDirection
+  tiktokUrl: OrderDirection
+  pinterestUrl: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input SocialConfigUpdateInput {
+  identifier: String
+  facebookUrl: String
+  instagramUrl: String
+  linkedinUrl: String
+  youtubeUrl: String
+  twitterUrl: String
+  tiktokUrl: String
+  pinterestUrl: String
+  updatedAt: DateTime
+}
+
+input SocialConfigUpdateArgs {
+  where: SocialConfigWhereUniqueInput! = {id: 1}
+  data: SocialConfigUpdateInput!
+}
+
+input SocialConfigCreateInput {
+  identifier: String
+  facebookUrl: String
+  instagramUrl: String
+  linkedinUrl: String
+  youtubeUrl: String
+  twitterUrl: String
+  tiktokUrl: String
+  pinterestUrl: String
+  updatedAt: DateTime
+}
+
+type EmailConfig {
+  id: ID!
+  identifier: String
   smtpHost: String
   smtpPort: String
   smtpUser: String
@@ -802,13 +852,167 @@ input SiteConfigCreateInput {
   formNotificationEmails: String
   enableAutoReply: Boolean
   autoReplyTemplate: JSON
-  maintenanceMode: Boolean
-  enableCaptcha: Boolean
-  recaptchaSiteKey: String
-  recaptchaSecretKey: String
-  defaultLanguage: String
+  updatedAt: DateTime
+}
+
+input EmailConfigWhereUniqueInput {
+  id: ID
+}
+
+input EmailConfigWhereInput {
+  AND: [EmailConfigWhereInput!]
+  OR: [EmailConfigWhereInput!]
+  NOT: [EmailConfigWhereInput!]
+  id: IDFilter
+  identifier: StringFilter
+  smtpHost: StringFilter
+  smtpPort: StringFilter
+  smtpUser: StringFilter
+  smtpPassword: StringFilter
+  emailFromAddress: StringFilter
+  formNotificationEmails: StringFilter
+  enableAutoReply: BooleanFilter
+  updatedAt: DateTimeNullableFilter
+}
+
+input EmailConfigOrderByInput {
+  id: OrderDirection
+  identifier: OrderDirection
+  smtpHost: OrderDirection
+  smtpPort: OrderDirection
+  smtpUser: OrderDirection
+  smtpPassword: OrderDirection
+  emailFromAddress: OrderDirection
+  formNotificationEmails: OrderDirection
+  enableAutoReply: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input EmailConfigUpdateInput {
+  identifier: String
+  smtpHost: String
+  smtpPort: String
+  smtpUser: String
+  smtpPassword: String
+  emailFromAddress: String
+  emailFromName: JSON
+  formNotificationEmails: String
+  enableAutoReply: Boolean
+  autoReplyTemplate: JSON
+  updatedAt: DateTime
+}
+
+input EmailConfigUpdateArgs {
+  where: EmailConfigWhereUniqueInput! = {id: 1}
+  data: EmailConfigUpdateInput!
+}
+
+input EmailConfigCreateInput {
+  identifier: String
+  smtpHost: String
+  smtpPort: String
+  smtpUser: String
+  smtpPassword: String
+  emailFromAddress: String
+  emailFromName: JSON
+  formNotificationEmails: String
+  enableAutoReply: Boolean
+  autoReplyTemplate: JSON
+  updatedAt: DateTime
+}
+
+type SeoConfig {
+  id: ID!
+  identifier: String
+  googleAnalyticsId: String
+  googleSearchConsoleKey: String
+  bingWebmasterKey: String
+  tiktokPixelId: String
+  facebookPixelId: String
   enableIndexNow: Boolean
   indexNowKey: String
+  seoPingMode: String
+  seoPingRateLimit: String
+  lastSeoPingTime: DateTime
+  seoPingQueueCount: String
+  updatedAt: DateTime
+}
+
+input SeoConfigWhereUniqueInput {
+  id: ID
+}
+
+input SeoConfigWhereInput {
+  AND: [SeoConfigWhereInput!]
+  OR: [SeoConfigWhereInput!]
+  NOT: [SeoConfigWhereInput!]
+  id: IDFilter
+  identifier: StringFilter
+  googleAnalyticsId: StringFilter
+  googleSearchConsoleKey: StringFilter
+  bingWebmasterKey: StringFilter
+  tiktokPixelId: StringFilter
+  facebookPixelId: StringFilter
+  enableIndexNow: BooleanFilter
+  indexNowKey: StringFilter
+  seoPingMode: StringNullableFilter
+  seoPingRateLimit: StringNullableFilter
+  lastSeoPingTime: DateTimeNullableFilter
+  seoPingQueueCount: StringFilter
+  updatedAt: DateTimeNullableFilter
+}
+
+input SeoConfigOrderByInput {
+  id: OrderDirection
+  identifier: OrderDirection
+  googleAnalyticsId: OrderDirection
+  googleSearchConsoleKey: OrderDirection
+  bingWebmasterKey: OrderDirection
+  tiktokPixelId: OrderDirection
+  facebookPixelId: OrderDirection
+  enableIndexNow: OrderDirection
+  indexNowKey: OrderDirection
+  seoPingMode: OrderDirection
+  seoPingRateLimit: OrderDirection
+  lastSeoPingTime: OrderDirection
+  seoPingQueueCount: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input SeoConfigUpdateInput {
+  identifier: String
+  googleAnalyticsId: String
+  googleSearchConsoleKey: String
+  bingWebmasterKey: String
+  tiktokPixelId: String
+  facebookPixelId: String
+  enableIndexNow: Boolean
+  indexNowKey: String
+  seoPingMode: String
+  seoPingRateLimit: String
+  lastSeoPingTime: DateTime
+  seoPingQueueCount: String
+  updatedAt: DateTime
+}
+
+input SeoConfigUpdateArgs {
+  where: SeoConfigWhereUniqueInput! = {id: 1}
+  data: SeoConfigUpdateInput!
+}
+
+input SeoConfigCreateInput {
+  identifier: String
+  googleAnalyticsId: String
+  googleSearchConsoleKey: String
+  bingWebmasterKey: String
+  tiktokPixelId: String
+  facebookPixelId: String
+  enableIndexNow: Boolean
+  indexNowKey: String
+  seoPingMode: String
+  seoPingRateLimit: String
+  lastSeoPingTime: DateTime
+  seoPingQueueCount: String
   updatedAt: DateTime
 }
 
@@ -3707,22 +3911,12 @@ type Application {
   name: JSON
   shortDescription: JSON
   description: JSON
-  contentTranslations(where: ApplicationContentTranslationWhereInput! = {}, orderBy: [ApplicationContentTranslationOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ApplicationContentTranslationWhereUniqueInput): [ApplicationContentTranslation!]
-  contentTranslationsCount(where: ApplicationContentTranslationWhereInput! = {}): Int
-  contentByLocale(locale: String!): ApplicationContentByLocale
-  translatedLocales: String
-  mainImage: JSON
-  images: JSON
+  sceneGallery: JSON
   category: Category
   status: String
   createdAt: DateTime
   updatedAt: DateTime
   duplicate: String
-}
-
-type ApplicationContentByLocale {
-  locale: String
-  content: JSON
 }
 
 input ApplicationWhereUniqueInput {
@@ -3736,17 +3930,10 @@ input ApplicationWhereInput {
   NOT: [ApplicationWhereInput!]
   id: IDFilter
   slug: StringFilter
-  contentTranslations: ApplicationContentTranslationManyRelationFilter
   category: CategoryWhereInput
   status: StringNullableFilter
   createdAt: DateTimeNullableFilter
   updatedAt: DateTimeNullableFilter
-}
-
-input ApplicationContentTranslationManyRelationFilter {
-  every: ApplicationContentTranslationWhereInput
-  some: ApplicationContentTranslationWhereInput
-  none: ApplicationContentTranslationWhereInput
 }
 
 input ApplicationOrderByInput {
@@ -3762,20 +3949,11 @@ input ApplicationUpdateInput {
   name: JSON
   shortDescription: JSON
   description: JSON
-  contentTranslations: ApplicationContentTranslationRelateToManyForUpdateInput
-  mainImage: JSON
-  images: JSON
+  sceneGallery: JSON
   category: CategoryRelateToOneForUpdateInput
   status: String
   createdAt: DateTime
   updatedAt: DateTime
-}
-
-input ApplicationContentTranslationRelateToManyForUpdateInput {
-  disconnect: [ApplicationContentTranslationWhereUniqueInput!]
-  set: [ApplicationContentTranslationWhereUniqueInput!]
-  create: [ApplicationContentTranslationCreateInput!]
-  connect: [ApplicationContentTranslationWhereUniqueInput!]
 }
 
 input ApplicationUpdateArgs {
@@ -3788,18 +3966,11 @@ input ApplicationCreateInput {
   name: JSON
   shortDescription: JSON
   description: JSON
-  contentTranslations: ApplicationContentTranslationRelateToManyForCreateInput
-  mainImage: JSON
-  images: JSON
+  sceneGallery: JSON
   category: CategoryRelateToOneForCreateInput
   status: String
   createdAt: DateTime
   updatedAt: DateTime
-}
-
-input ApplicationContentTranslationRelateToManyForCreateInput {
-  create: [ApplicationContentTranslationCreateInput!]
-  connect: [ApplicationContentTranslationWhereUniqueInput!]
 }
 
 type ApplicationContentTranslation {
@@ -4957,6 +5128,30 @@ type Mutation {
   updateSiteConfigs(data: [SiteConfigUpdateArgs!]!): [SiteConfig]
   deleteSiteConfig(where: SiteConfigWhereUniqueInput! = {id: 1}): SiteConfig
   deleteSiteConfigs(where: [SiteConfigWhereUniqueInput!]!): [SiteConfig]
+  createContactConfig(data: ContactConfigCreateInput!): ContactConfig
+  createContactConfigs(data: [ContactConfigCreateInput!]!): [ContactConfig]
+  updateContactConfig(where: ContactConfigWhereUniqueInput! = {id: 1}, data: ContactConfigUpdateInput!): ContactConfig
+  updateContactConfigs(data: [ContactConfigUpdateArgs!]!): [ContactConfig]
+  deleteContactConfig(where: ContactConfigWhereUniqueInput! = {id: 1}): ContactConfig
+  deleteContactConfigs(where: [ContactConfigWhereUniqueInput!]!): [ContactConfig]
+  createSocialConfig(data: SocialConfigCreateInput!): SocialConfig
+  createSocialConfigs(data: [SocialConfigCreateInput!]!): [SocialConfig]
+  updateSocialConfig(where: SocialConfigWhereUniqueInput! = {id: 1}, data: SocialConfigUpdateInput!): SocialConfig
+  updateSocialConfigs(data: [SocialConfigUpdateArgs!]!): [SocialConfig]
+  deleteSocialConfig(where: SocialConfigWhereUniqueInput! = {id: 1}): SocialConfig
+  deleteSocialConfigs(where: [SocialConfigWhereUniqueInput!]!): [SocialConfig]
+  createEmailConfig(data: EmailConfigCreateInput!): EmailConfig
+  createEmailConfigs(data: [EmailConfigCreateInput!]!): [EmailConfig]
+  updateEmailConfig(where: EmailConfigWhereUniqueInput! = {id: 1}, data: EmailConfigUpdateInput!): EmailConfig
+  updateEmailConfigs(data: [EmailConfigUpdateArgs!]!): [EmailConfig]
+  deleteEmailConfig(where: EmailConfigWhereUniqueInput! = {id: 1}): EmailConfig
+  deleteEmailConfigs(where: [EmailConfigWhereUniqueInput!]!): [EmailConfig]
+  createSeoConfig(data: SeoConfigCreateInput!): SeoConfig
+  createSeoConfigs(data: [SeoConfigCreateInput!]!): [SeoConfig]
+  updateSeoConfig(where: SeoConfigWhereUniqueInput! = {id: 1}, data: SeoConfigUpdateInput!): SeoConfig
+  updateSeoConfigs(data: [SeoConfigUpdateArgs!]!): [SeoConfig]
+  deleteSeoConfig(where: SeoConfigWhereUniqueInput! = {id: 1}): SeoConfig
+  deleteSeoConfigs(where: [SeoConfigWhereUniqueInput!]!): [SeoConfig]
   createNavigationMenu(data: NavigationMenuCreateInput!): NavigationMenu
   createNavigationMenus(data: [NavigationMenuCreateInput!]!): [NavigationMenu]
   updateNavigationMenu(where: NavigationMenuWhereUniqueInput!, data: NavigationMenuUpdateInput!): NavigationMenu
@@ -5241,6 +5436,18 @@ type Query {
   siteConfig(where: SiteConfigWhereUniqueInput! = {id: 1}): SiteConfig
   siteConfigs(where: SiteConfigWhereInput! = {id: {equals: 1}}, orderBy: [SiteConfigOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SiteConfigWhereUniqueInput): [SiteConfig!]
   siteConfigsCount(where: SiteConfigWhereInput! = {id: {equals: 1}}): Int
+  contactConfig(where: ContactConfigWhereUniqueInput! = {id: 1}): ContactConfig
+  contactConfigs(where: ContactConfigWhereInput! = {id: {equals: 1}}, orderBy: [ContactConfigOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ContactConfigWhereUniqueInput): [ContactConfig!]
+  contactConfigsCount(where: ContactConfigWhereInput! = {id: {equals: 1}}): Int
+  socialConfig(where: SocialConfigWhereUniqueInput! = {id: 1}): SocialConfig
+  socialConfigs(where: SocialConfigWhereInput! = {id: {equals: 1}}, orderBy: [SocialConfigOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SocialConfigWhereUniqueInput): [SocialConfig!]
+  socialConfigsCount(where: SocialConfigWhereInput! = {id: {equals: 1}}): Int
+  emailConfig(where: EmailConfigWhereUniqueInput! = {id: 1}): EmailConfig
+  emailConfigs(where: EmailConfigWhereInput! = {id: {equals: 1}}, orderBy: [EmailConfigOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: EmailConfigWhereUniqueInput): [EmailConfig!]
+  emailConfigsCount(where: EmailConfigWhereInput! = {id: {equals: 1}}): Int
+  seoConfig(where: SeoConfigWhereUniqueInput! = {id: 1}): SeoConfig
+  seoConfigs(where: SeoConfigWhereInput! = {id: {equals: 1}}, orderBy: [SeoConfigOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SeoConfigWhereUniqueInput): [SeoConfig!]
+  seoConfigsCount(where: SeoConfigWhereInput! = {id: {equals: 1}}): Int
   navigationMenu(where: NavigationMenuWhereUniqueInput!): NavigationMenu
   navigationMenus(where: NavigationMenuWhereInput! = {}, orderBy: [NavigationMenuOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: NavigationMenuWhereUniqueInput): [NavigationMenu!]
   navigationMenusCount(where: NavigationMenuWhereInput! = {}): Int

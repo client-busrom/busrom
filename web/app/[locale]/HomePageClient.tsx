@@ -76,7 +76,7 @@ export function HomePageClient({
       </div>
 
       {/* 模块 4: 3D球体 (浅色背景) */}
-      <div data-header-theme="light">
+      <div data-header-theme="transparent">
         <Sphere3D />
       </div>
 

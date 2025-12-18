@@ -161,6 +161,9 @@ export const FaqItem = list({
       initialSort: { field: 'order', direction: 'ASC' },
     },
     labelField: 'internalId',
+    label: 'FAQ Items | 常见问题',
+    singular: 'FAQ Item | 常见问题',
+    plural: 'FAQ Items | 常见问题',
   },
 
   /**

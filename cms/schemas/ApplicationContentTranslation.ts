@@ -82,10 +82,11 @@ export const ApplicationContentTranslation = list({
 
     /**
      * Application (Relationship to parent record)
+     * Note: One-way reference since Application no longer uses contentTranslations
      */
     application: relationship({
       label: 'Application (应用)',
-      ref: 'Application.contentTranslations',
+      ref: 'Application',
       ui: {
         displayMode: 'cards',
         cardFields: ['slug'],
@@ -130,6 +131,9 @@ export const ApplicationContentTranslation = list({
       initialSort: { field: 'locale', direction: 'ASC' },
     },
     labelField: 'locale',
+    label: 'Application Translations | 应用案例翻译',
+    singular: 'Application Translation | 应用案例翻译',
+    plural: 'Application Translations | 应用案例翻译',
     isHidden: true,
   },
 

@@ -191,8 +191,8 @@ Busrom 团队`
   ui: {
     labelField: 'identifier',
     label: 'Email Config | 邮件服务配置',
-    singular: 'Email Config',
-    plural: 'Email Config',
+    singular: 'Email Config | 邮件服务配置',
+    plural: 'Email Config | 邮件服务配置',
     description: 'Email service and notification settings | 邮件服务和通知设置',
   },
 })

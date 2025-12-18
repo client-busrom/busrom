@@ -16,11 +16,29 @@ const CAROUSEL_DURATION = 5000; // 轮播间隔时间（毫秒）
 export default function ServiceFeatures({ data }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [progress, setProgress] = useState(0); // 进度 0-100
+  const [isVisible, setIsVisible] = useState(false); // 是否在视口内
+  const sectionRef = useRef<HTMLElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const progressRef = useRef<NodeJS.Timeout | null>(null);
 
   const features = data?.features || [];
   const featuresLength = features.length;
+
+  // 视口检测 - 不在视口时暂停轮播省电
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
 
   // --- 进度条动画逻辑 ---
   const startProgress = () => {
@@ -47,7 +65,7 @@ export default function ServiceFeatures({ data }: Props) {
     }
   };
 
-  // --- 自动轮播逻辑 ---
+  // --- 自动轮播逻辑 (仅在视口内运行) ---
   useEffect(() => {
     if (featuresLength === 0) return;
 
@@ -67,9 +85,15 @@ export default function ServiceFeatures({ data }: Props) {
       stopProgress();
     };
 
-    startInterval();
+    // 只在可见时启动轮播
+    if (isVisible) {
+      startInterval();
+    } else {
+      stopInterval();
+    }
+
     return () => stopInterval();
-  }, [featuresLength]);
+  }, [featuresLength, isVisible]);
 
   // --- 处理点击导航点 ---
   const handleDotClick = (index: number) => {
@@ -94,7 +118,7 @@ export default function ServiceFeatures({ data }: Props) {
   const activeFeature = features[activeIndex];
 
   return (
-    <section className="py-16 lg:py-24 bg-brand-main" data-header-theme="light">
+    <section ref={sectionRef} className="py-16 lg:py-24 bg-brand-main" data-header-theme="light">
       <div className="container mx-auto px-4">
         {/* 主容器：米色圆角背景 */}
         <div

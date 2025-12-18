@@ -273,9 +273,9 @@ export const HeroBannerItem = list({
       initialSort: { field: 'order', direction: 'ASC' },
       pageSize: 20,
     },
-    label: 'Hero Banner Item',
-    singular: 'Hero Banner Item',
-    plural: 'Hero Banner Items',
+    label: 'Hero Banner Items | 主横幅轮播',
+    singular: 'Hero Banner Item | 主横幅项',
+    plural: 'Hero Banner Items | 主横幅轮播',
     description: 'Hero 轮播项 - 最多9项。每项必须有标题、5个特点、4张图片。',
   },
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import type { HomeContent } from "@/lib/content-data";
-import { Button } from "@/components/ui/button";
+import { AnimatedLinkButton } from "@/components/ui/animated-link-button";
 import { LucideIcon, HelpCircle, Lightbulb, ShieldCheck, Factory, Globe, Users } from "lucide-react";
 import { cn } from "@/lib/utils"; // 导入 cn
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
@@ -10,6 +10,9 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage";
 type Props = {
   data: HomeContent["whyChooseBusrom"];
 };
+
+// 设计稿基准尺寸
+const DESIGN_WIDTH = 1920;
 
 // 图标映射 - 根据 reason title 匹配对应图标
 const iconMap: { [key: string]: LucideIcon } = {
@@ -33,13 +36,31 @@ const CAROUSEL_INTERVAL_MS = 3000;
 export default function WhyChooseBusrom({ data }: Props) {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [isHovering, setIsHovering] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
   const reasonsLength = data?.reasons?.length || 0;
 
-  // 自动轮播的核心逻辑 (保持不变)
+  // 视口检测 - 不在视口时暂停轮播省电
   useEffect(() => {
-    if (isHovering || reasonsLength === 0) {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  // 自动轮播的核心逻辑 (仅在视口内运行)
+  useEffect(() => {
+    if (isHovering || reasonsLength === 0 || !isVisible) {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -54,7 +75,7 @@ export default function WhyChooseBusrom({ data }: Props) {
         clearInterval(timerRef.current);
       }
     };
-  }, [isHovering, reasonsLength]);
+  }, [isHovering, reasonsLength, isVisible]);
 
   // Guard: if no data, don't render
   if (!data || !data.reasons || data.reasons.length === 0) {
@@ -62,30 +83,34 @@ export default function WhyChooseBusrom({ data }: Props) {
   }
 
   return (
-    <section className="py-16 bg-brand-main" data-header-theme="light">
+    <section ref={sectionRef} className="pt-20 pb-16 md:pt-24 bg-brand-main" data-header-theme="light">
       <div className="container mx-auto">
-        {/* --- 1. 顶部控制/标题区 (保持不变) --- */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12">
-          {/* ... 标题和按钮 ... */}
-          <div className="mb-4 md:mb-0">
-            <p className="font-medium font-anaheim text-sm text-brand-secondary">
-              Product Series Introduction
-            </p>
-            <h2 className="mt-2 font-extrabold text-5xl font-anaheim text-brand-text-black">
+        {/* --- 1. 顶部控制/标题区 --- */}
+        {/* 移动端标题 */}
+        <div className="flex flex-col md:hidden mb-6">
+          <h2 className="font-anaheim font-extrabold text-2xl text-brand-text-black">
+            {data.title} <span className="text-stroke-black">{data.title2}</span>
+          </h2>
+        </div>
+
+        {/* 桌面端标题 */}
+        <div className="hidden md:flex justify-between items-end mb-12">
+          <div>
+            <h2
+              className="font-anaheim font-extrabold text-brand-text-black"
+              style={{
+                fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
+                lineHeight: `${(67 / DESIGN_WIDTH) * 100}vw`,
+              }}
+            >
               {data.title} <span className="text-stroke-black">{data.title2}</span>
             </h2>
           </div>
-          <Button className="flex relative items-center justify-center font-anaheim font-medium text-brand-secondary h-10 px-4 text-sm bg-transparent hover:bg-transparent">
-            <div
-              className="absolute w-12 h-12 bg-[#ECE8D8] rounded-full z-0"
-              style={{
-                top: "50%",
-                left: "1px",
-                transform: "translateY(-50%)",
-              }}
-            ></div>
-            <span className="relative z-10">VIEW MORE INFORMATION</span>
-          </Button>
+
+          {/* 右侧按钮 */}
+          <AnimatedLinkButton>
+            VIEW MORE INFORMATION
+          </AnimatedLinkButton>
         </div>
 
         {/* --- 2. 桌面端: 手风琴轮播图 (md 及以上) --- */}

@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 import type { Config } from "tailwindcss"
+import tailwindcssAnimate from "tailwindcss-animate"
+import tailwindScrollbarHide from "tailwind-scrollbar-hide"
+import tailwindcssAspectRatio from "@tailwindcss/aspect-ratio"
 
 const config: Config = {
   darkMode: ["class"],
@@ -149,9 +152,9 @@ const config: Config = {
     },
   },
   plugins: [
-    require("tailwindcss-animate"),
-    require("tailwind-scrollbar-hide"), // 👈 添加这一行
-    require('@tailwindcss/aspect-ratio'),
+    tailwindcssAnimate,
+    tailwindScrollbarHide,
+    tailwindcssAspectRatio,
   ],
 }
 export default config

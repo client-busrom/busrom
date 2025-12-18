@@ -102,6 +102,9 @@ export const ProductSeriesCarousel = list({
   ui: {
     labelField: 'internalLabel',
     listView: { defaultFieldMode: 'read' },
+    label: 'Product Series Carousel | 产品系列轮播',
+    singular: 'Product Series Carousel | 产品系列轮播',
+    plural: 'Product Series Carousel | 产品系列轮播',
     description: 'Product Series Carousel - Homepage carousel configuration (singleton). Multilingual support: each language has its own carousel items with title, image, scene image, button text, and link URL. Supports auto-translation and drag-to-reorder.',
   },
 })

@@ -416,9 +416,9 @@ export const ServiceFeaturesConfig = list({
     listView: {
       initialColumns: ['status', 'publishedAt', 'updatedAt'],
     },
-    label: 'Service Features Config',
-    singular: 'Service Features Config',
-    plural: 'Service Features Configs',
+    label: 'Service Features Config | 服务特点配置',
+    singular: 'Service Features Config | 服务特点配置',
+    plural: 'Service Features Config | 服务特点配置',
     description: 'Service Features 配置 - Singleton，固定5个特点，图片数量: [4,2,6,2,2]',
     hideCreate: async ({ context }) => {
       const count = await context.query.ServiceFeaturesConfig.count()

@@ -3,17 +3,14 @@
  *
  * Features:
  * - 24-language support with hybrid multilingual approach
- * - JSON fields for short text (name, shortDescription)
- * - Relational table for rich text description
+ * - JSON fields for short text (name, shortDescription, description)
  * - Soft delete (status: PUBLISHED/DRAFT/ARCHIVED)
- * - Multiple images support
- * - Featured image
+ * - Scene gallery: multiple scene groups, each containing multiple images
  */
 
 import { list, graphql } from '@keystone-6/core'
 import { text, json, select, relationship, timestamp, virtual } from '@keystone-6/core/fields'
 import { submitUrlToIndexNow, buildFullUrl } from '../lib/indexnow'
-import { publicReadAccess } from '../lib/permissions/access-control'
 
 export const Application = list({
   fields: {
@@ -74,112 +71,21 @@ export const Application = list({
     }),
 
     // ==================================================================
-    // 🌐 Multi-language Fields: Relational Approach (Rich Text Content)
+    // 🖼️ Scene Gallery
     // ==================================================================
 
     /**
-     * Content Body Translations (Relational table - for rich text)
+     * Scene Gallery - Multiple scene groups, each containing multiple images
      *
-     * Each language's rich text content is stored in a separate ApplicationContentTranslation record.
-     * Operators click on a language card to enter the corresponding Document Editor.
+     * Data structure: [{ id: string, name: string, images: [{ id: string }] }]
+     * Each scene group can contain multiple images for showcasing different scenarios
      */
-    contentTranslations: relationship({
-      label: 'Content Translations (内容翻译)',
-      ref: 'ApplicationContentTranslation.application',
-      many: true,
+    sceneGallery: json({
+      label: 'Scene Gallery (场景图集)',
+      defaultValue: [],
       ui: {
-        displayMode: 'cards',
-        cardFields: ['locale', 'updatedAt'],
-        inlineCreate: { fields: ['locale'] },
-        inlineEdit: { fields: ['locale', 'content'] },
-        linkToItem: true,
-        inlineConnect: true,
-        description: 'Click language card to edit rich text content (点击语言卡片编辑富文本内容)',
-      },
-    }),
-
-    /**
-     * Virtual Field: Quick access to content by locale
-     *
-     * Used in GraphQL API queries
-     */
-    contentByLocale: virtual({
-      field: graphql.field({
-        type: graphql.object<{ locale: string; content: any }>()({
-          name: 'ApplicationContentByLocale',
-          fields: {
-            locale: graphql.field({ type: graphql.String }),
-            content: graphql.field({ type: graphql.JSON }),
-          },
-        }),
-        args: {
-          locale: graphql.arg({ type: graphql.nonNull(graphql.String) }),
-        },
-        async resolve(item, { locale }, context) {
-          const translations = await context.query.ApplicationContentTranslation.findMany({
-            where: {
-              application: { id: { equals: item.id as string } },
-              locale: { equals: locale },
-            },
-            query: 'locale content',
-          })
-          return translations[0] || { locale, content: null }
-        },
-      }),
-      ui: {
-        listView: { fieldMode: 'hidden' },
-        itemView: { fieldMode: 'hidden' },
-      },
-    }),
-
-    /**
-     * Virtual Field: Display list of translated locales
-     *
-     * Shows completed translations in list view (e.g., EN ✅ ZH ✅ ES)
-     */
-    translatedLocales: virtual({
-      field: graphql.field({
-        type: graphql.String,
-        async resolve(item, args, context) {
-          const translations = await context.query.ApplicationContentTranslation.findMany({
-            where: {
-              application: { id: { equals: item.id as string } },
-            },
-            query: 'locale',
-          })
-          const locales = translations.map((t: any) => String(t.locale))
-          return JSON.stringify(locales)
-        },
-      }),
-      ui: {
-        listView: { fieldMode: 'read' },
-        views: './custom-fields/TranslatedLocalesDisplay',
-      },
-    }),
-
-    // ==================================================================
-    // 🖼️ Media & Relationships
-    // ==================================================================
-
-    /**
-     * Main Image (Featured) - with filtered selector
-     */
-    mainImage: json({
-      label: 'Main Image (主图)',
-      ui: {
-        views: './custom-fields/SingleMediaField',
-        description: 'Main/featured image for this application case | 应用案例的主图',
-      },
-    }),
-
-    /**
-     * Gallery Images - with filtered selector
-     */
-    images: json({
-      label: 'Gallery Images (图集)',
-      ui: {
-        views: './custom-fields/MultipleMediaField',
-        description: 'Additional images showcasing this application | 展示该应用的更多图片',
+        views: './custom-fields/SceneGalleryField',
+        description: 'Manage scene image groups. Each scene can contain multiple images | 管理场景图集，每个场景可包含多张图片',
       },
     }),
 
@@ -314,9 +220,12 @@ export const Application = list({
    */
   ui: {
     listView: {
-      initialColumns: ['slug', 'translatedLocales', 'status', 'updatedAt'],
+      initialColumns: ['slug', 'category', 'status', 'updatedAt'],
       initialSort: { field: 'updatedAt', direction: 'DESC' },
     },
     labelField: 'slug',
+    label: 'Applications | 应用案例',
+    singular: 'Application | 应用案例',
+    plural: 'Applications | 应用案例',
   },
 })

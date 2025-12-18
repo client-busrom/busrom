@@ -131,8 +131,8 @@ export const ContactConfig = list({
   ui: {
     labelField: 'identifier',
     label: 'Contact Config | 联系信息配置',
-    singular: 'Contact Config',
-    plural: 'Contact Config',
+    singular: 'Contact Config | 联系信息配置',
+    plural: 'Contact Config | 联系信息配置',
     description: 'Company contact information settings | 公司联系信息设置',
   },
 })

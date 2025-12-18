@@ -360,7 +360,7 @@ export default function SimpleCta({ data }: Props) {
                     className="rounded-full font-anaheim font-semibold text-lg px-8 py-4 h-auto"
                     size="lg"
                   >
-                    {data.buttonText}
+                    {data.ctaText}
                   </Button>
                 </motion.div>
 
@@ -396,7 +396,7 @@ export default function SimpleCta({ data }: Props) {
                     className="rounded-full font-anaheim font-semibold text-xl 2xl:text-[32px] px-12 py-6 2xl:px-16 2xl:py-8 h-auto"
                     size="lg"
                   >
-                    {data.buttonText}
+                    {data.ctaText}
                   </Button>
                 </motion.div>
               </Link>

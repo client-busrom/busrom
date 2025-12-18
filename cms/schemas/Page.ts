@@ -435,7 +435,7 @@ export const Page = list({
       pageSize: 50,
     },
     labelField: 'slug',
-    label: 'Pages',
+    label: 'Pages | 页面',
     description: '统一页面管理 - 包含固定模板页和自由落地页',
   },
 

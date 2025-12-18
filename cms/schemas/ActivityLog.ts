@@ -176,6 +176,9 @@ export const ActivityLog = list({
       defaultFieldMode: 'read',
     },
     labelField: 'action',
+    label: 'Activity Logs | 活动日志',
+    singular: 'Activity Log | 活动日志',
+    plural: 'Activity Logs | 活动日志',
     // Hide create form in UI (logs are created by the system)
     hideCreate: true,
     // Hide delete button (logs should not be deleted manually)

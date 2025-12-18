@@ -9,7 +9,7 @@ import { SimplifiedInquiryForm } from "@/components/shop/SimplifiedInquiryForm"
 import { FullInquiryModal } from "@/components/shop/FullInquiryModal"
 import { ProductDetailSkeleton } from "@/components/shop/ProductDetailSkeleton"
 import { StickyProductInfo } from "@/components/shop/StickyLeftColumn"
-import { renderSection } from "@/components/shop/ProductContentRenderer"
+import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 import type { Product } from "@/lib/types/product"
 
 interface ProductDetailClientProps {
@@ -24,6 +24,7 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
   const [isFullFormOpen, setIsFullFormOpen] = useState(false)
   const [selectedSection, setSelectedSection] = useState<any>(null)
   const [initialFormData, setInitialFormData] = useState<Record<string, any>>({})
+  const [formConfig, setFormConfig] = useState<any>(null)
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -42,6 +43,33 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
 
         const data = await res.json()
         setProduct(data)
+
+        // Extract formConfig ID from content and fetch formConfig data
+        const formBlocks = data.content?.root?.children?.filter((n: any) =>
+          n.type === 'formBlock' || (n.type === 'block' && n.fields?.blockType === 'form-block')
+        ) || []
+
+        if (formBlocks.length > 0) {
+          const formConfigId = formBlocks[0].data?.formConfig?.id || formBlocks[0].fields?.formConfig?.id
+          if (formConfigId) {
+            try {
+              const formRes = await fetch(`/api/form-configs/${formConfigId}`)
+              if (formRes.ok) {
+                const formData = await formRes.json()
+                console.log('[ProductDetailClient] FormConfig loaded:', formData.id, 'fields:', formData.fields?.length)
+                setFormConfig(formData)
+              } else {
+                console.error('[ProductDetailClient] Failed to fetch formConfig:', formRes.status)
+              }
+            } catch (err) {
+              console.error('[ProductDetailClient] Failed to fetch form config:', err)
+            }
+          } else {
+            console.error('[ProductDetailClient] No formConfigId found in formBlock')
+          }
+        } else {
+          console.log('[ProductDetailClient] No formBlocks found in content')
+        }
       } catch (err) {
         console.error("Failed to fetch product:", err)
         setError("Failed to load product")
@@ -79,21 +107,23 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
   const images = product.mainImage || (product.showImage ? [product.showImage] : [])
   const displayName = product.localizedName || product.sku
 
-  // Parse content sections
-  const contentDocument = product.contentTranslation?.content?.document
+  // Parse Lexical content structure
+  const lexicalContent = product.content
   let preFormSections: any[] = []
   let formBlock: any = null
-  let postFormSections: any[] = [] // Changed from postFormContent to postFormSections
+  let postFormSections: any[] = []
 
-  if (contentDocument) {
+  if (lexicalContent?.root?.children) {
+    const nodes = lexicalContent.root.children
     let currentSection: any = null
     let foundForm = false
 
-    for (let i = 0; i < contentDocument.length; i++) {
-      const node = contentDocument[i]
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i]
 
-      // Found the form block
-      if (node.type === "component-block" && node.component === "formBlock") {
+      // Found the form block (support both 'formBlock' type and block with blockType='form-block')
+      // Only use the FIRST formBlock as the separator
+      if (!foundForm && (node.type === 'formBlock' || (node.type === 'block' && node.fields?.blockType === 'form-block'))) {
         if (currentSection) {
           preFormSections.push(currentSection)
           currentSection = null
@@ -103,68 +133,114 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
         continue
       }
 
-      // Before form: collect blockquote sections
+      // Before form: collect sections based on quote nodes with text or code
       if (!foundForm) {
-        if (
-          node.type === "blockquote" &&
-          node.children[0]?.type === "code" &&
-          node.children[0].children[0]?.text
-        ) {
-          if (currentSection) {
-            preFormSections.push(currentSection)
-          }
-          const titleText = node.children[0].children[0].text
-          currentSection = {
-            title: titleText,
-            content: [],
-          }
-          continue
-        }
-
-        if (currentSection && node.type !== "divider") {
-          currentSection.content.push(node)
-        }
-      } else {
-        // After form: Parse sections based on divider + blockquote pattern
-        // Check if this is a section divider (divider followed by blockquote with code)
-        if (node.type === "divider" && i + 1 < contentDocument.length) {
-          const nextNode = contentDocument[i + 1]
-          if (
-            nextNode.type === "blockquote" &&
-            nextNode.children[0]?.type === "code" &&
-            nextNode.children[0].children[0]?.text
-          ) {
-            // Save current section if exists
+        if (node.type === 'quote') {
+          // Check if quote contains text (section title marker)
+          const firstChild = node.children?.[0]
+          // Support both text nodes (new Payload format) and code nodes (old format)
+          if (firstChild && (firstChild.type === 'text' || firstChild.type === 'code')) {
+            // Save previous section
             if (currentSection) {
-              postFormSections.push(currentSection)
+              preFormSections.push(currentSection)
             }
-            // Start new section (title is not displayed, only used as identifier)
+            // Extract title text
+            const titleText = firstChild.type === 'text'
+              ? firstChild.text
+              : firstChild.children?.[0]?.text
             currentSection = {
-              id: nextNode.children[0].children[0].text,
-              content: [],
+              title: titleText || 'Section',
+              content: {
+                root: {
+                  type: 'root',
+                  format: '',
+                  indent: 0,
+                  version: 1,
+                  children: [],
+                  direction: null,
+                },
+              },
             }
-            // Skip the next node (blockquote) since we already processed it
-            i++
             continue
           }
         }
 
         // Add content to current section
-        if (currentSection && node.type !== "divider") {
-          currentSection.content.push(node)
+        if (currentSection && node.type !== 'horizontalrule') {
+          currentSection.content.root.children.push(node)
+        }
+      } else {
+        // After form: Parse sections based on horizontalrule + quote pattern
+        if (node.type === 'horizontalrule' && i + 1 < nodes.length) {
+          const nextNode = nodes[i + 1]
+          if (nextNode.type === 'quote') {
+            const firstChild = nextNode.children?.[0]
+            // Support both text nodes (new Payload format) and code nodes (old format)
+            if (firstChild && (firstChild.type === 'text' || firstChild.type === 'code')) {
+              // Save current section if exists
+              if (currentSection) {
+                postFormSections.push(currentSection)
+              }
+              // Extract section ID
+              const sectionId = firstChild.type === 'text'
+                ? firstChild.text
+                : firstChild.children?.[0]?.text
+              console.log('[ProductDetailClient] Creating postFormSection:', sectionId)
+              currentSection = {
+                id: sectionId || 'Section',
+                content: {
+                  root: {
+                    type: 'root',
+                    format: '',
+                    indent: 0,
+                    version: 1,
+                    children: [],
+                    direction: null,
+                  },
+                },
+              }
+              // Skip the next node (quote) since we already processed it
+              i++
+              continue
+            }
+          }
+        }
+
+        // Add content to current section
+        if (currentSection && node.type !== 'horizontalrule') {
+          currentSection.content.root.children.push(node)
         }
       }
     }
 
-    if (currentSection && !foundForm) {
-      preFormSections.push(currentSection)
-    }
-
-    // Don't forget to add the last post-form section
-    if (currentSection && foundForm) {
-      postFormSections.push(currentSection)
+    // Don't forget to add the last section
+    if (currentSection) {
+      if (!foundForm) {
+        preFormSections.push(currentSection)
+      } else {
+        postFormSections.push(currentSection)
+      }
     }
   }
+
+  console.log('[ProductDetailClient] Parsed sections:', {
+    preFormSections: preFormSections.length,
+    preFormTitles: preFormSections.map(s => s.title),
+    formBlock: !!formBlock,
+    formBlockData: formBlock?.data,
+    formConfig: !!formConfig,
+    formConfigFields: formConfig?.fields?.length,
+    postFormSections: postFormSections.length,
+    postFormIds: postFormSections.map(s => s.id),
+  })
+
+  console.log('[ProductDetailClient] FORM RENDERING CHECK:', {
+    hasFormBlock: !!formBlock,
+    hasFormConfig: !!formConfig,
+    willRenderForm: !!(formBlock && formConfig),
+    formBlockFull: formBlock,
+    formConfigFull: formConfig,
+  })
 
   return (
     <div className="min-h-screen bg-brand-main pt-20" data-header-theme="light">
@@ -264,11 +340,11 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
             })()}
 
             {/* Simplified Inquiry Form (Required fields only) */}
-            {formBlock && formBlock.props?.formConfig?.value && (
+            {formBlock && formConfig && (
               <div className="border-t-2 border-brand-accent-border pt-6">
                 <h3 className="font-anaheim font-extrabold text-lg md:text-xl text-brand-text-black mb-4">Product Inquiry</h3>
                 <SimplifiedInquiryForm
-                  formConfig={formBlock.props.formConfig.value}
+                  formConfig={formConfig}
                   locale={locale}
                   productSeries={product.series?.slug}
                   onOpenFullForm={(data) => {
@@ -401,7 +477,12 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
           <div className="space-y-8 mb-12">
             {postFormSections.map((section: any, sectionIndex: number) => (
               <div key={sectionIndex} className="space-y-6">
-                {renderSection(section)}
+                {section.id && (
+                  <h2 className="font-anaheim font-extrabold text-2xl md:text-3xl text-brand-text-black mb-4">
+                    {section.id}
+                  </h2>
+                )}
+                <LexicalRenderer content={section.content} />
               </div>
             ))}
           </div>
@@ -426,11 +507,12 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
         )}
       </div>
 
-      {formBlock && formBlock.props?.formConfig?.value && (
+      {/* Full Inquiry Modal */}
+      {formBlock && formConfig && (
         <FullInquiryModal
           isOpen={isFullFormOpen}
           onClose={() => setIsFullFormOpen(false)}
-          formConfig={formBlock.props.formConfig.value}
+          formConfig={formConfig}
           locale={locale}
           productSeries={product.series?.slug}
           initialData={initialFormData}
@@ -463,20 +545,7 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
             {/* Modal Content */}
             <div className="px-6 py-6">
               <div className="text-brand-text-main prose prose-sm md:prose-base max-w-none space-y-3">
-                {selectedSection.content.map((node: any, nodeIdx: number) => {
-                  if (node.type === "paragraph") {
-                    return (
-                      <p key={nodeIdx} className="text-sm md:text-base leading-relaxed">
-                        {node.children.map((child: any, childIdx: number) => {
-                          if (child.bold) return <strong key={childIdx} className="text-brand-text-black font-semibold">{child.text}</strong>
-                          if (child.italic) return <em key={childIdx}>{child.text}</em>
-                          return <span key={childIdx}>{child.text}</span>
-                        })}
-                      </p>
-                    )
-                  }
-                  return null
-                })}
+                <LexicalRenderer content={selectedSection.content} />
               </div>
             </div>
           </div>

@@ -4,7 +4,13 @@
 
 @layer base {
   :root {
-    /* 品牌颜色映射 (来自你的Figma规范) 
+    /* ========== 响应式缩放单位 (基于设计稿 1920x1080) ========== */
+    /* --rpx: 普通内容按宽度缩放 */
+    --rpx: calc(100vw / 1920);
+    /* --rpx-hero: Hero区域用min(宽度,高度)，保证不超出屏幕 */
+    --rpx-hero: min(calc(100vw / 1920), calc(100vh / 1080));
+
+    /* 品牌颜色映射 (来自你的Figma规范)
     */
 
     /* 主背景: #F6F4ED (主选色) */
@@ -150,8 +156,8 @@ html, body {
 }
 
 .text-stroke-custom-white {
-  -webkit-text-stroke: 0.04em#6B4E00;
-  text-stroke: 0.04em#6B4E00;
+  -webkit-text-stroke: 0.06em#6B4E00;
+  text-stroke: 0.06em#6B4E00;
 }
 
 .text-stroke-custom-gold {
@@ -171,4 +177,115 @@ html, body {
 .animate-shimmer {
   animation: shimmer 2s infinite linear;
   background-size: 1000px 100%;
+}
+
+/* 按钮圆球左右跳动动画 */
+@keyframes ball-bounce {
+  0%, 100% {
+    left: 4px;
+    transform: translateY(-50%);
+  }
+  50% {
+    left: calc(100% - 4px);
+    transform: translateX(-100%) translateY(-50%);
+  }
+}
+
+.ball-animated {
+  animation: ball-bounce 2.5s ease-in-out infinite;
+}
+
+.ball-static {
+  animation: none;
+  left: 4px;
+  transform: translateY(-50%);
+}
+
+/* 数字弹跳动画 */
+@keyframes bounce-number {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-8%) scale(1.05);
+  }
+  50% {
+    transform: translateY(0) scale(1);
+  }
+  75% {
+    transform: translateY(-4%) scale(1.02);
+  }
+}
+
+.animate-bounce-number {
+  animation: bounce-number 2s ease-in-out infinite;
+}
+
+/* Globe.gl 标签样式 - 深空科技风 */
+.globe-label {
+  background: rgba(0, 20, 40, 0.85);
+  color: #00FFFF;
+  padding: 6px 12px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 255, 255, 0.4);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2), inset 0 0 10px rgba(0, 255, 255, 0.05);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* 点击固定显示的标签 */
+.globe-label-fixed {
+  pointer-events: auto;
+  cursor: pointer;
+  animation: label-pulse 2s ease-in-out infinite;
+  border-color: rgba(0, 255, 255, 0.8);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(0, 255, 255, 0.1);
+}
+
+.globe-label-fixed:hover {
+  background: rgba(0, 40, 60, 0.9);
+}
+
+@keyframes label-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 255, 255, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.5), inset 0 0 15px rgba(0, 255, 255, 0.1);
+  }
+}
+
+/* 走马灯动画 - 使用 CSS 动画更省电 */
+@keyframes carousel-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* 桌面端走马灯 */
+.animate-carousel-desktop {
+  animation: carousel-scroll 25s linear infinite;
+}
+
+/* 移动端走马灯 */
+.animate-carousel-mobile {
+  animation: carousel-scroll 20s linear infinite;
+}
+
+/* 移动端产品走马灯 */
+.animate-carousel-products {
+  animation: carousel-scroll 30s linear infinite;
+}
+
+/* 当元素不在视口内时暂停动画 (配合 IntersectionObserver 使用) */
+.carousel-paused {
+  animation-play-state: paused;
 }

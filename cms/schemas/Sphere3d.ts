@@ -124,9 +124,9 @@ export const Sphere3d = list({
     listView: {
       initialColumns: ['status', 'publishedAt', 'updatedAt'],
     },
-    label: '3D Sphere',
-    singular: '3D Sphere',
-    plural: '3D Spheres',
+    label: '3D Sphere | 3D球体',
+    singular: '3D Sphere | 3D球体',
+    plural: '3D Sphere | 3D球体',
     description: '3D球体配置 - Singleton。暂留字段,后续使用。',
     hideCreate: async ({ context }) => {
       const count = await context.query.Sphere3d.count()

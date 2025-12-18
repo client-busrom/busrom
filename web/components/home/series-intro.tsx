@@ -23,6 +23,25 @@ export default function SeriesIntro({ data }: Props) {
   const [activeSeriesIndex, setActiveSeriesIndex] = useState(0);
   // 当前系列的图片轮播索引
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  // 视口检测
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // 视口检测 - 不在视口时暂停轮播省电
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
 
   const seriesIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const imageIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -85,25 +104,25 @@ export default function SeriesIntro({ data }: Props) {
     }
   }, [totalImages, activeImageIndex]);
 
-  // --- 系列自动轮播 ---
+  // --- 系列自动轮播 (仅在视口内运行) ---
   useEffect(() => {
-    if (isDragging) return;
+    if (isDragging || !isVisible) return;
 
     seriesIntervalRef.current = setInterval(handleSeriesNext, SERIES_AUTO_SCROLL_INTERVAL);
     return () => {
       if (seriesIntervalRef.current) clearInterval(seriesIntervalRef.current);
     };
-  }, [handleSeriesNext, isDragging]);
+  }, [handleSeriesNext, isDragging, isVisible]);
 
-  // --- 图片自动轮播 ---
+  // --- 图片自动轮播 (仅在视口内运行) ---
   useEffect(() => {
-    if (totalImages <= 1 || isDragging) return;
+    if (totalImages <= 1 || isDragging || !isVisible) return;
 
     imageIntervalRef.current = setInterval(handleImageNext, IMAGE_AUTO_SCROLL_INTERVAL);
     return () => {
       if (imageIntervalRef.current) clearInterval(imageIntervalRef.current);
     };
-  }, [handleImageNext, totalImages, isDragging]);
+  }, [handleImageNext, totalImages, isDragging, isVisible]);
 
   // --- 拖拽/滑动处理 ---
   const handleDragStart = (clientX: number) => {
@@ -206,7 +225,7 @@ export default function SeriesIntro({ data }: Props) {
   }
 
   return (
-    <section className="py-6 lg:py-8 bg-brand-main" data-header-theme="transparent">
+    <section ref={sectionRef} className="py-6 lg:py-8 bg-brand-main" data-header-theme="transparent">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="bg-brand-secondary rounded-2xl lg:rounded-3xl p-6 lg:p-10 overflow-hidden">
 

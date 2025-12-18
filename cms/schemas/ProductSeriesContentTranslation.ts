@@ -133,7 +133,9 @@ export const ProductSeriesContentTranslation = list({
       initialSort: { field: 'locale', direction: 'ASC' },
     },
     labelField: 'locale',
-
+    label: 'Product Series Translations | 产品系列翻译',
+    singular: 'Product Series Translation | 产品系列翻译',
+    plural: 'Product Series Translations | 产品系列翻译',
     // Hidden from main menu (only accessible through ProductSeries)
     isHidden: true,
   },
