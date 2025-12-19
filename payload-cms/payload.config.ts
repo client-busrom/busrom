@@ -384,13 +384,59 @@ export default buildConfig({
               const endpoint = process.env.S3_ENDPOINT || 'http://localhost:9000'
               return `${endpoint}/${s3Config.bucket}/media/${filename}`
             }
+
+            // Production: Parse filename to determine S3 path
+            // Filename format: {series}_{type}_{...}.jpg
+            // S3 path: {series}/{type}/{filename}
+            const seriesMapping: Record<string, string> = {
+              'glass-standoff': 'glass-standoff',
+              'glass-connected-fitting': 'glass-connected-fitting',
+              'glass-fence-spigot': 'glass-fence-spigot',
+              'guardrail-glass-clip': 'guardrail-glass-clip',
+              'bathroom-glass-clip': 'bathroom-glass-clip',
+              'glass-hinge': 'glass-hinge',
+              'sliding-door-kit': 'sliding-door-kit',
+              'bathroom-door-handle': 'bathroom-door-handle',
+              'hidden-hook': 'hidden-hook',
+              'common': 'common',
+            }
+
+            const typeMapping: Record<string, string> = {
+              'white': 'white',
+              'scene': 'scene',
+              'real': 'real',
+              'size': 'size',
+              'general': 'general',
+              'combo': 'combo',
+              'multi-style': 'multi-style',
+              'showcase': 'showcase',
+              'effect': 'effect',
+              'product': 'product',
+              'craft': 'craft',
+              'packaging': 'packaging',
+              'color': 'color',
+            }
+
+            // Parse filename to extract series and type
+            const parts = filename.replace(/\.[^.]+$/, '').split('_')
+            let s3Path = `media/${filename}` // Default fallback
+
+            if (parts.length >= 2) {
+              const series = parts[0]
+              const type = parts[1]
+
+              if (seriesMapping[series] && typeMapping[type]) {
+                s3Path = `${series}/${type}/${filename}`
+              }
+            }
+
             // CDN (production)
             const cdnDomain = process.env.CDN_DOMAIN
             if (cdnDomain && cdnDomain !== 'NONE') {
-              return `https://${cdnDomain}/media/${filename}`
+              return `https://${cdnDomain}/${s3Path}`
             }
             // Fallback to S3 URL
-            return `https://${s3Config.bucket}.s3.${process.env.S3_REGION}.amazonaws.com/media/${filename}`
+            return `https://${s3Config.bucket}.s3.${process.env.S3_REGION}.amazonaws.com/${s3Path}`
           },
         },
       },
