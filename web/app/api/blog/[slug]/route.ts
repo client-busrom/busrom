@@ -1,40 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { keystoneClient } from '@/lib/keystone-client'
-import { gql } from '@apollo/client'
+import { convertToCDNUrl } from '@/lib/cdn-url'
 
-// GraphQL query to get blog by slug
-const GET_BLOG = gql`
-  query GetBlog($slug: String!) {
-    blogs(where: { slug: { equals: $slug }, status: { equals: "PUBLISHED" } }) {
-      id
-      slug
-      title
-      excerpt
-      author
-      status
-      publishedAt
-      createdAt
-      updatedAt
-      coverImage
-      categories {
-        id
-        name
-      }
-      contentTranslations {
-        id
-        locale
-        content {
-          document
-        }
-      }
-    }
-  }
-`
+// Use runtime environment variable for server-side API calls
+const CMS_URL = process.env.CMS_GRAPHQL_URL
+  ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
+  : (process.env.CMS_URL || 'http://localhost:3002')
 
 /**
  * GET /api/blog/[slug]
  *
- * Fetch blog post by slug
+ * Fetch blog post by slug from Payload CMS
  *
  * Query parameters:
  * - locale: string (default: 'en')
@@ -48,21 +23,22 @@ export async function GET(
     const locale = searchParams.get('locale') || 'en'
     const { slug } = await params
 
-    // Execute GraphQL query
-    const { data, error } = await keystoneClient.query({
-      query: GET_BLOG,
-      variables: { slug },
-    })
+    // Fetch from Payload CMS REST API
+    const response = await fetch(
+      `${CMS_URL}/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&locale=${locale}&depth=2`,
+      { next: { revalidate: 60 } }
+    )
 
-    if (error) {
-      console.error('GraphQL Error:', error)
+    if (!response.ok) {
+      console.error('Payload API Error:', response.status, response.statusText)
       return NextResponse.json(
         { error: 'Failed to fetch blog' },
         { status: 500 }
       )
     }
 
-    const blogs = data?.blogs || []
+    const data = await response.json()
+    const blogs = data?.docs || []
 
     if (blogs.length === 0) {
       return NextResponse.json({ error: 'Blog not found' }, { status: 404 })
@@ -70,54 +46,31 @@ export async function GET(
 
     const blog = blogs[0]
 
-    // Extract localized text from JSON field
-    const extractLocalizedText = (jsonField: any): string => {
-      if (!jsonField) return ''
-      if (typeof jsonField === 'string') {
-        try {
-          jsonField = JSON.parse(jsonField)
-        } catch {
-          return jsonField
-        }
-      }
-      return jsonField[locale] || jsonField['en'] || ''
-    }
-
-    // Extract cover image URL
-    const extractCoverImage = (coverImage: any): string => {
+    // Get cover image URL
+    const getCoverImageUrl = (coverImage: any): string => {
       if (!coverImage) return ''
-      if (typeof coverImage === 'string') {
-        try {
-          coverImage = JSON.parse(coverImage)
-        } catch {
-          return coverImage
-        }
-      }
-      return coverImage.url || coverImage.src || ''
+      if (typeof coverImage === 'string') return coverImage
+      const url = coverImage.url || coverImage.sizes?.large?.url || ''
+      return url ? convertToCDNUrl(url) : ''
     }
-
-    // Find content translation for the requested locale
-    const translation = blog.contentTranslations?.find(
-      (t: any) => t.locale === locale
-    ) || blog.contentTranslations?.find((t: any) => t.locale === 'en')
 
     // Transform blog data
     const transformedBlog = {
       id: blog.id,
       slug: blog.slug,
-      title: extractLocalizedText(blog.title),
-      excerpt: extractLocalizedText(blog.excerpt),
-      author: blog.author,
+      title: blog.title || '',
+      excerpt: blog.excerpt || '',
+      author: blog.author || 'Busrom Team',
       status: blog.status,
       publishedAt: blog.publishedAt,
       createdAt: blog.createdAt,
       updatedAt: blog.updatedAt,
-      coverImage: extractCoverImage(blog.coverImage),
-      categories: blog.categories?.map((cat: any) => ({
+      coverImage: getCoverImageUrl(blog.coverImage),
+      categories: (blog.categories || []).map((cat: any) => ({
         id: cat.id,
-        name: extractLocalizedText(cat.name),
-      })) || [],
-      content: translation?.content || null,
+        name: cat.name || '',
+      })),
+      content: blog.contentTranslation || null,
       locale,
     }
 
