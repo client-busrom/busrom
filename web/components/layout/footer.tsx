@@ -86,28 +86,21 @@ export default function Footer({ locale, showForm = true }: Props) {
                 />
               </div>
 
-              {/* 联系信息 */}
+              {/* 联系信息 - Figma: 32px at 1920px, scaled down for better readability */}
               <ul
-                className="space-y-2 mb-6 md:mb-8 font-anaheim font-medium text-brand-text-inverse"
-                style={{ fontSize: rpx(32), lineHeight: rpx(61) }} // Figma: 32px
+                className="space-y-1 md:space-y-2 mb-6 md:mb-8 font-anaheim font-medium text-brand-text-inverse text-sm md:text-base lg:text-lg"
               >
                 <li>Email: {content.contact.email}</li>
                 <li>After-sales: {content.contact.afterSales}</li>
                 <li>WhatsApp: {content.contact.whatsapp}</li>
               </ul>
 
-              {/* 官方声明 */}
+              {/* 官方声明 - Figma: title 28px, content 20px at 1920px */}
               <div className="w-full lg:w-[80%] bg-brand-footer-emphasis-bg text-brand-footer-emphasis-text font-anaheim font-semibold p-3 md:p-4 rounded-lg">
-                <h4
-                  className="font-bold mb-2"
-                  style={{ fontSize: rpx(28), lineHeight: rpx(49) }} // Figma: 28px
-                >
+                <h4 className="font-bold mb-2 text-base md:text-lg lg:text-xl">
                   {content.notice.title}
                 </h4>
-                <div
-                  className="space-y-1 md:space-y-2"
-                  style={{ fontSize: rpx(20), lineHeight: rpx(26) }} // Figma: 20px
-                >
+                <div className="space-y-1 md:space-y-2 text-xs md:text-sm lg:text-base leading-relaxed">
                   {content.notice.lines.map((line, index) => (
                     <p key={index}>{line}</p>
                   ))}
@@ -123,26 +116,19 @@ export default function Footer({ locale, showForm = true }: Props) {
 
             {/* 右侧：占 40% - 表单 */}
             <div className="w-full lg:w-2/5 lg:px-4">
-              <h3
-                className="font-bold font-anaheim text-white"
-                style={{
-                  fontSize: rpx(80), // Figma: 80px
-                  lineHeight: rpx(49), // Figma: 49px
-                  marginBottom: rpx(32),
-                }}
-              >
+              {/* Figma: 80px at 1920px, scaled down proportionally */}
+              <h3 className="font-bold font-anaheim text-white text-3xl md:text-4xl lg:text-5xl mb-6 md:mb-8">
                 {content.form.title}
               </h3>
 
               <form className="space-y-3 md:space-y-4">
-                {/* Name */}
+                {/* Name - Figma: 32px at 1920px */}
                 <div>
                   <Input
                     type="text"
                     id="footer-name"
                     placeholder={content.form.placeholders.name}
-                    className={formInputClasses}
-                    style={{ fontSize: rpx(32), lineHeight: rpx(46) }} // Figma: 32px
+                    className={cn(formInputClasses, "text-sm md:text-base lg:text-lg")}
                   />
                 </div>
 
@@ -152,8 +138,7 @@ export default function Footer({ locale, showForm = true }: Props) {
                     type="email"
                     id="footer-email"
                     placeholder={content.form.placeholders.email}
-                    className={formInputClasses}
-                    style={{ fontSize: rpx(32), lineHeight: rpx(46) }} // Figma: 32px
+                    className={cn(formInputClasses, "text-sm md:text-base lg:text-lg")}
                   />
                 </div>
 
@@ -162,17 +147,15 @@ export default function Footer({ locale, showForm = true }: Props) {
                   <Textarea
                     id="footer-message"
                     placeholder={content.form.placeholders.message}
-                    className={cn(formInputClasses, "min-h-[40px]")}
-                    style={{ fontSize: rpx(32), lineHeight: rpx(46) }} // Figma: 32px
+                    className={cn(formInputClasses, "min-h-[40px] text-sm md:text-base lg:text-lg")}
                   />
                 </div>
 
-                {/* Submit Button */}
+                {/* Submit Button - Figma: 32px at 1920px */}
                 <div className="mt-6 md:mt-8 lg:mt-16">
                   <Button
                     type="submit"
-                    className={cn(formButtonClasses, "w-full sm:w-1/2 lg:w-1/3")}
-                    style={{ fontSize: rpx(32), lineHeight: rpx(46) }} // Figma: 32px
+                    className={cn(formButtonClasses, "w-full sm:w-1/2 lg:w-1/3 text-sm md:text-base lg:text-lg")}
                   >
                     {content.form.buttonText}
                   </Button>
