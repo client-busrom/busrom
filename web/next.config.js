@@ -84,11 +84,10 @@ const nextConfig = {
 
   /**
    * Experimental Features
+   *
+   * Note: optimizeFonts was removed from experimental in Next.js 15
+   * Font optimization is now enabled by default
    */
-  experimental: {
-    // Enable optimizeFonts for better font loading
-    optimizeFonts: true,
-  },
 
   /**
    * Security Headers

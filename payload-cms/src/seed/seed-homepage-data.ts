@@ -644,30 +644,55 @@ const footerData = {
 }
 
 /**
+ * Helper function to check if a value is a localized object {en, zh}
+ */
+function isLocalizedValue(value: any): boolean {
+  return value && typeof value === 'object' && 'en' in value && !Array.isArray(value)
+}
+
+/**
+ * Helper function to extract locale data from nested structure
+ * Recursively processes objects to extract locale-specific values
+ */
+function extractLocaleData(data: any, locale: string): any {
+  if (data === null || data === undefined) {
+    return data
+  }
+
+  // If it's a localized value {en: '...', zh: '...'}, extract the locale
+  if (isLocalizedValue(data)) {
+    return data[locale] ?? data.en ?? ''
+  }
+
+  // If it's an array, process each item
+  if (Array.isArray(data)) {
+    return data.map(item => extractLocaleData(item, locale))
+  }
+
+  // If it's an object (group), recursively process each field
+  if (typeof data === 'object') {
+    const result: Record<string, any> = {}
+    for (const [key, value] of Object.entries(data)) {
+      result[key] = extractLocaleData(value, locale)
+    }
+    return result
+  }
+
+  // For primitive values, return as-is
+  return data
+}
+
+/**
  * Helper function to create localized document
+ * Supports both top-level and nested localized fields (e.g., ctaButton.text)
  */
 async function createLocalizedDocument(
   payload: Payload,
   collection: string,
   data: any,
 ): Promise<string> {
-  // Extract localized fields (those with {en, zh} structure)
-  const localizedFields: Record<string, any> = {}
-  const nonLocalizedFields: Record<string, any> = {}
-
-  for (const [key, value] of Object.entries(data)) {
-    if (value && typeof value === 'object' && 'en' in value && 'zh' in value) {
-      localizedFields[key] = value
-    } else {
-      nonLocalizedFields[key] = value
-    }
-  }
-
-  // Create document with English (default locale)
-  const enData = { ...nonLocalizedFields }
-  for (const [key, value] of Object.entries(localizedFields)) {
-    enData[key] = (value as any).en
-  }
+  // Extract data for English locale (recursively handles nested groups)
+  const enData = extractLocaleData(data, 'en')
 
   const doc = await payload.create({
     collection,
@@ -675,13 +700,11 @@ async function createLocalizedDocument(
     locale: 'en',
   })
 
-  // Update with Chinese translations
-  const zhData: Record<string, any> = {}
-  for (const [key, value] of Object.entries(localizedFields)) {
-    zhData[key] = (value as any).zh
-  }
+  // Extract data for Chinese locale
+  const zhData = extractLocaleData(data, 'zh')
 
-  if (Object.keys(zhData).length > 0) {
+  // Only update zh if there's actual zh content
+  if (zhData && Object.keys(zhData).length > 0) {
     await payload.update({
       collection,
       id: doc.id,
@@ -695,29 +718,15 @@ async function createLocalizedDocument(
 
 /**
  * Helper function to update localized global
+ * Supports both top-level and nested localized fields (e.g., brandNameAnalysis.titlePart1)
  */
 async function updateLocalizedGlobal(
   payload: Payload,
   slug: string,
   data: any,
 ): Promise<void> {
-  // Extract localized fields (those with {en, zh} structure)
-  const localizedFields: Record<string, any> = {}
-  const nonLocalizedFields: Record<string, any> = {}
-
-  for (const [key, value] of Object.entries(data)) {
-    if (value && typeof value === 'object' && 'en' in value && 'zh' in value) {
-      localizedFields[key] = value
-    } else {
-      nonLocalizedFields[key] = value
-    }
-  }
-
-  // Update global with English (default locale)
-  const enData = { ...nonLocalizedFields }
-  for (const [key, value] of Object.entries(localizedFields)) {
-    enData[key] = (value as any).en
-  }
+  // Extract data for English locale (recursively handles nested groups)
+  const enData = extractLocaleData(data, 'en')
 
   await payload.updateGlobal({
     slug,
@@ -725,13 +734,11 @@ async function updateLocalizedGlobal(
     locale: 'en',
   })
 
-  // Update with Chinese translations
-  const zhData: Record<string, any> = {}
-  for (const [key, value] of Object.entries(localizedFields)) {
-    zhData[key] = (value as any).zh
-  }
+  // Extract data for Chinese locale
+  const zhData = extractLocaleData(data, 'zh')
 
-  if (Object.keys(zhData).length > 0) {
+  // Only update zh if there's actual zh content
+  if (zhData && Object.keys(zhData).length > 0) {
     await payload.updateGlobal({
       slug,
       data: zhData,

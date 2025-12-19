@@ -6,6 +6,7 @@ import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader.js";
 import gsap from "gsap";
+import type { PreloaderConfigData } from "@/lib/api/preloader-config";
 
 // GLSL 着色器代码 (用于文字)
 const vertexShader = `
@@ -20,7 +21,7 @@ const fragmentShader = `
   uniform float uProgressShine;
   uniform vec3 uBaseColor;
   uniform vec3 uHighlightColor;
-  uniform float uOpacity; 
+  uniform float uOpacity;
 
   varying vec2 vUv;
 
@@ -28,7 +29,7 @@ const fragmentShader = `
     float alpha = step(vUv.x, uProgressReveal);
     if (alpha < 0.5) discard;
     float shineWidth = 0.2;
-    float shinePosition = uProgressShine * (1.0 + shineWidth) - shineWidth; 
+    float shinePosition = uProgressShine * (1.0 + shineWidth) - shineWidth;
     float gradientFactor = smoothstep(shinePosition - shineWidth, shinePosition, vUv.x) - smoothstep(shinePosition, shinePosition + shineWidth, vUv.x);
     vec3 finalColor = mix(uBaseColor, uHighlightColor, gradientFactor);
     gl_FragColor = vec4(finalColor, uOpacity);
@@ -38,9 +39,10 @@ const fragmentShader = `
 
 interface PreloaderProps {
   onLoadingComplete: () => void;
+  config: PreloaderConfigData;
 }
 
-export function Preloader({ onLoadingComplete }: PreloaderProps) {
+export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -55,13 +57,13 @@ export function Preloader({ onLoadingComplete }: PreloaderProps) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     mountNode.appendChild(renderer.domElement);
 
-    // --- 独立材质 ---
+    // --- 独立材质 (使用 CMS 配置的颜色) ---
     const loadingMaterial = new THREE.ShaderMaterial({
       uniforms: {
         uProgressReveal: { value: 0 },
         uProgressShine: { value: 0 },
-        uBaseColor: { value: new THREE.Color("#EBE6D8") },
-        uHighlightColor: { value: new THREE.Color("#000000") },
+        uBaseColor: { value: new THREE.Color(config.textColor) },
+        uHighlightColor: { value: new THREE.Color(config.highlightColor) },
         uOpacity: { value: 1.0 },
       },
       vertexShader,
@@ -80,7 +82,11 @@ export function Preloader({ onLoadingComplete }: PreloaderProps) {
     let percentageText: THREE.Mesh | null = null;
     let logoMesh: THREE.Group | null = null;
 
-    svgLoader.load('/Busrom1.svg', (data) => {
+    // Load logo SVG
+    // Note: Three.js SVGLoader has issues with cross-origin SVGs, so we always use local file
+    // The CMS logo field is reserved for future use (e.g., displaying in a regular <img> tag)
+    const logoUrl = '/Busrom1.svg';
+    svgLoader.load(logoUrl, (data) => {
       const paths = data.paths;
       const group = new THREE.Group();
 
@@ -120,18 +126,19 @@ export function Preloader({ onLoadingComplete }: PreloaderProps) {
       scene.add(loadingText);
       loadingMaterial.uniforms.uProgressReveal.value = 1;
 
-      for (let i = 1; i <= 7; i++) {
-        textureLoader.load(`/${i}.jpg`);
-      }
+      // Preload images from CMS config
+      config.images.forEach((img) => {
+        textureLoader.load(img.src);
+      });
     });
 
-    // --- 动画逻辑 (保持不变) ---
+    // --- 动画逻辑 (使用 CMS 配置的时长) ---
     const masterTimeline = gsap.timeline({ paused: true });
 
     const fakeProgress = { value: 0 };
     masterTimeline.to(fakeProgress, {
       value: 100,
-      duration: 2.5,
+      duration: config.loadingDuration,
       ease: "power1.out",
       onUpdate: () => {
         if (!font) return;
@@ -160,15 +167,15 @@ export function Preloader({ onLoadingComplete }: PreloaderProps) {
     masterTimeline.call(() => {
       if (!logoMesh) return;
       scene.add(logoMesh);
-      gsap.from(logoMesh.scale, { x: 0, y: 0, z: 0, duration: 2, ease: "power2.out" });
+      gsap.from(logoMesh.scale, { x: 0, y: 0, z: 0, duration: config.logoAnimationDuration, ease: "power2.out" });
       gsap.from(logoMesh.rotation, {
         y: -Math.PI,
-        duration: 1.5,
+        duration: config.logoAnimationDuration * 0.75,
         ease: "power1.inOut",
       });
     });
 
-    masterTimeline.to({}, { duration: 2, onComplete: onLoadingComplete });
+    masterTimeline.to({}, { duration: config.logoAnimationDuration, onComplete: onLoadingComplete });
 
     loadingManager.onLoad = () => {
       masterTimeline.play();
@@ -226,7 +233,7 @@ export function Preloader({ onLoadingComplete }: PreloaderProps) {
       renderer.dispose();
       gsap.killTweensOf("*");
     };
-  }, [onLoadingComplete]);
+  }, [onLoadingComplete, config]);
 
-  return <div ref={mountRef} className="fixed inset-0 z-50" style={{ backgroundColor: "#EBE6D8" }}></div>;
+  return <div ref={mountRef} className="fixed inset-0 z-50" style={{ backgroundColor: config.backgroundColor }}></div>;
 }

@@ -3,8 +3,9 @@
  *
  * Features:
  * - SMTP server configuration
- * - Form notification settings
- * - Auto-reply templates
+ * - Form notification settings (global defaults)
+ * - Auto-reply templates with rich text support
+ * - Multi-language support with Translation Center
  */
 
 import type { GlobalConfig } from 'payload'
@@ -28,6 +29,20 @@ export const EmailConfig: GlobalConfig = {
   },
   fields: [
     // ==================================================================
+    // Translation Center (Sidebar)
+    // ==================================================================
+    {
+      name: 'translationCenter',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/components/fields/GlobalTranslationCenter',
+        },
+      },
+    },
+
+    // ==================================================================
     // SMTP Configuration
     // ==================================================================
     {
@@ -50,11 +65,12 @@ export const EmailConfig: GlobalConfig = {
         },
         {
           name: 'smtpPort',
-          type: 'text',
+          type: 'number',
           label: {
             en: 'SMTP Port',
             zh: 'SMTP 端口',
           },
+          defaultValue: 587,
           admin: {
             description: 'Usually 587 (TLS) or 465 (SSL)',
           },
@@ -75,7 +91,16 @@ export const EmailConfig: GlobalConfig = {
             zh: 'SMTP 密码',
           },
           admin: {
-            // Note: In production, use Payload's encrypted fields or env vars
+            description: 'For Gmail, use App Password (not your regular password)',
+          },
+        },
+        {
+          name: 'testSmtp',
+          type: 'ui',
+          admin: {
+            components: {
+              Field: '@/components/fields/SmtpTestButton',
+            },
           },
         },
       ],
@@ -109,25 +134,41 @@ export const EmailConfig: GlobalConfig = {
           },
           localized: true,
           defaultValue: 'Busrom Team',
-          admin: {
-            components: {
-              Field: '@/components/fields/MultiLocaleField#MultiLocaleTextField',
-            },
-          },
         },
       ],
     },
 
     // ==================================================================
-    // Form Notification Configuration
+    // Form Notification Configuration (Global Defaults)
     // ==================================================================
     {
       type: 'collapsible',
       label: {
-        en: 'Form Notification',
-        zh: '表单通知配置',
+        en: 'Form Notification (Global Defaults)',
+        zh: '表单通知配置（全局默认）',
+      },
+      admin: {
+        description: {
+          en: 'These settings apply to all forms unless overridden in individual form config',
+          zh: '这些设置适用于所有表单，除非在单独的表单配置中覆盖',
+        },
       },
       fields: [
+        {
+          name: 'formNotificationEnabled',
+          type: 'checkbox',
+          label: {
+            en: 'Enable Form Notifications',
+            zh: '启用表单通知',
+          },
+          defaultValue: true,
+          admin: {
+            description: {
+              en: 'Send email notifications when forms are submitted',
+              zh: '当表单提交时发送邮件通知',
+            },
+          },
+        },
         {
           name: 'formNotificationEmails',
           type: 'text',
@@ -137,16 +178,56 @@ export const EmailConfig: GlobalConfig = {
           },
           admin: {
             description: 'Comma-separated list of emails to notify on form submissions',
+            condition: (data) => data?.formNotificationEnabled,
           },
         },
+        {
+          name: 'notificationSubject',
+          type: 'text',
+          label: {
+            en: 'Notification Subject',
+            zh: '通知邮件主题',
+          },
+          localized: true,
+          defaultValue: 'New Form Submission: {formName}',
+          admin: {
+            description: 'Use {formName} for form name placeholder',
+            condition: (data) => data?.formNotificationEnabled,
+          },
+        },
+      ],
+    },
+
+    // ==================================================================
+    // Auto Reply Configuration (Global Defaults)
+    // ==================================================================
+    {
+      type: 'collapsible',
+      label: {
+        en: 'Auto Reply (Global Defaults)',
+        zh: '自动回复配置（全局默认）',
+      },
+      admin: {
+        description: {
+          en: 'Auto-reply settings used when individual form config does not specify',
+          zh: '当单独的表单配置未指定时使用的自动回复设置',
+        },
+      },
+      fields: [
         {
           name: 'enableAutoReply',
           type: 'checkbox',
           label: {
-            en: 'Enable Auto Reply',
-            zh: '启用自动回复',
+            en: 'Enable Auto Reply (Global Default)',
+            zh: '启用自动回复（全局默认）',
           },
           defaultValue: false,
+          admin: {
+            description: {
+              en: 'This is the default setting. Individual forms can override this.',
+              zh: '这是默认设置。单独的表单可以覆盖此设置。',
+            },
+          },
         },
         {
           name: 'autoReplySubject',
@@ -159,14 +240,11 @@ export const EmailConfig: GlobalConfig = {
           defaultValue: 'Thank you for contacting Busrom',
           admin: {
             condition: (data) => data.enableAutoReply,
-            components: {
-              Field: '@/components/fields/MultiLocaleField#MultiLocaleTextField',
-            },
           },
         },
         {
           name: 'autoReplyTemplate',
-          type: 'textarea',
+          type: 'richText',
           label: {
             en: 'Auto Reply Template',
             zh: '自动回复模板',
@@ -174,9 +252,12 @@ export const EmailConfig: GlobalConfig = {
           localized: true,
           admin: {
             condition: (data) => data.enableAutoReply,
-            description: 'Use {name} for submitter name',
+            description: {
+              en: 'Use {name} for submitter name, {email} for email, {formName} for form name',
+              zh: '使用 {name} 表示提交者姓名，{email} 表示邮箱，{formName} 表示表单名称',
+            },
             components: {
-              Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
+              beforeInput: ['@/components/fields/MultiLocaleRichTextField'],
             },
           },
         },

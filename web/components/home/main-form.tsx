@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,14 +9,30 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { MainFormData } from "@/lib/content-data";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { Turnstile } from "@/components/ui/turnstile";
+
 // lg 断点 (1024px) - 与 Tailwind 一致
 const LG_BREAKPOINT = 1024;
+
+// Helper: 获取提交次数
+const getSubmissionCount = (): number => {
+  if (typeof window === "undefined") return 0;
+  return parseInt(sessionStorage.getItem("main_form_submissions") || "0", 10);
+};
+
+// Helper: 增加提交次数
+const incrementSubmissionCount = (): void => {
+  if (typeof window === "undefined") return;
+  const current = getSubmissionCount();
+  sessionStorage.setItem("main_form_submissions", String(current + 1));
+};
 
 // ------------------------------------------------------------------
 // 类型定义
 // ------------------------------------------------------------------
 type Props = {
   data: MainFormData;
+  locale?: string;
 };
 
 // ------------------------------------------------------------------
@@ -27,8 +43,14 @@ const formLabelClasses = "block font-anaheim font-bold text-brand-form-input-tex
 const formInputClasses = `
   mt-1 block w-full bg-transparent text-brand-form-input-text
   placeholder:text-muted-foreground
-  border-0 rounded-none border-b border-white
-  focus:outline-none focus:ring-0 focus:border-primary
+  !border-0 !border-b !border-white !rounded-none
+  !outline-none !ring-0 !shadow-none
+  focus:!outline-none focus:!ring-0 focus:!border-b focus:!border-white focus:!shadow-none
+  focus-visible:!outline-none focus-visible:!ring-0 focus-visible:!ring-offset-0
+  autofill:bg-transparent autofill:text-brand-form-input-text
+  [&:-webkit-autofill]:bg-transparent
+  [&:-webkit-autofill]:[-webkit-text-fill-color:inherit]
+  [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]
 `;
 
 const formButtonClasses = `
@@ -39,7 +61,24 @@ const formButtonClasses = `
 // ------------------------------------------------------------------
 // MainForm 组件
 // ------------------------------------------------------------------
-export default function MainForm({ data }: Props) {
+// 表单配置类型
+interface FormConfig {
+  submitButtonText: string;
+  submittingText: string;
+  successMessage: string;
+  errorRequiredFields: string;
+  errorNetworkMessage: string;
+  errorCaptchaMessage: string;
+}
+
+// Turnstile 配置类型
+interface TurnstileConfig {
+  enabled: boolean;
+  siteKey: string;
+  threshold: number;
+}
+
+export default function MainForm({ data, locale = "en" }: Props) {
   const [scrollY, setScrollY] = useState(0);
   const sectionRef = useRef<HTMLDivElement>(null);
   const leftImageRef = useRef<HTMLDivElement>(null);
@@ -47,6 +86,140 @@ export default function MainForm({ data }: Props) {
   const [leftVisible, setLeftVisible] = useState(false);
   const [rightVisible, setRightVisible] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false); // lg 及以上
+
+  // 表单配置 (从 FormConfig API 获取)
+  const [formConfig, setFormConfig] = useState<FormConfig | null>(null);
+  // Turnstile 配置 (从 SiteConfig 获取)
+  const [turnstileConfig, setTurnstileConfig] = useState<TurnstileConfig | null>(null);
+
+  // 表单状态
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    whatsapp: "",
+    company: "",
+    message: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Turnstile 验证码状态
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [submissionCount, setSubmissionCount] = useState(0);
+
+  // 是否需要显示验证码
+  const shouldShowCaptcha = turnstileConfig?.enabled &&
+    turnstileConfig?.siteKey &&
+    submissionCount >= (turnstileConfig.threshold - 1);
+
+  // 获取表单配置和 Turnstile 配置
+  useEffect(() => {
+    const fetchConfigs = async () => {
+      try {
+        // 并行获取表单配置和 Turnstile 配置
+        const [formRes, turnstileRes] = await Promise.all([
+          fetch(`/api/form-config/main-form?locale=${locale}`),
+          fetch('/api/site-config/turnstile'),
+        ]);
+
+        if (formRes.ok) {
+          const config = await formRes.json();
+          setFormConfig(config);
+        }
+
+        if (turnstileRes.ok) {
+          const config = await turnstileRes.json();
+          setTurnstileConfig(config);
+        }
+      } catch (err) {
+        console.error("Error fetching configs:", err);
+      }
+    };
+    fetchConfigs();
+  }, [locale]);
+
+  // 初始化提交次数
+  useEffect(() => {
+    setSubmissionCount(getSubmissionCount());
+  }, []);
+
+
+  // Turnstile 回调
+  const handleTurnstileVerify = useCallback((token: string) => {
+    setTurnstileToken(token);
+    setError(null);
+  }, []);
+
+  const handleTurnstileError = useCallback(() => {
+    setTurnstileToken(null);
+    setError(formConfig?.errorCaptchaMessage || "Captcha verification failed");
+  }, [formConfig?.errorCaptchaMessage]);
+
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileToken(null);
+  }, []);
+
+  // 表单输入处理
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // 表单提交
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+
+    // 验证必填字段
+    if (!formData.name || !formData.email) {
+      setError(formConfig?.errorRequiredFields || "Please fill in name and email");
+      setSubmitting(false);
+      return;
+    }
+
+    // 检查验证码
+    if (shouldShowCaptcha && !turnstileToken) {
+      setError(formConfig?.errorCaptchaMessage || "Please complete the captcha verification");
+      setSubmitting(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/form-submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          formName: "main-form",
+          data: formData,
+          locale,
+          turnstileToken: shouldShowCaptcha ? turnstileToken : undefined,
+        }),
+      });
+
+      if (res.ok) {
+        setSubmitted(true);
+        incrementSubmissionCount();
+        setSubmissionCount((prev) => prev + 1);
+
+        // 5秒后重置表单
+        setTimeout(() => {
+          setSubmitted(false);
+          setFormData({ name: "", email: "", whatsapp: "", company: "", message: "" });
+          setTurnstileToken(null);
+        }, 5000);
+      } else {
+        const errorData = await res.json();
+        setError(errorData.error || formConfig?.errorNetworkMessage || "Submission failed");
+        setTurnstileToken(null);
+      }
+    } catch (err) {
+      setError(formConfig?.errorNetworkMessage || "Network error, please try again");
+      setTurnstileToken(null);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -189,126 +362,151 @@ export default function MainForm({ data }: Props) {
             style={{ width: "clamp(320px, 35vw, 560px)" }}
           >
             <div className={cardContainerClass}>
-            <form
-              className="flex flex-col"
-              style={{ gap: "clamp(12px, 1.2vw, 24px)" }}
-            >
-              {/* Name - y=198 */}
-              <div>
-                <Label
-                  htmlFor="name"
-                  className={formLabelClasses}
-                  style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
+              {/* 提交成功状态 */}
+              {submitted ? (
+                <div className="text-center py-8">
+                  <div className="text-4xl mb-4">✓</div>
+                  <p className="text-brand-form-input-text font-anaheim">
+                    {formConfig?.successMessage || "Submitted successfully! We will contact you soon."}
+                  </p>
+                </div>
+              ) : (
+                <form
+                  onSubmit={handleSubmit}
+                  className="flex flex-col"
+                  style={{ gap: "clamp(12px, 1.2vw, 24px)" }}
                 >
-                  {data.placeholderName}
-                </Label>
-                <Input
-                  type="text"
-                  id="name"
-                  placeholder={""}
-                  className={formInputClasses}
-                  style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
-                />
-              </div>
-              {/* Email - y=301 */}
-              <div>
-                <Label
-                  htmlFor="email"
-                  className={formLabelClasses}
-                  style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
-                >
-                  {data.placeholderEmail}
-                </Label>
-                <Input
-                  type="email"
-                  id="email"
-                  placeholder={""}
-                  className={formInputClasses}
-                  style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
-                />
-              </div>
-              {/* WhatsApp - y=404 */}
-              <div>
-                <Label
-                  htmlFor="whatsapp"
-                  className={formLabelClasses}
-                  style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
-                >
-                  {data.placeholderWhatsapp}
-                </Label>
-                <Input
-                  type="tel"
-                  id="whatsapp"
-                  placeholder={""}
-                  className={formInputClasses}
-                  style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
-                />
-              </div>
-              {/* Company - y=507 */}
-              <div>
-                <Label
-                  htmlFor="company"
-                  className={formLabelClasses}
-                  style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
-                >
-                  {data.placeholderCompany}
-                </Label>
-                <Input
-                  type="text"
-                  id="company"
-                  placeholder={""}
-                  className={formInputClasses}
-                  style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
-                />
-              </div>
-              {/* Message - y=610 */}
-              <div>
-                <Label
-                  htmlFor="message"
-                  className={formLabelClasses}
-                  style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
-                >
-                  {data.placeholderMessage}
-                </Label>
-                <Textarea
-                  id="message"
-                  placeholder={""}
-                  className={cn(formInputClasses, "min-h-[40px]")}
-                  style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
-                />
-              </div>
-              {/* Verify Code - y=713 */}
-              <div>
-                <Label
-                  htmlFor="verify"
-                  className={formLabelClasses}
-                  style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
-                >
-                  {data.placeholderVerify}
-                </Label>
-                <Input
-                  type="text"
-                  id="verify"
-                  placeholder={""}
-                  className={formInputClasses}
-                  style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
-                />
-              </div>
-              {/* Submit Button - y=842, 宽度 331px, 高度 68px */}
-              <div style={{ marginTop: "clamp(20px, 2.1vw, 40px)" }}>
-                <Button
-                  type="submit"
-                  className={formButtonClasses}
-                  style={{
-                    width: "clamp(165px, 17.2vw, 331px)",
-                    height: "clamp(34px, 3.5vw, 68px)",
-                    fontSize: "clamp(16px, 1.67vw, 32px)",
-                  }}
-                >
-                  {data.buttonText}
-                </Button>
-              </div>
-            </form>
+                  {/* Name */}
+                  <div>
+                    <Label
+                      htmlFor="name"
+                      className={formLabelClasses}
+                      style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
+                    >
+                      {data.placeholderName} <span className="text-red-400">*</span>
+                    </Label>
+                    <Input
+                      type="text"
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange("name", e.target.value)}
+                      className={formInputClasses}
+                      style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
+                      required
+                    />
+                  </div>
+                  {/* Email */}
+                  <div>
+                    <Label
+                      htmlFor="email"
+                      className={formLabelClasses}
+                      style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
+                    >
+                      {data.placeholderEmail} <span className="text-red-400">*</span>
+                    </Label>
+                    <Input
+                      type="email"
+                      id="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      className={formInputClasses}
+                      style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
+                      required
+                    />
+                  </div>
+                  {/* WhatsApp */}
+                  <div>
+                    <Label
+                      htmlFor="whatsapp"
+                      className={formLabelClasses}
+                      style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
+                    >
+                      {data.placeholderWhatsapp}
+                    </Label>
+                    <Input
+                      type="tel"
+                      id="whatsapp"
+                      value={formData.whatsapp}
+                      onChange={(e) => handleInputChange("whatsapp", e.target.value)}
+                      className={formInputClasses}
+                      style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
+                    />
+                  </div>
+                  {/* Company */}
+                  <div>
+                    <Label
+                      htmlFor="company"
+                      className={formLabelClasses}
+                      style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
+                    >
+                      {data.placeholderCompany}
+                    </Label>
+                    <Input
+                      type="text"
+                      id="company"
+                      value={formData.company}
+                      onChange={(e) => handleInputChange("company", e.target.value)}
+                      className={formInputClasses}
+                      style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
+                    />
+                  </div>
+                  {/* Message */}
+                  <div>
+                    <Label
+                      htmlFor="message"
+                      className={formLabelClasses}
+                      style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
+                    >
+                      {data.placeholderMessage}
+                    </Label>
+                    <Textarea
+                      id="message"
+                      value={formData.message}
+                      onChange={(e) => handleInputChange("message", e.target.value)}
+                      className={cn(formInputClasses, "min-h-[40px]")}
+                      style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
+                    />
+                  </div>
+
+                  {/* Turnstile 验证码 */}
+                  {shouldShowCaptcha && turnstileConfig?.siteKey && (
+                    <div className="flex justify-center my-2">
+                      <Turnstile
+                        siteKey={turnstileConfig.siteKey}
+                        onVerify={handleTurnstileVerify}
+                        onError={handleTurnstileError}
+                        onExpire={handleTurnstileExpire}
+                        theme="dark"
+                        size="normal"
+                        language={locale === "zh" ? "zh-CN" : locale}
+                      />
+                    </div>
+                  )}
+
+                  {/* 错误提示 */}
+                  {error && (
+                    <div className="text-red-400 text-sm text-center">
+                      {error}
+                    </div>
+                  )}
+
+                  {/* Submit Button */}
+                  <div style={{ marginTop: "clamp(20px, 2.1vw, 40px)" }}>
+                    <Button
+                      type="submit"
+                      disabled={submitting || (shouldShowCaptcha && !turnstileToken)}
+                      className={cn(formButtonClasses, "disabled:opacity-50 disabled:cursor-not-allowed")}
+                      style={{
+                        width: "clamp(165px, 17.2vw, 331px)",
+                        height: "clamp(34px, 3.5vw, 68px)",
+                        fontSize: "clamp(16px, 1.67vw, 32px)",
+                      }}
+                    >
+                      {submitting ? (formConfig?.submittingText || "Submitting...") : (formConfig?.submitButtonText || data.buttonText || "Submit")}
+                    </Button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
 

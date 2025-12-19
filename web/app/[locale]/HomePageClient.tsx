@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import useSWR from 'swr';
+import dynamic from 'next/dynamic';
 import type { Locale } from "@/i18n.config";
 // 1. 导入我们刚刚创建的 HomeContent 类型
 import type { HomeContent } from "@/lib/content-data";
@@ -10,7 +11,11 @@ import type { HomeContent } from "@/lib/content-data";
 import HeroBanner from "@/components/home/hero-banner";
 import ProductSeriesCarousel from "@/components/home/product-series-carousel";
 import ServiceFeatures from "@/components/home/service-features";
-import Sphere3D from "@/components/home/sphere-3d";
+// Sphere3D 使用动态导入，因为 react-globe.gl 有 16MB，会严重影响首屏加载
+const Sphere3D = dynamic(() => import("@/components/home/sphere-3d"), {
+  ssr: false,
+  loading: () => <div className="w-full h-[600px] bg-black" />,
+});
 import SimpleCta from "@/components/home/simple-cta";
 import SeriesIntro from "@/components/home/series-intro";
 import FeaturedProducts from "@/components/home/featured-products";
@@ -112,7 +117,7 @@ export function HomePageClient({
 
       {/* 模块 11 (Figma #12): 表单 (浅色背景) */}
       <div data-header-theme="transparent">
-        <MainForm data={content.mainForm} />
+        <MainForm data={content.mainForm} locale={currentLanguage} />
       </div>
 
       {/* 模块 12 (Figma #13): 为什么选择Busrom (浅色背景) */}

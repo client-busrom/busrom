@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type { Locale } from "@/i18n.config"
+import { Turnstile } from "@/components/ui/turnstile"
 
 interface FormField {
   label: string
@@ -81,6 +82,40 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null)
+  const [turnstileKey, setTurnstileKey] = useState(0)
+
+  // Fetch Turnstile site key from SiteConfig
+  useEffect(() => {
+    const fetchSiteKey = async () => {
+      try {
+        const res = await fetch('/api/site-config')
+        if (res.ok) {
+          const data = await res.json()
+          if (data.turnstileSiteKey) {
+            setTurnstileSiteKey(data.turnstileSiteKey)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch Turnstile site key:', error)
+      }
+    }
+    fetchSiteKey()
+  }, [])
+
+  // Handle Turnstile success - clear error if captcha error was showing
+  const handleTurnstileSuccess = (token: string) => {
+    setTurnstileToken(token)
+    // Clear captcha-related error
+    if (errors._captcha) {
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors._captcha
+        return newErrors
+      })
+    }
+  }
 
   const handleChange = (fieldName: string, value: any) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }))
@@ -125,6 +160,11 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
       }
     })
 
+    // Validate Turnstile if enabled
+    if (turnstileSiteKey && !turnstileToken) {
+      newErrors._captcha = locale === 'zh' ? '请完成人机验证' : 'Please complete the captcha verification'
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -139,7 +179,6 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
     setIsSubmitting(true)
 
     try {
-      // TODO: Replace with actual API endpoint
       const response = await fetch("/api/form-submissions", {
         method: "POST",
         headers: {
@@ -150,20 +189,26 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
           formName: configData.name,
           data: formData,
           locale,
+          turnstileToken,
         }),
       })
 
       if (response.ok) {
         setSubmitSuccess(true)
         setFormData({})
+        setTurnstileToken(null)
+        setTurnstileKey(prev => prev + 1)
         // Reset success message after 5 seconds
         setTimeout(() => setSubmitSuccess(false), 5000)
       } else {
-        throw new Error("Failed to submit form")
+        const data = await response.json()
+        setTurnstileToken(null)
+        setTurnstileKey(prev => prev + 1)
+        throw new Error(data.error || "Failed to submit form")
       }
     } catch (error) {
       console.error("Form submission error:", error)
-      setErrors({ _form: "Failed to submit form. Please try again." })
+      setErrors({ _form: error instanceof Error ? error.message : "Failed to submit form. Please try again." })
     } finally {
       setIsSubmitting(false)
     }
@@ -275,6 +320,22 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
           {errors[field.fieldName] && <p className="mt-1 text-sm text-red-500">{errors[field.fieldName]}</p>}
         </div>
       ))}
+
+      {/* Turnstile Captcha */}
+      {turnstileSiteKey && (
+        <div className="mt-4">
+          <Turnstile
+            key={turnstileKey}
+            siteKey={turnstileSiteKey}
+            onVerify={handleTurnstileSuccess}
+            onError={() => setTurnstileToken(null)}
+            onExpire={() => setTurnstileToken(null)}
+            theme="light"
+            language={locale === 'zh' ? 'zh-CN' : locale}
+          />
+          {errors._captcha && <p className="mt-1 text-sm text-red-500">{errors._captcha}</p>}
+        </div>
+      )}
 
       <button
         type="submit"

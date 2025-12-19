@@ -11,6 +11,7 @@
 export { HomeContent } from './HomeContent'
 export { Footer } from './Footer'
 export { SiteConfig } from './SiteConfig'
+export { PreloaderConfig } from './PreloaderConfig'
 
 // Homepage Sections (按前端 HomePageClient.tsx 顺序排列)
 // Note: HeroBanner (1) and SeriesIntro (6) are Collections, not Globals

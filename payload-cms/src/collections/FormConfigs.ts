@@ -254,6 +254,16 @@ export const FormConfigs: CollectionConfig = {
           defaultValue: 'Submit',
         },
         {
+          name: 'submittingText',
+          type: 'text',
+          label: {
+            en: 'Submitting Text',
+            zh: '提交中文字',
+          },
+          localized: true,
+          defaultValue: 'Submitting...',
+        },
+        {
           name: 'successMessage',
           type: 'textarea',
           label: {
@@ -261,6 +271,281 @@ export const FormConfigs: CollectionConfig = {
             zh: '成功提示',
           },
           localized: true,
+          defaultValue: 'Submitted successfully! We will contact you soon.',
+        },
+        {
+          name: 'errorRequiredFields',
+          type: 'text',
+          label: {
+            en: 'Required Fields Error',
+            zh: '必填字段错误提示',
+          },
+          localized: true,
+          defaultValue: 'Please fill in required fields',
+        },
+        {
+          name: 'errorNetworkMessage',
+          type: 'text',
+          label: {
+            en: 'Network Error Message',
+            zh: '网络错误提示',
+          },
+          localized: true,
+          defaultValue: 'Network error, please try again',
+        },
+        {
+          name: 'errorCaptchaMessage',
+          type: 'text',
+          label: {
+            en: 'Captcha Error Message',
+            zh: '验证码错误提示',
+          },
+          localized: true,
+          defaultValue: 'Please complete the captcha verification',
+        },
+      ],
+    },
+
+    // ==================================================================
+    // Rate Limiting & Anti-Spam
+    // ==================================================================
+    {
+      type: 'collapsible',
+      label: {
+        en: 'Rate Limiting & Anti-Spam',
+        zh: '频率限制与防刷',
+      },
+      admin: {
+        description: {
+          en: 'Protect form from spam and abuse',
+          zh: '保护表单免受垃圾信息和滥用',
+        },
+      },
+      fields: [
+        {
+          name: 'rateLimitEnabled',
+          type: 'checkbox',
+          label: {
+            en: 'Enable Rate Limiting',
+            zh: '启用频率限制',
+          },
+          defaultValue: true,
+        },
+        {
+          name: 'rateLimitPerIP',
+          type: 'number',
+          label: {
+            en: 'Max Submissions per IP (per hour)',
+            zh: '每IP每小时最大提交次数',
+          },
+          defaultValue: 5,
+          admin: {
+            description: {
+              en: 'Maximum submissions allowed from same IP within 1 hour',
+              zh: '同一IP在1小时内允许的最大提交次数',
+            },
+            condition: (data) => data?.rateLimitEnabled,
+          },
+        },
+        {
+          name: 'rateLimitPerDay',
+          type: 'number',
+          label: {
+            en: 'Max Submissions per Day (total)',
+            zh: '每日最大提交次数（总计）',
+          },
+          defaultValue: 100,
+          admin: {
+            description: {
+              en: 'Maximum total submissions for this form per day (0 = unlimited)',
+              zh: '此表单每天的最大提交总数（0 = 不限制）',
+            },
+            condition: (data) => data?.rateLimitEnabled,
+          },
+        },
+        {
+          name: 'minSubmitInterval',
+          type: 'number',
+          label: {
+            en: 'Minimum Interval (seconds)',
+            zh: '最小提交间隔（秒）',
+          },
+          defaultValue: 30,
+          admin: {
+            description: {
+              en: 'Minimum seconds between submissions from same IP',
+              zh: '同一IP两次提交之间的最小秒数',
+            },
+            condition: (data) => data?.rateLimitEnabled,
+          },
+        },
+      ],
+    },
+
+    // ==================================================================
+    // Captcha Settings (per-form overrides, keys in SiteConfig)
+    // ==================================================================
+    {
+      type: 'collapsible',
+      label: {
+        en: 'Captcha Settings',
+        zh: '验证码设置',
+      },
+      admin: {
+        description: {
+          en: 'Turnstile Site Key and Secret Key are configured in Site Config > Captcha',
+          zh: 'Turnstile 的 Site Key 和 Secret Key 在 站点配置 > 验证码 中统一设置',
+        },
+      },
+      fields: [
+        {
+          name: 'captchaEnabled',
+          type: 'checkbox',
+          label: {
+            en: 'Enable Captcha for this form',
+            zh: '为此表单启用验证码',
+          },
+          defaultValue: false,
+        },
+        {
+          name: 'captchaTheme',
+          type: 'select',
+          label: {
+            en: 'Captcha Theme',
+            zh: '验证码主题',
+          },
+          defaultValue: 'auto',
+          options: [
+            { label: 'Auto | 自动', value: 'auto' },
+            { label: 'Light | 浅色', value: 'light' },
+            { label: 'Dark | 深色', value: 'dark' },
+          ],
+          admin: {
+            condition: (data) => data?.captchaEnabled,
+          },
+        },
+        {
+          name: 'captchaSize',
+          type: 'select',
+          label: {
+            en: 'Captcha Size',
+            zh: '验证码尺寸',
+          },
+          defaultValue: 'normal',
+          options: [
+            { label: 'Normal | 正常', value: 'normal' },
+            { label: 'Compact | 紧凑', value: 'compact' },
+          ],
+          admin: {
+            condition: (data) => data?.captchaEnabled,
+          },
+        },
+      ],
+    },
+
+    // ==================================================================
+    // Email Notification Settings (per-form override)
+    // ==================================================================
+    {
+      type: 'collapsible',
+      label: {
+        en: 'Email Notification',
+        zh: '邮件通知设置',
+      },
+      admin: {
+        description: {
+          en: 'Override global email settings for this form. Leave empty to use global defaults.',
+          zh: '为此表单覆盖全局邮件设置。留空则使用全局默认值。',
+        },
+      },
+      fields: [
+        {
+          name: 'notificationEmails',
+          type: 'text',
+          label: {
+            en: 'Notification Emails (Override)',
+            zh: '通知邮箱（覆盖全局）',
+          },
+          admin: {
+            description: {
+              en: 'Comma-separated emails. If set, overrides global notification emails.',
+              zh: '逗号分隔的邮箱。如果设置，将覆盖全局通知邮箱。',
+            },
+          },
+        },
+      ],
+    },
+
+    // ==================================================================
+    // Auto Reply Settings (per-form)
+    // ==================================================================
+    {
+      type: 'collapsible',
+      label: {
+        en: 'Auto Reply',
+        zh: '自动回复设置',
+      },
+      admin: {
+        description: {
+          en: 'Configure auto-reply for this specific form. This takes priority over global settings.',
+          zh: '为此表单配置自动回复。此设置优先于全局设置。',
+        },
+      },
+      fields: [
+        {
+          name: 'autoReplyEnabled',
+          type: 'select',
+          label: {
+            en: 'Auto Reply',
+            zh: '自动回复',
+          },
+          defaultValue: 'inherit',
+          options: [
+            { label: 'Inherit from Global | 继承全局设置', value: 'inherit' },
+            { label: 'Enabled | 启用', value: 'enabled' },
+            { label: 'Disabled | 禁用', value: 'disabled' },
+          ],
+          admin: {
+            description: {
+              en: 'Choose whether to enable auto-reply for this form',
+              zh: '选择是否为此表单启用自动回复',
+            },
+          },
+        },
+        {
+          name: 'autoReplySubject',
+          type: 'text',
+          label: {
+            en: 'Auto Reply Subject (Override)',
+            zh: '自动回复主题（覆盖全局）',
+          },
+          localized: true,
+          admin: {
+            description: {
+              en: 'Leave empty to use global default',
+              zh: '留空则使用全局默认值',
+            },
+            condition: (data) => data?.autoReplyEnabled === 'enabled',
+          },
+        },
+        {
+          name: 'autoReplyTemplate',
+          type: 'richText',
+          label: {
+            en: 'Auto Reply Template (Override)',
+            zh: '自动回复模板（覆盖全局）',
+          },
+          localized: true,
+          admin: {
+            description: {
+              en: 'Leave empty to use global default. Use {name}, {email}, {formName} as placeholders.',
+              zh: '留空则使用全局默认值。可使用 {name}、{email}、{formName} 作为占位符。',
+            },
+            condition: (data) => data?.autoReplyEnabled === 'enabled',
+            components: {
+              beforeInput: ['@/components/fields/MultiLocaleRichTextField'],
+            },
+          },
         },
       ],
     },
