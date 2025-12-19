@@ -83,7 +83,7 @@ export const Media: CollectionConfig = {
         position: 'centre',
       },
     ],
-    adminThumbnail: ({ doc }) => {
+    adminThumbnail: ({ doc }: { doc: any }) => {
       // Use sizes.thumbnail.url if available, otherwise fall back to main url
       return doc?.sizes?.thumbnail?.url || doc?.url || null
     },
