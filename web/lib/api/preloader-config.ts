@@ -90,14 +90,29 @@ export async function getPreloaderConfig(): Promise<PreloaderConfigData> {
   try {
     const response = await fetch(`${CMS_URL}/api/globals/preloader-config?depth=2`, {
       next: { revalidate: 60 }, // Revalidate every 60 seconds
+      redirect: 'manual', // Don't follow redirects (302 to /signin means auth required)
     })
 
-    if (!response.ok) {
+    // If redirected (302) or not OK, return default config
+    if (!response.ok || response.status === 302) {
       console.warn(`Failed to fetch preloader config: ${response.status} ${response.statusText}`)
       return defaultConfig
     }
 
-    const data = await response.json()
+    // Check content type to ensure we got JSON, not HTML (login page)
+    const contentType = response.headers.get('content-type') || ''
+    if (!contentType.includes('application/json')) {
+      console.warn(`Preloader config returned non-JSON content type: ${contentType}`)
+      return defaultConfig
+    }
+
+    const text = await response.text()
+    if (!text || text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
+      console.warn('Preloader config returned HTML instead of JSON')
+      return defaultConfig
+    }
+
+    const data = JSON.parse(text)
 
     // Transform CMS data to PreloaderConfigData
     const images: ImageWallItem[] = (data.images || []).map((item: any) => {

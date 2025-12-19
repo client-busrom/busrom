@@ -67,9 +67,13 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
     }
 
     // Transform API response to match HomeContent type
-    // Extract carousel items - backend returns already filtered by locale
-    const rawCarouselItems = data.productSeriesCarousel?.items || []
-    const carouselItems = rawCarouselItems.map((item: any, index: number) => ({
+    // Extract carousel items - backend may return items as array or as { [locale]: [...] }
+    const carouselItemsData = data.productSeriesCarousel?.items
+    // Handle both formats: direct array or locale-keyed object
+    const rawCarouselItems = Array.isArray(carouselItemsData)
+      ? carouselItemsData
+      : (carouselItemsData?.[locale] || carouselItemsData?.en || [])
+    const carouselItems = (Array.isArray(rawCarouselItems) ? rawCarouselItems : []).map((item: any, index: number) => ({
       key: item.linkUrl || `item-${index}`,
       order: index,
       name: item.title || '',
