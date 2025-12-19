@@ -381,6 +381,7 @@ export default buildConfig({
       collections: {
         media: {
           prefix: 'media',
+          disableLocalStorage: true,
           generateFileURL: ({ filename, size }) => {
             // Handle null/undefined filename
             if (!filename) {
