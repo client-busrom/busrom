@@ -86,35 +86,50 @@ export const HeroBannerItems: CollectionConfig = {
       type: 'text',
       required: true,
       localized: true,
-      label: 'Feature 1 | 特点1',
+      label: {
+        en: 'Feature 1',
+        zh: '特点1',
+      },
     },
     {
       name: 'feature2',
       type: 'text',
       required: true,
       localized: true,
-      label: 'Feature 2 | 特点2',
+      label: {
+        en: 'Feature 2',
+        zh: '特点2',
+      },
     },
     {
       name: 'feature3',
       type: 'text',
       required: true,
       localized: true,
-      label: 'Feature 3 | 特点3',
+      label: {
+        en: 'Feature 3',
+        zh: '特点3',
+      },
     },
     {
       name: 'feature4',
       type: 'text',
       required: true,
       localized: true,
-      label: 'Feature 4 | 特点4',
+      label: {
+        en: 'Feature 4',
+        zh: '特点4',
+      },
     },
     {
       name: 'feature5',
       type: 'text',
       required: true,
       localized: true,
-      label: 'Feature 5 | 特点5',
+      label: {
+        en: 'Feature 5',
+        zh: '特点5',
+      },
     },
 
     // ==================================================================
@@ -184,11 +199,6 @@ export const HeroBannerItems: CollectionConfig = {
           label: {
             en: 'Button Text',
             zh: '按钮文本',
-          },
-          admin: {
-            components: {
-              Field: '@/components/fields/MultiLocaleField#MultiLocaleTextField',
-            },
           },
         },
         {
