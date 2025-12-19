@@ -35,8 +35,59 @@ interface LexicalRendererProps {
  * Block Component Definitions
  */
 
+// Helper to get CMS URL for fetching media
+const getCmsUrl = () => {
+  if (typeof window !== 'undefined') {
+    // Client-side: use public CMS URL
+    return process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.busromhouse.com'
+  }
+  // Server-side: use internal URL if available
+  return process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.busromhouse.com'
+}
+
+// Client component to handle image gallery with media fetching
 const ImageGalleryBlock = ({ node }: any) => {
   const { images, layout, spacing, lightbox } = node.data || node.fields || {}
+  const [mediaCache, setMediaCache] = React.useState<Record<string, any>>({})
+  const [loading, setLoading] = React.useState(true)
+
+  // Fetch media data for image IDs
+  React.useEffect(() => {
+    if (!images || images.length === 0) {
+      setLoading(false)
+      return
+    }
+
+    const fetchMedia = async () => {
+      const cmsUrl = getCmsUrl()
+      const newCache: Record<string, any> = {}
+
+      await Promise.all(
+        images.map(async (item: any) => {
+          // Handle both string ID and object with id
+          const imageId = typeof item.image === 'string' ? item.image : item.image?.id
+          if (!imageId || mediaCache[imageId]) return
+
+          try {
+            const res = await fetch(`${cmsUrl}/api/media/${imageId}?depth=0`)
+            if (res.ok) {
+              const data = await res.json()
+              newCache[imageId] = data
+            }
+          } catch (err) {
+            console.error(`Failed to fetch media ${imageId}:`, err)
+          }
+        })
+      )
+
+      if (Object.keys(newCache).length > 0) {
+        setMediaCache(prev => ({ ...prev, ...newCache }))
+      }
+      setLoading(false)
+    }
+
+    fetchMedia()
+  }, [images])
 
   if (!images || images.length === 0) return null
 
@@ -57,12 +108,36 @@ const ImageGalleryBlock = ({ node }: any) => {
 
   const isMasonry = layout === 'masonry'
 
+  if (loading) {
+    return (
+      <div className={`my-6 grid ${layoutClasses} ${spacingClasses}`}>
+        {images.map((_: any, index: number) => (
+          <div key={index} className="aspect-square bg-gray-200 rounded-lg animate-pulse" />
+        ))}
+      </div>
+    )
+  }
+
   return (
     <div className={`my-6 ${isMasonry ? layoutClasses : `grid ${layoutClasses} ${spacingClasses}`}`}>
       {images.map((item: any, index: number) => {
+        // Handle both string ID and object with id/url
+        const imageId = typeof item.image === 'string' ? item.image : item.image?.id
+        const mediaData = imageId ? mediaCache[imageId] : item.image
+
         // Try different variant names: tablet, card, or fallback to main URL
-        const imageUrl = item.image?.variants?.tablet?.url || item.image?.variants?.card?.url || item.image?.url
-        if (!imageUrl) return null
+        const imageUrl = mediaData?.variants?.tablet?.url ||
+                         mediaData?.variants?.card?.url ||
+                         mediaData?.url ||
+                         item.image?.url
+
+        if (!imageUrl) {
+          return (
+            <div key={index} className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-sm">
+              Image not found
+            </div>
+          )
+        }
 
         const imageElement = (
           <div
@@ -71,9 +146,9 @@ const ImageGalleryBlock = ({ node }: any) => {
           >
             <Image
               src={imageUrl}
-              alt={item.caption || item.image?.alt || `Gallery image ${index + 1}`}
-              width={item.image?.width || 800}
-              height={item.image?.height || 800}
+              alt={item.caption || mediaData?.alt || `Gallery image ${index + 1}`}
+              width={mediaData?.width || 800}
+              height={mediaData?.height || 800}
               className={`w-full ${isMasonry ? 'h-auto' : 'h-full'} object-cover transition-transform ${lightbox ? 'group-hover:scale-105' : ''}`}
               unoptimized
             />
@@ -95,10 +170,40 @@ const ImageGalleryBlock = ({ node }: any) => {
 
 const SingleImageBlock = ({ node }: any) => {
   const { image, caption, alignment, size } = node.data || node.fields || {}
-  // Try different variant names: desktop, tablet, card, or fallback to main URL
-  const imageUrl = image?.variants?.desktop?.url || image?.variants?.tablet?.url || image?.variants?.card?.url || image?.url
+  const [mediaData, setMediaData] = React.useState<any>(null)
+  const [loading, setLoading] = React.useState(true)
 
-  if (!imageUrl) return null
+  // Fetch media data if image is an ID
+  React.useEffect(() => {
+    const imageId = typeof image === 'string' ? image : image?.id
+    if (!imageId) {
+      setLoading(false)
+      return
+    }
+
+    // If image already has url, use it directly
+    if (image?.url) {
+      setMediaData(image)
+      setLoading(false)
+      return
+    }
+
+    const fetchMedia = async () => {
+      try {
+        const cmsUrl = getCmsUrl()
+        const res = await fetch(`${cmsUrl}/api/media/${imageId}?depth=0`)
+        if (res.ok) {
+          const data = await res.json()
+          setMediaData(data)
+        }
+      } catch (err) {
+        console.error(`Failed to fetch media ${imageId}:`, err)
+      }
+      setLoading(false)
+    }
+
+    fetchMedia()
+  }, [image])
 
   // Size configurations (matches Payload CMS feature config)
   const sizeClasses = {
@@ -115,14 +220,30 @@ const SingleImageBlock = ({ node }: any) => {
     right: 'ml-auto',
   }[alignment || 'center']
 
+  if (loading) {
+    return (
+      <figure className={`my-6 ${alignmentClasses}`}>
+        <div className={`relative w-full ${sizeClasses} aspect-video bg-gray-200 rounded-lg animate-pulse`} />
+      </figure>
+    )
+  }
+
+  // Try different variant names: desktop, tablet, card, or fallback to main URL
+  const imageUrl = mediaData?.variants?.desktop?.url ||
+                   mediaData?.variants?.tablet?.url ||
+                   mediaData?.variants?.card?.url ||
+                   mediaData?.url
+
+  if (!imageUrl) return null
+
   return (
     <figure className={`my-6 ${alignmentClasses}`}>
       <div className={`relative w-full ${sizeClasses} rounded-lg overflow-hidden`}>
         <Image
           src={imageUrl}
-          alt={caption || image?.alt || ''}
-          width={image?.width || 1920}
-          height={image?.height || 1080}
+          alt={caption || mediaData?.alt || ''}
+          width={mediaData?.width || 1920}
+          height={mediaData?.height || 1080}
           className="w-full h-auto object-contain"
           unoptimized
         />
@@ -256,6 +377,45 @@ const CarouselBlock = ({ node }: any) => {
   const [api, setApi] = React.useState<any>()
   const [canScrollPrev, setCanScrollPrev] = React.useState(false)
   const [canScrollNext, setCanScrollNext] = React.useState(true)
+  const [mediaCache, setMediaCache] = React.useState<Record<string, any>>({})
+  const [loading, setLoading] = React.useState(true)
+
+  // Fetch media data for slide images
+  React.useEffect(() => {
+    if (!slides || slides.length === 0) {
+      setLoading(false)
+      return
+    }
+
+    const fetchMedia = async () => {
+      const cmsUrl = getCmsUrl()
+      const newCache: Record<string, any> = {}
+
+      await Promise.all(
+        slides.map(async (slide: any) => {
+          const imageId = typeof slide.image === 'string' ? slide.image : slide.image?.id
+          if (!imageId || mediaCache[imageId] || slide.image?.url) return
+
+          try {
+            const res = await fetch(`${cmsUrl}/api/media/${imageId}?depth=0`)
+            if (res.ok) {
+              const data = await res.json()
+              newCache[imageId] = data
+            }
+          } catch (err) {
+            console.error(`Failed to fetch media ${imageId}:`, err)
+          }
+        })
+      )
+
+      if (Object.keys(newCache).length > 0) {
+        setMediaCache(prev => ({ ...prev, ...newCache }))
+      }
+      setLoading(false)
+    }
+
+    fetchMedia()
+  }, [slides])
 
   React.useEffect(() => {
     if (!api) return
@@ -312,21 +472,27 @@ const CarouselBlock = ({ node }: any) => {
         >
           <CarouselContent className="-ml-6">
             {slides.map((slide: any, index: number) => {
-              const imageUrl = slide.image?.variants?.desktop?.url || slide.image?.variants?.tablet?.url || slide.image?.url
+              const imageId = typeof slide.image === 'string' ? slide.image : slide.image?.id
+              const mediaData = imageId ? mediaCache[imageId] : slide.image
+              const imageUrl = mediaData?.variants?.desktop?.url || mediaData?.variants?.tablet?.url || mediaData?.url || slide.image?.url
 
               return (
                 <CarouselItem key={index} className="pl-6 basis-auto">
                   <div className="space-y-4">
-                    {imageUrl && (
+                    {(imageUrl || loading) && (
                       <div className="relative w-64 h-64 md:w-[488px] md:h-[488px] rounded-2xl overflow-hidden">
-                        <Image
-                          src={imageUrl}
-                          alt={slide.title || slide.description || ''}
-                          width={488}
-                          height={488}
-                          className="object-cover w-full h-full"
-                          unoptimized
-                        />
+                        {loading ? (
+                          <div className="w-full h-full bg-gray-200 animate-pulse" />
+                        ) : imageUrl ? (
+                          <Image
+                            src={imageUrl}
+                            alt={slide.title || slide.description || ''}
+                            width={488}
+                            height={488}
+                            className="object-cover w-full h-full"
+                            unoptimized
+                          />
+                        ) : null}
                       </div>
                     )}
 
@@ -491,9 +657,12 @@ const MarqueeLinksBlock = ({ node }: any) => {
 
 /**
  * Two Columns Block
+ *
+ * Uses a separate NestedLexicalRenderer component that builds full converters
+ * including all custom blocks for proper nested rendering.
  */
 const TwoColumnsBlock = ({ node }: any) => {
-  const { leftColumn, rightColumn, gap } = node.data || node.fields || {}
+  const { leftColumn, rightColumn, gap, columnRatio, verticalAlign } = node.data || node.fields || {}
 
   const gapClass = {
     small: 'gap-4',
@@ -501,13 +670,29 @@ const TwoColumnsBlock = ({ node }: any) => {
     large: 'gap-12',
   }[gap || 'normal']
 
+  // Column ratio classes
+  const ratioClass = {
+    '1:1': 'md:grid-cols-2',
+    '2:1': 'md:grid-cols-[2fr_1fr]',
+    '1:2': 'md:grid-cols-[1fr_2fr]',
+    '3:1': 'md:grid-cols-[3fr_1fr]',
+    '1:3': 'md:grid-cols-[1fr_3fr]',
+  }[columnRatio || '1:1']
+
+  // Vertical alignment classes
+  const alignClass = {
+    top: 'items-start',
+    center: 'items-center',
+    bottom: 'items-end',
+  }[verticalAlign || 'top']
+
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-2 ${gapClass} my-8`}>
+    <div className={`grid grid-cols-1 ${ratioClass} ${gapClass} ${alignClass} my-8`}>
       <div className="space-y-4">
-        {leftColumn && <RichText data={leftColumn} converters={defaultJSXConverters} />}
+        {leftColumn && <NestedLexicalRenderer content={leftColumn} />}
       </div>
       <div className="space-y-4">
-        {rightColumn && <RichText data={rightColumn} converters={defaultJSXConverters} />}
+        {rightColumn && <NestedLexicalRenderer content={rightColumn} />}
       </div>
     </div>
   )
@@ -577,4 +762,39 @@ export function LexicalRenderer({ content, className = '' }: LexicalRendererProp
       <RichText data={content} converters={converters} />
     </div>
   )
+}
+
+/**
+ * Nested Lexical Renderer
+ *
+ * Used for rendering nested rich text content (e.g., inside TwoColumnsBlock).
+ * Includes all custom converters for proper block rendering.
+ */
+function NestedLexicalRenderer({ content }: { content: any }) {
+  // Build full converters including all custom blocks
+  const converters: JSXConverters = {
+    ...defaultJSXConverters,
+    blocks: {
+      ...defaultJSXConverters.blocks,
+      ...customConverters.blocks,
+    },
+    // Also register as top-level node types (for DecoratorNodes)
+    carousel: CarouselBlock,
+    ctaButton: CtaButtonBlock,
+    hero: HeroBlock,
+    linkJump: LinkJumpBlock,
+    marqueeLinks: MarqueeLinksBlock,
+    notice: NoticeBlock,
+    singleImage: SingleImageBlock,
+    'custom-image-gallery': ImageGalleryBlock,
+    'image-gallery': ImageGalleryBlock,
+    videoEmbed: VideoEmbedBlock,
+    'video-embed': VideoEmbedBlock,
+    'cta-button': CtaButtonBlock,
+    'link-jump': LinkJumpBlock,
+    'marquee-links': MarqueeLinksBlock,
+    'single-image': SingleImageBlock,
+  }
+
+  return <RichText data={content} converters={converters} />
 }
