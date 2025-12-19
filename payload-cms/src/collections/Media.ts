@@ -83,7 +83,10 @@ export const Media: CollectionConfig = {
         position: 'centre',
       },
     ],
-    adminThumbnail: 'thumbnail',
+    adminThumbnail: ({ doc }) => {
+      // Use sizes.thumbnail.url if available, otherwise fall back to main url
+      return doc?.sizes?.thumbnail?.url || doc?.url || null
+    },
     mimeTypes: ['image/*'],
     // Focal point for smart cropping
     focalPoint: true,

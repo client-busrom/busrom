@@ -169,7 +169,12 @@
       "Bash(PGPASSWORD=payload_dev_password docker exec:*)",
       "Bash(PGPASSWORD=busrom_dev_password docker exec:*)",
       "Bash(/opt/homebrew/opt/postgresql@16/bin/psql:*)",
-      "Bash(docker run:*)"
+      "Bash(docker run:*)",
+      "Bash(brew --prefix:*)",
+      "Bash(PGPASSWORD=ADijIRcAHMHLHaZvH0eg /opt/homebrew/opt/postgresql@16/bin/psql:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(export PATH=\"/opt/homebrew/opt/postgresql@16/bin:$PATH\")",
+      "Bash(psql:*)"
     ],
     "deny": [],
     "ask": []
