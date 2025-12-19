@@ -381,7 +381,7 @@ export default buildConfig({
       collections: {
         media: {
           prefix: 'media',
-          generateFileURL: ({ filename }) => {
+          generateFileURL: ({ filename, size }) => {
             // Handle null/undefined filename
             if (!filename) {
               return ''
@@ -390,10 +390,36 @@ export default buildConfig({
             // MinIO local development
             if (process.env.USE_MINIO === 'true') {
               const endpoint = process.env.S3_ENDPOINT || 'http://localhost:9000'
+              // For variants in MinIO
+              if (size?.name) {
+                const variantFolder = size.name === 'card' ? 'small' : size.name === 'tablet' ? 'medium' : size.name === 'desktop' ? 'large' : size.name
+                return `${endpoint}/${s3Config.bucket}/variants/${variantFolder}/${filename}`
+              }
               return `${endpoint}/${s3Config.bucket}/media/${filename}`
             }
 
-            // Production: Parse filename to determine S3 path
+            // Production: Map Payload size names to S3 variant folder names
+            // Payload sizes: thumbnail, card, tablet, desktop
+            // S3 folders: thumbnail, small, medium, large
+            const sizeToFolderMap: Record<string, string> = {
+              'thumbnail': 'thumbnail',
+              'card': 'small',
+              'tablet': 'medium',
+              'desktop': 'large',
+            }
+
+            // CDN domain
+            const cdnDomain = process.env.CDN_DOMAIN
+            const baseUrl = cdnDomain && cdnDomain !== 'NONE'
+              ? `https://${cdnDomain}`
+              : `https://${s3Config.bucket}.s3.${process.env.S3_REGION}.amazonaws.com`
+
+            // If this is a variant (size is provided), use variants folder
+            if (size?.name && sizeToFolderMap[size.name]) {
+              return `${baseUrl}/variants/${sizeToFolderMap[size.name]}/${filename}`
+            }
+
+            // Original image: Parse filename to determine S3 path
             // Filename format: {series}_{type}_{...}.jpg
             // S3 path: {series}/{type}/{filename}
             const seriesMapping: Record<string, string> = {
@@ -438,13 +464,7 @@ export default buildConfig({
               }
             }
 
-            // CDN (production)
-            const cdnDomain = process.env.CDN_DOMAIN
-            if (cdnDomain && cdnDomain !== 'NONE') {
-              return `https://${cdnDomain}/${s3Path}`
-            }
-            // Fallback to S3 URL
-            return `https://${s3Config.bucket}.s3.${process.env.S3_REGION}.amazonaws.com/${s3Path}`
+            return `${baseUrl}/${s3Path}`
           },
         },
       },
