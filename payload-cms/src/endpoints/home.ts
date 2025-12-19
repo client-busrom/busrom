@@ -172,8 +172,8 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         id: item.id,
         title: item.title,
         subtitle: item.subtitle,
-        ctaText: item.ctaText,
-        ctaUrl: item.ctaUrl,
+        ctaText: item.ctaButton?.text || item.ctaText,
+        ctaUrl: item.ctaButton?.link || item.ctaUrl,
         features: [
           item.feature1,
           item.feature2,
