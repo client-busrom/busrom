@@ -109,9 +109,9 @@ export default function MainForm({ data, locale = "en" }: Props) {
   const [submissionCount, setSubmissionCount] = useState(0);
 
   // 是否需要显示验证码
-  const shouldShowCaptcha = turnstileConfig?.enabled &&
+  const shouldShowCaptcha = !!(turnstileConfig?.enabled &&
     turnstileConfig?.siteKey &&
-    submissionCount >= (turnstileConfig.threshold - 1);
+    submissionCount >= (turnstileConfig.threshold - 1));
 
   // 获取表单配置和 Turnstile 配置
   useEffect(() => {
