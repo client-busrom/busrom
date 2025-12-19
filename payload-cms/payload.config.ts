@@ -379,6 +379,11 @@ export default buildConfig({
         media: {
           prefix: 'media',
           generateFileURL: ({ filename }) => {
+            // Handle null/undefined filename
+            if (!filename) {
+              return ''
+            }
+
             // MinIO local development
             if (process.env.USE_MINIO === 'true') {
               const endpoint = process.env.S3_ENDPOINT || 'http://localhost:9000'
