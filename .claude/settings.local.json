@@ -167,7 +167,9 @@
       "Bash(/opt/homebrew/bin/woff2_compress:*)",
       "Bash(echo:*)",
       "Bash(PGPASSWORD=payload_dev_password docker exec:*)",
-      "Bash(PGPASSWORD=busrom_dev_password docker exec:*)"
+      "Bash(PGPASSWORD=busrom_dev_password docker exec:*)",
+      "Bash(/opt/homebrew/opt/postgresql@16/bin/psql:*)",
+      "Bash(docker run:*)"
     ],
     "deny": [],
     "ask": []
