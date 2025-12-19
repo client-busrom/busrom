@@ -18,7 +18,7 @@ import { SITEMAP_LOCALES } from '@/lib/api/sitemap'
 // Force dynamic rendering - this route fetches from CMS at runtime
 export const dynamic = 'force-dynamic'
 
-const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT || 'http://localhost:3000/api/graphql'
+const GRAPHQL_ENDPOINT = process.env.CMS_GRAPHQL_URL || 'http://localhost:3000/api/graphql'
 
 /**
  * Fetch robots.txt content from CMS

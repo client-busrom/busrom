@@ -8,8 +8,10 @@
 import { convertToCDNUrl } from '@/lib/cdn-url'
 
 // Use runtime environment variable for server-side API calls
-const CMS_URL = process.env.CMS_URL ||
-  (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : 'http://localhost:3002')
+// Prefer internal URL (from CMS_GRAPHQL_URL) over external CMS_URL for better performance
+const CMS_URL = process.env.CMS_GRAPHQL_URL
+  ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
+  : (process.env.CMS_URL || 'http://localhost:3002')
 
 /**
  * Image configuration for the image wall

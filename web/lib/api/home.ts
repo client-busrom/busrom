@@ -9,10 +9,11 @@ import type { HomeContent } from '@/lib/content-data'
 import { convertToCDNUrl } from '@/lib/cdn-url'
 
 // Use runtime environment variable for server-side API calls
-// CMS_URL is set in ECS task definition, falls back to CMS_GRAPHQL_URL base, then localhost
+// Prefer internal URL (from CMS_GRAPHQL_URL) over external CMS_URL for better performance in ECS
 // For Payload CMS, default port is 3002 in development
-const CMS_URL = process.env.CMS_URL ||
-  (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : 'http://localhost:3002')
+const CMS_URL = process.env.CMS_GRAPHQL_URL
+  ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
+  : (process.env.CMS_URL || 'http://localhost:3002')
 
 // Helper function to convert Media URL to CDN URL
 function getMediaUrl(fileUrl: string | null | undefined): string {
