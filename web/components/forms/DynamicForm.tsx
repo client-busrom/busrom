@@ -86,9 +86,9 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
   const [submissionCount, setSubmissionCount] = useState(0)
 
   // Check if captcha should be shown
-  const shouldShowCaptcha = formConfig?.captchaEnabled &&
+  const shouldShowCaptcha = !!(formConfig?.captchaEnabled &&
     formConfig.captchaSiteKey &&
-    submissionCount >= (formConfig.captchaThreshold - 1)
+    submissionCount >= (formConfig.captchaThreshold - 1))
 
   // Turnstile callbacks
   const handleTurnstileVerify = useCallback((token: string) => {
