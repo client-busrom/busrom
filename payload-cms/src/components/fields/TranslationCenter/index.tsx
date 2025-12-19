@@ -52,6 +52,7 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'feature3', labelKey: 'custom:translationCenter:feature3', type: 'text' },
     { name: 'feature4', labelKey: 'custom:translationCenter:feature4', type: 'text' },
     { name: 'feature5', labelKey: 'custom:translationCenter:feature5', type: 'text' },
+    { name: 'ctaButton.text', labelKey: 'custom:translationCenter:ctaButtonText', type: 'text' },
   ],
   'series-intro-items': [
     { name: 'title', labelKey: 'custom:translationCenter:title', type: 'text' },
@@ -140,16 +141,23 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
 
       const doc = await res.json()
 
+      // Helper function to get nested field value using dot notation
+      const getNestedValue = (obj: Record<string, unknown>, path: string): unknown => {
+        return path.split('.').reduce((current, key) => {
+          return current && typeof current === 'object' ? (current as Record<string, unknown>)[key] : undefined
+        }, obj as unknown)
+      }
+
       // locale: 'all' 返回的格式是每个字段都是 { en: '...', zh: '...', ... }
       const newFieldsData: FieldData[] = fieldConfigs.map(config => {
-        const fieldData = doc[config.name]
+        const fieldData = getNestedValue(doc, config.name)
         return {
           config,
           values: SUPPORTED_LOCALES.map(locale => ({
             locale: locale.code as LocaleCode,
             value: typeof fieldData === 'object' && fieldData !== null
-              ? (fieldData[locale.code] || '')
-              : (fieldData || ''),
+              ? ((fieldData as Record<string, string>)[locale.code] || '')
+              : (fieldData as string || ''),
           })),
         }
       })
@@ -310,11 +318,25 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
         const locale = SUPPORTED_LOCALES.find(l => l.code === localeCode)
         if (!locale) continue
 
-        const dataToSave: Record<string, string> = {}
+        // Helper function to set nested field value using dot notation
+        const setNestedValue = (obj: Record<string, unknown>, path: string, value: string) => {
+          const keys = path.split('.')
+          let current = obj
+          for (let i = 0; i < keys.length - 1; i++) {
+            const key = keys[i]
+            if (!current[key] || typeof current[key] !== 'object') {
+              current[key] = {}
+            }
+            current = current[key] as Record<string, unknown>
+          }
+          current[keys[keys.length - 1]] = value
+        }
+
+        const dataToSave: Record<string, unknown> = {}
         for (const field of fieldsData) {
           const value = field.values.find(v => v.locale === locale.code)?.value
           if (value !== undefined) {
-            dataToSave[field.config.name] = value
+            setNestedValue(dataToSave, field.config.name, value)
           }
         }
 
