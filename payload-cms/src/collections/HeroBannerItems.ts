@@ -172,7 +172,10 @@ export const HeroBannerItems: CollectionConfig = {
     {
       name: 'ctaButton',
       type: 'group',
-      label: 'CTA Button | 行动按钮',
+      label: {
+        en: 'CTA Button',
+        zh: '行动按钮',
+      },
       fields: [
         {
           name: 'text',
@@ -191,7 +194,10 @@ export const HeroBannerItems: CollectionConfig = {
         {
           name: 'link',
           type: 'text',
-          label: 'Button Link | 按钮链接',
+          label: {
+            en: 'Button Link',
+            zh: '按钮链接',
+          },
         },
       ],
     },
