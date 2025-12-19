@@ -7,7 +7,8 @@
  * Simply receives a formConfig reference and renders the form.
  */
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { Turnstile } from '@/components/ui/turnstile'
 
 interface FormField {
   fieldName: string
@@ -47,6 +48,36 @@ export function ContactFormBlock({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null)
+  const [turnstileKey, setTurnstileKey] = useState(0)
+
+  // Fetch Turnstile site key from SiteConfig
+  useEffect(() => {
+    const fetchSiteKey = async () => {
+      try {
+        const res = await fetch('/api/site-config')
+        if (res.ok) {
+          const data = await res.json()
+          if (data.turnstileSiteKey) {
+            setTurnstileSiteKey(data.turnstileSiteKey)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch Turnstile site key:', error)
+      }
+    }
+    fetchSiteKey()
+  }, [])
+
+  // Handle Turnstile success
+  const handleTurnstileSuccess = (token: string) => {
+    setTurnstileToken(token)
+    if (submitStatus === 'error') {
+      setSubmitStatus('idle')
+      setErrorMessage('')
+    }
+  }
 
   if (!formConfig?.data) {
     return (
@@ -71,6 +102,14 @@ export function ContactFormBlock({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Validate Turnstile if enabled
+    if (turnstileSiteKey && !turnstileToken) {
+      setSubmitStatus('error')
+      setErrorMessage(locale === 'zh' ? '请完成人机验证' : 'Please complete the captcha verification')
+      return
+    }
+
     setIsSubmitting(true)
     setSubmitStatus('idle')
     setErrorMessage('')
@@ -90,6 +129,7 @@ export function ContactFormBlock({
         },
         locale,
         autoSubmitted: false,
+        turnstileToken,
       }
 
       const response = await fetch('/api/form-submissions', {
@@ -105,10 +145,14 @@ export function ContactFormBlock({
 
       setSubmitStatus('success')
       setFormData({})
+      setTurnstileToken(null)
+      setTurnstileKey(prev => prev + 1)
     } catch (error) {
       console.error('Form submission error:', error)
       setSubmitStatus('error')
       setErrorMessage(error instanceof Error ? error.message : 'Failed to submit form. Please try again.')
+      setTurnstileToken(null)
+      setTurnstileKey(prev => prev + 1)
     } finally {
       setIsSubmitting(false)
     }
@@ -175,6 +219,21 @@ export function ContactFormBlock({
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {sortedFields.map((field) => renderField(field))}
+
+        {/* Turnstile Captcha */}
+        {turnstileSiteKey && (
+          <div className="mt-4">
+            <Turnstile
+              key={turnstileKey}
+              siteKey={turnstileSiteKey}
+              onVerify={handleTurnstileSuccess}
+              onError={() => setTurnstileToken(null)}
+              onExpire={() => setTurnstileToken(null)}
+              theme="light"
+              language={locale === 'zh' ? 'zh-CN' : locale}
+            />
+          </div>
+        )}
 
         <div className="pt-4">
           <button

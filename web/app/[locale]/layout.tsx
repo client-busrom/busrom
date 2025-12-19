@@ -9,10 +9,11 @@ import Header from "@/components/layout/header";
 import ConditionalFooter from "@/components/layout/conditional-footer";
 import { ClientLayoutWrapper } from "@/components/ClientLayoutWrapper";
 import { LenisProvider } from "@/components/lenis-provider";
+import { getPreloaderConfig } from "@/lib/api/preloader-config";
 
 // --- 配置所有本地字体 ---
 const paytoneOne = localFont({
-  src: "../../public/fonts/PaytoneOne-Regular.ttf",
+  src: "../../public/fonts/PaytoneOne-Regular.woff2",
   weight: "400",
   variable: "--font-paytone-one",
   display: "swap",
@@ -47,7 +48,7 @@ const anaheim = localFont({
 });
 
 const montserrat = localFont({
-  src: "../../public/fonts/Montserrat-VariableFont_wght.ttf",
+  src: "../../public/fonts/Montserrat-VariableFont_wght.woff2",
   weight: "100 900",
   variable: "--font-montserrat",
   display: "swap",
@@ -61,14 +62,14 @@ const bebasNeue = localFont({
 });
 
 const oswald = localFont({
-  src: "../../public/fonts/Oswald-VariableFont_wght.ttf",
+  src: "../../public/fonts/Oswald-VariableFont_wght.woff2",
   weight: "100 900",
   variable: "--font-oswald",
   display: "swap",
 });
 
 const inter = localFont({
-  src: "../../public/fonts/Inter-VariableFont.ttf",
+  src: "../../public/fonts/Inter-VariableFont.woff2",
   weight: "100 900",
   variable: "--font-inter",
   display: "swap",
@@ -88,6 +89,9 @@ export default async function RootLayout({
   const { locale } = await params;
   const validLocale = isValidLocale(locale) ? locale : defaultLocale;
 
+  // Fetch preloader configuration from CMS (server-side)
+  const preloaderConfig = await getPreloaderConfig();
+
   return (
     <html
       lang={validLocale}
@@ -106,7 +110,7 @@ export default async function RootLayout({
     >
       <body className={`${inter.className} overflow-x-hidden`}>
         {/* 👇 使用 ClientLayoutWrapper 包裹你的所有内容 */}
-        <ClientLayoutWrapper>
+        <ClientLayoutWrapper preloaderConfig={preloaderConfig}>
           <LenisProvider easingKey={"easeOutQuad"} />
           <div className="flex flex-col min-h-screen overflow-x-hidden">
             <Header locale={validLocale} />

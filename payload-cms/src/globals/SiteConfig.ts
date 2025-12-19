@@ -172,6 +172,66 @@ export const SiteConfig: GlobalConfig = {
             },
           ],
         },
+
+        // ----------------------------------------------------------
+        // Tab 5: Captcha (Cloudflare Turnstile)
+        // ----------------------------------------------------------
+        {
+          label: 'Captcha | 验证码',
+          fields: [
+            {
+              name: 'turnstileEnabled',
+              type: 'checkbox',
+              label: 'Enable Turnstile | 启用验证码',
+              defaultValue: false,
+              admin: {
+                description: {
+                  en: 'Enable Cloudflare Turnstile captcha for all forms',
+                  zh: '为所有表单启用 Cloudflare Turnstile 验证码',
+                },
+              },
+            },
+            {
+              name: 'turnstileSiteKey',
+              type: 'text',
+              label: 'Turnstile Site Key',
+              admin: {
+                description: {
+                  en: 'Get from Cloudflare Dashboard > Turnstile',
+                  zh: '从 Cloudflare 控制台 > Turnstile 获取',
+                },
+                condition: (data) => data?.turnstileEnabled,
+              },
+            },
+            {
+              name: 'turnstileSecretKey',
+              type: 'text',
+              label: 'Turnstile Secret Key',
+              admin: {
+                description: {
+                  en: 'Keep this secret! Used for server-side verification',
+                  zh: '请保密！用于服务端验证',
+                },
+                condition: (data) => data?.turnstileEnabled,
+              },
+            },
+            {
+              name: 'turnstileThreshold',
+              type: 'number',
+              label: 'Submission Threshold | 提交阈值',
+              defaultValue: 2,
+              min: 1,
+              max: 10,
+              admin: {
+                description: {
+                  en: 'Show captcha after this many submissions (2 = show after first)',
+                  zh: '达到此提交次数后显示验证码（2 = 第一次提交后显示）',
+                },
+                condition: (data) => data?.turnstileEnabled,
+              },
+            },
+          ],
+        },
       ],
     },
   ],

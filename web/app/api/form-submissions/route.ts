@@ -1,6 +1,153 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3002'
+const CMS_URL = process.env.CMS_URL ||
+  (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : 'http://localhost:3002')
+
+// In-memory rate limit store (for serverless, consider using Redis)
+const rateLimitStore = new Map<string, { count: number; lastSubmit: number; hourStart: number }>()
+
+// Clean up old entries every 10 minutes
+setInterval(() => {
+  const now = Date.now()
+  const oneHourAgo = now - 60 * 60 * 1000
+  for (const [key, value] of rateLimitStore.entries()) {
+    if (value.hourStart < oneHourAgo) {
+      rateLimitStore.delete(key)
+    }
+  }
+}, 10 * 60 * 1000)
+
+// Get Turnstile secret key from SiteConfig
+async function getTurnstileSecretKey(): Promise<string | null> {
+  try {
+    const response = await fetch(`${CMS_URL}/api/globals/site-config`, {
+      next: { revalidate: 300 },
+    })
+    if (!response.ok) return null
+    const data = await response.json()
+    return data.turnstileSecretKey || null
+  } catch {
+    return null
+  }
+}
+
+// Verify Turnstile token with Cloudflare
+async function verifyTurnstile(token: string, secretKey: string): Promise<boolean> {
+  try {
+    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        secret: secretKey,
+        response: token,
+      }),
+    })
+    const result = await response.json()
+    return result.success === true
+  } catch (error) {
+    console.error('Turnstile verification error:', error)
+    return false
+  }
+}
+
+// Rate limit configuration from form config
+interface RateLimitConfig {
+  enabled: boolean
+  perIP: number      // max per IP per hour
+  perDay: number     // max total per day
+  minInterval: number // min seconds between submissions
+}
+
+// Check rate limits
+async function checkRateLimit(
+  formId: string | number,
+  formName: string,
+  ip: string,
+  config: RateLimitConfig
+): Promise<{ allowed: boolean; reason?: string }> {
+  if (!config.enabled) {
+    return { allowed: true }
+  }
+
+  const now = Date.now()
+  const key = `${formName}:${ip}`
+  const record = rateLimitStore.get(key)
+
+  // Check minimum interval
+  if (record && config.minInterval > 0) {
+    const timeSinceLastSubmit = (now - record.lastSubmit) / 1000
+    if (timeSinceLastSubmit < config.minInterval) {
+      const waitTime = Math.ceil(config.minInterval - timeSinceLastSubmit)
+      return {
+        allowed: false,
+        reason: `Please wait ${waitTime} seconds before submitting again`,
+      }
+    }
+  }
+
+  // Check per-IP hourly limit
+  if (record && config.perIP > 0) {
+    const hourAgo = now - 60 * 60 * 1000
+    if (record.hourStart > hourAgo && record.count >= config.perIP) {
+      return {
+        allowed: false,
+        reason: `Maximum ${config.perIP} submissions per hour exceeded`,
+      }
+    }
+  }
+
+  // Check daily total limit (query database)
+  if (config.perDay > 0) {
+    try {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const todayISO = today.toISOString()
+
+      const countRes = await fetch(
+        `${CMS_URL}/api/form-submissions?where[formName][equals]=${encodeURIComponent(formName)}&where[submittedAt][greater_than_equal]=${encodeURIComponent(todayISO)}&limit=0`
+      )
+
+      if (countRes.ok) {
+        const countData = await countRes.json()
+        if (countData.totalDocs >= config.perDay) {
+          return {
+            allowed: false,
+            reason: `This form has reached its daily submission limit`,
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error checking daily limit:', error)
+      // Allow submission if we can't check (fail open for UX)
+    }
+  }
+
+  return { allowed: true }
+}
+
+// Update rate limit record after successful submission
+function updateRateLimitRecord(formName: string, ip: string) {
+  const now = Date.now()
+  const key = `${formName}:${ip}`
+  const record = rateLimitStore.get(key)
+  const hourAgo = now - 60 * 60 * 1000
+
+  if (record && record.hourStart > hourAgo) {
+    // Update existing record
+    rateLimitStore.set(key, {
+      count: record.count + 1,
+      lastSubmit: now,
+      hourStart: record.hourStart,
+    })
+  } else {
+    // Create new record
+    rateLimitStore.set(key, {
+      count: 1,
+      lastSubmit: now,
+      hourStart: now,
+    })
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,6 +159,7 @@ export async function POST(request: NextRequest) {
       attachments = [],
       locale,
       autoSubmitted = false,
+      turnstileToken,
     } = body
 
     console.log('[Form Submission API] Received submission:', {
@@ -19,6 +167,7 @@ export async function POST(request: NextRequest) {
       formName,
       locale,
       dataKeys: Object.keys(data || {}),
+      hasTurnstileToken: !!turnstileToken,
     })
 
     // Validate required fields
@@ -29,15 +178,88 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Verify Turnstile captcha if token is provided
+    if (turnstileToken) {
+      const secretKey = await getTurnstileSecretKey()
+      if (secretKey) {
+        const isValid = await verifyTurnstile(turnstileToken, secretKey)
+        if (!isValid) {
+          return NextResponse.json(
+            { error: 'Captcha verification failed' },
+            { status: 400 }
+          )
+        }
+        console.log('[Form Submission API] Turnstile verification passed')
+      } else {
+        console.warn('[Form Submission API] Turnstile secret key not configured in SiteConfig')
+      }
+    }
+
+    // Get IP address for rate limiting
+    const ipAddress = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+                     request.headers.get('x-real-ip') ||
+                     'unknown'
+
+    // Get form config for rate limit settings
+    let rateLimitConfig: RateLimitConfig = {
+      enabled: true,
+      perIP: 5,
+      perDay: 100,
+      minInterval: 30,
+    }
+
+    // Try to get form config with rate limit settings
+    let formConfigId: number | null = null
+    if (formId) {
+      formConfigId = typeof formId === 'string' ? parseInt(formId, 10) : formId
+    } else if (formName) {
+      try {
+        const formConfigRes = await fetch(
+          `${CMS_URL}/api/form-configs?where[name][equals]=${encodeURIComponent(formName)}&limit=1`
+        )
+        if (formConfigRes.ok) {
+          const formConfigData = await formConfigRes.json()
+          if (formConfigData.docs && formConfigData.docs.length > 0) {
+            const config = formConfigData.docs[0]
+            formConfigId = config.id
+
+            // Extract rate limit settings from form config
+            rateLimitConfig = {
+              enabled: config.rateLimitEnabled !== false, // default true
+              perIP: config.rateLimitPerIP ?? 5,
+              perDay: config.rateLimitPerDay ?? 100,
+              minInterval: config.minSubmitInterval ?? 30,
+            }
+            console.log('[Form Submission API] Rate limit config:', rateLimitConfig)
+          }
+        }
+      } catch (err) {
+        console.warn('[Form Submission API] Could not fetch form config:', err)
+      }
+    }
+
+    // Check rate limits
+    const rateLimitCheck = await checkRateLimit(
+      formConfigId || formName || 'unknown',
+      formName || 'unknown',
+      ipAddress,
+      rateLimitConfig
+    )
+
+    if (!rateLimitCheck.allowed) {
+      console.log('[Form Submission API] Rate limit exceeded:', rateLimitCheck.reason)
+      return NextResponse.json(
+        { error: rateLimitCheck.reason || 'Rate limit exceeded' },
+        { status: 429 }
+      )
+    }
+
     // Calculate total attachment size
     const totalAttachmentSize = Array.isArray(attachments)
       ? attachments.reduce((sum: number, file: any) => sum + (file.fileSize || 0), 0)
       : 0
 
     // Get request metadata
-    const ipAddress = request.headers.get('x-forwarded-for') ||
-                     request.headers.get('x-real-ip') ||
-                     'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'
     const referer = request.headers.get('referer') || 'unknown'
 
@@ -53,10 +275,10 @@ export async function POST(request: NextRequest) {
       status: 'UNREAD',
     }
 
-    // Add formConfig relationship if formId exists
-    if (formId) {
-      // Convert to number if it's a string
-      submissionData.formConfig = typeof formId === 'string' ? parseInt(formId, 10) : formId
+    // Add formConfig relationship (already looked up during rate limit check)
+    if (formConfigId) {
+      submissionData.formConfig = formConfigId
+      console.log('[Form Submission API] Using formConfig:', formConfigId)
     }
 
     // Add attachments if present
@@ -87,6 +309,9 @@ export async function POST(request: NextRequest) {
 
     const result = await response.json()
     console.log('[Form Submission API] Submission successful:', result.id)
+
+    // Update rate limit record after successful submission
+    updateRateLimitRecord(formName || 'unknown', ipAddress)
 
     // Mark uploaded files as used if present
     if (Array.isArray(attachments) && attachments.length > 0) {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react"
 import type { Locale } from "@/i18n.config"
+import { Turnstile } from "@/components/ui/turnstile"
 
 interface FormField {
   label: string
@@ -69,6 +70,9 @@ export function FullInquiryModal({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [lastActivity, setLastActivity] = useState(Date.now())
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null)
+  const [turnstileKey, setTurnstileKey] = useState(0)
 
   const inactivityTimerRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const beforeUnloadHandlerRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null)
@@ -79,6 +83,37 @@ export function FullInquiryModal({
   useEffect(() => {
     formDataRef.current = formData
   }, [formData])
+
+  // Fetch Turnstile site key from SiteConfig
+  useEffect(() => {
+    const fetchSiteKey = async () => {
+      try {
+        const res = await fetch('/api/site-config')
+        if (res.ok) {
+          const data = await res.json()
+          if (data.turnstileSiteKey) {
+            setTurnstileSiteKey(data.turnstileSiteKey)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch Turnstile site key:', error)
+      }
+    }
+    fetchSiteKey()
+  }, [])
+
+  // Handle Turnstile success - clear error if captcha error was showing
+  const handleTurnstileSuccess = (token: string) => {
+    setTurnstileToken(token)
+    // Clear captcha-related error
+    if (errors._captcha) {
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors._captcha
+        return newErrors
+      })
+    }
+  }
 
   // Prevent Lenis from capturing scroll events inside modal
   useEffect(() => {
@@ -276,6 +311,11 @@ export function FullInquiryModal({
       }
     })
 
+    // Validate Turnstile if enabled
+    if (turnstileSiteKey && !turnstileToken) {
+      newErrors._captcha = locale === 'zh' ? '请完成人机验证' : 'Please complete the captcha verification'
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -293,12 +333,20 @@ export function FullInquiryModal({
           data: formData,
           locale,
           autoSubmitted: isAuto,
+          turnstileToken: isAuto ? undefined : turnstileToken, // Don't require token for auto-submit
         }),
       })
+
+      if (response.ok) {
+        setTurnstileToken(null)
+        setTurnstileKey(prev => prev + 1)
+      }
 
       return response.ok
     } catch (error) {
       console.error("Form submission error:", error)
+      setTurnstileToken(null)
+      setTurnstileKey(prev => prev + 1)
       return false
     }
   }
@@ -529,6 +577,22 @@ export function FullInquiryModal({
               </div>
             )
           })}
+
+          {/* Turnstile Captcha */}
+          {turnstileSiteKey && (
+            <div className="mt-4">
+              <Turnstile
+                key={turnstileKey}
+                siteKey={turnstileSiteKey}
+                onVerify={handleTurnstileSuccess}
+                onError={() => setTurnstileToken(null)}
+                onExpire={() => setTurnstileToken(null)}
+                theme="light"
+                language={locale === 'zh' ? 'zh-CN' : locale}
+              />
+              {errors._captcha && <p className="mt-1 text-sm text-red-600 font-medium">{errors._captcha}</p>}
+            </div>
+          )}
 
           <div className="flex gap-4 pt-4 border-t-2 border-brand-accent-border">
             <button

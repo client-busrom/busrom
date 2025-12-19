@@ -75,7 +75,7 @@ const ImagePlaceholder = ({ ratio, src, alt, className, image }: ImagePlaceholde
 
   return (
     <div
-      className={cn("relative overflow-hidden rounded-lg shadow-lg", className)}
+      className={cn("relative overflow-hidden rounded-lg shadow-lg group", className)}
       style={{
         paddingBottom: paddingBottom,
         width: "100%",
@@ -86,7 +86,7 @@ const ImagePlaceholder = ({ ratio, src, alt, className, image }: ImagePlaceholde
         image={image}
         alt={alt || "Layout Image"}
         size="medium"
-        className="object-cover absolute inset-0 w-full h-full"
+        className="object-cover absolute inset-0 w-full h-full transition-transform duration-500 ease-out group-hover:scale-110"
       />
     </div>
   );

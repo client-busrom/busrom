@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect, FormEvent, useRef } from "react"
+import { useState, useEffect, FormEvent, useRef, useCallback } from "react"
 import type { Locale } from "@/i18n.config"
 import { Info } from "lucide-react"
+import { Turnstile } from "@/components/ui/turnstile"
 
 interface FormField {
   fieldName: string
@@ -38,6 +39,12 @@ interface FormConfig {
   enableCaptcha: boolean
   maxSubmissionsPerDay: number
   maxTotalFileSize?: number // MB
+  // Turnstile captcha settings
+  captchaEnabled: boolean
+  captchaSiteKey: string
+  captchaThreshold: number
+  captchaTheme: 'light' | 'dark' | 'auto'
+  captchaSize: 'normal' | 'compact'
 }
 
 interface DynamicFormProps {
@@ -45,6 +52,21 @@ interface DynamicFormProps {
   locale: Locale
   className?: string
   onSuccess?: () => void
+}
+
+// Helper to get submission count from sessionStorage
+const getSubmissionCount = (formName: string): number => {
+  if (typeof window === 'undefined') return 0
+  const key = `form_submissions_${formName}`
+  return parseInt(sessionStorage.getItem(key) || '0', 10)
+}
+
+// Helper to increment submission count in sessionStorage
+const incrementSubmissionCount = (formName: string): void => {
+  if (typeof window === 'undefined') return
+  const key = `form_submissions_${formName}`
+  const current = getSubmissionCount(formName)
+  sessionStorage.setItem(key, String(current + 1))
 }
 
 export function DynamicForm({ formName, locale, className, onSuccess }: DynamicFormProps) {
@@ -56,10 +78,34 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
   const [error, setError] = useState<string | null>(null)
   const [uploadingFiles, setUploadingFiles] = useState<Record<string, boolean>>({})
   const [uploadedAttachments, setUploadedAttachments] = useState<any[]>([])
-  const [showFileHelp, setShowFileHelp] = useState<string | null>(null) // Track which field's help is shown
+  const [showFileHelp, setShowFileHelp] = useState<string | null>(null)
   const fileHelpRef = useRef<HTMLDivElement>(null)
 
-  // Fetch form configuration
+  // Turnstile captcha state
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [submissionCount, setSubmissionCount] = useState(0)
+
+  // Check if captcha should be shown
+  const shouldShowCaptcha = formConfig?.captchaEnabled &&
+    formConfig.captchaSiteKey &&
+    submissionCount >= (formConfig.captchaThreshold - 1)
+
+  // Turnstile callbacks
+  const handleTurnstileVerify = useCallback((token: string) => {
+    setTurnstileToken(token)
+    setError(null)
+  }, [])
+
+  const handleTurnstileError = useCallback(() => {
+    setTurnstileToken(null)
+    setError('Captcha verification failed. Please try again.')
+  }, [])
+
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileToken(null)
+  }, [])
+
+  // Fetch form configuration and submission count
   useEffect(() => {
     const fetchFormConfig = async () => {
       try {
@@ -74,6 +120,9 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
             initialData[field.fieldName] = field.fieldType === 'checkbox' ? [] : ''
           })
           setFormData(initialData)
+
+          // Load submission count from sessionStorage
+          setSubmissionCount(getSubmissionCount(formName))
         } else {
           setError("Failed to load form configuration")
         }
@@ -310,6 +359,13 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
         return
       }
 
+      // Check captcha if required
+      if (shouldShowCaptcha && !turnstileToken) {
+        setError('Please complete the captcha verification')
+        setSubmitting(false)
+        return
+      }
+
       // Submit form
       const res = await fetch("/api/form-submissions", {
         method: "POST",
@@ -317,18 +373,24 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          formId: formConfig?.id, // Changed from formConfigId to formId
+          formId: formConfig?.id,
           formName: formConfig?.name,
           data: formData,
           attachments: uploadedAttachments,
           locale,
           sourcePage: window.location.href,
+          // Include turnstile token if captcha is enabled
+          turnstileToken: shouldShowCaptcha ? turnstileToken : undefined,
         }),
       })
 
       if (res.ok) {
         setSubmitted(true)
         onSuccess?.()
+
+        // Increment submission count for next time
+        incrementSubmissionCount(formName)
+        setSubmissionCount(prev => prev + 1)
 
         // Reset form after 5 seconds
         setTimeout(() => {
@@ -338,15 +400,18 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
             resetData[field.fieldName] = field.fieldType === 'checkbox' ? [] : ''
           })
           setFormData(resetData)
-          setUploadedAttachments([]) // Clear uploaded attachments
+          setUploadedAttachments([])
+          setTurnstileToken(null) // Reset captcha token
         }, 5000)
       } else {
         const errorData = await res.json()
         setError(errorData.error || formConfig?.errorMessage || "Failed to submit form")
+        setTurnstileToken(null) // Reset captcha on error
       }
     } catch (err) {
       console.error("Error submitting form:", err)
       setError(formConfig?.errorMessage || "Failed to submit form")
+      setTurnstileToken(null) // Reset captcha on error
     } finally {
       setSubmitting(false)
     }
@@ -750,6 +815,21 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
         .sort((a, b) => (a.order || 0) - (b.order || 0))
         .map(field => renderField(field))}
 
+      {/* Turnstile captcha widget */}
+      {shouldShowCaptcha && formConfig.captchaSiteKey && (
+        <div className="flex justify-center my-4">
+          <Turnstile
+            siteKey={formConfig.captchaSiteKey}
+            onVerify={handleTurnstileVerify}
+            onError={handleTurnstileError}
+            onExpire={handleTurnstileExpire}
+            theme={formConfig.captchaTheme}
+            size={formConfig.captchaSize}
+            language={locale === 'zh' ? 'zh-CN' : locale}
+          />
+        </div>
+      )}
+
       {/* Error message */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded p-4 text-red-600 text-sm">
@@ -760,7 +840,7 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
       {/* Submit button */}
       <button
         type="submit"
-        disabled={submitting}
+        disabled={submitting || (shouldShowCaptcha && !turnstileToken)}
         className="w-full py-3 px-6 bg-brand-text-black text-white font-anaheim font-bold uppercase tracking-wider hover:bg-brand-accent-gold hover:text-brand-text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {submitting ? "Sending..." : (formConfig.submitButtonText || "Submit")}

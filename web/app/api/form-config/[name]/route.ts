@@ -1,31 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { keystoneClient } from '@/lib/keystone-client'
-import { gql } from '@apollo/client'
 
-// GraphQL query to get form configuration
-const GET_FORM_CONFIG = gql`
-  query GetFormConfig($name: String!) {
-    formConfigs(where: { name: { equals: $name }, status: { equals: "PUBLISHED" } }) {
-      id
-      name
-      displayName
-      description
-      location
-      fields
-      submitButtonText
-      successMessage
-      errorMessage
-      enableCaptcha
-      maxSubmissionsPerDay
-      maxTotalFileSize
-    }
-  }
-`
+const CMS_URL = process.env.CMS_URL ||
+  (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : 'http://localhost:3002')
 
 /**
  * GET /api/form-config/[name]
  *
- * Fetch form configuration by name
+ * Fetch form configuration by name from Payload CMS
  *
  * Query parameters:
  * - locale: string (default: 'en')
@@ -39,23 +20,22 @@ export async function GET(
     const locale = searchParams.get('locale') || 'en'
     const { name: formName } = await params
 
-    // Execute GraphQL query
-    const { data, error } = await keystoneClient.query({
-      query: GET_FORM_CONFIG,
-      variables: {
-        name: formName,
-      },
-    })
+    // Fetch from Payload CMS REST API
+    const response = await fetch(
+      `${CMS_URL}/api/form-configs?where[name][equals]=${encodeURIComponent(formName)}&where[status][equals]=published&locale=${locale}&depth=1`,
+      { next: { revalidate: 60 } }
+    )
 
-    if (error) {
-      console.error('GraphQL Error:', error)
+    if (!response.ok) {
+      console.error('Payload CMS Error:', response.status)
       return NextResponse.json(
         { error: 'Failed to fetch form configuration' },
         { status: 500 }
       )
     }
 
-    const formConfigs = data?.formConfigs || []
+    const data = await response.json()
+    const formConfigs = data?.docs || []
 
     if (formConfigs.length === 0) {
       return NextResponse.json({ error: 'Form configuration not found' }, { status: 404 })
@@ -63,46 +43,24 @@ export async function GET(
 
     const formConfig = formConfigs[0]
 
-    // Extract localized content
-    const extractLocalizedText = (jsonField: any): string => {
-      if (!jsonField) return ''
-      if (typeof jsonField === 'string') {
-        try {
-          jsonField = JSON.parse(jsonField)
-        } catch {
-          return jsonField
-        }
-      }
-      return jsonField[locale] || jsonField['en'] || ''
-    }
-
-    // Extract localized fields array
-    const extractLocalizedFields = (fieldsJson: any): any[] => {
-      if (!fieldsJson) return []
-      if (typeof fieldsJson === 'string') {
-        try {
-          fieldsJson = JSON.parse(fieldsJson)
-        } catch {
-          return []
-        }
-      }
-      return fieldsJson[locale] || fieldsJson['en'] || []
-    }
-
-    // Transform form configuration
+    // Transform form configuration (Payload CMS returns localized fields directly)
     const transformedConfig = {
       id: formConfig.id,
       name: formConfig.name,
-      displayName: extractLocalizedText(formConfig.displayName),
-      description: extractLocalizedText(formConfig.description),
+      displayName: formConfig.displayName || '',
+      description: formConfig.description || '',
       location: formConfig.location,
-      fields: extractLocalizedFields(formConfig.fields),
-      submitButtonText: extractLocalizedText(formConfig.submitButtonText),
-      successMessage: extractLocalizedText(formConfig.successMessage),
-      errorMessage: extractLocalizedText(formConfig.errorMessage),
-      enableCaptcha: formConfig.enableCaptcha,
-      maxSubmissionsPerDay: formConfig.maxSubmissionsPerDay,
-      maxTotalFileSize: formConfig.maxTotalFileSize,
+      fields: formConfig.fields || [],
+      submitButtonText: formConfig.submitButtonText || 'Submit',
+      submittingText: formConfig.submittingText || 'Submitting...',
+      successMessage: formConfig.successMessage || 'Submitted successfully!',
+      errorRequiredFields: formConfig.errorRequiredFields || 'Please fill in required fields',
+      errorNetworkMessage: formConfig.errorNetworkMessage || 'Network error, please try again',
+      errorCaptchaMessage: formConfig.errorCaptchaMessage || 'Please complete the captcha verification',
+      // Turnstile captcha settings (per-form overrides)
+      captchaEnabled: formConfig.captchaEnabled || false,
+      captchaTheme: formConfig.captchaTheme || 'auto',
+      captchaSize: formConfig.captchaSize || 'normal',
     }
 
     return NextResponse.json(transformedConfig)

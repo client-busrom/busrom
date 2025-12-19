@@ -188,6 +188,11 @@ export interface MainFormData {
   placeholderMessage: string
   placeholderVerify: string
   buttonText: string
+  submittingText: string
+  successMessage: string
+  errorRequired: string
+  errorNetwork: string
+  errorCaptcha: string
   designTextLeft: string
   designTextRight: string
   image1: ImageObject | null

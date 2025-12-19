@@ -136,15 +136,19 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
     } : null
 
     // Transform MainForm - map images array to image1/image2
-    // Note: Placeholders are now handled by frontend i18n, not from CMS
     const mainForm = {
-      placeholderName: '', // Handled by frontend i18n
-      placeholderEmail: '', // Handled by frontend i18n
-      placeholderWhatsapp: '', // Handled by frontend i18n
-      placeholderCompany: '', // Handled by frontend i18n
-      placeholderMessage: '', // Handled by frontend i18n
-      placeholderVerify: '', // Handled by frontend i18n
-      buttonText: '', // Handled by frontend i18n
+      placeholderName: data.mainForm?.labelName || data.mainForm?.placeholderName || 'Name',
+      placeholderEmail: data.mainForm?.labelEmail || data.mainForm?.placeholderEmail || 'Email',
+      placeholderWhatsapp: data.mainForm?.labelWhatsapp || data.mainForm?.placeholderWhatsapp || 'WhatsApp',
+      placeholderCompany: data.mainForm?.labelCompany || data.mainForm?.placeholderCompany || 'Company',
+      placeholderMessage: data.mainForm?.labelMessage || data.mainForm?.placeholderMessage || 'Message',
+      placeholderVerify: data.mainForm?.placeholderVerify || 'Verify',
+      buttonText: data.mainForm?.buttonText || 'Submit',
+      submittingText: data.mainForm?.submittingText || 'Submitting...',
+      successMessage: data.mainForm?.successMessage || 'Submitted successfully! We will contact you soon.',
+      errorRequired: data.mainForm?.errorRequired || 'Please fill in name and email',
+      errorNetwork: data.mainForm?.errorNetwork || 'Network error, please try again',
+      errorCaptcha: data.mainForm?.errorCaptcha || 'Please complete the captcha verification',
       designTextLeft: data.mainForm?.designTextLeft || '',
       designTextRight: data.mainForm?.designTextRight || '',
       image1: data.mainForm?.images?.[0] ? toImageObject(data.mainForm.images[0], 'Main Form Left') : null,

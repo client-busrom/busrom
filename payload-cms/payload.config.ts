@@ -112,11 +112,13 @@ import {
   check2FARequiredHandler,
 } from './src/endpoints/auth-login'
 import { homeContentHandler } from './src/endpoints/home'
+import { testSmtpHandler } from './src/endpoints/test-smtp'
 
 // Globals - Website Settings
 import { HomeContent } from './src/globals/HomeContent'
 import { Footer } from './src/globals/Footer'
 import { SiteConfig } from './src/globals/SiteConfig'
+import { PreloaderConfig } from './src/globals/PreloaderConfig'
 import { ContactConfig } from './src/globals/ContactConfig'
 import { SocialConfig } from './src/globals/SocialConfig'
 // Globals - Homepage Sections (ordered to match frontend)
@@ -228,6 +230,7 @@ export default buildConfig({
     HomeContent,
     Footer,
     SiteConfig,
+    PreloaderConfig,
     ContactConfig,
     SocialConfig,
     // Homepage Sections (ordered to match frontend HomePageClient.tsx)
@@ -482,6 +485,12 @@ export default buildConfig({
       path: '/translate/test',
       method: 'post',
       handler: testTranslationHandler,
+    },
+    // Email Test Endpoint
+    {
+      path: '/test-smtp',
+      method: 'post',
+      handler: testSmtpHandler,
     },
     // 2FA Endpoints
     {

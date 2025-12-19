@@ -54,9 +54,13 @@ import { default as default_6e007ac8f0e2f687212ebb65ad91c147 } from '@/component
 import { default as default_8eace7ae1118053face74cf3167249d9 } from '@/components/fields/TagBasedRandomImages'
 import { default as default_f2f012c65168d1c448e59ecd59a1bae5 } from '@/components/admin/NavigationManagerLink'
 import { default as default_c2dbb529a09462acd9e8df0356a9434b } from '@/components/fields/FormFieldsTranslationCenter'
+import { default as default_7943e4c73893476d7fc7695e5ca0c666 } from '@/components/fields/FormDataDisplay'
+import { default as default_127e3c011c444cd50caa9cd70efd6d8a } from '@/components/fields/AttachmentsDisplay'
 import { default as default_bdc26dd478f73cf7016343f3a0586504 } from '@/components/fields/GlobalTranslationCenter'
+import { default as default_9a107ffbbe803e3cdf3dee39c142fca4 } from '@/components/fields/MediaArrayRowLabel'
 import { default as default_aef68a35a640877d18ec36dfae6830f7 } from '@/components/fields/SocialPlatformIcon'
 import { default as default_eba90d60bdfe915607fa737bdb8554fb } from '@/components/fields/MultilingualCarouselItems'
+import { default as default_95e57a5ac5a413f5bf54496a51c39a80 } from '@/components/fields/SmtpTestButton'
 import { Icon as Icon_a44df17d0fc3dcd873dae43dc3bf66bd } from '@/components/admin/Logo'
 import { default as default_a44df17d0fc3dcd873dae43dc3bf66bd } from '@/components/admin/Logo'
 import { default as default_9021c207f82628325087705959e6035c } from '@/components/admin/AdminStylesProvider'
@@ -119,9 +123,13 @@ export const importMap = {
   "@/components/fields/TagBasedRandomImages#default": default_8eace7ae1118053face74cf3167249d9,
   "@/components/admin/NavigationManagerLink#default": default_f2f012c65168d1c448e59ecd59a1bae5,
   "@/components/fields/FormFieldsTranslationCenter#default": default_c2dbb529a09462acd9e8df0356a9434b,
+  "@/components/fields/FormDataDisplay#default": default_7943e4c73893476d7fc7695e5ca0c666,
+  "@/components/fields/AttachmentsDisplay#default": default_127e3c011c444cd50caa9cd70efd6d8a,
   "@/components/fields/GlobalTranslationCenter#default": default_bdc26dd478f73cf7016343f3a0586504,
+  "@/components/fields/MediaArrayRowLabel#default": default_9a107ffbbe803e3cdf3dee39c142fca4,
   "@/components/fields/SocialPlatformIcon#default": default_aef68a35a640877d18ec36dfae6830f7,
   "@/components/fields/MultilingualCarouselItems#default": default_eba90d60bdfe915607fa737bdb8554fb,
+  "@/components/fields/SmtpTestButton#default": default_95e57a5ac5a413f5bf54496a51c39a80,
   "@/components/admin/Logo#Icon": Icon_a44df17d0fc3dcd873dae43dc3bf66bd,
   "@/components/admin/Logo#default": default_a44df17d0fc3dcd873dae43dc3bf66bd,
   "@/components/admin/AdminStylesProvider#default": default_9021c207f82628325087705959e6035c,

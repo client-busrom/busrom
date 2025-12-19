@@ -12,6 +12,7 @@
  */
 
 import type { CollectionConfig } from 'payload'
+import { sendFormNotificationEmail, sendAutoReplyEmail } from '../lib/form-email'
 
 export const FormSubmissions: CollectionConfig = {
   slug: 'form-submissions',
@@ -83,6 +84,43 @@ export const FormSubmissions: CollectionConfig = {
         return data
       },
     ],
+    afterChange: [
+      async ({ doc, req, operation }) => {
+        // Only send emails on create (new submission)
+        if (operation !== 'create') return doc
+
+        // Send emails asynchronously (don't block the response)
+        setImmediate(async () => {
+          try {
+            // Send notification email to admin
+            const notificationResult = await sendFormNotificationEmail(req.payload, doc)
+            if (notificationResult.success) {
+              // Update emailSent flag
+              await req.payload.update({
+                collection: 'form-submissions',
+                id: doc.id,
+                data: { emailSent: true },
+              })
+              req.payload.logger.info(`Notification email sent for submission ${doc.id}`)
+            } else if (notificationResult.error) {
+              req.payload.logger.error(`Failed to send notification email: ${notificationResult.error}`)
+            }
+
+            // Send auto-reply to submitter
+            const autoReplyResult = await sendAutoReplyEmail(req.payload, doc)
+            if (autoReplyResult.success) {
+              req.payload.logger.info(`Auto-reply email sent for submission ${doc.id}`)
+            } else if (autoReplyResult.error && autoReplyResult.error !== 'Auto-reply disabled') {
+              req.payload.logger.error(`Failed to send auto-reply email: ${autoReplyResult.error}`)
+            }
+          } catch (error: any) {
+            req.payload.logger.error('Error in email notification hook:', error?.message || error)
+          }
+        })
+
+        return doc
+      },
+    ],
   },
   fields: [
     // ==================================================================
@@ -115,29 +153,59 @@ export const FormSubmissions: CollectionConfig = {
     },
 
     // ==================================================================
-    // Form Data
+    // Form Data (Visual Display)
     // ==================================================================
+    {
+      name: 'dataDisplay',
+      type: 'ui',
+      label: {
+        en: 'Submitted Data',
+        zh: '提交的数据',
+      },
+      admin: {
+        components: {
+          Field: '@/components/fields/FormDataDisplay',
+        },
+      },
+    },
     {
       name: 'data',
       type: 'json',
       label: {
-        en: 'Form Data',
-        zh: '表单数据',
+        en: 'Form Data (Raw JSON)',
+        zh: '表单数据 (原始JSON)',
       },
       admin: {
+        readOnly: true,
         description: 'All submitted form field values',
+        condition: () => false, // Hide raw JSON field
+      },
+    },
+    {
+      name: 'attachmentsDisplay',
+      type: 'ui',
+      label: {
+        en: 'Attachments',
+        zh: '附件',
+      },
+      admin: {
+        components: {
+          Field: '@/components/fields/AttachmentsDisplay',
+        },
       },
     },
     {
       name: 'attachments',
       type: 'json',
       label: {
-        en: 'Attachments',
-        zh: '附件',
+        en: 'Attachments (Raw)',
+        zh: '附件 (原始)',
       },
       defaultValue: [],
       admin: {
+        readOnly: true,
         description: 'List of uploaded files',
+        condition: () => false, // Hide raw JSON field
       },
     },
     {
@@ -189,6 +257,7 @@ export const FormSubmissions: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
+        readOnly: true,
       },
     },
 

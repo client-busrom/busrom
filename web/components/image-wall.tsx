@@ -1,31 +1,31 @@
-﻿
-import { useEffect, useRef } from "react"
+﻿import { useEffect, useRef } from "react"
 import Image from "next/image"
 import gsap from "gsap"
-
-// [修正] 定义一个更详细的数据结构，包含图片源、位置、宽高比和尺寸缩放
-const imageDetails = [
-  { src: '/1.jpg', position: { top: "50%", left: "50%" }, aspectRatio: '9 / 16', widthScale: 1.0 },   // 1
-  { src: '/2.jpg', position: { top: "50%", left: "35%" }, aspectRatio: '9 / 6', widthScale: 1.0 },   // 2
-  { src: '/3.jpg', position: { top: "50%", left: "65%" }, aspectRatio: '9 / 12', widthScale: 0.8 },   // 3
-  { src: '/4.jpg', position: { top: "75%", left: "50%" }, aspectRatio: '9 / 6', widthScale: 1.0 },   // 4
-  { src: '/5.jpg', position: { top: "65%", left: "65%" }, aspectRatio: '9 / 6', widthScale: 1.4 },   // 5
-  { src: '/6.jpg', position: { top: "30%", left: "65%" }, aspectRatio: '9 / 6', widthScale: 1.4 },   // 6
-  { src: '/7.jpg', position: { top: "25%", left: "40%" }, aspectRatio: '9 / 6', widthScale: 1 },   // 7
-];
+import type { ImageWallItem } from "@/lib/api/preloader-config"
 
 const BASE_WIDTH = 256; // 设置一个基础宽度（像素），对应 w-64
 
 interface ImageWallProps {
-  isActive: boolean; // [新增] 控制动画是否开始
+  isActive: boolean;
   onComplete: () => void;
+  images: ImageWallItem[];
+  backgroundColor?: string;
+  duration?: number;
+  stagger?: number;
 }
 
-export function ImageWall({ isActive, onComplete }: ImageWallProps) {
+export function ImageWall({
+  isActive,
+  onComplete,
+  images,
+  backgroundColor = "#EBE6D8",
+  duration = 0.8,
+  stagger = 0.2,
+}: ImageWallProps) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // [修正] 只有在 isActive 为 true 时才执行动画
+    // 只有在 isActive 为 true 时才执行动画
     if (!isActive) return;
 
     const container = containerRef.current
@@ -41,7 +41,7 @@ export function ImageWall({ isActive, onComplete }: ImageWallProps) {
       },
     })
 
-    // [修正] 在动画开始前，立即让容器可见
+    // 在动画开始前，立即让容器可见
     gsap.set(container, { opacity: 1, pointerEvents: 'auto' });
 
     tl.fromTo(
@@ -50,25 +50,25 @@ export function ImageWall({ isActive, onComplete }: ImageWallProps) {
       {
         scale: 1,
         opacity: 1,
-        duration: 0.8,
+        duration: duration,
         ease: "power2.out",
-        stagger: 0.2,
+        stagger: stagger,
       }
     )
-  }, [isActive, onComplete])
+  }, [isActive, onComplete, duration, stagger])
 
   return (
     <div
       ref={containerRef}
-      // [修正] 初始状态下保持透明且不可交互
-      className="fixed inset-0 z-40 bg-[#EBE6D8] opacity-0 pointer-events-none"
+      className="fixed inset-0 z-40 opacity-0 pointer-events-none"
+      style={{ backgroundColor }}
     >
-      {imageDetails.map((item, index) => {
+      {images.map((item, index) => {
         const width = BASE_WIDTH * item.widthScale;
 
         return (
           <div
-            key={item.src}
+            key={`${item.src}-${index}`}
             className="image-item absolute overflow-hidden shadow-lg -translate-x-1/2 -translate-y-1/2"
             style={{
               top: item.position.top,
@@ -82,7 +82,8 @@ export function ImageWall({ isActive, onComplete }: ImageWallProps) {
               alt={`Gallery image ${index + 1}`}
               fill
               className="object-cover"
-              sizes={`${width}px`} // 建议为 next/image 添加 sizes 属性
+              sizes={`${width}px`}
+              priority // All images load with priority since this is the loading screen
             />
           </div>
         )
@@ -90,4 +91,3 @@ export function ImageWall({ isActive, onComplete }: ImageWallProps) {
     </div>
   )
 }
-

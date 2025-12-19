@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import type { Locale } from "@/i18n.config";
 import { getHomeContent } from "@/lib/content-data";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import Link from "next/link";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { Turnstile } from "@/components/ui/turnstile";
 
 type Props = {
   locale: Locale;
@@ -38,6 +39,123 @@ const rpx = (designValue: number) => `calc(var(--rpx) * ${designValue})`;
 
 export default function Footer({ locale, showForm = true }: Props) {
   const content = useMemo(() => getHomeContent(locale).footer, [locale]);
+
+  // Form state
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
+  const [turnstileKey, setTurnstileKey] = useState(0); // For resetting Turnstile
+
+  // Form config for multi-language messages
+  const [formConfig, setFormConfig] = useState<{
+    errorCaptchaMessage?: string;
+    errorRequiredFields?: string;
+    errorNetworkMessage?: string;
+    successMessage?: string;
+  } | null>(null);
+
+  // Fetch Turnstile site key from SiteConfig and form config
+  useEffect(() => {
+    const fetchConfigs = async () => {
+      try {
+        const [siteRes, formRes] = await Promise.all([
+          fetch('/api/site-config'),
+          fetch(`/api/form-config/footer-form?locale=${locale}`)
+        ]);
+
+        if (siteRes.ok) {
+          const data = await siteRes.json();
+          if (data.turnstileSiteKey) {
+            setTurnstileSiteKey(data.turnstileSiteKey);
+          }
+        }
+
+        if (formRes.ok) {
+          const data = await formRes.json();
+          setFormConfig(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch configs:', error);
+      }
+    };
+    fetchConfigs();
+  }, [locale]);
+
+  // Handle Turnstile success - clear error if captcha error was showing
+  const handleTurnstileSuccess = (token: string) => {
+    setTurnstileToken(token);
+    // Clear captcha-related error
+    if (submitStatus === 'error') {
+      setSubmitStatus('idle');
+      setErrorMessage('');
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Default messages (fallback if formConfig not loaded)
+    const defaultMessages = {
+      errorRequiredFields: locale === 'zh' ? '请填写所有字段' : 'Please fill in all fields',
+      errorCaptchaMessage: locale === 'zh' ? '请完成人机验证' : 'Please complete the captcha verification',
+      errorNetworkMessage: locale === 'zh' ? '网络错误，请重试' : 'Network error, please try again',
+      successMessage: locale === 'zh' ? '提交成功！我们会尽快与您联系。' : 'Submitted successfully! We will contact you soon.',
+    };
+
+    // Validate
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      setSubmitStatus('error');
+      setErrorMessage(formConfig?.errorRequiredFields || defaultMessages.errorRequiredFields);
+      return;
+    }
+
+    // Validate Turnstile if enabled
+    if (turnstileSiteKey && !turnstileToken) {
+      setSubmitStatus('error');
+      setErrorMessage(formConfig?.errorCaptchaMessage || defaultMessages.errorCaptchaMessage);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+    setErrorMessage('');
+
+    try {
+      const response = await fetch('/api/form-submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          formName: 'footer-form',
+          data: formData,
+          locale,
+          turnstileToken,
+        }),
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setFormData({ name: '', email: '', message: '' });
+        setTurnstileToken(null);
+        setTurnstileKey(prev => prev + 1); // Reset Turnstile widget
+      } else {
+        const data = await response.json();
+        setSubmitStatus('error');
+        setErrorMessage(data.error || (locale === 'zh' ? '提交失败，请重试' : 'Submission failed, please try again'));
+        setTurnstileToken(null);
+        setTurnstileKey(prev => prev + 1); // Reset Turnstile widget on error
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+      setErrorMessage(formConfig?.errorNetworkMessage || defaultMessages.errorNetworkMessage);
+      setTurnstileToken(null);
+      setTurnstileKey(prev => prev + 1);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (showForm) {
     // 首页版本：显示表单
@@ -121,14 +239,17 @@ export default function Footer({ locale, showForm = true }: Props) {
                 {content.form.title}
               </h3>
 
-              <form className="space-y-3 md:space-y-4">
+              <form className="space-y-3 md:space-y-4" onSubmit={handleSubmit}>
                 {/* Name - Figma: 32px at 1920px */}
                 <div>
                   <Input
                     type="text"
                     id="footer-name"
                     placeholder={content.form.placeholders.name}
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className={cn(formInputClasses, "text-sm md:text-base lg:text-lg")}
+                    disabled={isSubmitting}
                   />
                 </div>
 
@@ -138,7 +259,10 @@ export default function Footer({ locale, showForm = true }: Props) {
                     type="email"
                     id="footer-email"
                     placeholder={content.form.placeholders.email}
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className={cn(formInputClasses, "text-sm md:text-base lg:text-lg")}
+                    disabled={isSubmitting}
                   />
                 </div>
 
@@ -147,17 +271,48 @@ export default function Footer({ locale, showForm = true }: Props) {
                   <Textarea
                     id="footer-message"
                     placeholder={content.form.placeholders.message}
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     className={cn(formInputClasses, "min-h-[40px] text-sm md:text-base lg:text-lg")}
+                    disabled={isSubmitting}
                   />
                 </div>
+
+                {/* Turnstile Captcha */}
+                {turnstileSiteKey && (
+                  <div className="mt-4">
+                    <Turnstile
+                      key={turnstileKey}
+                      siteKey={turnstileSiteKey}
+                      onVerify={handleTurnstileSuccess}
+                      onError={() => setTurnstileToken(null)}
+                      onExpire={() => setTurnstileToken(null)}
+                      theme="dark"
+                      language={locale === 'zh' ? 'zh-CN' : locale}
+                    />
+                  </div>
+                )}
+
+                {/* Status messages */}
+                {submitStatus === 'success' && (
+                  <div className="text-green-400 text-sm">
+                    {formConfig?.successMessage || (locale === 'zh' ? '提交成功！我们会尽快与您联系。' : 'Submitted successfully! We will contact you soon.')}
+                  </div>
+                )}
+                {submitStatus === 'error' && errorMessage && (
+                  <div className="text-red-400 text-sm">{errorMessage}</div>
+                )}
 
                 {/* Submit Button - Figma: 32px at 1920px */}
                 <div className="mt-6 md:mt-8 lg:mt-16">
                   <Button
                     type="submit"
                     className={cn(formButtonClasses, "w-full sm:w-1/2 lg:w-1/3 text-sm md:text-base lg:text-lg")}
+                    disabled={isSubmitting}
                   >
-                    {content.form.buttonText}
+                    {isSubmitting
+                      ? (locale === 'zh' ? '提交中...' : 'Submitting...')
+                      : content.form.buttonText}
                   </Button>
                 </div>
               </form>
