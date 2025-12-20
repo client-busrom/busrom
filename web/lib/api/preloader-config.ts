@@ -46,8 +46,9 @@ export interface PreloaderConfigData {
 
 /**
  * Default preloader configuration (fallback when CMS is unavailable)
+ * 导出供 layout.tsx 直接使用，避免服务端阻塞
  */
-const defaultConfig: PreloaderConfigData = {
+export const defaultPreloaderConfig: PreloaderConfigData = {
   enabled: true,
   backgroundColor: '#EBE6D8',
   textColor: '#EBE6D8',
@@ -96,20 +97,20 @@ export async function getPreloaderConfig(): Promise<PreloaderConfigData> {
     // If redirected (302) or not OK, return default config
     if (!response.ok || response.status === 302) {
       console.warn(`Failed to fetch preloader config: ${response.status} ${response.statusText}`)
-      return defaultConfig
+      return defaultPreloaderConfig
     }
 
     // Check content type to ensure we got JSON, not HTML (login page)
     const contentType = response.headers.get('content-type') || ''
     if (!contentType.includes('application/json')) {
       console.warn(`Preloader config returned non-JSON content type: ${contentType}`)
-      return defaultConfig
+      return defaultPreloaderConfig
     }
 
     const text = await response.text()
     if (!text || text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
       console.warn('Preloader config returned HTML instead of JSON')
-      return defaultConfig
+      return defaultPreloaderConfig
     }
 
     const data = JSON.parse(text)
@@ -137,18 +138,18 @@ export async function getPreloaderConfig(): Promise<PreloaderConfigData> {
 
     return {
       enabled: data.enabled ?? true,
-      backgroundColor: data.backgroundColor || defaultConfig.backgroundColor,
-      textColor: data.textColor || defaultConfig.textColor,
-      highlightColor: data.highlightColor || defaultConfig.highlightColor,
+      backgroundColor: data.backgroundColor || defaultPreloaderConfig.backgroundColor,
+      textColor: data.textColor || defaultPreloaderConfig.textColor,
+      highlightColor: data.highlightColor || defaultPreloaderConfig.highlightColor,
       imageWallEnabled: data.imageWallEnabled ?? true,
-      images: images.length > 0 ? images : defaultConfig.images,
-      loadingDuration: data.loadingDuration || defaultConfig.loadingDuration,
-      logoAnimationDuration: data.logoAnimationDuration || defaultConfig.logoAnimationDuration,
-      imageWallDuration: data.imageWallDuration || defaultConfig.imageWallDuration,
-      imageWallStagger: data.imageWallStagger || defaultConfig.imageWallStagger,
+      images: images.length > 0 ? images : defaultPreloaderConfig.images,
+      loadingDuration: data.loadingDuration || defaultPreloaderConfig.loadingDuration,
+      logoAnimationDuration: data.logoAnimationDuration || defaultPreloaderConfig.logoAnimationDuration,
+      imageWallDuration: data.imageWallDuration || defaultPreloaderConfig.imageWallDuration,
+      imageWallStagger: data.imageWallStagger || defaultPreloaderConfig.imageWallStagger,
     }
   } catch (error) {
     console.error('Error fetching preloader config:', error)
-    return defaultConfig
+    return defaultPreloaderConfig
   }
 }
