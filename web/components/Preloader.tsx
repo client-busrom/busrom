@@ -117,6 +117,88 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
       logoMesh = group;
   });
 
+    // --- 图片加载进度跟踪 ---
+    let imagesLoaded = 0;
+    const totalImages = config.images.length;
+    const realProgress = { value: 0 };
+    let allImagesLoaded = false;
+    let fontAndLogoReady = false;
+
+    // 更新百分比文字显示
+    const updatePercentageDisplay = () => {
+      if (!font) return;
+      if (percentageText) {
+        scene.remove(percentageText);
+        percentageText.geometry.dispose();
+      }
+      const percentageGeo = new TextGeometry(`${Math.round(realProgress.value)}%`, { font, size: 0.12, depth: 0.05, curveSegments: 12 });
+      percentageGeo.center();
+      percentageText = new THREE.Mesh(percentageGeo, loadingMaterial);
+      percentageText.position.y = -0.1;
+      scene.add(percentageText);
+    };
+
+    // 检查是否可以开始结束动画
+    const checkAndStartEndAnimation = () => {
+      if (allImagesLoaded && fontAndLogoReady) {
+        // 确保进度显示为 100%
+        realProgress.value = 100;
+        updatePercentageDisplay();
+
+        // 开始结束动画
+        setTimeout(() => {
+          endTimeline.play();
+        }, 300); // 短暂延迟让用户看到 100%
+      }
+    };
+
+    // 加载图片并跟踪进度
+    const loadImagesWithProgress = () => {
+      if (totalImages === 0) {
+        allImagesLoaded = true;
+        checkAndStartEndAnimation();
+        return;
+      }
+
+      config.images.forEach((img) => {
+        const image = new Image();
+        image.onload = () => {
+          imagesLoaded++;
+          const targetProgress = (imagesLoaded / totalImages) * 100;
+
+          // 平滑动画到目标进度
+          gsap.to(realProgress, {
+            value: targetProgress,
+            duration: 0.3,
+            ease: "power1.out",
+            onUpdate: updatePercentageDisplay,
+          });
+
+          if (imagesLoaded >= totalImages) {
+            allImagesLoaded = true;
+            checkAndStartEndAnimation();
+          }
+        };
+        image.onerror = () => {
+          // 即使加载失败也计入进度
+          imagesLoaded++;
+          const targetProgress = (imagesLoaded / totalImages) * 100;
+          gsap.to(realProgress, {
+            value: targetProgress,
+            duration: 0.3,
+            ease: "power1.out",
+            onUpdate: updatePercentageDisplay,
+          });
+
+          if (imagesLoaded >= totalImages) {
+            allImagesLoaded = true;
+            checkAndStartEndAnimation();
+          }
+        };
+        image.src = img.src;
+      });
+    };
+
     fontLoader.load("https://cdn.jsdelivr.net/npm/three@0.137/examples/fonts/helvetiker_bold.typeface.json", (loadedFont) => {
       font = loadedFont;
       const loadingGeo = new TextGeometry("Busrom", { font, size: 0.15, depth: 0.05, curveSegments: 12 });
@@ -126,37 +208,17 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
       scene.add(loadingText);
       loadingMaterial.uniforms.uProgressReveal.value = 1;
 
-      // 在后台预加载图片，不阻塞动画开始
-      // 使用独立的 loader 避免影响 loadingManager.onLoad
-      const bgTextureLoader = new THREE.TextureLoader();
-      config.images.forEach((img) => {
-        bgTextureLoader.load(img.src);
-      });
+      // 显示初始 0%
+      updatePercentageDisplay();
+
+      // 开始加载图片
+      loadImagesWithProgress();
     });
 
-    // --- 动画逻辑 (使用 CMS 配置的时长) ---
-    const masterTimeline = gsap.timeline({ paused: true });
+    // --- 结束动画 (图片加载完成后播放) ---
+    const endTimeline = gsap.timeline({ paused: true });
 
-    const fakeProgress = { value: 0 };
-    masterTimeline.to(fakeProgress, {
-      value: 100,
-      duration: config.loadingDuration,
-      ease: "power1.out",
-      onUpdate: () => {
-        if (!font) return;
-        if (percentageText) {
-          scene.remove(percentageText);
-          percentageText.geometry.dispose();
-        }
-        const percentageGeo = new TextGeometry(`${Math.round(fakeProgress.value)}%`, { font, size: 0.12, depth: 0.05, curveSegments: 12 });
-        percentageGeo.center();
-        percentageText = new THREE.Mesh(percentageGeo, loadingMaterial);
-        percentageText.position.y = -0.1;
-        scene.add(percentageText);
-      },
-    });
-
-    masterTimeline.to(loadingMaterial.uniforms.uOpacity, {
+    endTimeline.to(loadingMaterial.uniforms.uOpacity, {
       value: 0,
       duration: 0.5,
       ease: "power2.in",
@@ -166,7 +228,7 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
       },
     });
 
-    masterTimeline.call(() => {
+    endTimeline.call(() => {
       if (!logoMesh) return;
       scene.add(logoMesh);
       gsap.from(logoMesh.scale, { x: 0, y: 0, z: 0, duration: config.logoAnimationDuration, ease: "power2.out" });
@@ -177,10 +239,12 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
       });
     });
 
-    masterTimeline.to({}, { duration: config.logoAnimationDuration, onComplete: onLoadingComplete });
+    endTimeline.to({}, { duration: config.logoAnimationDuration, onComplete: onLoadingComplete });
 
+    // 字体和 Logo 加载完成的回调
     loadingManager.onLoad = () => {
-      masterTimeline.play();
+      fontAndLogoReady = true;
+      checkAndStartEndAnimation();
     };
 
     gsap.to(loadingMaterial.uniforms.uProgressShine, {
