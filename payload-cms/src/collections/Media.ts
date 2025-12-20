@@ -349,7 +349,7 @@ export const Media: CollectionConfig = {
           // Check PreloaderConfig global (images array)
           try {
             const preloaderConfig = await payload.findGlobal({
-              slug: 'preloader-config',
+              slug: 'preloader-config' as any,
               depth: 0,
             })
             const preloaderImages = (preloaderConfig as any)?.images || []
