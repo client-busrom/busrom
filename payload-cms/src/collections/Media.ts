@@ -346,6 +346,24 @@ export const Media: CollectionConfig = {
           // Check if media is referenced by other collections
           const references: string[] = []
 
+          // Check PreloaderConfig global (images array)
+          try {
+            const preloaderConfig = await payload.findGlobal({
+              slug: 'preloader-config',
+              depth: 0,
+            })
+            const preloaderImages = (preloaderConfig as any)?.images || []
+            const isInPreloader = preloaderImages.some((img: any) => {
+              const imageId = typeof img?.image === 'object' ? img.image?.id : img?.image
+              return imageId === id || imageId === Number(id)
+            })
+            if (isInPreloader) {
+              references.push('Preloader Config')
+            }
+          } catch (e) {
+            // Preloader config might not exist, ignore
+          }
+
           // Check HeroBannerItems
           const heroBannerRefs = await payload.find({
             collection: 'hero-banner-items',
