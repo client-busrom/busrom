@@ -167,13 +167,11 @@ export default function Footer({ locale, showForm = true }: Props) {
         "
         data-header-theme="transparent"
       >
-        {/* 背景图片 */}
-        <Image
-          src={"/BusromFooterBg.png"}
-          alt={"FooterBg"}
-          fill
-          sizes="100vw"
-          className="object-cover z-0"
+        {/* 背景图片 - 使用 CSS 背景代替 fill Image 避免 CLS */}
+        <div
+          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/BusromFooterBg.png)' }}
+          aria-hidden="true"
         />
 
         {/* 卡片容器 (自定义底部距离) */}
