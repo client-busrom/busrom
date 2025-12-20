@@ -9,7 +9,7 @@ import Header from "@/components/layout/header";
 import ConditionalFooter from "@/components/layout/conditional-footer";
 import { ClientLayoutWrapper } from "@/components/ClientLayoutWrapper";
 import { LenisProvider } from "@/components/lenis-provider";
-import { getPreloaderConfig } from "@/lib/api/preloader-config";
+import { defaultPreloaderConfig } from "@/lib/api/preloader-config";
 
 // --- 配置所有本地字体 ---
 const paytoneOne = localFont({
@@ -89,8 +89,9 @@ export default async function RootLayout({
   const { locale } = await params;
   const validLocale = isValidLocale(locale) ? locale : defaultLocale;
 
-  // Fetch preloader configuration from CMS (server-side)
-  const preloaderConfig = await getPreloaderConfig();
+  // 使用默认配置立即渲染，避免阻塞
+  // 真实配置在 ClientLayoutWrapper 中异步获取
+  const preloaderConfig = defaultPreloaderConfig;
 
   return (
     <html
