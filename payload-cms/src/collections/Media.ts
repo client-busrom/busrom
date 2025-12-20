@@ -14,6 +14,15 @@
 
 import type { CollectionConfig } from 'payload'
 import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { generateVariantsHook } from '../hooks/generateVariants'
+
+// Variant folder mapping (Payload size name → S3 folder name)
+const VARIANT_FOLDERS: Record<string, string> = {
+  thumbnail: 'thumbnail',
+  card: 'small',
+  tablet: 'medium',
+  desktop: 'large',
+}
 
 // Initialize S3 client for manual file deletion
 const s3Client = new S3Client({
@@ -321,10 +330,16 @@ export const Media: CollectionConfig = {
         })
 
         // Check if user is super admin
-        // roles is a relationship array, need to check role.code
-        const isSuperAdmin = user?.roles?.some((role: any) =>
-          role?.code === 'super_admin' || role === 'super_admin'
-        )
+        // roles can be an array of IDs (numbers) or populated objects with code
+        const isSuperAdmin = user?.roles?.some((role: any) => {
+          // If role is populated object
+          if (typeof role === 'object' && role?.code === 'super_admin') return true
+          // If role is just an ID, check against super_admin role ID (1)
+          if (typeof role === 'number' && role === 1) return true
+          // If role is string ID
+          if (typeof role === 'string' && role === '1') return true
+          return false
+        }) || user?.isAdmin === true
 
         // If media is already archived and user is super admin, allow hard delete
         if (media.status === 'archived' && isSuperAdmin) {
@@ -357,28 +372,24 @@ export const Media: CollectionConfig = {
         const failedFiles: string[] = []
 
         try {
-          // Delete all variants from S3
-          if (doc.variants && typeof doc.variants === 'object') {
-            const variantKeys = Object.keys(doc.variants)
+          // Delete all variants from S3 (stored in variants/{folder}/ path)
+          const filename = doc.filename
+          if (filename) {
+            for (const [sizeName, folder] of Object.entries(VARIANT_FOLDERS)) {
+              const key = `variants/${folder}/${filename}`
 
-            for (const variantName of variantKeys) {
-              const variant = doc.variants[variantName]
-              if (variant?.filename) {
-                const key = `media/${variant.filename}`
-
-                try {
-                  await s3Client.send(
-                    new DeleteObjectCommand({
-                      Bucket: bucket,
-                      Key: key,
-                    })
-                  )
-                  deletedFiles.push(key)
-                  console.log(`  🗑️ Deleted variant: ${key}`)
-                } catch (error) {
-                  failedFiles.push(key)
-                  console.error(`  ❌ Failed to delete variant ${key}:`, error)
-                }
+              try {
+                await s3Client.send(
+                  new DeleteObjectCommand({
+                    Bucket: bucket,
+                    Key: key,
+                  })
+                )
+                deletedFiles.push(key)
+                console.log(`  🗑️ Deleted variant: ${key}`)
+              } catch (error) {
+                failedFiles.push(key)
+                console.error(`  ❌ Failed to delete variant ${key}:`, error)
               }
             }
           }
@@ -395,5 +406,6 @@ export const Media: CollectionConfig = {
         }
       },
     ],
+    afterChange: [generateVariantsHook],
   },
 }
