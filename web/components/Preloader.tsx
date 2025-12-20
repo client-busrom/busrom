@@ -123,15 +123,28 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
     const realProgress = { value: 0 };
     let allImagesLoaded = false;
     let fontAndLogoReady = false;
+    let lastDisplayedPercent = -1; // 避免重复更新相同的百分比
+    let minTimeElapsed = false; // 最小显示时间标记
+    const MIN_LOADING_TIME = 1500; // 最小加载时间 1.5 秒
 
-    // 更新百分比文字显示
+    // 设置最小显示时间
+    setTimeout(() => {
+      minTimeElapsed = true;
+      checkAndStartEndAnimation();
+    }, MIN_LOADING_TIME);
+
+    // 更新百分比文字显示 - 只在百分比变化时更新
     const updatePercentageDisplay = () => {
       if (!font) return;
+      const currentPercent = Math.round(realProgress.value);
+      if (currentPercent === lastDisplayedPercent) return; // 跳过相同百分比
+      lastDisplayedPercent = currentPercent;
+
       if (percentageText) {
         scene.remove(percentageText);
         percentageText.geometry.dispose();
       }
-      const percentageGeo = new TextGeometry(`${Math.round(realProgress.value)}%`, { font, size: 0.12, depth: 0.05, curveSegments: 12 });
+      const percentageGeo = new TextGeometry(`${currentPercent}%`, { font, size: 0.12, depth: 0.05, curveSegments: 12 });
       percentageGeo.center();
       percentageText = new THREE.Mesh(percentageGeo, loadingMaterial);
       percentageText.position.y = -0.1;
@@ -140,7 +153,8 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
 
     // 检查是否可以开始结束动画
     const checkAndStartEndAnimation = () => {
-      if (allImagesLoaded && fontAndLogoReady) {
+      // 需要满足三个条件：图片加载完成、字体和Logo准备好、最小时间已过
+      if (allImagesLoaded && fontAndLogoReady && minTimeElapsed) {
         // 确保进度显示为 100%
         realProgress.value = 100;
         updatePercentageDisplay();
@@ -160,41 +174,25 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
         return;
       }
 
+      // 启动平滑进度动画（在最小时间内从 0 到 100）
+      gsap.to(realProgress, {
+        value: 100,
+        duration: MIN_LOADING_TIME / 1000,
+        ease: "power1.out",
+        onUpdate: updatePercentageDisplay,
+      });
+
       config.images.forEach((img) => {
         const image = new Image();
-        image.onload = () => {
+        const handleLoad = () => {
           imagesLoaded++;
-          const targetProgress = (imagesLoaded / totalImages) * 100;
-
-          // 平滑动画到目标进度
-          gsap.to(realProgress, {
-            value: targetProgress,
-            duration: 0.3,
-            ease: "power1.out",
-            onUpdate: updatePercentageDisplay,
-          });
-
           if (imagesLoaded >= totalImages) {
             allImagesLoaded = true;
             checkAndStartEndAnimation();
           }
         };
-        image.onerror = () => {
-          // 即使加载失败也计入进度
-          imagesLoaded++;
-          const targetProgress = (imagesLoaded / totalImages) * 100;
-          gsap.to(realProgress, {
-            value: targetProgress,
-            duration: 0.3,
-            ease: "power1.out",
-            onUpdate: updatePercentageDisplay,
-          });
-
-          if (imagesLoaded >= totalImages) {
-            allImagesLoaded = true;
-            checkAndStartEndAnimation();
-          }
-        };
+        image.onload = handleLoad;
+        image.onerror = handleLoad; // 即使加载失败也计入进度
         image.src = img.src;
       });
     };

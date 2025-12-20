@@ -73,19 +73,24 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
   const shouldShowPreloader = preloaderConfig.enabled && isHomePage;
   const shouldShowImageWall = preloaderConfig.imageWallEnabled;
 
+  // 是否应该延迟渲染主内容（仅在首页 preloader 动画期间）
+  const shouldDeferContent = shouldShowPreloader && loadingStage !== "done";
+
   return (
     // SWRConfig 包裹所有内容，为整个应用提供 SWR 上下文
     <SWRConfig value={{ fetcher }}>
 
       {/* 内容层：
-        始终渲染子页面 (Header, main, Footer)，但通过 opacity 控制其可见性。
-        这确保了 SSR 的内容在动画播放时已存在于 DOM 中。
+        在 preloader 动画期间不渲染主内容，避免 3D Globe 等组件初始化阻塞主线程。
+        动画完成后再渲染，确保 Logo 旋转流畅。
       */}
-      <div
-        className={`transition-opacity duration-700 ${loadingStage === 'done' ? 'opacity-100' : 'opacity-0'}`}
-      >
-        {children}
-      </div>
+      {!shouldDeferContent && (
+        <div
+          className={`transition-opacity duration-700 ${loadingStage === 'done' ? 'opacity-100' : 'opacity-0'}`}
+        >
+          {children}
+        </div>
+      )}
 
       {/* 动画层：
         仅在动画未完成时渲染。它会覆盖在内容层之上。
