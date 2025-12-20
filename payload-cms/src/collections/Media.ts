@@ -13,8 +13,8 @@
  */
 
 import type { CollectionConfig } from 'payload'
+import { APIError } from 'payload'
 import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3'
-import { generateVariantsHook } from '../hooks/generateVariants'
 
 // Variant folder mapping (Payload size name → S3 folder name)
 const VARIANT_FOLDERS: Record<string, string> = {
@@ -422,10 +422,11 @@ export const Media: CollectionConfig = {
 
           // If there are references, show error with details
           if (references.length > 0) {
-            throw new Error(
-              `Cannot delete this media. It is referenced by: ${references.join(', ')}. ` +
-              `Please remove these references first before deleting. | ` +
-              `无法删除此媒体文件，它被以下内容引用：${references.join('、')}。请先移除这些引用后再删除。`
+            throw new APIError(
+              `无法删除此媒体文件，它被以下内容引用：${references.join('、')}。请先移除这些引用后再删除。`,
+              400,
+              undefined,
+              true // isPublic - show message to user
             )
           }
 
@@ -444,7 +445,12 @@ export const Media: CollectionConfig = {
         console.log(`📦 Media archived: ${media.filename}`)
 
         // Prevent actual deletion
-        throw new Error('Media archived. Super admins can permanently delete archived media. | 媒体已归档。超级管理员可以永久删除已归档的媒体。')
+        throw new APIError(
+          '媒体已归档。超级管理员可以永久删除已归档的媒体。',
+          400,
+          undefined,
+          true // isPublic - show message to user
+        )
       },
     ],
     afterDelete: [
@@ -492,6 +498,6 @@ export const Media: CollectionConfig = {
         }
       },
     ],
-    afterChange: [generateVariantsHook],
+    // Payload 内置 imageSizes 已自动生成变体，无需自定义 hook
   },
 }

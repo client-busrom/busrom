@@ -382,56 +382,31 @@ export default buildConfig({
         media: {
           prefix: 'media',
           disableLocalStorage: true,
-          generateFileURL: ({ filename, size }) => {
+          generateFileURL: ({ filename }) => {
             // Handle null/undefined filename
             if (!filename) {
               return ''
             }
 
+            // 判断是否是 Payload 生成的变体（带尺寸后缀如 -400x300）
+            const isPayloadVariant = /-\d+x\d+\.\w+$/.test(filename)
+
             // MinIO local development
             if (process.env.USE_MINIO === 'true') {
               const endpoint = process.env.S3_ENDPOINT || 'http://localhost:9000'
               const bucket = s3Config.bucket
-
-              // Payload size 名称到 S3 变体文件夹的映射
-              const sizeToFolderMap: Record<string, string> = {
-                'thumbnail': 'thumbnail',
-                'card': 'small',
-                'tablet': 'medium',
-                'desktop': 'large',
-              }
-
-              // 如果是变体图片，使用 variants/ 目录
-              if (size?.name && sizeToFolderMap[size.name]) {
-                return `${endpoint}/${bucket}/variants/${sizeToFolderMap[size.name]}/${filename}`
-              }
-
-              // 原图使用 media/ 目录
+              // Payload 生成的变体和原图都在 media/ 目录
               return `${endpoint}/${bucket}/media/${filename}`
             }
 
-            // CDN domain
+            // CDN domain (production)
             const cdnDomain = process.env.CDN_DOMAIN
             const baseUrl = cdnDomain && cdnDomain !== 'NONE'
               ? `https://${cdnDomain}`
               : `https://${s3Config.bucket}.s3.${process.env.S3_REGION}.amazonaws.com`
 
-            // Payload size 名称到 S3 变体文件夹的映射
-            // Payload sizes: thumbnail, card, tablet, desktop
-            // S3 folders: thumbnail, small, medium, large
-            const sizeToFolderMap: Record<string, string> = {
-              'thumbnail': 'thumbnail',
-              'card': 'small',
-              'tablet': 'medium',
-              'desktop': 'large',
-            }
-
-            // 如果是变体图片，使用 variants/ 目录
-            if (size?.name && sizeToFolderMap[size.name]) {
-              return `${baseUrl}/variants/${sizeToFolderMap[size.name]}/${filename}`
-            }
-
-            // 原图使用 media/ 目录
+            // Payload 生成的变体（带尺寸后缀）在 media/ 目录
+            // 原图也在 media/ 目录
             return `${baseUrl}/media/${filename}`
           },
         },

@@ -224,15 +224,20 @@ export const generateVariantsHook: CollectionAfterChangeHook = async ({
 
     // Update the media document with variant URLs
     if (Object.keys(sizes).length > 0) {
-      await payload.update({
-        collection: 'media',
-        id: doc.id,
-        data: {
-          sizes,
-        },
-      })
-
-      payload.logger.info(`✅ Variants generated and saved for: ${filename}`)
+      try {
+        payload.logger.info(`📝 Updating media ${doc.id} with sizes...`)
+        await payload.update({
+          collection: 'media',
+          id: doc.id,
+          data: {
+            sizes,
+          },
+        })
+        payload.logger.info(`✅ Variants generated and saved for: ${filename}`)
+      } catch (updateErr: any) {
+        payload.logger.error(`❌ Failed to update media ${doc.id}: ${updateErr.message}`)
+        // Don't throw - variants are uploaded, just URL update failed
+      }
     }
 
     return doc
