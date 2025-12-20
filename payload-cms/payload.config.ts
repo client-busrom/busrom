@@ -391,15 +391,32 @@ export default buildConfig({
             // MinIO local development
             if (process.env.USE_MINIO === 'true') {
               const endpoint = process.env.S3_ENDPOINT || 'http://localhost:9000'
-              // For variants in MinIO
-              if (size?.name) {
-                const variantFolder = size.name === 'card' ? 'small' : size.name === 'tablet' ? 'medium' : size.name === 'desktop' ? 'large' : size.name
-                return `${endpoint}/${s3Config.bucket}/variants/${variantFolder}/${filename}`
+              const bucket = s3Config.bucket
+
+              // Payload size 名称到 S3 变体文件夹的映射
+              const sizeToFolderMap: Record<string, string> = {
+                'thumbnail': 'thumbnail',
+                'card': 'small',
+                'tablet': 'medium',
+                'desktop': 'large',
               }
-              return `${endpoint}/${s3Config.bucket}/media/${filename}`
+
+              // 如果是变体图片，使用 variants/ 目录
+              if (size?.name && sizeToFolderMap[size.name]) {
+                return `${endpoint}/${bucket}/variants/${sizeToFolderMap[size.name]}/${filename}`
+              }
+
+              // 原图使用 media/ 目录
+              return `${endpoint}/${bucket}/media/${filename}`
             }
 
-            // Production: Map Payload size names to S3 variant folder names
+            // CDN domain
+            const cdnDomain = process.env.CDN_DOMAIN
+            const baseUrl = cdnDomain && cdnDomain !== 'NONE'
+              ? `https://${cdnDomain}`
+              : `https://${s3Config.bucket}.s3.${process.env.S3_REGION}.amazonaws.com`
+
+            // Payload size 名称到 S3 变体文件夹的映射
             // Payload sizes: thumbnail, card, tablet, desktop
             // S3 folders: thumbnail, small, medium, large
             const sizeToFolderMap: Record<string, string> = {
@@ -409,63 +426,13 @@ export default buildConfig({
               'desktop': 'large',
             }
 
-            // CDN domain
-            const cdnDomain = process.env.CDN_DOMAIN
-            const baseUrl = cdnDomain && cdnDomain !== 'NONE'
-              ? `https://${cdnDomain}`
-              : `https://${s3Config.bucket}.s3.${process.env.S3_REGION}.amazonaws.com`
-
-            // If this is a variant (size is provided), use variants folder
+            // 如果是变体图片，使用 variants/ 目录
             if (size?.name && sizeToFolderMap[size.name]) {
               return `${baseUrl}/variants/${sizeToFolderMap[size.name]}/${filename}`
             }
 
-            // Original image: Parse filename to determine S3 path
-            // Filename format: {series}_{type}_{...}.jpg
-            // S3 path: {series}/{type}/{filename}
-            const seriesMapping: Record<string, string> = {
-              'glass-standoff': 'glass-standoff',
-              'glass-connected-fitting': 'glass-connected-fitting',
-              'glass-fence-spigot': 'glass-fence-spigot',
-              'guardrail-glass-clip': 'guardrail-glass-clip',
-              'bathroom-glass-clip': 'bathroom-glass-clip',
-              'glass-hinge': 'glass-hinge',
-              'sliding-door-kit': 'sliding-door-kit',
-              'bathroom-door-handle': 'bathroom-door-handle',
-              'hidden-hook': 'hidden-hook',
-              'common': 'common',
-            }
-
-            const typeMapping: Record<string, string> = {
-              'white': 'white',
-              'scene': 'scene',
-              'real': 'real',
-              'size': 'size',
-              'general': 'general',
-              'combo': 'combo',
-              'multi-style': 'multi-style',
-              'showcase': 'showcase',
-              'effect': 'effect',
-              'product': 'product',
-              'craft': 'craft',
-              'packaging': 'packaging',
-              'color': 'color',
-            }
-
-            // Parse filename to extract series and type
-            const parts = filename.replace(/\.[^.]+$/, '').split('_')
-            let s3Path = `media/${filename}` // Default fallback
-
-            if (parts.length >= 2) {
-              const series = parts[0]
-              const type = parts[1]
-
-              if (seriesMapping[series] && typeMapping[type]) {
-                s3Path = `${series}/${type}/${filename}`
-              }
-            }
-
-            return `${baseUrl}/${s3Path}`
+            // 原图使用 media/ 目录
+            return `${baseUrl}/media/${filename}`
           },
         },
       },
