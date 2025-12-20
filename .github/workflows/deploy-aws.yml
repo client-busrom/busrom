@@ -330,10 +330,10 @@ jobs:
           echo "Image: ${{ needs.build-web.outputs.image-uri }}"
 
   # =============================================================================
-  # Post-deployment health checks
+  # Post-deployment health checks and cache warmup
   # =============================================================================
   health-check:
-    name: Health Check
+    name: Health Check & Cache Warmup
     runs-on: ubuntu-latest
     needs: [setup, deploy-payload-cms, deploy-web]
 
@@ -349,11 +349,38 @@ jobs:
           echo ""
           echo "Please verify the deployment manually:"
           if [ "${{ needs.setup.outputs.environment }}" == "production" ]; then
-            echo "  Payload CMS: https://cms.busrom.com/api/health"
-            echo "  Payload Admin: https://cms.busrom.com/admin"
-            echo "  Web: https://www.busrom.com/api/health"
+            echo "  Payload CMS: https://cms.busromhouse.com/api/health"
+            echo "  Payload Admin: https://cms.busromhouse.com/admin"
+            echo "  Web: https://www.busromhouse.com"
           else
-            echo "  Payload CMS: https://cms-staging.busrom.com/api/health"
-            echo "  Payload Admin: https://cms-staging.busrom.com/admin"
-            echo "  Web: https://staging.busrom.com/api/health"
+            echo "  Payload CMS: https://cms-staging.busromhouse.com/api/health"
+            echo "  Payload Admin: https://cms-staging.busromhouse.com/admin"
+            echo "  Web: https://staging.busromhouse.com"
           fi
+
+      - name: Cache Warmup - Production
+        if: needs.setup.outputs.environment == 'production'
+        run: |
+          echo "🔥 Warming up CloudFront cache..."
+
+          WEB_DOMAIN="https://www.busromhouse.com"
+          CMS_DOMAIN="https://cms.busromhouse.com"
+          LOCALES=("en" "zh" "es" "fr" "de")
+
+          # Warm CMS API endpoints
+          echo "📡 Warming CMS API..."
+          for locale in "${LOCALES[@]}"; do
+            curl -s -o /dev/null -w "  [%{http_code}] Homepage API ($locale): %{time_total}s\n" \
+              --max-time 120 "${CMS_DOMAIN}/api/home?locale=${locale}" || true
+            curl -s -o /dev/null -w "  [%{http_code}] Header ($locale): %{time_total}s\n" \
+              --max-time 120 "${CMS_DOMAIN}/api/globals/header?locale=${locale}&depth=2" || true
+          done
+
+          # Warm Web pages
+          echo "🌐 Warming Web pages..."
+          for locale in "${LOCALES[@]}"; do
+            curl -s -o /dev/null -w "  [%{http_code}] Homepage ($locale): %{time_total}s\n" \
+              --max-time 120 "${WEB_DOMAIN}/${locale}" || true
+          done
+
+          echo "✅ Cache warmup completed!"
