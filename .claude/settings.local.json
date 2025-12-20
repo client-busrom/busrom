@@ -174,7 +174,8 @@
       "Bash(PGPASSWORD=ADijIRcAHMHLHaZvH0eg /opt/homebrew/opt/postgresql@16/bin/psql:*)",
       "Bash(npm run type-check:*)",
       "Bash(export PATH=\"/opt/homebrew/opt/postgresql@16/bin:$PATH\")",
-      "Bash(psql:*)"
+      "Bash(psql:*)",
+      "Bash(docker logs:*)"
     ],
     "deny": [],
     "ask": []

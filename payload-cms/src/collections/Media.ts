@@ -341,8 +341,100 @@ export const Media: CollectionConfig = {
           return false
         }) || user?.isAdmin === true
 
-        // If media is already archived and user is super admin, allow hard delete
+        // If media is already archived and user is super admin, check for references before hard delete
         if (media.status === 'archived' && isSuperAdmin) {
+          // Check if media is referenced by other collections
+          const references: string[] = []
+
+          // Check HeroBannerItems
+          const heroBannerRefs = await payload.find({
+            collection: 'hero-banner-items',
+            where: {
+              or: [
+                { image1: { equals: id } },
+                { image2: { equals: id } },
+                { image3: { equals: id } },
+                { image4: { equals: id } },
+              ],
+            },
+            limit: 5,
+          })
+          if (heroBannerRefs.totalDocs > 0) {
+            references.push(`Hero Banner Items (${heroBannerRefs.totalDocs})`)
+          }
+
+          // Check ProductSeries
+          const productSeriesRefs = await payload.find({
+            collection: 'product-series',
+            where: {
+              or: [
+                { featuredImage: { equals: id } },
+                { coverImage: { equals: id } },
+              ],
+            },
+            limit: 5,
+          })
+          if (productSeriesRefs.totalDocs > 0) {
+            references.push(`Product Series (${productSeriesRefs.totalDocs})`)
+          }
+
+          // Check Products
+          const productRefs = await payload.find({
+            collection: 'products',
+            where: {
+              featuredImage: { equals: id },
+            },
+            limit: 5,
+          })
+          if (productRefs.totalDocs > 0) {
+            references.push(`Products (${productRefs.totalDocs})`)
+          }
+
+          // Check Blogs
+          const blogRefs = await payload.find({
+            collection: 'blogs',
+            where: {
+              coverImage: { equals: id },
+            },
+            limit: 5,
+          })
+          if (blogRefs.totalDocs > 0) {
+            references.push(`Blogs (${blogRefs.totalDocs})`)
+          }
+
+          // Check Pages
+          const pageRefs = await payload.find({
+            collection: 'pages',
+            where: {
+              featuredImage: { equals: id },
+            },
+            limit: 5,
+          })
+          if (pageRefs.totalDocs > 0) {
+            references.push(`Pages (${pageRefs.totalDocs})`)
+          }
+
+          // Check SeriesIntroItems
+          const seriesIntroRefs = await payload.find({
+            collection: 'series-intro-items',
+            where: {
+              image: { equals: id },
+            },
+            limit: 5,
+          })
+          if (seriesIntroRefs.totalDocs > 0) {
+            references.push(`Series Intro Items (${seriesIntroRefs.totalDocs})`)
+          }
+
+          // If there are references, show error with details
+          if (references.length > 0) {
+            throw new Error(
+              `Cannot delete this media. It is referenced by: ${references.join(', ')}. ` +
+              `Please remove these references first before deleting. | ` +
+              `无法删除此媒体文件，它被以下内容引用：${references.join('、')}。请先移除这些引用后再删除。`
+            )
+          }
+
           // Allow deletion - S3 files will be deleted by Payload's default behavior
           console.log(`🗑️ Super admin hard deleting archived media: ${media.filename}`)
           return // Continue with deletion
@@ -358,7 +450,7 @@ export const Media: CollectionConfig = {
         console.log(`📦 Media archived: ${media.filename}`)
 
         // Prevent actual deletion
-        throw new Error('Media archived. Super admins can permanently delete archived media.')
+        throw new Error('Media archived. Super admins can permanently delete archived media. | 媒体已归档。超级管理员可以永久删除已归档的媒体。')
       },
     ],
     afterDelete: [
