@@ -363,14 +363,11 @@ export const Media: CollectionConfig = {
             references.push(`Hero Banner Items (${heroBannerRefs.totalDocs})`)
           }
 
-          // Check ProductSeries
+          // Check ProductSeries (featuredImage)
           const productSeriesRefs = await payload.find({
             collection: 'product-series',
             where: {
-              or: [
-                { featuredImage: { equals: id } },
-                { coverImage: { equals: id } },
-              ],
+              featuredImage: { equals: id },
             },
             limit: 5,
           })
@@ -378,11 +375,14 @@ export const Media: CollectionConfig = {
             references.push(`Product Series (${productSeriesRefs.totalDocs})`)
           }
 
-          // Check Products
+          // Check Products (mainImage, showImage)
           const productRefs = await payload.find({
             collection: 'products',
             where: {
-              featuredImage: { equals: id },
+              or: [
+                { mainImage: { equals: id } },
+                { showImage: { equals: id } },
+              ],
             },
             limit: 5,
           })
@@ -390,7 +390,7 @@ export const Media: CollectionConfig = {
             references.push(`Products (${productRefs.totalDocs})`)
           }
 
-          // Check Blogs
+          // Check Blogs (coverImage)
           const blogRefs = await payload.find({
             collection: 'blogs',
             where: {
@@ -400,30 +400,6 @@ export const Media: CollectionConfig = {
           })
           if (blogRefs.totalDocs > 0) {
             references.push(`Blogs (${blogRefs.totalDocs})`)
-          }
-
-          // Check Pages
-          const pageRefs = await payload.find({
-            collection: 'pages',
-            where: {
-              featuredImage: { equals: id },
-            },
-            limit: 5,
-          })
-          if (pageRefs.totalDocs > 0) {
-            references.push(`Pages (${pageRefs.totalDocs})`)
-          }
-
-          // Check SeriesIntroItems
-          const seriesIntroRefs = await payload.find({
-            collection: 'series-intro-items',
-            where: {
-              image: { equals: id },
-            },
-            limit: 5,
-          })
-          if (seriesIntroRefs.totalDocs > 0) {
-            references.push(`Series Intro Items (${seriesIntroRefs.totalDocs})`)
           }
 
           // If there are references, show error with details
