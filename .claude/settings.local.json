@@ -175,7 +175,11 @@
       "Bash(npm run type-check:*)",
       "Bash(export PATH=\"/opt/homebrew/opt/postgresql@16/bin:$PATH\")",
       "Bash(psql:*)",
-      "Bash(docker logs:*)"
+      "Bash(docker logs:*)",
+      "Bash(AWS_PROFILE=busrom aws s3:*)",
+      "Bash(for i in 1 2 3)",
+      "Bash(do curl -s -w \"Request $i: %{time_total}s\\\\n\" -o /dev/null \"https://www.busromhouse.com/\")",
+      "Bash(AWS_PROFILE=busrom aws ecs:*)"
     ],
     "deny": [],
     "ask": []

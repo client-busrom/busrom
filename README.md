@@ -1,64 +1,58 @@
 # Busrom - International B2B Glass Hardware Product Website
 
-> **Tech Stack**: Next.js 15 + Keystone 6 + PostgreSQL + AWS
-> **Deployment**: AWS (EC2 + S3 + CloudFront + RDS)
+> **Tech Stack**: Next.js 15 + Payload CMS 3 + PostgreSQL + AWS
+> **Deployment**: AWS (ECS Fargate + S3 + CloudFront + RDS)
 > **Target Markets**: Global (24+ languages, excluding mainland China)
 
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D24.11.0-brightgreen)](https://nodejs.org/)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-15.6-black)](https://nextjs.org/)
-[![Keystone](https://img.shields.io/badge/Keystone-6.3-purple)](https://keystonejs.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
+[![Payload CMS](https://img.shields.io/badge/Payload-3.0-blue)](https://payloadcms.com/)
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
-- [Project Overview](#-project-overview)
-- [Quick Start](#-quick-start)
-- [Project Structure](#-project-structure)
-- [Technology Stack](#-technology-stack)
-- [Development](#-development)
-- [Deployment](#-deployment)
-- [Multi-language Support](#-multi-language-support)
-- [Documentation](#-documentation)
+- [Project Overview](#project-overview)
+- [Quick Start](#quick-start)
+- [Project Structure](#project-structure)
+- [Technology Stack](#technology-stack)
+- [Development](#development)
+- [Deployment](#deployment)
+- [Multi-language Support](#multi-language-support)
 
 ---
 
-## 🎯 Project Overview
+## Project Overview
 
 **Busrom** is a B2B international website for showcasing glass hardware products. The platform is designed to serve global markets with:
 
 - **24+ language support** (English, Chinese, Spanish, Portuguese, French, German, Italian, and more)
-- **Headless CMS architecture** (Keystone 6 backend + Next.js 15 frontend)
-- **AWS cloud infrastructure** (S3 for media, CloudFront CDN, RDS PostgreSQL)
+- **Headless CMS architecture** (Payload CMS 3 backend + Next.js 15 frontend)
+- **AWS cloud infrastructure** (ECS Fargate, S3 for media, CloudFront CDN, RDS PostgreSQL)
 - **SEO optimization** for international markets
 - **Responsive design** with Morandi warm color palette
 - **IP-based access control** (blocks mainland China via Cloudflare)
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
-- **Node.js**: 24.11.0 LTS or higher
+- **Node.js**: 20.0.0 LTS or higher
 - **npm**: 10.0.0 or higher
-- **PostgreSQL**: 15+ (or use Docker)
-- **AWS Account**: S3 + CloudFront for media storage
+- **Docker**: For local PostgreSQL and MinIO
+- **AWS Account**: S3 + CloudFront for media storage (production)
 
 ### Installation
 
-1. **Clone the repository** (or you're already here):
+1. **Clone the repository**:
    ```bash
    cd /path/to/busrom-work
    ```
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Start local development services** (PostgreSQL + MinIO + Nginx CDN):
+2. **Start local development services** (PostgreSQL + MinIO + Nginx CDN):
    ```bash
    docker-compose up -d
    ```
@@ -68,135 +62,126 @@
    - **MinIO** (port 9000, 9001) - Local S3 storage (free, no AWS costs)
    - **Nginx CDN** (port 8080) - Local CDN for media files
 
-   See [docs/06-本地开发环境配置.md](./docs/06-本地开发环境配置.md) for details.
+3. **Install dependencies**:
+   ```bash
+   # Install Payload CMS dependencies
+   cd payload-cms && npm install
+
+   # Install Web dependencies
+   cd ../web && npm install
+   ```
 
 4. **Configure environment variables**:
    ```bash
    # Copy environment variable templates
-   cp cms/.env.example cms/.env
+   cp payload-cms/.env.example payload-cms/.env
    cp web/.env.example web/.env.local
-
-   # Edit cms/.env
-   # For local development, MinIO is pre-configured (no AWS needed!)
-   # For production, update with real AWS credentials
    ```
 
 5. **Start development servers**:
    ```bash
-   # Start both CMS and Web in one command
-   npm run dev
+   # Start Payload CMS (port 3002)
+   cd payload-cms && npm run dev
 
-   # Or start them separately:
-   npm run dev:cms  # Keystone CMS at http://localhost:3000
-   npm run dev:web  # Next.js Web at http://localhost:3001
+   # In another terminal, start Web (port 3001)
+   cd web && npm run dev
    ```
 
-6. **Create first admin user**:
-   - Visit http://localhost:3000
-   - Follow the prompts to create your first admin user
-   - This user will have full access to the CMS
+6. **Access the applications**:
+   - **Payload CMS Admin**: http://localhost:3002/admin
+   - **Web Frontend**: http://localhost:3001
+   - **MinIO Console**: http://localhost:9001 (minioadmin / minioadmin123)
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 busrom-work/
-├── docs/                          # 📚 Project documentation (existing)
-│   ├── 00-项目总览.md
-│   ├── 03-CMS数据模型/
-│   └── api-contracts/
-├── cms/                           # 🎛️ Keystone 6 Backend CMS
-│   ├── schemas/                   # Data models
-│   │   ├── User.ts                # Admin users & roles
-│   │   ├── HomePage.ts            # Homepage content (singleton)
-│   │   ├── Media.ts               # AWS S3 media library
-│   │   ├── MediaCategory.ts       # Media categorization
-│   │   ├── Category.ts            # Product categories
-│   │   ├── ProductSeries.ts       # Product series/collections
-│   │   └── Product.ts             # Individual products/SKUs
-│   ├── keystone.ts                # Main Keystone configuration
-│   ├── schema.ts                  # Schema entry point
-│   ├── auth.ts                    # Authentication configuration
+├── docs/                          # Project documentation
+├── payload-cms/                   # Payload CMS 3 Backend
+│   ├── src/
+│   │   ├── collections/           # Data models (Media, Products, etc.)
+│   │   ├── globals/               # Global settings (PreloaderConfig, etc.)
+│   │   ├── components/            # Custom admin components
+│   │   └── hooks/                 # Payload hooks
+│   ├── payload.config.ts          # Main Payload configuration
 │   ├── package.json
 │   └── .env.example
-├── web/                           # 🌐 Next.js 15 Frontend
+├── web/                           # Next.js 15 Frontend
 │   ├── app/                       # Next.js App Router
-│   │   ├── [locale]/              # Localized routes (24 languages)
-│   │   │   ├── layout.tsx         # Locale-specific layout
-│   │   │   └── page.tsx           # Homepage
-│   │   ├── layout.tsx             # Root layout
-│   │   ├── page.tsx               # Root page (redirects to /en)
-│   │   └── globals.css            # Global styles
+│   │   └── [locale]/              # Localized routes (24 languages)
 │   ├── components/                # React components
 │   ├── lib/                       # Utilities
-│   │   └── keystone-client.ts     # GraphQL client for Keystone
+│   │   └── api/                   # API clients for Payload CMS
 │   ├── public/                    # Static assets
 │   ├── next.config.js
-│   ├── tailwind.config.ts
 │   ├── package.json
 │   └── .env.example
-├── package.json                   # Monorepo root config
-├── tsconfig.json                  # Global TypeScript config
-├── docker-compose.yml             # PostgreSQL for local dev
+├── docker/                        # Docker configurations
+│   └── nginx/                     # Local CDN config
+├── .github/workflows/             # GitHub Actions
+│   ├── ci.yml                     # CI pipeline
+│   └── deploy-aws.yml             # AWS deployment
+├── docker-compose.yml             # Local development services
+├── Dockerfile.payload-cms         # Payload CMS Docker image
+├── Dockerfile.web                 # Web Docker image
 └── README.md                      # This file
 ```
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Backend (CMS)
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **Keystone 6** | ^6.3.1 | Headless CMS framework |
+| **Payload CMS** | ^3.0 | Headless CMS framework |
 | **PostgreSQL** | ^15.0 | Relational database (AWS RDS in production) |
-| **Prisma** | ^5.22.0 | ORM (bundled with Keystone) |
-| **GraphQL** | ^16.10.0 | API layer |
-| **AWS SDK** | ^3.705.0 | S3 integration for media storage |
+| **Drizzle ORM** | - | Database ORM (bundled with Payload) |
+| **AWS SDK** | ^3.x | S3 integration for media storage |
 
 ### Frontend (Web)
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **Next.js** | ^15.6.0 | React framework (App Router) |
-| **React** | ^19.1.0 | UI library |
-| **TypeScript** | ^5.6.3 | Type safety |
-| **Tailwind CSS** | ^3.4.17 | Utility-first CSS framework |
-| **Apollo Client** | ^3.11.11 | GraphQL client |
-| **next-intl** | ^3.27.2 | Internationalization |
+| **Next.js** | ^15.0 | React framework (App Router) |
+| **React** | ^19.0 | UI library |
+| **TypeScript** | ^5.6 | Type safety |
+| **Tailwind CSS** | ^3.4 | Utility-first CSS framework |
+| **GSAP** | ^3.x | Animations |
+| **Three.js** | ^0.x | 3D graphics |
 
 ### AWS Services
 
 | Service | Purpose |
 |---------|---------|
-| **EC2** | Application hosting (CMS + Web) |
+| **ECS Fargate** | Container hosting (CMS + Web) |
 | **S3** | Media file storage (images) |
 | **CloudFront** | CDN for global content delivery |
 | **RDS PostgreSQL** | Production database |
+| **ECR** | Docker image registry |
 | **Cloudflare** | IP-based access control (block China) |
 
 ---
 
-## 💻 Development
+## Development
 
 ### Available Scripts
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start both CMS and Web in development mode |
-| `npm run dev:cms` | Start only Keystone CMS (port 3000) |
-| `npm run dev:web` | Start only Next.js Web (port 3001) |
-| `npm run build` | Build both projects for production |
-| `npm run build:cms` | Build only CMS |
-| `npm run build:web` | Build only Web |
+| `npm run dev:cms` | Start Payload CMS (port 3002) |
+| `npm run dev:web` | Start Next.js Web (port 3001) |
+| `npm run build:cms` | Build Payload CMS for production |
+| `npm run build:web` | Build Web for production |
 
-### CMS Development
+### Payload CMS Development
 
-- **Admin UI**: http://localhost:3000
-- **GraphQL Playground**: http://localhost:3000/api/graphql
-- **Database migrations**: `npm run migrate --workspace=cms`
+- **Admin UI**: http://localhost:3002/admin
+- **REST API**: http://localhost:3002/api
+- **GraphQL Playground**: http://localhost:3002/api/graphql
 
 ### Web Development
 
@@ -204,11 +189,10 @@ busrom-work/
 - **Supported routes**:
   - `/` → Redirects to `/en`
   - `/[locale]` → Homepage for any supported language
-  - Example: `/en`, `/zh`, `/es`, `/fr`, etc.
 
 ---
 
-## 🌍 Multi-language Support
+## Multi-language Support
 
 ### Supported Languages (24 total)
 
@@ -226,91 +210,61 @@ busrom-work/
 **Asian Languages**:
 - Chinese (zh) - Traditional/Simplified
 
-### Implementation
+---
 
-- **CMS**: All content fields have language-specific versions (e.g., `name_en`, `name_zh`)
-- **Frontend**: Dynamic routes via `[locale]` parameter
-- **RTL Support**: Automatic detection for Arabic, Hebrew, Persian
-- **Fallback**: English (en) is required for all content
+## Deployment
+
+### AWS Architecture
+
+```
+                    ┌─────────────────┐
+                    │   Cloudflare    │ ← IP filtering (block China)
+                    └────────┬────────┘
+                             │
+                    ┌────────▼────────┐
+                    │   CloudFront    │ ← CDN (Media + API Cache)
+                    └────────┬────────┘
+                             │
+              ┌──────────────┴──────────────┐
+              │                             │
+     ┌────────▼────────┐           ┌────────▼────────┐
+     │   ECS Fargate   │           │   ECS Fargate   │
+     │  (Payload CMS)  │           │     (Web)       │
+     └────────┬────────┘           └────────┬────────┘
+              │                             │
+              └──────────────┬──────────────┘
+                             │
+                    ┌────────▼────────┐
+                    │ RDS PostgreSQL  │
+                    └─────────────────┘
+                             │
+                    ┌────────▼────────┐
+                    │   S3 (Media)    │
+                    └─────────────────┘
+```
+
+### Deployment via GitHub Actions
+
+Push to `main` branch triggers automatic deployment to production:
+1. Build Docker images
+2. Push to ECR
+3. Deploy to ECS Fargate
+4. Health check
 
 ---
 
-## 📚 Documentation
-
-For detailed information, refer to the documentation in the `docs/` directory:
-
-- **[00-项目总览.md](./docs/00-项目总览.md)** - Project overview and requirements
-- **[03-CMS数据模型/](./docs/03-CMS数据模型/)** - Database schema and data models
-- **[api-contracts/](./docs/api-contracts/)** - API contract examples
-
----
-
-## 🔒 Security Features
+## Security Features
 
 - **XSS Protection**: Input sanitization and Content Security Policy headers
 - **CSRF Protection**: Session-based authentication with secure cookies
-- **SQL Injection Prevention**: Prisma ORM parameterized queries
+- **SQL Injection Prevention**: Drizzle ORM parameterized queries
 - **HTTPS Only**: Force HTTPS in production
 - **IP Blocking**: Mainland China IP addresses blocked via Cloudflare
 - **Soft Delete**: All content uses `status` field instead of physical deletion
 
 ---
 
-## 🚢 Deployment
-
-### AWS Deployment Architecture
-
-```
-┌─────────────────┐
-│   Cloudflare    │ ← IP filtering (block China)
-│   + CloudFront  │ ← CDN
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│      EC2        │ ← Next.js + Keystone
-│   (t3.medium)   │
-└────────┬────────┘
-         │
-    ┌────▼──────┐     ┌──────────┐
-    │    RDS    │────▶│    S3    │
-    │PostgreSQL │     │ (Media)  │
-    └───────────┘     └──────────┘
-```
-
-### Deployment Steps
-
-Detailed deployment instructions will be added in `docs/deployment.md` (to be created).
-
-**Quick Deployment Checklist**:
-1. ✅ Set up AWS S3 bucket and CloudFront distribution
-2. ✅ Configure RDS PostgreSQL instance
-3. ✅ Launch EC2 instance and install Node.js 24+
-4. ✅ Clone repository and install dependencies
-5. ✅ Configure production environment variables
-6. ✅ Build both projects: `npm run build`
-7. ✅ Start with PM2 or systemd
-8. ✅ Set up Cloudflare for IP filtering and SSL
-
----
-
-## 🤝 Contributing
-
-This is a private project. For internal team members:
-
-1. Create a feature branch: `git checkout -b feature/your-feature-name`
-2. Make your changes and commit: `git commit -m "Add your feature"`
-3. Push to the branch: `git push origin feature/your-feature-name`
-4. Create a Pull Request for review
-
----
-
-## 📝 License
-
-Proprietary - All rights reserved by Busrom
-
----
-
-## 🆘 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -323,34 +277,23 @@ docker-compose up -d
 
 **Port Already in Use**:
 ```bash
-# Find and kill the process using port 3000 or 3001
-lsof -ti:3000 | xargs kill -9
+# Find and kill the process using port 3001 or 3002
 lsof -ti:3001 | xargs kill -9
-```
-
-**Keystone Migration Errors**:
-```bash
-# Reset the database (development only!)
-cd cms
-npm run migrate -- --reset
+lsof -ti:3002 | xargs kill -9
 ```
 
 **AWS S3 Upload Errors**:
-- Check your AWS credentials in `cms/.env`
+- Check your AWS credentials in `payload-cms/.env`
 - Verify S3 bucket permissions
 - Ensure CloudFront distribution is configured
 
 ---
 
-## 📧 Support
+## License
 
-For questions or issues, contact the development team:
-
-- **Technical Lead**: [Your Name]
-- **Email**: [your-email@busrom.com]
-- **Documentation**: See `docs/` directory
+Proprietary - All rights reserved by Busrom
 
 ---
 
-**Last Updated**: 2025-11-01
-**Version**: 1.0.0
+**Last Updated**: 2025-12-20
+**Version**: 2.0.0
