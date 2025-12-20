@@ -1,5 +1,4 @@
-﻿import { useEffect, useRef } from "react"
-import Image from "next/image"
+﻿import { useEffect, useRef, useState } from "react"
 import gsap from "gsap"
 import type { ImageWallItem } from "@/lib/api/preloader-config"
 
@@ -23,10 +22,24 @@ export function ImageWall({
   stagger = 0.2,
 }: ImageWallProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [loadedCount, setLoadedCount] = useState(0)
+  const [allImagesReady, setAllImagesReady] = useState(false)
+
+  // 当所有图片加载完成时标记为 ready
+  useEffect(() => {
+    if (loadedCount >= images.length && images.length > 0) {
+      setAllImagesReady(true)
+    }
+  }, [loadedCount, images.length])
+
+  // 处理图片加载完成
+  const handleImageLoad = () => {
+    setLoadedCount(prev => prev + 1)
+  }
 
   useEffect(() => {
-    // 只有在 isActive 为 true 时才执行动画
-    if (!isActive) return;
+    // 只有在 isActive 为 true 且所有图片都已加载时才执行动画
+    if (!isActive || !allImagesReady) return;
 
     const container = containerRef.current
     if (!container) return
@@ -44,18 +57,28 @@ export function ImageWall({
     // 在动画开始前，立即让容器可见
     gsap.set(container, { opacity: 1, pointerEvents: 'auto' });
 
+    // 使用 transform 而不是 scale，启用硬件加速
     tl.fromTo(
       ".image-item",
-      { scale: 0, opacity: 0 },
+      {
+        scale: 0,
+        opacity: 0,
+        willChange: "transform, opacity"
+      },
       {
         scale: 1,
         opacity: 1,
         duration: duration,
         ease: "power2.out",
         stagger: stagger,
+        force3D: true, // 强制使用 GPU 加速
+        onComplete: () => {
+          // 动画结束后移除 will-change 以释放资源
+          gsap.set(".image-item", { willChange: "auto" });
+        }
       }
     )
-  }, [isActive, onComplete, duration, stagger])
+  }, [isActive, allImagesReady, onComplete, duration, stagger])
 
   return (
     <div
@@ -77,13 +100,12 @@ export function ImageWall({
               aspectRatio: item.aspectRatio,
             }}
           >
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={item.src}
               alt={`Gallery image ${index + 1}`}
-              fill
-              className="object-cover"
-              sizes={`${width}px`}
-              priority // All images load with priority since this is the loading screen
+              className="absolute inset-0 w-full h-full object-cover"
+              onLoad={handleImageLoad}
             />
           </div>
         )
