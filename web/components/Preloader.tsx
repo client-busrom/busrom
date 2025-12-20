@@ -126,9 +126,11 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
       scene.add(loadingText);
       loadingMaterial.uniforms.uProgressReveal.value = 1;
 
-      // Preload images from CMS config
+      // 在后台预加载图片，不阻塞动画开始
+      // 使用独立的 loader 避免影响 loadingManager.onLoad
+      const bgTextureLoader = new THREE.TextureLoader();
       config.images.forEach((img) => {
-        textureLoader.load(img.src);
+        bgTextureLoader.load(img.src);
       });
     });
 
