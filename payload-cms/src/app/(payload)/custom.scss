@@ -248,3 +248,57 @@ html[data-theme='dark'] {
   background: rgba(160, 135, 69, 0.15) !important;
   border-left: 3px solid #A08745;
 }
+
+/* ============================================
+   Media Collection - Larger Thumbnails
+   ============================================ */
+
+/* Media list view - enlarge thumbnails */
+.collection-list__table {
+  /* Increase thumbnail column width for media collection */
+  .upload-cell {
+    width: 120px !important;
+    min-width: 120px !important;
+
+    .thumbnail {
+      width: 100px !important;
+      height: 75px !important;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+  }
+}
+
+/* Relationship field thumbnail preview - larger */
+.relationship--single-value__thumbnail,
+.upload-relationship-details__thumbnail {
+  width: 80px !important;
+  height: 60px !important;
+  min-width: 80px !important;
+  object-fit: cover;
+}
+
+/* Upload gallery view - larger cards */
+.upload-gallery {
+  .upload-gallery__card {
+    width: 180px !important;
+
+    .upload-gallery__image {
+      height: 135px !important;
+      object-fit: cover;
+    }
+  }
+}
+
+/* List drawer for selecting media - larger thumbnails */
+.list-drawer__content {
+  .upload-cell {
+    width: 100px !important;
+
+    .thumbnail {
+      width: 80px !important;
+      height: 60px !important;
+      object-fit: cover;
+    }
+  }
+}
