@@ -10,6 +10,19 @@ import type { PayloadHandler } from 'payload'
 
 /**
  * Helper function to get media URL with variants
+ *
+ * Payload CMS stores image sizes in `sizes` field with structure:
+ *   { thumbnail: { url, width, height }, card: { url, ... }, tablet: { url, ... }, desktop: { url, ... } }
+ *
+ * Frontend expects `variants` field with structure:
+ *   { thumbnail: url, small: url, medium: url, large: url, xlarge: url, webp: url }
+ *
+ * Size mapping (Payload -> Frontend):
+ *   thumbnail (400x300) -> thumbnail
+ *   card (768x512) -> small
+ *   tablet (1024w) -> medium
+ *   desktop (1920w) -> large
+ *   original url -> xlarge
  */
 function getMediaWithVariants(media: any | string | null | undefined) {
   if (!media || typeof media === 'string') {
@@ -25,14 +38,55 @@ function getMediaWithVariants(media: any | string | null | undefined) {
       }
     : undefined
 
+  // Convert Payload's sizes to frontend's variants format
+  const sizes = media.sizes || {}
+  const originalUrl = media.url || ''
+
+  // Build variants object with fallback chain
+  // For each size, use the specific size URL if available, otherwise fallback to larger size or original
+  const variants: Record<string, string> = {}
+
+  // thumbnail (400x300) - smallest
+  if (sizes.thumbnail?.url) {
+    variants.thumbnail = sizes.thumbnail.url
+  }
+
+  // small (768x512) - from card size
+  if (sizes.card?.url) {
+    variants.small = sizes.card.url
+  } else if (sizes.thumbnail?.url) {
+    variants.small = sizes.thumbnail.url
+  }
+
+  // medium (1024w) - from tablet size
+  if (sizes.tablet?.url) {
+    variants.medium = sizes.tablet.url
+  } else if (sizes.card?.url) {
+    variants.medium = sizes.card.url
+  } else {
+    variants.medium = originalUrl
+  }
+
+  // large (1920w) - from desktop size
+  if (sizes.desktop?.url) {
+    variants.large = sizes.desktop.url
+  } else if (sizes.tablet?.url) {
+    variants.large = sizes.tablet.url
+  } else {
+    variants.large = originalUrl
+  }
+
+  // xlarge - always use original
+  variants.xlarge = originalUrl
+
   return {
     id: media.id,
-    url: media.url || '',
+    url: originalUrl,
     filename: media.filename || '',
     mimeType: media.mimeType || '',
     width: media.width || 0,
     height: media.height || 0,
-    variants: media.variants || {},
+    variants,
     altText: media.altText || media.alt || '',
     cropFocalPoint,
   }
