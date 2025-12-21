@@ -60,7 +60,7 @@ const CDN_DOMAIN = process.env.NEXT_PUBLIC_CDN_DOMAIN || 'http://localhost:8080'
  * - Relative path: prepend CDN domain
  */
 function normalizeToCDN(url: string): string {
-  if (!url) return url
+  if (!url || typeof url !== 'string') return url || ''
 
   // Already using CDN domain
   if (url.includes(CDN_DOMAIN) || url.includes('cloudfront.net')) {
