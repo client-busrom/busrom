@@ -178,7 +178,7 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
 
   return (
     <section
-      className="relative w-full h-full overflow-hidden font-sans"
+      className="relative w-full h-full min-h-[700px] overflow-hidden font-sans"
       style={{ backgroundColor: DESKTOP_CONFIG.backgroundColor }}
     >
       {/* Layer 1: SVG 装饰层 (hero-banner-9-1.svg) */}

@@ -6,6 +6,8 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // --- 响应式尺寸函数 ---
 const rpxHero = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
+// 带最小值的版本，防止在中等屏幕下缩放太严重
+const rpxHeroMin = (designValue: number, minValue: number) => `max(${minValue}px, calc(var(--rpx-hero) * ${designValue}))`;
 
 // --- BannerProps Definition ---
 type BannerData = HomeContent["heroBanner"][number];
@@ -115,7 +117,7 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
 
   return (
     <section
-      className="relative w-full h-full overflow-hidden font-sans"
+      className="relative w-full h-full min-h-[700px] overflow-hidden font-sans"
       style={{ backgroundColor: DESKTOP_CONFIG.backgroundColor }}
     >
       {/* Layer 1: 背景图片 (data.images[0]) - 桌面端 */}
@@ -160,18 +162,18 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
       {/* Layer 2: 右上角 Feature[1] 胶囊 - 桌面端 */}
       <div
         className="hidden md:block absolute right-0 z-20"
-        style={{ top: rpxHero(DESKTOP_CONFIG.feature1.top) }}
+        style={{ top: rpxHeroMin(DESKTOP_CONFIG.feature1.top, 80) }}
       >
         <div
           className="bg-[#665F1F] text-[#FEFFD8]"
           style={{
-            paddingLeft: rpxHero(DESKTOP_CONFIG.feature1.paddingX),
-            paddingRight: rpxHero(DESKTOP_CONFIG.feature1.paddingX),
-            paddingTop: rpxHero(DESKTOP_CONFIG.feature1.paddingY),
-            paddingBottom: rpxHero(DESKTOP_CONFIG.feature1.paddingY),
-            borderTopLeftRadius: rpxHero(DESKTOP_CONFIG.feature1.borderRadius),
-            borderBottomLeftRadius: rpxHero(DESKTOP_CONFIG.feature1.borderRadius),
-            fontSize: rpxHero(DESKTOP_CONFIG.feature1.fontSize),
+            paddingLeft: rpxHeroMin(DESKTOP_CONFIG.feature1.paddingX, 24),
+            paddingRight: rpxHeroMin(DESKTOP_CONFIG.feature1.paddingX, 24),
+            paddingTop: rpxHeroMin(DESKTOP_CONFIG.feature1.paddingY, 12),
+            paddingBottom: rpxHeroMin(DESKTOP_CONFIG.feature1.paddingY, 12),
+            borderTopLeftRadius: rpxHeroMin(DESKTOP_CONFIG.feature1.borderRadius, 50),
+            borderBottomLeftRadius: rpxHeroMin(DESKTOP_CONFIG.feature1.borderRadius, 50),
+            fontSize: rpxHeroMin(DESKTOP_CONFIG.feature1.fontSize, 24),
           }}
         >
           <p className="font-paytone-one font-regular">
@@ -180,18 +182,18 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
         </div>
       </div>
 
-      {/* Layer 3: 标题 - md到lg 用 rpxHero 缩放 */}
+      {/* Layer 3: 标题 - md及以上 使用带最小值的 rpxHero 缩放 */}
       <div
-        className="hidden md:block lg:hidden absolute z-20"
+        className="hidden md:block absolute z-20"
         style={{
           left: DESKTOP_CONFIG.leftContent.left,
-          top: rpxHero(DESKTOP_CONFIG.leftContent.top),
+          top: rpxHeroMin(DESKTOP_CONFIG.leftContent.top, 80),
         }}
       >
         <h1
           className="font-paytone-one font-regular leading-tight"
           style={{
-            fontSize: rpxHero(DESKTOP_CONFIG.title.fontSize),
+            fontSize: rpxHeroMin(DESKTOP_CONFIG.title.fontSizeSmall, 48),
             lineHeight: DESKTOP_CONFIG.title.lineHeight,
           }}
         >
@@ -212,77 +214,13 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
         </h1>
       </div>
 
-      {/* Layer 3: 标题 - lg到xl 缩小版固定像素 */}
+      {/* Layer 3.5: Feature 卡片 - md及以上 使用带最小值的 rpxHero 缩放 */}
       <div
-        className="hidden lg:block xl:hidden absolute z-20"
+        className="hidden md:flex absolute z-20 flex-col"
         style={{
           left: DESKTOP_CONFIG.leftContent.left,
-          top: DESKTOP_CONFIG.leftContent.top,
-        }}
-      >
-        <h1
-          className="font-paytone-one font-regular leading-tight"
-          style={{
-            fontSize: DESKTOP_CONFIG.title.fontSizeSmall,
-            lineHeight: DESKTOP_CONFIG.title.lineHeight,
-          }}
-        >
-          {feature0Lines.map((line, index) => {
-            const isLastLine = feature0Lines.length > 1 && index === feature0Lines.length - 1;
-            return (
-              <div
-                key={index}
-                className={isLastLine ? 'text-[#FDF6C2]' : 'text-black'}
-                style={{
-                  WebkitTextStroke: isLastLine ? '2px #000000' : '2px #FDF6C2',
-                }}
-              >
-                {line}
-              </div>
-            );
-          })}
-        </h1>
-      </div>
-
-      {/* Layer 3: 标题 - xl及以上 固定像素 */}
-      <div
-        className="hidden xl:block absolute z-20"
-        style={{
-          left: DESKTOP_CONFIG.leftContent.left,
-          top: DESKTOP_CONFIG.leftContent.top,
-        }}
-      >
-        <h1
-          className="font-paytone-one font-regular leading-tight"
-          style={{
-            fontSize: DESKTOP_CONFIG.title.fontSize,
-            lineHeight: DESKTOP_CONFIG.title.lineHeight,
-          }}
-        >
-          {feature0Lines.map((line, index) => {
-            const isLastLine = feature0Lines.length > 1 && index === feature0Lines.length - 1;
-            return (
-              <div
-                key={index}
-                className={isLastLine ? 'text-[#FDF6C2]' : 'text-black'}
-                style={{
-                  WebkitTextStroke: isLastLine ? '2px #000000' : '2px #FDF6C2',
-                }}
-              >
-                {line}
-              </div>
-            );
-          })}
-        </h1>
-      </div>
-
-      {/* Layer 3.5: Feature 卡片 - md到lg 用 rpxHero 缩放 */}
-      <div
-        className="hidden md:flex lg:hidden absolute z-20 flex-col"
-        style={{
-          left: DESKTOP_CONFIG.leftContent.left,
-          bottom: rpxHero(DESKTOP_CONFIG.featureCards.bottom),
-          gap: rpxHero(DESKTOP_CONFIG.featureCards.gap),
+          bottom: rpxHeroMin(DESKTOP_CONFIG.featureCards.bottom, 60),
+          gap: rpxHeroMin(DESKTOP_CONFIG.featureCards.gapSmall, 10),
         }}
       >
         {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
@@ -290,81 +228,17 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
             key={index}
             className="bg-[#FFFB1B]/20 border border-[#CFBC37] flex items-center"
             style={{
-              width: rpxHero(DESKTOP_CONFIG.featureCards.width),
-              height: rpxHero(DESKTOP_CONFIG.featureCards.height),
-              borderRadius: rpxHero(DESKTOP_CONFIG.featureCards.borderRadius),
-              borderWidth: rpxHero(DESKTOP_CONFIG.featureCards.borderWidth),
-              paddingLeft: rpxHero(24),
-              paddingRight: rpxHero(24),
+              width: rpxHeroMin(DESKTOP_CONFIG.featureCards.widthSmall, 260),
+              height: rpxHeroMin(DESKTOP_CONFIG.featureCards.heightSmall, 44),
+              borderRadius: rpxHeroMin(DESKTOP_CONFIG.featureCards.borderRadius, 12),
+              borderWidth: `max(1.5px, ${rpxHero(DESKTOP_CONFIG.featureCards.borderWidth)})`,
+              paddingLeft: rpxHeroMin(16, 12),
+              paddingRight: rpxHeroMin(16, 12),
             }}
           >
             <p
               className="font-phudu font-semibold text-[#CFBC37] text-stroke-custom-gold text-left"
-              style={{ fontSize: rpxHero(DESKTOP_CONFIG.featureCards.fontSize) }}
-            >
-              {feature}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Layer 3.5: Feature 卡片 - lg到xl 缩小版固定像素 */}
-      <div
-        className="hidden lg:flex xl:hidden absolute z-20 flex-col"
-        style={{
-          left: DESKTOP_CONFIG.leftContent.left,
-          bottom: DESKTOP_CONFIG.featureCards.bottom,
-          gap: DESKTOP_CONFIG.featureCards.gapSmall,
-        }}
-      >
-        {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
-          <div
-            key={index}
-            className="bg-[#FFFB1B]/20 border border-[#CFBC37] flex items-center"
-            style={{
-              width: DESKTOP_CONFIG.featureCards.widthSmall,
-              height: DESKTOP_CONFIG.featureCards.heightSmall,
-              borderRadius: DESKTOP_CONFIG.featureCards.borderRadius,
-              borderWidth: DESKTOP_CONFIG.featureCards.borderWidth,
-              paddingLeft: 16,
-              paddingRight: 16,
-            }}
-          >
-            <p
-              className="font-phudu font-semibold text-[#CFBC37] text-stroke-custom-gold text-left"
-              style={{ fontSize: DESKTOP_CONFIG.featureCards.fontSizeSmall }}
-            >
-              {feature}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Layer 3.5: Feature 卡片 - xl及以上 固定像素 */}
-      <div
-        className="hidden xl:flex absolute z-20 flex-col"
-        style={{
-          left: DESKTOP_CONFIG.leftContent.left,
-          bottom: DESKTOP_CONFIG.featureCards.bottom,
-          gap: DESKTOP_CONFIG.featureCards.gap,
-        }}
-      >
-        {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
-          <div
-            key={index}
-            className="bg-[#FFFB1B]/20 border border-[#CFBC37] flex items-center"
-            style={{
-              width: DESKTOP_CONFIG.featureCards.width,
-              height: DESKTOP_CONFIG.featureCards.height,
-              borderRadius: DESKTOP_CONFIG.featureCards.borderRadius,
-              borderWidth: DESKTOP_CONFIG.featureCards.borderWidth,
-              paddingLeft: 24,
-              paddingRight: 24,
-            }}
-          >
-            <p
-              className="font-phudu font-semibold text-[#CFBC37] text-stroke-custom-gold text-left"
-              style={{ fontSize: DESKTOP_CONFIG.featureCards.fontSize }}
+              style={{ fontSize: rpxHeroMin(DESKTOP_CONFIG.featureCards.fontSizeSmall, 18) }}
             >
               {feature}
             </p>
@@ -376,9 +250,9 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
       <div
         className="hidden md:flex absolute z-20"
         style={{
-          bottom: rpxHero(DESKTOP_CONFIG.bottomImages.bottom),
-          right: rpxHero(DESKTOP_CONFIG.bottomImages.right),
-          gap: rpxHero(DESKTOP_CONFIG.bottomImages.gap),
+          bottom: rpxHeroMin(DESKTOP_CONFIG.bottomImages.bottom, 60),
+          right: rpxHeroMin(DESKTOP_CONFIG.bottomImages.right, 40),
+          gap: rpxHeroMin(DESKTOP_CONFIG.bottomImages.gap, 12),
         }}
       >
         {[data.images[1], data.images[2], data.images[3]].map((image, index) => (
@@ -386,10 +260,10 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
             key={index}
             className="relative overflow-hidden border-white"
             style={{
-              width: rpxHero(DESKTOP_CONFIG.bottomImages.width),
-              height: rpxHero(DESKTOP_CONFIG.bottomImages.height),
-              borderRadius: rpxHero(DESKTOP_CONFIG.bottomImages.borderRadius),
-              borderWidth: rpxHero(DESKTOP_CONFIG.bottomImages.borderWidth),
+              width: rpxHeroMin(DESKTOP_CONFIG.bottomImages.width, 160),
+              height: rpxHeroMin(DESKTOP_CONFIG.bottomImages.height, 130),
+              borderRadius: rpxHeroMin(DESKTOP_CONFIG.bottomImages.borderRadius, 20),
+              borderWidth: `max(3px, ${rpxHero(DESKTOP_CONFIG.bottomImages.borderWidth)})`,
               borderStyle: 'solid',
             }}
           >

@@ -135,7 +135,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
   const titleLine3 = parts[2] || "";  // Glass Clip
 
   return (
-    <section className="relative w-full h-full overflow-hidden font-sans">
+    <section className="relative w-full h-full min-h-[700px] overflow-hidden font-sans">
       {/* 背景颜色层 */}
       <div
         className="absolute inset-0 z-0"

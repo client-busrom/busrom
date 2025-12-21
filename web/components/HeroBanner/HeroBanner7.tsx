@@ -298,7 +298,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
   const ovalClipId = "ovalClipHero7"; // 唯一 ID
 
   return (
-    <section className="relative w-full h-full overflow-hidden font-sans bg-[#99935f]">
+    <section className="relative w-full h-full min-h-[700px] overflow-hidden font-sans bg-[#99935f]">
       <svg width="0" height="0" style={{ position: 'absolute' }}>
         <defs>
           {/* 【新增】椭圆 clipPath */}

@@ -8,7 +8,8 @@
     /* --rpx: 普通内容按宽度缩放 */
     --rpx: calc(100vw / 1920);
     /* --rpx-hero: Hero区域用min(宽度,高度)，保证不超出屏幕 */
-    --rpx-hero: min(calc(100vw / 1920), calc(100vh / 1080));
+    /* 最小值: 700px / 1080 = 0.648，当视口高度 < 700px 时停止缩小 */
+    --rpx-hero: min(calc(100vw / 1920), max(calc(700px / 1080), calc(100vh / 1080)));
 
     /* 品牌颜色映射 (来自你的Figma规范)
     */

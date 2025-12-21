@@ -14,6 +14,13 @@ type BannerProps = {
 // 使用 CSS 变量 --rpx-hero，在宽屏幕上按宽度缩放，在高屏幕上按高度缩放
 const rpx = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
 
+// 移动端配置
+const MOBILE_CONFIG = {
+  titleFontSize: 'text-3xl sm:text-4xl md:text-5xl',
+  itemFontSize: 'text-base sm:text-lg md:text-xl',
+  itemPadding: 'px-5 py-3 sm:px-6 sm:py-4',
+};
+
 // 背景图片配置
 const BACKGROUND_CONFIG = {
   backgroundColor: '#756f3f',  // 背景颜色
@@ -79,7 +86,7 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
   const parallelogramClipPath = "polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%)";
 
   return (
-    <section className="relative w-full h-full overflow-hidden font-sans">
+    <section className="relative w-full h-full min-h-[700px] overflow-hidden font-sans">
       {/* 背景颜色层 */}
       <div
         className="absolute inset-0 z-0"
@@ -104,9 +111,9 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
         />
       </div>
 
-      {/* SVG 装饰元素 - 左下角，撑满高度 */}
+      {/* SVG 装饰元素 - 桌面端 */}
       <div
-        className="absolute"
+        className="hidden lg:block absolute"
         style={{
           left: 0,
           bottom: 0,
@@ -123,10 +130,23 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
           className="object-contain object-left-bottom"
         />
       </div>
-
-      {/* 左侧文字内容 - 左下定位 */}
+      {/* SVG 装饰元素 - 移动端 */}
       <div
-        className="absolute flex flex-col"
+        className="lg:hidden absolute left-0 bottom-0 w-[85%] sm:w-[80%] md:w-[75%] h-full"
+        style={{ zIndex: SVG_CONFIG.zIndex }}
+      >
+        <Image
+          src={svgUrl}
+          alt="decoration"
+          fill
+          sizes="85vw"
+          className="object-contain object-left-bottom"
+        />
+      </div>
+
+      {/* 左侧文字内容 - 桌面端 (lg+) */}
+      <div
+        className="hidden lg:flex absolute flex-col"
         style={{
           left: LEFT_CONTENT_CONFIG.left,
           bottom: LEFT_CONTENT_CONFIG.bottom,
@@ -189,9 +209,37 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
         </div>
       </div>
 
-      {/* 右上角装饰 */}
+      {/* 左侧文字内容 - 移动端 (< lg) */}
+      <div className="lg:hidden absolute flex flex-col left-6 sm:left-8 md:left-10 bottom-20 sm:bottom-24 md:bottom-28 z-[6]">
+        {/* 标题文字 */}
+        <p className={`font-paytone-one font-regular text-[#000000] text-stroke-custom-light ${MOBILE_CONFIG.titleFontSize} leading-tight mb-8 sm:mb-10 max-w-[320px] sm:max-w-[400px] md:max-w-[500px]`}>
+          {data.features[0]}
+        </p>
+
+        {/* 三个条目 - 移动端使用圆角矩形 */}
+        <div className="flex flex-col gap-3 sm:gap-4">
+          {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
+            <div
+              key={index}
+              className={`bg-gradient-to-r from-[#5A4F0E] to-[#C0A91D] rounded-full ${MOBILE_CONFIG.itemPadding}`}
+              style={{
+                maskImage: 'linear-gradient(to right, black 0%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to right, black 0%, transparent 100%)',
+              }}
+            >
+              <p className={`font-medium text-[#FFF5AD] ${MOBILE_CONFIG.itemFontSize} pl-3`}
+                style={{ textShadow: '0 2px 6px #565020' }}
+              >
+                {feature}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 右上角装饰 - 桌面端 */}
       <div
-        className="absolute top-0 right-0 z-[4]"
+        className="hidden lg:block absolute top-0 right-0 z-[4]"
         style={{
           width: rpx(CORNER_TOP_RIGHT.width),
           height: rpx(CORNER_TOP_RIGHT.height),
@@ -199,10 +247,18 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
           borderRadius: `0 0 0 ${CORNER_RADIUS}px`,
         }}
       />
-
-      {/* 右下角装饰 */}
+      {/* 右上角装饰 - 移动端 */}
       <div
-        className="absolute bottom-0 right-0 z-[4]"
+        className="lg:hidden absolute top-0 right-0 z-[4] w-8 h-24 sm:w-10 sm:h-32"
+        style={{
+          backgroundColor: CORNER_COLOR,
+          borderRadius: `0 0 0 ${CORNER_RADIUS}px`,
+        }}
+      />
+
+      {/* 右下角装饰 - 桌面端 */}
+      <div
+        className="hidden lg:block absolute bottom-0 right-0 z-[4]"
         style={{
           width: rpx(CORNER_BOTTOM_RIGHT.width),
           height: rpx(CORNER_BOTTOM_RIGHT.height),
@@ -210,10 +266,18 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
           borderRadius: `${CORNER_RADIUS}px 0 0 0`,
         }}
       />
-
-      {/* 左下角装饰 */}
+      {/* 右下角装饰 - 移动端 */}
       <div
-        className="absolute bottom-0 left-0 z-[4]"
+        className="lg:hidden absolute bottom-0 right-0 z-[4] w-32 h-6 sm:w-48 sm:h-8"
+        style={{
+          backgroundColor: CORNER_COLOR,
+          borderRadius: `${CORNER_RADIUS}px 0 0 0`,
+        }}
+      />
+
+      {/* 左下角装饰 - 桌面端 */}
+      <div
+        className="hidden lg:block absolute bottom-0 left-0 z-[4]"
         style={{
           width: rpx(CORNER_BOTTOM_LEFT.width),
           height: rpx(CORNER_BOTTOM_LEFT.height),
@@ -221,10 +285,18 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
           borderRadius: `0 ${CORNER_RADIUS}px 0 0`,
         }}
       />
-
-      {/* 顶部居中装饰 */}
+      {/* 左下角装饰 - 移动端 */}
       <div
-        className="absolute top-0 z-[4]"
+        className="lg:hidden absolute bottom-0 left-0 z-[4] w-6 h-32 sm:w-8 sm:h-48"
+        style={{
+          backgroundColor: CORNER_COLOR,
+          borderRadius: `0 ${CORNER_RADIUS}px 0 0`,
+        }}
+      />
+
+      {/* 顶部居中装饰 - 桌面端 */}
+      <div
+        className="hidden lg:block absolute top-0 z-[4]"
         style={{
           left: CORNER_TOP_CENTER.left,
           width: CORNER_TOP_CENTER.width,
@@ -233,10 +305,18 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
           borderRadius: `0 0 ${CORNER_RADIUS}px ${CORNER_RADIUS}px`,
         }}
       />
-
-      {/* 右侧内容区域 - 标题+图片作为整体 */}
+      {/* 顶部居中装饰 - 移动端 */}
       <div
-        className="absolute z-10 flex flex-col items-end"
+        className="lg:hidden absolute top-0 left-[20%] w-[60%] h-8 sm:h-10 z-[4]"
+        style={{
+          backgroundColor: CORNER_COLOR,
+          borderRadius: `0 0 ${CORNER_RADIUS}px ${CORNER_RADIUS}px`,
+        }}
+      />
+
+      {/* 右侧内容区域 - 桌面端 (lg+) */}
+      <div
+        className="hidden lg:flex absolute z-10 flex-col items-end"
         style={{
           right: RIGHT_CONTENT_CONFIG.contentRight,
           top: RIGHT_CONTENT_CONFIG.contentTop,
@@ -307,6 +387,43 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
             />
           </div>
         </div>
+        </div>
+      </div>
+
+      {/* 右侧内容区域 - 移动端 (< lg) */}
+      <div className="lg:hidden absolute z-10 right-4 sm:right-6 md:right-8 top-20 sm:top-24 md:top-28 flex flex-col items-end">
+        {/* 右侧标题 */}
+        <h1 className="font-paytone-one font-regular text-white text-right text-xl sm:text-2xl md:text-3xl mb-4 sm:mb-5"
+          style={{ textShadow: '0 2px 4px rgba(117, 112, 63, 0.5)' }}
+        >
+          {data.features[1]}
+        </h1>
+
+        {/* 右侧图片组 - 移动端简化布局 */}
+        <div className="relative">
+          {/* 大图 */}
+          <div className="overflow-hidden shadow-lg bg-white p-2 sm:p-2.5 rounded-2xl w-44 h-40 sm:w-56 sm:h-52 md:w-72 md:h-64">
+            <div className="relative w-full h-full overflow-hidden rounded-xl">
+              <OptimizedImage
+                image={data.images[1]}
+                alt="Large feature image"
+                size="large"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
+          {/* 小图 - 移动端偏移较小 */}
+          <div className="absolute overflow-hidden shadow-lg bg-white z-20 p-1.5 sm:p-2 rounded-xl -left-20 sm:-left-28 md:-left-36 top-12 sm:top-16 md:top-20 w-32 h-28 sm:w-40 sm:h-36 md:w-48 md:h-44">
+            <div className="relative w-full h-full overflow-hidden rounded-lg">
+              <OptimizedImage
+                image={data.images[2]}
+                alt="Small feature image"
+                size="medium"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </section>

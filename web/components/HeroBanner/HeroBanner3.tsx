@@ -56,10 +56,11 @@ const CONFIG = {
   imageGap: 12,
   // 左侧文字
   subtitleFontSize: 36,
-  titleFontSize: 72,
-  featureFontSize: 18,
-  featurePaddingX: 24,
-  featurePaddingY: 12,
+  titleFontSize: 90,  // 设计稿 90px
+  featureFontSize: 24,  // 增大字号
+  featurePaddingX: 32,  // 增大内边距
+  featurePaddingY: 16,
+  featureMaxWidth: 420,  // 增大最大宽度
 };
 
 // --- HeroBanner3 Component ---
@@ -75,7 +76,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
   const featureTextColors = ["#FFF5AD", "#756F3F", "#FFF5AD"];
 
   return (
-    <section className="relative w-full h-full overflow-hidden font-sans">
+    <section className="relative w-full h-full min-h-[700px] overflow-hidden font-sans">
       {/* 背景颜色层 */}
       <div
         className="absolute inset-0 z-0"
@@ -189,10 +190,11 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
         >
           {/* Feature[1] - 副标题 */}
           <p
-            className="font-regular text-[#000000] mb-4"
+            className="font-semibold text-[#000000] mb-4"
             style={{
               fontSize: rpx(CONFIG.subtitleFontSize),
               marginLeft: rpx(24),
+              fontWeight: 600,
             }}
           >
             {feature1Rest}{" "}
@@ -200,15 +202,20 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
           </p>
           {/* Feature[0] - 主标题 */}
           <h1
-            className="font-poller-one font-regular text-stroke-custom-light text-[#332E0B] mb-8"
-            style={{ fontSize: rpx(CONFIG.titleFontSize) }}
+            className="font-poller-one text-[#332E0B] mb-8"
+            style={{
+              fontSize: rpx(CONFIG.titleFontSize),
+              lineHeight: 1.1,
+              WebkitTextStroke: '2px #FDF6C2',
+              paintOrder: 'stroke fill',
+            }}
           >
             {data.features[0]}
           </h1>
           {/* Feature Stack */}
           <div
             className="flex flex-col"
-            style={{ gap: rpx(16), maxWidth: rpx(360) }}
+            style={{ gap: `max(12px, ${rpx(16)})`, maxWidth: `max(280px, ${rpx(CONFIG.featureMaxWidth)})` }}
           >
             {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
               <div
@@ -217,11 +224,11 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
                 style={{
                   backgroundColor: featureBgColors[index % featureBgColors.length],
                   color: featureTextColors[index % featureTextColors.length],
-                  fontSize: rpx(CONFIG.featureFontSize),
-                  paddingLeft: rpx(CONFIG.featurePaddingX),
-                  paddingRight: rpx(CONFIG.featurePaddingX),
-                  paddingTop: rpx(CONFIG.featurePaddingY),
-                  paddingBottom: rpx(CONFIG.featurePaddingY),
+                  fontSize: `max(16px, ${rpx(CONFIG.featureFontSize)})`,
+                  paddingLeft: `max(20px, ${rpx(CONFIG.featurePaddingX)})`,
+                  paddingRight: `max(20px, ${rpx(CONFIG.featurePaddingX)})`,
+                  paddingTop: `max(10px, ${rpx(CONFIG.featurePaddingY)})`,
+                  paddingBottom: `max(10px, ${rpx(CONFIG.featurePaddingY)})`,
                 }}
               >
                 {feature}
@@ -331,20 +338,27 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
           {/* 文字内容 - 叠在装饰元素上，居中显示 */}
           <div className="relative z-10 h-full flex flex-col justify-center items-center px-6">
             {/* Feature[1] - 副标题 */}
-            <p className="text-lg font-regular text-white mb-4 text-center">
+            <p className="text-lg sm:text-xl font-semibold text-white mb-4 text-center">
               {feature1Rest}{" "}
               <span className="text-[#F98538]">{feature1LastWord}</span>
             </p>
             {/* Feature[0] - 主标题 */}
-            <h1 className="text-3xl font-poller-one font-regular text-stroke-custom-light text-white mb-6 text-center">
+            <h1
+              className="text-3xl sm:text-4xl font-poller-one text-[#332E0B] mb-6 text-center"
+              style={{
+                lineHeight: 1.1,
+                WebkitTextStroke: '1.5px #FDF6C2',
+                paintOrder: 'stroke fill',
+              }}
+            >
               {data.features[0]}
             </h1>
             {/* Feature Stack */}
-            <div className="flex flex-col gap-3 w-full max-w-[300px]">
+            <div className="flex flex-col gap-4 w-full max-w-[340px]">
               {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
                 <div
                   key={index}
-                  className="px-5 py-3 rounded-full font-pingfang font-semibold text-center text-base"
+                  className="px-6 py-4 rounded-full font-pingfang font-semibold text-center text-lg sm:text-xl"
                   style={{
                     backgroundColor: featureBgColors[index % featureBgColors.length],
                     color: featureTextColors[index % featureTextColors.length],
