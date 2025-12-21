@@ -45,6 +45,25 @@ function isCacheValid(entry?: CacheEntry): boolean {
 }
 
 /**
+ * Get the best available thumbnail URL
+ * Priority: sizes.thumbnail.url > sizes.card.url > original url
+ *
+ * Note: Old Keystone data has thumbnailURL pointing to /variants/thumbnail/ path
+ * which may not exist for some images. We prefer Payload's sizes structure.
+ */
+function getThumbnailUrl(data: any): string {
+  // Try Payload's sizes structure first (more reliable)
+  if (data.sizes?.thumbnail?.url) {
+    return data.sizes.thumbnail.url
+  }
+  if (data.sizes?.card?.url) {
+    return data.sizes.card.url
+  }
+  // Fall back to original URL
+  return data.url || ''
+}
+
+/**
  * Fetch a single media item with caching
  */
 export async function fetchMediaItem(id: number): Promise<MediaItem | null> {
@@ -70,13 +89,19 @@ export async function fetchMediaItem(id: number): Promise<MediaItem | null> {
 
       const data = await res.json()
 
+      // Normalize thumbnailURL to use sizes structure instead of legacy /variants/ path
+      const normalizedData: MediaItem = {
+        ...data,
+        thumbnailURL: getThumbnailUrl(data),
+      }
+
       // Update cache
       cache.set(id, {
-        data,
+        data: normalizedData,
         timestamp: Date.now(),
       })
 
-      return data
+      return normalizedData
     } catch (error) {
       console.error(`Failed to fetch media item ${id}:`, error)
       return null

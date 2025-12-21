@@ -181,7 +181,13 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field }) => {
       const res = await fetch(`/api/media?${queryString}`)
       const data = await res.json()
 
-      setMedia(data.docs || [])
+      // Normalize thumbnailURL to use sizes structure instead of legacy /variants/ path
+      const normalizedDocs = (data.docs || []).map((doc: any) => ({
+        ...doc,
+        thumbnailURL: doc.sizes?.thumbnail?.url || doc.sizes?.card?.url || doc.url,
+      }))
+
+      setMedia(normalizedDocs)
       setTotalPages(data.totalPages || 1)
       setTotalDocs(data.totalDocs || 0)
     } catch (error) {
