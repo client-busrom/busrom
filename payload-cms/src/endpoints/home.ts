@@ -246,7 +246,7 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         title: item.title,
         description: item.description,
         productSeries: item.productSeries,
-        images: item.populatedImages || [],
+        images: (item.resolvedImages || []).map((img: any) => getMediaWithVariants(img)),
       })),
 
       // Featured Products
