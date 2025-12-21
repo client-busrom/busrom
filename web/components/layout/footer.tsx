@@ -170,7 +170,7 @@ export default function Footer({ locale, showForm = true }: Props) {
         {/* 背景图片 - 使用 CSS 背景代替 fill Image 避免 CLS */}
         <div
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/BusromFooterBg.png)' }}
+          style={{ backgroundImage: 'url(/BusromFooterBg.webp)' }}
           aria-hidden="true"
         />
 
