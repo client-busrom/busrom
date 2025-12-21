@@ -403,61 +403,7 @@ export default buildConfig({
               ? `https://${cdnDomain}`
               : `https://${s3Config.bucket}.s3.${region}.amazonaws.com`
 
-            // 判断是否是 Payload 生成的变体（带尺寸后缀如 -400x300）
-            const isPayloadVariant = /-\d+x\d+\.\w+$/.test(filename)
-            if (isPayloadVariant) {
-              // Payload 生成的变体都在 media/ 目录
-              return `${baseUrl}/media/${filename}`
-            }
-
-            // ================================================================
-            // Keystone 迁移图片路径映射
-            // 这些图片存储在 S3 的 /{category}/{type}/ 目录下
-            // ================================================================
-            const CATEGORY_MAP: Record<string, string> = {
-              'glass-standoff': 'glass-standoff',
-              'glass-connected': 'glass-connected-fitting',
-              'glass-fence': 'glass-fence-spigot',
-              'glass-hinge': 'glass-hinge',
-              'guardrail': 'guardrail-glass-clip',
-              'bathroom-glass': 'bathroom-glass-clip',
-              'bathroom-door': 'bathroom-door-handle',
-              'sliding-door': 'sliding-door-kit',
-              'hidden-hook': 'hidden-hook',
-            }
-
-            const TYPE_PATTERNS: Record<string, string> = {
-              '_scene_': 'scene',
-              '_effect_': 'effect',
-              '_combo_': 'combo',
-              '_product_': 'product',
-              '_white_': 'white',  // 特殊情况：有些文件在 white/ 目录
-            }
-
-            // 查找匹配的 category
-            let category: string | null = null
-            for (const [prefix, cat] of Object.entries(CATEGORY_MAP)) {
-              if (filename.startsWith(prefix)) {
-                category = cat
-                break
-              }
-            }
-
-            // 查找匹配的 type
-            let type: string | null = null
-            for (const [pattern, t] of Object.entries(TYPE_PATTERNS)) {
-              if (filename.includes(pattern)) {
-                type = t
-                break
-              }
-            }
-
-            // 如果能确定 category 和 type，使用 Keystone 路径
-            if (category && type) {
-              return `${baseUrl}/${category}/${type}/${filename}`
-            }
-
-            // 默认：Payload 上传的新图片在 media/ 目录
+            // All media files (original and variants) are in /media/ directory
             return `${baseUrl}/media/${filename}`
           },
         },
