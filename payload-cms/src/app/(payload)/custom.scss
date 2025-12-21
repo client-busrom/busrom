@@ -253,52 +253,55 @@ html[data-theme='dark'] {
    Media Collection - Larger Thumbnails
    ============================================ */
 
-/* Media list view - enlarge thumbnails */
-.collection-list__table {
-  /* Increase thumbnail column width for media collection */
-  .upload-cell {
-    width: 120px !important;
-    min-width: 120px !important;
+/* Media list view - enlarge thumbnails in table */
+[class*="table"] [class*="thumbnail"],
+[class*="Table"] [class*="Thumbnail"],
+table img[class*="thumbnail"],
+.table img,
+[data-testid*="thumbnail"] {
+  width: 120px !important;
+  height: 90px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  object-fit: cover !important;
+  border-radius: 4px !important;
+}
 
-    .thumbnail {
-      width: 100px !important;
-      height: 75px !important;
-      object-fit: cover;
-      border-radius: 4px;
-    }
-  }
+/* Target Payload's specific upload thumbnail cell */
+td[class*="cell"] img,
+[class*="cell--thumbnail"] img,
+[class*="Cell"] img[src*="thumbnail"],
+[class*="Cell"] img[src*="media"] {
+  width: 120px !important;
+  height: 90px !important;
+  min-width: 120px !important;
+  object-fit: cover !important;
+  border-radius: 4px !important;
+}
+
+/* Upload collection list thumbnails */
+[class*="upload"] img:not([class*="logo"]):not([class*="avatar"]) {
+  min-width: 100px !important;
+  min-height: 75px !important;
 }
 
 /* Relationship field thumbnail preview - larger */
-.relationship--single-value__thumbnail,
-.upload-relationship-details__thumbnail {
+[class*="relationship"] img,
+[class*="Relationship"] img {
   width: 80px !important;
   height: 60px !important;
   min-width: 80px !important;
-  object-fit: cover;
+  object-fit: cover !important;
 }
 
 /* Upload gallery view - larger cards */
-.upload-gallery {
-  .upload-gallery__card {
-    width: 180px !important;
-
-    .upload-gallery__image {
-      height: 135px !important;
-      object-fit: cover;
-    }
-  }
+[class*="gallery"] [class*="card"],
+[class*="Gallery"] [class*="Card"] {
+  width: 180px !important;
 }
 
-/* List drawer for selecting media - larger thumbnails */
-.list-drawer__content {
-  .upload-cell {
-    width: 100px !important;
-
-    .thumbnail {
-      width: 80px !important;
-      height: 60px !important;
-      object-fit: cover;
-    }
-  }
+[class*="gallery"] [class*="card"] img,
+[class*="Gallery"] [class*="Card"] img {
+  height: 135px !important;
+  object-fit: cover !important;
 }
