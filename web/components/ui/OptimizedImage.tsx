@@ -73,10 +73,13 @@ function normalizeImage(image: UniversalImage | string): MediaImage | null {
       const urlStr = typeof rawUrl === 'string' ? rawUrl :
                      (typeof rawUrl === 'object' && rawUrl?.url && typeof rawUrl.url === 'string') ? rawUrl.url : null
       if (urlStr) {
+        // Also preserve variants from the API response
+        const apiVariants = (image as any).variants
         return {
           ...mediaImage,
           file: { url: urlStr },
           fileUrl: urlStr,
+          variants: apiVariants || mediaImage.variants,
         }
       }
     }
