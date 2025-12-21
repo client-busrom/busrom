@@ -33,11 +33,11 @@ import type { ImageObject } from '@/lib/content-data'
  * Size presets for common use cases
  */
 export type ImageSizePreset =
-  | 'thumbnail'    // 150x150 - Thumbnails, admin UI
-  | 'small'        // 400px - Mobile lists, card covers
-  | 'medium'       // 800px - Tablet, desktop lists
-  | 'large'        // 1200px - Desktop detail pages
-  | 'xlarge'       // 1920px - Full-screen, hero banners
+  | 'thumbnail'    // 400x300 - Thumbnails (from Payload thumbnail)
+  | 'small'        // 768x512 - Mobile lists (from Payload card)
+  | 'medium'       // 1024px - Tablet (from Payload tablet)
+  | 'large'        // 1920px - Desktop (from Payload desktop)
+  | 'xlarge'       // Original - Full-screen, hero banners
   | 'auto'         // Use responsive srcSet
 
 /**
@@ -102,7 +102,7 @@ function normalizeImage(image: UniversalImage | string): MediaImage | null {
 export interface OptimizedImageProps {
   /** Image object or URL string - supports MediaImage (CMS), ImageObject (API), or direct URL */
   image?: UniversalImage | string
-  /** @deprecated Use 'image' prop instead. Media object from Keystone CMS */
+  /** @deprecated Use 'image' prop instead. Media object from Payload CMS */
   media?: MediaImage | null | undefined
   /** Alt text override (if not provided, uses localized altText from media) */
   alt?: string

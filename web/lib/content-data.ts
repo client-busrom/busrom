@@ -1,7 +1,7 @@
 /**
  * Content Data Types
  *
- * This module defines TypeScript types for all content from Keystone CMS.
+ * This module defines TypeScript types for all content from Payload CMS.
  * These types match the REST API specification defined in HomeContentApiDocumentation.md
  *
  * @module lib/content-data
@@ -33,18 +33,35 @@
  * />
  * ```
  */
+/**
+ * Image variant info from Payload CMS sizes
+ */
+export interface ImageVariantInfo {
+  url: string
+  width?: number
+  height?: number
+  mimeType?: string
+  filesize?: number
+  filename?: string
+}
+
 export interface ImageObject {
   url: string
   altText: string
   thumbnailUrl?: string
   cropFocalPoint?: { x: number; y: number }
   variants?: {
+    // Home API format (string URLs)
     thumbnail?: string
     small?: string
     medium?: string
     large?: string
     xlarge?: string
     webp?: string
+    // Product API format (Payload sizes as objects)
+    card?: string | ImageVariantInfo
+    tablet?: string | ImageVariantInfo
+    desktop?: string | ImageVariantInfo
   }
 }
 

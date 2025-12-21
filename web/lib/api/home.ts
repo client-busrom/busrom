@@ -1,7 +1,7 @@
 /**
  * Home Page Content API
  *
- * Unified API for fetching all home page content from Keystone CMS
+ * Unified API for fetching all home page content from Payload CMS
  * Uses the new /api/home REST endpoint for better performance
  */
 

@@ -1,7 +1,7 @@
 /**
  * Image Optimization Utilities
  *
- * This module provides utilities for working with Keystone CMS Media images,
+ * This module provides utilities for working with Payload CMS Media images,
  * including image variants selection and alt text localization.
  *
  * @module lib/image-utils
@@ -10,21 +10,23 @@
 /**
  * Image Variants type definition
  *
- * Keystone CMS automatically generates these variants for each uploaded image
+ * Payload CMS generates these variants via the home API endpoint:
+ * - Payload sizes: thumbnail (400x300), card (768x512), tablet (1024w), desktop (1920w)
+ * - API transforms to: thumbnail, small, medium, large, xlarge
  */
 export interface ImageVariants {
-  thumbnail?: string   // 150x150 - Thumbnails, admin UI
-  small?: string       // 400px width - Mobile lists, card covers
-  medium?: string      // 800px width - Tablet, desktop lists
-  large?: string       // 1200px width - Desktop detail pages, carousels
-  xlarge?: string      // 1920px width - Full-screen backgrounds, hero banners
-  webp?: string        // Adaptive - WebP format (smaller file size)
+  thumbnail?: string   // 400x300 - Thumbnails, admin UI (from Payload thumbnail)
+  small?: string       // 768x512 - Mobile lists, card covers (from Payload card)
+  medium?: string      // 1024px width - Tablet, desktop lists (from Payload tablet)
+  large?: string       // 1920px width - Desktop detail pages (from Payload desktop)
+  xlarge?: string      // Original - Full-screen backgrounds, hero banners
+  webp?: string        // WebP format (not currently generated)
 }
 
 /**
  * Media Image type definition
  *
- * Represents a media object from Keystone CMS
+ * Represents a media object from Payload CMS
  */
 export interface MediaImage {
   id: string
@@ -120,7 +122,7 @@ function normalizeToCDN(url: string | unknown): string {
  * Returns the best image URL based on requested size and format preference.
  * Falls back to smaller/larger sizes if the requested size is not available.
  *
- * @param image - Media object from Keystone
+ * @param image - Media object from Payload CMS
  * @param size - Desired image size (default: 'medium')
  * @param preferWebP - Whether to prefer WebP format (default: true)
  * @returns Optimized image URL or placeholder
@@ -179,7 +181,7 @@ export function getOptimizedImageUrl(
  *
  * Generates a srcset string for use in <picture> tags or Next.js Image loader
  *
- * @param image - Media object from Keystone
+ * @param image - Media object from Payload CMS
  * @returns srcset string with multiple sizes
  *
  * @example
