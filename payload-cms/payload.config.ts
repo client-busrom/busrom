@@ -388,18 +388,20 @@ export default buildConfig({
               return ''
             }
 
-            // CDN domain (production)
-            const cdnDomain = process.env.CDN_DOMAIN
-            const baseUrl = cdnDomain && cdnDomain !== 'NONE'
-              ? `https://${cdnDomain}`
-              : `https://${s3Config.bucket}.s3.${process.env.S3_REGION}.amazonaws.com`
-
-            // MinIO local development
+            // MinIO local development - check first
             if (process.env.USE_MINIO === 'true') {
               const endpoint = process.env.S3_ENDPOINT || 'http://localhost:9000'
               const bucket = s3Config.bucket
               return `${endpoint}/${bucket}/media/${filename}`
             }
+
+            // CDN domain (production)
+            const cdnDomain = process.env.CDN_DOMAIN
+            // Use s3Config.config.region which has a fallback to 'us-east-1'
+            const region = s3Config.config.region || 'us-east-1'
+            const baseUrl = cdnDomain && cdnDomain !== 'NONE'
+              ? `https://${cdnDomain}`
+              : `https://${s3Config.bucket}.s3.${region}.amazonaws.com`
 
             // 判断是否是 Payload 生成的变体（带尺寸后缀如 -400x300）
             const isPayloadVariant = /-\d+x\d+\.\w+$/.test(filename)

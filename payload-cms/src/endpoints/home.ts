@@ -39,6 +39,57 @@ function getMediaWithVariants(media: any | string | null | undefined) {
 }
 
 /**
+ * Helper function to resolve media IDs in carousel items
+ * JSON fields don't auto-populate relations, so we need to fetch media manually
+ */
+async function resolveCarouselItems(items: any[], payload: any) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return []
+  }
+
+  // Collect all unique media IDs
+  const mediaIds = new Set<number>()
+  for (const item of items) {
+    if (typeof item.image === 'number') mediaIds.add(item.image)
+    if (typeof item.sceneImage === 'number') mediaIds.add(item.sceneImage)
+  }
+
+  // Fetch all media in one query
+  const mediaMap = new Map<number, any>()
+  if (mediaIds.size > 0) {
+    try {
+      const mediaResult = await payload.find({
+        collection: 'media',
+        where: {
+          id: { in: Array.from(mediaIds) },
+        },
+        limit: mediaIds.size,
+        depth: 0,
+      })
+      for (const media of mediaResult.docs) {
+        mediaMap.set(media.id, media)
+      }
+    } catch (error) {
+      console.error('Error fetching media for carousel items:', error)
+    }
+  }
+
+  // Map items with resolved media
+  return items.map((item: any) => ({
+    title: item.title,
+    buttonText: item.buttonText,
+    linkUrl: item.linkUrl,
+    isShow: item.isShow,
+    image: getMediaWithVariants(
+      typeof item.image === 'number' ? mediaMap.get(item.image) : item.image
+    ),
+    sceneImage: getMediaWithVariants(
+      typeof item.sceneImage === 'number' ? mediaMap.get(item.sceneImage) : item.sceneImage
+    ),
+  }))
+}
+
+/**
  * Home Content Handler
  */
 export const homeContentHandler: PayloadHandler = async (req) => {
@@ -190,15 +241,13 @@ export const homeContentHandler: PayloadHandler = async (req) => {
       })),
 
       // Product Series Carousel
+      // Note: items is a JSON field, so media references are IDs that need to be resolved
       productSeriesCarousel: {
         title: productSeriesCarousel?.title || '',
-        items: (((productSeriesCarousel as any)?.items?.[locale] || []) as any[]).map((item: any) => ({
-          title: item.title,
-          buttonText: item.buttonText,
-          linkUrl: item.linkUrl,
-          image: getMediaWithVariants(item.productImage),
-          sceneImage: getMediaWithVariants(item.sceneImage),
-        })),
+        items: await resolveCarouselItems(
+          (productSeriesCarousel as any)?.items?.[locale] || [],
+          payload
+        ),
       },
 
       // Service Features
