@@ -8,7 +8,10 @@ WORKDIR /app
 # Copy package files
 COPY payload-cms/package.json payload-cms/package-lock.json ./
 
-# Install dependencies
+# Copy patches directory BEFORE npm ci so postinstall can apply them
+COPY payload-cms/patches ./patches
+
+# Install dependencies (postinstall will run patch-package)
 RUN npm ci
 
 # Copy source code
