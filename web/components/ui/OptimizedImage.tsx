@@ -65,7 +65,16 @@ function normalizeImage(image: UniversalImage | string): MediaImage | null {
 
   // Check if it's already MediaImage format (has 'id' field)
   if ('id' in image) {
-    return image as MediaImage
+    const mediaImage = image as MediaImage
+    // Handle API format where url is at root level instead of file.url
+    if (!mediaImage.file?.url && !mediaImage.fileUrl && (image as any).url) {
+      return {
+        ...mediaImage,
+        file: { url: (image as any).url },
+        fileUrl: (image as any).url,
+      }
+    }
+    return mediaImage
   }
 
   // Convert ImageObject to MediaImage format
