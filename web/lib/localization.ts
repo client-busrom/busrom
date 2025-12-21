@@ -2,7 +2,7 @@
  * Localization Utilities
  *
  * This module provides utilities for handling multilingual content
- * from Keystone CMS, which stores translations in JSON format.
+ * from Payload CMS, which stores translations in JSON format.
  *
  * @module lib/localization
  */
@@ -24,7 +24,7 @@ export type MultilingualField = Record<string, string> | null | undefined
  * 3. Return first available value
  * 4. Return fallback text
  *
- * @param field - Multilingual JSON object from Keystone
+ * @param field - Multilingual JSON object from Payload CMS
  * @param locale - Language code (e.g., 'en', 'zh', 'es')
  * @param fallback - Fallback text if no translation found (default: '')
  * @returns Localized text

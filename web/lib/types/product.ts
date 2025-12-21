@@ -1,7 +1,7 @@
 /**
  * Product Types
  *
- * Type definitions for Product and ProductSeries models from Keystone CMS
+ * Type definitions for Product and ProductSeries models from Payload CMS
  */
 
 import { ImageObject } from "../content-data"
