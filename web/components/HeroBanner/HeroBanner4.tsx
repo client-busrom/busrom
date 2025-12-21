@@ -88,7 +88,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
   ];
 
   return (
-    <section className="relative w-full h-full overflow-hidden font-sans">
+    <section className="relative w-full h-full min-h-[700px] overflow-hidden font-sans">
       {/* --- SVG 定义 (隐藏在布局外) --- */}
       <svg width="0" height="0" style={{ position: "absolute" }}>
         <defs>

@@ -152,23 +152,26 @@ export default function HeroBanner({ data, locale }: Props) {
     api?.scrollTo(index);
   };
 
+  // 最小高度常量 - 确保 UI 元素不会重叠
+  const MIN_HEIGHT = "min-h-[700px]";
+  const MIN_HEIGHT_CLASS = `h-screen ${MIN_HEIGHT}`;
+
   return (
     // 根容器: 确保它定义了高度
-    <section ref={sectionRef} className="relative w-full h-screen min-h-[800px]">
+    <section ref={sectionRef} className={`relative w-full ${MIN_HEIGHT_CLASS}`}>
       <Carousel
         setApi={setApi}
         plugins={[autoplayPlugin.current]}
         // Carousel 容器: 继承 section 的高度
-        className="w-full h-screen min-h-[800px]"
+        className={`w-full ${MIN_HEIGHT_CLASS}`}
         opts={{
           loop: true,
           align: "start",
         }}
       >
-        <CarouselContent 
-            // ⬅️ 关键修正：确保 Flex 容器 h-full min-h-[700px]
-            // m-0 移除，使用 tailwind 默认的负 margin (如果 carousel 库需要)
-            className="h-screen min-h-[800px] m-0" 
+        <CarouselContent
+            // Flex 容器需要相同的最小高度
+            className={`${MIN_HEIGHT_CLASS} m-0`}
         >
           {data && data.length > 0 ? (
             data.map((bannerData, index) => {
@@ -178,9 +181,9 @@ export default function HeroBanner({ data, locale }: Props) {
               if (!BannerComponent) {
                 return (
                   // CarouselItem: 确保其高度继承并设为 flex
-                  <CarouselItem 
-                    key={`fallback-${index}`} 
-                    className="h-full min-h-[800px] p-0 basis-full flex items-center justify-center bg-red-500 text-white"
+                  <CarouselItem
+                    key={`fallback-${index}`}
+                    className={`h-full ${MIN_HEIGHT} p-0 basis-full flex items-center justify-center bg-red-500 text-white`}
                   >
                     Error: Banner Component {componentType} missing
                   </CarouselItem>
@@ -188,17 +191,16 @@ export default function HeroBanner({ data, locale }: Props) {
               }
               return (
                 // CarouselItem: 确保其高度继承，并设为 flex 容器
-                <CarouselItem 
-                    key={index} 
-                    className="h-full min-h-[700px] p-0 basis-full flex" // ⬅️ 确保 flex 布局，以便子组件 h-full 有效
+                <CarouselItem
+                    key={index}
+                    className={`h-full ${MIN_HEIGHT} p-0 basis-full flex`}
                 >
-                  {/* ⬅️ 关键：BannerComponent 本身必须包含 w-full h-full 或 block/flex 才能继承 700px */}
-                  <BannerComponent data={bannerData} locale={locale} /> 
+                  <BannerComponent data={bannerData} locale={locale} />
                 </CarouselItem>
               );
             })
           ) : (
-            <CarouselItem className="h-full min-h-[700px] p-0 flex items-center justify-center bg-gray-700 text-white">
+            <CarouselItem className={`h-full ${MIN_HEIGHT} p-0 flex items-center justify-center bg-gray-700 text-white`}>
               No banner data available.
             </CarouselItem>
           )}

@@ -13,9 +13,11 @@ type BannerProps = {
 
 // --- 响应式尺寸函数 ---
 // --rpx: 按宽度缩放（图片遮罩等需要精确对齐的元素）
-// --rpx-hero: 按 min(宽度, 高度) 缩放（文字等不能超出屏幕的元素）
+// --rpx-hero: 按 min(宽度, 高度) 缩放，有最小值防止过度缩小
 const rpx = (designValue: number) => `calc(var(--rpx) * ${designValue})`;
 const rpxHero = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
+// 用于内容元素，确保在小屏幕上不会重叠
+const rpxContent = rpxHero;
 
 // --- 遮罩和图片配置 (基于 Figma 设计稿 1920x1080) ---
 // 右侧主图遮罩 (hero-banner-6-1.svg)
@@ -110,7 +112,7 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
     : `${MASK_2_CONFIG.imagePositionX}% ${MASK_2_CONFIG.imagePositionY}%`;
 
   return (
-    <section className="relative w-full h-full overflow-hidden font-sans">
+    <section className="relative w-full h-full min-h-[700px] overflow-hidden font-sans">
       {/* z-0: 底色背景 */}
       <div className="absolute inset-0 z-0 bg-[#FFEECA]" />
 
@@ -203,17 +205,17 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
           className="absolute flex items-center justify-end"
           style={{
             left: 0,
-            top: rpx(CONTENT_CONFIG.tagline.top),
-            width: rpx(CONTENT_CONFIG.tagline.width),
-            height: rpx(CONTENT_CONFIG.tagline.height),
-            paddingRight: rpx(40),
+            top: rpxContent(CONTENT_CONFIG.tagline.top),
+            width: rpxContent(CONTENT_CONFIG.tagline.width),
+            height: rpxContent(CONTENT_CONFIG.tagline.height),
+            paddingRight: rpxContent(40),
             background: 'linear-gradient(to left, #FFFFFF, #FFDE95)',
-            borderRadius: `0 ${rpx(CONTENT_CONFIG.tagline.borderRadius)} ${rpx(CONTENT_CONFIG.tagline.borderRadius)} 0`,
+            borderRadius: `0 ${rpxContent(CONTENT_CONFIG.tagline.borderRadius)} ${rpxContent(CONTENT_CONFIG.tagline.borderRadius)} 0`,
           }}
         >
           <p
             className="font-arial font-bold italic text-[#754600]"
-            style={{ fontSize: rpx(CONTENT_CONFIG.tagline.fontSize) }}
+            style={{ fontSize: rpxContent(CONTENT_CONFIG.tagline.fontSize) }}
           >
             {data.features[1]}
           </p>
@@ -223,10 +225,10 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
         <h1
           className="absolute font-poller-one text-white text-stroke-custom"
           style={{
-            left: rpx(CONTENT_CONFIG.left),
-            top: rpx(CONTENT_CONFIG.title.line1Top),
-            fontSize: rpx(CONTENT_CONFIG.title.fontSize),
-            lineHeight: `${rpx(CONTENT_CONFIG.title.lineHeight)}`,
+            left: rpxContent(CONTENT_CONFIG.left),
+            top: rpxContent(CONTENT_CONFIG.title.line1Top),
+            fontSize: rpxContent(CONTENT_CONFIG.title.fontSize),
+            lineHeight: `${rpxContent(CONTENT_CONFIG.title.lineHeight)}`,
           }}
         >
           {titleLine1}
@@ -236,10 +238,10 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
         <h1
           className="absolute font-poller-one text-[#332E0B] text-stroke-custom-light"
           style={{
-            left: rpx(CONTENT_CONFIG.left),
-            top: rpx(CONTENT_CONFIG.title.line2Top),
-            fontSize: rpx(CONTENT_CONFIG.title.fontSize),
-            lineHeight: `${rpx(CONTENT_CONFIG.title.lineHeight)}`,
+            left: rpxContent(CONTENT_CONFIG.left),
+            top: rpxContent(CONTENT_CONFIG.title.line2Top),
+            fontSize: rpxContent(CONTENT_CONFIG.title.fontSize),
+            lineHeight: `${rpxContent(CONTENT_CONFIG.title.lineHeight)}`,
           }}
         >
           {titleLine2}
@@ -250,10 +252,10 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
           <h1
             className="absolute font-poller-one text-[#332E0B] text-stroke-custom-light"
             style={{
-              left: rpx(CONTENT_CONFIG.left),
-              top: rpx(CONTENT_CONFIG.title.line3Top),
-              fontSize: rpx(CONTENT_CONFIG.title.fontSize),
-              lineHeight: `${rpx(CONTENT_CONFIG.title.lineHeight)}`,
+              left: rpxContent(CONTENT_CONFIG.left),
+              top: rpxContent(CONTENT_CONFIG.title.line3Top),
+              fontSize: rpxContent(CONTENT_CONFIG.title.fontSize),
+              lineHeight: `${rpxContent(CONTENT_CONFIG.title.lineHeight)}`,
             }}
           >
             {titleLine3}
@@ -266,18 +268,18 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
             key={index}
             className="absolute flex items-center justify-end bg-[#756F3F]"
             style={{
-              left: rpx(CONTENT_CONFIG.features.lefts[index]),
-              bottom: rpx(CONTENT_CONFIG.features.bottoms[index]),
-              width: rpx(CONTENT_CONFIG.features.width),
-              height: rpx(CONTENT_CONFIG.features.height),
-              borderRadius: rpx(CONTENT_CONFIG.features.borderRadius),
+              left: rpxContent(CONTENT_CONFIG.features.lefts[index]),
+              bottom: rpxContent(CONTENT_CONFIG.features.bottoms[index]),
+              width: rpxContent(CONTENT_CONFIG.features.width),
+              height: rpxContent(CONTENT_CONFIG.features.height),
+              borderRadius: rpxContent(CONTENT_CONFIG.features.borderRadius),
               transform: `rotate(${CONTENT_CONFIG.features.rotation}deg)`,
               transformOrigin: 'center center',
             }}
           >
             <span
               className="font-pingfang font-semibold text-[#FFF5AD]"
-              style={{ fontSize: rpx(CONTENT_CONFIG.features.fontSize), paddingRight: rpx(40) }}
+              style={{ fontSize: rpxContent(CONTENT_CONFIG.features.fontSize), paddingRight: rpxContent(40) }}
             >
               {feature}
             </span>

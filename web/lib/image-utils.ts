@@ -59,8 +59,20 @@ const CDN_DOMAIN = process.env.NEXT_PUBLIC_CDN_DOMAIN || 'http://localhost:8080'
  * - S3 URL (https://xxx.s3.amazonaws.com/...): convert to CDN
  * - Relative path: prepend CDN domain
  */
-function normalizeToCDN(url: string): string {
-  if (!url || typeof url !== 'string') return url || ''
+function normalizeToCDN(url: string | unknown): string {
+  // Ensure url is a valid string
+  if (!url) return ''
+  if (typeof url !== 'string') {
+    // If it's an object with a url property, try to extract it
+    if (typeof url === 'object' && url !== null && 'url' in url) {
+      const extractedUrl = (url as { url: unknown }).url
+      if (typeof extractedUrl === 'string') {
+        return normalizeToCDN(extractedUrl)
+      }
+    }
+    console.warn('[normalizeToCDN] Received non-string url:', typeof url, url)
+    return ''
+  }
 
   // Already using CDN domain
   if (url.includes(CDN_DOMAIN) || url.includes('cloudfront.net')) {
@@ -75,14 +87,23 @@ function normalizeToCDN(url: string): string {
       return `${CDN_DOMAIN}${urlObj.pathname}`
     }
 
-    // S3 URL: https://xxx.s3.amazonaws.com/bucket/...
+    // S3 URL: https://bucket.s3.region.amazonaws.com/path/...
+    // or: https://s3.region.amazonaws.com/bucket/path/...
     if (urlObj.hostname.includes('amazonaws.com')) {
-      // CloudFront doesn't need bucket name in path
       const pathParts = urlObj.pathname.split('/').filter(Boolean)
-      // Remove bucket name if present (first part)
-      if (pathParts.length > 1) {
-        pathParts.shift()
+
+      // For local development (localhost CDN), map to MinIO structure
+      if (CDN_DOMAIN.includes('localhost')) {
+        // Get the bucket name from hostname (busrom-media.s3.region.amazonaws.com)
+        const bucketMatch = urlObj.hostname.match(/^([^.]+)\.s3\./)
+        const bucketName = bucketMatch ? bucketMatch[1] : 'busrom-media'
+
+        // Return local CDN URL with bucket name in path
+        return `${CDN_DOMAIN}/${bucketName}/${pathParts.join('/')}`
       }
+
+      // For production CloudFront, it's already configured with origin path
+      // Just use the path without bucket name
       return `${CDN_DOMAIN}/${pathParts.join('/')}`
     }
 

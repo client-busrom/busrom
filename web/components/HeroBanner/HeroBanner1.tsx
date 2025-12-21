@@ -122,7 +122,7 @@ type BannerProps = {
 // --- HeroBanner1 组件 ---
 const HeroBanner1: FC<BannerProps> = ({ data }) => {
   return (
-    <section className="relative w-full h-full overflow-hidden font-sans flex items-center justify-center text-center">
+    <section className="relative w-full h-full min-h-[700px] overflow-hidden font-sans flex items-center justify-center text-center">
       {/* 背景图 */}
       <OptimizedImage
         image={data.images[0]}
@@ -143,9 +143,9 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
         }}
       />
 
-      {/* 椭圆装饰1 - 右上角 */}
+      {/* 椭圆装饰1 - 右上角 - 桌面端 */}
       <div
-        className="absolute"
+        className="hidden md:block absolute"
         style={{
           right: rpx(ELLIPSE_1_CONFIG.right),
           top: rpx(ELLIPSE_1_CONFIG.top),
@@ -158,10 +158,18 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
           zIndex: ELLIPSE_1_CONFIG.zIndex,
         }}
       />
-
-      {/* 椭圆装饰2 - 左下角 */}
+      {/* 椭圆装饰1 - 右上角 - 移动端 */}
       <div
-        className="absolute"
+        className="md:hidden absolute right-[15%] -top-8 w-32 h-12 sm:w-40 sm:h-14 rounded-full"
+        style={{
+          backgroundColor: ELLIPSE_1_CONFIG.backgroundColor,
+          zIndex: ELLIPSE_1_CONFIG.zIndex,
+        }}
+      />
+
+      {/* 椭圆装饰2 - 左下角 - 桌面端 */}
+      <div
+        className="hidden md:block absolute"
         style={{
           left: rpx(ELLIPSE_2_CONFIG.left),
           bottom: rpx(ELLIPSE_2_CONFIG.bottom),
@@ -174,10 +182,18 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
           zIndex: ELLIPSE_2_CONFIG.zIndex,
         }}
       />
-
-      {/* SVG UI 元素1 + 装饰图片1 - 左上角 */}
+      {/* 椭圆装饰2 - 左下角 - 移动端 */}
       <div
-        className="absolute"
+        className="md:hidden absolute left-[15%] -bottom-8 w-32 h-12 sm:w-40 sm:h-14 rounded-full"
+        style={{
+          backgroundColor: ELLIPSE_2_CONFIG.backgroundColor,
+          zIndex: ELLIPSE_2_CONFIG.zIndex,
+        }}
+      />
+
+      {/* SVG UI 元素1 + 装饰图片1 - 左上角 - 桌面端 */}
+      <div
+        className="hidden md:block absolute"
         style={{
           left: 0,
           top: 0,
@@ -227,9 +243,56 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
         )}
       </div>
 
-      {/* SVG UI 元素2 + 装饰图片2 - 右下角 */}
+      {/* SVG UI 元素1 + 装饰图片1 - 左上角 - 移动端 */}
       <div
-        className="absolute"
+        className="md:hidden absolute left-0 top-0 w-[55%] sm:w-[50%]"
+        style={{
+          aspectRatio: `${SVG_1_CONFIG.width} / ${SVG_1_CONFIG.height}`,
+          zIndex: SVG_1_CONFIG.zIndex,
+        }}
+      >
+        <Image
+          src="/hero-banner-1-1.svg"
+          alt="左上装饰"
+          fill
+          className="object-contain object-left-top"
+        />
+        {/* 装饰图片1 - 相对于SVG容器定位 */}
+        {data.images[1] && (
+          <div
+            className="absolute overflow-hidden"
+            style={{
+              left: `${(IMAGE_1_CONFIG.left / SVG_1_CONFIG.width) * 100}%`,
+              top: `${(IMAGE_1_CONFIG.top / SVG_1_CONFIG.height) * 100}%`,
+              width: `${(IMAGE_1_CONFIG.width / SVG_1_CONFIG.width) * 100}%`,
+              height: `${(IMAGE_1_CONFIG.height / SVG_1_CONFIG.height) * 100}%`,
+              transform: `rotate(${IMAGE_1_CONFIG.rotate}deg)`,
+              border: `8px solid ${IMAGE_1_CONFIG.borderColor}`,
+              borderRadius: IMAGE_1_CONFIG.borderRadius,
+              zIndex: IMAGE_1_CONFIG.zIndex,
+            }}
+          >
+            <div
+              className="w-full h-full"
+              style={{
+                transform: `rotate(${-IMAGE_1_CONFIG.rotate}deg) scale(${IMAGE_1_CONFIG.imageScale}) translate(${IMAGE_1_CONFIG.imageOffsetX}%, ${IMAGE_1_CONFIG.imageOffsetY}%)`,
+              }}
+            >
+              <OptimizedImage
+                image={data.images[1]}
+                alt="装饰图1"
+                size="medium"
+                className="w-full h-full object-cover"
+                objectPosition="center center"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* SVG UI 元素2 + 装饰图片2 - 右下角 - 桌面端 */}
+      <div
+        className="hidden md:block absolute"
         style={{
           right: 0,
           bottom: 0,
@@ -271,6 +334,53 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
                 image={data.images[2]}
                 alt="装饰图2"
                 size="large"
+                className="w-full h-full object-cover"
+                objectPosition="center center"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* SVG UI 元素2 + 装饰图片2 - 右下角 - 移动端 */}
+      <div
+        className="md:hidden absolute right-0 bottom-0 w-[55%] sm:w-[50%]"
+        style={{
+          aspectRatio: `${SVG_2_CONFIG.width} / ${SVG_2_CONFIG.height}`,
+          zIndex: SVG_2_CONFIG.zIndex,
+        }}
+      >
+        <Image
+          src="/hero-banner-1-2.svg"
+          alt="右下装饰"
+          fill
+          className="object-contain object-right-bottom"
+        />
+        {/* 装饰图片2 - 相对于SVG容器定位 */}
+        {data.images[2] && (
+          <div
+            className="absolute overflow-hidden"
+            style={{
+              right: `${(IMAGE_2_CONFIG.right / SVG_2_CONFIG.width) * 100}%`,
+              bottom: `${(IMAGE_2_CONFIG.bottom / SVG_2_CONFIG.height) * 100}%`,
+              width: `${(IMAGE_2_CONFIG.width / SVG_2_CONFIG.width) * 100}%`,
+              height: `${(IMAGE_2_CONFIG.height / SVG_2_CONFIG.height) * 100}%`,
+              transform: `rotate(${IMAGE_2_CONFIG.rotate}deg)`,
+              border: `8px solid ${IMAGE_2_CONFIG.borderColor}`,
+              borderRadius: IMAGE_2_CONFIG.borderRadius,
+              zIndex: IMAGE_2_CONFIG.zIndex,
+            }}
+          >
+            <div
+              className="w-full h-full"
+              style={{
+                transform: `rotate(${-IMAGE_2_CONFIG.rotate}deg) scale(${IMAGE_2_CONFIG.imageScale}) translate(${IMAGE_2_CONFIG.imageOffsetX}%, ${IMAGE_2_CONFIG.imageOffsetY}%)`,
+              }}
+            >
+              <OptimizedImage
+                image={data.images[2]}
+                alt="装饰图2"
+                size="medium"
                 className="w-full h-full object-cover"
                 objectPosition="center center"
               />
