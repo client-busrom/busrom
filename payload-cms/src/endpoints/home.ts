@@ -305,6 +305,7 @@ export const homeContentHandler: PayloadHandler = async (req) => {
       },
 
       // Service Features
+      // Image counts per feature: [4, 2, 6, 2, 2]
       serviceFeatures: serviceFeatures ? {
         status: serviceFeatures?.status,
         title: serviceFeatures?.title,
@@ -316,8 +317,9 @@ export const homeContentHandler: PayloadHandler = async (req) => {
           images: [
             getMediaWithVariants(serviceFeatures[`feature0${num}Image1`]),
             getMediaWithVariants(serviceFeatures[`feature0${num}Image2`]),
-            num === 3 && getMediaWithVariants(serviceFeatures[`feature0${num}Image3`]),
-            num === 3 && getMediaWithVariants(serviceFeatures[`feature0${num}Image4`]),
+            // Feature 01 has 4 images, Feature 03 has 6 images
+            (num === 1 || num === 3) && getMediaWithVariants(serviceFeatures[`feature0${num}Image3`]),
+            (num === 1 || num === 3) && getMediaWithVariants(serviceFeatures[`feature0${num}Image4`]),
             num === 3 && getMediaWithVariants(serviceFeatures[`feature0${num}Image5`]),
             num === 3 && getMediaWithVariants(serviceFeatures[`feature0${num}Image6`]),
           ].filter(Boolean),
