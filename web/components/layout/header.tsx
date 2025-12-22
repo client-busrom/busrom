@@ -31,6 +31,8 @@ export default function Header({ locale }: { locale: string }) {
 
   // 5. 关键：IntersectionObserver 逻辑
   useEffect(() => {
+    let observer: IntersectionObserver | null = null;
+
     // 使用 setTimeout 确保 DOM 已经渲染完成
     const timer = setTimeout(() => {
       const sections = document.querySelectorAll("[data-header-theme]");
@@ -40,8 +42,8 @@ export default function Header({ locale }: { locale: string }) {
         return;
       }
 
-      const observer = new IntersectionObserver(
-        (entries) => {
+      observer = new IntersectionObserver(
+        () => {
           // 收集所有带 data-header-theme 的元素及其位置信息
           const allSections = Array.from(document.querySelectorAll("[data-header-theme]"));
 
@@ -68,7 +70,6 @@ export default function Header({ locale }: { locale: string }) {
 
           if (activeSection) {
             const newTheme = (activeSection as HTMLElement).dataset.headerTheme as HeaderTheme;
-            console.log('Setting theme to:', newTheme, 'element top:', minTop);
             setTheme(newTheme);
           }
         },
@@ -80,15 +81,15 @@ export default function Header({ locale }: { locale: string }) {
         }
       );
 
-      sections.forEach((section) => observer.observe(section));
-
-      return () => {
-        sections.forEach((section) => observer.unobserve(section));
-        observer.disconnect();
-      };
+      sections.forEach((section) => observer!.observe(section));
     }, 100);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      if (observer) {
+        observer.disconnect();
+      }
+    };
   }, [pathname]); // 当路由变化时重新运行
 
   const handleCloseMenu = () => {
@@ -99,7 +100,6 @@ export default function Header({ locale }: { locale: string }) {
   // 6. 决定最终的样式 (来自你的 Demo 逻辑)
   // 如果菜单打开，强制为 'light' 主题
   const activeTheme = isMenuOpen ? "light" : theme;
-  console.log(theme);
 
   // 动态计算文字和背景色
   const headerBgColor = activeTheme === "transparent" ? "bg-transparent" : "bg-brand-main";

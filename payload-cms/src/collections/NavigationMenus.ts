@@ -101,7 +101,7 @@ export const NavigationMenus: CollectionConfig = {
         condition: (data) => data?.type === 'submenu',
       },
     },
-    // Media Tags (for PRODUCT_CARDS type)
+    // Media Tags (for menu items that need images)
     {
       name: 'mediaTags',
       type: 'relationship',
@@ -112,8 +112,9 @@ export const NavigationMenus: CollectionConfig = {
         zh: '媒体标签',
       },
       admin: {
-        description: '选择标签筛选图片，用于 PRODUCT_CARDS 类型',
-        condition: (data) => data?.type === 'product_cards',
+        description: '选择标签筛选图片，用于菜单卡片显示',
+        // 显示条件：自身是 product_cards 类型，或者有父级菜单（子菜单）
+        condition: (data) => data?.type === 'product_cards' || data?.parent,
       },
     },
     // Hierarchical Structure

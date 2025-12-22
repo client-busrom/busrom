@@ -327,12 +327,17 @@ export interface FooterNavigationMenu {
   link: string
 }
 
+export interface FooterSocialLink {
+  platform: string
+  url: string
+}
+
 export interface FooterData {
   form: FooterFormConfig
   contact: FooterContactInfo
   notice: FooterNotice
-  column3Menus?: FooterNavigationMenu[]
-  column4Menus?: FooterNavigationMenu[]
+  navigationMenus?: FooterNavigationMenu[]
+  socialLinks?: FooterSocialLink[]
 }
 
 /**

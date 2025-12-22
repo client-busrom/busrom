@@ -258,12 +258,17 @@ interface FooterNavigationMenu {
   link: string;
 }
 
+interface FooterSocialLink {
+  platform: string;
+  url: string;
+}
+
 interface FooterData {
   form: FooterFormConfig;
   contact: FooterContactInfo;
   notice: FooterNotice;
-  column3Menus?: FooterNavigationMenu[];
-  column4Menus?: FooterNavigationMenu[];
+  navigationMenus?: FooterNavigationMenu[];
+  socialLinks?: FooterSocialLink[];
 }
 
 interface HomeContentData {
@@ -1292,14 +1297,22 @@ export const homeContent_EN: HomeContentData = {
         'Busrom Team',
       ],
     },
-    column3Menus: [
+    navigationMenus: [
       { slug: 'product', name: 'Product', link: '/product' },
       { slug: 'service', name: 'Service', link: '/service' },
       { slug: 'about-us', name: 'About Us', link: '/about-us' },
-    ],
-    column4Menus: [
       { slug: 'contact-us', name: 'Contact Us', link: '/contact-us' },
       { slug: 'shop', name: 'Shop', link: '/shop' },
+    ],
+    socialLinks: [
+      { platform: 'facebook', url: 'https://www.facebook.com/busromhouse' },
+      { platform: 'instagram', url: 'https://www.instagram.com/busromhouse' },
+      { platform: 'twitter', url: 'https://twitter.com/busromhouse' },
+      { platform: 'linkedin', url: 'https://www.linkedin.com/company/busromhouse' },
+      { platform: 'youtube', url: 'https://www.youtube.com/@busromhouse' },
+      { platform: 'tiktok', url: 'https://www.tiktok.com/@busromhouse' },
+      { platform: 'whatsapp', url: 'https://wa.me/8613426931306' },
+      { platform: 'wechat', url: 'busromhouse' },
     ],
   },
 };
