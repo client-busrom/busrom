@@ -168,6 +168,8 @@ export default buildConfig({
   // ==================================================================
   admin: {
     user: Users.slug,
+    // Disable Gravatar to avoid broken images (gravatar.com is blocked in China)
+    avatar: 'default',
     meta: {
       titleSuffix: '- Busrom CMS',
       // favicon: '/favicon.ico',
