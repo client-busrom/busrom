@@ -258,12 +258,17 @@ interface FooterNavigationMenu {
   link: string;
 }
 
+interface FooterSocialLink {
+  platform: string;
+  url: string;
+}
+
 interface FooterData {
   form: FooterFormConfig;
   contact: FooterContactInfo;
   notice: FooterNotice;
-  column3Menus?: FooterNavigationMenu[];
-  column4Menus?: FooterNavigationMenu[];
+  navigationMenus?: FooterNavigationMenu[];
+  socialLinks?: FooterSocialLink[];
 }
 
 interface HomeContentData {
@@ -1190,14 +1195,22 @@ export const homeContent_ZH: HomeContentData = {
         'Busrom 团队',
       ],
     },
-    column3Menus: [
+    navigationMenus: [
       { slug: 'product', name: '产品', link: '/product' },
       { slug: 'service', name: '服务', link: '/service' },
       { slug: 'about-us', name: '关于我们', link: '/about-us' },
-    ],
-    column4Menus: [
       { slug: 'contact-us', name: '联系我们', link: '/contact-us' },
       { slug: 'shop', name: '商店', link: '/shop' },
+    ],
+    socialLinks: [
+      { platform: 'facebook', url: 'https://www.facebook.com/busromhouse' },
+      { platform: 'instagram', url: 'https://www.instagram.com/busromhouse' },
+      { platform: 'twitter', url: 'https://twitter.com/busromhouse' },
+      { platform: 'linkedin', url: 'https://www.linkedin.com/company/busromhouse' },
+      { platform: 'youtube', url: 'https://www.youtube.com/@busromhouse' },
+      { platform: 'tiktok', url: 'https://www.tiktok.com/@busromhouse' },
+      { platform: 'whatsapp', url: 'https://wa.me/8613426931306' },
+      { platform: 'wechat', url: 'busromhouse' },
     ],
   },
 };

@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { memo } from 'react';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import type { Locale } from "@/i18n.config";
@@ -7,15 +8,12 @@ import type { Locale } from "@/i18n.config";
 import type { HomeContent } from "@/lib/content-data";
 
 // --- 2. 导入所有 15 个模块组件 ---
-// (你需要确保这些文件都创建在 components/home/ 目录下)
+// 首屏组件直接导入
 import HeroBanner from "@/components/home/hero-banner";
 import ProductSeriesCarousel from "@/components/home/product-series-carousel";
 import ServiceFeatures from "@/components/home/service-features";
-// Sphere3D 使用动态导入，因为 react-globe.gl 有 16MB，会严重影响首屏加载
-const Sphere3D = dynamic(() => import("@/components/home/sphere-3d"), {
-  ssr: false,
-  loading: () => <div className="w-full h-[600px] bg-black" />,
-});
+
+// 非首屏组件直接导入（动态导入会导致加载期间高度为0，影响header主题检测）
 import SimpleCta from "@/components/home/simple-cta";
 import SeriesIntro from "@/components/home/series-intro";
 import FeaturedProducts from "@/components/home/featured-products";
@@ -27,6 +25,24 @@ import WhyChooseBusrom from "@/components/home/why-choose-busrom";
 import CaseStudies from "@/components/home/case-studies";
 import BrandAnalysis from "@/components/home/brand-analysis";
 import BrandValue from "@/components/home/brand-value";
+
+// Sphere3D 使用动态导入（因为包含 WebGL，需要 ssr: false）
+const Sphere3D = dynamic(() => import("@/components/home/sphere-3d"), {
+  ssr: false,
+  loading: () => <div className="w-full h-screen bg-[#020408]" />,
+});
+
+// 使用 memo 包装纯展示组件，避免父组件更新时不必要的重渲染
+const MemoizedServiceFeatures = memo(ServiceFeatures);
+const MemoizedSimpleCta = memo(SimpleCta);
+const MemoizedSeriesIntro = memo(SeriesIntro);
+const MemoizedBrandAdvantages = memo(BrandAdvantages);
+const MemoizedOemOdm = memo(OemOdm);
+const MemoizedQuoteSteps = memo(QuoteSteps);
+const MemoizedWhyChooseBusrom = memo(WhyChooseBusrom);
+const MemoizedCaseStudies = memo(CaseStudies);
+const MemoizedBrandAnalysis = memo(BrandAnalysis);
+const MemoizedBrandValue = memo(BrandValue);
 
 // 接收从服务端传来的初始数据和语言
 export function HomePageClient({
@@ -77,68 +93,90 @@ export function HomePageClient({
 
       {/* 模块 3: 服务特色 (浅色背景) */}
       <div data-header-theme="light">
-        <ServiceFeatures data={content.serviceFeatures} />
+        <MemoizedServiceFeatures data={content.serviceFeatures} />
       </div>
 
-      {/* 模块 4: 3D球体 (浅色背景) */}
+      {/* 模块 4: 3D球体 */}
       <div data-header-theme="transparent">
         <Sphere3D />
       </div>
 
-      {/* 模块 5: 简易表单跳转 (浅色背景) */}
-      <div data-header-theme="light">
-        <SimpleCta data={content.simpleCta} />
-      </div>
+      {/* 模块 5: 简易表单跳转 */}
+      {content.simpleCta?.images && (
+        <div data-header-theme="light">
+          <MemoizedSimpleCta data={content.simpleCta} />
+        </div>
+      )}
 
-      {/* 模块 6: 系列产品介绍 (深色背景) */}
-      <div data-header-theme="dark">
-        <SeriesIntro data={content.seriesIntro} />
-      </div>
+      {/* 模块 6: 系列产品介绍 */}
+      {content.seriesIntro && (
+        <div data-header-theme="dark">
+          <MemoizedSeriesIntro data={content.seriesIntro} />
+        </div>
+      )}
 
-      {/* 模块 7: 精选产品 (浅色背景) */}
-      <div data-header-theme="light">
-        <FeaturedProducts data={content.featuredProducts} locale={currentLanguage} />
-      </div>
+      {/* 模块 7: 精选产品 */}
+      {content.featuredProducts?.series?.length > 0 && (
+        <div data-header-theme="light">
+          <FeaturedProducts data={content.featuredProducts} locale={currentLanguage} />
+        </div>
+      )}
 
-      {/* 模块 8: 品牌优势 (图片背景) */}
-      <div data-header-theme="transparent">
-        <BrandAdvantages data={content.brandAdvantages} />
-      </div>
+      {/* 模块 8: 品牌优势 */}
+      {content.brandAdvantages?.advantages && content.brandAdvantages?.icons && (
+        <div data-header-theme="transparent">
+          <MemoizedBrandAdvantages data={content.brandAdvantages} />
+        </div>
+      )}
 
-      {/* 模块 9: OEM / ODM合作 (图片背景) */}
-      <div data-header-theme="transparent">
-        <OemOdm data={content.oemOdm} />
-      </div>
+      {/* 模块 9: OEM / ODM合作 */}
+      {content.oemOdm?.oem && content.oemOdm?.odm && (
+        <div data-header-theme="transparent">
+          <MemoizedOemOdm data={content.oemOdm} />
+        </div>
+      )}
 
-      {/* 模块 10: 获取报价五步曲 (浅色背景) */}
-      <div data-header-theme="light">
-        <QuoteSteps data={content.quoteSteps} />
-      </div>
+      {/* 模块 10: 获取报价五步曲 */}
+      {content.quoteSteps?.steps?.length > 0 && (
+        <div data-header-theme="light">
+          <MemoizedQuoteSteps data={content.quoteSteps} />
+        </div>
+      )}
 
-      {/* 模块 11 (Figma #12): 表单 (浅色背景) */}
-      <div data-header-theme="transparent">
-        <MainForm data={content.mainForm} locale={currentLanguage} />
-      </div>
+      {/* 模块 11: 表单 */}
+      {content.mainForm && (
+        <div data-header-theme="transparent">
+          <MainForm data={content.mainForm} locale={currentLanguage} />
+        </div>
+      )}
 
-      {/* 模块 12 (Figma #13): 为什么选择Busrom (浅色背景) */}
-      <div data-header-theme="light">
-        <WhyChooseBusrom data={content.whyChooseBusrom} />
-      </div>
+      {/* 模块 12: 为什么选择Busrom */}
+      {content.whyChooseBusrom?.reasons?.length > 0 && (
+        <div data-header-theme="light">
+          <MemoizedWhyChooseBusrom data={content.whyChooseBusrom} />
+        </div>
+      )}
 
-      {/* 模块 13 (Figma #14): 应用案例轮播 (浅色背景) */}
-      <div data-header-theme="light">
-        <CaseStudies data={content.caseStudies} />
-      </div>
+      {/* 模块 13: 应用案例轮播 */}
+      {content.caseStudies?.applications?.length > 0 && (
+        <div data-header-theme="light">
+          <MemoizedCaseStudies data={content.caseStudies} />
+        </div>
+      )}
 
-      {/* 模块 14 (Figma #15): 品牌价值植入 (图片背景) */}
-      <div data-header-theme="transparent">
-        <BrandAnalysis data={content.brandAnalysis} />
-      </div>
+      {/* 模块 14: 品牌价值植入 */}
+      {content.brandAnalysis?.centers && content.brandAnalysis?.analysis && (
+        <div data-header-theme="transparent">
+          <MemoizedBrandAnalysis data={content.brandAnalysis} />
+        </div>
+      )}
 
-      {/* 模块 15 (Figma #16): 品牌价值体现 (浅色背景) */}
-      <div data-header-theme="light">
-        <BrandValue data={content.brandValue} />
-      </div>
+      {/* 模块 15: 品牌价值体现 */}
+      {content.brandValue?.param1 && content.brandValue?.slogan && (
+        <div data-header-theme="light">
+          <MemoizedBrandValue data={content.brandValue} />
+        </div>
+      )}
       
     </main>
   )

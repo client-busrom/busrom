@@ -30,9 +30,11 @@ async function getRandomImageFromMediaTags(mediaTags: Array<{ id: string; name: 
 
   try {
     // 使用第一个 mediaTag 的 ID 查询图片
+    // 只查询场景图 (primaryCategory = 2, name = "scene")
+    // 获取多张图片然后随机选择一张
     const tagId = mediaTags[0].id;
     const response = await fetch(
-      `${CMS_URL}/api/media?where[mediaTags][in]=${tagId}&limit=1&locale=${locale}`,
+      `${CMS_URL}/api/media?where[tags][in]=${tagId}&where[primaryCategory][equals]=2&limit=20&locale=${locale}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +47,9 @@ async function getRandomImageFromMediaTags(mediaTags: Array<{ id: string; name: 
 
     const data = await response.json();
     if (data.docs && data.docs.length > 0) {
-      const media = data.docs[0];
+      // 随机选择一张图片
+      const randomIndex = Math.floor(Math.random() * data.docs.length);
+      const media = data.docs[randomIndex];
       return {
         url: media.url,
         filename: media.filename,
@@ -60,8 +64,17 @@ async function getRandomImageFromMediaTags(mediaTags: Array<{ id: string; name: 
 
 /**
  * 转换函数：将 Payload CMS 数据转换为前端期望的格式
+ * @param item - 当前菜单项
+ * @param locale - 语言
+ * @param allMenus - 所有菜单（用于查找子菜单）
+ * @param parentType - 父菜单的类型（用于子菜单继承）
  */
-async function transformNavigationItem(item: PayloadNavMenu, locale: string, allMenus: PayloadNavMenu[]): Promise<NavItem> {
+async function transformNavigationItem(
+  item: PayloadNavMenu,
+  locale: string,
+  allMenus: PayloadNavMenu[],
+  parentType?: string
+): Promise<NavItem> {
   // 转换类型：小写转大写下划线
   const typeMap: Record<string, NavigationMenuType> = {
     'standard': NavigationMenuType.STANDARD,
@@ -84,8 +97,12 @@ async function transformNavigationItem(item: PayloadNavMenu, locale: string, all
     result.inquiryLink = item.inquiryLink;
   }
 
-  // 如果是 product_cards 类型且有 mediaTags，获取随机图片
-  if (item.type === 'product_cards' && item.mediaTags && item.mediaTags.length > 0) {
+  // 获取图片的条件：
+  // 1. 自身是 product_cards 类型
+  // 2. 或者父菜单是 product_cards 类型（子菜单继承）
+  const shouldFetchImage = item.type === 'product_cards' || parentType === 'product_cards';
+
+  if (shouldFetchImage && item.mediaTags && item.mediaTags.length > 0) {
     const image = await getRandomImageFromMediaTags(item.mediaTags, locale);
     if (image) {
       result.image = image;
@@ -99,12 +116,12 @@ async function transformNavigationItem(item: PayloadNavMenu, locale: string, all
     return parentId === item.id;
   });
 
-  // 递归转换子菜单
+  // 递归转换子菜单，传递当前菜单的类型
   if (children.length > 0) {
     result.childMenus = await Promise.all(
       children
         .sort((a, b) => a.order - b.order)
-        .map(child => transformNavigationItem(child, locale, allMenus))
+        .map(child => transformNavigationItem(child, locale, allMenus, item.type))
     );
   }
 

@@ -215,25 +215,15 @@ export const Footer: GlobalConfig = {
                 },
               ],
             },
-            // Navigation Menus
+            // Navigation Menus (横向展示)
             {
-              name: 'column3Menus',
+              name: 'navigationMenus',
               type: 'relationship',
               relationTo: 'navigation-menus',
               hasMany: true,
-              label: 'Column 3 Navigation Menus | 第三列导航菜单',
+              label: 'Navigation Menus | 导航菜单',
               admin: {
-                description: '选择要在非首页页脚第三列显示的导航菜单（必须是有实际页面的菜单）',
-              },
-            },
-            {
-              name: 'column4Menus',
-              type: 'relationship',
-              relationTo: 'navigation-menus',
-              hasMany: true,
-              label: 'Column 4 Navigation Menus | 第四列导航菜单',
-              admin: {
-                description: '选择要在非首页页脚第四列显示的导航菜单（必须是有实际页面的菜单）',
+                description: '选择要在非首页页脚显示的导航菜单（横向排列）',
               },
             },
             // Copyright & Legal

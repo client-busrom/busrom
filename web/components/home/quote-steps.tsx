@@ -245,7 +245,7 @@ export default function QuoteSteps({ data }: Props) {
                 {/* 步骤序号 x=388 → 20.2% */}
                 <span
                   className={cn(
-                    "absolute font-montserrat font-extrabold transition-all duration-300",
+                    "absolute z-10 font-montserrat font-extrabold transition-all duration-300",
                     isActive ? "text-brand-text-black" : "text-stroke-black"
                   )}
                   style={{
@@ -260,7 +260,7 @@ export default function QuoteSteps({ data }: Props) {
                 {/* 步骤文本 x=714 → 37.2% */}
                 <p
                   className={cn(
-                    "absolute font-anaheim font-bold transition-colors duration-300",
+                    "absolute z-10 font-anaheim font-bold transition-colors duration-300",
                     isActive
                       ? "text-brand-text-black"
                       : "text-brand-text-black/80"
@@ -280,7 +280,7 @@ export default function QuoteSteps({ data }: Props) {
                 {/* 步骤图片 x≈1001 → 52.1% */}
                 <div
                   className={cn(
-                    "absolute z-20 transition-all duration-500 overflow-hidden shadow-2xl",
+                    "absolute z-0 transition-all duration-500 overflow-hidden shadow-2xl",
                     isActive
                       ? "opacity-100"
                       : "opacity-0 pointer-events-none"

@@ -12,32 +12,13 @@ import { LenisProvider } from "@/components/lenis-provider";
 import { getPreloaderConfig } from "@/lib/api/preloader-config";
 
 // --- 配置所有本地字体 ---
+// 首屏关键字体 - 优先加载
 const paytoneOne = localFont({
   src: "../../public/fonts/PaytoneOne-Regular.woff2",
   weight: "400",
   variable: "--font-paytone-one",
   display: "swap",
-});
-
-const pollerOne = localFont({
-  src: "../../public/fonts/PollerOne-Regular.woff2",
-  weight: "400",
-  variable: "--font-poller-one",
-  display: "swap",
-});
-
-const pavanam = localFont({
-  src: "../../public/fonts/Pavanam-Regular.woff2",
-  weight: "400",
-  variable: "--font-pavanam",
-  display: "swap",
-});
-
-const phudu = localFont({
-  src: "../../public/fonts/Phudu-Variable.woff2",
-  weight: "400 900",
-  variable: "--font-phudu",
-  display: "swap",
+  preload: true, // Logo 字体 - 首屏必需
 });
 
 const anaheim = localFont({
@@ -45,27 +26,7 @@ const anaheim = localFont({
   weight: "400 800",
   variable: "--font-anaheim",
   display: "swap",
-});
-
-const montserrat = localFont({
-  src: "../../public/fonts/Montserrat-VariableFont_wght.woff2",
-  weight: "100 900",
-  variable: "--font-montserrat",
-  display: "swap",
-});
-
-const bebasNeue = localFont({
-  src: "../../public/fonts/BebasNeue-Regular.woff2",
-  weight: "400",
-  variable: "--font-bebas-neue",
-  display: "swap",
-});
-
-const oswald = localFont({
-  src: "../../public/fonts/Oswald-VariableFont_wght.woff2",
-  weight: "100 900",
-  variable: "--font-oswald",
-  display: "swap",
+  preload: true, // 主要正文字体 - 首屏必需
 });
 
 const inter = localFont({
@@ -73,6 +34,56 @@ const inter = localFont({
   weight: "100 900",
   variable: "--font-inter",
   display: "swap",
+  preload: true, // 基础字体 - 首屏必需
+});
+
+// 非首屏字体 - 按需加载
+const pollerOne = localFont({
+  src: "../../public/fonts/PollerOne-Regular.woff2",
+  weight: "400",
+  variable: "--font-poller-one",
+  display: "swap",
+  preload: false,
+});
+
+const pavanam = localFont({
+  src: "../../public/fonts/Pavanam-Regular.woff2",
+  weight: "400",
+  variable: "--font-pavanam",
+  display: "swap",
+  preload: false,
+});
+
+const phudu = localFont({
+  src: "../../public/fonts/Phudu-Variable.woff2",
+  weight: "400 900",
+  variable: "--font-phudu",
+  display: "swap",
+  preload: false,
+});
+
+const montserrat = localFont({
+  src: "../../public/fonts/Montserrat-VariableFont_wght.woff2",
+  weight: "100 900",
+  variable: "--font-montserrat",
+  display: "swap",
+  preload: false,
+});
+
+const bebasNeue = localFont({
+  src: "../../public/fonts/BebasNeue-Regular.woff2",
+  weight: "400",
+  variable: "--font-bebas-neue",
+  display: "swap",
+  preload: false,
+});
+
+const oswald = localFont({
+  src: "../../public/fonts/Oswald-VariableFont_wght.woff2",
+  weight: "100 900",
+  variable: "--font-oswald",
+  display: "swap",
+  preload: false,
 });
 
 export function generateStaticParams() {
@@ -108,6 +119,11 @@ export default async function RootLayout({
       font-sans
     `}
     >
+      <head>
+        {/* CDN 预连接 - 加速图片加载 */}
+        <link rel="preconnect" href="https://d2kqew3hn5wphn.cloudfront.net" />
+        <link rel="dns-prefetch" href="https://d2kqew3hn5wphn.cloudfront.net" />
+      </head>
       <body className={`${inter.className} overflow-x-hidden`}>
         {/* 👇 使用 ClientLayoutWrapper 包裹你的所有内容 */}
         <ClientLayoutWrapper preloaderConfig={preloaderConfig}>

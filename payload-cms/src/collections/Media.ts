@@ -153,6 +153,7 @@ export const Media: CollectionConfig = {
       relationTo: 'media-tags',
       hasMany: true,
       label: 'Tags | 标签',
+      index: true, // Enable querying by tags
       admin: {
         description: 'Tags for filtering and searching | 用于筛选和搜索的标签',
       },

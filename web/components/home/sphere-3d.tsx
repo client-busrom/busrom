@@ -115,9 +115,9 @@ const CONFIG = {
     originHitRadius: 2.0,
   },
   globe: {
-    imageUrl: "//unpkg.com/three-globe/example/img/earth-night.jpg",
-    atmosphereColor: "#00C8FF",
-    atmosphereAltitude: 0.2,
+    imageUrl: "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
+    atmosphereColor: "#87CEEB",
+    atmosphereAltitude: 0.15,
   },
   initialView: { lat: 23.1291, lng: 113.2644, altitude: 2.5 },
   minAltitude: 1.5,
@@ -186,21 +186,27 @@ export default function Sphere3D({ locale = "en" }: Sphere3DProps) {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  // 监听是否在视口内，不在视口时暂停渲染以省电
+  // 监听是否在视口内，不在视口时完全卸载 Globe 以释放内存
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
+        const wasVisible = isVisible;
         setIsVisible(entry.isIntersecting);
+        // 离开视口时重置状态，下次进入时重新初始化
+        if (wasVisible && !entry.isIntersecting) {
+          setIsGlobeReady(false);
+          setSelectedPoint(null);
+        }
       },
       { threshold: 0.1 }
     );
 
     observer.observe(section);
     return () => observer.disconnect();
-  }, []);
+  }, [isVisible]);
 
   // 当不在视口内时暂停自转
   useEffect(() => {
@@ -333,7 +339,8 @@ export default function Sphere3D({ locale = "en" }: Sphere3DProps) {
             </div>
           </div>
         )}
-        {size.width > 0 && size.height > 0 && (
+        {/* 只在视口内时渲染 Globe，离开视口时完全卸载以释放内存 */}
+        {size.width > 0 && size.height > 0 && isVisible && (
           <Globe
             ref={globeRef}
             width={size.width}
