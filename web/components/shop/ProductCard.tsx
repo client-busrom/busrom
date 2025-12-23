@@ -6,6 +6,13 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import type { Product } from "@/lib/types/product"
 
+// Helper to extract URL from variant (can be string or object with url)
+function getVariantUrl(variant: string | { url?: string } | undefined): string | undefined {
+  if (!variant) return undefined
+  if (typeof variant === 'string') return variant
+  return variant.url
+}
+
 interface ProductCardProps {
   product: Product & { localizedName?: string }
   locale: string
@@ -81,7 +88,7 @@ export function ProductCard({ product, locale }: ProductCardProps) {
       >
         {displayImage ? (
           <Image
-            src={displayImage.variants?.large || displayImage.url}
+            src={getVariantUrl(displayImage.variants?.large) || getVariantUrl(displayImage.variants?.desktop) || getVariantUrl(displayImage.variants?.tablet) || getVariantUrl(displayImage.variants?.card) || getVariantUrl(displayImage.variants?.thumbnail) || displayImage.url}
             alt={displayImage.altText || displayName}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"

@@ -46,8 +46,8 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
     const data = await response.json()
 
     // Helper function to convert media data to ImageObject
-    // Supports both string URL (legacy) and object with url + cropFocalPoint (new format)
-    const toImageObject = (mediaData: string | { url: string; cropFocalPoint?: { x: number; y: number } } | null | undefined, alt: string = ''): { url: string; altText: string; cropFocalPoint?: { x: number; y: number } } => {
+    // Supports both string URL (legacy) and object with url + variants + cropFocalPoint (new format)
+    const toImageObject = (mediaData: string | { url: string; variants?: Record<string, string>; cropFocalPoint?: { x: number; y: number }; altText?: string } | null | undefined, alt: string = ''): { url: string; altText: string; variants?: Record<string, string>; cropFocalPoint?: { x: number; y: number } } => {
       if (!mediaData) {
         return { url: '/images/placeholder.jpg', altText: alt }
       }
@@ -58,10 +58,15 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
           altText: alt
         }
       }
-      // Handle object with url and cropFocalPoint
+      // Handle object with url, variants, and cropFocalPoint
+      // Convert all variant URLs to CDN URLs
+      const variants = mediaData.variants ? Object.fromEntries(
+        Object.entries(mediaData.variants).map(([key, url]) => [key, getMediaUrl(url)])
+      ) : undefined
       return {
         url: getMediaUrl(mediaData.url),
-        altText: alt,
+        altText: mediaData.altText || alt,
+        variants,
         cropFocalPoint: mediaData.cropFocalPoint
       }
     }
@@ -87,13 +92,13 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
     const brandAdvantages = {
       advantages: data.brandAdvantages?.advantages?.map((item: any) => item.text) || [],
       icons: data.brandAdvantages?.advantages?.map((item: any) => item.icon) || [],
-      image: data.brandAdvantages?.image ? { url: data.brandAdvantages.image, altText: 'Brand Advantages' } : { url: '', altText: '' },
+      image: data.brandAdvantages?.image ? toImageObject(data.brandAdvantages.image, 'Brand Advantages') : { url: '', altText: '' },
     }
 
-    // Transform SimpleCta images from Media ID[] to ImageObject[]
+    // Transform SimpleCta images - now receives full objects with variants from CMS
     const simpleCta = data.simpleCta ? {
       ...data.simpleCta,
-      images: (data.simpleCta.images || []).map((id: string) => toImageObject(id, data.simpleCta.title)),
+      images: (data.simpleCta.images || []).map((imgData: any) => toImageObject(imgData, data.simpleCta.title)),
     } : null
 
     // Transform OemOdm images from Media IDs to ImageObjects
@@ -112,14 +117,10 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
       },
     }
 
-    // Transform SeriesIntro images
-    // Backend already returns URLs in the images array, just need to wrap them in ImageObject
+    // Transform SeriesIntro images - now receives full objects with variants from CMS
     const seriesIntro = (data.seriesIntro || []).map((item: any) => ({
       ...item,
-      images: (item.images || []).map((url: string) => ({
-        url: url,
-        altText: item.title
-      })),
+      images: (item.images || []).map((imgData: any) => toImageObject(imgData, item.title)),
     }))
 
     // Transform WhyChooseBusrom images
@@ -187,12 +188,12 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
       } : defaultValueItem,
     }
 
-    // Transform ServiceFeatures images
+    // Transform ServiceFeatures images - now receives full objects with variants from CMS
     const serviceFeatures = data.serviceFeatures ? {
       ...data.serviceFeatures,
       features: (data.serviceFeatures.features || []).map((feature: any) => ({
         ...feature,
-        images: (feature.images || []).map((id: string) => toImageObject(id, feature.title)),
+        images: (feature.images || []).map((imgData: any) => toImageObject(imgData, feature.title)),
       })),
     } : null
 
@@ -300,12 +301,19 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
           text: data.brandAnalysis.brandNameAnalysis?.textPart1 || '',
           text2: data.brandAnalysis.brandNameAnalysis?.textPart2 || '',
         },
-        centers: (data.brandAnalysis.centers || []).map((center: any) => ({
-          title: center.title || '',
-          description: center.description || '',
-          largeImage: toImageObject(center.largeImage, center.title).url,
-          smallImage: toImageObject(center.smallImage, center.title).url,
-        })),
+        centers: (data.brandAnalysis.centers || []).map((center: any) => {
+          const largeImg = toImageObject(center.largeImage, center.title)
+          const smallImg = toImageObject(center.smallImage, center.title)
+          return {
+            title: center.title || '',
+            description: center.description || '',
+            // Keep full image objects for variant support, but also provide URL for backward compat
+            largeImage: largeImg.url,
+            smallImage: smallImg.url,
+            largeImageData: largeImg,
+            smallImageData: smallImg,
+          }
+        }),
       } : defaultBrandAnalysis,
       brandValue,
       footer,

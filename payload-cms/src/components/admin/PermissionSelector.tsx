@@ -10,7 +10,7 @@
  */
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react'
-import { useField, useAllFormFields, useDocumentInfo } from '@payloadcms/ui'
+import { useField, useAllFormFields, useDocumentInfo, useTranslation } from '@payloadcms/ui'
 
 // Category labels mapping
 const CATEGORY_LABELS: Record<string, { en: string; zh: string }> = {
@@ -20,6 +20,52 @@ const CATEGORY_LABELS: Record<string, { en: string; zh: string }> = {
   FORMS: { en: 'Form Management', zh: '表单管理' },
   HOMEPAGE: { en: 'Homepage Management', zh: '首页管理' },
   SYSTEM: { en: 'System Configuration', zh: '系统设置' },
+}
+
+// Resource labels mapping
+const RESOURCE_LABELS: Record<string, { en: string; zh: string }> = {
+  USER: { en: 'Users', zh: '用户' },
+  ROLE: { en: 'Roles', zh: '角色' },
+  PERMISSION: { en: 'Permissions', zh: '权限' },
+  ACTIVITY_LOG: { en: 'Activity Logs', zh: '操作日志' },
+  PRODUCT: { en: 'Products', zh: '产品' },
+  PRODUCT_SERIES: { en: 'Product Series', zh: '产品系列' },
+  PAGE: { en: 'Pages', zh: '页面' },
+  BLOG: { en: 'Blogs', zh: '博客' },
+  APPLICATION: { en: 'Applications', zh: '应用案例' },
+  CATEGORY: { en: 'Categories', zh: '分类' },
+  FAQ_ITEM: { en: 'FAQ Items', zh: '常见问题' },
+  REUSABLE_BLOCK: { en: 'Reusable Blocks', zh: '可复用内容块' },
+  DOCUMENT_TEMPLATE: { en: 'Document Templates', zh: '文档模版' },
+  NAVIGATION_MENU: { en: 'Navigation Menus', zh: '导航菜单' },
+  HERO_BANNER_ITEM: { en: 'Hero Banner Items', zh: '轮播图' },
+  MEDIA: { en: 'Media', zh: '媒体' },
+  MEDIA_CATEGORY: { en: 'Media Categories', zh: '媒体分类' },
+  MEDIA_TAG: { en: 'Media Tags', zh: '媒体标签' },
+  FORM_CONFIG: { en: 'Form Configs', zh: '表单配置' },
+  FORM_SUBMISSION: { en: 'Form Submissions', zh: '表单提交' },
+  HOME_CONTENT: { en: 'Home Content', zh: '首页内容' },
+  FOOTER: { en: 'Footer', zh: '页脚' },
+  HOMEPAGE_GLOBAL: { en: 'Homepage Globals', zh: '首页组件' },
+  SITE_CONFIG: { en: 'Site Config', zh: '站点配置' },
+  SEO_SETTING: { en: 'SEO Settings', zh: 'SEO 设置' },
+  CUSTOM_SCRIPT: { en: 'Custom Scripts', zh: '自定义脚本' },
+  EMAIL_CONFIG: { en: 'Email Config', zh: '邮件配置' },
+  CONTACT_CONFIG: { en: 'Contact Config', zh: '联系配置' },
+  SOCIAL_CONFIG: { en: 'Social Config', zh: '社交配置' },
+  TRANSLATION_CONFIG: { en: 'Translation Config', zh: '翻译配置' },
+}
+
+// Action labels mapping
+const ACTION_LABELS: Record<string, { en: string; zh: string }> = {
+  CREATE: { en: 'Create', zh: '创建' },
+  READ: { en: 'Read', zh: '读取' },
+  UPDATE: { en: 'Update', zh: '更新' },
+  DELETE: { en: 'Delete', zh: '删除' },
+  PUBLISH: { en: 'Publish', zh: '发布' },
+  EXPORT: { en: 'Export', zh: '导出' },
+  IMPORT: { en: 'Import', zh: '导入' },
+  MANAGE: { en: 'Manage', zh: '管理' },
 }
 
 // Category order for display
@@ -56,6 +102,12 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(CATEGORY_ORDER))
   const [rolePermissionIds, setRolePermissionIds] = useState<Set<string>>(new Set())
   const [loadingRoles, setLoadingRoles] = useState(false)
+  const { i18n: { language } } = useTranslation()
+
+  // Get localized text helper
+  const t = (obj: { en: string; zh: string }) => {
+    return language === 'zh' ? obj.zh : obj.en
+  }
 
   // Get the document info to determine if we're editing a user or role
   const { collectionSlug } = useDocumentInfo()
@@ -290,20 +342,43 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
   const labelText = useMemo(() => {
     if (!field.label) return ''
     if (typeof field.label === 'string') return field.label
-    return field.label.zh || field.label.en || ''
-  }, [field.label])
+    return t(field.label as { en: string; zh: string })
+  }, [field.label, language])
 
   // Get description text
   const descriptionText = useMemo(() => {
     if (!field.admin?.description) return ''
     if (typeof field.admin.description === 'string') return field.admin.description
-    return field.admin.description.zh || field.admin.description.en || ''
-  }, [field.admin?.description])
+    return t(field.admin.description as { en: string; zh: string })
+  }, [field.admin?.description, language])
+
+  // i18n messages
+  const messages = {
+    loading: { en: 'Loading permissions...', zh: '加载权限中...' },
+    loadingRoles: { en: 'Loading role permissions...', zh: '加载角色权限中...' },
+    roleGranted: { en: 'Role has granted', zh: '角色已授予' },
+    permissions: { en: 'permissions', zh: '个权限' },
+    cannotCancel: { en: '(blue marked, cannot cancel)', zh: '（蓝色标记，不可取消）' },
+    canAdd: { en: 'Can add', zh: '还可添加' },
+    additionalPerms: { en: 'additional permissions', zh: '个额外权限' },
+    allIncluded: { en: 'Role includes all permissions, no need to add more.', zh: '角色已包含所有权限，无需添加额外权限。' },
+    totalPerms: { en: 'Total permissions', zh: '总权限' },
+    fromRole: { en: 'from role', zh: '角色' },
+    additional: { en: 'additional', zh: '额外' },
+    selected: { en: 'Selected', zh: '已选择' },
+    selectAll: { en: 'Select All', zh: '全选' },
+    selectAllExtra: { en: 'Select All Extra', zh: '全选额外权限' },
+    deselectAll: { en: 'Deselect All', zh: '取消全选' },
+    clearExtra: { en: 'Clear Extra', zh: '清除额外权限' },
+    allFromRole: { en: 'All from role', zh: '全部来自角色' },
+    fromRoleLabel: { en: 'From role', zh: '角色' },
+    cannotCancelTitle: { en: 'This permission is from role, cannot cancel', zh: '此权限来自角色，不可取消' },
+  }
 
   if (loading) {
     return (
       <div style={{ padding: '20px', color: '#666' }}>
-        加载权限中...
+        {t(messages.loading)}
       </div>
     )
   }
@@ -342,7 +417,7 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
       {/* Loading roles indicator */}
       {loadingRoles && (
         <div style={{ padding: '8px', color: '#666', fontSize: '13px' }}>
-          加载角色权限中...
+          {t(messages.loadingRoles)}
         </div>
       )}
 
@@ -358,11 +433,11 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
             fontSize: '13px',
           }}
         >
-          <strong>角色已授予 {rolePermissionIds.size} 个权限</strong>（蓝色标记，不可取消）
+          <strong>{t(messages.roleGranted)} {rolePermissionIds.size} {t(messages.permissions)}</strong>{t(messages.cannotCancel)}
           {additionalAvailable > 0 ? (
-            <span>。还可添加 {additionalAvailable} 个额外权限。</span>
+            <span>。{t(messages.canAdd)} {additionalAvailable} {t(messages.additionalPerms)}。</span>
           ) : (
-            <span>。角色已包含所有权限，无需添加额外权限。</span>
+            <span>。{t(messages.allIncluded)}</span>
           )}
         </div>
       )}
@@ -382,15 +457,15 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
         <span style={{ fontWeight: 500 }}>
           {isUserCollection ? (
             <>
-              总权限: {totalEffectivePermissions} / {permissions.length}
+              {t(messages.totalPerms)}: {totalEffectivePermissions} / {permissions.length}
               {rolePermissionIds.size > 0 && (
                 <span style={{ color: 'var(--theme-elevation-400)', marginLeft: '8px', fontSize: '13px' }}>
-                  (角色: {rolePermissionIds.size}, 额外: {selectedIds.size})
+                  ({t(messages.fromRole)}: {rolePermissionIds.size}, {t(messages.additional)}: {selectedIds.size})
                 </span>
               )}
             </>
           ) : (
-            <>已选择 {selectedIds.size} / {permissions.length} 个权限</>
+            <>{t(messages.selected)} {selectedIds.size} / {permissions.length} {t(messages.permissions)}</>
           )}
         </span>
 
@@ -409,7 +484,7 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
                 fontSize: '13px',
               }}
             >
-              {isUserCollection ? '全选额外权限' : '全选'}
+              {isUserCollection ? t(messages.selectAllExtra) : t(messages.selectAll)}
             </button>
             <button
               type="button"
@@ -423,7 +498,7 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
                 fontSize: '13px',
               }}
             >
-              {isUserCollection ? '清除额外权限' : '取消全选'}
+              {isUserCollection ? t(messages.clearExtra) : t(messages.deselectAll)}
             </button>
           </div>
         )}
@@ -515,7 +590,7 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
 
               {/* Category label */}
               <span style={{ fontWeight: 600, flex: 1 }}>
-                {categoryLabel.zh}
+                {t(categoryLabel)}
                 <span style={{ color: 'var(--theme-elevation-400)', fontWeight: 400, marginLeft: '8px' }}>
                   ({selectedInCategory}/{categoryPerms.length})
                 </span>
@@ -526,7 +601,7 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
                     marginLeft: '8px',
                     fontSize: '12px',
                   }}>
-                    {allFromRole ? '✓ 全部来自角色' : `角色: ${roleInCategory}`}
+                    {allFromRole ? `✓ ${t(messages.allFromRole)}` : `${t(messages.fromRoleLabel)}: ${roleInCategory}`}
                   </span>
                 )}
               </span>
@@ -548,7 +623,7 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
                         borderBottom: '1px solid var(--theme-elevation-100)',
                       }}
                     >
-                      {resource.replace(/_/g, ' ')}
+                      {RESOURCE_LABELS[resource] ? t(RESOURCE_LABELS[resource]) : resource.replace(/_/g, ' ')}
                     </div>
 
                     {/* Permission checkboxes in a row */}
@@ -583,7 +658,7 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
                               fontSize: '12px',
                               transition: 'all 0.15s',
                             }}
-                            title={isRolePermission ? '此权限来自角色，不可取消' : ''}
+                            title={isRolePermission ? t(messages.cannotCancelTitle) : ''}
                           >
                             <input
                               type="checkbox"
@@ -597,7 +672,7 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
                               }}
                             />
                             <span style={{ color: isRolePermission ? 'var(--theme-info-700)' : undefined }}>
-                              {perm.action}
+                              {ACTION_LABELS[perm.action] ? t(ACTION_LABELS[perm.action]) : perm.action}
                             </span>
                             {isRolePermission && (
                               <span

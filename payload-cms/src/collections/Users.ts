@@ -197,6 +197,10 @@ export const Users: CollectionConfig = {
     {
       name: 'twoFactorManagement',
       type: 'ui',
+      label: {
+        en: 'Two-Factor Authentication',
+        zh: '双因素认证',
+      },
       admin: {
         // Hide on create-first-user and only show on own account
         condition: (data, siblingData, { user }) => {

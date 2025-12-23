@@ -187,6 +187,68 @@ export const customTranslationsEn = {
     },
 
     // ========================================================================
+    // Permission Resources
+    // ========================================================================
+    permissionResources: {
+      USER: 'Users',
+      ROLE: 'Roles',
+      PERMISSION: 'Permissions',
+      ACTIVITY_LOG: 'Activity Logs',
+      PRODUCT: 'Products',
+      PRODUCT_SERIES: 'Product Series',
+      PAGE: 'Pages',
+      BLOG: 'Blogs',
+      APPLICATION: 'Applications',
+      CATEGORY: 'Categories',
+      FAQ_ITEM: 'FAQ Items',
+      REUSABLE_BLOCK: 'Reusable Blocks',
+      DOCUMENT_TEMPLATE: 'Document Templates',
+      NAVIGATION_MENU: 'Navigation Menus',
+      HERO_BANNER_ITEM: 'Hero Banner Items',
+      MEDIA: 'Media',
+      MEDIA_CATEGORY: 'Media Categories',
+      MEDIA_TAG: 'Media Tags',
+      FORM_CONFIG: 'Form Configs',
+      FORM_SUBMISSION: 'Form Submissions',
+      HOME_CONTENT: 'Home Content',
+      FOOTER: 'Footer',
+      HOMEPAGE_GLOBAL: 'Homepage Globals',
+      SITE_CONFIG: 'Site Config',
+      SEO_SETTING: 'SEO Settings',
+      CUSTOM_SCRIPT: 'Custom Scripts',
+      EMAIL_CONFIG: 'Email Config',
+      CONTACT_CONFIG: 'Contact Config',
+      SOCIAL_CONFIG: 'Social Config',
+      TRANSLATION_CONFIG: 'Translation Config',
+    },
+
+    // ========================================================================
+    // Permission Actions
+    // ========================================================================
+    permissionActions: {
+      CREATE: 'Create',
+      READ: 'Read',
+      UPDATE: 'Update',
+      DELETE: 'Delete',
+      PUBLISH: 'Publish',
+      EXPORT: 'Export',
+      IMPORT: 'Import',
+      MANAGE: 'Manage',
+    },
+
+    // ========================================================================
+    // Permission Categories
+    // ========================================================================
+    permissionCategories: {
+      USER: 'User Management',
+      CONTENT: 'Content Management',
+      MEDIA: 'Media Management',
+      FORMS: 'Form Management',
+      HOMEPAGE: 'Homepage Management',
+      SYSTEM: 'System Configuration',
+    },
+
+    // ========================================================================
     // Navigation Labels (CustomNav component)
     // ========================================================================
     nav: {
@@ -420,6 +482,68 @@ export const customTranslationsZh = {
       displayName: '显示名称',
       submitButtonText: '提交按钮文字',
       successMessage: '成功提示消息',
+    },
+
+    // ========================================================================
+    // Permission Resources
+    // ========================================================================
+    permissionResources: {
+      USER: '用户',
+      ROLE: '角色',
+      PERMISSION: '权限',
+      ACTIVITY_LOG: '操作日志',
+      PRODUCT: '产品',
+      PRODUCT_SERIES: '产品系列',
+      PAGE: '页面',
+      BLOG: '博客',
+      APPLICATION: '应用案例',
+      CATEGORY: '分类',
+      FAQ_ITEM: '常见问题',
+      REUSABLE_BLOCK: '可复用内容块',
+      DOCUMENT_TEMPLATE: '文档模版',
+      NAVIGATION_MENU: '导航菜单',
+      HERO_BANNER_ITEM: '轮播图',
+      MEDIA: '媒体',
+      MEDIA_CATEGORY: '媒体分类',
+      MEDIA_TAG: '媒体标签',
+      FORM_CONFIG: '表单配置',
+      FORM_SUBMISSION: '表单提交',
+      HOME_CONTENT: '首页内容',
+      FOOTER: '页脚',
+      HOMEPAGE_GLOBAL: '首页组件',
+      SITE_CONFIG: '站点配置',
+      SEO_SETTING: 'SEO 设置',
+      CUSTOM_SCRIPT: '自定义脚本',
+      EMAIL_CONFIG: '邮件配置',
+      CONTACT_CONFIG: '联系配置',
+      SOCIAL_CONFIG: '社交配置',
+      TRANSLATION_CONFIG: '翻译配置',
+    },
+
+    // ========================================================================
+    // Permission Actions
+    // ========================================================================
+    permissionActions: {
+      CREATE: '创建',
+      READ: '读取',
+      UPDATE: '更新',
+      DELETE: '删除',
+      PUBLISH: '发布',
+      EXPORT: '导出',
+      IMPORT: '导入',
+      MANAGE: '管理',
+    },
+
+    // ========================================================================
+    // Permission Categories
+    // ========================================================================
+    permissionCategories: {
+      USER: '用户与权限',
+      CONTENT: '内容管理',
+      MEDIA: '媒体库',
+      FORMS: '表单管理',
+      HOMEPAGE: '首页管理',
+      SYSTEM: '系统设置',
     },
 
     // ========================================================================

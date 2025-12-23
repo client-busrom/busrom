@@ -166,7 +166,7 @@ export default function OemOdm({ data }: Props) {
           <OptimizedImage
             image={OEM.bgImage}
             alt={OEM.bgImage?.altText || "OEM Background"}
-            size="xlarge"
+            size="large"
             className="object-cover absolute inset-0 w-full h-full"
           />
           {/* 轻微遮罩增加文字可读性 */}
@@ -184,7 +184,7 @@ export default function OemOdm({ data }: Props) {
           <OptimizedImage
             image={ODM.bgImage}
             alt={ODM.bgImage?.altText || "ODM Background"}
-            size="xlarge"
+            size="large"
             className="object-cover absolute inset-0 w-full h-full"
           />
           {/* 轻微遮罩增加文字可读性 */}

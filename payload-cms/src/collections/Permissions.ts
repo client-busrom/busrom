@@ -10,71 +10,66 @@
 
 import type { CollectionConfig } from 'payload'
 
-// All manageable resources in the system
+// All manageable resources in the system with i18n labels
 const RESOURCES = [
-  // ==================== 用户与权限 (Users & Access) ====================
-  { label: 'Users | 用户', value: 'USER' },
-  { label: 'Roles | 角色', value: 'ROLE' },
-  { label: 'Permissions | 权限', value: 'PERMISSION' },
-  { label: 'Activity Logs | 操作日志', value: 'ACTIVITY_LOG' },
-
-  // ==================== 内容管理 (Content) ====================
-  { label: 'Products | 产品', value: 'PRODUCT' },
-  { label: 'Product Series | 产品系列', value: 'PRODUCT_SERIES' },
-  { label: 'Pages | 页面', value: 'PAGE' },
-  { label: 'Blogs | 博客', value: 'BLOG' },
-  { label: 'Applications | 应用案例', value: 'APPLICATION' },
-  { label: 'Categories | 分类', value: 'CATEGORY' },
-  { label: 'FAQ Items | 常见问题', value: 'FAQ_ITEM' },
-  { label: 'Reusable Blocks | 可复用内容块', value: 'REUSABLE_BLOCK' },
-  { label: 'Document Templates | 文档模版', value: 'DOCUMENT_TEMPLATE' },
-  { label: 'Navigation Menus | 导航菜单', value: 'NAVIGATION_MENU' },
-  { label: 'Hero Banner Items | 轮播图', value: 'HERO_BANNER_ITEM' },
-
-  // ==================== 媒体库 (Media Library) ====================
-  { label: 'Media | 媒体', value: 'MEDIA' },
-  { label: 'Media Categories | 媒体分类', value: 'MEDIA_CATEGORY' },
-  { label: 'Media Tags | 媒体标签', value: 'MEDIA_TAG' },
-
-  // ==================== 表单管理 (Forms) ====================
-  { label: 'Form Configs | 表单配置', value: 'FORM_CONFIG' },
-  { label: 'Form Submissions | 表单提交', value: 'FORM_SUBMISSION' },
-
-  // ==================== 首页管理 (Homepage) ====================
-  { label: 'Home Content | 首页内容', value: 'HOME_CONTENT' },
-  { label: 'Footer | 页脚', value: 'FOOTER' },
-  { label: 'Homepage Globals | 首页组件', value: 'HOMEPAGE_GLOBAL' },
-
-  // ==================== 系统设置 (System Settings) ====================
-  { label: 'Site Config | 站点配置', value: 'SITE_CONFIG' },
-  { label: 'SEO Settings | SEO 设置', value: 'SEO_SETTING' },
-  { label: 'Custom Scripts | 自定义脚本', value: 'CUSTOM_SCRIPT' },
-  { label: 'Email Config | 邮件配置', value: 'EMAIL_CONFIG' },
-  { label: 'Contact Config | 联系配置', value: 'CONTACT_CONFIG' },
-  { label: 'Social Config | 社交配置', value: 'SOCIAL_CONFIG' },
-  { label: 'Translation Config | 翻译配置', value: 'TRANSLATION_CONFIG' },
+  // Users & Access
+  { value: 'USER', label: { en: 'Users', zh: '用户' } },
+  { value: 'ROLE', label: { en: 'Roles', zh: '角色' } },
+  { value: 'PERMISSION', label: { en: 'Permissions', zh: '权限' } },
+  { value: 'ACTIVITY_LOG', label: { en: 'Activity Logs', zh: '操作日志' } },
+  // Content
+  { value: 'PRODUCT', label: { en: 'Products', zh: '产品' } },
+  { value: 'PRODUCT_SERIES', label: { en: 'Product Series', zh: '产品系列' } },
+  { value: 'PAGE', label: { en: 'Pages', zh: '页面' } },
+  { value: 'BLOG', label: { en: 'Blogs', zh: '博客' } },
+  { value: 'APPLICATION', label: { en: 'Applications', zh: '应用案例' } },
+  { value: 'CATEGORY', label: { en: 'Categories', zh: '分类' } },
+  { value: 'FAQ_ITEM', label: { en: 'FAQ Items', zh: '常见问题' } },
+  { value: 'REUSABLE_BLOCK', label: { en: 'Reusable Blocks', zh: '可复用内容块' } },
+  { value: 'DOCUMENT_TEMPLATE', label: { en: 'Document Templates', zh: '文档模版' } },
+  { value: 'NAVIGATION_MENU', label: { en: 'Navigation Menus', zh: '导航菜单' } },
+  { value: 'HERO_BANNER_ITEM', label: { en: 'Hero Banner Items', zh: '轮播图' } },
+  // Media Library
+  { value: 'MEDIA', label: { en: 'Media', zh: '媒体' } },
+  { value: 'MEDIA_CATEGORY', label: { en: 'Media Categories', zh: '媒体分类' } },
+  { value: 'MEDIA_TAG', label: { en: 'Media Tags', zh: '媒体标签' } },
+  // Forms
+  { value: 'FORM_CONFIG', label: { en: 'Form Configs', zh: '表单配置' } },
+  { value: 'FORM_SUBMISSION', label: { en: 'Form Submissions', zh: '表单提交' } },
+  // Homepage
+  { value: 'HOME_CONTENT', label: { en: 'Home Content', zh: '首页内容' } },
+  { value: 'FOOTER', label: { en: 'Footer', zh: '页脚' } },
+  { value: 'HOMEPAGE_GLOBAL', label: { en: 'Homepage Globals', zh: '首页组件' } },
+  // System Settings
+  { value: 'SITE_CONFIG', label: { en: 'Site Config', zh: '站点配置' } },
+  { value: 'SEO_SETTING', label: { en: 'SEO Settings', zh: 'SEO 设置' } },
+  { value: 'CUSTOM_SCRIPT', label: { en: 'Custom Scripts', zh: '自定义脚本' } },
+  { value: 'EMAIL_CONFIG', label: { en: 'Email Config', zh: '邮件配置' } },
+  { value: 'CONTACT_CONFIG', label: { en: 'Contact Config', zh: '联系配置' } },
+  { value: 'SOCIAL_CONFIG', label: { en: 'Social Config', zh: '社交配置' } },
+  { value: 'TRANSLATION_CONFIG', label: { en: 'Translation Config', zh: '翻译配置' } },
 ] as const
 
-// Available actions
+// Available actions with i18n labels
 const ACTIONS = [
-  { label: 'Create | 创建', value: 'CREATE' },
-  { label: 'Read | 读取', value: 'READ' },
-  { label: 'Update | 更新', value: 'UPDATE' },
-  { label: 'Delete | 删除', value: 'DELETE' },
-  { label: 'Publish | 发布', value: 'PUBLISH' },
-  { label: 'Export | 导出', value: 'EXPORT' },
-  { label: 'Import | 导入', value: 'IMPORT' },
-  { label: 'Manage | 管理', value: 'MANAGE' },
+  { value: 'CREATE', label: { en: 'Create', zh: '创建' } },
+  { value: 'READ', label: { en: 'Read', zh: '读取' } },
+  { value: 'UPDATE', label: { en: 'Update', zh: '更新' } },
+  { value: 'DELETE', label: { en: 'Delete', zh: '删除' } },
+  { value: 'PUBLISH', label: { en: 'Publish', zh: '发布' } },
+  { value: 'EXPORT', label: { en: 'Export', zh: '导出' } },
+  { value: 'IMPORT', label: { en: 'Import', zh: '导入' } },
+  { value: 'MANAGE', label: { en: 'Manage', zh: '管理' } },
 ] as const
 
-// Permission categories for grouping
+// Permission categories for grouping with i18n labels
 const CATEGORIES = [
-  { label: 'User Management | 用户与权限', value: 'USER' },
-  { label: 'Content Management | 内容管理', value: 'CONTENT' },
-  { label: 'Media Management | 媒体库', value: 'MEDIA' },
-  { label: 'Form Management | 表单管理', value: 'FORMS' },
-  { label: 'Homepage Management | 首页管理', value: 'HOMEPAGE' },
-  { label: 'System Configuration | 系统设置', value: 'SYSTEM' },
+  { value: 'USER', label: { en: 'User Management', zh: '用户与权限' } },
+  { value: 'CONTENT', label: { en: 'Content Management', zh: '内容管理' } },
+  { value: 'MEDIA', label: { en: 'Media Management', zh: '媒体库' } },
+  { value: 'FORMS', label: { en: 'Form Management', zh: '表单管理' } },
+  { value: 'HOMEPAGE', label: { en: 'Homepage Management', zh: '首页管理' } },
+  { value: 'SYSTEM', label: { en: 'System Configuration', zh: '系统设置' } },
 ] as const
 
 export const Permissions: CollectionConfig = {
@@ -96,7 +91,10 @@ export const Permissions: CollectionConfig = {
       en: 'Users & Access',
       zh: '用户与权限',
     },
-    description: 'System permissions for role-based access control',
+    description: {
+      en: 'System permissions for role-based access control',
+      zh: '基于角色的访问控制系统权限',
+    },
   },
   access: {
     read: ({ req }) => {
@@ -133,7 +131,10 @@ export const Permissions: CollectionConfig = {
       required: true,
       options: RESOURCES.map(r => ({ label: r.label, value: r.value })),
       admin: {
-        description: 'The resource this permission applies to',
+        description: {
+          en: 'The resource this permission applies to',
+          zh: '此权限适用的资源',
+        },
       },
     },
     {
@@ -146,7 +147,10 @@ export const Permissions: CollectionConfig = {
       required: true,
       options: ACTIONS.map(a => ({ label: a.label, value: a.value })),
       admin: {
-        description: 'The action allowed on the resource',
+        description: {
+          en: 'The action allowed on the resource',
+          zh: '资源上允许的操作',
+        },
       },
     },
     {
@@ -159,7 +163,10 @@ export const Permissions: CollectionConfig = {
       unique: true,
       admin: {
         readOnly: true,
-        description: 'Auto-generated: RESOURCE_ACTION',
+        description: {
+          en: 'Auto-generated: RESOURCE_ACTION',
+          zh: '自动生成: 资源_操作',
+        },
       },
     },
 
@@ -176,7 +183,10 @@ export const Permissions: CollectionConfig = {
       options: CATEGORIES.map(c => ({ label: c.label, value: c.value })),
       admin: {
         position: 'sidebar',
-        description: 'Group permissions by category',
+        description: {
+          en: 'Group permissions by category',
+          zh: '按分类分组权限',
+        },
       },
     },
     {
@@ -186,6 +196,7 @@ export const Permissions: CollectionConfig = {
         en: 'Description',
         zh: '描述',
       },
+      localized: true,
       admin: {
         description: {
           en: 'Optional description of what this permission allows',

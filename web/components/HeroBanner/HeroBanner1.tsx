@@ -127,7 +127,7 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
       <OptimizedImage
         image={data.images[0]}
         alt="背景图"
-        size="xlarge"
+        size="large"
         className="absolute inset-0 w-full h-full object-cover z-0"
         objectPosition={getObjectPosition(data.images[0])}
         priority
@@ -191,7 +191,41 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
         }}
       />
 
-      {/* SVG UI 元素1 + 装饰图片1 - 左上角 - 桌面端 */}
+      {/* 装饰图片1 - 左上角 - 桌面端 (独立定位，不受SVG容器限制) */}
+      {data.images[1] && (
+        <div
+          className="hidden md:block absolute overflow-hidden"
+          style={{
+            left: rpx(IMAGE_1_CONFIG.left),
+            top: rpx(IMAGE_1_CONFIG.top),
+            width: rpx(IMAGE_1_CONFIG.width),
+            height: rpx(IMAGE_1_CONFIG.height),
+            transform: `rotate(${IMAGE_1_CONFIG.rotate}deg)`,
+            border: `${rpx(IMAGE_1_CONFIG.borderWidth)} solid ${IMAGE_1_CONFIG.borderColor}`,
+            borderRadius: IMAGE_1_CONFIG.borderRadius,
+            zIndex: IMAGE_1_CONFIG.zIndex,
+          }}
+        >
+          {/* 图片反向旋转，保持水平，并应用偏移 */}
+          <div
+            className="w-full h-full"
+            style={{
+              transform: `rotate(${-IMAGE_1_CONFIG.rotate}deg) scale(${IMAGE_1_CONFIG.imageScale}) translate(${IMAGE_1_CONFIG.imageOffsetX}%, ${IMAGE_1_CONFIG.imageOffsetY}%)`,
+            }}
+          >
+            <OptimizedImage
+              image={data.images[1]}
+              alt="装饰图1"
+              size="large"
+              className="w-full h-full object-cover"
+              objectPosition="center center"
+              priority
+            />
+          </div>
+        </div>
+      )}
+
+      {/* SVG UI 元素1 - 左上角 - 桌面端 */}
       <div
         className="hidden md:block absolute"
         style={{
@@ -208,39 +242,6 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
           fill
           className="object-contain object-left-top"
         />
-        {/* 装饰图片1 - 相对于SVG容器定位 */}
-        {data.images[1] && (
-          <div
-            className="absolute overflow-hidden"
-            style={{
-              // 相对于830x716的SVG容器的位置
-              left: `${(IMAGE_1_CONFIG.left / SVG_1_CONFIG.width) * 100}%`,
-              top: `${(IMAGE_1_CONFIG.top / SVG_1_CONFIG.height) * 100}%`,
-              width: `${(IMAGE_1_CONFIG.width / SVG_1_CONFIG.width) * 100}%`,
-              height: `${(IMAGE_1_CONFIG.height / SVG_1_CONFIG.height) * 100}%`,
-              transform: `rotate(${IMAGE_1_CONFIG.rotate}deg)`,
-              border: `${rpx(IMAGE_1_CONFIG.borderWidth)} solid ${IMAGE_1_CONFIG.borderColor}`,
-              borderRadius: IMAGE_1_CONFIG.borderRadius,
-              zIndex: IMAGE_1_CONFIG.zIndex,
-            }}
-          >
-            {/* 图片反向旋转，保持水平，并应用偏移 */}
-            <div
-              className="w-full h-full"
-              style={{
-                transform: `rotate(${-IMAGE_1_CONFIG.rotate}deg) scale(${IMAGE_1_CONFIG.imageScale}) translate(${IMAGE_1_CONFIG.imageOffsetX}%, ${IMAGE_1_CONFIG.imageOffsetY}%)`,
-              }}
-            >
-              <OptimizedImage
-                image={data.images[1]}
-                alt="装饰图1"
-                size="large"
-                className="w-full h-full object-cover"
-                objectPosition="center center"
-              />
-            </div>
-          </div>
-        )}
       </div>
 
       {/* SVG UI 元素1 + 装饰图片1 - 左上角 - 移动端 */}
@@ -290,7 +291,41 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
         )}
       </div>
 
-      {/* SVG UI 元素2 + 装饰图片2 - 右下角 - 桌面端 */}
+      {/* 装饰图片2 - 右下角 - 桌面端 (独立定位，不受SVG容器限制) */}
+      {data.images[2] && (
+        <div
+          className="hidden md:block absolute overflow-hidden"
+          style={{
+            right: rpx(IMAGE_2_CONFIG.right),
+            bottom: rpx(IMAGE_2_CONFIG.bottom),
+            width: rpx(IMAGE_2_CONFIG.width),
+            height: rpx(IMAGE_2_CONFIG.height),
+            transform: `rotate(${IMAGE_2_CONFIG.rotate}deg)`,
+            border: `${rpx(IMAGE_2_CONFIG.borderWidth)} solid ${IMAGE_2_CONFIG.borderColor}`,
+            borderRadius: IMAGE_2_CONFIG.borderRadius,
+            zIndex: IMAGE_2_CONFIG.zIndex,
+          }}
+        >
+          {/* 图片反向旋转，保持水平，并应用偏移 */}
+          <div
+            className="w-full h-full"
+            style={{
+              transform: `rotate(${-IMAGE_2_CONFIG.rotate}deg) scale(${IMAGE_2_CONFIG.imageScale}) translate(${IMAGE_2_CONFIG.imageOffsetX}%, ${IMAGE_2_CONFIG.imageOffsetY}%)`,
+            }}
+          >
+            <OptimizedImage
+              image={data.images[2]}
+              alt="装饰图2"
+              size="large"
+              className="w-full h-full object-cover"
+              objectPosition="center center"
+              priority
+            />
+          </div>
+        </div>
+      )}
+
+      {/* SVG UI 元素2 - 右下角 - 桌面端 */}
       <div
         className="hidden md:block absolute"
         style={{
@@ -307,39 +342,6 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
           fill
           className="object-contain object-right-bottom"
         />
-        {/* 装饰图片2 - 相对于SVG容器定位 */}
-        {data.images[2] && (
-          <div
-            className="absolute overflow-hidden"
-            style={{
-              // 相对于799x799的SVG容器的位置
-              right: `${(IMAGE_2_CONFIG.right / SVG_2_CONFIG.width) * 100}%`,
-              bottom: `${(IMAGE_2_CONFIG.bottom / SVG_2_CONFIG.height) * 100}%`,
-              width: `${(IMAGE_2_CONFIG.width / SVG_2_CONFIG.width) * 100}%`,
-              height: `${(IMAGE_2_CONFIG.height / SVG_2_CONFIG.height) * 100}%`,
-              transform: `rotate(${IMAGE_2_CONFIG.rotate}deg)`,
-              border: `${rpx(IMAGE_2_CONFIG.borderWidth)} solid ${IMAGE_2_CONFIG.borderColor}`,
-              borderRadius: IMAGE_2_CONFIG.borderRadius,
-              zIndex: IMAGE_2_CONFIG.zIndex,
-            }}
-          >
-            {/* 图片反向旋转，保持水平，并应用偏移 */}
-            <div
-              className="w-full h-full"
-              style={{
-                transform: `rotate(${-IMAGE_2_CONFIG.rotate}deg) scale(${IMAGE_2_CONFIG.imageScale}) translate(${IMAGE_2_CONFIG.imageOffsetX}%, ${IMAGE_2_CONFIG.imageOffsetY}%)`,
-              }}
-            >
-              <OptimizedImage
-                image={data.images[2]}
-                alt="装饰图2"
-                size="large"
-                className="w-full h-full object-cover"
-                objectPosition="center center"
-              />
-            </div>
-          </div>
-        )}
       </div>
 
       {/* SVG UI 元素2 + 装饰图片2 - 右下角 - 移动端 */}

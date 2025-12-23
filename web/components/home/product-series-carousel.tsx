@@ -267,7 +267,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
           <OptimizedImage
             image={hoveredItem.sceneImage}
             alt={hoveredItem.sceneImage.altText || "Scene"}
-            size="xlarge"
+            size="large"
             className="object-cover w-full h-full"
           />
         </motion.div>

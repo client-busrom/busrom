@@ -161,6 +161,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
               alt="Feature image 1"
               size="large"
               className="w-full h-full object-cover"
+              priority
             />
           </div>
         </div>
@@ -185,6 +186,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
               alt="Feature image 2"
               size="large"
               className="w-full h-full object-cover"
+              priority
             />
           </div>
         </div>
@@ -209,6 +211,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
               alt="Feature image 3"
               size="large"
               className="w-full h-full object-cover"
+              priority
             />
           </div>
         </div>
@@ -269,13 +272,13 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
         {/* 上方图片区域 */}
         <div className="h-[40%] flex justify-center items-stretch gap-3 px-4 pt-4">
           <div className="flex-1 overflow-hidden rounded-2xl">
-            <OptimizedImage image={data.images[1]} alt="Feature image 1" size="medium" className="w-full h-full object-cover" />
+            <OptimizedImage image={data.images[1]} alt="Feature image 1" size="medium" className="w-full h-full object-cover" priority />
           </div>
           <div className="flex-1 overflow-hidden rounded-2xl">
-            <OptimizedImage image={data.images[2]} alt="Feature image 2" size="medium" className="w-full h-full object-cover" />
+            <OptimizedImage image={data.images[2]} alt="Feature image 2" size="medium" className="w-full h-full object-cover" priority />
           </div>
           <div className="flex-1 overflow-hidden rounded-2xl">
-            <OptimizedImage image={data.images[3]} alt="Feature image 3" size="medium" className="w-full h-full object-cover" />
+            <OptimizedImage image={data.images[3]} alt="Feature image 3" size="medium" className="w-full h-full object-cover" priority />
           </div>
         </div>
 

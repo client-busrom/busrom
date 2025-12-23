@@ -29,7 +29,10 @@ export const Roles: CollectionConfig = {
       en: 'Users & Access',
       zh: '用户与权限',
     },
-    description: 'User roles with permission assignments',
+    description: {
+      en: 'User roles with permission assignments',
+      zh: '具有权限分配的用户角色',
+    },
   },
   access: {
     read: ({ req }) => {
@@ -70,11 +73,6 @@ export const Roles: CollectionConfig = {
       },
       required: true,
       localized: true,
-      admin: {
-        components: {
-          Field: '@/components/fields/MultiLocaleField#MultiLocaleTextField',
-        },
-      },
     },
     {
       name: 'code',
@@ -86,7 +84,10 @@ export const Roles: CollectionConfig = {
       required: true,
       unique: true,
       admin: {
-        description: 'Unique identifier, e.g., "content_editor", "product_manager"',
+        description: {
+          en: 'Unique identifier, e.g., "content_editor", "product_manager"',
+          zh: '唯一标识符，例如 "content_editor"、"product_manager"',
+        },
       },
     },
     {
@@ -97,11 +98,6 @@ export const Roles: CollectionConfig = {
         zh: '描述',
       },
       localized: true,
-      admin: {
-        components: {
-          Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
-        },
-      },
     },
 
     // ==================================================================
@@ -117,7 +113,10 @@ export const Roles: CollectionConfig = {
         zh: '权限',
       },
       admin: {
-        description: 'Select permissions for this role',
+        description: {
+          en: 'Select permissions for this role',
+          zh: '为此角色选择权限',
+        },
         components: {
           Field: '@/components/admin/PermissionSelector',
         },
@@ -207,7 +206,10 @@ export const Roles: CollectionConfig = {
       defaultValue: false,
       admin: {
         position: 'sidebar',
-        description: 'System roles cannot be deleted',
+        description: {
+          en: 'System roles cannot be deleted',
+          zh: '系统角色不能被删除',
+        },
         readOnly: true,
       },
     },
@@ -221,6 +223,20 @@ export const Roles: CollectionConfig = {
       defaultValue: true,
       admin: {
         position: 'sidebar',
+      },
+    },
+
+    // ==================================================================
+    // Translation Center
+    // ==================================================================
+    {
+      name: 'translationCenter',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/components/fields/TranslationCenter',
+        },
       },
     },
   ],

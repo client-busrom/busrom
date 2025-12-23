@@ -253,7 +253,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
               height: `${(CONFIG.imageHeight / 1080) * 100}%`,
             }}
           >
-            <OptimizedImage image={data.images[1]} alt="Feature image 1" size="large" className="w-full h-full object-cover" />
+            <OptimizedImage image={data.images[1]} alt="Feature image 1" size="large" className="w-full h-full object-cover" priority />
           </div>
           {/* 第二个：贴底，上方圆角 */}
           <div
@@ -263,7 +263,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
               height: `${(CONFIG.imageHeight / 1080) * 100}%`,
             }}
           >
-            <OptimizedImage image={data.images[2]} alt="Feature image 2" size="large" className="w-full h-full object-cover" />
+            <OptimizedImage image={data.images[2]} alt="Feature image 2" size="large" className="w-full h-full object-cover" priority />
           </div>
           {/* 第三个：贴顶，下方圆角 */}
           <div
@@ -273,7 +273,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
               height: `${(CONFIG.imageHeight / 1080) * 100}%`,
             }}
           >
-            <OptimizedImage image={data.images[3]} alt="Feature image 3" size="large" className="w-full h-full object-cover" />
+            <OptimizedImage image={data.images[3]} alt="Feature image 3" size="large" className="w-full h-full object-cover" priority />
           </div>
         </div>
       </div>
@@ -374,13 +374,13 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
         {/* 下方：三个图片横排，四角小圆边 */}
         <div className="relative h-[45%] flex justify-center items-stretch gap-3 px-4 pb-4">
           <div className="flex-1 overflow-hidden rounded-2xl">
-            <OptimizedImage image={data.images[1]} alt="Feature image 1" size="medium" className="w-full h-full object-cover" />
+            <OptimizedImage image={data.images[1]} alt="Feature image 1" size="medium" className="w-full h-full object-cover" priority />
           </div>
           <div className="flex-1 overflow-hidden rounded-2xl">
-            <OptimizedImage image={data.images[2]} alt="Feature image 2" size="medium" className="w-full h-full object-cover" />
+            <OptimizedImage image={data.images[2]} alt="Feature image 2" size="medium" className="w-full h-full object-cover" priority />
           </div>
           <div className="flex-1 overflow-hidden rounded-2xl">
-            <OptimizedImage image={data.images[3]} alt="Feature image 3" size="medium" className="w-full h-full object-cover" />
+            <OptimizedImage image={data.images[3]} alt="Feature image 3" size="medium" className="w-full h-full object-cover" priority />
           </div>
         </div>
       </div>
