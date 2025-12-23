@@ -119,10 +119,11 @@ export async function getPreloaderConfig(): Promise<PreloaderConfigData> {
     const images: ImageWallItem[] = (data.images || []).map((item: any) => {
       // Get the image URL from the media object
       // Prefer smaller variants for ImageWall (displayed at ~256-512px width)
-      // Priority: card (768px) > tablet (1024px) > original
+      // Priority: card (768px) > tablet (1024px) > thumbnail (400px) > original (last resort)
       const imageUrl = item.image?.sizes?.card?.url
         || item.image?.sizes?.tablet?.url
-        || item.image?.url
+        || item.image?.sizes?.thumbnail?.url
+        || item.image?.url  // Last resort fallback
       const cdnUrl = getMediaUrl(imageUrl)
 
       return {

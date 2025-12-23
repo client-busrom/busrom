@@ -213,7 +213,7 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
         <OptimizedImage
           image={data.images[0]}
           alt="Background"
-          size="xlarge"
+          size="large"
           className="w-full h-full object-cover"
           priority
         />
@@ -258,6 +258,7 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
               alt="Product Focus"
               size="large"
               className="absolute inset-0 w-full h-full object-cover -rotate-45"
+              priority
             />
           </div>
         </div>
@@ -332,6 +333,7 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
               alt="Product Focus"
               size="medium"
               className="absolute inset-0 w-full h-full object-cover -rotate-45"
+              priority
             />
           </div>
         </div>

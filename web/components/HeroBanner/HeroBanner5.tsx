@@ -184,6 +184,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
               alt="Top left image"
               size="large"
               className="w-full h-full object-cover"
+              priority
             />
           </div>
         </div>
@@ -214,6 +215,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
               alt="Bottom left image"
               size="large"
               className="w-full h-full object-cover"
+              priority
             />
           </div>
         </div>
@@ -242,8 +244,9 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
             <OptimizedImage
               image={data.images[3]}
               alt="Right large image"
-              size="xlarge"
+              size="large"
               className="w-full h-full object-cover"
+              priority
             />
           </div>
         </div>
@@ -291,6 +294,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
               alt="Top left image"
               size="large"
               className="w-full h-full object-cover"
+              priority
             />
           </div>
         </div>
@@ -321,6 +325,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
               alt="Bottom left image"
               size="large"
               className="w-full h-full object-cover"
+              priority
             />
           </div>
         </div>
@@ -349,8 +354,9 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
             <OptimizedImage
               image={data.images[3]}
               alt="Right large image"
-              size="xlarge"
+              size="large"
               className="w-full h-full object-cover"
+              priority
             />
           </div>
         </div>

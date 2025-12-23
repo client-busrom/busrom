@@ -341,7 +341,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                 <div key={index} className="flex-[0_0_100%] min-w-0 h-full">
                   <div className="relative w-full h-full">
                     <Image
-                      src={image.variants?.desktop?.url || image.variants?.tablet?.url || image.url}
+                      src={image.variants?.desktop?.url || image.variants?.tablet?.url || image.variants?.card?.url || image.variants?.thumbnail?.url || image.url}
                       alt={image.altText || `${productName} ${index + 1}`}
                       fill
                       sizes="100vw"

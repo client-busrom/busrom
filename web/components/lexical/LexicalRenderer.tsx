@@ -125,11 +125,13 @@ const ImageGalleryBlock = ({ node }: any) => {
         const imageId = typeof item.image === 'string' ? item.image : item.image?.id
         const mediaData = imageId ? mediaCache[imageId] : item.image
 
-        // Try different variant names: tablet, card, or fallback to main URL
-        const imageUrl = mediaData?.variants?.tablet?.url ||
+        // Try different variant names: desktop (1920px) > tablet (1024px) > card (768px)
+        // Never use original URL directly - always prefer variants
+        const imageUrl = mediaData?.variants?.desktop?.url ||
+                         mediaData?.variants?.tablet?.url ||
                          mediaData?.variants?.card?.url ||
-                         mediaData?.url ||
-                         item.image?.url
+                         mediaData?.variants?.thumbnail?.url ||
+                         mediaData?.url  // Last resort fallback
 
         if (!imageUrl) {
           return (
@@ -228,11 +230,13 @@ const SingleImageBlock = ({ node }: any) => {
     )
   }
 
-  // Try different variant names: desktop, tablet, card, or fallback to main URL
+  // Try different variant names: desktop (1920px) > tablet (1024px) > card (768px)
+  // Never use original URL directly - always prefer variants
   const imageUrl = mediaData?.variants?.desktop?.url ||
                    mediaData?.variants?.tablet?.url ||
                    mediaData?.variants?.card?.url ||
-                   mediaData?.url
+                   mediaData?.variants?.thumbnail?.url ||
+                   mediaData?.url  // Last resort fallback
 
   if (!imageUrl) return null
 
@@ -474,7 +478,8 @@ const CarouselBlock = ({ node }: any) => {
             {slides.map((slide: any, index: number) => {
               const imageId = typeof slide.image === 'string' ? slide.image : slide.image?.id
               const mediaData = imageId ? mediaCache[imageId] : slide.image
-              const imageUrl = mediaData?.variants?.desktop?.url || mediaData?.variants?.tablet?.url || mediaData?.url || slide.image?.url
+              // Prefer variants: desktop (1920px) > tablet (1024px) > card (768px)
+              const imageUrl = mediaData?.variants?.desktop?.url || mediaData?.variants?.tablet?.url || mediaData?.variants?.card?.url || mediaData?.variants?.thumbnail?.url || mediaData?.url
 
               return (
                 <CarouselItem key={index} className="pl-6 basis-auto">
@@ -557,8 +562,8 @@ const CarouselBlock = ({ node }: any) => {
 
 const HeroBlock = ({ node }: any) => {
   const { title, subtitle, backgroundImage, ctaText, ctaUrl } = node.data || node.fields || {}
-  // Try different variant names: desktop, tablet, or fallback to main URL
-  const bgUrl = backgroundImage?.variants?.desktop?.url || backgroundImage?.variants?.tablet?.url || backgroundImage?.url
+  // Prefer variants: desktop (1920px) > tablet (1024px) > card (768px)
+  const bgUrl = backgroundImage?.variants?.desktop?.url || backgroundImage?.variants?.tablet?.url || backgroundImage?.variants?.card?.url || backgroundImage?.variants?.thumbnail?.url || backgroundImage?.url
 
   return (
     <div className="relative w-full h-[400px] md:h-[600px] my-8 rounded-2xl overflow-hidden">

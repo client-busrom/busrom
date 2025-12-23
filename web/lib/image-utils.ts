@@ -156,14 +156,17 @@ export function getOptimizedImageUrl(
     return normalizeToCDN(variants.webp)
   }
 
-  // 2. Try requested size variant
-  if (variants && variants[size]) {
-    return normalizeToCDN(variants[size]!)
+  // 2. Map xlarge to large - never use original image, max is desktop (1920px)
+  const effectiveSize = size === 'xlarge' ? 'large' : size
+
+  // 3. Try requested size variant
+  if (variants && variants[effectiveSize]) {
+    return normalizeToCDN(variants[effectiveSize]!)
   }
 
-  // 3. Fallback strategy: try other sizes from large to small
+  // 4. Fallback strategy: try other sizes from large to small (skip xlarge/original)
   const fallbackOrder: Array<keyof ImageVariants> = [
-    'xlarge', 'large', 'medium', 'small', 'thumbnail'
+    'large', 'medium', 'small', 'thumbnail'
   ]
 
   for (const fallbackSize of fallbackOrder) {
@@ -172,7 +175,8 @@ export function getOptimizedImageUrl(
     }
   }
 
-  // 4. Last resort: return original URL (normalized to CDN)
+  // 5. Last resort: return original URL (normalized to CDN)
+  // This only happens if no variants exist at all
   return normalizeToCDN(originalUrl)
 }
 
@@ -200,10 +204,11 @@ export function getImageSrcSet(
   const { variants } = image
   const srcset: string[] = []
 
-  if (variants.small) srcset.push(`${normalizeToCDN(variants.small)} 400w`)
-  if (variants.medium) srcset.push(`${normalizeToCDN(variants.medium)} 800w`)
-  if (variants.large) srcset.push(`${normalizeToCDN(variants.large)} 1200w`)
-  if (variants.xlarge) srcset.push(`${normalizeToCDN(variants.xlarge)} 1920w`)
+  if (variants.thumbnail) srcset.push(`${normalizeToCDN(variants.thumbnail)} 400w`)
+  if (variants.small) srcset.push(`${normalizeToCDN(variants.small)} 768w`)
+  if (variants.medium) srcset.push(`${normalizeToCDN(variants.medium)} 1024w`)
+  if (variants.large) srcset.push(`${normalizeToCDN(variants.large)} 1920w`)
+  // Never use xlarge (original) - max is large (1920px desktop)
 
   return srcset.join(', ')
 }
@@ -323,7 +328,7 @@ export const IMAGE_SIZE_RECOMMENDATIONS = {
   productCard: 'medium' as const,
   productDetail: 'large' as const,
   productThumbnail: 'small' as const,
-  heroBanner: 'xlarge' as const,
+  heroBanner: 'large' as const,  // Max is 1920px desktop, never use original
   blogFeatured: 'large' as const,
   blogThumbnail: 'medium' as const,
   galleryThumbnail: 'thumbnail' as const,

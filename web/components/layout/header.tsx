@@ -29,65 +29,132 @@ export default function Header({ locale }: { locale: string }) {
   // SWR 会自动使用 ClientLayoutWrapper 中提供的全局 fetcher
   const { data: navigationItems } = useSWR<NavItem[]>(`/api/navigation?locale=${locale}`);
 
-  // 5. 关键：IntersectionObserver 逻辑
+  // 5. 关键：IntersectionObserver + MutationObserver 逻辑
+  // 支持 LazySection 动态渲染的场景
   useEffect(() => {
-    let observer: IntersectionObserver | null = null;
+    let intersectionObserver: IntersectionObserver | null = null;
+    let mutationObserver: MutationObserver | null = null;
+    let observedElements = new Set<Element>();
 
-    // 使用 setTimeout 确保 DOM 已经渲染完成
-    const timer = setTimeout(() => {
-      const sections = document.querySelectorAll("[data-header-theme]");
-      if (sections.length === 0) {
-        // 如果没有找到任何 section，默认设置为 light
+    // 计算当前应该激活的主题
+    const calculateActiveTheme = () => {
+      const allSections = Array.from(document.querySelectorAll("[data-header-theme]"));
+      if (allSections.length === 0) {
         setTheme("light");
         return;
       }
 
-      observer = new IntersectionObserver(
-        () => {
-          // 收集所有带 data-header-theme 的元素及其位置信息
-          const allSections = Array.from(document.querySelectorAll("[data-header-theme]"));
+      const headerHeight = headerRef.current?.offsetHeight || 80;
+      const triggerPoint = headerHeight;
+      let activeSection: Element | null = null;
+      let minTop = Infinity;
 
-          // Header 高度约为 80px
-          const headerHeight = headerRef.current?.offsetHeight || 80;
+      allSections.forEach((section) => {
+        const rect = section.getBoundingClientRect();
+        // 元素的顶部已经到达或通过了 header 底部，且元素底部还在视口中
+        const hasPassedHeader = rect.top <= triggerPoint && rect.bottom > 0;
 
-          // 找到与 header 底部相交或已经通过 header 的元素中，最靠近顶部的那个
-          // 触发点：header 底边位置（元素顶部到达这里时切换）
-          const triggerPoint = headerHeight;
-          let activeSection: Element | null = null;
-          let minTop = Infinity;
+        if (hasPassedHeader && rect.top < minTop) {
+          minTop = rect.top;
+          activeSection = section;
+        }
+      });
 
-          allSections.forEach((section) => {
-            const rect = section.getBoundingClientRect();
+      if (activeSection) {
+        const newTheme = (activeSection as HTMLElement).dataset.headerTheme as HeaderTheme;
+        setTheme(newTheme);
+      }
+    };
 
-            // 元素的顶部已经到达或通过了 header 底部，且元素底部还在视口中
-            const hasPassedHeader = rect.top <= triggerPoint && rect.bottom > 0;
+    // 设置或更新 IntersectionObserver
+    const setupIntersectionObserver = () => {
+      const sections = document.querySelectorAll("[data-header-theme]");
 
-            if (hasPassedHeader && rect.top < minTop) {
-              minTop = rect.top;
-              activeSection = section;
+      // 创建 observer（如果还没有）
+      if (!intersectionObserver) {
+        intersectionObserver = new IntersectionObserver(
+          calculateActiveTheme,
+          {
+            rootMargin: "0px 0px -90% 0px",
+            threshold: [0],
+          }
+        );
+      }
+
+      // 观察新元素
+      sections.forEach((section) => {
+        if (!observedElements.has(section)) {
+          intersectionObserver!.observe(section);
+          observedElements.add(section);
+        }
+      });
+
+      // 移除已不存在的元素
+      observedElements.forEach((element) => {
+        if (!document.body.contains(element)) {
+          intersectionObserver!.unobserve(element);
+          observedElements.delete(element);
+        }
+      });
+
+      // 立即计算一次
+      calculateActiveTheme();
+    };
+
+    // 使用 setTimeout 确保 DOM 已经渲染完成
+    const timer = setTimeout(() => {
+      setupIntersectionObserver();
+
+      // 使用 MutationObserver 监听 DOM 变化（LazySection 渲染新内容时）
+      mutationObserver = new MutationObserver((mutations) => {
+        let needsUpdate = false;
+
+        mutations.forEach((mutation) => {
+          // 检查是否有新增或移除的 data-header-theme 元素
+          mutation.addedNodes.forEach((node) => {
+            if (node instanceof Element) {
+              if (node.hasAttribute('data-header-theme') ||
+                  node.querySelector('[data-header-theme]')) {
+                needsUpdate = true;
+              }
             }
           });
+          mutation.removedNodes.forEach((node) => {
+            if (node instanceof Element) {
+              if (node.hasAttribute('data-header-theme') ||
+                  node.querySelector('[data-header-theme]')) {
+                needsUpdate = true;
+              }
+            }
+          });
+        });
 
-          if (activeSection) {
-            const newTheme = (activeSection as HTMLElement).dataset.headerTheme as HeaderTheme;
-            setTheme(newTheme);
-          }
-        },
-        {
-          // 顶部往下扩展，当元素顶部距离视口顶部还有这个距离时就触发
-          // 负值 = 检测区域下移（header底边位置），元素到达header底边时触发
-          rootMargin: "0px 0px -90% 0px",
-          threshold: [0],
+        if (needsUpdate) {
+          // 延迟一帧确保 DOM 更新完成
+          requestAnimationFrame(setupIntersectionObserver);
         }
-      );
+      });
 
-      sections.forEach((section) => observer!.observe(section));
+      mutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
     }, 100);
+
+    // 滚动时也需要重新计算（处理快速滚动的情况）
+    const handleScroll = () => {
+      requestAnimationFrame(calculateActiveTheme);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       clearTimeout(timer);
-      if (observer) {
-        observer.disconnect();
+      window.removeEventListener('scroll', handleScroll);
+      if (intersectionObserver) {
+        intersectionObserver.disconnect();
+      }
+      if (mutationObserver) {
+        mutationObserver.disconnect();
       }
     };
   }, [pathname]); // 当路由变化时重新运行

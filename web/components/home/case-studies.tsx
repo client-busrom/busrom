@@ -113,7 +113,7 @@ export default function CaseStudies({ data }: Props) {
                     <OptimizedImage
                       image={application.items[0]?.image}
                       alt={application.items[0]?.image?.altText || application.items[0]?.series || "Case study main"}
-                      size="xlarge"
+                      size="large"
                       className="object-cover rounded-lg absolute inset-0 w-full h-full"
                     />
                   </div>

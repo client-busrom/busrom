@@ -356,7 +356,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           <OptimizedImage
             image={data.images[0]}
             alt="Background"
-            size="xlarge"
+            size="large"
             className="w-full h-full object-cover"
             objectPosition={maskImagePosition}
             priority
@@ -394,6 +394,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
             size="large"
             className="absolute inset-0 w-full h-full object-cover -rotate-45"
             objectPosition={diamondTopPosition}
+            priority
           />
         </div>
       </div>
@@ -427,6 +428,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
             size="medium"
             className="absolute inset-0 w-full h-full object-cover -rotate-45"
             objectPosition={diamondMiddlePosition}
+            priority
           />
         </div>
       </div>
@@ -460,6 +462,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
             size="large"
             className="absolute inset-0 w-full h-full object-cover -rotate-45"
             objectPosition={diamondBottomPosition}
+            priority
           />
         </div>
       </div>
@@ -642,6 +645,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
                 size="medium"
                 className="absolute inset-0 w-full h-full object-cover -rotate-45"
                 objectPosition={diamondTopPosition}
+                priority
               />
             </div>
           </div>
@@ -669,6 +673,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
                 size="small"
                 className="absolute inset-0 w-full h-full object-cover -rotate-45"
                 objectPosition={diamondMiddlePosition}
+                priority
               />
             </div>
           </div>
@@ -696,6 +701,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
                 size="medium"
                 className="absolute inset-0 w-full h-full object-cover -rotate-45"
                 objectPosition={diamondBottomPosition}
+                priority
               />
             </div>
           </div>

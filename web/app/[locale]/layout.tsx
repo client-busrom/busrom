@@ -1,6 +1,7 @@
 import type React from "react";
 import { Suspense } from "react";
 import localFont from "next/font/local";
+import dynamic from "next/dynamic";
 import "../globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
 import ScrollToTopOnRouteChange from "@/components/ScrollToTopOnRouteChange";
@@ -8,8 +9,13 @@ import { isValidLocale, defaultLocale } from "@/i18n.config";
 import Header from "@/components/layout/header";
 import ConditionalFooter from "@/components/layout/conditional-footer";
 import { ClientLayoutWrapper } from "@/components/ClientLayoutWrapper";
-import { LenisProvider } from "@/components/lenis-provider";
 import { getPreloaderConfig } from "@/lib/api/preloader-config";
+
+// 延迟加载 LenisProvider（包含 GSAP），不阻塞首屏渲染
+const LenisProvider = dynamic(
+  () => import("@/components/lenis-provider").then(mod => ({ default: mod.LenisProvider })),
+  { loading: () => null }
+);
 
 // --- 配置所有本地字体 ---
 // 首屏关键字体 - 优先加载

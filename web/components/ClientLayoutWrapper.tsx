@@ -3,9 +3,18 @@
 import { useState, useCallback, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { SWRConfig } from 'swr';
-import { Preloader } from "@/components/Preloader";
-import { ImageWall } from "@/components/image-wall";
+import dynamic from 'next/dynamic';
 import type { PreloaderConfigData } from "@/lib/api/preloader-config";
+
+// 动态导入 Preloader 和 ImageWall（包含 GSAP），减少首屏 JS
+const Preloader = dynamic(
+  () => import("@/components/Preloader").then(mod => ({ default: mod.Preloader })),
+  { ssr: false }
+);
+const ImageWall = dynamic(
+  () => import("@/components/image-wall").then(mod => ({ default: mod.ImageWall })),
+  { ssr: false }
+);
 
 // 定义 SWR 全局 fetcher
 const fetcher = (resource: string) => fetch(resource).then(res => {
