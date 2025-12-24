@@ -25,16 +25,18 @@ export function useUserPreferences() {
   const pathname = usePathname()
 
   // 从 URL 初始化语言，避免闪烁
-  const initialLocale = typeof window !== 'undefined'
-    ? getLocaleFromPath(window.location.pathname)
-    : DEFAULT_LANGUAGE
+  // usePathname() 在客户端和服务端都能正确返回当前路径
+  const initialLocale = getLocaleFromPath(pathname)
 
   const [preferences, setPreferences] = useState<UserPreferences>({
-    country: getCountryFromLocale(initialLocale),
+    // 国家默认为美国，后续从 localStorage 读取用户选择
+    country: DEFAULT_COUNTRY,
+    // 语言跟着 URL 路由走
     language: initialLocale,
   })
 
-  const [isLoaded, setIsLoaded] = useState(false)
+  // 初始化时就基于 URL 设置为 true，避免 Loading 闪烁
+  const [isLoaded, setIsLoaded] = useState(true)
 
   // 从 localStorage 加载偏好设置，或从 URL 同步
   useEffect(() => {
@@ -44,10 +46,10 @@ export function useUserPreferences() {
 
       if (stored) {
         const parsed = JSON.parse(stored)
-        // 如果 localStorage 中的语言与 URL 不同，以 URL 为准
+        // 如果 localStorage 中的语言与 URL 不同，以 URL 为准，但保留用户选择的国家
         if (parsed.language !== urlLocale) {
           const updated = {
-            country: parsed.country || getCountryFromLocale(urlLocale),
+            country: parsed.country || DEFAULT_COUNTRY,
             language: urlLocale,
           }
           setPreferences(updated)
@@ -57,13 +59,13 @@ export function useUserPreferences() {
         } else {
           setPreferences({
             country: parsed.country || DEFAULT_COUNTRY,
-            language: parsed.language || DEFAULT_LANGUAGE,
+            language: urlLocale,
           })
         }
       } else {
-        // 首次访问，从 URL 初始化
+        // 首次访问，国家默认美国，语言跟 URL
         const initial = {
-          country: getCountryFromLocale(urlLocale),
+          country: DEFAULT_COUNTRY,
           language: urlLocale,
         }
         setPreferences(initial)
@@ -72,8 +74,6 @@ export function useUserPreferences() {
       }
     } catch (error) {
       console.error("Failed to load user preferences from localStorage:", error)
-    } finally {
-      setIsLoaded(true)
     }
   }, [pathname])
 
