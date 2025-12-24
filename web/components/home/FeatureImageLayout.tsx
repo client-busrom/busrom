@@ -203,7 +203,7 @@ const FeatureImage = ({ image, alt }: { image: any; alt: string }) => (
   <OptimizedImage
     image={image}
     alt={alt}
-    size="medium"
+    size="small"
     className="object-cover absolute inset-0 w-full h-full"
   />
 );
@@ -276,7 +276,7 @@ const TrapezoidImage = ({
         <OptimizedImage
           image={image}
           alt={alt}
-          size="medium"
+          size="small"
           className="object-cover w-full h-full"
         />
       </div>

@@ -65,31 +65,48 @@ export const Media: CollectionConfig = {
     delete: ({ req: { user } }) => user?.isAdmin === true,
   },
   upload: {
-    // Image processing
+    // Image processing with WebP conversion for better performance
+    // WebP typically provides 25-35% smaller file sizes than JPEG/PNG
     imageSizes: [
       {
         name: 'thumbnail',
         width: 400,
         height: 300,
         position: 'centre',
+        formatOptions: {
+          format: 'webp',
+          options: { quality: 80 },
+        },
       },
       {
         name: 'card',
         width: 768,
         height: 512,
         position: 'centre',
+        formatOptions: {
+          format: 'webp',
+          options: { quality: 80 },
+        },
       },
       {
         name: 'tablet',
         width: 1024,
         height: undefined,
         position: 'centre',
+        formatOptions: {
+          format: 'webp',
+          options: { quality: 80 },
+        },
       },
       {
         name: 'desktop',
         width: 1920,
         height: undefined,
         position: 'centre',
+        formatOptions: {
+          format: 'webp',
+          options: { quality: 85 },
+        },
       },
     ],
     adminThumbnail: ({ doc }: { doc: any }) => {

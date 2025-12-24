@@ -40,7 +40,7 @@ const inter = localFont({
   weight: "100 900",
   variable: "--font-inter",
   display: "swap",
-  preload: true, // 基础字体 - 首屏必需
+  preload: false, // 延迟加载 - 343KB 太大，影响 Speed Index
 });
 
 // 非首屏字体 - 按需加载
@@ -130,7 +130,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://d2kqew3hn5wphn.cloudfront.net" />
         <link rel="dns-prefetch" href="https://d2kqew3hn5wphn.cloudfront.net" />
       </head>
-      <body className={`${inter.className} overflow-x-hidden`}>
+      <body className={`font-sans overflow-x-hidden`}>
         {/* 👇 使用 ClientLayoutWrapper 包裹你的所有内容 */}
         <ClientLayoutWrapper preloaderConfig={preloaderConfig}>
           <LenisProvider easingKey={"easeOutQuad"} />

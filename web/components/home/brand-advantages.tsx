@@ -172,7 +172,7 @@ export default function BrandAdvantages({ data }: Props) {
       {data.image?.url && (
         <OptimizedBackgroundImage
           image={data.image}
-          size="large"
+          size="medium"
           className="absolute inset-0 z-0"
         />
       )}

@@ -166,7 +166,7 @@ export default function OemOdm({ data }: Props) {
           <OptimizedImage
             image={OEM.bgImage}
             alt={OEM.bgImage?.altText || "OEM Background"}
-            size="large"
+            size="medium"
             className="object-cover absolute inset-0 w-full h-full"
           />
           {/* 轻微遮罩增加文字可读性 */}
@@ -184,7 +184,7 @@ export default function OemOdm({ data }: Props) {
           <OptimizedImage
             image={ODM.bgImage}
             alt={ODM.bgImage?.altText || "ODM Background"}
-            size="large"
+            size="medium"
             className="object-cover absolute inset-0 w-full h-full"
           />
           {/* 轻微遮罩增加文字可读性 */}
@@ -273,7 +273,7 @@ export default function OemOdm({ data }: Props) {
             <OptimizedImage
               image={OEM.image}
               alt={OEM.image?.altText || OEM.title}
-              size="large"
+              size="thumbnail"
               className="object-cover w-full h-full"
             />
           </motion.div>
@@ -295,7 +295,7 @@ export default function OemOdm({ data }: Props) {
             <OptimizedImage
               image={ODM.image}
               alt={ODM.image?.altText || ODM.title}
-              size="large"
+              size="thumbnail"
               className="object-cover w-full h-full"
             />
           </motion.div>
@@ -353,7 +353,7 @@ export default function OemOdm({ data }: Props) {
             <OptimizedImage
               image={OEM.bgImage}
               alt={OEM.bgImage?.altText || "OEM Background"}
-              size="large"
+              size="small"
               className="object-cover absolute inset-0 w-full h-full"
             />
             <div className="absolute inset-0 bg-black/30 z-[1]" />
@@ -385,7 +385,7 @@ export default function OemOdm({ data }: Props) {
               <OptimizedImage
                 image={OEM.image}
                 alt={OEM.image?.altText || OEM.title}
-                size="medium"
+                size="thumbnail"
                 className="object-cover w-full h-full"
               />
             </div>
@@ -404,7 +404,7 @@ export default function OemOdm({ data }: Props) {
             <OptimizedImage
               image={ODM.bgImage}
               alt={ODM.bgImage?.altText || "ODM Background"}
-              size="large"
+              size="small"
               className="object-cover absolute inset-0 w-full h-full"
             />
             <div className="absolute inset-0 bg-black/30 z-[1]" />
@@ -441,7 +441,7 @@ export default function OemOdm({ data }: Props) {
               <OptimizedImage
                 image={ODM.image}
                 alt={ODM.image?.altText || ODM.title}
-                size="medium"
+                size="thumbnail"
                 className="object-cover w-full h-full"
               />
             </div>

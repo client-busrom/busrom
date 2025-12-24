@@ -135,7 +135,7 @@ export default function WhyChooseBusrom({ data }: Props) {
                 <OptimizedImage
                   image={data.reasons[index].image}
                   alt={data.reasons[index].image?.altText || reason.title}
-                  size="large"
+                  size="small"
                   className="object-cover object-center z-0 transition-transform duration-500 ease-in-out group-hover:scale-105 absolute inset-0 w-full h-full"
                 />
 
@@ -188,7 +188,7 @@ export default function WhyChooseBusrom({ data }: Props) {
                 <OptimizedImage
                   image={data.reasons[index].image}
                   alt={data.reasons[index].image?.altText || reason.title}
-                  size="large"
+                  size="small"
                   className="object-cover object-center z-0 absolute inset-0 w-full h-full"
                 />
                 <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />

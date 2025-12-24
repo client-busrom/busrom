@@ -347,7 +347,7 @@ export default function SeriesIntro({ data }: Props) {
                       <OptimizedImage
                         image={imageObj}
                         alt={imageObj?.altText || `${activeSeries?.title} - Image ${(idx % totalImages) + 1}`}
-                        size="large"
+                        size="small"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -399,7 +399,7 @@ export default function SeriesIntro({ data }: Props) {
                     <OptimizedImage
                       image={imageObj}
                       alt={imageObj?.altText || `${activeSeries?.title} - Image ${idx + 1}`}
-                      size="medium"
+                      size="small"
                       className="w-full h-full object-cover"
                     />
                   </div>

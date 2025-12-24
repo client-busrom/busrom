@@ -1,62 +1,53 @@
 /**
- * Regenerate Media Sizes for Payload CMS
+ * Regenerate Media Sizes for Payload CMS (Local MinIO version)
  *
- * This script regenerates image variants for all media records that were
- * migrated from Keystone and don't have Payload-generated sizes.
+ * This script regenerates image variants for media records that are missing sizes.
+ * Designed for local development with MinIO.
  *
  * Usage:
- *   DATABASE_URI="postgresql://..." npx tsx scripts/regenerate-media-sizes.ts --dry-run
- *   DATABASE_URI="postgresql://..." npx tsx scripts/regenerate-media-sizes.ts
- *   DATABASE_URI="postgresql://..." npx tsx scripts/regenerate-media-sizes.ts --limit=10
- *
- * Prerequisites:
- *   - AWS CLI configured with access to busrom-media-production bucket
- *   - sharp package installed
+ *   cd payload-cms
+ *   npx tsx scripts/regenerate-media-sizes-local.ts --dry-run
+ *   npx tsx scripts/regenerate-media-sizes-local.ts
+ *   npx tsx scripts/regenerate-media-sizes-local.ts --ids=676,2763,2764,2765
  */
 
 import { Pool } from 'pg'
 import sharp from 'sharp'
 import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import { Readable } from 'stream'
+import * as dotenv from 'dotenv'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-// Disable SSL certificate verification for AWS RDS
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+// ESM compatibility
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
-const S3_BUCKET = process.env.S3_BUCKET_NAME || 'busrom-media-production'
-const S3_REGION = process.env.S3_REGION || 'ap-southeast-1'
-const USE_MINIO = process.env.USE_MINIO === 'true'
+// Load environment variables
+dotenv.config({ path: path.join(__dirname, '../.env.local') })
+
+const S3_BUCKET = process.env.S3_BUCKET_NAME || 'busrom-media'
+const S3_REGION = process.env.S3_REGION || 'us-east-1'
 const S3_ENDPOINT = process.env.S3_ENDPOINT || 'http://localhost:9000'
-
-// CDN domain depends on environment
-const CDN_DOMAIN = USE_MINIO
-  ? 'http://localhost:8080'  // Local nginx proxy for MinIO
-  : 'https://d2kqew3hn5wphn.cloudfront.net'
+const MEDIA_URL_PREFIX = 'http://localhost:8080' // nginx proxy
 
 // Payload image sizes configuration (must match Media.ts)
-// Now with WebP conversion for better performance
 const IMAGE_SIZES = [
-  { name: 'thumbnail', width: 400, height: 300, quality: 80 },
-  { name: 'card', width: 768, height: 512, quality: 80 },
-  { name: 'tablet', width: 1024, height: undefined, quality: 80 },
-  { name: 'desktop', width: 1920, height: undefined, quality: 85 },
+  { name: 'thumbnail', width: 400, height: 300 },
+  { name: 'card', width: 768, height: 512 },
+  { name: 'tablet', width: 1024, height: undefined },
+  { name: 'desktop', width: 1920, height: undefined },
 ]
 
-// Always output WebP for better compression
-const OUTPUT_FORMAT = 'webp' as const
-const OUTPUT_EXT = 'webp'
-const OUTPUT_MIME = 'image/webp'
-
-// Initialize S3 client (supports both AWS S3 and MinIO)
+// Initialize S3 client for MinIO
 const s3Client = new S3Client({
   credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+    accessKeyId: process.env.S3_ACCESS_KEY_ID || 'minioadmin',
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || 'minioadmin123',
   },
   region: S3_REGION,
-  ...(USE_MINIO && {
-    endpoint: S3_ENDPOINT,
-    forcePathStyle: true,
-  }),
+  endpoint: S3_ENDPOINT,
+  forcePathStyle: true, // Required for MinIO
 })
 
 interface MediaRecord {
@@ -104,9 +95,11 @@ async function uploadToS3(key: string, buffer: Buffer, contentType: string): Pro
   await s3Client.send(command)
 }
 
-// Always convert to WebP for best compression
-function getOutputFormat(_mimeType: string): { format: 'webp'; ext: string; outputMime: string } {
-  return { format: OUTPUT_FORMAT, ext: OUTPUT_EXT, outputMime: OUTPUT_MIME }
+function getOutputFormat(mimeType: string): { format: keyof sharp.FormatEnum; ext: string; outputMime: string } {
+  if (mimeType === 'image/png') return { format: 'png', ext: 'png', outputMime: 'image/png' }
+  if (mimeType === 'image/webp') return { format: 'webp', ext: 'webp', outputMime: 'image/webp' }
+  if (mimeType === 'image/avif') return { format: 'avif', ext: 'avif', outputMime: 'image/avif' }
+  return { format: 'jpeg', ext: 'jpg', outputMime: 'image/jpeg' }
 }
 
 async function generateSizes(
@@ -118,11 +111,21 @@ async function generateSizes(
   const sizes: Record<string, SizeInfo> = {}
   const { format, ext, outputMime } = getOutputFormat(mimeType)
 
+  // Get original image metadata
+  const originalMeta = await sharp(sourceBuffer).metadata()
+  const originalWidth = originalMeta.width || 1920
+
   // Get base filename without extension
   const baseName = filename.replace(/\.[^.]+$/, '')
 
   for (const size of IMAGE_SIZES) {
     try {
+      // Skip if original is smaller than target size
+      if (originalWidth < size.width) {
+        console.log(`      ⏭ Skipping ${size.name}: original (${originalWidth}px) smaller than target (${size.width}px)`)
+        continue
+      }
+
       let sharpInstance = sharp(sourceBuffer)
 
       // Resize with proper options
@@ -140,17 +143,26 @@ async function generateSizes(
         })
       }
 
-      // Convert to WebP with quality setting
-      const outputBuffer = await sharpInstance.webp({ quality: size.quality }).toBuffer()
+      // Convert to target format with quality optimization
+      if (format === 'jpeg') {
+        sharpInstance = sharpInstance.jpeg({ quality: 85 })
+      } else if (format === 'png') {
+        sharpInstance = sharpInstance.png({ compressionLevel: 9 })
+      }
+
+      const outputBuffer = await sharpInstance.toBuffer()
       const metadata = await sharp(outputBuffer).metadata()
 
       // Generate filename for this size
       const sizeFilename = `${baseName}-${metadata.width}x${metadata.height}.${ext}`
       const s3Key = `media/${sizeFilename}`
-      const url = `${CDN_DOMAIN}/${s3Key}`
+      const url = `${MEDIA_URL_PREFIX}/media/${sizeFilename}`
 
       if (!dryRun) {
         await uploadToS3(s3Key, outputBuffer, outputMime)
+        console.log(`      ✓ Uploaded ${size.name}: ${sizeFilename} (${(outputBuffer.length / 1024).toFixed(0)}KB)`)
+      } else {
+        console.log(`      [DRY] Would upload ${size.name}: ${sizeFilename} (${(outputBuffer.length / 1024).toFixed(0)}KB)`)
       }
 
       sizes[size.name] = {
@@ -169,7 +181,6 @@ async function generateSizes(
   return sizes
 }
 
-// Process a single media record
 async function processMediaRecord(
   pool: Pool,
   row: MediaRecord,
@@ -177,40 +188,31 @@ async function processMediaRecord(
   total: number,
   dryRun: boolean
 ): Promise<{ success: boolean; id: number }> {
-  const { id, filename, url, mime_type } = row
+  const { id, filename, mime_type } = row
+
+  console.log(`\n[${index}/${total}] Processing: ${filename} (ID: ${id})`)
 
   try {
-    // Determine S3 key - try /media/ path first
-    let s3Key = `media/${filename}`
+    // Determine S3 key
+    const s3Key = `media/${filename}`
 
     // Download original image
-    let sourceBuffer: Buffer
-    try {
-      sourceBuffer = await downloadFromS3(s3Key)
-    } catch (e) {
-      // Try to parse from URL if /media/ doesn't exist
-      if (url) {
-        const urlPath = url.replace(CDN_DOMAIN, '').replace(/^\//, '')
-        s3Key = urlPath.split('?')[0] // Remove query params
-        sourceBuffer = await downloadFromS3(s3Key)
-      } else {
-        throw new Error(`Cannot find source file for ${filename}`)
-      }
-    }
+    console.log(`   Downloading from S3: ${s3Key}`)
+    const sourceBuffer = await downloadFromS3(s3Key)
+    console.log(`   Downloaded: ${(sourceBuffer.length / 1024 / 1024).toFixed(2)}MB`)
 
     // Generate all sizes
     const sizes = await generateSizes(sourceBuffer, filename, mime_type, dryRun)
 
     if (Object.keys(sizes).length === 0) {
-      console.log(`[${index}/${total}] ⚠ ${filename} - No sizes generated`)
+      console.log(`   ⚠ No sizes generated (image may be too small)`)
       return { success: false, id }
     }
 
-    // Update database with new sizes and correct URL
-    const newUrl = `${CDN_DOMAIN}/media/${filename}`
+    // Update database with new sizes
+    const newUrl = `${MEDIA_URL_PREFIX}/media/${filename}`
 
     if (!dryRun) {
-      // Build UPDATE query for Payload's flat column structure
       const updateQuery = `
         UPDATE media SET
           url = $1,
@@ -254,12 +256,13 @@ async function processMediaRecord(
         desktop.url, desktop.width, desktop.height, desktop.mimeType, desktop.filesize, desktop.filename,
         id,
       ])
+      console.log(`   ✓ Database updated`)
     }
 
-    console.log(`[${index}/${total}] ✓ ${filename}`)
+    console.log(`   ✓ Completed`)
     return { success: true, id }
   } catch (error: any) {
-    console.error(`[${index}/${total}] ✗ ${filename} - ${error.message}`)
+    console.error(`   ✗ Failed: ${error.message}`)
     return { success: false, id }
   }
 }
@@ -267,21 +270,14 @@ async function processMediaRecord(
 async function main() {
   const args = process.argv.slice(2)
   const dryRun = args.includes('--dry-run')
-  const forceWebp = args.includes('--force-webp') // Force convert all to WebP
-  const limitArg = args.find((a) => a.startsWith('--limit='))
-  const limit = limitArg ? parseInt(limitArg.split('=')[1], 10) : undefined
-  const offsetArg = args.find((a) => a.startsWith('--offset='))
-  const offset = offsetArg ? parseInt(offsetArg.split('=')[1], 10) : 0
-  const concurrencyArg = args.find((a) => a.startsWith('--concurrency='))
-  const concurrency = concurrencyArg ? parseInt(concurrencyArg.split('=')[1], 10) : 10
+  const idsArg = args.find((a) => a.startsWith('--ids='))
+  const ids = idsArg ? idsArg.split('=')[1].split(',').map(Number) : null
 
-  console.log('🔧 Regenerate Media Sizes Script')
+  console.log('🔧 Regenerate Media Sizes Script (Local MinIO)')
   console.log(`   Mode: ${dryRun ? 'DRY RUN' : 'LIVE'}`)
-  console.log(`   Force WebP: ${forceWebp ? 'YES' : 'NO'}`)
+  console.log(`   S3 Endpoint: ${S3_ENDPOINT}`)
   console.log(`   Bucket: ${S3_BUCKET}`)
-  console.log(`   Concurrency: ${concurrency}`)
-  if (limit) console.log(`   Limit: ${limit}`)
-  if (offset) console.log(`   Offset: ${offset}`)
+  if (ids) console.log(`   Target IDs: ${ids.join(', ')}`)
   console.log('')
 
   const databaseUri = process.env.DATABASE_URI
@@ -293,85 +289,60 @@ async function main() {
   const pool = new Pool({ connectionString: databaseUri })
 
   try {
-    // Find media records that need sizes regenerated
     let query: string
+    let params: any[] = []
 
-    if (forceWebp) {
-      // Force mode: regenerate all images that are not WebP
+    if (ids && ids.length > 0) {
+      // Process specific IDs
       query = `
         SELECT id, filename, url, mime_type, width, height
         FROM media
-        WHERE mime_type LIKE 'image/%'
-          AND (
-            sizes_thumbnail_url IS NULL
-            OR sizes_thumbnail_url NOT LIKE '%.webp'
-          )
+        WHERE id = ANY($1)
+          AND mime_type LIKE 'image/%'
         ORDER BY id
       `
+      params = [ids]
     } else {
-      // Normal mode: only process images without sizes or with old /variants/ path
+      // Find media records that need sizes regenerated
       query = `
         SELECT id, filename, url, mime_type, width, height
         FROM media
         WHERE mime_type LIKE 'image/%'
           AND (
-            sizes_thumbnail_url IS NULL
-            OR sizes_thumbnail_url = ''
-            OR sizes_thumbnail_url LIKE '%/variants/%'
+            sizes_desktop_url IS NULL
+            OR sizes_desktop_url = ''
+            OR sizes_desktop_url NOT LIKE '%/media/%'
           )
         ORDER BY id
       `
     }
 
-    if (limit) {
-      query += ` LIMIT ${limit}`
-    }
-    if (offset) {
-      query += ` OFFSET ${offset}`
+    const result = await pool.query<MediaRecord>(query, params)
+    const total = result.rows.length
+
+    if (total === 0) {
+      console.log('✅ No media records need processing')
+      return
     }
 
-    const result = await pool.query<MediaRecord>(query)
-    const total = result.rows.length
     console.log(`📊 Found ${total} media records to process`)
-    console.log('')
 
     let succeeded = 0
     let failed = 0
-    const startTime = Date.now()
 
-    // Process in batches with concurrency
-    for (let i = 0; i < result.rows.length; i += concurrency) {
-      const batch = result.rows.slice(i, i + concurrency)
-      const batchPromises = batch.map((row, batchIndex) =>
-        processMediaRecord(pool, row, i + batchIndex + 1, total, dryRun)
-      )
-
-      const batchResults = await Promise.all(batchPromises)
-
-      for (const r of batchResults) {
-        if (r.success) succeeded++
-        else failed++
-      }
-
-      // Progress update every batch
-      const elapsed = ((Date.now() - startTime) / 1000).toFixed(0)
-      const processed = Math.min(i + concurrency, total)
-      const rate = (processed / (Date.now() - startTime) * 1000).toFixed(1)
-      const eta = ((total - processed) / parseFloat(rate)).toFixed(0)
-      console.log(`   Progress: ${processed}/${total} (${rate}/s, ETA: ${eta}s)`)
+    for (let i = 0; i < result.rows.length; i++) {
+      const res = await processMediaRecord(pool, result.rows[i], i + 1, total, dryRun)
+      if (res.success) succeeded++
+      else failed++
     }
 
-    const totalTime = ((Date.now() - startTime) / 1000).toFixed(1)
-    console.log('')
-    console.log('📊 Summary:')
+    console.log('\n📊 Summary:')
     console.log(`   Processed: ${succeeded + failed}`)
     console.log(`   Succeeded: ${succeeded}`)
     console.log(`   Failed: ${failed}`)
-    console.log(`   Time: ${totalTime}s`)
 
     if (dryRun && succeeded > 0) {
-      console.log('')
-      console.log('ℹ️  This was a dry run. Run without --dry-run to apply changes.')
+      console.log('\nℹ️  This was a dry run. Run without --dry-run to apply changes.')
     }
   } finally {
     await pool.end()
