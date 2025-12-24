@@ -150,3 +150,33 @@ export function getLanguageByCode(code: string): Language | undefined {
 export function getAllCountries(): Country[] {
   return Object.values(countries).flat()
 }
+
+// 根据语言代码推断默认国家
+// 用于首次访问时根据 URL locale 设置合理的默认国家
+export function getCountryFromLocale(locale: string): string {
+  const localeToCountry: Record<string, string> = {
+    'zh': 'CN',  // 中文 -> 中国
+    'en': 'US',  // 英文 -> 美国
+    'es': 'ES',  // 西班牙语 -> 西班牙
+    'fr': 'FR',  // 法语 -> 法国
+    'de': 'DE',  // 德语 -> 德国
+    'pt': 'BR',  // 葡萄牙语 -> 巴西
+    'nl': 'NL',  // 荷兰语 -> 荷兰
+    'da': 'DK',  // 丹麦语 -> 丹麦
+    'no': 'NO',  // 挪威语 -> 挪威
+    'sv': 'SE',  // 瑞典语 -> 瑞典
+    'fi': 'FI',  // 芬兰语 -> 芬兰
+    'is': 'IS',  // 冰岛语 -> 冰岛
+    'cs': 'CZ',  // 捷克语 -> 捷克
+    'hu': 'HU',  // 匈牙利语 -> 匈牙利
+    'pl': 'PL',  // 波兰语 -> 波兰
+    'sk': 'SK',  // 斯洛伐克语 -> 斯洛伐克
+    'it': 'IT',  // 意大利语 -> 意大利
+    'ar': 'SA',  // 阿拉伯语 -> 沙特阿拉伯
+    'tr': 'TR',  // 土耳其语 -> 土耳其
+    'he': 'IL',  // 希伯来语 -> 以色列
+    'fa': 'IR',  // 波斯语 -> 伊朗
+    'az': 'AZ',  // 阿塞拜疆语 -> 阿塞拜疆
+  }
+  return localeToCountry[locale] || DEFAULT_COUNTRY
+}
