@@ -257,7 +257,20 @@
       "Bash(DATABASE_URI=\"postgresql://busrom_admin:ADijIRcAHMHLHaZvH0eg@busrom-db-production.cqhcko4ysea2.us-east-1.rds.amazonaws.com:5432/busrom_payload?sslmode=require\" )",
       "Bash(DATABASE_URI=\"postgresql://busrom_admin:ADijIRcAHMHLHaZvH0eg@busrom-db-production.cqhcko4ysea2.us-east-1.rds.amazonaws.com:5432/busrom_payload?sslmode=require\" S3_BUCKET_NAME=\"busrom-media-production\" S3_REGION=\"us-east-1\" S3_ACCESS_KEY_ID=\"AKIAZTV7WS56UW33UNVU\" S3_SECRET_ACCESS_KEY=\"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\" npx tsx scripts/regenerate-media-sizes.ts --dry-run --force-webp)",
       "Bash(DATABASE_URI=\"postgresql://busrom_admin:ADijIRcAHMHLHaZvH0eg@busrom-db-production.cqhcko4ysea2.us-east-1.rds.amazonaws.com:5432/busrom_payload?sslmode=require\" S3_BUCKET_NAME=\"busrom-media-production\" S3_REGION=\"us-east-1\" S3_ACCESS_KEY_ID=\"AKIAZTV7WS56UW33UNVU\" S3_SECRET_ACCESS_KEY=\"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\" npx tsx scripts/regenerate-media-sizes.ts --force-webp --concurrency=20)",
-      "Bash(DATABASE_URI=\"postgresql://busrom_admin:ADijIRcAHMHLHaZvH0eg@busrom-db-production.cqhcko4ysea2.us-east-1.rds.amazonaws.com:5432/busrom_payload?sslmode=require\" S3_BUCKET_NAME=\"busrom-media-production\" S3_REGION=\"us-east-1\" S3_ACCESS_KEY_ID=\"AKIAZTV7WS56UW33UNVU\" S3_SECRET_ACCESS_KEY=\"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\" npx tsx scripts/regenerate-media-sizes.ts --force-webp)"
+      "Bash(DATABASE_URI=\"postgresql://busrom_admin:ADijIRcAHMHLHaZvH0eg@busrom-db-production.cqhcko4ysea2.us-east-1.rds.amazonaws.com:5432/busrom_payload?sslmode=require\" S3_BUCKET_NAME=\"busrom-media-production\" S3_REGION=\"us-east-1\" S3_ACCESS_KEY_ID=\"AKIAZTV7WS56UW33UNVU\" S3_SECRET_ACCESS_KEY=\"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\" npx tsx scripts/regenerate-media-sizes.ts --force-webp)",
+      "Bash(aws logs tail:*)",
+      "Bash(aws elbv2 describe-target-health:*)",
+      "Bash(aws elbv2 describe-target-groups:*)",
+      "Bash(npm run migrate:create:*)",
+      "Bash(PGPASSWORD='ADijIRcAHMHLHaZvH0eg' psql:*)",
+      "Bash(NODE_TLS_REJECT_UNAUTHORIZED=0 DATABASE_URI=\"postgresql://busrom_admin:ADijIRcAHMHLHaZvH0eg@busrom-db-production.cqhcko4ysea2.us-east-1.rds.amazonaws.com:5432/busrom_payload?sslmode=require\" npx tsx:*)",
+      "Bash(aws s3 ls:*)",
+      "Bash(NODE_TLS_REJECT_UNAUTHORIZED=0 DATABASE_URI=\"postgresql://busrom_admin:ADijIRcAHMHLHaZvH0eg@busrom-db-production.cqhcko4ysea2.us-east-1.rds.amazonaws.com:5432/busrom_payload?sslmode=require\" npx tsx -e \"\nconst { Pool } = require\\(''''pg''''\\);\nconst pool = new Pool\\({ connectionString: process.env.DATABASE_URI, ssl: { rejectUnauthorized: false } }\\);\n\nasync function check\\(\\) {\n  const client = await pool.connect\\(\\);\n  const result = await client.query\\(\\\\`\n    SELECT id, filename, sizes_tablet_url, sizes_tablet_mime_type, sizes_desktop_url, sizes_desktop_mime_type\n    FROM media\n    WHERE filename ILIKE ''''%BusromBandBg%''''\n    LIMIT 5\n  \\\\`\\);\n  console.log\\(JSON.stringify\\(result.rows, null, 2\\)\\);\n  client.release\\(\\);\n  await pool.end\\(\\);\n}\ncheck\\(\\);\n\")",
+      "Bash(NODE_TLS_REJECT_UNAUTHORIZED=0 DATABASE_URI=\"postgresql://busrom_admin:ADijIRcAHMHLHaZvH0eg@busrom-db-production.cqhcko4ysea2.us-east-1.rds.amazonaws.com:5432/busrom_payload?sslmode=require\" npx tsx -e:*)",
+      "Bash(aws cloudwatch get-metric-statistics:*)",
+      "Bash(aws elbv2 describe-load-balancers:*)",
+      "Bash(time curl -s https://cms.busromhouse.com/api/home?locale=en)",
+      "Bash(do time curl -s https://cms.busromhouse.com/api/home?locale=en)"
     ],
     "deny": [],
     "ask": []

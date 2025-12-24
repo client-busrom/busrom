@@ -39,7 +39,7 @@ async function getRandomImageFromMediaTags(mediaTags: Array<{ id: string; name: 
         headers: {
           'Content-Type': 'application/json',
         },
-        next: { revalidate: 60 }, // 缓存 60 秒
+        next: { revalidate: 300 }, // 缓存 5 分钟
       }
     );
 
@@ -136,13 +136,14 @@ export async function GET(request: NextRequest) {
     console.log('[Navigation API] Fetching navigation from Payload CMS for locale:', locale);
 
     // 从 Payload CMS 获取所有可见的导航菜单
+    // 导航数据变化不频繁，缓存 5 分钟
     const response = await fetch(
       `${CMS_URL}/api/navigation-menus?where[visible][equals]=true&limit=1000&locale=${locale}&depth=2`,
       {
         headers: {
           'Content-Type': 'application/json',
         },
-        next: { revalidate: 60 }, // 缓存 60 秒
+        next: { revalidate: 300 }, // 缓存 5 分钟
       }
     );
 
@@ -173,7 +174,12 @@ export async function GET(request: NextRequest) {
 
     console.log('[Navigation API] Transformed data:', transformedData.length);
 
-    return NextResponse.json(transformedData);
+    // 设置响应缓存头：浏览器缓存 5 分钟，CDN 缓存 1 小时
+    return NextResponse.json(transformedData, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+      },
+    });
   } catch (error: any) {
     console.error('[Navigation API] Error:', error);
     console.error('[Navigation API] Error stack:', error?.stack);
