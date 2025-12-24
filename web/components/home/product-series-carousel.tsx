@@ -254,7 +254,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
       data-header-theme="transparent"
       style={{ aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` }}
     >
-      {/* 场景图背景 - 全屏显示需要 medium 尺寸 */}
+      {/* 场景图背景 - 全屏显示需要 large 尺寸 */}
       {hoveredItem?.sceneImage && (
         <motion.div
           key={hoveredItem.key + "-scene"}
@@ -267,7 +267,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
           <OptimizedImage
             image={hoveredItem.sceneImage}
             alt={hoveredItem.sceneImage.altText || "Scene"}
-            size="medium"
+            size="large"
             className="object-cover w-full h-full"
           />
         </motion.div>
@@ -387,7 +387,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
                 <OptimizedImage
                   image={item.image}
                   alt={item.image?.altText || item.name}
-                  size="small"
+                  size="medium"
                   className="object-cover w-full h-full"
                   priority={isOnScreen}
                 />
