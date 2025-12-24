@@ -1,7 +1,6 @@
 import type { Locale } from "@/i18n.config"
 import { Suspense } from "react"
 import { HomeContent } from "@/lib/content-data"
-import { getUserPreferencesFromCookies } from "@/lib/server/user-preferences"
 import { getHomeContent } from "@/lib/api/home"
 import { HomePageClient } from "./HomePageClient"
 
@@ -37,9 +36,8 @@ function getLCPImageUrls(content: HomeContent): string[] {
 
 // 异步组件：获取首页数据
 async function HomeContentLoader({ locale }: { locale: Locale }) {
-  const preferences = await getUserPreferencesFromCookies()
-  const currentLanguage = (preferences.language as Locale) || locale
-  const content = await getHomeContent(currentLanguage) as HomeContent;
+  // URL 中的 locale 优先于 cookie，确保用户访问 /zh 时获取中文内容
+  const content = await getHomeContent(locale) as HomeContent;
 
   // 获取 LCP 图片 URLs 并生成 preload links
   const lcpImageUrls = getLCPImageUrls(content)
@@ -60,7 +58,7 @@ async function HomeContentLoader({ locale }: { locale: Locale }) {
       ))}
       <HomePageClient
         initialContent={content}
-        currentLanguage={currentLanguage}
+        currentLanguage={locale}
       />
     </>
   )
