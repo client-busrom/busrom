@@ -36,7 +36,7 @@ function getMediaUrl(fileUrl: string | null | undefined): string {
 export async function getHomeContent(locale: string = 'en'): Promise<HomeContent> {
   try {
     const response = await fetch(`${CMS_URL}/api/home?locale=${locale}`, {
-      next: { revalidate: 60 }, // Revalidate every 60 seconds
+      next: { revalidate: 300 }, // Revalidate every 5 minutes
     })
 
     if (!response.ok) {

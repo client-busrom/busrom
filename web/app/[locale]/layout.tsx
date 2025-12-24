@@ -9,7 +9,7 @@ import { isValidLocale, defaultLocale } from "@/i18n.config";
 import Header from "@/components/layout/header";
 import ConditionalFooter from "@/components/layout/conditional-footer";
 import { ClientLayoutWrapper } from "@/components/ClientLayoutWrapper";
-import { getPreloaderConfig } from "@/lib/api/preloader-config";
+import { defaultPreloaderConfig } from "@/lib/api/preloader-config";
 
 // 延迟加载 LenisProvider（包含 GSAP），不阻塞首屏渲染
 const LenisProvider = dynamic(
@@ -106,8 +106,9 @@ export default async function RootLayout({
   const { locale } = await params;
   const validLocale = isValidLocale(locale) ? locale : defaultLocale;
 
-  // 从 CMS 获取 preloader 配置
-  const preloaderConfig = await getPreloaderConfig();
+  // 使用默认配置，避免阻塞 SSR
+  // Preloader 组件会在客户端异步获取最新配置
+  const preloaderConfig = defaultPreloaderConfig;
 
   return (
     <html
