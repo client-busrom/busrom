@@ -4,6 +4,9 @@ import { HomeContent } from "@/lib/content-data"
 import { getHomeContent } from "@/lib/api/home"
 import { HomePageClient } from "./HomePageClient"
 
+// 强制动态渲染，避免构建时预渲染失败（CMS 不可用）
+export const dynamic = 'force-dynamic'
+
 // Helper: 从 variant 提取 URL（可能是 string 或 { url: string }）
 function getVariantUrl(variant: string | { url?: string } | undefined): string | null {
   if (!variant) return null
