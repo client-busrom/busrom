@@ -1,30 +1,34 @@
 ﻿"use client";
 
-import { memo } from 'react';
+import { memo, useState, useEffect, useRef } from 'react';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import type { Locale } from "@/i18n.config";
 // 1. 导入我们刚刚创建的 HomeContent 类型
 import type { HomeContent } from "@/lib/content-data";
 
-// --- 2. 导入所有 15 个模块组件 ---
-// 首屏组件直接导入
+// --- 2. 导入组件 ---
+// 首屏组件直接导入（首屏性能关键）- 只保留不使用 framer-motion 的组件
 import HeroBanner from "@/components/home/hero-banner";
-import ProductSeriesCarousel from "@/components/home/product-series-carousel";
-import ServiceFeatures from "@/components/home/service-features";
 
-// 非首屏组件直接导入（动态导入会导致加载期间高度为0，影响header主题检测）
-import SimpleCta from "@/components/home/simple-cta";
-import SeriesIntro from "@/components/home/series-intro";
-import FeaturedProducts from "@/components/home/featured-products";
-import BrandAdvantages from "@/components/home/brand-advantages";
-import OemOdm from "@/components/home/oem-odm";
-import QuoteSteps from "@/components/home/quote-steps";
-import MainForm from "@/components/home/main-form";
-import WhyChooseBusrom from "@/components/home/why-choose-busrom";
-import CaseStudies from "@/components/home/case-studies";
-import BrandAnalysis from "@/components/home/brand-analysis";
-import BrandValue from "@/components/home/brand-value";
+// 使用 framer-motion 的组件动态导入，避免首屏加载 framer-motion (54KB gzip)
+// 这样可以显著减少首屏 JS 执行时间 (Speed Index)
+const ProductSeriesCarousel = dynamic(() => import("@/components/home/product-series-carousel"));
+const ServiceFeatures = dynamic(() => import("@/components/home/service-features"));
+
+// 非首屏组件动态导入，减少首屏 JS 体积
+// 注意：动态导入的组件在加载期间高度为0，需要设置 min-height
+const SimpleCta = dynamic(() => import("@/components/home/simple-cta"));
+const SeriesIntro = dynamic(() => import("@/components/home/series-intro"));
+const FeaturedProducts = dynamic(() => import("@/components/home/featured-products"));
+const BrandAdvantages = dynamic(() => import("@/components/home/brand-advantages"));
+const OemOdm = dynamic(() => import("@/components/home/oem-odm"));
+const QuoteSteps = dynamic(() => import("@/components/home/quote-steps"));
+const MainForm = dynamic(() => import("@/components/home/main-form"));
+const WhyChooseBusrom = dynamic(() => import("@/components/home/why-choose-busrom"));
+const CaseStudies = dynamic(() => import("@/components/home/case-studies"));
+const BrandAnalysis = dynamic(() => import("@/components/home/brand-analysis"));
+const BrandValue = dynamic(() => import("@/components/home/brand-value"));
 
 // Sphere3D 使用动态导入（因为包含 WebGL，需要 ssr: false）
 const Sphere3D = dynamic(() => import("@/components/home/sphere-3d"), {
@@ -32,8 +36,43 @@ const Sphere3D = dynamic(() => import("@/components/home/sphere-3d"), {
   loading: () => <div className="w-full h-screen bg-[#020408]" />,
 });
 
+// 延迟渲染组件 - 只在接近视口时才开始加载 Three.js
+// 这样可以避免首屏加载时下载和执行大量 JS
+function DeferredSphere3D() {
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element || shouldLoad) return;
+
+    // 使用 Intersection Observer 检测是否接近视口
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoad(true);
+          observer.disconnect();
+        }
+      },
+      {
+        rootMargin: '200px 0px', // 提前 200px 开始加载
+        threshold: 0,
+      }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [shouldLoad]);
+
+  return (
+    <div ref={containerRef} className="w-full h-screen bg-[#020408]">
+      {shouldLoad && <Sphere3D />}
+    </div>
+  );
+}
+
 // 使用 memo 包装纯展示组件，避免父组件更新时不必要的重渲染
-const MemoizedServiceFeatures = memo(ServiceFeatures);
+// 注意：动态导入的组件已内置缓存，不需要额外 memo
 const MemoizedSimpleCta = memo(SimpleCta);
 const MemoizedSeriesIntro = memo(SeriesIntro);
 const MemoizedBrandAdvantages = memo(BrandAdvantages);
@@ -93,13 +132,13 @@ export function HomePageClient({
 
       {/* 模块 3: 服务特色 (浅色背景) */}
       <div data-header-theme="light">
-        <MemoizedServiceFeatures data={content.serviceFeatures} />
+        <ServiceFeatures data={content.serviceFeatures} />
       </div>
 
-      {/* 模块 4: 3D球体 */}
-      <div data-header-theme="transparent">
-        <Sphere3D />
-      </div>
+      {/* 模块 4: 3D球体 - 暂时注释掉测试性能影响 */}
+      {/* <div data-header-theme="transparent">
+        <DeferredSphere3D />
+      </div> */}
 
       {/* 模块 5: 简易表单跳转 */}
       {content.simpleCta?.images && (

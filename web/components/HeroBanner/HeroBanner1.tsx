@@ -1,10 +1,11 @@
 // components/HeroBanner/HeroBanner1.tsx
+// ⚡ SSR Component - No "use client" for LCP optimization
 import type { FC } from "react";
 import Image from "next/image";
 import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
-import { cn, getObjectPosition } from "@/lib/utils";
-import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { getObjectPosition } from "@/lib/utils";
+import { ServerImage } from "@/components/ui/ServerImage";
 
 // --- 响应式尺寸函数 ---
 // 使用 CSS 变量 --rpx-hero，在宽屏幕上按宽度缩放，在高屏幕上按高度缩放
@@ -123,11 +124,12 @@ type BannerProps = {
 const HeroBanner1: FC<BannerProps> = ({ data }) => {
   return (
     <section className="relative w-full h-full min-h-[700px] overflow-hidden font-sans flex items-center justify-center text-center">
-      {/* 背景图 */}
-      <OptimizedImage
+      {/* 背景图 - LCP 关键图片 */}
+      <ServerImage
         image={data.images[0]}
         alt="背景图"
-        size="large"
+        size="small"
+        fill
         className="absolute inset-0 w-full h-full object-cover z-0"
         objectPosition={getObjectPosition(data.images[0])}
         priority
@@ -213,10 +215,11 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
               transform: `rotate(${-IMAGE_1_CONFIG.rotate}deg) scale(${IMAGE_1_CONFIG.imageScale}) translate(${IMAGE_1_CONFIG.imageOffsetX}%, ${IMAGE_1_CONFIG.imageOffsetY}%)`,
             }}
           >
-            <OptimizedImage
+            <ServerImage
               image={data.images[1]}
               alt="装饰图1"
-              size="large"
+              size="small"
+              fill
               className="w-full h-full object-cover"
               objectPosition="center center"
               priority
@@ -279,10 +282,11 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
                 transform: `rotate(${-IMAGE_1_CONFIG.rotate}deg) scale(${IMAGE_1_CONFIG.imageScale}) translate(${IMAGE_1_CONFIG.imageOffsetX}%, ${IMAGE_1_CONFIG.imageOffsetY}%)`,
               }}
             >
-              <OptimizedImage
+              <ServerImage
                 image={data.images[1]}
                 alt="装饰图1"
-                size="medium"
+                size="small"
+                fill
                 className="w-full h-full object-cover"
                 objectPosition="center center"
               />
@@ -313,10 +317,11 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
               transform: `rotate(${-IMAGE_2_CONFIG.rotate}deg) scale(${IMAGE_2_CONFIG.imageScale}) translate(${IMAGE_2_CONFIG.imageOffsetX}%, ${IMAGE_2_CONFIG.imageOffsetY}%)`,
             }}
           >
-            <OptimizedImage
+            <ServerImage
               image={data.images[2]}
               alt="装饰图2"
-              size="large"
+              size="small"
+              fill
               className="w-full h-full object-cover"
               objectPosition="center center"
               priority
@@ -379,10 +384,11 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
                 transform: `rotate(${-IMAGE_2_CONFIG.rotate}deg) scale(${IMAGE_2_CONFIG.imageScale}) translate(${IMAGE_2_CONFIG.imageOffsetX}%, ${IMAGE_2_CONFIG.imageOffsetY}%)`,
               }}
             >
-              <OptimizedImage
+              <ServerImage
                 image={data.images[2]}
                 alt="装饰图2"
-                size="medium"
+                size="small"
+                fill
                 className="w-full h-full object-cover"
                 objectPosition="center center"
               />

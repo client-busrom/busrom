@@ -111,6 +111,19 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
+        // --- 基础字体 (优化: 使用系统字体栈作为 fallback，减少首屏阻塞) ---
+        'sans': [
+          'var(--font-anaheim)',  // 首选: Anaheim (24KB, preload)
+          'ui-sans-serif',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          '"Segoe UI"',
+          'Roboto',
+          '"Helvetica Neue"',
+          'Arial',
+          'sans-serif',
+        ],
+
         // --- Web Fonts (使用 CSS 变量) ---
         'paytone-one': ['var(--font-paytone-one)', 'sans-serif'],
         'poller-one':  ['var(--font-poller-one)', 'serif'],
@@ -120,6 +133,7 @@ const config: Config = {
         'montserrat':  ['var(--font-montserrat)', 'sans-serif'],
         'bebas-neue':  ['var(--font-bebas-neue)', 'sans-serif'],
         'oswald':      ['var(--font-oswald)', 'sans-serif'],
+        'inter':       ['var(--font-inter)', 'sans-serif'],  // 需要时显式使用
 
         // --- 系统字体 (直接使用名字) ---
         'arial':    ['Arial', 'sans-serif'],

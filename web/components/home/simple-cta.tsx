@@ -85,7 +85,7 @@ const ImagePlaceholder = ({ ratio, src, alt, className, image }: ImagePlaceholde
       <OptimizedImage
         image={image}
         alt={alt || "Layout Image"}
-        size="medium"
+        size="small"
         className="object-cover absolute inset-0 w-full h-full transition-transform duration-500 ease-out group-hover:scale-110"
       />
     </div>

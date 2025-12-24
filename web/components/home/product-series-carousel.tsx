@@ -254,7 +254,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
       data-header-theme="transparent"
       style={{ aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` }}
     >
-      {/* 场景图背景 */}
+      {/* 场景图背景 - 全屏显示需要 medium 尺寸 */}
       {hoveredItem?.sceneImage && (
         <motion.div
           key={hoveredItem.key + "-scene"}
@@ -267,7 +267,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
           <OptimizedImage
             image={hoveredItem.sceneImage}
             alt={hoveredItem.sceneImage.altText || "Scene"}
-            size="large"
+            size="medium"
             className="object-cover w-full h-full"
           />
         </motion.div>
@@ -282,7 +282,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
               <OptimizedImage
                 image={visibleItems[1]?.item?.image}
                 alt={visibleItems[1]?.item?.image?.altText || visibleItems[1]?.item?.name || ""}
-                size="large"
+                size="small"
                 className="object-cover w-full h-full"
                 priority
               />
@@ -294,7 +294,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
               <OptimizedImage
                 image={visibleItems[2]?.item?.image}
                 alt={visibleItems[2]?.item?.image?.altText || visibleItems[2]?.item?.name || ""}
-                size="large"
+                size="small"
                 className="object-cover w-full h-full"
                 priority
               />
@@ -387,7 +387,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
                 <OptimizedImage
                   image={item.image}
                   alt={item.image?.altText || item.name}
-                  size="large"
+                  size="small"
                   className="object-cover w-full h-full"
                   priority={isOnScreen}
                 />

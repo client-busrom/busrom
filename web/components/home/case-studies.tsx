@@ -113,7 +113,7 @@ export default function CaseStudies({ data }: Props) {
                     <OptimizedImage
                       image={application.items[0]?.image}
                       alt={application.items[0]?.image?.altText || application.items[0]?.series || "Case study main"}
-                      size="large"
+                      size="small"
                       className="object-cover rounded-lg absolute inset-0 w-full h-full"
                     />
                   </div>
@@ -130,12 +130,12 @@ export default function CaseStudies({ data }: Props) {
                     }
                   >
                     {/* 小图 1 - 使用 items[1] */}
-                    {/* 【已修改】让图片去填充一个具有正确比例的盒子 */}
+                    {/* 显示尺寸约501x751，使用small(768px)已足够 */}
                     <div className="relative w-full h-1/2 shadow-lg">
                       <OptimizedImage
                         image={application.items[1]?.image}
                         alt={application.items[1]?.image?.altText || application.items[1]?.series || "Case study detail 1"}
-                        size="medium"
+                        size="thumbnail"
                         className="object-cover rounded-lg absolute inset-0 w-full h-full"
                       />
                     </div>
@@ -145,7 +145,7 @@ export default function CaseStudies({ data }: Props) {
                       <OptimizedImage
                         image={application.items[2]?.image}
                         alt={application.items[2]?.image?.altText || application.items[2]?.series || "Case study detail 2"}
-                        size="medium"
+                        size="thumbnail"
                         className="object-cover rounded-lg absolute inset-0 w-full h-full"
                       />
                     </div>

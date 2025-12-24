@@ -104,7 +104,7 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
         <OptimizedImage
           image={data.images[0]}
           alt="Background"
-          size="large"
+          size="small"
           className="absolute inset-0 w-full h-full object-cover"
           objectPosition={getObjectPosition(data.images[0])}
           priority
@@ -355,7 +355,7 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
             <OptimizedImage
               image={data.images[1]}
               alt="Large feature image"
-              size="large"
+              size="small"
               className="absolute inset-0 w-full h-full object-cover"
               priority
             />
@@ -383,7 +383,7 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
             <OptimizedImage
               image={data.images[2]}
               alt="Small feature image"
-              size="medium"
+              size="small"
               className="absolute inset-0 w-full h-full object-cover"
               priority
             />
@@ -409,7 +409,7 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
               <OptimizedImage
                 image={data.images[1]}
                 alt="Large feature image"
-                size="large"
+                size="thumbnail"
                 className="absolute inset-0 w-full h-full object-cover"
                 priority
               />
@@ -422,7 +422,7 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
               <OptimizedImage
                 image={data.images[2]}
                 alt="Small feature image"
-                size="medium"
+                size="thumbnail"
                 className="absolute inset-0 w-full h-full object-cover"
                 priority
               />

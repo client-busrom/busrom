@@ -81,7 +81,7 @@ const ProductCard = ({ product, index, isMobile = false, locale }: ProductCardPr
         <OptimizedImage
           image={product.image}
           alt={product.image?.altText || product.title}
-          size="medium"
+          size="small"
           className="object-cover absolute inset-0 w-full h-full"
         />
       </div>

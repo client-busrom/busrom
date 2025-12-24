@@ -114,12 +114,16 @@ export default function LocaleSwitcher({ activeTheme }: LocaleSwitcherProps) {
     setIsOpen(false)
   }
 
-  // 加载状态
+  // 加载状态 - 使用相同尺寸的占位符避免 CLS
   if (!isLoaded) {
     return (
-      <div className="flex items-center space-x-1 opacity-50">
-        <Globe className={cn("w-4 h-4", activeTheme === 'transparent' ? 'text-white' : 'text-brand-text-main')} />
-        <span className={cn("text-xs", activeTheme === 'transparent' ? 'text-white' : 'text-brand-text-main')}>Loading...</span>
+      <div className={cn(
+        "flex items-center space-x-1.5 opacity-50 min-w-[120px]",
+        activeTheme === 'transparent' ? 'text-white' : 'text-brand-text-main'
+      )}>
+        <span className="text-xl">🌐</span>
+        <span className="text-sm font-anaheim font-medium">Loading...</span>
+        <ChevronDown className="w-4 h-4" />
       </div>
     )
   }
@@ -129,11 +133,11 @@ export default function LocaleSwitcher({ activeTheme }: LocaleSwitcherProps) {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* 触发按钮 - 无背景无边框 */}
+      {/* 触发按钮 - 无背景无边框，固定最小宽度避免 CLS */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-            "flex items-center space-x-1.5 group transition-opacity hover:opacity-80",
+            "flex items-center space-x-1.5 group transition-opacity hover:opacity-80 min-w-[120px]",
             buttonTextColor
         )}
         aria-label="Select country and language"

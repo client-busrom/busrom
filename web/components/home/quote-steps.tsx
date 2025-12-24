@@ -300,7 +300,7 @@ export default function QuoteSteps({ data }: Props) {
                   <OptimizedImage
                     image={step.image}
                     alt={step.image?.altText || step.text}
-                    size="medium"
+                    size="small"
                     className="object-cover absolute inset-0 w-full h-full"
                   />
                 </div>
@@ -400,7 +400,7 @@ export default function QuoteSteps({ data }: Props) {
                   <OptimizedImage
                     image={step.image}
                     alt={step.image?.altText || step.text}
-                    size="medium"
+                    size="small"
                     className="object-cover w-full h-full"
                   />
                 </div>

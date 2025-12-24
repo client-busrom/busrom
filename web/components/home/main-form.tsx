@@ -343,7 +343,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
                   right: "3.6%",
                 }}
               >
-                <OptimizedImage image={data.image1} alt={data.image1?.altText || data.designTextLeft} size="large" className="object-cover w-full h-full absolute inset-0" />
+                <OptimizedImage image={data.image1} alt={data.image1?.altText || data.designTextLeft} size="small" className="object-cover w-full h-full absolute inset-0" />
               </div>
 
               {/* 2. 顶层手机框 (z-20) */}
@@ -541,7 +541,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
                   right: "3.6%",
                 }}
               >
-                <OptimizedImage image={data.image2} alt={data.image2?.altText || data.designTextRight} size="large" className="object-cover w-full h-full absolute inset-0" />
+                <OptimizedImage image={data.image2} alt={data.image2?.altText || data.designTextRight} size="small" className="object-cover w-full h-full absolute inset-0" />
               </div>
 
               {/* 2. 顶层手机框 (z-20) */}

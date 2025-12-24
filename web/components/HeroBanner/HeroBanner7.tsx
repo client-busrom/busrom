@@ -356,7 +356,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           <OptimizedImage
             image={data.images[0]}
             alt="Background"
-            size="large"
+            size="medium"
             className="w-full h-full object-cover"
             objectPosition={maskImagePosition}
             priority
@@ -391,7 +391,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           <OptimizedImage
             image={data.images[1]}
             alt="Top rotated image"
-            size="large"
+            size="thumbnail"
             className="absolute inset-0 w-full h-full object-cover -rotate-45"
             objectPosition={diamondTopPosition}
             priority
@@ -425,7 +425,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           <OptimizedImage
             image={data.images[2]}
             alt="Middle rotated image"
-            size="medium"
+            size="thumbnail"
             className="absolute inset-0 w-full h-full object-cover -rotate-45"
             objectPosition={diamondMiddlePosition}
             priority
@@ -459,7 +459,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           <OptimizedImage
             image={data.images[3]}
             alt="Bottom rotated image"
-            size="large"
+            size="thumbnail"
             className="absolute inset-0 w-full h-full object-cover -rotate-45"
             objectPosition={diamondBottomPosition}
             priority
@@ -614,7 +614,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               <OptimizedImage
                 image={data.images[0]}
                 alt="Background"
-                size="large"
+                size="thumbnail"
                 className="w-full h-full object-cover"
                 objectPosition={MOBILE_CONFIG.svg.imagePosition}
               />
@@ -642,7 +642,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               <OptimizedImage
                 image={data.images[1]}
                 alt="Top rotated image"
-                size="medium"
+                size="thumbnail"
                 className="absolute inset-0 w-full h-full object-cover -rotate-45"
                 objectPosition={diamondTopPosition}
                 priority
@@ -670,7 +670,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               <OptimizedImage
                 image={data.images[2]}
                 alt="Middle rotated image"
-                size="small"
+                size="thumbnail"
                 className="absolute inset-0 w-full h-full object-cover -rotate-45"
                 objectPosition={diamondMiddlePosition}
                 priority
@@ -698,7 +698,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               <OptimizedImage
                 image={data.images[3]}
                 alt="Bottom rotated image"
-                size="medium"
+                size="thumbnail"
                 className="absolute inset-0 w-full h-full object-cover -rotate-45"
                 objectPosition={diamondBottomPosition}
                 priority

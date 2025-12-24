@@ -94,7 +94,7 @@ export default function BrandValue({ data }: Props) {
                 <OptimizedImage
                   image={item.image}
                   alt={item.image?.altText || item.title || item.description}
-                  size="medium"
+                  size="small"
                   className="object-cover z-0 transition-transform duration-500 group-hover:scale-105 absolute inset-0 w-full h-full"
                 />
                 {/* 渐变遮罩 */}
@@ -132,7 +132,7 @@ export default function BrandValue({ data }: Props) {
               <OptimizedImage
                 image={item.image}
                 alt={item.image?.altText || item.title || item.description}
-                size="large"
+                size="small"
                 className="object-cover object-center z-0 absolute inset-0 w-full h-full"
               />
               {/* 渐变遮罩 */}
