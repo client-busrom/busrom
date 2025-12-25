@@ -586,6 +586,32 @@ export default buildConfig({
     // Skip initialization if database tables don't exist yet
     // This happens on first deployment when push:true hasn't run yet
     try {
+      // Step 0: Fix sphere_3d table if it has incorrect structure
+      // This is a one-time fix for tables created manually with wrong schema
+      try {
+        const db = payload.db as any
+        if (db?.drizzle) {
+          const result = await db.drizzle.execute(`
+            SELECT column_name FROM information_schema.columns
+            WHERE table_name = 'sphere_3d' AND column_name = 'description'
+          `)
+
+          // If sphere_3d exists but doesn't have description column, drop and let Payload recreate
+          const checkTable = await db.drizzle.execute(`
+            SELECT 1 FROM information_schema.tables WHERE table_name = 'sphere_3d'
+          `)
+
+          if (checkTable.rows?.length > 0 && (!result.rows || result.rows.length === 0)) {
+            payload.logger.info('🔧 Fixing sphere_3d table structure...')
+            await db.drizzle.execute(`DROP TABLE IF EXISTS sphere_3d_locales CASCADE`)
+            await db.drizzle.execute(`DROP TABLE IF EXISTS sphere_3d CASCADE`)
+            payload.logger.info('✅ sphere_3d tables dropped. Payload will recreate them.')
+          }
+        }
+      } catch (fixError: any) {
+        payload.logger.warn(`⚠️ sphere_3d fix check: ${fixError.message}`)
+      }
+
       // Step 1: Seed permissions and roles (idempotent - only creates if not exists)
       await seedPermissionsSystem(payload)
 
