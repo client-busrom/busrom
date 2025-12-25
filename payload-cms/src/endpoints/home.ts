@@ -194,11 +194,19 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         locale,
         depth: 2,
       }),
-      payload.findGlobal({
-        slug: 'sphere-3d',
-        locale,
-        depth: 2,
-      }),
+      // Sphere 3D - wrap in try-catch to handle missing table gracefully
+      (async () => {
+        try {
+          return await payload.findGlobal({
+            slug: 'sphere-3d',
+            locale,
+            depth: 2,
+          })
+        } catch (error) {
+          console.warn('sphere-3d table not found, returning null')
+          return null
+        }
+      })(),
       payload.findGlobal({
         slug: 'simple-cta',
         locale,
@@ -338,8 +346,8 @@ export const homeContentHandler: PayloadHandler = async (req) => {
       // Sphere 3D (only if published)
       sphere3d: sphere3d?.status === 'published' ? {
         status: sphere3d?.status,
-        title: sphere3d?.title,
-        description: sphere3d?.description,
+        title: sphere3d?.title || 'GLOBAL NETWORK',
+        description: sphere3d?.description || '',
       } : null,
 
       // Simple CTA (only if published)
