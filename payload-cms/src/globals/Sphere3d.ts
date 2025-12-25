@@ -67,7 +67,7 @@ export const Sphere3d: GlobalConfig = {
         },
       },
     },
-    // Description - 暂时不使用本地化，避免数据库迁移问题
+    // Description
     {
       name: 'description',
       type: 'text',
@@ -75,7 +75,7 @@ export const Sphere3d: GlobalConfig = {
         en: 'Description',
         zh: '描述',
       },
-      // localized: true, // 暂时禁用，等数据库迁移完成后再启用
+      localized: true,
       admin: {
         description: {
           en: 'e.g. Serving customers worldwide from Guangdong, China',
