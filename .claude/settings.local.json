@@ -63,7 +63,10 @@
       "Bash(identify:*)",
       "WebFetch(domain:www.busromhouse.com)",
       "Bash(for file in /Users/cerfbaleine/workspace/busrom-work/web/components/home/featured-products.tsx /Users/cerfbaleine/workspace/busrom-work/web/components/home/hero-banner.tsx /Users/cerfbaleine/workspace/busrom-work/web/components/home/quote-steps.tsx /Users/cerfbaleine/workspace/busrom-work/web/components/home/series-intro.tsx /Users/cerfbaleine/workspace/busrom-work/web/components/home/service-features.tsx /Users/cerfbaleine/workspace/busrom-work/web/components/home/why-choose-busrom.tsx)",
-      "Bash(PGPASSWORD=busrom_dev_password psql:*)"
+      "Bash(PGPASSWORD=busrom_dev_password psql:*)",
+      "Bash(PGPASSWORD=ADijIRcAHMHLHaZvH0eg psql:*)",
+      "Bash(/opt/Homebrew/opt/libpq/bin/psql:*)",
+      "Bash(/opt/Homebrew/Cellar/postgresql@16/16.11/bin/psql:*)"
     ],
     "deny": [],
     "ask": []
