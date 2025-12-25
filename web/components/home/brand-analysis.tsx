@@ -92,7 +92,7 @@ export default function BrandAnalysis({ data }: Props) {
     };
   }, [desktopApi]);
 
-  if (!data || !data.centers || !data.analysis) {
+  if (!data || !data.centers) {
     return null;
   }
 
@@ -224,38 +224,18 @@ export default function BrandAnalysis({ data }: Props) {
           </button>
         </div>
 
-        {/* Bus rom 底部 - 与桌面端一致的对称布局 */}
-        <div className="relative w-full px-4">
-          {/* Bus rom 行 - Bus右对齐 rom左对齐 中间对齐 */}
-          <div className="relative flex">
-            <span
-              className="font-anaheim font-extrabold text-white text-4xl text-right"
-              style={{ width: "50%", paddingRight: "10px" }}
-            >
-              {data.analysis.title}
-            </span>
-            <span
-              className="font-anaheim font-extrabold text-transparent text-4xl text-left"
-              style={{ width: "50%", paddingLeft: "10px", WebkitTextStroke: "1px #FFFFFF" }}
-            >
-              {data.analysis.title2}
-            </span>
-          </div>
-          {/* Buffer & Bridge / Room & Space 行 */}
-          <div className="relative flex mt-1">
-            <span
-              className="font-anaheim font-semibold text-transparent text-base text-right"
-              style={{ width: "50%", paddingRight: "10px", WebkitTextStroke: "1px #FFFFFF" }}
-            >
-              {data.analysis.text}
-            </span>
-            <span
-              className="font-anaheim font-semibold text-white text-base text-left"
-              style={{ width: "50%", paddingLeft: "10px" }}
-            >
-              {data.analysis.text2}
-            </span>
-          </div>
+        {/* Bus rom 底部 - 使用 SVG 图片，左右分开 */}
+        <div className="relative w-full px-4 flex justify-center gap-4">
+          <img
+            src="/CenterLabel1.svg"
+            alt="Bus - Buffer & Bridge"
+            className="h-auto w-[42%] max-w-[180px]"
+          />
+          <img
+            src="/CenterLabel2.svg"
+            alt="rom - Room & Space"
+            className="h-auto w-[42%] max-w-[180px]"
+          />
         </div>
       </div>
 
@@ -417,75 +397,30 @@ export default function BrandAnalysis({ data }: Props) {
           </div>
         </div>
 
-        {/* Bottom 区域容器 - Bus rom 文字 */}
-        {/* 设计稿: x:384, y:985 (相对于 BrandAnalysis y:16524，bottom y:17509，所以相对 y = 17509-16524 = 985) */}
+        {/* Bottom 区域容器 - Bus rom SVG 图片，左右分开 */}
+        {/* 设计稿: x:384, y:985, 1153x236 */}
         <div
-          className="absolute"
+          className="absolute flex justify-center"
           style={{
             left: `${(384 / DESIGN_WIDTH) * 100}%`,
             top: `${(985 / 1449) * 100}%`,
             width: `${(BOTTOM_WIDTH / DESIGN_WIDTH) * 100}%`,
             aspectRatio: `${BOTTOM_WIDTH} / ${BOTTOM_HEIGHT}`,
+            gap: `${(120 / DESIGN_WIDTH) * 100}vw`,
           }}
         >
-          {/* Bus - x:250, y:3, 128px ExtraBold 白色填充 右对齐 */}
-          <span
-            className="absolute font-anaheim font-extrabold text-white"
-            style={{
-              left: `${(250 / BOTTOM_WIDTH) * 100}%`,
-              top: `${(3 / BOTTOM_HEIGHT) * 100}%`,
-              fontSize: `${(128 / DESIGN_WIDTH) * 100}vw`,
-              lineHeight: `${47 / 128}`,
-              textAlign: "right",
-              transform: "translateX(-100%)",
-              marginLeft: `${(293 / BOTTOM_WIDTH) * 100}%`,
-            }}
-          >
-            {data.analysis.title}
-          </span>
-
-          {/* rom - x:663, y:0, 128px ExtraBold 白色描边 左对齐 */}
-          <span
-            className="absolute font-anaheim font-extrabold text-transparent"
-            style={{
-              left: `${(663 / BOTTOM_WIDTH) * 100}%`,
-              top: `${(0 / BOTTOM_HEIGHT) * 100}%`,
-              fontSize: `${(128 / DESIGN_WIDTH) * 100}vw`,
-              lineHeight: `${47 / 128}`,
-              WebkitTextStroke: "1px #FFFFFF",
-            }}
-          >
-            {data.analysis.title2}
-          </span>
-
-          {/* Buffer & Bridge - x:0, y:186, 64px SemiBold 白色描边 右对齐 */}
-          <span
-            className="absolute font-anaheim font-semibold text-transparent"
-            style={{
-              left: "0%",
-              top: `${(186 / BOTTOM_HEIGHT) * 100}%`,
-              width: `${(543 / BOTTOM_WIDTH) * 100}%`,
-              fontSize: `${(64 / DESIGN_WIDTH) * 100}vw`,
-              lineHeight: `${47 / 64}`,
-              textAlign: "right",
-              WebkitTextStroke: "1px #FFFFFF",
-            }}
-          >
-            {data.analysis.text}
-          </span>
-
-          {/* Room & Space - x:663, y:189, 64px SemiBold 白色填充 左对齐 */}
-          <span
-            className="absolute font-anaheim font-semibold text-white"
-            style={{
-              left: `${(663 / BOTTOM_WIDTH) * 100}%`,
-              top: `${(189 / BOTTOM_HEIGHT) * 100}%`,
-              fontSize: `${(64 / DESIGN_WIDTH) * 100}vw`,
-              lineHeight: `${47 / 64}`,
-            }}
-          >
-            {data.analysis.text2}
-          </span>
+          {/* CenterLabel1: Bus + Buffer & Bridge (左侧) */}
+          <img
+            src="/CenterLabel1.svg"
+            alt="Bus - Buffer & Bridge"
+            className="h-full w-auto object-contain"
+          />
+          {/* CenterLabel2: rom + Room & Space (右侧) */}
+          <img
+            src="/CenterLabel2.svg"
+            alt="rom - Room & Space"
+            className="h-full w-auto object-contain"
+          />
         </div>
       </div>
     </section>

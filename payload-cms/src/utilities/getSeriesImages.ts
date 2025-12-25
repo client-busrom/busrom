@@ -70,11 +70,9 @@ export async function getSeriesImages(
       const where: any = {}
       const andConditions: any[] = []
 
-      // Category/Tag filters (OR logic)
-      const orConditions: any[] = []
-
+      // Category/Tag filters (AND logic - must match both if both specified)
       if (config.categories && config.categories.length > 0) {
-        orConditions.push({
+        andConditions.push({
           primaryCategory: {
             in: config.categories,
           },
@@ -82,16 +80,10 @@ export async function getSeriesImages(
       }
 
       if (config.tags && config.tags.length > 0) {
-        orConditions.push({
+        andConditions.push({
           tags: {
             in: config.tags,
           },
-        })
-      }
-
-      if (orConditions.length > 0) {
-        andConditions.push({
-          or: orConditions,
         })
       }
 

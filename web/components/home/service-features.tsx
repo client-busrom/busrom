@@ -17,6 +17,7 @@ export default function ServiceFeatures({ data }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [progress, setProgress] = useState(0); // 进度 0-100
   const [isVisible, setIsVisible] = useState(false); // 是否在视口内
+  const [isHovering, setIsHovering] = useState(false); // 鼠标悬停暂停
   const sectionRef = useRef<HTMLElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const progressRef = useRef<NodeJS.Timeout | null>(null);
@@ -85,15 +86,15 @@ export default function ServiceFeatures({ data }: Props) {
       stopProgress();
     };
 
-    // 只在可见时启动轮播
-    if (isVisible) {
+    // 只在可见且不悬停时启动轮播
+    if (isVisible && !isHovering) {
       startInterval();
     } else {
       stopInterval();
     }
 
     return () => stopInterval();
-  }, [featuresLength, isVisible]);
+  }, [featuresLength, isVisible, isHovering]);
 
   // --- 处理点击导航点 ---
   const handleDotClick = (index: number) => {
@@ -118,7 +119,13 @@ export default function ServiceFeatures({ data }: Props) {
   const activeFeature = features[activeIndex];
 
   return (
-    <section ref={sectionRef} className="py-16 lg:py-24 bg-brand-main" data-header-theme="light">
+    <section
+      ref={sectionRef}
+      className="py-16 lg:py-24 bg-brand-main"
+      data-header-theme="light"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
       <div className="container mx-auto px-4">
         {/* 主容器：米色圆角背景 */}
         <div

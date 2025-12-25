@@ -13,8 +13,8 @@ import type { JSX } from 'react'
 import { NoticeBox } from './NoticeBox'
 import { ContactFormBlock } from '../ContactFormBlock'
 import Image from 'next/image'
-import * as LucideIcons from 'lucide-react'
 import Link from 'next/link'
+import { getIcon } from '@/lib/icon-map'
 
 // Temporary type definition to replace DocumentRendererProps
 type DocumentRendererProps = {
@@ -30,8 +30,7 @@ type DocumentRendererProps = {
  * Helper function to get Lucide icon component
  */
 function getLucideIcon(iconName: string) {
-  const Icon = (LucideIcons as any)[iconName]
-  return Icon || LucideIcons.HelpCircle
+  return getIcon(iconName)
 }
 
 /**

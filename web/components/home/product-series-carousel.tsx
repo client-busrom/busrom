@@ -276,53 +276,44 @@ export default function ProductSeriesCarousel({ data }: Props) {
       )}
 
       {/* ==================== 移动端布局 ==================== */}
-      <div className="lg:hidden h-full flex flex-col justify-center px-4 py-8">
-        <div className="relative flex-1 flex items-center justify-center">
-          {/* 左侧 */}
-          <div className="w-[45%] aspect-square left-[5%] absolute">
-            <Link href={visibleItems[1]?.item?.href || "#"} className="block w-full h-full">
-              <OptimizedImage
-                image={visibleItems[1]?.item?.image}
+      <div className="lg:hidden absolute inset-0 flex flex-col py-4">
+        {/* 图片区域 - 占据大部分空间 */}
+        <div className="flex-1 flex items-center justify-center gap-2 px-2">
+          {/* 左侧图片 + 标题 */}
+          <div className="flex flex-col items-center w-[45%]">
+            <Link href={visibleItems[1]?.item?.href || "#"} className="block w-full">
+              <img
+                src={visibleItems[1]?.item?.image?.url || visibleItems[1]?.item?.image?.variants?.small || ''}
                 alt={visibleItems[1]?.item?.image?.altText || visibleItems[1]?.item?.name || ""}
-                size="small"
-                width={800}
-                height={800}
-                className="object-cover w-full h-full"
-                priority
+                className="w-full h-auto"
               />
             </Link>
+            <span className="font-anaheim font-extrabold text-white text-xs mt-2 text-center">
+              {visibleItems[1]?.item?.name}
+            </span>
           </div>
-          {/* 右侧 */}
-          <div className="w-[45%] aspect-square right-[5%] absolute">
-            <Link href={visibleItems[2]?.item?.href || "#"} className="block w-full h-full">
-              <OptimizedImage
-                image={visibleItems[2]?.item?.image}
+          {/* 右侧图片 + 标题 */}
+          <div className="flex flex-col items-center w-[45%]">
+            <Link href={visibleItems[2]?.item?.href || "#"} className="block w-full">
+              <img
+                src={visibleItems[2]?.item?.image?.url || visibleItems[2]?.item?.image?.variants?.small || ''}
                 alt={visibleItems[2]?.item?.image?.altText || visibleItems[2]?.item?.name || ""}
-                size="small"
-                width={800}
-                height={800}
-                className="object-cover w-full h-full"
-                priority
+                className="w-full h-auto"
               />
             </Link>
+            <span className="font-anaheim font-extrabold text-white text-xs mt-2 text-center">
+              {visibleItems[2]?.item?.name}
+            </span>
           </div>
         </div>
 
-        <div className="flex justify-between px-4 mt-4">
-          <span className="font-anaheim font-extrabold text-white text-lg">
-            {visibleItems[1]?.item?.name}
-          </span>
-          <span className="font-anaheim font-extrabold text-white text-lg">
-            {visibleItems[2]?.item?.name}
-          </span>
-        </div>
-
-        <div className="flex justify-between px-4 mt-4">
+        {/* 按钮 */}
+        <div className="flex justify-between px-6 pb-2">
           <button onClick={() => paginate(-1)} aria-label="Previous">
-            <img src="/btnLeft2.svg" alt="Previous" className="w-12 h-12" />
+            <img src="/btnLeft2.svg" alt="Previous" className="w-10 h-10" />
           </button>
           <button onClick={() => paginate(1)} aria-label="Next">
-            <img src="/btnRight2.svg" alt="Next" className="w-12 h-12" />
+            <img src="/btnRight2.svg" alt="Next" className="w-10 h-10" />
           </button>
         </div>
       </div>

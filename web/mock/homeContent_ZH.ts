@@ -207,7 +207,7 @@ interface BrandCenter {
 }
 
 interface BrandAnalysisData {
-  analysis: BrandAnalysisInfo;
+  status?: string;
   centers: BrandCenter[];
 }
 
@@ -1101,12 +1101,6 @@ export const homeContent_ZH: HomeContentData = {
 
   // 模块 14: 品牌分析
   brandAnalysis: {
-    analysis: {
-      title: 'Bus',
-      title2: 'rom',
-      text: '缓冲 (Buffer) & 桥梁 (Bridge)',
-      text2: '房间 (Room) & 空间 (Space)',
-    },
     centers: [
       {
         title: '品牌中心',

@@ -122,6 +122,14 @@ export interface SimpleCtaData {
 }
 
 /**
+ * Module 4: Sphere 3D Globe
+ */
+export interface Sphere3dData {
+  title: string
+  description: string
+}
+
+/**
  * Module 6: Series Introduction
  */
 export interface SeriesIntroItem {
@@ -236,14 +244,23 @@ export interface WhyChooseBusromData {
 /**
  * Module 13: Case Studies
  */
-export interface CaseStudyItem {
-  series: string
-  slug: string
-  image: ImageObject
+export interface SceneGalleryItem {
+  sceneName: string
+  images: ImageObject[]
 }
 
 export interface CaseStudyApplication {
-  items: CaseStudyItem[]
+  id: number
+  slug: string
+  name: string
+  shortDescription: string
+  description: string
+  category: {
+    id: number
+    name: string
+    slug: string
+  } | null
+  sceneGallery: SceneGalleryItem[]
 }
 
 export interface CaseStudiesData {
@@ -255,13 +272,6 @@ export interface CaseStudiesData {
 /**
  * Module 14: Brand Analysis
  */
-export interface BrandAnalysisInfo {
-  title: string
-  title2: string
-  text: string
-  text2: string
-}
-
 export interface BrandCenter {
   title: string
   description: string
@@ -270,7 +280,7 @@ export interface BrandCenter {
 }
 
 export interface BrandAnalysisData {
-  analysis: BrandAnalysisInfo
+  status?: string
   centers: BrandCenter[]
 }
 
@@ -354,7 +364,7 @@ export interface HomeContent {
   heroBanner: HeroBannerItem[]
   productSeriesCarousel: ProductSeriesItem[]
   serviceFeatures: ServiceFeaturesData
-  sphere3d: Record<string, never>
+  sphere3d: Sphere3dData | null
   simpleCta: SimpleCtaData
   seriesIntro: SeriesIntroItem[]
   featuredProducts: FeaturedProductsData

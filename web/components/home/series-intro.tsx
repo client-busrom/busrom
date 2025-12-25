@@ -26,6 +26,7 @@ export default function SeriesIntro({ data }: Props) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   // 视口检测
   const [isVisible, setIsVisible] = useState(false);
+  const [isHovering, setIsHovering] = useState(false); // 鼠标悬停暂停
   const sectionRef = useRef<HTMLElement>(null);
 
   // 视口检测 - 不在视口时暂停轮播省电
@@ -106,25 +107,25 @@ export default function SeriesIntro({ data }: Props) {
     }
   }, [totalImages, activeImageIndex]);
 
-  // --- 系列自动轮播 (仅在视口内运行) ---
+  // --- 系列自动轮播 (仅在视口内且不悬停时运行) ---
   useEffect(() => {
-    if (isDragging || !isVisible) return;
+    if (isDragging || !isVisible || isHovering) return;
 
     seriesIntervalRef.current = setInterval(handleSeriesNext, SERIES_AUTO_SCROLL_INTERVAL);
     return () => {
       if (seriesIntervalRef.current) clearInterval(seriesIntervalRef.current);
     };
-  }, [handleSeriesNext, isDragging, isVisible]);
+  }, [handleSeriesNext, isDragging, isVisible, isHovering]);
 
-  // --- 图片自动轮播 (仅在视口内运行) ---
+  // --- 图片自动轮播 (仅在视口内且不悬停时运行) ---
   useEffect(() => {
-    if (totalImages <= 1 || isDragging || !isVisible) return;
+    if (totalImages <= 1 || isDragging || !isVisible || isHovering) return;
 
     imageIntervalRef.current = setInterval(handleImageNext, IMAGE_AUTO_SCROLL_INTERVAL);
     return () => {
       if (imageIntervalRef.current) clearInterval(imageIntervalRef.current);
     };
-  }, [handleImageNext, totalImages, isDragging, isVisible]);
+  }, [handleImageNext, totalImages, isDragging, isVisible, isHovering]);
 
   // --- 拖拽/滑动处理 ---
   const handleDragStart = (clientX: number) => {
@@ -228,7 +229,13 @@ export default function SeriesIntro({ data }: Props) {
   }
 
   return (
-    <section ref={sectionRef} className="py-6 lg:py-8 bg-brand-main" data-header-theme="transparent">
+    <section
+      ref={sectionRef}
+      className="py-6 lg:py-8 bg-brand-main"
+      data-header-theme="transparent"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
       <div className="container mx-auto px-4 lg:px-8">
         <div className="bg-brand-secondary rounded-2xl lg:rounded-3xl p-6 lg:p-10 overflow-hidden">
 
@@ -319,7 +326,7 @@ export default function SeriesIntro({ data }: Props) {
               {/* 右侧: 图片轮播 (循环) */}
               <div
                 ref={carouselRef}
-                className="flex-1 overflow-hidden rounded-2xl cursor-grab active:cursor-grabbing select-none aspect-[16/9]"
+                className="flex-1 overflow-hidden rounded-2xl cursor-grab active:cursor-grabbing select-none aspect-[21/9]"
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
@@ -345,7 +352,7 @@ export default function SeriesIntro({ data }: Props) {
                   {[...currentImages, ...currentImages.slice(0, Math.min(2, totalImages))].map((imageObj, idx) => (
                     <div
                       key={`${activeSeries?.title}-img-${idx}`}
-                      className="flex-shrink-0 w-[75%] aspect-[3/2] relative rounded-2xl overflow-hidden"
+                      className="flex-shrink-0 w-[75%] aspect-[2/1] relative rounded-2xl overflow-hidden"
                     >
                       <OptimizedImage
                         image={imageObj}
@@ -397,7 +404,7 @@ export default function SeriesIntro({ data }: Props) {
                 {currentImages.map((imageObj, idx) => (
                   <div
                     key={`${activeSeries?.title}-mobile-img-${idx}`}
-                    className="flex-shrink-0 w-[85%] aspect-[4/3] relative rounded-xl overflow-hidden"
+                    className="flex-shrink-0 w-[85%] aspect-[16/9] relative rounded-xl overflow-hidden"
                   >
                     <OptimizedImage
                       image={imageObj}

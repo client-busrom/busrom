@@ -405,7 +405,7 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
           style={{
             fontSize: rpx(48),
             lineHeight: 1.2,
-            marginTop: rpx(210),
+            marginTop: rpx(20),
             textShadow: '0 0 10px rgba(117, 112, 63, 0.5)',
             WebkitTextStroke: `${rpx(2)} #75703F`,
           }}

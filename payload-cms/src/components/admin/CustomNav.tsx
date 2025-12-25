@@ -117,7 +117,8 @@ const SubGroupHeader: React.FC<{
   labelKey: string
   isOpen: boolean
   onClick: () => void
-}> = ({ labelKey, isOpen, onClick }) => {
+  hasChildren?: boolean
+}> = ({ labelKey, isOpen, onClick, hasChildren = true }) => {
   const { t } = useTranslation()
   const label = t(`custom:nav:${labelKey}` as any)
 
@@ -149,16 +150,59 @@ const SubGroupHeader: React.FC<{
       }}
     >
       <span>{label}</span>
-      <span
-        style={{
-          transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-          transition: 'transform 0.2s',
-          fontSize: '10px',
-        }}
-      >
-        ▸
-      </span>
+      {hasChildren && (
+        <span
+          style={{
+            transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+            transition: 'transform 0.2s',
+            fontSize: '10px',
+          }}
+        >
+          ▸
+        </span>
+      )}
     </button>
+  )
+}
+
+// Sub-group link item (styled like SubGroupHeader but as a direct link)
+const SubGroupLinkItem: React.FC<{ href: string; labelKey: string }> = ({ href, labelKey }) => {
+  const pathname = usePathname()
+  const { t } = useTranslation()
+  const label = t(`custom:nav:${labelKey}` as any)
+  const isActive = pathname === href || pathname?.startsWith(href + '/')
+
+  return (
+    <Link
+      href={href}
+      style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '8px 16px 8px 24px',
+        textDecoration: 'none',
+        fontSize: '13px',
+        fontWeight: isActive ? 600 : 500,
+        color: isActive ? 'var(--theme-elevation-800)' : 'var(--theme-elevation-600)',
+        margin: '2px 8px',
+        borderRadius: '4px',
+        backgroundColor: isActive ? 'var(--theme-elevation-100)' : 'transparent',
+        transition: 'background-color 0.15s',
+      }}
+      onMouseEnter={(e) => {
+        if (!isActive) {
+          e.currentTarget.style.backgroundColor = 'var(--theme-elevation-50)'
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!isActive) {
+          e.currentTarget.style.backgroundColor = 'transparent'
+        }
+      }}
+    >
+      <span>{label}</span>
+    </Link>
   )
 }
 
@@ -245,8 +289,8 @@ export const CustomNav: React.FC = () => {
             <NavItem href="/admin/globals/brand-analysis" labelKey="brandAnalysis" />
             <NavItem href="/admin/globals/brand-value" labelKey="brandValue" />
           </NestedSubGroup>
-          {/* 其他子页 */}
-          <NavItem href="/admin/collections/pages" labelKey="subpages" />
+          {/* 其他子页 - 使用与首页内容相同的样式 */}
+          <SubGroupLinkItem href="/admin/collections/pages" labelKey="subpages" />
         </CollapsibleGroup>
 
         {/* Media Library */}

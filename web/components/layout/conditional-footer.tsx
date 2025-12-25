@@ -15,6 +15,11 @@ export default function ConditionalFooter({ locale }: Props) {
   // 首页的路径格式: /en, /zh, /es, /fr, /de
   const isHomePage = pathname === `/${locale}` || pathname === "/";
 
-  // 首页显示表单版Footer，其他页面显示四列布局版Footer
-  return <Footer locale={locale} showForm={isHomePage} />;
+  // 首页不显示 Footer（首页有自己的 Footer 在 HomePageClient 中）
+  if (isHomePage) {
+    return null;
+  }
+
+  // 其他页面显示四列布局版Footer
+  return <Footer locale={locale} showForm={false} />;
 }

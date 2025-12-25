@@ -338,6 +338,8 @@ export const homeContentHandler: PayloadHandler = async (req) => {
       // Sphere 3D (only if published)
       sphere3d: sphere3d?.status === 'published' ? {
         status: sphere3d?.status,
+        title: sphere3d?.title,
+        description: sphere3d?.description,
       } : null,
 
       // Simple CTA (only if published)
@@ -364,14 +366,59 @@ export const homeContentHandler: PayloadHandler = async (req) => {
       })),
 
       // Featured Products (only if published)
-      featuredProducts: featuredProducts?.status === 'published' ? {
-        status: featuredProducts?.status,
-        title: featuredProducts?.title,
-        description: featuredProducts?.description,
-        viewAllButtonText: featuredProducts?.viewAllButtonText,
-        viewAllButtonUrl: featuredProducts?.viewAllButtonUrl,
-        categories: featuredProducts?.categories || [],
-      } : null,
+      // Fetch products for each selected series
+      featuredProducts: await (async () => {
+        if (featuredProducts?.status !== 'published') return null
+
+        const categories = featuredProducts?.categories || []
+        if (!Array.isArray(categories) || categories.length === 0) return null
+
+        // For each series, fetch up to 3 products
+        const seriesWithProducts = await Promise.all(
+          categories.map(async (seriesItem: any) => {
+            const seriesId = typeof seriesItem === 'object' ? seriesItem.id : seriesItem
+            const seriesData = typeof seriesItem === 'object' ? seriesItem : null
+
+            // Fetch products for this series
+            const productsResult = await payload.find({
+              collection: 'products',
+              locale,
+              depth: 2,
+              where: {
+                series: { equals: seriesId },
+                status: { equals: 'published' },
+              },
+              limit: 3,
+              sort: 'order',
+            })
+
+            return {
+              seriesId,
+              seriesTitle: seriesData?.name || seriesData?.localizedName || `Series ${seriesId}`,
+              seriesSlug: seriesData?.slug || '',
+              products: productsResult.docs.map((product: any) => ({
+                id: product.id,
+                slug: product.slug,
+                title: product.name || product.localizedName || '',
+                image: getMediaWithVariants(product.showImage),
+                features: (product.attributes || [])
+                  .filter((attr: any) => attr.isShow)
+                  .slice(0, 3)
+                  .map((attr: any) => `${attr.key}: ${attr.value}`),
+              })),
+            }
+          })
+        )
+
+        return {
+          status: featuredProducts?.status,
+          title: featuredProducts?.title,
+          description: featuredProducts?.description,
+          viewAllButtonText: featuredProducts?.viewAllButtonText,
+          viewAllButtonUrl: featuredProducts?.viewAllButtonUrl,
+          series: seriesWithProducts.filter(s => s.products.length > 0),
+        }
+      })(),
 
       // Brand Advantages (only if published)
       brandAdvantages: brandAdvantages?.status === 'published' ? {
@@ -442,22 +489,47 @@ export const homeContentHandler: PayloadHandler = async (req) => {
       } : null,
 
       // Case Studies (only if published)
-      caseStudies: caseStudies?.status === 'published' ? {
-        status: caseStudies?.status,
-        title: caseStudies?.title,
-        description: caseStudies?.description,
-        categories: caseStudies?.categories || [],
-      } : null,
+      // Fetch applications for case studies
+      caseStudies: caseStudies?.status === 'published' ? await (async () => {
+        // Get all published applications with their scene galleries
+        const applicationsResult = await payload.find({
+          collection: 'applications',
+          locale,
+          depth: 2,
+          where: {
+            status: { equals: 'published' },
+          },
+          limit: 100,
+        })
+
+        const applications = applicationsResult.docs.map((app: any) => ({
+          id: app.id,
+          slug: app.slug,
+          name: app.name,
+          shortDescription: app.shortDescription,
+          description: app.description,
+          category: app.category ? {
+            id: app.category.id,
+            name: app.category.name,
+            slug: app.category.slug,
+          } : null,
+          sceneGallery: (app.sceneGallery || []).map((scene: any) => ({
+            sceneName: scene.sceneName,
+            images: (scene.images || []).map((img: any) => getMediaWithVariants(img)),
+          })),
+        }))
+
+        return {
+          status: caseStudies?.status,
+          title: caseStudies?.title,
+          description: caseStudies?.description,
+          applications,
+        }
+      })() : null,
 
       // Brand Analysis (only if published)
       brandAnalysis: brandAnalysis?.status === 'published' ? {
         status: brandAnalysis?.status,
-        brandNameAnalysis: {
-          titlePart1: brandAnalysis?.brandNameAnalysis?.titlePart1,
-          titlePart2: brandAnalysis?.brandNameAnalysis?.titlePart2,
-          textPart1: brandAnalysis?.brandNameAnalysis?.textPart1,
-          textPart2: brandAnalysis?.brandNameAnalysis?.textPart2,
-        },
         centers: [
           {
             title: brandAnalysis?.brandCenter?.title,
