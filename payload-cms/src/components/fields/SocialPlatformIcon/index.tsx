@@ -1,8 +1,13 @@
 'use client'
 
 import React from 'react'
-import { useField } from '@payloadcms/ui'
+import { useField, useTranslation } from '@payloadcms/ui'
 import './styles.scss'
+
+// i18n translations
+const i18n = {
+  selectPlatform: { en: 'Select a platform', zh: '选择平台' },
+}
 
 // SVG Icons for each platform
 const PLATFORM_ICONS: Record<string, React.ReactNode> = {
@@ -114,12 +119,14 @@ interface SocialPlatformIconProps {
 
 export const SocialPlatformIcon: React.FC<SocialPlatformIconProps> = ({ path }) => {
   const { value } = useField<string>({ path })
+  const { i18n: { language } } = useTranslation()
+  const t = (obj: { en: string; zh: string }) => language === 'zh' ? obj.zh : obj.en
 
   if (!value) {
     return (
       <div className="social-platform-icon social-platform-icon--empty">
         <div className="social-platform-icon__placeholder">
-          Select a platform
+          {t(i18n.selectPlatform)}
         </div>
       </div>
     )

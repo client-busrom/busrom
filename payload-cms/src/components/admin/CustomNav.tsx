@@ -112,6 +112,85 @@ const CollapsibleGroup: React.FC<{
   )
 }
 
+// Sub-group header component (for nested groups - 3rd level)
+const SubGroupHeader: React.FC<{
+  labelKey: string
+  isOpen: boolean
+  onClick: () => void
+}> = ({ labelKey, isOpen, onClick }) => {
+  const { t } = useTranslation()
+  const label = t(`custom:nav:${labelKey}` as any)
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '8px 16px 8px 24px',
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        fontSize: '13px',
+        fontWeight: 500,
+        color: 'var(--theme-elevation-600)',
+        margin: '2px 8px',
+        borderRadius: '4px',
+        transition: 'background-color 0.15s',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = 'var(--theme-elevation-50)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'transparent'
+      }}
+    >
+      <span>{label}</span>
+      <span
+        style={{
+          transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+          transition: 'transform 0.2s',
+          fontSize: '10px',
+        }}
+      >
+        ▸
+      </span>
+    </button>
+  )
+}
+
+// Nested sub-group component (for 3rd level navigation)
+const NestedSubGroup: React.FC<{
+  labelKey: string
+  defaultOpen?: boolean
+  children: React.ReactNode
+}> = ({ labelKey, defaultOpen = false, children }) => {
+  const [isOpen, setIsOpen] = React.useState(defaultOpen)
+
+  return (
+    <div>
+      <SubGroupHeader
+        labelKey={labelKey}
+        isOpen={isOpen}
+        onClick={() => setIsOpen(!isOpen)}
+      />
+      <div
+        style={{
+          maxHeight: isOpen ? '2000px' : '0',
+          overflow: 'hidden',
+          transition: 'max-height 0.3s ease-in-out',
+          paddingLeft: '16px',
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  )
+}
+
 export const CustomNav: React.FC = () => {
   const { user } = useAuth()
   const isAdmin = (user as any)?.isAdmin === true
@@ -146,24 +225,28 @@ export const CustomNav: React.FC = () => {
           <NavItem href="/admin/navigation-manager" labelKey="navigationManager" />
         </CollapsibleGroup>
 
-        {/* Homepage Content - Ordered like frontend */}
-        <CollapsibleGroup labelKey="homepage" defaultOpen={false}>
-          <NavItem href="/admin/collections/hero-banner-items" labelKey="heroBanner" />
-          <NavItem href="/admin/globals/product-series-carousel" labelKey="productSeriesCarousel" />
-          <NavItem href="/admin/globals/service-features" labelKey="serviceFeatures" />
-          <NavItem href="/admin/globals/sphere-3d" labelKey="sphere3d" />
-          <NavItem href="/admin/globals/simple-cta" labelKey="simpleCta" />
-          <NavItem href="/admin/globals/series-intro" labelKey="seriesIntro" />
-          <NavItem href="/admin/globals/featured-products" labelKey="featuredProducts" />
-          <NavItem href="/admin/globals/brand-advantages" labelKey="brandAdvantages" />
-          <NavItem href="/admin/globals/oem-odm" labelKey="oemOdm" />
-          <NavItem href="/admin/globals/quote-steps" labelKey="quoteSteps" />
-          <NavItem href="/admin/globals/main-form" labelKey="mainForm" />
-          <NavItem href="/admin/globals/why-choose-busrom" labelKey="whyChooseBusrom" />
-          <NavItem href="/admin/globals/case-studies" labelKey="caseStudies" />
-          <NavItem href="/admin/globals/brand-analysis" labelKey="brandAnalysis" />
-          <NavItem href="/admin/globals/brand-value" labelKey="brandValue" />
-          <NavItem href="/admin/globals/footer" labelKey="footer" />
+        {/* 网站页面管理 - 包含首页内容和其他子页 */}
+        <CollapsibleGroup labelKey="websitePages">
+          {/* 首页内容 - 嵌套的三级菜单 */}
+          <NestedSubGroup labelKey="homepage">
+            <NavItem href="/admin/collections/hero-banner-items" labelKey="heroBanner" />
+            <NavItem href="/admin/collections/series-intro-items" labelKey="seriesIntro" />
+            <NavItem href="/admin/globals/product-series-carousel" labelKey="productSeriesCarousel" />
+            <NavItem href="/admin/globals/service-features" labelKey="serviceFeatures" />
+            <NavItem href="/admin/globals/sphere-3d" labelKey="sphere3d" />
+            <NavItem href="/admin/globals/simple-cta" labelKey="simpleCta" />
+            <NavItem href="/admin/globals/featured-products" labelKey="featuredProducts" />
+            <NavItem href="/admin/globals/brand-advantages" labelKey="brandAdvantages" />
+            <NavItem href="/admin/globals/oem-odm" labelKey="oemOdm" />
+            <NavItem href="/admin/globals/quote-steps" labelKey="quoteSteps" />
+            <NavItem href="/admin/globals/main-form" labelKey="mainForm" />
+            <NavItem href="/admin/globals/why-choose-busrom" labelKey="whyChooseBusrom" />
+            <NavItem href="/admin/globals/case-studies" labelKey="caseStudies" />
+            <NavItem href="/admin/globals/brand-analysis" labelKey="brandAnalysis" />
+            <NavItem href="/admin/globals/brand-value" labelKey="brandValue" />
+          </NestedSubGroup>
+          {/* 其他子页 */}
+          <NavItem href="/admin/collections/pages" labelKey="subpages" />
         </CollapsibleGroup>
 
         {/* Media Library */}
@@ -202,11 +285,17 @@ export const CustomNav: React.FC = () => {
           <NavItem href="/admin/collections/seo-settings" labelKey="seoSettings" />
         </CollapsibleGroup>
 
-        {/* Site Config */}
-        <CollapsibleGroup labelKey="siteConfig" defaultOpen={false}>
+        {/* Website Settings - 网站设置 */}
+        <CollapsibleGroup labelKey="websiteSettings" defaultOpen={false}>
+          <NavItem href="/admin/globals/home-content" labelKey="homeContent" />
+          <NavItem href="/admin/globals/footer" labelKey="footer" />
           <NavItem href="/admin/globals/site-config" labelKey="siteConfigItem" />
-          <NavItem href="/admin/globals/contact-config" labelKey="contactConfig" />
+          <NavItem href="/admin/globals/preloader-config" labelKey="preloaderConfig" />
           <NavItem href="/admin/globals/social-config" labelKey="socialConfig" />
+        </CollapsibleGroup>
+
+        {/* CMS Settings - CMS 配置 */}
+        <CollapsibleGroup labelKey="cmsSettings" defaultOpen={false}>
           <NavItem href="/admin/globals/email-config" labelKey="emailConfig" />
           <NavItem href="/admin/globals/translation-config" labelKey="translationConfig" />
         </CollapsibleGroup>

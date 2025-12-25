@@ -26,18 +26,32 @@ export function ImageWall({
   const [allImagesReady, setAllImagesReady] = useState(false)
 
   // 当所有图片加载完成时标记为 ready
+  // 如果没有图片，直接标记为 ready
   useEffect(() => {
-    if (loadedCount >= images.length && images.length > 0) {
+    if (images.length === 0) {
+      setAllImagesReady(true)
+    } else if (loadedCount >= images.length) {
       setAllImagesReady(true)
     }
   }, [loadedCount, images.length])
 
-  // 处理图片加载完成
+  // 处理图片加载完成或失败
   const handleImageLoad = () => {
     setLoadedCount(prev => prev + 1)
   }
 
+  // 图片加载失败也计入已加载数量，避免卡住
+  const handleImageError = () => {
+    setLoadedCount(prev => prev + 1)
+  }
+
   useEffect(() => {
+    // 如果没有图片且 isActive，直接完成
+    if (isActive && images.length === 0) {
+      onComplete()
+      return
+    }
+
     // 只有在 isActive 为 true 且所有图片都已加载时才执行动画
     if (!isActive || !allImagesReady) return;
 
@@ -106,6 +120,7 @@ export function ImageWall({
               alt={`Gallery image ${index + 1}`}
               className="absolute inset-0 w-full h-full object-cover"
               onLoad={handleImageLoad}
+              onError={handleImageError}
             />
           </div>
         )

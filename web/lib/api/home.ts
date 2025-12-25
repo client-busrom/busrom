@@ -78,6 +78,14 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
     const rawCarouselItems = Array.isArray(carouselItemsData)
       ? carouselItemsData
       : (carouselItemsData?.[locale] || carouselItemsData?.en || [])
+
+    // Helper to fix legacy /product/ URLs to /products/
+    const fixProductUrl = (url: string | null | undefined): string => {
+      if (!url) return '#'
+      // Convert /product/xxx to /products/xxx
+      return url.replace(/^\/product\//, '/products/')
+    }
+
     const carouselItems = (Array.isArray(rawCarouselItems) ? rawCarouselItems : []).map((item: any, index: number) => ({
       key: item.linkUrl || `item-${index}`,
       order: index,
@@ -85,7 +93,7 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
       image: toImageObject(item.image, item.title),
       sceneImage: toImageObject(item.sceneImage, item.title),
       buttonText: item.buttonText || 'Learn More',
-      href: item.linkUrl || '#',
+      href: fixProductUrl(item.linkUrl),
     }))
 
     // Transform Brand Advantages from {advantages: [{text, icon}], image} to {advantages: string[], icons: string[], image}

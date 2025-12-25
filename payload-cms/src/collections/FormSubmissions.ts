@@ -33,7 +33,10 @@ export const FormSubmissions: CollectionConfig = {
       en: 'Forms',
       zh: '表单管理',
     },
-    description: 'View and manage form submissions',
+    description: {
+      en: 'View and manage form submissions',
+      zh: '查看和管理表单提交',
+    },
     pagination: {
       defaultLimit: 25,
     },
@@ -135,7 +138,10 @@ export const FormSubmissions: CollectionConfig = {
         zh: '表单配置',
       },
       admin: {
-        description: 'The form configuration this submission belongs to',
+        description: {
+          en: 'The form configuration this submission belongs to',
+          zh: '此提交所属的表单配置',
+        },
         readOnly: true,
       },
     },
@@ -148,7 +154,10 @@ export const FormSubmissions: CollectionConfig = {
       },
       admin: {
         readOnly: true,
-        description: 'Auto-populated from form config',
+        description: {
+          en: 'Auto-populated from form config',
+          zh: '从表单配置自动填充',
+        },
       },
     },
 
@@ -177,7 +186,10 @@ export const FormSubmissions: CollectionConfig = {
       },
       admin: {
         readOnly: true,
-        description: 'All submitted form field values',
+        description: {
+          en: 'All submitted form field values',
+          zh: '所有提交的表单字段值',
+        },
         condition: () => false, // Hide raw JSON field
       },
     },
@@ -204,7 +216,10 @@ export const FormSubmissions: CollectionConfig = {
       defaultValue: [],
       admin: {
         readOnly: true,
-        description: 'List of uploaded files',
+        description: {
+          en: 'List of uploaded files',
+          zh: '上传文件列表',
+        },
         condition: () => false, // Hide raw JSON field
       },
     },
@@ -218,7 +233,10 @@ export const FormSubmissions: CollectionConfig = {
       defaultValue: 0,
       admin: {
         readOnly: true,
-        description: 'Total size of all attachments in bytes',
+        description: {
+          en: 'Total size of all attachments in bytes',
+          zh: '所有附件的总大小（字节）',
+        },
       },
     },
 
@@ -283,7 +301,10 @@ export const FormSubmissions: CollectionConfig = {
           },
           admin: {
             readOnly: true,
-            description: 'Language at time of submission',
+            description: {
+              en: 'Language at time of submission',
+              zh: '提交时的语言',
+            },
           },
         },
         {
@@ -295,7 +316,10 @@ export const FormSubmissions: CollectionConfig = {
           },
           admin: {
             readOnly: true,
-            description: 'Page URL where form was submitted',
+            description: {
+              en: 'Page URL where form was submitted',
+              zh: '表单提交的页面URL',
+            },
           },
         },
         {
@@ -334,7 +358,10 @@ export const FormSubmissions: CollectionConfig = {
         zh: '管理员备注',
       },
       admin: {
-        description: 'Internal notes about this submission',
+        description: {
+          en: 'Internal notes about this submission',
+          zh: '关于此提交的内部备注',
+        },
       },
     },
 
@@ -352,7 +379,10 @@ export const FormSubmissions: CollectionConfig = {
       admin: {
         position: 'sidebar',
         readOnly: true,
-        description: 'Whether notification email has been sent',
+        description: {
+          en: 'Whether notification email has been sent',
+          zh: '是否已发送通知邮件',
+        },
       },
     },
 

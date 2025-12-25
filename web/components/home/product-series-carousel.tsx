@@ -268,6 +268,8 @@ export default function ProductSeriesCarousel({ data }: Props) {
             image={hoveredItem.sceneImage}
             alt={hoveredItem.sceneImage.altText || "Scene"}
             size="large"
+            width={1920}
+            height={1200}
             className="object-cover w-full h-full"
           />
         </motion.div>
@@ -283,6 +285,8 @@ export default function ProductSeriesCarousel({ data }: Props) {
                 image={visibleItems[1]?.item?.image}
                 alt={visibleItems[1]?.item?.image?.altText || visibleItems[1]?.item?.name || ""}
                 size="small"
+                width={800}
+                height={800}
                 className="object-cover w-full h-full"
                 priority
               />
@@ -295,6 +299,8 @@ export default function ProductSeriesCarousel({ data }: Props) {
                 image={visibleItems[2]?.item?.image}
                 alt={visibleItems[2]?.item?.image?.altText || visibleItems[2]?.item?.name || ""}
                 size="small"
+                width={800}
+                height={800}
                 className="object-cover w-full h-full"
                 priority
               />
@@ -388,6 +394,8 @@ export default function ProductSeriesCarousel({ data }: Props) {
                   image={item.image}
                   alt={item.image?.altText || item.name}
                   size="medium"
+                  width={800}
+                  height={800}
                   className="object-cover w-full h-full"
                   priority={isOnScreen}
                 />

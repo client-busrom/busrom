@@ -102,7 +102,10 @@ export const FeaturedProducts: GlobalConfig = {
         zh: '产品系列分类',
       },
       admin: {
-        description: 'Select and order product series. API will automatically return 3 random products per series.',
+        description: {
+          en: 'Select and order product series. API will automatically return 3 random products per series.',
+          zh: '选择并排序产品系列。API将自动为每个系列返回3个随机产品。',
+        },
       },
     },
   ],

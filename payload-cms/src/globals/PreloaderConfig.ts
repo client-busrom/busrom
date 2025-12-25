@@ -48,7 +48,10 @@ export const PreloaderConfig: GlobalConfig = {
                 zh: '启用加载动画',
               },
               admin: {
-                description: 'Turn off to skip loading animation | 关闭后跳过加载动画',
+                description: {
+                  en: 'Turn off to skip loading animation',
+                  zh: '关闭后跳过加载动画',
+                },
               },
             },
             {
@@ -60,7 +63,10 @@ export const PreloaderConfig: GlobalConfig = {
                 zh: '背景颜色',
               },
               admin: {
-                description: 'Hex color code (e.g., #EBE6D8) | 十六进制颜色代码',
+                description: {
+                  en: 'Hex color code (e.g., #EBE6D8)',
+                  zh: '十六进制颜色代码',
+                },
               },
             },
             {
@@ -72,7 +78,10 @@ export const PreloaderConfig: GlobalConfig = {
                 zh: '文字颜色',
               },
               admin: {
-                description: 'Color for loading text | 加载文字颜色',
+                description: {
+                  en: 'Color for loading text',
+                  zh: '加载文字颜色',
+                },
               },
             },
             {
@@ -84,7 +93,10 @@ export const PreloaderConfig: GlobalConfig = {
                 zh: '高亮颜色',
               },
               admin: {
-                description: 'Color for shine effect | 闪光效果颜色',
+                description: {
+                  en: 'Color for shine effect',
+                  zh: '闪光效果颜色',
+                },
               },
             },
           ],
@@ -108,7 +120,10 @@ export const PreloaderConfig: GlobalConfig = {
                 zh: '启用图片墙',
               },
               admin: {
-                description: 'Show image wall after loading animation | 加载动画后显示图片墙',
+                description: {
+                  en: 'Show image wall after loading animation',
+                  zh: '加载动画后显示图片墙',
+                },
               },
             },
             {
@@ -129,7 +144,10 @@ export const PreloaderConfig: GlobalConfig = {
                 },
               },
               admin: {
-                description: 'Add images for the image wall animation. Each image can have custom position and size. | 添加图片墙动画的图片，每张图片可以自定义位置和大小。',
+                description: {
+                  en: 'Add images for the image wall animation. Each image can have custom position and size.',
+                  zh: '添加图片墙动画的图片，每张图片可以自定义位置和大小。',
+                },
                 initCollapsed: false,
                 components: {
                   RowLabel: '@/components/fields/MediaArrayRowLabel',
@@ -146,7 +164,10 @@ export const PreloaderConfig: GlobalConfig = {
                     zh: '图片',
                   },
                   admin: {
-                    description: 'Select an image from media library | 从媒体库选择图片',
+                    description: {
+                      en: 'Select an image from media library',
+                      zh: '从媒体库选择图片',
+                    },
                   },
                 },
                 {
@@ -244,7 +265,10 @@ export const PreloaderConfig: GlobalConfig = {
                 zh: '加载进度时长（秒）',
               },
               admin: {
-                description: 'How long the 0-100% progress takes | 0-100%进度条持续时间',
+                description: {
+                  en: 'How long the 0-100% progress takes',
+                  zh: '0-100%进度条持续时间',
+                },
                 step: 0.5,
               },
             },
@@ -259,7 +283,10 @@ export const PreloaderConfig: GlobalConfig = {
                 zh: 'Logo动画时长（秒）',
               },
               admin: {
-                description: 'Duration of logo reveal animation | Logo展示动画时长',
+                description: {
+                  en: 'Duration of logo reveal animation',
+                  zh: 'Logo展示动画时长',
+                },
                 step: 0.5,
               },
             },
@@ -274,7 +301,10 @@ export const PreloaderConfig: GlobalConfig = {
                 zh: '图片墙动画时长（秒）',
               },
               admin: {
-                description: 'Duration for each image to appear | 每张图片出现的动画时长',
+                description: {
+                  en: 'Duration for each image to appear',
+                  zh: '每张图片出现的动画时长',
+                },
                 step: 0.1,
               },
             },
@@ -289,7 +319,10 @@ export const PreloaderConfig: GlobalConfig = {
                 zh: '图片错开延迟（秒）',
               },
               admin: {
-                description: 'Delay between each image appearing | 每张图片之间的延迟',
+                description: {
+                  en: 'Delay between each image appearing',
+                  zh: '每张图片之间的延迟',
+                },
                 step: 0.05,
               },
             },

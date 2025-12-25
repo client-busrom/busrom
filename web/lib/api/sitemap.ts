@@ -235,8 +235,21 @@ function getStaticRoutes(): { path: string; changefreq: SitemapUrl['changefreq']
 }
 
 /**
- * Generate URLs for a specific locale with hreflang alternates
+ * 生成带 hreflang alternates 的 URL
+ *
+ * URL 策略:
+ * - 英文(默认): busromhouse.com/about (无前缀)
+ * - 其他语言: busromhouse.com/zh/about (有前缀)
  */
+function getLocalizedPath(path: string, locale: string): string {
+  // 默认语言不需要前缀
+  if (locale === defaultLocale) {
+    return path || '/'
+  }
+  // 非默认语言添加前缀
+  return `/${locale}${path}`
+}
+
 function generateUrlWithAlternates(
   path: string,
   lastmod: string,
@@ -245,20 +258,20 @@ function generateUrlWithAlternates(
   locale: string,
   baseUrl: string
 ): SitemapUrl {
-  // Generate alternate URLs for all locales
+  // Generate alternate URLs for all locales (使用新的 URL 策略)
   const alternates: { locale: string; url: string }[] = SITEMAP_LOCALES.map((loc) => ({
     locale: loc as string,
-    url: `${baseUrl}/${loc}${path}`,
+    url: `${baseUrl}${getLocalizedPath(path, loc)}`,
   }))
 
-  // Add x-default (points to default locale)
+  // Add x-default (points to default locale - now without prefix)
   alternates.push({
     locale: 'x-default',
-    url: `${baseUrl}/${defaultLocale}${path}`,
+    url: `${baseUrl}${getLocalizedPath(path, defaultLocale)}`,
   })
 
   return {
-    url: `/${locale}${path}`,
+    url: getLocalizedPath(path, locale),
     lastmod,
     changefreq,
     priority,

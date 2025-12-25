@@ -130,7 +130,7 @@ const config: Config = {
         'pavanam':     ['var(--font-pavanam)', 'sans-serif'],
         'phudu':       ['var(--font-phudu)', 'sans-serif'],
         'anaheim':     ['var(--font-anaheim)', 'sans-serif'],
-        'montserrat':  ['var(--font-montserrat)', 'sans-serif'],
+        // 'montserrat' 已移除 - 使用 SVG 替代 (节省 211KB)
         'bebas-neue':  ['var(--font-bebas-neue)', 'sans-serif'],
         'oswald':      ['var(--font-oswald)', 'sans-serif'],
         'inter':       ['var(--font-inter)', 'sans-serif'],  // 需要时显式使用

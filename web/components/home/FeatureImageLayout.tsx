@@ -173,9 +173,9 @@ export default function FeatureImageLayout({ activeFeature, activeIndex }: Featu
 
           {/* Layout 3 & 4: 平行四边形布局 (2张图) */}
           {(layoutType === 3 || layoutType === 4) && (
-            <div className={cn(containerWidth, "h-full pb-2 flex items-start")}>
+            <div className={cn(containerWidth, "h-full pb-2 flex items-start gap-[2px] lg:gap-[3px] xl:gap-[4px] 2xl:gap-[5px]")}>
               {/* 左侧平行四边形 */}
-              <div className="relative h-full flex-1 -mr-[5px] lg:-mr-[9px] xl:-mr-[13px] 2xl:-mr-[17px]">
+              <div className="relative h-full flex-1">
                 <TrapezoidImage
                   image={images[0]}
                   alt={images[0]?.altText || `${activeFeature.title} 1`}
@@ -183,7 +183,7 @@ export default function FeatureImageLayout({ activeFeature, activeIndex }: Featu
                 />
               </div>
               {/* 右侧平行四边形 */}
-              <div className="relative h-full flex-1 -ml-[5px] lg:-ml-[9px] xl:-ml-[13px] 2xl:-ml-[17px]">
+              <div className="relative h-full flex-1">
                 <TrapezoidImage
                   image={images[1]}
                   alt={images[1]?.altText || `${activeFeature.title} 2`}

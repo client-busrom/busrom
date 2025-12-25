@@ -67,7 +67,10 @@ export const Sphere3d: GlobalConfig = {
         zh: '3D模型URL',
       },
       admin: {
-        description: '3D模型文件地址',
+        description: {
+          en: '3D model file URL',
+          zh: '3D模型文件地址',
+        },
       },
     },
     {

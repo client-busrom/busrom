@@ -30,7 +30,10 @@ export const SeoSettings: CollectionConfig = {
       en: 'Settings',
       zh: '系统设置',
     },
-    description: 'SEO configuration for pages',
+    description: {
+      en: 'SEO configuration for pages',
+      zh: '页面 SEO 配置',
+    },
   },
   access: {
     read: () => true,
@@ -39,6 +42,17 @@ export const SeoSettings: CollectionConfig = {
     delete: ({ req }) => !!req.user,
   },
   fields: [
+    // Translation Center
+    {
+      name: 'translationCenter',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/components/fields/TranslationCenter',
+        },
+      },
+    },
     // ==================================================================
     // Identifier
     // ==================================================================
@@ -52,7 +66,10 @@ export const SeoSettings: CollectionConfig = {
       required: true,
       unique: true,
       admin: {
-        description: 'Unique identifier for this SEO setting',
+        description: {
+          en: 'Unique identifier for this SEO setting',
+          zh: '此 SEO 配置的唯一标识符',
+        },
       },
     },
 
@@ -69,10 +86,10 @@ export const SeoSettings: CollectionConfig = {
       required: true,
       defaultValue: 'global',
       options: [
-        { label: 'Global (All Pages) | 全局', value: 'global' },
-        { label: 'Page Type | 页面类型', value: 'page_type' },
-        { label: 'Exact Path | 精确路径', value: 'exact_path' },
-        { label: 'Path Pattern (Wildcard) | 路径规则', value: 'path_pattern' },
+        { label: { en: 'Global (All Pages)', zh: '全局（所有页面）' }, value: 'global' },
+        { label: { en: 'Page Type', zh: '页面类型' }, value: 'page_type' },
+        { label: { en: 'Exact Path', zh: '精确路径' }, value: 'exact_path' },
+        { label: { en: 'Path Pattern (Wildcard)', zh: '路径规则（通配符）' }, value: 'path_pattern' },
       ],
     },
     {
@@ -83,15 +100,15 @@ export const SeoSettings: CollectionConfig = {
         zh: '页面类型',
       },
       options: [
-        { label: 'Home | 首页', value: 'home' },
-        { label: 'Product Series List', value: 'product_series_list' },
-        { label: 'Product Series Detail', value: 'product_series_detail' },
-        { label: 'Shop List', value: 'shop_list' },
-        { label: 'Shop Product Detail', value: 'shop_detail' },
-        { label: 'Blog List', value: 'blog_list' },
-        { label: 'Blog Detail', value: 'blog_detail' },
-        { label: 'Application List', value: 'application_list' },
-        { label: 'Application Detail', value: 'application_detail' },
+        { label: { en: 'Home', zh: '首页' }, value: 'home' },
+        { label: { en: 'Product Series List', zh: '产品系列列表' }, value: 'product_series_list' },
+        { label: { en: 'Product Series Detail', zh: '产品系列详情' }, value: 'product_series_detail' },
+        { label: { en: 'Shop List', zh: '商城列表' }, value: 'shop_list' },
+        { label: { en: 'Shop Product Detail', zh: '商品详情' }, value: 'shop_detail' },
+        { label: { en: 'Blog List', zh: '博客列表' }, value: 'blog_list' },
+        { label: { en: 'Blog Detail', zh: '博客详情' }, value: 'blog_detail' },
+        { label: { en: 'Application List', zh: '应用列表' }, value: 'application_list' },
+        { label: { en: 'Application Detail', zh: '应用详情' }, value: 'application_detail' },
       ],
       admin: {
         condition: (data) => data.scope === 'page_type',
@@ -106,6 +123,10 @@ export const SeoSettings: CollectionConfig = {
       },
       admin: {
         condition: (data) => data.scope === 'exact_path',
+        description: {
+          en: 'Enter the exact URL path (e.g., /about)',
+          zh: '输入精确的 URL 路径（例如：/about）',
+        },
       },
     },
     {
@@ -117,7 +138,10 @@ export const SeoSettings: CollectionConfig = {
       },
       admin: {
         condition: (data) => data.scope === 'path_pattern',
-        description: 'e.g., /product/* or /blog/**',
+        description: {
+          en: 'e.g., /product/* or /blog/**',
+          zh: '例如：/product/* 或 /blog/**',
+        },
       },
     },
 
@@ -140,9 +164,9 @@ export const SeoSettings: CollectionConfig = {
           },
           localized: true,
           admin: {
-            description: 'Override page title for SEO',
-            components: {
-              Field: '@/components/fields/MultiLocaleField#MultiLocaleTextField',
+            description: {
+              en: 'Override page title for SEO (50-60 characters recommended)',
+              zh: '覆盖页面的 SEO 标题（建议 50-60 个字符）',
             },
           },
         },
@@ -155,9 +179,9 @@ export const SeoSettings: CollectionConfig = {
           },
           localized: true,
           admin: {
-            description: '150-160 characters recommended',
-            components: {
-              Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
+            description: {
+              en: '150-160 characters recommended',
+              zh: '建议 150-160 个字符',
             },
           },
         },
@@ -170,9 +194,9 @@ export const SeoSettings: CollectionConfig = {
           },
           localized: true,
           admin: {
-            description: 'Comma-separated keywords',
-            components: {
-              Field: '@/components/fields/MultiLocaleField#MultiLocaleTextField',
+            description: {
+              en: 'Comma-separated keywords',
+              zh: '用逗号分隔的关键词',
             },
           },
         },
@@ -184,7 +208,10 @@ export const SeoSettings: CollectionConfig = {
     // ==================================================================
     {
       type: 'collapsible',
-      label: 'Open Graph',
+      label: {
+        en: 'Open Graph',
+        zh: 'Open Graph 社交分享',
+      },
       admin: {
         initCollapsed: true,
       },
@@ -192,22 +219,30 @@ export const SeoSettings: CollectionConfig = {
         {
           name: 'ogTitle',
           type: 'text',
-          label: 'OG Title',
+          label: {
+            en: 'OG Title',
+            zh: 'OG 标题',
+          },
           localized: true,
           admin: {
-            components: {
-              Field: '@/components/fields/MultiLocaleField#MultiLocaleTextField',
+            description: {
+              en: 'Title displayed when shared on social media',
+              zh: '在社交媒体分享时显示的标题',
             },
           },
         },
         {
           name: 'ogDescription',
           type: 'textarea',
-          label: 'OG Description',
+          label: {
+            en: 'OG Description',
+            zh: 'OG 描述',
+          },
           localized: true,
           admin: {
-            components: {
-              Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
+            description: {
+              en: 'Description displayed when shared on social media',
+              zh: '在社交媒体分享时显示的描述',
             },
           },
         },
@@ -215,8 +250,15 @@ export const SeoSettings: CollectionConfig = {
           name: 'ogImage',
           type: 'upload',
           relationTo: 'media',
-          label: 'OG Image',
+          label: {
+            en: 'OG Image',
+            zh: 'OG 图片',
+          },
           admin: {
+            description: {
+              en: 'Image displayed when shared on social media (1200x630px recommended)',
+              zh: '在社交媒体分享时显示的图片（建议 1200x630 像素）',
+            },
             components: {
               Field: '@/components/fields/MediaPicker',
             },
@@ -225,13 +267,22 @@ export const SeoSettings: CollectionConfig = {
         {
           name: 'ogType',
           type: 'select',
-          label: 'OG Type',
+          label: {
+            en: 'OG Type',
+            zh: 'OG 类型',
+          },
           defaultValue: 'website',
           options: [
-            { label: 'Website', value: 'website' },
-            { label: 'Article', value: 'article' },
-            { label: 'Product', value: 'product' },
+            { label: { en: 'Website', zh: '网站' }, value: 'website' },
+            { label: { en: 'Article', zh: '文章' }, value: 'article' },
+            { label: { en: 'Product', zh: '产品' }, value: 'product' },
           ],
+          admin: {
+            description: {
+              en: 'Type of content for social sharing',
+              zh: '社交分享的内容类型',
+            },
+          },
         },
       ],
     },
@@ -252,21 +303,45 @@ export const SeoSettings: CollectionConfig = {
         {
           name: 'robotsIndex',
           type: 'checkbox',
-          label: 'Allow Indexing',
+          label: {
+            en: 'Allow Indexing',
+            zh: '允许索引',
+          },
           defaultValue: true,
+          admin: {
+            description: {
+              en: 'Allow search engines to index this page',
+              zh: '允许搜索引擎索引此页面',
+            },
+          },
         },
         {
           name: 'robotsFollow',
           type: 'checkbox',
-          label: 'Allow Following Links',
+          label: {
+            en: 'Allow Following Links',
+            zh: '允许跟踪链接',
+          },
           defaultValue: true,
+          admin: {
+            description: {
+              en: 'Allow search engines to follow links on this page',
+              zh: '允许搜索引擎跟踪此页面上的链接',
+            },
+          },
         },
         {
           name: 'canonicalUrl',
           type: 'text',
-          label: 'Canonical URL',
+          label: {
+            en: 'Canonical URL',
+            zh: '规范链接',
+          },
           admin: {
-            description: 'Leave empty to use default page URL',
+            description: {
+              en: 'Leave empty to use default page URL',
+              zh: '留空则使用默认页面 URL',
+            },
           },
         },
       ],
@@ -288,35 +363,59 @@ export const SeoSettings: CollectionConfig = {
         {
           name: 'includeInSitemap',
           type: 'checkbox',
-          label: 'Include in Sitemap',
+          label: {
+            en: 'Include in Sitemap',
+            zh: '包含在 Sitemap 中',
+          },
           defaultValue: true,
+          admin: {
+            description: {
+              en: 'Include this page in the sitemap.xml',
+              zh: '将此页面包含在 sitemap.xml 中',
+            },
+          },
         },
         {
           name: 'sitemapPriority',
           type: 'number',
-          label: 'Sitemap Priority',
+          label: {
+            en: 'Sitemap Priority',
+            zh: 'Sitemap 优先级',
+          },
           defaultValue: 0.5,
           min: 0,
           max: 1,
           admin: {
             step: 0.1,
-            description: '0.0 - 1.0',
+            description: {
+              en: '0.0 - 1.0 (higher = more important)',
+              zh: '0.0 - 1.0（越高越重要）',
+            },
           },
         },
         {
           name: 'sitemapChangefreq',
           type: 'select',
-          label: 'Change Frequency',
+          label: {
+            en: 'Change Frequency',
+            zh: '更新频率',
+          },
           defaultValue: 'weekly',
           options: [
-            { label: 'Always', value: 'always' },
-            { label: 'Hourly', value: 'hourly' },
-            { label: 'Daily', value: 'daily' },
-            { label: 'Weekly', value: 'weekly' },
-            { label: 'Monthly', value: 'monthly' },
-            { label: 'Yearly', value: 'yearly' },
-            { label: 'Never', value: 'never' },
+            { label: { en: 'Always', zh: '始终' }, value: 'always' },
+            { label: { en: 'Hourly', zh: '每小时' }, value: 'hourly' },
+            { label: { en: 'Daily', zh: '每天' }, value: 'daily' },
+            { label: { en: 'Weekly', zh: '每周' }, value: 'weekly' },
+            { label: { en: 'Monthly', zh: '每月' }, value: 'monthly' },
+            { label: { en: 'Yearly', zh: '每年' }, value: 'yearly' },
+            { label: { en: 'Never', zh: '从不' }, value: 'never' },
           ],
+          admin: {
+            description: {
+              en: 'How often this page is likely to change',
+              zh: '此页面可能更新的频率',
+            },
+          },
         },
       ],
     },

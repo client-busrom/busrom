@@ -154,19 +154,31 @@ export default function HeroBanner({ data, locale }: Props) {
       </Carousel>
 
       {scrollSnaps.length > 0 && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex space-x-2">
-          {scrollSnaps.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => scrollTo(index)}
-              className={cn(
-                "h-2 w-2 rounded-full transition-all duration-200",
-                index === currentSlide ? "bg-white scale-125" : "bg-white/50 hover:bg-white/75"
-              )}
-              aria-label={`Go to slide ${index + 1}`}
+        <>
+          {/* 底部进度条 */}
+          <div className="absolute bottom-0 left-0 right-0 z-10 h-1 bg-white/30">
+            <div
+              className="h-full bg-white transition-all duration-300 ease-out"
+              style={{ width: `${((currentSlide + 1) / scrollSnaps.length) * 100}%` }}
             />
-          ))}
-        </div>
+          </div>
+
+          {/* 右下角页码指示器 */}
+          <div
+            className="absolute bottom-6 right-8 z-10 flex items-baseline text-white font-anaheim"
+            style={{
+              textShadow: '0 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.3)',
+            }}
+          >
+            <span className="text-2xl font-bold">
+              {String(currentSlide + 1).padStart(2, '0')}
+            </span>
+            <span className="text-base text-white/80 mx-1">/</span>
+            <span className="text-base text-white/80">
+              {String(scrollSnaps.length).padStart(2, '0')}
+            </span>
+          </div>
+        </>
       )}
     </section>
   );

@@ -119,7 +119,6 @@ import { HomeContent } from './src/globals/HomeContent'
 import { Footer } from './src/globals/Footer'
 import { SiteConfig } from './src/globals/SiteConfig'
 import { PreloaderConfig } from './src/globals/PreloaderConfig'
-import { ContactConfig } from './src/globals/ContactConfig'
 import { SocialConfig } from './src/globals/SocialConfig'
 // Globals - Homepage Sections (ordered to match frontend)
 import { ProductSeriesCarousel } from './src/globals/ProductSeriesCarousel'
@@ -181,6 +180,8 @@ export default buildConfig({
         Logo: '@/components/admin/Logo',
         Icon: '@/components/admin/Logo#Icon',
       },
+      // Custom navigation - organized with collapsible groups
+      Nav: '@/components/admin/CustomNav',
       // Admin styles provider - hides unnecessary actions on account page
       providers: ['@/components/admin/AdminStylesProvider'],
     },
@@ -233,7 +234,6 @@ export default buildConfig({
     Footer,
     SiteConfig,
     PreloaderConfig,
-    ContactConfig,
     SocialConfig,
     // Homepage Sections (ordered to match frontend HomePageClient.tsx)
     // Note: HeroBanner (1) and SeriesIntro (6) are Collections, not Globals

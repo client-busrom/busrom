@@ -5,11 +5,12 @@ import dynamic from "next/dynamic";
 import "../globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
 import ScrollToTopOnRouteChange from "@/components/ScrollToTopOnRouteChange";
-import { isValidLocale, defaultLocale } from "@/i18n.config";
+import { isValidLocale, defaultLocale, locales } from "@/i18n.config";
 import Header from "@/components/layout/header";
 import ConditionalFooter from "@/components/layout/conditional-footer";
 import { ClientLayoutWrapper } from "@/components/ClientLayoutWrapper";
-import { defaultPreloaderConfig } from "@/lib/api/preloader-config";
+import { getPreloaderConfig } from "@/lib/api/preloader-config";
+import { getNavigation } from "@/lib/api/navigation";
 
 // 延迟加载 LenisProvider（包含 GSAP），不阻塞首屏渲染
 const LenisProvider = dynamic(
@@ -68,13 +69,7 @@ const phudu = localFont({
   preload: false,
 });
 
-const montserrat = localFont({
-  src: "../../public/fonts/Montserrat-VariableFont_wght.woff2",
-  weight: "100 900",
-  variable: "--font-montserrat",
-  display: "swap",
-  preload: false,
-});
+// Montserrat 已移除 - 使用 SVG 替代 (节省 211KB)
 
 const bebasNeue = localFont({
   src: "../../public/fonts/BebasNeue-Regular.woff2",
@@ -93,7 +88,8 @@ const oswald = localFont({
 });
 
 export function generateStaticParams() {
-  return [{ locale: "en" }, { locale: "zh" }, { locale: "es" }, { locale: "fr" }, { locale: "de" }];
+  // 动态生成所有支持的 locale 参数
+  return locales.map(locale => ({ locale }));
 }
 
 export default async function RootLayout({
@@ -106,9 +102,11 @@ export default async function RootLayout({
   const { locale } = await params;
   const validLocale = isValidLocale(locale) ? locale : defaultLocale;
 
-  // 使用默认配置，避免阻塞 SSR
-  // Preloader 组件会在客户端异步获取最新配置
-  const preloaderConfig = defaultPreloaderConfig;
+  // 并行获取 preloader 配置和导航数据，避免串行等待
+  const [preloaderConfig, initialNavigation] = await Promise.all([
+    getPreloaderConfig(),
+    getNavigation(validLocale),
+  ]);
 
   return (
     <html
@@ -119,7 +117,6 @@ export default async function RootLayout({
       ${pavanam.variable}
       ${phudu.variable}
       ${anaheim.variable}
-      ${montserrat.variable}
       ${bebasNeue.variable}
       ${oswald.variable}
       ${inter.variable}
@@ -136,7 +133,7 @@ export default async function RootLayout({
         <ClientLayoutWrapper preloaderConfig={preloaderConfig}>
           <LenisProvider easingKey={"easeOutQuad"} />
           <div className="flex flex-col min-h-screen overflow-x-hidden">
-            <Header locale={validLocale} />
+            <Header locale={validLocale} initialNavigation={initialNavigation} />
             {children}
             <Suspense fallback={null}>
               <ScrollToTopOnRouteChange />

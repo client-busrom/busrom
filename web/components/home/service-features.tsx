@@ -150,9 +150,9 @@ export default function ServiceFeatures({ data }: Props) {
               className={cn(
                 "flex flex-col justify-center",
                 "px-6 py-8",
-                "lg:px-10 lg:py-0 lg:w-[340px] lg:flex-shrink-0",
-                "xl:px-14 xl:w-[400px]",
-                "2xl:px-[80px] 2xl:w-[480px]"
+                "lg:px-10 lg:py-0 lg:w-[380px] lg:flex-shrink-0",
+                "xl:px-14 xl:w-[440px]",
+                "2xl:px-[80px] 2xl:w-[520px]"
               )}
             >
               {/* 主标题 */}

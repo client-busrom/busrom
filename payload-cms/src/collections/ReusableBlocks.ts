@@ -68,7 +68,10 @@ export const ReusableBlocks: CollectionConfig = {
               required: true,
               unique: true,
               admin: {
-                description: 'Unique identifier (e.g., "cta-contact-us", "feature-quality")',
+                description: {
+                  en: 'Unique identifier (e.g., "cta-contact-us", "feature-quality")',
+                  zh: '唯一标识符（例如："cta-contact-us"、"feature-quality"）',
+                },
               },
             },
             {
@@ -126,7 +129,10 @@ export const ReusableBlocks: CollectionConfig = {
               },
               localized: true,
               admin: {
-                description: 'Rich text content - use language tabs above to switch locales',
+                description: {
+                  en: 'Rich text content - use language tabs above to switch locales',
+                  zh: '富文本内容 - 使用上方语言标签切换语言',
+                },
                 components: {
                   beforeInput: ['@/components/fields/MultiLocaleRichTextField'],
                 },

@@ -81,7 +81,10 @@ export const ActivityLogs: CollectionConfig = {
       en: 'Users & Access',
       zh: '用户与权限',
     },
-    description: 'System activity audit trail',
+    description: {
+      en: 'System activity audit trail',
+      zh: '系统操作审计日志',
+    },
     pagination: {
       defaultLimit: 50,
     },
@@ -122,7 +125,10 @@ export const ActivityLogs: CollectionConfig = {
       },
       admin: {
         readOnly: true,
-        description: 'Stored for reference even if user is deleted',
+        description: {
+          en: 'Stored for reference even if user is deleted',
+          zh: '即使用户被删除也会保留以供参考',
+        },
       },
     },
     {
@@ -186,7 +192,10 @@ export const ActivityLogs: CollectionConfig = {
       },
       admin: {
         readOnly: true,
-        description: 'Human-readable title of the affected entity',
+        description: {
+          en: 'Human-readable title of the affected entity',
+          zh: '受影响实体的可读标题',
+        },
       },
     },
 
@@ -202,7 +211,10 @@ export const ActivityLogs: CollectionConfig = {
       },
       admin: {
         readOnly: true,
-        description: 'Human-readable summary of the action',
+        description: {
+          en: 'Human-readable summary of the action',
+          zh: '操作的可读摘要',
+        },
       },
     },
     {
@@ -214,7 +226,10 @@ export const ActivityLogs: CollectionConfig = {
       },
       admin: {
         readOnly: true,
-        description: 'JSON object containing before/after values',
+        description: {
+          en: 'JSON object containing before/after values',
+          zh: '包含变更前/后值的 JSON 对象',
+        },
       },
     },
     {
@@ -226,7 +241,10 @@ export const ActivityLogs: CollectionConfig = {
       },
       admin: {
         readOnly: true,
-        description: 'Additional context about the action',
+        description: {
+          en: 'Additional context about the action',
+          zh: '关于操作的额外上下文信息',
+        },
       },
     },
 

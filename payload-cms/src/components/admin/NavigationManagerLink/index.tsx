@@ -2,8 +2,19 @@
 
 import React from 'react'
 import Link from 'next/link'
+import { useTranslation } from '@payloadcms/ui'
+
+// i18n translations
+const i18n = {
+  dragSort: { en: 'Drag to Sort', zh: '拖拽排序' },
+  description: { en: 'Use visual interface to drag and adjust menu order', zh: '使用可视化界面拖拽调整菜单顺序' },
+  openManager: { en: 'Open Sort Manager', zh: '打开排序管理器' },
+}
 
 export const NavigationManagerLink: React.FC = () => {
+  const { i18n: { language } } = useTranslation()
+  const t = (obj: { en: string; zh: string }) => language === 'zh' ? obj.zh : obj.en
+
   return (
     <div
       style={{
@@ -33,9 +44,9 @@ export const NavigationManagerLink: React.FC = () => {
         <line x1="16" y1="3" x2="14" y2="21" />
       </svg>
       <div style={{ flex: 1 }}>
-        <strong>拖拽排序</strong>
+        <strong>{t(i18n.dragSort)}</strong>
         <span style={{ marginLeft: '8px', opacity: 0.7 }}>
-          使用可视化界面拖拽调整菜单顺序
+          {t(i18n.description)}
         </span>
       </div>
       <Link
@@ -53,7 +64,7 @@ export const NavigationManagerLink: React.FC = () => {
           fontSize: '14px',
         }}
       >
-        打开排序管理器
+        {t(i18n.openManager)}
         <svg
           width="16"
           height="16"

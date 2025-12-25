@@ -21,7 +21,10 @@ export const TranslationConfig: GlobalConfig = {
       en: 'CMS Settings',
       zh: 'CMS系统设置',
     },
-    description: 'Configure translation service for multi-language content',
+    description: {
+      en: 'Configure translation service for multi-language content',
+      zh: '配置多语言内容的翻译服务',
+    },
   },
   access: {
     read: ({ req }) => {
@@ -52,7 +55,10 @@ export const TranslationConfig: GlobalConfig = {
         { label: 'Azure Translator', value: 'azure' },
       ],
       admin: {
-        description: 'Select the translation service to use',
+        description: {
+          en: 'Select the translation service to use',
+          zh: '选择要使用的翻译服务',
+        },
       },
     },
 
@@ -67,7 +73,10 @@ export const TranslationConfig: GlobalConfig = {
         zh: 'API 密钥',
       },
       admin: {
-        description: 'Enter your translation service API key',
+        description: {
+          en: 'Enter your translation service API key',
+          zh: '输入您的翻译服务 API 密钥',
+        },
       },
     },
     {
@@ -78,7 +87,10 @@ export const TranslationConfig: GlobalConfig = {
         zh: '自定义 API 端点',
       },
       admin: {
-        description: 'Optional: Custom endpoint for self-hosted translation services',
+        description: {
+          en: 'Optional: Custom endpoint for self-hosted translation services',
+          zh: '可选：自托管翻译服务的自定义端点',
+        },
         condition: (data) => data.service === 'azure',
       },
     },
@@ -100,7 +112,10 @@ export const TranslationConfig: GlobalConfig = {
         { label: 'Auto Detect', value: 'auto' },
       ],
       admin: {
-        description: 'Default language to translate from',
+        description: {
+          en: 'Default language to translate from',
+          zh: '默认翻译源语言',
+        },
       },
     },
 
@@ -126,7 +141,10 @@ export const TranslationConfig: GlobalConfig = {
           },
           defaultValue: 60,
           admin: {
-            description: 'Limit translation requests to prevent API quota issues',
+            description: {
+              en: 'Limit translation requests to prevent API quota issues',
+              zh: '限制翻译请求以防止 API 配额问题',
+            },
           },
         },
         {
@@ -138,7 +156,10 @@ export const TranslationConfig: GlobalConfig = {
           },
           defaultValue: 100,
           admin: {
-            description: 'Delay between translation requests',
+            description: {
+              en: 'Delay between translation requests',
+              zh: '翻译请求之间的延迟',
+            },
           },
         },
       ],
@@ -157,7 +178,10 @@ export const TranslationConfig: GlobalConfig = {
       defaultValue: false,
       admin: {
         position: 'sidebar',
-        description: 'Enable or disable the translation feature',
+        description: {
+          en: 'Enable or disable the translation feature',
+          zh: '启用或禁用翻译功能',
+        },
       },
     },
     {

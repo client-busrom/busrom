@@ -103,7 +103,6 @@ export const countries: Record<string, Country[]> = {
 
 export const languages: Language[] = [
   { code: "en", name: "English", nativeName: "English" },
-  { code: "zh", name: "Chinese", nativeName: "中文" },
   { code: "es", name: "Spanish", nativeName: "Español" },
   { code: "pt", name: "Portuguese", nativeName: "Português" },
   { code: "fr", name: "French", nativeName: "Français" },
@@ -126,6 +125,7 @@ export const languages: Language[] = [
   { code: "tr", name: "Turkish", nativeName: "Türkçe" },
   { code: "he", name: "Hebrew", nativeName: "עברית" },
   { code: "az", name: "Azerbaijani", nativeName: "Azərbaycan" },
+  { code: "zh", name: "Chinese", nativeName: "中文" },
 ]
 
 // 默认设置

@@ -30,7 +30,10 @@ export const FormConfigs: CollectionConfig = {
       en: 'Forms',
       zh: '表单管理',
     },
-    description: 'Configure dynamic form fields',
+    description: {
+      en: 'Configure dynamic form fields',
+      zh: '配置动态表单字段',
+    },
   },
   access: {
     read: () => true,
@@ -52,7 +55,10 @@ export const FormConfigs: CollectionConfig = {
       required: true,
       unique: true,
       admin: {
-        description: 'e.g., "main-form", "footer-form", "contact-us-form"',
+        description: {
+          en: 'e.g., "main-form", "footer-form", "contact-us-form"',
+          zh: '例如："main-form"、"footer-form"、"contact-us-form"',
+        },
       },
     },
     {
@@ -102,7 +108,10 @@ export const FormConfigs: CollectionConfig = {
         zh: '表单字段',
       },
       admin: {
-        description: 'Configure dynamic form fields',
+        description: {
+          en: 'Configure dynamic form fields',
+          zh: '配置动态表单字段',
+        },
       },
       fields: [
         {
@@ -114,7 +123,10 @@ export const FormConfigs: CollectionConfig = {
           },
           required: true,
           admin: {
-            description: 'Internal field name (e.g., "email", "company")',
+            description: {
+              en: 'Internal field name (e.g., "email", "company")',
+              zh: '内部字段名称（例如："email"、"company"）',
+            },
           },
         },
         {
@@ -194,7 +206,10 @@ export const FormConfigs: CollectionConfig = {
           },
           defaultValue: true,
           admin: {
-            description: 'Only for checkbox fields. When unchecked, checkbox acts as single-selection (like radio)',
+            description: {
+              en: 'Only for checkbox fields. When unchecked, checkbox acts as single-selection (like radio)',
+              zh: '仅适用于复选框字段。取消勾选时，复选框表现为单选（类似单选按钮）',
+            },
             condition: (data, siblingData) => siblingData?.fieldType === 'checkbox',
           },
         },

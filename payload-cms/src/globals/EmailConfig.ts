@@ -21,7 +21,10 @@ export const EmailConfig: GlobalConfig = {
       en: 'CMS Settings',
       zh: 'CMS系统设置',
     },
-    description: 'Email service and notification settings',
+    description: {
+      en: 'Email service and notification settings',
+      zh: '邮件服务和通知设置',
+    },
   },
   access: {
     read: () => true,
@@ -60,7 +63,10 @@ export const EmailConfig: GlobalConfig = {
             zh: 'SMTP 主机',
           },
           admin: {
-            description: 'SMTP server hostname (e.g., smtp.gmail.com)',
+            description: {
+              en: 'SMTP server hostname (e.g., smtp.gmail.com)',
+              zh: 'SMTP服务器主机名（例如：smtp.gmail.com）',
+            },
           },
         },
         {
@@ -72,7 +78,10 @@ export const EmailConfig: GlobalConfig = {
           },
           defaultValue: 587,
           admin: {
-            description: 'Usually 587 (TLS) or 465 (SSL)',
+            description: {
+              en: 'Usually 587 (TLS) or 465 (SSL)',
+              zh: '通常是 587 (TLS) 或 465 (SSL)',
+            },
           },
         },
         {
@@ -91,7 +100,10 @@ export const EmailConfig: GlobalConfig = {
             zh: 'SMTP 密码',
           },
           admin: {
-            description: 'For Gmail, use App Password (not your regular password)',
+            description: {
+              en: 'For Gmail, use App Password (not your regular password)',
+              zh: '对于 Gmail，请使用应用专用密码（而非常规密码）',
+            },
           },
         },
         {
@@ -177,7 +189,10 @@ export const EmailConfig: GlobalConfig = {
             zh: '通知邮箱',
           },
           admin: {
-            description: 'Comma-separated list of emails to notify on form submissions',
+            description: {
+              en: 'Comma-separated list of emails to notify on form submissions',
+              zh: '表单提交时通知的邮箱列表，用逗号分隔',
+            },
             condition: (data) => data?.formNotificationEnabled,
           },
         },
@@ -191,7 +206,10 @@ export const EmailConfig: GlobalConfig = {
           localized: true,
           defaultValue: 'New Form Submission: {formName}',
           admin: {
-            description: 'Use {formName} for form name placeholder',
+            description: {
+              en: 'Use {formName} for form name placeholder',
+              zh: '使用 {formName} 作为表单名称占位符',
+            },
             condition: (data) => data?.formNotificationEnabled,
           },
         },

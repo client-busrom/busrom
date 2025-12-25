@@ -1,7 +1,31 @@
 'use client'
 
 import React from 'react'
-import { useField } from '@payloadcms/ui'
+import { useField, useTranslation } from '@payloadcms/ui'
+
+// i18n translations
+const i18n = {
+  noFormData: { en: 'No form data', zh: '无表单数据' },
+  field: { en: 'Field', zh: '字段' },
+  value: { en: 'Value', zh: '值' },
+  // Field labels
+  name: { en: 'Name', zh: '姓名' },
+  email: { en: 'Email', zh: '邮箱' },
+  phone: { en: 'Phone', zh: '电话' },
+  whatsapp: { en: 'WhatsApp', zh: 'WhatsApp' },
+  company: { en: 'Company', zh: '公司' },
+  message: { en: 'Message', zh: '留言' },
+  subject: { en: 'Subject', zh: '主题' },
+  country: { en: 'Country', zh: '国家' },
+  city: { en: 'City', zh: '城市' },
+  address: { en: 'Address', zh: '地址' },
+  product: { en: 'Product', zh: '产品' },
+  quantity: { en: 'Quantity', zh: '数量' },
+  budget: { en: 'Budget', zh: '预算' },
+  timeline: { en: 'Timeline', zh: '时间' },
+  source: { en: 'Source', zh: '来源' },
+  notes: { en: 'Notes', zh: '备注' },
+}
 
 /**
  * FormDataDisplay Component
@@ -11,33 +35,38 @@ import { useField } from '@payloadcms/ui'
 export const FormDataDisplay: React.FC<{ path: string }> = () => {
   // Read from the actual 'data' field
   const { value } = useField<Record<string, any>>({ path: 'data' })
+  const { i18n: { language } } = useTranslation()
+  const t = (obj: { en: string; zh: string }) => language === 'zh' ? obj.zh : obj.en
 
   if (!value || typeof value !== 'object') {
     return (
       <div style={{ padding: '12px', color: '#666' }}>
-        No form data
+        {t(i18n.noFormData)}
       </div>
     )
   }
 
-  // Field label mapping for better display
-  const fieldLabels: Record<string, string> = {
-    name: 'Name / 姓名',
-    email: 'Email / 邮箱',
-    phone: 'Phone / 电话',
-    whatsapp: 'WhatsApp',
-    company: 'Company / 公司',
-    message: 'Message / 留言',
-    subject: 'Subject / 主题',
-    country: 'Country / 国家',
-    city: 'City / 城市',
-    address: 'Address / 地址',
-    product: 'Product / 产品',
-    quantity: 'Quantity / 数量',
-    budget: 'Budget / 预算',
-    timeline: 'Timeline / 时间',
-    source: 'Source / 来源',
-    notes: 'Notes / 备注',
+  // Field label mapping for better display - now uses i18n
+  const getFieldLabel = (key: string): string => {
+    const labelMap: Record<string, { en: string; zh: string }> = {
+      name: i18n.name,
+      email: i18n.email,
+      phone: i18n.phone,
+      whatsapp: i18n.whatsapp,
+      company: i18n.company,
+      message: i18n.message,
+      subject: i18n.subject,
+      country: i18n.country,
+      city: i18n.city,
+      address: i18n.address,
+      product: i18n.product,
+      quantity: i18n.quantity,
+      budget: i18n.budget,
+      timeline: i18n.timeline,
+      source: i18n.source,
+      notes: i18n.notes,
+    }
+    return labelMap[key] ? t(labelMap[key]) : key
   }
 
   const entries = Object.entries(value).filter(([_, val]) => val !== '' && val !== null && val !== undefined)
@@ -45,7 +74,7 @@ export const FormDataDisplay: React.FC<{ path: string }> = () => {
   if (entries.length === 0) {
     return (
       <div style={{ padding: '12px', color: '#666' }}>
-        No form data
+        {t(i18n.noFormData)}
       </div>
     )
   }
@@ -80,7 +109,7 @@ export const FormDataDisplay: React.FC<{ path: string }> = () => {
                 width: '30%',
               }}
             >
-              Field / 字段
+              {t(i18n.field)}
             </th>
             <th
               style={{
@@ -89,7 +118,7 @@ export const FormDataDisplay: React.FC<{ path: string }> = () => {
                 fontWeight: 600,
               }}
             >
-              Value / 值
+              {t(i18n.value)}
             </th>
           </tr>
         </thead>
@@ -112,7 +141,7 @@ export const FormDataDisplay: React.FC<{ path: string }> = () => {
                   verticalAlign: 'top',
                 }}
               >
-                {fieldLabels[key] || key}
+                {getFieldLabel(key)}
               </td>
               <td
                 style={{

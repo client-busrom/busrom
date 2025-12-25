@@ -32,7 +32,10 @@ export const HomeContent: GlobalConfig = {
         zh: '首页区块',
       },
       admin: {
-        description: '配置首页各区块的显示顺序和状态',
+        description: {
+          en: 'Configure homepage section display order and status',
+          zh: '配置首页各区块的显示顺序和状态',
+        },
       },
       fields: [
         {

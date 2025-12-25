@@ -68,7 +68,10 @@ export const MainForm: GlobalConfig = {
         zh: '表单配置',
       },
       admin: {
-        description: '选择要使用的表单配置。如果选择了，将使用 FormConfig 的字段配置；如果不选，则使用下方的占位符配置。',
+        description: {
+          en: 'Select the form configuration to use. If selected, FormConfig fields will be used; otherwise, use placeholder config below.',
+          zh: '选择要使用的表单配置。如果选择了，将使用 FormConfig 的字段配置；如果不选，则使用下方的占位符配置。',
+        },
       },
     },
 
@@ -84,7 +87,10 @@ export const MainForm: GlobalConfig = {
       },
       localized: true,
       admin: {
-        description: '例如: "Premium Architectural Glass Hardware"',
+        description: {
+          en: 'e.g.: "Premium Architectural Glass Hardware"',
+          zh: '例如: "Premium Architectural Glass Hardware"',
+        },
       },
     },
     {
@@ -96,7 +102,10 @@ export const MainForm: GlobalConfig = {
       },
       localized: true,
       admin: {
-        description: '例如: "Customized Structure and Color"',
+        description: {
+          en: 'e.g.: "Customized Structure and Color"',
+          zh: '例如: "Customized Structure and Color"',
+        },
       },
     },
 

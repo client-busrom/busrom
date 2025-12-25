@@ -460,7 +460,7 @@ export const homeContent_EN: HomeContentData = {
         'homeProductSeries/glass_standoff.png',
         'Glass Standoff Series'
       ),
-      href: '/product/glass-standoff',
+      href: '/products/glass-standoff',
     },
     {
       key: 'glass-connected-fitting',
@@ -470,7 +470,7 @@ export const homeContent_EN: HomeContentData = {
         'homeProductSeries/glass_connected_fitting.png',
         'Glass Connected Fitting Series'
       ),
-      href: '/product/glass-connected-fitting',
+      href: '/products/glass-connected-fitting',
     },
     {
       key: 'glass-fence-spigot',
@@ -480,7 +480,7 @@ export const homeContent_EN: HomeContentData = {
         'homeProductSeries/glass_fence_spigot.png',
         'Glass Fence Spigot Series'
       ),
-      href: '/product/glass-fence-spigot',
+      href: '/products/glass-fence-spigot',
     },
     {
       key: 'glass-clip-railing',
@@ -490,7 +490,7 @@ export const homeContent_EN: HomeContentData = {
         'homeProductSeries/glass_clip_outdoor.png',
         'Glass Railing Clip Series'
       ),
-      href: '/product/glass-clip',
+      href: '/products/glass-clip',
     },
     {
       key: 'glass-clip-bathroom',
@@ -500,7 +500,7 @@ export const homeContent_EN: HomeContentData = {
         'homeProductSeries/glass_clip_washroom.png',
         'Bathroom Glass Clip Series'
       ),
-      href: '/product/glass-clip',
+      href: '/products/glass-clip',
     },
     {
       key: 'glass-hinge',
@@ -510,7 +510,7 @@ export const homeContent_EN: HomeContentData = {
         'homeProductSeries/glass_hinge.png',
         'Glass Hinge Series'
       ),
-      href: '/product/glass-hinge',
+      href: '/products/glass-hinge',
     },
     {
       key: 'sliding-door-kit',
@@ -520,7 +520,7 @@ export const homeContent_EN: HomeContentData = {
         'homeProductSeries/sliding_door_kit.png',
         'Sliding Door Kit Series'
       ),
-      href: '/product/sliding-door-kit',
+      href: '/products/sliding-door-kit',
     },
     {
       key: 'bathroom-door-handle',
@@ -530,7 +530,7 @@ export const homeContent_EN: HomeContentData = {
         'homeProductSeries/bathroom_&_door_handle.png',
         'Bathroom & Door Handle Series'
       ),
-      href: '/product/bathroom-door-handle',
+      href: '/products/bathroom-door-handle',
     },
     {
       key: 'hidden-hook',
@@ -540,7 +540,7 @@ export const homeContent_EN: HomeContentData = {
         'homeProductSeries/hidden_hook.png',
         'Hidden Hook Series'
       ),
-      href: '/product/hidden-hook',
+      href: '/products/hidden-hook',
     },
   ],
 
@@ -634,56 +634,56 @@ export const homeContent_EN: HomeContentData = {
       description:
         'Designed for glass panel fixing, Busrom Glass Standoff Series is made of high strength stainless steel, precision CNC machined and polished, which not only ensures stable load bearing, but also has an elegant and modern metal texture. Widely used in curtain walls, partitions, stair railings and other scenarios, providing safe and reliable support for glass installation.',
       images: [ createImageObject('1.jpg', 'Glass Standoff Series'),],
-      href: '/product/glass-standoff',
+      href: '/products/glass-standoff',
     },
     {
       title: 'Glass Connected Fitting',
       description:
         'The Glass Connected Fitting Series provides flexible solutions for the assembly of multiple glass panels, including right angles, T-pieces, crosses and adjustable joints. The products adopt precision casting and turning technology, with high assembly precision and solid interface, and are widely used in glass curtain walls, staircase handrails and partitions.',
       images: [ createImageObject('2.jpg', 'Glass Connected Fitting Series'),],
-      href: '/product/glass-connected-fitting',
+      href: '/products/glass-connected-fitting',
     },
     {
       title: 'Glass Fence Spigot',
       description:
         'Used in systems such as glass railings and fences, the Busrom Glass Fence Spigot features a thickened base design and high-strength bolted joints to provide superior resistance to bending and bursting. The multiple-plated or sandblasted surfaces resist rust and moisture and blend seamlessly with a variety of architectural styles.',
       images: [ createImageObject('3.jpg', 'Glass Fence Spigot Series'),],
-      href: '/product/glass-fence-spigot',
+      href: '/products/glass-fence-spigot',
     },
     {
       title: 'Glass Railing & Bathroom Clip',
       description:
         'Busrom Glass Clips are known for their simple and compact shape and precise clamping force. The product is made of aviation-grade stainless steel, which is passivated and coated through multiple passivation processes, taking into account both corrosion resistance and visual aesthetics. It is suitable for staircase guardrail, glass partition, bathroom wall and other installation scenarios, easy to install and strong performance.',
       images: [ createImageObject('4.jpg', 'Glass Clip Series'),],
-      href: '/product/glass-clip',
+      href: '/products/glass-clip',
     },
     {
       title: 'Glass Hinge',
       description:
         'Busrom Glass Hinge Series is designed for shower enclosures and glass doors, with a built-in silent cushioning mechanism and stainless steel shaft to ensure smooth, noiseless opening and closing. The hinges are waterproof and rustproof to withstand frequent use and humid environments, providing both safety and durability.',
       images: [ createImageObject('5.jpg', 'Glass Hinge Series'),],
-      href: '/product/glass-hinge',
+      href: '/products/glass-hinge',
     },
     {
       title: 'Sliding Door Kit',
       description:
         'Busrom Sliding Door Kit integrates high-precision silent rollers, limiters, clamps, hooks and floor track guides, all components are made of high-quality aircraft grade stainless steel, to ensure the door is pushed and pulled smoothly and without shaking. It is suitable for sliding doors in bathrooms, shower rooms, interior partitions, and office scenarios.',
       images: [ createImageObject('6.jpg', 'Sliding Door Kit Series'),],
-      href: '/product/sliding-door-kit',
+      href: '/products/sliding-door-kit',
     },
     {
       title: 'Bathroom & Door Handle',
       description:
         'Our Bathroom & Door Handle Series covers a wide range of shapes such as straight and curved, with materials ranging from brass to stainless steel available, and surface treatments supporting a variety of effects such as chrome plating, brushed, black titanium, and so on. Whether it\'s a shower door, interior sliding door, or exterior door, they all provide a comfortable grip and high-end texture.',
       images: [ createImageObject('7.jpg', 'Bathroom & Door Handle Series'),],
-      href: '/product/bathroom-door-handle',
+      href: '/products/bathroom-door-handle',
     },
     {
       title: 'Hidden Hook',
       description:
         'Busrom Hidden Hooks are cleverly integrated into the wall where you want them to be, with a simple, screwless appearance, silent and silent when opened, and blending in with the wall when closed. Suitable for checkrooms, bathrooms, entrance halls, display areas and other scenarios, taking into account the load-bearing capacity and aesthetic design, bringing a minimalist and practical storage experience to the space.',
       images: [ createImageObject('8.jpg', 'Hidden Hook Series'),],
-      href: '/product/hidden-hook',
+      href: '/products/hidden-hook',
     },
   ],
 
