@@ -29,40 +29,40 @@ const DESKTOP_CONFIG = {
     svgAspectRatio: 1920 / 1080,  // 完整 SVG 宽高比
   },
 
-  // 左侧内容区域
+  // 左侧内容区域 (Figma: x 132, y 85)
   leftContent: {
-    left: '6%',            // 左边距（百分比）
-    top: 120,              // 顶部距离
+    left: 132,             // 左边距 - 设计稿尺寸
+    top: 85,               // 顶部距离 - 设计稿尺寸
   },
 
-  // 标题配置
+  // 标题配置 (Figma: 96px, lineHeight: 113px)
   title: {
-    fontSize: 100,         // 字体大小 - xl及以上
-    fontSizeSmall: 72,     // 字体大小 - lg到xl
-    lineHeight: 1.1,
+    fontSize: 96,          // 字体大小 - 设计稿尺寸
+    fontSizeSmall: 96,     // 保持一致
+    lineHeight: 113 / 96,  // 约 1.177
   },
 
-  // Feature 胶囊配置 [2,3,4]
+  // Feature 胶囊配置 [2,3,4] (Figma: 40px, 卡片 632x97, 圆角 30)
   featureCards: {
     bottom: 100,           // 底部距离（固定像素）
-    width: 500,            // 卡片宽度（固定像素） - xl及以上
-    widthSmall: 340,       // 卡片宽度（固定像素） - lg到xl
-    height: 80,            // 卡片高度（固定像素）
-    heightSmall: 56,       // 卡片高度 - lg到xl
+    width: 632,            // 卡片宽度 - 设计稿尺寸
+    widthSmall: 500,       // 卡片宽度 - lg到xl
+    height: 97,            // 卡片高度 - 设计稿尺寸
+    heightSmall: 80,       // 卡片高度 - lg到xl
     gap: 20,               // 卡片间距（固定像素）
-    gapSmall: 12,          // 卡片间距 - lg到xl
-    fontSize: 36,          // 字体大小（固定像素）
-    fontSizeSmall: 24,     // 字体大小 - lg到xl
-    borderRadius: 16,      // 圆角
-    borderWidth: 2,
+    gapSmall: 16,          // 卡片间距 - lg到xl
+    fontSize: 40,          // 字体大小 - 设计稿尺寸
+    fontSizeSmall: 40,     // 保持一致
+    borderRadius: 30,      // 圆角 - 设计稿尺寸
+    borderWidth: 1,
   },
 
-  // 右上角 Feature[1] 胶囊
+  // 右上角 Feature[1] 胶囊 (Figma: top 150, fontSize 48)
   feature1: {
-    top: 120,              // 顶部距离
+    top: 150,              // 顶部距离 - 设计稿尺寸
     paddingX: 48,          // 水平内边距
     paddingY: 24,          // 垂直内边距
-    fontSize: 48,          // 字体大小
+    fontSize: 48,          // 字体大小 - 设计稿尺寸
     borderRadius: 100,     // 左侧圆角 (rounded-l-full)
   },
 
@@ -186,8 +186,8 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
       <div
         className="hidden md:block absolute z-20"
         style={{
-          left: DESKTOP_CONFIG.leftContent.left,
-          top: rpxHeroMin(DESKTOP_CONFIG.leftContent.top, 80),
+          left: rpxHeroMin(DESKTOP_CONFIG.leftContent.left, 60),
+          top: rpxHeroMin(DESKTOP_CONFIG.leftContent.top, 60),
         }}
       >
         <h1
@@ -218,9 +218,9 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
       <div
         className="hidden md:flex absolute z-20 flex-col"
         style={{
-          left: DESKTOP_CONFIG.leftContent.left,
+          left: rpxHeroMin(DESKTOP_CONFIG.leftContent.left, 60),
           bottom: rpxHeroMin(DESKTOP_CONFIG.featureCards.bottom, 60),
-          gap: rpxHeroMin(DESKTOP_CONFIG.featureCards.gapSmall, 10),
+          gap: rpxHeroMin(DESKTOP_CONFIG.featureCards.gapSmall, 12),
         }}
       >
         {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
@@ -228,17 +228,22 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
             key={index}
             className="bg-[#FFFB1B]/20 border border-[#CFBC37] flex items-center"
             style={{
-              width: rpxHeroMin(DESKTOP_CONFIG.featureCards.widthSmall, 260),
+              // 宽度自适应内容，不设固定宽度
               height: rpxHeroMin(DESKTOP_CONFIG.featureCards.heightSmall, 44),
               borderRadius: rpxHeroMin(DESKTOP_CONFIG.featureCards.borderRadius, 12),
               borderWidth: `max(1.5px, ${rpxHero(DESKTOP_CONFIG.featureCards.borderWidth)})`,
-              paddingLeft: rpxHeroMin(16, 12),
-              paddingRight: rpxHeroMin(16, 12),
+              // Figma: 文字 x:177, 背景框 x:132, 所以左内边距 = 45px
+              paddingLeft: rpxHeroMin(45, 20),
+              paddingRight: rpxHeroMin(45, 20),
             }}
           >
             <p
-              className="font-phudu font-semibold text-[#CFBC37] text-stroke-custom-gold text-left"
-              style={{ fontSize: rpxHeroMin(DESKTOP_CONFIG.featureCards.fontSizeSmall, 18) }}
+              className="font-phudu font-semibold text-[#CFBC37] text-left whitespace-nowrap"
+              style={{
+                fontSize: rpxHeroMin(DESKTOP_CONFIG.featureCards.fontSizeSmall, 18),
+                // Figma: DROP_SHADOW color rgba(86,80,32,1) offset(0,4) blur 12.6
+                textShadow: '0 4px 12px rgba(86, 80, 32, 1)',
+              }}
             >
               {feature}
             </p>
@@ -327,7 +332,10 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
                 key={index}
                 className="bg-[#FFFB1B]/20 border border-[#CFBC37] rounded-lg px-4 py-2"
               >
-                <p className={`${MOBILE_CONFIG.featureCards.fontSize} font-phudu font-semibold text-[#CFBC37] text-stroke-custom-gold text-left`}>
+                <p
+                  className={`${MOBILE_CONFIG.featureCards.fontSize} font-phudu font-semibold text-[#CFBC37] text-left`}
+                  style={{ textShadow: '0 3px 8px rgba(86, 80, 32, 1)' }}
+                >
                   {feature}
                 </p>
               </div>
