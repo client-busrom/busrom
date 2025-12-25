@@ -140,14 +140,16 @@ export default function HeroBanner({ data, locale }: Props) {
 
   // 自动播放控制
   useEffect(() => {
-    if (!api) return;
+    if (!api || !data || data.length === 0) return;
     const autoplay = autoplayPlugin.current;
-    if (isVisible) {
-      autoplay.play();
-    } else {
-      autoplay.stop();
+    if (autoplay && typeof autoplay.play === 'function') {
+      if (isVisible) {
+        autoplay.play();
+      } else {
+        autoplay.stop();
+      }
     }
-  }, [api, isVisible]);
+  }, [api, isVisible, data]);
 
   // Carousel API 事件
   useEffect(() => {

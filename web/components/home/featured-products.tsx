@@ -264,15 +264,22 @@ const MobileProductCarousel = ({
 
   // 根据视口可见性控制自动播放
   useEffect(() => {
-    if (!api) return;
+    if (!api || !products || products.length === 0) return;
 
     const autoplay = autoplayPlugin.current;
-    if (isVisible) {
-      autoplay.play();
-    } else {
-      autoplay.stop();
+    if (autoplay && typeof autoplay.play === 'function') {
+      if (isVisible) {
+        autoplay.play();
+      } else {
+        autoplay.stop();
+      }
     }
-  }, [api, isVisible]);
+  }, [api, isVisible, products]);
+
+  // Guard: 如果没有产品，不渲染
+  if (!products || products.length === 0) {
+    return null;
+  }
 
   return (
     <div className="relative py-2 -mx-4">
