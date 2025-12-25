@@ -249,6 +249,25 @@ export const customTranslationsEn = {
     },
 
     // ========================================================================
+    // Navigation Manager Component
+    // ========================================================================
+    navManager: {
+      title: 'Navigation Menu Manager',
+      description: 'Drag and drop to reorder menus within the same level. Click "Edit" to modify individual items.',
+      loading: 'Loading menus...',
+      noMenus: 'No navigation menus found',
+      noName: '(No name)',
+      hidden: 'Hidden',
+      edit: 'Edit',
+      backToList: 'Back to List View',
+      createNew: 'Create New Menu',
+      orderSaved: 'Order saved!',
+      saveFailed: 'Failed to save order',
+      loadFailed: 'Failed to load menus',
+      sameLevelOnly: 'Can only reorder within the same level',
+    },
+
+    // ========================================================================
     // Navigation Labels (CustomNav component)
     // ========================================================================
     nav: {
@@ -256,6 +275,7 @@ export const customTranslationsEn = {
       // Groups
       usersAccess: 'Users & Access',
       navigation: 'Navigation',
+      websitePages: 'Website Pages',
       homepage: 'Homepage',
       mediaLibrary: 'Media Library',
       products: 'Products',
@@ -263,6 +283,8 @@ export const customTranslationsEn = {
       forms: 'Forms',
       advanced: 'Advanced',
       siteConfig: 'Site Config',
+      websiteSettings: 'Website Settings',
+      cmsSettings: 'CMS Settings',
       // Items
       users: 'Users',
       roles: 'Roles',
@@ -295,6 +317,8 @@ export const customTranslationsEn = {
       blogs: 'Blogs',
       applications: 'Applications',
       pages: 'Pages',
+      homepageManager: 'Homepage Manager',
+      subpages: 'Subpages',
       faqItems: 'FAQ Items',
       reusableBlocks: 'Reusable Blocks',
       documentTemplates: 'Document Templates',
@@ -303,7 +327,8 @@ export const customTranslationsEn = {
       customScripts: 'Custom Scripts',
       seoSettings: 'SEO Settings',
       siteConfigItem: 'Site Config',
-      contactConfig: 'Contact Config',
+      homeContent: 'Home Content',
+      preloaderConfig: 'Preloader Config',
       socialConfig: 'Social Config',
       emailConfig: 'Email Config',
       translationConfig: 'Translation Config',
@@ -547,6 +572,25 @@ export const customTranslationsZh = {
     },
 
     // ========================================================================
+    // Navigation Manager Component
+    // ========================================================================
+    navManager: {
+      title: '导航菜单管理器',
+      description: '拖放以在同一层级内重新排序菜单。点击"编辑"修改单个项目。',
+      loading: '加载菜单中...',
+      noMenus: '未找到导航菜单',
+      noName: '(无名称)',
+      hidden: '隐藏',
+      edit: '编辑',
+      backToList: '返回列表视图',
+      createNew: '创建新菜单',
+      orderSaved: '排序已保存！',
+      saveFailed: '保存排序失败',
+      loadFailed: '加载菜单失败',
+      sameLevelOnly: '只能在同一层级内重新排序',
+    },
+
+    // ========================================================================
     // Navigation Labels (CustomNav component)
     // ========================================================================
     nav: {
@@ -554,6 +598,7 @@ export const customTranslationsZh = {
       // Groups
       usersAccess: '用户与权限',
       navigation: '导航管理',
+      websitePages: '网站页面管理',
       homepage: '首页内容',
       mediaLibrary: '媒体库',
       products: '产品管理',
@@ -561,6 +606,8 @@ export const customTranslationsZh = {
       forms: '表单管理',
       advanced: '高级功能',
       siteConfig: '站点配置',
+      websiteSettings: '网站设置',
+      cmsSettings: 'CMS 配置',
       // Items
       users: '用户',
       roles: '角色',
@@ -593,6 +640,8 @@ export const customTranslationsZh = {
       blogs: '博客',
       applications: '应用',
       pages: '页面',
+      homepageManager: '首页管理',
+      subpages: '其他子页',
       faqItems: '常见问题',
       reusableBlocks: '可复用块',
       documentTemplates: '文档模板',
@@ -601,7 +650,8 @@ export const customTranslationsZh = {
       customScripts: '自定义脚本',
       seoSettings: 'SEO设置',
       siteConfigItem: '站点配置',
-      contactConfig: '联系配置',
+      homeContent: '首页内容配置',
+      preloaderConfig: '加载动画配置',
       socialConfig: '社交配置',
       emailConfig: '邮件配置',
       translationConfig: '翻译配置',

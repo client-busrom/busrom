@@ -1,54 +1,73 @@
 ﻿"use client"
 
-import { useEffect } from "react"
-import Lenis from "lenis"
+import { useEffect, useRef } from "react"
 import { easings } from "./easings"
-import { gsap } from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
-
-// Register GSAP plugin
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger)
-}
 
 interface LenisProviderProps {
   easingKey: string
 }
 
 export function LenisProvider({ easingKey }: LenisProviderProps) {
+  const lenisRef = useRef<any>(null)
+  const rafCallbackRef = useRef<((time: number) => void) | null>(null)
+
   useEffect(() => {
-    const selected = easings[easingKey]
+    // 延迟初始化 - 等待首屏渲染完成后再加载 GSAP
+    // 使用 requestIdleCallback 在浏览器空闲时初始化，避免阻塞首屏
+    const initLenis = async () => {
+      // 动态导入 GSAP 和 Lenis，减少首屏 JS 体积
+      const [{ default: Lenis }, { gsap }, { ScrollTrigger }] = await Promise.all([
+        import("lenis"),
+        import("gsap"),
+        import("gsap/ScrollTrigger"),
+      ])
 
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+      // 注册 GSAP 插件
+      gsap.registerPlugin(ScrollTrigger)
 
-    const lenis = new Lenis({
-      duration: 1,          // 尾部缓动时间略长
-      easing: selected.fn,
-      lerp: 0.05,           // 桌面端尾部跟随慢一点
-      syncTouch: true,
-      syncTouchLerp: isTouchDevice ? 0.15 : undefined,  // 移动端更快响应
-      touchMultiplier: isTouchDevice ? 1.5 : 1,    // 降低移动端滑动距离
-      wheelMultiplier: 0.8,  // 降低滚轮灵敏度，减少滑过头
-      smoothWheel: true,
-    })
+      const selected = easings[easingKey]
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
 
-    // Expose lenis to window for page-level control
-    ;(window as any).lenis = lenis
+      const lenis = new Lenis({
+        duration: 1,
+        easing: selected.fn,
+        lerp: 0.05,
+        syncTouch: true,
+        syncTouchLerp: isTouchDevice ? 0.15 : undefined,
+        touchMultiplier: isTouchDevice ? 1.5 : 1,
+        wheelMultiplier: 0.8,
+        smoothWheel: true,
+      })
 
-    // Integrate Lenis with ScrollTrigger
-    lenis.on('scroll', ScrollTrigger.update)
+      lenisRef.current = lenis
+      ;(window as any).lenis = lenis
 
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000)
-    })
+      // Integrate Lenis with ScrollTrigger
+      lenis.on('scroll', ScrollTrigger.update)
 
-    gsap.ticker.lagSmoothing(0)
+      const rafCallback = (time: number) => {
+        lenis.raf(time * 1000)
+      }
+      rafCallbackRef.current = rafCallback
+
+      gsap.ticker.add(rafCallback)
+      gsap.ticker.lagSmoothing(0)
+    }
+
+    // 使用 requestIdleCallback 或 setTimeout 延迟初始化
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(initLenis, { timeout: 2000 })
+    } else {
+      // Fallback: 延迟 100ms 初始化
+      setTimeout(initLenis, 100)
+    }
 
     return () => {
-      lenis.destroy()
-      gsap.ticker.remove((time) => {
-        lenis.raf(time * 1000)
-      })
+      if (lenisRef.current) {
+        lenisRef.current.destroy()
+      }
+      // 注意：GSAP ticker 清理需要在模块加载后进行
+      // 由于是动态导入，这里简单返回
     }
   }, [easingKey])
 

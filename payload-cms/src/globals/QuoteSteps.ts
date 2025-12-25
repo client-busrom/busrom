@@ -66,7 +66,10 @@ export const QuoteSteps: GlobalConfig = {
       },
       localized: true,
       admin: {
-        description: '例如: "Design Project Solutions"',
+        description: {
+          en: 'e.g.: "Design Project Solutions"',
+          zh: '例如: "Design Project Solutions"',
+        },
       },
     },
     {
@@ -78,7 +81,10 @@ export const QuoteSteps: GlobalConfig = {
       },
       localized: true,
       admin: {
-        description: '例如: "Just Easy 5 Steps"',
+        description: {
+          en: 'e.g.: "Just Easy 5 Steps"',
+          zh: '例如: "Just Easy 5 Steps"',
+        },
       },
     },
     {

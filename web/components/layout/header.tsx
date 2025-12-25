@@ -14,7 +14,12 @@ import useSWR from "swr";
 // 1. 定义 Header 的主题类型
 type HeaderTheme = "transparent" | "light" | "dark";
 
-export default function Header({ locale }: { locale: string }) {
+interface HeaderProps {
+  locale: string;
+  initialNavigation?: NavItem[]; // SSR 预取的导航数据
+}
+
+export default function Header({ locale, initialNavigation }: HeaderProps) {
   // 2. 状态：用于移动端菜单
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -25,9 +30,17 @@ export default function Header({ locale }: { locale: string }) {
   // 监听路由变化
   const pathname = usePathname();
 
-  // 4. 关键：使用 SWR 获取导航数据
-  // SWR 会自动使用 ClientLayoutWrapper 中提供的全局 fetcher
-  const { data: navigationItems } = useSWR<NavItem[]>(`/api/navigation?locale=${locale}`);
+  // 4. 关键：使用 SWR 获取导航数据，使用 SSR 预取的数据作为 fallback
+  // 如果有 SSR 预取的数据，禁用首次加载时的重新验证，避免关键请求链
+  const { data: navigationItems } = useSWR<NavItem[]>(
+    `/api/navigation?locale=${locale}`,
+    null,
+    {
+      fallbackData: initialNavigation,
+      revalidateOnMount: !initialNavigation, // 有初始数据时不立即重新验证
+      revalidateOnFocus: false, // 窗口获得焦点时不重新验证
+    }
+  );
 
   // 5. 关键：IntersectionObserver + MutationObserver 逻辑
   // 支持 LazySection 动态渲染的场景

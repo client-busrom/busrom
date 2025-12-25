@@ -93,7 +93,10 @@ export const CaseStudies: GlobalConfig = {
         zh: '应用分类',
       },
       admin: {
-        description: 'Select and order application categories (type=APPLICATION). API will automatically return 3 random case study items per category.',
+        description: {
+          en: 'Select and order application categories (type=APPLICATION). API will automatically return 3 random case study items per category.',
+          zh: '选择并排序应用分类（type=APPLICATION）。API将自动为每个分类返回3个随机案例项目。',
+        },
       },
     },
   ],

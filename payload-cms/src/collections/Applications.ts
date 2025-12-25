@@ -67,7 +67,10 @@ export const Applications: CollectionConfig = {
               required: true,
               unique: true,
               admin: {
-                description: 'URL-friendly identifier (e.g., "commercial-building-glass-railing")',
+                description: {
+                  en: 'URL-friendly identifier (e.g., "commercial-building-glass-railing")',
+                  zh: 'URL友好标识符（例如："commercial-building-glass-railing"）',
+                },
               },
             },
             {
@@ -130,7 +133,10 @@ export const Applications: CollectionConfig = {
                 zh: '场景图集',
               },
               admin: {
-                description: 'Manage scene image groups. Each scene can contain multiple images.',
+                description: {
+                  en: 'Manage scene image groups. Each scene can contain multiple images.',
+                  zh: '管理场景图片组。每个场景可以包含多张图片。',
+                },
               },
               fields: [
                 {
@@ -153,7 +159,10 @@ export const Applications: CollectionConfig = {
                     zh: '图片',
                   },
                   admin: {
-                    description: 'Select multiple images for this scene',
+                    description: {
+                      en: 'Select multiple images for this scene',
+                      zh: '为此场景选择多张图片',
+                    },
                     components: {
                       Field: '@/components/fields/MediaPicker',
                     },

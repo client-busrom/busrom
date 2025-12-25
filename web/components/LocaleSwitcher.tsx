@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils"
 import { usePathname, useRouter, replaceLocaleInPath } from "@/lib/navigation"
 import { Button } from "@/components/ui/button"
+import { locales } from "@/i18n.config"
 
 // 定义 Header 传入的主题类型
 type HeaderTheme = "transparent" | "light" | "dark";
@@ -28,7 +29,7 @@ export default function LocaleSwitcher({ activeTheme }: LocaleSwitcherProps) {
   const dropdownRef = useRef<HTMLDivElement>(null)
   const countryListRef = useRef<HTMLDivElement>(null); // Ref for country list
   const languageListRef = useRef<HTMLDivElement>(null); // Ref for language list
-  const { preferences, isLoaded, updateCountry, updateLanguage } = useUserPreferences()
+  const { preferences, isLoaded, updatePreferences } = useUserPreferences()
   const pathname = usePathname()
   const router = useRouter()
 
@@ -101,17 +102,28 @@ export default function LocaleSwitcher({ activeTheme }: LocaleSwitcherProps) {
 
   // 点击确认按钮
   const handleConfirm = () => {
-    const originalLanguage = preferences.language;
+    try {
+      const originalLanguage = preferences.language;
 
-    updateCountry(tempCountryCode)
-    updateLanguage(tempLanguageCode)
+      // 一次性保存国家和语言偏好（避免状态覆盖问题）
+      updatePreferences({
+        country: tempCountryCode,
+        language: tempLanguageCode,
+      })
 
-    if (tempLanguageCode !== originalLanguage) {
-      const newPath = replaceLocaleInPath(pathname, tempLanguageCode)
-      router.push(newPath)
+      // 关闭弹窗
+      setIsOpen(false)
+
+      // 语言变化时跳转页面
+      // CMS 会自动 fallback 到英文如果某语言没有翻译
+      if (tempLanguageCode !== originalLanguage && locales.includes(tempLanguageCode as any)) {
+        const newPath = replaceLocaleInPath(pathname, tempLanguageCode)
+        router.push(newPath)
+      }
+    } catch (error) {
+      console.error('[LocaleSwitcher] Error in handleConfirm:', error)
+      setIsOpen(false)
     }
-
-    setIsOpen(false)
   }
 
   // 加载状态 - 使用相同尺寸的占位符避免 CLS

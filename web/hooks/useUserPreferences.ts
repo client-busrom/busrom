@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import { DEFAULT_COUNTRY, DEFAULT_LANGUAGE, getCountryFromLocale } from "@/lib/countries-languages"
-import { locales } from "@/i18n.config"
+import { locales, defaultLocale } from "@/i18n.config"
 
 export interface UserPreferences {
   country: string
@@ -13,12 +13,14 @@ export interface UserPreferences {
 const STORAGE_KEY = "user-preferences"
 
 // 从 URL 路径中提取 locale
+// 新策略: 无前缀 = 默认语言(英文)，/zh = 中文
 function getLocaleFromPath(pathname: string): string {
   const segments = pathname.split('/').filter(Boolean)
   if (segments.length > 0 && locales.includes(segments[0] as any)) {
     return segments[0]
   }
-  return DEFAULT_LANGUAGE
+  // 没有语言前缀 = 默认语言
+  return defaultLocale
 }
 
 export function useUserPreferences() {

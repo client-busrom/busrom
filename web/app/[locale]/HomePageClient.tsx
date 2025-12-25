@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import type { Locale } from "@/i18n.config";
 // 1. 导入我们刚刚创建的 HomeContent 类型
 import type { HomeContent } from "@/lib/content-data";
+import { LazySection } from "@/components/ui/LazySection";
 
 // --- 2. 导入组件 ---
 // 首屏组件直接导入（首屏性能关键）- 只保留不使用 framer-motion 的组件
@@ -135,86 +136,86 @@ export function HomePageClient({
         <ServiceFeatures data={content.serviceFeatures} />
       </div>
 
-      {/* 模块 4: 3D球体 - 暂时注释掉测试性能影响 */}
-      {/* <div data-header-theme="transparent">
+      {/* 模块 4: 3D球体 - 延迟加载 */}
+      <div data-header-theme="transparent">
         <DeferredSphere3D />
-      </div> */}
+      </div>
 
-      {/* 模块 5: 简易表单跳转 */}
+      {/* 模块 5: 简易表单跳转 - 懒加载 */}
       {content.simpleCta?.images && (
-        <div data-header-theme="light">
+        <LazySection minHeight="600px" headerTheme="light">
           <MemoizedSimpleCta data={content.simpleCta} />
-        </div>
+        </LazySection>
       )}
 
-      {/* 模块 6: 系列产品介绍 */}
+      {/* 模块 6: 系列产品介绍 - 懒加载 */}
       {content.seriesIntro && (
-        <div data-header-theme="dark">
+        <LazySection minHeight="800px" headerTheme="dark">
           <MemoizedSeriesIntro data={content.seriesIntro} />
-        </div>
+        </LazySection>
       )}
 
-      {/* 模块 7: 精选产品 */}
+      {/* 模块 7: 精选产品 - 懒加载 */}
       {content.featuredProducts?.series?.length > 0 && (
-        <div data-header-theme="light">
+        <LazySection minHeight="600px" headerTheme="light">
           <FeaturedProducts data={content.featuredProducts} locale={currentLanguage} />
-        </div>
+        </LazySection>
       )}
 
-      {/* 模块 8: 品牌优势 */}
+      {/* 模块 8: 品牌优势 - 懒加载 */}
       {content.brandAdvantages?.advantages && content.brandAdvantages?.icons && (
-        <div data-header-theme="transparent">
+        <LazySection minHeight="500px" headerTheme="transparent">
           <MemoizedBrandAdvantages data={content.brandAdvantages} />
-        </div>
+        </LazySection>
       )}
 
-      {/* 模块 9: OEM / ODM合作 */}
+      {/* 模块 9: OEM / ODM合作 - 懒加载 */}
       {content.oemOdm?.oem && content.oemOdm?.odm && (
-        <div data-header-theme="transparent">
+        <LazySection minHeight="600px" headerTheme="transparent">
           <MemoizedOemOdm data={content.oemOdm} />
-        </div>
+        </LazySection>
       )}
 
-      {/* 模块 10: 获取报价五步曲 */}
+      {/* 模块 10: 获取报价五步曲 - 懒加载 */}
       {content.quoteSteps?.steps?.length > 0 && (
-        <div data-header-theme="light">
+        <LazySection minHeight="800px" headerTheme="light">
           <MemoizedQuoteSteps data={content.quoteSteps} />
-        </div>
+        </LazySection>
       )}
 
-      {/* 模块 11: 表单 */}
+      {/* 模块 11: 表单 - 懒加载 */}
       {content.mainForm && (
-        <div data-header-theme="transparent">
+        <LazySection minHeight="600px" headerTheme="transparent">
           <MainForm data={content.mainForm} locale={currentLanguage} />
-        </div>
+        </LazySection>
       )}
 
-      {/* 模块 12: 为什么选择Busrom */}
+      {/* 模块 12: 为什么选择Busrom - 懒加载 */}
       {content.whyChooseBusrom?.reasons?.length > 0 && (
-        <div data-header-theme="light">
+        <LazySection minHeight="500px" headerTheme="light">
           <MemoizedWhyChooseBusrom data={content.whyChooseBusrom} />
-        </div>
+        </LazySection>
       )}
 
-      {/* 模块 13: 应用案例轮播 */}
+      {/* 模块 13: 应用案例轮播 - 懒加载 */}
       {content.caseStudies?.applications?.length > 0 && (
-        <div data-header-theme="light">
+        <LazySection minHeight="600px" headerTheme="light">
           <MemoizedCaseStudies data={content.caseStudies} />
-        </div>
+        </LazySection>
       )}
 
-      {/* 模块 14: 品牌价值植入 */}
+      {/* 模块 14: 品牌价值植入 - 懒加载 */}
       {content.brandAnalysis?.centers && content.brandAnalysis?.analysis && (
-        <div data-header-theme="transparent">
+        <LazySection minHeight="800px" headerTheme="transparent">
           <MemoizedBrandAnalysis data={content.brandAnalysis} />
-        </div>
+        </LazySection>
       )}
 
-      {/* 模块 15: 品牌价值体现 */}
+      {/* 模块 15: 品牌价值体现 - 懒加载 */}
       {content.brandValue?.param1 && content.brandValue?.slogan && (
-        <div data-header-theme="light">
+        <LazySection minHeight="600px" headerTheme="light">
           <MemoizedBrandValue data={content.brandValue} />
-        </div>
+        </LazySection>
       )}
       
     </main>

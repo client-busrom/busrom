@@ -65,7 +65,10 @@ export const ServiceFeatures: GlobalConfig = {
       },
       localized: true,
       admin: {
-        description: '例如: "Premium Architectural Glass Hardware"',
+        description: {
+          en: 'e.g.: "Premium Architectural Glass Hardware"',
+          zh: '例如: "Premium Architectural Glass Hardware"',
+        },
       },
     },
     {
@@ -90,7 +93,10 @@ export const ServiceFeatures: GlobalConfig = {
       },
       localized: true,
       admin: {
-        description: '例如: "Any Size, Any Structure, Any Shape"',
+        description: {
+          en: 'e.g.: "Any Size, Any Structure, Any Shape"',
+          zh: '例如: "Any Size, Any Structure, Any Shape"',
+        },
       },
     },
     {
@@ -102,7 +108,10 @@ export const ServiceFeatures: GlobalConfig = {
       },
       localized: true,
       admin: {
-        description: '例如: "Any Size"',
+        description: {
+          en: 'e.g.: "Any Size"',
+          zh: '例如: "Any Size"',
+        },
       },
     },
     {

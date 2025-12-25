@@ -1,7 +1,15 @@
 'use client'
 
 import React from 'react'
-import { useField } from '@payloadcms/ui'
+import { useField, useTranslation } from '@payloadcms/ui'
+
+// i18n translations
+const i18n = {
+  noAttachments: { en: 'No attachments', zh: '无附件' },
+  unknownFile: { en: 'Unknown file', zh: '未知文件' },
+  unknownType: { en: 'Unknown type', zh: '未知类型' },
+  download: { en: 'Download', zh: '下载' },
+}
 
 interface Attachment {
   fileName: string
@@ -18,11 +26,13 @@ interface Attachment {
 export const AttachmentsDisplay: React.FC<{ path: string }> = () => {
   // Read from the actual 'attachments' field
   const { value } = useField<Attachment[]>({ path: 'attachments' })
+  const { i18n: { language } } = useTranslation()
+  const t = (obj: { en: string; zh: string }) => language === 'zh' ? obj.zh : obj.en
 
   if (!value || !Array.isArray(value) || value.length === 0) {
     return (
       <div style={{ padding: '12px', color: '#666' }}>
-        No attachments / 无附件
+        {t(i18n.noAttachments)}
       </div>
     )
   }
@@ -84,7 +94,7 @@ export const AttachmentsDisplay: React.FC<{ path: string }> = () => {
                 wordBreak: 'break-word',
               }}
             >
-              {attachment.fileName || 'Unknown file'}
+              {attachment.fileName || t(i18n.unknownFile)}
             </div>
             <div
               style={{
@@ -92,7 +102,7 @@ export const AttachmentsDisplay: React.FC<{ path: string }> = () => {
                 color: 'var(--theme-elevation-500)',
               }}
             >
-              {attachment.fileType || 'Unknown type'} • {formatFileSize(attachment.fileSize || 0)}
+              {attachment.fileType || t(i18n.unknownType)} • {formatFileSize(attachment.fileSize || 0)}
             </div>
           </div>
 

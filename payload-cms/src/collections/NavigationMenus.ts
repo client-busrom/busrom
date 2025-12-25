@@ -54,7 +54,10 @@ export const NavigationMenus: CollectionConfig = {
       required: true,
       unique: true,
       admin: {
-        description: '唯一标识符，例如: product, service, about-us',
+        description: {
+          en: 'Unique identifier, e.g.: product, service, about-us',
+          zh: '唯一标识符，例如: product, service, about-us',
+        },
       },
     },
     {
@@ -97,7 +100,10 @@ export const NavigationMenus: CollectionConfig = {
         zh: '图标',
       },
       admin: {
-        description: 'Lucide-react 图标名称，例如: Home, Package, Wrench',
+        description: {
+          en: 'Lucide-react icon name, e.g.: Home, Package, Wrench',
+          zh: 'Lucide-react 图标名称，例如: Home, Package, Wrench',
+        },
         condition: (data) => data?.type === 'submenu',
       },
     },
@@ -112,7 +118,10 @@ export const NavigationMenus: CollectionConfig = {
         zh: '媒体标签',
       },
       admin: {
-        description: '选择标签筛选图片，用于菜单卡片显示',
+        description: {
+          en: 'Select tags to filter images for menu card display',
+          zh: '选择标签筛选图片，用于菜单卡片显示',
+        },
         // 显示条件：自身是 product_cards 类型，或者有父级菜单（子菜单）
         condition: (data) => data?.type === 'product_cards' || data?.parent,
       },
@@ -127,7 +136,10 @@ export const NavigationMenus: CollectionConfig = {
         zh: '父级菜单',
       },
       admin: {
-        description: '留空表示顶级菜单',
+        description: {
+          en: 'Leave empty for top-level menu',
+          zh: '留空表示顶级菜单',
+        },
       },
     },
     // Link Configuration
@@ -139,7 +151,10 @@ export const NavigationMenus: CollectionConfig = {
         zh: '链接',
       },
       admin: {
-        description: '外链 https://... 或内部路径 /product, /service',
+        description: {
+          en: 'External URL https://... or internal path /product, /service',
+          zh: '外链 https://... 或内部路径 /product, /service',
+        },
       },
     },
     {
@@ -150,7 +165,10 @@ export const NavigationMenus: CollectionConfig = {
         zh: '询单链接',
       },
       admin: {
-        description: '"询单"按钮的链接，仅用于 PRODUCT_CARDS 类型',
+        description: {
+          en: 'Link for "Inquiry" button, only for PRODUCT_CARDS type',
+          zh: '"询单"按钮的链接，仅用于 PRODUCT_CARDS 类型',
+        },
         condition: (data) => data?.type === 'product_cards',
       },
     },
@@ -166,7 +184,10 @@ export const NavigationMenus: CollectionConfig = {
       min: 1,
       max: 100,
       admin: {
-        description: '数字越小越靠前',
+        description: {
+          en: 'Lower number appears first',
+          zh: '数字越小越靠前',
+        },
       },
     },
     {
@@ -178,7 +199,10 @@ export const NavigationMenus: CollectionConfig = {
       },
       defaultValue: false,
       admin: {
-        description: '系统默认菜单，不可删除',
+        description: {
+          en: 'System default menu, cannot be deleted',
+          zh: '系统默认菜单，不可删除',
+        },
         readOnly: true,
       },
     },

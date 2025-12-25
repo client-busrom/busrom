@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { cn } from "@/lib/utils";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { StepNumber } from "./StepNumbers";
 
 type Props = {
   data: HomeContent["quoteSteps"];
@@ -243,19 +244,19 @@ export default function QuoteSteps({ data }: Props) {
                 onClick={() => setActiveIndex(index)}
               >
                 {/* 步骤序号 x=388 → 20.2% */}
-                <span
+                <div
                   className={cn(
-                    "absolute z-10 font-montserrat font-extrabold transition-all duration-300",
-                    isActive ? "text-brand-text-black" : "text-stroke-black"
+                    "absolute z-10 transition-all duration-300",
+                    isActive ? "text-brand-text-black" : "text-brand-text-black/20"
                   )}
                   style={{
                     left: "20.2%", // 388/1920
-                    fontSize: "clamp(70px, 7.3vw, 140px)", // 140px
-                    lineHeight: "0.82", // 115/140
+                    width: "clamp(116px, 12vw, 232px)", // 按比例缩放
+                    height: "clamp(58px, 6vw, 116px)",
                   }}
                 >
-                  {pos.number}/
-                </span>
+                  <StepNumber step={(index + 1) as 1 | 2 | 3 | 4 | 5} filled={isActive} />
+                </div>
 
                 {/* 步骤文本 x=714 → 37.2% */}
                 <p
@@ -364,15 +365,14 @@ export default function QuoteSteps({ data }: Props) {
               >
                 {/* 步骤内容 */}
                 <div className="flex items-center mb-4">
-                  <span
+                  <div
                     className={cn(
-                      "text-4xl font-montserrat font-extrabold transition-all duration-300 mr-4 leading-none",
-                      "text-stroke-black",
-                      { "text-brand-text-black": isActive }
+                      "w-[80px] h-[40px] mr-4 transition-all duration-300",
+                      isActive ? "text-brand-text-black" : "text-brand-text-black/20"
                     )}
                   >
-                    {pos.number}/
-                  </span>
+                    <StepNumber step={(index + 1) as 1 | 2 | 3 | 4 | 5} filled={isActive} />
+                  </div>
                   <p
                     className={cn(
                       "text-lg font-anaheim font-bold transition-colors duration-300 leading-tight",

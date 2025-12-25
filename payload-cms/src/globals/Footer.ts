@@ -48,7 +48,10 @@ export const Footer: GlobalConfig = {
       type: 'tabs',
       tabs: [
         {
-          label: 'Contact | 联系方式',
+          label: {
+            en: 'Contact',
+            zh: '联系方式',
+          },
           fields: [
             // Form Configuration
             {
@@ -60,7 +63,10 @@ export const Footer: GlobalConfig = {
                 zh: '表单配置',
               },
               admin: {
-                description: '选择一个表单配置 (推荐使用 "footer-form")。表单的所有配置（字段、按钮文本等）都在 FormConfig 中设置。',
+                description: {
+                  en: 'Select a form configuration (recommended: "footer-form"). All form settings (fields, button text, etc.) are configured in FormConfig.',
+                  zh: '选择一个表单配置（推荐使用 "footer-form"）。表单的所有配置（字段、按钮文本等）都在 FormConfig 中设置。',
+                },
               },
             },
             // Contact Information
@@ -76,61 +82,94 @@ export const Footer: GlobalConfig = {
                   name: 'contactTitle',
                   type: 'text',
                   localized: true,
-                  label: 'Contact Title | 联系标题',
+                  label: {
+                    en: 'Contact Title',
+                    zh: '联系标题',
+                  },
                 },
                 // Email
                 {
                   name: 'contactEmailLabel',
                   type: 'text',
                   localized: true,
-                  label: 'Email Label | 邮箱标签',
+                  label: {
+                    en: 'Email Label',
+                    zh: '邮箱标签',
+                  },
                   admin: {
-                    description: '例如: "Email", "联系邮箱" 等',
+                    description: {
+                      en: 'e.g., "Email", "Contact Email"',
+                      zh: '例如: "Email", "联系邮箱" 等',
+                    },
                   },
                 },
                 {
                   name: 'contactEmail',
                   type: 'email',
-                  label: 'Email | 邮箱',
+                  label: {
+                    en: 'Email',
+                    zh: '邮箱',
+                  },
                 },
                 // After Sales
                 {
                   name: 'afterSalesLabel',
                   type: 'text',
                   localized: true,
-                  label: 'After Sales Label | 售后标签',
+                  label: {
+                    en: 'After Sales Label',
+                    zh: '售后标签',
+                  },
                   admin: {
-                    description: '例如: "After-sales", "售后" 等',
+                    description: {
+                      en: 'e.g., "After-sales", "Support"',
+                      zh: '例如: "After-sales", "售后" 等',
+                    },
                   },
                 },
                 {
                   name: 'afterSalesEmail',
                   type: 'email',
-                  label: 'After Sales Email | 售后邮箱',
+                  label: {
+                    en: 'After Sales Email',
+                    zh: '售后邮箱',
+                  },
                 },
                 // WhatsApp
                 {
                   name: 'whatsappLabel',
                   type: 'text',
                   localized: true,
-                  label: 'WhatsApp Label | WhatsApp标签',
+                  label: {
+                    en: 'WhatsApp Label',
+                    zh: 'WhatsApp标签',
+                  },
                 },
                 {
                   name: 'whatsappNumber',
                   type: 'text',
-                  label: 'WhatsApp Number | WhatsApp号码',
+                  label: {
+                    en: 'WhatsApp Number',
+                    zh: 'WhatsApp号码',
+                  },
                 },
                 {
                   name: 'address',
                   type: 'textarea',
                   localized: true,
-                  label: 'Address | 地址',
+                  label: {
+                    en: 'Address',
+                    zh: '地址',
+                  },
                 },
                 {
                   name: 'workingHours',
                   type: 'text',
                   localized: true,
-                  label: 'Working Hours | 工作时间',
+                  label: {
+                    en: 'Working Hours',
+                    zh: '工作时间',
+                  },
                 },
               ],
             },
@@ -147,33 +186,51 @@ export const Footer: GlobalConfig = {
                   name: 'officialNoticeTitle',
                   type: 'text',
                   localized: true,
-                  label: 'Notice Title | 声明标题',
+                  label: {
+                    en: 'Notice Title',
+                    zh: '声明标题',
+                  },
                 },
                 {
                   name: 'officialNoticeLine1',
                   type: 'text',
                   localized: true,
-                  label: 'Line 1 | 第1行',
+                  label: {
+                    en: 'Line 1',
+                    zh: '第1行',
+                  },
                 },
                 {
                   name: 'officialNoticeLine2',
                   type: 'text',
                   localized: true,
-                  label: 'Line 2 | 第2行',
+                  label: {
+                    en: 'Line 2',
+                    zh: '第2行',
+                  },
                 },
                 {
                   name: 'officialNoticeLine3',
                   type: 'text',
                   localized: true,
-                  label: 'Line 3 | 第3行',
+                  label: {
+                    en: 'Line 3',
+                    zh: '第3行',
+                  },
                 },
                 {
                   name: 'officialNoticeLine4',
                   type: 'text',
                   localized: true,
-                  label: 'Line 4 | 第4行',
+                  label: {
+                    en: 'Line 4',
+                    zh: '第4行',
+                  },
                   admin: {
-                    description: '例如：署名、日期等',
+                    description: {
+                      en: 'e.g., signature, date, etc.',
+                      zh: '例如：署名、日期等',
+                    },
                   },
                 },
               ],
@@ -181,39 +238,34 @@ export const Footer: GlobalConfig = {
           ],
         },
         {
-          label: 'Links & Menus | 链接菜单',
+          label: {
+            en: 'Links & Menus',
+            zh: '链接菜单',
+          },
           fields: [
-            // Social Links
+            // Social Links - Reference to SocialConfig
             {
-              name: 'socialLinks',
-              type: 'array',
-              label: 'Social Links | 社交链接',
-              fields: [
-                {
-                  name: 'platform',
-                  type: 'select',
-                  options: [
-                    { label: 'Facebook', value: 'facebook' },
-                    { label: 'Twitter/X', value: 'twitter' },
-                    { label: 'Instagram', value: 'instagram' },
-                    { label: 'LinkedIn', value: 'linkedin' },
-                    { label: 'YouTube', value: 'youtube' },
-                    { label: 'TikTok', value: 'tiktok' },
-                    { label: 'WeChat', value: 'wechat' },
-                    { label: 'WhatsApp', value: 'whatsapp' },
-                  ],
+              name: 'socialLinksNote',
+              type: 'ui',
+              admin: {
+                components: {
+                  Field: {
+                    path: '@/components/fields/InfoBox',
+                    exportName: 'InfoBox',
+                    clientProps: {
+                      message: {
+                        en: 'Social links are managed in Social Config. Go to Website Settings > Social Config to edit social media links.',
+                        zh: '社交链接在"社交媒体配置"中管理。请前往 网站设置 > 社交媒体配置 编辑社交链接。',
+                      },
+                      linkHref: '/admin/globals/social-config',
+                      linkText: {
+                        en: 'Edit Social Links',
+                        zh: '编辑社交链接',
+                      },
+                    },
+                  },
                 },
-                {
-                  name: 'url',
-                  type: 'text',
-                  required: true,
-                },
-                {
-                  name: 'icon',
-                  type: 'upload',
-                  relationTo: 'media',
-                },
-              ],
+              },
             },
             // Navigation Menus (横向展示)
             {
@@ -221,9 +273,15 @@ export const Footer: GlobalConfig = {
               type: 'relationship',
               relationTo: 'navigation-menus',
               hasMany: true,
-              label: 'Navigation Menus | 导航菜单',
+              label: {
+                en: 'Navigation Menus',
+                zh: '导航菜单',
+              },
               admin: {
-                description: '选择要在非首页页脚显示的导航菜单（横向排列）',
+                description: {
+                  en: 'Select navigation menus to display in non-homepage footer (horizontal layout)',
+                  zh: '选择要在非首页页脚显示的导航菜单（横向排列）',
+                },
               },
             },
             // Copyright & Legal
@@ -231,23 +289,37 @@ export const Footer: GlobalConfig = {
               name: 'copyrightText',
               type: 'text',
               localized: true,
-              label: 'Copyright Text | 版权文本',
+              label: {
+                en: 'Copyright Text',
+                zh: '版权文本',
+              },
             },
             {
               name: 'legalLinks',
               type: 'array',
-              label: 'Legal Links | 法律链接',
+              label: {
+                en: 'Legal Links',
+                zh: '法律链接',
+              },
               fields: [
                 {
                   name: 'label',
                   type: 'text',
                   localized: true,
                   required: true,
+                  label: {
+                    en: 'Label',
+                    zh: '标签',
+                  },
                 },
                 {
                   name: 'url',
                   type: 'text',
                   required: true,
+                  label: {
+                    en: 'URL',
+                    zh: '链接',
+                  },
                 },
               ],
             },

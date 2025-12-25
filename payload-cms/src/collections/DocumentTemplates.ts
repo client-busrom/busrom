@@ -32,7 +32,10 @@ export const DocumentTemplates: CollectionConfig = {
       en: 'Content',
       zh: '内容管理',
     },
-    description: 'Pre-made content templates that can be inserted into documents',
+    description: {
+      en: 'Pre-made content templates that can be inserted into documents',
+      zh: '可插入文档的预制内容模板',
+    },
     pagination: {
       defaultLimit: 50,
     },
@@ -57,7 +60,10 @@ export const DocumentTemplates: CollectionConfig = {
       required: true,
       unique: true,
       admin: {
-        description: 'Unique identifier (e.g., "product-intro-template")',
+        description: {
+          en: 'Unique identifier (e.g., "product-intro-template")',
+          zh: '唯一标识符（例如："product-intro-template"）',
+        },
       },
     },
     {
@@ -99,7 +105,10 @@ export const DocumentTemplates: CollectionConfig = {
         { label: 'Other | 其他', value: 'other' },
       ],
       admin: {
-        description: 'Category for organizing templates',
+        description: {
+          en: 'Category for organizing templates',
+          zh: '用于组织模板的分类',
+        },
       },
     },
 
@@ -126,7 +135,10 @@ export const DocumentTemplates: CollectionConfig = {
         zh: '标签',
       },
       admin: {
-        description: 'Comma-separated tags for searching (e.g., "product, hero, banner")',
+        description: {
+          en: 'Comma-separated tags for searching (e.g., "product, hero, banner")',
+          zh: '用逗号分隔的搜索标签（例如："product, hero, banner"）',
+        },
       },
     },
 
@@ -144,7 +156,10 @@ export const DocumentTemplates: CollectionConfig = {
       admin: {
         readOnly: true,
         position: 'sidebar',
-        description: 'Number of times this template has been used',
+        description: {
+          en: 'Number of times this template has been used',
+          zh: '此模板的使用次数',
+        },
       },
     },
 
@@ -166,7 +181,10 @@ export const DocumentTemplates: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
-        description: 'Only ACTIVE templates appear in the template selector',
+        description: {
+          en: 'Only ACTIVE templates appear in the template selector',
+          zh: '只有"启用"状态的模板会显示在模板选择器中',
+        },
       },
     },
   ],

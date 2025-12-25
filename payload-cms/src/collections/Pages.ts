@@ -25,22 +25,25 @@ export const Pages: CollectionConfig = {
   slug: 'pages',
   labels: {
     singular: {
-      en: 'Page',
-      zh: '页面',
+      en: 'Subpage',
+      zh: '子页面',
     },
     plural: {
-      en: 'Pages',
-      zh: '页面',
+      en: 'Subpages',
+      zh: '其他子页',
     },
   },
   admin: {
     useAsTitle: 'slug',
     defaultColumns: ['slug', 'pageType', 'template', 'status', 'order', 'updatedAt'],
     group: {
-      en: 'Content',
-      zh: '内容管理',
+      en: 'Website Pages',
+      zh: '网站页面管理',
     },
-    description: 'Unified page management - includes template pages and freeform landing pages',
+    description: {
+      en: 'Manage subpages - includes template pages and freeform landing pages',
+      zh: '管理子页面 - 包括模板页面和自由格式着陆页',
+    },
   },
   access: {
     read: () => true,
@@ -85,7 +88,10 @@ export const Pages: CollectionConfig = {
               required: true,
               unique: true,
               admin: {
-                description: 'CMS internal identifier. e.g.: service-overview, faq, summer-promotion-2024',
+                description: {
+                  en: 'CMS internal identifier. e.g.: service-overview, faq, summer-promotion-2024',
+                  zh: 'CMS内部标识符。例如：service-overview, faq, summer-promotion-2024',
+                },
               },
               validate: (value: any) => {
                 if (!value) return true
@@ -106,7 +112,10 @@ export const Pages: CollectionConfig = {
               required: true,
               unique: true,
               admin: {
-                description: 'Full URL path for frontend routing. e.g.: /service/one-stop-shop, /about-us/story',
+                description: {
+                  en: 'Full URL path for frontend routing. e.g.: /service/one-stop-shop, /about-us/story',
+                  zh: '前端路由的完整URL路径。例如：/service/one-stop-shop, /about-us/story',
+                },
               },
               validate: (value: any) => {
                 if (!value) return true
@@ -134,7 +143,10 @@ export const Pages: CollectionConfig = {
                 { label: 'Freeform Page | 自由落地页', value: 'FREEFORM' },
               ],
               admin: {
-                description: 'Template: fixed structure, only edit content | Freeform: fully customizable',
+                description: {
+                  en: 'Template: fixed structure, only edit content | Freeform: fully customizable',
+                  zh: '模板：固定结构，只能编辑内容 | 自由格式：完全可自定义',
+                },
               },
             },
             {
@@ -145,7 +157,10 @@ export const Pages: CollectionConfig = {
                 zh: '模板名称',
               },
               admin: {
-                description: 'Only for template pages. e.g.: SERVICE_OVERVIEW, FAQ, ABOUT_US, OEM_ODM',
+                description: {
+                  en: 'Only for template pages. e.g.: SERVICE_OVERVIEW, FAQ, ABOUT_US, OEM_ODM',
+                  zh: '仅用于模板页面。例如：SERVICE_OVERVIEW, FAQ, ABOUT_US, OEM_ODM',
+                },
                 condition: (data) => data.pageType === 'TEMPLATE',
               },
             },
@@ -180,7 +195,10 @@ export const Pages: CollectionConfig = {
                 zh: '富文本内容',
               },
               admin: {
-                description: 'Rich text content - use language tabs above to switch locales',
+                description: {
+                  en: 'Rich text content - use language tabs above to switch locales',
+                  zh: '富文本内容 - 使用上方语言标签切换语言',
+                },
                 components: {
                   beforeInput: ['@/components/fields/MultiLocaleRichTextField'],
                 },
@@ -208,7 +226,10 @@ export const Pages: CollectionConfig = {
                 zh: '顶部图片标签',
               },
               admin: {
-                description: 'Select media tags for hero waterfall animation',
+                description: {
+                  en: 'Select media tags for hero waterfall animation',
+                  zh: '选择用于顶部瀑布动画的媒体标签',
+                },
               },
             },
             {
@@ -257,7 +278,10 @@ export const Pages: CollectionConfig = {
       defaultValue: false,
       admin: {
         position: 'sidebar',
-        description: 'System pages cannot be deleted',
+        description: {
+          en: 'System pages cannot be deleted',
+          zh: '系统页面无法删除',
+        },
       },
     },
     {
@@ -301,7 +325,10 @@ export const Pages: CollectionConfig = {
       defaultValue: 0,
       admin: {
         position: 'sidebar',
-        description: 'Lower number = higher priority',
+        description: {
+          en: 'Lower number = higher priority',
+          zh: '数字越小优先级越高',
+        },
       },
     },
     {

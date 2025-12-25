@@ -1,7 +1,17 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useFormFields } from '@payloadcms/ui'
+import { useFormFields, useTranslation } from '@payloadcms/ui'
+
+// i18n translations
+const i18n = {
+  fillFirst: { en: 'Please fill in SMTP host, user, and password first', zh: '请先填写 SMTP 主机、用户名和密码' },
+  success: { en: 'Test email sent successfully!', zh: '测试邮件发送成功！' },
+  failed: { en: 'Failed to send test email', zh: '发送测试邮件失败' },
+  networkError: { en: 'Network error', zh: '网络错误' },
+  sending: { en: 'Sending...', zh: '发送中...' },
+  sendTestEmail: { en: 'Send Test Email', zh: '发送测试邮件' },
+}
 
 /**
  * SmtpTestButton Component
@@ -11,6 +21,8 @@ import { useFormFields } from '@payloadcms/ui'
 export const SmtpTestButton: React.FC = () => {
   const [testing, setTesting] = useState(false)
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
+  const { i18n: { language } } = useTranslation()
+  const t = (obj: { en: string; zh: string }) => language === 'zh' ? obj.zh : obj.en
 
   // Get SMTP fields from form
   const smtpHost = useFormFields(([fields]) => fields.smtpHost?.value as string)
@@ -21,7 +33,7 @@ export const SmtpTestButton: React.FC = () => {
 
   const handleTest = async () => {
     if (!smtpHost || !smtpUser || !smtpPassword) {
-      setResult({ success: false, message: 'Please fill in SMTP host, user, and password first' })
+      setResult({ success: false, message: t(i18n.fillFirst) })
       return
     }
 
@@ -50,12 +62,12 @@ export const SmtpTestButton: React.FC = () => {
       const data = await response.json()
 
       if (response.ok) {
-        setResult({ success: true, message: data.message || 'Test email sent successfully!' })
+        setResult({ success: true, message: data.message || t(i18n.success) })
       } else {
-        setResult({ success: false, message: data.error || 'Failed to send test email' })
+        setResult({ success: false, message: data.error || t(i18n.failed) })
       }
     } catch (error) {
-      setResult({ success: false, message: error instanceof Error ? error.message : 'Network error' })
+      setResult({ success: false, message: error instanceof Error ? error.message : t(i18n.networkError) })
     } finally {
       setTesting(false)
     }
@@ -77,7 +89,7 @@ export const SmtpTestButton: React.FC = () => {
           fontSize: '14px',
         }}
       >
-        {testing ? 'Sending...' : 'Send Test Email'}
+        {testing ? t(i18n.sending) : t(i18n.sendTestEmail)}
       </button>
 
       {result && (

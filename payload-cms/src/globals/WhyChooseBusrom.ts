@@ -86,7 +86,10 @@ export const WhyChooseBusrom: GlobalConfig = {
       },
       localized: true,
       admin: {
-        description: '例如: "VIEW MORE INFORMATION"',
+        description: {
+          en: 'e.g.: "VIEW MORE INFORMATION"',
+          zh: '例如: "VIEW MORE INFORMATION"',
+        },
       },
     },
     {
@@ -97,7 +100,10 @@ export const WhyChooseBusrom: GlobalConfig = {
         zh: '查看更多按钮链接',
       },
       admin: {
-        description: '例如: "/about-us" 或 "https://example.com/about"',
+        description: {
+          en: 'e.g.: "/about-us" or "https://example.com/about"',
+          zh: '例如: "/about-us" 或 "https://example.com/about"',
+        },
       },
     },
 
@@ -130,7 +136,10 @@ export const WhyChooseBusrom: GlobalConfig = {
         zh: '理由01 - 图标',
       },
       admin: {
-        description: 'Lucide React 图标名称',
+        description: {
+          en: 'Lucide React icon name',
+          zh: 'Lucide React 图标名称',
+        },
       },
     },
     {
@@ -177,7 +186,10 @@ export const WhyChooseBusrom: GlobalConfig = {
         zh: '理由02 - 图标',
       },
       admin: {
-        description: 'Lucide React 图标名称',
+        description: {
+          en: 'Lucide React icon name',
+          zh: 'Lucide React 图标名称',
+        },
       },
     },
     {
@@ -224,7 +236,10 @@ export const WhyChooseBusrom: GlobalConfig = {
         zh: '理由03 - 图标',
       },
       admin: {
-        description: 'Lucide React 图标名称',
+        description: {
+          en: 'Lucide React icon name',
+          zh: 'Lucide React 图标名称',
+        },
       },
     },
     {
@@ -271,7 +286,10 @@ export const WhyChooseBusrom: GlobalConfig = {
         zh: '理由04 - 图标',
       },
       admin: {
-        description: 'Lucide React 图标名称',
+        description: {
+          en: 'Lucide React icon name',
+          zh: 'Lucide React 图标名称',
+        },
       },
     },
     {
@@ -318,7 +336,10 @@ export const WhyChooseBusrom: GlobalConfig = {
         zh: '理由05 - 图标',
       },
       admin: {
-        description: 'Lucide React 图标名称',
+        description: {
+          en: 'Lucide React icon name',
+          zh: 'Lucide React 图标名称',
+        },
       },
     },
     {

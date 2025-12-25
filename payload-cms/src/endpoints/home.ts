@@ -294,19 +294,28 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         ].filter(Boolean),
       })),
 
-      // Product Series Carousel
+      // Product Series Carousel (only if published)
       // Note: items is a JSON field, so media references are IDs that need to be resolved
-      productSeriesCarousel: {
+      // JSON fields don't auto-fallback, so we manually fallback to 'en' if locale data is empty or incomplete
+      productSeriesCarousel: productSeriesCarousel?.status === 'published' ? {
         title: productSeriesCarousel?.title || '',
-        items: await resolveCarouselItems(
-          (productSeriesCarousel as any)?.items?.[locale] || [],
-          payload
-        ),
-      },
+        items: await (async () => {
+          const localeItems = (productSeriesCarousel as any)?.items?.[locale] || []
+          const enItems = (productSeriesCarousel as any)?.items?.['en'] || []
 
-      // Service Features
+          // Check if locale items have actual content (not just empty shells)
+          const hasValidContent = localeItems.some((item: any) => item.title || item.image)
+
+          return resolveCarouselItems(
+            hasValidContent ? localeItems : enItems,
+            payload
+          )
+        })(),
+      } : null,
+
+      // Service Features (only if published)
       // Image counts per feature: [4, 2, 6, 2, 2]
-      serviceFeatures: serviceFeatures ? {
+      serviceFeatures: serviceFeatures?.status === 'published' ? {
         status: serviceFeatures?.status,
         title: serviceFeatures?.title,
         subtitle: serviceFeatures?.subtitle,
@@ -326,13 +335,13 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         })),
       } : null,
 
-      // Sphere 3D
-      sphere3d: sphere3d ? {
+      // Sphere 3D (only if published)
+      sphere3d: sphere3d?.status === 'published' ? {
         status: sphere3d?.status,
       } : null,
 
-      // Simple CTA
-      simpleCta: simpleCta ? {
+      // Simple CTA (only if published)
+      simpleCta: simpleCta?.status === 'published' ? {
         status: simpleCta?.status,
         title: simpleCta?.title,
         subtitle: simpleCta?.subtitle,
@@ -354,18 +363,18 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         images: (item.resolvedImages || []).map((img: any) => getMediaWithVariants(img)),
       })),
 
-      // Featured Products
-      featuredProducts: featuredProducts ? {
+      // Featured Products (only if published)
+      featuredProducts: featuredProducts?.status === 'published' ? {
         status: featuredProducts?.status,
         title: featuredProducts?.title,
         description: featuredProducts?.description,
         viewAllButtonText: featuredProducts?.viewAllButtonText,
         viewAllButtonUrl: featuredProducts?.viewAllButtonUrl,
-        series: featuredProducts?.series || [],
+        categories: featuredProducts?.categories || [],
       } : null,
 
-      // Brand Advantages
-      brandAdvantages: brandAdvantages ? {
+      // Brand Advantages (only if published)
+      brandAdvantages: brandAdvantages?.status === 'published' ? {
         status: brandAdvantages?.status,
         image: getMediaWithVariants(brandAdvantages?.image),
         advantages: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {
@@ -375,8 +384,8 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         }).filter(Boolean),
       } : null,
 
-      // OEM/ODM
-      oemOdm: oemOdm ? {
+      // OEM/ODM (only if published)
+      oemOdm: oemOdm?.status === 'published' ? {
         status: oemOdm?.status,
         oem: {
           title: oemOdm?.oemTitle,
@@ -392,8 +401,8 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         },
       } : null,
 
-      // Quote Steps
-      quoteSteps: quoteSteps ? {
+      // Quote Steps (only if published)
+      quoteSteps: quoteSteps?.status === 'published' ? {
         status: quoteSteps?.status,
         headerTitle: quoteSteps?.headerTitle,
         headerTitle2: quoteSteps?.headerTitle2,
@@ -406,8 +415,8 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         })),
       } : null,
 
-      // Main Form
-      mainForm: mainForm ? {
+      // Main Form (only if published)
+      mainForm: mainForm?.status === 'published' ? {
         status: mainForm?.status,
         designTextLeft: mainForm?.designTextLeft,
         designTextRight: mainForm?.designTextRight,
@@ -417,8 +426,8 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         ].filter(Boolean),
       } : null,
 
-      // Why Choose Busrom
-      whyChooseBusrom: whyChooseBusrom ? {
+      // Why Choose Busrom (only if published)
+      whyChooseBusrom: whyChooseBusrom?.status === 'published' ? {
         status: whyChooseBusrom?.status,
         title: whyChooseBusrom?.title,
         title2: whyChooseBusrom?.title2,
@@ -432,16 +441,16 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         })),
       } : null,
 
-      // Case Studies
-      caseStudies: caseStudies ? {
+      // Case Studies (only if published)
+      caseStudies: caseStudies?.status === 'published' ? {
         status: caseStudies?.status,
         title: caseStudies?.title,
         description: caseStudies?.description,
-        applications: caseStudies?.applications || [],
+        categories: caseStudies?.categories || [],
       } : null,
 
-      // Brand Analysis
-      brandAnalysis: brandAnalysis ? {
+      // Brand Analysis (only if published)
+      brandAnalysis: brandAnalysis?.status === 'published' ? {
         status: brandAnalysis?.status,
         brandNameAnalysis: {
           titlePart1: brandAnalysis?.brandNameAnalysis?.titlePart1,
@@ -471,8 +480,8 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         ],
       } : null,
 
-      // Brand Value
-      brandValue: brandValue ? {
+      // Brand Value (only if published)
+      brandValue: brandValue?.status === 'published' ? {
         status: brandValue?.status,
         title: brandValue?.title,
         subtitle: brandValue?.subtitle,
@@ -505,8 +514,8 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         ],
       } : null,
 
-      // Footer
-      footer: footer ? {
+      // Footer (only if published)
+      footer: footer?.status === 'published' ? {
         status: footer?.status,
         form: {
           title: footer?.formTitle,

@@ -1,9 +1,19 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { locales, defaultLocale } from '@/i18n.config'; // 假设 i18n 配置在这里
+import { locales, defaultLocale, nonDefaultLocales } from '@/i18n.config';
 
-function getLocale(request: NextRequest): string {
-  // 1. 优先从我们自己设置的 user-preferences cookie 中获取语言
+/**
+ * URL 路由策略:
+ * - 英文(默认): busromhouse.com/  (无前缀)
+ * - 其他语言: busromhouse.com/zh, busromhouse.com/fr 等
+ *
+ * SEO 301 重定向:
+ * - /en -> /
+ * - /en/about -> /about
+ */
+
+function getPreferredLocale(request: NextRequest): string {
+  // 1. 优先从 user-preferences cookie 中获取语言
   const preferencesCookie = request.cookies.get('user-preferences')?.value;
   if (preferencesCookie) {
     try {
@@ -14,7 +24,7 @@ function getLocale(request: NextRequest): string {
     } catch (e) { /* ignore malformed cookie */ }
   }
 
-  // 2. 如果没有 cookie，再从 Accept-Language header 获取
+  // 2. 如果没有 cookie，从 Accept-Language header 获取
   const languages = request.headers.get('accept-language')?.split(',')?.map(lang => lang.split(';')[0]);
   if (languages) {
     for (const lang of languages) {
@@ -30,16 +40,34 @@ function getLocale(request: NextRequest): string {
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  const pathnameIsMissingLocale = locales.every(
-    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+
+  // 1. 处理 /en 和 /en/* 的 301 重定向 (SEO 保护)
+  if (pathname === `/${defaultLocale}` || pathname.startsWith(`/${defaultLocale}/`)) {
+    // /en -> /
+    // /en/about -> /about
+    const newPath = pathname.replace(new RegExp(`^/${defaultLocale}/?`), '/') || '/';
+    const url = new URL(newPath, request.url);
+    url.search = request.nextUrl.search; // 保留查询参数
+    return NextResponse.redirect(url, 301);
+  }
+
+  // 2. 检查路径是否已经有非默认语言前缀 (如 /zh, /fr)
+  const hasNonDefaultLocale = nonDefaultLocales.some(
+    (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)
   );
 
-  if (pathnameIsMissingLocale) {
-    const locale = getLocale(request);
-    return NextResponse.redirect(
-      new URL(`/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`, request.url)
-    );
+  // 3. 如果路径没有语言前缀，视为默认语言(英文)，直接通过
+  //    但需要通过 rewrite 将请求路由到 /en/* 的页面
+  if (!hasNonDefaultLocale) {
+    // 没有语言前缀 = 英文内容
+    // 使用 rewrite 将 / 映射到 /en (内部路由，URL 不变)
+    const url = request.nextUrl.clone();
+    url.pathname = `/${defaultLocale}${pathname}`;
+    return NextResponse.rewrite(url);
   }
+
+  // 4. 有非默认语言前缀的路径，直接通过
+  return NextResponse.next();
 }
 
 export const config = {

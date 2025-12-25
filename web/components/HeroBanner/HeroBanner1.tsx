@@ -128,7 +128,7 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
       <ServerImage
         image={data.images[0]}
         alt="背景图"
-        size="small"
+        size="large"
         fill
         className="absolute inset-0 w-full h-full object-cover z-0"
         objectPosition={getObjectPosition(data.images[0])}

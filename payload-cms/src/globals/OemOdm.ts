@@ -67,7 +67,10 @@ export const OemOdm: GlobalConfig = {
       },
       localized: true,
       admin: {
-        description: '例如: "OEM"',
+        description: {
+          en: 'e.g.: "OEM"',
+          zh: '例如: "OEM"',
+        },
       },
     },
     {
@@ -79,7 +82,10 @@ export const OemOdm: GlobalConfig = {
         zh: 'OEM - 背景图',
       },
       admin: {
-        description: 'OEM部分的背景图片',
+        description: {
+          en: 'Background image for OEM section',
+          zh: 'OEM部分的背景图片',
+        },
         components: {
           Field: '@/components/fields/MediaPicker',
         },
@@ -94,7 +100,10 @@ export const OemOdm: GlobalConfig = {
         zh: 'OEM - 主图',
       },
       admin: {
-        description: 'OEM部分的主图片',
+        description: {
+          en: 'Main image for OEM section',
+          zh: 'OEM部分的主图片',
+        },
         components: {
           Field: '@/components/fields/MediaPicker',
         },
@@ -109,7 +118,10 @@ export const OemOdm: GlobalConfig = {
       },
       localized: true,
       admin: {
-        description: '例如: "At Busrom, we work closely with designers, retailers..."',
+        description: {
+          en: 'e.g.: "At Busrom, we work closely with designers, retailers..."',
+          zh: '例如: "At Busrom, we work closely with designers, retailers..."',
+        },
       },
     },
     {
@@ -121,7 +133,10 @@ export const OemOdm: GlobalConfig = {
       },
       localized: true,
       admin: {
-        description: '例如: "Ready to turn your concept into a producible product?..."',
+        description: {
+          en: 'e.g.: "Ready to turn your concept into a producible product?..."',
+          zh: '例如: "Ready to turn your concept into a producible product?..."',
+        },
       },
     },
 
@@ -137,7 +152,10 @@ export const OemOdm: GlobalConfig = {
       },
       localized: true,
       admin: {
-        description: '例如: "ODM"',
+        description: {
+          en: 'e.g.: "ODM"',
+          zh: '例如: "ODM"',
+        },
       },
     },
     {
@@ -149,7 +167,10 @@ export const OemOdm: GlobalConfig = {
         zh: 'ODM - 背景图',
       },
       admin: {
-        description: 'ODM部分的背景图片',
+        description: {
+          en: 'Background image for ODM section',
+          zh: 'ODM部分的背景图片',
+        },
         components: {
           Field: '@/components/fields/MediaPicker',
         },
@@ -164,7 +185,10 @@ export const OemOdm: GlobalConfig = {
         zh: 'ODM - 主图',
       },
       admin: {
-        description: 'ODM部分的主图片',
+        description: {
+          en: 'Main image for ODM section',
+          zh: 'ODM部分的主图片',
+        },
         components: {
           Field: '@/components/fields/MediaPicker',
         },
@@ -179,7 +203,10 @@ export const OemOdm: GlobalConfig = {
       },
       localized: true,
       admin: {
-        description: '例如: "Fully Customized Structure & Size & Color"',
+        description: {
+          en: 'e.g.: "Fully Customized Structure & Size & Color"',
+          zh: '例如: "Fully Customized Structure & Size & Color"',
+        },
       },
     },
     {
@@ -191,7 +218,10 @@ export const OemOdm: GlobalConfig = {
       },
       localized: true,
       admin: {
-        description: '例如: "Complete Solution - Just The Way You Want Them"',
+        description: {
+          en: 'e.g.: "Complete Solution - Just The Way You Want Them"',
+          zh: '例如: "Complete Solution - Just The Way You Want Them"',
+        },
       },
     },
   ],

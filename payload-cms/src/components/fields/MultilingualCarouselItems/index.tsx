@@ -1,10 +1,50 @@
 'use client'
 
 import React, { useCallback, useState, useEffect } from 'react'
-import { useField } from '@payloadcms/ui'
+import { useField, useTranslation } from '@payloadcms/ui'
 import { SUPPORTED_LOCALES, type LocaleCode } from '../../../lib/locales'
 import MediaPicker from '../MediaPicker'
 import './styles.scss'
+
+// i18n translations
+const i18n = {
+  title: { en: 'Carousel Items (Multilingual)', zh: '轮播项目（多语言）' },
+  autoTranslate: { en: 'Auto-Translate', zh: '自动翻译' },
+  hide: { en: 'Hide', zh: '隐藏' },
+  autoTranslateSettings: { en: 'Auto-Translate Settings', zh: '自动翻译设置' },
+  sourceLanguage: { en: 'Source Language', zh: '源语言' },
+  empty: { en: 'empty', zh: '空' },
+  items: { en: 'items', zh: '项' },
+  overwriteExisting: { en: 'Overwrite existing translations', zh: '覆盖已有翻译' },
+  targetLanguages: { en: 'Target Languages', zh: '目标语言' },
+  selected: { en: 'selected', zh: '已选' },
+  deselectAll: { en: 'Deselect All', zh: '取消全选' },
+  selectAll: { en: 'Select All', zh: '全选' },
+  source: { en: 'source', zh: '源' },
+  translating: { en: 'Translating...', zh: '翻译中...' },
+  translateTo: { en: 'Translate from', zh: '从' },
+  to: { en: 'to', zh: '翻译到' },
+  language: { en: 'Language', zh: '种语言' },
+  languages: { en: 'Languages', zh: '种语言' },
+  noItems: { en: 'No items yet. Click "Add Item" to create one.', zh: '暂无项目。点击"添加项目"创建一个。' },
+  item: { en: 'Item', zh: '项目' },
+  removeItem: { en: 'Remove this item from all languages', zh: '从所有语言中删除此项' },
+  fieldTitle: { en: 'Title', zh: '标题' },
+  enterTitle: { en: 'Enter title in', zh: '输入标题' },
+  buttonText: { en: 'Button Text', zh: '按钮文字' },
+  buttonTextPlaceholder: { en: 'Button text in', zh: '按钮文字' },
+  linkUrl: { en: 'Link URL (Same for all languages)', zh: '链接URL（所有语言相同）' },
+  showItem: { en: 'Show this item', zh: '显示此项' },
+  productImage: { en: 'Product Image (Same for all languages)', zh: '产品图片（所有语言相同）' },
+  sceneImage: { en: 'Scene Image (Same for all languages)', zh: '场景图片（所有语言相同）' },
+  addItem: { en: '+ Add Item (to all languages)', zh: '+ 添加项目（到所有语言）' },
+  hint: { en: 'Items are synchronized across all languages. Switch tabs to edit translations.', zh: '项目在所有语言间同步。切换标签编辑翻译。' },
+  noItemsError: { en: 'No items found in', zh: '未找到项目于' },
+  addItemsFirst: { en: 'Please add items first.', zh: '请先添加项目。' },
+  selectTargetError: { en: 'Please select at least one target language', zh: '请至少选择一个目标语言' },
+  translationCompleted: { en: 'Translation completed!', zh: '翻译完成！' },
+  translationFailed: { en: 'Translation failed', zh: '翻译失败' },
+}
 
 interface CarouselItem {
   title?: string
@@ -21,6 +61,8 @@ interface MultilingualItems {
 
 export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
   const { value, setValue } = useField<MultilingualItems>({ path })
+  const { i18n: { language } } = useTranslation()
+  const t = (obj: { en: string; zh: string }) => language === 'zh' ? obj.zh : obj.en
   const [activeLocale, setActiveLocale] = useState<LocaleCode>('en')
   const [showTranslationPanel, setShowTranslationPanel] = useState(false)
   const [isTranslating, setIsTranslating] = useState(false)
@@ -155,18 +197,18 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
   const handleTranslate = useCallback(async () => {
     const sourceItems = value?.[sourceLanguage]
     if (!sourceItems || sourceItems.length === 0) {
-      setError(`No items found in ${sourceLanguage.toUpperCase()}. Please add items first.`)
+      setError(`${t(i18n.noItemsError)} ${sourceLanguage.toUpperCase()}. ${t(i18n.addItemsFirst)}`)
       return
     }
 
     if (selectedLanguages.length === 0) {
-      setError('Please select at least one target language')
+      setError(t(i18n.selectTargetError))
       return
     }
 
     setIsTranslating(true)
     setError('')
-    setStatus(`Translating from ${sourceLanguage.toUpperCase()} to ${selectedLanguages.length} language(s)...`)
+    setStatus(`${t(i18n.translateTo)} ${sourceLanguage.toUpperCase()} ${t(i18n.to)} ${selectedLanguages.length} ${selectedLanguages.length > 1 ? t(i18n.languages) : t(i18n.language)}...`)
 
     try {
       const newValue = { ...value }
@@ -238,13 +280,13 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
       }
 
       setValue(newValue)
-      setStatus('✅ Translation completed!')
+      setStatus(`✅ ${t(i18n.translationCompleted)}`)
       setTimeout(() => {
         setStatus('')
         setShowTranslationPanel(false)
       }, 2000)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Translation failed')
+      setError(err instanceof Error ? err.message : t(i18n.translationFailed))
     } finally {
       setIsTranslating(false)
     }
@@ -254,7 +296,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
     <div className="multilingual-carousel-items">
       <div className="multilingual-carousel-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-          <h3 style={{ margin: 0 }}>Carousel Items (Multilingual)</h3>
+          <h3 style={{ margin: 0 }}>{t(i18n.title)}</h3>
           <button
             type="button"
             onClick={() => setShowTranslationPanel(!showTranslationPanel)}
@@ -269,7 +311,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
               fontWeight: 500,
             }}
           >
-            🌐 {showTranslationPanel ? 'Hide' : 'Auto-Translate'}
+            🌐 {showTranslationPanel ? t(i18n.hide) : t(i18n.autoTranslate)}
           </button>
         </div>
         <div className="multilingual-carousel-locale-tabs">
@@ -286,7 +328,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
                 type="button"
                 className={`locale-tab ${isActive ? 'active' : ''}`}
                 onClick={() => setActiveLocale(locale.code)}
-                title={`${locale.label}${hasItems ? ` (${localeItems.length} items)` : ' (empty)'}`}
+                title={`${locale.label}${hasItems ? ` (${localeItems.length} ${t(i18n.items)})` : ` (${t(i18n.empty)})`}`}
               >
                 <span className="locale-flag">{locale.flag}</span>
                 <span className="locale-code">{locale.code.toUpperCase()}</span>
@@ -306,13 +348,13 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
             border: '1px solid #e2e8f0'
           }}>
             <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: 600 }}>
-              🌐 Auto-Translate Settings
+              🌐 {t(i18n.autoTranslateSettings)}
             </h4>
 
             {/* Source Language Selector */}
             <div style={{ marginBottom: '12px' }}>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, marginBottom: '6px' }}>
-                Source Language
+                {t(i18n.sourceLanguage)}
               </label>
               <select
                 value={sourceLanguage}
@@ -331,7 +373,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
                   const hasContent = value?.[lang.code]?.length > 0
                   return (
                     <option key={lang.code} value={lang.code}>
-                      {lang.flag} {lang.label} {hasContent ? `(${value[lang.code].length} items)` : '(empty)'}
+                      {lang.flag} {lang.label} {hasContent ? `(${value[lang.code].length} ${t(i18n.items)})` : `(${t(i18n.empty)})`}
                     </option>
                   )
                 })}
@@ -354,7 +396,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
                   disabled={isTranslating}
                   style={{ cursor: isTranslating ? 'not-allowed' : 'pointer' }}
                 />
-                <span>Overwrite existing translations</span>
+                <span>{t(i18n.overwriteExisting)}</span>
               </label>
             </div>
 
@@ -367,7 +409,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
                 marginBottom: '8px'
               }}>
                 <label style={{ fontSize: '13px', fontWeight: 500 }}>
-                  Target Languages ({selectedLanguages.length} selected)
+                  {t(i18n.targetLanguages)} ({selectedLanguages.length} {t(i18n.selected)})
                 </label>
                 <button
                   type="button"
@@ -382,7 +424,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
                     cursor: isTranslating ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  {selectedLanguages.length === localeCodes.filter(l => l !== sourceLanguage).length ? 'Deselect All' : 'Select All'}
+                  {selectedLanguages.length === localeCodes.filter(l => l !== sourceLanguage).length ? t(i18n.deselectAll) : t(i18n.selectAll)}
                 </button>
               </div>
 
@@ -427,7 +469,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
                         />
                         <span>
                           {lang.flag} {lang.code.toUpperCase()}
-                          {isSourceLang && ' (source)'}
+                          {isSourceLang && ` (${t(i18n.source)})`}
                         </span>
                       </label>
                     )
@@ -453,7 +495,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
                 fontSize: '14px'
               }}
             >
-              {isTranslating ? 'Translating...' : `Translate from ${sourceLanguage.toUpperCase()} to ${selectedLanguages.length} Language${selectedLanguages.length > 1 ? 's' : ''}`}
+              {isTranslating ? t(i18n.translating) : `${t(i18n.translateTo)} ${sourceLanguage.toUpperCase()} ${t(i18n.to)} ${selectedLanguages.length} ${selectedLanguages.length > 1 ? t(i18n.languages) : t(i18n.language)}`}
             </button>
 
             {/* Status/Error Messages */}
@@ -476,20 +518,20 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
       <div className="multilingual-carousel-items-list">
         {items.length === 0 ? (
           <div className="no-items">
-            <p>No items yet. Click "Add Item" to create one.</p>
+            <p>{t(i18n.noItems)}</p>
           </div>
         ) : (
           items.map((item, index) => (
             <div key={index} className="carousel-item-card">
               <div className="carousel-item-header">
                 <h4>
-                  Item {index + 1} ({activeLocale.toUpperCase()})
+                  {t(i18n.item)} {index + 1} ({activeLocale.toUpperCase()})
                 </h4>
                 <button
                   type="button"
                   className="remove-item-btn"
                   onClick={() => removeItem(index)}
-                  title="Remove this item from all languages"
+                  title={t(i18n.removeItem)}
                 >
                   ×
                 </button>
@@ -497,27 +539,27 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
 
               <div className="carousel-item-fields">
                 <div className="field-row">
-                  <label>Title</label>
+                  <label>{t(i18n.fieldTitle)}</label>
                   <input
                     type="text"
                     value={item.title || ''}
                     onChange={(e) => updateItem(index, 'title', e.target.value)}
-                    placeholder={`Enter title in ${activeLocale.toUpperCase()}`}
+                    placeholder={`${t(i18n.enterTitle)} ${activeLocale.toUpperCase()}`}
                   />
                 </div>
 
                 <div className="field-row">
-                  <label>Button Text</label>
+                  <label>{t(i18n.buttonText)}</label>
                   <input
                     type="text"
                     value={item.buttonText || ''}
                     onChange={(e) => updateItem(index, 'buttonText', e.target.value)}
-                    placeholder={`Button text in ${activeLocale.toUpperCase()}`}
+                    placeholder={`${t(i18n.buttonTextPlaceholder)} ${activeLocale.toUpperCase()}`}
                   />
                 </div>
 
                 <div className="field-row">
-                  <label>Link URL (Same for all languages)</label>
+                  <label>{t(i18n.linkUrl)}</label>
                   <input
                     type="text"
                     value={item.linkUrl || ''}
@@ -534,7 +576,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
                       onChange={(e) => updateItem(index, 'isShow', e.target.checked)}
                       style={{ marginRight: '8px' }}
                     />
-                    Show this item
+                    {t(i18n.showItem)}
                   </label>
                 </div>
 
@@ -543,7 +585,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
                     path={`items.${activeLocale}.${index}.image`}
                     field={{
                       name: 'image',
-                      label: 'Product Image (Same for all languages)',
+                      label: t(i18n.productImage),
                       hasMany: false,
                       relationTo: 'media',
                     }}
@@ -555,7 +597,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
                     path={`items.${activeLocale}.${index}.sceneImage`}
                     field={{
                       name: 'sceneImage',
-                      label: 'Scene Image (Same for all languages)',
+                      label: t(i18n.sceneImage),
                       hasMany: false,
                       relationTo: 'media',
                     }}
@@ -569,10 +611,10 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
 
       <div className="multilingual-carousel-actions">
         <button type="button" className="add-item-btn" onClick={addItem}>
-          + Add Item (to all languages)
+          {t(i18n.addItem)}
         </button>
         <p className="hint">
-          Items are synchronized across all languages. Switch tabs to edit translations.
+          {t(i18n.hint)}
         </p>
       </div>
     </div>

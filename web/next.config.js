@@ -88,6 +88,26 @@ const nextConfig = {
    * Note: optimizeFonts was removed from experimental in Next.js 15
    * Font optimization is now enabled by default
    */
+  experimental: {
+    // 优化包大小 - 移除重复模块
+    optimizePackageImports: [
+      'lucide-react',
+      'framer-motion',
+      '@radix-ui/react-accordion',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+    ],
+  },
+
+  /**
+   * Compiler Options - 减少 JS 体积
+   */
+  compiler: {
+    // 移除 console.log (生产环境)
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
 
   /**
    * Security Headers

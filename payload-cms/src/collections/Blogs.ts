@@ -62,7 +62,10 @@ export const Blogs: CollectionConfig = {
               required: true,
               unique: true,
               admin: {
-                description: 'URL-friendly identifier (e.g., "how-to-install-glass-standoff")',
+                description: {
+                  en: 'URL-friendly identifier (e.g., "how-to-install-glass-standoff")',
+                  zh: 'URL友好标识符（例如："how-to-install-glass-standoff"）',
+                },
               },
             },
             {
@@ -84,7 +87,10 @@ export const Blogs: CollectionConfig = {
               },
               localized: true,
               admin: {
-                description: 'Short summary for previews and SEO',
+                description: {
+                  en: 'Short summary for previews and SEO',
+                  zh: '用于预览和SEO的简短摘要',
+                },
               },
             },
             {
@@ -117,7 +123,10 @@ export const Blogs: CollectionConfig = {
               },
               localized: true,
               admin: {
-                description: 'Rich text content - use language tabs above to switch locales',
+                description: {
+                  en: 'Rich text content - use language tabs above to switch locales',
+                  zh: '富文本内容 - 使用上方语言标签切换语言',
+                },
                 components: {
                   beforeInput: ['@/components/fields/MultiLocaleRichTextField'],
                 },
@@ -162,7 +171,10 @@ export const Blogs: CollectionConfig = {
                 type: { equals: 'BLOG' },
               },
               admin: {
-                description: 'Select blog categories',
+                description: {
+                  en: 'Select blog categories',
+                  zh: '选择博客分类',
+                },
               },
             },
           ],

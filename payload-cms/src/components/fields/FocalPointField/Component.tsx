@@ -10,7 +10,33 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react'
-import { useField, FieldLabel, useFormFields } from '@payloadcms/ui'
+import { useField, FieldLabel, useFormFields, useTranslation } from '@payloadcms/ui'
+
+// i18n translations
+const i18n = {
+  title: { en: 'Focal Point Editor', zh: '图片焦点编辑器' },
+  description: { en: 'Click or drag to set the focal point. The focal area will be preserved when cropping.', zh: '点击或拖拽设置图片的焦点位置，裁剪时会优先保留焦点区域' },
+  imagePreview: { en: 'Image Preview', zh: '图片预览' },
+  focalCoordinates: { en: 'Focal Coordinates:', zh: '焦点坐标:' },
+  xCoord: { en: 'X Coordinate (Horizontal)', zh: 'X 坐标（横向）' },
+  yCoord: { en: 'Y Coordinate (Vertical)', zh: 'Y 坐标（纵向）' },
+  usageTips: { en: 'Usage Tips:', zh: '使用说明：' },
+  tip1: { en: 'Click or drag the red marker to important content', zh: '点击或拖拽红色标记到重要内容上' },
+  tip2: { en: 'Focal point will be preserved in any aspect ratio crop', zh: '焦点位置会在任意比例裁剪时优先保留' },
+  tip3: { en: 'Works for landscape, portrait, square and all display scenarios', zh: '适用于横版、竖版、方形等所有展示场景' },
+  commonUsage: { en: 'Common Usage:', zh: '常见用法：' },
+  usage1: { en: 'Portrait photos: Set focal point on face', zh: '人物照片：焦点设在脸部' },
+  usage2: { en: 'Product images: Set focal point at product center', zh: '产品图片：焦点设在产品中心' },
+  usage3: { en: 'Landscape photos: Set focal point on main subject', zh: '风景照片：焦点设在主体景物' },
+  resetCenter: { en: 'Reset to Center', zh: '重置居中' },
+  cancel: { en: 'Cancel', zh: '取消' },
+  saveFocalPoint: { en: 'Save Focal Point', zh: '保存焦点' },
+  xCoordLabel: { en: 'X (0-100)', zh: 'X坐标 (0-100)' },
+  yCoordLabel: { en: 'Y (0-100)', zh: 'Y坐标 (0-100)' },
+  visualEdit: { en: 'Visual Edit', zh: '可视化编辑' },
+  uploadFirst: { en: 'Please upload an image and save first before using visual editor', zh: '请先上传图片并保存后再使用可视化编辑' },
+  tipVisualEdit: { en: 'Tip: Click "Visual Edit" to set focal point directly on the image', zh: '提示：点击"可视化编辑"可在图片上直接设置焦点' },
+}
 
 type FocalPoint = {
   x: number
@@ -23,6 +49,7 @@ type FocalPointModalProps = {
   initialFocalPoint: FocalPoint
   onSave: (focalPoint: FocalPoint) => void
   onClose: () => void
+  t: (obj: { en: string; zh: string }) => string
 }
 
 const FocalPointModal: React.FC<FocalPointModalProps> = ({
@@ -31,6 +58,7 @@ const FocalPointModal: React.FC<FocalPointModalProps> = ({
   initialFocalPoint,
   onSave,
   onClose,
+  t,
 }) => {
   const [focalX, setFocalX] = useState(initialFocalPoint.x)
   const [focalY, setFocalY] = useState(initialFocalPoint.y)
@@ -125,10 +153,10 @@ const FocalPointModal: React.FC<FocalPointModalProps> = ({
         }}>
           <div>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-              图片焦点编辑器 / Focal Point Editor
+              {t(i18n.title)}
             </h2>
             <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-              点击或拖拽设置图片的焦点位置，裁剪时会优先保留焦点区域
+              {t(i18n.description)}
             </p>
           </div>
           <button
@@ -191,7 +219,7 @@ const FocalPointModal: React.FC<FocalPointModalProps> = ({
                 pointerEvents: 'none',
               }}>
                 <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>🖼️</div>
-                <div>图片预览</div>
+                <div>{t(i18n.imagePreview)}</div>
               </div>
             )}
 
@@ -290,12 +318,12 @@ const FocalPointModal: React.FC<FocalPointModalProps> = ({
               marginBottom: '1rem',
             }}>
               <div style={{ marginBottom: '1rem' }}>
-                <strong>焦点坐标:</strong>
+                <strong>{t(i18n.focalCoordinates)}</strong>
               </div>
 
               <div style={{ marginBottom: '0.75rem' }}>
                 <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>
-                  X 坐标（横向）
+                  {t(i18n.xCoord)}
                 </div>
                 <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#2563eb' }}>
                   {focalX}%
@@ -304,7 +332,7 @@ const FocalPointModal: React.FC<FocalPointModalProps> = ({
 
               <div>
                 <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>
-                  Y 坐标（纵向）
+                  {t(i18n.yCoord)}
                 </div>
                 <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#2563eb' }}>
                   {focalY}%
@@ -321,11 +349,11 @@ const FocalPointModal: React.FC<FocalPointModalProps> = ({
               lineHeight: '1.5',
               marginBottom: '1rem',
             }}>
-              <div style={{ fontWeight: '600', marginBottom: '0.5rem' }}>💡 使用说明：</div>
+              <div style={{ fontWeight: '600', marginBottom: '0.5rem' }}>💡 {t(i18n.usageTips)}</div>
               <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
-                <li>点击或拖拽红色标记到重要内容上</li>
-                <li>焦点位置会在任意比例裁剪时优先保留</li>
-                <li>适用于横版、竖版、方形等所有展示场景</li>
+                <li>{t(i18n.tip1)}</li>
+                <li>{t(i18n.tip2)}</li>
+                <li>{t(i18n.tip3)}</li>
               </ul>
             </div>
 
@@ -337,11 +365,11 @@ const FocalPointModal: React.FC<FocalPointModalProps> = ({
               fontSize: '0.875rem',
               lineHeight: '1.5',
             }}>
-              <div style={{ fontWeight: '600', marginBottom: '0.5rem' }}>📌 常见用法：</div>
+              <div style={{ fontWeight: '600', marginBottom: '0.5rem' }}>📌 {t(i18n.commonUsage)}</div>
               <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
-                <li>人物照片：焦点设在脸部</li>
-                <li>产品图片：焦点设在产品中心</li>
-                <li>风景照片：焦点设在主体景物</li>
+                <li>{t(i18n.usage1)}</li>
+                <li>{t(i18n.usage2)}</li>
+                <li>{t(i18n.usage3)}</li>
               </ul>
             </div>
           </div>
@@ -367,7 +395,7 @@ const FocalPointModal: React.FC<FocalPointModalProps> = ({
               fontWeight: '500',
             }}
           >
-            🔄 重置居中
+            🔄 {t(i18n.resetCenter)}
           </button>
 
           <button
@@ -382,7 +410,7 @@ const FocalPointModal: React.FC<FocalPointModalProps> = ({
               fontWeight: '500',
             }}
           >
-            取消
+            {t(i18n.cancel)}
           </button>
 
           <button
@@ -398,7 +426,7 @@ const FocalPointModal: React.FC<FocalPointModalProps> = ({
               fontWeight: '500',
             }}
           >
-            💾 保存焦点
+            💾 {t(i18n.saveFocalPoint)}
           </button>
         </div>
       </div>
@@ -408,6 +436,8 @@ const FocalPointModal: React.FC<FocalPointModalProps> = ({
 
 export const FocalPointFieldComponent: React.FC<any> = ({ path, label }) => {
   const { value, setValue } = useField<{ x?: number | null; y?: number | null }>({ path })
+  const { i18n: { language } } = useTranslation()
+  const t = (obj: { en: string; zh: string }) => language === 'zh' ? obj.zh : obj.en
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Get image URL from form fields
@@ -455,7 +485,7 @@ export const FocalPointFieldComponent: React.FC<any> = ({ path, label }) => {
             }}
           />
           <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
-            X坐标 (0-100)
+            {t(i18n.xCoordLabel)}
           </div>
         </div>
 
@@ -480,7 +510,7 @@ export const FocalPointFieldComponent: React.FC<any> = ({ path, label }) => {
             }}
           />
           <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
-            Y坐标 (0-100)
+            {t(i18n.yCoordLabel)}
           </div>
         </div>
 
@@ -500,7 +530,7 @@ export const FocalPointFieldComponent: React.FC<any> = ({ path, label }) => {
             marginTop: '0px',
           }}
         >
-          🎯 可视化编辑
+          🎯 {t(i18n.visualEdit)}
         </button>
       </div>
 
@@ -513,7 +543,7 @@ export const FocalPointFieldComponent: React.FC<any> = ({ path, label }) => {
           fontSize: '0.75rem',
           marginTop: '0.5rem',
         }}>
-          💡 请先上传图片并保存后再使用可视化编辑
+          💡 {t(i18n.uploadFirst)}
         </div>
       )}
 
@@ -526,7 +556,7 @@ export const FocalPointFieldComponent: React.FC<any> = ({ path, label }) => {
           fontSize: '0.75rem',
           marginTop: '0.5rem',
         }}>
-          💡 <strong>提示：</strong>点击"可视化编辑"可在图片上直接设置焦点
+          💡 {t(i18n.tipVisualEdit)}
         </div>
       )}
 
@@ -536,6 +566,7 @@ export const FocalPointFieldComponent: React.FC<any> = ({ path, label }) => {
         initialFocalPoint={currentFocalPoint}
         onSave={handleSave}
         onClose={() => setIsModalOpen(false)}
+        t={t}
       />
     </div>
   )

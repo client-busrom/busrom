@@ -70,7 +70,10 @@ export const Categories: CollectionConfig = {
       required: true,
       unique: true,
       admin: {
-        description: 'URL-friendly identifier (e.g., "door-hardware")',
+        description: {
+          en: 'URL-friendly identifier (e.g., "door-hardware")',
+          zh: 'URL友好标识符（例如："door-hardware"）',
+        },
       },
     },
 
@@ -106,7 +109,10 @@ export const Categories: CollectionConfig = {
         zh: '父分类',
       },
       admin: {
-        description: 'Parent category for hierarchical structure',
+        description: {
+          en: 'Parent category for hierarchical structure',
+          zh: '用于层级结构的父分类',
+        },
       },
     },
 
@@ -141,7 +147,10 @@ export const Categories: CollectionConfig = {
       defaultValue: 0,
       admin: {
         position: 'sidebar',
-        description: 'Lower number = higher priority',
+        description: {
+          en: 'Lower number = higher priority',
+          zh: '数字越小优先级越高',
+        },
       },
     },
     {

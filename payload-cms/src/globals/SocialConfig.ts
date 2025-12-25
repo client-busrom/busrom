@@ -20,7 +20,10 @@ export const SocialConfig: GlobalConfig = {
       en: 'Website Settings',
       zh: '网站设置',
     },
-    description: 'Social media links settings',
+    description: {
+      en: 'Social media links settings',
+      zh: '社交媒体链接设置',
+    },
   },
   access: {
     read: () => true,
@@ -35,7 +38,10 @@ export const SocialConfig: GlobalConfig = {
         zh: '社交链接',
       },
       admin: {
-        description: 'Add social media links with custom icons',
+        description: {
+          en: 'Add social media links with custom icons',
+          zh: '添加带有自定义图标的社交媒体链接',
+        },
       },
       fields: [
         {
@@ -79,7 +85,10 @@ export const SocialConfig: GlobalConfig = {
           },
           admin: {
             condition: (data, siblingData) => siblingData?.platform === 'custom',
-            description: 'Enter the name of your custom platform',
+            description: {
+              en: 'Enter the name of your custom platform',
+              zh: '输入您的自定义平台名称',
+            },
           },
         },
         {
@@ -91,7 +100,10 @@ export const SocialConfig: GlobalConfig = {
           },
           required: true,
           admin: {
-            description: 'Full URL to your social profile',
+            description: {
+              en: 'Full URL to your social profile',
+              zh: '社交主页的完整链接',
+            },
           },
         },
         {
@@ -103,7 +115,10 @@ export const SocialConfig: GlobalConfig = {
             zh: '自定义图标',
           },
           admin: {
-            description: 'Optional: Upload a custom icon (SVG or PNG recommended). Leave empty to use default platform icon.',
+            description: {
+              en: 'Optional: Upload a custom icon (SVG or PNG recommended). Leave empty to use default platform icon.',
+              zh: '可选：上传自定义图标（建议使用 SVG 或 PNG）。留空则使用默认平台图标。',
+            },
             components: {
               Field: '@/components/fields/MediaPicker',
             },
@@ -118,7 +133,10 @@ export const SocialConfig: GlobalConfig = {
           },
           defaultValue: 0,
           admin: {
-            description: 'Lower number appears first',
+            description: {
+              en: 'Lower number appears first',
+              zh: '数字越小越靠前',
+            },
           },
         },
       ],

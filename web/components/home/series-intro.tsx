@@ -12,7 +12,8 @@ type Props = {
 // --- 常量定义 ---
 const SERIES_AUTO_SCROLL_INTERVAL = 30000; // 系列轮播: 30秒
 const IMAGE_AUTO_SCROLL_INTERVAL = 5000;   // 图片轮播: 5秒
-const VISIBLE_WINDOW_SIZE = 7;
+const VISIBLE_WINDOW_SIZE = 5;  // 显示5个标签
+const FOCUS_POSITION = 1;       // 焦点在第二个位置（索引1，从0开始）
 const SWIPE_THRESHOLD = 50; // 滑动阈值
 
 export default function SeriesIntro({ data }: Props) {
@@ -57,7 +58,8 @@ export default function SeriesIntro({ data }: Props) {
   const currentImages = activeSeries?.images || [];
   const totalImages = currentImages.length;
 
-  const VISIBLE_ITEMS_CENTER_OFFSET = Math.floor(VISIBLE_WINDOW_SIZE / 2);
+  // 焦点位置偏移量（焦点在第二个位置）
+  const VISIBLE_ITEMS_FOCUS_OFFSET = FOCUS_POSITION;
 
   // --- 系列轮播控制 ---
   const handleSeriesNext = useCallback(() => {
@@ -193,12 +195,13 @@ export default function SeriesIntro({ data }: Props) {
     const window: {
       title: string;
       description: string;
-      distanceFromCenter: number;
+      distanceFromFocus: number;
       isCurrent: boolean;
       originalIndex: number;
     }[] = [];
 
-    const startIndex = activeSeriesIndex - VISIBLE_ITEMS_CENTER_OFFSET;
+    // 焦点在第二个位置，所以起始索引 = 当前索引 - 1
+    const startIndex = activeSeriesIndex - VISIBLE_ITEMS_FOCUS_OFFSET;
 
     for (let i = 0; i < VISIBLE_WINDOW_SIZE; i++) {
       let currentIndex = startIndex + i;
@@ -208,7 +211,7 @@ export default function SeriesIntro({ data }: Props) {
       if (item) {
         window.push({
           ...item,
-          distanceFromCenter: Math.abs(i - VISIBLE_ITEMS_CENTER_OFFSET),
+          distanceFromFocus: Math.abs(i - VISIBLE_ITEMS_FOCUS_OFFSET),
           isCurrent: dataIndex === activeSeriesIndex,
           originalIndex: dataIndex,
         });
@@ -239,7 +242,7 @@ export default function SeriesIntro({ data }: Props) {
                   Product Series Introduction
                 </h2>
                 {activeSeries && (
-                  <p className="text-base xl:text-lg leading-relaxed text-white max-w-2xl">
+                  <p className="text-sm xl:text-base leading-relaxed text-white max-w-xl">
                     {activeSeries.description}
                   </p>
                 )}
@@ -248,12 +251,12 @@ export default function SeriesIntro({ data }: Props) {
               {/* 右侧: 系列列表轮播 */}
               <div className="w-80 flex-shrink-0">
                 <div className="h-64 overflow-hidden relative">
-                  <div className="flex flex-col absolute w-full top-1/2 left-0 -translate-y-1/2">
+                  <div className="flex flex-col absolute w-full top-0 left-0">
                     {renderWindow.map((item, idx) => (
                       <button
                         key={`${item.title}-${idx}`}
-                        className="w-full text-right py-2 transition-all duration-300 h-9"
-                        style={{ opacity: getOpacity(item.distanceFromCenter) }}
+                        className="w-full text-left py-3 transition-all duration-300 h-12"
+                        style={{ opacity: getOpacity(item.distanceFromFocus) }}
                         onClick={() => {
                           setActiveSeriesIndex(item.originalIndex);
                           setActiveImageIndex(0);

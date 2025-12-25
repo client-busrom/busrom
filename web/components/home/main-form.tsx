@@ -86,6 +86,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
   const [leftVisible, setLeftVisible] = useState(false);
   const [rightVisible, setRightVisible] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false); // lg 及以上
+  const [isVisible, setIsVisible] = useState(false); // 表单是否进入视口
 
   // 表单配置 (从 FormConfig API 获取)
   const [formConfig, setFormConfig] = useState<FormConfig | null>(null);
@@ -113,8 +114,13 @@ export default function MainForm({ data, locale = "en" }: Props) {
     turnstileConfig?.siteKey &&
     submissionCount >= (turnstileConfig.threshold - 1));
 
-  // 获取表单配置和 Turnstile 配置
+  // 延迟加载配置 - 只在表单进入视口时才获取
+  const [configLoaded, setConfigLoaded] = useState(false);
+
+  // 获取表单配置和 Turnstile 配置 - 延迟到表单可见时
   useEffect(() => {
+    if (!isVisible || configLoaded) return;
+
     const fetchConfigs = async () => {
       try {
         // 并行获取表单配置和 Turnstile 配置
@@ -132,12 +138,14 @@ export default function MainForm({ data, locale = "en" }: Props) {
           const config = await turnstileRes.json();
           setTurnstileConfig(config);
         }
+
+        setConfigLoaded(true);
       } catch (err) {
         console.error("Error fetching configs:", err);
       }
     };
     fetchConfigs();
-  }, [locale]);
+  }, [locale, isVisible, configLoaded]);
 
   // 初始化提交次数
   useEffect(() => {
@@ -241,6 +249,25 @@ export default function MainForm({ data, locale = "en" }: Props) {
     return () => mql.removeEventListener("change", onChange);
   }, []);
 
+  // 检测表单是否进入视口 - 用于延迟加载配置
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || isVisible) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" } // 提前 200px 开始加载
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [isVisible]);
+
   // 移动端/平板淡入效果的 Intersection Observer (lg 以下)
   useEffect(() => {
     if (isDesktop) return;
@@ -343,7 +370,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
                   right: "3.6%",
                 }}
               >
-                <OptimizedImage image={data.image1} alt={data.image1?.altText || data.designTextLeft} size="small" className="object-cover w-full h-full absolute inset-0" />
+                <OptimizedImage image={data.image1} alt={data.image1?.altText || data.designTextLeft} size="medium" className="object-contain w-full h-full absolute inset-0" />
               </div>
 
               {/* 2. 顶层手机框 (z-20) */}
@@ -541,7 +568,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
                   right: "3.6%",
                 }}
               >
-                <OptimizedImage image={data.image2} alt={data.image2?.altText || data.designTextRight} size="small" className="object-cover w-full h-full absolute inset-0" />
+                <OptimizedImage image={data.image2} alt={data.image2?.altText || data.designTextRight} size="medium" className="object-contain w-full h-full absolute inset-0" />
               </div>
 
               {/* 2. 顶层手机框 (z-20) */}

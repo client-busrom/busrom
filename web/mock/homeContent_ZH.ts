@@ -456,7 +456,7 @@ export const homeContent_ZH: HomeContentData = {
         'homeProductSeries/glass_standoff.png',
         '玻璃广告螺丝系列'
       ),
-      href: '/product/glass-standoff',
+      href: '/products/glass-standoff',
     },
     {
       key: 'glass-connected-fitting',
@@ -466,7 +466,7 @@ export const homeContent_ZH: HomeContentData = {
         'homeProductSeries/glass_connected_fitting.png',
         '玻璃连接件系列'
       ),
-      href: '/product/glass-connected-fitting',
+      href: '/products/glass-connected-fitting',
     },
     {
       key: 'glass-fence-spigot',
@@ -476,7 +476,7 @@ export const homeContent_ZH: HomeContentData = {
         'homeProductSeries/glass_fence_spigot.png',
         '玻璃立柱系列'
       ),
-      href: '/product/glass-fence-spigot',
+      href: '/products/glass-fence-spigot',
     },
     {
       key: 'glass-clip-railing',
@@ -486,7 +486,7 @@ export const homeContent_ZH: HomeContentData = {
         'homeProductSeries/glass_clip_outdoor.png',
         '玻璃护栏夹系列'
       ),
-      href: '/product/glass-clip',
+      href: '/products/glass-clip',
     },
     {
       key: 'glass-clip-bathroom',
@@ -496,7 +496,7 @@ export const homeContent_ZH: HomeContentData = {
         'homeProductSeries/glass_clip_washroom.png',
         '浴室玻璃夹系列'
       ),
-      href: '/product/glass-clip',
+      href: '/products/glass-clip',
     },
     {
       key: 'glass-hinge',
@@ -506,7 +506,7 @@ export const homeContent_ZH: HomeContentData = {
         'homeProductSeries/glass_hinge.png',
         '玻璃合页系列'
       ),
-      href: '/product/glass-hinge',
+      href: '/products/glass-hinge',
     },
     {
       key: 'sliding-door-kit',
@@ -516,7 +516,7 @@ export const homeContent_ZH: HomeContentData = {
         'homeProductSeries/sliding_door_kit.png',
         '推拉门套件系列'
       ),
-      href: '/product/sliding-door-kit',
+      href: '/products/sliding-door-kit',
     },
     {
       key: 'bathroom-door-handle',
@@ -526,7 +526,7 @@ export const homeContent_ZH: HomeContentData = {
         'homeProductSeries/bathroom_&_door_handle.png',
         '浴室及大门拉手系列'
       ),
-      href: '/product/bathroom-door-handle',
+      href: '/products/bathroom-door-handle',
     },
     {
       key: 'hidden-hook',
@@ -536,7 +536,7 @@ export const homeContent_ZH: HomeContentData = {
         'homeProductSeries/hidden_hook.png',
         '隐藏式挂钩系列'
       ),
-      href: '/product/hidden-hook',
+      href: '/products/hidden-hook',
     },
   ],
 
@@ -630,56 +630,56 @@ export const homeContent_ZH: HomeContentData = {
       description:
         '专为玻璃面板固定而设计,Busrom 玻璃广告螺丝系列采用高强度不锈钢,经精密CNC加工和抛光,不仅确保稳定的承重,更具有优雅现代的金属质感。广泛应用于幕墙、隔断、楼梯栏杆等场景,为玻璃安装提供安全可靠的支撑。',
       images: [ createImageObject('1.jpg', '玻璃广告螺丝系列'),],
-      href: '/product/glass-standoff',
+      href: '/products/glass-standoff',
     },
     {
       title: '玻璃连接件',
       description:
         '玻璃连接件系列为多块玻璃面板的组装提供灵活的解决方案,包括直角、T型、十字和可调角度接头。产品采用精密铸造和车削工艺,装配精度高,接口牢固,广泛应用于玻璃幕墙、楼梯扶手和隔断。',
       images: [ createImageObject('2.jpg', '玻璃连接件系列'),],
-      href: '/product/glass-connected-fitting',
+      href: '/products/glass-connected-fitting',
     },
     {
       title: '玻璃立柱',
       description:
         'Busrom 玻璃围栏立柱用于玻璃栏杆和围栏系统,采用加厚底座设计和高强度螺栓连接,提供卓越的抗弯和抗爆裂性能。多重电镀或喷砂表面处理,能抵抗锈蚀和潮湿,并与各种建筑风格无缝融合。',
       images: [ createImageObject('3.jpg', '玻璃立柱系列'),],
-      href: '/product/glass-fence-spigot',
+      href: '/products/glass-fence-spigot',
     },
     {
       title: '玻璃护栏及浴室夹',
       description:
         'Busrom 玻璃夹以其简约小巧的造型和精准的夹持力而闻名。产品选用航空级不锈钢,经过多道钝化工艺处理和涂层,兼顾了耐腐蚀性与视觉美感。适用于楼梯护栏、玻璃隔断、浴室墙体等安装场景,安装简便,性能稳固。',
       images: [ createImageObject('4.jpg', '玻璃夹系列'),],
-      href: '/product/glass-clip',
+      href: '/products/glass-clip',
     },
     {
       title: '玻璃合页',
       description:
         'Busrom 玻璃合页系列专为淋浴房和玻璃门设计,内置静音缓冲机制和不锈钢转轴,确保开合顺滑无噪音。合页经过防水防锈处理,能承受高频使用和潮湿环境,兼具安全与耐用性。',
       images: [ createImageObject('5.jpg', '玻璃合页系列'),],
-      href: '/product/glass-hinge',
+      href: '/products/glass-hinge',
     },
     {
       title: '推拉门套件',
       description:
         'Busrom 推拉门套件集成了高精度静音滚轮、限位器、夹具、挂钩和地轨导向件,所有部件均由优质航空级不锈钢制成,确保门体推拉平稳、无晃动。适用于浴室、淋浴房、室内隔断及办公场景的推拉门。',
       images: [ createImageObject('6.jpg', '推拉门套件系列'),],
-      href: '/product/sliding-door-kit',
+      href: '/products/sliding-door-kit',
     },
     {
       title: '浴室及大门拉手',
       description:
         '我们的浴室及大门拉手系列涵盖了直型、弯型等多种造型,材质从黄铜到不锈钢一应俱全,表面处理支持镀铬、拉丝、黑钛等多种效果。无论是淋浴门、室内推拉门还是室外大门,都能提供舒适的握感和高端的质感。',
       images: [ createImageObject('7.jpg', '浴室及大门拉手系列'),],
-      href: '/product/bathroom-door-handle',
+      href: '/products/bathroom-door-handle',
     },
     {
       title: '隐藏式挂钩',
       description:
         'Busrom 隐藏式挂钩巧妙地融入您希望的墙面,外观简洁无螺丝,开启时静音无声,闭合时与墙面融为一体。适用于衣帽间、浴室、玄关、展示区等场景,兼顾了承重能力与美学设计,为空间带来极简实用的收纳体验。',
       images: [ createImageObject('8.jpg', '隐藏式挂钩系列'),],
-      href: '/product/hidden-hook',
+      href: '/products/hidden-hook',
     },
   ],
 

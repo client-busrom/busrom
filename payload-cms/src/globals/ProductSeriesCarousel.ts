@@ -19,6 +19,7 @@ export const ProductSeriesCarousel: GlobalConfig = {
       en: 'Homepage',
       zh: '首页管理',
     },
+    // Note: Hidden from default nav via CustomNav.tsx
   },
   access: {
     read: () => true,
@@ -75,7 +76,10 @@ export const ProductSeriesCarousel: GlobalConfig = {
         components: {
           Field: '@/components/fields/MultilingualCarouselItems',
         },
-        description: 'Multilingual carousel items. Each language has its own array of items.',
+        description: {
+          en: 'Multilingual carousel items. Each language has its own array of items.',
+          zh: '多语言轮播项。每种语言有自己的项目数组。',
+        },
       },
     },
     // Carousel Settings

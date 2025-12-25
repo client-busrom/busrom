@@ -67,9 +67,15 @@ export const SeriesIntroItems: CollectionConfig = {
       name: 'internalLabel',
       type: 'text',
       required: true,
-      label: 'Internal Label | 内部标识',
+      label: {
+        en: 'Internal Label',
+        zh: '内部标识',
+      },
       admin: {
-        description: 'Internal identifier for this series intro item',
+        description: {
+          en: 'Internal identifier for this series intro item',
+          zh: '此系列介绍项的内部标识符',
+        },
       },
     },
 
@@ -85,7 +91,10 @@ export const SeriesIntroItems: CollectionConfig = {
         zh: '产品系列',
       },
       admin: {
-        description: 'Link to a product series',
+        description: {
+          en: 'Link to a product series',
+          zh: '关联到产品系列',
+        },
       },
     },
 
@@ -125,7 +134,10 @@ export const SeriesIntroItems: CollectionConfig = {
         components: {
           Field: '@/components/fields/TagBasedRandomImages',
         },
-        description: 'Choose manual selection (up to 5 images) or auto random by category/tags',
+        description: {
+          en: 'Choose manual selection (up to 5 images) or auto random by category/tags',
+          zh: '选择手动选择（最多5张图片）或按分类/标签自动随机选择',
+        },
       },
     },
 
@@ -140,7 +152,10 @@ export const SeriesIntroItems: CollectionConfig = {
         { label: 'Published | 已发布', value: 'published' },
         { label: 'Draft | 草稿', value: 'draft' },
       ],
-      label: 'Status | 状态',
+      label: {
+        en: 'Status',
+        zh: '状态',
+      },
       admin: {
         position: 'sidebar',
       },

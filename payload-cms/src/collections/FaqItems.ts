@@ -67,7 +67,10 @@ export const FaqItems: CollectionConfig = {
               required: true,
               unique: true,
               admin: {
-                description: 'Unique identifier (e.g., "shipping-policy")',
+                description: {
+                  en: 'Unique identifier (e.g., "shipping-policy")',
+                  zh: '唯一标识符（例如："shipping-policy"）',
+                },
               },
             },
             {
@@ -101,7 +104,10 @@ export const FaqItems: CollectionConfig = {
               },
               localized: true,
               admin: {
-                description: 'Rich text answer - use language tabs above to switch locales',
+                description: {
+                  en: 'Rich text answer - use language tabs above to switch locales',
+                  zh: '富文本答案 - 使用上方语言标签切换语言',
+                },
                 components: {
                   beforeInput: ['@/components/fields/MultiLocaleRichTextField'],
                 },
@@ -131,7 +137,10 @@ export const FaqItems: CollectionConfig = {
                 type: { equals: 'FAQ' },
               },
               admin: {
-                description: 'Select an FAQ category',
+                description: {
+                  en: 'Select an FAQ category',
+                  zh: '选择FAQ分类',
+                },
               },
             },
             {
@@ -144,7 +153,10 @@ export const FaqItems: CollectionConfig = {
                 zh: '相关问题',
               },
               admin: {
-                description: 'Link to related FAQ items',
+                description: {
+                  en: 'Link to related FAQ items',
+                  zh: '关联相关FAQ项目',
+                },
               },
             },
           ],
@@ -175,7 +187,10 @@ export const FaqItems: CollectionConfig = {
       defaultValue: 0,
       admin: {
         position: 'sidebar',
-        description: 'Lower number = higher priority',
+        description: {
+          en: 'Lower number = higher priority',
+          zh: '数字越小优先级越高',
+        },
       },
     },
     {

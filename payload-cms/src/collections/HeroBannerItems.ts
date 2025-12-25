@@ -60,7 +60,10 @@ export const HeroBannerItems: CollectionConfig = {
       required: true,
       label: 'Internal Label | 内部标识',
       admin: {
-        description: 'Internal identifier for this banner item (e.g., "Banner 1 - Glass Standoff")',
+        description: {
+          en: 'Internal identifier for this banner item (e.g., "Banner 1 - Glass Standoff")',
+          zh: '此轮播项的内部标识（例如："Banner 1 - 玻璃支架"）',
+        },
       },
     },
 
@@ -141,7 +144,10 @@ export const HeroBannerItems: CollectionConfig = {
       relationTo: 'media',
       label: 'Image 1 | 图片1',
       admin: {
-        description: 'Select an image | 选择一张图片',
+        description: {
+          en: 'Select an image',
+          zh: '选择一张图片',
+        },
         components: {
           Field: '@/components/fields/MediaPicker',
         },
