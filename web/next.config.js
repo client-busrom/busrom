@@ -100,6 +100,111 @@ const nextConfig = {
   },
 
   /**
+   * Webpack Configuration
+   *
+   * 优化 chunk 分割，避免 framer-motion 等大型库被重复打包
+   */
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.optimization.splitChunks = {
+        ...config.optimization.splitChunks,
+        cacheGroups: {
+          ...config.optimization.splitChunks?.cacheGroups,
+          // 将 framer-motion 提取到独立 chunk，所有组件共享
+          'framer-motion': {
+            name: 'framer-motion',
+            test: /[\\/]node_modules[\\/](framer-motion|motion-dom|motion-utils|motion)[\\/]/,
+            chunks: 'all',
+            priority: 40,
+            enforce: true,
+          },
+          // 将 Three.js 相关库提取到独立 chunk
+          'three': {
+            name: 'three',
+            test: /[\\/]node_modules[\\/](three|@react-three|react-globe\.gl|globe\.gl)[\\/]/,
+            chunks: 'all',
+            priority: 40,
+            enforce: true,
+          },
+          // 将 GSAP 提取到独立 chunk
+          'gsap': {
+            name: 'gsap',
+            test: /[\\/]node_modules[\\/]gsap[\\/]/,
+            chunks: 'all',
+            priority: 40,
+            enforce: true,
+          },
+          // 将 Embla Carousel 提取到独立 chunk
+          'embla': {
+            name: 'embla',
+            test: /[\\/]node_modules[\\/]embla-carousel[\\/]/,
+            chunks: 'all',
+            priority: 40,
+            enforce: true,
+          },
+          // 将 Payload Lexical 提取到独立 chunk
+          'lexical': {
+            name: 'lexical',
+            test: /[\\/]node_modules[\\/](@payloadcms[\\/]richtext-lexical|lexical)[\\/]/,
+            chunks: 'all',
+            priority: 40,
+            enforce: true,
+          },
+          // 将 Radix UI 提取到独立 chunk
+          'radix': {
+            name: 'radix',
+            test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
+            chunks: 'all',
+            priority: 40,
+            enforce: true,
+          },
+          // 将 SWR 提取到独立 chunk
+          'swr': {
+            name: 'swr',
+            test: /[\\/]node_modules[\\/]swr[\\/]/,
+            chunks: 'all',
+            priority: 40,
+            enforce: true,
+          },
+          // 将 next-intl 提取到独立 chunk
+          'intl': {
+            name: 'intl',
+            test: /[\\/]node_modules[\\/](next-intl|intl-messageformat|@formatjs)[\\/]/,
+            chunks: 'all',
+            priority: 40,
+            enforce: true,
+          },
+          // 将 Lenis 提取到独立 chunk
+          'lenis': {
+            name: 'lenis',
+            test: /[\\/]node_modules[\\/]lenis[\\/]/,
+            chunks: 'all',
+            priority: 40,
+            enforce: true,
+          },
+          // 将 Lucide 图标提取到独立 chunk（只包含实际使用的图标）
+          'icons': {
+            name: 'icons',
+            test: /[\\/]node_modules[\\/]lucide-react[\\/]/,
+            chunks: 'all',
+            priority: 40,
+            enforce: true,
+          },
+          // 其他大型库
+          'vendors': {
+            name: 'vendors',
+            test: /[\\/]node_modules[\\/]/,
+            chunks: 'all',
+            priority: 10,
+            reuseExistingChunk: true,
+          },
+        },
+      };
+    }
+    return config;
+  },
+
+  /**
    * Compiler Options - 减少 JS 体积
    */
   compiler: {

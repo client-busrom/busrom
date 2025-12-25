@@ -54,41 +54,6 @@ export const BrandAnalysis: GlobalConfig = {
         position: 'sidebar',
       },
     },
-    // Brand Name Analysis
-    {
-      name: 'brandNameAnalysis',
-      type: 'group',
-      label: {
-        en: 'Brand Name Analysis',
-        zh: '品牌名称分析',
-      },
-      fields: [
-        {
-          name: 'titlePart1',
-          type: 'text',
-          label: 'Title Part 1 (e.g., "Bus")',
-          localized: true,
-        },
-        {
-          name: 'titlePart2',
-          type: 'text',
-          label: 'Title Part 2 (e.g., "rom")',
-          localized: true,
-        },
-        {
-          name: 'textPart1',
-          type: 'text',
-          label: 'Text Part 1 (e.g., "Bus--Buffer & Bridge")',
-          localized: true,
-        },
-        {
-          name: 'textPart2',
-          type: 'text',
-          label: 'Text Part 2 (e.g., "rom--Room & Space")',
-          localized: true,
-        },
-      ],
-    },
     // Brand Center
     {
       name: 'brandCenter',

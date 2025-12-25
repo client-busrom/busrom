@@ -2,8 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { useState, useEffect, useRef, useCallback } from "react";
-import dynamic from "next/dynamic";
+import { useState, useEffect, useRef, useCallback, lazy, Suspense, ComponentType } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
 import { type CarouselApi } from "@/components/ui/carousel";
@@ -14,43 +13,42 @@ import {
   CarouselPrevious,
   CarouselNext,
 } from "@/components/ui/carousel";
-import { cn } from "@/lib/utils";
 import Autoplay from "embla-carousel-autoplay";
 
-// ⚡ 首屏 Banner 直接导入（SSR 关键）
+// ⚡ 首屏 Banner 直接导入（只加载第1个）
 import HeroBanner1 from "@/components/HeroBanner/HeroBanner1";
-
-// 非首屏 Banner 动态导入
-const HeroBanner2 = dynamic(() => import("@/components/HeroBanner/HeroBanner2"));
-const HeroBanner3 = dynamic(() => import("@/components/HeroBanner/HeroBanner3"));
-const HeroBanner4 = dynamic(() => import("@/components/HeroBanner/HeroBanner4"));
-const HeroBanner5 = dynamic(() => import("@/components/HeroBanner/HeroBanner5"));
-const HeroBanner6 = dynamic(() => import("@/components/HeroBanner/HeroBanner6"));
-const HeroBanner7 = dynamic(() => import("@/components/HeroBanner/HeroBanner7"));
-const HeroBanner8 = dynamic(() => import("@/components/HeroBanner/HeroBanner8"));
-const HeroBanner9 = dynamic(() => import("@/components/HeroBanner/HeroBanner9"));
 
 type Props = {
   data: HomeContent["heroBanner"];
   locale: Locale;
 };
 
-const BannerComponents = [
-  null,
-  HeroBanner1,
-  HeroBanner2,
-  HeroBanner3,
-  HeroBanner4,
-  HeroBanner5,
-  HeroBanner6,
-  HeroBanner7,
-  HeroBanner8,
-  HeroBanner9,
-];
+type BannerData = HomeContent["heroBanner"][number];
+type BannerComponentType = ComponentType<{ data: BannerData; locale: Locale }>;
+
+// 延迟加载的 Banner 组件（2-9 延迟加载）
+const lazyBanners: Record<number, () => Promise<{ default: BannerComponentType }>> = {
+  2: () => import("@/components/HeroBanner/HeroBanner2"),
+  3: () => import("@/components/HeroBanner/HeroBanner3"),
+  4: () => import("@/components/HeroBanner/HeroBanner4"),
+  5: () => import("@/components/HeroBanner/HeroBanner5"),
+  6: () => import("@/components/HeroBanner/HeroBanner6"),
+  7: () => import("@/components/HeroBanner/HeroBanner7"),
+  8: () => import("@/components/HeroBanner/HeroBanner8"),
+  9: () => import("@/components/HeroBanner/HeroBanner9"),
+};
 
 const AUTOPLAY_DELAY = 6000;
+const PRELOAD_BEFORE = 2000; // 提前 2 秒预加载下一个 Banner
 const MIN_HEIGHT = "min-h-[700px]";
 const HEIGHT_CLASS = `h-screen ${MIN_HEIGHT}`;
+
+// 占位组件 - 用于 Banner 加载中
+function BannerPlaceholder() {
+  return (
+    <div className={`w-full h-full ${MIN_HEIGHT} bg-gradient-to-br from-[#F6F4ED] to-[#E8E4D9]`} />
+  );
+}
 
 export default function HeroBanner({ data, locale }: Props) {
   const [api, setApi] = useState<CarouselApi>();
@@ -59,6 +57,14 @@ export default function HeroBanner({ data, locale }: Props) {
   const [isVisible, setIsVisible] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
 
+  // 已加载的 Banner 组件缓存（只有第1个直接可用）
+  const [loadedBanners, setLoadedBanners] = useState<Record<number, BannerComponentType>>({
+    1: HeroBanner1,
+  });
+
+  // 用 ref 追踪已加载状态，避免重复加载
+  const loadedRef = useRef<Set<number>>(new Set([1]));
+
   const autoplayPlugin = useRef(
     Autoplay({
       delay: AUTOPLAY_DELAY,
@@ -66,6 +72,57 @@ export default function HeroBanner({ data, locale }: Props) {
       stopOnMouseEnter: true,
     })
   );
+
+  // 预加载 Banner（不依赖 state，避免无限循环）
+  const preloadBanner = useCallback((bannerIndex: number) => {
+    if (loadedRef.current.has(bannerIndex) || !lazyBanners[bannerIndex]) return;
+
+    // 标记为正在加载
+    loadedRef.current.add(bannerIndex);
+
+    lazyBanners[bannerIndex]().then((module) => {
+      setLoadedBanners((prev) => ({
+        ...prev,
+        [bannerIndex]: module.default,
+      }));
+    });
+  }, []);
+
+  // 首次加载后，立即预加载第 2 个 Banner（确保轮播流畅）
+  useEffect(() => {
+    // 立即预加载 Banner2（下一张）
+    const timer1 = setTimeout(() => {
+      preloadBanner(2);
+    }, 500); // 页面加载后 0.5 秒开始预加载
+
+    // 提前预加载 Banner3
+    const timer2 = setTimeout(() => {
+      preloadBanner(3);
+    }, AUTOPLAY_DELAY - PRELOAD_BEFORE); // 第一次轮播前预加载
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, [preloadBanner]);
+
+  // 当轮播切换时，立即加载当前 Banner + 预加载下一个
+  useEffect(() => {
+    if (!data || data.length <= 1) return;
+
+    const currentIndex = currentSlide + 1; // Banner 索引从 1 开始
+    const nextIndex = ((currentSlide + 1) % data.length) + 1;
+
+    // 立即加载当前 Banner（手动切换时需要）
+    preloadBanner(currentIndex);
+
+    // 预加载下一个 Banner
+    const timer = setTimeout(() => {
+      preloadBanner(nextIndex);
+    }, AUTOPLAY_DELAY - PRELOAD_BEFORE);
+
+    return () => clearTimeout(timer);
+  }, [currentSlide, data, preloadBanner]);
 
   // 视口检测
   useEffect(() => {
@@ -133,12 +190,16 @@ export default function HeroBanner({ data, locale }: Props) {
         <CarouselContent className={`${HEIGHT_CLASS} m-0`}>
           {data && data.length > 0 ? (
             data.map((bannerData, index) => {
-              const BannerComponent = BannerComponents[index + 1];
-              if (!BannerComponent) return null;
+              const bannerIndex = index + 1; // Banner 索引从 1 开始
+              const BannerComponent = loadedBanners[bannerIndex];
 
               return (
                 <CarouselItem key={index} className={`h-full ${MIN_HEIGHT} p-0 basis-full flex`}>
-                  <BannerComponent data={bannerData} locale={locale} />
+                  {BannerComponent ? (
+                    <BannerComponent data={bannerData} locale={locale} />
+                  ) : (
+                    <BannerPlaceholder />
+                  )}
                 </CarouselItem>
               );
             })

@@ -69,7 +69,13 @@ const phudu = localFont({
   preload: false,
 });
 
-// Montserrat 已移除 - 使用 SVG 替代 (节省 211KB)
+const montserrat = localFont({
+  src: "../../public/fonts/Montserrat-VariableFont_wght.woff2",
+  weight: "100 900",
+  variable: "--font-montserrat",
+  display: "swap",
+  preload: false, // 非首屏字体，按需加载
+});
 
 const bebasNeue = localFont({
   src: "../../public/fonts/BebasNeue-Regular.woff2",
@@ -117,6 +123,7 @@ export default async function RootLayout({
       ${pavanam.variable}
       ${phudu.variable}
       ${anaheim.variable}
+      ${montserrat.variable}
       ${bebasNeue.variable}
       ${oswald.variable}
       ${inter.variable}

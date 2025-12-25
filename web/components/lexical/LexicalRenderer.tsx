@@ -11,8 +11,8 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import * as LucideIcons from 'lucide-react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { getIcon } from '@/lib/icon-map'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import { Button } from '@/components/ui/button'
 import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
@@ -22,8 +22,7 @@ import type { JSXConverters } from '@payloadcms/richtext-lexical/react'
 
 // Helper function to get Lucide icon component
 function getLucideIcon(iconName: string) {
-  const Icon = (LucideIcons as any)[iconName]
-  return Icon || LucideIcons.ExternalLink
+  return getIcon(iconName)
 }
 
 interface LexicalRendererProps {

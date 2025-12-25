@@ -207,7 +207,7 @@ interface BrandCenter {
 }
 
 interface BrandAnalysisData {
-  analysis: BrandAnalysisInfo;
+  status?: string;
   centers: BrandCenter[];
 }
 
@@ -1195,12 +1195,6 @@ export const homeContent_EN: HomeContentData = {
 
   // Module 14: Brand Analysis
   brandAnalysis: {
-    analysis: {
-      title: 'Bus',
-      title2: 'rom',
-      text: 'Buffer & Bridge',
-      text2: 'Room & Space',
-    },
     centers: [
       {
         title: 'Brand Center',

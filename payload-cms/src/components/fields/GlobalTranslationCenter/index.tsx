@@ -161,6 +161,7 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
   ],
   'sphere-3d': [
     { name: 'title', labelKey: 'custom:translationCenter:title', type: 'text' },
+    { name: 'description', labelKey: 'custom:translationCenter:description', type: 'text' },
   ],
 }
 
@@ -436,9 +437,9 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
           }
         }
 
-        // Globals 不需要获取源语言数据填充必填字段（Globals 没有 slug 等必填字段）
+        // Globals 使用 POST 更新（Payload 不支持 PATCH）
         const saveRes = await fetch(`/api/globals/${globalSlug}?locale=${locale.code}`, {
-          method: 'PATCH',
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(dataToSave),
         })

@@ -191,7 +191,7 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
           <OptimizedImage
             image={data.images[0]}
             alt="主图"
-            size="medium"
+            size="large"
             className="w-full h-full object-cover"
             objectPosition={image1Position}
             priority

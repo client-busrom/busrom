@@ -225,7 +225,6 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
       applications: []
     }
     const defaultBrandAnalysis = {
-      analysis: { title: '', title2: '', text: '', text2: '' },
       centers: []
     }
     const defaultServiceFeatures = {
@@ -292,10 +291,27 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
       heroBanner,
       productSeriesCarousel: carouselItems,
       serviceFeatures: serviceFeatures || defaultServiceFeatures,
-      sphere3d: {}, // Empty object as per spec
+      sphere3d: data.sphere3d ? {
+        title: data.sphere3d.title || '',
+        description: data.sphere3d.description || '',
+      } : null,
       simpleCta: simpleCta || defaultSimpleCta,
       seriesIntro,
-      featuredProducts: data.featuredProducts || defaultFeaturedProducts,
+      featuredProducts: data.featuredProducts ? {
+        title: data.featuredProducts.title || '',
+        description: data.featuredProducts.description || '',
+        viewAllButton: data.featuredProducts.viewAllButtonText || '',
+        categories: '',
+        series: (data.featuredProducts.series || []).map((s: any) => ({
+          seriesTitle: s.seriesTitle || '',
+          products: (s.products || []).map((p: any) => ({
+            slug: p.slug || '',
+            title: p.title || '',
+            image: toImageObject(p.image, p.title),
+            features: p.features || [],
+          })),
+        })),
+      } : defaultFeaturedProducts,
       brandAdvantages,
       oemOdm,
       quoteSteps: quoteSteps || defaultQuoteSteps,
@@ -303,12 +319,6 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
       whyChooseBusrom: whyChooseBusrom || defaultWhyChooseBusrom,
       caseStudies: data.caseStudies || defaultCaseStudies,
       brandAnalysis: data.brandAnalysis ? {
-        analysis: {
-          title: data.brandAnalysis.brandNameAnalysis?.titlePart1 || '',
-          title2: data.brandAnalysis.brandNameAnalysis?.titlePart2 || '',
-          text: data.brandAnalysis.brandNameAnalysis?.textPart1 || '',
-          text2: data.brandAnalysis.brandNameAnalysis?.textPart2 || '',
-        },
         centers: (data.brandAnalysis.centers || []).map((center: any) => {
           const largeImg = toImageObject(center.largeImage, center.title)
           const smallImg = toImageObject(center.smallImage, center.title)

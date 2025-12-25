@@ -34,8 +34,15 @@ const getProductSlug = (url: string): string | null => {
 }
 
 // 获取产品图片（优先使用 API 返回的图片，否则使用映射）
+// 自动将原图 URL 转换为 small variant (768x512)
 const getProductImage = (url: string, apiImage?: { url: string; filename: string }): string | null => {
-  if (apiImage?.url) return apiImage.url
+  if (apiImage?.url) {
+    // 将原图 URL 转换为 small variant
+    // 原图: /media/xxx.jpg -> variant: /media/xxx-768x512.webp
+    const originalUrl = apiImage.url
+    const variantUrl = originalUrl.replace(/(\.[^.]+)$/, '-768x512.webp')
+    return variantUrl
+  }
   const slug = getProductSlug(url)
   return slug ? productImageMap[slug] || null : null
 }

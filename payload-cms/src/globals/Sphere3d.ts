@@ -1,7 +1,7 @@
 /**
- * Sphere3d Global - 3D Sphere Configuration
+ * Sphere3d Global - 3D Globe Configuration
  *
- * 用途: 首页3D球体展示区块配置（预留）
+ * 用途: 首页3D地球展示区块配置
  */
 
 import type { GlobalConfig } from 'payload'
@@ -9,8 +9,8 @@ import type { GlobalConfig } from 'payload'
 export const Sphere3d: GlobalConfig = {
   slug: 'sphere-3d',
   label: {
-    en: '3D Sphere',
-    zh: '3D球体',
+    en: '3D Globe',
+    zh: '3D地球',
   },
   admin: {
     group: {
@@ -23,6 +23,17 @@ export const Sphere3d: GlobalConfig = {
     update: ({ req }) => !!req.user,
   },
   fields: [
+    // Translation Center
+    {
+      name: 'translationCenter',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/components/fields/GlobalTranslationCenter',
+        },
+      },
+    },
     // Status
     {
       name: 'status',
@@ -40,16 +51,7 @@ export const Sphere3d: GlobalConfig = {
         position: 'sidebar',
       },
     },
-    // Configuration
-    {
-      name: 'enabled',
-      type: 'checkbox',
-      label: {
-        en: 'Enabled',
-        zh: '启用',
-      },
-      defaultValue: false,
-    },
+    // Title
     {
       name: 'title',
       type: 'text',
@@ -58,29 +60,28 @@ export const Sphere3d: GlobalConfig = {
         zh: '标题',
       },
       localized: true,
-    },
-    {
-      name: 'modelUrl',
-      type: 'text',
-      label: {
-        en: '3D Model URL',
-        zh: '3D模型URL',
-      },
       admin: {
         description: {
-          en: '3D model file URL',
-          zh: '3D模型文件地址',
+          en: 'e.g. GLOBAL NETWORK',
+          zh: '例如：全球网络',
         },
       },
     },
+    // Description
     {
-      name: 'backgroundColor',
+      name: 'description',
       type: 'text',
       label: {
-        en: 'Background Color',
-        zh: '背景色',
+        en: 'Description',
+        zh: '描述',
       },
-      defaultValue: '#000000',
+      localized: true,
+      admin: {
+        description: {
+          en: 'e.g. Serving customers worldwide from Guangdong, China',
+          zh: '例如：从中国广东服务全球客户',
+        },
+      },
     },
   ],
 }
