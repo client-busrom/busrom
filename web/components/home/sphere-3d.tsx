@@ -146,9 +146,9 @@ const CONFIG = {
   arc: {
     color: ["#00FFFF", "#0096FF"],
     strokeWidth: 0.8,
-    dashLength: 0.3,
-    dashGap: 0.15,
-    dashAnimateTime: 1500,
+    dashLength: 0.15,      // 线条更短 (原 0.3)
+    dashGap: 0.2,          // 间隔稍大
+    dashAnimateTime: 3000, // 流速更慢 (原 1500)
     altitude: 0.25,
   },
   point: {
@@ -526,7 +526,7 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
       )}
 
       {/* 标题 */}
-      <div className="absolute top-24 md:top-32 left-1/2 -translate-x-1/2 text-center z-10 pointer-events-none">
+      <div className="absolute top-12 md:top-20 left-1/2 -translate-x-1/2 text-center z-10 pointer-events-none">
         <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
           {title}
         </h2>
