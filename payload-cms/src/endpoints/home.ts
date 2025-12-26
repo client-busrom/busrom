@@ -355,6 +355,7 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         status: simpleCta?.status,
         title: simpleCta?.title,
         subtitle: simpleCta?.subtitle,
+        description: simpleCta?.description,
         ctaText: simpleCta?.ctaText,
         ctaUrl: simpleCta?.ctaLink, // Field name in DB is ctaLink
         images: [
