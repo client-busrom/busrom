@@ -73,6 +73,15 @@ export const SimpleCta: GlobalConfig = {
       localized: true,
     },
     {
+      name: 'description',
+      type: 'textarea',
+      label: {
+        en: 'Description',
+        zh: '描述',
+      },
+      localized: true,
+    },
+    {
       name: 'ctaText',
       type: 'text',
       label: {
