@@ -64,6 +64,17 @@ function transformImageVariants(variants: any) {
 }
 
 /**
+ * Convert Payload's focalX/focalY to cropFocalPoint format
+ */
+function getCropFocalPoint(media: any): { x: number; y: number } | undefined {
+  if (media?.focalX !== undefined && media?.focalX !== null &&
+      media?.focalY !== undefined && media?.focalY !== null) {
+    return { x: media.focalX, y: media.focalY }
+  }
+  return undefined
+}
+
+/**
  * Transform a media object to include CDN URLs
  */
 function transformMediaObject(media: any) {
@@ -369,7 +380,7 @@ export async function GET(
                   altText: p.showImage.alt || '',
                   filename: p.showImage.filename,
                   variants: transformImageVariants(p.showImage.sizes),
-                  cropFocalPoint: p.showImage.focalPoint,
+                  cropFocalPoint: getCropFocalPoint(p.showImage),
                 }
               : null,
             mainImage: p.mainImage && Array.isArray(p.mainImage)
@@ -379,7 +390,7 @@ export async function GET(
                   altText: img.alt || '',
                   filename: img.filename,
                   variants: transformImageVariants(img.sizes),
-                  cropFocalPoint: img.focalPoint,
+                  cropFocalPoint: getCropFocalPoint(img),
                 }))
               : [],
             isFeatured: p.featured || false,
@@ -423,7 +434,7 @@ export async function GET(
             altText: product.showImage.alt || '',
             filename: product.showImage.filename,
             variants: transformImageVariants(product.showImage.sizes),
-            cropFocalPoint: product.showImage.focalPoint,
+            cropFocalPoint: getCropFocalPoint(product.showImage),
           }
         : null,
       mainImage: product.mainImage && Array.isArray(product.mainImage)
@@ -433,7 +444,7 @@ export async function GET(
             altText: img.alt || '',
             filename: img.filename,
             variants: transformImageVariants(img.sizes),
-            cropFocalPoint: img.focalPoint,
+            cropFocalPoint: getCropFocalPoint(img),
           }))
         : [],
       // Series
