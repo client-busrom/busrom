@@ -25,7 +25,7 @@ const DESKTOP_FEATURE1_CONFIG = {
 // --- 桌面端右侧内容配置 (基于 Figma 设计稿 1920x1080) ---
 const DESKTOP_RIGHT_CONTENT_CONFIG = {
   titleFontSize: 100,     // 标题字体大小 (设计稿像素)
-  right: 160,             // 右边距 (设计稿像素)
+  right: 80,             // 右边距 (设计稿像素)
   // Feature 胶囊配置
   featureFontSize: 40,    // Feature 字体大小 (设计稿像素)
   featureWidth: 455,      // 椭圆宽度 (设计稿像素)
@@ -374,9 +374,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           transform: `translateY(-50%) translateY(${rpxHero(DIAMOND_TOP_CONFIG.offsetY)}) rotate(45deg)`,
           width: rpxHero(DIAMOND_TOP_CONFIG.size),
           height: rpxHero(DIAMOND_TOP_CONFIG.size),
-          borderWidth: rpxHero(DIAMOND_TOP_CONFIG.borderWidth),
-          borderColor: DIAMOND_TOP_CONFIG.borderColor,
-          borderStyle: 'solid',
+          boxShadow: `0 0 0 ${rpxHero(11)} ${DIAMOND_TOP_CONFIG.borderColor}`,
           borderRadius: rpxHero(DIAMOND_TOP_CONFIG.borderRadius),
           zIndex: DIAMOND_TOP_CONFIG.zIndex,
         }}
@@ -408,9 +406,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           transform: `translateY(-50%) translateY(${rpxHero(DIAMOND_MIDDLE_CONFIG.offsetY)}) rotate(45deg)`,
           width: rpxHero(DIAMOND_MIDDLE_CONFIG.size),
           height: rpxHero(DIAMOND_MIDDLE_CONFIG.size),
-          borderWidth: rpxHero(DIAMOND_MIDDLE_CONFIG.borderWidth),
-          borderColor: DIAMOND_MIDDLE_CONFIG.borderColor,
-          borderStyle: 'solid',
+          boxShadow: `0 0 0 ${rpxHero(11)} ${DIAMOND_MIDDLE_CONFIG.borderColor}`,
           borderRadius: rpxHero(DIAMOND_MIDDLE_CONFIG.borderRadius),
           zIndex: DIAMOND_MIDDLE_CONFIG.zIndex,
         }}
@@ -442,9 +438,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           transform: `translateY(-50%) translateY(${rpxHero(DIAMOND_BOTTOM_CONFIG.offsetY)}) rotate(45deg)`,
           width: rpxHero(DIAMOND_BOTTOM_CONFIG.size),
           height: rpxHero(DIAMOND_BOTTOM_CONFIG.size),
-          borderWidth: rpxHero(DIAMOND_BOTTOM_CONFIG.borderWidth),
-          borderColor: DIAMOND_BOTTOM_CONFIG.borderColor,
-          borderStyle: 'solid',
+          boxShadow: `0 0 0 ${rpxHero(11)} ${DIAMOND_BOTTOM_CONFIG.borderColor}`,
           borderRadius: rpxHero(DIAMOND_BOTTOM_CONFIG.borderRadius),
           zIndex: DIAMOND_BOTTOM_CONFIG.zIndex,
         }}
@@ -479,8 +473,12 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           }}
         >
           <p
-            className="font-paytone-one font-regular text-white text-stroke-custom-white text-left"
-            style={{ fontSize: rpxHero(DESKTOP_FEATURE1_CONFIG.fontSize) }}
+            className="font-paytone-one font-regular text-white text-left"
+            style={{
+              fontSize: rpxHero(DESKTOP_FEATURE1_CONFIG.fontSize),
+              WebkitTextStroke: `${rpxHero(6)} #6B4E00`,
+              paintOrder: 'stroke fill',
+            }}
           >
             {feature1Lines.map((line, index) => (
               <span key={index}>
@@ -497,14 +495,29 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           style={{ right: rpxHero(DESKTOP_RIGHT_CONTENT_CONFIG.right) }}
         >
 
-          {/* Top: Feature[0] - 支持多行，第一行白色，其他行深色 */}
+          {/* Top: Feature[0] - 支持多行，第一行白色（但-号用深色），其他行深色 */}
           <h1
-            className="text-left font-paytone-one font-regular text-stroke-black leading-tight"
-            style={{ fontSize: rpxHero(DESKTOP_RIGHT_CONTENT_CONFIG.titleFontSize) }}
+            className="text-left font-paytone-one font-regular leading-tight"
+            style={{
+              fontSize: rpxHero(DESKTOP_RIGHT_CONTENT_CONFIG.titleFontSize),
+              WebkitTextStroke: `${rpxHero(4)} #000000`,
+              paintOrder: 'stroke fill',
+            }}
           >
             {feature0Lines.map((line, index) => (
               <div key={index} className={index === 0 ? 'text-[#FFFFFF]' : 'text-[#433E12]'}>
-                {line}
+                {index === 0 ? (
+                  // 第一行：把 - 号单独用深色
+                  line.split(/(-)/g).map((part, partIndex) => (
+                    part === '-' ? (
+                      <span key={partIndex} className="text-[#433E12]">-</span>
+                    ) : (
+                      <span key={partIndex}>{part}</span>
+                    )
+                  ))
+                ) : (
+                  line
+                )}
               </div>
             ))}
           </h1>
@@ -526,7 +539,10 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               >
                 <p
                   className="font-pingfang font-semibold text-[#000000]"
-                  style={{ fontSize: rpxHero(DESKTOP_RIGHT_CONTENT_CONFIG.featureFontSize) }}
+                  style={{
+                    fontSize: rpxHero(DESKTOP_RIGHT_CONTENT_CONFIG.featureFontSize),
+                    letterSpacing: '0.06em',
+                  }}
                 >
                   {feature}
                 </p>
@@ -562,11 +578,28 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           className="relative z-10 flex flex-col items-center justify-center px-6 pb-4"
           style={{ minHeight: MOBILE_CONFIG.topPadding }}
         >
-          {/* 标题 - 支持多行，第一行白色，其他行深色 */}
-          <h1 className="text-center text-3xl sm:text-4xl font-paytone-one font-regular text-stroke-black leading-tight mb-4">
+          {/* 标题 - 支持多行，第一行白色（但-号用深色），其他行深色 */}
+          <h1
+            className="text-center text-3xl sm:text-4xl font-paytone-one font-regular leading-tight mb-4"
+            style={{
+              WebkitTextStroke: '2px #000000',
+              paintOrder: 'stroke fill',
+            }}
+          >
             {feature0Lines.map((line, index) => (
               <div key={index} className={index === 0 ? 'text-[#FFFFFF]' : 'text-[#433E12]'}>
-                {line}
+                {index === 0 ? (
+                  // 第一行：把 - 号单独用深色
+                  line.split(/(-)/g).map((part, partIndex) => (
+                    part === '-' ? (
+                      <span key={partIndex} className="text-[#433E12]">-</span>
+                    ) : (
+                      <span key={partIndex}>{part}</span>
+                    )
+                  ))
+                ) : (
+                  line
+                )}
               </div>
             ))}
           </h1>
@@ -630,9 +663,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               top: MOBILE_CONFIG.diamondTop.top,
               width: MOBILE_CONFIG.diamondTop.size,
               height: MOBILE_CONFIG.diamondTop.size,
-              borderWidth: MOBILE_CONFIG.diamondTop.borderWidth,
-              borderColor: DIAMOND_TOP_CONFIG.borderColor,
-              borderStyle: 'solid',
+              boxShadow: `0 0 0 ${MOBILE_CONFIG.diamondTop.borderWidth}px ${DIAMOND_TOP_CONFIG.borderColor}`,
               borderRadius: MOBILE_CONFIG.diamondTop.borderRadius,
               transform: 'rotate(45deg)',
               zIndex: 20,
@@ -659,9 +690,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               transform: 'translateY(-50%) rotate(45deg)',
               width: MOBILE_CONFIG.diamondMiddle.size,
               aspectRatio: '1',
-              borderWidth: MOBILE_CONFIG.diamondMiddle.borderWidth,
-              borderColor: DIAMOND_MIDDLE_CONFIG.borderColor,
-              borderStyle: 'solid',
+              boxShadow: `0 0 0 ${MOBILE_CONFIG.diamondMiddle.borderWidth}px ${DIAMOND_MIDDLE_CONFIG.borderColor}`,
               borderRadius: MOBILE_CONFIG.diamondMiddle.borderRadius,
               zIndex: 20,
             }}
@@ -686,9 +715,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               bottom: MOBILE_CONFIG.diamondBottom.bottom,
               width: MOBILE_CONFIG.diamondBottom.size,
               height: MOBILE_CONFIG.diamondBottom.size,
-              borderWidth: MOBILE_CONFIG.diamondBottom.borderWidth,
-              borderColor: DIAMOND_BOTTOM_CONFIG.borderColor,
-              borderStyle: 'solid',
+              boxShadow: `0 0 0 ${MOBILE_CONFIG.diamondBottom.borderWidth}px ${DIAMOND_BOTTOM_CONFIG.borderColor}`,
               borderRadius: MOBILE_CONFIG.diamondBottom.borderRadius,
               transform: 'rotate(45deg)',
               zIndex: 20,
@@ -714,7 +741,13 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               bottom: MOBILE_CONFIG.featureText.bottom,
             }}
           >
-            <p className={`${MOBILE_CONFIG.featureText.fontSize} font-paytone-one font-regular text-white text-stroke-custom-white text-left`}>
+            <p
+              className={`${MOBILE_CONFIG.featureText.fontSize} font-paytone-one font-regular text-white text-left`}
+              style={{
+                WebkitTextStroke: '2px #6B4E00',
+                paintOrder: 'stroke fill',
+              }}
+            >
               {feature1Lines.map((line, index) => (
                 <span key={index}>
                   {line}

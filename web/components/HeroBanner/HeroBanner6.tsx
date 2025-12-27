@@ -46,7 +46,7 @@ const MASK_2_CONFIG = {
   useCMSFocalPoint: true,
   // 模糊效果 (CSS filter)
   blur: 7,            // 模糊程度 (px)
-  opacity: 0.62,      // 透明度
+  opacity: 0.85,      // 透明度 (提高以减少黄色背景透出)
 };
 
 // 左上角小圆装饰
@@ -64,17 +64,17 @@ const CONTENT_CONFIG = {
   top: 86,
   // 顶部标语胶囊 (渐变背景，左边方角右边圆角)
   tagline: {
-    top: 86,
-    width: 760,
+    top: 84,
+    width: 700,
     height: 122,
     fontSize: 40,
     borderRadius: 61,  // 只有右边圆角
   },
   // 主标题
   title: {
-    line1Top: 210,      // "Curated"
-    line2Top: 320,      // "Details"
-    line3Top: 420,      // "Glass Hinge"
+    line1Top: 220,      // "Curated"
+    line2Top: 340,      // "Details"
+    line3Top: 450,      // "Glass Hinge"
     fontSize: 96,
     lineHeight: 107,
   },
@@ -216,47 +216,53 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
         >
           <p
             className="font-arial font-bold italic text-[#754600]"
-            style={{ fontSize: rpxContent(CONTENT_CONFIG.tagline.fontSize) }}
+            style={{ fontSize: rpxContent(CONTENT_CONFIG.tagline.fontSize), letterSpacing: '0.05em' }}
           >
             {data.features[1]}
           </p>
         </div>
 
-        {/* 主标题第一行 - "Curated" 白色描边 */}
+        {/* 主标题第一行 - "Curated" 白色 + #443D05 描边 */}
         <h1
-          className="absolute font-poller-one text-white text-stroke-custom"
+          className="absolute font-poller-one text-white antialiased"
           style={{
             left: rpxContent(CONTENT_CONFIG.left),
             top: rpxContent(CONTENT_CONFIG.title.line1Top),
             fontSize: rpxContent(CONTENT_CONFIG.title.fontSize),
             lineHeight: `${rpxContent(CONTENT_CONFIG.title.lineHeight)}`,
+            WebkitTextStroke: `${rpx(10)} #443D05`,
+            paintOrder: 'stroke fill',
           }}
         >
           {titleLine1}
         </h1>
 
-        {/* 主标题第二行 - "Details" 深色描边 */}
+        {/* 主标题第二行 - "Details" #322E0B + #FDF6C2 描边 */}
         <h1
-          className="absolute font-poller-one text-[#332E0B] text-stroke-custom-light"
+          className="absolute font-poller-one text-[#322E0B] antialiased"
           style={{
             left: rpxContent(CONTENT_CONFIG.left),
             top: rpxContent(CONTENT_CONFIG.title.line2Top),
             fontSize: rpxContent(CONTENT_CONFIG.title.fontSize),
             lineHeight: `${rpxContent(CONTENT_CONFIG.title.lineHeight)}`,
+            WebkitTextStroke: `${rpx(6)} #FDF6C2`,
+            paintOrder: 'stroke fill',
           }}
         >
           {titleLine2}
         </h1>
 
-        {/* 主标题第三行 - "Glass Hinge" 深色描边 */}
+        {/* 主标题第三行 - "Glass Hinge" #322E0B + #FDF6C2 描边 */}
         {titleLine3 && (
           <h1
-            className="absolute font-poller-one text-[#332E0B] text-stroke-custom-light"
+            className="absolute font-poller-one text-[#322E0B] antialiased"
             style={{
               left: rpxContent(CONTENT_CONFIG.left),
               top: rpxContent(CONTENT_CONFIG.title.line3Top),
               fontSize: rpxContent(CONTENT_CONFIG.title.fontSize),
               lineHeight: `${rpxContent(CONTENT_CONFIG.title.lineHeight)}`,
+              WebkitTextStroke: `${rpx(8)} #FDF6C2`,
+              paintOrder: 'stroke fill',
             }}
           >
             {titleLine3}
@@ -294,20 +300,29 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
         <div className="flex items-center justify-end rounded-full px-4 py-2 mb-4 self-start"
           style={{ background: 'linear-gradient(to left, #FFFFFF, #FFDE95)' }}
         >
-          <p className="font-arial font-bold italic text-[#754600] text-sm">
+          <p className="font-arial font-bold italic text-[#754600] text-sm" style={{ letterSpacing: '0.05em' }}>
             {data.features[1]}
           </p>
         </div>
 
         {/* 主标题 */}
-        <h1 className="font-poller-one text-white text-stroke-custom text-4xl sm:text-5xl mb-1">
+        <h1
+          className="font-poller-one text-white text-4xl sm:text-5xl mb-1 antialiased"
+          style={{ WebkitTextStroke: '2px #443D05', paintOrder: 'stroke fill' }}
+        >
           {titleLine1}
         </h1>
-        <h1 className="font-poller-one text-[#332E0B] text-stroke-custom-light text-4xl sm:text-5xl mb-1">
+        <h1
+          className="font-poller-one text-[#322E0B] text-4xl sm:text-5xl mb-1 antialiased"
+          style={{ WebkitTextStroke: '2px #FDF6C2', paintOrder: 'stroke fill' }}
+        >
           {titleLine2}
         </h1>
         {titleLine3 && (
-          <h1 className="font-poller-one text-[#332E0B] text-stroke-custom-light text-4xl sm:text-5xl mb-8">
+          <h1
+            className="font-poller-one text-[#322E0B] text-4xl sm:text-5xl mb-8 antialiased"
+            style={{ WebkitTextStroke: '2px #FDF6C2', paintOrder: 'stroke fill' }}
+          >
             {titleLine3}
           </h1>
         )}

@@ -5,6 +5,7 @@ import { Locale } from "@/i18n.config";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // --- 响应式尺寸函数 ---
+const rpx = (designValue: number) => `calc(var(--rpx) * ${designValue})`;
 const rpxHero = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
 
 // --- BannerProps Definition ---
@@ -28,32 +29,37 @@ const DESKTOP_CONFIG = {
     width: 1332,
     aspectRatio: 1332 / 1080,  // 遮罩可见区域宽高比
     svgAspectRatio: 1920 / 1080,  // 完整 SVG 宽高比
+    // 图片在遮罩内的位置调整
+    imagePosition: 'center center',  // object-position 值
+    imageScale: 1.2,                    // 图片缩放比例 (1 = 100%)
+    imageOffsetX: -5,                  // 水平偏移 (百分比)
+    imageOffsetY: 0,                  // 垂直偏移 (百分比)
   },
 
   // 装饰 SVG (hero-banner-9-2.svg) 配置
   decorativeSvg: {
-    width: 887,            // SVG 原始宽度
-    height: 489,           // SVG 原始高度
-    bottom: 0,           // 底部定位
-    left: 0,            // 左侧定位
+    width: 800,            // SVG 原始宽度
+    height: 440,           // SVG 原始高度
+    bottom: 0,             // 底部定位
+    left: 0,               // 左侧定位
   },
 
   // 左下角菱形图片 (data.images[1])
   diamondImage: {
-    size: 400,             // 正方形尺寸
+    size: 370,             // 正方形尺寸
     borderRadius: 80,      // 圆角
     rotation: 45,          // 旋转角度 (正45度形成菱形)
-    bottom: -50,          // 底部定位
+    bottom: -50,           // 底部定位
     left: -20,             // 左侧定位
     imageScale: 1.4,       // 图片缩放比例
-    imageOffsetX: 0,       // 图片水平偏移
-    imageOffsetY: 0,       // 图片垂直偏移
+    imageOffsetX: 20,       // 图片水平偏移
+    imageOffsetY: -20,       // 图片垂直偏移
   },
 
   // 左下角 Feature 文字 [2,3,4]
   featureText: {
     bottom: 80,            // 底部定位
-    left: 450,             // 左侧定位
+    left: 380,             // 左侧定位
     fontSize: 32,          // 字体大小
     strokeColor: '#6B4E00', // 描边颜色
     strokeWidth: 2,        // 描边宽度
@@ -72,21 +78,21 @@ const DESKTOP_CONFIG = {
     fontSize: 100,         // 字体大小
     rotation: -1.81,       // 旋转角度
     lineHeight: 1.1,
-    right: '5%',           // 右边距（百分比）
-    top: 140,               // 顶部距离
+    right: '3%',           // 右边距（百分比）
+    top: 200,               // 顶部距离
     color: '#3C3712',      // 文字颜色
     strokeColor: '#ffffff', // 描边颜色
     strokeWidth: 2,        // 描边宽度
     // SVG 背景框参数
-    svgPaddingLeft: 24,    // 文字左内边距
+    svgPaddingLeft: 16,    // 文字左内边距
     svgPaddingRight: 100,  // 文字右内边距
-    svgPaddingTop: 16,     // 文字上内边距
-    svgPaddingBottom: 16,  // 文字下内边距
+    svgPaddingTop: 14,     // 文字上内边距
+    svgPaddingBottom: 10,  // 文字下内边距
     svgOffsetLeft: -30,    // SVG 左偏移
-    svgOffsetTop: -20,     // SVG 上偏移
+    svgOffsetTop: -30,     // SVG 上偏移
     svgExtraWidth: 160,    // SVG 额外宽度
-    svgExtraHeight: 40,    // SVG 额外高度
-    gap: 32,               // 行间距
+    svgExtraHeight: 60,    // SVG 额外高度
+    gap: 36,               // 行间距
   },
 
   // 右侧 Feature[1] 文字
@@ -158,7 +164,8 @@ const FeatureBlock: FC<FeatureBlockProps> = ({ lines, fontSize, rotation, lineHe
                 paddingBottom: size(config.svgPaddingBottom),
                 transform: `rotate(${rotation}deg)`,
                 color: config.color,
-                WebkitTextStroke: `${config.strokeWidth}px ${config.strokeColor}`,
+                WebkitTextStroke: `${rpx(6)} ${config.strokeColor}`,
+                paintOrder: 'stroke fill',
               }}
             >
               {line}
@@ -210,13 +217,21 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
           WebkitMaskRepeat: 'no-repeat',
         }}
       >
-        <OptimizedImage
-          image={data.images[0]}
-          alt="Background"
-          size="medium"
-          className="w-full h-full object-cover"
-          priority
-        />
+        <div
+          className="w-full h-full"
+          style={{
+            transform: `scale(${DESKTOP_CONFIG.maskImage.imageScale}) translate(${DESKTOP_CONFIG.maskImage.imageOffsetX}%, ${DESKTOP_CONFIG.maskImage.imageOffsetY}%)`,
+            transformOrigin: 'center center',
+          }}
+        >
+          <OptimizedImage
+            image={data.images[0]}
+            alt="Background"
+            size="medium"
+            className="w-full h-full object-cover"
+            priority
+          />
+        </div>
       </div>
 
       {/* 左下角元素容器 - lg 及以上固定像素 */}
@@ -256,7 +271,7 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
             <OptimizedImage
               image={data.images[1]}
               alt="Product Focus"
-              size="thumbnail"
+              size="medium"
               className="absolute inset-0 w-full h-full object-cover -rotate-45"
               priority
             />
@@ -278,7 +293,9 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
               style={{
                 fontSize: DESKTOP_CONFIG.featureText.fontSize,
                 color: DESKTOP_CONFIG.featureText.color,
-                WebkitTextStroke: `${DESKTOP_CONFIG.featureText.strokeWidth}px ${DESKTOP_CONFIG.featureText.strokeColor}`,
+                WebkitTextStroke: `${rpx(4)} #6B4E00`,
+                paintOrder: 'stroke fill',
+                letterSpacing: '0.03em',
               }}
             >
               {feature}
@@ -353,7 +370,9 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
               style={{
                 fontSize: DESKTOP_CONFIG.featureText.fontSize,
                 color: DESKTOP_CONFIG.featureText.color,
-                WebkitTextStroke: `${DESKTOP_CONFIG.featureText.strokeWidth}px ${DESKTOP_CONFIG.featureText.strokeColor}`,
+                WebkitTextStroke: `${rpx(4)} #6B4E00`,
+                paintOrder: 'stroke fill',
+                letterSpacing: '0.03em',
               }}
             >
               {feature}
@@ -405,9 +424,11 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
         }}
       >
         <h1
-          className="font-paytone-one font-regular text-white text-stroke-custom-white"
+          className="font-paytone-one font-regular text-white"
           style={{
             fontSize: rpxHero(DESKTOP_CONFIG.feature1.fontSize),
+            WebkitTextStroke: `${rpx(7)} #6B4E00`,
+            paintOrder: 'stroke fill',
           }}
         >
           {(data.features[1] || "").split(/\n|\\n|\/n/).map((line, index, arr) => (
@@ -428,9 +449,11 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
         }}
       >
         <h1
-          className="font-paytone-one font-regular text-white text-stroke-custom-white"
+          className="font-paytone-one font-regular text-white"
           style={{
             fontSize: DESKTOP_CONFIG.feature1.fontSize * LG_SCALE,
+            WebkitTextStroke: `${3 * LG_SCALE}px #6B4E00`,
+            paintOrder: 'stroke fill',
           }}
         >
           {(data.features[1] || "").split(/\n|\\n|\/n/).map((line, index, arr) => (

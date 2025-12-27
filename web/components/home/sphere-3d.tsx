@@ -145,20 +145,17 @@ const DESTINATIONS: LocationData[] = [
 const CONFIG = {
   arc: {
     color: ["#00FFFF", "#0096FF"],
-    strokeWidth: 0.8,
-    dashLength: 0.15,      // 线条更短 (原 0.3)
-    dashGap: 0.2,          // 间隔稍大
-    dashAnimateTime: 3000, // 流速更慢 (原 1500)
+    strokeWidth: 0.4,      // 更细的线条
+    dashLength: 0.02,      // 短线段
+    dashGap: 0.06,         // 小间隔
+    dashAnimateTime: 3000, // 快速流动
     altitude: 0.25,
   },
   point: {
     color: "#00FFFF",
-    radius: 0.6,
-    originRadius: 1.0,
+    radius: 0.8,           // 稍大一点，更容易点击
+    originRadius: 1.0,     // 起点稍大
     originColor: "#00FF88",
-    // 交互区域比显示半径更大
-    hitRadius: 1.5,
-    originHitRadius: 2.0,
   },
   globe: {
     imageUrl: "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
@@ -201,7 +198,7 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
   const [isGlobeReady, setIsGlobeReady] = useState(false);
   const [selectedPoint, setSelectedPoint] = useState<string | null>(null);
   const [isInteractive, setIsInteractive] = useState(false);
-  const [isVisible, setIsVisible] = useState(false); // 是否在视口内
+  const [isVisible, setIsVisible] = useState(true); // 是否在视口内（默认 true，避免初始不渲染）
 
   // 根据 locale 获取地名
   const getLocalizedName = useCallback((location: LocationData) => {
@@ -209,15 +206,21 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
     return location.name[lang] || location.name.en;
   }, [locale]);
 
-  // 生成弧线数据 (从广东到各目的地)
+  // 弧线数据 - 只在选中某个地点时显示从广东到该地点的连线
   const arcsData = useMemo(() => {
-    return DESTINATIONS.map((dest) => ({
+    if (!selectedPoint || selectedPoint === ORIGIN.id) {
+      return [];
+    }
+    const selectedDest = DESTINATIONS.find((d) => d.id === selectedPoint);
+    if (!selectedDest) return [];
+
+    return [{
       startLat: ORIGIN.lat,
       startLng: ORIGIN.lng,
-      endLat: dest.lat,
-      endLng: dest.lng,
-    }));
-  }, []);
+      endLat: selectedDest.lat,
+      endLng: selectedDest.lng,
+    }];
+  }, [selectedPoint]);
 
   // 生成点数据 (包含地名，用于悬停显示)
   const pointsData = useMemo(() => {
@@ -226,6 +229,7 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
       ...DESTINATIONS.map((d) => ({ ...d, label: getLocalizedName(d) })),
     ];
   }, [getLocalizedName]);
+
 
   // 监听窗口大小
   useEffect(() => {
@@ -271,6 +275,35 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
       controls.autoRotate = isVisible;
     }
   }, [isVisible, isGlobeReady]);
+
+  // 组件卸载时清理 WebGL 资源
+  useEffect(() => {
+    return () => {
+      if (globeRef.current) {
+        // 清理 Three.js renderer
+        const renderer = globeRef.current.renderer?.();
+        if (renderer) {
+          renderer.dispose();
+          renderer.forceContextLoss();
+        }
+        // 清理 scene
+        const scene = globeRef.current.scene?.();
+        if (scene) {
+          scene.traverse((object: any) => {
+            if (object.geometry) object.geometry.dispose();
+            if (object.material) {
+              if (Array.isArray(object.material)) {
+                object.material.forEach((m: any) => m.dispose());
+              } else {
+                object.material.dispose();
+              }
+            }
+          });
+        }
+        globeRef.current = null;
+      }
+    };
+  }, []);
 
   // 当 globe 准备好时的回调
   const handleGlobeReady = useCallback(() => {
@@ -331,12 +364,6 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
     setZoomLevel(altitudeToZoom(CONFIG.initialView.altitude));
   }, []);
 
-  // 点击点时切换固定显示
-  const handlePointClick = useCallback((point: any) => {
-    if (!isInteractive && isMobile) return; // 移动端未进入交互模式时不响应
-    setSelectedPoint((prev) => (prev === point.id ? null : point.id));
-  }, [isInteractive, isMobile]);
-
   // 进入/退出交互模式
   const enterInteractiveMode = useCallback(() => {
     setIsInteractive(true);
@@ -394,8 +421,8 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
             </div>
           </div>
         )}
-        {/* 只在视口内时渲染 Globe，离开视口时完全卸载以释放内存 */}
-        {size.width > 0 && size.height > 0 && isVisible && (
+        {/* Globe 始终渲染，避免重复初始化导致卡顿；离开视口时只暂停动画 */}
+        {size.width > 0 && size.height > 0 && (
           <Globe
             ref={globeRef}
             width={size.width}
@@ -417,7 +444,21 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
             arcDashLength={CONFIG.arc.dashLength}
             arcDashGap={CONFIG.arc.dashGap}
             arcDashAnimateTime={CONFIG.arc.dashAnimateTime}
-            arcAltitude={CONFIG.arc.altitude}
+            arcAltitudeAutoScale={0.5}
+            arcAltitude={(d: any) => {
+              // 根据两点间距离动态计算弧线高度
+              const lat1 = d.startLat * Math.PI / 180;
+              const lat2 = d.endLat * Math.PI / 180;
+              const dLng = (d.endLng - d.startLng) * Math.PI / 180;
+              // 大圆距离（弧度）
+              const dist = Math.acos(
+                Math.sin(lat1) * Math.sin(lat2) +
+                Math.cos(lat1) * Math.cos(lat2) * Math.cos(dLng)
+              );
+              // 距离越远，弧线越高（最小0.2，最大0.6）
+              return Math.min(0.6, Math.max(0.2, dist / Math.PI * 0.8));
+            }}
+            arcsTransitionDuration={300}
             // 点配置 (悬停显示地名)
             pointsData={pointsData}
             pointLat="lat"
@@ -426,20 +467,14 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
             pointRadius={(d: any) => d.isOrigin ? CONFIG.point.originRadius : CONFIG.point.radius}
             pointAltitude={0.01}
             pointResolution={12}
-            // 悬停显示地名 tooltip
             pointLabel={(d: any) => `<div class="globe-label">${d.label}</div>`}
-            onPointClick={handlePointClick}
-            // 光环层 - 扩大交互区域 + 视觉效果
-            ringsData={pointsData}
-            ringLat="lat"
-            ringLng="lng"
-            ringColor={(d: any) => d.isOrigin ? "rgba(0, 255, 136, 0.3)" : "rgba(0, 255, 255, 0.3)"}
-            ringMaxRadius={(d: any) => d.isOrigin ? 3 : 2.5}
-            ringPropagationSpeed={1}
-            ringRepeatPeriod={2000}
-            onRingClick={handlePointClick}
-            ringLabel={(d: any) => `<div class="globe-label">${d.label}</div>`}
-            // HTML elements 层 - 用于固定显示选中的标签
+            onPointClick={(point: any) => {
+              if (!isInteractive && isMobile) return;
+              setSelectedPoint((prev) => (prev === point.id ? null : point.id));
+            }}
+            // 光环层 - 暂时禁用来测试内存
+            ringsData={[]}
+            // HTML elements 层 - 选中时显示固定标签
             htmlElementsData={pointsData.filter((d) => d.id === selectedPoint)}
             htmlLat="lat"
             htmlLng="lng"

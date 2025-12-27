@@ -5,6 +5,7 @@ import { Locale } from "@/i18n.config";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // --- 响应式尺寸函数 ---
+const rpx = (designValue: number) => `calc(var(--rpx) * ${designValue})`;
 const rpxHero = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
 // 带最小值的版本，防止在中等屏幕下缩放太严重
 const rpxHeroMin = (designValue: number, minValue: number) => `max(${minValue}px, calc(var(--rpx-hero) * ${designValue}))`;
@@ -42,26 +43,22 @@ const DESKTOP_CONFIG = {
     lineHeight: 113 / 96,  // 约 1.177
   },
 
-  // Feature 胶囊配置 [2,3,4] (Figma: 40px, 卡片 632x97, 圆角 30)
+  // Feature 胶囊配置 [2,3,4] - 文字 + 内边距撑开
   featureCards: {
-    bottom: 100,           // 底部距离（固定像素）
-    width: 632,            // 卡片宽度 - 设计稿尺寸
-    widthSmall: 500,       // 卡片宽度 - lg到xl
-    height: 97,            // 卡片高度 - 设计稿尺寸
-    heightSmall: 80,       // 卡片高度 - lg到xl
-    gap: 20,               // 卡片间距（固定像素）
-    gapSmall: 16,          // 卡片间距 - lg到xl
-    fontSize: 40,          // 字体大小 - 设计稿尺寸
-    fontSizeSmall: 40,     // 保持一致
-    borderRadius: 30,      // 圆角 - 设计稿尺寸
+    bottom: 130,           // 底部距离
+    gap: 20,               // 卡片间距
+    fontSize: 40,          // 字体大小
+    paddingX: 44,          // 水平内边距
+    paddingY: 18,          // 垂直内边距
+    borderRadius: 30,      // 圆角
     borderWidth: 1,
   },
 
   // 右上角 Feature[1] 胶囊 (Figma: top 150, fontSize 48)
   feature1: {
-    top: 150,              // 顶部距离 - 设计稿尺寸
-    paddingX: 48,          // 水平内边距
-    paddingY: 24,          // 垂直内边距
+    top: 124,              // 顶部距离 - 设计稿尺寸
+    paddingX: 44,          // 水平内边距
+    paddingY: 54,          // 垂直内边距
     fontSize: 48,          // 字体大小 - 设计稿尺寸
     borderRadius: 100,     // 左侧圆角 (rounded-l-full)
   },
@@ -69,12 +66,12 @@ const DESKTOP_CONFIG = {
   // 底部三张图片
   bottomImages: {
     bottom: 100,           // 底部距离
-    right: 80,             // 右边距
-    gap: 24,               // 图片间距
-    width: 280,            // 单张图片宽度
-    height: 220,           // 单张图片高度
+    right: 60,             // 右边距
+    gap: 42,               // 图片间距
+    width: 318,            // 单张图片宽度
+    height: 291,           // 单张图片高度
     borderRadius: 34,      // 圆角
-    borderWidth: 6,        // 边框宽度
+    borderWidth: 10,        // 边框宽度
   },
 };
 
@@ -120,10 +117,10 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
       className="relative w-full h-full min-h-[700px] overflow-hidden font-sans"
       style={{ backgroundColor: DESKTOP_CONFIG.backgroundColor }}
     >
-      {/* Layer 1: 背景图片 (data.images[0]) - 桌面端 */}
+      {/* Layer 1: 背景图片 (data.images[0]) - 全端显示 */}
       {/* 图片容器只覆盖遮罩可见区域，这样图片中心在遮罩中心 */}
       <div
-        className="hidden md:block absolute right-0 top-0 h-full z-0"
+        className="absolute right-0 top-0 h-full z-0"
         style={{
           // 宽度 = 高度 × 遮罩区域宽高比 (1055/1080)
           aspectRatio: DESKTOP_CONFIG.maskImage.aspectRatio,
@@ -148,9 +145,9 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
         />
       </div>
 
-      {/* Layer 1.5: SVG 装饰层（白边 + 装饰元素）- 桌面端 */}
+      {/* Layer 1.5: SVG 装饰层（白边 + 装饰元素）- 全端显示 */}
       <div
-        className="hidden md:block absolute inset-0 z-10 pointer-events-none"
+        className="absolute inset-0 z-10 pointer-events-none"
         style={{
           backgroundImage: 'url(/hero-banner-8-1.svg?v=2)',
           backgroundSize: 'auto 100%',
@@ -204,7 +201,9 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
                 key={index}
                 className={isLastLine ? 'text-[#FDF6C2]' : 'text-black'}
                 style={{
-                  WebkitTextStroke: isLastLine ? '2px #000000' : '2px #FDF6C2',
+                  WebkitTextStroke: isLastLine ? `${rpx(6)} #000000` : `${rpx(6)} #FDF6C2`,
+                  paintOrder: 'stroke fill',
+                  letterSpacing: '0.06em',
                 }}
               >
                 {line}
@@ -214,34 +213,33 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
         </h1>
       </div>
 
-      {/* Layer 3.5: Feature 卡片 - md及以上 使用带最小值的 rpxHero 缩放 */}
+      {/* Layer 3.5: Feature 卡片 - md及以上 */}
       <div
         className="hidden md:flex absolute z-20 flex-col"
         style={{
           left: rpxHeroMin(DESKTOP_CONFIG.leftContent.left, 60),
           bottom: rpxHeroMin(DESKTOP_CONFIG.featureCards.bottom, 60),
-          gap: rpxHeroMin(DESKTOP_CONFIG.featureCards.gapSmall, 12),
+          gap: rpxHeroMin(DESKTOP_CONFIG.featureCards.gap, 12),
         }}
       >
         {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
           <div
             key={index}
-            className="bg-[#FFFB1B]/20 border border-[#CFBC37] flex items-center"
+            className="bg-[#FFFB1B]/[0.17] border border-[#CFBC37] flex items-center"
             style={{
-              // 宽度自适应内容，不设固定宽度
-              height: rpxHeroMin(DESKTOP_CONFIG.featureCards.heightSmall, 44),
               borderRadius: rpxHeroMin(DESKTOP_CONFIG.featureCards.borderRadius, 12),
               borderWidth: `max(1.5px, ${rpxHero(DESKTOP_CONFIG.featureCards.borderWidth)})`,
-              // Figma: 文字 x:177, 背景框 x:132, 所以左内边距 = 45px
-              paddingLeft: rpxHeroMin(45, 20),
-              paddingRight: rpxHeroMin(45, 20),
+              paddingLeft: rpxHeroMin(DESKTOP_CONFIG.featureCards.paddingX, 20),
+              paddingRight: rpxHeroMin(DESKTOP_CONFIG.featureCards.paddingX, 20),
+              paddingTop: rpxHeroMin(DESKTOP_CONFIG.featureCards.paddingY, 12),
+              paddingBottom: rpxHeroMin(DESKTOP_CONFIG.featureCards.paddingY, 12),
             }}
           >
             <p
               className="font-phudu font-semibold text-[#CFBC37] text-left whitespace-nowrap"
               style={{
-                fontSize: rpxHeroMin(DESKTOP_CONFIG.featureCards.fontSizeSmall, 18),
-                // Figma: DROP_SHADOW color rgba(86,80,32,1) offset(0,4) blur 12.6
+                fontSize: rpxHeroMin(DESKTOP_CONFIG.featureCards.fontSize, 18),
+                letterSpacing: '0.09em',
                 textShadow: '0 4px 12px rgba(86, 80, 32, 1)',
               }}
             >
@@ -251,9 +249,9 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
         ))}
       </div>
 
-      {/* Layer 4: 底部三张图片 - 桌面端 */}
+      {/* Layer 4: 底部三张图片 - 桌面端 (lg及以上横向，md到lg竖向) */}
       <div
-        className="hidden md:flex absolute z-20"
+        className="hidden md:flex absolute z-20 flex-col lg:flex-row"
         style={{
           bottom: rpxHeroMin(DESKTOP_CONFIG.bottomImages.bottom, 60),
           right: rpxHeroMin(DESKTOP_CONFIG.bottomImages.right, 40),
@@ -263,13 +261,12 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
         {[data.images[1], data.images[2], data.images[3]].map((image, index) => (
           <div
             key={index}
-            className="relative overflow-hidden border-white"
+            className="relative overflow-hidden"
             style={{
               width: rpxHeroMin(DESKTOP_CONFIG.bottomImages.width, 160),
               height: rpxHeroMin(DESKTOP_CONFIG.bottomImages.height, 130),
               borderRadius: rpxHeroMin(DESKTOP_CONFIG.bottomImages.borderRadius, 20),
-              borderWidth: `max(3px, ${rpxHero(DESKTOP_CONFIG.bottomImages.borderWidth)})`,
-              borderStyle: 'solid',
+              boxShadow: `0 0 0 ${rpx(DESKTOP_CONFIG.bottomImages.borderWidth)} #FFFFFF`,
             }}
           >
             <OptimizedImage
@@ -297,98 +294,78 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
         </div>
       </div>
 
-      {/* 移动端: 主内容区域 */}
-      <div className="md:hidden relative z-20 flex flex-col h-full px-6">
-        {/* 上部：标题 + Feature 卡片 */}
-        <div
-          className="flex flex-col justify-center"
-          style={{ paddingTop: MOBILE_CONFIG.topPadding }}
-        >
-          {/* 标题 */}
-          <h1 className={`${MOBILE_CONFIG.title.fontSize} font-paytone-one font-regular leading-tight`}>
-            {feature0Lines.map((line, index) => {
-              const isLastLine = feature0Lines.length > 1 && index === feature0Lines.length - 1;
-              return (
-                <div
-                  key={index}
-                  className={isLastLine ? 'text-[#FDF6C2]' : 'text-black'}
-                  style={{
-                    WebkitTextStroke: isLastLine ? '1.5px #000000' : '1.5px #FDF6C2',
-                  }}
-                >
-                  {line}
-                </div>
-              );
-            })}
-          </h1>
-
-          {/* Feature 卡片 */}
-          <div
-            className="flex flex-col gap-3 w-full max-w-sm"
-            style={{ marginTop: MOBILE_CONFIG.featureCards.marginTop }}
-          >
-            {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
+      {/* 移动端: 左侧内容 (标题 + Feature 卡片) */}
+      <div
+        className="md:hidden absolute z-20 px-4"
+        style={{ top: MOBILE_CONFIG.topPadding, left: 0 }}
+      >
+        {/* 标题 */}
+        <h1 className={`${MOBILE_CONFIG.title.fontSize} font-paytone-one font-regular leading-tight`}>
+          {feature0Lines.map((line, index) => {
+            const isLastLine = feature0Lines.length > 1 && index === feature0Lines.length - 1;
+            return (
               <div
                 key={index}
-                className="bg-[#FFFB1B]/20 border border-[#CFBC37] rounded-lg px-4 py-2"
+                className={isLastLine ? 'text-[#FDF6C2]' : 'text-black'}
+                style={{
+                  WebkitTextStroke: isLastLine ? '2px #000000' : '2px #FDF6C2',
+                  paintOrder: 'stroke fill',
+                  letterSpacing: '0.06em',
+                }}
               >
-                <p
-                  className={`${MOBILE_CONFIG.featureCards.fontSize} font-phudu font-semibold text-[#CFBC37] text-left`}
-                  style={{ textShadow: '0 3px 8px rgba(86, 80, 32, 1)' }}
-                >
-                  {feature}
-                </p>
+                {line}
               </div>
-            ))}
-          </div>
-        </div>
+            );
+          })}
+        </h1>
 
-        {/* 下部：横图 + 三张小图 */}
-        <div className="flex-1 flex flex-col mt-6 gap-3 pb-4">
-          {/* 横向大图 16:9 */}
+        {/* Feature 卡片 */}
+        <div
+          className="flex flex-col gap-2 w-full"
+          style={{ marginTop: MOBILE_CONFIG.featureCards.marginTop }}
+        >
+          {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
+            <div
+              key={index}
+              className="bg-[#FFFB1B]/[0.17] border border-[#CFBC37] rounded-lg px-3 py-1.5"
+            >
+              <p
+                className="text-sm font-phudu font-semibold text-[#CFBC37] text-left whitespace-nowrap"
+                style={{ textShadow: '0 2px 6px rgba(86, 80, 32, 1)' }}
+              >
+                {feature}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 移动端: 底部三张图片 */}
+      <div
+        className="md:hidden absolute z-20 left-4 right-4 flex justify-center"
+        style={{
+          bottom: 16,
+          gap: MOBILE_CONFIG.bottomImages.gap,
+        }}
+      >
+        {[data.images[1], data.images[2], data.images[3]].map((image, index) => (
           <div
-            className="relative w-full rounded-2xl overflow-hidden border-white"
+            key={index}
+            className="relative flex-1 overflow-hidden"
             style={{
-              aspectRatio: '16/9',
-              borderWidth: MOBILE_CONFIG.bottomImages.borderWidth,
-              borderStyle: 'solid',
+              height: MOBILE_CONFIG.bottomImages.height,
+              borderRadius: MOBILE_CONFIG.bottomImages.borderRadius,
+              boxShadow: `0 0 0 ${MOBILE_CONFIG.bottomImages.borderWidth}px #FFFFFF`,
             }}
           >
             <OptimizedImage
-              image={data.images[0]}
-              alt="Background"
-              size="small"
+              image={image}
+              alt={`Feature image ${index + 1}`}
+              size="thumbnail"
               className="absolute inset-0 w-full h-full object-cover"
             />
           </div>
-
-          {/* 底部三张图片 */}
-          <div
-            className="flex justify-center"
-            style={{ gap: MOBILE_CONFIG.bottomImages.gap }}
-          >
-            {[data.images[1], data.images[2], data.images[3]].map((image, index) => (
-              <div
-                key={index}
-                className="relative flex-1 overflow-hidden border-white"
-                style={{
-                  height: MOBILE_CONFIG.bottomImages.height,
-                  borderRadius: MOBILE_CONFIG.bottomImages.borderRadius,
-                  borderWidth: MOBILE_CONFIG.bottomImages.borderWidth,
-                  borderStyle: 'solid',
-                }}
-              >
-                <OptimizedImage
-                  image={image}
-                  alt={`Feature image ${index + 1}`}
-                  size="thumbnail"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  priority
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+        ))}
       </div>
     </section>
   );

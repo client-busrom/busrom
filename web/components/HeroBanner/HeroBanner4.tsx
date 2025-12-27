@@ -25,10 +25,13 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
   const feature0SecondPart = feature0Words[1];
 
   // --- SVG clipPath 定义 (右侧平行四边形图片) ---
+  // 设计稿尺寸: 644 x 811, 向右倾斜
+  // 平行四边形: 左上(0,0) → 右上(310,0) → 右下(644,811) → 左下(334,811)
+  // 右上角和左下角有圆角
   const clipPathId = `trapezoidClipHero4`;
   const svgPathData =
-    "M2.45086 41.8012C-6.01835 22.0071 8.50246 0 30.0322 0H261.26C273.273 0 284.127 7.16624 288.847 18.2132L609.712 769.213C618.168 789.006 603.648 811 582.125 811H351.36C339.353 811 328.502 803.84 323.779 792.801L2.45086 41.8012Z";
-  const scaleX = 1 / 613;
+    "M2.5 41.8C-6 22 8.5 0 30 0H280C292 0 303 7.2 308 18.2L641.5 769.2C650 789 635.5 811 614 811H364C352 811 341 803.8 336 792.8L2.5 41.8Z";
+  const scaleX = 1 / 644;
   const scaleY = 1 / 811;
   const svgTransform = `scale(${scaleX.toFixed(6)} ${scaleY.toFixed(6)})`;
 
@@ -62,19 +65,20 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
     featureGap: 18,
   };
 
-  // --- 右侧三个图片配置 ---
+  // --- 右侧三个图片配置 (基于 1920x1080 设计稿，使用 rpx 等比例缩放) ---
+  // 图片1: x=579, y=82, 644x811
+  // 图片2: x=980, y=223, 643x811
+  // 图片3: x=1258, y=82, 644x811
+  // 向右偏移 100px 以适配实际显示
   const IMAGES_CONFIG = {
-    containerWidth: 1318,
-    imageWidth: 38,
-    image1Left: 20,
-    image2Left: 44,
-    image3Left: 59.5,
-    image1Top: 5,
-    image2Top: 20,
-    image3Top: 5,
-    image1Bottom: 20,
-    image2Bottom: 5,
-    image3Bottom: 20,
+    imageWidth: 644,
+    imageHeight: 811,
+    image1Left: 679,
+    image2Left: 1080,
+    image3Left: 1358,
+    image1Top: 82,
+    image2Top: 223,
+    image3Top: 82,
     image1Scale: 1.1,
     image2Scale: 1.1,
     image3Scale: 1.1,
@@ -107,28 +111,26 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
       />
 
       {/* 右上装饰 SVG - 桌面端 */}
-      <div className="absolute top-0 right-0 z-[1] pointer-events-none hidden lg:block">
-        <Image
+      <div
+        className="absolute inset-0 z-[1] pointer-events-none hidden lg:block overflow-hidden"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/hero-banner-4-1.svg"
           alt="decoration"
-          width={1536}
-          height={690}
-          style={{ width: '80vw', height: 'auto' }}
+          className="absolute"
+          style={{
+            width: '3732px',
+            height: '1622px',
+            right: '-15%',
+            bottom: '-10%',
+          }}
         />
       </div>
-      {/* 右上装饰 SVG - 移动端 (固定宽度80vw，高度自动，不再缩小) */}
-      <div className="absolute top-0 right-0 z-[1] pointer-events-none lg:hidden">
-        <Image
-          src="/hero-banner-4-1.svg"
-          alt="decoration"
-          width={1536}
-          height={690}
-          style={{ width: 'max(80vw, 819px)', height: 'auto' }}
-        />
-      </div>
+      
 
       {/* 左下装饰 SVG - 固定尺寸 */}
-      <div className="absolute -bottom-[100px] left-0 z-[1] pointer-events-none">
+      <div className="absolute bottom-0 left-0 z-[1] pointer-events-none">
         <Image
           src="/hero-banner-4-2.svg"
           alt="decoration"
@@ -138,17 +140,16 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
       </div>
       {/* 桌面端三个平行四边形图片 */}
       <div
-        className="absolute inset-y-0 right-0 h-full hidden lg:block z-20 pointer-events-none"
-        style={{ width: `${IMAGES_CONFIG.containerWidth}px` }}
+        className="absolute inset-0 hidden lg:block z-20 pointer-events-none"
       >
         {/* --- 图片 1 --- */}
         <div
           className="absolute overflow-hidden"
           style={{
-            left: `${IMAGES_CONFIG.image1Left}%`,
-            width: `${IMAGES_CONFIG.imageWidth}%`,
-            top: `${IMAGES_CONFIG.image1Top}%`,
-            bottom: `${IMAGES_CONFIG.image1Bottom}%`,
+            left: rpx(IMAGES_CONFIG.image1Left),
+            top: rpx(IMAGES_CONFIG.image1Top),
+            width: rpx(IMAGES_CONFIG.imageWidth),
+            height: rpx(IMAGES_CONFIG.imageHeight),
             clipPath: `url(#${clipPathId})`
           }}
         >
@@ -159,7 +160,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
             <OptimizedImage
               image={data.images[1]}
               alt="Feature image 1"
-              size="small"
+              size="medium"
               className="w-full h-full object-cover"
               priority
             />
@@ -170,10 +171,10 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
         <div
           className="absolute z-10 overflow-hidden"
           style={{
-            left: `${IMAGES_CONFIG.image2Left}%`,
-            width: `${IMAGES_CONFIG.imageWidth}%`,
-            top: `${IMAGES_CONFIG.image2Top}%`,
-            bottom: `${IMAGES_CONFIG.image2Bottom}%`,
+            left: rpx(IMAGES_CONFIG.image2Left),
+            top: rpx(IMAGES_CONFIG.image2Top),
+            width: rpx(IMAGES_CONFIG.imageWidth),
+            height: rpx(IMAGES_CONFIG.imageHeight),
             clipPath: `url(#${clipPathId})`
           }}
         >
@@ -184,7 +185,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
             <OptimizedImage
               image={data.images[2]}
               alt="Feature image 2"
-              size="small"
+              size="medium"
               className="w-full h-full object-cover"
               priority
             />
@@ -195,10 +196,10 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
         <div
           className="absolute overflow-hidden"
           style={{
-            left: `${IMAGES_CONFIG.image3Left}%`,
-            width: `${IMAGES_CONFIG.imageWidth}%`,
-            top: `${IMAGES_CONFIG.image3Top}%`,
-            bottom: `${IMAGES_CONFIG.image3Bottom}%`,
+            left: rpx(IMAGES_CONFIG.image3Left),
+            top: rpx(IMAGES_CONFIG.image3Top),
+            width: rpx(IMAGES_CONFIG.imageWidth),
+            height: rpx(IMAGES_CONFIG.imageHeight),
             clipPath: `url(#${clipPathId})`
           }}
         >
@@ -209,7 +210,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
             <OptimizedImage
               image={data.images[3]}
               alt="Feature image 3"
-              size="small"
+              size="medium"
               className="w-full h-full object-cover"
               priority
             />
@@ -225,29 +226,37 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
         >
           {/* Feature[1] - 副标题 (支持换行和缩进) */}
           <p
-            className="font-paytone-one font-regular text-white text-stroke-custom-white whitespace-pre-wrap"
+            className="font-paytone-one font-normal text-white whitespace-pre-wrap antialiased"
             style={{
-              fontSize: rpx(TEXT_CONFIG.subtitleFontSize),
+              fontSize: rpx(48),
               marginBottom: rpx(32),
-              lineHeight: rpx(66),
+              marginLeft: rpx(5),
+              marginTop: rpx(5),
+              lineHeight: `${rpx(66)}`,
+              WebkitTextStroke: `${rpx(6)} #6B4E00`,
+              paintOrder: 'stroke fill',
             }}
           >
-            {data.features[1]?.replace(/\/n/g, '\n        ')}
+            {data.features[1]?.replace(/\/n/g, '\n          ')}
           </p>
           {/* Feature[0] - 主标题 */}
           <h1
-            className="font-paytone-one font-regular"
+            className="font-paytone-one font-normal antialiased"
             style={{
-              fontSize: rpx(TEXT_CONFIG.titleFontSize),
+              fontSize: rpx(96),
               lineHeight: rpx(TEXT_CONFIG.titleLineHeight),
               marginBottom: rpx(48),
+              marginLeft: rpx(30),
+              marginTop: rpx(-20),
+              WebkitTextStroke: `${rpx(6)} #FDF6C2`,
+              paintOrder: 'stroke fill',
             }}
           >
-            <div className="text-[#FFB800] text-stroke-custom-light">{feature0FirstPart}</div>
-            {feature0SecondPart && <div className="text-[#000000] text-stroke-custom-light">{feature0SecondPart}</div>}
+            <div className="text-[#FFB800]">{feature0FirstPart}</div>
+            {feature0SecondPart && <div className="text-[#000000]">{feature0SecondPart}</div>}
           </h1>
           {/* Feature Stack (阶梯状平行四边形) */}
-          <div className="flex flex-col" style={{ gap: rpx(TEXT_CONFIG.featureGap) }}>
+          <div className="flex flex-col" style={{ gap: rpx(TEXT_CONFIG.featureGap), marginLeft: rpx(40), transform: `translateY(${rpx(70)})` }}>
             {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
               <div
                 key={index}

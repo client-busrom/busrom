@@ -46,7 +46,7 @@ const TEXT_CONFIG = {
   // 右侧文字 (百分比定位)
   rightTextFontSize: 64,
   rightTextLineHeight: 81,
-  rightTextRight: 5,              // 距离右边百分比
+  rightTextRight: 2,              // 距离右边百分比
   rightTextTop: 66,               // 距离顶部百分比 (712/1080 ≈ 66%)
   rightTextMaxWidth: 586,         // 最大宽度，控制换行
 };
@@ -66,39 +66,39 @@ const MOBILE_TEXT_CONFIG = {
   featureFontSize: 18,
   featureLineHeight: 48,
   featureGap: 12,
-  rightTextFontSize: 24,
-  rightTextLineHeight: 32,
+  rightTextFontSize: 32,
+  rightTextLineHeight: 40,
 };
 
 // --- 菱形配置 ---
 // 注意: imageScale 最小值应为 √2 ≈ 1.42，否则旋转45度后图片无法完全覆盖菱形
 const DIAMOND_CONFIG = {
-  // 中间纯色菱形 (无图片) - 居右定位
+  // 中间纯色菱形 (无图片) - 与上下菱形对齐
   center: {
     size: 600,           // 正方形边长
-    top: 50,             // 距离顶部百分比
-    right: 20,            // 距离右边百分比
+    top: 50,             // 距离顶部百分比 (垂直居中)
+    left: 60,            // 与上下菱形相同的 left 位置
     borderRadius: 100,    // 圆角
     backgroundColor: '#AEA76D',
   },
-  // 左上角图片菱形
+  // 左上角图片菱形 (设计稿 470.83x470.83, 圆角 97)
   topLeft: {
-    size: 470,
-    top: -5,             // 距离顶部百分比
-    left: 47,            // 距离左边百分比
-    borderRadius: 100,
+    size: 471,
+    top: -7,             // 距离顶部百分比
+    left: 46,            // 距离左边百分比
+    borderRadius: 97,
     borderWidth: 19,
     borderColor: '#756F3F',
     imageScale: 1.5,     // 图片缩放
     imageOffsetX: 0,     // 图片水平偏移 (负值往左，正值往右，百分比)
     imageOffsetY: 0,     // 图片垂直偏移 (负值往上，正值往下，百分比)
   },
-  // 左下角图片菱形
+  // 左下角图片菱形 (设计稿 470.83x470.83, 圆角 97)
   bottomLeft: {
-    size: 470,
-    bottom: -5,          // 距离底部百分比
-    left: 47,            // 距离左边百分比
-    borderRadius: 100,
+    size: 471,
+    bottom: -7,          // 距离底部百分比
+    left: 46,            // 距离左边百分比
+    borderRadius: 97,
     borderWidth: 19,
     borderColor: '#756F3F',
     imageScale: 1.5,
@@ -109,8 +109,8 @@ const DIAMOND_CONFIG = {
   right: {
     size: 1060,
     top: 50,             // 距离顶部百分比 (垂直居中)
-    right: -18,          // 桌面端距离右边百分比
-    rightMobile: -30,    // 移动端距离右边百分比 (lg以下)
+    right: -17,          // 桌面端距离右边百分比
+    rightMobile: -20,    // 移动端距离右边百分比 (lg以下)
     borderRadius: 100,
     borderWidth: 23,
     borderColor: '#756F3F',
@@ -144,15 +144,15 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
 
       {/* 菱形元素容器 - 桌面端 (lg及以上) */}
       <div className="hidden lg:block absolute inset-0 z-10 pointer-events-none">
-        {/* 中间纯色菱形 - 居右定位 */}
+        {/* 中间纯色菱形 - 与上下菱形对齐 */}
         <div
           className="absolute"
           style={{
             width: rpx(DIAMOND_CONFIG.center.size),
             height: rpx(DIAMOND_CONFIG.center.size),
             top: `${DIAMOND_CONFIG.center.top}%`,
-            right: `${DIAMOND_CONFIG.center.right}%`,
-            transform: 'translateY(-50%) rotate(45deg)',
+            left: `${DIAMOND_CONFIG.center.left}%`,
+            transform: 'translate(-50%, -50%) rotate(45deg)',
             borderRadius: rpx(DIAMOND_CONFIG.center.borderRadius),
             backgroundColor: DIAMOND_CONFIG.center.backgroundColor,
           }}
@@ -168,9 +168,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
             left: `${DIAMOND_CONFIG.topLeft.left}%`,
             transform: 'translate(-50%, 0) rotate(45deg)',
             borderRadius: rpx(DIAMOND_CONFIG.topLeft.borderRadius),
-            borderWidth: rpx(DIAMOND_CONFIG.topLeft.borderWidth),
-            borderStyle: 'solid',
-            borderColor: DIAMOND_CONFIG.topLeft.borderColor,
+            boxShadow: `0 0 0 ${rpx(DIAMOND_CONFIG.topLeft.borderWidth)} ${DIAMOND_CONFIG.topLeft.borderColor}`,
           }}
         >
           <div
@@ -199,9 +197,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
             left: `${DIAMOND_CONFIG.bottomLeft.left}%`,
             transform: 'translate(-50%, 0) rotate(45deg)',
             borderRadius: rpx(DIAMOND_CONFIG.bottomLeft.borderRadius),
-            borderWidth: rpx(DIAMOND_CONFIG.bottomLeft.borderWidth),
-            borderStyle: 'solid',
-            borderColor: DIAMOND_CONFIG.bottomLeft.borderColor,
+            boxShadow: `0 0 0 ${rpx(DIAMOND_CONFIG.bottomLeft.borderWidth)} ${DIAMOND_CONFIG.bottomLeft.borderColor}`,
           }}
         >
           <div
@@ -230,9 +226,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
             right: `${DIAMOND_CONFIG.right.right}%`,
             transform: 'translateY(-50%) rotate(45deg)',
             borderRadius: rpx(DIAMOND_CONFIG.right.borderRadius),
-            borderWidth: rpx(DIAMOND_CONFIG.right.borderWidth),
-            borderStyle: 'solid',
-            borderColor: DIAMOND_CONFIG.right.borderColor,
+            boxShadow: `0 0 0 ${rpx(DIAMOND_CONFIG.right.borderWidth)} ${DIAMOND_CONFIG.right.borderColor}`,
           }}
         >
           <div
@@ -254,15 +248,15 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
 
       {/* 菱形元素容器 - 移动端 (lg以下) */}
       <div className="lg:hidden absolute inset-0 z-10 pointer-events-none">
-        {/* 中间纯色菱形 - 居右定位 */}
+        {/* 中间纯色菱形 - 与上下菱形对齐 */}
         <div
           className="absolute"
           style={{
             width: mobileFixedSize(DIAMOND_CONFIG.center.size),
             height: mobileFixedSize(DIAMOND_CONFIG.center.size),
             top: `${DIAMOND_CONFIG.center.top}%`,
-            right: `${DIAMOND_CONFIG.center.right}%`,
-            transform: 'translateY(-50%) rotate(45deg)',
+            left: `${DIAMOND_CONFIG.center.left}%`,
+            transform: 'translate(-50%, -50%) rotate(45deg)',
             borderRadius: mobileFixedSize(DIAMOND_CONFIG.center.borderRadius),
             backgroundColor: DIAMOND_CONFIG.center.backgroundColor,
           }}
@@ -278,9 +272,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
             left: `${DIAMOND_CONFIG.topLeft.left}%`,
             transform: 'translate(-50%, 0) rotate(45deg)',
             borderRadius: mobileFixedSize(DIAMOND_CONFIG.topLeft.borderRadius),
-            borderWidth: mobileFixedSize(DIAMOND_CONFIG.topLeft.borderWidth),
-            borderStyle: 'solid',
-            borderColor: DIAMOND_CONFIG.topLeft.borderColor,
+            boxShadow: `0 0 0 ${mobileFixedSize(DIAMOND_CONFIG.topLeft.borderWidth)} ${DIAMOND_CONFIG.topLeft.borderColor}`,
           }}
         >
           <div
@@ -309,9 +301,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
             left: `${DIAMOND_CONFIG.bottomLeft.left}%`,
             transform: 'translate(-50%, 0) rotate(45deg)',
             borderRadius: mobileFixedSize(DIAMOND_CONFIG.bottomLeft.borderRadius),
-            borderWidth: mobileFixedSize(DIAMOND_CONFIG.bottomLeft.borderWidth),
-            borderStyle: 'solid',
-            borderColor: DIAMOND_CONFIG.bottomLeft.borderColor,
+            boxShadow: `0 0 0 ${mobileFixedSize(DIAMOND_CONFIG.bottomLeft.borderWidth)} ${DIAMOND_CONFIG.bottomLeft.borderColor}`,
           }}
         >
           <div
@@ -340,9 +330,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
             right: `${DIAMOND_CONFIG.right.rightMobile}%`,
             transform: 'translateY(-50%) rotate(45deg)',
             borderRadius: rpx(DIAMOND_CONFIG.right.borderRadius),
-            borderWidth: rpx(DIAMOND_CONFIG.right.borderWidth),
-            borderStyle: 'solid',
-            borderColor: DIAMOND_CONFIG.right.borderColor,
+            boxShadow: `0 0 0 ${rpx(DIAMOND_CONFIG.right.borderWidth)} ${DIAMOND_CONFIG.right.borderColor}`,
           }}
         >
           <div
@@ -373,13 +361,15 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
           }}
         >
           {/* Feature[0] - 标题区域 */}
-          <h1 className="text-[#433E12]">
+          <h1 className="text-[#433E12] antialiased">
             {/* 第一行: Design-forward (Pavanam) */}
             <div
               className="font-pavanam font-normal"
               style={{
                 fontSize: rpx(TEXT_CONFIG.line1FontSize),
                 lineHeight: rpx(TEXT_CONFIG.line1LineHeight),
+                WebkitTextStroke: `${rpx(2)} #000000`,
+                paintOrder: 'stroke fill',
               }}
             >
               {titleLine1}
@@ -390,6 +380,8 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
               style={{
                 fontSize: rpx(TEXT_CONFIG.line2FontSize),
                 lineHeight: rpx(TEXT_CONFIG.line2LineHeight),
+                WebkitTextStroke: `${rpx(2)} #000000`,
+                paintOrder: 'stroke fill',
               }}
             >
               {titleLine2}
@@ -400,6 +392,8 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
               style={{
                 fontSize: rpx(TEXT_CONFIG.line3FontSize),
                 lineHeight: rpx(TEXT_CONFIG.line3LineHeight),
+                WebkitTextStroke: `${rpx(2)} #000000`,
+                paintOrder: 'stroke fill',
               }}
             >
               {titleLine3}
@@ -430,6 +424,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
                     fontSize: rpx(TEXT_CONFIG.featureFontSize),
                     lineHeight: rpx(TEXT_CONFIG.featureLineHeight),
                     paddingLeft: rpx(16),
+                    letterSpacing: '0.06em',
                   }}
                 >
                   {feature}
@@ -449,10 +444,12 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
           }}
         >
           <p
-            className="font-paytone-one font-normal text-white text-stroke-custom-white text-left"
+            className="font-paytone-one font-normal text-white text-left whitespace-pre-line antialiased"
             style={{
               fontSize: rpx(TEXT_CONFIG.rightTextFontSize),
               lineHeight: rpx(TEXT_CONFIG.rightTextLineHeight),
+              WebkitTextStroke: `${rpx(6)} #6B4E00`,
+              paintOrder: 'stroke fill',
             }}
           >
             {data.features[1]?.replace(/\/n/g, '\n')}
@@ -471,12 +468,14 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
           }}
         >
           {/* Feature[0] - 标题区域 */}
-          <h1 className="text-[#433E12]">
+          <h1 className="text-[#433E12] antialiased">
             <div
               className="font-pavanam font-normal"
               style={{
                 fontSize: `${MOBILE_TEXT_CONFIG.line1FontSize}px`,
                 lineHeight: `${MOBILE_TEXT_CONFIG.line1LineHeight}px`,
+                WebkitTextStroke: '1px #000000',
+                paintOrder: 'stroke fill',
               }}
             >
               {titleLine1}
@@ -486,6 +485,8 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
               style={{
                 fontSize: `${MOBILE_TEXT_CONFIG.line2FontSize}px`,
                 lineHeight: `${MOBILE_TEXT_CONFIG.line2LineHeight}px`,
+                WebkitTextStroke: '1px #000000',
+                paintOrder: 'stroke fill',
               }}
             >
               {titleLine2}
@@ -495,6 +496,8 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
               style={{
                 fontSize: `${MOBILE_TEXT_CONFIG.line3FontSize}px`,
                 lineHeight: `${MOBILE_TEXT_CONFIG.line3LineHeight}px`,
+                WebkitTextStroke: '1px #000000',
+                paintOrder: 'stroke fill',
               }}
             >
               {titleLine3}
@@ -525,6 +528,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
                     fontSize: `${MOBILE_TEXT_CONFIG.featureFontSize}px`,
                     lineHeight: `${MOBILE_TEXT_CONFIG.featureLineHeight}px`,
                     paddingLeft: '12px',
+                    letterSpacing: '0.06em',
                   }}
                 >
                   {feature}
@@ -536,7 +540,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
 
         {/* --- Right Bottom (Feature[1]) - 移动端 --- */}
         <div
-          className="absolute right-4 bottom-8"
+          className="absolute right-4 bottom-16"
         >
           <p
             className="font-paytone-one font-normal text-white text-stroke-custom-white whitespace-pre-line text-right"
@@ -545,7 +549,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
               lineHeight: `${MOBILE_TEXT_CONFIG.rightTextLineHeight}px`,
             }}
           >
-            {data.features[1]}
+            {data.features[1]?.replace(/\/n/g, '\n')}
           </p>
         </div>
       </div>

@@ -40,8 +40,9 @@ const lazyBanners: Record<number, () => Promise<{ default: BannerComponentType }
 
 const AUTOPLAY_DELAY = 6000;
 const PRELOAD_BEFORE = 2000; // 提前 2 秒预加载下一个 Banner
-const MIN_HEIGHT = "min-h-[700px]";
-const HEIGHT_CLASS = `h-screen ${MIN_HEIGHT}`;
+const MIN_HEIGHT = "min-h-[600px]";
+// 使用 calc(100vh - 46px) 减去 header 高度，留出 header 空间
+const HEIGHT_CLASS = `h-[calc(100vh-46px)] ${MIN_HEIGHT}`;
 
 // 占位组件 - 用于 Banner 加载中
 function BannerPlaceholder() {

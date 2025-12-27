@@ -34,17 +34,25 @@ const SVG_CONFIG = {
   zIndex: 5,
 };
 
-// 左侧文字内容配置 (左下定位)
+// 左侧文字内容配置
 const LEFT_CONTENT_CONFIG = {
-  left: '10.4%',      // 200/1920
-  bottom: '16.7%',    // 从底部定位
-  titleFontSize: 80,
-  titleMaxWidth: 720,
-  titleMarginBottom: 120,
-  itemFontSize: 32,
-  itemGap: 16,
-  itemPaddingX: 36,
-  itemPaddingY: 14,
+  // 主标题位置 (基于 Figma: x=145, y=237)
+  titleLeft: 145,
+  titleTop: 237,
+  titleFontSize: 96,
+  titleLineHeight: 99,
+  titleMaxWidth: 868,
+  // Feature 平行四边形背景 (基于 Figma: x=159, y=624/737/850)
+  itemBgLeft: 159,
+  itemBgWidth: 596,
+  itemBgHeight: 83,
+  itemBgGap: 113, // 737-624 = 113
+  itemBgFirstTop: 624,
+  // Feature 文字位置 (基于 Figma: x=213, y=612)
+  itemTextLeft: 213,
+  itemTextFirstTop: 612,
+  itemFontSize: 40,
+  itemLineHeight: 111,
 };
 
 // 3个角落装饰元素配置 (只有一个角是圆角)
@@ -58,25 +66,28 @@ const CORNER_BOTTOM_RIGHT = { width: 550, height: 60 };
 const CORNER_BOTTOM_LEFT = { width: 60, height: 460 };
 const CORNER_TOP_CENTER = { left: '25.5%', width: '49%', height: 70 }; // 百分比居中
 
-// 右侧内容配置 (右上定位)
+// 右侧内容配置 (基于 Figma)
 const RIGHT_CONTENT_CONFIG = {
-  // 整个右侧内容区域定位
-  contentRight: '5.4%',
-  contentTop: '10%',
-  // 标题
-  titleFontSize: 54,
-  titleMarginBottom: 40,       // 标题和图片的间距 (px)
-  // 小图 (前景，左上) - 相对大图偏移
-  smallImageOffsetRight: 350,  // 相对大图往左偏移 (加大间距)
-  smallImageOffsetTop: 140,    // 相对大图往上偏移
-  smallImageWidth: 360,
-  smallImageHeight: 329,
-  // 大图尺寸
-  largeImageWidth: 616,
-  largeImageHeight: 563,
+  // 标题位置 (x=1040, y=159)
+  titleTop: 159,
+  titleFontSize: 48,
+  titleLineHeight: 116,
+  titleWidth: 771,
+  titleRight: 109, // 1920-1040-771 = 109
+  // 小图 (Figma: x=960, y=462, 360x329) - 放大5%
+  smallImageLeft: 960,
+  smallImageTop: 462,
+  smallImageWidth: 378,
+  smallImageHeight: 345,
+  smallImageBorderWidth: 17,
+  // 大图 (Figma: x=1201, y=314, 616x563) - 放大5%
+  largeImageLeft: 1201,
+  largeImageTop: 314,
+  largeImageWidth: 647,
+  largeImageHeight: 591,
+  largeImageBorderWidth: 20,
   // 共用
-  borderRadius: 34,
-  borderWidth: 10,
+  borderRadius: 44,  // Figma 34 + 边框补偿，视觉匹配
 };
 
 // --- HeroBanner2 Component ---
@@ -144,69 +155,59 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
         />
       </div>
 
-      {/* 左侧文字内容 - 桌面端 (lg+) */}
-      <div
-        className="hidden lg:flex absolute flex-col"
+      {/* 左侧主标题 - 桌面端 (lg+) */}
+      <p
+        className="hidden lg:block absolute font-paytone-one text-[#000000]"
         style={{
-          left: LEFT_CONTENT_CONFIG.left,
-          bottom: LEFT_CONTENT_CONFIG.bottom,
-          zIndex: 6,
+          left: rpx(LEFT_CONTENT_CONFIG.titleLeft),
+          top: rpx(LEFT_CONTENT_CONFIG.titleTop),
+          fontSize: rpx(LEFT_CONTENT_CONFIG.titleFontSize),
+          lineHeight: `${rpx(LEFT_CONTENT_CONFIG.titleLineHeight)}`,
+          maxWidth: rpx(LEFT_CONTENT_CONFIG.titleMaxWidth),
+          WebkitTextStroke: `${rpx(7)} #FDF6C2`,
+          paintOrder: 'stroke fill',
+          zIndex: 8,
         }}
       >
-        {/* 标题文字 */}
-        <p
-          className="font-paytone-one font-regular text-[#000000] text-stroke-custom-light"
-          style={{
-            fontSize: rpx(LEFT_CONTENT_CONFIG.titleFontSize),
-            lineHeight: 1.15,
-            marginBottom: rpx(LEFT_CONTENT_CONFIG.titleMarginBottom),
-            maxWidth: rpx(LEFT_CONTENT_CONFIG.titleMaxWidth),
-          }}
-        >
-          {data.features[0]}
-        </p>
+        {data.features[0]}
+      </p>
 
-        {/* 三个平行四边形条目 */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: rpx(LEFT_CONTENT_CONFIG.itemGap),
-          }}
-        >
-          {[data.features[2], data.features[3], data.features[4]].map((feature, index) => {
-            const transparencyMaskStyle = {
-              maskImage: 'linear-gradient(to right, black 0%, transparent 100%)',
-              WebkitMaskImage: 'linear-gradient(to right, black 0%, transparent 100%)',
-            };
-
-            return (
+      {/* 左侧 Feature 列表 - 桌面端 (lg+) */}
+      <div className="hidden lg:block absolute" style={{ zIndex: 8 }}>
+        {[data.features[2], data.features[3], data.features[4]].map((feature, index) => {
+          const bgTop = LEFT_CONTENT_CONFIG.itemBgFirstTop + index * LEFT_CONTENT_CONFIG.itemBgGap;
+          const textTop = LEFT_CONTENT_CONFIG.itemTextFirstTop + index * LEFT_CONTENT_CONFIG.itemLineHeight;
+          return (
+            <div key={index}>
+              {/* 平行四边形背景 */}
               <div
-                key={index}
-                className="bg-gradient-to-r from-[#5A4F0E] to-[#C0A91D]"
+                className="absolute"
                 style={{
-                  clipPath: parallelogramClipPath,
-                  ...transparencyMaskStyle,
-                  paddingLeft: rpx(LEFT_CONTENT_CONFIG.itemPaddingX),
-                  paddingRight: rpx(LEFT_CONTENT_CONFIG.itemPaddingX * 2),
-                  paddingTop: rpx(LEFT_CONTENT_CONFIG.itemPaddingY),
-                  paddingBottom: rpx(LEFT_CONTENT_CONFIG.itemPaddingY),
+                  left: rpx(LEFT_CONTENT_CONFIG.itemBgLeft),
+                  top: rpx(bgTop),
+                  width: rpx(LEFT_CONTENT_CONFIG.itemBgWidth),
+                  height: rpx(LEFT_CONTENT_CONFIG.itemBgHeight),
+                  background: 'linear-gradient(to right, rgba(90, 79, 14, 1) 0%, rgba(90, 79, 14, 1) 15%, rgba(140, 120, 20, 0.5) 55%, rgba(140, 120, 20, 0) 100%)',
+                  clipPath: 'polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%)',
+                }}
+              />
+              {/* 文字 */}
+              <p
+                className="absolute font-pingfang font-semibold text-[#FFF5AD] whitespace-nowrap antialiased"
+                style={{
+                  left: rpx(LEFT_CONTENT_CONFIG.itemTextLeft),
+                  top: rpx(textTop),
+                  fontSize: rpx(LEFT_CONTENT_CONFIG.itemFontSize),
+                  lineHeight: `${rpx(LEFT_CONTENT_CONFIG.itemLineHeight)}`,
+                  letterSpacing: '0.06em',
+                  textShadow: `0 4px 12.6px rgba(86, 80, 32, 1)`,
                 }}
               >
-                <p
-                  className="font-medium text-[#FFF5AD]"
-                  style={{
-                    fontSize: rpx(LEFT_CONTENT_CONFIG.itemFontSize),
-                    paddingLeft: rpx(16),
-                    textShadow: `0 ${rpx(4)} ${rpx(12.6)} #565020`,
-                  }}
-                >
-                  {feature}
-                </p>
-              </div>
-            );
-          })}
-        </div>
+                {feature}
+              </p>
+            </div>
+          );
+        })}
       </div>
 
       {/* 左侧文字内容 - 移动端 (< lg) */}
@@ -314,83 +315,69 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
         }}
       />
 
-      {/* 右侧内容区域 - 桌面端 (lg+) */}
+      {/* 大图 - 桌面端 (lg+) - 在左侧SVG之上，左侧文字之下 */}
+      {/* Figma: x=1201, y=314, 616x563 */}
+      {/* 大图右边距 = 1920 - 1201 - 616 = 103 */}
       <div
-        className="hidden lg:flex absolute z-10 flex-col items-end"
+        className="hidden lg:block absolute overflow-hidden shadow-lg z-[6] box-border"
         style={{
-          right: RIGHT_CONTENT_CONFIG.contentRight,
-          top: RIGHT_CONTENT_CONFIG.contentTop,
+          right: rpx(93),
+          top: rpx(RIGHT_CONTENT_CONFIG.largeImageTop - 10),
+          width: rpx(RIGHT_CONTENT_CONFIG.largeImageWidth),
+          height: rpx(RIGHT_CONTENT_CONFIG.largeImageHeight),
+          borderRadius: rpx(RIGHT_CONTENT_CONFIG.borderRadius),
+          border: `${rpx(RIGHT_CONTENT_CONFIG.largeImageBorderWidth)} solid white`,
         }}
       >
-        {/* 右侧标题 */}
-        <h1
-          className="font-paytone-one font-regular text-white text-left"
-          style={{
-            fontSize: rpx(RIGHT_CONTENT_CONFIG.titleFontSize),
-            textShadow: '0 2px 4px rgba(117, 112, 63, 0.5)',
-            marginBottom: rpx(RIGHT_CONTENT_CONFIG.titleMarginBottom),
-          }}
-        >
-          {data.features[1]}
-        </h1>
-
-        {/* 右侧图片组 */}
-        <div className="relative">
-        {/* 大图 (背景) */}
-        <div
-          className="overflow-hidden shadow-lg bg-white"
-          style={{
-            width: rpx(RIGHT_CONTENT_CONFIG.largeImageWidth),
-            height: rpx(RIGHT_CONTENT_CONFIG.largeImageHeight),
-            padding: rpx(RIGHT_CONTENT_CONFIG.borderWidth),
-            borderRadius: rpx(RIGHT_CONTENT_CONFIG.borderRadius),
-          }}
-        >
-          <div
-            className="relative w-full h-full overflow-hidden"
-            style={{
-              borderRadius: rpx(RIGHT_CONTENT_CONFIG.borderRadius - RIGHT_CONTENT_CONFIG.borderWidth),
-            }}
-          >
-            <OptimizedImage
-              image={data.images[1]}
-              alt="Large feature image"
-              size="small"
-              className="absolute inset-0 w-full h-full object-cover"
-              priority
-            />
-          </div>
-        </div>
-
-        {/* 小图 (前景，相对大图偏移) */}
-        <div
-          className="absolute overflow-hidden shadow-lg bg-white z-20"
-          style={{
-            right: rpx(RIGHT_CONTENT_CONFIG.smallImageOffsetRight),
-            top: rpx(RIGHT_CONTENT_CONFIG.smallImageOffsetTop),
-            width: rpx(RIGHT_CONTENT_CONFIG.smallImageWidth),
-            height: rpx(RIGHT_CONTENT_CONFIG.smallImageHeight),
-            padding: rpx(RIGHT_CONTENT_CONFIG.borderWidth),
-            borderRadius: rpx(RIGHT_CONTENT_CONFIG.borderRadius),
-          }}
-        >
-          <div
-            className="relative w-full h-full overflow-hidden"
-            style={{
-              borderRadius: rpx(RIGHT_CONTENT_CONFIG.borderRadius - RIGHT_CONTENT_CONFIG.borderWidth),
-            }}
-          >
-            <OptimizedImage
-              image={data.images[2]}
-              alt="Small feature image"
-              size="small"
-              className="absolute inset-0 w-full h-full object-cover"
-              priority
-            />
-          </div>
-        </div>
-        </div>
+        <OptimizedImage
+          image={data.images[2]}
+          alt="Large feature image"
+          size="small"
+          className="absolute inset-0 w-full h-full object-cover"
+          priority
+        />
       </div>
+
+      {/* 小图 - 桌面端 (lg+) - 在大图之上，左侧文字之下 */}
+      {/* Figma: x=960, y=462, 360x329 */}
+      {/* 小图右边距 = 1920 - 960 - 360 = 600 */}
+      <div
+        className="hidden lg:block absolute overflow-hidden shadow-lg z-[7] box-border"
+        style={{
+          right: rpx(590),
+          top: rpx(RIGHT_CONTENT_CONFIG.smallImageTop - 10),
+          width: rpx(RIGHT_CONTENT_CONFIG.smallImageWidth),
+          height: rpx(RIGHT_CONTENT_CONFIG.smallImageHeight),
+          borderRadius: rpx(RIGHT_CONTENT_CONFIG.borderRadius),
+          border: `${rpx(RIGHT_CONTENT_CONFIG.smallImageBorderWidth)} solid white`,
+        }}
+      >
+        <OptimizedImage
+          image={data.images[1]}
+          alt="Small feature image"
+          size="small"
+          className="absolute inset-0 w-full h-full object-cover"
+          priority
+        />
+      </div>
+
+      {/* 右侧标题 - 桌面端 (lg+) - 最上层 z-30 */}
+      {/* 和大图右对齐, right=103 */}
+      <h1
+        className="hidden lg:block absolute font-paytone-one font-normal text-white text-left antialiased"
+        style={{
+          right: rpx(103),
+          top: rpx(RIGHT_CONTENT_CONFIG.titleTop),
+          fontSize: rpx(RIGHT_CONTENT_CONFIG.titleFontSize),
+          lineHeight: `${rpx(RIGHT_CONTENT_CONFIG.titleLineHeight)}`,
+          width: rpx(RIGHT_CONTENT_CONFIG.titleWidth),
+          WebkitTextStroke: `${rpx(1)} #75703F`,
+          paintOrder: 'stroke fill',
+          zIndex: 30,
+        }}
+      >
+        {data.features[1]}
+      </h1>
 
       {/* 右侧内容区域 - 移动端 (< lg) */}
       <div className="lg:hidden absolute z-10 right-4 sm:right-6 md:right-8 top-20 sm:top-24 md:top-28 flex flex-col items-end">

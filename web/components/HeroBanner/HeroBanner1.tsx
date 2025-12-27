@@ -20,20 +20,20 @@ const DESIGN_HEIGHT = 1080;
 // ========================================
 const IMAGE_1_CONFIG = {
   // 位置 (基于1920x1080设计稿的像素值)
-  left: -148,      // 左边距 (负值表示超出左边界)
-  top: -120,       // 上边距 (负值表示超出上边界)
+  left: -134,      // 左边距 (负值表示超出左边界)
+  top: -164,       // 上边距 (负值表示超出上边界)
   // 尺寸
   width: 800,      // 宽度
-  height: 650,     // 高度
+  height: 700,     // 高度
   // 旋转角度 (正值顺时针，负值逆时针)
   rotate: 30,      // 旋转角度
   // 图片缩放 (用于填满旋转后的容器)
-  imageScale: 1.15,
+  imageScale: 1.2,
   // 图片偏移 (用于调整图片在框内的位置)
-  imageOffsetX: 20, // 负值往左，正值往右 (百分比)
-  imageOffsetY: 15, // 负值往上，正值往下 (百分比)
+  imageOffsetX: 0, // 负值往左，正值往右 (百分比)
+  imageOffsetY: 12, // 负值往上，正值往下 (百分比)
   // 边框
-  borderWidth: 20, // 边框宽度
+  borderWidth: 24, // 边框宽度
   borderColor: '#FDF6C2',
   // 圆角 (左上 右上 右下 左下)
   borderRadius: '0% 35% 10% 0%',
@@ -43,20 +43,20 @@ const IMAGE_1_CONFIG = {
 
 const IMAGE_2_CONFIG = {
   // 位置 (基于1920x1080设计稿的像素值)
-  right: -128,     // 右边距
-  bottom: -120,    // 下边距
+  right: -138,     // 右边距
+  bottom: -138,    // 下边距
   // 尺寸
-  width: 650,      // 宽度
+  width: 700,      // 宽度
   height: 800,     // 高度
   // 旋转角度 (正值顺时针，负值逆时针)
   rotate: 126,     // 旋转角度
   // 图片缩放 (用于填满旋转后的容器)
-  imageScale: 1.1,
+  imageScale: 1.05,
   // 图片偏移 (用于调整图片在框内的位置)
-  imageOffsetX: -20, // 负值往左，正值往右 (百分比)
+  imageOffsetX: -10, // 负值往左，正值往右 (百分比)
   imageOffsetY: -10, // 负值往上，正值往下 (百分比)
   // 边框
-  borderWidth: 20,  // 边框宽度
+  borderWidth: 24,  // 边框宽度
   borderColor: '#FDF6C2',
   // 圆角 (左上 右上 右下 左下)
   borderRadius: '0% 0% 35% 10%',
@@ -86,8 +86,8 @@ const SVG_2_CONFIG = {
 // 椭圆装饰配置
 const ELLIPSE_1_CONFIG = {
   // 右上角椭圆
-  right: 200,     // 右边距 (负值超出边界)
-  top: -85,        // 上边距 (负值超出边界)
+  right: 160,     // 右边距 (负值超出边界)
+  top: -56,        // 上边距 (负值超出边界)
   width: 312,      // 宽度
   height: 125,     // 高度
   // 圆角 (50% = 完美椭圆，可以用不同值创建不规则形状)
@@ -101,7 +101,7 @@ const ELLIPSE_1_CONFIG = {
 const ELLIPSE_2_CONFIG = {
   // 左下角椭圆
   left: 200,      // 左边距 (负值超出边界)
-  bottom: -85,     // 下边距 (负值超出边界)
+  bottom: -80,     // 下边距 (负值超出边界)
   width: 312,      // 宽度
   height: 125,     // 高度
   // 圆角 (50% = 完美椭圆，可以用不同值创建不规则形状)
@@ -124,26 +124,28 @@ type BannerProps = {
 const HeroBanner1: FC<BannerProps> = ({ data }) => {
   return (
     <section className="relative w-full h-full min-h-[700px] overflow-hidden font-sans flex items-center justify-center text-center">
-      {/* 背景图 - LCP 关键图片 */}
-      <ServerImage
-        image={data.images[0]}
-        alt="背景图"
-        size="large"
-        fill
-        className="absolute inset-0 w-full h-full object-cover z-0"
-        objectPosition={getObjectPosition(data.images[0])}
-        priority
-      />
-
-      {/* 白色毛玻璃遮罩 */}
+      {/* 背景容器 - 白色底 + 45%透明图片 + 11px模糊 */}
       <div
-        className="absolute inset-0 z-[1]"
+        className="absolute inset-0 z-0"
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.3)',
-          backdropFilter: 'blur(5px)',
-          WebkitBackdropFilter: 'blur(5px)',
+          filter: 'blur(5px)',
         }}
-      />
+      >
+        {/* 白色底层 100% */}
+        <div className="absolute inset-0 bg-white" />
+        {/* 图片层 45% 透明度 */}
+        <div className="absolute inset-0" style={{ opacity: 0.45 }}>
+          <ServerImage
+            image={data.images[0]}
+            alt="背景图"
+            size="large"
+            fill
+            className="absolute inset-0 w-full h-full object-cover"
+            objectPosition={getObjectPosition(data.images[0])}
+            priority
+          />
+        </div>
+      </div>
 
       {/* 椭圆装饰1 - 右上角 - 桌面端 */}
       <div
@@ -398,16 +400,21 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
       </div>
 
       {/* 内容容器 - 桌面端 (md+) */}
-      <div className="hidden md:flex relative z-30 flex-col items-center w-full">
+      <div
+        className="hidden md:flex relative z-30 flex-col items-center w-full"
+        style={{ marginTop: rpx(-100) }}
+      >
         {/* Feature[1] - 顶部标语 */}
         <p
           className="font-paytone-one text-[#FFBC5F] text-center"
           style={{
             fontSize: rpx(48),
-            lineHeight: 1.2,
-            marginTop: rpx(20),
-            textShadow: '0 0 10px rgba(117, 112, 63, 0.5)',
-            WebkitTextStroke: `${rpx(2)} #75703F`,
+            lineHeight: rpx(116),
+            marginTop: rpx(60),
+            marginBottom: rpx(10),
+            WebkitTextStroke: `${rpx(3.5)} #75703F`,
+            paintOrder: 'stroke fill',
+            textShadow: '0 -1px 0 #75703F',
           }}
         >
           {data.features[1]}
@@ -418,9 +425,11 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
           className="font-paytone-one text-black text-center"
           style={{
             fontSize: rpx(86),
-            lineHeight: 1.2,
-            marginTop: rpx(20),
-            WebkitTextStroke: `${rpx(2)} #FDF6C2`,
+            lineHeight: rpx(125),
+            marginTop: rpx(0),
+            marginBottom: rpx(0),
+            WebkitTextStroke: `${rpx(8)} #FDF6C2`,
+            paintOrder: 'stroke fill',
           }}
         >
           {data.features[0]?.split(' ').slice(0, 2).join(' ')}
@@ -431,8 +440,9 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
           className="font-paytone-one text-black text-center"
           style={{
             fontSize: rpx(120),
-            lineHeight: 1.05,
-            WebkitTextStroke: `${rpx(2)} #FDF6C2`,
+            lineHeight: rpx(125),
+            WebkitTextStroke: `${rpx(8)} #FDF6C2`,
+            paintOrder: 'stroke fill',
           }}
         >
           {data.features[0]?.split(' ').slice(2).join(' ')}
@@ -460,10 +470,11 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
                 }}
               >
                 <p
-                  className="text-[#FDF6C2] text-center font-medium whitespace-pre-line"
+                  className="font-pingfang font-light text-[#FDF6C2] text-center whitespace-pre-line"
                   style={{
                     fontSize: rpx(28),
                     lineHeight: 1.4,
+                    letterSpacing: '0.06em',
                     textShadow: '0 4px 12px rgba(86, 80, 32, 1)',
                   }}
                 >
@@ -482,7 +493,8 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
           className="font-paytone-one text-[#FFBC5F] text-center text-lg"
           style={{
             textShadow: '0 0 10px rgba(117, 112, 63, 0.5)',
-            WebkitTextStroke: '0.5px #75703F',
+            WebkitTextStroke: '1px #75703F',
+            paintOrder: 'stroke fill',
           }}
         >
           {data.features[1]}
@@ -492,7 +504,8 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
         <h1
           className="font-paytone-one text-black text-center text-3xl mt-4"
           style={{
-            WebkitTextStroke: '1px #FDF6C2',
+            WebkitTextStroke: '2px #FDF6C2',
+            paintOrder: 'stroke fill',
           }}
         >
           {data.features[0]}

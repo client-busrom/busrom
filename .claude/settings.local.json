@@ -66,7 +66,12 @@
       "Bash(PGPASSWORD=busrom_dev_password psql:*)",
       "Bash(PGPASSWORD=ADijIRcAHMHLHaZvH0eg psql:*)",
       "Bash(/opt/Homebrew/opt/libpq/bin/psql:*)",
-      "Bash(/opt/Homebrew/Cellar/postgresql@16/16.11/bin/psql:*)"
+      "Bash(/opt/Homebrew/Cellar/postgresql@16/16.11/bin/psql:*)",
+      "Bash(PGPASSWORD=ADijIRcAHMHLHaZvH0eg /opt/Homebrew/Cellar/postgresql@16/16.11/bin/psql:*)",
+      "Bash(AWS_DEFAULT_REGION=ap-southeast-1 aws ecs update-service:*)",
+      "Bash(AWS_DEFAULT_REGION=ap-southeast-1 aws ecs:*)",
+      "Bash(TASK_ID=\"bba17bb4fdaf4743bb3236fdaa121d4b\")",
+      "Bash(__NEW_LINE__ aws ecs execute-command )"
     ],
     "deny": [],
     "ask": []
