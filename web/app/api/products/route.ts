@@ -55,6 +55,17 @@ function transformImageVariants(variants: any) {
 }
 
 /**
+ * Convert Payload's focalX/focalY to cropFocalPoint format
+ */
+function getCropFocalPoint(media: any): { x: number; y: number } | undefined {
+  if (media?.focalX !== undefined && media?.focalX !== null &&
+      media?.focalY !== undefined && media?.focalY !== null) {
+    return { x: media.focalX, y: media.focalY }
+  }
+  return undefined
+}
+
+/**
  * GET /api/products
  *
  * Query parameters:
@@ -158,7 +169,7 @@ export async function GET(request: NextRequest) {
               id: product.showImage.id,
               url: normalizeToCDN(product.showImage.url),
               altText: product.showImage.alt || '',
-              cropFocalPoint: product.showImage.focalPoint,
+              cropFocalPoint: getCropFocalPoint(product.showImage),
               variants: transformImageVariants(product.showImage.sizes),
             }
           : null,
@@ -167,7 +178,7 @@ export async function GET(request: NextRequest) {
               id: img.id,
               url: normalizeToCDN(img.url),
               altText: img.alt || '',
-              cropFocalPoint: img.focalPoint,
+              cropFocalPoint: getCropFocalPoint(img),
               variants: transformImageVariants(img.sizes),
             }))
           : [],
