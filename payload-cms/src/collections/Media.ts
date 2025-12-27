@@ -266,45 +266,6 @@ export const Media: CollectionConfig = {
     },
 
     // ==================================================================
-    // 🎯 Focal Point (for smart cropping)
-    // ==================================================================
-    {
-      name: 'focalPointData',
-      type: 'group',
-      label: 'Focal Point | 焦点位置',
-      admin: {
-        description: 'Visual editor for image focal point | 可视化焦点编辑器',
-        components: {
-          Field: '@/components/fields/FocalPointField/Component#FocalPointFieldComponent',
-        },
-      },
-      fields: [
-        {
-          name: 'x',
-          type: 'number',
-          label: 'X Position',
-          min: 0,
-          max: 100,
-          defaultValue: 50,
-          admin: {
-            hidden: true,
-          },
-        },
-        {
-          name: 'y',
-          type: 'number',
-          label: 'Y Position',
-          min: 0,
-          max: 100,
-          defaultValue: 50,
-          admin: {
-            hidden: true,
-          },
-        },
-      ],
-    },
-
-    // ==================================================================
     // 📊 Status
     // ==================================================================
     {
