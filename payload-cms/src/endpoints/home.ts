@@ -29,12 +29,13 @@ function getMediaWithVariants(media: any | string | null | undefined) {
     return null
   }
 
-  // Payload uses focalPointData instead of cropFocalPoint
+  // Payload's built-in focalPoint feature uses focalX/focalY fields
   // Convert to frontend format: { x: number, y: number }
-  const cropFocalPoint = media.focalPointData?.x !== undefined && media.focalPointData?.y !== undefined
+  const cropFocalPoint = media.focalX !== undefined && media.focalX !== null &&
+                         media.focalY !== undefined && media.focalY !== null
     ? {
-        x: media.focalPointData.x,
-        y: media.focalPointData.y,
+        x: media.focalX,
+        y: media.focalY,
       }
     : undefined
 
