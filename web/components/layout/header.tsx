@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Link } from "@/lib/navigation";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { MobileMenu } from "./mobile-menu";
-import { DesktopMenu } from "./desktop-menu";
+import { DesktopNavigation } from "./desktop-navigation";
 import type { NavItem } from "@/types/navigation";
 import useSWR from "swr";
 
@@ -22,6 +22,9 @@ interface HeaderProps {
 export default function Header({ locale, initialNavigation }: HeaderProps) {
   // 2. 状态：用于移动端菜单
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // 状态：桌面端下拉菜单是否展开
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // 3. 状态：用于滚动时的主题
   const [theme, setTheme] = useState<HeaderTheme>("transparent");
@@ -173,46 +176,55 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
   }, [pathname]); // 当路由变化时重新运行
 
   const handleCloseMenu = () => {
-    console.log('handleCloseMenu called! Setting isMenuOpen to false.');
     setIsMenuOpen(false);
   };
 
   // 6. 决定最终的样式 (来自你的 Demo 逻辑)
-  // 如果菜单打开，强制为 'light' 主题
-  const activeTheme = isMenuOpen ? "light" : theme;
+  // 如果菜单打开（移动端或桌面端下拉），强制为 'light' 主题
+  const activeTheme = (isMenuOpen || isDropdownOpen) ? "light" : theme;
 
   // 动态计算文字和背景色
   const headerBgColor = activeTheme === "transparent" ? "bg-transparent" : "bg-brand-main";
   const headerTextColor = activeTheme === "transparent" ? "text-white" : "text-brand-text-main";
   const headerHoverBg = activeTheme === "transparent" ? "hover:bg-white/10" : "hover:bg-black/10";
+  const headerShadow = isDropdownOpen ? "shadow-md" : "";
 
   return (
     <>
       <header
         ref={headerRef}
-        className={cn("fixed top-0 left-0 right-0 w-full z-[60] transition-all duration-300 ease-in-out", headerBgColor)}
+        className={cn("fixed top-0 left-0 right-0 w-full z-[70] transition-all duration-300 ease-in-out", headerBgColor, headerShadow)}
       >
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-6 py-2">
           <div className="flex items-center justify-between">
-            {/* 左侧：汉堡菜单按钮 */}
-            <div className="flex-1 flex justify-start">
+            {/* 左侧：移动端汉堡菜单 / 桌面端导航 (order 1-3) */}
+            <div className="flex-1 flex justify-start items-center">
+              {/* 移动端：汉堡菜单按钮 */}
               <button
                 onClick={(event) => {
                   event.stopPropagation();
                   setIsMenuOpen(!isMenuOpen);
                 }}
                 className={cn(
-                  "p-2 rounded-md transition-colors duration-200",
+                  "lg:hidden p-2 rounded-md transition-colors duration-200",
                   headerTextColor,
                   headerHoverBg
                 )}
               >
                 <Menu className="w-5 h-5" />
               </button>
+
+              {/* 桌面端：左侧导航 (order 1-3) */}
+              <DesktopNavigation
+                navigationItems={navigationItems || []}
+                position="left"
+                theme={activeTheme}
+                onMenuOpen={setIsDropdownOpen}
+              />
             </div>
 
             {/* 中间：Logo */}
-            <div className="flex-1 flex justify-center">
+            <div className="flex-shrink-0">
               <Link href={`/${locale}`}>
                 <h1 className={cn("text-3xl tracking-wider font-paytone-one transition-colors duration-300", headerTextColor)}>
                   Busrom
@@ -220,20 +232,22 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
               </Link>
             </div>
 
-            {/* 右侧：语言选择 */}
-            <div className="flex-1 flex justify-end">
+            {/* 右侧：桌面端导航 (order 4-6) + 语言选择 */}
+            <div className="flex-1 flex justify-end items-center gap-6">
+              {/* 桌面端：右侧导航 (order 4-6) */}
+              <DesktopNavigation
+                navigationItems={navigationItems || []}
+                position="right"
+                theme={activeTheme}
+                onMenuOpen={setIsDropdownOpen}
+              />
+
+              {/* 语言选择 */}
               <LocaleSwitcher activeTheme={activeTheme} />
             </div>
           </div>
         </div>
       </header>
-
-      {/* 桌面端菜单 */}
-      <DesktopMenu
-        isOpen={isMenuOpen}
-        onClose={handleCloseMenu}
-        navigationItems={navigationItems || []}
-      />
 
       {/* 移动端菜单 */}
       <MobileMenu

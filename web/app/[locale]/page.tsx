@@ -60,8 +60,7 @@ async function HomeContentLoader({ locale }: { locale: Locale }) {
           rel="preload"
           as="image"
           href={url}
-          // @ts-expect-error - fetchpriority is valid but not in React types yet
-          fetchpriority="high"
+          fetchPriority="high"
         />
       ))}
 

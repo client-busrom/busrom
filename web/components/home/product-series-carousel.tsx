@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "@/lib/navigation";
 import type { HomeContent } from "@/lib/content-data";
@@ -67,8 +67,18 @@ export default function ProductSeriesCarousel({ data }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [hoveredPosition, setHoveredPosition] = useState<number | null>(null); // 1 或 2（屏内的两个位置）
   const [isAnimating, setIsAnimating] = useState(false); // 动画锁
+  const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const seriesCount = data?.length || 0;
+
+  // 清理 timeout 防止内存泄漏
+  useEffect(() => {
+    return () => {
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const paginate = useCallback((dir: number) => {
     if (isAnimating) return; // 动画进行中，忽略点击
@@ -77,8 +87,13 @@ export default function ProductSeriesCarousel({ data }: Props) {
     setCurrentIndex((prev) => (prev + dir + seriesCount) % seriesCount);
     setHoveredPosition(null);
 
+    // 清理之前的 timeout
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+    }
+
     // 动画结束后解锁（与动画时长匹配）
-    setTimeout(() => {
+    animationTimeoutRef.current = setTimeout(() => {
       setIsAnimating(false);
     }, 350); // 与 arcTransition.duration 一致
   }, [seriesCount, isAnimating]);

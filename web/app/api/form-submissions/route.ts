@@ -6,8 +6,9 @@ const CMS_URL = process.env.CMS_URL ||
 // In-memory rate limit store (for serverless, consider using Redis)
 const rateLimitStore = new Map<string, { count: number; lastSubmit: number; hourStart: number }>()
 
-// Clean up old entries every 10 minutes
-setInterval(() => {
+// Clean up old entries lazily (on each request) instead of using setInterval
+// This avoids memory leaks in serverless environments
+function cleanupOldEntries() {
   const now = Date.now()
   const oneHourAgo = now - 60 * 60 * 1000
   for (const [key, value] of rateLimitStore.entries()) {
@@ -15,7 +16,7 @@ setInterval(() => {
       rateLimitStore.delete(key)
     }
   }
-}, 10 * 60 * 1000)
+}
 
 // Get Turnstile secret key from SiteConfig
 async function getTurnstileSecretKey(): Promise<string | null> {
@@ -150,6 +151,9 @@ function updateRateLimitRecord(formName: string, ip: string) {
 }
 
 export async function POST(request: NextRequest) {
+  // Clean up old rate limit entries on each request (lazy cleanup)
+  cleanupOldEntries()
+
   try {
     const body = await request.json()
     const {

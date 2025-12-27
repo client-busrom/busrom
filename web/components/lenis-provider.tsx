@@ -10,19 +10,30 @@ interface LenisProviderProps {
 export function LenisProvider({ easingKey }: LenisProviderProps) {
   const lenisRef = useRef<any>(null)
   const rafCallbackRef = useRef<((time: number) => void) | null>(null)
+  const gsapRef = useRef<any>(null)
+  const scrollTriggerRef = useRef<any>(null)
+  const idleCallbackIdRef = useRef<number | null>(null)
+  const timeoutIdRef = useRef<NodeJS.Timeout | null>(null)
+  const isDestroyedRef = useRef(false)
 
   useEffect(() => {
-    // 延迟初始化 - 等待首屏渲染完成后再加载 GSAP
-    // 使用 requestIdleCallback 在浏览器空闲时初始化，避免阻塞首屏
+    isDestroyedRef.current = false
+
     const initLenis = async () => {
-      // 动态导入 GSAP 和 Lenis，减少首屏 JS 体积
+      // 如果组件已卸载，不再初始化
+      if (isDestroyedRef.current) return
+
       const [{ default: Lenis }, { gsap }, { ScrollTrigger }] = await Promise.all([
         import("lenis"),
         import("gsap"),
         import("gsap/ScrollTrigger"),
       ])
 
-      // 注册 GSAP 插件
+      // 再次检查，因为 await 期间组件可能已卸载
+      if (isDestroyedRef.current) return
+
+      gsapRef.current = gsap
+      scrollTriggerRef.current = ScrollTrigger
       gsap.registerPlugin(ScrollTrigger)
 
       const selected = easings[easingKey]
@@ -42,7 +53,6 @@ export function LenisProvider({ easingKey }: LenisProviderProps) {
       lenisRef.current = lenis
       ;(window as any).lenis = lenis
 
-      // Integrate Lenis with ScrollTrigger
       lenis.on('scroll', ScrollTrigger.update)
 
       const rafCallback = (time: number) => {
@@ -54,20 +64,43 @@ export function LenisProvider({ easingKey }: LenisProviderProps) {
       gsap.ticker.lagSmoothing(0)
     }
 
-    // 使用 requestIdleCallback 或 setTimeout 延迟初始化
     if ('requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(initLenis, { timeout: 2000 })
+      idleCallbackIdRef.current = (window as any).requestIdleCallback(initLenis, { timeout: 2000 })
     } else {
-      // Fallback: 延迟 100ms 初始化
-      setTimeout(initLenis, 100)
+      timeoutIdRef.current = setTimeout(initLenis, 100)
     }
 
     return () => {
+      isDestroyedRef.current = true
+
+      // 取消待执行的初始化
+      if (idleCallbackIdRef.current !== null && 'cancelIdleCallback' in window) {
+        (window as any).cancelIdleCallback(idleCallbackIdRef.current)
+      }
+      if (timeoutIdRef.current !== null) {
+        clearTimeout(timeoutIdRef.current)
+      }
+
+      // 移除 GSAP ticker 回调 - 修复内存泄漏
+      if (gsapRef.current && rafCallbackRef.current) {
+        gsapRef.current.ticker.remove(rafCallbackRef.current)
+      }
+
+      // 清理 ScrollTrigger
+      if (scrollTriggerRef.current) {
+        scrollTriggerRef.current.getAll().forEach((trigger: any) => trigger.kill())
+      }
+
+      // 销毁 Lenis
       if (lenisRef.current) {
         lenisRef.current.destroy()
+        lenisRef.current = null
       }
-      // 注意：GSAP ticker 清理需要在模块加载后进行
-      // 由于是动态导入，这里简单返回
+
+      // 清理全局引用
+      if (typeof window !== 'undefined') {
+        delete (window as any).lenis
+      }
     }
   }, [easingKey])
 

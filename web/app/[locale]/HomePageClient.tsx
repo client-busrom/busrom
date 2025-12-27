@@ -74,27 +74,43 @@ const Sphere3D = dynamic(() => import("@/components/home/sphere-3d"), {
 function DeferredSphere3D({ data }: { data: { title: string; description: string } | null }) {
   const [shouldLoad, setShouldLoad] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     const element = containerRef.current;
-    if (!element || shouldLoad) return;
+    if (!element) return;
+
+    // 如果已经加载，不需要再创建 observer
+    if (shouldLoad) return;
+
+    // 清理之前的 observer
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
 
     // 使用 Intersection Observer 检测是否接近视口
-    const observer = new IntersectionObserver(
+    observerRef.current = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setShouldLoad(true);
-          observer.disconnect();
+          observerRef.current?.disconnect();
+          observerRef.current = null;
         }
       },
       {
-        rootMargin: '200px 0px', // 提前 200px 开始加载
+        rootMargin: '500px 0px', // 提前 500px 开始加载，给 Globe 更多初始化时间
         threshold: 0,
       }
     );
 
-    observer.observe(element);
-    return () => observer.disconnect();
+    observerRef.current.observe(element);
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
+    };
   }, [shouldLoad]);
 
   return (
@@ -154,7 +170,7 @@ export function HomePageClient({
     <main className="min-h-screen">
 
       {/* 模块 1: Hero Banner (图片背景) - z-20 确保始终在懒加载内容上层 */}
-      <div data-header-theme="transparent" className="relative z-20">
+      <div data-header-theme="light" className="relative z-20 mt-[46px]">
         <HeroBanner data={content.heroBanner} locale={currentLanguage} />
       </div>
 
@@ -182,17 +198,17 @@ export function HomePageClient({
           </LazySection>
         )}
 
-        {/* 模块 6: 系列产品介绍 */}
-        {content.seriesIntro && (
-          <LazySection headerTheme="dark">
-            <MemoizedSeriesIntro data={content.seriesIntro} />
-          </LazySection>
-        )}
-
-        {/* 模块 7: 精选产品 */}
+        {/* 模块 6: 精选产品 */}
         {content.featuredProducts?.series?.length > 0 && (
           <LazySection headerTheme="light">
             <FeaturedProducts data={content.featuredProducts} locale={currentLanguage} />
+          </LazySection>
+        )}
+
+        {/* 模块 7: 系列产品介绍 */}
+        {content.seriesIntro && (
+          <LazySection headerTheme="dark">
+            <MemoizedSeriesIntro data={content.seriesIntro} />
           </LazySection>
         )}
 

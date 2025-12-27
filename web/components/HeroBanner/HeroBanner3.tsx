@@ -16,7 +16,7 @@ const rpx = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
 
 // 背景配置
 const BACKGROUND_CONFIG = {
-  backgroundColor: '#756f3f',
+  backgroundColor: '#6E6941',
 };
 
 // UI装饰元素配置
@@ -27,7 +27,7 @@ const UI_CONFIG = {
   rectWidth: 413,
   rectHeight: 1044,
   // 装饰颜色
-  decorColor: '#fff6ed',
+  decorColor: '#FFFCE8',
   // 各区域 left 位置
   zone1Left: 24,    // 第一区域
   zone2Left: 96,   // 第二区域
@@ -36,14 +36,14 @@ const UI_CONFIG = {
   // 第一区域
   zone1CircleTop: -33,        // 小圆距离顶部
   zone1CircleOffsetX: 5,    // 小圆向右偏移
-  zone1SvgTop: 360,          // SVG距离顶部
+  zone1SvgTop: 420,          // SVG距离顶部 (下移)
   // 第四区域
   zone4CircleBottom: -33,     // 小圆距离底部
   zone4CircleOffsetX: 5,    // 小圆向右偏移
-  zone4SvgTop: 100,          // SVG距离顶部
-  // SVG原始尺寸 (36x248)
+  zone4SvgTop: 40,          // SVG距离顶部 (上移)
+  // SVG原始尺寸 (36x285) - 基于 1920x1080 设计稿
   svgWidth: 36,
-  svgHeight: 248,
+  svgHeight: 285,
   zIndex: 5,
 };
 
@@ -57,10 +57,19 @@ const CONFIG = {
   // 左侧文字
   subtitleFontSize: 36,
   titleFontSize: 90,  // 设计稿 90px
-  featureFontSize: 24,  // 增大字号
-  featurePaddingX: 32,  // 增大内边距
-  featurePaddingY: 16,
-  featureMaxWidth: 420,  // 增大最大宽度
+  // Feature 圆角矩形 (基于 Figma)
+  featureLeft: 186,
+  featureFirstTop: 671,
+  featureGap: 119, // 790-671 = 119
+  featureWidth: 557,
+  featureHeight: 93,
+  featureBorderRadius: 46.5,
+  // Feature 文字 (基于 Figma)
+  featureTextLeft: 245,
+  featureTextFirstTop: 680,
+  featureTextGap: 119, // 799-680 = 119
+  featureFontSize: 40,
+  featureLineHeight: 75,
 };
 
 // --- HeroBanner3 Component ---
@@ -71,9 +80,9 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
   const feature1LastWord = feature1Words.pop() || "";
   const feature1Rest = feature1Words.join(" ");
 
-  // --- Feature Stack Colors ---
-  const featureBgColors = ["#F98538", "#FFF5AD", "#F98538"];
-  const featureTextColors = ["#FFF5AD", "#756F3F", "#FFF5AD"];
+  // --- Feature Stack Colors (基于 Figma) ---
+  const featureBgColors = ["#F98538", "#494526", "#F98538"];
+  const featureTextColors = ["#FFF5AD", "#FFF5AD", "#FFF5AD"];
 
   return (
     <section className="relative w-full h-full min-h-[700px] overflow-hidden font-sans">
@@ -185,28 +194,29 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
       <div className="hidden md:flex absolute inset-0 z-20">
         {/* 左侧文字内容 */}
         <div
-          className="flex flex-col justify-center h-full text-left px-[5%]"
-          style={{ width: '55%' }}
+          className="flex flex-col justify-center h-full text-left"
+          style={{ width: '55%', paddingTop: rpx(140), paddingLeft: rpx(120) }}
         >
           {/* Feature[1] - 副标题 */}
           <p
-            className="font-semibold text-[#000000] mb-4"
+            className="font-arial text-[#000000] mb-4"
             style={{
-              fontSize: rpx(CONFIG.subtitleFontSize),
+              fontSize: rpx(40),
               marginLeft: rpx(24),
-              fontWeight: 600,
+              fontWeight: 400,
+              letterSpacing: '0.05em',
             }}
           >
             {feature1Rest}{" "}
-            <span className="text-[#F98538]">{feature1LastWord}</span>
+            <span className="text-[#F98538]" style={{ fontWeight: 900 }}>{feature1LastWord}</span>
           </p>
           {/* Feature[0] - 主标题 */}
           <h1
-            className="font-poller-one text-[#332E0B] mb-8"
+            className="font-poller-one font-normal text-[#332E0B] mb-8 antialiased"
             style={{
               fontSize: rpx(CONFIG.titleFontSize),
               lineHeight: 1.1,
-              WebkitTextStroke: '2px #FDF6C2',
+              WebkitTextStroke: `${rpx(6)} #FDF6C2`,
               paintOrder: 'stroke fill',
             }}
           >
@@ -215,20 +225,21 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
           {/* Feature Stack */}
           <div
             className="flex flex-col"
-            style={{ gap: `max(12px, ${rpx(16)})`, maxWidth: `max(280px, ${rpx(CONFIG.featureMaxWidth)})` }}
+            style={{ gap: rpx(26), marginLeft: rpx(CONFIG.featureLeft - 120), marginTop: rpx(20) }}
           >
             {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
               <div
                 key={index}
-                className="rounded-full font-pingfang font-semibold text-center"
+                className="flex items-center font-pingfang font-semibold antialiased whitespace-nowrap"
                 style={{
+                  width: rpx(CONFIG.featureWidth),
+                  height: rpx(CONFIG.featureHeight),
                   backgroundColor: featureBgColors[index % featureBgColors.length],
+                  borderRadius: rpx(CONFIG.featureBorderRadius),
+                  paddingLeft: rpx(CONFIG.featureTextLeft - CONFIG.featureLeft),
+                  fontSize: rpx(CONFIG.featureFontSize),
+                  letterSpacing: '0.06em',
                   color: featureTextColors[index % featureTextColors.length],
-                  fontSize: `max(16px, ${rpx(CONFIG.featureFontSize)})`,
-                  paddingLeft: `max(20px, ${rpx(CONFIG.featurePaddingX)})`,
-                  paddingRight: `max(20px, ${rpx(CONFIG.featurePaddingX)})`,
-                  paddingTop: `max(10px, ${rpx(CONFIG.featurePaddingY)})`,
-                  paddingBottom: `max(10px, ${rpx(CONFIG.featurePaddingY)})`,
                 }}
               >
                 {feature}
@@ -253,7 +264,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
               height: `${(CONFIG.imageHeight / 1080) * 100}%`,
             }}
           >
-            <OptimizedImage image={data.images[1]} alt="Feature image 1" size="small" className="w-full h-full object-cover" priority />
+            <OptimizedImage image={data.images[1]} alt="Feature image 1" size="medium" className="w-full h-full object-cover" priority />
           </div>
           {/* 第二个：贴底，上方圆角 */}
           <div
@@ -263,7 +274,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
               height: `${(CONFIG.imageHeight / 1080) * 100}%`,
             }}
           >
-            <OptimizedImage image={data.images[2]} alt="Feature image 2" size="small" className="w-full h-full object-cover" priority />
+            <OptimizedImage image={data.images[2]} alt="Feature image 2" size="medium" className="w-full h-full object-cover" priority />
           </div>
           {/* 第三个：贴顶，下方圆角 */}
           <div
@@ -273,7 +284,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
               height: `${(CONFIG.imageHeight / 1080) * 100}%`,
             }}
           >
-            <OptimizedImage image={data.images[3]} alt="Feature image 3" size="small" className="w-full h-full object-cover" priority />
+            <OptimizedImage image={data.images[3]} alt="Feature image 3" size="medium" className="w-full h-full object-cover" priority />
           </div>
         </div>
       </div>
@@ -374,13 +385,13 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
         {/* 下方：三个图片横排，四角小圆边 */}
         <div className="relative h-[45%] flex justify-center items-stretch gap-3 px-4 pb-4">
           <div className="flex-1 overflow-hidden rounded-2xl">
-            <OptimizedImage image={data.images[1]} alt="Feature image 1" size="small" className="w-full h-full object-cover" priority />
+            <OptimizedImage image={data.images[1]} alt="Feature image 1" size="medium" className="w-full h-full object-cover" priority />
           </div>
           <div className="flex-1 overflow-hidden rounded-2xl">
-            <OptimizedImage image={data.images[2]} alt="Feature image 2" size="small" className="w-full h-full object-cover" priority />
+            <OptimizedImage image={data.images[2]} alt="Feature image 2" size="medium" className="w-full h-full object-cover" priority />
           </div>
           <div className="flex-1 overflow-hidden rounded-2xl">
-            <OptimizedImage image={data.images[3]} alt="Feature image 3" size="small" className="w-full h-full object-cover" priority />
+            <OptimizedImage image={data.images[3]} alt="Feature image 3" size="medium" className="w-full h-full object-cover" priority />
           </div>
         </div>
       </div>

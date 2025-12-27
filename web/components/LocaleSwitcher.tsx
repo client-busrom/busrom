@@ -1,20 +1,21 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react" // 确保导入 useRef 和 useEffect
+import { useState, useRef, useEffect } from "react"
 import { Check, ChevronDown, Globe } from "lucide-react"
 import { useUserPreferences } from "@/hooks/useUserPreferences"
 import {
-  countries, // 假设包含所有国家数据
-  languages, // 假设包含所有语言数据
+  countries,
+  languages,
   getCountryByCode,
   getLanguageByCode,
-  getAllCountries, // 确保有这个函数返回扁平的国家列表
+  getAllCountries,
   type Country,
   type Language,
 } from "@/lib/countries-languages"
 import { cn } from "@/lib/utils"
 import { usePathname, useRouter, replaceLocaleInPath } from "@/lib/navigation"
 import { Button } from "@/components/ui/button"
+import { CountryFlag } from "@/components/ui/CountryFlag"
 import { locales } from "@/i18n.config"
 
 // 定义 Header 传入的主题类型
@@ -133,7 +134,7 @@ export default function LocaleSwitcher({ activeTheme }: LocaleSwitcherProps) {
         "flex items-center space-x-1.5 opacity-50 min-w-[120px]",
         activeTheme === 'transparent' ? 'text-white' : 'text-brand-text-main'
       )}>
-        <span className="text-xl">🌐</span>
+        <Globe className="w-5 h-4" />
         <span className="text-sm font-anaheim font-medium">Loading...</span>
         <ChevronDown className="w-4 h-4" />
       </div>
@@ -154,9 +155,9 @@ export default function LocaleSwitcher({ activeTheme }: LocaleSwitcherProps) {
         )}
         aria-label="Select country and language"
       >
-        <span className="text-xl">{selectedCountry?.flag}</span>
+        <CountryFlag countryCode={selectedCountry?.code || "US"} className="w-5 h-4 rounded-sm" />
         <span className="text-sm font-anaheim font-medium">
-          {selectedCountry?.name} / {selectedLanguage?.nativeName}
+          {selectedCountry?.shortName} / {selectedLanguage?.nativeName}
         </span>
         <ChevronDown className={cn("w-4 h-4 transition-transform", isOpen && "rotate-180")} />
       </button>
@@ -181,7 +182,7 @@ export default function LocaleSwitcher({ activeTheme }: LocaleSwitcherProps) {
                     )}
                   >
                     <div className="flex items-center space-x-2">
-                      <span className="text-base">{country.flag}</span>
+                      <CountryFlag countryCode={country.code} className="w-5 h-4 rounded-sm" />
                       <span>{country.name}</span>
                     </div>
                     {tempCountryCode === country.code && <Check className="w-4 h-4" />}

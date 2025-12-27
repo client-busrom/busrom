@@ -1,7 +1,6 @@
 import { default as default_a66bd44433c9260839699cd88113e799 } from '@/components/admin/PermissionSelector'
 import { default as default_85b184ead3859892512d1fa42a0ba167 } from '@/components/admin/TwoFactorAuthField'
 import { MultiLocaleTextField as MultiLocaleTextField_818f830b0ef41c7fd6298cda9b34bc80 } from '@/components/fields/MultiLocaleField'
-import { FocalPointFieldComponent as FocalPointFieldComponent_6904d00a57281a75f10db10aeaa5dca2 } from '@/components/fields/FocalPointField/Component'
 import { default as default_6e007ac8f0e2f687212ebb65ad91c147 } from '@/components/fields/TranslationCenter'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -73,7 +72,6 @@ export const importMap = {
   "@/components/admin/PermissionSelector#default": default_a66bd44433c9260839699cd88113e799,
   "@/components/admin/TwoFactorAuthField#default": default_85b184ead3859892512d1fa42a0ba167,
   "@/components/fields/MultiLocaleField#MultiLocaleTextField": MultiLocaleTextField_818f830b0ef41c7fd6298cda9b34bc80,
-  "@/components/fields/FocalPointField/Component#FocalPointFieldComponent": FocalPointFieldComponent_6904d00a57281a75f10db10aeaa5dca2,
   "@/components/fields/TranslationCenter#default": default_6e007ac8f0e2f687212ebb65ad91c147,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,

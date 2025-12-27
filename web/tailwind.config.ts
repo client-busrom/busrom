@@ -136,8 +136,9 @@ const config: Config = {
         'inter':       ['var(--font-inter)', 'sans-serif'],  // 需要时显式使用
 
         // --- 系统字体 (直接使用名字) ---
-        'arial':    ['Arial', 'sans-serif'],
-        'pingfang': ['"PingFang SC"', 'sans-serif'],
+        'arial':       ['Arial', 'sans-serif'],
+        'arial-black': ['"Arial Black"', 'sans-serif'],
+        'pingfang':    ['"PingFang SC"', 'sans-serif'],
       },
       keyframes: {
         "accordion-down": {
