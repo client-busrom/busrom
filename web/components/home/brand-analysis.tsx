@@ -4,6 +4,7 @@ import * as React from "react";
 import type { HomeContent } from "@/lib/content-data";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { OptimizedBackgroundImage } from "@/components/ui/OptimizedImage";
 import {
   Carousel,
   CarouselContent,
@@ -106,6 +107,13 @@ export default function BrandAnalysis({ data }: Props) {
       {/* 背景图片 */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-black" />
+        {data.backgroundImage && (
+          <OptimizedBackgroundImage
+            image={data.backgroundImage}
+            size="large"
+            className="absolute inset-0 z-0"
+          />
+        )}
       </div>
 
       {/* ==================== 移动端布局 (<1024px) ==================== */}
@@ -242,15 +250,15 @@ export default function BrandAnalysis({ data }: Props) {
       {/* ==================== 桌面端布局 (>=1024px) - 等比例缩放 ==================== */}
       <div
         className="hidden lg:block relative"
-        style={{ aspectRatio: `${DESIGN_WIDTH} / 1449` }}
+        style={{ aspectRatio: `${DESIGN_WIDTH} / 1150` }}
       >
         {/* Top 区域容器 - 基于设计稿等比例定位 */}
-        {/* 设计稿: x:160, y:215 相对于 1920x1449 */}
+        {/* 设计稿: x:160, y:100 相对于 1920x1150 */}
         <div
           className="absolute"
           style={{
             left: `${(160 / DESIGN_WIDTH) * 100}%`,
-            top: `${(215 / 1449) * 100}%`,
+            top: `${(100 / 1150) * 100}%`,
             width: `${(TOP_WIDTH / DESIGN_WIDTH) * 100}%`,
             aspectRatio: `${TOP_WIDTH} / ${TOP_HEIGHT}`,
           }}
@@ -398,12 +406,12 @@ export default function BrandAnalysis({ data }: Props) {
         </div>
 
         {/* Bottom 区域容器 - Bus rom SVG 图片，左右分开 */}
-        {/* 设计稿: x:384, y:985, 1153x236 */}
+        {/* 设计稿: x:384, y:780, 1153x236 相对于 1920x1150 */}
         <div
           className="absolute flex justify-center"
           style={{
             left: `${(384 / DESIGN_WIDTH) * 100}%`,
-            top: `${(985 / 1449) * 100}%`,
+            top: `${(780 / 1150) * 100}%`,
             width: `${(BOTTOM_WIDTH / DESIGN_WIDTH) * 100}%`,
             aspectRatio: `${BOTTOM_WIDTH} / ${BOTTOM_HEIGHT}`,
             gap: `${(120 / DESIGN_WIDTH) * 100}vw`,

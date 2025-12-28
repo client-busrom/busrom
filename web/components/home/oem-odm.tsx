@@ -27,8 +27,10 @@ export default function OemOdm({ data }: Props) {
   const { oem: OEM, odm: ODM } = data;
 
   // clip-path for desktop diagonal split
-  const clipPathLeft = "polygon(0% 0%, 58% 0%, 40% 100%, 0% 100%)";
-  const clipPathRight = "polygon(58% 0%, 100% 0%, 100% 100%, 40% 100%)";
+  // 左侧：右边斜切
+  const clipPathLeft = "polygon(0% 0%, 100% 0%, 85% 100%, 0% 100%)";
+  // 右侧：左边斜切
+  const clipPathRight = "polygon(15% 0%, 100% 0%, 100% 100%, 0% 100%)";
 
   // 动画配置
   const easeOutQuad = [0.25, 0.46, 0.45, 0.94] as const;
@@ -155,10 +157,13 @@ export default function OemOdm({ data }: Props) {
         className="hidden md:block relative"
         style={{ height: "clamp(400px, 51.5vw, 988px)" }}
       >
-        {/* OEM 背景图片 (左侧) - 在深色背景上方 */}
+        {/* OEM 背景图片 (左侧) - 按实际图片尺寸 1106x988 */}
         <motion.div
-          className="absolute inset-y-0 left-0 w-full z-[1]"
-          style={{ clipPath: clipPathLeft }}
+          className="absolute inset-y-0 left-0 z-[1]"
+          style={{
+            width: "57.6%", // 1106 / 1920
+            clipPath: clipPathLeft,
+          }}
           variants={bgLeftVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
@@ -166,17 +171,20 @@ export default function OemOdm({ data }: Props) {
           <OptimizedImage
             image={OEM.bgImage}
             alt={OEM.bgImage?.altText || "OEM Background"}
-            size="medium"
+            size="large"
             className="object-cover absolute inset-0 w-full h-full"
           />
           {/* 轻微遮罩增加文字可读性 */}
           <div className="absolute inset-0 bg-black/30 z-[1]" />
         </motion.div>
 
-        {/* ODM 背景图片 (右侧) - 在深色背景上方 */}
+        {/* ODM 背景图片 (右侧) - 按实际图片尺寸 1034x988 */}
         <motion.div
-          className="absolute inset-y-0 right-0 w-full z-[2]"
-          style={{ clipPath: clipPathRight }}
+          className="absolute inset-y-0 right-0 z-[2]"
+          style={{
+            width: "53.8%", // 1034 / 1920
+            clipPath: clipPathRight,
+          }}
           variants={bgRightVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
@@ -184,7 +192,7 @@ export default function OemOdm({ data }: Props) {
           <OptimizedImage
             image={ODM.bgImage}
             alt={ODM.bgImage?.altText || "ODM Background"}
-            size="medium"
+            size="large"
             className="object-cover absolute inset-0 w-full h-full"
           />
           {/* 轻微遮罩增加文字可读性 */}
@@ -273,7 +281,7 @@ export default function OemOdm({ data }: Props) {
             <OptimizedImage
               image={OEM.image}
               alt={OEM.image?.altText || OEM.title}
-              size="thumbnail"
+              size="small"
               className="object-cover w-full h-full"
             />
           </motion.div>
@@ -295,7 +303,7 @@ export default function OemOdm({ data }: Props) {
             <OptimizedImage
               image={ODM.image}
               alt={ODM.image?.altText || ODM.title}
-              size="thumbnail"
+              size="small"
               className="object-cover w-full h-full"
             />
           </motion.div>

@@ -281,6 +281,7 @@ export interface BrandCenter {
 
 export interface BrandAnalysisData {
   status?: string
+  backgroundImage?: ImageObject | null
   centers: BrandCenter[]
 }
 

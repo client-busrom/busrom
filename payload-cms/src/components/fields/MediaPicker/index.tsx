@@ -41,7 +41,7 @@ interface MediaTag {
 }
 
 interface MediaPickerProps {
-  path: string
+  path?: string
   field: {
     name: string
     label?: string | Record<string, string>
@@ -49,6 +49,9 @@ interface MediaPickerProps {
     relationTo?: string
     required?: boolean
   }
+  // Optional controlled mode - when provided, bypasses useField
+  value?: number | number[] | null
+  onChange?: (value: number | number[] | null) => void
 }
 
 // Format file size
@@ -59,8 +62,11 @@ const formatFileSize = (bytes?: number): string => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field }) => {
-  const { value, setValue } = useField<number | number[] | null>({ path })
+export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field, value: controlledValue, onChange }) => {
+  // Use controlled mode if value/onChange provided, otherwise use useField
+  const fieldHook = useField<number | number[] | null>({ path: path || field.name })
+  const value = controlledValue !== undefined ? controlledValue : fieldHook.value
+  const setValue = onChange || fieldHook.setValue
   const locale = useLocale()
   const { t, i18n } = useTranslation()
   const adminLang = i18n.language // Admin UI language (from account settings)

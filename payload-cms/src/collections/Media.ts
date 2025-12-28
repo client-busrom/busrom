@@ -93,6 +93,7 @@ export const Media: CollectionConfig = {
         width: 1024,
         height: undefined,
         position: 'centre',
+        withoutEnlargement: true, // Keep original size if smaller, but still generate webp
         formatOptions: {
           format: 'webp',
           options: { quality: 80 },
@@ -103,6 +104,7 @@ export const Media: CollectionConfig = {
         width: 1920,
         height: undefined,
         position: 'centre',
+        withoutEnlargement: true, // Keep original size if smaller, but still generate webp
         formatOptions: {
           format: 'webp',
           options: { quality: 85 },

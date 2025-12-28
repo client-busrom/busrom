@@ -181,20 +181,24 @@ html, body {
   background-size: 1000px 100%;
 }
 
-/* 按钮圆球左右跳动动画 */
-@keyframes ball-bounce {
-  0%, 100% {
+/* 按钮圆球左右移动动画 */
+@keyframes ballBounce {
+  0% {
     left: 4px;
     transform: translateY(-50%);
   }
   50% {
-    left: calc(100% - 4px);
-    transform: translateX(-100%) translateY(-50%);
+    left: calc(100% - 3.125vw - 4px);
+    transform: translateY(-50%);
+  }
+  100% {
+    left: 4px;
+    transform: translateY(-50%);
   }
 }
 
 .ball-animated {
-  animation: ball-bounce 2.5s ease-in-out infinite;
+  animation: ballBounce 3s ease-in-out infinite;
 }
 
 .ball-static {

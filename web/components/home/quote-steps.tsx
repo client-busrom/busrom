@@ -28,15 +28,17 @@ const ROTATION_DEGREES = -15; // 逆时针旋转 15 度
 /**
  * Quote Steps Section
  *
- * 设计分辨率: 1920x1720
- * 响应式适配: lg (1024px) 使用比例 1024/1920 ≈ 0.533
+ * 设计分辨率: 1920 宽度，内容区域 1607x1273 居中
  *
  * Figma 关键位置 (基于 1920 宽度):
- * - 标题区域: x=160 (8.3%)
- * - 描述文字: x=1339 (69.7%), 装饰圆点 x=1303 (67.9%)
- * - 步骤序号: x=388 (20.2%)
- * - 步骤文字: x=714 (37.2%)
- * - 图片: x≈1001 (52.1%)
+ * - 内容区域左边距: 160px (8.33%)
+ * - "Design Project Solutions": x=160, y=0 (相对 section)
+ * - "Just Easy 5 Steps": x=160, y=82
+ * - "From concept to reality...": x=160, y=201
+ * - 描述文字: x=1339 (69.74%), 装饰圆点 x=1303 (67.86%)
+ * - 步骤区域: y=358 (相对 section top)
+ * - 步骤序号: x=425 (22.14%)
+ * - 步骤文字: x=735 (38.28%)
  */
 export default function QuoteSteps({ data }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -112,14 +114,23 @@ export default function QuoteSteps({ data }: Props) {
     return null;
   }
 
-  // 步骤位置配置 (基于 Figma JSON，调整留白)
-  // 增加上下留白，将步骤区域压缩到 30%-88% 范围内
+  // 设计稿尺寸
+  const DESIGN_WIDTH = 1920;
+  const PADDING_TOP = 100; // 上方留白
+  const PADDING_BOTTOM = 150; // 下方留白
+  const STEPS_OFFSET = 100; // 步骤区域与标题的额外间距
+  const CONTENT_HEIGHT = 1273; // 原始内容区域高度
+  const DESIGN_HEIGHT = CONTENT_HEIGHT + PADDING_TOP + PADDING_BOTTOM + STEPS_OFFSET; // 总高度
+
+  // 步骤位置配置 (基于 Figma JSON + 上方留白 + 额外间距)
+  // 步骤区域起始 y=358 (相对于 section top = 11111-10753)
+  // 每个步骤间距约 194-202px
   const stepPositions = [
-    { top: "30%", number: "01" },
-    { top: "42%", number: "02" },
-    { top: "54%", number: "03" },
-    { top: "66%", number: "04" },
-    { top: "78%", number: "05" },
+    { top: 358 + PADDING_TOP + STEPS_OFFSET, number: "01" },
+    { top: 560 + PADDING_TOP + STEPS_OFFSET, number: "02" },
+    { top: 762 + PADDING_TOP + STEPS_OFFSET, number: "03" },
+    { top: 957 + PADDING_TOP + STEPS_OFFSET, number: "04" },
+    { top: 1152 + PADDING_TOP + STEPS_OFFSET, number: "05" },
   ];
 
   return (
@@ -131,33 +142,35 @@ export default function QuoteSteps({ data }: Props) {
       {/* ==================== Desktop Layout (md+) ==================== */}
       <div
         className="hidden md:block relative w-full"
-        style={{ height: "clamp(700px, 100vw, 1920px)" }} // 桌面端固定高度
+        style={{
+          height: `calc(${DESIGN_HEIGHT} / ${DESIGN_WIDTH} * 100vw)`,
+          maxHeight: `${DESIGN_HEIGHT}px`,
+        }}
       >
-        {/* 标题区域 - 左侧 x=160 → 8.3% */}
+        {/* 标题区域 - 左侧 x=160 → 8.33% */}
         <div
           className="absolute"
           style={{
-            left: "8.3%", // 160/1920
-            top: "5%",
+            left: `${(160 / DESIGN_WIDTH) * 100}%`,
+            top: `${(PADDING_TOP / DESIGN_HEIGHT) * 100}%`,
           }}
         >
-          {/* 副标题 "Design Project Solutions" - y=0 相对板块 */}
+          {/* 副标题 "Design Project Solutions" - y=0 */}
           <h3
             className="font-anaheim font-bold text-stroke-black"
             style={{
-              fontSize: "clamp(24px, 2.5vw, 48px)",
-              lineHeight: "106px",
-              height: "clamp(53px, 5.5vw, 106px)",
+              fontSize: `${(48 / DESIGN_WIDTH) * 100}vw`,
+              lineHeight: `${(106 / DESIGN_WIDTH) * 100}vw`,
             }}
           >
             {data.headerTitle}
           </h3>
-          {/* 主标题 "Just Easy 5 Steps" - y=82 相对板块 */}
+          {/* 主标题 "Just Easy 5 Steps" - y=82 */}
           <h2
-            className="font-anaheim font-extrabold text-brand-text-black"
+            className="font-anaheim font-extrabold text-brand-text-black flex items-baseline"
             style={{
-              fontSize: "clamp(48px, 5vw, 96px)",
-              lineHeight: "1.1",
+              fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
+              lineHeight: `${(106 / DESIGN_WIDTH) * 100}vw`,
             }}
           >
             {parts.map((part, index) => {
@@ -167,8 +180,8 @@ export default function QuoteSteps({ data }: Props) {
                   <AnimatedNumber
                     key={index}
                     value={Number(part)}
-                    className="text-brand-accent-gold"
-                    style={{ fontSize: "clamp(60px, 6.25vw, 120px)" }}
+                    className="text-brand-accent-gold mx-[0.15em]"
+                    style={{ fontSize: `${(120 / DESIGN_WIDTH) * 100}vw` }}
                   />
                 );
               }
@@ -183,39 +196,39 @@ export default function QuoteSteps({ data }: Props) {
           <h3
             className="font-anaheim font-bold text-brand-text-black"
             style={{
-              fontSize: "clamp(18px, 1.88vw, 36px)",
-              lineHeight: "1.67",
-              marginTop: "clamp(8px, 0.8vw, 16px)",
+              fontSize: `${(36 / DESIGN_WIDTH) * 100}vw`,
+              lineHeight: `${(60 / DESIGN_WIDTH) * 100}vw`,
             }}
           >
             {data.headerSubtitle}
           </h3>
         </div>
 
-        {/* 描述文字 - 右侧 x=1339 → 69.7% */}
+        {/* 装饰圆点 x=1303, y=42 (10795-10753) + padding */}
+        <div
+          className="absolute bg-[#ECE8D8] rounded-full z-0"
+          style={{
+            left: `${(1303 / DESIGN_WIDTH) * 100}%`,
+            top: `${((42 + PADDING_TOP) / DESIGN_HEIGHT) * 100}%`,
+            width: `${(71 / DESIGN_WIDTH) * 100}vw`,
+            height: `${(71 / DESIGN_WIDTH) * 100}vw`,
+          }}
+        />
+
+        {/* 描述文字 - 右侧 x=1339, y=68 (10821-10753) + padding */}
         <div
           className="absolute"
           style={{
-            left: "69.7%", // 1339/1920
-            top: "9%",
-            width: "clamp(214px, 22.3vw, 428px)", // 428/1920
+            left: `${(1339 / DESIGN_WIDTH) * 100}%`,
+            top: `${((68 + PADDING_TOP) / DESIGN_HEIGHT) * 100}%`,
+            width: `${(428 / DESIGN_WIDTH) * 100}vw`,
           }}
         >
-          {/* 装饰圆点 x=1303 → 67.9% */}
-          <div
-            className="absolute bg-[#ECE8D8] rounded-full z-0"
-            style={{
-              width: "clamp(35px, 3.7vw, 71px)", // 71/1920
-              height: "clamp(35px, 3.7vw, 71px)",
-              left: "-10%",
-              top: "-10%",
-            }}
-          />
           <p
             className="text-brand-secondary font-anaheim font-medium relative z-10"
             style={{
-              fontSize: "clamp(10px, 1.04vw, 20px)", // 20/1920
-              lineHeight: "1.5",
+              fontSize: `${(20 / DESIGN_WIDTH) * 100}vw`,
+              lineHeight: `${(30 / DESIGN_WIDTH) * 100}vw`,
             }}
           >
             {data.headerDescription}
@@ -237,48 +250,47 @@ export default function QuoteSteps({ data }: Props) {
                 className="absolute cursor-pointer transition-all duration-300"
                 style={{
                   left: "0",
-                  top: pos.top,
+                  top: `${(pos.top / DESIGN_HEIGHT) * 100}%`,
                   width: "100%",
                 }}
                 onMouseEnter={() => handleMouseEnter(index)}
                 onClick={() => setActiveIndex(index)}
               >
-                {/* 步骤序号 x=388 → 20.2% */}
+                {/* 步骤序号 x=425 → 22.14% */}
                 <div
                   className={cn(
                     "absolute z-10 transition-all duration-300",
                     isActive ? "text-brand-text-black" : "text-brand-text-black/20"
                   )}
                   style={{
-                    left: "20.2%", // 388/1920
-                    width: "clamp(116px, 12vw, 232px)", // 按比例缩放
-                    height: "clamp(58px, 6vw, 116px)",
+                    left: `${(425 / DESIGN_WIDTH) * 100}%`,
+                    width: `${(241 / DESIGN_WIDTH) * 100}vw`,
+                    height: `${(121 / DESIGN_WIDTH) * 100}vw`,
                   }}
                 >
                   <StepNumber step={(index + 1) as 1 | 2 | 3 | 4 | 5} filled={isActive} />
                 </div>
 
-                {/* 步骤文本 x=714 → 37.2% */}
+                {/* 步骤文本 x=735 → 38.28% */}
                 <p
                   className={cn(
-                    "absolute z-10 font-anaheim font-bold transition-colors duration-300",
+                    "absolute z-10 font-anaheim font-bold transition-colors duration-300 whitespace-pre-line",
                     isActive
                       ? "text-brand-text-black"
                       : "text-brand-text-black/80"
                   )}
                   style={{
-                    left: "37.2%", // 714/1920
-                    top: "clamp(15px, 1.5vw, 30px)", // 与数字顶部对齐
-                    fontSize: "clamp(24px, 2.5vw, 48px)", // 48px
-                    lineHeight: "0.96", // 46/48
-                    whiteSpace: "pre-line",
+                    left: `${(735 / DESIGN_WIDTH) * 100}%`,
+                    top: `${(53 / DESIGN_WIDTH) * 100}vw`, // 与数字垂直居中对齐
+                    fontSize: `${(48 / DESIGN_WIDTH) * 100}vw`,
+                    lineHeight: `${(46 / DESIGN_WIDTH) * 100}vw`,
+                    width: `${(609 / DESIGN_WIDTH) * 100}vw`,
                   }}
                 >
-                  {/* 将字面 \n 转换为真正的换行 */}
-                  {step.text.replace(/\\n/g, '\n')}
+                  {step.text.replace(/\\n|\/n/g, '\n')}
                 </p>
 
-                {/* 步骤图片 x≈1001 → 52.1% */}
+                {/* 步骤图片 - 位于右侧 */}
                 <div
                   className={cn(
                     "absolute z-0 transition-all duration-500 overflow-hidden shadow-2xl",
@@ -287,11 +299,11 @@ export default function QuoteSteps({ data }: Props) {
                       : "opacity-0 pointer-events-none"
                   )}
                   style={{
-                    left: "52.1%", // 1001/1920
+                    left: `${(1100 / DESIGN_WIDTH) * 100}%`,
                     top: "50%",
-                    width: "clamp(251px, 26.2vw, 503px)", // 503/1920
+                    width: `${(503 / DESIGN_WIDTH) * 100}vw`,
                     aspectRatio: "503 / 360",
-                    borderRadius: "clamp(15px, 1.56vw, 30px)",
+                    borderRadius: `${(30 / DESIGN_WIDTH) * 100}vw`,
                     transformOrigin: "center center",
                     transform: isActive
                       ? `translateY(-50%) rotate(${ROTATION_DEGREES}deg)`
@@ -354,7 +366,6 @@ export default function QuoteSteps({ data }: Props) {
         <div className="space-y-8" onMouseLeave={handleMouseLeave}>
           {data.steps.map((step, index) => {
             const isActive = index === activeIndexToDisplay;
-            const pos = stepPositions[index] || stepPositions[0];
 
             return (
               <div
@@ -375,13 +386,13 @@ export default function QuoteSteps({ data }: Props) {
                   </div>
                   <p
                     className={cn(
-                      "text-lg font-anaheim font-bold transition-colors duration-300 leading-tight",
+                      "text-lg font-anaheim font-bold transition-colors duration-300 leading-tight whitespace-pre-line",
                       isActive
                         ? "text-brand-text-black"
                         : "text-brand-text-black/80"
                     )}
                   >
-                    {step.text.replace(/\\n/g, '\n')}
+                    {step.text.replace(/\\n|\/n/g, '\n')}
                   </p>
                 </div>
 

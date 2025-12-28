@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { AnimatedLinkButton } from "@/components/ui/animated-link-button";
 import { LucideIcon, HelpCircle, Lightbulb, ShieldCheck, Factory, Globe, Users } from "lucide-react";
-import { cn } from "@/lib/utils"; // 导入 cn
+import { cn } from "@/lib/utils";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 type Props = {
@@ -13,6 +13,46 @@ type Props = {
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920;
+const DESIGN_HEIGHT = 922;
+
+// 布局配置 - 基于 Figma JSON
+const LAYOUT = {
+  // 左右边距
+  paddingLeft: 150,
+  paddingRight: 150,
+
+  // 标题区域
+  header: {
+    titleY: 68,
+    titleFontSize: 80,
+    titleLineHeight: 95,
+  },
+
+  // VIEW MORE 按钮
+  viewMore: {
+    y: 92,
+  },
+
+  // 手风琴卡片区域
+  accordion: {
+    y: 248,
+    width: 1600,
+    height: 646,
+    cardCollapsedWidth: 272,
+    cardExpandedWidth: 437,
+    cardBorderRadius: 30,
+    gap: 18,
+  },
+
+  // 展开卡片内容
+  expandedContent: {
+    titleFontSize: 32,
+    titleLineHeight: 34,
+    descFontSize: 20,
+    descLineHeight: 27,
+    iconSize: 78,
+  },
+};
 
 // 图标映射 - 根据 reason title 匹配对应图标
 const iconMap: { [key: string]: LucideIcon } = {
@@ -77,131 +117,203 @@ export default function WhyChooseBusrom({ data }: Props) {
     };
   }, [isHovering, reasonsLength, isVisible]);
 
+  // vw 转换函数
+  const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
+
   // Guard: if no data, don't render
   if (!data || !data.reasons || data.reasons.length === 0) {
     return null;
   }
 
   return (
-    <section ref={sectionRef} className="pt-20 pb-16 md:pt-24 bg-brand-main" data-header-theme="light">
-      <div className="container mx-auto">
-        {/* --- 1. 顶部控制/标题区 --- */}
-        {/* 移动端标题 */}
-        <div className="flex flex-col md:hidden mb-6">
-          <h2 className="font-anaheim font-extrabold text-2xl text-brand-text-black">
-            {data.title} <span className="text-stroke-black">{data.title2}</span>
-          </h2>
-        </div>
+    <section ref={sectionRef} className="py-12 lg:py-0 bg-brand-main" data-header-theme="light">
+      <div className="container mx-auto px-4 lg:px-0" style={{ maxWidth: '100%' }}>
 
-        {/* 桌面端标题 */}
-        <div className="hidden md:flex justify-between items-end mb-12">
-          <div>
-            <h2
-              className="font-anaheim font-extrabold text-brand-text-black"
-              style={{
-                fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
-                lineHeight: `${(67 / DESIGN_WIDTH) * 100}vw`,
-              }}
-            >
+        {/* ==================== 移动端布局 ==================== */}
+        <div className="lg:hidden">
+          {/* 标题 */}
+          <div className="mb-6">
+            <h2 className="font-anaheim font-extrabold text-2xl text-brand-text-black">
               {data.title} <span className="text-stroke-black">{data.title2}</span>
             </h2>
           </div>
 
-          {/* 右侧按钮 */}
-          <AnimatedLinkButton>
-            VIEW MORE INFORMATION
-          </AnimatedLinkButton>
-        </div>
-
-        {/* --- 2. 桌面端: 手风琴轮播图 (md 及以上) --- */}
-        <div
-          className="hidden md:flex w-full h-[500px] gap-4"
-          onMouseEnter={() => setIsHovering(true)}
-          onMouseLeave={() => setIsHovering(false)}
-        >
-          {data.reasons.map((reason, index) => {
-            const isExpanded = activeIndex === index;
-            const flex = isExpanded ? "8 1 0%" : "3 1 0%";
-            const IconComponent = iconMap[reason.title] || iconMap.default;
-
-            return (
-              <div
-                key={reason.title}
-                className="relative overflow-hidden transition-all duration-500 ease-in-out cursor-pointer group rounded-lg" // 容器动画
-                style={{ flex: flex }}
-                onMouseEnter={() => setActiveIndex(index)}
-              >
-                {/* 1. 背景图 (保持不变) */}
-                <OptimizedImage
-                  image={data.reasons[index].image}
-                  alt={data.reasons[index].image?.altText || reason.title}
-                  size="small"
-                  className="object-cover object-center z-0 transition-transform duration-500 ease-in-out group-hover:scale-105 absolute inset-0 w-full h-full"
-                />
-
-                {/* 2. 阴影渐变 (z-10) */}
+          {/* 垂直堆叠卡片 */}
+          <div className="grid grid-cols-1 gap-6">
+            {data.reasons.map((reason, index) => {
+              const IconComponent = iconMap[reason.title] || iconMap.default;
+              return (
                 <div
-                  className={cn(
-                    "absolute bottom-0 left-0 w-full h-1/2 z-10",
-                    "bg-gradient-to-t from-black/80 to-transparent",
-                    "transition-opacity ease-in-out", // 基础过渡
-                    // 【已修改】
-                    isExpanded
-                      ? "opacity-100 duration-200 delay-300" // 渐显: 延迟300ms, 动画200ms
-                      : "opacity-0 duration-200" // 渐隐: 立即, 动画200ms
-                  )}
-                />
-
-                {/* 3. 渐显的文字内容 (z-20) */}
-                <div
-                  className={cn(
-                    "absolute bottom-0 left-0 w-full z-20 p-6",
-                    "flex flex-col items-center justify-end text-center",
-                    "transition-opacity ease-in-out", // 基础过渡
-                    // 【已修改】
-                    isExpanded
-                      ? "opacity-100 duration-200 delay-300" // 渐显: 延迟300ms, 动画200ms
-                      : "opacity-0 duration-200" // 渐隐: 立即, 动画200ms
-                  )}
+                  key={reason.title}
+                  className="relative w-full aspect-video rounded-lg overflow-hidden shadow-lg"
                 >
-                  <div className="w-12 h-12 mb-4 flex items-center justify-center">
-                    <IconComponent className="w-8 h-8 text-white" />
+                  <OptimizedImage
+                    image={data.reasons[index].image}
+                    alt={data.reasons[index].image?.altText || reason.title}
+                    size="small"
+                    className="object-cover object-center z-0 absolute inset-0 w-full h-full"
+                  />
+                  <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                  <div className="relative z-20 h-full p-6 flex flex-col items-center justify-end text-center">
+                    <div className="w-12 h-12 mb-2 flex items-center justify-center">
+                      <IconComponent className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-1">{reason.title}</h3>
+                    <p className="text-white/90 text-sm">{reason.description}</p>
                   </div>
-                  <h3 className="text-2xl font-semibold text-white mb-2">{reason.title}</h3>
-                  <p className="text-white/90">{reason.description}</p>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-        
-        {/* --- 3. 移动端: 垂直堆叠卡片 (md 以下) --- */}
-        <div className="grid md:hidden grid-cols-1 gap-6">
-          {data.reasons.map((reason, index) => {
-            const IconComponent = iconMap[reason.title] || iconMap.default;
-            return (
-              // (移动端卡片布局保持不变)
-              <div
-                key={reason.title}
-                className="relative w-full aspect-video rounded-lg overflow-hidden shadow-lg"
+
+        {/* ==================== 桌面端布局 ==================== */}
+        <div
+          className="hidden lg:block"
+          style={{
+            paddingLeft: vw(LAYOUT.paddingLeft),
+            paddingRight: vw(LAYOUT.paddingRight),
+            paddingTop: vw(LAYOUT.header.titleY),
+            paddingBottom: vw(60),
+          }}
+        >
+          {/* 顶部区域 - Header */}
+          <div className="flex justify-between items-end">
+            {/* 左侧标题 */}
+            <h2
+              className="font-anaheim font-extrabold"
+              style={{
+                fontSize: vw(LAYOUT.header.titleFontSize),
+                lineHeight: vw(LAYOUT.header.titleLineHeight),
+              }}
+            >
+              <span
+                style={{
+                  color: '#000000',
+                  WebkitTextStroke: `calc(4 * var(--rpx)) #756f3f`,
+                  paintOrder: 'stroke fill',
+                }}
               >
-                <OptimizedImage
-                  image={data.reasons[index].image}
-                  alt={data.reasons[index].image?.altText || reason.title}
-                  size="small"
-                  className="object-cover object-center z-0 absolute inset-0 w-full h-full"
-                />
-                <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                <div className="relative z-20 h-full p-6 flex flex-col items-center justify-end text-center">
-                  <div className="w-12 h-12 mb-2 flex items-center justify-center">
-                    <IconComponent className="w-8 h-8 text-white" />
+                {data.title}
+              </span>{' '}
+              <span
+                style={{
+                  color: '#f6f4ed',
+                  WebkitTextStroke: `calc(4 * var(--rpx)) #756f3f`,
+                  paintOrder: 'stroke fill',
+                }}
+              >
+                {data.title2}
+              </span>
+            </h2>
+
+            {/* 右侧 VIEW MORE */}
+            <AnimatedLinkButton>
+              VIEW MORE INFORMATION
+            </AnimatedLinkButton>
+          </div>
+
+          {/* 手风琴卡片区域 */}
+          <div
+            className="flex"
+            style={{
+              marginTop: vw(LAYOUT.accordion.y - LAYOUT.header.titleY - LAYOUT.header.titleLineHeight),
+              height: vw(LAYOUT.accordion.height),
+              gap: vw(LAYOUT.accordion.gap),
+            }}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+          >
+            {data.reasons.map((reason, index) => {
+              const isExpanded = activeIndex === index;
+              const IconComponent = iconMap[reason.title] || iconMap.default;
+
+              return (
+                <div
+                  key={reason.title}
+                  className="relative overflow-hidden transition-all duration-500 ease-in-out cursor-pointer group"
+                  style={{
+                    width: isExpanded ? vw(LAYOUT.accordion.cardExpandedWidth) : vw(LAYOUT.accordion.cardCollapsedWidth),
+                    borderRadius: vw(LAYOUT.accordion.cardBorderRadius),
+                    boxShadow: isExpanded ? '0 4px 15px rgba(0, 0, 0, 0.5)' : 'none',
+                  }}
+                  onMouseEnter={() => setActiveIndex(index)}
+                >
+                  {/* 背景图 */}
+                  <OptimizedImage
+                    image={data.reasons[index].image}
+                    alt={data.reasons[index].image?.altText || reason.title}
+                    size="medium"
+                    className="object-cover object-center z-0 transition-transform duration-500 ease-in-out group-hover:scale-105 absolute inset-0 w-full h-full"
+                  />
+
+                  {/* 阴影渐变 */}
+                  <div
+                    className={cn(
+                      "absolute bottom-0 left-0 w-full z-10",
+                      "transition-opacity ease-in-out",
+                      isExpanded
+                        ? "opacity-100 duration-200 delay-300"
+                        : "opacity-0 duration-200"
+                    )}
+                    style={{
+                      height: '63%',
+                      background: 'linear-gradient(to top, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0) 100%)',
+                    }}
+                  />
+
+                  {/* 渐显的文字内容 */}
+                  <div
+                    className={cn(
+                      "absolute bottom-0 left-0 w-full z-20",
+                      "flex flex-col items-center justify-end text-center",
+                      "transition-opacity ease-in-out",
+                      isExpanded
+                        ? "opacity-100 duration-200 delay-300"
+                        : "opacity-0 duration-200"
+                    )}
+                    style={{
+                      padding: vw(30),
+                      paddingBottom: vw(50),
+                    }}
+                  >
+                    {/* 图标 */}
+                    <div
+                      className="flex items-center justify-center"
+                      style={{
+                        width: vw(LAYOUT.expandedContent.iconSize),
+                        height: vw(LAYOUT.expandedContent.iconSize),
+                        marginBottom: vw(30),
+                      }}
+                    >
+                      <IconComponent className="w-full h-full text-white" />
+                    </div>
+                    {/* 标题 */}
+                    <h3
+                      className="font-anaheim font-bold text-white text-center"
+                      style={{
+                        fontSize: vw(LAYOUT.expandedContent.titleFontSize),
+                        lineHeight: vw(LAYOUT.expandedContent.titleLineHeight),
+                        marginBottom: vw(28),
+                      }}
+                    >
+                      {reason.title}
+                    </h3>
+                    {/* 描述 */}
+                    <p
+                      className="font-anaheim font-medium text-white text-center"
+                      style={{
+                        fontSize: vw(LAYOUT.expandedContent.descFontSize),
+                        lineHeight: vw(LAYOUT.expandedContent.descLineHeight),
+                      }}
+                    >
+                      {reason.description}
+                    </p>
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-1">{reason.title}</h3>
-                  <p className="text-white/90 text-sm">{reason.description}</p>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
       </div>

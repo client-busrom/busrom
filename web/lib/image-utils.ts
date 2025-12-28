@@ -156,12 +156,14 @@ export function getOptimizedImageUrl(
     return normalizeToCDN(variants.webp)
   }
 
-  // 2. Map xlarge to large - never use original image, max is desktop (1920px)
-  const effectiveSize = size === 'xlarge' ? 'large' : size
+  // 2. If xlarge requested, return original image directly
+  if (size === 'xlarge') {
+    return normalizeToCDN(originalUrl)
+  }
 
   // 3. Try requested size variant
-  if (variants && variants[effectiveSize]) {
-    return normalizeToCDN(variants[effectiveSize]!)
+  if (variants && variants[size]) {
+    return normalizeToCDN(variants[size]!)
   }
 
   // 4. Fallback strategy: try other sizes from large to small (skip xlarge/original)

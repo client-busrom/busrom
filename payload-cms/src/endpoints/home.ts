@@ -540,6 +540,7 @@ export const homeContentHandler: PayloadHandler = async (req) => {
       // Brand Analysis (only if published)
       brandAnalysis: brandAnalysis?.status === 'published' ? {
         status: brandAnalysis?.status,
+        backgroundImage: getMediaWithVariants(brandAnalysis?.backgroundImage),
         centers: [
           {
             title: brandAnalysis?.brandCenter?.title,
