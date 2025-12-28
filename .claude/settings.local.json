@@ -71,7 +71,21 @@
       "Bash(AWS_DEFAULT_REGION=ap-southeast-1 aws ecs update-service:*)",
       "Bash(AWS_DEFAULT_REGION=ap-southeast-1 aws ecs:*)",
       "Bash(TASK_ID=\"bba17bb4fdaf4743bb3236fdaa121d4b\")",
-      "Bash(__NEW_LINE__ aws ecs execute-command )"
+      "Bash(__NEW_LINE__ aws ecs execute-command )",
+      "Bash(NODE_ENV=production node:*)",
+      "WebFetch(domain:busromhouse.com)",
+      "Bash(AWS_DEFAULT_REGION=ap-southeast-1 aws logs tail:*)",
+      "Bash(AWS_DEFAULT_REGION=ap-southeast-1 aws logs:*)",
+      "Bash(for region in us-east-1 us-west-2 eu-west-1 ap-northeast-1 ap-southeast-2)",
+      "Bash(do echo '=== $region ===' aws ecs list-clusters --region $region)",
+      "Bash(PGPASSWORD=busrom_dev_password /opt/Homebrew/Cellar/postgresql@16/16.11/bin/psql:*)",
+      "Bash(for region in us-east-1 ap-southeast-1 ap-northeast-1 eu-west-1)",
+      "Bash(do echo:*)",
+      "Bash(AWS_DEFAULT_REGION=$region aws ecs list-clusters:*)",
+      "Bash(AWS_DEFAULT_REGION=us-east-1 aws ecs list-services:*)",
+      "Bash(AWS_DEFAULT_REGION=us-east-1 aws ecs list-tasks:*)",
+      "Bash(AWS_DEFAULT_REGION=us-east-1 aws ecs execute-command:*)",
+      "Bash(AWS_DEFAULT_REGION=us-east-1 aws ecs describe-tasks:*)"
     ],
     "deny": [],
     "ask": []

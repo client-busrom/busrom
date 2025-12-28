@@ -133,6 +133,7 @@ export default function BrandAnalysis({ data }: Props) {
                 <CarouselItem
                   key={center.title || index}
                   className="relative h-full p-0"
+                  style={{ zIndex: currentSlide === index ? 10 : 1 }}
                 >
                   <div className="relative w-full h-full">
                     {/*
@@ -285,6 +286,7 @@ export default function BrandAnalysis({ data }: Props) {
                   <CarouselItem
                     key={center.title || index}
                     className="relative h-full p-0"
+                    style={{ zIndex: currentSlide === index ? 10 : 1 }}
                   >
                     <div className="relative w-full h-full">
                       {/* 大圆 - x:0, y:0, 555x555 相对于 939x555 容器 */}
