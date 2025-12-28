@@ -183,7 +183,7 @@ const altitudeToZoom = (alt: number) => {
 
 // 默认标题（fallback）
 const DEFAULT_TITLE = "GLOBAL NETWORK";
-const DEFAULT_DESCRIPTION = "Serving customers worldwide from Guangdong, China";
+const DEFAULT_DESCRIPTION = "Serving Customers Worldwide From Guangdong, China";
 
 export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
   // 使用后端数据，fallback 到默认值

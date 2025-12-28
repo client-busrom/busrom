@@ -215,28 +215,104 @@ const nextConfig = {
   },
 
   /**
+   * Source Maps - 生产环境调试和性能分析
+   */
+  productionBrowserSourceMaps: true,
+
+  /**
    * Security Headers
+   *
+   * - CSP: 防止 XSS 攻击
+   * - HSTS: 强制 HTTPS
+   * - COOP: 源隔离
    */
   async headers() {
+    // CSP 配置 - 使用 strict-dynamic 和 unsafe-inline 作为 fallback
+    // Next.js 目前不原生支持 nonce，所以使用 strict-dynamic 配合 unsafe-inline
+    const cspDirectives = [
+      "default-src 'self'",
+      // Scripts: strict-dynamic + unsafe-inline (fallback for older browsers)
+      process.env.NODE_ENV === 'development'
+        ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com"
+        : "script-src 'self' 'unsafe-inline' 'strict-dynamic' https://challenges.cloudflare.com",
+      // Styles: self + inline (Tailwind/styled-jsx 需要)
+      "style-src 'self' 'unsafe-inline'",
+      // Images: self + data + blob + CDN
+      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net http://localhost:*",
+      // Fonts: self + CDN
+      "font-src 'self' https://cdn.jsdelivr.net",
+      // Connect: self + API + CDN + Cloudflare Turnstile
+      "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com http://localhost:*",
+      // Media: self + CDN
+      "media-src 'self' https://*.amazonaws.com https://*.cloudfront.net",
+      // Frame: Cloudflare Turnstile
+      "frame-src 'self' https://challenges.cloudflare.com",
+      // Object: none
+      "object-src 'none'",
+      // Base URI: self
+      "base-uri 'self'",
+      // Form action: self
+      "form-action 'self'",
+      // Frame ancestors: none (防止 clickjacking)
+      "frame-ancestors 'none'",
+      // Upgrade insecure requests (生产环境)
+      ...(process.env.NODE_ENV === 'production' ? ["upgrade-insecure-requests"] : []),
+    ].join('; ')
+
     return [
       {
         source: '/:path*',
         headers: [
+          // Content Security Policy
+          {
+            key: 'Content-Security-Policy',
+            value: cspDirectives,
+          },
+          // HTTP Strict Transport Security (HSTS)
+          // max-age=31536000 (1年), includeSubDomains, preload
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains; preload',
+          },
+          // Cross-Origin-Opener-Policy
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin',
+          },
+          // Cross-Origin-Embedder-Policy (配合 COOP)
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'credentialless',
+          },
+          // Cross-Origin-Resource-Policy
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'same-origin',
+          },
+          // X-Content-Type-Options
           {
             key: 'X-Content-Type-Options',
             value: 'nosniff',
           },
+          // X-Frame-Options (被 CSP frame-ancestors 替代，但保留兼容旧浏览器)
           {
             key: 'X-Frame-Options',
             value: 'DENY',
           },
+          // X-XSS-Protection (旧浏览器)
           {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
           },
+          // Referrer-Policy
           {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
+          },
+          // Permissions-Policy (限制浏览器功能)
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
           },
         ],
       },
