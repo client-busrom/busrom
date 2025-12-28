@@ -219,6 +219,7 @@ export default function BrandAnalysis({ data }: Props) {
             disabled={!canScrollPrev}
             className="w-12 h-12 rounded-full flex items-center justify-center disabled:opacity-30"
             style={{ background: "rgba(255, 255, 255, 0.23)" }}
+            aria-label="Previous slide"
           >
             <ChevronLeft className="w-5 h-5 text-white" />
           </button>
@@ -227,6 +228,7 @@ export default function BrandAnalysis({ data }: Props) {
             disabled={!canScrollNext}
             className="w-12 h-12 rounded-full flex items-center justify-center disabled:opacity-30"
             style={{ background: "rgba(255, 255, 255, 0.54)" }}
+            aria-label="Next slide"
           >
             <ChevronRight className="w-5 h-5 text-white" />
           </button>
@@ -387,6 +389,7 @@ export default function BrandAnalysis({ data }: Props) {
                 height: `${(88 / DESIGN_WIDTH) * 100}vw`,
                 background: "rgba(255, 255, 255, 0.23)",
               }}
+              aria-label="Previous slide"
             >
               <ChevronLeft className="w-[35%] h-[35%] text-white" />
             </button>
@@ -399,6 +402,7 @@ export default function BrandAnalysis({ data }: Props) {
                 height: `${(88 / DESIGN_WIDTH) * 100}vw`,
                 background: "rgba(255, 255, 255, 0.54)",
               }}
+              aria-label="Next slide"
             >
               <ChevronRight className="w-[35%] h-[35%] text-white" />
             </button>

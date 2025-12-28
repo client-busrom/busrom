@@ -58,7 +58,6 @@ function getDefaultRobotsTxt(siteUrl: string): string {
     .join('\n')
 
   return `# Busrom Robots.txt
-# Updated: ${new Date().toISOString()}
 # Multi-language B2B industrial hardware website
 
 User-agent: *
@@ -72,16 +71,7 @@ Disallow: /api/
 Disallow: /_next/
 Disallow: /static/
 
-# Crawl-delay for polite crawling
-Crawl-delay: 1
-
-# Sitemap Index (contains all language-specific sitemaps)
-Sitemap: ${siteUrl}/sitemaps.xml
-
-# Language-specific sitemaps
-${localeSitemaps}
-
-# Main sitemap (for backward compatibility)
+# Sitemap
 Sitemap: ${siteUrl}/sitemap.xml
 `
 }

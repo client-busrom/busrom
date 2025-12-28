@@ -413,7 +413,7 @@ export default function SimpleCta({ data }: Props) {
               {data.description}
             </p>
             <div className="pt-4">
-              <Link href="/contact">
+              <Link href="/contact-us">
                 <motion.div
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -573,7 +573,7 @@ export default function SimpleCta({ data }: Props) {
 
             {/* CTA 按钮 */}
             <div>
-              <Link href="/contact">
+              <Link href="/contact-us">
                 <motion.div
                   className="origin-center inline-block"
                   style={{ transformOrigin: "50% 50%" }}
