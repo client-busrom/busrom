@@ -165,7 +165,6 @@ export default function BrandAnalysis({ data }: Props) {
                           alt={center.title}
                           fill
                           className="object-cover"
-                          unoptimized
                         />
                       )}
                     </div>
@@ -199,7 +198,6 @@ export default function BrandAnalysis({ data }: Props) {
                           alt={`${center.title} detail`}
                           fill
                           className="object-cover"
-                          unoptimized
                         />
                       )}
                     </div>
@@ -318,7 +316,6 @@ export default function BrandAnalysis({ data }: Props) {
                             alt={center.title}
                             fill
                             className="object-cover"
-                            unoptimized
                           />
                         )}
                       </div>
@@ -350,7 +347,6 @@ export default function BrandAnalysis({ data }: Props) {
                             alt={`${center.title} detail`}
                             fill
                             className="object-cover"
-                            unoptimized
                           />
                         )}
                       </div>

@@ -355,13 +355,22 @@ const MobileProductCarousel = ({
   useEffect(() => {
     if (!api || !products || products.length === 0) return;
 
-    const autoplay = api?.plugins()?.autoplay;
-    if (autoplay && typeof autoplay.play === 'function') {
-      if (isVisible) {
-        autoplay.play();
-      } else {
-        autoplay.stop();
+    try {
+      const autoplay = api?.plugins()?.autoplay;
+      if (autoplay && typeof autoplay.play === 'function' && typeof autoplay.stop === 'function') {
+        // Check if carousel has slides before playing
+        const slideCount = api.scrollSnapList()?.length || 0;
+        if (slideCount > 0) {
+          if (isVisible) {
+            autoplay.play();
+          } else {
+            autoplay.stop();
+          }
+        }
       }
+    } catch (error) {
+      // Silently ignore autoplay errors
+      console.warn('Autoplay error:', error);
     }
   }, [api, isVisible, products]);
 
