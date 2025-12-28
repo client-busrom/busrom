@@ -85,7 +85,8 @@
       "Bash(AWS_DEFAULT_REGION=us-east-1 aws ecs list-services:*)",
       "Bash(AWS_DEFAULT_REGION=us-east-1 aws ecs list-tasks:*)",
       "Bash(AWS_DEFAULT_REGION=us-east-1 aws ecs execute-command:*)",
-      "Bash(AWS_DEFAULT_REGION=us-east-1 aws ecs describe-tasks:*)"
+      "Bash(AWS_DEFAULT_REGION=us-east-1 aws ecs describe-tasks:*)",
+      "Bash(AWS_DEFAULT_REGION=us-east-1 aws ecs:*)"
     ],
     "deny": [],
     "ask": []
