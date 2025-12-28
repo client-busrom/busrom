@@ -241,8 +241,8 @@ const nextConfig = {
         : "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
       // Styles: self + inline (Tailwind/styled-jsx 需要)
       "style-src 'self' 'unsafe-inline'",
-      // Images: self + data + blob + CDN
-      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net http://localhost:*",
+      // Images: self + data + blob + CDN + unpkg (Globe textures)
+      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net https://unpkg.com http://localhost:*",
       // Fonts: self + CDN
       "font-src 'self' https://cdn.jsdelivr.net",
       // Connect: self + API + CDN + Cloudflare Turnstile + jsdelivr (Three.js fonts) + WebSocket (HMR)
