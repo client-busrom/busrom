@@ -586,30 +586,56 @@ export default buildConfig({
     // Skip initialization if database tables don't exist yet
     // This happens on first deployment when push:true hasn't run yet
     try {
-      // Step 0: Fix sphere_3d table if it has incorrect structure
-      // This is a one-time fix for tables created manually with wrong schema
+      // Step 0: Ensure sphere_3d table exists with correct structure
+      // This handles cases where the table is missing from synced databases
       try {
         const db = payload.db as any
         if (db?.drizzle) {
-          const result = await db.drizzle.execute(`
-            SELECT column_name FROM information_schema.columns
-            WHERE table_name = 'sphere_3d' AND column_name = 'description'
-          `)
-
-          // If sphere_3d exists but doesn't have description column, drop and let Payload recreate
+          // Check if sphere_3d table exists
           const checkTable = await db.drizzle.execute(`
             SELECT 1 FROM information_schema.tables WHERE table_name = 'sphere_3d'
           `)
 
-          if (checkTable.rows?.length > 0 && (!result.rows || result.rows.length === 0)) {
-            payload.logger.info('🔧 Fixing sphere_3d table structure...')
-            await db.drizzle.execute(`DROP TABLE IF EXISTS sphere_3d_locales CASCADE`)
-            await db.drizzle.execute(`DROP TABLE IF EXISTS sphere_3d CASCADE`)
-            payload.logger.info('✅ sphere_3d tables dropped. Payload will recreate them.')
+          if (!checkTable.rows || checkTable.rows.length === 0) {
+            // Table doesn't exist - create it
+            payload.logger.info('🔧 Creating missing sphere_3d tables...')
+            await db.drizzle.execute(`
+              CREATE TABLE IF NOT EXISTS sphere_3d (
+                id SERIAL PRIMARY KEY,
+                status VARCHAR(255) DEFAULT 'draft',
+                updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+              )
+            `)
+            await db.drizzle.execute(`
+              CREATE TABLE IF NOT EXISTS sphere_3d_locales (
+                id SERIAL PRIMARY KEY,
+                _parent_id INTEGER REFERENCES sphere_3d(id) ON DELETE CASCADE,
+                _locale VARCHAR(255) NOT NULL,
+                title TEXT,
+                description TEXT,
+                UNIQUE(_parent_id, _locale)
+              )
+            `)
+            payload.logger.info('✅ sphere_3d tables created successfully.')
+          } else {
+            // Table exists - check if it has description column (for old schema fix)
+            const result = await db.drizzle.execute(`
+              SELECT column_name FROM information_schema.columns
+              WHERE table_name = 'sphere_3d' AND column_name = 'description'
+            `)
+
+            // If sphere_3d exists in main table (old schema), drop and recreate with locales
+            if (result.rows && result.rows.length > 0) {
+              payload.logger.info('🔧 Fixing sphere_3d table structure (migrating to locales)...')
+              await db.drizzle.execute(`DROP TABLE IF EXISTS sphere_3d_locales CASCADE`)
+              await db.drizzle.execute(`DROP TABLE IF EXISTS sphere_3d CASCADE`)
+              payload.logger.info('✅ sphere_3d tables dropped. Payload will recreate them.')
+            }
           }
         }
       } catch (fixError: any) {
-        payload.logger.warn(`⚠️ sphere_3d fix check: ${fixError.message}`)
+        payload.logger.warn(`⚠️ sphere_3d table check: ${fixError.message}`)
       }
 
       // Step 1: Seed permissions and roles (idempotent - only creates if not exists)

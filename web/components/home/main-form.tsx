@@ -61,8 +61,21 @@ const formButtonClasses = `
 // ------------------------------------------------------------------
 // MainForm 组件
 // ------------------------------------------------------------------
+// 表单字段配置类型
+interface FormField {
+  fieldName: string;
+  label: string;
+  placeholder?: string;
+  fieldType: 'text' | 'email' | 'phone' | 'textarea' | 'select' | 'checkbox' | 'radio' | 'number' | 'date' | 'file';
+  required?: boolean;
+  width?: 'full' | 'half' | 'third';
+  order?: number;
+  options?: { value: string; label: string }[];
+}
+
 // 表单配置类型
 interface FormConfig {
+  fields?: FormField[];
   submitButtonText: string;
   submittingText: string;
   successMessage: string;
@@ -90,6 +103,39 @@ export default function MainForm({ data, locale = "en" }: Props) {
 
   // 表单配置 (从 FormConfig API 获取)
   const [formConfig, setFormConfig] = useState<FormConfig | null>(null);
+
+  // 获取字段 label - 优先使用 formConfig 中的配置
+  const getFieldLabel = (fieldName: string, fallbackLabel: string): string => {
+    if (formConfig?.fields) {
+      const field = formConfig.fields.find(f => f.fieldName === fieldName);
+      if (field?.label) {
+        return field.label;
+      }
+    }
+    return fallbackLabel;
+  };
+
+  // 获取字段 placeholder
+  const getFieldPlaceholder = (fieldName: string, fallbackPlaceholder?: string): string | undefined => {
+    if (formConfig?.fields) {
+      const field = formConfig.fields.find(f => f.fieldName === fieldName);
+      if (field?.placeholder) {
+        return field.placeholder;
+      }
+    }
+    return fallbackPlaceholder;
+  };
+
+  // 检查字段是否必填
+  const isFieldRequired = (fieldName: string, defaultRequired: boolean = false): boolean => {
+    if (formConfig?.fields) {
+      const field = formConfig.fields.find(f => f.fieldName === fieldName);
+      if (field !== undefined) {
+        return field.required ?? defaultRequired;
+      }
+    }
+    return defaultRequired;
+  };
   // Turnstile 配置 (从 SiteConfig 获取)
   const [turnstileConfig, setTurnstileConfig] = useState<TurnstileConfig | null>(null);
 
@@ -342,12 +388,12 @@ export default function MainForm({ data, locale = "en" }: Props) {
       data-header-theme="transparent"
     >
       <div className="container mx-auto px-4">
-        <div className="flex flex-col lg:flex-row gap-12 max-w-6xl mx-auto lg:items-center items-center">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 max-w-6xl mx-auto lg:items-center items-center">
           {/* 左侧 - 图片 */}
           <div
             ref={leftImageRef}
             className={cn(
-              "lg:w-[30%] w-[50%]",
+              "lg:w-[30%] w-[60%]",
               // lg 以下 (手机/平板) 淡入效果
               !isDesktop && "transition-opacity duration-700 ease-out",
               !isDesktop && (leftVisible ? "opacity-100" : "opacity-0")
@@ -377,16 +423,16 @@ export default function MainForm({ data, locale = "en" }: Props) {
               <Image src="/iPhoneFrame.svg" alt="iPhone Frame" fill className="object-cover z-20" />
             </div>
             {/* 3. 文字遮罩 (z-30) */}
-            <div className="w-full p-8 z-30 flex justify-center">
-              <p className="text-white text-center text-xl lg:text-xl text-stroke-black font-anaheim font-bold whitespace-nowrap lg:whitespace-normal">{data.designTextLeft}</p>
+            <div className="w-full p-4 lg:p-8 z-30 flex justify-center">
+              <p className="text-white text-center text-base lg:text-xl text-stroke-black font-anaheim font-bold">{data.designTextLeft}</p>
             </div>
           </div>
 
           {/* 中间 - 表单 */}
           {/* 宽度 477/1920 ≈ 24.8%, 但需要加上左右padding，实际容器更宽 */}
           <div
-            className="w-[80%] lg:w-auto"
-            style={{ width: "clamp(320px, 35vw, 560px)" }}
+            className="w-full lg:w-auto order-first lg:order-none"
+            style={{ width: isDesktop ? "clamp(320px, 35vw, 560px)" : "100%" }}
           >
             <div className={cardContainerClass}>
               {/* 提交成功状态 */}
@@ -410,7 +456,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
                       className={formLabelClasses}
                       style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
                     >
-                      {data.placeholderName} <span className="text-red-400">*</span>
+                      {getFieldLabel("name", data.placeholderName)} {isFieldRequired("name", true) && <span className="text-red-400">*</span>}
                     </Label>
                     <Input
                       type="text"
@@ -419,7 +465,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
                       onChange={(e) => handleInputChange("name", e.target.value)}
                       className={formInputClasses}
                       style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
-                      required
+                      required={isFieldRequired("name", true)}
                     />
                   </div>
                   {/* Email */}
@@ -429,7 +475,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
                       className={formLabelClasses}
                       style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
                     >
-                      {data.placeholderEmail} <span className="text-red-400">*</span>
+                      {getFieldLabel("email", data.placeholderEmail)} {isFieldRequired("email", true) && <span className="text-red-400">*</span>}
                     </Label>
                     <Input
                       type="email"
@@ -438,7 +484,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
                       onChange={(e) => handleInputChange("email", e.target.value)}
                       className={formInputClasses}
                       style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
-                      required
+                      required={isFieldRequired("email", true)}
                     />
                   </div>
                   {/* WhatsApp */}
@@ -448,7 +494,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
                       className={formLabelClasses}
                       style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
                     >
-                      {data.placeholderWhatsapp}
+                      {getFieldLabel("whatsapp", data.placeholderWhatsapp)} {isFieldRequired("whatsapp") && <span className="text-red-400">*</span>}
                     </Label>
                     <Input
                       type="tel"
@@ -457,6 +503,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
                       onChange={(e) => handleInputChange("whatsapp", e.target.value)}
                       className={formInputClasses}
                       style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
+                      required={isFieldRequired("whatsapp")}
                     />
                   </div>
                   {/* Company */}
@@ -466,7 +513,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
                       className={formLabelClasses}
                       style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
                     >
-                      {data.placeholderCompany}
+                      {getFieldLabel("company", data.placeholderCompany)} {isFieldRequired("company") && <span className="text-red-400">*</span>}
                     </Label>
                     <Input
                       type="text"
@@ -475,6 +522,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
                       onChange={(e) => handleInputChange("company", e.target.value)}
                       className={formInputClasses}
                       style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
+                      required={isFieldRequired("company")}
                     />
                   </div>
                   {/* Message */}
@@ -484,7 +532,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
                       className={formLabelClasses}
                       style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
                     >
-                      {data.placeholderMessage}
+                      {getFieldLabel("message", data.placeholderMessage)} {isFieldRequired("message") && <span className="text-red-400">*</span>}
                     </Label>
                     <Textarea
                       id="message"
@@ -492,6 +540,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
                       onChange={(e) => handleInputChange("message", e.target.value)}
                       className={cn(formInputClasses, "min-h-[40px]")}
                       style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
+                      required={isFieldRequired("message")}
                     />
                   </div>
 
@@ -541,7 +590,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
           <div
             ref={rightImageRef}
             className={cn(
-              "lg:w-[30%] w-[50%]",
+              "lg:w-[30%] w-[60%]",
               // lg 以下 (手机/平板) 淡入效果
               !isDesktop && "transition-opacity duration-700 ease-out delay-150",
               !isDesktop && (rightVisible ? "opacity-100" : "opacity-0")
@@ -554,10 +603,10 @@ export default function MainForm({ data, locale = "en" }: Props) {
             }
           >
             {/* 3. 文字遮罩 (z-30) */}
-            <div className="relative w-full p-8 z-30 flex justify-center">
-              <p className="text-white text-center text-xl lg:text-xl text-stroke-black font-anaheim font-bold whitespace-nowrap lg:whitespace-normal">{data.designTextRight}</p>
+            <div className="w-full p-4 lg:p-8 z-30 flex justify-center">
+              <p className="text-white text-center text-base lg:text-xl text-stroke-black font-anaheim font-bold">{data.designTextRight}</p>
             </div>
-            <div className={cn(imageCardContainerClass, "bottom-0")}>
+            <div className={imageCardContainerClass}>
               {/* 1. 底层内容图片 (z-10) */}
               <div
                 className="absolute overflow-hidden lg:rounded-[48px] md:rounded-[54px] sm:rounded-[30px] rounded-[24px] z-10"

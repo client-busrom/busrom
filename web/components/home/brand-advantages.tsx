@@ -6,62 +6,54 @@ import Image from "next/image";
 import type { HomeContent } from "@/lib/content-data";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Component, Cpu, EyeOff, Factory, Gauge, HelpCircle, LucideIcon, ShieldCheck, Sparkles, Target, Waves } from "lucide-react";
 
 type Props = {
   data: HomeContent["brandAdvantages"];
 };
 
-const SECTION_HEIGHT = 3000;
+const SECTION_HEIGHT = 2000;
 const REVEAL_START_OFFSET = 100;
 const HIDE_OFFSET = 400;
 
-// 设计稿基准尺寸
+// 设计稿基准尺寸 - 基于视口高度 (100vh ≈ 1080px)
 const DESIGN_WIDTH = 1920;
-const DESIGN_HEIGHT = 1382;
+const DESIGN_HEIGHT = 1080; // 视口高度
 
-// 从设计稿提取的精确位置（相对于组件左上角的坐标）
-// 按照设计稿中的 9 个 advantage items，上方的往上调整
+// 从设计稿提取的精确位置
+// Figma 原始坐标 (基于1382高度的设计)，缩放到1080视口
+// Figma Group 161 高度=1382, 缩放系数 = 1080/1382 = 0.7814
+// Busrom 在 Figma 中 y=204 (相对于 section top), 缩放后 = 159
+// 将 Busrom 放在视口中心偏上位置 (约 35% = 378)
+// 偏移量 = 378 - 159 = 219
+
+// 各 item 原始相对位置 (相对于 section top) + 缩放 + 偏移
 const ADVANTAGE_POSITIONS_DESIGN = [
-  // 0: Group 103 - 上中 (Sparkles)
-  { x: 831, y: 320 },
-  // 1: Group 111 - 左上
-  { x: 311, y: 380 },
-  // 2: Group 104 - 右上
-  { x: 1232, y: 390 },
-  // 3: Group 105 - 右中 (Gauge)
-  { x: 1565, y: 600 },
-  // 4: Group 110 - 左中 (Waves)
-  { x: 43, y: 640 },
-  // 5: Group 106 - 右下
-  { x: 1502, y: 925 },
-  // 6: Group 109 - 左下
-  { x: 196, y: 958 },
-  // 7: Group 107 - 下右 (Factory)
-  { x: 1053, y: 1054 },
-  // 8: Group 108 - 下中
-  { x: 590, y: 1081 },
+  // 0: 左上
+  { x: 311, y: 70 },
+  // 1: 上中
+  { x: 831, y: 0 },
+  // 2: 右上
+  { x: 1232, y: 85 },
+  // 3: 左中
+  { x: 43, y: 350 },
+  // 4: 左下
+  { x: 196, y: 580 },
+  // 5: 下中
+  { x: 590, y: 750 },
+  // 6: 下右
+  { x: 1053, y: 700 },
+  // 7: 右中
+  { x: 1565, y: 320 },
+  // 8: 右下
+  { x: 1502, y: 550 },
 ];
 
-// "Busrom" 标题位置：y=658 (相对于组件), 字体大小 300px -> 按比例缩小
-const TITLE_Y = 658;
-const TITLE_FONT_SIZE = 200; // 缩小标题
+// "Busrom" 标题位置 - 视口中心偏上
+const TITLE_Y = 378;
+const TITLE_FONT_SIZE = 300;
 
 // 图标圆圈尺寸
 const ICON_SIZE = 66;
-
-const iconMap: { [key: string]: LucideIcon } = {
-  Sparkles,
-  Target,
-  Component,
-  ShieldCheck,
-  Gauge,
-  EyeOff,
-  Waves,
-  Cpu,
-  Factory,
-  default: HelpCircle,
-};
 
 export default function BrandAdvantages({ data }: Props) {
   const isMobile = useIsMobile(); // ⬅️ 引入移动端判断
@@ -172,7 +164,7 @@ export default function BrandAdvantages({ data }: Props) {
       {data.image?.url && (
         <OptimizedBackgroundImage
           image={data.image}
-          size="medium"
+          size="xlarge"
           className="absolute inset-0 z-0"
         />
       )}
@@ -205,29 +197,30 @@ export default function BrandAdvantages({ data }: Props) {
           {/* ==================== 移动端布局 ==================== */}
           <div className="lg:hidden h-full flex flex-col justify-center items-center px-6 py-8">
             {/* 移动端标题 */}
-            <h1 className="text-center font-pingfang font-semibold text-white text-4xl mb-8">
+            <h1 className="text-center font-pingfang font-semibold text-white text-7xl mb-8">
               Busrom
             </h1>
 
             {/* 移动端 advantages 列表 - 两列网格 */}
             <ul className="grid grid-cols-2 gap-4 w-full max-w-md">
               {data.advantages.map((advantage, index) => {
-                const iconName = data.icons[index];
-                const IconComponent = iconMap[iconName] || iconMap.default;
+                const iconIndex = index + 1;
                 return (
                   <li
                     key={advantage}
                     className="flex items-center gap-2 p-2"
                   >
-                    <div className="w-10 h-10 rounded-full border border-white flex items-center justify-center flex-shrink-0">
-                      <IconComponent
-                        className="w-5 h-5"
-                        stroke="#FFFFFF"
-                        strokeWidth={1.5}
+                    <div className="w-10 h-10 flex-shrink-0">
+                      <Image
+                        src={`/brand-adv-${iconIndex}.svg`}
+                        alt={`Advantage ${iconIndex}`}
+                        width={40}
+                        height={40}
+                        className="w-full h-full"
                       />
                     </div>
-                    <span className="font-anaheim text-white text-xs leading-tight">
-                      {advantage}
+                    <span className="font-anaheim text-white text-xs leading-tight whitespace-pre-line">
+                      {advantage.replace(/\\n|\/n/g, '\n')}
                     </span>
                   </li>
                 );
@@ -257,8 +250,7 @@ export default function BrandAdvantages({ data }: Props) {
             {/* Advantages 按设计稿位置分布 */}
             {data.advantages.map((advantage, index) => {
               const pos = ADVANTAGE_POSITIONS_DESIGN[index % ADVANTAGE_POSITIONS_DESIGN.length];
-              const iconName = data.icons[index];
-              const IconComponent = iconMap[iconName] || iconMap.default;
+              const iconIndex = index + 1; // SVG 文件从 1 开始编号
 
               return (
                 <div
@@ -269,30 +261,31 @@ export default function BrandAdvantages({ data }: Props) {
                     top: `${(pos.y / DESIGN_HEIGHT) * 100}%`,
                   }}
                 >
-                  {/* 圆形图标容器 */}
+                  {/* SVG 图标 */}
                   <div
-                    className="rounded-full border border-white flex items-center justify-center flex-shrink-0"
+                    className="flex-shrink-0"
                     style={{
                       width: `${(ICON_SIZE / DESIGN_WIDTH) * 100}vw`,
                       height: `${(ICON_SIZE / DESIGN_WIDTH) * 100}vw`,
                     }}
                   >
-                    <IconComponent
-                      className="w-1/2 h-1/2"
-                      stroke="#FFFFFF"
-                      strokeWidth={1.5}
+                    <Image
+                      src={`/brand-adv-${iconIndex}.svg`}
+                      alt={`Advantage ${iconIndex}`}
+                      width={ICON_SIZE}
+                      height={ICON_SIZE}
+                      className="w-full h-full"
                     />
                   </div>
-                  {/* 文字 - 允许换行 */}
+                  {/* 文字 - 支持 \n 和 /n 换行 */}
                   <span
-                    className="font-anaheim text-white"
+                    className="font-anaheim text-white whitespace-pre-line"
                     style={{
                       fontSize: `${(18 / DESIGN_WIDTH) * 100}vw`,
-                      maxWidth: `${(180 / DESIGN_WIDTH) * 100}vw`,
                       lineHeight: 1.3,
                     }}
                   >
-                    {advantage}
+                    {advantage.replace(/\\n|\/n/g, '\n')}
                   </span>
                 </div>
               );

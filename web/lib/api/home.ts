@@ -319,6 +319,7 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
       whyChooseBusrom: whyChooseBusrom || defaultWhyChooseBusrom,
       caseStudies: data.caseStudies || defaultCaseStudies,
       brandAnalysis: data.brandAnalysis ? {
+        backgroundImage: data.brandAnalysis.backgroundImage ? toImageObject(data.brandAnalysis.backgroundImage, 'Brand Analysis Background') : null,
         centers: (data.brandAnalysis.centers || []).map((center: any) => {
           const largeImg = toImageObject(center.largeImage, center.title)
           const smallImg = toImageObject(center.smallImage, center.title)

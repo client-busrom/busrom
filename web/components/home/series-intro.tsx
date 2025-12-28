@@ -255,33 +255,58 @@ export default function SeriesIntro({ data }: Props) {
                 )}
               </div>
 
-              {/* 右侧: 系列列表轮播 */}
-              <div className="w-80 flex-shrink-0">
-                <div className="h-64 overflow-hidden relative">
-                  <div className="flex flex-col absolute w-full top-0 left-0">
-                    {renderWindow.map((item, idx) => (
-                      <button
-                        key={`${item.title}-${idx}`}
-                        className="w-full text-left py-3 transition-all duration-300 h-12"
-                        style={{ opacity: getOpacity(item.distanceFromFocus) }}
-                        onClick={() => {
-                          setActiveSeriesIndex(item.originalIndex);
-                          setActiveImageIndex(0);
-                        }}
-                      >
-                        <span
-                          className={cn(
-                            "text-lg font-anaheim font-bold transition-colors duration-300",
-                            item.isCurrent
-                              ? "text-brand-cream"
-                              : "text-brand-cream/70 hover:text-brand-cream"
-                          )}
+              {/* 右侧: 系列列表轮播 + 上下切换按钮 */}
+              <div className="w-80 flex-shrink-0 flex gap-4">
+                {/* 系列列表 */}
+                <div className="flex-1">
+                  <div className="h-64 overflow-hidden relative">
+                    <div className="flex flex-col absolute w-full top-0 left-0">
+                      {renderWindow.map((item, idx) => (
+                        <button
+                          key={`${item.title}-${idx}`}
+                          className="w-full text-left py-3 transition-all duration-300 h-12"
+                          style={{ opacity: getOpacity(item.distanceFromFocus) }}
+                          onClick={() => {
+                            setActiveSeriesIndex(item.originalIndex);
+                            setActiveImageIndex(0);
+                          }}
                         >
-                          {item.title}
-                        </span>
-                      </button>
-                    ))}
+                          <span
+                            className={cn(
+                              "text-lg font-anaheim font-bold transition-colors duration-300",
+                              item.isCurrent
+                                ? "text-brand-cream"
+                                : "text-brand-cream/70 hover:text-brand-cream"
+                            )}
+                          >
+                            {item.title}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
+                </div>
+
+                {/* 上下切换按钮 - 切换系列 */}
+                <div className="flex flex-col gap-3 justify-center">
+                  <button
+                    onClick={handleSeriesPrev}
+                    className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                    aria-label="Previous series"
+                  >
+                    <svg className="w-5 h-5 text-brand-cream" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={handleSeriesNext}
+                    className="w-12 h-12 rounded-full bg-white flex items-center justify-center transition-colors hover:bg-white/90"
+                    aria-label="Next series"
+                  >
+                    <svg className="w-5 h-5 text-brand-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
                 </div>
               </div>
             </div>
@@ -300,21 +325,21 @@ export default function SeriesIntro({ data }: Props) {
                   </span>
                 </div>
 
-                {/* 切换按钮 - 横向排列 */}
+                {/* 切换按钮 - 横向排列 - 切换图片 */}
                 <div className="flex gap-3 justify-center">
                   <button
-                    onClick={handleSeriesPrev}
+                    onClick={handleImagePrev}
                     className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
-                    aria-label="Previous series"
+                    aria-label="Previous image"
                   >
                     <svg className="w-5 h-5 text-brand-cream" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                   </button>
                   <button
-                    onClick={handleSeriesNext}
+                    onClick={handleImageNext}
                     className="w-12 h-12 rounded-full bg-white flex items-center justify-center transition-colors hover:bg-white/90"
-                    aria-label="Next series"
+                    aria-label="Next image"
                   >
                     <svg className="w-5 h-5 text-brand-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

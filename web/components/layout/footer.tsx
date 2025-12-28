@@ -282,63 +282,50 @@ export default function Footer({ locale, showForm = true }: Props) {
           aria-hidden="true"
         />
 
-        {/* 卡片容器 - Figma: 1860x924 at 1920px */}
+        {/* 卡片容器 - lg以上固定宽度居中，不随屏幕放大 */}
         <div
           className="
             relative z-10 bg-brand-secondary
-            w-[92%] sm:w-[88%] md:w-[90%] lg:w-[92%] xl:w-[97%]
+            w-[92%] sm:w-[88%] md:w-[90%] lg:w-[820px] xl:w-[1000px] 2xl:w-[1200px]
             mx-auto
             mt-[280px] sm:mt-[320px] md:mt-[380px] lg:mt-[200px] xl:mt-[100px] 2xl:mt-0
-            mb-8 md:mb-12 lg:mb-[calc(var(--rpx)*157)]
-            p-6 sm:p-8 md:p-10 lg:py-[calc(var(--rpx)*112)] lg:px-[calc(var(--rpx)*130)]
-            rounded-[40px] sm:rounded-[50px] md:rounded-[60px] lg:rounded-[calc(var(--rpx)*84)]
+            mb-8 md:mb-12 lg:mb-20
+            p-6 sm:p-8 md:p-10 lg:py-16 lg:px-16 xl:py-20 xl:px-20
+            rounded-[40px] sm:rounded-[50px] md:rounded-[60px] lg:rounded-[60px]
           "
-          style={{
-            maxWidth: '1860px', // Figma: 1860px width
-          }}
         >
           {/* 使用 Flex 布局 + 垂直分隔线 */}
           <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-between lg:gap-8 xl:gap-12">
 
-            {/* 左侧 - Figma: 宽度约 732px, 竖线在 x=1129 */}
-            <div className="w-full lg:w-[50%] xl:w-[45%] lg:max-w-[calc(var(--rpx)*800)]">
-              {/* Logo - Figma: 345x90 */}
-              <div style={{ marginBottom: 'calc(var(--rpx) * 55)' }}>
+            {/* 左侧 */}
+            <div className="w-full lg:w-[55%]">
+              {/* Logo */}
+              <div className="mb-4 lg:mb-6">
                 <Image
                   src="/Busrom2.svg"
                   alt="Busrom Logo"
                   width={345}
                   height={90}
-                  className="object-contain"
-                  style={{ width: 'calc(var(--rpx) * 345)', height: 'auto' }}
+                  className="object-contain w-[140px] lg:w-[160px] xl:w-[180px] h-auto"
                 />
               </div>
 
-              {/* 联系信息 - Figma: 32px, 行高 61px, 宽度 732px */}
-              <ul
-                className="font-anaheim font-medium text-brand-text-inverse text-base md:text-xl lg:text-2xl xl:text-[32px] w-full lg:max-w-[calc(var(--rpx)*732)] space-y-2 md:space-y-3 lg:space-y-0 leading-relaxed lg:leading-[calc(var(--rpx)*61)] mb-6 md:mb-8 lg:mb-[calc(var(--rpx)*55)]"
-              >
+              {/* 联系信息 */}
+              <ul className="font-anaheim font-medium text-brand-text-inverse text-sm md:text-base lg:text-lg space-y-0.5 md:space-y-1 leading-relaxed mb-4 md:mb-6">
                 <li>Email: {content.contact.email}</li>
                 <li>After-sales: {content.contact.afterSales}</li>
                 <li>WhatsApp: {content.contact.whatsapp}</li>
               </ul>
 
-              {/* 官方声明 - Figma: 732x360, title 28px, content 20px 行高 26px */}
-              <div
-                className="bg-brand-footer-emphasis-bg text-brand-footer-emphasis-text font-anaheim font-semibold w-full lg:max-w-[calc(var(--rpx)*732)] p-4 md:p-6 lg:py-[calc(var(--rpx)*26)] lg:px-[calc(var(--rpx)*40)]"
-              >
-                <h4
-                  className="font-bold text-lg md:text-xl lg:text-2xl xl:text-[28px]"
-                  style={{ lineHeight: 'calc(var(--rpx) * 49)', marginBottom: 'calc(var(--rpx) * 20)' }}
-                >
+              {/* 官方声明 */}
+              <div className="bg-brand-footer-emphasis-bg text-brand-footer-emphasis-text font-anaheim font-semibold p-3 md:p-4">
+                <h4 className="font-bold text-base md:text-lg lg:text-xl leading-normal mb-2 lg:mb-3">
                   {content.notice.title}
                 </h4>
-                <ul className="text-sm md:text-base lg:text-lg xl:text-[20px] leading-relaxed lg:leading-[1.6] space-y-3 md:space-y-4 lg:space-y-5">
+                <ul className="text-xs md:text-sm lg:text-base leading-relaxed space-y-2 md:space-y-3">
                   {content.notice.lines.map((line, index) => (
-                    <li key={index} className="flex items-start gap-3 lg:gap-4">
-                      <span
-                        className="rounded-full bg-current flex-shrink-0 w-1.5 h-1.5 md:w-2 md:h-2 mt-2 md:mt-2.5 lg:mt-3"
-                      ></span>
+                    <li key={index} className="flex items-start gap-2">
+                      <span className="rounded-full bg-current flex-shrink-0 w-1 h-1 md:w-1.5 md:h-1.5 mt-1.5 md:mt-2"></span>
                       <span>{line}</span>
                     </li>
                   ))}
@@ -346,27 +333,23 @@ export default function Footer({ locale, showForm = true }: Props) {
               </div>
             </div>
 
-            {/* 垂直分隔线 - Figma: 1px x 669px, 颜色 #E3DEBB */}
-            <div className="hidden lg:block w-px self-stretch" style={{ backgroundColor: '#E3DEBB', minHeight: 'calc(var(--rpx) * 669)' }}></div>
+            {/* 垂直分隔线 */}
+            <div className="hidden lg:block w-px self-stretch bg-[#E3DEBB]"></div>
 
             {/* 水平分隔线 - 仅移动端显示 */}
             <div className="lg:hidden w-full h-px bg-white/30 my-6"></div>
 
-            {/* 右侧：占 38% - 表单 */}
-            <div className="w-full lg:w-[38%]">
-              {/* Figma: 80px at 1920px, 双层文字叠加 - 底层描边偏移5px，顶层填充 */}
-              {/* 标题到表单间距: 201px (20104 - 19903) */}
-              <h3
-                className="relative font-bold font-anaheim text-4xl md:text-5xl lg:text-6xl xl:text-[80px] xl:leading-[49px]"
-                style={{ marginBottom: 'calc(var(--rpx) * 100)' }}
-              >
-                {/* 底层：白色描边，向右下偏移5px */}
+            {/* 右侧：表单 */}
+            <div className="w-full lg:w-[40%]">
+              {/* 标题 - 双层文字叠加效果 */}
+              <h3 className="relative font-bold font-anaheim text-4xl md:text-5xl lg:text-5xl xl:text-6xl mb-8 lg:mb-12">
+                {/* 底层：白色描边，向右下偏移2px */}
                 <span
                   className="absolute text-transparent"
                   style={{
                     WebkitTextStroke: '1px white',
-                    top: '5px',
-                    left: '5px',
+                    top: '2px',
+                    left: '2px',
                   }}
                 >
                   {content.form.title}
@@ -377,8 +360,8 @@ export default function Footer({ locale, showForm = true }: Props) {
                 </span>
               </h3>
 
-              <form className="flex flex-col" style={{ gap: 'calc(var(--rpx) * 65)' }} onSubmit={handleSubmit}>
-                {/* Name - Figma: 32px at 1920px */}
+              <form className="flex flex-col gap-6 lg:gap-8" onSubmit={handleSubmit}>
+                {/* Name */}
                 <div>
                   <Input
                     type="text"
@@ -386,8 +369,7 @@ export default function Footer({ locale, showForm = true }: Props) {
                     placeholder={content.form.placeholders.name}
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className={cn(formInputClasses, "text-base md:text-xl lg:text-2xl xl:text-[32px]")}
-                    style={{ lineHeight: 'calc(var(--rpx) * 46)' }}
+                    className={cn(formInputClasses, "text-base md:text-lg lg:text-xl xl:text-2xl")}
                     disabled={isSubmitting}
                   />
                 </div>
@@ -400,8 +382,7 @@ export default function Footer({ locale, showForm = true }: Props) {
                     placeholder={content.form.placeholders.email}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className={cn(formInputClasses, "text-base md:text-xl lg:text-2xl xl:text-[32px]")}
-                    style={{ lineHeight: 'calc(var(--rpx) * 46)' }}
+                    className={cn(formInputClasses, "text-base md:text-lg lg:text-xl xl:text-2xl")}
                     disabled={isSubmitting}
                   />
                 </div>
@@ -413,8 +394,7 @@ export default function Footer({ locale, showForm = true }: Props) {
                     placeholder={content.form.placeholders.message}
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className={cn(formInputClasses, "min-h-[60px] text-base md:text-xl lg:text-2xl xl:text-[32px]")}
-                    style={{ lineHeight: 'calc(var(--rpx) * 46)' }}
+                    className={cn(formInputClasses, "min-h-[60px] text-base md:text-lg lg:text-xl xl:text-2xl")}
                     disabled={isSubmitting}
                   />
                 </div>
@@ -439,21 +419,17 @@ export default function Footer({ locale, showForm = true }: Props) {
                   <div className="text-red-400 text-sm">{errorMessage}</div>
                 )}
 
-                {/* Submit Button - Figma: 331x67, 32px, 圆角 33.5px */}
-                <div className="mt-8 md:mt-10 lg:mt-12">
+                {/* Submit Button */}
+                <div className="mt-6 lg:mt-8">
                   <Button
                     type="submit"
                     className={cn(
                       formButtonClasses,
-                      "text-base md:text-xl lg:text-2xl xl:text-[32px] font-semibold",
-                      "px-8 md:px-12 lg:px-16",
-                      "h-12 md:h-14 lg:h-[calc(var(--rpx)*67)]",
-                      "rounded-full lg:rounded-[calc(var(--rpx)*33.5)]"
+                      "text-base md:text-lg lg:text-xl xl:text-2xl font-semibold",
+                      "px-8 md:px-10 lg:px-12",
+                      "h-12 md:h-14 lg:h-16",
+                      "rounded-full"
                     )}
-                    style={{
-                      minWidth: 'calc(var(--rpx) * 331)',
-                      lineHeight: 'calc(var(--rpx) * 46)',
-                    }}
                     disabled={isSubmitting}
                   >
                     {isSubmitting

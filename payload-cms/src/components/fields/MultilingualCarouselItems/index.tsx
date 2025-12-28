@@ -582,25 +582,27 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
 
                 <div className="field-row">
                   <MediaPicker
-                    path={`items.${activeLocale}.${index}.image`}
                     field={{
                       name: 'image',
                       label: t(i18n.productImage),
                       hasMany: false,
                       relationTo: 'media',
                     }}
+                    value={item.image as number | null}
+                    onChange={(newValue) => updateItem(index, 'image', newValue)}
                   />
                 </div>
 
                 <div className="field-row">
                   <MediaPicker
-                    path={`items.${activeLocale}.${index}.sceneImage`}
                     field={{
                       name: 'sceneImage',
                       label: t(i18n.sceneImage),
                       hasMany: false,
                       relationTo: 'media',
                     }}
+                    value={item.sceneImage as number | null}
+                    onChange={(newValue) => updateItem(index, 'sceneImage', newValue)}
                   />
                 </div>
               </div>

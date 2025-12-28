@@ -31,9 +31,58 @@ type ProductCardProps = {
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920;
+const DESIGN_HEIGHT = 1230;
 
-// 阶梯偏移量 (设计稿像素)
-const STEP_OFFSETS = [0, 40, 80]; // 左、中、右
+// 布局配置 - 基于 Figma JSON (已应用85%缩放)
+const LAYOUT = {
+  // 左右边距
+  paddingLeft: 160,
+  paddingRight: 160,
+
+  // 标题区域
+  header: {
+    subtitleY: 0,
+    titleY: 53,           // 62 * 0.85
+    titleFontSize: 82,    // 96 * 0.85
+    subtitleFontSize: 27, // 32 * 0.85
+  },
+
+  // 分类标签栏
+  tags: {
+    y: 145,               // 171 * 0.85
+    height: 68,           // 80 * 0.85
+    borderRadius: 34,     // 40 * 0.85
+    fontSize: 20,         // 24 * 0.85
+    gap: 26,              // 30 * 0.85
+  },
+
+  // 产品卡片
+  cards: {
+    startY: 239,          // 281 * 0.85
+    width: 385,           // 453 * 0.85
+    imageHeight: 468,     // 550 * 0.85
+    borderRadius: 26,     // 30 * 0.85
+    gap: 71,              // 83 * 0.85
+    stepOffsets: [0, 58, 114],  // [0, 68, 134] * 0.85
+    titleMarginTop: 34,   // 40 * 0.85
+    titleFontSize: 27,    // 32 * 0.85
+    featureFontSize: 24,  // 28 * 0.85
+    featureLineHeight: 42, // 49 * 0.85
+  },
+
+  // 右上角 "VIEW MORE"
+  viewMore: {
+    circleX: 1397,
+    circleY: 51,          // 60 * 0.85
+    circleSize: 60,       // 71 * 0.85
+    textX: 1427,
+    textY: 69,            // 81 * 0.85
+    fontSize: 27,         // 32 * 0.85
+  },
+
+  // 卡片网格最大宽度比例
+  gridMaxWidth: 85,       // 85%
+};
 
 // 走马灯配置
 const CAROUSEL_SPEED = 30; // 像素/秒
@@ -42,11 +91,14 @@ const CAROUSEL_ITEM_GAP = 16; // 间距
 // --- 产品卡片组件 ---
 const ProductCard = ({ product, index, isMobile = false, locale }: ProductCardProps) => {
   // 计算阶梯偏移 (仅桌面端)
-  const stepOffset = STEP_OFFSETS[index % 3];
+  const stepOffset = LAYOUT.cards.stepOffsets[index % 3];
   const [isHovered, setIsHovered] = useState(false);
 
   // 产品详情页链接
   const productHref = `/${locale}/shop/${product.slug}`;
+
+  // vw 转换函数
+  const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
 
   return (
     <Link
@@ -54,12 +106,10 @@ const ProductCard = ({ product, index, isMobile = false, locale }: ProductCardPr
       className={cn(
         "flex flex-col cursor-pointer",
         "transition-transform duration-500 ease-out",
-        // 桌面端有阶梯偏移和 hover 效果
         !isMobile && "origin-top"
       )}
       style={!isMobile ? {
-        // 桌面端：结合阶梯偏移和 hover 放大
-        transform: `translateY(${(stepOffset / DESIGN_WIDTH) * 100}vw) scale(${isHovered ? 1.05 : 1})`,
+        transform: `translateY(${vw(stepOffset)}) scale(${isHovered ? 1.03 : 1})`,
       } : undefined}
       onMouseEnter={() => !isMobile && setIsHovered(true)}
       onMouseLeave={() => !isMobile && setIsHovered(false)}
@@ -67,52 +117,74 @@ const ProductCard = ({ product, index, isMobile = false, locale }: ProductCardPr
       {/* 图片容器 */}
       <div
         className={cn(
-          "relative w-full rounded-xl overflow-hidden shadow-lg",
-          // 移动端: 固定尺寸; 桌面端: 按设计稿比例
-          isMobile
-            ? "aspect-[3/4] mb-3"
-            : "mb-4"
+          "relative w-full overflow-hidden shadow-lg bg-white",
+          isMobile ? "aspect-[3/4] mb-3 rounded-xl" : ""
         )}
         style={!isMobile ? {
-          // 设计稿卡片宽度约 380px，高度约 480px
-          aspectRatio: '380 / 480',
+          aspectRatio: `${LAYOUT.cards.width} / ${LAYOUT.cards.imageHeight}`,
+          borderRadius: vw(LAYOUT.cards.borderRadius),
         } : undefined}
       >
         <OptimizedImage
           image={product.image}
           alt={product.image?.altText || product.title}
-          size="small"
-          className="object-cover absolute inset-0 w-full h-full"
+          size="medium"
+          objectFit="contain"
+          className="absolute inset-0 w-full h-full"
         />
       </div>
 
       {/* 文本内容 */}
-      <div className={cn(isMobile ? "px-1" : "px-2")}>
-        <h3 className={cn(
-          "font-anaheim font-extrabold text-brand-text-black",
-          isMobile ? "text-base mb-1" : "text-lg mb-2"
-        )}>
+      <div
+        className={cn(isMobile ? "px-1" : "")}
+        style={!isMobile ? {
+          paddingLeft: vw(47),  // 246 - 199 = 47
+          marginTop: vw(LAYOUT.cards.titleMarginTop),
+        } : undefined}
+      >
+        <h3
+          className={cn(
+            "font-semibold text-brand-text-black",
+            isMobile ? "text-base mb-1 font-anaheim" : ""
+          )}
+          style={!isMobile ? {
+            fontSize: vw(LAYOUT.cards.titleFontSize),
+            marginBottom: vw(34),  // 942 - 871 - 57 ≈ 间距
+          } : undefined}
+        >
           {product.title}
         </h3>
         {/* 特点列表 */}
-        <ul className={cn(
-          "space-y-1 text-brand-text-main",
-          isMobile ? "text-xs" : "text-sm"
-        )}>
+        <ul
+          className={cn(
+            "text-brand-text-main",
+            isMobile ? "space-y-1 text-xs" : ""
+          )}
+          style={!isMobile ? {
+            fontSize: vw(LAYOUT.cards.featureFontSize),
+            lineHeight: vw(LAYOUT.cards.featureLineHeight),
+          } : undefined}
+        >
           {product.features.map((feature, idx) => (
             <li key={idx} className="flex items-start">
               <svg
                 className={cn(
-                  "text-brand-secondary flex-shrink-0 mt-0.5",
-                  isMobile ? "w-3 h-3 mr-1.5" : "w-4 h-4 mr-2"
+                  "text-brand-secondary flex-shrink-0",
+                  isMobile ? "w-3 h-3 mr-1.5 mt-0.5" : ""
                 )}
+                style={!isMobile ? {
+                  width: vw(32),
+                  height: vw(32),
+                  marginRight: vw(27),
+                  marginTop: vw(6),
+                } : undefined}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
               </svg>
-              <span className="leading-tight">{feature}</span>
+              <span>{feature}</span>
             </li>
           ))}
         </ul>
@@ -137,17 +209,29 @@ const SeriesCarousel = ({
   onMouseEnter: () => void;
   onMouseLeave: () => void;
 }) => {
+  // vw 转换函数
+  const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
+
   const renderItems = (keyPrefix: string) => (
     series.map((s, index) => (
       <button
         key={`${keyPrefix}-${s.seriesTitle}`}
         onClick={() => onSelect(index)}
         className={cn(
-          "px-5 py-2 whitespace-nowrap rounded-full text-sm transition-colors duration-300 flex-shrink-0",
+          "whitespace-nowrap transition-colors duration-300 flex-shrink-0 flex items-center justify-center font-pingfang font-semibold",
           index === activeIndex
             ? "bg-brand-secondary text-white shadow-md"
-            : "bg-white/80 border border-brand-text-black/10 text-brand-text-black hover:bg-brand-secondary/10 hover:border-brand-secondary/30"
+            : "bg-[#f6f4ed] border border-brand-text-black/10 hover:bg-brand-secondary/10 hover:border-brand-secondary/30"
         )}
+        style={{
+          height: vw(LAYOUT.tags.height),
+          borderRadius: vw(LAYOUT.tags.borderRadius),
+          fontSize: vw(LAYOUT.tags.fontSize),
+          paddingLeft: vw(40),
+          paddingRight: vw(40),
+          letterSpacing: '0.02em',
+          color: index === activeIndex ? '#FFFFFF' : '#756F3F',
+        }}
       >
         {s.seriesTitle}
       </button>
@@ -156,19 +240,24 @@ const SeriesCarousel = ({
 
   return (
     <div
-      className="relative overflow-hidden py-2"
+      className="relative overflow-hidden"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      style={{
+        paddingTop: vw(10),
+        paddingBottom: vw(10),
+      }}
     >
       {/* 左右渐变遮罩 */}
       <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-brand-main to-transparent z-10 pointer-events-none" />
       <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-brand-main to-transparent z-10 pointer-events-none" />
 
       <div
-        className="flex gap-4 animate-carousel-desktop"
+        className="flex animate-carousel-desktop"
         style={{
           width: 'max-content',
-          animationPlayState: isPaused ? 'paused' : 'running'
+          animationPlayState: isPaused ? 'paused' : 'running',
+          gap: vw(LAYOUT.tags.gap),
         }}
       >
         {renderItems('first')}
@@ -266,7 +355,7 @@ const MobileProductCarousel = ({
   useEffect(() => {
     if (!api || !products || products.length === 0) return;
 
-    const autoplay = autoplayPlugin.current;
+    const autoplay = api?.plugins()?.autoplay;
     if (autoplay && typeof autoplay.play === 'function') {
       if (isVisible) {
         autoplay.play();
@@ -383,16 +472,19 @@ export default function FeaturedProducts({ data, locale }: Props) {
     return null;
   }
 
+  // vw 转换函数
+  const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
+
   return (
-    <section ref={sectionRef} className="py-12 lg:py-20 bg-brand-main" data-header-theme="light">
-      <div className="container mx-auto px-4 lg:px-8">
+    <section ref={sectionRef} className="py-12 lg:py-0 bg-brand-main" data-header-theme="light">
+      <div className="container mx-auto px-4 lg:px-0" style={{ maxWidth: '100%' }}>
 
         {/* ==================== 移动端布局 ==================== */}
         <div className="lg:hidden">
           {/* 标题区 */}
           <div className="mb-4">
             <p className="font-anaheim text-xs text-brand-secondary mb-1">
-              Product Series Introduction
+              {data.description || "Product Series Introduction"}
             </p>
             <h2 className="font-anaheim font-extrabold text-2xl text-brand-text-black">
               {data.title || "Hot Products"}
@@ -419,46 +511,59 @@ export default function FeaturedProducts({ data, locale }: Props) {
               variant="outline"
               className="text-brand-secondary border-brand-secondary/30 text-sm"
             >
-              View All Products
+              {data.viewAllButton || "View All Products"}
             </Button>
           </div>
         </div>
 
         {/* ==================== 桌面端布局 ==================== */}
-        <div className="hidden lg:block">
-          {/* 顶部区域 */}
-          <div className="flex justify-between items-end mb-6">
-            {/* 左侧标题 - 设计稿: 副标题 32px, 主标题需要你提供 */}
+        <div
+          className="hidden lg:block"
+          style={{
+            paddingLeft: vw(LAYOUT.paddingLeft),
+            paddingRight: vw(LAYOUT.paddingRight),
+            paddingTop: vw(80),
+            paddingBottom: vw(200),
+            position: 'relative',
+          }}
+        >
+          {/* 顶部区域 - Header */}
+          <div className="flex justify-between items-end">
+            {/* 左侧标题 */}
             <div>
               <p
                 className="font-anaheim font-medium text-brand-secondary"
                 style={{
-                  fontSize: `${(32 / DESIGN_WIDTH) * 100}vw`,
-                  lineHeight: `${(30 / DESIGN_WIDTH) * 100}vw`,
-                  marginBottom: `${(32 / DESIGN_WIDTH) * 100}vw`,
+                  fontSize: vw(LAYOUT.header.subtitleFontSize),
+                  lineHeight: '1.2',
+                  marginBottom: vw(32),
                 }}
               >
-                Product Series Introduction
+                {data.description || "Product Series Introduction"}
               </p>
               <h2
                 className="font-anaheim font-extrabold text-brand-text-black"
                 style={{
-                  fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
-                  lineHeight: `${(67 / DESIGN_WIDTH) * 100}vw`,
+                  fontSize: vw(LAYOUT.header.titleFontSize),
+                  lineHeight: '1',
                 }}
               >
                 {data.title || "Hot Products"}
               </h2>
             </div>
 
-            {/* 右侧按钮 - 设计稿: 32px 字体, Anaheim Medium */}
+            {/* 右侧 VIEW MORE */}
             <AnimatedLinkButton>
-              VIEW MORE INFORMATION
+              {data.viewAllButton || "VIEW MORE INFORMATION"}
             </AnimatedLinkButton>
           </div>
 
           {/* 系列走马灯标签 */}
-          <div className="mb-8">
+          <div
+            style={{
+              marginTop: vw(LAYOUT.tags.y - LAYOUT.header.titleY - 67), // 定位到 y=171
+            }}
+          >
             <SeriesCarousel
               series={productSeries}
               activeIndex={activeSeriesIndex}
@@ -471,10 +576,11 @@ export default function FeaturedProducts({ data, locale }: Props) {
 
           {/* 三栏产品卡片网格 (阶梯状) */}
           <div
-            className="grid grid-cols-3 items-start"
+            className="grid grid-cols-3 items-start mx-auto"
             style={{
-              gap: `${(48 / DESIGN_WIDTH) * 100}vw`,
-              paddingBottom: `${(STEP_OFFSETS[2] / DESIGN_WIDTH) * 100}vw`, // 为最大偏移留空间
+              gap: vw(LAYOUT.cards.gap),
+              marginTop: vw(20),
+              maxWidth: `${LAYOUT.gridMaxWidth}%`,
             }}
           >
             {itemsToDisplay.map((product, index) => (
