@@ -245,10 +245,10 @@ const nextConfig = {
       "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net http://localhost:*",
       // Fonts: self + CDN
       "font-src 'self' https://cdn.jsdelivr.net",
-      // Connect: self + API + CDN + Cloudflare Turnstile + WebSocket (HMR)
+      // Connect: self + API + CDN + Cloudflare Turnstile + jsdelivr (Three.js fonts) + WebSocket (HMR)
       isDev
-        ? "connect-src 'self' ws://localhost:* http://localhost:* https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com"
-        : "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com",
+        ? "connect-src 'self' ws://localhost:* http://localhost:* https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com https://cdn.jsdelivr.net"
+        : "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com https://cdn.jsdelivr.net",
       // Media: self + CDN
       "media-src 'self' https://*.amazonaws.com https://*.cloudfront.net http://localhost:*",
       // Frame: Cloudflare Turnstile
