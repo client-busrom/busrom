@@ -129,11 +129,16 @@ export default function BrandAnalysis({ data }: Props) {
             }}
           >
             <CarouselContent className="h-full m-0">
-              {data.centers.map((center, index) => (
+              {data.centers.map((center, index) => {
+                const isActive = currentSlide === index;
+                return (
                 <CarouselItem
                   key={center.title || index}
                   className="relative h-full p-0"
-                  style={{ zIndex: currentSlide === index ? 10 : 1 }}
+                  style={{
+                    zIndex: isActive ? 10 : 1,
+                    pointerEvents: isActive ? 'auto' : 'none',
+                  }}
                 >
                   <div className="relative w-full h-full">
                     {/*
@@ -160,6 +165,7 @@ export default function BrandAnalysis({ data }: Props) {
                           alt={center.title}
                           fill
                           className="object-cover"
+                          unoptimized
                         />
                       )}
                     </div>
@@ -193,12 +199,14 @@ export default function BrandAnalysis({ data }: Props) {
                           alt={`${center.title} detail`}
                           fill
                           className="object-cover"
+                          unoptimized
                         />
                       )}
                     </div>
                   </div>
                 </CarouselItem>
-              ))}
+                );
+              })}
             </CarouselContent>
           </Carousel>
         </div>
@@ -284,14 +292,6 @@ export default function BrandAnalysis({ data }: Props) {
               <CarouselContent className="h-full m-0">
                 {data.centers.map((center, index) => {
                   const isActive = currentSlide === index;
-                  // Debug: log image URLs
-                  if (typeof window !== 'undefined' && index === 0) {
-                    console.log('BrandAnalysis centers:', data.centers.map(c => ({
-                      title: c.title,
-                      largeImage: c.largeImage,
-                      smallImage: c.smallImage
-                    })));
-                  }
                   return (
                   <CarouselItem
                     key={center.title || index}
@@ -300,9 +300,6 @@ export default function BrandAnalysis({ data }: Props) {
                       zIndex: isActive ? 10 : 1,
                       pointerEvents: isActive ? 'auto' : 'none',
                     }}
-                    data-slide-index={index}
-                    data-large-image={center.largeImage}
-                    data-small-image={center.smallImage}
                   >
                     <div className="relative w-full h-full">
                       {/* 大圆 - x:0, y:0, 555x555 相对于 939x555 容器 */}
