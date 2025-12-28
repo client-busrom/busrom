@@ -638,6 +638,93 @@ export default buildConfig({
         payload.logger.warn(`⚠️ sphere_3d table check: ${fixError.message}`)
       }
 
+      // Step 0.1: Ensure simple_cta table exists with correct structure
+      try {
+        const db = payload.db as any
+        if (db?.drizzle) {
+          const checkTable = await db.drizzle.execute(`
+            SELECT 1 FROM information_schema.tables WHERE table_name = 'simple_cta'
+          `)
+
+          if (!checkTable.rows || checkTable.rows.length === 0) {
+            payload.logger.info('🔧 Creating missing simple_cta tables...')
+            await db.drizzle.execute(`
+              CREATE TABLE IF NOT EXISTS simple_cta (
+                id SERIAL PRIMARY KEY,
+                status VARCHAR(255) DEFAULT 'draft',
+                cta_link TEXT,
+                image1_id INTEGER,
+                image2_id INTEGER,
+                image3_id INTEGER,
+                updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+              )
+            `)
+            await db.drizzle.execute(`
+              CREATE TABLE IF NOT EXISTS simple_cta_locales (
+                id SERIAL PRIMARY KEY,
+                _parent_id INTEGER NOT NULL REFERENCES simple_cta(id) ON DELETE CASCADE,
+                _locale VARCHAR(255) NOT NULL,
+                title VARCHAR(255),
+                subtitle VARCHAR(255),
+                description TEXT,
+                cta_text VARCHAR(255),
+                UNIQUE(_locale, _parent_id)
+              )
+            `)
+            payload.logger.info('✅ simple_cta tables created successfully.')
+          }
+        }
+      } catch (fixError: any) {
+        payload.logger.warn(`⚠️ simple_cta table check: ${fixError.message}`)
+      }
+
+      // Step 0.2: Ensure brand_analysis table exists with correct structure
+      try {
+        const db = payload.db as any
+        if (db?.drizzle) {
+          const checkTable = await db.drizzle.execute(`
+            SELECT 1 FROM information_schema.tables WHERE table_name = 'brand_analysis'
+          `)
+
+          if (!checkTable.rows || checkTable.rows.length === 0) {
+            payload.logger.info('🔧 Creating missing brand_analysis tables...')
+            await db.drizzle.execute(`
+              CREATE TABLE IF NOT EXISTS brand_analysis (
+                id SERIAL PRIMARY KEY,
+                status VARCHAR(255) DEFAULT 'draft',
+                background_image_id INTEGER,
+                brand_center_large_image_id INTEGER,
+                brand_center_small_image_id INTEGER,
+                project_center_large_image_id INTEGER,
+                project_center_small_image_id INTEGER,
+                service_center_large_image_id INTEGER,
+                service_center_small_image_id INTEGER,
+                updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+              )
+            `)
+            await db.drizzle.execute(`
+              CREATE TABLE IF NOT EXISTS brand_analysis_locales (
+                id SERIAL PRIMARY KEY,
+                _parent_id INTEGER NOT NULL REFERENCES brand_analysis(id) ON DELETE CASCADE,
+                _locale VARCHAR(255) NOT NULL,
+                brand_center_title VARCHAR(255),
+                brand_center_description TEXT,
+                project_center_title VARCHAR(255),
+                project_center_description TEXT,
+                service_center_title VARCHAR(255),
+                service_center_description TEXT,
+                UNIQUE(_locale, _parent_id)
+              )
+            `)
+            payload.logger.info('✅ brand_analysis tables created successfully.')
+          }
+        }
+      } catch (fixError: any) {
+        payload.logger.warn(`⚠️ brand_analysis table check: ${fixError.message}`)
+      }
+
       // Step 1: Seed permissions and roles (idempotent - only creates if not exists)
       await seedPermissionsSystem(payload)
 
