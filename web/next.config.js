@@ -227,36 +227,42 @@ const nextConfig = {
    * - COOP: 源隔离
    */
   async headers() {
-    // CSP 配置 - 使用 strict-dynamic 和 unsafe-inline 作为 fallback
-    // Next.js 目前不原生支持 nonce，所以使用 strict-dynamic 配合 unsafe-inline
+    // 检测是否为开发环境
+    const isDev = process.env.NODE_ENV !== 'production'
+
+    // CSP 配置
+    // Note: strict-dynamic 与 Next.js 不兼容 (Next.js 不支持 nonce)
+    // 使用 unsafe-inline 配合严格的 default-src 和其他限制来保护安全
     const cspDirectives = [
       "default-src 'self'",
-      // Scripts: strict-dynamic + unsafe-inline (fallback for older browsers)
-      process.env.NODE_ENV === 'development'
+      // Scripts: unsafe-inline 是 Next.js 必需的，通过限制其他来源来保护安全
+      isDev
         ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com"
-        : "script-src 'self' 'unsafe-inline' 'strict-dynamic' https://challenges.cloudflare.com",
+        : "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
       // Styles: self + inline (Tailwind/styled-jsx 需要)
       "style-src 'self' 'unsafe-inline'",
       // Images: self + data + blob + CDN
       "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net http://localhost:*",
       // Fonts: self + CDN
       "font-src 'self' https://cdn.jsdelivr.net",
-      // Connect: self + API + CDN + Cloudflare Turnstile
-      "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com http://localhost:*",
+      // Connect: self + API + CDN + Cloudflare Turnstile + WebSocket (HMR)
+      isDev
+        ? "connect-src 'self' ws://localhost:* http://localhost:* https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com"
+        : "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com",
       // Media: self + CDN
-      "media-src 'self' https://*.amazonaws.com https://*.cloudfront.net",
+      "media-src 'self' https://*.amazonaws.com https://*.cloudfront.net http://localhost:*",
       // Frame: Cloudflare Turnstile
       "frame-src 'self' https://challenges.cloudflare.com",
-      // Object: none
+      // Object: none - 防止 Flash/Java 等插件攻击
       "object-src 'none'",
-      // Base URI: self
+      // Base URI: self - 防止 base tag 注入
       "base-uri 'self'",
-      // Form action: self
+      // Form action: self - 防止表单劫持
       "form-action 'self'",
-      // Frame ancestors: none (防止 clickjacking)
+      // Frame ancestors: none - 防止 clickjacking
       "frame-ancestors 'none'",
-      // Upgrade insecure requests (生产环境)
-      ...(process.env.NODE_ENV === 'production' ? ["upgrade-insecure-requests"] : []),
+      // Upgrade insecure requests (仅生产环境)
+      ...(!isDev ? ["upgrade-insecure-requests"] : []),
     ].join('; ')
 
     return [
