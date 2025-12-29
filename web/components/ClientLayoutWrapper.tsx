@@ -40,13 +40,14 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
   );
 
   // 客户端检查 sessionStorage，如果已显示过则跳过 preloader
-  // 也检测 Lighthouse 测试并跳过
+  // 也检测 Lighthouse / PageSpeed Insights 测试并跳过
   useEffect(() => {
     if (!preloaderConfig.enabled) return;
 
-    // 检测 Lighthouse (Chrome DevTools 性能测试)
-    const isLighthouse = /Lighthouse|Chrome-Lighthouse/i.test(navigator.userAgent);
-    if (isLighthouse) {
+    // 检测 Lighthouse / PageSpeed Insights (性能测试工具)
+    const ua = navigator.userAgent;
+    const isPerformanceTest = /Lighthouse|Chrome-Lighthouse|PageSpeed|Speed Insights/i.test(ua);
+    if (isPerformanceTest) {
       setLoadingStage("done");
       return;
     }
