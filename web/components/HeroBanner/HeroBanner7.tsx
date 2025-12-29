@@ -392,7 +392,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           <OptimizedImage
             image={data.images[1]}
             alt="Top rotated image"
-            size="medium"
+            size="large"
             className="absolute inset-0 w-full h-full object-cover -rotate-45"
             objectPosition={diamondTopPosition}
             priority
@@ -424,7 +424,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           <OptimizedImage
             image={data.images[2]}
             alt="Middle rotated image"
-            size="medium"
+            size="large"
             className="absolute inset-0 w-full h-full object-cover -rotate-45"
             objectPosition={diamondMiddlePosition}
             priority
@@ -456,7 +456,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           <OptimizedImage
             image={data.images[3]}
             alt="Bottom rotated image"
-            size="medium"
+            size="large"
             className="absolute inset-0 w-full h-full object-cover -rotate-45"
             objectPosition={diamondBottomPosition}
             priority
@@ -676,7 +676,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               <OptimizedImage
                 image={data.images[1]}
                 alt="Top rotated image"
-                size="medium"
+                size="large"
                 className="absolute inset-0 w-full h-full object-cover -rotate-45"
                 objectPosition={diamondTopPosition}
                 priority
@@ -702,7 +702,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               <OptimizedImage
                 image={data.images[2]}
                 alt="Middle rotated image"
-                size="medium"
+                size="large"
                 className="absolute inset-0 w-full h-full object-cover -rotate-45"
                 objectPosition={diamondMiddlePosition}
                 priority
@@ -728,7 +728,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               <OptimizedImage
                 image={data.images[3]}
                 alt="Bottom rotated image"
-                size="medium"
+                size="large"
                 className="absolute inset-0 w-full h-full object-cover -rotate-45"
                 objectPosition={diamondBottomPosition}
                 priority
