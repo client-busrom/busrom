@@ -224,11 +224,14 @@ export function OptimizedImage({
 
   // Calculate object position from cropFocalPoint (if not explicitly set)
   // cropFocalPoint: { x: 0-100, y: 0-100 } -> objectPosition: "x% y%"
+  // Note: 'thumbnail' and 'small' sizes are pre-cropped by Payload with focal point,
+  // so we should NOT apply cropFocalPoint again (it would move the image incorrectly)
+  const isCroppedSize = size === 'thumbnail' || size === 'small'
   const calculatedObjectPosition = objectPosition !== 'center'
     ? objectPosition
-    : normalizedMedia?.cropFocalPoint
+    : (normalizedMedia?.cropFocalPoint && !isCroppedSize)
       ? `${normalizedMedia.cropFocalPoint.x}% ${normalizedMedia.cropFocalPoint.y}%`
-      : objectPosition
+      : 'center'
 
   // Check if media has a valid URL (support both file.url and fileUrl)
   const hasValidUrl = normalizedMedia?.file?.url || normalizedMedia?.fileUrl

@@ -14,12 +14,17 @@ type BannerProps = {
 // 使用 CSS 变量 --rpx-hero，在宽屏幕上按宽度缩放，在高屏幕上按高度缩放
 const rpx = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
 
-// 移动端配置
-const MOBILE_CONFIG = {
-  titleFontSize: 'text-3xl sm:text-4xl md:text-5xl',
-  itemFontSize: 'text-base sm:text-lg md:text-xl',
-  itemPadding: 'px-5 py-3 sm:px-6 sm:py-4',
-};
+// 处理换行符：支持 /n 和 \n
+const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
+
+// 移动端缩放比例
+// md 及以上 (≥768px): 100% = 1024/1920 ≈ 0.533
+// md 以下 (<768px): 80% = 0.427
+const SCALE_MD = 1024 / 1920; // ≈ 0.533
+const SCALE_SM = SCALE_MD * 0.8; // ≈ 0.427
+const rpxMd = (designValue: number) => `${designValue * SCALE_MD}px`;
+const rpxSm = (designValue: number) => `${designValue * SCALE_SM}px`;
+
 
 // 背景图片配置
 const BACKGROUND_CONFIG = {
@@ -94,8 +99,6 @@ const RIGHT_CONTENT_CONFIG = {
 const HeroBanner2: FC<BannerProps> = ({ data }) => {
   const svgUrl: string = "/hero-banner-2-1.svg";
 
-  const parallelogramClipPath = "polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%)";
-
   return (
     <section className="relative w-full h-full min-h-[700px] overflow-hidden font-sans">
       {/* 背景颜色层 */}
@@ -122,14 +125,14 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
         />
       </div>
 
-      {/* SVG 装饰元素 - 桌面端 */}
+      {/* SVG 装饰元素 - 桌面端 (z-5) */}
       <div
         className="hidden lg:block absolute"
         style={{
           left: 0,
           bottom: 0,
           width: rpx(SVG_CONFIG.width),
-          height: '100%',
+          height: rpx(1080),
           zIndex: SVG_CONFIG.zIndex,
         }}
       >
@@ -141,39 +144,37 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
           className="object-contain object-left-bottom"
         />
       </div>
-      {/* SVG 装饰元素 - 移动端 */}
-      <div
-        className="lg:hidden absolute left-0 bottom-0 w-[85%] sm:w-[80%] md:w-[75%] h-full"
-        style={{ zIndex: SVG_CONFIG.zIndex }}
-      >
-        <Image
-          src={svgUrl}
-          alt="decoration"
-          fill
-          sizes="85vw"
-          className="object-contain object-left-bottom"
-        />
-      </div>
 
-      {/* 左侧主标题 - 桌面端 (lg+) */}
-      <p
-        className="hidden lg:block absolute font-paytone-one text-[#000000]"
+      {/* 左侧文字容器 - 桌面端 (z-8，在图片上层) */}
+      {/* 与 SVG 容器完全相同的尺寸和位置，让文字跟 SVG 同步缩放 */}
+      <div
+        className="hidden lg:block absolute pointer-events-none"
         style={{
-          left: rpx(LEFT_CONTENT_CONFIG.titleLeft),
-          top: rpx(LEFT_CONTENT_CONFIG.titleTop),
-          fontSize: rpx(LEFT_CONTENT_CONFIG.titleFontSize),
-          lineHeight: `${rpx(LEFT_CONTENT_CONFIG.titleLineHeight)}`,
-          maxWidth: rpx(LEFT_CONTENT_CONFIG.titleMaxWidth),
-          WebkitTextStroke: `${rpx(7)} #FDF6C2`,
-          paintOrder: 'stroke fill',
+          left: 0,
+          bottom: 0,
+          width: rpx(SVG_CONFIG.width),
+          height: rpx(1080),
           zIndex: 8,
         }}
       >
-        {data.features[0]}
-      </p>
+        {/* 左侧主标题 */}
+        <p
+          className="absolute font-paytone-one text-[#000000] pointer-events-auto"
+          style={{
+            left: rpx(LEFT_CONTENT_CONFIG.titleLeft),
+            top: rpx(LEFT_CONTENT_CONFIG.titleTop),
+            fontSize: rpx(LEFT_CONTENT_CONFIG.titleFontSize),
+            lineHeight: `${rpx(LEFT_CONTENT_CONFIG.titleLineHeight)}`,
+            maxWidth: rpx(LEFT_CONTENT_CONFIG.titleMaxWidth),
+            WebkitTextStroke: `${rpx(7)} #FDF6C2`,
+            paintOrder: 'stroke fill',
+            whiteSpace: 'pre-line',
+          }}
+        >
+          {formatText(data.features[0])}
+        </p>
 
-      {/* 左侧 Feature 列表 - 桌面端 (lg+) */}
-      <div className="hidden lg:block absolute" style={{ zIndex: 8 }}>
+        {/* 左侧 Feature 列表 */}
         {[data.features[2], data.features[3], data.features[4]].map((feature, index) => {
           const bgTop = LEFT_CONTENT_CONFIG.itemBgFirstTop + index * LEFT_CONTENT_CONFIG.itemBgGap;
           const textTop = LEFT_CONTENT_CONFIG.itemTextFirstTop + index * LEFT_CONTENT_CONFIG.itemLineHeight;
@@ -210,32 +211,164 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
         })}
       </div>
 
-      {/* 左侧文字内容 - 移动端 (< lg) */}
-      <div className="lg:hidden absolute flex flex-col left-6 sm:left-8 md:left-10 bottom-20 sm:bottom-24 md:bottom-28 z-[6]">
-        {/* 标题文字 */}
-        <p className={`font-paytone-one font-regular text-[#000000] text-stroke-custom-light ${MOBILE_CONFIG.titleFontSize} leading-tight mb-8 sm:mb-10 max-w-[320px] sm:max-w-[400px] md:max-w-[500px]`}>
-          {data.features[0]}
+      {/* ============ 移动端 md-lg (768px-1024px) - 100% 尺寸 ============ */}
+      {/* SVG 装饰元素 */}
+      <div
+        className="hidden md:block lg:hidden absolute origin-bottom-left"
+        style={{
+          left: 0,
+          bottom: 0,
+          width: rpxMd(SVG_CONFIG.width),
+          height: rpxMd(1080),
+          zIndex: SVG_CONFIG.zIndex,
+        }}
+      >
+        <Image
+          src={svgUrl}
+          alt="decoration"
+          fill
+          sizes="85vw"
+          className="object-contain object-left-bottom"
+        />
+      </div>
+      {/* 左侧文字容器 */}
+      <div
+        className="hidden md:block lg:hidden absolute pointer-events-none origin-bottom-left"
+        style={{
+          left: 0,
+          bottom: 0,
+          width: rpxMd(SVG_CONFIG.width),
+          height: rpxMd(1080),
+          zIndex: 8,
+        }}
+      >
+        <p
+          className="absolute font-paytone-one text-[#000000] pointer-events-auto"
+          style={{
+            left: rpxMd(LEFT_CONTENT_CONFIG.titleLeft),
+            top: rpxMd(LEFT_CONTENT_CONFIG.titleTop),
+            fontSize: rpxMd(LEFT_CONTENT_CONFIG.titleFontSize),
+            lineHeight: rpxMd(LEFT_CONTENT_CONFIG.titleLineHeight),
+            maxWidth: rpxMd(LEFT_CONTENT_CONFIG.titleMaxWidth),
+            WebkitTextStroke: `${SCALE_MD * 7}px #FDF6C2`,
+            paintOrder: 'stroke fill',
+            whiteSpace: 'pre-line',
+          }}
+        >
+          {formatText(data.features[0])}
         </p>
-
-        {/* 三个条目 - 移动端使用圆角矩形 */}
-        <div className="flex flex-col gap-3 sm:gap-4">
-          {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
-            <div
-              key={index}
-              className={`bg-gradient-to-r from-[#5A4F0E] to-[#C0A91D] rounded-full ${MOBILE_CONFIG.itemPadding}`}
-              style={{
-                maskImage: 'linear-gradient(to right, black 0%, transparent 100%)',
-                WebkitMaskImage: 'linear-gradient(to right, black 0%, transparent 100%)',
-              }}
-            >
-              <p className={`font-medium text-[#FFF5AD] ${MOBILE_CONFIG.itemFontSize} pl-3`}
-                style={{ textShadow: '0 2px 6px #565020' }}
+        {[data.features[2], data.features[3], data.features[4]].map((feature, index) => {
+          const bgTop = LEFT_CONTENT_CONFIG.itemBgFirstTop + index * LEFT_CONTENT_CONFIG.itemBgGap;
+          const textTop = LEFT_CONTENT_CONFIG.itemTextFirstTop + index * LEFT_CONTENT_CONFIG.itemLineHeight;
+          return (
+            <div key={index}>
+              <div
+                className="absolute"
+                style={{
+                  left: rpxMd(LEFT_CONTENT_CONFIG.itemBgLeft),
+                  top: rpxMd(bgTop),
+                  width: rpxMd(LEFT_CONTENT_CONFIG.itemBgWidth),
+                  height: rpxMd(LEFT_CONTENT_CONFIG.itemBgHeight),
+                  background: 'linear-gradient(to right, rgba(90, 79, 14, 1) 0%, rgba(90, 79, 14, 1) 15%, rgba(140, 120, 20, 0.5) 55%, rgba(140, 120, 20, 0) 100%)',
+                  clipPath: 'polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%)',
+                }}
+              />
+              <p
+                className="absolute font-pingfang font-semibold text-[#FFF5AD] whitespace-nowrap antialiased"
+                style={{
+                  left: rpxMd(LEFT_CONTENT_CONFIG.itemTextLeft),
+                  top: rpxMd(textTop),
+                  fontSize: rpxMd(LEFT_CONTENT_CONFIG.itemFontSize),
+                  lineHeight: rpxMd(LEFT_CONTENT_CONFIG.itemLineHeight),
+                  letterSpacing: '0.06em',
+                  textShadow: `0 4px 12.6px rgba(86, 80, 32, 1)`,
+                }}
               >
                 {feature}
               </p>
             </div>
-          ))}
-        </div>
+          );
+        })}
+      </div>
+
+      {/* ============ 移动端 <md (<768px) - 80% 尺寸 ============ */}
+      {/* SVG 装饰元素 */}
+      <div
+        className="md:hidden absolute origin-bottom-left"
+        style={{
+          left: 0,
+          bottom: 0,
+          width: rpxSm(SVG_CONFIG.width),
+          height: rpxSm(1080),
+          zIndex: SVG_CONFIG.zIndex,
+        }}
+      >
+        <Image
+          src={svgUrl}
+          alt="decoration"
+          fill
+          sizes="85vw"
+          className="object-contain object-left-bottom"
+        />
+      </div>
+      {/* 左侧文字容器 */}
+      <div
+        className="md:hidden absolute pointer-events-none origin-bottom-left"
+        style={{
+          left: 0,
+          bottom: 0,
+          width: rpxSm(SVG_CONFIG.width),
+          height: rpxSm(1080),
+          zIndex: 8,
+        }}
+      >
+        <p
+          className="absolute font-paytone-one text-[#000000] pointer-events-auto"
+          style={{
+            left: rpxSm(LEFT_CONTENT_CONFIG.titleLeft),
+            top: rpxSm(LEFT_CONTENT_CONFIG.titleTop),
+            fontSize: rpxSm(LEFT_CONTENT_CONFIG.titleFontSize),
+            lineHeight: rpxSm(LEFT_CONTENT_CONFIG.titleLineHeight),
+            maxWidth: rpxSm(LEFT_CONTENT_CONFIG.titleMaxWidth),
+            WebkitTextStroke: `${SCALE_SM * 7}px #FDF6C2`,
+            paintOrder: 'stroke fill',
+            whiteSpace: 'pre-line',
+          }}
+        >
+          {formatText(data.features[0])}
+        </p>
+        {[data.features[2], data.features[3], data.features[4]].map((feature, index) => {
+          const bgTop = LEFT_CONTENT_CONFIG.itemBgFirstTop + index * LEFT_CONTENT_CONFIG.itemBgGap;
+          const textTop = LEFT_CONTENT_CONFIG.itemTextFirstTop + index * LEFT_CONTENT_CONFIG.itemLineHeight;
+          return (
+            <div key={index}>
+              <div
+                className="absolute"
+                style={{
+                  left: rpxSm(LEFT_CONTENT_CONFIG.itemBgLeft),
+                  top: rpxSm(bgTop),
+                  width: rpxSm(LEFT_CONTENT_CONFIG.itemBgWidth),
+                  height: rpxSm(LEFT_CONTENT_CONFIG.itemBgHeight),
+                  background: 'linear-gradient(to right, rgba(90, 79, 14, 1) 0%, rgba(90, 79, 14, 1) 15%, rgba(140, 120, 20, 0.5) 55%, rgba(140, 120, 20, 0) 100%)',
+                  clipPath: 'polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%)',
+                }}
+              />
+              <p
+                className="absolute font-pingfang font-semibold text-[#FFF5AD] whitespace-nowrap antialiased"
+                style={{
+                  left: rpxSm(LEFT_CONTENT_CONFIG.itemTextLeft),
+                  top: rpxSm(textTop),
+                  fontSize: rpxSm(LEFT_CONTENT_CONFIG.itemFontSize),
+                  lineHeight: rpxSm(LEFT_CONTENT_CONFIG.itemLineHeight),
+                  letterSpacing: '0.06em',
+                  textShadow: `0 4px 12.6px rgba(86, 80, 32, 1)`,
+                }}
+              >
+                {feature}
+              </p>
+            </div>
+          );
+        })}
       </div>
 
       {/* 右上角装饰 - 桌面端 */}
@@ -373,19 +506,20 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
           width: rpx(RIGHT_CONTENT_CONFIG.titleWidth),
           WebkitTextStroke: `${rpx(1)} #75703F`,
           paintOrder: 'stroke fill',
+          whiteSpace: 'pre-line',
           zIndex: 30,
         }}
       >
-        {data.features[1]}
+        {formatText(data.features[1])}
       </h1>
 
       {/* 右侧内容区域 - 移动端 (< lg) */}
       <div className="lg:hidden absolute z-10 right-4 sm:right-6 md:right-8 top-20 sm:top-24 md:top-28 flex flex-col items-end">
         {/* 右侧标题 */}
-        <h1 className="font-paytone-one font-regular text-white text-right text-xl sm:text-2xl md:text-3xl mb-4 sm:mb-5"
+        <h1 className="font-paytone-one font-regular text-white text-right text-xl sm:text-2xl md:text-3xl mb-4 sm:mb-5 whitespace-pre-line"
           style={{ textShadow: '0 2px 4px rgba(117, 112, 63, 0.5)' }}
         >
-          {data.features[1]}
+          {formatText(data.features[1])}
         </h1>
 
         {/* 右侧图片组 - 移动端简化布局 */}

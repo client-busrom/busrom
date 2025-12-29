@@ -7,6 +7,9 @@ import { Locale } from "@/i18n.config";
 import { getObjectPosition } from "@/lib/utils";
 import { ServerImage } from "@/components/ui/ServerImage";
 
+// 处理换行符：支持 /n 和 \n
+const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
+
 // --- 响应式尺寸函数 ---
 // 使用 CSS 变量 --rpx-hero，在宽屏幕上按宽度缩放，在高屏幕上按高度缩放
 const rpx = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
@@ -406,7 +409,7 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
       >
         {/* Feature[1] - 顶部标语 */}
         <p
-          className="font-paytone-one text-[#FFBC5F] text-center"
+          className="font-paytone-one text-[#FFBC5F] text-center whitespace-pre-line"
           style={{
             fontSize: rpx(48),
             lineHeight: rpx(116),
@@ -417,12 +420,12 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
             textShadow: '0 -1px 0 #75703F',
           }}
         >
-          {data.features[1]}
+          {formatText(data.features[1])}
         </p>
 
         {/* Feature[0] - 主标题第一行 */}
         <h2
-          className="font-paytone-one text-black text-center"
+          className="font-paytone-one text-black text-center whitespace-pre-line"
           style={{
             fontSize: rpx(86),
             lineHeight: rpx(125),
@@ -432,12 +435,12 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
             paintOrder: 'stroke fill',
           }}
         >
-          {data.features[0]?.split(' ').slice(0, 2).join(' ')}
+          {formatText(data.features[0])?.split(' ').slice(0, 2).join(' ')}
         </h2>
 
         {/* Feature[0] - 主标题第二行 */}
         <h1
-          className="font-paytone-one text-black text-center"
+          className="font-paytone-one text-black text-center whitespace-pre-line"
           style={{
             fontSize: rpx(120),
             lineHeight: rpx(125),
@@ -445,7 +448,7 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
             paintOrder: 'stroke fill',
           }}
         >
-          {data.features[0]?.split(' ').slice(2).join(' ')}
+          {formatText(data.features[0])?.split(' ').slice(2).join(' ')}
         </h1>
 
         {/* 三个特性按钮 */}
@@ -490,25 +493,25 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
       <div className="flex md:hidden relative z-30 flex-col items-center w-full px-4 py-8">
         {/* Feature[1] - 顶部标语 */}
         <p
-          className="font-paytone-one text-[#FFBC5F] text-center text-lg"
+          className="font-paytone-one text-[#FFBC5F] text-center text-lg whitespace-pre-line"
           style={{
             textShadow: '0 0 10px rgba(117, 112, 63, 0.5)',
             WebkitTextStroke: '1px #75703F',
             paintOrder: 'stroke fill',
           }}
         >
-          {data.features[1]}
+          {formatText(data.features[1])}
         </p>
 
         {/* Feature[0] - 主标题 (不拆分，自动换行) */}
         <h1
-          className="font-paytone-one text-black text-center text-3xl mt-4"
+          className="font-paytone-one text-black text-center text-3xl mt-4 whitespace-pre-line"
           style={{
             WebkitTextStroke: '2px #FDF6C2',
             paintOrder: 'stroke fill',
           }}
         >
-          {data.features[0]}
+          {formatText(data.features[0])}
         </h1>
 
         {/* 三个特性按钮 - 垂直排列 */}

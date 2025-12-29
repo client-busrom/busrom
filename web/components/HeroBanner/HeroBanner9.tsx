@@ -4,6 +4,9 @@ import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
+// 处理换行符：支持 /n 和 \n
+const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
+
 // --- 响应式尺寸函数 ---
 const rpx = (designValue: number) => `calc(var(--rpx) * ${designValue})`;
 const rpxHero = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
@@ -180,8 +183,8 @@ const FeatureBlock: FC<FeatureBlockProps> = ({ lines, fontSize, rotation, lineHe
 // --- HeroBanner9 Component ---
 const HeroBanner9: FC<BannerProps> = ({ data }) => {
   // --- Split Feature[0] (支持换行: \n, \\n, /n) ---
-  const feature0Text = data.features[0] || "";
-  const feature0Lines = feature0Text.split(/\n|\\n|\/n/);
+  const feature0Text = formatText(data.features[0]);
+  const feature0Lines = feature0Text.split('\n');
 
   return (
     <section
@@ -424,19 +427,14 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
         }}
       >
         <h1
-          className="font-paytone-one font-regular text-white"
+          className="font-paytone-one font-regular text-white whitespace-pre-line"
           style={{
             fontSize: rpxHero(DESKTOP_CONFIG.feature1.fontSize),
             WebkitTextStroke: `${rpx(7)} #6B4E00`,
             paintOrder: 'stroke fill',
           }}
         >
-          {(data.features[1] || "").split(/\n|\\n|\/n/).map((line, index, arr) => (
-            <span key={index}>
-              {line}
-              {index < arr.length - 1 && <br />}
-            </span>
-          ))}
+          {formatText(data.features[1])}
         </h1>
       </div>
 
@@ -449,19 +447,14 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
         }}
       >
         <h1
-          className="font-paytone-one font-regular text-white"
+          className="font-paytone-one font-regular text-white whitespace-pre-line"
           style={{
             fontSize: DESKTOP_CONFIG.feature1.fontSize * LG_SCALE,
             WebkitTextStroke: `${3 * LG_SCALE}px #6B4E00`,
             paintOrder: 'stroke fill',
           }}
         >
-          {(data.features[1] || "").split(/\n|\\n|\/n/).map((line, index, arr) => (
-            <span key={index}>
-              {line}
-              {index < arr.length - 1 && <br />}
-            </span>
-          ))}
+          {formatText(data.features[1])}
         </h1>
       </div>
 

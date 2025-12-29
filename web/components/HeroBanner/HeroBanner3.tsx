@@ -4,6 +4,9 @@ import Image from "next/image";
 import type { HomeContent } from "@/lib/content-data";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
+// 处理换行符：支持 /n 和 \n
+const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
+
 // --- BannerProps Definition ---
 type BannerData = HomeContent["heroBanner"][number];
 type BannerProps = {
@@ -212,7 +215,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
           </p>
           {/* Feature[0] - 主标题 */}
           <h1
-            className="font-poller-one font-normal text-[#332E0B] mb-8 antialiased"
+            className="font-poller-one font-normal text-[#332E0B] mb-8 antialiased whitespace-pre-line"
             style={{
               fontSize: rpx(CONFIG.titleFontSize),
               lineHeight: 1.1,
@@ -220,7 +223,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
               paintOrder: 'stroke fill',
             }}
           >
-            {data.features[0]}
+            {formatText(data.features[0])}
           </h1>
           {/* Feature Stack */}
           <div
@@ -355,14 +358,14 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
             </p>
             {/* Feature[0] - 主标题 */}
             <h1
-              className="text-3xl sm:text-4xl font-poller-one text-[#332E0B] mb-6 text-center"
+              className="text-3xl sm:text-4xl font-poller-one text-[#332E0B] mb-6 text-center whitespace-pre-line"
               style={{
                 lineHeight: 1.1,
                 WebkitTextStroke: '1.5px #FDF6C2',
                 paintOrder: 'stroke fill',
               }}
             >
-              {data.features[0]}
+              {formatText(data.features[0])}
             </h1>
             {/* Feature Stack */}
             <div className="flex flex-col gap-4 w-full max-w-[340px]">
