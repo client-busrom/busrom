@@ -62,8 +62,8 @@ const DESKTOP_CONFIG = {
   // 左下角 Feature 文字 [2,3,4]
   featureText: {
     bottom: 80,            // 底部定位
-    left: 380,             // 左侧定位
-    fontSize: 32,          // 字体大小
+    left: 390,             // 左侧定位
+    fontSize: 28,          // 字体大小
     strokeColor: '#6B4E00', // 描边颜色
     strokeWidth: 2,        // 描边宽度
     gap: 8,                // 文字间距
@@ -81,7 +81,7 @@ const DESKTOP_CONFIG = {
     fontSize: 100,         // 字体大小
     rotation: -1.81,       // 旋转角度
     lineHeight: 1.1,
-    right: '3%',           // 右边距（百分比）
+    right: '5%',           // 右边距（百分比）
     top: 200,               // 顶部距离
     color: '#3C3712',      // 文字颜色
     strokeColor: '#ffffff', // 描边颜色
@@ -96,6 +96,7 @@ const DESKTOP_CONFIG = {
     svgExtraWidth: 160,    // SVG 额外宽度
     svgExtraHeight: 60,    // SVG 额外高度
     gap: 36,               // 行间距
+    firstLineOffsetY: -10, // 第一行额外上移（负值往上）
   },
 
   // 右侧 Feature[1] 文字
@@ -155,7 +156,7 @@ const FeatureBlock: FC<FeatureBlockProps> = ({ lines, fontSize, rotation, lineHe
                 height: `calc(100% + ${size(config.svgExtraHeight)})`,
               }}
             />
-            {/* 文字 - 只有文字旋转 */}
+            {/* 文字 - 只有文字旋转，第一行额外上移 */}
             <h1
               className="relative font-paytone-one font-regular whitespace-nowrap"
               style={{
@@ -165,7 +166,9 @@ const FeatureBlock: FC<FeatureBlockProps> = ({ lines, fontSize, rotation, lineHe
                 paddingRight: size(config.svgPaddingRight),
                 paddingTop: size(config.svgPaddingTop),
                 paddingBottom: size(config.svgPaddingBottom),
-                transform: `rotate(${rotation}deg)`,
+                transform: index === 0
+                  ? `rotate(${rotation}deg) translateY(${size(config.firstLineOffsetY)})`
+                  : `rotate(${rotation}deg)`,
                 color: config.color,
                 WebkitTextStroke: `${rpx(6)} ${config.strokeColor}`,
                 paintOrder: 'stroke fill',

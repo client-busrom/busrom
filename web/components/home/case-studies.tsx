@@ -24,7 +24,7 @@ const LAYOUT = {
     titleFontSize: 80,
     titleLineHeight: 95,
     subtitleY: 135,
-    subtitleFontSize: 32,
+    subtitleFontSize: 16,
     subtitleLineHeight: 30,
   },
 

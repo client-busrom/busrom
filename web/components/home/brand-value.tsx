@@ -124,8 +124,8 @@ export default function BrandValue({ data }: Props) {
                   <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 to-transparent" />
                 </div>
 
-                {/* 文字：固定在外层容器中，不随图片移动，不阻止悬停 */}
-                <div className="relative z-20 flex flex-col items-center justify-center text-center p-4 pointer-events-none">
+                {/* 文字：固定在外层容器中，不随图片移动，不阻止悬停，初始隐藏悬停显示 */}
+                <div className="relative z-20 flex flex-col items-center justify-center text-center p-4 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   {item.title && (
                     <h3
                       className="font-anaheim font-semibold text-white tracking-wider whitespace-pre-line"

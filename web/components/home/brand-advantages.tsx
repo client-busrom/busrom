@@ -13,7 +13,7 @@ type Props = {
 
 const SECTION_HEIGHT = 2000;
 const REVEAL_START_OFFSET = 100;
-const HIDE_OFFSET = 400;
+const HIDE_OFFSET = 500;
 
 // 设计稿基准尺寸 - 基于视口高度 (100vh ≈ 1080px)
 const DESIGN_WIDTH = 1920;
@@ -27,33 +27,44 @@ const DESIGN_HEIGHT = 1080; // 视口高度
 // 偏移量 = 378 - 159 = 219
 
 // 各 item 原始相对位置 (相对于 section top) + 缩放 + 偏移
+// Y 偏移量，用于整体调整 item 的垂直位置
+const ITEMS_Y_OFFSET = -100;
+
 const ADVANTAGE_POSITIONS_DESIGN = [
   // 0: 左上
-  { x: 311, y: 70 },
+  { x: 311, y: 70 + ITEMS_Y_OFFSET },
   // 1: 上中
-  { x: 831, y: 0 },
+  { x: 831, y: 0 + ITEMS_Y_OFFSET },
   // 2: 右上
-  { x: 1232, y: 85 },
+  { x: 1232, y: 85 + ITEMS_Y_OFFSET },
   // 3: 左中
-  { x: 43, y: 350 },
+  { x: 43, y: 350 + ITEMS_Y_OFFSET },
   // 4: 左下
-  { x: 196, y: 580 },
+  { x: 196, y: 580 + ITEMS_Y_OFFSET },
   // 5: 下中
-  { x: 590, y: 750 },
+  { x: 590, y: 750 + ITEMS_Y_OFFSET },
   // 6: 下右
-  { x: 1053, y: 700 },
+  { x: 1053, y: 700 + ITEMS_Y_OFFSET },
   // 7: 右中
-  { x: 1565, y: 320 },
+  { x: 1565, y: 320 + ITEMS_Y_OFFSET },
   // 8: 右下
-  { x: 1502, y: 550 },
+  { x: 1502, y: 550 + ITEMS_Y_OFFSET },
 ];
 
 // "Busrom" 标题位置 - 视口中心偏上
-const TITLE_Y = 378;
+const TITLE_Y = 278;
 const TITLE_FONT_SIZE = 300;
 
 // 图标圆圈尺寸
 const ICON_SIZE = 66;
+
+// 左上角 "Brand Advantage" 标题配置
+const SECTION_TITLE = {
+  x: 140,           // 距离左边的距离 (px, 基于 1920)
+  y: -420,           // 距离顶部的距离 (px, 基于 1080)
+  fontSize: 60,     // 字体大小 (px, 基于 1920)
+  lineHeight: 1.1,  // 行高
+};
 
 export default function BrandAdvantages({ data }: Props) {
   const isMobile = useIsMobile(); // ⬅️ 引入移动端判断
@@ -194,38 +205,72 @@ export default function BrandAdvantages({ data }: Props) {
             transition: "opacity 0.5s",
           }}
         >
-          {/* ==================== 移动端布局 ==================== */}
-          <div className="lg:hidden h-full flex flex-col justify-center items-center px-6 py-8">
-            {/* 移动端标题 */}
-            <h1 className="text-center font-pingfang font-semibold text-white text-7xl mb-8">
-              Busrom
-            </h1>
+          {/* ==================== 移动端布局 - 树状分支 ==================== */}
+          <div className="lg:hidden h-full flex flex-col items-center pt-6 pb-4 overflow-visible">
+            {/* 顶部标题区 - 不受 max-w 限制 */}
+            <div className="flex flex-col items-center w-full mb-0 px-4 relative z-10">
+              {/* Brand Advantage 标题 */}
+              <div className="font-anaheim font-extrabold text-white text-xl text-center leading-tight mb-2">
+                <span>Brand Advantage</span>
+              </div>
+              {/* Busrom */}
+              <h1 className="font-pingfang font-semibold text-white" style={{ fontSize: '18vw' }}>
+                Busrom
+              </h1>
+            </div>
 
-            {/* 移动端 advantages 列表 - 两列网格 */}
-            <ul className="grid grid-cols-2 gap-4 w-full max-w-md">
-              {data.advantages.map((advantage, index) => {
-                const iconIndex = index + 1;
-                return (
-                  <li
-                    key={advantage}
-                    className="flex items-center gap-2 p-2"
-                  >
-                    <div className="w-10 h-10 flex-shrink-0">
-                      <Image
-                        src={`/brand-adv-${iconIndex}.svg`}
-                        alt={`Advantage ${iconIndex}`}
-                        width={40}
-                        height={40}
-                        className="w-full h-full"
+            {/* 树状分支结构 - 限制最大宽度 */}
+            <div className="relative flex-1 w-full max-w-md mx-auto px-4">
+              {/* 中央主干线 - 向上延伸连接 Busrom */}
+              <div className="absolute left-1/2 -top-4 bottom-0 w-0.5 bg-white/30 -translate-x-1/2" />
+
+              {/* 分支节点 */}
+              <div className="relative h-full flex flex-col justify-evenly py-2">
+                {data.advantages.map((advantage, index) => {
+                  const iconIndex = index + 1;
+                  const isLeft = index % 2 === 0;
+
+                  return (
+                    <div
+                      key={advantage}
+                      className={cn(
+                        "relative flex items-center gap-2",
+                        isLeft ? "flex-row pr-[52%]" : "flex-row-reverse pl-[52%]"
+                      )}
+                    >
+                      {/* 横向分支线 */}
+                      <div
+                        className={cn(
+                          "absolute top-1/2 h-0.5 bg-white/30 -translate-y-1/2",
+                          isLeft ? "right-[48%] w-[8%]" : "left-[48%] w-[8%]"
+                        )}
                       />
+
+                      {/* 图标 */}
+                      <div className="w-8 h-8 flex-shrink-0 relative z-10">
+                        <Image
+                          src={`/brand-adv-${iconIndex}.svg`}
+                          alt={`Advantage ${iconIndex}`}
+                          width={32}
+                          height={32}
+                          className="w-full h-full"
+                        />
+                      </div>
+
+                      {/* 文字 */}
+                      <span
+                        className={cn(
+                          "font-anaheim text-white text-xs leading-tight whitespace-pre-line",
+                          isLeft ? "text-right" : "text-left"
+                        )}
+                      >
+                        {advantage.replace(/\\n|\/n/g, '\n')}
+                      </span>
                     </div>
-                    <span className="font-anaheim text-white text-xs leading-tight whitespace-pre-line">
-                      {advantage.replace(/\\n|\/n/g, '\n')}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           {/* ==================== 桌面端布局 - 按设计稿定位 ==================== */}
@@ -233,6 +278,20 @@ export default function BrandAdvantages({ data }: Props) {
             className="hidden lg:block relative w-full h-full"
             style={{ aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` }}
           >
+            {/* 左上角 "Brand Advantage" 标题 */}
+            <div
+              className="absolute font-anaheim font-extrabold text-white text-left"
+              style={{
+                left: `${(SECTION_TITLE.x / DESIGN_WIDTH) * 100}%`,
+                top: `${(SECTION_TITLE.y / DESIGN_HEIGHT) * 100}%`,
+                fontSize: `${(SECTION_TITLE.fontSize / DESIGN_WIDTH) * 100}vw`,
+                lineHeight: SECTION_TITLE.lineHeight,
+              }}
+            >
+              <div>Brand</div>
+              <div>Advantage</div>
+            </div>
+
             {/* 中心 "Busrom" 标题 */}
             <h1
               className="absolute font-pingfang font-semibold text-white whitespace-nowrap"

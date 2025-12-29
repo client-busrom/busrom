@@ -45,8 +45,8 @@ const MASK_IMAGE_CONFIG = {
   centerY: true,          // 垂直居中
   // 图片在遮罩内的缩放和偏移
   imageScale: 1.2,          // 图片缩放比例
-  imageOffsetX: -70,     // 图片水平偏移 (设计稿像素)
-  imageOffsetY: 0,        // 图片垂直偏移 (设计稿像素)
+  imageOffsetX: -90,     // 图片水平偏移 (设计稿像素)
+  imageOffsetY: 10,        // 图片垂直偏移 (设计稿像素)
   imagePositionX: 50,     // object-position X (%)
   imagePositionY: 50,     // object-position Y (%)
   useCMSFocalPoint: true, // 是否使用 CMS 的焦点
@@ -66,7 +66,7 @@ const DIAMOND_TOP_CONFIG = {
   borderColor: '#756F3F', // 边框颜色
   borderRadius: 97,       // 圆角大小
   // 图片
-  imageScale: 1.42,        // 图片缩放比例
+  imageScale: 1.5,        // 图片缩放比例
   imageOffsetX: 0,        // 图片水平偏移 (设计稿像素)
   imageOffsetY: 0,        // 图片垂直偏移 (设计稿像素)
   imagePositionX: 50,     // object-position X (%)
@@ -88,7 +88,7 @@ const DIAMOND_MIDDLE_CONFIG = {
   borderColor: '#756F3F', // 边框颜色
   borderRadius: 88,       // 圆角大小
   // 图片
-  imageScale: 1.5,        // 图片缩放比例
+  imageScale: 1.3,        // 图片缩放比例
   imageOffsetX: 0,        // 图片水平偏移 (设计稿像素)
   imageOffsetY: 0,        // 图片垂直偏移 (设计稿像素)
   imagePositionX: 50,     // object-position X (%)
@@ -110,7 +110,7 @@ const DIAMOND_BOTTOM_CONFIG = {
   borderColor: '#756F3F', // 边框颜色
   borderRadius: 97,       // 圆角大小
   // 图片
-  imageScale: 1.42,        // 图片缩放比例
+  imageScale: 1.5,        // 图片缩放比例
   imageOffsetX: 0,        // 图片水平偏移 (设计稿像素)
   imageOffsetY: 0,        // 图片垂直偏移 (设计稿像素)
   imagePositionX: 50,     // object-position X (%)
@@ -384,19 +384,23 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
       >
         <div
           className="relative w-full h-full"
-          style={{
-            transform: `scale(${DIAMOND_TOP_CONFIG.imageScale}) translate(${rpxHero(DIAMOND_TOP_CONFIG.imageOffsetX)}, ${rpxHero(DIAMOND_TOP_CONFIG.imageOffsetY)})`,
-            transformOrigin: 'center center',
-          }}
+          style={{ transform: 'rotate(-45deg)' }}
         >
-          <OptimizedImage
-            image={data.images[1]}
-            alt="Top rotated image"
-            size="large"
-            className="absolute inset-0 w-full h-full object-cover -rotate-45"
-            objectPosition={diamondTopPosition}
-            priority
-          />
+          <div
+            className="w-full h-full"
+            style={{
+              transform: `scale(${DIAMOND_TOP_CONFIG.imageScale})`,
+              transformOrigin: diamondTopPosition,
+            }}
+          >
+            <OptimizedImage
+              image={data.images[1]}
+              alt="Top rotated image"
+              size="large"
+              className="absolute inset-0 w-full h-full object-cover"
+              priority
+            />
+          </div>
         </div>
       </div>
 
@@ -416,19 +420,23 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
       >
         <div
           className="relative w-full h-full"
-          style={{
-            transform: `scale(${DIAMOND_MIDDLE_CONFIG.imageScale}) translate(${rpxHero(DIAMOND_MIDDLE_CONFIG.imageOffsetX)}, ${rpxHero(DIAMOND_MIDDLE_CONFIG.imageOffsetY)})`,
-            transformOrigin: 'center center',
-          }}
+          style={{ transform: 'rotate(-45deg)' }}
         >
-          <OptimizedImage
-            image={data.images[2]}
-            alt="Middle rotated image"
-            size="large"
-            className="absolute inset-0 w-full h-full object-cover -rotate-45"
-            objectPosition={diamondMiddlePosition}
-            priority
-          />
+          <div
+            className="w-full h-full"
+            style={{
+              transform: `scale(${DIAMOND_MIDDLE_CONFIG.imageScale})`,
+              transformOrigin: diamondMiddlePosition,
+            }}
+          >
+            <OptimizedImage
+              image={data.images[2]}
+              alt="Middle rotated image"
+              size="large"
+              className="absolute inset-0 w-full h-full object-cover"
+              priority
+            />
+          </div>
         </div>
       </div>
 
@@ -448,19 +456,23 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
       >
         <div
           className="relative w-full h-full"
-          style={{
-            transform: `scale(${DIAMOND_BOTTOM_CONFIG.imageScale}) translate(${rpxHero(DIAMOND_BOTTOM_CONFIG.imageOffsetX)}, ${rpxHero(DIAMOND_BOTTOM_CONFIG.imageOffsetY)})`,
-            transformOrigin: 'center center',
-          }}
+          style={{ transform: 'rotate(-45deg)' }}
         >
-          <OptimizedImage
-            image={data.images[3]}
-            alt="Bottom rotated image"
-            size="large"
-            className="absolute inset-0 w-full h-full object-cover -rotate-45"
-            objectPosition={diamondBottomPosition}
-            priority
-          />
+          <div
+            className="w-full h-full"
+            style={{
+              transform: `scale(${DIAMOND_BOTTOM_CONFIG.imageScale})`,
+              transformOrigin: diamondBottomPosition,
+            }}
+          >
+            <OptimizedImage
+              image={data.images[3]}
+              alt="Bottom rotated image"
+              size="large"
+              className="absolute inset-0 w-full h-full object-cover"
+              priority
+            />
+          </div>
         </div>
       </div>
 
@@ -672,15 +684,25 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               zIndex: 20,
             }}
           >
-            <div className="relative w-full h-full" style={{ transform: `scale(${MOBILE_CONFIG.diamondTop.imageScale})` }}>
-              <OptimizedImage
-                image={data.images[1]}
-                alt="Top rotated image"
-                size="large"
-                className="absolute inset-0 w-full h-full object-cover -rotate-45"
-                objectPosition={diamondTopPosition}
-                priority
-              />
+            <div
+              className="relative w-full h-full"
+              style={{ transform: 'rotate(-45deg)' }}
+            >
+              <div
+                className="w-full h-full"
+                style={{
+                  transform: `scale(${MOBILE_CONFIG.diamondTop.imageScale})`,
+                  transformOrigin: diamondTopPosition,
+                }}
+              >
+                <OptimizedImage
+                  image={data.images[1]}
+                  alt="Top rotated image"
+                  size="large"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  priority
+                />
+              </div>
             </div>
           </div>
 
@@ -698,15 +720,25 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               zIndex: 20,
             }}
           >
-            <div className="relative w-full h-full" style={{ transform: `scale(${MOBILE_CONFIG.diamondMiddle.imageScale})` }}>
-              <OptimizedImage
-                image={data.images[2]}
-                alt="Middle rotated image"
-                size="large"
-                className="absolute inset-0 w-full h-full object-cover -rotate-45"
-                objectPosition={diamondMiddlePosition}
-                priority
-              />
+            <div
+              className="relative w-full h-full"
+              style={{ transform: 'rotate(-45deg)' }}
+            >
+              <div
+                className="w-full h-full"
+                style={{
+                  transform: `scale(${MOBILE_CONFIG.diamondMiddle.imageScale})`,
+                  transformOrigin: diamondMiddlePosition,
+                }}
+              >
+                <OptimizedImage
+                  image={data.images[2]}
+                  alt="Middle rotated image"
+                  size="large"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  priority
+                />
+              </div>
             </div>
           </div>
 
@@ -724,15 +756,25 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               zIndex: 20,
             }}
           >
-            <div className="relative w-full h-full" style={{ transform: `scale(${MOBILE_CONFIG.diamondBottom.imageScale})` }}>
-              <OptimizedImage
-                image={data.images[3]}
-                alt="Bottom rotated image"
-                size="large"
-                className="absolute inset-0 w-full h-full object-cover -rotate-45"
-                objectPosition={diamondBottomPosition}
-                priority
-              />
+            <div
+              className="relative w-full h-full"
+              style={{ transform: 'rotate(-45deg)' }}
+            >
+              <div
+                className="w-full h-full"
+                style={{
+                  transform: `scale(${MOBILE_CONFIG.diamondBottom.imageScale})`,
+                  transformOrigin: diamondBottomPosition,
+                }}
+              >
+                <OptimizedImage
+                  image={data.images[3]}
+                  alt="Bottom rotated image"
+                  size="large"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  priority
+                />
+              </div>
             </div>
           </div>
 

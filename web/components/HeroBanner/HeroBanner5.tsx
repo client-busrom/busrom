@@ -34,15 +34,18 @@ const TEXT_CONFIG = {
   // 第一行: "Design-forward" (Pavanam)
   line1FontSize: 90,
   line1LineHeight: 106,
-  // 第二行: "Waterproof Bathroom" (Paytone One) - 两行
+  // 第二行: "Waterproof" (Paytone One)
   line2FontSize: 120,
   line2LineHeight: 106,
-  // 第三行: "Glass Clip" (Paytone One)
-  line3FontSize: 90,
+  // 第三行: "Bathroom" (Paytone One)
+  line3FontSize: 120,
   line3LineHeight: 106,
+  // 第四行: "Glass Clip" (Paytone One)
+  line4FontSize: 90,
+  line4LineHeight: 106,
   // Feature 背景条
   featureHeight: 75,
-  featureWidths: [399, 474, 517],  // 递增宽度
+  featureWidths: [460, 545, 595],  // 递增宽度
   featureFontSize: 40,
   featureLineHeight: 91,
   featureGap: 20,                 // 间距
@@ -62,10 +65,12 @@ const MOBILE_TEXT_CONFIG = {
   line1LineHeight: 40,
   line2FontSize: 48,
   line2LineHeight: 52,
-  line3FontSize: 36,
-  line3LineHeight: 44,
+  line3FontSize: 48,
+  line3LineHeight: 52,
+  line4FontSize: 36,
+  line4LineHeight: 44,
   featureHeight: 48,
-  featureWidths: [260, 300, 340],
+  featureWidths: [300, 345, 390],
   featureFontSize: 18,
   featureLineHeight: 48,
   featureGap: 12,
@@ -92,7 +97,7 @@ const DIAMOND_CONFIG = {
     borderRadius: 97,
     borderWidth: 19,
     borderColor: '#756F3F',
-    imageScale: 1.5,     // 图片缩放
+    imageScale: 1.42,     // 图片缩放
     imageOffsetX: 0,     // 图片水平偏移 (负值往左，正值往右，百分比)
     imageOffsetY: 0,     // 图片垂直偏移 (负值往上，正值往下，百分比)
   },
@@ -104,7 +109,7 @@ const DIAMOND_CONFIG = {
     borderRadius: 97,
     borderWidth: 19,
     borderColor: '#756F3F',
-    imageScale: 1.5,
+    imageScale: 1.42,
     imageOffsetX: 0,
     imageOffsetY: 0,
   },
@@ -126,16 +131,22 @@ const DIAMOND_CONFIG = {
 // --- HeroBanner5 Component ---
 const HeroBanner5: FC<BannerProps> = ({ data }) => {
   // --- Split Feature[0] ---
-  // 格式: "Design-forward  Waterproof /nBathroom  Glass Clip"
-  // 用双空格分隔各部分，/n 表示换行
+  // 格式: "Design-forward  Waterproof  Bathroom  Glass Clip" (用双空格分隔4部分)
+  // 或者: "Design-forward\nWaterproof\nBathroom\nGlass Clip" (用换行分隔4部分)
   // line1: Design-forward (Pavanam 90px)
-  // line2: Waterproof /n Bathroom (Paytone One 120px)
-  // line3: Glass Clip (Paytone One 90px)
+  // line2: Waterproof (Paytone One 120px)
+  // line3: Bathroom (Paytone One 120px)
+  // line4: Glass Clip (Paytone One 90px)
   const feature0Text = formatText(data.features[0]);
-  const parts = feature0Text.split(/\s{2,}/);  // 按双空格或更多空格分割
+  // 先尝试用换行分割，如果只有1部分则用双空格分割
+  let parts = feature0Text.split('\n');
+  if (parts.length < 4) {
+    parts = feature0Text.split(/\s{2,}/);  // 按双空格或更多空格分割
+  }
   const titleLine1 = parts[0] || "";  // Design-forward
-  const titleLine2 = parts[1] || "";  // Waterproof \n Bathroom (已经处理过换行)
-  const titleLine3 = parts[2] || "";  // Glass Clip
+  const titleLine2 = parts[1] || "";  // Waterproof
+  const titleLine3 = parts[2] || "";  // Bathroom
+  const titleLine4 = parts[3] || "";  // Glass Clip
 
   return (
     <section className="relative w-full h-full min-h-[700px] overflow-hidden font-sans">
@@ -177,16 +188,26 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
           <div
             className="w-full h-full"
             style={{
-              transform: `rotate(-45deg) scale(${DIAMOND_CONFIG.topLeft.imageScale}) translate(${DIAMOND_CONFIG.topLeft.imageOffsetX}%, ${DIAMOND_CONFIG.topLeft.imageOffsetY}%)`,
+              transform: 'rotate(-45deg)',
             }}
           >
-            <OptimizedImage
-              image={data.images[1]}
-              alt="Top left image"
-              size="large"
+            <div
               className="w-full h-full"
-              priority
-            />
+              style={{
+                transform: `scale(${DIAMOND_CONFIG.topLeft.imageScale})`,
+                transformOrigin: data.images[1]?.cropFocalPoint
+                  ? `${data.images[1].cropFocalPoint.x}% ${data.images[1].cropFocalPoint.y}%`
+                  : 'center',
+              }}
+            >
+              <OptimizedImage
+                image={data.images[1]}
+                alt="Top left image"
+                size="large"
+                className="w-full h-full object-cover"
+                priority
+              />
+            </div>
           </div>
         </div>
 
@@ -206,16 +227,26 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
           <div
             className="w-full h-full"
             style={{
-              transform: `rotate(-45deg) scale(${DIAMOND_CONFIG.bottomLeft.imageScale}) translate(${DIAMOND_CONFIG.bottomLeft.imageOffsetX}%, ${DIAMOND_CONFIG.bottomLeft.imageOffsetY}%)`,
+              transform: 'rotate(-45deg)',
             }}
           >
-            <OptimizedImage
-              image={data.images[2]}
-              alt="Bottom left image"
-              size="small"
-              className="w-full h-full object-cover"
-              priority
-            />
+            <div
+              className="w-full h-full"
+              style={{
+                transform: `scale(${DIAMOND_CONFIG.bottomLeft.imageScale})`,
+                transformOrigin: data.images[2]?.cropFocalPoint
+                  ? `${data.images[2].cropFocalPoint.x}% ${data.images[2].cropFocalPoint.y}%`
+                  : 'center',
+              }}
+            >
+              <OptimizedImage
+                image={data.images[2]}
+                alt="Bottom left image"
+                size="large"
+                className="w-full h-full object-cover"
+                priority
+              />
+            </div>
           </div>
         </div>
 
@@ -281,16 +312,26 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
           <div
             className="w-full h-full"
             style={{
-              transform: `rotate(-45deg) scale(${DIAMOND_CONFIG.topLeft.imageScale}) translate(${DIAMOND_CONFIG.topLeft.imageOffsetX}%, ${DIAMOND_CONFIG.topLeft.imageOffsetY}%)`,
+              transform: 'rotate(-45deg)',
             }}
           >
-            <OptimizedImage
-              image={data.images[1]}
-              alt="Top left image"
-              size="large"
-              className="w-full h-full object-cover"
-              priority
-            />
+            <div
+              className="w-full h-full"
+              style={{
+                transform: `scale(${DIAMOND_CONFIG.topLeft.imageScale})`,
+                transformOrigin: data.images[1]?.cropFocalPoint
+                  ? `${data.images[1].cropFocalPoint.x}% ${data.images[1].cropFocalPoint.y}%`
+                  : 'center',
+              }}
+            >
+              <OptimizedImage
+                image={data.images[1]}
+                alt="Top left image"
+                size="large"
+                className="w-full h-full object-cover"
+                priority
+              />
+            </div>
           </div>
         </div>
 
@@ -310,16 +351,26 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
           <div
             className="w-full h-full"
             style={{
-              transform: `rotate(-45deg) scale(${DIAMOND_CONFIG.bottomLeft.imageScale}) translate(${DIAMOND_CONFIG.bottomLeft.imageOffsetX}%, ${DIAMOND_CONFIG.bottomLeft.imageOffsetY}%)`,
+              transform: 'rotate(-45deg)',
             }}
           >
-            <OptimizedImage
-              image={data.images[2]}
-              alt="Bottom left image"
-              size="medium"
-              className="w-full h-full object-cover"
-              priority
-            />
+            <div
+              className="w-full h-full"
+              style={{
+                transform: `scale(${DIAMOND_CONFIG.bottomLeft.imageScale})`,
+                transformOrigin: data.images[2]?.cropFocalPoint
+                  ? `${data.images[2].cropFocalPoint.x}% ${data.images[2].cropFocalPoint.y}%`
+                  : 'center',
+              }}
+            >
+              <OptimizedImage
+                image={data.images[2]}
+                alt="Bottom left image"
+                size="large"
+                className="w-full h-full object-cover"
+                priority
+              />
+            </div>
           </div>
         </div>
 
@@ -377,9 +428,9 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
             >
               {titleLine1}
             </div>
-            {/* 第二行: Waterproof Bathroom (Paytone One 120px) */}
+            {/* 第二行: Waterproof (Paytone One 120px) */}
             <div
-              className="font-paytone-one font-normal whitespace-pre-line"
+              className="font-paytone-one font-normal"
               style={{
                 fontSize: rpx(TEXT_CONFIG.line2FontSize),
                 lineHeight: rpx(TEXT_CONFIG.line2LineHeight),
@@ -389,7 +440,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
             >
               {titleLine2}
             </div>
-            {/* 第三行: Glass Clip (Paytone One 90px) */}
+            {/* 第三行: Bathroom (Paytone One 120px) */}
             <div
               className="font-paytone-one font-normal"
               style={{
@@ -400,6 +451,18 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
               }}
             >
               {titleLine3}
+            </div>
+            {/* 第四行: Glass Clip (Paytone One 90px) */}
+            <div
+              className="font-paytone-one font-normal"
+              style={{
+                fontSize: rpx(TEXT_CONFIG.line4FontSize),
+                lineHeight: rpx(TEXT_CONFIG.line4LineHeight),
+                WebkitTextStroke: `${rpx(2)} #000000`,
+                paintOrder: 'stroke fill',
+              }}
+            >
+              {titleLine4}
             </div>
           </h1>
 
@@ -484,7 +547,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
               {titleLine1}
             </div>
             <div
-              className="font-paytone-one font-normal whitespace-pre-line"
+              className="font-paytone-one font-normal"
               style={{
                 fontSize: `${MOBILE_TEXT_CONFIG.line2FontSize}px`,
                 lineHeight: `${MOBILE_TEXT_CONFIG.line2LineHeight}px`,
@@ -504,6 +567,17 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
               }}
             >
               {titleLine3}
+            </div>
+            <div
+              className="font-paytone-one font-normal"
+              style={{
+                fontSize: `${MOBILE_TEXT_CONFIG.line4FontSize}px`,
+                lineHeight: `${MOBILE_TEXT_CONFIG.line4LineHeight}px`,
+                WebkitTextStroke: '1px #000000',
+                paintOrder: 'stroke fill',
+              }}
+            >
+              {titleLine4}
             </div>
           </h1>
 

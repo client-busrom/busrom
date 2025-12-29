@@ -31,57 +31,59 @@ type ProductCardProps = {
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920;
-const DESIGN_HEIGHT = 1230;
+const DESIGN_HEIGHT = 922; // 目标可视高度 (1080 - 浏览器UI 112 - 导航栏 46)
 
-// 布局配置 - 基于 Figma JSON (已应用85%缩放)
+// 布局配置 - 基于 Figma JSON (应用64%缩放以适应1920x968屏幕)
+// 原始设计稿高度1230，需要在1920宽度下适应968-46=922高度
+// 缩放比例 = 1640/1920 * 0.75 ≈ 0.64
 const LAYOUT = {
   // 左右边距
-  paddingLeft: 160,
-  paddingRight: 160,
+  paddingLeft: 120,
+  paddingRight: 120,
 
   // 标题区域
   header: {
     subtitleY: 0,
-    titleY: 53,           // 62 * 0.85
-    titleFontSize: 82,    // 96 * 0.85
-    subtitleFontSize: 27, // 32 * 0.85
+    titleY: 40,           // 62 * 0.64
+    titleFontSize: 61,    // 96 * 0.64
+    subtitleFontSize: 20, // 32 * 0.64
   },
 
   // 分类标签栏
   tags: {
-    y: 145,               // 171 * 0.85
-    height: 68,           // 80 * 0.85
-    borderRadius: 34,     // 40 * 0.85
-    fontSize: 20,         // 24 * 0.85
-    gap: 26,              // 30 * 0.85
+    y: 109,               // 171 * 0.64
+    height: 51,           // 80 * 0.64
+    borderRadius: 26,     // 40 * 0.64
+    fontSize: 15,         // 24 * 0.64
+    gap: 19,              // 30 * 0.64
   },
 
   // 产品卡片
   cards: {
-    startY: 239,          // 281 * 0.85
-    width: 385,           // 453 * 0.85
-    imageHeight: 468,     // 550 * 0.85
-    borderRadius: 26,     // 30 * 0.85
-    gap: 71,              // 83 * 0.85
-    stepOffsets: [0, 58, 114],  // [0, 68, 134] * 0.85
-    titleMarginTop: 34,   // 40 * 0.85
-    titleFontSize: 27,    // 32 * 0.85
-    featureFontSize: 24,  // 28 * 0.85
-    featureLineHeight: 42, // 49 * 0.85
+    startY: 180,          // 281 * 0.64
+    width: 290,           // 453 * 0.64
+    imageHeight: 352,     // 550 * 0.64
+    borderRadius: 19,     // 30 * 0.64
+    gap: 53,              // 83 * 0.64
+    stepOffsets: [0, 44, 86],  // [0, 68, 134] * 0.64
+    titleMarginTop: 26,   // 40 * 0.64
+    titleFontSize: 20,    // 32 * 0.64
+    featureFontSize: 18,  // 28 * 0.64
+    featureLineHeight: 31, // 49 * 0.64
   },
 
   // 右上角 "VIEW MORE"
   viewMore: {
     circleX: 1397,
-    circleY: 51,          // 60 * 0.85
-    circleSize: 60,       // 71 * 0.85
+    circleY: 38,          // 60 * 0.64
+    circleSize: 45,       // 71 * 0.64
     textX: 1427,
-    textY: 69,            // 81 * 0.85
-    fontSize: 27,         // 32 * 0.85
+    textY: 52,            // 81 * 0.64
+    fontSize: 20,         // 32 * 0.64
   },
 
   // 卡片网格最大宽度比例
-  gridMaxWidth: 85,       // 85%
+  gridMaxWidth: 72,       // 85% * 0.85 ≈ 72% (缩小网格区域以适应高度)
 };
 
 // 走马灯配置
@@ -531,13 +533,16 @@ export default function FeaturedProducts({ data, locale }: Props) {
           style={{
             paddingLeft: vw(LAYOUT.paddingLeft),
             paddingRight: vw(LAYOUT.paddingRight),
-            paddingTop: vw(80),
-            paddingBottom: vw(200),
+            paddingTop: vw(50),      // 80 * 0.64
+            paddingBottom: vw(80),   // 底部间距
             position: 'relative',
           }}
         >
           {/* 顶部区域 - Header */}
-          <div className="flex justify-between items-end">
+          <div
+            className="flex justify-between items-end mx-auto"
+            style={{ maxWidth: `${LAYOUT.gridMaxWidth}%` }}
+          >
             {/* 左侧标题 */}
             <div>
               <p
@@ -545,7 +550,7 @@ export default function FeaturedProducts({ data, locale }: Props) {
                 style={{
                   fontSize: vw(LAYOUT.header.subtitleFontSize),
                   lineHeight: '1.2',
-                  marginBottom: vw(32),
+                  marginBottom: vw(20),  // 32 * 0.64
                 }}
               >
                 {data.description || "Product Series Introduction"}
@@ -588,7 +593,7 @@ export default function FeaturedProducts({ data, locale }: Props) {
             className="grid grid-cols-3 items-start mx-auto"
             style={{
               gap: vw(LAYOUT.cards.gap),
-              marginTop: vw(20),
+              marginTop: vw(13),   // 20 * 0.64
               maxWidth: `${LAYOUT.gridMaxWidth}%`,
             }}
           >
