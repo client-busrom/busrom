@@ -64,12 +64,15 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
 
   // 点击菜单项
   const handleMenuClick = (item: NavItem, e: React.MouseEvent) => {
-    // 如果有子菜单，切换展开状态
-    if (item.childMenus && item.childMenus.length > 0) {
+    // Product 和 Shop 点击直接跳转（悬停展开子菜单）
+    // 其他有子菜单的项点击切换展开状态
+    const isProductOrShop = item.url === '/products' || item.url === '/shop'
+
+    if (item.childMenus && item.childMenus.length > 0 && !isProductOrShop) {
       e.preventDefault()
       setActiveMenuId(activeMenuId === item.id ? null : item.id)
     } else {
-      // 没有子菜单，关闭当前展开的菜单
+      // 没有子菜单或是 Product/Shop，关闭当前展开的菜单并跳转
       setActiveMenuId(null)
     }
   }
