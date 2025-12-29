@@ -6,6 +6,7 @@ import { Link } from "@/lib/navigation";
 import type { HomeContent } from "@/lib/content-data";
 import type { Locale } from "@/i18n.config";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { getOptimizedImageUrl, type MediaImage } from "@/lib/image-utils";
 
 type Props = {
   data: HomeContent["productSeriesCarousel"];
@@ -79,6 +80,21 @@ export default function ProductSeriesCarousel({ data }: Props) {
       }
     };
   }, []);
+
+  // 预加载所有场景图 (sceneImage) - 悬停时需要秒出
+  useEffect(() => {
+    if (!data || data.length === 0) return;
+
+    data.forEach((item) => {
+      if (item.sceneImage) {
+        const url = getOptimizedImageUrl(item.sceneImage as MediaImage, 'large', true);
+        if (url && !url.includes('placeholder')) {
+          const img = new Image();
+          img.src = url;
+        }
+      }
+    });
+  }, [data]);
 
   const paginate = useCallback((dir: number) => {
     if (isAnimating) return; // 动画进行中，忽略点击

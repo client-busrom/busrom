@@ -332,14 +332,14 @@ export default function OemOdm({ data }: Props) {
               top: "79%",
               width: "clamp(170px, 22.4vw, 431px)",
               fontSize: "clamp(12px, 1.25vw, 24px)",
-              lineHeight: "1.25",
+              lineHeight: "1.35",
             }}
             variants={contentRightVariants}
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
           >
             {ODM.description.map((paragraph, index) => (
-              <p key={index} className="mb-2">
+              <p key={index}>
                 {paragraph}
               </p>
             ))}

@@ -44,6 +44,8 @@ const MASK_2_CONFIG = {
   top: -10,             // 贴顶部
   // 图片配置
   imageScale: 0.8,
+  imageOffsetX: 0,   // 图片水平偏移 (px)
+  imageOffsetY: 0,   // 图片垂直偏移 (px)
   imagePositionX: 50,
   imagePositionY: 50,
   useCMSFocalPoint: true,
@@ -83,7 +85,7 @@ const CONTENT_CONFIG = {
   },
   // 底部 Feature 条 (旋转后需要调整位置)
   features: {
-    width: 643,
+    width: 740,
     height: 107,
     borderRadius: 71,
     fontSize: 40,
@@ -156,6 +158,7 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
           style={{
             width: `${MASK_2_CONFIG.imageScale * 100}%`,
             filter: `blur(${MASK_2_CONFIG.blur}px)`,
+            transform: `translate(${MASK_2_CONFIG.imageOffsetX}px, ${MASK_2_CONFIG.imageOffsetY}px)`,
           }}
         >
           <OptimizedImage
@@ -194,7 +197,7 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
           <OptimizedImage
             image={data.images[0]}
             alt="主图"
-            size="large"
+            size="xlarge"
             className="w-full h-full object-cover"
             objectPosition={image1Position}
             priority
@@ -206,13 +209,14 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
       <div className="hidden lg:block relative z-20 h-full">
         {/* 顶部标语胶囊 - 渐变背景从白到橙，左边方角右边圆角 */}
         <div
-          className="absolute flex items-center justify-end"
+          className="absolute flex items-start justify-end"
           style={{
             left: 0,
             top: rpxContent(CONTENT_CONFIG.tagline.top),
             width: rpxContent(CONTENT_CONFIG.tagline.width),
             height: rpxContent(CONTENT_CONFIG.tagline.height),
             paddingRight: rpxContent(40),
+            paddingTop: `calc(${rpxContent(CONTENT_CONFIG.tagline.height)} / 3)`,
             background: 'linear-gradient(to left, #FFFFFF, #FFDE95)',
             borderRadius: `0 ${rpxContent(CONTENT_CONFIG.tagline.borderRadius)} ${rpxContent(CONTENT_CONFIG.tagline.borderRadius)} 0`,
           }}

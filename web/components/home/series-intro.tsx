@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { cn } from "@/lib/utils";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { getOptimizedImageUrl, type MediaImage } from "@/lib/image-utils";
 
 type Props = {
   data: HomeContent["seriesIntro"];
@@ -44,6 +45,24 @@ export default function SeriesIntro({ data }: Props) {
     observer.observe(section);
     return () => observer.disconnect();
   }, []);
+
+  // 预加载所有系列的图片
+  useEffect(() => {
+    if (!seriesData || seriesData.length === 0) return;
+
+    // 预加载所有系列的所有图片
+    seriesData.forEach((series) => {
+      series.images?.forEach((imageObj) => {
+        if (imageObj) {
+          const url = getOptimizedImageUrl(imageObj as MediaImage, 'medium', true);
+          if (url && !url.includes('placeholder')) {
+            const img = new Image();
+            img.src = url;
+          }
+        }
+      });
+    });
+  }, [seriesData]);
 
   const seriesIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const imageIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -237,7 +256,7 @@ export default function SeriesIntro({ data }: Props) {
       onMouseLeave={() => setIsHovering(false)}
     >
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="bg-brand-secondary rounded-2xl lg:rounded-3xl p-6 lg:p-10 overflow-hidden">
+        <div className="bg-brand-secondary rounded-2xl lg:rounded-3xl p-6 lg:py-20 lg:pl-20 lg:pr-0 overflow-hidden">
 
           {/* ===== 桌面端布局 (lg+) ===== */}
           <div className="hidden lg:block">
@@ -245,26 +264,26 @@ export default function SeriesIntro({ data }: Props) {
             <div className="flex gap-12 mb-8">
               {/* 左侧: 标题+描述 */}
               <div className="flex-1">
-                <h2 className="text-4xl xl:text-5xl font-anaheim font-extrabold mb-6" style={{ color: '#FFFAD3' }}>
+                <h2 className="text-5xl xl:text-6xl font-anaheim font-extrabold mb-6" style={{ color: '#FFFAD3' }}>
                   Product Series Introduction
                 </h2>
                 {activeSeries && (
-                  <p className="text-sm xl:text-base leading-relaxed text-white max-w-xl">
+                  <p className="text-sm xl:text-base leading-relaxed text-white max-w-2xl mt-2 ml-4">
                     {activeSeries.description}
                   </p>
                 )}
               </div>
 
               {/* 右侧: 系列列表轮播 + 上下切换按钮 */}
-              <div className="w-80 flex-shrink-0 flex gap-4">
+              <div className="w-80 flex-shrink-0 flex gap-0">
                 {/* 系列列表 */}
                 <div className="flex-1">
-                  <div className="h-64 overflow-hidden relative">
+                  <div className="h-72 overflow-hidden relative">
                     <div className="flex flex-col absolute w-full top-0 left-0">
                       {renderWindow.map((item, idx) => (
                         <button
                           key={`${item.title}-${idx}`}
-                          className="w-full text-left py-3 transition-all duration-300 h-12"
+                          className="w-full text-left py-4 transition-all duration-300 h-14"
                           style={{ opacity: getOpacity(item.distanceFromFocus) }}
                           onClick={() => {
                             setActiveSeriesIndex(item.originalIndex);
@@ -288,7 +307,7 @@ export default function SeriesIntro({ data }: Props) {
                 </div>
 
                 {/* 上下切换按钮 - 切换系列 */}
-                <div className="flex flex-col gap-3 justify-center">
+                <div className="flex flex-col gap-3 justify-center -translate-x-8">
                   <button
                     onClick={handleSeriesPrev}
                     className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
@@ -351,7 +370,7 @@ export default function SeriesIntro({ data }: Props) {
               {/* 右侧: 图片轮播 (循环) */}
               <div
                 ref={carouselRef}
-                className="flex-1 overflow-hidden rounded-2xl cursor-grab active:cursor-grabbing select-none aspect-[21/9]"
+                className="flex-1 overflow-hidden rounded-l-2xl cursor-grab active:cursor-grabbing select-none aspect-[21/9]"
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
@@ -382,7 +401,7 @@ export default function SeriesIntro({ data }: Props) {
                       <OptimizedImage
                         image={imageObj}
                         alt={imageObj?.altText || `${activeSeries?.title} - Image ${(idx % totalImages) + 1}`}
-                        size="small"
+                        size="medium"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -434,7 +453,7 @@ export default function SeriesIntro({ data }: Props) {
                     <OptimizedImage
                       image={imageObj}
                       alt={imageObj?.altText || `${activeSeries?.title} - Image ${idx + 1}`}
-                      size="small"
+                      size="medium"
                       className="w-full h-full object-cover"
                     />
                   </div>

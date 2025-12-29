@@ -64,7 +64,7 @@ const CONFIG = {
   featureLeft: 186,
   featureFirstTop: 671,
   featureGap: 119, // 790-671 = 119
-  featureWidth: 557,
+  featureWidth: 640,
   featureHeight: 93,
   featureBorderRadius: 46.5,
   // Feature 文字 (基于 Figma)
@@ -205,7 +205,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
             className="font-arial text-[#000000] mb-4"
             style={{
               fontSize: rpx(40),
-              marginLeft: rpx(24),
+              marginLeft: rpx(14),
               fontWeight: 400,
               letterSpacing: '0.05em',
             }}

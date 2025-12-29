@@ -256,22 +256,22 @@ export default function QuoteSteps({ data }: Props) {
                 onMouseEnter={() => handleMouseEnter(index)}
                 onClick={() => setActiveIndex(index)}
               >
-                {/* 步骤序号 x=425 → 22.14% */}
+                {/* 步骤序号 */}
                 <div
                   className={cn(
                     "absolute z-10 transition-all duration-300",
                     isActive ? "text-brand-text-black" : "text-brand-text-black/20"
                   )}
                   style={{
-                    left: `${(425 / DESIGN_WIDTH) * 100}%`,
-                    width: `${(241 / DESIGN_WIDTH) * 100}vw`,
-                    height: `${(121 / DESIGN_WIDTH) * 100}vw`,
+                    left: `${(500 / DESIGN_WIDTH) * 100}%`,
+                    width: `${(180 / DESIGN_WIDTH) * 100}vw`,
+                    height: `${(90 / DESIGN_WIDTH) * 100}vw`,
                   }}
                 >
                   <StepNumber step={(index + 1) as 1 | 2 | 3 | 4 | 5} filled={isActive} />
                 </div>
 
-                {/* 步骤文本 x=735 → 38.28% */}
+                {/* 步骤文本 */}
                 <p
                   className={cn(
                     "absolute z-10 font-anaheim font-bold transition-colors duration-300 whitespace-pre-line",
@@ -281,9 +281,9 @@ export default function QuoteSteps({ data }: Props) {
                   )}
                   style={{
                     left: `${(735 / DESIGN_WIDTH) * 100}%`,
-                    top: `${(53 / DESIGN_WIDTH) * 100}vw`, // 与数字垂直居中对齐
-                    fontSize: `${(48 / DESIGN_WIDTH) * 100}vw`,
-                    lineHeight: `${(46 / DESIGN_WIDTH) * 100}vw`,
+                    top: `${(40 / DESIGN_WIDTH) * 100}vw`,
+                    fontSize: `${(36 / DESIGN_WIDTH) * 100}vw`,
+                    lineHeight: `${(36 / DESIGN_WIDTH) * 100}vw`,
                     width: `${(609 / DESIGN_WIDTH) * 100}vw`,
                   }}
                 >
@@ -299,11 +299,11 @@ export default function QuoteSteps({ data }: Props) {
                       : "opacity-0 pointer-events-none"
                   )}
                   style={{
-                    left: `${(1100 / DESIGN_WIDTH) * 100}%`,
+                    left: `${(1000 / DESIGN_WIDTH) * 100}%`,
                     top: "50%",
-                    width: `${(503 / DESIGN_WIDTH) * 100}vw`,
+                    width: `${(377 / DESIGN_WIDTH) * 100}vw`,
                     aspectRatio: "503 / 360",
-                    borderRadius: `${(30 / DESIGN_WIDTH) * 100}vw`,
+                    borderRadius: `${(22 / DESIGN_WIDTH) * 100}vw`,
                     transformOrigin: "center center",
                     transform: isActive
                       ? `translateY(-50%) rotate(${ROTATION_DEGREES}deg)`

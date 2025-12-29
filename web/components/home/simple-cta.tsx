@@ -22,172 +22,159 @@ const LAYOUT_CONFIG = {
   },
 
   // === 左右两栏布局 ===
-  // 基于 Figma 1920px 设计稿精确计算:
-  // 整体: x=186, w=1459 (左701 + 间距161 + 右597)
-  // 左侧: 186/1920=9.69% 起点, 701/1920=36.51% 宽度
-  // 右侧: 1048/1920=54.58% 起点, 597/1920=31.09% 宽度
-  // 间距: 161/1920=8.39%
+  // 基于 Figma 1920px 设计稿，按 90% 缩放，使用实际像素值:
+  // 原始: w=1459 → 缩放后: w=1313
+  // 原始左侧701 → 631, 间距161 → 145, 右侧597 → 537
   columns: {
-    // 整体区域占屏幕宽度: 1459/1920 = 76%
-    totalWidth: "76%",
-    // 左侧起点距屏幕左边: 186/1920 = 9.69%
-    leftMargin: "9.69%",
-    // 左侧宽度占整体: 701/1459 = 48.05%
-    leftWidth: "48.05%",
-    // 间距占整体: 161/1459 = 11.03%
-    gap: "11.03%",
-    // 右侧宽度占整体: 597/1459 = 40.92%
-    rightWidth: "40.92%",
+    totalWidth: "1313px",      // 1459 × 0.9
+    leftWidth: "631px",        // 701 × 0.9
+    gap: "145px",              // 161 × 0.9
+    rightWidth: "537px",       // 597 × 0.9
   },
 
   // === 左侧图片区域 - 桌面端 ===
-  // 基于 Figma 设计稿精确计算：
-  // 整体区域: 左边186, 右边887, 顶3575, 底4427 → 宽701, 高852
+  // 基于 Figma 设计稿，按 90% 缩放，使用实际像素值:
+  // 原始: 宽701, 高852 → 缩放后: 宽631, 高767
   desktop: {
-    // 整体容器宽高比
-    containerAspectRatio: "701/852",
+    // 整体容器尺寸
+    containerWidth: "631px",   // 701 × 0.9
+    containerHeight: "767px",  // 852 × 0.9
 
-    // 米色背景矩形: x=274, y=3759, w=546, h=472
+    // 米色背景矩形: 原始 546×472 → 491×425
     bgRect: {
-      width: "77.89%",       // 546/701
-      aspectRatio: "546/472",
-      left: "12.55%",        // (274-186)/701
-      top: "21.60%",         // (3759-3575)/852
+      width: "491px",          // 546 × 0.9
+      height: "425px",         // 472 × 0.9
+      left: "79px",            // 88 × 0.9 (原始偏移 274-186=88)
+      top: "166px",            // 184 × 0.9 (原始偏移 3759-3575=184)
     },
 
-    // 图片1 - 上方大图: x=338, y=3575, w=549, h=324
+    // 图片1 - 上方大图: 原始 549×324 → 494×292
     image1: {
-      width: "78.32%",       // 549/701
-      left: "21.68%",        // (338-186)/701
-      top: "0%",
-      ratio: "549/324",
-      borderRadius: "rounded-[20px]",
+      width: "494px",          // 549 × 0.9
+      height: "292px",         // 324 × 0.9
+      left: "137px",           // 152 × 0.9 (原始偏移 338-186=152)
+      top: "0px",
+      borderRadius: "rounded-[18px]",  // 20 × 0.9
       zIndex: "z-20",
     },
 
-    // 图片2 - 左下图: x=186, y=3992, w=326, h=387
+    // 图片2 - 左下图: 原始 326×387 → 293×348
     image2: {
-      width: "46.50%",       // 326/701
-      left: "0%",            // 186-186=0
-      bottom: "5.63%",       // (4427-(3992+387))/852
-      ratio: "326/387",
-      borderRadius: "rounded-[20px]",
+      width: "293px",          // 326 × 0.9
+      height: "348px",         // 387 × 0.9
+      left: "0px",
+      bottom: "43px",          // 48 × 0.9 (原始偏移 4427-(3992+387)=48)
+      borderRadius: "rounded-[18px]",
       zIndex: "z-30",
     },
 
-    // 图片3 - 右下图: x=560, y=3945, w=327, h=482
+    // 图片3 - 右下图: 原始 327×482 → 294×434
     image3: {
-      width: "46.65%",       // 327/701
-      left: "53.35%",        // (560-186)/701
-      bottom: "0%",
-      ratio: "327/482",
-      borderRadius: "rounded-[19px]",
+      width: "294px",          // 327 × 0.9
+      height: "434px",         // 482 × 0.9
+      left: "337px",           // 374 × 0.9 (原始偏移 560-186=374)
+      bottom: "0px",
+      borderRadius: "rounded-[17px]",  // 19 × 0.9
       zIndex: "z-30",
     },
   },
 
   // === 左侧图片区域 - 移动端 ===
+  // 移动端保持百分比以适应不同屏幕宽度
   mobile: {
-    // 整体容器宽高比 - 使用与桌面端相同的比例保持一致
-    containerAspectRatio: "701/852",
+    containerAspectRatio: "631/767",
 
-    // 米色背景矩形
     bgRect: {
       width: "78%",
-      aspectRatio: "546/472",
-      left: "12%",
-      top: "22%",
+      aspectRatio: "491/425",
+      left: "12.5%",
+      top: "21.6%",
     },
 
-    // 图片1 - 上方大图
     image1: {
       width: "78%",
       left: "22%",
       top: "0%",
-      ratio: "549/324",
+      ratio: "494/292",
       borderRadius: "rounded-[12px]",
       zIndex: "z-20",
     },
 
-    // 图片2 - 左下图
     image2: {
       width: "46%",
       left: "0%",
-      bottom: "6%",
-      ratio: "326/387",
+      bottom: "5.6%",
+      ratio: "293/348",
       borderRadius: "rounded-[12px]",
       zIndex: "z-30",
     },
 
-    // 图片3 - 右下图
     image3: {
       width: "46%",
-      left: "54%",
+      left: "53.4%",
       bottom: "0%",
-      ratio: "327/482",
-      borderRadius: "rounded-[12px]",
+      ratio: "294/434",
+      borderRadius: "rounded-[11px]",
       zIndex: "z-30",
     },
   },
 
   // === 右侧文本区域 ===
-  // 基于 Figma 精确间距:
-  // title1 底边 → title2 顶边: -10px (重叠)
-  // title2 底边 → subtitle 顶边: 46px
-  // subtitle 底边 → description 顶边: 86px
-  // description 底边 → button 顶边: 138px
+  // 基于 Figma 精确间距，按 90% 缩放:
+  // 原始间距 × 0.9
   text: {
-    // 标题第一行 (Ready to Start) - y=3617, h=93, fontSize=64
+    // 标题第一行 (Ready to Start) - fontSize: 64 × 0.9 = 58
     title1: {
-      fontSize: "text-3xl lg:text-4xl xl:text-5xl 2xl:text-[64px]",
-      lineHeight: "leading-tight 2xl:leading-[93px]",
+      fontSize: "text-3xl lg:text-4xl xl:text-[48px] 2xl:text-[58px]",
+      lineHeight: "leading-tight 2xl:leading-[84px]",
       color: "text-brand-text-black",
-      marginBottom: "mb-[-10px]",  // 与 title2 重叠 10px
+      marginBottom: "mb-[-9px]",  // -10 × 0.9
     },
 
-    // 标题第二行 (Your Project?) - y=3700, h=93, fontSize=96
+    // 标题第二行 (Your Project?) - fontSize: 96 × 0.9 = 86
     title2: {
-      fontSize: "text-4xl lg:text-5xl xl:text-6xl 2xl:text-[96px]",
-      lineHeight: "leading-none 2xl:leading-[93px]",
+      fontSize: "text-4xl lg:text-5xl xl:text-[72px] 2xl:text-[86px]",
+      lineHeight: "leading-none 2xl:leading-[84px]",
       color: "text-brand-text-black",
-      marginBottom: "mb-[46px]",   // 与 subtitle 间距 46px
+      marginBottom: "mb-[41px]",   // 46 × 0.9
     },
 
-    // 副标题 (Let's Build Something Exceptional!) - y=3839, h=30, fontSize=36
+    // 副标题 (Let's Build Something Exceptional!) - fontSize: 36 × 0.9 = 32
     subtitle: {
-      fontSize: "text-xl lg:text-2xl xl:text-3xl 2xl:text-[36px]",
-      lineHeight: "leading-tight 2xl:leading-[30px]",
+      fontSize: "text-xl lg:text-2xl xl:text-[28px] 2xl:text-[32px]",
+      lineHeight: "leading-tight 2xl:leading-[27px]",
       color: "text-[#978350]",
-      marginBottom: "mb-[86px]",   // 与 description 间距 86px
+      marginBottom: "mb-[77px]",   // 86 × 0.9
+      noWrap: true,                // 不换行
     },
 
-    // 描述文字 - y=3955, h=162, fontSize=32, lineHeight=53
+    // 描述文字 - fontSize: 32 × 0.9 = 29
     description: {
-      fontSize: "text-base lg:text-lg xl:text-xl 2xl:text-[32px]",
-      lineHeight: "leading-relaxed 2xl:leading-[53px]",
-      maxWidth: "max-w-[597px]",
+      fontSize: "text-base lg:text-lg xl:text-[24px] 2xl:text-[29px]",
+      lineHeight: "leading-relaxed 2xl:leading-[48px]",
+      maxWidth: "max-w-[537px]",   // 597 × 0.9
       color: "text-[#3C3C3C]",
-      marginBottom: "mb-[138px]",  // 与 button 间距 138px
+      marginBottom: "mb-[124px]",  // 138 × 0.9
     },
   },
 
   // === CTA 按钮 ===
+  // 按 90% 缩放
   button: {
-
-    // 桌面端按钮尺寸
+    // 桌面端按钮尺寸: 372 × 0.9 = 335, 68 × 0.9 = 61, 32 × 0.9 = 29
     desktop: {
-      width: "w-[280px] lg:w-[320px] 2xl:w-[372px]",
-      height: "h-[52px] lg:h-[58px] 2xl:h-[68px]",
-      fontSize: "text-lg lg:text-xl 2xl:text-[32px]",
-      borderRadius: "rounded-[34px]",
+      width: "w-[252px] lg:w-[288px] 2xl:w-[335px]",
+      height: "h-[47px] lg:h-[52px] 2xl:h-[61px]",
+      fontSize: "text-base lg:text-lg 2xl:text-[29px]",
+      borderRadius: "rounded-[31px]",
     },
 
     // 移动端按钮尺寸
     mobile: {
-      width: "w-[240px]",
-      height: "h-[48px]",
-      fontSize: "text-base",
-      borderRadius: "rounded-[34px]",
+      width: "w-[216px]",
+      height: "h-[43px]",
+      fontSize: "text-sm",
+      borderRadius: "rounded-[31px]",
     },
   },
 };
@@ -296,7 +283,7 @@ export default function SimpleCta({ data }: Props) {
         <motion.div
           className="absolute w-[120%] left-[-10%] flex items-center justify-center"
           style={{
-            height: "32px",
+            height: "48px",
             top: "50%",
             backgroundColor: "#EBE6D7",
             transformOrigin: "center center",
@@ -314,7 +301,7 @@ export default function SimpleCta({ data }: Props) {
         <motion.div
           className="absolute w-[120%] left-[-10%] flex items-center justify-center"
           style={{
-            height: "32px",
+            height: "48px",
             top: "50%",
             backgroundColor: "#756F3F",
             transformOrigin: "center center",
@@ -406,10 +393,10 @@ export default function SimpleCta({ data }: Props) {
                 {secondLine}
               </h3>
             )}
-            <h4 className="font-anaheim font-bold text-xl text-[#978350] leading-tight">
+            <h4 className="font-anaheim font-bold text-xl text-[#978350] leading-tight whitespace-nowrap">
               {data.subtitle}
             </h4>
-            <p className="font-anaheim font-normal text-base text-[#3C3C3C] leading-relaxed">
+            <p className="font-montserrat font-bold text-base text-[#3C3C3C] leading-relaxed">
               {data.description}
             </p>
             <div className="pt-4">
@@ -440,20 +427,18 @@ export default function SimpleCta({ data }: Props) {
       {/* Figma 1920px: 左侧 x=186 w=701, 右侧 x=1048 w=597, 间距=161 */}
       <div className={cn("hidden lg:block", cfg.section.marginTop)}>
         <div
-          className="flex items-start mx-auto"
+          className="flex items-start justify-center mx-auto"
           style={{
             maxWidth: "1920px",
-            paddingLeft: "9.69%",    /* 186/1920 */
-            paddingRight: "14.32%",  /* 275/1920 */
-            gap: "11.03%",           /* 161/1459 of content area */
+            gap: cfg.columns.gap,
           }}
         >
-          {/* 左侧图片区域: 701px / (701+161+597) = 48.05% */}
+          {/* 左侧图片区域 */}
           <div
             className="relative shrink-0"
             style={{
-              width: "48.05%",
-              aspectRatio: cfg.desktop.containerAspectRatio,
+              width: cfg.desktop.containerWidth,
+              height: cfg.desktop.containerHeight,
             }}
           >
             {/* 米色背景 */}
@@ -461,7 +446,7 @@ export default function SimpleCta({ data }: Props) {
               className="absolute bg-[#F2EEDF] z-0 rounded-lg"
               style={{
                 width: cfg.desktop.bgRect.width,
-                aspectRatio: cfg.desktop.bgRect.aspectRatio,
+                height: cfg.desktop.bgRect.height,
                 left: cfg.desktop.bgRect.left,
                 top: cfg.desktop.bgRect.top,
               }}
@@ -471,12 +456,13 @@ export default function SimpleCta({ data }: Props) {
               className={cn("absolute", cfg.desktop.image1.zIndex)}
               style={{
                 width: cfg.desktop.image1.width,
+                height: cfg.desktop.image1.height,
                 left: cfg.desktop.image1.left,
                 top: cfg.desktop.image1.top,
               }}
             >
               <ImagePlaceholder
-                ratio={cfg.desktop.image1.ratio}
+                ratio="494/292"
                 alt={data.images[0]?.altText || "Image 1"}
                 className={cfg.desktop.image1.borderRadius}
                 image={data.images[0]}
@@ -487,12 +473,13 @@ export default function SimpleCta({ data }: Props) {
               className={cn("absolute", cfg.desktop.image2.zIndex)}
               style={{
                 width: cfg.desktop.image2.width,
+                height: cfg.desktop.image2.height,
                 left: cfg.desktop.image2.left,
                 bottom: cfg.desktop.image2.bottom,
               }}
             >
               <ImagePlaceholder
-                ratio={cfg.desktop.image2.ratio}
+                ratio="293/348"
                 alt={data.images[1]?.altText || "Image 2"}
                 className={cfg.desktop.image2.borderRadius}
                 image={data.images[1]}
@@ -503,12 +490,13 @@ export default function SimpleCta({ data }: Props) {
               className={cn("absolute", cfg.desktop.image3.zIndex)}
               style={{
                 width: cfg.desktop.image3.width,
+                height: cfg.desktop.image3.height,
                 left: cfg.desktop.image3.left,
                 bottom: cfg.desktop.image3.bottom,
               }}
             >
               <ImagePlaceholder
-                ratio={cfg.desktop.image3.ratio}
+                ratio="294/434"
                 alt={data.images[2]?.altText || "Image 3"}
                 className={cfg.desktop.image3.borderRadius}
                 image={data.images[2]}
@@ -516,10 +504,10 @@ export default function SimpleCta({ data }: Props) {
             </div>
           </div>
 
-          {/* 右侧文本区域: 597px / (701+161+597) = 40.92% */}
+          {/* 右侧文本区域 */}
           <div
             className="text-left shrink-0"
-            style={{ width: "40.92%" }}
+            style={{ width: cfg.columns.rightWidth }}
           >
 
             {/* 标题第一行 - Ready to Start */}
@@ -550,7 +538,7 @@ export default function SimpleCta({ data }: Props) {
 
             {/* 副标题 - Let's Build Something Exceptional! */}
             <h4 className={cn(
-              "font-anaheim font-bold",
+              "font-anaheim font-bold whitespace-nowrap",
               cfg.text.subtitle.fontSize,
               cfg.text.subtitle.lineHeight,
               cfg.text.subtitle.color,
@@ -561,7 +549,7 @@ export default function SimpleCta({ data }: Props) {
 
             {/* 描述文字 */}
             <p className={cn(
-              "font-anaheim font-normal",
+              "font-montserrat font-bold",
               cfg.text.description.fontSize,
               cfg.text.description.lineHeight,
               cfg.text.description.maxWidth,

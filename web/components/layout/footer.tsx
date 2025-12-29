@@ -129,6 +129,8 @@ export default function Footer({ locale, showForm = true }: Props) {
     errorRequiredFields?: string;
     errorNetworkMessage?: string;
     successMessage?: string;
+    submitButtonText?: string;
+    submittingText?: string;
   } | null>(null);
 
   // Footer API data (for non-home pages)
@@ -272,7 +274,7 @@ export default function Footer({ locale, showForm = true }: Props) {
             relative bg-gray-900 text-white
             flex flex-col justify-end
           "
-          style={{ minHeight: 'calc(var(--rpx) * 1581)' }} // Figma: 1581px height
+          style={{ minHeight: 'calc(var(--rpx) * 1000)' }} // Reduced from Figma: 1581px
           data-header-theme="transparent"
         >
         {/* 背景图片 - 使用 CSS 背景代替 fill Image 避免 CLS */}
@@ -426,15 +428,15 @@ export default function Footer({ locale, showForm = true }: Props) {
                     className={cn(
                       formButtonClasses,
                       "text-base md:text-lg lg:text-xl xl:text-2xl font-semibold",
-                      "px-8 md:px-10 lg:px-12",
+                      "px-20 md:px-28 lg:px-36",
                       "h-12 md:h-14 lg:h-16",
                       "rounded-full"
                     )}
                     disabled={isSubmitting}
                   >
                     {isSubmitting
-                      ? (locale === 'zh' ? '提交中...' : 'Submitting...')
-                      : content.form.buttonText}
+                      ? (formConfig?.submittingText || (locale === 'zh' ? '提交中...' : 'Submitting...'))
+                      : (formConfig?.submitButtonText || content.form.buttonText)}
                   </Button>
                 </div>
               </form>
