@@ -4,6 +4,9 @@ import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
+// 处理换行符：支持 /n 和 \n
+const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
+
 // --- BannerProps 定义 ---
 type BannerData = HomeContent["heroBanner"][number];
 type BannerProps = {
@@ -95,9 +98,9 @@ const CONTENT_CONFIG = {
 // --- HeroBanner6 组件 ---
 const HeroBanner6: FC<BannerProps> = ({ data }) => {
   // --- 拆分标题 (支持三行: Curated / Details Glass / Hinge) ---
-  // 支持真正的换行符和字面的 \n 字符串
-  const fullFeatureTitle = data.features[0] || "";
-  const lines = fullFeatureTitle.split(/\n|\\n/);
+  // 使用 formatText 统一处理换行符
+  const fullFeatureTitle = formatText(data.features[0]);
+  const lines = fullFeatureTitle.split('\n');
   const titleLine1 = lines[0] || "";  // "Curated"
   const titleLine2 = lines[1] || "";  // "Details Glass"
   const titleLine3 = lines[2] || "";  // "Hinge"
@@ -215,10 +218,10 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
           }}
         >
           <p
-            className="font-arial font-bold italic text-[#754600]"
+            className="font-arial font-bold italic text-[#754600] whitespace-pre-line"
             style={{ fontSize: rpxContent(CONTENT_CONFIG.tagline.fontSize), letterSpacing: '0.05em' }}
           >
-            {data.features[1]}
+            {formatText(data.features[1])}
           </p>
         </div>
 
@@ -300,8 +303,8 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
         <div className="flex items-center justify-end rounded-full px-4 py-2 mb-4 self-start"
           style={{ background: 'linear-gradient(to left, #FFFFFF, #FFDE95)' }}
         >
-          <p className="font-arial font-bold italic text-[#754600] text-sm" style={{ letterSpacing: '0.05em' }}>
-            {data.features[1]}
+          <p className="font-arial font-bold italic text-[#754600] text-sm whitespace-pre-line" style={{ letterSpacing: '0.05em' }}>
+            {formatText(data.features[1])}
           </p>
         </div>
 

@@ -5,6 +5,9 @@ import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
+// 处理换行符：支持 /n 和 \n
+const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
+
 // --- BannerProps 定义 ---
 type BannerData = HomeContent["heroBanner"][number];
 type BannerProps = {
@@ -19,7 +22,7 @@ const rpx = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
 // --- HeroBanner4 组件 ---
 const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
   // --- 拆分 Feature[0] ---
-  const feature0Text = data.features[0] || "";
+  const feature0Text = formatText(data.features[0]);
   const feature0Words = feature0Text.split("\n");
   const feature0FirstPart = feature0Words[0];
   const feature0SecondPart = feature0Words[1];
@@ -122,7 +125,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
           style={{
             width: '3732px',
             height: '1622px',
-            right: '-15%',
+            right: '-14%',
             bottom: '-10%',
           }}
         />
@@ -237,7 +240,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
               paintOrder: 'stroke fill',
             }}
           >
-            {data.features[1]?.replace(/\/n/g, '\n          ')}
+            {formatText(data.features[1])?.replace(/\n/g, '\n          ')}
           </p>
           {/* Feature[0] - 主标题 */}
           <h1
@@ -295,7 +298,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
         <div className="flex-1 flex flex-col justify-center items-start px-6 pb-8">
           {/* Feature[1] - 副标题 */}
           <p className="font-paytone-one font-regular text-3xl text-white text-stroke-custom-white mb-4 whitespace-pre-wrap text-left">
-            {data.features[1]?.replace(/\/n/g, '\n        ')}
+            {formatText(data.features[1])?.replace(/\n/g, '\n        ')}
           </p>
           {/* Feature[0] - 主标题 */}
           <h1 className="font-paytone-one font-regular text-5xl sm:text-6xl mb-8 text-left">

@@ -4,6 +4,9 @@ import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
+// 处理换行符：支持 /n 和 \n
+const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
+
 // --- 响应式尺寸函数 ---
 // 使用 --rpx-hero 来适应实际视口高度
 const rpxHero = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
@@ -288,12 +291,12 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
   const diamondBottomPosition = getImagePosition(DIAMOND_BOTTOM_CONFIG, data.images[3]);
 
   // --- Split Feature[0] (支持换行: \n, \\n, /n，支持多行) ---
-  const feature0Text = data.features[0] || "";
-  const feature0Lines = feature0Text.split(/\n|\\n|\/n/);
+  const feature0Text = formatText(data.features[0]);
+  const feature0Lines = feature0Text.split('\n');
 
   // --- Split Feature[1] (支持换行: \n, \\n, /n) ---
-  const feature1Text = data.features[1] || "";
-  const feature1Lines = feature1Text.split(/\n|\\n|\/n/);
+  const feature1Text = formatText(data.features[1]);
+  const feature1Lines = feature1Text.split('\n');
 
   const ovalClipId = "ovalClipHero7"; // 唯一 ID
 

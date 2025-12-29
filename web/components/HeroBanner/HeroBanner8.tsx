@@ -4,6 +4,9 @@ import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
+// 处理换行符：支持 /n 和 \n
+const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
+
 // --- 响应式尺寸函数 ---
 const rpx = (designValue: number) => `calc(var(--rpx) * ${designValue})`;
 const rpxHero = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
@@ -109,8 +112,8 @@ const MOBILE_CONFIG = {
 // --- HeroBanner8 Component ---
 const HeroBanner8: FC<BannerProps> = ({ data }) => {
   // --- Split Feature[0] (支持换行: \n, \\n, /n) ---
-  const feature0Text = data.features[0] || "";
-  const feature0Lines = feature0Text.split(/\n|\\n|\/n/);
+  const feature0Text = formatText(data.features[0]);
+  const feature0Lines = feature0Text.split('\n');
 
   return (
     <section
@@ -173,8 +176,8 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
             fontSize: rpxHeroMin(DESKTOP_CONFIG.feature1.fontSize, 24),
           }}
         >
-          <p className="font-paytone-one font-regular">
-            {data.features[1]}
+          <p className="font-paytone-one font-regular whitespace-pre-line">
+            {formatText(data.features[1])}
           </p>
         </div>
       </div>
@@ -288,8 +291,8 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
         style={{ top: MOBILE_CONFIG.feature1.top }}
       >
         <div className="bg-[#665F1F] text-[#FEFFD8] rounded-l-full px-6 py-3">
-          <p className={`${MOBILE_CONFIG.feature1.fontSize} font-paytone-one font-regular`}>
-            {data.features[1]}
+          <p className={`${MOBILE_CONFIG.feature1.fontSize} font-paytone-one font-regular whitespace-pre-line`}>
+            {formatText(data.features[1])}
           </p>
         </div>
       </div>

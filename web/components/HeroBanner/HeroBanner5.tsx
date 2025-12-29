@@ -4,6 +4,9 @@ import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
+// 处理换行符：支持 /n 和 \n
+const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
+
 // --- BannerProps Definition ---
 type BannerData = HomeContent["heroBanner"][number];
 type BannerProps = {
@@ -128,10 +131,10 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
   // line1: Design-forward (Pavanam 90px)
   // line2: Waterproof /n Bathroom (Paytone One 120px)
   // line3: Glass Clip (Paytone One 90px)
-  const feature0Text = data.features[0] || "";
+  const feature0Text = formatText(data.features[0]);
   const parts = feature0Text.split(/\s{2,}/);  // 按双空格或更多空格分割
   const titleLine1 = parts[0] || "";  // Design-forward
-  const titleLine2 = (parts[1] || "").replace(/\/n/g, '\n');  // Waterproof /n Bathroom -> 换行
+  const titleLine2 = parts[1] || "";  // Waterproof \n Bathroom (已经处理过换行)
   const titleLine3 = parts[2] || "";  // Glass Clip
 
   return (
@@ -180,8 +183,8 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
             <OptimizedImage
               image={data.images[1]}
               alt="Top left image"
-              size="small"
-              className="w-full h-full object-cover"
+              size="thumbnail"
+              className="w-full h-full"
               priority
             />
           </div>
@@ -238,7 +241,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
             <OptimizedImage
               image={data.images[3]}
               alt="Right large image"
-              size="small"
+              size="large"
               className="w-full h-full object-cover"
               priority
             />
@@ -284,7 +287,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
             <OptimizedImage
               image={data.images[1]}
               alt="Top left image"
-              size="small"
+              size="large"
               className="w-full h-full object-cover"
               priority
             />
@@ -342,7 +345,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
             <OptimizedImage
               image={data.images[3]}
               alt="Right large image"
-              size="small"
+              size="large"
               className="w-full h-full object-cover"
               priority
             />
@@ -452,7 +455,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
               paintOrder: 'stroke fill',
             }}
           >
-            {data.features[1]?.replace(/\/n/g, '\n')}
+            {formatText(data.features[1])}
           </p>
         </div>
       </div>
@@ -549,7 +552,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
               lineHeight: `${MOBILE_TEXT_CONFIG.rightTextLineHeight}px`,
             }}
           >
-            {data.features[1]?.replace(/\/n/g, '\n')}
+            {formatText(data.features[1])}
           </p>
         </div>
       </div>
