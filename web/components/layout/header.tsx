@@ -195,7 +195,7 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
         ref={headerRef}
         className={cn("fixed top-0 left-0 right-0 w-full z-[70] transition-all duration-300 ease-in-out", headerBgColor, headerShadow)}
       >
-        <div className="max-w-7xl mx-auto px-6 py-2">
+        <div className="w-full px-[10%] py-2">
           <div className="flex items-center justify-between">
             {/* 左侧：Logo + 移动端汉堡菜单 */}
             <div className="flex items-center gap-4">
