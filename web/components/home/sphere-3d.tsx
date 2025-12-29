@@ -158,7 +158,13 @@ const CONFIG = {
     originColor: "#00FF88",
   },
   globe: {
-    imageUrl: "https://d2kqew3hn5wphn.cloudfront.net/media/globe/earth-blue-marble.webp",
+    // 本地用 nginx 代理 MinIO，生产用 CloudFront
+    imageUrl: process.env.NODE_ENV === 'development'
+      ? "http://localhost:8080/media/globe/earth-blue-marble.webp"
+      : "https://d2kqew3hn5wphn.cloudfront.net/media/globe/earth-blue-marble.webp",
+    backgroundUrl: process.env.NODE_ENV === 'development'
+      ? "http://localhost:8080/media/globe/night-sky.webp"
+      : "https://d2kqew3hn5wphn.cloudfront.net/media/globe/night-sky.webp",
     atmosphereColor: "#87CEEB",
     atmosphereAltitude: 0.15,
   },
@@ -428,7 +434,7 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
             width={size.width}
             height={size.height}
             globeImageUrl={CONFIG.globe.imageUrl}
-            backgroundImageUrl="https://d2kqew3hn5wphn.cloudfront.net/media/globe/night-sky.webp"
+            backgroundImageUrl={CONFIG.globe.backgroundUrl}
             atmosphereColor={CONFIG.globe.atmosphereColor}
             atmosphereAltitude={CONFIG.globe.atmosphereAltitude}
             backgroundColor="rgba(0,0,0,0)"
