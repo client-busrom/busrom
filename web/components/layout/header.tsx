@@ -197,8 +197,8 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
       >
         <div className="max-w-7xl mx-auto px-6 py-2">
           <div className="flex items-center justify-between">
-            {/* 左侧：移动端汉堡菜单 / 桌面端导航 (order 1-3) */}
-            <div className="flex-1 flex justify-start items-center">
+            {/* 左侧：Logo + 移动端汉堡菜单 */}
+            <div className="flex items-center gap-4">
               {/* 移动端：汉堡菜单按钮 */}
               <button
                 onClick={(event) => {
@@ -214,17 +214,7 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
                 <Menu className="w-5 h-5" />
               </button>
 
-              {/* 桌面端：左侧导航 (order 1-3) */}
-              <DesktopNavigation
-                navigationItems={navigationItems || []}
-                position="left"
-                theme={activeTheme}
-                onMenuOpen={setIsDropdownOpen}
-              />
-            </div>
-
-            {/* 中间：Logo */}
-            <div className="flex-shrink-0">
+              {/* Logo */}
               <Link href={`/${locale}`}>
                 <h1 className={cn("text-3xl tracking-wider font-paytone-one transition-colors duration-300", headerTextColor)}>
                   Busrom
@@ -232,17 +222,17 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
               </Link>
             </div>
 
-            {/* 右侧：桌面端导航 (order 4-6) + 语言选择 */}
-            <div className="flex-1 flex justify-end items-center gap-6">
-              {/* 桌面端：右侧导航 (order 4-6) */}
+            {/* 中间：桌面端导航（所有菜单项） */}
+            <div className="hidden lg:flex flex-1 justify-center">
               <DesktopNavigation
                 navigationItems={navigationItems || []}
-                position="right"
                 theme={activeTheme}
                 onMenuOpen={setIsDropdownOpen}
               />
+            </div>
 
-              {/* 语言选择 */}
+            {/* 右侧：语言选择 */}
+            <div className="flex items-center">
               <LocaleSwitcher activeTheme={activeTheme} />
             </div>
           </div>

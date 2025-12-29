@@ -56,7 +56,9 @@ export default function HeroBanner({ data, locale }: Props) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
   const [isVisible, setIsVisible] = useState(true);
+  const [progress, setProgress] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // 已加载的 Banner 组件缓存（只有第1个直接可用）
   const [loadedBanners, setLoadedBanners] = useState<Record<number, BannerComponentType>>({
@@ -165,6 +167,8 @@ export default function HeroBanner({ data, locale }: Props) {
     const onSelect = () => {
       if (!api) return;
       setCurrentSlide(api.selectedScrollSnap());
+      // 切换时重置进度条
+      setProgress(0);
     };
 
     api.on("reInit", onInitOrReinit);
@@ -178,6 +182,34 @@ export default function HeroBanner({ data, locale }: Props) {
       }
     };
   }, [api]);
+
+  // 进度条动画 - 每个 banner 从 0% 到 100%
+  useEffect(() => {
+    if (!isVisible || !data || data.length <= 1) {
+      setProgress(0);
+      return;
+    }
+
+    // 清除之前的 interval
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+    }
+
+    // 每 60ms 更新一次进度（6000ms / 100 = 60ms per 1%）
+    const updateInterval = AUTOPLAY_DELAY / 100;
+    progressIntervalRef.current = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) return 0;
+        return prev + 1;
+      });
+    }, updateInterval);
+
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+    };
+  }, [isVisible, currentSlide, data]);
 
   const scrollTo = useCallback((index: number) => api?.scrollTo(index), [api]);
 
@@ -219,18 +251,22 @@ export default function HeroBanner({ data, locale }: Props) {
 
       {scrollSnaps.length > 0 && (
         <>
-          {/* 底部进度条 */}
-          <div className="absolute bottom-0 left-0 right-0 z-10 h-1 bg-white/30">
+          {/* 底部进度条 - 从 left 15% 到 50% */}
+          <div
+            className="absolute bottom-7 z-10 h-[2px] bg-white/50"
+            style={{ left: '15%', width: '35%' }}
+          >
             <div
-              className="h-full bg-white transition-all duration-300 ease-out"
-              style={{ width: `${((currentSlide + 1) / scrollSnaps.length) * 100}%` }}
+              className="h-full bg-white"
+              style={{ width: `${progress}%` }}
             />
           </div>
 
-          {/* 右下角页码指示器 */}
+          {/* 页码指示器 - right 15% */}
           <div
-            className="absolute bottom-6 right-8 z-10 flex items-baseline text-white font-anaheim"
+            className="absolute bottom-3 z-10 flex items-baseline text-white font-anaheim"
             style={{
+              right: '15%',
               textShadow: '0 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.3)',
             }}
           >

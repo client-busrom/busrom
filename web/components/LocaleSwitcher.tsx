@@ -135,7 +135,7 @@ export default function LocaleSwitcher({ activeTheme }: LocaleSwitcherProps) {
         activeTheme === 'transparent' ? 'text-white' : 'text-brand-text-main'
       )}>
         <Globe className="w-5 h-4" />
-        <span className="text-sm font-anaheim font-medium">Loading...</span>
+        <span className="text-sm font-montserrat font-bold">Loading...</span>
         <ChevronDown className="w-4 h-4" />
       </div>
     )
@@ -156,7 +156,7 @@ export default function LocaleSwitcher({ activeTheme }: LocaleSwitcherProps) {
         aria-label="Select country and language"
       >
         <CountryFlag countryCode={selectedCountry?.code || "US"} className="w-5 h-4 rounded-sm" />
-        <span className="text-sm font-anaheim font-medium">
+        <span className="text-sm font-montserrat font-bold">
           {selectedCountry?.shortName} / {selectedLanguage?.nativeName}
         </span>
         <ChevronDown className={cn("w-4 h-4 transition-transform", isOpen && "rotate-180")} />
