@@ -237,20 +237,36 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
   }, [getLocalizedName]);
 
 
-  // 监听窗口大小
+  // 监听窗口大小 - 使用 ResizeObserver 确保正确获取尺寸
   useEffect(() => {
-    const update = () => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const updateSize = () => {
       setIsMobile(window.innerWidth < 1024);
-      if (containerRef.current) {
-        setSize({
-          width: containerRef.current.offsetWidth,
-          height: containerRef.current.offsetHeight,
-        });
+      const width = container.offsetWidth;
+      const height = container.offsetHeight;
+      if (width > 0 && height > 0) {
+        setSize({ width, height });
       }
     };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+
+    // 使用 ResizeObserver 监听容器尺寸变化
+    const resizeObserver = new ResizeObserver(() => {
+      updateSize();
+    });
+    resizeObserver.observe(container);
+
+    // 初始化尺寸（添加小延迟确保布局完成）
+    updateSize();
+    const timer = setTimeout(updateSize, 100);
+
+    window.addEventListener("resize", updateSize);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateSize);
+      clearTimeout(timer);
+    };
   }, []);
 
   // 监听是否在视口内
