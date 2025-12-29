@@ -52,6 +52,13 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
       return;
     }
 
+    // 检测 iOS Safari - Three.js WebGL 在某些情况下可能崩溃
+    const isIOSSafari = /iPad|iPhone|iPod/.test(ua) && /Safari/.test(ua) && !/Chrome|CriOS|FxiOS/.test(ua);
+    if (isIOSSafari) {
+      setLoadingStage("done");
+      return;
+    }
+
     try {
       if (sessionStorage.getItem(PRELOADER_SHOWN_KEY) === 'true') {
         setLoadingStage("done");
