@@ -158,7 +158,7 @@ const CONFIG = {
     originColor: "#00FF88",
   },
   globe: {
-    imageUrl: "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
+    imageUrl: "https://d2kqew3hn5wphn.cloudfront.net/media/globe/earth-blue-marble.webp",
     atmosphereColor: "#87CEEB",
     atmosphereAltitude: 0.15,
   },
@@ -428,7 +428,7 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
             width={size.width}
             height={size.height}
             globeImageUrl={CONFIG.globe.imageUrl}
-            backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
+            backgroundImageUrl="https://d2kqew3hn5wphn.cloudfront.net/media/globe/night-sky.webp"
             atmosphereColor={CONFIG.globe.atmosphereColor}
             atmosphereAltitude={CONFIG.globe.atmosphereAltitude}
             backgroundColor="rgba(0,0,0,0)"
