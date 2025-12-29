@@ -10,7 +10,6 @@ import { Settings, Globe, HelpCircle, Info, Book, FileText, ArrowRight, ChevronD
 
 interface DesktopNavigationProps {
   navigationItems: NavItem[]
-  position: "left" | "right"
   theme: "transparent" | "light" | "dark"
   onMenuOpen?: (isOpen: boolean) => void
 }
@@ -48,7 +47,7 @@ const getProductImage = (url: string, apiImage?: { url: string; filename: string
   return null
 }
 
-export function DesktopNavigation({ navigationItems, position, theme, onMenuOpen }: DesktopNavigationProps) {
+export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: DesktopNavigationProps) {
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -58,14 +57,10 @@ export function DesktopNavigation({ navigationItems, position, theme, onMenuOpen
     onMenuOpen?.(activeMenuId !== null)
   }, [activeMenuId, onMenuOpen])
 
-  // 根据 order 过滤菜单项：左边 1-3，右边 4-6
-  const filteredItems = navigationItems.filter(item => {
-    if (position === "left") {
-      return item.order >= 1 && item.order <= 3
-    } else {
-      return item.order >= 4 && item.order <= 6
-    }
-  }).sort((a, b) => a.order - b.order)
+  // 按 order 排序所有菜单项，隐藏 Home（点 logo 即可）
+  const sortedItems = [...navigationItems]
+    .filter(item => item.url !== '/' && item.url !== '/home')
+    .sort((a, b) => a.order - b.order)
 
   // 点击菜单项
   const handleMenuClick = (item: NavItem, e: React.MouseEvent) => {
@@ -77,6 +72,18 @@ export function DesktopNavigation({ navigationItems, position, theme, onMenuOpen
       // 没有子菜单，关闭当前展开的菜单
       setActiveMenuId(null)
     }
+  }
+
+  // 悬停打开子菜单
+  const handleMouseEnter = (item: NavItem) => {
+    if (item.childMenus && item.childMenus.length > 0) {
+      setActiveMenuId(item.id)
+    }
+  }
+
+  // 悬停离开关闭子菜单
+  const handleMouseLeave = () => {
+    setActiveMenuId(null)
   }
 
   // 点击外部关闭菜单
@@ -105,18 +112,22 @@ export function DesktopNavigation({ navigationItems, position, theme, onMenuOpen
 
   return (
     <>
-      <div ref={menuRef} className={cn("hidden lg:flex items-center", position === "left" ? "gap-6" : "gap-6")}>
-        {filteredItems.map((item) => {
+      <div ref={menuRef} className="flex items-center gap-6" onMouseLeave={handleMouseLeave}>
+        {sortedItems.map((item) => {
           const hasChildren = item.childMenus && item.childMenus.length > 0
           const isActive = activeMenuId === item.id
 
           return (
-            <div key={item.id} className="relative">
+            <div
+              key={item.id}
+              className="relative"
+              onMouseEnter={() => handleMouseEnter(item)}
+            >
               <Link
                 href={item.url}
                 onClick={(e) => handleMenuClick(item, e)}
                 className={cn(
-                  "flex items-center gap-1 text-sm font-anaheim font-medium transition-colors py-2",
+                  "flex items-center gap-1 text-sm font-montserrat font-bold transition-colors py-2",
                   textColor,
                   hoverColor,
                   isActive && "text-brand-secondary"
@@ -161,6 +172,8 @@ export function DesktopNavigation({ navigationItems, position, theme, onMenuOpen
               className="fixed left-0 right-0 z-[55] bg-brand-main shadow-lg"
               style={{ top: "46px", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
               onWheel={(e) => e.stopPropagation()}
+              onMouseEnter={() => setActiveMenuId(activeMenuId)}
+              onMouseLeave={handleMouseLeave}
             >
               <div className="container mx-auto px-4 lg:px-[66px] py-6 max-h-[70vh] overflow-y-auto scrollbar-hide">
                 {(() => {
@@ -202,7 +215,7 @@ export function DesktopNavigation({ navigationItems, position, theme, onMenuOpen
                               </div>
 
                               <div className="absolute top-4 left-4 z-10">
-                                <p className="text-lg font-semibold text-white drop-shadow-lg">
+                                <p className="text-lg font-montserrat font-bold text-white drop-shadow-lg">
                                   {child.label}
                                 </p>
                               </div>
@@ -210,14 +223,14 @@ export function DesktopNavigation({ navigationItems, position, theme, onMenuOpen
                               <div className="absolute bottom-0 left-0 right-0 flex gap-2 p-4 translate-y-full opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                                 <Link
                                   href={isShopMenu ? `/shop?series=${getProductSlug(child.url)}` : child.url}
-                                  className="flex-1 py-2 px-4 text-center text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                                  className="flex-1 py-2 px-4 text-center text-sm font-montserrat font-bold bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
                                   onClick={() => setActiveMenuId(null)}
                                 >
                                   Learn More
                                 </Link>
                                 <Link
                                   href={child.inquiryLink || '/contact-us'}
-                                  className="flex-1 py-2 px-4 text-center text-sm font-medium bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-colors"
+                                  className="flex-1 py-2 px-4 text-center text-sm font-montserrat font-bold bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-colors"
                                   onClick={() => setActiveMenuId(null)}
                                 >
                                   Inquiry
@@ -244,7 +257,7 @@ export function DesktopNavigation({ navigationItems, position, theme, onMenuOpen
                             <div className="text-muted-foreground group-hover:text-brand-accent-gold transition-colors">
                               {getIcon(child.icon)}
                             </div>
-                            <span className="text-lg font-medium text-muted-foreground group-hover:text-brand-accent-gold text-center transition-colors">
+                            <span className="text-lg font-montserrat font-bold text-muted-foreground group-hover:text-brand-accent-gold text-center transition-colors">
                               {child.label}
                             </span>
                           </Link>
@@ -263,7 +276,7 @@ export function DesktopNavigation({ navigationItems, position, theme, onMenuOpen
                           className="group px-4 py-3 rounded-md transition-colors"
                           onClick={() => setActiveMenuId(null)}
                         >
-                          <span className="text-lg font-medium text-muted-foreground group-hover:text-brand-accent-gold transition-colors">
+                          <span className="text-lg font-montserrat font-bold text-muted-foreground group-hover:text-brand-accent-gold transition-colors">
                             {child.label}
                           </span>
                         </Link>
