@@ -392,7 +392,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
           <OptimizedImage
             image={data.images[1]}
             alt="Top rotated image"
-            size="large"
+            size="medium"
             className="absolute inset-0 w-full h-full object-cover -rotate-45"
             objectPosition={diamondTopPosition}
             priority
@@ -676,7 +676,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
               <OptimizedImage
                 image={data.images[1]}
                 alt="Top rotated image"
-                size="large"
+                size="medium"
                 className="absolute inset-0 w-full h-full object-cover -rotate-45"
                 objectPosition={diamondTopPosition}
                 priority
