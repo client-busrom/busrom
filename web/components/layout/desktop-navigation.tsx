@@ -6,7 +6,7 @@ import Image from "next/image"
 import { Link } from "@/lib/navigation"
 import { cn } from "@/lib/utils"
 import type { NavItem } from "@/types/navigation"
-import { Settings, Globe, HelpCircle, Info, Book, FileText, ArrowRight } from "lucide-react"
+import { Settings, Globe, HelpCircle, Info, Book, FileText, ArrowRight, ChevronDown } from "lucide-react"
 
 interface DesktopNavigationProps {
   navigationItems: NavItem[]
@@ -130,13 +130,22 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
                 href={item.url}
                 onClick={(e) => handleMenuClick(item, e)}
                 className={cn(
-                  "relative text-sm font-montserrat font-bold transition-colors py-2",
+                  "relative flex items-center gap-1 text-sm font-montserrat font-bold transition-colors py-2",
                   textColor,
                   hoverColor,
                   isActive && "text-brand-secondary"
                 )}
               >
                 {item.label}
+                {/* 箭头图标（有子菜单时显示） */}
+                {hasChildren && (
+                  <ChevronDown
+                    className={cn(
+                      "w-4 h-4 transition-transform duration-200",
+                      isActive && "rotate-180"
+                    )}
+                  />
+                )}
                 {/* 下划线指示器（有子菜单且激活时显示） */}
                 {hasChildren && (
                   <span
