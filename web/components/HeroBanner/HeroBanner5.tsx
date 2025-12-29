@@ -422,7 +422,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
                 }}
               >
                 <p
-                  className="font-pingfang font-semibold text-black"
+                  className="font-montserrat font-bold text-black"
                   style={{
                     fontSize: rpx(TEXT_CONFIG.featureFontSize),
                     lineHeight: rpx(TEXT_CONFIG.featureLineHeight),
@@ -526,7 +526,7 @@ const HeroBanner5: FC<BannerProps> = ({ data }) => {
                 }}
               >
                 <p
-                  className="font-pingfang font-semibold text-black"
+                  className="font-montserrat font-bold text-black"
                   style={{
                     fontSize: `${MOBILE_TEXT_CONFIG.featureFontSize}px`,
                     lineHeight: `${MOBILE_TEXT_CONFIG.featureLineHeight}px`,

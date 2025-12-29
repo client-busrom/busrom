@@ -473,7 +473,7 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
                 }}
               >
                 <p
-                  className="font-pingfang font-light text-[#FDF6C2] text-center whitespace-pre-line"
+                  className="font-montserrat font-bold text-[#FDF6C2] text-center whitespace-pre-line"
                   style={{
                     fontSize: rpx(28),
                     lineHeight: 1.4,
@@ -522,7 +522,7 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
               className="flex items-center justify-center border border-white bg-[#756F3F] rounded-full py-3 px-6"
             >
               <p
-                className="text-[#FDF6C2] text-center font-medium text-sm"
+                className="text-[#FDF6C2] text-center font-montserrat font-bold text-sm"
                 style={{
                   textShadow: '0 4px 12px rgba(86, 80, 32, 1)',
                 }}

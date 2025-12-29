@@ -239,7 +239,7 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
             }}
           >
             <p
-              className="font-phudu font-semibold text-[#CFBC37] text-left whitespace-nowrap"
+              className="font-montserrat font-bold text-[#CFBC37] text-left whitespace-nowrap"
               style={{
                 fontSize: rpxHeroMin(DESKTOP_CONFIG.featureCards.fontSize, 18),
                 letterSpacing: '0.09em',
@@ -333,7 +333,7 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
               className="bg-[#FFFB1B]/[0.17] border border-[#CFBC37] rounded-lg px-3 py-1.5"
             >
               <p
-                className="text-sm font-phudu font-semibold text-[#CFBC37] text-left whitespace-nowrap"
+                className="text-sm font-montserrat font-bold text-[#CFBC37] text-left whitespace-nowrap"
                 style={{ textShadow: '0 2px 6px rgba(86, 80, 32, 1)' }}
               >
                 {feature}

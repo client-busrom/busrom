@@ -541,7 +541,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
                 }}
               >
                 <p
-                  className="font-pingfang font-semibold text-[#000000]"
+                  className="font-montserrat font-bold text-[#000000]"
                   style={{
                     fontSize: rpxHero(DESKTOP_RIGHT_CONTENT_CONFIG.featureFontSize),
                     letterSpacing: '0.06em',
@@ -614,7 +614,7 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
                 key={index}
                 className="bg-[#E9E2A0] px-4 py-2 flex items-center justify-center rounded-full"
               >
-                <p className="text-xs font-pingfang font-semibold text-[#000000]">
+                <p className="text-xs font-montserrat font-bold text-[#000000]">
                   {feature}
                 </p>
               </div>

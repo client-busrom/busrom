@@ -194,7 +194,7 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
               />
               {/* 文字 */}
               <p
-                className="absolute font-pingfang font-semibold text-[#FFF5AD] whitespace-nowrap antialiased"
+                className="absolute font-montserrat font-bold text-[#FFF5AD] whitespace-nowrap antialiased"
                 style={{
                   left: rpx(LEFT_CONTENT_CONFIG.itemTextLeft),
                   top: rpx(textTop),
@@ -274,7 +274,7 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
                 }}
               />
               <p
-                className="absolute font-pingfang font-semibold text-[#FFF5AD] whitespace-nowrap antialiased"
+                className="absolute font-montserrat font-bold text-[#FFF5AD] whitespace-nowrap antialiased"
                 style={{
                   left: rpxMd(LEFT_CONTENT_CONFIG.itemTextLeft),
                   top: rpxMd(textTop),
@@ -354,7 +354,7 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
                 }}
               />
               <p
-                className="absolute font-pingfang font-semibold text-[#FFF5AD] whitespace-nowrap antialiased"
+                className="absolute font-montserrat font-bold text-[#FFF5AD] whitespace-nowrap antialiased"
                 style={{
                   left: rpxSm(LEFT_CONTENT_CONFIG.itemTextLeft),
                   top: rpxSm(textTop),

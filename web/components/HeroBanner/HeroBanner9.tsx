@@ -292,7 +292,7 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
           {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
             <h2
               key={index}
-              className="font-paytone-one font-regular text-center"
+              className="font-montserrat font-bold text-center"
               style={{
                 fontSize: DESKTOP_CONFIG.featureText.fontSize,
                 color: DESKTOP_CONFIG.featureText.color,
@@ -369,7 +369,7 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
           {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
             <h2
               key={index}
-              className="font-paytone-one font-regular text-center"
+              className="font-montserrat font-bold text-center"
               style={{
                 fontSize: DESKTOP_CONFIG.featureText.fontSize,
                 color: DESKTOP_CONFIG.featureText.color,

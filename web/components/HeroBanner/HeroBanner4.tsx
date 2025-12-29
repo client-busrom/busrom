@@ -263,7 +263,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
             {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
               <div
                 key={index}
-                className="bg-[#FFD978] flex items-center justify-center font-pingfang font-semibold text-[#000000]"
+                className="bg-[#FFD978] flex items-center justify-center font-montserrat font-bold text-[#000000]"
                 style={{
                   width: rpx(featureConfigs[index].width),
                   height: rpx(TEXT_CONFIG.featureHeight),
@@ -314,7 +314,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
               return (
                 <div
                   key={index}
-                  className="bg-[#FFD978] h-14 flex items-center justify-center font-pingfang font-semibold text-lg text-[#000000]"
+                  className="bg-[#FFD978] h-14 flex items-center justify-center font-montserrat font-bold text-lg text-[#000000]"
                   style={{
                     width: mobileWidths[index],
                     marginLeft: `${mobileMarginLeft[index]}px`,
