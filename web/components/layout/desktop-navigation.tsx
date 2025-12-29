@@ -204,6 +204,7 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
                               <div className="absolute inset-0 overflow-hidden">
                                 {imageUrl ? (
                                   <Image
+                                    key={`${activeItem.id}-${child.id}-${imageUrl}`}
                                     src={imageUrl}
                                     alt={child.label}
                                     fill
