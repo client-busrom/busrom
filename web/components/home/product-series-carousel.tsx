@@ -87,7 +87,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
 
     data.forEach((item) => {
       if (item.sceneImage) {
-        const url = getOptimizedImageUrl(item.sceneImage as MediaImage, 'large', true);
+        const url = getOptimizedImageUrl(item.sceneImage as unknown as MediaImage, 'large', true);
         if (url && !url.includes('placeholder')) {
           const img = new Image();
           img.src = url;

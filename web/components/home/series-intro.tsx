@@ -54,7 +54,7 @@ export default function SeriesIntro({ data }: Props) {
     seriesData.forEach((series) => {
       series.images?.forEach((imageObj) => {
         if (imageObj) {
-          const url = getOptimizedImageUrl(imageObj as MediaImage, 'medium', true);
+          const url = getOptimizedImageUrl(imageObj as unknown as MediaImage, 'medium', true);
           if (url && !url.includes('placeholder')) {
             const img = new Image();
             img.src = url;
