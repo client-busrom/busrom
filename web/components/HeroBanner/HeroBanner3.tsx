@@ -233,7 +233,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
             {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
               <div
                 key={index}
-                className="flex items-center font-pingfang font-semibold antialiased whitespace-nowrap"
+                className="flex items-center font-montserrat font-bold antialiased whitespace-nowrap"
                 style={{
                   width: rpx(CONFIG.featureWidth),
                   height: rpx(CONFIG.featureHeight),
@@ -372,7 +372,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
               {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
                 <div
                   key={index}
-                  className="px-6 py-4 rounded-full font-pingfang font-semibold text-center text-lg sm:text-xl"
+                  className="px-6 py-4 rounded-full font-montserrat font-bold text-center text-lg sm:text-xl"
                   style={{
                     backgroundColor: featureBgColors[index % featureBgColors.length],
                     color: featureTextColors[index % featureTextColors.length],

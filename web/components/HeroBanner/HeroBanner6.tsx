@@ -288,7 +288,7 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
             }}
           >
             <span
-              className="font-pingfang font-semibold text-[#FFF5AD]"
+              className="font-montserrat font-bold text-[#FFF5AD]"
               style={{ fontSize: rpxContent(CONTENT_CONFIG.features.fontSize), paddingRight: rpxContent(40) }}
             >
               {feature}
