@@ -104,14 +104,14 @@ export default function BrandAnalysis({ data }: Props) {
       className="relative bg-black overflow-hidden"
       data-header-theme="transparent"
     >
-      {/* 背景图片 */}
+      {/* 背景图片 - 只在第一个 center 时显示 */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-black" />
-        {data.backgroundImage && (
+        {data.backgroundImage && currentSlide === 0 && (
           <OptimizedBackgroundImage
             image={data.backgroundImage}
             size="large"
-            className="absolute inset-0 z-0"
+            className="absolute inset-0 z-0 transition-opacity duration-500"
           />
         )}
       </div>

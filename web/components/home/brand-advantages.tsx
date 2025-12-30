@@ -58,9 +58,9 @@ const TITLE_FONT_SIZE = 300;
 // 图标圆圈尺寸
 const ICON_SIZE = 66;
 
-// 左上角 "Brand Advantage" 标题配置
+// 右上角 "Brand Advantage" 标题配置
 const SECTION_TITLE = {
-  x: 140,           // 距离左边的距离 (px, 基于 1920)
+  x: 140,           // 距离右边的距离 (px, 基于 1920)
   y: -420,           // 距离顶部的距离 (px, 基于 1080)
   fontSize: 60,     // 字体大小 (px, 基于 1920)
   lineHeight: 1.1,  // 行高
@@ -278,11 +278,11 @@ export default function BrandAdvantages({ data }: Props) {
             className="hidden lg:block relative w-full h-full"
             style={{ aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` }}
           >
-            {/* 左上角 "Brand Advantage" 标题 */}
+            {/* 右上角 "Brand Advantage" 标题 */}
             <div
-              className="absolute font-anaheim font-extrabold text-white text-left"
+              className="absolute font-anaheim font-extrabold text-white text-right"
               style={{
-                left: `${(SECTION_TITLE.x / DESIGN_WIDTH) * 100}%`,
+                right: `${(SECTION_TITLE.x / DESIGN_WIDTH) * 100}%`,
                 top: `${(SECTION_TITLE.y / DESIGN_HEIGHT) * 100}%`,
                 fontSize: `${(SECTION_TITLE.fontSize / DESIGN_WIDTH) * 100}vw`,
                 lineHeight: SECTION_TITLE.lineHeight,
