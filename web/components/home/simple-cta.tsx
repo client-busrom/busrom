@@ -396,7 +396,7 @@ export default function SimpleCta({ data }: Props) {
             <h4 className="font-anaheim font-bold text-xl text-[#978350] leading-tight whitespace-nowrap">
               {data.subtitle}
             </h4>
-            <p className="font-montserrat font-bold text-base text-[#3C3C3C] leading-relaxed">
+            <p className="font-montserrat font-normal text-base text-[#3C3C3C] leading-relaxed">
               {data.description}
             </p>
             <div className="pt-4">
@@ -549,7 +549,7 @@ export default function SimpleCta({ data }: Props) {
 
             {/* 描述文字 */}
             <p className={cn(
-              "font-montserrat font-bold",
+              "font-montserrat font-normal",
               cfg.text.description.fontSize,
               cfg.text.description.lineHeight,
               cfg.text.description.maxWidth,
