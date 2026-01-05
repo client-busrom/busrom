@@ -20,7 +20,7 @@ import type { MoreSeriesData, MoreSeriesItem } from "@/lib/content-parser"
 
 // Design constants
 const DESIGN_WIDTH = 1920
-const DESIGN_HEIGHT = 784
+const DESIGN_HEIGHT = 884  // 增加100px顶部留白
 const CARD_WIDTH = 391
 const CARD_HEIGHT = 360
 const CARD_GAP = 35
@@ -127,7 +127,7 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
         className="absolute font-josefin-sans font-bold text-center"
         style={{
           left: `${(602 / DESIGN_WIDTH) * 100}%`,
-          top: `${(40 / DESIGN_WIDTH) * 100}vw`,
+          top: `${(140 / DESIGN_WIDTH) * 100}vw`,  // 40 -> 140, 增加100px顶部留白
           width: `${(717 / DESIGN_WIDTH) * 100}%`,
           fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
           lineHeight: `${(101 / DESIGN_WIDTH) * 100}vw`,
@@ -144,7 +144,7 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
         style={{
           left: `${(100 / DESIGN_WIDTH) * 100}%`,
           right: `${(100 / DESIGN_WIDTH) * 100}%`,
-          top: `${(160 / DESIGN_WIDTH) * 100}vw`,
+          top: `${(260 / DESIGN_WIDTH) * 100}vw`,  // 160 -> 260, 增加100px顶部留白
           height: `${((CARD_HEIGHT + 120) / DESIGN_WIDTH) * 100}vw`,
         }}
       >
@@ -287,22 +287,30 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
         className="absolute cursor-pointer group z-10"
         style={{
           left: `${(508 / DESIGN_WIDTH) * 100}%`,
-          top: `${(620 / DESIGN_WIDTH) * 100}vw`,
-          width: `${(85 / DESIGN_WIDTH) * 100}vw`,
-          height: `${(85 / DESIGN_WIDTH) * 100}vw`,
+          top: `${(720 / DESIGN_WIDTH) * 100}vw`,
+          width: `${(83 / DESIGN_WIDTH) * 100}vw`,
+          height: `${(82 / DESIGN_WIDTH) * 100}vw`,
         }}
         onClick={goToPrev}
         aria-label="Previous"
       >
-        {/* White circle with arrow, flipped for left direction */}
+        {/* 默认状态 - 空心圆 + 深色箭头 */}
         <svg
-          className="absolute inset-0 w-full h-full"
-          viewBox="0 0 85 85"
+          className="absolute inset-0 w-full h-full transition-opacity duration-300 group-hover:opacity-0"
+          viewBox="0 0 83 82"
           fill="none"
-          style={{ transform: "scaleX(-1)" }}
         >
-          <circle cx="42.1816" cy="42.1816" r="37.8399" transform="rotate(6.07406 42.1816 42.1816)" stroke="white"/>
-          <path d="M58.047 41.8215L58.0462 41.7988C58.0309 41.4968 57.9237 41.2067 57.739 40.9672L57.7281 40.9533L57.7309 40.9573C57.6645 40.8621 57.5891 40.7737 57.5056 40.6931L57.4817 40.6705L46.4688 30.4222C45.7476 29.7511 44.6195 29.7923 43.9493 30.5143L43.9294 30.5361C43.2801 31.2588 43.3277 32.372 44.0415 33.0363L52.1138 40.548L28.0729 41.4272C27.2519 41.4572 26.6107 42.1479 26.6407 42.9697L26.6484 43.1781C26.6913 43.9881 27.3756 44.617 28.1885 44.5873L52.2294 43.7082L44.7273 51.7895C44.0571 52.5114 44.0984 53.6404 44.8195 54.3114C45.5406 54.9826 46.6687 54.9413 47.339 54.2194L57.5748 43.1932L57.5961 43.1699C57.6665 43.0913 57.7297 43.0067 57.7852 42.917L57.7991 42.8941L57.7963 42.8983C57.9756 42.6358 58.0658 42.3226 58.0538 42.0049L58.047 41.8215Z" fill="white"/>
+          <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="none"/>
+          <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="#464010"/>
+        </svg>
+        {/* 悬停状态 - 实心圆 + 白色箭头 */}
+        <svg
+          className="absolute inset-0 w-full h-full transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+          viewBox="0 0 83 82"
+          fill="none"
+        >
+          <ellipse cx="41.5" cy="41" rx="41.5" ry="41" fill="#756F3F"/>
+          <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="white"/>
         </svg>
       </button>
 
@@ -311,21 +319,30 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
         className="absolute cursor-pointer group z-10"
         style={{
           left: `${(1338 / DESIGN_WIDTH) * 100}%`,
-          top: `${(620 / DESIGN_WIDTH) * 100}vw`,
-          width: `${(85 / DESIGN_WIDTH) * 100}vw`,
-          height: `${(85 / DESIGN_WIDTH) * 100}vw`,
+          top: `${(720 / DESIGN_WIDTH) * 100}vw`,
+          width: `${(83 / DESIGN_WIDTH) * 100}vw`,
+          height: `${(82 / DESIGN_WIDTH) * 100}vw`,
         }}
         onClick={goToNext}
         aria-label="Next"
       >
-        {/* White circle with arrow */}
+        {/* 默认状态 - 空心圆 + 深色箭头 */}
         <svg
-          className="absolute inset-0 w-full h-full"
-          viewBox="0 0 85 85"
+          className="absolute inset-0 w-full h-full transition-opacity duration-300 group-hover:opacity-0"
+          viewBox="0 0 83 82"
           fill="none"
         >
-          <circle cx="42.1816" cy="42.1816" r="37.8399" transform="rotate(6.07406 42.1816 42.1816)" stroke="white"/>
-          <path d="M58.047 41.8215L58.0462 41.7988C58.0309 41.4968 57.9237 41.2067 57.739 40.9672L57.7281 40.9533L57.7309 40.9573C57.6645 40.8621 57.5891 40.7737 57.5056 40.6931L57.4817 40.6705L46.4688 30.4222C45.7476 29.7511 44.6195 29.7923 43.9493 30.5143L43.9294 30.5361C43.2801 31.2588 43.3277 32.372 44.0415 33.0363L52.1138 40.548L28.0729 41.4272C27.2519 41.4572 26.6107 42.1479 26.6407 42.9697L26.6484 43.1781C26.6913 43.9881 27.3756 44.617 28.1885 44.5873L52.2294 43.7082L44.7273 51.7895C44.0571 52.5114 44.0984 53.6404 44.8195 54.3114C45.5406 54.9826 46.6687 54.9413 47.339 54.2194L57.5748 43.1932L57.5961 43.1699C57.6665 43.0913 57.7297 43.0067 57.7852 42.917L57.7991 42.8941L57.7963 42.8983C57.9756 42.6358 58.0658 42.3226 58.0538 42.0049L58.047 41.8215Z" fill="white"/>
+          <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="none"/>
+          <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="#464010"/>
+        </svg>
+        {/* 悬停状态 - 实心圆 + 白色箭头 */}
+        <svg
+          className="absolute inset-0 w-full h-full transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+          viewBox="0 0 83 82"
+          fill="none"
+        >
+          <ellipse cx="41.5" cy="41" rx="41.5" ry="41" fill="#756F3F"/>
+          <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="white"/>
         </svg>
       </button>
 
@@ -334,7 +351,7 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
         className="absolute rounded-full overflow-hidden"
         style={{
           left: `${(630 / DESIGN_WIDTH) * 100}%`,
-          top: `${(660 / DESIGN_WIDTH) * 100}vw`,
+          top: `${(760 / DESIGN_WIDTH) * 100}vw`,  // 660 -> 760, 下移100px
           width: `${(669 / DESIGN_WIDTH) * 100}vw`,
           height: `${(6 / DESIGN_WIDTH) * 100}vw`,
           backgroundColor: "rgba(209, 209, 209, 0.52)",

@@ -174,17 +174,13 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
 
       {/* Main Title (above images, supports /n line breaks) */}
       <h2
-        className="absolute font-anaheim font-extrabold"
+        className="absolute font-anaheim font-extrabold gradient-text-shine-white"
         style={{
           left: `${(153 / DESIGN_WIDTH) * 100}%`,
           top: `${((2677 - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
           width: `${(851 / DESIGN_WIDTH) * 100}%`,
           fontSize: `${(128 / DESIGN_WIDTH) * 100}vw`,
           lineHeight: `${108 / 128}`,
-          background: 'linear-gradient(to bottom, #FFFFFF, rgba(255, 250, 209, 0.48))',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
           zIndex: 2,
         }}
       >
@@ -265,16 +261,12 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
 
       {/* Tech Spec Title */}
       <h3
-        className="absolute font-lilita-one"
+        className="absolute font-lilita-one gradient-text-shine-olive"
         style={{
           left: `${(727 / DESIGN_WIDTH) * 100}%`,
           top: `${((3217 - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
           fontSize: `${(64 / DESIGN_WIDTH) * 100}vw`,
           lineHeight: `${57 / 64}`,
-          background: 'linear-gradient(to right, #756F3F, #DBD076)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
         }}
       >
         {techSpecTitle}
@@ -378,12 +370,13 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
       {/* Category Section Title (dynamic based on current category) */}
       {/* Figma: x:1097, y:4072, width:511, height:30, fontSize:96, Jomhuria Regular */}
       <h4
-        className="absolute text-black transition-all duration-300 whitespace-nowrap font-jomhuria"
+        className="absolute text-black transition-all duration-300 whitespace-nowrap font-jomhuria animate-pulse-scale"
         style={{
           left: `${(1097 / DESIGN_WIDTH) * 100}%`,
           top: `${((4040 - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
           fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
           lineHeight: 1,
+          transformOrigin: 'left center',
         }}
       >
         {currentCategoryData.title || 'Materials & Processes'}

@@ -77,9 +77,9 @@ export function Quote({ data, className }: QuoteProps) {
         </div>
       )}
 
-      {/* BUS ROM Logo Text */}
+      {/* BUS ROM Logo Text - with sway animation pointing towards arrow */}
       <div
-        className="absolute"
+        className="absolute animate-logo-sway"
         style={{
           left: `${(50 / DESIGN_WIDTH) * 100}%`,
           top: `${(400 / DESIGN_WIDTH) * 100}vw`,
@@ -94,15 +94,16 @@ export function Quote({ data, className }: QuoteProps) {
         />
       </div>
 
-      {/* Arrow in the middle of BUS ROM - with hover effect */}
+      {/* Arrow in the middle of BUS ROM - with pulse animation synced with logo sway */}
       <Link
         href={ctaLink || "#"}
-        className="absolute group"
+        className="absolute group animate-arrow-pulse"
         style={{
           left: `${(753 / DESIGN_WIDTH) * 100}%`,
           top: `${(480 / DESIGN_WIDTH) * 100}vw`,
           width: `${(220 / DESIGN_WIDTH) * 100}vw`,
           height: `${(59 / DESIGN_WIDTH) * 100}vw`,
+          transformOrigin: 'left center',
         }}
       >
         {/* Default state */}

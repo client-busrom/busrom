@@ -424,3 +424,129 @@ select:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 1000px hsl(var(--secondary)) inset !important;
   -webkit-text-fill-color: white !important;
 }
+
+/* 标题光泽扫过动画 - 金属反光效果 */
+@keyframes textShine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.text-shine {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 1) 35%,
+    rgba(255, 255, 150, 1) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 150, 1) 55%,
+    rgba(255, 255, 255, 1) 65%,
+    rgba(255, 255, 255, 1) 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShine 6s ease-in-out infinite;
+}
+
+/* 缩放呼吸动画 - 轻柔的放大缩小效果 */
+@keyframes pulseScale {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+.animate-pulse-scale {
+  animation: pulseScale 3s ease-in-out infinite;
+}
+
+/* Logo 左右缓动动画 - 配合箭头形成指向效果 */
+@keyframes logoSway {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(1.5vw);
+  }
+}
+
+.animate-logo-sway {
+  animation: logoSway 3s ease-in-out infinite;
+}
+
+/* 箭头脉冲动画 - 配合 logo 缓动 */
+@keyframes arrowPulse {
+  0%, 100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(1.5vw) scale(1.1);
+    opacity: 0.9;
+  }
+}
+
+.animate-arrow-pulse {
+  animation: arrowPulse 3s ease-in-out infinite;
+}
+
+/* 渐变文字光泽扫过动画 - 白色渐变版本 (从左上往右下扫过) */
+@keyframes gradientSweepWhiteDiagonal {
+  0%, 100% {
+    background-position: 200% -100%;
+  }
+  40%, 60% {
+    background-position: -200% 200%;
+  }
+}
+
+.gradient-text-shine-white {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 250, 209, 0.48) 0%,
+    rgba(255, 250, 209, 0.48) 40%,
+    #FFFFD0 45%,
+    #FFFFFF 50%,
+    #FFFFD0 55%,
+    rgba(255, 250, 209, 0.48) 60%,
+    rgba(255, 250, 209, 0.48) 100%
+  );
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientSweepWhiteDiagonal 6s ease-in-out infinite;
+}
+
+/* 渐变文字光泽扫过动画 - 橄榄色渐变版本 (从左到右扫过) */
+@keyframes gradientSweepOlive {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.gradient-text-shine-olive {
+  background: linear-gradient(
+    90deg,
+    #756F3F 0%,
+    #756F3F 30%,
+    #F0E68C 40%,
+    #DBD076 50%,
+    #DBD076 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientSweepOlive 6s ease-in-out infinite;
+}

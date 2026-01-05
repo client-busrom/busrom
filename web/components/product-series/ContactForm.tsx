@@ -28,6 +28,11 @@ interface ContactFormProps {
   className?: string
 }
 
+// Image switch interval in milliseconds
+const IMAGE_SWITCH_INTERVAL = 4000
+// Animation duration for fold/unfold effect
+const ANIMATION_DURATION = 600
+
 export function ContactForm({ data, className }: ContactFormProps) {
   if (!data) return null
 
@@ -46,6 +51,72 @@ export function ContactForm({ data, className }: ContactFormProps) {
   // Track form height to adjust section height
   const formRef = React.useRef<HTMLFormElement>(null)
   const [sectionHeight, setSectionHeight] = React.useState(0)
+
+  // Image carousel state - 6 images split into 3 groups of 2
+  const [currentGroupIndex, setCurrentGroupIndex] = React.useState(0)
+  const [isAnimating, setIsAnimating] = React.useState(false)
+  const [isFolded, setIsFolded] = React.useState(false)
+
+  // Calculate number of groups (pairs of images)
+  const imageGroups = React.useMemo(() => {
+    const groups: Array<[string, string]> = []
+    for (let i = 0; i < productImages.length; i += 2) {
+      if (productImages[i] && productImages[i + 1]) {
+        groups.push([productImages[i], productImages[i + 1]])
+      } else if (productImages[i]) {
+        // If odd number of images, pair last one with first
+        groups.push([productImages[i], productImages[0] || productImages[i]])
+      }
+    }
+    return groups.length > 0 ? groups : [[productImages[0] || '', productImages[1] || '']]
+  }, [productImages])
+
+  // Track which images to display (separate from currentGroupIndex for animation timing)
+  const [displayedGroupIndex, setDisplayedGroupIndex] = React.useState(0)
+  // Track mask visibility for card flip effect
+  const [showMask, setShowMask] = React.useState(false)
+
+  // Auto-switch images with fold animation
+  React.useEffect(() => {
+    if (imageGroups.length <= 1) return
+
+    const interval = setInterval(() => {
+      // Step 1: Start fold animation (old images fold inward)
+      setIsAnimating(true)
+      setIsFolded(true)
+
+      // Step 2: After fold completes, show mask to cover images
+      setTimeout(() => {
+        setShowMask(true)
+
+        // Step 3: After mask appears, switch images
+        setTimeout(() => {
+          setCurrentGroupIndex(prev => (prev + 1) % imageGroups.length)
+          setDisplayedGroupIndex(prev => (prev + 1) % imageGroups.length)
+
+          // Step 4: Hide mask to reveal new images
+          setTimeout(() => {
+            setShowMask(false)
+
+            // Step 5: Unfold with new images
+            setTimeout(() => {
+              setIsFolded(false)
+
+              // Step 6: Animation complete
+              setTimeout(() => {
+                setIsAnimating(false)
+              }, ANIMATION_DURATION)
+            }, 100)
+          }, 150)
+        }, 150)
+      }, ANIMATION_DURATION)
+    }, IMAGE_SWITCH_INTERVAL)
+
+    return () => clearInterval(interval)
+  }, [imageGroups.length])
+
+  // Get current image pair to display
+  const currentImages = imageGroups[displayedGroupIndex] || [productImages[0], productImages[1]]
 
   React.useEffect(() => {
     const formEl = formRef.current
@@ -133,8 +204,9 @@ export function ContactForm({ data, className }: ContactFormProps) {
       />
 
       {/* Title - "Contact Us Get A Quote" at x=153, y=80 (relative to section y=5791) */}
+      {/* 双层文字叠加效果：底层白色描边镂空字 + 顶层带光泽动画的填充字 */}
       <h2
-        className="absolute font-josefin-sans font-bold text-white whitespace-nowrap"
+        className="absolute font-josefin-sans font-bold whitespace-nowrap"
         style={{
           left: px(153 - SECTION_X_OFFSET),
           top: vw(80),
@@ -142,56 +214,104 @@ export function ContactForm({ data, className }: ContactFormProps) {
           lineHeight: vw(109),
         }}
       >
-        {title || "Contact Us Get A Quote"}
+        {/* 底层：白色描边镂空字，向右下偏移形成立体感 */}
+        <span
+          className="absolute text-transparent"
+          style={{
+            WebkitTextStroke: '2px rgba(255, 255, 255, 0.6)',
+            top: vw(4),
+            left: vw(4),
+          }}
+        >
+          {title || "Contact Us Get A Quote"}
+        </span>
+        {/* 顶层：带光泽扫过动画的填充字 */}
+        <span className="relative text-shine">
+          {title || "Contact Us Get A Quote"}
+        </span>
       </h2>
 
-      {/* Left Tilted Product Image 1 - Rectangle 728, Figma rotation: 3.23deg -> CSS: -3.23deg */}
-      {productImages && productImages[0] && (
+      {/* Left Tilted Product Image 1 - Rectangle 728 */}
+      {/* Fold animation: rotate + translate to center, stack with image 2 */}
+      {currentImages[0] && (
         <div
           className="absolute overflow-hidden"
           style={{
             left: px(147 - SECTION_X_OFFSET),
-            top: vw(232.5),  // 6023.5 - 5791
+            top: vw(232.5),
             width: vw(306),
             height: vw(399),
-            transform: "rotate(-3.23deg)",
+            // Folded: rotate to 0 + move right and up to overlap with image 2
+            transform: isFolded
+              ? `translate(${(131.5 / DESIGN_WIDTH) * 100}vw, ${(-18 / DESIGN_WIDTH) * 100}vw) rotate(6deg)`
+              : "translate(0, 0) rotate(-3.23deg)",
+            transformOrigin: "center center",
             borderRadius: vw(30),
+            transition: `transform ${ANIMATION_DURATION}ms cubic-bezier(0.4, 0, 0.2, 1)`,
+            zIndex: 1,
           }}
         >
           <OptimizedImage
-            image={productImages[0]}
+            image={currentImages[0]}
             alt=""
             size="small"
             className="absolute inset-0 w-full h-full object-cover"
           />
+          {/* Mask overlay - brand color */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundColor: "#756F3F",
+              opacity: showMask ? 1 : 0,
+              transition: "opacity 150ms ease-in-out",
+              borderRadius: vw(30),
+            }}
+          />
         </div>
       )}
 
-      {/* Left Tilted Product Image 2 - Rectangle 729, Figma rotation: -15.15deg -> CSS: 15.15deg */}
-      {productImages && productImages[1] && (
+      {/* Left Tilted Product Image 2 - Rectangle 729 */}
+      {/* Fold animation: rotate + translate to center, stack with image 1 */}
+      {currentImages[1] && (
         <div
           className="absolute overflow-hidden"
           style={{
             left: px(410 - SECTION_X_OFFSET),
-            top: vw(190.2),  // 5981.2 - 5791
+            top: vw(190.2),
             width: vw(306),
             height: vw(411),
-            transform: "rotate(15.15deg)",
+            // Folded: rotate to 0 + move left and down to overlap with image 1
+            transform: isFolded
+              ? `translate(${(-131.5 / DESIGN_WIDTH) * 100}vw, ${(18 / DESIGN_WIDTH) * 100}vw) rotate(6deg)`
+              : "translate(0, 0) rotate(15.15deg)",
+            transformOrigin: "center center",
             borderRadius: vw(30),
+            transition: `transform ${ANIMATION_DURATION}ms cubic-bezier(0.4, 0, 0.2, 1)`,
+            zIndex: 2,
           }}
         >
           <OptimizedImage
-            image={productImages[1]}
+            image={currentImages[1]}
             alt=""
             size="small"
             className="absolute inset-0 w-full h-full object-cover"
+          />
+          {/* Mask overlay - brand color */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundColor: "#756F3F",
+              opacity: showMask ? 1 : 0,
+              transition: "opacity 150ms ease-in-out",
+              borderRadius: vw(30),
+            }}
           />
         </div>
       )}
 
       {/* Helper Title - "We'd love to hear from you!" at x=720, y=304 */}
       <h3
-        className="absolute font-inter font-semibold"
+        className="absolute font-inter font-semibold animate-pulse-scale"
         style={{
           left: px(720 - SECTION_X_OFFSET),
           top: vw(304),  // 6095 - 5791
@@ -199,6 +319,8 @@ export function ContactForm({ data, className }: ContactFormProps) {
           fontSize: vw(40),
           lineHeight: vw(58),
           color: "#FFFF95",  // rgb(1, 1, 0.584) ≈ yellow
+          transformOrigin: "left center",
+          zIndex: 10,
         }}
       >
         {helperTitle || "We'd love to hear from you!"}
@@ -214,6 +336,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
           fontSize: vw(20),
           lineHeight: vw(33),
           color: "#FFFF95",
+          zIndex: 10,
         }}
       >
         {helperText || "Share your needs, we will provide you with the best solution and quotation."}
@@ -342,7 +465,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center justify-center text-white font-anaheim font-semibold transition-all hover:brightness-110 disabled:opacity-70"
+          className="flex items-center justify-center text-white font-anaheim font-semibold transition-all hover:brightness-110 disabled:opacity-70 animate-pulse-scale"
           style={{
             width: vw(486),
             height: vw(83),
