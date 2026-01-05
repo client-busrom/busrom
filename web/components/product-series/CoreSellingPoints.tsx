@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-// Using native img instead of next/image to avoid CDN caching issues
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
 import type { CoreSellingPointsData } from "@/lib/content-parser"
 
@@ -167,7 +167,7 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
               borderRadius: `${(30 / DESIGN_WIDTH) * 100}vw`,
             }}
           >
-            <img src={img} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+            <OptimizedImage image={img} alt="" size="medium" className="absolute inset-0 w-full h-full object-cover" />
           </div>
         ))}
       </div>
@@ -234,7 +234,7 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
               zIndex: isMain ? 1 : 2,
             }}
           >
-            <img src={img} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            <OptimizedImage image={img} alt="" size="small" className="absolute inset-0 w-full h-full object-cover" />
           </div>
         )
       })}
@@ -358,7 +358,7 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
             borderRadius: `${(60 / DESIGN_WIDTH) * 100}vw`,
           }}
         >
-          <img src={currentImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
+          <OptimizedImage image={currentImage} alt="" size="medium" className="absolute inset-0 w-full h-full object-cover" />
           {/* White title overlay on image */}
           <div
             className="absolute font-josefin-sans font-bold text-white"

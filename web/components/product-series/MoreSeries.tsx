@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-// Using native img instead of next/image to avoid CDN caching issues
 import Link from "next/link"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import useEmblaCarousel from "embla-carousel-react"
 import AutoScroll from "embla-carousel-auto-scroll"
 import { cn } from "@/lib/utils"
@@ -211,9 +211,10 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
                           height: CARD_IMAGE_SIZE,
                         }}
                       >
-                        <img
-                          src={item.image}
+                        <OptimizedImage
+                          image={item.image}
                           alt={item.name}
+                          size="small"
                           className="absolute inset-0 w-full h-full object-contain"
                         />
                       </div>

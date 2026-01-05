@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-// Using native img instead of next/image to avoid CDN caching issues
 import { Upload } from "lucide-react"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
 import type { ContactFormData } from "@/lib/content-parser"
 
@@ -111,11 +111,12 @@ export function ContactForm({ data, className }: ContactFormProps) {
     >
       {/* Background Image - Rectangle 395 */}
       {backgroundImage && (
-        <img
-          src={backgroundImage}
+        <OptimizedImage
+          image={backgroundImage}
           alt=""
+          size="xlarge"
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ borderRadius: vw(30) }}
+          containerClassName="absolute inset-0"
         />
       )}
 
@@ -157,9 +158,10 @@ export function ContactForm({ data, className }: ContactFormProps) {
             borderRadius: vw(30),
           }}
         >
-          <img
-            src={productImages[0]}
+          <OptimizedImage
+            image={productImages[0]}
             alt=""
+            size="small"
             className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
@@ -178,9 +180,10 @@ export function ContactForm({ data, className }: ContactFormProps) {
             borderRadius: vw(30),
           }}
         >
-          <img
-            src={productImages[1]}
+          <OptimizedImage
+            image={productImages[1]}
             alt=""
+            size="small"
             className="absolute inset-0 w-full h-full object-cover"
           />
         </div>

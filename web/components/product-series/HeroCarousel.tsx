@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-// Using native img instead of next/image to avoid CDN caching issues
 import Link from "next/link"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
 import type { HeroCarouselData } from "@/lib/content-parser"
 
@@ -104,10 +104,12 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
           )}
         >
           {slide.backgroundImage && (
-            <img
-              src={slide.backgroundImage}
+            <OptimizedImage
+              image={slide.backgroundImage}
               alt=""
+              size="xlarge"
               className="absolute inset-0 w-full h-full object-cover"
+              priority={index === 0}
             />
           )}
           {/* 23% Black Overlay */}
@@ -297,9 +299,10 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
                 }}
                 onClick={() => goToSlide(img.slideIndex)}
               >
-                <img
-                  src={img.url}
+                <OptimizedImage
+                  image={img.url}
                   alt=""
+                  size="medium"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>

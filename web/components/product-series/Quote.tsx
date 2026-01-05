@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-// Using native img instead of next/image to avoid CDN caching issues
 import Link from "next/link"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
 import type { QuoteData } from "@/lib/content-parser"
 
@@ -59,9 +59,10 @@ export function Quote({ data, className }: QuoteProps) {
             borderBottomRightRadius: 0,
           }}
         >
-          <img
-            src={image}
+          <OptimizedImage
+            image={image}
             alt=""
+            size="large"
             className="absolute inset-0 w-full h-full object-cover"
           />
         </div>

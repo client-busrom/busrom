@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-// Using native img instead of next/image to avoid CDN caching issues
 import Link from "next/link"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
 import type { ProductOverviewData } from "@/lib/content-parser"
 
@@ -204,9 +204,10 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
                   zIndex: pos.zIndex,
                 }}
               >
-                <img
-                  src={img}
+                <OptimizedImage
+                  image={img}
                   alt=""
+                  size="medium"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
@@ -227,9 +228,10 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
               }}
               onClick={() => handleImageClick(positionIndex)}
             >
-              <img
-                src={img}
+              <OptimizedImage
+                image={img}
                 alt=""
+                size="small"
                 className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
