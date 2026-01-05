@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
+// Using native img instead of next/image to avoid CDN caching issues
 import { cn } from "@/lib/utils"
 import type { CoreSellingPointsData } from "@/lib/content-parser"
 
@@ -167,7 +167,7 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
               borderRadius: `${(30 / DESIGN_WIDTH) * 100}vw`,
             }}
           >
-            <Image src={img} alt="" fill className="object-cover" draggable={false} />
+            <img src={img} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
           </div>
         ))}
       </div>
@@ -234,7 +234,7 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
               zIndex: isMain ? 1 : 2,
             }}
           >
-            <Image src={img} alt="" fill className="object-cover" />
+            <img src={img} alt="" className="absolute inset-0 w-full h-full object-cover" />
           </div>
         )
       })}
@@ -358,7 +358,7 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
             borderRadius: `${(60 / DESIGN_WIDTH) * 100}vw`,
           }}
         >
-          <Image src={currentImage} alt="" fill className="object-cover" />
+          <img src={currentImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
           {/* White title overlay on image */}
           <div
             className="absolute font-josefin-sans font-bold text-white"
