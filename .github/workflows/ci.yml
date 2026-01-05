@@ -25,15 +25,12 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Install web dependencies
-        run: cd web && npm ci
+      - name: Install dependencies (root workspace)
+        run: npm ci
 
       - name: Run ESLint (Web)
         run: cd web && npm run lint || true
         continue-on-error: true
-
-      - name: Install Payload CMS dependencies
-        run: cd payload-cms && npm ci
 
       - name: TypeScript type check (Payload CMS)
         run: cd payload-cms && npx tsc --noEmit || true
@@ -54,8 +51,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Install dependencies
-        run: cd payload-cms && npm ci
+      - name: Install dependencies (root workspace)
+        run: npm ci
 
       - name: Build Payload CMS
         run: cd payload-cms && npm run build
@@ -78,8 +75,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Install dependencies
-        run: cd web && npm ci
+      - name: Install dependencies (root workspace)
+        run: npm ci
 
       - name: Build Web
         run: cd web && npm run build
