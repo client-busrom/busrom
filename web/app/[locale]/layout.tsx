@@ -93,6 +93,38 @@ const oswald = localFont({
   preload: false,
 });
 
+const jomhuria = localFont({
+  src: "../../public/fonts/Jomhuria-Regular.ttf",
+  weight: "400",
+  variable: "--font-jomhuria",
+  display: "swap",
+  preload: false,
+});
+
+const josefinSans = localFont({
+  src: "../../public/fonts/JosefinSans-VariableFont_wght.ttf",
+  weight: "100 700",
+  variable: "--font-josefin-sans",
+  display: "swap",
+  preload: false,
+});
+
+const joan = localFont({
+  src: "../../public/fonts/Joan-Regular.woff",
+  weight: "400",
+  variable: "--font-joan",
+  display: "swap",
+  preload: false,
+});
+
+const lilitaOne = localFont({
+  src: "../../public/fonts/LilitaOne-Regular.woff",
+  weight: "400",
+  variable: "--font-lilita-one",
+  display: "swap",
+  preload: false,
+});
+
 export function generateStaticParams() {
   // 动态生成所有支持的 locale 参数
   return locales.map(locale => ({ locale }));
@@ -127,6 +159,10 @@ export default async function RootLayout({
       ${bebasNeue.variable}
       ${oswald.variable}
       ${inter.variable}
+      ${jomhuria.variable}
+      ${josefinSans.variable}
+      ${joan.variable}
+      ${lilitaOne.variable}
       font-sans
     `}
     >

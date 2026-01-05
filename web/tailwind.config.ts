@@ -134,6 +134,10 @@ const config: Config = {
         'bebas-neue':  ['var(--font-bebas-neue)', 'sans-serif'],
         'oswald':      ['var(--font-oswald)', 'sans-serif'],
         'inter':       ['var(--font-inter)', 'sans-serif'],  // 需要时显式使用
+        'jomhuria':    ['var(--font-jomhuria)', 'sans-serif'],
+        'josefin-sans': ['var(--font-josefin-sans)', 'sans-serif'],
+        'joan':          ['var(--font-joan)', 'serif'],
+        'lilita-one':    ['var(--font-lilita-one)', 'sans-serif'],
 
         // --- 系统字体 (直接使用名字) ---
         'arial':       ['Arial', 'sans-serif'],
@@ -161,6 +165,26 @@ const config: Config = {
           "0%, 100%": { transform: "translateX(0) translateY(-50%)" },
           "50%": { transform: "translateX(calc(100% + 2vw)) translateY(-50%)" },
         },
+        "bounce-around": {
+          "0%": {
+            transform: "translate(0, 0)",
+          },
+          "20%": {
+            transform: "translate(-150px, 200px)",
+          },
+          "40%": {
+            transform: "translate(100px, 350px)",
+          },
+          "60%": {
+            transform: "translate(-100px, 150px)",
+          },
+          "80%": {
+            transform: "translate(50px, -50px)",
+          },
+          "100%": {
+            transform: "translate(0, 0)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -168,6 +192,7 @@ const config: Config = {
         "marquee": "marquee 20s linear infinite",
         "marquee-reverse": "marquee-reverse 20s linear infinite",
         "ball-bounce": "ball-bounce 2.5s ease-in-out infinite",
+        "bounce-around": "bounce-around 12s ease-in-out infinite",
       },
     },
   },
