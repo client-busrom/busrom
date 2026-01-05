@@ -44,6 +44,15 @@ export function Quote({ data, className }: QuoteProps) {
         }}
       />
 
+      {/* Bottom Inner Shadow - 底部内阴影分界线 */}
+      <div
+        className="absolute bottom-0 left-0 right-0 pointer-events-none"
+        style={{
+          height: '80px',
+          background: 'linear-gradient(to top, rgba(0, 0, 0, 0.3) 0%, transparent 100%)',
+        }}
+      />
+
       {/* Center Image */}
       {image && (
         <div
