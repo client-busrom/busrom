@@ -197,8 +197,107 @@ html, body {
   }
 }
 
+/* 装饰小球弹跳动画 - 模拟物理弹跳到边缘 */
+@keyframes bounceAround {
+  0% {
+    transform: translate(0, 0);
+  }
+  8% {
+    transform: translate(-450px, 180px);
+  }
+  16% {
+    transform: translate(-480px, 550px);
+  }
+  24% {
+    transform: translate(-100px, 700px);
+  }
+  32% {
+    transform: translate(400px, 500px);
+  }
+  40% {
+    transform: translate(500px, 150px);
+  }
+  48% {
+    transform: translate(200px, -200px);
+  }
+  56% {
+    transform: translate(-300px, -250px);
+  }
+  64% {
+    transform: translate(-500px, 100px);
+  }
+  72% {
+    transform: translate(-350px, 450px);
+  }
+  80% {
+    transform: translate(100px, 600px);
+  }
+  88% {
+    transform: translate(350px, 300px);
+  }
+  94% {
+    transform: translate(150px, 50px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
 .ball-animated {
   animation: ballBounce 3s ease-in-out infinite;
+}
+
+/* 黄点环绕圆形动画 - 外层容器旋转3圈 */
+@keyframes orbitSpin {
+  0%, 8% {
+    transform: rotate(0deg);
+  }
+  92%, 100% {
+    transform: rotate(1080deg);
+  }
+}
+
+/* 黄点位移动画 - 从中心向右移到边缘再回来 */
+@keyframes orbitRadius {
+  0%, 5% {
+    transform: translateX(0);
+  }
+  10%, 90% {
+    transform: translateX(300%);
+  }
+  95%, 100% {
+    transform: translateX(0);
+  }
+}
+
+/* 黄点自身反向旋转保持不转 */
+@keyframes orbitCounter {
+  0%, 8% {
+    transform: rotate(0deg);
+  }
+  92%, 100% {
+    transform: rotate(-360deg);
+  }
+}
+
+/* 呼吸效果 - 放大缩小 */
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* CTA按钮胶囊hover时呼吸效果 */
+.group:hover .cta-capsule-breathe {
+  animation: breathe 2s ease-in-out infinite;
+}
+
+/* 文字默认呼吸效果，hover时停止 */
+.group:hover .cta-text-breathe {
+  animation: none !important;
 }
 
 .ball-static {

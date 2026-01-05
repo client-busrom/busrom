@@ -1,10 +1,17 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import type { Locale } from "@/i18n.config"
-import { DocumentRenderer } from "@/components/document/DocumentRenderer"
+import { parseContentTranslation, type ParsedProductSeriesContent } from "@/lib/content-parser"
+import { HeroCarousel } from "@/components/product-series/HeroCarousel"
+import { ProductOverview } from "@/components/product-series/ProductOverview"
+import { CoreSellingPoints } from "@/components/product-series/CoreSellingPoints"
+import { Applications } from "@/components/product-series/Applications"
+import { ContactForm } from "@/components/product-series/ContactForm"
+import { MoreSeries } from "@/components/product-series/MoreSeries"
+import { Quote } from "@/components/product-series/Quote"
 
-interface ProductSeriesContent {
+interface ProductSeriesData {
   id: string
   slug: string
   name: string
@@ -12,9 +19,9 @@ interface ProductSeriesContent {
   featuredImage: string | null
   order: number
   status: string
-  content: {
-    document: any[]
-  }
+  contentTranslation: any
+  mediaUrls: Record<string, string>
+  reusableBlocks: Record<string, any>
   locale: string
 }
 
@@ -24,7 +31,7 @@ interface ProductSeriesPageProps {
 }
 
 export function ProductSeriesPage({ locale, slug }: ProductSeriesPageProps) {
-  const [seriesContent, setSeriesContent] = useState<ProductSeriesContent | null>(null)
+  const [seriesData, setSeriesData] = useState<ProductSeriesData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -41,7 +48,7 @@ export function ProductSeriesPage({ locale, slug }: ProductSeriesPageProps) {
         }
 
         const data = await res.json()
-        setSeriesContent(data)
+        setSeriesData(data)
       } catch (err) {
         console.error("Error fetching product series content:", err)
         setError(err instanceof Error ? err.message : "Failed to load product series")
@@ -53,21 +60,45 @@ export function ProductSeriesPage({ locale, slug }: ProductSeriesPageProps) {
     fetchSeriesContent()
   }, [locale, slug])
 
+  // Parse content translation
+  const parsedContent = useMemo<ParsedProductSeriesContent>(() => {
+    if (!seriesData?.contentTranslation) return {}
+
+    // Build media map from mediaUrls
+    const mediaMap = new Map<string, string>()
+    if (seriesData.mediaUrls) {
+      Object.entries(seriesData.mediaUrls).forEach(([id, url]) => {
+        mediaMap.set(id, url)
+      })
+    }
+
+    // Build reusable blocks map
+    const reusableBlocksMap = new Map<string, any>()
+    if (seriesData.reusableBlocks) {
+      Object.entries(seriesData.reusableBlocks).forEach(([id, content]) => {
+        reusableBlocksMap.set(id, content)
+      })
+    }
+
+    const result = parseContentTranslation(seriesData.contentTranslation, mediaMap, reusableBlocksMap)
+    console.log('parsedContent:', result)
+    console.log('moreSeries:', result.moreSeries)
+    return result
+  }, [seriesData])
+
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pt-20" data-header-theme="light">
-        <div className="container mx-auto px-6 md:px-8 lg:px-16 py-12">
-          <div className="flex items-center justify-center py-20">
-            <div className="w-12 h-12 border-2 border-brand-secondary border-t-transparent rounded-full animate-spin"></div>
-          </div>
+      <div className="min-h-screen bg-black" data-header-theme="transparent">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="w-12 h-12 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
         </div>
       </div>
     )
   }
 
   // Error state
-  if (error || !seriesContent) {
+  if (error || !seriesData) {
     return (
       <div className="min-h-screen bg-background pt-20" data-header-theme="light">
         <div className="container mx-auto px-6 md:px-8 lg:px-16 py-12">
@@ -91,63 +122,78 @@ export function ProductSeriesPage({ locale, slug }: ProductSeriesPageProps) {
     )
   }
 
-  // Render product series content
-  return (
-    <div className="min-h-screen bg-background pt-20" data-header-theme="light">
-      <div className="container mx-auto px-6 md:px-8 lg:px-16 py-12">
-        {/* Series Name */}
-        {seriesContent.name && (
-          <h1 className="text-4xl md:text-5xl font-anaheim font-extrabold text-brand-text-black mb-4">
-            {seriesContent.name}
-          </h1>
-        )}
+  // Check if there's any content to display
+  const hasContent = parsedContent.heroCarousel ||
+    parsedContent.productOverview ||
+    parsedContent.coreSellingPoints ||
+    parsedContent.applications ||
+    parsedContent.contactForm ||
+    parsedContent.moreSeries ||
+    parsedContent.quote
 
-        {/* Series Description */}
-        {seriesContent.description && (
-          <p className="text-lg text-brand-accent-gold mb-8">
-            {seriesContent.description}
-          </p>
-        )}
-
-        {/* Featured Image */}
-        {seriesContent.featuredImage && (
-          <div className="mb-8 rounded-lg overflow-hidden">
-            <img
-              src={seriesContent.featuredImage}
-              alt={seriesContent.name}
-              className="w-full h-auto object-cover"
-            />
+  // Empty content state
+  if (!hasContent) {
+    return (
+      <div className="min-h-screen bg-background pt-20" data-header-theme="light">
+        <div className="container mx-auto px-6 md:px-8 lg:px-16 py-12">
+          <div className="text-center py-20">
+            <div className="inline-block w-16 h-px bg-brand-accent-border mb-6"></div>
+            <h1 className="text-brand-text-black text-3xl font-anaheim font-extrabold mb-3">
+              {seriesData.name || "Product Series"}
+            </h1>
+            <p className="text-brand-accent-gold text-base mb-6">
+              Content is being prepared. Please check back later.
+            </p>
+            <a
+              href="/products"
+              className="inline-block px-8 py-3 bg-brand-text-black text-white font-anaheim font-bold text-sm uppercase tracking-wider hover:bg-brand-accent-gold transition-colors"
+            >
+              View All Products
+            </a>
           </div>
-        )}
-
-        {/* Document Content */}
-        {seriesContent.content?.document && (
-          <div className="prose prose-lg max-w-none">
-            <DocumentRenderer
-              document={seriesContent.content.document}
-              locale={locale}
-            />
-          </div>
-        )}
-
-        {/* Placeholder notice for UI design */}
-        <div className="mt-12 p-6 bg-brand-accent-gold/10 border border-brand-accent-gold/30 rounded-lg">
-          <p className="text-brand-text-black font-anaheim">
-            <strong>🎨 UI Design Pending:</strong> This product series page is using a template placeholder.
-            Custom UI design will be implemented based on the PDF framework provided.
-          </p>
-        </div>
-
-        {/* Back to Products Link */}
-        <div className="mt-8">
-          <a
-            href="/products"
-            className="inline-flex items-center text-brand-accent-gold hover:text-brand-text-black transition-colors font-anaheim font-bold"
-          >
-            ← Back to All Products
-          </a>
         </div>
       </div>
+    )
+  }
+
+  // Render product series content with sections
+  return (
+    <div className="min-h-screen bg-background" data-header-theme="transparent">
+      {/* Hero Carousel Section */}
+      {parsedContent.heroCarousel && (
+        <HeroCarousel data={parsedContent.heroCarousel} />
+      )}
+
+      {/* Product Overview Section */}
+      {parsedContent.productOverview && (
+        <ProductOverview data={parsedContent.productOverview} />
+      )}
+
+      {/* Core Selling Points Section */}
+      {parsedContent.coreSellingPoints && (
+        <CoreSellingPoints data={parsedContent.coreSellingPoints} />
+      )}
+
+      {/* Applications Section */}
+      {parsedContent.applications && (
+        <Applications data={parsedContent.applications} />
+      )}
+
+      {/* Contact Form Section */}
+      {parsedContent.contactForm && (
+        <ContactForm data={parsedContent.contactForm} />
+      )}
+
+      {/* More Series Section */}
+      {parsedContent.moreSeries && (
+        <MoreSeries data={parsedContent.moreSeries} currentSlug={slug} />
+      )}
+
+      {/* Quote Section */}
+      {parsedContent.quote && (
+        <Quote data={parsedContent.quote} />
+      )}
+
     </div>
   )
 }
