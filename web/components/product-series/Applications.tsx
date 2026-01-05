@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
+// Using native img instead of next/image to avoid CDN caching issues
 import useEmblaCarousel from "embla-carousel-react"
 import AutoScroll from "embla-carousel-auto-scroll"
 import { cn } from "@/lib/utils"
@@ -160,11 +160,10 @@ export function Applications({ data, className }: ApplicationsProps) {
                   borderRadius: `${(30 / DESIGN_WIDTH) * 100}vw`,
                 }}
               >
-                <Image
+                <img
                   src={imageUrl}
                   alt=""
-                  fill
-                  className="object-cover"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
             )

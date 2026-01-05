@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
+// Using native img instead of next/image to avoid CDN caching issues
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import type { QuoteData } from "@/lib/content-parser"
@@ -59,11 +59,10 @@ export function Quote({ data, className }: QuoteProps) {
             borderBottomRightRadius: 0,
           }}
         >
-          <Image
+          <img
             src={image}
             alt=""
-            fill
-            className="object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
       )}
@@ -78,11 +77,10 @@ export function Quote({ data, className }: QuoteProps) {
           height: `${(222 / DESIGN_WIDTH) * 100}vw`,
         }}
       >
-        <Image
+        <img
           src="/icons/busrom-logo-text.svg"
           alt="BUSROM"
-          fill
-          className="object-contain object-left"
+          className="w-full h-full object-contain object-left"
         />
       </div>
 
@@ -98,18 +96,16 @@ export function Quote({ data, className }: QuoteProps) {
         }}
       >
         {/* Default state */}
-        <Image
+        <img
           src="/icons/arrow-pill-default.svg"
           alt=""
-          fill
-          className="object-contain transition-opacity duration-300 group-hover:opacity-0"
+          className="absolute inset-0 w-full h-full object-contain transition-opacity duration-300 group-hover:opacity-0"
         />
         {/* Hover state */}
-        <Image
+        <img
           src="/icons/arrow-pill-hover.svg"
           alt=""
-          fill
-          className="object-contain transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+          className="absolute inset-0 w-full h-full object-contain transition-opacity duration-300 opacity-0 group-hover:opacity-100"
         />
       </Link>
 
@@ -176,7 +172,7 @@ export function Quote({ data, className }: QuoteProps) {
         </span>
 
         {/* Arrow icon - default state (filled) */}
-        <Image
+        <img
           src="/icons/arrow-circle-hover.svg"
           alt=""
           className="absolute z-10 transition-opacity duration-300 group-hover:opacity-0"
@@ -186,8 +182,6 @@ export function Quote({ data, className }: QuoteProps) {
             width: `${(81 / DESIGN_WIDTH) * 100}vw`,
             height: `${(81 / DESIGN_WIDTH) * 100}vw`,
           }}
-          width={81}
-          height={81}
         />
       </Link>
     </section>

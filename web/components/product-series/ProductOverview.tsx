@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
+// Using native img instead of next/image to avoid CDN caching issues
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import type { ProductOverviewData } from "@/lib/content-parser"
@@ -204,11 +204,10 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
                   zIndex: pos.zIndex,
                 }}
               >
-                <Image
+                <img
                   src={img}
                   alt=""
-                  fill
-                  className="object-cover"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
             )
@@ -228,11 +227,10 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
               }}
               onClick={() => handleImageClick(positionIndex)}
             >
-              <Image
+              <img
                 src={img}
                 alt=""
-                fill
-                className="object-cover"
+                className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
           )

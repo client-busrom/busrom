@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
+// Using native img instead of next/image to avoid CDN caching issues
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import type { HeroCarouselData } from "@/lib/content-parser"
@@ -104,12 +104,10 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
           )}
         >
           {slide.backgroundImage && (
-            <Image
+            <img
               src={slide.backgroundImage}
               alt=""
-              fill
-              className="object-cover"
-              priority={index === 0}
+              className="absolute inset-0 w-full h-full object-cover"
             />
           )}
           {/* 23% Black Overlay */}
@@ -201,11 +199,9 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
               {currentData.buttonText}
             </span>
             {/* Arrow Icon */}
-            <Image
+            <img
               src="/icon-arrow-circle.svg"
               alt=""
-              width={77}
-              height={77}
               className="relative z-10 transition-opacity duration-300 group-hover:opacity-0"
               style={{
                 width: `${(77 / DESIGN_WIDTH) * 100}vw`,
@@ -301,11 +297,10 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
                 }}
                 onClick={() => goToSlide(img.slideIndex)}
               >
-                <Image
+                <img
                   src={img.url}
                   alt=""
-                  fill
-                  className="object-cover"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
             )
