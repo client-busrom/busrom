@@ -95,14 +95,27 @@ export function Applications({ data, className }: ApplicationsProps) {
     }
   }, [emblaApi, onSelect, onScroll])
 
-  // 导航
-  const goToPrev = React.useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev()
+  // 获取 AutoScroll 插件实例
+  const autoScrollPlugin = React.useMemo(() => {
+    return emblaApi?.plugins()?.autoScroll
   }, [emblaApi])
 
+  // 导航 - 点击时先停止自动滚动，滚动完成后恢复
+  const goToPrev = React.useCallback(() => {
+    if (!emblaApi) return
+    autoScrollPlugin?.stop()
+    emblaApi.scrollPrev()
+    // 短暂延迟后恢复自动滚动
+    setTimeout(() => autoScrollPlugin?.play(), 2000)
+  }, [emblaApi, autoScrollPlugin])
+
   const goToNext = React.useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext()
-  }, [emblaApi])
+    if (!emblaApi) return
+    autoScrollPlugin?.stop()
+    emblaApi.scrollNext()
+    // 短暂延迟后恢复自动滚动
+    setTimeout(() => autoScrollPlugin?.play(), 2000)
+  }, [emblaApi, autoScrollPlugin])
 
   // 获取卡片样式
   const getCardStyle = (index: number) => {
@@ -151,7 +164,7 @@ export function Applications({ data, className }: ApplicationsProps) {
             return (
               <div
                 key={`slide-${index}`}
-                className="relative flex-shrink-0 overflow-hidden bg-[#D9D9D9]"
+                className="relative flex-shrink-0 overflow-hidden bg-[#D9D9D9] group transition-shadow duration-300 hover:shadow-2xl"
                 style={{
                   width: `${cardWidthVw}vw`,
                   height: `${(style.height / DESIGN_WIDTH) * 100}vw`,
@@ -164,7 +177,7 @@ export function Applications({ data, className }: ApplicationsProps) {
                   image={imageUrl}
                   alt=""
                   size="medium"
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 />
               </div>
             )

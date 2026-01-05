@@ -83,13 +83,25 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
     }
   }, [emblaApi, onSelect])
 
-  const goToPrev = React.useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev()
+  // 获取 AutoScroll 插件实例
+  const autoScrollPlugin = React.useMemo(() => {
+    return emblaApi?.plugins()?.autoScroll
   }, [emblaApi])
 
+  // 导航 - 点击时先停止自动滚动，滚动完成后恢复
+  const goToPrev = React.useCallback(() => {
+    if (!emblaApi) return
+    autoScrollPlugin?.stop()
+    emblaApi.scrollPrev()
+    setTimeout(() => autoScrollPlugin?.play(), 2000)
+  }, [emblaApi, autoScrollPlugin])
+
   const goToNext = React.useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext()
-  }, [emblaApi])
+    if (!emblaApi) return
+    autoScrollPlugin?.stop()
+    emblaApi.scrollNext()
+    setTimeout(() => autoScrollPlugin?.play(), 2000)
+  }, [emblaApi, autoScrollPlugin])
 
   // Progress calculation
   const progressPercent = series.length > 0
