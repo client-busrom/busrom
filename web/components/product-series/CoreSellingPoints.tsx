@@ -160,14 +160,14 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
         {titleImages.map((img, index) => (
           <div
             key={`title-img-${index}`}
-            className="flex-shrink-0 overflow-hidden bg-white pointer-events-none"
+            className="relative flex-shrink-0 overflow-hidden bg-white pointer-events-none"
             style={{
               width: `${(650 / DESIGN_WIDTH) * 100}vw`,
               height: `${(412 / DESIGN_WIDTH) * 100}vw`,
               borderRadius: `${(30 / DESIGN_WIDTH) * 100}vw`,
             }}
           >
-            <Image src={img} alt="" fill className="object-cover !relative" draggable={false} />
+            <Image src={img} alt="" fill className="object-cover" draggable={false} />
           </div>
         ))}
       </div>
