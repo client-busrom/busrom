@@ -197,7 +197,7 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
                 marginRight: `${(8 / DESIGN_WIDTH) * 100}vw`,
               }}
             />
-            <span className="relative z-10 transition-colors duration-300 group-hover:text-black">
+            <span className="relative z-10 transition-colors duration-300 group-hover:text-black flex items-center leading-none">
               {currentData.buttonText}
             </span>
             {/* Arrow Icon */}
