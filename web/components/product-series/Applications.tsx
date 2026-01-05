@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-// Using native img instead of next/image to avoid CDN caching issues
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import useEmblaCarousel from "embla-carousel-react"
 import AutoScroll from "embla-carousel-auto-scroll"
 import { cn } from "@/lib/utils"
@@ -160,9 +160,10 @@ export function Applications({ data, className }: ApplicationsProps) {
                   borderRadius: `${(30 / DESIGN_WIDTH) * 100}vw`,
                 }}
               >
-                <img
-                  src={imageUrl}
+                <OptimizedImage
+                  image={imageUrl}
                   alt=""
+                  size="medium"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
