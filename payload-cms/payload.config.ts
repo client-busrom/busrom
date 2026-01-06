@@ -884,7 +884,7 @@ export default buildConfig({
         const db = payload.db as any
         if (db?.drizzle) {
           // Collections that have versions enabled (excluding Users, Roles, Permissions)
-          const versionTables = [
+          const collectionVersionTables = [
             'applications', 'blogs', 'categories', 'document_templates',
             'faq_items', 'form_configs', 'hero_banner_items', 'media',
             'media_categories', 'media_tags', 'navigation_menus', 'pages',
@@ -892,7 +892,17 @@ export default buildConfig({
             'series_intro_items', 'custom_scripts'
           ]
 
-          for (const table of versionTables) {
+          // Globals that have versions: true
+          const globalVersionTables = [
+            'brand_advantages', 'brand_analysis', 'brand_value', 'case_studies',
+            'email_config', 'featured_products', 'footer', 'home_content',
+            'main_form', 'oem_odm', 'preloader_config', 'product_series_carousel',
+            'quote_steps', 'service_features', 'simple_cta', 'site_config',
+            'social_config', 'sphere_3d', 'translation_config', 'why_choose_busrom'
+          ]
+
+          // Create collection version tables (with parent_id reference)
+          for (const table of collectionVersionTables) {
             const vTable = `_${table}_v`
             const checkTable = await db.drizzle.execute(`
               SELECT 1 FROM information_schema.tables WHERE table_name = '${vTable}'
@@ -912,6 +922,29 @@ export default buildConfig({
                   snapshot BOOLEAN DEFAULT false
                 );
                 CREATE INDEX IF NOT EXISTS "${vTable}_parent_idx" ON "${vTable}" (parent_id);
+                CREATE INDEX IF NOT EXISTS "${vTable}_created_at_idx" ON "${vTable}" (created_at);
+              `)
+            }
+          }
+
+          // Create global version tables (no parent_id, globals have single record)
+          for (const table of globalVersionTables) {
+            const vTable = `_${table}_v`
+            const checkTable = await db.drizzle.execute(`
+              SELECT 1 FROM information_schema.tables WHERE table_name = '${vTable}'
+            `)
+
+            if (!checkTable.rows || checkTable.rows.length === 0) {
+              payload.logger.info(`🔧 Creating missing global version table: ${vTable}`)
+              await db.drizzle.execute(`
+                CREATE TABLE IF NOT EXISTS "${vTable}" (
+                  id SERIAL PRIMARY KEY,
+                  version JSONB NOT NULL,
+                  created_at TIMESTAMP(3) WITH TIME ZONE DEFAULT NOW() NOT NULL,
+                  updated_at TIMESTAMP(3) WITH TIME ZONE DEFAULT NOW() NOT NULL,
+                  latest BOOLEAN DEFAULT false,
+                  autosave BOOLEAN DEFAULT false
+                );
                 CREATE INDEX IF NOT EXISTS "${vTable}_created_at_idx" ON "${vTable}" (created_at);
               `)
             }
