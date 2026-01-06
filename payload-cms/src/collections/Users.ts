@@ -63,9 +63,10 @@ export const Users: CollectionConfig = {
     // Only admins can delete users
     delete: ({ req: { user } }) => user?.isAdmin === true,
   },
-  versions: {
-    maxPerDoc: 10,
-  },
+  // Temporarily disabled - requires migration to create _users_v table
+  // versions: {
+  //   maxPerDoc: 10,
+  // },
   fields: [
     // ==================================================================
     // 📝 Basic Information (always visible)
