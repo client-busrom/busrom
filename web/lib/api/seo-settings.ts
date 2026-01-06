@@ -208,11 +208,29 @@ export function buildMetadata(
   const ogDescription = seoSetting.ogDescription || seoSetting.metaDescription
 
   if (ogTitle || ogDescription || seoSetting.ogImage) {
-    metadata.openGraph = {
-      ...metadata.openGraph,
+    // Build OpenGraph metadata based on type
+    const ogType = seoSetting.ogType || 'website'
+
+    // Create base OpenGraph object
+    const openGraphBase = {
       title: ogTitle || undefined,
       description: ogDescription || undefined,
-      type: (seoSetting.ogType || 'website') as 'website' | 'article' | 'product',
+    }
+
+    // Handle different OG types (Next.js requires specific type structures)
+    if (ogType === 'article') {
+      metadata.openGraph = {
+        ...metadata.openGraph,
+        ...openGraphBase,
+        type: 'article' as const,
+      }
+    } else {
+      // Default to website for all other types (including 'product' which is not a valid OG type)
+      metadata.openGraph = {
+        ...metadata.openGraph,
+        ...openGraphBase,
+        type: 'website' as const,
+      }
     }
 
     if (seoSetting.ogImage?.url) {
