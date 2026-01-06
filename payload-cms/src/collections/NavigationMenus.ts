@@ -42,9 +42,12 @@ export const NavigationMenus: CollectionConfig = {
       return !!req.user
     },
   },
-  versions: {
-    maxPerDoc: 10,
-  },
+
+  // versions: {
+
+  // maxPerDoc: 10,
+
+  // },
   fields: [
     // Basic Information
     {

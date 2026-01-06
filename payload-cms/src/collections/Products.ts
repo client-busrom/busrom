@@ -40,9 +40,12 @@ export const Products: CollectionConfig = {
     delete: ({ req: { user } }) => user?.isAdmin === true,
   },
   // 版本控制 - 保留修改历史
-  versions: {
-    maxPerDoc: 10, // 每个文档最多保留10个版本
-  },
+
+  // versions: {
+
+  // maxPerDoc: 10, // 每个文档最多保留10个版本
+
+  // },
   fields: [
     // ==================================================================
     // Tab Layout for better organization

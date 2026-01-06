@@ -41,9 +41,12 @@ export const SeoSettings: CollectionConfig = {
     update: ({ req }) => !!req.user,
     delete: ({ req }) => !!req.user,
   },
-  versions: {
-    maxPerDoc: 10,
-  },
+
+  // versions: {
+
+  // maxPerDoc: 10,
+
+  // },
   fields: [
     // Translation Center
     {

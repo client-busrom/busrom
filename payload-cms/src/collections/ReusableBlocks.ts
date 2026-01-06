@@ -42,9 +42,12 @@ export const ReusableBlocks: CollectionConfig = {
     update: ({ req }) => !!req.user,
     delete: ({ req }) => !!req.user,
   },
-  versions: {
-    maxPerDoc: 10,
-  },
+
+  // versions: {
+
+  // maxPerDoc: 10,
+
+  // },
   fields: [
     // ==================================================================
     // Tab Layout for better organization

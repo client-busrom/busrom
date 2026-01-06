@@ -46,9 +46,12 @@ export const Roles: CollectionConfig = {
       return req.user?.isAdmin === true
     },
   },
-  versions: {
-    maxPerDoc: 10,
-  },
+
+  // versions: {
+
+  // maxPerDoc: 10,
+
+  // },
   hooks: {
     beforeDelete: [
       async ({ req, id }) => {
