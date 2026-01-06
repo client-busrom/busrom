@@ -39,6 +39,10 @@ export const Blogs: CollectionConfig = {
     update: ({ req }) => !!req.user,
     delete: ({ req }) => !!req.user,
   },
+  // 版本控制 - 保留修改历史
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     {
       type: 'tabs',
@@ -70,7 +74,7 @@ export const Blogs: CollectionConfig = {
             },
             {
               name: 'title',
-              type: 'text',
+              type: 'textarea',
               label: {
                 en: 'Blog Title',
                 zh: '博客标题',

@@ -21,6 +21,7 @@ export const BrandValue: GlobalConfig = {
       zh: '首页管理',
     },
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,
@@ -57,7 +58,7 @@ export const BrandValue: GlobalConfig = {
     // Main Title & Subtitle
     {
       name: 'title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Title',
         zh: '主标题',
@@ -66,7 +67,7 @@ export const BrandValue: GlobalConfig = {
     },
     {
       name: 'subtitle',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Subtitle',
         zh: '副标题',
@@ -79,7 +80,7 @@ export const BrandValue: GlobalConfig = {
     // ==================================================================
     {
       name: 'param1Title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Param 1 - Title',
         zh: 'Param 1 - 标题',
@@ -115,7 +116,7 @@ export const BrandValue: GlobalConfig = {
     // ==================================================================
     {
       name: 'param2Title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Param 2 - Title',
         zh: 'Param 2 - 标题',
@@ -151,7 +152,7 @@ export const BrandValue: GlobalConfig = {
     // ==================================================================
     {
       name: 'sloganTitle',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Slogan - Title',
         zh: 'Slogan - 标题',
@@ -187,7 +188,7 @@ export const BrandValue: GlobalConfig = {
     // ==================================================================
     {
       name: 'valueTitle',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Value - Title',
         zh: 'Value - 标题',
@@ -223,7 +224,7 @@ export const BrandValue: GlobalConfig = {
     // ==================================================================
     {
       name: 'visionTitle',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Vision - Title',
         zh: 'Vision - 标题',

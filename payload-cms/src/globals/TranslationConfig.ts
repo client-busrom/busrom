@@ -26,6 +26,7 @@ export const TranslationConfig: GlobalConfig = {
       zh: '配置多语言内容的翻译服务',
     },
   },
+  versions: true,
   access: {
     read: ({ req }) => {
       // Only authenticated users can read

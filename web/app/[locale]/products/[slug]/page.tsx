@@ -1,5 +1,6 @@
 import type { Locale } from "@/i18n.config"
 import { ProductSeriesPage } from "@/components/products/ProductSeriesPage"
+import { PageScripts } from "@/components/PageScripts"
 import type { Metadata } from "next"
 
 // This will be used for generating static params if needed
@@ -28,6 +29,14 @@ export default async function ProductSeriesDetailPage({
   params: Promise<{ locale: Locale; slug: string }>
 }) {
   const { locale, slug } = await params
+  const path = `/products/${slug}`
 
-  return <ProductSeriesPage locale={locale} slug={slug} />
+  return (
+    <>
+      <PageScripts path={path} pageType="product_series_detail" position="header" />
+      <PageScripts path={path} pageType="product_series_detail" position="body_start" />
+      <ProductSeriesPage locale={locale} slug={slug} />
+      <PageScripts path={path} pageType="product_series_detail" position="footer" />
+    </>
+  )
 }

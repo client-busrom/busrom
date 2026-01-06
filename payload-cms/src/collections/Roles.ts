@@ -46,6 +46,9 @@ export const Roles: CollectionConfig = {
       return req.user?.isAdmin === true
     },
   },
+  versions: {
+    maxPerDoc: 10,
+  },
   hooks: {
     beforeDelete: [
       async ({ req, id }) => {
@@ -66,13 +69,18 @@ export const Roles: CollectionConfig = {
     // ==================================================================
     {
       name: 'name',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Role Name',
         zh: '角色名称',
       },
       required: true,
       localized: true,
+      admin: {
+        components: {
+          Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
+        },
+      },
     },
     {
       name: 'code',

@@ -39,6 +39,10 @@ export const HeroBannerItems: CollectionConfig = {
     update: ({ req: { user } }) => !!user,
     delete: ({ req: { user } }) => user?.isAdmin === true,
   },
+  // 版本控制 - 保留修改历史
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     // Translation Center
     {
@@ -72,7 +76,7 @@ export const HeroBannerItems: CollectionConfig = {
     // ==================================================================
     {
       name: 'title',
-      type: 'text',
+      type: 'textarea',
       required: true,
       localized: true,
       label: {
@@ -82,11 +86,11 @@ export const HeroBannerItems: CollectionConfig = {
     },
 
     // ==================================================================
-    // ⭐ Features (固定5条)
+    // ⭐ Features (固定5条) - 使用 textarea 支持多行输入
     // ==================================================================
     {
       name: 'feature1',
-      type: 'text',
+      type: 'textarea',
       required: true,
       localized: true,
       label: {
@@ -96,7 +100,7 @@ export const HeroBannerItems: CollectionConfig = {
     },
     {
       name: 'feature2',
-      type: 'text',
+      type: 'textarea',
       required: true,
       localized: true,
       label: {
@@ -106,7 +110,7 @@ export const HeroBannerItems: CollectionConfig = {
     },
     {
       name: 'feature3',
-      type: 'text',
+      type: 'textarea',
       required: true,
       localized: true,
       label: {
@@ -116,7 +120,7 @@ export const HeroBannerItems: CollectionConfig = {
     },
     {
       name: 'feature4',
-      type: 'text',
+      type: 'textarea',
       required: true,
       localized: true,
       label: {
@@ -126,7 +130,7 @@ export const HeroBannerItems: CollectionConfig = {
     },
     {
       name: 'feature5',
-      type: 'text',
+      type: 'textarea',
       required: true,
       localized: true,
       label: {
@@ -200,7 +204,7 @@ export const HeroBannerItems: CollectionConfig = {
       fields: [
         {
           name: 'text',
-          type: 'text',
+          type: 'textarea',
           localized: true,
           label: {
             en: 'Button Text',

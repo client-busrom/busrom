@@ -27,6 +27,7 @@ export const SiteConfig: GlobalConfig = {
       zh: '全站配置设置',
     },
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req: { user } }) => user?.isAdmin === true,

@@ -11,6 +11,8 @@ import ConditionalFooter from "@/components/layout/conditional-footer";
 import { ClientLayoutWrapper } from "@/components/ClientLayoutWrapper";
 import { getPreloaderConfig } from "@/lib/api/preloader-config";
 import { getNavigation } from "@/lib/api/navigation";
+import { GlobalScripts } from "@/components/GlobalScripts";
+import { ScriptDebugger } from "@/components/ScriptDebugger";
 
 // 延迟加载 LenisProvider（包含 GSAP），不阻塞首屏渲染
 const LenisProvider = dynamic(
@@ -170,8 +172,16 @@ export default async function RootLayout({
         {/* CDN 预连接 - 加速图片加载 */}
         <link rel="preconnect" href="https://d2kqew3hn5wphn.cloudfront.net" />
         <link rel="dns-prefetch" href="https://d2kqew3hn5wphn.cloudfront.net" />
+        {/* 全局自定义脚本 - Header */}
+        <Suspense fallback={null}>
+          <GlobalScripts position="header" />
+        </Suspense>
       </head>
       <body className={`font-sans overflow-x-hidden`}>
+        {/* 全局自定义脚本 - Body Start */}
+        <Suspense fallback={null}>
+          <GlobalScripts position="body_start" />
+        </Suspense>
         {/* 👇 使用 ClientLayoutWrapper 包裹你的所有内容 */}
         <ClientLayoutWrapper preloaderConfig={preloaderConfig}>
           <LenisProvider easingKey={"easeOutQuad"} />
@@ -184,6 +194,14 @@ export default async function RootLayout({
             </Suspense>
             <ConditionalFooter locale={validLocale} />
           </div>
+          {/* 全局自定义脚本 - Footer */}
+          <Suspense fallback={null}>
+            <GlobalScripts position="footer" />
+          </Suspense>
+          {/* Script Debugger - only visible in debug mode */}
+          <Suspense fallback={null}>
+            <ScriptDebugger />
+          </Suspense>
         </ClientLayoutWrapper>
       </body>
     </html>

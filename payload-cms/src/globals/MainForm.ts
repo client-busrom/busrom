@@ -22,6 +22,7 @@ export const MainForm: GlobalConfig = {
       zh: '首页管理',
     },
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,
@@ -80,7 +81,7 @@ export const MainForm: GlobalConfig = {
     // ==================================================================
     {
       name: 'designTextLeft',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Design Text - Left',
         zh: '设计文字-左',
@@ -95,7 +96,7 @@ export const MainForm: GlobalConfig = {
     },
     {
       name: 'designTextRight',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Design Text - Right',
         zh: '设计文字-右',

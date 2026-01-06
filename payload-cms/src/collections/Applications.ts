@@ -44,6 +44,10 @@ export const Applications: CollectionConfig = {
     update: ({ req }) => !!req.user,
     delete: ({ req }) => !!req.user,
   },
+  // 版本控制 - 保留修改历史
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     {
       type: 'tabs',
@@ -75,7 +79,7 @@ export const Applications: CollectionConfig = {
             },
             {
               name: 'name',
-              type: 'text',
+              type: 'textarea',
               label: {
                 en: 'Application Name',
                 zh: '应用名称',
@@ -141,7 +145,7 @@ export const Applications: CollectionConfig = {
               fields: [
                 {
                   name: 'sceneName',
-                  type: 'text',
+                  type: 'textarea',
                   label: {
                     en: 'Scene Name',
                     zh: '场景名称',

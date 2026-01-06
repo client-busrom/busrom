@@ -21,6 +21,7 @@ export const BrandAdvantages: GlobalConfig = {
       zh: '首页管理',
     },
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,
@@ -75,7 +76,7 @@ export const BrandAdvantages: GlobalConfig = {
     // ==================================================================
     {
       name: 'advantage01Text',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Advantage 01 - Text',
         zh: '优势01 - 文字',
@@ -103,7 +104,7 @@ export const BrandAdvantages: GlobalConfig = {
     // ==================================================================
     {
       name: 'advantage02Text',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Advantage 02 - Text',
         zh: '优势02 - 文字',
@@ -131,7 +132,7 @@ export const BrandAdvantages: GlobalConfig = {
     // ==================================================================
     {
       name: 'advantage03Text',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Advantage 03 - Text',
         zh: '优势03 - 文字',
@@ -159,7 +160,7 @@ export const BrandAdvantages: GlobalConfig = {
     // ==================================================================
     {
       name: 'advantage04Text',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Advantage 04 - Text',
         zh: '优势04 - 文字',
@@ -187,7 +188,7 @@ export const BrandAdvantages: GlobalConfig = {
     // ==================================================================
     {
       name: 'advantage05Text',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Advantage 05 - Text',
         zh: '优势05 - 文字',
@@ -215,7 +216,7 @@ export const BrandAdvantages: GlobalConfig = {
     // ==================================================================
     {
       name: 'advantage06Text',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Advantage 06 - Text',
         zh: '优势06 - 文字',
@@ -243,7 +244,7 @@ export const BrandAdvantages: GlobalConfig = {
     // ==================================================================
     {
       name: 'advantage07Text',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Advantage 07 - Text',
         zh: '优势07 - 文字',
@@ -271,7 +272,7 @@ export const BrandAdvantages: GlobalConfig = {
     // ==================================================================
     {
       name: 'advantage08Text',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Advantage 08 - Text',
         zh: '优势08 - 文字',
@@ -299,7 +300,7 @@ export const BrandAdvantages: GlobalConfig = {
     // ==================================================================
     {
       name: 'advantage09Text',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Advantage 09 - Text',
         zh: '优势09 - 文字',

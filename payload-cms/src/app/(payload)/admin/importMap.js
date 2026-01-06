@@ -1,6 +1,6 @@
 import { default as default_a66bd44433c9260839699cd88113e799 } from '@/components/admin/PermissionSelector'
 import { default as default_85b184ead3859892512d1fa42a0ba167 } from '@/components/admin/TwoFactorAuthField'
-import { MultiLocaleTextField as MultiLocaleTextField_818f830b0ef41c7fd6298cda9b34bc80 } from '@/components/fields/MultiLocaleField'
+import { MultiLocaleTextareaField as MultiLocaleTextareaField_818f830b0ef41c7fd6298cda9b34bc80 } from '@/components/fields/MultiLocaleField'
 import { default as default_6e007ac8f0e2f687212ebb65ad91c147 } from '@/components/fields/TranslationCenter'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -51,7 +51,8 @@ import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { default as default_8eace7ae1118053face74cf3167249d9 } from '@/components/fields/TagBasedRandomImages'
 import { default as default_f2f012c65168d1c448e59ecd59a1bae5 } from '@/components/admin/NavigationManagerLink'
-import { MultiLocaleTextareaField as MultiLocaleTextareaField_818f830b0ef41c7fd6298cda9b34bc80 } from '@/components/fields/MultiLocaleField'
+import { MultiLocaleTextField as MultiLocaleTextField_818f830b0ef41c7fd6298cda9b34bc80 } from '@/components/fields/MultiLocaleField'
+import { default as default_a3e549dccdd3ea0f10d6ba87c5f4df9b } from '@/components/fields/PathSelector'
 import { default as default_c2dbb529a09462acd9e8df0356a9434b } from '@/components/fields/FormFieldsTranslationCenter'
 import { default as default_7943e4c73893476d7fc7695e5ca0c666 } from '@/components/fields/FormDataDisplay'
 import { default as default_127e3c011c444cd50caa9cd70efd6d8a } from '@/components/fields/AttachmentsDisplay'
@@ -71,7 +72,7 @@ import { CollectionCards as CollectionCards_ab83ff7e88da8d3530831f296ec4756a } f
 export const importMap = {
   "@/components/admin/PermissionSelector#default": default_a66bd44433c9260839699cd88113e799,
   "@/components/admin/TwoFactorAuthField#default": default_85b184ead3859892512d1fa42a0ba167,
-  "@/components/fields/MultiLocaleField#MultiLocaleTextField": MultiLocaleTextField_818f830b0ef41c7fd6298cda9b34bc80,
+  "@/components/fields/MultiLocaleField#MultiLocaleTextareaField": MultiLocaleTextareaField_818f830b0ef41c7fd6298cda9b34bc80,
   "@/components/fields/TranslationCenter#default": default_6e007ac8f0e2f687212ebb65ad91c147,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -122,7 +123,8 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@/components/fields/TagBasedRandomImages#default": default_8eace7ae1118053face74cf3167249d9,
   "@/components/admin/NavigationManagerLink#default": default_f2f012c65168d1c448e59ecd59a1bae5,
-  "@/components/fields/MultiLocaleField#MultiLocaleTextareaField": MultiLocaleTextareaField_818f830b0ef41c7fd6298cda9b34bc80,
+  "@/components/fields/MultiLocaleField#MultiLocaleTextField": MultiLocaleTextField_818f830b0ef41c7fd6298cda9b34bc80,
+  "@/components/fields/PathSelector#default": default_a3e549dccdd3ea0f10d6ba87c5f4df9b,
   "@/components/fields/FormFieldsTranslationCenter#default": default_c2dbb529a09462acd9e8df0356a9434b,
   "@/components/fields/FormDataDisplay#default": default_7943e4c73893476d7fc7695e5ca0c666,
   "@/components/fields/AttachmentsDisplay#default": default_127e3c011c444cd50caa9cd70efd6d8a,

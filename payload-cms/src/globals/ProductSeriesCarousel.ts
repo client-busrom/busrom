@@ -21,6 +21,7 @@ export const ProductSeriesCarousel: GlobalConfig = {
     },
     // Note: Hidden from default nav via CustomNav.tsx
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,
@@ -57,7 +58,7 @@ export const ProductSeriesCarousel: GlobalConfig = {
     // Title
     {
       name: 'title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Title',
         zh: '标题',

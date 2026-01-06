@@ -41,13 +41,16 @@ export const Categories: CollectionConfig = {
     update: ({ req }) => !!req.user,
     delete: ({ req }) => !!req.user,
   },
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     // ==================================================================
     // Multi-language Name
     // ==================================================================
     {
       name: 'name',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Category Name',
         zh: '分类名称',

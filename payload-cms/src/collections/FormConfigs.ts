@@ -41,6 +41,9 @@ export const FormConfigs: CollectionConfig = {
     update: ({ req }) => !!req.user,
     delete: ({ req }) => !!req.user,
   },
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     // ==================================================================
     // Basic Information
@@ -63,7 +66,7 @@ export const FormConfigs: CollectionConfig = {
     },
     {
       name: 'displayName',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Display Name',
         zh: '显示名称',
@@ -131,7 +134,7 @@ export const FormConfigs: CollectionConfig = {
         },
         {
           name: 'label',
-          type: 'text',
+          type: 'textarea',
           label: {
             en: 'Label',
             zh: '显示标签',
@@ -141,7 +144,7 @@ export const FormConfigs: CollectionConfig = {
         },
         {
           name: 'placeholder',
-          type: 'text',
+          type: 'textarea',
           label: {
             en: 'Placeholder',
             zh: '占位符',
@@ -190,7 +193,7 @@ export const FormConfigs: CollectionConfig = {
             },
             {
               name: 'label',
-              type: 'text',
+              type: 'textarea',
               label: 'Label',
               localized: true,
               required: true,
@@ -260,7 +263,7 @@ export const FormConfigs: CollectionConfig = {
       fields: [
         {
           name: 'submitButtonText',
-          type: 'text',
+          type: 'textarea',
           label: {
             en: 'Submit Button Text',
             zh: '提交按钮文字',
@@ -270,7 +273,7 @@ export const FormConfigs: CollectionConfig = {
         },
         {
           name: 'submittingText',
-          type: 'text',
+          type: 'textarea',
           label: {
             en: 'Submitting Text',
             zh: '提交中文字',
@@ -290,7 +293,7 @@ export const FormConfigs: CollectionConfig = {
         },
         {
           name: 'errorRequiredFields',
-          type: 'text',
+          type: 'textarea',
           label: {
             en: 'Required Fields Error',
             zh: '必填字段错误提示',
@@ -300,7 +303,7 @@ export const FormConfigs: CollectionConfig = {
         },
         {
           name: 'errorNetworkMessage',
-          type: 'text',
+          type: 'textarea',
           label: {
             en: 'Network Error Message',
             zh: '网络错误提示',
@@ -310,7 +313,7 @@ export const FormConfigs: CollectionConfig = {
         },
         {
           name: 'errorCaptchaMessage',
-          type: 'text',
+          type: 'textarea',
           label: {
             en: 'Captcha Error Message',
             zh: '验证码错误提示',
@@ -529,7 +532,7 @@ export const FormConfigs: CollectionConfig = {
         },
         {
           name: 'autoReplySubject',
-          type: 'text',
+          type: 'textarea',
           label: {
             en: 'Auto Reply Subject (Override)',
             zh: '自动回复主题（覆盖全局）',

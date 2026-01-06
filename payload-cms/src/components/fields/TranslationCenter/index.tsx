@@ -16,53 +16,60 @@ interface TranslatableFieldConfig {
 // 每个 collection 的可翻译字段配置
 const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
   products: [
-    { name: 'name', labelKey: 'custom:fields:productName', type: 'text' },
+    { name: 'name', labelKey: 'custom:fields:productName', type: 'textarea' },
     { name: 'shortDescription', labelKey: 'custom:fields:shortDescription', type: 'textarea' },
     { name: 'description', labelKey: 'custom:fields:description', type: 'textarea' },
   ],
   'product-series': [
-    { name: 'name', labelKey: 'custom:fields:seriesName', type: 'text' },
+    { name: 'name', labelKey: 'custom:fields:seriesName', type: 'textarea' },
     { name: 'description', labelKey: 'custom:fields:description', type: 'textarea' },
   ],
   pages: [
-    { name: 'title', labelKey: 'custom:fields:pageTitle', type: 'text' },
-    { name: 'heroText', labelKey: 'custom:translationCenter:heroText', type: 'text' },
-    { name: 'heroSubtitle', labelKey: 'custom:translationCenter:heroSubtitle', type: 'text' },
+    { name: 'title', labelKey: 'custom:fields:pageTitle', type: 'textarea' },
+    { name: 'heroText', labelKey: 'custom:translationCenter:heroText', type: 'textarea' },
+    { name: 'heroSubtitle', labelKey: 'custom:translationCenter:heroSubtitle', type: 'textarea' },
   ],
   blogs: [
-    { name: 'title', labelKey: 'custom:fields:blogTitle', type: 'text' },
+    { name: 'title', labelKey: 'custom:fields:blogTitle', type: 'textarea' },
     { name: 'excerpt', labelKey: 'custom:translationCenter:excerpt', type: 'textarea' },
   ],
   'faq-items': [
-    { name: 'question', labelKey: 'custom:fields:question', type: 'text' },
+    { name: 'question', labelKey: 'custom:fields:question', type: 'textarea' },
   ],
   'reusable-blocks': [
-    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'text' },
-    { name: 'subtitle', labelKey: 'custom:translationCenter:subtitle', type: 'text' },
+    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'textarea' },
+    { name: 'subtitle', labelKey: 'custom:translationCenter:subtitle', type: 'textarea' },
   ],
   applications: [
-    { name: 'name', labelKey: 'custom:fields:applicationName', type: 'text' },
+    { name: 'name', labelKey: 'custom:fields:applicationName', type: 'textarea' },
     { name: 'shortDescription', labelKey: 'custom:fields:shortDescription', type: 'textarea' },
     { name: 'description', labelKey: 'custom:fields:description', type: 'textarea' },
   ],
   'hero-banner-items': [
-    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'text' },
-    { name: 'feature1', labelKey: 'custom:translationCenter:feature1', type: 'text' },
-    { name: 'feature2', labelKey: 'custom:translationCenter:feature2', type: 'text' },
-    { name: 'feature3', labelKey: 'custom:translationCenter:feature3', type: 'text' },
-    { name: 'feature4', labelKey: 'custom:translationCenter:feature4', type: 'text' },
-    { name: 'feature5', labelKey: 'custom:translationCenter:feature5', type: 'text' },
-    { name: 'ctaButton.text', labelKey: 'custom:translationCenter:ctaButtonText', type: 'text' },
+    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'textarea' },
+    { name: 'feature1', labelKey: 'custom:translationCenter:feature1', type: 'textarea' },
+    { name: 'feature2', labelKey: 'custom:translationCenter:feature2', type: 'textarea' },
+    { name: 'feature3', labelKey: 'custom:translationCenter:feature3', type: 'textarea' },
+    { name: 'feature4', labelKey: 'custom:translationCenter:feature4', type: 'textarea' },
+    { name: 'feature5', labelKey: 'custom:translationCenter:feature5', type: 'textarea' },
+    { name: 'ctaButton.text', labelKey: 'custom:translationCenter:ctaButtonText', type: 'textarea' },
   ],
   'series-intro-items': [
-    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'text' },
+    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'textarea' },
     { name: 'description', labelKey: 'custom:translationCenter:description', type: 'textarea' },
   ],
   'form-configs': [
-    { name: 'displayName', labelKey: 'custom:fields:displayName', type: 'text' },
+    { name: 'displayName', labelKey: 'custom:fields:displayName', type: 'textarea' },
     { name: 'description', labelKey: 'custom:fields:description', type: 'textarea' },
-    { name: 'submitButtonText', labelKey: 'custom:fields:submitButtonText', type: 'text' },
+    { name: 'submitButtonText', labelKey: 'custom:fields:submitButtonText', type: 'textarea' },
     { name: 'successMessage', labelKey: 'custom:fields:successMessage', type: 'textarea' },
+  ],
+  'seo-settings': [
+    { name: 'metaTitle', labelKey: 'custom:fields:metaTitle', type: 'textarea' },
+    { name: 'metaDescription', labelKey: 'custom:fields:metaDescription', type: 'textarea' },
+    { name: 'metaKeywords', labelKey: 'custom:fields:metaKeywords', type: 'textarea' },
+    { name: 'ogTitle', labelKey: 'custom:fields:ogTitle', type: 'textarea' },
+    { name: 'ogDescription', labelKey: 'custom:fields:ogDescription', type: 'textarea' },
   ],
 }
 

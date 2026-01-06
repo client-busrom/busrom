@@ -21,6 +21,7 @@ export const FeaturedProducts: GlobalConfig = {
       zh: '首页管理',
     },
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,
@@ -60,7 +61,7 @@ export const FeaturedProducts: GlobalConfig = {
     // ==================================================================
     {
       name: 'title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Title',
         zh: '标题',
@@ -78,7 +79,7 @@ export const FeaturedProducts: GlobalConfig = {
     },
     {
       name: 'viewAllButtonText',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'View All Button Text',
         zh: '"查看全部"按钮文字',

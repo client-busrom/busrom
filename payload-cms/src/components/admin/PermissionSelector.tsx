@@ -27,7 +27,7 @@ const RESOURCE_LABELS: Record<string, { en: string; zh: string }> = {
   USER: { en: 'Users', zh: '用户' },
   ROLE: { en: 'Roles', zh: '角色' },
   PERMISSION: { en: 'Permissions', zh: '权限' },
-  ACTIVITY_LOG: { en: 'Activity Logs', zh: '操作日志' },
+  AUDIT_LOG: { en: 'Audit Log', zh: '审计日志' },
   PRODUCT: { en: 'Products', zh: '产品' },
   PRODUCT_SERIES: { en: 'Product Series', zh: '产品系列' },
   PAGE: { en: 'Pages', zh: '页面' },
@@ -118,7 +118,8 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
 
   // Extract roles value from form fields
   const rolesValue = useMemo(() => {
-    if (!isUserCollection || !fields?.roles) return []
+    if (!isUserCollection) return []
+    if (!fields?.roles) return []
     const rolesFieldValue = fields.roles?.value
     if (!rolesFieldValue) return []
     if (Array.isArray(rolesFieldValue)) {
@@ -139,7 +140,9 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
   useEffect(() => {
     const fetchPermissions = async () => {
       try {
-        const response = await fetch('/api/permissions?limit=500&depth=0')
+        const response = await fetch('/api/permissions?limit=500&depth=0', {
+          credentials: 'include', // Include cookies for authentication
+        })
         const data = await response.json()
         if (data.docs) {
           setPermissions(data.docs)
@@ -172,7 +175,9 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
 
         for (const roleId of rolesValue) {
           if (!roleId) continue
-          const response = await fetch(`/api/roles/${roleId}?depth=1`)
+          const response = await fetch(`/api/roles/${roleId}?depth=1`, {
+            credentials: 'include', // Include cookies for authentication
+          })
           const role = await response.json()
 
           if (role.permissions && Array.isArray(role.permissions)) {

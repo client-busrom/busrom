@@ -16,7 +16,7 @@ const RESOURCES = [
   { value: 'USER', label: { en: 'Users', zh: '用户' } },
   { value: 'ROLE', label: { en: 'Roles', zh: '角色' } },
   { value: 'PERMISSION', label: { en: 'Permissions', zh: '权限' } },
-  { value: 'ACTIVITY_LOG', label: { en: 'Activity Logs', zh: '操作日志' } },
+  { value: 'AUDIT_LOG', label: { en: 'Audit Log', zh: '审计日志' } },
   // Content
   { value: 'PRODUCT', label: { en: 'Products', zh: '产品' } },
   { value: 'PRODUCT_SERIES', label: { en: 'Product Series', zh: '产品系列' } },
@@ -105,6 +105,9 @@ export const Permissions: CollectionConfig = {
     create: ({ req }) => req.user?.isAdmin === true,
     update: ({ req }) => req.user?.isAdmin === true,
     delete: ({ req }) => req.user?.isAdmin === true,
+  },
+  versions: {
+    maxPerDoc: 10,
   },
   hooks: {
     beforeChange: [

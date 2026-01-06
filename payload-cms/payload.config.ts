@@ -55,6 +55,7 @@ import { DocumentTemplateFeature } from './src/lexical-features/document-templat
 import { ChecklistFeature } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { seoPlugin } from '@payloadcms/plugin-seo'
+import { auditorPlugin } from 'payload-auditor'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
@@ -77,7 +78,6 @@ import { NavigationMenus } from './src/collections/NavigationMenus'
 // Users & Access Control
 import { Roles } from './src/collections/Roles'
 import { Permissions } from './src/collections/Permissions'
-import { ActivityLogs } from './src/collections/ActivityLogs'
 // Content Collections
 import { Pages } from './src/collections/Pages'
 import { Blogs } from './src/collections/Blogs'
@@ -201,7 +201,6 @@ export default buildConfig({
     // Users & Access Control
     Roles,
     Permissions,
-    ActivityLogs,
     // Products
     Products,
     ProductSeries,
@@ -420,6 +419,161 @@ export default buildConfig({
       generateTitle: ({ doc }) => `${doc?.title || 'Busrom'} | Busrom`,
       generateDescription: ({ doc }) => doc?.excerpt || doc?.description || doc?.shortDescription || '',
       tabbedUI: true,
+    }),
+
+    // Auditor Plugin - 操作审计日志
+    // 注意：不追踪 users/roles/permissions，会导致 User 字段验证错误
+    auditorPlugin({
+      collection: {
+        // 自定义访问控制 - 使用 isAdmin 字段
+        Accessibility: {
+          customAccess: {
+            read: ({ req }) => req.user?.isAdmin === true,
+          },
+        },
+        trackCollections: [
+          // ==================== 媒体库 ====================
+          {
+            slug: 'media',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'media-categories',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'media-tags',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          // ==================== 产品 ====================
+          {
+            slug: 'products',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'product-series',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          // ==================== 首页内容 ====================
+          {
+            slug: 'hero-banner-items',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'series-intro-items',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          // ==================== 导航 ====================
+          {
+            slug: 'navigation-menus',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          // ==================== 内容管理 ====================
+          {
+            slug: 'pages',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'blogs',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'applications',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'categories',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'faq-items',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'reusable-blocks',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'document-templates',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          // ==================== 表单 ====================
+          {
+            slug: 'form-configs',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'form-submissions',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          // ==================== 系统设置 ====================
+          {
+            slug: 'custom-scripts',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'seo-settings',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+        ],
+      },
     }),
   ],
 

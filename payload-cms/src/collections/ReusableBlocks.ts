@@ -42,6 +42,9 @@ export const ReusableBlocks: CollectionConfig = {
     update: ({ req }) => !!req.user,
     delete: ({ req }) => !!req.user,
   },
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     // ==================================================================
     // Tab Layout for better organization
@@ -92,7 +95,7 @@ export const ReusableBlocks: CollectionConfig = {
             },
             {
               name: 'title',
-              type: 'text',
+              type: 'textarea',
               label: {
                 en: 'Title',
                 zh: '标题',
@@ -101,7 +104,7 @@ export const ReusableBlocks: CollectionConfig = {
             },
             {
               name: 'subtitle',
-              type: 'text',
+              type: 'textarea',
               label: {
                 en: 'Subtitle',
                 zh: '副标题',

@@ -21,6 +21,7 @@ export const QuoteSteps: GlobalConfig = {
       zh: '首页管理',
     },
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,
@@ -59,7 +60,7 @@ export const QuoteSteps: GlobalConfig = {
     // ==================================================================
     {
       name: 'headerTitle',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Header - Title',
         zh: '标题 - 主标题',
@@ -74,7 +75,7 @@ export const QuoteSteps: GlobalConfig = {
     },
     {
       name: 'headerTitle2',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Header - Title 2',
         zh: '标题 - 副标题',
@@ -89,7 +90,7 @@ export const QuoteSteps: GlobalConfig = {
     },
     {
       name: 'headerSubtitle',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Header - Subtitle',
         zh: '标题 - 小标题',
@@ -111,7 +112,7 @@ export const QuoteSteps: GlobalConfig = {
     // ==================================================================
     {
       name: 'step01Text',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Step 01 - Text',
         zh: '步骤01 - 文字',
@@ -138,7 +139,7 @@ export const QuoteSteps: GlobalConfig = {
     // ==================================================================
     {
       name: 'step02Text',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Step 02 - Text',
         zh: '步骤02 - 文字',
@@ -165,7 +166,7 @@ export const QuoteSteps: GlobalConfig = {
     // ==================================================================
     {
       name: 'step03Text',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Step 03 - Text',
         zh: '步骤03 - 文字',
@@ -192,7 +193,7 @@ export const QuoteSteps: GlobalConfig = {
     // ==================================================================
     {
       name: 'step04Text',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Step 04 - Text',
         zh: '步骤04 - 文字',
@@ -219,7 +220,7 @@ export const QuoteSteps: GlobalConfig = {
     // ==================================================================
     {
       name: 'step05Text',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Step 05 - Text',
         zh: '步骤05 - 文字',

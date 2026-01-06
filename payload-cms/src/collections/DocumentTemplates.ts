@@ -46,6 +46,9 @@ export const DocumentTemplates: CollectionConfig = {
     update: ({ req }) => !!req.user,
     delete: ({ req }) => req.user?.isAdmin === true,
   },
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     // ==================================================================
     // Basic Information
