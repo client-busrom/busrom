@@ -215,9 +215,9 @@ export const CustomScripts: CollectionConfig = {
     delete: ({ req }) => !!req.user,
   },
   // Temporarily disabled - requires migration to create _custom_scripts_v table
-  // versions: {
-  //   maxPerDoc: 10,
-  // },
+  versions: {
+    maxPerDoc: 10,
+  },
   hooks: {
     beforeChange: [
       async ({ data }) => {

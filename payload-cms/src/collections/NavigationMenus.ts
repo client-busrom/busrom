@@ -43,11 +43,9 @@ export const NavigationMenus: CollectionConfig = {
     },
   },
 
-  // versions: {
-
-  // maxPerDoc: 10,
-
-  // },
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     // Basic Information
     {

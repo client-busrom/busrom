@@ -45,11 +45,9 @@ export const FaqItems: CollectionConfig = {
     delete: ({ req }) => !!req.user,
   },
 
-  // versions: {
-
-  // maxPerDoc: 10,
-
-  // },
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     {
       type: 'tabs',

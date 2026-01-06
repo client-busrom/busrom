@@ -230,11 +230,9 @@ export const Media: CollectionConfig = {
     delete: ({ req: { user } }) => user?.isAdmin === true,
   },
 
-  // versions: {
-
-  // maxPerDoc: 5, // 媒体文件保留较少版本
-
-  // },
+  versions: {
+    maxPerDoc: 5,
+  },
   upload: {
     // Image processing with WebP conversion for better performance
     // WebP typically provides 25-35% smaller file sizes than JPEG/PNG

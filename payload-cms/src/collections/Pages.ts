@@ -64,11 +64,9 @@ export const Pages: CollectionConfig = {
   },
   // 版本控制 - 保留修改历史
 
-  // versions: {
-
-  // maxPerDoc: 10,
-
-  // },
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     // ==================================================================
     // Tab Layout for better organization

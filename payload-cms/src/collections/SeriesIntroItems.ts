@@ -41,11 +41,9 @@ export const SeriesIntroItems: CollectionConfig = {
     delete: ({ req: { user } }) => !!user,
   },
 
-  // versions: {
-
-  // maxPerDoc: 10,
-
-  // },
+  versions: {
+    maxPerDoc: 10,
+  },
   hooks: {
     afterRead: [
       async ({ doc, req: { payload } }) => {
