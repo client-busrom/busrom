@@ -39,6 +39,10 @@ export const ProductSeries: CollectionConfig = {
     update: ({ req: { user } }) => !!user,
     delete: ({ req: { user } }) => user?.isAdmin === true,
   },
+  // 版本控制 - 保留修改历史
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     {
       type: 'tabs',
@@ -71,7 +75,7 @@ export const ProductSeries: CollectionConfig = {
             },
             {
               name: 'name',
-              type: 'text',
+              type: 'textarea',
               required: true,
               localized: true,
               label: {

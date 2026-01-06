@@ -21,6 +21,7 @@ export const BrandAnalysis: GlobalConfig = {
       zh: '首页管理',
     },
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,
@@ -88,7 +89,7 @@ export const BrandAnalysis: GlobalConfig = {
       fields: [
         {
           name: 'title',
-          type: 'text',
+          type: 'textarea',
           label: 'Title',
           localized: true,
         },
@@ -133,7 +134,7 @@ export const BrandAnalysis: GlobalConfig = {
       fields: [
         {
           name: 'title',
-          type: 'text',
+          type: 'textarea',
           label: 'Title',
           localized: true,
         },
@@ -178,7 +179,7 @@ export const BrandAnalysis: GlobalConfig = {
       fields: [
         {
           name: 'title',
-          type: 'text',
+          type: 'textarea',
           label: 'Title',
           localized: true,
         },

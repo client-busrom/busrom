@@ -20,6 +20,7 @@ export const SimpleCta: GlobalConfig = {
       zh: '首页管理',
     },
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,
@@ -56,7 +57,7 @@ export const SimpleCta: GlobalConfig = {
     // Content
     {
       name: 'title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Title',
         zh: '标题',
@@ -65,7 +66,7 @@ export const SimpleCta: GlobalConfig = {
     },
     {
       name: 'subtitle',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Subtitle',
         zh: '副标题',
@@ -83,7 +84,7 @@ export const SimpleCta: GlobalConfig = {
     },
     {
       name: 'ctaText',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'CTA Text',
         zh: '按钮文字',

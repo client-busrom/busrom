@@ -41,6 +41,9 @@ export const SeoSettings: CollectionConfig = {
     update: ({ req }) => !!req.user,
     delete: ({ req }) => !!req.user,
   },
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     // Translation Center
     {
@@ -107,8 +110,7 @@ export const SeoSettings: CollectionConfig = {
         { label: { en: 'Shop Product Detail', zh: '商品详情' }, value: 'shop_detail' },
         { label: { en: 'Blog List', zh: '博客列表' }, value: 'blog_list' },
         { label: { en: 'Blog Detail', zh: '博客详情' }, value: 'blog_detail' },
-        { label: { en: 'Application List', zh: '应用列表' }, value: 'application_list' },
-        { label: { en: 'Application Detail', zh: '应用详情' }, value: 'application_detail' },
+        { label: { en: 'Applications', zh: '应用场景' }, value: 'applications' },
       ],
       admin: {
         condition: (data) => data.scope === 'page_type',
@@ -123,9 +125,8 @@ export const SeoSettings: CollectionConfig = {
       },
       admin: {
         condition: (data) => data.scope === 'exact_path',
-        description: {
-          en: 'Enter the exact URL path (e.g., /about)',
-          zh: '输入精确的 URL 路径（例如：/about）',
+        components: {
+          Field: '@/components/fields/PathSelector',
         },
       },
     },
@@ -138,9 +139,8 @@ export const SeoSettings: CollectionConfig = {
       },
       admin: {
         condition: (data) => data.scope === 'path_pattern',
-        description: {
-          en: 'e.g., /product/* or /blog/**',
-          zh: '例如：/product/* 或 /blog/**',
+        components: {
+          Field: '@/components/fields/PathSelector',
         },
       },
     },
@@ -157,7 +157,7 @@ export const SeoSettings: CollectionConfig = {
       fields: [
         {
           name: 'metaTitle',
-          type: 'text',
+          type: 'textarea',
           label: {
             en: 'Meta Title',
             zh: 'Meta 标题',
@@ -167,6 +167,9 @@ export const SeoSettings: CollectionConfig = {
             description: {
               en: 'Override page title for SEO (50-60 characters recommended)',
               zh: '覆盖页面的 SEO 标题（建议 50-60 个字符）',
+            },
+            components: {
+              Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
             },
           },
         },
@@ -187,7 +190,7 @@ export const SeoSettings: CollectionConfig = {
         },
         {
           name: 'metaKeywords',
-          type: 'text',
+          type: 'textarea',
           label: {
             en: 'Meta Keywords',
             zh: 'Meta 关键词',
@@ -197,6 +200,9 @@ export const SeoSettings: CollectionConfig = {
             description: {
               en: 'Comma-separated keywords',
               zh: '用逗号分隔的关键词',
+            },
+            components: {
+              Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
             },
           },
         },
@@ -218,7 +224,7 @@ export const SeoSettings: CollectionConfig = {
       fields: [
         {
           name: 'ogTitle',
-          type: 'text',
+          type: 'textarea',
           label: {
             en: 'OG Title',
             zh: 'OG 标题',
@@ -228,6 +234,9 @@ export const SeoSettings: CollectionConfig = {
             description: {
               en: 'Title displayed when shared on social media',
               zh: '在社交媒体分享时显示的标题',
+            },
+            components: {
+              Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
             },
           },
         },

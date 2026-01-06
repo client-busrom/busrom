@@ -42,6 +42,9 @@ export const NavigationMenus: CollectionConfig = {
       return !!req.user
     },
   },
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     // Basic Information
     {
@@ -62,7 +65,7 @@ export const NavigationMenus: CollectionConfig = {
     },
     {
       name: 'name',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Menu Name',
         zh: '菜单名称',
@@ -71,7 +74,7 @@ export const NavigationMenus: CollectionConfig = {
       required: true,
       admin: {
         components: {
-          Field: '@/components/fields/MultiLocaleField#MultiLocaleTextField',
+          Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
         },
       },
     },

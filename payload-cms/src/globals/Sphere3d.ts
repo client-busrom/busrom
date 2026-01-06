@@ -18,6 +18,7 @@ export const Sphere3d: GlobalConfig = {
       zh: '首页管理',
     },
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,
@@ -54,7 +55,7 @@ export const Sphere3d: GlobalConfig = {
     // Title
     {
       name: 'title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Title',
         zh: '标题',
@@ -70,7 +71,7 @@ export const Sphere3d: GlobalConfig = {
     // Description
     {
       name: 'description',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Description',
         zh: '描述',

@@ -25,6 +25,7 @@ export const Footer: GlobalConfig = {
       zh: '网站设置',
     },
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req: { user } }) => !!user,
@@ -80,7 +81,7 @@ export const Footer: GlobalConfig = {
               fields: [
                 {
                   name: 'contactTitle',
-                  type: 'text',
+                  type: 'textarea',
                   localized: true,
                   label: {
                     en: 'Contact Title',
@@ -90,7 +91,7 @@ export const Footer: GlobalConfig = {
                 // Email
                 {
                   name: 'contactEmailLabel',
-                  type: 'text',
+                  type: 'textarea',
                   localized: true,
                   label: {
                     en: 'Email Label',
@@ -114,7 +115,7 @@ export const Footer: GlobalConfig = {
                 // After Sales
                 {
                   name: 'afterSalesLabel',
-                  type: 'text',
+                  type: 'textarea',
                   localized: true,
                   label: {
                     en: 'After Sales Label',
@@ -138,7 +139,7 @@ export const Footer: GlobalConfig = {
                 // WhatsApp
                 {
                   name: 'whatsappLabel',
-                  type: 'text',
+                  type: 'textarea',
                   localized: true,
                   label: {
                     en: 'WhatsApp Label',
@@ -164,7 +165,7 @@ export const Footer: GlobalConfig = {
                 },
                 {
                   name: 'workingHours',
-                  type: 'text',
+                  type: 'textarea',
                   localized: true,
                   label: {
                     en: 'Working Hours',
@@ -184,7 +185,7 @@ export const Footer: GlobalConfig = {
               fields: [
                 {
                   name: 'officialNoticeTitle',
-                  type: 'text',
+                  type: 'textarea',
                   localized: true,
                   label: {
                     en: 'Notice Title',
@@ -193,7 +194,7 @@ export const Footer: GlobalConfig = {
                 },
                 {
                   name: 'officialNoticeLine1',
-                  type: 'text',
+                  type: 'textarea',
                   localized: true,
                   label: {
                     en: 'Line 1',
@@ -202,7 +203,7 @@ export const Footer: GlobalConfig = {
                 },
                 {
                   name: 'officialNoticeLine2',
-                  type: 'text',
+                  type: 'textarea',
                   localized: true,
                   label: {
                     en: 'Line 2',
@@ -211,7 +212,7 @@ export const Footer: GlobalConfig = {
                 },
                 {
                   name: 'officialNoticeLine3',
-                  type: 'text',
+                  type: 'textarea',
                   localized: true,
                   label: {
                     en: 'Line 3',
@@ -220,7 +221,7 @@ export const Footer: GlobalConfig = {
                 },
                 {
                   name: 'officialNoticeLine4',
-                  type: 'text',
+                  type: 'textarea',
                   localized: true,
                   label: {
                     en: 'Line 4',
@@ -287,7 +288,7 @@ export const Footer: GlobalConfig = {
             // Copyright & Legal
             {
               name: 'copyrightText',
-              type: 'text',
+              type: 'textarea',
               localized: true,
               label: {
                 en: 'Copyright Text',
@@ -304,7 +305,7 @@ export const Footer: GlobalConfig = {
               fields: [
                 {
                   name: 'label',
-                  type: 'text',
+                  type: 'textarea',
                   localized: true,
                   required: true,
                   label: {

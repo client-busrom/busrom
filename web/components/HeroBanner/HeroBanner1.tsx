@@ -7,8 +7,15 @@ import { Locale } from "@/i18n.config";
 import { getObjectPosition } from "@/lib/utils";
 import { ServerImage } from "@/components/ui/ServerImage";
 
-// 处理换行符：支持 /n 和 \n
-const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
+// 处理换行符：支持 /n 和 \n，并去除每行首尾空格
+const formatText = (text: string | undefined) => {
+  if (!text) return '';
+  return text
+    .replace(/\/n|\\n/g, '\n')
+    .split('\n')
+    .map(line => line.trim())
+    .join('\n');
+};
 
 // --- 响应式尺寸函数 ---
 // 使用 CSS 变量 --rpx-hero，在宽屏幕上按宽度缩放，在高屏幕上按高度缩放
@@ -412,7 +419,7 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
           className="font-paytone-one text-[#FFBC5F] text-center whitespace-pre-line"
           style={{
             fontSize: rpx(48),
-            lineHeight: rpx(116),
+            lineHeight: 1.2,
             marginTop: rpx(60),
             marginBottom: rpx(10),
             WebkitTextStroke: `${rpx(3.5)} #75703F`,
@@ -423,33 +430,40 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
           {formatText(data.features[1])}
         </p>
 
-        {/* Feature[0] - 主标题第一行 */}
-        <h2
-          className="font-paytone-one text-black text-center whitespace-pre-line"
-          style={{
-            fontSize: rpx(86),
-            lineHeight: rpx(125),
-            marginTop: rpx(0),
-            marginBottom: rpx(0),
-            WebkitTextStroke: `${rpx(8)} #FDF6C2`,
-            paintOrder: 'stroke fill',
-          }}
-        >
-          {formatText(data.features[0])?.split(' ').slice(0, 2).join(' ')}
-        </h2>
-
-        {/* Feature[0] - 主标题第二行 */}
-        <h1
-          className="font-paytone-one text-black text-center whitespace-pre-line"
-          style={{
-            fontSize: rpx(120),
-            lineHeight: rpx(125),
-            WebkitTextStroke: `${rpx(8)} #FDF6C2`,
-            paintOrder: 'stroke fill',
-          }}
-        >
-          {formatText(data.features[0])?.split(' ').slice(2).join(' ')}
-        </h1>
+        {/* Feature[0] - 主标题（按换行符拆分，第一行小字，第二行大字） */}
+        {(() => {
+          const lines = formatText(data.features[0])?.split('\n') || [];
+          const firstLine = lines[0] || '';
+          const restLines = lines.slice(1).join(' ');
+          return (
+            <>
+              <h2
+                className="font-paytone-one text-black text-center"
+                style={{
+                  fontSize: rpx(86),
+                  lineHeight: rpx(125),
+                  marginTop: rpx(0),
+                  marginBottom: rpx(0),
+                  WebkitTextStroke: `${rpx(8)} #FDF6C2`,
+                  paintOrder: 'stroke fill',
+                }}
+              >
+                {firstLine}
+              </h2>
+              <h1
+                className="font-paytone-one text-black text-center"
+                style={{
+                  fontSize: rpx(120),
+                  lineHeight: rpx(125),
+                  WebkitTextStroke: `${rpx(8)} #FDF6C2`,
+                  paintOrder: 'stroke fill',
+                }}
+              >
+                {restLines}
+              </h1>
+            </>
+          );
+        })()}
 
         {/* 三个特性按钮 */}
         <div

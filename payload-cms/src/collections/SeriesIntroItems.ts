@@ -40,6 +40,9 @@ export const SeriesIntroItems: CollectionConfig = {
     update: ({ req: { user } }) => !!user,
     delete: ({ req: { user } }) => !!user,
   },
+  versions: {
+    maxPerDoc: 10,
+  },
   hooks: {
     afterRead: [
       async ({ doc, req: { payload } }) => {
@@ -103,7 +106,7 @@ export const SeriesIntroItems: CollectionConfig = {
     // ==================================================================
     {
       name: 'title',
-      type: 'text',
+      type: 'textarea',
       localized: true,
       label: {
         en: 'Title',

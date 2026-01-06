@@ -26,6 +26,7 @@ export const EmailConfig: GlobalConfig = {
       zh: '邮件服务和通知设置',
     },
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,

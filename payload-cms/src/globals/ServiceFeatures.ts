@@ -22,6 +22,7 @@ export const ServiceFeatures: GlobalConfig = {
       zh: '首页管理',
     },
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,
@@ -58,7 +59,7 @@ export const ServiceFeatures: GlobalConfig = {
     // Main Title & Subtitle
     {
       name: 'title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Title',
         zh: '主标题',
@@ -86,7 +87,7 @@ export const ServiceFeatures: GlobalConfig = {
     // ==================================================================
     {
       name: 'feature01Title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Feature 01 - Title',
         zh: '特点01 - 标题',
@@ -101,7 +102,7 @@ export const ServiceFeatures: GlobalConfig = {
     },
     {
       name: 'feature01ShortTitle',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Feature 01 - Short Title',
         zh: '特点01 - 短标题',
@@ -185,7 +186,7 @@ export const ServiceFeatures: GlobalConfig = {
     // ==================================================================
     {
       name: 'feature02Title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Feature 02 - Title',
         zh: '特点02 - 标题',
@@ -194,7 +195,7 @@ export const ServiceFeatures: GlobalConfig = {
     },
     {
       name: 'feature02ShortTitle',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Feature 02 - Short Title',
         zh: '特点02 - 短标题',
@@ -244,7 +245,7 @@ export const ServiceFeatures: GlobalConfig = {
     // ==================================================================
     {
       name: 'feature03Title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Feature 03 - Title',
         zh: '特点03 - 标题',
@@ -253,7 +254,7 @@ export const ServiceFeatures: GlobalConfig = {
     },
     {
       name: 'feature03ShortTitle',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Feature 03 - Short Title',
         zh: '特点03 - 短标题',
@@ -359,7 +360,7 @@ export const ServiceFeatures: GlobalConfig = {
     // ==================================================================
     {
       name: 'feature04Title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Feature 04 - Title',
         zh: '特点04 - 标题',
@@ -368,7 +369,7 @@ export const ServiceFeatures: GlobalConfig = {
     },
     {
       name: 'feature04ShortTitle',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Feature 04 - Short Title',
         zh: '特点04 - 短标题',
@@ -418,7 +419,7 @@ export const ServiceFeatures: GlobalConfig = {
     // ==================================================================
     {
       name: 'feature05Title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Feature 05 - Title',
         zh: '特点05 - 标题',
@@ -427,7 +428,7 @@ export const ServiceFeatures: GlobalConfig = {
     },
     {
       name: 'feature05ShortTitle',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Feature 05 - Short Title',
         zh: '特点05 - 短标题',

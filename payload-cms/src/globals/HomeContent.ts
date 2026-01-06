@@ -18,6 +18,7 @@ export const HomeContent: GlobalConfig = {
       zh: '网站设置',
     },
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,

@@ -44,6 +44,9 @@ export const FaqItems: CollectionConfig = {
     update: ({ req }) => !!req.user,
     delete: ({ req }) => !!req.user,
   },
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     {
       type: 'tabs',
@@ -75,7 +78,7 @@ export const FaqItems: CollectionConfig = {
             },
             {
               name: 'question',
-              type: 'text',
+              type: 'textarea',
               label: {
                 en: 'Question',
                 zh: '问题',

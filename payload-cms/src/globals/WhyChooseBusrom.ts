@@ -20,6 +20,7 @@ export const WhyChooseBusrom: GlobalConfig = {
       zh: '首页管理',
     },
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,
@@ -56,7 +57,7 @@ export const WhyChooseBusrom: GlobalConfig = {
     // Title
     {
       name: 'title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Title',
         zh: '标题',
@@ -66,7 +67,7 @@ export const WhyChooseBusrom: GlobalConfig = {
     // Title 2
     {
       name: 'title2',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Title 2',
         zh: '标题2',
@@ -79,7 +80,7 @@ export const WhyChooseBusrom: GlobalConfig = {
     // ==================================================================
     {
       name: 'viewMoreButtonText',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'View More Button Text',
         zh: '查看更多按钮文字',
@@ -112,7 +113,7 @@ export const WhyChooseBusrom: GlobalConfig = {
     // ==================================================================
     {
       name: 'reason01Title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Reason 01 - Title',
         zh: '理由01 - 标题',
@@ -162,7 +163,7 @@ export const WhyChooseBusrom: GlobalConfig = {
     // ==================================================================
     {
       name: 'reason02Title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Reason 02 - Title',
         zh: '理由02 - 标题',
@@ -212,7 +213,7 @@ export const WhyChooseBusrom: GlobalConfig = {
     // ==================================================================
     {
       name: 'reason03Title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Reason 03 - Title',
         zh: '理由03 - 标题',
@@ -262,7 +263,7 @@ export const WhyChooseBusrom: GlobalConfig = {
     // ==================================================================
     {
       name: 'reason04Title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Reason 04 - Title',
         zh: '理由04 - 标题',
@@ -312,7 +313,7 @@ export const WhyChooseBusrom: GlobalConfig = {
     // ==================================================================
     {
       name: 'reason05Title',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Reason 05 - Title',
         zh: '理由05 - 标题',

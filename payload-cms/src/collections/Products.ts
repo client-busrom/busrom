@@ -39,6 +39,10 @@ export const Products: CollectionConfig = {
     update: ({ req: { user } }) => !!user,
     delete: ({ req: { user } }) => user?.isAdmin === true,
   },
+  // 版本控制 - 保留修改历史
+  versions: {
+    maxPerDoc: 10, // 每个文档最多保留10个版本
+  },
   fields: [
     // ==================================================================
     // Tab Layout for better organization
@@ -90,7 +94,7 @@ export const Products: CollectionConfig = {
             },
             {
               name: 'name',
-              type: 'text',
+              type: 'textarea',
               required: true,
               localized: true,
               label: {

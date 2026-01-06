@@ -33,6 +33,9 @@ export const MediaCategories: CollectionConfig = {
     update: ({ req: { user } }) => !!user,
     delete: ({ req: { user } }) => user?.isAdmin === true,
   },
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     {
       name: 'name',
@@ -47,12 +50,15 @@ export const MediaCategories: CollectionConfig = {
     },
     {
       name: 'displayName',
-      type: 'text',
+      type: 'textarea',
       required: true,
       localized: true,
       label: 'Display Name | 显示名称',
       admin: {
         description: 'User-friendly name shown in UI | 在界面中显示的友好名称',
+        components: {
+          Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
+        },
       },
     },
     {

@@ -62,6 +62,10 @@ export const Pages: CollectionConfig = {
       return true
     },
   },
+  // 版本控制 - 保留修改历史
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     // ==================================================================
     // Tab Layout for better organization
@@ -166,7 +170,7 @@ export const Pages: CollectionConfig = {
             },
             {
               name: 'title',
-              type: 'text',
+              type: 'textarea',
               label: {
                 en: 'Page Title',
                 zh: '页面标题',
@@ -234,7 +238,7 @@ export const Pages: CollectionConfig = {
             },
             {
               name: 'heroText',
-              type: 'text',
+              type: 'textarea',
               label: {
                 en: 'Hero Text Overlay',
                 zh: '顶部叠加文字',
@@ -243,7 +247,7 @@ export const Pages: CollectionConfig = {
             },
             {
               name: 'heroSubtitle',
-              type: 'text',
+              type: 'textarea',
               label: {
                 en: 'Hero Subtitle',
                 zh: '顶部副标题',

@@ -229,6 +229,9 @@ export const Media: CollectionConfig = {
     update: ({ req: { user } }) => !!user,
     delete: ({ req: { user } }) => user?.isAdmin === true,
   },
+  versions: {
+    maxPerDoc: 5, // 媒体文件保留较少版本
+  },
   upload: {
     // Image processing with WebP conversion for better performance
     // WebP typically provides 25-35% smaller file sizes than JPEG/PNG
@@ -304,7 +307,7 @@ export const Media: CollectionConfig = {
     // ==================================================================
     {
       name: 'alt',
-      type: 'text',
+      type: 'textarea',
       required: true,
       localized: true,
       label: {
@@ -314,7 +317,7 @@ export const Media: CollectionConfig = {
       admin: {
         description: 'SEO-friendly alt text for images | 图片的SEO友好替代文本',
         components: {
-          Field: '@/components/fields/MultiLocaleField#MultiLocaleTextField',
+          Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
         },
       },
     },

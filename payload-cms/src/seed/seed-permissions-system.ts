@@ -37,8 +37,8 @@ const PERMISSIONS = [
   { resource: 'PERMISSION', action: 'UPDATE', name: '更新权限', category: 'USER' },
   { resource: 'PERMISSION', action: 'DELETE', name: '删除权限', category: 'USER' },
 
-  { resource: 'ACTIVITY_LOG', action: 'READ', name: '查看操作日志', category: 'USER' },
-  { resource: 'ACTIVITY_LOG', action: 'DELETE', name: '删除操作日志', category: 'USER' },
+  { resource: 'AUDIT_LOG', action: 'READ', name: '查看审计日志', category: 'USER' },
+  { resource: 'AUDIT_LOG', action: 'DELETE', name: '删除审计日志', category: 'USER' },
 
   // ==================== 内容管理 (Content) ====================
   // Products
@@ -356,25 +356,23 @@ async function seedPermissions(payload: Payload): Promise<Map<string, string | n
 async function seedRoles(payload: Payload, permissionMap: Map<string, string | number>): Promise<void> {
   payload.logger.info('🌱 Seeding roles...')
 
-  // Fetch existing roles
+  // Fetch existing roles with their permissions
   const existingRoles = await payload.find({
     collection: 'roles',
     limit: 100,
     depth: 0,
   })
 
-  const existingCodes = new Set(existingRoles.docs.map((r) => r.code))
+  const existingRolesMap = new Map(existingRoles.docs.map((r) => [r.code, r]))
 
   let createdCount = 0
+  let updatedCount = 0
   let existingCount = 0
 
   for (const roleData of ROLES) {
-    if (existingCodes.has(roleData.code)) {
-      existingCount++
-      continue
-    }
+    const existingRole = existingRolesMap.get(roleData.code)
 
-    // Get permission IDs
+    // Get permission IDs for this role
     let permissionIds: (string | number)[] = []
 
     if (roleData.permissions === '*') {
@@ -392,6 +390,38 @@ async function seedRoles(payload: Payload, permissionMap: Map<string, string | n
       }
     }
 
+    if (existingRole) {
+      // Role exists - check if super_admin needs permission update
+      if (roleData.permissions === '*') {
+        // For super_admin, ensure it has ALL permissions
+        const currentPermCount = Array.isArray(existingRole.permissions) ? existingRole.permissions.length : 0
+        const allPermCount = permissionIds.length
+
+        if (currentPermCount < allPermCount) {
+          // Update super_admin with all permissions
+          try {
+            await payload.update({
+              collection: 'roles',
+              id: existingRole.id,
+              data: {
+                permissions: permissionIds,
+              },
+            })
+            updatedCount++
+            payload.logger.info(`  ✓ Updated role: ${roleData.name.en} (${currentPermCount} → ${allPermCount} permissions)`)
+          } catch (error) {
+            payload.logger.error(`Failed to update role ${roleData.code}:`, error)
+          }
+        } else {
+          existingCount++
+        }
+      } else {
+        existingCount++
+      }
+      continue
+    }
+
+    // Create new role
     try {
       // Create role with English locale first
       const created = await payload.create({
@@ -426,6 +456,12 @@ async function seedRoles(payload: Payload, permissionMap: Map<string, string | n
     }
   }
 
+  if (createdCount > 0) {
+    payload.logger.info(`  ✓ Created ${createdCount} new roles`)
+  }
+  if (updatedCount > 0) {
+    payload.logger.info(`  ✓ Updated ${updatedCount} roles with new permissions`)
+  }
   if (existingCount > 0) {
     payload.logger.info(`  ⊙ ${existingCount} roles already exist`)
   }

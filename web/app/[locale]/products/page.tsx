@@ -1,5 +1,6 @@
 import type { Locale } from "@/i18n.config"
 import { ProductsPageClient } from "./ProductsPageClient"
+import { PageScripts } from "@/components/PageScripts"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -17,5 +18,12 @@ export default async function ProductsPage({
   // Page ID from CMS
   const pageId = "be2d59b9-dc31-4298-9d33-a956eadd52de"
 
-  return <ProductsPageClient locale={locale} pageId={pageId} />
+  return (
+    <>
+      <PageScripts path="/products" pageType="product_series_list" position="header" />
+      <PageScripts path="/products" pageType="product_series_list" position="body_start" />
+      <ProductsPageClient locale={locale} pageId={pageId} />
+      <PageScripts path="/products" pageType="product_series_list" position="footer" />
+    </>
+  )
 }

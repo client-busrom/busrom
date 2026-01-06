@@ -15,7 +15,6 @@ export { ProductSeries } from './ProductSeries'
 // Users & Access Control
 export { Roles } from './Roles'
 export { Permissions } from './Permissions'
-export { ActivityLogs } from './ActivityLogs'
 
 // Site Structure
 export { NavigationMenus } from './NavigationMenus'

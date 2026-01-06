@@ -21,6 +21,7 @@ export const OemOdm: GlobalConfig = {
       zh: '首页管理',
     },
   },
+  versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,
@@ -60,7 +61,7 @@ export const OemOdm: GlobalConfig = {
     // ==================================================================
     {
       name: 'oemTitle',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'OEM - Title',
         zh: 'OEM - 标题',
@@ -145,7 +146,7 @@ export const OemOdm: GlobalConfig = {
     // ==================================================================
     {
       name: 'odmTitle',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'ODM - Title',
         zh: 'ODM - 标题',
