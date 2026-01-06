@@ -41,11 +41,9 @@ export const Products: CollectionConfig = {
   },
   // 版本控制 - 保留修改历史
 
-  // versions: {
-
-  // maxPerDoc: 10, // 每个文档最多保留10个版本
-
-  // },
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     // ==================================================================
     // Tab Layout for better organization

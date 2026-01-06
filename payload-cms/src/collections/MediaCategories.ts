@@ -34,11 +34,9 @@ export const MediaCategories: CollectionConfig = {
     delete: ({ req: { user } }) => user?.isAdmin === true,
   },
 
-  // versions: {
-
-  // maxPerDoc: 10,
-
-  // },
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     {
       name: 'name',
