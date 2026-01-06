@@ -212,7 +212,7 @@ export function buildMetadata(
       ...metadata.openGraph,
       title: ogTitle || undefined,
       description: ogDescription || undefined,
-      type: seoSetting.ogType || 'website',
+      type: (seoSetting.ogType || 'website') as 'website' | 'article' | 'product',
     }
 
     if (seoSetting.ogImage?.url) {
