@@ -879,6 +879,49 @@ export default buildConfig({
         payload.logger.warn(`⚠️ brand_analysis table check: ${fixError.message}`)
       }
 
+      // Step 0.3: Ensure version tables exist for collections with versions enabled
+      try {
+        const db = payload.db as any
+        if (db?.drizzle) {
+          // Collections that have versions enabled (excluding Users, Roles, Permissions)
+          const versionTables = [
+            'applications', 'blogs', 'categories', 'document_templates',
+            'faq_items', 'form_configs', 'hero_banner_items', 'media',
+            'media_categories', 'media_tags', 'navigation_menus', 'pages',
+            'products', 'product_series', 'reusable_blocks', 'seo_settings',
+            'series_intro_items', 'custom_scripts'
+          ]
+
+          for (const table of versionTables) {
+            const vTable = `_${table}_v`
+            const checkTable = await db.drizzle.execute(`
+              SELECT 1 FROM information_schema.tables WHERE table_name = '${vTable}'
+            `)
+
+            if (!checkTable.rows || checkTable.rows.length === 0) {
+              payload.logger.info(`🔧 Creating missing version table: ${vTable}`)
+              await db.drizzle.execute(`
+                CREATE TABLE IF NOT EXISTS "${vTable}" (
+                  id SERIAL PRIMARY KEY,
+                  parent_id INTEGER REFERENCES "${table}"(id) ON DELETE SET NULL,
+                  version JSONB NOT NULL,
+                  created_at TIMESTAMP(3) WITH TIME ZONE DEFAULT NOW() NOT NULL,
+                  updated_at TIMESTAMP(3) WITH TIME ZONE DEFAULT NOW() NOT NULL,
+                  latest BOOLEAN DEFAULT false,
+                  autosave BOOLEAN DEFAULT false,
+                  snapshot BOOLEAN DEFAULT false
+                );
+                CREATE INDEX IF NOT EXISTS "${vTable}_parent_idx" ON "${vTable}" (parent_id);
+                CREATE INDEX IF NOT EXISTS "${vTable}_created_at_idx" ON "${vTable}" (created_at);
+              `)
+            }
+          }
+          payload.logger.info('✅ Version tables check completed.')
+        }
+      } catch (versionError: any) {
+        payload.logger.warn(`⚠️ Version tables check: ${versionError.message}`)
+      }
+
       // Step 1: Seed permissions and roles (idempotent - only creates if not exists)
       await seedPermissionsSystem(payload)
 
