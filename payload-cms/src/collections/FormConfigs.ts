@@ -41,9 +41,12 @@ export const FormConfigs: CollectionConfig = {
     update: ({ req }) => !!req.user,
     delete: ({ req }) => !!req.user,
   },
-  versions: {
-    maxPerDoc: 10,
-  },
+
+  // versions: {
+
+  // maxPerDoc: 10,
+
+  // },
   fields: [
     // ==================================================================
     // Basic Information
