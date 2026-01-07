@@ -21,7 +21,7 @@ export const CaseStudies: GlobalConfig = {
       zh: '首页管理',
     },
   },
-  versions: true,
+  // versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,

@@ -22,7 +22,7 @@ export const PreloaderConfig: GlobalConfig = {
       zh: '网站设置',
     },
   },
-  versions: true,
+  // versions: true,
   access: {
     read: () => true,
     update: ({ req: { user } }) => !!user,

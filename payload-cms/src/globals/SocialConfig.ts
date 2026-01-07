@@ -25,7 +25,7 @@ export const SocialConfig: GlobalConfig = {
       zh: '社交媒体链接设置',
     },
   },
-  versions: true,
+  // versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,
