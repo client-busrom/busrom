@@ -331,14 +331,14 @@ export const Media: CollectionConfig = {
         // Queue a job to regenerate image sizes in background
         try {
           await payload.jobs.queue({
-            task: 'regenerateImageSizes',
+            task: 'regenerateImageSizes' as 'regenerateImageSizes',
             input: {
               mediaId: doc.id,
               filename: doc.filename,
               focalX: doc.focalX ?? 50,
               focalY: doc.focalY ?? 50,
             },
-          })
+          } as any)
           payload.logger.info(`✅ Regeneration job queued for ${doc.filename}`)
         } catch (error) {
           payload.logger.error(`❌ Failed to queue regeneration job for ${doc.filename}:`, error)
