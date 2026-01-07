@@ -104,7 +104,11 @@
       "Bash(AWS_DEFAULT_REGION=us-east-1 aws secretsmanager:*)",
       "Bash(for file in BrandAdvantages BrandAnalysis BrandValue CaseStudies FeaturedProducts Footer MainForm OemOdm ProductSeriesCarousel QuoteSteps ServiceFeatures SimpleCta Sphere3d WhyChooseBusrom)",
       "Bash(AWS_DEFAULT_REGION=us-east-1 aws cloudfront:*)",
-      "Bash(PGPASSWORD=ADijIRcAHMHLHaZvH0eg /opt/homebrew/Cellar/postgresql@16/16.11/bin/psql:*)"
+      "Bash(PGPASSWORD=ADijIRcAHMHLHaZvH0eg /opt/homebrew/Cellar/postgresql@16/16.11/bin/psql:*)",
+      "Bash(while read f)",
+      "Bash(do if grep -q \"^\\\\s*versions:\" \"$f\")",
+      "Bash(! grep -B1 \"^\\\\s*versions:\" \"$f\")",
+      "Bash(then basename \"$f\" .ts fi done)"
     ],
     "deny": [],
     "ask": []
