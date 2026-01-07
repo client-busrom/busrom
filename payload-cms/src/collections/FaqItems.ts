@@ -45,9 +45,10 @@ export const FaqItems: CollectionConfig = {
     delete: ({ req }) => !!req.user,
   },
 
-  versions: {
-    maxPerDoc: 10,
-  },
+  // 版本控制 - 暂时禁用，等待数据库迁移
+  // versions: {
+  //   maxPerDoc: 10,
+  // },
   fields: [
     {
       type: 'tabs',
