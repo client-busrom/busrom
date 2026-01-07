@@ -6,7 +6,6 @@
  * using the new focal point, uploads to S3, and updates the database.
  */
 
-import type { TaskConfig } from 'payload'
 import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import sharp from 'sharp'
 import { Readable } from 'stream'
@@ -47,38 +46,20 @@ async function streamToBuffer(stream: Readable): Promise<Buffer> {
   return Buffer.concat(chunks)
 }
 
-// Define the task input schema type
-type RegenerateImageSizesInput = {
+// Define the task input type
+interface RegenerateImageSizesInput {
   mediaId: number
   filename: string
   focalX: number
   focalY: number
 }
 
-export const regenerateImageSizesTask: TaskConfig<'regenerateImageSizes'> = {
+// Task configuration - using 'inline' task pattern for simpler typing
+export const regenerateImageSizesTask = {
   slug: 'regenerateImageSizes',
-
-  // Retry up to 3 times if failed
   retries: 3,
-
-  // Input schema definition
-  inputSchema: [
-    { name: 'mediaId', type: 'number', required: true },
-    { name: 'filename', type: 'text', required: true },
-    { name: 'focalX', type: 'number', required: true },
-    { name: 'focalY', type: 'number', required: true },
-  ],
-
-  // Output schema definition
-  outputSchema: [
-    { name: 'success', type: 'checkbox', required: true },
-    { name: 'sizesGenerated', type: 'number' },
-    { name: 'error', type: 'text' },
-  ],
-
-  // The actual job handler
-  handler: async ({ input, req }) => {
-    const { mediaId, filename, focalX, focalY } = input as RegenerateImageSizesInput
+  handler: async ({ input, req }: { input: RegenerateImageSizesInput; req: any }) => {
+    const { mediaId, filename, focalX, focalY } = input
     const { payload } = req
 
     payload.logger.info(`🎯 [Job] Starting image regeneration for ${filename} (ID: ${mediaId})`)
@@ -95,7 +76,7 @@ export const regenerateImageSizesTask: TaskConfig<'regenerateImageSizes'> = {
           Key: s3Key,
         }))
         sourceBuffer = await streamToBuffer(response.Body as Readable)
-      } catch (error) {
+      } catch {
         payload.logger.error(`❌ [Job] Failed to download original image: ${s3Key}`)
         return {
           output: {
@@ -205,8 +186,8 @@ export const regenerateImageSizesTask: TaskConfig<'regenerateImageSizes'> = {
 
           sizesGenerated++
           payload.logger.info(`   ✓ [Job] Generated ${size.name}: ${sizeFilename}`)
-        } catch (error) {
-          payload.logger.error(`   ✗ [Job] Failed to generate ${size.name}:`, error)
+        } catch (err) {
+          payload.logger.error(`   ✗ [Job] Failed to generate ${size.name}: ${err instanceof Error ? err.message : String(err)}`)
         }
       }
 
@@ -235,7 +216,7 @@ export const regenerateImageSizesTask: TaskConfig<'regenerateImageSizes'> = {
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
-      payload.logger.error(`❌ [Job] Error regenerating image sizes for ${filename}:`, error)
+      payload.logger.error(`❌ [Job] Error regenerating image sizes for ${filename}: ${errorMessage}`)
 
       return {
         output: {
