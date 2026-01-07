@@ -26,8 +26,9 @@ fi
 
 # Run database migrations before starting
 # Uses custom CSS loader to handle react-image-crop CSS import issue
+# --force-accept-warning skips interactive prompts for CI/CD environments
 echo "📦 Running database migrations..."
-node --import ./css-loader.mjs ./node_modules/payload/bin.js migrate
+node --import ./css-loader.mjs ./node_modules/payload/bin.js migrate --force-accept-warning
 
 # Start the Payload CMS server
 echo "🎯 Starting Payload CMS server on port ${PORT:-3002}..."
