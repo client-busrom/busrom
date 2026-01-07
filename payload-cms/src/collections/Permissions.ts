@@ -107,11 +107,12 @@ export const Permissions: CollectionConfig = {
     delete: ({ req }) => req.user?.isAdmin === true,
   },
 
-  // versions: {
+  // // versions: {
 
-  // maxPerDoc: 10,
+ // // maxPerDoc: 10,
 
-  // },
+ // // },
+
   hooks: {
     beforeChange: [
       ({ data }) => {

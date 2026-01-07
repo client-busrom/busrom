@@ -43,9 +43,12 @@ export const SeoSettings: CollectionConfig = {
   },
 
   // 版本控制 - 保留修改历史
-  versions: {
-    maxPerDoc: 10,
-  },
+  // versions: {
+
+  // maxPerDoc: 10,
+
+  // },
+
   fields: [
     // Translation Center
     {

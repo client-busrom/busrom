@@ -215,9 +215,12 @@ export const CustomScripts: CollectionConfig = {
     delete: ({ req }) => !!req.user,
   },
   // 版本控制 - 保留修改历史
-  versions: {
-    maxPerDoc: 10,
-  },
+  // versions: {
+
+  // maxPerDoc: 10,
+
+  // },
+
   hooks: {
     beforeChange: [
       async ({ data }) => {

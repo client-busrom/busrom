@@ -24,15 +24,16 @@ if [ -z "$S3_BUCKET" ]; then
   echo "⚠️  WARNING: S3_BUCKET is not set. Media uploads may not work."
 fi
 
-# Clear dev mode migrations (batch = -1) to prevent interactive prompts
-# This is needed because payload migrate doesn't support --force-accept-warning
-echo "🧹 Clearing dev mode migration records..."
-node --import ./css-loader.mjs ./clear-dev-migrations.mjs
-
-# Run database migrations before starting
-# Uses custom CSS loader to handle react-image-crop CSS import issue
-echo "📦 Running database migrations..."
-node --import ./css-loader.mjs ./node_modules/payload/bin.js migrate
+# NOTE: Migrations are temporarily disabled
+# The payload migrate command has issues with interactive prompts in production
+# and the versions feature has been disabled for now.
+# When re-enabling versions, uncomment the migration commands below:
+#
+# echo "🧹 Clearing dev mode migration records..."
+# node --import ./css-loader.mjs ./clear-dev-migrations.mjs
+#
+# echo "📦 Running database migrations..."
+# node --import ./css-loader.mjs ./node_modules/payload/bin.js migrate
 
 # Start the Payload CMS server
 echo "🎯 Starting Payload CMS server on port ${PORT:-3002}..."

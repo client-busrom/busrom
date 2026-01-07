@@ -47,11 +47,12 @@ export const Roles: CollectionConfig = {
     },
   },
 
-  // versions: {
+  // // versions: {
 
-  // maxPerDoc: 10,
+ // // maxPerDoc: 10,
 
-  // },
+ // // },
+
   hooks: {
     beforeDelete: [
       async ({ req, id }) => {
