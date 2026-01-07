@@ -21,7 +21,7 @@ export const ProductSeriesCarousel: GlobalConfig = {
     },
     // Note: Hidden from default nav via CustomNav.tsx
   },
-  versions: true,
+  // versions: true,
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,
