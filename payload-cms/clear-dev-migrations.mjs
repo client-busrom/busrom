@@ -1,11 +1,14 @@
 /**
- * Clear dev mode migrations (batch = -1) before running payload migrate
- * This prevents the interactive prompt asking about data loss
+ * Prepare database for payload migrate command
+ * 1. Delete dev mode migrations (batch = -1) to prevent interactive prompts
+ * 2. Mark initial migration as complete if database already has tables
  *
  * Usage: node --import ./css-loader.mjs clear-dev-migrations.mjs
  */
 
 import pg from 'pg'
+import fs from 'fs'
+import path from 'path'
 
 const databaseUri = process.env.DATABASE_URI
 
@@ -14,7 +17,7 @@ if (!databaseUri) {
   process.exit(1)
 }
 
-async function clearDevMigrations() {
+async function prepareMigrations() {
   // Enable SSL for production database connections (AWS RDS requires SSL)
   const client = new pg.Client({
     connectionString: databaseUri,
@@ -37,34 +40,70 @@ async function clearDevMigrations() {
       return
     }
 
-    // Check for dev migrations (batch = -1)
+    // Step 1: Delete dev migrations (batch = -1)
     const devMigrations = await client.query(
       'SELECT id, name FROM payload_migrations WHERE batch = -1'
     )
 
-    if (devMigrations.rowCount === 0) {
+    if (devMigrations.rowCount > 0) {
+      console.log(`Found ${devMigrations.rowCount} dev mode migration(s):`)
+      devMigrations.rows.forEach(row => {
+        console.log(`  - ${row.name}`)
+      })
+
+      const result = await client.query(
+        'DELETE FROM payload_migrations WHERE batch = -1'
+      )
+      console.log(`Deleted ${result.rowCount} dev mode migration record(s)`)
+    } else {
       console.log('No dev mode migrations found (batch = -1)')
-      return
     }
 
-    console.log(`Found ${devMigrations.rowCount} dev mode migration(s):`)
-    devMigrations.rows.forEach(row => {
-      console.log(`  - ${row.name}`)
-    })
+    // Step 2: Check if we need to mark initial migration as complete
+    // If database has tables but no migration records, mark initial migration as done
+    const usersTableCheck = await client.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_name = 'users'
+      )
+    `)
 
-    // Delete dev migrations
-    const result = await client.query(
-      'DELETE FROM payload_migrations WHERE batch = -1'
-    )
+    if (usersTableCheck.rows[0].exists) {
+      // Database has tables, check if initial migration is recorded
+      const migrationsDir = path.join(process.cwd(), 'src', 'migrations')
 
-    console.log(`Deleted ${result.rowCount} dev mode migration record(s)`)
+      if (fs.existsSync(migrationsDir)) {
+        const migrationFiles = fs.readdirSync(migrationsDir)
+          .filter(f => f.endsWith('.ts') && !f.startsWith('index'))
+          .map(f => f.replace('.ts', ''))
+          .sort()
+
+        for (const migrationName of migrationFiles) {
+          const existingRecord = await client.query(
+            'SELECT id FROM payload_migrations WHERE name = $1',
+            [migrationName]
+          )
+
+          if (existingRecord.rowCount === 0) {
+            console.log(`Marking migration as complete: ${migrationName}`)
+            await client.query(
+              `INSERT INTO payload_migrations (name, batch, created_at, updated_at)
+               VALUES ($1, 1, NOW(), NOW())`,
+              [migrationName]
+            )
+          }
+        }
+      }
+    }
+
+    console.log('Migration preparation complete')
 
   } catch (error) {
-    console.error('Error clearing dev migrations:', error.message)
+    console.error('Error preparing migrations:', error.message)
     // Don't exit with error - let migrate command handle it
   } finally {
     await client.end()
   }
 }
 
-clearDevMigrations()
+prepareMigrations()
