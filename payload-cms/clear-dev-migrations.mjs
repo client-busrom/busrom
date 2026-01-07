@@ -15,7 +15,11 @@ if (!databaseUri) {
 }
 
 async function clearDevMigrations() {
-  const client = new pg.Client({ connectionString: databaseUri })
+  // Enable SSL for production database connections (AWS RDS requires SSL)
+  const client = new pg.Client({
+    connectionString: databaseUri,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  })
 
   try {
     await client.connect()
