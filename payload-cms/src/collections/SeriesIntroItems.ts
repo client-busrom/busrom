@@ -42,9 +42,12 @@ export const SeriesIntroItems: CollectionConfig = {
   },
 
   // 版本控制 - 保留修改历史
-  versions: {
-    maxPerDoc: 10,
-  },
+  // versions: {
+
+  // maxPerDoc: 10,
+
+  // },
+
   hooks: {
     afterRead: [
       async ({ doc, req: { payload } }) => {

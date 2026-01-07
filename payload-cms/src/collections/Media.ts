@@ -72,7 +72,8 @@ export const Media: CollectionConfig = {
   },
 
   // Media doesn't need version control - files are stored in S3
-  // versions: { maxPerDoc: 5 },
+  // // versions: { maxPerDoc: 5 },
+
   upload: {
     // Image processing with WebP conversion for better performance
     // WebP typically provides 25-35% smaller file sizes than JPEG/PNG
