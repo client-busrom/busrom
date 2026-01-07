@@ -341,7 +341,7 @@ export const Media: CollectionConfig = {
           } as any)
           payload.logger.info(`✅ Regeneration job queued for ${doc.filename}`)
         } catch (error) {
-          payload.logger.error(`❌ Failed to queue regeneration job for ${doc.filename}:`, error)
+          payload.logger.error(`❌ Failed to queue regeneration job for ${doc.filename}: ${error instanceof Error ? error.message : String(error)}`)
         }
 
         return doc
