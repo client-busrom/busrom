@@ -14,9 +14,7 @@
 
 import type { CollectionConfig } from 'payload'
 import { APIError } from 'payload'
-import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
-import sharp from 'sharp'
-import { Readable } from 'stream'
+import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3'
 
 // Variant folder mapping (Payload size name → S3 folder name)
 const VARIANT_FOLDERS: Record<string, string> = {
@@ -41,166 +39,9 @@ const s3Client = new S3Client({
 
 const S3_BUCKET = process.env.S3_BUCKET_NAME || 'busrom-media'
 const USE_MINIO = process.env.USE_MINIO === 'true'
-// CDN URL base - local uses nginx proxy at :8080, production uses CloudFront
-const CDN_DOMAIN = USE_MINIO
-  ? 'http://localhost:8080'  // nginx proxy to MinIO
-  : (process.env.CDN_DOMAIN || 'https://d2kqew3hn5wphn.cloudfront.net')
 
-// Image sizes configuration for focal point regeneration
-const FOCAL_IMAGE_SIZES = [
-  { name: 'thumbnail', width: 400, height: 300, quality: 80 },
-  { name: 'card', width: 768, height: 512, quality: 80 },
-  { name: 'tablet', width: 1024, height: undefined, quality: 80 },
-  { name: 'desktop', width: 1920, height: undefined, quality: 85 },
-]
-
-// Helper: Stream to Buffer
-async function streamToBuffer(stream: Readable): Promise<Buffer> {
-  const chunks: Buffer[] = []
-  for await (const chunk of stream) {
-    chunks.push(Buffer.from(chunk))
-  }
-  return Buffer.concat(chunks)
-}
-
-// Regenerate image sizes with new focal point
-async function regenerateImageSizes(
-  doc: any,
-  payload: any
-): Promise<void> {
-  const { filename, focalX = 50, focalY = 50 } = doc
-
-  // Download original image from S3
-  const s3Key = `media/${filename}`
-  let sourceBuffer: Buffer
-
-  try {
-    const response = await s3Client.send(new GetObjectCommand({
-      Bucket: S3_BUCKET,
-      Key: s3Key,
-    }))
-    sourceBuffer = await streamToBuffer(response.Body as Readable)
-  } catch (error) {
-    console.error(`❌ Failed to download original image: ${s3Key}`, error)
-    throw error
-  }
-
-  // Get original image metadata
-  const originalMeta = await sharp(sourceBuffer).metadata()
-  const originalWidth = originalMeta.width || 1920
-  const originalHeight = originalMeta.height || 1080
-
-  // Calculate focal point position in pixels
-  const focalXPx = Math.round((focalX / 100) * originalWidth)
-  const focalYPx = Math.round((focalY / 100) * originalHeight)
-
-  const baseName = filename.replace(/\.[^.]+$/, '')
-  const sizesUpdate: Record<string, any> = {}
-
-  // Cache buster: only changes when focal point changes
-  const cacheBuster = Date.now()
-
-  for (const size of FOCAL_IMAGE_SIZES) {
-    try {
-      let outputBuffer: Buffer
-      let outputWidth: number
-      let outputHeight: number
-
-      if (size.height) {
-        // Fixed dimensions - need to crop with focal point
-        const targetAspect = size.width / size.height
-        const originalAspect = originalWidth / originalHeight
-
-        let cropWidth: number, cropHeight: number
-        let cropLeft: number, cropTop: number
-
-        if (originalAspect > targetAspect) {
-          // Original is wider - crop horizontally
-          cropHeight = originalHeight
-          cropWidth = Math.round(cropHeight * targetAspect)
-          cropTop = 0
-          // Center crop around focal point X
-          cropLeft = Math.max(0, Math.min(
-            focalXPx - Math.round(cropWidth / 2),
-            originalWidth - cropWidth
-          ))
-        } else {
-          // Original is taller - crop vertically
-          cropWidth = originalWidth
-          cropHeight = Math.round(cropWidth / targetAspect)
-          cropLeft = 0
-          // Center crop around focal point Y
-          cropTop = Math.max(0, Math.min(
-            focalYPx - Math.round(cropHeight / 2),
-            originalHeight - cropHeight
-          ))
-        }
-
-        outputBuffer = await sharp(sourceBuffer)
-          .extract({ left: cropLeft, top: cropTop, width: cropWidth, height: cropHeight })
-          .resize(size.width, size.height)
-          .webp({ quality: size.quality })
-          .toBuffer()
-
-        outputWidth = size.width
-        outputHeight = size.height
-      } else {
-        // Width only - just resize, no crop needed
-        const resized = await sharp(sourceBuffer)
-          .resize(size.width, undefined, {
-            fit: 'inside',
-            withoutEnlargement: true,
-          })
-          .webp({ quality: size.quality })
-          .toBuffer()
-
-        const meta = await sharp(resized).metadata()
-        outputBuffer = resized
-        outputWidth = meta.width || size.width
-        outputHeight = meta.height || 0
-      }
-
-      // Upload to S3
-      const sizeFilename = `${baseName}-${outputWidth}x${outputHeight}.webp`
-      const sizeS3Key = `media/${sizeFilename}`
-
-      await s3Client.send(new PutObjectCommand({
-        Bucket: S3_BUCKET,
-        Key: sizeS3Key,
-        Body: outputBuffer,
-        ContentType: 'image/webp',
-      }))
-
-      // Prepare update data (add cache-busting version)
-      sizesUpdate[size.name] = {
-        url: `${CDN_DOMAIN}/${sizeS3Key}?v=${cacheBuster}`,
-        width: outputWidth,
-        height: outputHeight,
-        mimeType: 'image/webp',
-        filesize: outputBuffer.length,
-        filename: sizeFilename,
-      }
-
-      console.log(`   ✓ Generated ${size.name}: ${sizeFilename}`)
-    } catch (error) {
-      console.error(`   ✗ Failed to generate ${size.name}:`, error)
-    }
-  }
-
-  // Update sizes in database (use payload.update with context to skip hooks)
-  if (Object.keys(sizesUpdate).length > 0) {
-    await payload.update({
-      collection: 'media',
-      id: doc.id,
-      data: {
-        sizes: sizesUpdate,
-      },
-      context: {
-        skipFocalPointRegeneration: true,
-      },
-    })
-  }
-}
+// Note: regenerateImageSizes logic has been moved to Jobs Queue task
+// See: src/jobs/regenerateImageSizes.ts
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -230,9 +71,8 @@ export const Media: CollectionConfig = {
     delete: ({ req: { user } }) => user?.isAdmin === true,
   },
 
-  versions: {
-    maxPerDoc: 5,
-  },
+  // Media doesn't need version control - files are stored in S3
+  // versions: { maxPerDoc: 5 },
   upload: {
     // Image processing with WebP conversion for better performance
     // WebP typically provides 25-35% smaller file sizes than JPEG/PNG
@@ -485,13 +325,24 @@ export const Media: CollectionConfig = {
 
         if (!focalChanged) return doc
 
-        console.log(`🎯 Focal point changed for ${doc.filename}, regenerating image sizes in background...`)
-        console.log(`   Previous: (${previousDoc.focalX}, ${previousDoc.focalY}) → New: (${doc.focalX}, ${doc.focalY})`)
+        payload.logger.info(`🎯 Focal point changed for ${doc.filename}, queuing regeneration job...`)
+        payload.logger.info(`   Previous: (${previousDoc.focalX}, ${previousDoc.focalY}) → New: (${doc.focalX}, ${doc.focalY})`)
 
-        // Run regeneration in background (don't await) so save completes immediately
-        regenerateImageSizes(doc, payload)
-          .then(() => console.log(`✅ Image sizes regenerated for ${doc.filename}`))
-          .catch((error) => console.error(`❌ Error regenerating image sizes for ${doc.filename}:`, error))
+        // Queue a job to regenerate image sizes in background
+        try {
+          await payload.jobs.queue({
+            task: 'regenerateImageSizes',
+            input: {
+              mediaId: doc.id,
+              filename: doc.filename,
+              focalX: doc.focalX ?? 50,
+              focalY: doc.focalY ?? 50,
+            },
+          })
+          payload.logger.info(`✅ Regeneration job queued for ${doc.filename}`)
+        } catch (error) {
+          payload.logger.error(`❌ Failed to queue regeneration job for ${doc.filename}:`, error)
+        }
 
         return doc
       },
