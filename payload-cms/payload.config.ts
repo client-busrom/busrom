@@ -912,21 +912,20 @@ export default buildConfig({
           if (!checkJobsTable.rows || checkJobsTable.rows.length === 0) {
             payload.logger.info('🔧 Creating missing payload_jobs tables...')
 
-            // Create payload_jobs table (main jobs queue)
+            // Create payload_jobs table (main jobs queue) with all required columns
             await db.drizzle.execute(`
               CREATE TABLE IF NOT EXISTS payload_jobs (
                 id SERIAL PRIMARY KEY,
                 input JSONB,
                 completed_at TIMESTAMP WITH TIME ZONE,
+                total_tried INTEGER DEFAULT 0,
                 processing BOOLEAN DEFAULT FALSE,
                 has_error BOOLEAN DEFAULT FALSE,
                 error JSONB,
-                log JSONB,
                 task_slug VARCHAR(255),
-                task_id VARCHAR(255),
                 queue VARCHAR(255) DEFAULT 'default',
                 wait_until TIMESTAMP WITH TIME ZONE,
-                seq_key VARCHAR(255),
+                meta JSONB,
                 updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
               )
@@ -938,10 +937,61 @@ export default buildConfig({
               CREATE INDEX IF NOT EXISTS payload_jobs_queue_idx ON payload_jobs(queue);
               CREATE INDEX IF NOT EXISTS payload_jobs_processing_idx ON payload_jobs(processing);
               CREATE INDEX IF NOT EXISTS payload_jobs_wait_until_idx ON payload_jobs(wait_until);
+              CREATE INDEX IF NOT EXISTS payload_jobs_completed_at_idx ON payload_jobs(completed_at);
+              CREATE INDEX IF NOT EXISTS payload_jobs_has_error_idx ON payload_jobs(has_error);
               CREATE INDEX IF NOT EXISTS payload_jobs_created_at_idx ON payload_jobs(created_at);
             `)
 
             payload.logger.info('✅ payload_jobs table created successfully.')
+          } else {
+            // Table exists but might be missing columns - add them if needed
+            const checkTotalTried = await db.drizzle.execute(`
+              SELECT 1 FROM information_schema.columns
+              WHERE table_name = 'payload_jobs' AND column_name = 'total_tried'
+            `)
+            if (!checkTotalTried.rows || checkTotalTried.rows.length === 0) {
+              await db.drizzle.execute(`ALTER TABLE payload_jobs ADD COLUMN IF NOT EXISTS total_tried INTEGER DEFAULT 0`)
+            }
+            const checkMeta = await db.drizzle.execute(`
+              SELECT 1 FROM information_schema.columns
+              WHERE table_name = 'payload_jobs' AND column_name = 'meta'
+            `)
+            if (!checkMeta.rows || checkMeta.rows.length === 0) {
+              await db.drizzle.execute(`ALTER TABLE payload_jobs ADD COLUMN IF NOT EXISTS meta JSONB`)
+            }
+          }
+
+          // Check if payload_jobs_log table exists (for job execution logs)
+          const checkLogTable = await db.drizzle.execute(`
+            SELECT 1 FROM information_schema.tables WHERE table_name = 'payload_jobs_log'
+          `)
+
+          if (!checkLogTable.rows || checkLogTable.rows.length === 0) {
+            payload.logger.info('🔧 Creating missing payload_jobs_log table...')
+
+            // Create payload_jobs_log table (logs for each job execution attempt)
+            await db.drizzle.execute(`
+              CREATE TABLE IF NOT EXISTS payload_jobs_log (
+                id SERIAL PRIMARY KEY,
+                _order INTEGER NOT NULL,
+                _parent_id INTEGER NOT NULL REFERENCES payload_jobs(id) ON DELETE CASCADE,
+                executed_at TIMESTAMP WITH TIME ZONE,
+                completed_at TIMESTAMP WITH TIME ZONE,
+                task_slug VARCHAR(255),
+                task_i_d VARCHAR(255),
+                input JSONB,
+                output JSONB,
+                state VARCHAR(255),
+                error JSONB
+              )
+            `)
+
+            await db.drizzle.execute(`
+              CREATE INDEX IF NOT EXISTS payload_jobs_log_parent_id_idx ON payload_jobs_log(_parent_id);
+              CREATE INDEX IF NOT EXISTS payload_jobs_log_order_idx ON payload_jobs_log(_order);
+            `)
+
+            payload.logger.info('✅ payload_jobs_log table created successfully.')
           }
 
           // Check if payload_jobs_stats table (global) exists
