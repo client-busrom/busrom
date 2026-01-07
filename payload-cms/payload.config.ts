@@ -899,6 +899,76 @@ export default buildConfig({
       // Payload's expected schema (which has version_xxx columns and _locales tables).
       // Removed manual version table creation - let Payload handle it properly.
 
+      // Step 0.3: Ensure Jobs Queue tables exist
+      // These are needed for background job processing (focal point image regeneration, etc.)
+      try {
+        const db = payload.db as any
+        if (db?.drizzle) {
+          // Check if payload_jobs table exists
+          const checkJobsTable = await db.drizzle.execute(`
+            SELECT 1 FROM information_schema.tables WHERE table_name = 'payload_jobs'
+          `)
+
+          if (!checkJobsTable.rows || checkJobsTable.rows.length === 0) {
+            payload.logger.info('🔧 Creating missing payload_jobs tables...')
+
+            // Create payload_jobs table (main jobs queue)
+            await db.drizzle.execute(`
+              CREATE TABLE IF NOT EXISTS payload_jobs (
+                id SERIAL PRIMARY KEY,
+                input JSONB,
+                completed_at TIMESTAMP WITH TIME ZONE,
+                processing BOOLEAN DEFAULT FALSE,
+                has_error BOOLEAN DEFAULT FALSE,
+                error JSONB,
+                log JSONB,
+                task_slug VARCHAR(255),
+                task_id VARCHAR(255),
+                queue VARCHAR(255) DEFAULT 'default',
+                wait_until TIMESTAMP WITH TIME ZONE,
+                seq_key VARCHAR(255),
+                updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
+              )
+            `)
+
+            // Create indexes for efficient job querying
+            await db.drizzle.execute(`
+              CREATE INDEX IF NOT EXISTS payload_jobs_task_slug_idx ON payload_jobs(task_slug);
+              CREATE INDEX IF NOT EXISTS payload_jobs_queue_idx ON payload_jobs(queue);
+              CREATE INDEX IF NOT EXISTS payload_jobs_processing_idx ON payload_jobs(processing);
+              CREATE INDEX IF NOT EXISTS payload_jobs_wait_until_idx ON payload_jobs(wait_until);
+              CREATE INDEX IF NOT EXISTS payload_jobs_created_at_idx ON payload_jobs(created_at);
+            `)
+
+            payload.logger.info('✅ payload_jobs table created successfully.')
+          }
+
+          // Check if payload_jobs_stats table (global) exists
+          const checkStatsTable = await db.drizzle.execute(`
+            SELECT 1 FROM information_schema.tables WHERE table_name = 'payload_jobs_stats'
+          `)
+
+          if (!checkStatsTable.rows || checkStatsTable.rows.length === 0) {
+            payload.logger.info('🔧 Creating missing payload_jobs_stats table...')
+
+            // Create payload_jobs_stats table (global for job queue statistics)
+            await db.drizzle.execute(`
+              CREATE TABLE IF NOT EXISTS payload_jobs_stats (
+                id SERIAL PRIMARY KEY,
+                stats JSONB,
+                updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
+              )
+            `)
+
+            payload.logger.info('✅ payload_jobs_stats table created successfully.')
+          }
+        }
+      } catch (jobsError: any) {
+        payload.logger.warn(`⚠️ Jobs tables check: ${jobsError.message}`)
+      }
+
       // Step 1: Seed permissions and roles (idempotent - only creates if not exists)
       await seedPermissionsSystem(payload)
 

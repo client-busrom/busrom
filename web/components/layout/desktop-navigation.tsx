@@ -57,9 +57,8 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
     onMenuOpen?.(activeMenuId !== null)
   }, [activeMenuId, onMenuOpen])
 
-  // 按 order 排序所有菜单项，隐藏 Home（点 logo 即可）
+  // 按 order 排序所有菜单项
   const sortedItems = [...navigationItems]
-    .filter(item => item.url !== '/' && item.url !== '/home')
     .sort((a, b) => a.order - b.order)
 
   // 点击菜单项
