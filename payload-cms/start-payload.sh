@@ -24,11 +24,10 @@ if [ -z "$S3_BUCKET" ]; then
   echo "⚠️  WARNING: S3_BUCKET is not set. Media uploads may not work."
 fi
 
-# Note: We use push:true in payload.config.ts for automatic schema management
-# The payload migrate command has CSS import issues in Node.js ESM mode
-# (ERR_UNKNOWN_FILE_EXTENSION for react-image-crop CSS)
-# Skip explicit migrate - Payload will handle schema sync on startup with push:true
-echo "📦 Using push:true for automatic schema management..."
+# Run database migrations before starting
+# Uses custom CSS loader to handle react-image-crop CSS import issue
+echo "📦 Running database migrations..."
+node --import ./css-loader.mjs ./node_modules/payload/bin.js migrate
 
 # Start the Payload CMS server
 echo "🎯 Starting Payload CMS server on port ${PORT:-3002}..."
