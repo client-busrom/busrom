@@ -894,10 +894,91 @@ export default buildConfig({
         payload.logger.warn(`⚠️ brand_analysis table check: ${fixError.message}`)
       }
 
-      // Note: Version tables are now managed by Payload's push:true
-      // The simple JSONB structure we created before was incompatible with
-      // Payload's expected schema (which has version_xxx columns and _locales tables).
-      // Removed manual version table creation - let Payload handle it properly.
+      // Step 0.4: Ensure Version tables exist for all collections with versions enabled
+      // push:true doesn't always create version tables, so we create them manually
+      try {
+        const db = payload.db as any
+        if (db?.drizzle) {
+          // Collections that have versions: { maxPerDoc: 10 } enabled
+          const versionedCollections = [
+            // Content collections
+            { slug: 'applications', tableName: '_applications_v', hasLocales: true },
+            { slug: 'blogs', tableName: '_blogs_v', hasLocales: true },
+            { slug: 'categories', tableName: '_categories_v', hasLocales: true },
+            { slug: 'custom-scripts', tableName: '_custom_scripts_v', hasLocales: false },
+            { slug: 'document-templates', tableName: '_document_templates_v', hasLocales: false },
+            { slug: 'faq-items', tableName: '_faq_items_v', hasLocales: true },
+            { slug: 'form-configs', tableName: '_form_configs_v', hasLocales: true },
+            { slug: 'hero-banner-items', tableName: '_hero_banner_items_v', hasLocales: true },
+            { slug: 'media-categories', tableName: '_media_categories_v', hasLocales: true },
+            { slug: 'media-tags', tableName: '_media_tags_v', hasLocales: true },
+            { slug: 'navigation-menus', tableName: '_navigation_menus_v', hasLocales: true },
+            { slug: 'pages', tableName: '_pages_v', hasLocales: true },
+            { slug: 'products', tableName: '_products_v', hasLocales: true },
+            { slug: 'product-series', tableName: '_product_series_v', hasLocales: true },
+            { slug: 'reusable-blocks', tableName: '_reusable_blocks_v', hasLocales: true },
+            { slug: 'seo-settings', tableName: '_seo_settings_v', hasLocales: true },
+            { slug: 'series-intro-items', tableName: '_series_intro_items_v', hasLocales: true },
+          ]
+
+          for (const col of versionedCollections) {
+            // Check if version table exists
+            const checkTable = await db.drizzle.execute(`
+              SELECT 1 FROM information_schema.tables WHERE table_name = '${col.tableName}'
+            `)
+
+            if (!checkTable.rows || checkTable.rows.length === 0) {
+              payload.logger.info(`🔧 Creating missing version table: ${col.tableName}...`)
+
+              // Create version table with Payload's expected structure
+              await db.drizzle.execute(`
+                CREATE TABLE IF NOT EXISTS "${col.tableName}" (
+                  id SERIAL PRIMARY KEY,
+                  parent_id INTEGER,
+                  version_status VARCHAR(255) DEFAULT 'draft',
+                  version_updated_at TIMESTAMP WITH TIME ZONE,
+                  version_created_at TIMESTAMP WITH TIME ZONE,
+                  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+                  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+                  latest BOOLEAN DEFAULT FALSE,
+                  autosave BOOLEAN DEFAULT FALSE,
+                  snapshot BOOLEAN DEFAULT FALSE
+                )
+              `)
+
+              // Create index on parent_id for efficient lookups
+              await db.drizzle.execute(`
+                CREATE INDEX IF NOT EXISTS "${col.tableName}_parent_idx" ON "${col.tableName}"(parent_id)
+              `)
+              await db.drizzle.execute(`
+                CREATE INDEX IF NOT EXISTS "${col.tableName}_latest_idx" ON "${col.tableName}"(latest)
+              `)
+              await db.drizzle.execute(`
+                CREATE INDEX IF NOT EXISTS "${col.tableName}_created_at_idx" ON "${col.tableName}"(created_at)
+              `)
+
+              // Create locales table if needed
+              if (col.hasLocales) {
+                await db.drizzle.execute(`
+                  CREATE TABLE IF NOT EXISTS "${col.tableName}_locales" (
+                    id SERIAL PRIMARY KEY,
+                    _locale VARCHAR(255) NOT NULL,
+                    _parent_id INTEGER REFERENCES "${col.tableName}"(id) ON DELETE CASCADE,
+                    UNIQUE(_locale, _parent_id)
+                  )
+                `)
+                await db.drizzle.execute(`
+                  CREATE INDEX IF NOT EXISTS "${col.tableName}_locales_parent_idx" ON "${col.tableName}_locales"(_parent_id)
+                `)
+              }
+
+              payload.logger.info(`✅ ${col.tableName} version table created successfully.`)
+            }
+          }
+        }
+      } catch (versionError: any) {
+        payload.logger.warn(`⚠️ Version tables check: ${versionError.message}`)
+      }
 
       // Step 0.3: Ensure Jobs Queue tables exist
       // These are needed for background job processing (focal point image regeneration, etc.)

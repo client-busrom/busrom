@@ -47,10 +47,10 @@ export const DocumentTemplates: CollectionConfig = {
     delete: ({ req }) => req.user?.isAdmin === true,
   },
 
-  // 版本控制 - 暂时禁用，等待数据库迁移
-  // versions: {
-  //   maxPerDoc: 10,
-  // },
+  // 版本控制 - 保留修改历史
+  versions: {
+    maxPerDoc: 10,
+  },
   fields: [
     // ==================================================================
     // Basic Information
