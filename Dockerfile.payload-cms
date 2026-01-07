@@ -42,10 +42,11 @@ COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/payload.config.t
 COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/src ./src
 COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/tsconfig.json ./tsconfig.json
 
-# Copy startup script and CSS loader for migrations
+# Copy startup script, CSS loader, and migration cleanup script
 COPY --chown=payloaduser:nodejs payload-cms/start-payload.sh ./start-payload.sh
 COPY --chown=payloaduser:nodejs payload-cms/css-loader.mjs ./css-loader.mjs
 COPY --chown=payloaduser:nodejs payload-cms/css-loader-hooks.mjs ./css-loader-hooks.mjs
+COPY --chown=payloaduser:nodejs payload-cms/clear-dev-migrations.mjs ./clear-dev-migrations.mjs
 RUN chmod +x ./start-payload.sh
 
 # Switch to non-root user
