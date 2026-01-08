@@ -431,6 +431,7 @@ export default buildConfig({
         // 自定义访问控制 - 使用 isAdmin 字段
         Accessibility: {
           customAccess: {
+            create: () => true, // 允许系统创建审计日志
             read: ({ req }) => req.user?.isAdmin === true,
           },
         },
