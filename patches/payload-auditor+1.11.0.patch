@@ -1,0 +1,14 @@
+diff --git a/node_modules/payload-auditor/dist/core/buffer/bufferManager.js b/node_modules/payload-auditor/dist/core/buffer/bufferManager.js
+index 528370a..d4a98e9 100644
+--- a/node_modules/payload-auditor/dist/core/buffer/bufferManager.js
++++ b/node_modules/payload-auditor/dist/core/buffer/bufferManager.js
+@@ -11,7 +11,8 @@ const flushBuffer = async (pluginOptions)=>{
+     store.length = 0;
+     await Promise.all(logsToInsert.map((log)=>payloadInstance.create({
+             collection: pluginOptions.collection?.slug ? pluginOptions.collection?.slug : defaultCollectionValues.slug,
+-            data: log
++            data: log,
++            overrideAccess: true
+         })));
+ };
+ export const bufferManager = (payload, pluginOptions)=>{
