@@ -207,10 +207,15 @@ export interface ParsedProductSeriesContent {
 
 /**
  * Extract text from a Lexical node recursively
+ * Preserves line breaks (Shift+Enter creates linebreak nodes in Lexical)
  */
 function extractText(node: LexicalNode): string {
   if (node.type === 'text') {
     return (node as LexicalTextNode).text
+  }
+  // Handle linebreak nodes (Shift+Enter in Lexical editor)
+  if (node.type === 'linebreak') {
+    return '\n'
   }
   if ('children' in node && Array.isArray(node.children)) {
     return node.children.map(extractText).join('')
@@ -309,9 +314,9 @@ function parseHeroCarousel(
 
   const slides: HeroCarouselSlide[] = []
   for (let i = 0; i < slideCount; i++) {
-    // Split title by /n for multi-line support
+    // Split title by actual newlines (\n from Shift+Enter) or literal /n for multi-line support
     const rawTitle = titles[i] || ''
-    const titleLines = rawTitle.split(/\/n|\\n/).map(line => line.trim()).filter(Boolean)
+    const titleLines = rawTitle.split(/\n|\/n/).map(line => line.trim()).filter(Boolean)
 
     slides.push({
       title: titleLines.length > 0 ? titleLines : [rawTitle],
@@ -347,7 +352,7 @@ function parseProductOverview(
     // Last 2 lines = subtitle (48px, black)
     if (node.type === 'heading' && 'tag' in node && node.tag === 'h1') {
       const fullTitle = extractText(node)
-      const allLines = fullTitle.split(/\/n|\\n/).map(p => p.trim()).filter(Boolean)
+      const allLines = fullTitle.split(/\n|\/n/).map(p => p.trim()).filter(Boolean)
 
       if (allLines.length >= 4) {
         // 4+ lines: first 2 are title, rest are subtitle
@@ -1074,7 +1079,7 @@ function parseQuote(
   // Split quotes by /n for multi-line support
   const processedQuotes: string[] = []
   for (const quote of quotes) {
-    const lines = quote.split(/\/n|\\n/).map(line => line.trim()).filter(Boolean)
+    const lines = quote.split(/\n|\/n/).map(line => line.trim()).filter(Boolean)
     processedQuotes.push(lines.join(' '))
   }
 

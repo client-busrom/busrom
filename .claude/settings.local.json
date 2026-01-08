@@ -108,7 +108,17 @@
       "Bash(while read f)",
       "Bash(do if grep -q \"^\\\\s*versions:\" \"$f\")",
       "Bash(! grep -B1 \"^\\\\s*versions:\" \"$f\")",
-      "Bash(then basename \"$f\" .ts fi done)"
+      "Bash(then basename \"$f\" .ts fi done)",
+      "Bash(NODE_OPTIONS=\"--import ./css-loader.mjs --no-deprecation\" npx payload:*)",
+      "Bash(NODE_OPTIONS=\"--no-deprecation\" npx tsx:*)",
+      "Bash(NODE_OPTIONS=\"--import ./css-loader.mjs --no-deprecation\" npx payload migrate:*)",
+      "Bash(DATABASE_URI=\"postgres://payload_dev:busrom_dev_password@localhost:5432/payload_dev\" node:*)",
+      "Bash(DATABASE_URI=\"postgresql://busrom:busrom_dev_password@localhost:5432/busrom_payload\" node:*)",
+      "Bash(DATABASE_URI=\"postgresql://busrom:busrom_dev_password@localhost:5432/busrom_payload\" /opt/Homebrew/Cellar/postgresql@16/16.11/bin/psql:*)",
+      "Bash(AWS_DEFAULT_REGION=us-east-1 aws rds describe-db-instances:*)",
+      "Bash(AWS_DEFAULT_REGION=us-east-1 aws ec2:*)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(zcat:*)"
     ],
     "deny": [],
     "ask": []

@@ -17,7 +17,8 @@ import {
   Link2,
   FileText,
   PackageOpen,
-  ChevronDown
+  ChevronDown,
+  LayoutGrid
 } from 'lucide-react'
 import { INSERT_IMAGE_GALLERY_COMMAND } from '../image-gallery/plugin'
 import { INSERT_SINGLE_IMAGE_COMMAND } from '../single-image/plugin'
@@ -30,6 +31,7 @@ import { INSERT_CAROUSEL_COMMAND } from '../carousel/plugin'
 import { INSERT_MARQUEE_LINKS_COMMAND } from '../marquee-links/plugin'
 import { INSERT_FORM_BLOCK_COMMAND } from '../form-block/plugin'
 import { INSERT_REUSABLE_BLOCK_COMMAND } from '../reusable-block/plugin'
+import { INSERT_APPLICATION_CAROUSEL_COMMAND } from '../application-carousel/plugin'
 // import { INSERT_CHECK_LIST_COMMAND } from '@lexical/list' // 已使用内置 ChecklistFeature
 import { INSERT_BLOCK_COMMAND } from '@payloadcms/richtext-lexical/client'
 
@@ -173,6 +175,16 @@ export const ToolbarButton: React.FC = () => {
 
   const insertReusableBlock = () => {
     editor.dispatchCommand(INSERT_REUSABLE_BLOCK_COMMAND, undefined)
+    setIsOpen(false)
+  }
+
+  const insertApplicationCarousel = () => {
+    console.log('🎯 insertApplicationCarousel called')
+    console.log('🎯 INSERT_APPLICATION_CAROUSEL_COMMAND:', INSERT_APPLICATION_CAROUSEL_COMMAND)
+    console.log('🎯 editor:', editor)
+    console.log('🎯 editor key:', editor._key)
+    const result = editor.dispatchCommand(INSERT_APPLICATION_CAROUSEL_COMMAND, undefined)
+    console.log('🎯 dispatchCommand result:', result)
     setIsOpen(false)
   }
 
@@ -492,6 +504,36 @@ export const ToolbarButton: React.FC = () => {
           >
             <PlayCircle size={18} style={{ opacity: 0.7 }} />
             <span>{i18n?.language === 'zh' ? '轮播图' : 'Carousel'}</span>
+          </button>
+
+          {/* 应用轮播 - Custom Feature */}
+          <button
+            type="button"
+            onClick={insertApplicationCarousel}
+            style={{
+              all: 'unset',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              width: '100%',
+              padding: '8px 12px',
+              cursor: 'pointer',
+              fontSize: '13px',
+              color: 'var(--theme-elevation-800, #1f2937)',
+              backgroundColor: 'transparent',
+              transition: 'background-color 0.15s ease',
+              boxSizing: 'border-box',
+              fontFamily: 'var(--font-body)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--theme-elevation-100, #f9fafb)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent'
+            }}
+          >
+            <LayoutGrid size={18} style={{ opacity: 0.7 }} />
+            <span>{i18n?.language === 'zh' ? '应用轮播' : 'Application Carousel'}</span>
           </button>
 
           {/* 滚动链接 - Custom Feature */}

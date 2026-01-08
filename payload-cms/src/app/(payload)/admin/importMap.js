@@ -7,6 +7,7 @@ import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8c
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { BlocksToolbarDropdownFeatureClient as BlocksToolbarDropdownFeatureClient_669410b80561d416638c54872826e396 } from '@/lexical-features/blocks-toolbar-dropdown/feature.client'
 import { DocumentTemplateFeatureClient as DocumentTemplateFeatureClient_dcfc2a8f560838093c5dfa7b3826380f } from '@/lexical-features/document-template/feature.client'
+import { ApplicationCarouselFeatureClient as ApplicationCarouselFeatureClient_819ab19afa76e1884082d6b0d73b0620 } from '@/lexical-features/application-carousel/feature.client'
 import { ReusableBlockFeatureClient as ReusableBlockFeatureClient_b9527d92f7daf4742e0cbc76eb0340a6 } from '@/lexical-features/reusable-block/feature.client'
 import { FormBlockFeatureClient as FormBlockFeatureClient_97e789367a6c899f2a78b21f3b64a501 } from '@/lexical-features/form-block/feature.client'
 import { MarqueeLinksFeatureClient as MarqueeLinksFeatureClient_1b2dff0857760443a4f3b480c444bff5 } from '@/lexical-features/marquee-links/feature.client'
@@ -79,6 +80,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
   "@/lexical-features/blocks-toolbar-dropdown/feature.client#BlocksToolbarDropdownFeatureClient": BlocksToolbarDropdownFeatureClient_669410b80561d416638c54872826e396,
   "@/lexical-features/document-template/feature.client#DocumentTemplateFeatureClient": DocumentTemplateFeatureClient_dcfc2a8f560838093c5dfa7b3826380f,
+  "@/lexical-features/application-carousel/feature.client#ApplicationCarouselFeatureClient": ApplicationCarouselFeatureClient_819ab19afa76e1884082d6b0d73b0620,
   "@/lexical-features/reusable-block/feature.client#ReusableBlockFeatureClient": ReusableBlockFeatureClient_b9527d92f7daf4742e0cbc76eb0340a6,
   "@/lexical-features/form-block/feature.client#FormBlockFeatureClient": FormBlockFeatureClient_97e789367a6c899f2a78b21f3b64a501,
   "@/lexical-features/marquee-links/feature.client#MarqueeLinksFeatureClient": MarqueeLinksFeatureClient_1b2dff0857760443a4f3b480c444bff5,
