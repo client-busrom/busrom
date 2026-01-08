@@ -8,6 +8,9 @@ WORKDIR /app
 # Copy root package files (monorepo structure)
 COPY package.json package-lock.json ./
 
+# Copy patches directory for patch-package
+COPY patches ./patches
+
 # Copy payload-cms workspace
 COPY payload-cms ./payload-cms
 
