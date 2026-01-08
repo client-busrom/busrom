@@ -426,6 +426,8 @@ export default buildConfig({
 
     // Auditor Plugin - 操作审计日志
     // 注意：不追踪 users/roles/permissions，会导致 User 字段验证错误
+    // 注意：插件使用 payload.create() 不带 overrideAccess，所以 access.create 需要为 true
+    // 这是通过修改 node_modules 或等待插件修复来解决
     auditorPlugin({
       collection: {
         // 自定义访问控制 - 使用 isAdmin 字段
