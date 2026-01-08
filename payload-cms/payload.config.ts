@@ -52,6 +52,7 @@ import { MarqueeLinksFeature } from './src/lexical-features/marquee-links'
 import { FormBlockFeature } from './src/lexical-features/form-block'
 import { ReusableBlockFeature } from './src/lexical-features/reusable-block'
 import { DocumentTemplateFeature } from './src/lexical-features/document-template'
+import { ApplicationCarouselFeature } from './src/lexical-features/application-carousel'
 import { ChecklistFeature } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { seoPlugin } from '@payloadcms/plugin-seo'
@@ -370,6 +371,7 @@ export default buildConfig({
         MarqueeLinksFeature(), // Custom Feature 滚动链接 - WYSIWYG
         FormBlockFeature(), // Custom Feature 表单块 - WYSIWYG
         ReusableBlockFeature(), // Custom Feature 可复用块 - WYSIWYG
+        ApplicationCarouselFeature(), // Custom Feature 应用轮播 - WYSIWYG
         DocumentTemplateFeature(), // Custom Feature 文档模板 - 工具栏按钮
         BlocksToolbarDropdownFeature(), // 工具栏右侧自定义块按钮
       ]

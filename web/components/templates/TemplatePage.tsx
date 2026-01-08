@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import type { Locale } from "@/i18n.config"
 import { DocumentRenderer } from "@/components/document/DocumentRenderer"
+import { ServiceOverviewTemplate } from "./ServiceOverviewTemplate"
 
 interface PageContent {
   id: string
@@ -14,6 +15,11 @@ interface PageContent {
   status: string
   content: {
     document: any[]
+  }
+  contentTranslation?: {
+    root?: {
+      children?: any[]
+    }
   }
   locale: string
 }
@@ -92,7 +98,18 @@ export function TemplatePage({ locale, slug, template }: TemplatePageProps) {
     )
   }
 
-  // Render template-specific content or fallback to document renderer
+  // Render template-specific content
+  // SERVICE_OVERVIEW template
+  if (template === "SERVICE_OVERVIEW") {
+    return (
+      <ServiceOverviewTemplate
+        locale={locale}
+        pageContent={pageContent}
+      />
+    )
+  }
+
+  // Default fallback to document renderer
   return (
     <div className="min-h-screen bg-background pt-20" data-header-theme="light">
       <div className="container mx-auto px-6 md:px-8 lg:px-16 py-12">

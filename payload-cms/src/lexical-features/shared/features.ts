@@ -51,6 +51,7 @@ import { FormBlockFeature } from '../form-block'
 import { ReusableBlockFeature } from '../reusable-block'
 import { DocumentTemplateFeature } from '../document-template'
 import { BlocksToolbarDropdownFeature } from '../blocks-toolbar-dropdown'
+import { ApplicationCarouselFeature } from '../application-carousel'
 
 /**
  * Get base text formatting and structure features
@@ -125,6 +126,7 @@ export const getCustomContentFeatures = () => [
   MarqueeLinksFeature(),
   FormBlockFeature(),
   ReusableBlockFeature(),
+  ApplicationCarouselFeature(),
 ]
 
 /**
