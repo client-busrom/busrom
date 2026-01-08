@@ -505,11 +505,12 @@ export function ContactFormSection({
                     {/* Icon instead of checkbox/radio indicator */}
                     <div style={{ width: vw(36), height: vw(36), display: "flex", alignItems: "center", justifyContent: "center" }}>
                       {IconComponent ? (
-                        <IconComponent
-                          className={isSelected ? "text-white" : "text-white/70"}
-                          style={{ width: vw(28), height: vw(28) }}
-                          strokeWidth={1.5}
-                        />
+                        <div style={{ width: vw(28), height: vw(28) }}>
+                          <IconComponent
+                            className={`${isSelected ? "text-white" : "text-white/70"} w-full h-full`}
+                            strokeWidth={1.5}
+                          />
+                        </div>
                       ) : (
                         <div
                           style={{
