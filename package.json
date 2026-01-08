@@ -14,7 +14,7 @@
     "build": "npm run build --workspaces",
     "build:cms": "npm run build --workspace=payload-cms",
     "build:web": "npm run build --workspace=web",
-    "postinstall": "patch-package && echo '\n✅ Installation complete! Next steps:\n1. Start PostgreSQL & MinIO: docker-compose up -d\n2. Configure environment: cp payload-cms/.env.example payload-cms/.env && cp web/.env.example web/.env\n3. Start development: npm run dev\n'"
+    "postinstall": "npx --no patch-package || true"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
