@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import type { Locale } from "@/i18n.config"
-import { DocumentRenderer } from "@/components/document/DocumentRenderer"
+import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -193,12 +193,9 @@ export function BlogDetailClient({ locale, slug }: BlogDetailClientProps) {
         )}
 
         {/* Content */}
-        {blog.content?.document && (
+        {blog.content && (
           <div className="prose prose-lg max-w-none">
-            <DocumentRenderer
-              document={blog.content.document}
-              locale={locale}
-            />
+            <LexicalRenderer content={blog.content} />
           </div>
         )}
 

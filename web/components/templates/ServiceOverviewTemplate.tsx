@@ -490,7 +490,7 @@ export function ServiceOverviewTemplate({ locale, pageContent }: ServiceOverview
       "Busrom's business scope covers 100+ countries, not only has the ability to do private service for our wholesalers and dealers but also offers bespoke plans for designers, builders, and homeowners."
     const ctaText = extractTextAfterMarker(contentChildren, "simple-cta-text") || "Talk to Our Specialists for Tailored Solutions."
     const buttonText = extractTextAfterMarker(contentChildren, "simple-cta-button-text") || "Get Started"
-    const buttonLink = extractTextAfterMarker(contentChildren, "simple-cta-button-link") || "/contact"
+    const buttonLink = extractTextAfterMarker(contentChildren, "simple-cta-button-link") || "/contact-us"
 
     // Get images from gallery after "simple-cta-image" marker
     const images = extractGalleryImagesAfterMarker(contentChildren, "simple-cta-image", mediaData)
