@@ -40,7 +40,7 @@ export function SimpleCtaSection({
   description = "Busrom's business scope covers 100+ countries, not only has the ability to do private service for our wholesalers and dealers but also offers bespoke plans for designers, builders, and homeowners.",
   ctaText = "Talk to Our Specialists for Tailored Solutions.",
   buttonText = "Get Started",
-  buttonLink = "/contact",
+  buttonLink = "/contact-us",
   images = [],
 }: SimpleCtaSectionProps) {
   // vw conversion function

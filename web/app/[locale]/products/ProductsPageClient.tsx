@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import type { Locale } from "@/i18n.config"
-import { DocumentRenderer } from "@/components/document/DocumentRenderer"
+import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 
 interface PageContent {
   id: string
@@ -104,10 +104,9 @@ export function ProductsPageClient({ locale, pageId }: ProductsPageClientProps) 
         )}
 
         {/* Document Content */}
-        {pageContent.content?.document && (
-          <DocumentRenderer
-            document={pageContent.content.document}
-            locale={locale}
+        {pageContent.content && (
+          <LexicalRenderer
+            content={pageContent.content}
             className="prose prose-lg max-w-none"
           />
         )}

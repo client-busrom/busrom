@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import type { Locale } from "@/i18n.config"
-import { DocumentRenderer } from "@/components/document/DocumentRenderer"
+import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 import { ServiceOverviewTemplate } from "./ServiceOverviewTemplate"
 
 interface PageContent {
@@ -130,12 +130,9 @@ export function TemplatePage({ locale, slug, template }: TemplatePageProps) {
         {/* Template-specific rendering will be added here in the future */}
         {/* For now, we'll use the document renderer as a placeholder */}
 
-        {pageContent.content?.document && (
+        {pageContent.content && (
           <div className="prose prose-lg max-w-none">
-            <DocumentRenderer
-              document={pageContent.content.document}
-              locale={locale}
-            />
+            <LexicalRenderer content={pageContent.content} />
           </div>
         )}
 

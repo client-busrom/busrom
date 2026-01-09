@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import type { Locale } from "@/i18n.config"
-import { DocumentRenderer } from "@/components/document/DocumentRenderer"
+import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -149,17 +149,14 @@ export function PageDetailClient({ locale, slug }: PageDetailClientProps) {
         )}
 
         {/* Content */}
-        {page.content?.document && (
+        {page.content && (
           <div className="prose prose-lg max-w-none">
-            <DocumentRenderer
-              document={page.content.document}
-              locale={locale}
-            />
+            <LexicalRenderer content={page.content} />
           </div>
         )}
 
         {/* No content placeholder */}
-        {!page.content?.document && (
+        {!page.content && (
           <div className="py-12 text-center">
             <p className="text-brand-accent-gold">
               {locale === "zh" ? "此页面暂无内容。" : "This page has no content yet."}

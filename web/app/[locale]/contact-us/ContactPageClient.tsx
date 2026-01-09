@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import type { Locale } from "@/i18n.config"
-import { DocumentRenderer } from "@/components/document/DocumentRenderer"
+import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 
 interface PageData {
   id: string
@@ -12,9 +12,7 @@ interface PageData {
   template: string
   title: string
   status: string
-  content: {
-    document: any[]
-  }
+  content: any // Lexical EditorState
   locale: string
 }
 
@@ -83,12 +81,11 @@ export function ContactPageClient({ locale }: ContactPageClientProps) {
         </div>
       </div>
 
-      {/* Page Content - Rendered from CMS */}
+      {/* Page Content - Rendered from Payload CMS Lexical */}
       <div className="container mx-auto px-6 md:px-8 lg:px-16 py-16">
-        <DocumentRenderer
-          document={pageData.content.document}
-          locale={locale}
-        />
+        {pageData.content && (
+          <LexicalRenderer content={pageData.content} />
+        )}
       </div>
     </div>
   )
