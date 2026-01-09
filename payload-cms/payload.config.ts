@@ -972,9 +972,10 @@ export default buildConfig({
             payload.logger.info('🔧 Creating missing payload_jobs_log table...')
 
             // Create payload_jobs_log table (logs for each job execution attempt)
+            // Note: id is VARCHAR to accept MongoDB-style ObjectIds from Payload
             await db.drizzle.execute(`
               CREATE TABLE IF NOT EXISTS payload_jobs_log (
-                id SERIAL PRIMARY KEY,
+                id VARCHAR(255) PRIMARY KEY,
                 _order INTEGER NOT NULL,
                 _parent_id INTEGER NOT NULL REFERENCES payload_jobs(id) ON DELETE CASCADE,
                 executed_at TIMESTAMP WITH TIME ZONE,
@@ -994,6 +995,40 @@ export default buildConfig({
             `)
 
             payload.logger.info('✅ payload_jobs_log table created successfully.')
+          } else {
+            // Table exists - check if id column is SERIAL (wrong) and needs to be fixed to VARCHAR
+            const checkIdType = await db.drizzle.execute(`
+              SELECT data_type FROM information_schema.columns
+              WHERE table_name = 'payload_jobs_log' AND column_name = 'id'
+            `)
+            if (checkIdType.rows && checkIdType.rows.length > 0) {
+              const dataType = (checkIdType.rows[0] as any).data_type
+              if (dataType === 'integer') {
+                payload.logger.info('🔧 Fixing payload_jobs_log id column type from INTEGER to VARCHAR...')
+                // Drop and recreate the table with correct schema
+                await db.drizzle.execute(`DROP TABLE IF EXISTS payload_jobs_log CASCADE`)
+                await db.drizzle.execute(`
+                  CREATE TABLE payload_jobs_log (
+                    id VARCHAR(255) PRIMARY KEY,
+                    _order INTEGER NOT NULL,
+                    _parent_id INTEGER NOT NULL REFERENCES payload_jobs(id) ON DELETE CASCADE,
+                    executed_at TIMESTAMP WITH TIME ZONE,
+                    completed_at TIMESTAMP WITH TIME ZONE,
+                    task_slug VARCHAR(255),
+                    task_i_d VARCHAR(255),
+                    input JSONB,
+                    output JSONB,
+                    state VARCHAR(255),
+                    error JSONB
+                  )
+                `)
+                await db.drizzle.execute(`
+                  CREATE INDEX IF NOT EXISTS payload_jobs_log_parent_id_idx ON payload_jobs_log(_parent_id);
+                  CREATE INDEX IF NOT EXISTS payload_jobs_log_order_idx ON payload_jobs_log(_order);
+                `)
+                payload.logger.info('✅ payload_jobs_log table recreated with VARCHAR id.')
+              }
+            }
           }
 
           // Check if payload_jobs_stats table (global) exists
