@@ -67,6 +67,14 @@ export const LEXICAL_TRANSLATION_CONFIG: Record<string, FieldPath[]> = {
     { path: 'slides', isArray: true },
   ],
 
+  // Product Carousel - each item has translatable buttonText
+  'productCarousel': [
+    { path: 'items', isArray: true },
+  ],
+
+  // Application Carousel - no translatable fields for now
+  // (applications are fetched by ID, their content is already localized in the applications collection)
+
   // FormBlock and ReusableBlock are references, no translation needed
   // 'formBlock': [],
   // 'reusableBlock': [],
@@ -80,6 +88,7 @@ export const ARRAY_ITEM_FIELDS: Record<string, string[]> = {
   'links': ['title'], // marqueeLinks
   'images': ['caption'], // image-gallery
   'slides': ['title', 'description', 'buttonText', 'caption'], // carousel
+  'items': ['buttonText'], // productCarousel - only buttonText is translatable per item
 }
 
 /**
