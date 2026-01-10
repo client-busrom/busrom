@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import type { Locale } from "@/i18n.config"
 import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 import { ServiceOverviewTemplate } from "./ServiceOverviewTemplate"
+import { ContactUsTemplate } from "./ContactUsTemplate"
 
 interface PageContent {
   id: string
@@ -103,6 +104,16 @@ export function TemplatePage({ locale, slug, template }: TemplatePageProps) {
   if (template === "SERVICE_OVERVIEW") {
     return (
       <ServiceOverviewTemplate
+        locale={locale}
+        pageContent={pageContent}
+      />
+    )
+  }
+
+  // CONTACT_US template
+  if (template === "CONTACT_US") {
+    return (
+      <ContactUsTemplate
         locale={locale}
         pageContent={pageContent}
       />

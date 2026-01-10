@@ -47,12 +47,16 @@ const OUTPUT_EXT = 'webp'
 const OUTPUT_MIME = 'image/webp'
 
 // Initialize S3 client (supports both AWS S3 and MinIO)
+// Uses default AWS credentials from ~/.aws/credentials if not provided via env
 const s3Client = new S3Client({
-  credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
-  },
   region: S3_REGION,
+  ...(process.env.S3_ACCESS_KEY_ID &&
+    process.env.S3_SECRET_ACCESS_KEY && {
+      credentials: {
+        accessKeyId: process.env.S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+      },
+    }),
   ...(USE_MINIO && {
     endpoint: S3_ENDPOINT,
     forcePathStyle: true,
@@ -290,7 +294,10 @@ async function main() {
     process.exit(1)
   }
 
-  const pool = new Pool({ connectionString: databaseUri })
+  const pool = new Pool({
+    connectionString: databaseUri,
+    ssl: databaseUri.includes('rds.amazonaws.com') ? { rejectUnauthorized: false } : undefined,
+  })
 
   try {
     // Find media records that need sizes regenerated

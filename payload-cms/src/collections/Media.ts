@@ -75,6 +75,14 @@ export const Media: CollectionConfig = {
   // // versions: { maxPerDoc: 5 },
 
   upload: {
+    // Automatically resize large images on upload
+    // This prevents storing unnecessarily large original files
+    resizeOptions: {
+      width: 3000,
+      height: 3000,
+      fit: 'inside', // Maintain aspect ratio, fit within bounds
+      withoutEnlargement: true, // Don't upscale small images
+    },
     // Image processing with WebP conversion for better performance
     // WebP typically provides 25-35% smaller file sizes than JPEG/PNG
     imageSizes: [

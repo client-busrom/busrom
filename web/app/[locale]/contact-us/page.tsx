@@ -1,5 +1,5 @@
 import type { Locale } from "@/i18n.config"
-import { ContactPageClient } from "./ContactPageClient"
+import { TemplatePage } from "@/components/templates/TemplatePage"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -14,5 +14,5 @@ export default async function ContactPage({
 }) {
   const { locale } = await params
 
-  return <ContactPageClient locale={locale} />
+  return <TemplatePage locale={locale} slug="contact-us" template="CONTACT_US" />
 }
