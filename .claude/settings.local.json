@@ -118,7 +118,8 @@
       "Bash(AWS_DEFAULT_REGION=us-east-1 aws rds describe-db-instances:*)",
       "Bash(AWS_DEFAULT_REGION=us-east-1 aws ec2:*)",
       "WebFetch(domain:www.npmjs.com)",
-      "Bash(zcat:*)"
+      "Bash(zcat:*)",
+      "Bash(DATABASE_URI=\"postgresql://busrom_admin:ADijIRcAHMHLHaZvH0eg@busrom-db-production.cqhcko4ysea2.us-east-1.rds.amazonaws.com:5432/busrom_payload\" S3_BUCKET_NAME=\"busrom-media-production\" S3_REGION=\"us-east-1\" npx tsx:*)"
     ],
     "deny": [],
     "ask": []

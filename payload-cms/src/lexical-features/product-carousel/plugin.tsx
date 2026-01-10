@@ -19,9 +19,12 @@ export const ProductCarouselPlugin = (): null => {
   const [editor] = useLexicalComposerContext()
 
   useEffect(() => {
+    console.log('🛒 ProductCarouselPlugin registering on editor:', editor._key)
+    console.log('🛒 Command object ID:', INSERT_PRODUCT_CAROUSEL_COMMAND)
     return editor.registerCommand(
       INSERT_PRODUCT_CAROUSEL_COMMAND,
       (payload) => {
+        console.log('🛒 Command received!')
         const defaultData: ProductCarouselData = {
           items: [],
           autoplay: true,

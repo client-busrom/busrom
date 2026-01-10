@@ -53,6 +53,7 @@ import { FormBlockFeature } from './src/lexical-features/form-block'
 import { ReusableBlockFeature } from './src/lexical-features/reusable-block'
 import { DocumentTemplateFeature } from './src/lexical-features/document-template'
 import { ApplicationCarouselFeature } from './src/lexical-features/application-carousel'
+import { ProductCarouselFeature } from './src/lexical-features/product-carousel'
 import { ChecklistFeature } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { seoPlugin } from '@payloadcms/plugin-seo'
@@ -187,7 +188,11 @@ export default buildConfig({
       // Custom navigation - organized with collapsible groups
       Nav: '@/components/admin/CustomNav',
       // Admin styles provider - hides unnecessary actions on account page
-      providers: ['@/components/admin/AdminStylesProvider'],
+      // CompressedUploadProvider - compresses images before upload (client-side)
+      providers: [
+        '@/components/admin/AdminStylesProvider',
+        '@/components/uploads/CompressedUploadField#CompressedUploadProvider',
+      ],
     },
     // Admin UI localization
     dateFormat: 'yyyy-MM-dd HH:mm:ss',
@@ -372,6 +377,7 @@ export default buildConfig({
         FormBlockFeature(), // Custom Feature 表单块 - WYSIWYG
         ReusableBlockFeature(), // Custom Feature 可复用块 - WYSIWYG
         ApplicationCarouselFeature(), // Custom Feature 应用轮播 - WYSIWYG
+        ProductCarouselFeature(), // Custom Feature 产品轮播 - WYSIWYG
         DocumentTemplateFeature(), // Custom Feature 文档模板 - 工具栏按钮
         BlocksToolbarDropdownFeature(), // 工具栏右侧自定义块按钮
       ]

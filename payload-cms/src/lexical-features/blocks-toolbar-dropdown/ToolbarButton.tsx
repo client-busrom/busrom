@@ -186,6 +186,8 @@ export const ToolbarButton: React.FC = () => {
   }
 
   const insertProductCarousel = () => {
+    console.log('🛒 ToolbarButton dispatching on editor:', editor._key)
+    console.log('🛒 Command object ID:', INSERT_PRODUCT_CAROUSEL_COMMAND)
     editor.dispatchCommand(INSERT_PRODUCT_CAROUSEL_COMMAND, undefined)
     setIsOpen(false)
   }
