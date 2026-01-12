@@ -242,9 +242,13 @@ export const MultiLocaleField: React.FC<MultiLocaleFieldProps> = ({
     setTranslateStatus('正在翻译...')
 
     try {
+      // Get user's personal translation settings from localStorage
+      const { getTranslationHeaders } = await import('@/lib/translation-client')
+      const personalHeaders = getTranslationHeaders()
+
       const res = await fetch('/api/translate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...personalHeaders },
         body: JSON.stringify({
           text: sourceValue,
           sourceLang: sourceLocale,

@@ -342,6 +342,7 @@ export const CustomNav: React.FC = () => {
         <CollapsibleGroup labelKey="cmsSettings" defaultOpen={false}>
           <NavItem href="/admin/globals/email-config" labelKey="emailConfig" />
           <NavItem href="/admin/globals/translation-config" labelKey="translationConfig" />
+          <NavItem href="/admin/translation-settings" labelKey="myTranslationSettings" />
         </CollapsibleGroup>
       </div>
 

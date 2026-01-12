@@ -277,6 +277,10 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
         const sourceField = sourceFields[fieldIdx]
 
         // Translate label
+        // Get user's personal translation settings
+        const { getTranslationHeaders } = await import('@/lib/translation-client')
+        const personalHeaders = getTranslationHeaders()
+
         const sourceLabel = getFieldValue(fieldIdx, 'label', sourceLocale)
         if (sourceLabel) {
           const localesToTranslate = targetLocales.filter(locale => {
@@ -287,7 +291,7 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
           if (localesToTranslate.length > 0) {
             const res = await fetch('/api/translate', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 'Content-Type': 'application/json', ...personalHeaders },
               body: JSON.stringify({
                 text: sourceLabel,
                 sourceLang: sourceLocale,
@@ -316,7 +320,7 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
           if (localesToTranslate.length > 0) {
             const res = await fetch('/api/translate', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 'Content-Type': 'application/json', ...personalHeaders },
               body: JSON.stringify({
                 text: sourcePlaceholder,
                 sourceLang: sourceLocale,
@@ -347,7 +351,7 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
             if (localesToTranslate.length > 0) {
               const res = await fetch('/api/translate', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...personalHeaders },
                 body: JSON.stringify({
                   text: sourceOptLabel,
                   sourceLang: sourceLocale,

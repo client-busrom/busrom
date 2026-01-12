@@ -168,26 +168,24 @@ export function ProductSeriesEntrySection({
 
       {/* 斜杠 / */}
       <div
-        className="absolute"
+        className="absolute bg-brand-olive-dark"
         style={{
           left: vw(1001),
           top: vw(101),
           width: vw(18),
           height: vw(79),
-          backgroundColor: "#46400F",
           transform: "skewX(-15deg)",
         }}
       />
 
       {/* 小圆点 */}
       <div
-        className="absolute rounded-full"
+        className="absolute rounded-full bg-brand-olive-dark"
         style={{
           left: vw(1033),
           top: vw(161),
           width: vw(9),
           height: vw(9),
-          backgroundColor: "#46400F",
         }}
       />
 
@@ -202,12 +200,7 @@ export function ProductSeriesEntrySection({
         }}
       >
         {/* Are You - 四向描边效果，类似 text-stroke-black */}
-        <span
-          style={{
-            color: "#f6f4ef",
-            textShadow: `-1px -1px 0 #464010, 1px -1px 0 #464010, -1px 1px 0 #464010, 1px 1px 0 #464010`,
-          }}
-        >
+        <span className="text-brand-main text-stroke-dark-olive">
           {titleRightBold}
         </span>
         <br />

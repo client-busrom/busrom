@@ -337,7 +337,8 @@ export const customTranslationsEn = {
       preloaderConfig: 'Preloader Config',
       socialConfig: 'Social Config',
       emailConfig: 'Email Config',
-      translationConfig: 'Translation Config',
+      translationConfig: 'Translation Config (Global)',
+      myTranslationSettings: 'My Translation Settings',
     },
   },
 }
@@ -666,7 +667,8 @@ export const customTranslationsZh = {
       preloaderConfig: '加载动画配置',
       socialConfig: '社交配置',
       emailConfig: '邮件配置',
-      translationConfig: '翻译配置',
+      translationConfig: '翻译配置（全局）',
+      myTranslationSettings: '我的翻译设置',
     },
   },
 }

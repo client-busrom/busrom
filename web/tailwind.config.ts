@@ -65,12 +65,17 @@ const config: Config = {
           // 主色 / 副色
           main: "#F6F4ED",       // 主选色
           secondary: "#756F3F",    // 副选色 (深色背景)
+          "dark-olive": "#464010", // 深橄榄色 (描边/边框)
+          "light-olive": "#827A3C", // 浅橄榄色
+          "olive-dark": "#46400F", // 深橄榄色变体
+          "olive-mid": "#989260",  // 中等橄榄色
 
           // 基础文字
           text: {
             main: "#3C3C3C",       // 柔和的黑色 (来自第5点)
             black: "#000000",      // 纯黑 (来自第3, 5, 10点)
             inverse: "#FFFFFF",     // 反色 (来自第2, 6, 8, 9, 15点)
+            "dark-brown": "#3D3708", // 深棕色文字
           },
 
           // 点缀色 - 金色系
@@ -78,12 +83,29 @@ const config: Config = {
             gold: "#A08745",       // (来自第10点 "特殊强调文字")
             "gold-light": "#978350",   // (来自第5点 "副标题")
             border: "#CDC094",     // (来自第3点 "图片边框")
+            orange: "#FF7C02",     // 橙色强调
+            "gold-bright": "#B8AD52", // 亮金色
           },
 
           // 点缀色 - 奶油色系
           cream: {
             DEFAULT: "#FFFAD3",    // (来自第6点 "标题")
             dark: "#DAC99E",      // (来自第6点 "副标题" 和 第17点 "强调事项文字")
+            light: "#FDF3BC",     // 浅奶油色 (卡片背景)
+            border: "#C3BD8B",    // 奶油色边框
+          },
+
+          // 点缀色 - 黄色系
+          yellow: {
+            DEFAULT: "#FCE638",   // 主黄色
+            bright: "#FFEE6A",    // 亮黄色 (hover效果)
+            "card-bg": "#646336", // 卡片背景深色
+            "card-border": "#fce638", // 卡片边框
+          },
+
+          // 点缀色 - 橙色系
+          orange: {
+            DEFAULT: "#D58A00",   // 主橙色
           },
 
           // 特殊表单色 (来自第12点)
@@ -101,6 +123,14 @@ const config: Config = {
             "button-text": "#625D2F",
             "emphasis-bg": "#625D2F",
             "emphasis-text": "#D2CC9E", // (注意: 你写的是 #D2CC9E，我猜可能是 #DAC99E?)
+          },
+
+          // 卡片/遮罩透明色
+          overlay: {
+            "olive-60": "rgba(141, 132, 58, 0.6)",  // 橄榄色遮罩 60%
+            "cream-38": "rgba(255, 245, 168, 0.38)", // 奶油色遮罩 38%
+            "cream-54": "rgba(255, 245, 168, 0.54)", // 奶油色遮罩 54%
+            "cream-30": "rgba(255, 245, 168, 0.30)", // 奶油色遮罩 30%
           }
         }
       },
@@ -138,6 +168,8 @@ const config: Config = {
         'josefin-sans': ['var(--font-josefin-sans)', 'sans-serif'],
         'joan':          ['var(--font-joan)', 'serif'],
         'lilita-one':    ['var(--font-lilita-one)', 'sans-serif'],
+        'kaushan-script': ['var(--font-kaushan-script)', 'cursive'],
+        'moul':            ['var(--font-moul)', 'sans-serif'],
 
         // --- 系统字体 (直接使用名字) ---
         'arial':       ['Arial', 'sans-serif'],
@@ -185,6 +217,14 @@ const config: Config = {
             transform: "translate(0, 0)",
           },
         },
+        "pulse-scale": {
+          "0%, 100%": {
+            transform: "scale(1)",
+          },
+          "50%": {
+            transform: "scale(1.05)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -193,6 +233,7 @@ const config: Config = {
         "marquee-reverse": "marquee-reverse 20s linear infinite",
         "ball-bounce": "ball-bounce 2.5s ease-in-out infinite",
         "bounce-around": "bounce-around 12s ease-in-out infinite",
+        "pulse-scale": "pulse-scale 2s ease-in-out infinite",
       },
     },
   },

@@ -280,10 +280,14 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
           return overwriteExisting || !targetData?.specifications || targetData.specifications.length === 0
         })
         .map(async (targetLang) => {
+          // Get user's personal translation settings
+          const { getTranslationHeaders } = await import('@/lib/translation-client')
+          const personalHeaders = getTranslationHeaders()
+
           // Single batch request for all texts
           const res = await fetch('/api/translate', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...personalHeaders },
             body: JSON.stringify({
               texts: allTexts,
               sourceLang: sourceLocale,

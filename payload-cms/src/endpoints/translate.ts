@@ -160,8 +160,45 @@ async function translateWithAzure(
   return data[0]?.translations?.[0]?.text || text
 }
 
+/**
+ * Get translation config
+ * Supports per-request override from headers (for user personal settings stored in localStorage)
+ * Falls back to global config
+ */
+async function getTranslationConfig(payload: any, user: any, headers?: Headers) {
+  // Check for per-request override from headers (user's personal settings from localStorage)
+  if (headers) {
+    const personalService = headers.get('x-translation-service')
+    const personalApiKey = headers.get('x-translation-api-key')
+    const personalEndpoint = headers.get('x-translation-endpoint')
+
+    if (personalApiKey) {
+      return {
+        service: personalService || 'google',
+        apiKey: personalApiKey,
+        apiEndpoint: personalEndpoint || undefined,
+        isEnabled: true,
+        source: 'user' as const,
+      }
+    }
+  }
+
+  // Fall back to global config
+  const globalConfig = await payload.findGlobal({
+    slug: 'translation-config',
+  })
+
+  return {
+    service: globalConfig.service as string,
+    apiKey: globalConfig.apiKey as string,
+    apiEndpoint: globalConfig.apiEndpoint as string | undefined,
+    isEnabled: globalConfig.isEnabled as boolean,
+    source: 'global' as const,
+  }
+}
+
 export const translateHandler: PayloadHandler = async (req) => {
-  const { payload, user } = req
+  const { payload, user, headers } = req
 
   // Check authentication
   if (!user) {
@@ -169,17 +206,15 @@ export const translateHandler: PayloadHandler = async (req) => {
   }
 
   try {
-    // Get translation config
-    const config = await payload.findGlobal({
-      slug: 'translation-config',
-    })
+    // Get translation config (check headers for user settings, then fall back to global)
+    const config = await getTranslationConfig(payload, user, headers)
 
     if (!config.isEnabled) {
-      return Response.json({ error: 'Translation service is not enabled' }, { status: 400 })
+      return Response.json({ error: 'Translation service is not enabled. Please configure your API key in user settings.' }, { status: 400 })
     }
 
     if (!config.apiKey) {
-      return Response.json({ error: 'Translation API key is not configured' }, { status: 400 })
+      return Response.json({ error: 'Translation API key is not configured. Please set your API key in user settings.' }, { status: 400 })
     }
 
     const service = config.service as 'google' | 'deepl' | 'azure'
@@ -292,25 +327,21 @@ export const translateHandler: PayloadHandler = async (req) => {
 
 /**
  * Test translation connection
+ * Tests user's personal translation settings
  */
 export const testTranslationHandler: PayloadHandler = async (req) => {
-  const { payload, user } = req
+  const { payload, user, headers } = req
 
   if (!user) {
     return Response.json({ error: 'Authentication required' }, { status: 401 })
   }
 
-  if (user.role !== 'admin' && user.role !== 'super_admin') {
-    return Response.json({ error: 'Permission denied' }, { status: 403 })
-  }
-
   try {
-    const config = await payload.findGlobal({
-      slug: 'translation-config',
-    })
+    // Get config from headers (user settings) or global
+    const config = await getTranslationConfig(payload, user, headers)
 
     if (!config.apiKey) {
-      return Response.json({ error: 'API key is not configured' }, { status: 400 })
+      return Response.json({ error: 'API key is not configured. Please set your API key first.' }, { status: 400 })
     }
 
     const service = config.service as 'google' | 'deepl' | 'azure'
@@ -324,35 +355,45 @@ export const testTranslationHandler: PayloadHandler = async (req) => {
     } else if (service === 'deepl') {
       translatedText = await translateWithDeepL(testText, 'en', 'zh', apiKey)
     } else if (service === 'azure') {
-      translatedText = await translateWithAzure(testText, 'en', 'zh', apiKey, false, config.apiEndpoint as string | undefined)
+      translatedText = await translateWithAzure(testText, 'en', 'zh', apiKey, false, config.apiEndpoint)
     } else {
       throw new Error('Invalid translation service')
     }
 
-    // Update test result
-    await payload.updateGlobal({
-      slug: 'translation-config',
-      data: {
-        lastTestedAt: new Date().toISOString(),
-        lastTestResult: 'success',
-      },
-    })
+    // If using global config, update global test result
+    if (config.source === 'global') {
+      await payload.updateGlobal({
+        slug: 'translation-config',
+        data: {
+          lastTestedAt: new Date().toISOString(),
+          lastTestResult: 'success',
+        },
+      })
+    }
 
     return Response.json({
       success: true,
       message: 'Translation test successful',
       originalText: testText,
       translatedText,
+      configSource: config.source,
     })
   } catch (error) {
-    // Update test result as failed
-    await payload.updateGlobal({
-      slug: 'translation-config',
-      data: {
-        lastTestedAt: new Date().toISOString(),
-        lastTestResult: 'failed',
-      },
-    })
+    // Update global test result as failed (only if using global config)
+    try {
+      const config = await getTranslationConfig(payload, user)
+      if (config.source === 'global') {
+        await payload.updateGlobal({
+          slug: 'translation-config',
+          data: {
+            lastTestedAt: new Date().toISOString(),
+            lastTestResult: 'failed',
+          },
+        })
+      }
+    } catch (e) {
+      // Ignore error updating global
+    }
 
     payload.logger.error('Translation test failed:', error)
     return Response.json(
@@ -363,4 +404,67 @@ export const testTranslationHandler: PayloadHandler = async (req) => {
       { status: 500 }
     )
   }
+}
+
+/**
+ * Get global translation settings info
+ * User's personal settings are stored in localStorage and sent via headers
+ */
+export const getUserTranslationSettingsHandler: PayloadHandler = async (req) => {
+  const { payload, user, headers } = req
+
+  if (!user) {
+    return Response.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  try {
+    // Check if user has personal settings in headers
+    const personalApiKey = headers?.get('x-translation-api-key')
+    const personalService = headers?.get('x-translation-service')
+
+    if (personalApiKey) {
+      return Response.json({
+        success: true,
+        settings: {
+          service: personalService || 'google',
+          hasApiKey: true,
+          apiKeyPreview: `${personalApiKey.substring(0, 8)}...`,
+          isEnabled: true,
+          source: 'user',
+        },
+      })
+    }
+
+    // Return global config info
+    const globalConfig = await payload.findGlobal({
+      slug: 'translation-config',
+    })
+
+    return Response.json({
+      success: true,
+      settings: {
+        service: globalConfig.service || 'google',
+        hasApiKey: !!globalConfig.apiKey,
+        apiKeyPreview: globalConfig.apiKey ? `${(globalConfig.apiKey as string).substring(0, 8)}...` : '',
+        isEnabled: globalConfig.isEnabled || false,
+        source: 'global',
+      },
+    })
+  } catch (error) {
+    payload.logger.error('Failed to get translation settings:', error)
+    return Response.json(
+      { error: error instanceof Error ? error.message : 'Failed to get settings' },
+      { status: 500 }
+    )
+  }
+}
+
+/**
+ * Placeholder for save - settings are stored in localStorage on client side
+ */
+export const saveUserTranslationSettingsHandler: PayloadHandler = async (req) => {
+  return Response.json({
+    success: true,
+    message: 'Settings should be saved in localStorage on the client side',
+  })
 }
