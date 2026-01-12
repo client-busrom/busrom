@@ -83,8 +83,8 @@ export const HeroBannerItems: CollectionConfig = {
       required: true,
       localized: true,
       label: {
-        en: 'Title',
-        zh: '标题',
+        en: 'Content Title',
+        zh: '内容标题',
       },
     },
 
@@ -97,8 +97,8 @@ export const HeroBannerItems: CollectionConfig = {
       required: true,
       localized: true,
       label: {
-        en: 'Feature 1',
-        zh: '特点1',
+        en: 'Title',
+        zh: '标题',
       },
     },
     {
@@ -107,8 +107,8 @@ export const HeroBannerItems: CollectionConfig = {
       required: true,
       localized: true,
       label: {
-        en: 'Feature 2',
-        zh: '特点2',
+        en: 'Subtitle',
+        zh: '副标题',
       },
     },
     {
@@ -117,8 +117,8 @@ export const HeroBannerItems: CollectionConfig = {
       required: true,
       localized: true,
       label: {
-        en: 'Feature 3',
-        zh: '特点3',
+        en: 'Display 1',
+        zh: '展示1',
       },
     },
     {
@@ -127,8 +127,8 @@ export const HeroBannerItems: CollectionConfig = {
       required: true,
       localized: true,
       label: {
-        en: 'Feature 4',
-        zh: '特点4',
+        en: 'Display 2',
+        zh: '展示2',
       },
     },
     {
@@ -137,26 +137,44 @@ export const HeroBannerItems: CollectionConfig = {
       required: true,
       localized: true,
       label: {
-        en: 'Feature 5',
-        zh: '特点5',
+        en: 'Display 3',
+        zh: '展示3',
       },
     },
 
     // ==================================================================
-    // 🖼️ Images (固定4张)
+    // 🖼️ Images (根据 order 条件显示)
     // ==================================================================
+    // 图片使用情况 (order 1-9 对应 Banner 1-9):
+    // order 1 (Banner1): image1 ✅, image2 ✅, image3 ✅, image4 ❌
+    // order 2 (Banner2): image1 ✅, image2 ✅, image3 ✅, image4 ❌
+    // order 3 (Banner3): image1 ❌, image2 ✅, image3 ✅, image4 ✅
+    // order 4 (Banner4): image1 ❌, image2 ✅, image3 ✅, image4 ✅
+    // order 5 (Banner5): image1 ❌, image2 ✅, image3 ✅, image4 ✅
+    // order 6 (Banner6): image1 ✅, image2 ✅, image3 ❌, image4 ❌
+    // order 7 (Banner7): image1 ✅, image2 ✅, image3 ✅, image4 ✅
+    // order 8 (Banner8): image1 ✅, image2 ✅, image3 ✅, image4 ✅
+    // order 9 (Banner9): image1 ✅, image2 ✅, image3 ❌, image4 ❌
     {
       name: 'image1',
       type: 'upload',
       relationTo: 'media',
-      label: 'Image 1 | 图片1',
+      label: {
+        en: 'Image 1 (Background)',
+        zh: '图片1（背景图）',
+      },
       admin: {
         description: {
-          en: 'Select an image',
-          zh: '选择一张图片',
+          en: 'Background image for Banner 1,2,6,7,8,9',
+          zh: '用于 Banner 1,2,6,7,8,9 的背景图',
         },
         components: {
           Field: '@/components/fields/MediaPicker',
+        },
+        // 显示条件: order 为 1,2,6,7,8,9 时显示
+        condition: (data) => {
+          const order = data?.order
+          return [1, 2, 6, 7, 8, 9].includes(order)
         },
       },
     },
@@ -164,21 +182,37 @@ export const HeroBannerItems: CollectionConfig = {
       name: 'image2',
       type: 'upload',
       relationTo: 'media',
-      label: 'Image 2 | 图片2',
+      label: {
+        en: 'Image 2 (Decoration 1)',
+        zh: '图片2（装饰图1）',
+      },
       admin: {
+        description: {
+          en: 'Decoration image used in all banners',
+          zh: '所有 Banner 都使用的装饰图',
+        },
         components: {
           Field: '@/components/fields/MediaPicker',
         },
+        // 所有 banner 都使用 image2，无需条件
       },
     },
     {
       name: 'image3',
       type: 'upload',
       relationTo: 'media',
-      label: 'Image 3 | 图片3',
+      label: {
+        en: 'Image 3 (Decoration 2)',
+        zh: '图片3（装饰图2）',
+      },
       admin: {
         components: {
           Field: '@/components/fields/MediaPicker',
+        },
+        // 显示条件: order 为 1,2,3,4,5,7,8 时显示 (排除 6,9)
+        condition: (data) => {
+          const order = data?.order
+          return ![6, 9].includes(order)
         },
       },
     },
@@ -186,10 +220,18 @@ export const HeroBannerItems: CollectionConfig = {
       name: 'image4',
       type: 'upload',
       relationTo: 'media',
-      label: 'Image 4 | 图片4',
+      label: {
+        en: 'Image 4 (Decoration 3)',
+        zh: '图片4（装饰图3）',
+      },
       admin: {
         components: {
           Field: '@/components/fields/MediaPicker',
+        },
+        // 显示条件: order 为 3,4,5,7,8 时显示
+        condition: (data) => {
+          const order = data?.order
+          return [3, 4, 5, 7, 8].includes(order)
         },
       },
     },
