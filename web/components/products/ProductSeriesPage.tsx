@@ -158,7 +158,7 @@ export function ProductSeriesPage({ locale, slug }: ProductSeriesPageProps) {
 
   // Render product series content with sections
   return (
-    <div className="min-h-screen bg-background" data-header-theme="transparent">
+    <div className="min-h-screen bg-background" data-header-theme="light">
       {/* Hero Carousel Section */}
       {parsedContent.heroCarousel && (
         <HeroCarousel data={parsedContent.heroCarousel} />
