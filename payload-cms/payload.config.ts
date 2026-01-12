@@ -102,7 +102,7 @@ import { contentBlocks } from './src/blocks'
 
 // Custom Endpoints
 import { exportFormSubmissionsHandler } from './src/endpoints/exportFormSubmissions'
-import { translateHandler, testTranslationHandler } from './src/endpoints/translate'
+import { translateHandler, testTranslationHandler, saveUserTranslationSettingsHandler, getUserTranslationSettingsHandler } from './src/endpoints/translate'
 import {
   setup2FAHandler,
   enable2FAHandler,
@@ -614,6 +614,17 @@ export default buildConfig({
       path: '/translate/test',
       method: 'post',
       handler: testTranslationHandler,
+    },
+    // User Translation Settings
+    {
+      path: '/translate/settings',
+      method: 'get',
+      handler: getUserTranslationSettingsHandler,
+    },
+    {
+      path: '/translate/settings',
+      method: 'post',
+      handler: saveUserTranslationSettingsHandler,
     },
     // Email Test Endpoint
     {

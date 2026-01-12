@@ -35,6 +35,9 @@ import type { ProductOverviewData } from "@/lib/content-parser"
 const DESIGN_WIDTH = 1920
 const DESIGN_HEIGHT = 1159
 
+// Mobile breakpoint
+const MOBILE_BREAKPOINT = 768
+
 interface ProductOverviewProps {
   data: ProductOverviewData
   className?: string
@@ -58,7 +61,7 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
 
   const { titleLines = [], subtitleLines = [], brandName = '', description = '', images = [], ctaButton } = data
 
-  // Track which image index is at which position
+  // Track which image index is at which position (for desktop)
   // positions[positionIndex] = imageIndex
   // Position 0 = main, Position 1-4 = bg positions
   const [positions, setPositions] = React.useState<number[]>(() =>
@@ -88,10 +91,86 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
   }
 
   return (
-    <section
-      className={cn("relative w-full bg-[#F6F4ED] overflow-hidden", className)}
-      style={{ aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` }}
-    >
+    <>
+      {/* Mobile Layout */}
+      <section className={cn("md:hidden relative w-full bg-[#F6F4ED] px-6 py-12", className)}>
+        {/* Title */}
+        <h2 className="font-josefin-sans font-bold text-[#706933] text-3xl leading-tight mb-4">
+          {titleLines.map((line, index) => (
+            <span key={index}>
+              {line}
+              {index < titleLines.length - 1 && <br />}
+            </span>
+          ))}
+        </h2>
+
+        {/* Subtitle */}
+        <h3 className="font-josefin-sans font-semibold text-black text-xl mb-6">
+          {subtitleLines.map((line, index) => (
+            <span key={index}>
+              {line}
+              {index < subtitleLines.length - 1 && <br />}
+            </span>
+          ))}
+        </h3>
+
+        {/* Description */}
+        <p className="font-josefin-sans text-base leading-relaxed mb-8">
+          <span className="text-[#FFAA2B] font-bold text-lg">{brandName}</span>
+          <span className="text-black">{description}</span>
+        </p>
+
+        {/* Main Image */}
+        {images?.[positions[0]] && (
+          <div className="w-full rounded-2xl overflow-hidden shadow-lg mb-4">
+            <img
+              src={images[positions[0]]}
+              alt=""
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        )}
+
+        {/* Thumbnail Images Grid */}
+        {images.length > 1 && (
+          <div className="grid grid-cols-4 gap-2">
+            {positions.slice(1, 5).map((imageIndex, posIndex) => {
+              const img = images[imageIndex]
+              if (!img) return null
+              return (
+                <div
+                  key={`thumb-${imageIndex}`}
+                  className="rounded-lg overflow-hidden cursor-pointer"
+                  onClick={() => handleImageClick(posIndex + 1)}
+                >
+                  <img
+                    src={img}
+                    alt=""
+                    className="w-full h-auto object-cover"
+                  />
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* CTA Button - Mobile */}
+        {ctaButton && (
+          <Link
+            href={ctaButton.url}
+            className="mt-8 inline-flex items-center gap-2 px-6 py-3 border-2 border-[#756F3F] rounded-full font-anaheim font-medium text-[#756F3F] hover:bg-[#756F3F] hover:text-white transition-colors"
+          >
+            <div className="w-3 h-3 rounded-full bg-[#FFCC4A]" />
+            {ctaButton.text}
+          </Link>
+        )}
+      </section>
+
+      {/* Desktop Layout */}
+      <section
+        className={cn("hidden md:block relative w-full bg-[#F6F4ED] overflow-hidden", className)}
+        style={{ aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` }}
+      >
       {/* Decorative background circle - bouncing animation */}
       <div
         className="absolute rounded-full bg-[#F7F1DB]"
@@ -326,7 +405,8 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
           </Link>
         )
       })()}
-    </section>
+      </section>
+    </>
   )
 }
 

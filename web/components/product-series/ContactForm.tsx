@@ -309,16 +309,16 @@ export function ContactForm({ data, className }: ContactFormProps) {
         </div>
       )}
 
-      {/* Helper Title - "We'd love to hear from you!" at x=720, y=304 */}
+      {/* Helper Title - "We'd love to hear from you!" */}
       <h3
         className="absolute font-inter font-semibold animate-pulse-scale"
         style={{
-          left: px(720 - SECTION_X_OFFSET),
-          top: vw(304),  // 6095 - 5791
+          left: px(800 - SECTION_X_OFFSET),
+          top: vw(304),
           width: px(391),
           fontSize: vw(40),
           lineHeight: vw(58),
-          color: "#FFFF95",  // rgb(1, 1, 0.584) ≈ yellow
+          color: "#FFFF95",
           transformOrigin: "left center",
           zIndex: 10,
         }}
@@ -326,12 +326,12 @@ export function ContactForm({ data, className }: ContactFormProps) {
         {helperTitle || "We'd love to hear from you!"}
       </h3>
 
-      {/* Helper Text at x=720, y=436 */}
+      {/* Helper Text */}
       <p
         className="absolute font-inter"
         style={{
-          left: px(720 - SECTION_X_OFFSET),
-          top: vw(436),  // 6227 - 5791
+          left: px(800 - SECTION_X_OFFSET),
+          top: vw(436),
           width: px(391),
           fontSize: vw(20),
           lineHeight: vw(33),
@@ -429,7 +429,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
 
         {/* Upload File Button */}
         <label
-          className="flex items-center justify-center gap-2 cursor-pointer self-end"
+          className="flex items-center justify-center gap-2 cursor-pointer self-end transition-all duration-300 hover:opacity-100 hover:bg-white/20 hover:border-white"
           style={{
             width: vw(256),
             height: vw(58),
@@ -465,7 +465,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center justify-center text-white font-anaheim font-semibold transition-all hover:brightness-110 disabled:opacity-70 animate-pulse-scale"
+          className="flex items-center justify-center text-white font-anaheim font-semibold transition-all duration-300 hover:scale-110 disabled:opacity-70 animate-pulse-scale"
           style={{
             width: vw(486),
             height: vw(83),
@@ -473,6 +473,15 @@ export function ContactForm({ data, className }: ContactFormProps) {
             borderRadius: vw(63),
             fontSize: vw(32),
             marginTop: vw(10),
+            boxShadow: "0 4px 15px rgba(0, 0, 0, 0.2)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#C4B440"
+            e.currentTarget.style.boxShadow = "0 8px 30px rgba(196, 180, 64, 0.5)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "#9C9032"
+            e.currentTarget.style.boxShadow = "0 4px 15px rgba(0, 0, 0, 0.2)"
           }}
         >
           {isSubmitting ? "Sending..." : "Send Inquiry"}

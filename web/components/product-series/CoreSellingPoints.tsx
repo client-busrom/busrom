@@ -29,8 +29,18 @@ import type { CoreSellingPointsData } from "@/lib/content-parser"
 
 // Design constants
 const DESIGN_WIDTH = 1920
-const DESIGN_HEIGHT = 2257
-const SECTION_Y_OFFSET = 2506 // Where this section starts in full page
+// 第一屏：Title + 图片画廊 + Tech Spec (922px)
+// 第二屏：Product Advantages (1100px)
+const FIRST_SCREEN_HEIGHT = 922
+const SECOND_SCREEN_HEIGHT = 1100
+const DESIGN_HEIGHT = FIRST_SCREEN_HEIGHT + SECOND_SCREEN_HEIGHT
+
+// 用于第二屏元素的Y坐标偏移计算
+// 原始设计中 Product Advantages 从 y:3506 开始（相对于整个页面）
+// 现在需要从 FIRST_SCREEN_HEIGHT (922px) 开始，再上移 200px
+const ORIGINAL_ADVANTAGES_START = 3506
+const ADVANTAGES_EXTRA_OFFSET = 200
+const ADVANTAGES_Y_OFFSET = ORIGINAL_ADVANTAGES_START - FIRST_SCREEN_HEIGHT + ADVANTAGES_EXTRA_OFFSET
 
 interface CoreSellingPointsProps {
   data: CoreSellingPointsData
@@ -136,15 +146,16 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
         }}
       />
 
-      {/* ===== TITLE AREA ===== */}
+      {/* ===== FIRST SCREEN: TITLE + GALLERY + TECH SPEC (922px) ===== */}
+
       {/* Draggable Image List (behind title) */}
       <div
         ref={imageContainerRef}
         className="absolute flex gap-4 cursor-grab active:cursor-grabbing select-none"
         style={{
           left: `${(734 / DESIGN_WIDTH) * 100}%`,
-          top: `${((2632 - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
-          height: `${(412 / DESIGN_WIDTH) * 100}vw`,
+          top: `${(80 / DESIGN_HEIGHT) * 100}%`,
+          height: `${(280 / DESIGN_WIDTH) * 100}vw`,
           transform: `translateX(${currentTranslate}px)`,
           transition: isDragging ? 'none' : 'transform 0.3s ease-out',
           zIndex: 1,
@@ -162,9 +173,9 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
             key={`title-img-${index}`}
             className="relative flex-shrink-0 overflow-hidden bg-white pointer-events-none"
             style={{
-              width: `${(650 / DESIGN_WIDTH) * 100}vw`,
-              height: `${(412 / DESIGN_WIDTH) * 100}vw`,
-              borderRadius: `${(30 / DESIGN_WIDTH) * 100}vw`,
+              width: `${(440 / DESIGN_WIDTH) * 100}vw`,
+              height: `${(280 / DESIGN_WIDTH) * 100}vw`,
+              borderRadius: `${(20 / DESIGN_WIDTH) * 100}vw`,
             }}
           >
             <OptimizedImage image={img} alt="" size="medium" className="absolute inset-0 w-full h-full object-cover" />
@@ -172,15 +183,15 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
         ))}
       </div>
 
-      {/* Main Title (above images, supports /n line breaks) */}
+      {/* Main Title (above images) */}
       <h2
         className="absolute font-anaheim font-extrabold gradient-text-shine-white"
         style={{
           left: `${(153 / DESIGN_WIDTH) * 100}%`,
-          top: `${((2677 - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
-          width: `${(851 / DESIGN_WIDTH) * 100}%`,
-          fontSize: `${(128 / DESIGN_WIDTH) * 100}vw`,
-          lineHeight: `${108 / 128}`,
+          top: `${(100 / DESIGN_HEIGHT) * 100}%`,
+          width: `${(700 / DESIGN_WIDTH) * 100}%`,
+          fontSize: `${(86 / DESIGN_WIDTH) * 100}vw`,
+          lineHeight: `${80 / 86}`,
           zIndex: 2,
         }}
       >
@@ -197,22 +208,21 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
       <div
         className="absolute"
         style={{
-          left: `${(652 / DESIGN_WIDTH) * 100}%`,
-          top: `${((3163 - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
-          width: `${(1269 / DESIGN_WIDTH) * 100}vw`,
-          height: `${(693 / DESIGN_WIDTH) * 100}vw`,
+          left: `${(550 / DESIGN_WIDTH) * 100}%`,
+          top: `${(400 / DESIGN_HEIGHT) * 100}%`,
+          width: `${(1370 / DESIGN_WIDTH) * 100}vw`,
+          height: `${(480 / DESIGN_WIDTH) * 100}vw`,
           backgroundColor: '#FFFDE9',
-          borderTopLeftRadius: `${(30 / DESIGN_WIDTH) * 100}vw`,
-          borderBottomLeftRadius: `${(30 / DESIGN_WIDTH) * 100}vw`,
+          borderTopLeftRadius: `${(20 / DESIGN_WIDTH) * 100}vw`,
+          borderBottomLeftRadius: `${(20 / DESIGN_WIDTH) * 100}vw`,
         }}
       />
 
       {/* Tech Spec Left Images with Swap */}
       {techSpecImages.slice(0, 2).map((img, index) => {
-        // Position config based on which image is "main"
         const isMain = index === techSpecMainIndex
-        const mainPos = { x: 278, y: 3367, w: 316, h: 432, radius: 30 }
-        const smallPos = { x: 157, y: 3538, w: 194, h: 221, radius: 18 }
+        const mainPos = { x: 200, y: 480, w: 260, h: 350, radius: 20 }
+        const smallPos = { x: 120, y: 620, w: 160, h: 180, radius: 12 }
         const pos = isMain ? mainPos : smallPos
 
         if (!img) return null
@@ -223,7 +233,7 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
             className="absolute overflow-hidden bg-white transition-all duration-500 ease-in-out"
             style={{
               left: `${(pos.x / DESIGN_WIDTH) * 100}%`,
-              top: `${((pos.y - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
+              top: `${(pos.y / DESIGN_HEIGHT) * 100}%`,
               width: `${(pos.w / DESIGN_WIDTH) * 100}vw`,
               height: `${(pos.h / DESIGN_WIDTH) * 100}vw`,
               borderRadius: `${(pos.radius / DESIGN_WIDTH) * 100}vw`,
@@ -240,19 +250,14 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
         <button
           className="absolute cursor-pointer z-10"
           style={{
-            left: `${(236 / DESIGN_WIDTH) * 100}%`,
-            top: `${((3217 - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
-            width: `${(84 / DESIGN_WIDTH) * 100}vw`,
-            height: `${(84 / DESIGN_WIDTH) * 100}vw`,
+            left: `${(160 / DESIGN_WIDTH) * 100}%`,
+            top: `${(420 / DESIGN_HEIGHT) * 100}%`,
+            width: `${(60 / DESIGN_WIDTH) * 100}vw`,
+            height: `${(60 / DESIGN_WIDTH) * 100}vw`,
           }}
           onClick={swapTechSpecImages}
         >
-          {/* White circle with arrow icon */}
-          <svg
-            className="w-full h-full"
-            viewBox="0 0 85 85"
-            fill="none"
-          >
+          <svg className="w-full h-full" viewBox="0 0 85 85" fill="none">
             <circle cx="42.1816" cy="42.1816" r="37.8399" transform="rotate(6.07406 42.1816 42.1816)" stroke="white"/>
             <path d="M58.047 41.8215L58.0462 41.7988C58.0309 41.4968 57.9237 41.2067 57.739 40.9672L57.7281 40.9533L57.7309 40.9573C57.6645 40.8621 57.5891 40.7737 57.5056 40.6931L57.4817 40.6705L46.4688 30.4222C45.7476 29.7511 44.6195 29.7923 43.9493 30.5143L43.9294 30.5361C43.2801 31.2588 43.3277 32.372 44.0415 33.0363L52.1138 40.548L28.0729 41.4272C27.2519 41.4572 26.6107 42.1479 26.6407 42.9697L26.6484 43.1781C26.6913 43.9881 27.3756 44.617 28.1885 44.5873L52.2294 43.7082L44.7273 51.7895C44.0571 52.5114 44.0984 53.6404 44.8195 54.3114C45.5406 54.9826 46.6687 54.9413 47.339 54.2194L57.5748 43.1932L57.5961 43.1699C57.6665 43.0913 57.7297 43.0067 57.7852 42.917L57.7991 42.8941L57.7963 42.8983C57.9756 42.6358 58.0658 42.3226 58.0538 42.0049L58.047 41.8215Z" fill="white"/>
           </svg>
@@ -263,10 +268,10 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
       <h3
         className="absolute font-lilita-one gradient-text-shine-olive"
         style={{
-          left: `${(727 / DESIGN_WIDTH) * 100}%`,
-          top: `${((3217 - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
-          fontSize: `${(64 / DESIGN_WIDTH) * 100}vw`,
-          lineHeight: `${57 / 64}`,
+          left: `${(610 / DESIGN_WIDTH) * 100}%`,
+          top: `${(420 / DESIGN_HEIGHT) * 100}%`,
+          fontSize: `${(48 / DESIGN_WIDTH) * 100}vw`,
+          lineHeight: 1,
         }}
       >
         {techSpecTitle}
@@ -274,9 +279,9 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
 
       {/* Tech Spec Items */}
       {techSpecItems.map((item, index) => {
-        const yPositions = [3315, 3388, 3462, 3541, 3620, 3714]
-        const valueYPositions = [3328, 3403, 3475, 3544, 3627, 3723]
-        const separatorYPositions = [3377, 3454, 3531, 3608, 3702]
+        const startY = 500
+        const itemHeight = 60
+        const yPos = startY + index * itemHeight
 
         return (
           <React.Fragment key={`spec-${index}`}>
@@ -284,10 +289,10 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
             <span
               className="absolute font-inter font-semibold text-[#464010]"
               style={{
-                left: `${(727 / DESIGN_WIDTH) * 100}%`,
-                top: `${((yPositions[index] - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
-                fontSize: `${(24 / DESIGN_WIDTH) * 100}vw`,
-                lineHeight: `${57 / 24}`,
+                left: `${(610 / DESIGN_WIDTH) * 100}%`,
+                top: `${(yPos / DESIGN_HEIGHT) * 100}%`,
+                fontSize: `${(20 / DESIGN_WIDTH) * 100}vw`,
+                lineHeight: 1.5,
               }}
             >
               {item.key}
@@ -297,24 +302,24 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
             <span
               className="absolute font-inter text-black"
               style={{
-                left: `${(1083 / DESIGN_WIDTH) * 100}%`,
-                top: `${((valueYPositions[index] - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
-                width: `${(707 / DESIGN_WIDTH) * 100}vw`,
-                fontSize: `${(20 / DESIGN_WIDTH) * 100}vw`,
-                lineHeight: `${30 / 20}`,
+                left: `${(920 / DESIGN_WIDTH) * 100}%`,
+                top: `${(yPos / DESIGN_HEIGHT) * 100}%`,
+                width: `${(850 / DESIGN_WIDTH) * 100}vw`,
+                fontSize: `${(18 / DESIGN_WIDTH) * 100}vw`,
+                lineHeight: 1.5,
               }}
             >
               {item.value}
             </span>
 
             {/* Separator line */}
-            {index < separatorYPositions.length && (
+            {index < techSpecItems.length - 1 && (
               <div
                 className="absolute bg-[#DFD8B8]"
                 style={{
-                  left: `${(727 / DESIGN_WIDTH) * 100}%`,
-                  top: `${((separatorYPositions[index] - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
-                  width: `${(1030 / DESIGN_WIDTH) * 100}vw`,
+                  left: `${(610 / DESIGN_WIDTH) * 100}%`,
+                  top: `${((yPos + 45) / DESIGN_HEIGHT) * 100}%`,
+                  width: `${(1160 / DESIGN_WIDTH) * 100}vw`,
                   height: '1px',
                 }}
               />
@@ -323,13 +328,13 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
         )
       })}
 
-      {/* ===== PRODUCT ADVANTAGES AREA ===== */}
+      {/* ===== SECOND SCREEN: PRODUCT ADVANTAGES AREA (starts at y:922) ===== */}
       {/* Advantages Title (behind image) */}
       <h3
         className="absolute font-josefin-sans font-bold text-[#464010]"
         style={{
           left: `${(153 / DESIGN_WIDTH) * 100}%`,
-          top: `${((4087 - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
+          top: `${((4087 - ADVANTAGES_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
           width: `${(717 / DESIGN_WIDTH) * 100}%`,
           fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
           lineHeight: `${101 / 96}`,
@@ -344,7 +349,7 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
           className="absolute overflow-hidden transition-all duration-500"
           style={{
             left: `${(468 / DESIGN_WIDTH) * 100}%`,
-            top: `${((4016 - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
+            top: `${((4016 - ADVANTAGES_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
             width: `${(518 / DESIGN_WIDTH) * 100}vw`,
             height: `${(605 / DESIGN_WIDTH) * 100}vw`,
             borderRadius: `${(60 / DESIGN_WIDTH) * 100}vw`,
@@ -373,7 +378,7 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
         className="absolute text-black transition-all duration-300 whitespace-nowrap font-jomhuria animate-pulse-scale"
         style={{
           left: `${(1097 / DESIGN_WIDTH) * 100}%`,
-          top: `${((4040 - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
+          top: `${((4040 - ADVANTAGES_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
           fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
           lineHeight: 1,
           transformOrigin: 'left center',
@@ -400,7 +405,7 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
         className="absolute cursor-pointer group"
         style={{
           left: `${(NAV_BUTTON_LEFT_X / DESIGN_WIDTH) * 100}%`,
-          top: `${((NAV_BUTTON_LEFT_Y - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
+          top: `${((NAV_BUTTON_LEFT_Y - ADVANTAGES_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
           width: `${(NAV_BUTTON_WIDTH / DESIGN_WIDTH) * 100}vw`,
           height: `${(NAV_BUTTON_HEIGHT / DESIGN_WIDTH) * 100}vw`,
         }}
@@ -430,7 +435,7 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
         className="absolute cursor-pointer group"
         style={{
           left: `${(NAV_BUTTON_RIGHT_X / DESIGN_WIDTH) * 100}%`,
-          top: `${((NAV_BUTTON_RIGHT_Y - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
+          top: `${((NAV_BUTTON_RIGHT_Y - ADVANTAGES_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
           width: `${(NAV_BUTTON_WIDTH / DESIGN_WIDTH) * 100}vw`,
           height: `${(NAV_BUTTON_HEIGHT / DESIGN_WIDTH) * 100}vw`,
         }}
@@ -473,7 +478,7 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
             className="absolute cursor-pointer transition-all duration-500 ease-out"
             style={{
               left: `${(1076 / DESIGN_WIDTH) * 100}%`,
-              top: `${((baseY - SECTION_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
+              top: `${((baseY - ADVANTAGES_Y_OFFSET) / DESIGN_HEIGHT) * 100}%`,
               width: `${(681 / DESIGN_WIDTH) * 100}vw`,
               height: isExpanded ? `${(208 / DESIGN_WIDTH) * 100}vw` : `${(105 / DESIGN_WIDTH) * 100}vw`,
               borderRadius: `${(52.5 / DESIGN_WIDTH) * 100}vw`,
