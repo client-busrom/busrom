@@ -166,6 +166,14 @@ html, body {
   -webkit-text-stroke: 0.04em#565020;
   text-stroke: 0.04em#565020;
 }
+
+.text-stroke-dark-olive {
+  text-shadow:
+    -1px -1px 0 #464010,
+     1px -1px 0 #464010,
+    -1px  1px 0 #464010,
+     1px  1px 0 #464010;
+}
 /* Skeleton shimmer animation */
 @keyframes shimmer {
   0% {
@@ -195,6 +203,87 @@ html, body {
     left: 4px;
     transform: translateY(-50%);
   }
+}
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* 字符跳动动画 - 带暂停间隔 */
+@keyframes charBounce {
+  0%, 14%, 100% {
+    transform: translateY(0);
+  }
+  7% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-char-bounce {
+  animation: charBounce 4s ease-in-out infinite;
+}
+
+/* 箭头循环移动动画 */
+@keyframes arrowFloat {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(3px, -3px);
+  }
+}
+
+@keyframes arrowFloatLarge {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(8px, -8px);
+  }
+}
+
+.animate-arrow-float {
+  animation: arrowFloat 2s ease-in-out infinite;
+}
+
+.animate-arrow-float-large {
+  animation: arrowFloatLarge 1s ease-in-out infinite;
+}
+
+/* 箭头链接 - 默认小幅度循环，悬停时大幅度 */
+.arrow-link {
+  animation: arrowFloat 2s ease-in-out infinite;
+}
+
+.group\/title:hover .arrow-link {
+  animation: arrowFloatLarge 1s ease-in-out infinite;
+}
+
+/* 百叶窗条纹收起动画 - 水平方向，从左到右 */
+@keyframes blindStripHorizontal {
+  0%, 10% {
+    transform: scaleX(1);
+  }
+  40%, 100% {
+    transform: scaleX(0);
+  }
+}
+
+.animate-blind-strip-horizontal {
+  transform-origin: left center;
+  animation: blindStripHorizontal 3s ease-out infinite;
 }
 
 /* 装饰小球弹跳动画 - 模拟物理弹跳到边缘 */

@@ -227,12 +227,16 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
             ...sourceItem, // Keep non-text fields (image, sceneImage, linkUrl, isShow)
           }
 
+          // Get user's personal translation settings
+          const { getTranslationHeaders } = await import('@/lib/translation-client')
+          const personalHeaders = getTranslationHeaders()
+
           // Translate title
           if (sourceItem.title) {
             try {
               const response = await fetch('/api/translate', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...personalHeaders },
                 credentials: 'include',
                 body: JSON.stringify({
                   text: sourceItem.title,
@@ -255,7 +259,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
             try {
               const response = await fetch('/api/translate', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...personalHeaders },
                 credentials: 'include',
                 body: JSON.stringify({
                   text: sourceItem.buttonText,

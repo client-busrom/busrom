@@ -266,9 +266,13 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
           }
 
           try {
+            // Get user's personal translation settings
+            const { getTranslationHeaders } = await import('@/lib/translation-client')
+            const personalHeaders = getTranslationHeaders()
+
             const res = await fetch('/api/translate', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 'Content-Type': 'application/json', ...personalHeaders },
               body: JSON.stringify({
                 texts: textsToTranslate,
                 sourceLang: activeLocale,
@@ -543,9 +547,24 @@ function extractTextsFromLexical(node: unknown, path: (string | number)[] = []):
 
   const obj = node as Record<string, unknown>
 
+  // Skip code blocks entirely (type === 'code')
+  if (obj.type === 'code') {
+    return segments
+  }
+
   // If this node has a text property (text node)
   if (typeof obj.text === 'string' && obj.text.trim()) {
-    segments.push({ text: obj.text, path: [...path, 'text'] })
+    const text = obj.text
+
+    // Check if this text node has code format
+    // In Lexical, format is a bitmask: 1=bold, 2=italic, 4=strikethrough, 8=underline, 16=code, 32=subscript, 64=superscript
+    const textFormat = typeof obj.format === 'number' ? obj.format : 0
+    const isCodeFormat = (textFormat & 16) !== 0
+
+    // Skip if text is in code format - these are component keys (e.g., hero-carousel, hero-carousel-title)
+    if (!isCodeFormat) {
+      segments.push({ text: obj.text, path: [...path, 'text'] })
+    }
   }
 
   // Handle Lexical Block nodes (layout blocks like TwoColumns, ThreeColumns, etc.)

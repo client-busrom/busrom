@@ -252,9 +252,13 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
 
         if (localesToTranslate.length === 0) continue
 
+        // Get user's personal translation settings
+        const { getTranslationHeaders } = await import('@/lib/translation-client')
+        const personalHeaders = getTranslationHeaders()
+
         const res = await fetch('/api/translate', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...personalHeaders },
           body: JSON.stringify({
             text: sourceValue,
             sourceLang: sourceLocale,

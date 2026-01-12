@@ -233,10 +233,10 @@ function SupportCard({ card, index }: SupportCardProps) {
           }}
         >
           <Icon
+            className="text-brand-light-olive"
             style={{
               width: rpx(60),
               height: rpx(60),
-              color: "#827A3C",
             }}
             strokeWidth={1.5}
           />
@@ -300,7 +300,7 @@ export function SupportNarrativeSection({
           height: vw(792),
           left: vw(-207),
           top: vw(398),
-          backgroundColor: "rgba(255, 245, 168, 0.38)",
+          backgroundColor: "rgb(255 245 168 / 0.38)",
           filter: `blur(${vw(104)})`,
         }}
         animate={{
@@ -322,7 +322,7 @@ export function SupportNarrativeSection({
           height: vw(148),
           left: vw(1196),
           top: vw(724),
-          backgroundColor: "rgba(255, 245, 168, 0.54)",
+          backgroundColor: "rgb(255 245 168 / 0.54)",
           filter: `blur(${vw(104)})`,
         }}
         animate={{
@@ -344,7 +344,7 @@ export function SupportNarrativeSection({
           height: vw(406),
           left: vw(1450),
           top: vw(0),
-          backgroundColor: "rgba(255, 245, 168, 0.30)",
+          backgroundColor: "rgb(255 245 168 / 0.30)",
           filter: `blur(${vw(104)})`,
         }}
         animate={{

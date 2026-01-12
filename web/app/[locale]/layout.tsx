@@ -127,6 +127,22 @@ const lilitaOne = localFont({
   preload: false,
 });
 
+const kaushanScript = localFont({
+  src: "../../public/fonts/KaushanScript-Regular.ttf",
+  weight: "400",
+  variable: "--font-kaushan-script",
+  display: "swap",
+  preload: false,
+});
+
+const moul = localFont({
+  src: "../../public/fonts/Moul-Regular.ttf",
+  weight: "400",
+  variable: "--font-moul",
+  display: "swap",
+  preload: false,
+});
+
 export function generateStaticParams() {
   // 动态生成所有支持的 locale 参数
   return locales.map(locale => ({ locale }));
@@ -165,6 +181,8 @@ export default async function RootLayout({
       ${josefinSans.variable}
       ${joan.variable}
       ${lilitaOne.variable}
+      ${kaushanScript.variable}
+      ${moul.variable}
       font-sans
     `}
     >
