@@ -63,11 +63,17 @@ export function middleware(request: NextRequest) {
     // 使用 rewrite 将 / 映射到 /en (内部路由，URL 不变)
     const url = request.nextUrl.clone();
     url.pathname = `/${defaultLocale}${pathname}`;
-    return NextResponse.rewrite(url);
+    const response = NextResponse.rewrite(url);
+    // Add Vary header to prevent CDN from caching RSC payload for HTML requests
+    response.headers.set('Vary', 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch');
+    return response;
   }
 
   // 4. 有非默认语言前缀的路径，直接通过
-  return NextResponse.next();
+  const response = NextResponse.next();
+  // Add Vary header to prevent CDN from caching RSC payload for HTML requests
+  response.headers.set('Vary', 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch');
+  return response;
 }
 
 export const config = {

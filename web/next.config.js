@@ -320,6 +320,12 @@ const nextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
           },
+          // Vary header - Critical for CDN to cache correctly based on Accept header
+          // Prevents RSC payload from being served to HTML requests
+          {
+            key: 'Vary',
+            value: 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch',
+          },
         ],
       },
     ]
