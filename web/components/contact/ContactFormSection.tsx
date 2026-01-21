@@ -7,8 +7,8 @@ import { Turnstile } from "@/components/ui/turnstile"
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920
-const SECTION_HEIGHT = 1098
-const DEFAULT_TEXTAREA_HEIGHT = 127 // 默认 textarea 高度
+const SECTION_HEIGHT = 922
+const DEFAULT_TEXTAREA_HEIGHT = 100 // 默认 textarea 高度
 
 interface MediaObject {
   id: string
@@ -331,17 +331,17 @@ export function ContactFormSection({
         className="absolute"
         style={{
           left: vw(373),
-          top: vw(97),
-          width: vw(596),
+          top: vw(70),
+          width: vw(520),
         }}
       >
         {/* 标题阴影层 */}
         <h2
           className="absolute font-moul"
           style={{
-            top: vw(5),
-            fontSize: vw(48),
-            lineHeight: vw(63),
+            top: vw(4),
+            fontSize: vw(40),
+            lineHeight: vw(52),
             color: "#4B3A02",
           }}
         >
@@ -351,8 +351,8 @@ export function ContactFormSection({
         <h2
           className="relative font-moul"
           style={{
-            fontSize: vw(48),
-            lineHeight: vw(63),
+            fontSize: vw(40),
+            lineHeight: vw(52),
             color: "#B08B07",
           }}
         >
@@ -365,10 +365,10 @@ export function ContactFormSection({
         className="absolute font-moul"
         style={{
           left: vw(372),
-          top: vw(267),
-          width: vw(596),
-          fontSize: vw(32),
-          lineHeight: vw(48),
+          top: vw(210),
+          width: vw(520),
+          fontSize: vw(26),
+          lineHeight: vw(40),
           color: "#4B3A02",
         }}
       >
@@ -381,9 +381,9 @@ export function ContactFormSection({
         className="absolute flex flex-col"
         style={{
           left: vw(1188),
-          top: vw(104),
+          top: vw(80),
           width: vw(486),
-          gap: vw(20),  // 输入框之间的间距
+          gap: vw(12),  // 输入框之间的间距（收缩）
         }}
       >
         {/* 动态渲染表单字段 */}
@@ -402,13 +402,13 @@ export function ContactFormSection({
                   className="font-anaheim font-semibold placeholder:text-white/95"
                   style={{
                     width: vw(486),
-                    height: vw(63),
-                    borderRadius: vw(15),
+                    height: vw(50),
+                    borderRadius: vw(12),
                     backgroundColor: "#B4A25F",
                     border: "1px solid rgba(255, 255, 255, 0.34)",
-                    paddingLeft: vw(29),
-                    fontSize: vw(20),
-                    lineHeight: vw(40),
+                    paddingLeft: vw(24),
+                    fontSize: vw(18),
+                    lineHeight: vw(36),
                     color: "white",
                   }}
                   required={field.required}
@@ -416,21 +416,7 @@ export function ContactFormSection({
                 />
               )
             })}
-            {/* Message 标签 */}
-            {sortedFields.some(f => f.fieldType === "textarea" || f.fieldName === "message") && (
-              <label
-                className="font-anaheim font-semibold"
-                style={{
-                  fontSize: vw(22),
-                  lineHeight: vw(23),
-                  color: "#6B5500",
-                  marginTop: vw(10),
-                }}
-              >
-                Message Note
-              </label>
-            )}
-            {/* Textarea */}
+            {/* Textarea - 不显示 Message Note 标签 */}
             {sortedFields.filter(f => f.fieldType === "textarea" || f.fieldName === "message").map(field => (
               <textarea
                 key={field.fieldName}
@@ -441,16 +427,16 @@ export function ContactFormSection({
                 className="font-anaheim font-semibold placeholder:text-white/95 resize-y"
                 style={{
                   width: vw(486),
-                  minHeight: vw(127),
-                  maxHeight: vw(300),
-                  borderRadius: vw(15),
+                  minHeight: vw(100),
+                  maxHeight: vw(250),
+                  borderRadius: vw(12),
                   backgroundColor: "#B4A25F",
                   border: "1px solid rgba(255, 255, 255, 0.34)",
-                  paddingLeft: vw(29),
-                  paddingRight: vw(29),
-                  paddingTop: vw(17),
-                  fontSize: vw(20),
-                  lineHeight: vw(23),
+                  paddingLeft: vw(24),
+                  paddingRight: vw(24),
+                  paddingTop: vw(14),
+                  fontSize: vw(18),
+                  lineHeight: vw(22),
                   color: "white",
                 }}
                 required={field.required}
@@ -468,9 +454,9 @@ export function ContactFormSection({
               onChange={(e) => handleInputChange("name", e.target.value)}
               className="font-anaheim font-semibold placeholder:text-white/95"
               style={{
-                width: vw(486), height: vw(63), borderRadius: vw(15),
+                width: vw(486), height: vw(50), borderRadius: vw(12),
                 backgroundColor: "#B4A25F", border: "1px solid rgba(255, 255, 255, 0.34)",
-                paddingLeft: vw(29), fontSize: vw(20), lineHeight: vw(40), color: "white",
+                paddingLeft: vw(24), fontSize: vw(18), lineHeight: vw(36), color: "white",
               }}
               required
               disabled={isSubmitting}
@@ -482,9 +468,9 @@ export function ContactFormSection({
               onChange={(e) => handleInputChange("email", e.target.value)}
               className="font-anaheim font-semibold placeholder:text-white/95"
               style={{
-                width: vw(486), height: vw(63), borderRadius: vw(15),
+                width: vw(486), height: vw(50), borderRadius: vw(12),
                 backgroundColor: "#B4A25F", border: "1px solid rgba(255, 255, 255, 0.34)",
-                paddingLeft: vw(29), fontSize: vw(20), lineHeight: vw(40), color: "white",
+                paddingLeft: vw(24), fontSize: vw(18), lineHeight: vw(36), color: "white",
               }}
               required
               disabled={isSubmitting}
@@ -496,9 +482,9 @@ export function ContactFormSection({
               onChange={(e) => handleInputChange("whatsapp", e.target.value)}
               className="font-anaheim font-semibold placeholder:text-white/95"
               style={{
-                width: vw(486), height: vw(63), borderRadius: vw(15),
+                width: vw(486), height: vw(50), borderRadius: vw(12),
                 backgroundColor: "#B4A25F", border: "1px solid rgba(255, 255, 255, 0.34)",
-                paddingLeft: vw(29), fontSize: vw(20), lineHeight: vw(40), color: "white",
+                paddingLeft: vw(24), fontSize: vw(18), lineHeight: vw(36), color: "white",
               }}
               disabled={isSubmitting}
             />
@@ -509,18 +495,12 @@ export function ContactFormSection({
               onChange={(e) => handleInputChange("country", e.target.value)}
               className="font-anaheim font-semibold placeholder:text-white/95"
               style={{
-                width: vw(486), height: vw(63), borderRadius: vw(15),
+                width: vw(486), height: vw(50), borderRadius: vw(12),
                 backgroundColor: "#B4A25F", border: "1px solid rgba(255, 255, 255, 0.34)",
-                paddingLeft: vw(29), fontSize: vw(20), lineHeight: vw(40), color: "white",
+                paddingLeft: vw(24), fontSize: vw(18), lineHeight: vw(36), color: "white",
               }}
               disabled={isSubmitting}
             />
-            <label
-              className="font-anaheim font-semibold"
-              style={{ fontSize: vw(22), lineHeight: vw(23), color: "#6B5500", marginTop: vw(10) }}
-            >
-              Message Note
-            </label>
             <textarea
               ref={textareaRef}
               placeholder="Please Briefly Describe Your Project Requirements Or Customization Ideas."
@@ -528,10 +508,10 @@ export function ContactFormSection({
               onChange={(e) => handleInputChange("message", e.target.value)}
               className="font-anaheim font-semibold placeholder:text-white/95 resize-y"
               style={{
-                width: vw(486), minHeight: vw(127), maxHeight: vw(300), borderRadius: vw(15),
+                width: vw(486), minHeight: vw(100), maxHeight: vw(250), borderRadius: vw(12),
                 backgroundColor: "#B4A25F", border: "1px solid rgba(255, 255, 255, 0.34)",
-                paddingLeft: vw(29), paddingRight: vw(29), paddingTop: vw(17),
-                fontSize: vw(20), lineHeight: vw(23), color: "white",
+                paddingLeft: vw(24), paddingRight: vw(24), paddingTop: vw(14),
+                fontSize: vw(18), lineHeight: vw(22), color: "white",
               }}
               disabled={isSubmitting}
             />
@@ -539,7 +519,7 @@ export function ContactFormSection({
         )}
 
         {/* Upload File 按钮 - 在 textarea 下方右侧 */}
-        <div className="flex justify-end" style={{ marginTop: vw(-10) }}>
+        <div className="flex justify-end" style={{ marginTop: vw(8) }}>
           <label
             className="flex items-center cursor-pointer group transition-colors duration-300 hover:bg-[#6B5500]"
             style={{
@@ -687,10 +667,10 @@ export function ContactFormSection({
         className="absolute overflow-hidden"
         style={{
           left: vw(4),
-          top: vw(542),
-          width: vw(893),
-          height: vw(391),
-          borderRadius: vw(302),
+          top: vw(420),
+          width: vw(780),
+          height: vw(340),
+          borderRadius: vw(260),
           backgroundColor: "#D9D9D9",
         }}
       >
@@ -713,10 +693,10 @@ export function ContactFormSection({
         <div
           className="absolute rounded-full border-2"
           style={{
-            left: vw(474),
-            top: vw(337),
-            width: vw(171),
-            height: vw(171),
+            left: vw(420),
+            top: vw(290),
+            width: vw(140),
+            height: vw(140),
             borderColor: "white",
           }}
         />
@@ -727,12 +707,12 @@ export function ContactFormSection({
       <span
         className="absolute font-moul whitespace-nowrap"
         style={{
-          left: vw(202),
-          top: vw(669),
-          width: vw(90),
-          height: vw(692),
-          fontSize: vw(96),
-          lineHeight: vw(90),
+          left: vw(180),
+          top: vw(580),
+          width: vw(80),
+          height: vw(600),
+          fontSize: vw(80),
+          lineHeight: vw(75),
           transform: "rotate(-90deg)",
           transformOrigin: "top left",
           color: "#302C06",
@@ -745,21 +725,21 @@ export function ContactFormSection({
         className="absolute overflow-hidden pointer-events-none"
         style={{
           left: vw(4),
-          top: vw(542),
-          width: vw(893),
-          height: vw(391),
-          borderRadius: vw(302),
+          top: vw(420),
+          width: vw(780),
+          height: vw(340),
+          borderRadius: vw(260),
         }}
       >
         <span
           className="absolute font-moul whitespace-nowrap"
           style={{
-            left: vw(198),  // 202-4=198 相对于裁切容器
-            top: vw(127),   // 669-542=127 相对于裁切容器
-            width: vw(90),
-            height: vw(692),
-            fontSize: vw(96),
-            lineHeight: vw(90),
+            left: vw(176),
+            top: vw(160),
+            width: vw(80),
+            height: vw(600),
+            fontSize: vw(80),
+            lineHeight: vw(75),
             transform: "rotate(-90deg)",
             transformOrigin: "top left",
             color: "white",
@@ -776,10 +756,10 @@ export function ContactFormSection({
           <div
             className="absolute rounded-full border group cursor-pointer"
             style={{
-              left: vw(478),
-              top: vw(879),
-              width: vw(171),
-              height: vw(171),
+              left: vw(424),
+              top: vw(710),
+              width: vw(140),
+              height: vw(140),
               borderColor: "#464010",
             }}
             onMouseEnter={() => setIsHoveringControl(true)}
@@ -829,9 +809,9 @@ export function ContactFormSection({
           <div
             className="absolute"
             style={{
-              left: vw(153),
-              top: vw(964),
-              width: vw(278),
+              left: vw(140),
+              top: vw(800),
+              width: vw(240),
               height: vw(3),
               backgroundColor: "#464010",
               opacity: 0.3,
@@ -842,9 +822,9 @@ export function ContactFormSection({
           <div
             className="absolute transition-all duration-100"
             style={{
-              left: vw(153),
-              top: vw(964),
-              width: `calc(${vw(278)} * ${(currentImageIndex + 1) / validImages.length})`,
+              left: vw(140),
+              top: vw(800),
+              width: `calc(${vw(240)} * ${(currentImageIndex + 1) / validImages.length})`,
               height: vw(3),
               backgroundColor: "#464010",
               borderRadius: vw(2),
@@ -854,10 +834,10 @@ export function ContactFormSection({
           <div
             className="absolute"
             style={{
-              left: vw(417),
-              top: vw(962),
-              width: vw(17),
-              height: vw(7),
+              left: vw(368),
+              top: vw(798),
+              width: vw(14),
+              height: vw(6),
               backgroundColor: "#464010",
               borderRadius: vw(2),
             }}
@@ -871,29 +851,29 @@ export function ContactFormSection({
           <div
             className="absolute rounded-full border"
             style={{
-              left: vw(478),
-              top: vw(879),
-              width: vw(171),
-              height: vw(171),
+              left: vw(424),
+              top: vw(710),
+              width: vw(140),
+              height: vw(140),
               borderColor: "#464010",
             }}
           />
           <div
             className="absolute rounded-full"
             style={{
-              left: vw(552),
-              top: vw(953),
-              width: vw(24),
-              height: vw(24),
+              left: vw(482),
+              top: vw(768),
+              width: vw(20),
+              height: vw(20),
               backgroundColor: "#464010",
             }}
           />
           <div
             className="absolute"
             style={{
-              left: vw(153),
-              top: vw(964),
-              width: vw(278),
+              left: vw(140),
+              top: vw(800),
+              width: vw(240),
               height: vw(1),
               backgroundColor: "#464010",
             }}
@@ -901,9 +881,9 @@ export function ContactFormSection({
           <div
             className="absolute"
             style={{
-              left: vw(417),
-              top: vw(962),
-              width: vw(17),
+              left: vw(368),
+              top: vw(798),
+              width: vw(14),
               height: vw(5),
               backgroundColor: "#464010",
             }}

@@ -89,210 +89,191 @@ function transformMediaObject(media: any) {
 }
 
 /**
- * Recursively populate image references in Lexical content
- * Fetches media objects by ID and replaces them in the content tree
+ * Extract media ID from various formats
  */
-async function populateLexicalImages(node: any, mediaCache: Map<string, any>, depth = 0): Promise<any> {
+function extractMediaId(value: any): string | null {
+  if (!value) return null
+  if (typeof value === 'string' || typeof value === 'number') return String(value)
+  if (typeof value === 'object' && value.id) return String(value.id)
+  return null
+}
+
+/**
+ * Recursively collect all media IDs from Lexical content
+ */
+function collectMediaIds(node: any, ids: Set<string>): void {
+  if (!node || typeof node !== 'object') return
+
+  if (Array.isArray(node)) {
+    node.forEach(item => collectMediaIds(item, ids))
+    return
+  }
+
+  // Check data fields for media references
+  if (node.data && typeof node.data === 'object') {
+    const data = node.data
+
+    // Single image fields
+    const singleFields = ['image', 'mediaIcon', 'backgroundImage']
+    singleFields.forEach(field => {
+      const id = extractMediaId(data[field])
+      if (id) ids.add(id)
+    })
+
+    // Array fields with image/media
+    if (Array.isArray(data.images)) {
+      data.images.forEach((item: any) => {
+        const id = extractMediaId(item?.image)
+        if (id) ids.add(id)
+      })
+    }
+
+    if (Array.isArray(data.items)) {
+      data.items.forEach((item: any) => {
+        const mediaId = extractMediaId(item?.media)
+        const iconId = extractMediaId(item?.mediaIcon)
+        if (mediaId) ids.add(mediaId)
+        if (iconId) ids.add(iconId)
+      })
+    }
+
+    if (Array.isArray(data.slides)) {
+      data.slides.forEach((slide: any) => {
+        const id = extractMediaId(slide?.image)
+        if (id) ids.add(id)
+      })
+    }
+  }
+
+  // Recursively process nested structures
+  if (node.root) collectMediaIds(node.root, ids)
+  if (node.children) collectMediaIds(node.children, ids)
+  if (node.fields) {
+    Object.values(node.fields).forEach(value => collectMediaIds(value, ids))
+  }
+}
+
+/**
+ * Batch fetch all media by IDs in parallel
+ */
+async function batchFetchMedia(ids: Set<string>): Promise<Map<string, any>> {
+  const cache = new Map<string, any>()
+  if (ids.size === 0) return cache
+
+  const fetchPromises = Array.from(ids).map(async (id) => {
+    try {
+      const res = await fetch(`${CMS_URL}/api/media/${id}`)
+      if (res.ok) {
+        const data = await res.json()
+        return { id, data: transformMediaObject(data) }
+      }
+    } catch (err) {
+      console.error(`[batchFetchMedia] Failed to fetch media ${id}:`, err)
+    }
+    return null
+  })
+
+  const results = await Promise.all(fetchPromises)
+  results.forEach(result => {
+    if (result) cache.set(result.id, result.data)
+  })
+
+  return cache
+}
+
+/**
+ * Populate media references in Lexical content using pre-fetched cache
+ */
+function populateMediaFromCache(node: any, cache: Map<string, any>): any {
   if (!node || typeof node !== 'object') return node
 
-  // Handle arrays
   if (Array.isArray(node)) {
-    return Promise.all(node.map(item => populateLexicalImages(item, mediaCache, depth)))
+    return node.map(item => populateMediaFromCache(item, cache))
   }
 
-  // Clone the node
   const populated = { ...node }
 
-  // Check if this node has image data that needs population
   if (populated.data && typeof populated.data === 'object') {
-    // Handle single image field
-    if (populated.data.image) {
-      const imageId = typeof populated.data.image === 'object' ? populated.data.image.id : populated.data.image
-      if (imageId && !mediaCache.has(String(imageId))) {
-        try {
-          const mediaRes = await fetch(`${CMS_URL}/api/media/${imageId}`)
-          if (mediaRes.ok) {
-            const mediaData = await mediaRes.json()
-            mediaCache.set(String(imageId), transformMediaObject(mediaData))
-          }
-        } catch (err) {
-          console.error(`[populateLexicalImages] Failed to fetch media ${imageId}:`, err)
-        }
-      }
-      if (mediaCache.has(String(imageId))) {
-        populated.data.image = mediaCache.get(String(imageId))
-      }
-    }
+    populated.data = { ...populated.data }
 
-    // Handle images array (for gallery)
+    // Single image fields
+    const singleFields = ['image', 'mediaIcon', 'backgroundImage']
+    singleFields.forEach(field => {
+      const id = extractMediaId(populated.data[field])
+      if (id && cache.has(id)) {
+        populated.data[field] = cache.get(id)
+      }
+    })
+
+    // Images array
     if (Array.isArray(populated.data.images)) {
-      populated.data.images = await Promise.all(
-        populated.data.images.map(async (item: any) => {
-          if (!item || typeof item !== 'object') return item
-
-          const imageId = typeof item.image === 'object' ? item.image.id : item.image
-          if (imageId && !mediaCache.has(String(imageId))) {
-            try {
-              const mediaRes = await fetch(`${CMS_URL}/api/media/${imageId}`)
-              if (mediaRes.ok) {
-                const mediaData = await mediaRes.json()
-                mediaCache.set(String(imageId), transformMediaObject(mediaData))
-              }
-            } catch (err) {
-              console.error(`[populateLexicalImages] Failed to fetch media ${imageId}:`, err)
-            }
-          }
-
-          return {
-            ...item,
-            image: mediaCache.has(String(imageId)) ? mediaCache.get(String(imageId)) : item.image
-          }
-        })
-      )
+      populated.data.images = populated.data.images.map((item: any) => {
+        if (!item || typeof item !== 'object') return item
+        const id = extractMediaId(item.image)
+        return id && cache.has(id) ? { ...item, image: cache.get(id) } : item
+      })
     }
 
-    // Handle media icon
-    if (populated.data.mediaIcon) {
-      const iconId = typeof populated.data.mediaIcon === 'object' ? populated.data.mediaIcon.id : populated.data.mediaIcon
-      if (iconId && !mediaCache.has(String(iconId))) {
-        try {
-          const mediaRes = await fetch(`${CMS_URL}/api/media/${iconId}`)
-          if (mediaRes.ok) {
-            const mediaData = await mediaRes.json()
-            mediaCache.set(String(iconId), transformMediaObject(mediaData))
-          }
-        } catch (err) {
-          console.error(`[populateLexicalImages] Failed to fetch media icon ${iconId}:`, err)
-        }
-      }
-      if (mediaCache.has(String(iconId))) {
-        populated.data.mediaIcon = mediaCache.get(String(iconId))
-      }
-    }
-
-    // Handle backgroundImage
-    if (populated.data.backgroundImage) {
-      const bgId = typeof populated.data.backgroundImage === 'object' ? populated.data.backgroundImage.id : populated.data.backgroundImage
-      if (bgId && !mediaCache.has(String(bgId))) {
-        try {
-          const mediaRes = await fetch(`${CMS_URL}/api/media/${bgId}`)
-          if (mediaRes.ok) {
-            const mediaData = await mediaRes.json()
-            mediaCache.set(String(bgId), transformMediaObject(mediaData))
-          }
-        } catch (err) {
-          console.error(`[populateLexicalImages] Failed to fetch background image ${bgId}:`, err)
-        }
-      }
-      if (mediaCache.has(String(bgId))) {
-        populated.data.backgroundImage = mediaCache.get(String(bgId))
-      }
-    }
-
-    // Handle carousel/marquee items with media
+    // Items array (carousel/marquee)
     if (Array.isArray(populated.data.items)) {
-      populated.data.items = await Promise.all(
-        populated.data.items.map(async (item: any) => {
-          if (!item || typeof item !== 'object') return item
-
-          const result = { ...item }
-
-          // Handle item.media
-          if (result.media) {
-            const mediaId = typeof result.media === 'object' ? result.media.id : result.media
-            if (mediaId && !mediaCache.has(String(mediaId))) {
-              try {
-                const mediaRes = await fetch(`${CMS_URL}/api/media/${mediaId}`)
-                if (mediaRes.ok) {
-                  const mediaData = await mediaRes.json()
-                  mediaCache.set(String(mediaId), transformMediaObject(mediaData))
-                }
-              } catch (err) {
-                console.error(`[populateLexicalImages] Failed to fetch item media ${mediaId}:`, err)
-              }
-            }
-            if (mediaCache.has(String(mediaId))) {
-              result.media = mediaCache.get(String(mediaId))
-            }
-          }
-
-          // Handle item.mediaIcon
-          if (result.mediaIcon) {
-            const iconId = typeof result.mediaIcon === 'object' ? result.mediaIcon.id : result.mediaIcon
-            if (iconId && !mediaCache.has(String(iconId))) {
-              try {
-                const mediaRes = await fetch(`${CMS_URL}/api/media/${iconId}`)
-                if (mediaRes.ok) {
-                  const mediaData = await mediaRes.json()
-                  mediaCache.set(String(iconId), transformMediaObject(mediaData))
-                }
-              } catch (err) {
-                console.error(`[populateLexicalImages] Failed to fetch item icon ${iconId}:`, err)
-              }
-            }
-            if (mediaCache.has(String(iconId))) {
-              result.mediaIcon = mediaCache.get(String(iconId))
-            }
-          }
-
-          return result
-        })
-      )
+      populated.data.items = populated.data.items.map((item: any) => {
+        if (!item || typeof item !== 'object') return item
+        const result = { ...item }
+        const mediaId = extractMediaId(item.media)
+        const iconId = extractMediaId(item.mediaIcon)
+        if (mediaId && cache.has(mediaId)) result.media = cache.get(mediaId)
+        if (iconId && cache.has(iconId)) result.mediaIcon = cache.get(iconId)
+        return result
+      })
     }
 
-    // Handle carousel slides with images
+    // Slides array
     if (Array.isArray(populated.data.slides)) {
-      populated.data.slides = await Promise.all(
-        populated.data.slides.map(async (slide: any) => {
-          if (!slide || typeof slide !== 'object') return slide
-
-          const result = { ...slide }
-
-          // Handle slide.image
-          if (result.image) {
-            const imageId = typeof result.image === 'object' ? result.image.id : result.image
-            if (imageId && !mediaCache.has(String(imageId))) {
-              try {
-                const mediaRes = await fetch(`${CMS_URL}/api/media/${imageId}`)
-                if (mediaRes.ok) {
-                  const mediaData = await mediaRes.json()
-                  mediaCache.set(String(imageId), transformMediaObject(mediaData))
-                }
-              } catch (err) {
-                console.error(`[populateLexicalImages] Failed to fetch slide image ${imageId}:`, err)
-              }
-            }
-            if (mediaCache.has(String(imageId))) {
-              result.image = mediaCache.get(String(imageId))
-            }
-          }
-
-          return result
-        })
-      )
+      populated.data.slides = populated.data.slides.map((slide: any) => {
+        if (!slide || typeof slide !== 'object') return slide
+        const id = extractMediaId(slide.image)
+        return id && cache.has(id) ? { ...slide, image: cache.get(id) } : slide
+      })
     }
   }
 
-  // Recursively process root (top level of Lexical content)
-  if (populated.root && typeof populated.root === 'object') {
-    populated.root = await populateLexicalImages(populated.root, mediaCache, depth + 1)
+  // Recursively process nested structures
+  if (populated.root) {
+    populated.root = populateMediaFromCache(populated.root, cache)
   }
-
-  // Recursively process children
-  if (populated.children && Array.isArray(populated.children)) {
-    populated.children = await populateLexicalImages(populated.children, mediaCache, depth + 1)
+  if (populated.children) {
+    populated.children = populateMediaFromCache(populated.children, cache)
   }
-
-  // Recursively process fields (for blocks)
-  if (populated.fields && typeof populated.fields === 'object') {
+  if (populated.fields) {
+    populated.fields = { ...populated.fields }
     for (const [key, value] of Object.entries(populated.fields)) {
       if (value && typeof value === 'object') {
-        populated.fields[key] = await populateLexicalImages(value, mediaCache, depth + 1)
+        populated.fields[key] = populateMediaFromCache(value, cache)
       }
     }
   }
 
   return populated
+}
+
+/**
+ * Populate all image references in Lexical content
+ * Optimized: collects all IDs first, fetches in parallel, then populates
+ */
+async function populateLexicalImages(content: any): Promise<{ content: any; mediaCount: number }> {
+  // Step 1: Collect all media IDs
+  const mediaIds = new Set<string>()
+  collectMediaIds(content, mediaIds)
+
+  console.log(`[populateLexicalImages] Found ${mediaIds.size} unique media references`)
+
+  // Step 2: Batch fetch all media in parallel
+  const mediaCache = await batchFetchMedia(mediaIds)
+
+  // Step 3: Populate content with cached media
+  const populated = populateMediaFromCache(content, mediaCache)
+
+  return { content: populated, mediaCount: mediaCache.size }
 }
 
 /**
@@ -342,12 +323,12 @@ export async function GET(
     const product = productData.docs[0]
     console.log('[Product Detail API] Product found:', product.id)
 
-    // Populate image references in Lexical content
-    const mediaCache = new Map<string, any>()
+    // Populate image references in Lexical content (optimized: parallel fetch)
     if (product.contentTranslation) {
       console.log('[Product Detail API] Populating Lexical images...')
-      product.contentTranslation = await populateLexicalImages(product.contentTranslation, mediaCache)
-      console.log('[Product Detail API] Populated', mediaCache.size, 'unique images')
+      const { content, mediaCount } = await populateLexicalImages(product.contentTranslation)
+      product.contentTranslation = content
+      console.log('[Product Detail API] Populated', mediaCount, 'unique images')
     }
 
     // 获取同系列的相关产品

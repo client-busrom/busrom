@@ -23,15 +23,19 @@ interface PayloadNavMenu {
 }
 
 /**
- * 从媒体标签获取随机图片
+ * 从媒体标签获取图片（确定性选择，基于菜单ID）
+ * 注意：不使用随机选择，以确保图片URL稳定，便于浏览器缓存
  */
-async function getRandomImageFromMediaTags(mediaTags: Array<{ id: string; name: string }>, locale: string): Promise<{ url: string; filename: string } | null> {
+async function getImageFromMediaTags(
+  mediaTags: Array<{ id: string; name: string }>,
+  locale: string,
+  menuId: string
+): Promise<{ url: string; filename: string } | null> {
   if (!mediaTags || mediaTags.length === 0) return null;
 
   try {
     // 使用第一个 mediaTag 的 ID 查询图片
     // 只查询场景图 (primaryCategory = 2, name = "scene")
-    // 获取多张图片然后随机选择一张
     const tagId = mediaTags[0].id;
     const response = await fetch(
       `${CMS_URL}/api/media?where[tags][in]=${tagId}&where[primaryCategory][equals]=2&limit=20&locale=${locale}`,
@@ -47,9 +51,12 @@ async function getRandomImageFromMediaTags(mediaTags: Array<{ id: string; name: 
 
     const data = await response.json();
     if (data.docs && data.docs.length > 0) {
-      // 随机选择一张图片
-      const randomIndex = Math.floor(Math.random() * data.docs.length);
-      const media = data.docs[randomIndex];
+      // 基于菜单ID确定性选择图片（相同菜单始终返回相同图片）
+      // 使用简单的哈希：将menuId转为数字后取模
+      const menuIdStr = String(menuId || '');
+      const hash = menuIdStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const index = hash % data.docs.length;
+      const media = data.docs[index];
       return {
         url: media.url,
         filename: media.filename,
@@ -103,7 +110,7 @@ async function transformNavigationItem(
   const shouldFetchImage = item.type === 'product_cards' || parentType === 'product_cards';
 
   if (shouldFetchImage && item.mediaTags && item.mediaTags.length > 0) {
-    const image = await getRandomImageFromMediaTags(item.mediaTags, locale);
+    const image = await getImageFromMediaTags(item.mediaTags, locale, item.id);
     if (image) {
       result.image = image;
     }

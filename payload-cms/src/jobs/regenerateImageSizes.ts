@@ -111,37 +111,76 @@ export const regenerateImageSizesTask = {
 
           if (size.height) {
             // Fixed dimensions - need to crop with focal point
+            // Strategy: Scale up image if needed, then crop to exact dimensions
+            // This ensures focal point is always centered and aspect ratio is correct
+
             const targetAspect = size.width / size.height
             const originalAspect = originalWidth / originalHeight
 
-            let cropWidth: number, cropHeight: number
-            let cropLeft: number, cropTop: number
+            // Calculate the scale factor needed to ensure we can crop the target area
+            // We need the scaled image to be at least as large as the target in both dimensions
+            let scaleFactor: number
 
             if (originalAspect > targetAspect) {
-              // Original is wider - crop horizontally
-              cropHeight = originalHeight
-              cropWidth = Math.round(cropHeight * targetAspect)
-              cropTop = 0
-              // Center crop around focal point X
-              cropLeft = Math.max(0, Math.min(
-                focalXPx - Math.round(cropWidth / 2),
-                originalWidth - cropWidth
-              ))
+              // Original is wider than target - height is the limiting factor
+              // Scale so that height matches target, then crop width
+              scaleFactor = size.height / originalHeight
             } else {
-              // Original is taller - crop vertically
-              cropWidth = originalWidth
-              cropHeight = Math.round(cropWidth / targetAspect)
-              cropLeft = 0
-              // Center crop around focal point Y
-              cropTop = Math.max(0, Math.min(
-                focalYPx - Math.round(cropHeight / 2),
-                originalHeight - cropHeight
-              ))
+              // Original is taller than target - width is the limiting factor
+              // Scale so that width matches target, then crop height
+              scaleFactor = size.width / originalWidth
             }
 
-            outputBuffer = await sharp(sourceBuffer)
-              .extract({ left: cropLeft, top: cropTop, width: cropWidth, height: cropHeight })
-              .resize(size.width, size.height)
+            // Ensure scale factor is at least 1 to avoid unnecessary downscaling before crop
+            // (we want to upscale small images, not downscale large ones before cropping)
+            const effectiveScale = Math.max(scaleFactor, 1)
+
+            // Calculate scaled dimensions
+            const scaledWidth = Math.round(originalWidth * effectiveScale)
+            const scaledHeight = Math.round(originalHeight * effectiveScale)
+
+            // Calculate focal point position in scaled image
+            const scaledFocalX = Math.round(focalXPx * effectiveScale)
+            const scaledFocalY = Math.round(focalYPx * effectiveScale)
+
+            // Calculate crop region centered on focal point
+            let cropLeft = Math.round(scaledFocalX - size.width / 2)
+            let cropTop = Math.round(scaledFocalY - size.height / 2)
+
+            // Clamp crop region to image bounds
+            cropLeft = Math.max(0, Math.min(cropLeft, scaledWidth - size.width))
+            cropTop = Math.max(0, Math.min(cropTop, scaledHeight - size.height))
+
+            // Ensure crop dimensions don't exceed scaled image
+            const cropWidth = Math.min(size.width, scaledWidth)
+            const cropHeight = Math.min(size.height, scaledHeight)
+
+            // Build the sharp pipeline
+            let pipeline = sharp(sourceBuffer)
+
+            // Only resize if we need to scale up
+            if (effectiveScale > 1) {
+              pipeline = pipeline.resize(scaledWidth, scaledHeight, {
+                fit: 'fill', // Exact dimensions
+              })
+            }
+
+            // Extract the crop region
+            pipeline = pipeline.extract({
+              left: cropLeft,
+              top: cropTop,
+              width: cropWidth,
+              height: cropHeight,
+            })
+
+            // If the crop is smaller than target (edge case), resize to exact target
+            if (cropWidth < size.width || cropHeight < size.height) {
+              pipeline = pipeline.resize(size.width, size.height, {
+                fit: 'cover',
+              })
+            }
+
+            outputBuffer = await pipeline
               .webp({ quality: size.quality })
               .toBuffer()
 

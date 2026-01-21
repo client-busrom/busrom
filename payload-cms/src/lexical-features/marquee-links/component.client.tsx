@@ -257,7 +257,7 @@ interface MediaData {
 
 export const MarqueeLinksComponent: React.FC<MarqueeLinksComponentProps> = ({ nodeKey, data }) => {
   const [editor] = useLexicalComposerContext()
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [isEditing, setIsEditing] = useState(false)
   const [localData, setLocalData] = useState<MarqueeLinksData>(data)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
@@ -681,6 +681,9 @@ export const MarqueeLinksComponent: React.FC<MarqueeLinksComponentProps> = ({ no
             setCurrentEditingIndex(null)
           }}
           onSelect={handleMediaSelect}
+          imageIndex={currentEditingIndex || 0}
+          t={t}
+          i18n={i18n}
         />
 
         <LinkPickerModal isOpen={isLinkPickerOpen} onClose={() => setIsLinkPickerOpen(false)} onSelect={handleLinkSelect} />

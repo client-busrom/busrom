@@ -20,7 +20,7 @@ interface CarouselComponentProps {
 
 export const CarouselComponent: React.FC<CarouselComponentProps> = ({ nodeKey, data }) => {
   const [editor] = useLexicalComposerContext()
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [isEditing, setIsEditing] = useState(false)
   const [localData, setLocalData] = useState<CarouselData>(data)
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -418,6 +418,8 @@ export const CarouselComponent: React.FC<CarouselComponentProps> = ({ nodeKey, d
           onClose={() => setShowMediaPicker(false)}
           onSelect={handleMediaSelect}
           imageIndex={selectedSlideIndex}
+          t={t}
+          i18n={i18n}
         />
 
         {/* Link Picker Modal */}

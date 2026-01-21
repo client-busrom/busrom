@@ -4,6 +4,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { useField, useDocumentInfo, useLocale, useTranslation } from '@payloadcms/ui'
 import { SUPPORTED_LOCALES, type LocaleCode } from '../../../lib/locales'
 import { fetchAllLocaleData, getFieldFromCache } from '../localeDataCache'
+import { MediaPicker } from '../MediaPicker'
 import './styles.scss'
 
 interface SpecificationItem {
@@ -596,14 +597,31 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                               placeholder="https://..."
                             />
                           </div>
-                          <div className="spec-item__field">
-                            <label>Media ID (Optional)</label>
-                            <input
-                              type="text"
-                              value={item.image || ''}
-                              onChange={(e) => updateItem(groupIdx, itemIdx, { image: e.target.value })}
-                              onBlur={handleBlur}
-                              placeholder="Media ID"
+                          <div className="spec-item__field spec-item__field--media">
+                            <label>Image (Optional)</label>
+                            <MediaPicker
+                              field={{
+                                name: `spec-image-${groupIdx}-${itemIdx}`,
+                                label: 'Image',
+                                hasMany: false,
+                              }}
+                              value={item.image ? Number(item.image) : null}
+                              onChange={(newValue) => {
+                                updateItem(groupIdx, itemIdx, { image: newValue ? String(newValue) : '' })
+                                if (activeLocale !== currentLocale.code) {
+                                  const newSpecs = currentSpecs.map((g, i) =>
+                                    i === groupIdx
+                                      ? {
+                                          ...g,
+                                          items: g.items.map((it, j) =>
+                                            j === itemIdx ? { ...it, image: newValue ? String(newValue) : '' } : it
+                                          ),
+                                        }
+                                      : g
+                                  )
+                                  setTimeout(() => saveToLocale(activeLocale, newSpecs), 0)
+                                }
+                              }}
                             />
                           </div>
                         </div>

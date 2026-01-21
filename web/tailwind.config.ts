@@ -225,6 +225,73 @@ const config: Config = {
             transform: "scale(1.05)",
           },
         },
+        "bounce-slow": {
+          "0%, 100%": {
+            transform: "translateY(0) scale(1)",
+          },
+          "50%": {
+            transform: "translateY(-10px) scale(1.05)",
+          },
+        },
+        "ping-slow": {
+          "0%": {
+            transform: "scale(1)",
+            opacity: "0.6",
+          },
+          "75%, 100%": {
+            transform: "scale(1.5)",
+            opacity: "0",
+          },
+        },
+        // Arrow animations for Why Choose Us section
+        "arrow-right": {
+          "0%": {
+            transform: "rotate(0deg) translateX(calc(var(--arrow-distance) * -1))",
+            opacity: "0",
+          },
+          "20%": {
+            opacity: "1",
+          },
+          "80%": {
+            opacity: "1",
+          },
+          "100%": {
+            transform: "rotate(0deg) translateX(var(--arrow-distance))",
+            opacity: "0",
+          },
+        },
+        "arrow-left": {
+          "0%": {
+            transform: "rotate(180deg) translateX(calc(var(--arrow-distance) * -1))",
+            opacity: "0",
+          },
+          "20%": {
+            opacity: "1",
+          },
+          "80%": {
+            opacity: "1",
+          },
+          "100%": {
+            transform: "rotate(180deg) translateX(var(--arrow-distance))",
+            opacity: "0",
+          },
+        },
+        "arrow-down": {
+          "0%": {
+            transform: "rotate(90deg) translateX(calc(var(--arrow-distance) * -1))",
+            opacity: "0",
+          },
+          "20%": {
+            opacity: "1",
+          },
+          "80%": {
+            opacity: "1",
+          },
+          "100%": {
+            transform: "rotate(90deg) translateX(var(--arrow-distance))",
+            opacity: "0",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -234,6 +301,11 @@ const config: Config = {
         "ball-bounce": "ball-bounce 2.5s ease-in-out infinite",
         "bounce-around": "bounce-around 12s ease-in-out infinite",
         "pulse-scale": "pulse-scale 2s ease-in-out infinite",
+        "bounce-slow": "bounce-slow 1.5s ease-in-out infinite",
+        "ping-slow": "ping-slow 2s ease-out infinite",
+        "arrow-right": "arrow-right 1.2s ease-in-out infinite",
+        "arrow-left": "arrow-left 1.2s ease-in-out infinite",
+        "arrow-down": "arrow-down 1.2s ease-in-out infinite",
       },
     },
   },

@@ -123,6 +123,20 @@ html, body {
   }
 }
 
+/* Moon orbit animation along image mask edge */
+@keyframes moon-orbit {
+  0% {
+    offset-distance: 0%;
+  }
+  100% {
+    offset-distance: 100%;
+  }
+}
+
+.animate-moon-orbit {
+  animation: moon-orbit 30s linear infinite;
+}
+
 /* 将动画应用封装成一个工具类 */
 .animate-shine {
   animation: shine 2s linear infinite;

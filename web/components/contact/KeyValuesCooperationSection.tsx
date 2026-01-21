@@ -9,6 +9,9 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage"
 const DESIGN_WIDTH = 1920
 const SECTION_HEIGHT = 818
 
+// 内容缩放比例
+const CONTENT_SCALE = 0.8
+
 interface MediaObject {
   id: string
   url: string
@@ -58,15 +61,28 @@ export function KeyValuesCooperationSection({
     setActiveIndex((prev) => (prev < items.length - 1 ? prev + 1 : 0))
   }, [items.length])
 
+  // 缩放后的板块高度
+  const scaledHeight = SECTION_HEIGHT * CONTENT_SCALE
+
   return (
     <section
-      className="relative w-full"
+      className="relative w-full overflow-hidden"
       style={{
-        aspectRatio: `${DESIGN_WIDTH} / ${SECTION_HEIGHT}`,
-        marginTop: vw(80),
-        marginBottom: vw(80),
+        height: vw(scaledHeight),
+        marginTop: vw(40),
+        marginBottom: vw(40),
       }}
     >
+      {/* 内容容器 - 整体缩小到80%并居中 */}
+      <div
+        className="absolute left-0 w-full"
+        style={{
+          height: vw(SECTION_HEIGHT),
+          top: `calc(50% - ${vw(SECTION_HEIGHT * CONTENT_SCALE / 2)})`,
+          transform: `scale(${CONTENT_SCALE})`,
+          transformOrigin: "top center",
+        }}
+      >
       {/* 背景大号描边 "Value" 文字 - 字符跳动效果 */}
       <div
         className="absolute font-josefin-sans font-bold pointer-events-none w-full text-center flex justify-center"
@@ -102,13 +118,13 @@ export function KeyValuesCooperationSection({
           height: vw(552),
         }}
       >
-        {/* 左边橄榄色月牙形 - 固定装饰 */}
+        {/* 左边橄榄色月牙形 - 固定装饰，稍微加宽以消除缝隙 */}
         <div
           className="absolute"
           style={{
             left: 0,
             top: 0,
-            width: vw(415),
+            width: vw(420),  // 从415增加到420，消除与中间图片的缝隙
             height: vw(552),
           }}
         >
@@ -388,7 +404,7 @@ export function KeyValuesCooperationSection({
               />
               {/* 要点文字 */}
               <p
-                className="absolute font-acme text-left text-brand-orange"
+                className="absolute font-montserrat font-semibold text-left text-brand-orange"
                 style={{
                   left: vw(40),
                   top: vw(63),
@@ -403,6 +419,7 @@ export function KeyValuesCooperationSection({
           ))}
         </div>
       )}
+      </div>
     </section>
   )
 }

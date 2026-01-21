@@ -257,9 +257,9 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                     key={index}
                     onClick={() => onThumbnailClick(index)}
                     className={cn(
-                      "relative flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all",
+                      "relative flex-shrink-0 w-[120px] h-[80px] rounded-lg overflow-hidden border-2 transition-all",
                       selectedIndex === index
-                        ? "border-brand-secondary ring-2 ring-brand-secondary ring-offset-2"
+                        ? "border-brand-secondary"
                         : "border-gray-200 hover:border-gray-300"
                     )}
                   >
@@ -267,7 +267,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                       src={image.variants?.thumbnail?.url || image.variants?.card?.url || image.url}
                       alt={image.altText || `${productName} ${index + 1}`}
                       fill
-                      sizes="56px"
+                      sizes="120px"
                       className="object-cover"
                       unoptimized
                     />

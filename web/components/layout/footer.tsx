@@ -527,7 +527,7 @@ export default function Footer({ locale, showForm = true }: Props) {
           <div>
             {footerData.notice.title && <h4 className="font-bold text-lg mb-4 font-anaheim">{footerData.notice.title}</h4>}
             {footerData.notice.lines && footerData.notice.lines.length > 0 && (
-              <div className="text-xs space-y-2 font-anaheim">
+              <div className="text-sm space-y-2 font-anaheim">
                 {footerData.notice.lines.map((line, index) => (
                   <p key={index}>{line}</p>
                 ))}
@@ -536,9 +536,12 @@ export default function Footer({ locale, showForm = true }: Props) {
           </div>
         </div>
 
+        {/* 分隔线 */}
+        <div className="h-px bg-brand-text-inverse/30 my-6"></div>
+
         {/* 第二行：Navigation（横向排列，居左对齐） */}
         {footerData.navigationMenus && footerData.navigationMenus.length > 0 && (
-          <div className="py-6">
+          <div className="pb-6">
             <nav className="flex flex-wrap gap-6 md:gap-10">
               {footerData.navigationMenus.map((menu) => (
                 <Link
@@ -554,7 +557,7 @@ export default function Footer({ locale, showForm = true }: Props) {
         )}
 
         {/* 第三行：Logo+版权（居中） | 社交媒体链接 */}
-        <div className="pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="pt-16 flex flex-col md:flex-row justify-between items-center gap-4">
           {/* 左侧占位 - 保持社交链接右对齐 */}
           <div className="hidden md:block md:flex-1"></div>
 
@@ -563,8 +566,8 @@ export default function Footer({ locale, showForm = true }: Props) {
             <Image
               src="/Busrom1.svg"
               alt="Busrom Logo"
-              width={80}
-              height={24}
+              width={60}
+              height={18}
               className="object-contain"
             />
             {footerData.copyrightText && (

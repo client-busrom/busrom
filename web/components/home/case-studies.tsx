@@ -105,7 +105,7 @@ export default function CaseStudies({ data }: Props) {
   }
 
   // 从每个 application 的 sceneGallery 中提取图片用于展示
-  // 取前3个场景，每个场景随机选一张图片
+  // 取前3个场景，每个场景选第一张图片（确定性选择，便于缓存）
   const getDisplayImages = React.useCallback((app: CaseStudyApplication): ImageObject[] => {
     const images: ImageObject[] = [];
     const scenes = app.sceneGallery || [];
@@ -114,9 +114,8 @@ export default function CaseStudies({ data }: Props) {
     for (let i = 0; i < Math.min(3, scenes.length); i++) {
       const scene = scenes[i];
       if (scene.images && scene.images.length > 0) {
-        // 随机选一张图片
-        const randomIndex = Math.floor(Math.random() * scene.images.length);
-        const img = scene.images[randomIndex];
+        // 选第一张图片（确定性选择，避免每次渲染变化）
+        const img = scene.images[0];
         if (img) {
           images.push(img);
         }

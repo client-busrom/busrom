@@ -1,16 +1,62 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import type { Locale } from "@/i18n.config"
 import { ProductGallery } from "@/components/shop/ProductGallery"
-import { ProductCard } from "@/components/shop/ProductCard"
 import { SimplifiedInquiryForm } from "@/components/shop/SimplifiedInquiryForm"
 import { FullInquiryModal } from "@/components/shop/FullInquiryModal"
 import { ProductDetailSkeleton } from "@/components/shop/ProductDetailSkeleton"
 import { StickyProductInfo } from "@/components/shop/StickyLeftColumn"
 import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
-import type { Product } from "@/lib/types/product"
+import { ProductHeroSection } from "@/components/shop/ProductHeroSection"
+import { SectionRenderer } from "./SectionRenderer"
+import { parseLexicalSections } from "./parseSectionData"
+
+// Description component with 3-line clamp and expand button
+function DescriptionWithExpand({ description }: { description: string | any }) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [needsExpand, setNeedsExpand] = useState(false)
+  const textRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (textRef.current) {
+      // Check if text is clamped (content height > visible height)
+      const lineHeight = parseFloat(getComputedStyle(textRef.current).lineHeight)
+      const maxHeight = lineHeight * 3
+      setNeedsExpand(textRef.current.scrollHeight > maxHeight + 2) // +2 for tolerance
+    }
+  }, [description])
+
+  if (typeof description !== "string") {
+    return (
+      <div className="text-brand-text-main prose prose-sm md:prose-base max-w-none">
+        <div>{JSON.stringify(description)}</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="text-brand-text-main">
+      <div
+        ref={textRef}
+        className={`text-sm md:text-base leading-relaxed whitespace-pre-line ${
+          !isExpanded ? "line-clamp-3" : ""
+        }`}
+      >
+        {description}
+      </div>
+      {needsExpand && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="mt-2 text-sm text-brand-accent-gold hover:text-brand-secondary transition-colors"
+        >
+          {isExpanded ? "Show less" : "Learn more"}
+        </button>
+      )}
+    </div>
+  )
+}
 
 interface ProductDetailClientProps {
   locale: Locale
@@ -56,7 +102,6 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
               const formRes = await fetch(`/api/form-configs/${formConfigId}`)
               if (formRes.ok) {
                 const formData = await formRes.json()
-                console.log('[ProductDetailClient] FormConfig loaded:', formData.id, 'fields:', formData.fields?.length)
                 setFormConfig(formData)
               } else {
                 console.error('[ProductDetailClient] Failed to fetch formConfig:', formRes.status)
@@ -67,8 +112,6 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
           } else {
             console.error('[ProductDetailClient] No formConfigId found in formBlock')
           }
-        } else {
-          console.log('[ProductDetailClient] No formBlocks found in content')
         }
       } catch (err) {
         console.error("Failed to fetch product:", err)
@@ -107,146 +150,17 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
   const images = product.mainImage || (product.showImage ? [product.showImage] : [])
   const displayName = product.localizedName || product.sku
 
-  // Parse Lexical content structure
-  const lexicalContent = product.content
-  let preFormSections: any[] = []
-  let formBlock: any = null
-  let postFormSections: any[] = []
+  // Parse Lexical content structure using extracted function
+  const { preFormSections, formBlock, postFormSections } = parseLexicalSections(product.content)
 
-  if (lexicalContent?.root?.children) {
-    const nodes = lexicalContent.root.children
-    let currentSection: any = null
-    let foundForm = false
-
-    for (let i = 0; i < nodes.length; i++) {
-      const node = nodes[i]
-
-      // Found the form block (support both 'formBlock' type and block with blockType='form-block')
-      // Only use the FIRST formBlock as the separator
-      if (!foundForm && (node.type === 'formBlock' || (node.type === 'block' && node.fields?.blockType === 'form-block'))) {
-        if (currentSection) {
-          preFormSections.push(currentSection)
-          currentSection = null
-        }
-        formBlock = node
-        foundForm = true
-        continue
-      }
-
-      // Before form: collect sections based on quote nodes with text or code
-      if (!foundForm) {
-        if (node.type === 'quote') {
-          // Check if quote contains text (section title marker)
-          const firstChild = node.children?.[0]
-          // Support both text nodes (new Payload format) and code nodes (old format)
-          if (firstChild && (firstChild.type === 'text' || firstChild.type === 'code')) {
-            // Save previous section
-            if (currentSection) {
-              preFormSections.push(currentSection)
-            }
-            // Extract title text
-            const titleText = firstChild.type === 'text'
-              ? firstChild.text
-              : firstChild.children?.[0]?.text
-            currentSection = {
-              title: titleText || 'Section',
-              content: {
-                root: {
-                  type: 'root',
-                  format: '',
-                  indent: 0,
-                  version: 1,
-                  children: [],
-                  direction: null,
-                },
-              },
-            }
-            continue
-          }
-        }
-
-        // Add content to current section
-        if (currentSection && node.type !== 'horizontalrule') {
-          currentSection.content.root.children.push(node)
-        }
-      } else {
-        // After form: Parse sections based on horizontalrule + quote pattern
-        if (node.type === 'horizontalrule' && i + 1 < nodes.length) {
-          const nextNode = nodes[i + 1]
-          if (nextNode.type === 'quote') {
-            const firstChild = nextNode.children?.[0]
-            // Support both text nodes (new Payload format) and code nodes (old format)
-            if (firstChild && (firstChild.type === 'text' || firstChild.type === 'code')) {
-              // Save current section if exists
-              if (currentSection) {
-                postFormSections.push(currentSection)
-              }
-              // Extract section ID
-              const sectionId = firstChild.type === 'text'
-                ? firstChild.text
-                : firstChild.children?.[0]?.text
-              console.log('[ProductDetailClient] Creating postFormSection:', sectionId)
-              currentSection = {
-                id: sectionId || 'Section',
-                content: {
-                  root: {
-                    type: 'root',
-                    format: '',
-                    indent: 0,
-                    version: 1,
-                    children: [],
-                    direction: null,
-                  },
-                },
-              }
-              // Skip the next node (quote) since we already processed it
-              i++
-              continue
-            }
-          }
-        }
-
-        // Add content to current section
-        if (currentSection && node.type !== 'horizontalrule') {
-          currentSection.content.root.children.push(node)
-        }
-      }
-    }
-
-    // Don't forget to add the last section
-    if (currentSection) {
-      if (!foundForm) {
-        preFormSections.push(currentSection)
-      } else {
-        postFormSections.push(currentSection)
-      }
-    }
-  }
-
-  console.log('[ProductDetailClient] Parsed sections:', {
-    preFormSections: preFormSections.length,
-    preFormTitles: preFormSections.map(s => s.title),
-    formBlock: !!formBlock,
-    formBlockData: formBlock?.data,
-    formConfig: !!formConfig,
-    formConfigFields: formConfig?.fields?.length,
-    postFormSections: postFormSections.length,
-    postFormIds: postFormSections.map(s => s.id),
-  })
-
-  console.log('[ProductDetailClient] FORM RENDERING CHECK:', {
-    hasFormBlock: !!formBlock,
-    hasFormConfig: !!formConfig,
-    willRenderForm: !!(formBlock && formConfig),
-    formBlockFull: formBlock,
-    formConfigFull: formConfig,
-  })
+  // Get the first main image for the hero section
+  const heroImage = images.length > 0 ? images[0] : null
 
   return (
-    <div className="min-h-screen bg-brand-main pt-20" data-header-theme="light">
+    <div className="min-h-screen bg-brand-main">
       {/* Main Content */}
-      <div className="container mx-auto px-6 md:px-8 lg:px-12 py-8">
-        {/* Main Product Section - Shopify Style */}
+      <div className="max-w-[1195px] mx-auto px-6 md:px-8 lg:px-12 pt-[78px] pb-8" data-header-theme="light">
+        {/* Main Product Section */}
         <div className="flex flex-col md:flex-row gap-6 md:gap-8 lg:gap-10 mb-12">
           {/* Left Column - Gallery + Sections (70% width) - Sticky with GSAP */}
           <StickyProductInfo>
@@ -279,12 +193,11 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
             )}
           </StickyProductInfo>
 
-          {/* Right Column - Product Info (30% width) - Normal scroll */}
-          <div className="w-full md:w-[30%] flex-shrink-0" data-right-column>
+          {/* Right Column - Product Info (40% width) - Normal scroll */}
+          <div className="w-full md:w-[40%] flex-shrink-0" data-right-column>
             <div className="space-y-6">
-            {/* Product Name & SKU */}
+            {/* Product Name */}
             <div>
-              <p className="text-sm md:text-base text-brand-accent-gold-light mb-2">SKU: {product.sku}</p>
               <h1 className="font-anaheim font-extrabold text-2xl md:text-3xl lg:text-4xl text-brand-text-black mb-3">
                 {displayName}
               </h1>
@@ -300,151 +213,88 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
 
             {/* Description */}
             {product.localizedDescription && (
-              <div className="text-brand-text-main prose prose-sm md:prose-base max-w-none">
-                {typeof product.localizedDescription === "string" ? (
-                  <p className="text-sm md:text-base leading-relaxed">{product.localizedDescription}</p>
-                ) : (
-                  <div>{JSON.stringify(product.localizedDescription)}</div>
-                )}
-              </div>
+              <DescriptionWithExpand description={product.localizedDescription} />
             )}
 
             {/* Specifications */}
             {(() => {
-              const specs = product.specifications?.[locale] || product.specifications?.["en"] || []
+              // 支持两种格式: 直接数组 [...] 或按语言分组 {en: [...], zh: [...]}
+              const specs = Array.isArray(product.specifications)
+                ? product.specifications
+                : (product.specifications?.[locale] || product.specifications?.["en"] || [])
 
               return specs && specs.length > 0 && (
-                <div className="border-t-2 border-brand-accent-border pt-6">
-                  <h3 className="font-anaheim font-extrabold text-lg md:text-xl text-brand-text-black mb-4">Specifications</h3>
-                  <div className="space-y-3">
-                    {specs.map((spec: any, idx: number) => (
+                <div className="pt-4 space-y-6">
+                  {specs.map((spec: any, idx: number) => (
                     <div key={idx}>
-                      <p className="text-sm md:text-base font-medium text-brand-text-main mb-2">
-                        {spec.text || spec.name?.[locale] || spec.name?.en || ""}
+                      {/* Group title with description style */}
+                      <p className="text-sm md:text-base text-brand-text-main mb-3">
+                        <span className="font-semibold">{spec.text || spec.name?.[locale] || spec.name?.en || ""}</span>
                       </p>
-                      <div className="flex flex-wrap gap-2">
-                        {(spec.items || spec.options || []).map((item: any, itemIdx: number) => (
-                          <span
-                            key={itemIdx}
-                            className="px-3 py-1.5 bg-brand-cream-dark text-brand-text-black text-xs md:text-sm rounded-full border border-brand-accent-border"
-                          >
-                            {item.text || item.value?.[locale] || item.value?.en || ""}
-                          </span>
-                        ))}
+                      {/* Grid layout: 2 columns on mobile, 3 columns if more items */}
+                      <div className="grid grid-cols-2 gap-2">
+                        {(spec.items || spec.options || []).map((item: any, itemIdx: number) => {
+                          const hasImage = item.image
+                          const imageUrl = hasImage
+                            ? `/api/media/${item.image}/file?width=200`
+                            : null
+
+                          return (
+                            <div
+                              key={itemIdx}
+                              className="flex flex-col items-center p-3 bg-white rounded-xl border border-gray-200 hover:border-brand-secondary transition-colors cursor-pointer"
+                            >
+                              {/* Only show image if media ID exists */}
+                              {imageUrl && (
+                                <div className="w-12 h-12 mb-2 flex items-center justify-center">
+                                  <img
+                                    src={imageUrl}
+                                    alt={item.text || ""}
+                                    className="max-w-full max-h-full object-contain"
+                                  />
+                                </div>
+                              )}
+                              {/* Item text */}
+                              <span className="text-xs md:text-sm text-center text-brand-text-black leading-tight">
+                                {item.text || item.value?.[locale] || item.value?.en || ""}
+                              </span>
+                            </div>
+                          )
+                        })}
                       </div>
                     </div>
-                    ))}
-                  </div>
+                  ))}
                 </div>
               )
             })()}
 
             {/* Simplified Inquiry Form (Required fields only) */}
-            {formBlock && formConfig && (
-              <div className="border-t-2 border-brand-accent-border pt-6">
-                <h3 className="font-anaheim font-extrabold text-lg md:text-xl text-brand-text-black mb-4">Product Inquiry</h3>
-                <SimplifiedInquiryForm
-                  formConfig={formConfig}
-                  locale={locale}
-                  productSeries={product.series?.slug}
-                  onOpenFullForm={(data) => {
-                    setInitialFormData(data)
-                    setIsFullFormOpen(true)
-                  }}
-                />
-              </div>
-            )}
+            {formBlock && formConfig && (() => {
+              const configData = formConfig?.data || formConfig
+              const formDisplayName = configData?.displayName || "Product Inquiry"
+              const formDescription = configData?.description || ""
 
-            {/* Product Features - Additional content to make right side taller */}
-            <div className="border-t-2 border-brand-accent-border pt-6">
-              <h3 className="font-anaheim font-extrabold text-lg md:text-xl text-brand-text-black mb-4">Key Features</h3>
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 rounded-full bg-brand-cream flex items-center justify-center mt-0.5">
-                    <svg className="w-3 h-3 md:w-4 md:h-4 text-brand-accent-gold" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm md:text-base font-medium text-brand-text-black">Premium Quality Materials</p>
-                    <p className="text-xs md:text-sm text-brand-text-main mt-1">Built with high-grade components for lasting durability</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 rounded-full bg-brand-cream flex items-center justify-center mt-0.5">
-                    <svg className="w-3 h-3 md:w-4 md:h-4 text-brand-accent-gold" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm md:text-base font-medium text-brand-text-black">Easy Installation</p>
-                    <p className="text-xs md:text-sm text-brand-text-main mt-1">Simple setup process with included instructions</p>
+              return (
+                <div className="pt-4">
+                  <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+                    <h3 className="font-anaheim font-extrabold text-lg md:text-xl text-brand-text-black mb-2">{formDisplayName}</h3>
+                    {formDescription && (
+                      <p className="text-sm text-gray-500 mb-4 whitespace-pre-line">{formDescription}</p>
+                    )}
+                    <SimplifiedInquiryForm
+                      formConfig={formConfig}
+                      locale={locale}
+                      productSeries={product.series?.slug}
+                      onOpenFullForm={(data) => {
+                        setInitialFormData(data)
+                        setIsFullFormOpen(true)
+                      }}
+                    />
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 rounded-full bg-brand-cream flex items-center justify-center mt-0.5">
-                    <svg className="w-3 h-3 md:w-4 md:h-4 text-brand-accent-gold" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm md:text-base font-medium text-brand-text-black">Warranty Included</p>
-                    <p className="text-xs md:text-sm text-brand-text-main mt-1">Comprehensive coverage for peace of mind</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 rounded-full bg-brand-cream flex items-center justify-center mt-0.5">
-                    <svg className="w-3 h-3 md:w-4 md:h-4 text-brand-accent-gold" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm md:text-base font-medium text-brand-text-black">Fast Shipping</p>
-                    <p className="text-xs md:text-sm text-brand-text-main mt-1">Quick delivery to your location</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+              )
+            })()}
 
-            {/* Why Choose Us - More content */}
-            <div className="border-t-2 border-brand-accent-border pt-6">
-              <h3 className="font-anaheim font-extrabold text-lg md:text-xl text-brand-text-black mb-4">Why Choose This Product</h3>
-              <div className="prose prose-sm md:prose-base text-brand-text-main">
-                <p className="mb-3 text-sm md:text-base leading-relaxed">
-                  This product represents the perfect balance of quality, functionality, and value.
-                  Designed with attention to detail and built to last.
-                </p>
-                <p className="mb-3 text-sm md:text-base leading-relaxed">
-                  Our commitment to excellence ensures that every unit meets rigorous quality standards
-                  before reaching your hands.
-                </p>
-                <p className="text-sm md:text-base leading-relaxed">
-                  Join thousands of satisfied customers who have already made the smart choice.
-                </p>
-              </div>
-            </div>
-
-            {/* Trust Badges */}
-            <div className="border-t-2 border-brand-accent-border pt-6">
-              <div className="grid grid-cols-2 gap-3 md:gap-4">
-                <div className="text-center p-3 md:p-4 bg-brand-cream rounded-lg border border-brand-accent-border">
-                  <div className="text-xl md:text-2xl font-anaheim font-extrabold text-brand-secondary">10+</div>
-                  <div className="text-xs md:text-sm text-brand-text-main mt-1">Years Experience</div>
-                </div>
-                <div className="text-center p-3 md:p-4 bg-brand-cream rounded-lg border border-brand-accent-border">
-                  <div className="text-xl md:text-2xl font-anaheim font-extrabold text-brand-secondary">5000+</div>
-                  <div className="text-xs md:text-sm text-brand-text-main mt-1">Happy Customers</div>
-                </div>
-                <div className="text-center p-3 md:p-4 bg-brand-cream rounded-lg border border-brand-accent-border">
-                  <div className="text-xl md:text-2xl font-anaheim font-extrabold text-brand-secondary">24/7</div>
-                  <div className="text-xs md:text-sm text-brand-text-main mt-1">Customer Support</div>
-                </div>
-                <div className="text-center p-3 md:p-4 bg-brand-cream rounded-lg border border-brand-accent-border">
-                  <div className="text-xl md:text-2xl font-anaheim font-extrabold text-brand-secondary">100%</div>
-                  <div className="text-xs md:text-sm text-brand-text-main mt-1">Satisfaction</div>
-                </div>
-              </div>
-            </div>
             </div>
           </div>
         </div>
@@ -472,40 +322,25 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
           </div>
         )}
 
-        {/* Post-form Sections */}
-        {postFormSections.length > 0 && (
-          <div className="space-y-8 mb-12">
-            {postFormSections.map((section: any, sectionIndex: number) => (
-              <div key={sectionIndex} className="space-y-6">
-                {section.id && (
-                  <h2 className="font-anaheim font-extrabold text-2xl md:text-3xl text-brand-text-black mb-4">
-                    {section.id}
-                  </h2>
-                )}
-                <LexicalRenderer content={section.content} />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Related Products */}
-        {product.relatedProducts && product.relatedProducts.length > 0 && (
-          <div>
-            <h2 className="font-anaheim font-extrabold text-2xl md:text-3xl text-brand-text-black mb-6">
-              Related Products
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {product.relatedProducts.map((relatedProduct: Product) => (
-                <ProductCard
-                  key={relatedProduct.id}
-                  product={relatedProduct}
-                  locale={locale}
-                />
-              ))}
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Hero Section - Full Width */}
+      <ProductHeroSection
+        productName={displayName}
+        description={product.localizedShortDescription || product.localizedDescription || ""}
+        heroImage={heroImage}
+      />
+
+      {/* Post-form Sections - Rendered based on section type */}
+      {postFormSections.map((section: any, sectionIndex: number) => (
+        <SectionRenderer
+          key={sectionIndex}
+          section={section}
+          sectionIndex={sectionIndex}
+          locale={locale}
+          productAttributes={product.attributes}
+        />
+      ))}
 
       {/* Full Inquiry Modal */}
       {formBlock && formConfig && (
