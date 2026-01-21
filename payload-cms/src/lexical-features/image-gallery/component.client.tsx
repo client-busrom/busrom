@@ -9,7 +9,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $getNodeByKey } from 'lexical'
-import { ZoomIn, GripVertical, X, Image as ImageIcon, Plus, Trash2 } from 'lucide-react'
+import { ZoomIn, GripVertical, X, Image as ImageIcon, Plus, Trash2, Grid, List } from 'lucide-react'
 import { useTranslation } from '@payloadcms/ui'
 import {
   DndContext,
@@ -33,7 +33,10 @@ import { $createImageGalleryNode, ImageGalleryNode } from './node.tsx'
 
 // 翻译辅助函数
 const getTranslation = (key: string, t: any, i18n: any) => {
+  // i18n.language 返回 'en' 或 'zh'
   const lang = i18n?.language || 'zh'
+  // Debug: 临时添加日志查看实际语言值
+  // console.log('[getTranslation] i18n:', i18n, 'language:', lang, 'key:', key)
   const translations: Record<string, Record<string, string>> = {
     zh: {
       title: '图片画廊',
@@ -60,6 +63,39 @@ const getTranslation = (key: string, t: any, i18n: any) => {
       normal: '中',
       large: '大',
       currentImages: '当前',
+      // MediaPicker 弹窗翻译
+      selectImage: '选择图片',
+      gridView: '网格',
+      listView: '列表',
+      searchPlaceholder: '搜索图片文件名...',
+      allCategories: '全部分类',
+      allTags: '全部标签',
+      allTypes: '全部类型',
+      imageType: '图片',
+      videoType: '视频',
+      pdfType: 'PDF',
+      groupNumber: '分组编号',
+      sceneNumber: '场景编号',
+      imageNumber: '图片编号',
+      seriesNumber: '系列编号',
+      category: '分类',
+      tag: '标签',
+      type: '类型',
+      group: '分组',
+      scene: '场景',
+      image: '图片',
+      series: '系列',
+      noImagesFound: '未找到图片',
+      select: '选择',
+      firstPage: '首页',
+      lastPage: '末页',
+      prevPage: '上一页',
+      nextPage: '下一页',
+      jumpTo: '跳至',
+      page: '页',
+      totalPages: '共 {total} 页',
+      switch: '切换',
+      escClose: 'ESC 关闭',
     },
     en: {
       title: 'Image Gallery',
@@ -86,6 +122,39 @@ const getTranslation = (key: string, t: any, i18n: any) => {
       normal: 'Normal',
       large: 'Large',
       currentImages: 'Current',
+      // MediaPicker modal translations
+      selectImage: 'Select Image',
+      gridView: 'Grid',
+      listView: 'List',
+      searchPlaceholder: 'Search image filename...',
+      allCategories: 'All Categories',
+      allTags: 'All Tags',
+      allTypes: 'All Types',
+      imageType: 'Image',
+      videoType: 'Video',
+      pdfType: 'PDF',
+      groupNumber: 'Group Number',
+      sceneNumber: 'Scene Number',
+      imageNumber: 'Image Number',
+      seriesNumber: 'Series Number',
+      category: 'Category',
+      tag: 'Tag',
+      type: 'Type',
+      group: 'Group',
+      scene: 'Scene',
+      image: 'Image',
+      series: 'Series',
+      noImagesFound: 'No images found',
+      select: 'Select',
+      firstPage: 'First',
+      lastPage: 'Last',
+      prevPage: 'Previous',
+      nextPage: 'Next',
+      jumpTo: 'Go to',
+      page: 'page',
+      totalPages: '({total} pages)',
+      switch: 'Switch',
+      escClose: 'ESC to close',
     }
   }
   return translations[lang]?.[key] || translations.zh[key] || key
@@ -323,7 +392,8 @@ interface MediaPickerModalProps {
   onClose: () => void
   onSelect: (mediaId: string) => void
   imageIndex: number
-  t: typeof translations.en
+  t: any
+  i18n: any
 }
 
 interface MediaItem {
@@ -349,12 +419,15 @@ interface MediaTag {
   name: string
 }
 
-export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onClose, onSelect, imageIndex }) => {
+export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onClose, onSelect, imageIndex, t, i18n }) => {
   const [media, setMedia] = useState<MediaItem[]>([])
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+
+  // 视图模式: 'grid' | 'list'
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   // 筛选状态
   const [selectedCategory, setSelectedCategory] = useState<string>('')
@@ -489,16 +562,61 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#1f2937' }}>
-          选择图片 #{imageIndex + 1}
-        </h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <h3 style={{ margin: 0, color: '#1f2937' }}>
+            {getTranslation('selectImage', t, i18n)} #{imageIndex + 1}
+          </h3>
+          {/* 视图模式切换 */}
+          <div style={{ display: 'flex', gap: '4px', backgroundColor: '#f3f4f6', padding: '4px', borderRadius: '6px' }}>
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              style={{
+                padding: '6px 10px',
+                backgroundColor: viewMode === 'grid' ? '#A08745' : 'transparent',
+                color: viewMode === 'grid' ? 'white' : '#6b7280',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '13px',
+                transition: 'all 0.2s',
+              }}
+            >
+              <Grid size={16} />
+              {getTranslation('gridView', t, i18n)}
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              style={{
+                padding: '6px 10px',
+                backgroundColor: viewMode === 'list' ? '#A08745' : 'transparent',
+                color: viewMode === 'list' ? 'white' : '#6b7280',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '13px',
+                transition: 'all 0.2s',
+              }}
+            >
+              <List size={16} />
+              {getTranslation('listView', t, i18n)}
+            </button>
+          </div>
+        </div>
 
         {/* 筛选器区域 */}
         <div style={{ marginBottom: '16px' }}>
           {/* 搜索框 */}
           <input
             type="text"
-            placeholder="搜索图片文件名..."
+            placeholder={getTranslation('searchPlaceholder', t, i18n)}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value)
@@ -532,7 +650,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                 cursor: 'pointer',
               }}
             >
-              <option value="">全部分类</option>
+              <option value="">{getTranslation('allCategories', t, i18n)}</option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
@@ -556,7 +674,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                 cursor: 'pointer',
               }}
             >
-              <option value="">全部标签</option>
+              <option value="">{getTranslation('allTags', t, i18n)}</option>
               {tags.map((tag) => (
                 <option key={tag.id} value={tag.id}>
                   {tag.name}
@@ -580,10 +698,10 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                 cursor: 'pointer',
               }}
             >
-              <option value="">全部类型</option>
-              <option value="image">图片</option>
-              <option value="video">视频</option>
-              <option value="pdf">PDF</option>
+              <option value="">{getTranslation('allTypes', t, i18n)}</option>
+              <option value="image">{getTranslation('imageType', t, i18n)}</option>
+              <option value="video">{getTranslation('videoType', t, i18n)}</option>
+              <option value="pdf">{getTranslation('pdfType', t, i18n)}</option>
             </select>
           </div>
 
@@ -592,7 +710,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
             {/* 分组编号 */}
             <input
               type="number"
-              placeholder="分组编号"
+              placeholder={getTranslation('groupNumber', t, i18n)}
               value={groupNumber}
               onChange={(e) => {
                 setGroupNumber(e.target.value)
@@ -609,7 +727,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
             {/* 场景编号 */}
             <input
               type="number"
-              placeholder="场景编号"
+              placeholder={getTranslation('sceneNumber', t, i18n)}
               value={sceneNumber}
               onChange={(e) => {
                 setSceneNumber(e.target.value)
@@ -626,7 +744,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
             {/* 图片编号 */}
             <input
               type="number"
-              placeholder="图片编号"
+              placeholder={getTranslation('imageNumber', t, i18n)}
               value={imageNumber}
               onChange={(e) => {
                 setImageNumber(e.target.value)
@@ -643,7 +761,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
             {/* 系列编号 */}
             <input
               type="text"
-              placeholder="系列编号"
+              placeholder={getTranslation('seriesNumber', t, i18n)}
               value={seriesNumber}
               onChange={(e) => {
                 setSeriesNumber(e.target.value)
@@ -674,7 +792,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                     fontSize: '12px',
                   }}
                 >
-                  分类: {categories.find(c => String(c.id) === selectedCategory)?.name}
+                  {getTranslation('category', t, i18n)}: {categories.find(c => String(c.id) === selectedCategory)?.name}
                   <button
                     onClick={() => {
                       setSelectedCategory('')
@@ -708,7 +826,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                     fontSize: '12px',
                   }}
                 >
-                  标签: {tags.find(t => String(t.id) === selectedTag)?.name}
+                  {getTranslation('tag', t, i18n)}: {tags.find(tag => String(tag.id) === selectedTag)?.name}
                   <button
                     onClick={() => {
                       setSelectedTag('')
@@ -742,7 +860,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                     fontSize: '12px',
                   }}
                 >
-                  类型: {mimeTypeFilter === 'video' ? '视频' : mimeTypeFilter === 'pdf' ? 'PDF' : mimeTypeFilter}
+                  {getTranslation('type', t, i18n)}: {mimeTypeFilter === 'video' ? getTranslation('videoType', t, i18n) : mimeTypeFilter === 'pdf' ? getTranslation('pdfType', t, i18n) : mimeTypeFilter}
                   <button
                     onClick={() => {
                       setMimeTypeFilter('image')
@@ -776,7 +894,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                     fontSize: '12px',
                   }}
                 >
-                  分组: {groupNumber}
+                  {getTranslation('group', t, i18n)}: {groupNumber}
                   <button
                     onClick={() => {
                       setGroupNumber('')
@@ -810,7 +928,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                     fontSize: '12px',
                   }}
                 >
-                  场景: {sceneNumber}
+                  {getTranslation('scene', t, i18n)}: {sceneNumber}
                   <button
                     onClick={() => {
                       setSceneNumber('')
@@ -844,7 +962,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                     fontSize: '12px',
                   }}
                 >
-                  图片: {imageNumber}
+                  {getTranslation('image', t, i18n)}: {imageNumber}
                   <button
                     onClick={() => {
                       setImageNumber('')
@@ -878,7 +996,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                     fontSize: '12px',
                   }}
                 >
-                  系列: {seriesNumber}
+                  {getTranslation('series', t, i18n)}: {seriesNumber}
                   <button
                     onClick={() => {
                       setSeriesNumber('')
@@ -913,17 +1031,18 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
         >
           {loading ? (
             <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
-              加载中...
+              {getTranslation('loading', t, i18n)}
             </div>
           ) : media.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
-              未找到图片
+              {getTranslation('noImagesFound', t, i18n)}
             </div>
-          ) : (
+          ) : viewMode === 'grid' ? (
+            /* 网格视图 */
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
                 gap: '12px',
               }}
             >
@@ -932,93 +1051,378 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                   key={item.id}
                   onClick={() => onSelect(String(item.id))}
                   style={{
-                    aspectRatio: '1',
-                    borderRadius: '4px',
+                    borderRadius: '8px',
                     overflow: 'hidden',
                     cursor: 'pointer',
                     border: '2px solid #e5e7eb',
                     transition: 'all 0.2s',
-                    position: 'relative',
+                    backgroundColor: '#ffffff',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = '#A08745'
-                    e.currentTarget.style.transform = 'scale(1.05)'
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(160, 135, 69, 0.2)'
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.borderColor = '#e5e7eb'
-                    e.currentTarget.style.transform = 'scale(1)'
+                    e.currentTarget.style.boxShadow = 'none'
                   }}
                 >
-                  {item.thumbnailURL || item.url ? (
-                    <img
-                      src={item.thumbnailURL || item.url}
-                      alt={item.alt || item.filename}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                      }}
-                    />
-                  ) : (
+                  {/* 图片区域 */}
+                  <div style={{ aspectRatio: '1', position: 'relative', backgroundColor: '#f9fafb' }}>
+                    {item.thumbnailURL || item.url ? (
+                      <img
+                        src={item.thumbnailURL || item.url}
+                        alt={item.alt || item.filename}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#9ca3af',
+                        }}
+                      >
+                        <ImageIcon size={32} />
+                      </div>
+                    )}
+                  </div>
+                  {/* 文件名区域 */}
+                  <div
+                    style={{
+                      padding: '8px',
+                      borderTop: '1px solid #f3f4f6',
+                    }}
+                  >
                     <div
                       style={{
-                        width: '100%',
-                        height: '100%',
-                        backgroundColor: '#f3f4f6',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
                         fontSize: '12px',
-                        color: '#6b7280',
+                        color: '#374151',
+                        fontWeight: 500,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
                       }}
+                      title={item.filename}
                     >
                       {item.filename}
                     </div>
-                  )}
+                    {item.width && item.height && (
+                      <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '2px' }}>
+                        {item.width} × {item.height}
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
+            </div>
+          ) : (
+            /* 列表视图 */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {media.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => onSelect(String(item.id))}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    border: '2px solid #e5e7eb',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    backgroundColor: '#ffffff',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#A08745'
+                    e.currentTarget.style.backgroundColor = '#FFFBEB'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = '#e5e7eb'
+                    e.currentTarget.style.backgroundColor = '#ffffff'
+                  }}
+                >
+                  {/* 缩略图 */}
+                  <div
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      borderRadius: '6px',
+                      overflow: 'hidden',
+                      flexShrink: 0,
+                      backgroundColor: '#f9fafb',
+                    }}
+                  >
+                    {item.thumbnailURL || item.url ? (
+                      <img
+                        src={item.thumbnailURL || item.url}
+                        alt={item.alt || item.filename}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#9ca3af',
+                        }}
+                      >
+                        <ImageIcon size={24} />
+                      </div>
+                    )}
+                  </div>
+                  {/* 文件信息 */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: 500,
+                        color: '#1f2937',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                      title={item.filename}
+                    >
+                      {item.filename}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px', display: 'flex', gap: '12px' }}>
+                      {item.width && item.height && (
+                        <span>{item.width} × {item.height}</span>
+                      )}
+                      {item.mimeType && (
+                        <span>{item.mimeType.split('/')[1]?.toUpperCase()}</span>
+                      )}
+                    </div>
+                    {item.alt && (
+                      <div
+                        style={{
+                          fontSize: '11px',
+                          color: '#9ca3af',
+                          marginTop: '2px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        Alt: {item.alt}
+                      </div>
+                    )}
+                  </div>
+                  {/* 选择指示 */}
+                  <div
+                    style={{
+                      padding: '6px 12px',
+                      backgroundColor: '#A08745',
+                      color: 'white',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      fontWeight: 500,
+                      opacity: 0,
+                      transition: 'opacity 0.2s',
+                    }}
+                    className="select-indicator"
+                  >
+                    {getTranslation('select', t, i18n)}
+                  </div>
+                </div>
+              ))}
+              <style>{`
+                div:hover > .select-indicator {
+                  opacity: 1 !important;
+                }
+              `}</style>
             </div>
           )}
         </div>
 
         {/* 分页 */}
         {totalPages > 1 && (
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+            {/* 首页 */}
+            <button
+              type="button"
+              onClick={() => setPage(1)}
+              disabled={page === 1}
+              title={getTranslation('firstPage', t, i18n)}
+              style={{
+                padding: '6px 10px',
+                backgroundColor: page === 1 ? '#f3f4f6' : '#ffffff',
+                color: page === 1 ? '#9ca3af' : '#374151',
+                border: '1px solid #e5e7eb',
+                borderRadius: '4px',
+                cursor: page === 1 ? 'not-allowed' : 'pointer',
+                fontSize: '13px',
+              }}
+            >
+              «
+            </button>
+            {/* 上一页 */}
             <button
               type="button"
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
               style={{
-                padding: '4px 12px',
-                backgroundColor: page === 1 ? '#e5e7eb' : '#A08745',
-                color: page === 1 ? '#9ca3af' : 'white',
-                border: 'none',
+                padding: '6px 12px',
+                backgroundColor: page === 1 ? '#f3f4f6' : '#ffffff',
+                color: page === 1 ? '#9ca3af' : '#374151',
+                border: '1px solid #e5e7eb',
                 borderRadius: '4px',
                 cursor: page === 1 ? 'not-allowed' : 'pointer',
-                fontSize: '14px',
+                fontSize: '13px',
               }}
             >
-              上一页
+              {getTranslation('prevPage', t, i18n)}
             </button>
-            <span style={{ padding: '4px 12px', fontSize: '14px', color: '#6b7280' }}>
-              {page} / {totalPages}
-            </span>
+
+            {/* 页码按钮 */}
+            <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+              {(() => {
+                const pages: (number | string)[] = []
+                const showPages = 5 // 最多显示的页码数
+                let start = Math.max(1, page - Math.floor(showPages / 2))
+                let end = Math.min(totalPages, start + showPages - 1)
+
+                // 调整 start 如果 end 到达边界
+                if (end - start + 1 < showPages) {
+                  start = Math.max(1, end - showPages + 1)
+                }
+
+                // 添加第一页
+                if (start > 1) {
+                  pages.push(1)
+                  if (start > 2) pages.push('...')
+                }
+
+                // 添加中间页码
+                for (let i = start; i <= end; i++) {
+                  pages.push(i)
+                }
+
+                // 添加最后一页
+                if (end < totalPages) {
+                  if (end < totalPages - 1) pages.push('...')
+                  pages.push(totalPages)
+                }
+
+                return pages.map((p, idx) => (
+                  p === '...' ? (
+                    <span key={`ellipsis-${idx}`} style={{ padding: '0 4px', color: '#9ca3af' }}>...</span>
+                  ) : (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setPage(p as number)}
+                      style={{
+                        minWidth: '32px',
+                        padding: '6px 10px',
+                        backgroundColor: page === p ? '#A08745' : '#ffffff',
+                        color: page === p ? 'white' : '#374151',
+                        border: page === p ? '1px solid #A08745' : '1px solid #e5e7eb',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                        fontWeight: page === p ? 600 : 400,
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      {p}
+                    </button>
+                  )
+                ))
+              })()}
+            </div>
+
+            {/* 下一页 */}
             <button
               type="button"
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
               style={{
-                padding: '4px 12px',
-                backgroundColor: page === totalPages ? '#e5e7eb' : '#A08745',
-                color: page === totalPages ? '#9ca3af' : 'white',
-                border: 'none',
+                padding: '6px 12px',
+                backgroundColor: page === totalPages ? '#f3f4f6' : '#ffffff',
+                color: page === totalPages ? '#9ca3af' : '#374151',
+                border: '1px solid #e5e7eb',
                 borderRadius: '4px',
                 cursor: page === totalPages ? 'not-allowed' : 'pointer',
-                fontSize: '14px',
+                fontSize: '13px',
               }}
             >
-              下一页
+              {getTranslation('nextPage', t, i18n)}
             </button>
+            {/* 末页 */}
+            <button
+              type="button"
+              onClick={() => setPage(totalPages)}
+              disabled={page === totalPages}
+              title={getTranslation('lastPage', t, i18n)}
+              style={{
+                padding: '6px 10px',
+                backgroundColor: page === totalPages ? '#f3f4f6' : '#ffffff',
+                color: page === totalPages ? '#9ca3af' : '#374151',
+                border: '1px solid #e5e7eb',
+                borderRadius: '4px',
+                cursor: page === totalPages ? 'not-allowed' : 'pointer',
+                fontSize: '13px',
+              }}
+            >
+              »
+            </button>
+
+            {/* 跳转输入 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginLeft: '12px' }}>
+              <span style={{ fontSize: '13px', color: '#6b7280' }}>{getTranslation('jumpTo', t, i18n)}</span>
+              <input
+                type="number"
+                min={1}
+                max={totalPages}
+                defaultValue={page}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const value = parseInt((e.target as HTMLInputElement).value)
+                    if (value >= 1 && value <= totalPages) {
+                      setPage(value)
+                    }
+                  }
+                }}
+                onBlur={(e) => {
+                  const value = parseInt(e.target.value)
+                  if (value >= 1 && value <= totalPages && value !== page) {
+                    setPage(value)
+                  } else {
+                    e.target.value = String(page)
+                  }
+                }}
+                style={{
+                  width: '50px',
+                  padding: '6px 8px',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '4px',
+                  fontSize: '13px',
+                  textAlign: 'center',
+                  outline: 'none',
+                }}
+              />
+              <span style={{ fontSize: '13px', color: '#6b7280' }}>{getTranslation('page', t, i18n)}</span>
+              <span style={{ fontSize: '12px', color: '#9ca3af', marginLeft: '4px' }}>
+                {getTranslation('totalPages', t, i18n).replace('{total}', String(totalPages))}
+              </span>
+            </div>
           </div>
         )}
 
@@ -1037,7 +1441,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
               fontSize: '14px',
             }}
           >
-            取消
+            {getTranslation('cancel', t, i18n)}
           </button>
         </div>
       </div>
@@ -1473,7 +1877,7 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
                       overflow: 'hidden',
                       position: 'relative',
                     }}
-                    title="点击选择图片"
+                    title={getTranslation('clickToSelect', t, i18n)}
                   >
                     {item.image && imageCache[item.image as string] ? (
                       <>
@@ -1497,17 +1901,17 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
                           padding: '2px 4px',
                           textAlign: 'center',
                         }}>
-                          点击更换
+                          {getTranslation('clickToChange', t, i18n)}
                         </div>
                       </>
                     ) : item.image ? (
                       <div style={{ textAlign: 'center', fontSize: '10px', padding: '4px' }}>
-                        加载中...
+                        {getTranslation('loading', t, i18n)}
                       </div>
                     ) : (
                       <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                         <ImageIcon size={20} style={{ color: '#9ca3af' }} />
-                        <span style={{ fontSize: '10px' }}>点击选择</span>
+                        <span style={{ fontSize: '10px' }}>{getTranslation('clickToSelect', t, i18n)}</span>
                       </div>
                     )}
                   </div>
@@ -1734,7 +2138,7 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
                       }}
                     >
                       <ImageIcon size={24} style={{ marginBottom: '8px', color: '#9ca3af' }} />
-                      <div>加载中...</div>
+                      <div>{getTranslation('loading', t, i18n)}</div>
                     </div>
                   )}
                 </div>
@@ -1760,6 +2164,8 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
             setTempImageId('')
           }}
           imageIndex={editingImageIndex}
+          t={t}
+          i18n={i18n}
         />
       )}
 
@@ -1936,8 +2342,8 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
               gap: '20px',
             }}
           >
-            <span>← → 切换</span>
-            <span>ESC 关闭</span>
+            <span>← → {getTranslation('switch', t, i18n)}</span>
+            <span>{getTranslation('escClose', t, i18n)}</span>
           </div>
         </div>
       )}

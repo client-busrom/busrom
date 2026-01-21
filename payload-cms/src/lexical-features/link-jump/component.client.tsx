@@ -35,7 +35,7 @@ export const LinkJumpComponent: React.FC<LinkJumpComponentProps> = (props) => {
   const [showMediaPicker, setShowMediaPicker] = useState(false)
   const [isLinkPickerOpen, setIsLinkPickerOpen] = useState(false)
   const [iconData, setIconData] = useState<MediaData | null>(null)
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const nodeData = (props as any).data || (props as any).node?.__data || (props as any).__data
   const nodeKey = props.nodeKey
@@ -511,6 +511,9 @@ export const LinkJumpComponent: React.FC<LinkJumpComponentProps> = (props) => {
         isOpen={showMediaPicker}
         onSelect={handleIconSelect}
         onClose={() => setShowMediaPicker(false)}
+        imageIndex={0}
+        t={t}
+        i18n={i18n}
       />
 
       {/* LinkPickerModal */}

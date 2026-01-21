@@ -10,7 +10,13 @@ const CUSTOM_CURSOR = `url("data:image/svg+xml,${encodeURIComponent(CUSTOM_CURSO
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920
-const SECTION_HEIGHT = 1083
+const SECTION_HEIGHT = 922
+
+// 原始内容高度（用于计算垂直居中）
+const ORIGINAL_CONTENT_HEIGHT = 1083
+
+// 内容缩放比例
+const CONTENT_SCALE = 0.9
 
 // 图片区域位置和尺寸
 const IMAGE_LEFT = 152
@@ -71,6 +77,17 @@ export function QuoteImageSection({
         background: "linear-gradient(180deg, #FFF9E8 0%, #F9E9A7 100%)",
       }}
     >
+      {/* 内容容器 - 整体缩小到90%并垂直居中 */}
+      {/* 缩放后内容高度: 1083 * 0.9 = 974.7, 垂直偏移: (922 - 974.7) / 2 = -26.35 */}
+      <div
+        className="absolute left-0 w-full"
+        style={{
+          height: vw(ORIGINAL_CONTENT_HEIGHT),
+          top: `calc(50% - ${vw(ORIGINAL_CONTENT_HEIGHT * CONTENT_SCALE / 2)})`,
+          transform: `scale(${CONTENT_SCALE})`,
+          transformOrigin: "top center",
+        }}
+      >
       {/* 底层：黑色标题文字 */}
       <h2
         className="absolute font-josefin-sans font-bold text-center"
@@ -216,6 +233,7 @@ export function QuoteImageSection({
             {buttonText}
           </span>
         </Link>
+      </div>
       </div>
     </section>
   )

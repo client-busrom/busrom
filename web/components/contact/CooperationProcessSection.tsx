@@ -320,7 +320,7 @@ export function CooperationProcessSection({
         className="absolute flex items-center cursor-pointer group"
         style={{
           left: vw(1176),
-          top: vw(769),  // 7477-6708=769
+          top: vw(819),  // 7477-6708=769, +50px
           height: vw(66),
         }}
         onClick={onButtonClick}

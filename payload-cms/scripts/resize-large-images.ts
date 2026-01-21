@@ -277,10 +277,17 @@ async function main() {
   const offsetArg = args.find((a) => a.startsWith('--offset='))
   const offset = offsetArg ? parseInt(offsetArg.split('=')[1], 10) : 0
 
+  // Filter by dimension instead of file size
+  const byDimension = args.includes('--by-dimension')
+
+  // Min dimension to filter (only process images larger than this)
+  const minDimArg = args.find((a) => a.startsWith('--min-dimension='))
+  const minDimension = minDimArg ? parseInt(minDimArg.split('=')[1], 10) : 5200
+
   console.log('🖼️  Resize Large Images Script')
   console.log(`   Mode: ${dryRun ? 'DRY RUN (no changes)' : 'LIVE (will resize images)'}`)
-  console.log(`   Min Size: ${minSizeMB} MB`)
-  console.log(`   Max Dimension: ${maxDimension}px`)
+  console.log(`   Filter by: ${byDimension ? `dimension > ${minDimension}px` : `filesize > ${minSizeMB}MB`}`)
+  console.log(`   Resize to: max ${maxDimension}px`)
   console.log(`   Quality: ${quality}`)
   console.log(`   Bucket: ${S3_BUCKET}`)
   if (limit) console.log(`   Limit: ${limit}`)
@@ -300,18 +307,33 @@ async function main() {
 
   try {
     // Find large media records
-    let query = `
-      SELECT id, filename, url, mime_type, width, height, filesize
-      FROM media
-      WHERE mime_type LIKE 'image/%'
-        AND filesize > $1
-      ORDER BY filesize DESC
-    `
+    let query: string
+    let queryParams: any[] = []
 
-    const queryParams: any[] = [minSizeBytes]
+    if (byDimension) {
+      // Filter by dimension: width or height > minDimension
+      query = `
+        SELECT id, filename, url, mime_type, width, height, filesize
+        FROM media
+        WHERE mime_type LIKE 'image/%'
+          AND (width > $1 OR height > $1)
+        ORDER BY GREATEST(width, height) DESC
+      `
+      queryParams = [minDimension]
+    } else {
+      // Filter by file size
+      query = `
+        SELECT id, filename, url, mime_type, width, height, filesize
+        FROM media
+        WHERE mime_type LIKE 'image/%'
+          AND filesize > $1
+        ORDER BY filesize DESC
+      `
+      queryParams = [minSizeBytes]
+    }
 
     if (limit) {
-      query += ` LIMIT $2`
+      query += ` LIMIT $${queryParams.length + 1}`
       queryParams.push(limit)
     }
     if (offset) {

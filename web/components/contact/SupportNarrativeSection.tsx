@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState, useEffect, useCallback, useRef } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import {
@@ -14,23 +14,30 @@ import {
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920
-const SECTION_HEIGHT = 890 // 调整为实际内容高度
+const SECTION_HEIGHT = 922 // 调整为与 BusromMainFeaturesSection 一致
 
 // 响应式尺寸函数
 const rpx = (designValue: number) => `calc(var(--rpx-support) * ${designValue})`
 
-// 边框尺寸 (240x353)
-const FRAME_WIDTH = 240
-const FRAME_HEIGHT = 353
+// 边框尺寸 (240x353 * 0.8)
+const FRAME_WIDTH = 192
+const FRAME_HEIGHT = 282
 
-// 跑道形轨道参数（顶部半圆 + 直线 + 底部半圆）
-const TRACK_RADIUS = 118 // 半圆半径 (120 - 2px边距)
-const TRACK_CENTER_X = 120 // 中心x
-const TRACK_TOP_CENTER_Y = 120 // 顶部半圆中心y
-const TRACK_BOTTOM_CENTER_Y = 233 // 底部半圆中心y
+// 跑道形轨道参数 (80%缩放)
+const TRACK_RADIUS = 94      // 118 * 0.8
+const TRACK_CENTER_X = 96    // 120 * 0.8
+const TRACK_TOP_CENTER_Y = 96     // 120 * 0.8
+const TRACK_BOTTOM_CENTER_Y = 186 // 233 * 0.8
 
-// 卡片间距
-const CARD_GAP = 27
+// 卡片间距 (80%缩放)
+const CARD_GAP = 22  // 27 * 0.8
+
+// 星星轨道运动一周的时间 (秒)
+const STAR_ORBIT_DURATION = 4
+// 轮播间隔 = 星星转一周 (ms)
+const AUTO_PLAY_INTERVAL = STAR_ORBIT_DURATION * 1000
+// 鼠标不动后恢复轮播的时间 (ms)
+const RESUME_DELAY = 4000
 
 // 图标映射
 const iconMap: Record<string, React.ComponentType<any>> = {
@@ -45,6 +52,54 @@ const iconMap: Record<string, React.ComponentType<any>> = {
 // 默认图标顺序
 const defaultIcons = [FileText, Lightbulb, Settings, Calculator, Package, Layers]
 
+// 生成跑道形路径
+const generateTrackPath = (startPercent: number) => {
+  const xPoints: number[] = []
+  const yPoints: number[] = []
+  const steps = 72
+
+  for (let i = 0; i <= steps; i++) {
+    const percent = ((startPercent + (i / steps) * 100) % 100) / 100
+    let x: number, y: number
+
+    if (percent < 0.16) {
+      const angle = (270 + (percent / 0.16) * 90) * Math.PI / 180
+      x = TRACK_CENTER_X + TRACK_RADIUS * Math.cos(angle)
+      y = TRACK_TOP_CENTER_Y + TRACK_RADIUS * Math.sin(angle)
+    } else if (percent < 0.34) {
+      const t = (percent - 0.16) / 0.18
+      x = TRACK_CENTER_X + TRACK_RADIUS
+      y = TRACK_TOP_CENTER_Y + t * (TRACK_BOTTOM_CENTER_Y - TRACK_TOP_CENTER_Y)
+    } else if (percent < 0.66) {
+      const angle = ((percent - 0.34) / 0.32) * 180 * Math.PI / 180
+      x = TRACK_CENTER_X + TRACK_RADIUS * Math.cos(angle)
+      y = TRACK_BOTTOM_CENTER_Y + TRACK_RADIUS * Math.sin(angle)
+    } else if (percent < 0.84) {
+      const t = (percent - 0.66) / 0.18
+      x = TRACK_CENTER_X - TRACK_RADIUS
+      y = TRACK_BOTTOM_CENTER_Y - t * (TRACK_BOTTOM_CENTER_Y - TRACK_TOP_CENTER_Y)
+    } else {
+      const angle = (180 + ((percent - 0.84) / 0.16) * 90) * Math.PI / 180
+      x = TRACK_CENTER_X + TRACK_RADIUS * Math.cos(angle)
+      y = TRACK_TOP_CENTER_Y + TRACK_RADIUS * Math.sin(angle)
+    }
+
+    xPoints.push(x)
+    yPoints.push(y)
+  }
+  return { x: xPoints, y: yPoints }
+}
+
+// 预计算路径
+const largeStarPath = generateTrackPath(10)
+const littleStarPath = generateTrackPath(60)
+
+// 星星初始位置
+const largeStarInitialX = largeStarPath.x[0]
+const largeStarInitialY = largeStarPath.y[0]
+const littleStarInitialX = littleStarPath.x[0]
+const littleStarInitialY = littleStarPath.y[0]
+
 export interface SupportCardData {
   id: string | number
   title: string
@@ -54,66 +109,13 @@ export interface SupportCardData {
 interface SupportCardProps {
   card: SupportCardData
   index: number
+  isActive: boolean
+  onHover: () => void
 }
 
-function SupportCard({ card, index }: SupportCardProps) {
+function SupportCard({ card, index, isActive, onHover }: SupportCardProps) {
   // 根据icon字符串获取图标组件，否则使用默认顺序
   const Icon = card.icon ? iconMap[card.icon] || defaultIcons[index] : defaultIcons[index]
-
-  // 生成跑道形路径上的关键帧 (顺时针)
-  // 路径: 右侧直线向下 -> 底部半圆 -> 左侧直线向上 -> 顶部半圆
-  const generateTrackPath = (startPercent: number) => {
-    const xPoints: number[] = []
-    const yPoints: number[] = []
-    const steps = 72 // 总步数
-
-    for (let i = 0; i <= steps; i++) {
-      const percent = ((startPercent + (i / steps) * 100) % 100) / 100
-      let x: number, y: number
-
-      // 路径分段：
-      // 0-0.16: 顶部半圆右半部分 (从顶部到右侧)
-      // 0.16-0.34: 右侧直线向下
-      // 0.34-0.66: 底部半圆 (从右到左)
-      // 0.66-0.84: 左侧直线向上
-      // 0.84-1.0: 顶部半圆左半部分 (从左侧到顶部)
-
-      if (percent < 0.16) {
-        // 顶部半圆右半部分 (270° -> 360°)
-        const angle = (270 + (percent / 0.16) * 90) * Math.PI / 180
-        x = TRACK_CENTER_X + TRACK_RADIUS * Math.cos(angle)
-        y = TRACK_TOP_CENTER_Y + TRACK_RADIUS * Math.sin(angle)
-      } else if (percent < 0.34) {
-        // 右侧直线向下
-        const t = (percent - 0.16) / 0.18
-        x = TRACK_CENTER_X + TRACK_RADIUS
-        y = TRACK_TOP_CENTER_Y + t * (TRACK_BOTTOM_CENTER_Y - TRACK_TOP_CENTER_Y)
-      } else if (percent < 0.66) {
-        // 底部半圆 (0° -> 180°)
-        const angle = ((percent - 0.34) / 0.32) * 180 * Math.PI / 180
-        x = TRACK_CENTER_X + TRACK_RADIUS * Math.cos(angle)
-        y = TRACK_BOTTOM_CENTER_Y + TRACK_RADIUS * Math.sin(angle)
-      } else if (percent < 0.84) {
-        // 左侧直线向上
-        const t = (percent - 0.66) / 0.18
-        x = TRACK_CENTER_X - TRACK_RADIUS
-        y = TRACK_BOTTOM_CENTER_Y - t * (TRACK_BOTTOM_CENTER_Y - TRACK_TOP_CENTER_Y)
-      } else {
-        // 顶部半圆左半部分 (180° -> 270°)
-        const angle = (180 + ((percent - 0.84) / 0.16) * 90) * Math.PI / 180
-        x = TRACK_CENTER_X + TRACK_RADIUS * Math.cos(angle)
-        y = TRACK_TOP_CENTER_Y + TRACK_RADIUS * Math.sin(angle)
-      }
-
-      xPoints.push(x)
-      yPoints.push(y)
-    }
-    return { x: xPoints, y: yPoints }
-  }
-
-  // 大星星从右上角开始 (约10%)，小星星从左下角开始 (约60%)
-  const largeStarPath = generateTrackPath(10)
-  const littleStarPath = generateTrackPath(60)
 
   return (
     <motion.div
@@ -122,16 +124,17 @@ function SupportCard({ card, index }: SupportCardProps) {
         width: rpx(FRAME_WIDTH),
         height: rpx(FRAME_HEIGHT),
       }}
-      whileHover="hover"
-      initial="initial"
+      onMouseEnter={onHover}
+      animate={isActive ? "active" : "inactive"}
+      initial="inactive"
     >
       {/* 整体放大容器 */}
       <motion.div
         className="relative w-full h-full"
         style={{ transformOrigin: "center center" }}
         variants={{
-          initial: { scale: 1 },
-          hover: { scale: 1.15 },
+          inactive: { scale: 1 },
+          active: { scale: 1.15 },
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
       >
@@ -143,36 +146,30 @@ function SupportCard({ card, index }: SupportCardProps) {
           className="object-contain"
         />
 
-        {/* 大星星 - 右上角起始，顺时针沿椭圆移动 */}
+        {/* 大星星 */}
         <motion.div
           className="absolute"
           style={{
-            width: rpx(44),
-            height: rpx(42),
-            marginLeft: rpx(-22),
-            marginTop: rpx(-21),
+            width: rpx(35),   // 44 * 0.8
+            height: rpx(34),  // 42 * 0.8
+            marginLeft: rpx(-18), // -22 * 0.8
+            marginTop: rpx(-17),  // -21 * 0.8
           }}
-          animate={{
+          animate={isActive ? {
             left: largeStarPath.x.map((v) => rpx(v)),
             top: largeStarPath.y.map((v) => rpx(v)),
             rotate: 360,
+          } : {
+            left: rpx(largeStarInitialX),
+            top: rpx(largeStarInitialY),
+            rotate: 0,
           }}
-          transition={{
-            left: {
-              duration: 8,
-              ease: "linear",
-              repeat: Infinity,
-            },
-            top: {
-              duration: 8,
-              ease: "linear",
-              repeat: Infinity,
-            },
-            rotate: {
-              duration: 3,
-              ease: "linear",
-              repeat: Infinity,
-            },
+          transition={isActive ? {
+            left: { duration: STAR_ORBIT_DURATION, ease: "linear", repeat: Infinity },
+            top: { duration: STAR_ORBIT_DURATION, ease: "linear", repeat: Infinity },
+            rotate: { duration: STAR_ORBIT_DURATION / 2, ease: "linear", repeat: Infinity },
+          } : {
+            duration: 0.3,
           }}
         >
           <Image
@@ -183,36 +180,30 @@ function SupportCard({ card, index }: SupportCardProps) {
           />
         </motion.div>
 
-        {/* 小星星 - 左下角起始，顺时针沿椭圆移动 */}
+        {/* 小星星 */}
         <motion.div
           className="absolute"
           style={{
-            width: rpx(23),
-            height: rpx(22),
-            marginLeft: rpx(-11.5),
-            marginTop: rpx(-11),
+            width: rpx(18),   // 23 * 0.8
+            height: rpx(18),  // 22 * 0.8
+            marginLeft: rpx(-9),  // -11.5 * 0.8
+            marginTop: rpx(-9),   // -11 * 0.8
           }}
-          animate={{
+          animate={isActive ? {
             left: littleStarPath.x.map((v) => rpx(v)),
             top: littleStarPath.y.map((v) => rpx(v)),
             rotate: 360,
+          } : {
+            left: rpx(littleStarInitialX),
+            top: rpx(littleStarInitialY),
+            rotate: 0,
           }}
-          transition={{
-            left: {
-              duration: 8,
-              ease: "linear",
-              repeat: Infinity,
-            },
-            top: {
-              duration: 8,
-              ease: "linear",
-              repeat: Infinity,
-            },
-            rotate: {
-              duration: 4,
-              ease: "linear",
-              repeat: Infinity,
-            },
+          transition={isActive ? {
+            left: { duration: STAR_ORBIT_DURATION, ease: "linear", repeat: Infinity },
+            top: { duration: STAR_ORBIT_DURATION, ease: "linear", repeat: Infinity },
+            rotate: { duration: STAR_ORBIT_DURATION / 1.5, ease: "linear", repeat: Infinity },
+          } : {
+            duration: 0.3,
           }}
         >
           <Image
@@ -230,13 +221,15 @@ function SupportCard({ card, index }: SupportCardProps) {
             left: "50%",
             top: "40%",
             transform: "translate(-50%, -50%)",
+            width: rpx(48),  // 60 * 0.8
+            height: rpx(48),
           }}
         >
           <Icon
             className="text-brand-light-olive"
             style={{
-              width: rpx(60),
-              height: rpx(60),
+              width: rpx(48),  // 60 * 0.8
+              height: rpx(48),
             }}
             strokeWidth={1.5}
           />
@@ -247,11 +240,11 @@ function SupportCard({ card, index }: SupportCardProps) {
           className="absolute font-anaheim font-semibold text-black text-center"
           style={{
             left: "50%",
-            top: rpx(220),
+            top: rpx(176),  // 220 * 0.8
             transform: "translateX(-50%)",
-            width: rpx(200),
-            fontSize: rpx(24),
-            lineHeight: rpx(28),
+            width: rpx(160), // 200 * 0.8
+            fontSize: rpx(19), // 24 * 0.8
+            lineHeight: rpx(22), // 28 * 0.8
           }}
         >
           {card.title.split("\n").map((line, i) => (
@@ -282,14 +275,100 @@ export function SupportNarrativeSection({
   // vw 尺寸计算
   const vw = (v: number) => `${(v / DESIGN_WIDTH) * 100}vw`
 
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
+  const resumeTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const autoPlayTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // 自动轮播
+  useEffect(() => {
+    if (isPaused || cards.length === 0) return
+
+    autoPlayTimerRef.current = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % cards.length)
+    }, AUTO_PLAY_INTERVAL)
+
+    return () => {
+      if (autoPlayTimerRef.current) {
+        clearInterval(autoPlayTimerRef.current)
+      }
+    }
+  }, [isPaused, cards.length])
+
+  // 鼠标悬停处理
+  const handleHover = useCallback((index: number) => {
+    // 暂停自动轮播
+    setIsPaused(true)
+    setActiveIndex(index)
+
+    // 清除之前的恢复计时器
+    if (resumeTimerRef.current) {
+      clearTimeout(resumeTimerRef.current)
+    }
+
+    // 设置新的恢复计时器
+    resumeTimerRef.current = setTimeout(() => {
+      setIsPaused(false)
+    }, RESUME_DELAY)
+  }, [])
+
+  // 清理计时器
+  useEffect(() => {
+    return () => {
+      if (resumeTimerRef.current) {
+        clearTimeout(resumeTimerRef.current)
+      }
+      if (autoPlayTimerRef.current) {
+        clearInterval(autoPlayTimerRef.current)
+      }
+    }
+  }, [])
+
   return (
+    <>
+    {/* Mobile Layout */}
+    <section className="md:hidden bg-brand-main px-4 py-8">
+      {/* 标题区域 */}
+      <div className="text-center mb-8">
+        <h2 className="font-josefin-sans font-bold text-2xl text-black mb-2">
+          {title}
+        </h2>
+      </div>
+
+      {/* 卡片网格 - 2列3行 */}
+      <div className="grid grid-cols-2 gap-4">
+        {cards.map((card, index) => {
+          const Icon = card.icon ? iconMap[card.icon] || defaultIcons[index] : defaultIcons[index]
+          const isActive = index === activeIndex
+          return (
+            <div
+              key={card.id}
+              className={`relative bg-brand-main border-2 rounded-3xl p-4 flex flex-col items-center justify-center min-h-[140px] transition-all duration-300 ${isActive ? 'border-[#756F3F] shadow-lg scale-105' : 'border-[#E3DEB8]'}`}
+              onClick={() => handleHover(index)}
+            >
+              {/* 图标 */}
+              <div className="relative w-12 h-12 mb-3 flex items-center justify-center">
+                <Icon
+                  className="text-brand-light-olive w-10 h-10"
+                  strokeWidth={1.5}
+                />
+              </div>
+              {/* 标题 */}
+              <p className="font-anaheim font-semibold text-sm text-center text-black leading-tight">
+                {card.title.split("\n").join(" ")}
+              </p>
+            </div>
+          )
+        })}
+      </div>
+    </section>
+
+    {/* Desktop Layout */}
     <section
-      className="relative w-full flex flex-col items-center"
+      className="relative w-full flex-col items-center justify-center hidden md:flex"
       style={{
-        minHeight: rpx(SECTION_HEIGHT),
-        paddingTop: rpx(100),
-        paddingBottom: rpx(100),
-        ["--rpx-support" as string]: `min(calc(100vw / ${DESIGN_WIDTH}), calc(100vh / ${SECTION_HEIGHT}))`,
+        height: rpx(SECTION_HEIGHT),
+        ["--rpx-support" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
       }}
     >
       {/* 背景漂浮圆形 - Ellipse 145 大正圆 左下 */}
@@ -357,16 +436,17 @@ export function SupportNarrativeSection({
           repeat: Infinity,
         }}
       />
+
       {/* 标题区域 */}
-      <div className="relative" style={{ marginBottom: rpx(100) }}>
+      <div className="relative z-10" style={{ marginBottom: rpx(64) }}>
         {/* 问号装饰 - 贴在 Get 上，摇摆动效 */}
         <motion.div
           className="absolute"
           style={{
-            right: rpx(-100),
-            top: rpx(-80),
-            width: rpx(110),
-            height: rpx(167),
+            right: rpx(-80),  // -100 * 0.8
+            top: rpx(-64),    // -80 * 0.8
+            width: rpx(88),   // 110 * 0.8
+            height: rpx(134), // 167 * 0.8
             transformOrigin: "center bottom",
           }}
           animate={{
@@ -391,15 +471,15 @@ export function SupportNarrativeSection({
         <h2
           className="relative z-10 font-josefin-sans font-bold text-black text-center flex justify-center"
           style={{
-            fontSize: rpx(77),
-            lineHeight: rpx(80),
+            fontSize: rpx(62),  // 77 * 0.8
+            lineHeight: rpx(64), // 80 * 0.8
           }}
         >
           {title.split("").map((char, index) => (
             <motion.span
               key={index}
               className="inline-block"
-              style={{ marginRight: char === " " ? rpx(20) : 0 }}
+              style={{ marginRight: char === " " ? rpx(16) : 0 }}
               animate={{
                 y: [0, -8, 0],
               }}
@@ -420,17 +500,24 @@ export function SupportNarrativeSection({
       {/* 卡片容器 - 居中 */}
       {cards.length > 0 && (
         <div
-          className="flex justify-center"
+          className="relative z-10 flex justify-center"
           style={{
             gap: rpx(CARD_GAP),
             width: rpx(totalCardsWidth),
           }}
         >
           {cards.map((card, index) => (
-            <SupportCard key={card.id} card={card} index={index} />
+            <SupportCard
+              key={card.id}
+              card={card}
+              index={index}
+              isActive={index === activeIndex}
+              onHover={() => handleHover(index)}
+            />
           ))}
         </div>
       )}
     </section>
+    </>
   )
 }

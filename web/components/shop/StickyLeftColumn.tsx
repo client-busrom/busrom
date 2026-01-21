@@ -57,11 +57,13 @@ export function StickyProductInfo({ children }: StickyProductInfoProps) {
       const wrapper = wrapperRef.current
       const content = contentRef.current
 
+      const stickyTop = 78 // 导航栏高度(46px) + 内容区padding(32px)
       const wrapperTop = wrapper.offsetTop
       const leftHeight = content.offsetHeight
       const rightHeight = rightColumn.offsetHeight
 
       console.log('📐 Measurements:', {
+        stickyTop,
         wrapperTop,
         leftHeight,
         rightHeight,
@@ -91,7 +93,7 @@ export function StickyProductInfo({ children }: StickyProductInfoProps) {
       // 使用 ScrollTrigger 但不用 pin,改用手动控制
       trigger = ScrollTrigger.create({
         trigger: wrapper,
-        start: `top ${wrapperTop}px`,
+        start: `top ${stickyTop}px`,
         end: () => {
           // 当左侧底部对齐右侧底部时结束
           if (rightHeight > leftHeight) {
@@ -101,22 +103,23 @@ export function StickyProductInfo({ children }: StickyProductInfoProps) {
         },
         onUpdate: (self) => {
           const progress = self.progress
+          const currentWidth = wrapper.offsetWidth
 
           if (self.isActive) {
-            // 激活状态:固定在顶部
+            // 激活状态:固定在顶部，留出导航栏空间
             gsap.set(content, {
               position: 'fixed',
-              top: wrapperTop,
-              width: wrapper.offsetWidth,
+              top: stickyTop,
+              width: currentWidth,
               zIndex: 10
             })
           } else if (progress >= 1) {
-            // 结束状态:恢复到容器底部
+            // 结束状态:使用绝对定位，top 值为右侧高度减去左侧高度
             gsap.set(content, {
               position: 'absolute',
-              top: 'auto',
-              bottom: 0,
-              width: '100%',
+              top: rightHeight - leftHeight,
+              bottom: 'auto',
+              width: currentWidth,
               zIndex: 'auto'
             })
           } else {
@@ -124,7 +127,7 @@ export function StickyProductInfo({ children }: StickyProductInfoProps) {
             gsap.set(content, {
               position: 'relative',
               top: 0,
-              width: '100%',
+              width: currentWidth,
               zIndex: 'auto'
             })
           }
@@ -166,7 +169,7 @@ export function StickyProductInfo({ children }: StickyProductInfoProps) {
   }, [])
 
   return (
-    <div ref={wrapperRef} className="w-full md:w-[70%] flex-shrink-0 relative">
+    <div ref={wrapperRef} className="w-full md:w-[60%] flex-shrink-0 relative">
       <div ref={contentRef}>
         {children}
       </div>

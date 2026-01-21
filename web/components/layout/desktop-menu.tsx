@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import Image from "next/image"
 import { Link } from "@/lib/navigation"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
 import type { NavItem } from "@/types/navigation"
 import { Settings, Globe, HelpCircle, Info, Book, FileText, ArrowRight } from "lucide-react"
@@ -51,19 +51,21 @@ const getProductSlug = (url: string): string | null => {
   return match ? match[2] : null
 }
 
+// 获取产品图片 URL（使用 small variant 768x512）
+const getImageUrl = (apiImage?: { url: string; filename?: string } | null): string | null => {
+  if (!apiImage?.url) return null
+  // 将原图 URL 转换为 small variant
+  // 原图: /media/xxx.jpg -> variant: /media/xxx-768x512.webp
+  return apiImage.url.replace(/(\.[^.]+)$/, '-768x512.webp')
+}
+
 // 获取产品图片（优先使用 API 返回的图片，否则使用映射）
-// 自动将原图 URL 转换为 small variant (768x512)
-const getProductImage = (url: string, apiImage?: { url: string; filename: string }): string | null => {
-  if (apiImage?.url) {
-    // 将原图 URL 转换为 small variant
-    // 原图: /media/xxx.jpg -> variant: /media/xxx-768x512.webp
-    const originalUrl = apiImage.url
-    const variantUrl = originalUrl.replace(/(\.[^.]+)$/, '-768x512.webp')
-    return variantUrl
-  }
+const getProductImage = (url: string, apiImage?: { url: string; filename?: string } | null): string | null => {
+  const imageUrl = getImageUrl(apiImage)
+  if (imageUrl) return imageUrl
+
   const slug = getProductSlug(url)
-  const mappedImage = slug ? productImageMap[slug] : null
-  return mappedImage
+  return slug ? productImageMap[slug] : null
 }
 
 export function DesktopMenu({ isOpen, onClose, navigationItems = [] }: DesktopMenuProps) {
@@ -183,13 +185,19 @@ export function DesktopMenu({ isOpen, onClose, navigationItems = [] }: DesktopMe
                                   >
                                     {/* 图片容器 */}
                                     <div className="absolute inset-0 overflow-hidden">
-                                      {imageUrl ? (
-                                        <Image
+                                      {child.image ? (
+                                        <OptimizedImage
+                                          image={child.image as any}
+                                          alt={child.label}
+                                          size="small"
+                                          loading="eager"
+                                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-125"
+                                        />
+                                      ) : imageUrl ? (
+                                        <img
                                           src={imageUrl}
                                           alt={child.label}
-                                          fill
-                                          sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                                          className="object-cover transition-transform duration-500 group-hover:scale-125"
+                                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-125"
                                         />
                                       ) : (
                                         <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-border">

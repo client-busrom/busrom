@@ -555,7 +555,8 @@ export const HeroComponent: React.FC<HeroComponentProps> = (props) => {
         onSelect={handleImageSelect}
         onClose={() => setShowMediaPicker(false)}
         imageIndex={0}
-        t={{} as any}
+        t={t}
+        i18n={i18n}
       />
 
       {/* LinkPickerModal */}

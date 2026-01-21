@@ -170,10 +170,6 @@ export function SimplifiedInquiryForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       {requiredFields.map((field: FormField) => (
         <div key={field.fieldName}>
-          <label htmlFor={field.fieldName} className="block text-sm font-medium text-gray-700 mb-1">
-            {field.label}
-            <span className="text-red-500 ml-1">*</span>
-          </label>
           {renderField(field)}
           {errors[field.fieldName] && (
             <p className="mt-1 text-xs text-red-500">{errors[field.fieldName]}</p>

@@ -21,11 +21,13 @@ interface PayloadNavMenu {
 }
 
 /**
- * 从媒体标签获取随机图片
+ * 从媒体标签获取图片（确定性选择，基于菜单ID）
+ * 注意：不使用随机选择，以确保图片URL稳定，便于浏览器缓存
  */
-async function getRandomImageFromMediaTags(
+async function getImageFromMediaTags(
   mediaTags: Array<{ id: string; name: string }>,
-  locale: string
+  locale: string,
+  menuId: string
 ): Promise<{ url: string; filename: string } | null> {
   if (!mediaTags || mediaTags.length === 0) return null;
 
@@ -43,8 +45,11 @@ async function getRandomImageFromMediaTags(
 
     const data = await response.json();
     if (data.docs && data.docs.length > 0) {
-      const randomIndex = Math.floor(Math.random() * data.docs.length);
-      const media = data.docs[randomIndex];
+      // 基于菜单ID确定性选择图片（相同菜单始终返回相同图片）
+      const menuIdStr = String(menuId || '');
+      const hash = menuIdStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const index = hash % data.docs.length;
+      const media = data.docs[index];
       return { url: media.url, filename: media.filename };
     }
   } catch (error) {
@@ -94,7 +99,7 @@ async function transformNavigationItem(
   const shouldFetchImage = item.type === 'product_cards' || parentType === 'product_cards';
 
   if (shouldFetchImage && item.mediaTags && item.mediaTags.length > 0) {
-    const image = await getRandomImageFromMediaTags(item.mediaTags, locale);
+    const image = await getImageFromMediaTags(item.mediaTags, locale, item.id);
     if (image) {
       result.image = image;
     }

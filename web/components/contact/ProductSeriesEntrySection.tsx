@@ -1,26 +1,44 @@
 "use client"
 
-import React, { useState, useCallback, useEffect } from "react"
+import React, { useState, useCallback, useEffect, useRef, useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import useEmblaCarousel from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
+import AutoScroll from "embla-carousel-auto-scroll"
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920
 const SECTION_HEIGHT = 850
 
-// 卡片尺寸
+// 移动端设计稿基准尺寸
+const MOBILE_DESIGN_WIDTH = 375
+
+// 卡片尺寸 - 桌面端
 const CARD_WIDTH = 202
 const CARD_HEIGHT = 252
 const CARD_GAP = 12
 
-// 放大后的尺寸
+// 放大后的尺寸 - 桌面端
 const EXPANDED_WIDTH = 400
 const EXPANDED_HEIGHT = 500
 
+// 卡片尺寸 - 移动端（固定尺寸，不放大）
+const MOBILE_CARD_WIDTH = 140
+const MOBILE_CARD_HEIGHT = 180
+const MOBILE_CARD_GAP = 12
+
 // 图片大小（百分比）
 const IMAGE_SIZE = "80%"
+
+// 自动轮播间隔 (ms)
+const AUTO_PLAY_INTERVAL = 4000
+// 鼠标不动后恢复轮播的时间 (ms)
+const RESUME_DELAY = 4000
+
+// 箭头按钮位置（设计稿尺寸）
+const LEFT_ARROW_RIGHT = 153 + 83 + 20 // 左箭头右边界 + 边距
+const RIGHT_ARROW_LEFT = 1666 - 20 // 右箭头左边界 - 边距
 
 interface MediaObject {
   id: string
@@ -62,7 +80,21 @@ export function ProductSeriesEntrySection({
   viewMoreText = "view more",
   viewMoreLink = "/products",
 }: ProductSeriesEntrySectionProps) {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  const [activeIndex, setActiveIndex] = useState<number>(0)
+  const [isPaused, setIsPaused] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const resumeTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const autoPlayTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // 检测是否移动端
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
@@ -75,37 +107,287 @@ export function ProductSeriesEntrySection({
     [WheelGesturesPlugin()]
   )
 
-  // vw 尺寸计算
+  // vw 尺寸计算 - 桌面端
   const vw = (v: number) => `${(v / DESIGN_WIDTH) * 100}vw`
+
+  // vw 尺寸计算 - 移动端
+  const mvw = (v: number) => `${(v / MOBILE_DESIGN_WIDTH) * 100}vw`
 
   // 点击卡片切换放大状态
   const handleCardClick = useCallback((index: number) => {
-    setActiveIndex(prev => prev === index ? null : index)
+    setIsPaused(true)
+    setActiveIndex(index)
+
+    if (resumeTimerRef.current) {
+      clearTimeout(resumeTimerRef.current)
+    }
+
+    resumeTimerRef.current = setTimeout(() => {
+      setIsPaused(false)
+    }, RESUME_DELAY)
   }, [])
 
-  // 当 activeIndex 变化时，重新计算 embla
+  // 自动轮播
   useEffect(() => {
-    if (emblaApi) {
-      // 延迟一下让 DOM 更新完成
-      setTimeout(() => emblaApi.reInit(), 50)
+    if (isPaused || products.length === 0) return
+
+    autoPlayTimerRef.current = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % products.length)
+    }, AUTO_PLAY_INTERVAL)
+
+    return () => {
+      if (autoPlayTimerRef.current) {
+        clearInterval(autoPlayTimerRef.current)
+      }
     }
-  }, [activeIndex, emblaApi])
+  }, [isPaused, products.length])
 
-  // 左箭头点击
+  // 清理计时器
+  useEffect(() => {
+    return () => {
+      if (resumeTimerRef.current) {
+        clearTimeout(resumeTimerRef.current)
+      }
+      if (autoPlayTimerRef.current) {
+        clearInterval(autoPlayTimerRef.current)
+      }
+    }
+  }, [])
+
+  // 检查卡片是否在两个箭头按钮之间（仅桌面端）
+  const isCardInVisibleArea = useCallback((index: number) => {
+    if (!emblaApi || isMobile) return true
+
+    const slideNodes = emblaApi.slideNodes()
+    if (!slideNodes || !slideNodes[index]) return true
+
+    const slideNode = slideNodes[index]
+    const slideRect = slideNode.getBoundingClientRect()
+
+    // 计算缩放比例
+    const scale = window.innerWidth / DESIGN_WIDTH
+
+    // 两个箭头之间的可视区域（实际像素）
+    const leftBoundary = LEFT_ARROW_RIGHT * scale
+    const rightBoundary = RIGHT_ARROW_LEFT * scale
+
+    // 检查卡片是否完全在可视区域内（考虑放大后的宽度）
+    const expandedWidth = EXPANDED_WIDTH * scale
+    const cardLeft = slideRect.left
+    const cardRight = cardLeft + expandedWidth
+
+    return cardLeft >= leftBoundary && cardRight <= rightBoundary
+  }, [emblaApi, isMobile])
+
+  // 当 activeIndex 变化时，检查是否需要滚动
+  useEffect(() => {
+    if (!emblaApi || activeIndex === null) return
+
+    // 检查卡片放大后是否在两个箭头之间
+    if (!isCardInVisibleArea(activeIndex)) {
+      emblaApi.scrollTo(activeIndex)
+    }
+
+    // 等卡片尺寸动画完成后（500ms），重新计算 Embla 的尺寸
+    const timer = setTimeout(() => {
+      emblaApi.reInit()
+    }, 550)
+
+    return () => clearTimeout(timer)
+  }, [activeIndex, emblaApi, isCardInVisibleArea])
+
+  // 左箭头点击 - 切换到上一个 item
   const handlePrev = useCallback(() => {
-    if (!emblaApi) return
-    emblaApi.scrollPrev()
-  }, [emblaApi])
+    setIsPaused(true)
+    setActiveIndex((prev) => Math.max(0, prev - 1))
 
-  // 右箭头点击
+    if (resumeTimerRef.current) {
+      clearTimeout(resumeTimerRef.current)
+    }
+    resumeTimerRef.current = setTimeout(() => {
+      setIsPaused(false)
+    }, RESUME_DELAY)
+  }, [])
+
+  // 右箭头点击 - 切换到下一个 item
   const handleNext = useCallback(() => {
-    if (!emblaApi) return
-    emblaApi.scrollNext()
-  }, [emblaApi])
+    setIsPaused(true)
+    setActiveIndex((prev) => Math.min(products.length - 1, prev + 1))
 
+    if (resumeTimerRef.current) {
+      clearTimeout(resumeTimerRef.current)
+    }
+    resumeTimerRef.current = setTimeout(() => {
+      setIsPaused(false)
+    }, RESUME_DELAY)
+  }, [products.length])
+
+  // 移动端布局 - 使用 AutoScroll 循环轮播
+  const [mobileEmblaRef, mobileEmblaApi] = useEmblaCarousel(
+    {
+      loop: true,
+      align: "start",
+      skipSnaps: false,
+      dragFree: true,
+      containScroll: false,
+    },
+    [
+      AutoScroll({
+        speed: 1,
+        stopOnInteraction: false,
+        stopOnMouseEnter: true,
+        stopOnFocusIn: true,
+      }),
+    ]
+  )
+
+  // 获取 AutoScroll 插件实例
+  const autoScrollPlugin = useMemo(() => {
+    return mobileEmblaApi?.plugins()?.autoScroll
+  }, [mobileEmblaApi])
+
+  // 移动端导航
+  const mobileGoToPrev = useCallback(() => {
+    if (!mobileEmblaApi) return
+    autoScrollPlugin?.stop()
+    mobileEmblaApi.scrollPrev()
+    setTimeout(() => autoScrollPlugin?.play(), 2000)
+  }, [mobileEmblaApi, autoScrollPlugin])
+
+  const mobileGoToNext = useCallback(() => {
+    if (!mobileEmblaApi) return
+    autoScrollPlugin?.stop()
+    mobileEmblaApi.scrollNext()
+    setTimeout(() => autoScrollPlugin?.play(), 2000)
+  }, [mobileEmblaApi, autoScrollPlugin])
+
+  if (isMobile) {
+    return (
+      <section className="relative w-full py-10 overflow-hidden">
+        {/* 移动端标题 - 放大 */}
+        <div className="text-center mb-8 px-4">
+          <h2 className="font-josefin-sans font-bold text-3xl text-black mb-2">
+            {(titleLeft || "Which\nProducts").split("\n").join(" ")}
+          </h2>
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <span className="text-sm font-josefin-sans font-bold text-black uppercase">
+              {titleLeftSuperscript}
+            </span>
+            <div
+              className="bg-brand-olive-dark"
+              style={{
+                width: "10px",
+                height: "30px",
+                transform: "skewX(-15deg)",
+              }}
+            />
+          </div>
+          <p className="font-josefin-sans font-bold text-2xl">
+            <span className="text-brand-main text-stroke-dark-olive">
+              {titleRightBold}
+            </span>{" "}
+            <span className="text-black">{titleRightNormal}</span>
+          </p>
+        </div>
+
+        {/* 移动端循环轮播 */}
+        <div className="relative px-2">
+          {/* Embla 轮播 */}
+          <div
+            className="overflow-hidden"
+            ref={mobileEmblaRef}
+          >
+            <div
+              className="flex"
+              style={{ gap: `${MOBILE_CARD_GAP}px` }}
+            >
+              {products.map((product, index) => {
+                const isLast = index === products.length - 1
+                return (
+                <Link
+                  key={product.id}
+                  href={product.link || viewMoreLink}
+                  className="relative flex-shrink-0 group"
+                  style={{
+                    width: `${MOBILE_CARD_WIDTH}px`,
+                    height: `${MOBILE_CARD_HEIGHT}px`,
+                    marginRight: isLast ? `${MOBILE_CARD_GAP}px` : undefined,
+                  }}
+                >
+                  {/* 卡片容器 */}
+                  <div
+                    className="absolute inset-0 overflow-hidden bg-white transition-shadow duration-300 group-active:shadow-lg"
+                    style={{
+                      borderRadius: "16px",
+                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                    }}
+                  >
+                    {/* 图片 */}
+                    {product.image && (
+                      <div
+                        className="absolute"
+                        style={{
+                          top: "10%",
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                          width: "75%",
+                          height: "60%",
+                        }}
+                      >
+                        <Image
+                          src={product.image.variants?.medium || product.image.url}
+                          alt={product.image.alt || product.title}
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
+                    )}
+
+                    {/* View More - 常显 */}
+                    <div
+                      className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-1 text-xs font-josefin-sans font-bold text-brand-olive-dark"
+                    >
+                      <span>{product.buttonText || viewMoreText}</span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                      </svg>
+                    </div>
+                  </div>
+                </Link>
+              )})}
+            </div>
+          </div>
+
+          {/* 左右箭头 - 底部居中 */}
+          <div className="flex justify-center items-center gap-6 mt-6">
+            <button
+              onClick={mobileGoToPrev}
+              className="w-10 h-10 flex items-center justify-center"
+            >
+              <svg viewBox="0 0 83 82" fill="none" className="w-full h-full">
+                <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="white"/>
+                <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="#464010"/>
+              </svg>
+            </button>
+            <button
+              onClick={mobileGoToNext}
+              className="w-10 h-10 flex items-center justify-center"
+            >
+              <svg viewBox="0 0 83 82" fill="none" className="w-full h-full">
+                <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="white"/>
+                <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="#464010"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  // 桌面端布局
   return (
     <section
-      className="relative w-full overflow-hidden"
+      className="relative w-full overflow-x-clip"
       style={{
         aspectRatio: `${DESIGN_WIDTH} / ${SECTION_HEIGHT}`,
       }}
@@ -175,17 +457,6 @@ export function ProductSeriesEntrySection({
           width: vw(18),
           height: vw(79),
           transform: "skewX(-15deg)",
-        }}
-      />
-
-      {/* 小圆点 */}
-      <div
-        className="absolute rounded-full bg-brand-olive-dark"
-        style={{
-          left: vw(1033),
-          top: vw(161),
-          width: vw(9),
-          height: vw(9),
         }}
       />
 
@@ -274,17 +545,17 @@ export function ProductSeriesEntrySection({
 
       {/* Embla 轮播区域 */}
       <div
-        className="absolute overflow-x-clip overflow-y-visible"
+        className="absolute !overflow-visible [&>*]:!overflow-visible"
         ref={emblaRef}
         style={{
           left: vw(100),
-          right: vw(100),
+          right: vw(0),
           bottom: vw(80),
           height: vw(EXPANDED_HEIGHT + 100),
         }}
       >
         <div
-          className="flex items-end h-full"
+          className="flex items-end h-full !overflow-visible"
           style={{
             gap: vw(CARD_GAP),
           }}
@@ -297,7 +568,7 @@ export function ProductSeriesEntrySection({
             return (
               <div
                 key={product.id}
-                className="relative flex-shrink-0 cursor-pointer transition-all duration-500 ease-out"
+                className="relative flex-shrink-0 cursor-pointer transition-all duration-500 ease-out overflow-visible"
                 style={{
                   width: isActive ? vw(EXPANDED_WIDTH) : vw(CARD_WIDTH),
                   height: isActive ? vw(EXPANDED_HEIGHT) : vw(CARD_HEIGHT),
@@ -305,8 +576,8 @@ export function ProductSeriesEntrySection({
                   boxShadow: isActive
                     ? "0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 12px 24px -8px rgba(0, 0, 0, 0.4)"
                     : "0 4px 12px rgba(0, 0, 0, 0.1)",
-                  marginLeft: isFirst ? vw(100) : undefined,
-                  marginRight: isLast ? vw(100) : undefined,
+                  marginLeft: isFirst ? vw(200) : undefined,
+                  marginRight: isLast ? vw(300) : undefined,
                 }}
                 onClick={() => handleCardClick(index)}
               >
@@ -317,14 +588,14 @@ export function ProductSeriesEntrySection({
                     borderRadius: vw(30),
                   }}
                 >
-                  {/* 图片容器 - 底部对齐，水平居中 */}
+                  {/* 图片容器 - 上下居中，水平居中 */}
                   {product.image && (
                     <div
                       className="absolute"
                       style={{
-                        bottom: 0,
+                        top: "50%",
                         left: "50%",
-                        transform: "translateX(-50%)",
+                        transform: "translate(-50%, -50%)",
                         width: IMAGE_SIZE,
                         height: IMAGE_SIZE,
                       }}
@@ -333,32 +604,32 @@ export function ProductSeriesEntrySection({
                         src={product.image.variants?.large || product.image.url}
                         alt={product.image.alt || product.title}
                         fill
-                        className="object-contain object-bottom"
+                        className="object-contain"
                       />
                     </div>
                   )}
                 </div>
 
-                {/* 激活时显示右上角 - 箭头 + buttonText（在卡片内部） */}
+                {/* 激活时显示右侧 - 箭头 + buttonText（顶对齐，在卡片右侧外面） */}
                 {isActive && (
                   <Link
                     href={product.link || viewMoreLink}
                     className="absolute transition-all duration-300"
                     style={{
-                      right: vw(10),
-                      top: vw(10),
+                      left: `calc(100% + ${vw(10)})`,
+                      top: 0,
                     }}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    {/* 箭头装饰 */}
-                    <Image
-                      src="/contact-support/arrow-corner.svg"
-                      alt=""
-                      width={129}
-                      height={129}
+                    {/* 箭头装饰 - 用 span + background-image */}
+                    <span
                       style={{
+                        display: "block",
                         width: vw(80),
                         height: vw(80),
+                        backgroundImage: "url(/contact-support/arrow-corner.svg)",
+                        backgroundSize: "contain",
+                        backgroundRepeat: "no-repeat",
                       }}
                     />
                     {/* buttonText 文字 - 在箭头下方 */}

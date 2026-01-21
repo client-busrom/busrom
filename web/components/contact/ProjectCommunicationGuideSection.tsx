@@ -29,10 +29,17 @@ interface ProjectCommunicationGuideSectionProps {
   image?: MediaObject | null
 }
 
-// 解析文本，提取加粗部分
+// 解析文本，提取加粗部分和换行
 // 假设后端返回的格式中，加粗文字用 **text** 或 <strong>text</strong> 包裹
-function parseTextWithBold(text: string): { text: string; isBold: boolean }[] {
-  const parts: { text: string; isBold: boolean }[] = []
+// 换行符 \n 会被保留并在渲染时转换为 <br />
+interface TextPart {
+  text: string
+  isBold: boolean
+  isLineBreak?: boolean
+}
+
+function parseTextWithBold(text: string): TextPart[] {
+  const parts: TextPart[] = []
 
   // 匹配 **text** 或 <strong>text</strong> 格式
   const regex = /\*\*(.+?)\*\*|<strong>(.+?)<\/strong>/g
@@ -40,18 +47,39 @@ function parseTextWithBold(text: string): { text: string; isBold: boolean }[] {
   let match
 
   while ((match = regex.exec(text)) !== null) {
-    // 添加匹配前的普通文本
+    // 添加匹配前的普通文本（可能包含换行）
     if (match.index > lastIndex) {
-      parts.push({ text: text.slice(lastIndex, match.index), isBold: false })
+      const beforeText = text.slice(lastIndex, match.index)
+      // 按换行符分割
+      const segments = beforeText.split('\n')
+      segments.forEach((seg, i) => {
+        if (seg) {
+          parts.push({ text: seg, isBold: false })
+        }
+        // 在非最后一个段落后添加换行标记
+        if (i < segments.length - 1) {
+          parts.push({ text: '', isBold: false, isLineBreak: true })
+        }
+      })
     }
     // 添加加粗文本
     parts.push({ text: match[1] || match[2], isBold: true })
     lastIndex = regex.lastIndex
   }
 
-  // 添加剩余的普通文本
+  // 添加剩余的普通文本（可能包含换行）
   if (lastIndex < text.length) {
-    parts.push({ text: text.slice(lastIndex), isBold: false })
+    const remainingText = text.slice(lastIndex)
+    const segments = remainingText.split('\n')
+    segments.forEach((seg, i) => {
+      if (seg) {
+        parts.push({ text: seg, isBold: false })
+      }
+      // 在非最后一个段落后添加换行标记
+      if (i < segments.length - 1) {
+        parts.push({ text: '', isBold: false, isLineBreak: true })
+      }
+    })
   }
 
   return parts.length > 0 ? parts : [{ text, isBold: false }]
@@ -74,7 +102,7 @@ export function ProjectCommunicationGuideSection({
 
   return (
     <section
-      className="relative w-full"
+      className="relative w-full overflow-hidden"
       style={{
         aspectRatio: `${DESIGN_WIDTH} / ${SECTION_HEIGHT}`,
       }}
@@ -144,14 +172,21 @@ export function ProjectCommunicationGuideSection({
           lineHeight: vw(42),
         }}
       >
-        {subtitleParts.map((part, index) => (
-          <span
-            key={index}
-            className={part.isBold ? "font-bold text-brand-accent-orange" : ""}
-          >
-            {part.text}
-          </span>
-        ))}
+        {subtitleParts.map((part, index) => {
+          // 换行标记
+          if (part.isLineBreak) {
+            return <br key={index} />
+          }
+
+          return (
+            <span
+              key={index}
+              className={part.isBold ? "font-bold text-brand-accent-orange" : ""}
+            >
+              {part.text}
+            </span>
+          )
+        })}
       </p>
 
       {/* 右侧图片区域 - 使用 SVG mask 实现沿轨迹擦出效果 */}
@@ -159,8 +194,8 @@ export function ProjectCommunicationGuideSection({
         <div
           className="absolute overflow-hidden"
           style={{
-            right: vw(-100),
-            top: vw(0),
+            right: vw(0),
+            top: vw(-50),
             width: vw(1045),
             height: vw(959),
           }}
@@ -194,20 +229,6 @@ export function ProjectCommunicationGuideSection({
                   : "center"
               }
             />
-            {/* 百叶窗遮罩层 - 10条竖条从左到右收起 */}
-            <div className="absolute inset-0 pointer-events-none">
-              {[...Array(10)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute h-full animate-blind-strip-horizontal bg-brand-main"
-                  style={{
-                    left: `${i * 10}%`,
-                    width: '10%',
-                    animationDelay: `${i * 0.1}s`,
-                  }}
-                />
-              ))}
-            </div>
           </div>
         </div>
       )}
@@ -235,31 +256,38 @@ export function ProjectCommunicationGuideSection({
             fontSize: vw(26),
           }}
         >
-          {descriptionParts.map((part, index) => (
-            <span
-              key={index}
-              style={{
-                lineHeight: part.isBold ? vw(51) : vw(38),
-              }}
-            >
-              {part.isBold ? (
-                <span
-                  className="font-bold bg-brand-yellow-card-bg border border-brand-yellow"
-                  style={{
-                    fontSize: vw(28),
-                    borderRadius: vw(12),
-                    padding: `${vw(6)} ${vw(8)} ${vw(2)} ${vw(8)}`,
-                    boxDecorationBreak: "clone",
-                    WebkitBoxDecorationBreak: "clone",
-                  }}
-                >
-                  {part.text}
-                </span>
-              ) : (
-                part.text
-              )}
-            </span>
-          ))}
+          {descriptionParts.map((part, index) => {
+            // 换行标记
+            if (part.isLineBreak) {
+              return <br key={index} />
+            }
+
+            return (
+              <span
+                key={index}
+                style={{
+                  lineHeight: part.isBold ? vw(51) : vw(38),
+                }}
+              >
+                {part.isBold ? (
+                  <span
+                    className="font-bold bg-brand-yellow-card-bg border border-brand-yellow"
+                    style={{
+                      fontSize: vw(28),
+                      borderRadius: vw(12),
+                      padding: `${vw(10)} ${vw(8)} ${vw(2)} ${vw(8)}`,
+                      boxDecorationBreak: "clone",
+                      WebkitBoxDecorationBreak: "clone",
+                    }}
+                  >
+                    {part.text}
+                  </span>
+                ) : (
+                  part.text
+                )}
+              </span>
+            )
+          })}
         </p>
       </div>
     </section>
