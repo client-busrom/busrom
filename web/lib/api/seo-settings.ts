@@ -43,6 +43,9 @@ export interface SeoSetting {
   includeInSitemap?: boolean
   sitemapPriority?: number
   sitemapChangefreq?: string
+  // Timestamps
+  createdAt?: string
+  updatedAt?: string
 }
 
 interface SeoSettingsResponse {
@@ -179,9 +182,8 @@ export function buildMetadata(
   if (seoSetting.metaDescription) {
     metadata.description = seoSetting.metaDescription
   }
-  if (seoSetting.metaKeywords) {
-    metadata.keywords = seoSetting.metaKeywords.split(',').map(k => k.trim())
-  }
+  // Note: metaKeywords are NOT set here - they are distributed via SeoAttributeDistributor
+  // to avoid creating a visible <meta name="keywords"> tag
 
   // Robots
   const robotsIndex = seoSetting.robotsIndex !== false
@@ -195,11 +197,27 @@ export function buildMetadata(
     },
   }
 
-  // Canonical
+  // Canonical - ensure it's an absolute URL
   if (seoSetting.canonicalUrl) {
+    let canonicalUrl = seoSetting.canonicalUrl.trim()
+
+    // If it doesn't start with http(s), make it absolute
+    if (!canonicalUrl.startsWith('http://') && !canonicalUrl.startsWith('https://')) {
+      // Remove leading www. if present (we'll add https://www.)
+      if (canonicalUrl.startsWith('www.')) {
+        canonicalUrl = 'https://' + canonicalUrl
+      } else if (canonicalUrl.startsWith('/')) {
+        // Path-only canonical, prepend base URL
+        canonicalUrl = baseUrl + canonicalUrl
+      } else {
+        // Bare domain or path, assume it needs https://
+        canonicalUrl = 'https://' + canonicalUrl
+      }
+    }
+
     metadata.alternates = {
       ...metadata.alternates,
-      canonical: seoSetting.canonicalUrl,
+      canonical: canonicalUrl,
     }
   }
 
@@ -272,4 +290,539 @@ export async function getPageMetadata(
 ): Promise<Metadata> {
   const seoSetting = await getMatchingSeoSetting(path, pageType, locale)
   return buildMetadata(seoSetting, pageMetadata)
+}
+
+/**
+ * Get ALL matching SEO settings for a page (sorted by priority)
+ * Used for hidden keyword injection
+ */
+export async function getAllMatchingSeoSettings(
+  path: string,
+  pageType?: string,
+  locale: string = 'en'
+): Promise<SeoSetting[]> {
+  const allSettings = await getAllSeoSettings(locale)
+
+  // Normalize path (remove locale prefix if present)
+  const normalizedPath = path.replace(/^\/(en|zh|de|fr|es|pt|it|nl|pl|ru|ja|ko|ar|th|vi|id|ms|tr|hi|bn)/, '') || '/'
+
+  // Find all matching settings with priority
+  const matches: { setting: SeoSetting; priority: number }[] = []
+
+  for (const setting of allSettings) {
+    switch (setting.scope) {
+      case 'exact_path':
+        if (setting.exactPath === normalizedPath) {
+          matches.push({ setting, priority: 4 })
+        }
+        break
+
+      case 'path_pattern':
+        if (setting.pathPattern && matchPathPattern(setting.pathPattern, normalizedPath)) {
+          matches.push({ setting, priority: 3 })
+        }
+        break
+
+      case 'page_type':
+        if (pageType && setting.pageType === pageType) {
+          matches.push({ setting, priority: 2 })
+        }
+        break
+
+      case 'global':
+        matches.push({ setting, priority: 1 })
+        break
+    }
+  }
+
+  // Sort by priority (highest first) and return all settings
+  matches.sort((a, b) => b.priority - a.priority)
+  return matches.map(m => m.setting)
+}
+
+/**
+ * Data structure for hidden SEO injection
+ * @deprecated Use KeywordDistribution instead
+ */
+export interface HiddenSeoData {
+  // For CSS pseudo-element injection (hidden from users, visible to crawlers)
+  hiddenTitles: string[]
+  hiddenDescriptions: string[]
+  hiddenKeywords: string[]
+  // All keywords combined and shuffled for distribution
+  allKeywordsArray: string[]
+}
+
+/**
+ * Keyword distribution strategy across HTML attributes
+ * Distributes keywords into existing element attributes to avoid black-hat SEO
+ */
+export interface KeywordDistribution {
+  // Image alt text (30% of keywords)
+  imgAlts: string[]
+  // Link title attributes (15% of keywords)
+  linkTitles: string[]
+  // ARIA labels for buttons/navigation (15% of keywords)
+  ariaLabels: string[]
+  // ARIA described-by with sr-only elements (10% of keywords)
+  ariaDescribedby: string[]
+  // Image title attributes (10% of keywords)
+  imgTitles: string[]
+  // Input/textarea placeholders (8% of keywords)
+  placeholders: string[]
+  // Screen reader only labels (5% of keywords)
+  srOnlyLabels: string[]
+  // Data attributes (5% of keywords)
+  dataAttributes: string[]
+  // Additional meta tags (2% of keywords)
+  metaTags: string[]
+  // Total count for reference
+  totalKeywords: number
+}
+
+/**
+ * Get SEO data for hidden injection
+ * - Primary SEO setting is used for meta tags (title, description)
+ * - All other titles, descriptions, and keywords are collected for hidden injection
+ */
+export async function getHiddenSeoData(
+  path: string,
+  pageType?: string,
+  locale: string = 'en'
+): Promise<HiddenSeoData> {
+  const allSettings = await getAllMatchingSeoSettings(path, pageType, locale)
+
+  const hiddenTitles: string[] = []
+  const hiddenDescriptions: string[] = []
+  const hiddenKeywords: string[] = []
+
+  // First setting is primary (used for meta tags)
+  // Skip it for hidden injection, collect the rest
+  allSettings.forEach((setting, index) => {
+    // For titles and descriptions, skip the first one (it's in meta tags)
+    if (index > 0) {
+      if (setting.metaTitle) {
+        hiddenTitles.push(setting.metaTitle)
+      }
+      if (setting.metaDescription) {
+        hiddenDescriptions.push(setting.metaDescription)
+      }
+    }
+
+    // For keywords, collect from ALL settings (including primary)
+    if (setting.metaKeywords) {
+      const keywords = setting.metaKeywords
+        .split(/[,\n]/)
+        .map(k => k.trim())
+        .filter(k => k.length > 0)
+      hiddenKeywords.push(...keywords)
+    }
+  })
+
+  // Remove duplicates and shuffle keywords for natural distribution
+  const uniqueKeywords = [...new Set(hiddenKeywords)]
+  const shuffledKeywords = shuffleArray(uniqueKeywords)
+
+  return {
+    hiddenTitles,
+    hiddenDescriptions,
+    hiddenKeywords: uniqueKeywords,
+    allKeywordsArray: shuffledKeywords,
+  }
+}
+
+/**
+ * Fisher-Yates shuffle for random keyword distribution
+ */
+function shuffleArray<T>(array: T[]): T[] {
+  const result = [...array]
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[result[i], result[j]] = [result[j], result[i]]
+  }
+  return result
+}
+
+/**
+ * Get distributed keywords for attribute-based SEO
+ * Dynamically distributes ALL keywords from matching SEO settings across different HTML attributes
+ *
+ * Distribution percentages (adjust based on total count):
+ * - 30% → img alt
+ * - 15% → a title
+ * - 15% → aria-label
+ * - 10% → aria-describedby
+ * - 10% → img title
+ * - 8% → placeholder
+ * - 5% → sr-only labels
+ * - 5% → data-* attributes
+ * - 2% → meta tags
+ */
+export async function getDistributedKeywords(
+  path: string,
+  pageType?: string,
+  locale: string = 'en'
+): Promise<KeywordDistribution> {
+  const allSettings = await getAllMatchingSeoSettings(path, pageType, locale)
+
+  // Extract ALL keywords from all matching settings
+  const allKeywords: string[] = []
+  allSettings.forEach(setting => {
+    if (setting.metaKeywords) {
+      const keywords = setting.metaKeywords
+        .split(/[,\n]/)
+        .map(k => k.trim())
+        .filter(k => k.length > 0)
+      allKeywords.push(...keywords)
+    }
+  })
+
+  // Remove duplicates and shuffle for natural distribution
+  const uniqueKeywords = [...new Set(allKeywords)]
+  const shuffled = shuffleArray(uniqueKeywords)
+
+  const total = shuffled.length
+
+  // If no keywords, return empty distribution
+  if (total === 0) {
+    return {
+      imgAlts: [],
+      linkTitles: [],
+      ariaLabels: [],
+      ariaDescribedby: [],
+      imgTitles: [],
+      placeholders: [],
+      srOnlyLabels: [],
+      dataAttributes: [],
+      metaTags: [],
+      totalKeywords: 0,
+    }
+  }
+
+  // Dynamic distribution based on percentages
+  let currentIndex = 0
+
+  const imgAltsCount = Math.floor(total * 0.30)
+  const imgAlts = shuffled.slice(currentIndex, currentIndex + imgAltsCount)
+  currentIndex += imgAltsCount
+
+  const linkTitlesCount = Math.floor(total * 0.15)
+  const linkTitles = shuffled.slice(currentIndex, currentIndex + linkTitlesCount)
+  currentIndex += linkTitlesCount
+
+  const ariaLabelsCount = Math.floor(total * 0.15)
+  const ariaLabels = shuffled.slice(currentIndex, currentIndex + ariaLabelsCount)
+  currentIndex += ariaLabelsCount
+
+  const ariaDescribedbyCount = Math.floor(total * 0.10)
+  const ariaDescribedby = shuffled.slice(currentIndex, currentIndex + ariaDescribedbyCount)
+  currentIndex += ariaDescribedbyCount
+
+  const imgTitlesCount = Math.floor(total * 0.10)
+  const imgTitles = shuffled.slice(currentIndex, currentIndex + imgTitlesCount)
+  currentIndex += imgTitlesCount
+
+  const placeholdersCount = Math.floor(total * 0.08)
+  const placeholders = shuffled.slice(currentIndex, currentIndex + placeholdersCount)
+  currentIndex += placeholdersCount
+
+  const srOnlyLabelsCount = Math.floor(total * 0.05)
+  const srOnlyLabels = shuffled.slice(currentIndex, currentIndex + srOnlyLabelsCount)
+  currentIndex += srOnlyLabelsCount
+
+  const dataAttributesCount = Math.floor(total * 0.05)
+  const dataAttributes = shuffled.slice(currentIndex, currentIndex + dataAttributesCount)
+  currentIndex += dataAttributesCount
+
+  // Remaining keywords go to meta tags
+  const metaTags = shuffled.slice(currentIndex)
+
+  return {
+    imgAlts,
+    linkTitles,
+    ariaLabels,
+    ariaDescribedby,
+    imgTitles,
+    placeholders,
+    srOnlyLabels,
+    dataAttributes,
+    metaTags,
+    totalKeywords: total,
+  }
+}
+
+// ============================================================================
+// New SEO Logic - Global-based priority system
+// ============================================================================
+
+/**
+ * Sort SEO settings by priority
+ * Priority order:
+ * 1. sitemapPriority (higher first)
+ * 2. scope type (exact_path > path_pattern > page_type > global)
+ * 3. createdAt (earlier first)
+ */
+function sortByPriority(settings: SeoSetting[]): SeoSetting[] {
+  const scopePriority: Record<string, number> = {
+    exact_path: 4,
+    path_pattern: 3,
+    page_type: 2,
+    global: 1,
+  }
+
+  return settings.sort((a, b) => {
+    // 1. Compare sitemapPriority (higher first)
+    const priorityA = a.sitemapPriority ?? 0.5
+    const priorityB = b.sitemapPriority ?? 0.5
+    if (priorityA !== priorityB) {
+      return priorityB - priorityA
+    }
+
+    // 2. Compare scope type
+    const scopeA = scopePriority[a.scope] || 0
+    const scopeB = scopePriority[b.scope] || 0
+    if (scopeA !== scopeB) {
+      return scopeB - scopeA
+    }
+
+    // 3. Compare createdAt (earlier first)
+    const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+    const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+    return timeA - timeB
+  })
+}
+
+/**
+ * Extract all text fields (title, description, keywords) from a SEO setting
+ */
+function extractAllTextFromSetting(setting: SeoSetting): string[] {
+  const texts: string[] = []
+
+  // Add title
+  if (setting.metaTitle) {
+    texts.push(setting.metaTitle)
+  }
+
+  // Add description
+  if (setting.metaDescription) {
+    texts.push(setting.metaDescription)
+  }
+
+  // Add keywords
+  if (setting.metaKeywords) {
+    const keywords = setting.metaKeywords
+      .split(/[,\n]/)
+      .map(k => k.trim())
+      .filter(k => k.length > 0)
+    texts.push(...keywords)
+  }
+
+  return texts
+}
+
+/**
+ * Get SEO for homepage
+ * - Title & Description: Use global's
+ * - Keywords distribution: global keywords + all matching SEO data (title, description, keywords)
+ */
+export async function getHomePageSeo(
+  locale: string = 'en'
+): Promise<{
+  setting: SeoSetting | null
+  distributedKeywords: KeywordDistribution
+}> {
+  const allSettings = await getAllSeoSettings(locale)
+
+  // Find global setting
+  const globalSetting = allSettings.find(s => s.scope === 'global')
+
+  // Find all matching settings for homepage
+  const homeMatches = allSettings.filter(s => {
+    if (s.scope === 'exact_path' && s.exactPath === '/') return true
+    if (s.scope === 'page_type' && s.pageType === 'home') return true
+    if (s.scope === 'path_pattern' && s.pathPattern && matchPathPattern(s.pathPattern, '/')) return true
+    return false
+  })
+
+  // Extract keywords for distribution
+  const allTexts: string[] = []
+
+  // 1. Add global keywords
+  if (globalSetting?.metaKeywords) {
+    const keywords = globalSetting.metaKeywords
+      .split(/[,\n]/)
+      .map(k => k.trim())
+      .filter(k => k.length > 0)
+    allTexts.push(...keywords)
+  }
+
+  // 2. Add all text from other homepage matches
+  homeMatches.forEach(setting => {
+    allTexts.push(...extractAllTextFromSetting(setting))
+  })
+
+  // Distribute keywords
+  const distribution = distributeKeywords(allTexts)
+
+  return {
+    setting: globalSetting || null,
+    distributedKeywords: distribution,
+  }
+}
+
+/**
+ * Get SEO for non-homepage
+ * - If has matching SEO: use highest priority's title/description + distribute (highest's keywords + others' all text)
+ * - If no matching SEO: use global's title/description + distribute global's keywords only
+ */
+export async function getNonHomePageSeo(
+  path: string,
+  pageType?: string,
+  locale: string = 'en'
+): Promise<{
+  setting: SeoSetting | null
+  distributedKeywords: KeywordDistribution
+}> {
+  const allSettings = await getAllSeoSettings(locale)
+
+  // Normalize path
+  const normalizedPath = path.replace(/^\/(en|zh|de|fr|es|pt|it|nl|pl|ru|ja|ko|ar|th|vi|id|ms|tr|hi|bn)/, '') || '/'
+
+  // Find all matching settings (excluding global)
+  const matches: SeoSetting[] = []
+
+  for (const setting of allSettings) {
+    if (setting.scope === 'global') continue
+
+    if (setting.scope === 'exact_path' && setting.exactPath === normalizedPath) {
+      matches.push(setting)
+    } else if (setting.scope === 'path_pattern' && setting.pathPattern && matchPathPattern(setting.pathPattern, normalizedPath)) {
+      matches.push(setting)
+    } else if (setting.scope === 'page_type' && pageType && setting.pageType === pageType) {
+      matches.push(setting)
+    }
+  }
+
+  // If no matches, use global
+  if (matches.length === 0) {
+    const globalSetting = allSettings.find(s => s.scope === 'global')
+
+    const allTexts: string[] = []
+    if (globalSetting?.metaKeywords) {
+      const keywords = globalSetting.metaKeywords
+        .split(/[,\n]/)
+        .map(k => k.trim())
+        .filter(k => k.length > 0)
+      allTexts.push(...keywords)
+    }
+
+    return {
+      setting: globalSetting || null,
+      distributedKeywords: distributeKeywords(allTexts),
+    }
+  }
+
+  // Sort matches by priority
+  const sorted = sortByPriority(matches)
+  const highestPriority = sorted[0]
+  const others = sorted.slice(1)
+
+  // Extract keywords for distribution
+  const allTexts: string[] = []
+
+  // 1. Add highest priority's keywords
+  if (highestPriority.metaKeywords) {
+    const keywords = highestPriority.metaKeywords
+      .split(/[,\n]/)
+      .map(k => k.trim())
+      .filter(k => k.length > 0)
+    allTexts.push(...keywords)
+  }
+
+  // 2. Add all text from other matches
+  others.forEach(setting => {
+    allTexts.push(...extractAllTextFromSetting(setting))
+  })
+
+  return {
+    setting: highestPriority,
+    distributedKeywords: distributeKeywords(allTexts),
+  }
+}
+
+/**
+ * Helper: Distribute keywords across HTML attributes
+ */
+function distributeKeywords(texts: string[]): KeywordDistribution {
+  // Remove duplicates and shuffle
+  const uniqueTexts = [...new Set(texts)]
+  const shuffled = shuffleArray(uniqueTexts)
+
+  const total = shuffled.length
+
+  if (total === 0) {
+    return {
+      imgAlts: [],
+      linkTitles: [],
+      ariaLabels: [],
+      ariaDescribedby: [],
+      imgTitles: [],
+      placeholders: [],
+      srOnlyLabels: [],
+      dataAttributes: [],
+      metaTags: [],
+      totalKeywords: 0,
+    }
+  }
+
+  // Dynamic distribution based on percentages
+  let currentIndex = 0
+
+  const imgAltsCount = Math.floor(total * 0.30)
+  const imgAlts = shuffled.slice(currentIndex, currentIndex + imgAltsCount)
+  currentIndex += imgAltsCount
+
+  const linkTitlesCount = Math.floor(total * 0.15)
+  const linkTitles = shuffled.slice(currentIndex, currentIndex + linkTitlesCount)
+  currentIndex += linkTitlesCount
+
+  const ariaLabelsCount = Math.floor(total * 0.15)
+  const ariaLabels = shuffled.slice(currentIndex, currentIndex + ariaLabelsCount)
+  currentIndex += ariaLabelsCount
+
+  const ariaDescribedbyCount = Math.floor(total * 0.10)
+  const ariaDescribedby = shuffled.slice(currentIndex, currentIndex + ariaDescribedbyCount)
+  currentIndex += ariaDescribedbyCount
+
+  const imgTitlesCount = Math.floor(total * 0.10)
+  const imgTitles = shuffled.slice(currentIndex, currentIndex + imgTitlesCount)
+  currentIndex += imgTitlesCount
+
+  const placeholdersCount = Math.floor(total * 0.08)
+  const placeholders = shuffled.slice(currentIndex, currentIndex + placeholdersCount)
+  currentIndex += placeholdersCount
+
+  const srOnlyLabelsCount = Math.floor(total * 0.05)
+  const srOnlyLabels = shuffled.slice(currentIndex, currentIndex + srOnlyLabelsCount)
+  currentIndex += srOnlyLabelsCount
+
+  const dataAttributesCount = Math.floor(total * 0.05)
+  const dataAttributes = shuffled.slice(currentIndex, currentIndex + dataAttributesCount)
+  currentIndex += dataAttributesCount
+
+  // Remaining go to meta tags
+  const metaTags = shuffled.slice(currentIndex)
+
+  return {
+    imgAlts,
+    linkTitles,
+    ariaLabels,
+    ariaDescribedby,
+    imgTitles,
+    placeholders,
+    srOnlyLabels,
+    dataAttributes,
+    metaTags,
+    totalKeywords: total,
+  }
 }
