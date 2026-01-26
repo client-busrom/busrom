@@ -1,10 +1,8 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Link } from "@/lib/navigation"
-import { OptimizedImage } from "@/components/ui/OptimizedImage"
-import { getOptimizedImageUrl, type MediaImage } from "@/lib/image-utils"
 import { cn } from "@/lib/utils"
 import type { NavItem } from "@/types/navigation"
 import { Settings, Globe, HelpCircle, Info, Book, FileText, ArrowRight } from "lucide-react"
@@ -91,8 +89,6 @@ function MenuCard({
   menuPrefix: string
 }) {
   const imageUrl = getProductImage(child.url, child.image)
-  // 生成唯一的图片key，确保图片变化时完全重新渲染
-  const imageKey = `${menuPrefix}-${child.id}-${child.image?.url || imageUrl || 'no-image'}`
 
   return (
     <div
@@ -101,22 +97,20 @@ function MenuCard({
         isLargeCard && "lg:col-span-2"
       )}
     >
-      {/* 图片容器 */}
+      {/* 图片容器 - 直接使用 img 标签避免状态问题 */}
       <div className="absolute inset-0 overflow-hidden">
-        {child.image ? (
-          <OptimizedImage
-            key={imageKey}
-            image={child.image as any}
+        {child.image?.url ? (
+          <img
+            src={child.image.url}
             alt={child.label}
-            size="small"
             loading="eager"
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-125"
           />
         ) : imageUrl ? (
           <img
-            key={imageKey}
             src={imageUrl}
             alt={child.label}
+            loading="eager"
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-125"
           />
         ) : (
@@ -156,45 +150,6 @@ function MenuCard({
 
 export function DesktopMenu({ isOpen, onClose, navigationItems = [] }: DesktopMenuProps) {
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null)
-  const preloadedRef = useRef(false)
-
-  // 预加载所有菜单图片（菜单首次打开时）
-  useEffect(() => {
-    if (isOpen && !preloadedRef.current) {
-      preloadedRef.current = true
-
-      // 收集所有图片 URL（使用和 OptimizedImage 相同的方式获取）
-      const imageUrls: string[] = []
-      navigationItems.forEach(item => {
-        if (item.childMenus) {
-          item.childMenus.forEach(child => {
-            if (child.image) {
-              // 使用 getOptimizedImageUrl 获取和渲染时一致的 URL
-              const mediaImage: MediaImage = {
-                id: '',
-                filename: '',
-                file: { url: child.image.url },
-                variants: (child.image as any).variants,
-              }
-              const url = getOptimizedImageUrl(mediaImage, 'small', true)
-              if (url && !url.includes('placeholder')) {
-                imageUrls.push(url)
-              }
-            } else {
-              const fallbackUrl = getProductImage(child.url, null)
-              if (fallbackUrl) imageUrls.push(fallbackUrl)
-            }
-          })
-        }
-      })
-
-      // 使用 Image 对象预加载
-      imageUrls.forEach(url => {
-        const img = new Image()
-        img.src = url
-      })
-    }
-  }, [isOpen, navigationItems])
 
   // 处理一级菜单悬停
   const handleMenuHover = (menuId: string) => {
@@ -258,23 +213,17 @@ export function DesktopMenu({ isOpen, onClose, navigationItems = [] }: DesktopMe
                   ))}
                 </div>
 
-                {/* 二级菜单 - 预渲染所有子菜单，通过 CSS 控制显示/隐藏 */}
-                <div className="relative">
-                  {navigationItems.filter(item => item.childMenus && item.childMenus.length > 0).map((item) => {
-                    const isActive = hoveredMenu === item.id
-                    const isProductMenu = item.url === '/products'
-                    const isShopMenu = item.url === '/shop'
+                {/* 二级菜单 - 只渲染当前激活的菜单 */}
+                {navigationItems.filter(item => item.childMenus && item.childMenus.length > 0).map((item) => {
+                  const isActive = hoveredMenu === item.id
+                  const isProductMenu = item.url === '/products'
+                  const isShopMenu = item.url === '/shop'
 
-                    return (
-                      <div
-                        key={item.id}
-                        className={cn(
-                          "transition-opacity duration-300 ease-in-out",
-                          isActive
-                            ? "opacity-100 relative z-10"
-                            : "opacity-0 absolute inset-0 pointer-events-none z-0"
-                        )}
-                      >
+                  // 只渲染当前激活的菜单
+                  if (!isActive) return null
+
+                  return (
+                    <div key={item.id}>
                       <div className="pt-6">
                         {/* PRODUCT_CARDS 类型 - 产品卡片网格 */}
                         {item.type === 'PRODUCT_CARDS' && (
@@ -333,9 +282,8 @@ export function DesktopMenu({ isOpen, onClose, navigationItems = [] }: DesktopMe
                         )}
                       </div>
                     </div>
-                    )
-                  })}
-                </div>
+                  )
+                })}
               </div>
           </motion.div>
         </>
