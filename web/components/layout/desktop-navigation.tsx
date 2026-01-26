@@ -38,8 +38,49 @@ const getProductSlug = (url: string): string | null => {
 
 export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: DesktopNavigationProps) {
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null)
+  const [imagesPreloaded, setImagesPreloaded] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // 预加载所有菜单图片
+  useEffect(() => {
+    if (imagesPreloaded || navigationItems.length === 0) return
+
+    const imageUrls: string[] = []
+    navigationItems.forEach(item => {
+      if (item.childMenus) {
+        item.childMenus.forEach(child => {
+          if (child.image?.url) {
+            imageUrls.push(child.image.url)
+          }
+        })
+      }
+    })
+
+    // 使用 Image 对象预加载
+    let loadedCount = 0
+    imageUrls.forEach(url => {
+      const img = new window.Image()
+      img.onload = () => {
+        loadedCount++
+        if (loadedCount === imageUrls.length) {
+          setImagesPreloaded(true)
+        }
+      }
+      img.onerror = () => {
+        loadedCount++
+        if (loadedCount === imageUrls.length) {
+          setImagesPreloaded(true)
+        }
+      }
+      img.src = url
+    })
+
+    // 如果没有图片，直接标记为已预加载
+    if (imageUrls.length === 0) {
+      setImagesPreloaded(true)
+    }
+  }, [navigationItems, imagesPreloaded])
 
   // 通知父组件菜单展开状态
   useEffect(() => {
