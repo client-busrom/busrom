@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Link } from "@/lib/navigation"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
+import { getOptimizedImageUrl, type MediaImage } from "@/lib/image-utils"
 import { cn } from "@/lib/utils"
 import type { NavItem } from "@/types/navigation"
 import { Settings, Globe, HelpCircle, Info, Book, FileText, ArrowRight } from "lucide-react"
@@ -68,8 +69,132 @@ const getProductImage = (url: string, apiImage?: { url: string; filename?: strin
   return slug ? productImageMap[slug] : null
 }
 
+// 卡片项的类型
+interface CardItem {
+  id: string
+  label: string
+  url: string
+  image?: { url: string; filename?: string } | null
+  inquiryLink?: string
+}
+
+// 单个卡片组件 - 完全独立，不复用状态
+function MenuCard({
+  child,
+  isLargeCard,
+  isShopMenu,
+  menuPrefix,
+}: {
+  child: CardItem
+  isLargeCard: boolean
+  isShopMenu: boolean
+  menuPrefix: string
+}) {
+  const imageUrl = getProductImage(child.url, child.image)
+  // 生成唯一的图片key，确保图片变化时完全重新渲染
+  const imageKey = `${menuPrefix}-${child.id}-${child.image?.url || imageUrl || 'no-image'}`
+
+  return (
+    <div
+      className={cn(
+        "group relative w-full h-[360px] overflow-hidden rounded-lg bg-muted cursor-pointer",
+        isLargeCard && "lg:col-span-2"
+      )}
+    >
+      {/* 图片容器 */}
+      <div className="absolute inset-0 overflow-hidden">
+        {child.image ? (
+          <OptimizedImage
+            key={imageKey}
+            image={child.image as any}
+            alt={child.label}
+            size="small"
+            loading="eager"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-125"
+          />
+        ) : imageUrl ? (
+          <img
+            key={imageKey}
+            src={imageUrl}
+            alt={child.label}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-125"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-border">
+            <span className="text-muted-foreground text-xs">No Image</span>
+          </div>
+        )}
+      </div>
+
+      {/* 标题文字 - 左上角 */}
+      <div className="absolute top-4 left-4 z-10">
+        <p className="text-lg font-semibold text-white drop-shadow-lg">
+          {child.label}
+        </p>
+      </div>
+
+      {/* 底部按钮组 - 悬停时从底部出现 */}
+      <div className="absolute bottom-0 left-0 right-0 flex gap-2 p-4 translate-y-full opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+        <Link
+          href={isShopMenu ? `/shop?series=${getProductSlug(child.url)}` : child.url}
+          className="flex-1 py-2 px-4 text-center text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+          onClick={(e) => e.stopPropagation()}
+        >
+          Learn More
+        </Link>
+        <Link
+          href={child.inquiryLink || '/contact-us'}
+          className="flex-1 py-2 px-4 text-center text-sm font-medium bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-colors"
+          onClick={(e) => e.stopPropagation()}
+        >
+          Inquiry
+        </Link>
+      </div>
+    </div>
+  )
+}
+
 export function DesktopMenu({ isOpen, onClose, navigationItems = [] }: DesktopMenuProps) {
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null)
+  const preloadedRef = useRef(false)
+
+  // 预加载所有菜单图片（菜单首次打开时）
+  useEffect(() => {
+    if (isOpen && !preloadedRef.current) {
+      preloadedRef.current = true
+
+      // 收集所有图片 URL（使用和 OptimizedImage 相同的方式获取）
+      const imageUrls: string[] = []
+      navigationItems.forEach(item => {
+        if (item.childMenus) {
+          item.childMenus.forEach(child => {
+            if (child.image) {
+              // 使用 getOptimizedImageUrl 获取和渲染时一致的 URL
+              const mediaImage: MediaImage = {
+                id: '',
+                filename: '',
+                file: { url: child.image.url },
+                variants: (child.image as any).variants,
+              }
+              const url = getOptimizedImageUrl(mediaImage, 'small', true)
+              if (url && !url.includes('placeholder')) {
+                imageUrls.push(url)
+              }
+            } else {
+              const fallbackUrl = getProductImage(child.url, null)
+              if (fallbackUrl) imageUrls.push(fallbackUrl)
+            }
+          })
+        }
+      })
+
+      // 使用 Image 对象预加载
+      imageUrls.forEach(url => {
+        const img = new Image()
+        img.src = url
+      })
+    }
+  }, [isOpen, navigationItems])
 
   // 处理一级菜单悬停
   const handleMenuHover = (menuId: string) => {
@@ -133,136 +258,67 @@ export function DesktopMenu({ isOpen, onClose, navigationItems = [] }: DesktopMe
                   ))}
                 </div>
 
-                {/* 二级菜单 - 悬停时显示 */}
-                <AnimatePresence mode="wait">
-                  {hoveredMenu && navigationItems.find(item => item.id === hoveredMenu)?.childMenus && (
-                    <motion.div
-                      key={hoveredMenu}
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                      className="overflow-hidden"
-                    >
+                {/* 二级菜单 - 预渲染所有子菜单，通过 CSS 控制显示/隐藏 */}
+                <div className="relative">
+                  {navigationItems.filter(item => item.childMenus && item.childMenus.length > 0).map((item) => {
+                    const isActive = hoveredMenu === item.id
+                    const isProductMenu = item.url === '/products'
+                    const isShopMenu = item.url === '/shop'
+
+                    return (
+                      <div
+                        key={item.id}
+                        className={cn(
+                          "transition-opacity duration-300 ease-in-out",
+                          isActive
+                            ? "opacity-100 relative z-10"
+                            : "opacity-0 absolute inset-0 pointer-events-none z-0"
+                        )}
+                      >
                       <div className="pt-6">
-                      {(() => {
-                        const activeItem = navigationItems.find(item => item.id === hoveredMenu)
-                        if (!activeItem?.childMenus) return null
+                        {/* PRODUCT_CARDS 类型 - 产品卡片网格 */}
+                        {item.type === 'PRODUCT_CARDS' && (
+                          <div className={cn(
+                            "grid gap-2.5",
+                            "grid-cols-1",
+                            "lg:grid-cols-4"
+                          )}>
+                            {item.childMenus!.map((child, index) => (
+                              <MenuCard
+                                key={`${item.id}-${child.id}`}
+                                child={child}
+                                isLargeCard={isProductMenu ? index < 2 : (isShopMenu ? index === 0 : false)}
+                                isShopMenu={isShopMenu}
+                                menuPrefix={item.id}
+                              />
+                            ))}
+                          </div>
+                        )}
 
-                        // PRODUCT_CARDS 类型 - 产品卡片网格
-                        if (activeItem.type === 'PRODUCT_CARDS') {
-                          // 判断是 product 还是 shop（通过 url 判断）
-                          const isProductMenu = activeItem.url === '/products'
-                          const isShopMenu = activeItem.url === '/shop'
+                        {/* SUBMENU 类型 - 带图标的菜单 */}
+                        {item.type === 'SUBMENU' && (
+                          <div className="grid grid-cols-4 gap-4 max-w-4xl mx-auto">
+                            {item.childMenus!.map((child) => (
+                              <Link
+                                key={child.id}
+                                href={child.url}
+                                className="group flex flex-col items-center justify-center gap-3 p-6 rounded-lg transition-colors"
+                              >
+                                <div className="text-muted-foreground group-hover:text-brand-accent-gold transition-colors">
+                                  {getIcon(child.icon)}
+                                </div>
+                                <span className="text-lg font-medium text-muted-foreground group-hover:text-brand-accent-gold text-center transition-colors">
+                                  {child.label}
+                                </span>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
 
-                          console.log('Active menu:', activeItem.label, 'URL:', activeItem.url, 'isProduct:', isProductMenu, 'isShop:', isShopMenu)
-
-                          return (
-                            <div className={cn(
-                              "grid gap-2.5",
-                              // 移动端始终单列
-                              "grid-cols-1",
-                              // lg 及以上使用桌面端布局
-                              "lg:grid-cols-4"
-                            )}>
-                              {activeItem.childMenus.map((child, index) => {
-                                const imageUrl = getProductImage(child.url, child.image)
-
-                                // Product 布局：第一行两张大卡片（各占2列）
-                                const isProductFirstRow = isProductMenu && index < 2
-                                // Shop 布局：第一张大卡片（占2列）
-                                const isShopFirstCard = isShopMenu && index === 0
-
-                                return (
-                                  <div
-                                    key={child.id}
-                                    className={cn(
-                                      "group relative w-full h-[360px] overflow-hidden rounded-lg bg-muted cursor-pointer",
-                                      // lg 及以上应用特殊布局
-                                      isProductFirstRow && "lg:col-span-2",
-                                      isShopFirstCard && "lg:col-span-2"
-                                    )}
-                                  >
-                                    {/* 图片容器 */}
-                                    <div className="absolute inset-0 overflow-hidden">
-                                      {child.image ? (
-                                        <OptimizedImage
-                                          image={child.image as any}
-                                          alt={child.label}
-                                          size="small"
-                                          loading="eager"
-                                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-125"
-                                        />
-                                      ) : imageUrl ? (
-                                        <img
-                                          src={imageUrl}
-                                          alt={child.label}
-                                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-125"
-                                        />
-                                      ) : (
-                                        <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-border">
-                                          <span className="text-muted-foreground text-xs">No Image</span>
-                                        </div>
-                                      )}
-                                    </div>
-
-                                    {/* 标题文字 - 左上角 */}
-                                    <div className="absolute top-4 left-4 z-10">
-                                      <p className="text-lg font-semibold text-white drop-shadow-lg">
-                                        {child.label}
-                                      </p>
-                                    </div>
-
-                                    {/* 底部按钮组 - 悬停时从底部出现 */}
-                                    <div className="absolute bottom-0 left-0 right-0 flex gap-2 p-4 translate-y-full opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                                      <Link
-                                        href={isShopMenu ? `/shop?series=${getProductSlug(child.url)}` : child.url}
-                                        className="flex-1 py-2 px-4 text-center text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-                                        onClick={(e) => e.stopPropagation()}
-                                      >
-                                        Learn More
-                                      </Link>
-                                      <Link
-                                        href={child.inquiryLink || '/contact-us'}
-                                        className="flex-1 py-2 px-4 text-center text-sm font-medium bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-colors"
-                                        onClick={(e) => e.stopPropagation()}
-                                      >
-                                        Inquiry
-                                      </Link>
-                                    </div>
-                                  </div>
-                                )
-                              })}
-                            </div>
-                          )
-                        }
-
-                        // SUBMENU 类型 - 带图标的菜单
-                        if (activeItem.type === 'SUBMENU') {
-                          return (
-                            <div className="grid grid-cols-4 gap-4 max-w-4xl mx-auto">
-                              {activeItem.childMenus.map((child) => (
-                                <Link
-                                  key={child.id}
-                                  href={child.url}
-                                  className="group flex flex-col items-center justify-center gap-3 p-6 rounded-lg transition-colors"
-                                >
-                                  <div className="text-muted-foreground group-hover:text-brand-accent-gold transition-colors">
-                                    {getIcon(child.icon)}
-                                  </div>
-                                  <span className="text-lg font-medium text-muted-foreground group-hover:text-brand-accent-gold text-center transition-colors">
-                                    {child.label}
-                                  </span>
-                                </Link>
-                              ))}
-                            </div>
-                          )
-                        }
-
-                        // STANDARD 类型 - 普通列表
-                        return (
+                        {/* STANDARD 类型 - 普通列表 */}
+                        {item.type !== 'PRODUCT_CARDS' && item.type !== 'SUBMENU' && (
                           <div className="grid grid-cols-4 gap-2 max-w-4xl mx-auto">
-                            {activeItem.childMenus.map((child) => (
+                            {item.childMenus!.map((child) => (
                               <Link
                                 key={child.id}
                                 href={child.url}
@@ -274,12 +330,12 @@ export function DesktopMenu({ isOpen, onClose, navigationItems = [] }: DesktopMe
                               </Link>
                             ))}
                           </div>
-                        )
-                      })()}
+                        )}
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                    </div>
+                    )
+                  })}
+                </div>
               </div>
           </motion.div>
         </>
