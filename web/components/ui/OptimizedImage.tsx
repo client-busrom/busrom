@@ -18,7 +18,7 @@
 
 'use client'
 
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   getOptimizedImageUrl,
   getImageSrcSet,
@@ -215,6 +215,15 @@ export function OptimizedImage({
 
   // Normalize image to MediaImage format (supports both image and media props)
   const normalizedMedia = normalizeImage(image) || media
+
+  // Get a stable key for the image to detect changes
+  const imageKey = normalizedMedia?.file?.url || normalizedMedia?.fileUrl || ''
+
+  // Reset loading state when image changes
+  useEffect(() => {
+    setIsLoaded(false)
+    setHasError(false)
+  }, [imageKey])
 
   // Determine loading strategy
   const loadingStrategy = priority ? 'eager' : (loading || 'lazy')
