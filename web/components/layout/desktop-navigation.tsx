@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import Image from "next/image"
 import { Link } from "@/lib/navigation"
 import { cn } from "@/lib/utils"
 import type { NavItem } from "@/types/navigation"
@@ -35,16 +34,6 @@ const getIcon = (iconName?: string) => {
 const getProductSlug = (url: string): string | null => {
   const match = url.match(/\/(products|shop)\/([^/?]+)/)
   return match ? match[2] : null
-}
-
-// 获取产品图片
-const getProductImage = (url: string, apiImage?: { url: string; filename: string }): string | null => {
-  if (apiImage?.url) {
-    const originalUrl = apiImage.url
-    const variantUrl = originalUrl.replace(/(\.[^.]+)$/, '-768x512.webp')
-    return variantUrl
-  }
-  return null
 }
 
 export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: DesktopNavigationProps) {
@@ -197,7 +186,6 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
                     return (
                       <div className="grid gap-2.5 grid-cols-1 lg:grid-cols-4">
                         {activeItem.childMenus.map((child, index) => {
-                          const imageUrl = getProductImage(child.url, child.image)
                           const isProductFirstRow = isProductMenu && index < 2
                           const isShopFirstCard = isShopMenu && index === 0
 
@@ -211,14 +199,11 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
                               )}
                             >
                               <div className="absolute inset-0 overflow-hidden">
-                                {imageUrl ? (
-                                  <Image
-                                    key={`${activeItem.id}-${child.id}-${imageUrl}`}
-                                    src={imageUrl}
+                                {child.image?.url ? (
+                                  <img
+                                    src={child.image.url}
                                     alt={child.label}
-                                    fill
-                                    sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                                    className="object-cover transition-transform duration-500 group-hover:scale-125"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-125"
                                   />
                                 ) : (
                                   <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-border">
