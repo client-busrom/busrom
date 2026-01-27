@@ -56,12 +56,12 @@ export function ProductCustomizationFlowSection({
 
   // 步骤条位置配置 (所有值 * 0.8)
   const stepConfigs = [
-    { y: 90, width: 433, height: 90 },   // 113*0.8, 541*0.8, 112*0.8
-    { y: 186, width: 487, height: 88 },  // 232*0.8, 609*0.8, 110*0.8 (高亮项)
-    { y: 279, width: 433, height: 90 },  // 349*0.8
-    { y: 374, width: 433, height: 90 },  // 468*0.8
-    { y: 470, width: 433, height: 88 },  // 587*0.8
-    { y: 563, width: 433, height: 90 },  // 704*0.8
+    { y: 90, width: 433, height: 90 },
+    { y: 186, width: 433, height: 88 },
+    { y: 279, width: 433, height: 90 },
+    { y: 374, width: 433, height: 90 },
+    { y: 470, width: 433, height: 88 },
+    { y: 563, width: 433, height: 90 },
   ]
 
   // 自动轮播
@@ -185,8 +185,8 @@ export function ProductCustomizationFlowSection({
           left: rpx(124 + CENTER_OFFSET),
           top: rpx(130),
           width: rpx(752),
-          fontSize: rpx(77),
-          lineHeight: rpx(85),
+          fontSize: rpx(72),
+          lineHeight: rpx(80),
           color: "#000000",
         }}
       >
@@ -200,15 +200,15 @@ export function ProductCustomizationFlowSection({
           className="absolute flex items-center"
           style={{
             left: rpx(133 + CENTER_OFFSET),
-            top: rpx(428 + index * 63),
+            top: rpx(428 + index * 50),
           }}
         >
           {/* 圆点 */}
           <div
             className="rounded-full"
             style={{
-              width: rpx(12),
-              height: rpx(12),
+              width: rpx(10),
+              height: rpx(10),
               backgroundColor: "#756F3F",
             }}
           />
@@ -216,9 +216,9 @@ export function ProductCustomizationFlowSection({
           <p
             className="font-josefin-sans font-semibold"
             style={{
-              marginLeft: rpx(28),
-              fontSize: rpx(32),
-              lineHeight: rpx(65),
+              marginLeft: rpx(24),
+              fontSize: rpx(20),
+              lineHeight: rpx(30),
               color: "#625C2C",
             }}
           >
@@ -274,7 +274,7 @@ export function ProductCustomizationFlowSection({
               style={{
                 marginLeft: rpx(36),
                 marginBottom: rpx(18),
-                fontSize: rpx(51),
+                fontSize: rpx(36),
                 lineHeight: 1,
               }}
               animate={{
@@ -289,9 +289,9 @@ export function ProductCustomizationFlowSection({
             <motion.span
               className="font-josefin-sans font-semibold text-black"
               style={{
-                marginLeft: rpx(24),
+                marginLeft: rpx(20),
                 marginBottom: rpx(22),
-                fontSize: isActive ? rpx(29) : rpx(24),
+                fontSize: isActive ? rpx(22) : rpx(20),
                 lineHeight: 1,
               }}
               animate={{

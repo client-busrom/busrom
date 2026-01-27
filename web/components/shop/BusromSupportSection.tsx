@@ -336,7 +336,7 @@ export function BusromSupportSection({
                 className="absolute font-josefin-sans"
                 style={{
                   left: rpx(37),   // 46 * 0.8
-                  top: rpx(122),   // 152 * 0.8
+                  top: rpx(145),   // 增加间隔
                   width: rpx(216), // 270 * 0.8
                   fontSize: rpx(19),  // 24 * 0.8
                   lineHeight: rpx(23), // 29 * 0.8

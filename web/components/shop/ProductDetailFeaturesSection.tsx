@@ -63,24 +63,68 @@ export function ProductDetailFeaturesSection({
     : "center"
 
   return (
+    <>
+    {/* Mobile Layout */}
+    <section className="md:hidden bg-brand-main px-4 py-8">
+      {/* Title */}
+      <h2 className="font-josefin-sans font-bold text-2xl text-center text-[#46401F] mb-6">
+        {title}
+      </h2>
+
+      {/* Image */}
+      {image && (
+        <div className="w-full h-48 rounded-2xl overflow-hidden mb-6">
+          <OptimizedImage
+            image={image as any}
+            alt={image.altText || image.alt || title || ""}
+            size="medium"
+            className="w-full h-full object-cover"
+            objectPosition={objectPosition}
+          />
+        </div>
+      )}
+
+      {/* Cards */}
+      <div className="space-y-4">
+        {items.slice(0, 3).map((item, index) => {
+          const style = CARD_STYLES[index] || CARD_STYLES[0]
+          return (
+            <div
+              key={index}
+              className={`${style.bg} rounded-2xl p-4`}
+            >
+              <h3 className={`font-inter font-bold text-lg mb-2 ${style.titleColor}`}>
+                {item.title}
+              </h3>
+              {item.description && (
+                <p className={`font-inter text-sm ${style.descColor}`}>
+                  {item.description}
+                </p>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </section>
+
+    {/* Desktop Layout */}
     <section
-      className="relative w-full bg-brand-main overflow-hidden"
+      className="relative w-full bg-brand-main overflow-hidden hidden md:block"
       style={{
         ["--rpx-detail-features" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
-        paddingTop: rpx(67),
-        paddingBottom: rpx(55),
+        height: rpx(922),
       }}
     >
-      {/* Desktop Layout */}
+      {/* Desktop Content */}
       <div
-        className="hidden md:flex items-stretch"
+        className="hidden md:flex items-center h-full"
         style={{ gap: rpx(37) }}
       >
         {/* Left Image */}
         <div
           className="flex-shrink-0 overflow-hidden"
           style={{
-            width: rpx(433),
+            width: rpx(520),
             borderTopRightRadius: rpx(30),
             borderBottomRightRadius: rpx(30),
           }}
@@ -110,25 +154,30 @@ export function ProductDetailFeaturesSection({
                 key={index}
                 className={`${style.bg} flex flex-col justify-between`}
                 style={{
-                  width: rpx(810),
-                  height: rpx(250),
-                  borderRadius: rpx(30),
-                  padding: rpx(44),
-                  paddingBottom: rpx(20),
+                  width: rpx(600),
+                  height: rpx(150),
+                  borderRadius: rpx(24),
+                  padding: rpx(20),
+                  paddingBottom: rpx(14),
                 }}
-                initial={{ opacity: 0, x: -50 }}
+                initial={{ opacity: 0, x: -80 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.15 }}
-                whileHover={{ scale: 1.02, x: 10 }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                whileHover={{
+                  scale: 1.05,
+                  x: 25,
+                  boxShadow: "0 15px 40px rgba(70, 64, 31, 0.3)",
+                }}
+                whileTap={{ scale: 0.98 }}
               >
                 {/* Title */}
                 <h3
                   className={`font-inter font-bold ${style.titleColor}`}
                   style={{
-                    fontSize: rpx(36),
-                    lineHeight: rpx(30),
-                    marginTop: rpx(15),
+                    fontSize: rpx(24),
+                    lineHeight: rpx(24),
+                    marginTop: rpx(4),
                   }}
                 >
                   {item.title}
@@ -139,16 +188,16 @@ export function ProductDetailFeaturesSection({
                   className="mt-auto"
                   style={{
                     background: style.barGradient,
-                    borderRadius: rpx(14),
-                    padding: `${rpx(15)} ${rpx(12)}`,
+                    borderRadius: rpx(12),
+                    padding: `${rpx(12)} ${rpx(10)}`,
                   }}
                 >
                   {item.description && (
                     <p
                       className={`font-inter ${style.descColor}`}
                       style={{
-                        fontSize: rpx(24),
-                        lineHeight: rpx(31),
+                        fontSize: rpx(16),
+                        lineHeight: rpx(22),
                       }}
                     >
                       {item.description}
@@ -163,23 +212,24 @@ export function ProductDetailFeaturesSection({
         {/* Right Column - Title and Circle */}
         <div
           className="flex-1 relative flex items-start justify-center"
-          style={{ paddingTop: rpx(38) }}
+          style={{ alignSelf: "center", height: `calc(${rpx(150)} * 3 + ${rpx(25)} * 2)` }}
         >
           {/* Decorative circle */}
           <motion.div
             className="absolute rounded-full bg-[#EAE5BD]"
             style={{
-              bottom: rpx(153),
-              right: rpx(38),
+              bottom: rpx(20),
+              right: rpx(60),
               width: rpx(190),
               height: rpx(190),
             }}
             animate={{
-              scale: [1, 1.05, 1],
-              opacity: [0.8, 1, 0.8],
+              scale: [1, 1.2, 1],
+              opacity: [0.6, 1, 0.6],
+              y: [0, -15, 0],
             }}
             transition={{
-              duration: 4,
+              duration: 3,
               repeat: Infinity,
               ease: "easeInOut",
             }}
@@ -191,8 +241,8 @@ export function ProductDetailFeaturesSection({
             <h2
               className="font-josefin-sans font-bold whitespace-pre-line text-transparent"
               style={{
-                fontSize: rpx(100),
-                lineHeight: rpx(113),
+                fontSize: rpx(72),
+                lineHeight: rpx(82),
                 WebkitTextStroke: `2px #464010`,
                 writingMode: "vertical-rl",
                 textOrientation: "mixed",
@@ -204,8 +254,8 @@ export function ProductDetailFeaturesSection({
             <h2
               className="absolute font-josefin-sans font-bold whitespace-pre-line text-[#46401F]"
               style={{
-                fontSize: rpx(100),
-                lineHeight: rpx(113),
+                fontSize: rpx(72),
+                lineHeight: rpx(82),
                 writingMode: "vertical-rl",
                 textOrientation: "mixed",
                 bottom: 3,
@@ -218,48 +268,7 @@ export function ProductDetailFeaturesSection({
         </div>
       </div>
 
-      {/* Mobile Layout */}
-      <div className="block md:hidden px-4 py-8">
-        {/* Title */}
-        <h2 className="font-josefin-sans font-bold text-2xl text-center text-[#46401F] mb-6">
-          {title}
-        </h2>
-
-        {/* Image */}
-        {image && (
-          <div className="w-full h-48 rounded-2xl overflow-hidden mb-6">
-            <OptimizedImage
-              image={image as any}
-              alt={image.altText || image.alt || title || ""}
-              size="medium"
-              className="w-full h-full object-cover"
-              objectPosition={objectPosition}
-            />
-          </div>
-        )}
-
-        {/* Cards */}
-        <div className="space-y-4">
-          {items.slice(0, 3).map((item, index) => {
-            const style = CARD_STYLES[index] || CARD_STYLES[0]
-            return (
-              <div
-                key={index}
-                className={`${style.bg} rounded-2xl p-4`}
-              >
-                <h3 className={`font-inter font-bold text-lg mb-2 ${style.titleColor}`}>
-                  {item.title}
-                </h3>
-                {item.description && (
-                  <p className={`font-inter text-sm ${style.descColor}`}>
-                    {item.description}
-                  </p>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      </div>
     </section>
+    </>
   )
 }
