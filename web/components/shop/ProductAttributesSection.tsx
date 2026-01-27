@@ -142,6 +142,7 @@ export function ProductAttributesSection({
         className="hidden md:block"
         style={{
           ["--rpx-attr" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
+          height: rpx(922),
         }}
       >
         <div className="flex">
@@ -267,8 +268,8 @@ export function ProductAttributesSection({
                     <p
                       className="font-josefin-sans"
                       style={{
-                        fontSize: rpx(26),
-                        lineHeight: rpx(28),
+                        fontSize: rpx(20),
+                        lineHeight: rpx(24),
                         color: "#4D4D4D",
                         minHeight: rpx(84),
                       }}
@@ -295,8 +296,8 @@ export function ProductAttributesSection({
           <h2
             className="font-josefin-sans font-bold"
             style={{
-              fontSize: rpx(96),
-              lineHeight: rpx(93),
+              fontSize: rpx(56),
+              lineHeight: rpx(60),
               color: "#706934",
               maxWidth: rpx(960),
             }}

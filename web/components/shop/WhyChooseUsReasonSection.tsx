@@ -204,221 +204,230 @@ export function WhyChooseUsReasonSection({
 
       {/* Desktop Layout */}
       <section
-        className="relative w-full bg-brand-main overflow-hidden hidden md:block"
+        className="relative w-full bg-brand-main overflow-hidden hidden md:flex justify-center"
         style={{
           ["--rpx-reason" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
           height: rpx(922),
         }}
       >
-        {/* Left Side - Title and Description */}
+        {/* Centered Container */}
         <div
-          className="absolute"
+          className="relative flex-shrink-0"
           style={{
-            left: rpx(LEFT_OFFSET),
-            top: rpx(120),
-            width: rpx(750),
+            width: rpx(CONTENT_WIDTH),
+            height: rpx(922),
           }}
         >
-          {/* Title - max 3 lines with float-up animation (NOT scaled) */}
-          <h2
-            className="font-josefin-sans font-bold text-black animate-float-up"
-            style={{
-              fontSize: rpx(72),
-              lineHeight: rpx(82),
-              maxHeight: rpx(246),
-              overflow: "hidden",
-            }}
-            key={`title-${currentIndex}`}
-          >
-            {currentItem.title}
-          </h2>
-        </div>
-
-        {/* Next Arrow Button (Right arrow) - same row as description start, offset to the right */}
-        <button
-          onClick={goToNext}
-          className="absolute group cursor-pointer"
-          style={{
-            left: rpx(LEFT_OFFSET + 150),
-            top: rpx(420),
-            width: srpx(105),
-            height: srpx(58),
-          }}
-          aria-label="Next slide"
-        >
+          {/* Left Side - Title and Description */}
           <div
-            className="w-full h-full flex items-center justify-center transition-colors duration-300 bg-brand-secondary group-hover:bg-brand-dark-olive"
-            style={{ borderRadius: srpx(45) }}
-          >
-            {/* Right Arrow Icon */}
-            <svg
-              width="76"
-              height="14"
-              viewBox="0 0 76 14"
-              fill="none"
-              className="transition-transform duration-300 group-hover:translate-x-1"
-              style={{ width: srpx(76), height: srpx(14) }}
-            >
-              <path
-                d="M0 7H69"
-                stroke="white"
-                strokeWidth="2"
-              />
-              <path
-                d="M62 1L75 7L62 13"
-                stroke="white"
-                strokeWidth="2"
-                fill="none"
-              />
-            </svg>
-          </div>
-        </button>
-
-        {/* Description - to the right of next button */}
-        <div
-          className="absolute"
-          style={{
-            left: rpx(LEFT_OFFSET + 250),
-            top: rpx(420),
-            width: srpx(550),
-          }}
-        >
-          <p
-            className="font-josefin-sans font-normal text-black animate-float-up whitespace-pre-line"
+            className="absolute"
             style={{
-              fontSize: srpx(32),
-              lineHeight: srpx(41),
-              animationDelay: "0.15s",
-              opacity: 0,
+              left: 0,
+              top: rpx(120),
+              width: rpx(750),
             }}
-            key={`desc-${currentIndex}`}
           >
-            {currentItem.description}
-          </p>
-        </div>
-
-        {/* Prev Arrow Button (Left arrow) - below next button */}
-        <button
-          onClick={goToPrev}
-          className="absolute group cursor-pointer"
-          style={{
-            left: rpx(LEFT_OFFSET),
-            top: rpx(500),
-            width: srpx(105),
-            height: srpx(59),
-          }}
-          aria-label="Previous slide"
-        >
-          <div
-            className="w-full h-full flex items-center justify-center transition-colors duration-300 border border-[#bab489] group-hover:bg-brand-secondary/10"
-            style={{ borderRadius: srpx(29.5) }}
-          >
-            {/* Left Arrow Icon */}
-            <svg
-              width="76"
-              height="14"
-              viewBox="0 0 76 14"
-              fill="none"
-              className="transition-transform duration-300 group-hover:-translate-x-1"
-              style={{ width: srpx(76), height: srpx(14) }}
+            {/* Title - max 3 lines with float-up animation (NOT scaled) */}
+            <h2
+              className="font-josefin-sans font-bold text-black animate-float-up"
+              style={{
+                fontSize: rpx(72),
+                lineHeight: rpx(82),
+                maxHeight: rpx(246),
+                overflow: "hidden",
+              }}
+              key={`title-${currentIndex}`}
             >
-              <path
-                d="M76 7H7"
-                stroke="#756F3F"
-                strokeWidth="2"
-              />
-              <path
-                d="M14 13L1 7L14 1"
-                stroke="#756F3F"
-                strokeWidth="2"
-                fill="none"
-              />
-            </svg>
+              {currentItem.title}
+            </h2>
           </div>
-        </button>
 
-        {/* Right Side - Images (scaled) */}
-        {/* Main Large Image (Current Item) */}
-        <div
-          className="absolute overflow-hidden animate-fade-scale-in"
-          style={{
-            left: rpx(LEFT_OFFSET + 850),
-            top: rpx(87),
-            width: srpx(601),
-            height: srpx(756),
-            borderRadius: srpx(84),
-          }}
-          key={`main-container-${currentIndex}`}
-        >
-          {currentItem.image ? (
-            <OptimizedImage
-              image={currentItem.image as any}
-              alt={currentItem.title}
-              size="large"
-              className="w-full h-full object-cover"
-              key={`main-img-${currentIndex}`}
-            />
-          ) : (
-            <div className="w-full h-full bg-muted flex items-center justify-center">
-              <span className="text-muted-foreground text-2xl">{currentItem.title}</span>
+          {/* Next Arrow Button (Right arrow) - same row as description start, offset to the right */}
+          <button
+            onClick={goToNext}
+            className="absolute group cursor-pointer"
+            style={{
+              left: rpx(150),
+              top: rpx(420),
+              width: srpx(105),
+              height: srpx(58),
+            }}
+            aria-label="Next slide"
+          >
+            <div
+              className="w-full h-full flex items-center justify-center transition-colors duration-300 bg-brand-secondary group-hover:bg-brand-dark-olive"
+              style={{ borderRadius: srpx(45) }}
+            >
+              {/* Right Arrow Icon */}
+              <svg
+                width="76"
+                height="14"
+                viewBox="0 0 76 14"
+                fill="none"
+                className="transition-transform duration-300 group-hover:translate-x-1"
+                style={{ width: srpx(76), height: srpx(14) }}
+              >
+                <path
+                  d="M0 7H69"
+                  stroke="white"
+                  strokeWidth="2"
+                />
+                <path
+                  d="M62 1L75 7L62 13"
+                  stroke="white"
+                  strokeWidth="2"
+                  fill="none"
+                />
+              </svg>
             </div>
-          )}
-        </div>
+          </button>
 
-        {/* Small Image Card (Next Item) - overlapping on the right side of main image */}
-        <div
-          className="absolute cursor-pointer group"
-          onClick={goToNext}
-          style={{
-            // Position: main image left + main image width * scale - overlap
-            left: rpx(LEFT_OFFSET + 850 + 601 * SCALE - 80),
-            top: rpx(87 + 209 * SCALE),
-            width: srpx(261),
-            height: srpx(422),
-            borderRadius: srpx(61),
-            backgroundColor: "#756F3F",
-          }}
-        >
-          {/* "NEXT" Text */}
-          <p
-            className="absolute font-josefin-sans font-semibold text-white"
+          {/* Description - to the right of next button */}
+          <div
+            className="absolute"
             style={{
-              left: srpx(21),
-              top: srpx(80),
-              width: srpx(219),
-              fontSize: srpx(36),
-              lineHeight: srpx(55),
-              textAlign: "center",
+              left: rpx(250),
+              top: rpx(420),
+              width: srpx(550),
             }}
           >
-            {nextButtonText}
-          </p>
+            <p
+              className="font-josefin-sans font-normal text-black animate-float-up whitespace-pre-line"
+              style={{
+                fontSize: rpx(20),
+                lineHeight: rpx(28),
+                animationDelay: "0.15s",
+                opacity: 0,
+              }}
+              key={`desc-${currentIndex}`}
+            >
+              {currentItem.description}
+            </p>
+          </div>
 
-          {/* Small Image */}
+          {/* Prev Arrow Button (Left arrow) - below next button */}
+          <button
+            onClick={goToPrev}
+            className="absolute group cursor-pointer"
+            style={{
+              left: 0,
+              top: rpx(500),
+              width: srpx(105),
+              height: srpx(59),
+            }}
+            aria-label="Previous slide"
+          >
+            <div
+              className="w-full h-full flex items-center justify-center transition-colors duration-300 border border-[#bab489] group-hover:bg-brand-secondary/10"
+              style={{ borderRadius: srpx(29.5) }}
+            >
+              {/* Left Arrow Icon */}
+              <svg
+                width="76"
+                height="14"
+                viewBox="0 0 76 14"
+                fill="none"
+                className="transition-transform duration-300 group-hover:-translate-x-1"
+                style={{ width: srpx(76), height: srpx(14) }}
+              >
+                <path
+                  d="M76 7H7"
+                  stroke="#756F3F"
+                  strokeWidth="2"
+                />
+                <path
+                  d="M14 13L1 7L14 1"
+                  stroke="#756F3F"
+                  strokeWidth="2"
+                  fill="none"
+                />
+              </svg>
+            </div>
+          </button>
+
+          {/* Right Side - Images (scaled) */}
+          {/* Main Large Image (Current Item) */}
           <div
             className="absolute overflow-hidden animate-fade-scale-in"
             style={{
-              left: srpx(21),
-              top: srpx(150),
-              width: srpx(219),
-              height: srpx(211),
-              borderRadius: srpx(61),
+              left: rpx(850),
+              top: rpx(87),
+              width: rpx(400),
+              height: rpx(503),
+              borderRadius: rpx(56),
             }}
-            key={`next-container-${nextIndex}`}
+            key={`main-container-${currentIndex}`}
           >
-            {nextItem?.image ? (
+            {currentItem.image ? (
               <OptimizedImage
-                image={nextItem.image as any}
-                alt={nextItem.title}
-                size="small"
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                key={`next-img-${nextIndex}`}
+                image={currentItem.image as any}
+                alt={currentItem.title}
+                size="large"
+                className="w-full h-full object-cover"
+                key={`main-img-${currentIndex}`}
               />
             ) : (
-              <div className="w-full h-full bg-muted/50 flex items-center justify-center">
-                <span className="text-white/70 text-sm">{nextItem?.title}</span>
+              <div className="w-full h-full bg-muted flex items-center justify-center">
+                <span className="text-muted-foreground text-2xl">{currentItem.title}</span>
               </div>
             )}
+          </div>
+
+          {/* Small Image Card (Next Item) - overlapping on the right side of main image */}
+          <div
+            className="absolute cursor-pointer group"
+            onClick={goToNext}
+            style={{
+              // Position: main image left + main image width - overlap
+              left: rpx(850 + 400 - 60),
+              top: rpx(87 + 139),
+              width: rpx(174),
+              height: rpx(281),
+              borderRadius: rpx(41),
+              backgroundColor: "#756F3F",
+            }}
+          >
+            {/* "NEXT" Text */}
+            <p
+              className="absolute font-josefin-sans font-semibold text-white"
+              style={{
+                left: rpx(14),
+                top: rpx(53),
+                width: rpx(146),
+                fontSize: rpx(24),
+                lineHeight: rpx(36),
+                textAlign: "center",
+              }}
+            >
+              {nextButtonText}
+            </p>
+
+            {/* Small Image */}
+            <div
+              className="absolute overflow-hidden animate-fade-scale-in"
+              style={{
+                left: rpx(14),
+                top: rpx(120),
+                width: rpx(146),
+                height: rpx(140),
+                borderRadius: rpx(30),
+              }}
+              key={`next-container-${nextIndex}`}
+            >
+              {nextItem?.image ? (
+                <OptimizedImage
+                  image={nextItem.image as any}
+                  alt={nextItem.title}
+                  size="small"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  key={`next-img-${nextIndex}`}
+                />
+              ) : (
+                <div className="w-full h-full bg-muted/50 flex items-center justify-center">
+                  <span className="text-white/70 text-sm">{nextItem?.title}</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>

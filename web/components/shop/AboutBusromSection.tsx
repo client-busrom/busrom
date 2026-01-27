@@ -112,8 +112,8 @@ export function AboutBusromSection({
           left: rpx(122 + CENTER_OFFSET),
           top: rpx(63),
           width: rpx(506),
-          fontSize: rpx(112),
-          lineHeight: rpx(103),
+          fontSize: rpx(96),
+          lineHeight: rpx(88),
           color: "#464010",
         }}
       >
@@ -171,12 +171,12 @@ export function AboutBusromSection({
               paddingRight: rpx(48),
             }}
           >
-            {/* 左侧描述文字 */}
+            {/* 左侧描述文字 (value) */}
             <p
               className="font-josefin-sans font-semibold whitespace-pre-line"
               style={{
-                fontSize: rpx(26), // 32*0.8
-                lineHeight: rpx(34), // 42*0.8
+                fontSize: rpx(20),
+                lineHeight: rpx(26),
                 color: textColor,
               }}
             >
@@ -187,8 +187,8 @@ export function AboutBusromSection({
             <h3
               className="font-josefin-sans font-bold text-right"
               style={{
-                fontSize: rpx(38), // 48*0.8
-                lineHeight: rpx(46), // 58*0.8
+                fontSize: rpx(24),
+                lineHeight: rpx(30),
                 color: textColor,
               }}
             >
