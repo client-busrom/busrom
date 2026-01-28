@@ -10,7 +10,6 @@ import { ProductDetailSkeleton } from "@/components/shop/ProductDetailSkeleton"
 import { StickyProductInfo } from "@/components/shop/StickyLeftColumn"
 import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 import { ProductHeroSection } from "@/components/shop/ProductHeroSection"
-import { ProductMarqueeBanner } from "@/components/shop/ProductMarqueeBanner"
 import { SectionRenderer } from "./SectionRenderer"
 import { parseLexicalSections } from "./parseSectionData"
 
@@ -325,8 +324,15 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
 
       </div>
 
-      {/* Marquee Banner - After Main Content */}
-      <ProductMarqueeBanner text="Busrom" />
+      {/* First scrolling-link section - Before Hero */}
+      {postFormSections.length > 0 && postFormSections[0].id === 'scrolling-link' && (
+        <SectionRenderer
+          section={postFormSections[0]}
+          sectionIndex={0}
+          locale={locale}
+          productAttributes={product.attributes}
+        />
+      )}
 
       {/* Hero Section - Full Width */}
       <ProductHeroSection
@@ -335,19 +341,20 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
         heroImage={heroImage}
       />
 
-      {/* Post-form Sections - Rendered based on section type */}
-      {postFormSections.map((section: any, sectionIndex: number) => (
-        <SectionRenderer
-          key={sectionIndex}
-          section={section}
-          sectionIndex={sectionIndex}
-          locale={locale}
-          productAttributes={product.attributes}
-        />
-      ))}
-
-      {/* Marquee Banner - After Last Section */}
-      <ProductMarqueeBanner text="Busrom" />
+      {/* Post-form Sections - Rendered based on section type (skip first if it was scrolling-link) */}
+      {postFormSections.map((section: any, sectionIndex: number) => {
+        // Skip first section if it was already rendered as scrolling-link before hero
+        if (sectionIndex === 0 && section.id === 'scrolling-link') return null
+        return (
+          <SectionRenderer
+            key={sectionIndex}
+            section={section}
+            sectionIndex={sectionIndex}
+            locale={locale}
+            productAttributes={product.attributes}
+          />
+        )
+      })}
 
       {/* Full Inquiry Modal */}
       {formBlock && formConfig && (
