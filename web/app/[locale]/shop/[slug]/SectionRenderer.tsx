@@ -213,6 +213,15 @@ export function SectionRenderer({
     )
   }
 
+  // Scrolling Link Section - renders marqueeLinks block directly (full-width, no container)
+  if (section.id === 'scrolling-link') {
+    return (
+      <div key={sectionIndex} className="w-full">
+        <LexicalRenderer content={section.content} />
+      </div>
+    )
+  }
+
   // Default: render with LexicalRenderer in a container
   return (
     <div key={sectionIndex} className="container mx-auto px-6 md:px-8 lg:px-12 py-8">
