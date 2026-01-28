@@ -110,7 +110,8 @@ export function parseSixCoreStrengthsData(content: LexicalContent) {
       if (nextNode?.type === 'list' && nextNode.children) {
         for (let j = 0; j < Math.min(6, nextNode.children.length); j++) {
           const listItem = nextNode.children[j]
-          const itemText = listItem?.children?.[0]?.text?.trim()
+          // Use extractTextWithLinebreaks to handle linebreaks from shift+enter
+          const itemText = extractTextWithLinebreaks(listItem?.children)?.trim()
           if (itemText) {
             strengthItems.push({ title: itemText })
           }
