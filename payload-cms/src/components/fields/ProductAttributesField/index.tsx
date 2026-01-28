@@ -4,6 +4,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { useField, useDocumentInfo, useLocale, useTranslation } from '@payloadcms/ui'
 import { SUPPORTED_LOCALES, type LocaleCode } from '../../../lib/locales'
 import { fetchAllLocaleData, getFieldFromCache } from '../localeDataCache'
+import { LocaleFlag } from '../../ui/LocaleFlag'
 import './styles.scss'
 
 interface AttributeItem {
@@ -329,7 +330,7 @@ export const ProductAttributesField: React.FC<ProductAttributesFieldProps> = ({
                   const hasContent = data?.attributes && data.attributes.length > 0
                   return (
                     <option key={lang.code} value={lang.code}>
-                      {lang.flag} {lang.label} {hasContent ? '✓' : '(empty)'}
+                      {lang.label} {hasContent ? '✓' : '(empty)'}
                     </option>
                   )
                 })}
@@ -365,7 +366,7 @@ export const ProductAttributesField: React.FC<ProductAttributesFieldProps> = ({
                       }}
                       disabled={isTranslating}
                     />
-                    {lang.flag} {lang.code.toUpperCase()}
+                    <LocaleFlag localeCode={lang.code} className="target-locale-flag" /> {lang.code.toUpperCase()}
                   </label>
                 ))}
               </div>
@@ -410,7 +411,7 @@ export const ProductAttributesField: React.FC<ProductAttributesFieldProps> = ({
               onClick={() => setActiveLocale(lang.code as LocaleCode)}
               title={`${lang.label}${isCurrent ? ' (Current)' : ''}`}
             >
-              <span className="locale-tab__flag">{lang.flag}</span>
+              <LocaleFlag localeCode={lang.code} className="locale-tab__flag" />
               <span className="locale-tab__code">{lang.code.toUpperCase()}</span>
               {isCompleted && <span className="locale-tab__check">✓</span>}
               {isCurrent && <span className="locale-tab__current">●</span>}
@@ -423,7 +424,7 @@ export const ProductAttributesField: React.FC<ProductAttributesFieldProps> = ({
       <div className="product-attributes-field__editor">
         <div className="editor-header">
           <span className="editor-header__locale">
-            {SUPPORTED_LOCALES.find(l => l.code === activeLocale)?.flag}{' '}
+            <LocaleFlag localeCode={activeLocale} className="editor-header__flag" />{' '}
             {SUPPORTED_LOCALES.find(l => l.code === activeLocale)?.label}
             {activeLocale === currentLocale.code && <span className="current-badge">Current Locale</span>}
           </span>

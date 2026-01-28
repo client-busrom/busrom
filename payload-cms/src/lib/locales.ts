@@ -2,33 +2,34 @@
  * Locale Configuration
  *
  * 24种支持的语言配置
+ * 注意：flag 字段已弃用，请使用 LocaleFlag 组件显示国旗图标
  */
 
 export const SUPPORTED_LOCALES = [
-  { code: 'en', label: 'English', flag: '🇺🇸' },
-  { code: 'zh', label: '中文', flag: '🇨🇳' },
-  { code: 'es', label: 'Español', flag: '🇪🇸' },
-  { code: 'fr', label: 'Français', flag: '🇫🇷' },
-  { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
-  { code: 'ja', label: '日本語', flag: '🇯🇵' },
-  { code: 'ko', label: '한국어', flag: '🇰🇷' },
-  { code: 'pt', label: 'Português', flag: '🇧🇷' },
-  { code: 'it', label: 'Italiano', flag: '🇮🇹' },
-  { code: 'nl', label: 'Nederlands', flag: '🇳🇱' },
-  { code: 'pl', label: 'Polski', flag: '🇵🇱' },
-  { code: 'ru', label: 'Русский', flag: '🇷🇺' },
-  { code: 'ar', label: 'العربية', flag: '🇸🇦' },
-  { code: 'th', label: 'ไทย', flag: '🇹🇭' },
-  { code: 'vi', label: 'Tiếng Việt', flag: '🇻🇳' },
-  { code: 'id', label: 'Bahasa Indonesia', flag: '🇮🇩' },
-  { code: 'ms', label: 'Bahasa Melayu', flag: '🇲🇾' },
-  { code: 'tr', label: 'Türkçe', flag: '🇹🇷' },
-  { code: 'hi', label: 'हिन्दी', flag: '🇮🇳' },
-  { code: 'bn', label: 'বাংলা', flag: '🇧🇩' },
-  { code: 'sv', label: 'Svenska', flag: '🇸🇪' },
-  { code: 'da', label: 'Dansk', flag: '🇩🇰' },
-  { code: 'no', label: 'Norsk', flag: '🇳🇴' },
-  { code: 'fi', label: 'Suomi', flag: '🇫🇮' },
+  { code: 'en', label: 'English' },
+  { code: 'zh', label: '中文' },
+  { code: 'es', label: 'Español' },
+  { code: 'fr', label: 'Français' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'ja', label: '日本語' },
+  { code: 'ko', label: '한국어' },
+  { code: 'pt', label: 'Português' },
+  { code: 'it', label: 'Italiano' },
+  { code: 'nl', label: 'Nederlands' },
+  { code: 'pl', label: 'Polski' },
+  { code: 'ru', label: 'Русский' },
+  { code: 'ar', label: 'العربية' },
+  { code: 'th', label: 'ไทย' },
+  { code: 'vi', label: 'Tiếng Việt' },
+  { code: 'id', label: 'Bahasa Indonesia' },
+  { code: 'ms', label: 'Bahasa Melayu' },
+  { code: 'tr', label: 'Türkçe' },
+  { code: 'hi', label: 'हिन्दी' },
+  { code: 'bn', label: 'বাংলা' },
+  { code: 'sv', label: 'Svenska' },
+  { code: 'da', label: 'Dansk' },
+  { code: 'no', label: 'Norsk' },
+  { code: 'fi', label: 'Suomi' },
 ] as const
 
 export type LocaleCode = typeof SUPPORTED_LOCALES[number]['code']
@@ -40,10 +41,5 @@ export const DEFAULT_LOCALE: LocaleCode = 'en'
 
 export const getLocaleLabel = (code: string): string => {
   const locale = SUPPORTED_LOCALES.find(l => l.code === code)
-  return locale ? `${locale.flag} ${locale.label}` : code
-}
-
-export const getLocaleFlag = (code: string): string => {
-  const locale = SUPPORTED_LOCALES.find(l => l.code === code)
-  return locale?.flag || ''
+  return locale ? locale.label : code
 }

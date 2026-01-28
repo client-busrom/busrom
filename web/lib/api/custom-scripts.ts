@@ -35,6 +35,9 @@ const ALLOWED_SCRIPT_DOMAINS = [
   'clarity.ms',
   'www.clarity.ms',
   'bat.bing.com',
+  // Yandex
+  'mc.yandex.ru',
+  'metrika.yandex.ru',
   // Hotjar
   'static.hotjar.com',
   'script.hotjar.com',

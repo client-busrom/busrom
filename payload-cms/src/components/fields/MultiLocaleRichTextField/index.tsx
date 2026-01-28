@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState, useRef } from 'react'
 import { useField, useDocumentInfo, useLocale, useTranslation } from '@payloadcms/ui'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { SUPPORTED_LOCALES, type LocaleCode } from '../../../lib/locales'
+import { LocaleFlag } from '../../ui/LocaleFlag'
 import { fetchAllLocaleData, getFieldFromCache, invalidateCache } from '../localeDataCache'
 import './styles.scss'
 
@@ -402,7 +403,7 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
               onClick={() => handleLocaleChange(locale.code as LocaleCode)}
               title={`${locale.label}${hasContent ? ' (has content)' : ' (empty)'}${isPayloadCurrent ? ' - Current locale' : ''}`}
             >
-              <span className="locale-tab__flag">{locale.flag}</span>
+              <LocaleFlag localeCode={locale.code} className="locale-tab__flag" />
               <span className="locale-tab__code">{locale.code.toUpperCase()}</span>
               {hasContent && <span className="locale-tab__dot">●</span>}
             </button>
@@ -415,7 +416,7 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
         <div className="ml-richtext-field__copy-panel">
           <div className="copy-panel__header">
             <span>
-              {translateMode === 'translate' ? 'Translate' : 'Copy'} from {activeLocaleInfo?.flag} {activeLocale.toUpperCase()} to:
+              {translateMode === 'translate' ? 'Translate' : 'Copy'} from <LocaleFlag localeCode={activeLocale} className="inline-flag" /> {activeLocale.toUpperCase()} to:
             </span>
             <div className="copy-panel__quick-select">
               <button type="button" className="ml-btn ml-btn--text" onClick={handleSelectAllTargets}>All</button>
@@ -465,7 +466,7 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
                       }
                     }}
                   />
-                  <span>{locale.flag}</span>
+                  <LocaleFlag localeCode={locale.code} className="inline-flag" />
                   <span>{locale.code.toUpperCase()}</span>
                   {hasContent && <span className="filled-dot">●</span>}
                 </label>
@@ -505,7 +506,7 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
 
       {/* Current editing locale indicator */}
       <div className="ml-richtext-field__editing-indicator">
-        <span>{activeLocaleInfo?.flag}</span>
+        <LocaleFlag localeCode={activeLocale} className="editing-flag" />
         <span>Editing: <strong>{activeLocaleInfo?.label}</strong></span>
       </div>
     </div>

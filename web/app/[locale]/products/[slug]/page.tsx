@@ -1,6 +1,7 @@
 import type { Locale } from "@/i18n.config"
 import { ProductSeriesPage } from "@/components/products/ProductSeriesPage"
 import { PageScripts } from "@/components/PageScripts"
+import { PageSeoInjector } from "@/components/seo"
 import type { Metadata } from "next"
 
 // This will be used for generating static params if needed
@@ -35,6 +36,7 @@ export default async function ProductSeriesDetailPage({
     <>
       <PageScripts path={path} pageType="product_series_detail" position="header" />
       <PageScripts path={path} pageType="product_series_detail" position="body_start" />
+      <PageSeoInjector path={path} pageType="product_series_detail" locale={locale} />
       <ProductSeriesPage locale={locale} slug={slug} />
       <PageScripts path={path} pageType="product_series_detail" position="footer" />
     </>

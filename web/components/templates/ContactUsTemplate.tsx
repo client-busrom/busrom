@@ -124,12 +124,10 @@ interface TextSegment {
 
 function extractSegmentsAfterMarker(children: any[], markerId: string): TextSegment[] {
   const nodesAfterMarker = extractAfterMarker(children, markerId)
-  console.log("extractSegmentsAfterMarker - nodesAfterMarker:", markerId, nodesAfterMarker)
 
   for (const node of nodesAfterMarker) {
     if (node.type === "paragraph" && node.children) {
       const segments: TextSegment[] = []
-      console.log("extractSegmentsAfterMarker - paragraph children:", node.children)
       for (const child of node.children) {
         if (child.type === "linebreak") {
           // 换行作为普通文本
@@ -534,8 +532,6 @@ export function ContactUsTemplate({ locale, pageContent }: ContactUsTemplateProp
     const title = extractTextAfterMarker(blockMainContent, "contact-form-subtitle")
     // contact-form-description = 副标题 "Based On Your Specific Needs..."
     const subtitle = extractSegmentsAfterMarker(blockMainContent, "contact-form-description")
-
-    console.log("contactFormData:", { verticalTitle, title, subtitle, blockMainContent })
 
     // 从 mainContent 中提取轮播图
     for (const node of blockMainContent) {

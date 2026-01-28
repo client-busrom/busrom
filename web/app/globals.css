@@ -653,3 +653,21 @@ select:-webkit-autofill:active {
   -webkit-text-fill-color: transparent;
   animation: gradientSweepOlive 6s ease-in-out infinite;
 }
+
+/* ========== Accessibility Utilities ========== */
+/*
+ * Screen reader only content - accessible to screen readers but visually hidden
+ * This is a legitimate accessibility pattern (not black-hat SEO)
+ */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

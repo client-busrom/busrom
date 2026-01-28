@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useDocumentInfo, useLocale, useTranslation } from '@payloadcms/ui'
 import { SUPPORTED_LOCALES, type LocaleCode } from '../../../lib/locales'
+import { LocaleFlag } from '../../ui/LocaleFlag'
 import './styles.scss'
 
 // 定义可翻译字段的配置
@@ -565,7 +566,7 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
                       >
                         {SUPPORTED_LOCALES.map(l => (
                           <option key={l.code} value={l.code}>
-                            {l.flag} {l.label}
+                            {l.label}
                           </option>
                         ))}
                       </select>
@@ -610,7 +611,7 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
                                 }
                               }}
                             />
-                            <span className="tc-target-item__flag">{locale.flag}</span>
+                            <LocaleFlag localeCode={locale.code} className="tc-target-item__flag" />
                             <span className="tc-target-item__code">{locale.code.toUpperCase()}</span>
                             {allFilled && <span className="tc-target-item__check">✓</span>}
                           </label>
@@ -687,7 +688,7 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
                                 className={`tc-field__cell ${isEmpty ? 'tc-field__cell--empty' : ''} ${isSource ? 'tc-field__cell--source' : ''} ${isTarget ? 'tc-field__cell--target' : ''}`}
                               >
                                 <div className="tc-field__cell-header">
-                                  <span>{locale.flag}</span>
+                                  <LocaleFlag localeCode={locale.code} className="tc-field__cell-flag" />
                                   <span className="tc-field__cell-code">{locale.code.toUpperCase()}</span>
                                   {isSource && <span className="tc-badge tc-badge--source">{t('custom:translationCenter:source' as any)}</span>}
                                 </div>

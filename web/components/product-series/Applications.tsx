@@ -16,20 +16,17 @@ import type { ApplicationsData } from "@/lib/content-parser"
 
 // Design constants
 const DESIGN_WIDTH = 1920
-const DESIGN_HEIGHT = 950  // 增加高度，留出更多上下空间
+const DESIGN_HEIGHT = 1050  // 增加高度，留出更多上下空间
 const CARD_WIDTH = 420
 const CARD_GAP = 12
 const TOP_PADDING = 60     // 顶部间距
 const BOTTOM_PADDING = 120 // 底部间距（给按钮和进度条留空间）
 
-// 卡片样式配置：每个位置的 Y 偏移和高度（循环模式 0-5）
+// 卡片样式配置：每个位置的 Y 偏移和高度（循环模式 0-2）
 const CARD_STYLES = [
-  { yOffset: 0, height: 562 },   // Style 0
-  { yOffset: 70, height: 562 },  // Style 1 - 下移
-  { yOffset: 0, height: 562 },   // Style 2
-  { yOffset: 0, height: 425 },   // Style 3 - 中间，较短
-  { yOffset: 69, height: 562 },  // Style 4 - 下移
-  { yOffset: 0, height: 562 },   // Style 5
+  { yOffset: 0, height: 562 },    // Style 0
+  { yOffset: 70, height: 562 },   // Style 1 - 下移 70px
+  { yOffset: 140, height: 562 },  // Style 2 - 下移 140px
 ]
 
 interface ApplicationsProps {
@@ -146,7 +143,7 @@ export function Applications({ data, className }: ApplicationsProps) {
           left: 0,
           right: 0,
           top: `${(TOP_PADDING / DESIGN_WIDTH) * 100}vw`,
-          height: `${((562 + 70 + 30) / DESIGN_WIDTH) * 100}vw`, // 使用 vw 与卡片一致
+          height: `${((562 + 140 + 30) / DESIGN_WIDTH) * 100}vw`, // 使用 vw 与卡片一致
         }}
       >
         {/* Embla Container */}

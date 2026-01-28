@@ -4,6 +4,7 @@ import React, { useCallback, useState, useEffect } from 'react'
 import { useField, useTranslation } from '@payloadcms/ui'
 import { SUPPORTED_LOCALES, type LocaleCode } from '../../../lib/locales'
 import MediaPicker from '../MediaPicker'
+import { LocaleFlag } from '../../ui/LocaleFlag'
 import './styles.scss'
 
 // i18n translations
@@ -334,7 +335,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
                 onClick={() => setActiveLocale(locale.code)}
                 title={`${locale.label}${hasItems ? ` (${localeItems.length} ${t(i18n.items)})` : ` (${t(i18n.empty)})`}`}
               >
-                <span className="locale-flag">{locale.flag}</span>
+                <LocaleFlag localeCode={locale.code} className="locale-flag" />
                 <span className="locale-code">{locale.code.toUpperCase()}</span>
                 {hasItems && <span className="locale-check">✓</span>}
               </button>
@@ -377,7 +378,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
                   const hasContent = value?.[lang.code]?.length > 0
                   return (
                     <option key={lang.code} value={lang.code}>
-                      {lang.flag} {lang.label} {hasContent ? `(${value[lang.code].length} ${t(i18n.items)})` : `(${t(i18n.empty)})`}
+                      {lang.label} {hasContent ? `(${value[lang.code].length} ${t(i18n.items)})` : `(${t(i18n.empty)})`}
                     </option>
                   )
                 })}
@@ -471,8 +472,8 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
                           disabled={isDisabled}
                           style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
                         />
-                        <span>
-                          {lang.flag} {lang.code.toUpperCase()}
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <LocaleFlag localeCode={lang.code} style={{ width: '18px', height: '12px' }} /> {lang.code.toUpperCase()}
                           {isSourceLang && ` (${t(i18n.source)})`}
                         </span>
                       </label>

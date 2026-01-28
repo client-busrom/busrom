@@ -107,6 +107,12 @@
       input {
         cursor: pointer;
       }
+
+      .target-locale-flag {
+        width: 16px;
+        height: 11px;
+        flex-shrink: 0;
+      }
     }
 
     .translate-actions {
@@ -144,9 +150,18 @@
       margin-bottom: 0.5rem;
 
       &__locale {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
         font-size: 0.875rem;
         font-weight: 600;
         color: var(--theme-elevation-700);
+      }
+
+      &__flag {
+        width: 20px;
+        height: 14px;
+        flex-shrink: 0;
       }
 
       &__badge {
@@ -201,7 +216,9 @@
   }
 
   &__flag {
-    font-size: 0.875rem;
+    width: 18px;
+    height: 12px;
+    flex-shrink: 0;
   }
 
   &__code {
