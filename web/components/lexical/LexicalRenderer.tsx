@@ -600,7 +600,7 @@ const HeroBlock = ({ node }: any) => {
 }
 
 const MarqueeLinksBlock = ({ node }: any) => {
-  const { speed, items } = node.data || node.fields || {}
+  const { speed, items, theme } = node.data || node.fields || {}
   const [isPaused, setIsPaused] = React.useState(false)
 
   const speedDuration = {
@@ -609,11 +609,17 @@ const MarqueeLinksBlock = ({ node }: any) => {
     fast: '10s',
   }[speed as 'slow' | 'medium' | 'fast'] || '20s'
 
+  const isDark = theme === 'dark'
+  const bgClass = isDark ? 'bg-brand-secondary' : 'bg-brand-main'
+  const textClass = isDark ? 'text-white' : 'text-brand-secondary'
+  const iconClass = isDark ? 'text-brand-cream' : 'text-brand-secondary'
+  const dividerClass = isDark ? 'bg-white/30' : 'bg-brand-secondary/30'
+
   if (!items || items.length === 0) return null
 
   return (
     <div
-      className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden bg-brand-secondary py-3 my-8"
+      className={`relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden ${bgClass} py-3 my-8`}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -632,7 +638,7 @@ const MarqueeLinksBlock = ({ node }: any) => {
               className="flex items-center gap-3 px-4 py-2 hover:opacity-80 transition-opacity whitespace-nowrap flex-shrink-0"
             >
               {item.iconType === 'lucide' ? (
-                <div className="text-brand-cream">
+                <div className={iconClass}>
                   {React.createElement(getLucideIcon(item.lucideIconName), { size: 20 })}
                 </div>
               ) : item.mediaIcon?.url ? (
@@ -640,10 +646,10 @@ const MarqueeLinksBlock = ({ node }: any) => {
                   <Image src={item.mediaIcon.url} alt={item.linkText} width={20} height={20} className="w-full h-full object-cover" />
                 </div>
               ) : null}
-              <span className="text-white font-medium">{item.linkText}</span>
+              <span className={`${textClass} font-medium`}>{item.linkText}</span>
             </Link>
             <div className="flex items-center">
-              <div className="w-px h-6 bg-white/30 flex-shrink-0"></div>
+              <div className={`w-px h-6 ${dividerClass} flex-shrink-0`}></div>
             </div>
           </React.Fragment>
         ))}
