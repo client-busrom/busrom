@@ -27,6 +27,7 @@ export interface MarqueeLink {
 export interface MarqueeLinksData {
   links: MarqueeLink[]
   speed: 'slow' | 'medium' | 'fast'
+  theme?: 'light' | 'dark'
 }
 
 export type SerializedMarqueeLinksNode = Spread<
