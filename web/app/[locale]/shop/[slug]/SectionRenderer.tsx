@@ -3,7 +3,6 @@
 import type { Locale } from "@/i18n.config"
 import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 import { ProductAttributesSection } from "@/components/shop/ProductAttributesSection"
-import { ProductMarqueeBanner } from "@/components/shop/ProductMarqueeBanner"
 import { SixCoreStrengthsSection } from "@/components/shop/SixCoreStrengthsSection"
 import { ProductFeaturesSection } from "@/components/shop/ProductFeaturesSection"
 import { ProductDetailFeaturesSection } from "@/components/shop/ProductDetailFeaturesSection"
@@ -51,14 +50,12 @@ export function SectionRenderer({
   if (section.id === 'product-attributes') {
     const data = parseProductAttributesData(section.content, productAttributes)
     return (
-      <div key={sectionIndex}>
-        <ProductAttributesSection
-          title={data.title}
-          image={data.image}
-          attributes={data.attributes}
-        />
-        <ProductMarqueeBanner text="Busrom" />
-      </div>
+      <ProductAttributesSection
+        key={sectionIndex}
+        title={data.title}
+        image={data.image}
+        attributes={data.attributes}
+      />
     )
   }
 

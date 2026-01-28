@@ -10,6 +10,7 @@ import { ProductDetailSkeleton } from "@/components/shop/ProductDetailSkeleton"
 import { StickyProductInfo } from "@/components/shop/StickyLeftColumn"
 import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 import { ProductHeroSection } from "@/components/shop/ProductHeroSection"
+import { ProductMarqueeBanner } from "@/components/shop/ProductMarqueeBanner"
 import { SectionRenderer } from "./SectionRenderer"
 import { parseLexicalSections } from "./parseSectionData"
 
@@ -324,6 +325,9 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
 
       </div>
 
+      {/* Marquee Banner - After Main Content */}
+      <ProductMarqueeBanner text="Busrom" />
+
       {/* Hero Section - Full Width */}
       <ProductHeroSection
         productName={displayName}
@@ -341,6 +345,9 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
           productAttributes={product.attributes}
         />
       ))}
+
+      {/* Marquee Banner - After Last Section */}
+      <ProductMarqueeBanner text="Busrom" />
 
       {/* Full Inquiry Modal */}
       {formBlock && formConfig && (
