@@ -39,41 +39,23 @@ export function SimplifiedInquiryForm({
   productSeries,
   onOpenFullForm,
 }: SimplifiedInquiryFormProps) {
-  console.log('[SimplifiedInquiryForm] Raw formConfig:', formConfig)
-
   type ConfigData = FormConfig['data'] & Partial<FormConfig>
   const configData = (formConfig?.data || formConfig) as ConfigData
-
-  console.log('[SimplifiedInquiryForm] ConfigData after extraction:', configData)
-  console.log('[SimplifiedInquiryForm] ConfigData.fields type:', Array.isArray(configData?.fields) ? 'array' : typeof configData?.fields)
-  console.log('[SimplifiedInquiryForm] ConfigData.fields:', configData?.fields)
 
   // Handle both array format (Payload) and object format (legacy)
   let allFields: FormField[] = []
   if (Array.isArray(configData?.fields)) {
     // Payload format: fields is an array
     allFields = configData.fields as FormField[]
-    console.log('[SimplifiedInquiryForm] Using Payload array format, fields:', allFields.length)
   } else if (configData?.fields) {
     // Legacy format: fields is an object with locale keys
     allFields = configData.fields[locale] || configData.fields["en"] || []
-    console.log('[SimplifiedInquiryForm] Using legacy object format, fields:', allFields.length)
-  } else {
-    console.log('[SimplifiedInquiryForm] No fields found!')
   }
 
   // Only show required fields
   const requiredFields = allFields
     .filter((field: FormField) => field.required)
     .sort((a: FormField, b: FormField) => a.order - b.order)
-
-  console.log('[SimplifiedInquiryForm] Rendering:', {
-    hasConfigData: !!configData,
-    allFieldsCount: allFields.length,
-    requiredFieldsCount: requiredFields.length,
-    fieldNames: requiredFields.map(f => f.fieldName),
-    requiredFields: requiredFields,
-  })
 
   const [formData, setFormData] = useState<Record<string, any>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})

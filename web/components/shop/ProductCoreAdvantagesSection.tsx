@@ -149,17 +149,17 @@ export function ProductCoreAdvantagesSection({
         paddingBottom: rpx(80),
       }}
     >
-      {/* Main Container */}
+      {/* Main Container - 缩小宽度 (0.755倍) */}
       <div
         className="relative mx-auto"
         style={{
-          marginLeft: rpx(66),
-          marginRight: rpx(66),
+          marginLeft: rpx(285),
+          marginRight: rpx(285),
         }}
       >
         <AnimatePresence mode="wait">
           {!isExpanded ? (
-            /* Collapsed State */
+            /* Collapsed State - 与展开状态比例一致 */
             <motion.div
               key="collapsed"
               initial={{ opacity: 0 }}
@@ -167,7 +167,7 @@ export function ProductCoreAdvantagesSection({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               className="relative"
-              style={{ height: rpx(648) }}
+              style={{ height: rpx(489) }}
             >
               {/* Background SVG */}
               <Image
@@ -175,6 +175,7 @@ export function ProductCoreAdvantagesSection({
                 alt=""
                 fill
                 className="object-contain object-top"
+                style={{ objectPosition: "center top" }}
                 priority
               />
 
@@ -184,29 +185,29 @@ export function ProductCoreAdvantagesSection({
                 <div
                   className="flex items-end"
                   style={{
-                    paddingLeft: rpx(89),
-                    paddingBottom: rpx(150),
+                    paddingLeft: rpx(50),
+                    paddingBottom: rpx(100),
                   }}
                 >
                   <h2
                     className="font-josefin-sans font-bold text-white whitespace-pre-line"
                     style={{
-                      fontSize: rpx(96),
-                      lineHeight: rpx(110),
-                      width: rpx(800),
+                      fontSize: rpx(72),
+                      lineHeight: rpx(83),
+                      width: rpx(600),
                     }}
                   >
                     {title}
                   </h2>
                 </div>
 
-                {/* Right: 3 Images */}
+                {/* Right: 3 Images - 与展开状态比例一致 */}
                 <div
                   className="flex items-start ml-auto"
                   style={{
-                    gap: rpx(6),
-                    paddingTop: rpx(39),
-                    paddingRight: rpx(42),
+                    gap: rpx(5),
+                    paddingTop: rpx(30),
+                    paddingRight: rpx(32),
                   }}
                 >
                   {/* Image 1 - tall */}
@@ -214,9 +215,9 @@ export function ProductCoreAdvantagesSection({
                     <div
                       className="overflow-hidden flex-shrink-0"
                       style={{
-                        width: rpx(243),
-                        height: rpx(484),
-                        borderRadius: rpx(69),
+                        width: rpx(188),
+                        height: rpx(376),
+                        borderRadius: rpx(53),
                       }}
                     >
                       <OptimizedImage
@@ -233,9 +234,9 @@ export function ProductCoreAdvantagesSection({
                     <div
                       className="overflow-hidden flex-shrink-0"
                       style={{
-                        width: rpx(243),
-                        height: rpx(392),
-                        borderRadius: rpx(69),
+                        width: rpx(188),
+                        height: rpx(305),
+                        borderRadius: rpx(53),
                       }}
                     >
                       <OptimizedImage
@@ -252,9 +253,9 @@ export function ProductCoreAdvantagesSection({
                     <div
                       className="overflow-hidden flex-shrink-0"
                       style={{
-                        width: rpx(243),
-                        height: rpx(484),
-                        borderRadius: rpx(69),
+                        width: rpx(188),
+                        height: rpx(376),
+                        borderRadius: rpx(53),
                       }}
                     >
                       <OptimizedImage
@@ -272,7 +273,7 @@ export function ProductCoreAdvantagesSection({
               <div
                 className="absolute z-20 left-1/2 -translate-x-1/2"
                 style={{
-                  bottom: rpx(64),
+                  bottom: rpx(20),
                   width: rpx(126),
                   height: rpx(126),
                 }}
@@ -299,49 +300,49 @@ export function ProductCoreAdvantagesSection({
               </div>
             </motion.div>
           ) : (
-            /* Expanded State */
+            /* Expanded State - 缩小到880高度 (0.755倍)，字体保持原大小 */
             <motion.div
               key="expanded"
-              initial={{ opacity: 0, height: rpx(648) }}
-              animate={{ opacity: 1, height: rpx(1166) }}
-              exit={{ opacity: 0, height: rpx(648) }}
+              initial={{ opacity: 0, height: rpx(489) }}
+              animate={{ opacity: 1, height: rpx(880) }}
+              exit={{ opacity: 0, height: rpx(489) }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
               className="relative overflow-hidden"
               style={{
                 background: "linear-gradient(to bottom, #686230, #CEC25F)",
-                borderRadius: rpx(75),
+                borderRadius: rpx(43),
               }}
             >
               {/* Content */}
               <div className="relative z-10 h-full">
-                {/* Top Section: Title and Images */}
+                {/* Top Section: Title and Images - 缩小0.755倍，字体保持 */}
                 <div className="flex">
-                  {/* Left: Title */}
+                  {/* Left: Title - 字体缩小，width保持让文字两行 */}
                   <div
                     style={{
-                      paddingLeft: rpx(89),
-                      paddingTop: rpx(314),
+                      paddingLeft: rpx(50),
+                      paddingTop: rpx(120),
                     }}
                   >
                     <h2
                       className="font-josefin-sans font-bold text-white whitespace-pre-line"
                       style={{
-                        fontSize: rpx(96),
-                        lineHeight: rpx(110),
-                        width: rpx(800),
+                        fontSize: rpx(72),
+                        lineHeight: rpx(83),
+                        width: rpx(600),
                       }}
                     >
                       {title}
                     </h2>
                   </div>
 
-                  {/* Right: 3 Images */}
+                  {/* Right: 3 Images - 加大100px高度，等比例加宽 */}
                   <div
                     className="flex items-start ml-auto"
                     style={{
-                      gap: rpx(6),
-                      paddingTop: rpx(39),
-                      paddingRight: rpx(42),
+                      gap: rpx(4),
+                      paddingTop: rpx(22),
+                      paddingRight: rpx(24),
                     }}
                   >
                     {/* Image 1 - tall */}
@@ -349,9 +350,9 @@ export function ProductCoreAdvantagesSection({
                       <div
                         className="overflow-hidden flex-shrink-0"
                         style={{
-                          width: rpx(243),
-                          height: rpx(484),
-                          borderRadius: rpx(69),
+                          width: rpx(188),
+                          height: rpx(376),
+                          borderRadius: rpx(53),
                         }}
                       >
                         <OptimizedImage
@@ -368,10 +369,10 @@ export function ProductCoreAdvantagesSection({
                       <div
                         className="overflow-hidden flex-shrink-0"
                         style={{
-                          width: rpx(243),
-                          height: rpx(392),
-                          marginTop: rpx(92),
-                          borderRadius: rpx(69),
+                          width: rpx(188),
+                          height: rpx(305),
+                          marginTop: rpx(71),
+                          borderRadius: rpx(53),
                         }}
                       >
                         <OptimizedImage
@@ -388,9 +389,9 @@ export function ProductCoreAdvantagesSection({
                       <div
                         className="overflow-hidden flex-shrink-0"
                         style={{
-                          width: rpx(243),
-                          height: rpx(484),
-                          borderRadius: rpx(69),
+                          width: rpx(188),
+                          height: rpx(376),
+                          borderRadius: rpx(53),
                         }}
                       >
                         <OptimizedImage
@@ -404,19 +405,19 @@ export function ProductCoreAdvantagesSection({
                   </div>
                 </div>
 
-                {/* Bottom Section: Advantage Cards - 3 columns, 2 rows */}
+                {/* Bottom Section: Advantage Cards - 3 columns, 2 rows - 保持原尺寸 */}
                 <div
                   className="flex flex-col"
                   style={{
-                    paddingLeft: rpx(87),
-                    paddingRight: rpx(87),
-                    paddingTop: rpx(100),
-                    paddingBottom: rpx(60),
-                    gap: rpx(22),
+                    paddingLeft: rpx(66),
+                    paddingRight: rpx(66),
+                    paddingTop: rpx(30),
+                    paddingBottom: rpx(45),
+                    gap: rpx(17),
                   }}
                 >
                   {/* Row 1 */}
-                  <div className="flex" style={{ gap: rpx(22) }}>
+                  <div className="flex" style={{ gap: rpx(17) }}>
                     {items.slice(0, 3).map((item, index) => {
                       const style = CARD_STYLES[index] || CARD_STYLES[0]
                       return (
@@ -424,10 +425,10 @@ export function ProductCoreAdvantagesSection({
                           key={index}
                           className="flex flex-col overflow-hidden"
                           style={{
-                            width: rpx(472),
-                            height: rpx(236),
+                            width: rpx(356),
+                            height: rpx(200),
                             backgroundColor: style.bg,
-                            borderRadius: rpx(41),
+                            borderRadius: rpx(31),
                           }}
                           initial={{ opacity: 0, y: 30 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -437,16 +438,16 @@ export function ProductCoreAdvantagesSection({
                           <div
                             className="flex items-end"
                             style={{
-                              height: rpx(118),
-                              paddingLeft: rpx(30),
-                              paddingBottom: rpx(10),
+                              height: rpx(100),
+                              paddingLeft: rpx(23),
+                              paddingBottom: rpx(8),
                             }}
                           >
                             <h3
                               className="font-inter font-bold whitespace-pre-line"
                               style={{
-                                fontSize: rpx(30),
-                                lineHeight: rpx(36),
+                                fontSize: rpx(28),
+                                lineHeight: rpx(34),
                                 color: style.titleColor,
                               }}
                             >
@@ -458,12 +459,12 @@ export function ProductCoreAdvantagesSection({
                           <div
                             className="flex items-start"
                             style={{
-                              width: rpx(472),
-                              height: rpx(118),
+                              width: rpx(356),
+                              height: rpx(100),
                               background: `linear-gradient(to bottom, ${style.gradientFrom}, ${style.gradientTo})`,
-                              borderBottomLeftRadius: rpx(41),
-                              borderBottomRightRadius: rpx(41),
-                              padding: rpx(20),
+                              borderBottomLeftRadius: rpx(31),
+                              borderBottomRightRadius: rpx(31),
+                              padding: rpx(15),
                               marginTop: 'auto',
                             }}
                           >
@@ -471,8 +472,8 @@ export function ProductCoreAdvantagesSection({
                               <p
                                 className="font-inter whitespace-pre-line"
                                 style={{
-                                  fontSize: rpx(20),
-                                  lineHeight: rpx(25),
+                                  fontSize: rpx(18),
+                                  lineHeight: rpx(23),
                                   color: style.descColor,
                                 }}
                               >
@@ -485,8 +486,8 @@ export function ProductCoreAdvantagesSection({
                     })}
                   </div>
 
-                  {/* Row 2 - offset 102px to the right */}
-                  <div className="flex" style={{ gap: rpx(22), marginLeft: rpx(102) }}>
+                  {/* Row 2 - offset to the right */}
+                  <div className="flex" style={{ gap: rpx(17), marginLeft: rpx(77) }}>
                     {items.slice(3, 6).map((item, index) => {
                       const style = CARD_STYLES[index + 3] || CARD_STYLES[0]
                       return (
@@ -494,10 +495,10 @@ export function ProductCoreAdvantagesSection({
                           key={index + 3}
                           className="flex flex-col overflow-hidden"
                           style={{
-                            width: rpx(472),
-                            height: rpx(236),
+                            width: rpx(356),
+                            height: rpx(200),
                             backgroundColor: style.bg,
-                            borderRadius: rpx(41),
+                            borderRadius: rpx(31),
                           }}
                           initial={{ opacity: 0, y: 30 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -507,16 +508,16 @@ export function ProductCoreAdvantagesSection({
                           <div
                             className="flex items-end"
                             style={{
-                              height: rpx(118),
-                              paddingLeft: rpx(30),
-                              paddingBottom: rpx(10),
+                              height: rpx(100),
+                              paddingLeft: rpx(23),
+                              paddingBottom: rpx(8),
                             }}
                           >
                             <h3
                               className="font-inter font-bold whitespace-pre-line"
                               style={{
-                                fontSize: rpx(30),
-                                lineHeight: rpx(36),
+                                fontSize: rpx(28),
+                                lineHeight: rpx(34),
                                 color: style.titleColor,
                               }}
                             >
@@ -528,12 +529,12 @@ export function ProductCoreAdvantagesSection({
                           <div
                             className="flex items-start"
                             style={{
-                              width: rpx(472),
-                              height: rpx(118),
+                              width: rpx(356),
+                              height: rpx(100),
                               background: `linear-gradient(to bottom, ${style.gradientFrom}, ${style.gradientTo})`,
-                              borderBottomLeftRadius: rpx(41),
-                              borderBottomRightRadius: rpx(41),
-                              padding: rpx(20),
+                              borderBottomLeftRadius: rpx(31),
+                              borderBottomRightRadius: rpx(31),
+                              padding: rpx(15),
                               marginTop: 'auto',
                             }}
                           >
@@ -541,8 +542,8 @@ export function ProductCoreAdvantagesSection({
                               <p
                                 className="font-inter whitespace-pre-line"
                                 style={{
-                                  fontSize: rpx(20),
-                                  lineHeight: rpx(25),
+                                  fontSize: rpx(18),
+                                  lineHeight: rpx(23),
                                   color: style.descColor,
                                 }}
                               >

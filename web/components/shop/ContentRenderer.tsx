@@ -214,14 +214,6 @@ export function ContentRenderer({ content, locale }: ContentRendererProps) {
 
   const { preFormSections, formBlock, postFormContent } = parseContentSections(content)
 
-  // Debug logging
-  console.log("ContentRenderer parsed:", {
-    preFormSectionsCount: preFormSections.length,
-    hasFormBlock: !!formBlock,
-    formBlock,
-    postFormContentCount: postFormContent.length,
-  })
-
   return (
     <div className="space-y-8">
       {/* Pre-form collapsible sections */}

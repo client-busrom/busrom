@@ -143,31 +143,28 @@ function FeatureCard({ card, index, isActive, onHover }: FeatureCardProps) {
           className="object-contain"
         />
 
-        {/* 大星星 */}
+        {/* 大星星 - 使用 key 强制在 isActive 变化时重新挂载 */}
         <motion.div
+          key={`large-star-${isActive ? 'active' : 'inactive'}`}
           className="absolute"
           style={{
             width: rpx(35),   // 44 * 0.8
             height: rpx(34),  // 42 * 0.8
             marginLeft: rpx(-18), // -22 * 0.8
             marginTop: rpx(-17),  // -21 * 0.8
+            left: rpx(largeStarInitialX),
+            top: rpx(largeStarInitialY),
           }}
           animate={isActive ? {
             left: largeStarPath.x.map((v) => rpx(v)),
             top: largeStarPath.y.map((v) => rpx(v)),
             rotate: 360,
-          } : {
-            left: rpx(largeStarInitialX),
-            top: rpx(largeStarInitialY),
-            rotate: 0,
-          }}
+          } : {}}
           transition={isActive ? {
             left: { duration: STAR_ORBIT_DURATION, ease: "linear", repeat: Infinity },
             top: { duration: STAR_ORBIT_DURATION, ease: "linear", repeat: Infinity },
             rotate: { duration: STAR_ORBIT_DURATION / 2, ease: "linear", repeat: Infinity },
-          } : {
-            duration: 0.3,
-          }}
+          } : {}}
         >
           <Image
             src="/busrom-main-features/large-star.svg"
@@ -177,31 +174,28 @@ function FeatureCard({ card, index, isActive, onHover }: FeatureCardProps) {
           />
         </motion.div>
 
-        {/* 小星星 */}
+        {/* 小星星 - 使用 key 强制在 isActive 变化时重新挂载 */}
         <motion.div
+          key={`little-star-${isActive ? 'active' : 'inactive'}`}
           className="absolute"
           style={{
             width: rpx(18),   // 23 * 0.8
             height: rpx(18),  // 22 * 0.8
             marginLeft: rpx(-9),  // -11.5 * 0.8
             marginTop: rpx(-9),   // -11 * 0.8
+            left: rpx(littleStarInitialX),
+            top: rpx(littleStarInitialY),
           }}
           animate={isActive ? {
             left: littleStarPath.x.map((v) => rpx(v)),
             top: littleStarPath.y.map((v) => rpx(v)),
             rotate: 360,
-          } : {
-            left: rpx(littleStarInitialX),
-            top: rpx(littleStarInitialY),
-            rotate: 0,
-          }}
+          } : {}}
           transition={isActive ? {
             left: { duration: STAR_ORBIT_DURATION, ease: "linear", repeat: Infinity },
             top: { duration: STAR_ORBIT_DURATION, ease: "linear", repeat: Infinity },
             rotate: { duration: STAR_ORBIT_DURATION / 1.5, ease: "linear", repeat: Infinity },
-          } : {
-            duration: 0.3,
-          }}
+          } : {}}
         >
           <Image
             src="/busrom-main-features/little-star.svg"
