@@ -64,7 +64,7 @@ function LinkJumpBlock({ props }: any) {
 
 // Marquee Links Component - Full viewport width, compact height with separators
 function MarqueeLinksBlock({ props }: any) {
-  const { speed, items } = props
+  const { speed, items, theme } = props
   const [isPaused, setIsPaused] = React.useState(false)
 
   // Speed duration mapping
@@ -74,9 +74,16 @@ function MarqueeLinksBlock({ props }: any) {
     fast: '10s',
   }[speed as 'slow' | 'medium' | 'fast'] || '20s'
 
+  // Theme styling
+  const isDark = theme === 'dark'
+  const bgClass = isDark ? 'bg-brand-secondary' : 'bg-brand-main'
+  const textClass = isDark ? 'text-white' : 'text-brand-secondary'
+  const iconClass = isDark ? 'text-brand-cream' : 'text-brand-secondary'
+  const dividerClass = isDark ? 'bg-white/30' : 'bg-brand-secondary/30'
+
   return (
     <div
-      className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden bg-brand-secondary py-3"
+      className={`relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden ${bgClass} py-3`}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -98,7 +105,7 @@ function MarqueeLinksBlock({ props }: any) {
             >
               {/* Icon */}
               {item.iconType === 'lucide' ? (
-                <div className="text-brand-cream">
+                <div className={iconClass}>
                   {React.createElement(getLucideIcon(item.lucideIconName), { size: 20 })}
                 </div>
               ) : item.mediaIcon?.url ? (
@@ -113,12 +120,12 @@ function MarqueeLinksBlock({ props }: any) {
                 </div>
               ) : null}
 
-              <span className="text-white font-medium">{item.linkText}</span>
+              <span className={`${textClass} font-medium`}>{item.linkText}</span>
             </Link>
 
             {/* Separator - stronger vertical line */}
             <div className="flex items-center">
-              <div className="w-px h-6 bg-white/30 flex-shrink-0"></div>
+              <div className={`w-px h-6 ${dividerClass} flex-shrink-0`}></div>
             </div>
           </React.Fragment>
         ))}

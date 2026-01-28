@@ -72,5 +72,18 @@ export const MarqueeLinks: Block = {
         { label: 'Fast', value: 'fast' },
       ],
     },
+    {
+      name: 'theme',
+      type: 'select',
+      label: {
+        en: 'Theme',
+        zh: '主题',
+      },
+      defaultValue: 'light',
+      options: [
+        { label: { en: 'Light', zh: '浅色' }, value: 'light' },
+        { label: { en: 'Dark', zh: '深色' }, value: 'dark' },
+      ],
+    },
   ],
 }
