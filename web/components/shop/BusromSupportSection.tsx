@@ -6,13 +6,9 @@ import { motion } from "framer-motion"
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920
-const SECTION_HEIGHT = 922
 
 // 响应式尺寸函数
 const rpx = (designValue: number) => `calc(var(--rpx-support) * ${designValue})`
-
-// 内容居中偏移量 (原始1920宽度，缩放80%后内容宽度1536，左右各留192)
-const CENTER_OFFSET = 192
 
 // 自动轮播间隔 (ms)
 const AUTO_PLAY_INTERVAL = 4000
@@ -112,8 +108,6 @@ export function BusromSupportSection({
   const cardWidth = 288   // 360 * 0.8
   const cardHeight = 519  // 649 * 0.8
   const cardGap = 12      // 15 * 0.8
-  const cardStartX = 180  // 225 * 0.8
-  const cardStartY = 199  // 249 * 0.8
 
   // 自动轮播
   useEffect(() => {
@@ -159,7 +153,7 @@ export function BusromSupportSection({
   return (
     <>
     {/* Mobile Layout */}
-    <section className="md:hidden bg-brand-main px-4 py-10">
+    <section className="md:hidden bg-brand-main px-4 py-8">
       <h2 className="font-josefin-sans font-bold text-2xl text-[#46400F] mb-6 text-center">
         {title}
       </h2>
@@ -243,45 +237,43 @@ export function BusromSupportSection({
 
     {/* Desktop Layout */}
     <section
-      className="relative w-full bg-brand-main hidden md:block"
+      className="w-full bg-brand-main hidden md:flex flex-col items-center py-20"
       style={{
-        height: rpx(SECTION_HEIGHT),
-        paddingBottom: rpx(32), // 40 * 0.8
         ["--rpx-support" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
       }}
     >
-      {/* 标题左侧装饰圆 */}
-      <div
-        className="absolute rounded-full"
-        style={{
-          left: rpx(569 + CENTER_OFFSET), // 711 * 0.8
-          top: rpx(13),                    // 16 * 0.8
-          width: rpx(130),                 // 163 * 0.8
-          height: rpx(130),
-          background: "linear-gradient(135deg, #EFE9BC 0%, #F6F4ED 100%)",
-        }}
-      />
-
-      {/* 标题 */}
-      <h2
-        className="absolute font-josefin-sans font-bold"
-        style={{
-          left: rpx(626 + CENTER_OFFSET), // 782 * 0.8
-          top: rpx(78),                    // 98 * 0.8
-          fontSize: rpx(102),              // 128 * 0.8
-          lineHeight: rpx(97),             // 121 * 0.8
-          color: "#46400F",
-        }}
-      >
-        {title}
-      </h2>
+      {/* 标题区域 */}
+      <div className="relative mb-12">
+        {/* 标题左侧装饰圆 */}
+        <div
+          className="absolute rounded-full"
+          style={{
+            left: rpx(-80),
+            top: rpx(-30),
+            width: rpx(130),
+            height: rpx(130),
+            background: "linear-gradient(135deg, #EFE9BC 0%, #F6F4ED 100%)",
+            zIndex: 0,
+          }}
+        />
+        {/* 标题 */}
+        <h2
+          className="relative font-josefin-sans font-bold"
+          style={{
+            fontSize: rpx(60),
+            lineHeight: rpx(68),
+            color: "#46400F",
+            zIndex: 1,
+          }}
+        >
+          {title}
+        </h2>
+      </div>
 
       {/* 4个卡片 */}
       <div
-        className="absolute flex"
+        className="flex justify-center"
         style={{
-          left: rpx(cardStartX + CENTER_OFFSET),
-          top: rpx(cardStartY),
           gap: rpx(cardGap),
         }}
       >
@@ -338,8 +330,8 @@ export function BusromSupportSection({
                   left: rpx(37),   // 46 * 0.8
                   top: rpx(145),   // 增加间隔
                   width: rpx(216), // 270 * 0.8
-                  fontSize: rpx(19),  // 24 * 0.8
-                  lineHeight: rpx(23), // 29 * 0.8
+                  fontSize: rpx(20),
+                  lineHeight: rpx(26),
                   color: config.descColor,
                 }}
               >

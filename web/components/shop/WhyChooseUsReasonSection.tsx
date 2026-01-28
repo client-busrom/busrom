@@ -204,10 +204,9 @@ export function WhyChooseUsReasonSection({
 
       {/* Desktop Layout */}
       <section
-        className="relative w-full bg-brand-main overflow-hidden hidden md:flex justify-center"
+        className="relative w-full bg-brand-main overflow-hidden hidden md:flex justify-center py-20"
         style={{
           ["--rpx-reason" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
-          height: rpx(922),
         }}
       >
         {/* Centered Container */}
@@ -215,7 +214,7 @@ export function WhyChooseUsReasonSection({
           className="relative flex-shrink-0"
           style={{
             width: rpx(CONTENT_WIDTH),
-            height: rpx(922),
+            minHeight: rpx(700),
           }}
         >
           {/* Left Side - Title and Description */}
@@ -231,8 +230,8 @@ export function WhyChooseUsReasonSection({
             <h2
               className="font-josefin-sans font-bold text-black animate-float-up"
               style={{
-                fontSize: rpx(72),
-                lineHeight: rpx(82),
+                fontSize: rpx(60),
+                lineHeight: rpx(56),
                 maxHeight: rpx(246),
                 overflow: "hidden",
               }}

@@ -139,10 +139,9 @@ export function ProductAttributesSection({
     <section className="relative w-full overflow-hidden bg-brand-main">
       {/* Desktop Layout */}
       <div
-        className="hidden md:block"
+        className="hidden md:flex flex-col py-20"
         style={{
           ["--rpx-attr" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
-          height: rpx(922),
         }}
       >
         <div className="flex">
@@ -255,8 +254,8 @@ export function ProductAttributesSection({
                     <h3
                       className="font-josefin-sans font-bold self-end"
                       style={{
-                        fontSize: rpx(30),
-                        lineHeight: rpx(32),
+                        fontSize: rpx(24),
+                        lineHeight: rpx(28),
                         color: "#46401F",
                         paddingBottom: rpx(15),
                       }}
@@ -268,8 +267,8 @@ export function ProductAttributesSection({
                     <p
                       className="font-josefin-sans"
                       style={{
-                        fontSize: rpx(20),
-                        lineHeight: rpx(24),
+                        fontSize: rpx(16),
+                        lineHeight: rpx(22),
                         color: "#4D4D4D",
                         minHeight: rpx(84),
                       }}
@@ -285,19 +284,19 @@ export function ProductAttributesSection({
 
         {/* Title and Navigation */}
         <div
-          className="relative"
+          className="relative flex items-center justify-between"
           style={{
             paddingLeft: rpx(145),
+            paddingRight: rpx(263),
             paddingTop: rpx(23),
-            paddingBottom: rpx(30),
           }}
         >
           {/* Title */}
           <h2
             className="font-josefin-sans font-bold"
             style={{
-              fontSize: rpx(56),
-              lineHeight: rpx(60),
+              fontSize: rpx(60),
+              lineHeight: rpx(68),
               color: "#706934",
               maxWidth: rpx(960),
             }}
@@ -305,12 +304,10 @@ export function ProductAttributesSection({
             {title}
           </h2>
 
-          {/* Navigation Arrows - Left arrow lower, Right arrow higher */}
+          {/* Navigation Arrows */}
           <div
-            className="absolute flex items-end"
+            className="flex items-end"
             style={{
-              right: rpx(263),
-              bottom: rpx(60),
               gap: rpx(107),
             }}
           >

@@ -232,8 +232,8 @@ function FeatureCard({ card, index, isActive, onHover }: FeatureCardProps) {
             top: rpx(176),  // 220 * 0.8
             transform: "translateX(-50%)",
             width: rpx(160), // 200 * 0.8
-            fontSize: rpx(29), // 36 * 0.8
-            lineHeight: rpx(35), // 44 * 0.8
+            fontSize: rpx(24),
+            lineHeight: rpx(30),
             color: "#3B360B",
           }}
         >
@@ -354,10 +354,8 @@ export function BusromMainFeaturesSection({
 
     {/* Desktop Layout */}
     <section
-      className="relative w-full flex-col items-center bg-brand-main hidden md:flex"
+      className="relative w-full flex-col items-center bg-brand-main hidden md:flex py-20"
       style={{
-        height: rpx(SECTION_HEIGHT),
-        paddingTop: rpx(150),  // 调整使内容垂直居中
         ["--rpx-features" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
       }}
     >
@@ -433,8 +431,8 @@ export function BusromMainFeaturesSection({
         <h2
           className="font-josefin-sans font-bold text-center whitespace-pre-line"
           style={{
-            fontSize: rpx(77),  // 96 * 0.8
-            lineHeight: rpx(88), // 110 * 0.8
+            fontSize: rpx(60),
+            lineHeight: rpx(56),
             color: "#464010",
           }}
         >
@@ -445,8 +443,8 @@ export function BusromMainFeaturesSection({
         <p
           className="font-josefin-sans font-semibold text-center whitespace-pre-line"
           style={{
-            fontSize: rpx(38),  // 48 * 0.8
-            lineHeight: rpx(88), // 110 * 0.8
+            fontSize: rpx(24),
+            lineHeight: rpx(32),
             color: "#464010",
           }}
         >

@@ -46,12 +46,26 @@ export function ProductHeroSection({
   heroImage,
 }: ProductHeroSectionProps) {
   const handleScrollDown = () => {
-    // Scroll to the content section below
-    const heroHeight = document.querySelector('[data-product-hero]')?.clientHeight || 0
-    window.scrollTo({
-      top: heroHeight + 46, // 46px for header offset
-      behavior: "smooth",
+    // Get the visible hero section (desktop or mobile)
+    const heroSections = document.querySelectorAll('[data-product-hero]')
+    let visibleHero: Element | null = null
+
+    heroSections.forEach(section => {
+      const rect = section.getBoundingClientRect()
+      if (rect.height > 0 && rect.width > 0) {
+        visibleHero = section
+      }
     })
+
+    if (visibleHero) {
+      // Scroll by the height of the hero section
+      const heroRect = visibleHero.getBoundingClientRect()
+      const scrollTarget = window.scrollY + heroRect.bottom
+      window.scrollTo({
+        top: scrollTarget,
+        behavior: 'smooth'
+      })
+    }
   }
 
   // Calculate object position from focal point
@@ -100,8 +114,8 @@ export function ProductHeroSection({
             left: rpx(389),
             top: rpx(295),
             width: rpx(1203),
-            fontSize: rpx(100),
-            lineHeight: "1.08",
+            fontSize: rpx(60),
+            lineHeight: rpx(68),
           }}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -117,8 +131,8 @@ export function ProductHeroSection({
             left: rpx(389),
             top: rpx(461),
             width: rpx(1203),
-            fontSize: rpx(48),
-            lineHeight: "1.08",
+            fontSize: rpx(24),
+            lineHeight: rpx(32),
             background: "linear-gradient(180deg, #FFFFFF 0%, #999999 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",

@@ -170,17 +170,14 @@ export function WhyChooseUsSection({
 
     {/* Desktop Layout - 固定尺寸，居中显示 */}
     <section
-      className="relative w-full bg-brand-main overflow-hidden hidden md:flex justify-center"
-      style={{
-        height: px(900),
-      }}
+      className="relative w-full bg-brand-main overflow-hidden hidden md:flex justify-center py-20"
     >
       {/* 固定宽度的内容容器，水平居中 */}
       <div
         className="relative flex-shrink-0"
         style={{
           width: px(1920),
-          height: px(900),
+          minHeight: px(900),
         }}
       >
         {/* Title */}
@@ -190,8 +187,8 @@ export function WhyChooseUsSection({
             left: px(533),
             top: px(30),
             width: px(854),
-            fontSize: px(54),
-            lineHeight: px(62),
+            fontSize: px(60),
+            lineHeight: px(56),
             color: "#464010",
           }}
         >

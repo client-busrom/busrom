@@ -127,8 +127,8 @@ const FeatureItem = ({
         left: rpx(x - Math.min(x, dotX) + 10),
         top: rpx(y - Math.min(y, dotY) + 10),
         width: rpx(width),
-        fontSize: rpx(28),
-        lineHeight: rpx(30),
+        fontSize: rpx(20),
+        lineHeight: rpx(26),
         color: "#46401F",
       }}
       variants={{
@@ -277,10 +277,10 @@ export function ProductFeaturesSection({
       className="relative w-full overflow-hidden bg-brand-main hidden md:block"
       style={{
         ["--rpx-features" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
-        height: rpx(922),
+        minHeight: rpx(922),
       }}
     >
-      <div className="h-full">
+      <div className="relative" style={{ minHeight: rpx(922) }}>
         {/* Title */}
         <h2
           className="absolute font-josefin-sans font-bold text-center"
@@ -288,8 +288,8 @@ export function ProductFeaturesSection({
             left: rpx(288),
             top: rpx(51),
             width: rpx(1344),
-            fontSize: rpx(96),
-            lineHeight: rpx(124),
+            fontSize: rpx(60),
+            lineHeight: rpx(56),
             color: "#46401F",
           }}
         >

@@ -109,10 +109,9 @@ export function ProductDetailFeaturesSection({
 
     {/* Desktop Layout */}
     <section
-      className="relative w-full bg-brand-main overflow-hidden hidden md:block"
+      className="relative w-full bg-brand-main overflow-hidden hidden md:block py-20"
       style={{
         ["--rpx-detail-features" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
-        height: rpx(922),
       }}
     >
       {/* Desktop Content */}
@@ -241,8 +240,8 @@ export function ProductDetailFeaturesSection({
             <h2
               className="font-josefin-sans font-bold whitespace-pre-line text-transparent"
               style={{
-                fontSize: rpx(72),
-                lineHeight: rpx(82),
+                fontSize: rpx(60),
+                lineHeight: rpx(56),
                 WebkitTextStroke: `2px #464010`,
                 writingMode: "vertical-rl",
                 textOrientation: "mixed",
@@ -254,8 +253,8 @@ export function ProductDetailFeaturesSection({
             <h2
               className="absolute font-josefin-sans font-bold whitespace-pre-line text-[#46401F]"
               style={{
-                fontSize: rpx(72),
-                lineHeight: rpx(82),
+                fontSize: rpx(60),
+                lineHeight: rpx(56),
                 writingMode: "vertical-rl",
                 textOrientation: "mixed",
                 bottom: 3,
