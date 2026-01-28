@@ -459,6 +459,24 @@ export const MarqueeLinksComponent: React.FC<MarqueeLinksComponentProps> = ({ no
         </div>
 
         <div style={{ marginBottom: '12px' }}>
+          <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', fontWeight: 500 }}>{i18n?.language === 'zh' ? '主题' : 'Theme'}</label>
+          <select
+            value={localData.theme || 'light'}
+            onChange={(e) => setLocalData({ ...localData, theme: e.target.value as 'light' | 'dark' })}
+            style={{
+              width: '100%',
+              padding: '6px',
+              border: '1px solid #d1d5db',
+              borderRadius: '4px',
+              fontSize: '12px',
+            }}
+          >
+            <option value="light">{i18n?.language === 'zh' ? '浅色' : 'Light'}</option>
+            <option value="dark">{i18n?.language === 'zh' ? '深色' : 'Dark'}</option>
+          </select>
+        </div>
+
+        <div style={{ marginBottom: '12px' }}>
           <label style={{ display: 'block', marginBottom: '8px', fontSize: '12px', fontWeight: 500 }}>{i18n?.language === 'zh' ? '链接列表' : 'Links'}</label>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
             {localData.links.map((link, index) => {
@@ -706,7 +724,7 @@ export const MarqueeLinksComponent: React.FC<MarqueeLinksComponentProps> = ({ no
       }}
     >
       <div style={{ marginBottom: '8px', fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>
-        {i18n?.language === 'zh' ? '滚动链接' : 'Marquee Links'} ({localData.links.length} {i18n?.language === 'zh' ? '个链接' : 'links'}, {i18n?.language === 'zh' ? '速度' : 'speed'}: {localData.speed === 'slow' ? (i18n?.language === 'zh' ? '慢速' : 'Slow') : localData.speed === 'medium' ? (i18n?.language === 'zh' ? '中速' : 'Medium') : (i18n?.language === 'zh' ? '快速' : 'Fast')})
+        {i18n?.language === 'zh' ? '滚动链接' : 'Marquee Links'} ({localData.links.length} {i18n?.language === 'zh' ? '个链接' : 'links'}, {i18n?.language === 'zh' ? '速度' : 'speed'}: {localData.speed === 'slow' ? (i18n?.language === 'zh' ? '慢速' : 'Slow') : localData.speed === 'medium' ? (i18n?.language === 'zh' ? '中速' : 'Medium') : (i18n?.language === 'zh' ? '快速' : 'Fast')}, {i18n?.language === 'zh' ? '主题' : 'theme'}: {localData.theme === 'dark' ? (i18n?.language === 'zh' ? '深色' : 'Dark') : (i18n?.language === 'zh' ? '浅色' : 'Light')})
       </div>
       <div
         style={{

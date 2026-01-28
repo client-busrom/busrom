@@ -600,67 +600,142 @@ const HeroBlock = ({ node }: any) => {
 }
 
 const MarqueeLinksBlock = ({ node }: any) => {
-  const { speed, items, theme } = node.data || node.fields || {}
+  const { speed, links, theme } = node.data || node.fields || {}
   const [isPaused, setIsPaused] = React.useState(false)
+  const [mediaCache, setMediaCache] = React.useState<Record<string, any>>({})
+  const containerRef = React.useRef<HTMLDivElement>(null)
+  const [repeatCount, setRepeatCount] = React.useState(10) // Default repeat count
+
+  // Calculate how many times to repeat items to fill the screen
+  React.useEffect(() => {
+    if (!containerRef.current || !links || links.length === 0) return
+
+    // Estimate: each item is roughly 200px wide, we need at least 2x screen width
+    const screenWidth = window.innerWidth
+    const estimatedItemWidth = 200
+    const totalItemsWidth = links.length * estimatedItemWidth
+    const neededRepeats = Math.ceil((screenWidth * 2.5) / totalItemsWidth)
+    setRepeatCount(Math.max(neededRepeats, 5)) // At least 5 repeats
+  }, [links])
+
+  // Fetch media data for icons that are media IDs
+  React.useEffect(() => {
+    if (!links || links.length === 0) return
+
+    const fetchMedia = async () => {
+      const cmsUrl = getCmsUrl()
+      const newCache: Record<string, any> = {}
+
+      await Promise.all(
+        links.map(async (link: any) => {
+          const iconId = typeof link.icon === 'object' ? link.icon?.id : link.icon
+          if (!iconId || mediaCache[iconId]) return
+
+          try {
+            const res = await fetch(`${cmsUrl}/api/media/${iconId}?depth=0`)
+            if (res.ok) {
+              const data = await res.json()
+              newCache[iconId] = data
+            }
+          } catch (err) {
+            console.error(`Failed to fetch media ${iconId}:`, err)
+          }
+        })
+      )
+
+      if (Object.keys(newCache).length > 0) {
+        setMediaCache(prev => ({ ...prev, ...newCache }))
+      }
+    }
+
+    fetchMedia()
+  }, [links])
 
   const speedDuration = {
-    slow: '30s',
-    medium: '20s',
-    fast: '10s',
-  }[speed as 'slow' | 'medium' | 'fast'] || '20s'
+    slow: '60s',
+    medium: '40s',
+    fast: '20s',
+  }[speed as 'slow' | 'medium' | 'fast'] || '40s'
 
   const isDark = theme === 'dark'
-  const bgClass = isDark ? 'bg-brand-secondary' : 'bg-brand-main'
-  const textClass = isDark ? 'text-white' : 'text-brand-secondary'
-  const iconClass = isDark ? 'text-brand-cream' : 'text-brand-secondary'
-  const dividerClass = isDark ? 'bg-white/30' : 'bg-brand-secondary/30'
+  // Dark theme: dark background, white text, gold icons
+  // Light theme: cream/beige background with slight contrast, dark text, gold icons
+  const bgClass = isDark ? 'bg-[#bfb672]' : 'bg-[#ebe6d7]'
+  const textClass = isDark ? 'text-white' : 'text-black'
+  const iconClass = isDark ? 'text-brand-accent-gold' : 'text-brand-accent-gold'
+  const dividerClass = isDark ? 'bg-white/30' : 'bg-brand-secondary/25'
 
-  if (!items || items.length === 0) return null
+  if (!links || links.length === 0) return null
+
+  // Render a single link item
+  const renderLinkItem = (link: any, keyPrefix: string, idx: number) => {
+    const iconId = typeof link.icon === 'object' ? link.icon?.id : link.icon
+    const mediaData = iconId ? mediaCache[iconId] : null
+    const iconUrl = mediaData?.variants?.thumbnail?.url || mediaData?.url
+
+    return (
+      <div key={`${keyPrefix}-${idx}`} className="flex items-center shrink-0">
+        <Link
+          href={link.url || '#'}
+          className="flex items-center gap-3 px-6 hover:opacity-70 transition-opacity whitespace-nowrap"
+        >
+          {link.iconName ? (
+            <div className={`${iconClass} flex-shrink-0`}>
+              {React.createElement(getLucideIcon(link.iconName), { size: 20, fill: 'currentColor', strokeWidth: 0 })}
+            </div>
+          ) : iconUrl ? (
+            <div className="w-5 h-5 rounded overflow-hidden flex-shrink-0">
+              <Image src={iconUrl} alt={link.title} width={20} height={20} className="w-full h-full object-cover" unoptimized />
+            </div>
+          ) : null}
+          <span className={`${textClass} text-[16px] font-montserrat font-medium`}>{link.title}</span>
+        </Link>
+        <div className={`w-px h-5 ${dividerClass}`}></div>
+      </div>
+    )
+  }
+
+  // Create repeated items array
+  const repeatedItems = React.useMemo(() => {
+    const items: React.ReactNode[] = []
+    for (let r = 0; r < repeatCount; r++) {
+      links.forEach((link: any, idx: number) => {
+        items.push(renderLinkItem(link, `r${r}`, idx))
+      })
+    }
+    return items
+  }, [links, repeatCount, mediaCache, iconClass, textClass, dividerClass])
 
   return (
     <div
-      className={`relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden ${bgClass} py-3 my-8`}
+      ref={containerRef}
+      className={`relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden ${bgClass} py-3`}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div
-        className="flex gap-8"
-        style={{
-          animation: `marquee ${speedDuration} linear infinite`,
-          animationPlayState: isPaused ? 'paused' : 'running',
-        }}
-      >
-        {[...items, ...items].map((item: any, idx: number) => (
-          <React.Fragment key={idx}>
-            <Link
-              href={item.linkUrl || '#'}
-              target={item.openInNewTab ? '_blank' : undefined}
-              className="flex items-center gap-3 px-4 py-2 hover:opacity-80 transition-opacity whitespace-nowrap flex-shrink-0"
-            >
-              {item.iconType === 'lucide' ? (
-                <div className={iconClass}>
-                  {React.createElement(getLucideIcon(item.lucideIconName), { size: 20 })}
-                </div>
-              ) : item.mediaIcon?.url ? (
-                <div className="w-5 h-5 rounded overflow-hidden">
-                  <Image src={item.mediaIcon.url} alt={item.linkText} width={20} height={20} className="w-full h-full object-cover" />
-                </div>
-              ) : null}
-              <span className={`${textClass} font-medium`}>{item.linkText}</span>
-            </Link>
-            <div className="flex items-center">
-              <div className={`w-px h-6 ${dividerClass} flex-shrink-0`}></div>
-            </div>
-          </React.Fragment>
-        ))}
+      {/* Infinite scroll container */}
+      <div className="flex">
+        {/* First track */}
+        <div
+          className="flex shrink-0 items-center animate-marquee"
+          style={{
+            animationDuration: speedDuration,
+            animationPlayState: isPaused ? 'paused' : 'running',
+          }}
+        >
+          {repeatedItems}
+        </div>
+        {/* Second track - identical copy for seamless loop */}
+        <div
+          className="flex shrink-0 items-center animate-marquee"
+          style={{
+            animationDuration: speedDuration,
+            animationPlayState: isPaused ? 'paused' : 'running',
+          }}
+        >
+          {repeatedItems}
+        </div>
       </div>
-
-      <style jsx>{`
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-      `}</style>
     </div>
   )
 }
