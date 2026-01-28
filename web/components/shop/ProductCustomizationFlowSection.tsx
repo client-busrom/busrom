@@ -175,7 +175,7 @@ export function ProductCustomizationFlowSection({
       className="relative w-full bg-brand-main overflow-hidden hidden md:block"
       style={{
         ["--rpx-flow" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
-        height: rpx(SECTION_HEIGHT),
+        minHeight: rpx(738),
       }}
     >
       {/* 左侧标题 */}
@@ -185,8 +185,8 @@ export function ProductCustomizationFlowSection({
           left: rpx(124 + CENTER_OFFSET),
           top: rpx(130),
           width: rpx(752),
-          fontSize: rpx(72),
-          lineHeight: rpx(80),
+          fontSize: rpx(60),
+          lineHeight: rpx(56),
           color: "#000000",
         }}
       >

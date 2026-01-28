@@ -298,7 +298,7 @@ export function ProductApplicationsSection({
           left: rpx(623),
           top: rpx(148),
           right: 0,
-          height: rpx(560),
+          height: rpx(620),
         }}
       >
         <div
@@ -313,8 +313,8 @@ export function ProductApplicationsSection({
                 key={`${app.id}-${index}`}
                 className="relative flex-shrink-0 overflow-hidden group"
                 style={{
-                  width: rpx(271),
-                  height: rpx(534),
+                  width: rpx(350),
+                  height: rpx(600),
                   borderRadius: rpx(24),
                   marginRight: isLast ? rpx(30) : undefined,
                 }}

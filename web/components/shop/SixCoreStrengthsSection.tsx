@@ -133,8 +133,8 @@ export function SixCoreStrengthsSection({
           <span
             className="font-inter font-semibold text-white whitespace-pre-line text-left"
             style={{
-              fontSize: rpx(28),
-              lineHeight: rpx(30),
+              fontSize: rpx(20),
+              lineHeight: rpx(26),
             }}
           >
             {item.title}
@@ -198,10 +198,10 @@ export function SixCoreStrengthsSection({
       className="relative w-full bg-brand-main overflow-hidden hidden md:block"
       style={{
         ["--rpx-strengths" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
-        height: rpx(922),
+        minHeight: rpx(922),
       }}
     >
-      <div className="h-full">
+      <div className="relative" style={{ minHeight: rpx(922) }}>
         {/* Header */}
         <div
           className="absolute"
@@ -216,8 +216,8 @@ export function SixCoreStrengthsSection({
             <p
               className="font-josefin-sans text-right"
               style={{
-                fontSize: rpx(64),
-                lineHeight: rpx(124),
+                fontSize: rpx(24),
+                lineHeight: rpx(32),
                 color: "#AB9F63",
                 paddingRight: rpx(100),
               }}
@@ -230,10 +230,10 @@ export function SixCoreStrengthsSection({
           <h2
             className="font-josefin-sans font-bold text-center"
             style={{
-              fontSize: rpx(96),
-              lineHeight: rpx(124),
+              fontSize: rpx(60),
+              lineHeight: rpx(56),
               color: "#46401F",
-              marginTop: rpx(-30),
+              marginTop: rpx(10),
             }}
           >
             {title}
@@ -245,7 +245,7 @@ export function SixCoreStrengthsSection({
           className="absolute"
           style={{
             left: rpx(150),
-            top: rpx(379),
+            top: rpx(316),
             width: rpx(CARD_WIDTH),
             height: rpx(stackedHeight),
           }}
@@ -258,7 +258,7 @@ export function SixCoreStrengthsSection({
           className="absolute"
           style={{
             left: rpx(643),
-            top: rpx(316),
+            top: rpx(250),
             width: rpx(624),
             height: rpx(524),
           }}
@@ -297,7 +297,7 @@ export function SixCoreStrengthsSection({
           className="absolute"
           style={{
             left: rpx(1317),
-            top: rpx(379),
+            top: rpx(316),
             width: rpx(CARD_WIDTH),
             height: rpx(stackedHeight),
           }}

@@ -143,10 +143,9 @@ export function ProductCoreAdvantagesSection({
 
     {/* Desktop Layout */}
     <section
-      className="relative w-full bg-brand-main overflow-hidden hidden md:block"
+      className="relative w-full bg-brand-main overflow-hidden hidden md:block py-20"
       style={{
         ["--rpx-core-advantages" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
-        paddingBottom: rpx(80),
       }}
     >
       {/* Main Container - 缩小宽度 (0.755倍) */}
@@ -327,8 +326,8 @@ export function ProductCoreAdvantagesSection({
                     <h2
                       className="font-josefin-sans font-bold text-white whitespace-pre-line"
                       style={{
-                        fontSize: rpx(72),
-                        lineHeight: rpx(83),
+                        fontSize: rpx(60),
+                        lineHeight: rpx(68),
                         width: rpx(600),
                       }}
                     >
@@ -446,8 +445,8 @@ export function ProductCoreAdvantagesSection({
                             <h3
                               className="font-inter font-bold whitespace-pre-line"
                               style={{
-                                fontSize: rpx(28),
-                                lineHeight: rpx(34),
+                                fontSize: rpx(24),
+                                lineHeight: rpx(30),
                                 color: style.titleColor,
                               }}
                             >
@@ -472,7 +471,7 @@ export function ProductCoreAdvantagesSection({
                               <p
                                 className="font-inter whitespace-pre-line"
                                 style={{
-                                  fontSize: rpx(18),
+                                  fontSize: rpx(16),
                                   lineHeight: rpx(23),
                                   color: style.descColor,
                                 }}
@@ -516,8 +515,8 @@ export function ProductCoreAdvantagesSection({
                             <h3
                               className="font-inter font-bold whitespace-pre-line"
                               style={{
-                                fontSize: rpx(28),
-                                lineHeight: rpx(34),
+                                fontSize: rpx(24),
+                                lineHeight: rpx(30),
                                 color: style.titleColor,
                               }}
                             >
@@ -542,7 +541,7 @@ export function ProductCoreAdvantagesSection({
                               <p
                                 className="font-inter whitespace-pre-line"
                                 style={{
-                                  fontSize: rpx(18),
+                                  fontSize: rpx(16),
                                   lineHeight: rpx(23),
                                   color: style.descColor,
                                 }}
