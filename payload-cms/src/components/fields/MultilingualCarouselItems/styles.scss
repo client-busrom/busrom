@@ -34,8 +34,15 @@
         transition: all 0.2s;
 
         .locale-flag {
-          font-size: 14px;
-          line-height: 1;
+          width: 18px;
+          height: 12px;
+          flex-shrink: 0;
+
+          svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+          }
         }
 
         .locale-code {

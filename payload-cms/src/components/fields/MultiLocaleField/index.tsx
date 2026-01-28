@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useField, useDocumentInfo, useLocale, useTranslation } from '@payloadcms/ui'
 import { SUPPORTED_LOCALES, getLocaleLabel, type LocaleCode } from '../../../lib/locales'
+import { LocaleFlag } from '../../ui/LocaleFlag'
 import './styles.scss'
 
 type FieldType = 'text' | 'textarea'
@@ -405,7 +406,7 @@ export const MultiLocaleField: React.FC<MultiLocaleFieldProps> = ({
               onClick={() => setActiveLocale(locale.code as LocaleCode)}
               title={`${locale.label}${hasContent ? ' (has content)' : ' (empty)'}${isPayloadCurrent ? ' - Current locale' : ''}`}
             >
-              <span className="locale-tab__flag">{locale.flag}</span>
+              <LocaleFlag localeCode={locale.code} className="locale-tab__flag" />
               <span className="locale-tab__code">{locale.code.toUpperCase()}</span>
               {hasContent && <span className="locale-tab__indicator">●</span>}
             </button>
@@ -455,7 +456,7 @@ export const MultiLocaleField: React.FC<MultiLocaleFieldProps> = ({
                         }
                       }}
                     />
-                    {locale.flag} {locale.code.toUpperCase()}
+                    <LocaleFlag localeCode={locale.code} className="target-locale-flag" /> {locale.code.toUpperCase()}
                   </label>
                 ))}
               </div>
@@ -498,7 +499,7 @@ export const MultiLocaleField: React.FC<MultiLocaleFieldProps> = ({
       <div className="multi-locale-field__input-wrapper">
         <div className="input-header">
           <span className="input-header__locale">
-            {activeLocaleInfo?.flag} {activeLocaleInfo?.label} ({activeLocale.toUpperCase()})
+            <LocaleFlag localeCode={activeLocale} className="input-header__flag" /> {activeLocaleInfo?.label} ({activeLocale.toUpperCase()})
           </span>
           {activeLocale === currentLocale.code && (
             <span className="input-header__badge">Current Locale</span>

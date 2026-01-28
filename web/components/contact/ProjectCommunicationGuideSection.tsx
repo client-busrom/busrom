@@ -41,8 +41,22 @@ interface TextPart {
 function parseTextWithBold(text: string): TextPart[] {
   const parts: TextPart[] = []
 
-  // 匹配 **text** 或 <strong>text</strong> 格式
-  const regex = /\*\*(.+?)\*\*|<strong>(.+?)<\/strong>/g
+  // 辅助函数：处理文本段落（可能包含换行符）
+  const addTextSegments = (content: string, isBold: boolean) => {
+    const segments = content.split('\n')
+    segments.forEach((seg, i) => {
+      if (seg) {
+        parts.push({ text: seg, isBold })
+      }
+      // 在非最后一个段落后添加换行标记
+      if (i < segments.length - 1) {
+        parts.push({ text: '', isBold: false, isLineBreak: true })
+      }
+    })
+  }
+
+  // 匹配 **text** 或 <strong>text</strong> 格式（支持换行符）
+  const regex = /\*\*([\s\S]+?)\*\*|<strong>([\s\S]+?)<\/strong>/g
   let lastIndex = 0
   let match
 
@@ -50,36 +64,18 @@ function parseTextWithBold(text: string): TextPart[] {
     // 添加匹配前的普通文本（可能包含换行）
     if (match.index > lastIndex) {
       const beforeText = text.slice(lastIndex, match.index)
-      // 按换行符分割
-      const segments = beforeText.split('\n')
-      segments.forEach((seg, i) => {
-        if (seg) {
-          parts.push({ text: seg, isBold: false })
-        }
-        // 在非最后一个段落后添加换行标记
-        if (i < segments.length - 1) {
-          parts.push({ text: '', isBold: false, isLineBreak: true })
-        }
-      })
+      addTextSegments(beforeText, false)
     }
-    // 添加加粗文本
-    parts.push({ text: match[1] || match[2], isBold: true })
+    // 添加加粗文本（也可能包含换行）
+    const boldContent = match[1] || match[2]
+    addTextSegments(boldContent, true)
     lastIndex = regex.lastIndex
   }
 
   // 添加剩余的普通文本（可能包含换行）
   if (lastIndex < text.length) {
     const remainingText = text.slice(lastIndex)
-    const segments = remainingText.split('\n')
-    segments.forEach((seg, i) => {
-      if (seg) {
-        parts.push({ text: seg, isBold: false })
-      }
-      // 在非最后一个段落后添加换行标记
-      if (i < segments.length - 1) {
-        parts.push({ text: '', isBold: false, isLineBreak: true })
-      }
-    })
+    addTextSegments(remainingText, false)
   }
 
   return parts.length > 0 ? parts : [{ text, isBold: false }]
@@ -167,7 +163,7 @@ export function ProjectCommunicationGuideSection({
         style={{
           left: vw(171),
           top: vw(585),
-          width: vw(400),
+          width: vw(550),
           fontSize: vw(32),
           lineHeight: vw(42),
         }}

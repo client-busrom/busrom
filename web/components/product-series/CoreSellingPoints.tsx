@@ -75,39 +75,140 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
   const [dragOffset, setDragOffset] = React.useState(0)
   const [currentTranslate, setCurrentTranslate] = React.useState(0)
 
+  // For inertia/momentum scrolling
+  const velocityRef = React.useRef(0)
+  const lastXRef = React.useRef(0)
+  const lastTimeRef = React.useRef(0)
+  const animationFrameRef = React.useRef<number | null>(null)
+
+  // Calculate drag boundaries based on number of images
+  // Each image is 440px wide with 16px gap (gap-4)
+  const imageWidth = 440
+  const imageGap = 16
+  const totalImagesWidth = titleImages.length * imageWidth + (titleImages.length - 1) * imageGap
+  // Right boundary: allow dragging left until last image is visible (with some margin)
+  // Left boundary: don't allow dragging right past initial position (with some margin)
+  const maxTranslate = 100 // allow slight overscroll to the right
+  const minTranslate = -(totalImagesWidth - imageWidth - 200) // show at least one image + margin
+
+  // Clamp translate value within boundaries
+  const clampTranslate = React.useCallback((value: number) => {
+    return Math.max(minTranslate, Math.min(maxTranslate, value))
+  }, [minTranslate, maxTranslate])
+
+  // Apply inertia after drag ends
+  const applyInertia = React.useCallback(() => {
+    const friction = 0.95
+    const minVelocity = 0.5
+
+    const animate = () => {
+      if (Math.abs(velocityRef.current) < minVelocity) {
+        animationFrameRef.current = null
+        return
+      }
+
+      setCurrentTranslate(prev => {
+        const next = prev + velocityRef.current
+        const clamped = clampTranslate(next)
+        // Stop animation if we hit the boundary
+        if (clamped !== next) {
+          velocityRef.current = 0
+          return clamped
+        }
+        return next
+      })
+      velocityRef.current *= friction
+
+      animationFrameRef.current = requestAnimationFrame(animate)
+    }
+
+    animate()
+  }, [clampTranslate])
+
+  // Cleanup animation on unmount
+  React.useEffect(() => {
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+    }
+  }, [])
+
   // Handle mouse drag for image list
   const handleMouseDown = (e: React.MouseEvent) => {
+    // Stop any ongoing inertia animation
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current)
+      animationFrameRef.current = null
+    }
+
     setIsDragging(true)
     setDragStartX(e.clientX)
     setDragOffset(currentTranslate)
+    lastXRef.current = e.clientX
+    lastTimeRef.current = Date.now()
+    velocityRef.current = 0
   }
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return
     e.preventDefault()
+
+    const now = Date.now()
+    const dt = now - lastTimeRef.current
+
+    if (dt > 0) {
+      velocityRef.current = (e.clientX - lastXRef.current) / dt * 16 // normalize to ~60fps
+    }
+
+    lastXRef.current = e.clientX
+    lastTimeRef.current = now
+
     const delta = e.clientX - dragStartX
-    setCurrentTranslate(dragOffset + delta)
+    setCurrentTranslate(clampTranslate(dragOffset + delta))
   }
 
   const handleMouseUp = () => {
     setIsDragging(false)
+    applyInertia()
   }
 
   // Touch events for mobile
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Stop any ongoing inertia animation
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current)
+      animationFrameRef.current = null
+    }
+
     setIsDragging(true)
     setDragStartX(e.touches[0].clientX)
     setDragOffset(currentTranslate)
+    lastXRef.current = e.touches[0].clientX
+    lastTimeRef.current = Date.now()
+    velocityRef.current = 0
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging) return
+
+    const now = Date.now()
+    const dt = now - lastTimeRef.current
+
+    if (dt > 0) {
+      velocityRef.current = (e.touches[0].clientX - lastXRef.current) / dt * 16
+    }
+
+    lastXRef.current = e.touches[0].clientX
+    lastTimeRef.current = now
+
     const delta = e.touches[0].clientX - dragStartX
-    setCurrentTranslate(dragOffset + delta)
+    setCurrentTranslate(clampTranslate(dragOffset + delta))
   }
 
   const handleTouchEnd = () => {
     setIsDragging(false)
+    applyInertia()
   }
 
   // Get current category data
@@ -185,7 +286,7 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
 
       {/* Main Title (above images) */}
       <h2
-        className="absolute font-anaheim font-extrabold gradient-text-shine-white"
+        className="absolute font-anaheim font-extrabold gradient-text-shine-white select-none"
         style={{
           left: `${(153 / DESIGN_WIDTH) * 100}%`,
           top: `${(100 / DESIGN_HEIGHT) * 100}%`,
@@ -204,25 +305,91 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
       </h2>
 
       {/* ===== TECH SPEC AREA ===== */}
-      {/* Tech Spec Background (left-side rounded corners) */}
+      {/* Tech Spec Background with flex layout */}
       <div
-        className="absolute"
+        className="absolute flex justify-start"
         style={{
-          left: `${(550 / DESIGN_WIDTH) * 100}%`,
+          right: 0,
           top: `${(400 / DESIGN_HEIGHT) * 100}%`,
-          width: `${(1370 / DESIGN_WIDTH) * 100}vw`,
-          height: `${(480 / DESIGN_WIDTH) * 100}vw`,
+          width: `${(1100 / DESIGN_WIDTH) * 100}vw`,
+          minHeight: `${(480 / DESIGN_WIDTH) * 100}vw`,
           backgroundColor: '#FFFDE9',
           borderTopLeftRadius: `${(20 / DESIGN_WIDTH) * 100}vw`,
           borderBottomLeftRadius: `${(20 / DESIGN_WIDTH) * 100}vw`,
         }}
-      />
+      >
+        {/* Inner content container - fixed width, aligned right */}
+        <div
+          className="flex flex-col"
+          style={{
+            width: `${(1000 / DESIGN_WIDTH) * 100}vw`,
+            padding: `${(30 / DESIGN_WIDTH) * 100}vw ${(50 / DESIGN_WIDTH) * 100}vw`,
+          }}
+        >
+          {/* Tech Spec Title */}
+          <h3
+            className="font-lilita-one gradient-text-shine-olive"
+            style={{
+              fontSize: `${(48 / DESIGN_WIDTH) * 100}vw`,
+              lineHeight: 1,
+              marginBottom: `${(30 / DESIGN_WIDTH) * 100}vw`,
+            }}
+          >
+            {techSpecTitle}
+          </h3>
+
+          {/* Tech Spec Items */}
+          <div className="flex flex-col">
+            {techSpecItems.map((item, index) => (
+              <div key={`spec-${index}`}>
+                {/* Row with Label and Value */}
+                <div
+                  className="flex"
+                  style={{
+                    gap: `${(20 / DESIGN_WIDTH) * 100}vw`,
+                    paddingTop: `${(8 / DESIGN_WIDTH) * 100}vw`,
+                    paddingBottom: `${(8 / DESIGN_WIDTH) * 100}vw`,
+                  }}
+                >
+                  {/* Label */}
+                  <span
+                    className="font-inter font-semibold text-[#464010] flex-shrink-0"
+                    style={{
+                      width: `${(280 / DESIGN_WIDTH) * 100}vw`,
+                      fontSize: `${(20 / DESIGN_WIDTH) * 100}vw`,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {item.key}
+                  </span>
+
+                  {/* Value */}
+                  <span
+                    className="font-inter text-black text-left flex-1"
+                    style={{
+                      fontSize: `${(18 / DESIGN_WIDTH) * 100}vw`,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {item.value}
+                  </span>
+                </div>
+
+                {/* Separator line */}
+                {index < techSpecItems.length - 1 && (
+                  <div className="w-full h-px bg-[#DFD8B8]" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Tech Spec Left Images with Swap */}
       {techSpecImages.slice(0, 2).map((img, index) => {
         const isMain = index === techSpecMainIndex
-        const mainPos = { x: 200, y: 480, w: 260, h: 350, radius: 20 }
-        const smallPos = { x: 120, y: 620, w: 160, h: 180, radius: 12 }
+        const mainPos = { x: 280, y: 440, w: 340, h: 420, radius: 24 }
+        const smallPos = { x: 180, y: 620, w: 200, h: 220, radius: 16 }
         const pos = isMain ? mainPos : smallPos
 
         if (!img) return null
@@ -263,70 +430,6 @@ export function CoreSellingPoints({ data, className }: CoreSellingPointsProps) {
           </svg>
         </button>
       )}
-
-      {/* Tech Spec Title */}
-      <h3
-        className="absolute font-lilita-one gradient-text-shine-olive"
-        style={{
-          left: `${(610 / DESIGN_WIDTH) * 100}%`,
-          top: `${(420 / DESIGN_HEIGHT) * 100}%`,
-          fontSize: `${(48 / DESIGN_WIDTH) * 100}vw`,
-          lineHeight: 1,
-        }}
-      >
-        {techSpecTitle}
-      </h3>
-
-      {/* Tech Spec Items */}
-      {techSpecItems.map((item, index) => {
-        const startY = 500
-        const itemHeight = 60
-        const yPos = startY + index * itemHeight
-
-        return (
-          <React.Fragment key={`spec-${index}`}>
-            {/* Label */}
-            <span
-              className="absolute font-inter font-semibold text-[#464010]"
-              style={{
-                left: `${(610 / DESIGN_WIDTH) * 100}%`,
-                top: `${(yPos / DESIGN_HEIGHT) * 100}%`,
-                fontSize: `${(20 / DESIGN_WIDTH) * 100}vw`,
-                lineHeight: 1.5,
-              }}
-            >
-              {item.key}
-            </span>
-
-            {/* Value */}
-            <span
-              className="absolute font-inter text-black"
-              style={{
-                left: `${(920 / DESIGN_WIDTH) * 100}%`,
-                top: `${(yPos / DESIGN_HEIGHT) * 100}%`,
-                width: `${(850 / DESIGN_WIDTH) * 100}vw`,
-                fontSize: `${(18 / DESIGN_WIDTH) * 100}vw`,
-                lineHeight: 1.5,
-              }}
-            >
-              {item.value}
-            </span>
-
-            {/* Separator line */}
-            {index < techSpecItems.length - 1 && (
-              <div
-                className="absolute bg-[#DFD8B8]"
-                style={{
-                  left: `${(610 / DESIGN_WIDTH) * 100}%`,
-                  top: `${((yPos + 45) / DESIGN_HEIGHT) * 100}%`,
-                  width: `${(1160 / DESIGN_WIDTH) * 100}vw`,
-                  height: '1px',
-                }}
-              />
-            )}
-          </React.Fragment>
-        )
-      })}
 
       {/* ===== SECOND SCREEN: PRODUCT ADVANTAGES AREA (starts at y:922) ===== */}
       {/* Advantages Title (behind image) */}

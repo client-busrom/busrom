@@ -124,7 +124,10 @@
       "Bash(DATABASE_URI=\"postgresql://busrom_admin:ADijIRcAHMHLHaZvH0eg@busrom-db-production.cqhcko4ysea2.us-east-1.rds.amazonaws.com:5432/busrom_payload\" npx tsx -e:*)",
       "mcp__figma__get_figma_data",
       "WebFetch(domain:fonts.googleapis.com)",
-      "Bash(woff2_compress:*)"
+      "Bash(woff2_compress:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(NODE_OPTIONS=\"--no-deprecation --loader tsx\" node:*)",
+      "Bash(NODE_OPTIONS=\"--no-deprecation --import tsx\" node:*)"
     ],
     "deny": [],
     "ask": []

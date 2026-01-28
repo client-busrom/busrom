@@ -154,7 +154,6 @@ export function ContactForm({ data, className }: ContactFormProps) {
     setIsSubmitting(true)
 
     // TODO: Implement form submission
-    console.log("Form submitted:", formData, file)
 
     setTimeout(() => {
       setIsSubmitting(false)

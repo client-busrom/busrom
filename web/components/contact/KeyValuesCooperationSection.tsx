@@ -140,7 +140,7 @@ export function KeyValuesCooperationSection({
         <div
           className="absolute overflow-hidden"
           style={{
-            left: vw(309),
+            left: vw(312),
             top: 0,
             width: vw(416),
             height: vw(552),

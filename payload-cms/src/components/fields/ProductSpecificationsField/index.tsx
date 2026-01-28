@@ -5,6 +5,7 @@ import { useField, useDocumentInfo, useLocale, useTranslation } from '@payloadcm
 import { SUPPORTED_LOCALES, type LocaleCode } from '../../../lib/locales'
 import { fetchAllLocaleData, getFieldFromCache } from '../localeDataCache'
 import { MediaPicker } from '../MediaPicker'
+import { LocaleFlag } from '../../ui/LocaleFlag'
 import './styles.scss'
 
 interface SpecificationItem {
@@ -405,7 +406,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                   const hasContent = data?.specifications && data.specifications.length > 0
                   return (
                     <option key={lang.code} value={lang.code}>
-                      {lang.flag} {lang.label} {hasContent ? '✓' : '(empty)'}
+                      {lang.label} {hasContent ? '✓' : '(empty)'}
                     </option>
                   )
                 })}
@@ -441,7 +442,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                       }}
                       disabled={isTranslating}
                     />
-                    {lang.flag} {lang.code.toUpperCase()}
+                    <LocaleFlag localeCode={lang.code} className="target-locale-flag" /> {lang.code.toUpperCase()}
                   </label>
                 ))}
               </div>
@@ -486,7 +487,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
               onClick={() => setActiveLocale(lang.code as LocaleCode)}
               title={`${lang.label}${isCurrent ? ' (Current)' : ''}`}
             >
-              <span className="locale-tab__flag">{lang.flag}</span>
+              <LocaleFlag localeCode={lang.code} className="locale-tab__flag" />
               <span className="locale-tab__code">{lang.code.toUpperCase()}</span>
               {isCompleted && <span className="locale-tab__check">✓</span>}
               {isCurrent && <span className="locale-tab__current">●</span>}
@@ -499,7 +500,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
       <div className="product-specs-field__editor">
         <div className="editor-header">
           <span className="editor-header__locale">
-            {SUPPORTED_LOCALES.find(l => l.code === activeLocale)?.flag}{' '}
+            <LocaleFlag localeCode={activeLocale} className="editor-header__flag" />{' '}
             {SUPPORTED_LOCALES.find(l => l.code === activeLocale)?.label}
             {activeLocale === currentLocale.code && <span className="current-badge">Current Locale</span>}
           </span>

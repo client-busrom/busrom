@@ -34,6 +34,9 @@ export const ALLOWED_SCRIPT_DOMAINS = [
   'clarity.ms',
   'www.clarity.ms',
   'bat.bing.com',
+  // Yandex
+  'mc.yandex.ru',
+  'metrika.yandex.ru',
   // Hotjar
   'static.hotjar.com',
   'script.hotjar.com',
@@ -154,6 +157,59 @@ src="https://www.facebook.com/tr?id=${id}&ev=PageView&noscript=1"/></noscript>
     })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
 </script>
 <!-- End Hotjar Tracking Code -->`,
+  },
+  bing_uet: {
+    name: 'Bing UET (Universal Event Tracking)',
+    description: 'Microsoft Bing Ads conversion tracking',
+    placeholder: 'XXXXXXXX',
+    template: (id: string) => `<!-- Bing UET Tag -->
+<script>
+(function(w,d,t,r,u){var f,n,i;w[u]=w[u]||[],f=function(){var o={ti:"${id}",enableAutoSpaTracking:true};o.q=w[u],w[u]=new UET(o),w[u].push("pageLoad")},n=d.createElement(t),n.src=r,n.async=1,n.onload=n.onreadystatechange=function(){var s=this.readyState;s&&s!=="loaded"&&s!=="complete"||(f(),n.onload=n.onreadystatechange=null)},i=d.getElementsByTagName(t)[0],i.parentNode.insertBefore(n,i)})(window,document,"script","//bat.bing.com/bat.js","uetq");
+</script>
+<!-- End Bing UET Tag -->`,
+  },
+  yandex_metrica: {
+    name: 'Yandex Metrica',
+    description: 'Yandex Metrica analytics (Russian market)',
+    placeholder: 'XXXXXXXX',
+    template: (id: string) => `<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+   m[i].l=1*new Date();
+   for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(${id}, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true
+   });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/${id}" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->`,
+  },
+  google_search_console: {
+    name: 'Google Search Console Verification',
+    description: 'Google Search Console ownership verification meta tag',
+    placeholder: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    template: (id: string) => `<!-- Google Search Console Verification -->
+<meta name="google-site-verification" content="${id}" />`,
+  },
+  bing_webmaster: {
+    name: 'Bing Webmaster Verification',
+    description: 'Bing Webmaster Tools ownership verification meta tag',
+    placeholder: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    template: (id: string) => `<!-- Bing Webmaster Verification -->
+<meta name="msvalidate.01" content="${id}" />`,
+  },
+  yandex_webmaster: {
+    name: 'Yandex Webmaster Verification',
+    description: 'Yandex Webmaster ownership verification meta tag',
+    placeholder: 'XXXXXXXXXXXXXXXX',
+    template: (id: string) => `<!-- Yandex Webmaster Verification -->
+<meta name="yandex-verification" content="${id}" />`,
   },
 }
 

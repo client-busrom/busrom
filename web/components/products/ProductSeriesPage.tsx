@@ -80,10 +80,7 @@ export function ProductSeriesPage({ locale, slug }: ProductSeriesPageProps) {
       })
     }
 
-    const result = parseContentTranslation(seriesData.contentTranslation, mediaMap, reusableBlocksMap)
-    console.log('parsedContent:', result)
-    console.log('moreSeries:', result.moreSeries)
-    return result
+    return parseContentTranslation(seriesData.contentTranslation, mediaMap, reusableBlocksMap)
   }, [seriesData])
 
   // Loading state

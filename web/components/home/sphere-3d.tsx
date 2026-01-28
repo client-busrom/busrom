@@ -329,7 +329,6 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
 
   // 当 globe 准备好时的回调
   const handleGlobeReady = useCallback(() => {
-    console.log("Globe is ready!");
     setIsGlobeReady(true);
 
     const globe = globeRef.current;

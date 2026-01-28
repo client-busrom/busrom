@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useDocumentInfo, useLocale, useTranslation } from '@payloadcms/ui'
 import { SUPPORTED_LOCALES, type LocaleCode } from '../../../lib/locales'
+import { LocaleFlag } from '../../ui/LocaleFlag'
 import './styles.scss'
 
 interface FormFieldOption {
@@ -486,7 +487,7 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
                       >
                         {SUPPORTED_LOCALES.map(l => (
                           <option key={l.code} value={l.code}>
-                            {l.flag} {l.label}
+                            {l.label}
                           </option>
                         ))}
                       </select>
@@ -527,7 +528,7 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
                                 }
                               }}
                             />
-                            <span className="fftc-target-item__flag">{locale.flag}</span>
+                            <LocaleFlag localeCode={locale.code} className="fftc-target-item__flag" />
                             <span className="fftc-target-item__code">{locale.code.toUpperCase()}</span>
                           </label>
                         )
@@ -618,7 +619,7 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
                                 <div className="fftc-field__row-inputs">
                                   {SUPPORTED_LOCALES.map(locale => (
                                     <div key={locale.code} className="fftc-field__input-group">
-                                      <span className="fftc-field__locale">{locale.flag} {locale.code.toUpperCase()}</span>
+                                      <span className="fftc-field__locale"><LocaleFlag localeCode={locale.code} className="fftc-field__locale-flag" /> {locale.code.toUpperCase()}</span>
                                       <input
                                         type="text"
                                         value={getFieldValue(fieldIdx, 'label', locale.code)}
@@ -638,7 +639,7 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
                                 <div className="fftc-field__row-inputs">
                                   {SUPPORTED_LOCALES.map(locale => (
                                     <div key={locale.code} className="fftc-field__input-group">
-                                      <span className="fftc-field__locale">{locale.flag} {locale.code.toUpperCase()}</span>
+                                      <span className="fftc-field__locale"><LocaleFlag localeCode={locale.code} className="fftc-field__locale-flag" /> {locale.code.toUpperCase()}</span>
                                       <input
                                         type="text"
                                         value={getFieldValue(fieldIdx, 'placeholder', locale.code)}
@@ -665,7 +666,7 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
                                       <div className="fftc-field__row-inputs">
                                         {SUPPORTED_LOCALES.map(locale => (
                                           <div key={locale.code} className="fftc-field__input-group">
-                                            <span className="fftc-field__locale">{locale.flag} {locale.code.toUpperCase()}</span>
+                                            <span className="fftc-field__locale"><LocaleFlag localeCode={locale.code} className="fftc-field__locale-flag" /> {locale.code.toUpperCase()}</span>
                                             <input
                                               type="text"
                                               value={getOptionLabel(fieldIdx, optIdx, locale.code)}

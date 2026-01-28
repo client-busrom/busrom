@@ -3,8 +3,9 @@ import type { Locale } from "@/i18n.config"
 import { Suspense } from "react"
 import { HomeContent } from "@/lib/content-data"
 import { getHomeContent } from "@/lib/api/home"
-import { getPageMetadata } from "@/lib/api/seo-settings"
+import { getHomePageSeo, buildMetadata } from "@/lib/api/seo-settings"
 import { PageScripts } from "@/components/PageScripts"
+import { PageSeoInjector } from "@/components/seo"
 
 // 首页客户端组件 (带轮播)
 import { HomePageClient } from "./HomePageClient"
@@ -28,8 +29,9 @@ export async function generateMetadata({
       : 'Leading manufacturer of premium glass hardware products for global markets.',
   }
 
-  // 从 CMS 获取 SEO 设置并合并
-  return getPageMetadata('/', 'home', locale, defaultMetadata)
+  // 首页使用 global 的 title 和 description
+  const { setting } = await getHomePageSeo(locale)
+  return buildMetadata(setting, defaultMetadata)
 }
 
 // Helper: 从 variant 提取 URL
@@ -107,6 +109,9 @@ export default async function Home({
       {/* Page-specific scripts for homepage */}
       <PageScripts path="/" pageType="home" position="header" />
       <PageScripts path="/" pageType="home" position="body_start" />
+
+      {/* Hidden SEO content injection - Homepage special logic */}
+      <PageSeoInjector path="/" pageType="home" locale={locale} isHomePage={true} />
 
       <Suspense fallback={<HomePageSkeleton />}>
         <HomeContentLoader locale={locale} />
