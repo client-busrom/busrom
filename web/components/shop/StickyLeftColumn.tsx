@@ -32,7 +32,6 @@ export function StickyProductInfo({ children }: StickyProductInfoProps) {
 
       // 检查屏幕尺寸
       if (!checkScreenSize()) {
-        console.log('📱 Screen size < md, sticky disabled')
         // 清理已有的 trigger
         if (trigger) {
           trigger.kill()
@@ -62,17 +61,8 @@ export function StickyProductInfo({ children }: StickyProductInfoProps) {
       const leftHeight = content.offsetHeight
       const rightHeight = rightColumn.offsetHeight
 
-      console.log('📐 Measurements:', {
-        stickyTop,
-        wrapperTop,
-        leftHeight,
-        rightHeight,
-        heightDiff: rightHeight - leftHeight
-      })
-
       // 如果右侧比左侧短，不启用磁吸
       if (rightHeight <= leftHeight) {
-        console.log('⚠️ Right column shorter than left, sticky disabled')
         // 清理已有的 trigger
         if (trigger) {
           trigger.kill()
@@ -134,8 +124,6 @@ export function StickyProductInfo({ children }: StickyProductInfoProps) {
         },
         invalidateOnRefresh: true
       })
-
-      console.log('✅ Sticky left column created')
     }
 
     // 初始化设置

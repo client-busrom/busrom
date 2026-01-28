@@ -216,23 +216,23 @@ export function ProductApplicationsSection({
       </div>
     </section>
 
-    {/* Desktop Layout */}
+    {/* Desktop Layout - 所有元素缩小到80%，背景保持1920x922 */}
     <section
       className="relative w-full overflow-hidden hidden md:block"
       style={{
         ["--rpx-applications" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
-        height: rpx(949),
+        height: rpx(922),
         background: "linear-gradient(to bottom, #464040, #AC9D27)",
       }}
     >
-      {/* Title - SVG image */}
+      {/* Title - SVG image (缩小80%，左移100px) */}
       <div
         className="absolute z-20"
         style={{
-          left: rpx(153),
-          top: rpx(219),
-          width: rpx(596),
-          height: rpx(362),
+          left: rpx(214),
+          top: rpx(213),
+          width: rpx(477),
+          height: rpx(290),
         }}
       >
         <img
@@ -242,15 +242,15 @@ export function ProductApplicationsSection({
         />
       </div>
 
-      {/* Left Navigation Button */}
+      {/* Left Navigation Button (缩小80%，左移100px) */}
       <button
         onClick={goToPrev}
         className="absolute cursor-pointer z-10 group"
         style={{
-          left: rpx(153),
-          top: rpx(660),
-          width: rpx(83),
-          height: rpx(82),
+          left: rpx(214),
+          top: rpx(566),
+          width: rpx(66),
+          height: rpx(66),
         }}
         aria-label="Previous slide"
       >
@@ -266,15 +266,15 @@ export function ProductApplicationsSection({
         </svg>
       </button>
 
-      {/* Right Navigation Button */}
+      {/* Right Navigation Button (缩小80%，左移100px) */}
       <button
         onClick={goToNext}
         className="absolute cursor-pointer z-10 group"
         style={{
-          left: rpx(273),
-          top: rpx(660),
-          width: rpx(83),
-          height: rpx(82),
+          left: rpx(310),
+          top: rpx(566),
+          width: rpx(66),
+          height: rpx(66),
         }}
         aria-label="Next slide"
       >
@@ -290,20 +290,20 @@ export function ProductApplicationsSection({
         </svg>
       </button>
 
-      {/* Carousel */}
+      {/* Carousel (缩小80%，左移100px) */}
       <div
         className="absolute overflow-hidden"
         ref={emblaRef}
         style={{
-          left: rpx(664),
-          top: rpx(137),
+          left: rpx(623),
+          top: rpx(148),
           right: 0,
-          height: rpx(700),
+          height: rpx(560),
         }}
       >
         <div
           className="flex h-full"
-          style={{ gap: rpx(38) }}
+          style={{ gap: rpx(30) }}
         >
           {applications.length > 0 ? (
             applications.map((app, index) => {
@@ -313,10 +313,10 @@ export function ProductApplicationsSection({
                 key={`${app.id}-${index}`}
                 className="relative flex-shrink-0 overflow-hidden group"
                 style={{
-                  width: rpx(339),
-                  height: rpx(668),
-                  borderRadius: rpx(30),
-                  marginRight: isLast ? rpx(38) : undefined,
+                  width: rpx(271),
+                  height: rpx(534),
+                  borderRadius: rpx(24),
+                  marginRight: isLast ? rpx(30) : undefined,
                 }}
               >
                 {app.image ? (
@@ -334,11 +334,11 @@ export function ProductApplicationsSection({
                 {/* Title overlay */}
                 <div
                   className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent"
-                  style={{ padding: rpx(20) }}
+                  style={{ padding: rpx(16) }}
                 >
                   <h3
                     className="font-anaheim font-bold text-white leading-tight"
-                    style={{ fontSize: rpx(20) }}
+                    style={{ fontSize: rpx(16) }}
                   >
                     {app.title}
                   </h3>
@@ -352,9 +352,9 @@ export function ProductApplicationsSection({
                   key={index}
                   className="flex-shrink-0 bg-muted animate-pulse"
                   style={{
-                    width: rpx(339),
-                    height: rpx(668),
-                    borderRadius: rpx(30),
+                    width: rpx(271),
+                    height: rpx(534),
+                    borderRadius: rpx(24),
                   }}
                 />
               ))}

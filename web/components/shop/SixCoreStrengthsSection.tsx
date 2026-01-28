@@ -123,21 +123,23 @@ export function SixCoreStrengthsSection({
         onMouseEnter={() => setHoveredIndex(globalIndex)}
         onMouseLeave={() => setHoveredIndex(null)}
       >
-        <motion.span
-          className="absolute font-inter font-semibold text-white"
-          style={{
-            left: rpx(86),
-            fontSize: rpx(28),
-            lineHeight: rpx(30),
-          }}
+        <motion.div
+          className="w-full h-full flex items-center justify-center px-6"
           animate={{
-            top: isHovered ? "50%" : "35%",
-            y: "-50%",
+            y: isHovered ? 0 : -10,
           }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
         >
-          {item.title}
-        </motion.span>
+          <span
+            className="font-inter font-semibold text-white whitespace-pre-line text-left"
+            style={{
+              fontSize: rpx(28),
+              lineHeight: rpx(30),
+            }}
+          >
+            {item.title}
+          </span>
+        </motion.div>
       </motion.div>
     )
   }

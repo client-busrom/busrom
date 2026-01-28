@@ -27,13 +27,8 @@ export function StickyGallery({ images, productName }: StickyGalleryProps) {
     const timeoutId = setTimeout(() => {
       if (!galleryRef.current || !containerRef.current) return
 
-      console.log('🎯 Initializing ScrollTrigger...')
-      console.log('Gallery ref:', galleryRef.current)
-      console.log('Container ref:', containerRef.current)
-
       // 找到主包装容器 (包含整个左右布局)
       const mainWrapper = containerRef.current.parentElement?.parentElement?.parentElement
-      console.log('Main wrapper:', mainWrapper)
 
       // 创建 sticky 效果
       triggerRef.current = ScrollTrigger.create({
@@ -44,13 +39,7 @@ export function StickyGallery({ images, productName }: StickyGalleryProps) {
         pin: galleryRef.current,
         pinSpacing: false,
         invalidateOnRefresh: true,
-        markers: true, // 调试模式,查看触发区域
-        onEnter: () => console.log('✅ ScrollTrigger entered'),
-        onLeave: () => console.log('🚀 ScrollTrigger left'),
-        onUpdate: (self) => console.log('📊 Progress:', self.progress),
       })
-
-      console.log('ScrollTrigger created:', triggerRef.current)
 
       // 刷新 ScrollTrigger 确保计算正确
       ScrollTrigger.refresh()

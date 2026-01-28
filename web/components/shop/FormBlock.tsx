@@ -42,9 +42,6 @@ interface FormBlockProps {
 }
 
 export function FormBlock({ formConfig, locale }: FormBlockProps) {
-  // Debug logging
-  console.log("FormBlock received:", { formConfig, locale })
-
   // Handle different possible data structures
   const configData = formConfig?.data || formConfig
 

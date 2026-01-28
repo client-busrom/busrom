@@ -153,13 +153,10 @@ export function FullInquiryModal({
     const controllingField = sortedFields.find(f => f.fieldName === controllingFieldName)
 
     if (!controllingField || !controllingField.options) {
-      console.log('[shouldShowCustomizeField] No controlling field found or no options')
       return false
     }
 
     const fieldValue = formData[controllingFieldName]
-    console.log('[shouldShowCustomizeField] Current InquiryProduct value:', fieldValue)
-    console.log('[shouldShowCustomizeField] Available options:', controllingField.options.map((o: any) => o.value))
 
     // Check if any "Others"/"Customize" option is selected
     const hasCustomizeSelected = controllingField.options.some((option: any) => {
@@ -170,21 +167,14 @@ export function FullInquiryModal({
 
       if (!isCustomize) return false
 
-      console.log('[shouldShowCustomizeField] Found customize option:', option.value)
-
       // Check if this option is selected
       if (Array.isArray(fieldValue)) {
-        const isSelected = fieldValue.includes(option.value)
-        console.log('[shouldShowCustomizeField] Array check:', option.value, 'selected:', isSelected)
-        return isSelected
+        return fieldValue.includes(option.value)
       } else {
-        const isSelected = fieldValue === option.value
-        console.log('[shouldShowCustomizeField] String check:', option.value, 'selected:', isSelected)
-        return isSelected
+        return fieldValue === option.value
       }
     })
 
-    console.log('[shouldShowCustomizeField] Final result:', hasCustomizeSelected)
     return hasCustomizeSelected
   }
 
@@ -219,7 +209,6 @@ export function FullInquiryModal({
       const timeSinceActivity = now - lastActivity
 
       if (timeSinceActivity >= AUTO_SUBMIT_TIMEOUT) {
-        console.log("Auto-submitting form due to inactivity...")
         handleAutoSubmit()
       }
     }
@@ -352,7 +341,6 @@ export function FullInquiryModal({
   }
 
   const handleAutoSubmit = async () => {
-    console.log("Auto-submitting form...")
     await submitFormData(true)
   }
 
