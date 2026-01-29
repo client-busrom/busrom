@@ -42,7 +42,7 @@ export function StrengthBadges({ items }: StrengthBadgesProps) {
         return (
           <div key={index} className="flex flex-col items-center text-center flex-1 min-w-0">
             {/* Icon/Image with circular background */}
-            <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#f5f3eb] flex items-center justify-center mb-2 overflow-hidden">
+            <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#e8e4d9] flex items-center justify-center mb-2 overflow-hidden">
               {imageUrl ? (
                 <Image
                   src={imageUrl}
