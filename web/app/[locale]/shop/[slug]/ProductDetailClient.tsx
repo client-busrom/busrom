@@ -214,9 +214,17 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
               {product.series && (
                 <Link
                   href={`/${locale}/products/${product.series.slug}`}
-                  className="text-sm md:text-base text-brand-accent-gold underline hover:text-brand-secondary hover:no-underline transition-colors"
+                  className="inline-flex items-center gap-1 text-sm md:text-base text-brand-accent-gold underline hover:text-brand-secondary hover:no-underline transition-colors group"
                 >
                   View {product.series.localizedName || product.series.name} Series
+                  <svg
+                    className="w-4 h-4 transition-transform group-hover:translate-x-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 </Link>
               )}
             </div>

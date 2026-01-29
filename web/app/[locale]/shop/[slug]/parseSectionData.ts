@@ -42,6 +42,7 @@ export function extractTextWithLinebreaks(children: LexicalNode[] | undefined): 
 }
 
 // Helper: Extract basic section data (title, subtitle, image)
+// Supports shift+enter line breaks in title and subtitle
 export function extractBasicSectionData(content: LexicalContent) {
   const nodes = content?.root?.children || []
   let title = ''
@@ -56,7 +57,8 @@ export function extractBasicSectionData(content: LexicalContent) {
     if (node.type === 'paragraph' && nodeText.endsWith('-title')) {
       const nextNode = nodes[i + 1]
       if (nextNode?.type === 'heading' || nextNode?.type === 'paragraph') {
-        title = nextNode.children?.[0]?.text || ''
+        // Use extractTextWithLinebreaks to preserve shift+enter line breaks
+        title = extractTextWithLinebreaks(nextNode.children)
       }
     }
 
@@ -64,7 +66,8 @@ export function extractBasicSectionData(content: LexicalContent) {
     if (node.type === 'paragraph' && nodeText.endsWith('-subtitle')) {
       const nextNode = nodes[i + 1]
       if (nextNode?.type === 'heading' || nextNode?.type === 'paragraph') {
-        subtitle = nextNode.children?.[0]?.text || ''
+        // Use extractTextWithLinebreaks to preserve shift+enter line breaks
+        subtitle = extractTextWithLinebreaks(nextNode.children)
       }
     }
 

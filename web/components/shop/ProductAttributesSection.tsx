@@ -293,7 +293,7 @@ export function ProductAttributesSection({
         >
           {/* Title */}
           <h2
-            className="font-josefin-sans font-bold"
+            className="font-josefin-sans font-bold whitespace-pre-line"
             style={{
               fontSize: rpx(60),
               lineHeight: rpx(68),
@@ -366,7 +366,7 @@ export function ProductAttributesSection({
       {/* Mobile Layout */}
       <div className="block md:hidden px-4 py-8">
         {/* Title */}
-        <h2 className="font-josefin-sans font-bold text-2xl text-[#706934] mb-6">
+        <h2 className="font-josefin-sans font-bold text-2xl text-[#706934] mb-6 whitespace-pre-line">
           {title}
         </h2>
 

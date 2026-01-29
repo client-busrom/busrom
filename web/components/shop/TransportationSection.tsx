@@ -64,7 +64,7 @@ export function TransportationSection({
           transform: "rotate(-90deg)",
           transformOrigin: "left bottom",
           left: rpx(481),
-          bottom: rpx(80),
+          bottom: rpx(40),
         }}
       >
         {title}
