@@ -93,12 +93,14 @@ export function parseMainContentStrengthData(content: LexicalContent) {
     // Check for carousel block (visual editing in CMS)
     if (node.type === 'carousel' && node.data?.slides) {
       for (const slide of node.data.slides) {
-        // Title can contain line break for subtitle: "100K+\nHappy Customers"
-        const titleParts = (slide.title || '').split('\n')
+        // Title is the main text, description is the subtitle (supports line breaks)
+        const title = slide.title || ''
+        // Description can contain line breaks, preserve them
+        const subtitle = slide.description || ''
         strengthItems.push({
           image: slide.image || null,
-          title: titleParts[0] || '',
-          subtitle: titleParts[1] || slide.description || '',
+          title,
+          subtitle,
         })
       }
     }
