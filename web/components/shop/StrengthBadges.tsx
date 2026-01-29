@@ -1,10 +1,12 @@
 "use client"
 
 import React from "react"
+import Image from "next/image"
 import { Users, Shield, Truck, Leaf } from "lucide-react"
 
 interface StrengthItem {
-  icon: string
+  icon?: string
+  image?: { id: string; url?: string } | null
   title: string
   subtitle?: string
 }
@@ -33,12 +35,27 @@ export function StrengthBadges({ items = defaultItems }: StrengthBadgesProps) {
   return (
     <div className="flex justify-between items-start gap-2 py-4">
       {items.slice(0, 4).map((item, index) => {
-        const IconComponent = iconMap[item.icon.toLowerCase()] || Users
+        const IconComponent = item.icon ? (iconMap[item.icon.toLowerCase()] || Users) : null
+        const imageUrl = item.image?.url || (item.image?.id ? `/api/media/${item.image.id}/file?width=100` : null)
+
         return (
           <div key={index} className="flex flex-col items-center text-center flex-1 min-w-0">
-            {/* Icon with circular background */}
-            <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#f5f3eb] flex items-center justify-center mb-2">
-              <IconComponent className="text-[#5d6b4a]" size={24} />
+            {/* Icon/Image with circular background */}
+            <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#f5f3eb] flex items-center justify-center mb-2 overflow-hidden">
+              {imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  alt={item.title}
+                  width={56}
+                  height={56}
+                  className="w-full h-full object-contain p-2"
+                  unoptimized
+                />
+              ) : IconComponent ? (
+                <IconComponent className="text-[#5d6b4a]" size={24} />
+              ) : (
+                <Users className="text-[#5d6b4a]" size={24} />
+              )}
             </div>
             {/* Title */}
             <p className="font-josefin-sans font-semibold text-xs md:text-sm text-[#3a3a3a] leading-tight">
