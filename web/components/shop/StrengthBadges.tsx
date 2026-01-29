@@ -60,9 +60,9 @@ export function StrengthBadges({ items }: StrengthBadgesProps) {
             <p className="font-josefin-sans font-semibold text-xs md:text-sm text-[#3a3a3a] leading-tight">
               {item.title}
             </p>
-            {/* Subtitle */}
+            {/* Subtitle - supports line breaks */}
             {item.subtitle && (
-              <p className="font-josefin-sans text-xs md:text-sm text-[#3a3a3a] leading-tight">
+              <p className="font-josefin-sans text-xs md:text-sm text-[#3a3a3a] leading-tight whitespace-pre-line">
                 {item.subtitle}
               </p>
             )}
