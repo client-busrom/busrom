@@ -231,9 +231,7 @@ export function WhyChooseUsReasonSection({
               className="font-josefin-sans font-bold text-black animate-float-up"
               style={{
                 fontSize: rpx(60),
-                lineHeight: rpx(56),
-                maxHeight: rpx(246),
-                overflow: "hidden",
+                lineHeight: rpx(68),
               }}
               key={`title-${currentIndex}`}
             >
@@ -294,7 +292,7 @@ export function WhyChooseUsReasonSection({
               className="font-josefin-sans font-normal text-black animate-float-up whitespace-pre-line"
               style={{
                 fontSize: rpx(20),
-                lineHeight: rpx(28),
+                lineHeight: rpx(26),
                 animationDelay: "0.15s",
                 opacity: 0,
               }}
