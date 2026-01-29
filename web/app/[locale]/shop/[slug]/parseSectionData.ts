@@ -80,6 +80,50 @@ export function extractBasicSectionData(content: LexicalContent) {
   return { title, subtitle, image }
 }
 
+// Parse Main Content Strength Section (badges below gallery)
+export function parseMainContentStrengthData(content: LexicalContent) {
+  const nodes = content?.root?.children || []
+  const strengthItems: { icon: string; title: string; subtitle?: string }[] = []
+
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i]
+    const nodeText = node.children?.[0]?.text || ''
+
+    // Check for item marker
+    if (node.type === 'paragraph' && nodeText === 'main-content-strength-item') {
+      const nextNode = nodes[i + 1]
+      if (nextNode?.type === 'list' && nextNode.children) {
+        for (const listItem of nextNode.children) {
+          if (listItem.type === 'listitem') {
+            // Format: "icon:users|100K+|Happy Customers" or just "100K+\nHappy Customers"
+            const text = extractTextWithLinebreaks(listItem.children)
+            if (text) {
+              const parts = text.split('|')
+              if (parts.length >= 2) {
+                // Format with pipe separator: icon:users|100K+|Happy Customers
+                const iconPart = parts[0].startsWith('icon:') ? parts[0].replace('icon:', '') : 'users'
+                const title = parts[0].startsWith('icon:') ? parts[1] : parts[0]
+                const subtitle = parts[0].startsWith('icon:') ? parts[2] : parts[1]
+                strengthItems.push({ icon: iconPart, title, subtitle })
+              } else {
+                // Format with line break: "100K+\nHappy Customers"
+                const lines = text.split('\n')
+                strengthItems.push({
+                  icon: 'users',
+                  title: lines[0] || '',
+                  subtitle: lines[1] || '',
+                })
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return { items: strengthItems.length > 0 ? strengthItems : undefined }
+}
+
 // Parse Product Attributes Section
 export function parseProductAttributesData(content: LexicalContent, productAttributes: any[]) {
   const { title, image } = extractBasicSectionData(content)
