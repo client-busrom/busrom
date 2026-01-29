@@ -81,32 +81,43 @@ export function extractBasicSectionData(content: LexicalContent) {
 }
 
 // Parse Main Content Strength Section (badges below gallery)
+// Supports carousel block for visual editing in CMS
 export function parseMainContentStrengthData(content: LexicalContent) {
   const nodes = content?.root?.children || []
-  const strengthItems: { icon: string; title: string; subtitle?: string }[] = []
+  const strengthItems: { icon?: string; image?: any; title: string; subtitle?: string }[] = []
 
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i]
     const nodeText = node.children?.[0]?.text || ''
 
-    // Check for item marker
+    // Check for carousel block (visual editing in CMS)
+    if (node.type === 'carousel' && node.data?.slides) {
+      for (const slide of node.data.slides) {
+        // Title can contain line break for subtitle: "100K+\nHappy Customers"
+        const titleParts = (slide.title || '').split('\n')
+        strengthItems.push({
+          image: slide.image || null,
+          title: titleParts[0] || '',
+          subtitle: titleParts[1] || slide.description || '',
+        })
+      }
+    }
+
+    // Fallback: Check for item marker with list (text-based)
     if (node.type === 'paragraph' && nodeText === 'main-content-strength-item') {
       const nextNode = nodes[i + 1]
       if (nextNode?.type === 'list' && nextNode.children) {
         for (const listItem of nextNode.children) {
           if (listItem.type === 'listitem') {
-            // Format: "icon:users|100K+|Happy Customers" or just "100K+\nHappy Customers"
             const text = extractTextWithLinebreaks(listItem.children)
             if (text) {
               const parts = text.split('|')
               if (parts.length >= 2) {
-                // Format with pipe separator: icon:users|100K+|Happy Customers
                 const iconPart = parts[0].startsWith('icon:') ? parts[0].replace('icon:', '') : 'users'
                 const title = parts[0].startsWith('icon:') ? parts[1] : parts[0]
                 const subtitle = parts[0].startsWith('icon:') ? parts[2] : parts[1]
                 strengthItems.push({ icon: iconPart, title, subtitle })
               } else {
-                // Format with line break: "100K+\nHappy Customers"
                 const lines = text.split('\n')
                 strengthItems.push({
                   icon: 'users',
