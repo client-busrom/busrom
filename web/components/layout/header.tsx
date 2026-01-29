@@ -195,26 +195,39 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
         ref={headerRef}
         className={cn("fixed top-0 left-0 right-0 w-full z-[70] transition-all duration-300 ease-in-out", headerBgColor, headerShadow)}
       >
-        <div className="w-full px-[10%] py-2">
-          <div className="flex items-center justify-between">
-            {/* 左侧：Logo + 移动端汉堡菜单 */}
-            <div className="flex items-center gap-4">
-              {/* 移动端：汉堡菜单按钮 */}
-              <button
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setIsMenuOpen(!isMenuOpen);
-                }}
-                className={cn(
-                  "lg:hidden p-2 rounded-md transition-colors duration-200",
-                  headerTextColor,
-                  headerHoverBg
-                )}
-              >
-                <Menu className="w-5 h-5" />
-              </button>
+        <div className="w-full px-4 lg:px-6 xl:px-10 py-2">
+          {/* 移动端布局：三列，Logo居中 */}
+          <div className="flex lg:hidden items-center justify-between relative">
+            {/* 左侧：汉堡菜单按钮 */}
+            <button
+              onClick={(event) => {
+                event.stopPropagation();
+                setIsMenuOpen(!isMenuOpen);
+              }}
+              className={cn(
+                "p-2 rounded-md transition-colors duration-200",
+                headerTextColor,
+                headerHoverBg
+              )}
+            >
+              <Menu className="w-5 h-5" />
+            </button>
 
-              {/* Logo */}
+            {/* 中间：Logo 居中 */}
+            <Link href={`/${locale}`} className="absolute left-1/2 -translate-x-1/2">
+              <h1 className={cn("text-2xl tracking-wider font-paytone-one transition-colors duration-300", headerTextColor)}>
+                Busrom
+              </h1>
+            </Link>
+
+            {/* 右侧：语言选择 */}
+            <LocaleSwitcher activeTheme={activeTheme} />
+          </div>
+
+          {/* 桌面端布局 */}
+          <div className="hidden lg:flex items-center justify-between">
+            {/* 左侧：Logo */}
+            <div className="flex items-center">
               <Link href={`/${locale}`}>
                 <h1 className={cn("text-3xl tracking-wider font-paytone-one transition-colors duration-300", headerTextColor)}>
                   Busrom
@@ -222,8 +235,8 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
               </Link>
             </div>
 
-            {/* 中间：桌面端导航（所有菜单项） */}
-            <div className="hidden lg:flex flex-1 justify-center">
+            {/* 中间：桌面端导航 */}
+            <div className="flex flex-1 justify-center">
               <DesktopNavigation
                 navigationItems={navigationItems || []}
                 theme={activeTheme}

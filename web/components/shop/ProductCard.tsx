@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { cn } from "@/lib/utils"
+import { cn, getLocalizedName } from "@/lib/utils"
+import { useTranslations } from "@/lib/translations"
 import type { Product } from "@/lib/types/product"
 
 // Helper to extract URL from variant (can be string or object with url)
@@ -21,7 +22,11 @@ interface ProductCardProps {
 export function ProductCard({ product, locale }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isHovering, setIsHovering] = useState(false)
+  const [hoveredButton, setHoveredButton] = useState<"details" | "inquiry" | null>(null)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  // 从 messages 文件获取翻译
+  const t = useTranslations(locale, "shop")
 
   // Get display name
   const displayName =
@@ -62,6 +67,7 @@ export function ProductCard({ product, locale }: ProductCardProps) {
 
   const handleMouseLeave = () => {
     setIsHovering(false)
+    setHoveredButton(null)
   }
 
   // Determine which image to display
@@ -92,7 +98,7 @@ export function ProductCard({ product, locale }: ProductCardProps) {
             alt={displayImage.altText || displayName}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-opacity duration-300"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
             style={{
               objectPosition: `${displayImage.cropFocalPoint?.x || 50}% ${displayImage.cropFocalPoint?.y || 50}%`,
               objectFit: 'cover',
@@ -105,39 +111,69 @@ export function ProductCard({ product, locale }: ProductCardProps) {
           </div>
         )}
 
-        {/* Carousel indicators - Only show when hovering and has multiple images */}
-        {isHovering && mainImages.length > 1 && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full">
-            {mainImages.map((_, index) => (
-              <div
-                key={index}
-                className={cn(
-                  "rounded-full transition-all",
-                  index === currentImageIndex
-                    ? "bg-white w-6 h-2"
-                    : "bg-white/60 w-2 h-2"
-                )}
-              />
-            ))}
-          </div>
-        )}
-
         {/* Featured badge */}
         {product.isFeatured && (
           <div className="absolute top-0 right-0 bg-brand-secondary text-white text-xs font-semibold px-4 py-2 uppercase tracking-wider">
             Featured
           </div>
         )}
+
+        {/* Hover Overlay with Two Buttons */}
+        <div
+          className={cn(
+            "absolute inset-0 bg-black/0 flex items-end justify-center transition-all duration-300",
+            isHovering ? "bg-black/20" : ""
+          )}
+        >
+          <div className={cn(
+            "flex gap-3 mb-4 transition-all duration-300 transform",
+            isHovering ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          )}>
+            {/* View Details Button */}
+            <Link
+              href={`/${locale}/shop/${product.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onMouseEnter={() => setHoveredButton("details")}
+              onMouseLeave={() => setHoveredButton(null)}
+              className={cn(
+                "px-4 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all duration-300 border",
+                hoveredButton === "details"
+                  ? "bg-brand-secondary text-white border-brand-secondary"
+                  : "bg-brand-main text-brand-text-main border-brand-secondary/30"
+              )}
+            >
+              {t.viewDetails}
+            </Link>
+
+            {/* Send Inquiry Button */}
+            <Link
+              href={`/${locale}/shop/${product.slug}#inquiry`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onMouseEnter={() => setHoveredButton("inquiry")}
+              onMouseLeave={() => setHoveredButton(null)}
+              className={cn(
+                "px-4 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all duration-300 border",
+                hoveredButton === "inquiry"
+                  ? "bg-brand-secondary text-white border-brand-secondary"
+                  : "bg-brand-main text-brand-text-main border-brand-secondary/30"
+              )}
+            >
+              {t.sendInquiry}
+            </Link>
+          </div>
+        </div>
       </Link>
 
-      {/* Product Info - Minimalist Style */}
-      <div className="flex flex-col space-y-3 relative">
+      {/* Product Info */}
+      <div className="flex flex-col space-y-2">
         {/* Product Name */}
         <Link
           href={`/${locale}/shop/${product.slug}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-anaheim font-extrabold text-xl text-brand-text-black line-clamp-2 hover:text-brand-secondary transition-colors leading-tight"
+          className="font-anaheim font-bold text-base text-brand-text-black line-clamp-2 hover:text-brand-secondary transition-colors leading-tight uppercase"
         >
           {displayName}
         </Link>
@@ -146,41 +182,11 @@ export function ProductCard({ product, locale }: ProductCardProps) {
         {product.series && 'slug' in product.series && (
           <Link
             href={`/${locale}/products/${product.series.slug}`}
-            className="text-xs text-brand-accent-gold hover:text-brand-secondary transition-colors font-medium uppercase tracking-wider"
+            className="text-xs text-brand-accent-gold hover:text-brand-secondary transition-colors"
           >
-            {'name' in product.series && (
-              product.series.name?.[locale] ||
-              product.series.name?.["en"] ||
-              "View Series"
-            )}
+            {'name' in product.series && getLocalizedName(product.series.name, locale, "View Series")}
           </Link>
         )}
-
-        {/* Short Description */}
-        {shortDescription && (
-          <div className="text-sm text-brand-text-black/70 line-clamp-2 leading-relaxed">
-            {typeof shortDescription === 'string'
-              ? shortDescription
-              : shortDescription?.document?.[0]?.children?.[0]?.text || ''}
-          </div>
-        )}
-
-        {/* Inquiry Button - Slides in on hover (desktop only), always visible on mobile */}
-        <div className="lg:overflow-hidden">
-          <Link
-            href={`/${locale}#contact-form?product=${product.sku}`}
-            className={cn(
-              "block w-full py-3 px-0 text-center border-t-2 mt-4",
-              "border-brand-secondary text-brand-secondary font-anaheim font-bold text-sm uppercase tracking-wider",
-              "hover:border-brand-text-black hover:text-brand-text-black transition-all duration-300",
-              "focus:outline-none",
-              "lg:transform lg:transition-transform lg:duration-300 lg:ease-out",
-              isHovering ? "lg:translate-y-0 lg:opacity-100" : "lg:translate-y-full lg:opacity-0"
-            )}
-          >
-            Inquire Now
-          </Link>
-        </div>
       </div>
     </div>
   )

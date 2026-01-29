@@ -14,6 +14,15 @@
     "contact": "联系",
     "viewAllProducts": "查看所有产品"
   },
+  "shop": {
+    "viewDetails": "查看详情",
+    "sendInquiry": "发送询盘",
+    "allProducts": "所有产品",
+    "searchProducts": "搜索产品...",
+    "applyFilter": "筛选",
+    "featuredOnly": "仅精选",
+    "sortBy": "排序"
+  },
   "ContactPage": {
     "title": "联系我们",
     "subtitle": "获取高品质不锈钢玻璃五金解决方案，请与我们联系",
