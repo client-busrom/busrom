@@ -86,9 +86,11 @@ export interface ProductSeries {
   id: string
   slug: string
 
-  // Multilingual fields
-  name: Record<string, string>
-  description: Record<string, string>
+  // Multilingual fields (can be Record<string, string> or localized string)
+  name: Record<string, string> | string
+  localizedName?: string // Already localized by Payload API
+  description: Record<string, string> | string
+  localizedDescription?: string // Already localized by Payload API
 
   // Content translations (relational)
   contentTranslations?: ProductSeriesContentTranslation[]

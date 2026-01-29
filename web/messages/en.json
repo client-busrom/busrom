@@ -14,6 +14,15 @@
     "contact": "Contact",
     "viewAllProducts": "View All Products"
   },
+  "shop": {
+    "viewDetails": "View Details",
+    "sendInquiry": "Send Inquiry",
+    "allProducts": "All Products",
+    "searchProducts": "Search products...",
+    "applyFilter": "Apply filter",
+    "featuredOnly": "Featured Only",
+    "sortBy": "Sort by"
+  },
   "ContactPage": {
     "title": "Contact Us",
     "subtitle": "Get in touch with us for high-quality stainless steel glass hardware solutions",

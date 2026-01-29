@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { cn } from "@/lib/utils"
+import { cn, getLocalizedName } from "@/lib/utils"
 import type { ProductSeries, ProductSortField, ProductSortDirection } from "@/lib/types/product"
 
 interface ProductFiltersProps {
@@ -157,7 +157,7 @@ export function ProductFilters({
           <div className="space-y-3">
             {series.map((s) => {
               const isSelected = selectedSeries.includes(s.slug)
-              const displayName = s.name?.[locale] || s.name?.["en"] || s.slug
+              const displayName = getLocalizedName(s.name, locale, s.slug)
 
               return (
                 <label

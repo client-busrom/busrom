@@ -17,3 +17,24 @@ export function getObjectPosition(image?: ImageObject | null): string {
   }
   return `${image.cropFocalPoint.x}% ${image.cropFocalPoint.y}%`
 }
+
+/**
+ * 获取本地化名称
+ * 处理两种情况：
+ * 1. 已本地化的字符串 (从 Payload API 获取时已经本地化)
+ * 2. Record<string, string> 格式的多语言对象
+ *
+ * @param name - 名称（可以是字符串或多语言对象）
+ * @param locale - 当前语言
+ * @param fallback - 后备值
+ * @returns 本地化后的字符串
+ */
+export function getLocalizedName(
+  name: string | Record<string, string> | undefined | null,
+  locale: string,
+  fallback: string = ""
+): string {
+  if (!name) return fallback
+  if (typeof name === "string") return name
+  return name[locale] || name["en"] || fallback
+}
