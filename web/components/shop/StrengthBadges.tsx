@@ -31,7 +31,12 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; size?: n
   leaf: Leaf,
 }
 
-export function StrengthBadges({ items = defaultItems }: StrengthBadgesProps) {
+export function StrengthBadges({ items }: StrengthBadgesProps) {
+  // If no items configured, don't render the component
+  if (!items || items.length === 0) {
+    return null
+  }
+
   return (
     <div className="flex justify-between items-start gap-2 py-4">
       {items.slice(0, 4).map((item, index) => {
