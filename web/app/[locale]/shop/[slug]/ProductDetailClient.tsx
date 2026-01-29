@@ -10,8 +10,9 @@ import { ProductDetailSkeleton } from "@/components/shop/ProductDetailSkeleton"
 import { StickyProductInfo } from "@/components/shop/StickyLeftColumn"
 import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 import { ProductHeroSection } from "@/components/shop/ProductHeroSection"
+import { StrengthBadges } from "@/components/shop/StrengthBadges"
 import { SectionRenderer } from "./SectionRenderer"
-import { parseLexicalSections } from "./parseSectionData"
+import { parseLexicalSections, parseMainContentStrengthData } from "./parseSectionData"
 
 // Description component with 3-line clamp and expand button
 function DescriptionWithExpand({ description }: { description: string | any }) {
@@ -153,6 +154,10 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
   // Parse Lexical content structure using extracted function
   const { preFormSections, formBlock, postFormSections } = parseLexicalSections(product.content)
 
+  // Find and parse main-content-strength section from preFormSections
+  const strengthSection = preFormSections.find((s: any) => s.title === 'main-content-strength')
+  const strengthData = strengthSection ? parseMainContentStrengthData(strengthSection.content) : null
+
   // Get the first main image for the hero section
   const heroImage = images.length > 0 ? images[0] : null
 
@@ -165,14 +170,19 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
           {/* Left Column - Gallery + Sections (70% width) - Sticky with GSAP */}
           <StickyProductInfo>
             {/* Gallery */}
-            <div className="mb-6">
+            <div className="mb-4">
               <ProductGallery images={images} productName={displayName} />
             </div>
 
+            {/* Strength Badges - Below Gallery */}
+            <div className="mb-6">
+              <StrengthBadges items={strengthData?.items} />
+            </div>
+
             {/* Section Buttons - Click to open modal (Desktop only - md+) */}
-            {preFormSections.length > 0 && (
+            {preFormSections.filter((s: any) => s.title !== 'main-content-strength').length > 0 && (
               <div className="hidden md:block space-y-3 md:space-y-4">
-                {preFormSections.map((section: any, index: number) => (
+                {preFormSections.filter((s: any) => s.title !== 'main-content-strength').map((section: any, index: number) => (
                   <button
                     key={index}
                     onClick={() => setSelectedSection(section)}
@@ -204,9 +214,9 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
               {product.series && (
                 <Link
                   href={`/${locale}/products/${product.series.slug}`}
-                  className="text-sm md:text-base text-brand-accent-gold hover:text-brand-secondary transition-colors hover:underline"
+                  className="text-sm md:text-base text-brand-accent-gold underline hover:text-brand-secondary hover:no-underline transition-colors"
                 >
-                  View {product.series.localizedName} Series
+                  View {product.series.localizedName || product.series.name} Series
                 </Link>
               )}
             </div>
@@ -300,9 +310,9 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
         </div>
 
         {/* Section Buttons - Click to open modal (Mobile only - below md) */}
-        {preFormSections.length > 0 && (
+        {preFormSections.filter((s: any) => s.title !== 'main-content-strength').length > 0 && (
           <div className="block md:hidden mb-12 space-y-3">
-            {preFormSections.map((section: any, index: number) => (
+            {preFormSections.filter((s: any) => s.title !== 'main-content-strength').map((section: any, index: number) => (
               <button
                 key={index}
                 onClick={() => setSelectedSection(section)}
