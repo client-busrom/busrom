@@ -59,7 +59,7 @@ export function ProductHeroSection({
 
     if (visibleHero) {
       // Scroll by the height of the hero section
-      const heroRect = visibleHero.getBoundingClientRect()
+      const heroRect = (visibleHero as Element).getBoundingClientRect()
       const scrollTarget = window.scrollY + heroRect.bottom
       window.scrollTo({
         top: scrollTarget,
