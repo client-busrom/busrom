@@ -202,24 +202,22 @@ export function SixCoreStrengthsSection({
       }}
     >
       <div className="relative" style={{ minHeight: rpx(922) }}>
-        {/* Header */}
+        {/* Header - centered in screen */}
         <div
-          className="absolute"
+          className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
           style={{
-            left: rpx(374),
             top: rpx(62),
-            width: rpx(1162),
           }}
         >
-          {/* Subtitle - positioned to the right */}
+          {/* Subtitle - right aligned with title, above title */}
           {subtitle && (
             <p
-              className="font-josefin-sans text-right"
+              className="font-josefin-sans self-end"
               style={{
-                fontSize: rpx(24),
-                lineHeight: rpx(32),
+                fontSize: rpx(29),
+                lineHeight: rpx(36),
                 color: "#AB9F63",
-                paddingRight: rpx(100),
+                marginBottom: rpx(10),
               }}
             >
               {subtitle}
@@ -233,7 +231,6 @@ export function SixCoreStrengthsSection({
               fontSize: rpx(60),
               lineHeight: rpx(56),
               color: "#46401F",
-              marginTop: rpx(10),
             }}
           >
             {title}

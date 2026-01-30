@@ -217,6 +217,8 @@ export function MobileMenu({ isOpen, onClose, navigationItems = [] }: MobileMenu
                                             alt={child.label}
                                             fill
                                             className="object-cover"
+                                            unoptimized
+                                            loading="lazy"
                                           />
                                         </div>
                                       ) : (

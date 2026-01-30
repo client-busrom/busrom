@@ -31,6 +31,9 @@ const nextConfig = {
       },
     ],
     formats: ['image/avif', 'image/webp'],
+    // 启用 dangerouslyAllowSVG 以支持 SVG
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
   /**
