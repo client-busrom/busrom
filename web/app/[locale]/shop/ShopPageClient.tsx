@@ -22,12 +22,12 @@ function getVariantUrl(variant: string | { url?: string } | undefined): string |
   return variant.url
 }
 
-// 获取产品图片 URL
+// 获取产品图片 URL - 优先使用正方形的 tablet 变体
 function getProductImageUrl(product: Product): string | undefined {
   const image = product.showImage
   if (!image) return undefined
-  return getVariantUrl(image.variants?.card) ||
-         getVariantUrl(image.variants?.tablet) ||
+  return getVariantUrl(image.variants?.tablet) ||
+         getVariantUrl(image.variants?.card) ||
          getVariantUrl(image.variants?.medium) ||
          getVariantUrl(image.variants?.large) ||
          getVariantUrl(image.variants?.thumbnail) ||

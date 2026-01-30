@@ -141,7 +141,7 @@ export function ProductCard({ product, locale, imageVariants, textVariants, prio
         >
         {displayImage ? (
           <Image
-            src={getVariantUrl(displayImage.variants?.card) || getVariantUrl(displayImage.variants?.tablet) || getVariantUrl(displayImage.variants?.medium) || getVariantUrl(displayImage.variants?.large) || getVariantUrl(displayImage.variants?.thumbnail) || displayImage.url}
+            src={getVariantUrl(displayImage.variants?.tablet) || getVariantUrl(displayImage.variants?.card) || getVariantUrl(displayImage.variants?.medium) || getVariantUrl(displayImage.variants?.large) || getVariantUrl(displayImage.variants?.thumbnail) || displayImage.url}
             alt={displayImage.altText || displayName}
             fill
             sizes="250px"
