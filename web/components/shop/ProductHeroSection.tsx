@@ -114,8 +114,8 @@ export function ProductHeroSection({
             left: rpx(389),
             top: rpx(295),
             width: rpx(1203),
-            fontSize: rpx(60),
-            lineHeight: rpx(68),
+            fontSize: rpx(100),
+            lineHeight: "auto",
           }}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -131,8 +131,8 @@ export function ProductHeroSection({
             left: rpx(389),
             top: rpx(461),
             width: rpx(1203),
-            fontSize: rpx(24),
-            lineHeight: rpx(32),
+            fontSize: rpx(48),
+            lineHeight: "auto",
             background: "linear-gradient(180deg, #FFFFFF 0%, #999999 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",

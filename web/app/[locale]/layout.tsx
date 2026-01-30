@@ -143,6 +143,14 @@ const moul = localFont({
   preload: false,
 });
 
+const orbitron = localFont({
+  src: "../../public/fonts/Orbitron-Medium.ttf",
+  weight: "500",
+  variable: "--font-orbitron",
+  display: "swap",
+  preload: false,
+});
+
 export function generateStaticParams() {
   // 动态生成所有支持的 locale 参数
   return locales.map(locale => ({ locale }));
@@ -183,6 +191,7 @@ export default async function RootLayout({
       ${lilitaOne.variable}
       ${kaushanScript.variable}
       ${moul.variable}
+      ${orbitron.variable}
       font-sans
     `}
     >

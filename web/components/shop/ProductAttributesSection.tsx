@@ -149,20 +149,20 @@ export function ProductAttributesSection({
           <div
             className="relative flex-shrink-0 z-10"
             style={{
-              width: rpx(971),
-              height: rpx(488),
+              width: rpx(780),
+              height: rpx(450),
               backgroundColor: "#F6F4ED",
               boxShadow: "34px 0 23.6px -19px rgba(0, 0, 0, 0.09)",
             }}
           >
-            {/* Main Image */}
+            {/* Main Image - 600x370 */}
             <div
               className="absolute overflow-hidden"
               style={{
-                left: rpx(153),
-                top: rpx(47),
-                width: rpx(791),
-                height: rpx(403),
+                left: rpx(90),
+                top: rpx(40),
+                width: rpx(600),
+                height: rpx(370),
                 borderRadius: rpx(60),
               }}
             >
@@ -185,8 +185,8 @@ export function ProductAttributesSection({
             className="relative flex-1 overflow-hidden"
             style={{
               marginLeft: rpx(-72),
-              paddingTop: rpx(47),
-              paddingBottom: rpx(38),
+              paddingTop: rpx(40),
+              paddingBottom: rpx(40),
             }}
           >
             {/* Cards Container */}
@@ -217,7 +217,7 @@ export function ProductAttributesSection({
                     className="flex-shrink-0"
                     style={{
                       width: rpx(cardWidth),
-                      height: rpx(403),
+                      height: rpx(370),
                       borderRadius: rpx(60),
                       backgroundColor: CARD_COLORS[index % CARD_COLORS.length],
                       padding: rpx(40),

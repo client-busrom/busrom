@@ -42,7 +42,7 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
   const menuRef = useRef<HTMLDivElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // 预加载所有菜单图片
+  // 预加载所有菜单图片 - 使用 link preload 更早加载
   useEffect(() => {
     if (imagesPreloaded || navigationItems.length === 0) return
 
@@ -57,19 +57,40 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
       }
     })
 
-    // 使用 Image 对象预加载
+    // 使用 link preload 进行预加载（更快）
+    const preloadLinks: HTMLLinkElement[] = []
+    imageUrls.forEach((url, index) => {
+      // 清理已存在的相同 URL 的预加载
+      const existingLink = document.querySelector(`link[href="${url}"][rel="preload"]`)
+      if (existingLink) return
+
+      const link = document.createElement('link')
+      link.rel = 'preload'
+      link.as = 'image'
+      link.href = url
+      link.setAttribute('data-nav-preload', 'true')
+      // 前4张高优先级
+      if (index < 4) {
+        link.setAttribute('fetchpriority', 'high')
+      }
+      document.head.appendChild(link)
+      preloadLinks.push(link)
+    })
+
+    // 同时使用 Image 对象确保完全加载
     let loadedCount = 0
+    const totalImages = imageUrls.length
     imageUrls.forEach(url => {
       const img = new window.Image()
       img.onload = () => {
         loadedCount++
-        if (loadedCount === imageUrls.length) {
+        if (loadedCount === totalImages) {
           setImagesPreloaded(true)
         }
       }
       img.onerror = () => {
         loadedCount++
-        if (loadedCount === imageUrls.length) {
+        if (loadedCount === totalImages) {
           setImagesPreloaded(true)
         }
       }
@@ -79,6 +100,15 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
     // 如果没有图片，直接标记为已预加载
     if (imageUrls.length === 0) {
       setImagesPreloaded(true)
+    }
+
+    // 清理函数
+    return () => {
+      preloadLinks.forEach(link => {
+        if (link.parentNode) {
+          link.parentNode.removeChild(link)
+        }
+      })
     }
   }, [navigationItems, imagesPreloaded])
 
@@ -191,14 +221,16 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
       </div>
 
       {/* 二级菜单下拉 - 全屏宽度 */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {activeItem && activeItem.childMenus && activeItem.childMenus.length > 0 && (
           <>
             {/* 背景遮罩 - 从 header 下方开始 */}
             <motion.div
+              key="overlay"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.08 }}
               className="fixed inset-0 z-40 bg-black/30"
               style={{ top: "46px" }}
               onClick={() => setActiveMenuId(null)}
@@ -206,11 +238,12 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
 
             {/* 下拉菜单 - 紧贴 header 底部 */}
             <motion.div
+              key={activeItem.id}
               ref={dropdownRef}
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.12, ease: "easeOut" }}
               className="fixed left-0 right-0 z-[55] bg-brand-main shadow-lg"
               style={{ top: "46px", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
               onWheel={(e) => e.stopPropagation()}
@@ -245,6 +278,9 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
                                     src={child.image.url}
                                     alt={child.label}
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-125"
+                                    loading="eager"
+                                    decoding="async"
+                                    fetchPriority={index < 4 ? "high" : "auto"}
                                   />
                                 ) : (
                                   <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-border">

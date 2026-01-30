@@ -101,6 +101,27 @@ export async function GET(request: NextRequest) {
       sortDir,
     })
 
+    // If series slug is provided, first get the series ID
+    let seriesId: string | null = null
+    if (seriesSlug) {
+      try {
+        const seriesUrl = `${CMS_URL}/api/product-series?where[slug][equals]=${encodeURIComponent(seriesSlug)}&limit=1`
+        const seriesRes = await fetch(seriesUrl, {
+          headers: { 'Content-Type': 'application/json' },
+          next: { revalidate: 300 }, // Cache for 5 minutes
+        })
+        if (seriesRes.ok) {
+          const seriesData = await seriesRes.json()
+          if (seriesData.docs && seriesData.docs.length > 0) {
+            seriesId = seriesData.docs[0].id
+            console.log('[Products API] Found series ID:', seriesId, 'for slug:', seriesSlug)
+          }
+        }
+      } catch (e) {
+        console.error('[Products API] Failed to fetch series by slug:', e)
+      }
+    }
+
     // 构建 Payload API URL
     const params = new URLSearchParams()
     params.append('locale', locale)
@@ -112,12 +133,10 @@ export async function GET(request: NextRequest) {
     // TODO: Re-enable after setting product status to 'published' in Payload CMS
     // params.append('where[status][equals]', 'published')
 
-    // Series filter - need to query series by slug first, then filter by ID
-    // NOTE: Payload doesn't support nested where queries like where[series.slug][equals]
-    // For now, skip this filter and we'll implement it differently if needed
-    // if (seriesSlug) {
-    //   params.append('where[series.slug][equals]', seriesSlug)
-    // }
+    // Series filter by ID
+    if (seriesId) {
+      params.append('where[series][equals]', seriesId)
+    }
 
     // Featured filter
     if (isFeatured) {
