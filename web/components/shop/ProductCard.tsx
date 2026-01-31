@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { motion, Variants } from "framer-motion"
 import { cn, getLocalizedName } from "@/lib/utils"
 import { useTranslations } from "@/lib/translations"
 import type { Product } from "@/lib/types/product"
@@ -39,16 +38,13 @@ function extractPlainText(content: any): string | null {
 interface ProductCardProps {
   product: Product & { localizedName?: string }
   locale: string
-  // 动画变体 - 由父组件传入
-  imageVariants?: Variants
-  textVariants?: Variants
   // 优先加载 - 首屏图片设置为 true
   priority?: boolean
   // 索引 - 用于计算是否需要优先加载
   index?: number
 }
 
-export function ProductCard({ product, locale, imageVariants, textVariants, priority, index = 0 }: ProductCardProps) {
+export function ProductCard({ product, locale, priority, index = 0 }: ProductCardProps) {
   // 前8个产品优先加载 (首屏2行 * 4列)
   const shouldPrioritize = priority ?? index < 8
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -58,17 +54,6 @@ export function ProductCard({ product, locale, imageVariants, textVariants, prio
 
   // 从 messages 文件获取翻译
   const t = useTranslations(locale, "shop")
-
-  // 默认动画变体
-  const defaultImageVariants: Variants = imageVariants || {
-    hidden: { opacity: 0, x: -30 },
-    visible: { opacity: 1, x: 0 },
-  }
-
-  const defaultTextVariants: Variants = textVariants || {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  }
 
   // Get display name
   const displayName =
@@ -81,38 +66,37 @@ export function ProductCard({ product, locale, imageVariants, textVariants, prio
 
   // Primary display: showImage
   const showImage = product.showImage
-  // Carousel images: mainImage array
+
+  // Additional images from mainImage array (for carousel on hover)
   const mainImages = product.mainImage || []
 
-  // Auto-rotate through mainImage on hover
-  useEffect(() => {
-    if (isHovering && mainImages.length > 0) {
+  // Handle hover image cycling
+  const handleMouseEnter = () => {
+    setIsHovering(true)
+    if (mainImages.length > 1) {
       intervalRef.current = setInterval(() => {
         setCurrentImageIndex((prev) => (prev + 1) % mainImages.length)
-      }, 800)
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-        intervalRef.current = null
-      }
-      setCurrentImageIndex(0)
+      }, 1500)
     }
+  }
 
+  const handleMouseLeave = () => {
+    setIsHovering(false)
+    setCurrentImageIndex(0)
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+  }
+
+  // Cleanup interval on unmount
+  useEffect(() => {
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
       }
     }
-  }, [isHovering, mainImages.length])
-
-  const handleMouseEnter = () => {
-    setIsHovering(true)
-  }
-
-  const handleMouseLeave = () => {
-    setIsHovering(false)
-    setHoveredButton(null)
-  }
+  }, [])
 
   // Determine which image to display
   const displayImage = isHovering && mainImages.length > 0
@@ -128,17 +112,13 @@ export function ProductCard({ product, locale, imageVariants, textVariants, prio
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Image Container - Square Aspect Ratio with horizontal animation */}
-      <motion.div
-        variants={defaultImageVariants}
-        transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+      {/* Image Container - Square Aspect Ratio */}
+      <Link
+        href={`/${locale}/shop/${product.slug}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="relative w-[250px] h-[250px] bg-white overflow-hidden mb-3 block"
       >
-        <Link
-          href={`/${locale}/shop/${product.slug}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="relative w-[250px] h-[250px] bg-white overflow-hidden mb-3 block"
-        >
         {displayImage ? (
           <Image
             src={getVariantUrl(displayImage.variants?.tablet) || getVariantUrl(displayImage.variants?.card) || getVariantUrl(displayImage.variants?.medium) || getVariantUrl(displayImage.variants?.large) || getVariantUrl(displayImage.variants?.thumbnail) || displayImage.url}
@@ -222,15 +202,10 @@ export function ProductCard({ product, locale, imageVariants, textVariants, prio
             </Link>
           </div>
         </div>
-        </Link>
-      </motion.div>
+      </Link>
 
-      {/* Product Info - with vertical animation */}
-      <motion.div
-        className="flex flex-col space-y-1 w-[250px]"
-        variants={defaultTextVariants}
-        transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1], delay: 0.1 }}
-      >
+      {/* Product Info */}
+      <div className="flex flex-col space-y-1 w-[250px]">
         {/* Product Name */}
         <Link
           href={`/${locale}/shop/${product.slug}`}
@@ -247,7 +222,7 @@ export function ProductCard({ product, locale, imageVariants, textVariants, prio
             {shortDescription}
           </p>
         )}
-      </motion.div>
+      </div>
     </div>
   )
 }
