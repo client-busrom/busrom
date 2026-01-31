@@ -87,6 +87,8 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
 
   // 用于动画的 key，切换系列时改变
   const [animationKey, setAnimationKey] = useState(0)
+  // 用于控制退出动画
+  const [isExiting, setIsExiting] = useState(false)
 
   // Fetch series for navigation
   const { data: seriesData } = useSWR<{ series: ProductSeries[] }>(
@@ -117,13 +119,21 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
     preload(url, fetcher)
   }, [locale, sortBy, sortDirection, featuredOnly])
 
-  // 切换系列
+  // 切换系列 - 先触发退出动画，再切换数据
   const handleSeriesChange = useCallback((newSeries: string) => {
-    if (newSeries === selectedSeries) return
-    setSelectedSeries(newSeries)
-    setCurrentPage(1)
-    setAnimationKey(prev => prev + 1) // 触发动画
-  }, [selectedSeries])
+    if (newSeries === selectedSeries || isExiting) return
+
+    // 先触发退出动画
+    setIsExiting(true)
+
+    // 等待退出动画完成后再切换数据
+    setTimeout(() => {
+      setSelectedSeries(newSeries)
+      setCurrentPage(1)
+      setAnimationKey(prev => prev + 1)
+      setIsExiting(false)
+    }, 400) // 退出动画时长
+  }, [selectedSeries, isExiting])
 
   // 监听 URL 参数变化
   useEffect(() => {
@@ -242,7 +252,7 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
       x: 30,
       scale: 0.95,
       transition: {
-        duration: 0.2,
+        duration: 0.35,
       }
     },
   }
@@ -424,7 +434,7 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
           )}
 
           <AnimatePresence mode="wait">
-            {filteredProducts.length === 0 ? (
+            {filteredProducts.length === 0 && !isExiting ? (
               <motion.div
                 key="no-results"
                 initial={{ opacity: 0 }}
@@ -441,18 +451,17 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
               </motion.div>
             ) : (
               <motion.div
-                key={`products-${animationKey}`}
+                key={`products-${animationKey}-${isExiting ? 'exit' : 'enter'}`}
                 className="flex flex-wrap justify-center gap-4 lg:gap-6 max-w-[1072px] mx-auto"
                 variants={containerVariants}
                 initial="hidden"
-                animate="visible"
+                animate={isExiting ? "exit" : "visible"}
                 exit="exit"
               >
                 {filteredProducts.map((product, index) => (
                   <motion.div
                     key={product.id}
                     variants={cardVariants}
-                    layout
                   >
                     <ProductCard
                       product={product}

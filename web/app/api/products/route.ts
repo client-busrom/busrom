@@ -225,7 +225,15 @@ export async function GET(request: NextRequest) {
       totalPages: data.totalPages,
     }
 
-    return NextResponse.json(apiResponse)
+    // 禁用 CDN 缓存，确保每次请求都获取最新数据
+    // API 路由不应被 CDN 缓存，因为不同查询参数返回不同结果
+    return NextResponse.json(apiResponse, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'CDN-Cache-Control': 'no-store',
+        'Surrogate-Control': 'no-store',
+      },
+    })
   } catch (error: any) {
     console.error('[Products API] Error:', error)
     console.error('[Products API] Error stack:', error?.stack)
