@@ -23,6 +23,7 @@ import {
 } from "lucide-react"
 
 const DESIGN_WIDTH = 1920
+const SCALE = 0.7
 
 interface MediaObject {
   id: string
@@ -123,7 +124,7 @@ export function BrandServicesSection({
   const [expandedItemIndex, setExpandedItemIndex] = useState<number | null>(null)
   const itemSectionRef = useRef<HTMLDivElement>(null)
 
-  const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
+  const vw = (px: number) => `${(px * SCALE / DESIGN_WIDTH) * 100}vw`
 
   const activeCategory = categories[activeCategoryIndex]
 
@@ -533,8 +534,9 @@ export function BrandServicesSection({
       {/* Bottom Section - Service Items */}
       <section
         ref={itemSectionRef}
-        className="hidden lg:block relative w-full mx-auto"
+        className="hidden lg:block relative mx-auto"
         style={{
+          width: vw(1920),
           height: vw(922),
           marginTop: vw(214),
         }}
@@ -543,8 +545,8 @@ export function BrandServicesSection({
         <div
           className="absolute inset-y-0"
           style={{
-            left: vw(350),
-            right: vw(192),
+            left: vw(200),
+            right: vw(200),
             borderRadius: vw(153),
             background: "#F1E8CB",
           }}
@@ -552,11 +554,11 @@ export function BrandServicesSection({
 
         {/* Content */}
         <div className="relative h-full">
-          {/* Left Side - Category Title & Navigation */}
+          {/* Left Side - Category Title & Navigation - 在背景板外面，标题一半在内一半在外 */}
           <div
             className="absolute"
             style={{
-              left: vw(158),
+              left: vw(100),
               top: vw(72),
             }}
           >
@@ -578,11 +580,11 @@ export function BrandServicesSection({
               </motion.h3>
             </AnimatePresence>
 
-            {/* Arrow decoration - positioned at x=269.93 relative to section, after title */}
+            {/* Arrow decoration - positioned after title with wave animation */}
             <div
               style={{
                 marginTop: vw(40),
-                marginLeft: vw(270 - 158),
+                marginLeft: 0,
               }}
             >
               <svg
@@ -593,16 +595,16 @@ export function BrandServicesSection({
                   height: vw(16),
                 }}
               >
-                <path d="M118.6 17L126.921 9L118.6 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M52.6415 17L60.9623 9L52.6415 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M105.69 17L114.011 9L105.69 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M39.7317 17L48.0525 9L39.7317 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M92.7805 17L101.099 9L92.7805 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M26.8217 17L35.1405 9L26.8217 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M79.8687 17L88.1895 9L79.8687 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M13.9099 17L22.2307 9L13.9099 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M66.9588 17L75.2796 9L66.9588 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M1 17L9.3208 9L1 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M1 17L9.3208 9L1 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0s" }}/>
+                <path d="M13.9099 17L22.2307 9L13.9099 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.1s" }}/>
+                <path d="M26.8217 17L35.1405 9L26.8217 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.2s" }}/>
+                <path d="M39.7317 17L48.0525 9L39.7317 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.3s" }}/>
+                <path d="M52.6415 17L60.9623 9L52.6415 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.4s" }}/>
+                <path d="M66.9588 17L75.2796 9L66.9588 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.5s" }}/>
+                <path d="M79.8687 17L88.1895 9L79.8687 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.6s" }}/>
+                <path d="M92.7805 17L101.099 9L92.7805 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.7s" }}/>
+                <path d="M105.69 17L114.011 9L105.69 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.8s" }}/>
+                <path d="M118.6 17L126.921 9L118.6 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.9s" }}/>
               </svg>
             </div>
 
@@ -680,11 +682,11 @@ export function BrandServicesSection({
             className="absolute"
             style={{
               left: vw(440),
-              right: vw(240),
+              right: vw(440),
               top: vw(308),
             }}
           >
-            <div className="flex justify-between items-start">
+            <div className="flex items-start justify-center" style={{ gap: vw(128) }}>
               <AnimatePresence mode="wait">
                 {activeCategory?.items.map((item, index) => {
                   const isExpanded = expandedItemIndex === index
@@ -712,15 +714,37 @@ export function BrandServicesSection({
                           width: vw(168),
                         }}
                       >
-                        {/* Icon */}
+                        {/* Icon with white circle background */}
                         <div
-                          className="text-black"
+                          className="relative"
                           style={{
-                            width: vw(58),
-                            height: vw(53),
+                            width: vw(64),
+                            height: vw(58),
                           }}
                         >
-                          <IconComponent className="w-full h-full" strokeWidth={1.5} />
+                          {/* White circle - left top */}
+                          <div
+                            className="absolute rounded-full"
+                            style={{
+                              width: vw(44),
+                              height: vw(44),
+                              backgroundColor: "#F8F7EA",
+                              left: 0,
+                              top: 0,
+                            }}
+                          />
+                          {/* Icon - right bottom */}
+                          <div
+                            className="absolute text-[#756F3F]"
+                            style={{
+                              width: vw(47),
+                              height: vw(50),
+                              right: 0,
+                              bottom: 0,
+                            }}
+                          >
+                            <IconComponent className="w-full h-full" strokeWidth={1.5} />
+                          </div>
                         </div>
 
                         {/* Title */}
@@ -768,15 +792,37 @@ export function BrandServicesSection({
                                   className="flex"
                                   style={{ gap: vw(24) }}
                                 >
-                                  {/* Icon */}
+                                  {/* Icon with circle background */}
                                   <div
-                                    className="text-black flex-shrink-0"
+                                    className="relative flex-shrink-0"
                                     style={{
-                                      width: vw(58),
-                                      height: vw(51),
+                                      width: vw(64),
+                                      height: vw(58),
                                     }}
                                   >
-                                    <IconComponent className="w-full h-full" strokeWidth={1.5} />
+                                    {/* Circle - left top */}
+                                    <div
+                                      className="absolute rounded-full"
+                                      style={{
+                                        width: vw(44),
+                                        height: vw(42),
+                                        backgroundColor: "#EFE8AD",
+                                        left: 0,
+                                        top: 0,
+                                      }}
+                                    />
+                                    {/* Icon - right bottom */}
+                                    <div
+                                      className="absolute text-[#756F3F]"
+                                      style={{
+                                        width: vw(47),
+                                        height: vw(50),
+                                        right: 0,
+                                        bottom: 0,
+                                      }}
+                                    >
+                                      <IconComponent className="w-full h-full" strokeWidth={1.5} />
+                                    </div>
                                   </div>
 
                                   {/* Title & Description */}

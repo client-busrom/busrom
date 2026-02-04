@@ -320,14 +320,14 @@ export default function Footer({ locale, showForm = true }: Props) {
               </ul>
 
               {/* 官方声明 */}
-              <div className="bg-brand-footer-emphasis-bg text-brand-footer-emphasis-text font-anaheim font-semibold p-3 md:p-4">
+              <div className="bg-brand-footer-emphasis-bg text-brand-footer-emphasis-text font-anaheim font-semibold p-3 md:p-4 pl-6 md:pl-8">
                 <h4 className="font-bold text-base md:text-lg lg:text-xl leading-normal mb-2 lg:mb-3">
                   {content.notice.title}
                 </h4>
-                <ul className="text-xs md:text-sm lg:text-base leading-relaxed space-y-2 md:space-y-3">
+                <ul className="text-xs md:text-sm lg:text-base leading-loose space-y-0">
                   {content.notice.lines.map((line, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="rounded-full bg-current flex-shrink-0 w-1 h-1 md:w-1.5 md:h-1.5 mt-1.5 md:mt-2"></span>
+                    <li key={index} className="flex items-start">
+                      <span className="rounded-full bg-current flex-shrink-0 w-1 h-1 md:w-1.5 md:h-1.5 mt-1.5 md:mt-2 -ml-3 md:-ml-4 mr-2 md:mr-2.5"></span>
                       <span>{line}</span>
                     </li>
                   ))}
@@ -524,14 +524,17 @@ export default function Footer({ locale, showForm = true }: Props) {
           </div>
 
           {/* 右侧：Official Notice */}
-          <div>
+          <div className="pl-4">
             {footerData.notice.title && <h4 className="font-bold text-lg mb-4 font-anaheim">{footerData.notice.title}</h4>}
             {footerData.notice.lines && footerData.notice.lines.length > 0 && (
-              <div className="text-sm space-y-2 font-anaheim">
+              <ul className="text-sm leading-loose space-y-0 font-anaheim">
                 {footerData.notice.lines.map((line, index) => (
-                  <p key={index}>{line}</p>
+                  <li key={index} className="flex items-start">
+                    <span className="rounded-full bg-current flex-shrink-0 w-1.5 h-1.5 mt-2 -ml-4 mr-2.5"></span>
+                    <span>{line}</span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
           </div>
         </div>
@@ -561,8 +564,8 @@ export default function Footer({ locale, showForm = true }: Props) {
           {/* 左侧占位 - 保持社交链接右对齐 */}
           <div className="hidden md:block md:flex-1"></div>
 
-          {/* 中间：Logo + 版权（居中） */}
-          <div className="flex items-center gap-3">
+          {/* 中间：Logo + 版权（上下结构，居中） */}
+          <div className="flex flex-col items-center gap-[20px]">
             <Image
               src="/Busrom1.svg"
               alt="Busrom Logo"

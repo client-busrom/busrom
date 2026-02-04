@@ -507,7 +507,7 @@ export function ServiceOverviewTemplate({ locale, pageContent }: ServiceOverview
 
   return (
     <div className="min-h-screen bg-background" data-header-theme="dark">
-      {/* Service Value Section */}
+      {/* Service Value Section - 全屏 */}
       <ServiceValueSection
         title={serviceValueTitle}
         slides={serviceValueSlides}
@@ -516,42 +516,50 @@ export function ServiceOverviewTemplate({ locale, pageContent }: ServiceOverview
         interval={5}
       />
 
-      {/* Brand Services Section */}
-      <BrandServicesSection
-        title={brandServicesData.title}
-        description={brandServicesData.description}
-        categories={brandServicesData.categories}
-        decorativeImages={brandServicesData.decorativeImages}
-      />
+      {/* Brand Services Section - 70%缩放（组件内部处理） */}
+      <div className="mt-8 lg:mt-[60px]">
+        <BrandServicesSection
+          title={brandServicesData.title}
+          description={brandServicesData.description}
+          categories={brandServicesData.categories}
+          decorativeImages={brandServicesData.decorativeImages}
+        />
+      </div>
 
-      {/* Contact Form Section */}
-      <ContactFormSection
-        locale={locale as any}
-        formName="service-overview-form"
-        backgroundImage={contactFormData.backgroundImage}
-      />
+      {/* Contact Form Section - 70%缩放（组件内部处理） */}
+      <div className="mt-8 lg:mt-[60px]">
+        <ContactFormSection
+          locale={locale as any}
+          formName="service-overview-form"
+          backgroundImage={contactFormData.backgroundImage}
+        />
+      </div>
 
-      {/* Applications Section */}
-      <ApplicationsSection
-        locale={locale}
-        titleLine1={applicationsData.titleLine1}
-        titleLine2={applicationsData.titleLine2}
-        highlightText={applicationsData.highlightText}
-        viewMoreLink={applicationsData.viewMoreLink.startsWith('/') ? `/${locale}${applicationsData.viewMoreLink}` : applicationsData.viewMoreLink}
-        viewMoreText={applicationsData.viewMoreText}
-        applicationIds={applicationsData.applicationIds}
-      />
+      {/* Applications Section - 70%缩放（组件内部处理） */}
+      <div className="mt-8 lg:mt-[60px]">
+        <ApplicationsSection
+          locale={locale}
+          titleLine1={applicationsData.titleLine1}
+          titleLine2={applicationsData.titleLine2}
+          highlightText={applicationsData.highlightText}
+          viewMoreLink={applicationsData.viewMoreLink.startsWith('/') ? `/${locale}${applicationsData.viewMoreLink}` : applicationsData.viewMoreLink}
+          viewMoreText={applicationsData.viewMoreText}
+          applicationIds={applicationsData.applicationIds}
+        />
+      </div>
 
-      {/* Simple CTA Section */}
-      <SimpleCtaSection
-        locale={locale}
-        title={simpleCtaData.title}
-        description={simpleCtaData.description}
-        ctaText={simpleCtaData.ctaText}
-        buttonText={simpleCtaData.buttonText}
-        buttonLink={simpleCtaData.buttonLink}
-        images={simpleCtaData.images}
-      />
+      {/* Simple CTA Section - 70%缩放（组件内部处理） */}
+      <div className="mt-8 pb-8 lg:mt-[60px] lg:pb-[60px]">
+        <SimpleCtaSection
+          locale={locale}
+          title={simpleCtaData.title}
+          description={simpleCtaData.description}
+          ctaText={simpleCtaData.ctaText}
+          buttonText={simpleCtaData.buttonText}
+          buttonLink={simpleCtaData.buttonLink}
+          images={simpleCtaData.images}
+        />
+      </div>
     </div>
   )
 }
