@@ -15,6 +15,7 @@ import {
 import type { Locale } from "@/i18n.config"
 
 const DESIGN_WIDTH = 1920
+const SCALE = 0.7
 
 // Service type icon mapping
 const serviceTypeIcons: Record<string, React.FC<{ className?: string; strokeWidth?: number }>> = {
@@ -120,7 +121,9 @@ export function ContactFormSection({
   phone = "+86 13426931306",
   footerNote = "We will get back to you within 24 working hours\n(except all major holidays)",
 }: ContactFormSectionProps) {
-  const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
+  const vw = (px: number) => `${(px * SCALE / DESIGN_WIDTH) * 100}vw`
+  // 全宽元素不缩放
+  const vwFull = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
 
   const [formConfig, setFormConfig] = useState<FormConfig | null>(null)
   const [formData, setFormData] = useState<Record<string, any>>({})
@@ -948,303 +951,288 @@ export function ContactFormSection({
       </div>
 
       {/* ==================== Desktop Layout ==================== */}
-      <div className="hidden lg:block relative w-full" style={{ width: vw(1920), height: vw(1585) }}>
-      {/* Background */}
-      <div className="absolute inset-0 bg-[#6E6839]">
-        {backgroundImage && (
-          <OptimizedImage
-            image={backgroundImage as any}
-            alt="Contact form background"
-            size="xlarge"
-            className="w-full h-full object-cover opacity-50"
-          />
-        )}
-        {/* Blur overlay */}
-        <div className="absolute inset-0" style={{ backdropFilter: `blur(${vw(7.5)})` }} />
-      </div>
-
-      {/* Decorative Mask with gradient glow */}
-      <div
-        className="absolute overflow-hidden"
-        style={{
-          left: vw(178),
-          top: vw(131),
-          width: vw(1600),
-          height: vw(1351),
-          borderRadius: vw(52),
-          backdropFilter: `blur(${vw(18.7)})`,
-          background: "rgba(117, 111, 63, 0.36)",
-        }}
-      >
-        {/* Radial gradient glow at bottom-left - ellipse fading outward */}
-        <svg
-          className="absolute pointer-events-none"
-          style={{
-            left: vw(-1018),
-            top: vw(260),
-            width: vw(2173),
-            height: vw(2257),
-          }}
-          viewBox="0 0 2173 2257"
-          fill="none"
-          preserveAspectRatio="none"
-        >
-          <defs>
-            <radialGradient id="contactGlow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-              <stop offset="0%" stopColor="#CFBE38" stopOpacity="0.93" />
-              <stop offset="100%" stopColor="#998D2D" stopOpacity="0" />
-            </radialGradient>
-          </defs>
-          <ellipse cx="1086.5" cy="1128.5" rx="1086.5" ry="1128.26" fill="url(#contactGlow)" />
-        </svg>
-      </div>
-
-      {/* Content Container */}
-      <div className="relative h-full">
-        {/* Left Side - Contact Info */}
-        <div className="absolute" style={{ left: vw(274), top: vw(228) }}>
-          {/* Main Title - Need More Assistance? */}
-          <h2 className="font-anaheim font-extrabold" style={{ fontSize: vw(85), lineHeight: vw(98) }}>
-            {/* Need - white fill with yellow stroke */}
-            <span
-              className="text-white"
-              style={{
-                WebkitTextStroke: `${vw(2)} #FFEF72`,
-                paintOrder: "stroke fill",
-              }}
-            >
-              Need{" "}
-            </span>
-            {/* More - hollow outline text */}
-            <span
-              className="font-paytone-one"
-              style={{
-                fontSize: vw(85),
-                lineHeight: vw(98),
-                WebkitTextStroke: `${vw(0.5)} #FFEF72`,
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              More
-            </span>
-            <br />
-            {/* Assistance? - white fill with yellow stroke */}
-            <span
-              className="text-white"
-              style={{
-                WebkitTextStroke: `${vw(2)} #FFEF72`,
-                paintOrder: "stroke fill",
-              }}
-            >
-              Assistance?
-            </span>
-          </h2>
+      <div className="hidden lg:block relative w-full" style={{ height: vwFull(922) }}>
+        {/* Background - 全宽 */}
+        <div className="absolute inset-0 bg-[#6E6839]">
+          {backgroundImage && (
+            <OptimizedImage
+              image={backgroundImage as any}
+              alt="Contact form background"
+              size="xlarge"
+              className="w-full h-full object-cover opacity-50"
+            />
+          )}
+          {/* Blur overlay */}
+          <div className="absolute inset-0" style={{ backdropFilter: `blur(${vwFull(7.5)})` }} />
         </div>
 
-        {/* Subtitle - Manual Service Request */}
-        <p
-          className="absolute font-anaheim font-extrabold"
-          style={{
-            left: vw(278),
-            top: vw(522),
-            fontSize: vw(40),
-            lineHeight: vw(98),
-            color: "#FFF071",
-          }}
-        >
-          {subtitle}
-        </p>
-
-        {/* Description */}
-        <p
-          className="absolute font-anaheim font-normal text-white"
-          style={{
-            left: vw(274),
-            top: vw(609),
-            width: vw(475),
-            fontSize: vw(24),
-            lineHeight: vw(40),
-          }}
-        >
-          {description}
-        </p>
-
-        {/* Email Label */}
-        <p
-          className="absolute font-anaheim font-semibold text-white/70"
-          style={{
-            left: vw(270),
-            top: vw(947),
-            fontSize: vw(24),
-            lineHeight: vw(54),
-          }}
-        >
-          Email
-        </p>
-
-        {/* Email Value */}
-        <p
-          className="absolute font-anaheim font-semibold text-white"
-          style={{
-            left: vw(270),
-            top: vw(1012),
-            fontSize: vw(40),
-            lineHeight: vw(54),
-          }}
-        >
-          {email}
-        </p>
-
-        {/* Phone Label */}
-        <p
-          className="absolute font-anaheim font-semibold text-white/70"
-          style={{
-            left: vw(270),
-            top: vw(1140),
-            fontSize: vw(24),
-            lineHeight: vw(54),
-          }}
-        >
-          Phone / WhatsApp
-        </p>
-
-        {/* Phone Value */}
-        <p
-          className="absolute font-anaheim font-semibold text-white"
-          style={{
-            left: vw(270),
-            top: vw(1205),
-            fontSize: vw(45),
-            lineHeight: vw(54),
-          }}
-        >
-          {phone}
-        </p>
-
-        {/* Footer Note */}
-        <p
-          className="absolute font-anaheim font-semibold text-white whitespace-pre-line"
-          style={{
-            left: vw(274),
-            top: vw(1345),
-            width: vw(428),
-            fontSize: vw(16),
-            lineHeight: vw(30),
-          }}
-        >
-          {footerNote}
-        </p>
-
-        {/* Right Side - Form */}
-        <div className="absolute" style={{ left: vw(965), top: vw(239), width: vw(715) }}>
-          {/* Form Header */}
-          <h3
-            className="font-anaheim font-semibold text-white"
+        {/* 内容居中容器 - 全宽 */}
+        <div className="relative w-full h-full">
+          {/* Decorative Mask with gradient glow - 垂直居中 */}
+          <div
+            className="absolute overflow-hidden left-1/2 top-1/2"
             style={{
-              fontSize: vw(42),
-              lineHeight: vw(61),
-              marginBottom: vw(42),
+              transform: "translate(-50%, -50%)",
+              width: vwFull(1120),
+              height: vwFull(800),
+              borderRadius: vwFull(52),
+              backdropFilter: `blur(${vwFull(18.7)})`,
+              background: "rgba(117, 111, 63, 0.36)",
             }}
           >
-            Send us an inquiry via the following contact details
-          </h3>
-
-          {loading ? (
-            <div className="flex items-center justify-center" style={{ paddingTop: vw(48), paddingBottom: vw(48) }}>
-              <div
-                className="border-2 border-white border-t-transparent rounded-full animate-spin"
-                style={{ width: vw(32), height: vw(32) }}
-              />
-            </div>
-          ) : submitted ? (
-            <div
-              className="bg-white/20 backdrop-blur-sm text-center"
-              style={{ borderRadius: vw(15), padding: vw(32) }}
+            {/* Radial gradient glow at bottom-left - ellipse fading outward */}
+            <svg
+              className="absolute pointer-events-none"
+              style={{
+                left: vwFull(-1018),
+                top: vwFull(260),
+                width: vwFull(2173),
+                height: vwFull(2257),
+              }}
+              viewBox="0 0 2173 2257"
+              fill="none"
+              preserveAspectRatio="none"
             >
-              <svg
-                className="text-[#FFF071] mx-auto"
-                style={{ width: vw(64), height: vw(64), marginBottom: vw(16) }}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <h3
-                className="font-anaheim font-bold text-white"
-                style={{ fontSize: vw(20), marginBottom: vw(8) }}
-              >
-                Success!
-              </h3>
-              <p className="text-white/80" style={{ fontSize: vw(16) }}>
-                {formConfig?.successMessage || "Your message has been sent successfully!"}
-              </p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: vw(14) }}>
-              {/* Name & Email Row */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: vw(37) }}>
-                {fields.nameEmail.slice(0, 2).map((field) => (
-                  <div key={field.fieldName}>{renderField(field)}</div>
-                ))}
-              </div>
+              <defs>
+                <radialGradient id="contactGlow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                  <stop offset="0%" stopColor="#CFBE38" stopOpacity="0.93" />
+                  <stop offset="100%" stopColor="#998D2D" stopOpacity="0" />
+                </radialGradient>
+              </defs>
+              <ellipse cx="1086.5" cy="1128.5" rx="1086.5" ry="1128.26" fill="url(#contactGlow)" />
+            </svg>
+          </div>
 
-              {/* Service Type Checkboxes */}
-              {fields.serviceType && renderField(fields.serviceType)}
-
-              {/* Description Textarea */}
-              {fields.description && renderField(fields.description)}
-
-              {/* File Upload */}
-              {fields.file && renderField(fields.file)}
-
-              {/* Captcha */}
-              {shouldShowCaptcha && formConfig?.captchaSiteKey && (
-                <div className="flex justify-center" style={{ paddingTop: vw(16), paddingBottom: vw(16) }}>
-                  <Turnstile
-                    siteKey={formConfig.captchaSiteKey}
-                    onVerify={handleTurnstileVerify}
-                    onError={handleTurnstileError}
-                    onExpire={handleTurnstileExpire}
-                    theme={formConfig.captchaTheme}
-                    size={formConfig.captchaSize}
-                    language={locale === "zh" ? "zh-CN" : locale}
-                  />
-                </div>
-              )}
-
-              {/* Error Message */}
-              {error && (
-                <div
-                  className="bg-red-500/20 border border-red-500/50 text-red-200"
-                  style={{ borderRadius: vw(15), padding: vw(16), fontSize: vw(14) }}
+          {/* Content Container - 垂直居中，内容用vw缩放 */}
+          <div
+            className="absolute left-1/2 top-1/2"
+            style={{
+              transform: "translate(-50%, -50%)",
+              width: vwFull(1120),
+              height: vwFull(800),
+            }}
+          >
+            {/* Left Side - Title Section (左上角定位) */}
+            <div className="absolute" style={{ left: vw(60), top: vw(50) }}>
+              {/* Main Title - Need More Assistance? */}
+              <h2 className="font-anaheim font-extrabold" style={{ fontSize: vw(85), lineHeight: vw(98) }}>
+                {/* Need - white fill with yellow stroke */}
+                <span
+                  className="text-white"
+                  style={{
+                    WebkitTextStroke: `${vw(2)} #FFEF72`,
+                    paintOrder: "stroke fill",
+                  }}
                 >
-                  {error}
-                </div>
-              )}
+                  Need{" "}
+                </span>
+                {/* More - hollow outline text */}
+                <span
+                  className="font-paytone-one"
+                  style={{
+                    fontSize: vw(85),
+                    lineHeight: vw(98),
+                    WebkitTextStroke: `${vw(0.5)} #FFEF72`,
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  More
+                </span>
+                <br />
+                {/* Assistance? - white fill with yellow stroke */}
+                <span
+                  className="text-white"
+                  style={{
+                    WebkitTextStroke: `${vw(2)} #FFEF72`,
+                    paintOrder: "stroke fill",
+                  }}
+                >
+                  Assistance?
+                </span>
+              </h2>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={submitting || (shouldShowCaptcha && !turnstileToken)}
-                className="w-full bg-[#B2A224] text-white font-anaheim font-semibold hover:bg-[#9A8C1E] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              {/* Subtitle - Manual Service Request */}
+              <p
+                className="font-anaheim font-extrabold"
                 style={{
-                  height: vw(72),
-                  borderRadius: vw(63),
-                  fontSize: vw(23),
+                  marginTop: vw(30),
+                  fontSize: vw(40),
+                  lineHeight: vw(50),
+                  color: "#FFF071",
                 }}
               >
-                {submitting ? "Sending..." : formConfig?.submitButtonText || "Send Inquiry"}
-              </button>
-            </form>
-          )}
+                {subtitle}
+              </p>
+
+              {/* Description */}
+              <p
+                className="font-anaheim font-normal text-white"
+                style={{
+                  marginTop: vw(20),
+                  width: vw(475),
+                  fontSize: vw(24),
+                  lineHeight: vw(36),
+                }}
+              >
+                {description}
+              </p>
+            </div>
+
+            {/* Left Side - Contact Info (左下角定位) */}
+            <div className="absolute" style={{ left: vw(60), bottom: vw(50) }}>
+              {/* Email */}
+              <p
+                className="font-anaheim font-semibold text-white/70"
+                style={{ fontSize: vw(20), lineHeight: vw(30) }}
+              >
+                Email
+              </p>
+              <p
+                className="font-anaheim font-semibold text-white"
+                style={{ fontSize: vw(32), lineHeight: vw(40), marginTop: vw(8) }}
+              >
+                {email}
+              </p>
+
+              {/* Phone */}
+              <p
+                className="font-anaheim font-semibold text-white/70"
+                style={{ fontSize: vw(20), lineHeight: vw(30), marginTop: vw(30) }}
+              >
+                Phone / WhatsApp
+              </p>
+              <p
+                className="font-anaheim font-semibold text-white"
+                style={{ fontSize: vw(36), lineHeight: vw(44), marginTop: vw(8) }}
+              >
+                {phone}
+              </p>
+
+              {/* Footer Note */}
+              <p
+                className="font-anaheim font-semibold text-white whitespace-pre-line"
+                style={{
+                  marginTop: vw(30),
+                  width: vw(428),
+                  fontSize: vw(14),
+                  lineHeight: vw(24),
+                }}
+              >
+                {footerNote}
+              </p>
+            </div>
+
+            {/* Right Side - Form */}
+            <div className="absolute" style={{ left: vw(750), top: vw(50), width: vw(715) }}>
+              {/* Form Header */}
+              <h3
+                className="font-anaheim font-semibold text-white"
+                style={{
+                  fontSize: vw(42),
+                  lineHeight: vw(61),
+                  marginBottom: vw(42),
+                }}
+              >
+                Send us an inquiry via the following contact details
+              </h3>
+
+              {loading ? (
+                <div className="flex items-center justify-center" style={{ paddingTop: vw(48), paddingBottom: vw(48) }}>
+                  <div
+                    className="border-2 border-white border-t-transparent rounded-full animate-spin"
+                    style={{ width: vw(32), height: vw(32) }}
+                  />
+                </div>
+              ) : submitted ? (
+                <div
+                  className="bg-white/20 backdrop-blur-sm text-center"
+                  style={{ borderRadius: vw(15), padding: vw(32) }}
+                >
+                  <svg
+                    className="text-[#FFF071] mx-auto"
+                    style={{ width: vw(64), height: vw(64), marginBottom: vw(16) }}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <h3
+                    className="font-anaheim font-bold text-white"
+                    style={{ fontSize: vw(20), marginBottom: vw(8) }}
+                  >
+                    Success!
+                  </h3>
+                  <p className="text-white/80" style={{ fontSize: vw(16) }}>
+                    {formConfig?.successMessage || "Your message has been sent successfully!"}
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: vw(14) }}>
+                  {/* Name & Email Row */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: vw(37) }}>
+                    {fields.nameEmail.slice(0, 2).map((field) => (
+                      <div key={field.fieldName}>{renderField(field)}</div>
+                    ))}
+                  </div>
+
+                  {/* Service Type Checkboxes */}
+                  {fields.serviceType && renderField(fields.serviceType)}
+
+                  {/* Description Textarea */}
+                  {fields.description && renderField(fields.description)}
+
+                  {/* File Upload */}
+                  {fields.file && renderField(fields.file)}
+
+                  {/* Captcha */}
+                  {shouldShowCaptcha && formConfig?.captchaSiteKey && (
+                    <div className="flex justify-center" style={{ paddingTop: vw(16), paddingBottom: vw(16) }}>
+                      <Turnstile
+                        siteKey={formConfig.captchaSiteKey}
+                        onVerify={handleTurnstileVerify}
+                        onError={handleTurnstileError}
+                        onExpire={handleTurnstileExpire}
+                        theme={formConfig.captchaTheme}
+                        size={formConfig.captchaSize}
+                        language={locale === "zh" ? "zh-CN" : locale}
+                      />
+                    </div>
+                  )}
+
+                  {/* Error Message */}
+                  {error && (
+                    <div
+                      className="bg-red-500/20 border border-red-500/50 text-red-200"
+                      style={{ borderRadius: vw(15), padding: vw(16), fontSize: vw(14) }}
+                    >
+                      {error}
+                    </div>
+                  )}
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={submitting || (shouldShowCaptcha && !turnstileToken)}
+                    className="w-full bg-[#B2A224] text-white font-anaheim font-semibold hover:bg-[#9A8C1E] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      height: vw(72),
+                      borderRadius: vw(63),
+                      fontSize: vw(23),
+                    }}
+                  >
+                    {submitting ? "Sending..." : formConfig?.submitButtonText || "Send Inquiry"}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
       </div>
     </section>
   )

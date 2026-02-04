@@ -33,6 +33,7 @@ interface SimpleCtaSectionProps {
 
 // Design constants
 const DESIGN_WIDTH = 1920
+const SCALE = 0.7
 
 export function SimpleCtaSection({
   locale,
@@ -43,8 +44,8 @@ export function SimpleCtaSection({
   buttonLink = "/contact-us",
   images = [],
 }: SimpleCtaSectionProps) {
-  // vw conversion function
-  const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
+  // vw conversion function with 70% scale
+  const vw = (px: number) => `${(px * SCALE / DESIGN_WIDTH) * 100}vw`
 
   // Embla carousel for mobile images
   const [emblaRef] = useEmblaCarousel({
@@ -126,9 +127,10 @@ export function SimpleCtaSection({
 
       {/* ==================== Desktop Layout (vw scaling) ==================== */}
       <div
-        className="hidden lg:block relative"
+        className="hidden lg:block relative mx-auto"
         style={{
           height: vw(922),
+          width: vw(1920),
         }}
       >
         {/* Gradient Background */}

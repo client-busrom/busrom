@@ -122,11 +122,10 @@ const FeatureItem = ({
     />
     {/* Text - above dot */}
     <motion.p
-      className={`absolute font-josefin-sans font-semibold z-10 ${align === "right" ? "text-right" : "text-left"}`}
+      className={`absolute font-josefin-sans font-semibold z-10 whitespace-pre ${align === "right" ? "text-right" : "text-left"}`}
       style={{
         left: rpx(x - Math.min(x, dotX) + 10),
         top: rpx(y - Math.min(y, dotY) + 10),
-        width: rpx(width),
         fontSize: rpx(20),
         lineHeight: rpx(26),
         color: "#46401F",

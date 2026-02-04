@@ -8,6 +8,7 @@ import AutoScroll from "embla-carousel-auto-scroll"
 import { AnimatedLinkButton } from "@/components/ui/animated-link-button"
 
 const DESIGN_WIDTH = 1920
+const SCALE = 0.7
 
 interface MediaObject {
   id: string
@@ -65,7 +66,7 @@ export function ApplicationsSection({
   viewMoreLink = "/applications",
   viewMoreText = "VIEW MORE",
 }: ApplicationsSectionProps) {
-  const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
+  const vw = (px: number) => `${(px * SCALE / DESIGN_WIDTH) * 100}vw`
 
   const [applications, setApplications] = useState<ApplicationItem[]>(initialApplications || [])
   const [loading, setLoading] = useState(!initialApplications)
