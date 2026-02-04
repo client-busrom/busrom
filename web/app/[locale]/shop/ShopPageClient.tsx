@@ -258,9 +258,9 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F0]" data-header-theme="light">
+    <div className="min-h-screen bg-[#F6F4ED]" data-header-theme="light">
       {/* Series Title */}
-      <div className="container mx-auto px-4 lg:px-8 pt-20 lg:pt-[78px] overflow-hidden">
+      <div className="container mx-auto px-4 lg:px-8 pt-[78px] lg:pt-[130px] overflow-hidden">
         <div className="relative h-[52px] lg:h-[68px] flex items-center justify-center">
           <AnimatePresence mode="wait">
             <motion.h1
@@ -278,7 +278,7 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
       </div>
 
       {/* Product Series Tabs Navigation */}
-      <nav className="bg-[#F5F5F0] mt-2 lg:mt-3">
+      <nav className="bg-[#F6F4ED] mt-2 lg:mt-3">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex items-center justify-center py-3 lg:py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 lg:gap-x-6 lg:gap-y-4 max-w-[calc(7*140px)]">
@@ -318,10 +318,10 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
       </nav>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 lg:px-8 pt-5 lg:pt-6 pb-8 lg:pb-12">
+      <main className="container mx-auto px-4 lg:px-8 pt-[60px] lg:pt-[100px] pb-8 lg:pb-12">
 
         {/* Filter Toolbar */}
-        <div className="bg-white rounded-lg shadow-sm px-4 py-3 mb-6 lg:mb-8 max-w-[1072px] mx-auto">
+        <div className="bg-white rounded-lg shadow-sm px-4 py-3 mb-[39px] lg:mb-[65px] max-w-[1072px] mx-auto">
           <div className="flex items-center gap-4">
             {/* Left: Combined Filter & Sort */}
             <div className="relative" ref={filterSortRef}>

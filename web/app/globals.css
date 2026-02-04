@@ -600,6 +600,62 @@ select:-webkit-autofill:active {
   animation: arrowPulse 3s ease-in-out infinite;
 }
 
+/* 波浪透明度动画 - 用于箭头从左到右依次亮起 */
+@keyframes pulseWave {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-pulse-wave {
+  animation: pulseWave 2s ease-in-out infinite;
+}
+
+/* 虚线流动动画 - 顺时针方向 */
+@keyframes dashFlow {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -48; /* dasharray 10+14=24，两个周期 */
+  }
+}
+
+.animate-dash-flow {
+  animation: dashFlow 1.5s linear infinite;
+}
+
+/* 虚线流动动画 - 逆时针方向 */
+@keyframes dashFlowReverse {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 48;
+  }
+}
+
+.animate-dash-flow-reverse {
+  animation: dashFlowReverse 1.5s linear infinite;
+}
+
+/* 慢速旋转动画 - 用于虚线圆圈 */
+@keyframes spinSlow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 10s linear infinite;
+}
+
 /* 渐变文字光泽扫过动画 - 白色渐变版本 (从左上往右下扫过) */
 @keyframes gradientSweepWhiteDiagonal {
   0%, 100% {
