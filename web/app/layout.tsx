@@ -62,7 +62,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  // This root layout should NOT render html/body tags when using [locale] layout
-  // The [locale]/layout.tsx will handle the html/body tags with proper locale
-  return children
+  return (
+    <html>
+      <body>{children}</body>
+    </html>
+  )
 }

@@ -9,7 +9,7 @@ const DESIGN_WIDTH = 1920
 const DESIGN_HEIGHT = 645 // 922 * 0.7
 
 // 响应式尺寸函数
-const rpx = (designValue: number) => `calc(var(--rpx-service-intro) * ${designValue})`
+const rpx = (designValue: number) => `calc(var(--rpx-odm-service-intro) * ${designValue})`
 
 interface MediaObject {
   id: string
@@ -34,25 +34,19 @@ interface TextSegment {
   underline?: boolean
 }
 
-interface OemOdmServiceIntroductionProps {
+interface OdmServiceIntroductionProps {
   // 右侧图片
   image?: MediaObject | null
   // 右上角格式化文本片段
   topDescriptionSegments?: TextSegment[]
   // 左下角格式化文本片段
   leftDescriptionSegments?: TextSegment[]
-  // OEM 标题文字
-  oemTitle?: string
-  // Service 文字
-  serviceTitle?: string
-  // Introduction 文字
-  introductionTitle?: string
 }
 
 const defaultContent = {
   topDescriptionSegments: [
     { text: "Relying on years of industry accumulation and professional technical capabilities, we provide customers with comprehensive " },
-    { text: "OEM cooperation", bold: true },
+    { text: "ODM cooperation", bold: true },
     { text: " services to help brands create differentiated high-quality products." },
   ] as TextSegment[],
   leftDescriptionSegments: [
@@ -62,21 +56,18 @@ const defaultContent = {
   ] as TextSegment[],
 }
 
-export function OemOdmServiceIntroduction({
+export function OdmServiceIntroduction({
   image,
   topDescriptionSegments = defaultContent.topDescriptionSegments,
   leftDescriptionSegments = defaultContent.leftDescriptionSegments,
-  oemTitle = "OEM",
-  serviceTitle = "Service",
-  introductionTitle = "Introduction",
-}: OemOdmServiceIntroductionProps) {
+}: OdmServiceIntroductionProps) {
   const [isArrowHovered, setIsArrowHovered] = useState(false)
 
   return (
     <section
       className="relative w-full overflow-hidden"
       style={{
-        ["--rpx-service-intro" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
+        ["--rpx-odm-service-intro" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
       }}
     >
       {/* ========== PC端布局 ========== */}
@@ -90,7 +81,7 @@ export function OemOdmServiceIntroduction({
             height: rpx(DESIGN_HEIGHT),
           }}
         >
-        {/* 背景矩形 - 渐变背景 */}
+        {/* 背景矩形 - 渐变背景（与外层渐变顶部一致） */}
         <div
           className="absolute"
           style={{
@@ -98,12 +89,12 @@ export function OemOdmServiceIntroduction({
             top: rpx(52), // 74 * 0.7
             width: rpx(1302), // 1860 * 0.7
             height: rpx(576), // 823 * 0.7
-            background: "linear-gradient(180deg, #756F3F 0%, #58522B 100%)",
+            background: "linear-gradient(180deg, #EDE9C7 0%, #D1CB93 100%)",
             borderRadius: rpx(21), // 30 * 0.7
           }}
         />
 
-        {/* 左上角 OEM 大标题 - text-shadow 模拟外描边 */}
+        {/* 左上角 ODM 大标题 - 镂空效果（两层叠加） */}
         <motion.div
           className="absolute"
           style={{
@@ -115,29 +106,37 @@ export function OemOdmServiceIntroduction({
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
         >
+          {/* 底层 - 描边色填充 + text-shadow 扩展 */}
           <span
-            className="font-anaheim font-bold uppercase"
+            className="absolute font-anaheim font-bold uppercase"
             style={{
               fontSize: rpx(126), // 180 * 0.7
               lineHeight: rpx(120), // 171 * 0.7
-              color: "#756F3F",
+              color: "#464010",
               textShadow: `
-                -2px -2px 0 #ffffff,
-                2px -2px 0 #ffffff,
-                -2px 2px 0 #ffffff,
-                2px 2px 0 #ffffff,
-                0px -2px 0 #ffffff,
-                0px 2px 0 #ffffff,
-                -2px 0px 0 #ffffff,
-                2px 0px 0 #ffffff,
-                -3px 0px 0 #ffffff,
-                3px 0px 0 #ffffff,
-                0px -3px 0 #ffffff,
-                0px 3px 0 #ffffff
+                -2px -2px 0 #464010,
+                2px -2px 0 #464010,
+                -2px 2px 0 #464010,
+                2px 2px 0 #464010,
+                0px -2px 0 #464010,
+                0px 2px 0 #464010,
+                -2px 0px 0 #464010,
+                2px 0px 0 #464010
               `,
             }}
           >
-            {oemTitle}
+            ODM
+          </span>
+          {/* 上层 - 背景色填充，挖空中间 */}
+          <span
+            className="relative font-anaheim font-bold uppercase"
+            style={{
+              fontSize: rpx(126), // 180 * 0.7
+              lineHeight: rpx(120), // 171 * 0.7
+              color: "#EDE9C7",
+            }}
+          >
+            ODM
           </span>
         </motion.div>
 
@@ -154,13 +153,14 @@ export function OemOdmServiceIntroduction({
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <div
-            className="font-anaheim font-extrabold text-white"
+            className="font-anaheim font-extrabold"
             style={{
               fontSize: rpx(45), // 64 * 0.7
               lineHeight: rpx(53), // 75 * 0.7
+              color: "#59542A",
             }}
           >
-            {serviceTitle}
+            Service
           </div>
           {/* Introduction 双层叠字 */}
           <div className="relative">
@@ -170,7 +170,7 @@ export function OemOdmServiceIntroduction({
               style={{
                 fontSize: rpx(45), // 64 * 0.7
                 lineHeight: rpx(53), // 75 * 0.7
-                backgroundImage: "linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0) 100%)",
+                backgroundImage: "linear-gradient(180deg, #59542A 0%, rgba(89,84,42,0) 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
@@ -178,7 +178,7 @@ export function OemOdmServiceIntroduction({
                 opacity: 0.5,
               }}
             >
-              {introductionTitle}
+              Introduction
             </div>
             {/* 上层主文字 */}
             <div
@@ -186,13 +186,13 @@ export function OemOdmServiceIntroduction({
               style={{
                 fontSize: rpx(45), // 64 * 0.7
                 lineHeight: rpx(53), // 75 * 0.7
-                backgroundImage: "linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0) 100%)",
+                backgroundImage: "linear-gradient(180deg, #59542A 0%, rgba(89,84,42,0) 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
               }}
             >
-              {introductionTitle}
+              Introduction
             </div>
           </div>
         </motion.div>
@@ -211,14 +211,14 @@ export function OemOdmServiceIntroduction({
           <svg width="100%" height="100%" viewBox="0 0 283 30" fill="none" preserveAspectRatio="none">
             <path
               d="M0 15H283"
-              stroke="url(#gradient-line)"
+              stroke="url(#odm-gradient-line)"
               strokeWidth="2"
               strokeOpacity="0.52"
             />
             <defs>
-              <linearGradient id="gradient-line" x1="0" y1="0" x2="283" y2="0">
-                <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
-                <stop offset="100%" stopColor="#ffffff" stopOpacity="1" />
+              <linearGradient id="odm-gradient-line" x1="0" y1="0" x2="283" y2="0">
+                <stop offset="0%" stopColor="#59542A" stopOpacity="0" />
+                <stop offset="100%" stopColor="#59542A" stopOpacity="1" />
               </linearGradient>
             </defs>
           </svg>
@@ -246,7 +246,7 @@ export function OemOdmServiceIntroduction({
               cx="64"
               cy="64"
               r="63"
-              stroke={isArrowHovered ? "#FFF3BD" : "#514B1A"}
+              stroke={isArrowHovered ? "#756F3F" : "#9B9565"}
               strokeWidth="2"
               strokeDasharray="9 9"
               className="animate-spin-slow transition-colors duration-300"
@@ -255,7 +255,7 @@ export function OemOdmServiceIntroduction({
             {/* 静止的箭头 */}
             <path
               d="M84.9806 80.1714L85.0033 80.141C85.3002 79.7327 85.4653 79.2435 85.4766 78.7388L85.4771 78.7093L85.4765 78.7175C85.4901 78.5243 85.4849 78.3303 85.461 78.1381L85.4537 78.0836L81.9007 53.2242C81.6681 51.5963 80.1598 50.4667 78.5322 50.7013L78.4835 50.7088C76.8823 50.9662 75.7766 52.4618 76.0068 54.0731L78.6112 72.2946L46.4689 48.2213C45.3712 47.3992 43.8141 47.6237 42.9912 48.7224L42.7825 49.0011C41.9888 50.0981 42.2178 51.6325 43.3045 52.4464L75.4468 76.5197L57.2285 79.1458C55.601 79.3804 54.4705 80.8899 54.7031 82.5177C54.9357 84.1455 56.4439 85.2752 58.0715 85.0406L82.9287 81.4574L82.9809 81.4494C83.1546 81.4212 83.3255 81.3776 83.4916 81.3193L83.5337 81.3042L83.5256 81.3067C84.0338 81.1538 84.4795 80.8418 84.797 80.4165L84.9806 80.1714Z"
-              fill={isArrowHovered ? "#FFF3BD" : "#514B1A"}
+              fill={isArrowHovered ? "#756F3F" : "#9B9565"}
               className="transition-colors duration-300"
             />
           </svg>
@@ -269,20 +269,21 @@ export function OemOdmServiceIntroduction({
             top: rpx(52), // 74 * 0.7
             width: rpx(1), // 2 * 0.7
             height: rpx(111), // 158 * 0.7
-            backgroundColor: "rgba(255,255,255,0.27)",
+            backgroundColor: "rgba(89,84,42,0.27)",
             borderRadius: rpx(19), // 27 * 0.7
           }}
         />
 
         {/* 右上角描述文字 */}
         <motion.p
-          className="absolute font-anaheim text-white"
+          className="absolute font-anaheim"
           style={{
             left: rpx(580), // 828 * 0.7
             top: rpx(60), // 85 * 0.7
             width: rpx(725), // 1035 * 0.7
             fontSize: rpx(22), // 32 * 0.7
             lineHeight: rpx(36), // 51 * 0.7
+            color: "#59542A",
             zIndex: 10,
           }}
           initial={{ opacity: 0, y: 20 }}
@@ -298,14 +299,14 @@ export function OemOdmServiceIntroduction({
                 <span
                   key={index}
                   className="relative inline-block font-anaheim font-extrabold"
-                  style={{ fontSize: rpx(25), lineHeight: rpx(36) }} // 36 * 0.7
+                  style={{ fontSize: rpx(34), lineHeight: rpx(36) }} // 48 * 0.7
                 >
-                  {/* 下层 - 深色 + 外描边，向右下偏移2rpx */}
+                  {/* 下层 - #9E8C00 填充 + #FFF392 外描边，向右下偏移 */}
                   <span
                     className="absolute font-anaheim font-extrabold"
                     style={{
-                      fontSize: rpx(25), // 36 * 0.7
-                      color: "#413A03",
+                      fontSize: rpx(34), // 48 * 0.7
+                      color: "#9E8C00",
                       left: rpx(3), // 4 * 0.7
                       top: rpx(3), // 4 * 0.7
                       textShadow: `
@@ -322,12 +323,12 @@ export function OemOdmServiceIntroduction({
                   >
                     {segment.text}
                   </span>
-                  {/* 上层 - 白色 */}
+                  {/* 上层 - 深色 */}
                   <span
                     className="relative font-anaheim font-extrabold"
                     style={{
-                      fontSize: rpx(25), // 36 * 0.7
-                      color: "#FFFFFF",
+                      fontSize: rpx(34), // 48 * 0.7
+                      color: "#59542A",
                     }}
                   >
                     {segment.text}
@@ -342,7 +343,7 @@ export function OemOdmServiceIntroduction({
                   className="font-anaheim font-bold"
                   style={{
                     fontSize: rpx(22), // 32 * 0.7
-                    color: "#FFDB4B",
+                    color: "#756F3F",
                   }}
                 >
                   {segment.text}
@@ -350,7 +351,7 @@ export function OemOdmServiceIntroduction({
               )
             }
             return (
-              <span key={index} className="text-white">
+              <span key={index} style={{ color: "#59542A" }}>
                 {segment.text}
               </span>
             )
@@ -376,7 +377,7 @@ export function OemOdmServiceIntroduction({
           {image && (
             <OptimizedImage
               image={image as any}
-              alt="OEM Service"
+              alt="ODM Service"
               size="xlarge"
               className="w-full h-full object-cover"
             />
@@ -408,20 +409,20 @@ export function OemOdmServiceIntroduction({
               if (segment.text === "\n") {
                 return <br key={index} />
               }
-              // 下划线文字 - 双层字体
+              // 下划线文字 - 双层字体叠字效果
               if (segment.underline) {
                 return (
                   <span
                     key={index}
                     className="relative inline-block font-anaheim font-extrabold"
-                    style={{ fontSize: rpx(25), lineHeight: rpx(39) }} // 36 * 0.7
+                    style={{ fontSize: rpx(34), lineHeight: rpx(39) }} // 48 * 0.7
                   >
-                    {/* 下层 - 深色 + 外描边，向右下偏移2rpx */}
+                    {/* 下层 - #9E8C00 填充 + #FFF392 外描边，向右下偏移 */}
                     <span
                       className="absolute font-anaheim font-extrabold"
                       style={{
-                        fontSize: rpx(25), // 36 * 0.7
-                        color: "#413A03",
+                        fontSize: rpx(34), // 48 * 0.7
+                        color: "#9E8C00",
                         left: rpx(1), // 2 * 0.7
                         top: rpx(1), // 2 * 0.7
                         textShadow: `
@@ -438,12 +439,12 @@ export function OemOdmServiceIntroduction({
                     >
                       {segment.text}
                     </span>
-                    {/* 上层 - 白色 */}
+                    {/* 上层 - 深色 */}
                     <span
                       className="relative font-anaheim font-extrabold"
                       style={{
-                        fontSize: rpx(25), // 36 * 0.7
-                        color: "#FFFFFF",
+                        fontSize: rpx(34), // 48 * 0.7
+                        color: "#59542A",
                       }}
                     >
                       {segment.text}
@@ -459,7 +460,7 @@ export function OemOdmServiceIntroduction({
                     className="font-anaheim font-bold"
                     style={{
                       fontSize: rpx(22), // 32 * 0.7
-                      color: "#FFDB4B",
+                      color: "#756F3F",
                     }}
                   >
                     {segment.text}
@@ -470,7 +471,7 @@ export function OemOdmServiceIntroduction({
               return (
                 <span
                   key={index}
-                  className="text-white"
+                  style={{ color: "#59542A" }}
                 >
                   {segment.text}
                 </span>
@@ -486,19 +487,34 @@ export function OemOdmServiceIntroduction({
         <div
           className="relative rounded-2xl overflow-hidden p-6"
           style={{
-            background: "linear-gradient(180deg, #756F3F 0%, #58522B 100%)",
+            background: "linear-gradient(180deg, #EDE9C7 0%, #D1CB93 100%)",
           }}
         >
-          {/* OEM 标题 */}
-          <div className="mb-4">
+          {/* ODM 标题 - 镂空效果 */}
+          <div className="mb-4 relative">
+            {/* 底层 - 描边 */}
             <span
-              className="font-anaheim font-bold text-6xl"
+              className="absolute font-anaheim font-bold text-6xl"
               style={{
-                color: "transparent",
-                WebkitTextStroke: "1.5px #ffffff",
+                color: "#464010",
+                textShadow: `
+                  -1px -1px 0 #464010,
+                  1px -1px 0 #464010,
+                  -1px 1px 0 #464010,
+                  1px 1px 0 #464010
+                `,
               }}
             >
-              {oemTitle}
+              ODM
+            </span>
+            {/* 上层 - 背景色挖空 */}
+            <span
+              className="relative font-anaheim font-bold text-6xl"
+              style={{
+                color: "#EDE9C7",
+              }}
+            >
+              ODM
             </span>
           </div>
 
@@ -506,14 +522,14 @@ export function OemOdmServiceIntroduction({
           <div
             className="font-anaheim font-extrabold text-2xl mb-6"
             style={{
-              backgroundImage: "linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.3) 100%)",
+              backgroundImage: "linear-gradient(180deg, #59542A 0%, rgba(89,84,42,0.3) 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}
           >
-            {serviceTitle}
+            Service
             <br />
-            {introductionTitle}
+            Introduction
           </div>
 
           {/* 图片 */}
@@ -521,7 +537,7 @@ export function OemOdmServiceIntroduction({
             <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-6">
               <OptimizedImage
                 image={image as any}
-                alt="OEM Service"
+                alt="ODM Service"
                 size="large"
                 className="w-full h-full object-cover"
               />
@@ -529,21 +545,21 @@ export function OemOdmServiceIntroduction({
           )}
 
           {/* 描述文字 */}
-          <p className="text-white text-sm leading-relaxed mb-4">
+          <p className="text-sm leading-relaxed mb-4" style={{ color: "#59542A" }}>
             {topDescriptionSegments.map((segment, index) => {
               if (segment.text === "\n") {
                 return <br key={index} />
               }
               if (segment.underline) {
                 return (
-                  <span key={index} className="font-bold text-[#FFF392]">
+                  <span key={index} className="font-bold" style={{ color: "#756F3F" }}>
                     {segment.text}
                   </span>
                 )
               }
               if (segment.bold) {
                 return (
-                  <span key={index} className="font-bold text-[#FFDB4B]">
+                  <span key={index} className="font-bold" style={{ color: "#756F3F" }}>
                     {segment.text}
                   </span>
                 )
@@ -552,21 +568,21 @@ export function OemOdmServiceIntroduction({
             })}
           </p>
 
-          <p className="text-white text-sm leading-relaxed">
+          <p className="text-sm leading-relaxed" style={{ color: "#59542A" }}>
             {leftDescriptionSegments.map((segment, index) => {
               if (segment.text === "\n") {
                 return <br key={index} />
               }
               if (segment.underline) {
                 return (
-                  <span key={index} className="font-bold text-[#FFF392]">
+                  <span key={index} className="font-bold" style={{ color: "#756F3F" }}>
                     {segment.text}
                   </span>
                 )
               }
               if (segment.bold) {
                 return (
-                  <span key={index} className="font-bold text-[#FFDB4B]">
+                  <span key={index} className="font-bold" style={{ color: "#756F3F" }}>
                     {segment.text}
                   </span>
                 )
@@ -580,4 +596,4 @@ export function OemOdmServiceIntroduction({
   )
 }
 
-export default OemOdmServiceIntroduction
+export default OdmServiceIntroduction

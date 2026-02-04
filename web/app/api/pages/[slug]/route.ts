@@ -140,6 +140,58 @@ async function fetchMediaData(ids: string[]): Promise<Record<string, MediaObject
 }
 
 /**
+ * Fetch form config by ID
+ */
+async function fetchFormConfigById(id: string, locale: string): Promise<any | null> {
+  try {
+    const res = await fetch(
+      `${CMS_URL}/api/form-configs/${id}?locale=${locale}&depth=1`,
+      { next: { revalidate: 60 } }
+    )
+    if (res.ok) {
+      const data = await res.json()
+      if (data?.id) {
+        return data
+      }
+    }
+  } catch (e) {
+    console.error(`Failed to fetch form config by ID ${id}:`, e)
+  }
+  return null
+}
+
+/**
+ * Extract formBlock formConfig ID from content
+ */
+function extractFormConfigId(content: any): string | null {
+  function traverse(node: any): string | null {
+    if (!node) return null
+
+    // Check for formBlock
+    if (node.type === 'formBlock' && node.data?.formConfig?.id) {
+      return String(node.data.formConfig.id)
+    }
+
+    // Recurse into children
+    if (node.children && Array.isArray(node.children)) {
+      for (const child of node.children) {
+        const result = traverse(child)
+        if (result) return result
+      }
+    }
+
+    // Check root
+    if (node.root) {
+      return traverse(node.root)
+    }
+
+    return null
+  }
+
+  return traverse(content)
+}
+
+/**
  * GET /api/pages/[slug]
  *
  * Fetch page content by slug from Payload CMS
@@ -183,6 +235,13 @@ export async function GET(
     const mediaIds = extractMediaIds(page.contentTranslation)
     const mediaData = await fetchMediaData(mediaIds)
 
+    // Fetch form config if formBlock exists in content
+    let formConfig = null
+    const formConfigId = extractFormConfigId(page.contentTranslation)
+    if (formConfigId) {
+      formConfig = await fetchFormConfigById(formConfigId, locale)
+    }
+
     // Transform page data
     const transformedPage = {
       id: page.id,
@@ -194,6 +253,7 @@ export async function GET(
       status: page.status,
       content: page.contentTranslation || null,
       mediaData,
+      formConfig,
       heroText: page.heroText || '',
       heroSubtitle: page.heroSubtitle || '',
       locale,

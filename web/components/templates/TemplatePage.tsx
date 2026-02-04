@@ -5,6 +5,7 @@ import type { Locale } from "@/i18n.config"
 import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 import { ServiceOverviewTemplate } from "./ServiceOverviewTemplate"
 import { ContactUsTemplate } from "./ContactUsTemplate"
+import { OemOdmTemplate } from "./OemOdmTemplate"
 
 interface PageContent {
   id: string
@@ -15,13 +16,18 @@ interface PageContent {
   title: string
   status: string
   content: {
-    document: any[]
+    document?: any[]
+    root?: {
+      children?: any[]
+    }
   }
   contentTranslation?: {
     root?: {
       children?: any[]
     }
   }
+  mediaData?: Record<string, any>
+  formConfig?: any
   locale: string
 }
 
@@ -114,6 +120,16 @@ export function TemplatePage({ locale, slug, template }: TemplatePageProps) {
   if (template === "CONTACT_US") {
     return (
       <ContactUsTemplate
+        locale={locale}
+        pageContent={pageContent}
+      />
+    )
+  }
+
+  // OEM_ODM template
+  if (template === "OEM_ODM") {
+    return (
+      <OemOdmTemplate
         locale={locale}
         pageContent={pageContent}
       />
