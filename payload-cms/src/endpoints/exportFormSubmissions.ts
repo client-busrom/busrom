@@ -14,7 +14,7 @@
  */
 
 import type { PayloadHandler } from 'payload'
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 
 interface ExportRequest {
   format: 'csv' | 'excel'
@@ -128,20 +128,35 @@ export const exportFormSubmissionsHandler: PayloadHandler = async (req) => {
       return flatData
     })
 
-    // Create workbook
-    const worksheet = XLSX.utils.json_to_sheet(exportData)
+    // Create workbook with ExcelJS
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('Form Submissions')
 
-    // Auto-size columns
-    const maxWidth = 50
+    // Get column headers from first row
     const firstRow = exportData[0] || {}
-    const wscols = Object.keys(firstRow).map((key) => {
+    const columns = Object.keys(firstRow)
+
+    // Set up columns with headers and auto-width
+    const maxWidth = 50
+    worksheet.columns = columns.map((key) => {
       const maxLength = Math.max(
         key.length,
         ...exportData.map((row) => String(row[key] || '').length)
       )
-      return { wch: Math.min(maxLength + 2, maxWidth) }
+      return {
+        header: key,
+        key,
+        width: Math.min(maxLength + 2, maxWidth),
+      }
     })
-    worksheet['!cols'] = wscols
+
+    // Add data rows
+    exportData.forEach((row) => {
+      worksheet.addRow(row)
+    })
+
+    // Style header row
+    worksheet.getRow(1).font = { bold: true }
 
     // Generate filename
     const timestamp = new Date().toISOString().split('T')[0]
@@ -152,8 +167,8 @@ export const exportFormSubmissionsHandler: PayloadHandler = async (req) => {
 
     if (format === 'csv') {
       // Export as CSV
-      const csv = XLSX.utils.sheet_to_csv(worksheet)
-      const csvWithBom = '\uFEFF' + csv // Add BOM for UTF-8 Excel compatibility
+      const csvBuffer = await workbook.csv.writeBuffer()
+      const csvWithBom = '\uFEFF' + csvBuffer.toString() // Add BOM for UTF-8 Excel compatibility
 
       return new Response(csvWithBom, {
         status: 200,
@@ -164,11 +179,7 @@ export const exportFormSubmissionsHandler: PayloadHandler = async (req) => {
       })
     } else {
       // Export as Excel
-      const workbook = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Form Submissions')
-
-      // Generate Excel file
-      const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' })
+      const excelBuffer = await workbook.xlsx.writeBuffer()
 
       return new Response(excelBuffer, {
         status: 200,

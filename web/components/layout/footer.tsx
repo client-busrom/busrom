@@ -321,13 +321,13 @@ export default function Footer({ locale, showForm = true }: Props) {
 
               {/* 官方声明 */}
               <div className="bg-brand-footer-emphasis-bg text-brand-footer-emphasis-text font-anaheim font-semibold p-3 md:p-4 pl-6 md:pl-8">
-                <h4 className="font-bold text-base md:text-lg lg:text-xl leading-normal mb-2 lg:mb-3">
+                <h4 className="font-bold text-base md:text-lg lg:text-xl leading-loose">
                   {content.notice.title}
                 </h4>
                 <ul className="text-xs md:text-sm lg:text-base leading-loose space-y-0">
                   {content.notice.lines.map((line, index) => (
                     <li key={index} className="flex items-start">
-                      <span className="rounded-full bg-current flex-shrink-0 w-1 h-1 md:w-1.5 md:h-1.5 mt-1.5 md:mt-2 -ml-3 md:-ml-4 mr-2 md:mr-2.5"></span>
+                      <span className="rounded-full bg-current flex-shrink-0 w-1 h-1 md:w-1.5 md:h-1.5 -ml-3 md:-ml-4 mr-2 md:mr-2.5 mt-[0.6em]"></span>
                       <span>{line}</span>
                     </li>
                   ))}
@@ -478,7 +478,7 @@ export default function Footer({ locale, showForm = true }: Props) {
 
   return (
     <footer
-      className="relative bg-brand-secondary text-brand-text-inverse py-12"
+      className="relative bg-brand-secondary text-brand-text-inverse pt-12 pb-[40px]"
       data-header-theme="dark"
     >
       <div className="container mx-auto px-8">
@@ -525,12 +525,14 @@ export default function Footer({ locale, showForm = true }: Props) {
 
           {/* 右侧：Official Notice */}
           <div className="pl-4">
-            {footerData.notice.title && <h4 className="font-bold text-lg mb-4 font-anaheim">{footerData.notice.title}</h4>}
+            {footerData.notice.title && (
+              <h4 className="font-bold text-lg leading-loose font-anaheim">{footerData.notice.title}</h4>
+            )}
             {footerData.notice.lines && footerData.notice.lines.length > 0 && (
               <ul className="text-sm leading-loose space-y-0 font-anaheim">
                 {footerData.notice.lines.map((line, index) => (
                   <li key={index} className="flex items-start">
-                    <span className="rounded-full bg-current flex-shrink-0 w-1.5 h-1.5 mt-2 -ml-4 mr-2.5"></span>
+                    <span className="rounded-full bg-current flex-shrink-0 w-1.5 h-1.5 -ml-4 mr-2.5 mt-[0.6em]"></span>
                     <span>{line}</span>
                   </li>
                 ))}
