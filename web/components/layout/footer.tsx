@@ -327,7 +327,7 @@ export default function Footer({ locale, showForm = true }: Props) {
                 <ul className="text-xs md:text-sm lg:text-base leading-loose space-y-0">
                   {content.notice.lines.map((line, index) => (
                     <li key={index} className="flex items-start">
-                      <span className="rounded-full bg-current flex-shrink-0 w-1 h-1 md:w-1.5 md:h-1.5 -ml-3 md:-ml-4 mr-2 md:mr-2.5 mt-[0.6em]"></span>
+                      <span className="rounded-full bg-current flex-shrink-0 w-1 h-1 md:w-1.5 md:h-1.5 -ml-3 md:-ml-4 mr-2 md:mr-2.5 mt-[0.75em]"></span>
                       <span>{line}</span>
                     </li>
                   ))}
@@ -532,7 +532,7 @@ export default function Footer({ locale, showForm = true }: Props) {
               <ul className="text-sm leading-loose space-y-0 font-anaheim">
                 {footerData.notice.lines.map((line, index) => (
                   <li key={index} className="flex items-start">
-                    <span className="rounded-full bg-current flex-shrink-0 w-1.5 h-1.5 -ml-4 mr-2.5 mt-[0.6em]"></span>
+                    <span className="rounded-full bg-current flex-shrink-0 w-1 h-1 -ml-4 mr-2.5 mt-[0.75em]"></span>
                     <span>{line}</span>
                   </li>
                 ))}
