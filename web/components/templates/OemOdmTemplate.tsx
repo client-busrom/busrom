@@ -725,10 +725,10 @@ export function OemOdmTemplate({ locale, pageContent }: OemOdmTemplateProps) {
   // 使用 applicationCarousel 类型
   // ========================================
   const applicationsData = useMemo(() => {
-    const nodesAfterMarker = extractAfterMarker(contentChildren, "applications")
     const applicationIds: number[] = []
 
-    for (const node of nodesAfterMarker) {
+    // 直接遍历所有节点查找 applicationCarousel，因为它在 applications 标记后但会被子标记中断
+    for (const node of contentChildren) {
       // 处理 applicationCarousel 类型 - applications 数组包含 {id: number}
       if (node.type === "applicationCarousel" && node.data?.applications) {
         for (const app of node.data.applications) {
@@ -736,6 +736,7 @@ export function OemOdmTemplate({ locale, pageContent }: OemOdmTemplateProps) {
             applicationIds.push(app.id)
           }
         }
+        break // 只取第一个 applicationCarousel
       }
     }
 
