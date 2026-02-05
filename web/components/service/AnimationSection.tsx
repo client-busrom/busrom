@@ -260,7 +260,12 @@ export function AnimationSection({
   const rippleRef = useRef<WaterRipple | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const imageUrl = backgroundImage?.url
+  // Use Next.js image proxy to avoid CORS issues with Canvas
+  // The /_next/image endpoint serves images with proper CORS headers
+  const rawImageUrl = backgroundImage?.url
+  const imageUrl = rawImageUrl
+    ? `/_next/image?url=${encodeURIComponent(rawImageUrl)}&w=1920&q=75`
+    : null
 
   useEffect(() => {
     if (!canvasRef.current || !imageUrl) return
