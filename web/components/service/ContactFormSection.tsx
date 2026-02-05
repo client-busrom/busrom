@@ -3,29 +3,21 @@
 import React, { useState, useEffect, FormEvent, useCallback } from "react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { Turnstile } from "@/components/ui/turnstile"
-import {
-  Headphones,
-  Lightbulb,
-  CornerUpLeft,
-  ArrowLeftRight,
-  Search,
-  RefreshCcw,
-  Banknote,
-} from "lucide-react"
+import Image from "next/image"
 import type { Locale } from "@/i18n.config"
 
 const DESIGN_WIDTH = 1920
-const SCALE = 0.7
+// No scale - using Figma values directly (1920px design)
 
-// Service type icon mapping
-const serviceTypeIcons: Record<string, React.FC<{ className?: string; strokeWidth?: number }>> = {
-  "product-consultation": Headphones,
-  "customized-solution": Lightbulb,
-  "returns": CornerUpLeft,
-  "exchange": ArrowLeftRight,
-  "warranty": Search,
-  "replacement": RefreshCcw,
-  "refund": Banknote,
+// Service type SVG icon paths
+const serviceTypeIconPaths: Record<string, string> = {
+  "product-consultation": "/images/service-icons/product-consultation.svg",
+  "customized-solution": "/images/service-icons/customized-solution.svg",
+  "returns": "/images/service-icons/returns.svg",
+  "exchange": "/images/service-icons/exchange.svg",
+  "warranty": "/images/service-icons/warranty.svg",
+  "replacement": "/images/service-icons/replacement.svg",
+  "refund": "/images/service-icons/refund.svg",
 }
 
 interface MediaObject {
@@ -121,9 +113,8 @@ export function ContactFormSection({
   phone = "+86 13426931306",
   footerNote = "We will get back to you within 24 working hours\n(except all major holidays)",
 }: ContactFormSectionProps) {
-  const vw = (px: number) => `${(px * SCALE / DESIGN_WIDTH) * 100}vw`
-  // 全宽元素不缩放
-  const vwFull = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
+  // Convert Figma px to responsive vw (based on 1920px design, no scale)
+  const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
 
   const [formConfig, setFormConfig] = useState<FormConfig | null>(null)
   const [formData, setFormData] = useState<Record<string, any>>({})
@@ -329,31 +320,33 @@ export function ContactFormSection({
   }
 
   // Custom styled input field for desktop
+  // Figma: Input 339×62, border-radius 15, font 20px
   const renderField = (field: FormField) => {
     const inputBaseStyle: React.CSSProperties = {
       width: "100%",
-      height: vw(72),
-      paddingLeft: vw(20),
-      paddingRight: vw(20),
+      height: vw(62),
+      paddingLeft: vw(26),
+      paddingRight: vw(26),
       borderRadius: vw(15),
-      backgroundColor: "rgba(33, 28, 11, 0.2)",
-      border: "1px solid rgba(255, 255, 255, 0.3)",
+      backgroundColor: "rgba(33, 28, 11, 0.18)",
+      border: "1px solid rgba(255, 255, 255, 0.34)",
       color: "white",
       fontFamily: "var(--font-anaheim)",
       fontWeight: 600,
       fontSize: vw(20),
     }
 
+    // Figma: Textarea 715×117
     const textareaStyle: React.CSSProperties = {
       width: "100%",
-      height: vw(135),
-      paddingLeft: vw(20),
-      paddingRight: vw(20),
+      height: vw(117),
+      paddingLeft: vw(26),
+      paddingRight: vw(26),
       paddingTop: vw(16),
       paddingBottom: vw(16),
       borderRadius: vw(15),
-      backgroundColor: "rgba(33, 28, 11, 0.2)",
-      border: "1px solid rgba(255, 255, 255, 0.3)",
+      backgroundColor: "rgba(33, 28, 11, 0.18)",
+      border: "1px solid rgba(255, 255, 255, 0.34)",
       color: "white",
       fontFamily: "var(--font-anaheim)",
       fontWeight: 600,
@@ -361,16 +354,17 @@ export function ContactFormSection({
       resize: "none" as const,
     }
 
+    // Figma: Checkbox item 339×62
     const checkboxItemStyle: React.CSSProperties = {
       display: "flex",
       alignItems: "center",
-      gap: vw(16),
-      height: vw(72),
-      paddingLeft: vw(20),
-      paddingRight: vw(20),
+      gap: vw(20),
+      height: vw(62),
+      paddingLeft: vw(26),
+      paddingRight: vw(26),
       borderRadius: vw(15),
-      backgroundColor: "rgba(33, 28, 11, 0.2)",
-      border: "1px solid rgba(255, 255, 255, 0.3)",
+      backgroundColor: "rgba(33, 28, 11, 0.18)",
+      border: "1px solid rgba(255, 255, 255, 0.34)",
       cursor: "pointer",
       transition: "all 0.2s",
     }
@@ -400,8 +394,8 @@ export function ContactFormSection({
 
       case "textarea":
         return (
-          <div style={{ display: "flex", flexDirection: "column", gap: vw(16) }}>
-            <label className="font-anaheim font-semibold text-white" style={{ fontSize: vw(23) }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: vw(13) }}>
+            <label className="font-anaheim font-semibold text-white" style={{ fontSize: vw(24), lineHeight: vw(40) }}>
               {field.label}
             </label>
             <textarea
@@ -419,8 +413,8 @@ export function ContactFormSection({
 
       case "radio":
         return (
-          <div style={{ display: "flex", flexDirection: "column", gap: vw(16) }}>
-            <label className="font-anaheim font-semibold text-white" style={{ fontSize: vw(23) }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: vw(12) }}>
+            <label className="font-anaheim font-semibold text-white" style={{ fontSize: vw(24) }}>
               {field.label}
             </label>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: vw(14) }}>
@@ -486,18 +480,19 @@ export function ContactFormSection({
         const isSingleSelect = field.allowMultiple === false
 
         return (
-          <div style={{ display: "flex", flexDirection: "column", gap: vw(16) }}>
-            <label className="font-anaheim font-semibold text-white" style={{ fontSize: vw(23) }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: vw(12) }}>
+            <label className="font-anaheim font-semibold text-white" style={{ fontSize: vw(24) }}>
               {field.label}
             </label>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: vw(14) }}>
+            {/* Figma: column gap = 1264-888-339 = 37, row gap = 4788-4714-62 = 12 */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: vw(37), rowGap: vw(12) }}>
               {field.options?.map((option) => {
                 const isSelected = isSingleSelect
                   ? formData[field.fieldName] === option.value
                   : (formData[field.fieldName] || []).includes(option.value)
 
-                // Get icon for this option
-                const IconComponent = serviceTypeIcons[option.value]
+                // Get SVG icon path for this option
+                const iconPath = serviceTypeIconPaths[option.value]
 
                 return (
                   <label
@@ -506,14 +501,16 @@ export function ContactFormSection({
                     className="hover:bg-[#211C0B]/30"
                   >
                     {/* Icon instead of checkbox/radio indicator */}
-                    <div style={{ width: vw(36), height: vw(36), display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {IconComponent ? (
-                        <div style={{ width: vw(28), height: vw(28) }}>
-                          <IconComponent
-                            className={`${isSelected ? "text-white" : "text-white/70"} w-full h-full`}
-                            strokeWidth={1.5}
-                          />
-                        </div>
+                    <div style={{ width: vw(36), height: vw(36), display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                      {iconPath ? (
+                        <Image
+                          src={iconPath}
+                          alt={option.label}
+                          width={28}
+                          height={28}
+                          className={`transition-opacity ${isSelected ? "opacity-100" : "opacity-70"}`}
+                          style={{ width: vw(28), height: vw(28) }}
+                        />
                       ) : (
                         <div
                           style={{
@@ -545,7 +542,7 @@ export function ContactFormSection({
                     <span
                       className="font-anaheim font-semibold"
                       style={{
-                        fontSize: vw(22),
+                        fontSize: vw(20),
                         color: isSelected ? "white" : "rgba(255, 255, 255, 0.7)",
                       }}
                     >
@@ -575,17 +572,17 @@ export function ContactFormSection({
 
       case "file":
         return (
-          <div style={{ display: "flex", flexDirection: "column", gap: vw(16) }}>
+          <div>
             <label
               htmlFor={field.fieldName}
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                height: vw(90),
+                height: vw(78),
                 borderRadius: vw(15),
-                backgroundColor: "rgba(33, 28, 11, 0.5)",
-                border: "1px solid rgba(255, 255, 255, 0.3)",
+                backgroundColor: "rgba(33, 28, 11, 0.54)",
+                border: "1px dashed rgba(255, 255, 255, 0.34)",
                 cursor: "pointer",
                 transition: "all 0.2s",
               }}
@@ -738,18 +735,21 @@ export function ContactFormSection({
                   ? formData[field.fieldName] === option.value
                   : (formData[field.fieldName] || []).includes(option.value)
 
-                const IconComponent = serviceTypeIcons[option.value]
+                const iconPath = serviceTypeIconPaths[option.value]
 
                 return (
                   <label
                     key={option.value}
                     className={isSelected ? checkboxItemActiveClass : checkboxItemClass}
                   >
-                    <div className="w-[24px] h-[24px] flex items-center justify-center">
-                      {IconComponent ? (
-                        <IconComponent
-                          className={`w-[20px] h-[20px] ${isSelected ? "text-white" : "text-white/70"}`}
-                          strokeWidth={1.5}
+                    <div className="w-[24px] h-[24px] flex items-center justify-center relative">
+                      {iconPath ? (
+                        <Image
+                          src={iconPath}
+                          alt={option.label}
+                          width={20}
+                          height={20}
+                          className={`transition-opacity ${isSelected ? "opacity-100" : "opacity-70"}`}
                         />
                       ) : (
                         <div
@@ -951,7 +951,8 @@ export function ContactFormSection({
       </div>
 
       {/* ==================== Desktop Layout ==================== */}
-      <div className="hidden lg:block relative w-full" style={{ height: vwFull(922) }}>
+      {/* Figma: 1920×922 */}
+      <div className="hidden lg:block relative w-full" style={{ height: vw(922) }}>
         {/* Background - 全宽 */}
         <div className="absolute inset-0 bg-[#6E6839]">
           {backgroundImage && (
@@ -962,32 +963,34 @@ export function ContactFormSection({
               className="w-full h-full object-cover opacity-50"
             />
           )}
-          {/* Blur overlay */}
-          <div className="absolute inset-0" style={{ backdropFilter: `blur(${vwFull(7.5)})` }} />
+          {/* Blur overlay - Figma: radius 7.5 */}
+          <div className="absolute inset-0" style={{ backdropFilter: `blur(${vw(7.5)})` }} />
         </div>
 
-        {/* 内容居中容器 - 全宽 */}
+        {/* 内容容器 - 全宽定位 */}
         <div className="relative w-full h-full">
-          {/* Decorative Mask with gradient glow - 垂直居中 */}
+          {/* Decorative Mask with gradient glow - 背景框 */}
+          {/* 内容边界: x=307~1603, y=45~877, 加padding后居中 */}
           <div
-            className="absolute overflow-hidden left-1/2 top-1/2"
+            className="absolute overflow-hidden"
             style={{
-              transform: "translate(-50%, -50%)",
-              width: vwFull(1120),
-              height: vwFull(800),
-              borderRadius: vwFull(52),
-              backdropFilter: `blur(${vwFull(18.7)})`,
+              left: vw(267),
+              top: vw(5),
+              width: vw(1376),
+              height: vw(912),
+              borderRadius: vw(52),
+              backdropFilter: `blur(${vw(18.7)})`,
               background: "rgba(117, 111, 63, 0.36)",
             }}
           >
-            {/* Radial gradient glow at bottom-left - ellipse fading outward */}
+            {/* Radial gradient glow at bottom-left */}
             <svg
               className="absolute pointer-events-none"
               style={{
-                left: vwFull(-1018),
-                top: vwFull(260),
-                width: vwFull(2173),
-                height: vwFull(2257),
+                left: vw(-1018),
+                top: vw(260),
+                width: vw(2173),
+                height: vw(2257),
               }}
               viewBox="0 0 2173 2257"
               fill="none"
@@ -1003,24 +1006,17 @@ export function ContactFormSection({
             </svg>
           </div>
 
-          {/* Content Container - 垂直居中，内容用vw缩放 */}
-          <div
-            className="absolute left-1/2 top-1/2"
-            style={{
-              transform: "translate(-50%, -50%)",
-              width: vwFull(1120),
-              height: vwFull(800),
-            }}
-          >
-            {/* Left Side - Title Section (左上角定位) */}
-            <div className="absolute" style={{ left: vw(60), top: vw(50) }}>
+          {/* Left Side - Title Section */}
+          {/* x=327, y=45 */}
+          <div className="absolute" style={{ left: vw(327), top: vw(45) }}>
               {/* Main Title - Need More Assistance? */}
-              <h2 className="font-anaheim font-extrabold" style={{ fontSize: vw(85), lineHeight: vw(98) }}>
+              {/* Figma: font-size 60, line-height 68 */}
+              <h2 className="font-anaheim font-extrabold" style={{ fontSize: vw(60), lineHeight: vw(68) }}>
                 {/* Need - white fill with yellow stroke */}
                 <span
                   className="text-white"
                   style={{
-                    WebkitTextStroke: `${vw(2)} #FFEF72`,
+                    WebkitTextStroke: `1px #FFEF72`,
                     paintOrder: "stroke fill",
                   }}
                 >
@@ -1030,9 +1026,8 @@ export function ContactFormSection({
                 <span
                   className="font-paytone-one"
                   style={{
-                    fontSize: vw(85),
-                    lineHeight: vw(98),
-                    WebkitTextStroke: `${vw(0.5)} #FFEF72`,
+                    fontSize: vw(60),
+                    WebkitTextStroke: `1px #FFEF72`,
                     WebkitTextFillColor: "transparent",
                   }}
                 >
@@ -1043,7 +1038,7 @@ export function ContactFormSection({
                 <span
                   className="text-white"
                   style={{
-                    WebkitTextStroke: `${vw(2)} #FFEF72`,
+                    WebkitTextStroke: `1px #FFEF72`,
                     paintOrder: "stroke fill",
                   }}
                 >
@@ -1052,12 +1047,13 @@ export function ContactFormSection({
               </h2>
 
               {/* Subtitle - Manual Service Request */}
+              {/* 与标题距离拉远 marginTop: 50 */}
               <p
                 className="font-anaheim font-extrabold"
                 style={{
-                  marginTop: vw(30),
-                  fontSize: vw(40),
-                  lineHeight: vw(50),
+                  marginTop: vw(50),
+                  fontSize: vw(29),
+                  lineHeight: vw(40),
                   color: "#FFF071",
                 }}
               >
@@ -1065,72 +1061,79 @@ export function ContactFormSection({
               </p>
 
               {/* Description */}
+              {/* 与subtitle距离缩短 marginTop: 8 */}
               <p
                 className="font-anaheim font-normal text-white"
                 style={{
-                  marginTop: vw(20),
-                  width: vw(475),
-                  fontSize: vw(24),
-                  lineHeight: vw(36),
+                  marginTop: vw(8),
+                  width: vw(440),
+                  fontSize: vw(20),
+                  lineHeight: vw(40),
                 }}
               >
                 {description}
               </p>
-            </div>
+          </div>
 
-            {/* Left Side - Contact Info (左下角定位) */}
-            <div className="absolute" style={{ left: vw(60), bottom: vw(50) }}>
-              {/* Email */}
+          {/* Left Side - Contact Info (Group 188) */}
+          {/* Figma: x=307 → 右移20px → x=327, y=543 */}
+          <div className="absolute" style={{ left: vw(327), top: vw(543) }}>
+              {/* Email label - Figma: y=5059, font-size 20, line-height 54 */}
               <p
                 className="font-anaheim font-semibold text-white/70"
-                style={{ fontSize: vw(20), lineHeight: vw(30) }}
+                style={{ fontSize: vw(20), lineHeight: vw(54) }}
               >
                 Email
               </p>
-              <p
-                className="font-anaheim font-semibold text-white"
-                style={{ fontSize: vw(32), lineHeight: vw(40), marginTop: vw(8) }}
+              {/* Email value - Figma: y=5099 (5099-5059-54=-14, 紧贴) font-size 24, line-height 54 */}
+              <a
+                href={`mailto:${email}`}
+                className="font-anaheim font-semibold text-white underline hover:text-white/80 transition-colors block"
+                style={{ fontSize: vw(24), lineHeight: vw(54), textUnderlineOffset: vw(6) }}
               >
                 {email}
-              </p>
+              </a>
 
-              {/* Phone */}
+              {/* Phone label - Figma: y=5166 (5166-5099-54=13) font-size 20, line-height 54 */}
               <p
                 className="font-anaheim font-semibold text-white/70"
-                style={{ fontSize: vw(20), lineHeight: vw(30), marginTop: vw(30) }}
+                style={{ fontSize: vw(20), lineHeight: vw(54), marginTop: vw(13) }}
               >
                 Phone / WhatsApp
               </p>
-              <p
-                className="font-anaheim font-semibold text-white"
-                style={{ fontSize: vw(36), lineHeight: vw(44), marginTop: vw(8) }}
+              {/* Phone value - Figma: y=5199 (5199-5166-54=-21, 紧贴) font-size 24, line-height 54 */}
+              <a
+                href={`tel:${phone.replace(/\s/g, '')}`}
+                className="font-anaheim font-semibold text-white underline hover:text-white/80 transition-colors block"
+                style={{ fontSize: vw(24), lineHeight: vw(54), letterSpacing: "0.07em", textUnderlineOffset: vw(6) }}
               >
                 {phone}
-              </p>
+              </a>
 
-              {/* Footer Note */}
+              {/* Footer Note - Figma: y=5296 (5296-5199-54=43) font-size 16, line-height 30 */}
               <p
                 className="font-anaheim font-semibold text-white whitespace-pre-line"
                 style={{
-                  marginTop: vw(30),
+                  marginTop: vw(43),
                   width: vw(428),
-                  fontSize: vw(14),
-                  lineHeight: vw(24),
+                  fontSize: vw(16),
+                  lineHeight: vw(30),
                 }}
               >
                 {footerNote}
-              </p>
-            </div>
+            </p>
+          </div>
 
-            {/* Right Side - Form */}
-            <div className="absolute" style={{ left: vw(750), top: vw(50), width: vw(715) }}>
-              {/* Form Header */}
+          {/* Right Side - Form */}
+          {/* Figma: x=888 → 左移20px → x=868, width=715 */}
+          <div className="absolute" style={{ left: vw(868), top: vw(45), width: vw(715) }}>
+              {/* Form Header - Figma: font-size 29, line-height 61 */}
               <h3
                 className="font-anaheim font-semibold text-white"
                 style={{
-                  fontSize: vw(42),
+                  fontSize: vw(29),
                   lineHeight: vw(61),
-                  marginBottom: vw(42),
+                  marginBottom: vw(24),
                 }}
               >
                 Send us an inquiry via the following contact details
@@ -1173,22 +1176,28 @@ export function ContactFormSection({
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: vw(14) }}>
-                  {/* Name & Email Row */}
+                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column" }}>
+                  {/* Name & Email Row - Figma: x=886/1262, y=113, gap 37px */}
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: vw(37) }}>
                     {fields.nameEmail.slice(0, 2).map((field) => (
                       <div key={field.fieldName}>{renderField(field)}</div>
                     ))}
                   </div>
 
-                  {/* Service Type Checkboxes */}
-                  {fields.serviceType && renderField(fields.serviceType)}
+                  {/* Service Type Checkboxes - Figma: y=187 (gap from input: 187-113-62=12) */}
+                  <div style={{ marginTop: vw(12) }}>
+                    {fields.serviceType && renderField(fields.serviceType)}
+                  </div>
 
-                  {/* Description Textarea */}
-                  {fields.description && renderField(fields.description)}
+                  {/* Description Textarea - Figma: y=531 (gap from last checkbox: 531-460-62=9) */}
+                  <div style={{ marginTop: vw(9) }}>
+                    {fields.description && renderField(fields.description)}
+                  </div>
 
-                  {/* File Upload */}
-                  {fields.file && renderField(fields.file)}
+                  {/* File Upload - Figma: y=720 (gap from textarea: 720-584-117=19) */}
+                  <div style={{ marginTop: vw(19) }}>
+                    {fields.file && renderField(fields.file)}
+                  </div>
 
                   {/* Captcha */}
                   {shouldShowCaptcha && formConfig?.captchaSiteKey && (
@@ -1209,28 +1218,29 @@ export function ContactFormSection({
                   {error && (
                     <div
                       className="bg-red-500/20 border border-red-500/50 text-red-200"
-                      style={{ borderRadius: vw(15), padding: vw(16), fontSize: vw(14) }}
+                      style={{ marginTop: vw(12), borderRadius: vw(15), padding: vw(16), fontSize: vw(14) }}
                     >
                       {error}
                     </div>
                   )}
 
-                  {/* Submit Button */}
+                  {/* Submit Button - Figma: y=815, 715×62, border-radius 63, font-size 24 */}
+                  {/* Gap from upload: 815-720-78=17 */}
                   <button
                     type="submit"
                     disabled={submitting || (shouldShowCaptcha && !turnstileToken)}
                     className="w-full bg-[#B2A224] text-white font-anaheim font-semibold hover:bg-[#9A8C1E] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
-                      height: vw(72),
+                      marginTop: vw(17),
+                      height: vw(62),
                       borderRadius: vw(63),
-                      fontSize: vw(23),
+                      fontSize: vw(24),
                     }}
                   >
                     {submitting ? "Sending..." : formConfig?.submitButtonText || "Send Inquiry"}
-                  </button>
-                </form>
-              )}
-            </div>
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>

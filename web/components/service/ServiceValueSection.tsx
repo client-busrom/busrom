@@ -245,7 +245,7 @@ export function ServiceValueSection({
     <section
       ref={containerRef}
       className="relative w-full overflow-hidden mt-[46px]"
-      style={{ height: typeof window !== 'undefined' && window.innerWidth >= 1024 ? vw(968) : undefined }}
+      style={{ height: typeof window !== 'undefined' && window.innerWidth >= 1024 ? vw(922) : undefined }}
     >
       {/* ==================== Mobile Layout ==================== */}
       <div className="lg:hidden relative min-h-[500px] py-6">
@@ -403,7 +403,7 @@ export function ServiceValueSection({
         <h1
           className="font-anaheim font-extrabold text-[#756F3F] select-none whitespace-nowrap"
           style={{
-            fontSize: vw(180),
+            fontSize: vw(120),
             lineHeight: vw(137),
             position: "absolute",
             left: "50%",
@@ -416,7 +416,7 @@ export function ServiceValueSection({
         <h1
           className="font-anaheim font-extrabold text-white select-none relative whitespace-nowrap"
           style={{
-            fontSize: vw(180),
+            fontSize: vw(120),
             lineHeight: vw(137),
             textShadow: `0px ${vw(4)} ${vw(25)} rgba(54, 54, 54, 0.25)`,
           }}
@@ -558,17 +558,20 @@ export function ServiceValueSection({
       })}
 
       {/* Content Card - Fixed position per design */}
+      {/* Card centered below active dot at ACTIVE_POSITION 0.38 on curve */}
+      {/* Design: 571x342, scaled by 284/342 = 0.83 → 474x284 */}
+      {/* Visual alignment: active dot at ~750, card width 474, left = 750 - 237 = 513 */}
       <AnimatePresence mode="wait">
         <motion.div
           key={currentIndex}
           className="absolute overflow-hidden"
           style={{
-            left: vw(439),
+            left: vw(513),
             top: vw(602),
-            width: vw(552),
+            width: vw(474),
             height: vw(284),
             borderRadius: vw(30),
-            backgroundColor: "rgba(222, 214, 152, 0.5)",
+            backgroundColor: "rgba(222, 214, 152, 0.3)",
           }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -601,20 +604,20 @@ export function ServiceValueSection({
               </div>
             )}
 
-            {/* Text content */}
+            {/* Text content - scaled by 0.83 from design (32/47, 22/31) */}
             <div className="flex flex-col justify-start flex-1 overflow-hidden">
               <h3
-                className="font-anaheim font-extrabold text-black line-clamp-2"
+                className="font-anaheim font-extrabold text-black"
                 style={{
                   fontSize: vw(24),
                   lineHeight: vw(32),
-                  marginBottom: vw(8),
+                  marginBottom: vw(6),
                 }}
               >
                 {activeSlide?.title}
               </h3>
               <p
-                className="font-anaheim font-medium text-[#3C3C3C] line-clamp-6"
+                className="font-anaheim font-medium text-[#3C3C3C]"
                 style={{
                   fontSize: vw(16),
                   lineHeight: vw(24),

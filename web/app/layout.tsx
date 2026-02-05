@@ -55,6 +55,9 @@ export const metadata: Metadata = {
 /**
  * Root Layout Component
  *
+ * This is a pass-through layout. The actual html/body structure
+ * is defined in app/[locale]/layout.tsx to support i18n.
+ *
  * @param children - Child components to render
  */
 export default function RootLayout({
@@ -62,9 +65,5 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <html>
-      <body>{children}</body>
-    </html>
-  )
+  return children
 }
