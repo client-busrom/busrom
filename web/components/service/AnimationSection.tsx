@@ -260,18 +260,14 @@ export function AnimationSection({
   const rippleRef = useRef<WaterRipple | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Use Next.js image proxy to avoid CORS issues with Canvas
-  // The /_next/image endpoint serves images with proper CORS headers
-  const rawImageUrl = backgroundImage?.url
-  const imageUrl = rawImageUrl
-    ? `/_next/image?url=${encodeURIComponent(rawImageUrl)}&w=1920&q=75`
-    : null
+  const imageUrl = backgroundImage?.url
 
   useEffect(() => {
     if (!canvasRef.current || !imageUrl) return
 
     const canvas = canvasRef.current
     const container = containerRef.current
+    let blobUrl: string | null = null
 
     // Set canvas size based on container - use lower resolution for performance
     const updateCanvasSize = () => {
@@ -284,20 +280,30 @@ export function AnimationSection({
     }
 
     const image = new Image()
-    image.crossOrigin = "anonymous"
-    image.onload = () => {
-      updateCanvasSize()
 
-      // Clean up previous instance
-      if (rippleRef.current) {
-        rippleRef.current.destroy()
-      }
+    // Fetch image as blob to avoid CORS issues with Canvas getImageData
+    // CloudFront doesn't return CORS headers, but fetch + blob URL works around this
+    fetch(imageUrl)
+      .then(response => response.blob())
+      .then(blob => {
+        blobUrl = URL.createObjectURL(blob)
+        image.onload = () => {
+          updateCanvasSize()
 
-      // Create new ripple effect
-      rippleRef.current = new WaterRipple(canvas, image)
-      rippleRef.current.start()
-    }
-    image.src = imageUrl
+          // Clean up previous instance
+          if (rippleRef.current) {
+            rippleRef.current.destroy()
+          }
+
+          // Create new ripple effect
+          rippleRef.current = new WaterRipple(canvas, image)
+          rippleRef.current.start()
+        }
+        image.src = blobUrl
+      })
+      .catch(err => {
+        console.error('Failed to load animation background image:', err)
+      })
 
     // Handle resize with debounce
     let resizeTimeout: NodeJS.Timeout
@@ -339,6 +345,10 @@ export function AnimationSection({
       observer.disconnect()
       if (rippleRef.current) {
         rippleRef.current.destroy()
+      }
+      // Clean up blob URL to prevent memory leak
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl)
       }
     }
   }, [imageUrl])
