@@ -6,6 +6,7 @@ import { BrandServicesSection } from "@/components/service/BrandServicesSection"
 import { ContactFormSection } from "@/components/service/ContactFormSection"
 import { ApplicationsSection } from "@/components/service/ApplicationsSection"
 import { SimpleCtaSection } from "@/components/service/SimpleCtaSection"
+import { AnimationSection } from "@/components/service/AnimationSection"
 
 interface MediaObject {
   id: string
@@ -353,9 +354,15 @@ export function ServiceOverviewTemplate({ locale, pageContent }: ServiceOverview
       "Our service blends creative strategy with flawless execution to define your story, design your identity, and amplify your presence."
 
     // Get images from gallery after "brand-service-image" marker
+    // 6 images total: 2 per category (top, bottom) for 3 categories
     const galleryImages = extractGalleryImagesAfterMarker(contentChildren, "brand-service-image", mediaData)
-    const topImage = galleryImages[0] || null
-    const bottomImage = galleryImages[1] || null
+
+    // Group images by category: [0,1] for category 0, [2,3] for category 1, [4,5] for category 2
+    const categoryImages = [
+      { top: galleryImages[0] || null, bottom: galleryImages[1] || null },
+      { top: galleryImages[2] || null, bottom: galleryImages[3] || null },
+      { top: galleryImages[4] || null, bottom: galleryImages[5] || null },
+    ]
 
     const categories = extractBrandServiceCategories(contentChildren, mediaData)
 
@@ -396,10 +403,7 @@ export function ServiceOverviewTemplate({ locale, pageContent }: ServiceOverview
     return {
       title,
       description,
-      decorativeImages: {
-        top: topImage,
-        bottom: bottomImage,
-      },
+      categoryImages,
       categories: finalCategories,
     }
   }, [contentChildren, mediaData])
@@ -505,6 +509,12 @@ export function ServiceOverviewTemplate({ locale, pageContent }: ServiceOverview
     }
   }, [contentChildren, mediaData])
 
+  // Extract Animation section data
+  const animationData = useMemo(() => {
+    const backgroundImage = extractImageAfterMarker(contentChildren, "animation-image", mediaData)
+    return { backgroundImage }
+  }, [contentChildren, mediaData])
+
   return (
     <div className="min-h-screen bg-background" data-header-theme="dark">
       {/* Service Value Section - 全屏 */}
@@ -517,17 +527,17 @@ export function ServiceOverviewTemplate({ locale, pageContent }: ServiceOverview
       />
 
       {/* Brand Services Section - 70%缩放（组件内部处理） */}
-      <div className="mt-8 lg:mt-[60px]">
+      <div className="mt-8 lg:mt-[72px]">
         <BrandServicesSection
           title={brandServicesData.title}
           description={brandServicesData.description}
           categories={brandServicesData.categories}
-          decorativeImages={brandServicesData.decorativeImages}
+          categoryImages={brandServicesData.categoryImages}
         />
       </div>
 
       {/* Contact Form Section - 70%缩放（组件内部处理） */}
-      <div className="mt-8 lg:mt-[60px]">
+      <div className="mt-8 lg:mt-[72px]">
         <ContactFormSection
           locale={locale as any}
           formName="service-overview-form"
@@ -549,7 +559,7 @@ export function ServiceOverviewTemplate({ locale, pageContent }: ServiceOverview
       </div>
 
       {/* Simple CTA Section - 70%缩放（组件内部处理） */}
-      <div className="mt-8 pb-8 lg:mt-[60px] lg:pb-[60px]">
+      <div className="mt-8 lg:mt-[60px]">
         <SimpleCtaSection
           locale={locale}
           title={simpleCtaData.title}
@@ -560,6 +570,16 @@ export function ServiceOverviewTemplate({ locale, pageContent }: ServiceOverview
           images={simpleCtaData.images}
         />
       </div>
+
+      {/* Animation Section - Water Ripple Effect */}
+      {animationData.backgroundImage && (
+        <div className="mt-8 lg:mt-[60px]">
+          <AnimationSection
+            locale={locale}
+            backgroundImage={animationData.backgroundImage}
+          />
+        </div>
+      )}
     </div>
   )
 }

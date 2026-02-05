@@ -44,8 +44,10 @@ export function SimpleCtaSection({
   buttonLink = "/contact-us",
   images = [],
 }: SimpleCtaSectionProps) {
-  // vw conversion function with 70% scale
+  // Layout vw: with 0.7 scale for backgrounds, images, positions
   const vw = (px: number) => `${(px * SCALE / DESIGN_WIDTH) * 100}vw`
+  // Font vw: no scale, using standard font sizes (60/24/20/16)
+  const fontVw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
 
   // Embla carousel for mobile images
   const [emblaRef] = useEmblaCarousel({
@@ -140,7 +142,7 @@ export function SimpleCtaSection({
             left: vw(114),
             top: 0,
             width: vw(1672),
-            height: vw(701),
+            height: vw(780),
             borderRadius: vw(100),
             background: "linear-gradient(180deg, #756F3F 0%, #968D45 100%)",
           }}
@@ -154,34 +156,31 @@ export function SimpleCtaSection({
             top: vw(96),
           }}
         >
-          {/* Shadow/stroke layer */}
+          {/* Shadow/background layer - solid fill with background color + stroke */}
           <span
             className="absolute font-anaheim font-extrabold whitespace-nowrap"
             style={{
-              left: vw(3),
-              top: vw(4),
-              lineHeight: vw(98),
-              color: "transparent",
-              WebkitTextStroke: `${vw(2)} #FFFAD0`,
+              left: vw(1.5),
+              top: vw(2),
+              fontSize: fontVw(60),
+              lineHeight: fontVw(68),
+              color: "#756F3F",
+              WebkitTextStroke: `2px #FFFAD0`,
+              paintOrder: "stroke fill",
             }}
           >
-            {title.split(' ').slice(0, -1).map((word, i) => (
-              <span key={i} style={{ fontSize: vw(50) }}>{word} </span>
-            ))}
-            <span style={{ fontSize: vw(60) }}>{title.split(' ').slice(-1)[0]}</span>
+            {title}
           </span>
           {/* Main text layer */}
           <h2
             className="relative font-anaheim font-extrabold whitespace-nowrap"
             style={{
-              lineHeight: vw(98),
+              fontSize: fontVw(60),
+              lineHeight: fontVw(68),
               color: "#FFF180",
             }}
           >
-            {title.split(' ').slice(0, -1).map((word, i) => (
-              <span key={i} style={{ fontSize: vw(50) }}>{word} </span>
-            ))}
-            <span style={{ fontSize: vw(60) }}>{title.split(' ').slice(-1)[0]}</span>
+            {title}
           </h2>
         </div>
 
@@ -190,10 +189,10 @@ export function SimpleCtaSection({
           className="absolute font-anaheim font-medium text-white"
           style={{
             left: vw(186),
-            top: vw(201),
+            top: vw(261),
             width: vw(683),
-            fontSize: vw(22),
-            lineHeight: vw(34),
+            fontSize: fontVw(16),
+            lineHeight: fontVw(26),
           }}
         >
           {description}
@@ -204,10 +203,10 @@ export function SimpleCtaSection({
           className="absolute font-anaheim font-extrabold"
           style={{
             left: vw(291),
-            top: vw(396),
+            top: vw(456),
             width: vw(503),
-            fontSize: vw(32),
-            lineHeight: vw(42),
+            fontSize: fontVw(24),
+            lineHeight: fontVw(32),
             color: "#FFEB4E",
           }}
         >
@@ -220,7 +219,7 @@ export function SimpleCtaSection({
           className="absolute flex items-center justify-center transition-transform hover:scale-105"
           style={{
             left: vw(305),
-            top: vw(516),
+            top: vw(576),
             width: vw(325),
             height: vw(67),
             borderRadius: vw(33.5),
@@ -230,8 +229,8 @@ export function SimpleCtaSection({
           <span
             className="font-anaheim font-semibold"
             style={{
-              fontSize: vw(32),
-              lineHeight: vw(46),
+              fontSize: fontVw(24),
+              lineHeight: fontVw(32),
               color: "#625D2F",
             }}
           >
@@ -239,18 +238,35 @@ export function SimpleCtaSection({
           </span>
         </Link>
 
-        {/* Decorative Arrow SVG - points from CTA text to button */}
+        {/* Decorative Arrow SVG - points from CTA text to button with pulse animation */}
         <svg
-          className="absolute"
+          className="absolute animate-pulse-glow"
           style={{
             left: vw(620),
-            top: vw(450),
+            top: vw(510),
             width: vw(81),
             height: vw(61),
           }}
           viewBox="0 0 47 86"
           fill="none"
         >
+          <style>
+            {`
+              @keyframes pulseGlow {
+                0%, 100% {
+                  opacity: 1;
+                  filter: drop-shadow(0 0 0px rgba(255, 236, 88, 0));
+                }
+                50% {
+                  opacity: 0.7;
+                  filter: drop-shadow(0 0 8px rgba(255, 236, 88, 0.8));
+                }
+              }
+              .animate-pulse-glow {
+                animation: pulseGlow 1.5s ease-in-out infinite;
+              }
+            `}
+          </style>
           <path
             d="M46.8929 77.8431L7.43987 85.283L1.92092e-05 45.83L13.398 54.9766C40.8378 14.7828 26.377 5.74071e-06 26.377 5.74071e-06C26.377 5.74071e-06 60.9347 28.5027 33.4949 68.6965L46.8929 77.8431Z"
             fill="url(#paint0_linear_cta)"
@@ -270,13 +286,13 @@ export function SimpleCtaSection({
           </defs>
         </svg>
 
-        {/* Right side images - stacked */}
+        {/* Right side images - stacked, 下移60px */}
         {/* Image 1 - Top right */}
         <div
           className="absolute overflow-hidden bg-[#D9D9D9]"
           style={{
             left: vw(995),
-            top: vw(148),
+            top: vw(208),
             width: vw(497),
             height: vw(274),
             borderRadius: vw(42),
@@ -298,7 +314,7 @@ export function SimpleCtaSection({
           className="absolute overflow-hidden bg-[#D9D9D9]"
           style={{
             left: vw(1323),
-            top: vw(322),
+            top: vw(382),
             width: vw(527),
             height: vw(476),
             borderRadius: vw(42),
@@ -320,7 +336,7 @@ export function SimpleCtaSection({
           className="absolute overflow-hidden bg-[#D9D9D9]"
           style={{
             left: vw(1076),
-            top: vw(476),
+            top: vw(536),
             width: vw(336),
             height: vw(410),
             borderRadius: vw(42),

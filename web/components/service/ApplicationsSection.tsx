@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useCallback, useMemo } from "react"
+import Image from "next/image"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import Link from "next/link"
 import useEmblaCarousel from "embla-carousel-react"
@@ -49,11 +50,12 @@ interface ApplicationsSectionProps {
 const DESIGN_HEIGHT = 922
 
 // Card configurations based on Figma layout - staggered heights
+// Final display sizes: 570x400 and 420x400, divide by 0.7 to get design values
 const CARD_STYLES = [
-  { width: 812, height: 574, yOffset: 0 },    // Large card
-  { width: 602, height: 574, yOffset: 124 },  // Medium card, offset down
-  { width: 812, height: 574, yOffset: 0 },    // Large card
-  { width: 602, height: 574, yOffset: 124 },  // Medium card, offset down
+  { width: 814, height: 571, yOffset: 0 },    // Rectangle card (570/0.7 x 400/0.7)
+  { width: 600, height: 571, yOffset: 177 },  // Square-ish card (420/0.7 x 400/0.7), offset down (124/0.7)
+  { width: 814, height: 571, yOffset: 0 },    // Rectangle card
+  { width: 600, height: 571, yOffset: 177 },  // Square-ish card, offset down
 ]
 
 export function ApplicationsSection({
@@ -66,7 +68,10 @@ export function ApplicationsSection({
   viewMoreLink = "/applications",
   viewMoreText = "VIEW MORE",
 }: ApplicationsSectionProps) {
+  // Layout vw: with 0.7 scale for backgrounds, images, positions
   const vw = (px: number) => `${(px * SCALE / DESIGN_WIDTH) * 100}vw`
+  // Font vw: no scale, using standard font sizes (60/24/20/16)
+  const fontVw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
 
   const [applications, setApplications] = useState<ApplicationItem[]>(initialApplications || [])
   const [loading, setLoading] = useState(!initialApplications)
@@ -239,7 +244,7 @@ export function ApplicationsSection({
         @media (min-width: 1024px) {
           section {
             width: ${vw(1920)};
-            height: ${vw(1022)};
+            height: ${vw(1150)};
             margin-top: ${vw(120)};
             margin-bottom: ${vw(120)};
           }
@@ -354,10 +359,10 @@ export function ApplicationsSection({
           style={{
             left: vw(228),
             top: vw(19),
-            fontSize: vw(150),
-            lineHeight: vw(97),
+            fontSize: fontVw(150),
+            lineHeight: fontVw(97),
             color: "#F6F4EF",
-            WebkitTextStroke: `${vw(4)} #756F3F`,
+            WebkitTextStroke: `4px #756F3F`,
             paintOrder: "stroke fill",
           }}
         >
@@ -368,8 +373,8 @@ export function ApplicationsSection({
         <h2
           className="relative font-anaheim font-extrabold text-foreground"
           style={{
-            fontSize: vw(80),
-            lineHeight: vw(113),
+            fontSize: fontVw(60),
+            lineHeight: fontVw(80),
           }}
         >
           {titleLine1}
@@ -381,15 +386,24 @@ export function ApplicationsSection({
       {/* VIEW MORE Button */}
       <Link
         href={viewMoreLink}
-        className="absolute z-10"
+        className="absolute z-10 flex items-center"
         style={{
           right: vw(195),
           top: vw(15),
+          gap: vw(16),
         }}
       >
         <AnimatedLinkButton>
           {viewMoreText}
         </AnimatedLinkButton>
+        <div className="relative" style={{ width: vw(30), height: vw(25) }}>
+          <Image
+            src="/images/service-icons/view-more-arrow.svg"
+            alt="View more"
+            fill
+            className="object-contain"
+          />
+        </div>
       </Link>
 
       {/* Embla Carousel */}
@@ -400,8 +414,8 @@ export function ApplicationsSection({
           left: 0,
           right: 0,
           top: vw(224),
-          height: vw(798), // 574 + 124 offset + 100 for shadow
-          paddingBottom: vw(100),
+          height: vw(900), // 571 + 177 offset + 150 for shadow
+          paddingBottom: vw(150),
         }}
       >
         <div
@@ -418,14 +432,19 @@ export function ApplicationsSection({
               return (
                 <div
                   key={`${app.id}-${index}`}
-                  className="relative flex-shrink-0 overflow-hidden group transition-shadow duration-300 hover:shadow-2xl"
+                  className="relative flex-shrink-0 overflow-hidden group transition-shadow duration-300"
                   style={{
                     width: vw(style.width),
                     height: vw(style.height),
                     marginTop: vw(style.yOffset),
                     marginRight: isLast ? vw(38) : undefined, // Add gap after last item for loop continuity
                     borderRadius: vw(30),
-                    boxShadow: `0px ${vw(49)} ${vw(47.3)} rgba(0, 0, 0, 0.25)`,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = `0px ${vw(49)} ${vw(47.3)} rgba(0, 0, 0, 0.25)`
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = 'none'
                   }}
                 >
                   {/* Card content - no link, just display */}
@@ -448,7 +467,7 @@ export function ApplicationsSection({
                   >
                     <h3
                       className="font-anaheim font-bold text-white leading-tight"
-                      style={{ fontSize: vw(24) }}
+                      style={{ fontSize: fontVw(24) }}
                     >
                       {app.title}
                     </h3>
@@ -456,7 +475,7 @@ export function ApplicationsSection({
                       <p
                         className="font-anaheim text-white/80 line-clamp-2"
                         style={{
-                          fontSize: vw(16),
+                          fontSize: fontVw(16),
                           marginTop: vw(8),
                         }}
                       >
@@ -561,29 +580,6 @@ export function ApplicationsSection({
         </svg>
       </button>
 
-      {/* Progress Bar */}
-      {totalItems > 0 && (
-        <div
-          className="absolute overflow-hidden z-10"
-          style={{
-            right: vw(195),
-            top: vw(100),
-            width: vw(300),
-            height: vw(4),
-            borderRadius: vw(2),
-            backgroundColor: "rgba(209, 209, 209, 0.52)",
-          }}
-        >
-          <div
-            className="h-full transition-all duration-300 ease-out"
-            style={{
-              width: `${progressPercent}%`,
-              borderRadius: vw(2),
-              backgroundColor: "rgba(63, 63, 63, 0.6)",
-            }}
-          />
-        </div>
-      )}
       </div>
     </section>
   )
