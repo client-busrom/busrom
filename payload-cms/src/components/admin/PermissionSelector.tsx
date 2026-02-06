@@ -96,7 +96,7 @@ interface PermissionSelectorProps {
 }
 
 export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, field }) => {
-  const { value, setValue } = useField<string[]>({ path })
+  const { value, setValue } = useField<(string | number)[]>({ path })
   const [permissions, setPermissions] = useState<Permission[]>([])
   const [loading, setLoading] = useState(true)
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(CATEGORY_ORDER))
