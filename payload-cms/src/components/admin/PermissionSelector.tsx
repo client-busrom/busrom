@@ -265,7 +265,7 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
 
   // Toggle a single permission
   const togglePermission = useCallback(
-    (permId: string) => {
+    (permId: string | number) => {
       // Can't toggle permissions that come from roles
       if (isUserCollection && rolePermissionIds.has(String(permId))) {
         return
@@ -276,7 +276,7 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
       const index = newValue.findIndex(id => String(id) === permIdStr)
 
       if (index === -1) {
-        newValue.push(permId)
+        newValue.push(permId) // Preserve original type (number)
       } else {
         newValue.splice(index, 1)
       }
@@ -300,15 +300,20 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({ path, fi
       const toggleableIds = toggleablePerms.map((p) => p.id)
       const allToggleableSelected = toggleablePerms.every(p => selectedIds.has(String(p.id)))
 
-      let newValue: string[]
+      let newValue: (string | number)[]
       if (allToggleableSelected) {
         // Deselect all toggleable in category
         newValue = (value || []).filter((id) => !toggleableIds.map(String).includes(String(id)))
       } else {
-        // Select all toggleable in category
-        const currentSet = new Set((value || []).map(String))
-        toggleableIds.forEach((id) => currentSet.add(String(id)))
-        newValue = Array.from(currentSet)
+        // Select all toggleable in category - preserve original ID types (numbers)
+        const currentIds = new Set((value || []).map(String))
+        const result = [...(value || [])]
+        toggleableIds.forEach((id) => {
+          if (!currentIds.has(String(id))) {
+            result.push(id) // Push original ID (number), not string
+          }
+        })
+        newValue = result
       }
       setValue(newValue)
     },
