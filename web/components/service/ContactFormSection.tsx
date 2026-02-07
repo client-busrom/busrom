@@ -3,14 +3,14 @@
 import React, { useState, useEffect, FormEvent, useCallback } from "react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { Turnstile } from "@/components/ui/turnstile"
-import Image from "next/image"
 import type { Locale } from "@/i18n.config"
+import Image from "next/image"
 
 const DESIGN_WIDTH = 1920
-// No scale - using Figma values directly (1920px design)
+const SCALE = 0.7
 
-// Service type SVG icon paths
-const serviceTypeIconPaths: Record<string, string> = {
+// Service type icon mapping - using SVG files from public/images/service-icons
+const serviceTypeIcons: Record<string, string> = {
   "product-consultation": "/images/service-icons/product-consultation.svg",
   "customized-solution": "/images/service-icons/customized-solution.svg",
   "returns": "/images/service-icons/returns.svg",
@@ -113,8 +113,9 @@ export function ContactFormSection({
   phone = "+86 13426931306",
   footerNote = "We will get back to you within 24 working hours\n(except all major holidays)",
 }: ContactFormSectionProps) {
-  // Convert Figma px to responsive vw (based on 1920px design, no scale)
-  const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
+  const vw = (px: number) => `${(px * SCALE / DESIGN_WIDTH) * 100}vw`
+  // 全宽元素不缩放
+  const vwFull = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
 
   const [formConfig, setFormConfig] = useState<FormConfig | null>(null)
   const [formData, setFormData] = useState<Record<string, any>>({})
@@ -320,33 +321,31 @@ export function ContactFormSection({
   }
 
   // Custom styled input field for desktop
-  // Figma: Input 339×62, border-radius 15, font 20px
   const renderField = (field: FormField) => {
     const inputBaseStyle: React.CSSProperties = {
       width: "100%",
-      height: vw(62),
-      paddingLeft: vw(26),
-      paddingRight: vw(26),
+      height: vw(72),
+      paddingLeft: vw(20),
+      paddingRight: vw(20),
       borderRadius: vw(15),
-      backgroundColor: "rgba(33, 28, 11, 0.18)",
-      border: "1px solid rgba(255, 255, 255, 0.34)",
+      backgroundColor: "rgba(33, 28, 11, 0.2)",
+      border: "1px solid rgba(255, 255, 255, 0.3)",
       color: "white",
       fontFamily: "var(--font-anaheim)",
       fontWeight: 600,
       fontSize: vw(20),
     }
 
-    // Figma: Textarea 715×117
     const textareaStyle: React.CSSProperties = {
       width: "100%",
-      height: vw(117),
-      paddingLeft: vw(26),
-      paddingRight: vw(26),
+      height: vw(135),
+      paddingLeft: vw(20),
+      paddingRight: vw(20),
       paddingTop: vw(16),
       paddingBottom: vw(16),
       borderRadius: vw(15),
-      backgroundColor: "rgba(33, 28, 11, 0.18)",
-      border: "1px solid rgba(255, 255, 255, 0.34)",
+      backgroundColor: "rgba(33, 28, 11, 0.2)",
+      border: "1px solid rgba(255, 255, 255, 0.3)",
       color: "white",
       fontFamily: "var(--font-anaheim)",
       fontWeight: 600,
@@ -354,17 +353,16 @@ export function ContactFormSection({
       resize: "none" as const,
     }
 
-    // Figma: Checkbox item 339×62
     const checkboxItemStyle: React.CSSProperties = {
       display: "flex",
       alignItems: "center",
-      gap: vw(20),
-      height: vw(62),
-      paddingLeft: vw(26),
-      paddingRight: vw(26),
+      gap: vw(16),
+      height: vw(72),
+      paddingLeft: vw(20),
+      paddingRight: vw(20),
       borderRadius: vw(15),
-      backgroundColor: "rgba(33, 28, 11, 0.18)",
-      border: "1px solid rgba(255, 255, 255, 0.34)",
+      backgroundColor: "rgba(33, 28, 11, 0.2)",
+      border: "1px solid rgba(255, 255, 255, 0.3)",
       cursor: "pointer",
       transition: "all 0.2s",
     }
@@ -394,8 +392,8 @@ export function ContactFormSection({
 
       case "textarea":
         return (
-          <div style={{ display: "flex", flexDirection: "column", gap: vw(13) }}>
-            <label className="font-anaheim font-semibold text-white" style={{ fontSize: vw(24), lineHeight: vw(40) }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: vw(16) }}>
+            <label className="font-anaheim font-semibold text-white" style={{ fontSize: vw(23) }}>
               {field.label}
             </label>
             <textarea
@@ -413,8 +411,8 @@ export function ContactFormSection({
 
       case "radio":
         return (
-          <div style={{ display: "flex", flexDirection: "column", gap: vw(12) }}>
-            <label className="font-anaheim font-semibold text-white" style={{ fontSize: vw(24) }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: vw(16) }}>
+            <label className="font-anaheim font-semibold text-white" style={{ fontSize: vw(23) }}>
               {field.label}
             </label>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: vw(14) }}>
@@ -480,19 +478,18 @@ export function ContactFormSection({
         const isSingleSelect = field.allowMultiple === false
 
         return (
-          <div style={{ display: "flex", flexDirection: "column", gap: vw(12) }}>
-            <label className="font-anaheim font-semibold text-white" style={{ fontSize: vw(24) }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: vw(16) }}>
+            <label className="font-anaheim font-semibold text-white" style={{ fontSize: vw(23) }}>
               {field.label}
             </label>
-            {/* Figma: column gap = 1264-888-339 = 37, row gap = 4788-4714-62 = 12 */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: vw(37), rowGap: vw(12) }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: vw(14) }}>
               {field.options?.map((option) => {
                 const isSelected = isSingleSelect
                   ? formData[field.fieldName] === option.value
                   : (formData[field.fieldName] || []).includes(option.value)
 
-                // Get SVG icon path for this option
-                const iconPath = serviceTypeIconPaths[option.value]
+                // Get icon for this option
+                const iconSrc = serviceTypeIcons[option.value]
 
                 return (
                   <label
@@ -501,15 +498,18 @@ export function ContactFormSection({
                     className="hover:bg-[#211C0B]/30"
                   >
                     {/* Icon instead of checkbox/radio indicator */}
-                    <div style={{ width: vw(36), height: vw(36), display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                      {iconPath ? (
+                    <div style={{ width: vw(36), height: vw(36), display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {iconSrc ? (
                         <Image
-                          src={iconPath}
+                          src={iconSrc}
                           alt={option.label}
                           width={28}
                           height={28}
-                          className={`transition-opacity ${isSelected ? "opacity-100" : "opacity-70"}`}
-                          style={{ width: vw(28), height: vw(28) }}
+                          style={{
+                            width: vw(28),
+                            height: vw(28),
+                            opacity: isSelected ? 1 : 0.7,
+                          }}
                         />
                       ) : (
                         <div
@@ -542,7 +542,7 @@ export function ContactFormSection({
                     <span
                       className="font-anaheim font-semibold"
                       style={{
-                        fontSize: vw(20),
+                        fontSize: vw(22),
                         color: isSelected ? "white" : "rgba(255, 255, 255, 0.7)",
                       }}
                     >
@@ -572,17 +572,17 @@ export function ContactFormSection({
 
       case "file":
         return (
-          <div>
+          <div style={{ display: "flex", flexDirection: "column", gap: vw(16) }}>
             <label
               htmlFor={field.fieldName}
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                height: vw(78),
+                height: vw(90),
                 borderRadius: vw(15),
-                backgroundColor: "rgba(33, 28, 11, 0.54)",
-                border: "1px dashed rgba(255, 255, 255, 0.34)",
+                backgroundColor: "rgba(33, 28, 11, 0.5)",
+                border: "1px dashed rgba(255, 255, 255, 0.3)",
                 cursor: "pointer",
                 transition: "all 0.2s",
               }}
@@ -735,21 +735,22 @@ export function ContactFormSection({
                   ? formData[field.fieldName] === option.value
                   : (formData[field.fieldName] || []).includes(option.value)
 
-                const iconPath = serviceTypeIconPaths[option.value]
+                const iconSrc = serviceTypeIcons[option.value]
 
                 return (
                   <label
                     key={option.value}
                     className={isSelected ? checkboxItemActiveClass : checkboxItemClass}
                   >
-                    <div className="w-[24px] h-[24px] flex items-center justify-center relative">
-                      {iconPath ? (
+                    <div className="w-[24px] h-[24px] flex items-center justify-center">
+                      {iconSrc ? (
                         <Image
-                          src={iconPath}
+                          src={iconSrc}
                           alt={option.label}
                           width={20}
                           height={20}
-                          className={`transition-opacity ${isSelected ? "opacity-100" : "opacity-70"}`}
+                          className="w-[20px] h-[20px]"
+                          style={{ opacity: isSelected ? 1 : 0.7 }}
                         />
                       ) : (
                         <div
@@ -951,9 +952,8 @@ export function ContactFormSection({
       </div>
 
       {/* ==================== Desktop Layout ==================== */}
-      {/* Figma: 1920×922 */}
-      <div className="hidden lg:block relative w-full" style={{ height: vw(922) }}>
-        {/* Background - 全宽 */}
+      <div className="hidden lg:block relative w-full" style={{ height: vwFull(922) }}>
+        {/* Background - 全宽不缩放 */}
         <div className="absolute inset-0 bg-[#6E6839]">
           {backgroundImage && (
             <OptimizedImage
@@ -963,27 +963,28 @@ export function ContactFormSection({
               className="w-full h-full object-cover opacity-50"
             />
           )}
-          {/* Blur overlay - Figma: radius 7.5 */}
-          <div className="absolute inset-0" style={{ backdropFilter: `blur(${vw(7.5)})` }} />
+          {/* Blur overlay */}
+          <div className="absolute inset-0" style={{ backdropFilter: `blur(${vwFull(7.5)})` }} />
         </div>
 
-        {/* 内容容器 - 全宽定位 */}
-        <div className="relative w-full h-full">
-          {/* Decorative Mask with gradient glow - 背景框 */}
-          {/* 内容边界: x=307~1603, y=45~877, 加padding后居中 */}
+        {/* Content Wrapper - 居中容器 */}
+        <div
+          className="relative h-full mx-auto"
+          style={{ width: vw(1920) }}
+        >
+          {/* Decorative Mask with gradient glow - 880px高度，垂直居中 */}
           <div
-            className="absolute overflow-hidden"
+            className="absolute overflow-hidden left-1/2 top-1/2"
             style={{
-              left: vw(267),
-              top: vw(5),
-              width: vw(1376),
-              height: vw(912),
+              transform: "translate(-50%, -50%)",
+              width: vw(1600),
+              height: vwFull(880),
               borderRadius: vw(52),
               backdropFilter: `blur(${vw(18.7)})`,
               background: "rgba(117, 111, 63, 0.36)",
             }}
           >
-            {/* Radial gradient glow at bottom-left */}
+            {/* Radial gradient glow at bottom-left - ellipse fading outward */}
             <svg
               className="absolute pointer-events-none"
               style={{
@@ -1006,17 +1007,24 @@ export function ContactFormSection({
             </svg>
           </div>
 
-          {/* Left Side - Title Section */}
-          {/* x=327, y=45 */}
-          <div className="absolute" style={{ left: vw(327), top: vw(45) }}>
+          {/* Content Container - 在880px框内居中 */}
+          <div
+            className="absolute left-1/2 top-1/2"
+            style={{
+              transform: "translate(-50%, -50%)",
+              width: vw(1600),
+              height: vwFull(880),
+            }}
+          >
+            {/* Left Side - Contact Info */}
+            <div className="absolute" style={{ left: vw(96), top: vwFull(60) }}>
               {/* Main Title - Need More Assistance? */}
-              {/* Figma: font-size 60, line-height 68 */}
-              <h2 className="font-anaheim font-extrabold" style={{ fontSize: vw(60), lineHeight: vw(68) }}>
+              <h2 className="font-anaheim font-extrabold" style={{ fontSize: vw(85), lineHeight: vw(98) }}>
                 {/* Need - white fill with yellow stroke */}
                 <span
                   className="text-white"
                   style={{
-                    WebkitTextStroke: `1px #FFEF72`,
+                    WebkitTextStroke: `${vw(2)} #FFEF72`,
                     paintOrder: "stroke fill",
                   }}
                 >
@@ -1026,8 +1034,9 @@ export function ContactFormSection({
                 <span
                   className="font-paytone-one"
                   style={{
-                    fontSize: vw(60),
-                    WebkitTextStroke: `1px #FFEF72`,
+                    fontSize: vw(85),
+                    lineHeight: vw(98),
+                    WebkitTextStroke: `${vw(0.5)} #FFEF72`,
                     WebkitTextFillColor: "transparent",
                   }}
                 >
@@ -1038,210 +1047,219 @@ export function ContactFormSection({
                 <span
                   className="text-white"
                   style={{
-                    WebkitTextStroke: `1px #FFEF72`,
+                    WebkitTextStroke: `${vw(2)} #FFEF72`,
                     paintOrder: "stroke fill",
                   }}
                 >
                   Assistance?
                 </span>
               </h2>
+            </div>
 
-              {/* Subtitle - Manual Service Request */}
-              {/* 与标题距离拉远 marginTop: 50 */}
-              <p
-                className="font-anaheim font-extrabold"
-                style={{
-                  marginTop: vw(50),
-                  fontSize: vw(29),
-                  lineHeight: vw(40),
-                  color: "#FFF071",
-                }}
-              >
-                {subtitle}
-              </p>
-
-              {/* Description */}
-              {/* 与subtitle距离缩短 marginTop: 8 */}
-              <p
-                className="font-anaheim font-normal text-white"
-                style={{
-                  marginTop: vw(8),
-                  width: vw(440),
-                  fontSize: vw(20),
-                  lineHeight: vw(40),
-                }}
-              >
-                {description}
-              </p>
-          </div>
-
-          {/* Left Side - Contact Info (Group 188) */}
-          {/* Figma: x=307 → 右移20px → x=327, y=543 */}
-          <div className="absolute" style={{ left: vw(327), top: vw(543) }}>
-              {/* Email label - Figma: y=5059, font-size 20, line-height 54 */}
-              <p
-                className="font-anaheim font-semibold text-white/70"
-                style={{ fontSize: vw(20), lineHeight: vw(54) }}
-              >
-                Email
-              </p>
-              {/* Email value - Figma: y=5099 (5099-5059-54=-14, 紧贴) font-size 24, line-height 54 */}
-              <a
-                href={`mailto:${email}`}
-                className="font-anaheim font-semibold text-white underline hover:text-white/80 transition-colors block"
-                style={{ fontSize: vw(24), lineHeight: vw(54), textUnderlineOffset: vw(6) }}
-              >
-                {email}
-              </a>
-
-              {/* Phone label - Figma: y=5166 (5166-5099-54=13) font-size 20, line-height 54 */}
-              <p
-                className="font-anaheim font-semibold text-white/70"
-                style={{ fontSize: vw(20), lineHeight: vw(54), marginTop: vw(13) }}
-              >
-                Phone / WhatsApp
-              </p>
-              {/* Phone value - Figma: y=5199 (5199-5166-54=-21, 紧贴) font-size 24, line-height 54 */}
-              <a
-                href={`tel:${phone.replace(/\s/g, '')}`}
-                className="font-anaheim font-semibold text-white underline hover:text-white/80 transition-colors block"
-                style={{ fontSize: vw(24), lineHeight: vw(54), letterSpacing: "0.07em", textUnderlineOffset: vw(6) }}
-              >
-                {phone}
-              </a>
-
-              {/* Footer Note - Figma: y=5296 (5296-5199-54=43) font-size 16, line-height 30 */}
-              <p
-                className="font-anaheim font-semibold text-white whitespace-pre-line"
-                style={{
-                  marginTop: vw(43),
-                  width: vw(428),
-                  fontSize: vw(16),
-                  lineHeight: vw(30),
-                }}
-              >
-                {footerNote}
+            {/* Subtitle - Manual Service Request */}
+            <p
+              className="absolute font-anaheim font-extrabold"
+              style={{
+                left: vw(96),
+                top: vwFull(220),
+                fontSize: vw(40),
+                lineHeight: vw(54),
+                color: "#FFF071",
+              }}
+            >
+              {subtitle}
             </p>
-          </div>
 
-          {/* Right Side - Form */}
-          {/* Figma: x=888 → 左移20px → x=868, width=715 */}
-          <div className="absolute" style={{ left: vw(868), top: vw(45), width: vw(715) }}>
-              {/* Form Header - Figma: font-size 29, line-height 61 */}
-              <h3
-                className="font-anaheim font-semibold text-white"
-                style={{
-                  fontSize: vw(29),
-                  lineHeight: vw(61),
-                  marginBottom: vw(24),
-                }}
+            {/* Description */}
+            <p
+              className="absolute font-anaheim font-normal text-white"
+              style={{
+                left: vw(96),
+                top: vwFull(280),
+                width: vw(475),
+                fontSize: vw(24),
+                lineHeight: vw(36),
+              }}
+            >
+              {description}
+            </p>
+
+            {/* Email Label */}
+            <p
+              className="absolute font-anaheim font-semibold text-white/70"
+              style={{
+                left: vw(96),
+                top: vwFull(450),
+                fontSize: vw(24),
+                lineHeight: vw(40),
+              }}
+            >
+              Email
+            </p>
+
+            {/* Email Value */}
+            <p
+              className="absolute font-anaheim font-semibold text-white"
+              style={{
+                left: vw(96),
+                top: vwFull(490),
+                fontSize: vw(40),
+                lineHeight: vw(48),
+              }}
+            >
+              {email}
+            </p>
+
+            {/* Phone Label */}
+            <p
+              className="absolute font-anaheim font-semibold text-white/70"
+              style={{
+                left: vw(96),
+                top: vwFull(565),
+                fontSize: vw(24),
+                lineHeight: vw(40),
+              }}
+            >
+              Phone / WhatsApp
+            </p>
+
+            {/* Phone Value */}
+            <p
+              className="absolute font-anaheim font-semibold text-white"
+              style={{
+                left: vw(96),
+                top: vwFull(605),
+                fontSize: vw(45),
+                lineHeight: vw(48),
+              }}
+            >
+              {phone}
+            </p>
+
+            {/* Footer Note */}
+            <p
+              className="absolute font-anaheim font-semibold text-white whitespace-pre-line"
+              style={{
+                left: vw(96),
+                top: vwFull(700),
+                width: vw(428),
+                fontSize: vw(16),
+                lineHeight: vw(26),
+              }}
+            >
+              {footerNote}
+            </p>
+
+            {/* Right Side - Form */}
+            <div className="absolute" style={{ left: vw(787), top: vwFull(60), width: vw(715) }}>
+          {/* Form Header */}
+          <h3
+            className="font-anaheim font-semibold text-white"
+            style={{
+              fontSize: vw(42),
+              lineHeight: vw(61),
+              marginBottom: vw(42),
+            }}
+          >
+            Send us an inquiry via the following contact details
+          </h3>
+
+          {loading ? (
+            <div className="flex items-center justify-center" style={{ paddingTop: vw(48), paddingBottom: vw(48) }}>
+              <div
+                className="border-2 border-white border-t-transparent rounded-full animate-spin"
+                style={{ width: vw(32), height: vw(32) }}
+              />
+            </div>
+          ) : submitted ? (
+            <div
+              className="bg-white/20 backdrop-blur-sm text-center"
+              style={{ borderRadius: vw(15), padding: vw(32) }}
+            >
+              <svg
+                className="text-[#FFF071] mx-auto"
+                style={{ width: vw(64), height: vw(64), marginBottom: vw(16) }}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                Send us an inquiry via the following contact details
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <h3
+                className="font-anaheim font-bold text-white"
+                style={{ fontSize: vw(20), marginBottom: vw(8) }}
+              >
+                Success!
               </h3>
+              <p className="text-white/80" style={{ fontSize: vw(16) }}>
+                {formConfig?.successMessage || "Your message has been sent successfully!"}
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: vw(14) }}>
+              {/* Name & Email Row */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: vw(37) }}>
+                {fields.nameEmail.slice(0, 2).map((field) => (
+                  <div key={field.fieldName}>{renderField(field)}</div>
+                ))}
+              </div>
 
-              {loading ? (
-                <div className="flex items-center justify-center" style={{ paddingTop: vw(48), paddingBottom: vw(48) }}>
-                  <div
-                    className="border-2 border-white border-t-transparent rounded-full animate-spin"
-                    style={{ width: vw(32), height: vw(32) }}
+              {/* Service Type Checkboxes */}
+              {fields.serviceType && renderField(fields.serviceType)}
+
+              {/* Description Textarea */}
+              {fields.description && renderField(fields.description)}
+
+              {/* File Upload */}
+              {fields.file && renderField(fields.file)}
+
+              {/* Captcha */}
+              {shouldShowCaptcha && formConfig?.captchaSiteKey && (
+                <div className="flex justify-center" style={{ paddingTop: vw(16), paddingBottom: vw(16) }}>
+                  <Turnstile
+                    siteKey={formConfig.captchaSiteKey}
+                    onVerify={handleTurnstileVerify}
+                    onError={handleTurnstileError}
+                    onExpire={handleTurnstileExpire}
+                    theme={formConfig.captchaTheme}
+                    size={formConfig.captchaSize}
+                    language={locale === "zh" ? "zh-CN" : locale}
                   />
                 </div>
-              ) : submitted ? (
+              )}
+
+              {/* Error Message */}
+              {error && (
                 <div
-                  className="bg-white/20 backdrop-blur-sm text-center"
-                  style={{ borderRadius: vw(15), padding: vw(32) }}
+                  className="bg-red-500/20 border border-red-500/50 text-red-200"
+                  style={{ borderRadius: vw(15), padding: vw(16), fontSize: vw(14) }}
                 >
-                  <svg
-                    className="text-[#FFF071] mx-auto"
-                    style={{ width: vw(64), height: vw(64), marginBottom: vw(16) }}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <h3
-                    className="font-anaheim font-bold text-white"
-                    style={{ fontSize: vw(20), marginBottom: vw(8) }}
-                  >
-                    Success!
-                  </h3>
-                  <p className="text-white/80" style={{ fontSize: vw(16) }}>
-                    {formConfig?.successMessage || "Your message has been sent successfully!"}
-                  </p>
+                  {error}
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column" }}>
-                  {/* Name & Email Row - Figma: x=886/1262, y=113, gap 37px */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: vw(37) }}>
-                    {fields.nameEmail.slice(0, 2).map((field) => (
-                      <div key={field.fieldName}>{renderField(field)}</div>
-                    ))}
-                  </div>
+              )}
 
-                  {/* Service Type Checkboxes - Figma: y=187 (gap from input: 187-113-62=12) */}
-                  <div style={{ marginTop: vw(12) }}>
-                    {fields.serviceType && renderField(fields.serviceType)}
-                  </div>
-
-                  {/* Description Textarea - Figma: y=531 (gap from last checkbox: 531-460-62=9) */}
-                  <div style={{ marginTop: vw(9) }}>
-                    {fields.description && renderField(fields.description)}
-                  </div>
-
-                  {/* File Upload - Figma: y=720 (gap from textarea: 720-584-117=19) */}
-                  <div style={{ marginTop: vw(19) }}>
-                    {fields.file && renderField(fields.file)}
-                  </div>
-
-                  {/* Captcha */}
-                  {shouldShowCaptcha && formConfig?.captchaSiteKey && (
-                    <div className="flex justify-center" style={{ paddingTop: vw(16), paddingBottom: vw(16) }}>
-                      <Turnstile
-                        siteKey={formConfig.captchaSiteKey}
-                        onVerify={handleTurnstileVerify}
-                        onError={handleTurnstileError}
-                        onExpire={handleTurnstileExpire}
-                        theme={formConfig.captchaTheme}
-                        size={formConfig.captchaSize}
-                        language={locale === "zh" ? "zh-CN" : locale}
-                      />
-                    </div>
-                  )}
-
-                  {/* Error Message */}
-                  {error && (
-                    <div
-                      className="bg-red-500/20 border border-red-500/50 text-red-200"
-                      style={{ marginTop: vw(12), borderRadius: vw(15), padding: vw(16), fontSize: vw(14) }}
-                    >
-                      {error}
-                    </div>
-                  )}
-
-                  {/* Submit Button - Figma: y=815, 715×62, border-radius 63, font-size 24 */}
-                  {/* Gap from upload: 815-720-78=17 */}
-                  <button
-                    type="submit"
-                    disabled={submitting || (shouldShowCaptcha && !turnstileToken)}
-                    className="w-full bg-[#B2A224] text-white font-anaheim font-semibold hover:bg-[#9A8C1E] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                      marginTop: vw(17),
-                      height: vw(62),
-                      borderRadius: vw(63),
-                      fontSize: vw(24),
-                    }}
-                  >
-                    {submitting ? "Sending..." : formConfig?.submitButtonText || "Send Inquiry"}
-                </button>
-              </form>
-            )}
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={submitting || (shouldShowCaptcha && !turnstileToken)}
+                className="w-full bg-[#B2A224] text-white font-anaheim font-semibold hover:bg-[#9A8C1E] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  height: vw(72),
+                  borderRadius: vw(63),
+                  fontSize: vw(23),
+                }}
+              >
+                {submitting ? "Sending..." : formConfig?.submitButtonText || "Send Inquiry"}
+              </button>
+            </form>
+          )}
           </div>
+        </div>
         </div>
       </div>
     </section>
