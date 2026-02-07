@@ -50,6 +50,17 @@ export const SeoSettings: CollectionConfig = {
   // },
 
   fields: [
+    // Auto Draft - 自动保存草稿到 localStorage
+    {
+      name: 'autoDraft',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/components/fields/AutoDraft',
+        },
+      },
+    },
     // Translation Center
     {
       name: 'translationCenter',
@@ -173,9 +184,6 @@ export const SeoSettings: CollectionConfig = {
               en: 'Override page title for SEO (50-60 characters recommended)',
               zh: '覆盖页面的 SEO 标题（建议 50-60 个字符）',
             },
-            components: {
-              Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
-            },
           },
         },
         {
@@ -205,9 +213,6 @@ export const SeoSettings: CollectionConfig = {
             description: {
               en: 'Comma-separated keywords',
               zh: '用逗号分隔的关键词',
-            },
-            components: {
-              Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
             },
           },
         },
@@ -239,9 +244,6 @@ export const SeoSettings: CollectionConfig = {
             description: {
               en: 'Title displayed when shared on social media',
               zh: '在社交媒体分享时显示的标题',
-            },
-            components: {
-              Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
             },
           },
         },
