@@ -281,9 +281,11 @@ export function AnimationSection({
 
     const image = new Image()
 
-    // Fetch image as blob to avoid CORS issues with Canvas getImageData
-    // CloudFront doesn't return CORS headers, but fetch + blob URL works around this
-    fetch(imageUrl)
+    // Use internal API proxy to avoid CORS issues with Canvas getImageData
+    // CloudFront doesn't return CORS headers, so we proxy through Next.js
+    const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(imageUrl)}`
+
+    fetch(proxyUrl)
       .then(response => response.blob())
       .then(blob => {
         blobUrl = URL.createObjectURL(blob)
