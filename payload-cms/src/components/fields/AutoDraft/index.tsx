@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useCallback, useState } from 'react'
-import { useDocumentInfo, useFormFields, useTranslation, useLocale } from '@payloadcms/ui'
+import { useDocumentInfo, useFormFields, useTranslation, useLocale, useForm } from '@payloadcms/ui'
 import './styles.scss'
 
 interface AutoDraftProps {
@@ -37,6 +37,7 @@ export const AutoDraft: React.FC<AutoDraftProps> = () => {
   const { id, collectionSlug } = useDocumentInfo()
   const locale = useLocale()
   const { t } = useTranslation()
+  const { setModified, dispatchFields } = useForm()
 
   // 获取所有表单字段
   const allFields = useFormFields(([fields]) => fields)
@@ -45,6 +46,7 @@ export const AutoDraft: React.FC<AutoDraftProps> = () => {
   const [hasDraft, setHasDraft] = useState(false)
   const [showRestorePrompt, setShowRestorePrompt] = useState(false)
   const [draftTimestamp, setDraftTimestamp] = useState<Date | null>(null)
+  const [draftData, setDraftData] = useState<Record<string, any> | null>(null)
 
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
   const lastDataRef = useRef<string>('')
@@ -113,6 +115,33 @@ export const AutoDraft: React.FC<AutoDraftProps> = () => {
     return null
   }, [collectionSlug, id, localeCode])
 
+  // 恢复草稿
+  const restoreDraft = useCallback(() => {
+    if (!draftData || !dispatchFields) return
+
+    try {
+      // 使用 dispatchFields 更新表单字段
+      Object.entries(draftData).forEach(([fieldPath, value]) => {
+        dispatchFields({
+          type: 'UPDATE',
+          path: fieldPath,
+          value: value,
+        })
+      })
+
+      // 标记表单已修改
+      setModified(true)
+
+      // 清除恢复提示
+      setShowRestorePrompt(false)
+      setDraftData(null)
+
+      console.log('[AutoDraft] Draft restored successfully')
+    } catch (error) {
+      console.error('[AutoDraft] Failed to restore draft:', error)
+    }
+  }, [draftData, dispatchFields, setModified])
+
   // 忽略草稿
   const dismissDraft = useCallback(() => {
     if (collectionSlug) {
@@ -121,6 +150,7 @@ export const AutoDraft: React.FC<AutoDraftProps> = () => {
     setShowRestorePrompt(false)
     setHasDraft(false)
     setDraftTimestamp(null)
+    setDraftData(null)
   }, [collectionSlug, id, localeCode])
 
   // 清除草稿（保存成功后调用）
@@ -147,6 +177,7 @@ export const AutoDraft: React.FC<AutoDraftProps> = () => {
         setHasDraft(true)
         setShowRestorePrompt(true)
         setDraftTimestamp(draft.timestamp)
+        setDraftData(draft.data) // 保存草稿数据用于恢复
         console.log('[AutoDraft] Found existing draft from:', draft.timestamp)
       }
     }
@@ -294,15 +325,19 @@ export const AutoDraft: React.FC<AutoDraftProps> = () => {
             <div className="auto-draft__prompt-actions">
               <button
                 type="button"
+                className="auto-draft__btn auto-draft__btn--restore"
+                onClick={restoreDraft}
+              >
+                {t('custom:autoDraft:restore' as any) || 'Restore'}
+              </button>
+              <button
+                type="button"
                 className="auto-draft__btn auto-draft__btn--dismiss"
                 onClick={dismissDraft}
               >
                 {t('custom:autoDraft:dismiss' as any) || 'Dismiss'}
               </button>
             </div>
-          </div>
-          <div className="auto-draft__prompt-note">
-            {t('custom:autoDraft:restoreNote' as any) || 'Note: Draft data is stored locally. If needed, please re-enter the content.'}
           </div>
         </div>
       )}
