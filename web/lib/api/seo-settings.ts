@@ -71,7 +71,7 @@ export async function getAllSeoSettings(locale: string = 'en'): Promise<SeoSetti
 
   try {
     const response = await fetch(
-      `${CMS_URL}/api/seo-settings?locale=${locale}&limit=100&depth=1`,
+      `${CMS_URL}/api/seo-settings?locale=${locale}&limit=500&depth=1`,
       {
         next: { revalidate: 300 }, // 5 minutes
       }
