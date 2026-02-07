@@ -118,28 +118,69 @@ export const AutoDraft: React.FC<AutoDraftProps> = () => {
   const restoreDraft = useCallback(() => {
     if (!draftData) return
 
+    console.log('[AutoDraft] Attempting to restore draft data:', draftData)
+
     try {
       // 遍历草稿数据，找到对应的表单元素并填充值
       Object.entries(draftData).forEach(([fieldPath, value]) => {
-        if (value === undefined || value === null) return
+        if (value === undefined || value === null || value === '') return
 
-        // 尝试找到对应的表单元素
-        // Payload 使用 name 属性来标识字段
-        const input = document.querySelector(
-          `[name="${fieldPath}"], [data-path="${fieldPath}"]`
-        ) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null
+        console.log(`[AutoDraft] Trying to restore field: ${fieldPath} = ${value}`)
+
+        // Payload v3 使用 id 属性: field-{fieldPath}
+        // 也尝试其他可能的选择器
+        const selectors = [
+          `#field-${fieldPath}`,
+          `#field-${fieldPath.replace(/\./g, '__')}`,
+          `[name="${fieldPath}"]`,
+          `[data-path="${fieldPath}"]`,
+          `textarea[id*="${fieldPath}"]`,
+          `input[id*="${fieldPath}"]`,
+        ]
+
+        let input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null = null
+
+        for (const selector of selectors) {
+          try {
+            input = document.querySelector(selector) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null
+            if (input) {
+              console.log(`[AutoDraft] Found field with selector: ${selector}`)
+              break
+            }
+          } catch (e) {
+            // Invalid selector, skip
+          }
+        }
 
         if (input) {
           // 设置值
-          input.value = String(value)
+          const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+            window.HTMLTextAreaElement.prototype,
+            'value'
+          )?.set || Object.getOwnPropertyDescriptor(
+            window.HTMLInputElement.prototype,
+            'value'
+          )?.set
 
-          // 触发 input 和 change 事件让 React 感知变化
-          input.dispatchEvent(new Event('input', { bubbles: true }))
-          input.dispatchEvent(new Event('change', { bubbles: true }))
+          if (nativeInputValueSetter) {
+            nativeInputValueSetter.call(input, String(value))
+          } else {
+            input.value = String(value)
+          }
+
+          // 触发 React 的 onChange
+          const event = new Event('input', { bubbles: true })
+          input.dispatchEvent(event)
 
           console.log(`[AutoDraft] Restored field: ${fieldPath}`)
         } else {
-          console.log(`[AutoDraft] Field not found: ${fieldPath}`)
+          console.log(`[AutoDraft] Field not found for path: ${fieldPath}`)
+          // 列出所有表单元素用于调试
+          console.log('[AutoDraft] Available form elements:',
+            Array.from(document.querySelectorAll('input, textarea, select'))
+              .map(el => ({ id: el.id, name: (el as any).name, tagName: el.tagName }))
+              .slice(0, 20)
+          )
         }
       })
 
@@ -147,7 +188,7 @@ export const AutoDraft: React.FC<AutoDraftProps> = () => {
       setShowRestorePrompt(false)
       setDraftData(null)
 
-      console.log('[AutoDraft] Draft restore attempted')
+      console.log('[AutoDraft] Draft restore completed')
     } catch (error) {
       console.error('[AutoDraft] Failed to restore draft:', error)
     }
