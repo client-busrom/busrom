@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useCallback, useState } from 'react'
-import { useDocumentInfo, useFormFields, useTranslation, useLocale, useForm } from '@payloadcms/ui'
+import { useDocumentInfo, useFormFields, useTranslation, useLocale } from '@payloadcms/ui'
 import './styles.scss'
 
 interface AutoDraftProps {
@@ -37,7 +37,6 @@ export const AutoDraft: React.FC<AutoDraftProps> = () => {
   const { id, collectionSlug } = useDocumentInfo()
   const locale = useLocale()
   const { t } = useTranslation()
-  const { setModified, dispatchFields } = useForm()
 
   // 获取所有表单字段
   const allFields = useFormFields(([fields]) => fields)
@@ -117,30 +116,42 @@ export const AutoDraft: React.FC<AutoDraftProps> = () => {
 
   // 恢复草稿
   const restoreDraft = useCallback(() => {
-    if (!draftData || !dispatchFields) return
+    if (!draftData) return
 
     try {
-      // 使用 dispatchFields 更新表单字段
+      // 遍历草稿数据，找到对应的表单元素并填充值
       Object.entries(draftData).forEach(([fieldPath, value]) => {
-        dispatchFields({
-          type: 'UPDATE',
-          path: fieldPath,
-          value: value,
-        })
-      })
+        if (value === undefined || value === null) return
 
-      // 标记表单已修改
-      setModified(true)
+        // 尝试找到对应的表单元素
+        // Payload 使用 name 属性来标识字段
+        const input = document.querySelector(
+          `[name="${fieldPath}"], [data-path="${fieldPath}"]`
+        ) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null
+
+        if (input) {
+          // 设置值
+          input.value = String(value)
+
+          // 触发 input 和 change 事件让 React 感知变化
+          input.dispatchEvent(new Event('input', { bubbles: true }))
+          input.dispatchEvent(new Event('change', { bubbles: true }))
+
+          console.log(`[AutoDraft] Restored field: ${fieldPath}`)
+        } else {
+          console.log(`[AutoDraft] Field not found: ${fieldPath}`)
+        }
+      })
 
       // 清除恢复提示
       setShowRestorePrompt(false)
       setDraftData(null)
 
-      console.log('[AutoDraft] Draft restored successfully')
+      console.log('[AutoDraft] Draft restore attempted')
     } catch (error) {
       console.error('[AutoDraft] Failed to restore draft:', error)
     }
-  }, [draftData, dispatchFields, setModified])
+  }, [draftData])
 
   // 忽略草稿
   const dismissDraft = useCallback(() => {
