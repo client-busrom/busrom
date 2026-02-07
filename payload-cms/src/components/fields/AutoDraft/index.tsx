@@ -153,26 +153,46 @@ export const AutoDraft: React.FC<AutoDraftProps> = () => {
         }
 
         if (input) {
-          // 设置值
-          const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-            window.HTMLTextAreaElement.prototype,
-            'value'
-          )?.set || Object.getOwnPropertyDescriptor(
-            window.HTMLInputElement.prototype,
-            'value'
-          )?.set
+          // 根据元素类型设置值
+          const tagName = input.tagName.toLowerCase()
 
-          if (nativeInputValueSetter) {
-            nativeInputValueSetter.call(input, String(value))
-          } else {
+          if (tagName === 'select') {
+            // Select 元素直接设置 value
             input.value = String(value)
+            input.dispatchEvent(new Event('change', { bubbles: true }))
+          } else if (tagName === 'textarea') {
+            // Textarea 使用原生 setter
+            const textareaSetter = Object.getOwnPropertyDescriptor(
+              window.HTMLTextAreaElement.prototype,
+              'value'
+            )?.set
+            if (textareaSetter) {
+              textareaSetter.call(input, String(value))
+            } else {
+              input.value = String(value)
+            }
+            input.dispatchEvent(new Event('input', { bubbles: true }))
+          } else if (tagName === 'input') {
+            // Input 使用原生 setter
+            const inputType = (input as HTMLInputElement).type
+            if (inputType === 'checkbox') {
+              (input as HTMLInputElement).checked = Boolean(value)
+              input.dispatchEvent(new Event('change', { bubbles: true }))
+            } else {
+              const inputSetter = Object.getOwnPropertyDescriptor(
+                window.HTMLInputElement.prototype,
+                'value'
+              )?.set
+              if (inputSetter) {
+                inputSetter.call(input, String(value))
+              } else {
+                input.value = String(value)
+              }
+              input.dispatchEvent(new Event('input', { bubbles: true }))
+            }
           }
 
-          // 触发 React 的 onChange
-          const event = new Event('input', { bubbles: true })
-          input.dispatchEvent(event)
-
-          console.log(`[AutoDraft] Restored field: ${fieldPath}`)
+          console.log(`[AutoDraft] Restored field: ${fieldPath} (${tagName})`)
         } else {
           console.log(`[AutoDraft] Field not found for path: ${fieldPath}`)
           // 列出所有表单元素用于调试
