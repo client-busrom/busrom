@@ -19,8 +19,7 @@ interface SeoAttributeDistributorProps {
   distribution: KeywordDistribution
 }
 
-// Maximum keywords per image alt (to keep alt text reasonable)
-const MAX_KEYWORDS_PER_IMAGE = 15
+// No fixed limit - dynamically calculate based on available keywords and images
 
 /**
  * Client component that distributes keywords into existing page elements
@@ -72,17 +71,15 @@ export function SeoAttributeDistributor({ distribution }: SeoAttributeDistributo
       // ============================================================
       // 1. IMAGE ALT - Primary target, fill as much as possible
       // Exclude header images, overwrite original alt
+      // Dynamic calculation: distribute ALL keywords evenly across images
       // ============================================================
       const allImages = Array.from(document.querySelectorAll('img'))
         .filter(img => !isInsideHeader(img))
 
       if (allImages.length > 0 && keywordIndex < keywordPool.length) {
-        // Calculate keywords per image to distribute evenly
-        const remainingKeywords = keywordPool.length - keywordIndex
-        const keywordsPerImage = Math.min(
-          Math.ceil(remainingKeywords / allImages.length),
-          MAX_KEYWORDS_PER_IMAGE
-        )
+        // Dynamic: calculate keywords per image based on total keywords and image count
+        const totalKeywords = keywordPool.length
+        const keywordsPerImage = Math.ceil(totalKeywords / allImages.length)
 
         allImages.forEach(img => {
           const keywords = getNextKeywords(keywordsPerImage)
@@ -102,10 +99,7 @@ export function SeoAttributeDistributor({ distribution }: SeoAttributeDistributo
 
       if (imagesForTitle.length > 0 && keywordIndex < keywordPool.length) {
         const remainingKeywords = keywordPool.length - keywordIndex
-        const keywordsPerImage = Math.min(
-          Math.ceil(remainingKeywords / imagesForTitle.length),
-          MAX_KEYWORDS_PER_IMAGE
-        )
+        const keywordsPerImage = Math.ceil(remainingKeywords / imagesForTitle.length)
 
         imagesForTitle.forEach(img => {
           const keywords = getNextKeywords(keywordsPerImage)
