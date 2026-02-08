@@ -97,6 +97,17 @@ export const customTranslationsEn = {
     },
 
     // ========================================================================
+    // Auto Draft Component
+    // ========================================================================
+    autoDraft: {
+      foundDraft: 'Unsaved draft found',
+      restore: 'Restore',
+      dismiss: 'Dismiss',
+      savedAt: 'Draft saved at',
+      restoreNote: 'Note: Draft data is stored locally. If needed, please re-enter the content.',
+    },
+
+    // ========================================================================
     // Media Picker Component
     // ========================================================================
     mediaPicker: {
@@ -424,6 +435,17 @@ export const customTranslationsZh = {
       success: '成功',
       failed: '失败',
       loadFailed: '加载表单字段数据失败',
+    },
+
+    // ========================================================================
+    // Auto Draft Component
+    // ========================================================================
+    autoDraft: {
+      foundDraft: '发现未保存的草稿',
+      restore: '恢复',
+      dismiss: '忽略',
+      savedAt: '草稿保存于',
+      restoreNote: '注意：草稿数据存储在本地浏览器中。如需恢复，请重新输入内容。',
     },
 
     // ========================================================================
