@@ -32,7 +32,7 @@ export function DesktopTopSection({
       className="hidden lg:block relative mx-auto"
       style={{
         width: vw(1344),      // 1920 * 0.7
-        height: vw(655),      // 936 * 0.7
+        height: vw(705),      // increased from 655
         marginTop: vw(34),    // 49 * 0.7
       }}
     >
@@ -43,7 +43,7 @@ export function DesktopTopSection({
           left: vw(70),       // 100 * 0.7
           top: 0,
           width: vw(1204),    // 1720 * 0.7
-          height: vw(655),    // 936 * 0.7
+          height: vw(705),    // increased from 655
           borderRadius: vw(21), // 30 * 0.7
           background: "linear-gradient(180deg, #756F3F 0%, #8F8840 100%)",
         }}
@@ -54,7 +54,7 @@ export function DesktopTopSection({
         className="absolute"
         style={{
           left: vw(181),      // 258 * 0.7
-          top: vw(58),        // 上移20px (72 - 20 = 52, 四舍五入58)
+          top: vw(83),        // centered: 58 + 25
         }}
       >
         {/* Title and Description */}
@@ -64,7 +64,7 @@ export function DesktopTopSection({
             style={{
               fontSize: vw(60),
               lineHeight: vw(68),
-              marginBottom: vw(28), // 40 * 0.7
+              marginBottom: vw(10), // 40 * 0.7
             }}
           >
             {title}
@@ -72,8 +72,8 @@ export function DesktopTopSection({
           <p
             className="font-anaheim font-semibold text-[#FFF9D3]"
             style={{
-              fontSize: vw(20),
-              lineHeight: vw(30),
+              fontSize: vw(18),
+              lineHeight: vw(28),
             }}
           >
             {description}
@@ -86,7 +86,7 @@ export function DesktopTopSection({
         className="absolute flex flex-col"
         style={{
           left: vw(136),
-          top: vw(262),       // 下移10px
+          top: vw(287),       // centered: 262 + 25
         }}
       >
         {categories.map((category, index) => {
@@ -156,7 +156,7 @@ export function DesktopTopSection({
           height: vw(75),
           background: "#706B38",
           left: vw(1128),     // 1611 * 0.7
-          top: vw(48),        // 69 * 0.7
+          top: vw(73),        // centered: 48 + 25
         }}
       />
 
@@ -166,7 +166,7 @@ export function DesktopTopSection({
         style={{
           fontSize: vw(28),   // 40 * 0.7
           right: vw(217),     // 310 * 0.7
-          top: vw(60),        // 85 * 0.7
+          top: vw(85),        // centered: 60 + 25
           letterSpacing: "0.5em",
         }}
       >
@@ -179,7 +179,7 @@ export function DesktopTopSection({
         style={{
           fontSize: vw(28),   // 40 * 0.7
           left: vw(1134),     // 1620 * 0.7
-          top: vw(126),       // 180 * 0.7
+          top: vw(151),       // centered: 126 + 25
           writingMode: "vertical-rl",
           textOrientation: "mixed",
           letterSpacing: "0.5em",
@@ -196,7 +196,7 @@ export function DesktopTopSection({
           height: vw(256),    // 365 * 0.7
           borderRadius: vw(21), // 30 * 0.7
           left: vw(755),      // 1079 * 0.7
-          top: vw(124),       // 177 * 0.7
+          top: vw(149),       // centered: 124 + 25
           boxShadow: `${vw(3)} ${vw(3)} ${vw(8)} rgba(0, 0, 0, 0.25)`, // 4/4/11.4 * 0.7
         }}
       >
@@ -231,7 +231,7 @@ export function DesktopTopSection({
           height: vw(255),    // 364 * 0.7
           borderRadius: vw(21), // 30 * 0.7
           left: vw(849),      // 1213 * 0.7
-          top: vw(352),       // 503 * 0.7
+          top: vw(377),       // centered: 352 + 25
           boxShadow: `${vw(3)} ${vw(3)} ${vw(7)} rgba(0, 0, 0, 0.25)`, // 4/4/9.3 * 0.7
         }}
       >

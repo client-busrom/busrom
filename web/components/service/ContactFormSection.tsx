@@ -581,12 +581,9 @@ export function ContactFormSection({
                 justifyContent: "center",
                 height: vw(90),
                 borderRadius: vw(15),
-                backgroundColor: "rgba(33, 28, 11, 0.5)",
-                border: "1px dashed rgba(255, 255, 255, 0.3)",
                 cursor: "pointer",
-                transition: "all 0.2s",
               }}
-              className="hover:bg-[#211C0B]/60"
+              className="bg-[#211C0B]/50 border border-dashed border-white/30 transition-all duration-200 hover:bg-[#211C0B]/70 hover:border-white/60 hover:scale-[1.02]"
             >
               <span className="font-anaheim font-semibold text-white/50" style={{ fontSize: vw(20) }}>
                 {uploadingFiles[field.fieldName]
@@ -978,7 +975,7 @@ export function ContactFormSection({
             style={{
               transform: "translate(-50%, -50%)",
               width: vw(1600),
-              height: vwFull(880),
+              height: vwFull(800),
               borderRadius: vw(52),
               backdropFilter: `blur(${vw(18.7)})`,
               background: "rgba(117, 111, 63, 0.36)",
@@ -1007,17 +1004,17 @@ export function ContactFormSection({
             </svg>
           </div>
 
-          {/* Content Container - 在880px框内居中 */}
+          {/* Content Container - 在800px框内居中 */}
           <div
             className="absolute left-1/2 top-1/2"
             style={{
               transform: "translate(-50%, -50%)",
               width: vw(1600),
-              height: vwFull(880),
+              height: vwFull(800),
             }}
           >
             {/* Left Side - Contact Info */}
-            <div className="absolute" style={{ left: vw(96), top: vwFull(60) }}>
+            <div className="absolute" style={{ left: vw(96), top: vwFull(55) }}>
               {/* Main Title - Need More Assistance? */}
               <h2 className="font-anaheim font-extrabold" style={{ fontSize: vw(85), lineHeight: vw(98) }}>
                 {/* Need - white fill with yellow stroke */}
@@ -1061,7 +1058,7 @@ export function ContactFormSection({
               className="absolute font-anaheim font-extrabold"
               style={{
                 left: vw(96),
-                top: vwFull(220),
+                top: vwFull(200),
                 fontSize: vw(40),
                 lineHeight: vw(54),
                 color: "#FFF071",
@@ -1075,7 +1072,7 @@ export function ContactFormSection({
               className="absolute font-anaheim font-normal text-white"
               style={{
                 left: vw(96),
-                top: vwFull(280),
+                top: vwFull(255),
                 width: vw(475),
                 fontSize: vw(24),
                 lineHeight: vw(36),
@@ -1089,7 +1086,7 @@ export function ContactFormSection({
               className="absolute font-anaheim font-semibold text-white/70"
               style={{
                 left: vw(96),
-                top: vwFull(450),
+                top: vwFull(495),
                 fontSize: vw(24),
                 lineHeight: vw(40),
               }}
@@ -1098,24 +1095,25 @@ export function ContactFormSection({
             </p>
 
             {/* Email Value */}
-            <p
-              className="absolute font-anaheim font-semibold text-white"
+            <a
+              href={`mailto:${email}`}
+              className="absolute font-anaheim font-semibold text-white underline hover:text-white/80 transition-colors"
               style={{
                 left: vw(96),
-                top: vwFull(490),
+                top: vwFull(530),
                 fontSize: vw(40),
                 lineHeight: vw(48),
               }}
             >
               {email}
-            </p>
+            </a>
 
             {/* Phone Label */}
             <p
               className="absolute font-anaheim font-semibold text-white/70"
               style={{
                 left: vw(96),
-                top: vwFull(565),
+                top: vwFull(600),
                 fontSize: vw(24),
                 lineHeight: vw(40),
               }}
@@ -1124,24 +1122,26 @@ export function ContactFormSection({
             </p>
 
             {/* Phone Value */}
-            <p
-              className="absolute font-anaheim font-semibold text-white"
+            <a
+              href={`tel:${phone?.replace(/\s/g, '')}`}
+              className="absolute font-anaheim font-semibold text-white underline hover:text-white/80 transition-colors"
               style={{
                 left: vw(96),
-                top: vwFull(605),
+                top: vwFull(635),
                 fontSize: vw(45),
                 lineHeight: vw(48),
+                letterSpacing: '0.07em',
               }}
             >
               {phone}
-            </p>
+            </a>
 
             {/* Footer Note */}
             <p
               className="absolute font-anaheim font-semibold text-white whitespace-pre-line"
               style={{
                 left: vw(96),
-                top: vwFull(700),
+                top: vwFull(720),
                 width: vw(428),
                 fontSize: vw(16),
                 lineHeight: vw(26),
@@ -1151,7 +1151,7 @@ export function ContactFormSection({
             </p>
 
             {/* Right Side - Form */}
-            <div className="absolute" style={{ left: vw(787), top: vwFull(60), width: vw(715) }}>
+            <div className="absolute" style={{ left: vw(787), top: vwFull(55), width: vw(715) }}>
           {/* Form Header */}
           <h3
             className="font-anaheim font-semibold text-white"

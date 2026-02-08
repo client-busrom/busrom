@@ -61,13 +61,14 @@ const ACTIVE_POSITION = 0.38 // Position where the active dot should be
 const getIconForTitle = (title: string): LucideIcon => {
   const titleLower = title.toLowerCase()
 
+  // More specific matches first
+  if (titleLower.includes("rigorous") || titleLower.includes("inspection")) return ClipboardCheck
   if (titleLower.includes("quality")) return Award
   if (titleLower.includes("safety") || titleLower.includes("comfort")) return Shield
   if (titleLower.includes("innovation")) return Lightbulb
   if (titleLower.includes("custom")) return Settings
   if (titleLower.includes("precision") || titleLower.includes("machining")) return Gauge
   if (titleLower.includes("sustainab") || titleLower.includes("cost")) return Leaf
-  if (titleLower.includes("inspection") || titleLower.includes("quality inspection")) return ClipboardCheck
   if (titleLower.includes("global") || titleLower.includes("partnership")) return Globe
 
   // Default icon
@@ -362,7 +363,7 @@ export function ServiceValueSection({
       <div className="hidden lg:block relative w-full h-full">
       {/* Background with gradient overlay */}
       <div className="absolute inset-0">
-        {/* Background gradient */}
+        {/* Layer 1 (bottom): Green gradient */}
         <div
           className="absolute inset-0"
           style={{
@@ -370,13 +371,13 @@ export function ServiceValueSection({
           }}
         />
 
-        {/* Background image */}
+        {/* Layer 2 (top): Background image with 79% opacity */}
         {backgroundImage && (
-          <div className="absolute inset-0">
+          <div className="absolute inset-0" style={{ opacity: 0.79 }}>
             <OptimizedImage
               image={backgroundImage as any}
               size="large"
-              className="w-full h-full object-cover mix-blend-multiply"
+              className="w-full h-full object-cover"
               priority
             />
           </div>
@@ -567,11 +568,11 @@ export function ServiceValueSection({
           className="absolute overflow-hidden"
           style={{
             left: vw(513),
-            top: vw(602),
+            top: vw(550),
             width: vw(474),
             height: vw(284),
             borderRadius: vw(30),
-            backgroundColor: "rgba(222, 214, 152, 0.3)",
+            backgroundColor: "rgba(222, 214, 152, 0.5)",
           }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

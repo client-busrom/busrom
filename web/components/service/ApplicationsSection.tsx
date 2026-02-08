@@ -50,12 +50,14 @@ interface ApplicationsSectionProps {
 const DESIGN_HEIGHT = 922
 
 // Card configurations based on Figma layout - staggered heights
-// Final display sizes: 570x400 and 420x400, divide by 0.7 to get design values
+// Use exact values that result in whole pixels after 0.7 scale: 570x400 and 420x400
+// 570/0.7 ≈ 814.29, 400/0.7 ≈ 571.43, 420/0.7 = 600
+// Use direct pixel values divided by scale factor at render time
 const CARD_STYLES = [
-  { width: 814, height: 571, yOffset: 0 },    // Rectangle card (570/0.7 x 400/0.7)
-  { width: 600, height: 571, yOffset: 177 },  // Square-ish card (420/0.7 x 400/0.7), offset down (124/0.7)
-  { width: 814, height: 571, yOffset: 0 },    // Rectangle card
-  { width: 600, height: 571, yOffset: 177 },  // Square-ish card, offset down
+  { width: 570, height: 400, yOffset: 0, useDirectPx: true },    // Rectangle card 570x400
+  { width: 420, height: 400, yOffset: 124, useDirectPx: true },  // Square-ish card 420x400, offset down 124px
+  { width: 570, height: 400, yOffset: 0, useDirectPx: true },    // Rectangle card
+  { width: 420, height: 400, yOffset: 124, useDirectPx: true },  // Square-ish card, offset down
 ]
 
 export function ApplicationsSection({
@@ -72,6 +74,8 @@ export function ApplicationsSection({
   const vw = (px: number) => `${(px * SCALE / DESIGN_WIDTH) * 100}vw`
   // Font vw: no scale, using standard font sizes (60/24/20/16)
   const fontVw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
+  // Direct pixel to vw: no scale, for exact pixel values (card sizes)
+  const pxToVw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
 
   const [applications, setApplications] = useState<ApplicationItem[]>(initialApplications || [])
   const [loading, setLoading] = useState(!initialApplications)
@@ -434,9 +438,9 @@ export function ApplicationsSection({
                   key={`${app.id}-${index}`}
                   className="relative flex-shrink-0 overflow-hidden group transition-shadow duration-300"
                   style={{
-                    width: vw(style.width),
-                    height: vw(style.height),
-                    marginTop: vw(style.yOffset),
+                    width: pxToVw(style.width),
+                    height: pxToVw(style.height),
+                    marginTop: pxToVw(style.yOffset),
                     marginRight: isLast ? vw(38) : undefined, // Add gap after last item for loop continuity
                     borderRadius: vw(30),
                   }}
