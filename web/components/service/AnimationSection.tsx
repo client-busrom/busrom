@@ -58,8 +58,27 @@ class WaterRipple {
     this.rippleMap = new Int32Array(size)
     this.lastMap = new Int32Array(size)
 
-    // Draw the image to canvas and get texture
-    this.ctx.drawImage(image, 0, 0, this.width, this.height)
+    // Draw the image to canvas with object-fit: cover behavior
+    const imgRatio = image.naturalWidth / image.naturalHeight
+    const canvasRatio = this.width / this.height
+
+    let drawWidth, drawHeight, drawX, drawY
+
+    if (imgRatio > canvasRatio) {
+      // Image is wider - fit height, crop width
+      drawHeight = this.height
+      drawWidth = this.height * imgRatio
+      drawX = (this.width - drawWidth) / 2
+      drawY = 0
+    } else {
+      // Image is taller - fit width, crop height
+      drawWidth = this.width
+      drawHeight = this.width / imgRatio
+      drawX = 0
+      drawY = (this.height - drawHeight) / 2
+    }
+
+    this.ctx.drawImage(image, drawX, drawY, drawWidth, drawHeight)
     this.texture = this.ctx.getImageData(0, 0, this.width, this.height)
     this.ripple = this.ctx.getImageData(0, 0, this.width, this.height)
 
@@ -355,22 +374,14 @@ export function AnimationSection({
     }
   }, [imageUrl])
 
-  // Handle mouse interaction - scale coordinates to match canvas resolution
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (rippleRef.current && canvasRef.current) {
-      const rect = canvasRef.current.getBoundingClientRect()
-      const x = (e.clientX - rect.left) * RIPPLE_SCALE
-      const y = (e.clientY - rect.top) * RIPPLE_SCALE
-      rippleRef.current.drop(x, y, 5 * RIPPLE_SCALE, 180, true)
-    }
-  }, [])
-
+  // Handle click interaction only - use drop's non-raw mode to let it handle coordinate conversion
   const handleClick = useCallback((e: React.MouseEvent) => {
-    if (rippleRef.current && canvasRef.current) {
-      const rect = canvasRef.current.getBoundingClientRect()
-      const x = (e.clientX - rect.left) * RIPPLE_SCALE
-      const y = (e.clientY - rect.top) * RIPPLE_SCALE
-      rippleRef.current.drop(x, y, 10 * RIPPLE_SCALE, 400, true)
+    if (rippleRef.current && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      // Pass false for isRaw so drop() converts coordinates using canvas.offsetWidth/Height
+      rippleRef.current.drop(x, y, 10, 400, false)
     }
   }, [])
 
@@ -385,9 +396,8 @@ export function AnimationSection({
         ref={containerRef}
         className="hidden lg:block relative w-full overflow-hidden cursor-pointer"
         style={{
-          height: vw(922),
+          height: vw(786),
         }}
-        onMouseMove={handleMouseMove}
         onClick={handleClick}
       >
         {/* Canvas for water ripple effect */}

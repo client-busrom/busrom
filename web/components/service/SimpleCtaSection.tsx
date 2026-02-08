@@ -48,6 +48,8 @@ export function SimpleCtaSection({
   const vw = (px: number) => `${(px * SCALE / DESIGN_WIDTH) * 100}vw`
   // Font vw: no scale, using standard font sizes (60/24/20/16)
   const fontVw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
+  // Direct pixel to vw: no scale, for exact pixel values (image sizes)
+  const pxToVw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
 
   // Embla carousel for mobile images
   const [emblaRef] = useEmblaCarousel({
@@ -186,10 +188,10 @@ export function SimpleCtaSection({
 
         {/* Description text */}
         <p
-          className="absolute font-anaheim font-medium text-white"
+          className="absolute font-montserrat font-medium text-white"
           style={{
-            left: vw(186),
-            top: vw(261),
+            left: vw(190),
+            top: vw(210),
             width: vw(683),
             fontSize: fontVw(16),
             lineHeight: fontVw(26),
@@ -287,14 +289,14 @@ export function SimpleCtaSection({
         </svg>
 
         {/* Right side images - stacked, 下移60px */}
-        {/* Image 1 - Top right */}
+        {/* Image 1 - Top right: 348x192 */}
         <div
           className="absolute overflow-hidden bg-[#D9D9D9]"
           style={{
             left: vw(995),
             top: vw(208),
-            width: vw(497),
-            height: vw(274),
+            width: pxToVw(348),
+            height: pxToVw(192),
             borderRadius: vw(42),
             boxShadow: "0px 4px 24.4px rgba(0, 0, 0, 0.25)",
           }}
@@ -309,14 +311,14 @@ export function SimpleCtaSection({
           ) : null}
         </div>
 
-        {/* Image 2 - Bottom right (largest) */}
+        {/* Image 2 - Bottom right (largest): 369x333 */}
         <div
           className="absolute overflow-hidden bg-[#D9D9D9]"
           style={{
             left: vw(1323),
             top: vw(382),
-            width: vw(527),
-            height: vw(476),
+            width: pxToVw(369),
+            height: pxToVw(333),
             borderRadius: vw(42),
             boxShadow: "0px 4px 24.4px rgba(0, 0, 0, 0.25)",
           }}
@@ -331,14 +333,14 @@ export function SimpleCtaSection({
           ) : null}
         </div>
 
-        {/* Image 3 - Bottom left of the image group */}
+        {/* Image 3 - Bottom left of the image group: 235x287 */}
         <div
           className="absolute overflow-hidden bg-[#D9D9D9]"
           style={{
             left: vw(1076),
             top: vw(536),
-            width: vw(336),
-            height: vw(410),
+            width: pxToVw(235),
+            height: pxToVw(287),
             borderRadius: vw(42),
             boxShadow: "0px 4px 24.4px rgba(0, 0, 0, 0.25)",
           }}
