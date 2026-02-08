@@ -74,6 +74,10 @@ async function getEffectiveEmailConfig(
   // Get auto-reply template (form override > global)
   const autoReplyTemplate = formConfig?.autoReplyTemplate || emailConfig.autoReplyTemplate
 
+  // Determine sender (form override > global)
+  const senderEmailAddress = formConfig?.senderEmailAddress || emailConfig.emailFromAddress
+  const senderName = formConfig?.senderName || emailConfig.emailFromName
+
   return {
     // Global settings
     formNotificationEnabled: emailConfig.formNotificationEnabled || false,
@@ -81,6 +85,9 @@ async function getEffectiveEmailConfig(
     notificationSubject: emailConfig.notificationSubject || 'New Form Submission: {formName}',
     emailFromAddress: emailConfig.emailFromAddress,
     emailFromName: emailConfig.emailFromName,
+    // Sender (form override > global)
+    senderEmailAddress,
+    senderName,
     // Auto-reply (merged)
     autoReplyEnabled,
     autoReplySubject,
@@ -164,11 +171,17 @@ export async function sendFormNotificationEmail(
     </html>
   `
 
+  // Build from address with form-specific sender
+  const fromAddress = config.senderEmailAddress && config.senderName
+    ? `"${config.senderName}" <${config.senderEmailAddress}>`
+    : undefined // Use default from email.ts
+
   // Send email
   return sendEmail(payload, {
     to: emails,
     subject,
     html,
+    from: fromAddress,
     replyTo: submission.data?.email,
   }, locale)
 }
@@ -243,10 +256,16 @@ export async function sendAutoReplyEmail(
     </html>
   `
 
+  // Build from address with form-specific sender
+  const fromAddress = config.senderEmailAddress && config.senderName
+    ? `"${config.senderName}" <${config.senderEmailAddress}>`
+    : undefined // Use default from email.ts
+
   // Send email
   return sendEmail(payload, {
     to: submitterEmail,
     subject,
     html,
+    from: fromAddress,
   }, locale)
 }
