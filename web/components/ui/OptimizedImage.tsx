@@ -340,7 +340,7 @@ export function OptimizedImage({
           {srcSet && (
             <source srcSet={srcSet} sizes={defaultSizes} />
           )}
-          {/* Fallback img */}
+          {/* Fallback img - suppressHydrationWarning because SEO component may modify alt after hydration */}
           <img
             ref={imgRef}
             src={defaultSrc}
@@ -355,6 +355,7 @@ export function OptimizedImage({
             fetchPriority={priority ? 'high' : undefined}
             onLoad={handleLoad}
             onError={handleError}
+            suppressHydrationWarning
           />
         </picture>
       </ImageContainer>
@@ -382,7 +383,7 @@ export function OptimizedImage({
         {webpUrl && (
           <source srcSet={webpUrl} type="image/webp" />
         )}
-        {/* Fallback img */}
+        {/* Fallback img - suppressHydrationWarning because SEO component may modify alt after hydration */}
         <img
           ref={imgRef}
           src={imageUrl}
@@ -397,6 +398,7 @@ export function OptimizedImage({
           fetchPriority={priority ? 'high' : undefined}
           onLoad={handleLoad}
           onError={handleError}
+          suppressHydrationWarning
         />
       </picture>
     </ImageContainer>

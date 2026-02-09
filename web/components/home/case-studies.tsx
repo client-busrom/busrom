@@ -104,17 +104,20 @@ export default function CaseStudies({ data }: Props) {
     return null;
   }
 
-  // 从每个 application 的 sceneGallery 中提取图片用于展示
-  // 取前3个场景，每个场景选第一张图片（确定性选择，便于缓存）
+  // 获取展示图片：优先使用后端预选的 displayImages，否则回退到 sceneGallery
   const getDisplayImages = React.useCallback((app: CaseStudyApplication): ImageObject[] => {
+    // 优先使用后端预选的 displayImages
+    if (app.displayImages && app.displayImages.length > 0) {
+      return app.displayImages.slice(0, 3);
+    }
+
+    // 回退逻辑：从 sceneGallery 中提取（兼容旧数据）
     const images: ImageObject[] = [];
     const scenes = app.sceneGallery || [];
 
-    // 取前3个场景
     for (let i = 0; i < Math.min(3, scenes.length); i++) {
       const scene = scenes[i];
       if (scene.images && scene.images.length > 0) {
-        // 选第一张图片（确定性选择，避免每次渲染变化）
         const img = scene.images[0];
         if (img) {
           images.push(img);

@@ -317,6 +317,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
                 src={visibleItems[1]?.item?.image?.url || visibleItems[1]?.item?.image?.variants?.small || ''}
                 alt={visibleItems[1]?.item?.image?.altText || visibleItems[1]?.item?.name || ""}
                 className="w-full h-auto"
+                suppressHydrationWarning
               />
             </Link>
             <span className="font-anaheim font-extrabold text-white text-xs mt-2 text-center">
@@ -330,6 +331,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
                 src={visibleItems[2]?.item?.image?.url || visibleItems[2]?.item?.image?.variants?.small || ''}
                 alt={visibleItems[2]?.item?.image?.altText || visibleItems[2]?.item?.name || ""}
                 className="w-full h-auto"
+                suppressHydrationWarning
               />
             </Link>
             <span className="font-anaheim font-extrabold text-white text-xs mt-2 text-center">
@@ -340,11 +342,11 @@ export default function ProductSeriesCarousel({ data }: Props) {
 
         {/* 按钮 */}
         <div className="flex justify-between px-6 pb-2">
-          <button onClick={() => paginate(-1)} aria-label="Previous">
-            <img src="/btnLeft2.svg" alt="Previous" className="w-10 h-10" />
+          <button onClick={() => paginate(-1)} aria-label="Previous" suppressHydrationWarning>
+            <img src="/btnLeft2.svg" alt="Previous" className="w-10 h-10" suppressHydrationWarning />
           </button>
-          <button onClick={() => paginate(1)} aria-label="Next">
-            <img src="/btnRight2.svg" alt="Next" className="w-10 h-10" />
+          <button onClick={() => paginate(1)} aria-label="Next" suppressHydrationWarning>
+            <img src="/btnRight2.svg" alt="Next" className="w-10 h-10" suppressHydrationWarning />
           </button>
         </div>
       </div>

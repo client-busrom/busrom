@@ -499,20 +499,95 @@ export const homeContentHandler: PayloadHandler = async (req) => {
       } : null,
 
       // Case Studies (only if published)
-      // Fetch applications for case studies
+      // Fetch selected applications for case studies
       caseStudies: caseStudies?.status === 'published' ? await (async () => {
-        // Get all published applications with their scene galleries
+        // Get selected application IDs from the global
+        const selectedAppIds = (caseStudies.applications || []).map((app: any) =>
+          typeof app === 'object' ? app.id : app
+        )
+
+        if (selectedAppIds.length === 0) {
+          return {
+            status: caseStudies?.status,
+            title: caseStudies?.title,
+            description: caseStudies?.description,
+            applications: [],
+          }
+        }
+
+        // Fetch selected applications with their scene galleries
         const applicationsResult = await payload.find({
           collection: 'applications',
           locale,
           depth: 2,
           where: {
+            id: { in: selectedAppIds },
             status: { equals: 'published' },
           },
-          limit: 100,
+          limit: selectedAppIds.length,
         })
 
-        const applications = applicationsResult.docs.map((app: any) => ({
+        // Maintain the order from selectedAppIds
+        const appMap = new Map(applicationsResult.docs.map((app: any) => [app.id, app]))
+        const orderedApps = selectedAppIds
+          .map((id: any) => appMap.get(id))
+          .filter(Boolean)
+
+        /**
+         * Select 3 display images from scene gallery:
+         * - If groups >= 3: randomly pick 3 groups, then 1 random image from each
+         * - If groups < 3: flatten all images and randomly pick 3
+         *
+         * Uses a seeded random based on app.id for consistent results across requests
+         */
+        const selectDisplayImages = (sceneGallery: any[]) => {
+          if (!sceneGallery || sceneGallery.length === 0) return []
+
+          // Simple seeded random function (for consistent results)
+          const seededRandom = (seed: number) => {
+            const x = Math.sin(seed) * 10000
+            return x - Math.floor(x)
+          }
+
+          const groups = sceneGallery.filter((scene: any) =>
+            scene.images && scene.images.length > 0
+          )
+
+          if (groups.length >= 3) {
+            // Randomly pick 3 groups, then 1 image from each
+            const shuffledGroups = [...groups]
+              .map((g, i) => ({ g, sort: seededRandom(i + 1) }))
+              .sort((a, b) => a.sort - b.sort)
+              .map(({ g }) => g)
+              .slice(0, 3)
+
+            return shuffledGroups.map((group: any, idx: number) => {
+              const images = group.images || []
+              const randomIdx = Math.floor(seededRandom(idx + 100) * images.length)
+              return getMediaWithVariants(images[randomIdx])
+            }).filter(Boolean)
+          } else {
+            // Flatten all images and pick 3 randomly
+            const allImages: any[] = []
+            groups.forEach((scene: any) => {
+              (scene.images || []).forEach((img: any) => {
+                allImages.push(img)
+              })
+            })
+
+            if (allImages.length === 0) return []
+
+            const shuffledImages = [...allImages]
+              .map((img, i) => ({ img, sort: seededRandom(i + 200) }))
+              .sort((a, b) => a.sort - b.sort)
+              .map(({ img }) => img)
+              .slice(0, 3)
+
+            return shuffledImages.map((img: any) => getMediaWithVariants(img)).filter(Boolean)
+          }
+        }
+
+        const applications = orderedApps.map((app: any) => ({
           id: app.id,
           slug: app.slug,
           name: app.name,
@@ -523,6 +598,9 @@ export const homeContentHandler: PayloadHandler = async (req) => {
             name: app.category.name,
             slug: app.category.slug,
           } : null,
+          // Pre-selected display images (3 images per application)
+          displayImages: selectDisplayImages(app.sceneGallery),
+          // Also include full sceneGallery for backward compatibility
           sceneGallery: (app.sceneGallery || []).map((scene: any) => ({
             sceneName: scene.sceneName,
             images: (scene.images || []).map((img: any) => getMediaWithVariants(img)),

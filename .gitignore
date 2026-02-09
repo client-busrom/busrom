@@ -68,3 +68,8 @@ github-secrets-checklist.txt
 *.pem
 *.key
 MEDIA_REIMPORT_PLAN.md
+
+# AI tools config
+.agents/
+.gemini/
+.github/skills/

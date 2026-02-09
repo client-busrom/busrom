@@ -260,6 +260,9 @@ export interface CaseStudyApplication {
     name: string
     slug: string
   } | null
+  /** Pre-selected display images (3 images) from backend */
+  displayImages?: ImageObject[]
+  /** Full scene gallery for backward compatibility */
   sceneGallery: SceneGalleryItem[]
 }
 
