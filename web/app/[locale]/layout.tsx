@@ -167,15 +167,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const faviconUrl = getMediaUrl(siteConfig.favicon)
   const logoUrl = getMediaUrl(siteConfig.logo)
 
-  const icons: Metadata['icons'] = {}
+  // Use CMS favicon or fallback to local favicon-gold-b.svg
+  const finalFaviconUrl = faviconUrl || '/favicon-gold-b.svg'
 
-  if (faviconUrl) {
-    icons.icon = [
-      { url: faviconUrl, sizes: '32x32' },
-      { url: faviconUrl, sizes: '16x16' },
-    ]
-    icons.shortcut = faviconUrl
-    icons.apple = faviconUrl
+  const icons: Metadata['icons'] = {
+    icon: [
+      { url: finalFaviconUrl, sizes: '32x32' },
+      { url: finalFaviconUrl, sizes: '16x16' },
+    ],
+    shortcut: finalFaviconUrl,
+    apple: finalFaviconUrl,
   }
 
   return {

@@ -154,6 +154,9 @@ export default function Footer({ locale, showForm = true }: Props) {
     }
   }, [locale, showForm]);
 
+  // Site logo URL from SiteConfig
+  const [siteLogoUrl, setSiteLogoUrl] = useState<string | null>(null);
+
   // Fetch Turnstile site key from SiteConfig and form config
   useEffect(() => {
     const fetchConfigs = async () => {
@@ -167,6 +170,9 @@ export default function Footer({ locale, showForm = true }: Props) {
           const data = await siteRes.json();
           if (data.turnstileSiteKey) {
             setTurnstileSiteKey(data.turnstileSiteKey);
+          }
+          if (data.logoUrl) {
+            setSiteLogoUrl(data.logoUrl);
           }
         }
 
@@ -464,11 +470,12 @@ export default function Footer({ locale, showForm = true }: Props) {
         <div className="container mx-auto px-8">
           <div className="flex justify-center">
             <Image
-              src="/Busrom1.svg"
+              src={siteLogoUrl || "/Busrom1.svg"}
               alt="Busrom Logo"
               width={80}
               height={24}
               className="object-contain"
+              unoptimized={!!siteLogoUrl}
             />
           </div>
         </div>
@@ -569,11 +576,12 @@ export default function Footer({ locale, showForm = true }: Props) {
           {/* 中间：Logo + 版权（上下结构，居中） */}
           <div className="flex flex-col items-center gap-[20px]">
             <Image
-              src="/Busrom1.svg"
+              src={siteLogoUrl || "/Busrom1.svg"}
               alt="Busrom Logo"
               width={60}
               height={18}
               className="object-contain"
+              unoptimized={!!siteLogoUrl}
             />
             {footerData.copyrightText && (
               <span className="text-brand-text-inverse/60 text-sm font-anaheim">

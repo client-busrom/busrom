@@ -22,12 +22,21 @@ export async function GET() {
 
     const data = await response.json()
 
+    // Build logo URL if available
+    let logoUrl = null
+    if (data.logo) {
+      if (data.logo.url) {
+        logoUrl = data.logo.url.startsWith('http') ? data.logo.url : `${CMS_URL}${data.logo.url}`
+      }
+    }
+
     // Return public config only (no secret keys)
     return NextResponse.json({
       // Turnstile (captcha)
       turnstileSiteKey: data.turnstileSiteKey || null,
       turnstileEnabled: data.turnstileEnabled || false,
-      // Add other public fields as needed
+      // Logo
+      logoUrl,
     })
   } catch (error) {
     console.error('Error fetching site config:', error)

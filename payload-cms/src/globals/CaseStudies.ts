@@ -2,8 +2,10 @@
  * CaseStudies Global - Case Studies Configuration
  *
  * 用途: 首页应用案例区块配置
- * - 选择和排序应用分类（type=APPLICATION）
- * - API自动为每个分类返回3个随机案例
+ * - 直接选择要展示的应用案例（applications）
+ * - 每个应用案例展示3张图片：
+ *   - 如果场景图集分组>=3，随机选3组，每组随机选1张
+ *   - 如果场景图集分组<3，打散所有图片随机选3张
  * - 支持24语言
  */
 
@@ -79,25 +81,25 @@ export const CaseStudies: GlobalConfig = {
     },
 
     // ==================================================================
-    // 📊 Application Categories (Sortable)
+    // 📊 Applications Selection
     // ==================================================================
-    // Note: Keystone uses SortableApplicationCategoriesField (JSON with sortable IDs, type=APPLICATION only)
-    // For now, we use relationship array for simplicity
-    // TODO: Implement custom sortable field with filtering if needed
     {
-      name: 'categories',
+      name: 'applications',
       type: 'relationship',
-      relationTo: 'categories',
+      relationTo: 'applications',
       hasMany: true,
       label: {
-        en: 'Application Categories',
-        zh: '应用分类',
+        en: 'Applications',
+        zh: '应用案例',
       },
       admin: {
         description: {
-          en: 'Select and order application categories (type=APPLICATION). API will automatically return 3 random case study items per category.',
-          zh: '选择并排序应用分类（type=APPLICATION）。API将自动为每个分类返回3个随机案例项目。',
+          en: 'Select applications to display. Each application will show 3 images from its scene gallery.',
+          zh: '选择要展示的应用案例。每个案例将从场景图集中展示3张图片。',
         },
+      },
+      filterOptions: {
+        status: { equals: 'published' },
       },
     },
   ],
