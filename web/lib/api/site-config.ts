@@ -14,7 +14,20 @@ export interface TurnstileConfig {
   threshold: number
 }
 
+export interface MediaImage {
+  id: string
+  url?: string
+  filename?: string
+  mimeType?: string
+  width?: number
+  height?: number
+}
+
 export interface SiteConfigData {
+  siteName?: string
+  siteTagline?: string
+  logo?: MediaImage | null
+  favicon?: MediaImage | null
   turnstile: TurnstileConfig
 }
 
@@ -32,6 +45,10 @@ export async function getSiteConfig(): Promise<SiteConfigData> {
     const data = await response.json()
 
     return {
+      siteName: data.siteName || 'Busrom',
+      siteTagline: data.siteTagline || '',
+      logo: data.logo || null,
+      favicon: data.favicon || null,
       turnstile: {
         enabled: data.turnstileEnabled || false,
         siteKey: data.turnstileSiteKey || '',
@@ -47,6 +64,10 @@ export async function getSiteConfig(): Promise<SiteConfigData> {
 
 function getDefaultConfig(): SiteConfigData {
   return {
+    siteName: 'Busrom',
+    siteTagline: '',
+    logo: null,
+    favicon: null,
     turnstile: {
       enabled: false,
       siteKey: '',
@@ -54,6 +75,20 @@ function getDefaultConfig(): SiteConfigData {
       threshold: 2,
     },
   }
+}
+
+/**
+ * Get full URL for a media image
+ */
+export function getMediaUrl(media: MediaImage | null | undefined): string | null {
+  if (!media) return null
+  if (media.url) {
+    // If URL is absolute, return as-is
+    if (media.url.startsWith('http')) return media.url
+    // Otherwise prepend CMS URL
+    return `${CMS_URL}${media.url}`
+  }
+  return null
 }
 
 // Client-side function to get turnstile config (without secret key)

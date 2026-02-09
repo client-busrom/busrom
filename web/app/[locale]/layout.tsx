@@ -1,4 +1,5 @@
 import type React from "react";
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
 import dynamic from "next/dynamic";
@@ -13,6 +14,8 @@ import { getPreloaderConfig } from "@/lib/api/preloader-config";
 import { getNavigation } from "@/lib/api/navigation";
 import { GlobalScripts } from "@/components/GlobalScripts";
 import { ScriptDebugger } from "@/components/ScriptDebugger";
+import { OrganizationSchema } from "@/components/seo/OrganizationSchema";
+import { getSiteConfig, getMediaUrl } from "@/lib/api/site-config";
 
 // 延迟加载 LenisProvider（包含 GSAP），不阻塞首屏渲染
 const LenisProvider = dynamic(
@@ -156,6 +159,33 @@ export function generateStaticParams() {
   return locales.map(locale => ({ locale }));
 }
 
+/**
+ * Generate dynamic metadata including favicon from CMS
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const siteConfig = await getSiteConfig()
+  const faviconUrl = getMediaUrl(siteConfig.favicon)
+  const logoUrl = getMediaUrl(siteConfig.logo)
+
+  const icons: Metadata['icons'] = {}
+
+  if (faviconUrl) {
+    icons.icon = [
+      { url: faviconUrl, sizes: '32x32' },
+      { url: faviconUrl, sizes: '16x16' },
+    ]
+    icons.shortcut = faviconUrl
+    icons.apple = faviconUrl
+  }
+
+  return {
+    icons,
+    openGraph: {
+      ...(logoUrl && { images: [{ url: logoUrl }] }),
+    },
+  }
+}
+
 export default async function RootLayout({
   children,
   params
@@ -199,6 +229,10 @@ export default async function RootLayout({
         {/* CDN 预连接 - 加速图片加载 */}
         <link rel="preconnect" href="https://d2kqew3hn5wphn.cloudfront.net" />
         <link rel="dns-prefetch" href="https://d2kqew3hn5wphn.cloudfront.net" />
+        {/* Organization Schema for Google Search logo */}
+        <Suspense fallback={null}>
+          <OrganizationSchema locale={validLocale} />
+        </Suspense>
         {/* 全局自定义脚本 - Header */}
         <Suspense fallback={null}>
           <GlobalScripts position="header" />
