@@ -496,35 +496,6 @@ export const FormConfigs: CollectionConfig = {
             },
           },
         },
-        {
-          name: 'senderEmailAddress',
-          type: 'email',
-          label: {
-            en: 'Sender Email Address (Override)',
-            zh: '发件邮箱地址（覆盖全局）',
-          },
-          admin: {
-            description: {
-              en: 'e.g., support@busromhouse.com, sales@busromhouse.com. Leave empty to use global default.',
-              zh: '例如：support@busromhouse.com、sales@busromhouse.com。留空则使用全局默认值。',
-            },
-          },
-        },
-        {
-          name: 'senderName',
-          type: 'text',
-          label: {
-            en: 'Sender Name (Override)',
-            zh: '发件人名称（覆盖全局）',
-          },
-          localized: true,
-          admin: {
-            description: {
-              en: 'e.g., "Busrom Support", "Busrom Sales". Leave empty to use global default.',
-              zh: '例如："Busrom 客服"、"Busrom 销售"。留空则使用全局默认值。',
-            },
-          },
-        },
       ],
     },
 
