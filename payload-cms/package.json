@@ -20,8 +20,7 @@
     "import:media": "npx tsx scripts/migrate-media-from-keystone-enhanced.ts",
     "import:media:s3": "npx tsx scripts/import-media-from-aws-s3.ts",
     "deploy:production": "npx tsx scripts/deploy-production-data.ts",
-    "parse:media-metadata": "npx tsx scripts/parse-media-metadata.ts",
-    "postinstall": "patch-package"
+    "parse:media-metadata": "npx tsx scripts/parse-media-metadata.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.982.0",
