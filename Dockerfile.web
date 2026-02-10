@@ -11,20 +11,21 @@ WORKDIR /app
 # Install dependencies only when needed
 COPY package*.json ./
 COPY web/package*.json ./web/
+COPY payload-cms/package.json ./payload-cms/
 
-# Install production dependencies
-RUN npm ci --omit=dev --workspace=web
+# Install production dependencies (all workspaces needed for monorepo)
+RUN npm ci --omit=dev
 
 # ============ Stage 2: Builder ============
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy package files
+# Copy package files (all workspaces needed for monorepo npm ci)
 COPY package*.json ./
 COPY web/package*.json ./web/
+COPY payload-cms/package.json ./payload-cms/
 
 # Install ALL dependencies (including dev dependencies needed for build)
-# Use --workspace=web to install web dependencies, node_modules will be in /app/node_modules
 RUN npm ci
 
 # Copy source code
@@ -66,9 +67,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/web/public ./web/public
 COPY --from=builder --chown=nextjs:nodejs /app/web/.next ./web/.next
 COPY --from=builder --chown=nextjs:nodejs /app/web/next.config.js ./web/next.config.js
 
-# Copy node_modules (needed for Next.js runtime)
+# Copy node_modules (needed for Next.js runtime, monorepo hoists to root)
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=deps --chown=nextjs:nodejs /app/web/node_modules ./web/node_modules
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing

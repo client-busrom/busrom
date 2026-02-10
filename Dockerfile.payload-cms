@@ -11,11 +11,15 @@ COPY package.json package-lock.json ./
 # Copy patches directory for patch-package
 COPY patches ./patches
 
-# Copy payload-cms workspace
-COPY payload-cms ./payload-cms
+# Copy all workspace package.json files (required for npm ci in monorepo)
+COPY payload-cms/package.json ./payload-cms/package.json
+COPY web/package.json ./web/package.json
 
 # Install ALL dependencies from root (monorepo)
 RUN npm ci
+
+# Copy payload-cms source code after install
+COPY payload-cms ./payload-cms
 
 # Build payload-cms
 WORKDIR /app/payload-cms
