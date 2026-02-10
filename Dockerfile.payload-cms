@@ -5,29 +5,24 @@ FROM node:20-bookworm AS base
 FROM base AS builder
 WORKDIR /app
 
-# Copy root package files (monorepo structure)
-COPY package.json package-lock.json ./
+# Copy package files (payload-cms has its own package-lock.json)
+COPY payload-cms/package.json payload-cms/package-lock.json ./
 
-# Copy patches directory for patch-package
-COPY patches ./patches
+# Copy patches directory BEFORE npm ci so postinstall can apply them
+COPY payload-cms/patches ./patches
 
-# Copy all workspace package.json files (required for npm ci in monorepo)
-COPY payload-cms/package.json ./payload-cms/package.json
-COPY web/package.json ./web/package.json
-
-# Install ALL dependencies from root (monorepo)
+# Install dependencies (postinstall will run patch-package)
 RUN npm ci
 
-# Copy payload-cms source code after install
-COPY payload-cms ./payload-cms
+# Copy source code
+COPY payload-cms ./
 
-# Build payload-cms
-WORKDIR /app/payload-cms
+# Build
 RUN npm run build
 
 # ============ Runner Stage ============
 FROM base AS runner
-WORKDIR /app/payload-cms
+WORKDIR /app
 
 # Set production environment
 ENV NODE_ENV=production
@@ -38,15 +33,8 @@ ENV PORT=3002
 RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs payloaduser
 
-# Copy built application from builder
-COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/.next ./.next
-# Copy root node_modules (monorepo hoists all dependencies to root)
-COPY --from=builder --chown=payloaduser:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/package.json ./package.json
-COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/next.config.mjs ./next.config.mjs
-COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/payload.config.ts ./payload.config.ts
-COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/src ./src
-COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/tsconfig.json ./tsconfig.json
+# Copy everything from builder
+COPY --from=builder --chown=payloaduser:nodejs /app ./
 
 # Copy startup script, CSS loader, and migration cleanup script
 COPY --chown=payloaduser:nodejs payload-cms/start-payload.sh ./start-payload.sh
