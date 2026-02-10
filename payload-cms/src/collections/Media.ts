@@ -197,6 +197,21 @@ export const Media: CollectionConfig = {
     },
 
     // ==================================================================
+    // 📊 Specifications (顶层字段，支持批量编辑)
+    // ==================================================================
+    {
+      name: 'specs',
+      type: 'json',
+      label: 'Specifications | 规格信息',
+      admin: {
+        description: 'Product specifications for this image (key-value pairs) | 此图片的产品规格（键值对）',
+        components: {
+          Field: '@/components/fields/SpecsField',
+        },
+      },
+    },
+
+    // ==================================================================
     // 📊 Metadata
     // ==================================================================
     {
@@ -224,58 +239,6 @@ export const Media: CollectionConfig = {
           admin: {
             description: 'Image sequence number within a series/scene group | 该系列/场景分组内的图片序号',
           },
-        },
-        {
-          name: 'specs',
-          type: 'array',
-          label: 'Specifications | 规格信息',
-          admin: {
-            description: 'Product specifications for this image | 此图片的产品规格',
-          },
-          fields: [
-            {
-              type: 'row',
-              fields: [
-                {
-                  name: 'key',
-                  type: 'select',
-                  label: 'Attribute | 属性',
-                  required: true,
-                  options: [
-                    { label: 'Color | 颜色', value: 'color' },
-                    { label: 'Material | 材质', value: 'material' },
-                    { label: 'Size | 尺寸', value: 'size' },
-                    { label: 'Finish | 表面处理', value: 'finish' },
-                    { label: 'Model | 型号', value: 'model' },
-                    { label: 'Series | 系列', value: 'series' },
-                    { label: 'Style | 款式', value: 'style' },
-                    { label: 'Other | 其他', value: 'other' },
-                  ],
-                  admin: {
-                    width: '30%',
-                  },
-                },
-                {
-                  name: 'value',
-                  type: 'text',
-                  label: 'Value | 值',
-                  required: true,
-                  admin: {
-                    width: '50%',
-                  },
-                },
-                {
-                  name: 'customKey',
-                  type: 'text',
-                  label: 'Custom Key | 自定义属性名',
-                  admin: {
-                    width: '20%',
-                    condition: (data, siblingData) => siblingData?.key === 'other',
-                  },
-                },
-              ],
-            },
-          ],
         },
         {
           name: 'notes',

@@ -612,7 +612,7 @@ export function ServiceValueSection({
                 style={{
                   fontSize: vw(24),
                   lineHeight: vw(32),
-                  marginBottom: vw(6),
+                  marginBottom: vw(36),
                 }}
               >
                 {activeSlide?.title}

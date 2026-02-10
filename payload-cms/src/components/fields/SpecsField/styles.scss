@@ -1,0 +1,132 @@
+.specs-field {
+  width: 100%;
+  margin-bottom: 1rem;
+
+  &__header {
+    margin-bottom: 0.75rem;
+  }
+
+  &__label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--theme-elevation-800);
+    margin-bottom: 0.25rem;
+  }
+
+  &__description {
+    font-size: 0.75rem;
+    color: var(--theme-elevation-500);
+    margin: 0;
+  }
+
+  &__items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__item {
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: 4px;
+    padding: 0.5rem;
+  }
+
+  &__row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  &__select {
+    flex: 0 0 auto;
+    min-width: 180px;
+    padding: 0.5rem;
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: 4px;
+    background: var(--theme-elevation-0);
+    color: var(--theme-elevation-800);
+    font-size: 0.875rem;
+
+    &:focus {
+      outline: none;
+      border-color: var(--theme-elevation-400);
+    }
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.5rem;
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: 4px;
+    background: var(--theme-elevation-0);
+    color: var(--theme-elevation-800);
+    font-size: 0.875rem;
+
+    &:focus {
+      outline: none;
+      border-color: var(--theme-elevation-400);
+    }
+
+    &--custom-key {
+      flex: 0 0 150px;
+    }
+
+    &--value {
+      flex: 1;
+    }
+  }
+
+  &__remove {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--theme-error-500);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: background 0.2s;
+
+    &:hover {
+      background: var(--theme-error-600);
+    }
+  }
+
+  &__add {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 1rem;
+    background: var(--theme-elevation-100);
+    color: var(--theme-elevation-700);
+    border: 1px dashed var(--theme-elevation-300);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+
+    &:hover {
+      background: var(--theme-elevation-150);
+      border-color: var(--theme-elevation-400);
+    }
+  }
+
+  &__debug {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background: var(--theme-elevation-100);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    overflow-x: auto;
+  }
+}

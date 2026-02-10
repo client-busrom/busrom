@@ -118,7 +118,7 @@ export function OemOdmServiceIntroduction({
           <span
             className="font-anaheim font-bold uppercase"
             style={{
-              fontSize: rpx(126), // 180 * 0.7
+              fontSize: rpx(120),
               lineHeight: rpx(120), // 171 * 0.7
               color: "#756F3F",
               textShadow: `
@@ -156,7 +156,7 @@ export function OemOdmServiceIntroduction({
           <div
             className="font-anaheim font-extrabold text-white"
             style={{
-              fontSize: rpx(45), // 64 * 0.7
+              fontSize: rpx(40),
               lineHeight: rpx(53), // 75 * 0.7
             }}
           >
@@ -164,18 +164,18 @@ export function OemOdmServiceIntroduction({
           </div>
           {/* Introduction 双层叠字 */}
           <div className="relative">
-            {/* 下层阴影 - 下移2px */}
+            {/* 下层阴影 - 下移 */}
             <div
               className="absolute font-anaheim font-extrabold"
               style={{
-                fontSize: rpx(45), // 64 * 0.7
+                fontSize: rpx(40),
                 lineHeight: rpx(53), // 75 * 0.7
                 backgroundImage: "linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0) 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
-                top: rpx(1), // 2 * 0.7
-                opacity: 0.5,
+                top: rpx(4),
+                opacity: 0.3,
               }}
             >
               {introductionTitle}
@@ -184,7 +184,7 @@ export function OemOdmServiceIntroduction({
             <div
               className="relative font-anaheim font-extrabold"
               style={{
-                fontSize: rpx(45), // 64 * 0.7
+                fontSize: rpx(40),
                 lineHeight: rpx(53), // 75 * 0.7
                 backgroundImage: "linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0) 100%)",
                 WebkitBackgroundClip: "text",
@@ -281,7 +281,7 @@ export function OemOdmServiceIntroduction({
             left: rpx(580), // 828 * 0.7
             top: rpx(60), // 85 * 0.7
             width: rpx(725), // 1035 * 0.7
-            fontSize: rpx(22), // 32 * 0.7
+            fontSize: rpx(20),
             lineHeight: rpx(36), // 51 * 0.7
             zIndex: 10,
           }}
@@ -298,13 +298,13 @@ export function OemOdmServiceIntroduction({
                 <span
                   key={index}
                   className="relative inline-block font-anaheim font-extrabold"
-                  style={{ fontSize: rpx(25), lineHeight: rpx(36) }} // 36 * 0.7
+                  style={{ fontSize: rpx(24), lineHeight: rpx(36) }}
                 >
                   {/* 下层 - 深色 + 外描边，向右下偏移2rpx */}
                   <span
                     className="absolute font-anaheim font-extrabold"
                     style={{
-                      fontSize: rpx(25), // 36 * 0.7
+                      fontSize: rpx(24),
                       color: "#413A03",
                       left: rpx(3), // 4 * 0.7
                       top: rpx(3), // 4 * 0.7
@@ -326,7 +326,7 @@ export function OemOdmServiceIntroduction({
                   <span
                     className="relative font-anaheim font-extrabold"
                     style={{
-                      fontSize: rpx(25), // 36 * 0.7
+                      fontSize: rpx(24),
                       color: "#FFFFFF",
                     }}
                   >
@@ -341,7 +341,7 @@ export function OemOdmServiceIntroduction({
                   key={index}
                   className="font-anaheim font-bold"
                   style={{
-                    fontSize: rpx(22), // 32 * 0.7
+                    fontSize: rpx(20),
                     color: "#FFDB4B",
                   }}
                 >
@@ -399,7 +399,7 @@ export function OemOdmServiceIntroduction({
           <p
             className="font-anaheim"
             style={{
-              fontSize: rpx(22), // 32 * 0.7
+              fontSize: rpx(20),
               lineHeight: rpx(39), // 56 * 0.7
             }}
           >
@@ -414,25 +414,21 @@ export function OemOdmServiceIntroduction({
                   <span
                     key={index}
                     className="relative inline-block font-anaheim font-extrabold"
-                    style={{ fontSize: rpx(25), lineHeight: rpx(39) }} // 36 * 0.7
+                    style={{ fontSize: rpx(24), lineHeight: rpx(39) }}
                   >
-                    {/* 下层 - 深色 + 外描边，向右下偏移2rpx */}
+                    {/* 下层 - 深色 + 外描边，向右下偏移 */}
                     <span
                       className="absolute font-anaheim font-extrabold"
                       style={{
-                        fontSize: rpx(25), // 36 * 0.7
+                        fontSize: rpx(24),
                         color: "#413A03",
-                        left: rpx(1), // 2 * 0.7
-                        top: rpx(1), // 2 * 0.7
+                        left: rpx(2),
+                        top: rpx(2),
                         textShadow: `
-                          -2px -2px 0 #FFF392,
-                          2px -2px 0 #FFF392,
-                          -2px 2px 0 #FFF392,
-                          2px 2px 0 #FFF392,
-                          0px -2px 0 #FFF392,
-                          0px 2px 0 #FFF392,
-                          -2px 0px 0 #FFF392,
-                          2px 0px 0 #FFF392
+                          -1px -1px 0 #FFF392,
+                          1px -1px 0 #FFF392,
+                          -1px 1px 0 #FFF392,
+                          1px 1px 0 #FFF392
                         `,
                       }}
                     >
@@ -442,7 +438,7 @@ export function OemOdmServiceIntroduction({
                     <span
                       className="relative font-anaheim font-extrabold"
                       style={{
-                        fontSize: rpx(25), // 36 * 0.7
+                        fontSize: rpx(24),
                         color: "#FFFFFF",
                       }}
                     >
@@ -458,7 +454,7 @@ export function OemOdmServiceIntroduction({
                     key={index}
                     className="font-anaheim font-bold"
                     style={{
-                      fontSize: rpx(22), // 32 * 0.7
+                      fontSize: rpx(20),
                       color: "#FFDB4B",
                     }}
                   >
