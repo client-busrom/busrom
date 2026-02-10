@@ -203,32 +203,35 @@ function extractFormattedTextAfterMarker(children: any[], markerId: string): Tex
   return segments
 }
 
+// 递归提取节点中的文本（支持换行）
+function extractTextFromNode(node: any): string {
+  if (!node) return ""
+
+  // 如果是文本节点
+  if (node.text !== undefined) {
+    return node.text
+  }
+
+  // 如果是换行节点
+  if (node.type === "linebreak") {
+    return "\n"
+  }
+
+  // 如果有子节点，递归处理
+  if (node.children && Array.isArray(node.children)) {
+    return node.children.map((child: any) => extractTextFromNode(child)).join("")
+  }
+
+  return ""
+}
+
 // 提取标记符之后的文本（支持换行）
 function extractTextAfterMarker(children: any[], markerId: string): string | null {
   const nodesAfterMarker = extractAfterMarker(children, markerId)
 
   for (const node of nodesAfterMarker) {
-    if (node.type === "paragraph" && node.children) {
-      let text = ""
-      for (const child of node.children) {
-        if (child.type === "linebreak") {
-          text += "\n"
-        } else if (child.text !== undefined) {
-          text += child.text
-        }
-      }
-      if (text.trim()) return text
-    }
-    // 处理 heading 节点
-    if (node.type === "heading" && node.children) {
-      let text = ""
-      for (const child of node.children) {
-        if (child.type === "linebreak") {
-          text += "\n"
-        } else if (child.text !== undefined) {
-          text += child.text
-        }
-      }
+    if ((node.type === "paragraph" || node.type === "heading") && node.children) {
+      const text = extractTextFromNode(node)
       if (text.trim()) return text
     }
   }

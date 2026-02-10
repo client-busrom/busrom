@@ -128,7 +128,7 @@ export function OemOdmProductSeries({
             className="flex items-center"
             style={{ gap: rpx(16) }}
           >
-            <AnimatedLinkButton>
+            <AnimatedLinkButton variant="dark">
               {viewMoreText}
             </AnimatedLinkButton>
             <div className="relative" style={{ width: rpx(21), height: rpx(17.5) }}>

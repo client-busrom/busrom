@@ -110,7 +110,7 @@ function BubbleText({ text, isActive }: { text: string; isActive: boolean }) {
 
       {/* 主文字层 - 实心填充 + 阴影 */}
       <span
-        className="absolute font-anaheim font-extrabold"
+        className="absolute font-anaheim font-extrabold text-left"
         style={{
           left: 0,
           top: 0,
@@ -191,7 +191,10 @@ export function OdmAdvantages({
             left: rpx(520), // 743 * 0.7
             top: rpx(5), // 7 * 0.7
             fontSize: rpx(60),
-            lineHeight: rpx(48), // 68 * 0.7
+            lineHeight: rpx(68),
+            width: rpx(800),
+            letterSpacing: "0.03em",
+            whiteSpace: "pre-line",
             background: "linear-gradient(to bottom, #D8D2A2 0%, #756F3F 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
@@ -307,7 +310,7 @@ export function OdmAdvantages({
               borderBottomLeftRadius: 0,
               borderTopRightRadius: rpx(21), // 30 * 0.7
               borderBottomRightRadius: rpx(21), // 30 * 0.7
-              paddingLeft: rpx(48), // 69 * 0.7
+              paddingLeft: rpx(26), // aligned with title
               paddingRight: rpx(24), // 34 * 0.7
             }}
             initial={{ opacity: 0, y: 20 }}

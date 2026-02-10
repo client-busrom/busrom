@@ -82,12 +82,12 @@ function BubbleText({ text, isActive }: { text: string; isActive: boolean }) {
   }, [isActive])
 
   return (
-    <div className="relative" style={{ height: rpx(74) }}> {/* 105 * 0.7 */}
+    <div className="relative text-left" style={{ height: rpx(74) }}> {/* 105 * 0.7 */}
       {/* 气泡层 - 向上飘动并渐变消失 */}
       {bubbles.map((bubble) => (
         <motion.span
           key={bubble.id}
-          className="absolute font-anaheim font-extrabold whitespace-nowrap"
+          className="absolute font-anaheim font-extrabold whitespace-nowrap text-left"
           style={{
             left: 0,
             fontSize: rpx(32), // 46 * 0.7
@@ -109,7 +109,7 @@ function BubbleText({ text, isActive }: { text: string; isActive: boolean }) {
 
       {/* 主文字层 - 实心填充 + 阴影 */}
       <span
-        className="absolute font-anaheim font-extrabold whitespace-nowrap"
+        className="absolute font-anaheim font-extrabold whitespace-nowrap text-left"
         style={{
           left: 0,
           top: 0,
@@ -188,9 +188,12 @@ export function OemOdmAdvantages({
           style={{
             left: rpx(520), // 743 * 0.7
             top: rpx(5), // 7 * 0.7
+            width: rpx(800),
             fontSize: rpx(60),
             lineHeight: rpx(68),
+            letterSpacing: "0.03em",
             color: "#756f3f",
+            whiteSpace: "pre-line",
             textShadow: `
               -2px -2px 0 #CAC386,
               2px -2px 0 #CAC386,
@@ -312,7 +315,7 @@ export function OemOdmAdvantages({
               borderBottomLeftRadius: 0,
               borderTopRightRadius: rpx(21), // 30 * 0.7
               borderBottomRightRadius: rpx(21), // 30 * 0.7
-              paddingLeft: rpx(48), // 69 * 0.7
+              paddingLeft: rpx(26), // 与left偏移抵消，使文字左对齐title
               paddingRight: rpx(24), // 34 * 0.7
             }}
             initial={{ opacity: 0, y: 20 }}
@@ -323,7 +326,7 @@ export function OemOdmAdvantages({
             <AnimatePresence mode="wait">
               <motion.p
                 key={currentIndex}
-                className="font-anaheim font-semibold text-white"
+                className="font-anaheim font-semibold text-white text-left"
                 style={{
                   width: rpx(408), // 583 * 0.7
                   fontSize: rpx(20), // 28 * 0.7
@@ -407,6 +410,7 @@ export function OemOdmAdvantages({
           style={{
             color: "transparent",
             WebkitTextStroke: "1px #CAC386",
+            whiteSpace: "pre-line",
           }}
         >
           {title}
