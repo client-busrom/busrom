@@ -177,6 +177,13 @@ export default buildConfig({
     meta: {
       titleSuffix: '- Busrom CMS',
       icons: [
+        // Standard .ico for broad compatibility
+        {
+          rel: 'icon',
+          type: 'image/x-icon',
+          url: '/favicon.ico',
+        },
+        // SVG for modern browsers
         {
           rel: 'icon',
           type: 'image/svg+xml',

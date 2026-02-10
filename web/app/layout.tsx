@@ -23,6 +23,14 @@ export const metadata: Metadata = {
   authors: [{ name: 'Busrom' }],
   creator: 'Busrom',
   publisher: 'Busrom',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
+      { url: '/favicon-gold-b.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/favicon-gold-b.svg',
+  },
   robots: {
     index: true,
     follow: true,
