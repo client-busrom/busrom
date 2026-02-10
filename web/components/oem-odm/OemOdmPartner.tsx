@@ -106,33 +106,51 @@ export function OemOdmPartner({
       <div className="hidden md:block relative w-full" style={{ height: rpx(DESIGN_HEIGHT) }}>
         {/* 左上角装饰 SVG - 连接上一个板块 */}
         <div
-          className="absolute"
+          className="absolute overflow-visible"
           style={{
-            left: rpx(0),
-            top: rpx(-133),
-            width: rpx(487),
-            height: rpx(585),
+            left: rpx(-100),
+            top: rpx(-200),
+            width: rpx(600),
+            height: rpx(600),
             opacity: 0.3,
           }}
         >
-          <svg width="100%" height="100%" viewBox="0 0 487 585" fill="none">
+          {/* 外圈虚线 - 旋转动画 */}
+          <svg
+            className="absolute animate-spin-slow"
+            width="100%"
+            height="100%"
+            viewBox="0 0 600 600"
+            fill="none"
+            style={{ transformOrigin: 'center center' }}
+          >
             <circle
-              cx="194.073"
-              cy="292.073"
-              r="288.073"
+              cx="300"
+              cy="300"
+              r="288"
               stroke="#4D460D"
               strokeWidth="8"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeDasharray="40 40"
-              className="animate-spin-slow"
-              style={{ transformOrigin: '194.073px 292.073px' }}
             />
+          </svg>
+          {/* 中间箭头 - 浮动动画 */}
+          <motion.svg
+            className="absolute"
+            width="100%"
+            height="100%"
+            viewBox="0 0 600 600"
+            fill="none"
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
             <path
+              transform="translate(105, 8)"
               d="M288.51 364.863L288.613 364.726C289.949 362.888 290.692 360.686 290.743 358.415L290.745 358.282L290.742 358.319C290.804 357.449 290.78 356.576 290.673 355.711L290.64 355.466L274.647 243.57C273.6 236.242 266.811 231.158 259.485 232.214L259.266 232.247C252.059 233.406 247.081 240.138 248.118 247.391L259.841 329.408L115.163 221.051C110.223 217.351 103.214 218.361 99.5098 223.307L98.5704 224.561C94.9977 229.499 96.0285 236.405 100.92 240.069L245.597 348.426L163.594 360.247C156.269 361.303 151.18 368.097 152.227 375.424C153.274 382.751 160.062 387.836 167.388 386.78L279.274 370.652L279.509 370.616C280.291 370.488 281.061 370.293 281.808 370.03L281.997 369.962L281.961 369.973C284.249 369.285 286.255 367.88 287.684 365.966L288.51 364.863Z"
               fill="#4D460D"
             />
-          </svg>
+          </motion.svg>
         </div>
 
         {/* 标题 - Why Partner with Busrom OEM? */}
@@ -162,7 +180,7 @@ export function OemOdmPartner({
               style={{
                 left: rpx(253),
                 top: rpx(540 + index * 109),
-                width: rpx(919 * 0.7),
+                width: rpx(800),
                 height: rpx(130 * 0.7),
               }}
               initial={{ opacity: 0, x: -30 }}
@@ -208,8 +226,8 @@ export function OemOdmPartner({
               <motion.span
                 className="absolute font-anaheim font-bold"
                 style={{
-                  left: rpx(584),
-                  top: rpx(-55),
+                  left: rpx(740),
+                  top: rpx(-35),
                   fontSize: rpx(70),
                   lineHeight: rpx(71),
                 }}
@@ -220,16 +238,16 @@ export function OemOdmPartner({
               >
                 {String(index + 1).padStart(2, "0")}
               </motion.span>
-              {/* 斜线装饰 */}
+              {/* 竖线装饰 - 锚点在中心，逆时针旋转65度 */}
               <motion.div
                 className="absolute"
                 style={{
-                  left: rpx(638),
-                  top: rpx(36),
-                  width: rpx(80),
-                  height: rpx(2),
+                  left: rpx(758),
+                  top: rpx(10),
+                  width: rpx(2),
+                  height: rpx(80),
                   transform: "rotate(-65deg)",
-                  transformOrigin: "left center",
+                  transformOrigin: "center center",
                 }}
                 animate={{
                   backgroundColor: isActive ? "#C4BC7A" : "#9B9359",

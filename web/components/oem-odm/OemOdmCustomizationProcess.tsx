@@ -50,9 +50,9 @@ const defaultContent = {
 // 卡片贴着的椭圆参数（保持原位置，不跟随虚线右移）
 // 椭圆圆心在虚线弧线右侧
 const ELLIPSE_CENTER_X = 1050
-const ELLIPSE_CENTER_Y = 436
+const ELLIPSE_CENTER_Y = 437
 const ELLIPSE_RADIUS_X = 218  // 虚线的完整宽度
-const ELLIPSE_RADIUS_Y = 416  // 832 / 2
+const ELLIPSE_RADIUS_Y = 350  // 缩小垂直半径，首尾卡片更紧凑
 
 // 卡片距离虚线的间距
 const CARD_GAP_FROM_LINE = 15
@@ -171,7 +171,7 @@ export function OemOdmCustomizationProcess({
     animate(joystickAngle, 0, { type: "spring", stiffness: 400, damping: 25 })
 
     // 轮盘惯性吸附到最近的卡片位置
-    const anglePerCard = 26 // 每个卡片间隔的角度
+    const anglePerCard = 18 // 每个卡片间隔的角度
     const currentValue = wheelRotation.get()
     const snappedAngle = Math.round(currentValue / anglePerCard) * anglePerCard
 
@@ -187,7 +187,7 @@ export function OemOdmCustomizationProcess({
   const getCardPositions = () => {
     const totalSteps = steps.length
     const visibleCount = 5 // 固定显示5张卡片
-    const anglePerCard = 26 // 每个卡片间隔的角度
+    const anglePerCard = 18 // 每个卡片间隔的角度
     const centerAngle = 180 // 中心位置角度（椭圆左侧水平位置）
 
     const cards = []
@@ -209,7 +209,9 @@ export function OemOdmCustomizationProcess({
       // offset=0 表示中心卡片，应该在 centerAngle
       // 加上当前旋转的小数部分实现平滑滚动
       const fractionalOffset = rotationOffset - centerIndex
-      const angle = centerAngle - (offset - fractionalOffset) * anglePerCard
+      // 中间卡片与相邻卡片额外拉开间距
+      const extraGap = offset === 0 ? 0 : (offset > 0 ? -6 : 6)
+      const angle = centerAngle - (offset - fractionalOffset) * anglePerCard + extraGap
 
       // 中间位置判断
       const distanceFromCenter = Math.abs(offset - fractionalOffset)
@@ -224,8 +226,8 @@ export function OemOdmCustomizationProcess({
       // 计算卡片旋转（沿切线方向）
       const cardRotation = getCardRotation(angle)
 
-      // 透明度（边缘渐隐）
-      const opacity = Math.max(0.3, 1 - distanceFromCenter * 0.35)
+      // 透明度（所有卡片不透明）
+      const opacity = 1
 
       // 缩放（中间大，边缘小）
       const scale = isCenter ? 1 : Math.max(0.8, 1 - distanceFromCenter * 0.1)
@@ -275,7 +277,7 @@ export function OemOdmCustomizationProcess({
           <div
             className="absolute rounded-full"
             style={{
-              left: rpx(-45),
+              left: rpx(-245),
               top: rpx(92),
               width: rpx(487),
               height: rpx(718),
@@ -287,7 +289,7 @@ export function OemOdmCustomizationProcess({
           <div
             className="absolute rounded-full"
             style={{
-              left: rpx(-204),
+              left: rpx(-404),
               top: rpx(92),
               width: rpx(487),
               height: rpx(718),
@@ -402,7 +404,7 @@ export function OemOdmCustomizationProcess({
           <motion.div
             className="absolute"
             style={{
-              left: rpx(107),
+              left: rpx(-93),
               top: rpx(50),
               zIndex: 5,
             }}
@@ -446,7 +448,7 @@ export function OemOdmCustomizationProcess({
           <motion.span
             className="absolute font-anaheim font-extrabold"
             style={{
-              left: rpx(107),
+              left: rpx(-93),
               top: rpx(50 + titleSolidLines.length * 90 + 180),
               fontSize: rpx(90),
               lineHeight: rpx(46),
@@ -473,7 +475,7 @@ export function OemOdmCustomizationProcess({
           <div
             className="absolute overflow-hidden pointer-events-none rounded-full"
             style={{
-              left: rpx(-204),
+              left: rpx(-404),
               top: rpx(92),
               width: rpx(487),
               height: rpx(718),
@@ -638,14 +640,10 @@ export function OemOdmCustomizationProcess({
               // 根据位置计算渐变效果（上方和下方的卡片有渐隐效果）
               const isTopEdge = card.offset <= -1.5
               const isBottomEdge = card.offset >= 1.5
-              const gradientStyle = isTopEdge
-                ? "linear-gradient(135deg, rgba(117, 111, 63, 0) 16.79%, rgba(117, 111, 63, 0.58) 29.14%, #7D7744 53.12%, #948B55 71.79%, #CC9B7D 100%)"
-                : isBottomEdge
-                ? "linear-gradient(135deg, #CC9B7D 0%, #948B55 28.2%, #7D7644 46.9%, #756F3F 70.9%, rgba(117, 111, 63, 0) 83.2%)"
-                : "linear-gradient(135deg, #756F3F 0%, #CCC37D 100%)"
+              const gradientStyle = "linear-gradient(135deg, #756F3F 0%, #CCC37D 100%)"
 
-              // 计算旋转角度
-              const rotation = (card.angle - 180) * 0.6
+              // 计算旋转角度（中间卡片强制水平）
+              const rotation = card.isCenter ? 0 : (card.angle - 180) * 0.6
 
               return (
                 <motion.div
@@ -666,7 +664,7 @@ export function OemOdmCustomizationProcess({
                     rotate: rotation,
                     scale: card.scale,
                     opacity: card.opacity,
-                    zIndex: card.isCenter ? 15 : 10 - Math.abs(card.offset),
+                    zIndex: card.isCenter ? 15 : 10 + card.offset,
                     boxShadow: card.isCenter ? "0px 10px 30px rgba(0,0,0,0.1)" : "none",
                   }}
                   whileHover={{ scale: card.scale * 1.03 }}

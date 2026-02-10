@@ -183,7 +183,7 @@ export function OemOdmProductGuide({
                   style={{
                     width: rpx(575),
                     height: rpx(560),
-                    borderRadius: `${rpx(60)} ${rpx(60)} 0 ${rpx(60)}`,
+                    borderRadius: `${rpx(150)} ${rpx(150)} 0 ${rpx(150)}`,
                     transformOrigin: "bottom right",
                     boxShadow: "-2px 7px 19px rgba(0,0,0,0.4)",
                   }}
@@ -226,7 +226,7 @@ export function OemOdmProductGuide({
                     top: rpx(80),
                     width: rpx(575),
                     height: rpx(560),
-                    borderRadius: `${rpx(60)} ${rpx(60)} 0 ${rpx(60)}`,
+                    borderRadius: `${rpx(150)} ${rpx(150)} 0 ${rpx(150)}`,
                     transformOrigin: "bottom right",
                     transform: "rotate(-20deg)",
                     opacity: 0.65,
@@ -239,7 +239,7 @@ export function OemOdmProductGuide({
                     top: rpx(25),
                     width: rpx(575),
                     height: rpx(560),
-                    borderRadius: `${rpx(60)} ${rpx(60)} 0 ${rpx(60)}`,
+                    borderRadius: `${rpx(150)} ${rpx(150)} 0 ${rpx(150)}`,
                     transformOrigin: "bottom right",
                     transform: "rotate(-10deg)",
                     opacity: 0.65,
@@ -252,7 +252,7 @@ export function OemOdmProductGuide({
                     top: 0,
                     width: rpx(575),
                     height: rpx(560),
-                    borderRadius: `${rpx(60)} ${rpx(60)} 0 ${rpx(60)}`,
+                    borderRadius: `${rpx(150)} ${rpx(150)} 0 ${rpx(150)}`,
                     transformOrigin: "bottom right",
                     transform: "rotate(-6deg)",
                   }}
@@ -309,7 +309,7 @@ export function OemOdmProductGuide({
           className="absolute"
           style={{
             left: rpx(705),
-            top: rpx(735),
+            top: rpx(535),
             width: rpx(273),
             height: rpx(273),
           }}
@@ -346,7 +346,7 @@ export function OemOdmProductGuide({
               style={{
                 left: rpx(2),
                 top: rpx(5),
-                fontSize: rpx(88),
+                fontSize: rpx(600 / 7),
                 lineHeight: rpx(99),
                 color: "#DAC062",
               }}
@@ -358,7 +358,7 @@ export function OemOdmProductGuide({
             <motion.h2
               className="relative font-anaheim font-extrabold whitespace-pre-line"
               style={{
-                fontSize: rpx(88),
+                fontSize: rpx(600 / 7),
                 lineHeight: rpx(99),
                 color: "#6F6200",
               }}
@@ -392,7 +392,7 @@ export function OemOdmProductGuide({
             href={buttonLink}
             className="flex items-center justify-center font-anaheim font-semibold text-white"
             style={{
-              marginTop: rpx(50),
+              marginTop: rpx(80),
               width: rpx(407),
               height: rpx(102),
               backgroundColor: "#756F3F",

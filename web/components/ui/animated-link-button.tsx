@@ -7,16 +7,22 @@ const DESIGN_WIDTH = 1920;
 type AnimatedLinkButtonProps = {
   children: React.ReactNode;
   className?: string;
+  variant?: "light" | "dark"; // light: 浅色背景用, dark: 深色背景用
 };
 
-export function AnimatedLinkButton({ children, className }: AnimatedLinkButtonProps) {
+export function AnimatedLinkButton({ children, className, variant = "light" }: AnimatedLinkButtonProps) {
   const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
   const ballSize = vw(60);
+
+  const isDark = variant === "dark";
+  const ballColor = isDark ? "#5C5623" : "#ECE8D8";
+  const textColorClass = isDark ? "text-[#C7BB5D]" : "text-brand-secondary";
 
   return (
     <button
       className={cn(
-        "group relative flex items-center justify-center font-anaheim font-medium text-brand-secondary bg-transparent overflow-visible",
+        "group relative flex items-center justify-center font-anaheim font-medium bg-transparent overflow-visible",
+        textColorClass,
         className
       )}
       style={{
@@ -29,11 +35,12 @@ export function AnimatedLinkButton({ children, className }: AnimatedLinkButtonPr
     >
       {/* 小球 - 使用 CSS animation 实现左右移动 */}
       <div
-        className="ball-animated absolute rounded-full bg-[#ECE8D8] z-0 group-hover:!animate-none group-hover:!left-1 group-hover:-translate-y-1/2"
+        className="ball-animated absolute rounded-full z-0 group-hover:!animate-none group-hover:!left-1 group-hover:-translate-y-1/2"
         style={{
           width: ballSize,
           height: ballSize,
           top: "50%",
+          backgroundColor: ballColor,
         }}
       />
       <span className="relative z-10 transition-transform duration-300 group-hover:translate-x-1">

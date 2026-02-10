@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
@@ -23,18 +23,22 @@ const rpx = (designValue: number) => `calc(var(--rpx-value-guide) * ${designValu
 const drawerAnimationStyles = `
 @keyframes drawerSlideLeft {
   0% {
+    opacity: 0;
     transform: translateX(15vw);
   }
   100% {
+    opacity: 1;
     transform: translateX(0);
   }
 }
 
 @keyframes drawerSlideRight {
   0% {
+    opacity: 0;
     transform: translateX(-15vw);
   }
   100% {
+    opacity: 1;
     transform: translateX(0);
   }
 }
@@ -91,24 +95,6 @@ export function OemOdmValueGuide({
 }: OemOdmValueGuideProps) {
   const [isLeftImageHovered, setIsLeftImageHovered] = useState(false)
   const [isRightTextExpanded, setIsRightTextExpanded] = useState(false)
-  const [isAnimationComplete, setIsAnimationComplete] = useState(false)
-  const [showMask, setShowMask] = useState(true)
-
-  // 动画完成后隐藏遮罩
-  useEffect(() => {
-    const maskTimer = setTimeout(() => {
-      setShowMask(false)
-    }, (MASK_FADE_DELAY + MASK_FADE_DURATION) * 1000)
-
-    const animationTimer = setTimeout(() => {
-      setIsAnimationComplete(true)
-    }, (INITIAL_DELAY + DRAWER_ANIMATION_DURATION) * 1000)
-
-    return () => {
-      clearTimeout(maskTimer)
-      clearTimeout(animationTimer)
-    }
-  }, [])
 
   const getObjectPosition = (image?: MediaObject | null) =>
     image?.cropFocalPoint ? `${image.cropFocalPoint.x}% ${image.cropFocalPoint.y}%` : "center"
@@ -147,7 +133,7 @@ export function OemOdmValueGuide({
         </div>
 
         {/* 左侧图片 - 底部对齐，抽屉动画从中间往左滑出 */}
-        <div
+        <motion.div
           className="absolute overflow-hidden cursor-pointer"
           style={{
             left: rpx(76),
@@ -156,8 +142,10 @@ export function OemOdmValueGuide({
             height: rpx(761),
             borderTopLeftRadius: rpx(321),
             zIndex: 2,
-            animation: `drawerSlideLeft ${DRAWER_ANIMATION_DURATION}s cubic-bezier(0.25, 0.1, 0.25, 1) ${INITIAL_DELAY}s both`,
           }}
+          initial={{ opacity: 0, x: "15vw" }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: DRAWER_ANIMATION_DURATION, delay: INITIAL_DELAY, ease: [0.25, 0.1, 0.25, 1] }}
           onMouseEnter={() => setIsLeftImageHovered(true)}
           onMouseLeave={() => setIsLeftImageHovered(false)}
         >
@@ -168,7 +156,7 @@ export function OemOdmValueGuide({
               <div className="w-full h-full bg-gray-400"><Image src="/images/placeholder-person.jpg" alt="OEM Service" fill className="object-cover" priority /></div>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* 主标题 */}
         <div className="absolute flex flex-col items-center" style={{ left: rpx(600), top: rpx(178), width: rpx(603), zIndex: 20 }}>
@@ -225,7 +213,7 @@ export function OemOdmValueGuide({
         </motion.div>
 
         {/* 右侧图片 - 底部对齐，抽屉动画从中间往右滑出 */}
-        <div
+        <motion.div
           className="absolute overflow-hidden"
           style={{
             right: rpx(165),
@@ -234,8 +222,10 @@ export function OemOdmValueGuide({
             height: rpx(579),
             borderTopRightRadius: rpx(209),
             zIndex: 2,
-            animation: `drawerSlideRight ${DRAWER_ANIMATION_DURATION}s cubic-bezier(0.25, 0.1, 0.25, 1) ${INITIAL_DELAY}s both`,
           }}
+          initial={{ opacity: 0, x: "-15vw" }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: DRAWER_ANIMATION_DURATION, delay: INITIAL_DELAY, ease: [0.25, 0.1, 0.25, 1] }}
         >
           <div className="w-full h-full grayscale">
             {rightImage ? (
@@ -245,7 +235,7 @@ export function OemOdmValueGuide({
             )}
           </div>
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.85) 100%)" }} />
-        </div>
+        </motion.div>
 
         {/* 左下角悬停卡片 */}
         <AnimatePresence>
@@ -266,40 +256,19 @@ export function OemOdmValueGuide({
           </div>
         </motion.div>
 
-        {/* 中间遮罩层 - 与抽屉动画同步渐隐 */}
-        {/* 使用两个不透明div分别匹配左右背景色 */}
-        <AnimatePresence>
-          {showMask && (
-            <>
-              {/* 左侧遮罩 - 不透明，匹配左侧背景 */}
-              <motion.div
-                className="absolute top-0 bottom-0 left-0 pointer-events-none"
-                style={{
-                  width: rpx(683),
-                  zIndex: 25,
-                  backgroundColor: "#f0ebda",
-                }}
-                initial={{ opacity: 1 }}
-                animate={{ opacity: 0 }}
-                transition={{ duration: MASK_FADE_DURATION, delay: MASK_FADE_DELAY, ease: "easeOut" }}
-                exit={{ opacity: 0 }}
-              />
-              {/* 右侧遮罩 - 不透明，使用实色近似右侧背景 */}
-              <motion.div
-                className="absolute top-0 bottom-0 right-0 pointer-events-none"
-                style={{
-                  left: rpx(683),
-                  zIndex: 25,
-                  backgroundColor: "#bab37b",
-                }}
-                initial={{ opacity: 1 }}
-                animate={{ opacity: 0 }}
-                transition={{ duration: MASK_FADE_DURATION, delay: MASK_FADE_DELAY, ease: "easeOut" }}
-                exit={{ opacity: 0 }}
-              />
-            </>
-          )}
-        </AnimatePresence>
+        {/* 中间遮罩层 - 覆盖两张图片之间的中间区域，抽屉动画完成后渐隐 */}
+        <motion.div
+          className="absolute top-0 bottom-0 pointer-events-none"
+          style={{
+            left: rpx(683),
+            right: rpx(651),
+            zIndex: 10,
+            background: "linear-gradient(to right, #f0ebda 0%, #9a946a 100%)",
+          }}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: MASK_FADE_DURATION, delay: MASK_FADE_DELAY, ease: "easeOut" }}
+        />
       </div>
 
       {/* ================================================================
