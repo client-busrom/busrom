@@ -172,10 +172,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const icons: Metadata['icons'] = {
     icon: [
-      { url: finalFaviconUrl, sizes: '32x32' },
-      { url: finalFaviconUrl, sizes: '16x16' },
+      // Standard .ico for broad compatibility (search engines, legacy browsers)
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
+      // SVG for modern browsers (sharp at any size)
+      { url: finalFaviconUrl, type: 'image/svg+xml' },
     ],
-    shortcut: finalFaviconUrl,
+    shortcut: '/favicon.ico',
     apple: finalFaviconUrl,
   }
 

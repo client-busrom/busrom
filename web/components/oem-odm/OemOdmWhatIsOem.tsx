@@ -104,8 +104,8 @@ export function OemOdmWhatIsOem({
         <motion.div
           className="absolute"
           style={{
-            left: rpx(1210),
-            top: rpx(0),
+            left: rpx(1230),
+            top: rpx(20),
             width: rpx(53), // 缩小问号
             height: rpx(80),
             zIndex: 15,
@@ -137,9 +137,9 @@ export function OemOdmWhatIsOem({
         <motion.div
           className="absolute"
           style={{
-            left: rpx(715), // 1022 * 0.7
-            top: rpx(64), // 92 * 0.7
-            width: rpx(515), // 735 * 0.7
+            left: rpx(500),
+            top: rpx(84),
+            width: rpx(730),
             height: rpx(116), // 165 * 0.7
             zIndex: 10,
           }}

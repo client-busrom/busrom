@@ -1,8 +1,11 @@
 "use client"
 
 import React from "react"
+import Image from "next/image"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
+import { AnimatedLinkButton } from "@/components/ui/animated-link-button"
 
 // 设计稿基准尺寸 (已按0.7缩放)
 const DESIGN_WIDTH = 1920
@@ -54,7 +57,7 @@ interface OdmProductSeriesProps {
 }
 
 const defaultContent = {
-  title: "Series of products",
+  title: "Series Of Products",
   description: "We offer a full-process ODM solution for glass hardware from design and development to production and delivery, helping you efficiently create differentiated products. Its main products include",
 }
 
@@ -107,62 +110,34 @@ export function OdmProductSeries({
         </motion.h2>
 
         {/* VIEW MORE 按钮 */}
-        <motion.a
-          href={viewMoreLink}
-          className="absolute flex items-center group"
+        <motion.div
+          className="absolute z-20"
           style={{
-            left: rpx(1068), // 1525 * 0.7
-            top: rpx(35), // 50 * 0.7
-            zIndex: 20,
+            right: rpx(106),
+            top: rpx(35),
           }}
           initial={{ opacity: 0, x: 20 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          {/* 圆形装饰 */}
-          <div
-            className="absolute rounded-full"
-            style={{
-              width: rpx(50), // 71 * 0.7
-              height: rpx(50), // 71 * 0.7
-              backgroundColor: "#DCD6AA",
-              zIndex: -1,
-            }}
-          />
-          {/* 文字 */}
-          <span
-            className="font-anaheim font-medium group-hover:opacity-80 transition-opacity"
-            style={{
-              marginLeft: rpx(21), // 30 * 0.7
-              fontSize: rpx(22), // 32 * 0.7
-              lineHeight: rpx(21), // 30 * 0.7
-              color: "#544D16",
-            }}
+          <Link
+            href={viewMoreLink}
+            className="flex items-center"
+            style={{ gap: rpx(16) }}
           >
-            VIEW MORE
-          </span>
-          {/* 双箭头 */}
-          <div
-            className="group-hover:translate-x-1 transition-transform"
-            style={{
-              marginLeft: rpx(16), // 23 * 0.7
-              width: rpx(22), // 32 * 0.7
-              height: rpx(18), // 26 * 0.7
-            }}
-          >
-            <svg
-              width="100%"
-              height="100%"
-              viewBox="0 0 32 26"
-              fill="none"
-            >
-              <path
-                d="M14.8571 13L2 26L0 23.9778L10.8571 13L0 2.02222L2 0L14.8571 13ZM32 13L19.1429 26L17.1429 23.9778L28 13L17.1429 2.02222L19.1429 0L32 13Z"
-                fill="#544D16"
+            <AnimatedLinkButton>
+              VIEW MORE
+            </AnimatedLinkButton>
+            <div className="relative" style={{ width: rpx(21), height: rpx(17.5) }}>
+              <Image
+                src="/images/service-icons/view-more-arrow.svg"
+                alt="View more"
+                fill
+                className="object-contain"
               />
-            </svg>
-          </div>
-        </motion.a>
+            </div>
+          </Link>
+        </motion.div>
 
         {/* 左侧描述文字 */}
         <motion.p

@@ -99,13 +99,36 @@ interface OemOdmTemplateProps {
 // Helper 函数 - 解析 CMS 富文本内容
 // ========================================
 
-// 提取标记符之后的所有节点
-// CMS 输入格式：使用引用块 (blockquote) + 代码格式 (format: 16) 作为标记符
-function extractAfterMarker(children: any[], markerId: string): any[] {
-  let foundMarker = false
+// 递归展平所有子节点，包括 layout 内部的节点
+function flattenChildren(children: any[]): any[] {
   const result: any[] = []
 
   for (const node of children) {
+    // 如果是 layout 节点，递归展平其内部的 columns
+    if (node.type === "layout" && node.columns) {
+      for (const column of node.columns) {
+        if (column.children) {
+          result.push(...flattenChildren(column.children))
+        }
+      }
+    } else {
+      result.push(node)
+    }
+  }
+
+  return result
+}
+
+// 提取标记符之后的所有节点
+// CMS 输入格式：使用引用块 (blockquote) + 代码格式 (format: 16) 作为标记符
+function extractAfterMarker(children: any[], markerId: string): any[] {
+  // 先展平所有节点，包括 layout 内部的
+  const flatChildren = flattenChildren(children)
+
+  let foundMarker = false
+  const result: any[] = []
+
+  for (const node of flatChildren) {
     // 查找带有 format: 16 (代码格式) 的段落或引用块作为标记符
     if (node.type === "paragraph" || node.type === "quote") {
       const text = node.children?.[0]?.text || ""
