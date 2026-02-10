@@ -46,6 +46,7 @@ COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/next.config.mjs 
 COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/payload.config.ts ./payload.config.ts
 COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/src ./src
 COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/tsconfig.json ./tsconfig.json
+COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/public ./public
 
 # Copy startup script, CSS loader, and migration cleanup script
 COPY --chown=payloaduser:nodejs payload-cms/start-payload.sh ./start-payload.sh
