@@ -84,8 +84,8 @@ const defaultBrandCurve: CurvedTextConfig = {
   width: 495,
   height: 400, // 只需要上半部分的高度
   // 胶囊顶部路径: 从左下开始，沿左边上去，绕过顶部，沿右边下来
-  // 左边起点高一些(Y=280)，右边终点低一些(Y=400)
-  path: "M 40, 280 L 40, 247.5 A 207.5, 207.5 0 0, 1 455, 247.5 L 455, 400",
+  // 左右两边起点终点等高
+  path: "M 40, 340 L 40, 247.5 A 207.5, 207.5 0 0, 1 455, 247.5 L 455, 340",
   fontSize: 26,
 }
 
@@ -142,7 +142,7 @@ export function OemOdmBrandAdvantage({
         <div
           className="absolute rounded-full"
           style={{
-            left: rpx(1247),
+            right: 0,
             top: rpx(207),
             width: rpx(656),
             height: rpx(942),
@@ -179,7 +179,7 @@ export function OemOdmBrandAdvantage({
             textAnchor="middle"
             letterSpacing="1em"
           >
-            <textPath href="#brandCurve" startOffset="50%">
+            <textPath href="#brandCurve" startOffset="52%">
               {title}
             </textPath>
           </text>
@@ -206,7 +206,7 @@ export function OemOdmBrandAdvantage({
             className="absolute flex flex-col items-center text-center"
             style={{
               left: rpx(74),
-              top: rpx(176),
+              top: rpx(150),
               width: rpx(347),
             }}
           >
@@ -216,7 +216,7 @@ export function OemOdmBrandAdvantage({
                 className="font-anaheim font-semibold text-white capitalize"
                 style={{
                   fontSize: rpx(28),
-                  lineHeight: rpx(60),
+                  lineHeight: rpx(80),
                 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -301,55 +301,68 @@ export function OemOdmBrandAdvantage({
           </motion.span>
         </motion.div>
 
-        {/* ========== 虚线装饰曲线 ========== */}
+        {/* ========== 上方虚线装饰曲线 (左上角) ========== */}
         <svg
           className="absolute pointer-events-none"
           style={{
-            // 中间胶囊: left=698, width=496, 中心点=698+248=946
-            // SVG宽度838，所以left = 946 - 838/2 = 527
             left: rpx(527),
             top: rpx(33),
-            width: rpx(838),
-            height: rpx(856),
-            zIndex: 2, // 与中间胶囊同层
+            width: rpx(837),
+            height: rpx(862),
+            zIndex: 2, // 与中间卡片同层
           }}
-          viewBox="0 0 838 856"
+          viewBox="0 0 837 862"
           fill="none"
         >
           {/* 上方虚线曲线 - 从左下到右上 */}
           <path
-            d="M20.844 299.957C-7.2055 200.472 -26.1631 1.5 122.402 1.5C270.968 1.5 445.455 112.316 514.128 167.724"
+            d="M20.844 299.957C-7.2055 200.471 -26.163 1.5 122.402 1.5C270.968 1.5 445.455 112.316 514.128 167.724"
             stroke="#756F3F"
             strokeWidth="3"
             strokeDasharray="10 14"
             className="animate-dash-flow"
           />
-          {/* 下方虚线曲线 - 从右上到左下 */}
+          {/* 左侧曲线起点圆 */}
+          <circle cx="22.1928" cy="301.615" r="8.29048" fill="#756F3F" />
+          {/* 上方曲线端点圆 */}
+          <circle cx="514.647" cy="167.31" r="8.29048" fill="#756F3F" />
+        </svg>
+
+        {/* ========== 下方虚线装饰曲线 (右下角) ========== */}
+        <svg
+          className="absolute pointer-events-none"
+          style={{
+            left: rpx(527),
+            top: rpx(33),
+            width: rpx(837),
+            height: rpx(862),
+            zIndex: 1, // 在中间卡片下层，右边卡片上层
+          }}
+          viewBox="0 0 837 862"
+          fill="none"
+        >
+          {/* 下方虚线曲线 */}
           <path
-            d="M641.492 814.382C732.687 866.059 894.766 907.981 813.519 662.251"
+            d="M514.128 704.5C733.304 929 894.766 907.981 813.519 662.251"
             stroke="#756F3F"
             strokeWidth="3"
             strokeDasharray="10 14"
-            className="animate-dash-flow-reverse"
+            className="animate-dash-flow"
           />
           {/* 右侧曲线端点圆 */}
           <path
             d="M818.908 662.251C818.908 666.83 815.196 670.542 810.617 670.542C806.039 670.542 802.327 666.83 802.327 662.251C802.327 657.672 806.039 653.961 810.617 653.961C815.196 653.961 818.908 657.672 818.908 662.251Z"
             fill="#756F3F"
           />
-          {/* 左侧曲线起点圆 */}
-          <circle cx="22.1928" cy="301.615" r="8.29048" fill="#756F3F" />
           {/* 下方曲线起点圆 */}
           <path
-            d="M649.782 811.48C649.782 816.059 646.07 819.77 641.492 819.77C636.913 819.77 633.201 816.059 633.201 811.48C633.201 806.901 636.913 803.189 641.492 803.189C646.07 803.189 649.782 806.901 649.782 811.48Z"
+            d="M522.885 703.79C522.885 708.369 519.173 712.081 514.594 712.081C510.016 712.081 506.304 708.369 506.304 703.79C506.304 699.212 510.016 695.5 514.594 695.5C519.173 695.5 522.885 699.212 522.885 703.79Z"
             fill="#756F3F"
           />
-          {/* 上方曲线端点圆 */}
-          <circle cx="514.647" cy="167.31" r="8.29048" fill="#756F3F" />
         </svg>
 
         {/* Click to know more 弯曲文字 - OEM (中间胶囊) */}
-        <motion.svg
+        <svg
           className="absolute pointer-events-none"
           style={{
             left: rpx(clickCurveConfig.left),
@@ -357,11 +370,10 @@ export function OemOdmBrandAdvantage({
             width: rpx(clickCurveConfig.width),
             height: rpx(clickCurveConfig.height),
             zIndex: 10,
+            opacity: activeCard === 'oem' ? 1 : 0,
+            transition: 'opacity 0.3s',
           }}
           viewBox={`0 0 ${clickCurveConfig.width} ${clickCurveConfig.height}`}
-          initial={{ opacity: 1 }}
-          animate={{ opacity: activeCard === 'oem' ? 1 : 0 }}
-          transition={{ duration: 0.3 }}
         >
           <defs>
             <path
@@ -381,10 +393,10 @@ export function OemOdmBrandAdvantage({
               {clickToKnowMore}
             </textPath>
           </text>
-        </motion.svg>
+        </svg>
 
         {/* Click to know more 弯曲文字 - ODM (右侧胶囊) */}
-        <motion.svg
+        <svg
           className="absolute pointer-events-none"
           style={{
             // ODM 胶囊位置: left=1119, 相对于 OEM 偏移 421 (1119-698)
@@ -393,11 +405,10 @@ export function OemOdmBrandAdvantage({
             width: rpx(clickCurveConfig.width),
             height: rpx(clickCurveConfig.height),
             zIndex: 10,
+            opacity: activeCard === 'odm' ? 1 : 0,
+            transition: 'opacity 0.3s',
           }}
           viewBox={`0 0 ${clickCurveConfig.width} ${clickCurveConfig.height}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: activeCard === 'odm' ? 1 : 0 }}
-          transition={{ duration: 0.3 }}
         >
           <defs>
             <path
@@ -417,7 +428,7 @@ export function OemOdmBrandAdvantage({
               {clickToKnowMore}
             </textPath>
           </text>
-        </motion.svg>
+        </svg>
 
         {/* ========== 右侧图片 - ODM ========== */}
         <motion.div
@@ -428,7 +439,7 @@ export function OemOdmBrandAdvantage({
             width: rpx(496),
             height: rpx(712),
             borderRadius: rpx(299),
-            zIndex: 1, // 最下层
+            zIndex: 0, // 右侧卡片，在下方虚线下层
           }}
           initial={{ opacity: 0, x: 50 }}
           animate={{

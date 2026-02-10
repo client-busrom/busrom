@@ -176,7 +176,13 @@ export default buildConfig({
     avatar: 'default',
     meta: {
       titleSuffix: '- Busrom CMS',
-      // favicon: '/favicon.ico',
+      icons: [
+        {
+          rel: 'icon',
+          type: 'image/svg+xml',
+          url: '/favicon.svg',
+        },
+      ],
       // ogImage: '/og-image.png', // Not supported in this version
     },
     components: {

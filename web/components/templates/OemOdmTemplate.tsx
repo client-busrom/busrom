@@ -470,19 +470,12 @@ export function OemOdmTemplate({ locale, pageContent }: OemOdmTemplateProps) {
     const rightImage = galleryImages[1] || null
 
     return {
-      titleLine1: titleLines[0] || null,
-      titleLine2: titleLines[1] || null,
-      titleLine3: titleLines[2] || null,
-      titleLine4: titleLines[3] || null,
-      titleLine5: titleLines[4] || null,
+      titleLines,
+      features,
       description: descriptionLeft,
-      feature1: features[0] || null,
-      feature2: features[1] || null,
-      feature3: features[2] || null,
       rightDescription: descriptionRight,
       leftImage,
       rightImage,
-      topLabel: "OEM/ODM", // 固定标签
     }
   }, [contentChildren, mediaData])
 
@@ -771,18 +764,8 @@ export function OemOdmTemplate({ locale, pageContent }: OemOdmTemplateProps) {
     <main className="min-h-screen" data-header-theme="dark">
       {/* Hero Section - Value Guide */}
       <OemOdmValueGuide
-        titleLines={[
-          heroData.titleLine1,
-          heroData.titleLine2,
-          heroData.titleLine3,
-          heroData.titleLine4,
-          heroData.titleLine5,
-        ].filter(Boolean) as string[]}
-        features={[
-          heroData.feature1,
-          heroData.feature2,
-          heroData.feature3,
-        ].filter(Boolean) as string[]}
+        titleLines={heroData.titleLines}
+        features={heroData.features}
         leftDescription={heroData.description || undefined}
         rightDescription={heroData.rightDescription || undefined}
         leftImage={heroData.leftImage}
