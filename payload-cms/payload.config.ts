@@ -1086,6 +1086,33 @@ export default buildConfig({
         payload.logger.warn(`⚠️ Jobs tables check: ${jobsError.message}`)
       }
 
+      // Step 0.x: Clean up stuck/failed jobs to prevent _rels error loop
+      try {
+        const db = payload.db as any
+        if (db?.drizzle) {
+          const checkJobsTable = await db.drizzle.execute(`
+            SELECT 1 FROM information_schema.tables WHERE table_name = 'payload_jobs'
+          `)
+          if (checkJobsTable.rows && checkJobsTable.rows.length > 0) {
+            // Delete all failed and stuck (processing for over 10 minutes) jobs
+            const result = await db.drizzle.execute(`
+              DELETE FROM payload_jobs
+              WHERE task_slug = 'regenerateImageSizes'
+              AND (
+                processing = false
+                OR updated_at < NOW() - INTERVAL '10 minutes'
+              )
+            `)
+            const deletedCount = result.rowCount || 0
+            if (deletedCount > 0) {
+              payload.logger.info(`🧹 Cleaned up ${deletedCount} stuck/failed regenerateImageSizes job(s)`)
+            }
+          }
+        }
+      } catch (cleanupError: any) {
+        payload.logger.warn(`⚠️ Jobs cleanup: ${cleanupError.message}`)
+      }
+
       // Step 1: Seed permissions and roles (idempotent - only creates if not exists)
       await seedPermissionsSystem(payload)
 
