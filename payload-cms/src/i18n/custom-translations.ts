@@ -200,6 +200,7 @@ export const customTranslationsEn = {
       metaKeywords: 'Meta Keywords',
       ogTitle: 'OG Title',
       ogDescription: 'OG Description',
+      sceneName: 'Scene Name',
     },
 
     // ========================================================================
@@ -541,6 +542,7 @@ export const customTranslationsZh = {
       metaKeywords: 'Meta 关键词',
       ogTitle: 'OG 标题',
       ogDescription: 'OG 描述',
+      sceneName: '场景名称',
     },
 
     // ========================================================================

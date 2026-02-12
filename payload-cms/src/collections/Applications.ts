@@ -153,7 +153,6 @@ export const Applications: CollectionConfig = {
                     en: 'Scene Name',
                     zh: '场景名称',
                   },
-                  required: true,
                   localized: true,
                 },
                 {

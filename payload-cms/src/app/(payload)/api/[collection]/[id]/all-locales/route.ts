@@ -15,6 +15,7 @@ export async function GET(
       collection: collection as any,
       id,
       locale: 'all',
+      fallbackLocale: false,
       depth: 0,
     })
 
