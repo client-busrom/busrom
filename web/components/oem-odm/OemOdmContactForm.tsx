@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useEffect, useCallback } from "react"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { Turnstile } from "@/components/ui/turnstile"
@@ -27,6 +28,9 @@ interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
   width?: number
   height?: number
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 interface FormField {
@@ -320,12 +324,23 @@ export function OemOdmContactForm({
             }}
           >
             {image ? (
-              <OptimizedImage
-                image={image as any}
-                alt="OEM/ODM Contact"
-                size="xlarge"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
+              image.enableLink && image.linkUrl ? (
+                <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block absolute inset-0 w-full h-full">
+                  <OptimizedImage
+                    image={image as any}
+                    alt="OEM/ODM Contact"
+                    size="xlarge"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </Link>
+              ) : (
+                <OptimizedImage
+                  image={image as any}
+                  alt="OEM/ODM Contact"
+                  size="xlarge"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              )
             ) : (
               <div className="absolute inset-0 bg-black" />
             )}
@@ -854,12 +869,23 @@ export function OemOdmContactForm({
         {/* Hero 区域 */}
         <div className="relative rounded-2xl overflow-hidden mb-6" style={{ minHeight: "200px" }}>
           {image ? (
-            <OptimizedImage
-              image={image as any}
-              alt="OEM/ODM Contact"
-              size="large"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
+            image.enableLink && image.linkUrl ? (
+              <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block absolute inset-0 w-full h-full">
+                <OptimizedImage
+                  image={image as any}
+                  alt="OEM/ODM Contact"
+                  size="large"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </Link>
+            ) : (
+              <OptimizedImage
+                image={image as any}
+                alt="OEM/ODM Contact"
+                size="large"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )
           ) : (
             <div className="absolute inset-0 bg-black" />
           )}

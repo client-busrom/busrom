@@ -71,5 +71,37 @@ export const SingleImage: Block = {
         { label: 'Full Width', value: 'full' },
       ],
     },
+    {
+      name: 'enableLink',
+      type: 'checkbox',
+      label: {
+        en: 'Enable Link',
+        zh: '启用链接',
+      },
+      defaultValue: false,
+    },
+    {
+      name: 'linkUrl',
+      type: 'text',
+      label: {
+        en: 'Link URL',
+        zh: '链接地址',
+      },
+      admin: {
+        condition: (_, siblingData) => siblingData?.enableLink,
+      },
+    },
+    {
+      name: 'openInNewTab',
+      type: 'checkbox',
+      label: {
+        en: 'Open in New Tab',
+        zh: '新标签页打开',
+      },
+      defaultValue: false,
+      admin: {
+        condition: (_, siblingData) => siblingData?.enableLink,
+      },
+    },
   ],
 }

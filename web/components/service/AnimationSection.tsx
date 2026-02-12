@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useRef, useEffect, useCallback } from "react"
+import Link from "next/link"
 
 const DESIGN_WIDTH = 1920
 
@@ -15,6 +16,9 @@ interface MediaObject {
     large?: string
     xlarge?: string
   }
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 interface AnimationSectionProps {
@@ -421,11 +425,21 @@ export function AnimationSection({
       {/* Mobile Layout - Simple image display */}
       <div className="lg:hidden relative w-full aspect-video overflow-hidden">
         {imageUrl && (
-          <img
-            src={imageUrl}
-            alt={backgroundImage.alt || "Animation background"}
-            className="w-full h-full object-cover"
-          />
+          backgroundImage.enableLink && backgroundImage.linkUrl ? (
+            <Link href={backgroundImage.linkUrl} target={backgroundImage.openInNewTab ? "_blank" : undefined} rel={backgroundImage.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+              <img
+                src={imageUrl}
+                alt={backgroundImage.alt || "Animation background"}
+                className="w-full h-full object-cover"
+              />
+            </Link>
+          ) : (
+            <img
+              src={imageUrl}
+              alt={backgroundImage.alt || "Animation background"}
+              className="w-full h-full object-cover"
+            />
+          )
         )}
       </div>
     </section>

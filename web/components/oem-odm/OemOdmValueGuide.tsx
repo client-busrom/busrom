@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
@@ -67,6 +68,9 @@ interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
   width?: number
   height?: number
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 interface OemOdmValueGuideProps {
@@ -149,13 +153,24 @@ export function OemOdmValueGuide({
           onMouseEnter={() => setIsLeftImageHovered(true)}
           onMouseLeave={() => setIsLeftImageHovered(false)}
         >
-          <div className="w-full h-full grayscale">
-            {leftImage ? (
+          {leftImage?.enableLink && leftImage.linkUrl ? (
+            <Link
+              href={leftImage.linkUrl}
+              target={leftImage.openInNewTab ? '_blank' : undefined}
+              rel={leftImage.openInNewTab ? 'noopener noreferrer' : undefined}
+              className="block w-full h-full grayscale"
+            >
               <OptimizedImage image={leftImage as any} alt="OEM Service" size="large" className="w-full h-full object-cover" objectPosition={getObjectPosition(leftImage)} priority />
-            ) : (
-              <div className="w-full h-full bg-gray-400"><Image src="/images/placeholder-person.jpg" alt="OEM Service" fill className="object-cover" priority /></div>
-            )}
-          </div>
+            </Link>
+          ) : (
+            <div className="w-full h-full grayscale">
+              {leftImage ? (
+                <OptimizedImage image={leftImage as any} alt="OEM Service" size="large" className="w-full h-full object-cover" objectPosition={getObjectPosition(leftImage)} priority />
+              ) : (
+                <div className="w-full h-full bg-gray-400"><Image src="/images/placeholder-person.jpg" alt="OEM Service" fill className="object-cover" priority /></div>
+              )}
+            </div>
+          )}
         </motion.div>
 
         {/* 主标题 */}
@@ -227,14 +242,25 @@ export function OemOdmValueGuide({
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: DRAWER_ANIMATION_DURATION, delay: INITIAL_DELAY, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          <div className="w-full h-full grayscale">
-            {rightImage ? (
+          {rightImage?.enableLink && rightImage.linkUrl ? (
+            <Link
+              href={rightImage.linkUrl}
+              target={rightImage.openInNewTab ? '_blank' : undefined}
+              rel={rightImage.openInNewTab ? 'noopener noreferrer' : undefined}
+              className="block w-full h-full grayscale"
+            >
               <OptimizedImage image={rightImage as any} alt="Professional Service" size="large" className="w-full h-full object-cover" objectPosition={getObjectPosition(rightImage)} priority />
-            ) : (
-              <div className="w-full h-full bg-gray-500"><Image src="/images/placeholder-work.jpg" alt="Professional Service" fill className="object-cover" priority /></div>
-            )}
-          </div>
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.85) 100%)" }} />
+            </Link>
+          ) : (
+            <div className="w-full h-full grayscale">
+              {rightImage ? (
+                <OptimizedImage image={rightImage as any} alt="Professional Service" size="large" className="w-full h-full object-cover" objectPosition={getObjectPosition(rightImage)} priority />
+              ) : (
+                <div className="w-full h-full bg-gray-500"><Image src="/images/placeholder-work.jpg" alt="Professional Service" fill className="object-cover" priority /></div>
+              )}
+            </div>
+          )}
+          <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.85) 100%)" }} />
         </motion.div>
 
         {/* 左下角悬停卡片 */}
@@ -311,13 +337,22 @@ export function OemOdmValueGuide({
           whileInView={{ opacity: 1, x: 0 }}
           className="relative w-full aspect-[4/5] rounded-tl-[60px] overflow-hidden grayscale shadow-2xl mb-12"
         >
-          {leftImage ? (
+          {leftImage?.enableLink && leftImage.linkUrl ? (
+            <Link
+              href={leftImage.linkUrl}
+              target={leftImage.openInNewTab ? '_blank' : undefined}
+              rel={leftImage.openInNewTab ? 'noopener noreferrer' : undefined}
+              className="block w-full h-full"
+            >
+              <OptimizedImage image={leftImage as any} alt="OEM" className="w-full h-full object-cover" />
+            </Link>
+          ) : leftImage ? (
             <OptimizedImage image={leftImage as any} alt="OEM" className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-gray-400" />
           )}
           {/* 文字直接浮盖 */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-6 flex items-end">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-6 flex items-end pointer-events-none">
             <p className="text-white text-xs font-anaheim leading-relaxed">{leftDescription}</p>
           </div>
         </motion.div>
@@ -328,7 +363,16 @@ export function OemOdmValueGuide({
           whileInView={{ opacity: 1, x: 0 }}
           className="relative w-[85%] ml-auto aspect-square rounded-tr-[80px] overflow-hidden grayscale opacity-70 shadow-xl mb-12"
         >
-          {rightImage ? (
+          {rightImage?.enableLink && rightImage.linkUrl ? (
+            <Link
+              href={rightImage.linkUrl}
+              target={rightImage.openInNewTab ? '_blank' : undefined}
+              rel={rightImage.openInNewTab ? 'noopener noreferrer' : undefined}
+              className="block w-full h-full"
+            >
+              <OptimizedImage image={rightImage as any} alt="Pro" className="w-full h-full object-cover" />
+            </Link>
+          ) : rightImage ? (
             <OptimizedImage image={rightImage as any} alt="Pro" className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-gray-500" />

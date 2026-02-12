@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import type { Locale } from "@/i18n.config"
@@ -36,6 +37,9 @@ interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
   width?: number
   height?: number
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 interface OemOdmProductGuideProps {
@@ -199,12 +203,23 @@ export function OemOdmProductGuide({
                     ease: [0.4, 0, 0.2, 1],
                   }}
                 >
-                  <OptimizedImage
-                    image={image as any}
-                    alt="Product"
-                    size="medium"
-                    className="w-full h-full object-cover"
-                  />
+                  {image.enableLink && image.linkUrl ? (
+                    <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                      <OptimizedImage
+                        image={image as any}
+                        alt="Product"
+                        size="medium"
+                        className="w-full h-full object-cover"
+                      />
+                    </Link>
+                  ) : (
+                    <OptimizedImage
+                      image={image as any}
+                      alt="Product"
+                      size="medium"
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                   {/* 白色遮罩 - 根据层级显示不同透明度 */}
                   {config.overlay > 0 && (
                     <div
@@ -428,12 +443,23 @@ export function OemOdmProductGuide({
                 boxShadow: "-2px 7px 19px rgba(0,0,0,0.3)",
               }}
             >
-              <OptimizedImage
-                image={selectedImages[0] as any}
-                alt="Product"
-                size="medium"
-                className="w-full h-full object-cover"
-              />
+              {selectedImages[0].enableLink && selectedImages[0].linkUrl ? (
+                <Link href={selectedImages[0].linkUrl} target={selectedImages[0].openInNewTab ? "_blank" : undefined} rel={selectedImages[0].openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                  <OptimizedImage
+                    image={selectedImages[0] as any}
+                    alt="Product"
+                    size="medium"
+                    className="w-full h-full object-cover"
+                  />
+                </Link>
+              ) : (
+                <OptimizedImage
+                  image={selectedImages[0] as any}
+                  alt="Product"
+                  size="medium"
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
           )}
         </div>

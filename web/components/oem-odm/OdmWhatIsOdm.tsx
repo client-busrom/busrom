@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
@@ -25,6 +26,9 @@ interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
   width?: number
   height?: number
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 // 文本片段接口 - 支持格式化
@@ -88,12 +92,23 @@ export function OdmWhatIsOdm({
           transition={{ duration: 0.6 }}
         >
           {image && (
-            <OptimizedImage
-              image={image as any}
-              alt="What Is ODM"
-              size="large"
-              className="w-full h-full object-cover"
-            />
+            image.enableLink && image.linkUrl ? (
+              <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                <OptimizedImage
+                  image={image as any}
+                  alt="What Is ODM"
+                  size="large"
+                  className="w-full h-full object-cover"
+                />
+              </Link>
+            ) : (
+              <OptimizedImage
+                image={image as any}
+                alt="What Is ODM"
+                size="large"
+                className="w-full h-full object-cover"
+              />
+            )
           )}
         </motion.div>
 
@@ -256,12 +271,23 @@ export function OdmWhatIsOdm({
         {/* 图片 */}
         {image && (
           <div className="relative w-full aspect-[724/537] rounded-2xl overflow-hidden mb-4">
-            <OptimizedImage
-              image={image as any}
-              alt="What Is ODM"
-              size="large"
-              className="w-full h-full object-cover"
-            />
+            {image.enableLink && image.linkUrl ? (
+              <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                <OptimizedImage
+                  image={image as any}
+                  alt="What Is ODM"
+                  size="large"
+                  className="w-full h-full object-cover"
+                />
+              </Link>
+            ) : (
+              <OptimizedImage
+                image={image as any}
+                alt="What Is ODM"
+                size="large"
+                className="w-full h-full object-cover"
+              />
+            )}
           </div>
         )}
 

@@ -9,10 +9,11 @@ import React, { useState, useEffect } from 'react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $getNodeByKey } from 'lexical'
 import { useTranslation } from '@payloadcms/ui'
-import { Image as ImageIcon } from 'lucide-react'
+import { Image as ImageIcon, Link as LinkIcon } from 'lucide-react'
 import type { SingleImageData } from './node'
 import { $createSingleImageNode, SingleImageNode } from './node'
 import { MediaPickerModal } from '../image-gallery/component.client'
+import { LinkPickerModal } from '../carousel/component.client'
 
 interface MediaItem {
   id: number
@@ -61,6 +62,7 @@ export const SingleImageComponent: React.FC<SingleImageComponentProps> = (props)
 
   const [imageData, setImageData] = useState<MediaItem | null>(null)
   const [isSelectingImage, setIsSelectingImage] = useState(false)
+  const [showLinkPicker, setShowLinkPicker] = useState(false)
 
   const data = isEditing ? formData : nodeData || formData
 
@@ -327,6 +329,77 @@ export const SingleImageComponent: React.FC<SingleImageComponentProps> = (props)
               <option value="full">{getSizeLabel('full')}</option>
             </select>
           </div>
+
+          {/* 启用链接 */}
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={formData.enableLink || false}
+                onChange={(e) => setFormData({ ...formData, enableLink: e.target.checked })}
+              />
+              {i18n?.language === 'zh' ? '启用链接' : 'Enable Link'}
+            </label>
+          </div>
+
+          {formData.enableLink && (
+            <>
+              {/* 链接地址 */}
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
+                  {i18n?.language === 'zh' ? '链接地址' : 'Link URL'}
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    value={formData.linkUrl || ''}
+                    onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })}
+                    placeholder={i18n?.language === 'zh' ? '输入链接地址' : 'Enter link URL'}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      paddingRight: '36px',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowLinkPicker(true)}
+                    title={i18n?.language === 'zh' ? '选择站内链接' : 'Select internal link'}
+                    style={{
+                      position: 'absolute',
+                      right: '8px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      padding: '4px',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      color: '#6b7280',
+                    }}
+                  >
+                    <LinkIcon size={16} />
+                  </button>
+                </div>
+              </div>
+
+              {/* 新标签页打开 */}
+              <div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={formData.openInNewTab || false}
+                    onChange={(e) => setFormData({ ...formData, openInNewTab: e.target.checked })}
+                  />
+                  {i18n?.language === 'zh' ? '新标签页打开' : 'Open in New Tab'}
+                </label>
+              </div>
+            </>
+          )}
         </div>
       ) : (
         <div
@@ -387,6 +460,18 @@ export const SingleImageComponent: React.FC<SingleImageComponentProps> = (props)
           imageIndex={0}
           t={t}
           i18n={i18n}
+        />
+      )}
+
+      {/* 链接选择器模态框 */}
+      {showLinkPicker && (
+        <LinkPickerModal
+          isOpen={showLinkPicker}
+          onClose={() => setShowLinkPicker(false)}
+          onSelect={(path: string) => {
+            setFormData({ ...formData, linkUrl: path })
+            setShowLinkPicker(false)
+          }}
         />
       )}
     </div>

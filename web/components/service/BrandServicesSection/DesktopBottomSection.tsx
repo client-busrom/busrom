@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
@@ -422,12 +423,23 @@ export function DesktopBottomSection({
                                 height: imgIndex === 1 ? vw(157) : vw(118), // 224/168 * 0.7
                               }}
                             >
-                              <OptimizedImage
-                                image={image as any}
-                                alt={`${item.title} ${imgIndex + 1}`}
-                                size={imgIndex === 1 ? "medium" : "small"}
-                                className="w-full h-full object-cover"
-                              />
+                              {image.enableLink && image.linkUrl ? (
+                                <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                                  <OptimizedImage
+                                    image={image as any}
+                                    alt={`${item.title} ${imgIndex + 1}`}
+                                    size={imgIndex === 1 ? "medium" : "small"}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </Link>
+                              ) : (
+                                <OptimizedImage
+                                  image={image as any}
+                                  alt={`${item.title} ${imgIndex + 1}`}
+                                  size={imgIndex === 1 ? "medium" : "small"}
+                                  className="w-full h-full object-cover"
+                                />
+                              )}
                             </div>
                           ))
                         ) : (

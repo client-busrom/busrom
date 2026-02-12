@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import {
@@ -40,9 +41,16 @@ interface AttributeCard {
   description: string
 }
 
+interface ImageLinkData {
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
+}
+
 interface ProductAttributesSectionProps {
   title: string
   image?: MediaObject | null
+  imageLink?: ImageLinkData | null
   attributes: AttributeCard[]
 }
 
@@ -73,6 +81,7 @@ const getIconForAttribute = (title: string) => {
 export function ProductAttributesSection({
   title,
   image,
+  imageLink,
   attributes,
 }: ProductAttributesSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -167,13 +176,25 @@ export function ProductAttributesSection({
               }}
             >
               {image ? (
-                <OptimizedImage
-                  image={image as any}
-                  alt={image.altText || image.alt || title}
-                  size="large"
-                  className="w-full h-full object-cover"
-                  objectPosition={objectPosition}
-                />
+                imageLink?.enableLink && imageLink.linkUrl ? (
+                  <Link href={imageLink.linkUrl} target={imageLink.openInNewTab ? "_blank" : undefined} rel={imageLink.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                    <OptimizedImage
+                      image={image as any}
+                      alt={image.altText || image.alt || title}
+                      size="large"
+                      className="w-full h-full object-cover"
+                      objectPosition={objectPosition}
+                    />
+                  </Link>
+                ) : (
+                  <OptimizedImage
+                    image={image as any}
+                    alt={image.altText || image.alt || title}
+                    size="large"
+                    className="w-full h-full object-cover"
+                    objectPosition={objectPosition}
+                  />
+                )
               ) : (
                 <div className="w-full h-full bg-gray-300" />
               )}
@@ -373,13 +394,25 @@ export function ProductAttributesSection({
         {/* Image */}
         {image && (
           <div className="w-full h-48 rounded-2xl overflow-hidden mb-6">
-            <OptimizedImage
-              image={image as any}
-              alt={image.altText || image.alt || title}
-              size="medium"
-              className="w-full h-full object-cover"
-              objectPosition={objectPosition}
-            />
+            {imageLink?.enableLink && imageLink.linkUrl ? (
+              <Link href={imageLink.linkUrl} target={imageLink.openInNewTab ? "_blank" : undefined} rel={imageLink.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                <OptimizedImage
+                  image={image as any}
+                  alt={image.altText || image.alt || title}
+                  size="medium"
+                  className="w-full h-full object-cover"
+                  objectPosition={objectPosition}
+                />
+              </Link>
+            ) : (
+              <OptimizedImage
+                image={image as any}
+                alt={image.altText || image.alt || title}
+                size="medium"
+                className="w-full h-full object-cover"
+                objectPosition={objectPosition}
+              />
+            )}
           </div>
         )}
 

@@ -41,6 +41,9 @@ interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
   width?: number
   height?: number
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 interface OdmProductSeriesProps {
@@ -191,12 +194,23 @@ export function OdmProductSeries({
             }}
           >
             {image && (
-              <OptimizedImage
-                image={image as any}
-                alt="Product Series"
-                size="xlarge"
-                className="w-full h-full object-cover"
-              />
+              image.enableLink && image.linkUrl ? (
+                <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                  <OptimizedImage
+                    image={image as any}
+                    alt="Product Series"
+                    size="xlarge"
+                    className="w-full h-full object-cover"
+                  />
+                </Link>
+              ) : (
+                <OptimizedImage
+                  image={image as any}
+                  alt="Product Series"
+                  size="xlarge"
+                  className="w-full h-full object-cover"
+                />
+              )
             )}
           </div>
 
@@ -311,12 +325,23 @@ export function OdmProductSeries({
                 WebkitClipPath: "url(#odmProductSeriesClipPathMobile)",
               }}
             >
-              <OptimizedImage
-                image={image as any}
-                alt="Product Series"
-                size="large"
-                className="w-full h-full object-cover"
-              />
+              {image.enableLink && image.linkUrl ? (
+                <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                  <OptimizedImage
+                    image={image as any}
+                    alt="Product Series"
+                    size="large"
+                    className="w-full h-full object-cover"
+                  />
+                </Link>
+              ) : (
+                <OptimizedImage
+                  image={image as any}
+                  alt="Product Series"
+                  size="large"
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
           )}
 

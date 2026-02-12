@@ -25,6 +25,9 @@ export interface SingleImageData {
   caption?: string
   alignment: SingleImageAlignment
   size: SingleImageSize
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 export type SerializedSingleImageNode = Spread<

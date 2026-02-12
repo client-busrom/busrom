@@ -2,6 +2,7 @@
 
 import React from "react"
 import { motion } from "framer-motion"
+import Link from "next/link"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 // Design reference dimensions (from Figma 1920x922)
@@ -23,10 +24,17 @@ interface FeatureItem {
   title: string
 }
 
+interface ImageLinkData {
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
+}
+
 interface ProductFeaturesSectionProps {
   title?: string
   items: FeatureItem[]
   image?: MediaObject | null
+  imageLink?: ImageLinkData | null
 }
 
 // Star component with twinkling animation
@@ -219,6 +227,7 @@ export function ProductFeaturesSection({
   title = "Product Features",
   items,
   image,
+  imageLink,
 }: ProductFeaturesSectionProps) {
   // Use provided items or fallback to defaults
   const leftItems = items.slice(0, 3)
@@ -241,13 +250,30 @@ export function ProductFeaturesSection({
       {/* Center Image */}
       {image && (
         <div className="w-full aspect-[4/3] rounded-3xl overflow-hidden mb-6">
-          <OptimizedImage
-            image={image as any}
-            alt={image.altText || image.alt || title || ""}
-            size="medium"
-            className="w-full h-full object-cover"
-            objectPosition={objectPosition}
-          />
+          {imageLink?.enableLink && imageLink.linkUrl ? (
+            <Link
+              href={imageLink.linkUrl}
+              target={imageLink.openInNewTab ? "_blank" : undefined}
+              rel={imageLink.openInNewTab ? "noopener noreferrer" : undefined}
+              className="block w-full h-full"
+            >
+              <OptimizedImage
+                image={image as any}
+                alt={image.altText || image.alt || title || ""}
+                size="medium"
+                className="w-full h-full object-cover"
+                objectPosition={objectPosition}
+              />
+            </Link>
+          ) : (
+            <OptimizedImage
+              image={image as any}
+              alt={image.altText || image.alt || title || ""}
+              size="medium"
+              className="w-full h-full object-cover"
+              objectPosition={objectPosition}
+            />
+          )}
         </div>
       )}
 
@@ -332,13 +358,30 @@ export function ProductFeaturesSection({
             }}
           >
             {image ? (
-              <OptimizedImage
-                image={image as any}
-                alt={image.altText || image.alt || title || ""}
-                size="xlarge"
-                className="w-full h-full object-cover"
-                objectPosition={objectPosition}
-              />
+              imageLink?.enableLink && imageLink.linkUrl ? (
+                <Link
+                  href={imageLink.linkUrl}
+                  target={imageLink.openInNewTab ? "_blank" : undefined}
+                  rel={imageLink.openInNewTab ? "noopener noreferrer" : undefined}
+                  className="block w-full h-full"
+                >
+                  <OptimizedImage
+                    image={image as any}
+                    alt={image.altText || image.alt || title || ""}
+                    size="xlarge"
+                    className="w-full h-full object-cover"
+                    objectPosition={objectPosition}
+                  />
+                </Link>
+              ) : (
+                <OptimizedImage
+                  image={image as any}
+                  alt={image.altText || image.alt || title || ""}
+                  size="xlarge"
+                  className="w-full h-full object-cover"
+                  objectPosition={objectPosition}
+                />
+              )
             ) : (
               <div className="w-full h-full bg-gray-300" />
             )}

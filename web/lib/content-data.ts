@@ -278,6 +278,7 @@ export interface CaseStudiesData {
 export interface BrandCenter {
   title: string
   description: string
+  backgroundImage?: ImageObject | null
   largeImage?: string | null
   smallImage?: string | null
 }

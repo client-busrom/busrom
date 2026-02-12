@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
@@ -25,6 +26,9 @@ interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
   width?: number
   height?: number
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 interface PartnerItem {
@@ -291,12 +295,23 @@ export function OdmPartner({
                 ease: [0.4, 0, 0.2, 1],
               }}
             >
-              <OptimizedImage
-                image={image as any}
-                alt={`Partner Image ${imageIndex + 1}`}
-                size="large"
-                className="w-full h-full object-cover"
-              />
+              {image.enableLink && image.linkUrl ? (
+                <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                  <OptimizedImage
+                    image={image as any}
+                    alt={`Partner Image ${imageIndex + 1}`}
+                    size="large"
+                    className="w-full h-full object-cover"
+                  />
+                </Link>
+              ) : (
+                <OptimizedImage
+                  image={image as any}
+                  alt={`Partner Image ${imageIndex + 1}`}
+                  size="large"
+                  className="w-full h-full object-cover"
+                />
+              )}
             </motion.div>
           )
         })}
@@ -345,12 +360,23 @@ export function OdmPartner({
                   ease: [0.4, 0, 0.2, 1],
                 }}
               >
-                <OptimizedImage
-                  image={image as any}
-                  alt={`Partner Image ${imageIndex + 1}`}
-                  size="medium"
-                  className="w-full h-full object-cover"
-                />
+                {image.enableLink && image.linkUrl ? (
+                  <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                    <OptimizedImage
+                      image={image as any}
+                      alt={`Partner Image ${imageIndex + 1}`}
+                      size="medium"
+                      className="w-full h-full object-cover"
+                    />
+                  </Link>
+                ) : (
+                  <OptimizedImage
+                    image={image as any}
+                    alt={`Partner Image ${imageIndex + 1}`}
+                    size="medium"
+                    className="w-full h-full object-cover"
+                  />
+                )}
               </motion.div>
             )
           })}

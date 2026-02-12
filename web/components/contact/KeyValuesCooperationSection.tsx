@@ -24,6 +24,9 @@ interface MediaObject {
     xlarge?: string
   }
   cropFocalPoint?: { x: number; y: number } | null
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 export interface KeyValuesCooperationItem {
@@ -167,17 +170,33 @@ export function KeyValuesCooperationSection({
               }}
             >
               <div className="w-full h-full opacity-85">
-                <OptimizedImage
-                  image={currentItem.images[0] as any}
-                  alt={currentItem.title}
-                  size="xlarge"
-                  className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img1:scale-110"
-                  objectPosition={
-                    currentItem.images[0]?.cropFocalPoint
-                      ? `${currentItem.images[0].cropFocalPoint.x}% ${currentItem.images[0].cropFocalPoint.y}%`
-                      : "center"
-                  }
-                />
+                {currentItem.images[0]?.enableLink && currentItem.images[0]?.linkUrl ? (
+                  <Link href={currentItem.images[0].linkUrl} target={currentItem.images[0].openInNewTab ? "_blank" : undefined} rel={currentItem.images[0].openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                    <OptimizedImage
+                      image={currentItem.images[0] as any}
+                      alt={currentItem.title}
+                      size="xlarge"
+                      className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img1:scale-110"
+                      objectPosition={
+                        currentItem.images[0]?.cropFocalPoint
+                          ? `${currentItem.images[0].cropFocalPoint.x}% ${currentItem.images[0].cropFocalPoint.y}%`
+                          : "center"
+                      }
+                    />
+                  </Link>
+                ) : (
+                  <OptimizedImage
+                    image={currentItem.images[0] as any}
+                    alt={currentItem.title}
+                    size="xlarge"
+                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img1:scale-110"
+                    objectPosition={
+                      currentItem.images[0]?.cropFocalPoint
+                        ? `${currentItem.images[0].cropFocalPoint.x}% ${currentItem.images[0].cropFocalPoint.y}%`
+                        : "center"
+                    }
+                  />
+                )}
               </div>
             </div>
           )}
@@ -211,17 +230,33 @@ export function KeyValuesCooperationSection({
               }}
             >
               <div className="w-full h-full opacity-85">
-                <OptimizedImage
-                  image={currentItem.images[1] as any}
-                  alt={currentItem.title}
-                  size="xlarge"
-                  className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img2:scale-110"
-                  objectPosition={
-                    currentItem.images[1]?.cropFocalPoint
-                      ? `${currentItem.images[1].cropFocalPoint.x}% ${currentItem.images[1].cropFocalPoint.y}%`
-                      : "center"
-                  }
-                />
+                {currentItem.images[1]?.enableLink && currentItem.images[1]?.linkUrl ? (
+                  <Link href={currentItem.images[1].linkUrl} target={currentItem.images[1].openInNewTab ? "_blank" : undefined} rel={currentItem.images[1].openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                    <OptimizedImage
+                      image={currentItem.images[1] as any}
+                      alt={currentItem.title}
+                      size="xlarge"
+                      className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img2:scale-110"
+                      objectPosition={
+                        currentItem.images[1]?.cropFocalPoint
+                          ? `${currentItem.images[1].cropFocalPoint.x}% ${currentItem.images[1].cropFocalPoint.y}%`
+                          : "center"
+                      }
+                    />
+                  </Link>
+                ) : (
+                  <OptimizedImage
+                    image={currentItem.images[1] as any}
+                    alt={currentItem.title}
+                    size="xlarge"
+                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img2:scale-110"
+                    objectPosition={
+                      currentItem.images[1]?.cropFocalPoint
+                        ? `${currentItem.images[1].cropFocalPoint.x}% ${currentItem.images[1].cropFocalPoint.y}%`
+                        : "center"
+                    }
+                  />
+                )}
               </div>
             </div>
           )}

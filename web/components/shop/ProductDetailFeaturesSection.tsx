@@ -2,6 +2,7 @@
 
 import React from "react"
 import { motion } from "framer-motion"
+import Link from "next/link"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 // Design reference dimensions (from Figma 1920x922)
@@ -24,10 +25,17 @@ interface DetailFeatureItem {
   description?: string
 }
 
+interface ImageLinkData {
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
+}
+
 interface ProductDetailFeaturesSectionProps {
   title?: string
   items: DetailFeatureItem[]
   image?: MediaObject | null
+  imageLink?: ImageLinkData | null
 }
 
 // Card styles for each position (top to bottom: dark, medium, light)
@@ -56,6 +64,7 @@ export function ProductDetailFeaturesSection({
   title = "Product Detail Features",
   items,
   image,
+  imageLink,
 }: ProductDetailFeaturesSectionProps) {
   // Calculate object position from focal point
   const objectPosition = image?.cropFocalPoint
@@ -74,13 +83,30 @@ export function ProductDetailFeaturesSection({
       {/* Image */}
       {image && (
         <div className="w-full h-48 rounded-2xl overflow-hidden mb-6">
-          <OptimizedImage
-            image={image as any}
-            alt={image.altText || image.alt || title || ""}
-            size="medium"
-            className="w-full h-full object-cover"
-            objectPosition={objectPosition}
-          />
+          {imageLink?.enableLink && imageLink.linkUrl ? (
+            <Link
+              href={imageLink.linkUrl}
+              target={imageLink.openInNewTab ? "_blank" : undefined}
+              rel={imageLink.openInNewTab ? "noopener noreferrer" : undefined}
+              className="block w-full h-full"
+            >
+              <OptimizedImage
+                image={image as any}
+                alt={image.altText || image.alt || title || ""}
+                size="medium"
+                className="w-full h-full object-cover"
+                objectPosition={objectPosition}
+              />
+            </Link>
+          ) : (
+            <OptimizedImage
+              image={image as any}
+              alt={image.altText || image.alt || title || ""}
+              size="medium"
+              className="w-full h-full object-cover"
+              objectPosition={objectPosition}
+            />
+          )}
         </div>
       )}
 
@@ -129,13 +155,30 @@ export function ProductDetailFeaturesSection({
           }}
         >
           {image ? (
-            <OptimizedImage
-              image={image as any}
-              alt={image.altText || image.alt || title || ""}
-              size="xlarge"
-              className="w-full h-full object-cover"
-              objectPosition={objectPosition}
-            />
+            imageLink?.enableLink && imageLink.linkUrl ? (
+              <Link
+                href={imageLink.linkUrl}
+                target={imageLink.openInNewTab ? "_blank" : undefined}
+                rel={imageLink.openInNewTab ? "noopener noreferrer" : undefined}
+                className="block w-full h-full"
+              >
+                <OptimizedImage
+                  image={image as any}
+                  alt={image.altText || image.alt || title || ""}
+                  size="xlarge"
+                  className="w-full h-full object-cover"
+                  objectPosition={objectPosition}
+                />
+              </Link>
+            ) : (
+              <OptimizedImage
+                image={image as any}
+                alt={image.altText || image.alt || title || ""}
+                size="xlarge"
+                className="w-full h-full object-cover"
+                objectPosition={objectPosition}
+              />
+            )
           ) : (
             <div className="w-full h-full bg-gray-300" style={{ minHeight: rpx(800) }} />
           )}

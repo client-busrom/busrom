@@ -323,9 +323,12 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
         centers: (data.brandAnalysis.centers || []).map((center: any) => {
           const largeImg = toImageObject(center.largeImage, center.title)
           const smallImg = toImageObject(center.smallImage, center.title)
+          const bgImg = center.backgroundImage ? toImageObject(center.backgroundImage, 'Background') : null
+          const fallbackBg = data.brandAnalysis.backgroundImage ? toImageObject(data.brandAnalysis.backgroundImage, 'Brand Analysis Background') : null
           return {
             title: center.title || '',
             description: center.description || '',
+            backgroundImage: bgImg || fallbackBg,
             // Keep full image objects for variant support, but also provide URL for backward compat
             largeImage: largeImg.url,
             smallImage: smallImg.url,

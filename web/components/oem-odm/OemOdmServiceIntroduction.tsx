@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
@@ -25,6 +26,9 @@ interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
   width?: number
   height?: number
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 // 文本片段接口 - 支持格式化
@@ -374,12 +378,23 @@ export function OemOdmServiceIntroduction({
           transition={{ duration: 0.8, delay: 0.3 }}
         >
           {image && (
-            <OptimizedImage
-              image={image as any}
-              alt="OEM Service"
-              size="xlarge"
-              className="w-full h-full object-cover"
-            />
+            image.enableLink && image.linkUrl ? (
+              <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                <OptimizedImage
+                  image={image as any}
+                  alt="OEM Service"
+                  size="xlarge"
+                  className="w-full h-full object-cover"
+                />
+              </Link>
+            ) : (
+              <OptimizedImage
+                image={image as any}
+                alt="OEM Service"
+                size="xlarge"
+                className="w-full h-full object-cover"
+              />
+            )
           )}
         </motion.div>
 
@@ -515,12 +530,23 @@ export function OemOdmServiceIntroduction({
           {/* 图片 */}
           {image && (
             <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-6">
-              <OptimizedImage
-                image={image as any}
-                alt="OEM Service"
-                size="large"
-                className="w-full h-full object-cover"
-              />
+              {image.enableLink && image.linkUrl ? (
+                <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                  <OptimizedImage
+                    image={image as any}
+                    alt="OEM Service"
+                    size="large"
+                    className="w-full h-full object-cover"
+                  />
+                </Link>
+              ) : (
+                <OptimizedImage
+                  image={image as any}
+                  alt="OEM Service"
+                  size="large"
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
           )}
 

@@ -615,7 +615,7 @@ interface LinkPickerModalProps {
   onSelect: (path: string) => void
 }
 
-const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClose, onSelect }) => {
+export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClose, onSelect }) => {
   const { i18n } = useTranslation()
   const [selectedCollection, setSelectedCollection] = useState('pages')
   const [searchTerm, setSearchTerm] = useState('')

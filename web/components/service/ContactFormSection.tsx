@@ -5,6 +5,7 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { Turnstile } from "@/components/ui/turnstile"
 import type { Locale } from "@/i18n.config"
 import Image from "next/image"
+import Link from "next/link"
 
 const DESIGN_WIDTH = 1920
 const SCALE = 0.7
@@ -34,6 +35,9 @@ interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
   width?: number
   height?: number
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 interface FormField {
@@ -830,12 +834,23 @@ export function ContactFormSection({
         {/* Background with blur */}
         <div className="absolute inset-0">
           {backgroundImage && (
-            <OptimizedImage
-              image={backgroundImage as any}
-              alt="Contact form background"
-              size="large"
-              className="w-full h-full object-cover opacity-50"
-            />
+            backgroundImage.enableLink && backgroundImage.linkUrl ? (
+              <Link href={backgroundImage.linkUrl} target={backgroundImage.openInNewTab ? "_blank" : undefined} rel={backgroundImage.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                <OptimizedImage
+                  image={backgroundImage as any}
+                  alt="Contact form background"
+                  size="large"
+                  className="w-full h-full object-cover opacity-50"
+                />
+              </Link>
+            ) : (
+              <OptimizedImage
+                image={backgroundImage as any}
+                alt="Contact form background"
+                size="large"
+                className="w-full h-full object-cover opacity-50"
+              />
+            )
           )}
           <div className="absolute inset-0 backdrop-blur-[7.5px]" />
         </div>
@@ -953,12 +968,23 @@ export function ContactFormSection({
         {/* Background - 全宽不缩放 */}
         <div className="absolute inset-0 bg-[#6E6839]">
           {backgroundImage && (
-            <OptimizedImage
-              image={backgroundImage as any}
-              alt="Contact form background"
-              size="xlarge"
-              className="w-full h-full object-cover opacity-50"
-            />
+            backgroundImage.enableLink && backgroundImage.linkUrl ? (
+              <Link href={backgroundImage.linkUrl} target={backgroundImage.openInNewTab ? "_blank" : undefined} rel={backgroundImage.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                <OptimizedImage
+                  image={backgroundImage as any}
+                  alt="Contact form background"
+                  size="xlarge"
+                  className="w-full h-full object-cover opacity-50"
+                />
+              </Link>
+            ) : (
+              <OptimizedImage
+                image={backgroundImage as any}
+                alt="Contact form background"
+                size="xlarge"
+                className="w-full h-full object-cover opacity-50"
+              />
+            )
           )}
           {/* Blur overlay */}
           <div className="absolute inset-0" style={{ backdropFilter: `blur(${vwFull(7.5)})` }} />

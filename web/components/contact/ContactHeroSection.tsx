@@ -2,6 +2,7 @@
 
 import React from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
@@ -27,6 +28,9 @@ interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
   width?: number
   height?: number
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 interface ContactHeroSectionProps {
@@ -312,14 +316,27 @@ export function ContactHeroSection({
           }}
         >
           {heroImage ? (
-            <OptimizedImage
-              image={heroImage as any}
-              alt="Contact hero"
-              size="large"
-              className="w-full h-full object-cover"
-              objectPosition={objectPosition}
-              priority
-            />
+            heroImage.enableLink && heroImage.linkUrl ? (
+              <Link href={heroImage.linkUrl} target={heroImage.openInNewTab ? "_blank" : undefined} rel={heroImage.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                <OptimizedImage
+                  image={heroImage as any}
+                  alt="Contact hero"
+                  size="large"
+                  className="w-full h-full object-cover"
+                  objectPosition={objectPosition}
+                  priority
+                />
+              </Link>
+            ) : (
+              <OptimizedImage
+                image={heroImage as any}
+                alt="Contact hero"
+                size="large"
+                className="w-full h-full object-cover"
+                objectPosition={objectPosition}
+                priority
+              />
+            )
           ) : (
             <div className="w-full h-full bg-[#D9D9D9]" />
           )}

@@ -100,6 +100,20 @@ export const BrandAnalysis: GlobalConfig = {
           localized: true,
         },
         {
+          name: 'backgroundImage',
+          type: 'upload',
+          relationTo: 'media',
+          label: {
+            en: 'Background Image',
+            zh: '背景图片',
+          },
+          admin: {
+            components: {
+              Field: '@/components/fields/MediaPicker',
+            },
+          },
+        },
+        {
           name: 'largeImage',
           type: 'upload',
           relationTo: 'media',
@@ -145,6 +159,20 @@ export const BrandAnalysis: GlobalConfig = {
           localized: true,
         },
         {
+          name: 'backgroundImage',
+          type: 'upload',
+          relationTo: 'media',
+          label: {
+            en: 'Background Image',
+            zh: '背景图片',
+          },
+          admin: {
+            components: {
+              Field: '@/components/fields/MediaPicker',
+            },
+          },
+        },
+        {
           name: 'largeImage',
           type: 'upload',
           relationTo: 'media',
@@ -188,6 +216,20 @@ export const BrandAnalysis: GlobalConfig = {
           type: 'textarea',
           label: 'Description',
           localized: true,
+        },
+        {
+          name: 'backgroundImage',
+          type: 'upload',
+          relationTo: 'media',
+          label: {
+            en: 'Background Image',
+            zh: '背景图片',
+          },
+          admin: {
+            components: {
+              Field: '@/components/fields/MediaPicker',
+            },
+          },
         },
         {
           name: 'largeImage',

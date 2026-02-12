@@ -439,7 +439,7 @@ export default buildConfig({
 
     // SEO Plugin
     seoPlugin({
-      collections: ['pages', 'blogs', 'products', 'applications'],
+      collections: ['blogs', 'products'],
       generateTitle: ({ doc }) => `${doc?.title || 'Busrom'} | Busrom`,
       generateDescription: ({ doc }) => doc?.excerpt || doc?.description || doc?.shortDescription || '',
       tabbedUI: true,
