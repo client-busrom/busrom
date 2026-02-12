@@ -12,6 +12,10 @@ interface TranslatableFieldConfig {
   name: string
   labelKey: string // 使用 i18n key
   type: 'text' | 'textarea'
+  // Array field support: field lives inside an array
+  isArrayField?: boolean
+  arrayFieldName?: string // e.g. 'sceneGallery'
+  arraySubField?: string // e.g. 'sceneName'
 }
 
 // 每个 collection 的可翻译字段配置
@@ -45,6 +49,7 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'name', labelKey: 'custom:fields:applicationName', type: 'textarea' },
     { name: 'shortDescription', labelKey: 'custom:fields:shortDescription', type: 'textarea' },
     { name: 'description', labelKey: 'custom:fields:description', type: 'textarea' },
+    { name: 'sceneGallery.sceneName', labelKey: 'custom:fields:sceneName', type: 'textarea', isArrayField: true, arrayFieldName: 'sceneGallery', arraySubField: 'sceneName' },
   ],
   'hero-banner-items': [
     { name: 'title', labelKey: 'custom:translationCenter:title', type: 'textarea' },
@@ -157,18 +162,46 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
       }
 
       // locale: 'all' 返回的格式是每个字段都是 { en: '...', zh: '...', ... }
-      const newFieldsData: FieldData[] = fieldConfigs.map(config => {
-        const fieldData = getNestedValue(doc, config.name)
-        return {
-          config,
-          values: SUPPORTED_LOCALES.map(locale => ({
-            locale: locale.code as LocaleCode,
-            value: typeof fieldData === 'object' && fieldData !== null
-              ? ((fieldData as Record<string, string>)[locale.code] || '')
-              : (fieldData as string || ''),
-          })),
+      const newFieldsData: FieldData[] = []
+
+      for (const config of fieldConfigs) {
+        if (config.isArrayField && config.arrayFieldName && config.arraySubField) {
+          // Array field: expand each array item into a separate FieldData entry
+          const arrayData = doc[config.arrayFieldName] as Array<Record<string, unknown>> | undefined
+          if (Array.isArray(arrayData)) {
+            arrayData.forEach((item, index) => {
+              const fieldData = item[config.arraySubField!]
+              newFieldsData.push({
+                config: {
+                  ...config,
+                  // Use a unique name like "sceneGallery[0].sceneName" for identification
+                  name: `${config.arrayFieldName}[${index}].${config.arraySubField}`,
+                  // Display label like "Scene 1 - Scene Name"
+                  labelKey: `__array__:Scene ${index + 1} - :${config.labelKey}`,
+                },
+                values: SUPPORTED_LOCALES.map(locale => ({
+                  locale: locale.code as LocaleCode,
+                  value: typeof fieldData === 'object' && fieldData !== null
+                    ? ((fieldData as Record<string, string>)[locale.code] || '')
+                    : (fieldData as string || ''),
+                })),
+              })
+            })
+          }
+        } else {
+          // Regular field
+          const fieldData = getNestedValue(doc, config.name)
+          newFieldsData.push({
+            config,
+            values: SUPPORTED_LOCALES.map(locale => ({
+              locale: locale.code as LocaleCode,
+              value: typeof fieldData === 'object' && fieldData !== null
+                ? ((fieldData as Record<string, string>)[locale.code] || '')
+                : (fieldData as string || ''),
+            })),
+          })
         }
-      })
+      }
 
       setFieldsData(newFieldsData)
     } catch (error) {
@@ -268,6 +301,11 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
         })
         const data = await res.json()
 
+        if (!res.ok || !data.translations) {
+          console.error('[TranslationCenter] Translation API error:', data.error || res.status)
+          throw new Error(data.error || `Translation API returned ${res.status}`)
+        }
+
         // 更新本地状态
         setFieldsData(prev => prev.map(f => {
           if (f.config.name === field.config.name) {
@@ -345,18 +383,45 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
         }
 
         const dataToSave: Record<string, unknown> = {}
+
+        // Collect array field updates: { arrayFieldName: { index: { subField: value } } }
+        const arrayFieldUpdates: Record<string, Record<number, Record<string, string>>> = {}
+
         for (const field of fieldsData) {
           const value = field.values.find(v => v.locale === locale.code)?.value
-          if (value !== undefined) {
+          if (value === undefined) continue
+
+          // Check if this is an expanded array field entry (e.g. "sceneGallery[0].sceneName")
+          const arrayMatch = field.config.name.match(/^(.+)\[(\d+)]\.(.+)$/)
+          if (arrayMatch) {
+            const [, arrName, idxStr, subField] = arrayMatch
+            const idx = parseInt(idxStr, 10)
+            if (!arrayFieldUpdates[arrName]) arrayFieldUpdates[arrName] = {}
+            if (!arrayFieldUpdates[arrName][idx]) arrayFieldUpdates[arrName][idx] = {}
+            arrayFieldUpdates[arrName][idx][subField] = value
+          } else {
             setNestedValue(dataToSave, field.config.name, value)
           }
         }
 
-        // 获取源语言数据用于填充必填字段
+        // 获取源语言数据用于填充必填字段 + array field base data
         const sourceRes = await fetch(
           `/api/${collectionSlug}/${docId}?locale=${sourceLocale}&depth=0`
         )
         const sourceData = await sourceRes.json()
+
+        // Merge array field updates: preserve all existing fields (images, id, etc.), only update translated sub-fields
+        for (const [arrName, indexUpdates] of Object.entries(arrayFieldUpdates)) {
+          const sourceArray = (sourceData[arrName] as Array<Record<string, unknown>>) || []
+          const mergedArray = sourceArray.map((item, idx) => {
+            const updates = indexUpdates[idx]
+            if (updates) {
+              return { ...item, ...updates }
+            }
+            return { ...item }
+          })
+          dataToSave[arrName] = mergedArray
+        }
 
         // 填充必填字段
         if (collectionSlug === 'products') {
@@ -593,7 +658,20 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
                       <div key={field.config.name} className="tc-field">
                         <div className="tc-field__header">
                           <span className="tc-field__name">
-                            {t(field.config.labelKey as any)}
+                            {field.config.labelKey.startsWith('__array__:')
+                              ? (() => {
+                                  // Format: "__array__:Scene 1 - :custom:fields:sceneName"
+                                  const rest = field.config.labelKey.slice('__array__:'.length)
+                                  const colonIdx = rest.indexOf(':custom:')
+                                  if (colonIdx >= 0) {
+                                    const prefix = rest.slice(0, colonIdx)
+                                    const key = rest.slice(colonIdx + 1)
+                                    return `${prefix}${t(key as any)}`
+                                  }
+                                  return rest
+                                })()
+                              : t(field.config.labelKey as any)
+                            }
                           </span>
                           <span className={`tc-field__status ${filled === total ? 'tc-field__status--complete' : ''}`}>
                             {filled}/{total}
