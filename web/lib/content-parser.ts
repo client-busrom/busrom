@@ -53,6 +53,9 @@ interface LexicalImageGalleryNode {
     images: Array<{
       image: string // Media ID
       caption?: string
+      enableLink?: boolean
+      linkUrl?: string
+      openInNewTab?: boolean
     }>
     layout?: string
     spacing?: string

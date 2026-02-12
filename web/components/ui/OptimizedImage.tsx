@@ -482,12 +482,12 @@ export function OptimizedBackgroundImage({
 
   const backgroundStyle: React.CSSProperties = overlay
     ? {
-        backgroundImage: `${overlay}, url(${imageUrl})`,
+        backgroundImage: imageUrl ? `${overlay}, url("${imageUrl}")` : undefined,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }
     : {
-        backgroundImage: `url(${imageUrl})`,
+        backgroundImage: imageUrl ? `url("${imageUrl}")` : undefined,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }

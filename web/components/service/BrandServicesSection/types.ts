@@ -12,6 +12,9 @@ export interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
   width?: number
   height?: number
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 export interface ServiceItem {

@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import Link from "next/link"
 import { ChevronUp, ChevronDown } from "lucide-react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { ServiceCategory, CategoryImages } from "./types"
@@ -97,12 +98,23 @@ export function MobileLayout({
 
           {currentImages?.top && (
             <div className="mt-4 rounded-[14px] overflow-hidden h-[140px]">
-              <OptimizedImage
-                image={currentImages.top as any}
-                alt="Brand service"
-                size="small"
-                className="w-full h-full object-cover"
-              />
+              {currentImages.top.enableLink && currentImages.top.linkUrl ? (
+                <Link href={currentImages.top.linkUrl} target={currentImages.top.openInNewTab ? "_blank" : undefined} rel={currentImages.top.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                  <OptimizedImage
+                    image={currentImages.top as any}
+                    alt="Brand service"
+                    size="small"
+                    className="w-full h-full object-cover"
+                  />
+                </Link>
+              ) : (
+                <OptimizedImage
+                  image={currentImages.top as any}
+                  alt="Brand service"
+                  size="small"
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
           )}
         </div>
@@ -172,12 +184,23 @@ export function MobileLayout({
                               key={imgIndex}
                               className="flex-shrink-0 w-[80px] h-[60px] rounded-[6px] overflow-hidden"
                             >
-                              <OptimizedImage
-                                image={image as any}
-                                alt={`${item.title} ${imgIndex + 1}`}
-                                size="thumbnail"
-                                className="w-full h-full object-cover"
-                              />
+                              {image.enableLink && image.linkUrl ? (
+                                <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                                  <OptimizedImage
+                                    image={image as any}
+                                    alt={`${item.title} ${imgIndex + 1}`}
+                                    size="thumbnail"
+                                    className="w-full h-full object-cover"
+                                  />
+                                </Link>
+                              ) : (
+                                <OptimizedImage
+                                  image={image as any}
+                                  alt={`${item.title} ${imgIndex + 1}`}
+                                  size="thumbnail"
+                                  className="w-full h-full object-cover"
+                                />
+                              )}
                             </div>
                           ))}
                         </div>

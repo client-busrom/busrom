@@ -47,7 +47,8 @@ export function extractBasicSectionData(content: LexicalContent) {
   const nodes = content?.root?.children || []
   let title = ''
   let subtitle = ''
-  let image = null
+  let image: any = null
+  let imageLink: { enableLink?: boolean; linkUrl?: string; openInNewTab?: boolean } | null = null
 
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i]
@@ -57,7 +58,6 @@ export function extractBasicSectionData(content: LexicalContent) {
     if (node.type === 'paragraph' && nodeText.endsWith('-title')) {
       const nextNode = nodes[i + 1]
       if (nextNode?.type === 'heading' || nextNode?.type === 'paragraph') {
-        // Use extractTextWithLinebreaks to preserve shift+enter line breaks
         title = extractTextWithLinebreaks(nextNode.children)
       }
     }
@@ -66,7 +66,6 @@ export function extractBasicSectionData(content: LexicalContent) {
     if (node.type === 'paragraph' && nodeText.endsWith('-subtitle')) {
       const nextNode = nodes[i + 1]
       if (nextNode?.type === 'heading' || nextNode?.type === 'paragraph') {
-        // Use extractTextWithLinebreaks to preserve shift+enter line breaks
         subtitle = extractTextWithLinebreaks(nextNode.children)
       }
     }
@@ -76,11 +75,18 @@ export function extractBasicSectionData(content: LexicalContent) {
       const nextNode = nodes[i + 1]
       if (nextNode?.type === 'singleImage' && nextNode?.data?.image) {
         image = nextNode.data.image
+        if (nextNode.data?.enableLink) {
+          imageLink = {
+            enableLink: true,
+            linkUrl: nextNode.data.linkUrl,
+            openInNewTab: nextNode.data.openInNewTab,
+          }
+        }
       }
     }
   }
 
-  return { title, subtitle, image }
+  return { title, subtitle, image, imageLink }
 }
 
 // Parse Main Content Strength Section (badges below gallery)
@@ -142,7 +148,7 @@ export function parseMainContentStrengthData(content: LexicalContent) {
 
 // Parse Product Attributes Section
 export function parseProductAttributesData(content: LexicalContent, productAttributes: any[]) {
-  const { title, image } = extractBasicSectionData(content)
+  const { title, image, imageLink } = extractBasicSectionData(content)
   const visibleAttributes = (productAttributes || [])
     .filter((attr: any) => attr.isShow)
     .map((attr: any) => ({
@@ -153,13 +159,14 @@ export function parseProductAttributesData(content: LexicalContent, productAttri
   return {
     title: title || 'Product attributes & technical processes',
     image,
+    imageLink,
     attributes: visibleAttributes,
   }
 }
 
 // Parse Six Core Strengths Section
 export function parseSixCoreStrengthsData(content: LexicalContent) {
-  const { title, subtitle, image } = extractBasicSectionData(content)
+  const { title, subtitle, image, imageLink } = extractBasicSectionData(content)
   const nodes = content?.root?.children || []
   const strengthItems: { title: string }[] = []
 
@@ -180,12 +187,12 @@ export function parseSixCoreStrengthsData(content: LexicalContent) {
     }
   }
 
-  return { title, subtitle, image, items: strengthItems }
+  return { title, subtitle, image, imageLink, items: strengthItems }
 }
 
 // Parse Product Features Section
 export function parseProductFeaturesData(content: LexicalContent) {
-  const { title, image } = extractBasicSectionData(content)
+  const { title, image, imageLink } = extractBasicSectionData(content)
   const nodes = content?.root?.children || []
   const featureItems: { title: string }[] = []
 
@@ -205,13 +212,14 @@ export function parseProductFeaturesData(content: LexicalContent) {
     }
   }
 
-  return { title, image, items: featureItems }
+  return { title, image, imageLink, items: featureItems }
 }
 
 // Parse Product Detail Features Section (three-column layout)
 export function parseProductDetailFeaturesData(content: LexicalContent) {
   const nodes = content?.root?.children || []
   let leftImage = null
+  let imageLink: { enableLink?: boolean; linkUrl?: string; openInNewTab?: boolean } | null = null
   let rightTitle = ''
   const centerItems: { title: string; description?: string }[] = []
 
@@ -222,6 +230,13 @@ export function parseProductDetailFeaturesData(content: LexicalContent) {
       for (const leftNode of leftChildren) {
         if (leftNode.type === 'singleImage' && leftNode.data?.image) {
           leftImage = leftNode.data.image
+          if (leftNode.data?.enableLink) {
+            imageLink = {
+              enableLink: true,
+              linkUrl: leftNode.data.linkUrl,
+              openInNewTab: leftNode.data.openInNewTab,
+            }
+          }
         }
       }
 
@@ -279,6 +294,7 @@ export function parseProductDetailFeaturesData(content: LexicalContent) {
     title: rightTitle || 'Product Detail Features',
     items: centerItems,
     image: leftImage,
+    imageLink,
   }
 }
 
@@ -459,6 +475,7 @@ export function parseAboutBusromData(content: LexicalContent) {
   const nodes = content?.root?.children || []
   let sectionTitle = 'About Busrom'
   let sectionImage = null
+  let imageLink: { enableLink?: boolean; linkUrl?: string; openInNewTab?: boolean } | null = null
   const serviceItems: { title: string; description: string }[] = []
 
   for (let i = 0; i < nodes.length; i++) {
@@ -478,6 +495,13 @@ export function parseAboutBusromData(content: LexicalContent) {
       const nextNode = nodes[i + 1]
       if (nextNode?.type === 'singleImage' && nextNode?.data?.image) {
         sectionImage = nextNode.data.image
+        if (nextNode.data?.enableLink) {
+          imageLink = {
+            enableLink: true,
+            linkUrl: nextNode.data.linkUrl,
+            openInNewTab: nextNode.data.openInNewTab,
+          }
+        }
       }
     }
 
@@ -521,6 +545,7 @@ export function parseAboutBusromData(content: LexicalContent) {
   return {
     title: sectionTitle,
     image: sectionImage,
+    imageLink,
     services: serviceItems.length > 0 ? serviceItems : undefined,
   }
 }
@@ -760,6 +785,7 @@ export function parseTransportationData(content: LexicalContent) {
   const nodes = content?.root?.children || []
   let sectionTitle = 'transportation'
   let sectionImage = null
+  let imageLink: { enableLink?: boolean; linkUrl?: string; openInNewTab?: boolean } | null = null
 
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i]
@@ -778,6 +804,13 @@ export function parseTransportationData(content: LexicalContent) {
       const nextNode = nodes[i + 1]
       if (nextNode?.type === 'singleImage' && nextNode?.data?.image) {
         sectionImage = nextNode.data.image
+        if (nextNode.data?.enableLink) {
+          imageLink = {
+            enableLink: true,
+            linkUrl: nextNode.data.linkUrl,
+            openInNewTab: nextNode.data.openInNewTab,
+          }
+        }
       }
     }
   }
@@ -785,6 +818,7 @@ export function parseTransportationData(content: LexicalContent) {
   return {
     title: sectionTitle,
     image: sectionImage,
+    imageLink,
   }
 }
 

@@ -19,6 +19,9 @@ interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
   width?: number
   height?: number
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 interface SimpleCtaSectionProps {
@@ -115,12 +118,23 @@ export function SimpleCtaSection({
                     className="flex-shrink-0 w-[160px] h-[120px] rounded-[16px] overflow-hidden bg-[#D9D9D9]"
                     style={{ boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)" }}
                   >
-                    <OptimizedImage
-                      image={image as any}
-                      alt={`CTA Image ${index + 1}`}
-                      size="small"
-                      className="w-full h-full object-cover"
-                    />
+                    {image.enableLink && image.linkUrl ? (
+                      <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                        <OptimizedImage
+                          image={image as any}
+                          alt={`CTA Image ${index + 1}`}
+                          size="small"
+                          className="w-full h-full object-cover"
+                        />
+                      </Link>
+                    ) : (
+                      <OptimizedImage
+                        image={image as any}
+                        alt={`CTA Image ${index + 1}`}
+                        size="small"
+                        className="w-full h-full object-cover"
+                      />
+                    )}
                   </div>
                 ))}
               </div>
@@ -302,12 +316,23 @@ export function SimpleCtaSection({
           }}
         >
           {images[0] ? (
-            <OptimizedImage
-              image={images[0] as any}
-              alt="CTA Image 1"
-              size="medium"
-              className="w-full h-full object-cover"
-            />
+            images[0].enableLink && images[0].linkUrl ? (
+              <Link href={images[0].linkUrl} target={images[0].openInNewTab ? "_blank" : undefined} rel={images[0].openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                <OptimizedImage
+                  image={images[0] as any}
+                  alt="CTA Image 1"
+                  size="medium"
+                  className="w-full h-full object-cover"
+                />
+              </Link>
+            ) : (
+              <OptimizedImage
+                image={images[0] as any}
+                alt="CTA Image 1"
+                size="medium"
+                className="w-full h-full object-cover"
+              />
+            )
           ) : null}
         </div>
 
@@ -324,12 +349,23 @@ export function SimpleCtaSection({
           }}
         >
           {images[1] ? (
-            <OptimizedImage
-              image={images[1] as any}
-              alt="CTA Image 2"
-              size="medium"
-              className="w-full h-full object-cover"
-            />
+            images[1].enableLink && images[1].linkUrl ? (
+              <Link href={images[1].linkUrl} target={images[1].openInNewTab ? "_blank" : undefined} rel={images[1].openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                <OptimizedImage
+                  image={images[1] as any}
+                  alt="CTA Image 2"
+                  size="medium"
+                  className="w-full h-full object-cover"
+                />
+              </Link>
+            ) : (
+              <OptimizedImage
+                image={images[1] as any}
+                alt="CTA Image 2"
+                size="medium"
+                className="w-full h-full object-cover"
+              />
+            )
           ) : null}
         </div>
 
@@ -346,12 +382,23 @@ export function SimpleCtaSection({
           }}
         >
           {images[2] ? (
-            <OptimizedImage
-              image={images[2] as any}
-              alt="CTA Image 3"
-              size="medium"
-              className="w-full h-full object-cover"
-            />
+            images[2].enableLink && images[2].linkUrl ? (
+              <Link href={images[2].linkUrl} target={images[2].openInNewTab ? "_blank" : undefined} rel={images[2].openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                <OptimizedImage
+                  image={images[2] as any}
+                  alt="CTA Image 3"
+                  size="medium"
+                  className="w-full h-full object-cover"
+                />
+              </Link>
+            ) : (
+              <OptimizedImage
+                image={images[2] as any}
+                alt="CTA Image 3"
+                size="medium"
+                className="w-full h-full object-cover"
+              />
+            )
           ) : null}
         </div>
       </div>

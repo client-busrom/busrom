@@ -22,6 +22,9 @@ interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
   width?: number
   height?: number
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 interface CarouselSlide {
@@ -119,7 +122,13 @@ function extractImageAfterMarker(
       const image = node.data.image
       const imageId = typeof image === "string" ? image : image?.id
       if (imageId && mediaData[imageId]) {
-        return mediaData[imageId]
+        const mediaObj = { ...mediaData[imageId] }
+        if (node.data.enableLink) {
+          mediaObj.enableLink = true
+          mediaObj.linkUrl = node.data.linkUrl
+          mediaObj.openInNewTab = node.data.openInNewTab
+        }
+        return mediaObj
       }
     }
   }
@@ -140,7 +149,13 @@ function extractGalleryImagesAfterMarker(
       for (const img of node.data.images) {
         const imageId = typeof img.image === "string" ? img.image : img.image?.id
         if (imageId && mediaData[imageId]) {
-          images.push(mediaData[imageId])
+          const mediaObj = { ...mediaData[imageId] }
+          if (img.enableLink) {
+            mediaObj.enableLink = true
+            mediaObj.linkUrl = img.linkUrl
+            mediaObj.openInNewTab = img.openInNewTab
+          }
+          images.push(mediaObj)
         }
       }
       break
@@ -225,7 +240,13 @@ function extractItemImages(
       for (const img of node.data.images) {
         const imageId = typeof img.image === "string" ? img.image : img.image?.id
         if (imageId && mediaData[imageId]) {
-          images.push(mediaData[imageId])
+          const mediaObj = { ...mediaData[imageId] }
+          if (img.enableLink) {
+            mediaObj.enableLink = true
+            mediaObj.linkUrl = img.linkUrl
+            mediaObj.openInNewTab = img.openInNewTab
+          }
+          images.push(mediaObj)
         }
       }
       return images

@@ -623,18 +623,21 @@ export const homeContentHandler: PayloadHandler = async (req) => {
           {
             title: brandAnalysis?.brandCenter?.title,
             description: brandAnalysis?.brandCenter?.description,
+            backgroundImage: getMediaWithVariants(brandAnalysis?.brandCenter?.backgroundImage) || getMediaWithVariants(brandAnalysis?.backgroundImage),
             largeImage: getMediaWithVariants(brandAnalysis?.brandCenter?.largeImage),
             smallImage: getMediaWithVariants(brandAnalysis?.brandCenter?.smallImage),
           },
           {
             title: brandAnalysis?.projectCenter?.title,
             description: brandAnalysis?.projectCenter?.description,
+            backgroundImage: getMediaWithVariants(brandAnalysis?.projectCenter?.backgroundImage) || getMediaWithVariants(brandAnalysis?.backgroundImage),
             largeImage: getMediaWithVariants(brandAnalysis?.projectCenter?.largeImage),
             smallImage: getMediaWithVariants(brandAnalysis?.projectCenter?.smallImage),
           },
           {
             title: brandAnalysis?.serviceCenter?.title,
             description: brandAnalysis?.serviceCenter?.description,
+            backgroundImage: getMediaWithVariants(brandAnalysis?.serviceCenter?.backgroundImage) || getMediaWithVariants(brandAnalysis?.backgroundImage),
             largeImage: getMediaWithVariants(brandAnalysis?.serviceCenter?.largeImage),
             smallImage: getMediaWithVariants(brandAnalysis?.serviceCenter?.smallImage),
           },

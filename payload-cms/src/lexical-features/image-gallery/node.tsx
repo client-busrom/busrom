@@ -21,6 +21,9 @@ export interface ImageGalleryData {
   images: Array<{
     image: string | { id: string }
     caption?: string
+    enableLink?: boolean
+    linkUrl?: string
+    openInNewTab?: boolean
   }>
   layout: 'grid-2' | 'grid-3' | 'grid-4' | 'masonry'
   spacing: 'small' | 'normal' | 'large'

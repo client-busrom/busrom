@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
@@ -26,6 +27,9 @@ interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
   width?: number
   height?: number
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 interface CurvedTextConfig {
@@ -261,13 +265,25 @@ export function OemOdmBrandAdvantage({
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
             {leftImage ? (
-              <OptimizedImage
-                image={leftImage as any}
-                alt="OEM Service"
-                size="large"
-                className="w-full h-full object-cover"
-                objectPosition={getObjectPosition(leftImage)}
-              />
+              leftImage.enableLink && leftImage.linkUrl ? (
+                <Link href={leftImage.linkUrl} target={leftImage.openInNewTab ? "_blank" : undefined} rel={leftImage.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                  <OptimizedImage
+                    image={leftImage as any}
+                    alt="OEM Service"
+                    size="large"
+                    className="w-full h-full object-cover"
+                    objectPosition={getObjectPosition(leftImage)}
+                  />
+                </Link>
+              ) : (
+                <OptimizedImage
+                  image={leftImage as any}
+                  alt="OEM Service"
+                  size="large"
+                  className="w-full h-full object-cover"
+                  objectPosition={getObjectPosition(leftImage)}
+                />
+              )
             ) : (
               <div className="w-full h-full bg-black" />
             )}
@@ -463,13 +479,25 @@ export function OemOdmBrandAdvantage({
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
             {rightImage ? (
-              <OptimizedImage
-                image={rightImage as any}
-                alt="ODM Service"
-                size="large"
-                className="w-full h-full object-cover"
-                objectPosition={getObjectPosition(rightImage)}
-              />
+              rightImage.enableLink && rightImage.linkUrl ? (
+                <Link href={rightImage.linkUrl} target={rightImage.openInNewTab ? "_blank" : undefined} rel={rightImage.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                  <OptimizedImage
+                    image={rightImage as any}
+                    alt="ODM Service"
+                    size="large"
+                    className="w-full h-full object-cover"
+                    objectPosition={getObjectPosition(rightImage)}
+                  />
+                </Link>
+              ) : (
+                <OptimizedImage
+                  image={rightImage as any}
+                  alt="ODM Service"
+                  size="large"
+                  className="w-full h-full object-cover"
+                  objectPosition={getObjectPosition(rightImage)}
+                />
+              )
             ) : (
               <div className="w-full h-full bg-black" />
             )}

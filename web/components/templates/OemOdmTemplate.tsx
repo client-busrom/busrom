@@ -35,6 +35,9 @@ interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
   width?: number
   height?: number
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 interface FormField {
@@ -163,7 +166,13 @@ function extractImageAfterMarker(
       const image = node.data.image
       const imageId = typeof image === "string" ? image : image?.id
       if (imageId && mediaData[imageId]) {
-        return mediaData[imageId]
+        const mediaObj = { ...mediaData[imageId] }
+        if (node.data.enableLink) {
+          mediaObj.enableLink = true
+          mediaObj.linkUrl = node.data.linkUrl
+          mediaObj.openInNewTab = node.data.openInNewTab
+        }
+        return mediaObj
       }
     }
   }
@@ -369,7 +378,13 @@ function extractGalleryAfterMarker(
       const image = node.data.image
       const imageId = typeof image === "string" ? image : image?.id
       if (imageId && mediaData[imageId]) {
-        images.push(mediaData[imageId])
+        const mediaObj = { ...mediaData[imageId] }
+        if (node.data.enableLink) {
+          mediaObj.enableLink = true
+          mediaObj.linkUrl = node.data.linkUrl
+          mediaObj.openInNewTab = node.data.openInNewTab
+        }
+        images.push(mediaObj)
       }
     }
     // 自定义图片画廊
@@ -379,7 +394,13 @@ function extractGalleryAfterMarker(
           ? galleryItem.image
           : galleryItem?.image?.id
         if (imageId && mediaData[imageId]) {
-          images.push(mediaData[imageId])
+          const mediaObj = { ...mediaData[imageId] }
+          if (galleryItem.enableLink) {
+            mediaObj.enableLink = true
+            mediaObj.linkUrl = galleryItem.linkUrl
+            mediaObj.openInNewTab = galleryItem.openInNewTab
+          }
+          images.push(mediaObj)
         }
       }
     }

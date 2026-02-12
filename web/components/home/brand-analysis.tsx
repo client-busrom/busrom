@@ -104,16 +104,25 @@ export default function BrandAnalysis({ data }: Props) {
       className="relative bg-black overflow-hidden"
       data-header-theme="transparent"
     >
-      {/* 背景图片 - 所有 center 共用 */}
+      {/* 背景图片 - 每个 center 独立背景，带淡入淡出切换 */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-black" />
-        {data.backgroundImage && (
-          <OptimizedBackgroundImage
-            image={data.backgroundImage}
-            size="large"
-            className="absolute inset-0 z-0"
-          />
-        )}
+        {data.centers.map((center, index) => {
+          const bgImage = center.backgroundImage || data.backgroundImage;
+          return bgImage ? (
+            <div
+              key={index}
+              className="absolute inset-0 z-0 transition-opacity duration-700"
+              style={{ opacity: currentSlide === index ? 1 : 0 }}
+            >
+              <OptimizedBackgroundImage
+                image={bgImage}
+                size="large"
+                className="absolute inset-0"
+              />
+            </div>
+          ) : null;
+        })}
       </div>
 
       {/* ==================== 移动端布局 (<1024px) ==================== */}

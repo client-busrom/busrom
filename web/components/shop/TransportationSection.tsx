@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import Link from "next/link"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 const DESIGN_WIDTH = 1920
@@ -16,14 +17,22 @@ interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
 }
 
+interface ImageLinkData {
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
+}
+
 interface TransportationSectionProps {
   title?: string
   image?: MediaObject | null
+  imageLink?: ImageLinkData | null
 }
 
 export function TransportationSection({
   title = "transportation",
   image,
+  imageLink,
 }: TransportationSectionProps) {
   return (
     <>
@@ -37,12 +46,23 @@ export function TransportationSection({
       {/* 图片 */}
       {image && (
         <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden">
-          <OptimizedImage
-            image={image as any}
-            alt={image.altText || image.alt || title}
-            size="medium"
-            className="w-full h-full object-cover"
-          />
+          {imageLink?.enableLink && imageLink.linkUrl ? (
+            <Link href={imageLink.linkUrl} target={imageLink.openInNewTab ? "_blank" : undefined} rel={imageLink.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+              <OptimizedImage
+                image={image as any}
+                alt={image.altText || image.alt || title}
+                size="medium"
+                className="w-full h-full object-cover"
+              />
+            </Link>
+          ) : (
+            <OptimizedImage
+              image={image as any}
+              alt={image.altText || image.alt || title}
+              size="medium"
+              className="w-full h-full object-cover"
+            />
+          )}
         </div>
       )}
     </section>
@@ -83,12 +103,23 @@ export function TransportationSection({
             borderBottomRightRadius: 0,
           }}
         >
-          <OptimizedImage
-            image={image as any}
-            alt={image.altText || image.alt || title}
-            size="xlarge"
-            className="w-full h-full object-cover"
-          />
+          {imageLink?.enableLink && imageLink.linkUrl ? (
+            <Link href={imageLink.linkUrl} target={imageLink.openInNewTab ? "_blank" : undefined} rel={imageLink.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+              <OptimizedImage
+                image={image as any}
+                alt={image.altText || image.alt || title}
+                size="xlarge"
+                className="w-full h-full object-cover"
+              />
+            </Link>
+          ) : (
+            <OptimizedImage
+              image={image as any}
+              alt={image.altText || image.alt || title}
+              size="xlarge"
+              className="w-full h-full object-cover"
+            />
+          )}
         </div>
       )}
     </section>

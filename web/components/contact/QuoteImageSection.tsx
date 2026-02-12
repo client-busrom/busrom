@@ -37,6 +37,9 @@ interface MediaObject {
     xlarge?: string
   }
   cropFocalPoint?: { x: number; y: number } | null
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 interface QuoteImageSectionProps {
@@ -129,12 +132,23 @@ export function QuoteImageSection({
       >
         {/* 背景图片 */}
         {image ? (
-          <OptimizedImage
-            image={image as any}
-            alt="Quote background"
-            size="xlarge"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          image.enableLink && image.linkUrl ? (
+            <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block absolute inset-0 w-full h-full">
+              <OptimizedImage
+                image={image as any}
+                alt="Quote background"
+                size="xlarge"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </Link>
+          ) : (
+            <OptimizedImage
+              image={image as any}
+              alt="Quote background"
+              size="xlarge"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          )
         ) : (
           <div className="absolute inset-0 bg-gray-600" />
         )}

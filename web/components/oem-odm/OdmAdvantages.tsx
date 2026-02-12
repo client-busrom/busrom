@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
@@ -25,6 +26,9 @@ interface MediaObject {
   cropFocalPoint?: { x: number; y: number } | null
   width?: number
   height?: number
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 interface AdvantageItem {
@@ -228,12 +232,23 @@ export function OdmAdvantages({
               transition={{ duration: 0.5 }}
             >
               {leftImage ? (
-                <OptimizedImage
-                  image={leftImage as any}
-                  alt={currentItem?.title || "Advantage Image"}
-                  size="large"
-                  className="w-full h-full object-cover"
-                />
+                leftImage.enableLink && leftImage.linkUrl ? (
+                  <Link href={leftImage.linkUrl} target={leftImage.openInNewTab ? "_blank" : undefined} rel={leftImage.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                    <OptimizedImage
+                      image={leftImage as any}
+                      alt={currentItem?.title || "Advantage Image"}
+                      size="large"
+                      className="w-full h-full object-cover"
+                    />
+                  </Link>
+                ) : (
+                  <OptimizedImage
+                    image={leftImage as any}
+                    alt={currentItem?.title || "Advantage Image"}
+                    size="large"
+                    className="w-full h-full object-cover"
+                  />
+                )
               ) : (
                 <div className="w-full h-full bg-[#D9D9D9]" />
               )}
@@ -262,12 +277,23 @@ export function OdmAdvantages({
               transition={{ duration: 0.5 }}
             >
               {middleImage ? (
-                <OptimizedImage
-                  image={middleImage as any}
-                  alt={nextItem?.title || "Next Advantage Image"}
-                  size="medium"
-                  className="w-full h-full object-cover"
-                />
+                middleImage.enableLink && middleImage.linkUrl ? (
+                  <Link href={middleImage.linkUrl} target={middleImage.openInNewTab ? "_blank" : undefined} rel={middleImage.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                    <OptimizedImage
+                      image={middleImage as any}
+                      alt={nextItem?.title || "Next Advantage Image"}
+                      size="medium"
+                      className="w-full h-full object-cover"
+                    />
+                  </Link>
+                ) : (
+                  <OptimizedImage
+                    image={middleImage as any}
+                    alt={nextItem?.title || "Next Advantage Image"}
+                    size="medium"
+                    className="w-full h-full object-cover"
+                  />
+                )
               ) : (
                 <div className="w-full h-full bg-[#D9D9D9]" />
               )}
@@ -429,12 +455,23 @@ export function OdmAdvantages({
                 transition={{ duration: 0.5 }}
               >
                 {leftImage ? (
-                  <OptimizedImage
-                    image={leftImage as any}
-                    alt={currentItem?.title || "Advantage Image"}
-                    size="medium"
-                    className="w-full h-full object-cover"
-                  />
+                  leftImage.enableLink && leftImage.linkUrl ? (
+                    <Link href={leftImage.linkUrl} target={leftImage.openInNewTab ? "_blank" : undefined} rel={leftImage.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                      <OptimizedImage
+                        image={leftImage as any}
+                        alt={currentItem?.title || "Advantage Image"}
+                        size="medium"
+                        className="w-full h-full object-cover"
+                      />
+                    </Link>
+                  ) : (
+                    <OptimizedImage
+                      image={leftImage as any}
+                      alt={currentItem?.title || "Advantage Image"}
+                      size="medium"
+                      className="w-full h-full object-cover"
+                    />
+                  )
                 ) : (
                   <div className="w-full h-full bg-[#D9D9D9]" />
                 )}
@@ -453,12 +490,23 @@ export function OdmAdvantages({
                 transition={{ duration: 0.5 }}
               >
                 {middleImage ? (
-                  <OptimizedImage
-                    image={middleImage as any}
-                    alt={nextItem?.title || "Next Advantage Image"}
-                    size="small"
-                    className="w-full h-full object-cover"
-                  />
+                  middleImage.enableLink && middleImage.linkUrl ? (
+                    <Link href={middleImage.linkUrl} target={middleImage.openInNewTab ? "_blank" : undefined} rel={middleImage.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                      <OptimizedImage
+                        image={middleImage as any}
+                        alt={nextItem?.title || "Next Advantage Image"}
+                        size="small"
+                        className="w-full h-full object-cover"
+                      />
+                    </Link>
+                  ) : (
+                    <OptimizedImage
+                      image={middleImage as any}
+                      alt={nextItem?.title || "Next Advantage Image"}
+                      size="small"
+                      className="w-full h-full object-cover"
+                    />
+                  )
                 ) : (
                   <div className="w-full h-full bg-[#D9D9D9]" />
                 )}

@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
+import Link from "next/link"
 
 // Design reference dimensions (from Figma 1920x922)
 const DESIGN_WIDTH = 1920
@@ -24,11 +25,18 @@ interface StrengthItem {
   description?: string
 }
 
+interface ImageLinkData {
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
+}
+
 interface SixCoreStrengthsSectionProps {
   subtitle?: string
   title?: string
   items: StrengthItem[]
   image?: MediaObject | null
+  imageLink?: ImageLinkData | null
 }
 
 // Card background colors from Figma (3 different colors, bottom to top)
@@ -48,6 +56,7 @@ export function SixCoreStrengthsSection({
   title,
   items,
   image,
+  imageLink,
 }: SixCoreStrengthsSectionProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
@@ -166,13 +175,30 @@ export function SixCoreStrengthsSection({
       {/* Center Image */}
       {image && (
         <div className="w-full aspect-[4/3] rounded-3xl overflow-hidden mb-6">
-          <OptimizedImage
-            image={image as any}
-            alt={image.altText || image.alt || title || ""}
-            size="medium"
-            className="w-full h-full object-cover"
-            objectPosition={objectPosition}
-          />
+          {imageLink?.enableLink && imageLink.linkUrl ? (
+            <Link
+              href={imageLink.linkUrl}
+              target={imageLink.openInNewTab ? "_blank" : undefined}
+              rel={imageLink.openInNewTab ? "noopener noreferrer" : undefined}
+              className="block w-full h-full"
+            >
+              <OptimizedImage
+                image={image as any}
+                alt={image.altText || image.alt || title || ""}
+                size="medium"
+                className="w-full h-full object-cover"
+                objectPosition={objectPosition}
+              />
+            </Link>
+          ) : (
+            <OptimizedImage
+              image={image as any}
+              alt={image.altText || image.alt || title || ""}
+              size="medium"
+              className="w-full h-full object-cover"
+              objectPosition={objectPosition}
+            />
+          )}
         </div>
       )}
 
@@ -276,13 +302,30 @@ export function SixCoreStrengthsSection({
             }}
           >
             {image ? (
-              <OptimizedImage
-                image={image as any}
-                alt={image.altText || image.alt || title || ""}
-                size="large"
-                className="w-full h-full object-cover"
-                objectPosition={objectPosition}
-              />
+              imageLink?.enableLink && imageLink.linkUrl ? (
+                <Link
+                  href={imageLink.linkUrl}
+                  target={imageLink.openInNewTab ? "_blank" : undefined}
+                  rel={imageLink.openInNewTab ? "noopener noreferrer" : undefined}
+                  className="block w-full h-full"
+                >
+                  <OptimizedImage
+                    image={image as any}
+                    alt={image.altText || image.alt || title || ""}
+                    size="large"
+                    className="w-full h-full object-cover"
+                    objectPosition={objectPosition}
+                  />
+                </Link>
+              ) : (
+                <OptimizedImage
+                  image={image as any}
+                  alt={image.altText || image.alt || title || ""}
+                  size="large"
+                  className="w-full h-full object-cover"
+                  objectPosition={objectPosition}
+                />
+              )
             ) : (
               <div className="w-full h-full bg-gray-300" />
             )}

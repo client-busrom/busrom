@@ -54,6 +54,7 @@ export function SectionRenderer({
         key={sectionIndex}
         title={data.title}
         image={data.image}
+        imageLink={data.imageLink}
         attributes={data.attributes}
       />
     )
@@ -69,6 +70,7 @@ export function SectionRenderer({
         title={data.title}
         items={data.items}
         image={data.image}
+        imageLink={data.imageLink}
       />
     )
   }
@@ -82,6 +84,7 @@ export function SectionRenderer({
         title={data.title}
         items={data.items}
         image={data.image}
+        imageLink={data.imageLink}
       />
     )
   }
@@ -95,6 +98,7 @@ export function SectionRenderer({
         title={data.title}
         items={data.items}
         image={data.image}
+        imageLink={data.imageLink}
       />
     )
   }
@@ -146,6 +150,7 @@ export function SectionRenderer({
         key={sectionIndex}
         title={data.title}
         image={data.image}
+        imageLink={data.imageLink}
         services={data.services}
       />
     )
@@ -209,6 +214,7 @@ export function SectionRenderer({
         key={sectionIndex}
         title={data.title}
         image={data.image}
+        imageLink={data.imageLink}
       />
     )
   }

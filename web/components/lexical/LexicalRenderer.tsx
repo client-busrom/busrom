@@ -161,8 +161,19 @@ const ImageGalleryBlock = ({ node }: any) => {
           </div>
         )
 
-        // TODO: Implement lightbox functionality if needed
-        // For now, just render the image
+        if (item.enableLink && item.linkUrl) {
+          return (
+            <Link
+              key={index}
+              href={item.linkUrl}
+              target={item.openInNewTab ? '_blank' : undefined}
+              rel={item.openInNewTab ? 'noopener noreferrer' : undefined}
+            >
+              {imageElement}
+            </Link>
+          )
+        }
+
         return imageElement
       })}
     </div>
@@ -170,7 +181,7 @@ const ImageGalleryBlock = ({ node }: any) => {
 }
 
 const SingleImageBlock = ({ node }: any) => {
-  const { image, caption, alignment, size } = node.data || node.fields || {}
+  const { image, caption, alignment, size, enableLink, linkUrl, openInNewTab } = node.data || node.fields || {}
   const [mediaData, setMediaData] = React.useState<any>(null)
   const [loading, setLoading] = React.useState(true)
 
@@ -239,18 +250,32 @@ const SingleImageBlock = ({ node }: any) => {
 
   if (!imageUrl) return null
 
+  const imageContent = (
+    <div className={`relative w-full ${sizeClasses} rounded-lg overflow-hidden`}>
+      <Image
+        src={imageUrl}
+        alt={caption || mediaData?.alt || ''}
+        width={mediaData?.width || 1920}
+        height={mediaData?.height || 1080}
+        className="w-full h-auto object-contain"
+        unoptimized
+      />
+    </div>
+  )
+
   return (
     <figure className={`my-6 ${alignmentClasses}`}>
-      <div className={`relative w-full ${sizeClasses} rounded-lg overflow-hidden`}>
-        <Image
-          src={imageUrl}
-          alt={caption || mediaData?.alt || ''}
-          width={mediaData?.width || 1920}
-          height={mediaData?.height || 1080}
-          className="w-full h-auto object-contain"
-          unoptimized
-        />
-      </div>
+      {enableLink && linkUrl ? (
+        <Link
+          href={linkUrl}
+          target={openInNewTab ? '_blank' : undefined}
+          rel={openInNewTab ? 'noopener noreferrer' : undefined}
+        >
+          {imageContent}
+        </Link>
+      ) : (
+        imageContent
+      )}
       {caption && (
         <figcaption className="text-sm text-gray-600 mt-2 text-center">
           {caption}

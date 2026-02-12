@@ -2,6 +2,7 @@
 
 import React, { useMemo } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 // 设计稿基准尺寸
@@ -20,6 +21,9 @@ interface MediaObject {
     xlarge?: string
   }
   cropFocalPoint?: { x: number; y: number } | null
+  enableLink?: boolean
+  linkUrl?: string
+  openInNewTab?: boolean
 }
 
 interface ProjectCommunicationGuideSectionProps {
@@ -214,17 +218,33 @@ export function ProjectCommunicationGuideSection({
               clipPath: "url(#image-clip)",
             }}
           >
-            <OptimizedImage
-              image={image as any}
-              alt="Project communication"
-              size="xlarge"
-              className="w-full h-full object-cover"
-              objectPosition={
-                image.cropFocalPoint
-                  ? `${image.cropFocalPoint.x}% ${image.cropFocalPoint.y}%`
-                  : "center"
-              }
-            />
+            {image.enableLink && image.linkUrl ? (
+              <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                <OptimizedImage
+                  image={image as any}
+                  alt="Project communication"
+                  size="xlarge"
+                  className="w-full h-full object-cover"
+                  objectPosition={
+                    image.cropFocalPoint
+                      ? `${image.cropFocalPoint.x}% ${image.cropFocalPoint.y}%`
+                      : "center"
+                  }
+                />
+              </Link>
+            ) : (
+              <OptimizedImage
+                image={image as any}
+                alt="Project communication"
+                size="xlarge"
+                className="w-full h-full object-cover"
+                objectPosition={
+                  image.cropFocalPoint
+                    ? `${image.cropFocalPoint.x}% ${image.cropFocalPoint.y}%`
+                    : "center"
+                }
+              />
+            )}
           </div>
         </div>
       )}

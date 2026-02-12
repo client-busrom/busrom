@@ -9,7 +9,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $getNodeByKey } from 'lexical'
-import { ZoomIn, GripVertical, X, Image as ImageIcon, Plus, Trash2, Grid, List } from 'lucide-react'
+import { ZoomIn, GripVertical, X, Image as ImageIcon, Plus, Trash2, Grid, List, Link as LinkIcon } from 'lucide-react'
 import { useTranslation } from '@payloadcms/ui'
 import {
   DndContext,
@@ -30,6 +30,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import type { ImageGalleryData } from './node.tsx'
 import { $createImageGalleryNode, ImageGalleryNode } from './node.tsx'
+import { LinkPickerModal } from '../carousel/component.client'
 
 // 翻译辅助函数
 const getTranslation = (key: string, t: any, i18n: any) => {
@@ -96,6 +97,11 @@ const getTranslation = (key: string, t: any, i18n: any) => {
       totalPages: '共 {total} 页',
       switch: '切换',
       escClose: 'ESC 关闭',
+      enableLink: '启用链接',
+      linkUrl: '链接地址',
+      linkUrlPlaceholder: '输入链接地址',
+      openInNewTab: '新标签页打开',
+      selectInternalLink: '选择站内链接',
     },
     en: {
       title: 'Image Gallery',
@@ -155,6 +161,11 @@ const getTranslation = (key: string, t: any, i18n: any) => {
       totalPages: '({total} pages)',
       switch: 'Switch',
       escClose: 'ESC to close',
+      enableLink: 'Enable Link',
+      linkUrl: 'Link URL',
+      linkUrlPlaceholder: 'Enter link URL',
+      openInNewTab: 'Open in New Tab',
+      selectInternalLink: 'Select internal link',
     }
   }
   return translations[lang]?.[key] || translations.zh[key] || key
@@ -164,11 +175,13 @@ const getTranslation = (key: string, t: any, i18n: any) => {
 interface SortableImageItemProps {
   id: string
   index: number
-  item: { image: string | { id: string }, caption?: string }
+  item: { image: string | { id: string }, caption?: string, enableLink?: boolean, linkUrl?: string, openInNewTab?: boolean }
   imageData: MediaItem | null
   onEdit: () => void
   onRemove: () => void
   onCaptionChange: (value: string) => void
+  onFieldChange: (field: string, value: any) => void
+  onOpenLinkPicker: () => void
   t: any
   i18n: any
 }
@@ -181,6 +194,8 @@ const SortableImageItem: React.FC<SortableImageItemProps> = ({
   onEdit,
   onRemove,
   onCaptionChange,
+  onFieldChange,
+  onOpenLinkPicker,
   t,
   i18n,
 }) => {
@@ -350,6 +365,67 @@ const SortableImageItem: React.FC<SortableImageItemProps> = ({
               e.currentTarget.style.boxShadow = 'none'
             }}
           />
+
+          {/* 启用链接 */}
+          <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={item.enableLink || false}
+              onChange={(e) => onFieldChange('enableLink', e.target.checked)}
+            />
+            {getTranslation('enableLink', t, i18n)}
+          </label>
+
+          {item.enableLink && (
+            <>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  value={item.linkUrl || ''}
+                  onChange={(e) => onFieldChange('linkUrl', e.target.value)}
+                  placeholder={getTranslation('linkUrlPlaceholder', t, i18n)}
+                  style={{
+                    width: '100%',
+                    padding: '6px 10px',
+                    paddingRight: '30px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    outline: 'none',
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={onOpenLinkPicker}
+                  title={getTranslation('selectInternalLink', t, i18n)}
+                  style={{
+                    position: 'absolute',
+                    right: '6px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    padding: '2px',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    color: '#6b7280',
+                  }}
+                >
+                  <LinkIcon size={14} />
+                </button>
+              </div>
+
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={item.openInNewTab || false}
+                  onChange={(e) => onFieldChange('openInNewTab', e.target.checked)}
+                />
+                {getTranslation('openInNewTab', t, i18n)}
+              </label>
+            </>
+          )}
         </div>
 
         {/* 删除按钮 - 小图标 */}
@@ -1482,6 +1558,10 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
   // 图片信息缓存
   const [imageCache, setImageCache] = useState<Record<string, MediaItem>>({})
 
+  // 链接选择器状态
+  const [showLinkPicker, setShowLinkPicker] = useState(false)
+  const [linkPickerImageIndex, setLinkPickerImageIndex] = useState<number>(0)
+
   // 灯箱状态
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
@@ -1663,6 +1743,25 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
     const newImages = [...formData.images]
     newImages[index] = { ...newImages[index], caption }
     setFormData({ ...formData, images: newImages })
+  }
+
+  // 更新图片的任意字段
+  const handleUpdateImageField = (index: number, field: string, value: any) => {
+    const newImages = [...formData.images]
+    newImages[index] = { ...newImages[index], [field]: value }
+    setFormData({ ...formData, images: newImages })
+  }
+
+  // 打开链接选择器
+  const openLinkPickerForImage = (index: number) => {
+    setLinkPickerImageIndex(index)
+    setShowLinkPicker(true)
+  }
+
+  // 链接选择回调
+  const handleLinkSelect = (path: string) => {
+    handleUpdateImageField(linkPickerImageIndex, 'linkUrl', path)
+    setShowLinkPicker(false)
   }
 
   // 先显示简单的预览
@@ -1915,7 +2014,7 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
                       </div>
                     )}
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <input
                       type="text"
                       placeholder={getTranslation('imageCaption', t, i18n)}
@@ -1929,6 +2028,66 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
                         fontSize: '14px',
                       }}
                     />
+
+                    {/* 启用链接 */}
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={item.enableLink || false}
+                        onChange={(e) => handleUpdateImageField(index, 'enableLink', e.target.checked)}
+                      />
+                      {getTranslation('enableLink', t, i18n)}
+                    </label>
+
+                    {item.enableLink && (
+                      <>
+                        <div style={{ position: 'relative' }}>
+                          <input
+                            type="text"
+                            value={item.linkUrl || ''}
+                            onChange={(e) => handleUpdateImageField(index, 'linkUrl', e.target.value)}
+                            placeholder={getTranslation('linkUrlPlaceholder', t, i18n)}
+                            style={{
+                              width: '100%',
+                              padding: '6px 10px',
+                              paddingRight: '30px',
+                              border: '1px solid #d1d5db',
+                              borderRadius: '4px',
+                              fontSize: '13px',
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => openLinkPickerForImage(index)}
+                            title={getTranslation('selectInternalLink', t, i18n)}
+                            style={{
+                              position: 'absolute',
+                              right: '6px',
+                              top: '50%',
+                              transform: 'translateY(-50%)',
+                              padding: '2px',
+                              backgroundColor: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              color: '#6b7280',
+                            }}
+                          >
+                            <LinkIcon size={14} />
+                          </button>
+                        </div>
+
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={item.openInNewTab || false}
+                            onChange={(e) => handleUpdateImageField(index, 'openInNewTab', e.target.checked)}
+                          />
+                          {getTranslation('openInNewTab', t, i18n)}
+                        </label>
+                      </>
+                    )}
                   </div>
                   <button
                     type="button"
@@ -2166,6 +2325,15 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
           imageIndex={editingImageIndex}
           t={t}
           i18n={i18n}
+        />
+      )}
+
+      {/* 链接选择器弹窗 */}
+      {showLinkPicker && (
+        <LinkPickerModal
+          isOpen={showLinkPicker}
+          onClose={() => setShowLinkPicker(false)}
+          onSelect={handleLinkSelect}
         />
       )}
 

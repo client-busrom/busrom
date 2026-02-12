@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { ServiceCategory, CategoryImages, vw } from "./types"
@@ -190,7 +191,7 @@ export function DesktopTopSection({
 
       {/* Top decorative image */}
       <div
-        className="absolute overflow-hidden bg-[#D9D9D9]"
+        className="absolute overflow-hidden bg-[#D9D9D9] z-10"
         style={{
           width: vw(354),     // 505 * 0.7
           height: vw(256),    // 365 * 0.7
@@ -210,12 +211,23 @@ export function DesktopTopSection({
             className="w-full h-full"
           >
             {currentImages.top ? (
-              <OptimizedImage
-                image={currentImages.top as any}
-                alt={`${activeCategory?.title || 'Brand service'} - top`}
-                size="medium"
-                className="w-full h-full object-cover"
-              />
+              currentImages.top.enableLink && currentImages.top.linkUrl ? (
+                <Link href={currentImages.top.linkUrl} target={currentImages.top.openInNewTab ? "_blank" : undefined} rel={currentImages.top.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                  <OptimizedImage
+                    image={currentImages.top as any}
+                    alt={`${activeCategory?.title || 'Brand service'} - top`}
+                    size="medium"
+                    className="w-full h-full object-cover"
+                  />
+                </Link>
+              ) : (
+                <OptimizedImage
+                  image={currentImages.top as any}
+                  alt={`${activeCategory?.title || 'Brand service'} - top`}
+                  size="medium"
+                  className="w-full h-full object-cover"
+                />
+              )
             ) : (
               <div className="w-full h-full bg-[#D9D9D9]" />
             )}
@@ -225,7 +237,7 @@ export function DesktopTopSection({
 
       {/* Bottom decorative image */}
       <div
-        className="absolute overflow-hidden bg-[#D9D9D9]"
+        className="absolute overflow-hidden bg-[#D9D9D9] z-10"
         style={{
           width: vw(354),     // 505 * 0.7
           height: vw(255),    // 364 * 0.7
@@ -245,12 +257,23 @@ export function DesktopTopSection({
             className="w-full h-full"
           >
             {currentImages.bottom ? (
-              <OptimizedImage
-                image={currentImages.bottom as any}
-                alt={`${activeCategory?.title || 'Brand service'} - bottom`}
-                size="medium"
-                className="w-full h-full object-cover"
-              />
+              currentImages.bottom.enableLink && currentImages.bottom.linkUrl ? (
+                <Link href={currentImages.bottom.linkUrl} target={currentImages.bottom.openInNewTab ? "_blank" : undefined} rel={currentImages.bottom.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                  <OptimizedImage
+                    image={currentImages.bottom as any}
+                    alt={`${activeCategory?.title || 'Brand service'} - bottom`}
+                    size="medium"
+                    className="w-full h-full object-cover"
+                  />
+                </Link>
+              ) : (
+                <OptimizedImage
+                  image={currentImages.bottom as any}
+                  alt={`${activeCategory?.title || 'Brand service'} - bottom`}
+                  size="medium"
+                  className="w-full h-full object-cover"
+                />
+              )
             ) : (
               <div className="w-full h-full bg-[#D9D9D9]" />
             )}

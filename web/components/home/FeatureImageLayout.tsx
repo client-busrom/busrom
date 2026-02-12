@@ -276,7 +276,7 @@ const TrapezoidImage = ({
         <OptimizedImage
           image={image}
           alt={alt}
-          size="small"
+          size="medium"
           className="object-cover w-full h-full"
         />
       </div>
