@@ -8,6 +8,7 @@ import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8c
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { BlocksToolbarDropdownFeatureClient as BlocksToolbarDropdownFeatureClient_669410b80561d416638c54872826e396 } from '@/lexical-features/blocks-toolbar-dropdown/feature.client'
 import { DocumentTemplateFeatureClient as DocumentTemplateFeatureClient_dcfc2a8f560838093c5dfa7b3826380f } from '@/lexical-features/document-template/feature.client'
+import { IconListFeatureClient as IconListFeatureClient_3641d6c34e022d74a716fcef2ed947a4 } from '@/lexical-features/icon-list/feature.client'
 import { ProductCarouselFeatureClient as ProductCarouselFeatureClient_b3d775d53153ba31754992d83d60f87e } from '@/lexical-features/product-carousel/feature.client'
 import { ApplicationCarouselFeatureClient as ApplicationCarouselFeatureClient_819ab19afa76e1884082d6b0d73b0620 } from '@/lexical-features/application-carousel/feature.client'
 import { ReusableBlockFeatureClient as ReusableBlockFeatureClient_b9527d92f7daf4742e0cbc76eb0340a6 } from '@/lexical-features/reusable-block/feature.client'
@@ -53,6 +54,7 @@ import { MetaTitleComponent as MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c08
 import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { default as default_8eace7ae1118053face74cf3167249d9 } from '@/components/fields/TagBasedRandomImages'
+import { default as default_a3a3aa8bfebcaf82c7d4953fe2175cbd } from '@/components/fields/IconPicker'
 import { default as default_f2f012c65168d1c448e59ecd59a1bae5 } from '@/components/admin/NavigationManagerLink'
 import { MultiLocaleTextField as MultiLocaleTextField_818f830b0ef41c7fd6298cda9b34bc80 } from '@/components/fields/MultiLocaleField'
 import { default as default_a3e549dccdd3ea0f10d6ba87c5f4df9b } from '@/components/fields/PathSelector'
@@ -85,6 +87,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
   "@/lexical-features/blocks-toolbar-dropdown/feature.client#BlocksToolbarDropdownFeatureClient": BlocksToolbarDropdownFeatureClient_669410b80561d416638c54872826e396,
   "@/lexical-features/document-template/feature.client#DocumentTemplateFeatureClient": DocumentTemplateFeatureClient_dcfc2a8f560838093c5dfa7b3826380f,
+  "@/lexical-features/icon-list/feature.client#IconListFeatureClient": IconListFeatureClient_3641d6c34e022d74a716fcef2ed947a4,
   "@/lexical-features/product-carousel/feature.client#ProductCarouselFeatureClient": ProductCarouselFeatureClient_b3d775d53153ba31754992d83d60f87e,
   "@/lexical-features/application-carousel/feature.client#ApplicationCarouselFeatureClient": ApplicationCarouselFeatureClient_819ab19afa76e1884082d6b0d73b0620,
   "@/lexical-features/reusable-block/feature.client#ReusableBlockFeatureClient": ReusableBlockFeatureClient_b9527d92f7daf4742e0cbc76eb0340a6,
@@ -130,6 +133,7 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@/components/fields/TagBasedRandomImages#default": default_8eace7ae1118053face74cf3167249d9,
+  "@/components/fields/IconPicker#default": default_a3a3aa8bfebcaf82c7d4953fe2175cbd,
   "@/components/admin/NavigationManagerLink#default": default_f2f012c65168d1c448e59ecd59a1bae5,
   "@/components/fields/MultiLocaleField#MultiLocaleTextField": MultiLocaleTextField_818f830b0ef41c7fd6298cda9b34bc80,
   "@/components/fields/PathSelector#default": default_a3e549dccdd3ea0f10d6ba87c5f4df9b,

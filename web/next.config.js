@@ -92,6 +92,7 @@ const nextConfig = {
     // 优化包大小 - 移除重复模块
     optimizePackageImports: [
       'lucide-react',
+      '@iconify/react',
       'framer-motion',
       '@radix-ui/react-accordion',
       '@radix-ui/react-dialog',
@@ -241,14 +242,14 @@ const nextConfig = {
         : "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
       // Styles: self + inline (Tailwind/styled-jsx 需要)
       "style-src 'self' 'unsafe-inline'",
-      // Images: self + data + blob + CDN + unpkg (Globe textures)
-      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net https://unpkg.com http://localhost:*",
+      // Images: self + data + blob + CDN + unpkg (Globe textures) + Iconify API
+      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net https://unpkg.com https://api.iconify.design http://localhost:*",
       // Fonts: self + CDN
       "font-src 'self' https://cdn.jsdelivr.net",
       // Connect: self + API + CDN + Cloudflare Turnstile + jsdelivr (Three.js fonts) + WebSocket (HMR)
       isDev
-        ? "connect-src 'self' ws://localhost:* http://localhost:* https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com https://cdn.jsdelivr.net"
-        : "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com https://cdn.jsdelivr.net",
+        ? "connect-src 'self' ws://localhost:* http://localhost:* https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design"
+        : "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design",
       // Media: self + CDN
       "media-src 'self' https://*.amazonaws.com https://*.cloudfront.net http://localhost:*",
       // Frame: Cloudflare Turnstile
@@ -266,6 +267,21 @@ const nextConfig = {
     ].join('; ')
 
     return [
+      // Allow search engines and external services to access static assets (favicon, images, fonts)
+      {
+        source: '/favicon.ico',
+        headers: [
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+          { key: 'Cache-Control', value: 'public, max-age=86400' },
+        ],
+      },
+      {
+        source: '/favicon-gold-b.svg',
+        headers: [
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+          { key: 'Cache-Control', value: 'public, max-age=86400' },
+        ],
+      },
       {
         source: '/:path*',
         headers: [

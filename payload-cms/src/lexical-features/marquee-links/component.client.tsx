@@ -9,8 +9,9 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $getNodeByKey } from 'lexical'
 import React, { useState, useEffect } from 'react'
 import { MarqueeLinksData, MarqueeLinksNode, MarqueeLink } from './node'
-import { X, Plus, Link as LinkIcon, GripVertical, ExternalLink } from 'lucide-react'
-import * as LucideIcons from 'lucide-react'
+import { X, Plus, Link as LinkIcon, GripVertical } from 'lucide-react'
+import { getIconSvgUrl, normalizeIconName } from '../../components/fields/IconPicker/iconify-utils'
+import { InlineIconSearch } from '../../components/fields/IconPicker/InlineIconSearch'
 import { MediaPickerModal } from '../image-gallery/component.client'
 import { useTranslation } from '@payloadcms/ui'
 
@@ -36,10 +37,11 @@ const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClose, onSe
   const [isLoading, setIsLoading] = useState(false)
 
   const collections = [
-    { value: 'products', label: i18n?.language === 'zh' ? '产品' : 'Products', pathPrefix: '/products' },
-    { value: 'productSeries', label: i18n?.language === 'zh' ? '产品系列' : 'Product Series', pathPrefix: '/series' },
-    { value: 'pages', label: i18n?.language === 'zh' ? '页面' : 'Pages', pathPrefix: '/pages' },
-    { value: 'blogs', label: i18n?.language === 'zh' ? '博客' : 'Blogs', pathPrefix: '/blog' },
+    { value: 'products', label: i18n?.language === 'zh' ? '产品' : 'Products', pathPrefix: '/products', searchField: 'name' },
+    { value: 'product-series', label: i18n?.language === 'zh' ? '产品系列' : 'Product Series', pathPrefix: '/series', searchField: 'name' },
+    { value: 'pages', label: i18n?.language === 'zh' ? '页面' : 'Pages', pathPrefix: '/pages', searchField: 'title' },
+    { value: 'blogs', label: i18n?.language === 'zh' ? '博客' : 'Blogs', pathPrefix: '/blog', searchField: 'title' },
+    { value: 'applications', label: i18n?.language === 'zh' ? '应用' : 'Applications', pathPrefix: '/applications', searchField: 'name' },
   ]
 
   useEffect(() => {
@@ -57,7 +59,9 @@ const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClose, onSe
       })
 
       if (searchQuery) {
-        params.append('where[title][like]', searchQuery)
+        const collection = collections.find((c) => c.value === selectedCollection)
+        const searchField = collection?.searchField || 'title'
+        params.append(`where[${searchField}][like]`, searchQuery)
       }
 
       const response = await fetch(`/api/${selectedCollection}?${params}`)
@@ -617,51 +621,20 @@ export const MarqueeLinksComponent: React.FC<MarqueeLinksComponentProps> = ({ no
                   </div>
 
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                      <label style={{ fontSize: '11px', fontWeight: 500 }}>{i18n?.language === 'zh' ? 'Lucide 图标名称（可选）' : 'Lucide Icon Name (Optional)'}</label>
-                      <a
-                        href="https://lucide.dev/icons/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '2px',
-                          fontSize: '10px',
-                          color: '#3b82f6',
-                          textDecoration: 'none',
-                        }}
-                      >
-                        {i18n?.language === 'zh' ? '选择图标' : 'Select Icon'} <ExternalLink size={10} />
-                      </a>
-                    </div>
-                    <input
-                      type="text"
+                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', fontWeight: 500 }}>{i18n?.language === 'zh' ? 'Iconify 图标（可选）' : 'Iconify Icon (Optional)'}</label>
+                    <InlineIconSearch
                       value={link.iconName || ''}
-                      onChange={(e) => {
-                        const newValue = e.target.value
+                      onChange={(newValue) => {
                         handleLinkChange(index, 'iconName', newValue)
-                        // If a Lucide icon name is entered, clear the uploaded icon / 如果输入了 Lucide 图标名称，清空上传的图标
                         if (newValue && iconId) {
                           handleLinkChange(index, 'icon', '')
                         }
                       }}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onDragStart={(e) => e.stopPropagation()}
-                      placeholder="ArrowRight, Check, Star..."
                       disabled={!!iconId}
-                      style={{
-                        width: '100%',
-                        padding: '4px 6px',
-                        border: '1px solid #d1d5db',
-                        borderRadius: '3px',
-                        fontSize: '11px',
-                        backgroundColor: iconId ? '#f3f4f6' : 'white',
-                        cursor: iconId ? 'not-allowed' : 'text',
-                      }}
+                      isZh={i18n?.language === 'zh'}
                     />
                     <p style={{ margin: '2px 0 0 0', fontSize: '9px', color: '#6b7280' }}>
-                      {iconId ? (i18n?.language === 'zh' ? '已使用上传图标，如需使用 Lucide 图标请先删除上传的图标' : 'Using uploaded icon. Delete it to use Lucide icon.') : (i18n?.language === 'zh' ? '输入 Lucide 图标名称' : 'Enter Lucide icon name')}
+                      {iconId ? (i18n?.language === 'zh' ? '已使用上传图标，删除后可使用 Iconify 图标' : 'Using uploaded icon. Delete it to use Iconify icon.') : (i18n?.language === 'zh' ? '点击"搜索图标"可视化选择' : 'Click "Search Icons" to browse visually')}
                     </p>
                   </div>
                 </div>
@@ -755,11 +728,11 @@ export const MarqueeLinksComponent: React.FC<MarqueeLinksComponentProps> = ({ no
                 )
               }
 
-              // Then use Lucide icons / 其次使用 Lucide 图标
+              // Then use Iconify icons / 其次使用 Iconify 图标
               if (link.iconName) {
-                const IconComponent = (LucideIcons as any)[link.iconName]
-                if (IconComponent) {
-                  return <IconComponent size={20} style={{ color: '#6b7280' }} />
+                const iconifyName = normalizeIconName(link.iconName)
+                if (iconifyName) {
+                  return <img src={getIconSvgUrl(iconifyName, '#333')} alt={link.iconName} style={{ width: '20px', height: '20px' }} />
                 }
               }
 

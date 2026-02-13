@@ -12,18 +12,13 @@ import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { getIcon } from '@/lib/icon-map'
+import { IconifyIcon } from '@/components/ui/IconifyIcon'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import { Button } from '@/components/ui/button'
 import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
 import { RichText, defaultJSXConverters } from '@payloadcms/richtext-lexical/react'
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical'
 import type { JSXConverters } from '@payloadcms/richtext-lexical/react'
-
-// Helper function to get Lucide icon component
-function getLucideIcon(iconName: string) {
-  return getIcon(iconName)
-}
 
 interface LexicalRendererProps {
   content: SerializedEditorState
@@ -366,9 +361,9 @@ const LinkJumpBlock = ({ node }: any) => {
     >
       {/* Icon */}
       <div className="flex-shrink-0">
-        {iconType === 'lucide' ? (
+        {iconType === 'lucide' && lucideIconName ? (
           <div className="w-6 h-6 flex items-center justify-center text-brand-accent-gold">
-            {React.createElement(getLucideIcon(lucideIconName), { size: 24 })}
+            <IconifyIcon name={lucideIconName} size={24} color="currentColor" />
           </div>
         ) : mediaIcon?.url ? (
           <div className="w-6 h-6 rounded overflow-hidden">
@@ -706,7 +701,7 @@ const MarqueeLinksBlock = ({ node }: any) => {
         >
           {link.iconName ? (
             <div className={`${iconClass} flex-shrink-0`}>
-              {React.createElement(getLucideIcon(link.iconName), { size: 20, fill: 'currentColor', strokeWidth: 0 })}
+              <IconifyIcon name={link.iconName} size={20} color="currentColor" />
             </div>
           ) : iconUrl ? (
             <div className="w-5 h-5 rounded overflow-hidden flex-shrink-0">
@@ -809,6 +804,34 @@ const TwoColumnsBlock = ({ node }: any) => {
 }
 
 /**
+ * Icon List Block - renders icon + title + subtitle items
+ */
+function IconListBlock({ node }: { node: any }) {
+  const items = node?.data?.items || []
+  if (items.length === 0) return null
+
+  return (
+    <div className="flex justify-between items-start gap-2 py-4">
+      {items.slice(0, 8).map((item: any, index: number) => (
+        <div key={index} className="flex flex-col items-center text-center flex-1 min-w-0">
+          <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#e8e4d9] flex items-center justify-center mb-2">
+            {item.icon && <IconifyIcon name={item.icon} size={24} color="#5d6b4a" />}
+          </div>
+          <p className="font-josefin-sans font-semibold text-xs md:text-sm text-[#3a3a3a] leading-tight whitespace-pre-line">
+            {item.title}
+          </p>
+          {item.subtitle && (
+            <p className="font-josefin-sans text-xs md:text-sm text-[#3a3a3a] leading-tight whitespace-pre-line">
+              {item.subtitle}
+            </p>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/**
  * Custom JSX Converters for our Lexical nodes
  */
 export const customConverters: JSXConverters = {
@@ -826,6 +849,8 @@ export const customConverters: JSXConverters = {
     'marquee-links': MarqueeLinksBlock,
     'twoColumns': TwoColumnsBlock,
 
+    'icon-list': IconListBlock,
+
     // CamelCase naming (aliases)
     'custom-image-gallery': ImageGalleryBlock,
     'singleImage': SingleImageBlock,
@@ -833,6 +858,7 @@ export const customConverters: JSXConverters = {
     'ctaButton': CtaButtonBlock,
     'linkJump': LinkJumpBlock,
     'marqueeLinks': MarqueeLinksBlock,
+    'iconList': IconListBlock,
   },
 }
 
@@ -857,8 +883,10 @@ export function LexicalRenderer({ content, className = '' }: LexicalRendererProp
     marqueeLinks: MarqueeLinksBlock,
     notice: NoticeBlock,
     singleImage: SingleImageBlock,
+    iconList: IconListBlock,
     'custom-image-gallery': ImageGalleryBlock,
     'image-gallery': ImageGalleryBlock,
+    'icon-list': IconListBlock,
     videoEmbed: VideoEmbedBlock,
     'video-embed': VideoEmbedBlock,
     'cta-button': CtaButtonBlock,
@@ -896,8 +924,10 @@ function NestedLexicalRenderer({ content }: { content: any }) {
     marqueeLinks: MarqueeLinksBlock,
     notice: NoticeBlock,
     singleImage: SingleImageBlock,
+    iconList: IconListBlock,
     'custom-image-gallery': ImageGalleryBlock,
     'image-gallery': ImageGalleryBlock,
+    'icon-list': IconListBlock,
     videoEmbed: VideoEmbedBlock,
     'video-embed': VideoEmbedBlock,
     'cta-button': CtaButtonBlock,

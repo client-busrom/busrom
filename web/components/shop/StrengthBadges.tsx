@@ -3,6 +3,7 @@
 import React from "react"
 import Image from "next/image"
 import { Users, Shield, Truck, Leaf } from "lucide-react"
+import { IconifyIcon } from "@/components/ui/IconifyIcon"
 
 interface StrengthItem {
   icon?: string
@@ -52,12 +53,14 @@ export function StrengthBadges({ items }: StrengthBadgesProps) {
                   className="w-full h-full object-contain p-2"
                   unoptimized
                 />
+              ) : item.icon ? (
+                <IconifyIcon name={item.icon} size={24} color="#5d6b4a" />
               ) : (
                 <DefaultIcon className="text-[#5d6b4a]" size={24} />
               )}
             </div>
             {/* Title */}
-            <p className="font-josefin-sans font-semibold text-xs md:text-sm text-[#3a3a3a] leading-tight">
+            <p className="font-josefin-sans font-semibold text-xs md:text-sm text-[#3a3a3a] leading-tight whitespace-pre-line">
               {item.title}
             </p>
             {/* Subtitle - supports line breaks */}

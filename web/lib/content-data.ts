@@ -230,6 +230,7 @@ export interface MainFormData {
 export interface WhyChooseReason {
   title: string
   description: string
+  icon?: string
   image: ImageObject
 }
 

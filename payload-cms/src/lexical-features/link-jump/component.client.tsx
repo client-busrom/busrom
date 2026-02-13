@@ -10,7 +10,8 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $getNodeByKey } from 'lexical'
 import { useTranslation } from '@payloadcms/ui'
 import { Link as LinkIcon, ExternalLink } from 'lucide-react'
-import * as LucideIcons from 'lucide-react'
+import { getIconSvgUrl, normalizeIconName } from '../../components/fields/IconPicker/iconify-utils'
+import { InlineIconSearch } from '../../components/fields/IconPicker/InlineIconSearch'
 import type { LinkJumpData } from './node'
 import { $createLinkJumpNode, LinkJumpNode } from './node'
 import { MediaPickerModal } from '../image-gallery/component.client'
@@ -345,28 +346,20 @@ export const LinkJumpComponent: React.FC<LinkJumpComponentProps> = (props) => {
             </button>
           </div>
 
-          {/* Lucide 图标名称 */}
+          {/* Iconify 图标名称 */}
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
-              {i18n?.language === 'zh' ? 'Lucide 图标名称（可选）' : 'Lucide Icon Name (Optional)'}
+              {i18n?.language === 'zh' ? 'Iconify 图标（可选）' : 'Iconify Icon (Optional)'}
             </label>
-            <input
-              type="text"
+            <InlineIconSearch
               value={formData.iconName || ''}
-              onChange={(e) => setFormData({ ...formData, iconName: e.target.value })}
-              placeholder="ArrowRight, Check, Star..."
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                border: '1px solid #e5e7eb',
-                borderRadius: '6px',
-                fontSize: '14px',
-              }}
+              onChange={(iconName) => setFormData({ ...formData, iconName: iconName })}
+              isZh={i18n?.language === 'zh'}
             />
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#6b7280' }}>
               {i18n?.language === 'zh'
-                ? '输入 Lucide React 图标名称，如 ArrowRight、Check、Star 等。优先使用图片图标。'
-                : 'Enter Lucide React icon name like ArrowRight, Check, Star, etc. Image icon takes priority.'
+                ? '点击"搜索图标"可视化选择，或直接输入名称。优先使用图片图标。'
+                : 'Click "Search Icons" to browse visually, or type a name directly. Image icon takes priority.'
               }
             </p>
           </div>
@@ -425,10 +418,10 @@ export const LinkJumpComponent: React.FC<LinkJumpComponentProps> = (props) => {
               )
             }
 
-            // 其次使用 Lucide 图标
+            // 其次使用 Iconify 图标
             if (data.iconName) {
-              const IconComponent = (LucideIcons as any)[data.iconName]
-              if (IconComponent) {
+              const iconifyName = normalizeIconName(data.iconName)
+              if (iconifyName) {
                 return (
                   <div
                     style={{
@@ -439,10 +432,13 @@ export const LinkJumpComponent: React.FC<LinkJumpComponentProps> = (props) => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: 'white',
                     }}
                   >
-                    <IconComponent size={24} />
+                    <img
+                      src={getIconSvgUrl(iconifyName, 'white')}
+                      alt={data.iconName}
+                      style={{ width: '24px', height: '24px' }}
+                    />
                   </div>
                 )
               }
