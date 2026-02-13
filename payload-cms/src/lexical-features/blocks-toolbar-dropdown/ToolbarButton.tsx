@@ -19,7 +19,8 @@ import {
   PackageOpen,
   ChevronDown,
   LayoutGrid,
-  Package
+  Package,
+  List
 } from 'lucide-react'
 import { INSERT_IMAGE_GALLERY_COMMAND } from '../image-gallery/plugin'
 import { INSERT_SINGLE_IMAGE_COMMAND } from '../single-image/plugin'
@@ -34,6 +35,7 @@ import { INSERT_FORM_BLOCK_COMMAND } from '../form-block/plugin'
 import { INSERT_REUSABLE_BLOCK_COMMAND } from '../reusable-block/plugin'
 import { INSERT_APPLICATION_CAROUSEL_COMMAND } from '../application-carousel/plugin'
 import { INSERT_PRODUCT_CAROUSEL_COMMAND } from '../product-carousel/plugin'
+import { INSERT_ICON_LIST_COMMAND } from '../icon-list/plugin'
 // import { INSERT_CHECK_LIST_COMMAND } from '@lexical/list' // 已使用内置 ChecklistFeature
 import { INSERT_BLOCK_COMMAND } from '@payloadcms/richtext-lexical/client'
 
@@ -189,6 +191,11 @@ export const ToolbarButton: React.FC = () => {
     console.log('🛒 ToolbarButton dispatching on editor:', editor._key)
     console.log('🛒 Command object ID:', INSERT_PRODUCT_CAROUSEL_COMMAND)
     editor.dispatchCommand(INSERT_PRODUCT_CAROUSEL_COMMAND, undefined)
+    setIsOpen(false)
+  }
+
+  const insertIconList = () => {
+    editor.dispatchCommand(INSERT_ICON_LIST_COMMAND, undefined)
     setIsOpen(false)
   }
 
@@ -598,6 +605,36 @@ export const ToolbarButton: React.FC = () => {
           >
             <Link2 size={18} style={{ opacity: 0.7 }} />
             <span>{i18n?.language === 'zh' ? '滚动链接' : 'Marquee Links'}</span>
+          </button>
+
+          {/* 图标列表 - Custom Feature */}
+          <button
+            type="button"
+            onClick={insertIconList}
+            style={{
+              all: 'unset',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              width: '100%',
+              padding: '8px 12px',
+              cursor: 'pointer',
+              fontSize: '13px',
+              color: 'var(--theme-elevation-800, #1f2937)',
+              backgroundColor: 'transparent',
+              transition: 'background-color 0.15s ease',
+              boxSizing: 'border-box',
+              fontFamily: 'var(--font-body)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--theme-elevation-100, #f9fafb)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent'
+            }}
+          >
+            <List size={18} style={{ opacity: 0.7 }} />
+            <span>{i18n?.language === 'zh' ? '图标列表' : 'Icon List'}</span>
           </button>
 
           {/* 表单块 - Custom Feature */}

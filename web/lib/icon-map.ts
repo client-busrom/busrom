@@ -141,7 +141,15 @@ export const iconMap: Record<string, LucideIcon> = {
 }
 
 /**
+ * Check if a name is in Iconify format (contains ":")
+ */
+export function isIconifyFormat(name: string | undefined): boolean {
+  return !!name && name.includes(':')
+}
+
+/**
  * 根据图标名称获取图标组件（同步版本）
+ * 仅用于静态 Lucide 图标 fallback，新代码应使用 IconifyIcon 组件
  * @param iconName - 图标名称（如 "ArrowRight"）
  * @param fallback - 找不到时的默认图标
  */

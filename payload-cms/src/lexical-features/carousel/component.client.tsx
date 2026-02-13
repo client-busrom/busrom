@@ -211,24 +211,23 @@ export const CarouselComponent: React.FC<CarouselComponentProps> = ({ nodeKey, d
               return (
                 <div
                   key={index}
-                  draggable
-                  onDragStart={() => handleDragStart(index)}
                   onDragOver={(e) => handleDragOver(e, index)}
-                  onDragEnd={handleDragEnd}
                   style={{
                     padding: '8px',
                     backgroundColor: 'white',
                     borderRadius: '6px',
                     border: draggedIndex === index ? '2px solid #A08745' : '1px solid #e5e7eb',
                     position: 'relative',
-                    cursor: 'move',
                     opacity: draggedIndex === index ? 0.6 : 1,
                     transition: 'opacity 0.15s ease',
                     transform: draggedIndex === index ? 'scale(0.98)' : 'scale(1)',
                   }}
                 >
-                  {/* Drag Indicator */}
+                  {/* Drag Handle - only this element is draggable */}
                   <div
+                    draggable
+                    onDragStart={() => handleDragStart(index)}
+                    onDragEnd={handleDragEnd}
                     style={{
                       position: 'absolute',
                       top: '4px',
@@ -288,6 +287,7 @@ export const CarouselComponent: React.FC<CarouselComponentProps> = ({ nodeKey, d
                     type="text"
                     value={slide.title || ''}
                     onChange={(e) => handleSlideChange(index, 'title', e.target.value)}
+                    onKeyDown={(e) => e.stopPropagation()}
                     placeholder={i18n?.language === 'zh' ? '标题' : 'Title'}
                     style={{ width: '100%', padding: '4px 6px', border: '1px solid #d1d5db', borderRadius: '3px', fontSize: '11px', marginBottom: '6px' }}
                   />
@@ -296,6 +296,7 @@ export const CarouselComponent: React.FC<CarouselComponentProps> = ({ nodeKey, d
                   <textarea
                     value={slide.description || ''}
                     onChange={(e) => handleSlideChange(index, 'description', e.target.value)}
+                    onKeyDown={(e) => e.stopPropagation()}
                     placeholder={i18n?.language === 'zh' ? '描述' : 'Description'}
                     rows={2}
                     style={{ width: '100%', padding: '4px 6px', border: '1px solid #d1d5db', borderRadius: '3px', fontSize: '11px', marginBottom: '6px', resize: 'vertical' }}
@@ -318,6 +319,7 @@ export const CarouselComponent: React.FC<CarouselComponentProps> = ({ nodeKey, d
                         type="text"
                         value={slide.buttonText || ''}
                         onChange={(e) => handleSlideChange(index, 'buttonText', e.target.value)}
+                        onKeyDown={(e) => e.stopPropagation()}
                         placeholder={i18n?.language === 'zh' ? '按钮文本' : 'Button text'}
                         style={{ width: '100%', padding: '4px 6px', border: '1px solid #d1d5db', borderRadius: '3px', fontSize: '11px', marginBottom: '6px' }}
                       />
@@ -328,6 +330,7 @@ export const CarouselComponent: React.FC<CarouselComponentProps> = ({ nodeKey, d
                           type="text"
                           value={slide.buttonLink || ''}
                           onChange={(e) => handleSlideChange(index, 'buttonLink', e.target.value)}
+                          onKeyDown={(e) => e.stopPropagation()}
                           placeholder={i18n?.language === 'zh' ? '按钮链接' : 'Button link'}
                           style={{ width: '100%', padding: '4px 6px 4px 6px', paddingRight: '30px', border: '1px solid #d1d5db', borderRadius: '3px', fontSize: '11px' }}
                         />

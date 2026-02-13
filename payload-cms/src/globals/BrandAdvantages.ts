@@ -92,11 +92,14 @@ export const BrandAdvantages: GlobalConfig = {
       },
       admin: {
         description: {
-          en: 'Lucide React icon name, e.g.: Sparkles, Target, Component',
-          zh: 'Lucide React 图标名称，例如: Sparkles, Target, Component',
+          en: 'Iconify icon name, e.g.: lucide:sparkles, mdi:home',
+          zh: 'Iconify 图标名称，例如: lucide:sparkles, mdi:home',
+        },
+        components: {
+          Field: '@/components/fields/IconPicker',
         },
       },
-      defaultValue: 'Sparkles',
+      defaultValue: 'lucide:sparkles',
     },
 
     // ==================================================================
@@ -119,12 +122,11 @@ export const BrandAdvantages: GlobalConfig = {
         zh: '优势02 - 图标',
       },
       admin: {
-        description: {
-          en: 'Lucide React icon name',
-          zh: 'Lucide React 图标名称',
+        components: {
+          Field: '@/components/fields/IconPicker',
         },
       },
-      defaultValue: 'Sparkles',
+      defaultValue: 'lucide:sparkles',
     },
 
     // ==================================================================
@@ -147,12 +149,11 @@ export const BrandAdvantages: GlobalConfig = {
         zh: '优势03 - 图标',
       },
       admin: {
-        description: {
-          en: 'Lucide React icon name',
-          zh: 'Lucide React 图标名称',
+        components: {
+          Field: '@/components/fields/IconPicker',
         },
       },
-      defaultValue: 'Sparkles',
+      defaultValue: 'lucide:sparkles',
     },
 
     // ==================================================================
@@ -175,12 +176,11 @@ export const BrandAdvantages: GlobalConfig = {
         zh: '优势04 - 图标',
       },
       admin: {
-        description: {
-          en: 'Lucide React icon name',
-          zh: 'Lucide React 图标名称',
+        components: {
+          Field: '@/components/fields/IconPicker',
         },
       },
-      defaultValue: 'Sparkles',
+      defaultValue: 'lucide:sparkles',
     },
 
     // ==================================================================
@@ -203,12 +203,11 @@ export const BrandAdvantages: GlobalConfig = {
         zh: '优势05 - 图标',
       },
       admin: {
-        description: {
-          en: 'Lucide React icon name',
-          zh: 'Lucide React 图标名称',
+        components: {
+          Field: '@/components/fields/IconPicker',
         },
       },
-      defaultValue: 'Sparkles',
+      defaultValue: 'lucide:sparkles',
     },
 
     // ==================================================================
@@ -231,12 +230,11 @@ export const BrandAdvantages: GlobalConfig = {
         zh: '优势06 - 图标',
       },
       admin: {
-        description: {
-          en: 'Lucide React icon name',
-          zh: 'Lucide React 图标名称',
+        components: {
+          Field: '@/components/fields/IconPicker',
         },
       },
-      defaultValue: 'Sparkles',
+      defaultValue: 'lucide:sparkles',
     },
 
     // ==================================================================
@@ -259,12 +257,11 @@ export const BrandAdvantages: GlobalConfig = {
         zh: '优势07 - 图标',
       },
       admin: {
-        description: {
-          en: 'Lucide React icon name',
-          zh: 'Lucide React 图标名称',
+        components: {
+          Field: '@/components/fields/IconPicker',
         },
       },
-      defaultValue: 'Sparkles',
+      defaultValue: 'lucide:sparkles',
     },
 
     // ==================================================================
@@ -287,12 +284,11 @@ export const BrandAdvantages: GlobalConfig = {
         zh: '优势08 - 图标',
       },
       admin: {
-        description: {
-          en: 'Lucide React icon name',
-          zh: 'Lucide React 图标名称',
+        components: {
+          Field: '@/components/fields/IconPicker',
         },
       },
-      defaultValue: 'Sparkles',
+      defaultValue: 'lucide:sparkles',
     },
 
     // ==================================================================
@@ -315,12 +311,11 @@ export const BrandAdvantages: GlobalConfig = {
         zh: '优势09 - 图标',
       },
       admin: {
-        description: {
-          en: 'Lucide React icon name',
-          zh: 'Lucide React 图标名称',
+        components: {
+          Field: '@/components/fields/IconPicker',
         },
       },
-      defaultValue: 'Sparkles',
+      defaultValue: 'lucide:sparkles',
     },
   ],
 }

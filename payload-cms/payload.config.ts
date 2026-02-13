@@ -54,6 +54,7 @@ import { ReusableBlockFeature } from './src/lexical-features/reusable-block'
 import { DocumentTemplateFeature } from './src/lexical-features/document-template'
 import { ApplicationCarouselFeature } from './src/lexical-features/application-carousel'
 import { ProductCarouselFeature } from './src/lexical-features/product-carousel'
+import { IconListFeature } from './src/lexical-features/icon-list'
 import { ChecklistFeature } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { seoPlugin } from '@payloadcms/plugin-seo'
@@ -391,6 +392,7 @@ export default buildConfig({
         ReusableBlockFeature(), // Custom Feature 可复用块 - WYSIWYG
         ApplicationCarouselFeature(), // Custom Feature 应用轮播 - WYSIWYG
         ProductCarouselFeature(), // Custom Feature 产品轮播 - WYSIWYG
+        IconListFeature(), // Custom Feature 图标列表 - WYSIWYG
         DocumentTemplateFeature(), // Custom Feature 文档模板 - 工具栏按钮
         BlocksToolbarDropdownFeature(), // 工具栏右侧自定义块按钮
       ]

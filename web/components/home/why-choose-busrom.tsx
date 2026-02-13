@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { AnimatedLinkButton } from "@/components/ui/animated-link-button";
 import { LucideIcon, HelpCircle, Lightbulb, ShieldCheck, Factory, Globe, Users } from "lucide-react";
+import { IconifyIcon } from "@/components/ui/IconifyIcon";
 import { cn } from "@/lib/utils";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
@@ -156,7 +157,11 @@ export default function WhyChooseBusrom({ data }: Props) {
                   <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                   <div className="relative z-20 h-full p-6 flex flex-col items-center justify-end text-center">
                     <div className="w-12 h-12 mb-2 flex items-center justify-center">
-                      <IconComponent className="w-8 h-8 text-white" />
+                      {reason.icon ? (
+                        <IconifyIcon name={reason.icon} size={32} color="white" />
+                      ) : (
+                        <IconComponent className="w-8 h-8 text-white" />
+                      )}
                     </div>
                     <h3 className="text-xl font-semibold text-white mb-1">{reason.title}</h3>
                     <p className="text-white/90 text-sm">{reason.description}</p>
@@ -286,7 +291,11 @@ export default function WhyChooseBusrom({ data }: Props) {
                         marginBottom: vw(30),
                       }}
                     >
-                      <IconComponent className="w-full h-full text-white" />
+                      {reason.icon ? (
+                        <IconifyIcon name={reason.icon} size={78} color="white" className="w-full h-full" />
+                      ) : (
+                        <IconComponent className="w-full h-full text-white" />
+                      )}
                     </div>
                     {/* 标题 */}
                     <h3

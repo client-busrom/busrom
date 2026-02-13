@@ -5,29 +5,13 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Link } from "@/lib/navigation"
 import { cn } from "@/lib/utils"
 import type { NavItem } from "@/types/navigation"
-import { Settings, Globe, HelpCircle, Info, Book, FileText, ArrowRight, ChevronDown } from "lucide-react"
+import { ChevronDown } from "lucide-react"
+import { IconifyIcon } from "@/components/ui/IconifyIcon"
 
 interface DesktopNavigationProps {
   navigationItems: NavItem[]
   theme: "transparent" | "light" | "dark"
   onMenuOpen?: (isOpen: boolean) => void
-}
-
-// Icon 映射
-const iconMap: Record<string, any> = {
-  Settings,
-  Globe,
-  HelpCircle,
-  Info,
-  Book,
-  FileText,
-  Default: ArrowRight,
-}
-
-const getIcon = (iconName?: string) => {
-  if (!iconName) return null
-  const IconComponent = iconMap[iconName] || iconMap.Default
-  return <IconComponent className="w-5 h-5" />
 }
 
 // 从 URL 中提取产品 slug
@@ -330,7 +314,11 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
                             onClick={() => setActiveMenuId(null)}
                           >
                             <div className="text-muted-foreground group-hover:text-brand-accent-gold transition-colors">
-                              {getIcon(child.icon)}
+                              {child.icon ? (
+                                <IconifyIcon name={child.icon} size={20} color="currentColor" />
+                              ) : (
+                                <IconifyIcon name="lucide:arrow-right" size={20} color="currentColor" />
+                              )}
                             </div>
                             <span className="text-lg font-montserrat font-bold text-muted-foreground group-hover:text-brand-accent-gold text-center transition-colors">
                               {child.label}

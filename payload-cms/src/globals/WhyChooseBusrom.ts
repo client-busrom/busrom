@@ -137,9 +137,8 @@ export const WhyChooseBusrom: GlobalConfig = {
         zh: '理由01 - 图标',
       },
       admin: {
-        description: {
-          en: 'Lucide React icon name',
-          zh: 'Lucide React 图标名称',
+        components: {
+          Field: '@/components/fields/IconPicker',
         },
       },
     },
@@ -187,9 +186,8 @@ export const WhyChooseBusrom: GlobalConfig = {
         zh: '理由02 - 图标',
       },
       admin: {
-        description: {
-          en: 'Lucide React icon name',
-          zh: 'Lucide React 图标名称',
+        components: {
+          Field: '@/components/fields/IconPicker',
         },
       },
     },
@@ -237,9 +235,8 @@ export const WhyChooseBusrom: GlobalConfig = {
         zh: '理由03 - 图标',
       },
       admin: {
-        description: {
-          en: 'Lucide React icon name',
-          zh: 'Lucide React 图标名称',
+        components: {
+          Field: '@/components/fields/IconPicker',
         },
       },
     },
@@ -287,9 +284,8 @@ export const WhyChooseBusrom: GlobalConfig = {
         zh: '理由04 - 图标',
       },
       admin: {
-        description: {
-          en: 'Lucide React icon name',
-          zh: 'Lucide React 图标名称',
+        components: {
+          Field: '@/components/fields/IconPicker',
         },
       },
     },
@@ -337,9 +333,8 @@ export const WhyChooseBusrom: GlobalConfig = {
         zh: '理由05 - 图标',
       },
       admin: {
-        description: {
-          en: 'Lucide React icon name',
-          zh: 'Lucide React 图标名称',
+        components: {
+          Field: '@/components/fields/IconPicker',
         },
       },
     },

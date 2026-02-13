@@ -99,6 +99,17 @@ export function parseMainContentStrengthData(content: LexicalContent) {
     const node = nodes[i]
     const nodeText = node.children?.[0]?.text || ''
 
+    // Check for iconList block (icon + title + subtitle list)
+    if (node.type === 'iconList' && node.data?.items) {
+      for (const item of node.data.items) {
+        strengthItems.push({
+          icon: item.icon || undefined,
+          title: item.title || '',
+          subtitle: item.subtitle || '',
+        })
+      }
+    }
+
     // Check for carousel block (visual editing in CMS)
     if (node.type === 'carousel' && node.data?.slides) {
       for (const slide of node.data.slides) {

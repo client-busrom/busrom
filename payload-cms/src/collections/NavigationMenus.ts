@@ -108,9 +108,8 @@ export const NavigationMenus: CollectionConfig = {
         zh: '图标',
       },
       admin: {
-        description: {
-          en: 'Lucide-react icon name, e.g.: Home, Package, Wrench',
-          zh: 'Lucide-react 图标名称，例如: Home, Package, Wrench',
+        components: {
+          Field: '@/components/fields/IconPicker',
         },
         condition: (data) => data?.type === 'submenu',
       },
