@@ -51,6 +51,9 @@ export const customTranslationsEn = {
       loadFailed: 'Failed to load data',
       partialSave: 'Partial save',
       noChanges: 'No changes to save',
+      sourceEmpty: 'The source language content is empty',
+      sourceEmptyConfirm: 'The source language ({{locale}}) has no content for the following fields:\n\n{{fields}}\n\nTranslating from an empty source will produce empty results and may overwrite existing translations.\n\nAre you sure you want to continue?',
+      sourceEmptyRichText: 'The current locale ({{locale}}) has no content in this field. Translating/copying from an empty source will produce empty results and may overwrite existing translations.\n\nPlease switch to a locale that has content first.',
       languages: 'languages',
       fieldLanguageCombinations: 'field-language combinations',
 
@@ -393,6 +396,9 @@ export const customTranslationsZh = {
       loadFailed: '加载数据失败',
       partialSave: '部分保存',
       noChanges: '没有修改需要保存',
+      sourceEmpty: '源语言内容为空',
+      sourceEmptyConfirm: '源语言（{{locale}}）以下字段内容为空：\n\n{{fields}}\n\n从空的源语言翻译将产生空结果，并可能覆盖已有的翻译内容。\n\n确定要继续吗？',
+      sourceEmptyRichText: '当前语言（{{locale}}）的此字段没有内容。从空的源语言翻译/复制将产生空结果，并可能覆盖已有的翻译内容。\n\n请先切换到有内容的语言。',
       languages: '种语言',
       fieldLanguageCombinations: '个字段-语言组合',
 

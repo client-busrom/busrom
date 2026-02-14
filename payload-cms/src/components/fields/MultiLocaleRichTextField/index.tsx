@@ -202,7 +202,14 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
     if (targetLocales.length === 0) return
 
     const sourceValue = localeValues.find(l => l.locale === activeLocale)?.value
-    if (!sourceValue) return
+    if (!sourceValue || !hasRichTextContent(sourceValue)) {
+      const localeLabel = SUPPORTED_LOCALES.find(l => l.code === activeLocale)?.label || activeLocale
+      const isZh = i18n?.language === 'zh'
+      window.alert(isZh
+        ? `当前语言（${localeLabel}）的此字段没有内容。从空的源语言复制将产生空结果，并可能覆盖已有的翻译内容。\n\n请先切换到有内容的语言。`
+        : `The current locale (${localeLabel}) has no content in this field. Copying from an empty source will produce empty results and may overwrite existing translations.\n\nPlease switch to a locale that has content first.`)
+      return
+    }
 
     // Update state
     setLocaleValues(prev =>
@@ -235,14 +242,21 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
     }
 
     setTargetLocales([])
-  }, [activeLocale, targetLocales, localeValues, overwriteExisting, id, currentLocale.code, handleSaveLocale, collectionSlug, globalSlug])
+  }, [activeLocale, targetLocales, localeValues, overwriteExisting, id, currentLocale.code, handleSaveLocale, collectionSlug, globalSlug, i18n])
 
   // Translate content from current locale to selected locales
   const handleTranslateToLocales = useCallback(async () => {
     if (targetLocales.length === 0) return
 
     const sourceValue = localeValues.find(l => l.locale === activeLocale)?.value
-    if (!sourceValue) return
+    if (!sourceValue || !hasRichTextContent(sourceValue)) {
+      const localeLabel = SUPPORTED_LOCALES.find(l => l.code === activeLocale)?.label || activeLocale
+      const isZh = i18n?.language === 'zh'
+      window.alert(isZh
+        ? `当前语言（${localeLabel}）的此字段没有内容。从空的源语言翻译将产生空结果，并可能覆盖已有的翻译内容。\n\n请先切换到有内容的语言。`
+        : `The current locale (${localeLabel}) has no content in this field. Translating from an empty source will produce empty results and may overwrite existing translations.\n\nPlease switch to a locale that has content first.`)
+      return
+    }
 
     setIsTranslating(true)
 
@@ -333,7 +347,7 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
     } finally {
       setIsTranslating(false)
     }
-  }, [activeLocale, targetLocales, localeValues, overwriteExisting, id, currentLocale.code, handleSaveLocale, handleCopyToLocales, collectionSlug, globalSlug])
+  }, [activeLocale, targetLocales, localeValues, overwriteExisting, id, currentLocale.code, handleSaveLocale, handleCopyToLocales, collectionSlug, globalSlug, i18n])
 
   // Select helpers
   const handleSelectAllTargets = useCallback(() => {

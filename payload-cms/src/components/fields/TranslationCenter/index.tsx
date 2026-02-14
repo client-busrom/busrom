@@ -100,7 +100,7 @@ interface TranslationCenterProps {
 export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
   const { id, collectionSlug } = useDocumentInfo()
   const currentLocale = useLocale()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const fieldConfigs = collectionSlug ? TRANSLATABLE_FIELDS[collectionSlug] : []
 
@@ -267,6 +267,40 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
       return
     }
 
+    // 检查源语言内容是否为空，防止用空内容覆盖已有翻译
+    const emptySourceFields = fieldsData.filter(field => {
+      const sourceValue = field.values.find(v => v.locale === sourceLocale)?.value
+      return !sourceValue
+    })
+
+    if (emptySourceFields.length > 0) {
+      const sourceLabel = SUPPORTED_LOCALES.find(l => l.code === sourceLocale)?.label || sourceLocale
+      const fieldNames = emptySourceFields.map(f => {
+        if (f.config.labelKey.startsWith('__array__:')) {
+          const rest = f.config.labelKey.slice('__array__:'.length)
+          const colonIdx = rest.indexOf(':custom:')
+          return colonIdx >= 0 ? rest.slice(0, colonIdx) + (t(rest.slice(colonIdx + 1) as any) || '') : rest
+        }
+        return t(f.config.labelKey as any) as string || f.config.name
+      }).join('\n')
+
+      // 如果全部字段为空，直接阻止
+      if (emptySourceFields.length === fieldsData.length) {
+        setStatusMessage({ type: 'error', key: 'custom:translationCenter:sourceEmpty' })
+        return
+      }
+
+      // 部分字段为空，二次确认
+      const isZh = i18n?.language === 'zh'
+      const confirmMsg = isZh
+        ? `源语言（${sourceLabel}）以下字段内容为空：\n\n${fieldNames}\n\n从空的源语言翻译将产生空结果，并可能覆盖已有的翻译内容。\n\n确定要继续吗？`
+        : `The source language (${sourceLabel}) has no content for the following fields:\n\n${fieldNames}\n\nTranslating from an empty source will produce empty results and may overwrite existing translations.\n\nAre you sure you want to continue?`
+
+      if (!window.confirm(confirmMsg)) {
+        return
+      }
+    }
+
     setIsTranslating(true)
     setStatusMessage(null)
 
@@ -339,7 +373,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
     } finally {
       setIsTranslating(false)
     }
-  }, [fieldsData, sourceLocale, targetLocales, overwriteExisting])
+  }, [fieldsData, sourceLocale, targetLocales, overwriteExisting, t, i18n])
 
   // 保存
   const handleSave = useCallback(async () => {

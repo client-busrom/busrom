@@ -234,8 +234,17 @@ export const MultiLocaleField: React.FC<MultiLocaleFieldProps> = ({
     console.log('[Translate] sourceLocale:', sourceLocale, 'sourceValue:', sourceValue)
     console.log('[Translate] targetLocales:', targetLocales)
 
-    if (!sourceValue || targetLocales.length === 0) {
-      console.log('[Translate] Aborted: no source value or no target locales')
+    if (targetLocales.length === 0) {
+      console.log('[Translate] Aborted: no target locales')
+      return
+    }
+
+    if (!sourceValue) {
+      const localeLabel = SUPPORTED_LOCALES.find(l => l.code === sourceLocale)?.label || sourceLocale
+      const isZh = i18n?.language === 'zh'
+      window.alert(isZh
+        ? `源语言（${localeLabel}）的此字段没有内容。从空的源语言翻译将产生空结果，并可能覆盖已有的翻译内容。\n\n请先切换到有内容的语言。`
+        : `The source language (${localeLabel}) has no content in this field. Translating from an empty source will produce empty results and may overwrite existing translations.\n\nPlease switch to a locale that has content first.`)
       return
     }
 
