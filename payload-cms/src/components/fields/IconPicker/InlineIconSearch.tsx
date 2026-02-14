@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { IconSearchGrid } from './IconSearchGrid'
 import { getIconSvgUrl, normalizeIconName } from './iconify-utils'
 
@@ -88,8 +89,8 @@ export const InlineIconSearch: React.FC<InlineIconSearchProps> = ({ value, onCha
         )}
       </div>
 
-      {/* 搜索弹窗 */}
-      {isSearchOpen && (
+      {/* 搜索弹窗 - 使用 Portal 渲染到 body，避免被 Lexical DecoratorNode 容器限制 */}
+      {isSearchOpen && typeof document !== 'undefined' && createPortal(
         <div
           style={{
             position: 'fixed',
@@ -101,7 +102,7 @@ export const InlineIconSearch: React.FC<InlineIconSearchProps> = ({ value, onCha
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 9999,
+            zIndex: 99999,
           }}
           onClick={() => setIsSearchOpen(false)}
         >
@@ -161,7 +162,8 @@ export const InlineIconSearch: React.FC<InlineIconSearchProps> = ({ value, onCha
               />
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
