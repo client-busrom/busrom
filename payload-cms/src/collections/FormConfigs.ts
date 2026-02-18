@@ -10,6 +10,62 @@
  */
 
 import type { CollectionConfig } from 'payload'
+import {
+  lexicalEditor,
+  BoldFeature,
+  ItalicFeature,
+  UnderlineFeature,
+  StrikethroughFeature,
+  SubscriptFeature,
+  SuperscriptFeature,
+  InlineCodeFeature,
+  ParagraphFeature,
+  HeadingFeature,
+  UnorderedListFeature,
+  OrderedListFeature,
+  LinkFeature,
+  UploadFeature,
+  FixedToolbarFeature,
+  InlineToolbarFeature,
+  AlignFeature,
+  IndentFeature,
+  BlockquoteFeature,
+  HorizontalRuleFeature,
+} from '@payloadcms/richtext-lexical'
+
+/**
+ * Simplified Lexical editor for email templates.
+ * Includes text formatting + image upload, excludes custom blocks/embeds.
+ */
+const emailTemplateEditor = lexicalEditor({
+  features: [
+    // Text formatting
+    BoldFeature(),
+    ItalicFeature(),
+    UnderlineFeature(),
+    StrikethroughFeature(),
+    SubscriptFeature(),
+    SuperscriptFeature(),
+    InlineCodeFeature(),
+    // Structure
+    ParagraphFeature(),
+    HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
+    BlockquoteFeature(),
+    HorizontalRuleFeature(),
+    // Lists
+    UnorderedListFeature(),
+    OrderedListFeature(),
+    // Links & images
+    LinkFeature(),
+    UploadFeature(),
+    // Layout
+    AlignFeature(),
+    IndentFeature(),
+    // Toolbar
+    FixedToolbarFeature(),
+    InlineToolbarFeature(),
+  ],
+})
 
 export const FormConfigs: CollectionConfig = {
   slug: 'form-configs',
@@ -467,39 +523,6 @@ export const FormConfigs: CollectionConfig = {
     },
 
     // ==================================================================
-    // Email Notification Settings (per-form override)
-    // ==================================================================
-    {
-      type: 'collapsible',
-      label: {
-        en: 'Email Notification',
-        zh: '邮件通知设置',
-      },
-      admin: {
-        description: {
-          en: 'Override global email settings for this form. Leave empty to use global defaults.',
-          zh: '为此表单覆盖全局邮件设置。留空则使用全局默认值。',
-        },
-      },
-      fields: [
-        {
-          name: 'notificationEmails',
-          type: 'text',
-          label: {
-            en: 'Notification Emails (Override)',
-            zh: '通知邮箱（覆盖全局）',
-          },
-          admin: {
-            description: {
-              en: 'Comma-separated emails. If set, overrides global notification emails.',
-              zh: '逗号分隔的邮箱。如果设置，将覆盖全局通知邮箱。',
-            },
-          },
-        },
-      ],
-    },
-
-    // ==================================================================
     // Auto Reply Settings (per-form)
     // ==================================================================
     {
@@ -510,8 +533,8 @@ export const FormConfigs: CollectionConfig = {
       },
       admin: {
         description: {
-          en: 'Configure auto-reply for this specific form. This takes priority over global settings.',
-          zh: '为此表单配置自动回复。此设置优先于全局设置。',
+          en: 'Configure auto-reply for this specific form. Overrides the SMTP config defaults.',
+          zh: '为此表单配置自动回复。覆盖 SMTP 配置中的默认设置。',
         },
       },
       fields: [
@@ -524,7 +547,7 @@ export const FormConfigs: CollectionConfig = {
           },
           defaultValue: 'inherit',
           options: [
-            { label: 'Inherit from Global | 继承全局设置', value: 'inherit' },
+            { label: 'Inherit from SMTP Config | 继承 SMTP 配置', value: 'inherit' },
             { label: 'Enabled | 启用', value: 'enabled' },
             { label: 'Disabled | 禁用', value: 'disabled' },
           ],
@@ -540,13 +563,13 @@ export const FormConfigs: CollectionConfig = {
           type: 'textarea',
           label: {
             en: 'Auto Reply Subject (Override)',
-            zh: '自动回复主题（覆盖全局）',
+            zh: '自动回复主题（覆盖 SMTP 默认）',
           },
           localized: true,
           admin: {
             description: {
-              en: 'Leave empty to use global default',
-              zh: '留空则使用全局默认值',
+              en: 'Leave empty to use SMTP config default',
+              zh: '留空则使用 SMTP 配置的默认值',
             },
             condition: (data) => data?.autoReplyEnabled === 'enabled',
           },
@@ -554,15 +577,16 @@ export const FormConfigs: CollectionConfig = {
         {
           name: 'autoReplyTemplate',
           type: 'richText',
+          editor: emailTemplateEditor,
           label: {
             en: 'Auto Reply Template (Override)',
-            zh: '自动回复模板（覆盖全局）',
+            zh: '自动回复模板（覆盖 SMTP 默认）',
           },
           localized: true,
           admin: {
             description: {
-              en: 'Leave empty to use global default. Use {name}, {email}, {formName} as placeholders.',
-              zh: '留空则使用全局默认值。可使用 {name}、{email}、{formName} 作为占位符。',
+              en: 'Leave empty to use SMTP config default. Use {name}, {email}, {formName} as placeholders.',
+              zh: '留空则使用 SMTP 配置的默认值。可使用 {name}、{email}、{formName} 作为占位符。',
             },
             condition: (data) => data?.autoReplyEnabled === 'enabled',
             components: {

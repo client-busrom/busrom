@@ -2,7 +2,7 @@
  * Form Email Utility
  *
  * Handles form notification and auto-reply emails
- * Respects global settings and per-form overrides
+ * Uses SmtpConfigs collection to find the SMTP config associated with each form
  */
 
 import type { Payload } from 'payload'
@@ -11,6 +11,7 @@ import {
   lexicalToHtml,
   replacePlaceholders,
   generateFormDataHtml,
+  type EmailConfig,
 } from './email'
 
 interface FormSubmission {
@@ -28,65 +29,52 @@ interface EmailResult {
 }
 
 /**
- * Get effective email configuration by merging global and per-form settings
+ * Find the SmtpConfig that is associated with a given formConfig
  */
-async function getEffectiveEmailConfig(
+async function findSmtpConfigForForm(
   payload: Payload,
-  formConfigId: string | number | undefined,
-  locale: string
-) {
-  // Get global email config
-  const emailConfig = await payload.findGlobal({
-    slug: 'email-config',
-    locale: (locale || 'en') as 'en' | 'zh',
-  }) as any
+  formConfigId: string | number,
+  locale: string,
+): Promise<any | null> {
+  try {
+    const result = await payload.find({
+      collection: 'smtp-configs' as any,
+      where: {
+        and: [
+          { formConfigs: { in: [formConfigId] } },
+          { status: { equals: 'enabled' } },
+        ],
+      },
+      locale: (locale || 'en') as any,
+      limit: 1,
+    })
 
-  // Get form-specific config if available
-  let formConfig: any = null
-  if (formConfigId) {
-    try {
-      formConfig = await payload.findByID({
-        collection: 'form-configs',
-        id: formConfigId,
-        locale: (locale || 'en') as 'en' | 'zh',
-      })
-    } catch {
-      // Form config not found, use global only
+    if (result.totalDocs === 0) {
+      return null
     }
+
+    return result.docs[0]
+  } catch (error) {
+    console.error('Failed to find SMTP config for form:', error)
+    return null
   }
+}
 
-  // Determine notification emails (form override > global)
-  const notificationEmails = formConfig?.notificationEmails || emailConfig.formNotificationEmails
-
-  // Determine if auto-reply is enabled
-  // Form setting: 'inherit' -> use global, 'enabled' -> true, 'disabled' -> false
-  let autoReplyEnabled = emailConfig.enableAutoReply || false
-  if (formConfig?.autoReplyEnabled === 'enabled') {
-    autoReplyEnabled = true
-  } else if (formConfig?.autoReplyEnabled === 'disabled') {
-    autoReplyEnabled = false
-  }
-  // 'inherit' uses the global setting (already set above)
-
-  // Get auto-reply subject (form override > global)
-  const autoReplySubject = formConfig?.autoReplySubject || emailConfig.autoReplySubject
-
-  // Get auto-reply template (form override > global)
-  const autoReplyTemplate = formConfig?.autoReplyTemplate || emailConfig.autoReplyTemplate
+/**
+ * Build an EmailConfig object from a SmtpConfig document
+ */
+function buildEmailConfig(smtpConfig: any): EmailConfig {
+  const port = Number(smtpConfig.smtpPort) || 587
+  const secure = port === 465
 
   return {
-    // Global settings
-    formNotificationEnabled: emailConfig.formNotificationEnabled || false,
-    notificationEmails,
-    notificationSubject: emailConfig.notificationSubject || 'New Form Submission: {formName}',
-    emailFromAddress: emailConfig.emailFromAddress,
-    emailFromName: emailConfig.emailFromName,
-    // Auto-reply (merged)
-    autoReplyEnabled,
-    autoReplySubject,
-    autoReplyTemplate,
-    // Form config
-    formConfig,
+    smtpHost: smtpConfig.smtpHost,
+    smtpPort: port,
+    smtpSecure: secure,
+    smtpUser: smtpConfig.smtpUser,
+    smtpPassword: smtpConfig.smtpPassword,
+    emailFromAddress: smtpConfig.emailFromAddress || smtpConfig.smtpUser,
+    emailFromName: smtpConfig.emailFromName || 'Busrom',
   }
 }
 
@@ -104,20 +92,28 @@ export async function sendFormNotificationEmail(
     ? submission.formConfig?.id
     : submission.formConfig
 
-  const config = await getEffectiveEmailConfig(payload, formConfigId, locale)
+  if (!formConfigId) {
+    return { success: false, error: 'No form config ID' }
+  }
+
+  // Find the SMTP config for this form
+  const smtpConfig = await findSmtpConfigForForm(payload, formConfigId, locale)
+  if (!smtpConfig) {
+    return { success: false, error: 'No SMTP config found for this form' }
+  }
 
   // Check if notifications are enabled
-  if (!config.formNotificationEnabled) {
+  if (!smtpConfig.notificationEnabled) {
     return { success: false, error: 'Form notifications disabled' }
   }
 
   // Check if there are notification emails configured
-  if (!config.notificationEmails) {
+  if (!smtpConfig.notificationEmails) {
     return { success: false, error: 'No notification emails configured' }
   }
 
   // Parse notification emails
-  const emails = config.notificationEmails
+  const emails = smtpConfig.notificationEmails
     .split(',')
     .map((e: string) => e.trim())
     .filter((e: string) => e)
@@ -127,9 +123,10 @@ export async function sendFormNotificationEmail(
   }
 
   // Build subject
-  const subject = replacePlaceholders(config.notificationSubject, {
-    formName: submission.formName || 'Unknown Form',
-  })
+  const subject = replacePlaceholders(
+    smtpConfig.notificationSubject || 'New Form Submission: {formName}',
+    { formName: submission.formName || 'Unknown Form' },
+  )
 
   // Build HTML content
   const formDataHtml = generateFormDataHtml(submission.data || {})
@@ -164,13 +161,14 @@ export async function sendFormNotificationEmail(
     </html>
   `
 
-  // Send email
-  return sendEmail(payload, {
+  // Build email config and send
+  const emailConfig = buildEmailConfig(smtpConfig)
+  return sendEmail(emailConfig, {
     to: emails,
     subject,
     html,
     replyTo: submission.data?.email,
-  }, locale)
+  })
 }
 
 /**
@@ -193,27 +191,66 @@ export async function sendAutoReplyEmail(
     ? submission.formConfig?.id
     : submission.formConfig
 
-  const config = await getEffectiveEmailConfig(payload, formConfigId, locale)
+  if (!formConfigId) {
+    return { success: false, error: 'No form config ID' }
+  }
 
-  // Check if auto-reply is enabled
-  if (!config.autoReplyEnabled) {
+  // Find the SMTP config for this form
+  const smtpConfig = await findSmtpConfigForForm(payload, formConfigId, locale)
+  if (!smtpConfig) {
+    return { success: false, error: 'No SMTP config found for this form' }
+  }
+
+  // Get form-specific auto-reply settings
+  let formConfig: any = null
+  try {
+    formConfig = await payload.findByID({
+      collection: 'form-configs',
+      id: formConfigId,
+      locale: (locale || 'en') as any,
+    })
+  } catch {
+    // Form config not found
+  }
+
+  // Determine if auto-reply is enabled and which template to use
+  const formAutoReply = formConfig?.autoReplyEnabled || 'inherit'
+
+  let autoReplyEnabled: boolean
+  let autoReplySubject: string | undefined
+  let autoReplyTemplate: any
+
+  if (formAutoReply === 'disabled') {
+    return { success: false, error: 'Auto-reply disabled' }
+  } else if (formAutoReply === 'enabled') {
+    autoReplyEnabled = true
+    // Use form-level subject/template, falling back to SMTP config defaults
+    autoReplySubject = formConfig?.autoReplySubject || smtpConfig.autoReplySubject
+    autoReplyTemplate = formConfig?.autoReplyTemplate || smtpConfig.autoReplyTemplate
+  } else {
+    // 'inherit' — use SMTP config settings
+    autoReplyEnabled = smtpConfig.autoReplyEnabled || false
+    autoReplySubject = smtpConfig.autoReplySubject
+    autoReplyTemplate = smtpConfig.autoReplyTemplate
+  }
+
+  if (!autoReplyEnabled) {
     return { success: false, error: 'Auto-reply disabled' }
   }
 
-  // Check if template exists
-  if (!config.autoReplyTemplate) {
+  if (!autoReplyTemplate) {
     return { success: false, error: 'No auto-reply template configured' }
   }
 
   // Build subject
-  const subject = replacePlaceholders(config.autoReplySubject || 'Thank you for contacting us', {
+  const subject = replacePlaceholders(autoReplySubject || 'Thank you for contacting us', {
     name: submission.data?.name || '',
     email: submitterEmail,
     formName: submission.formName || '',
   })
 
   // Convert rich text template to HTML
-  let templateHtml = lexicalToHtml(config.autoReplyTemplate)
+  let templateHtml = lexicalToHtml(autoReplyTemplate)
 
   // Replace placeholders in template
   templateHtml = replacePlaceholders(templateHtml, {
@@ -243,10 +280,11 @@ export async function sendAutoReplyEmail(
     </html>
   `
 
-  // Send email
-  return sendEmail(payload, {
+  // Build email config and send
+  const emailConfig = buildEmailConfig(smtpConfig)
+  return sendEmail(emailConfig, {
     to: submitterEmail,
     subject,
     html,
-  }, locale)
+  })
 }

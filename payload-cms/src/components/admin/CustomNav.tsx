@@ -321,6 +321,7 @@ export const CustomNav: React.FC = () => {
         <CollapsibleGroup labelKey="forms">
           <NavItem href="/admin/collections/form-configs" labelKey="formConfigs" />
           <NavItem href="/admin/collections/form-submissions" labelKey="formSubmissions" />
+          <NavItem href="/admin/collections/smtp-configs" labelKey="smtpConfigs" />
         </CollapsibleGroup>
 
         {/* Advanced */}
@@ -340,7 +341,6 @@ export const CustomNav: React.FC = () => {
 
         {/* CMS Settings - CMS 配置 */}
         <CollapsibleGroup labelKey="cmsSettings" defaultOpen={false}>
-          <NavItem href="/admin/globals/email-config" labelKey="emailConfig" />
           <NavItem href="/admin/globals/translation-config" labelKey="translationConfig" />
           <NavItem href="/admin/translation-settings" labelKey="myTranslationSettings" />
         </CollapsibleGroup>
