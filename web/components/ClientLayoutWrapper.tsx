@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { SWRConfig } from 'swr';
 import dynamic from 'next/dynamic';
 import type { PreloaderConfigData } from "@/lib/api/preloader-config";
@@ -25,6 +26,14 @@ const fetcher = (resource: string) => fetch(resource).then(res => {
 // sessionStorage key for tracking if preloader has been shown
 const PRELOADER_SHOWN_KEY = 'busrom_preloader_shown';
 
+// 判断是否为首页路径（支持所有语言前缀）
+// "/", "/en", "/zh", "/fr" 等都算首页
+function isHomePage(pathname: string): boolean {
+  // 去掉语言前缀后判断是否为根路径
+  const withoutLocale = pathname.replace(/^\/[a-z]{2}(\/|$)/, '/');
+  return withoutLocale === '/';
+}
+
 interface ClientLayoutWrapperProps {
   children: React.ReactNode;
   preloaderConfig: PreloaderConfigData;
@@ -33,16 +42,24 @@ interface ClientLayoutWrapperProps {
 type LoadingStage = "loading" | "imageWall" | "done";
 
 export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutWrapperProps) {
-  // 初始状态：如果 preloader 禁用则直接 done，否则先设为 loading
-  // 实际的 sessionStorage 检查在 useEffect 中进行，避免 hydration mismatch
+  const pathname = usePathname();
+
+  // 初始状态：只有首页 + preloader 启用时才设为 loading
   const [loadingStage, setLoadingStage] = useState<LoadingStage>(
     preloaderConfig.enabled ? "loading" : "done"
   );
 
-  // 客户端检查 sessionStorage，如果已显示过则跳过 preloader
-  // 也检测 Lighthouse / PageSpeed Insights 测试并跳过
+  // 客户端检查：非首页直接跳过、sessionStorage 已标记跳过、性能测试工具跳过
+  // Preloader 使用 dynamic({ ssr: false })，在 useEffect 执行前不会渲染，
+  // 所以即使 loadingStage 初始为 "loading"，也不会闪烁 preloader 动画
   useEffect(() => {
     if (!preloaderConfig.enabled) return;
+
+    // 非首页 → 直接跳过，不播放 preloader
+    if (!isHomePage(pathname)) {
+      setLoadingStage("done");
+      return;
+    }
 
     // 检测 Lighthouse / PageSpeed Insights (性能测试工具)
     const ua = navigator.userAgent;
@@ -52,13 +69,7 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
       return;
     }
 
-    // 检测 iOS Safari - Three.js WebGL 在某些情况下可能崩溃
-    const isIOSSafari = /iPad|iPhone|iPod/.test(ua) && /Safari/.test(ua) && !/Chrome|CriOS|FxiOS/.test(ua);
-    if (isIOSSafari) {
-      setLoadingStage("done");
-      return;
-    }
-
+    // 当前 session 内已经显示过 → 跳过（语言切换、F5刷新等场景）
     try {
       if (sessionStorage.getItem(PRELOADER_SHOWN_KEY) === 'true') {
         setLoadingStage("done");
@@ -66,7 +77,7 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
     } catch (e) {
       // sessionStorage 不可用，继续显示 preloader
     }
-  }, [preloaderConfig.enabled]);
+  }, [preloaderConfig.enabled, pathname]);
 
   // 标记 preloader 已显示（保存到 sessionStorage）
   const markPreloaderShown = useCallback(() => {

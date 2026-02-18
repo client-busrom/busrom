@@ -267,21 +267,6 @@ const nextConfig = {
     ].join('; ')
 
     return [
-      // Allow search engines and external services to access static assets (favicon, images, fonts)
-      {
-        source: '/favicon.ico',
-        headers: [
-          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
-          { key: 'Cache-Control', value: 'public, max-age=86400' },
-        ],
-      },
-      {
-        source: '/favicon-gold-b.svg',
-        headers: [
-          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
-          { key: 'Cache-Control', value: 'public, max-age=86400' },
-        ],
-      },
       {
         source: '/:path*',
         headers: [
@@ -342,6 +327,22 @@ const nextConfig = {
             key: 'Vary',
             value: 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch',
           },
+        ],
+      },
+      // Favicon: allow cross-origin access for search engines (Bing, Google etc.)
+      // Must come AFTER /:path* so cross-origin overrides same-origin
+      {
+        source: '/favicon.ico',
+        headers: [
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+          { key: 'Cache-Control', value: 'public, max-age=86400' },
+        ],
+      },
+      {
+        source: '/favicon-gold-b.svg',
+        headers: [
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+          { key: 'Cache-Control', value: 'public, max-age=86400' },
         ],
       },
     ]
