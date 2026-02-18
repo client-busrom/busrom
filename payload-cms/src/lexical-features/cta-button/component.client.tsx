@@ -250,6 +250,7 @@ export const CtaButtonComponent: React.FC<CtaButtonComponentProps> = (props) => 
               type="text"
               value={formData.text || ''}
               onChange={(e) => setFormData({ ...formData, text: e.target.value })}
+              onKeyDown={(e) => e.stopPropagation()}
               placeholder={i18n?.language === 'zh' ? '输入按钮文字' : 'Enter button text'}
               style={{
                 width: '100%',
@@ -272,6 +273,7 @@ export const CtaButtonComponent: React.FC<CtaButtonComponentProps> = (props) => 
                 type="text"
                 value={formData.url || ''}
                 onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                onKeyDown={(e) => e.stopPropagation()}
                 placeholder="https://example.com 或 /pages/about"
                 style={{
                   width: '100%',

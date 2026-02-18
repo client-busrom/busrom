@@ -22,7 +22,7 @@ interface DocumentTemplate {
   key: string
   name: string
   description?: string
-  category: string
+  category: string | { id: string; name: string; slug: string }
   content?: any
   status: string
   usageCount?: number

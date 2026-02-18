@@ -746,6 +746,7 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                             type="text"
                             value={item.buttonText}
                             onChange={(e) => handleUpdateItem(index, { buttonText: e.target.value })}
+                            onKeyDown={(e) => e.stopPropagation()}
                             style={{
                               width: '100%',
                               padding: '8px 10px',
@@ -847,6 +848,7 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                     type="number"
                     value={localData.interval}
                     onChange={(e) => setLocalData({ ...localData, interval: Math.max(1, Math.min(30, Number(e.target.value))) })}
+                    onKeyDown={(e) => e.stopPropagation()}
                     min={1}
                     max={30}
                     style={{
@@ -1137,6 +1139,7 @@ const ProductPickerModal: React.FC<ProductPickerModalProps> = ({ isOpen, onClose
             type="text"
             value={searchTerm}
             onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1) }}
+            onKeyDown={(e) => e.stopPropagation()}
             placeholder={i18n?.language === 'zh' ? '搜索产品...' : 'Search products...'}
             style={{ width: '100%', padding: '10px 12px 10px 40px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
           />
@@ -1303,6 +1306,7 @@ const SeriesPickerModal: React.FC<SeriesPickerModalProps> = ({ isOpen, onClose, 
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => e.stopPropagation()}
             placeholder={i18n?.language === 'zh' ? '搜索系列...' : 'Search series...'}
             style={{ width: '100%', padding: '10px 12px 10px 40px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '14px' }}
           />

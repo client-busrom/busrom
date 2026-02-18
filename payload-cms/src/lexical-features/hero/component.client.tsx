@@ -215,6 +215,7 @@ export const HeroComponent: React.FC<HeroComponentProps> = (props) => {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onKeyDown={(e) => e.stopPropagation()}
               placeholder={i18n?.language === 'zh' ? '输入标题' : 'Enter title'}
               style={{
                 width: '100%',
@@ -234,6 +235,7 @@ export const HeroComponent: React.FC<HeroComponentProps> = (props) => {
             <textarea
               value={formData.subtitle || ''}
               onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
+              onKeyDown={(e) => e.stopPropagation()}
               placeholder={i18n?.language === 'zh' ? '输入副标题' : 'Enter subtitle'}
               rows={3}
               style={{
@@ -313,6 +315,7 @@ export const HeroComponent: React.FC<HeroComponentProps> = (props) => {
               type="text"
               value={formData.ctaText || ''}
               onChange={(e) => setFormData({ ...formData, ctaText: e.target.value })}
+              onKeyDown={(e) => e.stopPropagation()}
               placeholder={i18n?.language === 'zh' ? '输入按钮文字' : 'Enter button text'}
               style={{
                 width: '100%',
@@ -334,6 +337,7 @@ export const HeroComponent: React.FC<HeroComponentProps> = (props) => {
                 type="text"
                 value={formData.ctaUrl || ''}
                 onChange={(e) => setFormData({ ...formData, ctaUrl: e.target.value })}
+                onKeyDown={(e) => e.stopPropagation()}
                 placeholder="https://example.com 或 /pages/about"
                 style={{
                   width: '100%',

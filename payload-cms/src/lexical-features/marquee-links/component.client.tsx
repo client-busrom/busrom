@@ -163,6 +163,7 @@ const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClose, onSe
               setSearchQuery(e.target.value)
               setCurrentPage(1)
             }}
+            onKeyDown={(e) => e.stopPropagation()}
             style={{
               width: '100%',
               padding: '8px',
@@ -526,6 +527,7 @@ export const MarqueeLinksComponent: React.FC<MarqueeLinksComponentProps> = ({ no
                       type="text"
                       value={link.title}
                       onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
+                      onKeyDown={(e) => e.stopPropagation()}
                       onMouseDown={(e) => e.stopPropagation()}
                       onDragStart={(e) => e.stopPropagation()}
                       placeholder={i18n?.language === 'zh' ? '链接标题' : 'Link Title'}
@@ -544,6 +546,7 @@ export const MarqueeLinksComponent: React.FC<MarqueeLinksComponentProps> = ({ no
                       type="text"
                       value={link.url}
                       onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
+                      onKeyDown={(e) => e.stopPropagation()}
                       onMouseDown={(e) => e.stopPropagation()}
                       onDragStart={(e) => e.stopPropagation()}
                       placeholder={i18n?.language === 'zh' ? '链接地址' : 'Link URL'}
