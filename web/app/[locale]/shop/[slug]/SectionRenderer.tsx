@@ -37,18 +37,16 @@ interface SectionRendererProps {
   section: ParsedSection
   sectionIndex: number
   locale: Locale
-  productAttributes?: any[]
 }
 
 export function SectionRenderer({
   section,
   sectionIndex,
   locale,
-  productAttributes = [],
 }: SectionRendererProps) {
   // Product Attributes Section
   if (section.id === 'product-attributes') {
-    const data = parseProductAttributesData(section.content, productAttributes)
+    const data = parseProductAttributesData(section.content)
     return (
       <ProductAttributesSection
         key={sectionIndex}

@@ -5,20 +5,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
-import {
-  Box,
-  Ruler,
-  RotateCcw,
-  Palette,
-  Sparkles,
-  Layers,
-  Settings,
-  Wrench,
-  Shield,
-  Zap,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react"
+import { ChevronLeft, ChevronRight, Zap } from "lucide-react"
+import { IconifyIcon } from "@/components/ui/IconifyIcon"
 
 // Design reference dimensions (from Figma 1920x712 for this section)
 const DESIGN_WIDTH = 1920
@@ -36,7 +24,7 @@ interface MediaObject {
 }
 
 interface AttributeCard {
-  icon?: MediaObject | string
+  icon?: string
   title: string
   description: string
 }
@@ -63,19 +51,12 @@ const CARD_COLORS = [
   "rgb(228, 218, 183)", // #E4DAB7
 ]
 
-// Map attribute titles to lucide icons
-const getIconForAttribute = (title: string) => {
-  const lowerTitle = title.toLowerCase()
-  if (lowerTitle.includes('material')) return Box
-  if (lowerTitle.includes('thickness') || lowerTitle.includes('size')) return Ruler
-  if (lowerTitle.includes('angle') || lowerTitle.includes('style')) return RotateCcw
-  if (lowerTitle.includes('surface') || lowerTitle.includes('color')) return Palette
-  if (lowerTitle.includes('process') || lowerTitle.includes('treatment')) return Sparkles
-  if (lowerTitle.includes('layer')) return Layers
-  if (lowerTitle.includes('setting')) return Settings
-  if (lowerTitle.includes('tool')) return Wrench
-  if (lowerTitle.includes('protect') || lowerTitle.includes('safe')) return Shield
-  return Zap // Default icon
+// Render icon: Iconify icon name or fallback to default Zap icon
+const AttributeIcon = ({ icon, className, style }: { icon?: string; className?: string; style?: React.CSSProperties }) => {
+  if (icon) {
+    return <IconifyIcon name={icon} className={className} style={style} />
+  }
+  return <Zap className={className} style={style} strokeWidth={1.5} />
 }
 
 export function ProductAttributesSection({
@@ -230,8 +211,6 @@ export function ProductAttributesSection({
               onTouchEnd={() => handleDragEnd(false)}
             >
               {attributes.map((attr, index) => {
-                const IconComponent = getIconForAttribute(attr.title)
-
                 return (
                   <motion.div
                     key={index}
@@ -258,13 +237,13 @@ export function ProductAttributesSection({
                         backgroundColor: "#C8BC8B",
                       }}
                     >
-                      <IconComponent
+                      <AttributeIcon
+                        icon={attr.icon}
                         className="text-white"
                         style={{
                           width: rpx(48),
                           height: rpx(48),
                         }}
-                        strokeWidth={1.5}
                       />
                     </div>
 
@@ -429,8 +408,6 @@ export function ProductAttributesSection({
             onTouchEnd={() => handleDragEnd(true)}
           >
             {attributes.map((attr, index) => {
-              const IconComponent = getIconForAttribute(attr.title)
-
               return (
                 <motion.div
                   key={index}
@@ -449,7 +426,7 @@ export function ProductAttributesSection({
                     className="flex items-center justify-center rounded-full w-12 h-12 mb-4"
                     style={{ backgroundColor: "#C8BC8B" }}
                   >
-                    <IconComponent className="text-white w-6 h-6" strokeWidth={1.5} />
+                    <AttributeIcon icon={attr.icon} className="text-white w-6 h-6" />
                   </div>
 
                   {/* Title */}

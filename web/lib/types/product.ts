@@ -7,14 +7,6 @@
 import { ImageObject } from "../content-data"
 
 /**
- * Product Attribute - Multilingual key-value pair
- */
-export interface ProductAttribute {
-  key: Record<string, string> // { en: "Material", zh: "材质", ... }
-  value: Record<string, string> // { en: "Stainless Steel", zh: "不锈钢", ... }
-}
-
-/**
  * Product Specification Variant (e.g., color, size options)
  */
 export interface ProductSpecification {
@@ -50,8 +42,7 @@ export interface Product {
   // Content translations (relational)
   contentTranslations?: ProductContentTranslation[]
 
-  // Attributes and specifications
-  attributes?: ProductAttribute[]
+  // Specifications
   specifications?: ProductSpecification[]
 
   // Images

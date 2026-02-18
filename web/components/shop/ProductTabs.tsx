@@ -2,11 +2,9 @@
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import type { ProductAttribute } from "@/lib/types/product"
-
 interface ProductTabsProps {
   description: any // Document JSON
-  attributes?: ProductAttribute[]
+  attributes?: Array<{ key?: Record<string, string>; value?: Record<string, string> }>
   specifications?: any
   locale: string
 }
