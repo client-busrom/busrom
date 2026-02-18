@@ -148,6 +148,7 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
               setSearchQuery(e.target.value)
               setCurrentPage(1)
             }}
+            onKeyDown={(e) => e.stopPropagation()}
             style={{
               width: '100%',
               padding: '8px',

@@ -206,6 +206,7 @@ export const VideoEmbedComponent: React.FC<VideoEmbedComponentProps> = (props) =
               type="text"
               value={formData.url || ''}
               onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+              onKeyDown={(e) => e.stopPropagation()}
               placeholder="https://www.youtube.com/watch?v=..."
               style={{
                 width: '100%',
@@ -231,6 +232,7 @@ export const VideoEmbedComponent: React.FC<VideoEmbedComponentProps> = (props) =
               type="text"
               value={formData.caption || ''}
               onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
+              onKeyDown={(e) => e.stopPropagation()}
               placeholder={i18n?.language === 'zh' ? '输入视频说明（可选）' : 'Enter caption (optional)'}
               style={{
                 width: '100%',

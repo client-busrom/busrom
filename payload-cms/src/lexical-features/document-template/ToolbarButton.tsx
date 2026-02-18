@@ -19,7 +19,7 @@ interface DocumentTemplate {
   key: string
   name: string
   description?: string
-  category: string
+  category: string | { id: string; name: string; slug: string }
   status: string
   usageCount?: number
   content?: any
@@ -35,31 +35,37 @@ export const ToolbarButton: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
 
-  // Load templates when modal opens
+  const [categories, setCategories] = useState<{ id: string; name: string; label?: string; slug: string }[]>([])
+
+  // Load templates and categories when modal opens
   useEffect(() => {
     if (!isOpen) return
 
-    const loadTemplates = async () => {
+    const loadData = async () => {
       setIsLoading(true)
       try {
-        console.log('🔍 Loading templates...')
-        const res = await fetch('/api/document-templates?where[status][equals]=active&limit=100&sort=-updatedAt')
-        if (res.ok) {
-          const data = await res.json()
-          console.log('✅ Templates loaded:', data.docs?.length || 0)
-          console.log('📋 Templates:', data.docs)
+        const [templatesRes, categoriesRes] = await Promise.all([
+          fetch('/api/document-templates?where[status][equals]=active&limit=100&sort=-updatedAt&depth=1'),
+          fetch('/api/template-categories?limit=100&sort=order'),
+        ])
+
+        if (templatesRes.ok) {
+          const data = await templatesRes.json()
           setTemplates(data.docs || [])
-        } else {
-          console.error('❌ Failed to load templates, status:', res.status)
+        }
+
+        if (categoriesRes.ok) {
+          const data = await categoriesRes.json()
+          setCategories(data.docs || [])
         }
       } catch (error) {
-        console.error('❌ Failed to load document templates:', error)
+        console.error('Failed to load document templates:', error)
       } finally {
         setIsLoading(false)
       }
     }
 
-    loadTemplates()
+    loadData()
   }, [isOpen])
 
   const handleInsertTemplate = async (template: DocumentTemplate) => {
@@ -176,20 +182,17 @@ export const ToolbarButton: React.FC = () => {
     setIsOpen(false)
   }
 
-  const categories = [
+  const categoryOptions = [
     { value: 'all', label: i18n.language === 'zh' ? '全部' : 'All' },
-    { value: 'product-intro', label: i18n.language === 'zh' ? '产品介绍' : 'Product Introduction' },
-    { value: 'feature', label: i18n.language === 'zh' ? '功能特点' : 'Feature Section' },
-    { value: 'faq', label: i18n.language === 'zh' ? '常见问题' : 'FAQ Section' },
-    { value: 'testimonial', label: i18n.language === 'zh' ? '客户评价' : 'Testimonial' },
-    { value: 'cta', label: i18n.language === 'zh' ? '行动召唤' : 'Call to Action' },
-    { value: 'comparison', label: i18n.language === 'zh' ? '对比表格' : 'Comparison Table' },
-    { value: 'other', label: i18n.language === 'zh' ? '其他' : 'Other' },
+    ...categories.map(cat => ({ value: cat.id, label: cat.label || cat.name })),
   ]
 
   const filteredTemplates = selectedCategory === 'all'
     ? templates
-    : templates.filter(t => t.category === selectedCategory)
+    : templates.filter(t => {
+        const catId = typeof t.category === 'object' ? t.category?.id : t.category
+        return catId === selectedCategory
+      })
 
   console.log('[DocumentTemplateToolbarButton] Rendering button')
 
@@ -295,7 +298,7 @@ export const ToolbarButton: React.FC = () => {
               gap: '8px',
               flexWrap: 'wrap',
             }}>
-              {categories.map(cat => (
+              {categoryOptions.map(cat => (
                 <button
                   key={cat.value}
                   type="button"

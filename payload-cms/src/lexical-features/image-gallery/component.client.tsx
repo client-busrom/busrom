@@ -79,6 +79,18 @@ const getTranslation = (key: string, t: any, i18n: any) => {
       sceneNumber: '场景编号',
       imageNumber: '图片编号',
       seriesNumber: '系列编号',
+      specsFilter: '规格筛选',
+      specsValue: '规格值',
+      specsColor: '颜色',
+      specsMaterial: '材质',
+      specsSize: '尺寸',
+      specsFinish: '表面处理',
+      specsModel: '型号',
+      specsSeries: '系列',
+      specsStyle: '款式',
+      specsCustom: '自定义',
+      specsKeyName: '属性名',
+      specs: '规格',
       category: '分类',
       tag: '标签',
       type: '类型',
@@ -143,6 +155,18 @@ const getTranslation = (key: string, t: any, i18n: any) => {
       sceneNumber: 'Scene Number',
       imageNumber: 'Image Number',
       seriesNumber: 'Series Number',
+      specsFilter: 'Specs Filter',
+      specsValue: 'Specs value',
+      specsColor: 'Color',
+      specsMaterial: 'Material',
+      specsSize: 'Size',
+      specsFinish: 'Finish',
+      specsModel: 'Model',
+      specsSeries: 'Series',
+      specsStyle: 'Style',
+      specsCustom: 'Custom',
+      specsKeyName: 'Key name',
+      specs: 'Specs',
       category: 'Category',
       tag: 'Tag',
       type: 'Type',
@@ -347,6 +371,7 @@ const SortableImageItem: React.FC<SortableImageItemProps> = ({
             placeholder={getTranslation('imageCaption', t, i18n)}
             value={item.caption || ''}
             onChange={(e) => onCaptionChange(e.target.value)}
+            onKeyDown={(e) => e.stopPropagation()}
             style={{
               width: '100%',
               padding: '8px 12px',
@@ -383,6 +408,7 @@ const SortableImageItem: React.FC<SortableImageItemProps> = ({
                   type="text"
                   value={item.linkUrl || ''}
                   onChange={(e) => onFieldChange('linkUrl', e.target.value)}
+                  onKeyDown={(e) => e.stopPropagation()}
                   placeholder={getTranslation('linkUrlPlaceholder', t, i18n)}
                   style={{
                     width: '100%',
@@ -516,7 +542,9 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
   const [groupNumber, setGroupNumber] = useState<string>('')
   const [sceneNumber, setSceneNumber] = useState<string>('')
   const [imageNumber, setImageNumber] = useState<string>('')
-  const [seriesNumber, setSeriesNumber] = useState<string>('')
+  const [specsKey, setSpecsKey] = useState<string>('')
+  const [specsCustomKey, setSpecsCustomKey] = useState<string>('')
+  const [specsValue, setSpecsValue] = useState<string>('')
 
   // 获取分类列表
   const fetchCategories = useCallback(async () => {
@@ -544,50 +572,51 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
   const fetchMedia = useCallback(async () => {
     setLoading(true)
     try {
-      const params = new URLSearchParams({
-        limit: '12',
-        page: page.toString(),
-        sort: '-createdAt',
-        depth: '0',
-        'where[status][equals]': 'active',
-      })
+      const actualSpecsKey = specsKey === '__custom' ? specsCustomKey : specsKey
+      const useSpecsSearch = !!actualSpecsKey
 
-      // MIME类型筛选
-      if (mimeTypeFilter) {
-        params.append('where[mimeType][contains]', mimeTypeFilter)
-      }
+      let res: Response
+      let data: any
 
-      // 搜索
-      if (search) {
-        params.append('where[filename][contains]', search)
-      }
+      if (useSpecsSearch) {
+        // Use custom endpoint for JSONB specs querying
+        const params = new URLSearchParams({
+          limit: '12',
+          page: page.toString(),
+          sort: '-createdAt',
+          specsKey: actualSpecsKey,
+        })
+        if (specsValue) params.set('specsValue', specsValue)
+        if (search) params.set('search', search)
+        if (selectedCategory) params.set('category', selectedCategory)
+        if (selectedTag) params.set('tag', selectedTag)
+        if (mimeTypeFilter) params.set('mimeType', mimeTypeFilter)
+        if (groupNumber) params.set('group', groupNumber)
+        if (sceneNumber) params.set('sceneNumber', sceneNumber)
+        if (imageNumber) params.set('imageNumber', imageNumber)
 
-      // 分类筛选
-      if (selectedCategory) {
-        params.append('where[primaryCategory][equals]', selectedCategory)
-      }
+        res = await fetch(`/api/media-search?${params.toString()}`)
+        data = await res.json()
+      } else {
+        // Use standard Payload REST API
+        const params = new URLSearchParams({
+          limit: '12',
+          page: page.toString(),
+          sort: '-createdAt',
+          depth: '0',
+          'where[status][equals]': 'active',
+        })
+        if (mimeTypeFilter) params.append('where[mimeType][contains]', mimeTypeFilter)
+        if (search) params.append('where[filename][contains]', search)
+        if (selectedCategory) params.append('where[primaryCategory][equals]', selectedCategory)
+        if (selectedTag) params.append('where[tags][in]', selectedTag)
+        if (groupNumber) params.append('where[metadata.group][equals]', groupNumber)
+        if (sceneNumber) params.append('where[metadata.sceneNumber][equals]', sceneNumber)
+        if (imageNumber) params.append('where[metadata.imageNumber][equals]', imageNumber)
 
-      // 标签筛选
-      if (selectedTag) {
-        params.append('where[tags][in]', selectedTag)
+        res = await fetch(`/api/media?${params.toString()}`)
+        data = await res.json()
       }
-
-      // Metadata 筛选
-      if (groupNumber) {
-        params.append('where[metadata.group][equals]', groupNumber)
-      }
-      if (sceneNumber) {
-        params.append('where[metadata.sceneNumber][equals]', sceneNumber)
-      }
-      if (imageNumber) {
-        params.append('where[metadata.imageNumber][equals]', imageNumber)
-      }
-      if (seriesNumber) {
-        params.append('where[metadata.specs.value][contains]', seriesNumber)
-      }
-
-      const res = await fetch(`/api/media?${params.toString()}`)
-      const data = await res.json()
 
       setMedia(data.docs || [])
       setTotalPages(data.totalPages || 1)
@@ -596,7 +625,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
     } finally {
       setLoading(false)
     }
-  }, [page, search, selectedCategory, selectedTag, mimeTypeFilter, groupNumber, sceneNumber, imageNumber, seriesNumber])
+  }, [page, search, selectedCategory, selectedTag, mimeTypeFilter, groupNumber, sceneNumber, imageNumber, specsKey, specsCustomKey, specsValue])
 
   useEffect(() => {
     if (isOpen) {
@@ -698,6 +727,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
               setSearch(e.target.value)
               setPage(1)
             }}
+            onKeyDown={(e) => e.stopPropagation()}
             style={{
               width: '100%',
               padding: '8px 12px',
@@ -782,7 +812,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
           </div>
 
           {/* 第二行筛选器 - Metadata */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '12px' }}>
             {/* 分组编号 */}
             <input
               type="number"
@@ -792,6 +822,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                 setGroupNumber(e.target.value)
                 setPage(1)
               }}
+              onKeyDown={(e) => e.stopPropagation()}
               style={{
                 padding: '8px 12px',
                 border: '1px solid #d1d5db',
@@ -809,6 +840,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                 setSceneNumber(e.target.value)
                 setPage(1)
               }}
+              onKeyDown={(e) => e.stopPropagation()}
               style={{
                 padding: '8px 12px',
                 border: '1px solid #d1d5db',
@@ -826,23 +858,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                 setImageNumber(e.target.value)
                 setPage(1)
               }}
-              style={{
-                padding: '8px 12px',
-                border: '1px solid #d1d5db',
-                borderRadius: '4px',
-                fontSize: '14px',
-              }}
-            />
-
-            {/* 系列编号 */}
-            <input
-              type="text"
-              placeholder={getTranslation('seriesNumber', t, i18n)}
-              value={seriesNumber}
-              onChange={(e) => {
-                setSeriesNumber(e.target.value)
-                setPage(1)
-              }}
+              onKeyDown={(e) => e.stopPropagation()}
               style={{
                 padding: '8px 12px',
                 border: '1px solid #d1d5db',
@@ -852,8 +868,81 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
             />
           </div>
 
+          {/* 第三行筛选器 - Specs 规格 */}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <select
+              value={specsKey === '__custom' ? '__custom' : specsKey}
+              onChange={(e) => {
+                const val = e.target.value
+                setSpecsKey(val)
+                if (!val) { setSpecsValue(''); setSpecsCustomKey('') }
+                setPage(1)
+              }}
+              style={{
+                padding: '8px 12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '4px',
+                fontSize: '14px',
+                backgroundColor: 'white',
+                cursor: 'pointer',
+                flex: '0 0 auto',
+                minWidth: '140px',
+              }}
+            >
+              <option value="">{getTranslation('specsFilter', t, i18n)}...</option>
+              <option value="color">{getTranslation('specsColor', t, i18n)}</option>
+              <option value="material">{getTranslation('specsMaterial', t, i18n)}</option>
+              <option value="size">{getTranslation('specsSize', t, i18n)}</option>
+              <option value="finish">{getTranslation('specsFinish', t, i18n)}</option>
+              <option value="model">{getTranslation('specsModel', t, i18n)}</option>
+              <option value="series">{getTranslation('specsSeries', t, i18n)}</option>
+              <option value="style">{getTranslation('specsStyle', t, i18n)}</option>
+              <option value="__custom">{getTranslation('specsCustom', t, i18n)}...</option>
+            </select>
+
+            {specsKey === '__custom' && (
+              <input
+                type="text"
+                placeholder={getTranslation('specsKeyName', t, i18n) + '...'}
+                value={specsCustomKey}
+                onChange={(e) => {
+                  setSpecsCustomKey(e.target.value)
+                  setPage(1)
+                }}
+                onKeyDown={(e) => e.stopPropagation()}
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  flex: 1,
+                }}
+              />
+            )}
+
+            {specsKey && (
+              <input
+                type="text"
+                placeholder={getTranslation('specsValue', t, i18n) + '...'}
+                value={specsValue}
+                onChange={(e) => {
+                  setSpecsValue(e.target.value)
+                  setPage(1)
+                }}
+                onKeyDown={(e) => e.stopPropagation()}
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  flex: 1,
+                }}
+              />
+            )}
+          </div>
+
           {/* 已选筛选器标签 */}
-          {(selectedCategory || selectedTag || (mimeTypeFilter && mimeTypeFilter !== 'image') || groupNumber || sceneNumber || imageNumber || seriesNumber) && (
+          {(selectedCategory || selectedTag || (mimeTypeFilter && mimeTypeFilter !== 'image') || groupNumber || sceneNumber || imageNumber || specsKey) && (
             <div style={{ marginTop: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {selectedCategory && (
                 <span
@@ -1059,7 +1148,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                   </button>
                 </span>
               )}
-              {seriesNumber && (
+              {specsKey && (
                 <span
                   style={{
                     display: 'inline-flex',
@@ -1072,10 +1161,12 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                     fontSize: '12px',
                   }}
                 >
-                  {getTranslation('series', t, i18n)}: {seriesNumber}
+                  {getTranslation('specs', t, i18n)}: {specsKey === '__custom' ? specsCustomKey : getTranslation(`specs${specsKey.charAt(0).toUpperCase() + specsKey.slice(1)}`, t, i18n)}{specsValue ? ` = ${specsValue}` : ''}
                   <button
                     onClick={() => {
-                      setSeriesNumber('')
+                      setSpecsKey('')
+                      setSpecsCustomKey('')
+                      setSpecsValue('')
                       setPage(1)
                     }}
                     style={{
@@ -1469,6 +1560,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
                 max={totalPages}
                 defaultValue={page}
                 onKeyDown={(e) => {
+                  e.stopPropagation()
                   if (e.key === 'Enter') {
                     const value = parseInt((e.target as HTMLInputElement).value)
                     if (value >= 1 && value <= totalPages) {
@@ -2020,6 +2112,7 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
                       placeholder={getTranslation('imageCaption', t, i18n)}
                       value={item.caption || ''}
                       onChange={(e) => handleUpdateCaption(index, e.target.value)}
+                      onKeyDown={(e) => e.stopPropagation()}
                       style={{
                         width: '100%',
                         padding: '8px',
@@ -2046,6 +2139,7 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
                             type="text"
                             value={item.linkUrl || ''}
                             onChange={(e) => handleUpdateImageField(index, 'linkUrl', e.target.value)}
+                            onKeyDown={(e) => e.stopPropagation()}
                             placeholder={getTranslation('linkUrlPlaceholder', t, i18n)}
                             style={{
                               width: '100%',

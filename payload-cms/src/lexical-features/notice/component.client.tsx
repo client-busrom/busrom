@@ -219,6 +219,7 @@ export const NoticeComponent: React.FC<NoticeComponentProps> = (props) => {
               type="text"
               value={formData.title || ''}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onKeyDown={(e) => e.stopPropagation()}
               placeholder={i18n?.language === 'zh' ? '输入标题' : 'Enter title'}
               style={{
                 width: '100%',
@@ -239,6 +240,7 @@ export const NoticeComponent: React.FC<NoticeComponentProps> = (props) => {
             <textarea
               value={formData.content || ''}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+              onKeyDown={(e) => e.stopPropagation()}
               placeholder={i18n?.language === 'zh' ? '输入内容' : 'Enter content'}
               rows={4}
               style={{

@@ -274,6 +274,7 @@ export const SingleImageComponent: React.FC<SingleImageComponentProps> = (props)
               type="text"
               value={formData.caption || ''}
               onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
+              onKeyDown={(e) => e.stopPropagation()}
               placeholder={i18n?.language === 'zh' ? '输入图片说明（可选）' : 'Enter caption (optional)'}
               style={{
                 width: '100%',
@@ -354,6 +355,7 @@ export const SingleImageComponent: React.FC<SingleImageComponentProps> = (props)
                     type="text"
                     value={formData.linkUrl || ''}
                     onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })}
+                    onKeyDown={(e) => e.stopPropagation()}
                     placeholder={i18n?.language === 'zh' ? '输入链接地址' : 'Enter link URL'}
                     style={{
                       width: '100%',

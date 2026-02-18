@@ -329,6 +329,7 @@ export const ApplicationCarouselComponent: React.FC<ApplicationCarouselComponent
               type="number"
               value={localData.interval}
               onChange={(e) => setLocalData({ ...localData, interval: Math.max(1, Math.min(30, Number(e.target.value))) })}
+              onKeyDown={(e) => e.stopPropagation()}
               min={1}
               max={30}
               style={{ width: '100%', padding: '6px 8px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px' }}
@@ -668,6 +669,7 @@ const ApplicationPickerModal: React.FC<ApplicationPickerModalProps> = ({ isOpen,
               setSearchTerm(e.target.value)
               setCurrentPage(1)
             }}
+            onKeyDown={(e) => e.stopPropagation()}
             placeholder={i18n?.language === 'zh' ? '搜索应用...' : 'Search applications...'}
             style={{
               width: '100%',

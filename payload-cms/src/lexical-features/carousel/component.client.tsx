@@ -398,6 +398,7 @@ export const CarouselComponent: React.FC<CarouselComponentProps> = ({ nodeKey, d
               type="number"
               value={localData.interval}
               onChange={(e) => setLocalData({ ...localData, interval: Math.max(1, Math.min(30, Number(e.target.value))) })}
+              onKeyDown={(e) => e.stopPropagation()}
               min={1}
               max={30}
               style={{ width: '100%', padding: '6px 8px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px' }}
@@ -742,6 +743,7 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
               setSearchTerm(e.target.value)
               setCurrentPage(1)
             }}
+            onKeyDown={(e) => e.stopPropagation()}
             placeholder={i18n?.language === 'zh' ? '搜索标题或 slug...' : 'Search by title or slug...'}
             style={{
               width: '100%',

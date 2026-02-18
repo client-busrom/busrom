@@ -206,6 +206,7 @@ export const LinkJumpComponent: React.FC<LinkJumpComponentProps> = (props) => {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onKeyDown={(e) => e.stopPropagation()}
               placeholder={i18n?.language === 'zh' ? '输入链接标题' : 'Enter link title'}
               style={{
                 width: '100%',
@@ -225,6 +226,7 @@ export const LinkJumpComponent: React.FC<LinkJumpComponentProps> = (props) => {
             <textarea
               value={formData.description || ''}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onKeyDown={(e) => e.stopPropagation()}
               placeholder={i18n?.language === 'zh' ? '输入链接描述' : 'Enter link description'}
               rows={3}
               style={{
@@ -248,6 +250,7 @@ export const LinkJumpComponent: React.FC<LinkJumpComponentProps> = (props) => {
                 type="text"
                 value={formData.url}
                 onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                onKeyDown={(e) => e.stopPropagation()}
                 placeholder="https://example.com 或 /pages/about"
                 style={{
                   width: '100%',
