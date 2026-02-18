@@ -257,6 +257,61 @@ function populateMediaFromCache(node: any, cache: Map<string, any>): any {
 }
 
 /**
+ * Expand reusableBlock nodes in Lexical content by fetching the referenced
+ * reusable block and splicing its children into the parent array.
+ * This runs before populateLexicalImages so expanded content gets image population.
+ */
+async function expandReusableBlocks(content: any, locale: string): Promise<any> {
+  if (!content?.root?.children) return content
+
+  const result = { ...content, root: { ...content.root } }
+  result.root.children = await expandChildren(result.root.children, locale)
+  return result
+}
+
+async function expandChildren(children: any[], locale: string): Promise<any[]> {
+  const expanded: any[] = []
+
+  for (const node of children) {
+    if (node?.type === 'reusableBlock') {
+      const blockData = node.data?.reusableBlock
+      const blockId = typeof blockData === 'object' ? blockData?.id : blockData
+      if (!blockId) continue
+
+      try {
+        const res = await fetch(
+          `${CMS_URL}/api/reusable-blocks/${blockId}?locale=${locale}&depth=1`
+        )
+        if (res.ok) {
+          const block = await res.json()
+          const blockChildren = block?.contentTranslation?.root?.children
+          if (Array.isArray(blockChildren) && blockChildren.length > 0) {
+            // Recursively expand in case of nested reusableBlocks
+            const nestedExpanded = await expandChildren(blockChildren, locale)
+            expanded.push(...nestedExpanded)
+            continue
+          }
+        }
+      } catch (err) {
+        console.error(`[expandReusableBlocks] Failed to fetch reusable block ${blockId}:`, err)
+      }
+      // If fetch failed or no content, skip the node
+      continue
+    }
+
+    // Recursively handle children of non-reusableBlock nodes
+    if (Array.isArray(node?.children) && node.children.length > 0) {
+      const expandedNode = { ...node, children: await expandChildren(node.children, locale) }
+      expanded.push(expandedNode)
+    } else {
+      expanded.push(node)
+    }
+  }
+
+  return expanded
+}
+
+/**
  * Populate all image references in Lexical content
  * Optimized: collects all IDs first, fetches in parallel, then populates
  */
@@ -323,8 +378,11 @@ export async function GET(
     const product = productData.docs[0]
     console.log('[Product Detail API] Product found:', product.id)
 
-    // Populate image references in Lexical content (optimized: parallel fetch)
+    // Expand reusableBlock nodes, then populate image references
     if (product.contentTranslation) {
+      console.log('[Product Detail API] Expanding reusable blocks...')
+      product.contentTranslation = await expandReusableBlocks(product.contentTranslation, locale)
+
       console.log('[Product Detail API] Populating Lexical images...')
       const { content, mediaCount } = await populateLexicalImages(product.contentTranslation)
       product.contentTranslation = content

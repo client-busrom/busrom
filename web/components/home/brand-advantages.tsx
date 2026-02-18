@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { OptimizedBackgroundImage } from "@/components/ui/OptimizedImage";
+import { IconifyIcon } from "@/components/ui/IconifyIcon";
 import Image from "next/image";
 import type { HomeContent } from "@/lib/content-data";
 import { cn } from "@/lib/utils";
@@ -65,6 +66,13 @@ const SECTION_TITLE = {
   fontSize: 60,     // 字体大小 (px, 基于 1920)
   lineHeight: 1.1,  // 行高
 };
+
+/**
+ * Check if a CMS icon value is valid (not empty / not default placeholder)
+ */
+function isValidCmsIcon(icon: string | undefined): icon is string {
+  return !!icon && icon !== 'lucide:sparkles'
+}
 
 export default function BrandAdvantages({ data }: Props) {
   const isMobile = useIsMobile(); // ⬅️ 引入移动端判断
@@ -246,15 +254,19 @@ export default function BrandAdvantages({ data }: Props) {
                         )}
                       />
 
-                      {/* 图标 */}
-                      <div className="w-8 h-8 flex-shrink-0 relative z-10">
-                        <Image
-                          src={`/brand-adv-${iconIndex}.svg`}
-                          alt={`Advantage ${iconIndex}`}
-                          width={32}
-                          height={32}
-                          className="w-full h-full"
-                        />
+                      {/* 图标 - CMS有值则用Iconify，否则用默认SVG */}
+                      <div className="w-8 h-8 flex-shrink-0 relative z-10 flex items-center justify-center">
+                        {isValidCmsIcon(data.icons[index]) ? (
+                          <IconifyIcon name={data.icons[index]} size={32} className="text-white" />
+                        ) : (
+                          <Image
+                            src={`/brand-adv-${iconIndex}.svg`}
+                            alt={`Advantage ${iconIndex}`}
+                            width={32}
+                            height={32}
+                            className="w-full h-full"
+                          />
+                        )}
                       </div>
 
                       {/* 文字 */}
@@ -320,21 +332,32 @@ export default function BrandAdvantages({ data }: Props) {
                     top: `${(pos.y / DESIGN_HEIGHT) * 100}%`,
                   }}
                 >
-                  {/* SVG 图标 */}
+                  {/* 图标 - CMS有值则用Iconify，否则用默认SVG */}
                   <div
-                    className="flex-shrink-0"
+                    className="flex-shrink-0 flex items-center justify-center"
                     style={{
                       width: `${(ICON_SIZE / DESIGN_WIDTH) * 100}vw`,
                       height: `${(ICON_SIZE / DESIGN_WIDTH) * 100}vw`,
                     }}
                   >
-                    <Image
-                      src={`/brand-adv-${iconIndex}.svg`}
-                      alt={`Advantage ${iconIndex}`}
-                      width={ICON_SIZE}
-                      height={ICON_SIZE}
-                      className="w-full h-full"
-                    />
+                    {isValidCmsIcon(data.icons[index]) ? (
+                      <IconifyIcon
+                        name={data.icons[index]}
+                        className="text-white w-full h-full"
+                        style={{
+                          width: `${(ICON_SIZE / DESIGN_WIDTH) * 100}vw`,
+                          height: `${(ICON_SIZE / DESIGN_WIDTH) * 100}vw`,
+                        }}
+                      />
+                    ) : (
+                      <Image
+                        src={`/brand-adv-${iconIndex}.svg`}
+                        alt={`Advantage ${iconIndex}`}
+                        width={ICON_SIZE}
+                        height={ICON_SIZE}
+                        className="w-full h-full"
+                      />
+                    )}
                   </div>
                   {/* 文字 - 支持 \n 和 /n 换行 */}
                   <span
