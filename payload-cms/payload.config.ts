@@ -98,6 +98,7 @@ import { CustomScripts } from './src/collections/CustomScripts'
 import { SeoSettings } from './src/collections/SeoSettings'
 import { FormConfigs } from './src/collections/FormConfigs'
 import { FormSubmissions } from './src/collections/FormSubmissions'
+import { SmtpConfigs } from './src/collections/SmtpConfigs'
 
 // Content Blocks for Lexical Editor
 import { contentBlocks } from './src/blocks'
@@ -143,7 +144,6 @@ import { CaseStudies } from './src/globals/CaseStudies'
 import { BrandAnalysis } from './src/globals/BrandAnalysis'
 import { BrandValue } from './src/globals/BrandValue'
 // Globals - CMS Settings
-import { EmailConfig } from './src/globals/EmailConfig'
 import { TranslationConfig } from './src/globals/TranslationConfig'
 
 // Seed functions
@@ -248,6 +248,7 @@ export default buildConfig({
     SeoSettings,
     FormConfigs,
     FormSubmissions,
+    SmtpConfigs,
   ],
 
   // ==================================================================
@@ -276,7 +277,6 @@ export default buildConfig({
     BrandAnalysis,          // 14
     BrandValue,             // 15
     // CMS Settings (CMS系统配置)
-    EmailConfig,
     TranslationConfig,
   ],
 
@@ -583,6 +583,13 @@ export default buildConfig({
           },
           {
             slug: 'form-submissions',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'smtp-configs',
             hooks: {
               afterChange: { update: { enabled: true }, create: { enabled: true } },
               afterDelete: { enabled: true },

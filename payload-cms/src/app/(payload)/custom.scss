@@ -305,3 +305,15 @@ td[class*="cell"] img,
   height: 135px !important;
   object-fit: cover !important;
 }
+
+/* ============================================
+   Lexical Editor - Images keep original size,
+   only prevent horizontal overflow
+   ============================================ */
+.rich-text-lexical img,
+[class*="LexicalEditor"] img,
+[class*="lexical"] img,
+.ContentEditable__root img {
+  max-width: 100%;
+  height: auto;
+}

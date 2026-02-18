@@ -144,11 +144,6 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'serviceCenter.title', labelKey: 'Service Center - Title', type: 'textarea' },
     { name: 'serviceCenter.description', labelKey: 'Service Center - Description', type: 'textarea' },
   ],
-  'email-config': [
-    { name: 'emailFromName', labelKey: 'Email From Name', type: 'textarea' },
-    { name: 'autoReplySubject', labelKey: 'Auto Reply Subject', type: 'textarea' },
-    { name: 'autoReplyTemplate', labelKey: 'Auto Reply Template', type: 'textarea' },
-  ],
   'site-config': [
     { name: 'siteName', labelKey: 'Site Name', type: 'textarea' },
     { name: 'siteTagline', labelKey: 'Site Tagline', type: 'textarea' },

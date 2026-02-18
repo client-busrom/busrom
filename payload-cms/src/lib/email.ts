@@ -2,11 +2,10 @@
  * Email Utility
  *
  * Handles email sending using nodemailer
- * Supports SMTP configuration from EmailConfig global
+ * Supports direct SMTP configuration via EmailConfig
  */
 
 import nodemailer from 'nodemailer'
-import type { Payload } from 'payload'
 
 export interface EmailConfig {
   smtpHost: string
@@ -28,39 +27,6 @@ export interface SendEmailOptions {
 }
 
 /**
- * Get email configuration from EmailConfig global
- */
-export async function getEmailConfig(payload: Payload, locale?: string): Promise<EmailConfig | null> {
-  try {
-    const config = await payload.findGlobal({
-      slug: 'email-config',
-      locale: (locale || 'en') as 'en' | 'zh',
-    }) as any
-
-    if (!config.smtpHost || !config.smtpUser || !config.smtpPassword) {
-      return null
-    }
-
-    const port = Number(config.smtpPort) || 587
-    // Auto-detect SSL based on port: 465 = SSL, others (587, 25) = STARTTLS
-    const secure = port === 465
-
-    return {
-      smtpHost: config.smtpHost as string,
-      smtpPort: port,
-      smtpSecure: secure,
-      smtpUser: config.smtpUser as string,
-      smtpPassword: config.smtpPassword as string,
-      emailFromAddress: (config.emailFromAddress as string) || config.smtpUser as string,
-      emailFromName: (config.emailFromName as string) || 'Busrom',
-    }
-  } catch (error) {
-    console.error('Failed to get email config:', error)
-    return null
-  }
-}
-
-/**
  * Create nodemailer transporter from config
  */
 export function createTransporter(config: EmailConfig) {
@@ -76,20 +42,13 @@ export function createTransporter(config: EmailConfig) {
 }
 
 /**
- * Send email using configured SMTP
+ * Send email using provided SMTP config
  */
 export async function sendEmail(
-  payload: Payload,
+  config: EmailConfig,
   options: SendEmailOptions,
-  locale?: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const config = await getEmailConfig(payload, locale)
-
-    if (!config) {
-      return { success: false, error: 'Email not configured. Please configure SMTP in Email Config.' }
-    }
-
     const transporter = createTransporter(config)
 
     const fromAddress = options.from || `"${config.emailFromName}" <${config.emailFromAddress}>`

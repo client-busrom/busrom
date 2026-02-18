@@ -288,6 +288,16 @@ export const customTranslationsEn = {
     },
 
     // ========================================================================
+    // SMTP Form Config Picker Component
+    // ========================================================================
+    smtpFormPicker: {
+      conflictTitle: 'Form Already Assigned',
+      conflictMessage: 'The form "{formName}" is already assigned to SMTP config "{smtpName}". Each form can only belong to one SMTP config. Do you want to remove it from "{smtpName}" and assign it here?',
+      reassignSuccess: 'Form reassigned successfully',
+      reassignFailed: 'Failed to reassign form',
+    },
+
+    // ========================================================================
     // Navigation Labels (CustomNav component)
     // ========================================================================
     nav: {
@@ -346,6 +356,7 @@ export const customTranslationsEn = {
       templateCategories: 'Template Categories',
       formConfigs: 'Form Configs',
       formSubmissions: 'Form Submissions',
+      smtpConfigs: 'SMTP Configs',
       customScripts: 'Custom Scripts',
       seoSettings: 'SEO Settings',
       siteConfigItem: 'Site Config',
@@ -634,6 +645,16 @@ export const customTranslationsZh = {
     },
 
     // ========================================================================
+    // SMTP Form Config Picker Component
+    // ========================================================================
+    smtpFormPicker: {
+      conflictTitle: '表单已分配',
+      conflictMessage: '表单 "{formName}" 已分配给 SMTP 配置 "{smtpName}"。每个表单只能属于一个 SMTP 配置。是否从 "{smtpName}" 中移除并分配到此处？',
+      reassignSuccess: '表单重新分配成功',
+      reassignFailed: '重新分配表单失败',
+    },
+
+    // ========================================================================
     // Navigation Labels (CustomNav component)
     // ========================================================================
     nav: {
@@ -692,6 +713,7 @@ export const customTranslationsZh = {
       templateCategories: '模板分类',
       formConfigs: '表单配置',
       formSubmissions: '表单提交',
+      smtpConfigs: 'SMTP 配置',
       customScripts: '自定义脚本',
       seoSettings: 'SEO设置',
       siteConfigItem: '站点配置',
