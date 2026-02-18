@@ -404,8 +404,7 @@ export async function GET(
             },
           }
         : null,
-      // Attributes and specifications (JSON fields)
-      attributes: product.attributes || null,
+      // Specifications (JSON field)
       specifications: product.specifications || null,
       // Images (with CDN URL transformation)
       showImage: product.showImage

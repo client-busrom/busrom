@@ -348,7 +348,6 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
           section={postFormSections[0]}
           sectionIndex={0}
           locale={locale}
-          productAttributes={product.attributes}
         />
       )}
 
@@ -369,8 +368,7 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
             section={section}
             sectionIndex={sectionIndex}
             locale={locale}
-            productAttributes={product.attributes}
-          />
+            />
         )
       })}
 

@@ -184,32 +184,14 @@ export const Products: CollectionConfig = {
         },
 
         // ----------------------------------------------------------
-        // Tab 3: Attributes & Specifications (Multilingual JSON)
+        // Tab 3: Specifications (Multilingual JSON)
         // ----------------------------------------------------------
         {
           label: {
-            en: 'Attributes',
-            zh: '属性',
+            en: 'Specifications',
+            zh: '规格',
           },
           fields: [
-            {
-              name: 'attributes',
-              type: 'json',
-              localized: true,
-              label: {
-                en: 'Product Attributes',
-                zh: '产品属性',
-              },
-              admin: {
-                description: {
-                  en: 'Product attributes (key-value pairs)',
-                  zh: '产品属性（键值对）',
-                },
-                components: {
-                  Field: '@/components/fields/ProductAttributesField',
-                },
-              },
-            },
             {
               name: 'specifications',
               type: 'json',

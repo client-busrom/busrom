@@ -158,20 +158,54 @@ export function parseMainContentStrengthData(content: LexicalContent) {
 }
 
 // Parse Product Attributes Section
-export function parseProductAttributesData(content: LexicalContent, productAttributes: any[]) {
+// Attributes are now embedded in rich text via iconList nodes (product-attributes-item marker)
+export function parseProductAttributesData(content: LexicalContent) {
   const { title, image, imageLink } = extractBasicSectionData(content)
-  const visibleAttributes = (productAttributes || [])
-    .filter((attr: any) => attr.isShow)
-    .map((attr: any) => ({
-      title: attr.key,
-      description: attr.value,
-    }))
+  const nodes = content?.root?.children || []
+  const attributes: { icon?: string; title: string; description: string }[] = []
+
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i]
+
+    // Read from iconList block (icon + title + subtitle)
+    if (node.type === 'iconList' && node.data?.items) {
+      for (const item of node.data.items) {
+        attributes.push({
+          icon: item.icon || undefined,
+          title: item.title || '',
+          description: item.subtitle || '',
+        })
+      }
+    }
+
+    // Fallback: product-attributes-item marker with list
+    if (node.type === 'paragraph' && node.children?.[0]?.text === 'product-attributes-item') {
+      const nextNode = nodes[i + 1]
+      if (nextNode?.type === 'list' && nextNode.children) {
+        for (const listItem of nextNode.children) {
+          if (listItem.type === 'listitem') {
+            const text = extractTextWithLinebreaks(listItem.children)
+            if (text) {
+              const parts = text.split('|')
+              if (parts.length >= 2) {
+                attributes.push({
+                  icon: parts[0].startsWith('icon:') ? parts[0].replace('icon:', '') : undefined,
+                  title: parts[0].startsWith('icon:') ? (parts[1] || '') : parts[0],
+                  description: parts[0].startsWith('icon:') ? (parts[2] || '') : (parts[1] || ''),
+                })
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 
   return {
     title: title || 'Product attributes & technical processes',
     image,
     imageLink,
-    attributes: visibleAttributes,
+    attributes,
   }
 }
 
