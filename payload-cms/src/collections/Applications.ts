@@ -15,19 +15,19 @@ export const Applications: CollectionConfig = {
   labels: {
     singular: {
       en: 'Application',
-      zh: '应用案例',
+      zh: '案例图集',
     },
     plural: {
       en: 'Applications',
-      zh: '应用案例',
+      zh: '案例图集',
     },
   },
   admin: {
     useAsTitle: 'slug',
     defaultColumns: ['slug', 'category', 'status', 'updatedAt'],
     group: {
-      en: 'Content',
-      zh: '内容管理',
+      en: 'Media Library',
+      zh: '媒体库',
     },
   },
   access: {

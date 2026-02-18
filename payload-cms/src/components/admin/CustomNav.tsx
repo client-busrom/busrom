@@ -298,6 +298,7 @@ export const CustomNav: React.FC = () => {
           <NavItem href="/admin/collections/media" labelKey="media" />
           <NavItem href="/admin/collections/media-categories" labelKey="mediaCategories" />
           <NavItem href="/admin/collections/media-tags" labelKey="mediaTags" />
+          <NavItem href="/admin/collections/applications" labelKey="applications" />
         </CollapsibleGroup>
 
         {/* Products */}
@@ -310,7 +311,6 @@ export const CustomNav: React.FC = () => {
         <CollapsibleGroup labelKey="content">
           <NavItem href="/admin/collections/categories" labelKey="categories" />
           <NavItem href="/admin/collections/blogs" labelKey="blogs" />
-          <NavItem href="/admin/collections/applications" labelKey="applications" />
           <NavItem href="/admin/collections/faq-items" labelKey="faqItems" />
           <NavItem href="/admin/collections/reusable-blocks" labelKey="reusableBlocks" />
           <NavItem href="/admin/collections/document-templates" labelKey="documentTemplates" />
