@@ -195,6 +195,7 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
   }, [localeCodes, sourceLanguage, selectedLanguages.length])
 
   // Handle auto-translate
+  // Optimized: collect all unique texts, translate each to all target languages in one API call
   const handleTranslate = useCallback(async () => {
     const sourceItems = value?.[sourceLanguage]
     if (!sourceItems || sourceItems.length === 0) {
@@ -207,81 +208,71 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
       return
     }
 
+    // Filter target languages that actually need translation
+    const newValue = { ...value }
+    const targetLangs = selectedLanguages.filter(lang => {
+      if (overwriteExisting) return true
+      return !newValue[lang]?.length || newValue[lang].length === 0
+    })
+
+    if (targetLangs.length === 0) {
+      setStatus(`✅ ${t(i18n.translationCompleted)}`)
+      setTimeout(() => setStatus(''), 2000)
+      return
+    }
+
     setIsTranslating(true)
     setError('')
-    setStatus(`${t(i18n.translateTo)} ${sourceLanguage.toUpperCase()} ${t(i18n.to)} ${selectedLanguages.length} ${selectedLanguages.length > 1 ? t(i18n.languages) : t(i18n.language)}...`)
+    setStatus(`${t(i18n.translateTo)} ${sourceLanguage.toUpperCase()} ${t(i18n.to)} ${targetLangs.length} ${targetLangs.length > 1 ? t(i18n.languages) : t(i18n.language)}...`)
 
     try {
-      const newValue = { ...value }
+      // Get user's personal translation settings
+      const { getTranslationHeaders } = await import('@/lib/translation-client')
+      const personalHeaders = getTranslationHeaders()
 
-      for (const targetLang of selectedLanguages) {
-        // Skip if overwrite is disabled and target already has items
-        if (!overwriteExisting && newValue[targetLang]?.length > 0) {
-          continue
-        }
+      // Collect all unique texts from source items
+      const uniqueTexts = new Map<string, Record<string, string>>() // text -> { lang: translated }
+      for (const item of sourceItems) {
+        if (item.title && item.title.trim()) uniqueTexts.set(item.title, {})
+        if (item.buttonText && item.buttonText.trim()) uniqueTexts.set(item.buttonText, {})
+      }
 
-        // Translate each item
-        const translatedItems: CarouselItem[] = []
-
-        for (const sourceItem of sourceItems) {
-          const translatedItem: CarouselItem = {
-            ...sourceItem, // Keep non-text fields (image, sceneImage, linkUrl, isShow)
+      // Translate each unique text to all target languages in one call
+      const translationPromises = Array.from(uniqueTexts.keys()).map(async (text) => {
+        try {
+          const res = await fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...personalHeaders },
+            credentials: 'include',
+            body: JSON.stringify({
+              text,
+              sourceLang: sourceLanguage,
+              targetLangs,
+            }),
+          })
+          if (res.ok) {
+            const data = await res.json()
+            uniqueTexts.set(text, data.translations || {})
           }
+        } catch (err) {
+          console.error('Translation error:', err)
+        }
+      })
 
-          // Get user's personal translation settings
-          const { getTranslationHeaders } = await import('@/lib/translation-client')
-          const personalHeaders = getTranslationHeaders()
+      await Promise.all(translationPromises)
 
-          // Translate title
+      // Build translated items for each target language
+      for (const lang of targetLangs) {
+        newValue[lang] = sourceItems.map((sourceItem: CarouselItem) => {
+          const translatedItem: CarouselItem = { ...sourceItem }
           if (sourceItem.title) {
-            try {
-              const response = await fetch('/api/translate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', ...personalHeaders },
-                credentials: 'include',
-                body: JSON.stringify({
-                  text: sourceItem.title,
-                  sourceLang: sourceLanguage,
-                  targetLangs: [targetLang],
-                }),
-              })
-
-              if (response.ok) {
-                const data = await response.json()
-                translatedItem.title = data.translations?.[targetLang] || sourceItem.title
-              }
-            } catch (err) {
-              console.error('Translation error for title:', err)
-            }
+            translatedItem.title = uniqueTexts.get(sourceItem.title)?.[lang] || sourceItem.title
           }
-
-          // Translate buttonText
           if (sourceItem.buttonText) {
-            try {
-              const response = await fetch('/api/translate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', ...personalHeaders },
-                credentials: 'include',
-                body: JSON.stringify({
-                  text: sourceItem.buttonText,
-                  sourceLang: sourceLanguage,
-                  targetLangs: [targetLang],
-                }),
-              })
-
-              if (response.ok) {
-                const data = await response.json()
-                translatedItem.buttonText = data.translations?.[targetLang] || sourceItem.buttonText
-              }
-            } catch (err) {
-              console.error('Translation error for buttonText:', err)
-            }
+            translatedItem.buttonText = uniqueTexts.get(sourceItem.buttonText)?.[lang] || sourceItem.buttonText
           }
-
-          translatedItems.push(translatedItem)
-        }
-
-        newValue[targetLang] = translatedItems
+          return translatedItem
+        })
       }
 
       setValue(newValue)

@@ -77,6 +77,14 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
   const [isTranslating, setIsTranslating] = useState(false)
   const [translateMode, setTranslateMode] = useState<'copy' | 'translate'>('translate')
 
+  // Translation progress tracking
+  const [translationProgress, setTranslationProgress] = useState<{
+    completed: number
+    total: number
+    currentLocale: string
+    results: { locale: string; success: boolean }[]
+  } | null>(null)
+
   // Track if we've loaded other locales
   const hasLoadedRef = useRef(false)
 
@@ -131,6 +139,8 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
   }, [value, activeLocale])
 
   // Save content to a specific locale (for non-current locales, needs API call)
+  // Sends the rich text field + any required localized text fields from cache
+  // to avoid Payload validation errors (e.g. required `title` field)
   const handleSaveLocale = useCallback(async (locale: LocaleCode, content: LexicalContent) => {
     if (!id || locale === currentLocale.code) return
 
@@ -139,45 +149,50 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
       : `/api/globals/${globalSlug}`
 
     try {
-      // First, fetch the current document for this locale to get all required fields
-      const getRes = await fetch(`${baseEndpoint}?locale=${locale}&depth=0`, {
-        credentials: 'include',
-      })
+      // Build PATCH body: start with the rich text field
+      const patchBody: Record<string, unknown> = { [field.name]: content }
 
-      if (!getRes.ok) {
-        console.error(`Failed to fetch ${locale} data: ${getRes.status}`)
-        return
+      // Include required localized text fields from cache to pass Payload validation.
+      // Without this, PATCH fails with 400 if e.g. `title` is required but empty for this locale.
+      // We only include simple string fields — no relations or arrays — to avoid race conditions.
+      const requiredFields: Record<string, string[]> = {
+        pages: ['title'],
+        products: ['name'],
+        'product-series': ['name'],
+        'faq-items': ['question'],
       }
 
-      const existingData = await getRes.json()
-
-      // Merge the new description with existing data
-      const updateData = {
-        ...existingData,
-        [field.name]: content,
+      const fieldsToInclude = collectionSlug ? (requiredFields[collectionSlug] || []) : []
+      for (const reqField of fieldsToInclude) {
+        if (reqField === field.name) continue // Already in the body
+        // Try to get from cache
+        const cachedValue = getFieldFromCache(collectionSlug, globalSlug, id, reqField, locale)
+        if (cachedValue && typeof cachedValue === 'string') {
+          patchBody[reqField] = cachedValue
+        } else {
+          // Fallback: get from source locale (current locale)
+          const sourceCachedValue = getFieldFromCache(collectionSlug, globalSlug, id, reqField, currentLocale.code as LocaleCode)
+          if (sourceCachedValue && typeof sourceCachedValue === 'string') {
+            patchBody[reqField] = sourceCachedValue
+          }
+        }
       }
 
-      // Remove fields that shouldn't be sent back
-      delete updateData.id
-      delete updateData.createdAt
-      delete updateData.updatedAt
-
-      // Now PATCH with the complete data
       const res = await fetch(`${baseEndpoint}?locale=${locale}`, {
         method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData),
+        body: JSON.stringify(patchBody),
       })
 
       if (!res.ok) {
         const errorBody = await res.text()
         console.error(`Failed to save ${locale}: ${res.status}`, errorBody)
-      } else {
-        console.log(`Successfully saved ${locale}`)
+        throw new Error(`Failed to save ${locale}: ${res.status}`)
       }
     } catch (error) {
       console.error(`Failed to save ${locale}:`, error)
+      throw error
     }
   }, [id, collectionSlug, globalSlug, currentLocale.code, field.name])
 
@@ -211,6 +226,9 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
       return
     }
 
+    setIsTranslating(true)
+    setTranslationProgress({ completed: 0, total: targetLocales.length, currentLocale: '', results: [] })
+
     // Update state
     setLocaleValues(prev =>
       prev.map(l => {
@@ -224,24 +242,51 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
       })
     )
 
-    // If document exists, save to API
+    // If document exists, save to API sequentially (one at a time).
+    // Payload internally does read-modify-write on the full document,
+    // so parallel PATCHes to the same document will overwrite each other.
+    const results: { locale: string; success: boolean }[] = []
     if (id) {
-      await Promise.all(
-        targetLocales.map(locale => {
-          if (locale !== currentLocale.code) {
-            const existing = localeValues.find(l => l.locale === locale)
-            if (overwriteExisting || !hasRichTextContent(existing?.value)) {
-              return handleSaveLocale(locale, sourceValue)
-            }
-          }
-          return Promise.resolve()
-        })
-      )
+      const localesToSave = targetLocales.filter(locale => {
+        if (locale === currentLocale.code) return false
+        const existing = localeValues.find(l => l.locale === locale)
+        return overwriteExisting || !hasRichTextContent(existing?.value)
+      })
+      for (const locale of localesToSave) {
+        try {
+          await handleSaveLocale(locale, sourceValue)
+          results.push({ locale, success: true })
+        } catch {
+          results.push({ locale, success: false })
+        }
+        setTranslationProgress(prev => prev ? {
+          ...prev,
+          completed: results.length,
+          results: [...results],
+          currentLocale: '',
+        } : null)
+      }
       // Invalidate cache after saving
       invalidateCache(collectionSlug, globalSlug, id)
+    } else {
+      // No API call needed (new document), all succeed
+      results.push(...targetLocales.map(l => ({ locale: l, success: true })))
     }
 
+    // Show final results
+    setTranslationProgress({
+      completed: targetLocales.length,
+      total: targetLocales.length,
+      currentLocale: '',
+      results,
+    })
     setTargetLocales([])
+    setIsTranslating(false)
+
+    // Auto-hide progress after 5 seconds
+    setTimeout(() => {
+      setTranslationProgress(null)
+    }, 5000)
   }, [activeLocale, targetLocales, localeValues, overwriteExisting, id, currentLocale.code, handleSaveLocale, collectionSlug, globalSlug, i18n])
 
   // Translate content from current locale to selected locales
@@ -259,6 +304,7 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
     }
 
     setIsTranslating(true)
+    setTranslationProgress({ completed: 0, total: targetLocales.length, currentLocale: '', results: [] })
 
     try {
       // Extract all text segments from the source content
@@ -270,53 +316,73 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
       }
 
       const textsToTranslate = segments.map(s => s.text)
+      const results: { locale: string; success: boolean }[] = []
 
-      // Translate to all target locales in parallel
-      const translationResults = await Promise.all(
-        targetLocales.map(async (targetLang) => {
-          // Check if we should skip (has content and not overwriting)
-          const existing = localeValues.find(l => l.locale === targetLang)
-          if (!overwriteExisting && hasRichTextContent(existing?.value)) {
-            return { locale: targetLang, content: null, skipped: true }
-          }
+      // Translate to all target locales sequentially with progress tracking
+      const translationResults: { locale: LocaleCode; content: LexicalContent | null; skipped: boolean }[] = []
 
-          try {
-            // Get user's personal translation settings
-            const { getTranslationHeaders } = await import('@/lib/translation-client')
-            const personalHeaders = getTranslationHeaders()
+      for (const targetLang of targetLocales) {
+        setTranslationProgress(prev => prev ? { ...prev, currentLocale: targetLang } : null)
 
-            const res = await fetch('/api/translate', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', ...personalHeaders },
-              body: JSON.stringify({
-                texts: textsToTranslate,
-                sourceLang: activeLocale,
-                targetLang: targetLang,
-              }),
-            })
+        // Check if we should skip (has content and not overwriting)
+        const existing = localeValues.find(l => l.locale === targetLang)
+        if (!overwriteExisting && hasRichTextContent(existing?.value)) {
+          translationResults.push({ locale: targetLang, content: null, skipped: true })
+          results.push({ locale: targetLang, success: true })
+          setTranslationProgress(prev => prev ? {
+            ...prev,
+            completed: prev.completed + 1,
+            results: [...prev.results, { locale: targetLang, success: true }],
+          } : null)
+          continue
+        }
 
-            if (!res.ok) {
-              console.error(`Translation to ${targetLang} failed`)
-              return { locale: targetLang, content: null, skipped: false }
-            }
+        try {
+          // Get user's personal translation settings
+          const { getTranslationHeaders } = await import('@/lib/translation-client')
+          const personalHeaders = getTranslationHeaders()
 
+          const res = await fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...personalHeaders },
+            body: JSON.stringify({
+              texts: textsToTranslate,
+              sourceLang: activeLocale,
+              targetLang: targetLang,
+            }),
+          })
+
+          if (!res.ok) {
+            console.error(`Translation to ${targetLang} failed`)
+            translationResults.push({ locale: targetLang, content: null, skipped: false })
+            results.push({ locale: targetLang, success: false })
+          } else {
             const data = await res.json()
             const translatedTexts = data.translations as string[]
 
             if (!translatedTexts || !Array.isArray(translatedTexts)) {
               console.error(`Invalid translation response for ${targetLang}:`, data)
-              return { locale: targetLang, content: null, skipped: false }
+              translationResults.push({ locale: targetLang, content: null, skipped: false })
+              results.push({ locale: targetLang, success: false })
+            } else {
+              // Reconstruct Lexical content with translated texts
+              const translatedContent = replaceTextsInLexical(sourceValue, segments, translatedTexts)
+              translationResults.push({ locale: targetLang, content: translatedContent, skipped: false })
+              results.push({ locale: targetLang, success: true })
             }
-
-            // Reconstruct Lexical content with translated texts
-            const translatedContent = replaceTextsInLexical(sourceValue, segments, translatedTexts)
-            return { locale: targetLang, content: translatedContent, skipped: false }
-          } catch (error) {
-            console.error(`Translation to ${targetLang} error:`, error)
-            return { locale: targetLang, content: null, skipped: false }
           }
-        })
-      )
+        } catch (error) {
+          console.error(`Translation to ${targetLang} error:`, error)
+          translationResults.push({ locale: targetLang, content: null, skipped: false })
+          results.push({ locale: targetLang, success: false })
+        }
+
+        setTranslationProgress(prev => prev ? {
+          ...prev,
+          completed: prev.completed + 1,
+          results: [...results],
+        } : null)
+      }
 
       // Update state with translated content
       setLocaleValues(prev =>
@@ -329,21 +395,41 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
         })
       )
 
-      // If document exists, save to API
+      // If document exists, save to API one at a time (sequential).
+      // Payload internally does read-modify-write on the full document,
+      // so parallel PATCHes to the same document will overwrite each other.
       if (id) {
-        const successfulTranslations = translationResults.filter(r => r.content && !r.skipped)
-        await Promise.all(
-          successfulTranslations
-            .filter(r => r.locale !== currentLocale.code)
-            .map(r => handleSaveLocale(r.locale, r.content))
-        )
+        const toSave = translationResults.filter(r => r.content && !r.skipped && r.locale !== currentLocale.code)
+        for (const r of toSave) {
+          try {
+            await handleSaveLocale(r.locale, r.content!)
+          } catch {
+            // Mark as failed in results if save fails
+            const idx = results.findIndex(res => res.locale === r.locale)
+            if (idx !== -1) results[idx].success = false
+          }
+        }
         // Invalidate cache after saving
         invalidateCache(collectionSlug, globalSlug, id)
       }
 
+      // Show final results for 5 seconds
+      setTranslationProgress({
+        completed: targetLocales.length,
+        total: targetLocales.length,
+        currentLocale: '',
+        results,
+      })
+
       setTargetLocales([])
+
+      // Auto-hide progress after 5 seconds
+      setTimeout(() => {
+        setTranslationProgress(null)
+      }, 5000)
     } catch (error) {
       console.error('Translation error:', error)
+      setTranslationProgress(null)
     } finally {
       setIsTranslating(false)
     }
@@ -419,7 +505,7 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
             >
               <LocaleFlag localeCode={locale.code} className="locale-tab__flag" />
               <span className="locale-tab__code">{locale.code.toUpperCase()}</span>
-              {hasContent && <span className="locale-tab__dot">●</span>}
+              {hasContent && <span className="locale-tab__dot">✓</span>}
             </button>
           )
         })}
@@ -482,7 +568,7 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
                   />
                   <LocaleFlag localeCode={locale.code} className="inline-flag" />
                   <span>{locale.code.toUpperCase()}</span>
-                  {hasContent && <span className="filled-dot">●</span>}
+                  {hasContent && <span className="filled-dot">✓</span>}
                 </label>
               )
             })}
@@ -506,7 +592,9 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
               {isTranslating ? (
                 <>
                   <span className="spinner"></span>
-                  Translating...
+                  {translationProgress
+                    ? `${translationProgress.completed}/${translationProgress.total} ${translationProgress.currentLocale ? `(${translationProgress.currentLocale.toUpperCase()})` : ''}`
+                    : 'Translating...'}
                 </>
               ) : translateMode === 'translate' ? (
                 `🌐 Translate to ${targetLocales.length} locale(s)`
@@ -515,6 +603,35 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
               )}
             </button>
           </div>
+
+          {/* Translation progress & results */}
+          {translationProgress && (
+            <div className="copy-panel__progress">
+              <div className="progress-bar">
+                <div
+                  className="progress-bar__fill"
+                  style={{ width: `${(translationProgress.completed / translationProgress.total) * 100}%` }}
+                />
+              </div>
+              {!isTranslating && translationProgress.completed === translationProgress.total && (
+                <div className="progress-result">
+                  {(() => {
+                    const successCount = translationProgress.results.filter(r => r.success).length
+                    const failCount = translationProgress.results.filter(r => !r.success).length
+                    if (failCount === 0) {
+                      return <span className="progress-result--success">✓ {successCount} locale(s) translated successfully</span>
+                    }
+                    return (
+                      <span className="progress-result--partial">
+                        ✓ {successCount} succeeded, ✗ {failCount} failed
+                        ({translationProgress.results.filter(r => !r.success).map(r => r.locale.toUpperCase()).join(', ')})
+                      </span>
+                    )
+                  })()}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 

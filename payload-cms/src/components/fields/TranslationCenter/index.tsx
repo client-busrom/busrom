@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useDocumentInfo, useLocale, useTranslation } from '@payloadcms/ui'
+import { useDocumentInfo, useLocale, useTranslation, useAllFormFields } from '@payloadcms/ui'
 import { SUPPORTED_LOCALES, type LocaleCode } from '../../../lib/locales'
 import { LocaleFlag } from '../../ui/LocaleFlag'
 import './styles.scss'
@@ -103,6 +103,24 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
   const { t, i18n } = useTranslation()
 
   const fieldConfigs = collectionSlug ? TRANSLATABLE_FIELDS[collectionSlug] : []
+  const [formFields] = useAllFormFields()
+
+  // 动态计算可翻译字段总数（展开数组字段为实际行数）
+  const actualFieldCount = useMemo(() => {
+    if (!fieldConfigs || fieldConfigs.length === 0) return 0
+    let count = 0
+    for (const config of fieldConfigs) {
+      if (config.isArrayField && config.arrayFieldName && config.arraySubField) {
+        // 从表单字段中统计数组行数：匹配 "arrayFieldName.N.subField" 的 key
+        const pattern = new RegExp(`^${config.arrayFieldName}\\.(\\d+)\\.${config.arraySubField}$`)
+        const arrayItemCount = Object.keys(formFields || {}).filter(key => pattern.test(key)).length
+        count += arrayItemCount
+      } else {
+        count += 1
+      }
+    }
+    return count
+  }, [fieldConfigs, formFields])
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [fieldsData, setFieldsData] = useState<FieldData[]>([])
@@ -114,6 +132,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
   const [isSaving, setIsSaving] = useState(false)
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'warning'; key: string; params?: Record<string, string | number> } | null>(null)
   const [modifiedLocales, setModifiedLocales] = useState<Set<LocaleCode>>(new Set()) // 追踪修改过的语言
+  const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set()) // 选中参与翻译的字段
 
   // ESC 键关闭弹窗
   useEffect(() => {
@@ -204,6 +223,8 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
       }
 
       setFieldsData(newFieldsData)
+      // 默认全选所有字段
+      setSelectedFields(new Set(newFieldsData.map(f => f.config.name)))
     } catch (error) {
       console.error('[TranslationCenter] Error:', error)
       setStatusMessage({ type: 'error', key: 'custom:translationCenter:loadFailed' })
@@ -267,8 +288,17 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
       return
     }
 
+    // 只处理选中的字段
+    const fieldsToTranslate = fieldsData.filter(f => selectedFields.has(f.config.name))
+
+    if (fieldsToTranslate.length === 0) {
+      const isZh = i18n?.language === 'zh'
+      setStatusMessage({ type: 'warning', key: isZh ? '__inline:请至少选择一个字段' : '__inline:Please select at least one field' })
+      return
+    }
+
     // 检查源语言内容是否为空，防止用空内容覆盖已有翻译
-    const emptySourceFields = fieldsData.filter(field => {
+    const emptySourceFields = fieldsToTranslate.filter(field => {
       const sourceValue = field.values.find(v => v.locale === sourceLocale)?.value
       return !sourceValue
     })
@@ -284,8 +314,8 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
         return t(f.config.labelKey as any) as string || f.config.name
       }).join('\n')
 
-      // 如果全部字段为空，直接阻止
-      if (emptySourceFields.length === fieldsData.length) {
+      // 如果全部选中字段为空，直接阻止
+      if (emptySourceFields.length === fieldsToTranslate.length) {
         setStatusMessage({ type: 'error', key: 'custom:translationCenter:sourceEmpty' })
         return
       }
@@ -304,10 +334,11 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
     setIsTranslating(true)
     setStatusMessage(null)
 
-    let totalTranslated = 0
+    let translatedFieldCount = 0
+    const translatedLanguages = new Set<string>()
 
     try {
-      for (const field of fieldsData) {
+      for (const field of fieldsToTranslate) {
         const sourceValue = field.values.find(v => v.locale === sourceLocale)?.value
         if (!sourceValue) continue
 
@@ -363,17 +394,39 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
           return newSet
         })
 
-        totalTranslated += localesToTranslate.length
+        translatedFieldCount++
+        localesToTranslate.forEach(l => translatedLanguages.add(l))
       }
 
-      setStatusMessage({ type: 'success', key: 'custom:translationCenter:translateSuccess', params: { count: totalTranslated } })
+      setStatusMessage({ type: 'success', key: 'custom:translationCenter:translateSuccess', params: { fields: translatedFieldCount, languages: translatedLanguages.size } })
     } catch (error) {
       console.error('[TranslationCenter] Translation error:', error)
       setStatusMessage({ type: 'error', key: 'custom:translationCenter:translateFailed' })
     } finally {
       setIsTranslating(false)
     }
-  }, [fieldsData, sourceLocale, targetLocales, overwriteExisting, t, i18n])
+  }, [fieldsData, selectedFields, sourceLocale, targetLocales, overwriteExisting, t, i18n])
+
+  // 字段选择辅助方法
+  const handleToggleField = useCallback((fieldName: string) => {
+    setSelectedFields(prev => {
+      const next = new Set(prev)
+      if (next.has(fieldName)) {
+        next.delete(fieldName)
+      } else {
+        next.add(fieldName)
+      }
+      return next
+    })
+  }, [])
+
+  const handleSelectAllFields = useCallback(() => {
+    setSelectedFields(new Set(fieldsData.map(f => f.config.name)))
+  }, [fieldsData])
+
+  const handleDeselectAllFields = useCallback(() => {
+    setSelectedFields(new Set())
+  }, [])
 
   // 保存
   const handleSave = useCallback(async () => {
@@ -517,7 +570,12 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
 
     // 对于带参数的消息，手动构建
     if (status.key === 'custom:translationCenter:translateSuccess') {
-      return `${icon} ${t('custom:translationCenter:translateSuccess' as any)} ${status.params?.count || 0} ${t('custom:translationCenter:fieldLanguageCombinations' as any)}`
+      const isZh = i18n?.language === 'zh'
+      const fields = status.params?.fields || 0
+      const languages = status.params?.languages || 0
+      return isZh
+        ? `${icon} 已翻译 ${fields} 个字段到 ${languages} 种语言`
+        : `${icon} Translated ${fields} field(s) to ${languages} language(s)`
     }
     if (status.key === 'custom:translationCenter:saveSuccess') {
       return `${icon} ${t('custom:translationCenter:saveSuccess' as any)} ${status.params?.count || 0} ${t('custom:translationCenter:languages' as any)}`
@@ -526,8 +584,13 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
       return `${icon} ${t('custom:translationCenter:partialSave' as any)}: ${status.params?.success || 0} ✓ / ${status.params?.fail || 0} ✗`
     }
 
+    // 内联消息（不走 i18n）
+    if (status.key.startsWith('__inline:')) {
+      return `${icon} ${status.key.slice('__inline:'.length)}`
+    }
+
     return `${icon} ${messages[status.key] || status.key}`
-  }, [t])
+  }, [t, i18n])
 
   if (!collectionSlug || !fieldConfigs || fieldConfigs.length === 0 || !id) {
     return (
@@ -554,7 +617,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
           🌐 {t('custom:translationCenter:triggerButton' as any)}
         </button>
         <span className="tc-trigger__hint">
-          {fieldConfigs.length} {t('custom:translationCenter:triggerHint' as any)}
+          {actualFieldCount || fieldConfigs.length} {t('custom:translationCenter:triggerHint' as any)}
         </span>
       </div>
 
@@ -685,12 +748,41 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
 
                 {/* 字段列表 */}
                 <div className="tc-modal__fields">
+                  <div className="tc-fields-select-bar">
+                    <label className="tc-fields-select-bar__label">
+                      <input
+                        type="checkbox"
+                        checked={selectedFields.size === fieldsData.length}
+                        ref={(el) => {
+                          if (el) el.indeterminate = selectedFields.size > 0 && selectedFields.size < fieldsData.length
+                        }}
+                        onChange={() => {
+                          if (selectedFields.size === fieldsData.length) {
+                            handleDeselectAllFields()
+                          } else {
+                            handleSelectAllFields()
+                          }
+                        }}
+                      />
+                      {i18n?.language === 'zh'
+                        ? `已选 ${selectedFields.size}/${fieldsData.length} 个字段参与翻译`
+                        : `${selectedFields.size}/${fieldsData.length} field(s) selected for translation`}
+                    </label>
+                  </div>
                   {fieldsData.map(field => {
                     const { filled, total } = getFieldFillStatus(field)
+                    const isFieldSelected = selectedFields.has(field.config.name)
 
                     return (
-                      <div key={field.config.name} className="tc-field">
+                      <div key={field.config.name} className={`tc-field ${!isFieldSelected ? 'tc-field--excluded' : ''}`}>
                         <div className="tc-field__header">
+                          <label className="tc-field__select">
+                            <input
+                              type="checkbox"
+                              checked={isFieldSelected}
+                              onChange={() => handleToggleField(field.config.name)}
+                            />
+                          </label>
                           <span className="tc-field__name">
                             {field.config.labelKey.startsWith('__array__:')
                               ? (() => {

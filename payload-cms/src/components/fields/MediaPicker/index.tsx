@@ -81,7 +81,10 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field, value: co
   const [mimeTypeFilter, setMimeTypeFilter] = useState<string>('')
   const [groupFilter, setGroupFilter] = useState<string>('')
   const [sceneNumberFilter, setSceneNumberFilter] = useState<string>('')
-  const [seriesNumberFilter, setSeriesNumberFilter] = useState<string>('')
+  const [imageNumberFilter, setImageNumberFilter] = useState<string>('')
+  const [specsKeyFilter, setSpecsKeyFilter] = useState<string>('')
+  const [specsCustomKey, setSpecsCustomKey] = useState<string>('')
+  const [specsValueFilter, setSpecsValueFilter] = useState<string>('')
   const [categories, setCategories] = useState<MediaCategory[]>([])
   const [tags, setTags] = useState<MediaTag[]>([])
   const [page, setPage] = useState(1)
@@ -138,54 +141,58 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field, value: co
   const fetchMedia = useCallback(async () => {
     setLoading(true)
     try {
-      const params = new URLSearchParams({
-        limit: '24',
-        page: page.toString(),
-        sort: sortField,
-        depth: '1',
-      })
+      // Determine actual specs key
+      const actualSpecsKey = specsKeyFilter === '__custom' ? specsCustomKey : specsKeyFilter
+      const useSpecsSearch = !!actualSpecsKey
 
-      // Build where query
-      const whereConditions: string[] = []
+      let res: Response
+      let data: any
 
-      if (search) {
-        whereConditions.push(`where[filename][contains]=${encodeURIComponent(search)}`)
+      if (useSpecsSearch) {
+        // Use custom endpoint for JSONB specs querying
+        const params = new URLSearchParams({
+          limit: '24',
+          page: page.toString(),
+          sort: sortField,
+          specsKey: actualSpecsKey,
+        })
+        if (specsValueFilter) params.set('specsValue', specsValueFilter)
+        if (search) params.set('search', search)
+        if (categoryFilter) params.set('category', categoryFilter)
+        if (tagFilter) params.set('tag', tagFilter)
+        if (mimeTypeFilter) params.set('mimeType', mimeTypeFilter)
+        if (groupFilter) params.set('group', groupFilter)
+        if (sceneNumberFilter) params.set('sceneNumber', sceneNumberFilter)
+        if (imageNumberFilter) params.set('imageNumber', imageNumberFilter)
+
+        res = await fetch(`/api/media-search?${params.toString()}`)
+        data = await res.json()
+      } else {
+        // Use standard Payload REST API
+        const params = new URLSearchParams({
+          limit: '24',
+          page: page.toString(),
+          sort: sortField,
+          depth: '1',
+        })
+
+        const whereConditions: string[] = []
+        if (search) whereConditions.push(`where[filename][contains]=${encodeURIComponent(search)}`)
+        if (categoryFilter) whereConditions.push(`where[primaryCategory][equals]=${categoryFilter}`)
+        if (tagFilter) whereConditions.push(`where[tags][in]=${tagFilter}`)
+        if (mimeTypeFilter) whereConditions.push(`where[mimeType][contains]=${encodeURIComponent(mimeTypeFilter)}`)
+        if (groupFilter) whereConditions.push(`where[metadata.group][equals]=${groupFilter}`)
+        if (sceneNumberFilter) whereConditions.push(`where[metadata.sceneNumber][equals]=${sceneNumberFilter}`)
+        if (imageNumberFilter) whereConditions.push(`where[metadata.imageNumber][equals]=${imageNumberFilter}`)
+        whereConditions.push(`where[status][equals]=active`)
+
+        const queryString = whereConditions.length > 0
+          ? `${params.toString()}&${whereConditions.join('&')}`
+          : params.toString()
+
+        res = await fetch(`/api/media?${queryString}`)
+        data = await res.json()
       }
-
-      if (categoryFilter) {
-        whereConditions.push(`where[primaryCategory][equals]=${categoryFilter}`)
-      }
-
-      if (tagFilter) {
-        whereConditions.push(`where[tags][in]=${tagFilter}`)
-      }
-
-      if (mimeTypeFilter) {
-        whereConditions.push(`where[mimeType][contains]=${encodeURIComponent(mimeTypeFilter)}`)
-      }
-
-      if (groupFilter) {
-        whereConditions.push(`where[metadata.group][equals]=${groupFilter}`)
-      }
-
-      if (sceneNumberFilter) {
-        whereConditions.push(`where[metadata.sceneNumber][equals]=${sceneNumberFilter}`)
-      }
-
-      if (seriesNumberFilter) {
-        whereConditions.push(`where[metadata.specs.key][equals]=series`)
-        whereConditions.push(`where[metadata.specs.value][equals]=${encodeURIComponent(seriesNumberFilter)}`)
-      }
-
-      // Only show active media
-      whereConditions.push(`where[status][equals]=active`)
-
-      const queryString = whereConditions.length > 0
-        ? `${params.toString()}&${whereConditions.join('&')}`
-        : params.toString()
-
-      const res = await fetch(`/api/media?${queryString}`)
-      const data = await res.json()
 
       // Normalize thumbnailURL to use sizes structure instead of legacy /variants/ path
       const normalizedDocs = (data.docs || []).map((doc: any) => ({
@@ -201,7 +208,7 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field, value: co
     } finally {
       setLoading(false)
     }
-  }, [page, search, categoryFilter, tagFilter, mimeTypeFilter, groupFilter, sceneNumberFilter, seriesNumberFilter, sortField])
+  }, [page, search, categoryFilter, tagFilter, mimeTypeFilter, groupFilter, sceneNumberFilter, imageNumberFilter, specsKeyFilter, specsCustomKey, specsValueFilter, sortField])
 
   // Fetch media when modal opens or filters change
   useEffect(() => {
@@ -209,7 +216,7 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field, value: co
       fetchMedia()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, page, search, categoryFilter, tagFilter, mimeTypeFilter, groupFilter, sceneNumberFilter, seriesNumberFilter, sortField])
+  }, [isOpen, page, search, categoryFilter, tagFilter, mimeTypeFilter, groupFilter, sceneNumberFilter, imageNumberFilter, specsKeyFilter, specsCustomKey, specsValueFilter, sortField])
 
   const handleSelect = (item: MediaItem) => {
     if (hasMany) {
@@ -251,7 +258,10 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field, value: co
     setMimeTypeFilter('')
     setGroupFilter('')
     setSceneNumberFilter('')
-    setSeriesNumberFilter('')
+    setImageNumberFilter('')
+    setSpecsKeyFilter('')
+    setSpecsCustomKey('')
+    setSpecsValueFilter('')
     setPage(1)
   }
 
@@ -347,6 +357,7 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field, value: co
                   setSearch(e.target.value)
                   setPage(1)
                 }}
+                onKeyDown={(e) => e.stopPropagation()}
                 className="media-picker__search"
               />
 
@@ -422,6 +433,7 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field, value: co
                   setGroupFilter(e.target.value)
                   setPage(1)
                 }}
+                onKeyDown={(e) => e.stopPropagation()}
                 className="media-picker__filter-input"
               />
 
@@ -433,21 +445,72 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field, value: co
                   setSceneNumberFilter(e.target.value)
                   setPage(1)
                 }}
+                onKeyDown={(e) => e.stopPropagation()}
                 className="media-picker__filter-input"
               />
 
               <input
-                type="text"
-                placeholder="产品系列编号..."
-                value={seriesNumberFilter}
+                type="number"
+                placeholder={adminLang === 'zh' ? '图片编号...' : 'Image number...'}
+                value={imageNumberFilter}
                 onChange={(e) => {
-                  setSeriesNumberFilter(e.target.value)
+                  setImageNumberFilter(e.target.value)
                   setPage(1)
                 }}
+                onKeyDown={(e) => e.stopPropagation()}
                 className="media-picker__filter-input"
               />
 
-              {(search || categoryFilter || tagFilter || mimeTypeFilter || groupFilter || sceneNumberFilter || seriesNumberFilter) && (
+              <select
+                value={specsKeyFilter === '__custom' ? '__custom' : specsKeyFilter}
+                onChange={(e) => {
+                  const val = e.target.value
+                  setSpecsKeyFilter(val)
+                  if (!val) { setSpecsValueFilter(''); setSpecsCustomKey('') }
+                  setPage(1)
+                }}
+                className="media-picker__filter-select"
+              >
+                <option value="">{adminLang === 'zh' ? '规格筛选...' : 'Specs Filter...'}</option>
+                <option value="color">{adminLang === 'zh' ? '颜色' : 'Color'}</option>
+                <option value="material">{adminLang === 'zh' ? '材质' : 'Material'}</option>
+                <option value="size">{adminLang === 'zh' ? '尺寸' : 'Size'}</option>
+                <option value="finish">{adminLang === 'zh' ? '表面处理' : 'Finish'}</option>
+                <option value="model">{adminLang === 'zh' ? '型号' : 'Model'}</option>
+                <option value="series">{adminLang === 'zh' ? '系列' : 'Series'}</option>
+                <option value="style">{adminLang === 'zh' ? '款式' : 'Style'}</option>
+                <option value="__custom">{adminLang === 'zh' ? '自定义...' : 'Custom...'}</option>
+              </select>
+
+              {specsKeyFilter === '__custom' && (
+                <input
+                  type="text"
+                  placeholder={adminLang === 'zh' ? '属性名...' : 'Key name...'}
+                  value={specsCustomKey}
+                  onChange={(e) => {
+                    setSpecsCustomKey(e.target.value)
+                    setPage(1)
+                  }}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  className="media-picker__filter-input"
+                />
+              )}
+
+              {specsKeyFilter && (
+                <input
+                  type="text"
+                  placeholder={adminLang === 'zh' ? '规格值...' : 'Specs value...'}
+                  value={specsValueFilter}
+                  onChange={(e) => {
+                    setSpecsValueFilter(e.target.value)
+                    setPage(1)
+                  }}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  className="media-picker__filter-input"
+                />
+              )}
+
+              {(search || categoryFilter || tagFilter || mimeTypeFilter || groupFilter || sceneNumberFilter || imageNumberFilter || specsKeyFilter) && (
                 <button
                   type="button"
                   className="media-picker__clear-filters"
