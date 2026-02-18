@@ -97,25 +97,16 @@ export const DocumentTemplates: CollectionConfig = {
     // ==================================================================
     {
       name: 'category',
-      type: 'select',
+      type: 'relationship',
+      relationTo: 'template-categories',
       label: {
         en: 'Category',
         zh: '分类',
       },
-      defaultValue: 'other',
-      options: [
-        { label: 'Product Introduction | 产品介绍', value: 'product-intro' },
-        { label: 'Feature Section | 功能特点', value: 'feature' },
-        { label: 'FAQ Section | 常见问题', value: 'faq' },
-        { label: 'Testimonial | 客户评价', value: 'testimonial' },
-        { label: 'Call to Action | 行动召唤', value: 'cta' },
-        { label: 'Comparison Table | 对比表格', value: 'comparison' },
-        { label: 'Other | 其他', value: 'other' },
-      ],
       admin: {
         description: {
-          en: 'Category for organizing templates',
-          zh: '用于组织模板的分类',
+          en: 'Category for organizing templates (managed in Template Categories)',
+          zh: '用于组织模板的分类（在"模板分类"中管理）',
         },
       },
     },
