@@ -86,6 +86,7 @@ export interface Config {
     'faq-items': FaqItem;
     'reusable-blocks': ReusableBlock;
     'document-templates': DocumentTemplate;
+    'template-categories': TemplateCategory;
     'custom-scripts': CustomScript;
     'seo-settings': SeoSetting;
     'form-configs': FormConfig;
@@ -127,6 +128,7 @@ export interface Config {
     'faq-items': FaqItemsSelect<false> | FaqItemsSelect<true>;
     'reusable-blocks': ReusableBlocksSelect<false> | ReusableBlocksSelect<true>;
     'document-templates': DocumentTemplatesSelect<false> | DocumentTemplatesSelect<true>;
+    'template-categories': TemplateCategoriesSelect<false> | TemplateCategoriesSelect<true>;
     'custom-scripts': CustomScriptsSelect<false> | CustomScriptsSelect<true>;
     'seo-settings': SeoSettingsSelect<false> | SeoSettingsSelect<true>;
     'form-configs': FormConfigsSelect<false> | FormConfigsSelect<true>;
@@ -1235,9 +1237,9 @@ export interface DocumentTemplate {
   name: string;
   description?: string | null;
   /**
-   * Category for organizing templates
+   * Category for organizing templates (managed in Template Categories)
    */
-  category?: ('product-intro' | 'feature' | 'faq' | 'testimonial' | 'cta' | 'comparison' | 'other') | null;
+  category?: (number | TemplateCategory) | null;
   content?: {
     root: {
       type: string;
@@ -1265,6 +1267,21 @@ export interface DocumentTemplate {
    * Only ACTIVE templates appear in the template selector
    */
   status?: ('active' | 'draft' | 'archived') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "template-categories".
+ */
+export interface TemplateCategory {
+  id: number;
+  name: string;
+  /**
+   * Unique identifier (e.g., "product-intro", "faq")
+   */
+  slug: string;
+  order?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1602,6 +1619,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'document-templates';
         value: number | DocumentTemplate;
+      } | null)
+    | ({
+        relationTo: 'template-categories';
+        value: number | TemplateCategory;
       } | null)
     | ({
         relationTo: 'custom-scripts';
@@ -2102,6 +2123,17 @@ export interface DocumentTemplatesSelect<T extends boolean = true> {
   tags?: T;
   usageCount?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "template-categories_select".
+ */
+export interface TemplateCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  order?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -111,7 +111,7 @@ export const NavigationMenus: CollectionConfig = {
         components: {
           Field: '@/components/fields/IconPicker',
         },
-        condition: (data) => data?.type === 'submenu',
+        condition: (data) => data?.type === 'submenu' || data?.parent != null,
       },
     },
     // Media Tags (for menu items that need images)

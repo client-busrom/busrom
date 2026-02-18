@@ -92,6 +92,7 @@ import { Categories } from './src/collections/Categories'
 import { FaqItems } from './src/collections/FaqItems'
 import { ReusableBlocks } from './src/collections/ReusableBlocks'
 import { DocumentTemplates } from './src/collections/DocumentTemplates'
+import { TemplateCategories } from './src/collections/TemplateCategories'
 // Config Collections
 import { CustomScripts } from './src/collections/CustomScripts'
 import { SeoSettings } from './src/collections/SeoSettings'
@@ -119,6 +120,7 @@ import {
 } from './src/endpoints/auth-login'
 import { homeContentHandler } from './src/endpoints/home'
 import { testSmtpHandler } from './src/endpoints/test-smtp'
+import { mediaSearchHandler } from './src/endpoints/media-search'
 
 // Globals - Website Settings
 import { HomeContent } from './src/globals/HomeContent'
@@ -240,6 +242,7 @@ export default buildConfig({
     FaqItems,
     ReusableBlocks,
     DocumentTemplates,
+    TemplateCategories,
     // Config Collections
     CustomScripts,
     SeoSettings,
@@ -614,6 +617,12 @@ export default buildConfig({
       path: '/home',
       method: 'get',
       handler: homeContentHandler,
+    },
+    // Media Search (supports JSONB specs filtering)
+    {
+      path: '/media-search',
+      method: 'get',
+      handler: mediaSearchHandler,
     },
     {
       path: '/export-form-submissions',
@@ -1117,6 +1126,65 @@ export default buildConfig({
 
       // Step 1: Seed permissions and roles (idempotent - only creates if not exists)
       await seedPermissionsSystem(payload)
+
+      // Step 1.5: Seed default template categories (idempotent)
+      const defaultTemplateCategories = [
+        { name: { en: 'Product Introduction', zh: '产品介绍' }, slug: 'product-intro', order: 1 },
+        { name: { en: 'Company Profile', zh: '公司简介' }, slug: 'company-profile', order: 2 },
+        { name: { en: 'Service Description', zh: '服务说明' }, slug: 'service-description', order: 3 },
+        { name: { en: 'FAQ', zh: '常见问题' }, slug: 'faq', order: 4 },
+        { name: { en: 'News & Blog', zh: '新闻博客' }, slug: 'news-blog', order: 5 },
+        { name: { en: 'Landing Page', zh: '落地页' }, slug: 'landing-page', order: 6 },
+        { name: { en: 'Case Study', zh: '案例展示' }, slug: 'case-study', order: 7 },
+        { name: { en: 'General', zh: '通用' }, slug: 'general', order: 0 },
+      ]
+
+      for (const cat of defaultTemplateCategories) {
+        const existing = await payload.find({
+          collection: 'template-categories',
+          where: { slug: { equals: cat.slug } },
+          limit: 1,
+        })
+        if (existing.totalDocs === 0) {
+          // Create with en locale first
+          const created = await payload.create({
+            collection: 'template-categories',
+            data: {
+              name: cat.name.en,
+              slug: cat.slug,
+              order: cat.order,
+            },
+            locale: 'en',
+          })
+          // Set zh locale name (hook auto-generates bilingual label)
+          await payload.update({
+            collection: 'template-categories',
+            id: created.id,
+            data: { name: cat.name.zh },
+            locale: 'zh',
+          })
+          payload.logger.info(`✅ Template category created: ${cat.name.zh} | ${cat.name.en}`)
+        } else {
+          const doc = existing.docs[0] as any
+          const expectedLabel = `${cat.name.zh} | ${cat.name.en}`
+          if (doc.label !== expectedLabel) {
+            // Ensure both locales have correct names and label is filled
+            await payload.update({
+              collection: 'template-categories',
+              id: doc.id,
+              data: { name: cat.name.en },
+              locale: 'en',
+            })
+            await payload.update({
+              collection: 'template-categories',
+              id: doc.id,
+              data: { name: cat.name.zh },
+              locale: 'zh',
+            })
+            payload.logger.info(`🔄 Template category label fixed: ${expectedLabel}`)
+          }
+        }
+      }
 
       // Step 2: Create default admin user if no users exist
       const existingUsers = await payload.find({
