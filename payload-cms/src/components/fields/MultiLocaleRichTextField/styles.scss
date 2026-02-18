@@ -142,7 +142,9 @@
 
       .filled-dot {
         color: #22c55e;
-        font-size: 8px;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 1;
       }
     }
 
@@ -163,6 +165,39 @@
 
       input {
         margin: 0;
+      }
+    }
+
+    .copy-panel__progress {
+      margin-top: 10px;
+
+      .progress-bar {
+        width: 100%;
+        height: 4px;
+        background: var(--theme-elevation-150);
+        border-radius: 2px;
+        overflow: hidden;
+
+        &__fill {
+          height: 100%;
+          background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+          border-radius: 2px;
+          transition: width 0.3s ease;
+        }
+      }
+
+      .progress-result {
+        margin-top: 8px;
+        font-size: 12px;
+        font-weight: 500;
+
+        &--success {
+          color: #16a34a;
+        }
+
+        &--partial {
+          color: #d97706;
+        }
       }
     }
   }
@@ -250,8 +285,10 @@
 
   &__dot {
     color: #22c55e;
-    font-size: 8px;
+    font-size: 10px;
+    font-weight: 700;
     margin-left: 2px;
+    line-height: 1;
   }
 
   // Currently active tab (being viewed/edited)
@@ -262,6 +299,8 @@
 
     .locale-tab__dot {
       color: #86efac;
+      font-size: 10px;
+      font-weight: 700;
     }
   }
 
