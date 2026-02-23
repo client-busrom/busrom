@@ -157,8 +157,6 @@ function extractItems(flatNodes: any[], markerIndex: number, mediaData: Record<s
   }
   return items
 }
-
-// Main template component
 export function OneStopShopTemplate({ locale, pageContent }: OneStopShopTemplateProps) {
   const [productsData, setProductsData] = useState<any[]>([])
   const [loadingProducts, setLoadingProducts] = useState(true)
