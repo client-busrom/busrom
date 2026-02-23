@@ -65,6 +65,39 @@ function getCropFocalPoint(media: any): { x: number; y: number } | undefined {
 }
 
 /**
+ * Extract simple text highlights from productAttributes Lexical JSON
+ */
+function extractHighlights(productAttributes: any): { text: string; icon?: string }[] {
+  if (!productAttributes?.root?.children) return []
+  
+  const highlights: { text: string; icon?: string }[] = []
+  const nodes = productAttributes.root.children
+
+  for (const node of nodes) {
+    // 1. iconList nodes
+    if (node.type === 'iconList' && node.data?.items) {
+      node.data.items.forEach((item: any) => {
+        if (item.title) {
+          highlights.push({ text: item.title, icon: item.icon })
+        }
+      })
+    }
+    // 2. Standard list nodes
+    else if (node.type === 'list' && node.children) {
+      node.children.forEach((item: any) => {
+        if (item.children) {
+          const text = item.children.map((c: any) => c.text || '').join('').split('|')[0]
+          if (text.trim()) {
+            highlights.push({ text: text.trim() })
+          }
+        }
+      })
+    }
+  }
+  return highlights
+}
+
+/**
  * Transform product data to frontend format
  */
 function transformProduct(product: any) {
@@ -90,6 +123,9 @@ function transformProduct(product: any) {
           name: typeof product.series === 'string' ? '' : product.series.name,
         }
       : null,
+    productAttributes: {
+      highlights: extractHighlights(product.productAttributes)
+    },
   }
 }
 
@@ -113,6 +149,8 @@ interface CarouselItem {
   showName: boolean
   showDescription: boolean
   showButton: boolean
+  showHighlights: boolean
+  highlightsCount: number
   buttonText: string
   openInNewTab: boolean
 }
@@ -228,6 +266,8 @@ export async function POST(request: NextRequest) {
               showName: item.showName,
               showDescription: item.showDescription,
               showButton: item.showButton,
+              showHighlights: item.showHighlights,
+              highlightsCount: item.highlightsCount,
               buttonText: item.buttonText,
               openInNewTab: item.openInNewTab,
             },
@@ -252,6 +292,8 @@ export async function POST(request: NextRequest) {
               showName: item.showName,
               showDescription: item.showDescription,
               showButton: item.showButton,
+              showHighlights: item.showHighlights,
+              highlightsCount: item.highlightsCount,
               buttonText: item.buttonText,
               openInNewTab: item.openInNewTab,
             },

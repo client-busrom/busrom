@@ -189,6 +189,79 @@ export const SiteConfig: GlobalConfig = {
             },
           ],
         },
+        // ----------------------------------------------------------
+        // Tab 3: Maintenance & Cache
+        // ----------------------------------------------------------
+        {
+          label: {
+            en: 'Maintenance',
+            zh: '系统维护',
+          },
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'cloudfrontDistributionId',
+                  type: 'text',
+                  label: {
+                    en: 'CloudFront Distribution ID',
+                    zh: 'CloudFront 分配 ID',
+                  },
+                  admin: {
+                    width: '50%',
+                    description: {
+                      en: 'AWS CloudFront Distribution ID for CDN invalidation',
+                      zh: '用于 CDN 缓存刷新的 AWS CloudFront 分配 ID',
+                    },
+                  },
+                },
+                {
+                  name: 'frontendUrl',
+                  type: 'text',
+                  label: {
+                    en: 'Frontend URL',
+                    zh: '前端网站地址',
+                  },
+                  admin: {
+                    width: '50%',
+                    description: {
+                      en: 'URL of the frontend website (e.g., https://busrom.com)',
+                      zh: '前端网站的完整地址（例如 https://busrom.com）',
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              name: 'revalidateSecret',
+              type: 'text',
+              label: {
+                en: 'Revalidation Secret',
+                zh: '重新验证密钥',
+              },
+              admin: {
+                description: {
+                  en: 'Secret token for Next.js on-demand revalidation',
+                  zh: '用于 Next.js 按需重新验证的安全密钥',
+                },
+              },
+            },
+            {
+              name: 'cacheManagement',
+              type: 'ui',
+              label: {
+                en: 'Cache Control',
+                zh: '缓存管理',
+              },
+              admin: {
+                components: {
+                  Field: '@/components/fields/MaintenancePanel',
+                },
+              },
+            },
+          ],
+        },
       ],
     },
   ],

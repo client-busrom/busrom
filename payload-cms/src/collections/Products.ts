@@ -150,6 +150,24 @@ export const Products: CollectionConfig = {
                 },
               },
             },
+            {
+              name: 'productAttributes',
+              type: 'richText',
+              localized: true,
+              label: {
+                en: 'Product Attributes/Highlights',
+                zh: '产品属性/核心亮点',
+              },
+              admin: {
+                description: {
+                  en: 'Rich text for specific product attributes. You can use Document Templates to insert common ones.',
+                  zh: '用于特定产品属性的富文本。可以使用"文档模板"插入通用内容。',
+                },
+                components: {
+                  beforeInput: ['@/components/fields/MultiLocaleRichTextField'],
+                },
+              },
+            },
           ],
         },
 

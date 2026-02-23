@@ -212,6 +212,7 @@ export async function GET(request: NextRequest) {
         isFeatured: product.featured || false,
         order: product.order || 0,
         status: product.status === 'published' ? 'PUBLISHED' : 'DRAFT',
+        productAttributes: product.productAttributes || null,
         createdAt: product.createdAt,
         updatedAt: product.updatedAt,
       }

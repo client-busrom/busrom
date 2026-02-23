@@ -30,6 +30,8 @@ export interface ProductCarouselItem {
   showName: boolean
   showDescription: boolean
   showButton: boolean
+  showHighlights: boolean
+  highlightsCount: number
   buttonText: string // Translatable
   openInNewTab: boolean
 }

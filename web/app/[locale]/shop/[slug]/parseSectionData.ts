@@ -125,28 +125,25 @@ export function parseMainContentStrengthData(content: LexicalContent) {
       }
     }
 
-    // Fallback: Check for item marker with list (text-based)
-    if (node.type === 'paragraph' && nodeText === 'main-content-strength-item') {
-      const nextNode = nodes[i + 1]
-      if (nextNode?.type === 'list' && nextNode.children) {
-        for (const listItem of nextNode.children) {
-          if (listItem.type === 'listitem') {
-            const text = extractTextWithLinebreaks(listItem.children)
-            if (text) {
-              const parts = text.split('|')
-              if (parts.length >= 2) {
-                const iconPart = parts[0].startsWith('icon:') ? parts[0].replace('icon:', '') : 'users'
-                const title = parts[0].startsWith('icon:') ? parts[1] : parts[0]
-                const subtitle = parts[0].startsWith('icon:') ? parts[2] : parts[1]
-                strengthItems.push({ icon: iconPart, title, subtitle })
-              } else {
-                const lines = text.split('\n')
-                strengthItems.push({
-                  icon: 'users',
-                  title: lines[0] || '',
-                  subtitle: lines[1] || '',
-                })
-              }
+    // 3. Check for list block (text-based, with support for | icon separator)
+    if (node.type === 'list' && node.children) {
+      for (const listItem of node.children) {
+        if (listItem.type === 'listitem') {
+          const text = extractTextWithLinebreaks(listItem.children)
+          if (text) {
+            const parts = text.split('|')
+            if (parts.length >= 2) {
+              const iconPart = parts[0].startsWith('icon:') ? parts[0].replace('icon:', '') : 'users'
+              const title = parts[0].startsWith('icon:') ? parts[1] : parts[0]
+              const subtitle = parts[0].startsWith('icon:') ? parts[2] : parts[1]
+              strengthItems.push({ icon: iconPart, title, subtitle })
+            } else {
+              const lines = text.split('\n')
+              strengthItems.push({
+                icon: 'users',
+                title: lines[0] || '',
+                subtitle: lines[1] || '',
+              })
             }
           }
         }

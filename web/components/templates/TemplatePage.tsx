@@ -6,6 +6,7 @@ import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 import { ServiceOverviewTemplate } from "./ServiceOverviewTemplate"
 import { ContactUsTemplate } from "./ContactUsTemplate"
 import { OemOdmTemplate } from "./OemOdmTemplate"
+import { OneStopShopTemplate } from "./OneStopShopTemplate"
 
 interface PageContent {
   id: string
@@ -128,12 +129,12 @@ export function TemplatePage({ locale, slug, template }: TemplatePageProps) {
 
   // OEM_ODM template
   if (template === "OEM_ODM") {
-    return (
-      <OemOdmTemplate
-        locale={locale}
-        pageContent={pageContent}
-      />
-    )
+    return <OemOdmTemplate locale={locale} pageContent={pageContent} />
+  }
+
+  // ONE_STOP_SHOP template
+  if (template === "ONE_STOP_SHOP") {
+    return <OneStopShopTemplate locale={locale} pageContent={pageContent} />
   }
 
   // Default fallback to document renderer

@@ -154,9 +154,8 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
   // Parse Lexical content structure using extracted function
   const { preFormSections, formBlock, postFormSections } = parseLexicalSections(product.content)
 
-  // Find and parse main-content-strength section from preFormSections
-  const strengthSection = preFormSections.find((s: any) => s.title === 'main-content-strength')
-  const strengthData = strengthSection ? parseMainContentStrengthData(strengthSection.content) : null
+  // Use the new productAttributes field for strength badges
+  const strengthData = product.productAttributes ? parseMainContentStrengthData(product.productAttributes) : null
 
   // Get the first main image for the hero section
   const heroImage = images.length > 0 ? images[0] : null
@@ -180,9 +179,9 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
             </div>
 
             {/* Section Buttons - Click to open modal (Desktop only - md+) */}
-            {preFormSections.filter((s: any) => s.title !== 'main-content-strength').length > 0 && (
+            {preFormSections.length > 0 && (
               <div className="hidden md:block space-y-3 md:space-y-4">
-                {preFormSections.filter((s: any) => s.title !== 'main-content-strength').map((section: any, index: number) => (
+                {preFormSections.map((section: any, index: number) => (
                   <button
                     key={index}
                     onClick={() => setSelectedSection(section)}
@@ -318,9 +317,9 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
         </div>
 
         {/* Section Buttons - Click to open modal (Mobile only - below md) */}
-        {preFormSections.filter((s: any) => s.title !== 'main-content-strength').length > 0 && (
+        {preFormSections.length > 0 && (
           <div className="block md:hidden mb-12 space-y-3">
-            {preFormSections.filter((s: any) => s.title !== 'main-content-strength').map((section: any, index: number) => (
+            {preFormSections.map((section: any, index: number) => (
               <button
                 key={index}
                 onClick={() => setSelectedSection(section)}
