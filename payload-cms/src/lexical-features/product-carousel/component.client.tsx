@@ -143,7 +143,9 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
       showName: true,
       showDescription: true,
       showButton: true,
-      buttonText: i18n?.language === 'zh' ? '查看详情' : 'View Details',
+      showHighlights: true,
+      highlightsCount: 4,
+      buttonText: i18n?.language === 'zh' ? '查看全部' : 'See All',
       openInNewTab: false,
     }
     setLocalData({ ...localData, items: [...localData.items, newItem] })
@@ -246,6 +248,10 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
         backgroundColor: '#ffffff',
         boxShadow: '0 4px 20px rgba(160, 135, 69, 0.15)',
         overflow: 'hidden',
+        width: '100%',
+        maxWidth: '100%',
+        minWidth: 0,
+        boxSizing: 'border-box',
       }}>
         {/* Header */}
         <div style={{
@@ -673,7 +679,7 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                         }}>
                           <input
                             type="checkbox"
-                            checked={item.showName}
+                            checked={!!item.showName}
                             onChange={(e) => handleUpdateItem(index, { showName: e.target.checked })}
                             style={{ accentColor: '#A08745' }}
                           />
@@ -692,7 +698,7 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                         }}>
                           <input
                             type="checkbox"
-                            checked={item.showDescription}
+                            checked={!!item.showDescription}
                             onChange={(e) => handleUpdateItem(index, { showDescription: e.target.checked })}
                             style={{ accentColor: '#A08745' }}
                           />
@@ -711,7 +717,7 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                         }}>
                           <input
                             type="checkbox"
-                            checked={item.showButton}
+                            checked={!!item.showButton}
                             onChange={(e) => handleUpdateItem(index, { showButton: e.target.checked })}
                             style={{ accentColor: '#A08745' }}
                           />
@@ -730,13 +736,57 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                         }}>
                           <input
                             type="checkbox"
-                            checked={item.openInNewTab}
+                            checked={!!item.openInNewTab}
                             onChange={(e) => handleUpdateItem(index, { openInNewTab: e.target.checked })}
                             style={{ accentColor: '#A08745' }}
                           />
                           {i18n?.language === 'zh' ? '新标签打开' : 'New Tab'}
                         </label>
+                        <label style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px 10px',
+                          backgroundColor: 'white',
+                          borderRadius: '6px',
+                          border: '1px solid #fef08a',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                        }}>
+                          <input
+                            type="checkbox"
+                            checked={!!item.showHighlights}
+                            onChange={(e) => handleUpdateItem(index, { showHighlights: e.target.checked })}
+                            style={{ accentColor: '#A08745' }}
+                          />
+                          {i18n?.language === 'zh' ? '显示核心亮点' : 'Highlights'}
+                        </label>
                       </div>
+
+                      {item.showHighlights && (
+                        <div style={{ marginTop: '10px' }}>
+                          <label style={{ display: 'block', marginBottom: '4px', color: '#854d0e', fontWeight: 500 }}>
+                            {i18n?.language === 'zh' ? '随机显示数量' : 'Random Count'}
+                          </label>
+                          <input
+                            type="number"
+                            min={1}
+                            max={10}
+                            value={item.highlightsCount || 4}
+                            onChange={(e) => handleUpdateItem(index, { highlightsCount: Number(e.target.value) })}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            style={{
+                              width: '100%',
+                              padding: '8px 10px',
+                              border: '1px solid #fef08a',
+                              borderRadius: '6px',
+                              fontSize: '12px',
+                              backgroundColor: 'white',
+                            }}
+                          />
+                        </div>
+                      )}
+
                       {item.showButton && (
                         <div style={{ marginTop: '10px' }}>
                           <label style={{ display: 'block', marginBottom: '4px', color: '#854d0e', fontWeight: 500 }}>
@@ -892,7 +942,7 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                 }}>
                   <input
                     type="checkbox"
-                    checked={localData.autoplay}
+                    checked={!!localData.autoplay}
                     onChange={(e) => setLocalData({ ...localData, autoplay: e.target.checked })}
                     style={{ accentColor: '#16a34a' }}
                   />
@@ -937,7 +987,18 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
   return (
     <div
       onClick={() => setIsEditing(true)}
-      style={{ margin: '16px 0', padding: '16px', border: '1px solid #e5e7eb', borderRadius: '8px', cursor: 'pointer', backgroundColor: 'white', position: 'relative' }}
+      style={{ 
+        margin: '16px auto', 
+        padding: '16px', 
+        border: '1px solid #e5e7eb', 
+        borderRadius: '8px', 
+        cursor: 'pointer', 
+        backgroundColor: 'white', 
+        position: 'relative',
+        maxWidth: '640px', // Adjusted to 640px for tighter, more proportional width
+        width: '100%',
+        boxSizing: 'border-box'
+      }}
     >
       <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '6px' }}>
         {/* Carousel Container */}
@@ -984,6 +1045,13 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                           {product.shortDescription}
                         </p>
                       )}
+                      {item.showHighlights && (
+                        <div style={{ marginBottom: '8px', display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                          <span style={{ padding: '2px 6px', backgroundColor: '#fef9c3', color: '#854d0e', borderRadius: '4px', fontSize: '10px', fontWeight: 600, border: '1px solid #fef08a' }}>
+                            ✨ {item.highlightsCount || 4} {i18n?.language === 'zh' ? '个亮点' : 'Highlights'}
+                          </span>
+                        </div>
+                      )}
                       {item.showButton && (
                         <div style={{ fontSize: '11px', color: '#A08745', fontWeight: 500 }}>
                           {item.buttonText} →
@@ -997,9 +1065,14 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                     <div style={{ fontSize: '11px', color: '#065f46', marginBottom: '4px' }}>
                       {i18n?.language === 'zh' ? '自动随机' : 'Auto Random'}
                     </div>
-                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#047857' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#047857', marginBottom: '8px' }}>
                       {series.name}
                     </div>
+                    {item.showHighlights && (
+                      <span style={{ padding: '2px 6px', backgroundColor: '#dcfce7', color: '#166534', borderRadius: '4px', fontSize: '10px', fontWeight: 600, border: '1px solid #bbf7d0' }}>
+                        ✨ {item.highlightsCount || 4} {i18n?.language === 'zh' ? '个亮点' : 'Highlights'}
+                      </span>
+                    )}
                   </div>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '200px', color: '#9ca3af' }}>
@@ -1032,10 +1105,7 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
               style={{
                 position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)',
                 padding: '8px', backgroundColor: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%',
-                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)', zIndex: 10,
-              }}
-            >
+              }}>
               <ChevronRight size={20} />
             </button>
           </>
@@ -1058,6 +1128,7 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
     </div>
   )
 }
+
 
 // Product Picker Modal
 interface ProductPickerModalProps {

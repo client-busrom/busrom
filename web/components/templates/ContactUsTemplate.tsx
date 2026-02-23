@@ -651,6 +651,8 @@ export function ContactUsTemplate({ locale, pageContent }: ContactUsTemplateProp
             showName: item.showName !== false,
             showDescription: item.showDescription !== false,
             showButton: item.showButton !== false,
+            showHighlights: !!item.showHighlights,
+            highlightsCount: item.highlightsCount || 3,
             buttonText: item.buttonText || "View More",
             openInNewTab: item.openInNewTab || false,
           })
@@ -719,6 +721,9 @@ export function ContactUsTemplate({ locale, pageContent }: ContactUsTemplateProp
           buttonText: product._carouselItem?.buttonText || "View More",
           showName: product._carouselItem?.showName !== false,
           showButton: product._carouselItem?.showButton !== false,
+          showHighlights: !!product._carouselItem?.showHighlights,
+          highlightsCount: product._carouselItem?.highlightsCount || 3,
+          productAttributes: product.productAttributes || null,
         }))
 
         setProductShowItems(items)

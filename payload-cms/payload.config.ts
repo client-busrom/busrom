@@ -122,6 +122,7 @@ import {
 import { homeContentHandler } from './src/endpoints/home'
 import { testSmtpHandler } from './src/endpoints/test-smtp'
 import { mediaSearchHandler } from './src/endpoints/media-search'
+import { invalidateCdnHandler, revalidateFrontendHandler } from './src/endpoints/maintenance'
 
 // Globals - Website Settings
 import { HomeContent } from './src/globals/HomeContent'
@@ -709,6 +710,16 @@ export default buildConfig({
       path: '/auth/check-2fa',
       method: 'get',
       handler: check2FARequiredHandler,
+    },
+    {
+      path: '/maintenance/invalidate-cdn',
+      method: 'post',
+      handler: invalidateCdnHandler,
+    },
+    {
+      path: '/maintenance/revalidate-frontend',
+      method: 'post',
+      handler: revalidateFrontendHandler,
     },
   ],
 

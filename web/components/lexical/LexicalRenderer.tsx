@@ -20,6 +20,8 @@ import { RichText, defaultJSXConverters } from '@payloadcms/richtext-lexical/rea
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical'
 import type { JSXConverters } from '@payloadcms/richtext-lexical/react'
 
+import { ProductCarouselBlock } from './blocks/ProductCarouselBlock'
+
 interface LexicalRendererProps {
   content: SerializedEditorState
   className?: string
@@ -859,6 +861,8 @@ export const customConverters: JSXConverters = {
     'linkJump': LinkJumpBlock,
     'marqueeLinks': MarqueeLinksBlock,
     'iconList': IconListBlock,
+    'product-carousel': ProductCarouselBlock,
+    'productCarousel': ProductCarouselBlock,
   },
 }
 
@@ -893,6 +897,8 @@ export function LexicalRenderer({ content, className = '' }: LexicalRendererProp
     'link-jump': LinkJumpBlock,
     'marquee-links': MarqueeLinksBlock,
     'single-image': SingleImageBlock,
+    productCarousel: ProductCarouselBlock,
+    'product-carousel': ProductCarouselBlock,
   }
 
   return (
@@ -934,6 +940,8 @@ function NestedLexicalRenderer({ content }: { content: any }) {
     'link-jump': LinkJumpBlock,
     'marquee-links': MarqueeLinksBlock,
     'single-image': SingleImageBlock,
+    productCarousel: ProductCarouselBlock,
+    'product-carousel': ProductCarouselBlock,
   }
 
   return <RichText data={content} converters={converters} />

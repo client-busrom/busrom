@@ -19,54 +19,57 @@ export async function GET(request: NextRequest) {
     // 构建 Payload API URL
     const params = new URLSearchParams()
     params.append('locale', locale)
-    params.append('limit', '100') // Get all series
-    params.append('depth', '1')
-    // TODO: Re-enable after setting series status to 'published' in Payload CMS
-    // params.append('where[status][equals]', 'published')
+    params.append('limit', '100')
+    params.append('depth', '2') // Increase depth to get product images
     params.append('sort', 'order')
 
     const url = `${CMS_URL}/api/product-series?${params.toString()}`
     console.log('[Product Series API] Request URL:', url)
 
-    // 从 Payload CMS 获取系列数据
     const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      next: { revalidate: 60 }, // 缓存 60 秒
+      headers: { 'Content-Type': 'application/json' },
+      next: { revalidate: 60 },
     })
 
     if (!response.ok) {
-      console.error('[Product Series API] Payload CMS error:', response.status, response.statusText)
-      return NextResponse.json(
-        { error: 'Failed to fetch product series from CMS' },
-        { status: response.status }
-      )
+      return NextResponse.json({ error: 'Failed to fetch' }, { status: response.status })
     }
 
     const data = await response.json()
-    console.log('[Product Series API] Received series:', data.totalDocs)
 
-    // Transform data to match frontend expectations
-    const series = data.docs.map((s: any) => ({
-      id: s.id,
-      slug: s.slug,
-      name: s.name,
-      localizedName: s.name, // Already localized by Payload
-      description: s.description,
-      localizedDescription: s.description, // Already localized by Payload
-      featuredImage: s.featuredImage
-        ? {
-            id: s.featuredImage.id,
-            url: s.featuredImage.url,
-            altText: s.featuredImage.alt || '',
-            filename: s.featuredImage.filename,
-            variants: s.featuredImage.sizes,
-          }
-        : null,
-      order: s.order || 0,
-      status: s.status === 'published' ? 'PUBLISHED' : 'DRAFT',
-    }))
+    // Transform data
+    const series = data.docs.map((s: any) => {
+      // Logic: Prefer the first product's showImage (white backdrop) for this section.
+      // Fallback to series featuredImage (lifestyle) or first product's mainImage.
+      let finalImage = null;
+      
+      const firstProd = s.products?.docs?.length > 0 ? s.products.docs[0] : null;
+
+      if (firstProd) {
+        finalImage = firstProd.showImage || firstProd.mainImage?.[0];
+      }
+
+      // If no product image found, use the series image
+      if (!finalImage) {
+        finalImage = s.featuredImage;
+      }
+
+      return {
+        id: s.id,
+        slug: s.slug,
+        name: s.name,
+        description: s.description,
+        featuredImage: finalImage && finalImage.url ? {
+          id: finalImage.id,
+          url: finalImage.url,
+          altText: finalImage.alt || s.name,
+          filename: finalImage.filename,
+          variants: finalImage.sizes,
+        } : null,
+        order: s.order || 0,
+        status: s.status === 'published' ? 'PUBLISHED' : 'DRAFT',
+      }
+    })
 
     return NextResponse.json({ series })
   } catch (error) {

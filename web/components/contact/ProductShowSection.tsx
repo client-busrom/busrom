@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useEffect, useState, useRef } from "react"
+import React, { useCallback, useEffect, useState, useRef, useMemo } from "react"
 import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import Link from "next/link"
@@ -32,6 +32,9 @@ export interface ProductShowItem {
   buttonText?: string
   showName?: boolean
   showButton?: boolean
+  showHighlights?: boolean
+  highlightsCount?: number
+  productAttributes?: any
 }
 
 interface ProductShowSectionProps {
@@ -158,7 +161,28 @@ export function ProductShowSection({
   }, [items, selectedIndex])
 
   const visibleItems = getVisibleItems()
-  const centerItem = items[selectedIndex]
+
+  // 预处理 highlights，确保随机性且在轮播时保持稳定
+  const processedItems = useMemo(() => {
+    return items.map(item => {
+      if (!item.showHighlights || !item.productAttributes?.highlights) {
+        return { ...item, displayHighlights: [] }
+      }
+      
+      const shuffled = [...item.productAttributes.highlights]
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+      }
+      
+      return {
+        ...item,
+        displayHighlights: shuffled.slice(0, item.highlightsCount || 3)
+      }
+    })
+  }, [items])
+
+  const centerItem = processedItems[selectedIndex]
 
   return (
     <section
@@ -312,6 +336,31 @@ export function ProductShowSection({
         >
           {centerItem.title}
         </h3>
+      )}
+
+      {/* Highlights - 随机显示亮点 */}
+      {centerItem && centerItem.showHighlights && centerItem.displayHighlights?.length > 0 && (
+        <div 
+          className="absolute flex flex-wrap justify-center gap-4 transition-opacity duration-300"
+          style={{
+            left: "50%",
+            transform: "translateX(-50%)",
+            top: vw(630),
+            width: vw(800),
+          }}
+        >
+          {centerItem.displayHighlights.map((highlight: any, idx: number) => (
+            <div 
+              key={idx}
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20"
+            >
+              <div className="w-2 h-2 rounded-full bg-[#FFF49B]" />
+              <span className="text-white font-josefin-sans text-sm md:text-base">
+                {highlight.text}
+              </span>
+            </div>
+          ))}
+        </div>
       )}
 
       {/* View More 按钮 - 链接到中间卡片 */}
