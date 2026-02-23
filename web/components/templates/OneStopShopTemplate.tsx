@@ -23,13 +23,7 @@ interface MediaObject {
 
 interface OneStopShopTemplateProps {
   locale: string
-  pageContent: {
-    title: string
-    content?: { root?: { children?: any[] } } | null
-    contentTranslation?: { root?: { children?: any[] } } | null
-    mediaData?: Record<string, MediaObject>
-    formConfig?: any
-  }
+  pageContent: any
 }
 
 /**
@@ -164,6 +158,7 @@ function extractItems(flatNodes: any[], markerIndex: number, mediaData: Record<s
   return items
 }
 
+// Main template component
 export function OneStopShopTemplate({ locale, pageContent }: OneStopShopTemplateProps) {
   const [productsData, setProductsData] = useState<any[]>([])
   const [loadingProducts, setLoadingProducts] = useState(true)
@@ -223,7 +218,7 @@ export function OneStopShopTemplate({ locale, pageContent }: OneStopShopTemplate
   const trustBgImage = useMemo(() => {
     const bgMarker = "why-contractors-trust-us-bg-image"
     const flatNodes = contentChildren
-    const markerIdx = flatNodes.findIndex(n => JSON.stringify(n).includes(bgMarker))
+    const markerIdx = flatNodes.findIndex((n: any) => JSON.stringify(n).includes(bgMarker))
     if (markerIdx !== -1) {
       const nextNode = flatNodes[markerIdx + 1]
       if (nextNode?.data?.image) return mediaData[nextNode.data.image.id || nextNode.data.image]
@@ -286,7 +281,7 @@ export function OneStopShopTemplate({ locale, pageContent }: OneStopShopTemplate
      
      // Find the title text (the paragraph immediately following oem-odm-guide-title)
      let title = res.title || "READY TO\nJOIN IN BUSROM?"
-     const titleMarkerIndex = contentChildren.findIndex(n => JSON.stringify(n).includes("oem-odm-guide-title"))
+     const titleMarkerIndex = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("oem-odm-guide-title"))
      if (titleMarkerIndex !== -1 && titleMarkerIndex + 1 < contentChildren.length) {
        const titleNode = contentChildren[titleMarkerIndex + 1]
        if (titleNode && titleNode.children) {
@@ -298,7 +293,7 @@ export function OneStopShopTemplate({ locale, pageContent }: OneStopShopTemplate
      }
 
      // Extract image by checking the node after the marker, or fallback to the first uploaded item in the section
-     const bgImageIndex = contentChildren.findIndex(n => JSON.stringify(n).includes("oem-odm-guide-bg-image"))
+     const bgImageIndex = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("oem-odm-guide-bg-image"))
      let bgImage = null
      if (bgImageIndex !== -1 && bgImageIndex + 1 < contentChildren.length) {
        const nextNode = contentChildren[bgImageIndex + 1]
@@ -314,7 +309,7 @@ export function OneStopShopTemplate({ locale, pageContent }: OneStopShopTemplate
      // Extract CTA Link
      let ctaText = "READ MORE"
      let ctaLink = "/oem-odm"
-     const ctaMarkerIndex = contentChildren.findIndex(n => JSON.stringify(n).includes("oem-odm-guide-cta"))
+     const ctaMarkerIndex = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("oem-odm-guide-cta"))
      if (ctaMarkerIndex !== -1 && ctaMarkerIndex + 1 < contentChildren.length) {
        const ctaNode = contentChildren[ctaMarkerIndex + 1]
        if (ctaNode && ctaNode.type === "linkJump" && ctaNode.data) {
