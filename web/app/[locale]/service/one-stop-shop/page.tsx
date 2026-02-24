@@ -17,7 +17,7 @@ export async function generateMetadata({
     description: "Complete one-stop solution for all your glass hardware needs",
   }
 
-  return getPageMetadata('/service/one-stop', 'one_stop_shop', locale, defaultMetadata)
+  return getPageMetadata('/service/one-stop-shop', 'one_stop_shop', locale, defaultMetadata)
 }
 
 export default async function OneStopShopPage({
@@ -29,11 +29,11 @@ export default async function OneStopShopPage({
 
   return (
     <>
-      <PageScripts path="/service/one-stop" pageType="one_stop_shop" position="header" />
-      <PageScripts path="/service/one-stop" pageType="one_stop_shop" position="body_start" />
-      <PageSeoInjector path="/service/one-stop" pageType="one_stop_shop" locale={locale} />
+      <PageScripts path="/service/one-stop-shop" pageType="one_stop_shop" position="header" />
+      <PageScripts path="/service/one-stop-shop" pageType="one_stop_shop" position="body_start" />
+      <PageSeoInjector path="/service/one-stop-shop" pageType="one_stop_shop" locale={locale} />
       <TemplatePage locale={locale} slug="one-stop-shop" template="ONE_STOP_SHOP" />
-      <PageScripts path="/service/one-stop" pageType="one_stop_shop" position="footer" />
+      <PageScripts path="/service/one-stop-shop" pageType="one_stop_shop" position="footer" />
     </>
   )
 }
