@@ -64,7 +64,15 @@ async function getImageFromMediaTags(
  */
 function fixProductUrl(url: string | null | undefined): string {
   if (!url) return '#'
-  return url.replace(/^\/product\//, '/products/')
+  
+  let processedUrl = url.replace(/^\/product\//, '/products/')
+  
+  // Fix One-Stop Shop URL
+  if (processedUrl === '/service/one-stop') {
+    processedUrl = '/service/one-stop-shop'
+  }
+  
+  return processedUrl
 }
 
 /**

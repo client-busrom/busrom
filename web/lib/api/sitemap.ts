@@ -215,7 +215,7 @@ function getStaticRoutes(): { path: string; changefreq: SitemapUrl['changefreq']
 
     // Service pages
     { path: '/service/overview', changefreq: 'monthly', priority: 0.7 },
-    { path: '/service/one-stop', changefreq: 'monthly', priority: 0.7 },
+    { path: '/service/one-stop-shop', changefreq: 'monthly', priority: 0.7 },
     { path: '/service/oem-odm', changefreq: 'monthly', priority: 0.7 },
     { path: '/service/faq', changefreq: 'monthly', priority: 0.6 },
 
