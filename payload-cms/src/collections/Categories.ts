@@ -63,8 +63,9 @@ export const Categories: CollectionConfig = {
       required: true,
       localized: true,
       admin: {
-        components: {
-          Field: '@/components/fields/MultiLocaleField#MultiLocaleTextField',
+        description: {
+          en: 'Bilingual category name',
+          zh: '双语分类名称',
         },
       },
     },
@@ -97,11 +98,11 @@ export const Categories: CollectionConfig = {
       },
       required: true,
       options: [
-        { label: 'Page | 页面', value: 'PAGE' },
-        { label: 'Product | 产品', value: 'PRODUCT' },
-        { label: 'Blog | 博客', value: 'BLOG' },
-        { label: 'Application | 应用', value: 'APPLICATION' },
-        { label: 'FAQ | 常见问题', value: 'FAQ' },
+        { label: { en: 'Page', zh: '页面' }, value: 'PAGE' },
+        { label: { en: 'Product', zh: '产品' }, value: 'PRODUCT' },
+        { label: { en: 'Blog', zh: '博客' }, value: 'BLOG' },
+        { label: { en: 'Application', zh: '应用' }, value: 'APPLICATION' },
+        { label: { en: 'FAQ', zh: '常见问题' }, value: 'FAQ' },
       ],
     },
 
@@ -136,8 +137,9 @@ export const Categories: CollectionConfig = {
       },
       localized: true,
       admin: {
-        components: {
-          Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
+        description: {
+          en: 'Localized description of this category',
+          zh: '此分类的多语言描述',
         },
       },
     },
@@ -170,12 +172,22 @@ export const Categories: CollectionConfig = {
       },
       defaultValue: 'draft',
       options: [
-        { label: 'Published | 已发布', value: 'published' },
-        { label: 'Draft | 草稿', value: 'draft' },
-        { label: 'Archived | 归档', value: 'archived' },
+        { label: { en: 'Published', zh: '已发布' }, value: 'published' },
+        { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
+        { label: { en: 'Archived', zh: '归档' }, value: 'archived' },
       ],
       admin: {
         position: 'sidebar',
+      },
+    },
+    {
+      name: 'translationCenter',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/components/fields/TranslationCenter',
+        },
       },
     },
   ],

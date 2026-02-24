@@ -47,9 +47,15 @@ export const MediaCategories: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
-      label: 'Name (Slug) | 名称 (标识)',
+      label: {
+        en: 'Name (Slug)',
+        zh: '名称 (标识)',
+      },
       admin: {
-        description: 'Internal identifier (e.g., "product-images") | 内部标识符（如 "product-images"）',
+        description: {
+          en: 'Internal identifier (e.g., "product-images")',
+          zh: '内部标识符（如 "product-images"）',
+        },
       },
       index: true,
     },
@@ -58,11 +64,14 @@ export const MediaCategories: CollectionConfig = {
       type: 'textarea',
       required: true,
       localized: true,
-      label: 'Display Name | 显示名称',
+      label: {
+        en: 'Display Name',
+        zh: '显示名称',
+      },
       admin: {
-        description: 'User-friendly name shown in UI | 在界面中显示的友好名称',
-        components: {
-          Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
+        description: {
+          en: 'User-friendly name shown in UI',
+          zh: '在界面中显示的友好名称',
         },
       },
     },
@@ -70,31 +79,63 @@ export const MediaCategories: CollectionConfig = {
       name: 'description',
       type: 'textarea',
       localized: true,
-      label: 'Description | 描述',
+      label: {
+        en: 'Description',
+        zh: '描述',
+      },
     },
     {
       name: 'icon',
       type: 'text',
-      label: 'Icon | 图标',
+      label: {
+        en: 'Icon',
+        zh: '图标',
+      },
       admin: {
-        description: 'Icon name or emoji | 图标名称或 emoji',
+        description: {
+          en: 'Icon name or emoji',
+          zh: '图标名称 or emoji',
+        },
       },
     },
     {
       name: 'color',
       type: 'text',
-      label: 'Color | 颜色',
+      label: {
+        en: 'Color',
+        zh: '颜色',
+      },
       admin: {
-        description: 'Color code for UI display (e.g., #3498db) | UI显示的颜色代码',
+        description: {
+          en: 'Color code for UI display (e.g., #3498db)',
+          zh: 'UI显示的颜色代码',
+        },
       },
     },
     {
       name: 'order',
       type: 'number',
       defaultValue: 0,
-      label: 'Order | 排序',
+      label: {
+        en: 'Order',
+        zh: '排序',
+      },
       admin: {
-        description: 'Display order in lists | 列表中的显示顺序',
+        position: 'sidebar',
+        description: {
+          en: 'Display order in lists',
+          zh: '列表中的显示顺序',
+        },
+      },
+    },
+    {
+      name: 'translationCenter',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/components/fields/TranslationCenter',
+        },
       },
     },
   ],

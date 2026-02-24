@@ -153,11 +153,11 @@ export const FormConfigs: CollectionConfig = {
       required: true,
       defaultValue: 'CUSTOM',
       options: [
-        { label: 'Home - Main Form | 首页主表单', value: 'HOME_MAIN' },
-        { label: 'Footer Form | 页脚表单', value: 'FOOTER' },
-        { label: 'Contact Us Page | 联系我们', value: 'CONTACT_US' },
-        { label: 'Quick Inquiry | 快速咨询', value: 'QUICK_INQUIRY' },
-        { label: 'Custom | 自定义', value: 'CUSTOM' },
+        { label: { en: 'Home - Main Form', zh: '首页主表单' }, value: 'HOME_MAIN' },
+        { label: { en: 'Footer Form', zh: '页脚表单' }, value: 'FOOTER' },
+        { label: { en: 'Contact Us Page', zh: '联系我们' }, value: 'CONTACT_US' },
+        { label: { en: 'Quick Inquiry', zh: '快速咨询' }, value: 'QUICK_INQUIRY' },
+        { label: { en: 'Custom', zh: '自定义' }, value: 'CUSTOM' },
       ],
     },
 
@@ -222,16 +222,16 @@ export const FormConfigs: CollectionConfig = {
           required: true,
           defaultValue: 'text',
           options: [
-            { label: 'Text | 文本', value: 'text' },
-            { label: 'Email | 邮箱', value: 'email' },
-            { label: 'Phone | 电话', value: 'phone' },
-            { label: 'Textarea | 多行文本', value: 'textarea' },
-            { label: 'Select | 下拉选择', value: 'select' },
-            { label: 'Checkbox | 复选框', value: 'checkbox' },
-            { label: 'Radio | 单选', value: 'radio' },
-            { label: 'Number | 数字', value: 'number' },
-            { label: 'Date | 日期', value: 'date' },
-            { label: 'File | 文件', value: 'file' },
+            { label: { en: 'Text', zh: '文本' }, value: 'text' },
+            { label: { en: 'Email', zh: '邮箱' }, value: 'email' },
+            { label: { en: 'Phone', zh: '电话' }, value: 'phone' },
+            { label: { en: 'Textarea', zh: '多行文本' }, value: 'textarea' },
+            { label: { en: 'Select', zh: '下拉选择' }, value: 'select' },
+            { label: { en: 'Checkbox', zh: '复选框' }, value: 'checkbox' },
+            { label: { en: 'Radio', zh: '单选' }, value: 'radio' },
+            { label: { en: 'Number', zh: '数字' }, value: 'number' },
+            { label: { en: 'Date', zh: '日期' }, value: 'date' },
+            { label: { en: 'File', zh: '文件' }, value: 'file' },
           ],
         },
         {
@@ -295,9 +295,9 @@ export const FormConfigs: CollectionConfig = {
           },
           defaultValue: 'full',
           options: [
-            { label: 'Full | 全宽', value: 'full' },
-            { label: 'Half | 半宽', value: 'half' },
-            { label: 'Third | 三分之一', value: 'third' },
+            { label: { en: 'Full', zh: '全宽' }, value: 'full' },
+            { label: { en: 'Half', zh: '半宽' }, value: 'half' },
+            { label: { en: 'Third', zh: '三分之一' }, value: 'third' },
           ],
         },
         {
@@ -495,9 +495,9 @@ export const FormConfigs: CollectionConfig = {
           },
           defaultValue: 'auto',
           options: [
-            { label: 'Auto | 自动', value: 'auto' },
-            { label: 'Light | 浅色', value: 'light' },
-            { label: 'Dark | 深色', value: 'dark' },
+            { label: { en: 'Auto', zh: '自动' }, value: 'auto' },
+            { label: { en: 'Light', zh: '浅色' }, value: 'light' },
+            { label: { en: 'Dark', zh: '深色' }, value: 'dark' },
           ],
           admin: {
             condition: (data) => data?.captchaEnabled,
@@ -512,8 +512,8 @@ export const FormConfigs: CollectionConfig = {
           },
           defaultValue: 'normal',
           options: [
-            { label: 'Normal | 正常', value: 'normal' },
-            { label: 'Compact | 紧凑', value: 'compact' },
+            { label: { en: 'Normal', zh: '正常' }, value: 'normal' },
+            { label: { en: 'Compact', zh: '紧凑' }, value: 'compact' },
           ],
           admin: {
             condition: (data) => data?.captchaEnabled,
@@ -547,9 +547,9 @@ export const FormConfigs: CollectionConfig = {
           },
           defaultValue: 'inherit',
           options: [
-            { label: 'Inherit from SMTP Config | 继承 SMTP 配置', value: 'inherit' },
-            { label: 'Enabled | 启用', value: 'enabled' },
-            { label: 'Disabled | 禁用', value: 'disabled' },
+            { label: { en: 'Inherit from SMTP Config', zh: '继承 SMTP 配置' }, value: 'inherit' },
+            { label: { en: 'Enabled', zh: '启用' }, value: 'enabled' },
+            { label: { en: 'Disabled', zh: '禁用' }, value: 'disabled' },
           ],
           admin: {
             description: {
@@ -629,8 +629,8 @@ export const FormConfigs: CollectionConfig = {
       },
       defaultValue: 'draft',
       options: [
-        { label: 'Published | 已发布', value: 'published' },
-        { label: 'Draft | 草稿', value: 'draft' },
+        { label: { en: 'Published', zh: '已发布' }, value: 'published' },
+        { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
       ],
       admin: {
         position: 'sidebar',

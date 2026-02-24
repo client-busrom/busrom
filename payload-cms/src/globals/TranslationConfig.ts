@@ -208,9 +208,9 @@ export const TranslationConfig: GlobalConfig = {
         zh: '上次测试结果',
       },
       options: [
-        { label: 'Success | 成功', value: 'success' },
-        { label: 'Failed | 失败', value: 'failed' },
-        { label: 'Not Tested | 未测试', value: 'not_tested' },
+        { label: { en: 'Success', zh: '成功' }, value: 'success' },
+        { label: { en: 'Failed', zh: '失败' }, value: 'failed' },
+        { label: { en: 'Not Tested', zh: '未测试' }, value: 'not_tested' },
       ],
       defaultValue: 'not_tested',
       admin: {

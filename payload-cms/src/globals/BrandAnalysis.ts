@@ -48,8 +48,8 @@ export const BrandAnalysis: GlobalConfig = {
       },
       defaultValue: 'draft',
       options: [
-        { label: 'Draft | 草稿', value: 'draft' },
-        { label: 'Published | 已发布', value: 'published' },
+        { label: { en: 'Published', zh: '已发布' }, value: 'published' },
+        { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
       ],
       admin: {
         position: 'sidebar',
@@ -90,13 +90,19 @@ export const BrandAnalysis: GlobalConfig = {
         {
           name: 'title',
           type: 'textarea',
-          label: 'Title',
+          label: {
+            en: 'Title',
+            zh: '标题',
+          },
           localized: true,
         },
         {
           name: 'description',
           type: 'textarea',
-          label: 'Description',
+          label: {
+            en: 'Description',
+            zh: '描述',
+          },
           localized: true,
         },
         {
@@ -117,7 +123,10 @@ export const BrandAnalysis: GlobalConfig = {
           name: 'largeImage',
           type: 'upload',
           relationTo: 'media',
-          label: 'Large Image',
+          label: {
+            en: 'Large Image',
+            zh: '大图',
+          },
           admin: {
             components: {
               Field: '@/components/fields/MediaPicker',
@@ -128,7 +137,10 @@ export const BrandAnalysis: GlobalConfig = {
           name: 'smallImage',
           type: 'upload',
           relationTo: 'media',
-          label: 'Small Image',
+          label: {
+            en: 'Small Image',
+            zh: '小图',
+          },
           admin: {
             components: {
               Field: '@/components/fields/MediaPicker',
@@ -149,13 +161,19 @@ export const BrandAnalysis: GlobalConfig = {
         {
           name: 'title',
           type: 'textarea',
-          label: 'Title',
+          label: {
+            en: 'Title',
+            zh: '标题',
+          },
           localized: true,
         },
         {
           name: 'description',
           type: 'textarea',
-          label: 'Description',
+          label: {
+            en: 'Description',
+            zh: '描述',
+          },
           localized: true,
         },
         {
@@ -176,7 +194,10 @@ export const BrandAnalysis: GlobalConfig = {
           name: 'largeImage',
           type: 'upload',
           relationTo: 'media',
-          label: 'Large Image',
+          label: {
+            en: 'Large Image',
+            zh: '大图',
+          },
           admin: {
             components: {
               Field: '@/components/fields/MediaPicker',
@@ -187,7 +208,10 @@ export const BrandAnalysis: GlobalConfig = {
           name: 'smallImage',
           type: 'upload',
           relationTo: 'media',
-          label: 'Small Image',
+          label: {
+            en: 'Small Image',
+            zh: '小图',
+          },
           admin: {
             components: {
               Field: '@/components/fields/MediaPicker',
@@ -208,13 +232,19 @@ export const BrandAnalysis: GlobalConfig = {
         {
           name: 'title',
           type: 'textarea',
-          label: 'Title',
+          label: {
+            en: 'Title',
+            zh: '标题',
+          },
           localized: true,
         },
         {
           name: 'description',
           type: 'textarea',
-          label: 'Description',
+          label: {
+            en: 'Description',
+            zh: '描述',
+          },
           localized: true,
         },
         {
@@ -235,7 +265,10 @@ export const BrandAnalysis: GlobalConfig = {
           name: 'largeImage',
           type: 'upload',
           relationTo: 'media',
-          label: 'Large Image',
+          label: {
+            en: 'Large Image',
+            zh: '大图',
+          },
           admin: {
             components: {
               Field: '@/components/fields/MediaPicker',
@@ -246,7 +279,10 @@ export const BrandAnalysis: GlobalConfig = {
           name: 'smallImage',
           type: 'upload',
           relationTo: 'media',
-          label: 'Small Image',
+          label: {
+            en: 'Small Image',
+            zh: '小图',
+          },
           admin: {
             components: {
               Field: '@/components/fields/MediaPicker',

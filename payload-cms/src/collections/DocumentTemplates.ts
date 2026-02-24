@@ -82,6 +82,7 @@ export const DocumentTemplates: CollectionConfig = {
         zh: '模板名称',
       },
       required: true,
+      localized: true,
     },
     {
       name: 'description',
@@ -90,6 +91,7 @@ export const DocumentTemplates: CollectionConfig = {
         en: 'Description',
         zh: '描述',
       },
+      localized: true,
     },
 
     // ==================================================================
@@ -174,15 +176,25 @@ export const DocumentTemplates: CollectionConfig = {
       },
       defaultValue: 'active',
       options: [
-        { label: 'Active | 启用', value: 'active' },
-        { label: 'Draft | 草稿', value: 'draft' },
-        { label: 'Archived | 已归档', value: 'archived' },
+        { label: { en: 'Active', zh: '启用' }, value: 'active' },
+        { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
+        { label: { en: 'Archived', zh: '已归档' }, value: 'archived' },
       ],
       admin: {
         position: 'sidebar',
         description: {
           en: 'Only ACTIVE templates appear in the template selector',
           zh: '只有"启用"状态的模板会显示在模板选择器中',
+        },
+      },
+    },
+    {
+      name: 'translationCenter',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/components/fields/TranslationCenter',
         },
       },
     },

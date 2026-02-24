@@ -96,6 +96,12 @@ const PERMISSIONS = [
   { resource: 'DOCUMENT_TEMPLATE', action: 'UPDATE', name: '更新文档模板', category: 'CONTENT' },
   { resource: 'DOCUMENT_TEMPLATE', action: 'DELETE', name: '删除文档模板', category: 'CONTENT' },
 
+  // Template Categories
+  { resource: 'TEMPLATE_CATEGORY', action: 'CREATE', name: '创建模板分类', category: 'CONTENT' },
+  { resource: 'TEMPLATE_CATEGORY', action: 'READ', name: '查看模板分类', category: 'CONTENT' },
+  { resource: 'TEMPLATE_CATEGORY', action: 'UPDATE', name: '更新模板分类', category: 'CONTENT' },
+  { resource: 'TEMPLATE_CATEGORY', action: 'DELETE', name: '删除模板分类', category: 'CONTENT' },
+
   // Navigation Menus
   { resource: 'NAVIGATION_MENU', action: 'CREATE', name: '创建导航菜单', category: 'CONTENT' },
   { resource: 'NAVIGATION_MENU', action: 'READ', name: '查看导航菜单', category: 'CONTENT' },
@@ -202,6 +208,7 @@ const ROLES = [
       'FAQ_ITEM_CREATE', 'FAQ_ITEM_READ', 'FAQ_ITEM_UPDATE',
       'REUSABLE_BLOCK_CREATE', 'REUSABLE_BLOCK_READ', 'REUSABLE_BLOCK_UPDATE', 'REUSABLE_BLOCK_DELETE',
       'DOCUMENT_TEMPLATE_CREATE', 'DOCUMENT_TEMPLATE_READ', 'DOCUMENT_TEMPLATE_UPDATE', 'DOCUMENT_TEMPLATE_DELETE',
+      'TEMPLATE_CATEGORY_CREATE', 'TEMPLATE_CATEGORY_READ', 'TEMPLATE_CATEGORY_UPDATE', 'TEMPLATE_CATEGORY_DELETE',
       'NAVIGATION_MENU_READ', 'NAVIGATION_MENU_UPDATE',
       'HERO_BANNER_ITEM_CREATE', 'HERO_BANNER_ITEM_READ', 'HERO_BANNER_ITEM_UPDATE',
       // Media - Full access

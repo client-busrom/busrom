@@ -78,8 +78,9 @@ export const NavigationMenus: CollectionConfig = {
       localized: true,
       required: true,
       admin: {
-        components: {
-          Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
+        description: {
+          en: 'Bilingual menu name',
+          zh: '双语菜单名称',
         },
       },
     },
@@ -94,9 +95,9 @@ export const NavigationMenus: CollectionConfig = {
       required: true,
       defaultValue: 'standard',
       options: [
-        { label: 'Standard (普通链接)', value: 'standard' },
-        { label: 'Product Cards (图文卡片)', value: 'product_cards' },
-        { label: 'Submenu (Icon+文字子菜单)', value: 'submenu' },
+        { label: { en: 'Standard', zh: '普通链接' }, value: 'standard' },
+        { label: { en: 'Product Cards', zh: '图文卡片' }, value: 'product_cards' },
+        { label: { en: 'Submenu', zh: 'Icon+文字子菜单' }, value: 'submenu' },
       ],
     },
     // Icon (for SUBMENU type)
@@ -221,6 +222,16 @@ export const NavigationMenus: CollectionConfig = {
         zh: '显示',
       },
       defaultValue: true,
+    },
+    {
+      name: 'translationCenter',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/components/fields/TranslationCenter',
+        },
+      },
     },
   ],
 }

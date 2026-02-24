@@ -46,7 +46,10 @@ export const MediaTags: CollectionConfig = {
       name: 'name',
       type: 'text',
       required: true,
-      label: 'Tag Name | 标签名称',
+      label: {
+        en: 'Tag Name',
+        zh: '标签名称',
+      },
       index: true,
     },
     {
@@ -55,40 +58,72 @@ export const MediaTags: CollectionConfig = {
       required: true,
       defaultValue: 'general',
       options: [
-        { label: 'General | 通用', value: 'general' },
-        { label: 'Product Series | 产品系列', value: 'product_series' },
-        { label: 'Product Model | 产品型号', value: 'product_model' },
-        { label: 'Scene | 场景', value: 'scene' },
-        { label: 'Color | 颜色', value: 'color' },
-        { label: 'Material | 材质', value: 'material' },
-        { label: 'Style | 风格', value: 'style' },
+        { label: { en: 'General', zh: '通用' }, value: 'general' },
+        { label: { en: 'Product Series', zh: '产品系列' }, value: 'product_series' },
+        { label: { en: 'Product Model', zh: '产品型号' }, value: 'product_model' },
+        { label: { en: 'Scene', zh: '场景' }, value: 'scene' },
+        { label: { en: 'Color', zh: '颜色' }, value: 'color' },
+        { label: { en: 'Material', zh: '材质' }, value: 'material' },
+        { label: { en: 'Style', zh: '风格' }, value: 'style' },
       ],
-      label: 'Tag Type | 标签类型',
+      label: {
+        en: 'Tag Type',
+        zh: '标签类型',
+      },
       admin: {
-        description: 'Type of tag for grouping | 标签分组类型',
+        description: {
+          en: 'Type of tag for grouping',
+          zh: '标签分组类型',
+        },
       },
     },
     {
       name: 'category',
       type: 'relationship',
       relationTo: 'media-categories',
-      label: 'Category | 所属分类',
+      label: {
+        en: 'Category',
+        zh: '所属分类',
+      },
       admin: {
-        description: 'Optional category this tag belongs to | 此标签所属的可选分类',
+        description: {
+          en: 'Optional category this tag belongs to',
+          zh: '此标签所属的可选分类',
+        },
       },
     },
     {
       name: 'description',
       type: 'textarea',
       localized: true,
-      label: 'Description | 描述',
+      label: {
+        en: 'Description',
+        zh: '描述',
+      },
     },
     {
       name: 'color',
       type: 'text',
-      label: 'Color | 颜色',
+      label: {
+        en: 'Color',
+        zh: '颜色',
+      },
       admin: {
-        description: 'Color code for UI display | UI显示的颜色代码',
+        position: 'sidebar',
+        description: {
+          en: 'Color code for UI display',
+          zh: 'UI显示的颜色代码',
+        },
+      },
+    },
+    {
+      name: 'translationCenter',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/components/fields/TranslationCenter',
+        },
       },
     },
   ],

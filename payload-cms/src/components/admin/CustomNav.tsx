@@ -332,7 +332,6 @@ export const CustomNav: React.FC = () => {
 
         {/* Website Settings - 网站设置 */}
         <CollapsibleGroup labelKey="websiteSettings" defaultOpen={false}>
-          <NavItem href="/admin/globals/home-content" labelKey="homeContent" />
           <NavItem href="/admin/globals/footer" labelKey="footer" />
           <NavItem href="/admin/globals/site-config" labelKey="siteConfigItem" />
           <NavItem href="/admin/globals/preloader-config" labelKey="preloaderConfig" />

@@ -135,6 +135,16 @@ export const TemplateCategories: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'translationCenter',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/components/fields/TranslationCenter',
+        },
+      },
+    },
   ],
   timestamps: true,
 }

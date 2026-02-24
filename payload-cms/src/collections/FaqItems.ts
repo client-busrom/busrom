@@ -210,9 +210,9 @@ export const FaqItems: CollectionConfig = {
       },
       defaultValue: 'draft',
       options: [
-        { label: 'Published | 已发布', value: 'published' },
-        { label: 'Draft | 草稿', value: 'draft' },
-        { label: 'Archived | 归档', value: 'archived' },
+        { label: { en: 'Published', zh: '已发布' }, value: 'published' },
+        { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
+        { label: { en: 'Archived', zh: '归档' }, value: 'archived' },
       ],
       admin: {
         position: 'sidebar',

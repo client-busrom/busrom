@@ -48,8 +48,8 @@ export const QuoteSteps: GlobalConfig = {
       },
       defaultValue: 'draft',
       options: [
-        { label: 'Draft | 草稿', value: 'draft' },
-        { label: 'Published | 已发布', value: 'published' },
+        { label: { en: 'Published', zh: '已发布' }, value: 'published' },
+        { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
       ],
       admin: {
         position: 'sidebar',
