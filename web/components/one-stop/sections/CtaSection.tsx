@@ -174,7 +174,7 @@ export function CtaSection({ title, subtitle, image, formConfig }: CtaSectionPro
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 1, delay: 0.2 }}
-                className="absolute inset-0 z-10 bg-[#41412D]"
+                className="absolute inset-0 z-10"
               >
                 <OptimizedImage 
                   image={image} 

@@ -95,20 +95,22 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
         */}
         <div className="absolute left-[472px] top-[69px] z-10">
           <AnimatePresence mode="wait">
-             <motion.div 
-               key={index}
-               initial={{ opacity: 0, y: 20 }}
-               animate={{ opacity: 1, y: 0 }}
-               exit={{ opacity: 0, y: -20 }}
-               transition={{ duration: 0.8, ease: "easeInOut" }}
-               className="w-[522px] h-[852px] rounded-full overflow-hidden shadow-2xl bg-white/50"
-             >
-                <img 
-                  src={slides[index].image?.url || "https://placehold.co/522x852/41412D/C5A059"} 
-                  className="w-full h-full object-cover"
-                  alt={slides[index].title}
-                />
-             </motion.div>
+             {slides.map((slide, i) => i === index && (
+               <motion.div 
+                 key={i}
+                 initial={{ opacity: 0, y: 20 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 exit={{ opacity: 0, y: -20 }}
+                 transition={{ duration: 0.8, ease: "easeInOut" }}
+                 className="w-[522px] h-[852px] rounded-full overflow-hidden shadow-2xl bg-white/50"
+               >
+                  <img 
+                    src={slide.image?.url || "https://placehold.co/522x852/41412D/C5A059"} 
+                    className="w-full h-full object-cover"
+                    alt={slide.title}
+                  />
+               </motion.div>
+             ))}
           </AnimatePresence>
         </div>
 
@@ -167,16 +169,18 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
                         </span>
                         
                         <AnimatePresence mode="wait">
-                           <motion.p 
-                             key={index}
-                             initial={{ opacity: 0, x: -10 }}
-                             animate={{ opacity: 1, x: 0 }}
-                             exit={{ opacity: 0, x: 10 }}
-                             className="text-[20px] font-medium text-[#7A7A7A] leading-[1.4] mt-1"
-                             style={{ fontFamily: "var(--font-anaheim)" }}
-                           >
-                             {step.data.description}
-                           </motion.p>
+                           {slides.map((slide, i) => i === index && (
+                             <motion.p 
+                               key={i}
+                               initial={{ opacity: 0, x: -10 }}
+                               animate={{ opacity: 1, x: 0 }}
+                               exit={{ opacity: 0, x: 10 }}
+                               className="text-[20px] font-medium text-[#7A7A7A] leading-[1.4] mt-1"
+                               style={{ fontFamily: "var(--font-anaheim)" }}
+                             >
+                               {slide.description}
+                             </motion.p>
+                           ))}
                         </AnimatePresence>
                       </div>
                     </>

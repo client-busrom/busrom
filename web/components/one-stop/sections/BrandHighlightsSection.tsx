@@ -89,17 +89,19 @@ export function BrandHighlightsSection({
         {/* 2. Main Description */}
         <div className="absolute left-[153px] top-[376px] w-[819px] h-[253px]">
           <AnimatePresence mode="wait">
-            <motion.p 
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-              className="text-[24px] font-[600] leading-[39px] text-black"
-              style={{ fontFamily: "var(--font-anaheim)" }}
-            >
-              {currentItem.description}
-            </motion.p>
+            {items.map((item, i) => i === index && (
+              <motion.p 
+                key={item.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+                className="text-[24px] font-[600] leading-[39px] text-black"
+                style={{ fontFamily: "var(--font-anaheim)" }}
+              >
+                {item.description}
+              </motion.p>
+            ))}
           </AnimatePresence>
         </div>
 
@@ -128,35 +130,37 @@ export function BrandHighlightsSection({
         {/* 4. Large Main Image (Right Side) */}
         <div className="absolute left-[1171px] top-[141px] w-[777px] h-[1066px] z-10 pointer-events-none">
           <AnimatePresence mode="popLayout" custom={direction}>
-            <motion.div
-              key={currentItem.id}
-              initial={direction === 1 ? {
-                x: flyOffsetX,
-                y: flyOffsetY,
-                scale: flyScale,
-                opacity: 1
-              } : { opacity: 0, x: 100 }}
-              animate={{ x: 0, y: 0, scale: 1, opacity: 1 }}
-              exit={direction === 1 ? { opacity: 0, scale: 1.1 } : {
-                x: flyOffsetX,
-                y: flyOffsetY,
-                scale: flyScale,
-                opacity: 0.5
-              }}
-              transition={{ 
-                duration: 0.9, 
-                ease: [0.23, 1, 0.32, 1],
-                opacity: { duration: 0.4 }
-              }}
-              className="w-full h-full rounded-[30px] overflow-hidden shadow-2xl"
-            >
-              <OptimizedImage 
-                image={currentItem.image} 
-                alt="Highlight Main" 
-                className="w-full h-full object-cover"
-                size="xlarge"
-              />
-            </motion.div>
+            {items.map((item, i) => i === index && (
+              <motion.div
+                key={item.id}
+                initial={direction === 1 ? {
+                  x: flyOffsetX,
+                  y: flyOffsetY,
+                  scale: flyScale,
+                  opacity: 1
+                } : { opacity: 0, x: 100 }}
+                animate={{ x: 0, y: 0, scale: 1, opacity: 1 }}
+                exit={direction === 1 ? { opacity: 0, scale: 1.1 } : {
+                  x: flyOffsetX,
+                  y: flyOffsetY,
+                  scale: flyScale,
+                  opacity: 0.5
+                }}
+                transition={{ 
+                  duration: 0.9, 
+                  ease: [0.23, 1, 0.32, 1],
+                  opacity: { duration: 0.4 }
+                }}
+                className="w-full h-full rounded-[30px] overflow-hidden shadow-2xl"
+              >
+                <OptimizedImage 
+                  image={item.image} 
+                  alt="Highlight Main" 
+                  className="w-full h-full object-cover"
+                  size="xlarge"
+                />
+              </motion.div>
+            ))}
           </AnimatePresence>
         </div>
 
@@ -165,38 +169,42 @@ export function BrandHighlightsSection({
            {/* Thumbnail Image */}
            <div className="w-[282px] h-[375px] rounded-[30px] overflow-hidden shadow-xl">
              <AnimatePresence mode="popLayout">
-                <motion.div
-                  key={previewItem.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.1 }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                  className="w-full h-full"
-                >
-                  <OptimizedImage 
-                    image={previewItem.image} 
-                    alt="Next Preview" 
-                    className="w-full h-full object-cover"
-                    size="medium"
-                  />
-                </motion.div>
+                {items.map((item, i) => i === nextIndex && (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.1 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="w-full h-full"
+                  >
+                    <OptimizedImage 
+                      image={item.image} 
+                      alt="Next Preview" 
+                      className="w-full h-full object-cover"
+                      size="medium"
+                    />
+                  </motion.div>
+                ))}
              </AnimatePresence>
            </div>
            
            {/* Thumbnail Text Summary */}
            <div className="h-[52px]">
              <AnimatePresence mode="wait">
-                <motion.p 
-                  key={previewItem.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className="text-[20px] font-[600] leading-[26px] text-[#626262] line-clamp-2"
-                  style={{ fontFamily: "var(--font-anaheim)" }}
-                >
-                  {previewItem.summary}
-                </motion.p>
+                {items.map((item, i) => i === nextIndex && (
+                  <motion.p 
+                    key={item.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="text-[20px] font-[600] leading-[26px] text-[#626262] line-clamp-2"
+                    style={{ fontFamily: "var(--font-anaheim)" }}
+                  >
+                    {item.summary}
+                  </motion.p>
+                ))}
              </AnimatePresence>
            </div>
         </div>
