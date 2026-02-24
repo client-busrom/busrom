@@ -118,79 +118,81 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
 
           {/* Top Primary Card */}
           <AnimatePresence mode="popLayout" initial={false}>
-            <motion.div
-              key={`active-${currentIndex}`}
-              initial={{ opacity: 0, y: 100, rotate: -5 }}
-              animate={{ opacity: 1, y: 0, rotate: 0 }}
-              exit={{ opacity: 0, y: -150, rotate: 5 }}
-              transition={{ duration: 0.9, ease: [0.23, 1, 0.32, 1] }}
-              className="relative w-full min-h-[720px] h-auto rounded-[267px] border-[2px] border-[#FDF6C2] shadow-[18px_33px_17.4px_rgba(0,0,0,0.48)] overflow-hidden pointer-events-auto bg-[#272302]"
-            >
-               {/* Card Image and Gradient */}
-               <div className="absolute inset-0 z-0">
-                  <img
-                    src={getSlideInStack(0).image?.url || ""}
-                    className="w-full h-full object-cover"
-                    alt="top-slide-img"
-                  />
-                  <div 
-                    className="absolute inset-0"
-                    style={{
-                      background: "linear-gradient(to bottom, rgba(198, 191, 137, 0) 0%, rgba(39, 35, 2, 1) 100%)",
-                      opacity: 0.7
-                    }}
-                  />
-               </div>
+            {slides.map((slide, i) => i === currentIndex && (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 100, rotate: -5 }}
+                animate={{ opacity: 1, y: 0, rotate: 0 }}
+                exit={{ opacity: 0, y: -150, rotate: 5 }}
+                transition={{ duration: 0.9, ease: [0.23, 1, 0.32, 1] }}
+                className="relative w-full min-h-[720px] h-auto rounded-[267px] border-[2px] border-[#FDF6C2] shadow-[18px_33px_17.4px_rgba(0,0,0,0.48)] overflow-hidden pointer-events-auto bg-[#272302]"
+              >
+                 {/* Card Image and Gradient */}
+                 <div className="absolute inset-0 z-0">
+                    <img
+                      src={slide.image?.url || ""}
+                      className="w-full h-full object-cover"
+                      alt="top-slide-img"
+                    />
+                    <div 
+                      className="absolute inset-0"
+                      style={{
+                        background: "linear-gradient(to bottom, rgba(198, 191, 137, 0) 0%, rgba(39, 35, 2, 1) 100%)",
+                        opacity: 0.7
+                      }}
+                    />
+                 </div>
 
-               {/* Content - Absolute/Relative hybrid logic but flow-safe */}
-               <div className="relative z-10 w-full h-full pt-[297px] pb-[60px]">
-                  {/* Rectangle 316 - Background Box (Dynamic) */}
-                  <motion.div 
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="relative ml-[-36px] rounded-[40px] flex flex-col justify-start"
-                    style={{ 
-                      width: "958px", 
-                      minHeight: "285px",
-                      backgroundColor: textBoxColor,
-                      paddingLeft: "116px", 
-                      paddingTop: "33px",
-                      paddingRight: "60px",
-                      paddingBottom: "40px",
-                      backdropFilter: "blur(10px)"
-                    }}
-                  >
-                    {/* Title Area */}
-                    <div className="mb-6">
-                      <h1 
-                        className="font-normal leading-tight"
-                        style={{ 
-                          fontSize: `${adjustedTitleSize}px`,
-                          fontFamily: "var(--font-paytone-one)",
-                          color: titleColor,
-                          textShadow: `2px 2px 0px rgba(255,255,255,0.05), 0 4px 12.6px ${titleShadowColor}`
-                        }}
-                      >
-                        {getSlideInStack(0).title}
-                      </h1>
-                    </div>
+                 {/* Content - Absolute/Relative hybrid logic but flow-safe */}
+                 <div className="relative z-10 w-full h-full pt-[297px] pb-[60px]">
+                    {/* Rectangle 316 - Background Box (Dynamic) */}
+                    <motion.div 
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="relative ml-[-36px] rounded-[40px] flex flex-col justify-start"
+                      style={{ 
+                        width: "958px", 
+                        minHeight: "285px",
+                        backgroundColor: textBoxColor,
+                        paddingLeft: "116px", 
+                        paddingTop: "33px",
+                        paddingRight: "60px",
+                        paddingBottom: "40px",
+                        backdropFilter: "blur(10px)"
+                      }}
+                    >
+                      {/* Title Area */}
+                      <div className="mb-6">
+                        <h1 
+                          className="font-normal leading-tight"
+                          style={{ 
+                            fontSize: `${adjustedTitleSize}px`,
+                            fontFamily: "var(--font-paytone-one)",
+                            color: titleColor,
+                            textShadow: `2px 2px 0px rgba(255,255,255,0.05), 0 4px 12.6px ${titleShadowColor}`
+                          }}
+                        >
+                          {slide.title}
+                        </h1>
+                      </div>
 
-                    {/* Description Area */}
-                    <div>
-                      <p
-                        className="text-white font-semibold leading-tight lg:leading-[45px] tracking-tight"
-                        style={{ 
-                          fontSize: `${adjustedDescSize}px`,
-                          fontFamily: "var(--font-anaheim)",
-                          textShadow: "0 4px 7.8px rgba(0,0,0,0.71)"
-                        }}
-                      >
-                        {getSlideInStack(0).description}
-                      </p>
-                    </div>
-                  </motion.div>
-               </div>
-            </motion.div>
+                      {/* Description Area */}
+                      <div>
+                        <p
+                          className="text-white font-semibold leading-tight lg:leading-[45px] tracking-tight"
+                          style={{ 
+                            fontSize: `${adjustedDescSize}px`,
+                            fontFamily: "var(--font-anaheim)",
+                            textShadow: "0 4px 7.8px rgba(0,0,0,0.71)"
+                          }}
+                        >
+                          {slide.description}
+                        </p>
+                      </div>
+                    </motion.div>
+                 </div>
+              </motion.div>
+            ))}
           </AnimatePresence>
         </div>
       </div>
