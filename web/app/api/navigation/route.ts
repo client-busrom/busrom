@@ -99,6 +99,11 @@ async function transformNavigationItem(
     order: item.order,
   };
 
+  // Fix mission-critical URL mismatch for One-Stop Shop
+  if (result.url === '/service/one-stop') {
+    result.url = '/service/one-stop-shop';
+  }
+
   // 添加询单链接
   if (item.inquiryLink) {
     result.inquiryLink = item.inquiryLink;

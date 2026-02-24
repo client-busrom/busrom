@@ -45,11 +45,17 @@ export async function GET(request: NextRequest) {
           data.officialNoticeGroup?.officialNoticeLine4,
         ].filter(Boolean),
       },
-      navigationMenus: (data.navigationMenus || []).map((menu: any) => ({
-        slug: menu.slug,
-        name: menu.name,
-        link: menu.link || `/${menu.slug}`,
-      })),
+      navigationMenus: (data.navigationMenus || []).map((menu: any) => {
+        let link = menu.link || `/${menu.slug}`
+        if (link === '/service/one-stop') {
+          link = '/service/one-stop-shop'
+        }
+        return {
+          slug: menu.slug,
+          name: menu.name,
+          link: link,
+        }
+      }),
       socialLinks: (data.socialLinks || []).map((social: any) => ({
         platform: social.platform,
         url: social.url,
