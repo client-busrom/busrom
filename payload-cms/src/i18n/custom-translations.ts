@@ -186,6 +186,7 @@ export const customTranslationsEn = {
     // Field Labels (for custom components)
     // ========================================================================
     fields: {
+      name: 'Name',
       productName: 'Product Name',
       seriesName: 'Series Name',
       pageTitle: 'Page Title',
@@ -203,6 +204,7 @@ export const customTranslationsEn = {
       metaKeywords: 'Meta Keywords',
       ogTitle: 'OG Title',
       ogDescription: 'OG Description',
+      altText: 'Alt Text',
       sceneName: 'Scene Name',
     },
 
@@ -543,6 +545,7 @@ export const customTranslationsZh = {
     // Field Labels (for custom components)
     // ========================================================================
     fields: {
+      name: '名称',
       productName: '产品名称',
       seriesName: '系列名称',
       pageTitle: '页面标题',
@@ -560,6 +563,7 @@ export const customTranslationsZh = {
       metaKeywords: 'Meta 关键词',
       ogTitle: 'OG 标题',
       ogDescription: 'OG 描述',
+      altText: '替代文本',
       sceneName: '场景名称',
     },
 

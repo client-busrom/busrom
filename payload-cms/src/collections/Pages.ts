@@ -146,8 +146,8 @@ export const Pages: CollectionConfig = {
               required: true,
               defaultValue: 'FREEFORM',
               options: [
-                { label: 'Template Page | 固定模板页', value: 'TEMPLATE' },
-                { label: 'Freeform Page | 自由落地页', value: 'FREEFORM' },
+                { label: { en: 'Template Page', zh: '固定模板页' }, value: 'TEMPLATE' },
+                { label: { en: 'Freeform Page', zh: '自由落地页' }, value: 'FREEFORM' },
               ],
               admin: {
                 description: {
@@ -300,9 +300,9 @@ export const Pages: CollectionConfig = {
       },
       defaultValue: 'draft',
       options: [
-        { label: 'Published | 已发布', value: 'published' },
-        { label: 'Draft | 草稿', value: 'draft' },
-        { label: 'Archived | 归档', value: 'archived' },
+        { label: { en: 'Published', zh: '已发布' }, value: 'published' },
+        { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
+        { label: { en: 'Archived', zh: '归档' }, value: 'archived' },
       ],
       admin: {
         position: 'sidebar',

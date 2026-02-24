@@ -91,12 +91,12 @@ export const ReusableBlocks: CollectionConfig = {
               },
               required: true,
               options: [
-                { label: 'CTA | 行动召唤', value: 'CTA' },
-                { label: 'Feature | 特性', value: 'FEATURE' },
-                { label: 'Testimonial | 客户评价', value: 'TESTIMONIAL' },
-                { label: 'Contact | 联系信息', value: 'CONTACT' },
-                { label: 'Product | 产品', value: 'PRODUCT' },
-                { label: 'Custom | 自定义', value: 'CUSTOM' },
+                { label: { en: 'CTA', zh: '行动召唤' }, value: 'CTA' },
+                { label: { en: 'Feature', zh: '特性' }, value: 'FEATURE' },
+                { label: { en: 'Testimonial', zh: '客户评价' }, value: 'TESTIMONIAL' },
+                { label: { en: 'Contact', zh: '联系信息' }, value: 'CONTACT' },
+                { label: { en: 'Product', zh: '产品' }, value: 'PRODUCT' },
+                { label: { en: 'Custom', zh: '自定义' }, value: 'CUSTOM' },
               ],
             },
             {
@@ -175,9 +175,9 @@ export const ReusableBlocks: CollectionConfig = {
       },
       defaultValue: 'draft',
       options: [
-        { label: 'Published | 已发布', value: 'published' },
-        { label: 'Draft | 草稿', value: 'draft' },
-        { label: 'Archived | 归档', value: 'archived' },
+        { label: { en: 'Published', zh: '已发布' }, value: 'published' },
+        { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
+        { label: { en: 'Archived', zh: '归档' }, value: 'archived' },
       ],
       admin: {
         position: 'sidebar',

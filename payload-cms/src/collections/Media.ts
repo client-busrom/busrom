@@ -145,9 +145,15 @@ export const Media: CollectionConfig = {
       name: 'filename',
       type: 'text',
       required: true,
-      label: 'Filename | 文件名',
+      label: {
+        en: 'Filename',
+        zh: '文件名',
+      },
       admin: {
-        description: 'Media file name | 媒体文件名',
+        description: {
+          en: 'Media file name',
+          zh: '媒体文件名',
+        },
       },
       index: true,
     },
@@ -165,9 +171,19 @@ export const Media: CollectionConfig = {
         zh: '替代文本',
       },
       admin: {
-        description: 'SEO-friendly alt text for images | 图片的SEO友好替代文本',
+        description: {
+          en: 'SEO-friendly alt text for images',
+          zh: '图片的SEO友好替代文本',
+        },
+      },
+    },
+    {
+      name: 'translationCenter',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
         components: {
-          Field: '@/components/fields/MultiLocaleField#MultiLocaleTextareaField',
+          Field: '@/components/fields/TranslationCenter',
         },
       },
     },
@@ -179,9 +195,15 @@ export const Media: CollectionConfig = {
       name: 'primaryCategory',
       type: 'relationship',
       relationTo: 'media-categories',
-      label: 'Primary Category | 主分类',
+      label: {
+        en: 'Primary Category',
+        zh: '主分类',
+      },
       admin: {
-        description: 'Main category for this media | 此媒体的主分类',
+        description: {
+          en: 'Main category for this media',
+          zh: '此媒体的主分类',
+        },
       },
     },
     {
@@ -189,10 +211,16 @@ export const Media: CollectionConfig = {
       type: 'relationship',
       relationTo: 'media-tags',
       hasMany: true,
-      label: 'Tags | 标签',
+      label: {
+        en: 'Tags',
+        zh: '标签',
+      },
       index: true, // Enable querying by tags
       admin: {
-        description: 'Tags for filtering and searching | 用于筛选和搜索的标签',
+        description: {
+          en: 'Tags for filtering and searching',
+          zh: '用于筛选和搜索的标签',
+        },
       },
     },
 
@@ -202,9 +230,15 @@ export const Media: CollectionConfig = {
     {
       name: 'specs',
       type: 'json',
-      label: 'Specifications | 规格信息',
+      label: {
+        en: 'Specifications',
+        zh: '规格信息',
+      },
       admin: {
-        description: 'Product specifications for this image (key-value pairs) | 此图片的产品规格（键值对）',
+        description: {
+          en: 'Product specifications for this image (key-value pairs)',
+          zh: '此图片的产品规格（键值对）',
+        },
         components: {
           Field: '@/components/fields/SpecsField',
         },
@@ -217,33 +251,54 @@ export const Media: CollectionConfig = {
     {
       name: 'metadata',
       type: 'group',
-      label: 'Metadata | 元数据',
+      label: {
+        en: 'Metadata',
+        zh: '元数据',
+      },
       fields: [
         {
           name: 'group',
           type: 'number',
-          label: 'Scene Group | 场景分组',
+          label: {
+            en: 'Scene Group',
+            zh: '场景分组',
+          },
           admin: {
-            description: 'Scene group number for scene images | 场景图的分组编号',
+            description: {
+              en: 'Scene group number for scene images',
+              zh: '场景图的分组编号',
+            },
           },
         },
         {
           name: 'sceneNumber',
           type: 'number',
-          label: 'Scene Number | 场景编号',
+          label: {
+            en: 'Scene Number',
+            zh: '场景编号',
+          },
         },
         {
           name: 'imageNumber',
           type: 'number',
-          label: 'Image Number | 图片编号',
+          label: {
+            en: 'Image Number',
+            zh: '图片编号',
+          },
           admin: {
-            description: 'Image sequence number within a series/scene group | 该系列/场景分组内的图片序号',
+            description: {
+              en: 'Image sequence number within a series/scene group',
+              zh: '该系列/场景分组内的图片序号',
+            },
           },
         },
         {
           name: 'notes',
           type: 'textarea',
-          label: 'Notes | 备注',
+          label: {
+            en: 'Notes',
+            zh: '备注',
+          },
         },
       ],
     },
@@ -256,13 +311,16 @@ export const Media: CollectionConfig = {
       type: 'select',
       defaultValue: 'active',
       options: [
-        { label: 'Active | 启用', value: 'active' },
-        { label: 'Archived | 归档', value: 'archived' },
+        { label: { en: 'Active', zh: '启用' }, value: 'active' },
+        { label: { en: 'Archived', zh: '归档' }, value: 'archived' },
       ],
-      label: 'Status | 状态',
+      label: { en: 'Status', zh: '状态' },
       admin: {
         position: 'sidebar',
-        description: 'Media status (archived = soft delete) | 媒体状态（归档=软删除）',
+        description: {
+          en: 'Media status (archived = soft delete)',
+          zh: '媒体状态（归档=软删除）',
+        },
       },
     },
 
@@ -273,7 +331,10 @@ export const Media: CollectionConfig = {
       name: 'usageCount',
       type: 'number',
       defaultValue: 0,
-      label: 'Usage Count | 使用次数',
+      label: {
+        en: 'Usage Count',
+        zh: '使用次数',
+      },
       admin: {
         readOnly: true,
         position: 'sidebar',

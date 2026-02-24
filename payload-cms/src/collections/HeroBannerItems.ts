@@ -65,7 +65,10 @@ export const HeroBannerItems: CollectionConfig = {
       name: 'internalLabel',
       type: 'text',
       required: true,
-      label: 'Internal Label | 内部标识',
+      label: {
+        en: 'Internal Label',
+        zh: '内部标识',
+      },
       admin: {
         description: {
           en: 'Internal identifier for this banner item (e.g., "Banner 1 - Glass Standoff")',
@@ -274,7 +277,10 @@ export const HeroBannerItems: CollectionConfig = {
       name: 'order',
       type: 'number',
       defaultValue: 0,
-      label: 'Display Order | 显示顺序',
+      label: {
+        en: 'Display Order',
+        zh: '显示顺序',
+      },
       admin: {
         position: 'sidebar',
       },
@@ -284,10 +290,13 @@ export const HeroBannerItems: CollectionConfig = {
       type: 'select',
       defaultValue: 'draft',
       options: [
-        { label: 'Published | 已发布', value: 'published' },
-        { label: 'Draft | 草稿', value: 'draft' },
+        { label: { en: 'Published', zh: '已发布' }, value: 'published' },
+        { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
       ],
-      label: 'Status | 状态',
+      label: {
+        en: 'Status',
+        zh: '状态',
+      },
       admin: {
         position: 'sidebar',
       },

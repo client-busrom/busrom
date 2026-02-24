@@ -77,6 +77,30 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'ogTitle', labelKey: 'custom:fields:ogTitle', type: 'textarea' },
     { name: 'ogDescription', labelKey: 'custom:fields:ogDescription', type: 'textarea' },
   ],
+  'template-categories': [
+    { name: 'name', labelKey: 'custom:fields:name', type: 'textarea' },
+  ],
+  'document-templates': [
+    { name: 'name', labelKey: 'custom:fields:name', type: 'textarea' },
+    { name: 'description', labelKey: 'custom:fields:description', type: 'textarea' },
+  ],
+  categories: [
+    { name: 'name', labelKey: 'custom:fields:name', type: 'textarea' },
+    { name: 'description', labelKey: 'custom:fields:description', type: 'textarea' },
+  ],
+  'navigation-menus': [
+    { name: 'name', labelKey: 'custom:fields:name', type: 'textarea' },
+  ],
+  'media-categories': [
+    { name: 'displayName', labelKey: 'custom:fields:name', type: 'textarea' },
+    { name: 'description', labelKey: 'custom:fields:description', type: 'textarea' },
+  ],
+  'media-tags': [
+    { name: 'description', labelKey: 'custom:fields:description', type: 'textarea' },
+  ],
+  media: [
+    { name: 'alt', labelKey: 'custom:fields:altText', type: 'textarea' },
+  ],
 }
 
 interface FieldValue {

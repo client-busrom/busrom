@@ -425,8 +425,8 @@ export const SmtpConfigs: CollectionConfig = {
       },
       defaultValue: 'enabled',
       options: [
-        { label: 'Enabled | 启用', value: 'enabled' },
-        { label: 'Disabled | 禁用', value: 'disabled' },
+        { label: { en: 'Enabled', zh: '启用' }, value: 'enabled' },
+        { label: { en: 'Disabled', zh: '禁用' }, value: 'disabled' },
       ],
       admin: {
         position: 'sidebar',

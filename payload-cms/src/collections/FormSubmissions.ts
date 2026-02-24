@@ -253,9 +253,9 @@ export const FormSubmissions: CollectionConfig = {
       required: true,
       defaultValue: 'UNREAD',
       options: [
-        { label: 'Unread | 未读', value: 'UNREAD' },
-        { label: 'Read | 已读', value: 'READ' },
-        { label: 'Archived | 已归档', value: 'ARCHIVED' },
+        { label: { en: 'Unread', zh: '未读' }, value: 'UNREAD' },
+        { label: { en: 'Read', zh: '已读' }, value: 'READ' },
+        { label: { en: 'Archived', zh: '已归档' }, value: 'ARCHIVED' },
       ],
       admin: {
         position: 'sidebar',
@@ -270,8 +270,8 @@ export const FormSubmissions: CollectionConfig = {
       },
       defaultValue: 'MANUAL',
       options: [
-        { label: 'Manual | 手动提交', value: 'MANUAL' },
-        { label: 'Auto | 自动保存', value: 'AUTO' },
+        { label: { en: 'Manual', zh: '手动提交' }, value: 'MANUAL' },
+        { label: { en: 'Auto', zh: '自动保存' }, value: 'AUTO' },
       ],
       admin: {
         position: 'sidebar',
