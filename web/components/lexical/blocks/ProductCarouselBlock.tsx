@@ -66,15 +66,15 @@ export const ProductCarouselBlock = ({ node, locale }: any) => {
             const highlights = product.productAttributes?.highlights || []
             const shuffledHighlights = [...highlights].sort(() => 0.5 - Math.random())
               .slice(0, settings.highlightsCount || 3)
-
-            const basisClass = {
+            const basisClassMap: Record<number, string> = {
               1: 'lg:basis-full',
               2: 'lg:basis-1/2',
               3: 'lg:basis-1/3',
               4: 'lg:basis-1/4',
               5: 'lg:basis-1/5',
               6: 'lg:basis-1/6',
-            }[itemsPerView || 3] || 'lg:basis-1/3'
+            }
+            const basisClass = basisClassMap[(itemsPerView || 3) as number] || 'lg:basis-1/3'
 
             return (
               <CarouselItem key={index} className={`pl-4 basis-full md:basis-1/2 ${basisClass}`}>

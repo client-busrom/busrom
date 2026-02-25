@@ -54,6 +54,8 @@ import { ReusableBlockFeature } from './src/lexical-features/reusable-block'
 import { DocumentTemplateFeature } from './src/lexical-features/document-template'
 import { ApplicationCarouselFeature } from './src/lexical-features/application-carousel'
 import { ProductCarouselFeature } from './src/lexical-features/product-carousel'
+import { ProductReusableBlockFeature } from './src/lexical-features/product-reusable-block'
+import { SeriesReusableBlockFeature } from './src/lexical-features/series-reusable-block'
 import { IconListFeature } from './src/lexical-features/icon-list'
 import { ChecklistFeature } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
@@ -78,6 +80,11 @@ import { MediaCategories } from './src/collections/MediaCategories'
 import { MediaTags } from './src/collections/MediaTags'
 import { Products } from './src/collections/Products'
 import { ProductSeries } from './src/collections/ProductSeries'
+import { ProductAttributes } from './src/collections/ProductAttributes'
+import { ProductTemplates } from './src/collections/ProductTemplates'
+import { ProductReusableBlocks } from './src/collections/ProductReusableBlocks'
+import { SeriesTemplates } from './src/collections/SeriesTemplates'
+import { SeriesReusableBlocks } from './src/collections/SeriesReusableBlocks'
 import { HeroBannerItems } from './src/collections/HeroBannerItems'
 import { SeriesIntroItems } from './src/collections/SeriesIntroItems'
 import { NavigationMenus } from './src/collections/NavigationMenus'
@@ -230,6 +237,11 @@ export default buildConfig({
     // Products
     Products,
     ProductSeries,
+    ProductAttributes,
+    ProductTemplates,
+    ProductReusableBlocks,
+    SeriesTemplates,
+    SeriesReusableBlocks,
     // Homepage Collections (ordered to match frontend display order)
     HeroBannerItems,
     SeriesIntroItems,
@@ -357,7 +369,7 @@ export default buildConfig({
           },
         }),
         RelationshipFeature({
-          enabledCollections: ['products', 'product-series', 'blogs', 'pages'],
+          enabledCollections: ['products', 'product-series', 'blogs', 'pages', 'product-attributes', 'product-templates'],
         }),
 
         // ==========================================
@@ -396,6 +408,8 @@ export default buildConfig({
         ReusableBlockFeature(), // Custom Feature 可复用块 - WYSIWYG
         ApplicationCarouselFeature(), // Custom Feature 应用轮播 - WYSIWYG
         ProductCarouselFeature(), // Custom Feature 产品轮播 - WYSIWYG
+        ProductReusableBlockFeature(), // Custom Feature 产品详情块 - WYSIWYG
+        SeriesReusableBlockFeature(), // Custom Feature 产品详解块 - WYSIWYG
         IconListFeature(), // Custom Feature 图标列表 - WYSIWYG
         DocumentTemplateFeature(), // Custom Feature 文档模板 - 工具栏按钮
         BlocksToolbarDropdownFeature(), // 工具栏右侧自定义块按钮
@@ -445,8 +459,8 @@ export default buildConfig({
 
     // SEO Plugin
     seoPlugin({
-      collections: ['blogs', 'products'],
-      generateTitle: ({ doc }) => `${doc?.title || 'Busrom'} | Busrom`,
+      collections: ['blogs', 'products', 'product-series'],
+      generateTitle: ({ doc }) => `${doc?.title || doc?.name || 'Busrom'} | Busrom`,
       generateDescription: ({ doc }) => doc?.excerpt || doc?.description || doc?.shortDescription || '',
       tabbedUI: true,
     }),
@@ -496,6 +510,41 @@ export default buildConfig({
           },
           {
             slug: 'product-series',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'product-attributes',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'product-templates',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'product-reusable-blocks',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'series-templates',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'series-reusable-blocks',
             hooks: {
               afterChange: { update: { enabled: true }, create: { enabled: true } },
               afterDelete: { enabled: true },
@@ -569,6 +618,13 @@ export default buildConfig({
           },
           {
             slug: 'document-templates',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'template-categories',
             hooks: {
               afterChange: { update: { enabled: true }, create: { enabled: true } },
               afterDelete: { enabled: true },
@@ -1181,26 +1237,7 @@ export default buildConfig({
             data: { name: cat.name.zh },
             locale: 'zh',
           })
-          payload.logger.info(`✅ Template category created: ${cat.name.zh} | ${cat.name.en}`)
-        } else {
-          const doc = existing.docs[0] as any
-          const expectedLabel = `${cat.name.zh} | ${cat.name.en}`
-          if (doc.label !== expectedLabel) {
-            // Ensure both locales have correct names and label is filled
-            await payload.update({
-              collection: 'template-categories',
-              id: doc.id,
-              data: { name: cat.name.en },
-              locale: 'en',
-            })
-            await payload.update({
-              collection: 'template-categories',
-              id: doc.id,
-              data: { name: cat.name.zh },
-              locale: 'zh',
-            })
-            payload.logger.info(`🔄 Template category label fixed: ${expectedLabel}`)
-          }
+          payload.logger.info(`✅ Template category seeded: ${cat.name.zh} | ${cat.name.en}`)
         }
       }
 
