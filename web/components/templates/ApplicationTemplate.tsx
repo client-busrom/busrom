@@ -3,6 +3,7 @@
 import React, { useMemo } from "react"
 import { ApplicationHeroSection, HeroSlide } from "@/components/application/sections/ApplicationHeroSection"
 import { ApplicationProductNavigationSection } from "@/components/application/sections/ApplicationProductNavigationSection"
+import { ApplicationEngineerSaidSection } from "@/components/application/sections/ApplicationEngineerSaidSection"
 
 interface MediaObject {
   id: string
@@ -155,16 +156,61 @@ function extractSections(pageContent: any) {
   const carouselNode = navItemNodes.find((n: any) => n.type === "productCarousel")
   const carouselItems = carouselNode?.data?.items || []
 
-  return { 
-    slides, images, titleText, topSubtitleText, rightBoxText, bottomBoxText, seeAllText, seeAllHref,
-    navCtaText, navCtaHref, carouselItems
+  // Engineer Said Section
+  const engMainNodes = extractAfterMarker(children, "engineer-said-center")
+  const engineerMainQuote = engMainNodes?.length ? (engMainNodes[0]?.children || []).map((c: any) => c.text).join("").trim() : undefined
+
+  const engLeftNodes = extractAfterMarker(children, "engineer-said-left")
+  const engineerLeftQuote = engLeftNodes?.length ? (engLeftNodes[0]?.children || []).map((c: any) => c.text).join("").trim() : undefined
+
+  const engRightNodes = extractAfterMarker(children, "engineer-said-right")
+  const engineerRightQuote = engRightNodes?.length ? (engRightNodes[0]?.children || []).map((c: any) => c.text).join("").trim() : undefined
+
+  const engCtaNodes = extractAfterMarker(children, "engineer-said-cta")
+  const engCtaNode = engCtaNodes.find((n: any) => n.type === "linkJump")
+  const engineerCtaText = engCtaNode?.data?.title || "Explore\nMore"
+  const engineerCtaHref = engCtaNode?.data?.url || ""
+
+  const engImgNodes = extractAfterMarker(children, "engineer-said-image")
+  const engUploadNode = engImgNodes.find((n: any) => n.type === "upload")
+  const engImgId = engUploadNode?.value?.id || engUploadNode?.value
+  const engineerImageUrl = engImgId ? mediaData[engImgId]?.url : undefined
+
+  const workImgNodes = extractAfterMarker(children, "engineer-said-work")
+  const workUploadNode = workImgNodes.find((n: any) => n.type === "upload")
+  const workImgId = workUploadNode?.value?.id || workUploadNode?.value
+  const workImageUrl = workImgId ? mediaData[workImgId]?.url : undefined
+
+  return {
+    slides, 
+    images, 
+    titleText, 
+    topSubtitleText, 
+    rightBoxText, 
+    bottomBoxText, 
+    seeAllText, 
+    seeAllHref,
+    navCtaText, 
+    navCtaHref, 
+    carouselItems,
+    engineerMainQuote, 
+    engineerLeftQuote, 
+    engineerRightQuote, 
+    engineerCtaText, 
+    engineerCtaHref, 
+    engineerImageUrl, 
+    workImageUrl
   }
 }
 
 // ─── Template ─────────────────────────────────────────────────────────────────
 
 export function ApplicationTemplate({ locale, pageContent }: ApplicationTemplateProps) {
-  const { slides, images, titleText, topSubtitleText, rightBoxText, bottomBoxText, seeAllText, seeAllHref, navCtaText, navCtaHref, carouselItems } = useMemo(() => extractSections(pageContent), [pageContent])
+  const { 
+    slides, images, titleText, topSubtitleText, rightBoxText, bottomBoxText, seeAllText, seeAllHref, 
+    navCtaText, navCtaHref, carouselItems,
+    engineerMainQuote, engineerLeftQuote, engineerRightQuote, engineerCtaText, engineerCtaHref, engineerImageUrl, workImageUrl
+  } = useMemo(() => extractSections(pageContent), [pageContent])
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -184,6 +230,15 @@ export function ApplicationTemplate({ locale, pageContent }: ApplicationTemplate
         ctaText={navCtaText}
         ctaHref={navCtaHref}
         locale={locale}
+      />
+      <ApplicationEngineerSaidSection
+        mainQuote={engineerMainQuote}
+        leftQuote={engineerLeftQuote}
+        rightQuote={engineerRightQuote}
+        ctaText={engineerCtaText}
+        ctaHref={engineerCtaHref}
+        engineerImage={engineerImageUrl}
+        workImage={workImageUrl}
       />
       {/* More sections coming soon */}
     </div>
