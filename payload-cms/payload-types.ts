@@ -73,9 +73,10 @@ export interface Config {
     'media-tags': MediaTag;
     roles: Role;
     permissions: Permission;
-    'activity-logs': ActivityLog;
     products: Product;
     'product-series': ProductSery;
+    'product-attributes': ProductAttribute;
+    'product-templates': ProductTemplate;
     'hero-banner-items': HeroBannerItem;
     'series-intro-items': SeriesIntroItem;
     'navigation-menus': NavigationMenu;
@@ -91,7 +92,10 @@ export interface Config {
     'seo-settings': SeoSetting;
     'form-configs': FormConfig;
     'form-submissions': FormSubmission;
+    'smtp-configs': SmtpConfig;
+    'Audit-log': AuditLog;
     'payload-kv': PayloadKv;
+    'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -115,9 +119,10 @@ export interface Config {
     'media-tags': MediaTagsSelect<false> | MediaTagsSelect<true>;
     roles: RolesSelect<false> | RolesSelect<true>;
     permissions: PermissionsSelect<false> | PermissionsSelect<true>;
-    'activity-logs': ActivityLogsSelect<false> | ActivityLogsSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     'product-series': ProductSeriesSelect<false> | ProductSeriesSelect<true>;
+    'product-attributes': ProductAttributesSelect<false> | ProductAttributesSelect<true>;
+    'product-templates': ProductTemplatesSelect<false> | ProductTemplatesSelect<true>;
     'hero-banner-items': HeroBannerItemsSelect<false> | HeroBannerItemsSelect<true>;
     'series-intro-items': SeriesIntroItemsSelect<false> | SeriesIntroItemsSelect<true>;
     'navigation-menus': NavigationMenusSelect<false> | NavigationMenusSelect<true>;
@@ -133,7 +138,10 @@ export interface Config {
     'seo-settings': SeoSettingsSelect<false> | SeoSettingsSelect<true>;
     'form-configs': FormConfigsSelect<false> | FormConfigsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
+    'smtp-configs': SmtpConfigsSelect<false> | SmtpConfigsSelect<true>;
+    'Audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
+    'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -201,7 +209,7 @@ export interface Config {
     'home-content': HomeContent;
     footer: Footer;
     'site-config': SiteConfig;
-    'contact-config': ContactConfig;
+    'preloader-config': PreloaderConfig;
     'social-config': SocialConfig;
     'product-series-carousel': ProductSeriesCarousel;
     'service-features': ServiceFeature;
@@ -216,14 +224,14 @@ export interface Config {
     'case-studies': CaseStudy;
     'brand-analysis': BrandAnalysis;
     'brand-value': BrandValue;
-    'email-config': EmailConfig;
     'translation-config': TranslationConfig;
+    'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     'home-content': HomeContentSelect<false> | HomeContentSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     'site-config': SiteConfigSelect<false> | SiteConfigSelect<true>;
-    'contact-config': ContactConfigSelect<false> | ContactConfigSelect<true>;
+    'preloader-config': PreloaderConfigSelect<false> | PreloaderConfigSelect<true>;
     'social-config': SocialConfigSelect<false> | SocialConfigSelect<true>;
     'product-series-carousel': ProductSeriesCarouselSelect<false> | ProductSeriesCarouselSelect<true>;
     'service-features': ServiceFeaturesSelect<false> | ServiceFeaturesSelect<true>;
@@ -238,8 +246,8 @@ export interface Config {
     'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
     'brand-analysis': BrandAnalysisSelect<false> | BrandAnalysisSelect<true>;
     'brand-value': BrandValueSelect<false> | BrandValueSelect<true>;
-    'email-config': EmailConfigSelect<false> | EmailConfigSelect<true>;
     'translation-config': TranslationConfigSelect<false> | TranslationConfigSelect<true>;
+    'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale:
     | 'en'
@@ -270,7 +278,14 @@ export interface Config {
     collection: 'users';
   };
   jobs: {
-    tasks: unknown;
+    tasks: {
+      regenerateImageSizes: TaskRegenerateImageSizes;
+      'cleanup-payload-auditor-log': TaskCleanupPayloadAuditorLog;
+      inline: {
+        input: unknown;
+        output: unknown;
+      };
+    };
     workflows: unknown;
   };
 }
@@ -399,7 +414,7 @@ export interface Permission {
     | 'USER'
     | 'ROLE'
     | 'PERMISSION'
-    | 'ACTIVITY_LOG'
+    | 'AUDIT_LOG'
     | 'PRODUCT'
     | 'PRODUCT_SERIES'
     | 'PAGE'
@@ -472,49 +487,43 @@ export interface Permission {
 export interface Media {
   id: number;
   /**
-   * SEO-friendly alt text for images | 图片的SEO友好替代文本
+   * SEO-friendly alt text for images
    */
   alt: string;
   /**
-   * Main category for this media | 此媒体的主分类
+   * Main category for this media
    */
   primaryCategory?: (number | null) | MediaCategory;
   /**
-   * Tags for filtering and searching | 用于筛选和搜索的标签
+   * Tags for filtering and searching
    */
   tags?: (number | MediaTag)[] | null;
+  /**
+   * Product specifications for this image (key-value pairs)
+   */
+  specs?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   metadata?: {
     /**
-     * Scene group number for scene images | 场景图的分组编号
+     * Scene group number for scene images
      */
     group?: number | null;
     sceneNumber?: number | null;
     /**
-     * Image sequence number within a series/scene group | 该系列/场景分组内的图片序号
+     * Image sequence number within a series/scene group
      */
     imageNumber?: number | null;
-    /**
-     * Product specifications for this image | 此图片的产品规格
-     */
-    specs?:
-      | {
-          key: 'color' | 'material' | 'size' | 'finish' | 'model' | 'series' | 'style' | 'other';
-          value: string;
-          customKey?: string | null;
-          id?: string | null;
-        }[]
-      | null;
     notes?: string | null;
   };
   /**
-   * Visual editor for image focal point | 可视化焦点编辑器
-   */
-  focalPointData?: {
-    x?: number | null;
-    y?: number | null;
-  };
-  /**
-   * Media status (archived = soft delete) | 媒体状态（归档=软删除）
+   * Media status (archived = soft delete)
    */
   status?: ('active' | 'archived') | null;
   usageCount?: number | null;
@@ -524,7 +533,7 @@ export interface Media {
   url?: string | null;
   thumbnailURL?: string | null;
   /**
-   * Media file name | 媒体文件名
+   * Media file name
    */
   filename: string;
   mimeType?: string | null;
@@ -575,24 +584,24 @@ export interface Media {
 export interface MediaCategory {
   id: number;
   /**
-   * Internal identifier (e.g., "product-images") | 内部标识符（如 "product-images"）
+   * Internal identifier (e.g., "product-images")
    */
   name: string;
   /**
-   * User-friendly name shown in UI | 在界面中显示的友好名称
+   * User-friendly name shown in UI
    */
   displayName: string;
   description?: string | null;
   /**
-   * Icon name or emoji | 图标名称或 emoji
+   * Icon name or emoji
    */
   icon?: string | null;
   /**
-   * Color code for UI display (e.g., #3498db) | UI显示的颜色代码
+   * Color code for UI display (e.g., #3498db)
    */
   color?: string | null;
   /**
-   * Display order in lists | 列表中的显示顺序
+   * Display order in lists
    */
   order?: number | null;
   updatedAt: string;
@@ -606,112 +615,24 @@ export interface MediaTag {
   id: number;
   name: string;
   /**
-   * Type of tag for grouping | 标签分组类型
+   * Type of tag for grouping
    */
   type: 'general' | 'product_series' | 'product_model' | 'scene' | 'color' | 'material' | 'style';
   /**
-   * Optional category this tag belongs to | 此标签所属的可选分类
+   * Optional category this tag belongs to
    */
   category?: (number | null) | MediaCategory;
   description?: string | null;
   /**
-   * Color code for UI display | UI显示的颜色代码
+   * Color code for UI display
    */
   color?: string | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * System activity audit trail
+ * Manage product integration pages (including basic info, images, and SEO)
  *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "activity-logs".
- */
-export interface ActivityLog {
-  id: number;
-  user?: (number | null) | User;
-  /**
-   * Stored for reference even if user is deleted
-   */
-  userName?: string | null;
-  userEmail?: string | null;
-  action:
-    | 'CREATE'
-    | 'UPDATE'
-    | 'DELETE'
-    | 'LOGIN'
-    | 'LOGOUT'
-    | 'PUBLISH'
-    | 'UNPUBLISH'
-    | 'EXPORT'
-    | 'IMPORT'
-    | 'RESTORE'
-    | 'DUPLICATE'
-    | 'BULK_UPDATE'
-    | 'BULK_DELETE';
-  entity:
-    | 'USER'
-    | 'ROLE'
-    | 'PERMISSION'
-    | 'MEDIA'
-    | 'PRODUCT'
-    | 'PRODUCT_SERIES'
-    | 'PAGE'
-    | 'BLOG'
-    | 'APPLICATION'
-    | 'CATEGORY'
-    | 'FAQ_ITEM'
-    | 'REUSABLE_BLOCK'
-    | 'NAVIGATION_MENU'
-    | 'HERO_BANNER_ITEM'
-    | 'SITE_CONFIG'
-    | 'SEO_SETTING'
-    | 'CUSTOM_SCRIPT'
-    | 'FORM_CONFIG'
-    | 'FORM_SUBMISSION'
-    | 'FOOTER'
-    | 'HOME_CONTENT'
-    | 'EMAIL_CONFIG'
-    | 'SYSTEM';
-  entityId?: string | null;
-  /**
-   * Human-readable title of the affected entity
-   */
-  entityTitle?: string | null;
-  /**
-   * Human-readable summary of the action
-   */
-  summary?: string | null;
-  /**
-   * JSON object containing before/after values
-   */
-  changes?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  /**
-   * Additional context about the action
-   */
-  metadata?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  ipAddress?: string | null;
-  userAgent?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "products".
  */
@@ -739,47 +660,13 @@ export interface Product {
    */
   series?: (number | null) | ProductSery;
   /**
-   * Rich text content - use language tabs above to switch locales
+   * Select the attribute/specification page for this product
    */
-  contentTranslation?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  attributePage?: (number | null) | ProductAttribute;
   /**
-   * Product attributes (key-value pairs)
+   * Select the rich text content template for this product
    */
-  attributes?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  /**
-   * Product variants (colors, sizes, etc.)
-   */
-  specifications?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+  contentTemplate?: (number | null) | ProductTemplate;
   /**
    * Product list display image
    */
@@ -865,6 +752,9 @@ export interface ProductSery {
  */
 export interface Category {
   id: number;
+  /**
+   * Bilingual category name
+   */
   name: string;
   /**
    * URL-friendly identifier (e.g., "door-hardware")
@@ -875,12 +765,97 @@ export interface Category {
    * Parent category for hierarchical structure
    */
   parent?: (number | null) | Category;
+  /**
+   * Localized description of this category
+   */
   description?: string | null;
   /**
    * Lower number = higher priority
    */
   order?: number | null;
   status?: ('published' | 'draft' | 'archived') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-attributes".
+ */
+export interface ProductAttribute {
+  id: number;
+  /**
+   * Internal name for identification (e.g., "Glass Standoff Standard Attributes")
+   */
+  name: string;
+  /**
+   * Rich text for specific product attributes and highlights
+   */
+  productAttributes?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Product variants specifications (colors, sizes, etc.)
+   */
+  specifications?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  customAttributes?:
+    | {
+        label: string;
+        value: string;
+        show?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-templates".
+ */
+export interface ProductTemplate {
+  id: number;
+  /**
+   * Internal name for identification (e.g., "Glass Panel Connection Template")
+   */
+  name: string;
+  /**
+   * Rich text content for product details
+   */
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -901,9 +876,12 @@ export interface HeroBannerItem {
   feature4: string;
   feature5: string;
   /**
-   * Select an image | 选择一张图片
+   * Background image for Banner 1,2,6,7,8,9
    */
   image1?: (number | null) | Media;
+  /**
+   * Decoration image used in all banners
+   */
   image2?: (number | null) | Media;
   image3?: (number | null) | Media;
   image4?: (number | null) | Media;
@@ -955,37 +933,37 @@ export interface SeriesIntroItem {
 export interface NavigationMenu {
   id: number;
   /**
-   * 唯一标识符，例如: product, service, about-us
+   * Unique identifier, e.g.: product, service, about-us
    */
   slug: string;
+  /**
+   * Bilingual menu name
+   */
   name: string;
   type: 'standard' | 'product_cards' | 'submenu';
-  /**
-   * Lucide-react 图标名称，例如: Home, Package, Wrench
-   */
   icon?: string | null;
   /**
-   * 选择标签筛选图片，用于 PRODUCT_CARDS 类型
+   * Select tags to filter images for menu card display
    */
   mediaTags?: (number | MediaTag)[] | null;
   /**
-   * 留空表示顶级菜单
+   * Leave empty for top-level menu
    */
   parent?: (number | null) | NavigationMenu;
   /**
-   * 外链 https://... 或内部路径 /product, /service
+   * External URL https://... or internal path /product, /service
    */
   link?: string | null;
   /**
-   * "询单"按钮的链接，仅用于 PRODUCT_CARDS 类型
+   * Link for "Inquiry" button, only for PRODUCT_CARDS type
    */
   inquiryLink?: string | null;
   /**
-   * 数字越小越靠前
+   * Lower number appears first
    */
   order?: number | null;
   /**
-   * 系统默认菜单，不可删除
+   * System default menu, cannot be deleted
    */
   isSystem?: boolean | null;
   visible?: boolean | null;
@@ -993,7 +971,7 @@ export interface NavigationMenu {
   createdAt: string;
 }
 /**
- * Unified page management - includes template pages and freeform landing pages
+ * Manage subpages - includes template pages and freeform landing pages
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
@@ -1041,10 +1019,6 @@ export interface Page {
   heroMediaTags?: (number | MediaTag)[] | null;
   heroText?: string | null;
   heroSubtitle?: string | null;
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-  };
   /**
    * System pages cannot be deleted
    */
@@ -1126,7 +1100,7 @@ export interface Application {
    */
   sceneGallery?:
     | {
-        sceneName: string;
+        sceneName?: string | null;
         /**
          * Select multiple images for this scene
          */
@@ -1134,10 +1108,6 @@ export interface Application {
         id?: string | null;
       }[]
     | null;
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-  };
   status?: ('published' | 'draft' | 'archived') | null;
   updatedAt: string;
   createdAt: string;
@@ -1197,7 +1167,7 @@ export interface ReusableBlock {
    * Unique identifier (e.g., "cta-contact-us", "feature-quality")
    */
   slug: string;
-  blockType: 'CTA' | 'FEATURE' | 'TESTIMONIAL' | 'CONTACT' | 'CUSTOM';
+  blockType: 'CTA' | 'FEATURE' | 'TESTIMONIAL' | 'CONTACT' | 'PRODUCT' | 'CUSTOM';
   title?: string | null;
   subtitle?: string | null;
   /**
@@ -1239,7 +1209,7 @@ export interface DocumentTemplate {
   /**
    * Category for organizing templates (managed in Template Categories)
    */
-  category?: (number | TemplateCategory) | null;
+  category?: (number | null) | TemplateCategory;
   content?: {
     root: {
       type: string;
@@ -1278,6 +1248,10 @@ export interface TemplateCategory {
   id: number;
   name: string;
   /**
+   * Auto-generated bilingual label (do not edit manually)
+   */
+  label?: string | null;
+  /**
    * Unique identifier (e.g., "product-intro", "faq")
    */
   slug: string;
@@ -1298,11 +1272,37 @@ export interface CustomScript {
    */
   name: string;
   description?: string | null;
+  /**
+   * Templates are pre-approved and secure. Custom code requires admin privileges.
+   */
+  scriptType: 'template' | 'custom';
+  /**
+   * Select a pre-configured tracking script template
+   */
+  templateType?:
+    | (
+        | 'google_analytics_4'
+        | 'google_tag_manager'
+        | 'google_tag_manager_noscript'
+        | 'facebook_pixel'
+        | 'tiktok_pixel'
+        | 'microsoft_clarity'
+        | 'hotjar'
+      )
+    | null;
+  /**
+   * Enter your tracking ID (e.g., G-XXXXXXXXXX for GA4, GTM-XXXXXXX for GTM)
+   */
+  templateId?: string | null;
   scriptPosition: 'header' | 'footer' | 'body_start';
   /**
-   * Enter complete <script> tag or other code
+   * Enter custom code (admin only)
    */
-  content: string;
+  content?: string | null;
+  /**
+   * Preview of the generated script (read-only). Save to generate.
+   */
+  generatedContent?: string | null;
   scope: 'global' | 'page_type' | 'exact_path' | 'path_pattern';
   pageType?:
     | (
@@ -1313,23 +1313,22 @@ export interface CustomScript {
         | 'shop_detail'
         | 'blog_list'
         | 'blog_detail'
-        | 'application_list'
-        | 'application_detail'
+        | 'applications'
       )
     | null;
-  /**
-   * e.g., /about-us/contact
-   */
   exactPath?: string | null;
-  /**
-   * e.g., /product/* or /blog/**
-   */
   pathPattern?: string | null;
   isEnabled?: boolean | null;
   /**
    * Higher number = loads first
    */
   priority?: number | null;
+  /**
+   * Open this URL to preview script loading status (authorized access only)
+   */
+  previewUrl?: string | null;
+  lastTestedAt?: string | null;
+  testStatus?: ('not_tested' | 'passed' | 'failed') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1355,17 +1354,13 @@ export interface SeoSetting {
         | 'shop_detail'
         | 'blog_list'
         | 'blog_detail'
-        | 'application_list'
-        | 'application_detail'
+        | 'applications'
       )
     | null;
   exactPath?: string | null;
-  /**
-   * e.g., /product/* or /blog/**
-   */
   pathPattern?: string | null;
   /**
-   * Override page title for SEO
+   * Override page title for SEO (50-60 characters recommended)
    */
   metaTitle?: string | null;
   /**
@@ -1376,21 +1371,45 @@ export interface SeoSetting {
    * Comma-separated keywords
    */
   metaKeywords?: string | null;
+  /**
+   * Title displayed when shared on social media
+   */
   ogTitle?: string | null;
+  /**
+   * Description displayed when shared on social media
+   */
   ogDescription?: string | null;
+  /**
+   * Image displayed when shared on social media (1200x630px recommended)
+   */
   ogImage?: (number | null) | Media;
+  /**
+   * Type of content for social sharing
+   */
   ogType?: ('website' | 'article' | 'product') | null;
+  /**
+   * Allow search engines to index this page
+   */
   robotsIndex?: boolean | null;
+  /**
+   * Allow search engines to follow links on this page
+   */
   robotsFollow?: boolean | null;
   /**
    * Leave empty to use default page URL
    */
   canonicalUrl?: string | null;
+  /**
+   * Include this page in the sitemap.xml
+   */
   includeInSitemap?: boolean | null;
   /**
-   * 0.0 - 1.0
+   * 0.0 - 1.0 (higher = more important)
    */
   sitemapPriority?: number | null;
+  /**
+   * How often this page is likely to change
+   */
   sitemapChangefreq?: ('always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never') | null;
   updatedAt: string;
   createdAt: string;
@@ -1436,9 +1455,17 @@ export interface FormConfig {
           | {
               value: string;
               label: string;
+              /**
+               * If checked, selecting this option will show a text input for the user to type manually.
+               */
+              hasCustomInput?: boolean | null;
               id?: string | null;
             }[]
           | null;
+        /**
+         * Only for checkbox fields. When unchecked, checkbox acts as single-selection (like radio)
+         */
+        allowMultiple?: boolean | null;
         required?: boolean | null;
         width?: ('full' | 'half' | 'third') | null;
         order?: number | null;
@@ -1446,7 +1473,53 @@ export interface FormConfig {
       }[]
     | null;
   submitButtonText?: string | null;
+  submittingText?: string | null;
   successMessage?: string | null;
+  errorRequiredFields?: string | null;
+  errorNetworkMessage?: string | null;
+  errorCaptchaMessage?: string | null;
+  rateLimitEnabled?: boolean | null;
+  /**
+   * Maximum submissions allowed from same IP within 1 hour
+   */
+  rateLimitPerIP?: number | null;
+  /**
+   * Maximum total submissions for this form per day (0 = unlimited)
+   */
+  rateLimitPerDay?: number | null;
+  /**
+   * Minimum seconds between submissions from same IP
+   */
+  minSubmitInterval?: number | null;
+  captchaEnabled?: boolean | null;
+  captchaTheme?: ('auto' | 'light' | 'dark') | null;
+  captchaSize?: ('normal' | 'compact') | null;
+  /**
+   * Choose whether to enable auto-reply for this form
+   */
+  autoReplyEnabled?: ('inherit' | 'enabled' | 'disabled') | null;
+  /**
+   * Leave empty to use SMTP config default
+   */
+  autoReplySubject?: string | null;
+  /**
+   * Leave empty to use SMTP config default. Use {name}, {email}, {formName} as placeholders.
+   */
+  autoReplyTemplate?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   status?: ('published' | 'draft') | null;
   updatedAt: string;
   createdAt: string;
@@ -1521,6 +1594,95 @@ export interface FormSubmission {
   createdAt: string;
 }
 /**
+ * Configure SMTP accounts for form email sending
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "smtp-configs".
+ */
+export interface SmtpConfig {
+  id: number;
+  /**
+   * e.g., "Pre-sales Email", "After-sales Email"
+   */
+  name: string;
+  description?: string | null;
+  /**
+   * SMTP server hostname (e.g., smtp.gmail.com)
+   */
+  smtpHost: string;
+  /**
+   * Usually 587 (TLS) or 465 (SSL)
+   */
+  smtpPort?: number | null;
+  smtpUser: string;
+  /**
+   * For Gmail, use App Password (not your regular password)
+   */
+  smtpPassword: string;
+  /**
+   * Leave empty to use SMTP user as sender
+   */
+  emailFromAddress?: string | null;
+  emailFromName?: string | null;
+  /**
+   * Select forms that will use this SMTP config. Each form can only belong to one SMTP config.
+   */
+  formConfigs?: (number | FormConfig)[] | null;
+  notificationEnabled?: boolean | null;
+  /**
+   * Comma-separated list of emails to notify on form submissions
+   */
+  notificationEmails?: string | null;
+  /**
+   * Use {formName} for form name placeholder
+   */
+  notificationSubject?: string | null;
+  /**
+   * Default auto-reply setting. Individual forms can override.
+   */
+  autoReplyEnabled?: boolean | null;
+  /**
+   * Use {name}, {email}, {formName} as placeholders
+   */
+  autoReplySubject?: string | null;
+  /**
+   * Use {name}, {email}, {formName} as placeholders
+   */
+  autoReplyTemplate?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  status?: ('enabled' | 'disabled') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Audit-log".
+ */
+export interface AuditLog {
+  id: number;
+  operation: string;
+  onCollection: string;
+  documentId?: string | null;
+  user: number | User;
+  userAgent?: string | null;
+  hook?: string | null;
+  type: 'info' | 'debug' | 'warning' | 'error' | 'audit' | 'security' | 'unknown';
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -1536,6 +1698,107 @@ export interface PayloadKv {
     | number
     | boolean
     | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs".
+ */
+export interface PayloadJob {
+  id: number;
+  /**
+   * Input data provided to the job
+   */
+  input?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  taskStatus?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  completedAt?: string | null;
+  totalTried?: number | null;
+  /**
+   * If hasError is true this job will not be retried
+   */
+  hasError?: boolean | null;
+  /**
+   * If hasError is true, this is the error that caused it
+   */
+  error?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Task execution log
+   */
+  log?:
+    | {
+        executedAt: string;
+        completedAt: string;
+        taskSlug: 'inline' | 'regenerateImageSizes' | 'cleanup-payload-auditor-log';
+        taskID: string;
+        input?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        output?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        state: 'failed' | 'succeeded';
+        error?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  taskSlug?: ('inline' | 'regenerateImageSizes' | 'cleanup-payload-auditor-log') | null;
+  queue?: string | null;
+  waitUntil?: string | null;
+  processing?: boolean | null;
+  meta?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1569,16 +1832,20 @@ export interface PayloadLockedDocument {
         value: number | Permission;
       } | null)
     | ({
-        relationTo: 'activity-logs';
-        value: number | ActivityLog;
-      } | null)
-    | ({
         relationTo: 'products';
         value: number | Product;
       } | null)
     | ({
         relationTo: 'product-series';
         value: number | ProductSery;
+      } | null)
+    | ({
+        relationTo: 'product-attributes';
+        value: number | ProductAttribute;
+      } | null)
+    | ({
+        relationTo: 'product-templates';
+        value: number | ProductTemplate;
       } | null)
     | ({
         relationTo: 'hero-banner-items';
@@ -1639,6 +1906,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'form-submissions';
         value: number | FormSubmission;
+      } | null)
+    | ({
+        relationTo: 'smtp-configs';
+        value: number | SmtpConfig;
+      } | null)
+    | ({
+        relationTo: 'Audit-log';
+        value: number | AuditLog;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1721,27 +1996,14 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   primaryCategory?: T;
   tags?: T;
+  specs?: T;
   metadata?:
     | T
     | {
         group?: T;
         sceneNumber?: T;
         imageNumber?: T;
-        specs?:
-          | T
-          | {
-              key?: T;
-              value?: T;
-              customKey?: T;
-              id?: T;
-            };
         notes?: T;
-      };
-  focalPointData?:
-    | T
-    | {
-        x?: T;
-        y?: T;
       };
   status?: T;
   usageCount?: T;
@@ -1864,26 +2126,6 @@ export interface PermissionsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "activity-logs_select".
- */
-export interface ActivityLogsSelect<T extends boolean = true> {
-  user?: T;
-  userName?: T;
-  userEmail?: T;
-  action?: T;
-  entity?: T;
-  entityId?: T;
-  entityTitle?: T;
-  summary?: T;
-  changes?: T;
-  metadata?: T;
-  ipAddress?: T;
-  userAgent?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "products_select".
  */
 export interface ProductsSelect<T extends boolean = true> {
@@ -1893,9 +2135,8 @@ export interface ProductsSelect<T extends boolean = true> {
   shortDescription?: T;
   description?: T;
   series?: T;
-  contentTranslation?: T;
-  attributes?: T;
-  specifications?: T;
+  attributePage?: T;
+  contentTemplate?: T;
   showImage?: T;
   mainImage?: T;
   meta?:
@@ -1925,6 +2166,35 @@ export interface ProductSeriesSelect<T extends boolean = true> {
   status?: T;
   order?: T;
   isFeatured?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-attributes_select".
+ */
+export interface ProductAttributesSelect<T extends boolean = true> {
+  name?: T;
+  productAttributes?: T;
+  specifications?: T;
+  customAttributes?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        show?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-templates_select".
+ */
+export interface ProductTemplatesSelect<T extends boolean = true> {
+  name?: T;
+  content?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2002,12 +2272,6 @@ export interface PagesSelect<T extends boolean = true> {
   heroMediaTags?: T;
   heroText?: T;
   heroSubtitle?: T;
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-      };
   isSystem?: T;
   status?: T;
   publishedAt?: T;
@@ -2055,12 +2319,6 @@ export interface ApplicationsSelect<T extends boolean = true> {
         sceneName?: T;
         images?: T;
         id?: T;
-      };
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
       };
   status?: T;
   updatedAt?: T;
@@ -2132,6 +2390,7 @@ export interface DocumentTemplatesSelect<T extends boolean = true> {
  */
 export interface TemplateCategoriesSelect<T extends boolean = true> {
   name?: T;
+  label?: T;
   slug?: T;
   order?: T;
   updatedAt?: T;
@@ -2144,14 +2403,21 @@ export interface TemplateCategoriesSelect<T extends boolean = true> {
 export interface CustomScriptsSelect<T extends boolean = true> {
   name?: T;
   description?: T;
+  scriptType?: T;
+  templateType?: T;
+  templateId?: T;
   scriptPosition?: T;
   content?: T;
+  generatedContent?: T;
   scope?: T;
   pageType?: T;
   exactPath?: T;
   pathPattern?: T;
   isEnabled?: T;
   priority?: T;
+  previewUrl?: T;
+  lastTestedAt?: T;
+  testStatus?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2202,15 +2468,31 @@ export interface FormConfigsSelect<T extends boolean = true> {
           | {
               value?: T;
               label?: T;
+              hasCustomInput?: T;
               id?: T;
             };
+        allowMultiple?: T;
         required?: T;
         width?: T;
         order?: T;
         id?: T;
       };
   submitButtonText?: T;
+  submittingText?: T;
   successMessage?: T;
+  errorRequiredFields?: T;
+  errorNetworkMessage?: T;
+  errorCaptchaMessage?: T;
+  rateLimitEnabled?: T;
+  rateLimitPerIP?: T;
+  rateLimitPerDay?: T;
+  minSubmitInterval?: T;
+  captchaEnabled?: T;
+  captchaTheme?: T;
+  captchaSize?: T;
+  autoReplyEnabled?: T;
+  autoReplySubject?: T;
+  autoReplyTemplate?: T;
   status?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2240,11 +2522,81 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "smtp-configs_select".
+ */
+export interface SmtpConfigsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  smtpHost?: T;
+  smtpPort?: T;
+  smtpUser?: T;
+  smtpPassword?: T;
+  emailFromAddress?: T;
+  emailFromName?: T;
+  formConfigs?: T;
+  notificationEnabled?: T;
+  notificationEmails?: T;
+  notificationSubject?: T;
+  autoReplyEnabled?: T;
+  autoReplySubject?: T;
+  autoReplyTemplate?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Audit-log_select".
+ */
+export interface AuditLogSelect<T extends boolean = true> {
+  operation?: T;
+  onCollection?: T;
+  documentId?: T;
+  user?: T;
+  userAgent?: T;
+  hook?: T;
+  type?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
   key?: T;
   data?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs_select".
+ */
+export interface PayloadJobsSelect<T extends boolean = true> {
+  input?: T;
+  taskStatus?: T;
+  completedAt?: T;
+  totalTried?: T;
+  hasError?: T;
+  error?: T;
+  log?:
+    | T
+    | {
+        executedAt?: T;
+        completedAt?: T;
+        taskSlug?: T;
+        taskID?: T;
+        input?: T;
+        output?: T;
+        state?: T;
+        error?: T;
+        id?: T;
+      };
+  taskSlug?: T;
+  queue?: T;
+  waitUntil?: T;
+  processing?: T;
+  meta?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2285,7 +2637,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface HomeContent {
   id: number;
   /**
-   * 配置首页各区块的显示顺序和状态
+   * Configure homepage section display order and status
    */
   sections?:
     | {
@@ -2320,94 +2672,40 @@ export interface HomeContent {
 export interface Footer {
   id: number;
   /**
-   * 选择一个表单配置 (推荐使用 "footer-form")。如果选择了表单配置，将忽略下方的旧版字段设置。
+   * Select a form configuration (recommended: "footer-form"). All form settings (fields, button text, etc.) are configured in FormConfig.
    */
   formConfig?: (number | null) | FormConfig;
+  contactInfoGroup?: {
+    contactTitle?: string | null;
+    /**
+     * e.g., "Email", "Contact Email"
+     */
+    contactEmailLabel?: string | null;
+    contactEmail?: string | null;
+    /**
+     * e.g., "After-sales", "Support"
+     */
+    afterSalesLabel?: string | null;
+    afterSalesEmail?: string | null;
+    whatsappLabel?: string | null;
+    whatsappNumber?: string | null;
+    address?: string | null;
+    workingHours?: string | null;
+  };
+  officialNoticeGroup?: {
+    officialNoticeTitle?: string | null;
+    officialNoticeLine1?: string | null;
+    officialNoticeLine2?: string | null;
+    officialNoticeLine3?: string | null;
+    /**
+     * e.g., signature, date, etc.
+     */
+    officialNoticeLine4?: string | null;
+  };
   /**
-   * ⚠️ 旧版配置。如果使用了 FormConfig，此字段将被忽略。
+   * Select navigation menus to display in non-homepage footer (horizontal layout)
    */
-  formTitle?: string | null;
-  /**
-   * ⚠️ 旧版配置。
-   */
-  formPlaceholderName?: string | null;
-  /**
-   * ⚠️ 旧版配置。
-   */
-  formPlaceholderEmail?: string | null;
-  /**
-   * ⚠️ 旧版配置。
-   */
-  formPlaceholderMessage?: string | null;
-  submitButtonText?: string | null;
-  contactTitle?: string | null;
-  /**
-   * 例如: "Email", "联系邮箱" 等
-   */
-  contactEmailLabel?: string | null;
-  contactEmail?: string | null;
-  /**
-   * 例如: "After-sales", "售后" 等
-   */
-  afterSalesLabel?: string | null;
-  afterSalesEmail?: string | null;
-  whatsappLabel?: string | null;
-  whatsappNumber?: string | null;
-  /**
-   * ⚠️ 已弃用，请使用 contactEmail
-   */
-  email?: string | null;
-  /**
-   * ⚠️ 已弃用
-   */
-  phone?: string | null;
-  whatsapp?: string | null;
-  address?: string | null;
-  workingHours?: string | null;
-  officialNoticeTitle?: string | null;
-  officialNoticeLine1?: string | null;
-  officialNoticeLine2?: string | null;
-  officialNoticeLine3?: string | null;
-  /**
-   * 例如：署名、日期等
-   */
-  officialNoticeLine4?: string | null;
-  /**
-   * ⚠️ 旧版字段，请使用上方的 Line 1-4
-   */
-  officialNoticeContent?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  socialLinks?:
-    | {
-        platform?:
-          | ('facebook' | 'twitter' | 'instagram' | 'linkedin' | 'youtube' | 'tiktok' | 'wechat' | 'whatsapp')
-          | null;
-        url: string;
-        icon?: (number | null) | Media;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * 选择要在非首页页脚第三列显示的导航菜单（必须是有实际页面的菜单）
-   */
-  column3Menus?: (number | NavigationMenu)[] | null;
-  /**
-   * 选择要在非首页页脚第四列显示的导航菜单（必须是有实际页面的菜单）
-   */
-  column4Menus?: (number | NavigationMenu)[] | null;
+  navigationMenus?: (number | NavigationMenu)[] | null;
   copyrightText?: string | null;
   legalLinks?:
     | {
@@ -2420,61 +2718,127 @@ export interface Footer {
   createdAt?: string | null;
 }
 /**
+ * Site-wide configuration settings
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-config".
  */
 export interface SiteConfig {
   id: number;
+  /**
+   * The name of your website
+   */
   siteName: string;
+  /**
+   * A short tagline or slogan for your site
+   */
   siteTagline?: string | null;
+  /**
+   * Site logo (SVG or PNG recommended)
+   */
   logo?: (number | null) | Media;
+  /**
+   * Browser tab icon (ICO or PNG, 32x32px recommended)
+   */
   favicon?: (number | null) | Media;
-  contactEmail?: string | null;
-  contactPhone?: string | null;
-  contactAddress?: string | null;
-  googleMapsUrl?: string | null;
-  defaultMetaTitle?: string | null;
-  defaultMetaDescription?: string | null;
-  defaultOgImage?: (number | null) | Media;
-  googleAnalyticsId?: string | null;
-  googleTagManagerId?: string | null;
-  facebook?: string | null;
-  twitter?: string | null;
-  instagram?: string | null;
-  linkedin?: string | null;
-  youtube?: string | null;
-  tiktok?: string | null;
+  /**
+   * Enable Cloudflare Turnstile captcha for all forms
+   */
+  turnstileEnabled?: boolean | null;
+  /**
+   * Get from Cloudflare Dashboard > Turnstile
+   */
+  turnstileSiteKey?: string | null;
+  /**
+   * Keep this secret! Used for server-side verification
+   */
+  turnstileSecretKey?: string | null;
+  /**
+   * Show captcha after this many submissions (2 = show after first)
+   */
+  turnstileThreshold?: number | null;
+  /**
+   * AWS CloudFront Distribution ID for CDN invalidation
+   */
+  cloudfrontDistributionId?: string | null;
+  /**
+   * URL of the frontend website (e.g., https://busrom.com)
+   */
+  frontendUrl?: string | null;
+  /**
+   * Secret token for Next.js on-demand revalidation
+   */
+  revalidateSecret?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
 /**
- * Company contact information settings
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contact-config".
+ * via the `definition` "preloader-config".
  */
-export interface ContactConfig {
+export interface PreloaderConfig {
   id: number;
   /**
-   * Primary contact email
+   * Turn off to skip loading animation
    */
-  email?: string | null;
+  enabled?: boolean | null;
   /**
-   * Primary contact phone number
+   * Hex color code (e.g., #EBE6D8)
    */
-  phone?: string | null;
+  backgroundColor?: string | null;
   /**
-   * WhatsApp number for customer support
+   * Color for loading text
    */
-  whatsapp?: string | null;
+  textColor?: string | null;
   /**
-   * WeChat ID
+   * Color for shine effect
    */
-  wechat?: string | null;
+  highlightColor?: string | null;
   /**
-   * Company physical address
+   * Show image wall after loading animation
    */
-  address?: string | null;
+  imageWallEnabled?: boolean | null;
+  /**
+   * Add images for the image wall animation. Each image can have custom position and size.
+   */
+  images?:
+    | {
+        /**
+         * Select an image from media library
+         */
+        image: number | Media;
+        /**
+         * 0-100%
+         */
+        positionTop?: number | null;
+        /**
+         * 0-100%
+         */
+        positionLeft?: number | null;
+        aspectRatio?: ('9 / 16' | '9 / 12' | '9 / 6' | '1 / 1' | '16 / 9') | null;
+        /**
+         * 0.5 - 2.0
+         */
+        widthScale?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * How long the 0-100% progress takes
+   */
+  loadingDuration?: number | null;
+  /**
+   * Duration of logo reveal animation
+   */
+  logoAnimationDuration?: number | null;
+  /**
+   * Duration for each image to appear
+   */
+  imageWallDuration?: number | null;
+  /**
+   * Delay between each image appearing
+   */
+  imageWallStagger?: number | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2487,33 +2851,46 @@ export interface ContactConfig {
 export interface SocialConfig {
   id: number;
   /**
-   * Facebook page URL
+   * Add social media links with custom icons
    */
-  facebookUrl?: string | null;
-  /**
-   * Instagram profile URL
-   */
-  instagramUrl?: string | null;
-  /**
-   * LinkedIn company page URL
-   */
-  linkedinUrl?: string | null;
-  /**
-   * YouTube channel URL
-   */
-  youtubeUrl?: string | null;
-  /**
-   * Twitter/X profile URL
-   */
-  twitterUrl?: string | null;
-  /**
-   * TikTok profile URL
-   */
-  tiktokUrl?: string | null;
-  /**
-   * Pinterest profile URL
-   */
-  pinterestUrl?: string | null;
+  socialLinks?:
+    | {
+        platform:
+          | 'facebook'
+          | 'instagram'
+          | 'linkedin'
+          | 'youtube'
+          | 'twitter'
+          | 'tiktok'
+          | 'pinterest'
+          | 'whatsapp'
+          | 'telegram'
+          | 'discord'
+          | 'wechat'
+          | 'weibo'
+          | 'douyin'
+          | 'xiaohongshu'
+          | 'bilibili'
+          | 'custom';
+        /**
+         * Enter the name of your custom platform
+         */
+        customName?: string | null;
+        /**
+         * Full URL to your social profile
+         */
+        url: string;
+        /**
+         * Optional: Upload a custom icon (SVG or PNG recommended). Leave empty to use default platform icon.
+         */
+        icon?: (number | null) | Media;
+        /**
+         * Lower number appears first
+         */
+        order?: number | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2523,7 +2900,7 @@ export interface SocialConfig {
  */
 export interface ProductSeriesCarousel {
   id: number;
-  status?: ('draft' | 'published') | null;
+  status?: ('published' | 'draft') | null;
   title?: string | null;
   /**
    * Multilingual carousel items. Each language has its own array of items.
@@ -2548,18 +2925,18 @@ export interface ProductSeriesCarousel {
  */
 export interface ServiceFeature {
   id: number;
-  status?: ('draft' | 'published') | null;
+  status?: ('published' | 'draft') | null;
   /**
-   * 例如: "Premium Architectural Glass Hardware"
+   * e.g.: "Premium Architectural Glass Hardware"
    */
   title?: string | null;
   subtitle?: string | null;
   /**
-   * 例如: "Any Size, Any Structure, Any Shape"
+   * e.g.: "Any Size, Any Structure, Any Shape"
    */
   feature01Title?: string | null;
   /**
-   * 例如: "Any Size"
+   * e.g.: "Any Size"
    */
   feature01ShortTitle?: string | null;
   feature01Description?: string | null;
@@ -2600,14 +2977,15 @@ export interface ServiceFeature {
  */
 export interface Sphere3D {
   id: number;
-  status?: ('draft' | 'published') | null;
-  enabled?: boolean | null;
+  status?: ('published' | 'draft') | null;
+  /**
+   * e.g. GLOBAL NETWORK
+   */
   title?: string | null;
   /**
-   * 3D模型文件地址
+   * e.g. Serving customers worldwide from Guangdong, China
    */
-  modelUrl?: string | null;
-  backgroundColor?: string | null;
+  description?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2617,9 +2995,10 @@ export interface Sphere3D {
  */
 export interface SimpleCta {
   id: number;
-  status?: ('draft' | 'published') | null;
+  status?: ('published' | 'draft') | null;
   title?: string | null;
   subtitle?: string | null;
+  description?: string | null;
   ctaText?: string | null;
   ctaLink?: string | null;
   image1?: (number | null) | Media;
@@ -2634,7 +3013,7 @@ export interface SimpleCta {
  */
 export interface FeaturedProduct {
   id: number;
-  status?: ('draft' | 'published') | null;
+  status?: ('published' | 'draft') | null;
   title?: string | null;
   description?: string | null;
   viewAllButtonText?: string | null;
@@ -2651,52 +3030,28 @@ export interface FeaturedProduct {
  */
 export interface BrandAdvantage {
   id: number;
-  status?: ('draft' | 'published') | null;
+  status?: ('published' | 'draft') | null;
   image?: (number | null) | Media;
   advantage01Text?: string | null;
   /**
-   * Lucide React 图标名称，例如: Sparkles, Target, Component
+   * Iconify icon name, e.g.: lucide:sparkles, mdi:home
    */
   advantage01Icon?: string | null;
   advantage02Text?: string | null;
-  /**
-   * Lucide React 图标名称
-   */
   advantage02Icon?: string | null;
   advantage03Text?: string | null;
-  /**
-   * Lucide React 图标名称
-   */
   advantage03Icon?: string | null;
   advantage04Text?: string | null;
-  /**
-   * Lucide React 图标名称
-   */
   advantage04Icon?: string | null;
   advantage05Text?: string | null;
-  /**
-   * Lucide React 图标名称
-   */
   advantage05Icon?: string | null;
   advantage06Text?: string | null;
-  /**
-   * Lucide React 图标名称
-   */
   advantage06Icon?: string | null;
   advantage07Text?: string | null;
-  /**
-   * Lucide React 图标名称
-   */
   advantage07Icon?: string | null;
   advantage08Text?: string | null;
-  /**
-   * Lucide React 图标名称
-   */
   advantage08Icon?: string | null;
   advantage09Text?: string | null;
-  /**
-   * Lucide React 图标名称
-   */
   advantage09Icon?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -2707,45 +3062,45 @@ export interface BrandAdvantage {
  */
 export interface OemOdm {
   id: number;
-  status?: ('draft' | 'published') | null;
+  status?: ('published' | 'draft') | null;
   /**
-   * 例如: "OEM"
+   * e.g.: "OEM"
    */
   oemTitle?: string | null;
   /**
-   * OEM部分的背景图片
+   * Background image for OEM section
    */
   oemBgImage?: (number | null) | Media;
   /**
-   * OEM部分的主图片
+   * Main image for OEM section
    */
   oemImage?: (number | null) | Media;
   /**
-   * 例如: "At Busrom, we work closely with designers, retailers..."
+   * e.g.: "At Busrom, we work closely with designers, retailers..."
    */
   oemDescription1?: string | null;
   /**
-   * 例如: "Ready to turn your concept into a producible product?..."
+   * e.g.: "Ready to turn your concept into a producible product?..."
    */
   oemDescription2?: string | null;
   /**
-   * 例如: "ODM"
+   * e.g.: "ODM"
    */
   odmTitle?: string | null;
   /**
-   * ODM部分的背景图片
+   * Background image for ODM section
    */
   odmBgImage?: (number | null) | Media;
   /**
-   * ODM部分的主图片
+   * Main image for ODM section
    */
   odmImage?: (number | null) | Media;
   /**
-   * 例如: "Fully Customized Structure & Size & Color"
+   * e.g.: "Fully Customized Structure & Size & Color"
    */
   odmDescription1?: string | null;
   /**
-   * 例如: "Complete Solution - Just The Way You Want Them"
+   * e.g.: "Complete Solution - Just The Way You Want Them"
    */
   odmDescription2?: string | null;
   updatedAt?: string | null;
@@ -2757,13 +3112,13 @@ export interface OemOdm {
  */
 export interface QuoteStep {
   id: number;
-  status?: ('draft' | 'published') | null;
+  status?: ('published' | 'draft') | null;
   /**
-   * 例如: "Design Project Solutions"
+   * e.g.: "Design Project Solutions"
    */
   headerTitle?: string | null;
   /**
-   * 例如: "Just Easy 5 Steps"
+   * e.g.: "Just Easy 5 Steps"
    */
   headerTitle2?: string | null;
   headerSubtitle?: string | null;
@@ -2787,17 +3142,17 @@ export interface QuoteStep {
  */
 export interface MainForm {
   id: number;
-  status?: ('draft' | 'published') | null;
+  status?: ('published' | 'draft') | null;
   /**
-   * 选择要使用的表单配置。如果选择了，将使用 FormConfig 的字段配置；如果不选，则使用下方的占位符配置。
+   * Select the form configuration to use. If selected, FormConfig fields will be used; otherwise, use placeholder config below.
    */
   formConfig?: (number | null) | FormConfig;
   /**
-   * 例如: "Premium Architectural Glass Hardware"
+   * e.g.: "Premium Architectural Glass Hardware"
    */
   designTextLeft?: string | null;
   /**
-   * 例如: "Customized Structure and Color"
+   * e.g.: "Customized Structure and Color"
    */
   designTextRight?: string | null;
   image1?: (number | null) | Media;
@@ -2811,50 +3166,35 @@ export interface MainForm {
  */
 export interface WhyChooseBusrom {
   id: number;
-  status?: ('draft' | 'published') | null;
+  status?: ('published' | 'draft') | null;
   title?: string | null;
   title2?: string | null;
   /**
-   * 例如: "VIEW MORE INFORMATION"
+   * e.g.: "VIEW MORE INFORMATION"
    */
   viewMoreButtonText?: string | null;
   /**
-   * 例如: "/about-us" 或 "https://example.com/about"
+   * e.g.: "/about-us" or "https://example.com/about"
    */
   viewMoreButtonUrl?: string | null;
   reason01Title?: string | null;
   reason01Description?: string | null;
-  /**
-   * Lucide React 图标名称
-   */
   reason01Icon?: string | null;
   reason01Image?: (number | null) | Media;
   reason02Title?: string | null;
   reason02Description?: string | null;
-  /**
-   * Lucide React 图标名称
-   */
   reason02Icon?: string | null;
   reason02Image?: (number | null) | Media;
   reason03Title?: string | null;
   reason03Description?: string | null;
-  /**
-   * Lucide React 图标名称
-   */
   reason03Icon?: string | null;
   reason03Image?: (number | null) | Media;
   reason04Title?: string | null;
   reason04Description?: string | null;
-  /**
-   * Lucide React 图标名称
-   */
   reason04Icon?: string | null;
   reason04Image?: (number | null) | Media;
   reason05Title?: string | null;
   reason05Description?: string | null;
-  /**
-   * Lucide React 图标名称
-   */
   reason05Icon?: string | null;
   reason05Image?: (number | null) | Media;
   updatedAt?: string | null;
@@ -2866,13 +3206,13 @@ export interface WhyChooseBusrom {
  */
 export interface CaseStudy {
   id: number;
-  status?: ('draft' | 'published') | null;
+  status?: ('published' | 'draft') | null;
   title?: string | null;
   description?: string | null;
   /**
-   * Select and order application categories (type=APPLICATION). API will automatically return 3 random case study items per category.
+   * Select applications to display. Each application will show 3 images from its scene gallery.
    */
-  categories?: (number | Category)[] | null;
+  applications?: (number | Application)[] | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2882,28 +3222,29 @@ export interface CaseStudy {
  */
 export interface BrandAnalysis {
   id: number;
-  status?: ('draft' | 'published') | null;
-  brandNameAnalysis?: {
-    titlePart1?: string | null;
-    titlePart2?: string | null;
-    textPart1?: string | null;
-    textPart2?: string | null;
-  };
+  status?: ('published' | 'draft') | null;
+  /**
+   * Background image for the Brand Analysis section
+   */
+  backgroundImage?: (number | null) | Media;
   brandCenter?: {
     title?: string | null;
     description?: string | null;
+    backgroundImage?: (number | null) | Media;
     largeImage?: (number | null) | Media;
     smallImage?: (number | null) | Media;
   };
   projectCenter?: {
     title?: string | null;
     description?: string | null;
+    backgroundImage?: (number | null) | Media;
     largeImage?: (number | null) | Media;
     smallImage?: (number | null) | Media;
   };
   serviceCenter?: {
     title?: string | null;
     description?: string | null;
+    backgroundImage?: (number | null) | Media;
     largeImage?: (number | null) | Media;
     smallImage?: (number | null) | Media;
   };
@@ -2916,7 +3257,7 @@ export interface BrandAnalysis {
  */
 export interface BrandValue {
   id: number;
-  status?: ('draft' | 'published') | null;
+  status?: ('published' | 'draft') | null;
   title?: string | null;
   subtitle?: string | null;
   param1Title?: string | null;
@@ -2934,39 +3275,6 @@ export interface BrandValue {
   visionTitle?: string | null;
   visionDescription?: string | null;
   visionImage?: (number | null) | Media;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * Email service and notification settings
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "email-config".
- */
-export interface EmailConfig {
-  id: number;
-  /**
-   * SMTP server hostname (e.g., smtp.gmail.com)
-   */
-  smtpHost?: string | null;
-  /**
-   * Usually 587 (TLS) or 465 (SSL)
-   */
-  smtpPort?: string | null;
-  smtpUser?: string | null;
-  smtpPassword?: string | null;
-  emailFromAddress?: string | null;
-  emailFromName?: string | null;
-  /**
-   * Comma-separated list of emails to notify on form submissions
-   */
-  formNotificationEmails?: string | null;
-  enableAutoReply?: boolean | null;
-  autoReplySubject?: string | null;
-  /**
-   * Use {name} for submitter name
-   */
-  autoReplyTemplate?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -3013,6 +3321,24 @@ export interface TranslationConfig {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats".
+ */
+export interface PayloadJobsStat {
+  id: number;
+  stats?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home-content_select".
  */
 export interface HomeContentSelect<T extends boolean = true> {
@@ -3034,39 +3360,29 @@ export interface HomeContentSelect<T extends boolean = true> {
  */
 export interface FooterSelect<T extends boolean = true> {
   formConfig?: T;
-  formTitle?: T;
-  formPlaceholderName?: T;
-  formPlaceholderEmail?: T;
-  formPlaceholderMessage?: T;
-  submitButtonText?: T;
-  contactTitle?: T;
-  contactEmailLabel?: T;
-  contactEmail?: T;
-  afterSalesLabel?: T;
-  afterSalesEmail?: T;
-  whatsappLabel?: T;
-  whatsappNumber?: T;
-  email?: T;
-  phone?: T;
-  whatsapp?: T;
-  address?: T;
-  workingHours?: T;
-  officialNoticeTitle?: T;
-  officialNoticeLine1?: T;
-  officialNoticeLine2?: T;
-  officialNoticeLine3?: T;
-  officialNoticeLine4?: T;
-  officialNoticeContent?: T;
-  socialLinks?:
+  contactInfoGroup?:
     | T
     | {
-        platform?: T;
-        url?: T;
-        icon?: T;
-        id?: T;
+        contactTitle?: T;
+        contactEmailLabel?: T;
+        contactEmail?: T;
+        afterSalesLabel?: T;
+        afterSalesEmail?: T;
+        whatsappLabel?: T;
+        whatsappNumber?: T;
+        address?: T;
+        workingHours?: T;
       };
-  column3Menus?: T;
-  column4Menus?: T;
+  officialNoticeGroup?:
+    | T
+    | {
+        officialNoticeTitle?: T;
+        officialNoticeLine1?: T;
+        officialNoticeLine2?: T;
+        officialNoticeLine3?: T;
+        officialNoticeLine4?: T;
+      };
+  navigationMenus?: T;
   copyrightText?: T;
   legalLinks?:
     | T
@@ -3088,35 +3404,41 @@ export interface SiteConfigSelect<T extends boolean = true> {
   siteTagline?: T;
   logo?: T;
   favicon?: T;
-  contactEmail?: T;
-  contactPhone?: T;
-  contactAddress?: T;
-  googleMapsUrl?: T;
-  defaultMetaTitle?: T;
-  defaultMetaDescription?: T;
-  defaultOgImage?: T;
-  googleAnalyticsId?: T;
-  googleTagManagerId?: T;
-  facebook?: T;
-  twitter?: T;
-  instagram?: T;
-  linkedin?: T;
-  youtube?: T;
-  tiktok?: T;
+  turnstileEnabled?: T;
+  turnstileSiteKey?: T;
+  turnstileSecretKey?: T;
+  turnstileThreshold?: T;
+  cloudfrontDistributionId?: T;
+  frontendUrl?: T;
+  revalidateSecret?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contact-config_select".
+ * via the `definition` "preloader-config_select".
  */
-export interface ContactConfigSelect<T extends boolean = true> {
-  email?: T;
-  phone?: T;
-  whatsapp?: T;
-  wechat?: T;
-  address?: T;
+export interface PreloaderConfigSelect<T extends boolean = true> {
+  enabled?: T;
+  backgroundColor?: T;
+  textColor?: T;
+  highlightColor?: T;
+  imageWallEnabled?: T;
+  images?:
+    | T
+    | {
+        image?: T;
+        positionTop?: T;
+        positionLeft?: T;
+        aspectRatio?: T;
+        widthScale?: T;
+        id?: T;
+      };
+  loadingDuration?: T;
+  logoAnimationDuration?: T;
+  imageWallDuration?: T;
+  imageWallStagger?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -3126,13 +3448,16 @@ export interface ContactConfigSelect<T extends boolean = true> {
  * via the `definition` "social-config_select".
  */
 export interface SocialConfigSelect<T extends boolean = true> {
-  facebookUrl?: T;
-  instagramUrl?: T;
-  linkedinUrl?: T;
-  youtubeUrl?: T;
-  twitterUrl?: T;
-  tiktokUrl?: T;
-  pinterestUrl?: T;
+  socialLinks?:
+    | T
+    | {
+        platform?: T;
+        customName?: T;
+        url?: T;
+        icon?: T;
+        order?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -3200,10 +3525,8 @@ export interface ServiceFeaturesSelect<T extends boolean = true> {
  */
 export interface Sphere3DSelect<T extends boolean = true> {
   status?: T;
-  enabled?: T;
   title?: T;
-  modelUrl?: T;
-  backgroundColor?: T;
+  description?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -3216,6 +3539,7 @@ export interface SimpleCtaSelect<T extends boolean = true> {
   status?: T;
   title?: T;
   subtitle?: T;
+  description?: T;
   ctaText?: T;
   ctaLink?: T;
   image1?: T;
@@ -3369,7 +3693,7 @@ export interface CaseStudiesSelect<T extends boolean = true> {
   status?: T;
   title?: T;
   description?: T;
-  categories?: T;
+  applications?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -3380,19 +3704,13 @@ export interface CaseStudiesSelect<T extends boolean = true> {
  */
 export interface BrandAnalysisSelect<T extends boolean = true> {
   status?: T;
-  brandNameAnalysis?:
-    | T
-    | {
-        titlePart1?: T;
-        titlePart2?: T;
-        textPart1?: T;
-        textPart2?: T;
-      };
+  backgroundImage?: T;
   brandCenter?:
     | T
     | {
         title?: T;
         description?: T;
+        backgroundImage?: T;
         largeImage?: T;
         smallImage?: T;
       };
@@ -3401,6 +3719,7 @@ export interface BrandAnalysisSelect<T extends boolean = true> {
     | {
         title?: T;
         description?: T;
+        backgroundImage?: T;
         largeImage?: T;
         smallImage?: T;
       };
@@ -3409,6 +3728,7 @@ export interface BrandAnalysisSelect<T extends boolean = true> {
     | {
         title?: T;
         description?: T;
+        backgroundImage?: T;
         largeImage?: T;
         smallImage?: T;
       };
@@ -3445,25 +3765,6 @@ export interface BrandValueSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "email-config_select".
- */
-export interface EmailConfigSelect<T extends boolean = true> {
-  smtpHost?: T;
-  smtpPort?: T;
-  smtpUser?: T;
-  smtpPassword?: T;
-  emailFromAddress?: T;
-  emailFromName?: T;
-  formNotificationEmails?: T;
-  enableAutoReply?: T;
-  autoReplySubject?: T;
-  autoReplyTemplate?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "translation-config_select".
  */
 export interface TranslationConfigSelect<T extends boolean = true> {
@@ -3479,6 +3780,32 @@ export interface TranslationConfigSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats_select".
+ */
+export interface PayloadJobsStatsSelect<T extends boolean = true> {
+  stats?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskRegenerateImageSizes".
+ */
+export interface TaskRegenerateImageSizes {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskCleanup-payload-auditor-log".
+ */
+export interface TaskCleanupPayloadAuditorLog {
+  input?: unknown;
+  output?: unknown;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
