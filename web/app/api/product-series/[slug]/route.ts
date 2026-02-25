@@ -7,7 +7,7 @@ const CMS_URL = process.env.CMS_GRAPHQL_URL
   : (process.env.CMS_URL || 'http://localhost:3002')
 
 /**
- * Extract all reusable block IDs from contentTranslation
+ * Extract all reusable block IDs from Lexical content
  */
 function extractReusableBlockIds(content: any): string[] {
   const ids = new Set<string>()
@@ -15,10 +15,13 @@ function extractReusableBlockIds(content: any): string[] {
   function traverse(node: any) {
     if (!node) return
 
-    // Check for reusableBlock nodes
-    // Structure: { type: 'reusableBlock', data: { reusableBlock: { id: '2' } } }
-    if (node.type === 'reusableBlock' && node.data?.reusableBlock) {
-      const blockRef = node.data.reusableBlock
+    // Check for various reusable block types
+    const isReusableBlock = node.type === 'reusableBlock' || 
+                           node.type === 'seriesReusableBlock' || 
+                           node.type === 'productReusableBlock'
+
+    if (isReusableBlock) {
+      const blockRef = node.data?.reusableBlock || node.data?.seriesReusableBlock || node.data?.productReusableBlock
       // Handle both { id: '2' } and direct string '2'
       const blockId = typeof blockRef === 'object' ? blockRef.id : blockRef
       if (blockId) {
@@ -43,7 +46,7 @@ function extractReusableBlockIds(content: any): string[] {
 }
 
 /**
- * Fetch reusable blocks and return a map of id -> contentTranslation
+ * Fetch reusable blocks and return a map of id -> content
  */
 async function fetchReusableBlocks(ids: string[]): Promise<Map<string, any>> {
   const blockMap = new Map<string, any>()
@@ -52,13 +55,20 @@ async function fetchReusableBlocks(ids: string[]): Promise<Map<string, any>> {
 
   const promises = ids.map(async (id) => {
     try {
-      const res = await fetch(`${CMS_URL}/api/reusable-blocks/${id}?depth=2`, {
-        next: { revalidate: 3600 },
-      })
-      if (res.ok) {
-        const data = await res.json()
-        if (data.contentTranslation) {
-          blockMap.set(id, data.contentTranslation)
+      // Try series blocks first, then product, then general
+      const collections = ['series-reusable-blocks', 'product-reusable-blocks', 'reusable-blocks']
+      for (const col of collections) {
+        const res = await fetch(`${CMS_URL}/api/${col}/${id}?depth=2`, {
+          next: { revalidate: 3600 },
+        })
+        if (res.ok) {
+          const data = await res.json()
+          // Reusable blocks use contentTranslation or content
+          const content = data.contentTranslation || data.content
+          if (content) {
+            blockMap.set(id, content)
+            break
+          }
         }
       }
     } catch (e) {
@@ -71,78 +81,268 @@ async function fetchReusableBlocks(ids: string[]): Promise<Map<string, any>> {
 }
 
 /**
- * Extract all media IDs from contentTranslation (including reusable block content)
+ * Transform image variants to use CDN URLs
  */
-function extractMediaIds(content: any, reusableBlockMap: Map<string, any> = new Map()): string[] {
-  const ids = new Set<string>()
+function transformImageVariants(variants: any) {
+  if (!variants) return null
 
-  function traverse(node: any) {
-    if (!node) return
-
-    // Check for image gallery
-    if (node.type === 'custom-image-gallery' && node.data?.images) {
-      for (const img of node.data.images) {
-        if (img.image) ids.add(String(img.image))
+  const transformed: any = {}
+  for (const [key, value] of Object.entries(variants)) {
+    if (value && typeof value === 'object' && 'url' in value) {
+      transformed[key] = {
+        ...value,
+        url: convertToCDNUrl((value as any).url)
       }
+    } else if (typeof value === 'string') {
+      transformed[key] = convertToCDNUrl(value)
+    } else {
+      transformed[key] = value
+    }
+  }
+  return transformed
+}
+
+/**
+ * Transform a media object to include CDN URLs
+ */
+function transformMediaObject(media: any) {
+  if (!media || typeof media !== 'object') return media
+  if (typeof media === 'string' || typeof media === 'number') return media
+
+  return {
+    ...media,
+    url: media.url ? convertToCDNUrl(media.url) : undefined,
+    variants: transformImageVariants(media.sizes || media.variants),
+  }
+}
+
+/**
+ * Extract media ID from various formats
+ */
+function extractMediaId(value: any): string | null {
+  if (!value) return null
+  if (typeof value === 'string' || typeof value === 'number') return String(value)
+  if (typeof value === 'object' && value.id) return String(value.id)
+  return null
+}
+
+/**
+ * Recursively collect all media IDs from Lexical content
+ */
+function collectMediaIds(node: any, ids: Set<string>): void {
+  if (!node || typeof node !== 'object') return
+
+  if (Array.isArray(node)) {
+    node.forEach(item => collectMediaIds(item, ids))
+    return
+  }
+
+  // Check data fields for media references
+  if (node.data && typeof node.data === 'object') {
+    const data = node.data
+
+    // Single image fields
+    const singleFields = ['image', 'mediaIcon', 'backgroundImage']
+    singleFields.forEach(field => {
+      const id = extractMediaId(data[field])
+      if (id) ids.add(id)
+    })
+
+    // Array fields with image/media
+    if (Array.isArray(data.images)) {
+      data.images.forEach((item: any) => {
+        const id = extractMediaId(item?.image)
+        if (id) ids.add(id)
+      })
     }
 
-    // Check for carousel
-    if (node.type === 'carousel' && node.data?.slides) {
-      for (const slide of node.data.slides) {
-        if (slide.image?.id) ids.add(String(slide.image.id))
-      }
+    if (Array.isArray(data.items)) {
+      data.items.forEach((item: any) => {
+        const mediaId = extractMediaId(item?.media)
+        const iconId = extractMediaId(item?.mediaIcon)
+        if (mediaId) ids.add(mediaId)
+        if (iconId) ids.add(iconId)
+      })
     }
 
-    // Check for singleImage nodes
-    if (node.type === 'singleImage' && node.data?.image?.id) {
-      ids.add(String(node.data.image.id))
-    }
-
-    // Check for upload nodes (direct media references)
-    if (node.type === 'upload' && node.value?.id) {
-      ids.add(String(node.value.id))
-    }
-
-    // Check for block nodes (sidebar, etc.)
-    if (node.type === 'block' && node.fields) {
-      // Traverse mainContent
-      if (node.fields.mainContent?.root) {
-        traverse(node.fields.mainContent.root)
-      }
-      // Traverse sidebarContent
-      if (node.fields.sidebarContent?.root) {
-        traverse(node.fields.sidebarContent.root)
-      }
-    }
-
-    // Check for reusableBlock - traverse the fetched content
-    if (node.type === 'reusableBlock' && node.data?.reusableBlock) {
-      const blockRef = node.data.reusableBlock
-      // Handle both { id: '2' } and direct string '2'
-      const blockId = typeof blockRef === 'object' ? blockRef.id : blockRef
-      if (blockId) {
-        const blockContent = reusableBlockMap.get(String(blockId))
-        if (blockContent) {
-          traverse(blockContent)
-        }
-      }
-    }
-
-    // Recurse into children
-    if (node.children && Array.isArray(node.children)) {
-      for (const child of node.children) {
-        traverse(child)
-      }
-    }
-
-    // Check root
-    if (node.root) {
-      traverse(node.root)
+    if (Array.isArray(data.slides)) {
+      data.slides.forEach((slide: any) => {
+        const id = extractMediaId(slide?.image)
+        if (id) ids.add(id)
+      })
     }
   }
 
-  traverse(content)
-  return Array.from(ids)
+  // Recursively process nested structures
+  if (node.root) collectMediaIds(node.root, ids)
+  if (node.children) collectMediaIds(node.children, ids)
+  if (node.fields) {
+    Object.values(node.fields).forEach(value => collectMediaIds(value, ids))
+  }
+}
+
+/**
+ * Batch fetch all media by IDs in parallel
+ */
+async function batchFetchMedia(ids: Set<string>): Promise<Map<string, any>> {
+  const cache = new Map<string, any>()
+  if (ids.size === 0) return cache
+
+  const fetchPromises = Array.from(ids).map(async (id) => {
+    try {
+      const res = await fetch(`${CMS_URL}/api/media/${id}`)
+      if (res.ok) {
+        const data = await res.json()
+        return { id, data: transformMediaObject(data) }
+      }
+    } catch (err) {
+      console.error(`[batchFetchMedia] Failed to fetch media ${id}:`, err)
+    }
+    return null
+  })
+
+  const results = await Promise.all(fetchPromises)
+  results.forEach(result => {
+    if (result) cache.set(result.id, result.data)
+  })
+
+  return cache
+}
+
+/**
+ * Populate media references in Lexical content using pre-fetched cache
+ */
+function populateMediaFromCache(node: any, cache: Map<string, any>): any {
+  if (!node || typeof node !== 'object') return node
+
+  if (Array.isArray(node)) {
+    return node.map(item => populateMediaFromCache(item, cache))
+  }
+
+  const populated = { ...node }
+
+  if (populated.data && typeof populated.data === 'object') {
+    populated.data = { ...populated.data }
+
+    // Single image fields
+    const singleFields = ['image', 'mediaIcon', 'backgroundImage']
+    singleFields.forEach(field => {
+      const id = extractMediaId(populated.data[field])
+      if (id && cache.has(id)) {
+        populated.data[field] = cache.get(id)
+      }
+    })
+
+    // Images array
+    if (Array.isArray(populated.data.images)) {
+      populated.data.images = populated.data.images.map((item: any) => {
+        if (!item || typeof item !== 'object') return item
+        const id = extractMediaId(item.image)
+        return id && cache.has(id) ? { ...item, image: cache.get(id) } : item
+      })
+    }
+
+    // Items array (carousel/marquee)
+    if (Array.isArray(populated.data.items)) {
+      populated.data.items = populated.data.items.map((item: any) => {
+        if (!item || typeof item !== 'object') return item
+        const result = { ...item }
+        const mediaId = extractMediaId(item.media)
+        const iconId = extractMediaId(item.mediaIcon)
+        if (mediaId && cache.has(mediaId)) result.media = cache.get(mediaId)
+        if (iconId && cache.has(iconId)) result.mediaIcon = cache.get(iconId)
+        return result
+      })
+    }
+
+    // Slides array
+    if (Array.isArray(populated.data.slides)) {
+      populated.data.slides = populated.data.slides.map((slide: any) => {
+        if (!slide || typeof slide !== 'object') return slide
+        const id = extractMediaId(slide.image)
+        return id && cache.has(id) ? { ...slide, image: cache.get(id) } : slide
+      })
+    }
+  }
+
+  // Recursively process nested structures
+  if (populated.root) {
+    populated.root = populateMediaFromCache(populated.root, cache)
+  }
+  if (populated.children) {
+    populated.children = populateMediaFromCache(populated.children, cache)
+  }
+  if (populated.fields) {
+    populated.fields = { ...populated.fields }
+    for (const [key, value] of Object.entries(populated.fields)) {
+      if (value && typeof value === 'object') {
+        populated.fields[key] = populateMediaFromCache(value, cache)
+      }
+    }
+  }
+
+  return populated
+}
+
+/**
+ * Expand reusable block nodes in Lexical content
+ */
+async function expandReusableBlocks(content: any, locale: string): Promise<any> {
+  if (!content?.root?.children) return content
+
+  const result = { ...content, root: { ...content.root } }
+  result.root.children = await expandChildren(result.root.children, locale)
+  return result
+}
+
+async function expandChildren(children: any[], locale: string): Promise<any[]> {
+  const expanded: any[] = []
+
+  for (const node of children) {
+    const isReusableBlock = node?.type === 'reusableBlock' || 
+                           node?.type === 'seriesReusableBlock' || 
+                           node?.type === 'productReusableBlock'
+
+    if (isReusableBlock) {
+      const blockData = node.data?.reusableBlock || node.data?.seriesReusableBlock || node.data?.productReusableBlock
+      const blockId = typeof blockData === 'object' ? blockData?.id : blockData
+      if (!blockId) continue
+
+      try {
+        const collections = ['series-reusable-blocks', 'product-reusable-blocks', 'reusable-blocks']
+        let blockContent = null
+        
+        for (const col of collections) {
+          const res = await fetch(
+            `${CMS_URL}/api/${col}/${blockId}?locale=${locale}&depth=1`
+          )
+          if (res.ok) {
+            const block = await res.json()
+            blockContent = block?.contentTranslation?.root?.children || block?.content?.root?.children
+            if (blockContent) break
+          }
+        }
+
+        if (Array.isArray(blockContent) && blockContent.length > 0) {
+          const nestedExpanded = await expandChildren(blockContent, locale)
+          expanded.push(...nestedExpanded)
+          continue
+        }
+      } catch (err) {
+        console.error(`[expandReusableBlocks] Failed to fetch reusable block ${blockId}:`, err)
+      }
+      continue
+    }
+
+    if (Array.isArray(node?.children) && node.children.length > 0) {
+      const expandedNode = { ...node, children: await expandChildren(node.children, locale) }
+      expanded.push(expandedNode)
+    } else {
+      expanded.push(node)
+    }
+  }
+
+  return expanded
 }
 
 /**
@@ -226,25 +426,23 @@ export async function GET(
       return url ? convertToCDNUrl(url) : ''
     }
 
-    // Extract and fetch reusable blocks from contentTranslation
-    const contentTranslation = series.contentTranslation || null
-    const reusableBlockIds = extractReusableBlockIds(contentTranslation)
-    const reusableBlockMap = await fetchReusableBlocks(reusableBlockIds)
+    // CONTENT REDIRECT: Use seriesTemplate content if available
+    const contentTranslationRaw = series.seriesTemplate?.content || series.contentTranslation || null
+    
+    // 1. Expand reusable blocks into a flat list of nodes
+    const expandedContent = contentTranslationRaw ? await expandReusableBlocks(contentTranslationRaw, locale) : null
 
-    // Extract and fetch media URLs from contentTranslation (including reusable block content)
-    const mediaIds = extractMediaIds(contentTranslation, reusableBlockMap)
-    const mediaMap = await fetchMediaUrls(mediaIds)
+    // 2. Extract and fetch media URLs from expanded content
+    const mediaIds = new Set<string>()
+    if (expandedContent) {
+      collectMediaIds(expandedContent, mediaIds)
+    }
+    const mediaMap = await fetchMediaUrls(Array.from(mediaIds))
 
     // Convert mediaMap to object for JSON serialization
     const mediaUrls: Record<string, string> = {}
     mediaMap.forEach((url, id) => {
       mediaUrls[id] = url
-    })
-
-    // Convert reusableBlockMap to object for JSON serialization
-    const reusableBlocks: Record<string, any> = {}
-    reusableBlockMap.forEach((content, id) => {
-      reusableBlocks[id] = content
     })
 
     // Transform series data
@@ -257,9 +455,9 @@ export async function GET(
       order: series.order || 0,
       status: series.status,
       isFeatured: series.isFeatured || false,
-      contentTranslation,
+      contentTranslation: expandedContent,
       mediaUrls, // Media ID -> CDN URL mapping
-      reusableBlocks, // Reusable block ID -> contentTranslation mapping
+      reusableBlocks: {}, // Already expanded at API level
       locale,
     }
 

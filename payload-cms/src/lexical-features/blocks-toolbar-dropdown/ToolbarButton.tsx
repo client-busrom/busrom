@@ -35,6 +35,8 @@ import { INSERT_FORM_BLOCK_COMMAND } from '../form-block/plugin'
 import { INSERT_REUSABLE_BLOCK_COMMAND } from '../reusable-block/plugin'
 import { INSERT_APPLICATION_CAROUSEL_COMMAND } from '../application-carousel/plugin'
 import { INSERT_PRODUCT_CAROUSEL_COMMAND } from '../product-carousel/plugin'
+import { INSERT_PRODUCT_REUSABLE_BLOCK_COMMAND } from '../product-reusable-block/plugin'
+import { INSERT_SERIES_REUSABLE_BLOCK_COMMAND } from '../series-reusable-block/plugin'
 import { INSERT_ICON_LIST_COMMAND } from '../icon-list/plugin'
 // import { INSERT_CHECK_LIST_COMMAND } from '@lexical/list' // 已使用内置 ChecklistFeature
 import { INSERT_BLOCK_COMMAND } from '@payloadcms/richtext-lexical/client'
@@ -179,6 +181,16 @@ export const ToolbarButton: React.FC = () => {
 
   const insertReusableBlock = () => {
     editor.dispatchCommand(INSERT_REUSABLE_BLOCK_COMMAND, undefined)
+    setIsOpen(false)
+  }
+
+  const insertProductReusableBlock = () => {
+    editor.dispatchCommand(INSERT_PRODUCT_REUSABLE_BLOCK_COMMAND, undefined)
+    setIsOpen(false)
+  }
+
+  const insertSeriesReusableBlock = () => {
+    editor.dispatchCommand(INSERT_SERIES_REUSABLE_BLOCK_COMMAND, undefined)
     setIsOpen(false)
   }
 
@@ -695,6 +707,66 @@ export const ToolbarButton: React.FC = () => {
           >
             <PackageOpen size={18} style={{ opacity: 0.7 }} />
             <span>{i18n?.language === 'zh' ? '可复用块' : 'Reusable Block'}</span>
+          </button>
+
+          {/* 产品详情块 - Custom Feature */}
+          <button
+            type="button"
+            onClick={insertProductReusableBlock}
+            style={{
+              all: 'unset',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              width: '100%',
+              padding: '8px 12px',
+              cursor: 'pointer',
+              fontSize: '13px',
+              color: 'var(--theme-elevation-800, #1f2937)',
+              backgroundColor: 'transparent',
+              transition: 'background-color 0.15s ease',
+              boxSizing: 'border-box',
+              fontFamily: 'var(--font-body)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--theme-elevation-100, #f9fafb)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent'
+            }}
+          >
+            <Package size={18} style={{ opacity: 0.7 }} />
+            <span>{i18n?.language === 'zh' ? '产品详情页复用块' : 'Product Detail Block'}</span>
+          </button>
+
+          {/* 产品详解页复用块 - Custom Feature */}
+          <button
+            type="button"
+            onClick={insertSeriesReusableBlock}
+            style={{
+              all: 'unset',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              width: '100%',
+              padding: '8px 12px',
+              cursor: 'pointer',
+              fontSize: '13px',
+              color: 'var(--theme-elevation-800, #1f2937)',
+              backgroundColor: 'transparent',
+              transition: 'background-color 0.15s ease',
+              boxSizing: 'border-box',
+              fontFamily: 'var(--font-body)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--theme-elevation-100, #f9fafb)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent'
+            }}
+          >
+            <PackageOpen size={18} style={{ opacity: 0.7 }} />
+            <span>{i18n?.language === 'zh' ? '产品详解页复用块' : 'Series Detail Block'}</span>
           </button>
 
           {/* 布局块已移除，用户应该使用 Blocks 功能插入（在工具栏的 Blocks 下拉菜单） */}

@@ -62,7 +62,8 @@ const formatFileSize = (bytes?: number): string => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field, value: controlledValue, onChange }) => {
+export const MediaPicker: React.FC<MediaPickerProps> = (props) => {
+  const { path, field, value: controlledValue, onChange } = props;
   // Use controlled mode if value/onChange provided, otherwise use useField
   const fieldHook = useField<number | number[] | null>({ path: path || field.name })
   const value = controlledValue !== undefined ? controlledValue : fieldHook.value
@@ -93,7 +94,16 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field, value: co
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [sortField, setSortField] = useState<string>('-createdAt')
 
-  const hasMany = field.hasMany ?? false
+  console.log('[MediaPicker DEBUG props]', props);
+  
+  // In Payload 3.x, some UI fields receive `clientField` which contains the schema metadata
+  const hasMany = field?.hasMany || 
+                  (field as any)?.admin?.hasMany || 
+                  (fieldHook as any)?.field?.hasMany || 
+                  (props as any)?.clientField?.hasMany ||
+                  (props as any)?.hasMany ||
+                  (field as any)?._hasMany ||
+                  false;
 
   // Fetch categories and tags on mount (using shared cache)
   useEffect(() => {
@@ -218,18 +228,40 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field, value: co
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, page, search, categoryFilter, tagFilter, mimeTypeFilter, groupFilter, sceneNumberFilter, imageNumberFilter, specsKeyFilter, specsCustomKey, specsValueFilter, sortField])
 
-  const handleSelect = (item: MediaItem) => {
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null)
+
+  const handleSelect = (item: MediaItem, index: number, event?: React.MouseEvent) => {
     if (hasMany) {
-      const isSelected = selectedMedia.some(m => m.id === item.id)
-      if (isSelected) {
-        const newSelected = selectedMedia.filter(m => m.id !== item.id)
+      if (event?.shiftKey && lastSelectedIndex !== null && lastSelectedIndex !== index) {
+        // Range select
+        const start = Math.min(lastSelectedIndex, index)
+        const end = Math.max(lastSelectedIndex, index)
+        const range = media.slice(start, end + 1)
+        
+        const newSelected = [...selectedMedia]
+        range.forEach(rangeItem => {
+          if (!newSelected.some(m => m.id === rangeItem.id)) {
+            newSelected.push(rangeItem)
+          }
+        })
+        
         setSelectedMedia(newSelected)
+        // Update Payload form value immediately
         setValue(newSelected.map(m => m.id))
       } else {
-        const newSelected = [...selectedMedia, item]
-        setSelectedMedia(newSelected)
-        setValue(newSelected.map(m => m.id))
+        const isSelected = selectedMedia.some(m => m.id === item.id)
+        if (isSelected) {
+          const newSelected = selectedMedia.filter(m => m.id !== item.id)
+          setSelectedMedia(newSelected)
+          setValue(newSelected.map(m => m.id))
+        } else {
+          // APPEND to existing selections
+          const newSelected = [...selectedMedia, item]
+          setSelectedMedia(newSelected)
+          setValue(newSelected.map(m => m.id))
+        }
       }
+      setLastSelectedIndex(index)
     } else {
       setSelectedMedia([item])
       setValue(item.id)
@@ -529,6 +561,25 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field, value: co
                   已选择 {selectedMedia.length} 个
                 </span>
               )}
+              {hasMany && media.length > 0 && (
+                <button
+                  type="button"
+                  className="media-picker__clear-filters"
+                  style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', height: 'auto', minWidth: 'auto', marginLeft: '1rem', border: '1px solid var(--theme-elevation-300)' }}
+                  onClick={() => {
+                    const newSelected = [...selectedMedia]
+                    media.forEach(item => {
+                      if (!newSelected.some(m => m.id === item.id)) {
+                        newSelected.push(item)
+                      }
+                    })
+                    setSelectedMedia(newSelected)
+                    setValue(newSelected.map(m => m.id))
+                  }}
+                >
+                  {t('custom:mediaPicker:selectAll' as any) || '全选本页'}
+                </button>
+              )}
             </div>
 
             {/* Media Grid/List */}
@@ -539,13 +590,13 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field, value: co
                 <div className="media-picker__empty">没有找到媒体文件</div>
               ) : viewMode === 'grid' ? (
                 <div className="media-picker__grid">
-                  {media.map((item) => {
+                  {media.map((item, index) => {
                     const isSelected = selectedMedia.some(m => m.id === item.id)
                     return (
                       <div
                         key={item.id}
                         className={`media-picker__item ${isSelected ? 'selected' : ''}`}
-                        onClick={() => handleSelect(item)}
+                        onClick={(e) => handleSelect(item, index, e)}
                       >
                         <img
                           src={item.thumbnailURL || item.url}
@@ -576,13 +627,13 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({ path, field, value: co
                     </tr>
                   </thead>
                   <tbody>
-                    {media.map((item) => {
+                    {media.map((item, index) => {
                       const isSelected = selectedMedia.some(m => m.id === item.id)
                       return (
                         <tr
                           key={item.id}
                           className={isSelected ? 'selected' : ''}
-                          onClick={() => handleSelect(item)}
+                          onClick={(e) => handleSelect(item, index, e)}
                         >
                           <td>
                             <div className={`media-picker__checkbox ${isSelected ? 'checked' : ''}`}>

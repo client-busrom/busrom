@@ -17,7 +17,7 @@ export async function generateMetadata({
     description: "Explore real-world applications and case studies of Busrom glass hardware solutions",
   }
 
-  return getPageMetadata('/applications', 'applications', locale, defaultMetadata)
+  return getPageMetadata('/application', 'application', locale, defaultMetadata)
 }
 
 export default async function ApplicationsPage({
@@ -29,11 +29,11 @@ export default async function ApplicationsPage({
 
   return (
     <>
-      <PageScripts path="/applications" pageType="applications" position="header" />
-      <PageScripts path="/applications" pageType="applications" position="body_start" />
-      <PageSeoInjector path="/applications" pageType="applications" locale={locale} />
-      <TemplatePage locale={locale} slug="applications" template="APPLICATION_LIST" />
-      <PageScripts path="/applications" pageType="applications" position="footer" />
+      <PageScripts path="/application" pageType="application" position="header" />
+      <PageScripts path="/application" pageType="application" position="body_start" />
+      <PageSeoInjector path="/application" pageType="application" locale={locale} />
+      <TemplatePage locale={locale} slug="application" template="APPLICATION" />
+      <PageScripts path="/application" pageType="application" position="footer" />
     </>
   )
 }

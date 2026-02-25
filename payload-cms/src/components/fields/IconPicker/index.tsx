@@ -16,10 +16,16 @@ interface IconPickerProps {
       description?: string | Record<string, string>
     }
   }
+  value?: string
+  onChange?: (value: string) => void
 }
 
-export const IconPicker: React.FC<IconPickerProps> = ({ path, field }) => {
-  const { value, setValue } = useField<string>({ path: path || field.name })
+export const IconPicker: React.FC<IconPickerProps> = (props) => {
+  const { path, field, value: controlledValue, onChange } = props
+  const fieldHook = useField<string>({ path: path || field.name })
+  
+  const value = controlledValue !== undefined ? controlledValue : fieldHook.value
+  const setValue = onChange || fieldHook.setValue
   const { i18n } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
 

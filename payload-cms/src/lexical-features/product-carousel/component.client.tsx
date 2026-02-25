@@ -887,6 +887,8 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                   <option value={2}>{i18n?.language === 'zh' ? '2 个' : '2 items'}</option>
                   <option value={3}>{i18n?.language === 'zh' ? '3 个' : '3 items'}</option>
                   <option value={4}>{i18n?.language === 'zh' ? '4 个' : '4 items'}</option>
+                  <option value={5}>{i18n?.language === 'zh' ? '5 个' : '5 items'}</option>
+                  <option value={6}>{i18n?.language === 'zh' ? '6 个' : '6 items'}</option>
                 </select>
               </div>
               <div>

@@ -95,7 +95,6 @@ export const ReusableBlocks: CollectionConfig = {
                 { label: { en: 'Feature', zh: '特性' }, value: 'FEATURE' },
                 { label: { en: 'Testimonial', zh: '客户评价' }, value: 'TESTIMONIAL' },
                 { label: { en: 'Contact', zh: '联系信息' }, value: 'CONTACT' },
-                { label: { en: 'Product', zh: '产品' }, value: 'PRODUCT' },
                 { label: { en: 'Custom', zh: '自定义' }, value: 'CUSTOM' },
               ],
             },

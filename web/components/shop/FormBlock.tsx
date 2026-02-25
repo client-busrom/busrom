@@ -7,7 +7,7 @@ import { Turnstile } from "@/components/ui/turnstile"
 interface FormField {
   label: string
   fieldName: string
-  fieldType: "text" | "email" | "tel" | "textarea" | "checkbox" | "select"
+  fieldType: "text" | "email" | "tel" | "textarea" | "checkbox" | "select" | "radio"
   placeholder?: string
   required: boolean
   order: number
@@ -175,6 +175,40 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
 
     setIsSubmitting(true)
 
+    const processedData = { ...formData }
+    sortedFields.forEach((field) => {
+      const optionsWithCustom = field.options?.filter((o: any) => o.hasCustomInput) || []
+      
+      if (optionsWithCustom.length > 0) {
+        if (field.fieldType === 'checkbox' && Array.isArray(processedData[field.fieldName])) {
+          processedData[field.fieldName] = processedData[field.fieldName].map((val: string) => {
+            const hasCustom = optionsWithCustom.some((o: any) => o.value === val)
+            if (hasCustom) {
+              const customVal = processedData[`${field.fieldName}_custom_${val}`]
+              if (customVal) {
+                return `${val} (${customVal})`
+              }
+            }
+            return val
+          })
+          
+          optionsWithCustom.forEach((o: any) => {
+            delete processedData[`${field.fieldName}_custom_${o.value}`]
+          })
+        } else if (['radio', 'select', 'checkbox'].includes(field.fieldType)) {
+          const val = processedData[field.fieldName]
+          const hasCustom = optionsWithCustom.some((o: any) => o.value === val)
+          if (hasCustom) {
+            const customVal = processedData[`${field.fieldName}_custom`]
+            if (customVal) {
+              processedData[field.fieldName] = `${val} (${customVal})`
+            }
+          }
+          delete processedData[`${field.fieldName}_custom`]
+        }
+      }
+    })
+
     try {
       const response = await fetch("/api/form-submissions", {
         method: "POST",
@@ -184,7 +218,7 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
         body: JSON.stringify({
           formId: formConfig.id || configData.id,
           formName: configData.name,
-          data: formData,
+          data: processedData,
           locale,
           turnstileToken,
         }),
@@ -234,39 +268,102 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
       case "checkbox":
         return (
           <div className="space-y-2">
-            {field.options?.map((option) => (
-              <label key={option.value} className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name={field.fieldName}
-                  value={option.value}
-                  checked={formData[field.fieldName]?.includes(option.value) || false}
-                  onChange={(e) => handleCheckboxChange(field.fieldName, option.value, e.target.checked)}
-                  className="w-4 h-4 text-brand-secondary border-gray-300 rounded focus:ring-brand-secondary"
-                />
-                <span className="text-gray-700">{option.label}</span>
-              </label>
-            ))}
+            {field.options?.map((option: any) => {
+              const isChecked = formData[field.fieldName]?.includes(option.value) || false
+              return (
+                <div key={option.value} className="flex flex-col gap-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name={field.fieldName}
+                      value={option.value}
+                      checked={isChecked}
+                      onChange={(e) => handleCheckboxChange(field.fieldName, option.value, e.target.checked)}
+                      className="w-4 h-4 text-brand-secondary border-gray-300 rounded focus:ring-brand-secondary"
+                    />
+                    <span className="text-gray-700">{option.label}</span>
+                  </label>
+                  {isChecked && option.hasCustomInput && (
+                    <input
+                      type="text"
+                      className={`${commonClasses} ml-6 !w-[calc(100%-1.5rem)]`}
+                      placeholder={locale === 'zh' ? "请详细说明..." : "Please specify..."}
+                      value={formData[`${field.fieldName}_custom_${option.value}`] || ""}
+                      onChange={(e) => handleChange(`${field.fieldName}_custom_${option.value}`, e.target.value)}
+                      required
+                    />
+                  )}
+                </div>
+              )
+            })}
           </div>
         )
 
-      case "select":
+      case "select": {
+        const selectedOption = field.options?.find(o => o.value === formData[field.fieldName])
         return (
-          <select
-            id={field.fieldName}
-            name={field.fieldName}
-            value={formData[field.fieldName] || ""}
-            onChange={(e) => handleChange(field.fieldName, e.target.value)}
-            required={field.required}
-            className={`${commonClasses} ${errorClasses}`}
-          >
-            <option value="">{field.placeholder || `Select ${field.label}`}</option>
-            {field.options?.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-col gap-2">
+            <select
+              id={field.fieldName}
+              name={field.fieldName}
+              value={formData[field.fieldName] || ""}
+              onChange={(e) => handleChange(field.fieldName, e.target.value)}
+              required={field.required}
+              className={`${commonClasses} ${errorClasses}`}
+            >
+              <option value="">{field.placeholder || (locale === 'zh' ? `请选择 ${field.label}` : `Select ${field.label}`)}</option>
+              {field.options?.map((option: any) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {selectedOption && (selectedOption as any).hasCustomInput && (
+              <input
+                type="text"
+                className={`${commonClasses}`}
+                placeholder={locale === 'zh' ? "请详细说明..." : "Please specify..."}
+                value={formData[`${field.fieldName}_custom`] || ""}
+                onChange={(e) => handleChange(`${field.fieldName}_custom`, e.target.value)}
+                required
+              />
+            )}
+          </div>
+        )
+      }
+
+      case "radio":
+        return (
+          <div className="space-y-2">
+            {field.options?.map((option: any) => {
+              const isChecked = formData[field.fieldName] === option.value
+              return (
+                <div key={option.value} className="flex flex-col gap-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name={field.fieldName}
+                      value={option.value}
+                      checked={isChecked}
+                      onChange={(e) => handleChange(field.fieldName, e.target.value)}
+                      className="w-4 h-4 text-brand-secondary border-gray-300 focus:ring-brand-secondary"
+                    />
+                    <span className="text-gray-700">{option.label}</span>
+                  </label>
+                  {isChecked && option.hasCustomInput && (
+                    <input
+                      type="text"
+                      className={`${commonClasses} ml-6 !w-[calc(100%-1.5rem)]`}
+                      placeholder={locale === 'zh' ? "请详细说明..." : "Please specify..."}
+                      value={formData[`${field.fieldName}_custom`] || ""}
+                      onChange={(e) => handleChange(`${field.fieldName}_custom`, e.target.value)}
+                      required
+                    />
+                  )}
+                </div>
+              )
+            })}
+          </div>
         )
 
       default:

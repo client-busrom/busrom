@@ -40,7 +40,6 @@ const BLOCK_TYPES = [
   { value: 'FEATURE', label: { en: 'Feature', zh: '特性' } },
   { value: 'TESTIMONIAL', label: { en: 'Testimonial', zh: '客户评价' } },
   { value: 'CONTACT', label: { en: 'Contact', zh: '联系信息' } },
-  { value: 'PRODUCT', label: { en: 'Product', zh: '产品' } },
   { value: 'CUSTOM', label: { en: 'Custom', zh: '自定义' } },
 ]
 
