@@ -233,6 +233,37 @@ html[data-theme='dark'] {
     color: #756F3F;
   }
 
+  /* Breadcrumb (Step Nav) Fix - prevent overlapping */
+  .step-nav {
+    ul {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      align-items: center !important;
+      gap: 4px !important;
+      list-style: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+
+      li {
+        display: flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+
+        /* Ensure separator has space */
+        &::after {
+          margin-left: 4px !important;
+          opacity: 0.5 !important;
+        }
+
+        &:last-child::after {
+          content: none !important;
+        }
+      }
+    }
+  }
+
   /* Selection/highlight colors */
   ::selection {
     background: rgba(160, 135, 69, 0.3);

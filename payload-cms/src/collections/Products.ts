@@ -17,20 +17,24 @@ export const Products: CollectionConfig = {
   slug: 'products',
   labels: {
     singular: {
-      en: 'Product',
-      zh: '产品',
+      en: 'Product Detail Page',
+      zh: '产品详情整合页',
     },
     plural: {
-      en: 'Products',
-      zh: '产品',
+      en: 'Product Detail Pages',
+      zh: '产品详情整合页',
     },
   },
   admin: {
     useAsTitle: 'sku',
     defaultColumns: ['sku', 'name', 'series', 'status', 'isFeatured'],
     group: {
-      en: 'Content',
-      zh: '内容管理',
+      en: 'Products',
+      zh: '产品管理',
+    },
+    description: {
+      en: 'Manage product integration pages (including basic info, images, and SEO)',
+      zh: '管理产品整合页（包含基本信息、图片和SEO）',
     },
   },
   access: {
@@ -151,20 +155,22 @@ export const Products: CollectionConfig = {
               },
             },
             {
-              name: 'productAttributes',
-              type: 'richText',
-              localized: true,
+              name: 'category',
+              type: 'relationship',
+              relationTo: 'categories',
               label: {
-                en: 'Product Attributes/Highlights',
-                zh: '产品属性/核心亮点',
+                en: 'Category',
+                zh: '所属分类',
+              },
+              filterOptions: {
+                type: {
+                  equals: 'PRODUCT',
+                },
               },
               admin: {
                 description: {
-                  en: 'Rich text for specific product attributes. You can use Document Templates to insert common ones.',
-                  zh: '用于特定产品属性的富文本。可以使用"文档模板"插入通用内容。',
-                },
-                components: {
-                  beforeInput: ['@/components/fields/MultiLocaleRichTextField'],
+                  en: 'Primary category for this product (helps in filtering attributes and templates)',
+                  zh: '该产品的主分类（有助于筛选属性和模版）',
                 },
               },
             },
@@ -172,29 +178,61 @@ export const Products: CollectionConfig = {
         },
 
         // ----------------------------------------------------------
-        // Tab 2: Content Translation (Rich Text)
+        // Tab 2: Attributes & Content (Linked)
         // ----------------------------------------------------------
         {
           label: {
-            en: 'Content',
-            zh: '内容',
+            en: 'Attributes & Content',
+            zh: '属性与内容整合',
           },
           fields: [
             {
-              name: 'contentTranslation',
-              type: 'richText',
-              localized: true,
+              name: 'attributePage',
+              type: 'relationship',
+              relationTo: 'product-attributes',
               label: {
-                en: 'Content',
-                zh: '富文本内容',
+                en: 'Attribute Page',
+                zh: '关联属性页',
+              },
+              filterOptions: ({ data }) => {
+                if (data?.category) {
+                  return {
+                    category: {
+                      equals: data.category,
+                    },
+                  }
+                }
+                return true
               },
               admin: {
                 description: {
-                  en: 'Rich text content - use language tabs above to switch locales',
-                  zh: '富文本内容 - 使用上方的语言选项卡切换语言',
+                  en: 'Select the attribute/specification page for this product (filtered by category)',
+                  zh: '为该产品选择关联的属性/规格页（根据分类自动筛选）',
                 },
-                components: {
-                  beforeInput: ['@/components/fields/MultiLocaleRichTextField'],
+              },
+            },
+            {
+              name: 'contentTemplate',
+              type: 'relationship',
+              relationTo: 'product-templates',
+              label: {
+                en: 'Content Template',
+                zh: '关联内容模版页',
+              },
+              filterOptions: ({ data }) => {
+                if (data?.category) {
+                  return {
+                    category: {
+                      equals: data.category,
+                    },
+                  }
+                }
+                return true
+              },
+              admin: {
+                description: {
+                  en: 'Select the rich text content template for this product (filtered by category)',
+                  zh: '为该产品选择关联的富文本内容模版页（根据分类自动筛选）',
                 },
               },
             },
@@ -202,37 +240,7 @@ export const Products: CollectionConfig = {
         },
 
         // ----------------------------------------------------------
-        // Tab 3: Specifications (Multilingual JSON)
-        // ----------------------------------------------------------
-        {
-          label: {
-            en: 'Specifications',
-            zh: '规格',
-          },
-          fields: [
-            {
-              name: 'specifications',
-              type: 'json',
-              localized: true,
-              label: {
-                en: 'Product Specifications',
-                zh: '产品规格',
-              },
-              admin: {
-                description: {
-                  en: 'Product variants (colors, sizes, etc.)',
-                  zh: '产品变体（颜色、尺寸等）',
-                },
-                components: {
-                  Field: '@/components/fields/ProductSpecificationsField',
-                },
-              },
-            },
-          ],
-        },
-
-        // ----------------------------------------------------------
-        // Tab 4: Images
+        // Tab 3: Images
         // ----------------------------------------------------------
         {
           label: {
@@ -279,6 +287,7 @@ export const Products: CollectionConfig = {
             },
           ],
         },
+
       ],
     },
 

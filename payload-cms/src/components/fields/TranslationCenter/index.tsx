@@ -24,10 +24,26 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'name', labelKey: 'custom:fields:productName', type: 'textarea' },
     { name: 'shortDescription', labelKey: 'custom:fields:shortDescription', type: 'textarea' },
     { name: 'description', labelKey: 'custom:fields:description', type: 'textarea' },
+    { name: 'metaTitle', labelKey: 'custom:fields:metaTitle', type: 'textarea' },
+    { name: 'metaDescription', labelKey: 'custom:fields:metaDescription', type: 'textarea' },
   ],
   'product-series': [
     { name: 'name', labelKey: 'custom:fields:seriesName', type: 'textarea' },
     { name: 'description', labelKey: 'custom:fields:description', type: 'textarea' },
+    { name: 'metaTitle', labelKey: 'custom:fields:metaTitle', type: 'textarea' },
+    { name: 'metaDescription', labelKey: 'custom:fields:metaDescription', type: 'textarea' },
+  ],
+  'series-templates': [
+    { name: 'name', labelKey: 'custom:fields:name', type: 'textarea' },
+  ],
+  'product-templates': [
+    { name: 'name', labelKey: 'custom:fields:name', type: 'textarea' },
+  ],
+  'product-reusable-blocks': [
+    { name: 'title', labelKey: 'custom:fields:title', type: 'textarea' },
+  ],
+  'series-reusable-blocks': [
+    { name: 'title', labelKey: 'custom:fields:title', type: 'textarea' },
   ],
   pages: [
     { name: 'title', labelKey: 'custom:fields:pageTitle', type: 'textarea' },

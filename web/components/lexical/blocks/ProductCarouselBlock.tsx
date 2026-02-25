@@ -67,8 +67,17 @@ export const ProductCarouselBlock = ({ node, locale }: any) => {
             const shuffledHighlights = [...highlights].sort(() => 0.5 - Math.random())
               .slice(0, settings.highlightsCount || 3)
 
+            const basisClass = {
+              1: 'lg:basis-full',
+              2: 'lg:basis-1/2',
+              3: 'lg:basis-1/3',
+              4: 'lg:basis-1/4',
+              5: 'lg:basis-1/5',
+              6: 'lg:basis-1/6',
+            }[itemsPerView || 3] || 'lg:basis-1/3'
+
             return (
-              <CarouselItem key={index} className={`pl-4 basis-full md:basis-1/2 lg:basis-1/${itemsPerView || 3}`}>
+              <CarouselItem key={index} className={`pl-4 basis-full md:basis-1/2 ${basisClass}`}>
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden group h-full flex flex-col">
                   {/* Image Area */}
                   <div className="aspect-square relative overflow-hidden bg-gray-50">

@@ -259,6 +259,21 @@ export const FormConfigs: CollectionConfig = {
               localized: true,
               required: true,
             },
+            {
+              name: 'hasCustomInput',
+              type: 'checkbox',
+              label: {
+                en: 'Allow Custom Input',
+                zh: '允许自定义输入（如"其他"）',
+              },
+              defaultValue: false,
+              admin: {
+                description: {
+                  en: 'If checked, selecting this option will show a text input for the user to type manually.',
+                  zh: '如果勾选，用户选择此项时会弹出一个输入框供其手动填写。',
+                },
+              },
+            },
           ],
         },
         {

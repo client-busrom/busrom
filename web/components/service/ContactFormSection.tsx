@@ -281,13 +281,47 @@ export function ContactFormSection({
         return
       }
 
+      const processedData = { ...formData }
+      formConfig?.fields.forEach((field) => {
+        const optionsWithCustom = field.options?.filter((o: any) => o.hasCustomInput) || []
+        
+        if (optionsWithCustom.length > 0) {
+          if (field.fieldType === 'checkbox' && Array.isArray(processedData[field.fieldName])) {
+            processedData[field.fieldName] = processedData[field.fieldName].map((val: string) => {
+              const hasCustom = optionsWithCustom.some((o: any) => o.value === val)
+              if (hasCustom) {
+                const customVal = processedData[`${field.fieldName}_custom_${val}`]
+                if (customVal) {
+                  return `${val} (${customVal})`
+                }
+              }
+              return val
+            })
+            
+            optionsWithCustom.forEach((o: any) => {
+              delete processedData[`${field.fieldName}_custom_${o.value}`]
+            })
+          } else if (['radio', 'select', 'checkbox'].includes(field.fieldType)) {
+            const val = processedData[field.fieldName]
+            const hasCustom = optionsWithCustom.some((o: any) => o.value === val)
+            if (hasCustom) {
+              const customVal = processedData[`${field.fieldName}_custom`]
+              if (customVal) {
+                processedData[field.fieldName] = `${val} (${customVal})`
+              }
+            }
+            delete processedData[`${field.fieldName}_custom`]
+          }
+        }
+      })
+
       const res = await fetch("/api/form-submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           formId: formConfig?.id,
           formName: formConfig?.name,
-          data: formData,
+          data: processedData,
           attachments: uploadedAttachments,
           locale,
           sourcePage: window.location.href,
@@ -420,7 +454,7 @@ export function ContactFormSection({
               {field.label}
             </label>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: vw(14) }}>
-              {field.options?.map((option) => {
+              {field.options?.map((option: any) => {
                 const isSelected = formData[field.fieldName] === option.value
                 return (
                   <label
@@ -474,6 +508,17 @@ export function ContactFormSection({
                 )
               })}
             </div>
+            {field.options?.some((o: any) => formData[field.fieldName] === o.value && o.hasCustomInput) && (
+              <input
+                type="text"
+                value={formData[`${field.fieldName}_custom`] || ""}
+                onChange={(e) => handleChange(`${field.fieldName}_custom`, e.target.value)}
+                placeholder={locale === 'zh' ? "请详细说明..." : "Please specify..."}
+                style={inputBaseStyle}
+                className="placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors mt-2 w-full"
+                required
+              />
+            )}
           </div>
         )
 
@@ -487,7 +532,7 @@ export function ContactFormSection({
               {field.label}
             </label>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: vw(14) }}>
-              {field.options?.map((option) => {
+              {field.options?.map((option: any) => {
                 const isSelected = isSingleSelect
                   ? formData[field.fieldName] === option.value
                   : (formData[field.fieldName] || []).includes(option.value)
@@ -496,80 +541,107 @@ export function ContactFormSection({
                 const iconSrc = serviceTypeIcons[option.value]
 
                 return (
-                  <label
-                    key={option.value}
-                    style={isSelected ? checkboxItemActiveStyle : checkboxItemStyle}
-                    className="hover:bg-[#211C0B]/30"
-                  >
-                    {/* Icon instead of checkbox/radio indicator */}
-                    <div style={{ width: vw(36), height: vw(36), display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {iconSrc ? (
-                        <Image
-                          src={iconSrc}
-                          alt={option.label}
-                          width={28}
-                          height={28}
-                          style={{
-                            width: vw(28),
-                            height: vw(28),
-                            opacity: isSelected ? 1 : 0.7,
-                          }}
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width: vw(34),
-                            height: vw(34),
-                            borderRadius: isSingleSelect ? "50%" : vw(6),
-                            border: "2px solid",
-                            borderColor: isSelected ? "white" : "rgba(255, 255, 255, 0.7)",
-                            backgroundColor: isSelected ? "white" : "transparent",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            transition: "all 0.2s",
-                          }}
-                        >
-                          {isSelected && isSingleSelect && (
-                            <div
-                              style={{
-                                width: vw(16),
-                                height: vw(16),
-                                borderRadius: "50%",
-                                backgroundColor: "#6E6839",
-                              }}
-                            />
-                          )}
-                        </div>
-                      )}
-                    </div>
-                    <span
-                      className="font-anaheim font-semibold"
-                      style={{
-                        fontSize: vw(22),
-                        color: isSelected ? "white" : "rgba(255, 255, 255, 0.7)",
-                      }}
+                  <div key={option.value} className="flex flex-col gap-2">
+                    <label
+                      style={isSelected ? checkboxItemActiveStyle : checkboxItemStyle}
+                      className="hover:bg-[#211C0B]/30 h-full"
                     >
-                      {option.label}
-                    </span>
-                    <input
-                      type={isSingleSelect ? "radio" : "checkbox"}
-                      name={field.fieldName}
-                      value={option.value}
-                      checked={isSelected}
-                      onChange={(e) => {
-                        if (isSingleSelect) {
-                          handleChange(field.fieldName, e.target.value)
-                        } else {
-                          handleCheckboxChange(field.fieldName, option.value, e.target.checked)
-                        }
-                      }}
-                      className="hidden"
-                    />
-                  </label>
+                      {/* Icon instead of checkbox/radio indicator */}
+                      <div style={{ width: vw(36), height: vw(36), display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        {iconSrc ? (
+                          <Image
+                            src={iconSrc}
+                            alt={option.label}
+                            width={28}
+                            height={28}
+                            style={{
+                              width: vw(28),
+                              height: vw(28),
+                              opacity: isSelected ? 1 : 0.7,
+                            }}
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              width: vw(34),
+                              height: vw(34),
+                              borderRadius: isSingleSelect ? "50%" : vw(6),
+                              border: "2px solid",
+                              borderColor: isSelected ? "white" : "rgba(255, 255, 255, 0.7)",
+                              backgroundColor: isSelected ? "white" : "transparent",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              transition: "all 0.2s",
+                            }}
+                          >
+                            {isSelected && isSingleSelect && (
+                              <div
+                                style={{
+                                  width: vw(16),
+                                  height: vw(16),
+                                  borderRadius: "50%",
+                                  backgroundColor: "#6E6839",
+                                }}
+                              />
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <span
+                        className="font-anaheim font-semibold relative"
+                        style={{
+                          fontSize: vw(22),
+                          color: isSelected ? "white" : "rgba(255, 255, 255, 0.7)",
+                          whiteSpace: 'normal',
+                          display: 'block',
+                          lineHeight: '1.2',
+                          top: '1px'
+                        }}
+                      >
+                        {option.label}
+                      </span>
+                      <input
+                        type={isSingleSelect ? "radio" : "checkbox"}
+                        name={field.fieldName}
+                        value={option.value}
+                        checked={isSelected}
+                        onChange={(e) => {
+                          if (isSingleSelect) {
+                            handleChange(field.fieldName, e.target.value)
+                          } else {
+                            handleCheckboxChange(field.fieldName, option.value, e.target.checked)
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                    {isSelected && option.hasCustomInput && (
+                      <input
+                        type="text"
+                        value={formData[`${field.fieldName}_custom_${option.value}`] || ""}
+                        onChange={(e) => handleChange(`${field.fieldName}_custom_${option.value}`, e.target.value)}
+                        placeholder={locale === 'zh' ? "请详细说明..." : "Please specify..."}
+                        style={{...inputBaseStyle, height: vw(60)}}
+                        className="placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors mt-2 ml-4 !w-[calc(100%-1rem)]"
+                        required
+                      />
+                    )}
+                  </div>
                 )
               })}
             </div>
+            {isSingleSelect && field.options?.some((o: any) => formData[field.fieldName] === o.value && o.hasCustomInput) && (
+              <input
+                type="text"
+                value={formData[`${field.fieldName}_custom`] || ""}
+                onChange={(e) => handleChange(`${field.fieldName}_custom`, e.target.value)}
+                placeholder={locale === 'zh' ? "请详细说明..." : "Please specify..."}
+                style={inputBaseStyle}
+                className="placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors mt-2 w-full"
+                required
+              />
+            )}
           </div>
         )
       }

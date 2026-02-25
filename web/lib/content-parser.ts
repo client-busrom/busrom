@@ -993,39 +993,48 @@ function parseMoreSeries(
   let title = 'More series'
   const series: MoreSeriesItem[] = []
 
-  // Find reusableBlock and get its content from the map
+  // Process all nodes (expanded or contained in reusableBlock)
+  function processNodes(children: LexicalNode[]) {
+    for (const child of children) {
+      // Get title from h1 heading
+      if (child.type === 'heading' && (child as LexicalHeadingNode).tag === 'h1') {
+        title = extractText(child)
+      }
+
+      // Parse carousel for series items
+      if (child.type === 'carousel' && (child as LexicalCarouselNode).data?.slides) {
+        const carousel = child as LexicalCarouselNode
+        for (const slide of carousel.data.slides) {
+          // Handle various image formats
+          const imageId = slide.image?.id ? String(slide.image.id) : 
+                          (typeof slide.image === 'string' || typeof slide.image === 'number' ? String(slide.image) : '')
+          const imageUrl = imageId ? (mediaMap.get(imageId) || `/api/media/${imageId}`) : ''
+
+          series.push({
+            name: slide.title || '',
+            slug: slide.buttonLink?.replace('/product-series/', '').replace(/^\//, '') || '',
+            image: imageUrl,
+            link: slide.buttonLink || '#',
+          })
+        }
+      }
+    }
+  }
+
+  // Find reusableBlock or direct expanded children
   for (const node of nodes) {
-    if (node.type === 'reusableBlock' && 'data' in node) {
-      const reusableNode = node as { type: 'reusableBlock'; data: { reusableBlock: { id: string } | string | number } }
-      const blockRef = reusableNode.data?.reusableBlock
-      // Handle both { id: '2' } and direct string/number '2'
+    if (node.type === 'reusableBlock' || node.type === 'seriesReusableBlock') {
+      const blockType = node.type
+      const blockRef = (node as any).data?.[blockType]
       const blockId = typeof blockRef === 'object' && blockRef !== null ? String(blockRef.id) : String(blockRef)
       const blockContent = reusableBlocksMap.get(blockId)
 
       if (blockContent?.root?.children) {
-        // Parse reusable block content
-        for (const child of blockContent.root.children) {
-          // Get title from h1 heading
-          if (child.type === 'heading' && child.tag === 'h1') {
-            title = extractText(child)
-          }
-
-          // Parse carousel for series items
-          if (child.type === 'carousel' && child.data?.slides) {
-            for (const slide of child.data.slides) {
-              const imageId = slide.image?.id ? String(slide.image.id) : ''
-              const imageUrl = imageId ? (mediaMap.get(imageId) || `/api/media/${imageId}`) : ''
-
-              series.push({
-                name: slide.title || '',
-                slug: slide.buttonLink?.replace('/product-series/', '') || '',
-                image: imageUrl,
-                link: slide.buttonLink || '#',
-              })
-            }
-          }
-        }
+        processNodes(blockContent.root.children)
       }
+    } else {
+      // Handle expanded nodes directly
+      processNodes([node])
     }
   }
 

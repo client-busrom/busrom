@@ -44,6 +44,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
   const currentLocale = useLocale()
   const { i18n } = useTranslation()
   const adminLang = i18n.language // Admin UI language (from account settings)
+  const isZh = adminLang === 'zh'
   const { id, collectionSlug } = useDocumentInfo()
 
   // Active locale for editing
@@ -370,7 +371,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
           className="psf-btn psf-btn--translate"
           onClick={() => setShowTranslatePanel(!showTranslatePanel)}
         >
-          {showTranslatePanel ? 'Hide Translate' : 'Auto-Translate'}
+          {showTranslatePanel ? (isZh ? '隐藏翻译' : 'Hide Translate') : (isZh ? '自动翻译' : 'Auto-Translate')}
         </button>
       </div>
 
@@ -381,7 +382,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
       {/* Progress Bar */}
       <div className="product-specs-field__progress">
         <div className="progress-info">
-          <span>{completedCount} of {SUPPORTED_LOCALES.length} languages ({completionPercentage}%)</span>
+          <span>{isZh ? `已完成 ${completedCount} / ${SUPPORTED_LOCALES.length} 种语言 (${completionPercentage}%)` : `${completedCount} of ${SUPPORTED_LOCALES.length} languages (${completionPercentage}%)`}</span>
         </div>
         <div className="progress-bar">
           <div className="progress-bar__fill" style={{ width: `${completionPercentage}%` }} />
@@ -391,11 +392,11 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
       {/* Translation Panel */}
       {showTranslatePanel && (
         <div className="product-specs-field__translate-panel">
-          <h4>Auto-Translate Settings</h4>
+          <h4>{isZh ? '自动翻译设置' : 'Auto-Translate Settings'}</h4>
 
           <div className="translate-row">
             <div className="translate-col">
-              <label>Source Language</label>
+              <label>{isZh ? '源语言' : 'Source Language'}</label>
               <select
                 value={sourceLocale}
                 onChange={(e) => setSourceLocale(e.target.value as LocaleCode)}
@@ -417,13 +418,13 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
           <div className="translate-row">
             <div className="translate-col">
               <div className="target-header">
-                <label>Target Languages ({targetLocales.length} selected)</label>
+                <label>{isZh ? `目标语言 (${targetLocales.length} 已选择)` : `Target Languages (${targetLocales.length} selected)`}</label>
                 <div className="target-actions">
                   <button type="button" onClick={handleSelectAllTargets} disabled={isTranslating}>
-                    Select All
+                    {isZh ? '全选' : 'Select All'}
                   </button>
                   <button type="button" onClick={handleSelectEmptyTargets} disabled={isTranslating}>
-                    Select Empty
+                    {isZh ? '选空' : 'Select Empty'}
                   </button>
                 </div>
               </div>
@@ -457,7 +458,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                 onChange={(e) => setOverwriteExisting(e.target.checked)}
                 disabled={isTranslating}
               />
-              Overwrite existing content
+              {isZh ? '覆盖已有内容' : 'Overwrite existing content'}
             </label>
             <button
               type="button"
@@ -465,7 +466,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
               onClick={handleTranslate}
               disabled={isTranslating || targetLocales.length === 0 || (localeData.find(l => l.locale === sourceLocale)?.specifications?.length || 0) === 0}
             >
-              {isTranslating ? 'Translating...' : `Translate to ${targetLocales.length} languages`}
+              {isTranslating ? (isZh ? '翻译中...' : 'Translating...') : (isZh ? `翻译至 ${targetLocales.length} 种语言` : `Translate to ${targetLocales.length} languages`)}
             </button>
           </div>
         </div>

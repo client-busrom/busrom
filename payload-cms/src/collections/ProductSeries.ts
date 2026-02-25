@@ -17,20 +17,20 @@ export const ProductSeries: CollectionConfig = {
   slug: 'product-series',
   labels: {
     singular: {
-      en: 'Product Series',
-      zh: '产品系列',
+      en: 'Series Integration Page',
+      zh: '产品详解整合页',
     },
     plural: {
-      en: 'Product Series',
-      zh: '产品系列',
+      en: 'Series Integration Pages',
+      zh: '产品详解整合页',
     },
   },
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'slug', 'status', 'order'],
     group: {
-      en: 'Content',
-      zh: '内容管理',
+      en: 'Product Center',
+      zh: '产品中心',
     },
   },
   access: {
@@ -39,13 +39,6 @@ export const ProductSeries: CollectionConfig = {
     update: ({ req: { user } }) => !!user,
     delete: ({ req: { user } }) => user?.isAdmin === true,
   },
-  // 版本控制 - 保留修改历史
-  // versions: {
-
-  // maxPerDoc: 10,
-
-  // },
-
   fields: [
     {
       type: 'tabs',
@@ -127,38 +120,25 @@ export const ProductSeries: CollectionConfig = {
                 },
               },
             },
-          ],
-        },
-
-        // ==================================================================
-        // Tab 2: Content Translation (Rich Text)
-        // ==================================================================
-        {
-          label: {
-            en: 'Content',
-            zh: '内容',
-          },
-          fields: [
             {
-              name: 'contentTranslation',
-              type: 'richText',
-              localized: true,
+              name: 'seriesTemplate',
+              type: 'relationship',
+              // @ts-expect-error - series-templates slug is valid but types need regeneration
+              relationTo: 'series-templates',
               label: {
-                en: 'Content',
-                zh: '富文本内容',
+                en: 'Series Template',
+                zh: '关联产品详解页模版',
               },
               admin: {
                 description: {
-                  en: 'Rich text content - use language tabs above to switch locales',
-                  zh: '富文本内容 - 使用上方的语言选项卡切换语言',
-                },
-                components: {
-                  beforeInput: ['@/components/fields/MultiLocaleRichTextField'],
+                  en: 'Select the rich text content template for this series',
+                  zh: '为该产品系列选择关联的内容模版页性',
                 },
               },
             },
           ],
         },
+
 
         // ==================================================================
         // Tab 3: Images
@@ -196,7 +176,7 @@ export const ProductSeries: CollectionConfig = {
         {
           label: {
             en: 'Products',
-            zh: '产品',
+            zh: '产品列表',
           },
           fields: [
             {
@@ -206,7 +186,7 @@ export const ProductSeries: CollectionConfig = {
               on: 'series',
               label: {
                 en: 'Products',
-                zh: '产品',
+                zh: '包含产品',
               },
               admin: {
                 description: {

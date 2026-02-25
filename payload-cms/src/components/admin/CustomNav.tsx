@@ -301,15 +301,26 @@ export const CustomNav: React.FC = () => {
           <NavItem href="/admin/collections/applications" labelKey="applications" />
         </CollapsibleGroup>
 
-        {/* Products */}
-        <CollapsibleGroup labelKey="products">
-          <NavItem href="/admin/collections/product-series" labelKey="productSeries" />
-          <NavItem href="/admin/collections/products" labelKey="productsItem" />
-        </CollapsibleGroup>
-
         {/* Content */}
         <CollapsibleGroup labelKey="content">
           <NavItem href="/admin/collections/categories" labelKey="categories" />
+          
+          {/* 产品中心 (嵌套) */}
+          <NestedSubGroup labelKey="products">
+             <NestedSubGroup labelKey="productSeriesManagement">
+              <NavItem href="/admin/collections/product-series" labelKey="productSeries" />
+              <NavItem href="/admin/collections/series-templates" labelKey="seriesTemplates" />
+              <NavItem href="/admin/collections/series-reusable-blocks" labelKey="seriesReusableBlocks" />
+            </NestedSubGroup>
+            {/* 产品详情管理 - 嵌套的三级菜单 */}
+            <NestedSubGroup labelKey="productPageManagement">
+              <NavItem href="/admin/collections/products" labelKey="productsItem" />
+              <NavItem href="/admin/collections/product-attributes" labelKey="productAttributes" />
+              <NavItem href="/admin/collections/product-templates" labelKey="productTemplates" />
+              <NavItem href="/admin/collections/product-reusable-blocks" labelKey="productReusableBlocks" />
+            </NestedSubGroup>
+          </NestedSubGroup>
+
           <NavItem href="/admin/collections/blogs" labelKey="blogs" />
           <NavItem href="/admin/collections/faq-items" labelKey="faqItems" />
           <NavItem href="/admin/collections/reusable-blocks" labelKey="reusableBlocks" />

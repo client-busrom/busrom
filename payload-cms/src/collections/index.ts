@@ -11,6 +11,11 @@ export { MediaCategories } from './MediaCategories'
 export { MediaTags } from './MediaTags'
 export { Products } from './Products'
 export { ProductSeries } from './ProductSeries'
+export { ProductAttributes } from './ProductAttributes'
+export { ProductTemplates } from './ProductTemplates'
+export { SeriesTemplates } from './SeriesTemplates'
+export { ProductReusableBlocks } from './ProductReusableBlocks'
+export { SeriesReusableBlocks } from './SeriesReusableBlocks'
 
 // Users & Access Control
 export { Roles } from './Roles'

@@ -28,8 +28,8 @@ export const Categories: CollectionConfig = {
     },
   },
   admin: {
-    useAsTitle: 'slug',
-    defaultColumns: ['slug', 'type', 'order', 'status'],
+    useAsTitle: 'fullTitle',
+    defaultColumns: ['fullTitle', 'type', 'order', 'status'],
     group: {
       en: 'Content',
       zh: '内容管理',
@@ -41,15 +41,51 @@ export const Categories: CollectionConfig = {
     update: ({ req }) => !!req.user,
     delete: ({ req }) => !!req.user,
   },
+  hooks: {
+    beforeChange: [
+      async ({ data, req }) => {
+        // Helper to get a readable name from the category data
+        const getName = (doc: any) => {
+          if (!doc) return ''
+          // If name is localized object
+          if (doc.name && typeof doc.name === 'object') {
+            return doc.name.en || doc.name.zh || doc.slug || 'Untitled'
+          }
+          return doc.name || doc.slug || 'Untitled'
+        }
 
-  // 版本控制 - 保留修改历史
-  // versions: {
+        const currentName = getName(data)
+        let fullTitle = currentName
 
-  // maxPerDoc: 10,
-
-  // },
-
+        if (data.parent) {
+          try {
+            const parent = await req.payload.findByID({
+              collection: 'categories',
+              id: typeof data.parent === 'object' ? data.parent.id : data.parent,
+              depth: 0,
+            })
+            if (parent) {
+              const parentTitle = (parent as any).fullTitle || getName(parent)
+              fullTitle = `${parentTitle} > ${currentName}`
+            }
+          } catch (e) {
+            console.error('Error fetching parent category for fullTitle:', e)
+          }
+        }
+        data.fullTitle = fullTitle
+        return data
+      },
+    ],
+  },
   fields: [
+    {
+      name: 'fullTitle',
+      type: 'text',
+      admin: {
+        hidden: true,
+      },
+      index: true,
+    },
     // ==================================================================
     // Multi-language Name
     // ==================================================================
@@ -113,14 +149,36 @@ export const Categories: CollectionConfig = {
       name: 'parent',
       type: 'relationship',
       relationTo: 'categories',
-      label: {
-        en: 'Parent Category',
-        zh: '父分类',
+      filterOptions: ({ data, id }) => {
+        const filter: any = {}
+        if (data?.type) {
+          filter.type = { equals: data.type }
+        }
+        if (id) {
+          filter.id = { not_equals: id }
+        }
+        return filter
       },
       admin: {
         description: {
-          en: 'Parent category for hierarchical structure',
-          zh: '用于层级结构的父分类',
+          en: 'Parent category for hierarchical structure (filtered by same type)',
+          zh: '用于层级结构的父分类（仅显示相同类型的分类）',
+        },
+      },
+    },
+    {
+      name: 'children',
+      type: 'join',
+      collection: 'categories',
+      on: 'parent',
+      label: {
+        en: 'Sub-categories',
+        zh: '子分类',
+      },
+      admin: {
+        description: {
+          en: 'Direct sub-categories belonging to this category',
+          zh: '该分类下的直接子分类',
         },
       },
     },

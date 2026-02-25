@@ -71,7 +71,20 @@ async function seed() {
 
   for (const product of products) {
     try {
-      // Check if product already exists
+      // 1. Fetch the series to get its category
+      const seriesDoc = await payload.findByID({
+        collection: 'product-series',
+        id: product.series,
+        depth: 0,
+      })
+
+      const categoryId = seriesDoc?.category
+        ? typeof seriesDoc.category === 'object'
+          ? (seriesDoc.category as any).id
+          : seriesDoc.category
+        : undefined
+
+      // 2. Check if product already exists
       const existing = await payload.find({
         collection: 'products',
         where: { sku: { equals: product.sku } },
@@ -85,9 +98,12 @@ async function seed() {
 
       await payload.create({
         collection: 'products',
-        data: product as any,
+        data: {
+          ...product,
+          category: categoryId,
+        } as any,
       })
-      console.log(`✓ Created: ${product.sku}`)
+      console.log(`✓ Created: ${product.sku} (Category: ${categoryId})`)
       success++
     } catch (error: any) {
       console.log(`✗ Failed: ${product.sku} - ${error.message}`)
