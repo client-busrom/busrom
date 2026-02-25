@@ -154,8 +154,8 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
   // Parse Lexical content structure using extracted function
   const { preFormSections, formBlock, postFormSections } = parseLexicalSections(product.content)
 
-  // Use the new productAttributes field for strength badges
-  const strengthData = product.productAttributes ? parseMainContentStrengthData(product.productAttributes) : null
+  // Use ONLY Attribute Page data for core strengths (badges below gallery)
+  const strengthData = parseMainContentStrengthData(product.content, product.productAttributes)
 
   // Get the first main image for the hero section
   const heroImage = images.length > 0 ? images[0] : null
@@ -367,7 +367,7 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
             section={section}
             sectionIndex={sectionIndex}
             locale={locale}
-            />
+          />
         )
       })}
 

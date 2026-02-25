@@ -151,6 +151,26 @@ function collectMediaIds(node: any, ids: Set<string>): void {
   if (node.fields) {
     Object.values(node.fields).forEach(value => collectMediaIds(value, ids))
   }
+
+  // Handle JSON fields (AttributeItem[] or SpecificationGroup[])
+  if (Array.isArray(node)) {
+    node.forEach(item => {
+      // AttributeItem pattern
+      if (item?.visual?.image) {
+        const id = extractMediaId(item.visual.image)
+        if (id) ids.add(id)
+      }
+      // SpecificationItem/SingleImage pattern
+      if (item?.image) {
+        const id = extractMediaId(item.image)
+        if (id) ids.add(id)
+      }
+      // Recursive check for nested items (like SpecificationGroup.items)
+      if (item && typeof item === 'object') {
+        Object.values(item).forEach(val => collectMediaIds(val, ids))
+      }
+    })
+  }
 }
 
 /**
@@ -253,6 +273,39 @@ function populateMediaFromCache(node: any, cache: Map<string, any>): any {
     }
   }
 
+  // Handle JSON array fields
+  if (Array.isArray(populated)) {
+    return populated.map(item => {
+      if (!item || typeof item !== 'object') return item
+      const newItem = { ...item }
+      
+      // AttributeItem pattern
+      if (newItem.visual?.image) {
+        const id = extractMediaId(newItem.visual.image)
+        if (id && cache.has(id)) {
+          newItem.visual = { ...newItem.visual, image: cache.get(id) }
+        }
+      }
+      
+      // SpecificationItem/SingleImage pattern
+      if (newItem.image) {
+        const id = extractMediaId(newItem.image)
+        if (id && cache.has(id)) {
+          newItem.image = cache.get(id)
+        }
+      }
+
+      // Recurse into nested objects/arrays
+      for (const [key, val] of Object.entries(newItem)) {
+        if (val && typeof val === 'object' && key !== 'visual' && key !== 'image') {
+          (newItem as any)[key] = populateMediaFromCache(val, cache)
+        }
+      }
+      
+      return newItem
+    })
+  }
+
   return populated
 }
 
@@ -273,24 +326,37 @@ async function expandChildren(children: any[], locale: string): Promise<any[]> {
   const expanded: any[] = []
 
   for (const node of children) {
-    if (node?.type === 'reusableBlock') {
-      const blockData = node.data?.reusableBlock
+    const isReusableBlock = node?.type === 'reusableBlock' || 
+                           node?.type === 'seriesReusableBlock' || 
+                           node?.type === 'productReusableBlock'
+
+    if (isReusableBlock) {
+      const blockData = node.data?.reusableBlock || node.data?.seriesReusableBlock || node.data?.productReusableBlock
       const blockId = typeof blockData === 'object' ? blockData?.id : blockData
       if (!blockId) continue
 
       try {
-        const res = await fetch(
-          `${CMS_URL}/api/reusable-blocks/${blockId}?locale=${locale}&depth=1`
-        )
-        if (res.ok) {
-          const block = await res.json()
-          const blockChildren = block?.contentTranslation?.root?.children
-          if (Array.isArray(blockChildren) && blockChildren.length > 0) {
-            // Recursively expand in case of nested reusableBlocks
-            const nestedExpanded = await expandChildren(blockChildren, locale)
-            expanded.push(...nestedExpanded)
-            continue
+        // Try all reusable block collections
+        const collections = ['series-reusable-blocks', 'product-reusable-blocks', 'reusable-blocks']
+        let blockContent = null
+        
+        for (const col of collections) {
+          const res = await fetch(
+            `${CMS_URL}/api/${col}/${blockId}?locale=${locale}&depth=1`
+          )
+          if (res.ok) {
+            const block = await res.json()
+            // Some collections use contentTranslation, some use content
+            blockContent = block?.contentTranslation?.root?.children || block?.content?.root?.children
+            if (blockContent) break
           }
+        }
+
+        if (Array.isArray(blockContent) && blockContent.length > 0) {
+          // Recursively expand in case of nested reusableBlocks
+          const nestedExpanded = await expandChildren(blockContent, locale)
+          expanded.push(...nestedExpanded)
+          continue
         }
       } catch (err) {
         console.error(`[expandReusableBlocks] Failed to fetch reusable block ${blockId}:`, err)
@@ -378,15 +444,83 @@ export async function GET(
     const product = productData.docs[0]
     console.log('[Product Detail API] Product found:', product.id)
 
-    // Expand reusableBlock nodes, then populate image references
-    if (product.contentTranslation) {
-      console.log('[Product Detail API] Expanding reusable blocks...')
-      product.contentTranslation = await expandReusableBlocks(product.contentTranslation, locale)
+    // 0. Ensure we have the full product data and its associated templates/series
+    let contentToRender = product.contentTemplate?.content || null
+    let templateSource = product.contentTemplate ? 'product' : null
 
-      console.log('[Product Detail API] Populating Lexical images...')
-      const { content, mediaCount } = await populateLexicalImages(product.contentTranslation)
+    // If no product-specific template, look for series-level template
+    if (!contentToRender) {
+      let series = product.series
+      if (typeof series === 'string' || typeof series === 'number') {
+        console.log('[Product Detail API] Fetching unpopulated series:', series)
+        const sRes = await fetch(`${CMS_URL}/api/product-series/${series}?locale=${locale}&depth=2`)
+        if (sRes.ok) {
+          const seriesData = await sRes.json()
+          product.series = seriesData // Update reference for later transformation
+          series = seriesData
+        }
+      }
+      
+      if (series && typeof series === 'object') {
+        contentToRender = series.seriesTemplate?.content || null
+        if (contentToRender) templateSource = 'series'
+      }
+    }
+
+    // Finally fallback to direct content if no template found
+    if (!contentToRender) {
+      contentToRender = product.contentTranslation || null
+    }
+
+    const originalContentRaw = product.contentTranslation || null
+    console.log(`[Product Detail API] Content source selected: ${templateSource || 'direct'}`)
+
+    // 1. Process main content (template or direct)
+    if (contentToRender) {
+      console.log('[Product Detail API] Expanding reusable blocks for main content...')
+      const expanded = await expandReusableBlocks(contentToRender, locale)
+      const { content } = await populateLexicalImages(expanded)
       product.contentTranslation = content
-      console.log('[Product Detail API] Populated', mediaCount, 'unique images')
+    }
+
+    // 2. Process original product content if it's different (to preserve highlights)
+    let processedProductContent = null
+    const hasTemplate = !!(product.contentTemplate || product.series?.seriesTemplate)
+    
+    if (originalContentRaw && hasTemplate) {
+      console.log('[Product Detail API] Expanding reusable blocks for original content...')
+      const expanded = await expandReusableBlocks(originalContentRaw, locale)
+      const { content } = await populateLexicalImages(expanded)
+      processedProductContent = content
+    } else {
+      processedProductContent = product.contentTranslation
+    }
+
+    // 3. Extract and populate media for JSON attribute fields
+    const attributeFields = ['productAttributes', 'specifications', 'customAttributes']
+    const attrMediaIds = new Set<string>()
+    
+    // Check both product and attributePage
+    attributeFields.forEach(field => {
+      // @ts-ignore - access by string index
+      const data = product[field] || product.attributePage?.[field]
+      if (data) collectMediaIds(data, attrMediaIds)
+    })
+
+    if (attrMediaIds.size > 0) {
+      console.log(`[Product Detail API] Found ${attrMediaIds.size} media in JSON attributes`)
+      const attrCache = await batchFetchMedia(attrMediaIds)
+      
+      attributeFields.forEach(field => {
+        // @ts-ignore
+        if (product[field]) {
+          // @ts-ignore
+          product[field] = populateMediaFromCache(product[field], attrCache)
+        }
+        if (product.attributePage?.[field]) {
+          product.attributePage[field] = populateMediaFromCache(product.attributePage[field], attrCache)
+        }
+      })
     }
 
     // 获取同系列的相关产品
@@ -454,16 +588,18 @@ export async function GET(
       localizedDescription: product.description,
       // Content (rich text from Payload)
       content: product.contentTranslation, // Lexical rich text content
+      productContent: processedProductContent, // Original product content (useful for highlights)
       contentTranslation: product.contentTranslation
         ? {
             locale,
             content: {
               document: product.contentTranslation, // Payload rich text content
             },
+            productContent: processedProductContent,
           }
         : null,
-      // Specifications (JSON field)
-      specifications: product.specifications || null,
+      // Specifications (JSON field) - From product or linked attributePage
+      specifications: product.specifications || product.attributePage?.specifications || null,
       // Images (with CDN URL transformation)
       showImage: product.showImage
         ? {
@@ -500,7 +636,8 @@ export async function GET(
       isFeatured: product.featured || false,
       order: product.order || 0,
       status: product.status === 'published' ? 'PUBLISHED' : 'DRAFT',
-      productAttributes: product.productAttributes || null,
+      productAttributes: product.productAttributes || product.attributePage?.productAttributes || null,
+      customAttributes: product.customAttributes || product.attributePage?.customAttributes || null,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
       // Related products

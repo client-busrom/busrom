@@ -53,7 +53,7 @@ export function SectionRenderer({
         title={data.title}
         image={data.image}
         imageLink={data.imageLink}
-        attributes={data.attributes}
+        attributes={data.attributes || []}
       />
     )
   }

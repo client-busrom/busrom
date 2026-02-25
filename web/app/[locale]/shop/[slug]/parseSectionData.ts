@@ -90,68 +90,44 @@ export function extractBasicSectionData(content: LexicalContent) {
 }
 
 // Parse Main Content Strength Section (badges below gallery)
-// Supports carousel block for visual editing in CMS
-export function parseMainContentStrengthData(content: LexicalContent) {
-  const nodes = content?.root?.children || []
+// Strictly uses JSON array (jsonItems) from Attribute Page as per user requirement
+export function parseMainContentStrengthData(content: LexicalContent, jsonItems?: any[]) {
   const strengthItems: { icon?: string; image?: any; title: string; subtitle?: string }[] = []
 
-  for (let i = 0; i < nodes.length; i++) {
-    const node = nodes[i]
-    const nodeText = node.children?.[0]?.text || ''
-
-    // Check for iconList block (icon + title + subtitle list)
-    if (node.type === 'iconList' && node.data?.items) {
-      for (const item of node.data.items) {
+  if (jsonItems && Array.isArray(jsonItems)) {
+    const rawItems = parseJsonAttributeItems(jsonItems)
+    if (rawItems) {
+      rawItems.forEach(item => {
         strengthItems.push({
-          icon: item.icon || undefined,
-          title: item.title || '',
-          subtitle: item.subtitle || '',
+          icon: item.icon,
+          image: item.image,
+          title: item.value || item.key || '',
+          subtitle: item.key || '',
         })
-      }
-    }
-
-    // Check for carousel block (visual editing in CMS)
-    if (node.type === 'carousel' && node.data?.slides) {
-      for (const slide of node.data.slides) {
-        // Title is the main text, description is the subtitle (supports line breaks)
-        const title = slide.title || ''
-        // Description can contain line breaks, preserve them
-        const subtitle = slide.description || ''
-        strengthItems.push({
-          image: slide.image || null,
-          title,
-          subtitle,
-        })
-      }
-    }
-
-    // 3. Check for list block (text-based, with support for | icon separator)
-    if (node.type === 'list' && node.children) {
-      for (const listItem of node.children) {
-        if (listItem.type === 'listitem') {
-          const text = extractTextWithLinebreaks(listItem.children)
-          if (text) {
-            const parts = text.split('|')
-            if (parts.length >= 2) {
-              const iconPart = parts[0].startsWith('icon:') ? parts[0].replace('icon:', '') : 'users'
-              const title = parts[0].startsWith('icon:') ? parts[1] : parts[0]
-              const subtitle = parts[0].startsWith('icon:') ? parts[2] : parts[1]
-              strengthItems.push({ icon: iconPart, title, subtitle })
-            } else {
-              const lines = text.split('\n')
-              strengthItems.push({
-                icon: 'users',
-                title: lines[0] || '',
-                subtitle: lines[1] || '',
-              })
-            }
-          }
-        }
-      }
+      })
     }
   }
 
   return { items: strengthItems.length > 0 ? strengthItems : undefined }
+}
+
+/**
+ * Parse JSON attribute items from the product-attributes collection
+ */
+export function parseJsonAttributeItems(items: any[] | undefined | null) {
+  if (!Array.isArray(items)) return undefined
+  
+  return items
+    .filter(item => item.showOnFrontEnd !== false)
+    .map(item => {
+      const visual = item.visual || {}
+      return {
+        icon: visual.type === 'icon' ? visual.icon : undefined,
+        image: visual.type === 'image' ? visual.image : undefined,
+        key: item.key || '',
+        value: item.value || '',
+      }
+    })
 }
 
 // Parse Product Attributes Section
