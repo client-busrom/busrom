@@ -3,8 +3,8 @@ import type { CollectionConfig } from 'payload'
 export const SeriesTemplates: CollectionConfig = {
   slug: 'series-templates',
   labels: {
-    singular: { en: 'Series Template', zh: '产品详解页模版' },
-    plural: { en: 'Series Templates', zh: '产品详解页模版' },
+    singular: { en: 'Series Template', zh: '产品详解模版页' },
+    plural: { en: 'Series Templates', zh: '产品详解模版页' },
   },
   admin: {
     useAsTitle: 'name',

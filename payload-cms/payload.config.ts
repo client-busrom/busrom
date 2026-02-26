@@ -463,6 +463,17 @@ export default buildConfig({
       generateTitle: ({ doc }) => `${doc?.title || doc?.name || 'Busrom'} | Busrom`,
       generateDescription: ({ doc }) => doc?.excerpt || doc?.description || doc?.shortDescription || '',
       tabbedUI: true,
+      fields: ({ defaultFields }) => {
+        return defaultFields.map((field) => {
+          if ('name' in field && (field.name === 'title' || field.name === 'description')) {
+            return {
+              ...field,
+              localized: true,
+            }
+          }
+          return field
+        })
+      },
     }),
 
     // Auditor Plugin - 操作审计日志

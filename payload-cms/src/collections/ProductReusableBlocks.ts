@@ -5,11 +5,11 @@ export const ProductReusableBlocks: CollectionConfig = {
   labels: {
     singular: {
       en: 'Product Detail Block',
-      zh: '产品详情模版块',
+      zh: '产品详情复用块',
     },
     plural: {
       en: 'Product Detail Blocks',
-      zh: '产品详情模版块',
+      zh: '产品详情复用块',
     },
   },
   admin: {

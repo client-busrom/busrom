@@ -3,8 +3,8 @@ import type { CollectionConfig } from 'payload'
 export const SeriesReusableBlocks: CollectionConfig = {
   slug: 'series-reusable-blocks',
   labels: {
-    singular: { en: 'Series Block', zh: '产品详解页复用块' },
-    plural: { en: 'Series Blocks', zh: '产品详解页复用块' },
+    singular: { en: 'Series Block', zh: '产品详解复用块' },
+    plural: { en: 'Series Blocks', zh: '产品详解复用块' },
   },
   admin: {
     useAsTitle: 'slug',
