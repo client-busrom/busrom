@@ -2,6 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
+import { Fredericka_the_Great, Amiri } from "next/font/google";
 import dynamic from "next/dynamic";
 import "../globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -154,6 +155,22 @@ const orbitron = localFont({
   preload: false,
 });
 
+const frederickaTheGreat = Fredericka_the_Great({
+  weight: "400",
+  variable: "--font-fredericka",
+  display: "swap",
+  subsets: ["latin"],
+  preload: false,
+});
+
+const amiri = Amiri({
+  weight: "400",
+  variable: "--font-amiri",
+  display: "swap",
+  subsets: ["arabic", "latin"],
+  preload: false,
+});
+
 export function generateStaticParams() {
   // 动态生成所有支持的 locale 参数
   return locales.map(locale => ({ locale }));
@@ -225,6 +242,8 @@ export default async function RootLayout({
       ${kaushanScript.variable}
       ${moul.variable}
       ${orbitron.variable}
+      ${frederickaTheGreat.variable}
+      ${amiri.variable}
       font-sans
     `}
     >

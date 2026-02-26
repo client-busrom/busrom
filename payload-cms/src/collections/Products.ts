@@ -217,7 +217,7 @@ export const Products: CollectionConfig = {
               relationTo: 'product-templates',
               label: {
                 en: 'Content Template',
-                zh: '关联内容模版页',
+                zh: '关联产品详情模版页',
               },
               filterOptions: ({ data }) => {
                 if (data?.category) {
@@ -232,7 +232,7 @@ export const Products: CollectionConfig = {
               admin: {
                 description: {
                   en: 'Select the rich text content template for this product (filtered by category)',
-                  zh: '为该产品选择关联的富文本内容模版页（根据分类自动筛选）',
+                  zh: '为该产品选择关联的详情内容模版页（根据分类自动筛选）',
                 },
               },
             },

@@ -4,12 +4,12 @@ export const ProductTemplates: CollectionConfig = {
   slug: 'product-templates',
   labels: {
     singular: {
-      en: 'Product Template Page',
-      zh: '产品链接模版页',
+      en: 'Product Detail Template',
+      zh: '产品详情模版页',
     },
     plural: {
-      en: 'Product Template Pages',
-      zh: '产品链接模版页',
+      en: 'Product Detail Templates',
+      zh: '产品详情模版页',
     },
   },
   admin: {
