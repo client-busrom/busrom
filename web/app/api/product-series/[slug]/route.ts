@@ -81,22 +81,37 @@ async function fetchReusableBlocks(ids: string[]): Promise<Map<string, any>> {
 }
 
 /**
- * Transform image variants to use CDN URLs
+ * Transform image variants to use CDN URLs and standard keys
+ * Maps Payload keys (card, tablet, desktop) to standard keys (small, medium, large)
  */
 function transformImageVariants(variants: any) {
   if (!variants) return null
 
   const transformed: any = {}
+  
+  // Mapping for Payload CMS size keys to our internal standard keys
+  const sizeMap: Record<string, string> = {
+    card: 'small',
+    tablet: 'medium',
+    desktop: 'large',
+    thumbnail: 'thumbnail',
+  }
+
   for (const [key, value] of Object.entries(variants)) {
+    const targetKey = sizeMap[key] || key
+    
     if (value && typeof value === 'object' && 'url' in value) {
-      transformed[key] = {
+      transformed[targetKey] = {
         ...value,
         url: convertToCDNUrl((value as any).url)
       }
+      // Also keep original key for compatibility
+      if (targetKey !== key) transformed[key] = transformed[targetKey]
     } else if (typeof value === 'string') {
-      transformed[key] = convertToCDNUrl(value)
+      transformed[targetKey] = convertToCDNUrl(value)
+      if (targetKey !== key) transformed[key] = transformed[targetKey]
     } else {
-      transformed[key] = value
+      transformed[targetKey] = value
     }
   }
   return transformed
@@ -432,17 +447,17 @@ export async function GET(
     // 1. Expand reusable blocks into a flat list of nodes
     const expandedContent = contentTranslationRaw ? await expandReusableBlocks(contentTranslationRaw, locale) : null
 
-    // 2. Extract and fetch media URLs from expanded content
+    // 2. Extract and fetch media data from expanded content
     const mediaIds = new Set<string>()
     if (expandedContent) {
       collectMediaIds(expandedContent, mediaIds)
     }
-    const mediaMap = await fetchMediaUrls(Array.from(mediaIds))
+    const mediaMap = await batchFetchMedia(mediaIds)
 
     // Convert mediaMap to object for JSON serialization
-    const mediaUrls: Record<string, string> = {}
-    mediaMap.forEach((url, id) => {
-      mediaUrls[id] = url
+    const mediaData: Record<string, any> = {}
+    mediaMap.forEach((data, id) => {
+      mediaData[id] = data
     })
 
     // Transform series data
@@ -456,7 +471,7 @@ export async function GET(
       status: series.status,
       isFeatured: series.isFeatured || false,
       contentTranslation: expandedContent,
-      mediaUrls, // Media ID -> CDN URL mapping
+      mediaData, // Full Media objects including variants
       reusableBlocks: {}, // Already expanded at API level
       locale,
     }

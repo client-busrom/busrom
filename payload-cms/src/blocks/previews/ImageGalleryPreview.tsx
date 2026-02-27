@@ -12,6 +12,10 @@ interface ImageGalleryPreviewProps {
         id: string
         url: string
         alt?: string
+        sizes?: {
+          thumbnail?: { url: string }
+          card?: { url: string }
+        }
       }
       caption?: string
     }>
@@ -59,7 +63,7 @@ export const ImageGalleryPreview: React.FC<ImageGalleryPreviewProps> = ({ data }
             {item.image?.url ? (
               <>
                 <img
-                  src={item.image.url}
+                  src={item.image.sizes?.card?.url || item.image.sizes?.thumbnail?.url || item.image.url}
                   alt={item.image.alt || item.caption || `Image ${index + 1}`}
                   style={{
                     width: '100%',

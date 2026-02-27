@@ -22,7 +22,7 @@ export const LinkJump: Block = {
   fields: [
     {
       name: 'title',
-      type: 'text',
+      type: 'textarea',
       required: true,
       label: {
         en: 'Title',

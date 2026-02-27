@@ -85,15 +85,15 @@ function extractItems(flatNodes: any[], markerIndex: number, mediaData: Record<s
       items.push(...node.data.slides.map((s: any) => ({
         title: s.title || "",
         description: s.description || "",
-        image: s.image ? (mediaData[typeof s.image === 'string' ? s.image : s.image.id] || null) : null,
+        image: s.image ? (mediaData[typeof s.image === 'object' && s.image ? s.image.id : String(s.image)] || null) : null,
         sourceType: node.type
       })))
     }
 
     if (node.type === "custom-image-gallery" && node.data?.images) {
       items.push(...node.data.images.map((g: any) => ({
-        id: g.image?.id || g.image,
-        image: mediaData[g.image?.id || g.image],
+        id: typeof g.image === 'object' && g.image ? g.image.id : String(g.image || ""),
+        image: mediaData[typeof g.image === 'object' && g.image ? g.image.id : String(g.image || "")],
         title: g.title || "",
         link: g.linkUrl || "",
         sourceType: node.type
@@ -142,14 +142,14 @@ function extractItems(flatNodes: any[], markerIndex: number, mediaData: Record<s
 
     if (node.type === "singleImage" && node.data?.image) {
       items.push({
-        image: mediaData[node.data.image.id || node.data.image],
+        image: mediaData[typeof node.data.image === 'object' && node.data.image ? node.data.image.id : String(node.data.image || "")],
         title: node.data.caption || "",
         sourceType: node.type
       })
     }
     if (node.type === "upload" && node.value) {
       items.push({
-        image: mediaData[node.value.id || node.value],
+        image: mediaData[typeof node.value === 'object' && node.value ? node.value.id : String(node.value || "")],
         title: node.label || "",
         sourceType: node.type
       })
@@ -219,8 +219,14 @@ export function OneStopShopTemplate({ locale, pageContent }: OneStopShopTemplate
     const markerIdx = flatNodes.findIndex((n: any) => JSON.stringify(n).includes(bgMarker))
     if (markerIdx !== -1) {
       const nextNode = flatNodes[markerIdx + 1]
-      if (nextNode?.data?.image) return mediaData[nextNode.data.image.id || nextNode.data.image]
-      if (nextNode?.value?.id) return mediaData[nextNode.value.id]
+      if (nextNode?.data?.image) {
+        const id = typeof nextNode.data.image === 'object' && nextNode.data.image ? nextNode.data.image.id : String(nextNode.data.image || "")
+        return mediaData[id]
+      }
+      if (nextNode?.value) {
+        const id = typeof nextNode.value === 'object' && nextNode.value ? nextNode.value.id : String(nextNode.value || "")
+        return mediaData[id]
+      }
     }
     return null
   }, [contentChildren, mediaData])
@@ -295,10 +301,11 @@ export function OneStopShopTemplate({ locale, pageContent }: OneStopShopTemplate
      let bgImage = null
      if (bgImageIndex !== -1 && bgImageIndex + 1 < contentChildren.length) {
        const nextNode = contentChildren[bgImageIndex + 1]
-       if (nextNode.type === "upload" && nextNode.value) {
-         bgImage = mediaData[nextNode.value.id || nextNode.value]
-       } else if (nextNode.type === "singleImage" && nextNode.data?.image) {
-         bgImage = mediaData[nextNode.data.image.id || nextNode.data.image]
+        if (nextNode.type === "upload" && nextNode.value) {
+          const id = typeof nextNode.value === 'object' && nextNode.value ? nextNode.value.id : String(nextNode.value || "")
+          bgImage = mediaData[id]
+        } else if (nextNode.type === "singleImage" && nextNode.data?.image) {
+         bgImage = mediaData[typeof nextNode.data.image === 'object' && nextNode.data.image ? nextNode.data.image.id : String(nextNode.data.image || "")]
        }
      }
      if (!bgImage && res.items.length > 0 && res.items[0].image) {

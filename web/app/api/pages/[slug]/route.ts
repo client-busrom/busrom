@@ -18,7 +18,8 @@ function extractMediaIds(content: any): string[] {
     // Check for image gallery
     if (node.type === 'custom-image-gallery' && node.data?.images) {
       for (const img of node.data.images) {
-        if (img.image) ids.add(String(img.image))
+        // Only extract media IDs for media-sourced items (not application-sourced)
+        if (img.sourceType !== 'application' && img.image) ids.add(String(img.image))
       }
     }
 
@@ -69,6 +70,137 @@ function extractMediaIds(content: any): string[] {
 
   traverse(content)
   return Array.from(ids)
+}
+
+/**
+ * Extract application IDs from image gallery nodes that use application source
+ */
+function extractApplicationIds(content: any): string[] {
+  const ids = new Set<string>()
+
+  function traverse(node: any) {
+    if (!node) return
+
+    if (node.type === 'custom-image-gallery' && node.data?.images) {
+      for (const img of node.data.images) {
+        if (img.sourceType === 'application' && img.application) {
+          const appId = typeof img.application === 'object' && img.application ? img.application.id : String(img.application)
+          if (appId) ids.add(appId)
+        }
+      }
+    }
+
+    if (node.type === 'block' && node.fields) {
+      if (node.fields.mainContent?.root) traverse(node.fields.mainContent.root)
+      if (node.fields.sidebarContent?.root) traverse(node.fields.sidebarContent.root)
+    }
+
+    if (node.children && Array.isArray(node.children)) {
+      for (const child of node.children) traverse(child)
+    }
+    if (node.root) traverse(node.root)
+  }
+
+  traverse(content)
+  return Array.from(ids)
+}
+
+/**
+ * Fetch application scene gallery images and pick random ones
+ * Returns a map of applicationId -> MediaObject (random image)
+ */
+async function fetchApplicationImages(appIds: string[]): Promise<Record<string, MediaObject>> {
+  const appMediaMap: Record<string, MediaObject> = {}
+  if (appIds.length === 0) return appMediaMap
+
+  for (const appId of appIds) {
+    try {
+      const res = await fetch(`${CMS_URL}/api/applications/${appId}?depth=1`, {
+        next: { revalidate: 60 },
+      })
+      if (!res.ok) continue
+      const appData = await res.json()
+
+      // Collect all images from scene gallery
+      const allImages: Array<{ id: string; url: string; alt?: string; sizes?: any; width?: number; height?: number }> = []
+      if (appData.sceneGallery && Array.isArray(appData.sceneGallery)) {
+        for (const scene of appData.sceneGallery) {
+          if (scene.images && Array.isArray(scene.images)) {
+            for (const img of scene.images) {
+              if (typeof img === 'object' && img.url) {
+                allImages.push(img)
+              }
+            }
+          }
+        }
+      }
+
+      if (allImages.length > 0) {
+        // Pick a random image
+        const randomImg = allImages[Math.floor(Math.random() * allImages.length)]
+        appMediaMap[appId] = {
+          id: randomImg.id || appId,
+          url: convertToCDNUrl(randomImg.url),
+          alt: randomImg.alt || appData.name || '',
+          variants: {
+            thumbnail: randomImg.sizes?.thumbnail?.url ? convertToCDNUrl(randomImg.sizes.thumbnail.url) : undefined,
+            small: randomImg.sizes?.card?.url ? convertToCDNUrl(randomImg.sizes.card.url) : undefined,
+            medium: randomImg.sizes?.tablet?.url ? convertToCDNUrl(randomImg.sizes.tablet.url) : undefined,
+            large: randomImg.sizes?.desktop?.url ? convertToCDNUrl(randomImg.sizes.desktop.url) : undefined,
+            xlarge: convertToCDNUrl(randomImg.url),
+          },
+          width: randomImg.width || undefined,
+          height: randomImg.height || undefined,
+        }
+      }
+    } catch (e) {
+      console.error(`Failed to fetch application ${appId}:`, e)
+    }
+  }
+
+  return appMediaMap
+}
+
+/**
+ * Resolve application-sourced gallery items by injecting random image IDs
+ * This mutates the content in-place, replacing application references with resolved media IDs
+ */
+function resolveApplicationGalleryImages(
+  content: any,
+  appMediaMap: Record<string, MediaObject>,
+  mediaData: Record<string, MediaObject>
+): void {
+  function traverse(node: any) {
+    if (!node) return
+
+    if (node.type === 'custom-image-gallery' && node.data?.images) {
+      for (let i = 0; i < node.data.images.length; i++) {
+        const img = node.data.images[i]
+        if (img.sourceType === 'application' && img.application) {
+          const appId = typeof img.application === 'object' && img.application ? img.application.id : String(img.application)
+          if (appId && appMediaMap[appId]) {
+            // Inject the resolved media ID so the frontend can render it
+            const resolvedMedia = appMediaMap[appId]
+            img.image = resolvedMedia.id
+            // Also add to the main mediaData map
+            mediaData[resolvedMedia.id] = resolvedMedia
+          }
+        }
+      }
+    }
+
+    if (node.type === 'block' && node.fields) {
+      if (node.fields.mainContent?.root) traverse(node.fields.mainContent.root)
+      if (node.fields.sidebarContent?.root) traverse(node.fields.sidebarContent.root)
+    }
+
+    if (node.children && Array.isArray(node.children)) {
+      for (const child of node.children) traverse(child)
+    }
+    if (node.root) traverse(node.root)
+  }
+
+  traverse(content)
 }
 
 /**
@@ -234,6 +366,15 @@ export async function GET(
     // Extract and fetch media data
     const mediaIds = extractMediaIds(page.contentTranslation)
     const mediaData = await fetchMediaData(mediaIds)
+
+    // Extract and fetch application images for gallery items
+    const appIds = extractApplicationIds(page.contentTranslation)
+    const appMediaMap = await fetchApplicationImages(appIds)
+
+    // Resolve application gallery images (injects random media IDs into content)
+    if (Object.keys(appMediaMap).length > 0) {
+      resolveApplicationGalleryImages(page.contentTranslation, appMediaMap, mediaData)
+    }
 
     // Fetch form config if formBlock exists in content
     let formConfig = null

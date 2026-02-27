@@ -265,12 +265,16 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
       },
       contact: {
         title: data.footer.contact?.title || '',
-        emailLabel: 'Email', // Static label
+        emailLabel: data.footer.contact?.emailLabel || 'Email',
         email: data.footer.contact?.email || '',
-        afterSalesLabel: 'Phone', // Static label
-        afterSales: data.footer.contact?.phone || '',
-        whatsappLabel: 'WhatsApp', // Static label
+        afterSalesLabel: data.footer.contact?.afterSalesLabel || 'After Sales',
+        afterSales: data.footer.contact?.afterSales || '',
+        whatsappLabel: data.footer.contact?.whatsappLabel || 'WhatsApp',
         whatsapp: data.footer.contact?.whatsapp || '',
+        addressLabel: data.footer.contact?.addressLabel || '',
+        address: data.footer.contact?.address || '',
+        workingHoursLabel: data.footer.contact?.workingHoursLabel || '',
+        workingHours: data.footer.contact?.workingHours || '',
       },
       notice: {
         title: data.footer.notice?.title || '',

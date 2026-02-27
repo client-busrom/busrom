@@ -164,7 +164,7 @@ function extractImageAfterMarker(
   for (const node of nodesAfterMarker) {
     if (node.type === "singleImage" && node.data?.image) {
       const image = node.data.image
-      const imageId = typeof image === "string" ? image : image?.id
+      const imageId = typeof image === "object" && image ? image.id : String(image || "")
       if (imageId && mediaData[imageId]) {
         const mediaObj = { ...mediaData[imageId] }
         if (node.data.enableLink) {
@@ -376,7 +376,7 @@ function extractGalleryAfterMarker(
     // 单张图片
     if (node.type === "singleImage" && node.data?.image) {
       const image = node.data.image
-      const imageId = typeof image === "string" ? image : image?.id
+      const imageId = typeof image === "object" && image ? image.id : String(image || "")
       if (imageId && mediaData[imageId]) {
         const mediaObj = { ...mediaData[imageId] }
         if (node.data.enableLink) {
@@ -390,9 +390,10 @@ function extractGalleryAfterMarker(
     // 自定义图片画廊
     if (node.type === "custom-image-gallery" && node.data?.images) {
       for (const galleryItem of node.data.images) {
-        const imageId = typeof galleryItem?.image === "string"
-          ? galleryItem.image
-          : galleryItem?.image?.id
+        const imageId = typeof galleryItem?.image === "object" && galleryItem.image
+          ? galleryItem.image.id
+          : String(galleryItem?.image || "")
+          
         if (imageId && mediaData[imageId]) {
           const mediaObj = { ...mediaData[imageId] }
           if (galleryItem.enableLink) {
@@ -430,7 +431,7 @@ function extractAdvantageItemsAfterMarker(
     // 处理 carousel 类型 - slides 数组
     if (node.type === "carousel" && node.data?.slides) {
       for (const slide of node.data.slides) {
-        const imageId = typeof slide.image === "string" ? slide.image : slide.image?.id
+        const imageId = typeof slide.image === "object" && slide.image ? slide.image.id : String(slide.image || "")
         items.push({
           title: slide.title || "",
           description: slide.description || "",
@@ -466,7 +467,7 @@ function extractAdvantageItemsAfterMarker(
     // 查找图片并关联到对应的item（备用方案）
     if (node.type === "singleImage" && node.data?.image && items.length > 0) {
       const image = node.data.image
-      const imageId = typeof image === "string" ? image : image?.id
+      const imageId = typeof image === "object" && image ? image.id : String(image || "")
       if (imageId && mediaData[imageId]) {
         for (let k = items.length - 1; k >= 0; k--) {
           if (!items[k].image) {

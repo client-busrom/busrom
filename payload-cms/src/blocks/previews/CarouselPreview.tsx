@@ -12,6 +12,10 @@ interface CarouselPreviewProps {
         id: string
         url: string
         alt?: string
+        sizes?: {
+          thumbnail?: { url: string }
+          card?: { url: string }
+        }
       }
       caption?: string
     }>
@@ -52,7 +56,7 @@ export const CarouselPreview: React.FC<CarouselPreviewProps> = ({ data }) => {
       >
         {slides[0]?.image?.url ? (
           <img
-            src={slides[0].image.url}
+            src={slides[0].image.sizes?.card?.url || slides[0].image.sizes?.thumbnail?.url || slides[0].image.url}
             alt={slides[0].image.alt || slides[0].caption || 'Slide'}
             style={{
               width: '100%',

@@ -24,6 +24,10 @@ interface FooterApiData {
     afterSales: string;
     whatsappLabel: string;
     whatsapp: string;
+    addressLabel?: string;
+    address?: string;
+    workingHoursLabel?: string;
+    workingHours?: string;
   };
   notice: {
     title: string;
@@ -136,23 +140,21 @@ export default function Footer({ locale, showForm = true }: Props) {
   // Footer API data (for non-home pages)
   const [footerData, setFooterData] = useState<FooterApiData | null>(null);
 
-  // Fetch footer data from API (for non-home pages)
+  // Fetch footer data from API (always, for both home and subpages)
   useEffect(() => {
-    if (!showForm) {
-      const fetchFooterData = async () => {
-        try {
-          const response = await fetch(`/api/footer?locale=${locale}`);
-          if (response.ok) {
-            const data = await response.json();
-            setFooterData(data);
-          }
-        } catch (error) {
-          console.error('Failed to fetch footer data:', error);
+    const fetchFooterData = async () => {
+      try {
+        const response = await fetch(`/api/footer?locale=${locale}`);
+        if (response.ok) {
+          const data = await response.json();
+          setFooterData(data);
         }
-      };
-      fetchFooterData();
-    }
-  }, [locale, showForm]);
+      } catch (error) {
+        console.error('Failed to fetch footer data:', error);
+      }
+    };
+    fetchFooterData();
+  }, [locale]);
 
   // Site logo URL from SiteConfig
   const [siteLogoUrl, setSiteLogoUrl] = useState<string | null>(null);
@@ -318,11 +320,44 @@ export default function Footer({ locale, showForm = true }: Props) {
                 />
               </div>
 
-              {/* 联系信息 */}
+              {/* 联系信息 - 使用 API 数据，fallback 到 mock 数据 */}
               <ul className="font-anaheim font-medium text-brand-text-inverse text-sm md:text-base lg:text-lg space-y-0.5 md:space-y-1 leading-relaxed mb-4 md:mb-6">
-                <li>Email: {content.contact.email}</li>
-                <li>After-sales: {content.contact.afterSales}</li>
-                <li>WhatsApp: {content.contact.whatsapp}</li>
+                {(footerData?.contact?.email || content.contact.email) && (
+                  <li>
+                    {(footerData?.contact?.emailLabel || content.contact.emailLabel) && (
+                      <span>{footerData?.contact?.emailLabel || content.contact.emailLabel} </span>
+                    )}
+                    {footerData?.contact?.email || content.contact.email}
+                  </li>
+                )}
+                {(footerData?.contact?.afterSales || content.contact.afterSales) && (
+                  <li>
+                    {(footerData?.contact?.afterSalesLabel || content.contact.afterSalesLabel) && (
+                      <span>{footerData?.contact?.afterSalesLabel || content.contact.afterSalesLabel} </span>
+                    )}
+                    {footerData?.contact?.afterSales || content.contact.afterSales}
+                  </li>
+                )}
+                {(footerData?.contact?.whatsapp || content.contact.whatsapp) && (
+                  <li>
+                    {(footerData?.contact?.whatsappLabel || content.contact.whatsappLabel) && (
+                      <span>{footerData?.contact?.whatsappLabel || content.contact.whatsappLabel} </span>
+                    )}
+                    {footerData?.contact?.whatsapp || content.contact.whatsapp}
+                  </li>
+                )}
+                {(footerData?.contact?.address) && (
+                  <li>
+                    {footerData.contact.addressLabel && <span>{footerData.contact.addressLabel} </span>}
+                    {footerData.contact.address}
+                  </li>
+                )}
+                {(footerData?.contact?.workingHours) && (
+                  <li>
+                    {footerData.contact.workingHoursLabel && <span>{footerData.contact.workingHoursLabel} </span>}
+                    {footerData.contact.workingHours}
+                  </li>
+                )}
               </ul>
 
               {/* 官方声明 */}
@@ -525,6 +560,18 @@ export default function Footer({ locale, showForm = true }: Props) {
                   <a href={`https://wa.me/${footerData.contact.whatsapp.replace(/[^0-9]/g, '')}`} className="hover:text-brand-primary transition-colors">
                     {footerData.contact.whatsapp}
                   </a>
+                </li>
+              )}
+              {footerData.contact.address && (
+                <li>
+                  {footerData.contact.addressLabel && <span className="font-semibold">{footerData.contact.addressLabel} </span>}
+                  {footerData.contact.address}
+                </li>
+              )}
+              {footerData.contact.workingHours && (
+                <li>
+                  {footerData.contact.workingHoursLabel && <span className="font-semibold">{footerData.contact.workingHoursLabel} </span>}
+                  {footerData.contact.workingHours}
                 </li>
               )}
             </ul>

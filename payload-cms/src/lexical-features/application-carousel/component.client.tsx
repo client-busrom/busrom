@@ -543,7 +543,7 @@ interface ApplicationPickerModalProps {
   selectedIds: string[]
 }
 
-const ApplicationPickerModal: React.FC<ApplicationPickerModalProps> = ({ isOpen, onClose, onSelect, selectedIds }) => {
+export const ApplicationPickerModal: React.FC<ApplicationPickerModalProps> = ({ isOpen, onClose, onSelect, selectedIds }) => {
   const { i18n } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
   const [allApplications, setAllApplications] = useState<Application[]>([])

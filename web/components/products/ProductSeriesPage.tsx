@@ -20,7 +20,7 @@ interface ProductSeriesData {
   order: number
   status: string
   contentTranslation: any
-  mediaUrls: Record<string, string>
+  mediaData: Record<string, any>
   reusableBlocks: Record<string, any>
   locale: string
 }
@@ -64,11 +64,11 @@ export function ProductSeriesPage({ locale, slug }: ProductSeriesPageProps) {
   const parsedContent = useMemo<ParsedProductSeriesContent>(() => {
     if (!seriesData?.contentTranslation) return {}
 
-    // Build media map from mediaUrls
-    const mediaMap = new Map<string, string>()
-    if (seriesData.mediaUrls) {
-      Object.entries(seriesData.mediaUrls).forEach(([id, url]) => {
-        mediaMap.set(id, url)
+    // Build media map from mediaData (full objects)
+    const mediaMap = new Map<string, any>()
+    if (seriesData.mediaData) {
+      Object.entries(seriesData.mediaData).forEach(([id, data]) => {
+        mediaMap.set(id, data)
       })
     }
 

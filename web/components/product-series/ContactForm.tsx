@@ -253,7 +253,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
           <OptimizedImage
             image={currentImages[0]}
             alt=""
-            size="small"
+            size="thumbnail"
             className="absolute inset-0 w-full h-full object-cover"
           />
           {/* Mask overlay - brand color */}
@@ -292,7 +292,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
           <OptimizedImage
             image={currentImages[1]}
             alt=""
-            size="small"
+            size="thumbnail"
             className="absolute inset-0 w-full h-full object-cover"
           />
           {/* Mask overlay - brand color */}

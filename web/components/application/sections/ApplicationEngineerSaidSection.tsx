@@ -156,7 +156,7 @@ export function ApplicationEngineerSaidSection({
         <Link
           href={ctaHref || "/about"}
           className="absolute group overflow-visible"
-          style={{ left: vw(1013), top: vw(442), width: vw(165), height: vw(165) }}
+          style={{ left: vw(1013), top: vw(442), width: vw(165), height: vw(165), zIndex: 30 }}
         >
           {/* 1. Underlying Black Arrow (Visible only outside the black circle) */}
           <div
@@ -201,16 +201,19 @@ export function ApplicationEngineerSaidSection({
 
             {/* "Explore More" Text (Inside circle) */}
             <span
-              className="absolute text-white whitespace-pre-line block"
+              className="absolute whitespace-pre-line block"
               style={{
-                left: vw(60),
+                color: '#FFFFFF',
+                left: vw(65),
                 top: '50%',
                 transform: 'translateY(-50%)',
-                fontSize: vw(28),
-                lineHeight: vw(24),
+                fontSize: vw(24),
+                lineHeight: vw(28),
                 fontFamily: 'var(--font-anaheim), sans-serif',
               }}
-            >{`Explore\nMore`}</span>
+            >
+              {ctaText}
+            </span>
           </div>
         </Link>
 

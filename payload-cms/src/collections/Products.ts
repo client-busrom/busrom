@@ -18,11 +18,11 @@ export const Products: CollectionConfig = {
   labels: {
     singular: {
       en: 'Product Detail Page',
-      zh: '产品详情整合页',
+      zh: '产品链接整合页',
     },
     plural: {
       en: 'Product Detail Pages',
-      zh: '产品详情整合页',
+      zh: '产品链接整合页',
     },
   },
   admin: {
@@ -217,7 +217,7 @@ export const Products: CollectionConfig = {
               relationTo: 'product-templates',
               label: {
                 en: 'Content Template',
-                zh: '关联产品详情模版页',
+                zh: '关联产品链接模版页',
               },
               filterOptions: ({ data }) => {
                 if (data?.category) {
@@ -232,7 +232,7 @@ export const Products: CollectionConfig = {
               admin: {
                 description: {
                   en: 'Select the rich text content template for this product (filtered by category)',
-                  zh: '为该产品选择关联的详情内容模版页（根据分类自动筛选）',
+                  zh: '为该产品选择关联的链接内容模版页（根据分类自动筛选）',
                 },
               },
             },
@@ -278,7 +278,7 @@ export const Products: CollectionConfig = {
               admin: {
                 description: {
                   en: 'Product detail page images (gallery with hover carousel)',
-                  zh: '产品详情页图片（图库轮播）',
+                  zh: '产品链接页图片（图库轮播）',
                 },
                 components: {
                   Field: '@/components/fields/MediaPicker',

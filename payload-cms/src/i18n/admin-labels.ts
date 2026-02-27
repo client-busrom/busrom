@@ -86,7 +86,7 @@ export const LABELS = {
   isSystem: { en: 'System Page', zh: '系统页面' },
   publishedAt: { en: 'Published At', zh: '发布时间' },
   category: { en: 'Category', zh: '分类' },
-  categories: { en: 'Categories', zh: '分类' },
+  categories: { en: 'Categories', zh: '分类管理' },
 
   // Tabs
   tabBasicInfo: { en: 'Basic Info', zh: '基本信息' },
@@ -164,7 +164,7 @@ export const DESCRIPTIONS = {
   },
   mainImages: {
     en: 'Product detail page images (gallery with hover carousel)',
-    zh: '产品详情页图片（图库轮播）',
+    zh: '产品链接页图片（图库轮播）',
   },
   featuredImage: {
     en: 'Main image for this series',
@@ -329,8 +329,8 @@ export const COLLECTION_LABELS = {
     plural: { en: 'Applications', zh: '应用案例' },
   },
   categories: {
-    singular: { en: 'Category', zh: '分类' },
-    plural: { en: 'Categories', zh: '分类' },
+    singular: { en: 'Category', zh: '分类管理' },
+    plural: { en: 'Categories', zh: '分类管理' },
   },
   media: {
     singular: { en: 'Media', zh: '媒体' },

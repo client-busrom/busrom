@@ -155,12 +155,30 @@ export const Footer: GlobalConfig = {
                   },
                 },
                 {
+                  name: 'addressLabel',
+                  type: 'textarea',
+                  localized: true,
+                  label: {
+                    en: 'Address Label',
+                    zh: '地址标签',
+                  },
+                },
+                {
                   name: 'address',
                   type: 'textarea',
                   localized: true,
                   label: {
                     en: 'Address',
                     zh: '地址',
+                  },
+                },
+                {
+                  name: 'workingHoursLabel',
+                  type: 'textarea',
+                  localized: true,
+                  label: {
+                    en: 'Working Hours Label',
+                    zh: '工作时间标签',
                   },
                 },
                 {

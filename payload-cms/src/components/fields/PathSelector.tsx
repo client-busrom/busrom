@@ -242,7 +242,7 @@ export const PathSelectorField: TextFieldClientComponent = (props) => {
 function getFallbackOptions(isPattern: boolean): PathOption[] {
   if (isPattern) {
     return [
-      { label: '所有产品详情', value: '/products/*', isPattern: true },
+      { label: '所有产品链接', value: '/products/*', isPattern: true },
       { label: '所有商品详情', value: '/shop/*', isPattern: true },
       { label: '所有博客文章', value: '/blog/*', isPattern: true },
       { label: '所有服务页面', value: '/service/*', isPattern: true },
