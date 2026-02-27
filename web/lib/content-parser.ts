@@ -944,7 +944,18 @@ function parseContactForm(
     if (node.type === 'block' && 'fields' in node) {
       const blockNode = node as { type: 'block'; fields: { mainContent?: { root?: { children?: LexicalNode[] } } } }
       const mainContentChildren = blockNode.fields?.mainContent?.root?.children || []
+      let blockField: string | null = null
       for (const child of mainContentChildren) {
+        // Check for field markers inside the block
+        if (child.type === 'paragraph') {
+          const text = extractText(child).trim()
+          if (text === 'contact-form-title' || text === 'contact-form-helper' ||
+              text === 'contact-form-images' || text === 'contact-form-image' || text === 'contact-form-bg-image') {
+            blockField = text
+            continue
+          }
+        }
+
         // Extract title from h1
         if (child.type === 'heading' && (child as LexicalHeadingNode).tag === 'h1') {
           title = extractText(child)
@@ -953,19 +964,23 @@ function parseContactForm(
         if (child.type === 'heading' && (child as LexicalHeadingNode).tag === 'h2') {
           helperTitle = extractText(child)
         }
-        // Extract helper text from paragraph (skip empty ones)
+        // Extract helper text from paragraph (only if not a marker and current field is helper)
         if (child.type === 'paragraph') {
           const text = extractText(child).trim()
-          if (text) {
+          // If we're in helper section or no section yet, and not a marker, treat as helper text
+          if (text && (!blockField || blockField === 'contact-form-helper')) {
             helperText = text
           }
         }
         // Extract product images
         if (child.type === 'custom-image-gallery') {
-          const gallery = child as LexicalImageGalleryNode
-          for (const img of gallery.data.images) {
-            const url = mediaMap.get(img.image) || `/api/media/${img.image}`
-            productImages.push(url)
+          // If a marker was used, only use this gallery if it's the images marker
+          if (blockField === 'contact-form-images' || blockField === 'contact-form-image' || !blockField) {
+            const gallery = child as LexicalImageGalleryNode
+            for (const img of gallery.data.images) {
+              const url = mediaMap.get(img.image) || `/api/media/${img.image}`
+              productImages.push(url)
+            }
           }
         }
       }
