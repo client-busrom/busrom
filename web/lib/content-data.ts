@@ -330,6 +330,10 @@ export interface FooterContactInfo {
   afterSales: string
   whatsappLabel: string
   whatsapp: string
+  addressLabel?: string
+  address?: string
+  workingHoursLabel?: string
+  workingHours?: string
 }
 
 export interface FooterNotice {

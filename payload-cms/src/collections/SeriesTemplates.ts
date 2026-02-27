@@ -9,7 +9,7 @@ export const SeriesTemplates: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'updatedAt'],
-    group: { en: 'Product Center', zh: '产品中心' },
+    group: { en: 'Product Center', zh: '产品管理' },
   },
   access: {
     read: () => true,

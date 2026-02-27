@@ -2,7 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
-import { Fredericka_the_Great, Amiri } from "next/font/google";
+import { Fredericka_the_Great, Amiri, Black_Han_Sans, Berkshire_Swash } from "next/font/google";
 import dynamic from "next/dynamic";
 import "../globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -171,6 +171,22 @@ const amiri = Amiri({
   preload: false,
 });
 
+const blackHanSans = Black_Han_Sans({
+  weight: "400",
+  variable: "--font-black-han-sans",
+  display: "swap",
+  subsets: ["latin"],
+  preload: false,
+});
+
+const berkshireSwash = Berkshire_Swash({
+  weight: "400",
+  variable: "--font-berkshire",
+  display: "swap",
+  subsets: ["latin"],
+  preload: false,
+});
+
 export function generateStaticParams() {
   // 动态生成所有支持的 locale 参数
   return locales.map(locale => ({ locale }));
@@ -244,6 +260,8 @@ export default async function RootLayout({
       ${orbitron.variable}
       ${frederickaTheGreat.variable}
       ${amiri.variable}
+      ${blackHanSans.variable}
+      ${berkshireSwash.variable}
       font-sans
     `}
     >

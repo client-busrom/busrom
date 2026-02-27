@@ -682,36 +682,36 @@ export const homeContentHandler: PayloadHandler = async (req) => {
       footer: footer?.status === 'published' ? {
         status: footer?.status,
         form: {
-          title: footer?.formTitle,
+          title: footer?.formConfig?.displayName || '',
           placeholders: {
-            name: footer?.formPlaceholderName,
-            email: footer?.formPlaceholderEmail,
-            message: footer?.formPlaceholderMessage,
+            name: footer?.formConfig?.fields?.find((f: any) => f.fieldName === 'name')?.placeholder || '',
+            email: footer?.formConfig?.fields?.find((f: any) => f.fieldName === 'email')?.placeholder || '',
+            message: footer?.formConfig?.fields?.find((f: any) => f.fieldName === 'message')?.placeholder || '',
           },
-          buttonText: footer?.submitButtonText,
+          buttonText: footer?.formConfig?.submitButtonText || '',
         },
         contact: {
-          title: footer?.contactTitle,
-          address: footer?.address,
-          workingHours: footer?.workingHours,
-          // New fields
-          emailLabel: footer?.contactEmailLabel,
-          email: footer?.contactEmail || footer?.email, // Fallback to old field
-          afterSalesLabel: footer?.afterSalesLabel,
-          afterSales: footer?.afterSalesEmail || footer?.phone, // Fallback to old field
-          whatsappLabel: footer?.whatsappLabel,
-          whatsapp: footer?.whatsappNumber || footer?.whatsapp, // Fallback to old field
+          title: footer?.contactInfoGroup?.contactTitle,
+          addressLabel: footer?.contactInfoGroup?.addressLabel,
+          address: footer?.contactInfoGroup?.address,
+          workingHoursLabel: footer?.contactInfoGroup?.workingHoursLabel,
+          workingHours: footer?.contactInfoGroup?.workingHours,
+          emailLabel: footer?.contactInfoGroup?.contactEmailLabel,
+          email: footer?.contactInfoGroup?.contactEmail,
+          afterSalesLabel: footer?.contactInfoGroup?.afterSalesLabel,
+          afterSales: footer?.contactInfoGroup?.afterSalesEmail,
+          whatsappLabel: footer?.contactInfoGroup?.whatsappLabel,
+          whatsapp: footer?.contactInfoGroup?.whatsappNumber,
         },
         notice: {
-          title: footer?.officialNoticeTitle,
+          title: footer?.officialNoticeGroup?.officialNoticeTitle,
           // Support multi-line notice
           lines: [
-            footer?.officialNoticeLine1,
-            footer?.officialNoticeLine2,
-            footer?.officialNoticeLine3,
-            footer?.officialNoticeLine4,
+            footer?.officialNoticeGroup?.officialNoticeLine1,
+            footer?.officialNoticeGroup?.officialNoticeLine2,
+            footer?.officialNoticeGroup?.officialNoticeLine3,
+            footer?.officialNoticeGroup?.officialNoticeLine4,
           ].filter(Boolean),
-          text: footer?.officialNoticeText, // Legacy field
         },
         copyright: footer?.copyrightText,
         socialLinks: footer?.socialLinks || [],

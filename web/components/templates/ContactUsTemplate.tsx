@@ -88,7 +88,7 @@ function extractImageAfterMarker(
   for (const node of nodesAfterMarker) {
     if (node.type === "singleImage" && node.data?.image) {
       const image = node.data.image
-      const imageId = typeof image === "string" ? image : image?.id
+      const imageId = typeof image === "object" && image ? image.id : String(image || "")
       if (imageId && mediaData[imageId]) {
         const mediaObj = { ...mediaData[imageId] }
         if (node.data.enableLink) {
@@ -352,7 +352,7 @@ export function ContactUsTemplate({ locale, pageContent }: ContactUsTemplateProp
       // 单张图片
       if (node.type === "singleImage" && node.data?.image) {
         const image = node.data.image
-        const imageId = typeof image === "string" ? image : image?.id
+        const imageId = typeof image === "object" && image ? image.id : String(image || "")
         if (imageId && mediaData[imageId]) {
           const mediaObj = { ...mediaData[imageId] }
           if (node.data.enableLink) {
@@ -366,7 +366,7 @@ export function ContactUsTemplate({ locale, pageContent }: ContactUsTemplateProp
       // 自定义图片画廊
       if (node.type === "custom-image-gallery" && node.data?.images) {
         for (const galleryItem of node.data.images) {
-          const imageId = typeof galleryItem?.image === "string" ? galleryItem.image : galleryItem?.image?.id
+          const imageId = typeof galleryItem?.image === "object" && galleryItem.image ? galleryItem.image.id : String(galleryItem?.image || "")
           if (imageId && mediaData[imageId]) {
             const mediaObj = { ...mediaData[imageId] }
             if (galleryItem.enableLink) {
@@ -568,7 +568,7 @@ export function ContactUsTemplate({ locale, pageContent }: ContactUsTemplateProp
       // 单张图片
       if (node.type === "singleImage" && node.data?.image) {
         const image = node.data.image
-        const imageId = typeof image === "string" ? image : image?.id
+        const imageId = typeof image === "object" && image ? image.id : String(image || "")
         if (imageId && mediaData[imageId]) {
           const mediaObj = { ...mediaData[imageId] }
           if (node.data.enableLink) {
@@ -582,7 +582,7 @@ export function ContactUsTemplate({ locale, pageContent }: ContactUsTemplateProp
       // 自定义图片画廊
       if (node.type === "custom-image-gallery" && node.data?.images) {
         for (const galleryItem of node.data.images) {
-          const imageId = typeof galleryItem?.image === "string" ? galleryItem.image : galleryItem?.image?.id
+          const imageId = typeof galleryItem?.image === "object" && galleryItem.image ? galleryItem.image.id : String(galleryItem?.image || "")
           if (imageId && mediaData[imageId]) {
             const mediaObj = { ...mediaData[imageId] }
             if (galleryItem.enableLink) {

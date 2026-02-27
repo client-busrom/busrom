@@ -8,7 +8,7 @@ export const SeriesReusableBlocks: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'slug',
-    group: { en: 'Product Center', zh: '产品中心' },
+    group: { en: 'Product Center', zh: '产品管理' },
     defaultColumns: ['slug', 'title', 'status', 'updatedAt'],
   },
   access: {

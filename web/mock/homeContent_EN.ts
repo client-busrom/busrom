@@ -245,6 +245,10 @@ interface FooterContactInfo {
   afterSales: string;
   whatsappLabel: string;
   whatsapp: string;
+  addressLabel?: string;
+  address?: string;
+  workingHoursLabel?: string;
+  workingHours?: string;
 }
 
 interface FooterNotice {
@@ -1281,6 +1285,10 @@ export const homeContent_EN: HomeContentData = {
       afterSales: 'support@busromhouse.com',
       whatsappLabel: 'WhatsApp',
       whatsapp: '+86 13426931306',
+      addressLabel: 'Address',
+      address: 'Industrial Zone, Shunde, Foshan, Guangdong, China',
+      workingHoursLabel: 'Working Hours',
+      workingHours: 'Mon - Fri: 9:00 AM - 6:00 PM (GMT+8)',
     },
     notice: {
       title: 'Official Notice',

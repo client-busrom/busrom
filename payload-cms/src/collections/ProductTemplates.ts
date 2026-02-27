@@ -5,11 +5,11 @@ export const ProductTemplates: CollectionConfig = {
   labels: {
     singular: {
       en: 'Product Detail Template',
-      zh: '产品详情模版页',
+      zh: '产品链接模版页',
     },
     plural: {
       en: 'Product Detail Templates',
-      zh: '产品详情模版页',
+      zh: '产品链接模版页',
     },
   },
   admin: {
@@ -73,7 +73,7 @@ export const ProductTemplates: CollectionConfig = {
       admin: {
         description: {
           en: 'Rich text content for product details',
-          zh: '用于产品详情的富文本内容',
+          zh: '用于产品链接的富文本内容',
         },
         components: {
           beforeInput: ['@/components/fields/MultiLocaleRichTextField'],

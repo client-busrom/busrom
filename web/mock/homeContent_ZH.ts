@@ -245,6 +245,10 @@ interface FooterContactInfo {
   afterSales: string;
   whatsappLabel: string;
   whatsapp: string;
+  addressLabel?: string;
+  address?: string;
+  workingHoursLabel?: string;
+  workingHours?: string;
 }
 
 interface FooterNotice {
@@ -1179,6 +1183,10 @@ export const homeContent_ZH: HomeContentData = {
       afterSales: 'support@busromhouse.com',
       whatsappLabel: 'WhatsApp',
       whatsapp: '+86 13426931306',
+      addressLabel: '地址',
+      address: '中国广东省佛山市顺德工业区',
+      workingHoursLabel: '工作时间',
+      workingHours: '周一至周五: 9:00 AM - 6:00 PM (GMT+8)',
     },
     notice: {
       title: '官方声明',

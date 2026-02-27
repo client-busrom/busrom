@@ -19,7 +19,9 @@ import React from 'react'
 
 export interface ImageGalleryData {
   images: Array<{
+    sourceType?: 'media' | 'application'  // default: 'media'
     image: string | { id: string }
+    application?: string | { id: string }  // application ID when sourceType is 'application'
     caption?: string
     enableLink?: boolean
     linkUrl?: string

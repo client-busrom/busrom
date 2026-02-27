@@ -234,7 +234,7 @@ export const ProductReusableBlockComponent: React.FC<ProductReusableBlockCompone
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: '#1e293b' }}>
-            {t('Edit Product Block', '编辑产品详情块')}
+            {t('Edit Product Block', '编辑产品链接块')}
           </h4>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
@@ -356,7 +356,7 @@ export const ProductReusableBlockComponent: React.FC<ProductReusableBlockCompone
             <div style={{ padding: '20px', textAlign: 'center', color: '#6b7280', fontSize: '13px' }}>
               {hasFilters
                 ? t('No blocks match the filters', '没有匹配筛选条件的区块')
-                : t('No product blocks available', '没有可用的产品详情块')
+                : t('No product blocks available', '没有可用的产品链接块')
               }
             </div>
           ) : (
@@ -510,7 +510,7 @@ export const ProductReusableBlockComponent: React.FC<ProductReusableBlockCompone
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
             <div style={{ fontSize: '14px', fontWeight: 600, color: '#1e293b' }}>
-              {t('Product Detail Block', '产品详情块')}
+              {t('Product Detail Block', '产品链接块')}
             </div>
             {selectedBlock && (
               <a
@@ -581,8 +581,8 @@ export const ProductReusableBlockComponent: React.FC<ProductReusableBlockCompone
           ) : (
             <div style={{ fontSize: '13px', color: '#ef4444', padding: '8px 0' }}>
               {blockId
-                ? `⚠️ ${t('Product block not found', '产品详情块未找到')}`
-                : `⚠️ ${t('No product block selected', '未选择产品详情块')}`
+                ? `⚠️ ${t('Product block not found', '产品链接块未找到')}`
+                : `⚠️ ${t('No product block selected', '未选择产品链接块')}`
               }
             </div>
           )}

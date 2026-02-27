@@ -35,6 +35,10 @@ export async function GET(request: NextRequest) {
         afterSales: data.contactInfoGroup?.afterSalesEmail || '',
         whatsappLabel: data.contactInfoGroup?.whatsappLabel || 'WhatsApp: ',
         whatsapp: data.contactInfoGroup?.whatsappNumber || '',
+        addressLabel: data.contactInfoGroup?.addressLabel || (locale === 'zh' ? '地址: ' : 'Address: '),
+        address: data.contactInfoGroup?.address || '',
+        workingHoursLabel: data.contactInfoGroup?.workingHoursLabel || (locale === 'zh' ? '工作时间: ' : 'Working Hours: '),
+        workingHours: data.contactInfoGroup?.workingHours || '',
       },
       notice: {
         title: data.officialNoticeGroup?.officialNoticeTitle || 'Official Notice',

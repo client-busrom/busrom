@@ -13,6 +13,10 @@ interface SingleImagePreviewProps {
       alt?: string
       width?: number
       height?: number
+      sizes?: {
+        thumbnail?: { url: string }
+        card?: { url: string }
+      }
     }
     caption?: string
     alignment?: 'left' | 'center' | 'right'
@@ -50,7 +54,7 @@ export const SingleImagePreview: React.FC<SingleImagePreviewProps> = ({ data }) 
     <div style={{ textAlign: alignment, margin: '1rem 0' }}>
       <div style={{ display: 'inline-block', ...sizeStyles[size] }}>
         <img
-          src={image.url}
+          src={image.sizes?.card?.url || image.sizes?.thumbnail?.url || image.url}
           alt={image.alt || caption || 'Image'}
           style={{
             width: '100%',

@@ -9,8 +9,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $getNodeByKey } from 'lexical'
-import { ZoomIn, GripVertical, X, Image as ImageIcon, Plus, Trash2, Grid, List, Link as LinkIcon } from 'lucide-react'
+import { ZoomIn, GripVertical, X, Image as ImageIcon, Plus, Trash2, Grid, List, Link as LinkIcon, Layers } from 'lucide-react'
 import { useTranslation } from '@payloadcms/ui'
+import { ApplicationPickerModal } from '../application-carousel/component.client'
 import {
   DndContext,
   closestCenter,
@@ -114,6 +115,9 @@ const getTranslation = (key: string, t: any, i18n: any) => {
       linkUrlPlaceholder: '输入链接地址',
       openInNewTab: '新标签页打开',
       selectInternalLink: '选择站内链接',
+      addFromApplication: '从案例图集添加',
+      applicationSource: '案例图集',
+      randomImage: '随机图片',
     },
     en: {
       title: 'Image Gallery',
@@ -188,6 +192,9 @@ const getTranslation = (key: string, t: any, i18n: any) => {
       enableLink: 'Enable Link',
       linkUrl: 'Link URL',
       linkUrlPlaceholder: 'Enter link URL',
+      addFromApplication: 'Add from Application',
+      applicationSource: 'Application',
+      randomImage: 'Random image from app',
       openInNewTab: 'Open in New Tab',
       selectInternalLink: 'Select internal link',
     }
@@ -1658,6 +1665,10 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
+  // Application picker 状态
+  const [showAppPicker, setShowAppPicker] = useState(false)
+  const [appCache, setAppCache] = useState<Record<string, any>>({})
+
   // 拖拽传感器
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -1735,6 +1746,46 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
     }
 
     loadImageInfo()
+  }, [data.images])
+
+  // 加载 application 名称（仅用于显示标签，不加载图片）
+  useEffect(() => {
+    const loadAppNames = async () => {
+      const appItems = data.images.filter((img: any) => img.sourceType === 'application' && img.application)
+      const appIds = appItems.map((img: any) => {
+        const appRef = img.application
+        return typeof appRef === 'object' && appRef ? appRef.id : String(appRef)
+      }).filter((id: any) => id && !appCache[String(id)]) as string[]
+
+      if (appIds.length === 0) return
+
+      try {
+        const results = await Promise.all(
+          appIds.map(async (id) => {
+            try {
+              const res = await fetch(`/api/applications/${id}?depth=0`)
+              if (res.ok) {
+                const appData = await res.json()
+                return { id: String(id), name: appData.name || appData.slug || String(id) }
+              }
+            } catch {}
+            return { id: String(id), name: String(id) }
+          })
+        )
+
+        const newAppCache: Record<string, any> = { ...appCache }
+        results.forEach(result => {
+          if (result) {
+            newAppCache[result.id] = { name: result.name }
+          }
+        })
+        setAppCache(newAppCache)
+      } catch (error) {
+        console.error('Failed to load application names:', error)
+      }
+    }
+
+    loadAppNames()
   }, [data.images])
 
   // 保存编辑
@@ -1848,6 +1899,21 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
   const openLinkPickerForImage = (index: number) => {
     setLinkPickerImageIndex(index)
     setShowLinkPicker(true)
+  }
+
+  // 添加 Application 源的图片
+  const handleAddApplicationItems = (selectedIds: string[]) => {
+    const newItems = selectedIds.map(id => ({
+      sourceType: 'application' as const,
+      image: '',
+      application: id,
+      caption: '',
+    }))
+    setFormData({
+      ...formData,
+      images: [...formData.images, ...newItems],
+    })
+    setShowAppPicker(false)
   }
 
   // 链接选择回调
@@ -2035,20 +2101,45 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
                 {getTranslation('addImage', t, i18n)}（{formData.images.length}{getTranslation('images', t, i18n)}）
               </div>
               {formData.images.map((item, index) => {
+                const isAppSource = item.sourceType === 'application'
                 const imageId = typeof item.image === 'string' ? item.image : item.image?.id || `temp-${index}`
+                const appId = isAppSource ? (typeof item.application === 'object' && item.application ? item.application.id : String(item.application)) : null
                 return (
                   <div
-                    key={`edit-image-${imageId}-${index}`}
+                    key={`edit-image-${isAppSource ? `app-${appId}` : imageId}-${index}`}
                     style={{
                       display: 'flex',
                       gap: '12px',
                       padding: '12px',
                       marginBottom: '8px',
-                      backgroundColor: '#f9fafb',
+                      backgroundColor: isAppSource ? '#f0f9ff' : '#f9fafb',
                       borderRadius: '4px',
-                      border: '1px solid #e5e7eb',
+                      border: isAppSource ? '1px solid #0ea5e9' : '1px solid #e5e7eb',
                     }}
                   >
+                  {isAppSource ? (
+                    /* Application source item preview */
+                    <div
+                      style={{
+                        width: '80px',
+                        height: '80px',
+                        backgroundColor: '#e0f2fe',
+                        borderRadius: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        border: '2px solid #0ea5e9',
+                        overflow: 'hidden',
+                        position: 'relative',
+                      }}
+                    >
+                      <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                          <Layers size={20} style={{ color: '#0ea5e9' }} />
+                          <span style={{ fontSize: '9px', color: '#0ea5e9' }}>{getTranslation('randomImage', t, i18n)}</span>
+                        </div>
+                    </div>
+                  ) : (
                   <div
                     onClick={() => setEditingImageIndex(index)}
                     style={{
@@ -2106,7 +2197,14 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
                       </div>
                     )}
                   </div>
+                  )}
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {isAppSource && appId && (
+                      <div style={{ fontSize: '12px', color: '#0ea5e9', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Layers size={12} />
+                        {appCache[appId]?.name || appId}
+                      </div>
+                    )}
                     <input
                       type="text"
                       placeholder={getTranslation('imageCaption', t, i18n)}
@@ -2248,6 +2346,39 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
               {getTranslation('currentImages', t, i18n)} {formData.images.length} {getTranslation('images', t, i18n)}
             </div>
           </button>
+
+          {/* 从案例图集添加按钮 */}
+          <button
+            type="button"
+            onClick={() => setShowAppPicker(true)}
+            style={{
+              width: '100%',
+              padding: '20px',
+              backgroundColor: '#f0f9ff',
+              border: '2px dashed #0ea5e9',
+              borderRadius: '4px',
+              textAlign: 'center',
+              color: '#0ea5e9',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: 500,
+              transition: 'all 0.2s',
+              marginTop: '8px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#e0f2fe'
+              e.currentTarget.style.borderColor = '#0284c7'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#f0f9ff'
+              e.currentTarget.style.borderColor = '#0ea5e9'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+              <Layers size={16} />
+              {getTranslation('addFromApplication', t, i18n)}
+            </div>
+          </button>
         </div>
       ) : (
         <div
@@ -2288,19 +2419,22 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
             </div>
           ) : (
             data.images.map((item, index) => {
-              const imageData = item.image ? imageCache[item.image as string] : null
+              const isAppSource = item.sourceType === 'application'
+              const appId = isAppSource ? (typeof item.application === 'object' && item.application ? item.application.id : String(item.application)) : null
+              const imageData = !isAppSource && item.image ? imageCache[item.image as string] : null
               const imageId = typeof item.image === 'string' ? item.image : item.image?.id || `temp-${index}`
+              const hasPreview = imageData || isAppSource
               return (
                 <div
-                  key={`preview-image-${imageId}-${index}`}
-                  onClick={() => imageData && data.lightbox && openLightbox(index)}
+                  key={`preview-image-${isAppSource ? `app-${appId}` : imageId}-${index}`}
+                  onClick={() => hasPreview && data.lightbox && openLightbox(index)}
                   style={{
                     position: 'relative',
                     backgroundColor: '#f3f4f6',
                     borderRadius: '8px',
                     overflow: 'hidden',
-                    border: '1px solid #e5e7eb',
-                    cursor: imageData && data.lightbox ? 'pointer' : 'default',
+                    border: isAppSource ? '1px solid #0ea5e9' : '1px solid #e5e7eb',
+                    cursor: hasPreview && data.lightbox ? 'pointer' : 'default',
                     transition: 'transform 0.2s, box-shadow 0.2s',
                     // 瀑布流专用样式
                     ...(data.layout === 'masonry'
@@ -2316,19 +2450,57 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
                         }),
                   }}
                   onMouseEnter={(e) => {
-                    if (imageData && data.lightbox) {
+                    if (hasPreview && data.lightbox) {
                       e.currentTarget.style.transform = 'scale(1.02)'
                       e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)'
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (imageData && data.lightbox) {
+                    if (hasPreview && data.lightbox) {
                       e.currentTarget.style.transform = 'scale(1)'
                       e.currentTarget.style.boxShadow = 'none'
                     }
                   }}
                 >
-                  {imageData ? (
+                  {isAppSource ? (
+                    /* Application source placeholder - actual image resolved at frontend API */
+                    <div
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 50%, #e0f2fe 100%)',
+                        padding: '16px',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <Layers size={28} style={{ color: '#0ea5e9', marginBottom: '8px' }} />
+                      <div style={{ fontSize: '12px', fontWeight: 600, color: '#0284c7', marginBottom: '4px' }}>
+                        {appCache[appId!]?.name || `Application #${appId}`}
+                      </div>
+                      <div style={{ fontSize: '10px', color: '#0ea5e9', opacity: 0.8 }}>
+                        {getTranslation('randomImage', t, i18n)}
+                      </div>
+                      {item.caption && (
+                        <div style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)',
+                          color: 'white',
+                          padding: '12px 16px',
+                          fontSize: '13px',
+                          lineHeight: 1.4,
+                        }}>
+                          {item.caption}
+                        </div>
+                      )}
+                    </div>
+                  ) : imageData ? (
                     <>
                       <img
                         src={imageData.url}
@@ -2428,6 +2600,21 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
           isOpen={showLinkPicker}
           onClose={() => setShowLinkPicker(false)}
           onSelect={handleLinkSelect}
+        />
+      )}
+
+      {/* Application Picker 弹窗 */}
+      {showAppPicker && (
+        <ApplicationPickerModal
+          isOpen={showAppPicker}
+          onClose={() => setShowAppPicker(false)}
+          onSelect={handleAddApplicationItems}
+          selectedIds={
+            formData.images
+              .filter(img => img.sourceType === 'application' && img.application)
+              .map(img => typeof img.application === 'object' && img.application ? String(img.application.id) : String(img.application || ''))
+              .filter(Boolean)
+          }
         />
       )}
 

@@ -171,6 +171,7 @@ const config: Config = {
         'kaushan-script': ['var(--font-kaushan-script)', 'cursive'],
         'moul':            ['var(--font-moul)', 'sans-serif'],
         'orbitron':        ['var(--font-orbitron)', 'sans-serif'],
+        'berkshire-swash': ['var(--font-berkshire)', 'cursive'],
 
         // --- 系统字体 (直接使用名字) ---
         'arial':       ['Arial', 'sans-serif'],

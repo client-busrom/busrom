@@ -56,28 +56,6 @@ export const BrandAnalysis: GlobalConfig = {
       },
     },
 
-    // ==================================================================
-    // 🖼️ Background Image
-    // ==================================================================
-    {
-      name: 'backgroundImage',
-      type: 'upload',
-      relationTo: 'media',
-      label: {
-        en: 'Background Image',
-        zh: '背景图片',
-      },
-      admin: {
-        description: {
-          en: 'Background image for the Brand Analysis section',
-          zh: '品牌分析区块的背景图片',
-        },
-        components: {
-          Field: '@/components/fields/MediaPicker',
-        },
-      },
-    },
-
     // Brand Center
     {
       name: 'brandCenter',

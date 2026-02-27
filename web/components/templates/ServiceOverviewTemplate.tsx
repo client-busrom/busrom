@@ -92,9 +92,7 @@ function extractCarouselAfterMarker(
   for (const node of nodesAfterMarker) {
     if (node.type === "carousel" && node.data?.slides) {
       return node.data.slides.map((slide: any) => {
-        const imageId = typeof slide.image === "string"
-          ? slide.image
-          : slide.image?.id
+        const imageId = typeof slide.image === "object" && slide.image ? slide.image.id : String(slide.image || "")
 
         return {
           title: slide.title || "",
@@ -120,7 +118,7 @@ function extractImageAfterMarker(
   for (const node of nodesAfterMarker) {
     if (node.type === "singleImage" && node.data?.image) {
       const image = node.data.image
-      const imageId = typeof image === "string" ? image : image?.id
+      const imageId = typeof image === "object" && image ? image.id : String(image || "")
       if (imageId && mediaData[imageId]) {
         const mediaObj = { ...mediaData[imageId] }
         if (node.data.enableLink) {
@@ -147,7 +145,7 @@ function extractGalleryImagesAfterMarker(
   for (const node of nodesAfterMarker) {
     if (node.type === "custom-image-gallery" && node.data?.images) {
       for (const img of node.data.images) {
-        const imageId = typeof img.image === "string" ? img.image : img.image?.id
+        const imageId = typeof img.image === "object" && img.image ? img.image.id : String(img.image || "")
         if (imageId && mediaData[imageId]) {
           const mediaObj = { ...mediaData[imageId] }
           if (img.enableLink) {
@@ -238,7 +236,7 @@ function extractItemImages(
     if (node.type === "custom-image-gallery" && node.data?.images) {
       const images: MediaObject[] = []
       for (const img of node.data.images) {
-        const imageId = typeof img.image === "string" ? img.image : img.image?.id
+        const imageId = typeof img.image === "object" && img.image ? img.image.id : String(img.image || "")
         if (imageId && mediaData[imageId]) {
           const mediaObj = { ...mediaData[imageId] }
           if (img.enableLink) {

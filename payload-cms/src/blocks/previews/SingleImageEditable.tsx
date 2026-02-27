@@ -231,7 +231,7 @@ export const SingleImageEditable: React.FC<any> = (props) => {
         <div style={{ textAlign: alignment }}>
           <div style={{ display: 'inline-block', ...sizeStyles[size] }}>
             <img
-              src={image.url}
+              src={image.sizes?.card?.url || image.sizes?.thumbnail?.url || image.url}
               alt={image.alt || caption || 'Image'}
               style={{
                 width: '100%',

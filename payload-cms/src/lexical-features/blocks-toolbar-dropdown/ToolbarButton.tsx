@@ -709,7 +709,7 @@ export const ToolbarButton: React.FC = () => {
             <span>{i18n?.language === 'zh' ? '可复用块' : 'Reusable Block'}</span>
           </button>
 
-          {/* 产品详情块 - Custom Feature */}
+          {/* 产品链接块 - Custom Feature */}
           <button
             type="button"
             onClick={insertProductReusableBlock}
@@ -736,7 +736,7 @@ export const ToolbarButton: React.FC = () => {
             }}
           >
             <Package size={18} style={{ opacity: 0.7 }} />
-            <span>{i18n?.language === 'zh' ? '产品详情页复用块' : 'Product Detail Block'}</span>
+            <span>{i18n?.language === 'zh' ? '产品链接页复用块' : 'Product Detail Block'}</span>
           </button>
 
           {/* 产品详解页复用块 - Custom Feature */}

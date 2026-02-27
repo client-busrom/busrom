@@ -118,8 +118,8 @@ interface ContentTranslation {
 export interface HeroCarouselSlide {
   title: string[]  // Support multi-line titles (split by /n)
   description: string
-  backgroundImage: string
-  productImages: string[]
+  backgroundImage: any
+  productImages: any[]
   buttonText: string
   buttonLink: string
 }
@@ -133,7 +133,7 @@ export interface ProductOverviewData {
   subtitleLines: string[] // Last 2 lines (48px, black)
   brandName: string
   description: string
-  images: string[]
+  images: any[]
   ctaButton?: {
     text: string
     url: string
@@ -157,31 +157,31 @@ export interface AdvantageCategory {
 
 export interface CoreSellingPointsData {
   title: string
-  titleImages: string[]  // Draggable image list in title area
-  techSpecImages: string[]  // 2 images on the left of tech spec
+  titleImages: any[]  // Draggable image list in title area
+  techSpecImages: any[]  // 2 images on the left of tech spec
   techSpecTitle: string
   techSpecItems: TechSpecItem[]  // key-value pairs
   advantagesTitle: string
-  advantagesImages: string[]  // 4 images for 4 categories
+  advantagesImages: any[]  // 4 images for 4 categories
   advantagesCategories: AdvantageCategory[]  // 4 categories with expandable cards
 }
 
 export interface ApplicationsData {
-  images: string[]  // Array of application images for carousel
+  images: any[]  // Array of application images for carousel
 }
 
 export interface ContactFormData {
   title: string           // "Contact Us Get A Quote"
-  backgroundImage: string // Background image for the section
+  backgroundImage: any    // Background image for the section
   helperTitle: string     // "We'd love to hear from you!"
   helperText: string      // "Share your needs..."
-  productImages: string[] // Tilted product images on the left
+  productImages: any[]    // Tilted product images on the left
 }
 
 export interface MoreSeriesItem {
   name: string
   slug: string
-  image: string
+  image: any
   link: string
 }
 
@@ -191,7 +191,7 @@ export interface MoreSeriesData {
 }
 
 export interface QuoteData {
-  image: string           // Center image
+  image: any           // Center image
   quoteLeft: string       // Quote text on the left (white)
   quoteRight: string      // Quote text on the right (dark)
   ctaText: string         // CTA button text
@@ -258,13 +258,13 @@ function isQuoteMarker(node: LexicalNode, marker: string): boolean {
  */
 function parseHeroCarousel(
   nodes: LexicalNode[],
-  mediaMap: Map<string, string>
+  mediaMap: Map<string, any>
 ): HeroCarouselData | undefined {
   const titles: string[] = []
   const descriptions: string[] = []
-  const backgroundImages: string[] = []
+  const backgroundImages: any[] = []
   const productImageSets: Array<{
-    images: string[]
+    images: any[]
     buttonText: string
     buttonLink: string
   }> = []
@@ -339,13 +339,13 @@ function parseHeroCarousel(
  */
 function parseProductOverview(
   nodes: LexicalNode[],
-  mediaMap: Map<string, string>
+  mediaMap: Map<string, any>
 ): ProductOverviewData | undefined {
   let titleLines: string[] = []
   let subtitleLines: string[] = []
   let brandName = ''
   let description = ''
-  const images: string[] = []
+  const images: any[] = []
   let ctaButton: { text: string; url: string } | undefined
 
   for (const node of nodes) {
@@ -463,7 +463,7 @@ function splitIntoSections(nodes: LexicalNode[]): Map<string, LexicalNode[]> {
  */
 export function parseContentTranslation(
   contentTranslation: ContentTranslation | null | undefined,
-  mediaMap: Map<string, string> = new Map(),
+  mediaMap: Map<string, any> = new Map(),
   reusableBlocksMap: Map<string, any> = new Map()
 ): ParsedProductSeriesContent {
   if (!contentTranslation?.root?.children) {
@@ -525,16 +525,16 @@ export function parseContentTranslation(
  */
 function parseCoreSellingPoints(
   nodes: LexicalNode[],
-  mediaMap: Map<string, string>
+  mediaMap: Map<string, any>
 ): CoreSellingPointsData | undefined {
   let title = ''
-  const titleImages: string[] = []
-  const techSpecImages: string[] = []
+  const titleImages: any[] = []
+  const techSpecImages: any[] = []
   let techSpecTitle = ''
   const techSpecKeys: string[] = []
   const techSpecValues: string[] = []
   let advantagesTitle = ''
-  const advantagesImages: string[] = []
+  const advantagesImages: any[] = []
   const advantagesCategories: AdvantageCategory[] = []
 
   let currentField: string | null = null
@@ -829,9 +829,9 @@ function parseCardsFromList(listNode: LexicalListNode): AdvantageCard[] {
  */
 function parseApplications(
   nodes: LexicalNode[],
-  mediaMap: Map<string, string>
+  mediaMap: Map<string, any>
 ): ApplicationsData | undefined {
-  const images: string[] = []
+  const images: any[] = []
 
   for (const node of nodes) {
     // Parse image gallery or carousel for application images
@@ -862,13 +862,13 @@ function parseApplications(
  */
 function parseContactForm(
   nodes: LexicalNode[],
-  mediaMap: Map<string, string>
+  mediaMap: Map<string, any>
 ): ContactFormData | undefined {
   let title = 'Contact Us Get A Quote'
-  let backgroundImage = ''
+  let backgroundImage: any = ''
   let helperTitle = "We'd love to hear from you!"
   let helperText = 'Share your needs, we will provide you with the best solution and quotation.'
-  const productImages: string[] = []
+  const productImages: any[] = []
 
   let currentField: string | null = null
 
@@ -877,7 +877,7 @@ function parseContactForm(
     if (node.type === 'paragraph') {
       const text = extractText(node).trim()
       if (text === 'contact-form-title' || text === 'contact-form-helper' ||
-          text === 'contact-form-images' || text === 'contact-form-bg-image') {
+          text === 'contact-form-images' || text === 'contact-form-image' || text === 'contact-form-bg-image') {
         currentField = text
         continue
       }
@@ -923,7 +923,7 @@ function parseContactForm(
     }
 
     // Parse product images (tilted images on the left)
-    if (currentField === 'contact-form-images') {
+    if (currentField === 'contact-form-images' || currentField === 'contact-form-image') {
       if (node.type === 'custom-image-gallery') {
         const gallery = node as LexicalImageGalleryNode
         for (const img of gallery.data.images) {
@@ -987,7 +987,7 @@ function parseContactForm(
  */
 function parseMoreSeries(
   nodes: LexicalNode[],
-  mediaMap: Map<string, string>,
+  mediaMap: Map<string, any>,
   reusableBlocksMap: Map<string, any> = new Map()
 ): MoreSeriesData | undefined {
   let title = 'More series'
@@ -1049,9 +1049,9 @@ function parseMoreSeries(
  */
 function parseQuote(
   nodes: LexicalNode[],
-  mediaMap: Map<string, string>
+  mediaMap: Map<string, any>
 ): QuoteData | undefined {
-  let image = ''
+  let image: any = ''
   const quotes: string[] = []
   let ctaText = ''
   let ctaLink = ''

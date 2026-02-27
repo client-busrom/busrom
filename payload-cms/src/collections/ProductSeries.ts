@@ -30,7 +30,7 @@ export const ProductSeries: CollectionConfig = {
     defaultColumns: ['name', 'slug', 'status', 'order'],
     group: {
       en: 'Product Center',
-      zh: '产品中心',
+      zh: '产品管理',
     },
   },
   access: {
