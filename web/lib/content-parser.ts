@@ -431,28 +431,24 @@ function splitIntoSections(nodes: LexicalNode[]): Map<string, LexicalNode[]> {
 
   for (const node of nodes) {
     if (node.type === 'quote') {
-      // Save previous section
+      // Save nodes to current section before starting a new one
       if (currentSection) {
-        sections.set(currentSection, currentNodes)
+        const existing = sections.get(currentSection) || []
+        sections.set(currentSection, [...existing, ...currentNodes])
       }
       // Start new section
       currentSection = extractText(node).trim()
       currentNodes = []
-    } else if (node.type === 'horizontalrule') {
-      // Horizontal rules also act as section dividers
-      if (currentSection) {
-        sections.set(currentSection, currentNodes)
-        currentSection = null
-        currentNodes = []
-      }
     } else if (currentSection) {
+      // Normal nodes go into the current section
       currentNodes.push(node)
     }
   }
 
   // Save last section
   if (currentSection) {
-    sections.set(currentSection, currentNodes)
+    const existing = sections.get(currentSection) || []
+    sections.set(currentSection, [...existing, ...currentNodes])
   }
 
   return sections
@@ -1038,7 +1034,7 @@ function parseMoreSeries(
 
   // Find reusableBlock or direct expanded children
   for (const node of nodes) {
-    if (node.type === 'reusableBlock' || node.type === 'seriesReusableBlock') {
+    if (node.type === 'reusableBlock' || node.type === 'seriesReusableBlock' || node.type === 'productReusableBlock') {
       const blockType = node.type
       const blockRef = (node as any).data?.[blockType]
       const blockId = typeof blockRef === 'object' && blockRef !== null ? String(blockRef.id) : String(blockRef)
