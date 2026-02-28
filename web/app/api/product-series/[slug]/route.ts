@@ -332,23 +332,17 @@ async function expandChildren(children: any[], locale: string): Promise<any[]> {
       }
 
       try {
-        const collections = ['series-reusable-blocks', 'product-reusable-blocks', 'reusable-blocks']
-        let blockContent = null
+        let collection = 'reusable-blocks'
+        if (node.type === 'seriesReusableBlock') collection = 'series-reusable-blocks'
+        if (node.type === 'productReusableBlock') collection = 'product-reusable-blocks'
+
+        const url = `${CMS_URL}/api/${collection}/${blockId}?locale=${locale}&depth=1`
+        const res = await fetch(url, { next: { revalidate: 3600 } })
         
-        for (const col of collections) {
-          try {
-            // First attempt: use CMS_URL (might be external)
-            const url = `${CMS_URL}/api/${col}/${blockId}?locale=${locale}&depth=1`
-            const res = await fetch(url, { next: { revalidate: 3600 } })
-            
-            if (res.ok) {
-              const block = await res.json()
-              blockContent = block?.contentTranslation?.root?.children || block?.content?.root?.children
-              if (blockContent) break
-            }
-          } catch (e) {
-            // Ignore error for individual collection check
-          }
+        let blockContent = null
+        if (res.ok) {
+          const block = await res.json()
+          blockContent = block?.contentTranslation?.root?.children || block?.content?.root?.children
         }
 
         if (Array.isArray(blockContent) && blockContent.length > 0) {
