@@ -22,6 +22,7 @@ export const SeriesTemplates: CollectionConfig = {
       name: 'name',
       type: 'text',
       required: true,
+      localized: true,
       label: { en: 'Identifier Name', zh: '识别名称' },
     },
     {
