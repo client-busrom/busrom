@@ -326,6 +326,8 @@ async function expandChildren(children: any[], locale: string): Promise<any[]> {
   const expanded: any[] = []
 
   for (const node of children) {
+    if (!node) continue
+
     const isReusableBlock = node?.type === 'reusableBlock' || 
                            node?.type === 'seriesReusableBlock' || 
                            node?.type === 'productReusableBlock'
@@ -333,35 +335,36 @@ async function expandChildren(children: any[], locale: string): Promise<any[]> {
     if (isReusableBlock) {
       const blockData = node.data?.reusableBlock || node.data?.seriesReusableBlock || node.data?.productReusableBlock
       const blockId = typeof blockData === 'object' ? blockData?.id : blockData
-      if (!blockId) continue
+      
+      if (!blockId) {
+        console.warn(`[expandChildren] Reusable block missing ID:`, node.type)
+        continue
+      }
 
       try {
-        // Try all reusable block collections
-        const collections = ['series-reusable-blocks', 'product-reusable-blocks', 'reusable-blocks']
-        let blockContent = null
+        let collection = 'reusable-blocks'
+        if (node.type === 'seriesReusableBlock') collection = 'series-reusable-blocks'
+        if (node.type === 'productReusableBlock') collection = 'product-reusable-blocks'
+
+        const url = `${CMS_URL}/api/${collection}/${blockId}?locale=${locale}&depth=1`
+        const res = await fetch(url, { next: { revalidate: 3600 } })
         
-        for (const col of collections) {
-          const res = await fetch(
-            `${CMS_URL}/api/${col}/${blockId}?locale=${locale}&depth=1`
-          )
-          if (res.ok) {
-            const block = await res.json()
-            // Some collections use contentTranslation, some use content
-            blockContent = block?.contentTranslation?.root?.children || block?.content?.root?.children
-            if (blockContent) break
-          }
+        let blockContent = null
+        if (res.ok) {
+          const block = await res.json()
+          blockContent = block?.contentTranslation?.root?.children || block?.content?.root?.children
         }
 
         if (Array.isArray(blockContent) && blockContent.length > 0) {
-          // Recursively expand in case of nested reusableBlocks
           const nestedExpanded = await expandChildren(blockContent, locale)
           expanded.push(...nestedExpanded)
           continue
+        } else {
+          console.warn(`[expandChildren] Block ${blockId} not found or empty in collection ${collection}.`)
         }
       } catch (err) {
-        console.error(`[expandReusableBlocks] Failed to fetch reusable block ${blockId}:`, err)
+        console.error(`[expandReusableBlocks] Error processing block ${blockId}:`, err)
       }
-      // If fetch failed or no content, skip the node
       continue
     }
 
