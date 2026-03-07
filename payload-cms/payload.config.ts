@@ -306,9 +306,9 @@ export default buildConfig({
         },
       }),
     },
-    // Push schema to database - always enabled for initial deployment
-    // TODO: Set to false after tables are created in production
-    push: true,
+    // Push schema disabled in production - schema is already synced
+    // Only enable temporarily when deploying schema changes
+    push: false,
   }),
 
   // ==================================================================
