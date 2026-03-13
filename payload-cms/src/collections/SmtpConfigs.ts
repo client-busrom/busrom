@@ -324,15 +324,15 @@ export const SmtpConfigs: CollectionConfig = {
         },
         {
           name: 'notificationEmails',
-          type: 'text',
+          type: 'textarea',
           label: {
             en: 'Notification Emails',
             zh: '通知邮箱',
           },
           admin: {
             description: {
-              en: 'Comma-separated list of emails to notify on form submissions',
-              zh: '表单提交时通知的邮箱列表，用逗号分隔',
+              en: 'Enter emails separated by commas or newlines',
+              zh: '输入通知邮箱，使用逗号或回车换行分隔',
             },
             condition: (data) => data?.notificationEnabled,
           },

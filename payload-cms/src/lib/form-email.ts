@@ -112,9 +112,9 @@ export async function sendFormNotificationEmail(
     return { success: false, error: 'No notification emails configured' }
   }
 
-  // Parse notification emails
+  // Parse notification emails (supports newline, comma, or semicolon)
   const emails = smtpConfig.notificationEmails
-    .split(',')
+    .split(/[\n,;]+/)
     .map((e: string) => e.trim())
     .filter((e: string) => e)
 
