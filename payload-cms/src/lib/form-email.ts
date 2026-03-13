@@ -277,8 +277,8 @@ export async function sendAutoReplyEmail(
   })
 
   // Auto-generate Greeting (Modern Auto-reply pattern)
-  // Mapping for all 8 supported locales
-  const greetingTemplates: Record<string, { withName: string; withoutName: string; font: string }> = {
+  // Mapping for all 24 supported website locales
+  const greetingTemplates: Record<string, { withName: string; withoutName: string; font: string; dir?: 'rtl' | 'ltr' }> = {
     en: { withName: 'Dear <strong>{name}</strong>,', withoutName: 'Hello,', font: 'Arial, sans-serif' },
     zh: { withName: '尊敬的 <strong>{name}</strong>：', withoutName: '您好：', font: '"Microsoft YaHei", Arial, sans-serif' },
     es: { withName: 'Estimado/a <strong>{name}</strong>,', withoutName: 'Hola,', font: 'Arial, sans-serif' },
@@ -286,7 +286,23 @@ export async function sendAutoReplyEmail(
     de: { withName: 'Sehr geehrte/r <strong>{name}</strong>,', withoutName: 'Guten Tag,', font: 'Arial, sans-serif' },
     ja: { withName: '<strong>{name}</strong> 様', withoutName: 'こんにちは', font: '"Hiragino Kaku Gothic ProN", "MS PGothic", sans-serif' },
     ko: { withName: '<strong>{name}</strong> 님', withoutName: '안녕하세요', font: '"Malgun Gothic", dotum, sans-serif' },
+    pt: { withName: 'Prezado/a <strong>{name}</strong>,', withoutName: 'Olá,', font: 'Arial, sans-serif' },
+    it: { withName: 'Gentile <strong>{name}</strong>,', withoutName: 'Buongiorno,', font: 'Arial, sans-serif' },
+    nl: { withName: 'Beste <strong>{name}</strong>,', withoutName: 'Hallo,', font: 'Arial, sans-serif' },
+    pl: { withName: 'Szanowny Panie / Szanowna Pani <strong>{name}</strong>,', withoutName: 'Witaj,', font: 'Arial, sans-serif' },
+    ru: { withName: 'Уважаемый/ая <strong>{name}</strong>,', withoutName: 'Здравствуйте,', font: 'Arial, sans-serif' },
+    ar: { withName: 'عزيزي <strong>{name}</strong>،', withoutName: 'مرحباً،', font: 'Arial, sans-serif', dir: 'rtl' },
+    th: { withName: 'เรียนคุณ <strong>{name}</strong>,', withoutName: 'สวัสดี,', font: '"Leelawadee UI", sans-serif' },
     vi: { withName: 'Thân gửi <strong>{name}</strong>,', withoutName: 'Xin chào,', font: 'Arial, sans-serif' },
+    id: { withName: 'Halo <strong>{name}</strong>,', withoutName: 'Selamat siang,', font: 'Arial, sans-serif' },
+    ms: { withName: 'Helo <strong>{name}</strong>,', withoutName: 'Selamat sejahtera,', font: 'Arial, sans-serif' },
+    tr: { withName: 'Sayın <strong>{name}</strong>,', withoutName: 'Merhaba,', font: 'Arial, sans-serif' },
+    hi: { withName: 'प्रिय <strong>{name}</strong>,', withoutName: 'नमस्ते,', font: '"Mangal", sans-serif' },
+    bn: { withName: 'প্রিয় <strong>{name}</strong>,', withoutName: 'হ্যালো,', font: '"Vrinda", sans-serif' },
+    sv: { withName: 'Hej <strong>{name}</strong>,', withoutName: 'Hallå,', font: 'Arial, sans-serif' },
+    da: { withName: 'Hej <strong>{name}</strong>,', withoutName: 'Dav,', font: 'Arial, sans-serif' },
+    no: { withName: 'Hei <strong>{name}</strong>,', withoutName: 'Hallo,', font: 'Arial, sans-serif' },
+    fi: { withName: 'Hei <strong>{name}</strong>,', withoutName: 'Terve,', font: 'Arial, sans-serif' },
   }
 
   const currentLang = (locale.split('-')[0] || 'en').toLowerCase()
@@ -299,7 +315,7 @@ export async function sendAutoReplyEmail(
   // Build full HTML email with localized styling
   const html = `
     <!DOCTYPE html>
-    <html>
+    <html${template.dir ? ` dir="${template.dir}"` : ''}>
     <head>
       <meta charset="utf-8">
       <style>
@@ -309,6 +325,7 @@ export async function sendAutoReplyEmail(
           color: #333; 
           max-width: 600px; 
           margin: 0 auto; 
+          ${template.dir === 'rtl' ? 'text-align: right;' : ''}
         }
         .content { padding: 20px; }
         .greeting { margin-bottom: 20px; font-size: 16px; }
