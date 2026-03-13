@@ -308,6 +308,8 @@ export default buildConfig({
     },
     // Push schema disabled in production - schema is already synced
     // Only enable temporarily when deploying schema changes
+    // Manual Fix (2026-03-13): Removed NOT NULL constraints on 'name' columns in main
+    // tables (product_templates, series_templates) to allow localized field saving.
     push: false,
   }),
 
