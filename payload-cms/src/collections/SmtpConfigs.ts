@@ -386,8 +386,8 @@ export const SmtpConfigs: CollectionConfig = {
       defaultValue: 'Thank you for contacting Busrom',
       admin: {
         description: {
-          en: 'Use {name}, {email}, {formName} as placeholders',
-          zh: '可使用 {name}、{email}、{formName} 作为占位符',
+          en: 'Email subject. Supports placeholders like {name}, {company}.',
+          zh: '邮件主题。支持 {name}、{company} 等占位符。',
         },
         condition: (data) => data?.autoReplyEnabled,
       },
@@ -403,8 +403,8 @@ export const SmtpConfigs: CollectionConfig = {
       localized: true,
       admin: {
         description: {
-          en: 'Use {name}, {email}, {formName} as placeholders',
-          zh: '可使用 {name}、{email}、{formName} 作为占位符',
+          en: 'Write only the core message. "Dear [Name]," is added automatically at the top. {company}, {formName} are still available.',
+          zh: '只需填写核心内容。系统会自动在顶部添加“尊敬的 [姓名]：”称呼。{company}、{formName} 仍可作为手动占位符使用。',
         },
         condition: (data) => data?.autoReplyEnabled,
         components: {

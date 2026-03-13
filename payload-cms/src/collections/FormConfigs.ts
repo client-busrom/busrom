@@ -600,8 +600,8 @@ export const FormConfigs: CollectionConfig = {
           localized: true,
           admin: {
             description: {
-              en: 'Leave empty to use SMTP config default. Use {name}, {email}, {formName} as placeholders.',
-              zh: '留空则使用 SMTP 配置的默认值。可使用 {name}、{email}、{formName} 作为占位符。',
+              en: 'Leave empty to use SMTP config default. "Dear [Name]," is added automatically.',
+              zh: '留空则使用 SMTP 配置的默认值。系统会自动在顶部添加“尊敬的 [姓名]：”称呼。',
             },
             condition: (data) => data?.autoReplyEnabled === 'enabled',
             components: {

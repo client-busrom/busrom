@@ -242,39 +242,79 @@ export async function sendAutoReplyEmail(
     return { success: false, error: 'No auto-reply template configured' }
   }
 
+  // Helper to find field value by multiple possible keys (case-insensitive)
+  const getSmartValue = (keys: string[]) => {
+    const data = submission.data || {}
+    for (const key of keys) {
+      if (data[key]) return String(data[key])
+      const lowerKey = key.toLowerCase()
+      const entry = Object.entries(data).find(([k]) => k.toLowerCase() === lowerKey)
+      if (entry) return String(entry[1])
+    }
+    return ''
+  }
+
+  const name = getSmartValue(['name', 'fullName', 'firstName', 'userName', 'contactName'])
+  const company = getSmartValue(['company', 'companyName', 'organization'])
+
   // Build subject
   const subject = replacePlaceholders(autoReplySubject || 'Thank you for contacting us', {
-    name: submission.data?.name || '',
+    name,
     email: submitterEmail,
     formName: submission.formName || '',
+    company,
   })
 
   // Convert rich text template to HTML
   let templateHtml = lexicalToHtml(autoReplyTemplate)
 
-  // Replace placeholders in template
+  // Replace placeholders in template (keeping for backward compatibility)
   templateHtml = replacePlaceholders(templateHtml, {
-    name: submission.data?.name || '',
+    name,
     email: submitterEmail,
     formName: submission.formName || '',
-    company: submission.data?.company || '',
+    company,
   })
 
-  // Build full HTML email
+  // Auto-generate Greeting (Modern Auto-reply pattern)
+  // If name exists, prepend "Dear [Name]," or "尊敬的 [Name]：".
+  const isZH = locale.startsWith('zh')
+  const greeting = name
+    ? isZH
+      ? `<p>尊敬的 <strong>${name}</strong>：</p>`
+      : `<p>Dear <strong>${name}</strong>,</p>`
+    : isZH
+      ? `<p>您好：</p>`
+      : `<p>Hello,</p>`
+
+  // Build full HTML email with localized styling
   const html = `
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="utf-8">
       <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; }
+        body { 
+          font-family: ${isZH ? '"Microsoft YaHei", Arial, sans-serif' : 'Arial, sans-serif'}; 
+          line-height: 1.6; 
+          color: #333; 
+          max-width: 600px; 
+          margin: 0 auto; 
+        }
         .content { padding: 20px; }
+        .greeting { margin-bottom: 20px; font-size: 16px; }
+        .body-text { margin-bottom: 30px; }
         a { color: #2563eb; }
       </style>
     </head>
     <body>
       <div class="content">
-        ${templateHtml}
+        <div class="greeting">
+          ${greeting}
+        </div>
+        <div class="body-text">
+          ${templateHtml}
+        </div>
       </div>
     </body>
     </html>
