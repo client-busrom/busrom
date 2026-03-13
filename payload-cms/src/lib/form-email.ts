@@ -277,15 +277,24 @@ export async function sendAutoReplyEmail(
   })
 
   // Auto-generate Greeting (Modern Auto-reply pattern)
-  // If name exists, prepend "Dear [Name]," or "尊敬的 [Name]：".
-  const isZH = locale.startsWith('zh')
-  const greeting = name
-    ? isZH
-      ? `<p>尊敬的 <strong>${name}</strong>：</p>`
-      : `<p>Dear <strong>${name}</strong>,</p>`
-    : isZH
-      ? `<p>您好：</p>`
-      : `<p>Hello,</p>`
+  // Mapping for all 8 supported locales
+  const greetingTemplates: Record<string, { withName: string; withoutName: string; font: string }> = {
+    en: { withName: 'Dear <strong>{name}</strong>,', withoutName: 'Hello,', font: 'Arial, sans-serif' },
+    zh: { withName: '尊敬的 <strong>{name}</strong>：', withoutName: '您好：', font: '"Microsoft YaHei", Arial, sans-serif' },
+    es: { withName: 'Estimado/a <strong>{name}</strong>,', withoutName: 'Hola,', font: 'Arial, sans-serif' },
+    fr: { withName: 'Cher/Chère <strong>{name}</strong>,', withoutName: 'Bonjour,', font: 'Arial, sans-serif' },
+    de: { withName: 'Sehr geehrte/r <strong>{name}</strong>,', withoutName: 'Guten Tag,', font: 'Arial, sans-serif' },
+    ja: { withName: '<strong>{name}</strong> 様', withoutName: 'こんにちは', font: '"Hiragino Kaku Gothic ProN", "MS PGothic", sans-serif' },
+    ko: { withName: '<strong>{name}</strong> 님', withoutName: '안녕하세요', font: '"Malgun Gothic", dotum, sans-serif' },
+    vi: { withName: 'Thân gửi <strong>{name}</strong>,', withoutName: 'Xin chào,', font: 'Arial, sans-serif' },
+  }
+
+  const currentLang = (locale.split('-')[0] || 'en').toLowerCase()
+  const template = greetingTemplates[currentLang] || greetingTemplates.en
+  
+  const greetingHtml = name 
+    ? template.withName.replace('{name}', name) 
+    : template.withoutName
 
   // Build full HTML email with localized styling
   const html = `
@@ -295,7 +304,7 @@ export async function sendAutoReplyEmail(
       <meta charset="utf-8">
       <style>
         body { 
-          font-family: ${isZH ? '"Microsoft YaHei", Arial, sans-serif' : 'Arial, sans-serif'}; 
+          font-family: ${template.font}; 
           line-height: 1.6; 
           color: #333; 
           max-width: 600px; 
@@ -310,7 +319,7 @@ export async function sendAutoReplyEmail(
     <body>
       <div class="content">
         <div class="greeting">
-          ${greeting}
+          ${greetingHtml}
         </div>
         <div class="body-text">
           ${templateHtml}
