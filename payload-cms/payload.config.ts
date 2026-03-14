@@ -169,11 +169,9 @@ const s3Config = {
       secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
     },
     region: process.env.S3_REGION || 'us-east-1',
-    // MinIO local development
-    ...(process.env.USE_MINIO === 'true' && {
-      endpoint: process.env.S3_ENDPOINT || 'http://localhost:9000',
-      forcePathStyle: true,
-    }),
+    ...(process.env.S3_ENDPOINT && { endpoint: process.env.S3_ENDPOINT }),
+    ...(process.env.USE_MINIO === 'true' && !process.env.S3_ENDPOINT && { endpoint: 'http://localhost:9000' }),
+    ...(process.env.USE_MINIO === 'true' && { forcePathStyle: true }),
   },
 }
 
