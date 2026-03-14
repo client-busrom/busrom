@@ -12,6 +12,34 @@ import { Logout, useAuth, useTranslation } from '@payloadcms/ui'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+// Helper hook to persist expansion state in local storage
+const usePersistedExpansion = (labelKey: string, defaultOpen: boolean) => {
+  const [isOpen, setIsOpen] = React.useState(defaultOpen)
+
+  React.useEffect(() => {
+    try {
+      const saved = localStorage.getItem(`payload-nav-expanded:${labelKey}`)
+      if (saved !== null) {
+        setIsOpen(saved === 'true')
+      }
+    } catch (e) {
+      // Quietly fail if localStorage is blocked
+    }
+  }, [labelKey])
+
+  const toggle = () => {
+    const nextState = !isOpen
+    setIsOpen(nextState)
+    try {
+      localStorage.setItem(`payload-nav-expanded:${labelKey}`, String(nextState))
+    } catch (e) {
+      // Quietly fail
+    }
+  }
+
+  return [isOpen, toggle] as const
+}
+
 // Navigation item component
 const NavItem: React.FC<{ href: string; labelKey: string }> = ({ href, labelKey }) => {
   const pathname = usePathname()
@@ -90,14 +118,14 @@ const CollapsibleGroup: React.FC<{
   defaultOpen?: boolean
   children: React.ReactNode
 }> = ({ labelKey, defaultOpen = true, children }) => {
-  const [isOpen, setIsOpen] = React.useState(defaultOpen)
+  const [isOpen, toggle] = usePersistedExpansion(labelKey, defaultOpen)
 
   return (
     <div>
       <GroupHeader
         labelKey={labelKey}
         isOpen={isOpen}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggle}
       />
       <div
         style={{
@@ -212,14 +240,14 @@ const NestedSubGroup: React.FC<{
   defaultOpen?: boolean
   children: React.ReactNode
 }> = ({ labelKey, defaultOpen = false, children }) => {
-  const [isOpen, setIsOpen] = React.useState(defaultOpen)
+  const [isOpen, toggle] = usePersistedExpansion(labelKey, defaultOpen)
 
   return (
     <div>
       <SubGroupHeader
         labelKey={labelKey}
         isOpen={isOpen}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggle}
       />
       <div
         style={{
