@@ -672,7 +672,7 @@ export const customTranslationsZh = {
       dashboard: '仪表盘',
       // Groups
       usersAccess: '用户与权限',
-      navigation: '导航管理',
+      navigation: '网站导航管理',
       websitePages: '网站页面管理',
       homepage: '首页内容',
       mediaLibrary: '媒体库',
@@ -683,8 +683,8 @@ export const customTranslationsZh = {
       forms: '表单管理',
       advanced: '高级功能',
       siteConfig: '站点配置',
-      websiteSettings: '网站设置',
-      cmsSettings: 'CMS 配置',
+      websiteSettings: '网站全局设置',
+      cmsSettings: '翻译设置',
       // Items
       users: '用户',
       roles: '角色',
