@@ -136,6 +136,22 @@ export const TemplateCategories: CollectionConfig = {
       },
     },
     {
+      name: 'templates',
+      type: 'join',
+      collection: 'document-templates',
+      on: 'category',
+      label: {
+        en: 'Document Templates',
+        zh: '页面板块模板库',
+      },
+      admin: {
+        description: {
+          en: 'Templates belonging to this category',
+          zh: '属于此分类的页面板块模板',
+        },
+      },
+    },
+    {
       name: 'translationCenter',
       type: 'ui',
       admin: {
