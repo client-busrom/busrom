@@ -29,8 +29,12 @@ const productImageMap: Record<string, string> = {
 
 // 从 URL 中提取产品 slug（支持 /products/ 和 /shop/ 路径）
 const getProductSlug = (url: string): string | null => {
-  const match = url.match(/\/(products|shop)\/([^/?]+)/)
-  return match ? match[2] : null
+  if (!url) return null
+  const match = url.match(/\/(?:products|shop)\/([^/?#]+)/)
+  if (match) {
+    return match[1].replace(/\/$/, '')
+  }
+  return null
 }
 
 // 获取产品图片（优先使用 API 返回的图片，否则使用映射）
