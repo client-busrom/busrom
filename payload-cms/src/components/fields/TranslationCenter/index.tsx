@@ -119,6 +119,11 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
   media: [
     { name: 'alt', labelKey: 'custom:fields:altText', type: 'textarea' },
   ],
+  'smtp-configs': [
+    { name: 'emailFromName', labelKey: 'custom:fields:name', type: 'textarea' },
+    { name: 'notificationSubject', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
+    { name: 'autoReplySubject', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
+  ],
 }
 
 interface FieldValue {
