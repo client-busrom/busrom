@@ -16,8 +16,14 @@ interface DesktopNavigationProps {
 
 // 从 URL 中提取产品 slug
 const getProductSlug = (url: string): string | null => {
-  const match = url.match(/\/(products|shop)\/([^/?]+)/)
-  return match ? match[2] : null
+  if (!url) return null
+  // 匹配形如 /products/slug 或 /shop/slug 或 /products/slug/ 或 /shop/slug/ 的格式
+  const match = url.match(/\/(?:products|shop)\/([^/?#]+)/)
+  if (match) {
+    // 移除可能存在的末尾斜杠
+    return match[1].replace(/\/$/, '')
+  }
+  return null
 }
 
 export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: DesktopNavigationProps) {
