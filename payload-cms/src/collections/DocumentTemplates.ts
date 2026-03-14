@@ -18,11 +18,11 @@ export const DocumentTemplates: CollectionConfig = {
   labels: {
     singular: {
       en: 'Document Template',
-      zh: '文档模板',
+      zh: '页面板块模板库',
     },
     plural: {
       en: 'Document Templates',
-      zh: '文档模板',
+      zh: '页面板块模板库',
     },
   },
   admin: {
