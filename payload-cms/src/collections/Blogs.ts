@@ -18,11 +18,11 @@ export const Blogs: CollectionConfig = {
   labels: {
     singular: {
       en: 'Blog',
-      zh: '博客',
+      zh: '知识库',
     },
     plural: {
       en: 'Blogs',
-      zh: '博客',
+      zh: '知识库',
     },
   },
   admin: {

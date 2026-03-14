@@ -20,11 +20,11 @@ export const Categories: CollectionConfig = {
   labels: {
     singular: {
       en: 'Category',
-      zh: '分类',
+      zh: '分类结构管理',
     },
     plural: {
       en: 'Categories',
-      zh: '分类',
+      zh: '分类结构管理',
     },
   },
   admin: {

@@ -347,12 +347,12 @@ export const CustomNav: React.FC = () => {
 
         {/* Content */}
         <CollapsibleGroup labelKey="content">
-          <NavItem href="/admin/collections/categories" labelKey="categories" />
           <NavItem href="/admin/collections/blogs" labelKey="blogs" />
           <NavItem href="/admin/collections/faq-items" labelKey="faqItems" />
-          <NavItem href="/admin/collections/reusable-blocks" labelKey="reusableBlocks" />
+          <NavItem href="/admin/collections/categories" labelKey="categories" />
           <NavItem href="/admin/collections/document-templates" labelKey="documentTemplates" />
           <NavItem href="/admin/collections/template-categories" labelKey="templateCategories" />
+          <NavItem href="/admin/collections/reusable-blocks" labelKey="reusableBlocks" />
         </CollapsibleGroup>
 
         {/* Forms */}
