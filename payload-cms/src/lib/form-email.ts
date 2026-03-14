@@ -257,9 +257,13 @@ export async function sendAutoReplyEmail(
   const name = getSmartValue(['name', 'fullName', 'firstName', 'userName', 'contactName'])
   const company = getSmartValue(['company', 'companyName', 'organization'])
 
+  // Recipient display name (for To header and Greeting)
+  // Priority: Personal Name > Company Name
+  const recipientDisplayName = name || company
+
   // Build subject
   const subject = replacePlaceholders(autoReplySubject || 'Thank you for contacting us', {
-    name,
+    name: recipientDisplayName,
     email: submitterEmail,
     formName: submission.formName || '',
     company,
@@ -270,7 +274,7 @@ export async function sendAutoReplyEmail(
 
   // Replace placeholders in template (keeping for backward compatibility)
   templateHtml = replacePlaceholders(templateHtml, {
-    name,
+    name: name || recipientDisplayName,
     email: submitterEmail,
     formName: submission.formName || '',
     company,
@@ -308,8 +312,8 @@ export async function sendAutoReplyEmail(
   const currentLang = (locale.split('-')[0] || 'en').toLowerCase()
   const template = greetingTemplates[currentLang] || greetingTemplates.en
   
-  const greetingHtml = name 
-    ? template.withName.replace('{name}', name) 
+  const greetingHtml = recipientDisplayName 
+    ? template.withName.replace('{name}', recipientDisplayName) 
     : template.withoutName
 
   // Build full HTML email with localized styling
@@ -349,7 +353,7 @@ export async function sendAutoReplyEmail(
   // Build email config and send
   const emailConfig = buildEmailConfig(smtpConfig)
   return sendEmail(emailConfig, {
-    to: submitterEmail,
+    to: recipientDisplayName ? `"${recipientDisplayName}" <${submitterEmail}>` : submitterEmail,
     subject,
     html,
   })
