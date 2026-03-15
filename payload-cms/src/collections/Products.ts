@@ -297,6 +297,7 @@ export const Products: CollectionConfig = {
                 },
                 components: {
                   Field: '@/components/fields/MediaPicker',
+                  Cell: '@/components/fields/MediaThumbnailCell',
                 },
               },
             },
