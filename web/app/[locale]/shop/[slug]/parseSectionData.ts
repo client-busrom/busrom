@@ -840,7 +840,59 @@ export function parseTransportationData(content: LexicalContent) {
   }
 }
 
-// Parse Lexical content into pre-form and post-form sections
+const TECHNICAL_SECTION_IDS = [
+  'scrolling-link',
+  'hero-section',
+  'product-attributes',
+  'six-core-strengths',
+  'product-features',
+  'product-detail-features',
+  'product-core-advantages',
+  'applications',
+  'busrom-main-features',
+  'about-busrom',
+  'busrom-support',
+  'why-choose-us',
+  'why-choose-us-reason',
+  'product-customization-flow',
+  'transportation'
+]
+
+// Parse Product Hero Section
+export function parseProductHeroData(content: LexicalContent, defaultName: string) {
+  const nodes = content?.root?.children || []
+  let description = ''
+  let image = null
+
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i]
+    const nodeText = node.children?.[0]?.text || ''
+
+    // Description marker
+    if (node.type === 'paragraph' && nodeText === 'hero-section-description') {
+      const nextNode = nodes[i + 1]
+      if (nextNode?.type === 'paragraph' || nextNode?.type === 'heading') {
+        description = extractTextWithLinebreaks(nextNode.children)
+      }
+    }
+
+    // Image marker
+    if (node.type === 'paragraph' && nodeText === 'hero-section-bg-image') {
+      const nextNode = nodes[i + 1]
+      if (nextNode?.type === 'singleImage' && nextNode?.data?.image) {
+        image = nextNode.data.image
+      }
+    }
+  }
+
+  return {
+    productName: defaultName,
+    description: description || undefined,
+    heroImage: image,
+  }
+}
+
+// Parse Lexical content into pre-form (modal) and post-form (page) sections
 export function parseLexicalSections(lexicalContent: any) {
   let preFormSections: ParsedSection[] = []
   let formBlock: any = null
@@ -849,42 +901,61 @@ export function parseLexicalSections(lexicalContent: any) {
   if (lexicalContent?.root?.children) {
     const nodes = lexicalContent.root.children
     let currentSection: ParsedSection | null = null
-    let foundForm = false
+    let isCurrentSectionPageStyle = false // true if it should be rendered on page (postFormSections)
+    let foundFormMarker = false
 
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i]
 
-      // Found the form block (support both 'formBlock' type and block with blockType='form-block')
-      // Only use the FIRST formBlock as the separator
-      if (!foundForm && (node.type === 'formBlock' || (node.type === 'block' && node.fields?.blockType === 'form-block'))) {
+      // 1. Check for form block marker
+      const isActualFormBlock = node.type === 'formBlock' || (node.type === 'block' && node.fields?.blockType === 'form-block')
+      const isQuoteMarker = node.type === 'quote' && (
+        node.children?.[0]?.text === 'form-block' || 
+        node.children?.[0]?.children?.[0]?.text === 'form-block'
+      )
+
+      if (!foundFormMarker && (isActualFormBlock || isQuoteMarker)) {
         if (currentSection) {
-          preFormSections.push(currentSection)
+          if (isCurrentSectionPageStyle) postFormSections.push(currentSection)
+          else preFormSections.push(currentSection)
           currentSection = null
         }
         formBlock = node
-        foundForm = true
+        foundFormMarker = true
         continue
       }
 
-      // Before form: collect sections based on quote nodes with text or code
-      if (!foundForm) {
-        if (node.type === 'quote') {
-          const firstChild = node.children?.[0]
-          if (firstChild && (firstChild.type === 'text' || firstChild.type === 'code')) {
-            const titleText = firstChild.type === 'text'
-              ? firstChild.text
-              : firstChild.children?.[0]?.text
+      // 2. Check for section boundary (Quote, possibly preceded by HR)
+      const isHR = node.type === 'horizontalrule'
+      const isQuote = node.type === 'quote'
 
-            const nextNode = nodes[i + 1]
-            if (nextNode && (nextNode.type === 'formBlock' || (nextNode.type === 'block' && nextNode.fields?.blockType === 'form-block'))) {
-              continue
-            }
+      if (isHR || isQuote) {
+        // If it's an HR, look at the next node to see if it's a quote (section header)
+        const nextNode = isHR ? nodes[i + 1] : node
+        
+        if (nextNode?.type === 'quote') {
+          const firstChild = nextNode.children?.[0]
+          const titleText = (firstChild?.type === 'text' ? firstChild.text : firstChild?.children?.[0]?.text) || ''
+          const cleanId = titleText.trim()
 
+          if (cleanId) {
+            // Close the previous section if it exists
             if (currentSection) {
-              preFormSections.push(currentSection)
+              if (isCurrentSectionPageStyle) postFormSections.push(currentSection)
+              else preFormSections.push(currentSection)
             }
+
+            const isTechnical = TECHNICAL_SECTION_IDS.includes(cleanId)
+            
+            // Logic: 
+            // - Technical IDs (scrolling-link, etc.) ALWAYS go to page sections (postFormSections)
+            // - After form is found, ALL new quote sections go to page sections
+            // - Before form, non-technical quotes go to modal sections (preFormSections)
+            isCurrentSectionPageStyle = isTechnical || foundFormMarker
+
             currentSection = {
-              title: titleText || 'Section',
+              id: isTechnical ? cleanId : (isCurrentSectionPageStyle ? cleanId : undefined),
+              title: isTechnical ? undefined : cleanId,
               content: {
                 root: {
                   type: 'root',
@@ -896,58 +967,23 @@ export function parseLexicalSections(lexicalContent: any) {
                 } as any,
               },
             }
+
+            if (isHR) i++ // skip the quote we just looked ahead at
             continue
           }
         }
+      }
 
-        if (currentSection && node.type !== 'horizontalrule') {
-          (currentSection.content.root!.children as any[]).push(node)
-        }
-      } else {
-        // After form: Parse sections based on horizontalrule + quote pattern
-        if (node.type === 'horizontalrule' && i + 1 < nodes.length) {
-          const nextNode = nodes[i + 1]
-          if (nextNode.type === 'quote') {
-            const firstChild = nextNode.children?.[0]
-            if (firstChild && (firstChild.type === 'text' || firstChild.type === 'code')) {
-              if (currentSection) {
-                postFormSections.push(currentSection)
-              }
-              const sectionId = firstChild.type === 'text'
-                ? firstChild.text
-                : firstChild.children?.[0]?.text
-              currentSection = {
-                id: sectionId || 'Section',
-                content: {
-                  root: {
-                    type: 'root',
-                    format: '',
-                    indent: 0,
-                    version: 1,
-                    children: [],
-                    direction: null,
-                  } as any,
-                },
-              }
-              i++
-              continue
-            }
-          }
-        }
-
-        if (currentSection && node.type !== 'horizontalrule') {
-          (currentSection.content.root!.children as any[]).push(node)
-        }
+      // 3. Append nodes to current section
+      if (currentSection && node.type !== 'horizontalrule') {
+        (currentSection.content.root!.children as any[]).push(node)
       }
     }
 
-    // Don't forget to add the last section
+    // Add the final section
     if (currentSection) {
-      if (!foundForm) {
-        preFormSections.push(currentSection)
-      } else {
-        postFormSections.push(currentSection)
-      }
+      if (isCurrentSectionPageStyle) postFormSections.push(currentSection)
+      else preFormSections.push(currentSection)
     }
   }
 

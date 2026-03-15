@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react'
 import { TextFieldClientComponent } from 'payload'
-import { useField } from '@payloadcms/ui'
+import { useField, useTranslation } from '@payloadcms/ui'
 
 interface PathOption {
   label: string
@@ -21,6 +21,9 @@ interface PathSelectorProps {
 export const PathSelectorField: TextFieldClientComponent = (props) => {
   const { path, field } = props
   const { value, setValue } = useField<string>({ path })
+  const { i18n } = useTranslation()
+  const isZh = i18n.language === 'zh'
+  
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [options, setOptions] = useState<PathOption[]>([])
   const [loading, setLoading] = useState(false)
@@ -41,7 +44,7 @@ export const PathSelectorField: TextFieldClientComponent = (props) => {
           const seenPaths = new Set<string>()
 
           // 添加首页
-          pathOptions.push({ label: '首页 | Home', value: '/' })
+          pathOptions.push({ label: isZh ? '首页 | Home' : 'Home', value: '/' })
           seenPaths.add('/')
 
           data.docs.forEach((menu: any) => {
@@ -53,15 +56,14 @@ export const PathSelectorField: TextFieldClientComponent = (props) => {
 
             seenPaths.add(link)
 
-            // 获取菜单名称（中文优先）
+            // 获取菜单名称
             const name = menu.name || menu.slug
             const label = `${name} | ${menu.slug}`
 
             if (isPatternMode) {
               // 路径规则模式：转换为通配符格式
-              // /products -> /products/*
               pathOptions.push({
-                label: `${label} (子页面)`,
+                label: isZh ? `${label} (子页面)` : `${label} (Children)`,
                 value: `${link}/*`,
                 isPattern: true,
               })
@@ -76,14 +78,14 @@ export const PathSelectorField: TextFieldClientComponent = (props) => {
       } catch (error) {
         console.error('Failed to fetch navigation menus:', error)
         // 降级到静态选项
-        setOptions(getFallbackOptions(isPatternMode))
+        setOptions(getFallbackOptions(isPatternMode, isZh))
       } finally {
         setLoading(false)
       }
     }
 
     fetchPaths()
-  }, [isPatternMode])
+  }, [isPatternMode, isZh])
 
   const handleSelect = useCallback((selectedValue: string) => {
     setValue(selectedValue)
@@ -97,7 +99,7 @@ export const PathSelectorField: TextFieldClientComponent = (props) => {
   const getLabel = () => {
     if (!field.label) return field.name
     if (typeof field.label === 'string') return field.label
-    return field.label.zh || field.label.en || field.name
+    return isZh ? (field.label.zh || field.label.en || field.name) : (field.label.en || field.label.zh || field.name)
   }
 
   return (
@@ -139,7 +141,13 @@ export const PathSelectorField: TextFieldClientComponent = (props) => {
               opacity: loading ? 0.7 : 1,
             }}
           >
-            {loading ? '加载中...' : isDropdownOpen ? '收起' : '选择路径'}
+            {loading 
+              ? (isZh ? '加载中...' : 'Loading...') 
+              : (isDropdownOpen 
+                  ? (isZh ? '收起' : 'Close') 
+                  : (isZh ? '选择路径' : 'Select Path')
+                )
+            }
           </button>
         </div>
 
@@ -162,7 +170,7 @@ export const PathSelectorField: TextFieldClientComponent = (props) => {
           >
             {options.length === 0 ? (
               <div style={{ padding: '1rem', color: 'var(--theme-elevation-500)', textAlign: 'center' }}>
-                {loading ? '加载中...' : '暂无可用路径'}
+                {loading ? (isZh ? '加载中...' : 'Loading...') : (isZh ? '暂无可用路径' : 'No paths available')}
               </div>
             ) : (
               options.map((option) => (
@@ -211,8 +219,8 @@ export const PathSelectorField: TextFieldClientComponent = (props) => {
               }}
             >
               {isPatternMode
-                ? '💡 可使用通配符: * 匹配单层, ** 匹配多层'
-                : '💡 也可以直接在输入框中输入自定义路径'
+                ? (isZh ? '💡 可使用通配符: * 匹配单层, ** 匹配多层' : '💡 Wildcards: * matches 1 level, ** matches multiple')
+                : (isZh ? '💡 也可以直接在输入框中输入自定义路径' : '💡 Or type a custom path directly')
               }
             </div>
           </div>
@@ -228,8 +236,8 @@ export const PathSelectorField: TextFieldClientComponent = (props) => {
         }}
       >
         {isPatternMode
-          ? '路径规则支持通配符: /products/* 或 /blog/**'
-          : '输入精确的 URL 路径，如 /contact-us'
+          ? (isZh ? '路径规则支持通配符: /products/* 或 /blog/**' : 'Supports wildcards: /products/* or /blog/**')
+          : (isZh ? '输入精确的 URL 路径，如 /contact-us' : 'Enter exact URL path, e.g. /contact-us')
         }
       </div>
     </div>
@@ -239,21 +247,21 @@ export const PathSelectorField: TextFieldClientComponent = (props) => {
 /**
  * 降级选项（API 失败时使用）
  */
-function getFallbackOptions(isPattern: boolean): PathOption[] {
+function getFallbackOptions(isPattern: boolean, isZh: boolean): PathOption[] {
   if (isPattern) {
     return [
-      { label: '所有产品链接', value: '/products/*', isPattern: true },
-      { label: '所有商品详情', value: '/shop/*', isPattern: true },
-      { label: '所有博客文章', value: '/blog/*', isPattern: true },
-      { label: '所有服务页面', value: '/service/*', isPattern: true },
+      { label: isZh ? '所有产品链接' : 'All Products', value: '/products/*', isPattern: true },
+      { label: isZh ? '所有商品详情' : 'All Shop Items', value: '/shop/*', isPattern: true },
+      { label: isZh ? '所有博客文章' : 'All Blog Posts', value: '/blog/*', isPattern: true },
+      { label: isZh ? '所有服务页面' : 'All Services', value: '/service/*', isPattern: true },
     ]
   }
   return [
-    { label: '首页', value: '/' },
-    { label: '产品列表', value: '/products' },
-    { label: '商城', value: '/shop' },
-    { label: '博客', value: '/blog' },
-    { label: '联系我们', value: '/contact-us' },
+    { label: isZh ? '首页' : 'Home', value: '/' },
+    { label: isZh ? '产品列表' : 'Products', value: '/products' },
+    { label: isZh ? '商城' : 'Shop', value: '/shop' },
+    { label: isZh ? '博客' : 'Blog', value: '/blog' },
+    { label: isZh ? '联系我们' : 'Contact Us', value: '/contact-us' },
   ]
 }
 

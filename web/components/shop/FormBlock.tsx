@@ -73,7 +73,7 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
     )
   }
 
-  const sortedFields = [...fields].sort((a, b) => a.order - b.order)
+  const sortedFields = [...fields]
 
   const [formData, setFormData] = useState<Record<string, any>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})

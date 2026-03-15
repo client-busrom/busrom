@@ -4,10 +4,6 @@ import { default as default_6e007ac8f0e2f687212ebb65ad91c147 } from '@/component
 import { default as default_a8e2ac70c3f86fe45f78f09046549378 } from '@/components/fields/SpecsField'
 import { MultiLocaleTextareaField as MultiLocaleTextareaField_818f830b0ef41c7fd6298cda9b34bc80 } from '@/components/fields/MultiLocaleField'
 import { default as default_643116d2ab91f7b0d99236a7afb7c645 } from '@/components/fields/MediaPicker'
-import { OverviewComponent as OverviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
-import { MetaTitleComponent as MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
-import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
-import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { default as default_8ee29faa67a64494ccbe7f4a2ea41dbf } from '@/components/fields/AttributesTableField'
 import { default as default_1c5ae25fc75ab523bfe3f6b5ce843df4 } from '@/components/fields/ProductSpecificationsField'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -58,8 +54,14 @@ import { default as default_1b0cad300e9d837c9be64413930f499e } from '@/component
 import { default as default_8eace7ae1118053face74cf3167249d9 } from '@/components/fields/TagBasedRandomImages'
 import { default as default_a3a3aa8bfebcaf82c7d4953fe2175cbd } from '@/components/fields/IconPicker'
 import { default as default_f2f012c65168d1c448e59ecd59a1bae5 } from '@/components/admin/NavigationManagerLink'
+import { OverviewComponent as OverviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
+import { MetaTitleComponent as MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
+import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
+import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
+import { CategoryProductManager as CategoryProductManager_0f5a766bac8fcce623fd73b84d4fc7b6 } from '@/components/fields/CategoryProductManager'
 import { default as default_a3e549dccdd3ea0f10d6ba87c5f4df9b } from '@/components/fields/PathSelector'
 import { default as default_27a145562c8e9424ddd39c471f5ea155 } from '@/components/fields/AutoDraft'
+import { default as default_542a7bec4aca3e00d6f3ee70f3087485 } from '@/components/fields/SeoConflictAnalysis'
 import { default as default_c2dbb529a09462acd9e8df0356a9434b } from '@/components/fields/FormFieldsTranslationCenter'
 import { default as default_7943e4c73893476d7fc7695e5ca0c666 } from '@/components/fields/FormDataDisplay'
 import { default as default_127e3c011c444cd50caa9cd70efd6d8a } from '@/components/fields/AttachmentsDisplay'
@@ -86,10 +88,6 @@ export const importMap = {
   "@/components/fields/SpecsField#default": default_a8e2ac70c3f86fe45f78f09046549378,
   "@/components/fields/MultiLocaleField#MultiLocaleTextareaField": MultiLocaleTextareaField_818f830b0ef41c7fd6298cda9b34bc80,
   "@/components/fields/MediaPicker#default": default_643116d2ab91f7b0d99236a7afb7c645,
-  "@payloadcms/plugin-seo/client#OverviewComponent": OverviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
-  "@payloadcms/plugin-seo/client#MetaTitleComponent": MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c0860,
-  "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860,
-  "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@/components/fields/AttributesTableField#default": default_8ee29faa67a64494ccbe7f4a2ea41dbf,
   "@/components/fields/ProductSpecificationsField#default": default_1c5ae25fc75ab523bfe3f6b5ce843df4,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -140,8 +138,14 @@ export const importMap = {
   "@/components/fields/TagBasedRandomImages#default": default_8eace7ae1118053face74cf3167249d9,
   "@/components/fields/IconPicker#default": default_a3a3aa8bfebcaf82c7d4953fe2175cbd,
   "@/components/admin/NavigationManagerLink#default": default_f2f012c65168d1c448e59ecd59a1bae5,
+  "@payloadcms/plugin-seo/client#OverviewComponent": OverviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
+  "@payloadcms/plugin-seo/client#MetaTitleComponent": MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c0860,
+  "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860,
+  "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
+  "@/components/fields/CategoryProductManager#CategoryProductManager": CategoryProductManager_0f5a766bac8fcce623fd73b84d4fc7b6,
   "@/components/fields/PathSelector#default": default_a3e549dccdd3ea0f10d6ba87c5f4df9b,
   "@/components/fields/AutoDraft#default": default_27a145562c8e9424ddd39c471f5ea155,
+  "@/components/fields/SeoConflictAnalysis#default": default_542a7bec4aca3e00d6f3ee70f3087485,
   "@/components/fields/FormFieldsTranslationCenter#default": default_c2dbb529a09462acd9e8df0356a9434b,
   "@/components/fields/FormDataDisplay#default": default_7943e4c73893476d7fc7695e5ca0c666,
   "@/components/fields/AttachmentsDisplay#default": default_127e3c011c444cd50caa9cd70efd6d8a,

@@ -375,6 +375,10 @@ export const customTranslationsEn = {
       emailConfig: 'Email Config',
       translationConfig: 'Translation Config (Global)',
       myTranslationSettings: 'My Translation Settings',
+      shopPageConfig: 'Shop Page Management',
+      systemManagement: 'System Management',
+      systemNotifications: 'Notification Center',
+      systemSettings: 'System Settings',
     },
   },
 }
@@ -741,6 +745,10 @@ export const customTranslationsZh = {
       emailConfig: '邮件配置',
       translationConfig: '翻译配置（全局）',
       myTranslationSettings: '我的翻译设置',
+      shopPageConfig: 'Shop 列表页管理',
+      systemManagement: '系统管理',
+      systemNotifications: '系统通知中心',
+      systemSettings: '系统全局配置',
     },
   },
 }

@@ -13,11 +13,14 @@ import { AboutBusromSection } from "@/components/shop/AboutBusromSection"
 import { BusromSupportSection } from "@/components/shop/BusromSupportSection"
 import { WhyChooseUsSection } from "@/components/shop/WhyChooseUsSection"
 import { WhyChooseUsReasonSection } from "@/components/shop/WhyChooseUsReasonSection"
+
 import { ProductCustomizationFlowSection } from "@/components/shop/ProductCustomizationFlowSection"
 import { TransportationSection } from "@/components/shop/TransportationSection"
+import { ProductHeroSection } from "@/components/shop/ProductHeroSection"
 
 import {
   parseProductAttributesData,
+  parseProductHeroData,
   parseSixCoreStrengthsData,
   parseProductFeaturesData,
   parseProductDetailFeaturesData,
@@ -37,13 +40,28 @@ interface SectionRendererProps {
   section: ParsedSection
   sectionIndex: number
   locale: Locale
+  productName: string
 }
 
 export function SectionRenderer({
   section,
   sectionIndex,
   locale,
+  productName,
 }: SectionRendererProps) {
+  // Product Hero Section
+  if (section.id === 'hero-section') {
+    const data = parseProductHeroData(section.content, productName)
+    return (
+      <ProductHeroSection
+        key={sectionIndex}
+        productName={data.productName}
+        description={data.description}
+        heroImage={data.heroImage}
+      />
+    )
+  }
+
   // Product Attributes Section
   if (section.id === 'product-attributes') {
     const data = parseProductAttributesData(section.content)

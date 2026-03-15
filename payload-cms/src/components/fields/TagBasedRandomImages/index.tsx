@@ -16,15 +16,17 @@ interface TagBasedRandomImagesProps {
 export const TagBasedRandomImages: React.FC<TagBasedRandomImagesProps> = ({ path }) => {
   const { value, setValue } = useField<any>({ path })
 
-  const [mode, setMode] = useState<'manual' | 'auto'>(value?.mode || 'manual')
+  const [mode, setMode] = useState<'manual' | 'auto' | 'application'>(value?.mode || 'manual')
   const [selectedImages, setSelectedImages] = useState<number[]>(value?.manualImages || [])
   const [selectedCategories, setSelectedCategories] = useState<number[]>(value?.categories || [])
   const [selectedTags, setSelectedTags] = useState<number[]>(value?.tags || [])
+  const [selectedApplication, setSelectedApplication] = useState<string | number>(value?.applicationId || '')
   const [metadataGroup, setMetadataGroup] = useState<string>(value?.metadataGroup || '')
   const [metadataSceneNumber, setMetadataSceneNumber] = useState<string>(value?.metadataSceneNumber || '')
   const [seriesNumber, setSeriesNumber] = useState<string>(value?.seriesNumber || '')
   const [categories, setCategories] = useState<any[]>([])
   const [tags, setTags] = useState<any[]>([])
+  const [applications, setApplications] = useState<any[]>([])
   const [previewImages, setPreviewImages] = useState<any[]>([])
   const [isLoadingPreview, setIsLoadingPreview] = useState(false)
 
@@ -32,9 +34,10 @@ export const TagBasedRandomImages: React.FC<TagBasedRandomImagesProps> = ({ path
   useEffect(() => {
     const loadFilters = async () => {
       try {
-        const [categoriesRes, tagsRes] = await Promise.all([
+        const [categoriesRes, tagsRes, applicationsRes] = await Promise.all([
           fetch('/api/media-categories?limit=100'),
           fetch('/api/media-tags?limit=100'),
+          fetch('/api/applications?limit=100&depth=0'),
         ])
 
         if (categoriesRes.ok) {
@@ -46,6 +49,11 @@ export const TagBasedRandomImages: React.FC<TagBasedRandomImagesProps> = ({ path
           const tagData = await tagsRes.json()
           setTags(tagData.docs || [])
         }
+
+        if (applicationsRes.ok) {
+          const appData = await applicationsRes.json()
+          setApplications(appData.docs || [])
+        }
       } catch (error) {
         console.error('Error loading filters:', error)
       }
@@ -54,79 +62,131 @@ export const TagBasedRandomImages: React.FC<TagBasedRandomImagesProps> = ({ path
     loadFilters()
   }, [])
 
-  // Update value when mode or selections change
   useEffect(() => {
     const newValue = {
       mode,
       manualImages: mode === 'manual' ? selectedImages : [],
       categories: mode === 'auto' ? selectedCategories : [],
       tags: mode === 'auto' ? selectedTags : [],
+      applicationId: mode === 'application' ? selectedApplication : '',
       metadataGroup: mode === 'auto' ? metadataGroup : '',
       metadataSceneNumber: mode === 'auto' ? metadataSceneNumber : '',
       seriesNumber: mode === 'auto' ? seriesNumber : '',
     }
     setValue(newValue)
-  }, [mode, selectedImages, selectedCategories, selectedTags, metadataGroup, metadataSceneNumber, seriesNumber, setValue])
+  }, [mode, selectedImages, selectedCategories, selectedTags, selectedApplication, metadataGroup, metadataSceneNumber, seriesNumber, setValue])
 
   // Preview auto-selected images
   const loadPreview = useCallback(async () => {
-    const hasFilters =
+    const hasAutoFilters =
       selectedCategories.length > 0 ||
       selectedTags.length > 0 ||
       metadataGroup ||
       metadataSceneNumber ||
       seriesNumber
 
-    if (mode !== 'auto' || !hasFilters) {
+    if (mode === 'manual') {
+      setPreviewImages([])
+      return
+    }
+
+    if (mode === 'auto' && !hasAutoFilters) {
+      setPreviewImages([])
+      return
+    }
+
+    if (mode === 'application' && !selectedApplication) {
       setPreviewImages([])
       return
     }
 
     setIsLoadingPreview(true)
     try {
-      const params = new URLSearchParams()
-      params.append('limit', '5')
-      params.append('sort', '-createdAt')
+      if (mode === 'auto') {
+        const params = new URLSearchParams()
+        params.append('limit', '5')
+        params.append('sort', '-createdAt')
 
-      if (selectedCategories.length > 0) {
-        params.append('where[primaryCategory][in]', selectedCategories.join(','))
-      }
+        if (selectedCategories.length > 0) {
+          params.append('where[primaryCategory][in]', selectedCategories.join(','))
+        }
 
-      if (selectedTags.length > 0) {
-        params.append('where[tags][in]', selectedTags.join(','))
-      }
+        if (selectedTags.length > 0) {
+          params.append('where[tags][in]', selectedTags.join(','))
+        }
 
-      if (metadataGroup) {
-        params.append('where[metadataGroup][equals]', metadataGroup)
-      }
+        if (metadataGroup) {
+          params.append('where[metadataGroup][equals]', metadataGroup)
+        }
 
-      if (metadataSceneNumber) {
-        params.append('where[metadataSceneNumber][equals]', metadataSceneNumber)
-      }
+        if (metadataSceneNumber) {
+          params.append('where[metadataSceneNumber][equals]', metadataSceneNumber)
+        }
 
-      if (seriesNumber) {
-        // Search in metadata.specs array for series key
-        params.append('where[metadataSpecs.key][equals]', 'series')
-        params.append('where[metadataSpecs.value][equals]', seriesNumber)
-      }
+        if (seriesNumber) {
+          // Search in metadata.specs array for series key
+          params.append('where[metadataSpecs.key][equals]', 'series')
+          params.append('where[metadataSpecs.value][equals]', seriesNumber)
+        }
 
-      const response = await fetch(`/api/media?${params.toString()}`)
-      if (response.ok) {
-        const data = await response.json()
-        setPreviewImages(data.docs || [])
+        const response = await fetch(`/api/media?${params.toString()}`)
+        if (response.ok) {
+          const data = await response.json()
+          const docs = data.docs || []
+          if (docs.length > 0) {
+            const shuffled = [...docs].sort(() => Math.random() - 0.5)
+            const final = []
+            for (let i = 0; i < 5; i++) {
+              final.push(shuffled[i % shuffled.length])
+            }
+            setPreviewImages(final)
+          } else {
+            setPreviewImages([])
+          }
+        }
+      } else if (mode === 'application' && selectedApplication) {
+        // Fetch application specifically to get its scene gallery images
+        const response = await fetch(`/api/applications/${selectedApplication}?depth=1`)
+        if (response.ok) {
+          const app = await response.json()
+          // Flatten all images from all scenes
+          const allImages = (app.sceneGallery || []).flatMap((scene: any) => scene.images || [])
+          // De-duplicate if same image used in multiple scenes
+          const uniqueImages = Array.from(new Map(allImages.map((img: any) => [img.id, img])).values())
+          
+          if (uniqueImages.length > 0) {
+            // Normalize image URLs (Payload objects often have URLs in 'sizes')
+            const normalizedImages = uniqueImages.map((img: any) => ({
+              ...img,
+              thumbnailURL: img.sizes?.thumbnail?.url || img.sizes?.card?.url || img.url,
+            }))
+
+            // Option B: Cycle for preview consistency
+            const shuffled = [...normalizedImages].sort(() => Math.random() - 0.5)
+            const final = []
+            for (let i = 0; i < 5; i++) {
+              final.push(shuffled[i % shuffled.length])
+            }
+            setPreviewImages(final)
+          } else {
+            setPreviewImages([])
+          }
+        } else {
+          setPreviewImages([])
+        }
       }
     } catch (error) {
       console.error('Error loading preview:', error)
     } finally {
       setIsLoadingPreview(false)
     }
-  }, [mode, selectedCategories, selectedTags, metadataGroup, metadataSceneNumber, seriesNumber])
+  }, [mode, selectedCategories, selectedTags, selectedApplication, metadataGroup, metadataSceneNumber, seriesNumber])
 
   useEffect(() => {
-    if (mode === 'auto') {
+    if (mode === 'auto' || mode === 'application') {
       loadPreview()
     }
-  }, [mode, selectedCategories, selectedTags, metadataGroup, metadataSceneNumber, seriesNumber, loadPreview])
+  }, [mode, selectedCategories, selectedTags, selectedApplication, metadataGroup, metadataSceneNumber, seriesNumber, loadPreview])
 
   const toggleCategory = (id: number) => {
     setSelectedCategories(prev =>
@@ -154,15 +214,52 @@ export const TagBasedRandomImages: React.FC<TagBasedRandomImagesProps> = ({ path
           </button>
           <button
             type="button"
+            className={mode === 'application' ? 'active' : ''}
+            onClick={() => setMode('application')}
+          >
+            📂 Case Gallery (Random) | 案例图集 (随机)
+          </button>
+          <button
+            type="button"
             className={mode === 'auto' ? 'active' : ''}
             onClick={() => setMode('auto')}
           >
-            🎲 Auto Random (5 images) | 自动随机 (5张)
+            🎲 Tags Random (5 images) | 标签随机 (5张)
           </button>
         </div>
       </div>
 
-      {mode === 'manual' ? (
+      {mode === 'application' && (
+        <div className="application-mode">
+          <h4>Select Case Gallery | 选择案例图集</h4>
+          <div className="filter-section">
+            <select
+              value={selectedApplication}
+              onChange={(e) => setSelectedApplication(e.target.value)}
+              className="application-select"
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: '4px',
+                border: '1px solid #ddd',
+                fontSize: '14px'
+              }}
+            >
+              <option value="">-- Select an Application | 选择一个案例 --</option>
+              {applications.map((app) => (
+                <option key={app.id} value={app.id}>
+                  {app.slug} ({app.name})
+                </option>
+              ))}
+            </select>
+          </div>
+          <p className="hint">
+            System will randomly pick 5 images from the selected case gallery's scene groups.
+          </p>
+        </div>
+      )}
+
+      {mode === 'manual' && (
         <div className="manual-mode">
           <h4>Manually Select Images | 手动选择图片</h4>
           <MediaPicker
@@ -178,7 +275,9 @@ export const TagBasedRandomImages: React.FC<TagBasedRandomImagesProps> = ({ path
             Click "Select Media" to choose up to 5 images manually.
           </p>
         </div>
-      ) : (
+      )}
+
+      {mode === 'auto' && (
         <div className="auto-mode">
           <h4>Filter by Category, Tags & Metadata | 按分类、标签和元数据筛选</h4>
           <p className="hint">
@@ -253,33 +352,37 @@ export const TagBasedRandomImages: React.FC<TagBasedRandomImagesProps> = ({ path
               </div>
             </div>
           </div>
+        </div>
+      )}
 
-          {/* Preview */}
-          <div className="preview-section">
-            <h5>Preview (Random 5 Images) | 预览（随机5张）</h5>
-            {isLoadingPreview ? (
-              <p>Loading preview...</p>
-            ) : previewImages.length === 0 ? (
-              <p className="no-preview">
-                No images found matching selected filters. Please select categories or tags.
-              </p>
-            ) : (
-              <div className="preview-grid">
-                {previewImages.map((img) => (
-                  <div key={img.id} className="preview-item">
-                    <img
-                      src={img.thumbnailURL || img.url}
-                      alt={img.alt || img.filename}
-                    />
-                    <p>{img.filename}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-            <p className="hint">
-              ⚠️ Note: Preview shows current matching images. Actual random selection happens at render time.
+      {/* Preview - Show for Auto and Application modes */}
+      {(mode === 'auto' || mode === 'application') && (
+        <div className="preview-section" style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '15px' }}>
+          <h5>Preview (Random 5 Images) | 预览（随机5张）</h5>
+          {isLoadingPreview ? (
+            <p>Loading preview...</p>
+          ) : previewImages.length === 0 ? (
+            <p className="no-preview">
+              {mode === 'auto' 
+                ? 'No images found matching selected filters. Please select categories or tags.'
+                : 'Please select an application to see preview.'}
             </p>
-          </div>
+          ) : (
+            <div className="preview-grid">
+              {previewImages.map((img) => (
+                <div key={img.id} className="preview-item">
+                  <img
+                    src={img.thumbnailURL || img.url}
+                    alt={img.alt || img.filename}
+                  />
+                  <p>{img.filename}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="hint">
+            ⚠️ Note: Preview shows current matching images. Actual random selection happens at render time.
+          </p>
         </div>
       )}
     </div>

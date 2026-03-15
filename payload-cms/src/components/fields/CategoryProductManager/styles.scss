@@ -1,0 +1,161 @@
+.category-product-manager {
+  margin: 20px 0;
+  border: 1px solid #e2e2e2;
+  border-radius: 4px;
+  background: #f9f9f9;
+  overflow: hidden;
+
+  &__header {
+    background: #eeeeee;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e2e2;
+
+    h4 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  &__content {
+    padding: 0;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+
+    th {
+      text-align: left;
+      padding: 10px 15px;
+      background: #f5f5f5;
+      border-bottom: 1px solid #e2e2e2;
+      color: #666;
+      font-weight: 500;
+    }
+
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      vertical-align: middle;
+      background: #fff;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+  }
+
+  &__product-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: #eee;
+    }
+
+    .details {
+      display: flex;
+      flex-direction: column;
+
+      .name {
+        font-weight: 600;
+        color: #000;
+      }
+
+      .sku {
+        font-size: 11px;
+        color: #888;
+      }
+    }
+  }
+
+  &__checkbox-cell {
+    text-align: center;
+    width: 80px;
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    label {
+      display: block;
+      font-size: 10px;
+      color: #999;
+      margin-top: 4px;
+    }
+  }
+
+  &__order-cell {
+    width: 100px;
+
+    input[type="number"] {
+      width: 100%;
+      padding: 5px 8px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+    }
+  }
+
+  &__actions-cell {
+    width: 100px;
+    text-align: right;
+
+    .action-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #666;
+      margin-left: 10px;
+      font-size: 16px;
+
+      &:hover {
+        color: #000;
+      }
+
+      &--delete:hover {
+        color: #e63946;
+      }
+    }
+  }
+
+  &__empty {
+    padding: 30px;
+    text-align: center;
+    color: #999;
+    background: #fff;
+  }
+
+  &__add-section {
+    padding: 15px;
+    border-top: 1px solid #e2e2e2;
+    background: #fff;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    .picker-container {
+      flex: 1;
+    }
+  }
+
+  .save-hint {
+    font-size: 11px;
+    color: #d4a017;
+    margin-top: 8px;
+    padding: 0 15px 15px;
+    background: #fff;
+  }
+}

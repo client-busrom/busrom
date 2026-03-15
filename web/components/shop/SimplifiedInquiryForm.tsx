@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import type { Locale } from "@/i18n.config"
+import { PhoneInput } from "@/components/ui/PhoneInput"
 
 interface FormField {
   label: string
@@ -52,10 +53,8 @@ export function SimplifiedInquiryForm({
     allFields = configData.fields[locale] || configData.fields["en"] || []
   }
 
-  // Only show required fields
-  const requiredFields = allFields
-    .filter((field: FormField) => field.required)
-    .sort((a: FormField, b: FormField) => a.order - b.order)
+  // Only show required fields, preserving the order from the CMS array
+  const requiredFields = allFields.filter((field: FormField) => field.required)
 
   const [formData, setFormData] = useState<Record<string, any>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -124,10 +123,25 @@ export function SimplifiedInquiryForm({
 
       default:
         // Handle phone type by mapping it to tel
-        const inputType = (field.fieldType as string) === 'phone' ? 'tel' : field.fieldType
+        const isPhone = (field.fieldType as string) === 'phone' || (field.fieldType as string) === 'tel'
+        
+        if (isPhone) {
+          return (
+            <PhoneInput
+              id={field.fieldName}
+              name={field.fieldName}
+              value={formData[field.fieldName] || ""}
+              onChange={(phone) => handleChange(field.fieldName, phone)}
+              placeholder={field.placeholder}
+              required={field.required}
+              error={!!errors[field.fieldName]}
+            />
+          )
+        }
+
         return (
           <input
-            type={inputType}
+            type={field.fieldType}
             id={field.fieldName}
             name={field.fieldName}
             value={formData[field.fieldName] || ""}

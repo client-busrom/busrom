@@ -232,7 +232,22 @@ export const Products: CollectionConfig = {
               admin: {
                 description: {
                   en: 'Select the rich text content template for this product (filtered by category)',
-                  zh: '为该产品选择关联的链接内容模版页（根据分类自动筛选）',
+                  zh: '为该产品选择关联的链接内容模版页性（根据分类自动筛选）',
+                },
+              },
+            },
+            {
+              name: 'linkedForm',
+              type: 'relationship',
+              relationTo: 'form-configs',
+              label: {
+                en: 'Linked Form',
+                zh: '关联表单',
+              },
+              admin: {
+                description: {
+                  en: 'Select a form to display in the main content section (overrides form-block in template)',
+                  zh: '选择在详情内容板块显示的表单（如果选择，将覆盖模版中的 form-block 标记）',
                 },
               },
             },
@@ -338,12 +353,76 @@ export const Products: CollectionConfig = {
       type: 'number',
       defaultValue: 0,
       label: {
-        en: 'Display Order',
-        zh: '显示顺序',
+        en: 'Global Display Order',
+        zh: '全局显示顺序',
       },
       admin: {
         position: 'sidebar',
+        description: {
+          en: 'Generic order for this document in all lists',
+          zh: '该文档在所有列表中的通用顺序',
+        },
       },
+    },
+    {
+      label: {
+        en: 'Shop Management',
+        zh: 'Shop 列表管理',
+      },
+      type: 'collapsible',
+      admin: {
+        position: 'sidebar',
+      },
+      fields: [
+        {
+          name: 'shopVisibility',
+          type: 'checkbox',
+          defaultValue: true,
+          label: {
+            en: 'Show in Shop List',
+            zh: '在 Shop 列表展示',
+          },
+          admin: {
+            description: {
+              en: 'Toggle visibility of this product in the Shop gallery',
+              zh: '控制该产品是否出现在 Shop 列表页',
+            },
+          },
+        },
+        {
+          name: 'isHot',
+          type: 'checkbox',
+          defaultValue: false,
+          label: {
+            en: 'Hot Brand',
+            zh: '爆品 (Hot)',
+          },
+        },
+        {
+          name: 'isNew',
+          type: 'checkbox',
+          defaultValue: false,
+          label: {
+            en: 'New Arrival',
+            zh: '新品 (New)',
+          },
+        },
+        {
+          name: 'shopOrder',
+          type: 'number',
+          defaultValue: 0,
+          label: {
+            en: 'Sort Weight (Shop)',
+            zh: 'Shop 列表排序权重',
+          },
+          admin: {
+            description: {
+              en: 'Higher number = appears first in the shop list',
+              zh: '数字越大在列表页排名越靠前',
+            },
+          },
+        },
+      ],
     },
   ],
   hooks: {

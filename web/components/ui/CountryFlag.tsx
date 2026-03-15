@@ -76,13 +76,63 @@ import KI from "country-flag-icons/react/3x2/KI"
 import VU from "country-flag-icons/react/3x2/VU"
 import PG from "country-flag-icons/react/3x2/PG"
 import SB from "country-flag-icons/react/3x2/SB"
+import CN from "country-flag-icons/react/3x2/CN"
+import FR from "country-flag-icons/react/3x2/FR"
+import JP from "country-flag-icons/react/3x2/JP"
+import KR from "country-flag-icons/react/3x2/KR"
+import IN from "country-flag-icons/react/3x2/IN"
+import RU from "country-flag-icons/react/3x2/RU"
+import NG from "country-flag-icons/react/3x2/NG"
+import PE from "country-flag-icons/react/3x2/PE"
+import GR from "country-flag-icons/react/3x2/GR"
+import RO from "country-flag-icons/react/3x2/RO"
+import TH from "country-flag-icons/react/3x2/TH"
+import VN from "country-flag-icons/react/3x2/VN"
+import PH from "country-flag-icons/react/3x2/PH"
+import ID from "country-flag-icons/react/3x2/ID"
+import MY from "country-flag-icons/react/3x2/MY"
+import SG from "country-flag-icons/react/3x2/SG"
+import PK from "country-flag-icons/react/3x2/PK"
+import BD from "country-flag-icons/react/3x2/BD"
+import UA from "country-flag-icons/react/3x2/UA"
+import PT from "country-flag-icons/react/3x2/PT"
+import HR from "country-flag-icons/react/3x2/HR"
+import RS from "country-flag-icons/react/3x2/RS"
+import BG from "country-flag-icons/react/3x2/BG"
+import SI from "country-flag-icons/react/3x2/SI"
+import LT from "country-flag-icons/react/3x2/LT"
+import LV from "country-flag-icons/react/3x2/LV"
+import EE from "country-flag-icons/react/3x2/EE"
+import CY from "country-flag-icons/react/3x2/CY"
+import MT from "country-flag-icons/react/3x2/MT"
+import GE from "country-flag-icons/react/3x2/GE"
+import KE from "country-flag-icons/react/3x2/KE"
+import GH from "country-flag-icons/react/3x2/GH"
+import TZ from "country-flag-icons/react/3x2/TZ"
+import ET from "country-flag-icons/react/3x2/ET"
+import KH from "country-flag-icons/react/3x2/KH"
+import MM from "country-flag-icons/react/3x2/MM"
+import LK from "country-flag-icons/react/3x2/LK"
+import NP from "country-flag-icons/react/3x2/NP"
+import MN from "country-flag-icons/react/3x2/MN"
+import TW from "country-flag-icons/react/3x2/TW"
+import HK from "country-flag-icons/react/3x2/HK"
+import MO from "country-flag-icons/react/3x2/MO"
 
 // 国旗组件映射
-const flagComponents: Record<string, React.ComponentType<{ className?: string; title?: string }>> = {
-  US, CA, MX, BR, CO, GY, BS, PA, UY, CL, CR, AR, DO, TT,
+export const flagComponents: Record<string, React.ComponentType<{ className?: string; title?: string }>> = {
+  // Americas
+  US, CA, MX, BR, CO, GY, BS, PA, UY, CL, CR, AR, DO, TT, PE,
+  // Europe
   AT, BE, CZ, DK, DE, HU, IE, IS, IT, LU, NL, NO, PL, SK, ES, SE, CH, GB, FI,
-  SC, MU, GA, GQ, EG, BW, DZ, ZA, LY, TN, SZ, NA, CV, MA, AO,
-  AE, SA, QA, BH, KW, IL, TR, OM, AZ, LB, JO, IR, IQ,
+  FR, GR, RO, PT, HR, RS, BG, SI, LT, LV, EE, CY, MT, UA,
+  // Africa
+  SC, MU, GA, GQ, EG, BW, DZ, ZA, LY, TN, SZ, NA, CV, MA, AO, NG, KE, GH, TZ, ET,
+  // Middle East
+  AE, SA, QA, BH, KW, IL, TR, OM, AZ, LB, JO, IR, IQ, GE,
+  // Asia
+  CN, JP, KR, IN, RU, TH, VN, PH, ID, MY, SG, PK, BD, KH, MM, LK, NP, MN, TW, HK, MO,
+  // Oceania
   AU, NZ, PW, NR, FJ, TV, TO, WS, MH, FM, KI, VU, PG, SB,
 }
 

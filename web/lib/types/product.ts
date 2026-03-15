@@ -54,9 +54,14 @@ export interface Product {
 
   // Flags
   isFeatured: boolean
+  isHot?: boolean
+  isNew?: boolean
+  shopVisibility?: boolean
+  linkedForm?: string | { id: string; name: string }
 
   // Meta
   order: number
+  shopOrder?: number
   status: "PUBLISHED" | "DRAFT" | "ARCHIVED"
   createdAt: string
   updatedAt: string
@@ -125,7 +130,7 @@ export interface ProductFilters {
 /**
  * Product Sort Options
  */
-export type ProductSortField = "order" | "createdAt" | "updatedAt" | "name"
+export type ProductSortField = "order" | "shopOrder" | "createdAt" | "updatedAt" | "name"
 export type ProductSortDirection = "ASC" | "DESC"
 
 export interface ProductSort {

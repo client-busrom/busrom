@@ -143,8 +143,8 @@ export const SeriesIntroItems: CollectionConfig = {
           Field: '@/components/fields/TagBasedRandomImages',
         },
         description: {
-          en: 'Choose manual selection (up to 5 images) or auto random by category/tags',
-          zh: '选择手动选择（最多5张图片）或按分类/标签自动随机选择',
+          en: 'Choose manual selection, auto random by category/tags, or random from a Case Gallery (Application)',
+          zh: '选择手动选择、按分类/标签自动随机选择，或从案例图集（Application）中随机选择',
         },
       },
     },

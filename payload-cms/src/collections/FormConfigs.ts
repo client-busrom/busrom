@@ -144,21 +144,21 @@ export const FormConfigs: CollectionConfig = {
       localized: true,
     },
     {
-      name: 'location',
-      type: 'select',
+      name: 'assignedOperators',
+      type: 'relationship',
+      relationTo: 'users',
+      hasMany: true,
       label: {
-        en: 'Form Location',
-        zh: '表单位置',
+        en: 'Assigned Operators',
+        zh: '分权运营人员',
       },
-      required: true,
-      defaultValue: 'CUSTOM',
-      options: [
-        { label: { en: 'Home - Main Form', zh: '首页主表单' }, value: 'HOME_MAIN' },
-        { label: { en: 'Footer Form', zh: '页脚表单' }, value: 'FOOTER' },
-        { label: { en: 'Contact Us Page', zh: '联系我们' }, value: 'CONTACT_US' },
-        { label: { en: 'Quick Inquiry', zh: '快速咨询' }, value: 'QUICK_INQUIRY' },
-        { label: { en: 'Custom', zh: '自定义' }, value: 'CUSTOM' },
-      ],
+      admin: {
+        position: 'sidebar',
+        description: {
+          en: 'Only selected users (and super admins) will be able to see and manage submissions from this form.',
+          zh: '只有被选中的人员（以及超级管理员）才能看到并管理此表单的提交。',
+        },
+      },
     },
 
     // ==================================================================
@@ -314,15 +314,6 @@ export const FormConfigs: CollectionConfig = {
             { label: { en: 'Half', zh: '半宽' }, value: 'half' },
             { label: { en: 'Third', zh: '三分之一' }, value: 'third' },
           ],
-        },
-        {
-          name: 'order',
-          type: 'number',
-          label: {
-            en: 'Order',
-            zh: '顺序',
-          },
-          defaultValue: 0,
         },
       ],
     },

@@ -160,6 +160,31 @@ export const SeoSettings: CollectionConfig = {
         },
       },
     },
+    {
+      name: 'conflictAnalysis',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: '@/components/fields/SeoConflictAnalysis',
+        },
+      },
+    },
+    {
+      name: 'isMainSeo',
+      type: 'checkbox',
+      label: {
+        en: 'Set as Main SEO (Primary)',
+        zh: '设为主 SEO (展示标题/描述)',
+      },
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description: {
+          en: 'If checked, this item will provide the Meta Title and Description for the page. Other matching items will only be used for hidden long-tail keywords.',
+          zh: '勾选后，该项将提供页面的主标题和描述。同路径下的其他配置将仅作为隐藏长尾词使用。',
+        },
+      },
+    },
 
     // ==================================================================
     // SEO Fields
@@ -437,4 +462,48 @@ export const SeoSettings: CollectionConfig = {
     },
   ],
   timestamps: true,
+  hooks: {
+    beforeChange: [
+      async ({ data, req, originalDoc }) => {
+        // If isMainSeo is being set to true
+        if (data.isMainSeo === true && (originalDoc?.isMainSeo !== true)) {
+          const { payload } = req
+          const { scope, pageType, exactPath, pathPattern } = data
+
+          // Define finding criteria for "items with same matching precision"
+          const where: any = {
+            id: { not_equals: originalDoc?.id || '' }, // Exclude self
+            scope: { equals: scope },
+            isMainSeo: { equals: true },
+          }
+
+          if (scope === 'page_type') where.pageType = { equals: pageType }
+          if (scope === 'exact_path') where.exactPath = { equals: exactPath }
+          if (scope === 'path_pattern') where.pathPattern = { equals: pathPattern }
+
+          // Find other docs that are currently marked as Main SEO for the same target
+          const others = await payload.find({
+            collection: 'seo-settings',
+            where,
+            depth: 0,
+            limit: 100,
+          })
+
+          // Uncheck them
+          if (others.docs.length > 0) {
+            await Promise.all(
+              others.docs.map((doc) =>
+                payload.update({
+                  collection: 'seo-settings',
+                  id: doc.id,
+                  data: { isMainSeo: false } as any,
+                })
+              )
+            )
+          }
+        }
+        return data
+      },
+    ],
+  },
 }

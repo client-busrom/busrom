@@ -43,6 +43,7 @@ export interface SeoSetting {
   includeInSitemap?: boolean
   sitemapPriority?: number
   sitemapChangefreq?: string
+  isMainSeo?: boolean
   // Timestamps
   createdAt?: string
   updatedAt?: string
@@ -571,11 +572,9 @@ function sortByPriority(settings: SeoSetting[]): SeoSetting[] {
   }
 
   return settings.sort((a, b) => {
-    // 1. Compare sitemapPriority (higher first)
-    const priorityA = a.sitemapPriority ?? 0.5
-    const priorityB = b.sitemapPriority ?? 0.5
-    if (priorityA !== priorityB) {
-      return priorityB - priorityA
+    // 1. Compare isMainSeo (true comes first)
+    if (a.isMainSeo !== b.isMainSeo) {
+      return a.isMainSeo ? -1 : 1
     }
 
     // 2. Compare scope type

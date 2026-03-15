@@ -22,7 +22,7 @@ const fetcher = (url: string) => fetch(url).then(res => res.json())
 // 构建产品列表 API URL
 function buildProductsUrl(
   locale: string,
-  series: string,
+  category: string,
   sortBy: string,
   sortDirection: string,
   featuredOnly: boolean,
@@ -36,8 +36,8 @@ function buildProductsUrl(
     sortBy,
     sortDir: sortDirection.toLowerCase(),
   })
-  if (series) {
-    params.append("series", series)
+  if (category) {
+    params.append("category", category)
   }
   if (featuredOnly) {
     params.append("isFeatured", "true")
@@ -71,13 +71,13 @@ interface ShopPageClientProps {
 
 export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
   // Filter & Search State
-  const initialSeries = searchParams.series
-    ? (Array.isArray(searchParams.series) ? searchParams.series[0] : searchParams.series)
+  const initialCategory = searchParams.category
+    ? (Array.isArray(searchParams.category) ? searchParams.category[0] : searchParams.category)
     : ""
-  const [selectedSeries, setSelectedSeries] = useState<string>(initialSeries)
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory)
   const [searchQuery, setSearchQuery] = useState("")
-  const [sortBy, setSortBy] = useState<ProductSortField>("order")
-  const [sortDirection, setSortDirection] = useState<ProductSortDirection>("ASC")
+  const [sortBy, setSortBy] = useState<ProductSortField>("shopOrder")
+  const [sortDirection, setSortDirection] = useState<ProductSortDirection>("DESC")
   const [featuredOnly, setFeaturedOnly] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -90,22 +90,23 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
   // 用于控制退出动画
   const [isExiting, setIsExiting] = useState(false)
 
-  // Fetch series for navigation
-  const { data: seriesData } = useSWR<{ series: ProductSeries[] }>(
-    `/api/product-series?locale=${locale}`,
+  // Fetch Shop Config for tabs
+  const { data: configData } = useSWR<{ categories: any[], showAllTab: boolean, title: string, pageSize: number }>(
+    `/api/shop/config?locale=${locale}`,
     fetcher,
     { revalidateOnFocus: false }
   )
-  const series = seriesData?.series || []
+  const categories = configData?.categories || []
+  const showAllTab = configData?.showAllTab !== false
 
   // Fetch products with SWR
-  const productsUrl = buildProductsUrl(locale, selectedSeries, sortBy, sortDirection, featuredOnly, currentPage)
+  const productsUrl = buildProductsUrl(locale, selectedCategory, sortBy, sortDirection, featuredOnly, currentPage, configData?.pageSize || 24)
   const { data: productsData, isLoading, isValidating } = useSWR<ProductListResponse>(
     productsUrl,
     fetcher,
     {
       revalidateOnFocus: false,
-      keepPreviousData: true, // 保持旧数据直到新数据加载完成
+      keepPreviousData: true, 
     }
   )
 
@@ -114,37 +115,30 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
   const totalResults = productsData?.total || 0
 
   // 预取：鼠标悬停时预加载该系列的数据
-  const handleSeriesHover = useCallback((seriesSlug: string) => {
-    const url = buildProductsUrl(locale, seriesSlug, sortBy, sortDirection, featuredOnly)
+  const handleCategoryHover = useCallback((categorySlug: string) => {
+    const url = buildProductsUrl(locale, categorySlug, sortBy, sortDirection, featuredOnly)
     preload(url, fetcher)
   }, [locale, sortBy, sortDirection, featuredOnly])
 
-  // 切换系列 - 先触发退出动画，再切换数据
-  const handleSeriesChange = useCallback((newSeries: string) => {
-    if (newSeries === selectedSeries || isExiting) return
+  // 切换系列 - 直接切换，由 AnimatePresence 处理动画
+  const handleCategoryChange = useCallback((newCategory: string) => {
+    if (newCategory === selectedCategory) return
 
-    // 先触发退出动画
-    setIsExiting(true)
-
-    // 等待退出动画完成后再切换数据
-    setTimeout(() => {
-      setSelectedSeries(newSeries)
-      setCurrentPage(1)
-      setAnimationKey(prev => prev + 1)
-      setIsExiting(false)
-    }, 400) // 退出动画时长
-  }, [selectedSeries, isExiting])
+    setSelectedCategory(newCategory)
+    setAnimationKey(prev => prev + 1)
+    setCurrentPage(1)
+  }, [selectedCategory])
 
   // 监听 URL 参数变化
   useEffect(() => {
-    const seriesFromUrl = searchParams.series
-      ? (Array.isArray(searchParams.series) ? searchParams.series[0] : searchParams.series)
+    const categoryFromUrl = searchParams.category
+      ? (Array.isArray(searchParams.category) ? searchParams.category[0] : searchParams.category)
       : ""
-    if (seriesFromUrl !== selectedSeries) {
-      setSelectedSeries(seriesFromUrl)
+    if (categoryFromUrl !== selectedCategory) {
+      setSelectedCategory(categoryFromUrl)
       setAnimationKey(prev => prev + 1)
     }
-  }, [searchParams.series])
+  }, [searchParams.category])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -196,19 +190,18 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
     })
   }, [products, searchQuery, locale])
 
-  // Get current series name for title
-  const currentSeriesName = useMemo(() => {
-    if (!selectedSeries) return "All Products"
-    const found = series.find(s => s.slug === selectedSeries)
-    return found?.localizedName || getLocalizedName(found?.name, locale, selectedSeries)
-  }, [selectedSeries, series, locale])
+  // Get current category name for title
+  const displayTitle = useMemo(() => {
+    if (!selectedCategory) return "All Products"
+    const found = categories.find(c => c.id === selectedCategory || c.slug === selectedCategory)
+    return found?.name || "SHOP"
+  }, [selectedCategory, categories])
 
   // Sort options
   const sortOptions = [
-    { label: "Default", value: "order", direction: "ASC" as const },
+    { label: "Featured", value: "shopOrder", direction: "DESC" as const },
     { label: "Newest", value: "createdAt", direction: "DESC" as const },
-    { label: "Oldest", value: "createdAt", direction: "ASC" as const },
-    { label: "Updated", value: "updatedAt", direction: "DESC" as const },
+    { label: "Price", value: "order", direction: "ASC" as const }, // Just a placeholder for order
   ]
 
   // 首次加载显示骨架屏
@@ -264,14 +257,14 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
         <div className="relative h-[52px] lg:h-[68px] flex items-center justify-center">
           <AnimatePresence mode="wait">
             <motion.h1
-              key={currentSeriesName}
+              key={displayTitle}
               initial={{ y: 40, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -40, opacity: 0 }}
               transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
               className="font-orbitron font-medium text-4xl lg:text-6xl text-brand-text-black uppercase tracking-wide text-center absolute"
             >
-              {currentSeriesName}
+              {displayTitle}
             </motion.h1>
           </AnimatePresence>
         </div>
@@ -283,33 +276,33 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
           <div className="flex items-center justify-center py-3 lg:py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 lg:gap-x-6 lg:gap-y-4 max-w-[calc(7*140px)]">
               {/* All Products Tab */}
-              <button
-                onClick={() => handleSeriesChange("")}
-                onMouseEnter={() => handleSeriesHover("")}
-                className={cn(
-                  "text-sm font-medium transition-colors pb-1 whitespace-nowrap px-2",
-                  !selectedSeries
-                    ? "text-brand-text-black border-b-2 border-brand-text-black"
-                    : "text-brand-accent-gold hover:text-brand-text-black"
-                )}
-              >
-                All
-              </button>
-
-              {/* Series Tabs */}
-              {series.map((s) => (
+              {showAllTab && (
                 <button
-                  key={s.id}
-                  onClick={() => handleSeriesChange(s.slug)}
-                  onMouseEnter={() => handleSeriesHover(s.slug)}
+                  onClick={() => handleCategoryChange("")}
                   className={cn(
-                    "text-sm font-medium transition-colors pb-1 whitespace-nowrap px-2",
-                    selectedSeries === s.slug
+                    "text-sm font-medium transition-colors pb-1 whitespace-nowrap px-2 font-orbitron",
+                    !selectedCategory
                       ? "text-brand-text-black border-b-2 border-brand-text-black"
                       : "text-brand-accent-gold hover:text-brand-text-black"
                   )}
                 >
-                  {s.localizedName || getLocalizedName(s.name, locale, s.slug)}
+                  All
+                </button>
+              )}
+
+              {/* Category Tabs */}
+              {categories.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => handleCategoryChange(c.id)}
+                  className={cn(
+                    "text-sm font-medium transition-colors pb-1 whitespace-nowrap px-2 font-orbitron",
+                    selectedCategory === c.id
+                      ? "text-brand-text-black border-b-2 border-brand-text-black"
+                      : "text-brand-accent-gold hover:text-brand-text-black"
+                  )}
+                >
+                  {c.name}
                 </button>
               ))}
             </div>
@@ -434,13 +427,13 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
           )}
 
           <AnimatePresence mode="wait">
-            {filteredProducts.length === 0 && !isExiting ? (
+            {filteredProducts.length === 0 && !isLoading ? (
               <motion.div
                 key="no-results"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="text-center py-20"
+                className="text-center py-20 w-full"
               >
                 <p className="text-brand-text-black text-2xl font-anaheim font-extrabold mb-3">
                   No products found
@@ -451,11 +444,11 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
               </motion.div>
             ) : (
               <motion.div
-                key={`products-${animationKey}-${isExiting ? 'exit' : 'enter'}`}
+                key={`products-${selectedCategory}-${animationKey}`}
                 className="flex flex-wrap justify-center gap-4 lg:gap-6 max-w-[1072px] mx-auto"
                 variants={containerVariants}
                 initial="hidden"
-                animate={isExiting ? "exit" : "visible"}
+                animate="visible"
                 exit="exit"
               >
                 {filteredProducts.map((product, index) => (

@@ -641,6 +641,7 @@ export async function GET(
       status: product.status === 'published' ? 'PUBLISHED' : 'DRAFT',
       productAttributes: product.productAttributes || product.attributePage?.productAttributes || null,
       customAttributes: product.customAttributes || product.attributePage?.customAttributes || null,
+      linkedForm: product.linkedForm || null,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
       // Related products
