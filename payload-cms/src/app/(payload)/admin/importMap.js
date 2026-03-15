@@ -4,6 +4,7 @@ import { default as default_6e007ac8f0e2f687212ebb65ad91c147 } from '@/component
 import { default as default_a8e2ac70c3f86fe45f78f09046549378 } from '@/components/fields/SpecsField'
 import { MultiLocaleTextareaField as MultiLocaleTextareaField_818f830b0ef41c7fd6298cda9b34bc80 } from '@/components/fields/MultiLocaleField'
 import { default as default_643116d2ab91f7b0d99236a7afb7c645 } from '@/components/fields/MediaPicker'
+import { default as default_394ddaf2fca725ee5ec4bf214e01a751 } from '@/components/fields/MediaThumbnailCell'
 import { default as default_8ee29faa67a64494ccbe7f4a2ea41dbf } from '@/components/fields/AttributesTableField'
 import { default as default_1c5ae25fc75ab523bfe3f6b5ce843df4 } from '@/components/fields/ProductSpecificationsField'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -88,6 +89,7 @@ export const importMap = {
   "@/components/fields/SpecsField#default": default_a8e2ac70c3f86fe45f78f09046549378,
   "@/components/fields/MultiLocaleField#MultiLocaleTextareaField": MultiLocaleTextareaField_818f830b0ef41c7fd6298cda9b34bc80,
   "@/components/fields/MediaPicker#default": default_643116d2ab91f7b0d99236a7afb7c645,
+  "@/components/fields/MediaThumbnailCell#default": default_394ddaf2fca725ee5ec4bf214e01a751,
   "@/components/fields/AttributesTableField#default": default_8ee29faa67a64494ccbe7f4a2ea41dbf,
   "@/components/fields/ProductSpecificationsField#default": default_1c5ae25fc75ab523bfe3f6b5ce843df4,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
