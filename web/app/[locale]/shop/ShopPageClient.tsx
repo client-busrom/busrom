@@ -145,9 +145,12 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
       ? (Array.isArray(searchParams.category) ? searchParams.category[0] : searchParams.category)
       : ""
     
-    // 统一转换为字符串比较，避免 string vs number 导致的不等
-    if (String(categoryFromUrl || "") !== String(selectedCategory || "")) {
-      setSelectedCategory(categoryFromUrl ? String(categoryFromUrl) : "")
+    // 统一转换为字符串比较，避免数字 ID 与字符串 ID 不匹配
+    const normalizedUrlCat = String(categoryFromUrl || "")
+    const normalizedStateCat = String(selectedCategory || "")
+    
+    if (normalizedUrlCat !== normalizedStateCat) {
+      setSelectedCategory(normalizedUrlCat)
       setAnimationKey(prev => prev + 1)
     }
   }, [searchParams.category])
@@ -205,8 +208,9 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
   // Get current category name for title
   const displayTitle = useMemo(() => {
     if (!selectedCategory) return "All Products"
-    const found = categories.find(c => c.id === selectedCategory || c.slug === selectedCategory)
-    return found?.name || "SHOP"
+    // 使用 String() 确保数字和字符串 ID 都能匹配
+    const found = categories.find(c => String(c.id) === String(selectedCategory) || c.slug === selectedCategory)
+    return found?.name || "All Products" 
   }, [selectedCategory, categories])
 
   // Sort options
