@@ -120,11 +120,21 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
     preload(url, fetcher)
   }, [locale, sortBy, sortDirection, featuredOnly])
 
-  // 切换系列 - 直接切换，由 AnimatePresence 处理动画
+  // 切换系列 - 更新 URL 并由 useEffect 同步状态
   const handleCategoryChange = useCallback((newCategory: string) => {
-    if (newCategory === selectedCategory) return
-
-    setSelectedCategory(newCategory)
+    const params = new URLSearchParams(window.location.search)
+    if (newCategory) {
+      params.set('category', newCategory.toString())
+    } else {
+      params.delete('category')
+    }
+    params.set('page', '1') // Reset page
+    
+    const newUrl = `${window.location.pathname}?${params.toString()}`
+    window.history.pushState(null, '', newUrl)
+    
+    // 手动触发状态更新以获得即时响应
+    setSelectedCategory(newCategory.toString())
     setAnimationKey(prev => prev + 1)
     setCurrentPage(1)
   }, [selectedCategory])
@@ -134,8 +144,10 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
     const categoryFromUrl = searchParams.category
       ? (Array.isArray(searchParams.category) ? searchParams.category[0] : searchParams.category)
       : ""
-    if (categoryFromUrl !== selectedCategory) {
-      setSelectedCategory(categoryFromUrl)
+    
+    // 统一转换为字符串比较，避免 string vs number 导致的不等
+    if (String(categoryFromUrl || "") !== String(selectedCategory || "")) {
+      setSelectedCategory(categoryFromUrl ? String(categoryFromUrl) : "")
       setAnimationKey(prev => prev + 1)
     }
   }, [searchParams.category])
