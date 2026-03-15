@@ -174,7 +174,7 @@ export async function GET(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
       },
-      next: { revalidate: 60 }, // 缓存 60 秒
+      next: { revalidate: 0 }, // 禁用该路由的 Next.js 数据缓存，确保结果实时
     })
 
     if (!response.ok) {
