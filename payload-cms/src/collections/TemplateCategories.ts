@@ -13,11 +13,11 @@ export const TemplateCategories: CollectionConfig = {
   labels: {
     singular: {
       en: 'Template Category',
-      zh: '模版库分类集合',
+      zh: '组件模版库分类集合',
     },
     plural: {
       en: 'Template Categories',
-      zh: '模版库分类集合',
+      zh: '组件模版库分类集合',
     },
   },
   admin: {

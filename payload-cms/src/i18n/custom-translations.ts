@@ -732,7 +732,7 @@ export const customTranslationsZh = {
       faqItems: '常见问题',
       reusableBlocks: '可复用块',
       documentTemplates: '页面板块模板库',
-      templateCategories: '模版库分类集合',
+      templateCategories: '组件模版库分类集合',
       formConfigs: '表单配置',
       formSubmissions: '表单提交',
       smtpConfigs: 'SMTP 配置',
