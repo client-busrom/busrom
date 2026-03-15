@@ -102,8 +102,8 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
   const categories = configData?.categories || []
   const showAllTab = configData?.showAllTab !== false
 
-  // Fetch products with SWR
-  const productsUrl = buildProductsUrl(locale, selectedCategory, sortBy, sortDirection, featuredOnly, currentPage, configData?.pageSize || 24)
+  // Fetch products with SWR - 获取全量数据以支持前端快速筛选
+  const productsUrl = buildProductsUrl(locale, "", sortBy, sortDirection, featuredOnly, 1, 1000) 
   const { data: productsData, isLoading, isValidating } = useSWR<ProductListResponse>(
     productsUrl,
     fetcher,
@@ -113,9 +113,43 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
     }
   )
 
-  const products = productsData?.products || []
-  const totalPages = productsData?.totalPages || 1
-  const totalResults = productsData?.total || 0
+  const allProducts = productsData?.products || []
+  
+  // 1. 先按系列/分类进行前端筛选
+  const categoryFilteredProducts = useMemo(() => {
+    if (!selectedCategory) return allProducts
+    return allProducts.filter(p => {
+      const catId = (p as any).category?.id || (p as any).category
+      const seriesId = (p as any).series?.id || (p as any).series
+      const catSlug = (p as any).category?.slug
+      const seriesSlug = (p as any).series?.slug
+      
+      return String(catId) === String(selectedCategory) || 
+             String(seriesId) === String(selectedCategory) ||
+             catSlug === selectedCategory ||
+             seriesSlug === selectedCategory
+    })
+  }, [allProducts, selectedCategory])
+
+  // 2. 再按搜索关键词筛选
+  const filteredProducts = useMemo(() => {
+    if (!searchQuery.trim()) return categoryFilteredProducts
+    const query = searchQuery.toLowerCase()
+    return categoryFilteredProducts.filter((product) => {
+      const name = (product as any).localizedName?.toLowerCase() || product.name?.[locale]?.toLowerCase() || product.sku.toLowerCase()
+      return name.includes(query) || product.sku.toLowerCase().includes(query)
+    })
+  }, [categoryFilteredProducts, searchQuery, locale])
+
+  // 3. 处理前端分页
+  const pageSize = configData?.pageSize || 24
+  const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * pageSize
+    return filteredProducts.slice(start, start + pageSize)
+  }, [filteredProducts, currentPage, pageSize])
+
+  const totalResults = filteredProducts.length
 
   // 预取：鼠标悬停时预加载该系列的数据
   const handleCategoryHover = useCallback((categorySlug: string) => {
@@ -158,14 +192,14 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
 
   // 预加载首屏产品图片
   useEffect(() => {
-    if (products.length === 0) return
+    if (paginatedProducts.length === 0) return
 
     const existingPreloads = document.querySelectorAll('link[data-product-preload]')
     existingPreloads.forEach(link => link.remove())
 
-    const imagesToPreload = products.slice(0, 8)
+    const imagesToPreload = paginatedProducts.slice(0, 8)
     imagesToPreload.forEach((product, index) => {
-      const imageUrl = getProductImageUrl(product)
+      const imageUrl = (product as any).showImage?.url || (product as any).mainImage?.[0]?.url
       if (!imageUrl) return
 
       const link = document.createElement('link')
@@ -183,17 +217,7 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
       const preloads = document.querySelectorAll('link[data-product-preload]')
       preloads.forEach(link => link.remove())
     }
-  }, [products])
-
-  // Client-side search filtering
-  const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) return products
-    const query = searchQuery.toLowerCase()
-    return products.filter((product) => {
-      const name = (product as any).localizedName?.toLowerCase() || product.name?.[locale]?.toLowerCase() || product.sku.toLowerCase()
-      return name.includes(query) || product.sku.toLowerCase().includes(query)
-    })
-  }, [products, searchQuery, locale])
+  }, [paginatedProducts])
 
   // Get current category name for title
   const displayTitle = useMemo(() => {
@@ -211,7 +235,7 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
   ]
 
   // 首次加载显示骨架屏
-  if (isLoading && products.length === 0) {
+  if (isLoading && allProducts.length === 0) {
     return <ShopPageSkeleton />
   }
 
@@ -457,7 +481,7 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
                 animate="visible"
                 exit="exit"
               >
-                {filteredProducts.map((product, index) => (
+                {paginatedProducts.map((product, index) => (
                   <motion.div
                     key={product.id}
                     variants={cardVariants}
