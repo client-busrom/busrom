@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import useSWR, { preload } from "swr"
+import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import type { Locale } from "@/i18n.config"
 import { ProductCard } from "@/components/shop/ProductCard"
 import { ShopPageSkeleton } from "@/components/shop/ShopPageSkeleton"
@@ -70,16 +71,18 @@ interface ShopPageClientProps {
 }
 
 export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
-  // Filter & Search State
-  const initialCategory = searchParams.category
-    ? (Array.isArray(searchParams.category) ? searchParams.category[0] : searchParams.category)
-    : ""
-  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory)
+  const router = useRouter()
+  const searchParamsDict = useSearchParams()
+  const pathname = usePathname()
+
+  // Filter & Search State derived from URL
+  const selectedCategory = searchParamsDict.get('category') || ""
+  const currentPage = parseInt(searchParamsDict.get('page') || '1')
+  
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState<ProductSortField>("shopOrder")
   const [sortDirection, setSortDirection] = useState<ProductSortDirection>("DESC")
   const [featuredOnly, setFeaturedOnly] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
 
   // UI State
   const [isFilterSortOpen, setIsFilterSortOpen] = useState(false)
@@ -120,9 +123,9 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
     preload(url, fetcher)
   }, [locale, sortBy, sortDirection, featuredOnly])
 
-  // 切换系列 - 更新 URL 并由 useEffect 同步状态
+  // 切换系列 - 使用 Next.js Router 确保状态同步
   const handleCategoryChange = useCallback((newCategory: string) => {
-    const params = new URLSearchParams(window.location.search)
+    const params = new URLSearchParams(searchParamsDict.toString())
     if (newCategory) {
       params.set('category', newCategory.toString())
     } else {
@@ -130,30 +133,17 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
     }
     params.set('page', '1') // Reset page
     
-    const newUrl = `${window.location.pathname}?${params.toString()}`
-    window.history.pushState(null, '', newUrl)
-    
-    // 手动触发状态更新以获得即时响应
-    setSelectedCategory(newCategory.toString())
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
     setAnimationKey(prev => prev + 1)
-    setCurrentPage(1)
-  }, [selectedCategory])
+  }, [pathname, router, searchParamsDict])
 
-  // 监听 URL 参数变化
-  useEffect(() => {
-    const categoryFromUrl = searchParams.category
-      ? (Array.isArray(searchParams.category) ? searchParams.category[0] : searchParams.category)
-      : ""
-    
-    // 统一转换为字符串比较，避免数字 ID 与字符串 ID 不匹配
-    const normalizedUrlCat = String(categoryFromUrl || "")
-    const normalizedStateCat = String(selectedCategory || "")
-    
-    if (normalizedUrlCat !== normalizedStateCat) {
-      setSelectedCategory(normalizedUrlCat)
-      setAnimationKey(prev => prev + 1)
-    }
-  }, [searchParams.category])
+  // 分页切换
+  const handlePageChange = useCallback((newPage: number) => {
+    const params = new URLSearchParams(searchParamsDict.toString())
+    params.set('page', newPage.toString())
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+    setAnimationKey(prev => prev + 1)
+  }, [pathname, router, searchParamsDict])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -488,10 +478,7 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-4 mt-12 pt-8 border-t border-brand-accent-border">
             <button
-              onClick={() => {
-                setCurrentPage((p) => Math.max(1, p - 1))
-                setAnimationKey(prev => prev + 1)
-              }}
+              onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
               className="px-4 py-2 text-sm disabled:opacity-30 disabled:cursor-not-allowed text-brand-text-black hover:text-brand-secondary transition-colors"
             >
@@ -502,10 +489,7 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
-                  onClick={() => {
-                    setCurrentPage(page)
-                    setAnimationKey(prev => prev + 1)
-                  }}
+                  onClick={() => handlePageChange(page)}
                   className={cn(
                     "w-8 h-8 text-sm transition-colors",
                     page === currentPage
@@ -519,10 +503,7 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
             </div>
 
             <button
-              onClick={() => {
-                setCurrentPage((p) => Math.min(totalPages, p + 1))
-                setAnimationKey(prev => prev + 1)
-              }}
+              onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
               className="px-4 py-2 text-sm disabled:opacity-30 disabled:cursor-not-allowed text-brand-text-black hover:text-brand-secondary transition-colors"
             >
