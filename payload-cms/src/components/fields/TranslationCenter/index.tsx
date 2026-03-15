@@ -177,6 +177,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
   const [overwriteExisting, setOverwriteExisting] = useState(false)
   const [isTranslating, setIsTranslating] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [progress, setProgress] = useState<{ current: number; total: number } | null>(null)
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'warning'; key: string; params?: Record<string, string | number> } | null>(null)
   const [modifiedLocales, setModifiedLocales] = useState<Set<LocaleCode>>(new Set()) // 追踪修改过的语言
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set()) // 选中参与翻译的字段
@@ -379,6 +380,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
     }
 
     setIsTranslating(true)
+    setProgress({ current: 0, total: fieldsToTranslate.length })
     setStatusMessage(null)
 
     let translatedFieldCount = 0
@@ -443,6 +445,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
 
         translatedFieldCount++
         localesToTranslate.forEach(l => translatedLanguages.add(l))
+        setProgress(prev => prev ? { ...prev, current: translatedFieldCount } : null)
       }
 
       setStatusMessage({ type: 'success', key: 'custom:translationCenter:translateSuccess', params: { fields: translatedFieldCount, languages: translatedLanguages.size } })
@@ -451,6 +454,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
       setStatusMessage({ type: 'error', key: 'custom:translationCenter:translateFailed' })
     } finally {
       setIsTranslating(false)
+      setProgress(null)
     }
   }, [fieldsData, selectedFields, sourceLocale, targetLocales, overwriteExisting, t, i18n])
 
@@ -480,6 +484,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
     if (!id || !collectionSlug || !fieldConfigs) return
 
     setIsSaving(true)
+    setProgress({ current: 0, total: 1 }) // Will be updated
     setStatusMessage(null)
 
     let successCount = 0
@@ -495,8 +500,11 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
       if (localesToSave.length === 0) {
         setStatusMessage({ type: 'warning', key: 'custom:translationCenter:noChanges' })
         setIsSaving(false)
+        setProgress(null)
         return
       }
+
+      setProgress({ current: 0, total: localesToSave.length })
 
       for (const localeCode of localesToSave) {
         const locale = SUPPORTED_LOCALES.find(l => l.code === localeCode)
@@ -578,6 +586,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
         } else {
           failCount++
         }
+        setProgress(prev => prev ? { ...prev, current: successCount + failCount } : null)
       }
 
       if (failCount === 0) {
@@ -593,6 +602,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
       setStatusMessage({ type: 'error', key: 'custom:translationCenter:saveFailed' })
     } finally {
       setIsSaving(false)
+      setProgress(null)
     }
   }, [id, collectionSlug, fieldConfigs, fieldsData, sourceLocale, currentLocale.code, modifiedLocales])
 
@@ -613,6 +623,8 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
       'custom:translationCenter:translateFailed': t('custom:translationCenter:translateFailed' as any) as string,
       'custom:translationCenter:saveFailed': t('custom:translationCenter:saveFailed' as any) as string,
       'custom:translationCenter:loadFailed': t('custom:translationCenter:loadFailed' as any) as string,
+      'custom:translationCenter:noChanges': t('custom:translationCenter:noChanges' as any) as string,
+      'custom:translationCenter:sourceEmpty': t('custom:translationCenter:sourceEmpty' as any) as string,
     }
 
     // 对于带参数的消息，手动构建
@@ -771,7 +783,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
                         disabled={isTranslating || isSaving || targetLocales.length === 0}
                       >
                         {isTranslating
-                          ? t('custom:translationCenter:translating' as any)
+                          ? `${t('custom:translationCenter:translating' as any)} ${progress ? `(${progress.current}/${progress.total})` : ''}`
                           : `${t('custom:translationCenter:translate' as any)} (${targetLocales.length})`
                         }
                       </button>
@@ -781,7 +793,10 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
                         onClick={handleSave}
                         disabled={isTranslating || isSaving}
                       >
-                        {isSaving ? t('custom:translationCenter:saving' as any) : t('custom:translationCenter:saveAll' as any)}
+                        {isSaving 
+                          ? `${t('custom:translationCenter:saving' as any)} ${progress ? `(${progress.current}/${progress.total})` : ''}`
+                          : t('custom:translationCenter:saveAll' as any)
+                        }
                       </button>
                     </div>
                   </div>

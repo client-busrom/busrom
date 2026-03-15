@@ -73,8 +73,8 @@ export const ProductTemplates: CollectionConfig = {
       },
       admin: {
         description: {
-          en: 'Rich text content for product details',
-          zh: '用于产品链接的富文本内容',
+          en: 'Rich text content for product details (Forms should be linked in the Integration Page now)',
+          zh: '用于产品链接的富文本内容（表单请在整合页直接关联，不再建议在富文本中使用 form-block）',
         },
         components: {
           beforeInput: ['@/components/fields/MultiLocaleRichTextField'],

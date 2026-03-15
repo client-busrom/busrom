@@ -113,12 +113,15 @@ export function ProductCard({ product, locale, priority, index = 0 }: ProductCar
       onMouseLeave={handleMouseLeave}
     >
       {/* Image Container - Square Aspect Ratio */}
-      <Link
-        href={`/${locale}/shop/${product.slug}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="relative w-[250px] h-[250px] bg-white overflow-hidden mb-3 block"
+      <div 
+        className="relative w-[250px] h-[250px] bg-white overflow-hidden mb-3 block cursor-pointer group/image"
       >
+        <Link
+          href={`/${locale}/shop/${product.slug}`}
+          className="absolute inset-0 z-10"
+          target="_blank"
+          rel="noopener noreferrer"
+        />
         {displayImage ? (
           <Image
             src={getVariantUrl(displayImage.variants?.tablet) || getVariantUrl(displayImage.variants?.card) || getVariantUrl(displayImage.variants?.medium) || getVariantUrl(displayImage.variants?.large) || getVariantUrl(displayImage.variants?.thumbnail) || displayImage.url}
@@ -126,7 +129,7 @@ export function ProductCard({ product, locale, priority, index = 0 }: ProductCar
             fill
             sizes="250px"
             className={cn(
-              "transition-transform duration-500 group-hover:scale-105",
+              "transition-transform duration-500 group-hover/image:scale-105",
               // 初始白底图用 contain 完整展示，悬停轮播图用 cover 填满
               isHovering && mainImages.length > 0 ? "object-cover" : "object-contain"
             )}
@@ -141,17 +144,29 @@ export function ProductCard({ product, locale, priority, index = 0 }: ProductCar
           </div>
         )}
 
-        {/* Featured badge */}
-        {product.isFeatured && (
-          <div className="absolute top-0 right-0 bg-brand-secondary text-white text-[10px] font-semibold px-2 py-1 uppercase tracking-wider">
-            Featured
-          </div>
-        )}
+        {/* Status badges (Hot / New / Featured) */}
+        <div className="absolute top-0 right-0 flex flex-col items-end z-20">
+          {product.isHot && (
+            <div className="bg-[#E63946] text-white text-[9px] font-bold px-2 py-0.5 uppercase tracking-tighter mb-px">
+              HOT
+            </div>
+          )}
+          {product.isNew && (
+            <div className="bg-[#B5964B] text-white text-[9px] font-bold px-2 py-0.5 uppercase tracking-tighter mb-px">
+              NEW
+            </div>
+          )}
+          {product.isFeatured && (
+            <div className="bg-brand-secondary text-white text-[9px] font-bold px-2 py-0.5 uppercase tracking-tighter">
+              Featured
+            </div>
+          )}
+        </div>
 
         {/* Overlay with Two Buttons - Always visible on mobile, hover on desktop */}
         <div
           className={cn(
-            "absolute inset-0 flex items-end justify-center transition-all duration-300",
+            "absolute inset-0 flex items-end justify-center transition-all duration-300 z-20",
             // Mobile: always show light overlay
             "bg-black/10",
             // Desktop: darker overlay on hover
@@ -202,7 +217,7 @@ export function ProductCard({ product, locale, priority, index = 0 }: ProductCar
             </Link>
           </div>
         </div>
-      </Link>
+      </div>
 
       {/* Product Info */}
       <div className="flex flex-col space-y-1 w-[250px]">

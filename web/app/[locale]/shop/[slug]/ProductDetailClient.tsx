@@ -91,27 +91,44 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
         const data = await res.json()
         setProduct(data)
 
-        // Extract formConfig ID from content and fetch formConfig data
-        const formBlocks = data.content?.root?.children?.filter((n: any) =>
-          n.type === 'formBlock' || (n.type === 'block' && n.fields?.blockType === 'form-block')
-        ) || []
+        // 1. Check for directly linked form (higher priority)
+        let formConfigToUse = null
+        let formConfigId = null
 
-        if (formBlocks.length > 0) {
-          const formConfigId = formBlocks[0].data?.formConfig?.id || formBlocks[0].fields?.formConfig?.id
-          if (formConfigId) {
+        if (data.linkedForm) {
+          if (typeof data.linkedForm === 'object' && data.linkedForm.id) {
+            formConfigToUse = data.linkedForm
+            formConfigId = data.linkedForm.id
+          } else {
+            formConfigId = data.linkedForm
+          }
+        }
+
+        // 2. Fallback to form block in content if no direct link
+        if (!formConfigId) {
+          const formBlocks = data.content?.root?.children?.filter((n: any) =>
+            n.type === 'formBlock' || (n.type === 'block' && n.fields?.blockType === 'form-block')
+          ) || []
+
+          if (formBlocks.length > 0) {
+            formConfigId = formBlocks[0].data?.formConfig?.id || formBlocks[0].fields?.formConfig?.id
+          }
+        }
+
+        // Fetch form config if we have an ID but not the full object
+        if (formConfigId) {
+          if (formConfigToUse) {
+            setFormConfig(formConfigToUse)
+          } else {
             try {
               const formRes = await fetch(`/api/form-configs/${formConfigId}`)
               if (formRes.ok) {
                 const formData = await formRes.json()
                 setFormConfig(formData)
-              } else {
-                console.error('[ProductDetailClient] Failed to fetch formConfig:', formRes.status)
               }
             } catch (err) {
               console.error('[ProductDetailClient] Failed to fetch form config:', err)
             }
-          } else {
-            console.error('[ProductDetailClient] No formConfigId found in formBlock')
           }
         }
       } catch (err) {
@@ -286,7 +303,7 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
             })()}
 
             {/* Simplified Inquiry Form (Required fields only) */}
-            {formBlock && formConfig && (() => {
+            {formConfig && (() => {
               const configData = formConfig?.data || formConfig
               const formDisplayName = configData?.displayName || "Product Inquiry"
               const formDescription = configData?.description || ""
@@ -341,38 +358,21 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
 
       </div>
 
-      {/* First scrolling-link section - Before Hero */}
-      {postFormSections.length > 0 && postFormSections[0].id === 'scrolling-link' && (
-        <SectionRenderer
-          section={postFormSections[0]}
-          sectionIndex={0}
-          locale={locale}
-        />
-      )}
-
-      {/* Hero Section - Full Width */}
-      <ProductHeroSection
-        productName={displayName}
-        description={product.localizedShortDescription || product.localizedDescription || ""}
-        heroImage={heroImage}
-      />
-
-      {/* Post-form Sections - Rendered based on section type (skip first if it was scrolling-link) */}
+      {/* Sections - Rendered based on section type */}
       {postFormSections.map((section: any, sectionIndex: number) => {
-        // Skip first section if it was already rendered as scrolling-link before hero
-        if (sectionIndex === 0 && section.id === 'scrolling-link') return null
         return (
           <SectionRenderer
             key={sectionIndex}
             section={section}
             sectionIndex={sectionIndex}
             locale={locale}
+            productName={displayName}
           />
         )
       })}
 
       {/* Full Inquiry Modal */}
-      {formBlock && formConfig && (
+      {formConfig && (
         <FullInquiryModal
           isOpen={isFullFormOpen}
           onClose={() => setIsFullFormOpen(false)}

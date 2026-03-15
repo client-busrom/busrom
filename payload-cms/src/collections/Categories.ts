@@ -42,12 +42,37 @@ export const Categories: CollectionConfig = {
     delete: ({ req }) => !!req.user,
   },
   hooks: {
+    // 1. afterRead: Ensure 'children' relationship field is populated from existing 'parent' pointers
+    // This handles legacy data and cases where children were added from the child side.
+    afterRead: [
+      async ({ doc, req: { payload } }) => {
+        try {
+          const childrenResult = await payload.find({
+            collection: 'categories',
+            where: {
+              parent: { equals: doc.id },
+            },
+            depth: 0,
+            limit: 1000,
+          })
+          doc.children = childrenResult.docs.map((c) => c.id)
+        } catch (e) {
+          console.error(`Error populating children for category ${doc.id}:`, e)
+        }
+        return doc
+      },
+    ],
+    // 2. beforeChange: Synchronize bi-directional relationships
     beforeChange: [
-      async ({ data, req }) => {
-        // Helper to get a readable name from the category data
+      async ({ data, req, originalDoc, context }) => {
+        // Prevent infinite recursion during sync
+        if (context.isSyncing) return data
+
+        const { payload } = req
+
+        // --- Part A: Handle fullTitle generation ---
         const getName = (doc: any) => {
           if (!doc) return ''
-          // If name is localized object
           if (doc.name && typeof doc.name === 'object') {
             return doc.name.en || doc.name.zh || doc.slug || 'Untitled'
           }
@@ -59,7 +84,7 @@ export const Categories: CollectionConfig = {
 
         if (data.parent) {
           try {
-            const parent = await req.payload.findByID({
+            const parent = await payload.findByID({
               collection: 'categories',
               id: typeof data.parent === 'object' ? data.parent.id : data.parent,
               depth: 0,
@@ -73,6 +98,46 @@ export const Categories: CollectionConfig = {
           }
         }
         data.fullTitle = fullTitle
+
+        // --- Part B: Handle bi-directional sync (Child -> Parent) ---
+        // If parent field changed on this document, we don't need to do much here
+        // because the afterRead hook on the parent side will pick it up,
+        // but to keep DB data consistent if we're storing children array:
+        
+        // --- Part C: Handle bi-directional sync (Parent -> Child) ---
+        // If this document is being updated and 'children' array exists (from the UI)
+        if (originalDoc && data.children !== undefined) {
+          const newChildrenIds = (data.children || []).map((c: any) => typeof c === 'object' ? c.id : c)
+          const oldChildrenIds = (originalDoc.children || []).map((c: any) => typeof c === 'object' ? c.id : c)
+
+          // 1. Added children: Set their parent to this category
+          const added = newChildrenIds.filter((id: any) => !oldChildrenIds.includes(id))
+          for (const childId of added) {
+            await payload.update({
+              collection: 'categories',
+              id: childId,
+              data: { parent: originalDoc.id },
+              // Use context to prevent infinite loop
+              context: {
+                isSyncing: true
+              }
+            })
+          }
+
+          // 2. Removed children: Set their parent to null
+          const removed = oldChildrenIds.filter((id: any) => !newChildrenIds.includes(id))
+          for (const childId of removed) {
+            await payload.update({
+              collection: 'categories',
+              id: childId,
+              data: { parent: null },
+              context: {
+                isSyncing: true
+              }
+            })
+          }
+        }
+
         return data
       },
     ],
@@ -168,17 +233,27 @@ export const Categories: CollectionConfig = {
     },
     {
       name: 'children',
-      type: 'join',
-      collection: 'categories',
-      on: 'parent',
+      type: 'relationship',
+      relationTo: 'categories',
+      hasMany: true,
       label: {
         en: 'Sub-categories',
-        zh: '子分类',
+        zh: '管理子分类',
+      },
+      filterOptions: ({ data, id }) => {
+        const filter: any = {}
+        if (data?.type) {
+          filter.type = { equals: data.type }
+        }
+        if (id) {
+          filter.id = { not_equals: id }
+        }
+        return filter
       },
       admin: {
         description: {
-          en: 'Direct sub-categories belonging to this category',
-          zh: '该分类下的直接子分类',
+          en: 'Select existing categories to be sub-categories of this category',
+          zh: '直接从此处选择已有的分类作为该分类的子分类',
         },
       },
     },
@@ -245,6 +320,81 @@ export const Categories: CollectionConfig = {
         position: 'sidebar',
         components: {
           Field: '@/components/fields/TranslationCenter',
+        },
+      },
+    },
+    {
+      label: {
+        en: 'Shop Visibility',
+        zh: 'Shop 列表展示',
+      },
+      type: 'collapsible',
+      admin: {
+        condition: (data) => data?.type === 'PRODUCT',
+        position: 'sidebar',
+      },
+      fields: [
+        {
+          name: 'showInShop',
+          type: 'checkbox',
+          defaultValue: true,
+          label: {
+            en: 'Featured in Shop Tabs',
+            zh: '在 Shop 顶部标签展示',
+          },
+        },
+        {
+          name: 'shopTabOrder',
+          type: 'number',
+          defaultValue: 0,
+          label: {
+            en: 'Tab Sort Order',
+            zh: '标签显示排序',
+          },
+          admin: {
+            description: {
+              en: 'Determines the position of this category in the Shop top navigation',
+              zh: '控制该分类在 Shop 页面顶部导航栏的位置',
+            },
+          },
+        },
+      ],
+    },
+    // ==================================================================
+    // Shop Product Management (Category managing products)
+    // ==================================================================
+    {
+      name: 'shopProducts',
+      type: 'relationship',
+      relationTo: 'products',
+      hasMany: true,
+      label: {
+        en: 'Product Links Management',
+        zh: '属下产品链接管理',
+      },
+      filterOptions: ({ id }) => {
+        if (!id) return true
+        return {
+          category: {
+            equals: id,
+          },
+        }
+      },
+      admin: {
+        condition: (data) => data?.type === 'PRODUCT',
+        description: {
+          en: 'Manually manage and sort product links under this category for the Shop page. (Only products belonging to this category are shown)',
+          zh: '手动管理并排序该分类下的产品链接（仅限属于该分类的产品，用于在此界面直接控制展示顺序）',
+        },
+      },
+    },
+    {
+      name: 'shopProductsManager',
+      type: 'ui',
+      admin: {
+        condition: (data) => data?.type === 'PRODUCT',
+        components: {
+          Field: '@/components/fields/CategoryProductManager#CategoryProductManager',
         },
       },
     },

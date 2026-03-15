@@ -8,9 +8,10 @@
  */
 
 import React from 'react'
-import { Logout, useAuth, useTranslation } from '@payloadcms/ui'
+import { Hamburger, Logout, useAuth, useNav, useTranslation } from '@payloadcms/ui'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Logo } from './Logo'
 
 // Helper hook to persist expansion state in local storage
 const usePersistedExpansion = (labelKey: string, defaultOpen: boolean) => {
@@ -40,8 +41,11 @@ const usePersistedExpansion = (labelKey: string, defaultOpen: boolean) => {
   return [isOpen, toggle] as const
 }
 
-// Navigation item component
-const NavItem: React.FC<{ href: string; labelKey: string }> = ({ href, labelKey }) => {
+const NavItem: React.FC<{ href: string; labelKey: string; badge?: number }> = ({
+  href,
+  labelKey,
+  badge,
+}) => {
   const pathname = usePathname()
   const { t } = useTranslation()
   const label = t(`custom:nav:${labelKey}` as any)
@@ -51,7 +55,9 @@ const NavItem: React.FC<{ href: string; labelKey: string }> = ({ href, labelKey 
     <Link
       href={href}
       style={{
-        display: 'block',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         padding: '8px 16px 8px 24px',
         color: isActive ? 'var(--theme-elevation-800)' : 'var(--theme-elevation-600)',
         textDecoration: 'none',
@@ -63,7 +69,28 @@ const NavItem: React.FC<{ href: string; labelKey: string }> = ({ href, labelKey 
         transition: 'all 0.15s',
       }}
     >
-      {label}
+      <span>{label}</span>
+      {badge !== undefined && badge > 0 && (
+        <span
+          style={{
+            backgroundColor: 'var(--theme-error-400, #ff4d4f)',
+            color: 'white',
+            borderRadius: '10px',
+            padding: '0 6px',
+            fontSize: '10px',
+            height: '18px',
+            minWidth: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: 'bold',
+            marginLeft: '8px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          }}
+        >
+          {badge > 99 ? '99+' : badge}
+        </span>
+      )}
     </Link>
   )
 }
@@ -78,8 +105,7 @@ const GroupHeader: React.FC<{
   const label = t(`custom:nav:${labelKey}` as any)
 
   return (
-    <button
-      type="button"
+    <div
       onClick={onClick}
       style={{
         width: '100%',
@@ -87,8 +113,6 @@ const GroupHeader: React.FC<{
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '12px 16px',
-        background: 'none',
-        border: 'none',
         borderTop: '1px solid var(--theme-elevation-100)',
         cursor: 'pointer',
         fontSize: '12px',
@@ -97,6 +121,7 @@ const GroupHeader: React.FC<{
         letterSpacing: '0.5px',
         color: 'var(--theme-elevation-500)',
         marginTop: '8px',
+        userSelect: 'none', // Prevent text selection on click
       }}
     >
       <span>{label}</span>
@@ -108,7 +133,7 @@ const GroupHeader: React.FC<{
       >
         ▸
       </span>
-    </button>
+    </div>
   )
 }
 
@@ -151,8 +176,7 @@ const SubGroupHeader: React.FC<{
   const label = t(`custom:nav:${labelKey}` as any)
 
   return (
-    <button
-      type="button"
+    <div
       onClick={onClick}
       style={{
         width: '100%',
@@ -160,8 +184,6 @@ const SubGroupHeader: React.FC<{
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '8px 16px 8px 24px',
-        background: 'none',
-        border: 'none',
         cursor: 'pointer',
         fontSize: '13px',
         fontWeight: 500,
@@ -169,6 +191,7 @@ const SubGroupHeader: React.FC<{
         margin: '2px 8px',
         borderRadius: '4px',
         transition: 'background-color 0.15s',
+        userSelect: 'none',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.backgroundColor = 'var(--theme-elevation-50)'
@@ -189,7 +212,7 @@ const SubGroupHeader: React.FC<{
           ▸
         </span>
       )}
-    </button>
+    </div>
   )
 }
 
@@ -266,18 +289,43 @@ const NestedSubGroup: React.FC<{
 export const CustomNav: React.FC = () => {
   const { user } = useAuth()
   const isAdmin = (user as any)?.isAdmin === true
+  const [unreadCount, setUnreadCount] = React.useState<number>(0)
+
+  // Fetch unread form submissions and notifications count
+  React.useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        // Form submissions
+        const formResponse = await fetch('/api/form-submissions?where[status][equals]=UNREAD&limit=1')
+        if (formResponse.ok) {
+          const data = await formResponse.json()
+          setUnreadCount(data.totalDocs || 0)
+        }
+      } catch (error) {
+        console.error('Failed to fetch counts:', error)
+      }
+    }
+
+    fetchCounts()
+
+    // Refresh every 60 seconds
+    const interval = setInterval(fetchCounts, 60000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <nav
+      className="custom-nav"
       style={{
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
+        backgroundColor: 'var(--theme-elevation-50)',
       }}
     >
       <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '20px' }}>
         {/* Dashboard */}
-        <div style={{ padding: '16px 16px 8px' }}>
+        <div style={{ padding: '8px 16px 8px' }}>
           <NavItem href="/admin" labelKey="dashboard" />
         </div>
 
@@ -319,6 +367,7 @@ export const CustomNav: React.FC = () => {
           </NestedSubGroup>
           {/* 其他子页 - 使用与首页内容相同的样式 */}
           <SubGroupLinkItem href="/admin/collections/pages" labelKey="subpages" />
+          <NavItem href="/admin/globals/shop-page-config" labelKey="shopPageConfig" />
         </CollapsibleGroup>
 
         {/* Media Library */}
@@ -358,7 +407,7 @@ export const CustomNav: React.FC = () => {
         {/* Forms */}
         <CollapsibleGroup labelKey="forms">
           <NavItem href="/admin/collections/form-configs" labelKey="formConfigs" />
-          <NavItem href="/admin/collections/form-submissions" labelKey="formSubmissions" />
+          <NavItem href="/admin/collections/form-submissions" labelKey="formSubmissions" badge={unreadCount} />
           <NavItem href="/admin/collections/smtp-configs" labelKey="smtpConfigs" />
         </CollapsibleGroup>
 

@@ -12,6 +12,7 @@
  */
 
 import type { CollectionConfig } from 'payload'
+import { parsePhoneNumberFromString } from 'libphonenumber-js'
 import { sendFormNotificationEmail, sendAutoReplyEmail } from '../lib/form-email'
 
 export const FormSubmissions: CollectionConfig = {
@@ -51,8 +52,46 @@ export const FormSubmissions: CollectionConfig = {
       return false
     },
     // Only authenticated users can read/update
-    read: ({ req }) => !!req.user,
-    update: ({ req }) => !!req.user,
+    read: ({ req: { user } }) => {
+      if (!user) return false
+      if (user.isAdmin) return true
+
+      // Non-admins can only see submissions for forms they are assigned to,
+      // or forms that have no assigned operators (public forms)
+      return {
+        or: [
+          {
+            'formConfig.assignedOperators': {
+              exists: false,
+            },
+          },
+          {
+            'formConfig.assignedOperators': {
+              in: [user.id],
+            },
+          },
+        ],
+      }
+    },
+    update: ({ req: { user } }) => {
+      if (!user) return false
+      if (user.isAdmin) return true
+
+      return {
+        or: [
+          {
+            'formConfig.assignedOperators': {
+              exists: false,
+            },
+          },
+          {
+            'formConfig.assignedOperators': {
+              in: [user.id],
+            },
+          },
+        ],
+      }
+    },
     // Only super admin can delete
     delete: ({ req }) => {
       if (!req.user) return false
@@ -74,6 +113,53 @@ export const FormSubmissions: CollectionConfig = {
             }
           } catch (error: any) {
             req.payload.logger.error('Error fetching form config:', error?.message || error)
+          }
+        }
+
+        // Parse phone number for country info
+        if (operation === 'create' && data?.data) {
+          const formData = data.data
+          // Look for phone fields in common names
+          const phoneFieldKeys = ['phone', 'tel', 'whatsapp', 'phoneNumber', 'mobile']
+          let phoneValue = ''
+
+          // 1. Try common keys
+          for (const key of phoneFieldKeys) {
+            if (formData[key]) {
+              phoneValue = formData[key]
+              break
+            }
+          }
+
+          // 2. If not found, look for any value starting with '+'
+          if (!phoneValue) {
+            for (const key in formData) {
+              if (typeof formData[key] === 'string' && formData[key].startsWith('+')) {
+                phoneValue = formData[key]
+                break
+              }
+            }
+          }
+
+          if (phoneValue) {
+            try {
+              const phoneNumber = parsePhoneNumberFromString(phoneValue)
+              if (phoneNumber) {
+                data.countryCode = phoneNumber.country // e.g., 'CN', 'US'
+                // countryName is a bit harder without a library, but countryCode is usually enough
+                // for the notification. We can use Intl.DisplayNames if available in Node.
+                if (phoneNumber.country) {
+                  try {
+                    const regionNames = new Intl.DisplayNames(['en'], { type: 'region' })
+                    data.countryName = regionNames.of(phoneNumber.country)
+                  } catch (e) {
+                    data.countryName = phoneNumber.country
+                  }
+                }
+              }
+            } catch (err: any) {
+              req.payload.logger.error(`Phone parsing error: ${err?.message || err}`)
+            }
           }
         }
 
@@ -158,6 +244,30 @@ export const FormSubmissions: CollectionConfig = {
           en: 'Auto-populated from form config',
           zh: '从表单配置自动填充',
         },
+      },
+    },
+    {
+      name: 'countryCode',
+      type: 'text',
+      label: {
+        en: 'Country Code',
+        zh: '国家代码',
+      },
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'countryName',
+      type: 'text',
+      label: {
+        en: 'Country Name',
+        zh: '国家名称',
+      },
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
       },
     },
 

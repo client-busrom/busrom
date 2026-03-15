@@ -27,6 +27,7 @@ const RESOURCES = [
   { value: 'FAQ_ITEM', label: { en: 'FAQ Items', zh: '常见问题' } },
   { value: 'REUSABLE_BLOCK', label: { en: 'Reusable Blocks', zh: '可复用内容块' } },
   { value: 'DOCUMENT_TEMPLATE', label: { en: 'Document Templates', zh: '文档模版' } },
+  { value: 'TEMPLATE_CATEGORY', label: { en: 'Template Categories', zh: '模板分类' } },
   { value: 'NAVIGATION_MENU', label: { en: 'Navigation Menus', zh: '导航菜单' } },
   { value: 'HERO_BANNER_ITEM', label: { en: 'Hero Banner Items', zh: '轮播图' } },
   // Media Library

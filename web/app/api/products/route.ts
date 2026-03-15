@@ -83,7 +83,9 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const locale = searchParams.get('locale') || 'en'
     const seriesSlug = searchParams.get('series')
+    const categoryId = searchParams.get('category')
     const isFeatured = searchParams.get('isFeatured') === 'true'
+    const ignoreVisibility = searchParams.get('ignoreVisibility') === 'true'
     const search = searchParams.get('search')
     const page = parseInt(searchParams.get('page') || '1')
     const pageSize = parseInt(searchParams.get('pageSize') || '12')
@@ -138,9 +140,19 @@ export async function GET(request: NextRequest) {
       params.append('where[series][equals]', seriesId)
     }
 
+    // Category filter
+    if (categoryId) {
+      params.append('where[category][equals]', categoryId)
+    }
+
     // Featured filter
     if (isFeatured) {
-      params.append('where[featured][equals]', 'true')
+      params.append('where[isFeatured][equals]', 'true')
+    }
+
+    // Shop Visibility filter (default to showing only visible products in shop)
+    if (!ignoreVisibility) {
+      params.append('where[shopVisibility][equals]', 'true')
     }
 
     // Search filter (searches in name field)
@@ -149,7 +161,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Sorting
-    const sortField = sortBy === 'createdAt' ? 'createdAt' : sortBy === 'updatedAt' ? 'updatedAt' : 'order'
+    const sortField = sortBy === 'createdAt' ? 'createdAt' : 
+                     sortBy === 'updatedAt' ? 'updatedAt' : 
+                     sortBy === 'shopOrder' ? 'shopOrder' : 'order'
     params.append('sort', sortDir === 'desc' ? `-${sortField}` : sortField)
 
     const url = `${CMS_URL}/api/products?${params.toString()}`
@@ -209,10 +223,14 @@ export async function GET(request: NextRequest) {
               localizedName: product.series.name,
             }
           : null,
-        isFeatured: product.featured || false,
+        isFeatured: product.isFeatured || false,
+        isHot: product.isHot || false,
+        isNew: product.isNew || false,
         order: product.order || 0,
+        shopOrder: product.shopOrder || 0,
         status: product.status === 'published' ? 'PUBLISHED' : 'DRAFT',
         productAttributes: product.productAttributes || null,
+        linkedForm: product.linkedForm || null,
         createdAt: product.createdAt,
         updatedAt: product.updatedAt,
       }

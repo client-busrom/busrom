@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from "react"
 import type { Locale } from "@/i18n.config"
 import { Turnstile } from "@/components/ui/turnstile"
+import { PhoneInput } from "@/components/ui/PhoneInput"
 
 interface FormField {
   label: string
@@ -62,7 +63,7 @@ export function FullInquiryModal({
       // Legacy format: fields is an object with locale keys
       allFields = configData.fields[locale] || configData.fields["en"] || []
     }
-    return [...allFields].sort((a, b) => a.order - b.order)
+    return [...allFields]
   }, [configData?.fields, locale])
 
   const [formData, setFormData] = useState<Record<string, any>>(initialData)
@@ -465,6 +466,23 @@ export function FullInquiryModal({
         )
 
       default:
+        const isPhone = (field.fieldType as string) === 'phone' || (field.fieldType as string) === 'tel'
+        
+        if (isPhone) {
+          return (
+            <PhoneInput
+              id={field.fieldName}
+              name={field.fieldName}
+              value={formData[field.fieldName] || ""}
+              onChange={(phone) => handleChange(field.fieldName, phone)}
+              placeholder={field.placeholder}
+              required={field.required}
+              error={!!errors[field.fieldName]}
+              disabled={isSubmitting}
+            />
+          )
+        }
+
         return (
           <input
             type={field.fieldType}

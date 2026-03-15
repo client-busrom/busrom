@@ -9,8 +9,9 @@
 import type { Payload } from 'payload'
 
 interface ImageConfig {
-  mode: 'manual' | 'auto'
+  mode: 'manual' | 'auto' | 'application'
   manualImages?: number[] // Array of media IDs
+  applicationId?: string | number // Application ID
   categories?: number[]
   tags?: number[]
   metadataGroup?: string
@@ -137,11 +138,58 @@ export async function getSeriesImages(
         return []
       }
 
-      // Randomly select 5 images
-      const shuffled = allImages.sort(() => Math.random() - 0.5)
-      return shuffled.slice(0, 5)
+      // Randomly shuffle all matches
+      const shuffled = [...allImages].sort(() => Math.random() - 0.5)
+
+      // Option B: Cycle images to ensure exactly 5
+      const finalImages = []
+      for (let i = 0; i < 5; i++) {
+        finalImages.push(shuffled[i % shuffled.length])
+      }
+
+      return finalImages
     } catch (error) {
       console.error('Error fetching auto images:', error)
+      return []
+    }
+  }
+
+  // Application mode: randomly pick 5 images from the selected application's scene gallery
+  if (config.mode === 'application') {
+    if (!config.applicationId) {
+      return []
+    }
+
+    try {
+      const app = await payload.findByID({
+        collection: 'applications',
+        id: config.applicationId,
+        depth: 1, // To get media docs for the images
+      })
+
+      if (!app || !app.sceneGallery || app.sceneGallery.length === 0) {
+        return []
+      }
+
+      // Flatten all images from all scenes
+      const allImages = (app.sceneGallery as any[]).flatMap((scene: any) => scene.images || [])
+      
+      if (allImages.length === 0) {
+        return []
+      }
+
+      // De-duplicate if same image used in multiple scenes
+      const uniqueImages = Array.from(new Map(allImages.map((img: any) => [img.id || img, img])).values())
+
+      // Option B: Cycle images to ensure exactly 5
+      const shuffled = uniqueImages.sort(() => Math.random() - 0.5)
+      const finalImages = []
+      for (let i = 0; i < 5; i++) {
+        finalImages.push(shuffled[i % shuffled.length])
+      }
+      return finalImages
+    } catch (error) {
+      console.error('Error fetching application images:', error)
       return []
     }
   }

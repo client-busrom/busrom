@@ -137,6 +137,7 @@ import { Footer } from './src/globals/Footer'
 import { SiteConfig } from './src/globals/SiteConfig'
 import { PreloaderConfig } from './src/globals/PreloaderConfig'
 import { SocialConfig } from './src/globals/SocialConfig'
+import { ShopPageConfig } from './src/globals/ShopPageConfig'
 // Globals - Homepage Sections (ordered to match frontend)
 import { ProductSeriesCarousel } from './src/globals/ProductSeriesCarousel'
 import { ServiceFeatures } from './src/globals/ServiceFeatures'
@@ -165,8 +166,8 @@ const s3Config = {
   bucket: process.env.S3_BUCKET_NAME || 'busrom-media',
   config: {
     credentials: {
-      accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+      accessKeyId: process.env.S3_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID || '',
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY || '',
     },
     region: process.env.S3_REGION || 'us-east-1',
     ...(process.env.S3_ENDPOINT && { endpoint: process.env.S3_ENDPOINT }),
@@ -272,6 +273,7 @@ export default buildConfig({
     SiteConfig,
     PreloaderConfig,
     SocialConfig,
+    ShopPageConfig,
     // Homepage Sections (ordered to match frontend HomePageClient.tsx)
     // Note: HeroBanner (1) and SeriesIntro (6) are Collections, not Globals
     ProductSeriesCarousel,  // 2
@@ -308,7 +310,7 @@ export default buildConfig({
     // Only enable temporarily when deploying schema changes
     // Manual Fix (2026-03-13): Removed NOT NULL constraints on 'name' columns in main
     // tables (product_templates, series_templates) to allow localized field saving.
-    push: false,
+    push: process.env.PAYLOAD_DB_PUSH === 'true',
   }),
 
   // ==================================================================
@@ -459,7 +461,7 @@ export default buildConfig({
 
     // SEO Plugin
     seoPlugin({
-      collections: ['blogs', 'products', 'product-series'],
+      collections: ['blogs'],
       generateTitle: ({ doc }) => `${doc?.title || doc?.name || 'Busrom'} | Busrom`,
       generateDescription: ({ doc }) => doc?.excerpt || doc?.description || doc?.shortDescription || '',
       tabbedUI: true,
