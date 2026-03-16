@@ -457,7 +457,7 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
         {/* Products Grid with AnimatePresence */}
         <div className="relative min-h-[400px]">
           {/* Loading indicator - subtle, not blocking */}
-          {isValidating && products.length > 0 && (
+          {isValidating && allProducts.length > 0 && (
             <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
               <div className="w-6 h-6 border-2 border-brand-secondary border-t-transparent rounded-full animate-spin"></div>
             </div>
