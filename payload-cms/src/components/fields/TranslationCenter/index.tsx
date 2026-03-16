@@ -16,6 +16,7 @@ interface TranslatableFieldConfig {
   isArrayField?: boolean
   arrayFieldName?: string // e.g. 'sceneGallery'
   arraySubField?: string // e.g. 'sceneName'
+  condition?: (doc: any) => boolean
 }
 
 // 每个 collection 的可翻译字段配置
@@ -84,8 +85,8 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'successMessage', labelKey: 'custom:fields:successMessage', type: 'textarea' },
     { name: 'errorRequiredFields', labelKey: 'custom:fields:errorRequiredFields', type: 'textarea' },
     { name: 'errorNetworkMessage', labelKey: 'custom:fields:errorNetworkMessage', type: 'textarea' },
-    { name: 'errorCaptchaMessage', labelKey: 'custom:fields:errorCaptchaMessage', type: 'textarea' },
-    { name: 'autoReplySubject', labelKey: 'custom:fields:autoReplySubject', type: 'textarea' },
+    { name: 'errorCaptchaMessage', labelKey: 'custom:fields:errorCaptchaMessage', type: 'textarea', condition: (doc: any) => !!doc.captchaEnabled },
+    { name: 'autoReplySubject', labelKey: 'custom:fields:autoReplySubject', type: 'textarea', condition: (doc: any) => doc.autoReplyEnabled === 'enabled' },
   ],
   'seo-settings': [
     { name: 'metaTitle', labelKey: 'custom:fields:metaTitle', type: 'textarea' },
@@ -156,6 +157,19 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
     if (!fieldConfigs || fieldConfigs.length === 0) return 0
     let count = 0
     for (const config of fieldConfigs) {
+      // 检查条件是否满足
+      // 注意：这里使用 formFields 获取当前编辑状态的值，key 为字段名且包含 .value
+      const conditionData: Record<string, any> = {}
+      Object.keys(formFields || {}).forEach(key => {
+        if (formFields[key]?.value !== undefined) {
+          conditionData[key] = formFields[key].value
+        }
+      })
+      
+      if (config.condition && !config.condition(conditionData)) {
+        continue
+      }
+
       if (config.isArrayField && config.arrayFieldName && config.arraySubField) {
         // 从表单字段中统计数组行数：匹配 "arrayFieldName.N.subField" 的 key
         const pattern = new RegExp(`^${config.arrayFieldName}\\.(\\d+)\\.${config.arraySubField}$`)
@@ -231,6 +245,11 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
       const newFieldsData: FieldData[] = []
 
       for (const config of fieldConfigs) {
+        // Check condition if present
+        if (config.condition && !config.condition(doc)) {
+          continue
+        }
+
         if (config.isArrayField && config.arrayFieldName && config.arraySubField) {
           // Array field: expand each array item into a separate FieldData entry
           const arrayData = doc[config.arrayFieldName] as Array<Record<string, unknown>> | undefined
