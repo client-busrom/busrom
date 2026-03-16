@@ -11,7 +11,92 @@
  * - Tab UI for better organization
  */
 
-import type { CollectionConfig } from 'payload'
+import type { 
+  CollectionConfig, 
+  CollectionAfterChangeHook, 
+  CollectionAfterDeleteHook 
+} from 'payload'
+
+const afterChangeHook: CollectionAfterChangeHook = async ({
+  doc,
+  previousDoc,
+  operation,
+  req: { payload },
+}) => {
+  // Helper to extract ID from potentially populated field
+  const getCatId = (c: any) => (c && typeof c === 'object' ? c.id : c)
+  const newCatId = getCatId(doc.category)
+  const oldCatId = getCatId(previousDoc?.category)
+
+  // Skip if category hasn't changed during update
+  if (operation === 'update' && newCatId === oldCatId) return
+
+  // 1. Remove from old category if it exists
+  if (oldCatId) {
+    try {
+      const oldCat: any = await payload.findByID({ collection: 'categories', id: oldCatId, depth: 0 })
+      if (oldCat) {
+        const currentProducts = (oldCat.shopProducts || []).map((p: any) => getCatId(p))
+        const updatedProducts = currentProducts.filter((id: any) => id !== doc.id)
+        
+        if (currentProducts.length !== updatedProducts.length) {
+          await payload.update({
+            collection: 'categories',
+            id: oldCatId,
+            data: { shopProducts: updatedProducts } as any,
+          })
+        }
+      }
+    } catch (e: any) {
+      console.warn(`[Products Hook] Could not remove product from old category ${oldCatId}:`, e.message)
+    }
+  }
+
+  // 2. Add to new category if it exists
+  if (newCatId) {
+    try {
+      const newCat: any = await payload.findByID({ collection: 'categories', id: newCatId, depth: 0 })
+      if (newCat) {
+        const currentProducts = (newCat.shopProducts || []).map((p: any) => getCatId(p))
+        if (!currentProducts.includes(doc.id)) {
+          await payload.update({
+            collection: 'categories',
+            id: newCatId,
+            data: { shopProducts: [...currentProducts, doc.id] } as any,
+          })
+        }
+      }
+    } catch (e: any) {
+      console.warn(`[Products Hook] Could not add product to new category ${newCatId}:`, e.message)
+    }
+  }
+}
+
+const afterDeleteHook: CollectionAfterDeleteHook = async ({ req: { payload }, id, doc }) => {
+  const getCatId = (c: any) => (c && typeof c === 'object' ? c.id : c)
+  const catId = getCatId(doc.category)
+
+  if (catId) {
+    try {
+      const cat: any = await payload.findByID({ collection: 'categories', id: catId, depth: 0 })
+      if (cat) {
+        const currentProducts = (cat.shopProducts || []).map((p: any) => getCatId(p))
+        const updatedProducts = currentProducts.filter((pId: any) => pId !== id)
+        
+        if (currentProducts.length !== updatedProducts.length) {
+          await payload.update({
+            collection: 'categories',
+            id: catId,
+            data: { shopProducts: updatedProducts } as any,
+          })
+        }
+      }
+    } catch (e: any) {
+      console.warn(`[Products Hook] Could not remove product ${id} from category ${catId} on delete:`, e.message)
+    }
+  }
+}
+
 
 export const Products: CollectionConfig = {
   slug: 'products',
@@ -443,5 +528,7 @@ export const Products: CollectionConfig = {
         return data
       },
     ],
+    afterChange: [afterChangeHook],
+    afterDelete: [afterDeleteHook],
   },
 }
