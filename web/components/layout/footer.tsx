@@ -165,7 +165,7 @@ export default function Footer({ locale, showForm = true }: Props) {
       try {
         const [siteRes, formRes] = await Promise.all([
           fetch('/api/site-config'),
-          fetch(`/api/form-config/footer-form?locale=${locale}`)
+          fetch(`/api/form-config/footer-inquiry-form?locale=${locale}`)
         ]);
 
         if (siteRes.ok) {
@@ -233,7 +233,7 @@ export default function Footer({ locale, showForm = true }: Props) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          formName: 'footer-form',
+          formName: 'footer-inquiry-form',
           data: formData,
           locale,
           turnstileToken,
