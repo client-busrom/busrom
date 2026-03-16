@@ -215,9 +215,16 @@ export async function GET(request: NextRequest) {
               variants: transformImageVariants(img.sizes),
             }))
           : [],
+        category: product.category
+          ? {
+              id: product.category.id || product.category,
+              slug: product.category.slug,
+              name: product.category.name,
+            }
+          : null,
         series: product.series
           ? {
-              id: product.series.id,
+              id: product.series.id || product.series,
               slug: product.series.slug,
               name: product.series.name,
               localizedName: product.series.name,
