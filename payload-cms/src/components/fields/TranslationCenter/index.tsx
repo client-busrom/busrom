@@ -80,7 +80,12 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'displayName', labelKey: 'custom:fields:displayName', type: 'textarea' },
     { name: 'description', labelKey: 'custom:fields:description', type: 'textarea' },
     { name: 'submitButtonText', labelKey: 'custom:fields:submitButtonText', type: 'textarea' },
+    { name: 'submittingText', labelKey: 'custom:fields:submittingText', type: 'textarea' },
     { name: 'successMessage', labelKey: 'custom:fields:successMessage', type: 'textarea' },
+    { name: 'errorRequiredFields', labelKey: 'custom:fields:errorRequiredFields', type: 'textarea' },
+    { name: 'errorNetworkMessage', labelKey: 'custom:fields:errorNetworkMessage', type: 'textarea' },
+    { name: 'errorCaptchaMessage', labelKey: 'custom:fields:errorCaptchaMessage', type: 'textarea' },
+    { name: 'autoReplySubject', labelKey: 'custom:fields:autoReplySubject', type: 'textarea' },
   ],
   'seo-settings': [
     { name: 'metaTitle', labelKey: 'custom:fields:metaTitle', type: 'textarea' },
