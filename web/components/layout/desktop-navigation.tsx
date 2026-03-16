@@ -287,7 +287,7 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
 
                               <div className="absolute bottom-0 left-0 right-0 flex gap-2 p-4 translate-y-full opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                                 <Link
-                                  href={isShopMenu ? `/shop?series=${getProductSlug(child.url)}` : child.url}
+                                  href={isShopMenu ? `/shop?category=${getProductSlug(child.url)}` : child.url}
                                   className="flex-1 py-2 px-4 text-center text-sm font-montserrat font-bold bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
                                   onClick={() => setActiveMenuId(null)}
                                 >
