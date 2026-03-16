@@ -230,7 +230,7 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
   const displayTitle = useMemo(() => {
     if (!selectedCategory) return "All Products"
     // 使用 String() 确保数字和字符串 ID 都能匹配
-    const found = categories.find(c => String(c.id) === String(selectedCategory) || c.slug === selectedCategory)
+    const found = categories.find(c => c.slug === selectedCategory || String(c.id) === String(selectedCategory))
     return found?.name || "All Products" 
   }, [selectedCategory, categories])
 
@@ -331,10 +331,10 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
               {categories.map((c) => (
                 <button
                   key={c.id}
-                  onClick={() => handleCategoryChange(c.id)}
+                  onClick={() => handleCategoryChange(c.slug)}
                   className={cn(
                     "text-sm font-medium transition-colors pb-1 whitespace-nowrap px-2 font-orbitron",
-                    String(selectedCategory) === String(c.id)
+                    selectedCategory === c.slug
                       ? "text-brand-text-black border-b-2 border-brand-text-black"
                       : "text-brand-accent-gold hover:text-brand-text-black"
                   )}
