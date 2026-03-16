@@ -399,28 +399,25 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
       for (const locale of SUPPORTED_LOCALES) {
         if (locale.code === currentLocale.code) continue
 
-        const currentLocaleFields = localeData[locale.code]?.fields || []
-
-        // Merge with source fields to ensure required fields have a value
-        // Payload rejects empty 'required' fields even if they are localized
+        // Merge and ensure we send STRINGS for localized fields
+        // We use getFieldValue/getOptionLabel to handle both string and object data formats
         const fieldsToSave = sourceFields.map((sourceField, idx) => {
-          const targetField = currentLocaleFields[idx] || { ...sourceField }
-          
+          const currentLabel = getFieldValue(idx, 'label', locale.code)
+          const sourceLabel = getFieldValue(idx, 'label', sourceLocale)
+          const currentPlaceholder = getFieldValue(idx, 'placeholder', locale.code)
+          const sourcePlaceholder = getFieldValue(idx, 'placeholder', sourceLocale)
+
           return {
-            ...sourceField, // Copy non-localized fields (fieldName, fieldType, id, etc.)
-            label: targetField.label && typeof targetField.label === 'string' && targetField.label.trim() 
-              ? targetField.label 
-              : (sourceField.label || ' '), // Fallback to source or a space to satisfy requirement
-            placeholder: targetField.placeholder && typeof targetField.placeholder === 'string' && targetField.placeholder.trim()
-              ? targetField.placeholder
-              : targetField.placeholder, // Keep empty if it was empty
+            ...sourceField, // Copy stable non-localized fields (fieldName, fieldType, id, etc.)
+            // IMPORTANT: Overwrite localized fields with STRING values
+            label: (currentLabel && currentLabel.trim()) ? currentLabel : (sourceLabel || ' '),
+            placeholder: (currentPlaceholder && currentPlaceholder.trim()) ? currentPlaceholder : (sourcePlaceholder || ''),
             options: (sourceField.options || []).map((sourceOpt, optIdx) => {
-              const targetOpt = targetField.options?.[optIdx] || { ...sourceOpt }
+              const currentOptLabel = getOptionLabel(idx, optIdx, locale.code)
+              const sourceOptLabel = getOptionLabel(idx, optIdx, sourceLocale)
               return {
                 ...sourceOpt,
-                label: targetOpt.label && typeof targetOpt.label === 'string' && targetOpt.label.trim()
-                  ? targetOpt.label
-                  : (sourceOpt.label || ' '),
+                label: (currentOptLabel && currentOptLabel.trim()) ? currentOptLabel : (sourceOptLabel || ' '),
               }
             }),
           }
@@ -435,6 +432,12 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
         if (res.ok) {
           successCount++
         } else {
+          try {
+            const errData = await res.json()
+            console.error(`[FormFieldsTranslationCenter] Save failed for ${locale.code}:`, errData)
+          } catch (e) {
+            console.error(`[FormFieldsTranslationCenter] Save failed for ${locale.code}: ${res.status}`)
+          }
           failCount++
         }
       }
@@ -450,7 +453,7 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
     } finally {
       setIsSaving(false)
     }
-  }, [id, localeData, currentLocale.code, t])
+  }, [id, localeData, sourceLocale, currentLocale.code, getFieldValue, getOptionLabel, t])
 
   // Get source fields for rendering
   const sourceFields = localeData[sourceLocale]?.fields || []
