@@ -37,11 +37,33 @@ async function findSmtpConfigForForm(
   locale: string,
 ): Promise<any | null> {
   try {
+    let actualId = formConfigId
+
+    // 如果传入的是字符串且不是纯数字，可能是一个 Form Name (Slug)
+    // 需要先通过 Name 找到对应的 ID
+    if (typeof formConfigId === 'string' && isNaN(Number(formConfigId))) {
+      console.log(`[Email Debug] Input ID is a string name: "${formConfigId}". Looking up real ID...`)
+      const formDocs = await payload.find({
+        collection: 'form-configs',
+        where: {
+          name: { equals: formConfigId }
+        },
+        limit: 1
+      })
+      
+      if (formDocs.totalDocs > 0) {
+        actualId = formDocs.docs[0].id
+        console.log(`[Email Debug] Found real ID: ${actualId} for form name: "${formConfigId}"`)
+      } else {
+        console.warn(`[Email Debug] Could not find form config with name: "${formConfigId}"`)
+      }
+    }
+
     const result = await payload.find({
       collection: 'smtp-configs' as any,
       where: {
         and: [
-          { formConfigs: { in: [formConfigId] } },
+          { formConfigs: { in: [actualId] } },
           { status: { equals: 'enabled' } },
         ],
       },
@@ -50,6 +72,7 @@ async function findSmtpConfigForForm(
     })
 
     if (result.totalDocs === 0) {
+      console.warn(`[Email Debug] No SmtpConfigs found linked to form ID/Name: ${actualId}`)
       return null
     }
 
