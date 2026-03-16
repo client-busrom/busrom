@@ -27,10 +27,9 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json()
 
-    // Normalize slug: if the CMS stored a display name as slug (e.g. "Glass Standoff" instead of "glass-standoff"),
-    // convert it to a proper URL-friendly slug automatically.
+    // Normalize slug: handle cases where CMS stores display names or messy slugs.
     const toUrlSlug = (s: string): string =>
-      s.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+      s.trim().toLowerCase().replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '').replace(/[^a-z0-9-]/g, '')
 
     // Transform categories
     const categories = (data.categoryTabs || []).map((cat: any) => {

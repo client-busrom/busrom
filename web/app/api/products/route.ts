@@ -55,12 +55,17 @@ function transformImageVariants(variants: any) {
 }
 
 /**
- * Normalize a slug: if stored as display name (e.g. "Glass Standoff"), convert to URL-friendly form.
+ * Normalize a slug: handles spaces, multiple hyphens, underscores, etc.
+ * Example: "Glass- Standoff  Case" -> "glass-standoff-case"
  */
 function toUrlSlug(s: string): string {
   if (!s) return ''
-  if (!s.includes(' ') && s === s.toLowerCase()) return s // already valid
-  return s.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+  return s
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, '-')     // 把空格、下划线、连字号序列统统变成一个杠
+    .replace(/^-+|-+$/g, '')      // 去头尾杠
+    .replace(/[^a-z0-9-]/g, '')   // 删掉非法字符
 }
 
 /**
