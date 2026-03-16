@@ -145,16 +145,6 @@ export const ProductAttributes: CollectionConfig = {
         },
       ],
     },
-    {
-      name: 'translationCenter',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        components: {
-          Field: '@/components/fields/TranslationCenter',
-        },
-      },
-    },
   ],
   timestamps: true,
 }
