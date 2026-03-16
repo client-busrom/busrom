@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef, useCallback, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
@@ -171,7 +171,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
       try {
         // 并行获取表单配置和 Turnstile 配置
         const [formRes, turnstileRes] = await Promise.all([
-          fetch(`/api/form-config/main-form?locale=${locale}`),
+          fetch(`/api/form-config/home-page-main-inquiry-form?locale=${locale}`),
           fetch('/api/site-config/turnstile'),
         ]);
 
@@ -244,7 +244,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          formName: "main-form",
+          formName: "home-page-main-inquiry-form",
           data: formData,
           locale,
           turnstileToken: shouldShowCaptcha ? turnstileToken : undefined,
