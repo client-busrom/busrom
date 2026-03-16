@@ -24,14 +24,10 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'name', labelKey: 'custom:fields:productName', type: 'textarea' },
     { name: 'shortDescription', labelKey: 'custom:fields:shortDescription', type: 'textarea' },
     { name: 'description', labelKey: 'custom:fields:description', type: 'textarea' },
-    { name: 'meta.title', labelKey: 'custom:fields:metaTitle', type: 'textarea' },
-    { name: 'meta.description', labelKey: 'custom:fields:metaDescription', type: 'textarea' },
   ],
   'product-series': [
     { name: 'name', labelKey: 'custom:fields:seriesName', type: 'textarea' },
     { name: 'description', labelKey: 'custom:fields:description', type: 'textarea' },
-    { name: 'meta.title', labelKey: 'custom:fields:metaTitle', type: 'textarea' },
-    { name: 'meta.description', labelKey: 'custom:fields:metaDescription', type: 'textarea' },
   ],
   'series-templates': [
     { name: 'name', labelKey: 'custom:fields:name', type: 'textarea' },
@@ -53,8 +49,6 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
   blogs: [
     { name: 'title', labelKey: 'custom:fields:blogTitle', type: 'textarea' },
     { name: 'excerpt', labelKey: 'custom:translationCenter:excerpt', type: 'textarea' },
-    { name: 'meta.title', labelKey: 'custom:fields:metaTitle', type: 'textarea' },
-    { name: 'meta.description', labelKey: 'custom:fields:metaDescription', type: 'textarea' },
   ],
   'faq-items': [
     { name: 'question', labelKey: 'custom:fields:question', type: 'textarea' },
