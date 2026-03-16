@@ -10,14 +10,14 @@ import './styles.scss'
 interface FormFieldOption {
   id?: string
   value: string
-  label: string
+  label: string | Record<string, string>
 }
 
 interface FormField {
   id?: string
   fieldName: string
-  label: string
-  placeholder?: string
+  label: string | Record<string, string>
+  placeholder?: string | Record<string, string>
   fieldType: string
   options?: FormFieldOption[]
   required?: boolean
@@ -25,30 +25,21 @@ interface FormField {
   order?: number
 }
 
-interface LocaleDataEntry {
-  fields: FormField[]
-  displayName: string
-  description: string
-  submitButtonText: string
-  submittingText: string
-  successMessage: string
-  errorRequiredFields: string
-  errorNetworkMessage: string
-  errorCaptchaMessage: string
-  autoReplySubject: string
-}
-
 interface LocaleData {
-  [locale: string]: LocaleDataEntry
+  [locale: string]: {
+    fields?: FormField[]
+  }
 }
 
-const ROOT_LOCALIZED_FIELDS: (keyof LocaleDataEntry)[] = [
-  'displayName', 'description', 'submitButtonText', 'submittingText',
-  'successMessage', 'errorRequiredFields', 'errorNetworkMessage',
-  'errorCaptchaMessage', 'autoReplySubject'
-]
+interface FormFieldsTranslationCenterProps {
+  path?: string
+  field?: {
+    name: string
+    label?: string | Record<string, string>
+  }
+}
 
-export const FormFieldsTranslationCenter: React.FC = () => {
+export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterProps> = () => {
   const { id } = useDocumentInfo()
   const currentLocale = useLocale()
   const { t } = useTranslation()
@@ -96,105 +87,183 @@ export const FormFieldsTranslationCenter: React.FC = () => {
 
       const data = await res.json()
 
-      // Function to extract string value for a specific locale from potentially localized field
-      const getVal = (field: any, locale: string) => {
-        if (!field) return ''
-        if (typeof field === 'string') return field
-        if (typeof field === 'object' && field !== null) return field[locale] || ''
-        return ''
-      }
-
-      // Build locale data structure - NORMALIZE to strings early
+      // Build locale data structure
       const newLocaleData: LocaleData = {}
       for (const locale of SUPPORTED_LOCALES) {
-        const code = locale.code
-        newLocaleData[code] = {
-          fields: (data.fields?.[code] || data.fields || []).map((f: any) => ({
-            ...f,
-            label: getVal(f.label, code),
-            placeholder: getVal(f.placeholder, code),
-            options: (f.options || []).map((o: any) => ({
-              ...o,
-              label: getVal(o.label, code)
-            }))
-          })),
-          displayName: getVal(data.displayName, code),
-          description: getVal(data.description, code),
-          submitButtonText: getVal(data.submitButtonText, code),
-          submittingText: getVal(data.submittingText, code),
-          successMessage: getVal(data.successMessage, code),
-          errorRequiredFields: getVal(data.errorRequiredFields, code),
-          errorNetworkMessage: getVal(data.errorNetworkMessage, code),
-          errorCaptchaMessage: getVal(data.errorCaptchaMessage, code),
-          autoReplySubject: getVal(data.autoReplySubject, code),
+        newLocaleData[locale.code] = {
+          fields: data.fields?.[locale.code] || data.fields || [],
+        }
+      }
+
+      // If data is not in locale-keyed format, it's the current locale only
+      // We need to fetch each locale separately
+      if (!data.fields?.[SUPPORTED_LOCALES[0].code]) {
+        for (const locale of SUPPORTED_LOCALES) {
+          const localeRes = await fetch(`/api/form-configs/${id}?locale=${locale.code}&depth=0`)
+          if (localeRes.ok) {
+            const localeDoc = await localeRes.json()
+            newLocaleData[locale.code] = {
+              fields: localeDoc.fields || [],
+            }
+          }
         }
       }
 
       setLocaleData(newLocaleData)
-      setIsLoading(false)
+
+      // Expand all fields by default
+      const allFieldIds = new Set<string>()
+      const sourceFields = newLocaleData[sourceLocale]?.fields || []
+      sourceFields.forEach((field, idx) => {
+        allFieldIds.add(field.id || `field-${idx}`)
+      })
+      setExpandedFields(allFieldIds)
     } catch (error) {
-      console.error('[FormFieldsTranslationCenter] Error loading data:', error)
-      setStatusMessage({ type: 'error', text: t('custom:formFieldsTranslation:loadFailed' as any) as string || 'Failed to load form fields data' })
+      console.error('[FormFieldsTranslationCenter] Error:', error)
+      setStatusMessage({ type: 'error', text: t('custom:formFieldsTranslation:loadFailed' as any) as string || 'Failed to load data' })
+    } finally {
       setIsLoading(false)
     }
-  }, [id, t])
+  }, [id, sourceLocale, t])
 
-  const handleOpenModal = () => {
+  // Open modal
+  const handleOpenModal = useCallback(async () => {
+    if (!id) return
     setIsModalOpen(true)
-    loadAllLocalesData()
-  }
+    await loadAllLocalesData()
+  }, [id, loadAllLocalesData])
 
-  const updateRootFieldValue = useCallback((fieldName: keyof LocaleDataEntry, locale: string, newValue: string) => {
-    setLocaleData(prev => ({
-      ...prev,
-      [locale]: {
-        ...(prev[locale] as any),
-        [fieldName]: newValue,
-      }
-    }))
-  }, [])
+  // Get field value for a specific locale
+  const getFieldValue = useCallback((fieldIndex: number, fieldName: 'label' | 'placeholder', locale: string): string => {
+    const fields = localeData[locale]?.fields || []
+    const field = fields[fieldIndex]
+    if (!field) return ''
 
+    const value = field[fieldName]
+    if (typeof value === 'string') return value
+    if (typeof value === 'object' && value !== null) return value[locale] || ''
+    return ''
+  }, [localeData])
+
+  // Get option label for a specific locale
+  const getOptionLabel = useCallback((fieldIndex: number, optionIndex: number, locale: string): string => {
+    const fields = localeData[locale]?.fields || []
+    const field = fields[fieldIndex]
+    if (!field?.options?.[optionIndex]) return ''
+
+    const label = field.options[optionIndex].label
+    if (typeof label === 'string') return label
+    if (typeof label === 'object' && label !== null) return label[locale] || ''
+    return ''
+  }, [localeData])
+
+  // Update field value
   const updateFieldValue = useCallback((fieldIndex: number, fieldName: 'label' | 'placeholder', locale: string, newValue: string) => {
     setLocaleData(prev => {
       const newData = { ...prev }
-      if (!newData[locale]) return prev // Shouldn't happen after normalization
+      if (!newData[locale]) {
+        newData[locale] = { fields: [] }
+      }
 
       const fields = [...(newData[locale].fields || [])]
-      if (fields[fieldIndex]) {
-        fields[fieldIndex] = {
-          ...fields[fieldIndex],
-          [fieldName]: newValue,
-        }
+
+      // Ensure field exists
+      while (fields.length <= fieldIndex) {
+        fields.push({
+          fieldName: '',
+          label: '',
+          fieldType: 'text',
+        })
       }
+
+      fields[fieldIndex] = {
+        ...fields[fieldIndex],
+        [fieldName]: newValue,
+      }
+
       newData[locale] = { ...newData[locale], fields }
       return newData
     })
   }, [])
 
+  // Update option label
   const updateOptionLabel = useCallback((fieldIndex: number, optionIndex: number, locale: string, newValue: string) => {
     setLocaleData(prev => {
       const newData = { ...prev }
-      if (!newData[locale]) return prev
+      if (!newData[locale]?.fields?.[fieldIndex]?.options) return prev
 
       const fields = [...(newData[locale].fields || [])]
-      if (fields[fieldIndex] && fields[fieldIndex].options) {
-        const options = [...(fields[fieldIndex].options || [])]
-        if (options[optionIndex]) {
-          options[optionIndex] = {
-            ...options[optionIndex],
-            label: newValue,
-          }
-          fields[fieldIndex] = { ...fields[fieldIndex], options }
-        }
+      const options = [...(fields[fieldIndex].options || [])]
+
+      options[optionIndex] = {
+        ...options[optionIndex],
+        label: newValue,
       }
+
+      fields[fieldIndex] = {
+        ...fields[fieldIndex],
+        options,
+      }
+
       newData[locale] = { ...newData[locale], fields }
       return newData
     })
   }, [])
 
-  const handleTranslate = async () => {
+  // Select all target locales
+  const handleSelectAllTargets = useCallback(() => {
+    setTargetLocales(
+      SUPPORTED_LOCALES
+        .filter(l => l.code !== sourceLocale)
+        .map(l => l.code as LocaleCode)
+    )
+  }, [sourceLocale])
+
+  // Select empty target locales
+  const handleSelectEmptyTargets = useCallback(() => {
+    const emptyLocales: LocaleCode[] = []
+    const sourceFields = localeData[sourceLocale]?.fields || []
+
+    for (const locale of SUPPORTED_LOCALES) {
+      if (locale.code === sourceLocale) continue
+
+      // Check if any field is empty
+      let hasEmpty = false
+      sourceFields.forEach((_, idx) => {
+        if (!getFieldValue(idx, 'label', locale.code)) hasEmpty = true
+        if (!getFieldValue(idx, 'placeholder', locale.code)) hasEmpty = true
+
+        const options = localeData[locale.code]?.fields?.[idx]?.options || []
+        options.forEach((_, optIdx) => {
+          if (!getOptionLabel(idx, optIdx, locale.code)) hasEmpty = true
+        })
+      })
+
+      if (hasEmpty) {
+        emptyLocales.push(locale.code as LocaleCode)
+      }
+    }
+
+    setTargetLocales(emptyLocales)
+  }, [sourceLocale, localeData, getFieldValue, getOptionLabel])
+
+  // Toggle field expansion
+  const toggleFieldExpansion = useCallback((fieldId: string) => {
+    setExpandedFields(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(fieldId)) {
+        newSet.delete(fieldId)
+      } else {
+        newSet.add(fieldId)
+      }
+      return newSet
+    })
+  }, [])
+
+  // Translate
+  const handleTranslate = useCallback(async () => {
     if (targetLocales.length === 0) {
-      setStatusMessage({ type: 'error', text: t('custom:translationCenter:selectTargetLanguages' as any) as string || 'Please select target languages' })
+      setStatusMessage({ type: 'warning', text: t('custom:translationCenter:selectTargetLanguages' as any) as string || 'Please select target languages' })
       return
     }
 
@@ -202,62 +271,36 @@ export const FormFieldsTranslationCenter: React.FC = () => {
     setStatusMessage(null)
 
     try {
-      let totalTranslated = 0
-      
-      // Translate root fields
-      for (const fieldName of ROOT_LOCALIZED_FIELDS) {
-        const sourceVal = localeData[sourceLocale]?.[fieldName] as string
-        if (!sourceVal || sourceVal.trim() === '') continue
-
-        const localesToTranslate = targetLocales.filter(locale => {
-          if (overwriteExisting) return true
-          const currentVal = localeData[locale]?.[fieldName] as string
-          return !currentVal || currentVal.trim() === ''
-        })
-
-        if (localesToTranslate.length > 0) {
-          const res = await fetch('/api/translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              text: sourceVal,
-              sourceLang: sourceLocale,
-              targetLangs: localesToTranslate,
-            }),
-          })
-          const data = await res.json()
-          for (const locale of localesToTranslate) {
-            if (data.translations?.[locale]) {
-              updateRootFieldValue(fieldName, locale, data.translations[locale])
-              totalTranslated++
-            }
-          }
-        }
-      }
-
-      // Translate array fields
       const sourceFields = localeData[sourceLocale]?.fields || []
+      let totalTranslated = 0
+
       for (let fieldIdx = 0; fieldIdx < sourceFields.length; fieldIdx++) {
         const sourceField = sourceFields[fieldIdx]
-        
-        // Label
-        if (sourceField.label) {
+
+        // Translate label
+        // Get user's personal translation settings
+        const { getTranslationHeaders } = await import('@/lib/translation-client')
+        const personalHeaders = getTranslationHeaders()
+
+        const sourceLabel = getFieldValue(fieldIdx, 'label', sourceLocale)
+        if (sourceLabel) {
           const localesToTranslate = targetLocales.filter(locale => {
             if (overwriteExisting) return true
-            return !localeData[locale]?.fields[fieldIdx]?.label
+            return !getFieldValue(fieldIdx, 'label', locale)
           })
 
           if (localesToTranslate.length > 0) {
             const res = await fetch('/api/translate', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 'Content-Type': 'application/json', ...personalHeaders },
               body: JSON.stringify({
-                text: sourceField.label,
+                text: sourceLabel,
                 sourceLang: sourceLocale,
                 targetLangs: localesToTranslate,
               }),
             })
             const data = await res.json()
+
             for (const locale of localesToTranslate) {
               if (data.translations?.[locale]) {
                 updateFieldValue(fieldIdx, 'label', locale, data.translations[locale])
@@ -267,24 +310,26 @@ export const FormFieldsTranslationCenter: React.FC = () => {
           }
         }
 
-        // Placeholder
-        if (sourceField.placeholder) {
+        // Translate placeholder
+        const sourcePlaceholder = getFieldValue(fieldIdx, 'placeholder', sourceLocale)
+        if (sourcePlaceholder) {
           const localesToTranslate = targetLocales.filter(locale => {
             if (overwriteExisting) return true
-            return !localeData[locale]?.fields[fieldIdx]?.placeholder
+            return !getFieldValue(fieldIdx, 'placeholder', locale)
           })
 
           if (localesToTranslate.length > 0) {
             const res = await fetch('/api/translate', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 'Content-Type': 'application/json', ...personalHeaders },
               body: JSON.stringify({
-                text: sourceField.placeholder,
+                text: sourcePlaceholder,
                 sourceLang: sourceLocale,
                 targetLangs: localesToTranslate,
               }),
             })
             const data = await res.json()
+
             for (const locale of localesToTranslate) {
               if (data.translations?.[locale]) {
                 updateFieldValue(fieldIdx, 'placeholder', locale, data.translations[locale])
@@ -294,27 +339,28 @@ export const FormFieldsTranslationCenter: React.FC = () => {
           }
         }
 
-        // Options
+        // Translate options
         const sourceOptions = sourceField.options || []
         for (let optIdx = 0; optIdx < sourceOptions.length; optIdx++) {
-          const optLabel = sourceOptions[optIdx].label
-          if (optLabel) {
+          const sourceOptLabel = getOptionLabel(fieldIdx, optIdx, sourceLocale)
+          if (sourceOptLabel) {
             const localesToTranslate = targetLocales.filter(locale => {
               if (overwriteExisting) return true
-              return !localeData[locale]?.fields[fieldIdx]?.options?.[optIdx]?.label
+              return !getOptionLabel(fieldIdx, optIdx, locale)
             })
 
             if (localesToTranslate.length > 0) {
               const res = await fetch('/api/translate', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...personalHeaders },
                 body: JSON.stringify({
-                  text: optLabel,
+                  text: sourceOptLabel,
                   sourceLang: sourceLocale,
                   targetLangs: localesToTranslate,
                 }),
               })
               const data = await res.json()
+
               for (const locale of localesToTranslate) {
                 if (data.translations?.[locale]) {
                   updateOptionLabel(fieldIdx, optIdx, locale, data.translations[locale])
@@ -333,10 +379,12 @@ export const FormFieldsTranslationCenter: React.FC = () => {
     } finally {
       setIsTranslating(false)
     }
-  }
+  }, [localeData, sourceLocale, targetLocales, overwriteExisting, getFieldValue, getOptionLabel, updateFieldValue, updateOptionLabel, t])
 
-  const handleSave = async () => {
+  // Save all translations
+  const handleSave = useCallback(async () => {
     if (!id) return
+
     setIsSaving(true)
     setStatusMessage(null)
 
@@ -344,234 +392,331 @@ export const FormFieldsTranslationCenter: React.FC = () => {
     let failCount = 0
 
     try {
-      const sourceEntry = localeData[sourceLocale]
-      if (!sourceEntry) throw new Error('Source data not found')
+      // Gather source fields for fallback
+      const sourceFields = localeData[sourceLocale]?.fields || []
 
+      // Save each locale (except current locale which will be saved by the form)
       for (const locale of SUPPORTED_LOCALES) {
         if (locale.code === currentLocale.code) continue
-        
-        const currentEntry = localeData[locale.code] || { fields: [] } as any
-        
-        // Prepare root data
-        const payload: any = {}
-        for (const rf of ROOT_LOCALIZED_FIELDS) {
-          const val = (currentEntry[rf] || '').trim()
-          payload[rf] = val || (sourceEntry[rf] || '')
-        }
 
-        // Prepare fields array
-        payload.fields = sourceEntry.fields.map((sf, idx) => {
-          const cf = currentEntry.fields[idx] || {}
+        // Merge and ensure we send STRINGS for localized fields
+        // We use getFieldValue/getOptionLabel to handle both string and object data formats
+        const fieldsToSave = sourceFields.map((sourceField, idx) => {
+          const currentLabel = getFieldValue(idx, 'label', locale.code)
+          const sourceLabel = getFieldValue(idx, 'label', sourceLocale)
+          const currentPlaceholder = getFieldValue(idx, 'placeholder', locale.code)
+          const sourcePlaceholder = getFieldValue(idx, 'placeholder', sourceLocale)
+
           return {
-            ...sf,
-            label: (cf.label || '').trim() || (sf.label || ' '), // Fix: space as fallback for required
-            placeholder: cf.placeholder || sf.placeholder || '',
-            options: (sf.options || []).map((so, oIdx) => {
-              const co = cf.options?.[oIdx] || {}
+            ...sourceField, // Copy stable non-localized fields (fieldName, fieldType, id, etc.)
+            // IMPORTANT: Overwrite localized fields with STRING values
+            label: (currentLabel && currentLabel.trim()) ? currentLabel : (sourceLabel || ' '),
+            placeholder: (currentPlaceholder && currentPlaceholder.trim()) ? currentPlaceholder : (sourcePlaceholder || ''),
+            options: (sourceField.options || []).map((sourceOpt, optIdx) => {
+              const currentOptLabel = getOptionLabel(idx, optIdx, locale.code)
+              const sourceOptLabel = getOptionLabel(idx, optIdx, sourceLocale)
               return {
-                ...so,
-                label: (co.label || '').trim() || (so.label || ' ')
+                ...sourceOpt,
+                label: (currentOptLabel && currentOptLabel.trim()) ? currentOptLabel : (sourceOptLabel || ' '),
               }
-            })
+            }),
           }
         })
 
         const res = await fetch(`/api/form-configs/${id}?locale=${locale.code}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+          body: JSON.stringify({ fields: fieldsToSave }),
         })
 
         if (res.ok) {
           successCount++
         } else {
+          try {
+            const errData = await res.json()
+            console.error(`[FormFieldsTranslationCenter] Save failed for ${locale.code}:`, errData)
+          } catch (e) {
+            console.error(`[FormFieldsTranslationCenter] Save failed for ${locale.code}: ${res.status}`)
+          }
           failCount++
-          const errData = await res.json()
-          console.error(`[FormFieldsTranslation] Save failed for ${locale.code}:`, errData)
         }
       }
 
       if (failCount === 0) {
-        setStatusMessage({ type: 'success', text: `${t('custom:translationCenter:saveSuccess' as any) || 'Saved to'} ${successCount} languages` })
+        setStatusMessage({ type: 'success', text: `${t('custom:translationCenter:saveSuccess' as any) || 'Saved to'} ${successCount} ${t('custom:translationCenter:languages' as any) || 'languages'}` })
       } else {
-        setStatusMessage({ type: 'warning', text: `${successCount} success, ${failCount} failed` })
+        setStatusMessage({ type: 'warning', text: `${successCount} ${t('custom:formFieldsTranslation:success' as any) || 'success'}, ${failCount} ${t('custom:formFieldsTranslation:failed' as any) || 'failed'}` })
       }
     } catch (error) {
       console.error('[FormFieldsTranslationCenter] Save error:', error)
-      setStatusMessage({ type: 'error', text: 'Save failed' })
+      setStatusMessage({ type: 'error', text: t('custom:translationCenter:saveFailed' as any) as string || 'Save failed' })
     } finally {
       setIsSaving(false)
     }
-  }
+  }, [id, localeData, sourceLocale, currentLocale.code, getFieldValue, getOptionLabel, t])
 
-  const handleSelectAllTargets = () => {
-    setTargetLocales(SUPPORTED_LOCALES.filter(l => l.code !== sourceLocale).map(l => l.code))
-  }
-
-  const handleSelectEmptyTargets = () => {
-    const emptyLocales = SUPPORTED_LOCALES.filter(l => {
-      if (l.code === sourceLocale) return false
-      const data = localeData[l.code]
-      if (!data) return true
-      // Check if any required field is empty
-      const hasEmptyFields = data.fields.some(f => !f.label)
-      const hasEmptyRoot = ROOT_LOCALIZED_FIELDS.some(f => !data[f])
-      return hasEmptyFields || hasEmptyRoot
-    }).map(l => l.code)
-    setTargetLocales(emptyLocales)
-  }
-
-  const toggleField = (fieldIdx: number) => {
-    setExpandedFields(prev => {
-      const next = new Set(prev)
-      const key = String(fieldIdx)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      return next
-    })
-  }
-
+  // Get source fields for rendering
   const sourceFields = localeData[sourceLocale]?.fields || []
 
-  if (!id) return null
+  if (!id) {
+    return (
+      <div className="fftc-trigger fftc-trigger--disabled">
+        <button type="button" disabled>
+          {t('custom:formFieldsTranslation:triggerButton' as any) || 'Form Fields Translation'}
+        </button>
+        <span className="fftc-trigger__hint">
+          {t('custom:translationCenter:saveFirst' as any) || 'Save first'}
+        </span>
+      </div>
+    )
+  }
 
   return (
     <>
+      {/* Trigger Button */}
       <div className="fftc-trigger">
-        <button type="button" className="fftc-trigger__btn" onClick={handleOpenModal}>
+        <button
+          type="button"
+          className="fftc-trigger__btn"
+          onClick={handleOpenModal}
+        >
           {t('custom:formFieldsTranslation:triggerButton' as any) || 'Form Fields Translation'}
         </button>
-        <span className="fftc-trigger__hint">{sourceFields.length} fields</span>
+        <span className="fftc-trigger__hint">
+          {sourceFields.length} {t('custom:formFieldsTranslation:fields' as any) || 'fields'}
+        </span>
       </div>
 
+      {/* Modal */}
       {isModalOpen && typeof document !== 'undefined' && createPortal(
         <div className="fftc-modal-overlay">
           <div className="fftc-modal">
+            {/* Header */}
             <div className="fftc-modal__header">
-              <h2>{t('custom:formFieldsTranslation:title' as any) || 'Form Fields Translation'}</h2>
-              <button type="button" className="fftc-modal__close" onClick={() => setIsModalOpen(false)}>x</button>
+              <h2>{t('custom:formFieldsTranslation:title' as any) || 'Form Fields Translation Center'}</h2>
+              <button
+                type="button"
+                className="fftc-modal__close"
+                onClick={() => setIsModalOpen(false)}
+              >
+                x
+              </button>
             </div>
 
             {isLoading ? (
-              <div className="fftc-modal__loading">Loading...</div>
+              <div className="fftc-modal__loading">{t('custom:translationCenter:loading' as any) || 'Loading...'}</div>
             ) : (
               <>
+                {/* Controls */}
                 <div className="fftc-modal__controls">
                   <div className="fftc-control-row">
-                    <label>Source Language</label>
-                    <select value={sourceLocale} onChange={(e) => setSourceLocale(e.target.value as LocaleCode)}>
-                      {SUPPORTED_LOCALES.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
-                    </select>
+                    <div className="fftc-control-group">
+                      <label>{t('custom:translationCenter:sourceLanguage' as any) || 'Source Language'}</label>
+                      <select
+                        value={sourceLocale}
+                        onChange={(e) => setSourceLocale(e.target.value as LocaleCode)}
+                      >
+                        {SUPPORTED_LOCALES.map(l => (
+                          <option key={l.code} value={l.code}>
+                            {l.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
+
                   <div className="fftc-control-row">
-                    <label>Target Languages 
+                    <label>
+                      {t('custom:translationCenter:targetLanguages' as any) || 'Target Languages'}
                       <span className="fftc-control-actions">
-                        <button onClick={handleSelectAllTargets}>All</button>
-                        <button onClick={handleSelectEmptyTargets}>Empty</button>
-                        <button onClick={() => setTargetLocales([])}>Clear</button>
+                        <button type="button" onClick={handleSelectAllTargets}>
+                          {t('custom:translationCenter:selectAll' as any) || 'All'}
+                        </button>
+                        <button type="button" onClick={handleSelectEmptyTargets}>
+                          {t('custom:translationCenter:selectEmpty' as any) || 'Has Empty'}
+                        </button>
+                        <button type="button" onClick={() => setTargetLocales([])}>
+                          {t('custom:translationCenter:clearSelection' as any) || 'Clear'}
+                        </button>
                       </span>
                     </label>
                     <div className="fftc-targets-grid">
-                      {SUPPORTED_LOCALES.filter(l => l.code !== sourceLocale).map(l => (
-                        <label key={l.code} className={`fftc-target-item ${targetLocales.includes(l.code) ? 'fftc-target-item--selected' : ''}`}>
-                          <input type="checkbox" checked={targetLocales.includes(l.code)} 
-                            onChange={(e) => e.target.checked ? setTargetLocales([...targetLocales, l.code]) : setTargetLocales(targetLocales.filter(x => x !== l.code))} />
-                          <LocaleFlag localeCode={l.code} className="fftc-target-item__flag" />
-                          <span>{l.code.toUpperCase()}</span>
-                        </label>
-                      ))}
+                      {SUPPORTED_LOCALES.filter(l => l.code !== sourceLocale).map(locale => {
+                        const isSelected = targetLocales.includes(locale.code as LocaleCode)
+                        return (
+                          <label
+                            key={locale.code}
+                            className={`fftc-target-item ${isSelected ? 'fftc-target-item--selected' : ''}`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setTargetLocales([...targetLocales, locale.code as LocaleCode])
+                                } else {
+                                  setTargetLocales(targetLocales.filter(l => l !== locale.code))
+                                }
+                              }}
+                            />
+                            <LocaleFlag localeCode={locale.code} className="fftc-target-item__flag" />
+                            <span className="fftc-target-item__code">{locale.code.toUpperCase()}</span>
+                          </label>
+                        )
+                      })}
                     </div>
                   </div>
+
                   <div className="fftc-control-row fftc-control-row--actions">
-                    <label><input type="checkbox" checked={overwriteExisting} onChange={(e) => setOverwriteExisting(e.target.checked)} /> Overwrite existing</label>
+                    <label className="fftc-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={overwriteExisting}
+                        onChange={(e) => setOverwriteExisting(e.target.checked)}
+                      />
+                      {t('custom:translationCenter:overwriteExisting' as any) || 'Overwrite existing content'}
+                    </label>
                     <div className="fftc-action-buttons">
-                      <button className="fftc-btn fftc-btn--primary" onClick={handleTranslate} disabled={isTranslating || isSaving}>Translate</button>
-                      <button className="fftc-btn fftc-btn--secondary" onClick={handleSave} disabled={isTranslating || isSaving}>Save All</button>
+                      <button
+                        type="button"
+                        className="fftc-btn fftc-btn--primary"
+                        onClick={handleTranslate}
+                        disabled={isTranslating || isSaving || targetLocales.length === 0}
+                      >
+                        {isTranslating
+                          ? (t('custom:translationCenter:translating' as any) || 'Translating...')
+                          : `${t('custom:translationCenter:translate' as any) || 'Translate'} (${targetLocales.length})`
+                        }
+                      </button>
+                      <button
+                        type="button"
+                        className="fftc-btn fftc-btn--secondary"
+                        onClick={handleSave}
+                        disabled={isTranslating || isSaving}
+                      >
+                        {isSaving ? (t('custom:translationCenter:saving' as any) || 'Saving...') : (t('custom:translationCenter:saveAll' as any) || 'Save All')}
+                      </button>
                     </div>
                   </div>
-                  {statusMessage && <div className={`fftc-status fftc-status--${statusMessage.type}`}>{statusMessage.text}</div>}
+
+                  {statusMessage && (
+                    <div className={`fftc-status fftc-status--${statusMessage.type}`}>
+                      {statusMessage.type === 'success' && '✅ '}
+                      {statusMessage.type === 'error' && '❌ '}
+                      {statusMessage.type === 'warning' && '⚠️ '}
+                      {statusMessage.text}
+                    </div>
+                  )}
                 </div>
 
-                <div className="fftc-modal__content">
-                  {/* Root Fields Section */}
-                  <div className="fftc-section">
-                    <h3 className="fftc-section__title">General Information</h3>
-                    {ROOT_LOCALIZED_FIELDS.map(rf => (
-                      <div key={rf} className="fftc-root-field">
-                        <label className="fftc-root-field__label">{t(`custom:fields:${rf}` as any) || rf}</label>
-                        <div className="fftc-field-inputs">
-                          {[sourceLocale, ...targetLocales].map(code => (
-                            <div key={code} className="fftc-input-wrapper">
-                              <span className="fftc-lang-tag">{code.toUpperCase()}</span>
-                              <textarea rows={1} value={localeData[code]?.[rf] as string || ''} 
-                                onChange={(e) => updateRootFieldValue(rf, code, e.target.value)} />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                {/* Fields List */}
+                <div className="fftc-modal__fields">
+                  {sourceFields.length === 0 ? (
+                    <div className="fftc-empty">
+                      {t('custom:formFieldsTranslation:noFields' as any) || 'No form fields found. Add fields first.'}
+                    </div>
+                  ) : (
+                    sourceFields.map((field, fieldIdx) => {
+                      const fieldId = field.id || `field-${fieldIdx}`
+                      const isExpanded = expandedFields.has(fieldId)
+                      const hasOptions = ['select', 'radio', 'checkbox'].includes(field.fieldType) && field.options && field.options.length > 0
 
-                  {/* Array Fields Section */}
-                  <div className="fftc-section">
-                    <h3 className="fftc-section__title">Form Fields</h3>
-                    {sourceFields.map((field, idx) => (
-                      <div key={idx} className="fftc-field-group">
-                        <div className="fftc-field-header" onClick={() => toggleField(idx)}>
-                          <span className="fftc-field-name">{field.fieldName} ({field.fieldType})</span>
-                        </div>
-                        {expandedFields.has(String(idx)) && (
-                          <div className="fftc-field-details">
-                            <div className="fftc-field-row">
-                              <label>Label</label>
-                              <div className="fftc-field-inputs">
-                                {[sourceLocale, ...targetLocales].map(code => (
-                                  <div key={code} className="fftc-input-wrapper">
-                                    <span className="fftc-lang-tag">{code.toUpperCase()}</span>
-                                    <textarea rows={1} value={localeData[code]?.fields[idx]?.label || ''} 
-                                      onChange={(e) => updateFieldValue(idx, 'label', code, e.target.value)} />
-                                  </div>
-                                ))}
+                      return (
+                        <div key={fieldId} className="fftc-field">
+                          <div
+                            className="fftc-field__header"
+                            onClick={() => toggleFieldExpansion(fieldId)}
+                          >
+                            <span className={`fftc-field__toggle ${isExpanded ? 'fftc-field__toggle--expanded' : ''}`}>
+                              {isExpanded ? '▼' : '▶'}
+                            </span>
+                            <span className="fftc-field__icon">📋</span>
+                            <span className="fftc-field__name">{field.fieldName}</span>
+                            <span className="fftc-field__type">({field.fieldType})</span>
+                            {hasOptions && (
+                              <span className="fftc-field__options-count">
+                                {field.options?.length} {t('custom:formFieldsTranslation:options' as any) || 'options'}
+                              </span>
+                            )}
+                          </div>
+
+                          {isExpanded && (
+                            <div className="fftc-field__content">
+                              {/* Label Row */}
+                              <div className="fftc-field__row">
+                                <div className="fftc-field__row-label">
+                                  {t('custom:formFieldsTranslation:label' as any) || 'Label'}
+                                </div>
+                                <div className="fftc-field__row-inputs">
+                                  {SUPPORTED_LOCALES.map(locale => (
+                                    <div key={locale.code} className="fftc-field__input-group">
+                                      <span className="fftc-field__locale"><LocaleFlag localeCode={locale.code} className="fftc-field__locale-flag" /> {locale.code.toUpperCase()}</span>
+                                      <input
+                                        type="text"
+                                        value={getFieldValue(fieldIdx, 'label', locale.code)}
+                                        onChange={(e) => updateFieldValue(fieldIdx, 'label', locale.code, e.target.value)}
+                                        placeholder={t('custom:translationCenter:empty' as any) as string || 'Empty'}
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
-                            <div className="fftc-field-row">
-                              <label>Placeholder</label>
-                              <div className="fftc-field-inputs">
-                                {[sourceLocale, ...targetLocales].map(code => (
-                                  <div key={code} className="fftc-input-wrapper">
-                                    <span className="fftc-lang-tag">{code.toUpperCase()}</span>
-                                    <textarea rows={1} value={localeData[code]?.fields[idx]?.placeholder || ''} 
-                                      onChange={(e) => updateFieldValue(idx, 'placeholder', code, e.target.value)} />
-                                  </div>
-                                ))}
+
+                              {/* Placeholder Row */}
+                              <div className="fftc-field__row">
+                                <div className="fftc-field__row-label">
+                                  {t('custom:formFieldsTranslation:placeholder' as any) || 'Placeholder'}
+                                </div>
+                                <div className="fftc-field__row-inputs">
+                                  {SUPPORTED_LOCALES.map(locale => (
+                                    <div key={locale.code} className="fftc-field__input-group">
+                                      <span className="fftc-field__locale"><LocaleFlag localeCode={locale.code} className="fftc-field__locale-flag" /> {locale.code.toUpperCase()}</span>
+                                      <input
+                                        type="text"
+                                        value={getFieldValue(fieldIdx, 'placeholder', locale.code)}
+                                        onChange={(e) => updateFieldValue(fieldIdx, 'placeholder', locale.code, e.target.value)}
+                                        placeholder={t('custom:translationCenter:empty' as any) as string || 'Empty'}
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
-                            {field.options && field.options.length > 0 && (
-                              <div className="fftc-field-row">
-                                <label>Options</label>
-                                <div className="fftc-options-list">
-                                  {field.options.map((opt, oIdx) => (
-                                    <div key={oIdx} className="fftc-option-item">
-                                      <span className="fftc-option-value">{opt.value}</span>
-                                      <div className="fftc-field-inputs">
-                                        {[sourceLocale, ...targetLocales].map(code => (
-                                          <div key={code} className="fftc-input-wrapper">
-                                            <span className="fftc-lang-tag">{code.toUpperCase()}</span>
-                                            <input type="text" value={localeData[code]?.fields[idx]?.options?.[oIdx]?.label || ''} 
-                                              onChange={(e) => updateOptionLabel(idx, oIdx, code, e.target.value)} />
+
+                              {/* Options */}
+                              {hasOptions && (
+                                <div className="fftc-field__options">
+                                  <div className="fftc-field__options-header">
+                                    {t('custom:formFieldsTranslation:options' as any) || 'Options'}
+                                  </div>
+                                  {field.options?.map((option, optIdx) => (
+                                    <div key={option.id || `opt-${optIdx}`} className="fftc-field__option">
+                                      <div className="fftc-field__option-value">
+                                        <span className="fftc-field__option-bullet">•</span>
+                                        <code>{option.value}</code>
+                                      </div>
+                                      <div className="fftc-field__row-inputs">
+                                        {SUPPORTED_LOCALES.map(locale => (
+                                          <div key={locale.code} className="fftc-field__input-group">
+                                            <span className="fftc-field__locale"><LocaleFlag localeCode={locale.code} className="fftc-field__locale-flag" /> {locale.code.toUpperCase()}</span>
+                                            <input
+                                              type="text"
+                                              value={getOptionLabel(fieldIdx, optIdx, locale.code)}
+                                              onChange={(e) => updateOptionLabel(fieldIdx, optIdx, locale.code, e.target.value)}
+                                              placeholder={t('custom:translationCenter:empty' as any) as string || 'Empty'}
+                                            />
                                           </div>
                                         ))}
                                       </div>
                                     </div>
                                   ))}
                                 </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })
+                  )}
                 </div>
               </>
             )}
@@ -582,3 +727,5 @@ export const FormFieldsTranslationCenter: React.FC = () => {
     </>
   )
 }
+
+export default FormFieldsTranslationCenter
