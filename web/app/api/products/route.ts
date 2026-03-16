@@ -55,6 +55,15 @@ function transformImageVariants(variants: any) {
 }
 
 /**
+ * Normalize a slug: if stored as display name (e.g. "Glass Standoff"), convert to URL-friendly form.
+ */
+function toUrlSlug(s: string): string {
+  if (!s) return ''
+  if (!s.includes(' ') && s === s.toLowerCase()) return s // already valid
+  return s.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+}
+
+/**
  * Convert Payload's focalX/focalY to cropFocalPoint format
  */
 function getCropFocalPoint(media: any): { x: number; y: number } | undefined {
@@ -218,14 +227,14 @@ export async function GET(request: NextRequest) {
         category: product.category
           ? {
               id: product.category.id || product.category,
-              slug: product.category.slug,
+              slug: toUrlSlug(product.category.slug || ''),
               name: product.category.name,
             }
           : null,
         series: product.series
           ? {
               id: product.series.id || product.series,
-              slug: product.series.slug,
+              slug: toUrlSlug(product.series.slug || ''),
               name: product.series.name,
               localizedName: product.series.name,
             }

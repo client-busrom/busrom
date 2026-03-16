@@ -27,13 +27,25 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json()
 
+    // Normalize slug: if the CMS stored a display name as slug (e.g. "Glass Standoff" instead of "glass-standoff"),
+    // convert it to a proper URL-friendly slug automatically.
+    const toUrlSlug = (s: string): string =>
+      s.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+
     // Transform categories
-    const categories = (data.categoryTabs || []).map((cat: any) => ({
-      id: cat.id,
-      slug: cat.slug,
-      name: cat.name,
-      // localizedName is already handled by Payload auto-localization if we pass locale
-    }))
+    const categories = (data.categoryTabs || []).map((cat: any) => {
+      const rawSlug = cat.slug || ''
+      // If slug contains spaces or uppercase, it's stored incorrectly — normalize it
+      const slug = (rawSlug.includes(' ') || rawSlug !== rawSlug.toLowerCase())
+        ? toUrlSlug(rawSlug)
+        : rawSlug
+
+      return {
+        id: cat.id,
+        slug,
+        name: cat.name,
+      }
+    })
 
     return NextResponse.json({
       pageSize: data.pageSize || 24,
