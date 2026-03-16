@@ -3,15 +3,14 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import useSWR, { preload } from "swr"
+import useSWR from "swr"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import type { Locale } from "@/i18n.config"
 import { ProductCard } from "@/components/shop/ProductCard"
 import { ShopPageSkeleton } from "@/components/shop/ShopPageSkeleton"
-import { cn, getLocalizedName } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 import type {
   Product,
-  ProductSeries,
   ProductListResponse,
   ProductSortField,
   ProductSortDirection,
@@ -20,32 +19,6 @@ import type {
 // SWR fetcher
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
-// 构建产品列表 API URL
-function buildProductsUrl(
-  locale: string,
-  category: string,
-  sortBy: string,
-  sortDirection: string,
-  featuredOnly: boolean,
-  page: number = 1,
-  pageSize: number = 24
-) {
-  const params = new URLSearchParams({
-    locale,
-    page: page.toString(),
-    pageSize: pageSize.toString(),
-    sortBy,
-    sortDir: sortDirection.toLowerCase(),
-  })
-  if (category) {
-    params.append("category", category)
-  }
-  if (featuredOnly) {
-    params.append("isFeatured", "true")
-  }
-  return `/api/products?${params}`
-}
-
 // Helper to extract URL from variant
 function getVariantUrl(variant: string | { url?: string } | undefined): string | undefined {
   if (!variant) return undefined
@@ -53,47 +26,33 @@ function getVariantUrl(variant: string | { url?: string } | undefined): string |
   return variant.url
 }
 
-// 获取产品图片 URL - 优先使用正方形的 tablet 变体
-function getProductImageUrl(product: Product): string | undefined {
-  const image = product.showImage
-  if (!image) return undefined
-  return getVariantUrl(image.variants?.tablet) ||
-         getVariantUrl(image.variants?.card) ||
-         getVariantUrl(image.variants?.medium) ||
-         getVariantUrl(image.variants?.large) ||
-         getVariantUrl(image.variants?.thumbnail) ||
-         image.url
-}
-
 interface ShopPageClientProps {
   locale: Locale
   searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
+export function ShopPageClient({ locale }: ShopPageClientProps) {
   const router = useRouter()
   const searchParamsDict = useSearchParams()
   const pathname = usePathname()
 
-  // Filter & Search State derived from URL
+  // ============================================================
+  // URL is the SINGLE SOURCE OF TRUTH for all filter state
+  // ============================================================
   const selectedCategory = searchParamsDict.get('category') || ""
   const currentPage = parseInt(searchParamsDict.get('page') || '1')
-  
-  const [searchQuery, setSearchQuery] = useState("")
-  const [sortBy, setSortBy] = useState<ProductSortField>("shopOrder")
-  const [sortDirection, setSortDirection] = useState<ProductSortDirection>("DESC")
-  const [featuredOnly, setFeaturedOnly] = useState(false)
+  const sortBy = (searchParamsDict.get('sortBy') || 'shopOrder') as ProductSortField
+  const sortDirection = (searchParamsDict.get('sortDir') || 'DESC') as ProductSortDirection
+  const featuredOnly = searchParamsDict.get('featured') === 'true'
 
-  // UI State
+  // Local UI state only (not part of filtering logic)
+  const [searchQuery, setSearchQuery] = useState("")
   const [isFilterSortOpen, setIsFilterSortOpen] = useState(false)
   const filterSortRef = useRef<HTMLDivElement>(null)
 
-  // 用于动画的 key，切换系列时改变
-  const [animationKey, setAnimationKey] = useState(0)
-  // 用于控制退出动画
-  const [isExiting, setIsExiting] = useState(false)
-
-  // Fetch Shop Config for tabs
+  // ============================================================
+  // Data Fetching
+  // ============================================================
   const { data: configData } = useSWR<{ categories: any[], showAllTab: boolean, title: string, pageSize: number }>(
     `/api/shop/config?locale=${locale}`,
     fetcher,
@@ -102,53 +61,44 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
   const categories = configData?.categories || []
   const showAllTab = configData?.showAllTab !== false
 
-  // Fetch products with SWR - 获取全量数据以支持前端快速筛选
-  const productsUrl = buildProductsUrl(locale, "", sortBy, sortDirection, featuredOnly, 1, 1000) 
+  // Fetch ALL products once (front-end filtering is fast, avoids round trips per tab click)
+  const productsUrl = `/api/products?locale=${locale}&pageSize=1000&sortBy=${sortBy}&sortDir=${sortDirection.toLowerCase()}${featuredOnly ? '&isFeatured=true' : ''}`
   const { data: productsData, isLoading, isValidating } = useSWR<ProductListResponse>(
     productsUrl,
     fetcher,
     {
       revalidateOnFocus: false,
-      keepPreviousData: true, 
+      keepPreviousData: true,
     }
   )
 
   const allProducts = productsData?.products || []
-  
-  // 1. 先按系列/分类进行前端筛选
+
+  // ============================================================
+  // Front-end filtering (instant, no network round trip)
+  // ============================================================
   const categoryFilteredProducts = useMemo(() => {
     if (!selectedCategory) return allProducts
     return allProducts.filter(p => {
       const pany = p as any
-      const catId = pany.category?.id || pany.category
-      const seriesId = pany.series?.id || pany.series
       const catSlug = pany.category?.slug
       const seriesSlug = pany.series?.slug
-      
-      // 这里的逻辑要更宽泛：
-      // 如果选中的是 ID 14，那么产品不管是 category==14 还是 series 就叫 'hidden-hook'，都应该出来
-      const isMatch = String(catId) === String(selectedCategory) || 
-             String(seriesId) === String(selectedCategory) ||
-             catSlug === selectedCategory ||
+      // Match by slug (canonical) or fallback to ID string comparison
+      return catSlug === selectedCategory ||
              seriesSlug === selectedCategory ||
-             // 额外兜底：有些系列名可能和选中的 slug 相同
-             (selectedCategory && seriesSlug?.toLowerCase() === selectedCategory.toLowerCase().replace(/\s+/g, '-'))
-
-      return isMatch
+             String(pany.category?.id || pany.category) === String(selectedCategory)
     })
   }, [allProducts, selectedCategory])
 
-  // 2. 再按搜索关键词筛选
   const filteredProducts = useMemo(() => {
     if (!searchQuery.trim()) return categoryFilteredProducts
     const query = searchQuery.toLowerCase()
     return categoryFilteredProducts.filter((product) => {
-      const name = (product as any).localizedName?.toLowerCase() || product.name?.[locale]?.toLowerCase() || product.sku.toLowerCase()
+      const name = (product as any).localizedName?.toLowerCase() || (product.name as any)?.[locale]?.toLowerCase() || product.sku.toLowerCase()
       return name.includes(query) || product.sku.toLowerCase().includes(query)
     })
   }, [categoryFilteredProducts, searchQuery, locale])
 
-  // 3. 处理前端分页
   const pageSize = configData?.pageSize || 24
   const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1
   const paginatedProducts = useMemo(() => {
@@ -156,35 +106,36 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
     return filteredProducts.slice(start, start + pageSize)
   }, [filteredProducts, currentPage, pageSize])
 
-  const totalResults = filteredProducts.length
-
-  // 预取：鼠标悬停时预加载该系列的数据
-  const handleCategoryHover = useCallback((categorySlug: string) => {
-    const url = buildProductsUrl(locale, categorySlug, sortBy, sortDirection, featuredOnly)
-    preload(url, fetcher)
-  }, [locale, sortBy, sortDirection, featuredOnly])
-
-  // 切换系列 - 使用 Next.js Router 确保状态同步
-  const handleCategoryChange = useCallback((newCategory: string) => {
+  // ============================================================
+  // Navigation helpers — ALL URL updates go through one function
+  // ============================================================
+  const updateUrl = useCallback((updates: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParamsDict.toString())
-    if (newCategory) {
-      params.set('category', newCategory.toString())
-    } else {
-      params.delete('category')
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null || value === "") {
+        params.delete(key)
+      } else {
+        params.set(key, value)
+      }
+    })
+    // Always reset page when anything filter-related changes (except page itself)
+    if (!('page' in updates)) {
+      params.set('page', '1')
     }
-    params.set('page', '1') // Reset page
-    
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
-    setAnimationKey(prev => prev + 1)
   }, [pathname, router, searchParamsDict])
 
-  // 分页切换
+  const handleCategoryChange = useCallback((slug: string) => {
+    updateUrl({ category: slug || null })
+  }, [updateUrl])
+
   const handlePageChange = useCallback((newPage: number) => {
-    const params = new URLSearchParams(searchParamsDict.toString())
-    params.set('page', newPage.toString())
-    router.push(`${pathname}?${params.toString()}`, { scroll: false })
-    setAnimationKey(prev => prev + 1)
-  }, [pathname, router, searchParamsDict])
+    updateUrl({ page: newPage.toString() })
+  }, [updateUrl])
+
+  const handleSortChange = useCallback((newSortBy: string, newSortDir: string) => {
+    updateUrl({ sortBy: newSortBy, sortDir: newSortDir })
+  }, [updateUrl])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -197,94 +148,51 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  // 预加载首屏产品图片
-  useEffect(() => {
-    if (paginatedProducts.length === 0) return
-
-    const existingPreloads = document.querySelectorAll('link[data-product-preload]')
-    existingPreloads.forEach(link => link.remove())
-
-    const imagesToPreload = paginatedProducts.slice(0, 8)
-    imagesToPreload.forEach((product, index) => {
-      const imageUrl = (product as any).showImage?.url || (product as any).mainImage?.[0]?.url
-      if (!imageUrl) return
-
-      const link = document.createElement('link')
-      link.rel = 'preload'
-      link.as = 'image'
-      link.href = imageUrl
-      link.setAttribute('data-product-preload', 'true')
-      if (index < 4) {
-        link.setAttribute('fetchpriority', 'high')
-      }
-      document.head.appendChild(link)
-    })
-
-    return () => {
-      const preloads = document.querySelectorAll('link[data-product-preload]')
-      preloads.forEach(link => link.remove())
-    }
-  }, [paginatedProducts])
-
-  // Get current category name for title
+  // ============================================================
+  // Display helpers
+  // ============================================================
   const displayTitle = useMemo(() => {
     if (!selectedCategory) return "All Products"
-    // 使用 String() 确保数字和字符串 ID 都能匹配
     const found = categories.find(c => c.slug === selectedCategory || String(c.id) === String(selectedCategory))
-    return found?.name || "All Products" 
+    return found?.name || "All Products"
   }, [selectedCategory, categories])
 
-  // Sort options
   const sortOptions = [
     { label: "Featured", value: "shopOrder", direction: "DESC" as const },
     { label: "Newest", value: "createdAt", direction: "DESC" as const },
-    { label: "Price", value: "order", direction: "ASC" as const }, // Just a placeholder for order
+    { label: "Default Order", value: "order", direction: "ASC" as const },
   ]
 
-  // 首次加载显示骨架屏
-  if (isLoading && allProducts.length === 0) {
-    return <ShopPageSkeleton />
-  }
-
-  // 卡片动画变体
+  // ============================================================
+  // Animation variants
+  // ============================================================
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.05,
-        delayChildren: 0.1,
-      },
+      transition: { staggerChildren: 0.05, delayChildren: 0.1 },
     },
     exit: {
       opacity: 0,
-      transition: {
-        staggerChildren: 0.03,
-        staggerDirection: 1,
-      },
+      transition: { staggerChildren: 0.03 },
     },
   }
 
   const cardVariants = {
     hidden: { opacity: 0, x: -30, scale: 0.95 },
     visible: {
-      opacity: 1,
-      x: 0,
-      scale: 1,
-      transition: {
-        type: "spring" as const,
-        stiffness: 300,
-        damping: 24,
-      }
+      opacity: 1, x: 0, scale: 1,
+      transition: { type: "spring" as const, stiffness: 300, damping: 24 },
     },
     exit: {
-      opacity: 0,
-      x: 30,
-      scale: 0.95,
-      transition: {
-        duration: 0.35,
-      }
+      opacity: 0, x: 30, scale: 0.95,
+      transition: { duration: 0.35 },
     },
+  }
+
+  // 首次加载显示骨架屏
+  if (isLoading && allProducts.length === 0) {
+    return <ShopPageSkeleton />
   }
 
   return (
@@ -359,7 +267,7 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
                 onClick={() => setIsFilterSortOpen(!isFilterSortOpen)}
                 className={cn(
                   "flex items-center gap-2 text-sm transition-colors whitespace-nowrap",
-                  (featuredOnly || sortBy !== "order") ? "text-brand-secondary" : "text-brand-accent-gold hover:text-brand-text-black"
+                  (featuredOnly || sortBy !== "shopOrder") ? "text-brand-secondary" : "text-brand-accent-gold hover:text-brand-text-black"
                 )}
               >
                 <span>Apply filter</span>
@@ -371,12 +279,12 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
-                {(featuredOnly || sortBy !== "order") && (
+                {(featuredOnly || sortBy !== "shopOrder") && (
                   <span className="w-2 h-2 rounded-full bg-brand-secondary"></span>
                 )}
               </button>
 
-              {/* Combined Filter & Sort Dropdown */}
+              {/* Dropdown */}
               {isFilterSortOpen && (
                 <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-brand-accent-border shadow-lg z-50 rounded-lg">
                   {/* Filter Section */}
@@ -386,10 +294,7 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
                       <input
                         type="checkbox"
                         checked={featuredOnly}
-                        onChange={(e) => {
-                          setFeaturedOnly(e.target.checked)
-                          setAnimationKey(prev => prev + 1)
-                        }}
+                        onChange={(e) => updateUrl({ featured: e.target.checked ? 'true' : null })}
                         className="w-4 h-4 accent-brand-secondary cursor-pointer"
                       />
                       <span className="text-sm text-brand-text-black group-hover:text-brand-secondary transition-colors">
@@ -406,9 +311,8 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
                         <button
                           key={index}
                           onClick={() => {
-                            setSortBy(option.value as ProductSortField)
-                            setSortDirection(option.direction)
-                            setAnimationKey(prev => prev + 1)
+                            handleSortChange(option.value, option.direction)
+                            setIsFilterSortOpen(false)
                           }}
                           className={cn(
                             "block w-full text-left px-2 py-1.5 text-sm transition-colors rounded",
@@ -454,9 +358,9 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
           </div>
         </div>
 
-        {/* Products Grid with AnimatePresence */}
+        {/* Products Grid */}
         <div className="relative min-h-[400px]">
-          {/* Loading indicator - subtle, not blocking */}
+          {/* Subtle loading indicator */}
           {isValidating && allProducts.length > 0 && (
             <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
               <div className="w-6 h-6 border-2 border-brand-secondary border-t-transparent rounded-full animate-spin"></div>
@@ -481,7 +385,8 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
               </motion.div>
             ) : (
               <motion.div
-                key={`products-${selectedCategory}-${animationKey}`}
+                // Key changes whenever the visible product set changes — this is the correct trigger
+                key={`${selectedCategory}-${sortBy}-${sortDirection}-${featuredOnly}`}
                 className="flex flex-wrap justify-center gap-4 lg:gap-6 max-w-[1072px] mx-auto"
                 variants={containerVariants}
                 initial="hidden"
