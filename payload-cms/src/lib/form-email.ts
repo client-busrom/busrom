@@ -110,18 +110,25 @@ export async function sendFormNotificationEmail(
 ): Promise<EmailResult> {
   const locale = submission.locale || 'en'
 
-  // Get form config ID
-  const formConfigId = typeof submission.formConfig === 'object'
+  // Get form config ID or name
+  let formIdOrName = typeof submission.formConfig === 'object'
     ? submission.formConfig?.id
     : submission.formConfig
 
-  if (!formConfigId) {
-    return { success: false, error: 'No form config ID' }
+  // 补丁逻辑：如果 ID 是空的，尝试用 formName 兜底
+  if (!formIdOrName && submission.formName) {
+    console.log(`[Email Debug] formConfig ID is missing, falling back to formName: "${submission.formName}"`)
+    formIdOrName = submission.formName
+  }
+
+  if (!formIdOrName) {
+    console.error(`[Email Error] Missing both formConfig ID and formName for submission ${submission.id}`)
+    return { success: false, error: 'No form identification found' }
   }
 
   // Find the SMTP config for this form
-  console.log(`[Email Debug] Attempting to find SMTP config for Form ID: ${formConfigId}, Locale: ${locale}`)
-  const smtpConfig = await findSmtpConfigForForm(payload, formConfigId, locale)
+  console.log(`[Email Debug] Attempting to find SMTP config for: ${formIdOrName}, Locale: ${locale}`)
+  const smtpConfig = await findSmtpConfigForForm(payload, formIdOrName, locale)
   
   if (!smtpConfig) {
     console.warn(`[Email Debug] No SMTP config found for Form ID: ${formConfigId}`)
