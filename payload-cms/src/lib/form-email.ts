@@ -140,15 +140,18 @@ export async function sendFormNotificationEmail(
     return { success: false, error: 'No notification emails configured' }
   }
 
-  // Parse notification emails (supports newline, comma, or semicolon)
+  // Parse notification emails (supports newline, carriage return, comma, or semicolon)
   const emails = smtpConfig.notificationEmails
-    .split(/[\n,;]+/)
+    .split(/[\n\r,;]+/)
     .map((e: string) => e.trim())
-    .filter((e: string) => e)
+    .filter((e: string) => e && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) // 增加正则校验，确保地址合法
 
   if (emails.length === 0) {
+    console.error(`[Email Error] No valid email addresses found in config: "${smtpConfig.notificationEmails}"`)
     return { success: false, error: 'No valid notification emails' }
   }
+
+  console.log(`[Email Debug] Preparing to send to: ${emails.join(', ')}`)
 
   // Build subject
   const subject = replacePlaceholders(
