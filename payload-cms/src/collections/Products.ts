@@ -17,72 +17,102 @@ import type {
   CollectionAfterDeleteHook 
 } from 'payload'
 
+// 内存锁：确保同一个分类的 shopProducts 更新是串行的，防止高并发覆盖
+const categoryUpdateQueue: Record<string, Promise<void>> = {}
+
+const runSequentially = async (categoryId: string, task: () => Promise<void>) => {
+  // 获取该分类的当前任务链
+  const previousTask = categoryUpdateQueue[categoryId] || Promise.resolve()
+  
+  // 创建新任务并挂在链条上
+  const currentTask = (async () => {
+    try {
+      await previousTask
+      await task()
+    } catch (e) {
+      console.error(`[Category Sync Queue Error]:`, e)
+    }
+  })()
+  
+  categoryUpdateQueue[categoryId] = currentTask
+  
+  // 运行后清理，防止内存积压
+  currentTask.finally(() => {
+    if (categoryUpdateQueue[categoryId] === currentTask) {
+      delete categoryUpdateQueue[categoryId]
+    }
+  })
+  
+  return currentTask
+}
+
 const afterChangeHook: CollectionAfterChangeHook = async ({
   doc,
   previousDoc,
   operation,
   req: { payload },
 }) => {
-  // Helper to extract ID from potentially populated field
   const getCatId = (c: any) => (c && typeof c === 'object' ? c.id : c)
   const newCatId = getCatId(doc.category)
   const oldCatId = getCatId(previousDoc?.category)
 
-  // Skip if category hasn't changed during update
   if (operation === 'update' && newCatId === oldCatId) return
 
-  // 1. Remove from old category if it exists
+  // 1. 处理旧分类移除
   if (oldCatId) {
-    try {
-      const oldCat: any = await payload.findByID({ collection: 'categories', id: oldCatId, depth: 0 })
-      if (oldCat) {
-        const currentProducts = (oldCat.shopProducts || []).map((p: any) => getCatId(p))
-        const updatedProducts = currentProducts.filter((id: any) => id !== doc.id)
-        
-        if (currentProducts.length !== updatedProducts.length) {
-          await payload.update({
-            collection: 'categories',
-            id: oldCatId,
-            data: { shopProducts: updatedProducts } as any,
-          })
+    await runSequentially(oldCatId, async () => {
+      try {
+        const oldCat: any = await payload.findByID({ collection: 'categories', id: oldCatId, depth: 0 })
+        if (oldCat) {
+          const currentProducts = (oldCat.shopProducts || []).map((p: any) => getCatId(p))
+          const updatedProducts = currentProducts.filter((id: any) => id !== doc.id)
+          if (currentProducts.length !== updatedProducts.length) {
+            await payload.update({
+              collection: 'categories',
+              id: oldCatId,
+              data: { shopProducts: updatedProducts } as any,
+            })
+          }
         }
+      } catch (e: any) {
+        console.warn(`[Products Hook] Remove error:`, e.message)
       }
-    } catch (e: any) {
-      console.warn(`[Products Hook] Could not remove product from old category ${oldCatId}:`, e.message)
-    }
+    })
   }
 
-  // 2. Add to new category if it exists
+  // 2. 处理新分类添加
   if (newCatId) {
-    try {
-      const newCat: any = await payload.findByID({ collection: 'categories', id: newCatId, depth: 0 })
-      if (newCat) {
-        const currentProducts = (newCat.shopProducts || []).map((p: any) => getCatId(p))
-        if (!currentProducts.includes(doc.id)) {
-          await payload.update({
-            collection: 'categories',
-            id: newCatId,
-            data: { shopProducts: [...currentProducts, doc.id] } as any,
-          })
+    await runSequentially(newCatId, async () => {
+      try {
+        const newCat: any = await payload.findByID({ collection: 'categories', id: newCatId, depth: 0 })
+        if (newCat) {
+          const currentProducts = (newCat.shopProducts || []).map((p: any) => getCatId(p))
+          if (!currentProducts.includes(doc.id)) {
+            await payload.update({
+              collection: 'categories',
+              id: newCatId,
+              data: { shopProducts: [...currentProducts, doc.id] } as any,
+            })
+          }
         }
+      } catch (e: any) {
+        console.warn(`[Products Hook] Add error:`, e.message)
       }
-    } catch (e: any) {
-      console.warn(`[Products Hook] Could not add product to new category ${newCatId}:`, e.message)
-    }
+    })
   }
 }
 
 const afterDeleteHook: CollectionAfterDeleteHook = async ({ req: { payload }, id, doc }) => {
   const getCatId = (c: any) => (c && typeof c === 'object' ? c.id : c)
   const catId = getCatId(doc.category)
+  if (!catId) return
 
-  if (catId) {
+  await runSequentially(catId, async () => {
     try {
       const cat: any = await payload.findByID({ collection: 'categories', id: catId, depth: 0 })
       if (cat) {
         const currentProducts = (cat.shopProducts || []).map((p: any) => getCatId(p))
         const updatedProducts = currentProducts.filter((pId: any) => pId !== id)
-        
         if (currentProducts.length !== updatedProducts.length) {
           await payload.update({
             collection: 'categories',
@@ -92,9 +122,9 @@ const afterDeleteHook: CollectionAfterDeleteHook = async ({ req: { payload }, id
         }
       }
     } catch (e: any) {
-      console.warn(`[Products Hook] Could not remove product ${id} from category ${catId} on delete:`, e.message)
+      console.warn(`[Products Hook] Delete sync error:`, e.message)
     }
-  }
+  })
 }
 
 
@@ -190,8 +220,8 @@ export const Products: CollectionConfig = {
               required: true,
               localized: true,
               label: {
-                en: 'Product Name',
-                zh: '产品名称',
+                en: 'Product Title',
+                zh: '产品标题',
               },
             },
             {

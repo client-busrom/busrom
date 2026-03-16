@@ -187,7 +187,7 @@ export const customTranslationsEn = {
     // ========================================================================
     fields: {
       name: 'Name',
-      productName: 'Product Name',
+      productName: 'Product Title',
       seriesName: 'Series Name',
       pageTitle: 'Page Title',
       blogTitle: 'Blog Title',
@@ -562,7 +562,7 @@ export const customTranslationsZh = {
     // ========================================================================
     fields: {
       name: '名称',
-      productName: '产品名称',
+      productName: '产品标题',
       seriesName: '系列名称',
       pageTitle: '页面标题',
       blogTitle: '博客标题',
