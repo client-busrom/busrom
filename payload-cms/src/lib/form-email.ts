@@ -131,7 +131,7 @@ export async function sendFormNotificationEmail(
   const smtpConfig = await findSmtpConfigForForm(payload, formIdOrName, locale)
   
   if (!smtpConfig) {
-    console.warn(`[Email Debug] No SMTP config found for Form ID: ${formConfigId}`)
+    console.warn(`[Email Debug] No SMTP config found for Form ID/Name: ${formIdOrName}`)
     return { success: false, error: 'No SMTP config found for this form' }
   }
 
