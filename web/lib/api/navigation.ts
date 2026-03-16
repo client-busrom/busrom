@@ -60,7 +60,7 @@ async function getImageFromMediaTags(
 }
 
 /**
- * 修复旧版 /product/ URL 为 /products/
+ * 修复旧版 URL 并确保标准化格式
  */
 function fixProductUrl(url: string | null | undefined): string {
   if (!url) return '#'
@@ -70,6 +70,28 @@ function fixProductUrl(url: string | null | undefined): string {
   // Fix One-Stop Shop URL
   if (processedUrl === '/service/one-stop') {
     processedUrl = '/service/one-stop-shop'
+  }
+
+  // 1. 统一将 ?series= 替换为 ?category=
+  if (processedUrl.includes('/shop?series=')) {
+    processedUrl = processedUrl.replace('/shop?series=', '/shop?category=')
+  }
+
+  // 2. 如果包含 ?category=，尝试对参数值进行规范化处理
+  if (processedUrl.includes('/shop?category=')) {
+    try {
+      const [base, query] = processedUrl.split('?')
+      const params = new URLSearchParams(query)
+      const cat = params.get('category')
+      if (cat) {
+        // 对 category 的值进行标准化
+        const cleanCat = cat.trim().toLowerCase().replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '').replace(/[^a-z0-9-]/g, '')
+        params.set('category', cleanCat)
+        processedUrl = `${base}?${params.toString()}`
+      }
+    } catch (e) {
+      // 防止非法路径导致崩溃
+    }
   }
   
   return processedUrl

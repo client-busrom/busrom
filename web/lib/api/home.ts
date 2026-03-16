@@ -79,11 +79,31 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
       ? carouselItemsData
       : (carouselItemsData?.[locale] || carouselItemsData?.en || [])
 
-    // Helper to fix legacy /product/ URLs to /products/
+    // Helper to fix legacy URLs and ensure standardized formatting
     const fixProductUrl = (url: string | null | undefined): string => {
       if (!url) return '#'
-      // Convert /product/xxx to /products/xxx
-      return url.replace(/^\/product\//, '/products/')
+      
+      let processedUrl = url.replace(/^\/product\//, '/products/')
+
+      // 1. 统一将 ?series= 替换为 ?category=
+      if (processedUrl.includes('/shop?series=')) {
+        processedUrl = processedUrl.replace('/shop?series=', '/shop?category=')
+      }
+
+      // 2. 如果包含 ?category=，尝试对参数值进行规范化处理
+      if (processedUrl.includes('/shop?category=')) {
+        const [base, query] = processedUrl.split('?')
+        const params = new URLSearchParams(query)
+        const cat = params.get('category')
+        if (cat) {
+          // 对 category 的值进行标准化 (处理空格等)
+          const cleanCat = cat.trim().toLowerCase().replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '').replace(/[^a-z0-9-]/g, '')
+          params.set('category', cleanCat)
+          processedUrl = `${base}?${params.toString()}`
+        }
+      }
+      
+      return processedUrl
     }
 
     const carouselItems = (Array.isArray(rawCarouselItems) ? rawCarouselItems : []).map((item: any, index: number) => ({
