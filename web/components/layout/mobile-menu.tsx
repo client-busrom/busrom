@@ -205,7 +205,7 @@ export function MobileMenu({ isOpen, onClose, navigationItems = [] }: MobileMenu
                                   const imageUrl = getProductImage(child.url, child.image)
                                   const isShopMenu = item.url === '/shop'
                                   const childUrl = isShopMenu
-                                    ? `/shop?series=${getProductSlug(child.url)}`
+                                    ? `/shop?category=${getProductSlug(child.url)}`
                                     : child.url
 
                                   return (
