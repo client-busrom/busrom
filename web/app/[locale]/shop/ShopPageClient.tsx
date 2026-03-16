@@ -31,15 +31,27 @@ interface ShopPageClientProps {
   searchParams: { [key: string]: string | string[] | undefined }
 }
 
+// Helper to normalize slugs in the UI
+function toUrlSlug(s: string): string {
+  if (!s) return ''
+  return s
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/[^a-z0-9-]/g, '')
+}
+
 export function ShopPageClient({ locale }: ShopPageClientProps) {
   const router = useRouter()
   const searchParamsDict = useSearchParams()
   const pathname = usePathname()
 
   // ============================================================
-  // URL is the SINGLE SOURCE OF TRUTH for all filter state
+  // URL is the SINGLE SOURCE OF TRUTH (Always normalized)
   // ============================================================
-  const selectedCategory = searchParamsDict.get('category') || ""
+  const rawCategory = searchParamsDict.get('category') || ""
+  const selectedCategory = useMemo(() => toUrlSlug(rawCategory), [rawCategory])
   const currentPage = parseInt(searchParamsDict.get('page') || '1')
   const sortBy = (searchParamsDict.get('sortBy') || 'shopOrder') as ProductSortField
   const sortDirection = (searchParamsDict.get('sortDir') || 'DESC') as ProductSortDirection
@@ -81,12 +93,15 @@ export function ShopPageClient({ locale }: ShopPageClientProps) {
     if (!selectedCategory) return allProducts
     return allProducts.filter(p => {
       const pany = p as any
+      const catId = String(pany.category?.id || pany.category || '')
+      const seriesId = String(pany.series?.id || pany.series || '')
       const catSlug = pany.category?.slug
       const seriesSlug = pany.series?.slug
-      // Match by slug (canonical) or fallback to ID string comparison
+      
       return catSlug === selectedCategory ||
              seriesSlug === selectedCategory ||
-             String(pany.category?.id || pany.category) === String(selectedCategory)
+             catId === selectedCategory ||
+             seriesId === selectedCategory
     })
   }, [allProducts, selectedCategory])
 
