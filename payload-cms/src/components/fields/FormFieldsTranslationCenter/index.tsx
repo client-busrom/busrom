@@ -392,16 +392,44 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
     let failCount = 0
 
     try {
+      // Gather source fields for fallback
+      const sourceFields = localeData[sourceLocale]?.fields || []
+
       // Save each locale (except current locale which will be saved by the form)
       for (const locale of SUPPORTED_LOCALES) {
         if (locale.code === currentLocale.code) continue
 
-        const fields = localeData[locale.code]?.fields || []
+        const currentLocaleFields = localeData[locale.code]?.fields || []
+
+        // Merge with source fields to ensure required fields have a value
+        // Payload rejects empty 'required' fields even if they are localized
+        const fieldsToSave = sourceFields.map((sourceField, idx) => {
+          const targetField = currentLocaleFields[idx] || { ...sourceField }
+          
+          return {
+            ...sourceField, // Copy non-localized fields (fieldName, fieldType, id, etc.)
+            label: targetField.label && typeof targetField.label === 'string' && targetField.label.trim() 
+              ? targetField.label 
+              : (sourceField.label || ' '), // Fallback to source or a space to satisfy requirement
+            placeholder: targetField.placeholder && typeof targetField.placeholder === 'string' && targetField.placeholder.trim()
+              ? targetField.placeholder
+              : targetField.placeholder, // Keep empty if it was empty
+            options: (sourceField.options || []).map((sourceOpt, optIdx) => {
+              const targetOpt = targetField.options?.[optIdx] || { ...sourceOpt }
+              return {
+                ...sourceOpt,
+                label: targetOpt.label && typeof targetOpt.label === 'string' && targetOpt.label.trim()
+                  ? targetOpt.label
+                  : (sourceOpt.label || ' '),
+              }
+            }),
+          }
+        })
 
         const res = await fetch(`/api/form-configs/${id}?locale=${locale.code}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ fields }),
+          body: JSON.stringify({ fields: fieldsToSave }),
         })
 
         if (res.ok) {
