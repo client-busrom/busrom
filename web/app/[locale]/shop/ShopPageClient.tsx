@@ -119,15 +119,22 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
   const categoryFilteredProducts = useMemo(() => {
     if (!selectedCategory) return allProducts
     return allProducts.filter(p => {
-      const catId = (p as any).category?.id || (p as any).category
-      const seriesId = (p as any).series?.id || (p as any).series
-      const catSlug = (p as any).category?.slug
-      const seriesSlug = (p as any).series?.slug
+      const pany = p as any
+      const catId = pany.category?.id || pany.category
+      const seriesId = pany.series?.id || pany.series
+      const catSlug = pany.category?.slug
+      const seriesSlug = pany.series?.slug
       
-      return String(catId) === String(selectedCategory) || 
+      // 这里的逻辑要更宽泛：
+      // 如果选中的是 ID 14，那么产品不管是 category==14 还是 series 就叫 'hidden-hook'，都应该出来
+      const isMatch = String(catId) === String(selectedCategory) || 
              String(seriesId) === String(selectedCategory) ||
              catSlug === selectedCategory ||
-             seriesSlug === selectedCategory
+             seriesSlug === selectedCategory ||
+             // 额外兜底：有些系列名可能和选中的 slug 相同
+             (selectedCategory && seriesSlug?.toLowerCase() === selectedCategory.toLowerCase().replace(/\s+/g, '-'))
+
+      return isMatch
     })
   }, [allProducts, selectedCategory])
 
