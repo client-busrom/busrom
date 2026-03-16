@@ -334,7 +334,7 @@ export function ShopPageClient({ locale, searchParams }: ShopPageClientProps) {
                   onClick={() => handleCategoryChange(c.id)}
                   className={cn(
                     "text-sm font-medium transition-colors pb-1 whitespace-nowrap px-2 font-orbitron",
-                    selectedCategory === c.id
+                    String(selectedCategory) === String(c.id)
                       ? "text-brand-text-black border-b-2 border-brand-text-black"
                       : "text-brand-accent-gold hover:text-brand-text-black"
                   )}
