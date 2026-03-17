@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
@@ -197,7 +197,7 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
       });
     };
 
-    fontLoader.load("https://cdn.jsdelivr.net/npm/three@0.137/examples/fonts/helvetiker_bold.typeface.json", (loadedFont) => {
+    fontLoader.load("/helvetiker_bold.typeface.json", (loadedFont) => {
       font = loadedFont;
       const loadingGeo = new TextGeometry("Busrom", { font, size: 0.15, depth: 0.05, curveSegments: 12 });
       loadingGeo.center();
