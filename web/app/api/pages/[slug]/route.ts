@@ -4,7 +4,7 @@ import { convertToCDNUrl } from '@/lib/cdn-url'
 // Use runtime environment variable for server-side API calls
 const CMS_URL = process.env.CMS_GRAPHQL_URL
   ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
-  : (process.env.CMS_URL || 'http://localhost:3002')
+  : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002')
 
 /**
  * Extract all media IDs from contentTranslation

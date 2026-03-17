@@ -1,6 +1,6 @@
 import { NavigationMenuType, type NavItem } from '@/types/navigation';
 
-const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3002';
+const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
 
 /**
  * Payload CMS 导航菜单数据类型

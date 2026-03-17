@@ -10,7 +10,7 @@ import type { Metadata } from 'next'
 // CMS URL for API calls
 const CMS_URL = process.env.CMS_GRAPHQL_URL
   ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
-  : (process.env.CMS_URL || 'http://localhost:3002')
+  : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002')
 
 // CDN URL for images
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL || 'https://d2kqew3hn5wphn.cloudfront.net'

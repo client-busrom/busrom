@@ -4,8 +4,8 @@
  * Fetches global site configuration from Payload CMS
  */
 
-const CMS_URL = process.env.CMS_URL ||
-  (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : 'http://localhost:3002')
+const CMS_URL =
+  (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'))
 
 export interface TurnstileConfig {
   enabled: boolean
