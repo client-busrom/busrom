@@ -76,12 +76,12 @@ export async function sendEmail(
  * Convert Lexical rich text content to HTML
  * This is a simplified converter - for production, use @payloadcms/richtext-lexical serializers
  */
-export function lexicalToHtml(content: any): string {
+export async function lexicalToHtml(content: any, baseUrl: string = ''): Promise<string> {
   if (!content || !content.root || !content.root.children) {
     return ''
   }
 
-  function processNode(node: any): string {
+  async function processNode(node: any): Promise<string> {
     if (!node) return ''
 
     // Text node
@@ -99,33 +99,70 @@ export function lexicalToHtml(content: any): string {
     }
 
     // Process children
-    const childrenHtml = node.children?.map(processNode).join('') || ''
+    const childrenPromises = node.children?.map(processNode) || []
+    const childrenHtml = (await Promise.all(childrenPromises)).join('')
+
+    // Handle alignment
+    const style: string[] = []
+    if (node.format) {
+      if (['left', 'center', 'right', 'justify'].includes(node.format)) {
+        style.push(`text-align: ${node.format}`)
+      }
+    }
+    const styleAttr = style.length > 0 ? ` style="${style.join('; ')}"` : ''
 
     // Handle different node types
     switch (node.type) {
       case 'paragraph':
-        return `<p>${childrenHtml}</p>`
+        return `<p${styleAttr}>${childrenHtml}</p>`
       case 'heading':
-        const tag = node.tag || 'h2'
-        return `<${tag}>${childrenHtml}</${tag}>`
+        const hTag = node.tag || 'h2'
+        return `<${hTag}${styleAttr}>${childrenHtml}</${hTag}>`
       case 'list':
         const listTag = node.listType === 'number' ? 'ol' : 'ul'
-        return `<${listTag}>${childrenHtml}</${listTag}>`
+        return `<${listTag}${styleAttr}>${childrenHtml}</${listTag}>`
       case 'listitem':
-        return `<li>${childrenHtml}</li>`
+        return `<li${styleAttr}>${childrenHtml}</li>`
       case 'link':
+      case 'autolink':
         const href = node.fields?.url || node.url || '#'
-        return `<a href="${href}">${childrenHtml}</a>`
+        return `<a href="${href}" style="color: #2563eb; text-decoration: underline;">${childrenHtml}</a>`
       case 'quote':
-        return `<blockquote>${childrenHtml}</blockquote>`
+        return `<blockquote style="border-left: 4px solid #eee; padding-left: 16px; margin: 16px 0; color: #666;">${childrenHtml}</blockquote>`
       case 'linebreak':
         return '<br>'
+      case 'horizontalrule':
+        return '<hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">'
+      case 'upload':
+        // Payload Lexical upload node: value usually contains the media object
+        const media = node.value
+        if (!media || typeof media !== 'object') return ''
+        
+        // Handle both depth 0 (ID) and depth 1 (Object)
+        // If it's just an ID, we can't easily fetch it here without an async lookup
+        // But in most cases with Payload's findByID { depth: 1 }, it is an object
+        const mediaUrl = media.url || ''
+        const mediaAlt = media.alt || ''
+        
+        if (!mediaUrl) return ''
+        
+        const absoluteUrl = mediaUrl.startsWith('http') ? mediaUrl : `${baseUrl}${mediaUrl}`
+        
+        // Use a wrapper with some padding and responsive styles
+        return `
+          <div style="margin: 24px 0; text-align: center;">
+            <img src="${absoluteUrl}" alt="${mediaAlt}" style="max-width: 100%; height: auto; display: inline-block; border-radius: 4px;">
+            ${node.fields?.caption ? `<div style="margin-top: 8px; font-size: 13px; color: #666;">${node.fields.caption}</div>` : ''}
+          </div>
+        `
       default:
         return childrenHtml
     }
   }
 
-  return content.root.children.map(processNode).join('')
+  const childrenPromises = content.root.children.map(processNode)
+  const results = await Promise.all(childrenPromises)
+  return results.join('')
 }
 
 /**

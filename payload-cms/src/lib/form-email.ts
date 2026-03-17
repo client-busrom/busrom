@@ -308,7 +308,8 @@ export async function sendAutoReplyEmail(
   })
 
   // Convert rich text template to HTML
-  let templateHtml = lexicalToHtml(autoReplyTemplate)
+  const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
+  let templateHtml = await lexicalToHtml(autoReplyTemplate, baseUrl)
 
   // Replace placeholders in template (keeping for backward compatibility)
   templateHtml = replacePlaceholders(templateHtml, {
