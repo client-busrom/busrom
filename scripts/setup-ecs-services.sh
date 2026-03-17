@@ -250,11 +250,16 @@ create_ecs_service() {
     --query 'Subnets[*].SubnetId' \
     --output text | tr '\t' ',')
 
+  local desired_count=1
+  if [ "$service_type" == "web" ] && [ "$ENVIRONMENT" == "production" ]; then
+    desired_count=2
+  fi
+
   aws ecs create-service \
     --cluster "$ECS_CLUSTER" \
     --service-name "$service_name" \
     --task-definition "${PROJECT_NAME}-${service_type}-${ENVIRONMENT}" \
-    --desired-count 1 \
+    --desired-count $desired_count \
     --launch-type FARGATE \
     --platform-version LATEST \
     --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],securityGroups=[$ECS_SG_ID],assignPublicIp=ENABLED}" \

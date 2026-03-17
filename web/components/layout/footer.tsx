@@ -129,6 +129,7 @@ export default function Footer({ locale, showForm = true }: Props) {
 
   // Form config for multi-language messages
   const [formConfig, setFormConfig] = useState<{
+    name?: string;
     errorCaptchaMessage?: string;
     errorRequiredFields?: string;
     errorNetworkMessage?: string;
@@ -165,7 +166,7 @@ export default function Footer({ locale, showForm = true }: Props) {
       try {
         const [siteRes, formRes] = await Promise.all([
           fetch('/api/site-config'),
-          fetch(`/api/form-config/footer-inquiry-form?locale=${locale}`)
+          fetch(`/api/form-config/footer-form?locale=${locale}`)
         ]);
 
         if (siteRes.ok) {
@@ -233,7 +234,7 @@ export default function Footer({ locale, showForm = true }: Props) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          formName: 'footer-inquiry-form',
+          formName: formConfig?.name || 'footer-form',
           data: formData,
           locale,
           turnstileToken,

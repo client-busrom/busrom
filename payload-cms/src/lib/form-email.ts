@@ -14,6 +14,14 @@ import {
   type EmailConfig,
 } from './email'
 
+import fs from 'fs'
+import path from 'path'
+
+function debugLog(message: string) {
+  const logPath = '/tmp/email_debug.log'
+  const timestamp = new Date().toISOString()
+  fs.appendFileSync(logPath, `[${timestamp}] ${message}\n`)
+}
 interface FormSubmission {
   id: string | number
   formName?: string
@@ -42,20 +50,21 @@ async function findSmtpConfigForForm(
     // 如果传入的是字符串且不是纯数字，可能是一个 Form Name (Slug)
     // 需要先通过 Name 找到对应的 ID
     if (typeof formConfigId === 'string' && isNaN(Number(formConfigId))) {
-      console.log(`[Email Debug] Input ID is a string name: "${formConfigId}". Looking up real ID...`)
+      debugLog(`findSmtpConfigForForm - Input is string name: "${formConfigId}". Looking up real ID...`)
       const formDocs = await payload.find({
         collection: 'form-configs',
         where: {
           name: { equals: formConfigId }
         },
-        limit: 1
+        limit: 1,
+        overrideAccess: true,
       })
       
       if (formDocs.totalDocs > 0) {
         actualId = formDocs.docs[0].id
-        console.log(`[Email Debug] Found real ID: ${actualId} for form name: "${formConfigId}"`)
+        debugLog(`findSmtpConfigForForm - Found real ID: ${actualId} for form name: "${formConfigId}"`)
       } else {
-        console.warn(`[Email Debug] Could not find form config with name: "${formConfigId}"`)
+        debugLog(`findSmtpConfigForForm - Could not find form config with name: "${formConfigId}"`)
       }
     }
 
@@ -69,16 +78,17 @@ async function findSmtpConfigForForm(
       },
       locale: (locale || 'en') as any,
       limit: 1,
+      overrideAccess: true,
     })
 
     if (result.totalDocs === 0) {
-      console.warn(`[Email Debug] No SmtpConfigs found linked to form ID/Name: ${actualId}`)
+      debugLog(`findSmtpConfigForForm - No SmtpConfigs found linked to form ID/Name: ${actualId}`)
       return null
     }
 
     return result.docs[0]
   } catch (error) {
-    console.error('Failed to find SMTP config for form:', error)
+    debugLog(`findSmtpConfigForForm - PROMISE REJECTED or Error: ${error instanceof Error ? error.message : String(error)}`)
     return null
   }
 }
@@ -200,13 +210,16 @@ export async function sendFormNotificationEmail(
   `
 
   // Build email config and send
+  debugLog(`Sending notification to: ${emails.join(', ')}`)
   const emailConfig = buildEmailConfig(smtpConfig)
-  return sendEmail(emailConfig, {
+  const result = await sendEmail(emailConfig, {
     to: emails,
     subject,
     html,
     replyTo: submission.data?.email,
   })
+  debugLog(`Notification result: ${JSON.stringify(result)}`)
+  return result
 }
 
 /**
@@ -217,38 +230,63 @@ export async function sendAutoReplyEmail(
   submission: FormSubmission
 ): Promise<EmailResult> {
   const locale = submission.locale || 'en'
+  debugLog(`sendAutoReplyEmail started - Submission ID: ${submission.id}, Locale: ${locale}`)
 
   // Check if submitter has an email
   const submitterEmail = submission.data?.email
   if (!submitterEmail) {
+    debugLog(`sendAutoReplyEmail aborted - No submitter email found in data: ${JSON.stringify(submission.data)}`)
     return { success: false, error: 'No submitter email found' }
   }
 
   // Get form config ID
-  const formConfigId = typeof submission.formConfig === 'object'
+  let formConfigId = typeof submission.formConfig === 'object'
     ? submission.formConfig?.id
     : submission.formConfig
 
+  // 补丁逻辑：如果 ID 是空的，尝试用 formName 兜底
+  if (!formConfigId && submission.formName) {
+    debugLog(`sendAutoReplyEmail - formConfig ID is missing, falling back to formName: "${submission.formName}"`)
+    formConfigId = submission.formName
+  }
+
   if (!formConfigId) {
+    debugLog(`sendAutoReplyEmail aborted - No form identification found (missing ID and name)`)
     return { success: false, error: 'No form config ID' }
   }
 
   // Find the SMTP config for this form
   const smtpConfig = await findSmtpConfigForForm(payload, formConfigId, locale)
   if (!smtpConfig) {
+    debugLog(`sendAutoReplyEmail aborted - No SMTP config found for Form ID/Name: ${formConfigId}`)
     return { success: false, error: 'No SMTP config found for this form' }
   }
 
   // Get form-specific auto-reply settings
   let formConfig: any = null
   try {
-    formConfig = await payload.findByID({
-      collection: 'form-configs',
-      id: formConfigId,
-      locale: (locale || 'en') as any,
-    })
-  } catch {
-    // Form config not found
+    // Determine if we should find by ID or by name
+    if (typeof formConfigId === 'number' || (typeof formConfigId === 'string' && !isNaN(Number(formConfigId)))) {
+      formConfig = await payload.findByID({
+        collection: 'form-configs',
+        id: formConfigId,
+        locale: (locale || 'en') as any,
+        overrideAccess: true,
+      })
+    } else {
+      const results = await payload.find({
+        collection: 'form-configs',
+        where: { name: { equals: String(formConfigId) } },
+        locale: (locale || 'en') as any,
+        limit: 1,
+        overrideAccess: true,
+      })
+      if (results.totalDocs > 0) {
+        formConfig = results.docs[0]
+      }
+    }
+  } catch (err: any) {
+    debugLog(`sendAutoReplyEmail - Error fetching form config Doc: ${err.message}`)
   }
 
   // Determine if auto-reply is enabled and which template to use
@@ -309,7 +347,15 @@ export async function sendAutoReplyEmail(
 
   // Convert rich text template to HTML
   const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
-  let templateHtml = await lexicalToHtml(autoReplyTemplate, baseUrl)
+  debugLog(`Converting template to HTML. Content exists: ${!!autoReplyTemplate}, BaseURL: ${baseUrl}`)
+  let templateHtml = ''
+  try {
+    templateHtml = await lexicalToHtml(autoReplyTemplate, baseUrl)
+    debugLog(`Template converted successfully. Length: ${templateHtml.length}`)
+  } catch (err: any) {
+    debugLog(`Error in lexicalToHtml: ${err.message}`)
+    throw err
+  }
 
   // Replace placeholders in template (keeping for backward compatibility)
   templateHtml = replacePlaceholders(templateHtml, {
@@ -390,10 +436,13 @@ export async function sendAutoReplyEmail(
   `
 
   // Build email config and send
+  debugLog(`Calling sendEmail to: ${submitterEmail}, Subject: ${subject}`)
   const emailConfig = buildEmailConfig(smtpConfig)
-  return sendEmail(emailConfig, {
+  const result = await sendEmail(emailConfig, {
     to: recipientDisplayName ? `"${recipientDisplayName}" <${submitterEmail}>` : submitterEmail,
     subject,
     html,
   })
+  debugLog(`sendEmail result: ${JSON.stringify(result)}`)
+  return result
 }

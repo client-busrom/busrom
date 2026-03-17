@@ -34,7 +34,11 @@ interface FormConfig {
   description: string
   fields: FormField[]
   submitButtonText: string
+  submittingText: string
   successMessage: string
+  errorRequiredFields: string
+  errorNetworkMessage: string
+  errorCaptchaMessage: string
   errorMessage: string
   enableCaptcha: boolean
   maxSubmissionsPerDay: number
@@ -45,6 +49,8 @@ interface FormConfig {
   captchaThreshold: number
   captchaTheme: 'light' | 'dark' | 'auto'
   captchaSize: 'normal' | 'compact'
+  // Privacy consent
+  privacyConsentText?: string
 }
 
 interface DynamicFormProps {
@@ -354,14 +360,14 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
       })
 
       if (missingFields.length > 0) {
-        setError(`Please fill in required fields: ${missingFields.join(", ")}`)
+        setError(formConfig?.errorRequiredFields || `Please fill in required fields: ${missingFields.join(", ")}`)
         setSubmitting(false)
         return
       }
 
       // Check captcha if required
       if (shouldShowCaptcha && !turnstileToken) {
-        setError('Please complete the captcha verification')
+        setError(formConfig?.errorCaptchaMessage || 'Please complete the captcha verification')
         setSubmitting(false)
         return
       }
@@ -405,12 +411,12 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
         }, 5000)
       } else {
         const errorData = await res.json()
-        setError(errorData.error || formConfig?.errorMessage || "Failed to submit form")
+        setError(errorData.error || formConfig?.errorNetworkMessage || formConfig?.errorMessage || "Failed to submit form")
         setTurnstileToken(null) // Reset captcha on error
       }
     } catch (err) {
       console.error("Error submitting form:", err)
-      setError(formConfig?.errorMessage || "Failed to submit form")
+      setError(formConfig?.errorNetworkMessage || formConfig?.errorMessage || "Failed to submit form")
       setTurnstileToken(null) // Reset captcha on error
     } finally {
       setSubmitting(false)
@@ -801,7 +807,7 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
         <h3 className="text-xl font-anaheim font-bold text-green-700 mb-2">
           Success!
         </h3>
-        <p className="text-green-600">
+        <p className="text-green-600 whitespace-pre-line">
           {formConfig.successMessage || "Your message has been sent successfully!"}
         </p>
       </div>
@@ -841,10 +847,17 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
       <button
         type="submit"
         disabled={submitting || (shouldShowCaptcha && !turnstileToken)}
-        className="w-full py-3 px-6 bg-brand-text-black text-white font-anaheim font-bold uppercase tracking-wider hover:bg-brand-accent-gold hover:text-brand-text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full py-3 px-6 bg-brand-text-black text-white font-anaheim font-bold uppercase tracking-wider hover:bg-brand-accent-gold hover:text-brand-text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-pre-line"
       >
-        {submitting ? "Sending..." : (formConfig.submitButtonText || "Submit")}
+        {submitting ? (formConfig.submittingText || "Sending...") : (formConfig.submitButtonText || "Submit")}
       </button>
+
+      {/* Privacy consent text */}
+      {formConfig.privacyConsentText && (
+        <p className="mt-3 text-xs text-gray-500 leading-relaxed whitespace-pre-line">
+          {formConfig.privacyConsentText}
+        </p>
+      )}
     </form>
   )
 }

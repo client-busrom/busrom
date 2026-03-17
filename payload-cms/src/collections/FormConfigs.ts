@@ -388,6 +388,21 @@ export const FormConfigs: CollectionConfig = {
           localized: true,
           defaultValue: 'Please complete the captcha verification',
         },
+        {
+          name: 'privacyConsentText',
+          type: 'textarea',
+          label: {
+            en: 'Privacy Consent Text',
+            zh: '同意隐私',
+          },
+          localized: true,
+          admin: {
+            description: {
+              en: 'Privacy consent text displayed below the submit button. Leave empty to hide.',
+              zh: '显示在提交按钮下方的隐私同意文本。留空则不显示。',
+            },
+          },
+        },
       ],
     },
 
