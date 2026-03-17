@@ -13,7 +13,7 @@ import { convertToCDNUrl } from '@/lib/cdn-url'
 // For Payload CMS, default port is 3002 in development
 const CMS_URL = process.env.CMS_GRAPHQL_URL
   ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
-  : (process.env.CMS_URL || 'http://localhost:3002')
+  : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002')
 
 // Helper function to convert Media URL to CDN URL
 function getMediaUrl(fileUrl: string | null | undefined): string {

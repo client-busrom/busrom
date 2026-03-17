@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import type { Product, ProductListResponse } from '@/lib/types/product'
 
 // Payload CMS API 基础地址
-const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3002'
+const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 // CDN Domain configuration
 const CDN_DOMAIN = process.env.NEXT_PUBLIC_CDN_DOMAIN || 'http://localhost:8080'

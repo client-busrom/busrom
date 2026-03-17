@@ -5,7 +5,7 @@ import { PageSeoInjector } from "@/components/seo"
 import { getNonHomePageSeo, buildMetadata } from "@/lib/api/seo-settings"
 import type { Metadata } from "next"
 
-const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3002'
+const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 // Generate metadata for SEO
 // Strategy: seoPlugin's meta.title/meta.description as primary SEO (<title> + <meta description>)

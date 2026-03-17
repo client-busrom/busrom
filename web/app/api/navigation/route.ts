@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { NavigationMenuType, type NavItem } from '@/types/navigation';
 
 // Payload CMS API 基础地址
-const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3002';
+const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
 
 /**
  * Payload CMS 导航菜单数据类型
