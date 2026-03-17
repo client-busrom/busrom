@@ -3,8 +3,28 @@
 import config from '@payload-config'
 import { REST_DELETE, REST_GET, REST_OPTIONS, REST_PATCH, REST_POST } from '@payloadcms/next/routes'
 
-export const GET = REST_GET(config)
-export const POST = REST_POST(config)
-export const DELETE = REST_DELETE(config)
-export const PATCH = REST_PATCH(config)
-export const OPTIONS = REST_OPTIONS(config)
+const getHandler = REST_GET(config)
+const postHandler = REST_POST(config)
+const deleteHandler = REST_DELETE(config)
+const patchHandler = REST_PATCH(config)
+const optionsHandler = REST_OPTIONS(config)
+
+export const GET = async (request: Request, { params }: { params: Promise<any> }) => {
+  return getHandler(request, { params: await params })
+}
+
+export const POST = async (request: Request, { params }: { params: Promise<any> }) => {
+  return postHandler(request, { params: await params })
+}
+
+export const DELETE = async (request: Request, { params }: { params: Promise<any> }) => {
+  return deleteHandler(request, { params: await params })
+}
+
+export const PATCH = async (request: Request, { params }: { params: Promise<any> }) => {
+  return patchHandler(request, { params: await params })
+}
+
+export const OPTIONS = async (request: Request, { params }: { params: Promise<any> }) => {
+  return optionsHandler(request, { params: await params })
+}
