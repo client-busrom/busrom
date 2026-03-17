@@ -2,16 +2,16 @@
   "family": "busrom-web-ENVIRONMENT",
   "networkMode": "awsvpc",
   "requiresCompatibilities": ["FARGATE"],
-  "cpu": "512",
-  "memory": "1024",
+  "cpu": "1024",
+  "memory": "2048",
   "executionRoleArn": "arn:aws:iam::AWS_ACCOUNT_ID:role/ecsTaskExecutionRole",
   "taskRoleArn": "arn:aws:iam::AWS_ACCOUNT_ID:role/ecsTaskRole",
   "containerDefinitions": [
     {
       "name": "busrom-web",
       "image": "AWS_ACCOUNT_ID.dkr.ecr.AWS_REGION.amazonaws.com/busrom-web-ENVIRONMENT:latest",
-      "cpu": 512,
-      "memory": 1024,
+      "cpu": 1024,
+      "memory": 2048,
       "essential": true,
       "portMappings": [
         {

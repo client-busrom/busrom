@@ -83,6 +83,17 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null)
   const [turnstileKey, setTurnstileKey] = useState(0)
 
+  // Form config messages from form-config API
+  const [formMessages, setFormMessages] = useState<{
+    submitButtonText?: string
+    submittingText?: string
+    successMessage?: string
+    errorRequiredFields?: string
+    errorNetworkMessage?: string
+    errorCaptchaMessage?: string
+    privacyConsentText?: string
+  } | null>(null)
+
   // Fetch Turnstile site key from SiteConfig
   useEffect(() => {
     const fetchSiteKey = async () => {
@@ -100,6 +111,31 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
     }
     fetchSiteKey()
   }, [])
+
+  // Fetch form config messages (submitButtonText, privacyConsentText, etc.)
+  useEffect(() => {
+    if (!configData?.name) return
+    const fetchFormMessages = async () => {
+      try {
+        const res = await fetch(`/api/form-config/${configData.name}?locale=${locale}`)
+        if (res.ok) {
+          const data = await res.json()
+          setFormMessages({
+            submitButtonText: data.submitButtonText,
+            submittingText: data.submittingText,
+            successMessage: data.successMessage,
+            errorRequiredFields: data.errorRequiredFields,
+            errorNetworkMessage: data.errorNetworkMessage,
+            errorCaptchaMessage: data.errorCaptchaMessage,
+            privacyConsentText: data.privacyConsentText,
+          })
+        }
+      } catch (error) {
+        console.error('Failed to fetch form messages:', error)
+      }
+    }
+    fetchFormMessages()
+  }, [configData?.name, locale])
 
   // Handle Turnstile success - clear error if captcha error was showing
   const handleTurnstileSuccess = (token: string) => {
@@ -391,8 +427,8 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
           </svg>
         </div>
         <h3 className="text-2xl font-bold text-gray-900 mb-2">Thank You!</h3>
-        <p className="text-gray-600">
-          Your inquiry has been submitted successfully. We will get back to you as soon as possible.
+        <p className="text-gray-600 whitespace-pre-line">
+          {formMessages?.successMessage || 'Your inquiry has been submitted successfully. We will get back to you as soon as possible.'}
         </p>
       </div>
     )
@@ -434,10 +470,17 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full py-3 px-6 bg-brand-secondary text-white font-bold rounded-lg hover:bg-brand-secondary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full py-3 px-6 bg-brand-secondary text-white font-bold rounded-lg hover:bg-brand-secondary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-pre-line"
       >
-        {isSubmitting ? "Submitting..." : "Submit Inquiry"}
+        {isSubmitting ? (formMessages?.submittingText || "Submitting...") : (formMessages?.submitButtonText || "Submit Inquiry")}
       </button>
+
+      {/* Privacy consent text */}
+      {formMessages?.privacyConsentText && (
+        <p className="mt-3 text-xs text-gray-500 leading-relaxed whitespace-pre-line">
+          {formMessages.privacyConsentText}
+        </p>
+      )}
     </form>
   )
 }

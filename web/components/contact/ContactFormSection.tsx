@@ -231,7 +231,7 @@ export function ContactFormSection({
       // 提交表单
       const submissionData = {
         formId: configData?.id,
-        formName: configData?.name || "contact-us-inquiry-form",
+        formName: configData?.name || "contact-form",
         data: {
           ...formData,
           ...(fileUrl ? { attachment: fileUrl } : {}),
