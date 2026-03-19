@@ -13,6 +13,7 @@ import { ProductHeroSection } from "@/components/shop/ProductHeroSection"
 import { StrengthBadges } from "@/components/shop/StrengthBadges"
 import { SectionRenderer } from "./SectionRenderer"
 import { parseLexicalSections, parseMainContentStrengthData } from "./parseSectionData"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 // Description component with 3-line clamp and expand button
 function DescriptionWithExpand({ description }: { description: string | any }) {
@@ -121,7 +122,7 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
             setFormConfig(formConfigToUse)
           } else {
             try {
-              const formRes = await fetch(`/api/form-configs/${formConfigId}`)
+              const formRes = await fetch(`/api/form-configs/${formConfigId}?locale=${locale}`)
               if (formRes.ok) {
                 const formData = await formRes.json()
                 setFormConfig(formData)
@@ -263,33 +264,50 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
                     <div key={idx}>
                       {/* Group title with description style */}
                       <p className="text-sm md:text-base text-brand-text-main mb-3">
-                        <span className="font-semibold">{spec.text || spec.name?.[locale] || spec.name?.en || ""}</span>
+                        <span className="font-semibold whitespace-pre-line">{spec.text || spec.name?.[locale] || spec.name?.en || ""}</span>
                       </p>
                       {/* Grid layout: 2 columns on mobile, 3 columns if more items */}
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-3">
                         {(spec.items || spec.options || []).map((item: any, itemIdx: number) => {
-                          const hasImage = item.image
-                          const imageUrl = hasImage
-                            ? `/api/media/${item.image}/file?width=200`
-                            : null
+                          const hasColor = !!(item.color && item.color.trim() !== '')
+                          const hasImage = !!item.image
 
                           return (
                             <div
                               key={itemIdx}
-                              className="flex flex-col items-center p-3 bg-white rounded-xl border border-gray-200 hover:border-brand-secondary transition-colors cursor-pointer"
+                              className="flex flex-col items-center justify-between bg-white rounded-xl border border-gray-100 hover:border-brand-accent-gold hover:shadow-sm transition-all cursor-pointer group/spec py-6 px-3"
                             >
-                              {/* Only show image if media ID exists */}
-                              {imageUrl && (
-                                <div className="w-12 h-12 mb-2 flex items-center justify-center">
-                                  <img
-                                    src={imageUrl}
-                                    alt={item.text || ""}
-                                    className="max-w-full max-h-full object-contain"
-                                  />
+                              {(hasColor || hasImage) && (
+                                <div className="flex-1 flex flex-col items-center justify-center mb-4">
+                                  {hasColor ? (
+                                    /* Tiny circular color swatch */
+                                    <div 
+                                      className="w-8 h-8 rounded-full border border-gray-100 shadow-sm relative overflow-hidden"
+                                      style={{ 
+                                        backgroundColor: item.color,
+                                        boxShadow: 'inset 0 1px 3px rgba(255,255,255,0.4), inset 0 -1px 3px rgba(0,0,0,0.1)',
+                                        backgroundImage: `radial-gradient(circle at 35% 35%, rgba(255,255,255,0.3) 0%, transparent 65%)`
+                                      }}
+                                    />
+                                  ) : (
+                                    /* Sharp rectangular product image 120x72px using OptimizedImage */
+                                    <div className="w-[120px] h-[72px] flex items-center justify-center bg-gray-50">
+                                      <OptimizedImage
+                                        image={item.image}
+                                        alt={item.text || ""}
+                                        width={120}
+                                        height={72}
+                                        aspectRatio="120/72"
+                                        objectFit="cover"
+                                        className="w-full h-full"
+                                        size="thumbnail"
+                                      />
+                                    </div>
+                                  )}
                                 </div>
                               )}
-                              {/* Item text */}
-                              <span className="text-xs md:text-sm text-center text-brand-text-black leading-tight">
+                              
+                              <span className="text-[11px] md:text-sm text-center text-brand-text-black leading-tight whitespace-pre-line font-medium group-hover/spec:text-brand-accent-gold transition-colors">
                                 {item.text || item.value?.[locale] || item.value?.en || ""}
                               </span>
                             </div>

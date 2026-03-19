@@ -6,6 +6,9 @@ import { Turnstile } from "@/components/ui/turnstile"
 import type { Locale } from "@/i18n.config"
 import Image from "next/image"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
+import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput"
+import { ChevronDown } from 'lucide-react'
 
 const DESIGN_WIDTH = 1920
 const SCALE = 0.7
@@ -77,6 +80,9 @@ interface FormConfig {
   captchaTheme: "light" | "dark" | "auto"
   captchaSize: "normal" | "compact"
   maxTotalFileSize?: number
+  // Privacy consent
+  privacyConsentText?: string
+  submittingText?: string
 }
 
 interface ContactFormSectionProps {
@@ -129,6 +135,43 @@ export function ContactFormSection({
   const [error, setError] = useState<string | null>(null)
   const [uploadingFiles, setUploadingFiles] = useState<Record<string, boolean>>({})
   const [uploadedAttachments, setUploadedAttachments] = useState<any[]>([])
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
+  const [isGloballyAccepted, setIsGloballyAccepted] = useState(false)
+  const STORAGE_KEY = 'busrom_privacy_consent'
+
+  // Check global consent status on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const consent = localStorage.getItem(STORAGE_KEY)
+      if (consent === 'true') {
+        setIsGloballyAccepted(true)
+        setPrivacyAccepted(true)
+      }
+    }
+  }, [])
+
+  // Sync with global storage when accepted in this form
+  const handlePrivacyToggle = (checked: boolean) => {
+    setPrivacyAccepted(checked)
+    if (checked && typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, 'true')
+      // Trigger a storage event for other components to update
+      window.dispatchEvent(new Event('storage'))
+    }
+  }
+
+  // Listen for storage events from other components
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const consent = localStorage.getItem(STORAGE_KEY)
+      if (consent === 'true') {
+        setIsGloballyAccepted(true)
+        setPrivacyAccepted(true)
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
 
   // Turnstile captcha state
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
@@ -359,7 +402,9 @@ export function ContactFormSection({
   }
 
   // Custom styled input field for desktop
-  const renderField = (field: FormField) => {
+  const renderField = (field: FormField | null | undefined) => {
+    if (!field) return null
+
     const inputBaseStyle: React.CSSProperties = {
       width: "100%",
       height: vw(72),
@@ -414,6 +459,64 @@ export function ContactFormSection({
       case "text":
       case "email":
       case "tel":
+      case "phone": {
+        const fieldTypeLower = field.fieldType?.toLowerCase();
+        const fieldNameLower = field.fieldName?.toLowerCase();
+        const isPhoneField = fieldTypeLower === 'phone' || fieldTypeLower === 'tel' || fieldNameLower?.includes('phone') || fieldNameLower?.includes('whatsapp');
+        const isCountryField = fieldTypeLower === 'country' || fieldNameLower?.includes('country') || fieldNameLower?.includes('region');
+
+        if (isPhoneField) {
+          return (
+            <div className="dynamic-phone-input" style={{ width: '100vw' }}>
+              <PhoneInput
+                value={formData[field.fieldName] || ''}
+                onChange={(phone) => handleChange(field.fieldName, phone)}
+                placeholder={field.placeholder || field.label}
+                required={field.required}
+                disabled={submitting}
+                className="!bg-[#211C1133] !border-white/30 !rounded-[15px] !h-[72px] md:!h-[3.75vw]"
+                buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5"
+                inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-base"
+                dialCodeClassName="!text-white !text-base"
+              />
+            </div>
+          )
+        }
+
+        if (isCountryField) {
+          return (
+            <div className="relative" style={{ width: '100vw' }}>
+              <select
+                id={field.fieldName}
+                name={field.fieldName}
+                value={formData[field.fieldName] || ''}
+                onChange={(e) => handleChange(field.fieldName, e.target.value)}
+                required={field.required}
+                className="font-anaheim font-semibold appearance-none bg-[#211C1133] border border-white/30 text-white w-full placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors"
+                style={{
+                  height: vw(72),
+                  borderRadius: vw(15),
+                  paddingLeft: vw(20),
+                  paddingRight: vw(40),
+                  fontSize: vw(20),
+                }}
+              >
+                <option value="" className="text-black">Select Country/Region...</option>
+                {COUNTRIES.map(([name, iso2, dialCode]) => {
+                  return (
+                    <option key={iso2} value={name} className="text-black">
+                      {name} (+{dialCode})
+                    </option>
+                  )
+                })}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-white/50">
+                <ChevronDown size={20} />
+              </div>
+            </div>
+          )
+        }
+
         return (
           <input
             type={field.fieldType}
@@ -427,6 +530,7 @@ export function ContactFormSection({
             className="placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors"
           />
         )
+      }
 
       case "textarea":
         return (
@@ -704,7 +808,9 @@ export function ContactFormSection({
   const fields = getFieldsByType()
 
   // Custom styled input field for mobile
-  const renderMobileField = (field: FormField) => {
+  const renderMobileField = (field: FormField | null | undefined) => {
+    if (!field) return null
+    
     const inputBaseClass =
       "w-full h-[52px] px-[16px] rounded-[12px] bg-[#211C0B]/20 border border-white/30 text-white font-anaheim font-semibold text-[16px] placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors"
     const textareaClass =
@@ -718,6 +824,60 @@ export function ContactFormSection({
       case "text":
       case "email":
       case "tel":
+      case "text":
+      case "email":
+      case "tel":
+      case "phone": {
+        const fieldTypeLower = field.fieldType?.toLowerCase();
+        const fieldNameLower = field.fieldName?.toLowerCase();
+        const isPhoneField = fieldTypeLower === 'phone' || fieldTypeLower === 'tel' || fieldNameLower?.includes('phone') || fieldNameLower?.includes('whatsapp');
+        const isCountryField = fieldTypeLower === 'country' || fieldNameLower?.includes('country') || fieldNameLower?.includes('region');
+
+        if (isPhoneField) {
+          return (
+            <div className="dynamic-phone-input w-full">
+              <PhoneInput
+                value={formData[field.fieldName] || ''}
+                onChange={(phone) => handleChange(field.fieldName, phone)}
+                placeholder={field.placeholder || field.label}
+                required={field.required}
+                disabled={submitting}
+                className="!bg-[#211C1133] !border-white/30 !rounded-[12px] !h-[52px]"
+                buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5"
+                inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-base"
+                dialCodeClassName="!text-white !text-base"
+              />
+            </div>
+          )
+        }
+
+        if (isCountryField) {
+          return (
+            <div className="relative w-full">
+              <select
+                id={`mobile-${field.fieldName}`}
+                name={field.fieldName}
+                value={formData[field.fieldName] || ''}
+                onChange={(e) => handleChange(field.fieldName, e.target.value)}
+                required={field.required}
+                className="font-anaheim font-semibold appearance-none bg-[#211C1133] border border-white/30 text-white w-full h-[52px] px-[16px] rounded-[12px] placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors"
+              >
+                <option value="" className="text-black">Select Country/Region...</option>
+                {COUNTRIES.map(([name, iso2, dialCode]) => {
+                  return (
+                    <option key={iso2} value={name} className="text-black">
+                      {name} (+{dialCode})
+                    </option>
+                  )
+                })}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-white/50">
+                <ChevronDown size={18} />
+              </div>
+            </div>
+          )
+        }
+
         return (
           <input
             type={field.fieldType}
@@ -730,6 +890,7 @@ export function ContactFormSection({
             className={inputBaseClass}
           />
         )
+      }
 
       case "textarea":
         return (
@@ -900,14 +1061,18 @@ export function ContactFormSection({
   }
 
   return (
-    <section className="relative w-full bg-[#6E6839] mx-auto overflow-hidden" style={{ height: "auto" }}>
+    <section
+      id="contact-form"
+      className="relative w-full overflow-hidden"
+      style={{ minHeight: vwFull(922) }}
+    >
       {/* ==================== Mobile Layout ==================== */}
-      <div className="lg:hidden px-6 py-6">
-        {/* Background with blur */}
-        <div className="absolute inset-0">
+      <div className="lg:hidden relative">
+        {/* Background */}
+        <div className="absolute inset-0 bg-[#6E6839]">
           {backgroundImage && (
-            backgroundImage.enableLink && backgroundImage.linkUrl ? (
-              <Link href={backgroundImage.linkUrl} target={backgroundImage.openInNewTab ? "_blank" : undefined} rel={backgroundImage.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+            backgroundImage?.enableLink && backgroundImage?.linkUrl ? (
+              <Link href={backgroundImage.linkUrl as any} target={backgroundImage?.openInNewTab ? "_blank" : undefined} rel={backgroundImage?.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
                 <OptimizedImage
                   image={backgroundImage as any}
                   alt="Contact form background"
@@ -924,37 +1089,23 @@ export function ContactFormSection({
               />
             )
           )}
-          <div className="absolute inset-0 backdrop-blur-[7.5px]" />
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
         </div>
 
-        {/* Content */}
-        <div className="relative z-10">
-          {/* Title */}
-          <h2 className="font-anaheim font-extrabold text-[26px] leading-[34px] mb-2">
-            <span className="text-white" style={{ WebkitTextStroke: "1px #FFEF72", paintOrder: "stroke fill" }}>
-              Need{" "}
-            </span>
-            <span
-              className="font-paytone-one"
-              style={{ WebkitTextStroke: "0.5px #FFEF72", WebkitTextFillColor: "transparent" }}
-            >
-              More
-            </span>
-            <br />
-            <span className="text-white" style={{ WebkitTextStroke: "1px #FFEF72", paintOrder: "stroke fill" }}>
-              Assistance?
-            </span>
-          </h2>
-
-          {/* Subtitle */}
-          <p className="font-anaheim font-extrabold text-[17px] text-[#FFF071] mb-2">
-            {subtitle}
-          </p>
-
-          {/* Description */}
-          <p className="font-anaheim font-normal text-[13px] leading-[20px] text-white mb-5">
-            {description}
-          </p>
+        {/* Mobile Content */}
+        <div className="relative px-5 py-12">
+          {/* Header */}
+          <div className="mb-10">
+            <h2 className="font-anaheim font-extrabold text-[42px] leading-[1.1] text-white mb-4">
+              Need <span className="text-[#FFF071]">More</span> Assistance?
+            </h2>
+            <p className="font-anaheim font-extrabold text-[20px] text-[#FFF071] mb-4">
+              {subtitle}
+            </p>
+            <p className="font-anaheim font-normal text-white/90 text-[15px] leading-relaxed">
+              {description}
+            </p>
+          </div>
 
           {/* Form */}
           {loading ? (
@@ -971,21 +1122,13 @@ export function ContactFormSection({
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-[12px]">
-              {/* Name & Email Fields */}
               {fields.nameEmail.slice(0, 2).map((field) => (
                 <div key={field.fieldName}>{renderMobileField(field)}</div>
               ))}
-
-              {/* Service Type */}
               {fields.serviceType && renderMobileField(fields.serviceType)}
-
-              {/* Description */}
               {fields.description && renderMobileField(fields.description)}
-
-              {/* File Upload */}
               {fields.file && renderMobileField(fields.file)}
 
-              {/* Captcha */}
               {shouldShowCaptcha && formConfig?.captchaSiteKey && (
                 <div className="flex justify-center py-3">
                   <Turnstile
@@ -1000,14 +1143,12 @@ export function ContactFormSection({
                 </div>
               )}
 
-              {/* Error Message */}
               {error && (
                 <div className="bg-red-500/20 border border-red-500/50 rounded-[12px] p-3 text-red-200 text-sm">
                   {error}
                 </div>
               )}
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={submitting || (shouldShowCaptcha && !turnstileToken)}
@@ -1036,61 +1177,40 @@ export function ContactFormSection({
       </div>
 
       {/* ==================== Desktop Layout ==================== */}
-      <div className="hidden lg:block relative w-full" style={{ height: vwFull(922) }}>
-        {/* Background - 全宽不缩放 */}
+      <div className="hidden lg:block relative w-full" style={{ minHeight: vwFull(922) }}>
+        {/* Background */}
         <div className="absolute inset-0 bg-[#6E6839]">
           {backgroundImage && (
-            backgroundImage.enableLink && backgroundImage.linkUrl ? (
-              <Link href={backgroundImage.linkUrl} target={backgroundImage.openInNewTab ? "_blank" : undefined} rel={backgroundImage.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
-                <OptimizedImage
-                  image={backgroundImage as any}
-                  alt="Contact form background"
-                  size="xlarge"
-                  className="w-full h-full object-cover opacity-50"
-                />
-              </Link>
-            ) : (
-              <OptimizedImage
-                image={backgroundImage as any}
-                alt="Contact form background"
-                size="xlarge"
-                className="w-full h-full object-cover opacity-50"
-              />
-            )
+            <OptimizedImage
+              image={backgroundImage as any}
+              alt="Contact form background"
+              size="xlarge"
+              className="w-full h-full object-cover opacity-50"
+            />
           )}
-          {/* Blur overlay */}
           <div className="absolute inset-0" style={{ backdropFilter: `blur(${vwFull(7.5)})` }} />
         </div>
 
-        {/* Content Wrapper - 居中容器 */}
-        <div
-          className="relative h-full mx-auto"
-          style={{ width: vw(1920) }}
-        >
-          {/* Decorative Mask with gradient glow - 880px高度，垂直居中 */}
-          <div
-            className="absolute overflow-hidden left-1/2 top-1/2"
-            style={{
-              transform: "translate(-50%, -50%)",
-              width: vw(1600),
-              height: vwFull(800),
+        {/* Content Wrapper */}
+        <div className="relative z-10 mx-auto py-[60px]" style={{ width: vw(1920) }}>
+          <div 
+            className="mx-auto flex overflow-hidden" 
+            style={{ 
+              width: vw(1600), 
+              minHeight: vwFull(800), 
               borderRadius: vw(52),
               backdropFilter: `blur(${vw(18.7)})`,
               background: "rgba(117, 111, 63, 0.36)",
+              padding: `${vwFull(55)} 0`,
+              position: 'relative'
             }}
           >
-            {/* Radial gradient glow at bottom-left - ellipse fading outward */}
+            {/* Background Glow */}
             <svg
               className="absolute pointer-events-none"
-              style={{
-                left: vw(-1018),
-                top: vw(260),
-                width: vw(2173),
-                height: vw(2257),
-              }}
+              style={{ left: vw(-1018), top: vw(260), width: vw(2173), height: vw(2257) }}
               viewBox="0 0 2173 2257"
               fill="none"
-              preserveAspectRatio="none"
             >
               <defs>
                 <radialGradient id="contactGlow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
@@ -1100,264 +1220,120 @@ export function ContactFormSection({
               </defs>
               <ellipse cx="1086.5" cy="1128.5" rx="1086.5" ry="1128.26" fill="url(#contactGlow)" />
             </svg>
-          </div>
 
-          {/* Content Container - 在800px框内居中 */}
-          <div
-            className="absolute left-1/2 top-1/2"
-            style={{
-              transform: "translate(-50%, -50%)",
-              width: vw(1600),
-              height: vwFull(800),
-            }}
-          >
-            {/* Left Side - Contact Info */}
-            <div className="absolute" style={{ left: vw(96), top: vwFull(55) }}>
-              {/* Main Title - Need More Assistance? */}
-              <h2 className="font-anaheim font-extrabold" style={{ fontSize: vw(85), lineHeight: vw(98) }}>
-                {/* Need - white fill with yellow stroke */}
-                <span
-                  className="text-white"
-                  style={{
-                    WebkitTextStroke: `${vw(2)} #FFEF72`,
-                    paintOrder: "stroke fill",
-                  }}
-                >
-                  Need{" "}
-                </span>
-                {/* More - hollow outline text */}
-                <span
-                  className="font-paytone-one"
-                  style={{
-                    fontSize: vw(85),
-                    lineHeight: vw(98),
-                    WebkitTextStroke: `${vw(0.5)} #FFEF72`,
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  More
-                </span>
-                <br />
-                {/* Assistance? - white fill with yellow stroke */}
-                <span
-                  className="text-white"
-                  style={{
-                    WebkitTextStroke: `${vw(2)} #FFEF72`,
-                    paintOrder: "stroke fill",
-                  }}
-                >
-                  Assistance?
-                </span>
-              </h2>
-            </div>
+            <div className="relative w-full flex">
+              {/* Left Column */}
+              <div style={{ width: vw(680), flexShrink: 0, paddingLeft: vw(96) }}>
+                <h2 className="font-anaheim font-extrabold" style={{ fontSize: vw(85), lineHeight: vw(98) }}>
+                  <span className="text-white" style={{ WebkitTextStroke: `${vw(2)} #FFEF72`, paintOrder: "stroke fill" }}>Need </span>
+                  <span className="font-paytone-one" style={{ fontSize: vw(85), lineHeight: vw(98), WebkitTextStroke: `${vw(0.5)} #FFEF72`, WebkitTextFillColor: "transparent" }}>More</span>
+                  <br />
+                  <span className="text-white" style={{ WebkitTextStroke: `${vw(2)} #FFEF72`, paintOrder: "stroke fill" }}>Assistance?</span>
+                </h2>
 
-            {/* Subtitle - Manual Service Request */}
-            <p
-              className="absolute font-anaheim font-extrabold"
-              style={{
-                left: vw(96),
-                top: vwFull(200),
-                fontSize: vw(40),
-                lineHeight: vw(54),
-                color: "#FFF071",
-              }}
-            >
-              {subtitle}
-            </p>
+                <p className="font-anaheim font-extrabold" style={{ marginTop: vw(20), fontSize: vw(40), lineHeight: vw(54), color: "#FFF071" }}>
+                  {subtitle}
+                </p>
 
-            {/* Description */}
-            <p
-              className="absolute font-anaheim font-normal text-white"
-              style={{
-                left: vw(96),
-                top: vwFull(255),
-                width: vw(475),
-                fontSize: vw(24),
-                lineHeight: vw(36),
-              }}
-            >
-              {description}
-            </p>
+                <p className="font-anaheim font-normal text-white" style={{ marginTop: vw(25), width: vw(475), fontSize: vw(24), lineHeight: vw(36) }}>
+                  {description}
+                </p>
 
-            {/* Email Label */}
-            <p
-              className="absolute font-anaheim font-semibold text-white/70"
-              style={{
-                left: vw(96),
-                top: vwFull(495),
-                fontSize: vw(24),
-                lineHeight: vw(40),
-              }}
-            >
-              Email
-            </p>
+                <div style={{ marginTop: vw(60) }}>
+                  <p className="font-anaheim font-semibold text-white/70" style={{ fontSize: vw(24) }}>Email</p>
+                  <a href={`mailto:${email}`} className="font-anaheim font-semibold text-white underline" style={{ fontSize: vw(40) }}>{email}</a>
+                  
+                  <p className="font-anaheim font-semibold text-white/70" style={{ fontSize: vw(24), marginTop: vw(30) }}>Phone / WhatsApp</p>
+                  <a href={`tel:${phone?.replace(/\s/g, '')}`} className="font-anaheim font-semibold text-white underline" style={{ fontSize: vw(45) }}>{phone}</a>
+                </div>
 
-            {/* Email Value */}
-            <a
-              href={`mailto:${email}`}
-              className="absolute font-anaheim font-semibold text-white underline hover:text-white/80 transition-colors"
-              style={{
-                left: vw(96),
-                top: vwFull(530),
-                fontSize: vw(40),
-                lineHeight: vw(48),
-              }}
-            >
-              {email}
-            </a>
-
-            {/* Phone Label */}
-            <p
-              className="absolute font-anaheim font-semibold text-white/70"
-              style={{
-                left: vw(96),
-                top: vwFull(600),
-                fontSize: vw(24),
-                lineHeight: vw(40),
-              }}
-            >
-              Phone / WhatsApp
-            </p>
-
-            {/* Phone Value */}
-            <a
-              href={`tel:${phone?.replace(/\s/g, '')}`}
-              className="absolute font-anaheim font-semibold text-white underline hover:text-white/80 transition-colors"
-              style={{
-                left: vw(96),
-                top: vwFull(635),
-                fontSize: vw(45),
-                lineHeight: vw(48),
-                letterSpacing: '0.07em',
-              }}
-            >
-              {phone}
-            </a>
-
-            {/* Footer Note */}
-            <p
-              className="absolute font-anaheim font-semibold text-white whitespace-pre-line"
-              style={{
-                left: vw(96),
-                top: vwFull(720),
-                width: vw(428),
-                fontSize: vw(16),
-                lineHeight: vw(26),
-              }}
-            >
-              {footerNote}
-            </p>
-
-            {/* Right Side - Form */}
-            <div className="absolute" style={{ left: vw(787), top: vwFull(55), width: vw(715) }}>
-          {/* Form Header */}
-          <h3
-            className="font-anaheim font-semibold text-white"
-            style={{
-              fontSize: vw(42),
-              lineHeight: vw(61),
-              marginBottom: vw(42),
-            }}
-          >
-            Send us an inquiry via the following contact details
-          </h3>
-
-          {loading ? (
-            <div className="flex items-center justify-center" style={{ paddingTop: vw(48), paddingBottom: vw(48) }}>
-              <div
-                className="border-2 border-white border-t-transparent rounded-full animate-spin"
-                style={{ width: vw(32), height: vw(32) }}
-              />
-            </div>
-          ) : submitted ? (
-            <div
-              className="bg-white/20 backdrop-blur-sm text-center"
-              style={{ borderRadius: vw(15), padding: vw(32) }}
-            >
-              <svg
-                className="text-[#FFF071] mx-auto"
-                style={{ width: vw(64), height: vw(64), marginBottom: vw(16) }}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <h3
-                className="font-anaheim font-bold text-white"
-                style={{ fontSize: vw(20), marginBottom: vw(8) }}
-              >
-                Success!
-              </h3>
-              <p className="text-white/80" style={{ fontSize: vw(16) }}>
-                {formConfig?.successMessage || "Your message has been sent successfully!"}
-              </p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: vw(14) }}>
-              {/* Name & Email Row */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: vw(37) }}>
-                {fields.nameEmail.slice(0, 2).map((field) => (
-                  <div key={field.fieldName}>{renderField(field)}</div>
-                ))}
+                <p className="font-anaheim font-semibold text-white whitespace-pre-line" style={{ marginTop: vw(60), width: vw(428), fontSize: vw(16), lineHeight: vw(26) }}>
+                  {footerNote}
+                </p>
               </div>
 
-              {/* Service Type Checkboxes */}
-              {fields.serviceType && renderField(fields.serviceType)}
+              {/* Right Column */}
+              <div style={{ flex: 1, paddingRight: vw(96), paddingLeft: vw(50) }}>
+                <h3 className="font-anaheim font-semibold text-white" style={{ fontSize: vw(42), lineHeight: vw(61), marginBottom: vw(42) }}>
+                  Send us an inquiry via the following contact details
+                </h3>
 
-              {/* Description Textarea */}
-              {fields.description && renderField(fields.description)}
+                {loading ? (
+                  <div className="flex items-center justify-center p-12">
+                    <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                  </div>
+                ) : submitted ? (
+                  <div className="bg-white/20 backdrop-blur-sm p-12 text-center" style={{ borderRadius: vw(15) }}>
+                    <h3 className="text-2xl font-bold text-white mb-4">Success!</h3>
+                    <p className="text-white/80">{formConfig?.successMessage || "Your message has been sent successfully!"}</p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="flex flex-col" style={{ gap: vw(20) }}>
+                    <div className="grid grid-cols-2" style={{ gap: vw(20) }}>
+                      {fields.nameEmail.slice(0, 2).map((field) => (
+                        <div key={field.fieldName}>{renderField(field)}</div>
+                      ))}
+                    </div>
 
-              {/* File Upload */}
-              {fields.file && renderField(fields.file)}
+                    {fields.serviceType && renderField(fields.serviceType)}
+                    {fields.description && renderField(fields.description)}
+                    {fields.file && renderField(fields.file)}
 
-              {/* Captcha */}
-              {shouldShowCaptcha && formConfig?.captchaSiteKey && (
-                <div className="flex justify-center" style={{ paddingTop: vw(16), paddingBottom: vw(16) }}>
-                  <Turnstile
-                    siteKey={formConfig.captchaSiteKey}
-                    onVerify={handleTurnstileVerify}
-                    onError={handleTurnstileError}
-                    onExpire={handleTurnstileExpire}
-                    theme={formConfig.captchaTheme}
-                    size={formConfig.captchaSize}
-                    language={locale === "zh" ? "zh-CN" : locale}
-                  />
-                </div>
-              )}
+                    {shouldShowCaptcha && formConfig?.captchaSiteKey && (
+                      <div className="flex justify-center">
+                        <Turnstile
+                          siteKey={formConfig.captchaSiteKey}
+                          onVerify={handleTurnstileVerify}
+                          onError={handleTurnstileError}
+                          onExpire={handleTurnstileExpire}
+                          theme={formConfig.captchaTheme}
+                          size={formConfig.captchaSize}
+                          language={locale === "zh" ? "zh-CN" : locale}
+                        />
+                      </div>
+                    )}
 
-              {/* Error Message */}
-              {error && (
-                <div
-                  className="bg-red-500/20 border border-red-500/50 text-red-200"
-                  style={{ borderRadius: vw(15), padding: vw(16), fontSize: vw(14) }}
-                >
-                  {error}
-                </div>
-              )}
+                    {error && (
+                      <div className="bg-red-500/20 p-4 rounded-xl text-red-200 text-sm">
+                        {error}
+                      </div>
+                    )}
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={submitting || (shouldShowCaptcha && !turnstileToken)}
-                className="w-full bg-[#B2A224] text-white font-anaheim font-semibold hover:bg-[#9A8C1E] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  height: vw(72),
-                  borderRadius: vw(63),
-                  fontSize: vw(23),
-                }}
-              >
-                {submitting ? "Sending..." : formConfig?.submitButtonText || "Send Inquiry"}
-              </button>
-            </form>
-          )}
+                    {formConfig?.privacyConsentText && !isGloballyAccepted && (
+                      <div className="flex items-start gap-3 my-2 cursor-pointer" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
+                        <div className={cn(
+                          "mt-1 flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all",
+                          privacyAccepted ? "bg-white border-white" : "border-white/30"
+                        )}>
+                          {privacyAccepted && (
+                            <svg className="w-3.5 h-3.5 text-[#6E6839]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </div>
+                        <p className="text-[14px] leading-relaxed text-white/80 select-none">
+                          {formConfig.privacyConsentText}
+                        </p>
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={submitting || (shouldShowCaptcha && !turnstileToken) || (!!formConfig?.privacyConsentText && !privacyAccepted)}
+                      className={cn(
+                        "w-full bg-[#B2A224] text-white font-anaheim font-bold hover:bg-[#9A8C1E] transition-all py-6",
+                        "disabled:opacity-50 disabled:cursor-not-allowed text-[22px]",
+                        (!!formConfig?.privacyConsentText && !privacyAccepted) && "grayscale"
+                      )}
+                      style={{ borderRadius: vw(100), fontSize: vw(23) }}
+                    >
+                      {submitting ? "Sending..." : formConfig?.submitButtonText || "Send Inquiry"}
+                    </button>
+                  </form>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
         </div>
       </div>
     </section>

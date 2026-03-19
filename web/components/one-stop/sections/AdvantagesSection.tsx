@@ -48,11 +48,11 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
   if (!advantages || advantages.length === 0) return null
 
   return (
-    <section className="relative w-full overflow-hidden bg-[#F9F9F5] flex justify-center items-center" style={{ height: "1494px" }}>
+    <section className="relative w-full overflow-hidden bg-[#F9F9F5] flex justify-center items-start" style={{ height: "922px" }}>
       
       {/* 70% Scale Container */}
       <div 
-        className="relative w-[1920px] h-[1494px] origin-center flex-shrink-0"
+        className="relative w-[1920px] h-[1317px] origin-top flex-shrink-0"
         style={{ transform: "scale(0.7)" }}
       >
         
@@ -65,7 +65,7 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
         />
 
         {/* 2. Section Title */}
-        <div className="absolute left-[153px] top-[449px] w-[925px] z-20 pointer-events-none">
+        <div className="absolute left-[153px] top-[100px] w-[925px] z-20 pointer-events-none">
           <h2 
             className="text-[64px] font-semibold leading-[88px] tracking-tight text-[#756F3F]"
             style={{ 
@@ -79,7 +79,7 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
         </div>
 
         {/* 3. Draggable Carousel Track */}
-        <div className="absolute left-0 top-[728px] w-full h-[850px] z-10 cursor-grab active:cursor-grabbing">
+        <div className="absolute left-0 top-[380px] w-full h-[850px] z-10 cursor-grab active:cursor-grabbing">
           <motion.div
             style={{ x, left: basePadding }}
             drag="x"

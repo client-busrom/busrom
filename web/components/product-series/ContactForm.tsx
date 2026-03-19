@@ -4,7 +4,10 @@ import * as React from "react"
 import { Upload } from "lucide-react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
+import { useParams } from "next/navigation"
 import type { ContactFormData } from "@/lib/content-parser"
+import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput"
+import { ChevronDown } from 'lucide-react'
 
 /**
  * Contact Form Section
@@ -24,7 +27,7 @@ const DESIGN_HEIGHT = 696
 const SECTION_X_OFFSET = 30  // The group starts at x=30
 
 interface ContactFormProps {
-  data: ContactFormData
+  data: ContactFormData & { privacyConsentText?: string }
   className?: string
 }
 
@@ -43,10 +46,73 @@ export function ContactForm({ data, className }: ContactFormProps) {
     name: "",
     email: "",
     whatsapp: "",
+    country: "",
     message: "",
   })
   const [file, setFile] = React.useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [privacyAccepted, setPrivacyAccepted] = React.useState(false)
+  const [isGloballyAccepted, setIsGloballyAccepted] = React.useState(false)
+  const STORAGE_KEY = 'busrom_privacy_consent'
+
+  // Check global consent status on mount
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const consent = localStorage.getItem(STORAGE_KEY)
+      if (consent === 'true') {
+        setIsGloballyAccepted(true)
+        setPrivacyAccepted(true)
+      }
+    }
+  }, [])
+
+  const params = useParams()
+  const locale = (params?.locale as string) || "en"
+
+  // Fetch form config dynamically to get global privacy consent text if missing
+  const [fetchedFormConfig, setFetchedFormConfig] = React.useState<any>(null)
+  React.useEffect(() => {
+    if (!data.privacyConsentText) {
+      const fetchFormConfig = async () => {
+        try {
+          const res = await fetch(`/api/form-config/product-series-inquiry-form?locale=${locale}`)
+          if (res.ok) {
+            const config = await res.json()
+            setFetchedFormConfig(config)
+          }
+        } catch (error) {
+          console.error("Failed to fetch form config:", error)
+        }
+      }
+      fetchFormConfig()
+    }
+  }, [data.privacyConsentText, locale])
+
+  const privacyText = data.privacyConsentText || fetchedFormConfig?.privacyConsentText
+
+  // Sync with global storage when accepted in this form
+  const handlePrivacyToggle = (checked: boolean) => {
+    setPrivacyAccepted(checked)
+    if (checked && typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, 'true')
+      setIsGloballyAccepted(true)
+      // Trigger a storage event for other components to update
+      window.dispatchEvent(new Event('storage'))
+    }
+  }
+
+  // Listen for storage events from other components
+  React.useEffect(() => {
+    const handleStorageChange = () => {
+      const consent = localStorage.getItem(STORAGE_KEY)
+      if (consent === 'true') {
+        setIsGloballyAccepted(true)
+        setPrivacyAccepted(true)
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
 
   // Track form height to adjust section height
   const formRef = React.useRef<HTMLFormElement>(null)
@@ -138,7 +204,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
     return () => observer.disconnect()
   }, [])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
@@ -149,15 +215,70 @@ export function ContactForm({ data, className }: ContactFormProps) {
     }
   }
 
+  const [submitted, setSubmitted] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError(null)
 
-    // TODO: Implement form submission
+    try {
+      let attachmentUrl = ""
+      if (file) {
+        const formDataUpload = new FormData()
+        formDataUpload.append('file', file)
+        
+        const uploadRes = await fetch('/api/form-file-upload', {
+          method: 'POST',
+          body: formDataUpload,
+        })
+        
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json()
+          attachmentUrl = uploadData.url
+        }
+      }
 
-    setTimeout(() => {
+      const res = await fetch("/api/form-submissions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          formId: fetchedFormConfig?.id,
+          formName: "product-series-inquiry-form",
+          data: formData,
+          attachments: attachmentUrl ? [attachmentUrl] : [],
+          locale,
+          sourcePage: window.location.href,
+        }),
+      })
+
+      if (res.ok) {
+        setSubmitted(true)
+        setFormData({
+          name: "",
+          email: "",
+          whatsapp: "",
+          country: "",
+          message: "",
+        })
+        setFile(null)
+        
+        setTimeout(() => {
+          setSubmitted(false)
+        }, 5000)
+      } else {
+        const errorData = await res.json()
+        setError(errorData.error || "Failed to submit form. Please try again.")
+      }
+    } catch (err) {
+      console.error("Submission error:", err)
+      setError("An unexpected error occurred. Please try again.")
+    } finally {
       setIsSubmitting(false)
-    }, 1000)
+    }
   }
 
   // Helper to calculate position relative to design
@@ -390,22 +511,60 @@ export function ContactForm({ data, className }: ContactFormProps) {
         />
 
         {/* Input 3: WhatsApp */}
-        <input
-          type="text"
-          name="whatsapp"
-          placeholder="Your WhatsApp / Phone"
-          value={formData.whatsapp}
-          onChange={handleInputChange}
-          className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold"
+        <div
+          className="dynamic-phone-input"
           style={{
-            fontSize: vw(20),
-            paddingLeft: vw(29),
+            width: '100%',
             height: vw(63),
             backgroundColor: inputBg,
             border: inputBorder,
             borderRadius: vw(15),
+            overflow: 'visible'
           }}
-        />
+        >
+          <PhoneInput
+            value={formData.whatsapp || ''}
+            onChange={(phone) => setFormData(prev => ({ ...prev, whatsapp: phone }))}
+            placeholder="Your WhatsApp / Phone"
+            disabled={isSubmitting}
+            className="!bg-transparent !border-none !h-full !rounded-none"
+            buttonClassName="!bg-transparent !border-r-0 !text-white hover:!bg-white/10 !rounded-none !px-4 !h-full"
+            inputClassName="!bg-transparent !text-white !placeholder-white/95 !font-anaheim !font-semibold !text-[1.04vw] !h-full"
+            dialCodeClassName="!text-white !text-[1.04vw]"
+          />
+        </div>
+
+        {/* Input: Country/Region */}
+        <div className="relative">
+          <select
+            name="country"
+            value={formData.country}
+            onChange={handleInputChange}
+            disabled={isSubmitting}
+            className="w-full bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold appearance-none focus:outline-none transition-colors"
+            style={{
+              fontSize: vw(20),
+              paddingLeft: vw(29),
+              paddingRight: vw(40),
+              height: vw(63),
+              backgroundColor: inputBg,
+              border: inputBorder,
+              borderRadius: vw(15),
+            }}
+          >
+            <option value="" className="text-black">Select Country/Region...</option>
+            {COUNTRIES.map(([name, iso2, dialCode]) => {
+              return (
+                <option key={iso2} value={name} className="text-black">
+                  {name} (+{dialCode})
+                </option>
+              )
+            })}
+          </select>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-white/70">
+            <ChevronDown size={20} />
+          </div>
+        </div>
 
         {/* Input 4: Message (textarea) */}
         <textarea
@@ -460,14 +619,63 @@ export function ContactForm({ data, className }: ContactFormProps) {
           </span>
         </label>
 
+        {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
+        {privacyText && !isGloballyAccepted && (
+          <div
+            className="flex items-start gap-3 mt-2 cursor-pointer group"
+            onClick={() => handlePrivacyToggle(!privacyAccepted)}
+          >
+            <div
+              className={`flex-shrink-0 border flex items-center justify-center transition-all ${
+                privacyAccepted ? "bg-[#9C9032] border-[#9C9032]" : "border-white/30 bg-transparent"
+              }`}
+              style={{
+                marginTop: vw(4),
+                width: vw(20),
+                height: vw(20),
+                borderRadius: vw(4),
+              }}
+            >
+              {privacyAccepted && (
+                <svg style={{ width: vw(14), height: vw(14) }} className="text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </div>
+            <p
+              className="font-anaheim text-left select-none text-white/90 whitespace-pre-line"
+              style={{
+                fontSize: vw(14),
+                lineHeight: vw(18),
+              }}
+            >
+              {privacyText}
+            </p>
+          </div>
+        )}
+      {/* Status Messages */}
+      {submitted && (
+        <div className="text-green-400 font-anaheim mt-4 text-center w-full" style={{ fontSize: vw(18) }}>
+          Inquiry sent successfully! We will contact you soon.
+        </div>
+      )}
+      {error && (
+        <div className="text-red-400 font-anaheim mt-4 text-center w-full" style={{ fontSize: vw(18) }}>
+          {error}
+        </div>
+      )}
+
         {/* Send Inquiry Button */}
         <button
           type="submit"
-          disabled={isSubmitting}
-          className="flex items-center justify-center text-white font-anaheim font-semibold transition-all duration-300 hover:scale-110 disabled:opacity-70 animate-pulse-scale"
+          disabled={isSubmitting || (!!privacyText && !privacyAccepted)}
+          className={`flex items-center justify-center text-white font-anaheim font-semibold transition-all duration-300 hover:scale-105 disabled:opacity-70 animate-pulse-scale whitespace-pre-line leading-tight px-4 py-2 ${
+            (!!privacyText && !privacyAccepted) ? "grayscale opacity-80" : ""
+          }`}
           style={{
             width: vw(486),
-            height: vw(83),
+            minHeight: vw(83),
+            height: "auto",
             backgroundColor: "#9C9032",
             borderRadius: vw(63),
             fontSize: vw(32),
@@ -475,8 +683,10 @@ export function ContactForm({ data, className }: ContactFormProps) {
             boxShadow: "0 4px 15px rgba(0, 0, 0, 0.2)",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "#C4B440"
-            e.currentTarget.style.boxShadow = "0 8px 30px rgba(196, 180, 64, 0.5)"
+            if (!e.currentTarget.disabled) {
+              e.currentTarget.style.backgroundColor = "#C4B440"
+              e.currentTarget.style.boxShadow = "0 8px 30px rgba(196, 180, 64, 0.5)"
+            }
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = "#9C9032"

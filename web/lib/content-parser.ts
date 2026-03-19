@@ -176,6 +176,7 @@ export interface ContactFormData {
   helperTitle: string     // "We'd love to hear from you!"
   helperText: string      // "Share your needs..."
   productImages: any[]    // Tilted product images on the left
+  privacyConsentText?: string // Global privacy consent text
 }
 
 export interface MoreSeriesItem {
@@ -864,6 +865,7 @@ function parseContactForm(
   let backgroundImage: any = ''
   let helperTitle = "We'd love to hear from you!"
   let helperText = 'Share your needs, we will provide you with the best solution and quotation.'
+  let privacyConsentText = ''
   const productImages: any[] = []
 
   let currentField: string | null = null
@@ -873,7 +875,8 @@ function parseContactForm(
     if (node.type === 'paragraph') {
       const text = extractText(node).trim()
       if (text === 'contact-form-title' || text === 'contact-form-helper' ||
-          text === 'contact-form-images' || text === 'contact-form-image' || text === 'contact-form-bg-image') {
+          text === 'contact-form-images' || text === 'contact-form-image' || text === 'contact-form-bg-image' ||
+          text === 'contact-form-privacy-consent') {
         currentField = text
         continue
       }
@@ -918,6 +921,16 @@ function parseContactForm(
       }
     }
 
+    // Parse privacy consent text area
+    if (currentField === 'contact-form-privacy-consent') {
+      if (node.type === 'paragraph') {
+        const text = extractText(node).trim()
+        if (text && text !== 'contact-form-privacy-consent') {
+          privacyConsentText = text
+        }
+      }
+    }
+
     // Parse product images (tilted images on the left)
     if (currentField === 'contact-form-images' || currentField === 'contact-form-image') {
       if (node.type === 'custom-image-gallery') {
@@ -946,7 +959,8 @@ function parseContactForm(
         if (child.type === 'paragraph') {
           const text = extractText(child).trim()
           if (text === 'contact-form-title' || text === 'contact-form-helper' ||
-              text === 'contact-form-images' || text === 'contact-form-image' || text === 'contact-form-bg-image') {
+              text === 'contact-form-images' || text === 'contact-form-image' || text === 'contact-form-bg-image' || 
+              text === 'contact-form-privacy-consent') {
             blockField = text
             continue
           }
@@ -966,6 +980,9 @@ function parseContactForm(
           // If we're in helper section or no section yet, and not a marker, treat as helper text
           if (text && (!blockField || blockField === 'contact-form-helper')) {
             helperText = text
+          }
+          if (text && blockField === 'contact-form-privacy-consent') {
+            privacyConsentText = text
           }
         }
         // Extract product images
@@ -989,6 +1006,7 @@ function parseContactForm(
     helperTitle,
     helperText,
     productImages,
+    privacyConsentText
   }
 }
 

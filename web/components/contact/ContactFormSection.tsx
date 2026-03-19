@@ -1,9 +1,12 @@
 "use client"
 
-import React, { useState, useEffect, useCallback, useRef } from "react"
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { Upload, CheckCircle, Info, ChevronLeft, ChevronRight } from "lucide-react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { Turnstile } from "@/components/ui/turnstile"
+import { cn } from "@/lib/utils"
+import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput"
+import { ChevronDown } from 'lucide-react'
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920
@@ -56,11 +59,15 @@ interface ContactFormSectionProps {
   formConfig?: {
     id?: string
     data?: FormConfigData
+    privacyConsentText?: string
+    submitButtonText?: string
+    submittingText?: string
   } | null
   // 底部提示（无序列表）
   tips?: string[]
   // locale
   locale?: string
+  submitButtonText?: string
 }
 
 const defaultSubtitle: SubtitleSegment[] = [
@@ -77,10 +84,59 @@ export function ContactFormSection({
   formConfig,
   tips = [],
   locale = "en",
+  submitButtonText,
 }: ContactFormSectionProps) {
   const [formData, setFormData] = useState<Record<string, string>>({})
   const [fileName, setFileName] = useState<string>("")
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
+  const [isGloballyAccepted, setIsGloballyAccepted] = useState(false)
+  const STORAGE_KEY = 'busrom_privacy_consent'
+
+  // Helper to handle localized strings
+  const getLocalizedString = (value: any, locale: string) => {
+    if (!value) return null;
+    if (typeof value === 'string') return value;
+    if (typeof value === 'object') {
+      return value[locale] || value['en'] || Object.values(value)[0] || null;
+    }
+    return null;
+  };
+
+
+  // Check global consent status on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const consent = localStorage.getItem(STORAGE_KEY)
+      if (consent === 'true') {
+        setIsGloballyAccepted(true)
+        setPrivacyAccepted(true)
+      }
+    }
+  }, [])
+
+  // Sync with global storage when accepted in this form
+  const handlePrivacyToggle = (checked: boolean) => {
+    setPrivacyAccepted(checked)
+    if (checked && typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, 'true')
+      // Trigger a storage event for other components to update
+      window.dispatchEvent(new Event('storage'))
+    }
+  }
+
+  // Listen for storage events from other components
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const consent = localStorage.getItem(STORAGE_KEY)
+      if (consent === 'true') {
+        setIsGloballyAccepted(true)
+        setPrivacyAccepted(true)
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
   const [errorMessage, setErrorMessage] = useState("")
@@ -114,6 +170,52 @@ export function ContactFormSection({
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null)
   const [turnstileKey, setTurnstileKey] = useState(0)
+  const [fetchedFormConfig, setFetchedFormConfig] = useState<any>(null)
+
+  // Fetch full form config if we only have an ID or if we want to ensure we have the latest messages
+  useEffect(() => {
+    const fetchFullConfig = async () => {
+      const configId = formConfig?.id || (typeof formConfig === 'string' ? formConfig : null);
+      if (!configId) return;
+
+      try {
+        const res = await fetch(`/api/form-configs/${configId}?locale=${locale}`);
+        if (res.ok) {
+          const data = await res.json();
+          setFetchedFormConfig(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch full form config:", error);
+      }
+    };
+
+    fetchFullConfig();
+  }, [formConfig?.id, locale]);
+
+  // Merge provided config with fetched config
+  const mergedConfig = useMemo(() => {
+    return {
+      ...formConfig,
+      ...fetchedFormConfig,
+      // Prioritize fetched messages for privacy and submit button
+      privacyConsentText: fetchedFormConfig?.privacyConsentText || formConfig?.privacyConsentText,
+      submitButtonText: fetchedFormConfig?.submitButtonText || formConfig?.submitButtonText || submitButtonText,
+    };
+  }, [formConfig, fetchedFormConfig, submitButtonText]);
+
+  // Fetch Turnstile site key
+  const effectivePrivacyText = useMemo(() => {
+    return getLocalizedString(mergedConfig?.privacyConsentText, locale || 'en');
+  }, [mergedConfig, locale]);
+
+  const effectiveSubmitText = useMemo(() => {
+    return getLocalizedString(mergedConfig?.submitButtonText, locale || 'en');
+  }, [mergedConfig, locale]);
+
+  // Debugging
+  useEffect(() => {
+    console.log(`[ContactFormSection] Privacy text: ${effectivePrivacyText ? 'Found' : 'Missing'}, accepted: ${privacyAccepted}, globally: ${isGloballyAccepted}`);
+  }, [effectivePrivacyText, privacyAccepted, isGloballyAccepted]);
 
   // Fetch Turnstile site key
   useEffect(() => {
@@ -167,8 +269,8 @@ export function ContactFormSection({
   const vw = (v: number) => `${(v / DESIGN_WIDTH) * 100}vw`
 
   // 获取表单字段配置
-  const configData = formConfig?.data
-  const fields = configData?.fields?.[locale] || configData?.fields?.["en"] || []
+  const configData = mergedConfig?.data || mergedConfig
+  const fields = configData?.fields?.[locale] || configData?.fields?.["en"] || (Array.isArray(configData?.fields) ? configData.fields : [])
   const sortedFields = [...fields].sort((a, b) => (a.order || 0) - (b.order || 0))
 
   const handleInputChange = (fieldName: string, value: string) => {
@@ -211,10 +313,11 @@ export function ContactFormSection({
     try {
       // 如果有文件，先上传文件
       let fileUrl = ""
-      if (uploadedFile && configData?.id) {
+      const formId = mergedConfig?.id || configData?.id
+      if (uploadedFile && formId) {
         const fileFormData = new FormData()
         fileFormData.append("file", uploadedFile)
-        fileFormData.append("formConfigId", configData.id)
+        fileFormData.append("formConfigId", formId)
         fileFormData.append("fieldName", "attachment")
 
         const uploadRes = await fetch("/api/form-file-upload", {
@@ -230,8 +333,8 @@ export function ContactFormSection({
 
       // 提交表单
       const submissionData = {
-        formId: configData?.id,
-        formName: configData?.name || "contact-form",
+        formId: formId,
+        formName: mergedConfig?.name || configData?.name || "contact-form",
         data: {
           ...formData,
           ...(fileUrl ? { attachment: fileUrl } : {}),
@@ -392,6 +495,63 @@ export function ContactFormSection({
             {sortedFields.slice(0, 4).map((field) => {
               const isTextarea = field.fieldType === "textarea" || field.fieldName === "message"
               if (isTextarea) return null
+              
+              const fieldTypeLower = field.fieldType?.toLowerCase();
+              const fieldNameLower = field.fieldName?.toLowerCase();
+              const isPhoneField = fieldTypeLower === 'phone' || fieldTypeLower === 'tel' || fieldNameLower?.includes('phone') || fieldNameLower?.includes('whatsapp');
+              const isCountryField = fieldTypeLower === 'country' || fieldNameLower?.includes('country') || fieldNameLower?.includes('region');
+              if (isPhoneField) {
+                return (
+                  <div key={field.fieldName} className="dynamic-phone-input" style={{ width: '100%' }}>
+                    <PhoneInput
+                      value={formData[field.fieldName] || ''}
+                      onChange={(phone) => handleInputChange(field.fieldName, phone)}
+                      placeholder={`${field.placeholder || field.label}${field.required ? " *" : ""}`}
+                      required={field.required}
+                      disabled={isSubmitting}
+                      className="!bg-[#B4A25F] !border-white/34 !rounded-[12px] !h-[50px] md:!h-[2.6vw]"
+                      buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5"
+                      inputClassName="!bg-transparent !text-white !placeholder-white/95 !font-anaheim !font-semibold !text-base"
+                      dialCodeClassName="!text-white"
+                    />
+                  </div>
+                )
+              }
+
+              if (isCountryField) {
+                return (
+                  <div key={field.fieldName} className="relative">
+                    <select
+                      id={field.fieldName}
+                      name={field.fieldName}
+                      value={formData[field.fieldName] || ''}
+                      onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
+                      required={field.required}
+                      className="font-anaheim font-semibold appearance-none bg-[#B4A25F] border border-white/34 text-white w-full placeholder:text-white/95 focus:outline-none focus:border-white/60 transition-colors"
+                      style={{
+                        height: vw(50),
+                        borderRadius: vw(12),
+                        paddingLeft: vw(24),
+                        paddingRight: vw(40),
+                        fontSize: vw(18),
+                      }}
+                    >
+                      <option value="" className="text-black">Select Country/Region...</option>
+                      {COUNTRIES.map(([name, iso2, dialCode]) => {
+                        return (
+                          <option key={iso2} value={name} className="text-black">
+                            {name} (+{dialCode})
+                          </option>
+                        )
+                      })}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-white/70">
+                      <ChevronDown size={18} />
+                    </div>
+                  </div>
+                )
+              }
+
               return (
                 <input
                   key={field.fieldName}
@@ -475,32 +635,46 @@ export function ContactFormSection({
               required
               disabled={isSubmitting}
             />
-            <input
-              type="text"
-              placeholder="Your WhatsApp / WeChat"
-              value={formData.whatsapp || ""}
-              onChange={(e) => handleInputChange("whatsapp", e.target.value)}
-              className="font-anaheim font-semibold placeholder:text-white/95"
-              style={{
-                width: vw(486), height: vw(50), borderRadius: vw(12),
-                backgroundColor: "#B4A25F", border: "1px solid rgba(255, 255, 255, 0.34)",
-                paddingLeft: vw(24), fontSize: vw(18), lineHeight: vw(36), color: "white",
-              }}
-              disabled={isSubmitting}
-            />
-            <input
-              type="text"
-              placeholder="Country / Region"
-              value={formData.country || ""}
-              onChange={(e) => handleInputChange("country", e.target.value)}
-              className="font-anaheim font-semibold placeholder:text-white/95"
-              style={{
-                width: vw(486), height: vw(50), borderRadius: vw(12),
-                backgroundColor: "#B4A25F", border: "1px solid rgba(255, 255, 255, 0.34)",
-                paddingLeft: vw(24), fontSize: vw(18), lineHeight: vw(36), color: "white",
-              }}
-              disabled={isSubmitting}
-            />
+            <div className="dynamic-phone-input" style={{ width: '100%' }}>
+              <PhoneInput
+                value={formData.whatsapp || ''}
+                onChange={(phone) => handleInputChange("whatsapp", phone)}
+                placeholder="Your WhatsApp / WeChat"
+                disabled={isSubmitting}
+                className="!bg-[#B4A25F] !border-white/34 !rounded-[12px] !h-[50px] md:!h-[2.61vw]"
+                buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5"
+                inputClassName="!bg-transparent !text-white !placeholder-white/95 !font-anaheim !font-semibold !text-base"
+                dialCodeClassName="!text-white"
+              />
+            </div>
+            <div className="relative">
+              <select
+                id="country"
+                name="country"
+                value={formData.country || ''}
+                onChange={(e) => handleInputChange("country", e.target.value)}
+                className="font-anaheim font-semibold appearance-none bg-[#B4A25F] border border-white/34 text-white w-full placeholder:text-white/95 focus:outline-none focus:border-white/60 transition-colors"
+                style={{
+                  height: vw(50),
+                  borderRadius: vw(12),
+                  paddingLeft: vw(24),
+                  paddingRight: vw(40),
+                  fontSize: vw(18),
+                }}
+              >
+                <option value="" className="text-black">Select Country/Region...</option>
+                {COUNTRIES.map(([name, iso2, dialCode]) => {
+                  return (
+                    <option key={iso2} value={name} className="text-black">
+                      {name} (+{dialCode})
+                    </option>
+                  )
+                })}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-white/70">
+                <ChevronDown size={18} />
+              </div>
+            </div>
             <textarea
               ref={textareaRef}
               placeholder="Please Briefly Describe Your Project Requirements Or Customization Ideas."
@@ -577,22 +751,44 @@ export function ContactFormSection({
           </div>
         )}
 
+        {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
+        {effectivePrivacyText && !isGloballyAccepted && (
+          <div className="flex items-start gap-2 my-2 group cursor-pointer" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
+            <div className={cn(
+              "mt-1 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",
+              privacyAccepted ? "bg-[#7B6100] border-[#7B6100]" : "border-white/30 bg-transparent"
+            )}>
+              {privacyAccepted && (
+                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </div>
+            <p className="text-[12px] leading-relaxed text-[#4B3A02]/80 text-left whitespace-pre-line select-none">
+              {effectivePrivacyText}
+            </p>
+          </div>
+        )}
+
         {/* Submit 按钮 */}
         <button
           type="submit"
-          disabled={isSubmitting}
-          className="font-anaheim font-semibold text-white transition-all duration-300 disabled:opacity-50 hover:bg-[#5A4800] hover:scale-[1.02] hover:shadow-lg"
+          disabled={isSubmitting || (!!formConfig?.privacyConsentText && !privacyAccepted)}
+          className={cn(
+            "font-anaheim font-semibold text-white transition-all duration-300 disabled:opacity-50 hover:bg-[#5A4800] hover:scale-[1.02] hover:shadow-lg",
+            "h-auto whitespace-pre-line leading-tight px-6 py-4",
+            (!!formConfig?.privacyConsentText && !privacyAccepted) && "grayscale opacity-80"
+          )}
           style={{
             width: vw(486),
-            height: vw(83),
+            minHeight: vw(83),
             borderRadius: vw(63),
             backgroundColor: submitStatus === "success" ? "#4CAF50" : "#7B6100",
             fontSize: vw(32),
-            lineHeight: vw(40),
             marginTop: vw(10),
           }}
         >
-          {isSubmitting ? "Submitting..." : submitStatus === "success" ? "Submitted!" : "Submit Your Project"}
+          {isSubmitting ? (formConfig?.submittingText || "Submitting...") : submitStatus === "success" ? (locale === 'zh' ? '已提交!' : 'Submitted!') : (effectiveSubmitText || "Submit Your Project")}
         </button>
 
         {/* 错误提示 */}

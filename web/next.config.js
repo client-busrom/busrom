@@ -191,14 +191,6 @@ const nextConfig = {
             priority: 40,
             enforce: true,
           },
-          // 其他大型库
-          'vendors': {
-            name: 'vendors',
-            test: /[\\/]node_modules[\\/]/,
-            chunks: 'all',
-            priority: 10,
-            reuseExistingChunk: true,
-          },
         },
       };
     }
@@ -238,20 +230,20 @@ const nextConfig = {
       "default-src 'self'",
       // Scripts: unsafe-inline 是 Next.js 必需的，通过限制其他来源来保护安全
       isDev
-        ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com"
-        : "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
+        ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://www.googletagmanager.com"
+        : "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.googletagmanager.com",
       // Styles: self + inline (Tailwind/styled-jsx 需要)
       "style-src 'self' 'unsafe-inline'",
       // Images: self + data + blob + CDN + unpkg (Globe textures) + Iconify API
-      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net https://unpkg.com https://api.iconify.design http://localhost:*",
+      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net https://unpkg.com https://api.iconify.design http://localhost:* http://127.0.0.1:* https://www.google-analytics.com https://www.googletagmanager.com",
       // Fonts: self + CDN
       "font-src 'self' https://cdn.jsdelivr.net",
       // Connect: self + API + CDN + Cloudflare Turnstile + jsdelivr (Three.js fonts) + WebSocket (HMR)
       isDev
-        ? "connect-src 'self' ws://localhost:* http://localhost:* https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design"
-        : "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design",
+        ? "connect-src 'self' ws://localhost:* http://localhost:* http://127.0.0.1:* https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design https://www.google-analytics.com https://www.googletagmanager.com"
+        : "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design https://www.google-analytics.com https://www.googletagmanager.com",
       // Media: self + CDN
-      "media-src 'self' https://*.amazonaws.com https://*.cloudfront.net http://localhost:*",
+      "media-src 'self' https://*.amazonaws.com https://*.cloudfront.net http://localhost:* http://127.0.0.1:*",
       // Frame: Cloudflare Turnstile
       "frame-src 'self' https://challenges.cloudflare.com",
       // Object: none - 防止 Flash/Java 等插件攻击

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { cn } from "@/lib/utils"
 import type { Locale } from "@/i18n.config"
 import { PhoneInput } from "@/components/ui/PhoneInput"
 
@@ -23,8 +24,12 @@ interface FormConfig {
     location: string
     fields: {
       [locale: string]: FormField[]
-    }
+    } | FormField[]
+    privacyConsentText?: string
+    submitButtonText?: string
   }
+  privacyConsentText?: string
+  submitButtonText?: string
 }
 
 interface SimplifiedInquiryFormProps {
@@ -53,11 +58,70 @@ export function SimplifiedInquiryForm({
     allFields = configData.fields[locale] || configData.fields["en"] || []
   }
 
+  // Helper function to extract localized string if it's an object
+  const getLocalizedString = (val: any) => {
+    if (!val) return ""
+    if (typeof val === "string") return val
+    if (typeof val === "object") {
+      return val[locale] || val["en"] || ""
+    }
+    return ""
+  }
+
+  const privacyText = getLocalizedString(configData?.privacyConsentText || configData?.data?.privacyConsentText || (formConfig as any)?.privacyConsentText)
+  const submitText = getLocalizedString(configData?.submitButtonText || configData?.data?.submitButtonText || (formConfig as any)?.submitButtonText) || "Submit Inquiry"
+
   // Only show required fields, preserving the order from the CMS array
   const requiredFields = allFields.filter((field: FormField) => field.required)
 
   const [formData, setFormData] = useState<Record<string, any>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
+  const [isGloballyAccepted, setIsGloballyAccepted] = useState(false)
+  const STORAGE_KEY = 'busrom_privacy_consent'
+
+  // Debug log for privacy consent
+  useEffect(() => {
+    if (privacyText) {
+      console.log(`[SimplifiedInquiryForm] Privacy text: "${privacyText.substring(0, 30)}...", accepted: ${privacyAccepted}, globally: ${isGloballyAccepted}`)
+    } else {
+      console.log(`[SimplifiedInquiryForm] No privacy text found in config`, configData)
+    }
+  }, [privacyText, privacyAccepted, isGloballyAccepted, configData])
+
+  // Check global consent status on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const consent = localStorage.getItem(STORAGE_KEY)
+      if (consent === 'true') {
+        setIsGloballyAccepted(true)
+        setPrivacyAccepted(true)
+      }
+    }
+  }, [])
+
+  // Sync with global storage when accepted in this form
+  const handlePrivacyToggle = (checked: boolean) => {
+    setPrivacyAccepted(checked)
+    if (checked && typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, 'true')
+      // Trigger a storage event for other components to update
+      window.dispatchEvent(new Event('storage'))
+    }
+  }
+
+  // Listen for storage events from other components
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const consent = localStorage.getItem(STORAGE_KEY)
+      if (consent === 'true') {
+        setIsGloballyAccepted(true)
+        setPrivacyAccepted(true)
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
 
   const handleChange = (fieldName: string, value: any) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }))
@@ -173,11 +237,35 @@ export function SimplifiedInquiryForm({
         </div>
       ))}
 
+      {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
+      {privacyText && !isGloballyAccepted && (
+        <div className="flex items-start gap-2 my-2 cursor-pointer group" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
+          <div className={cn(
+            "mt-1 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",
+            privacyAccepted ? "bg-brand-secondary border-brand-secondary" : "border-gray-300 bg-transparent"
+          )}>
+            {privacyAccepted && (
+              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+          <p className="text-xs leading-relaxed text-gray-500 whitespace-pre-line select-none">
+            {privacyText}
+          </p>
+        </div>
+      )}
+
       <button
         type="submit"
-        className="w-full py-3 px-6 bg-brand-secondary text-white font-bold rounded-lg hover:bg-brand-secondary/90 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:ring-offset-2"
+        disabled={(!!privacyText && !privacyAccepted)}
+        className={cn(
+          "w-full py-3 px-6 bg-brand-secondary text-white font-bold rounded-lg hover:bg-brand-secondary/90 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:ring-offset-2",
+          "h-auto whitespace-pre-line leading-tight",
+          (!!privacyText && !privacyAccepted) && "opacity-50 grayscale cursor-not-allowed"
+        )}
       >
-        Submit Inquiry
+        {submitText}
       </button>
 
       <p className="text-xs text-gray-500 text-center">

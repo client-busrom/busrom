@@ -262,18 +262,18 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
                                 isShopFirstCard && "lg:col-span-2"
                               )}
                             >
-                              <div className="absolute inset-0 overflow-hidden">
+                              <div className="absolute inset-0 overflow-hidden bg-white">
                                 {child.image?.url ? (
                                   <img
-                                    src={child.image.url}
+                                    src={(child.image as any)?.sizes?.thumbnail?.url || child.image.url}
                                     alt={child.label}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-125"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                     loading="eager"
                                     decoding="async"
                                     fetchPriority={index < 4 ? "high" : "auto"}
                                   />
                                 ) : (
-                                  <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-border">
+                                  <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-border bg-muted">
                                     <span className="text-muted-foreground text-xs">No Image</span>
                                   </div>
                                 )}

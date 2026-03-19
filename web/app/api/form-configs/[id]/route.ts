@@ -11,8 +11,10 @@ export async function GET(
 ) {
   try {
     const { id } = await params
+    const searchParams = request.nextUrl.searchParams
+    const queryString = searchParams.toString()
 
-    const url = `${CMS_URL}/api/form-configs/${id}`
+    const url = `${CMS_URL}/api/form-configs/${id}${queryString ? `?${queryString}` : ''}`
     console.log('[Form Config API] Request URL:', url)
 
     const response = await fetch(url, {

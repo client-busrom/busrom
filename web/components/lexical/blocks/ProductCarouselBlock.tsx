@@ -98,6 +98,12 @@ export const ProductCarouselBlock = ({ node, locale }: any) => {
 
                   {/* Content Area */}
                   <div className="p-6 flex flex-col flex-1">
+                    {settings.showCategory && product.category?.name && (
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-brand-accent-gold mb-1">
+                        {product.category.name}
+                      </div>
+                    )}
+                    
                     {settings.showName && (
                       <h4 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-brand-accent-gold transition-colors">
                         {product.name}
