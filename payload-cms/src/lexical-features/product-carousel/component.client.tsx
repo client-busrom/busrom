@@ -41,6 +41,7 @@ interface Product {
   shortDescription?: string
   showImage?: { url?: string; thumbnailURL?: string } | string
   series?: { id: string; name: string; slug: string } | string
+  category?: { id: string; name: string; slug: string } | string
 }
 
 interface ProductSeries {
@@ -141,6 +142,7 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
       id: generateItemId(),
       selectionMode: mode,
       showName: true,
+      showCategory: true,
       showDescription: true,
       showButton: true,
       showHighlights: true,
@@ -684,6 +686,25 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                             style={{ accentColor: '#A08745' }}
                           />
                           {i18n?.language === 'zh' ? '显示名称' : 'Show Name'}
+                        </label>
+                        <label style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px 10px',
+                          backgroundColor: 'white',
+                          borderRadius: '6px',
+                          border: '1px solid #fef08a',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                        }}>
+                          <input
+                            type="checkbox"
+                            checked={!!item.showCategory}
+                            onChange={(e) => handleUpdateItem(index, { showCategory: e.target.checked })}
+                            style={{ accentColor: '#A08745' }}
+                          />
+                          {i18n?.language === 'zh' ? '显示分类' : 'Show Category'}
                         </label>
                         <label style={{
                           display: 'flex',

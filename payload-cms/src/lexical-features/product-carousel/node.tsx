@@ -28,6 +28,7 @@ export interface ProductCarouselItem {
   productSeries?: string // Product Series ID (for auto selection)
   // Display settings per item
   showName: boolean
+  showCategory: boolean
   showDescription: boolean
   showButton: boolean
   showHighlights: boolean

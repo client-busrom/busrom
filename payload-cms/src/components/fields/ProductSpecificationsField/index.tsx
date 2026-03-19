@@ -12,6 +12,7 @@ interface SpecificationItem {
   text: string
   url?: string
   image?: string
+  color?: string
 }
 
 interface SpecificationGroup {
@@ -186,7 +187,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
   const addItem = useCallback((groupIdx: number) => {
     const newSpecs = currentSpecs.map((group, i) =>
       i === groupIdx
-        ? { ...group, items: [...group.items, { text: '', url: '', image: '' }] }
+        ? { ...group, items: [...group.items, { text: '', url: '', image: '', color: '' }] }
         : group
     )
     updateLocaleSpecs(activeLocale, newSpecs)
@@ -535,12 +536,12 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                   </div>
                   <div className="spec-group__name">
                     <label>Group Name (e.g., Color, Size)</label>
-                    <input
-                      type="text"
+                    <textarea
                       value={group.text}
                       onChange={(e) => updateGroupText(groupIdx, e.target.value)}
                       onBlur={handleBlur}
                       placeholder="e.g., Color"
+                      rows={1}
                     />
                   </div>
                   <button
@@ -579,52 +580,108 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                           >▼</button>
                         </div>
                         <div className="spec-item__fields">
-                          <div className="spec-item__field">
-                            <label>Item Name</label>
-                            <input
-                              type="text"
-                              value={item.text}
-                              onChange={(e) => updateItem(groupIdx, itemIdx, { text: e.target.value })}
-                              onBlur={handleBlur}
-                              placeholder="e.g., Red"
-                            />
+                          {/* Item Name + 3D URL on the left */}
+                          <div className="spec-item__col spec-item__col--info">
+                            <div className="spec-item__field">
+                              <label>Item Name</label>
+                              <textarea
+                                value={item.text}
+                                onChange={(e) => updateItem(groupIdx, itemIdx, { text: e.target.value })}
+                                onBlur={handleBlur}
+                                placeholder="e.g., Red"
+                                rows={1}
+                              />
+                            </div>
+                            <div className="spec-item__field">
+                              <label>3D URL (Optional)</label>
+                              <input
+                                type="text"
+                                value={item.url || ''}
+                                onChange={(e) => updateItem(groupIdx, itemIdx, { url: e.target.value })}
+                                onBlur={handleBlur}
+                                placeholder="https://..."
+                              />
+                            </div>
                           </div>
-                          <div className="spec-item__field">
-                            <label>3D URL (Optional)</label>
-                            <input
-                              type="text"
-                              value={item.url || ''}
-                              onChange={(e) => updateItem(groupIdx, itemIdx, { url: e.target.value })}
-                              onBlur={handleBlur}
-                              placeholder="https://..."
-                            />
+
+                          {/* Image in the middle */}
+                          <div className="spec-item__col spec-item__col--media">
+                            <div className="spec-item__field spec-item__field--media">
+                              <label>Image (Optional)</label>
+                              <MediaPicker
+                                field={{
+                                  name: `spec-image-${groupIdx}-${itemIdx}`,
+                                  label: 'Image',
+                                  hasMany: false,
+                                }}
+                                value={item.image ? Number(item.image) : null}
+                                onChange={(newValue) => {
+                                  updateItem(groupIdx, itemIdx, { image: newValue ? String(newValue) : '' })
+                                  if (activeLocale !== currentLocale.code) {
+                                    const newSpecs = currentSpecs.map((g, i) =>
+                                      i === groupIdx
+                                        ? {
+                                            ...g,
+                                            items: g.items.map((it, j) =>
+                                              j === itemIdx ? { ...it, image: newValue ? String(newValue) : '' } : it
+                                            ),
+                                          }
+                                        : g
+                                    )
+                                    setTimeout(() => saveToLocale(activeLocale, newSpecs), 0)
+                                  }
+                                }}
+                              />
+                            </div>
                           </div>
-                          <div className="spec-item__field spec-item__field--media">
-                            <label>Image (Optional)</label>
-                            <MediaPicker
-                              field={{
-                                name: `spec-image-${groupIdx}-${itemIdx}`,
-                                label: 'Image',
-                                hasMany: false,
-                              }}
-                              value={item.image ? Number(item.image) : null}
-                              onChange={(newValue) => {
-                                updateItem(groupIdx, itemIdx, { image: newValue ? String(newValue) : '' })
-                                if (activeLocale !== currentLocale.code) {
-                                  const newSpecs = currentSpecs.map((g, i) =>
-                                    i === groupIdx
-                                      ? {
-                                          ...g,
-                                          items: g.items.map((it, j) =>
-                                            j === itemIdx ? { ...it, image: newValue ? String(newValue) : '' } : it
-                                          ),
-                                        }
-                                      : g
-                                  )
-                                  setTimeout(() => saveToLocale(activeLocale, newSpecs), 0)
-                                }
-                              }}
-                            />
+
+                          {/* Color Swatch on the right */}
+                          <div className="spec-item__col spec-item__col--swatch">
+                            <div className="spec-item__field">
+                              <label>Swatch (Optional)</label>
+                              <div className="spec-item__color-picker-wrap">
+                                <div className="spec-item__color-preview-trigger">
+                                  <div 
+                                    className="spec-item__color-preview-box"
+                                    style={{ backgroundColor: item.color || 'transparent' }}
+                                    onClick={() => {
+                                      const input = document.getElementById(`color-pick-${groupIdx}-${itemIdx}`) as HTMLInputElement;
+                                      if (input) input.click();
+                                    }}
+                                    data-has-color={!!item.color}
+                                  >
+                                    {!item.color && <span className="spec-item__color-add-icon">+</span>}
+                                  </div>
+                                  
+                                  <input
+                                    id={`color-pick-${groupIdx}-${itemIdx}`}
+                                    type="color"
+                                    value={item.color || '#ffffff'}
+                                    onChange={(e) => updateItem(groupIdx, itemIdx, { color: e.target.value })}
+                                    className="spec-item__color-hidden-input"
+                                  />
+                                  
+                                  {item.color && (
+                                    <button
+                                      type="button"
+                                      className="spec-item__color-clear-btn"
+                                      onClick={() => updateItem(groupIdx, itemIdx, { color: '' })}
+                                      title="Clear color"
+                                    >
+                                      &times;
+                                    </button>
+                                  )}
+                                </div>
+                                <input
+                                  type="text"
+                                  value={item.color || ''}
+                                  onChange={(e) => updateItem(groupIdx, itemIdx, { color: e.target.value })}
+                                  onBlur={handleBlur}
+                                  placeholder="#HEX"
+                                  className="spec-item__hex-input"
+                                />
+                              </div>
+                            </div>
                           </div>
                         </div>
                         <button
@@ -655,7 +712,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                       if (activeLocale !== currentLocale.code) {
                         const newSpecs = currentSpecs.map((g, i) =>
                           i === groupIdx
-                            ? { ...g, items: [...g.items, { text: '', url: '', image: '' }] }
+                            ? { ...g, items: [...g.items, { text: '', url: '', image: '', color: '' }] }
                             : g
                         )
                         setTimeout(() => saveToLocale(activeLocale, newSpecs), 0)
