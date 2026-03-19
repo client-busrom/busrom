@@ -2,6 +2,8 @@
 
 import React from 'react'
 import { useField, useTranslation } from '@payloadcms/ui'
+import { parsePhoneNumberFromString } from 'libphonenumber-js'
+import * as Flags from 'country-flag-icons/react/3x2'
 
 // i18n translations
 const i18n = {
@@ -143,14 +145,41 @@ export const FormDataDisplay: React.FC<{ path: string }> = () => {
               >
                 {getFieldLabel(key)}
               </td>
-              <td
+               <td
                 style={{
                   padding: '10px 12px',
                   wordBreak: 'break-word',
                   whiteSpace: 'pre-wrap',
                 }}
               >
-                {typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val)}
+                {(() => {
+                  if (typeof val !== 'string') return typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val)
+                  
+                  const keyLower = key.toLowerCase()
+                  if (keyLower === 'phone' || keyLower === 'whatsapp') {
+                    try {
+                      const phoneNumber = parsePhoneNumberFromString(val)
+                      if (phoneNumber && phoneNumber.country) {
+                        const FlagComponent = (Flags as any)[phoneNumber.country]
+                        return (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            {FlagComponent && (
+                              <div style={{ width: '20px', borderRadius: '2px', overflow: 'hidden', border: '1px solid #ddd', display: 'flex' }}>
+                                <FlagComponent />
+                              </div>
+                            )}
+                            <span style={{ fontWeight: 600 }}>+{phoneNumber.countryCallingCode}</span>
+                            <span>{phoneNumber.formatInternational().split(' ').slice(1).join(' ')}</span>
+                          </div>
+                        )
+                      }
+                    } catch (e) {
+                      // Fallback to raw string if parsing fails
+                    }
+                  }
+                  
+                  return String(val)
+                })()}
               </td>
             </tr>
           ))}

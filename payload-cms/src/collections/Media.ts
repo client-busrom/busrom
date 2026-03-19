@@ -89,6 +89,8 @@ export const Media: CollectionConfig = {
         name: 'thumbnail',
         width: 400,
         height: 300,
+        fit: 'inside',
+        withoutEnlargement: true,
         position: 'centre',
         formatOptions: {
           format: 'webp',
@@ -99,6 +101,8 @@ export const Media: CollectionConfig = {
         name: 'card',
         width: 768,
         height: 512,
+        fit: 'inside',
+        withoutEnlargement: true,
         position: 'centre',
         formatOptions: {
           format: 'webp',

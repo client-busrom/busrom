@@ -232,6 +232,7 @@ export const FormConfigs: CollectionConfig = {
             { label: { en: 'Number', zh: '数字' }, value: 'number' },
             { label: { en: 'Date', zh: '日期' }, value: 'date' },
             { label: { en: 'File', zh: '文件' }, value: 'file' },
+            { label: { en: 'Country/Region', zh: '国家/地区' }, value: 'country' },
           ],
         },
         {

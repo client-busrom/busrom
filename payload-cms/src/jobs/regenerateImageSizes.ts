@@ -23,11 +23,23 @@ const s3Client = new S3Client({
   }),
 })
 
-const S3_BUCKET = process.env.S3_BUCKET_NAME || 'busrom-media'
 const USE_MINIO = process.env.USE_MINIO === 'true'
-const CDN_DOMAIN = USE_MINIO
-  ? 'http://localhost:8080'
-  : (process.env.CDN_DOMAIN || 'https://d2kqew3hn5wphn.cloudfront.net')
+const S3_BUCKET = process.env.S3_BUCKET_NAME || 'busrom-media'
+
+// Get Base URL for images
+const getBaseUrl = () => {
+  if (USE_MINIO) {
+    const endpoint = process.env.S3_ENDPOINT || 'http://localhost:9000'
+    return `${endpoint}/${S3_BUCKET}`
+  }
+  const cdnDomain = process.env.CDN_DOMAIN
+  const region = process.env.S3_REGION || 'us-east-1'
+  return cdnDomain && cdnDomain !== 'NONE'
+    ? `https://${cdnDomain}`
+    : `https://${S3_BUCKET}.s3.${region}.amazonaws.com`
+}
+
+const BASE_URL = getBaseUrl()
 
 // Image sizes configuration
 const FOCAL_IMAGE_SIZES = [
@@ -109,7 +121,7 @@ export const regenerateImageSizesTask = {
           let outputWidth: number
           let outputHeight: number
 
-          if (size.height) {
+          if (size.height && !['thumbnail', 'card'].includes(size.name)) {
             // Fixed dimensions - need to crop with focal point
             // Strategy: Scale up image if needed, then crop to exact dimensions
             // This ensures focal point is always centered and aspect ratio is correct
@@ -187,9 +199,9 @@ export const regenerateImageSizesTask = {
             outputWidth = size.width
             outputHeight = size.height
           } else {
-            // Width only - just resize, no crop needed
+            // Width or both dimensions - fit: 'inside' ensures no cropping
             const resized = await sharp(sourceBuffer)
-              .resize(size.width, undefined, {
+              .resize(size.width, size.height, {
                 fit: 'inside',
                 withoutEnlargement: true,
               })
@@ -215,7 +227,7 @@ export const regenerateImageSizesTask = {
 
           // Prepare update data (add cache-busting version)
           sizesUpdate[size.name] = {
-            url: `${CDN_DOMAIN}/${sizeS3Key}?v=${cacheBuster}`,
+            url: `${BASE_URL}/media/${sizeFilename}?v=${cacheBuster}`,
             width: outputWidth,
             height: outputHeight,
             mimeType: 'image/webp',

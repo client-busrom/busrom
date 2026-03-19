@@ -9,10 +9,10 @@
  * - Link to FormConfig for form details
  * - Email notification on new submission
  * - Attachments support
+ * - Assignment to operators
  */
 
 import type { CollectionConfig } from 'payload'
-import { parsePhoneNumberFromString } from 'libphonenumber-js'
 import { sendFormNotificationEmail, sendAutoReplyEmail } from '../lib/form-email'
 
 export const FormSubmissions: CollectionConfig = {
@@ -56,21 +56,11 @@ export const FormSubmissions: CollectionConfig = {
       if (!user) return false
       if (user.isAdmin) return true
 
-      // Non-admins can only see submissions for forms they are assigned to,
-      // or forms that have no assigned operators (public forms)
+      // Non-admins can only see submissions specifically assigned to them
       return {
-        or: [
-          {
-            'formConfig.assignedOperators': {
-              exists: false,
-            },
-          },
-          {
-            'formConfig.assignedOperators': {
-              in: [user.id],
-            },
-          },
-        ],
+        assignedTo: {
+          equals: user.id
+        }
       }
     },
     update: ({ req: { user } }) => {
@@ -78,18 +68,9 @@ export const FormSubmissions: CollectionConfig = {
       if (user.isAdmin) return true
 
       return {
-        or: [
-          {
-            'formConfig.assignedOperators': {
-              exists: false,
-            },
-          },
-          {
-            'formConfig.assignedOperators': {
-              in: [user.id],
-            },
-          },
-        ],
+        assignedTo: {
+          equals: user.id
+        }
       }
     },
     // Only super admin can delete
@@ -116,50 +97,18 @@ export const FormSubmissions: CollectionConfig = {
           }
         }
 
-        // Parse phone number for country info
-        if (operation === 'create' && data?.data) {
-          const formData = data.data
-          // Look for phone fields in common names
-          const phoneFieldKeys = ['phone', 'tel', 'whatsapp', 'phoneNumber', 'mobile']
-          let phoneValue = ''
+        // When assignment updates to a new person, reset status to UNREAD
+        if (operation === 'update' && data?.assignedTo !== undefined) {
+          const oldAssignedTo = originalDoc?.assignedTo && typeof originalDoc.assignedTo === 'object' 
+            ? originalDoc.assignedTo.id 
+            : originalDoc?.assignedTo;
+          const newAssignedTo = data.assignedTo && typeof data.assignedTo === 'object'
+            ? data.assignedTo.id
+            : data.assignedTo;
 
-          // 1. Try common keys
-          for (const key of phoneFieldKeys) {
-            if (formData[key]) {
-              phoneValue = formData[key]
-              break
-            }
-          }
-
-          // 2. If not found, look for any value starting with '+'
-          if (!phoneValue) {
-            for (const key in formData) {
-              if (typeof formData[key] === 'string' && formData[key].startsWith('+')) {
-                phoneValue = formData[key]
-                break
-              }
-            }
-          }
-
-          if (phoneValue) {
-            try {
-              const phoneNumber = parsePhoneNumberFromString(phoneValue)
-              if (phoneNumber) {
-                data.countryCode = phoneNumber.country // e.g., 'CN', 'US'
-                // countryName is a bit harder without a library, but countryCode is usually enough
-                // for the notification. We can use Intl.DisplayNames if available in Node.
-                if (phoneNumber.country) {
-                  try {
-                    const regionNames = new Intl.DisplayNames(['en'], { type: 'region' })
-                    data.countryName = regionNames.of(phoneNumber.country)
-                  } catch (e) {
-                    data.countryName = phoneNumber.country
-                  }
-                }
-              }
-            } catch (err: any) {
-              req.payload.logger.error(`Phone parsing error: ${err?.message || err}`)
-            }
+          if (newAssignedTo && newAssignedTo !== oldAssignedTo) {
+            data.status = 'UNREAD';
+            data.readAt = null;
           }
         }
 
@@ -210,6 +159,46 @@ export const FormSubmissions: CollectionConfig = {
         return doc
       },
     ],
+    afterRead: [
+      async ({ doc, req, findMany }) => {
+        // Automatically mark as READ when someone opens the specific document
+        // - Admin can auto-read if not yet assigned
+        // - Assigned user can auto-read
+        // - findMany=false means we are opening the document in detail view
+        if (req?.user && !findMany && doc.status === 'UNREAD') {
+          const assignedToId = typeof doc.assignedTo === 'object' ? doc.assignedTo?.id : doc.assignedTo;
+          
+          let shouldAutoRead = false;
+          if (!assignedToId) {
+            shouldAutoRead = true;
+          } else if (assignedToId === req.user.id) {
+            shouldAutoRead = true;
+          }
+
+          if (shouldAutoRead && !req.context?.isAutoRead) {
+            setImmediate(async () => {
+              try {
+                await req.payload.update({
+                  collection: 'form-submissions',
+                  id: doc.id,
+                  data: {
+                    status: 'READ',
+                  },
+                  context: {
+                    isAutoRead: true
+                  }
+                });
+              } catch (e: any) {
+                req.payload.logger.error(`Auto-read failed: ${e?.message}`);
+              }
+            });
+            doc.status = 'READ';
+            doc.readAt = new Date().toISOString();
+          }
+        }
+        return doc;
+      }
+    ],
   },
   fields: [
     // ==================================================================
@@ -247,28 +236,25 @@ export const FormSubmissions: CollectionConfig = {
       },
     },
     {
-      name: 'countryCode',
-      type: 'text',
+      name: 'assignedTo',
+      type: 'relationship',
+      relationTo: 'users',
       label: {
-        en: 'Country Code',
-        zh: '国家代码',
+        en: 'Assigned To',
+        zh: '指派给 (业务员)',
       },
+      hasMany: false,
       admin: {
         position: 'sidebar',
-        readOnly: true,
+        description: {
+          en: 'Assign this submission to a specific operator',
+          zh: '将此提交记录分配给特定的处理人员',
+        },
       },
-    },
-    {
-      name: 'countryName',
-      type: 'text',
-      label: {
-        en: 'Country Name',
-        zh: '国家名称',
-      },
-      admin: {
-        position: 'sidebar',
-        readOnly: true,
-      },
+      access: {
+        // Only admins can change assignments
+        update: ({ req: { user } }) => !!user?.isAdmin,
+      }
     },
 
     // ==================================================================
