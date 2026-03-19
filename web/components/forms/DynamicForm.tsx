@@ -2,8 +2,13 @@
 
 import { useState, useEffect, FormEvent, useRef, useCallback } from "react"
 import type { Locale } from "@/i18n.config"
-import { Info } from "lucide-react"
+import { Info, ChevronDown } from "lucide-react"
 import { Turnstile } from "@/components/ui/turnstile"
+import { cn } from "@/lib/utils"
+import { Label } from "@/components/ui/label"
+import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone'
+// @ts-ignore
+import 'react-international-phone/style.css'
 
 interface FormField {
   fieldName: string
@@ -90,6 +95,32 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
   // Turnstile captcha state
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [submissionCount, setSubmissionCount] = useState(0)
+
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
+  const [isGloballyAccepted, setIsGloballyAccepted] = useState(false)
+  const STORAGE_KEY = 'busrom_privacy_consent'
+
+  // Check global consent status on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const accepted = localStorage.getItem(STORAGE_KEY) === 'true';
+      if (accepted) {
+        setPrivacyAccepted(true);
+        setIsGloballyAccepted(true);
+      }
+    }
+  }, []);
+
+  const handlePrivacyToggle = (val: boolean) => {
+    setPrivacyAccepted(val);
+    if (val) {
+      localStorage.setItem(STORAGE_KEY, 'true');
+      setIsGloballyAccepted(true);
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+      setIsGloballyAccepted(false);
+    }
+  };
 
   // Check if captcha should be shown
   const shouldShowCaptcha = !!(formConfig?.captchaEnabled &&
@@ -394,6 +425,13 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
         setSubmitted(true)
         onSuccess?.()
 
+        // 提交成功后也强制记录同意（双重保障）
+        if (formConfig?.privacyConsentText) {
+          localStorage.setItem(STORAGE_KEY, 'true');
+          setIsGloballyAccepted(true);
+          setPrivacyAccepted(true);
+        }
+
         // Increment submission count for next time
         incrementSubmissionCount(formName)
         setSubmissionCount(prev => prev + 1)
@@ -431,7 +469,6 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
     switch (field.fieldType) {
       case 'text':
       case 'email':
-      case 'tel':
       case 'url':
         return (
           <div key={field.fieldName}>
@@ -448,6 +485,60 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
               required={field.required}
               className={baseInputClass}
             />
+          </div>
+        )
+
+      case 'phone':
+        return (
+          <div key={field.fieldName} className="dynamic-phone-input">
+            <label htmlFor={field.fieldName} className={labelClass}>
+              {field.label} {field.required && <span className="text-red-500">*</span>}
+            </label>
+            <PhoneInput
+              defaultCountry="cn"
+              value={formData[field.fieldName] || ''}
+              onChange={(phone) => handleChange(field.fieldName, phone)}
+              placeholder={field.placeholder}
+              inputClassName="!flex-1 !h-auto !w-full !px-4 !py-3 !border-none !rounded-none !focus:outline-none !font-anaheim !text-base"
+              className="!flex !w-full !border !border-brand-accent-border !rounded-none !focus-within:border-brand-text-black !transition-colors"
+              countrySelectorStyleProps={{
+                buttonClassName: "!h-full !px-2 !border-r !border-brand-accent-border !bg-transparent !rounded-none hover:!bg-gray-50",
+                buttonContentWrapperClassName: "!flex !items-center !gap-1",
+                dropdownArrowClassName: "!hidden"
+              }}
+            />
+          </div>
+        )
+
+      case 'country':
+        return (
+          <div key={field.fieldName}>
+            <label htmlFor={field.fieldName} className={labelClass}>
+              {field.label} {field.required && <span className="text-red-500">*</span>}
+            </label>
+            <div className="relative">
+              <select
+                id={field.fieldName}
+                name={field.fieldName}
+                value={formData[field.fieldName] || ''}
+                onChange={(e) => handleChange(field.fieldName, e.target.value)}
+                required={field.required}
+                className={cn(baseInputClass, "appearance-none pr-10")}
+              >
+                <option value="">Select Country/Region...</option>
+                {defaultCountries.map(c => {
+                  const country = parseCountry(c);
+                  return (
+                    <option key={country.iso2} value={country.name}>
+                      {country.name} (+{country.dialCode})
+                    </option>
+                  )
+                })}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                <ChevronDown size={18} />
+              </div>
+            </div>
           </div>
         )
 
@@ -843,21 +934,36 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
         </div>
       )}
 
+      {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
+      {formConfig.privacyConsentText && !isGloballyAccepted && (
+        <div className="flex items-start gap-2 my-4 group cursor-pointer" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
+          <div className={cn(
+            "mt-1 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",
+            privacyAccepted ? "bg-brand-text-black border-brand-text-black" : "border-gray-300 bg-transparent"
+          )}>
+            {privacyAccepted && (
+              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+          <p className="text-[10px] leading-relaxed text-gray-500 text-left whitespace-pre-line select-none">
+            {formConfig.privacyConsentText}
+          </p>
+        </div>
+      )}
+
       {/* Submit button */}
       <button
         type="submit"
-        disabled={submitting || (shouldShowCaptcha && !turnstileToken)}
-        className="w-full py-3 px-6 bg-brand-text-black text-white font-anaheim font-bold uppercase tracking-wider hover:bg-brand-accent-gold hover:text-brand-text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-pre-line"
+        disabled={submitting || (shouldShowCaptcha && !turnstileToken) || (!!formConfig.privacyConsentText && !privacyAccepted)}
+        className={cn(
+          "w-full py-4 px-6 bg-brand-text-black text-white font-anaheim font-bold uppercase tracking-wider hover:bg-brand-accent-gold hover:text-brand-text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-pre-line leading-tight h-auto",
+          (!!formConfig.privacyConsentText && !privacyAccepted) && "grayscale opacity-80"
+        )}
       >
         {submitting ? (formConfig.submittingText || "Sending...") : (formConfig.submitButtonText || "Submit")}
       </button>
-
-      {/* Privacy consent text */}
-      {formConfig.privacyConsentText && (
-        <p className="mt-3 text-xs text-gray-500 leading-relaxed whitespace-pre-line">
-          {formConfig.privacyConsentText}
-        </p>
-      )}
     </form>
   )
 }

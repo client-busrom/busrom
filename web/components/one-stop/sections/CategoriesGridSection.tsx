@@ -11,6 +11,10 @@ interface Product {
   slug: string
   showImage?: { url: string }
   highlights?: string[]
+  category?: {
+    name?: string
+    localizedName?: string
+  }
 }
 
 interface CategoriesGridSectionProps {
@@ -97,7 +101,7 @@ export function CategoriesGridSection({ title, subtitle, products, locale, loadi
                 {/* Text Content - Higher Z-index */}
                 <div className="absolute left-[57px] top-[32px] w-[337px] z-30">
                    <h4 className="text-[40px] font-extrabold text-black leading-[1.1] mb-2" style={{ fontFamily: "var(--font-anaheim)" }}>
-                     {item.name}
+                     {item.category?.name || item.name}
                    </h4>
                 </div>
 

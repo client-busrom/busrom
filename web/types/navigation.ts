@@ -20,6 +20,7 @@ export enum NavigationMenuType {
 export interface NavigationImage {
   url: string;
   filename: string;
+  sizes?: any;
 }
 
 /**

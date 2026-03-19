@@ -6,7 +6,7 @@ import { CountryFlag } from "@/components/ui/CountryFlag"
 import { ChevronDown, Search } from "lucide-react"
 
 // Country data: [name, iso2, dialCode]
-const COUNTRIES: [string, string, string][] = [
+export const COUNTRIES: [string, string, string][] = [
   ["United States", "US", "1"],
   ["China", "CN", "86"],
   ["United Kingdom", "GB", "44"],
@@ -106,6 +106,10 @@ interface PhoneInputProps {
   onChange: (phone: string) => void
   placeholder?: string
   className?: string
+  containerClassName?: string
+  buttonClassName?: string
+  inputClassName?: string
+  dialCodeClassName?: string
   error?: boolean
   disabled?: boolean
   required?: boolean
@@ -118,6 +122,10 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   onChange,
   placeholder = "Phone number",
   className,
+  containerClassName,
+  buttonClassName,
+  inputClassName,
+  dialCodeClassName,
   error,
   disabled,
   required,
@@ -211,11 +219,12 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
     : COUNTRIES
 
   return (
-    <div className={cn("relative", className)} ref={dropdownRef} data-lenis-prevent>
+    <div className={cn("relative h-full", isOpen ? "z-[1001]" : "z-10", containerClassName)} ref={dropdownRef} data-lenis-prevent>
       <div className={cn(
         "flex items-stretch rounded-lg border border-gray-300 bg-white overflow-hidden transition-colors",
         error && "border-red-500",
-        disabled && "opacity-50 cursor-not-allowed"
+        disabled && "opacity-50 cursor-not-allowed",
+        className
       )}>
         {/* Country selector button */}
         <button
@@ -223,12 +232,13 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
           onClick={() => !disabled && setIsOpen(!isOpen)}
           disabled={disabled}
           className={cn(
-            "flex items-center gap-1.5 px-3 border-r border-gray-300 bg-white transition-colors flex-shrink-0",
+            "flex items-center gap-1.5 px-3 border-r border-gray-300 bg-white transition-colors flex-shrink-0 h-full",
             "hover:bg-gray-50 focus:outline-none",
+            buttonClassName
           )}
         >
           <CountryFlag countryCode={selectedCountry[1]} className="w-5 h-4 rounded-sm flex-shrink-0" />
-          <span className="text-sm font-medium text-brand-text-black">+{selectedCountry[2]}</span>
+          <span className={cn("text-sm font-medium text-brand-text-black", dialCodeClassName)}>+{selectedCountry[2]}</span>
           <ChevronDown className={cn("w-3.5 h-3.5 text-gray-400 transition-transform ml-0.5", isOpen && "rotate-180")} />
         </button>
 
@@ -243,10 +253,11 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
           onChange={handlePhoneChange}
           placeholder={placeholder}
           className={cn(
-            "flex-1 min-w-0 px-4 py-2.5 bg-white font-medium text-brand-text-black text-sm",
+            "flex-1 min-w-0 px-4 py-2.5 bg-white font-medium text-brand-text-black text-sm h-full",
             "placeholder:text-gray-400",
             "focus:outline-none",
-            disabled && "cursor-not-allowed"
+            disabled && "cursor-not-allowed",
+            inputClassName
           )}
         />
       </div>
@@ -254,7 +265,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
       {/* Dropdown */}
       {isOpen && (
         <div
-          className="absolute left-0 top-full mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl z-[110] overflow-hidden"
+          className="absolute left-0 top-full mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl z-[1002] overflow-hidden"
           style={{ maxHeight: '320px' }}
         >
           {/* Search */}
@@ -267,7 +278,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search country..."
-                className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-secondary focus:border-brand-secondary"
+                className="w-full pl-8 pr-3 py-2 text-base border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-secondary focus:border-brand-secondary"
               />
             </div>
           </div>
@@ -288,13 +299,13 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
                   type="button"
                   onClick={() => handleCountrySelect([countryName, iso2, dialCode])}
                   className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-gray-50",
+                    "w-full flex items-center gap-4 px-4 py-3.5 text-left transition-colors hover:bg-gray-50",
                     selectedCountry[1] === iso2 && selectedCountry[2] === dialCode && "bg-brand-secondary/5"
                   )}
                 >
-                  <CountryFlag countryCode={iso2} className="w-5 h-4 rounded-sm flex-shrink-0" />
-                  <span className="text-sm font-medium text-brand-text-black truncate flex-1">{countryName}</span>
-                  <span className="text-xs text-gray-400 flex-shrink-0">+{dialCode}</span>
+                  <CountryFlag countryCode={iso2} className="w-6 h-5 rounded-sm flex-shrink-0" />
+                  <span className="text-[22px] font-semibold text-brand-text-black truncate flex-1 leading-tight">{countryName}</span>
+                  <span className="text-[20px] text-gray-500 font-medium flex-shrink-0">+{dialCode}</span>
                 </button>
               ))
             )}

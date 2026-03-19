@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo } from "react"
 import type { Locale } from "@/i18n.config"
 import { Turnstile } from "@/components/ui/turnstile"
 import { PhoneInput } from "@/components/ui/PhoneInput"
+import { cn } from "@/lib/utils"
 
 interface FormField {
   label: string
@@ -25,8 +26,12 @@ interface FormConfig {
     location: string
     fields: {
       [locale: string]: FormField[]
-    }
+    } | FormField[]
+    privacyConsentText?: string
+    submitButtonText?: string
   }
+  privacyConsentText?: string
+  submitButtonText?: string
 }
 
 interface FullInquiryModalProps {
@@ -74,6 +79,43 @@ export function FullInquiryModal({
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null)
   const [turnstileKey, setTurnstileKey] = useState(0)
+  
+  // Form config messages from form-config API
+  const [formMessages, setFormMessages] = useState<{
+    submitButtonText?: string
+    submittingText?: string
+    successMessage?: string
+    errorRequiredFields?: string
+    errorNetworkMessage?: string
+    errorCaptchaMessage?: string
+    privacyConsentText?: string
+  } | null>(null)
+  
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
+  const [isGloballyAccepted, setIsGloballyAccepted] = useState(false)
+  const STORAGE_KEY = 'busrom_privacy_consent'
+
+  // Check global consent status on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const accepted = localStorage.getItem(STORAGE_KEY) === 'true';
+      if (accepted) {
+        setPrivacyAccepted(true);
+        setIsGloballyAccepted(true);
+      }
+    }
+  }, []);
+
+  const handlePrivacyToggle = (val: boolean) => {
+    setPrivacyAccepted(val);
+    if (val) {
+      localStorage.setItem(STORAGE_KEY, 'true');
+      setIsGloballyAccepted(true);
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+      setIsGloballyAccepted(false);
+    }
+  };
 
   const inactivityTimerRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const beforeUnloadHandlerRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null)
@@ -102,6 +144,51 @@ export function FullInquiryModal({
     }
     fetchSiteKey()
   }, [])
+
+  // Fetch form config messages (submitButtonText, privacyConsentText, etc.)
+  useEffect(() => {
+    if (!configData?.name) return
+    const fetchFormMessages = async () => {
+      try {
+        const res = await fetch(`/api/form-config/${configData.name}?locale=${locale}`)
+        if (res.ok) {
+          const data = await res.json()
+          setFormMessages({
+            submitButtonText: data.submitButtonText,
+            submittingText: data.submittingText,
+            successMessage: data.successMessage,
+            errorRequiredFields: data.errorRequiredFields,
+            errorNetworkMessage: data.errorNetworkMessage,
+            errorCaptchaMessage: data.errorCaptchaMessage,
+            privacyConsentText: data.privacyConsentText,
+          })
+        }
+      } catch (error) {
+        console.error('Failed to fetch form messages:', error)
+      }
+    }
+    fetchFormMessages()
+  }, [configData?.name, locale])
+
+  // Get effective privacy text (prioritize fetched messages, fallback to props config)
+  const getLocalizedString = (val: any) => {
+    if (!val) return ""
+    if (typeof val === "string") return val
+    if (typeof val === "object") {
+      return val[locale] || val["en"] || ""
+    }
+    return ""
+  }
+
+  const effectivePrivacyText = formMessages?.privacyConsentText || getLocalizedString(configData?.privacyConsentText || configData?.data?.privacyConsentText || (formConfig as any)?.privacyConsentText)
+  const effectiveSubmitText = formMessages?.submitButtonText || getLocalizedString(configData?.submitButtonText || configData?.data?.submitButtonText || (formConfig as any)?.submitButtonText) || "Submit Inquiry"
+
+  // Debug log
+  useEffect(() => {
+    if (effectivePrivacyText && isOpen) {
+      console.log(`[FullInquiryModal] Privacy text found: "${effectivePrivacyText.substring(0, 20)}...", globally accepted: ${isGloballyAccepted}`)
+    }
+  }, [effectivePrivacyText, isGloballyAccepted, isOpen])
 
   // Handle Turnstile success - clear error if captcha error was showing
   const handleTurnstileSuccess = (token: string) => {
@@ -208,7 +295,6 @@ export function FullInquiryModal({
     const checkInactivity = () => {
       const now = Date.now()
       const timeSinceActivity = now - lastActivity
-
       if (timeSinceActivity >= AUTO_SUBMIT_TIMEOUT) {
         handleAutoSubmit()
       }
@@ -306,6 +392,11 @@ export function FullInquiryModal({
       newErrors._captcha = locale === 'zh' ? '请完成人机验证' : 'Please complete the captcha verification'
     }
 
+    // Validate Privacy Consent
+    if (effectivePrivacyText && !privacyAccepted) {
+      newErrors._privacy = locale === 'zh' ? '请阅读并同意隐私条款' : 'Please read and agree to the privacy policy'
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -323,6 +414,7 @@ export function FullInquiryModal({
           data: formData,
           locale,
           autoSubmitted: isAuto,
+          privacyAccepted,
           turnstileToken: isAuto ? undefined : turnstileToken, // Don't require token for auto-submit
         }),
       })
@@ -394,11 +486,6 @@ export function FullInquiryModal({
         return (
           <div className="space-y-3">
             {field.options?.map((option) => {
-              const isCustomize = option.value.toLowerCase().includes('customize') ||
-                                 option.value.toLowerCase().includes('custom') ||
-                                 option.value.toLowerCase() === 'others' ||
-                                 option.value.toLowerCase() === 'other'
-
               return (
                 <div key={option.value}>
                   <label className="flex items-center gap-3 cursor-pointer group">
@@ -422,11 +509,6 @@ export function FullInquiryModal({
         return (
           <div className="space-y-3">
             {field.options?.map((option) => {
-              const isCustomize = option.value.toLowerCase().includes('customize') ||
-                                 option.value.toLowerCase().includes('custom') ||
-                                 option.value.toLowerCase() === 'others' ||
-                                 option.value.toLowerCase() === 'other'
-
               return (
                 <div key={option.value}>
                   <label className="flex items-center gap-3 cursor-pointer group">
@@ -510,8 +592,8 @@ export function FullInquiryModal({
             </svg>
           </div>
           <h3 className="text-2xl font-anaheim font-extrabold text-brand-text-black mb-2">Thank You!</h3>
-          <p className="text-brand-text-main">
-            Your inquiry has been submitted successfully. We will get back to you as soon as possible.
+          <p className="text-brand-text-main whitespace-pre-line">
+            {formMessages?.successMessage || "Your inquiry has been submitted successfully. We will get back to you as soon as possible."}
           </p>
         </div>
       </div>
@@ -600,6 +682,26 @@ export function FullInquiryModal({
             </div>
           )}
 
+          {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
+          {effectivePrivacyText && !isGloballyAccepted && (
+            <div className="flex items-start gap-2 group cursor-pointer" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
+              <div className={cn(
+                "mt-0.5 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",
+                privacyAccepted ? "bg-brand-secondary border-brand-secondary" : "border-gray-300 bg-transparent"
+              )}>
+                {privacyAccepted && (
+                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+              <p className="text-xs leading-relaxed text-gray-500 text-left whitespace-pre-line select-none">
+                {effectivePrivacyText}
+              </p>
+            </div>
+          )}
+          {errors._privacy && <p className="mt-1 text-sm text-red-600 font-medium">{errors._privacy}</p>}
+
           <div className="flex gap-4 pt-4 border-t-2 border-brand-accent-border">
             <button
               type="button"
@@ -610,12 +712,17 @@ export function FullInquiryModal({
             </button>
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="flex-1 py-3 px-6 bg-brand-secondary text-white font-anaheim font-extrabold rounded-lg hover:bg-brand-secondary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+              disabled={isSubmitting || (!!effectivePrivacyText && !privacyAccepted)}
+              className={cn(
+                "flex-1 py-3 px-6 bg-brand-secondary text-white font-anaheim font-extrabold rounded-lg hover:bg-brand-secondary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg whitespace-pre-line h-auto leading-tight",
+                (!!effectivePrivacyText && !privacyAccepted) && "grayscale opacity-80"
+              )}
             >
-              {isSubmitting ? "Submitting..." : "Submit Inquiry"}
+              {isSubmitting ? (formMessages?.submittingText || "Submitting...") : effectiveSubmitText}
             </button>
           </div>
+
+          {/* Removed passive text in favor of checkbox above */}
 
           <p className="text-xs text-brand-text-main/70 text-center">
             Your inquiry will be automatically saved if you leave this page inactive for 5 minutes

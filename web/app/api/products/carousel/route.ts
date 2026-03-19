@@ -123,6 +123,13 @@ function transformProduct(product: any) {
           name: typeof product.series === 'string' ? '' : product.series.name,
         }
       : null,
+    category: product.category
+      ? {
+          id: typeof product.category === 'string' ? product.category : product.category.id,
+          slug: typeof product.category === 'string' ? '' : product.category.slug,
+          name: typeof product.category === 'string' ? '' : product.category.name,
+        }
+      : null,
     productAttributes: {
       highlights: extractHighlights(product.productAttributes)
     },
@@ -147,6 +154,7 @@ interface CarouselItem {
   product?: string
   productSeries?: string
   showName: boolean
+  showCategory: boolean
   showDescription: boolean
   showButton: boolean
   showHighlights: boolean
@@ -264,6 +272,7 @@ export async function POST(request: NextRequest) {
             ...transformProduct(product),
             _carouselItem: {
               showName: item.showName,
+              showCategory: item.showCategory,
               showDescription: item.showDescription,
               showButton: item.showButton,
               showHighlights: item.showHighlights,

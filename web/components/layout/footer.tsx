@@ -74,7 +74,7 @@ function SuccessModal({
         </div>
 
         {/* 消息内容 */}
-        <p className="text-brand-text-main font-anaheim text-lg font-medium leading-relaxed flex-1">
+        <p className="text-brand-text-main font-anaheim text-lg font-medium leading-relaxed flex-1 whitespace-pre-line">
           {message}
         </p>
 
@@ -107,7 +107,7 @@ const formInputClasses = `
 const formButtonClasses = `
   w-1/3 rounded-full bg-brand-footer-button-bg
   text-brand-footer-button-text font-anaheim font-semibold
-  hover:bg-brand-footer-button-bg/90 pt-2 pb-2 mt-8
+  hover:bg-brand-footer-button-bg/90
 `;
 
 // Responsive px based on 1920px design width
@@ -136,10 +136,35 @@ export default function Footer({ locale, showForm = true }: Props) {
     successMessage?: string;
     submitButtonText?: string;
     submittingText?: string;
+    privacyConsentText?: string;
   } | null>(null);
 
-  // Footer API data (for non-home pages)
   const [footerData, setFooterData] = useState<FooterApiData | null>(null);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [isGloballyAccepted, setIsGloballyAccepted] = useState(false);
+  const STORAGE_KEY = 'busrom_privacy_consent';
+
+  // Check global consent status on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const accepted = localStorage.getItem(STORAGE_KEY) === 'true';
+      if (accepted) {
+        setPrivacyAccepted(true);
+        setIsGloballyAccepted(true);
+      }
+    }
+  }, []);
+
+  const handlePrivacyToggle = (val: boolean) => {
+    setPrivacyAccepted(val);
+    if (val) {
+      localStorage.setItem(STORAGE_KEY, 'true');
+      setIsGloballyAccepted(true);
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+      setIsGloballyAccepted(false);
+    }
+  };
 
   // Fetch footer data from API (always, for both home and subpages)
   useEffect(() => {
@@ -218,6 +243,13 @@ export default function Footer({ locale, showForm = true }: Props) {
       return;
     }
 
+    // Validate Privacy Consent
+    if (formConfig?.privacyConsentText && !privacyAccepted) {
+      setSubmitStatus('error');
+      setErrorMessage(locale === 'zh' ? '请查看并同意隐私条款' : 'Please agree to the privacy policy');
+      return;
+    }
+
     // Validate Turnstile if enabled
     if (turnstileSiteKey && !turnstileToken) {
       setSubmitStatus('error');
@@ -237,6 +269,7 @@ export default function Footer({ locale, showForm = true }: Props) {
           formName: formConfig?.name || 'footer-form',
           data: formData,
           locale,
+          privacyAccepted,
           turnstileToken,
         }),
       });
@@ -317,7 +350,8 @@ export default function Footer({ locale, showForm = true }: Props) {
                   alt="Busrom Logo"
                   width={345}
                   height={90}
-                  className="object-contain w-[140px] lg:w-[160px] xl:w-[180px] h-auto"
+                  className="object-contain w-[140px] lg:w-[160px] xl:w-[180px]"
+                  style={{ height: "auto" }}
                 />
               </div>
 
@@ -404,7 +438,7 @@ export default function Footer({ locale, showForm = true }: Props) {
                 </span>
               </h3>
 
-              <form className="flex flex-col gap-6 lg:gap-8" onSubmit={handleSubmit}>
+              <form className="flex flex-col gap-4 lg:gap-5" onSubmit={handleSubmit}>
                 {/* Name */}
                 <div>
                   <Input
@@ -463,18 +497,39 @@ export default function Footer({ locale, showForm = true }: Props) {
                   <div className="text-red-400 text-sm">{errorMessage}</div>
                 )}
 
-                {/* Submit Button */}
-                <div className="mt-6 lg:mt-8">
+                {/* Submit Button & Privacy */}
+                <div className="mt-4 flex flex-col gap-3">
+                  {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
+                  {formConfig?.privacyConsentText && !isGloballyAccepted && (
+                    <div className="flex items-start gap-3 cursor-pointer group" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
+                      <div className={cn(
+                        "mt-1 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",
+                        privacyAccepted ? "bg-brand-footer-button-bg border-brand-footer-button-bg" : "border-white/30 bg-transparent"
+                      )}>
+                        {privacyAccepted && (
+                          <svg className="w-3 h-3 text-brand-footer-button-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                      <p className="text-[10px] sm:text-[11px] leading-relaxed text-white/60 max-w-[450px] whitespace-pre-line select-none">
+                        {formConfig.privacyConsentText}
+                      </p>
+                    </div>
+                  )}
+
                   <Button
                     type="submit"
                     className={cn(
                       formButtonClasses,
                       "text-base md:text-lg lg:text-xl xl:text-2xl font-semibold",
-                      "px-20 md:px-28 lg:px-36",
-                      "h-12 md:h-14 lg:h-16",
-                      "rounded-full"
+                      "px-10 md:px-14 lg:px-20", // Reduced horizontal padding to allow more space for text
+                      "w-auto min-w-[200px]", // Changed w-1/3 to w-auto to prevent narrow buttons
+                      "h-auto py-3 leading-tight whitespace-pre-line", // Dynamic height
+                      "rounded-full",
+                      (!!formConfig?.privacyConsentText && !privacyAccepted) && "opacity-50 grayscale cursor-not-allowed"
                     )}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || (!!formConfig?.privacyConsentText && !privacyAccepted)}
                   >
                     {isSubmitting
                       ? (formConfig?.submittingText || (locale === 'zh' ? '提交中...' : 'Submitting...'))
@@ -511,6 +566,7 @@ export default function Footer({ locale, showForm = true }: Props) {
               width={80}
               height={24}
               className="object-contain"
+              style={{ width: "auto", height: "auto" }}
               unoptimized={!!siteLogoUrl}
             />
           </div>
@@ -536,6 +592,7 @@ export default function Footer({ locale, showForm = true }: Props) {
                 width={120}
                 height={32}
                 className="object-contain"
+                style={{ height: "auto" }}
               />
             </div>
             <ul className="space-y-2 text-sm font-anaheim">
@@ -629,6 +686,7 @@ export default function Footer({ locale, showForm = true }: Props) {
               width={60}
               height={18}
               className="object-contain"
+              style={{ width: "auto", height: "auto" }}
               unoptimized={!!siteLogoUrl}
             />
             {footerData.copyrightText && (

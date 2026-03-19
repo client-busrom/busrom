@@ -109,68 +109,34 @@ function collectMediaIds(node: any, ids: Set<string>): void {
     return
   }
 
-  // Check data fields for media references
+  // 1. Check known single image fields at any level
+  const knownFields = ['image', 'media', 'mediaIcon', 'backgroundImage', 'mediaMobile']
+  knownFields.forEach(field => {
+    const id = extractMediaId(node[field])
+    if (id) ids.add(id)
+  })
+
+  // 2. Check visual.image pattern (AttributeItem)
+  if (node.visual?.image) {
+    const id = extractMediaId(node.visual.image)
+    if (id) ids.add(id)
+  }
+
+  // 3. Check data blocks (Lexical)
   if (node.data && typeof node.data === 'object') {
-    const data = node.data
-
-    // Single image fields
-    const singleFields = ['image', 'mediaIcon', 'backgroundImage']
-    singleFields.forEach(field => {
-      const id = extractMediaId(data[field])
-      if (id) ids.add(id)
-    })
-
-    // Array fields with image/media
-    if (Array.isArray(data.images)) {
-      data.images.forEach((item: any) => {
-        const id = extractMediaId(item?.image)
-        if (id) ids.add(id)
-      })
-    }
-
-    if (Array.isArray(data.items)) {
-      data.items.forEach((item: any) => {
-        const mediaId = extractMediaId(item?.media)
-        const iconId = extractMediaId(item?.mediaIcon)
-        if (mediaId) ids.add(mediaId)
-        if (iconId) ids.add(iconId)
-      })
-    }
-
-    if (Array.isArray(data.slides)) {
-      data.slides.forEach((slide: any) => {
-        const id = extractMediaId(slide?.image)
-        if (id) ids.add(id)
-      })
-    }
+    collectMediaIds(node.data, ids)
   }
 
-  // Recursively process nested structures
-  if (node.root) collectMediaIds(node.root, ids)
-  if (node.children) collectMediaIds(node.children, ids)
-  if (node.fields) {
-    Object.values(node.fields).forEach(value => collectMediaIds(value, ids))
-  }
-
-  // Handle JSON fields (AttributeItem[] or SpecificationGroup[])
-  if (Array.isArray(node)) {
-    node.forEach(item => {
-      // AttributeItem pattern
-      if (item?.visual?.image) {
-        const id = extractMediaId(item.visual.image)
-        if (id) ids.add(id)
-      }
-      // SpecificationItem/SingleImage pattern
-      if (item?.image) {
-        const id = extractMediaId(item.image)
-        if (id) ids.add(id)
-      }
-      // Recursive check for nested items (like SpecificationGroup.items)
-      if (item && typeof item === 'object') {
-        Object.values(item).forEach(val => collectMediaIds(val, ids))
-      }
-    })
-  }
+  // 4. Recursive scan for all other object properties
+  Object.keys(node).forEach(key => {
+    // Skip already processed fields and standard non-media fields
+    if (knownFields.includes(key) || key === 'data' || key === 'visual') return
+    
+    const value = node[key]
+    if (value && typeof value === 'object') {
+      collectMediaIds(value, ids)
+    }
+  })
 }
 
 /**
@@ -211,100 +177,36 @@ function populateMediaFromCache(node: any, cache: Map<string, any>): any {
     return node.map(item => populateMediaFromCache(item, cache))
   }
 
+  // Create a new object to avoid mutating original (though it's usually already a copy)
   const populated = { ...node }
 
-  if (populated.data && typeof populated.data === 'object') {
-    populated.data = { ...populated.data }
-
-    // Single image fields
-    const singleFields = ['image', 'mediaIcon', 'backgroundImage']
-    singleFields.forEach(field => {
-      const id = extractMediaId(populated.data[field])
-      if (id && cache.has(id)) {
-        populated.data[field] = cache.get(id)
-      }
-    })
-
-    // Images array
-    if (Array.isArray(populated.data.images)) {
-      populated.data.images = populated.data.images.map((item: any) => {
-        if (!item || typeof item !== 'object') return item
-        const id = extractMediaId(item.image)
-        return id && cache.has(id) ? { ...item, image: cache.get(id) } : item
-      })
+  // 1. Check known single image fields
+  const knownFields = ['image', 'media', 'mediaIcon', 'backgroundImage', 'mediaMobile']
+  knownFields.forEach(field => {
+    const id = extractMediaId(populated[field])
+    if (id && cache.has(id)) {
+      populated[field] = cache.get(id)
     }
+  })
 
-    // Items array (carousel/marquee)
-    if (Array.isArray(populated.data.items)) {
-      populated.data.items = populated.data.items.map((item: any) => {
-        if (!item || typeof item !== 'object') return item
-        const result = { ...item }
-        const mediaId = extractMediaId(item.media)
-        const iconId = extractMediaId(item.mediaIcon)
-        if (mediaId && cache.has(mediaId)) result.media = cache.get(mediaId)
-        if (iconId && cache.has(iconId)) result.mediaIcon = cache.get(iconId)
-        return result
-      })
-    }
-
-    // Slides array
-    if (Array.isArray(populated.data.slides)) {
-      populated.data.slides = populated.data.slides.map((slide: any) => {
-        if (!slide || typeof slide !== 'object') return slide
-        const id = extractMediaId(slide.image)
-        return id && cache.has(id) ? { ...slide, image: cache.get(id) } : slide
-      })
+  // 2. Check visual.image pattern (AttributeItem)
+  if (populated.visual?.image) {
+    const id = extractMediaId(populated.visual.image)
+    if (id && cache.has(id)) {
+      populated.visual = { ...populated.visual, image: cache.get(id) }
     }
   }
 
-  // Recursively process nested structures
-  if (populated.root) {
-    populated.root = populateMediaFromCache(populated.root, cache)
-  }
-  if (populated.children) {
-    populated.children = populateMediaFromCache(populated.children, cache)
-  }
-  if (populated.fields) {
-    populated.fields = { ...populated.fields }
-    for (const [key, value] of Object.entries(populated.fields)) {
-      if (value && typeof value === 'object') {
-        populated.fields[key] = populateMediaFromCache(value, cache)
-      }
+  // 3. Recursive scan for all other object properties
+  Object.keys(populated).forEach(key => {
+    // Skip already processed fields
+    if (knownFields.includes(key) || key === 'visual') return
+    
+    const value = populated[key]
+    if (value && typeof value === 'object') {
+      populated[key] = populateMediaFromCache(value, cache)
     }
-  }
-
-  // Handle JSON array fields
-  if (Array.isArray(populated)) {
-    return populated.map(item => {
-      if (!item || typeof item !== 'object') return item
-      const newItem = { ...item }
-      
-      // AttributeItem pattern
-      if (newItem.visual?.image) {
-        const id = extractMediaId(newItem.visual.image)
-        if (id && cache.has(id)) {
-          newItem.visual = { ...newItem.visual, image: cache.get(id) }
-        }
-      }
-      
-      // SpecificationItem/SingleImage pattern
-      if (newItem.image) {
-        const id = extractMediaId(newItem.image)
-        if (id && cache.has(id)) {
-          newItem.image = cache.get(id)
-        }
-      }
-
-      // Recurse into nested objects/arrays
-      for (const [key, val] of Object.entries(newItem)) {
-        if (val && typeof val === 'object' && key !== 'visual' && key !== 'image') {
-          (newItem as any)[key] = populateMediaFromCache(val, cache)
-        }
-      }
-      
-      return newItem
-    })
-  }
+  })
 
   return populated
 }

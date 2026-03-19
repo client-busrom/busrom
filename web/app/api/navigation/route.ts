@@ -30,7 +30,7 @@ async function getImageFromMediaTags(
   mediaTags: Array<{ id: string; name: string }>,
   locale: string,
   menuId: string
-): Promise<{ url: string; filename: string } | null> {
+): Promise<{ url: string; filename: string; sizes?: any } | null> {
   if (!mediaTags || mediaTags.length === 0) return null;
 
   try {
@@ -60,6 +60,7 @@ async function getImageFromMediaTags(
       return {
         url: media.url,
         filename: media.filename,
+        sizes: media.sizes || {}, // Include sizes for optimized frontend loading
       };
     }
   } catch (error) {

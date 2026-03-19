@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Upload, ChevronDown, Check } from "lucide-react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
+import { cn } from "@/lib/utils"
+import { PhoneInput } from "@/components/ui/PhoneInput"
 
 interface CtaSectionProps {
   title?: string
@@ -108,22 +110,62 @@ function CustomDropdown({ label, options, placeholder, value, onChange }: any) {
  * Refined with Double-Layer Ghosting Effect and Lenis-compatible Dropdown.
  */
 export function CtaSection({ title, subtitle, image, formConfig }: CtaSectionProps) {
-  const SECTION_HEIGHT = 922
+  const [formState, setFormState] = useState<any>({
+    'project-type': '',
+    'primary-requirement': '',
+    'whatsapp': ''
+  })
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
+  const [isGloballyAccepted, setIsGloballyAccepted] = useState(false)
+  const STORAGE_KEY = 'busrom_privacy_consent'
+
+  const showPrivacy = formConfig?.privacyConsentText && !isGloballyAccepted
+  const SECTION_HEIGHT = showPrivacy ? 1100 : 922
   const IMAGE_HEIGHT = 800
   const IMAGE_WIDTH = 584.5
   const BG_TOP_OFFSET_SCALED = 180
 
-  const [formState, setFormState] = useState<any>({
-    'project-type': '',
-    'primary-requirement': ''
-  })
+  // Check global consent status on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const consent = localStorage.getItem(STORAGE_KEY)
+      if (consent === 'true') {
+        setIsGloballyAccepted(true)
+        setPrivacyAccepted(true)
+      }
+    }
+  }, [])
+
+  // Sync with global storage when accepted in this form
+  const handlePrivacyToggle = (checked: boolean) => {
+    setPrivacyAccepted(checked)
+    if (checked && typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, 'true')
+      setIsGloballyAccepted(true) // Update locally to trigger height change
+      // Trigger a storage event for other components to update
+      window.dispatchEvent(new Event('storage'))
+    }
+  }
+
+  // Listen for storage events from other components
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const consent = localStorage.getItem(STORAGE_KEY)
+      if (consent === 'true') {
+        setIsGloballyAccepted(true)
+        setPrivacyAccepted(true)
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
 
   const fields = formConfig?.fields || []
   const getField = (name: string) => fields.find((f: any) => f.fieldName === name)
 
   return (
     <section 
-      className="relative w-full overflow-hidden flex flex-col items-center bg-transparent z-10"
+      className="relative w-full overflow-hidden flex flex-col items-center bg-transparent z-10 transition-[height] duration-500 ease-in-out"
       style={{ height: `${SECTION_HEIGHT}px` }}
     >
       <style jsx global>{`
@@ -189,14 +231,14 @@ export function CtaSection({ title, subtitle, image, formConfig }: CtaSectionPro
 
       {/* 3. Scaled Content Container (Form Area) */}
       <div 
-        className="relative z-20 flex-shrink-0 origin-top flex items-start overflow-visible"
+        className="relative z-20 flex-shrink-0 origin-top flex items-start overflow-visible transition-[height] duration-500 ease-in-out"
         style={{ 
           width: `1920px`, 
-          height: `1357px`, 
+          height: `${Math.ceil(SECTION_HEIGHT / 0.7)}px`, 
           transform: `scale(0.7)`,
         }}
       >
-        <div className="pl-[153px] w-[1100px] pt-[380px]">
+        <div className="pl-[153px] w-[1100px] pt-[350px]">
            <div className="mb-10">
               <h2 className="text-[60px] font-extrabold text-[#FFF28E] leading-[1.1] mb-6 uppercase tracking-tighter" style={{ fontFamily: "var(--font-anaheim)" }}>
                 {title || "Get A Complete Solution"}
@@ -223,10 +265,16 @@ export function CtaSection({ title, subtitle, image, formConfig }: CtaSectionPro
                 placeholder={getField('email')?.placeholder || "Your Email"} 
                 className="h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40" 
               />
-              <input 
-                type="text" 
-                placeholder={getField('whatsapp')?.placeholder || "Your Whatsapp"} 
-                className="h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40" 
+              <PhoneInput
+                id="whatsapp"
+                value={formState['whatsapp'] || ''}
+                onChange={(phone) => setFormState({...formState, 'whatsapp': phone})}
+                placeholder={getField('whatsapp')?.placeholder || "Your Whatsapp"}
+                className="!h-[63px] !bg-black/30 !border-white/20 !rounded-[15px] !w-full"
+                buttonClassName="!bg-transparent !border-r-0 !text-white hover:!bg-white/10 !rounded-[15px] !px-4 !h-full"
+                inputClassName="!bg-transparent !text-white !placeholder-white/40 !font-medium !text-[22px] !h-full !px-2"
+                dialCodeClassName="!text-white !text-[20px]"
+                containerClassName="!h-[63px]"
               />
 
               <div className="relative z-[502]">
@@ -263,21 +311,48 @@ export function CtaSection({ title, subtitle, image, formConfig }: CtaSectionPro
               </div>
            </div>
 
-           <div className="mt-10 flex items-center gap-14">
+           <div className="mt-8 flex flex-col gap-6">
+               {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
+               {formConfig?.privacyConsentText && !isGloballyAccepted && (
+                 <div className="flex items-start gap-4 cursor-pointer group" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
+                   <div className={cn(
+                     "mt-1 flex-shrink-0 w-6 h-6 rounded border flex items-center justify-center transition-all",
+                     privacyAccepted ? "bg-[#B2A224] border-[#B2A224]" : "border-white/30 bg-black/30"
+                   )}>
+                     {privacyAccepted && (
+                       <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
+                       </svg>
+                     )}
+                   </div>
+                   <p className="text-[18px] leading-relaxed text-white/70 max-w-[700px] whitespace-pre-line select-none">
+                     {formConfig.privacyConsentText}
+                   </p>
+                 </div>
+               )}
+
+            <div className="flex flex-col gap-8">
+              <button className="flex items-center gap-4 text-white hover:text-[#FFF28E] transition-colors w-fit">
+                 <Upload className="w-8 h-8" />
+                 <span className="text-[24px] font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-anaheim)" }}>
+                    {getField('file')?.label || "Upload File"}
+                 </span>
+              </button>
+
               <motion.button 
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-[419px] h-[83px] bg-[#B2A224] text-white text-[40px] font-black rounded-[63px] shadow-2xl transition-all"
+                disabled={(!!formConfig?.privacyConsentText && !privacyAccepted)}
+                className={cn(
+                  "w-[419px] bg-[#B2A224] text-white text-[40px] font-black rounded-[63px] shadow-2xl transition-all",
+                  "min-h-[83px] h-auto py-4 whitespace-pre-line leading-tight px-8",
+                  (!!formConfig?.privacyConsentText && !privacyAccepted) && "grayscale opacity-80 cursor-not-allowed"
+                )}
                 style={{ fontFamily: "var(--font-anaheim)" }}
               >
                 {formConfig?.submitButtonText || "Send Inquiry"}
               </motion.button>
-              <button className="flex items-center gap-4 text-white hover:text-[#FFF28E] transition-colors">
-                 <Upload className="w-8 h-8" />
-                 <span className="text-[20px] font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-anaheim)" }}>
-                    {getField('file')?.label || "Upload File"}
-                 </span>
-              </button>
+           </div>
            </div>
         </div>
       </div>

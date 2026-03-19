@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import type { MainFormData } from "@/lib/content-data";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { Turnstile } from "@/components/ui/turnstile";
+import { PhoneInput } from "@/components/ui/PhoneInput";
 
 // lg 断点 (1024px) - 与 Tailwind 一致
 const LG_BREAKPOINT = 1024;
@@ -83,6 +84,7 @@ interface FormConfig {
   errorRequiredFields: string;
   errorNetworkMessage: string;
   errorCaptchaMessage: string;
+  privacyConsentText?: string;
 }
 
 // Turnstile 配置类型
@@ -151,9 +153,33 @@ export default function MainForm({ data, locale = "en" }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   // Turnstile 验证码状态
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
+  const STORAGE_KEY = 'busrom_privacy_consent';
+  const [isGloballyAccepted, setIsGloballyAccepted] = useState(false);
+
+  // 挂载时检查全局同意状态
+  useEffect(() => {
+    const accepted = localStorage.getItem(STORAGE_KEY) === 'true';
+    if (accepted) {
+      setPrivacyAccepted(true);
+      setIsGloballyAccepted(true);
+    }
+  }, []);
+
+  const handlePrivacyToggle = (val: boolean) => {
+    setPrivacyAccepted(val);
+    if (val) {
+      localStorage.setItem(STORAGE_KEY, 'true');
+      setIsGloballyAccepted(true);
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+      setIsGloballyAccepted(false);
+    }
+  };
   const [submissionCount, setSubmissionCount] = useState(0);
 
   // 是否需要显示验证码
@@ -248,6 +274,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
           formName: formConfig?.name || "main-form",
           data: formData,
           locale,
+          privacyAccepted,
           turnstileToken: shouldShowCaptcha ? turnstileToken : undefined,
         }),
       });
@@ -438,10 +465,10 @@ export default function MainForm({ data, locale = "en" }: Props) {
             <div className={cardContainerClass}>
               {/* 提交成功状态 */}
               {submitted ? (
-                <div className="text-center py-8">
-                  <div className="text-4xl mb-4">✓</div>
-                  <p className="text-brand-form-input-text font-anaheim">
-                    {formConfig?.successMessage || "Submitted successfully! We will contact you soon."}
+                <div className="text-center py-12">
+                  <div className="text-4xl mb-4 text-white">✓</div>
+                  <p className="text-white text-lg font-anaheim whitespace-pre-line">
+                    {formConfig?.successMessage || "Your message has been sent successfully!"}
                   </p>
                 </div>
               ) : (
@@ -497,14 +524,18 @@ export default function MainForm({ data, locale = "en" }: Props) {
                     >
                       {getFieldLabel("whatsapp", data.placeholderWhatsapp)} {isFieldRequired("whatsapp") && <span className="text-red-400">*</span>}
                     </Label>
-                    <Input
-                      type="tel"
+                    <PhoneInput
                       id="whatsapp"
                       value={formData.whatsapp}
-                      onChange={(e) => handleInputChange("whatsapp", e.target.value)}
-                      className={formInputClasses}
-                      style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
+                      onChange={(phone) => handleInputChange("whatsapp", phone)}
+                      placeholder={getFieldPlaceholder("whatsapp", data.placeholderWhatsapp)}
                       required={isFieldRequired("whatsapp")}
+                      disabled={submitting}
+                      className="!bg-transparent !border-0 !border-b !border-white !rounded-none !h-[45px]"
+                      buttonClassName="!bg-transparent !border-0 !border-r !border-white/20 !text-white hover:!bg-white/5 !rounded-none !px-0 !mr-2"
+                      inputClassName="!bg-transparent !text-brand-form-input-text !placeholder-white/50 !font-anaheim !font-bold !text-base"
+                      dialCodeClassName="!text-white !text-base"
+                      containerClassName="mt-1"
                     />
                   </div>
                   {/* Company */}
@@ -567,16 +598,38 @@ export default function MainForm({ data, locale = "en" }: Props) {
                     </div>
                   )}
 
+                  {/* 同意隐私勾选框 - 仅在本地没记号时展示 */}
+                  {formConfig?.privacyConsentText && !isGloballyAccepted && (
+                    <div className="flex items-start gap-2 mb-4 group cursor-pointer" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
+                      <div className={cn(
+                        "mt-1 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",
+                        privacyAccepted ? "bg-brand-form-button-bg border-brand-form-button-bg" : "border-white/50 bg-transparent"
+                      )}>
+                        {privacyAccepted && (
+                          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                      <p className="text-[10px] leading-tight text-white/70 text-left whitespace-pre-line select-none">
+                        {formConfig.privacyConsentText}
+                      </p>
+                    </div>
+                  )}
+
                   {/* Submit Button */}
-                  <div style={{ marginTop: "clamp(20px, 2.1vw, 40px)" }}>
+                  <div style={{ marginTop: "clamp(10px, 1vw, 20px)" }}>
                     <Button
                       type="submit"
-                      disabled={submitting || (shouldShowCaptcha && !turnstileToken)}
-                      className={cn(formButtonClasses, "disabled:opacity-50 disabled:cursor-not-allowed")}
+                      disabled={submitting || (shouldShowCaptcha && !turnstileToken) || (!!formConfig?.privacyConsentText && !privacyAccepted)}
+                      className={cn(formButtonClasses, "disabled:opacity-50 disabled:cursor-not-allowed whitespace-pre-line")}
                       style={{
                         width: "clamp(165px, 17.2vw, 331px)",
-                        height: "clamp(34px, 3.5vw, 68px)",
-                        fontSize: "clamp(16px, 1.67vw, 32px)",
+                        minHeight: "clamp(34px, 3.5vw, 68px)",
+                        padding: "8px 20px",
+                        fontSize: "clamp(14px, 1.45vw, 24px)", 
+                        lineHeight: "1.2",
+                        height: "auto",
                       }}
                     >
                       {submitting ? (formConfig?.submittingText || "Submitting...") : (formConfig?.submitButtonText || data.buttonText || "Submit")}

@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { Turnstile } from "@/components/ui/turnstile"
 import type { Locale } from "@/i18n.config"
+import { PhoneInput } from "@/components/ui/PhoneInput"
 
 // 设计稿基准尺寸 1920，缩放 70%
 const DESIGN_WIDTH = 1920
@@ -51,6 +52,7 @@ interface FormConfig {
   successMessage?: string
   errorMessage?: string
   fields?: FormField[] | Record<string, FormField[]>
+  privacyConsentText?: string
   data?: any
 }
 
@@ -77,11 +79,69 @@ export function OemOdmContactForm({
     : (rawFields?.[locale] || rawFields?.["en"] || [])
   const sortedFields = [...fields].sort((a, b) => (a.order || 0) - (b.order || 0))
 
+  // Helper function to extract localized string if it's an object
+  const getLocalizedString = (val: any) => {
+    if (!val) return ""
+    if (typeof val === "string") return val
+    if (typeof val === "object") {
+      return val[locale] || val["en"] || ""
+    }
+    return ""
+  }
+
+  const privacyText = getLocalizedString(configData?.privacyConsentText)
+  const submitText = getLocalizedString(configData?.submitButtonText || configData?.data?.submitButtonText) || "Submit Inquiry"
+
   // 表单数据状态
   const [formData, setFormData] = useState<Record<string, any>>({})
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
+  const [isGloballyAccepted, setIsGloballyAccepted] = useState(false)
+  const STORAGE_KEY = 'busrom_privacy_consent'
+
+  // Check global consent status on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const consent = localStorage.getItem(STORAGE_KEY)
+      if (consent === 'true') {
+        setIsGloballyAccepted(true)
+        setPrivacyAccepted(true)
+      }
+    }
+  }, [])
+
+  // Sync with global storage when accepted in this form
+  const handlePrivacyToggle = (checked: boolean) => {
+    setPrivacyAccepted(checked)
+    if (checked && typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, 'true')
+      setIsGloballyAccepted(true)
+      // Trigger a storage event for other components to update
+      window.dispatchEvent(new Event('storage'))
+    }
+  }
+
+  // Listen for storage events from other components
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const consent = localStorage.getItem(STORAGE_KEY)
+      if (consent === 'true') {
+        setIsGloballyAccepted(true)
+        setPrivacyAccepted(true)
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
+
+  // Check if we need to show privacy text to determine layout spacing
+  const hasPrivacyText = !!privacyText && !isGloballyAccepted
+  const containerHeight = hasPrivacyText ? 1742 : 1592
+  const innerHeight = hasPrivacyText ? 1725 : 1575
+  const captchaTop = hasPrivacyText ? 1480 : 1350
+  const submitTop = hasPrivacyText ? 1500 : 1358
 
   // 文件上传
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
@@ -288,11 +348,11 @@ export function OemOdmContactForm({
 
   return (
     <section
-      className="relative w-full overflow-hidden"
+      className="relative w-full overflow-hidden transition-all duration-500 ease-in-out"
       style={{ ["--rpx-contact-form" as string]: `calc(100vw / ${DESIGN_WIDTH})` }}
     >
       {/* ========== PC端布局 ========== */}
-      <div className="hidden md:block relative w-full" style={{ height: rpx(1592) }}>
+      <div className="hidden md:block relative w-full transition-all duration-500 ease-in-out" style={{ height: rpx(containerHeight) }}>
         {/* 居中容器 */}
         <div
           className="absolute left-1/2"
@@ -300,12 +360,12 @@ export function OemOdmContactForm({
         >
           {/* 白色背景卡片 */}
           <div
-            className="absolute"
+            className="absolute transition-all duration-500 ease-in-out"
             style={{
               left: rpx(24),
               top: rpx(17),
               width: rpx(1860),
-              height: rpx(1575),
+              height: rpx(innerHeight),
               backgroundColor: "#FFFFFF",
               borderRadius: rpx(30),
               border: "1px solid #cfcaa2",
@@ -554,21 +614,20 @@ export function OemOdmContactForm({
                 backgroundColor: "#F3F1EA",
                 borderRadius: rpx(15),
                 border: "1px solid rgba(255, 255, 255, 0.34)",
+                overflow: 'visible'
               }}
             >
-              <input
-                type="tel"
+              <PhoneInput
+                id={textFields[3]?.fieldName}
                 value={formData[textFields[3]?.fieldName] || ''}
-                onChange={(e) => handleChange(textFields[3]?.fieldName, e.target.value)}
-                className="w-full h-full font-anaheim font-semibold outline-none bg-transparent"
-                style={{
-                  paddingLeft: rpx(29),
-                  paddingRight: rpx(20),
-                  fontSize: rpx(24),
-                  color: "#756F3F",
-                }}
+                onChange={(phone) => handleChange(textFields[3]?.fieldName, phone)}
                 placeholder={textFields[3]?.placeholder || textFields[3]?.label || "Your Whatsapp"}
                 disabled={submitting}
+                className="!bg-transparent !border-none !h-full !rounded-none"
+                buttonClassName="!bg-transparent !border-r-0 !text-[#756F3F] hover:!bg-black/5 !rounded-none !px-4 !h-full"
+                inputClassName="!bg-transparent !text-[#756F3F] !placeholder-[#756F3F]/50 !font-anaheim !font-semibold !text-[1.25vw] !h-full"
+                dialCodeClassName="!text-[#756F3F] !text-[1.25vw]"
+                containerClassName="!h-full"
               />
             </div>
 
@@ -805,10 +864,10 @@ export function OemOdmContactForm({
             {/* Turnstile 验证码 */}
             {turnstileSiteKey && (
               <div
-                className="absolute"
+                className="absolute transition-all duration-500 ease-in-out"
                 style={{
                   left: rpx(127),
-                  top: rpx(1350),
+                  top: rpx(captchaTop),
                 }}
               >
                 <Turnstile
@@ -823,13 +882,54 @@ export function OemOdmContactForm({
               </div>
             )}
 
+            {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
+            {privacyText && !isGloballyAccepted && (
+              <div
+                className="absolute flex items-start gap-4 group cursor-pointer"
+                style={{
+                  left: rpx(450),
+                  top: rpx(1280),
+                  width: rpx(600),
+                }}
+                onClick={() => handlePrivacyToggle(!privacyAccepted)}
+              >
+                <div
+                  className={`flex-shrink-0 border flex items-center justify-center transition-all ${
+                    privacyAccepted ? "bg-[#756F3F] border-[#756F3F]" : "border-[#756F3F]/30 bg-transparent"
+                  }`}
+                  style={{
+                    marginTop: rpx(5),
+                    width: rpx(24),
+                    height: rpx(24),
+                    borderRadius: rpx(4),
+                  }}
+                >
+                  {privacyAccepted && (
+                    <svg style={{ width: rpx(16), height: rpx(16) }} className="text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+                <p
+                  className="font-anaheim text-left select-none whitespace-pre-line"
+                  style={{
+                    fontSize: rpx(18),
+                    lineHeight: rpx(24),
+                    color: "#756F3F",
+                  }}
+                >
+                  {privacyText}
+                </p>
+              </div>
+            )}
+
             {/* 错误提示 */}
             {error && (
               <div
-                className="absolute font-anaheim text-red-600"
+                className="absolute font-anaheim text-red-600 transition-all duration-500 ease-in-out"
                 style={{
                   left: rpx(400),
-                  top: rpx(1350),
+                  top: rpx(captchaTop),
                   fontSize: rpx(16),
                 }}
               >
@@ -840,22 +940,30 @@ export function OemOdmContactForm({
             {/* 提交按钮 */}
             <motion.button
               type="submit"
-              disabled={submitting || !!(turnstileSiteKey && !turnstileToken)}
-              className="absolute flex items-center justify-center disabled:opacity-50"
+              disabled={submitting || (!!formConfig?.privacyConsentText && !privacyAccepted)}
+              className={`absolute flex items-center justify-center disabled:opacity-50 transition-all duration-500 ease-in-out ${
+                (!!formConfig?.privacyConsentText && !privacyAccepted) ? "grayscale opacity-80" : ""
+              }`}
               style={{
                 left: rpx(450),
-                top: rpx(1358),
+                top: rpx(submitTop),
                 width: rpx(560),
-                height: rpx(113),
-                backgroundColor: "#756F3F",
+                minHeight: rpx(113),
+                height: "auto",
+                paddingTop: rpx(10),
+                paddingBottom: rpx(10),
                 borderRadius: rpx(63),
+                backgroundColor: "#756F3F",
               }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
               <span
-                className="font-anaheim font-semibold text-white"
-                style={{ fontSize: rpx(48) }}
+                className="font-anaheim font-semibold text-white text-center whitespace-pre-line"
+                style={{ 
+                  fontSize: rpx(48),
+                  lineHeight: rpx(52),
+                }}
               >
                 {submitting ? "Submitting..." : (configData?.submitButtonText || "Send Inquiry")}
               </span>
@@ -904,18 +1012,40 @@ export function OemOdmContactForm({
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {/* 文本输入框 */}
-            {textFields.map(field => (
-              <input
-                key={field.fieldName}
-                type={field.fieldType === 'email' ? 'email' : field.fieldType === 'tel' || field.fieldType === 'phone' ? 'tel' : 'text'}
-                value={formData[field.fieldName] || ''}
-                onChange={(e) => handleChange(field.fieldName, e.target.value)}
-                className="w-full h-12 font-anaheim font-semibold outline-none px-4 rounded-lg"
-                style={{ backgroundColor: "#F3F1EA", color: "#756F3F" }}
-                placeholder={field.placeholder || field.label}
-                disabled={submitting}
-              />
-            ))}
+            {textFields.map(field => {
+              const isPhone = field.fieldType === 'tel' || field.fieldType === 'phone' || field.fieldName.toLowerCase().includes('phone') || field.fieldName.toLowerCase().includes('whatsapp');
+              
+              if (isPhone) {
+                return (
+                  <PhoneInput
+                    key={field.fieldName}
+                    id={`mobile-${field.fieldName}`}
+                    value={formData[field.fieldName] || ''}
+                    onChange={(phone) => handleChange(field.fieldName, phone)}
+                    placeholder={field.placeholder || field.label}
+                    disabled={submitting}
+                    className="!bg-[#F3F1EA] !border-none !h-12 !rounded-lg"
+                    buttonClassName="!bg-transparent !border-r-0 !text-[#756F3F] hover:!bg-black/5 !rounded-l-lg !px-3 !h-full"
+                    inputClassName="!bg-transparent !text-[#756F3F] !placeholder-[#756F3F]/50 !font-anaheim !font-semibold !text-base !h-full"
+                    dialCodeClassName="!text-[#756F3F] !text-base"
+                    containerClassName="!h-12"
+                  />
+                );
+              }
+
+              return (
+                <input
+                  key={field.fieldName}
+                  type={field.fieldType === 'email' ? 'email' : 'text'}
+                  value={formData[field.fieldName] || ''}
+                  onChange={(e) => handleChange(field.fieldName, e.target.value)}
+                  className="w-full h-12 font-anaheim font-semibold outline-none px-4 rounded-lg"
+                  style={{ backgroundColor: "#F3F1EA", color: "#756F3F" }}
+                  placeholder={field.placeholder || field.label}
+                  disabled={submitting}
+                />
+              );
+            })}
 
             {/* 下拉选择 */}
             {selectFields.map(field => (
@@ -1003,14 +1133,44 @@ export function OemOdmContactForm({
               </div>
             )}
 
+            {/* Privacy Consent Checkbox - Mobile */}
+            {formConfig?.privacyConsentText && !isGloballyAccepted && (
+              <div
+                className="flex items-start gap-3 my-2 cursor-pointer group"
+                onClick={() => handlePrivacyToggle(!privacyAccepted)}
+              >
+                <div
+                  className={`flex-shrink-0 border flex items-center justify-center mt-1 transition-all ${
+                    privacyAccepted ? "bg-[#756F3F] border-[#756F3F]" : "border-gray-300 bg-transparent"
+                  }`}
+                  style={{
+                    width: "18px",
+                    height: "18px",
+                    borderRadius: "4px",
+                  }}
+                >
+                  {privacyAccepted && (
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+                <p className="text-[12px] text-[#756F3F] leading-relaxed text-left whitespace-pre-line select-none">
+                  {formConfig.privacyConsentText}
+                </p>
+              </div>
+            )}
+
             {/* 错误提示 */}
             {error && <div className="text-red-600 text-sm">{error}</div>}
 
             {/* 提交按钮 */}
             <button
               type="submit"
-              disabled={submitting || !!(turnstileSiteKey && !turnstileToken)}
-              className="w-full py-4 rounded-full font-anaheim font-semibold text-white text-xl disabled:opacity-50"
+              disabled={submitting || (!!formConfig?.privacyConsentText && !privacyAccepted)}
+              className={`w-full py-4 px-6 rounded-full font-anaheim font-semibold text-white text-xl disabled:opacity-50 h-auto whitespace-pre-line leading-tight ${
+                (!!formConfig?.privacyConsentText && !privacyAccepted) ? "grayscale opacity-80" : ""
+              }`}
               style={{ backgroundColor: "#756F3F" }}
             >
               {submitting ? "Submitting..." : (configData?.submitButtonText || "Send Inquiry")}

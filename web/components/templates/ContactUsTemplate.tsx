@@ -553,6 +553,8 @@ export function ContactUsTemplate({ locale, pageContent }: ContactUsTemplateProp
     const title = extractTextAfterMarker(blockMainContent, "contact-form-subtitle")
     // contact-form-description = 副标题 "Based On Your Specific Needs..."
     const subtitle = extractSegmentsAfterMarker(blockMainContent, "contact-form-description")
+    // contact-form-privacy-consent = 隐私同意文本
+    const privacyConsentText = extractTextAfterMarker(blockMainContent, "contact-form-privacy-consent") || extractTextAfterMarker(contentChildren, "contact-form-privacy-consent")
 
     // 从 mainContent 中提取轮播图
     for (const node of blockMainContent) {
@@ -625,6 +627,16 @@ export function ContactUsTemplate({ locale, pageContent }: ContactUsTemplateProp
         }
       }
     }
+    
+    // Merge privacyConsentText into formConfig if it's missing there but found in markers
+    console.log(`[ContactUsTemplate] privacyConsentText from marker:`, privacyConsentText);
+    console.log(`[ContactUsTemplate] formConfig before merge:`, formConfig);
+
+    if (formConfig && privacyConsentText && !formConfig.privacyConsentText) {
+      formConfig = { ...formConfig, privacyConsentText }
+    }
+    
+    console.log(`[ContactUsTemplate] formConfig after merge:`, formConfig);
 
     return { verticalTitle, title, subtitle, images, formConfig, tips }
   }, [contentChildren, mediaData])
