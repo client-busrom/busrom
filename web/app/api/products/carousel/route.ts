@@ -101,12 +101,24 @@ function extractHighlights(productAttributes: any): { text: string; icon?: strin
  * Transform product data to frontend format
  */
 function transformProduct(product: any) {
+  const getName = (obj: any) => {
+    if (!obj) return ''
+    if (typeof obj === 'string') return obj
+    if (typeof obj === 'object') {
+      return obj.en || obj.zh || obj.zh_CN || obj.zh_HK || Object.values(obj).find(v => typeof v === 'string') || ''
+    }
+    return ''
+  }
+
+  const categoryName = product.category ? getName(product.category.name || product.category.fullTitle || product.category.title) : ''
+  const productName = getName(product.name)
+
   return {
     id: product.id,
     sku: product.sku,
     slug: product.slug,
-    name: product.name,
-    shortDescription: product.shortDescription,
+    name: productName,
+    shortDescription: getName(product.shortDescription || product.description),
     showImage: product.showImage
       ? {
           id: product.showImage.id,
@@ -120,14 +132,14 @@ function transformProduct(product: any) {
       ? {
           id: typeof product.series === 'string' ? product.series : product.series.id,
           slug: typeof product.series === 'string' ? '' : product.series.slug,
-          name: typeof product.series === 'string' ? '' : product.series.name,
+          name: getName(product.series.name),
         }
       : null,
     category: product.category
       ? {
           id: typeof product.category === 'string' ? product.category : product.category.id,
           slug: typeof product.category === 'string' ? '' : product.category.slug,
-          name: typeof product.category === 'string' ? '' : product.category.name,
+          name: categoryName,
         }
       : null,
     productAttributes: {
@@ -299,6 +311,7 @@ export async function POST(request: NextRequest) {
             ...transformProduct(selectedProduct),
             _carouselItem: {
               showName: item.showName,
+              showCategory: item.showCategory,
               showDescription: item.showDescription,
               showButton: item.showButton,
               showHighlights: item.showHighlights,

@@ -26,11 +26,14 @@ interface MediaObject {
 
 export interface ProductShowItem {
   id: string | number
+  sku?: string
   title: string
+  categoryName?: string
   image: MediaObject | null
   link?: string
   buttonText?: string
   showName?: boolean
+  showCategory?: boolean
   showButton?: boolean
   showHighlights?: boolean
   highlightsCount?: number
@@ -322,8 +325,8 @@ export function ProductShowSection({
         </button>
       )}
 
-      {/* 产品名称 - 显示中间卡片的名称 */}
-      {centerItem && centerItem.showName !== false && (
+      {/* 产品名称/分类名称 - 显示中心项的标题 */}
+      {centerItem && (centerItem.showName !== false || centerItem.showCategory) && (
         <h3
           className="absolute font-josefin-sans font-bold text-white text-center transition-opacity duration-300"
           style={{
@@ -332,9 +335,10 @@ export function ProductShowSection({
             top: vw(572),
             fontSize: vw(30),
             lineHeight: vw(38),
+            zIndex: 50,
           }}
         >
-          {centerItem.title}
+          {centerItem.showName ? centerItem.title : (centerItem.categoryName || centerItem.title)}
         </h3>
       )}
 

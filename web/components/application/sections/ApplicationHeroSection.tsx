@@ -88,13 +88,20 @@ export function ApplicationHeroSection({ title, topSubtitle, rightBoxText = "APP
   const img = (slotIdx: number) => images[displayImages[slotIdx]] || null
 
   return (
-    <section className="relative w-full select-none" style={{ height: '922px', overflow: 'hidden', background: 'linear-gradient(to bottom, #756F3F 0%, #989260 100%)' }}>
-
+    <section 
+      data-header-theme="light"
+      className="relative w-full select-none overflow-hidden h-auto lg:h-[50.416vw]" 
+      style={{ 
+        background: 'linear-gradient(to bottom, #756F3F 0%, #989260 100%)' 
+      }}
+    >
+      {/* Dynamic top padding for desktop scaling visibility */}
+      <div className="hidden lg:block h-[2.3958vw]" /> 
       {/* ============ DESKTOP ============ */}
       <div className="hidden lg:block absolute inset-0">
         
-        {/* Scaling wrapper taking up 80% to fit neatly, offset by 46px header gap */}
-        <div className="relative w-full h-full" style={{ transform: 'scale(0.8)', transformOrigin: 'top center', marginTop: '46px' }}>
+        {/* Scaling wrapper taking up 80% to fit neatly */}
+        <div className="relative w-full h-full" style={{ transform: 'scale(0.8)', transformOrigin: 'top center' }}>
 
           {/* IMAGE LAYOUT ANIMATION BLOCK */}
           {displayImages.map((imageIdx, slotIdx) => {
@@ -145,12 +152,12 @@ export function ApplicationHeroSection({ title, topSubtitle, rightBoxText = "APP
           <div className="absolute flex flex-col items-start" style={{ left: vw(160), top: vw(132), zIndex: 20 }}>
             {/* Header / Title */}
             <div className="flex items-center" style={{ marginBottom: vw(10) }}>
-              <span className="font-anaheim font-medium text-white uppercase tracking-widest" style={{ fontSize: vw(20), lineHeight: vw(40) }}>
+              <span className="font-anaheim font-medium text-white tracking-widest" style={{ fontSize: vw(20), lineHeight: vw(40) }}>
                 {title}
               </span>
               <div style={{ width: vw(70), height: '1px', backgroundColor: 'white', marginLeft: vw(16), marginRight: vw(16), transform: 'rotate(6.86deg)' }} />
               {topSubtitle && (
-                <span className="font-anaheim font-medium text-white uppercase tracking-widest" style={{ fontSize: vw(20), lineHeight: vw(40) }}>
+                <span className="font-anaheim font-medium text-white tracking-widest" style={{ fontSize: vw(20), lineHeight: vw(40) }}>
                   {topSubtitle}
                 </span>
               )}

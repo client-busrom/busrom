@@ -52,15 +52,20 @@ export function ShopPageClient({ locale }: ShopPageClientProps) {
   // ============================================================
   const rawCategory = searchParamsDict.get('category') || ""
   const selectedCategory = useMemo(() => toUrlSlug(rawCategory), [rawCategory])
-  const currentPage = parseInt(searchParamsDict.get('page') || '1')
   const sortBy = (searchParamsDict.get('sortBy') || 'shopOrder') as ProductSortField
   const sortDirection = (searchParamsDict.get('sortDir') || 'DESC') as ProductSortDirection
   const featuredOnly = searchParamsDict.get('featured') === 'true'
 
-  // Local UI state only (not part of filtering logic)
+  // Local UI state
+  const [currentPage, setCurrentPage] = useState(1) // No longer in URL
   const [searchQuery, setSearchQuery] = useState("")
   const [isFilterSortOpen, setIsFilterSortOpen] = useState(false)
   const filterSortRef = useRef<HTMLDivElement>(null)
+
+  // Reset page when anything else changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedCategory, sortBy, sortDirection, featuredOnly, searchQuery])
 
   // ============================================================
   // Data Fetching
@@ -133,11 +138,12 @@ export function ShopPageClient({ locale }: ShopPageClientProps) {
         params.set(key, value)
       }
     })
-    // Always reset page when anything filter-related changes (except page itself)
-    if (!('page' in updates)) {
-      params.set('page', '1')
-    }
-    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+    
+    // Remove page from URL just in case some old links have it
+    params.delete('page')
+    
+    const queryString = params.toString()
+    router.push(queryString ? `${pathname}?${queryString}` : pathname, { scroll: false })
   }, [pathname, router, searchParamsDict])
 
   const handleCategoryChange = useCallback((slug: string) => {
@@ -145,8 +151,9 @@ export function ShopPageClient({ locale }: ShopPageClientProps) {
   }, [updateUrl])
 
   const handlePageChange = useCallback((newPage: number) => {
-    updateUrl({ page: newPage.toString() })
-  }, [updateUrl])
+    setCurrentPage(newPage)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
 
   const handleSortChange = useCallback((newSortBy: string, newSortDir: string) => {
     updateUrl({ sortBy: newSortBy, sortDir: newSortDir })
@@ -401,7 +408,7 @@ export function ShopPageClient({ locale }: ShopPageClientProps) {
             ) : (
               <motion.div
                 // Key changes whenever the visible product set changes — this is the correct trigger
-                key={`${selectedCategory}-${sortBy}-${sortDirection}-${featuredOnly}`}
+                key={`${selectedCategory}-${sortBy}-${sortDirection}-${featuredOnly}-${currentPage}`}
                 className="flex flex-wrap justify-center gap-4 lg:gap-6 max-w-[1072px] mx-auto"
                 variants={containerVariants}
                 initial="hidden"

@@ -202,15 +202,28 @@ export async function GET(request: NextRequest) {
     const data = await response.json()
     console.log('[Products API] Received products:', data.totalDocs)
 
+    const getName = (obj: any) => {
+      if (!obj) return ''
+      if (typeof obj === 'string') return obj
+      if (typeof obj === 'object') {
+        return obj.en || obj.zh || obj.zh_CN || obj.zh_HK || Object.values(obj).find(v => typeof v === 'string') || ''
+      }
+      return ''
+    }
+
     // Transform data to match frontend expectations
     const products = data.docs.map((product: any) => {
+      const productName = getName(product.name)
+      const categoryName = product.category ? getName(product.category.name || product.category.fullTitle || product.category.title) : ''
+      const seriesName = product.series ? getName(product.series.name) : ''
+
       return {
         id: product.id,
         sku: product.sku,
         slug: product.slug,
-        name: product.name, // Already localized by Payload
-        localizedName: product.name,
-        shortDescription: product.shortDescription,
+        name: productName,
+        localizedName: productName,
+        shortDescription: getName(product.shortDescription || product.description),
         showImage: product.showImage
           ? {
               id: product.showImage.id,
@@ -233,15 +246,15 @@ export async function GET(request: NextRequest) {
           ? {
               id: product.category.id || product.category,
               slug: toUrlSlug(product.category.slug || ''),
-              name: product.category.name,
+              name: categoryName,
             }
           : null,
         series: product.series
           ? {
               id: product.series.id || product.series,
               slug: toUrlSlug(product.series.slug || ''),
-              name: product.series.name,
-              localizedName: product.series.name,
+              name: seriesName,
+              localizedName: seriesName,
             }
           : null,
         isFeatured: product.isFeatured || false,

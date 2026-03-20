@@ -24,6 +24,8 @@ export interface WhyChooseUsItem {
 }
 
 interface ApplicationWhyChooseUsSectionProps {
+  decorate?: string
+  title?: string
   items?: WhyChooseUsItem[]
 }
 
@@ -38,7 +40,11 @@ const defaultItems: WhyChooseUsItem[] = [
   }
 ]
 
-export function ApplicationWhyChooseUsSection({ items = defaultItems }: ApplicationWhyChooseUsSectionProps) {
+export function ApplicationWhyChooseUsSection({ 
+  decorate = "Why", 
+  title = "contractors choose us?", 
+  items = defaultItems 
+}: ApplicationWhyChooseUsSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const currentItem = items[currentIndex % items.length]
 
@@ -46,17 +52,17 @@ export function ApplicationWhyChooseUsSection({ items = defaultItems }: Applicat
   const handlePrev = () => setCurrentIndex((prev) => (prev - 1 + items.length) % items.length)
 
   return (
-    <section className="relative w-full overflow-hidden select-none" style={{ height: vw(1025) }}>
+    <section className="relative w-full overflow-hidden select-none" style={{ height: vw(922) }}>
       <div className="absolute left-1/2 -translate-x-1/2 h-full" style={{ width: vw(1920) }}>
         
         {/* Left Gradient Box & Clipped "Why" Title */}
-        {/* Rectangle 402: x=0, y=3, w=550, h=1022 */}
-        <div className="absolute overflow-hidden" style={{ left: 0, top: vw(3), width: vw(550), height: vw(1022), zIndex: 5 }}>
+        {/* Rectangle 402: x=0, y=3, w=550, h=919 */}
+        <div className="absolute overflow-hidden" style={{ left: 0, top: vw(3), width: vw(550), height: vw(919), zIndex: 10 }}>
           {/* Gradient Background */}
           <div 
             className="absolute inset-0" 
             style={{ 
-              background: 'linear-gradient(165deg, #6E6731 0%, #D4C75F 100%)'
+              background: 'linear-gradient(90deg, #D4C75F -40%, #6E6731 100%)'
             }} 
           />
           
@@ -69,10 +75,11 @@ export function ApplicationWhyChooseUsSection({ items = defaultItems }: Applicat
               fontSize: vw(160), 
               fontFamily: 'var(--font-anaheim), sans-serif',
               color: 'transparent',
-              WebkitTextStroke: `${vw(1.5)} #FFFFFF`
+              WebkitTextStroke: `${vw(1.5)} #FFFFFF`,
+              paintOrder: 'stroke fill'
             }}
           >
-            Why
+            {decorate}
           </h3>
         </div>
 
@@ -84,12 +91,13 @@ export function ApplicationWhyChooseUsSection({ items = defaultItems }: Applicat
             top: vw(-60), 
             fontSize: vw(160), 
             fontFamily: 'var(--font-anaheim), sans-serif',
-            color: 'transparent',
-            WebkitTextStroke: `${vw(1.5)} #756F3F`,
-            zIndex: 2
+            color: '#F6F4ED', // Updated from transparent to #F6F4ED
+            WebkitTextStroke: `${vw(4)} #756F3F`,
+            paintOrder: 'stroke fill',
+            zIndex: 1
           }}
         >
-          Why
+          {decorate}
         </h3>
 
         {/* contractors choose us? Header */}
@@ -105,12 +113,12 @@ export function ApplicationWhyChooseUsSection({ items = defaultItems }: Applicat
             zIndex: 10
           }}
         >
-          contractors choose us?
+          {title}
         </h4>
 
         {/* Carousel Content Area */}
-        {/* Rectangle 404: x=550, y=123, w=1370, h=902 */}
-        <div className="absolute" style={{ left: vw(550), top: vw(123), width: vw(1370), height: vw(902), backgroundColor: '#A59E69', zIndex: 1 }}>
+        {/* Rectangle 404: x=550, y=123, w=1370, h=799 */}
+        <div className="absolute" style={{ left: vw(550), top: vw(123), width: vw(1370), height: vw(799), backgroundColor: '#A59E69', zIndex: 5 }}>
           
           <AnimatePresence mode="wait">
             <motion.div
@@ -126,7 +134,7 @@ export function ApplicationWhyChooseUsSection({ items = defaultItems }: Applicat
                 className="absolute" 
                 style={{ 
                   left: vw(807 - 550), 
-                  top: vw(343 - 110),
+                  top: vw(233 - 156),
                   width: vw(1200) // Explicitly set width to prevent inconsistent wrapping
                 }}
               >
@@ -161,7 +169,7 @@ export function ApplicationWhyChooseUsSection({ items = defaultItems }: Applicat
               </div>
 
               {/* Item Number & Line */}
-              <div className="absolute flex items-center" style={{ left: vw(812 - 550), top: vw(820 - 123) }}>
+              <div className="absolute flex items-center" style={{ left: vw(812 - 550), top: vw(597 - 156) }}>
                 <span 
                   style={{ 
                     fontSize: vw(102), // 128 * 0.8
@@ -183,7 +191,7 @@ export function ApplicationWhyChooseUsSection({ items = defaultItems }: Applicat
                 className="absolute text-black"
                 style={{ 
                   left: vw(812 - 550), 
-                  top: vw(500 - 123), 
+                  top: vw(377 - 156), 
                   width: vw(700), 
                   fontSize: vw(29), 
                   lineHeight: vw(46),
@@ -245,7 +253,7 @@ export function ApplicationWhyChooseUsSection({ items = defaultItems }: Applicat
               className="absolute overflow-hidden" 
               style={{ 
                 left: vw(176 + 55), // Shifted to look better with 100% box
-                top: vw(123 + 80), 
+                top: vw(123), 
                 width: vw(440), // 550 * 0.8
                 height: vw(634), // 793 * 0.8
                 borderRadius: `${vw(147)} 0 ${vw(147)} 0`,
@@ -261,7 +269,7 @@ export function ApplicationWhyChooseUsSection({ items = defaultItems }: Applicat
               className="absolute overflow-hidden" 
               style={{ 
                 right: 0, 
-                top: vw(700 + 40), 
+                top: vw(740 - 156), 
                 width: vw(440), 
                 height: vw(173), 
                 borderRadius: `0 0 0 ${vw(147)}`,

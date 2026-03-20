@@ -2,7 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
-import { Fredericka_the_Great, Amiri, Black_Han_Sans, Berkshire_Swash } from "next/font/google";
+import { Fredericka_the_Great, Amiri, Black_Han_Sans, Berkshire_Swash, Cherry_Bomb_One, Amarante } from "next/font/google";
 import dynamic from "next/dynamic";
 import "../globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -187,6 +187,22 @@ const berkshireSwash = Berkshire_Swash({
   preload: false,
 });
 
+const cherryBomb = Cherry_Bomb_One({
+  weight: "400",
+  variable: "--font-cherry-bomb",
+  display: "swap",
+  subsets: ["latin"],
+  preload: false,
+});
+
+const amarante = Amarante({
+  weight: "400",
+  variable: "--font-amarante",
+  display: "swap",
+  subsets: ["latin"],
+  preload: true,
+});
+
 export function generateStaticParams() {
   // 动态生成所有支持的 locale 参数
   return locales.map(locale => ({ locale }));
@@ -262,6 +278,8 @@ export default async function RootLayout({
       ${amiri.variable}
       ${blackHanSans.variable}
       ${berkshireSwash.variable}
+      ${cherryBomb.variable}
+      ${amarante.variable}
       font-sans
     `}
     >

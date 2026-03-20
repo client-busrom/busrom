@@ -169,9 +169,12 @@ const config: Config = {
         'joan':          ['var(--font-joan)', 'serif'],
         'lilita-one':    ['var(--font-lilita-one)', 'sans-serif'],
         'kaushan-script': ['var(--font-kaushan-script)', 'cursive'],
+        'cherry-bomb': ['var(--font-cherry-bomb)', 'cursive'],
         'moul':            ['var(--font-moul)', 'sans-serif'],
         'orbitron':        ['var(--font-orbitron)', 'sans-serif'],
         'berkshire-swash': ['var(--font-berkshire)', 'cursive'],
+        'amiri': ['var(--font-amiri)', 'serif'],
+        'amarante': ['var(--font-amarante)', 'Amarante', 'serif'],
 
         // --- 系统字体 (直接使用名字) ---
         'arial':       ['Arial', 'sans-serif'],

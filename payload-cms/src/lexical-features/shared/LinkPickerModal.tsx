@@ -25,9 +25,9 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
   const [isLoading, setIsLoading] = useState(false)
 
   const collections = [
-    { value: 'products', label: '产品', pathPrefix: '/products' },
-    { value: 'product-series', label: '产品系列', pathPrefix: '/series' },
-    { value: 'pages', label: '页面', pathPrefix: '/pages' },
+    { value: 'products', label: '产品', pathPrefix: '/shop' }, // Corrected to /shop
+    { value: 'product-series', label: '产品系列', pathPrefix: '/products' }, // Corrected to /products
+    { value: 'pages', label: '页面', pathPrefix: '' }, // Use path field if available
     { value: 'blogs', label: '博客', pathPrefix: '/blog' },
   ]
 
@@ -46,7 +46,11 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
       })
 
       if (searchQuery) {
-        params.append('where[title][like]', searchQuery)
+        // Support searching by multiple fields
+        // In Payload 3.x, searching on relationship target might need better query
+        params.append('where[or][0][title][contains]', searchQuery)
+        params.append('where[or][1][name][contains]', searchQuery)
+        params.append('where[or][2][slug][contains]', searchQuery)
       }
 
       const response = await fetch(`/api/${selectedCollection}?${params}`)
@@ -65,7 +69,22 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
     const collection = collections.find((c) => c.value === selectedCollection)
     if (!collection) return
 
-    const path = `${collection.pathPrefix}/${item.slug || item.id}`
+    // Priority 1: Use specific fields from the document itself if they exist
+    // This handles the 'Pages' collection which has a dedicated 'path' field
+    const itemPath = item.path || item.url
+    
+    let path = ''
+    if (itemPath && typeof itemPath === 'string') {
+      path = itemPath.startsWith('/') ? itemPath : `/${itemPath}`
+    } else {
+      // Priority 2: Fallback to collection prefix + slug
+      const slugValue = item.slug || item.id
+      path = `${collection.pathPrefix}/${slugValue}`
+    }
+
+    // Clean up potential double slashes
+    path = path.replace(/\/+/g, '/')
+    
     onSelect(path)
     onClose()
   }
