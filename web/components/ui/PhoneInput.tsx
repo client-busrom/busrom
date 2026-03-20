@@ -232,8 +232,8 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
           onClick={() => !disabled && setIsOpen(!isOpen)}
           disabled={disabled}
           className={cn(
-            "flex items-center gap-1.5 px-3 border-r border-gray-300 bg-white transition-colors flex-shrink-0 h-full",
-            "hover:bg-gray-50 focus:outline-none",
+            "flex items-center gap-1.5 px-3 bg-transparent transition-colors flex-shrink-0 h-full",
+            "hover:bg-black/5 focus:outline-none",
             buttonClassName
           )}
         >
@@ -300,12 +300,12 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
                   onClick={() => handleCountrySelect([countryName, iso2, dialCode])}
                   className={cn(
                     "w-full flex items-center gap-4 px-4 py-3.5 text-left transition-colors hover:bg-gray-50",
-                    selectedCountry[1] === iso2 && selectedCountry[2] === dialCode && "bg-brand-secondary/5"
+                    selectedCountry[1] === iso2 && selectedCountry[2] === dialCode && "bg-white"
                   )}
                 >
                   <CountryFlag countryCode={iso2} className="w-6 h-5 rounded-sm flex-shrink-0" />
-                  <span className="text-[22px] font-semibold text-brand-text-black truncate flex-1 leading-tight">{countryName}</span>
-                  <span className="text-[20px] text-gray-500 font-medium flex-shrink-0">+{dialCode}</span>
+                  <span className="text-sm font-semibold text-brand-text-black truncate flex-1 leading-tight">{countryName}</span>
+                  <span className="text-xs text-gray-500 font-medium flex-shrink-0">+{dialCode}</span>
                 </button>
               ))
             )}

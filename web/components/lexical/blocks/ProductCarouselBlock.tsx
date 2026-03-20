@@ -98,15 +98,17 @@ export const ProductCarouselBlock = ({ node, locale }: any) => {
 
                   {/* Content Area */}
                   <div className="p-6 flex flex-col flex-1">
-                    {settings.showCategory && product.category?.name && (
+                    {/* Category Label (only if name is also shown) */}
+                    {settings.showCategory && settings.showName && product.category?.name && (
                       <div className="text-[10px] font-bold uppercase tracking-widest text-brand-accent-gold mb-1">
                         {product.category.name}
                       </div>
                     )}
                     
-                    {settings.showName && (
+                    {/* Main Title (Product Name or Category Name) */}
+                    {(settings.showName || (!settings.showName && settings.showCategory)) && (
                       <h4 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-brand-accent-gold transition-colors">
-                        {product.name}
+                        {settings.showName ? product.name : product.category?.name}
                       </h4>
                     )}
                     

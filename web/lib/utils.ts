@@ -38,3 +38,47 @@ export function getLocalizedName(
   if (typeof name === "string") return name
   return name[locale] || name["en"] || fallback
 }
+
+/**
+ * 站内链接解析器 - 确保 CMS 与前端路由 100% 对齐
+ * 
+ * 规则：
+ * 1. 详解页 (Series) -> /products/[slug]
+ * 2. 产品售卖页 (Products) -> /shop/[slug]
+ * 3. 自定义页面 (Pages) -> 使用其自带的 path 字段 (如 /about)
+ */
+export function resolveInternalLink(url: string | null | undefined): string {
+  if (!url) return "#"
+  
+  let path = url.trim()
+  
+  // 处理外部链接
+  if (path.startsWith('http') || path.startsWith('mailto:') || path.startsWith('tel:')) {
+    return path
+  }
+
+  // 1. 修正详解页前缀: /product/xxx -> /products/xxx
+  // (注意: 这里是单数变复数)
+  if (path.startsWith('/product/')) {
+    path = path.replace(/^\/product\//, '/products/')
+  }
+
+  // 2. 修正 One-Stop Shop 特定路径
+  if (path === '/service/one-stop') {
+    path = '/service/one-stop-shop'
+  }
+
+  // 3. 修正旧版 series 参数
+  if (path.includes('/shop?series=')) {
+    path = path.replace('/shop?series=', '/shop?category=')
+  }
+
+  // 4. 清洗重复斜杠
+  path = path.replace(/\/+/g, '/')
+  
+  if (!path.startsWith('/')) {
+    path = '/' + path
+  }
+
+  return path
+}

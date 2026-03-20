@@ -107,6 +107,30 @@ function extractItems(flatNodes: any[], markerIndex: number, mediaData: Record<s
       })
     }
 
+    if (node.type === "productCarousel" && node.data?.items) {
+      const carouselItems = node.data.items.map((it: any) => {
+        const mapped = {
+          id: it.id,
+          selectionMode: it.selectionMode,
+          product: it.product,
+          productSeries: it.productSeries,
+          showName: it.showName !== false,
+          showCategory: !!it.showCategory,
+          showDescription: !!it.showDescription,
+          showButton: it.showButton !== false,
+          showHighlights: !!it.showHighlights,
+          highlightsCount: it.highlightsCount || 3,
+          buttonText: it.buttonText || "View More",
+          openInNewTab: !!it.openInNewTab,
+        }
+        return mapped
+      })
+      items.push({
+        sourceType: node.type,
+        carouselItems
+      })
+    }
+
     if (node.type === "list") {
       let currentItem: any = null
       node.children?.forEach((listItem: any) => {
@@ -160,6 +184,7 @@ function extractItems(flatNodes: any[], markerIndex: number, mediaData: Record<s
 export function OneStopShopTemplate({ locale, pageContent }: OneStopShopTemplateProps) {
   const [productsData, setProductsData] = useState<any[]>([])
   const [loadingProducts, setLoadingProducts] = useState(true)
+  const [carouselProductsData, setCarouselProductsData] = useState<Record<string, any[]>>({})
 
   const contentChildren = useMemo(() => 
     pageContent.content?.root?.children || pageContent.contentTranslation?.root?.children || [], 
@@ -178,7 +203,7 @@ export function OneStopShopTemplate({ locale, pageContent }: OneStopShopTemplate
      return { title: res.title || "Product Related To", subtitle: res.subtitle || "Busrom", items: res.items }
   }, [contentChildren, mediaData])
   
-  const productSeriesData = useMemo(() => extractSection(contentChildren, "product-attribute-title", mediaData), [contentChildren, mediaData])
+  const productSeriesData = useMemo(() => extractSection(contentChildren, "product-attribute", mediaData), [contentChildren, mediaData])
 
   // Brand Highlights with special title parsing
   const brandHighlightsData = useMemo(() => {
@@ -342,15 +367,99 @@ export function OneStopShopTemplate({ locale, pageContent }: OneStopShopTemplate
     fetchProducts()
   }, [locale])
 
+  // Fetch data for productCarousel blocks
+  useEffect(() => {
+    const fetchAllCarousels = async () => {
+      const allSections = [heroData, showcaseData, categoriesTitle, productSeriesData]
+      const fetchPromises: Promise<any>[] = []
+      
+      allSections.forEach((section: any) => {
+        section.items.forEach((item: any) => {
+          if (item.sourceType === 'productCarousel' && item.carouselItems?.length > 0) {
+            fetchPromises.push(
+              (async () => {
+                try {
+                  const res = await fetch('/api/products/carousel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items: item.carouselItems, locale }),
+                  })
+                  if (res.ok) {
+                    const data = await res.json()
+                    return { id: item.carouselItems[0].id, products: data.products || [] }
+                  }
+                } catch (e) {
+                  console.error('Failed to fetch carousel products', e)
+                }
+                return null
+              })()
+            )
+          }
+        })
+      })
+
+      const results = await Promise.all(fetchPromises)
+      const newData: Record<string, any[]> = {}
+      results.forEach(res => {
+        if (res) newData[res.id] = res.products
+      })
+      setCarouselProductsData(prev => ({ ...prev, ...newData }))
+    }
+
+    fetchAllCarousels()
+  }, [heroData, showcaseData, categoriesTitle, productSeriesData, locale])
+
+  // 整理数据映射 - 让 HighlightShowcaseSection 支持控制开关
+  const mappedShowcaseProducts = useMemo(() => {
+    const carouselItem = showcaseData.items.find(it => it.sourceType === 'productCarousel')
+    if (carouselItem && carouselProductsData[carouselItem.carouselItems[0].id]) {
+      return carouselProductsData[carouselItem.carouselItems[0].id].map(p => ({
+        id: p.id,
+        image: p.showImage,
+        title: p._carouselItem?.showName ? p.name : (p.category?.name || p.name),
+        link: p.slug ? `/${locale}/shop/${p.slug}` : undefined,
+        // 透传配置
+        showName: p._carouselItem?.showName !== false,
+        showCategory: !!p._carouselItem?.showCategory,
+        categoryName: p.category?.name || ""
+      }))
+    }
+    // 默认映射
+    return showcaseData.items.filter(it => it.sourceType !== 'productCarousel').map((it, idx) => ({
+      id: String(idx),
+      image: it.image,
+      title: it.title,
+      link: it.link
+    }))
+  }, [showcaseData, carouselProductsData, locale])
+
+  // 整理数据映射 - 让 CategoriesGridSection 也支持如果被替换为 Carousel 的情况
+  const gridProducts = useMemo(() => {
+    const carouselItem = categoriesTitle.items.find(it => it.sourceType === 'productCarousel')
+    if (carouselItem && carouselProductsData[carouselItem.carouselItems[0].id]) {
+      return carouselProductsData[carouselItem.carouselItems[0].id]
+    }
+    return productsData
+  }, [categoriesTitle, productsData, carouselProductsData])
+
+  // 整理数据映射 - 让 ProductSeriesShowcaseSection 也支持 Carousel 设置
+  const seriesProducts = useMemo(() => {
+    const carouselItem = productSeriesData.items.find(it => it.sourceType === 'productCarousel')
+    if (carouselItem && carouselProductsData[carouselItem.carouselItems[0].id]) {
+        return carouselProductsData[carouselItem.carouselItems[0].id]
+    }
+    return productsData
+  }, [productSeriesData, productsData, carouselProductsData])
+
   return (
     <div className="min-h-screen bg-[#F9F9F5]">
       <HeroSection slides={heroData.items} locale={locale} />
       <ValuePropositionSection title={problemsData.title} subtitle={problemsData.subtitle} problems={problemsData.items} advantages={[]} />
       <AdvantagesSection title={advantagesData.title} advantages={advantagesData.items} />
       <PurchaseProcessSection title={processData.title} slides={processData.items} />
-      <CategoriesGridSection title={categoriesTitle.title} subtitle={categoriesTitle.subtitle} products={productsData} locale={locale} loading={loadingProducts} />
-      {showcaseData.items.length > 0 && <HighlightShowcaseSection title={showcaseData.title} products={showcaseData.items} locale={locale} />}
-      {productsData.length > 0 && <ProductSeriesShowcaseSection title={productSeriesData.title} products={productsData} locale={locale} />}
+      <CategoriesGridSection title={categoriesTitle.title} subtitle={categoriesTitle.subtitle} products={gridProducts} locale={locale} loading={loadingProducts} />
+      {showcaseData.items.length > 0 && <HighlightShowcaseSection title={showcaseData.title} products={mappedShowcaseProducts as any} locale={locale} />}
+      {productsData.length > 0 && <ProductSeriesShowcaseSection title={productSeriesData.title} products={seriesProducts} locale={locale} />}
       {brandHighlightsData.items.length > 0 && <BrandHighlightsSection titleLine1={brandHighlightsData.titleLine1} titleLine2={brandHighlightsData.titleLine2} items={brandHighlightsData.items} />}
       <TrustSection title={trustData.title} items={trustData.items} images={trustImages} bgImage={trustBgImage} />
       <CtaSection title={ctaData.title} subtitle={ctaData.subtitle} image={ctaData.image} formConfig={pageContent.formConfig} />

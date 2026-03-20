@@ -138,12 +138,14 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
               className="absolute left-[153px] top-[262px] w-[766px] h-[561px] rounded-[30px] bg-[#F1E8CA] p-[90px] pt-[90px] flex flex-col"
               style={{ boxShadow: "0 21px 25.6px rgba(0,0,0,0.05)" }}
             >
-              {/* Product Name */}
+              {/* Product Name / Category Name */}
               <h3 
                 className="text-[64px] font-[800] text-[#6D5400] leading-[1] mb-[30px]"
                 style={{ fontFamily: "var(--font-anaheim)" }}
               >
-                {activeProduct.name}
+                {(activeProduct as any)._carouselItem 
+                  ? ((activeProduct as any)._carouselItem.showName === false ? ((activeProduct as any).category?.name || activeProduct.name) : activeProduct.name)
+                  : ((activeProduct as any).category?.name || activeProduct.name)}
               </h3>
 
               {/* Attributes List */}

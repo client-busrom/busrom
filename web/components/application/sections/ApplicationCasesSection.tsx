@@ -15,6 +15,9 @@ export interface ApplicationCase {
 }
 
 interface Props {
+  title?: string
+  subtitle?: string
+  titleImage?: string
   cases?: ApplicationCase[]
 }
 
@@ -26,7 +29,7 @@ const DEFAULT_CASES: ApplicationCase[] = [
   { id: "5", title: "Patch Fitting Office", category: "Corporate", image: "" },
 ]
 
-export function ApplicationCasesSection({ cases = DEFAULT_CASES }: Props) {
+export function ApplicationCasesSection({ title, subtitle = "Busrom", titleImage, cases = DEFAULT_CASES }: Props) {
   const [offset, setOffset] = useState(0)
   const [direction, setDirection] = useState(1)
   const [dragDirection, setDragDirection] = useState<'none' | 'left' | 'right'>('none')
@@ -63,64 +66,68 @@ export function ApplicationCasesSection({ cases = DEFAULT_CASES }: Props) {
   return (
     <section 
       className="relative w-full overflow-hidden flex flex-col items-center justify-center select-none"
-      style={{ height: '922px', backgroundColor: '#F6F4ED' }}
+      style={{ height: vw(996) }}
     >
-      {/* Top Thin Bar Decoration - MATCHING DESIGN */}
-      <div className="absolute top-0 w-full z-20" style={{ height: vw(23), backgroundColor: '#756F3F' }} />
 
-      {/* Background "Busrom" Ghost Text (Outline Only) */}
+      {/* Background "Busrom" Ghost Text - SVG for Gradient Stroke support */}
       <div 
-        className="absolute font-jomhuria select-none pointer-events-none" 
+        id="applications-subtitle"
+        className="absolute font-anaheim select-none pointer-events-none" 
         style={{ 
           left: vw(328), 
-          top: vw(-6), 
-          fontSize: vw(195), 
-          color: 'transparent', 
-          WebkitTextStroke: `${vw(1.5)} rgba(117, 111, 63, 0.45)`,
-          zIndex: 1
+          top: vw(60), 
+          zIndex: 1,
+          transform: 'scaleY(1)',
+          transformOrigin: 'top'
         }}
       >
-        Busrom
+        <svg width="100%" height={vw(120)} style={{ overflow: 'visible' }}>
+          <defs>
+            <linearGradient id="strokeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#000000" />
+              <stop offset="100%" stopColor="#B3B3B3" />
+            </linearGradient>
+          </defs>
+          <text
+            x="0"
+            y={vw(90)}
+            style={{
+              fontSize: vw(120),
+              fill: '#f6f4ed',
+              stroke: 'url(#strokeGradient)',
+              strokeWidth: vw(1.5),
+              paintOrder: 'stroke fill'
+            }}
+          >
+            {subtitle}
+          </text>
+        </svg>
       </div>
 
       {/* Content Wrapper to push everything towards center while maintaining hierarchy */}
       <div className="flex flex-col items-center w-full">
-        {/* Main Title "OUR CASES" - High Fidelity */}
-        <div className="relative mb-[vw(40)] flex flex-col items-center z-10" style={{ top: '-50px' }}>
-          {/* Back Layer Title (Fill + External Stroke) */}
-          <h2 
-            className="font-amiri font-black uppercase text-center absolute" 
-            style={{ 
-              fontSize: vw(135), 
-              lineHeight: 0.8, 
-              color: '#F6F4ED',
-              letterSpacing: vw(-2),
-              WebkitTextStroke: `${vw(1)} #80730C`,
-              paintOrder: 'stroke fill',
-              zIndex: -1,
-              pointerEvents: 'none',
-              transform: `translateY(${vw(3)})`
-            }}
-          >
-            OUR CASES
-          </h2>
-          {/* Front Layer Title */}
-          <h2 
-            className="font-amiri font-black uppercase text-center" 
-            style={{ 
-              fontSize: vw(135), 
-              lineHeight: 0.8, 
-              color: '#524C16',
-              letterSpacing: vw(-2),
-              filter: `drop-shadow(0 ${vw(12)} ${vw(12)} rgba(84, 79, 37, 0.2))`
-            }}
-          >
-            OUR CASES
-          </h2>
+        {/* Main Title "OUR CASES" - applications-title */}
+        <div 
+          id="applications-title"
+          className="relative mb-[vw(40)] flex flex-col items-center z-10" 
+          style={{ paddingTop: vw(0), transform: `translateX(${vw(100)})  translateY(${vw(-120)})` }}
+        >
+          {titleImage && (
+            <img 
+              src={titleImage} 
+              alt={title || "Applications Title"} 
+              className="object-contain"
+              style={{ 
+                width: vw(896.54), 
+                height: 'auto',
+                filter: `drop-shadow(0 ${vw(12)} ${vw(12)} rgba(84, 79, 37, 0.2))` 
+              }}
+            />
+          )}
         </div>
 
         {/* Carousel Container */}
-        <div className="relative w-full flex justify-center items-center" style={{ height: vw(520) }}>
+        <div className="relative w-full flex justify-center items-center" style={{ height: vw(420) }}>
         <AnimatePresence initial={false}>
           {visibleItems.map(({ p, caseIdx, slotIdx }) => {
             const item = cases[caseIdx]
@@ -223,7 +230,7 @@ export function ApplicationCasesSection({ cases = DEFAULT_CASES }: Props) {
       </div>
 
       {/* Navigation Arc & Controls */}
-      <div className="relative w-full flex justify-center items-center mt-[vw(70)]" style={{ height: vw(200) }}>
+      <div className="absolute bottom-0 w-full flex justify-center items-center" style={{ height: vw(360), marginBottom: vw(20) }}>
         
         {/* Arc Visual Rail - Actual design image */}
         <div className="absolute inset-0 pointer-events-none flex justify-center items-center z-0">

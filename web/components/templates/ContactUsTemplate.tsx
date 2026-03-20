@@ -657,16 +657,17 @@ export function ContactUsTemplate({ locale, pageContent }: ContactUsTemplateProp
         for (const item of carouselItems) {
           rawCarouselItems.push({
             id: item.id,
-            selectionMode: item.selectionMode || "auto",
+            selectionMode: item.selectionMode,
             product: item.product,
-            productSeries: item.productSeries ? String(item.productSeries) : undefined,
+            productSeries: item.productSeries,
             showName: item.showName !== false,
-            showDescription: item.showDescription !== false,
+            showCategory: !!item.showCategory,
+            showDescription: !!item.showDescription,
             showButton: item.showButton !== false,
             showHighlights: !!item.showHighlights,
             highlightsCount: item.highlightsCount || 3,
             buttonText: item.buttonText || "View More",
-            openInNewTab: item.openInNewTab || false,
+            openInNewTab: !!item.openInNewTab,
           })
         }
       }
@@ -727,11 +728,14 @@ export function ContactUsTemplate({ locale, pageContent }: ContactUsTemplateProp
         // 转换为 ProductShowItem 格式
         const items: ProductShowItem[] = products.map((product: any, index: number) => ({
           id: product.id || index,
+          sku: product.sku || "",
           title: product.name || "",
+          categoryName: product.category?.name || "",
           image: product.showImage || null,
           link: product.slug ? `/shop/${product.slug}` : undefined,
           buttonText: product._carouselItem?.buttonText || "View More",
           showName: product._carouselItem?.showName !== false,
+          showCategory: !!product._carouselItem?.showCategory,
           showButton: product._carouselItem?.showButton !== false,
           showHighlights: !!product._carouselItem?.showHighlights,
           highlightsCount: product._carouselItem?.highlightsCount || 3,

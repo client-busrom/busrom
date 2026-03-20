@@ -101,7 +101,10 @@ export function CategoriesGridSection({ title, subtitle, products, locale, loadi
                 {/* Text Content - Higher Z-index */}
                 <div className="absolute left-[57px] top-[32px] w-[337px] z-30">
                    <h4 className="text-[40px] font-extrabold text-black leading-[1.1] mb-2" style={{ fontFamily: "var(--font-anaheim)" }}>
-                     {item.category?.name || item.name}
+                     {/* 如果有明确的 _carouselItem 开关，听开关的；否则，优先显示分类名 */}
+                     {(item as any)._carouselItem 
+                       ? ((item as any)._carouselItem.showName === false ? (item.category?.name || item.name) : item.name)
+                       : (item.category?.name || item.name)}
                    </h4>
                 </div>
 
