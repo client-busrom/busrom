@@ -72,9 +72,9 @@ export function ApplicationCasesSection({ title, subtitle = "Busrom", titleImage
       {/* Background "Busrom" Ghost Text - SVG for Gradient Stroke support */}
       <div 
         id="applications-subtitle"
-        className="absolute font-anaheim select-none pointer-events-none" 
+        className="absolute font-quicksand font-semibold select-none pointer-events-none" 
         style={{ 
-          left: vw(328), 
+          left: vw(250), 
           top: vw(60), 
           zIndex: 1,
           transform: 'scaleY(1)',
@@ -95,7 +95,7 @@ export function ApplicationCasesSection({ title, subtitle = "Busrom", titleImage
               fontSize: vw(120),
               fill: '#f6f4ed',
               stroke: 'url(#strokeGradient)',
-              strokeWidth: vw(1.5),
+              strokeWidth: vw(3),
               paintOrder: 'stroke fill'
             }}
           >
@@ -110,7 +110,7 @@ export function ApplicationCasesSection({ title, subtitle = "Busrom", titleImage
         <div 
           id="applications-title"
           className="relative mb-[vw(40)] flex flex-col items-center z-10" 
-          style={{ paddingTop: vw(0), transform: `translateX(${vw(100)})  translateY(${vw(-120)})` }}
+          style={{ paddingTop: vw(0), transform: `translateX(${vw(90)})  translateY(${vw(-140)})` }}
         >
           {titleImage && (
             <img 

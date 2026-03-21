@@ -52,7 +52,7 @@ export function ApplicationWhyChooseUsSection({
   const handlePrev = () => setCurrentIndex((prev) => (prev - 1 + items.length) % items.length)
 
   return (
-    <section className="relative w-full overflow-hidden select-none" style={{ height: vw(922) }}>
+    <section className="relative w-full select-none" style={{ height: vw(922) }}>
       <div className="absolute left-1/2 -translate-x-1/2 h-full" style={{ width: vw(1920) }}>
         
         {/* Left Gradient Box & Clipped "Why" Title */}
@@ -71,8 +71,8 @@ export function ApplicationWhyChooseUsSection({
             className="absolute font-extrabold whitespace-nowrap"
             style={{ 
               left: vw(497 + 20), 
-              top: vw(-63), // Target global -60px (60 + 3 container offset)
-              fontSize: vw(160), 
+              top: vw(-100), // Target global -60px (60 + 3 container offset)
+              fontSize: vw(200), 
               fontFamily: 'var(--font-anaheim), sans-serif',
               color: 'transparent',
               WebkitTextStroke: `${vw(1.5)} #FFFFFF`,
@@ -88,8 +88,8 @@ export function ApplicationWhyChooseUsSection({
           className="absolute font-extrabold whitespace-nowrap"
           style={{ 
             left: vw(497 + 20), 
-            top: vw(-60), 
-            fontSize: vw(160), 
+            top: vw(-100), 
+            fontSize: vw(200), 
             fontFamily: 'var(--font-anaheim), sans-serif',
             color: '#F6F4ED', // Updated from transparent to #F6F4ED
             WebkitTextStroke: `${vw(4)} #756F3F`,
@@ -216,16 +216,7 @@ export function ApplicationWhyChooseUsSection({
           </AnimatePresence>
 
           {/* Navigation Arrows */}
-          <div className="absolute flex flex-col gap-4" style={{ left: vw(1725 - 550), top: vw(424 - 123), zIndex: 50 }}>
-            <button 
-              onClick={handlePrev}
-              className="rounded-full border border-white/60 flex items-center justify-center bg-white/20 hover:bg-white/40 transition-colors"
-              style={{ width: vw(50), height: vw(50) }}
-            >
-              <svg viewBox="0 0 14 24" fill="none" className="rotate-180" style={{ width: vw(11), height: vw(19) }}>
-                <path d="M1 23L12 12L1 1" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
+          <div className="absolute flex flex-col gap-4" style={{ left: vw(1725 - 550), top: vw(424 - 123 - 140), zIndex: 50 }}>
             <button 
               onClick={handleNext}
               className="rounded-full bg-white flex items-center justify-center hover:bg-white/90 transition-colors shadow-lg"
@@ -233,6 +224,15 @@ export function ApplicationWhyChooseUsSection({
             >
               <svg viewBox="0 0 14 24" fill="none" style={{ width: vw(11), height: vw(19) }}>
                 <path d="M1 23L12 12L1 1" stroke="#A59E69" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            <button 
+              onClick={handlePrev}
+              className="rounded-full border border-white/60 flex items-center justify-center bg-white/20 hover:bg-white/40 transition-colors"
+              style={{ width: vw(50), height: vw(50) }}
+            >
+              <svg viewBox="0 0 14 24" fill="none" className="rotate-180" style={{ width: vw(11), height: vw(19) }}>
+                <path d="M1 23L12 12L1 1" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
           </div>
