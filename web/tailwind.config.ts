@@ -175,6 +175,7 @@ const config: Config = {
         'berkshire-swash': ['var(--font-berkshire)', 'cursive'],
         'amiri': ['var(--font-amiri)', 'serif'],
         'amarante': ['var(--font-amarante)', 'Amarante', 'serif'],
+        'quicksand': ['var(--font-quicksand)', 'sans-serif'],
 
         // --- 系统字体 (直接使用名字) ---
         'arial':       ['Arial', 'sans-serif'],

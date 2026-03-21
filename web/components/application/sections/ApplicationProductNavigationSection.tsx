@@ -9,8 +9,8 @@ function vw(px: number) {
   return `${(px / 1920) * 100}vw`
 }
 
-// Scale toggle requested by UI to shrink items but keep centers identical
-const SCALE = 0.7
+// Scale toggle requested by UI to shrink items. Reverted base scale to 1 because we are now scaling the entire group wrapper by 0.54
+const SCALE = 1
 const svw = (px: number) => vw(px * SCALE)
 
 const calcSlot = (left: number, top: number, width: number, height: number) => ({
@@ -159,49 +159,16 @@ export function ApplicationProductNavigationSection({
   if (products.length === 0) return null
 
   return (
-    <section className="relative w-full overflow-hidden select-none bg-transparent" style={{ height: vw(1350) /* slightly bigger bounds */ }}>
+    <section className="relative w-full overflow-hidden select-none bg-transparent" style={{ height: vw(922) }}>
       {/* 1920 container to host exact coordinates */}
       <div className="absolute left-1/2 -translate-x-1/2 h-full" style={{ width: vw(1920) }}>
         
-        {/* ================== BACKGROUND LETTERS ================== */}
-        {/* R */}
-        <div className="absolute pointer-events-none" style={calcLetter(1019, -37, 116, 143)}>
-          <Image src="/images/application/letters/r.svg" alt="R" fill />
-        </div>
-        
-        {/* O */}
-        <div className="absolute pointer-events-none" style={calcLetter(1453, 156, 127, 141, 15)}>
-          <Image src="/images/application/letters/o.svg" alt="O" fill />
-        </div>
-
-        {/* M */}
-        <div className="absolute pointer-events-none" style={calcLetter(1704, 505, 160, 144, 3)}>
-          <Image src="/images/application/letters/m.svg" alt="M" fill />
-        </div>
-
-        {/* B */}
-        <div className="absolute pointer-events-none" style={calcLetter(36, 548, 132, 191, 3)}>
-          <Image src="/images/application/letters/b.svg" alt="B" fill />
-        </div>
-
-        {/* U */}
-        <div className="absolute pointer-events-none" style={calcLetter(291, 1018, 108, 141, 15)}>
-          <Image src="/images/application/letters/u.svg" alt="U" fill />
-        </div>
-
-        {/* S */}
-        <div className="absolute pointer-events-none" style={calcLetter(706, 1124, 98, 142)}>
-          <Image src="/images/application/letters/s.svg" alt="S" fill />
-        </div>
-
-
         {/* ================== CTA TOP RIGHT ================== */}
-        <div className="absolute" style={{ left: vw(1486), top: vw(172), zIndex: 20 }}>
+        <div className="absolute" style={{ left: vw(1486), top: vw(80), zIndex: 20 }}>
           <Link href={ctaHref || "/cases"} className="flex items-center group">
             <span className="font-anaheim font-semibold text-black uppercase group-hover:opacity-80 transition-opacity" style={{ fontSize: vw(32), lineHeight: vw(30), marginRight: vw(18) }}>
               {ctaText}
             </span>
-            {/* Same Subtract arrow styling from Figma */}
             <div className="relative flex items-center justify-center group-hover:opacity-80 transition-opacity" style={{ width: vw(102), height: vw(66), backgroundColor: '#756F3F', borderRadius: vw(33) }}>
               <div style={{ width: vw(33), height: vw(18) }}>
                 <svg viewBox="0 0 33 18" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
@@ -212,126 +179,150 @@ export function ApplicationProductNavigationSection({
           </Link>
         </div>
 
+        {/* ================== SCALED GROUP (LETTERS, SLOTS, ARROWS) ================== */}
+        <div 
+          className="absolute inset-0 pointer-events-none" 
+          style={{ transform: 'scale(0.54)', transformOrigin: 'center center', marginTop: vw(-120) }}
+        >
+          {/* We make inner elements pointer-events-auto if they need to be interactive */}
+          <div className="relative w-full h-full pointer-events-auto">
 
-        {/* ================== CAROUSEL SLOTS ================== */}
-        {indices.map((productIdx, slotIdx) => {
-          const slot = SLOTS[slotIdx]
-          const product = products[productIdx]
-          
-          if (!product) return null
+            {/* ================== BACKGROUND LETTERS ================== */}
+            <div className="absolute pointer-events-none" style={calcLetter(1019, -37, 116, 143)}>
+              <Image src="/images/application/letters/r.svg" alt="R" fill />
+            </div>
+            
+            <div className="absolute pointer-events-none" style={calcLetter(1453, 156, 127, 141, 15)}>
+              <Image src="/images/application/letters/o.svg" alt="O" fill />
+            </div>
 
-          const isCenter = slotIdx === 2
-          
-          return (
-            <motion.div
-              layout
-              key={`nav-product-${productIdx}`}
-              initial={false}
-              animate={{
-                left: slot.left,
-                top: slot.top,
-                width: slot.width,
-                height: slot.height,
-                zIndex: slot.zIndex,
-                boxShadow: slot.dropShadow || 'none',
-              }}
-              transition={{ type: "spring", stiffness: 200, damping: 25 }}
-              onClick={() => {
-                if (!isCenter) handleManualSwap(slotIdx)
-              }}
-              className="absolute overflow-hidden group cursor-pointer"
-              style={{
-                borderRadius: vw(60 * SCALE),
-                border: slot.borderColor ? `2px solid ${slot.borderColor}` : 'none',
-              }}
-            >
-              {/* Product Image */}
-              <div className="relative w-full h-full bg-stone-200">
-                {product.showImage?.url ? (
-                  <Image 
-                    src={product.showImage.url} 
-                    alt={product.name || "Product"} 
-                    fill 
-                    unoptimized
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-stone-200" />
-                )}
-                
-                {/* Overlay filter */}
-                {!isCenter && slot.bgColor && (
-                  <motion.div 
-                    layout
-                    className="absolute inset-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-80"
-                    style={{ backgroundColor: slot.bgColor }}
-                  />
-                )}
+            <div className="absolute pointer-events-none" style={calcLetter(1704, 505, 160, 144, 3)}>
+              <Image src="/images/application/letters/m.svg" alt="M" fill />
+            </div>
 
-                {/* Center Hover Items */}
-                {isCenter && (
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-                    {/* Top Right Arrow */}
-                    <div className="absolute flex items-center justify-center rounded-full border border-white/50" style={{ right: svw(40), top: svw(40), width: svw(156), height: svw(156), backgroundColor: '#756F3F' }}>
-                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: svw(64), height: svw(64) }}>
-                        <path d="M7 17L17 7M17 7H7M17 7V17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
+            <div className="absolute pointer-events-none" style={calcLetter(36, 548, 132, 191, 3)}>
+              <Image src="/images/application/letters/b.svg" alt="B" fill />
+            </div>
 
-                    {/* Bottom Details */}
-                    <div className="absolute bottom-0 w-full flex flex-col justify-center" style={{ 
-                      height: svw(304),
-                      backgroundColor: 'rgba(117, 111, 63, 0.74)',
-                      backdropFilter: 'blur(20px)',
-                      paddingLeft: svw(72),
-                      paddingRight: svw(72)
-                    }}>
-                      {/* Name */}
-                      {product._carouselItem?.showName !== false && (
-                        <h3 className="font-anaheim font-bold text-white truncate" style={{ fontSize: svw(64), lineHeight: 1.1, marginBottom: svw(16) }}>
-                          {product.name}
-                        </h3>
-                      )}
-                      {/* Highlights */}
-                      {product._carouselItem?.showHighlights !== false && (
-                        <div className="flex flex-col gap-[10px]">
-                          {(product.productAttributes?.highlights?.length > 0 
-                            ? product.productAttributes.highlights 
-                            : [{ text: "Premium Material" }, { text: "Customized Service" }, { text: "Durability Guaranteed" }]
-                          )
-                            .slice(0, product._carouselItem?.highlightsCount || 3)
-                            .map((h: any, idx: number) => (
-                            <div key={idx} className="flex items-center">
-                              {/* Dots */}
-                              <div className="relative flex items-center justify-center flex-shrink-0" style={{ width: svw(18), height: svw(18), marginRight: svw(24) }}>
-                                <div className="absolute inset-0 rounded-full border" style={{ borderColor: '#E4DDA9' }} />
-                                <div className="rounded-full" style={{ width: svw(10), height: svw(10), backgroundColor: '#FFE866' }} />
-                              </div>
-                              <span className="font-anaheim font-semibold text-white line-clamp-1" style={{ fontSize: svw(32), lineHeight: 1.2 }}>
-                                {h.text}
-                              </span>
-                            </div>
-                          ))}
+            <div className="absolute pointer-events-none" style={calcLetter(291, 1018, 108, 141, 15)}>
+              <Image src="/images/application/letters/u.svg" alt="U" fill />
+            </div>
+
+            <div className="absolute pointer-events-none" style={calcLetter(706, 1124, 98, 142)}>
+              <Image src="/images/application/letters/s.svg" alt="S" fill />
+            </div>
+
+            {/* ================== CAROUSEL SLOTS ================== */}
+            {indices.map((productIdx, slotIdx) => {
+              const slot = SLOTS[slotIdx]
+              const product = products[productIdx]
+              
+              if (!product) return null
+
+              const isCenter = slotIdx === 2
+              
+              return (
+                <motion.div
+                  layout
+                  key={`nav-product-${productIdx}`}
+                  initial={false}
+                  animate={{
+                    left: slot.left,
+                    top: slot.top,
+                    width: slot.width,
+                    height: slot.height,
+                    zIndex: slot.zIndex,
+                    boxShadow: slot.dropShadow || 'none',
+                  }}
+                  transition={{ type: "spring", stiffness: 200, damping: 25 }}
+                  onClick={() => {
+                    if (!isCenter) handleManualSwap(slotIdx)
+                  }}
+                  className="absolute overflow-hidden group cursor-pointer"
+                  style={{
+                    borderRadius: vw(60 * SCALE),
+                    border: slot.borderColor ? `2px solid ${slot.borderColor}` : 'none',
+                  }}
+                >
+                  <div className="relative w-full h-full bg-stone-200">
+                    {product.showImage?.url ? (
+                      <Image 
+                        src={product.showImage.url} 
+                        alt={product.name || "Product"} 
+                        fill 
+                        unoptimized
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-stone-200" />
+                    )}
+                    
+                    {!isCenter && slot.bgColor && (
+                      <motion.div 
+                        layout
+                        className="absolute inset-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-80"
+                        style={{ backgroundColor: slot.bgColor }}
+                      />
+                    )}
+
+                    {isCenter && (
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                        <div className="absolute flex items-center justify-center rounded-full border border-white/50" style={{ right: svw(40), top: svw(40), width: svw(156), height: svw(156), backgroundColor: '#756F3F' }}>
+                          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: svw(64), height: svw(64) }}>
+                            <path d="M7 17L17 7M17 7H7M17 7V17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
                         </div>
-                      )}
-                    </div>
+
+                        <div className="absolute bottom-0 w-full flex flex-col justify-center" style={{ 
+                          height: svw(304),
+                          backgroundColor: 'rgba(117, 111, 63, 0.74)',
+                          backdropFilter: 'blur(20px)',
+                          paddingLeft: svw(72),
+                          paddingRight: svw(72)
+                        }}>
+                          {product._carouselItem?.showName !== false && (
+                            <h3 className="font-anaheim font-bold text-white truncate" style={{ fontSize: svw(64), lineHeight: 1.1, marginBottom: svw(16) }}>
+                              {product.name}
+                            </h3>
+                          )}
+                          {product._carouselItem?.showHighlights !== false && (
+                            <div className="flex flex-col gap-[10px]">
+                              {(product.productAttributes?.highlights?.length > 0 
+                                ? product.productAttributes.highlights 
+                                : [{ text: "Premium Material" }, { text: "Customized Service" }, { text: "Durability Guaranteed" }]
+                              )
+                                .slice(0, product._carouselItem?.highlightsCount || 3)
+                                .map((h: any, idx: number) => (
+                                <div key={idx} className="flex items-center">
+                                  <div className="relative flex items-center justify-center flex-shrink-0" style={{ width: svw(18), height: svw(18), marginRight: svw(24) }}>
+                                    <div className="absolute inset-0 rounded-full border" style={{ borderColor: '#E4DDA9' }} />
+                                    <div className="rounded-full" style={{ width: svw(10), height: svw(10), backgroundColor: '#FFE866' }} />
+                                  </div>
+                                  <span className="font-anaheim font-semibold text-white line-clamp-1" style={{ fontSize: svw(32), lineHeight: 1.2 }}>
+                                    {h.text}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
+                </motion.div>
+              )
+            })}
 
+            {/* ================== ARROWS ================== */}
+            <button className="absolute hover:scale-105 transition-transform" style={{ left: vw(311), top: vw(334), width: vw(200), height: vw(152), zIndex: 20 }} onClick={prevSlide}>
+              <Image src="/images/application/letters/leftarrow.svg" alt="Prev" fill />
+            </button>
 
-              </div>
-            </motion.div>
-          )
-        })}
-
-        {/* ================== ARROWS ================== */}
-        <button className="absolute hover:scale-105 transition-transform" style={{ left: vw(441), top: vw(414), width: vw(200), height: vw(152), zIndex: 20 }} onClick={prevSlide}>
-          <Image src="/images/application/letters/leftarrow.svg" alt="Prev" fill />
-        </button>
-
-        <button className="absolute hover:scale-105 transition-transform" style={{ left: vw(1278), top: vw(837), width: vw(200), height: vw(152), zIndex: 20 }} onClick={nextSlide}>
-          <Image src="/images/application/letters/rightarrow.svg" alt="Next" fill />
-        </button>
+            <button className="absolute hover:scale-105 transition-transform" style={{ left: vw(1408), top: vw(917), width: vw(200), height: vw(152), zIndex: 20 }} onClick={nextSlide}>
+              <Image src="/images/application/letters/rightarrow.svg" alt="Next" fill />
+            </button>
+          </div>
+        </div>
 
       </div>
     </section>

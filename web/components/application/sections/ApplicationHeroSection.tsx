@@ -118,7 +118,31 @@ export function ApplicationHeroSection({ title, topSubtitle, rightBoxText = "APP
                 className="absolute overflow-hidden pointer-events-none"
                 style={config}
               >
-                {images[imageIdx] ? <OptimizedImage image={images[imageIdx] as any} alt="App Image" size="large" className="w-full h-full object-cover" /> : <div className="w-full h-full bg-white/10" />}
+                {/* Independent Floating/Breathing Animation Layer */}
+                <motion.div
+                  className="w-full h-full"
+                  animate={{ 
+                    y: [0, vw(slotIdx === 0 ? -10 : -16), 0],
+                  }}
+                  transition={{
+                    duration: slotIdx === 0 ? 3.8 : 4.5,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    ease: "easeInOut",
+                    delay: slotIdx * 0.6 // Phase shift for organic movement
+                  }}
+                >
+                  {images[imageIdx] ? (
+                    <OptimizedImage 
+                      image={images[imageIdx] as any} 
+                      alt="App Image" 
+                      size="large" 
+                      className="w-full h-full object-cover" 
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-white/10" />
+                  )}
+                </motion.div>
               </motion.div>
             )
           })}
