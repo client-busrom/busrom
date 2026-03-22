@@ -283,13 +283,13 @@ export const CarouselComponent: React.FC<CarouselComponentProps> = ({ nodeKey, d
                   </div>
 
                   {/* Title */}
-                  <input
-                    type="text"
+                  <textarea
                     value={slide.title || ''}
                     onChange={(e) => handleSlideChange(index, 'title', e.target.value)}
                     onKeyDown={(e) => e.stopPropagation()}
                     placeholder={i18n?.language === 'zh' ? '标题' : 'Title'}
-                    style={{ width: '100%', padding: '4px 6px', border: '1px solid #d1d5db', borderRadius: '3px', fontSize: '11px', marginBottom: '6px' }}
+                    rows={1}
+                    style={{ width: '100%', padding: '4px 6px', border: '1px solid #d1d5db', borderRadius: '3px', fontSize: '11px', marginBottom: '6px', resize: 'vertical' }}
                   />
 
                   {/* Description */}
@@ -479,12 +479,12 @@ export const CarouselComponent: React.FC<CarouselComponentProps> = ({ nodeKey, d
                     <img src={imageUrl} alt={slide.title || `Image ${index + 1}`} style={{ width: '100%', height: '200px', objectFit: 'cover', display: 'block' }} />
                     <div style={{ padding: '12px' }}>
                       {slide.title && (
-                        <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600, color: '#1f2937' }}>
+                        <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600, color: '#1f2937', whiteSpace: 'pre-wrap' }}>
                           {slide.title}
                         </h3>
                       )}
                       {slide.description && (
-                        <p style={{ margin: '0 0 12px 0', fontSize: '13px', color: '#6b7280', lineHeight: '1.5' }}>
+                        <p style={{ margin: '0 0 12px 0', fontSize: '13px', color: '#6b7280', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
                           {slide.description}
                         </p>
                       )}
