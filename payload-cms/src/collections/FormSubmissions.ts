@@ -29,7 +29,7 @@ export const FormSubmissions: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'formName',
-    defaultColumns: ['formName', 'status', 'submissionType', 'emailSent', 'locale', 'submittedAt'],
+    defaultColumns: ['formName', 'status', 'submissionType', 'country', 'city', 'emailSent', 'locale', 'submittedAt'],
     group: {
       en: 'Forms',
       zh: '表单管理',
@@ -116,6 +116,23 @@ export const FormSubmissions: CollectionConfig = {
         if (operation === 'update' && data?.status === 'READ') {
           if (originalDoc?.status !== 'READ') {
             data.readAt = new Date().toISOString()
+          }
+        }
+
+        // Resolve IP to Location
+        if (operation === 'create' && data?.ipAddress && data.ipAddress !== '127.0.0.1' && data.ipAddress !== '::1') {
+          try {
+            // Using ip-api.com (Free for non-commercial use, 45 requests per minute)
+            const response = await fetch(`http://ip-api.com/json/${data.ipAddress}?fields=status,country,city,regionName`);
+            const geo: any = await response.json();
+            if (geo && geo.status === 'success') {
+              data.country = geo.country;
+              const region = geo.regionName ? `, ${geo.regionName}` : '';
+              data.city = `${geo.city}${region}`;
+              req.payload.logger.info(`Resolved IP ${data.ipAddress} to ${data.city}, ${data.country}`);
+            }
+          } catch (e: any) {
+            req.payload.logger.error(`Failed to resolve IP ${data.ipAddress}: ${e?.message}`);
           }
         }
 
@@ -427,6 +444,36 @@ export const FormSubmissions: CollectionConfig = {
           },
           admin: {
             readOnly: true,
+          },
+        },
+        {
+          name: 'country',
+          type: 'text',
+          label: {
+            en: 'Country',
+            zh: '国家',
+          },
+          admin: {
+            readOnly: true,
+            description: {
+              en: 'Resolved from IP address',
+              zh: '从 IP 地址解析',
+            },
+          },
+        },
+        {
+          name: 'city',
+          type: 'text',
+          label: {
+            en: 'City',
+            zh: '城市',
+          },
+          admin: {
+            readOnly: true,
+            description: {
+              en: 'Resolved from IP address',
+              zh: '从 IP 地址解析',
+            },
           },
         },
         {
