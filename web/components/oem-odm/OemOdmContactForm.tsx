@@ -261,6 +261,7 @@ export function OemOdmContactForm({
           data: formData,
           locale,
           sourcePage: typeof window !== "undefined" ? window.location.href : "",
+          userLocalTime: typeof window !== "undefined" ? new Date().toString() : "",
           turnstileToken,
         }),
       })
