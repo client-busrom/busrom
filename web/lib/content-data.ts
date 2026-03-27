@@ -47,7 +47,7 @@ export interface ImageVariantInfo {
 
 export interface ImageObject {
   url: string
-  altText: string
+  altText?: string
   thumbnailUrl?: string
   cropFocalPoint?: { x: number; y: number }
   variants?: {

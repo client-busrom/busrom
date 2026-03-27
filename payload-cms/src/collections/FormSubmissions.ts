@@ -136,6 +136,27 @@ export const FormSubmissions: CollectionConfig = {
           }
         }
 
+        // Calculate China Time (UTC+8) on creation
+        if (operation === 'create') {
+          try {
+            const now = new Date();
+            // Using Intl.DateTimeFormat to get a reliable China Time string
+            const chinaTimeString = new Intl.DateTimeFormat('zh-CN', {
+              timeZone: 'Asia/Shanghai',
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false
+            }).format(now);
+            data.chinaTime = chinaTimeString;
+          } catch (e: any) {
+            req.payload.logger.error(`Failed to calculate China Time: ${e?.message}`);
+          }
+        }
+
         return data
       },
     ],
@@ -567,6 +588,36 @@ export const FormSubmissions: CollectionConfig = {
         readOnly: true,
         date: {
           pickerAppearance: 'dayAndTime',
+        },
+      },
+    },
+    {
+      name: 'userLocalTime',
+      type: 'text',
+      label: {
+        en: "Submitter's Local Time",
+        zh: '提交者当地时间',
+      },
+      admin: {
+        readOnly: true,
+        description: {
+          en: 'Captured from the user browser',
+          zh: '从提交者浏览器获取的本地时间',
+        },
+      },
+    },
+    {
+      name: 'chinaTime',
+      type: 'text',
+      label: {
+        en: 'China Time (CST)',
+        zh: '中国北京时间 (CST)',
+      },
+      admin: {
+        readOnly: true,
+        description: {
+          en: 'Calculated as UTC+8',
+          zh: '计算所得的北京时间 (UTC+8)',
         },
       },
     },

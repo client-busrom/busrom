@@ -252,6 +252,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
           attachments: attachmentUrl ? [attachmentUrl] : [],
           locale,
           sourcePage: window.location.href,
+          userLocalTime: new Date().toString(),
         }),
       })
 

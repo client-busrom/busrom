@@ -524,13 +524,13 @@ const CarouselBlock = ({ node }: any) => {
 
                     <div className="space-y-3 max-w-[256px] md:max-w-[488px]">
                       {slide.title && (
-                        <div className="font-bold text-brand-text-black text-lg">
+                        <div className="font-bold text-brand-text-black text-lg whitespace-pre-wrap">
                           {slide.title}
                         </div>
                       )}
 
                       {slide.description && (
-                        <div className="text-brand-text-main text-sm leading-relaxed">
+                        <div className="text-brand-text-main text-sm leading-relaxed whitespace-pre-wrap">
                           {slide.description}
                         </div>
                       )}

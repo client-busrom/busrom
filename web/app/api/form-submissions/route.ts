@@ -41,6 +41,7 @@ async function verifyTurnstile(token: string, secretKey: string): Promise<boolea
       body: new URLSearchParams({
         secret: secretKey,
         response: token,
+        // remoteip would be good but not strictly required
       }),
     })
     const result = await response.json()
@@ -164,6 +165,8 @@ export async function POST(request: NextRequest) {
       locale,
       autoSubmitted = false,
       turnstileToken,
+      userLocalTime,
+      sourcePage: bodySourcePage,
     } = body
 
     console.log('[Form Submission API] Received submission:', {
@@ -172,6 +175,7 @@ export async function POST(request: NextRequest) {
       locale,
       dataKeys: Object.keys(data || {}),
       hasTurnstileToken: !!turnstileToken,
+      userLocalTime,
     })
 
     // Validate required fields
@@ -272,7 +276,8 @@ export async function POST(request: NextRequest) {
       formName: formName || 'Unknown Form',
       data,
       locale: locale || 'en',
-      sourcePage: referer,
+      sourcePage: bodySourcePage || referer,
+      userLocalTime: userLocalTime || '',
       ipAddress,
       userAgent,
       submissionType: autoSubmitted ? 'AUTO' : 'MANUAL',

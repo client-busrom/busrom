@@ -199,7 +199,9 @@ export async function sendFormNotificationEmail(
         ${formDataHtml}
         <div class="meta">
           <p><strong>Submission ID:</strong> ${submission.id}</p>
-          <p><strong>Submitted At:</strong> ${new Date().toISOString()}</p>
+          <p><strong>UTC Time:</strong> ${new Date().toISOString()}</p>
+          ${submission.chinaTime ? `<p><strong>China Time (CST):</strong> ${submission.chinaTime}</p>` : ''}
+          ${submission.userLocalTime ? `<p><strong>Submitter Local Time:</strong> ${submission.userLocalTime}</p>` : ''}
           <p><strong>Locale:</strong> ${locale}</p>
           ${submission.sourcePage ? `<p><strong>Source Page:</strong> ${submission.sourcePage}</p>` : ''}
           ${submission.ipAddress ? `<p><strong>IP Address:</strong> ${submission.ipAddress}</p>` : ''}
