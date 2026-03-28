@@ -7,6 +7,7 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { Turnstile } from "@/components/ui/turnstile"
 import { cn } from "@/lib/utils"
 import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput"
+import { HollowText } from "@/components/common/HollowText"
 
 const DESIGN_WIDTH = 1920
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
@@ -63,6 +64,47 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
   // Image Gallery State
   const validImages = images.filter((img): img is MediaObject => img !== null && img !== undefined)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [direction, setDirection] = useState(0) // 1 for next, -1 for prev
+
+  // Slider variants for circular gallery
+  const sliderVariants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? "100%" : direction < 0 ? "-100%" : 0,
+      opacity: 0,
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? "100%" : direction > 0 ? "-100%" : 0,
+      opacity: 0,
+    }),
+  }
+
+  // Auto interval switching
+  useEffect(() => {
+    if (validImages.length <= 1) return
+    const interval = setInterval(() => {
+      setDirection(1)
+      setCurrentImageIndex((prev) => (prev + 1) % validImages.length)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [validImages.length, currentImageIndex])
+
+  const handlePrevImage = () => {
+    if (validImages.length <= 1) return
+    setDirection(-1)
+    setCurrentImageIndex((prev) => prev > 0 ? prev - 1 : validImages.length - 1)
+  }
+
+  const handleNextImage = () => {
+    if (validImages.length <= 1) return
+    setDirection(1)
+    setCurrentImageIndex((prev) => prev < validImages.length - 1 ? prev + 1 : 0)
+  }
 
   // Turnstile & Submit states
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -164,6 +206,11 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
     return getLocalizedString(mergedConfig?.submitButtonText, locale || 'en');
   }, [mergedConfig, locale]);
 
+  const effectiveDescription = useMemo(() => {
+    const formConfigDesc = (mergedConfig?.data || mergedConfig)?.description || mergedConfig?.description;
+    return getLocalizedString(formConfigDesc, locale || 'en') || description;
+  }, [mergedConfig, locale, description]);
+
   useEffect(() => {
     const fetchSiteKey = async () => {
       try {
@@ -180,23 +227,6 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
     }
     fetchSiteKey()
   }, [])
-
-  // Auto layout
-  useEffect(() => {
-    if (validImages.length <= 1) return
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % validImages.length)
-    }, 4000)
-    return () => clearInterval(interval)
-  }, [validImages.length, currentImageIndex])
-
-  const handlePrevImage = () => {
-    setCurrentImageIndex((prev) => prev > 0 ? prev - 1 : validImages.length - 1)
-  }
-
-  const handleNextImage = () => {
-    setCurrentImageIndex((prev) => prev < validImages.length - 1 ? prev + 1 : 0)
-  }
 
   const configData = mergedConfig?.data || mergedConfig
   const fields = configData?.fields?.[locale] || configData?.fields?.["en"] || (Array.isArray(configData?.fields) ? configData.fields : [])
@@ -306,7 +336,7 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
       className="relative w-full overflow-hidden" 
       style={{ 
         height: `calc(${vw(983)} + ${extraHeight}px)`,
-        background: "linear-gradient(to bottom, #756f3f 0%, #dbd076 100%)"
+        background: "linear-gradient(to bottom, #756f3f 0%, #dbd076 180%)"
       }}
     >
       <div className="relative z-10 w-full h-full max-w-[1920px] mx-auto">
@@ -314,9 +344,9 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
          <div className="absolute" style={{ left: vw(153), top: vw(315) }}>
             <h2 className="font-josefin-sans font-semibold uppercase flex flex-col" style={{ fontSize: vw(128), lineHeight: 0.99 }}>
                {titleLines[0] && (
-                 <span style={{ WebkitTextStroke: "2px #ffffff", color: "transparent" }}>
+                 <HollowText strokeColor="#ffffff" strokeWidth={2}>
                    {titleLines[0]}
-                 </span>
+                 </HollowText>
                )}
                {titleLines[1] && (
                  <span className="text-white">
@@ -343,12 +373,12 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
              fontSize: vw(20), lineHeight: 1.35, color: "#fff287" 
            }}
          >
-            {description}
+            {effectiveDescription}
          </p>
 
          {/* 2. Center Image Gallery (Group 259) */}
          <div className="absolute flex items-center justify-center" style={{ left: vw(521), top: vw(167), width: vw(751), height: vw(643) }}>
-            {/* Ellipse 110 */}
+            {/* Ellipse 110 (Decoration circle on top) */}
             <div 
               className="absolute rounded-full" 
               style={{ 
@@ -356,31 +386,36 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
                 top: 0, 
                 width: vw(291), 
                 height: vw(291), 
-                backgroundColor: "rgba(255, 232, 86, 0.6)",
+                backgroundColor: "#FFE85699",
                 mixBlendMode: "multiply",
                 zIndex: 2
               }} 
             />
-            {/* Main Image */}
+            {/* Main Image (Gallery Circle) */}
             <div 
               className="absolute rounded-full overflow-hidden" 
               style={{ left: vw(108), top: 0, width: vw(643), height: vw(643), zIndex: 1 }}
             >
-              <AnimatePresence mode="wait">
+              <AnimatePresence initial={false} custom={direction}>
                 {validImages[currentImageIndex] && (
                   <motion.div
                     key={currentImageIndex}
-                    initial={{ opacity: 0, scale: 1.05 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="w-full h-full"
+                    custom={direction}
+                    variants={sliderVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{
+                      x: { type: "spring", stiffness: 300, damping: 30 },
+                      opacity: { duration: 0.2 }
+                    }}
+                    className="absolute w-full h-full"
                   >
                     <OptimizedImage
-                      src={validImages[currentImageIndex].url}
+                      image={validImages[currentImageIndex].url}
                       alt={validImages[currentImageIndex].alt || "Gallery Image"}
-                      fill
-                      className="object-cover"
+                      containerClassName="w-full h-full"
+                      className="w-full h-full object-cover"
                     />
                   </motion.div>
                 )}
@@ -390,43 +425,39 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
             {/* Pagination Controls */}
             {validImages.length > 1 && (
               <>
-                {/* Prev Btn */}
+                {/* Prev Btn (from pencil iJ7bU) */}
                 <button 
                   onClick={handlePrevImage}
-                  className="absolute z-10 hover:scale-110 transition-transform flex items-center justify-center"
+                  className="absolute z-10 hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
                   style={{ 
-                    left: vw(-207), 
-                    top: vw(95), 
-                    width: vw(76), 
-                    height: vw(76), 
-                    border: `${vw(1)} solid white`, 
-                    transform: "rotate(45deg)",
+                    left: vw(-190), 
+                    top: vw(50), 
+                    width: vw(76.56), 
+                    height: vw(76.56), 
+                    transform: "rotate(-45deg)",
                   }}
+                  aria-label="Previous Image"
                 >
-                  <div style={{ transform: "rotate(-45deg)" }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                  </div>
+                  <svg width="100%" height="100%" viewBox="0 0 77 77" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#ffffff" d="M75.17835 76.56344c0.27404 0.00005 0.54193-0.08118 0.7698-0.23341 0.22787-0.15223 0.40548-0.36861 0.51035-0.62179 0.10487-0.25317 0.13231-0.53177 0.07884-0.80054-0.05347-0.26877-0.18546-0.51564-0.37925-0.7094l-71.42781-71.4275 10.50912 0c0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.61219 0.40577-0.97963 0-0.36743-0.14596-0.71981-0.40577-0.97963-0.25981-0.25981-0.6122-0.40577-0.97963-0.40577l-13.86223 0c-0.36458 0.00216-0.71362 0.14795-0.97142 0.40575-0.2578 0.2578-0.40359 0.60684-0.40575 0.97142l0 13.86223c0 0.36743 0.14596 0.71981 0.40577 0.97963 0.25981 0.25981 0.61219 0.40577 0.97963 0.40577 0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.6122 0.40577-0.97963l0-10.50956 71.42782 71.42794c0.12852 0.12883 0.28124 0.231 0.44937 0.30061 0.16814 0.06962 0.34838 0.10532 0.53036 0.10505z" />
+                  </svg>
                 </button>
-                {/* Next Btn */}
+                {/* Next Btn (from pencil OmRkm) */}
                 <button 
                   onClick={handleNextImage}
-                  className="absolute z-10 hover:scale-110 transition-transform flex items-center justify-center"
+                  className="absolute z-10 hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
                   style={{ 
                     left: vw(716), 
                     top: vw(672), 
-                    width: vw(76), 
-                    height: vw(76), 
-                    border: `${vw(1)} solid #d3c976`, 
-                    transform: "rotate(-45deg)",
+                    width: vw(76.56), 
+                    height: vw(76.56), 
+                    transform: "rotate(135deg)",
                   }}
+                  aria-label="Next Image"
                 >
-                  <div style={{ transform: "rotate(45deg)" }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d3c976" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                  </div>
+                  <svg width="100%" height="100%" viewBox="0 0 77 77" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#d3c976" d="M75.17835 76.56344c0.27404 0.00005 0.54193-0.08118 0.7698-0.23341 0.22787-0.15223 0.40548-0.36861 0.51035-0.62179 0.10487-0.25317 0.13231-0.53177 0.07884-0.80054-0.05347-0.26877-0.18546-0.51564-0.37925-0.7094l-71.42781-71.4275 10.50912 0c0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.61219 0.40577-0.97963 0-0.36743-0.14596-0.71981-0.40577-0.97963-0.25981-0.25981-0.6122-0.40577-0.97963-0.40577l-13.86223 0c-0.36458 0.00216-0.71362 0.14795-0.97142 0.40575-0.2578 0.2578-0.40359 0.60684-0.40575 0.97142l0 13.86223c0 0.36743 0.14596 0.71981 0.40577 0.97963 0.25981 0.25981 0.61219 0.40577 0.97963 0.40577 0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.6122 0.40577-0.97963l0-10.50956 71.42782 71.42794c0.12852 0.12883 0.28124 0.231 0.44937 0.30061 0.16814 0.06962 0.34838 0.10532 0.53036 0.10505z" />
+                  </svg>
                 </button>
               </>
             )}
@@ -479,8 +510,8 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
                           disabled={isSubmitting}
                           className="!bg-[#746d37] !border-white/34 !rounded-[15px] !h-[63px] md:!h-[3.28vw]"
                           buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5"
-                          inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-[20px]"
-                          dialCodeClassName="!text-white"
+                          inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-[16px] md:!text-[1.0416vw]"
+                          dialCodeClassName="!text-white !text-[16px] md:!text-[1.0416vw]"
                         />
                       </div>
                     )
