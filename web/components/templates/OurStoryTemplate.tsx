@@ -356,37 +356,77 @@ export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps)
     const images = extractCustomGalleryAfterMarker(contentChildren, "sustainable-commitment-image", mediaData)
     const content1 = extractTextAfterMarker(contentChildren, "sustainable-commitment-content-1") || "Manufacturing For The Future — Durable & Low Carbon Production"
     const content2 = extractTextAfterMarker(contentChildren, "sustainable-commitment-content-2") || "Delivering Traceable Quality Assurance and Sustainable Solution"
+    const tips = extractTextAfterMarker(contentChildren, "sustainable-commitment-tips") || "ABOUT BUSROM"
 
     return {
       title,
       description,
       images,
       content1,
-      content2
+      content2,
+      tips
     }
   }, [contentChildren, mediaData])
 
   // Future Prospect Section Data
   const prospectData = useMemo(() => {
     const title = extractTextAfterMarker(contentChildren, "future-prospect-title") || "Future Prospect"
-    const items = extractListAfterMarker(contentChildren, "future-prospect-item")
+    const items = extractCarouselAfterMarker(contentChildren, "future-prospect-item", mediaData)
+    const logoImage = extractImageAfterMarker(contentChildren, "future-prospect-logo-image", mediaData)
+    const tips = extractTextAfterMarker(contentChildren, "future-prospect-tips") || "Our Vision"
 
     return {
       title,
-      items
+      items,
+      logoImage,
+      tips
     }
   }, [contentChildren, mediaData])
 
   // Contact Form Section Data
   const contactFormData = useMemo(() => {
-    const title = extractTextAfterMarker(contentChildren, "contact-form-title") || "Contact Us"
+    // Basic texts
+    const subtitle = extractTextAfterMarker(contentChildren, "contact-form-title") || "Contact Us"
     const description = extractTextAfterMarker(contentChildren, "form-description") || ""
 
-    return {
-      title,
-      description
+    // Contact form images
+    const images = extractCustomGalleryAfterMarker(contentChildren, "contact-form-image", mediaData)
+
+    // Form config
+    let formConfig = null
+    const formNodes = extractAfterMarker(contentChildren, "contact-form-title")
+    for (const node of formNodes) {
+      if (node.type === "formBlock" && node.data?.formConfig) {
+        formConfig = node.data.formConfig
+        break
+      }
     }
-  }, [contentChildren])
+
+    // Attempt to fall back to the generic `contact-form` block strategy if formBlock isn't found
+    if (!formConfig) {
+      const nodesAfterForm = extractAfterMarker(contentChildren, "contact-form")
+      for (const node of nodesAfterForm) {
+        if (node.type === "block" && node.fields) {
+           const blockSidebar = node.fields.sidebarContent?.root?.children || []
+           for (const sidebarNode of blockSidebar) {
+             if (sidebarNode.type === "formBlock" && sidebarNode.data?.formConfig) {
+               formConfig = sidebarNode.data.formConfig
+               break
+             }
+           }
+        }
+      }
+    }
+
+    return {
+      title: "Get A \nQuote", // Default multi-line title from Pencil design
+      subtitle, 
+      description,
+      formConfig,
+      images,
+      locale
+    }
+  }, [contentChildren, mediaData, locale])
 
   // Applications Section Data
   const applicationsData = useMemo(() => {
