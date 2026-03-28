@@ -93,20 +93,33 @@ export function StoryBrandStrengthsSection({ data }: StoryBrandStrengthsSectionP
 
         {/* 2. Navigation Buttons */}
         <div 
-          className="absolute z-[100] flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-transform" 
-          style={{ left: vw(237.1), top: vw(294.6), width: vw(79.5), height: vw(79.5) }} 
+          className="absolute z-[100] flex items-center justify-center cursor-pointer border border-[#756f3f] bg-transparent rounded-full hover:scale-105 active:scale-95 transition-transform" 
+          style={{ left: vw(237), top: vw(295), width: vw(80), height: vw(80) }} 
           onClick={handlePrev}
         >
-           <div className="absolute inset-0 border border-[#756f3f] rounded-full" />
-           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="rotate-180 stroke-[#756f3f]"><path d="M9 18l6-6-6-6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+           <svg 
+             style={{ width: vw(32), height: vw(32) }} 
+             viewBox="0 0 24 24" 
+             fill="none" 
+             xmlns="http://www.w3.org/2000/svg"
+             className="rotate-180 text-[#756f3f]"
+           >
+              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+           </svg>
         </div>
         <div 
-          className="absolute z-[100] flex items-center justify-center cursor-pointer active:scale-95" 
-          style={{ right: vw(380), bottom: vw(84), width: vw(79), height: vw(79) }} 
+          className="absolute z-[100] flex items-center justify-center cursor-pointer bg-[#756f3f] rounded-full shadow-lg hover:scale-105 active:scale-95 transition-transform" 
+          style={{ right: vw(380), bottom: vw(84), width: vw(80), height: vw(80) }} 
           onClick={handleNext}
         >
-           <div className="absolute inset-0 bg-[#756f3f] rounded-full shadow-lg" />
-           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="stroke-white"><path d="M9 18l6-6-6-6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+           <svg 
+             style={{ width: vw(32), height: vw(32) }} 
+             viewBox="0 0 24 24" 
+             fill="none" 
+             xmlns="http://www.w3.org/2000/svg"
+           >
+              <path d="M9 18L15 12L9 6" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+           </svg>
         </div>
 
         {/* 3. Ladder Carousel */}
