@@ -105,7 +105,7 @@ function CustomDropdown({ field, value, onChange }: { field: FormField, value: s
     )
 }
 
-export function ApplicationContactFormSection({ locale = "en", bgImage, displayImage, logoImage, richText, formId = "10" }: Props) {
+export function ApplicationContactFormSection({ locale = "en", bgImage, displayImage, logoImage, richText, formId }: Props) {
   const [formConfig, setFormConfig] = useState<FormConfig | null>(null)
   const [formData, setFormData] = useState<Record<string, any>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)

@@ -13,6 +13,7 @@ interface StoryBrandSustainabilitySectionProps {
     images: { url: string }[]
     content1: string
     content2: string
+    tips: string
   }
 }
 
@@ -43,7 +44,7 @@ export function StoryBrandSustainabilitySection({ data }: StoryBrandSustainabili
   
   return (
     <section 
-      className="relative w-full bg-white overflow-hidden" 
+      className="relative w-full bg-[#f6f4ed] overflow-hidden" 
       style={{ height: vw(922) }}
     >
       {/* Decorative Rotating/Orbiting Group (Direct copy from BrandPosition vnWA6 + MdA83) */}
@@ -155,7 +156,7 @@ export function StoryBrandSustainabilitySection({ data }: StoryBrandSustainabili
             {/* BUS Text (jq6Z4) */}
             <div 
                className="absolute font-josefin-sans font-bold text-[#756f3f] opacity-20 select-none z-0"
-               style={{ left: vw(30), top: vw(80), fontSize: vw(180), pointerEvents: "none" }}
+               style={{ left: vw(60), top: vw(80), fontSize: vw(160), pointerEvents: "none" }}
             >
               BUS
             </div>
@@ -177,7 +178,7 @@ export function StoryBrandSustainabilitySection({ data }: StoryBrandSustainabili
              {/* ROM Text (Dcaz7) */}
              <div 
                 className="absolute font-josefin-sans font-bold text-[#756f3f] opacity-20 select-none z-0"
-                style={{ left: vw(-40), top: vw(560), fontSize: vw(180), pointerEvents: "none" }}
+                style={{ left: vw(-20), top: vw(560), fontSize: vw(160), pointerEvents: "none" }}
              >
                 ROM
              </div>
@@ -244,8 +245,8 @@ export function StoryBrandSustainabilitySection({ data }: StoryBrandSustainabili
             <div 
               className="absolute flex items-center"
               style={{ 
-                right: vw(40), 
-                bottom: vw(150), 
+                right: vw(100), 
+                bottom: vw(250), 
                 width: vw(245), 
                 transform: "rotate(-90deg)",
                 transformOrigin: "right center"
@@ -253,7 +254,7 @@ export function StoryBrandSustainabilitySection({ data }: StoryBrandSustainabili
             >
               <div className="w-[80vw] h-[1px] bg-black/20" />
               <span className="ml-4 whitespace-nowrap font-josefin-sans uppercase opacity-30 tracking-[0.2em]" style={{ fontSize: vw(14) }}>
-                ABOUT BUSROM
+                {data.tips || "ABOUT BUSROM"}
               </span>
             </div>
           </div>

@@ -2,32 +2,83 @@
 
 import React from "react"
 import { motion } from "framer-motion"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 const DESIGN_WIDTH = 1920
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
 
+interface MediaObject {
+  url: string
+  id: string
+}
+
+interface BrandProspectItem {
+  title: string
+  description: string
+  image: MediaObject | null
+}
+
 interface StoryBrandProspectSectionProps {
   data: {
     title: string
-    items: string[]
+    tips?: string
+    items: {
+      slides: BrandProspectItem[]
+    }
+    logoImage: MediaObject | null
   }
 }
 
+/**
+ * Helper to style text within double quotes or smart quotes
+ */
+function formatQuotedText(text: string) {
+  if (!text) return null
+  
+  // Split by straight or smart double quotes
+  const parts = text.split(/([\"“].*?[\"”])/g)
+  
+  return parts.map((part, index) => {
+    if ((part.startsWith('"') || part.startsWith('“')) && (part.endsWith('"') || part.endsWith('”'))) {
+      return (
+        <span 
+          key={index} 
+          className="font-bold text-[#ff7c02]" 
+          style={{ fontSize: vw(32) }}
+        >
+          {part}
+        </span>
+      )
+    }
+    return <span key={index}>{part}</span>
+  })
+}
+
 export function StoryBrandProspectSection({ data }: StoryBrandProspectSectionProps) {
+  const slides = data?.items?.slides || []
+  const logoImage = data?.logoImage
+
   return (
     <section 
-      className="relative w-full overflow-hidden py-40" 
+      className="relative w-full overflow-hidden" 
       style={{ 
         height: vw(1444),
-        background: "linear-gradient(to bottom, #f8efce, #f6f4ed)"
+        background: "linear-gradient(to bottom, #f6f4ed, #f8efce)"
       }}
     >
+      {/* Floating Decorative Item (bPWLu Ellipse 108) */}
+      <div 
+        className="absolute bg-[#f1ead1] pointer-events-none" 
+        style={{ right: vw(50), top: vw(50), width: vw(275), height: vw(275), borderRadius: "50%", opacity: 1 }}
+      />
+      
       <div className="relative z-10 w-full h-full max-w-[1920px] mx-auto">
+        
         {/* 1. Future Prospect Title (VU2Hn) */}
-        <div className="absolute" style={{ right: vw(160), top: vw(120) }}>
+        <div className="absolute" style={{ right: vw(194), top: vw(120), width: vw(636) }}>
            <h2 
-             className="font-josefin-sans font-bold text-[#574f0e] text-right" 
-             style={{ fontSize: vw(120), lineHeight: 0.875, maxWidth: vw(636) }}
+             className="font-josefin-sans font-bold text-[#574f0e] text-right whitespace-pre-line" 
+             style={{ fontSize: vw(120), lineHeight: 0.875 }}
            >
              {data.title}
            </h2>
@@ -37,37 +88,139 @@ export function StoryBrandProspectSection({ data }: StoryBrandProspectSectionPro
         <div className="absolute" style={{ left: vw(152), bottom: vw(145) }}>
            <div 
              className="font-josefin-sans font-bold text-[#574f0e] origin-left -rotate-90 uppercase tracking-[4px] whitespace-nowrap"
-             style={{ fontSize: vw(40) }}
+             style={{ fontSize: vw(20) }}
            >
-             Our Vision
+             {data.tips || "Our Vision"}
            </div>
         </div>
 
-        {/* 3. Prospect Items Staggered (xRzGI, FTqXd, qOmoH) */}
-        <div className="absolute inset-x-0 top-[40%] flex flex-col gap-40 px-[15%]">
-            {data.items.slice(0, 3).map((item, idx) => (
-               <motion.div 
-                 key={idx}
-                 initial={{ opacity: 0, x: idx % 2 === 0 ? -100 : 100 }}
-                 whileInView={{ opacity: 1, x: 0 }}
-                 viewport={{ once: true }}
-                 className={`relative w-[600px] p-10 bg-white/40 backdrop-blur-md rounded-[40px] border border-[#574f0e]/10 ${idx % 2 === 0 ? "self-start" : "self-end"}`}
-               >
-                  <div className="font-josefin-sans font-bold text-[#574f0e]" style={{ fontSize: vw(40) }}>
-                     {String(idx + 1).padStart(2, '0')}
-                  </div>
-                  <p className="mt-4 font-josefin-sans font-normal text-[#574f0e]/80" style={{ fontSize: vw(24) }}>
-                     {item}
-                  </p>
-               </motion.div>
-            ))}
-        </div>
+        {/* 3. Prospect Items */}
+        
+        {/* Item 1 (xRzGI): Framed Box Layout */}
+        {slides[0] && (
+          <div 
+            className="absolute flex flex-col items-center" 
+            style={{ 
+              left: vw(314), 
+              top: vw(97), 
+              width: vw(689), 
+              backgroundColor: "rgba(233, 223, 187, 0.38)", // #e9dfbb at ~38% opacity
+              border: `${vw(2)} solid #ad9f32`,
+              borderRadius: vw(30),
+              paddingTop: vw(38),
+              paddingBottom: vw(60)
+            }}
+          >
+             <div className="relative" style={{ width: vw(606), height: vw(394), borderRadius: vw(30), overflow: "hidden" }}>
+                <OptimizedImage
+                  image={slides[0].image}
+                  className="object-cover w-full h-full"
+                  size="medium"
+                />
+             </div>
+             <div 
+                className="font-josefin-sans font-semibold text-[#574f0e] text-left mt-12" 
+                style={{ width: vw(625), fontSize: vw(30), letterSpacing: vw(-0.6), lineHeight: 1.16 }}
+             >
+                {formatQuotedText(slides[0].description)}
+             </div>
+          </div>
+        )}
 
-        {/* Floating Decorative Item (bPWLu Ellipse 108) */}
-        <div 
-          className="absolute bg-[#f1ead1] pointer-events-none" 
-          style={{ right: vw(-50), top: vw(0), width: vw(300), height: vw(300), borderRadius: "50%", opacity: 0.4 }}
-        />
+        {/* Item 2 (FTqXd): Text wrapped around right-floated image */}
+        {slides[1] && (
+          <div 
+            className="absolute" 
+            style={{ right: vw(180) /* 1920 - 1079 - 661 ~= 180 */, top: vw(600), width: vw(664) }}
+          >
+             {/* Floated Image within text block */}
+             <div 
+               style={{ 
+                 float: "right", 
+                 width: vw(277), 
+                 height: vw(287), 
+                 marginLeft: vw(24),
+                 marginBottom: vw(24), // Buffer to ensure text flows nicely under it
+                 borderRadius: vw(30),
+                 overflow: "hidden"
+               }}
+             >
+                <OptimizedImage
+                  image={slides[1].image}
+                  className="object-cover w-full h-full"
+                  size="medium"
+                />
+             </div>
+             
+             {/* Container for wrapping text */}
+             <div 
+                className="font-josefin-sans font-medium text-[#574f0e] text-right" 
+                style={{ 
+                  fontSize: vw(24), 
+                  letterSpacing: vw(-0.48), 
+                  lineHeight: 1.25, 
+                  paddingTop: vw(110) // Text starts 110px below the top of the image
+                }}
+             >
+                {formatQuotedText(slides[1].description)}
+             </div>
+          </div>
+        )}
+
+        {/* Item 3 (qOmoH): Side-by-side flex container */}
+        {slides[2] && (
+          <div 
+            className="absolute flex items-center" 
+            style={{ left: vw(152), top: vw(1080) }}
+          >
+             <div 
+               className="relative shrink-0" 
+               style={{ 
+                 marginLeft: vw(54), 
+                 width: vw(209), 
+                 height: vw(216), 
+                 borderRadius: vw(30),
+                 overflow: "hidden" 
+               }}
+             >
+                <OptimizedImage
+                  image={slides[2].image}
+                  className="object-cover w-full h-full"
+                  size="small"
+                />
+             </div>
+             <div 
+                className="font-josefin-sans font-medium text-[#574f0e]" 
+                style={{ 
+                  marginLeft: vw(33), 
+                  width: vw(482), 
+                  fontSize: vw(28), 
+                  lineHeight: 1.28
+                }}
+             >
+                {formatQuotedText(slides[2].description)}
+             </div>
+          </div>
+        )}
+
+        {/* 4. Bottom Logo Image */}
+        {logoImage && (
+          <div 
+            className="absolute"
+            style={{ 
+              bottom: vw(0), 
+              width: vw(2166),
+              height: vw(338),
+              zIndex: 10
+            }}
+          >
+            <OptimizedImage
+              image={logoImage}
+              className="object-contain w-full h-full"
+              size="small"
+            />
+          </div>
+        )}
       </div>
     </section>
   )

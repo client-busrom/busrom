@@ -305,7 +305,7 @@ function extractSections(pageContent: any) {
   const contactDisplayUrl = findImgUrlByMarker("contact-form-image") || findImgUrlByMarker("contact-form-display-image")
   const contactLogoUrl = findImgUrlByMarker("contact-form-logo")
 
-  const contactTextNodes = extractAfterMarker(children, "contact-form-text")
+  const contactTextNodes = extractAfterMarker(children, "contact-form-title")
   const contactRichText = contactTextNodes.length ? contactTextNodes.filter(n => n.type !== 'formBlock' && n.type !== 'paragraph' || (n.children && n.children.length > 0 && n.children[0].text && !n.children[0].text.includes('-'))).flatMap((n: any) => n.children || []).map((c: any) => ({
     text: c.text,
     bold: (c.format & 1) === 1
