@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo } from "react"
+import React, { useMemo, useState, useEffect } from "react"
 import { StoryHeroSection } from "@/components/story/StoryHeroSection"
 import { StoryWhoWeAreSection } from "@/components/story/StoryWhoWeAreSection"
 import { StoryBrandPositionSection } from "@/components/story/StoryBrandPositionSection"
@@ -192,17 +192,102 @@ function extractPairedListAfterMarker(children: any[], markerId: string) {
   return []
 }
 
-function extractCustomGalleryAfterMarker(children: any[], markerId: string, mediaData: Record<string, MediaObject>) {
+function extractCustomGalleryAfterMarker(children: any[], markerId: string, mediaData: Record<string, MediaObject>, allApplications: any[] = []) {
   const nodesAfterMarker = extractAfterMarker(children, markerId)
-  for (const node of nodesAfterMarker) {
-    if (node.type === 'custom-image-gallery' && node.data?.images) {
-      return node.data.images.map((img: any) => {
-        const imageId = String(img.image?.id || img.image || "")
-        return imageId && mediaData[imageId] ? mediaData[imageId] : null
-      }).filter(Boolean)
+  const images: MediaObject[] = []
+
+  function getAppImage(app: any) {
+    if (!app) return null
+    let appImage = app.mainImage
+    if (!appImage && app.images?.length > 0) {
+      appImage = app.images[0].image || app.images[0]
+    }
+    if (!appImage && app.sceneGallery?.length > 0) {
+      const firstGroup = app.sceneGallery.find((g: any) => g.images?.length > 0)
+      if (firstGroup) {
+        // In our API transformation, g.images is an array of already-normalized media objects
+        appImage = firstGroup.images[0]
+      }
+    }
+    if (!appImage) return null
+
+    // If it's already a normalized object with a URL, return it directly
+    if (typeof appImage === 'object' && appImage.url) {
+      return appImage as MediaObject
+    }
+
+    const id = typeof appImage === 'object' ? appImage.id : String(appImage)
+    return mediaData[id] || (typeof appImage === 'object' ? appImage : { id, url: "" })
+  }
+
+  function traverseAndExtract(nodes: any[]) {
+    for (const node of nodes) {
+      if (node.type === 'custom-image-gallery' && node.data?.images) {
+        const glry = node.data.images.map((img: any) => {
+          if (img.sourceType === "application" && img.application) {
+            const appId = typeof img.application === "object" ? img.application.id : String(img.application)
+            const app = allApplications.find(a => String(a.id) === appId)
+            return getAppImage(app)
+          }
+          const imageId = String(img.image?.id || img.image || "")
+          return imageId && mediaData[imageId] ? mediaData[imageId] : null
+        }).filter(Boolean)
+        images.push(...glry)
+      } else if (node.type === "block" && node.fields?.blockType === "imageGallery" && node.fields?.images) {
+        const glry = node.fields.images.map((item: any) => {
+          if (item.sourceType === "media" && item.image) {
+            const imageId = String(item.image.id || item.image)
+            return mediaData[imageId] || (typeof item.image === "object" ? item.image : null)
+          } else if (item.sourceType === "application" && item.application) {
+            const appId = typeof item.application === "object" ? item.application.id : String(item.application)
+            const app = allApplications.find(a => String(a.id) === appId)
+            return getAppImage(app)
+          }
+          return null
+        }).filter(Boolean)
+        images.push(...glry)
+      } else if (node.type === "carousel" && node.data?.slides) {
+        const glry = node.data.slides.map((slide: any) => {
+          const imageId = String(slide.image?.id || slide.image || "")
+          return imageId && mediaData[imageId] ? mediaData[imageId] : null
+        }).filter(Boolean)
+        images.push(...glry)
+      } else if (node.type === "singleImage" && node.data?.image) {
+         const imageId = String(node.data.image?.id || node.data.image || "")
+         if (imageId && mediaData[imageId]) {
+           images.push(mediaData[imageId])
+         }
+      } else if (node.type === "block" && node.fields?.blockType === "singleImage" && node.fields?.image) {
+         const item = node.fields.image
+         const imageId = String(item.id || item)
+         if (imageId && mediaData[imageId]) {
+           images.push(mediaData[imageId])
+         }
+      } else if (node.type === "upload" && node.value) {
+         const imageId = String(node.value.id || node.value)
+         if (imageId && mediaData[imageId]) {
+           images.push(mediaData[imageId])
+         }
+      }
+
+      // Check for nested layouts/columns block
+      if (node.type === "layout" && node.columns) {
+        node.columns.forEach((col: any) => {
+          if (col.children) {
+            traverseAndExtract(col.children)
+          }
+        })
+      }
+      
+      // Standard Lexical children
+      if (node.children) {
+        traverseAndExtract(node.children)
+      }
     }
   }
-  return []
+
+  traverseAndExtract(nodesAfterMarker)
+  return images
 }
 
 // --------------------------------------------------------------------------
@@ -210,30 +295,116 @@ function extractCustomGalleryAfterMarker(children: any[], markerId: string, medi
 // --------------------------------------------------------------------------
 
 export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps) {
+  const [allApplications, setAllApplications] = useState<any[]>([])
+
+  useEffect(() => {
+    fetch(`/api/applications?locale=${locale}&limit=100`)
+      .then(res => res.json())
+      .then(data => setAllApplications(data.docs || []))
+  }, [locale])
+
   const contentChildren = useMemo(() => 
     pageContent.content?.root?.children || pageContent.contentTranslation?.root?.children || [],
     [pageContent]
   )
   const mediaData = pageContent.mediaData || {}
 
+  // --------------------------------------------------------------------------
+  // Global Helpers for OurStoryTemplate
+  // --------------------------------------------------------------------------
+  
+  // Robust image resolver for Application or Media sources
+  const resolveImage = useMemo(() => (source: any, sourceType: "application" | "media" = "media") => {
+    if (!source) return null
+
+    if (sourceType === "application") {
+      const appId = typeof source === "object" ? source.id : String(source)
+      const app = allApplications.find((a: any) => String(a.id) === appId)
+      if (!app) return null
+
+      // Check sceneGallery (Normalized by our /api/applications)
+      const firstImage = app.sceneGallery?.[0]?.images?.[0]
+      if (firstImage?.url) return firstImage as MediaObject
+      
+      // Check mainImage
+      if (app.mainImage?.url) return app.mainImage as MediaObject
+      return null
+    }
+
+    // Default: Media source
+    const imageId = typeof source === "object" ? source.id : String(source)
+    return mediaData[imageId] || (typeof source === "object" && source.url ? source : null)
+  }, [allApplications, mediaData])
+
+  // Helper to find specific block types within a major section, ignoring sub-markers
+  const findBlocksInSection = useMemo(() => (sectionPrefix: string, blockTypes: string[]) => {
+    const results: any[] = []
+    let inSection = false
+
+    for (const node of contentChildren) {
+      const text = getNodeTotalText(node)
+      const isMarker = (node.type === "code" || node.children?.[0]?.format === 16) && text.includes("-")
+      
+      if (isMarker && inSection && !text.startsWith(sectionPrefix)) break
+      if (isMarker && text.startsWith(sectionPrefix)) inSection = true
+
+      if (inSection) {
+        const scanner = (n: any) => {
+          if (blockTypes.includes(n.type)) results.push(n)
+          if (n.type === "block" && blockTypes.includes(n.fields?.blockType)) results.push(n.fields)
+          if (n.columns) n.columns.forEach((c: any) => c.children?.forEach(scanner))
+          if (n.children) n.children.forEach(scanner)
+        }
+        scanner(node)
+      }
+    }
+    return results
+  }, [contentChildren])
+
+  // Extract images from gallery/carousel/upload nodes using our robust resolver
+  const extractImagesFromBlocks = useMemo(() => (blocks: any[]) => {
+    const images: MediaObject[] = []
+    blocks.forEach(node => {
+      // 1. custom-image-gallery
+      if (node.type === "custom-image-gallery" && node.data?.images) {
+        const glry = node.data.images.map((img: any) => 
+          resolveImage(img.application || img.image, img.sourceType || "media")
+        ).filter(Boolean)
+        images.push(...glry)
+      }
+      // 2. imageGallery block
+      else if (node.blockType === "imageGallery" && node.images) {
+        const glry = node.images.map((item: any) => 
+          resolveImage(item.application || item.image, item.sourceType || "media")
+        ).filter(Boolean)
+        images.push(...glry)
+      }
+      // 3. carousel/carouselBlock
+      else if ((node.type === "carousel" && node.data?.slides) || (node.blockType === "carousel" && node.slides)) {
+        const slides = node.data?.slides || node.slides
+        const glry = slides.map((s: any) => resolveImage(s.image, "media")).filter(Boolean)
+        images.push(...glry)
+      }
+      // 4. singleImage
+      else if ((node.type === "singleImage" && node.data?.image) || (node.blockType === "singleImage" && node.image)) {
+        const img = resolveImage(node.data?.image || node.image, "media")
+        if (img) images.push(img)
+      }
+    })
+    return images
+  }, [resolveImage])
+
+  // --------------------------------------------------------------------------
+  // Section Memos
+  // --------------------------------------------------------------------------
+
   // Hero Section Data
   const heroData = useMemo(() => {
-    // 1. Text for hero-section-title (with bold parsing)
     const titleNodes = extractNodeChildrenAfterMarker(contentChildren, "hero-section-title")
-    
-    // 2. Subtitle 
     const subtitle = extractTextAfterMarker(contentChildren, "hero-section-subtitle") || "Make Projects"
-    
-    // 3. Content
     const content = extractTextAfterMarker(contentChildren, "hero-section-content") || ""
-    
-    // 4. Description styled nodes
     const descriptionNodes = extractNodeChildrenAfterMarker(contentChildren, "hero-section-description")
-    
-    // 5. Items (Ordered List)
     const items = extractListAfterMarker(contentChildren, "hero-section-item")
-    
-    // 6. Image
     const backgroundImage = extractImageAfterMarker(contentChildren, "hero-section-image", mediaData)
 
     return {
@@ -267,7 +438,6 @@ export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps)
     const title = extractTextAfterMarker(contentChildren, "brand-position-title") || "Brand Positioning"
     const subtitle = extractTextAfterMarker(contentChildren, "brand-position-subtitle") || "BRAND Philosophy"
     const description = extractTextAfterMarker(contentChildren, "brand-position-description") || ""
-    // Use the new Carousel extractor
     const items = extractCarouselAfterMarker(contentChildren, "brand-position-item", mediaData)
     const image = extractImageAfterMarker(contentChildren, "brand-position-image", mediaData)
 
@@ -305,35 +475,26 @@ export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps)
     const title = extractTextAfterMarker(contentChildren, "brand-highlights-title") || "Brand Highlights"
     const items = extractPairedListAfterMarker(contentChildren, "brand-highlights-item")
     
-    // Extract images for each item (max 4 items supported by design)
     const galleries = [
-      extractCustomGalleryAfterMarker(contentChildren, "brand-highlights-image-1", mediaData),
-      extractCustomGalleryAfterMarker(contentChildren, "brand-highlights-image-2", mediaData),
-      extractCustomGalleryAfterMarker(contentChildren, "brand-highlights-image-3", mediaData),
-      extractCustomGalleryAfterMarker(contentChildren, "brand-highlights-image-4", mediaData),
+      extractCustomGalleryAfterMarker(contentChildren, "brand-highlights-image-1", mediaData, allApplications),
+      extractCustomGalleryAfterMarker(contentChildren, "brand-highlights-image-2", mediaData, allApplications),
+      extractCustomGalleryAfterMarker(contentChildren, "brand-highlights-image-3", mediaData, allApplications),
+      extractCustomGalleryAfterMarker(contentChildren, "brand-highlights-image-4", mediaData, allApplications),
     ]
 
-    // Merge nested list data with images
     const slides = items.map((item: { title: string; content: string }, i: number) => ({
       ...item,
       images: (galleries[i] || []) as MediaObject[]
     }))
 
-    return {
-      title,
-      slides
-    }
-  }, [contentChildren, mediaData])
+    return { title, slides }
+  }, [contentChildren, mediaData, allApplications])
 
   // Brand Strengths Section Data
   const brandStrengthsData = useMemo(() => {
     const title = extractTextAfterMarker(contentChildren, "brand-strengths-title") || "Brand Strengths"
     const items = extractCarouselAfterMarker(contentChildren, "brand-strengths-item", mediaData)
-
-    return {
-      title,
-      items
-    }
+    return { title, items }
   }, [contentChildren, mediaData])
 
   // Brand Travel Section Data
@@ -341,7 +502,6 @@ export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps)
     const title = extractTextAfterMarker(contentChildren, "brand-travel-title") || "Brand Journey"
     const image = extractImageAfterMarker(contentChildren, "brand-travel-image", mediaData)
     const items = extractCarouselAfterMarker(contentChildren, "brand-travel-item", mediaData)
-
     return {
       title,
       image: image?.url || "/BusromFooterBg_original.webp",
@@ -351,22 +511,19 @@ export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps)
 
   // Sustainability Section Data
   const sustainabilityData = useMemo(() => {
-    const title = extractTextAfterMarker(contentChildren, "sustainable-commitment-title") || "Sustainable Commitment"
-    const description = extractTextAfterMarker(contentChildren, "sustainable-commitment-description") || ""
-    const images = extractCustomGalleryAfterMarker(contentChildren, "sustainable-commitment-image", mediaData)
-    const content1 = extractTextAfterMarker(contentChildren, "sustainable-commitment-content-1") || "Manufacturing For The Future — Durable & Low Carbon Production"
-    const content2 = extractTextAfterMarker(contentChildren, "sustainable-commitment-content-2") || "Delivering Traceable Quality Assurance and Sustainable Solution"
-    const tips = extractTextAfterMarker(contentChildren, "sustainable-commitment-tips") || "ABOUT BUSROM"
+    const sectionPrefix = "sustainable-commitment"
+    const title = extractTextAfterMarker(contentChildren, `${sectionPrefix}-title`) || "Sustainable Commitment"
+    const description = extractTextAfterMarker(contentChildren, `${sectionPrefix}-description`) || ""
+    const content1 = extractTextAfterMarker(contentChildren, `${sectionPrefix}-content-1`) || ""
+    const content2 = extractTextAfterMarker(contentChildren, `${sectionPrefix}-content-2`) || ""
+    const tips = extractTextAfterMarker(contentChildren, `${sectionPrefix}-tips`) || "ABOUT BUSROM"
 
-    return {
-      title,
-      description,
-      images,
-      content1,
-      content2,
-      tips
-    }
-  }, [contentChildren, mediaData])
+    // Use robust scanners for images/galleries
+    const blocks = findBlocksInSection(sectionPrefix, ["custom-image-gallery", "block"])
+    const images = extractImagesFromBlocks(blocks)
+
+    return { title, description, images, content1, content2, tips }
+  }, [contentChildren, findBlocksInSection, extractImagesFromBlocks])
 
   // Future Prospect Section Data
   const prospectData = useMemo(() => {
@@ -374,85 +531,149 @@ export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps)
     const items = extractCarouselAfterMarker(contentChildren, "future-prospect-item", mediaData)
     const logoImage = extractImageAfterMarker(contentChildren, "future-prospect-logo-image", mediaData)
     const tips = extractTextAfterMarker(contentChildren, "future-prospect-tips") || "Our Vision"
-
-    return {
-      title,
-      items,
-      logoImage,
-      tips
-    }
+    return { title, items, logoImage, tips }
   }, [contentChildren, mediaData])
 
   // Contact Form Section Data
   const contactFormData = useMemo(() => {
-    // Basic texts
-    const subtitle = extractTextAfterMarker(contentChildren, "contact-form-title") || "Contact Us"
+    const sectionPrefix = "contact-form"
+    const subtitle = extractTextAfterMarker(contentChildren, `${sectionPrefix}-title`) || "Contact Us"
     const description = extractTextAfterMarker(contentChildren, "form-description") || ""
 
-    // Contact form images
-    const images = extractCustomGalleryAfterMarker(contentChildren, "contact-form-image", mediaData)
-
-    // Form config
-    let formConfig = null
-    const formNodes = extractAfterMarker(contentChildren, "contact-form-title")
-    for (const node of formNodes) {
-      if (node.type === "formBlock" && node.data?.formConfig) {
-        formConfig = node.data.formConfig
-        break
-      }
-    }
-
-    // Attempt to fall back to the generic `contact-form` block strategy if formBlock isn't found
-    if (!formConfig) {
-      const nodesAfterForm = extractAfterMarker(contentChildren, "contact-form")
-      for (const node of nodesAfterForm) {
-        if (node.type === "block" && node.fields) {
-           const blockSidebar = node.fields.sidebarContent?.root?.children || []
-           for (const sidebarNode of blockSidebar) {
-             if (sidebarNode.type === "formBlock" && sidebarNode.data?.formConfig) {
-               formConfig = sidebarNode.data.formConfig
-               break
-             }
-           }
-        }
-      }
-    }
+    const blocks = findBlocksInSection(sectionPrefix, ["custom-image-gallery", "block", "formBlock"])
+    const images = extractImagesFromBlocks(blocks)
+    const formBlock = blocks.find(b => b.blockType === "formBlock" || b.type === "formBlock")
+    const formConfig = formBlock?.formConfig || formBlock?.data?.formConfig
 
     return {
-      title: "Get A \nQuote", // Default multi-line title from Pencil design
+      title: "Get A \nQuote",
       subtitle, 
       description,
       formConfig,
       images,
       locale
     }
-  }, [contentChildren, mediaData, locale])
+  }, [contentChildren, findBlocksInSection, extractImagesFromBlocks, locale])
 
   // Applications Section Data
-  const applicationsData = useMemo(() => {
+  // (allApplications + setAllApplications already declared at component top and fetched in useEffect above)
+
+  // Extract applicationCarousel node to get application IDs
+  const applicationsRawData = useMemo(() => {
     const title = extractTextAfterMarker(contentChildren, "applications-title") || "Applications"
+    const titleNodes = extractNodeChildrenAfterMarker(contentChildren, "applications-title") || []
     const description = extractTextAfterMarker(contentChildren, "applications-description") || ""
-    const items = extractCarouselAfterMarker(contentChildren, "applications-item", mediaData)
-
-    return {
-      title,
-      description,
-      items
+    const descriptionNodes = extractNodeChildrenAfterMarker(contentChildren, "applications-description") || []
+    // Extract linkJump component after applications-btn marker
+    let viewButtonText = "View Cases Gallery Now"
+    let viewButtonLink = ""
+    let viewButtonNewTab = false
+    const btnMarkerIdx = contentChildren.findIndex((n: any) => {
+      const text = n.children?.map((c: any) => c.text || "").join("") || ""
+      return text === "applications-btn"
+    })
+    if (btnMarkerIdx !== -1 && btnMarkerIdx + 1 < contentChildren.length) {
+      const btnNode = contentChildren[btnMarkerIdx + 1]
+      if (btnNode && btnNode.type === "linkJump" && btnNode.data) {
+        viewButtonText = btnNode.data.description || btnNode.data.title || viewButtonText
+        if (btnNode.data.url) {
+          viewButtonLink = btnNode.data.url.replace('/pages/', '/')
+        }
+        viewButtonNewTab = !!btnNode.data.openInNewTab
+      }
     }
-  }, [contentChildren, mediaData])
 
-  // Quote Section Data
-  const quoteData = useMemo(() => {
-    const title = extractTextAfterMarker(contentChildren, "quote-item-title") || "One-stop Shop"
-    const description = extractTextAfterMarker(contentChildren, "quote-item-description") || ""
-    const buttonText = extractTextAfterMarker(contentChildren, "quote-item-btn") || "Learn More"
-
-    return {
-      title,
-      description,
-      buttonText
+    // Find the applicationCarousel node after applications-item marker
+    let applicationIds: number[] = []
+    const markerIdx = contentChildren.findIndex((n: any) => {
+      const text = n.children?.map((c: any) => c.text || "").join("") || ""
+      return text === "applications-item"
+    })
+    if (markerIdx !== -1) {
+      for (let i = markerIdx + 1; i < contentChildren.length; i++) {
+        const node = contentChildren[i]
+        if (node.type === "applicationCarousel" && node.data?.applications) {
+          applicationIds = node.data.applications.map((a: any) => a.id)
+          break
+        }
+        // Stop if we hit a new section marker (quote)
+        if (node.type === "quote" || node.type === "horizontalrule") break
+      }
     }
+
+    return { title, titleNodes, description, descriptionNodes, viewButtonText, viewButtonLink, viewButtonNewTab, applicationIds }
   }, [contentChildren])
+
+  // Resolve application IDs to full data
+  const applicationsData = useMemo(() => {
+    const { title, titleNodes, description, descriptionNodes, viewButtonText, viewButtonLink, viewButtonNewTab, applicationIds } = applicationsRawData
+    const slides = applicationIds.map((id: number) => {
+      const app = allApplications.find((a: any) => String(a.id) === String(id))
+      if (!app) return null
+
+      // Image priority: mainImage -> sceneGallery first -> images first
+      let appImage = app.mainImage
+      if (!appImage && app.sceneGallery?.length > 0) {
+        const firstGroup = app.sceneGallery.find((g: any) => g.images?.length > 0)
+        if (firstGroup) appImage = firstGroup.images[0]
+      }
+      if (!appImage && app.images?.length > 0) {
+        appImage = app.images[0].image
+      }
+
+      return {
+        id: app.id,
+        title: app.title || app.name || "",
+        image: appImage,
+        description: app.subtitle || app.shortDescription || ""
+      }
+    }).filter(Boolean) as any[]
+
+    return { title, titleNodes, description, descriptionNodes, viewButtonText, viewButtonLink, viewButtonNewTab, items: { slides, autoplay: true, interval: 5 } }
+  }, [applicationsRawData, allApplications])
+
+  // Quote Section Data (Modified to Carousel)
+  const quoteData = useMemo(() => {
+    let slides: any[] = []
+    let autoplay = true
+    let interval = 5
+
+    const markerIdx = contentChildren.findIndex((n: any) => {
+      const text = n.children?.map((c: any) => c.text || "").join("") || ""
+      return text === "quote-item"
+    })
+
+    if (markerIdx !== -1) {
+      for (let i = markerIdx + 1; i < contentChildren.length; i++) {
+        const node = contentChildren[i]
+        if (node.type === "carousel" && node.data?.slides) {
+          autoplay = node.data.autoplay !== false
+          interval = node.data.interval || 5
+          slides = node.data.slides.map((slide: any) => {
+            let slideImage = null
+            if (slide.image?.id) {
+              const mediaId = String(slide.image.id)
+              slideImage = mediaData[mediaId] || null
+            }
+
+            return {
+              title: slide.title || "",
+              description: slide.description || "",
+              buttonText: slide.buttonText || "",
+              buttonLink: slide.buttonLink || slide.link || "",
+              showButton: slide.showButton !== false,
+              openInNewTab: slide.openInNewTab || false,
+              image: slideImage
+            }
+          })
+          break
+        }
+        if (node.type === "horizontalrule") break
+      }
+    }
+
+    return { slides, autoplay, interval }
+  }, [contentChildren, mediaData])
 
   return (
     <div className="min-h-screen bg-black" data-header-theme="dark">
