@@ -176,6 +176,9 @@ const config: Config = {
         'amiri': ['var(--font-amiri)', 'serif'],
         'amarante': ['var(--font-amarante)', 'Amarante', 'serif'],
         'quicksand': ['var(--font-quicksand)', 'sans-serif'],
+        'lemon': ['var(--font-lemon)', 'serif'],
+        'lobster': ['var(--font-lobster)', 'cursive'],
+        'kavivanar': ['Kavivanar', 'cursive'],
 
         // --- 系统字体 (直接使用名字) ---
         'arial':       ['Arial', 'sans-serif'],

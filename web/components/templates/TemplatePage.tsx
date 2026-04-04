@@ -9,6 +9,7 @@ import { OemOdmTemplate } from "./OemOdmTemplate"
 import { OneStopShopTemplate } from "./OneStopShopTemplate"
 import { ApplicationTemplate } from "./ApplicationTemplate"
 import { OurStoryTemplate } from "./OurStoryTemplate"
+import { SupportTemplate } from "./SupportTemplate"
 
 interface PageContent {
   id: string
@@ -147,6 +148,11 @@ export function TemplatePage({ locale, slug, template }: TemplatePageProps) {
   // OUR_STORY template
   if (template === "OUR_STORY") {
     return <OurStoryTemplate locale={locale} pageContent={pageContent as any} />
+  }
+
+  // SUPPORT template
+  if (template === "SUPPORT") {
+    return <SupportTemplate locale={locale} pageContent={pageContent as any} />
   }
 
   // Default fallback to document renderer

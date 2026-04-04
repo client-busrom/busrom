@@ -5464,7 +5464,7 @@
               "id": "QjjiT",
               "x": 968,
               "y": 796,
-              "name": "button",
+              "name": "view-btn",
               "children": [
                 {
                   "type": "rectangle",

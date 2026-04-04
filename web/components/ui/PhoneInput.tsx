@@ -110,11 +110,13 @@ interface PhoneInputProps {
   buttonClassName?: string
   inputClassName?: string
   dialCodeClassName?: string
+  chevronClassName?: string
   error?: boolean
   disabled?: boolean
   required?: boolean
   name?: string
   id?: string
+  style?: React.CSSProperties
 }
 
 export const PhoneInput: React.FC<PhoneInputProps> = ({
@@ -126,11 +128,13 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   buttonClassName,
   inputClassName,
   dialCodeClassName,
+  chevronClassName,
   error,
   disabled,
   required,
   name,
   id,
+  style,
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
@@ -219,9 +223,9 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
     : COUNTRIES
 
   return (
-    <div className={cn("relative h-full", isOpen ? "z-[1001]" : "z-10", containerClassName)} ref={dropdownRef} data-lenis-prevent>
+    <div className={cn("relative w-full", isOpen ? "z-[1001]" : "z-10", containerClassName)} ref={dropdownRef} data-lenis-prevent style={{ ...style, height: style?.height || '100%' }}>
       <div className={cn(
-        "flex items-stretch rounded-lg border border-gray-300 bg-white overflow-hidden transition-colors",
+        "flex items-stretch rounded-lg border border-gray-300 bg-white overflow-hidden transition-colors w-full h-full",
         error && "border-red-500",
         disabled && "opacity-50 cursor-not-allowed",
         className
@@ -237,9 +241,9 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
             buttonClassName
           )}
         >
-          <CountryFlag countryCode={selectedCountry[1]} className="w-5 h-4 rounded-sm flex-shrink-0" />
+          <CountryFlag countryCode={selectedCountry[1]} className="w-[1.25vw] h-[0.94vw] rounded-sm flex-shrink-0" />
           <span className={cn("text-sm font-medium text-brand-text-black", dialCodeClassName)}>+{selectedCountry[2]}</span>
-          <ChevronDown className={cn("w-3.5 h-3.5 text-gray-400 transition-transform ml-0.5", isOpen && "rotate-180")} />
+          <ChevronDown className={cn("w-3.5 h-3.5 text-gray-400 transition-transform ml-0.5", isOpen && "rotate-180", chevronClassName)} />
         </button>
 
         {/* Phone number input */}
