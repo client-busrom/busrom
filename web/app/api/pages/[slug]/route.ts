@@ -19,7 +19,12 @@ function extractMediaIds(content: any): string[] {
     if (node.type === 'custom-image-gallery' && node.data?.images) {
       for (const img of node.data.images) {
         // Only extract media IDs for media-sourced items (not application-sourced)
-        if (img.sourceType !== 'application' && img.image) ids.add(String(img.image))
+        if (img.sourceType !== 'application') {
+          const mediaId = img.image?.id || img.image || img.media?.id || img.media
+          if (mediaId && (typeof mediaId === 'string' || typeof mediaId === 'number')) {
+            ids.add(String(mediaId))
+          }
+        }
       }
     }
 

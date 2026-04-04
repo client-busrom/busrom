@@ -2,7 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
-import { Fredericka_the_Great, Amiri, Black_Han_Sans, Berkshire_Swash, Cherry_Bomb_One, Amarante, Quicksand } from "next/font/google";
+import { Fredericka_the_Great, Amiri, Black_Han_Sans, Berkshire_Swash, Cherry_Bomb_One, Amarante, Quicksand, Lemon, Lobster, Katibeh } from "next/font/google";
 import dynamic from "next/dynamic";
 import "../globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -203,9 +203,33 @@ const amarante = Amarante({
   preload: true,
 });
 
+const lemon = Lemon({
+  weight: "400",
+  variable: "--font-lemon",
+  display: "swap",
+  subsets: ["latin"],
+  preload: false,
+});
+
 const quicksand = Quicksand({
   weight: ["400", "500", "600", "700"],
   variable: "--font-quicksand",
+  display: "swap",
+  subsets: ["latin"],
+  preload: false,
+});
+
+const lobster = Lobster({
+  weight: "400",
+  variable: "--font-lobster",
+  display: "swap",
+  subsets: ["latin"],
+  preload: false,
+});
+
+const katibeh = Katibeh({
+  weight: "400",
+  variable: "--font-katibeh",
   display: "swap",
   subsets: ["latin"],
   preload: false,
@@ -289,6 +313,9 @@ export default async function RootLayout({
       ${cherryBomb.variable}
       ${amarante.variable}
       ${quicksand.variable}
+      ${lemon.variable}
+      ${lobster.variable}
+      ${katibeh.variable}
       font-sans
     `}
     >

@@ -410,14 +410,15 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
           return {
             ...sourceField, // Copy stable non-localized fields (fieldName, fieldType, id, etc.)
             // IMPORTANT: Overwrite localized fields with STRING values
-            label: (currentLabel && currentLabel.trim()) ? currentLabel : (sourceLabel || ' '),
-            placeholder: (currentPlaceholder && currentPlaceholder.trim()) ? currentPlaceholder : (sourcePlaceholder || ''),
+            // Preserve raw values to maintain intentional whitespace and indentation
+            label: (currentLabel !== undefined && currentLabel !== null && currentLabel !== '') ? currentLabel : (sourceLabel || ' '),
+            placeholder: (currentPlaceholder !== undefined && currentPlaceholder !== null && currentPlaceholder !== '') ? currentPlaceholder : (sourcePlaceholder || ''),
             options: (sourceField.options || []).map((sourceOpt, optIdx) => {
               const currentOptLabel = getOptionLabel(idx, optIdx, locale.code)
               const sourceOptLabel = getOptionLabel(idx, optIdx, sourceLocale)
               return {
                 ...sourceOpt,
-                label: (currentOptLabel && currentOptLabel.trim()) ? currentOptLabel : (sourceOptLabel || ' '),
+                label: (currentOptLabel !== undefined && currentOptLabel !== null && currentOptLabel !== '') ? currentOptLabel : (sourceOptLabel || ' '),
               }
             }),
           }
@@ -651,11 +652,12 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
                                   {SUPPORTED_LOCALES.map(locale => (
                                     <div key={locale.code} className="fftc-field__input-group">
                                       <span className="fftc-field__locale"><LocaleFlag localeCode={locale.code} className="fftc-field__locale-flag" /> {locale.code.toUpperCase()}</span>
-                                      <input
-                                        type="text"
+                                      <textarea
                                         value={getFieldValue(fieldIdx, 'label', locale.code)}
                                         onChange={(e) => updateFieldValue(fieldIdx, 'label', locale.code, e.target.value)}
-                                        placeholder={t('custom:translationCenter:empty' as any) as string || 'Empty'}
+                                        placeholder={getFieldValue(fieldIdx, 'label', sourceLocale)}
+                                        rows={1}
+                                        className="tc-field-input"
                                       />
                                     </div>
                                   ))}
@@ -671,11 +673,12 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
                                   {SUPPORTED_LOCALES.map(locale => (
                                     <div key={locale.code} className="fftc-field__input-group">
                                       <span className="fftc-field__locale"><LocaleFlag localeCode={locale.code} className="fftc-field__locale-flag" /> {locale.code.toUpperCase()}</span>
-                                      <input
-                                        type="text"
+                                      <textarea
                                         value={getFieldValue(fieldIdx, 'placeholder', locale.code)}
                                         onChange={(e) => updateFieldValue(fieldIdx, 'placeholder', locale.code, e.target.value)}
-                                        placeholder={t('custom:translationCenter:empty' as any) as string || 'Empty'}
+                                        placeholder={getFieldValue(fieldIdx, 'placeholder', sourceLocale)}
+                                        rows={1}
+                                        className="tc-field-input"
                                       />
                                     </div>
                                   ))}
@@ -698,11 +701,12 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
                                         {SUPPORTED_LOCALES.map(locale => (
                                           <div key={locale.code} className="fftc-field__input-group">
                                             <span className="fftc-field__locale"><LocaleFlag localeCode={locale.code} className="fftc-field__locale-flag" /> {locale.code.toUpperCase()}</span>
-                                            <input
-                                              type="text"
+                                            <textarea
                                               value={getOptionLabel(fieldIdx, optIdx, locale.code)}
                                               onChange={(e) => updateOptionLabel(fieldIdx, optIdx, locale.code, e.target.value)}
-                                              placeholder={t('custom:translationCenter:empty' as any) as string || 'Empty'}
+                                              placeholder={getOptionLabel(fieldIdx, optIdx, sourceLocale)}
+                                              rows={1}
+                                              className="tc-option-input"
                                             />
                                           </div>
                                         ))}
