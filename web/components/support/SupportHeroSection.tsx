@@ -121,7 +121,7 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
         
         {/* 1. Hero Title Triple Layer */}
         <div className="relative z-20 flex justify-center w-full select-none" style={{ paddingTop: vw(130) }}>
-          <div className="relative" style={{ width: vw(1499), height: vw(348) }}>
+          <div className="relative" style={{ width: vw(1580), height: vw(348) }}>
             
             {/* Layer 1: Base Black Text */}
             <div className="absolute inset-0 z-0">

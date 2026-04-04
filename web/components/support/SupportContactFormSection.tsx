@@ -240,7 +240,7 @@ export function SupportContactFormSection({
         </div>
 
         {/* Middle Layer: Diagonal Icons */}
-         <div className="absolute z-[10]" style={{ left: vw(135), top: vw(240), width: vw(135), height: vw(200) }}>
+         <div className="absolute z-[10]" style={{ left: vw(126), top: vw(260), width: vw(120), height: vw(160) }}>
             <svg width="100%" height="100%" viewBox="0 0 24.576 49.088" fill="none" preserveAspectRatio="none">
               <path d="M24.576 0c-3.02933 8.192-6.05867 16.384-9.088 24.576-2.98667 8.14933-5.99467 16.32-9.024 24.51201l-6.464 0c3.02933-8.192 6.03733-16.36267 9.024-24.51201 3.02933-8.192 6.05867-16.384 9.088-24.576l6.464 0z" fill="#FFE83C" />
             </svg>
@@ -267,7 +267,7 @@ export function SupportContactFormSection({
                return rawTitle.split('\n').map((line: string, i: number) => (
                  <span key={i} style={{ 
                    display: 'block', 
-                   paddingLeft: i > 0 ? '2em' : 0 
+                   paddingLeft: i > 0 ? '1em' : 0 
                  }}>
                    {line.replace(/ /g, "\u00A0")}
                  </span>
