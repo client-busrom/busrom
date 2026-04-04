@@ -10,6 +10,7 @@ import { SupportRemoteSection } from "@/components/support/SupportRemoteSection"
 import { SupportRequestProcessSection } from "@/components/support/SupportRequestProcessSection"
 import { SupportMarketingSalesSection } from "@/components/support/SupportMarketingSalesSection"
 import { SupportContactFormSection } from "@/components/support/SupportContactFormSection"
+import { SupportApplicationsSection } from "@/components/support/SupportApplicationsSection"
 
 interface MediaObject {
   id: string
@@ -477,8 +478,60 @@ export function SupportTemplate({ locale, pageContent }: SupportTemplateProps) {
     }
   }, [children, mediaData])
 
+  const applicationsData = useMemo(() => {
+    try {
+      // Find correctly labeled nodes
+      let territoryNodes = extractAfterMarker(children, "applications") || []
+      if (territoryNodes.length === 0) territoryNodes = extractAfterMarker(children, "applications-section") || []
+      if (territoryNodes.length === 0) territoryNodes = extractAfterMarker(children, "support-applications") || []
+      if (territoryNodes.length === 0) territoryNodes = extractAfterMarker(children, "applications-item") || []
+
+      const searchScope = (territoryNodes && territoryNodes.length > 0) ? territoryNodes : children
+      const items: any[] = []
+      let applicationIds: number[] = []
+      
+      // Look for applicationCarousel or standard carousel
+      if (Array.isArray(searchScope)) {
+        for (const node of searchScope) {
+          // Handle applicationCarousel (IDs only, fetch on client)
+          if (node.type === "applicationCarousel" && node.data?.applications) {
+            applicationIds = node.data.applications.map((a: any) => a.id).filter(Boolean)
+            if (applicationIds.length > 0) break
+          }
+          
+          // Handle standard carousel (manual slides)
+          if (node.type === "carousel" && node.data?.slides) {
+            items.push(...node.data.slides.map((s: any) => ({
+              id: s.id || Math.random().toString(),
+              title: s.title || "",
+              image: s.image?.id ? mediaData[s.image.id] : (typeof s.image === 'string' ? mediaData[s.image] : s.image)
+            })))
+            if (items.length > 0) break
+          }
+        }
+      }
+
+      // If nothing found in scope, try a global search for applicationCarousel
+      if (items.length === 0 && applicationIds.length === 0) {
+        const globalNode = children.find((n: any) => n.type === "applicationCarousel")
+        if (globalNode?.data?.applications) {
+          applicationIds = globalNode.data.applications.map((a: any) => a.id).filter(Boolean)
+        }
+      }
+
+      const found = items.length > 0 || applicationIds.length > 0
+      console.log("[SupportTemplate] Applications data status:", { found, itemCount: items.length, idCount: applicationIds.length })
+
+      return { items, applicationIds }
+    } catch (err) {
+      console.error("[SupportTemplate] Error in applicationsData useMemo:", err)
+      return { items: [], applicationIds: [] }
+    }
+  }, [children, mediaData])
+
   console.log("[SupportTemplate] Sections found:", { 
     hero: !!heroData, 
+    applications: !!applicationsData && (applicationsData.items.length > 0 || applicationsData.applicationIds.length > 0),
     commitment: !!commitmentData, 
     customized: !!customizedData, 
     qualityControl: !!qualityControlData,
@@ -489,9 +542,9 @@ export function SupportTemplate({ locale, pageContent }: SupportTemplateProps) {
   })
 
   return (
-    <main className="w-full">
+    <main className="relative bg-[#FBF9F1]">
       {heroData && <SupportHeroSection data={heroData} />}
-      
+
       {commitmentData && (
         <SupportCommitmentSection 
           title={commitmentData.mainTitle}
@@ -555,6 +608,14 @@ export function SupportTemplate({ locale, pageContent }: SupportTemplateProps) {
         />
       )}
       
+      {(applicationsData?.items.length > 0 || applicationsData?.applicationIds.length > 0) && (
+        <SupportApplicationsSection 
+          items={applicationsData.items} 
+          applicationIds={applicationsData.applicationIds}
+          locale={locale}
+        />
+      )}
+
       {!heroData && !commitmentData && !customizedData && !qualityControlData && !remoteData && (
         <div className="py-20 text-center text-gray-500">
            No content identified on this page. Please check CMS markers.
