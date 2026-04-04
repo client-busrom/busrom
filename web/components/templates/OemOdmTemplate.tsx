@@ -140,8 +140,11 @@ function extractAfterMarker(children: any[], markerId: string): any[] {
         continue
       }
       // 遇到新标记符则停止（代码格式 format: 16，且包含连字符）
+      // 如果新标记符是以当前 markerId 开头的子标记（例如 contact-form-tips 在 contact-form 内部），则不停止
       if (foundMarker && node.children?.[0]?.format === 16 && text.includes("-")) {
-        break
+        if (!text.startsWith(markerId + "-")) {
+          break
+        }
       }
     }
 
@@ -745,12 +748,11 @@ export function OemOdmTemplate({ locale, pageContent }: OemOdmTemplateProps) {
 
     // 从 formBlock 节点提取 formConfig ID
     let formConfigId: string | null = null
-    const nodesAfterMarker = extractAfterMarker(contentChildren, "contact-form")
-    for (const node of nodesAfterMarker) {
-      if (node.type === "formBlock" && node.data?.formConfig?.id) {
-        formConfigId = node.data.formConfig.id
-        break
-      }
+    const blockMarkerNodes = extractAfterMarker(contentChildren, "contact-form-block")
+    const formNode = blockMarkerNodes.find(n => n.type === "formBlock") || extractAfterMarker(contentChildren, "contact-form").find(n => n.type === "formBlock")
+    
+    if (formNode?.data?.formConfig?.id || formNode?.data?.id || formNode?.id) {
+      formConfigId = formNode.data?.formConfig?.id || formNode.data?.id || formNode.id
     }
 
     return {

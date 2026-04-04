@@ -64,8 +64,12 @@ function extractAfterMarker(children: any[], markerId: string): any[] {
         continue
       }
       // If we find a new marker, stop
+      // A new marker is a paragraph with format 16 (code style) and contains a hyphen
+      // BUT we don't stop if it's a sub-marker of the current one (e.g. contact-form-tips inside contact-form)
       if (foundMarker && node.children?.[0]?.format === 16 && text.includes("-")) {
-        break
+        if (!text.startsWith(markerId + "-")) {
+          break
+        }
       }
     }
 
@@ -598,13 +602,20 @@ export function ContactUsTemplate({ locale, pageContent }: ContactUsTemplateProp
       }
     }
 
-    // 从 sidebarContent 中提取表单配置和提示
+    // 从 sidebarContent 或 contact-form-block 标记中提取表单配置和提示
     let formConfig: any = null
     const tips: string[] = []
 
+    // 1. 尝试从专用的 contact-form-block 标记获取
+    const blockMarkerNodes = extractAfterMarker(contentChildren, "contact-form-block")
+    const formNodeFromMarker = blockMarkerNodes.find(n => n.type === "formBlock")
+    if (formNodeFromMarker?.data?.formConfig) {
+      formConfig = formNodeFromMarker.data.formConfig
+    }
+
     for (const sidebarNode of blockSidebarContent) {
       // formBlock 节点
-      if (sidebarNode.type === "formBlock" && sidebarNode.data?.formConfig) {
+      if (!formConfig && sidebarNode.type === "formBlock" && sidebarNode.data?.formConfig) {
         formConfig = sidebarNode.data.formConfig
       }
       // 无序列表 - 提示

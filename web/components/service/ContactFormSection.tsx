@@ -88,6 +88,8 @@ interface FormConfig {
 interface ContactFormSectionProps {
   locale: Locale
   formName?: string
+  formId?: string
+  formConfig?: FormConfig
   backgroundImage?: MediaObject | null
   title?: string
   subtitle?: string
@@ -115,6 +117,8 @@ const incrementSubmissionCount = (formName: string): void => {
 export function ContactFormSection({
   locale,
   formName = "service-inquiry",
+  formId,
+  formConfig: initialFormConfig,
   backgroundImage,
   title = "Need More\nAssistance?",
   subtitle = "Manual Service Request",
@@ -127,9 +131,9 @@ export function ContactFormSection({
   // 全宽元素不缩放
   const vwFull = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
 
-  const [formConfig, setFormConfig] = useState<FormConfig | null>(null)
+  const [formConfig, setFormConfig] = useState<FormConfig | null>(initialFormConfig || null)
   const [formData, setFormData] = useState<Record<string, any>>({})
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!initialFormConfig)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -199,9 +203,22 @@ export function ContactFormSection({
 
   // Fetch form configuration
   useEffect(() => {
+    if (initialFormConfig) {
+      setFormConfig(initialFormConfig)
+      const initialData: Record<string, any> = {}
+      initialFormConfig.fields.forEach((field: FormField) => {
+        initialData[field.fieldName] = field.fieldType === "checkbox" ? [] : ""
+      })
+      setFormData(initialData)
+      setSubmissionCount(getSubmissionCount(formName))
+      setLoading(false)
+      return
+    }
+
     const fetchFormConfig = async () => {
       try {
-        const res = await fetch(`/api/form-config/${formName}?locale=${locale}`)
+        const identifier = formId || formName
+        const res = await fetch(`/api/form-config/${identifier}?locale=${locale}`)
         if (res.ok) {
           const config = await res.json()
           setFormConfig(config)
@@ -224,7 +241,7 @@ export function ContactFormSection({
     }
 
     fetchFormConfig()
-  }, [formName, locale])
+  }, [formName, formId, initialFormConfig, locale])
 
   const handleChange = (fieldName: string, value: any) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }))

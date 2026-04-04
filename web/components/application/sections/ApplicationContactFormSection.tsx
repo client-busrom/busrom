@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronDown, Upload } from 'lucide-react'
 import { PhoneInput } from "@/components/ui/PhoneInput"
@@ -25,10 +25,11 @@ interface FormField {
 interface FormConfig {
   id: string
   name: string
-  fields: FormField[]
+  fields: any // Change to any to handle nested/localized structures
   submitButtonText?: string
   successMessage?: string
   errorMessage?: string
+  data?: { fields: any }
 }
 
 interface Props {
@@ -127,15 +128,25 @@ export function ApplicationContactFormSection({ locale = "en", bgImage, displayI
 
   useEffect(() => {
     const fetchConfig = async () => {
+      console.log("[ApplicationContactFormSection] Starting fetch for formId:", formId);
       if (!formId) return
       try {
         const res = await fetch(`/api/form-configs/${formId}?locale=${locale}`)
         if (res.ok) {
           const data = await res.json()
+          console.log("[ApplicationContactFormSection] Received API data:", data);
           setFormConfig(data)
-          const initialData: Record<string, any> = {}
-          data.fields.forEach((f: FormField) => { initialData[f.fieldName] = "" })
-          setFormData(initialData)
+          
+          // Safer field extraction for initial data state
+          const rawFields = data?.fields || data?.data?.fields
+          if (rawFields) {
+            const fieldsArr = Array.isArray(rawFields) ? rawFields : (rawFields[locale] || rawFields["en"] || [])
+            const initialData: Record<string, any> = {}
+            if (Array.isArray(fieldsArr)) {
+              fieldsArr.forEach((f: FormField) => { initialData[f.fieldName] = "" })
+              setFormData(initialData)
+            }
+          }
         }
       } catch (err) { console.error("Failed to fetch form config:", err) }
     }
@@ -230,11 +241,25 @@ export function ApplicationContactFormSection({ locale = "en", bgImage, displayI
     )
   }
 
-  const sortedFields = formConfig?.fields 
-    ? [...formConfig.fields]
-        .filter(f => !f.fieldName.toLowerCase().includes('upload') && !f.label.toLowerCase().includes('upload'))
-        .sort((a,b) => (a.order || 0) - (b.order || 0)) 
-    : []
+  const sortedFields = useMemo(() => {
+    const rawFields = formConfig?.fields || formConfig?.data?.fields
+    console.log("[ApplicationContactFormSection] Computing sortedFields:", { 
+      hasFormConfig: !!formConfig, 
+      rawFieldsPresence: !!rawFields,
+      rawFieldsType: typeof rawFields
+    });
+    
+    if (!rawFields) return []
+    
+    const fieldsArr = Array.isArray(rawFields) ? rawFields : (rawFields[locale] || rawFields["en"] || [])
+    console.log("[ApplicationContactFormSection] Extracted fieldsArr:", fieldsArr);
+
+    if (!Array.isArray(fieldsArr)) return []
+
+    return [...fieldsArr]
+        .filter(f => !f.fieldName?.toLowerCase().includes('upload') && !f.label?.toLowerCase().includes('upload'))
+        .sort((a,b) => (a.order || 0) - (b.order || 0))
+  }, [formConfig, locale])
   
   const renderRows = () => {
     const list: React.ReactNode[] = []
