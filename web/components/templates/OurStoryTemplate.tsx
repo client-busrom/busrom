@@ -81,8 +81,11 @@ function extractAfterMarker(children: any[], markerId: string): any[] {
 
     // Stop if we see a code-formatted block that looks like a DIFFERENT marker
     // (Only if we already found our marker)
-    if (foundMarker && (node.children?.[0]?.format === 16 || node.type === "code") && totalText.includes("-") && !totalText.includes(markerId)) {
-      break
+    // BUT we don't stop if it's a sub-marker of the current one (e.g. contact-form-tips inside contact-form)
+    if (foundMarker && (node.children?.[0]?.format === 16 || node.type === "code") && totalText.includes("-")) {
+       if (!totalText.startsWith(markerId + "-")) {
+          break
+       }
     }
 
     if (foundMarker) {
@@ -542,8 +545,12 @@ export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps)
 
     const blocks = findBlocksInSection(sectionPrefix, ["custom-image-gallery", "block", "formBlock"])
     const images = extractImagesFromBlocks(blocks)
-    const formBlock = blocks.find(b => b.blockType === "formBlock" || b.type === "formBlock")
-    const formConfig = formBlock?.formConfig || formBlock?.data?.formConfig
+    
+    // Prioritize contact-form-block marker
+    const blockMarkerNodes = extractAfterMarker(contentChildren, "contact-form-block")
+    const formNode = blockMarkerNodes.find(n => n.type === 'formBlock') || blocks.find(b => b.blockType === "formBlock" || b.type === "formBlock")
+    
+    const formConfig = formNode?.formConfig || formNode?.data?.formConfig || formNode
 
     return {
       title: "Get A \nQuote",

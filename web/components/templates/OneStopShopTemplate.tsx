@@ -260,7 +260,13 @@ export function OneStopShopTemplate({ locale, pageContent }: OneStopShopTemplate
      const res = extractSection(contentChildren, "contact-form", mediaData)
      const imgRes = extractSection(contentChildren, "contact-form-image", mediaData)
      const image = imgRes.items[0]?.image || null
-     return { title: res.title, subtitle: res.subtitle, image }
+     
+     // Form config extraction
+     const blockMarkerNodes = contentChildren.filter((n: any, i: number) => i > 0 && isMarkerNode(contentChildren[i-1], "contact-form-block"))
+     const formNode = blockMarkerNodes.find((n: any) => n.type === "formBlock") || res.items.find(it => it.sourceType === "formBlock")?.node
+     const formConfig = formNode?.data?.formConfig || formNode?.data || null
+
+     return { title: res.title, subtitle: res.subtitle, image, formConfig }
   }, [contentChildren, mediaData])
 
   // Applications
@@ -462,7 +468,7 @@ export function OneStopShopTemplate({ locale, pageContent }: OneStopShopTemplate
       {productsData.length > 0 && <ProductSeriesShowcaseSection title={productSeriesData.title} products={seriesProducts} locale={locale} />}
       {brandHighlightsData.items.length > 0 && <BrandHighlightsSection titleLine1={brandHighlightsData.titleLine1} titleLine2={brandHighlightsData.titleLine2} items={brandHighlightsData.items} />}
       <TrustSection title={trustData.title} items={trustData.items} images={trustImages} bgImage={trustBgImage} />
-      <CtaSection title={ctaData.title} subtitle={ctaData.subtitle} image={ctaData.image} formConfig={pageContent.formConfig} />
+      <CtaSection title={ctaData.title} subtitle={ctaData.subtitle} image={ctaData.image} formConfig={ctaData.formConfig || pageContent.formConfig} />
       {applicationsData.items.length > 0 && <ApplicationsSection title={applicationsData.title} items={applicationsData.items} locale={locale} />}
       <OemOdmGuideSection 
         title={oemOdmGuideData.title} 

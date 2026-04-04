@@ -68,8 +68,12 @@ function extractAfterMarker(children: any[], markerId: string): any[] {
         continue
       }
       // If we find a new marker, stop
+      // A new marker is a paragraph with format 16 (code style) and contains a hyphen
+      // BUT we don't stop if it's a sub-marker of the current one (e.g. contact-form-tips inside contact-form)
       if (foundMarker && node.children?.[0]?.format === 16 && text.includes("-")) {
-        break
+        if (!text.startsWith(markerId + "-")) {
+          break
+        }
       }
     }
 
@@ -433,10 +437,16 @@ export function ServiceOverviewTemplate({ locale, pageContent }: ServiceOverview
     const formTitle = extractTextAfterMarker(contentChildren, "contact-form-title")
     const formDescription = extractTextAfterMarker(contentChildren, "contact-form-description")
 
+    // Extract form config from markers
+    const blockMarkerNodes = extractAfterMarker(contentChildren, "contact-form-block")
+    const formNode = blockMarkerNodes.find(n => n.type === "formBlock") || extractAfterMarker(contentChildren, "contact-form").find(n => n.type === "formBlock")
+    const formConfig = formNode?.data?.formConfig || formNode?.data || null
+
     return {
       backgroundImage: bgImage,
       title: formTitle,
       description: formDescription,
+      formConfig,
     }
   }, [contentChildren, mediaData])
 
@@ -560,6 +570,7 @@ export function ServiceOverviewTemplate({ locale, pageContent }: ServiceOverview
         <ContactFormSection
           locale={locale as any}
           formName="service-overview-form"
+          formConfig={contactFormData.formConfig}
           backgroundImage={contactFormData.backgroundImage}
         />
       </div>

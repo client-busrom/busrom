@@ -61,7 +61,7 @@ export function SupportContactFormSection({
 
   // Fetch full config if needed
   useEffect(() => {
-    const configId = formConfig?.id
+    const configId = typeof formConfig === 'string' ? formConfig : formConfig?.id
     if (!configId) return
 
     const fetchFullConfig = async () => {
@@ -76,12 +76,15 @@ export function SupportContactFormSection({
       }
     }
     fetchFullConfig()
-  }, [formConfig?.id, locale])
+  }, [formConfig, locale])
 
-  const mergedConfig = useMemo(() => ({
-    ...formConfig,
-    ...fetchedFormConfig
-  }), [formConfig, fetchedFormConfig])
+  const mergedConfig = useMemo(() => {
+    const baseConfig = typeof formConfig === 'string' ? { id: formConfig } : formConfig || {}
+    return {
+      ...baseConfig,
+      ...fetchedFormConfig
+    }
+  }, [formConfig, fetchedFormConfig])
 
   const validImages = useMemo(() => {
     return images.filter((img): img is MediaObject => !!img?.url)
@@ -113,7 +116,7 @@ export function SupportContactFormSection({
     setIsSubmitting(true)
     setSubmitStatus("idle")
 
-    const formId = formConfig?.id
+    const formId = typeof formConfig === 'string' ? formConfig : formConfig?.id
     if (!formId) {
       console.error("Missing formId")
       setIsSubmitting(false)
@@ -147,7 +150,7 @@ export function SupportContactFormSection({
       // 2. Submit formal data
       const submissionData = {
         formId,
-        formName: formConfig?.name || "Support Contact Form",
+        formName: mergedConfig?.name || formConfig?.name || "Support Contact Form",
         data: {
           ...formData,
           ...(fileUrl ? { attachment: fileUrl } : {}),
@@ -180,7 +183,13 @@ export function SupportContactFormSection({
 
   const fields = useMemo(() => {
     const rawFields = mergedConfig?.fields || mergedConfig?.data?.fields
-    const f = rawFields?.[locale] || rawFields?.["en"] || (Array.isArray(rawFields) ? rawFields : [])
+    if (!rawFields) return []
+    
+    // Check if fields is an array or a localized object
+    const f = Array.isArray(rawFields) 
+      ? rawFields 
+      : (rawFields[locale] || rawFields["en"] || [])
+      
     return [...f].sort((a, b) => (a.order || 0) - (b.order || 0))
   }, [mergedConfig, locale])
 

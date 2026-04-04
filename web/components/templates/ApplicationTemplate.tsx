@@ -49,17 +49,34 @@ function extractAfterMarker(children: any[], markerId: string): any[] {
   let found = false
   const result: any[] = []
   const targetMarker = markerId.toLowerCase().trim()
+  
+  // For hierarchical markers (e.g., contact-form and contact-form-title), 
+  // we don't want to stop at sub-markers.
+  const markerPrefix = targetMarker.includes('-') 
+    ? targetMarker.split('-')[0] + '-' 
+    : targetMarker + '-'
+
   for (const node of flat) {
     if (node.type === "paragraph" || node.type === "quote") {
       const t = (node.children || []).map((c: any) => c.text || "").join("").trim().toLowerCase()
+      
+      // Found our start marker
       if (t === targetMarker) { 
         found = true
         continue 
       }
-      // If we see another marker (format 16 AND contains -), we stop unless we just started
-      if (found && (node.children?.[0]?.format === 16 || node.format === 16) && t.includes("-") && !t.startsWith("more-applications-")) {
-          // Check if we already found SOMETHING meaningful before stopping
-          if (result.length > 0) break
+      
+      // Stop condition:
+      // 1. We found a marker (format 16)
+      // 2. It's NOT the same marker prefix we are currently in
+      // 3. It's NOT a sub-marker of our current marker
+      if (found && (node.children?.[0]?.format === 16 || node.format === 16) && t.includes("-")) {
+          const isSubMarker = t.startsWith(targetMarker) || t.startsWith(markerPrefix)
+          const isSpecialExempt = t.startsWith("more-applications-")
+          
+          if (!isSubMarker && !isSpecialExempt) {
+              if (result.length > 0) break
+          }
       }
     }
     if (found) result.push(node)
@@ -301,17 +318,37 @@ function extractSections(pageContent: any) {
     return undefined
   }
 
+  // 1. Get the territory (marker-based)
+  let territoryNodes = extractAfterMarker(children, "contact-form")
+  if (territoryNodes.length === 0) territoryNodes = extractAfterMarker(children, "contact-form-title")
+  
+  const searchScope = territoryNodes.length > 0 ? territoryNodes : children
+
   const contactBgUrl = findImgUrlByMarker("contact-form-bg-image")
   const contactDisplayUrl = findImgUrlByMarker("contact-form-image") || findImgUrlByMarker("contact-form-display-image")
   const contactLogoUrl = findImgUrlByMarker("contact-form-logo")
 
-  const contactTextNodes = extractAfterMarker(children, "contact-form-title")
-  const contactRichText = contactTextNodes.length ? contactTextNodes.filter(n => n.type !== 'formBlock' && n.type !== 'paragraph' || (n.children && n.children.length > 0 && n.children[0].text && !n.children[0].text.includes('-'))).flatMap((n: any) => n.children || []).map((c: any) => ({
+  const contactTextNodes = extractAfterMarker(searchScope, "contact-form-title")
+  const finalTitleNodes = contactTextNodes.length > 0 ? contactTextNodes : searchScope
+
+  const contactRichText = finalTitleNodes.length ? finalTitleNodes.filter(n => n.type !== 'formBlock' && n.type !== 'paragraph' || (n.children && n.children.length > 0 && n.children[0].text && !n.children[0].text.includes('-'))).flatMap((n: any) => n.children || []).map((c: any) => ({
     text: c.text,
     bold: (c.format & 1) === 1
   })).filter(s => s.text) : []
 
-  const contactFormBlock = contactTextNodes.find(n => n.type === 'formBlock')
+  const blockMarkerNodes = extractAfterMarker(searchScope, "contact-form-block")
+  const contactFormBlock = blockMarkerNodes.find(n => n.type === 'formBlock') || 
+                           searchScope.find(n => n.type === 'formBlock') ||
+                           children.find((n: any) => n.type === 'formBlock')
+
+  console.log("[ApplicationTemplate] Form extraction diagnostic:", {
+    hasSearchScope: !!searchScope.length,
+    hasBlockMarker: !!blockMarkerNodes.length,
+    foundInMarker: !!blockMarkerNodes.find(n => n.type === 'formBlock'),
+    foundInScope: !!searchScope.find(n => n.type === 'formBlock'),
+    foundInTotal: !!children.find((n: any) => n.type === 'formBlock'),
+    finalBlockId: contactFormBlock?.data?.formConfig?.id || contactFormBlock?.data?.id || contactFormBlock?.id
+  });
 
   const applicationCasesNodes = extractAfterMarker(children, "applications-item")
   const applicationCarouselNode = applicationCasesNodes.find((n: any) => n.type === "applicationCarousel")
@@ -518,6 +555,12 @@ export function ApplicationTemplate({ locale, pageContent }: ApplicationTemplate
     }).filter(Boolean)
   }, [moreApplicationsData, allApplications])
 
+  console.log("[ApplicationTemplate] Form debug:", { 
+    contactFormBlockFound: !!contactFormBlock,
+    formConfigValue: contactFormBlock?.formConfig,
+    extractedFormId: typeof contactFormBlock?.formConfig === 'string' ? contactFormBlock.formConfig : contactFormBlock?.formConfig?.id || contactFormBlock?.data?.formConfig?.id || contactFormBlock?.data?.formConfig
+  })
+
   return (
     <div className="flex flex-col min-h-screen">
       <ApplicationHeroSection
@@ -564,7 +607,7 @@ export function ApplicationTemplate({ locale, pageContent }: ApplicationTemplate
         displayImage={contactDisplayUrl}
         logoImage={contactLogoUrl}
         richText={contactRichText}
-        formId={contactFormBlock?.formConfig?.id}
+        formId={typeof contactFormBlock?.formConfig === 'string' ? contactFormBlock.formConfig : contactFormBlock?.formConfig?.id || contactFormBlock?.data?.formConfig?.id || contactFormBlock?.data?.formConfig}
       />
       <ApplicationGuideSection 
         title={guideData.title}

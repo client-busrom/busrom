@@ -462,7 +462,10 @@ export function SupportTemplate({ locale, pageContent }: SupportTemplateProps) {
     }
 
     // Find form block in the scope
-    const formNode = searchScope.find((n: any) => n.type === "formBlock")
+    // Prioritize the specific contact-form-block marker if it exists
+    const blockMarkerNodes = extractAfterMarker(searchScope, "contact-form-block")
+    const formNode = blockMarkerNodes.find(n => n.type === "formBlock") || searchScope.find((n: any) => n.type === "formBlock")
+    
     const blockFormConfig = formNode?.data?.formConfig || formNode?.data || null
     // Fallback to global formConfig if the block one is just an ID (missing fields)
     const formConfig = (blockFormConfig?.fields ? blockFormConfig : (pageContent as any).formConfig) || blockFormConfig
