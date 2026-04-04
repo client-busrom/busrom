@@ -3774,7 +3774,7 @@
               "id": "NYUGs",
               "x": 0,
               "y": 11,
-              "name": "Glass Clip（4）",
+              "name": "bg-color",
               "fill": {
                 "type": "gradient",
                 "gradientType": "linear",
@@ -3810,7 +3810,7 @@
               "id": "a8SiO",
               "x": 1375.232421875,
               "y": 195,
-              "name": "Rectangle 482",
+              "name": "item2-image",
               "rotation": -8.085468564303062,
               "fill": {
                 "type": "image",
@@ -3832,7 +3832,7 @@
               "id": "H6t70",
               "x": 1280.056640625,
               "y": 235.7890625,
-              "name": "Rectangle 550",
+              "name": "item1-image",
               "rotation": 3.2347670704222518,
               "fill": {
                 "type": "image",
@@ -3862,7 +3862,7 @@
               "id": "ZI8Ps",
               "x": 153,
               "y": 323,
-              "name": "Schedule A 1:1 Technical Consultation to Quickly Resolve Your Challenges.",
+              "name": "item-title",
               "fill": "#574f0eff",
               "textGrowth": "fixed-width-height",
               "width": 978,
@@ -3878,7 +3878,7 @@
               "id": "jHR2r",
               "x": 153,
               "y": 617.9990234375,
-              "name": "Group 260",
+              "name": "item-button",
               "children": [
                 {
                   "type": "rectangle",
@@ -3886,7 +3886,7 @@
                   "id": "IyOAs",
                   "x": 0,
                   "y": 0,
-                  "name": "Rectangle 347",
+                  "name": "bg",
                   "width": 544,
                   "height": 125,
                   "stroke": {
@@ -3916,7 +3916,7 @@
                   "id": "rJ9oj",
                   "x": 423.23211669921875,
                   "y": 5.82421875,
-                  "name": "Subtract",
+                  "name": "icon",
                   "rotation": -7.369004241489115e-8,
                   "geometry": "M26.19223 8.59998c26.17723-16.46124 60.74237-8.58491 77.20361 17.59232 16.46105 26.1772 8.58483 60.74242-17.59232 77.20361-26.17712 16.46098-60.74237 8.58464-77.20361-17.59232-16.46119-26.17715-8.5847-60.74231 17.59232-77.20361z m45.582 30.7051l-0.04722-0.00375-21.8957-1.82932c-1.43375-0.1198-2.69054 0.96326-2.80687 2.41927l-0.00288 0.04341c-0.09161 1.43768 0.96929 2.69129 2.38854 2.80989l16.04864 1.34029-26.78151 23.08882c-0.91442 0.78841-1.02589 2.18071-0.24901 3.11031l0.19755 0.23632c0.78136 0.90378 2.13452 1.00833 3.03998 0.22797l26.78151-23.08882-1.30097 16.29799c-0.11626 1.45589 0.95197 2.73354 2.38565 2.85329 1.43375 0.11982 2.69081-0.96419 2.80709-2.42022l1.77855-22.28386c0.00966-0.15593 0.00481-0.31239-0.01263-0.46762l-0.00391-0.03996 0.00016 0.00805c-0.03163-0.47034-0.21117-0.91861-0.51216-1.27755l-0.17324-0.20675-0.02115-0.02585c-0.2906-0.33767-0.67633-0.57697-1.1046-0.6864l-0.02454-0.00659 0.00645 0.00247c-0.16213-0.04991-0.32916-0.08419-0.49773-0.10139z",
                   "fillRule": "evenodd",
@@ -3927,69 +3927,72 @@
               ]
             },
             {
-              "type": "rectangle",
-              "cornerRadius": 57,
-              "id": "HJSN9",
+              "type": "group",
+              "id": "fOjFR",
               "x": 153,
               "y": 129,
-              "name": "Rectangle 483",
-              "fill": "#f3f3f3ff",
-              "width": 366,
-              "height": 114,
-              "stroke": {
-                "align": "inside",
-                "thickness": 1,
-                "fill": "#aca675ff"
-              }
-            },
-            {
-              "type": "rectangle",
-              "cornerRadius": 51,
-              "id": "d496q",
-              "x": 337,
-              "y": 135,
-              "name": "Rectangle 548",
-              "fill": "#e7df98ff",
-              "width": 175,
-              "height": 102,
-              "stroke": {
-                "align": "inside",
-                "thickness": 1
-              }
-            },
-            {
-              "type": "text",
-              "id": "Tjqn1",
-              "x": 186,
-              "y": 161,
-              "name": "1",
-              "fill": "#756f3fff",
-              "textGrowth": "fixed-width-height",
-              "width": 127,
-              "height": 41,
-              "content": "1",
-              "lineHeight": 0.625,
-              "textAlign": "center",
-              "fontFamily": "jsMath-cmti10",
-              "fontSize": 96,
-              "fontWeight": "normal"
-            },
-            {
-              "type": "text",
-              "id": "CO1Nf",
-              "x": 308,
-              "y": 161,
-              "name": "2",
-              "fill": "#756f3fff",
-              "textGrowth": "fixed-width-height",
-              "width": 221,
-              "height": 41,
-              "content": "2",
-              "lineHeight": 0.625,
-              "textAlign": "center",
-              "fontFamily": "jsMath-cmti10",
-              "fontSize": 96,
-              "fontWeight": "normal"
+              "name": "toggle",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 57,
+                  "id": "HJSN9",
+                  "x": 0,
+                  "y": 0,
+                  "name": "bg",
+                  "fill": "#f3f3f3ff",
+                  "width": 366,
+                  "height": 114,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#aca675ff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 51,
+                  "id": "d496q",
+                  "x": 11,
+                  "y": 6,
+                  "name": "active-bg",
+                  "fill": "#e7df98ff",
+                  "width": 180,
+                  "height": 102,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "text",
+                  "id": "CO1Nf",
+                  "x": 237,
+                  "y": 27,
+                  "name": "2",
+                  "fill": "#756f3fff",
+                  "content": "2",
+                  "lineHeight": 0.625,
+                  "textAlign": "center",
+                  "fontFamily": "jsMath-cmti10",
+                  "fontSize": 96,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "Tjqn1",
+                  "x": 73,
+                  "y": 27,
+                  "name": "1",
+                  "fill": "#756f3fff",
+                  "content": "1",
+                  "lineHeight": 0.625,
+                  "textAlign": "center",
+                  "fontFamily": "jsMath-cmti10",
+                  "fontSize": 96,
+                  "fontWeight": "normal"
+                }
+              ]
             }
           ]
         }

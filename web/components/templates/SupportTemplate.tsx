@@ -11,6 +11,7 @@ import { SupportRequestProcessSection } from "@/components/support/SupportReques
 import { SupportMarketingSalesSection } from "@/components/support/SupportMarketingSalesSection"
 import { SupportContactFormSection } from "@/components/support/SupportContactFormSection"
 import { SupportApplicationsSection } from "@/components/support/SupportApplicationsSection"
+import { SupportQuoteSection } from "@/components/support/SupportQuoteSection"
 
 interface MediaObject {
   id: string
@@ -532,6 +533,25 @@ export function SupportTemplate({ locale, pageContent }: SupportTemplateProps) {
     }
   }, [children, mediaData])
 
+  // Quote Section extraction
+  const quoteData = useMemo(() => {
+    // Usually markers use format 16, so extractAfterMarker already handles this
+    const scope = extractAfterMarker(children, "quote-item")
+    if (scope.length === 0) return null
+    
+    const carouselNode = scope.find((n: any) => n.type === "carousel")
+    if (!carouselNode?.data?.slides) return null
+
+    return {
+      slides: carouselNode.data.slides.map((s: any) => ({
+        ...s,
+        image: s.image?.id ? mediaData[s.image.id] : (typeof s.image === 'string' ? mediaData[s.image] : s.image)
+      })),
+      autoplay: carouselNode.data.autoplay,
+      interval: carouselNode.data.interval
+    }
+  }, [children, mediaData])
+
   console.log("[SupportTemplate] Sections found:", { 
     hero: !!heroData, 
     applications: !!applicationsData && (applicationsData.items.length > 0 || applicationsData.applicationIds.length > 0),
@@ -541,7 +561,8 @@ export function SupportTemplate({ locale, pageContent }: SupportTemplateProps) {
     decorator: !!decoratorData,
     remote: !!remoteData,
     process: !!processData,
-    marketing: !!marketingData
+    marketing: !!marketingData,
+    quote: !!quoteData
   })
 
   return (
@@ -616,6 +637,14 @@ export function SupportTemplate({ locale, pageContent }: SupportTemplateProps) {
           items={applicationsData.items} 
           applicationIds={applicationsData.applicationIds}
           locale={locale}
+        />
+      )}
+
+      {quoteData && (
+        <SupportQuoteSection 
+          slides={quoteData.slides}
+          autoplay={quoteData.autoplay}
+          interval={quoteData.interval}
         />
       )}
 
