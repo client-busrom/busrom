@@ -35,8 +35,6 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
   const nextSlide = () => setIndex((prev) => (prev + 1) % slides.length)
   const prevSlide = () => setIndex((prev) => (prev - 1 + slides.length) % slides.length)
 
-  // 0.7 Scaled Coordinates - Visual Balancing Re-calculation
-  // Offset everything by -329 (original title left) to make content left-aligned in its block
   const getVisibleSteps = () => {
     const prev = (index - 1 + slides.length) % slides.length
     const next = (index + 1) % slides.length
@@ -51,14 +49,55 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
 
   return (
     <section 
-      className="relative w-full overflow-hidden bg-transparent flex justify-center items-center py-12 md:py-0 md:h-[922px]" 
+      className="relative w-full overflow-hidden bg-transparent flex justify-center items-center py-12 lg:py-0 lg:h-[48vw]" 
     >
-      <div className="relative w-full md:w-[1165px] h-auto md:h-[645px] flex flex-col md:block items-center px-10 md:px-0">
+      {/* MOBILE VIEW (< 1024px): Listing all items vertically */}
+      <div className="flex lg:hidden flex-col items-center px-6 gap-16 w-full">
+        {/* Mobile Header */}
+        <div className="text-center mb-4">
+          <h2 
+            className="font-semibold tracking-wide text-[32px] leading-tight"
+            style={{ 
+              fontFamily: "var(--font-anaheim)",
+              background: "linear-gradient(135deg, #756F3F 40%, rgba(117, 111, 63, 0.35) 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text"
+            }}
+            dangerouslySetInnerHTML={{ __html: (title || 'How To Make One-Stop Purchases').replace(/\n/g, '<br />') }}
+          />
+        </div>
+
+        {/* All Steps List */}
+        {slides.map((slide, i) => (
+          <div key={i} className="flex flex-col items-center w-full max-w-[340px] gap-6">
+            <div className="w-[340px] h-[220px] rounded-[20px] overflow-hidden shadow-lg bg-white/50">
+               <OptimizedImage 
+                 image={slide.image} 
+                 size="small"
+                 className="w-full h-full object-cover"
+                 alt={slide.title}
+               />
+            </div>
+            <div className="text-center space-y-3">
+              <span className="font-bold text-[#141414] tracking-widest text-[20px] uppercase block" style={{ fontFamily: "var(--font-anaheim)" }}>
+                {i + 1}. {slide.title}
+              </span>
+              <p className="font-medium text-[#7A7A7A] leading-[1.6] text-[15px]" style={{ fontFamily: "var(--font-anaheim)" }}>
+                {slide.description}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* DESKTOP VIEW (>= 1024px): Circular Flow with Proportional Scaling */}
+      <div className="hidden lg:block relative w-[75.2vw] h-[35vw] mx-auto">
         
-        {/* Decorative Dashed Curves - Hide on mobile if they disrupt flow */}
+        {/* Decorative Dashed Curves - Bottom Layer */}
         <div 
-          className="hidden md:block absolute pointer-events-none z-0"
-          style={{ left: "49px", top: "192px", width: "468px", height: "317px" }}
+          className="absolute pointer-events-none z-0"
+          style={{ left: vw(189), top: vw(192), width: vw(468), height: vw(317) }}
         >
            <svg width="100%" height="100%" viewBox="0 0 672 457" fill="none" className="w-full h-full">
               <path 
@@ -70,13 +109,30 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
            </svg>
         </div>
 
+        {/* Decorative Dashed Curves - TOP Layer */}
+        <div 
+          className="absolute pointer-events-none z-20"
+          style={{ left: vw(189), top: vw(192), width: vw(468), height: vw(317) }}
+        >
+           <svg width="100%" height="100%" viewBox="0 0 672 457" fill="none" className="w-full h-full">
+              <path 
+                d="M20.7206 298.054C-7.14999 199.203 -25.9867 1.5 121.632 1.5C269.25 1.5 442.624 111.61 510.859 166.664" 
+                stroke="#756F3F" strokeWidth="3" strokeDasharray="10 14" 
+                className="animate-dash-flow"
+              />
+              <circle cx="645.649" cy="260.161" r="8.23762" fill="#756F3F"/>
+              <circle cx="22.0609" cy="299.702" r="8.23762" fill="#756F3F"/>
+              <circle cx="511.376" cy="166.252" r="8.23762" fill="#756F3F"/>
+           </svg>
+        </div>
+
         {/* 1. Title */}
         <div 
-          className="relative md:absolute z-20 md:pointer-events-none mb-10 md:mb-0 text-center md:text-left"
-          style={{ left: typeof window !== 'undefined' && window.innerWidth < 768 ? "0" : "0px", top: typeof window !== 'undefined' && window.innerWidth < 768 ? "0" : "0px" }}
+          className="absolute z-30 pointer-events-none"
+          style={{ left: vw(140), top: "0px" }}
         >
           <h2 
-            className="font-semibold leading-tight tracking-wide text-[32px] md:text-[48px]"
+            className="font-semibold tracking-wide lg:text-[2.5vw] lg:leading-[1.2]"
             style={{ 
               fontFamily: "var(--font-anaheim)",
               background: "linear-gradient(135deg, #756F3F 40%, rgba(117, 111, 63, 0.35) 100%)",
@@ -88,24 +144,24 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
           />
         </div>
 
-        {/* 2. Central Image (Capsule shape) */}
+        {/* 2. Central Image */}
         <div 
-          className="relative md:absolute z-10 mb-10 md:mb-0"
-          style={{ left: typeof window !== 'undefined' && window.innerWidth < 768 ? "auto" : "100px", top: typeof window !== 'undefined' && window.innerWidth < 768 ? "auto" : "20px" }}
+          className="absolute z-10"
+          style={{ left: vw(240), top: vw(20) }}
         >
           <AnimatePresence mode="wait">
              {slides.map((slide, i) => i === index && (
                <motion.div 
                  key={i}
-                 initial={{ opacity: 0, scale: 0.95 }}
-                 animate={{ opacity: 1, scale: 1 }}
-                 exit={{ opacity: 0, scale: 0.95 }}
-                 transition={{ duration: 0.8 }}
+                 initial={{ opacity: 0, y: 14 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 exit={{ opacity: 0, y: -14 }}
+                 transition={{ duration: 0.8, ease: "easeInOut" }}
                  className="overflow-hidden shadow-2xl bg-white/50"
                  style={{ 
-                   width: typeof window !== 'undefined' && window.innerWidth < 768 ? "260px" : "365px", 
-                   height: typeof window !== 'undefined' && window.innerWidth < 768 ? "440px" : "620px", 
-                   borderRadius: typeof window !== 'undefined' && window.innerWidth < 768 ? "130px" : "183px" 
+                   width: vw(365), 
+                   height: vw(620), 
+                   borderRadius: vw(183) 
                  }}
                >
                   <OptimizedImage 
@@ -119,71 +175,105 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
           </AnimatePresence>
         </div>
 
-        {/* 3. Circular Flow Diagram & Steps Stacking */}
+        {/* 3. Circular Flow Diagram */}
         <div 
-          className="relative md:absolute w-full max-w-[400px] md:max-w-none h-auto md:h-[596px]"
-          style={{ left: typeof window !== 'undefined' && window.innerWidth < 768 ? "auto" : "569px", top: typeof window !== 'undefined' && window.innerWidth < 768 ? "auto" : "48px", width: typeof window !== 'undefined' && window.innerWidth < 768 ? "100%" : "596px" }}
+          className="absolute w-full h-[31.1vw]"
+          style={{ 
+            left: vw(709), 
+            top: vw(48), 
+            width: vw(596) 
+          }}
         >
-          {/* Background circle decorative - only for desktop */}
-          <div className="hidden md:block absolute inset-0 rounded-full border border-[#756F3F] opacity-30 pointer-events-none" />
+          {/* SOLID OUTER RING */}
+          <div className="absolute inset-0 rounded-full border border-[#756F3F] opacity-30 pointer-events-none" />
           
-          <div className="relative flex flex-col md:block items-center md:items-start gap-8 md:gap-0">
+          {/* DASHED INNER RING */}
+          <div className="absolute pointer-events-none z-0" style={{ inset: vw(60) }}> 
+            <svg width="100%" height="100%" viewBox="0 0 710 710" fill="none" className="rotate-infinite">
+               <circle 
+                 cx="355" cy="355" r="350" 
+                 stroke="#756F3F" strokeWidth="2.5" strokeDasharray="12 16" opacity="0.45" 
+                 className="animate-dash-flow"
+               />
+            </svg>
+          </div>
+
+          <div className="relative">
             {visibleSteps.map((step) => {
-              let top = 298 
-              let left = 50 
-              if (step.pos === "top") { left = 122; top = 122; } 
-              if (step.pos === "middle") { left = 50; top = 298; }
-              if (step.pos === "bottom") { left = 122; top = 474; } 
+              let top = 280 
+              let left = 70 
+              if (step.pos === "top") { left = 120; top = 110; } 
+              if (step.pos === "middle") { left = 70; top = 280; }
+              if (step.pos === "bottom") { left = 120; top = 460; } 
 
               return (
                 <div 
                   key={step.id} 
-                  className="relative md:absolute w-full md:w-auto" 
+                  className="absolute" 
                   style={{ 
-                    left: typeof window !== 'undefined' && window.innerWidth < 768 ? "0" : left + "px", 
-                    top: typeof window !== 'undefined' && window.innerWidth < 768 ? "0" : top + "px" 
+                    left: vw(left), 
+                    top: vw(top) 
                   }}
                 >
                   {step.active ? (
-                    <div className="flex flex-col items-center md:items-start">
-                      <div className="flex items-center gap-4 mb-2">
+                    <div className="flex flex-col relative items-start">
                         <motion.div 
-                          className="bg-[#756F3F] rounded-full flex items-center justify-center shadow-xl z-20 shrink-0"
-                          style={{ width: "40px", height: "40px" }}
+                          initial={{ scale: 0, rotate: -45 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          className="flex absolute bg-[#756F3F] rounded-full items-center justify-center shadow-xl z-20"
+                          style={{ 
+                            left: vw(-32), 
+                            top: vw(-5), 
+                            width: vw(48), 
+                            height: vw(48) 
+                          }}
                         >
-                           <svg width="24" height="24" viewBox="0 0 40 40" fill="none">
-                              <path d="M20 6C15 6 11 10 11 15C11 18.2 12.5 21.1 15 23V28H25V23C27.5 21.1 29 18.2 29 15C29 10 25 6 20 6Z" fill="white" />
+                           <svg width="60%" height="60%" viewBox="0 0 24 24" fill="none">
+                              <path d="M12 2C10.9 2 10 2.9 10 4V6H7C5.9 6 5 6.9 5 8V11C5 12.1 5.9 13 7 13H17C18.1 13 19 12.1 19 11V8C19 6.9 18.1 6 17 6H14V4C14 2.9 13.1 2 12 2Z" fill="white" />
+                               <rect x="7" y="14" width="10" height="8" rx="1" fill="white" />
                            </svg>
                         </motion.div>
+
+                      <div className="flex items-center gap-4 mb-2 pl-[1.7vw]">
                         <span 
-                          className="font-bold text-[#141414] tracking-widest text-[20px] md:text-[24px]" 
+                          className="font-bold text-[#141414] tracking-widest text-[1.46vw]" 
                           style={{ fontFamily: "var(--font-anaheim)" }}
                         >
                           {step.id}. {step.data.title}
                         </span>
                       </div>
-                      <p 
-                        className="font-medium text-[#7A7A7A] leading-[1.4] text-center md:text-left max-w-[280px] md:max-w-[245px]"
-                        style={{ fontSize: "16px", fontFamily: "var(--font-anaheim)" }}
-                      >
-                        {step.data.description}
-                      </p>
+                      <div className="pl-[1.7vw]">
+                        <AnimatePresence mode="wait">
+                          <motion.p
+                            key={index}
+                            initial={{ opacity: 0, x: -7 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="font-medium text-[#7A7A7A] leading-[1.6] max-w-[16.6vw]"
+                            style={{ fontSize: vw(20), fontFamily: "var(--font-anaheim)" }}
+                          >
+                            {step.data.description}
+                          </motion.p>
+                        </AnimatePresence>
+                      </div>
                     </div>
                   ) : (
                     <button 
                       onClick={step.onClick}
-                      className="group flex items-center justify-center md:justify-start gap-4 transition-opacity duration-300 hover:opacity-100 opacity-60 md:opacity-100"
+                      className="group flex items-center gap-4 transition-opacity duration-300 opacity-60 lg:opacity-100"
                     >
                       <div 
                         className="bg-white border border-[#756F3F]/40 group-hover:bg-[#756F3F] group-hover:border-[#756F3F] rounded-full flex items-center justify-center transition-all duration-300 shrink-0"
-                        style={{ width: "34px", height: "34px" }} 
+                        style={{ 
+                          width: vw(34), 
+                          height: vw(34) 
+                        }} 
                       >
-                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[#756F3F] group-hover:text-white">
+                         <svg width="60%" height="60%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[#756F3F] group-hover:text-white transition-colors duration-300">
                            <path d={step.pos === 'top' ? "M7 17L17 7M17 7H7M17 7V17" : "M7 7L17 17M17 17V7M17 17H7"} />
                          </svg>
                       </div>
                       <span 
-                        className="font-bold text-[#141414] tracking-widest uppercase transition-colors duration-300 group-hover:text-[#756F3F] text-[18px] md:text-[20px]" 
+                        className="font-bold text-[#141414] tracking-widest uppercase transition-colors duration-300 group-hover:text-[#756F3F] text-[1.15vw]" 
                         style={{ fontFamily: "var(--font-anaheim)" }} 
                       >
                         {step.id}. {step.data.title}
@@ -200,5 +290,3 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
     </section>
   )
 }
-
-
