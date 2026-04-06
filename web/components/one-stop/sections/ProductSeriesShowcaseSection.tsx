@@ -115,10 +115,10 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
 
             <div className="grid grid-cols-2 gap-4 w-full">
               <div className="aspect-[3/4] rounded-[20px] overflow-hidden shadow-lg border border-black/5">
-                <OptimizedImage image={displayedImages[0]} alt="Feature 1" className="w-full h-full object-cover" />
+                <OptimizedImage image={displayedImages[0]} alt="Feature 1" className="w-full h-full object-cover" size="medium" />
               </div>
               <div className="aspect-[3/4] rounded-[20px] overflow-hidden shadow-lg border border-black/5">
-                <OptimizedImage image={displayedImages[1]} alt="Feature 2" className="w-full h-full object-cover" />
+                <OptimizedImage image={displayedImages[1]} alt="Feature 2" className="w-full h-full object-cover" size="medium" />
               </div>
             </div>
 
@@ -219,10 +219,10 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
 
             {/* Right Image Cards */}
             <div className="w-[19.53%] aspect-[375/561] rounded-[1.56vw] xl:rounded-[22.8px] overflow-hidden shadow-2xl border border-black/5">
-              <OptimizedImage image={displayedImages[0]} alt="Showcase 1" className="w-full h-full object-cover" />
+              <OptimizedImage image={displayedImages[0]} alt="Showcase 1" className="w-full h-full object-cover" size="large" />
             </div>
             <div className="w-[19.53%] aspect-[375/561] rounded-[1.56vw] xl:rounded-[22.8px] overflow-hidden shadow-2xl border border-black/5">
-              <OptimizedImage image={displayedImages[1]} alt="Showcase 2" className="w-full h-full object-cover" />
+              <OptimizedImage image={displayedImages[1]} alt="Showcase 2" className="w-full h-full object-cover" size="large" />
             </div>
           </motion.div>
         </AnimatePresence>

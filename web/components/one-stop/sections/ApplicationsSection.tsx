@@ -23,12 +23,12 @@ interface ApplicationsSectionProps {
 export function ApplicationsSection({ title, items, locale }: ApplicationsSectionProps) {
   // Figma Constants (1920px base)
   const DESIGN_WIDTH = 1920
-  const SECTION_HEIGHT = 1083
+  const SECTION_HEIGHT = 900
   const ITEM_WIDTH = 373
   const ITEM_HEIGHT = 654
   const ITEM_GAP = 42 
-  // Significantly increased vertical offset for a dramatic "High-Mid-Low" valley effect
-  const MAX_Y_OFFSET = 300 
+  // Deepening the V-valley significantly
+  const MAX_Y_OFFSET = 380 
 
   // Layout vw helper (matching 0.7 scale design)
   const vw = (px: number) => `${(px * 0.7 / DESIGN_WIDTH) * 100}vw`
@@ -67,7 +67,7 @@ export function ApplicationsSection({ title, items, locale }: ApplicationsSectio
 
       // distFromCenter 0 = Center (Low point), 1 = Edges (High point)
       // Multiplier increased to 3.2 to ensure it reaches 'High' plateau faster toward the edges
-      const distFromCenter = Math.abs(diffToTarget * 3.2) 
+      const distFromCenter = Math.abs(diffToTarget * 8) 
       const clampedDist = Math.max(0, Math.min(1, distFromCenter))
       
       // Trajectory function: Sharp Parabolic
@@ -110,7 +110,7 @@ export function ApplicationsSection({ title, items, locale }: ApplicationsSectio
 
   if (!items || items.length === 0) return null
 
-  const displayItems = items.length < 8 ? [...items, ...items, ...items] : [...items, ...items]
+  const displayItems = items.length < 8 ? [...items, ...items, ...items, ...items] : [...items, ...items, ...items]
 
   return (
     <section 
@@ -137,14 +137,14 @@ export function ApplicationsSection({ title, items, locale }: ApplicationsSectio
       `}</style>
       
       <div className="absolute inset-0 pointer-events-none z-0" style={{ transform: "scale(0.7)", transformOrigin: "top center" }}>
-         <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "567px", top: "127px", width: "101px", height: "101px" }} />
-         <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "1164px", top: "285px", width: "51px", height: "51px" }} />
-         <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "1190px", top: "65px", width: "81px", height: "81px" }} />
-         <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "778px", top: "0px", width: "29px", height: "29px" }} />
+         <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "567px", top: "152px", width: "101px", height: "101px" }} />
+         <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "1164px", top: "310px", width: "51px", height: "51px" }} />
+         <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "1190px", top: "90px", width: "81px", height: "81px" }} />
+         <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "778px", top: "25px", width: "29px", height: "29px" }} />
       </div>
 
       <div className="relative w-[1920px] h-[1083px] origin-top flex-shrink-0 z-10" style={{ transform: "scale(0.7)" }}>
-        <div className="absolute inset-x-0 top-[75px] flex flex-col items-center">
+        <div className="absolute inset-x-0 top-[100px] flex flex-col items-center">
           <div className="relative text-center select-none">
             {/* 1. Underlying Stroke Layer (Offset 4px) - Only the outline */}
             <h2 
@@ -217,7 +217,7 @@ export function ApplicationsSection({ title, items, locale }: ApplicationsSectio
         <button onClick={scrollPrev} className="absolute left-[80px] top-[141px] w-[82px] h-[82px] rounded-full border-2 border-[#756f3f] flex items-center justify-center hover:bg-[#756f3f] hover:text-white transition-all z-50 bg-white/10 text-[#756f3f]">
           <ChevronLeft className="w-10 h-10" />
         </button>
-        <button onClick={scrollNext} className="absolute right-[80px] top-[141px] w-[82px] h-[82px] rounded-full bg-[#756f3f] flex items-center justify-center hover:opacity-90 transition-all z-50 text-white shadow-xl">
+        <button onClick={scrollNext} className="absolute right-[80px] top-[141px] w-[82px] h-[82px] rounded-full border-2 border-[#756f3f] flex items-center justify-center hover:bg-[#756f3f] hover:text-white transition-all z-50 bg-white/10 text-[#756f3f]">
           <ChevronRight className="w-10 h-10" />
         </button>
       </div>

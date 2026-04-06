@@ -285,17 +285,20 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
   }, [contentChildren, mediaData])
 
   const ctaData = useMemo(() => {
-     const res = extractSection(contentChildren, "contact-form", mediaData)
+     const res = extractSection(contentChildren, "contact-form-block", mediaData)
      const imgRes = extractSection(contentChildren, "contact-form-image", mediaData)
      const image = imgRes.items[0]?.image || null
      
-     // Form config extraction
+     // 提取表单配置
      const blockMarkerNodes = contentChildren.filter((n: any, i: number) => i > 0 && isMarkerNode(contentChildren[i-1], "contact-form-block"))
      const formNode = blockMarkerNodes.find((n: any) => n.type === "formBlock") || res.items.find(it => it.sourceType === "formBlock")?.node
-     const formConfig = formNode?.data?.formConfig || formNode?.data || null
+     
+     // 核心修复：如果找到的 formConfig 只有 ID 没有内容，且 PageContent 有默认配置，则使用 PageContent 的
+     const rawFormConfig = formNode?.data?.formConfig || formNode?.data || null
+     const formConfig = (rawFormConfig && rawFormConfig.fields) ? rawFormConfig : (pageContent.formConfig || rawFormConfig)
 
-     return { title: res.title, subtitle: res.subtitle, image, formConfig }
-  }, [contentChildren, mediaData])
+     return { title: res.title, description: res.subtitle, image, formConfig }
+  }, [contentChildren, mediaData, pageContent.formConfig])
 
   // Applications
   const [allApplications, setAllApplications] = useState<any[]>([])
@@ -521,7 +524,7 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
       {productsData.length > 0 && <ProductSeriesShowcaseSection title={productSeriesData.title} products={seriesProducts} locale={locale} />}
       {brandHighlightsData.items.length > 0 && <BrandHighlightsSection titleLine1={brandHighlightsData.titleLine1} titleLine2={brandHighlightsData.titleLine2} items={brandHighlightsData.items} />}
       <TrustSection title={trustData.title} items={trustData.items} images={trustImages} bgImage={trustBgImage} />
-      <CtaSection title={ctaData.title} subtitle={ctaData.subtitle} image={ctaData.image} formConfig={ctaData.formConfig || pageContent.formConfig} />
+      <CtaSection title={ctaData.title} description={ctaData.description} image={ctaData.image} formConfig={ctaData.formConfig || pageContent.formConfig} />
       {applicationsData.items.length > 0 && <ApplicationsSection title={applicationsData.title} items={applicationsData.items} locale={locale} />}
       <OemOdmGuideSection 
         title={oemOdmGuideData.title} 

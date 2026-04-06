@@ -44,7 +44,7 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
 
   return (
     <section 
-      className="relative w-full overflow-hidden flex flex-col items-center bg-black py-16 lg:py-0 lg:min-h-[850px]"
+      className="relative w-full overflow-hidden flex flex-col items-center bg-black py-32 lg:py-0 min-h-[1100px] lg:h-[1150px] lg:min-h-[1150px]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >

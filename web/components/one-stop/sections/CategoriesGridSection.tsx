@@ -136,6 +136,7 @@ export function CategoriesGridSection({
                       image={(item.showImage || item.image) as any}
                       alt={item.name}
                       className="object-contain object-left-bottom w-full h-full"
+                      size="medium"
                     />
                   </div>
                 </div>
