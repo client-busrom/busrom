@@ -47,24 +47,25 @@ export function CategoriesGridSection({
     >
       <div className="w-full max-w-[1300px] px-6 mx-auto flex flex-col items-center">
         {/* Titles */}
-        <div 
-          className="text-center mb-10 lg:mb-[3.64vw]" 
-        >
+        <div className="text-center mb-10 lg:mb-[3.64vw]">
           <h2 
-            className="font-anaheim font-extrabold text-black text-[32px] lg:text-[3.48vw]" 
+            className="font-anaheim font-extrabold text-black text-[32px] lg:text-[3.48vw] outline-1 lg:outline-2" 
             style={{ 
               lineHeight: 1.15,
-              WebkitTextStroke: typeof window !== 'undefined' && window.innerWidth < 1024 ? "1.5px #000000" : `${(67/1920)*100}vw #000000`,
+              WebkitTextStroke: "1.5px #000000",
+              // Media query for desktop stroke (overriding common style)
               paintOrder: "stroke fill"
             }}
             dangerouslySetInnerHTML={{ __html: (title || "Product Related To").replace(/\n/g, '<br />') }}
           />
-          <h3 className="font-anaheim font-extrabold text-[42px] lg:text-[4.68vw]" 
+          {/* Using a wrapper to handle the complex stroke change via CSS and responsive margin */}
+          <h3 
+            className="font-anaheim font-extrabold text-[42px] lg:text-[4.68vw] 
+                       mt-[-8px] lg:mt-[-0.73vw]" 
             style={{ 
               lineHeight: 1,
               color: "#EEEACB",
-              marginTop: typeof window !== 'undefined' && window.innerWidth < 1024 ? "-8px" : vw(-14),
-              WebkitTextStroke: typeof window !== 'undefined' && window.innerWidth < 1024 ? "1.5px #000000" : `${(67/1920)*100}vw #000000`, 
+              WebkitTextStroke: "1.5px #000000", 
               paintOrder: "stroke fill"
             }}
           >
@@ -73,15 +74,12 @@ export function CategoriesGridSection({
         </div>
  
         {/* Grid of Products */}
-        <div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full gap-6 lg:gap-[1.66vw]" 
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full gap-6 lg:gap-[1.66vw]">
           {products.map((item, index) => (
             <Link 
               key={item.id} 
               href={`/${locale}/shop/${item.slug}`} 
-              className="relative block"
-              style={{ paddingBottom: typeof window !== 'undefined' && window.innerWidth < 1024 ? "72%" : "92.2%", width: "100%" }}
+              className="relative block w-full aspect-[1/0.72] lg:aspect-[1/0.92]"
             >
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -91,8 +89,7 @@ export function CategoriesGridSection({
                   filter: `drop-shadow(0 ${vw(21)} ${vw(24)} rgba(0, 0, 0, 0.12))`
                 }}
                 viewport={{ once: true }}
-                className="absolute inset-0 group"
-                style={{ padding: typeof window !== 'undefined' && window.innerWidth < 1024 ? "20px" : vw(28) }}
+                className="absolute inset-0 group p-5 lg:p-[1.45vw]"
               >
                 {/* SVG Background Shape */}
                 <div className="absolute inset-0 z-0">
@@ -101,43 +98,23 @@ export function CategoriesGridSection({
                   </svg>
                 </div>
  
-                {/* Arrow Icon Button */}
+                {/* Arrow Icon Button - Proportional to SVG Cutout (Fully Reactive) */}
                 <div 
-                  className="absolute z-40 transition-all duration-300 group-hover:translate-x-[5px] group-hover:translate-y-[-5px] group-hover:scale-110"
-                  style={{ 
-                    top: typeof window !== 'undefined' && window.innerWidth < 1024 ? "-8px" : vw(-10), 
-                    right: typeof window !== 'undefined' && window.innerWidth < 1024 ? "-8px" : vw(-10), 
-                    width: typeof window !== 'undefined' && window.innerWidth < 1024 ? "48px" : vw(61), 
-                    height: typeof window !== 'undefined' && window.innerWidth < 1024 ? "48px" : vw(61) 
-                  }}
+                  className="absolute z-40 transition-all duration-300 group-hover:translate-x-[5px] group-hover:translate-y-[-5px] group-hover:scale-110 
+                             top-[-2%] right-[-2%] w-[12.1%] h-[12.1%] 
+                             lg:top-[-0.52vw] lg:right-[-0.52vw] lg:w-[3.17vw] lg:h-[3.17vw]"
                 >
                   <svg width="100%" height="100%" viewBox="0 0 61 61" fill="none">
-                    <circle 
-                      cx="30.5" cy="30.5" r="30.5" 
-                      fill="white"
-                      className="transition-colors duration-300 group-hover:fill-[#756F3F] shadow-sm"
-                    />
-                    <path 
-                      d="M41.7069 18.9091L41.6874 18.8946C41.4258 18.7044 41.1124 18.5986 40.7891 18.5914L40.7702 18.591L40.7755 18.5914C40.6517 18.5827 40.5274 18.586 40.4043 18.6014L40.3694 18.606L24.4438 20.8822C23.401 21.0312 22.6773 21.9974 22.8276 23.0401L22.8324 23.0713C22.9973 24.0971 23.9554 24.8055 24.9877 24.6579L36.6608 22.9895L21.2389 43.5807C20.7122 44.2839 20.856 45.2814 21.5599 45.8086L21.7384 45.9423C22.4412 46.4508 23.4241 46.3041 23.9456 45.6079L39.3675 25.0167L41.0499 36.6878C41.2001 37.7304 42.1672 38.4547 43.21 38.3056C44.2528 38.1566 44.9765 37.1905 44.8262 36.1478L42.5307 20.2236L42.5256 20.1902C42.5075 20.0789 42.4796 19.9694 42.4423 19.863L42.4326 19.836L42.4342 19.8412C42.3362 19.5157 42.1363 19.2302 41.8639 19.0267L41.7069 18.9091Z" 
-                      fill="#5E571F"
-                      className="transition-colors duration-300 group-hover:fill-white"
-                    />
+                    <circle cx="30.5" cy="30.5" r="30.5" fill="white" className="transition-colors duration-300 group-hover:fill-[#756F3F] shadow-sm"/>
+                    <path d="M41.7069 18.9091L41.6874 18.8946C41.4258 18.7044 41.1124 18.5986 40.7891 18.5914L40.7702 18.591L40.7755 18.5914C40.6517 18.5827 40.5274 18.586 40.4043 18.6014L40.3694 18.606L24.4438 20.8822C23.401 21.0312 22.6773 21.9974 22.8276 23.0401L22.8324 23.0713C22.9973 24.0971 23.9554 24.8055 24.9877 24.6579L36.6608 22.9895L21.2389 43.5807C20.7122 44.2839 20.856 45.2814 21.5599 45.8086L21.7384 45.9423C22.4412 46.4508 23.4241 46.3041 23.9456 45.6079L39.3675 25.0167L41.0499 36.6878C41.2001 37.7304 42.1672 38.4547 43.21 38.3056C44.2528 38.1566 44.9765 37.1905 44.8262 36.1478L42.5307 20.2236L42.5256 20.1902C42.5075 20.0789 42.4796 19.9694 42.4423 19.863L42.4326 19.836L42.4342 19.8412C42.3362 19.5157 42.1363 19.2302 41.8639 19.0267L41.7069 18.9091Z" fill="#5E571F" className="transition-colors duration-300 group-hover:fill-white"/>
                   </svg>
                 </div>
  
                 {/* Text Content */}
                 <div 
-                  className="absolute z-30" 
-                  style={{ 
-                    left: typeof window !== 'undefined' && window.innerWidth < 1024 ? "24px" : vw(40), 
-                    top: typeof window !== 'undefined' && window.innerWidth < 1024 ? "22px" : vw(22), 
-                    width: typeof window !== 'undefined' && window.innerWidth < 1024 ? "80%" : vw(260) 
-                  }}
+                  className="absolute z-30 left-6 top-[22px] w-[80%] lg:left-[2.08vw] lg:top-[1.14vw] lg:w-[13.54vw]" 
                 >
-                  <h4 
-                    className="font-anaheim font-extrabold text-black text-[18px] lg:text-[1.51vw]" 
-                    style={{ lineHeight: 1.25 }}
-                  >
+                  <h4 className="font-anaheim font-extrabold text-black text-[18px] lg:text-[1.51vw] leading-[1.25]">
                     {item.category?.name || item.name}
                   </h4>
                 </div>
@@ -152,13 +129,8 @@ export function CategoriesGridSection({
                   }}
                 >
                   <div 
-                    className="w-full h-full pointer-events-none"
-                    style={{
-                      transform: typeof window !== 'undefined' && window.innerWidth < 1024 
-                        ? `translate(-30px, 30px) scale(1.05)` 
-                        : `translate(${vw(-60)}, ${vw(60)}) scale(1.1)`,
-                      transformOrigin: "bottom left"
-                    }}
+                    className="w-full h-full pointer-events-none transform translate-x-[-30px] translate-y-[30px] scale-[1.05]
+                               lg:translate-x-[-3.125vw] lg:translate-y-[3.125vw] lg:scale-[1.1] origin-bottom-left"
                   >
                     <OptimizedImage
                       image={(item.showImage || item.image) as any}

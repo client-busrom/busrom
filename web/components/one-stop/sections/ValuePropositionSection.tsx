@@ -19,9 +19,6 @@ interface ValuePropositionProps {
   interval?: number
 }
 
-const DESIGN_WIDTH = 1920
-const vw = (px: number) => typeof window !== 'undefined' ? `${(px / DESIGN_WIDTH) * window.innerWidth}px` : `${px}px`
-
 /**
  * ValuePropositionSection - The Value of One-Stop Procurement
  */
@@ -29,9 +26,6 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
   const [currentIndex, setCurrentIndex] = useState(0)
   
   const data = problems.length > 0 ? problems : advantages
-  const itemWidth = 400
-  const gap = 20
-
   const handleNext = React.useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % data.length)
   }, [data.length])
@@ -52,12 +46,6 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
   }, [autoplay, interval, data.length, handleNext])
 
   if (data.length === 0) return null
-
-  // Function to calculate responsive VW value
-  const rVw = (px: number) => {
-    if (typeof window === 'undefined') return px
-    return (px / 1920) * window.innerWidth
-  }
 
   return (
     <section className="relative w-full overflow-hidden bg-transparent flex justify-center items-center py-12 lg:py-0 lg:h-[922px]">
