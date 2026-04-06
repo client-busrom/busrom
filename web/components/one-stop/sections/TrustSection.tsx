@@ -67,12 +67,12 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="text-[32px] lg:text-[60px] font-extrabold text-white leading-tight lg:leading-[70px] tracking-tighter mb-8 lg:mb-12 text-center lg:text-left"
+            className="text-[32px] lg:text-[60px] font-extrabold text-white leading-tight lg:leading-[70px] tracking-[0.05em] mb-8 lg:mb-12 text-center lg:text-left"
             style={{ fontFamily: "var(--font-anaheim)" }}
             dangerouslySetInnerHTML={{ __html: (title || "Why Contractors<br />Trust Us?").replace(/\n/g, '<br />') }}
           />
 
-          <div className="w-full lg:max-w-[613.6px] mx-auto lg:mx-0">
+          <div className="w-full lg:max-w-[640px] mx-auto lg:mx-0">
               {displayItems.slice(0, 6).map((item, i) => {
                   const isActive = activeIndex === i
                   return (
@@ -82,7 +82,7 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
                               className="w-full flex justify-between items-center text-left py-4 transition-all"
                           >
                               <h4 
-                                  className={`text-[18px] lg:text-[29px] font-bold leading-tight transition-colors duration-300 ${isActive ? 'text-[#FFF28E]' : 'text-white/60 group-hover:text-white'}`}
+                                  className={`text-[18px] lg:text-[24px] font-bold leading-tight transition-colors duration-300 ${isActive ? 'text-[#FFF28E]' : 'text-white/60 group-hover:text-white'}`}
                                   style={{ fontFamily: "var(--font-anaheim)" }}
                               >
                                   {item.title}
@@ -101,7 +101,7 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
                                       transition={{ duration: 0.4 }}
                                       className="overflow-hidden"
                                   >
-                                      <p className="text-[16px] lg:text-[20px] font-semibold text-white/80 leading-relaxed lg:leading-[32px] pb-8 lg:pr-12" style={{ fontFamily: "var(--font-anaheim)" }}>
+                                      <p className="text-[16px] lg:text-[20px] font-semibold text-white/80 leading-relaxed lg:leading-[32px] pb-8 lg:pr-[180px]" style={{ fontFamily: "var(--font-anaheim)" }}>
                                           {item.description || item.summary}
                                       </p>
                                   </motion.div>
@@ -117,13 +117,14 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
         <div className="relative w-full lg:w-auto h-[450px] lg:h-full lg:flex-grow flex items-center justify-center lg:block min-h-[750px] lg:min-h-[900px]">
             {/* Image 1 - top scatter (Pencil: image1) */}
             <motion.div 
+                initial={{ rotate: 2.19 }}
                 animate={{ 
-                    rotate: 2.19,
-                    y: [0, -15, 0]
+                    y: [0, -15]
                 }}
                 transition={{
-                    duration: 4,
+                    duration: 2,
                     repeat: Infinity,
+                    repeatType: "reverse",
                     ease: "easeInOut"
                 }}
                 className="absolute shadow-2xl rounded-[30px] lg:rounded-[54px] overflow-hidden z-30 lg:left-[135px] lg:top-[40px]"
@@ -139,13 +140,14 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
 
             {/* Image 2 - Main Large Image (Pencil: image2) */}
             <motion.div 
+                initial={{ rotate: 8.15 }}
                 animate={{ 
-                    rotate: 8.15,
-                    y: [0, 15, 0]
+                    y: [0, 15]
                 }}
                 transition={{
-                    duration: 5,
+                    duration: 2.5,
                     repeat: Infinity,
+                    repeatType: "reverse",
                     ease: "easeInOut",
                     delay: 0.5
                 }}
@@ -162,13 +164,14 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
 
             {/* Image 3 - mid left scatter (Pencil: image3) */}
             <motion.div 
+                initial={{ rotate: -20.86 }}
                 animate={{ 
-                    rotate: -20.86,
-                    y: [0, -20, 0]
+                    y: [0, -20]
                 }}
                 transition={{
-                    duration: 6,
+                    duration: 3,
                     repeat: Infinity,
+                    repeatType: "reverse",
                     ease: "easeInOut",
                     delay: 1
                 }}
@@ -185,13 +188,14 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
 
             {/* Image 4 - bottom scatter (Pencil: image4) */}
             <motion.div 
+                initial={{ rotate: -5.5 }}
                 animate={{ 
-                    rotate: -5.5,
-                    y: [0, 10, 0]
+                    y: [0, 10]
                 }}
                 transition={{
-                    duration: 4.5,
+                    duration: 2.25,
                     repeat: Infinity,
+                    repeatType: "reverse",
                     ease: "easeInOut",
                     delay: 0.2
                 }}
