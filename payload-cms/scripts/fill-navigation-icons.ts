@@ -20,7 +20,7 @@ const iconMapping = {
   'application': 'Lightbulb',
   'faq': 'HelpCircle',
   'oem-odm': 'Settings',
-  'one-stop-shop': 'Package',
+  'one-stop-solution': 'Package',
   'service-overview': 'LayoutDashboard',
 }
 
@@ -101,7 +101,7 @@ async function fillIcons() {
     console.log('    - application: Lightbulb')
     console.log('    - faq: HelpCircle')
     console.log('    - oem-odm: Settings')
-    console.log('    - one-stop-shop: Package')
+    console.log('    - one-stop-solution: Package')
     console.log('    - service-overview: LayoutDashboard')
 
     console.log('\n🎉 Done!')

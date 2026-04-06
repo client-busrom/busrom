@@ -37,10 +37,10 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'name', labelKey: 'custom:fields:name', type: 'textarea' },
   ],
   'product-reusable-blocks': [
-    { name: 'title', labelKey: 'custom:fields:title', type: 'textarea' },
+    { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
   ],
   'series-reusable-blocks': [
-    { name: 'title', labelKey: 'custom:fields:title', type: 'textarea' },
+    { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
   ],
   pages: [
     { name: 'title', labelKey: 'custom:fields:pageTitle', type: 'textarea' },
@@ -55,7 +55,7 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'question', labelKey: 'custom:fields:question', type: 'textarea' },
   ],
   'reusable-blocks': [
-    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'textarea' },
+    { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
     { name: 'subtitle', labelKey: 'custom:translationCenter:subtitle', type: 'textarea' },
   ],
   applications: [
@@ -65,7 +65,7 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'sceneGallery.sceneName', labelKey: 'custom:fields:sceneName', type: 'textarea', isArrayField: true, arrayFieldName: 'sceneGallery', arraySubField: 'sceneName' },
   ],
   'hero-banner-items': [
-    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'textarea' },
+    { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
     { name: 'feature1', labelKey: 'custom:translationCenter:feature1', type: 'textarea' },
     { name: 'feature2', labelKey: 'custom:translationCenter:feature2', type: 'textarea' },
     { name: 'feature3', labelKey: 'custom:translationCenter:feature3', type: 'textarea' },
@@ -74,7 +74,7 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'ctaButton.text', labelKey: 'custom:translationCenter:ctaButtonText', type: 'textarea' },
   ],
   'series-intro-items': [
-    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'textarea' },
+    { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
     { name: 'description', labelKey: 'custom:translationCenter:description', type: 'textarea' },
   ],
   'form-configs': [

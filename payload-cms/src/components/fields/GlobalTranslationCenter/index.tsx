@@ -17,7 +17,7 @@ interface TranslatableFieldConfig {
 // 每个 global 的可翻译字段配置
 const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
   'service-features': [
-    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'textarea' },
+    { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
     { name: 'subtitle', labelKey: 'custom:translationCenter:subtitle', type: 'textarea' },
     { name: 'feature01Title', labelKey: 'Feature 01 - Title', type: 'textarea' },
     { name: 'feature01ShortTitle', labelKey: 'Feature 01 - Short Title', type: 'textarea' },
@@ -47,7 +47,7 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'advantage09Text', labelKey: 'Advantage 09 - Text', type: 'textarea' },
   ],
   'why-choose-busrom': [
-    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'textarea' },
+    { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
     { name: 'title2', labelKey: 'Title 2', type: 'textarea' },
     { name: 'viewMoreButtonText', labelKey: 'View More Button Text', type: 'textarea' },
     { name: 'reason01Title', labelKey: 'Reason 01 - Title', type: 'textarea' },
@@ -73,7 +73,7 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'step05Text', labelKey: 'Step 05 - Text', type: 'textarea' },
   ],
   'brand-value': [
-    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'textarea' },
+    { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
     { name: 'subtitle', labelKey: 'custom:translationCenter:subtitle', type: 'textarea' },
     { name: 'param1Title', labelKey: 'Param 1 - Title', type: 'textarea' },
     { name: 'param1Description', labelKey: 'Param 1 - Description', type: 'textarea' },
@@ -87,8 +87,9 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'visionDescription', labelKey: 'Vision - Description', type: 'textarea' },
   ],
   'simple-cta': [
-    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'textarea' },
+    { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
     { name: 'subtitle', labelKey: 'custom:translationCenter:subtitle', type: 'textarea' },
+    { name: 'description', labelKey: 'custom:translationCenter:description', type: 'textarea' },
     { name: 'ctaText', labelKey: 'custom:translationCenter:ctaText', type: 'textarea' },
   ],
   'oem-odm': [
@@ -100,7 +101,7 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'odmDescription2', labelKey: 'ODM - Description Line 2', type: 'textarea' },
   ],
   'featured-products': [
-    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'textarea' },
+    { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
     { name: 'description', labelKey: 'custom:translationCenter:description', type: 'textarea' },
     { name: 'viewAllButtonText', labelKey: 'View All Button Text', type: 'textarea' },
   ],
@@ -109,7 +110,7 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'designTextRight', labelKey: 'Design Text - Right', type: 'textarea' },
   ],
   'case-studies': [
-    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'textarea' },
+    { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
     { name: 'description', labelKey: 'custom:translationCenter:description', type: 'textarea' },
   ],
   footer: [
@@ -129,7 +130,7 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'copyrightText', labelKey: 'Copyright Text', type: 'textarea' },
   ],
   'product-series-carousel': [
-    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'textarea' },
+    { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
     // Note: items array fields are handled by ArrayTranslationHelper component above
   ],
   'brand-analysis': [
@@ -148,7 +149,7 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'defaultMetaDescription', labelKey: 'Default Meta Description', type: 'textarea' },
   ],
   'sphere-3d': [
-    { name: 'title', labelKey: 'custom:translationCenter:title', type: 'textarea' },
+    { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
     { name: 'description', labelKey: 'custom:translationCenter:description', type: 'textarea' },
   ],
 }

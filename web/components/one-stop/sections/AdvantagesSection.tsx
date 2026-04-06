@@ -26,24 +26,31 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
   const cardWidthWithGap = 485
   const basePadding = 367 // Figma x coordinate for first card
 
+  // Removed auto-interval to match SupportQualityControlSection manual-only behavior
   useEffect(() => {
-    if (!advantages || advantages.length <= 3) return
-    
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % advantages.length)
-    }, 5000)
-    
-    return () => clearInterval(interval)
+    // We no longer automatically increment index
   }, [advantages])
 
   useEffect(() => {
-    const targetX = -(index * cardWidthWithGap)
+    // Match SupportQualityControlSection logic:
+    // If index <= 1, show from start (translateX = 0)
+    // Otherwise, translate so the active item is in the 2nd slot (index - 1)
+    let targetX = 0
+    if (index > 1) {
+      targetX = -(index - 1) * cardWidthWithGap
+    }
+    
+    // Nudge for the last item if it's the end of a long list
+    if (index === advantages.length - 1 && advantages.length > 3) {
+      targetX -= 100 // Small extra peek for the last one
+    }
+
     animate(x, targetX, {
       type: "spring",
-      stiffness: 300,
-      damping: 30,
+      stiffness: 100, // Matches SupportQualityControlSection
+      damping: 20,
     })
-  }, [index])
+  }, [index, advantages.length, cardWidthWithGap])
 
   if (!advantages || advantages.length === 0) return null
 

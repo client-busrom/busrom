@@ -13,14 +13,14 @@ export async function generateMetadata({
   const { locale } = await params
 
   const defaultMetadata: Metadata = {
-    title: "One-Stop Shop | Busrom",
+    title: "One-Stop Solution | Busrom",
     description: "Complete one-stop solution for all your glass hardware needs",
   }
 
-  return getPageMetadata('/service/one-stop-shop', 'one_stop_shop', locale, defaultMetadata)
+  return getPageMetadata('/service/one-stop-solution', 'one_stop_solution', locale, defaultMetadata)
 }
 
-export default async function OneStopShopPage({
+export default async function OneStopSolutionPage({
   params,
 }: {
   params: Promise<{ locale: Locale }>
@@ -29,11 +29,11 @@ export default async function OneStopShopPage({
 
   return (
     <>
-      <PageScripts path="/service/one-stop-shop" pageType="one_stop_shop" position="header" />
-      <PageScripts path="/service/one-stop-shop" pageType="one_stop_shop" position="body_start" />
-      <PageSeoInjector path="/service/one-stop-shop" pageType="one_stop_shop" locale={locale} />
-      <TemplatePage locale={locale} slug="one-stop-shop" template="ONE_STOP_SHOP" />
-      <PageScripts path="/service/one-stop-shop" pageType="one_stop_shop" position="footer" />
+      <PageScripts path="/service/one-stop-solution" pageType="one_stop_solution" position="header" />
+      <PageScripts path="/service/one-stop-solution" pageType="one_stop_solution" position="body_start" />
+      <PageSeoInjector path="/service/one-stop-solution" pageType="one_stop_solution" locale={locale} />
+      <TemplatePage locale={locale} slug="one-stop-solution" template="ONE_STOP_SOLUTION" />
+      <PageScripts path="/service/one-stop-solution" pageType="one_stop_solution" position="footer" />
     </>
   )
 }

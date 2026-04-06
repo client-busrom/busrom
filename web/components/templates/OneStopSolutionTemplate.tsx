@@ -21,7 +21,7 @@ interface MediaObject {
   alt?: string
 }
 
-interface OneStopShopTemplateProps {
+interface OneStopSolutionTemplateProps {
   locale: string
   pageContent: any
 }
@@ -181,7 +181,8 @@ function extractItems(flatNodes: any[], markerIndex: number, mediaData: Record<s
   }
   return items
 }
-export function OneStopShopTemplate({ locale, pageContent }: OneStopShopTemplateProps) {
+
+export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolutionTemplateProps) {
   const [productsData, setProductsData] = useState<any[]>([])
   const [loadingProducts, setLoadingProducts] = useState(true)
   const [carouselProductsData, setCarouselProductsData] = useState<Record<string, any[]>>({})
