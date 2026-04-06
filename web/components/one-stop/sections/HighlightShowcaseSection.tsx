@@ -84,7 +84,7 @@ export function HighlightShowcaseSection({ title, products, locale, viewMoreText
            <Link href={viewMoreLink || `/${locale}/shop`} className="flex items-center gap-4">
             <AnimatedLinkButton 
               variant="dark" 
-              className="text-white font-extrabold"
+              className="text-white"
               ballColor="#C7BB5D"
               style={{ fontSize: "20px", height: "50px", paddingLeft: "30px", paddingRight: "20px" }}
             >
@@ -137,7 +137,7 @@ export function HighlightShowcaseSection({ title, products, locale, viewMoreText
         >
           <AnimatedLinkButton 
             variant="dark" 
-            className="text-white font-extrabold"
+            className="text-white"
             ballColor="#ABA465"
           >
             {viewMoreText || "VIEW MORE"}
