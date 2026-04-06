@@ -23,7 +23,6 @@ interface ApplicationsSectionProps {
 export function ApplicationsSection({ title, items, locale }: ApplicationsSectionProps) {
   // Figma Constants (1920px base)
   const DESIGN_WIDTH = 1920
-  const SECTION_HEIGHT = 900
   const ITEM_WIDTH = 373
   const ITEM_HEIGHT = 654
   const ITEM_GAP = 42 
@@ -114,8 +113,7 @@ export function ApplicationsSection({ title, items, locale }: ApplicationsSectio
 
   return (
     <section 
-      className="relative w-full overflow-hidden bg-[#F6F4ED] flex flex-col items-center" 
-      style={{ height: vw(SECTION_HEIGHT / 0.7) }}
+      className="relative w-full bg-[#F6F4ED] flex flex-col items-center h-[900px]" 
     >
       <style jsx>{`
         .embla__viewport {
@@ -136,14 +134,18 @@ export function ApplicationsSection({ title, items, locale }: ApplicationsSectio
         }
       `}</style>
       
-      <div className="absolute inset-0 pointer-events-none z-0" style={{ transform: "scale(0.7)", transformOrigin: "top center" }}>
-         <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "567px", top: "152px", width: "101px", height: "101px" }} />
-         <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "1164px", top: "310px", width: "51px", height: "51px" }} />
-         <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "1190px", top: "90px", width: "81px", height: "81px" }} />
-         <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "778px", top: "25px", width: "29px", height: "29px" }} />
-      </div>
-
       <div className="relative w-[1920px] h-[1083px] origin-top flex-shrink-0 z-10" style={{ transform: "scale(0.7)" }}>
+        
+        {/* Background Circles - Now tightly bound to the title's coordinate system */}
+        <div className="absolute inset-x-0 top-[100px] flex flex-col items-center pointer-events-none">
+           <div className="relative w-[1920px] h-0 flex justify-center">
+              <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "567px", top: "52px", width: "101px", height: "101px" }} />
+              <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "1164px", top: "210px", width: "51px", height: "51px" }} />
+              <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "1190px", top: "-10px", width: "81px", height: "81px" }} />
+              <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "778px", top: "-75px", width: "29px", height: "29px" }} />
+           </div>
+        </div>
+
         <div className="absolute inset-x-0 top-[100px] flex flex-col items-center">
           <div className="relative text-center select-none">
             {/* 1. Underlying Stroke Layer (Offset 4px) - Only the outline */}

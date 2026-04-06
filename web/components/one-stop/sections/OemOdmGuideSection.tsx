@@ -24,12 +24,12 @@ export function OemOdmGuideSection({ title, description, bgImage, ctaText = "REA
 
   return (
     <section 
-      className="relative w-full overflow-hidden bg-transparent py-16 md:py-24"
+      className="relative w-full overflow-hidden bg-transparent pt-8 pb-16 md:pt-12 md:pb-32"
     >
       <div className="max-w-[1920px] mx-auto w-full flex flex-col items-center">
         
-        {/* 1. Large "BUSROM" SVG Masked Image Area */}
-        <div className="relative w-full h-[150px] md:h-[389px] flex items-center justify-center mb-12 md:mb-16">
+        {/* 1. Large "BUSROM" SVG Masked Image Area - Proportional Scaling */}
+        <div className="relative w-full max-w-[1920px] aspect-[1920/389] flex items-center justify-center">
             {bgImage ? (
                 <div 
                   className="w-full h-full relative"
@@ -65,8 +65,8 @@ export function OemOdmGuideSection({ title, description, bgImage, ctaText = "REA
             </svg>
         </div>
 
-        {/* 2. Text Content Container - Responsive */}
-        <div className="w-full flex flex-col md:flex-row justify-between items-center md:items-start px-10 md:pl-[140px] md:pr-[140px]">
+        {/* 2. Text Content Container - Responsive - PROPORTIONAL OVERLAP LOCKED */}
+        <div className="w-full flex flex-col md:flex-row justify-between items-center md:items-start px-10 md:pl-[140px] md:pr-[140px] relative -top-[6vw] md:-top-[5vw] z-20">
            
            <div className="w-full md:w-[900px] mb-12 md:mb-0">
               {title && (
