@@ -157,7 +157,7 @@ export function BrandHighlightsSection({
                   image={item.image} 
                   alt="Highlight Main" 
                   className="w-full h-full object-cover"
-                  size="xlarge"
+                  size="large"
                 />
               </motion.div>
             ))}
@@ -182,7 +182,7 @@ export function BrandHighlightsSection({
                       image={item.image} 
                       alt="Next Preview" 
                       className="w-full h-full object-cover"
-                      size="medium"
+                      size="small"
                     />
                   </motion.div>
                 ))}

@@ -1,13 +1,14 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowLeft, ArrowRight } from "lucide-react"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 interface SectionSlide {
   title: string
   description: string
-  image: { url: string } | null
+  image: { url: string } | any
 }
 
 interface ValuePropositionProps {
@@ -19,8 +20,6 @@ interface ValuePropositionProps {
 
 /**
  * ValuePropositionSection - The Value of One-Stop Procurement
- * Rebuilt as a Horizontal Infinite Scrolling Carousel.
- * Items slide in a row, with the leftmost item matching the content box.
  */
 export function ValuePropositionSection({ title, subtitle, problems, advantages }: ValuePropositionProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -28,8 +27,6 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages 
   const data = problems.length > 0 ? problems : advantages
   if (data.length === 0) return null
   
-  // Slot width = 529, Slot gap = 550 total (so 21px gap)
-  // Let's use the Figma spacing: 1005 - 455 = 550px per step.
   const stepWidth = 550
 
   const handleNext = () => {
@@ -75,17 +72,13 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages 
            </div>
         </div>
 
-        {/* 3. Static Background Content Box (Rectangle 273) */}
+        {/* 3. Static Background Content Box */}
         <div 
           className="absolute left-[363px] top-[233px] w-[792px] h-[578px] rounded-[30px] shadow-[0_80px_70.2px_rgba(0,0,0,0.07)] bg-gradient-to-b from-[#F6F4ED] to-white z-0"
         />
 
         {/* 4. Scrolling Items Area */}
         <div className="absolute inset-0 z-10">
-          {/* 
-            Horizontal Moving Track 
-            Base offset: x=455 (Figma Slot 1)
-          */}
           <motion.div 
             className="absolute top-[282px] left-[455px] flex"
             animate={{ x: -(currentIndex * stepWidth) }}
@@ -97,14 +90,13 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages 
                 className="w-[529px] h-[297px] rounded-[30px] overflow-hidden shadow-[0_31px_38.4px_rgba(0,0,0,0.17)] mr-[21px] flex-shrink-0 relative group cursor-pointer"
                 onClick={() => setCurrentIndex(idx)}
               >
-                <img 
-                  src={item.image?.url || "https://placehold.co/530x300/41412D/C5A059?text=Problem"}
-                  className="w-full h-full object-cover transition-all duration-700"
-                  style={{ 
-                    filter: idx === currentIndex ? "none" : "grayscale(0.5) opacity(0.5)"
-                  }}
+                <OptimizedImage 
+                  image={item.image}
+                  size="small"
+                  className={`w-full h-full object-cover transition-all duration-700 ${idx !== currentIndex ? 'grayscale opacity-50' : 'grayscale-0 opacity-100'}`}
                   alt={`Slide ${idx}`}
                 />
+                
                 {idx === currentIndex && (
                   <motion.div 
                     layoutId="active-border"
@@ -115,9 +107,7 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages 
             ))}
           </motion.div>
 
-          {/* 5. Active Text (Rectangle Content)
-              Positions relative to current active index text box info
-          */}
+          {/* 5. Active Text */}
           <div className="absolute left-[474px] top-[618px] w-[418px] h-[147px] pointer-events-none">
             <AnimatePresence mode="wait">
               <motion.p
@@ -139,14 +129,12 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages 
             <button 
               onClick={handlePrev}
               className="w-[78px] h-[77px] flex items-center justify-center text-[#756F3F] border border-[#756F3F]/20 rounded-full hover:bg-[#756F3F]/5 transition-colors"
-                aria-label="Previous"
             >
               <ArrowLeft className="w-8 h-8" />
             </button>
             <button 
               onClick={handleNext}
               className="w-[78px] h-[77px] flex items-center justify-center bg-[#756F3F] text-white rounded-full hover:scale-110 transition-transform shadow-lg"
-              aria-label="Next"
             >
               <ArrowRight className="w-8 h-8" />
             </button>
@@ -154,7 +142,6 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages 
         </div>
 
         {/* 7. Footer Decorative Elements */}
-        {/* Large Index Number */}
         <div className="absolute left-[1638px] top-[794px] w-[143px] h-[128px]">
            <AnimatePresence mode="wait">
              <motion.span
@@ -170,18 +157,7 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages 
            </AnimatePresence>
         </div>
 
-        {/* Decorative Line */}
-        <div 
-          className="absolute left-[1658px] top-[748px] w-[3.5px] h-[153px] bg-[#D7D1A8] origin-bottom -rotate-[44deg]"
-        />
-
-        {/* Accent Vector */}
-        <div className="absolute left-[273px] top-[748px] opacity-30">
-           <svg width="132" height="17" viewBox="0 0 132 17" fill="none">
-             <path d="M0 8.5H132" stroke="#756F3F" strokeWidth="2" strokeDasharray="4 4" />
-           </svg>
-        </div>
-
+        <div className="absolute left-[1658px] top-[748px] w-[3.5px] h-[153px] bg-[#D7D1A8] origin-bottom -rotate-[44deg]" />
       </div>
     </section>
   )

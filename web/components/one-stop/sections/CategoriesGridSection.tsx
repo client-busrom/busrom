@@ -115,7 +115,7 @@ export function CategoriesGridSection({ title, subtitle, products, locale, loadi
                     <OptimizedImage 
                       image={item.showImage as any} 
                       alt={item.name}
-                      size="medium"
+                      size="small"
                       className="w-full h-full object-contain"
                     />
                   )}

@@ -2,11 +2,12 @@
 
 import React, { useState } from "react"
 import { motion } from "framer-motion"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 interface SectionSlide {
   title: string
   description: string
-  image: { url: string } | null
+  image: { url: string } | any
 }
 
 interface AdvantagesSectionProps {
@@ -34,7 +35,7 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
   return (
     <section 
       className="relative w-full overflow-visible select-none"
-      style={{ minHeight: vw(922) }}
+      style={{ minHeight: vw(922)}}
     >
       <div className="flex flex-col w-full h-full">
         
@@ -74,7 +75,7 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
                     left: vw(basePadding),
                     gap: vw(gap),
                     paddingTop: vw(50),     
-                    paddingBottom: vw(230), // Ample room for the large active shadow
+                    paddingBottom: vw(230), 
                 }}
                 animate={{ x: `${scrollOffset / 19.2}vw` }}
                 transition={{ type: "spring", stiffness: 100, damping: 20 }}
@@ -121,24 +122,24 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
                         </h3>
                     </div>
 
-                    {/* Card Image - Proportional Scaling */}
+                    {/* Card Image - Proportional Scaling with OptimizedImage */}
                     <div 
                         className="rounded-[30px] shadow-[0_31px_38.4px_rgba(0,0,0,0.17)] overflow-hidden bg-gray-50"
                         style={{ 
                         width: vw(420), 
-                        height: vw(332), // Corrected to maintain original ratio
+                        height: vw(332), 
                         marginBottom: vw(35), 
                         borderRadius: vw(21)
                         }}
                     >
-                        <img 
-                        src={item.image?.url || "https://placehold.co/400x300/41412D/C5A059?text=Advantage"}
-                        className="w-full h-full object-cover pointer-events-none"
-                        alt={item.title}
+                        <OptimizedImage 
+                            image={item.image}
+                            size="small"
+                            className="w-full h-full"
                         />
                     </div>
 
-                    {/* Description Text - Expanded Width */}
+                    {/* Description Text */}
                     <div style={{ width: vw(420) }}>
                         <p 
                         className="font-medium leading-normal text-black text-justify"

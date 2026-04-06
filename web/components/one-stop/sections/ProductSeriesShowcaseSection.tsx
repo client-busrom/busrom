@@ -193,7 +193,7 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
                  alt="Attribute 1"
                  className="w-full h-full object-cover"
                  containerClassName="w-full h-full"
-                 size="medium"
+                 size="small"
                />
             </div>
 
@@ -204,7 +204,7 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
                  alt="Attribute 2"
                  className="w-full h-full object-cover"
                  containerClassName="w-full h-full"
-                 size="medium"
+                 size="small"
                />
             </div>
           </motion.div>

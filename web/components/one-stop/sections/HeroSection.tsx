@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 interface MediaObject {
   id?: string
@@ -12,7 +13,7 @@ interface MediaObject {
 interface Slide {
   title: string
   description: string
-  image: MediaObject | null
+  image: MediaObject | null | any
 }
 
 interface HeroSectionProps {
@@ -20,11 +21,6 @@ interface HeroSectionProps {
   locale: string
 }
 
-/**
- * HeroSection - One-Stop Shop Introduction
- * Scaled to 70% for container, but fonts adjusted down to avoid "enlarging".
- * Card (Rectangle 95) expands if text is too long.
- */
 export function HeroSection({ slides, locale }: HeroSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
 
@@ -52,26 +48,29 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
     return slides[(currentIndex + offset) % slides.length]
   }
 
-  // To keep font physical size stable while parent scale goes from 0.6 to 0.7:
-  // FontSize_New = FontSize_Old * (0.6 / 0.7)
   const adjustedTitleSize = Math.round(70 * (0.6 / 0.7)) // ~60px
   const adjustedDescSize = Math.round(38 * (0.6 / 0.7)) // ~33px
 
   return (
     <section className="relative w-full overflow-hidden bg-[#352F03] flex justify-center items-center pt-[46px]" style={{ height: "968px" }}>
-      {/* 1. Global Background Image */}
+      {/* 1. Global Background Image - Large Optimized Variant */}
       <div className="absolute inset-0 z-0 w-full h-full max-w-[1920px] mx-auto">
         <AnimatePresence mode="wait">
-          <motion.img
-            key={getSlideInStack(0).image?.url || currentIndex}
-            src={getSlideInStack(0).image?.url || ""}
+          <motion.div
+            key={getSlideInStack(0).image?.id || currentIndex}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.5 }}
-            className="w-full h-full object-cover select-none"
-            alt="Global BG"
-          />
+            className="w-full h-full"
+          >
+            <OptimizedImage 
+                image={getSlideInStack(0).image} 
+                size="large" 
+                className="w-full h-full object-cover select-none"
+                priority // LCP element
+            />
+          </motion.div>
         </AnimatePresence>
       </div>
 
@@ -88,7 +87,7 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
           style={{ transform: "scale(0.7)" }}
         >
           
-          {/* Back Cards */}
+          {/* Back Cards - Small Optimized Variants */}
           <AnimatePresence>
             {[3, 2, 1].map((offset) => {
               const slide = getSlideInStack(offset)
@@ -98,17 +97,17 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                 <motion.div
                   key={`${slide.title}-${currentIndex}-${offset}`}
                   initial={{ opacity: 0, rotate: 0 }}
-                  animate={{ opacity: 0.7, rotate: rotation }}
+                  animate={{ opacity: 0.5, rotate: rotation }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.8 }}
                   className="absolute inset-0 rounded-[267px] overflow-hidden border border-white/10"
                   style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
                 >
                   {slide.image && (
-                    <img
-                      src={slide.image.url}
+                    <OptimizedImage 
+                      image={slide.image}
+                      size="small"
                       className="w-full h-full object-cover opacity-50 grayscale-[0.3]"
-                      alt={`next-slide-${offset}`}
                     />
                   )}
                 </motion.div>
@@ -116,7 +115,7 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
             })}
           </AnimatePresence>
 
-          {/* Top Primary Card */}
+          {/* Top Primary Card - Large Optimized Variant */}
           <AnimatePresence mode="popLayout" initial={false}>
             {slides.map((slide, i) => i === currentIndex && (
               <motion.div
@@ -129,10 +128,11 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
               >
                  {/* Card Image and Gradient */}
                  <div className="absolute inset-0 z-0">
-                    <img
-                      src={slide.image?.url || ""}
+                    <OptimizedImage 
+                      image={slide.image}
+                      size="large"
                       className="w-full h-full object-cover"
-                      alt="top-slide-img"
+                      priority
                     />
                     <div 
                       className="absolute inset-0"
@@ -143,9 +143,8 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                     />
                  </div>
 
-                 {/* Content - Absolute/Relative hybrid logic but flow-safe */}
+                 {/* Content */}
                  <div className="relative z-10 w-full h-full pt-[297px] pb-[60px]">
-                    {/* Rectangle 316 - Background Box (Dynamic) */}
                     <motion.div 
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -161,7 +160,6 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                         backdropFilter: "blur(10px)"
                       }}
                     >
-                      {/* Title Area */}
                       <div className="mb-6">
                         <h1 
                           className="font-normal leading-tight"
@@ -176,7 +174,6 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                         </h1>
                       </div>
 
-                      {/* Description Area */}
                       <div>
                         <p
                           className="text-white font-semibold leading-tight lg:leading-[45px] tracking-tight"

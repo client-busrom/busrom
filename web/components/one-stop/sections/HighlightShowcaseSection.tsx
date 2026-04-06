@@ -110,7 +110,7 @@ export function HighlightShowcaseSection({ title, products, locale }: HighlightS
                               alt={item.title || ""} 
                               className="w-full h-full object-cover"
                               containerClassName="w-full h-full"
-                              size="large"
+                              size="small"
                             />
                           </div>
 

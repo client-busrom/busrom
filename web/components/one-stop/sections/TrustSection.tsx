@@ -55,10 +55,8 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
     >
       {/* 1. Background Layer (Full Width - Outside Scale Container) */}
       <div className="absolute inset-0 z-0">
-         {bgImage ? (
+         {bgImage && (
            <OptimizedImage image={bgImage} alt="Background" className="w-full h-full object-cover" size="xlarge" />
-         ) : (
-           <img src="/api/media/factory-bg.jpg" alt="Background" className="w-full h-full object-cover" />
          )}
          
          {/* Rectangle 311: Full-width Blur Overlay */}
@@ -139,7 +137,6 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
             })}
         </div>
 
-        {/* Collage Photo Wall */}
         <div className="absolute inset-0 pointer-events-none">
             {/* Rectangle 298 */}
             <motion.div 
@@ -147,7 +144,7 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
                 className="absolute shadow-2xl rounded-[54px] overflow-hidden border-4 border-white/10"
                 style={{ left: "1097px", top: `${getItemY(10911)}px`, width: "356px", height: "261px" }}
             >
-                {getImage(0) ? <OptimizedImage image={getImage(0)} alt="D1" className="w-full h-full object-cover" /> : <div className="w-full h-full bg-white/10" />}
+                {getImage(0) ? <OptimizedImage image={getImage(0)} alt="D1" className="w-full h-full object-cover" size="small" /> : <div className="w-full h-full bg-white/10" />}
             </motion.div>
 
             {/* Rectangle 297 */}
@@ -156,7 +153,7 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
                 className="absolute shadow-2xl rounded-[54px] overflow-hidden border-4 border-white/10"
                 style={{ left: "1398px", top: `${getItemY(11091)}px`, width: "500px", height: "679px" }}
             >
-                {getImage(1) ? <OptimizedImage image={getImage(1)} alt="D2" className="w-full h-full object-cover" /> : <div className="w-full h-full bg-white/10" />}
+                {getImage(1) ? <OptimizedImage image={getImage(1)} alt="D2" className="w-full h-full object-cover" size="small" /> : <div className="w-full h-full bg-white/10" />}
             </motion.div>
 
             {/* Rectangle 299 */}
@@ -165,7 +162,7 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
                 className="absolute shadow-2xl rounded-[54px] overflow-hidden border-4 border-white/10"
                 style={{ left: "970px", top: `${getItemY(11445)}px`, width: "340px", height: "400px" }}
             >
-                {getImage(2) ? <OptimizedImage image={getImage(2)} alt="D3" className="w-full h-full object-cover" /> : <div className="w-full h-full bg-white/10" />}
+                {getImage(2) ? <OptimizedImage image={getImage(2)} alt="D3" className="w-full h-full object-cover" size="small" /> : <div className="w-full h-full bg-white/10" />}
             </motion.div>
 
             {/* Rectangle 306 */}
@@ -174,7 +171,7 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
                 className="absolute shadow-2xl rounded-[54px] overflow-hidden border-4 border-white/10"
                 style={{ left: "1302px", top: `${getItemY(11807)}px`, width: "372px", height: "375px" }}
             >
-                {getImage(3) ? <OptimizedImage image={getImage(3)} alt="D4" className="w-full h-full object-cover" /> : <div className="w-full h-full bg-white/10" />}
+                {getImage(3) ? <OptimizedImage image={getImage(3)} alt="D4" className="w-full h-full object-cover" size="small" /> : <div className="w-full h-full bg-white/10" />}
             </motion.div>
         </div>
       </div>
