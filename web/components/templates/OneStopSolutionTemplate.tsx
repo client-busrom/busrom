@@ -486,7 +486,17 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
   }, [productSeriesData, productsData, carouselProductsData])
 
   return (
-    <div className="min-h-screen bg-[#F9F9F5]">
+    <div className="min-h-screen bg-[#f6f4ed] select-none">
+      <style jsx global>{`
+        /* 锁定全页面图片物理拖拽，保护版权 */
+        img {
+          -webkit-user-drag: none;
+          -khtml-user-drag: none;
+          -moz-user-drag: none;
+          -o-user-drag: none;
+          user-drag: none;
+        }
+      `}</style>
       <HeroSection slides={heroData.items} locale={locale} />
       <ValuePropositionSection 
         title={problemsData.title} 

@@ -36,13 +36,13 @@ export function HighlightShowcaseSection({ title, products, locale, viewMoreText
 
   return (
     <section 
-      className="relative w-full overflow-hidden flex flex-col items-center bg-[#F9F9F5]"
+      className="relative w-full overflow-hidden flex flex-col items-center"
       style={{ paddingTop: vw(80), paddingBottom: vw(50) }}
     >
       
       {/* Main Background Box (Rectangle 289) */}
       <div 
-        className="relative shadow-2xl"
+        className="relative"
         style={{ 
           width: vw(1860), 
           height: vw(860), 

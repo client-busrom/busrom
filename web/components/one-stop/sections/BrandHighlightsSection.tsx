@@ -47,7 +47,7 @@ export function BrandHighlightsSection({
   const flyScale = 282 / 777 // 0.363
 
   return (
-    <section className="relative w-full overflow-hidden flex flex-col items-center bg-[#F9F9F5] pt-[120px] pb-[200px]">
+    <section className="relative w-full overflow-hidden flex flex-col items-center pt-[120px] pb-[200px]">
       
       {/* 70% Scale Container */}
       <div className="relative w-[1920px] h-[1207px] origin-top flex flex-col flex-shrink-0" 
