@@ -44,27 +44,29 @@ export function BrandHighlightsSection({
   return (
     <section className="relative w-full overflow-hidden flex flex-col items-center justify-center pt-[120px] pb-[80px] md:h-[62.79vw] xl:h-[1205.7px]">
       
-      {/* 1. DESKTOP/TABLET CONTENT (Visible on MD and above) */}
-      <div className="hidden md:block relative w-full max-w-[1536px] mx-auto aspect-[1344/845] h-[50.3vw] xl:h-[965.7px] shrink-0">
-        
-        {/* Decorative Ellipses (Animated) */}
+      {/* Background Decorative Layer */}
+      <div className="absolute inset-0 z-0 pointer-events-none hidden md:block">
         <motion.div 
           animate={{ 
-            y: [0, -30, 0],
-            scale: [1, 1.05, 1]
-          }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute left-[42.7%] top-0 w-[26.2%] aspect-square rounded-full bg-[#EBE8D8] opacity-[0.31]"
-        />
-        <motion.div 
-          animate={{ 
-            x: [0, 20, 0],
-            y: [0, 15, 0],
+            y: [0, -40, 0],
             scale: [1, 1.1, 1]
           }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute left-[15.5%] top-[55.8%] w-[10.1%] aspect-square rounded-full bg-[#ECE8D8]"
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute left-[45%] top-[5%] w-[450px] h-[450px] rounded-full bg-[#E5E2D0] opacity-[0.5] blur-[20px]"
         />
+        <motion.div 
+          animate={{ 
+            x: [0, 30, 0],
+            y: [0, 20, 0],
+            scale: [1, 1.15, 1]
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute left-[10%] top-[50%] w-[200px] h-[200px] rounded-full bg-[#E5E2D0] opacity-[0.7] blur-[10px]"
+        />
+      </div>
+
+      {/* 1. DESKTOP/TABLET CONTENT (Visible on MD and above) */}
+      <div className="hidden md:block relative w-full max-w-[1536px] mx-auto aspect-[1344/845] h-[50.3vw] xl:h-[965.7px] shrink-0 z-10">
 
         {/* 1. Section Title */}
         <div className="absolute left-[5.96%] top-[9.45%] flex flex-col">
@@ -88,21 +90,23 @@ export function BrandHighlightsSection({
         </div>
 
         {/* 2. Main Description */}
-        <div className="absolute left-[5.96%] top-[36%] w-[42.6%] h-[21%]">
-          <AnimatePresence mode="wait">
-            {items.map((item, i) => i === index && (
-              <motion.p 
-                key={item.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-                className="text-[1.25vw] xl:text-[19.2px] font-[600] leading-[1.6] text-black"
-                style={{ fontFamily: "var(--font-anaheim)" }}
-              >
-                {item.description}
-              </motion.p>
-            ))}
+        <div className="absolute left-[5.96%] top-[36%] w-[42.6%] min-h-[25%] lg:min-h-[240px]">
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div 
+                key={index}
+                initial={{ opacity: 0, x: direction === 1 ? 40 : -40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: direction === 1 ? -40 : 40 }}
+                transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+                className="w-full"
+            >
+                <p 
+                    className="text-[1.25vw] xl:text-[19.2px] font-[600] leading-[1.6] text-black"
+                    style={{ fontFamily: "var(--font-anaheim)" }}
+                >
+                    {currentItem.description}
+                </p>
+            </motion.div>
           </AnimatePresence>
         </div>
 
@@ -131,83 +135,66 @@ export function BrandHighlightsSection({
         {/* 4. Large Main Image (Right Side) */}
         <div className="absolute left-[59%] top-[11.7%] w-[40.4%] h-[88.3%] z-10 pointer-events-none">
           <AnimatePresence mode="popLayout" custom={direction}>
-            {items.map((item, i) => i === index && (
-              <motion.div
-                key={item.id}
-                initial={direction === 1 ? {
-                  x: "-70%",
-                  y: "50%",
-                  scale: 0.36,
-                  opacity: 1
-                } : { opacity: 0, x: 100 }}
-                animate={{ x: 0, y: 0, scale: 1, opacity: 1 }}
-                exit={direction === 1 ? { opacity: 0, scale: 1.1 } : {
-                  x: "-70%",
-                  y: "50%",
-                  scale: 0.36,
-                  opacity: 0
-                }}
+            <motion.div
+                key={index}
+                initial={{ opacity: 0, x: direction === 1 ? 100 : -100 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: direction === 1 ? -100 : 100 }}
                 transition={{ 
-                  duration: 0.9, 
-                  ease: [0.23, 1, 0.32, 1],
-                  opacity: { duration: 0.4 }
+                  duration: 0.7, 
+                  ease: [0.23, 1, 0.32, 1]
                 }}
                 className="w-full h-full rounded-[2vw] xl:rounded-[34.2px] overflow-hidden shadow-2xl"
-              >
+            >
                 <OptimizedImage 
-                  image={item.image} 
+                  image={currentItem.image} 
                   alt="Highlight Main" 
                   className="w-full h-full object-cover"
                   size="large"
                 />
-              </motion.div>
-            ))}
+            </motion.div>
           </AnimatePresence>
         </div>
 
         {/* 5. Thumbnail Preview Group (Bottom Left) */}
         <div className="absolute left-[5.96%] top-[66%] w-[14.7%] flex flex-col gap-[10%] z-20">
            {/* Thumbnail Image */}
-           <div className="w-full aspect-[282/375] rounded-[1.5vw] xl:rounded-[22.8px] overflow-hidden shadow-xl">
-             <AnimatePresence mode="popLayout">
-                {items.map((item, i) => i === nextIndex && (
+            <div className="w-full aspect-[282/375] rounded-[1.5vw] xl:rounded-[22.8px] overflow-hidden shadow-xl">
+              <AnimatePresence mode="popLayout" custom={direction}>
                   <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 1.1 }}
+                    key={nextIndex}
+                    initial={{ opacity: 0, x: direction === 1 ? 30 : -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: direction === 1 ? -30 : 30 }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="w-full h-full"
+                    className="w-full h-full rounded-[1.5vw] xl:rounded-[22.8px] overflow-hidden"
                   >
                     <OptimizedImage 
-                      image={item.image} 
+                      image={items[nextIndex].image} 
                       alt="Next Preview" 
                       className="w-full h-full object-cover"
                       size="small"
                     />
                   </motion.div>
-                ))}
-             </AnimatePresence>
-           </div>
+              </AnimatePresence>
+            </div>
            
            {/* Thumbnail Text Summary */}
-           <div className="mt-4">
-             <AnimatePresence mode="wait">
-                {items.map((item, i) => i === nextIndex && (
+            <div className="mt-4">
+              <AnimatePresence mode="wait" custom={direction}>
                   <motion.p 
-                    key={item.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                    key={nextIndex}
+                    initial={{ opacity: 0, x: direction === 1 ? 20 : -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: direction === 1 ? -20 : 20 }}
                     transition={{ duration: 0.4 }}
                     className="text-[1.1vw] xl:text-[16px] font-[600] leading-[1.3] text-[#626262] line-clamp-2"
                     style={{ fontFamily: "var(--font-anaheim)" }}
                   >
-                    {item.summary}
+                    {items[nextIndex].summary}
                   </motion.p>
-                ))}
-             </AnimatePresence>
-           </div>
+              </AnimatePresence>
+            </div>
         </div>
 
       </div>
@@ -225,15 +212,28 @@ export function BrandHighlightsSection({
              dangerouslySetInnerHTML={{ __html: (titleLine2 || "").replace(/\n/g, '<br />') }}
            />
          </div>
-         <p className="text-base text-gray-700 leading-relaxed font-semibold">{currentItem.description}</p>
+         <div className="min-h-[100px]">
+            <AnimatePresence mode="wait" custom={direction}>
+                <motion.p 
+                    key={index}
+                    initial={{ opacity: 0, x: direction === 1 ? 20 : -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: direction === 1 ? -20 : 20 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className="text-base text-gray-700 leading-relaxed font-semibold"
+                >
+                    {currentItem.description}
+                </motion.p>
+            </AnimatePresence>
+         </div>
          <div className="relative w-full max-w-[320px] mx-auto aspect-[3/4] rounded-3xl overflow-hidden shadow-lg">
-           <AnimatePresence mode="wait">
+           <AnimatePresence mode="wait" custom={direction}>
              <motion.div
                key={index}
-               initial={{ opacity: 0 }}
-               animate={{ opacity: 1 }}
-               exit={{ opacity: 0 }}
-               transition={{ duration: 0.5 }}
+               initial={{ opacity: 0, x: direction === 1 ? 50 : -50 }}
+               animate={{ opacity: 1, x: 0 }}
+               exit={{ opacity: 0, x: direction === 1 ? -50 : 50 }}
+               transition={{ duration: 0.5, ease: "easeOut" }}
                className="w-full h-full"
              >
                <OptimizedImage image={currentItem.image} alt="Mobile Main" className="w-full h-full object-cover" />
