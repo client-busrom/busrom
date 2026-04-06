@@ -56,7 +56,12 @@ function extractSection(children: any[], markerId: string, mediaData: Record<str
 
   // 2. 找到包含 marker 的区域
   const targetSection = sections.find(sec => JSON.stringify(sec).includes(markerId))
-  if (!targetSection) return { title: "", subtitle: "", items: [], titleNodes: [] }
+  if (!targetSection) return { title: "", subtitle: "", items: [], titleNodes: [], autoplay: false, interval: 5 }
+
+  // Extract carousel configuration if present
+  const carouselNode = targetSection.find(n => n.type === "carousel")
+  const autoplay = carouselNode?.data?.autoplay ?? false
+  const interval = carouselNode?.data?.interval ?? 5
 
   const items = extractItems(targetSection, -1, mediaData)
   
@@ -73,7 +78,7 @@ function extractSection(children: any[], markerId: string, mediaData: Record<str
     }
   }
 
-  return { title, subtitle, items, titleNodes }
+  return { title, subtitle, items, titleNodes, autoplay, interval }
 }
 
 function extractItems(flatNodes: any[], markerIndex: number, mediaData: Record<string, MediaObject>) {
@@ -461,7 +466,14 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
   return (
     <div className="min-h-screen bg-[#F9F9F5]">
       <HeroSection slides={heroData.items} locale={locale} />
-      <ValuePropositionSection title={problemsData.title} subtitle={problemsData.subtitle} problems={problemsData.items} advantages={[]} />
+      <ValuePropositionSection 
+        title={problemsData.title} 
+        subtitle={problemsData.subtitle} 
+        problems={problemsData.items} 
+        advantages={[]} 
+        autoplay={problemsData.autoplay}
+        interval={problemsData.interval}
+      />
       <AdvantagesSection title={advantagesData.title} advantages={advantagesData.items} />
       <PurchaseProcessSection title={processData.title} slides={processData.items} />
       <CategoriesGridSection title={categoriesTitle.title} subtitle={categoriesTitle.subtitle} products={gridProducts} locale={locale} loading={loadingProducts} />

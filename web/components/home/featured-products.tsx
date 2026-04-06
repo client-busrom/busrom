@@ -86,10 +86,6 @@ const LAYOUT = {
   gridMaxWidth: 72,       // 85% * 0.85 ≈ 72% (缩小网格区域以适应高度)
 };
 
-// 走马灯配置
-const CAROUSEL_SPEED = 30; // 像素/秒
-const CAROUSEL_ITEM_GAP = 16; // 间距
-
 // --- 产品卡片组件 ---
 const ProductCard = ({ product, index, isMobile = false, locale }: ProductCardProps) => {
   // 计算阶梯偏移 (仅桌面端)

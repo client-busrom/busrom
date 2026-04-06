@@ -1,8 +1,7 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, ArrowRight } from "lucide-react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 interface SectionSlide {
@@ -16,26 +15,39 @@ interface ValuePropositionProps {
   subtitle?: string
   problems: SectionSlide[]
   advantages: SectionSlide[]
+  autoplay?: boolean
+  interval?: number
 }
 
 /**
  * ValuePropositionSection - The Value of One-Stop Procurement
  */
-export function ValuePropositionSection({ title, subtitle, problems, advantages }: ValuePropositionProps) {
+export function ValuePropositionSection({ title, subtitle, problems, advantages, autoplay, interval = 5 }: ValuePropositionProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   
   const data = problems.length > 0 ? problems : advantages
-  if (data.length === 0) return null
-  
   const stepWidth = 550
 
-  const handleNext = () => {
+  const handleNext = React.useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % data.length)
-  }
+  }, [data.length])
 
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev - 1 + data.length) % data.length)
   }
+
+  // Autoplay Effect
+  useEffect(() => {
+    if (!autoplay || data.length <= 1) return
+
+    const timer = setInterval(() => {
+      handleNext()
+    }, (interval || 5) * 1000)
+
+    return () => clearInterval(timer)
+  }, [autoplay, interval, data.length, handleNext])
+
+  if (data.length === 0) return null
 
   return (
     <section className="relative w-full overflow-hidden bg-[#F9F9F5] flex justify-center items-center" style={{ height: "922px" }}>
@@ -47,18 +59,29 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages 
       >
         
         {/* 1. Header Area */}
-        <div className="absolute left-[153px] top-[0px] w-[1009px] z-20">
+        <div className="absolute left-[153px] top-[0px] w-[1150px] z-50 pointer-events-none">
           <h2 
-            className="text-[96px] font-extrabold leading-[102px] text-[#78713A] tracking-tighter"
+            className="text-[96px] font-extrabold leading-[102px] text-[#78713A] tracking-[0.05em]"
             style={{ fontFamily: "var(--font-anaheim)" }}
             dangerouslySetInnerHTML={{ __html: (title || "The Value Of One-Stop<br />Procurement").replace(/\n/g, '<br />') }}
           />
         </div>
 
         {/* 2. Sub-indicator Area */}
-        <div className="absolute left-[1498px] top-[80px] flex flex-col items-end z-20">
+        <div className="absolute left-[1498px] top-[80px] flex flex-col items-end z-50 pointer-events-none">
            <div className="relative mb-2">
-             <div className="w-[101px] h-[101px] bg-[#EDEBD8] rounded-full absolute -top-4 -right-4 -z-10" />
+             <motion.div 
+               animate={{ 
+                 x: [0, 20, -20, 0],
+                 y: [0, -15, 15, 0],
+               }}
+               transition={{ 
+                 duration: 8, 
+                 repeat: Infinity, 
+                 ease: "easeInOut" 
+               }}
+               className="w-[120px] h-[120px] bg-[#EDEBD8] rounded-full absolute -top-8 -right-8 -z-10 blur-[10px] opacity-70" 
+             />
              <h3 
                className="text-[48px] font-semibold leading-[58px] text-[#756F3F] text-right"
                style={{ 
@@ -124,25 +147,39 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages 
             </AnimatePresence>
           </div>
 
-          {/* 6. Navigation Controls */}
-          <div className="absolute left-[1030px] top-[648px] flex gap-4 pointer-events-auto">
+          {/* 6. Navigation Controls - Individual Dashed Square Buttons */}
+          <div className="absolute left-[960px] top-[710px] flex pointer-events-auto z-20">
             <button 
-              onClick={handlePrev}
-              className="w-[78px] h-[77px] flex items-center justify-center text-[#756F3F] border border-[#756F3F]/20 rounded-full hover:bg-[#756F3F]/5 transition-colors"
+              onClick={handlePrev} 
+              className="w-[78px] h-[77px] flex items-center justify-center border border-dashed border-[#B0B0B0]/60 hover:bg-black/5 transition-all"
             >
-              <ArrowLeft className="w-8 h-8" />
+              <svg width="78" height="77" viewBox="0 0 78 77" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fillRule="evenodd" clipRule="evenodd" d="M30.4609 38.4697L45.6807 53.3662L47.8604 51.1514L35.0645 38.4697L47.8604 25.7881L45.6807 23.5732L30.4609 38.4697Z" fill="#B0B0B0"/>
+              </svg>
             </button>
             <button 
-              onClick={handleNext}
-              className="w-[78px] h-[77px] flex items-center justify-center bg-[#756F3F] text-white rounded-full hover:scale-110 transition-transform shadow-lg"
+              onClick={handleNext} 
+              className="w-[78px] h-[77px] flex items-center justify-center border border-dashed border-[#756F3F]/60 hover:bg-[#756F3F]/5 transition-all"
             >
-              <ArrowRight className="w-8 h-8" />
+              <svg width="78" height="77" viewBox="0 0 78 77" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fillRule="evenodd" clipRule="evenodd" d="M47.5391 38.4697L32.3193 53.3662L30.1396 51.1514L42.9355 38.4697L30.1396 25.7881L32.3193 23.5732L47.5391 38.4697Z" fill="#756F3F"/>
+              </svg>
             </button>
           </div>
         </div>
 
         {/* 7. Footer Decorative Elements */}
-        <div className="absolute left-[1638px] top-[794px] w-[143px] h-[128px]">
+        
+        {/* Left Bottom Chevron Array */}
+        <div className="absolute left-[160px] top-[740px] px-6 py-4 flex gap-1 opacity-50 z-20">
+           {Array.from({ length: 11 }).map((_, i) => (
+             <svg key={i} width="16" height="24" viewBox="0 0 16 24" fill="none" className="flex-shrink-0 animate-pulse-wave" style={{ animationDelay: `${i * 0.1}s` }}>
+               <path d="M4 4L12 12L4 20" stroke="#756F3F" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+             </svg>
+           ))}
+        </div>
+
+        <div className="absolute left-[1638px] top-[794px] w-[143px] h-[128px] z-20">
            <AnimatePresence mode="wait">
              <motion.span
                key={currentIndex}
@@ -157,7 +194,7 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages 
            </AnimatePresence>
         </div>
 
-        <div className="absolute left-[1658px] top-[748px] w-[3.5px] h-[153px] bg-[#D7D1A8] origin-bottom -rotate-[44deg]" />
+        <div className="absolute left-[1580px] top-[700px] w-[3.5px] h-[153px] bg-[#D7D1A8] origin-bottom rotate-[44deg] z-20" />
       </div>
     </section>
   )
