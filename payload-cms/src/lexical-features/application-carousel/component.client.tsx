@@ -185,7 +185,7 @@ export const ApplicationCarouselComponent: React.FC<ApplicationCarouselComponent
 
   if (isEditing) {
     return (
-      <div style={{ margin: '16px 0', padding: '16px', border: '2px solid #A08745', borderRadius: '8px', backgroundColor: '#ffffff' }}>
+      <div style={{ margin: '16px 0', padding: '16px', border: '2px solid #A08745', borderRadius: '8px', backgroundColor: '#ffffff', width: '100%' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>
             {i18n?.language === 'zh' ? '编辑应用轮播' : 'Edit Application Carousel'}
@@ -227,7 +227,7 @@ export const ApplicationCarouselComponent: React.FC<ApplicationCarouselComponent
           </div>
 
           {/* Selected Applications Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', width: '100%' }}>
             {applications.map((app, index) => (
               <div
                 key={app.id}
