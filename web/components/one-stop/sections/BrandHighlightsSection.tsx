@@ -7,8 +7,9 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage"
 interface BrandHighlightItem {
   id: string
   image: any
+  title?: string
   description: string
-  summary: string
+  summary?: string
 }
 
 interface BrandHighlightsSectionProps {
@@ -66,7 +67,7 @@ export function BrandHighlightsSection({
       </div>
 
       {/* 1. DESKTOP/TABLET CONTENT (Visible on MD and above) */}
-      <div className="hidden md:block relative w-full max-w-[1536px] mx-auto aspect-[1344/845] h-[50.3vw] xl:h-[965.7px] shrink-0 z-10">
+      <div className="hidden md:block relative w-full max-w-[1536px] mx-auto aspect-[1344/845] h-[55vw] xl:h-[1050px] shrink-0 z-10">
 
         {/* 1. Section Title */}
         <div className="absolute left-[5.96%] top-[9.45%] flex flex-col">
@@ -157,7 +158,7 @@ export function BrandHighlightsSection({
         </div>
 
         {/* 5. Thumbnail Preview Group (Bottom Left) */}
-        <div className="absolute left-[5.96%] top-[66%] w-[14.7%] flex flex-col gap-[10%] z-20">
+        <div className="absolute left-[5.96%] top-[60%] w-[14.7%] flex flex-col z-20">
            {/* Thumbnail Image */}
             <div className="w-full aspect-[282/375] rounded-[1.5vw] xl:rounded-[22.8px] overflow-hidden shadow-xl">
               <AnimatePresence mode="popLayout" custom={direction}>
@@ -179,8 +180,8 @@ export function BrandHighlightsSection({
               </AnimatePresence>
             </div>
            
-           {/* Thumbnail Text Summary */}
-            <div className="mt-4">
+            {/* Thumbnail Text Preview (Title) */}
+            <div className="mt-4 flex justify-center w-full">
               <AnimatePresence mode="wait" custom={direction}>
                   <motion.p 
                     key={nextIndex}
@@ -188,10 +189,10 @@ export function BrandHighlightsSection({
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: direction === 1 ? -20 : 20 }}
                     transition={{ duration: 0.4 }}
-                    className="text-[1.1vw] xl:text-[16px] font-[600] leading-[1.3] text-[#626262] line-clamp-2"
+                    className="max-w-[92%] text-[1vw] xl:text-[15.2px] font-[600] leading-[1.3] text-[#626262] line-clamp-2 text-center"
                     style={{ fontFamily: "var(--font-anaheim)" }}
                   >
-                    {items[nextIndex].summary}
+                    {items[nextIndex].title || items[nextIndex].description}
                   </motion.p>
               </AnimatePresence>
             </div>
