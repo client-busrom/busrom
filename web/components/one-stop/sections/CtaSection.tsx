@@ -9,7 +9,7 @@ import { PhoneInput } from "@/components/ui/PhoneInput"
 
 interface CtaSectionProps {
   title?: string
-  subtitle?: string
+  description?: string
   image?: any
   formConfig?: any
 }
@@ -109,7 +109,7 @@ function CustomDropdown({ label, options, placeholder, value, onChange }: any) {
  * CtaSection (Contact Form)
  * Refined with Double-Layer Ghosting Effect and Lenis-compatible Dropdown.
  */
-export function CtaSection({ title, subtitle, image, formConfig }: CtaSectionProps) {
+export function CtaSection({ title, description, image, formConfig }: CtaSectionProps) {
   const [formState, setFormState] = useState<any>({
     'project-type': '',
     'primary-requirement': '',
@@ -121,7 +121,7 @@ export function CtaSection({ title, subtitle, image, formConfig }: CtaSectionPro
 
   const showPrivacy = formConfig?.privacyConsentText && !isGloballyAccepted
   const SECTION_HEIGHT = showPrivacy ? 1100 : 922
-  const IMAGE_HEIGHT = 800
+  const IMAGE_HEIGHT = SECTION_HEIGHT - 120
   const IMAGE_WIDTH = 584.5
   const BG_TOP_OFFSET_SCALED = 180
 
@@ -165,9 +165,15 @@ export function CtaSection({ title, subtitle, image, formConfig }: CtaSectionPro
 
   return (
     <section 
-      className="relative w-full overflow-hidden flex flex-col items-center bg-transparent z-10 transition-[height] duration-500 ease-in-out"
-      style={{ height: `${SECTION_HEIGHT}px` }}
+      id="cta-section"
+      className="relative w-full overflow-hidden flex flex-col items-center bg-transparent z-10 transition-[height] duration-500 ease-in-out justify-start pb-24 xl:pb-0" 
+      style={{ height: 'auto' }}
     >
+      <style jsx>{`
+        @media (min-width: 1280px) {
+          #cta-section { height: ${SECTION_HEIGHT}px !important; }
+        }
+      `}</style>
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -177,13 +183,16 @@ export function CtaSection({ title, subtitle, image, formConfig }: CtaSectionPro
 
       {/* 1. Green Base Background */}
       <div 
-        className="absolute inset-x-0 bottom-0 bg-[#5E571F] z-0" 
+        className="absolute inset-x-0 bottom-0 bg-[#5E571F] z-0 hidden xl:block" 
         style={{ top: `${BG_TOP_OFFSET_SCALED}px` }} 
       />
-
-      {/* 2. Visual Layer: Double-Layer Images (Solid Foreground + Transparent Ghost) */}
       <div 
-        className="absolute right-0 bottom-0 z-10 pointer-events-none"
+        className="absolute inset-0 bg-[#5E571F] z-0 xl:hidden"
+      />
+
+      {/* 2. Visual Layer: Double-Layer Images (Solid Foreground + Transparent Ghost) - Desktop Only */}
+      <div 
+        className="absolute right-0 bottom-0 z-10 pointer-events-none hidden xl:block"
         style={{ 
            width: `${IMAGE_WIDTH}px`,
            height: `${IMAGE_HEIGHT}px`
@@ -229,9 +238,118 @@ export function CtaSection({ title, subtitle, image, formConfig }: CtaSectionPro
          )}
       </div>
 
-      {/* 3. Scaled Content Container (Form Area) */}
+      {/* 3. Mobile Content Container (Responsive Column) */}
+      <div className="relative z-20 w-full xl:hidden flex flex-col items-center px-6 py-12 gap-10">
+          <div className="w-full max-w-[500px] text-center space-y-4">
+              <h2 className="text-[32px] md:text-[40px] font-extrabold text-[#FFF28E] leading-tight tracking-tighter" style={{ fontFamily: "var(--font-anaheim)" }}>
+                {title || formConfig?.displayName || "Get A Complete Solution"}
+              </h2>
+              <p className="text-[16px] md:text-[18px] font-semibold text-white/90 leading-relaxed" style={{ fontFamily: "var(--font-anaheim)" }}>
+                {description || formConfig?.description || ""}
+              </p>
+          </div>
+
+          <div className="w-full max-w-[540px] flex flex-col gap-4">
+              <input 
+                type="text" 
+                placeholder={getField('name')?.placeholder || "Your Name"} 
+                className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40" 
+              />
+              <input 
+                type="text" 
+                placeholder={getField('company')?.placeholder || "Your Company / Your Team"} 
+                className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40" 
+              />
+              <input 
+                type="email" 
+                placeholder={getField('email')?.placeholder || "Your Email"} 
+                className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40" 
+              />
+              <div className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] overflow-hidden">
+                <PhoneInput
+                  id="whatsapp-mobile"
+                  value={formState['whatsapp'] || ''}
+                  onChange={(phone) => setFormState({...formState, 'whatsapp': phone})}
+                  placeholder={getField('whatsapp')?.placeholder || "Your Whatsapp"}
+                  className="!h-full !bg-transparent !w-full"
+                  buttonClassName="!bg-transparent !border-none !text-white hover:!bg-white/10 !px-4"
+                  inputClassName="!bg-transparent !text-white !placeholder-white/40 !text-[18px] !h-full !px-1"
+                  dialCodeClassName="!text-white !text-base"
+                />
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <CustomDropdown 
+                  placeholder={getField('project-type')?.placeholder || "Project Type"}
+                  options={getField('project-type')?.options}
+                  value={formState['project-type']}
+                  onChange={(val: string) => setFormState({...formState, 'project-type': val})}
+                  className="!h-[68px] !bg-white/5 !border !border-white/20 !rounded-[15px] !text-[18px] !px-5"
+                />
+                <CustomDropdown 
+                  placeholder={getField('primary-requirement')?.placeholder || "Primary Requirement"}
+                  options={getField('primary-requirement')?.options}
+                  value={formState['primary-requirement']}
+                  onChange={(val: string) => setFormState({...formState, 'primary-requirement': val})}
+                  className="!h-[68px] !bg-white/5 !border !border-white/20 !rounded-[15px] !text-[18px] !px-5"
+                />
+              </div>
+
+              <input 
+                 type="text" 
+                 placeholder={getField('other-primary-requirement')?.placeholder || "Please Enter..."}
+                 className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40"
+              />
+
+              <textarea 
+                  placeholder={getField('specific-requirements-project-description')?.placeholder || "Specific Requirements / Project Description"} 
+                  className="w-full h-36 bg-white/5 border border-white/20 rounded-[15px] p-5 text-white text-[18px] focus:border-[#FFF28E] resize-none placeholder:text-white/40" 
+              />
+
+              <div className="flex flex-col gap-6 mt-4">
+                  {formConfig?.privacyConsentText && !isGloballyAccepted && (
+                    <div className="flex items-start gap-3 cursor-pointer" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
+                      <div className={cn(
+                        "mt-1 flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all",
+                        privacyAccepted ? "bg-[#B2A224] border-[#B2A224]" : "border-white/30 bg-black/30"
+                      )}>
+                        {privacyAccepted && <Check className="w-3 h-3 text-white" />}
+                      </div>
+                      <p className="text-[13px] leading-relaxed text-white/70 text-left select-none">
+                        {formConfig.privacyConsentText}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-6 items-center">
+                    <button className="flex items-center gap-3 text-white hover:text-[#FFF28E] transition-colors w-fit">
+                        <Upload className="w-5 h-5" />
+                        <span className="text-[18px] font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-anaheim)" }}>
+                            {getField('file')?.label || "Upload File"}
+                        </span>
+                    </button>
+
+                    <motion.button 
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.96 }}
+                      disabled={(!!formConfig?.privacyConsentText && !privacyAccepted)}
+                      className={cn(
+                        "w-full max-w-[320px] bg-[#B2A224] text-white text-[24px] font-black rounded-full shadow-lg transition-all",
+                        "h-14 flex items-center justify-center",
+                        (!!formConfig?.privacyConsentText && !privacyAccepted) && "grayscale opacity-80 cursor-not-allowed"
+                      )}
+                      style={{ fontFamily: "var(--font-anaheim)" }}
+                    >
+                      {formConfig?.submitButtonText || "Send Inquiry"}
+                    </motion.button>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      {/* 4. Scaled Content Container (Form Area) - Desktop Only */}
       <div 
-        className="relative z-20 flex-shrink-0 origin-top flex items-start overflow-visible transition-[height] duration-500 ease-in-out"
+        className="relative z-20 flex-shrink-0 origin-top hidden xl:flex items-start overflow-visible transition-[height] duration-500 ease-in-out"
         style={{ 
           width: `1920px`, 
           height: `${Math.ceil(SECTION_HEIGHT / 0.7)}px`, 
@@ -240,11 +358,11 @@ export function CtaSection({ title, subtitle, image, formConfig }: CtaSectionPro
       >
         <div className="pl-[153px] w-[1100px] pt-[350px]">
            <div className="mb-10">
-              <h2 className="text-[60px] font-extrabold text-[#FFF28E] leading-[1.1] mb-6 uppercase tracking-tighter" style={{ fontFamily: "var(--font-anaheim)" }}>
-                {title || "Get A Complete Solution"}
+              <h2 className="text-[60px] font-extrabold text-[#FFF28E] leading-[1.1] mb-6 tracking-tighter" style={{ fontFamily: "var(--font-anaheim)" }}>
+                {title || formConfig?.displayName || ""}
               </h2>
               <p className="text-[24px] font-semibold text-white/90 leading-[41px] max-w-[823px]" style={{ fontFamily: "var(--font-anaheim)" }}>
-                {subtitle || "Looking for a One-stop Shopping for a Complete Set of Engineering Hardware? Any Size, Any Project - Get Your Custom Plan Quote in 24h."}
+                {description || formConfig?.description || ""}
               </p>
            </div>
 
@@ -311,7 +429,7 @@ export function CtaSection({ title, subtitle, image, formConfig }: CtaSectionPro
               </div>
            </div>
 
-           <div className="mt-8 flex flex-col gap-6">
+            <div className="mt-8 flex flex-col gap-6 w-[773px]">
                {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
                {formConfig?.privacyConsentText && !isGloballyAccepted && (
                  <div className="flex items-start gap-4 cursor-pointer group" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
@@ -325,13 +443,13 @@ export function CtaSection({ title, subtitle, image, formConfig }: CtaSectionPro
                        </svg>
                      )}
                    </div>
-                   <p className="text-[18px] leading-relaxed text-white/70 max-w-[700px] whitespace-pre-line select-none">
+                   <p className="text-[18px] leading-relaxed text-white/70 max-w-[700px] whitespace-pre-line select-none text-left">
                      {formConfig.privacyConsentText}
                    </p>
                  </div>
                )}
 
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-8 w-full">
               <button className="flex items-center gap-4 text-white hover:text-[#FFF28E] transition-colors w-fit">
                  <Upload className="w-8 h-8" />
                  <span className="text-[24px] font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-anaheim)" }}>
@@ -340,11 +458,22 @@ export function CtaSection({ title, subtitle, image, formConfig }: CtaSectionPro
               </button>
 
               <motion.button 
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                initial={{ rotate: 0, scale: 1 }}
+                animate={{ rotate: [0, -6, 6, -6, 6, -6, 6, 0] }}
+                whileHover={{ 
+                  scale: 1.05,
+                  rotate: 0,
+                  filter: "brightness(1.1)",
+                  boxShadow: "0 20px 40px rgba(0,0,0,0.25)"
+                }}
+                whileTap={{ scale: 0.96 }}
+                transition={{ 
+                  rotate: { duration: 0.6, repeat: Infinity, repeatDelay: 1.5, ease: "easeInOut" },
+                  scale: { type: "tween", duration: 0.15, ease: "easeOut" }
+                }}
                 disabled={(!!formConfig?.privacyConsentText && !privacyAccepted)}
                 className={cn(
-                  "w-[419px] bg-[#B2A224] text-white text-[40px] font-black rounded-[63px] shadow-2xl transition-all",
+                  "w-[419px] bg-[#B2A224] text-white text-[40px] font-black rounded-[63px] shadow-2xl transition-all self-center",
                   "min-h-[83px] h-auto py-4 whitespace-pre-line leading-tight px-8",
                   (!!formConfig?.privacyConsentText && !privacyAccepted) && "grayscale opacity-80 cursor-not-allowed"
                 )}

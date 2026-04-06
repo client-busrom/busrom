@@ -176,7 +176,7 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
                >
                   <OptimizedImage 
                     image={slide.image} 
-                    size="small"
+                    size="large"
                     className="w-full h-full object-cover"
                     alt={`Step ${i}`}
                   />

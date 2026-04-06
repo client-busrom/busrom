@@ -165,7 +165,7 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
                     >
                         <OptimizedImage 
                             image={item.image}
-                            size="small"
+                            size="medium"
                             className="w-full h-full object-cover"
                             alt={item.title}
                         />

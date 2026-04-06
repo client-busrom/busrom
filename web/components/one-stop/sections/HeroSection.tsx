@@ -66,7 +66,7 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
           >
             <OptimizedImage 
                 image={getSlideInStack(0).image} 
-                size="large" 
+                size="xlarge" 
                 className="w-full h-full object-cover select-none"
                 priority // LCP element
             />

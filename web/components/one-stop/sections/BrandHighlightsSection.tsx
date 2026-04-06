@@ -237,7 +237,7 @@ export function BrandHighlightsSection({
                transition={{ duration: 0.5, ease: "easeOut" }}
                className="w-full h-full"
              >
-               <OptimizedImage image={currentItem.image} alt="Mobile Main" className="w-full h-full object-cover" />
+               <OptimizedImage image={currentItem.image} alt="Mobile Main" className="w-full h-full object-cover" size="large" />
              </motion.div>
            </AnimatePresence>
          </div>
