@@ -118,23 +118,41 @@ export function HighlightShowcaseSection({ title, products, locale, viewMoreText
                    key={item.id} 
                    initial={{ opacity: 0, y: 50, rotate: rotation }}
                    whileInView={{ opacity: 1, y: 0, rotate: rotation }}
+                   whileHover={{ 
+                     y: -80, 
+                     rotate: 0, 
+                     zIndex: 100,
+                     transition: { type: "spring", stiffness: 260, damping: 20 }
+                   }}
                    viewport={{ once: true }}
                    transition={{ duration: 0.8, delay: index * 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
-                   className="flex-shrink-0 relative"
+                   className="flex-shrink-0 relative group"
                    style={{
                      width: vw(525),
                      height: isStraight ? vw(676) : vw(656),
                      marginTop: isStraight ? "0px" : vw(90),
                      // Force overlap using negative margin
                      marginLeft: index === 0 ? 0 : vw(-80),
-                     // Center card (index 1) sits on top
+                     // Default stacking: index 2 (right) is on top
                      zIndex: index === 2 ? 30 : (index === 0 ? 10 : 20)
                    }}
                  >
-                   <Link href={item.link || "#"} className="block w-full h-full relative group">
+                    {/* 第一层：巨幅弥散氛围影 - 制造大范围的黑色晕染场 */}
+                    <div 
+                      className="absolute inset-[5%] bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-700 blur-[130px] translate-y-32 pointer-events-none group-hover:scale-[1.3] z-0"
+                      style={{ borderRadius: vw(30) }}
+                    />
+                    
+                    {/* 第二层：沉稳核心落地影 - 锁定卡片物理轮廓的根部 */}
+                    <div 
+                      className="absolute inset-[12%] bg-black opacity-0 group-hover:opacity-100 transition-all duration-500 blur-[50px] translate-y-20 pointer-events-none z-0"
+                      style={{ borderRadius: vw(30) }}
+                    />
+
+                    <Link href={item.link || "#"} className="block w-full h-full relative z-10">
                       {/* Shadow & Background Shape */}
                       <div 
-                        className="absolute inset-0 shadow-[0_4px_30.1px_rgba(0,0,0,0.25)] overflow-hidden transition-all duration-300 group-hover:scale-[1.03] group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
+                        className="absolute inset-0 shadow-[0_15px_40px_rgba(0,0,0,0.25)] overflow-hidden transition-all duration-300 group-hover:scale-[1.04]"
                         style={{ borderRadius: vw(30) }}
                       >
                         {/* Product Image */}
@@ -148,10 +166,10 @@ export function HighlightShowcaseSection({ title, products, locale, viewMoreText
                           />
                         </div>
 
-                        {/* Gradient Hover Overlay */}
-                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300 flex flex-col justify-end p-8">
+                        {/* Text Overlay Only (No dark gradient covering image) */}
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
                            <h4 
-                             className="text-white font-bold"
+                             className="text-white font-bold drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]"
                              style={{ fontSize: vw(32), lineHeight: 1.2 }}
                            >
                              {item.title}
