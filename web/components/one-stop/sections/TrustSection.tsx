@@ -15,10 +15,6 @@ interface TrustSectionProps {
 export function TrustSection({ title, items, images = [], bgImage }: TrustSectionProps) {
   const [activeIndex, setActiveIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
-
-  const SECTION_WIDTH = 1920
-  const SECTION_HEIGHT = 1485
-  const LEFT_MARGIN = 182
   
   const defaultItems = [
     { title: "One-stop Full-range Supply", description: "Cover all parts of hardware, saving coordination costs" },
@@ -48,51 +44,51 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
 
   return (
     <section 
-      className="relative w-full overflow-hidden flex flex-col items-center bg-black py-16 md:py-0 md:min-h-[850px]"
+      className="relative w-full overflow-hidden flex flex-col items-center bg-black py-16 lg:py-0 lg:min-h-[850px]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* 1. Background Layer */}
       <div className="absolute inset-0 z-0">
          {bgImage && (
-           <OptimizedImage image={bgImage} alt="Background" className="w-full h-full object-cover" size="xlarge" />
+           <OptimizedImage image={bgImage} alt="Background" className="w-full h-full object-cover opacity-70" size="xlarge" />
          )}
          <div 
-           className="absolute inset-0 z-10 bg-black/50 backdrop-blur-[10px]"
+           className="absolute inset-0 z-10 bg-black/60 backdrop-blur-[8px]"
          />
       </div>
 
-      {/* 2. Content Container */}
-      <div className="relative z-20 w-full flex flex-col md:flex-row items-center md:items-start justify-between px-10 md:pl-[140px] md:pr-[100px] gap-12 md:gap-0 md:pt-[100px]">
+      {/* 2. Content Container - Centered Rail */}
+      <div className="relative z-20 w-full max-w-[1536px] mx-auto flex flex-col lg:flex-row items-center lg:items-start justify-between px-6 lg:pl-[112px] lg:pr-[80px] gap-12 lg:gap-0 lg:pt-[100px] h-full">
         
         {/* Left Column: Title & Accordion */}
-        <div className="w-full md:w-[787px] shrink-0">
+        <div className="w-full lg:w-[629.6px] shrink-0">
           <motion.h2
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="text-[32px] md:text-[96px] font-extrabold text-white leading-tight md:leading-[102px] tracking-tighter mb-8 md:mb-12 text-center md:text-left"
+            className="text-[32px] lg:text-[60px] font-extrabold text-white leading-tight lg:leading-[70px] tracking-tighter mb-8 lg:mb-12 text-center lg:text-left"
             style={{ fontFamily: "var(--font-anaheim)" }}
             dangerouslySetInnerHTML={{ __html: (title || "Why Contractors<br />Trust Us?").replace(/\n/g, '<br />') }}
           />
 
-          <div className="w-full max-w-[767px] mx-auto md:mx-0">
+          <div className="w-full lg:max-w-[613.6px] mx-auto lg:mx-0">
               {displayItems.slice(0, 6).map((item, i) => {
                   const isActive = activeIndex === i
                   return (
-                      <div key={i} className="mb-6 md:mb-8 group border-b border-white/10">
+                      <div key={i} className="mb-6 lg:mb-8 group border-b border-white/10">
                           <button 
                               onClick={() => setActiveIndex(i)}
                               className="w-full flex justify-between items-center text-left py-4 transition-all"
                           >
                               <h4 
-                                  className={`text-[18px] md:text-[32px] font-bold leading-tight transition-colors duration-300 ${isActive ? 'text-[#FFF28E]' : 'text-white/60 group-hover:text-white'}`}
+                                  className={`text-[18px] lg:text-[29px] font-bold leading-tight transition-colors duration-300 ${isActive ? 'text-[#FFF28E]' : 'text-white/60 group-hover:text-white'}`}
                                   style={{ fontFamily: "var(--font-anaheim)" }}
                               >
                                   {item.title}
                               </h4>
-                              <div className={`w-8 h-8 md:w-12 md:h-12 rounded-full border-2 flex items-center justify-center transition-all duration-300 shrink-0 ${isActive ? 'border-[#FFF28E] bg-[#FFF28E] text-black rotate-180' : 'border-white/20 text-white'}`}>
-                                  {isActive ? <Minus className="w-4 h-4 md:w-6 md:h-6" strokeWidth={3} /> : <Plus className="w-4 h-4 md:w-6 md:h-6" strokeWidth={3} />}
+                              <div className={`w-8 h-8 lg:w-[48px] lg:h-[48px] rounded-full border-2 flex items-center justify-center transition-all duration-300 shrink-0 ${isActive ? 'border-[#FFF28E] bg-[#FFF28E] text-black rotate-180' : 'border-white/20 text-white'}`}>
+                                  {isActive ? <Minus className="w-4 h-4 lg:w-[24px] lg:h-[24px]" strokeWidth={3} /> : <Plus className="w-4 h-4 lg:w-[24px] lg:h-[24px]" strokeWidth={3} />}
                               </div>
                           </button>
 
@@ -105,7 +101,7 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
                                       transition={{ duration: 0.4 }}
                                       className="overflow-hidden"
                                   >
-                                      <p className="text-[16px] md:text-[28px] font-semibold text-white/80 leading-relaxed md:leading-[44px] pb-8 md:pr-12" style={{ fontFamily: "var(--font-anaheim)" }}>
+                                      <p className="text-[16px] lg:text-[20px] font-semibold text-white/80 leading-relaxed lg:leading-[32px] pb-8 lg:pr-12" style={{ fontFamily: "var(--font-anaheim)" }}>
                                           {item.description || item.summary}
                                       </p>
                                   </motion.div>
@@ -117,43 +113,97 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
           </div>
         </div>
 
-        {/* Right Column: Dynamic Images Scatter - Adjust for mobile */}
-        <div className="relative w-full md:w-auto h-[400px] md:h-full md:flex-grow flex items-center justify-center md:block">
-            {/* Image 1 */}
+        {/* Right Column: Scatter Images */}
+        <div className="relative w-full lg:w-auto h-[450px] lg:h-full lg:flex-grow flex items-center justify-center lg:block min-h-[750px] lg:min-h-[900px]">
+            {/* Image 1 - top scatter (Pencil: image1) */}
             <motion.div 
-                animate={{ rotate: 2.19 }}
-                className="absolute shadow-2xl rounded-[30px] md:rounded-[54px] overflow-hidden border-2 md:border-4 border-white/10 z-30"
+                animate={{ 
+                    rotate: 2.19,
+                    y: [0, -15, 0]
+                }}
+                transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                }}
+                className="absolute shadow-2xl rounded-[30px] lg:rounded-[54px] overflow-hidden z-30 lg:left-[135px] lg:top-[40px]"
                 style={{ 
-                  left: typeof window !== 'undefined' && window.innerWidth < 768 ? "10%" : "200px", 
-                  top: typeof window !== 'undefined' && window.innerWidth < 768 ? "20px" : "150px", 
-                  width: typeof window !== 'undefined' && window.innerWidth < 768 ? "180px" : "356px", 
-                  height: typeof window !== 'undefined' && window.innerWidth < 768 ? "130px" : "261px" 
+                  left: "calc(50% - 200px)",
+                  top: "20px",
                 }}
             >
-                {getImage(0) ? <OptimizedImage image={getImage(0)} alt="D1" className="w-full h-full object-cover" size="small" /> : <div className="w-full h-full bg-white/10" />}
+                <div className="w-[180px] h-[124px] lg:w-[235px] lg:h-[162px]">
+                    {getImage(0) ? <OptimizedImage image={getImage(0)} alt="image1" className="w-full h-full object-cover" size="small" /> : <div className="w-full h-full bg-white/10" />}
+                </div>
             </motion.div>
 
-            {/* Image 2 - Main Large Image */}
+            {/* Image 2 - Main Large Image (Pencil: image2) */}
             <motion.div 
-                animate={{ rotate: 8.15 }}
-                className="absolute shadow-2xl rounded-[30px] md:rounded-[54px] overflow-hidden border-2 md:border-4 border-white/10 z-20"
+                animate={{ 
+                    rotate: 8.15,
+                    y: [0, 15, 0]
+                }}
+                transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.5
+                }}
+                className="absolute shadow-2xl rounded-[30px] lg:rounded-[54px] overflow-hidden z-0 lg:left-[333px] lg:top-[152px]"
                 style={{ 
-                  right: typeof window !== 'undefined' && window.innerWidth < 768 ? "5%" : "20px", 
-                  top: typeof window !== 'undefined' && window.innerWidth < 768 ? "80px" : "300px", 
-                  width: typeof window !== 'undefined' && window.innerWidth < 768 ? "220px" : "500px", 
-                  height: typeof window !== 'undefined' && window.innerWidth < 768 ? "300px" : "679px" 
+                  left: "calc(50% - 60px)",
+                  top: "180px",
                 }}
             >
-                {getImage(1) ? <OptimizedImage image={getImage(1)} alt="D2" className="w-full h-full object-cover" size="small" /> : <div className="w-full h-full bg-white/10" />}
+                <div className="w-[220px] h-[280px] lg:w-[331px] lg:h-[425px]">
+                    {getImage(1) ? <OptimizedImage image={getImage(1)} alt="image2" className="w-full h-full object-cover" size="large" /> : <div className="w-full h-full bg-white/10" />}
+                </div>
             </motion.div>
 
-            {/* Hidden secondary images on small mobile to avoid chaos */}
+            {/* Image 3 - mid left scatter (Pencil: image3) */}
             <motion.div 
-                animate={{ rotate: -20.86 }}
-                className="hidden md:block absolute shadow-2xl rounded-[54px] overflow-hidden border-4 border-white/10 z-10"
-                style={{ right: "150px", bottom: "100px", width: "340px", height: "400px" }}
+                animate={{ 
+                    rotate: -20.86,
+                    y: [0, -20, 0]
+                }}
+                transition={{
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 1
+                }}
+                className="hidden lg:block absolute shadow-2xl rounded-[40px] lg:rounded-[54px] overflow-hidden z-20"
+                style={{ 
+                  left: "50px", 
+                  top: "372px"
+                }}
             >
-                {getImage(2) ? <OptimizedImage image={getImage(2)} alt="D3" className="w-full h-full object-cover" size="small" /> : <div className="w-full h-full bg-white/10" />}
+                <div className="w-[229px] h-[258px]">
+                    {getImage(2) ? <OptimizedImage image={getImage(2)} alt="image3" className="w-full h-full object-cover" size="small" /> : <div className="w-full h-full bg-white/10" />}
+                </div>
+            </motion.div>
+
+            {/* Image 4 - bottom scatter (Pencil: image4) */}
+            <motion.div 
+                animate={{ 
+                    rotate: -5.5,
+                    y: [0, 10, 0]
+                }}
+                transition={{
+                    duration: 4.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.2
+                }}
+                className="hidden lg:block absolute shadow-2xl rounded-[30px] lg:rounded-[54px] overflow-hidden z-10"
+                style={{ 
+                  left: "268px", 
+                  top: "597px"
+                }}
+            >
+                <div className="w-[245px] h-[234px]">
+                    {getImage(3) ? <OptimizedImage image={getImage(3)} alt="image4" className="w-full h-full object-cover" size="small" /> : <div className="w-full h-full bg-white/10" />}
+                </div>
             </motion.div>
         </div>
       </div>
