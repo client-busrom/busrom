@@ -50,25 +50,24 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
   if (data.length === 0) return null
 
   return (
-    <section className="relative w-full overflow-hidden bg-[#F9F9F5] flex justify-center items-center" style={{ height: "922px" }}>
+    <section className="relative w-full overflow-hidden bg-transparent flex justify-center items-center py-12 md:py-0 md:h-[922px]">
       
-      {/* 70% Scale Container */}
+      {/* Container - Adaptive Scale */}
       <div 
-        className="relative w-[1920px] h-[922px] origin-center flex-shrink-0"
-        style={{ transform: "scale(0.7)" }}
+        className="relative w-full md:w-[1920px] h-auto min-h-[600px] md:h-[922px] origin-center flex-shrink-0 flex flex-col md:block scale-100 md:scale-[0.7]"
       >
         
         {/* 1. Header Area */}
-        <div className="absolute left-[153px] top-[0px] w-[1150px] z-50 pointer-events-none">
+        <div className="relative md:absolute left-0 md:left-[140px] top-0 px-10 md:px-0 w-full md:w-[1150px] z-50 mb-8 md:mb-0 text-center md:text-left">
           <h2 
-            className="text-[96px] font-extrabold leading-[102px] text-[#78713A] tracking-[0.05em]"
+            className="text-[32px] md:text-[96px] font-extrabold leading-tight md:leading-[102px] text-[#78713A] tracking-[0.05em]"
             style={{ fontFamily: "var(--font-anaheim)" }}
             dangerouslySetInnerHTML={{ __html: (title || "The Value Of One-Stop<br />Procurement").replace(/\n/g, '<br />') }}
           />
         </div>
 
-        {/* 2. Sub-indicator Area */}
-        <div className="absolute left-[1498px] top-[80px] flex flex-col items-end z-50 pointer-events-none">
+        {/* 2. Sub-indicator Area - Hide on very small screens or move */}
+        <div className="hidden md:flex absolute left-[1498px] top-[80px] flex-col items-end z-50 pointer-events-none">
            <div className="relative mb-2">
              <motion.div 
                animate={{ 
@@ -95,22 +94,22 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
            </div>
         </div>
 
-        {/* 3. Static Background Content Box */}
+        {/* 3. Static Background Content Box (Mobile adaptation) */}
         <div 
-          className="absolute left-[363px] top-[233px] w-[792px] h-[578px] rounded-[30px] shadow-[0_80px_70.2px_rgba(0,0,0,0.07)] bg-gradient-to-b from-[#F6F4ED] to-white z-0"
+          className="hidden md:block absolute left-[363px] top-[233px] w-[792px] h-[578px] rounded-[30px] shadow-[0_80px_70.2px_rgba(0,0,0,0.07)] bg-gradient-to-b from-[#F6F4ED] to-white z-0"
         />
 
         {/* 4. Scrolling Items Area */}
-        <div className="absolute inset-0 z-10">
+        <div className="relative md:absolute inset-0 z-10 min-h-[300px] mb-8 md:mb-0">
           <motion.div 
-            className="absolute top-[282px] left-[455px] flex"
-            animate={{ x: -(currentIndex * stepWidth) }}
+            className="flex md:absolute top-0 md:top-[282px] left-0 md:left-[455px] px-6 md:px-0"
+            animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? -(currentIndex * (window.innerWidth - 48 + 21)) : -(currentIndex * stepWidth) }}
             transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
           >
             {data.map((item, idx) => (
               <div 
                 key={idx}
-                className="w-[529px] h-[297px] rounded-[30px] overflow-hidden shadow-[0_31px_38.4px_rgba(0,0,0,0.17)] mr-[21px] flex-shrink-0 relative group cursor-pointer"
+                className="w-[85vw] md:w-[529px] h-[200px] md:h-[297px] rounded-[24px] md:rounded-[30px] overflow-hidden shadow-[0_31px_38.4px_rgba(0,0,0,0.17)] mr-[21px] flex-shrink-0 relative group cursor-pointer"
                 onClick={() => setCurrentIndex(idx)}
               >
                 <OptimizedImage 
@@ -123,23 +122,23 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
                 {idx === currentIndex && (
                   <motion.div 
                     layoutId="active-border"
-                    className="absolute inset-0 border-[6px] border-[#756F3F] rounded-[30px] z-10"
+                    className="absolute inset-0 border-[4px] md:border-[6px] border-[#756F3F] rounded-[24px] md:rounded-[30px] z-10"
                   />
                 )}
               </div>
             ))}
           </motion.div>
 
-          {/* 5. Active Text */}
-          <div className="absolute left-[474px] top-[618px] w-[418px] h-[147px] pointer-events-none">
+          {/* 5. Active Text (Mobile Bottom Placement) */}
+          <div className="relative md:absolute left-0 md:left-[474px] top-6 md:top-[618px] px-6 md:px-0 w-full md:w-[418px] min-h-[100px] md:h-[147px] text-center md:text-left">
             <AnimatePresence mode="wait">
               <motion.p
                 key={currentIndex}
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -50 }}
-                transition={{ duration: 0.5 }}
-                className="text-[24px] font-semibold leading-[32px] text-black"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.4 }}
+                className="text-[18px] md:text-[24px] font-semibold leading-relaxed md:leading-[32px] text-black"
                 style={{ fontFamily: "var(--font-anaheim)" }}
               >
                 {data[currentIndex].description}
@@ -147,39 +146,50 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
             </AnimatePresence>
           </div>
 
-          {/* 6. Navigation Controls - Individual Dashed Square Buttons */}
-          <div className="absolute left-[960px] top-[710px] flex pointer-events-auto z-20">
+          {/* 6. Navigation Controls */}
+          <div className="relative md:absolute left-0 md:left-[960px] top-10 md:top-[710px] flex justify-center md:justify-start pointer-events-auto z-20">
             <button 
               onClick={handlePrev} 
-              className="w-[78px] h-[77px] flex items-center justify-center border border-dashed border-[#B0B0B0]/60 hover:bg-black/5 transition-all"
+              className="w-[60px] md:w-[78px] h-[60px] md:h-[77px] flex items-center justify-center border border-dashed border-[#B0B0B0]/60 hover:bg-black/5"
             >
-              <svg width="78" height="77" viewBox="0 0 78 77" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fillRule="evenodd" clipRule="evenodd" d="M30.4609 38.4697L45.6807 53.3662L47.8604 51.1514L35.0645 38.4697L47.8604 25.7881L45.6807 23.5732L30.4609 38.4697Z" fill="#B0B0B0"/>
+              <svg width="24" height="24" viewBox="0 0 78 77" fill="none">
+                <path d="M30.4609 38.4697L45.6807 53.3662L47.8604 51.1514L35.0645 38.4697L47.8604 25.7881L45.6807 23.5732L30.4609 38.4697Z" fill="#B0B0B0"/>
               </svg>
             </button>
             <button 
               onClick={handleNext} 
-              className="w-[78px] h-[77px] flex items-center justify-center border border-dashed border-[#756F3F]/60 hover:bg-[#756F3F]/5 transition-all"
+              className="w-[60px] md:w-[78px] h-[60px] md:h-[77px] flex items-center justify-center border border-dashed border-[#756F3F]/60 hover:bg-[#756F3F]/5"
             >
-              <svg width="78" height="77" viewBox="0 0 78 77" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fillRule="evenodd" clipRule="evenodd" d="M47.5391 38.4697L32.3193 53.3662L30.1396 51.1514L42.9355 38.4697L30.1396 25.7881L32.3193 23.5732L47.5391 38.4697Z" fill="#756F3F"/>
+              <svg width="24" height="24" viewBox="0 0 78 77" fill="none">
+                <path d="M47.5391 38.4697L32.3193 53.3662L30.1396 51.1514L42.9355 38.4697L30.1396 25.7881L32.3193 23.5732L47.5391 38.4697Z" fill="#756F3F"/>
               </svg>
             </button>
           </div>
         </div>
 
-        {/* 7. Footer Decorative Elements */}
-        
-        {/* Left Bottom Chevron Array */}
-        <div className="absolute left-[160px] top-[740px] px-6 py-4 flex gap-1 opacity-50 z-20">
+        {/* 7. Footer Decorative Elements - Wave Effect */}
+        <div className="hidden md:flex absolute left-[210px] top-[740px] py-4 gap-1 opacity-50 z-20">
            {Array.from({ length: 11 }).map((_, i) => (
-             <svg key={i} width="16" height="24" viewBox="0 0 16 24" fill="none" className="flex-shrink-0 animate-pulse-wave" style={{ animationDelay: `${i * 0.1}s` }}>
+             <motion.svg 
+               key={i} 
+               width="16" height="24" viewBox="0 0 16 24" fill="none" 
+               className="flex-shrink-0"
+               animate={{ 
+                 opacity: [0.1, 0.6, 0.1],
+               }}
+               transition={{ 
+                 duration: 2.5, 
+                 repeat: Infinity, 
+                 delay: i * 0.15,
+                 ease: "easeInOut"
+               }}
+             >
                <path d="M4 4L12 12L4 20" stroke="#756F3F" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-             </svg>
+             </motion.svg>
            ))}
         </div>
 
-        <div className="absolute left-[1638px] top-[794px] w-[143px] h-[128px] z-20">
+        <div className="hidden md:block absolute left-[1638px] top-[794px] w-[143px] h-[128px] z-20">
            <AnimatePresence mode="wait">
              <motion.span
                key={currentIndex}
@@ -194,7 +204,7 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
            </AnimatePresence>
         </div>
 
-        <div className="absolute left-[1580px] top-[700px] w-[3.5px] h-[153px] bg-[#D7D1A8] origin-bottom rotate-[44deg] z-20" />
+        <div className="hidden md:block absolute left-[1580px] top-[700px] w-[3.5px] h-[153px] bg-[#D7D1A8] origin-bottom rotate-[44deg] z-20" />
       </div>
     </section>
   )

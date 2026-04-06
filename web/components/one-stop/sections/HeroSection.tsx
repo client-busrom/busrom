@@ -52,7 +52,7 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
   const adjustedDescSize = Math.round(38 * (0.6 / 0.7)) // ~33px
 
   return (
-    <section className="relative w-full overflow-hidden bg-[#352F03] flex justify-center items-center pt-[46px]" style={{ height: "968px" }}>
+    <section className="relative w-full overflow-hidden bg-[#352F03] flex justify-center items-center pt-[20px] md:pt-[46px] h-screen max-h-[968px] min-h-[600px]">
       {/* 1. Global Background Image - Large Optimized Variant */}
       <div className="absolute inset-0 z-0 w-full h-full max-w-[1920px] mx-auto">
         <AnimatePresence mode="wait">
@@ -80,14 +80,13 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
         style={{ backgroundColor: overlayColor }}
       />
 
-      {/* 3. Stacked Items Container - Scaled to 70% */}
-      <div className="relative z-20 w-full max-w-[1920px] h-full flex items-center justify-center pointer-events-none">
+      {/* 3. Stacked Items Container - Scaled on Desktop */}
+      <div className="relative z-20 w-full max-w-[1920px] h-full flex items-center justify-center pointer-events-none px-4 md:px-0">
         <div 
-          className="relative w-[1429px] h-auto min-h-[720px] origin-center transition-all duration-500"
-          style={{ transform: "scale(0.7)" }}
+          className="relative w-full md:w-[1429px] h-auto min-h-[500px] md:min-h-[720px] origin-center transition-all duration-500 scale-[0.85] md:scale-[0.7]"
         >
           
-          {/* Back Cards - Small Optimized Variants */}
+          {/* Back Cards - Hide on mobile if too cluttered */}
           <AnimatePresence>
             {[3, 2, 1].map((offset) => {
               const slide = getSlideInStack(offset)
@@ -100,7 +99,7 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                   animate={{ opacity: 0.5, rotate: rotation }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.8 }}
-                  className="absolute inset-0 rounded-[267px] overflow-hidden border border-white/10"
+                  className="absolute inset-0 rounded-[100px] md:rounded-[267px] overflow-hidden border border-white/10 hidden md:block"
                   style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
                 >
                   {slide.image && (
@@ -120,11 +119,11 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
             {slides.map((slide, i) => i === currentIndex && (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 100, rotate: -5 }}
+                initial={{ opacity: 0, y: 50, rotate: -2 }}
                 animate={{ opacity: 1, y: 0, rotate: 0 }}
-                exit={{ opacity: 0, y: -150, rotate: 5 }}
+                exit={{ opacity: 0, y: -100, rotate: 2 }}
                 transition={{ duration: 0.9, ease: [0.23, 1, 0.32, 1] }}
-                className="relative w-full min-h-[720px] h-auto rounded-[267px] border-[2px] border-[#FDF6C2] shadow-[18px_33px_17.4px_rgba(0,0,0,0.48)] overflow-hidden pointer-events-auto bg-[#272302]"
+                className="relative w-full min-h-[550px] md:min-h-[720px] h-auto rounded-[60px] md:rounded-[267px] border-[2px] border-[#FDF6C2] shadow-[18px_33px_17.4px_rgba(0,0,0,0.48)] overflow-hidden pointer-events-auto bg-[#272302]"
               >
                  {/* Card Image and Gradient */}
                  <div className="absolute inset-0 z-0">
@@ -144,31 +143,26 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                  </div>
 
                  {/* Content */}
-                 <div className="relative z-10 w-full h-full pt-[297px] pb-[60px]">
+                  <div className="relative z-10 w-full h-full pt-[180px] md:pt-[297px] pb-[60px] px-6 md:px-0">
                     <motion.div 
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="relative ml-[-36px] rounded-[40px] flex flex-col justify-start"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="relative md:ml-[-36px] flex flex-col justify-start w-full md:w-[958px] min-h-[220px] md:min-h-[285px] backdrop-blur-[10px]"
                       style={{ 
-                        width: "958px", 
-                        minHeight: "285px",
                         backgroundColor: textBoxColor,
-                        paddingLeft: "116px", 
-                        paddingTop: "33px",
-                        paddingRight: "60px",
-                        paddingBottom: "40px",
-                        backdropFilter: "blur(10px)"
+                        padding: "48px",
+                        paddingLeft: typeof window !== 'undefined' && window.innerWidth < 768 ? "48px" : "140px", 
                       }}
                     >
                       <div className="mb-6 relative">
-                        {/* 1. Behind Layer (Shadow/Stroke) */}
+                        {/* 1. Behind Layer (Shadow/Stroke) - Synchronize with Top layer */}
                         <h1 
-                          className="absolute inset-0 font-normal leading-tight"
+                          className="absolute inset-0 font-normal leading-tight text-center md:text-left"
                           style={{ 
-                            fontSize: `${adjustedTitleSize}px`,
+                            fontSize: "clamp(32px, 8vw, 60px)", // Synced size
                             fontFamily: "var(--font-paytone-one)",
                             color: "#8E5B10",
-                            WebkitTextStroke: "1.5px #ffffff", // Slightly more than 1px to compensate for visual shrink
+                            WebkitTextStroke: "1.5px #ffffff", 
                             transform: "translateY(8px)",
                             zIndex: 0
                           }}
@@ -178,9 +172,9 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
 
                         {/* 2. Top Primary Layer */}
                         <h1 
-                          className="relative font-normal leading-tight"
+                          className="relative font-normal leading-tight text-center md:text-left"
                           style={{ 
-                            fontSize: `${adjustedTitleSize}px`,
+                            fontSize: "clamp(32px, 8vw, 60px)",
                             fontFamily: "var(--font-paytone-one)",
                             color: titleColor,
                             textShadow: `0 4px 12.6px ${titleShadowColor}`,
@@ -191,11 +185,11 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                         </h1>
                       </div>
 
-                      <div>
+                      <div className="text-center md:text-left">
                         <p
-                          className="text-white font-semibold leading-tight lg:leading-[45px] tracking-tight"
+                          className="text-white font-semibold leading-normal tracking-tight"
                           style={{ 
-                            fontSize: `${adjustedDescSize}px`,
+                            fontSize: "clamp(16px, 4vw, 33px)",
                             fontFamily: "var(--font-anaheim)",
                             textShadow: "0 4px 7.8px rgba(0,0,0,0.71)"
                           }}

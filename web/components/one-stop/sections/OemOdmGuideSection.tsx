@@ -24,33 +24,24 @@ export function OemOdmGuideSection({ title, description, bgImage, ctaText = "REA
 
   return (
     <section 
-      className="relative w-full overflow-hidden bg-[#F6F4ED] flex justify-center items-start"
-      style={{ height: vw(SECTION_HEIGHT / 0.7) }}
+      className="relative w-full overflow-hidden bg-transparent py-16 md:py-24"
     >
-      <div 
-        className="relative flex-shrink-0 origin-top z-10"
-        style={{ 
-          width: `${DESIGN_WIDTH}px`,
-          height: `${SECTION_HEIGHT}px`,
-          transform: "scale(0.7)",
-        }}
-      >
-        {/* 1. Large "BUSROM" SVG Masked Image Area (1920x389) */}
-        <div className="absolute inset-x-0 top-[75px] h-[389px] flex items-center justify-center">
+      <div className="max-w-[1920px] mx-auto w-full flex flex-col items-center">
+        
+        {/* 1. Large "BUSROM" SVG Masked Image Area */}
+        <div className="relative w-full h-[150px] md:h-[389px] flex items-center justify-center mb-12 md:mb-16">
             {bgImage ? (
                 <div 
                   className="w-full h-full relative"
                   style={{
                     clipPath: "url(#busrom-clip)",
-                    // Add Webkit prefix as fallback
                     WebkitClipPath: "url(#busrom-clip)",
                   }}
                 >
                   <OptimizedImage 
                     image={bgImage} 
                     size="large" 
-                    className="absolute inset-0 w-full h-full" 
-                    objectFit="cover"
+                    className="absolute inset-0 w-full h-full object-cover" 
                   />
                 </div>
             ) : (
@@ -63,7 +54,6 @@ export function OemOdmGuideSection({ title, description, bgImage, ctaText = "REA
                 />
             )}
             
-            {/* Hidden SVG for clip-path definition */}
             <svg className="absolute w-0 h-0" aria-hidden="true">
               <defs>
                 <clipPath id="busrom-clip" clipPathUnits="objectBoundingBox">
@@ -75,62 +65,56 @@ export function OemOdmGuideSection({ title, description, bgImage, ctaText = "REA
             </svg>
         </div>
 
-        {/* 2. Text Description (y=705px approx, from JSON: y:15569 - 14864) */}
-        <div className="absolute left-[160px] top-[404px] w-[1400px] z-10 pointer-events-none">
-           {title && (
-             <h2 
-               className="font-black leading-[100px] mb-6"
-               style={{ 
-                 fontFamily: "var(--font-anaheim)", 
-                 fontSize: "100px", 
-                 fontWeight: 900,
-                 color: "#C4B647"
-               }}
-             >
-               {title.split('\n').map((line, i) => (
-                 <React.Fragment key={i}>
-                   {line}
-                   {i !== title.split('\n').length - 1 && <br />}
-                 </React.Fragment>
-               ))}
-             </h2>
-            )}
-         </div>
-
-        {/* 3. Description text separately positioned */}
-        <div className="absolute left-[160px] top-[705px] w-[909px]">
-           <motion.p 
-             initial={{ opacity: 0, y: 20 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             viewport={{ once: true }}
-             className="text-[#494949] text-[32px] font-semibold leading-[50px]"
-             style={{ fontFamily: "var(--font-anaheim)" }}
-           >
-              {description || "Busrom's business scope covers 100+ countries, not only has the ability to do OEM/ODM for our wholesalers and dealers, but also offers bespoke plans for designers, builders, and Enterprises."}
-           </motion.p>
-        </div>
-
-        {/* 4. Read More Link (y=770px approx) */}
-        <Link href={ctaLink} className="absolute left-[1575px] top-[756px] group flex items-center gap-[15px] hover:opacity-80 transition-opacity">
-           <span 
-             className="text-[#756F3F] text-[36px] font-bold leading-[33px] mt-2 text-right"
-             style={{ fontFamily: "var(--font-anaheim)" }}
-           >
-             {ctaText.split('\n').map((line, i) => (
-                 <React.Fragment key={i}>
-                   {line}
-                   {i !== ctaText.split('\n').length - 1 && <br />}
-                 </React.Fragment>
-             ))}
-           </span>
+        {/* 2. Text Content Container - Responsive */}
+        <div className="w-full flex flex-col md:flex-row justify-between items-center md:items-start px-10 md:pl-[140px] md:pr-[140px]">
            
-           {/* Custom Circular Arrow matching the Figma Vector specs (84.36x84.36) */}
-           <div className="w-[84px] h-[84px] rounded-full border border-[#756F3F] flex items-center justify-center relative overflow-hidden text-[#756F3F] group-hover:bg-[#756F3F] group-hover:text-white transition-colors duration-300">
-              <svg className="w-8 h-8 relative z-10 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                 <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
+           <div className="w-full md:w-[900px] mb-12 md:mb-0">
+              {title && (
+                <h2 
+                  className="text-[40px] md:text-[100px] font-black leading-tight md:leading-[100px] text-[#C4B647] mb-6 md:mb-10 text-center md:text-left"
+                  style={{ fontFamily: "var(--font-anaheim)" }}
+                >
+                  {title.split('\n').map((line, i) => (
+                    <React.Fragment key={i}>
+                      {line}
+                      {i !== title.split('\n').length - 1 && <br />}
+                    </React.Fragment>
+                  ))}
+                </h2>
+              )}
+
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="text-[#494949] text-[18px] md:text-[32px] font-semibold leading-relaxed md:leading-[50px] text-center md:text-left"
+                style={{ fontFamily: "var(--font-anaheim)" }}
+              >
+                 {description || "Busrom's business scope covers 100+ countries, not only has the ability to do OEM/ODM for our wholesalers and dealers, but also offers bespoke plans for designers, builders, and Enterprises."}
+              </motion.p>
            </div>
-        </Link>
+
+           {/* Read More Link */}
+           <Link href={ctaLink} className="flex items-center gap-[15px] hover:opacity-80 transition-opacity self-center md:self-end md:mb-4">
+              <span 
+                className="text-[#756F3F] text-[20px] md:text-[36px] font-bold leading-tight"
+                style={{ fontFamily: "var(--font-anaheim)" }}
+              >
+                {ctaText.split('\n').map((line, i) => (
+                    <React.Fragment key={i}>
+                      {line}
+                      {i !== ctaText.split('\n').length - 1 && <br />}
+                    </React.Fragment>
+                ))}
+              </span>
+              
+              <div className="w-12 h-12 md:w-[84px] md:h-[84px] rounded-full border border-[#756F3F] flex items-center justify-center text-[#756F3F] group-hover:bg-[#756F3F] group-hover:text-white transition-colors duration-300">
+                 <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                 </svg>
+              </div>
+           </Link>
+        </div>
       </div>
     </section>
   )
