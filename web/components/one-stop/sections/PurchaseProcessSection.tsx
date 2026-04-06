@@ -51,20 +51,14 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
 
   return (
     <section 
-      className="relative w-full overflow-hidden bg-[#F9F9F5] flex justify-center items-center" 
-      style={{ height: vw(922) }}
+      className="relative w-full overflow-hidden bg-transparent flex justify-center items-center py-12 md:py-0 md:h-[922px]" 
     >
-      <div className="relative w-[1165px] h-[645px] shrink-0">
+      <div className="relative w-full md:w-[1165px] h-auto md:h-[645px] flex flex-col md:block items-center px-10 md:px-0">
         
-        {/* Decorative Dashed Curves - Bottom Layer (Behind Image) */}
+        {/* Decorative Dashed Curves - Hide on mobile if they disrupt flow */}
         <div 
-          className="absolute pointer-events-none z-0"
-          style={{ 
-            left: "49px",
-            top: "192px",
-            width: "468px", 
-            height: "317px" 
-          }}
+          className="hidden md:block absolute pointer-events-none z-0"
+          style={{ left: "49px", top: "192px", width: "468px", height: "317px" }}
         >
            <svg width="100%" height="100%" viewBox="0 0 672 457" fill="none" className="w-full h-full">
               <path 
@@ -76,37 +70,14 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
            </svg>
         </div>
 
-        {/* Decorative Dashed Curves - Top Layer (Above Image/Title) */}
-        <div 
-          className="absolute pointer-events-none z-20"
-          style={{ 
-            left: "49px",
-            top: "192px",
-            width: "468px", 
-            height: "317px" 
-          }}
-        >
-           <svg width="100%" height="100%" viewBox="0 0 672 457" fill="none" className="w-full h-full">
-              <path 
-                d="M20.7206 298.054C-7.14999 199.203 -25.9867 1.5 121.632 1.5C269.25 1.5 442.624 111.61 510.859 166.664" 
-                stroke="#756F3F" strokeWidth="3" strokeDasharray="10 14" 
-                className="animate-dash-flow"
-              />
-              <circle cx="645.649" cy="260.161" r="8.23762" fill="#756F3F"/>
-              <circle cx="22.0609" cy="299.702" r="8.23762" fill="#756F3F"/>
-              <circle cx="511.376" cy="166.252" r="8.23762" fill="#756F3F"/>
-           </svg>
-        </div>
-
         {/* 1. Title */}
         <div 
-          className="absolute z-20 pointer-events-none"
-          style={{ left: "0px", top: "0px" }}
+          className="relative md:absolute z-20 md:pointer-events-none mb-10 md:mb-0 text-center md:text-left"
+          style={{ left: typeof window !== 'undefined' && window.innerWidth < 768 ? "0" : "0px", top: typeof window !== 'undefined' && window.innerWidth < 768 ? "0" : "0px" }}
         >
           <h2 
-            className="font-semibold leading-[1.2] tracking-wide"
+            className="font-semibold leading-tight tracking-wide text-[32px] md:text-[48px]"
             style={{ 
-              fontSize: "48px", 
               fontFamily: "var(--font-anaheim)",
               background: "linear-gradient(135deg, #756F3F 40%, rgba(117, 111, 63, 0.35) 100%)",
               WebkitBackgroundClip: "text",
@@ -119,22 +90,22 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
 
         {/* 2. Central Image (Capsule shape) */}
         <div 
-          className="absolute z-10"
-          style={{ left: "100px", top: "20px" }}
+          className="relative md:absolute z-10 mb-10 md:mb-0"
+          style={{ left: typeof window !== 'undefined' && window.innerWidth < 768 ? "auto" : "100px", top: typeof window !== 'undefined' && window.innerWidth < 768 ? "auto" : "20px" }}
         >
           <AnimatePresence mode="wait">
              {slides.map((slide, i) => i === index && (
                <motion.div 
                  key={i}
-                 initial={{ opacity: 0, y: 14 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 exit={{ opacity: 0, y: -14 }}
-                 transition={{ duration: 0.8, ease: "easeInOut" }}
+                 initial={{ opacity: 0, scale: 0.95 }}
+                 animate={{ opacity: 1, scale: 1 }}
+                 exit={{ opacity: 0, scale: 0.95 }}
+                 transition={{ duration: 0.8 }}
                  className="overflow-hidden shadow-2xl bg-white/50"
                  style={{ 
-                   width: "365px", 
-                   height: "620px", 
-                   borderRadius: "183px" 
+                   width: typeof window !== 'undefined' && window.innerWidth < 768 ? "260px" : "365px", 
+                   height: typeof window !== 'undefined' && window.innerWidth < 768 ? "440px" : "620px", 
+                   borderRadius: typeof window !== 'undefined' && window.innerWidth < 768 ? "130px" : "183px" 
                  }}
                >
                   <OptimizedImage 
@@ -148,23 +119,15 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
           </AnimatePresence>
         </div>
 
-        {/* 3. Circular Flow Diagram */}
+        {/* 3. Circular Flow Diagram & Steps Stacking */}
         <div 
-          className="absolute"
-          style={{ left: "569px", top: "48px", width: "596px", height: "596px" }}
+          className="relative md:absolute w-full max-w-[400px] md:max-w-none h-auto md:h-[596px]"
+          style={{ left: typeof window !== 'undefined' && window.innerWidth < 768 ? "auto" : "569px", top: typeof window !== 'undefined' && window.innerWidth < 768 ? "auto" : "48px", width: typeof window !== 'undefined' && window.innerWidth < 768 ? "100%" : "596px" }}
         >
-          <div className="absolute inset-0 rounded-full border border-[#756F3F] opacity-30 pointer-events-none" />
-          <div className="absolute pointer-events-none" style={{ inset: "50px" }}> 
-            <svg width="100%" height="100%" viewBox="0 0 710 710" fill="none">
-               <circle 
-                 cx="355" cy="355" r="354" 
-                 stroke="#756F3F" strokeWidth="1" strokeDasharray="8 8" opacity="0.5" 
-                 className="animate-dash-flow"
-               />
-            </svg>
-          </div>
-
-          <div className="relative w-full h-full">
+          {/* Background circle decorative - only for desktop */}
+          <div className="hidden md:block absolute inset-0 rounded-full border border-[#756F3F] opacity-30 pointer-events-none" />
+          
+          <div className="relative flex flex-col md:block items-center md:items-start gap-8 md:gap-0">
             {visibleSteps.map((step) => {
               let top = 298 
               let left = 50 
@@ -175,82 +138,56 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
               return (
                 <div 
                   key={step.id} 
-                  className="absolute" 
-                  style={{ left: left + "px", top: top + "px" }}
+                  className="relative md:absolute w-full md:w-auto" 
+                  style={{ 
+                    left: typeof window !== 'undefined' && window.innerWidth < 768 ? "0" : left + "px", 
+                    top: typeof window !== 'undefined' && window.innerWidth < 768 ? "0" : top + "px" 
+                  }}
                 >
                   {step.active ? (
-                    <>
-                      <motion.div 
-                        initial={{ scale: 0, rotate: -45 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        className="absolute bg-[#756F3F] rounded-full flex items-center justify-center shadow-xl z-20"
-                        style={{ 
-                          left: "-25px", 
-                          top: "-25px", 
-                          width: "50px", 
-                          height: "50px" 
-                        }}
-                      >
-                         <svg width="60%" height="60%" viewBox="0 0 40 40" fill="none">
-                            <path d="M20 6C15 6 11 10 11 15C11 18.2 12.5 21.1 15 23V28H25V23C27.5 21.1 29 18.2 29 15C29 10 25 6 20 6Z" fill="white" />
-                         </svg>
-                      </motion.div>
-                      
-                      <div 
-                        className="absolute flex flex-col"
-                        style={{ left: "38px", top: "-11px", minWidth: "245px" }} 
-                      >
+                    <div className="flex flex-col items-center md:items-start">
+                      <div className="flex items-center gap-4 mb-2">
+                        <motion.div 
+                          className="bg-[#756F3F] rounded-full flex items-center justify-center shadow-xl z-20 shrink-0"
+                          style={{ width: "40px", height: "40px" }}
+                        >
+                           <svg width="24" height="24" viewBox="0 0 40 40" fill="none">
+                              <path d="M20 6C15 6 11 10 11 15C11 18.2 12.5 21.1 15 23V28H25V23C27.5 21.1 29 18.2 29 15C29 10 25 6 20 6Z" fill="white" />
+                           </svg>
+                        </motion.div>
                         <span 
-                          className="font-bold text-[#141414] tracking-widest" 
-                          style={{ fontSize: "24px", fontFamily: "var(--font-anaheim)" }}
+                          className="font-bold text-[#141414] tracking-widest text-[20px] md:text-[24px]" 
+                          style={{ fontFamily: "var(--font-anaheim)" }}
                         >
                           {step.id}. {step.data.title}
                         </span>
-                        
-                        <AnimatePresence mode="wait">
-                           {slides.map((slide, i) => i === index && (
-                             <motion.p 
-                               key={i}
-                               initial={{ opacity: 0, x: -7 }}
-                               animate={{ opacity: 1, x: 0 }}
-                               exit={{ opacity: 0, x: 7 }}
-                               className="font-medium text-[#7A7A7A] leading-[1.4] mt-1"
-                               style={{ fontSize: "16px", fontFamily: "var(--font-anaheim)" }}
-                             >
-                               {slide.description}
-                             </motion.p>
-                           ))}
-                        </AnimatePresence>
                       </div>
-                    </>
+                      <p 
+                        className="font-medium text-[#7A7A7A] leading-[1.4] text-center md:text-left max-w-[280px] md:max-w-[245px]"
+                        style={{ fontSize: "16px", fontFamily: "var(--font-anaheim)" }}
+                      >
+                        {step.data.description}
+                      </p>
+                    </div>
                   ) : (
                     <button 
                       onClick={step.onClick}
-                      className="absolute group flex items-center"
-                      style={{ left: "-17px", top: "-17px", width: "max-content" }} 
+                      className="group flex items-center justify-center md:justify-start gap-4 transition-opacity duration-300 hover:opacity-100 opacity-60 md:opacity-100"
                     >
                       <div 
-                        className="bg-[#F9F9F5] border border-[#756F3F]/40 group-hover:bg-[#756F3F] group-hover:border-[#756F3F] hover:shadow-md transition-all duration-300 rounded-full flex items-center justify-center z-10 shrink-0"
+                        className="bg-white border border-[#756F3F]/40 group-hover:bg-[#756F3F] group-hover:border-[#756F3F] rounded-full flex items-center justify-center transition-all duration-300 shrink-0"
                         style={{ width: "34px", height: "34px" }} 
                       >
-                         {step.pos === 'top' ? (
-                           <svg width="60%" height="60%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[#756F3F] group-hover:text-white transition-colors duration-300">
-                             <path d="M7 17L17 7M17 7H7M17 7V17" />
-                           </svg>
-                         ) : (
-                           <svg width="60%" height="60%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[#756F3F] group-hover:text-white transition-colors duration-300">
-                             <path d="M7 7L17 17M17 17V7M17 17H7" />
-                           </svg>
-                         )}
+                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[#756F3F] group-hover:text-white">
+                           <path d={step.pos === 'top' ? "M7 17L17 7M17 7H7M17 7V17" : "M7 7L17 17M17 17V7M17 17H7"} />
+                         </svg>
                       </div>
-                      <div className="ml-3"> 
-                        <span 
-                          className="font-bold text-[#141414] tracking-widest uppercase transition-colors duration-300 group-hover:text-[#756F3F]" 
-                          style={{ fontSize: "20px", fontFamily: "var(--font-anaheim)" }} 
-                        >
-                          {step.id}. {step.data.title}
-                        </span>
-                      </div>
+                      <span 
+                        className="font-bold text-[#141414] tracking-widest uppercase transition-colors duration-300 group-hover:text-[#756F3F] text-[18px] md:text-[20px]" 
+                        style={{ fontFamily: "var(--font-anaheim)" }} 
+                      >
+                        {step.id}. {step.data.title}
+                      </span>
                     </button>
                   )}
                 </div>
