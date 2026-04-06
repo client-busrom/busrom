@@ -6,7 +6,7 @@ import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 import { ServiceOverviewTemplate } from "./ServiceOverviewTemplate"
 import { ContactUsTemplate } from "./ContactUsTemplate"
 import { OemOdmTemplate } from "./OemOdmTemplate"
-import { OneStopShopTemplate } from "./OneStopShopTemplate"
+import { OneStopSolutionTemplate } from "./OneStopSolutionTemplate"
 import { ApplicationTemplate } from "./ApplicationTemplate"
 import { OurStoryTemplate } from "./OurStoryTemplate"
 import { SupportTemplate } from "./SupportTemplate"
@@ -135,9 +135,9 @@ export function TemplatePage({ locale, slug, template }: TemplatePageProps) {
     return <OemOdmTemplate locale={locale} pageContent={pageContent} />
   }
 
-  // ONE_STOP_SHOP template
-  if (template === "ONE_STOP_SHOP") {
-    return <OneStopShopTemplate locale={locale} pageContent={pageContent} />
+  // ONE_STOP_SOLUTION template (legacy ONE_STOP_SHOP)
+  if (template === "ONE_STOP_SHOP" || template === "ONE_STOP_SOLUTION") {
+    return <OneStopSolutionTemplate locale={locale} pageContent={pageContent} />
   }
 
   // APPLICATION template

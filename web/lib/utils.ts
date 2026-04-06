@@ -63,9 +63,9 @@ export function resolveInternalLink(url: string | null | undefined): string {
     path = path.replace(/^\/product\//, '/products/')
   }
 
-  // 2. 修正 One-Stop Shop 特定路径
-  if (path === '/service/one-stop') {
-    path = '/service/one-stop-shop'
+  // 2. 修正 One-Stop Solution 特定路径
+  if (path === '/service/one-stop' || path === '/service/one-stop-shop') {
+    path = '/service/one-stop-solution'
   }
 
   // 3. 修正旧版 series 参数

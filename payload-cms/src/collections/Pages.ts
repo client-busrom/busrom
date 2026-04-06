@@ -120,14 +120,14 @@ export const Pages: CollectionConfig = {
               unique: true,
               admin: {
                 description: {
-                  en: 'Full URL path for frontend routing. e.g.: /service/one-stop-shop, /about-us/story',
-                  zh: '前端路由的完整URL路径。例如：/service/one-stop-shop, /about-us/story',
+                  en: 'Full URL path for frontend routing. e.g.: /service/one-stop-solution, /about-us/story',
+                  zh: '前端路由的完整URL路径。例如：/service/one-stop-solution, /about-us/story',
                 },
               },
               validate: (value: any) => {
                 if (!value) return true
                 if (!value.startsWith('/')) {
-                  return 'Path must start with / (e.g., /service/one-stop-shop)'
+                  return 'Path must start with / (e.g., /service/one-stop-solution)'
                 }
                 const pathRegex = /^\/[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*$/
                 if (!pathRegex.test(value)) {
