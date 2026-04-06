@@ -41,45 +41,46 @@ export function BrandHighlightsSection({
   const currentItem = items[index]
   const previewItem = items[nextIndex]
 
-  // 计算从缩略图到主图的偏移量 (x = 153 - 1171, y = 746 - 141)
-  const flyOffsetX = -1018
-  const flyOffsetY = 605
-  const flyScale = 282 / 777 // 0.363
-
   return (
-    <section className="relative w-full overflow-hidden flex flex-col items-center pt-[120px] pb-[200px]">
+    <section className="relative w-full overflow-hidden flex flex-col items-center pt-[120px] pb-[80px]">
       
-      {/* 70% Scale Container */}
-      <div className="relative w-[1920px] h-[1207px] origin-top flex flex-col flex-shrink-0" 
-        style={{ 
-          transform: "scale(0.7)",
-          marginBottom: "-362px" 
-        }}
-      >
+      {/* 1. DESKTOP/TABLET CONTENT (Visible on MD and above) */}
+      <div className="hidden md:block relative w-full max-w-[1344px] mx-auto aspect-[1344/845] shrink-0">
         
-        {/* Decorative Ellipses */}
-        <div 
-          className="absolute left-[859px] top-[0px] w-[503px] h-[503px] rounded-full bg-[#EBE8D8] opacity-[0.31]"
+        {/* Decorative Ellipses (Animated) */}
+        <motion.div 
+          animate={{ 
+            y: [0, -30, 0],
+            scale: [1, 1.05, 1]
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute left-[42.7%] top-0 w-[26.2%] aspect-square rounded-full bg-[#EBE8D8] opacity-[0.31]"
         />
-        <div 
-          className="absolute left-[337px] top-[674px] w-[195px] h-[195px] rounded-full bg-[#ECE8D8]"
+        <motion.div 
+          animate={{ 
+            x: [0, 20, 0],
+            y: [0, 15, 0],
+            scale: [1, 1.1, 1]
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute left-[15.5%] top-[55.8%] w-[10.1%] aspect-square rounded-full bg-[#ECE8D8]"
         />
 
         {/* 1. Section Title */}
-        <div className="absolute left-[153px] top-[114px] flex flex-col">
+        <div className="absolute left-[5.96%] top-[9.45%] flex flex-col">
           <h2 
-            className="text-[128px] font-[800] leading-[0.74]"
+            className="text-[6.66vw] xl:text-[89.6px] font-[800] leading-[0.74]"
             style={{ 
               fontFamily: "var(--font-anaheim)",
               color: "#F6F4ED",
-              WebkitTextStroke: "2px #756F3F",
+              WebkitTextStroke: "4px #756F3F",
               paintOrder: "stroke fill",
               marginBottom: "10px"
             }}
             dangerouslySetInnerHTML={{ __html: (titleLine1 || "").replace(/\n/g, '<br />') }}
           />
           <h2 
-            className="text-[96px] font-[800] leading-[1.09] text-black"
+            className="text-[5vw] xl:text-[67.2px] font-[800] leading-[1.09] text-black"
             style={{ fontFamily: "var(--font-anaheim)" }}
           >
             {titleLine2}
@@ -87,7 +88,7 @@ export function BrandHighlightsSection({
         </div>
 
         {/* 2. Main Description */}
-        <div className="absolute left-[153px] top-[376px] w-[819px] h-[253px]">
+        <div className="absolute left-[5.96%] top-[31.1%] w-[42.6%] h-[21%]">
           <AnimatePresence mode="wait">
             {items.map((item, i) => i === index && (
               <motion.p 
@@ -96,7 +97,7 @@ export function BrandHighlightsSection({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5 }}
-                className="text-[24px] font-[600] leading-[39px] text-black"
+                className="text-[1.25vw] xl:text-[16.8px] font-[600] leading-[1.6] text-black"
                 style={{ fontFamily: "var(--font-anaheim)" }}
               >
                 {item.description}
@@ -106,52 +107,52 @@ export function BrandHighlightsSection({
         </div>
 
         {/* 3. Navigation Buttons */}
-        <div className="absolute left-[819px] top-[1049px] flex gap-[46px] z-30">
+        <div className="absolute left-[40.6%] top-[86.9%] flex gap-[3.4%] z-30">
            {/* Prev */}
            <button 
              onClick={handlePrev}
-             className="w-[104px] h-[104px] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white hover:scale-110 transition-all active:scale-95"
+             className="w-[5.4vw] h-[5.4vw] xl:w-[72.8px] xl:h-[72.8px] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95 group"
            >
-              <svg width="23" height="40" viewBox="0 0 23 40" fill="none">
+              <svg width="40%" height="40%" viewBox="0 0 23 40" fill="none">
                 <path d="M21 2L2 20L21 38" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
            </button>
            {/* Next */}
            <button 
              onClick={handleNext}
-             className="w-[104px] h-[104px] rounded-full bg-[#756F3F] flex items-center justify-center shadow-lg hover:scale-110 transition-transform active:scale-95"
+             className="w-[5.4vw] h-[5.4vw] xl:w-[72.8px] xl:h-[72.8px] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95 group"
            >
-              <svg width="23" height="40" viewBox="0 0 23 40" fill="none">
-                <path d="M2 2L21 20L2 38" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg width="40%" height="40%" viewBox="0 0 23 40" fill="none">
+                <path d="M2 2L21 20L2 38" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
            </button>
         </div>
 
         {/* 4. Large Main Image (Right Side) */}
-        <div className="absolute left-[1171px] top-[141px] w-[777px] h-[1066px] z-10 pointer-events-none">
+        <div className="absolute left-[59%] top-[11.7%] w-[40.4%] h-[88.3%] z-10 pointer-events-none">
           <AnimatePresence mode="popLayout" custom={direction}>
             {items.map((item, i) => i === index && (
               <motion.div
                 key={item.id}
                 initial={direction === 1 ? {
-                  x: flyOffsetX,
-                  y: flyOffsetY,
-                  scale: flyScale,
+                  x: "-70%",
+                  y: "50%",
+                  scale: 0.36,
                   opacity: 1
                 } : { opacity: 0, x: 100 }}
                 animate={{ x: 0, y: 0, scale: 1, opacity: 1 }}
                 exit={direction === 1 ? { opacity: 0, scale: 1.1 } : {
-                  x: flyOffsetX,
-                  y: flyOffsetY,
-                  scale: flyScale,
-                  opacity: 0.5
+                  x: "-70%",
+                  y: "50%",
+                  scale: 0.36,
+                  opacity: 0
                 }}
                 transition={{ 
                   duration: 0.9, 
                   ease: [0.23, 1, 0.32, 1],
                   opacity: { duration: 0.4 }
                 }}
-                className="w-full h-full rounded-[30px] overflow-hidden shadow-2xl"
+                className="w-full h-full rounded-[2vw] xl:rounded-[30px] overflow-hidden shadow-2xl"
               >
                 <OptimizedImage 
                   image={item.image} 
@@ -165,9 +166,9 @@ export function BrandHighlightsSection({
         </div>
 
         {/* 5. Thumbnail Preview Group (Bottom Left) */}
-        <div className="absolute left-[153px] top-[746px] w-[282px] flex flex-col gap-[32px] z-20">
+        <div className="absolute left-[5.96%] top-[61.8%] w-[14.7%] flex flex-col gap-[10%] z-20">
            {/* Thumbnail Image */}
-           <div className="w-[282px] h-[375px] rounded-[30px] overflow-hidden shadow-xl">
+           <div className="w-full aspect-[282/375] rounded-[1.5vw] xl:rounded-[20px] overflow-hidden shadow-xl">
              <AnimatePresence mode="popLayout">
                 {items.map((item, i) => i === nextIndex && (
                   <motion.div
@@ -190,7 +191,7 @@ export function BrandHighlightsSection({
            </div>
            
            {/* Thumbnail Text Summary */}
-           <div className="h-[52px]">
+           <div className="mt-4">
              <AnimatePresence mode="wait">
                 {items.map((item, i) => i === nextIndex && (
                   <motion.p 
@@ -199,7 +200,7 @@ export function BrandHighlightsSection({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="text-[20px] font-[600] leading-[26px] text-[#626262] line-clamp-2"
+                    className="text-[1.1vw] xl:text-[14px] font-[600] leading-[1.3] text-[#626262] line-clamp-2"
                     style={{ fontFamily: "var(--font-anaheim)" }}
                   >
                     {item.summary}
@@ -210,6 +211,7 @@ export function BrandHighlightsSection({
         </div>
 
       </div>
+
       {/* Mobile Layout */}
       <div className="md:hidden px-6 w-full flex flex-col gap-6 mt-12">
          <div className="flex flex-col">
@@ -224,7 +226,7 @@ export function BrandHighlightsSection({
            />
          </div>
          <p className="text-base text-gray-700 leading-relaxed font-semibold">{currentItem.description}</p>
-         <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-lg">
+         <div className="relative w-full max-w-[320px] mx-auto aspect-[3/4] rounded-3xl overflow-hidden shadow-lg">
            <AnimatePresence mode="wait">
              <motion.div
                key={index}
@@ -238,19 +240,25 @@ export function BrandHighlightsSection({
              </motion.div>
            </AnimatePresence>
          </div>
-         <div className="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-[#EBE8D8]">
-           <div className="flex-1 mr-4">
-             <p className="text-xs text-[#756F3F] uppercase font-bold mb-1">Next Slide</p>
-             <p className="text-sm font-semibold line-clamp-1">{previewItem.summary}</p>
-           </div>
-           <div className="flex gap-2">
-             <button onClick={handlePrev} className="w-12 h-12 rounded-full border border-[#756F3F] flex items-center justify-center">
-               <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M8 2L2 8L8 14" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-             </button>
-             <button onClick={handleNext} className="w-12 h-12 rounded-full bg-[#756F3F] text-white flex items-center justify-center">
-               <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M2 2L8 8L2 14" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-             </button>
-           </div>
+         
+         {/* Centered Buttons */}
+         <div className="flex justify-center items-center gap-8 pt-4">
+           <button 
+             onClick={handlePrev} 
+             className="w-14 h-14 rounded-full border-2 border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] active:bg-[#756F3F] active:text-white transition-all shadow-sm"
+           >
+             <svg width="12" height="20" viewBox="0 0 10 16" fill="none">
+               <path d="M8 2L2 8L8 14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+             </svg>
+           </button>
+           <button 
+             onClick={handleNext} 
+             className="w-14 h-14 rounded-full border-2 border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] active:bg-[#756F3F] active:text-white transition-all shadow-sm"
+           >
+             <svg width="12" height="20" viewBox="0 0 10 16" fill="none">
+               <path d="M2 2L8 8L2 14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+             </svg>
+           </button>
          </div>
       </div>
     </section>
