@@ -60,7 +60,7 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
   const prevProduct = () => setCurrentIndex((prev) => (prev - 1 + validProducts.length) % validProducts.length)
 
   return (
-    <section className="relative w-full overflow-hidden bg-[#F9F9F5] flex justify-center items-center" style={{ height: "922px" }}>
+    <section className="relative w-full overflow-hidden flex justify-center items-center" style={{ height: "922px" }}>
       
       {/* 70% Scale Container */}
       <div 
