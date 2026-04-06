@@ -42,10 +42,10 @@ export function BrandHighlightsSection({
   const previewItem = items[nextIndex]
 
   return (
-    <section className="relative w-full overflow-hidden flex flex-col items-center pt-[120px] pb-[80px]">
+    <section className="relative w-full overflow-hidden flex flex-col items-center justify-center pt-[120px] pb-[80px] md:h-[62.79vw] xl:h-[1205.7px]">
       
       {/* 1. DESKTOP/TABLET CONTENT (Visible on MD and above) */}
-      <div className="hidden md:block relative w-full max-w-[1344px] mx-auto aspect-[1344/845] shrink-0">
+      <div className="hidden md:block relative w-full max-w-[1536px] mx-auto aspect-[1344/845] h-[50.3vw] xl:h-[965.7px] shrink-0">
         
         {/* Decorative Ellipses (Animated) */}
         <motion.div 
@@ -69,7 +69,7 @@ export function BrandHighlightsSection({
         {/* 1. Section Title */}
         <div className="absolute left-[5.96%] top-[9.45%] flex flex-col">
           <h2 
-            className="text-[6.66vw] xl:text-[89.6px] font-[800] leading-[0.74]"
+            className="text-[6.66vw] xl:text-[102.4px] font-[800] leading-[0.74]"
             style={{ 
               fontFamily: "var(--font-anaheim)",
               color: "#F6F4ED",
@@ -80,7 +80,7 @@ export function BrandHighlightsSection({
             dangerouslySetInnerHTML={{ __html: (titleLine1 || "").replace(/\n/g, '<br />') }}
           />
           <h2 
-            className="text-[5vw] xl:text-[67.2px] font-[800] leading-[1.09] text-black"
+            className="text-[5vw] xl:text-[76.8px] font-[800] leading-[1.09] text-black"
             style={{ fontFamily: "var(--font-anaheim)" }}
           >
             {titleLine2}
@@ -88,7 +88,7 @@ export function BrandHighlightsSection({
         </div>
 
         {/* 2. Main Description */}
-        <div className="absolute left-[5.96%] top-[31.1%] w-[42.6%] h-[21%]">
+        <div className="absolute left-[5.96%] top-[36%] w-[42.6%] h-[21%]">
           <AnimatePresence mode="wait">
             {items.map((item, i) => i === index && (
               <motion.p 
@@ -97,7 +97,7 @@ export function BrandHighlightsSection({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5 }}
-                className="text-[1.25vw] xl:text-[16.8px] font-[600] leading-[1.6] text-black"
+                className="text-[1.25vw] xl:text-[19.2px] font-[600] leading-[1.6] text-black"
                 style={{ fontFamily: "var(--font-anaheim)" }}
               >
                 {item.description}
@@ -107,11 +107,11 @@ export function BrandHighlightsSection({
         </div>
 
         {/* 3. Navigation Buttons */}
-        <div className="absolute left-[40.6%] top-[86.9%] flex gap-[3.4%] z-30">
+        <div className="absolute left-[40.6%] top-[92%] flex gap-[3.4%] z-30">
            {/* Prev */}
            <button 
              onClick={handlePrev}
-             className="w-[5.4vw] h-[5.4vw] xl:w-[72.8px] xl:h-[72.8px] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95 group"
+             className="w-[5.4vw] h-[5.4vw] xl:w-[83.2px] xl:h-[83.2px] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95 group"
            >
               <svg width="40%" height="40%" viewBox="0 0 23 40" fill="none">
                 <path d="M21 2L2 20L21 38" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
@@ -120,7 +120,7 @@ export function BrandHighlightsSection({
            {/* Next */}
            <button 
              onClick={handleNext}
-             className="w-[5.4vw] h-[5.4vw] xl:w-[72.8px] xl:h-[72.8px] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95 group"
+             className="w-[5.4vw] h-[5.4vw] xl:w-[83.2px] xl:h-[83.2px] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95 group"
            >
               <svg width="40%" height="40%" viewBox="0 0 23 40" fill="none">
                 <path d="M2 2L21 20L2 38" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
@@ -152,7 +152,7 @@ export function BrandHighlightsSection({
                   ease: [0.23, 1, 0.32, 1],
                   opacity: { duration: 0.4 }
                 }}
-                className="w-full h-full rounded-[2vw] xl:rounded-[30px] overflow-hidden shadow-2xl"
+                className="w-full h-full rounded-[2vw] xl:rounded-[34.2px] overflow-hidden shadow-2xl"
               >
                 <OptimizedImage 
                   image={item.image} 
@@ -166,9 +166,9 @@ export function BrandHighlightsSection({
         </div>
 
         {/* 5. Thumbnail Preview Group (Bottom Left) */}
-        <div className="absolute left-[5.96%] top-[61.8%] w-[14.7%] flex flex-col gap-[10%] z-20">
+        <div className="absolute left-[5.96%] top-[66%] w-[14.7%] flex flex-col gap-8 z-20">
            {/* Thumbnail Image */}
-           <div className="w-full aspect-[282/375] rounded-[1.5vw] xl:rounded-[20px] overflow-hidden shadow-xl">
+           <div className="w-full aspect-[282/375] rounded-[1.5vw] xl:rounded-[22.8px] overflow-hidden shadow-xl">
              <AnimatePresence mode="popLayout">
                 {items.map((item, i) => i === nextIndex && (
                   <motion.div
@@ -200,7 +200,7 @@ export function BrandHighlightsSection({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="text-[1.1vw] xl:text-[14px] font-[600] leading-[1.3] text-[#626262] line-clamp-2"
+                    className="text-[1.1vw] xl:text-[16px] font-[600] leading-[1.3] text-[#626262] line-clamp-2"
                     style={{ fontFamily: "var(--font-anaheim)" }}
                   >
                     {item.summary}
