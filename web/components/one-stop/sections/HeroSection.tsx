@@ -160,14 +160,31 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                         backdropFilter: "blur(10px)"
                       }}
                     >
-                      <div className="mb-6">
+                      <div className="mb-6 relative">
+                        {/* 1. Behind Layer (Shadow/Stroke) */}
                         <h1 
-                          className="font-normal leading-tight"
+                          className="absolute inset-0 font-normal leading-tight"
+                          style={{ 
+                            fontSize: `${adjustedTitleSize}px`,
+                            fontFamily: "var(--font-paytone-one)",
+                            color: "#8E5B10",
+                            WebkitTextStroke: "1.5px #ffffff", // Slightly more than 1px to compensate for visual shrink
+                            transform: "translateY(8px)",
+                            zIndex: 0
+                          }}
+                        >
+                          {slide.title}
+                        </h1>
+
+                        {/* 2. Top Primary Layer */}
+                        <h1 
+                          className="relative font-normal leading-tight"
                           style={{ 
                             fontSize: `${adjustedTitleSize}px`,
                             fontFamily: "var(--font-paytone-one)",
                             color: titleColor,
-                            textShadow: `2px 2px 0px rgba(255,255,255,0.05), 0 4px 12.6px ${titleShadowColor}`
+                            textShadow: `0 4px 12.6px ${titleShadowColor}`,
+                            zIndex: 1
                           }}
                         >
                           {slide.title}
@@ -182,9 +199,8 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                             fontFamily: "var(--font-anaheim)",
                             textShadow: "0 4px 7.8px rgba(0,0,0,0.71)"
                           }}
-                        >
-                          {slide.description}
-                        </p>
+                          dangerouslySetInnerHTML={{ __html: (slide.description || "").replace(/\n/g, '<br />') }}
+                        />
                       </div>
                     </motion.div>
                  </div>

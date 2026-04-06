@@ -52,6 +52,8 @@ export class ApplicationCarouselNode extends DecoratorNode<React.ReactElement> {
   createDOM(config: EditorConfig): HTMLElement {
     const div = document.createElement('div')
     div.className = 'application-carousel-node'
+    div.style.width = '100%'
+    div.style.display = 'block'
     return div
   }
 

@@ -161,7 +161,7 @@ export const CarouselComponent: React.FC<CarouselComponentProps> = ({ nodeKey, d
 
   if (isEditing) {
     return (
-      <div style={{ margin: '16px 0', padding: '16px', border: '2px solid #A08745', borderRadius: '8px', backgroundColor: '#ffffff' }}>
+      <div style={{ margin: '16px 0', padding: '16px', border: '2px solid #A08745', borderRadius: '8px', backgroundColor: '#ffffff', width: '100%', minWidth: '100%' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>
             {i18n?.language === 'zh' ? '编辑轮播图' : 'Edit Carousel'}
@@ -188,7 +188,7 @@ export const CarouselComponent: React.FC<CarouselComponentProps> = ({ nodeKey, d
         </div>
 
         {/* Slides Editor */}
-        <div style={{ marginBottom: '16px' }}>
+        <div style={{ marginBottom: '16px', width: '100%' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
             <label style={{ fontSize: '14px', fontWeight: 500 }}>
               {i18n?.language === 'zh' ? '图片列表' : 'Slides'}
@@ -202,8 +202,8 @@ export const CarouselComponent: React.FC<CarouselComponentProps> = ({ nodeKey, d
             </button>
           </div>
 
-          {/* Horizontal grid layout - fixed 3 columns */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+          {/* Horizontal grid layout - fixed 1 column */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(1, 1fr)', gap: '12px', width: '100%' }}>
             {localData.slides.map((slide, index) => {
               const imageId = slide.image && typeof slide.image === 'object' && 'id' in slide.image ? slide.image.id : null
               const imageUrl = imageId ? imageUrls[imageId] : null

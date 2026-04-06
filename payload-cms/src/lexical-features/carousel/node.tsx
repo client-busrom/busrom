@@ -60,6 +60,8 @@ export class CarouselNode extends DecoratorNode<React.ReactElement> {
   createDOM(config: EditorConfig): HTMLElement {
     const div = document.createElement('div')
     div.className = 'carousel-node'
+    div.style.width = '100%'
+    div.style.display = 'block'
     return div
   }
 
