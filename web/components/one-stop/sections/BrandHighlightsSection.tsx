@@ -107,7 +107,7 @@ export function BrandHighlightsSection({
         </div>
 
         {/* 3. Navigation Buttons */}
-        <div className="absolute left-[40.6%] top-[92%] flex gap-[3.4%] z-30">
+        <div className="absolute left-[40.6%] top-[92%] flex gap-8 z-30">
            {/* Prev */}
            <button 
              onClick={handlePrev}
@@ -166,7 +166,7 @@ export function BrandHighlightsSection({
         </div>
 
         {/* 5. Thumbnail Preview Group (Bottom Left) */}
-        <div className="absolute left-[5.96%] top-[66%] w-[14.7%] flex flex-col gap-8 z-20">
+        <div className="absolute left-[5.96%] top-[66%] w-[14.7%] flex flex-col gap-[10%] z-20">
            {/* Thumbnail Image */}
            <div className="w-full aspect-[282/375] rounded-[1.5vw] xl:rounded-[22.8px] overflow-hidden shadow-xl">
              <AnimatePresence mode="popLayout">
