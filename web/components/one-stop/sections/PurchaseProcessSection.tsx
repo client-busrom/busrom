@@ -165,7 +165,7 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
                  initial={{ opacity: 0, rotateY: 90 }}
                  animate={{ opacity: 1, rotateY: 0 }}
                  exit={{ opacity: 0, rotateY: -90 }}
-                 transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                 transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
                  className="overflow-hidden shadow-2xl bg-white/50"
                  style={{ 
                    width: vw(365), 

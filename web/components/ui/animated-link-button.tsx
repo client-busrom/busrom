@@ -9,16 +9,21 @@ type AnimatedLinkButtonProps = {
   className?: string;
   variant?: "light" | "dark"; // light: 浅色背景用, dark: 深色背景用
   ballColor?: string; // 自定义球体颜色
+  style?: React.CSSProperties; // 支持外部样式覆盖
 };
 
 export function AnimatedLinkButton({ 
   children, 
   className, 
   variant = "light",
-  ballColor: customBallColor
+  ballColor: customBallColor,
+  style: externalStyle
 }: AnimatedLinkButtonProps) {
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
   const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
-  const ballSize = vw(60);
+  
+  // Responsive defaults using clamp() or simple px for mobile
+  const ballSize = isMobile ? "44px" : vw(60);
 
   const isDark = variant === "dark";
   const ballColor = customBallColor || (isDark ? "#5C5623" : "#ECE8D8");
@@ -33,10 +38,11 @@ export function AnimatedLinkButton({
       )}
       style={{
         height: ballSize,
-        paddingLeft: vw(40),
-        paddingRight: vw(24),
-        fontSize: vw(32),
-        lineHeight: vw(30),
+        paddingLeft: isMobile ? "24px" : vw(40),
+        paddingRight: isMobile ? "16px" : vw(24),
+        fontSize: isMobile ? "18px" : vw(32),
+        lineHeight: isMobile ? "1.2" : vw(30),
+        ...externalStyle
       }}
     >
       {/* 小球 - 使用 CSS animation 实现左右移动 */}
