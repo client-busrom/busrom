@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from "react"
-import { motion, useMotionValue, animate } from "framer-motion"
+import React, { useState } from "react"
+import { motion } from "framer-motion"
 
 interface SectionSlide {
   title: string
@@ -14,68 +14,49 @@ interface AdvantagesSectionProps {
   advantages: SectionSlide[]
 }
 
-/**
- * AdvantagesSection - Advantages and features
- * Rebuilt to support Draggable Carousel and Conditional Shadow on Active Item.
- */
+const DESIGN_WIDTH = 1920
+const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
+
 export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps) {
   const [index, setIndex] = useState(0)
-  const x = useMotionValue(0)
   
-  // Card spacing from Figma: Card width 465 + gap 20 = 485px
-  const cardWidthWithGap = 485
-  const basePadding = 367 // Figma x coordinate for first card
+  // 1920 Design scaling - Ultra-wide and tall to restore image proportions
+  const cardWidth = 480
+  const cardHeight = 700
+  const gap = 30
+  const basePadding = 256.9
 
-  // Removed auto-interval to match SupportQualityControlSection manual-only behavior
-  useEffect(() => {
-    // We no longer automatically increment index
-  }, [advantages])
-
-  useEffect(() => {
-    // Match SupportQualityControlSection logic:
-    // If index <= 1, show from start (translateX = 0)
-    // Otherwise, translate so the active item is in the 2nd slot (index - 1)
-    let targetX = 0
-    if (index > 1) {
-      targetX = -(index - 1) * cardWidthWithGap
-    }
-    
-    // Nudge for the last item if it's the end of a long list
-    if (index === advantages.length - 1 && advantages.length > 3) {
-      targetX -= 100 // Small extra peek for the last one
-    }
-
-    animate(x, targetX, {
-      type: "spring",
-      stiffness: 100, // Matches SupportQualityControlSection
-      damping: 20,
-    })
-  }, [index, advantages.length, cardWidthWithGap])
+  // Logic: Active item slides into the 2nd slot (offset by basePadding)
+  const scrollOffset = -index * (cardWidth + gap)
 
   if (!advantages || advantages.length === 0) return null
 
   return (
-    <section className="relative w-full overflow-hidden bg-[#F9F9F5] flex justify-center items-start" style={{ height: "922px" }}>
-      
-      {/* 70% Scale Container */}
-      <div 
-        className="relative w-[1920px] h-[1317px] origin-top flex-shrink-0"
-        style={{ transform: "scale(0.7)" }}
-      >
+    <section 
+      className="relative w-full overflow-visible select-none"
+      style={{ minHeight: vw(922) }}
+    >
+      <div className="flex flex-col w-full h-full">
         
-        {/* 1. Background Decoration */}
+        {/* 1. Background decorative circular element */}
         <div 
-          className="absolute left-[-469px] top-[0px] w-[1280px] h-[1280px] rounded-full pointer-events-none"
+          className="absolute rounded-full pointer-events-none"
           style={{ 
-            background: "linear-gradient(to bottom, rgba(236, 232, 216, 0.28) 0%, rgba(236, 232, 216, 1) 100%)" 
+            left: vw(-328.3), 
+            top: vw(-280),    
+            width: vw(896),   
+            height: vw(896),
+            background: "linear-gradient(to bottom, rgba(236, 232, 216, 0.28) 0%, rgba(236, 232, 216, 1) 100%)",
+            opacity: 0.8
           }}
         />
 
-        {/* 2. Section Title */}
-        <div className="absolute left-[153px] top-[100px] w-[925px] z-20 pointer-events-none">
+        {/* 2. Section Title - Using Golden Scale (60px) */}
+        <div className="relative z-20 pointer-events-none" style={{ paddingLeft: vw(107.1), marginBottom: vw(56), width: vw(1000) }}>
           <h2 
-            className="text-[64px] font-semibold leading-[88px] tracking-tight text-[#756F3F]"
+            className="font-semibold leading-tight tracking-tight text-[#756F3F]"
             style={{ 
+              fontSize: vw(60), 
               fontFamily: "var(--font-anaheim)",
               background: "linear-gradient(to right, #756F3F 0%, rgba(117, 111, 63, 0.5) 100%)",
               WebkitBackgroundClip: "text",
@@ -85,89 +66,91 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
           />
         </div>
 
-        {/* 3. Draggable Carousel Track */}
-        <div className="absolute left-0 top-[380px] w-full h-[850px] z-10 cursor-grab active:cursor-grabbing">
-          <motion.div
-            style={{ x, left: basePadding }}
-            drag="x"
-            dragConstraints={{
-              left: -((advantages.length - 1) * cardWidthWithGap),
-              right: 0,
-            }}
-            onDragEnd={(_, info) => {
-              const offset = info.offset.x
-              const velocity = info.velocity.x
-              
-              if (offset < -100 || velocity < -500) {
-                setIndex((prev) => Math.min(prev + 1, advantages.length - 1))
-              } else if (offset > 100 || velocity > 500) {
-                setIndex((prev) => Math.max(prev - 1, 0))
-              }
-            }}
-            className="flex gap-[20px]"
-          >
-            {advantages.map((item, idx) => {
-              const isActive = idx === index
-              
-              return (
-                <motion.div
-                  key={idx}
-                  animate={{ 
-                    // Figma Shadow: 0 78 105.8 rgba(0,0,0,0.15)
-                    boxShadow: isActive 
-                      ? "0px 78px 105.8px rgba(0, 0, 0, 0.15)" 
-                      : "0px 4px 20px rgba(0, 0, 0, 0.05)",
-                    scale: isActive ? 1 : 0.96,
-                    opacity: isActive ? 1 : 0.8
-                  }}
-                  transition={{ duration: 0.5 }}
-                  className="w-[465px] h-[766px] bg-white rounded-[30px] flex-shrink-0 relative overflow-hidden p-10 select-none"
-                  onClick={() => setIndex(idx)}
-                >
-                  {/* Card Header */}
-                  <div className="flex items-center gap-4 mb-10">
-                    <div className="w-[81px] h-[81px] bg-[#BCB158] rounded-full shrink-0" />
-                    <h3 
-                      className="text-[32px] font-extrabold leading-[32px] text-black"
-                      style={{ fontFamily: "var(--font-anaheim)" }}
+        {/* 3. Carousel Wrap */}
+        <div className="relative w-full overflow-hidden" style={{ height: vw(1000) }}>
+            <motion.div
+                className="flex absolute top-0"
+                style={{ 
+                    left: vw(basePadding),
+                    gap: vw(gap),
+                    paddingTop: vw(50),     
+                    paddingBottom: vw(230), // Ample room for the large active shadow
+                }}
+                animate={{ x: `${scrollOffset / 19.2}vw` }}
+                transition={{ type: "spring", stiffness: 100, damping: 20 }}
+            >
+                {advantages.map((item, idx) => {
+                const isActive = idx === index
+                
+                return (
+                    <motion.div
+                    key={idx}
+                    animate={{ 
+                        boxShadow: isActive 
+                        ? "0px 78px 105.8px rgba(0, 0, 0, 0.15)" 
+                        : "0px 4px 20px rgba(0, 0, 0, 0.05)",
+                        scale: isActive ? 1 : 0.96,
+                        opacity: isActive ? 1 : 0.8
+                    }}
+                    transition={{ duration: 0.5 }}
+                    className="bg-white flex-shrink-0 relative overflow-hidden select-none cursor-pointer"
+                    style={{ 
+                        width: vw(cardWidth),
+                        height: vw(cardHeight),
+                        borderRadius: vw(21), 
+                        padding: vw(30)     
+                    }}
+                    onClick={() => setIndex(idx)}
                     >
-                      {item.title}
-                    </h3>
-                  </div>
+                    {/* Card Header - Locked 2nd/3rd Quadrant Start */}
+                    <div className="relative" style={{ height: vw(105), marginBottom: vw(15) }}>
+                        <div 
+                            className="absolute left-0 top-0 bg-[#BCB158] rounded-full shrink-0" 
+                            style={{ width: vw(56.7), height: vw(56.7) }}
+                        />
+                        <h3 
+                            className="relative z-10 font-extrabold leading-tight text-black"
+                            style={{ 
+                                fontSize: vw(24), 
+                                fontFamily: "var(--font-anaheim)",
+                                paddingTop: vw(28),
+                                paddingLeft: vw(35) 
+                            }}
+                        >
+                            {item.title}
+                        </h3>
+                    </div>
 
-                  {/* Card Image */}
-                  <div className="w-[387px] h-[306px] rounded-[30px] shadow-[0_31px_38.4px_rgba(0,0,0,0.17)] overflow-hidden mb-12 bg-gray-50">
-                    <img 
-                      src={item.image?.url || "https://placehold.co/400x300/41412D/C5A059?text=Advantage"}
-                      className="w-full h-full object-cover pointer-events-none"
-                      alt={item.title}
-                    />
-                  </div>
-
-                  {/* Description Text */}
-                  <div className="w-[387px]">
-                    <p 
-                      className="text-[24px] font-medium leading-[29px] text-black text-justify"
-                      style={{ fontFamily: "var(--font-anaheim)" }}
+                    {/* Card Image - Proportional Scaling */}
+                    <div 
+                        className="rounded-[30px] shadow-[0_31px_38.4px_rgba(0,0,0,0.17)] overflow-hidden bg-gray-50"
+                        style={{ 
+                        width: vw(420), 
+                        height: vw(332), // Corrected to maintain original ratio
+                        marginBottom: vw(35), 
+                        borderRadius: vw(21)
+                        }}
                     >
-                      {item.description}
-                    </p>
-                  </div>
-                </motion.div>
-              )
-            })}
-          </motion.div>
-        </div>
+                        <img 
+                        src={item.image?.url || "https://placehold.co/400x300/41412D/C5A059?text=Advantage"}
+                        className="w-full h-full object-cover pointer-events-none"
+                        alt={item.title}
+                        />
+                    </div>
 
-        {/* 4. Progress Bar */}
-        <div className="absolute left-[367px] bottom-[50px] flex gap-4 z-20">
-           {advantages.map((_, i) => (
-             <button
-               key={i}
-               onClick={() => setIndex(i)}
-               className={`h-2 rounded-full transition-all duration-300 ${i === index ? 'w-12 bg-[#756F3F]' : 'w-4 bg-[#756F3F]/20'}`}
-             />
-           ))}
+                    {/* Description Text - Expanded Width */}
+                    <div style={{ width: vw(420) }}>
+                        <p 
+                        className="font-medium leading-normal text-black text-justify"
+                        style={{ fontSize: vw(16), fontFamily: "var(--font-anaheim)" }}
+                        >
+                        {item.description}
+                        </p>
+                    </div>
+                    </motion.div>
+                )
+                })}
+            </motion.div>
         </div>
 
       </div>
