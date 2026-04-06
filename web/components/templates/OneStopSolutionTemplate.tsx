@@ -202,7 +202,29 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
   const problemsData = useMemo(() => extractSection(contentChildren, "one-stop-shop-value-item", mediaData), [contentChildren, mediaData])
   const advantagesData = useMemo(() => extractSection(contentChildren, "one-stop-shop-advantage-item", mediaData), [contentChildren, mediaData])
   const processData = useMemo(() => extractSection(contentChildren, "how-to-make-item", mediaData), [contentChildren, mediaData])
-  const showcaseData = useMemo(() => extractSection(contentChildren, "product-show-item", mediaData), [contentChildren, mediaData])
+  const showcaseData = useMemo(() => {
+    const res = extractSection(contentChildren, "product-show-item", mediaData)
+    
+    // 动态提取 View More 按钮数据
+    let viewMoreText = "VIEW MORE"
+    let viewMoreLink = `/${locale}/shop`
+    const btnMarkerIndex = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("product-show-btn"))
+    if (btnMarkerIndex !== -1 && btnMarkerIndex + 1 < contentChildren.length) {
+      const btnNode = contentChildren[btnMarkerIndex + 1]
+      if (btnNode.type === "linkJump" && btnNode.data) {
+        viewMoreText = (btnNode.data.title || btnNode.data.description || "VIEW MORE").toUpperCase()
+        if (btnNode.data.url) {
+          viewMoreLink = btnNode.data.url.replace('/pages/', '/')
+          // 确保内部链接补充 locale
+          if (viewMoreLink.startsWith('/') && !viewMoreLink.startsWith(`/${locale}`)) {
+            viewMoreLink = `/${locale}${viewMoreLink}`
+          }
+        }
+      }
+    }
+    
+    return { ...res, viewMoreText, viewMoreLink }
+  }, [contentChildren, mediaData, locale])
   
   const categoriesTitle = useMemo(() => {
      const res = extractSection(contentChildren, "feature-product-item", mediaData)
@@ -477,7 +499,15 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
       <AdvantagesSection title={advantagesData.title} advantages={advantagesData.items} />
       <PurchaseProcessSection title={processData.title} slides={processData.items} />
       <CategoriesGridSection title={categoriesTitle.title} subtitle={categoriesTitle.subtitle} products={gridProducts} locale={locale} loading={loadingProducts} />
-      {showcaseData.items.length > 0 && <HighlightShowcaseSection title={showcaseData.title} products={mappedShowcaseProducts as any} locale={locale} />}
+      {showcaseData.items.length > 0 && (
+        <HighlightShowcaseSection 
+          title={showcaseData.title} 
+          products={mappedShowcaseProducts as any} 
+          locale={locale} 
+          viewMoreText={showcaseData.viewMoreText}
+          viewMoreLink={showcaseData.viewMoreLink}
+        />
+      )}
       {productsData.length > 0 && <ProductSeriesShowcaseSection title={productSeriesData.title} products={seriesProducts} locale={locale} />}
       {brandHighlightsData.items.length > 0 && <BrandHighlightsSection titleLine1={brandHighlightsData.titleLine1} titleLine2={brandHighlightsData.titleLine2} items={brandHighlightsData.items} />}
       <TrustSection title={trustData.title} items={trustData.items} images={trustImages} bgImage={trustBgImage} />

@@ -8,14 +8,20 @@ type AnimatedLinkButtonProps = {
   children: React.ReactNode;
   className?: string;
   variant?: "light" | "dark"; // light: 浅色背景用, dark: 深色背景用
+  ballColor?: string; // 自定义球体颜色
 };
 
-export function AnimatedLinkButton({ children, className, variant = "light" }: AnimatedLinkButtonProps) {
+export function AnimatedLinkButton({ 
+  children, 
+  className, 
+  variant = "light",
+  ballColor: customBallColor
+}: AnimatedLinkButtonProps) {
   const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
   const ballSize = vw(60);
 
   const isDark = variant === "dark";
-  const ballColor = isDark ? "#5C5623" : "#ECE8D8";
+  const ballColor = customBallColor || (isDark ? "#5C5623" : "#ECE8D8");
   const textColorClass = isDark ? "text-[#C7BB5D]" : "text-brand-secondary";
 
   return (
