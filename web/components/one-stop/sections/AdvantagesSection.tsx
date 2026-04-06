@@ -23,7 +23,7 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
   
   // 1920 Design scaling - Ultra-wide and tall to restore image proportions
   const cardWidth = 480
-  const cardHeight = 700
+  const cardHeight = 650
   const gap = 30
   const basePadding = 256.9
 
@@ -53,7 +53,7 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
         />
 
         {/* 2. Section Title - Using Golden Scale (60px) */}
-        <div className="relative z-20 pointer-events-none" style={{ paddingLeft: vw(107.1), marginBottom: vw(56), width: vw(1000) }}>
+        <div className="relative z-20 pointer-events-none" style={{ paddingLeft: vw(107.1), marginBottom: vw(16), width: vw(1000) }}>
           <h2 
             className="font-semibold leading-tight tracking-tight text-[#756F3F]"
             style={{ 
@@ -105,17 +105,23 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
                     >
                     {/* Card Header - Locked 2nd/3rd Quadrant Start */}
                     <div className="relative" style={{ height: vw(105), marginBottom: vw(15) }}>
-                        <div 
-                            className="absolute left-0 top-0 bg-[#BCB158] rounded-full shrink-0" 
+                        <motion.div 
+                            className="absolute left-0 top-0 bg-[#BCB158] rounded-full shrink-0 z-0" 
                             style={{ width: vw(56.7), height: vw(56.7) }}
+                            animate={isActive ? { 
+                                scale: [1, 1.1, 1.05, 1],
+                                y: [0, -6, 2, 0],
+                                transition: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+                            } : {}}
+                            whileHover={{ scale: 1.2, filter: "brightness(1.1)" }}
                         />
                         <h3 
-                            className="relative z-10 font-extrabold leading-tight text-black"
+                            className={`relative z-10 leading-tight transition-all duration-500 ${isActive ? 'font-extrabold text-black' : 'font-medium text-[#4A4A4A]'}`}
                             style={{ 
                                 fontSize: vw(24), 
                                 fontFamily: "var(--font-anaheim)",
-                                paddingTop: vw(28),
-                                paddingLeft: vw(35) 
+                                paddingTop: vw(20),
+                                paddingLeft: vw(30) 
                             }}
                         >
                             {item.title}
