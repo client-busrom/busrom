@@ -1,12 +1,10 @@
 "use client"
 
-import React from "react"
+import React, { useId } from "react"
 
 /**
  * HollowText Component
  * Implements a "True Outside Stroke" effect using SVG Filters.
- * This ensures the interior of the characters is completely transparent (hollow)
- * and the stroke exists only on the outside, preventing internal line artifacts.
  */
 interface HollowTextProps {
   children: React.ReactNode
@@ -23,14 +21,15 @@ export function HollowText({
   className = "",
   style = {}
 }: HollowTextProps) {
-  const filterId = "true-outline-" + strokeColor.replace("#", "")
+  const uniqueId = useId()
+  const filterId = "true-outline-" + uniqueId.replace(/:/g, "")
 
   return (
     <>
       {/* Hidden SVG Filter Definition */}
-      <svg width="0" height="0" className="absolute pointer-events-none">
+      <svg width="0" height="0" className="absolute pointer-events-none" aria-hidden="true">
         <defs>
-          <filter id={filterId} x="-20%" y="-20%" width="140%" height="140%">
+          <filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
             {/* 1. Extract and Dilate (Grow) Alpha channel */}
             <feMorphology in="SourceAlpha" operator="dilate" radius={strokeWidth} result="dilated" />
             
