@@ -134,8 +134,22 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
 
             {/* Navigation Arrows (Mobile) */}
             <div className="flex justify-center gap-10 mt-4">
-              <button onClick={prevProduct} className="w-14 h-14 rounded-full border-2 border-[#756F3F] flex items-center justify-center bg-white shadow-md active:scale-95 transition-all"><svg width="12" height="20" viewBox="0 0 17 29" fill="none"><path d="M15.5 2L3 14.5L15.5 27" stroke="#756F3F" strokeWidth="3" strokeLinecap="round"/></svg></button>
-              <button onClick={nextProduct} className="w-14 h-14 rounded-full bg-[#756F3F] flex items-center justify-center shadow-md active:scale-95 transition-all"><svg width="12" height="20" viewBox="0 0 17 29" fill="none"><path d="M1.5 2L14 14.5L1.5 27" stroke="white" strokeWidth="3" strokeLinecap="round"/></svg></button>
+              <button 
+                onClick={prevProduct} 
+                className="w-14 h-14 rounded-full border-2 border-[#756F3F] flex items-center justify-center bg-white shadow-md active:bg-[#756F3F] text-[#756F3F] active:text-white group transition-all"
+              >
+                <svg width="12" height="20" viewBox="0 0 17 29" fill="none" className="transition-colors">
+                  <path d="M15.5 2L3 14.5L15.5 27" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                </svg>
+              </button>
+              <button 
+                onClick={nextProduct} 
+                className="w-14 h-14 rounded-full border-2 border-[#756F3F] flex items-center justify-center bg-white shadow-md active:bg-[#756F3F] text-[#756F3F] active:text-white group transition-all"
+              >
+                <svg width="12" height="20" viewBox="0 0 17 29" fill="none" className="transition-colors">
+                  <path d="M1.5 2L14 14.5L1.5 27" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                </svg>
+              </button>
             </div>
           </motion.div>
         </AnimatePresence>
@@ -162,11 +176,21 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
 
         {/* Navigation Arrows (Desktop) */}
         <div className="absolute right-[8.49vw] top-[6.25vw] flex gap-[4.01vw] z-30">
-          <button onClick={prevProduct} className="w-[3.85vw] h-[3.85vw] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white shadow-lg hover:bg-[#756F3F] group transition-all">
-            <svg width="0.88vw" height="1.51vw" viewBox="0 0 17 29" fill="none" className="group-hover:stroke-white transition-colors"><path d="M15.5 2L3 14.5L15.5 27" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/></svg>
+          <button 
+            onClick={prevProduct} 
+            className="w-[3.85vw] h-[3.85vw] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white shadow-lg hover:bg-[#756F3F] text-[#756F3F] hover:text-white group transition-all"
+          >
+            <svg width="0.88vw" height="1.51vw" viewBox="0 0 17 29" fill="none" className="transition-colors">
+              <path d="M15.5 2L3 14.5L15.5 27" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+            </svg>
           </button>
-          <button onClick={nextProduct} className="w-[3.85vw] h-[3.85vw] rounded-full bg-[#756F3F] flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-            <svg width="0.88vw" height="1.51vw" viewBox="0 0 17 29" fill="none"><path d="M1.5 2L14 14.5L1.5 27" stroke="white" strokeWidth="2.5" strokeLinecap="round"/></svg>
+          <button 
+            onClick={nextProduct} 
+            className="w-[3.85vw] h-[3.85vw] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white shadow-lg hover:bg-[#756F3F] text-[#756F3F] hover:text-white group transition-all"
+          >
+            <svg width="0.88vw" height="1.51vw" viewBox="0 0 17 29" fill="none" className="transition-colors">
+              <path d="M1.5 2L14 14.5L1.5 27" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+            </svg>
           </button>
         </div>
 
