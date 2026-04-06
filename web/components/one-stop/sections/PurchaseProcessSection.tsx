@@ -156,21 +156,22 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
         {/* 2. Central Image (Capsule) - DESKTOP ONLY */}
         <div 
           className="hidden lg:block absolute z-10"
-          style={{ left: vw(240), top: vw(20) }}
+          style={{ left: vw(240), top: vw(20), perspective: "1200px" }}
         >
           <AnimatePresence mode="wait">
              {slides.map((slide, i) => i === index && (
                <motion.div 
                  key={i}
-                 initial={{ opacity: 0, y: 14 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 exit={{ opacity: 0, y: -14 }}
-                 transition={{ duration: 0.8, ease: "easeInOut" }}
+                 initial={{ opacity: 0, rotateY: 90 }}
+                 animate={{ opacity: 1, rotateY: 0 }}
+                 exit={{ opacity: 0, rotateY: -90 }}
+                 transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
                  className="overflow-hidden shadow-2xl bg-white/50"
                  style={{ 
                    width: vw(365), 
                    height: vw(620), 
-                   borderRadius: vw(183) 
+                   borderRadius: vw(183),
+                   backfaceVisibility: "hidden"
                  }}
                >
                   <OptimizedImage 
