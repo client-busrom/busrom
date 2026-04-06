@@ -3,6 +3,7 @@
 import React from "react"
 import { motion } from "framer-motion"
 import { Link } from "@/lib/navigation"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 interface OemOdmGuideSectionProps {
   title?: string
@@ -14,8 +15,6 @@ interface OemOdmGuideSectionProps {
 }
 
 export function OemOdmGuideSection({ title, description, bgImage, ctaText = "READ MORE", ctaLink = "/oem-odm", locale }: OemOdmGuideSectionProps) {
-  console.log("OemOdmGuideSection received bgImage:", bgImage)
-  
   // Figma Constants 
   const DESIGN_WIDTH = 1920
   const SECTION_HEIGHT = 875
@@ -47,7 +46,12 @@ export function OemOdmGuideSection({ title, description, bgImage, ctaText = "REA
                     WebkitClipPath: "url(#busrom-clip)",
                   }}
                 >
-                  <img src={bgImage.url} alt="OEM/ODM Guide Background" className="absolute inset-0 w-full h-full object-cover" />
+                  <OptimizedImage 
+                    image={bgImage} 
+                    size="large" 
+                    className="absolute inset-0 w-full h-full" 
+                    objectFit="cover"
+                  />
                 </div>
             ) : (
                 <div 
