@@ -50,15 +50,13 @@ function extractAfterMarker(children: any[], markerId: string): any[] {
   const result: any[] = []
   const targetMarker = markerId.toLowerCase().trim()
   
-  // For hierarchical markers (e.g., contact-form and contact-form-title), 
-  // we don't want to stop at sub-markers.
-  const markerPrefix = targetMarker.includes('-') 
-    ? targetMarker.split('-')[0] + '-' 
-    : targetMarker + '-'
+  // Standard sub-marker prefix logic (e.g. "contact-form-")
+  const subMarkerPrefix = targetMarker + '-'
 
   for (const node of flat) {
-    if (node.type === "paragraph" || node.type === "quote") {
+    if (node.type === "paragraph" || node.type === "quote" || node.type === "heading") {
       const t = (node.children || []).map((c: any) => c.text || "").join("").trim().toLowerCase()
+      const isLexicalMarker = node.format === 16 || node.children?.some((c: any) => c.format === 16)
       
       // Found our start marker
       if (t === targetMarker) { 
@@ -67,16 +65,17 @@ function extractAfterMarker(children: any[], markerId: string): any[] {
       }
       
       // Stop condition:
-      // 1. We found a marker (format 16)
-      // 2. It's NOT the same marker prefix we are currently in
-      // 3. It's NOT a sub-marker of our current marker
-      if (found && (node.children?.[0]?.format === 16 || node.format === 16) && t.includes("-")) {
-          const isSubMarker = t.startsWith(targetMarker) || t.startsWith(markerPrefix)
-          const isSpecialExempt = t.startsWith("more-applications-")
-          
-          if (!isSubMarker && !isSpecialExempt) {
-              if (result.length > 0) break
+      // We found a different marker (format 16)
+      if (found && isLexicalMarker) {
+        // If it's a sub-marker (like contact-form-title for marker contact-form), don't stop.
+        const isSubMarker = t.startsWith(subMarkerPrefix)
+        const isSpecialExempt = t.startsWith("more-applications-")
+        
+        if (!isSubMarker && !isSpecialExempt) {
+          if (result.length > 0 || (t.includes('-') && !t.startsWith(targetMarker.split('-')[0]))) {
+            break
           }
+        }
       }
     }
     if (found) result.push(node)
@@ -407,8 +406,8 @@ function extractSections(pageContent: any) {
 
     return nodes.map(n => n.children || []).flat().map((c: any) => ({
       text: c.text || "",
-      bold: !!c.format && (c.format & 1) !== 0,
-      italic: !!c.format && (c.format & 2) !== 0,
+      bold: typeof c.format === 'number' && (c.format & 1) !== 0,
+      italic: typeof c.format === 'number' && (c.format & 2) !== 0,
       linebreak: c.type === 'linebreak'
     }))
   }
@@ -461,8 +460,8 @@ function extractSections(pageContent: any) {
       serviceCta: guideServiceCta,
       oemCta: guideOemCta
     },
-    applicationTitle: findRichTextByMarker("applications-title").map(t => t.text).join(""),
-    applicationSubtitle: findRichTextByMarker("applications-subtitle").map(t => t.text).join(""),
+    applicationTitle: (findRichTextByMarker("applications-title").length ? findRichTextByMarker("applications-title") : findRichTextByMarker("applications")).map(t => t.text).join(""),
+    applicationSubtitle: (findRichTextByMarker("applications-subtitle").length ? findRichTextByMarker("applications-subtitle") : findRichTextByMarker("applications-item")).map(t => t.text).join(""),
     applicationTitleImage: findImgUrlByMarker("applications-title-image"),
     whyChooseUsDecorate: findRichTextByMarker("why-contractors-choose-us-decorate").map(t => t.text).join(""),
     whyChooseUsTitle: findRichTextByMarker("why-contractors-choose-us-title").map(t => t.text).join("")
