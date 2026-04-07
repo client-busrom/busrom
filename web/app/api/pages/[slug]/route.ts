@@ -111,12 +111,12 @@ function extractApplicationIds(content: any): string[] {
 }
 
 /**
- * Fetch application scene gallery images and pick random ones
- * Returns a map of applicationId -> MediaObject (random image)
+ * Fetch application scene gallery images and return all available images per application
+ * Returns a map of applicationId -> Array of MediaObjects
  */
-async function fetchApplicationImages(appIds: string[]): Promise<Record<string, MediaObject>> {
-  const appMediaMap: Record<string, MediaObject> = {}
-  if (appIds.length === 0) return appMediaMap
+async function fetchApplicationImages(appIds: string[]): Promise<Record<string, MediaObject[]>> {
+  const appMediaLists: Record<string, MediaObject[]> = {}
+  if (appIds.length === 0) return appMediaLists
 
   for (const appId of appIds) {
     try {
@@ -126,14 +126,26 @@ async function fetchApplicationImages(appIds: string[]): Promise<Record<string, 
       if (!res.ok) continue
       const appData = await res.json()
 
-      // Collect all images from scene gallery
-      const allImages: Array<{ id: string; url: string; alt?: string; sizes?: any; width?: number; height?: number }> = []
+      const allImages: MediaObject[] = []
       if (appData.sceneGallery && Array.isArray(appData.sceneGallery)) {
         for (const scene of appData.sceneGallery) {
           if (scene.images && Array.isArray(scene.images)) {
             for (const img of scene.images) {
               if (typeof img === 'object' && img.url) {
-                allImages.push(img)
+                allImages.push({
+                  id: img.id,
+                  url: convertToCDNUrl(img.url),
+                  alt: img.alt || appData.name || '',
+                  variants: {
+                    thumbnail: img.sizes?.thumbnail?.url ? convertToCDNUrl(img.sizes.thumbnail.url) : undefined,
+                    small: img.sizes?.card?.url ? convertToCDNUrl(img.sizes.card.url) : undefined,
+                    medium: img.sizes?.tablet?.url ? convertToCDNUrl(img.sizes.tablet.url) : undefined,
+                    large: img.sizes?.desktop?.url ? convertToCDNUrl(img.sizes.desktop.url) : undefined,
+                    xlarge: convertToCDNUrl(img.url),
+                  },
+                  width: img.width || undefined,
+                  height: img.height || undefined,
+                })
               }
             }
           }
@@ -141,38 +153,23 @@ async function fetchApplicationImages(appIds: string[]): Promise<Record<string, 
       }
 
       if (allImages.length > 0) {
-        // Pick a random image
-        const randomImg = allImages[Math.floor(Math.random() * allImages.length)]
-        appMediaMap[appId] = {
-          id: randomImg.id || appId,
-          url: convertToCDNUrl(randomImg.url),
-          alt: randomImg.alt || appData.name || '',
-          variants: {
-            thumbnail: randomImg.sizes?.thumbnail?.url ? convertToCDNUrl(randomImg.sizes.thumbnail.url) : undefined,
-            small: randomImg.sizes?.card?.url ? convertToCDNUrl(randomImg.sizes.card.url) : undefined,
-            medium: randomImg.sizes?.tablet?.url ? convertToCDNUrl(randomImg.sizes.tablet.url) : undefined,
-            large: randomImg.sizes?.desktop?.url ? convertToCDNUrl(randomImg.sizes.desktop.url) : undefined,
-            xlarge: convertToCDNUrl(randomImg.url),
-          },
-          width: randomImg.width || undefined,
-          height: randomImg.height || undefined,
-        }
+        appMediaLists[appId] = allImages
       }
     } catch (e) {
       console.error(`Failed to fetch application ${appId}:`, e)
     }
   }
 
-  return appMediaMap
+  return appMediaLists
 }
 
 /**
  * Resolve application-sourced gallery items by injecting random image IDs
- * This mutates the content in-place, replacing application references with resolved media IDs
+ * This mutates the content in-place, picking a fresh random image for each item.
  */
 function resolveApplicationGalleryImages(
   content: any,
-  appMediaMap: Record<string, MediaObject>,
+  appMediaLists: Record<string, MediaObject[]>,
   mediaData: Record<string, MediaObject>
 ): void {
   function traverse(node: any) {
@@ -183,9 +180,14 @@ function resolveApplicationGalleryImages(
         const img = node.data.images[i]
         if (img.sourceType === 'application' && img.application) {
           const appId = typeof img.application === 'object' && img.application ? img.application.id : String(img.application)
-          if (appId && appMediaMap[appId]) {
-            // Inject the resolved media ID so the frontend can render it
-            const resolvedMedia = appMediaMap[appId]
+          const candidates = appMediaLists[appId]
+          
+          if (appId && candidates && candidates.length > 0) {
+            // Pick a UNIQUE random image for THIS specific gallery item
+            const randomIndex = Math.floor(Math.random() * candidates.length)
+            const resolvedMedia = candidates[randomIndex]
+            
+            // Inject the resolved media ID
             img.image = resolvedMedia.id
             // Also add to the main mediaData map
             mediaData[resolvedMedia.id] = resolvedMedia
