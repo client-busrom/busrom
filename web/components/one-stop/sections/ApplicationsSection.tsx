@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from "react"
+import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import useEmblaCarousel from "embla-carousel-react"
 import AutoScroll from "embla-carousel-auto-scroll"
@@ -139,10 +140,30 @@ export function ApplicationsSection({ title, items, locale }: ApplicationsSectio
         {/* Background Circles - Now tightly bound to the title's coordinate system */}
         <div className="absolute inset-x-0 top-[100px] flex flex-col items-center pointer-events-none">
            <div className="relative w-[1920px] h-0 flex justify-center">
-              <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "567px", top: "52px", width: "101px", height: "101px" }} />
-              <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "1164px", top: "210px", width: "51px", height: "51px" }} />
-              <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "1190px", top: "-10px", width: "81px", height: "81px" }} />
-              <div className="absolute bg-[#ECE8D8] rounded-full" style={{ left: "778px", top: "-75px", width: "29px", height: "29px" }} />
+              <motion.div 
+                animate={{ y: [0, -15, 0], x: [0, 10, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute bg-[#ECE8D8] rounded-full" 
+                style={{ left: "567px", top: "52px", width: "101px", height: "101px" }} 
+              />
+              <motion.div 
+                animate={{ y: [0, 20, 0], x: [0, -5, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                className="absolute bg-[#ECE8D8] rounded-full" 
+                style={{ left: "1164px", top: "210px", width: "51px", height: "51px" }} 
+              />
+              <motion.div 
+                animate={{ y: [0, -10, 0], x: [0, -15, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                className="absolute bg-[#ECE8D8] rounded-full" 
+                style={{ left: "1190px", top: "-10px", width: "81px", height: "81px" }} 
+              />
+              <motion.div 
+                animate={{ y: [0, 12, 0], x: [0, 8, 0] }}
+                transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
+                className="absolute bg-[#ECE8D8] rounded-full" 
+                style={{ left: "778px", top: "-75px", width: "29px", height: "29px" }} 
+              />
            </div>
         </div>
 

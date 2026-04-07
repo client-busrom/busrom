@@ -112,10 +112,19 @@ function CustomDropdown({ label, options, placeholder, value, onChange }: any) {
  */
 export function CtaSection({ title, description, image, formConfig, locale = "en" }: CtaSectionProps) {
   const [formState, setFormState] = useState<any>({
+    'name': '',
+    'company': '',
+    'email': '',
+    'whatsapp': '',
     'project-type': '',
     'primary-requirement': '',
-    'whatsapp': ''
+    'other-primary-requirement': '',
+    'specific-requirements-project-description': ''
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // --- Fetch full form config if only an ID is provided ---
   const [fetchedFormConfig, setFetchedFormConfig] = useState<any>(null)
@@ -171,13 +180,80 @@ export function CtaSection({ title, description, image, formConfig, locale = "en
     setPrivacyAccepted(checked)
     if (checked && typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEY, 'true')
-      setIsGloballyAccepted(true) // Update locally to trigger height change
-      // Trigger a storage event for other components to update
+      setIsGloballyAccepted(true)
       window.dispatchEvent(new Event('storage'))
     }
   }
 
-  // Listen for storage events from other components
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) setUploadedFile(file)
+  }
+
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    if (isSubmitting) return
+    if (!!mergedConfig?.privacyConsentText && !privacyAccepted) return
+
+    setIsSubmitting(true)
+    setSubmitStatus('idle')
+
+    try {
+      let fileUrl = ""
+      if (uploadedFile) {
+        const formData = new FormData()
+        formData.append("file", uploadedFile)
+        const uploadRes = await fetch("/api/media-upload", {
+          method: "POST",
+          body: formData,
+        })
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json()
+          fileUrl = uploadData.url
+        }
+      }
+
+      const submissionData = {
+        formId: mergedConfig?.id,
+        formName: mergedConfig?.name || mergedConfig?.displayName || "One-Stop Solution Contact",
+        data: {
+          ...formState,
+          ...(fileUrl ? { attachment: fileUrl } : {}),
+        },
+        locale,
+        sourcePage: typeof window !== "undefined" ? window.location.href : "",
+        userLocalTime: new Date().toString(),
+      }
+
+      const response = await fetch("/api/form-submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(submissionData),
+      })
+
+      if (!response.ok) throw new Error("Submission failed")
+
+      setSubmitStatus("success")
+      setFormState({
+        'name': '',
+        'company': '',
+        'email': '',
+        'whatsapp': '',
+        'project-type': '',
+        'primary-requirement': '',
+        'other-primary-requirement': '',
+        'specific-requirements-project-description': ''
+      })
+      setUploadedFile(null)
+      setTimeout(() => setSubmitStatus('idle'), 5000)
+    } catch (error) {
+      console.error("[CtaSection] Submission Error:", error)
+      setSubmitStatus("error")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   useEffect(() => {
     const handleStorageChange = () => {
       const consent = localStorage.getItem(STORAGE_KEY)
@@ -271,30 +347,56 @@ export function CtaSection({ title, description, image, formConfig, locale = "en
       {/* 3. Mobile Content Container (Responsive Column) */}
       <div className="relative z-20 w-full xl:hidden flex flex-col items-center px-6 py-12 gap-10">
           <div className="w-full max-w-[500px] text-center space-y-4">
-              <h2 className="text-[32px] md:text-[40px] font-extrabold text-[#FFF28E] leading-tight tracking-tighter" style={{ fontFamily: "var(--font-anaheim)" }}>
-                {title || mergedConfig?.displayName || "Get A Complete Solution"}
-              </h2>
-              <p className="text-[16px] md:text-[18px] font-semibold text-white/90 leading-relaxed" style={{ fontFamily: "var(--font-anaheim)" }}>
-                {description || mergedConfig?.description || ""}
-              </p>
-          </div>
+          <AnimatePresence>
+            {submitStatus !== 'idle' && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className={cn(
+                  "mb-4 px-4 py-2 rounded-lg text-center font-bold",
+                  submitStatus === 'success' ? "bg-[#FFF28E]/10 text-[#FFF28E]" : "bg-red-500/10 text-red-400"
+                )}
+                style={{ fontFamily: "var(--font-anaheim)" }}
+              >
+                {submitStatus === 'success' 
+                  ? (mergedConfig?.successMessage || "Submitted successfully!") 
+                  : (mergedConfig?.errorNetworkMessage || "Error. Please try again.")}
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <h2 className="text-[32px] md:text-[40px] font-extrabold text-[#FFF28E] leading-tight tracking-tighter" style={{ fontFamily: "var(--font-anaheim)" }}>
+            {mergedConfig?.displayName || title || "Get A Complete Solution"}
+          </h2>
+          <p className="text-[16px] md:text-[18px] font-semibold text-white/90 leading-relaxed" style={{ fontFamily: "var(--font-anaheim)" }}>
+            {description || mergedConfig?.description || ""}
+          </p>
+        </div>
 
-          <div className="w-full max-w-[540px] flex flex-col gap-4">
-              <input 
-                type="text" 
-                placeholder={getField('name')?.placeholder || "Your Name"} 
-                className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40" 
-              />
-              <input 
-                type="text" 
-                placeholder={getField('company')?.placeholder || "Your Company / Your Team"} 
-                className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40" 
-              />
-              <input 
-                type="email" 
-                placeholder={getField('email')?.placeholder || "Your Email"} 
-                className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40" 
-              />
+        <form onSubmit={handleSubmit} className="w-full max-w-[540px] flex flex-col gap-4">
+          <input 
+            type="text" 
+            value={formState['name']}
+            onChange={(e) => setFormState({...formState, name: e.target.value})}
+            placeholder={getField('name')?.placeholder || "Your Name"} 
+            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40" 
+            required
+          />
+          <input 
+            type="text" 
+            value={formState['company']}
+            onChange={(e) => setFormState({...formState, company: e.target.value})}
+            placeholder={getField('company')?.placeholder || "Your Company / Your Team"} 
+            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40" 
+          />
+          <input 
+            type="email" 
+            value={formState['email']}
+            onChange={(e) => setFormState({...formState, email: e.target.value})}
+            placeholder={getField('email')?.placeholder || "Your Email"} 
+            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40" 
+            required
+          />
               <div className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] overflow-hidden">
                 <PhoneInput
                   id="whatsapp-mobile"
@@ -325,16 +427,20 @@ export function CtaSection({ title, description, image, formConfig, locale = "en
                 />
               </div>
 
-              <input 
-                 type="text" 
-                 placeholder={getField('other-primary-requirement')?.placeholder || "Please Enter..."}
-                 className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40"
-              />
+          <input 
+             type="text" 
+             value={formState['other-primary-requirement']}
+             onChange={(e) => setFormState({...formState, 'other-primary-requirement': e.target.value})}
+             placeholder={getField('other-primary-requirement')?.placeholder || "Please Enter..."}
+             className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40"
+          />
 
-              <textarea 
-                  placeholder={getField('specific-requirements-project-description')?.placeholder || "Specific Requirements / Project Description"} 
-                  className="w-full h-36 bg-white/5 border border-white/20 rounded-[15px] p-5 text-white text-[18px] focus:border-[#FFF28E] resize-none placeholder:text-white/40" 
-              />
+          <textarea 
+              value={formState['specific-requirements-project-description']}
+              onChange={(e) => setFormState({...formState, 'specific-requirements-project-description': e.target.value})}
+              placeholder={getField('specific-requirements-project-description')?.placeholder || "Specific Requirements / Project Description"} 
+              className="w-full h-36 bg-white/5 border border-white/20 rounded-[15px] p-5 text-white text-[18px] focus:border-[#FFF28E] resize-none placeholder:text-white/40" 
+          />
 
               <div className="flex flex-col gap-6 mt-4">
                   {mergedConfig?.privacyConsentText && !isGloballyAccepted && (
@@ -351,39 +457,52 @@ export function CtaSection({ title, description, image, formConfig, locale = "en
                     </div>
                   )}
 
-                  <div className="flex flex-col gap-6 items-center">
-                    <button className="flex items-center gap-3 text-white hover:text-[#FFF28E] transition-colors w-fit">
-                        <Upload className="w-5 h-5" />
-                        <span className="text-[18px] font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-anaheim)" }}>
-                            {getField('file')?.label || "Upload File"}
-                        </span>
-                    </button>
+                <div className="flex flex-col gap-6 items-center">
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    onChange={handleFileChange} 
+                  />
+                  <button 
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-3 text-white hover:text-[#FFF28E] transition-colors w-fit"
+                  >
+                      <Upload className="w-5 h-5" />
+                      <span className="text-[18px] font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-anaheim)" }}>
+                          {uploadedFile ? uploadedFile.name : (getField('file')?.label || "Upload File")}
+                      </span>
+                  </button>
 
-                    <motion.button 
-                      initial={{ scale: 1 }}
-                      animate={{ scale: [1, 1.3, 1] }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
-                      whileHover={{ 
-                        scale: 1.1,
-                        transition: { duration: 0.2 },
-                        boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
-                      }}
-                      whileTap={{ scale: 0.96, transition: { duration: 0.1 } }}
-                      disabled={(!!mergedConfig?.privacyConsentText && !privacyAccepted)}
-                      className={cn(
-                        "w-full max-w-[320px] bg-[#B2A224] text-white text-[24px] font-black rounded-full shadow-lg transition-colors duration-300",
-                        "h-14 flex items-center justify-center",
-                        (!!mergedConfig?.privacyConsentText && !privacyAccepted) 
-                          ? "grayscale opacity-80 cursor-not-allowed"
-                          : "hover:bg-white hover:text-[#B2A224]"
-                      )}
-                      style={{ fontFamily: "var(--font-anaheim)" }}
-                    >
-                      {mergedConfig?.submitButtonText || "Send Inquiry"}
-                    </motion.button>
-                  </div>
-              </div>
-          </div>
+                  <motion.button 
+                    type="submit"
+                    initial={{ scale: 1 }}
+                    animate={{ scale: [1, 1.3, 1] }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+                    whileHover={{ 
+                      scale: 1.1,
+                      transition: { duration: 0.2 },
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
+                    }}
+                    whileTap={{ scale: 0.96, transition: { duration: 0.1 } }}
+                    disabled={isSubmitting || (!!mergedConfig?.privacyConsentText && !privacyAccepted)}
+                    className={cn(
+                      "w-full max-w-[320px] bg-[#B2A224] text-white text-[24px] font-black rounded-full shadow-lg transition-colors duration-300",
+                      "h-14 flex items-center justify-center",
+                      (isSubmitting || (!!mergedConfig?.privacyConsentText && !privacyAccepted))
+                        ? "grayscale opacity-80 cursor-not-allowed"
+                        : "hover:bg-white hover:text-[#B2A224]"
+                    )}
+                    style={{ fontFamily: "var(--font-anaheim)" }}
+                  >
+                    {isSubmitting 
+                      ? (mergedConfig?.submittingText || "Sending...") 
+                      : (mergedConfig?.submitButtonText || "Send Inquiry")}
+                  </motion.button>
+                </div>
+            </div>
+        </form>
       </div>
 
       {/* 4. Scaled Content Container (Form Area) - Desktop Only */}
@@ -396,7 +515,25 @@ export function CtaSection({ title, description, image, formConfig, locale = "en
         }}
       >
         <div className="pl-[153px] w-[1100px] pt-[350px]">
-           <div className="mb-10">
+           <div className="mb-4">
+               <AnimatePresence>
+                 {submitStatus !== 'idle' && (
+                   <motion.div
+                     initial={{ opacity: 0, x: -20 }}
+                     animate={{ opacity: 1, x: 0 }}
+                     exit={{ opacity: 0, x: -10 }}
+                     className={cn(
+                       "mb-2 text-[24px] font-bold uppercase tracking-widest",
+                       submitStatus === 'success' ? "text-[#FFF28E]" : "text-red-400"
+                     )}
+                     style={{ fontFamily: "var(--font-anaheim)" }}
+                   >
+                     {submitStatus === 'success' 
+                       ? (mergedConfig?.successMessage || "Submitted successfully!") 
+                       : (mergedConfig?.errorNetworkMessage || "Error. Please try again.")}
+                   </motion.div>
+                 )}
+               </AnimatePresence>
               <h2 className="text-[60px] font-extrabold text-[#FFF28E] leading-[1.1] mb-6 tracking-tighter" style={{ fontFamily: "var(--font-anaheim)" }}>
                 {title || mergedConfig?.displayName || ""}
               </h2>
@@ -405,22 +542,30 @@ export function CtaSection({ title, description, image, formConfig, locale = "en
               </p>
            </div>
 
-           <div className="grid grid-cols-2 gap-x-12 gap-y-4 w-[773px] relative">
+           <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-x-12 gap-y-4 w-[773px] relative">
               <input 
                 type="text" 
+                value={formState['name']}
+                onChange={(e) => setFormState({...formState, name: e.target.value})}
                 placeholder={getField('name')?.placeholder || "Your Name"} 
                 className="h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40" 
+                required
               />
               <input 
                 type="text" 
+                value={formState['company']}
+                onChange={(e) => setFormState({...formState, company: e.target.value})}
                 placeholder={getField('company')?.placeholder || "Your Company / Your Team"} 
                 className="h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40" 
               />
 
               <input 
                 type="email" 
+                value={formState['email']}
+                onChange={(e) => setFormState({...formState, email: e.target.value})}
                 placeholder={getField('email')?.placeholder || "Your Email"} 
                 className="h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40" 
+                required
               />
               <PhoneInput
                 id="whatsapp"
@@ -456,17 +601,20 @@ export function CtaSection({ title, description, image, formConfig, locale = "en
               <div />
               <input 
                  type="text" 
+                 value={formState['other-primary-requirement']}
+                 onChange={(e) => setFormState({...formState, 'other-primary-requirement': e.target.value})}
                  placeholder={getField('other-primary-requirement')?.placeholder || "Please Enter..."}
                  className="w-full h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40"
               />
 
               <div className="col-span-2">
                  <textarea 
+                    value={formState['specific-requirements-project-description']}
+                    onChange={(e) => setFormState({...formState, 'specific-requirements-project-description': e.target.value})}
                     placeholder={getField('specific-requirements-project-description')?.placeholder || "Specific Requirements / Project Description"} 
                     className="w-full h-[150px] bg-black/30 border border-white/20 rounded-[15px] p-6 text-white text-[20px] focus:border-[#FFF28E] resize-none placeholder:text-white/40" 
                  />
               </div>
-           </div>
 
             <div className="mt-8 flex flex-col gap-6 w-[773px]">
                {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
@@ -489,14 +637,25 @@ export function CtaSection({ title, description, image, formConfig, locale = "en
                )}
 
             <div className="flex flex-col gap-8 w-full">
-              <button className="flex items-center gap-4 text-white hover:text-[#FFF28E] transition-colors w-fit">
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                className="hidden" 
+                onChange={handleFileChange} 
+              />
+              <button 
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-4 text-white hover:text-[#FFF28E] transition-colors w-fit"
+              >
                  <Upload className="w-8 h-8" />
                  <span className="text-[24px] font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-anaheim)" }}>
-                    {getField('file')?.label || "Upload File"}
+                    {uploadedFile ? uploadedFile.name : (getField('file')?.label || "Upload File")}
                  </span>
               </button>
 
               <motion.button 
+                type="submit"
                 initial={{ scale: 1, rotate: 0 }}
                 animate={{ scale: [1, 1.03, 1], rotate: 0 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -507,20 +666,23 @@ export function CtaSection({ title, description, image, formConfig, locale = "en
                   boxShadow: "0 20px 40px rgba(0,0,0,0.25)"
                 }}
                 whileTap={{ scale: 0.96, rotate: 0, transition: { duration: 0.1 } }}
-                disabled={(!!mergedConfig?.privacyConsentText && !privacyAccepted)}
+                disabled={isSubmitting || (!!mergedConfig?.privacyConsentText && !privacyAccepted)}
                 className={cn(
                   "w-[419px] bg-[#B2A224] text-white text-[40px] font-black rounded-[63px] shadow-2xl transition-colors duration-300 self-center",
                   "min-h-[83px] h-auto py-4 whitespace-pre-line leading-tight px-8",
-                  (!!mergedConfig?.privacyConsentText && !privacyAccepted) 
+                  (isSubmitting || (!!mergedConfig?.privacyConsentText && !privacyAccepted))
                     ? "grayscale opacity-80 cursor-not-allowed"
                     : "hover:bg-white hover:text-[#B2A224]"
                 )}
                 style={{ fontFamily: "var(--font-anaheim)" }}
               >
-                {mergedConfig?.submitButtonText || "Send Inquiry"}
-              </motion.button>
+                 {isSubmitting 
+                   ? (mergedConfig?.submittingText || "Sending...") 
+                   : (mergedConfig?.submitButtonText || "Send Inquiry")}
+               </motion.button>
            </div>
            </div>
+           </form>
         </div>
       </div>
     </section>
