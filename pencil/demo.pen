@@ -1,0 +1,672 @@
+{
+  "version": "2.10",
+  "children": [
+    {
+      "type": "frame",
+      "id": "bi8Au",
+      "x": -648,
+      "y": -237,
+      "name": "Frame",
+      "clip": true,
+      "width": 1920,
+      "height": 2000,
+      "layout": "none",
+      "children": [
+        {
+          "type": "group",
+          "id": "9G3MW",
+          "x": 0,
+          "y": 0,
+          "name": "why-contractors-trust-us",
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "dKFwr",
+              "x": 0,
+              "y": 0,
+              "name": "Rectangle 296",
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "fill"
+              },
+              "width": 1920,
+              "height": 924,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "rectangle",
+              "id": "0SSb0",
+              "x": 0,
+              "y": 0,
+              "name": "Rectangle 311",
+              "fill": "#564c0080",
+              "width": 1920,
+              "height": 924,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "effect": {
+                "type": "background_blur",
+                "radius": 27.5625
+              }
+            },
+            {
+              "type": "text",
+              "id": "GzNf6",
+              "x": 182,
+              "y": 121.95555555555555,
+              "name": "Why Contractors Trust Us?",
+              "fill": "#ffffffff",
+              "textGrowth": "fixed-width-height",
+              "width": 787,
+              "height": 128.17777777777778,
+              "content": "Why Contractors Trust Us?",
+              "lineHeight": 1.0625,
+              "fontFamily": "Anaheim",
+              "fontSize": 96,
+              "fontWeight": "800"
+            },
+            {
+              "type": "text",
+              "id": "G96HR",
+              "x": 182,
+              "y": 310.4888888888889,
+              "name": "One-stop Full-range Supply",
+              "fill": "#fff28dff",
+              "textGrowth": "fixed-width-height",
+              "width": 529,
+              "height": 63.46666666666667,
+              "content": "One-stop Full-range Supply",
+              "lineHeight": 3.1875,
+              "fontFamily": "Anaheim",
+              "fontSize": 32,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "NSt1S",
+              "x": 182,
+              "y": 456.7111111111111,
+              "name": "Customize It Your Way",
+              "fill": "#fff28dff",
+              "textGrowth": "fixed-width-height",
+              "width": 529,
+              "height": 63.46666666666667,
+              "content": "Customize It Your Way",
+              "lineHeight": 3.1875,
+              "fontFamily": "Anaheim",
+              "fontSize": 32,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "I6e3q",
+              "x": 182,
+              "y": 604.8,
+              "name": "Professional Engineer Technical Support",
+              "fill": "#fff28dff",
+              "textGrowth": "fixed-width-height",
+              "width": 666,
+              "height": 63.46666666666667,
+              "content": "Professional Engineer Technical Support",
+              "lineHeight": 3.1875,
+              "fontFamily": "Anaheim",
+              "fontSize": 32,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "4Vqup",
+              "x": 182,
+              "y": 530.7555555555556,
+              "name": "Consistent Finished Appearance",
+              "fill": "#fff28dff",
+              "textGrowth": "fixed-width-height",
+              "width": 529,
+              "height": 63.46666666666667,
+              "content": "Consistent Finished Appearance",
+              "lineHeight": 3.1875,
+              "fontFamily": "Anaheim",
+              "fontSize": 32,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "vyvJF",
+              "x": 182,
+              "y": 678.8444444444444,
+              "name": "Fast Response",
+              "fill": "#fff28dff",
+              "textGrowth": "fixed-width-height",
+              "width": 529,
+              "height": 63.46666666666667,
+              "content": "Fast Response",
+              "lineHeight": 3.1875,
+              "fontFamily": "Anaheim",
+              "fontSize": 32,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "6Vyrk",
+              "x": 182,
+              "y": 752.8888888888888,
+              "name": "Rapid After-Sales Service & Spare Parts Support",
+              "fill": "#fff28dff",
+              "textGrowth": "fixed-width-height",
+              "width": 767,
+              "height": 63.46666666666667,
+              "content": "Rapid After-Sales Service & Spare Parts Support",
+              "lineHeight": 3.1875,
+              "fontFamily": "Anaheim",
+              "fontSize": 32,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "YMDmf",
+              "x": 182,
+              "y": 373.9555555555555,
+              "name": "Cover all parts of hardware, saving coordination costs",
+              "fill": "#ffffffff",
+              "textGrowth": "fixed-width-height",
+              "width": 590,
+              "height": 54.755555555555546,
+              "content": "Cover all parts of hardware, saving coordination costs",
+              "lineHeight": 1.5714285714285714,
+              "fontFamily": "Anaheim",
+              "fontSize": 28,
+              "fontWeight": "600"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 54,
+              "id": "SZJSj",
+              "x": 1291.9424941309392,
+              "y": 191.64444444444442,
+              "name": "image2",
+              "rotation": -8.154602561089655,
+              "fill": [
+                "#d9d9d9ff",
+                {
+                  "type": "image",
+                  "enabled": true,
+                  "url": "",
+                  "mode": "fill"
+                }
+              ],
+              "width": 331,
+              "height": 425,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 54,
+              "id": "7JpQt",
+              "x": 1010,
+              "y": 411.97187499999995,
+              "name": "image3",
+              "rotation": 20.857192734502025,
+              "fill": [
+                "#d9d9d9ff",
+                {
+                  "type": "image",
+                  "enabled": true,
+                  "url": "",
+                  "mode": "stretch"
+                }
+              ],
+              "width": 229,
+              "height": 258,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 54,
+              "id": "lwofE",
+              "x": 1228.5021390430438,
+              "y": 637.5438368055555,
+              "name": "image4",
+              "rotation": 5.501979813481212,
+              "fill": [
+                "#d9d9d9ff",
+                {
+                  "type": "image",
+                  "enabled": true,
+                  "url": "",
+                  "mode": "fill"
+                }
+              ],
+              "width": 245,
+              "height": 234,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 54,
+              "id": "A2rMK",
+              "x": 1093.5756156506839,
+              "y": 79.64444444444443,
+              "name": "image1",
+              "rotation": -2.1930845194010677,
+              "fill": [
+                "#d9d9d9ff",
+                {
+                  "type": "image",
+                  "enabled": true,
+                  "url": "",
+                  "mode": "fill"
+                }
+              ],
+              "width": 235,
+              "height": 162,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "group",
+              "id": "8RpPm",
+              "x": 880,
+              "y": 475.99999999999994,
+              "name": "Group 208",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "XpvjK",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Ellipse 69",
+                  "sweepAngle": -360.00001001791264,
+                  "width": 40,
+                  "height": 24.888888888888886,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#ffffffff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 31,
+                  "id": "vfsZn",
+                  "x": 10,
+                  "y": 12.4444444444444,
+                  "name": "Rectangle 300",
+                  "fill": "#ffffffff",
+                  "width": 20,
+                  "height": 1.2444444444444442,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 31,
+                  "id": "gOSU0",
+                  "x": 21,
+                  "y": 6.844444444444434,
+                  "name": "Rectangle 301",
+                  "rotation": -90.00000250447808,
+                  "fill": "#ffffffff",
+                  "width": 12.444444444444457,
+                  "height": 1.9999999999999984,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "KLrbe",
+              "x": 880,
+              "y": 624.0888888888888,
+              "name": "Group 210",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "EmVEV",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Ellipse 69",
+                  "sweepAngle": -360.00001001791264,
+                  "width": 40,
+                  "height": 24.888888888888886,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#ffffffff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 31,
+                  "id": "QMMnc",
+                  "x": 10,
+                  "y": 12.444444444444457,
+                  "name": "Rectangle 300",
+                  "fill": "#ffffffff",
+                  "width": 20,
+                  "height": 1.2444444444444442,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 31,
+                  "id": "kROPk",
+                  "x": 21,
+                  "y": 6.844444444444434,
+                  "name": "Rectangle 301",
+                  "rotation": -90.00000250447808,
+                  "fill": "#ffffffff",
+                  "width": 12.444444444444457,
+                  "height": 1.9999999999999984,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "jdrsd",
+              "x": 880,
+              "y": 329.7777777777777,
+              "name": "Group 207",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "NyxAE",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Ellipse 69",
+                  "sweepAngle": -360.00001001791264,
+                  "width": 40,
+                  "height": 24.888888888888886,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#ffffffff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 31,
+                  "id": "sPDOI",
+                  "x": 10,
+                  "y": 12.444444444444457,
+                  "name": "Rectangle 300",
+                  "fill": "#ffffffff",
+                  "width": 20,
+                  "height": 1.2444444444444442,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "hJ4nM",
+              "x": 182,
+              "y": 525.1555555555555,
+              "name": "Rectangle 302",
+              "fill": "#d9d9d9ff",
+              "width": 738,
+              "height": 1,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "rectangle",
+              "id": "6MysI",
+              "x": 182,
+              "y": 673.2444444444444,
+              "name": "Rectangle 304",
+              "fill": "#d9d9d9ff",
+              "width": 738,
+              "height": 1,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "group",
+              "id": "ETXoY",
+              "x": 880,
+              "y": 550.0444444444444,
+              "name": "Group 209",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "VJMaB",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Ellipse 69",
+                  "sweepAngle": -360.00001001791264,
+                  "width": 40,
+                  "height": 24.888888888888886,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#ffffffff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 31,
+                  "id": "VVGJG",
+                  "x": 10,
+                  "y": 12.444444444444457,
+                  "name": "Rectangle 300",
+                  "fill": "#ffffffff",
+                  "width": 20,
+                  "height": 1.2444444444444442,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 31,
+                  "id": "Qerz0",
+                  "x": 21,
+                  "y": 6.844444444444434,
+                  "name": "Rectangle 301",
+                  "rotation": -90.00000250447808,
+                  "fill": "#ffffffff",
+                  "width": 12.444444444444457,
+                  "height": 1.9999999999999984,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "W10As",
+              "x": 880,
+              "y": 698.1333333333333,
+              "name": "Group 211",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "u1WHH",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Ellipse 69",
+                  "sweepAngle": -360.00001001791264,
+                  "width": 40,
+                  "height": 24.888888888888886,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#ffffffff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 31,
+                  "id": "BjSwb",
+                  "x": 10,
+                  "y": 12.444444444444343,
+                  "name": "Rectangle 300",
+                  "fill": "#ffffffff",
+                  "width": 20,
+                  "height": 1.2444444444444442,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 31,
+                  "id": "lQ5tR",
+                  "x": 21,
+                  "y": 6.844444444444434,
+                  "name": "Rectangle 301",
+                  "rotation": -90.00000250447808,
+                  "fill": "#ffffffff",
+                  "width": 12.444444444444457,
+                  "height": 1.9999999999999984,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "2dHlM",
+              "x": 880,
+              "y": 772.1777777777777,
+              "name": "Group 212",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "MVSwv",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Ellipse 69",
+                  "sweepAngle": -360.00001001791264,
+                  "width": 40,
+                  "height": 24.888888888888886,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#ffffffff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 31,
+                  "id": "RC4mf",
+                  "x": 10,
+                  "y": 12.444444444444457,
+                  "name": "Rectangle 300",
+                  "fill": "#ffffffff",
+                  "width": 20,
+                  "height": 1.2444444444444442,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 31,
+                  "id": "HcNdZ",
+                  "x": 21,
+                  "y": 6.844444444444434,
+                  "name": "Rectangle 301",
+                  "rotation": -90.00000250447808,
+                  "fill": "#ffffffff",
+                  "width": 12.444444444444457,
+                  "height": 1.9999999999999984,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "5GWb1",
+              "x": 182,
+              "y": 451.11111111111103,
+              "name": "Rectangle 301",
+              "fill": "#d9d9d9ff",
+              "width": 738,
+              "height": 1,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "rectangle",
+              "id": "0GkFJ",
+              "x": 182,
+              "y": 599.1999999999999,
+              "name": "Rectangle 303",
+              "fill": "#d9d9d9ff",
+              "width": 738,
+              "height": 1,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "rectangle",
+              "id": "MOaBR",
+              "x": 182,
+              "y": 747.2888888888888,
+              "name": "Rectangle 305",
+              "fill": "#d9d9d9ff",
+              "width": 738,
+              "height": 1,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

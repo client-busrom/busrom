@@ -32,6 +32,7 @@ import { CSS } from '@dnd-kit/utilities'
 import type { ImageGalleryData } from './node.tsx'
 import { $createImageGalleryNode, ImageGalleryNode } from './node.tsx'
 import { LinkPickerModal } from '../carousel/component.client'
+import { fetchMediaCategories, fetchMediaTags } from '../../lib/media-filters-cache'
 
 // 翻译辅助函数
 const getTranslation = (key: string, t: any, i18n: any) => {
@@ -521,11 +522,13 @@ interface MediaItem {
 interface MediaCategory {
   id: number | string
   name: string
+  displayName?: string
 }
 
 interface MediaTag {
   id: number | string
   name: string
+  displayName?: string
 }
 
 export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onClose, onSelect, imageIndex, t, i18n }) => {
@@ -556,9 +559,8 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
   // 获取分类列表
   const fetchCategories = useCallback(async () => {
     try {
-      const res = await fetch('/api/media-categories?limit=100&sort=name')
-      const data = await res.json()
-      setCategories(data.docs || [])
+      const data = await fetchMediaCategories()
+      setCategories(data || [])
     } catch (error) {
       console.error('Failed to fetch categories:', error)
     }
@@ -567,9 +569,8 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
   // 获取标签列表
   const fetchTags = useCallback(async () => {
     try {
-      const res = await fetch('/api/media-tags?limit=100&sort=name')
-      const data = await res.json()
-      setTags(data.docs || [])
+      const data = await fetchMediaTags()
+      setTags(data || [])
     } catch (error) {
       console.error('Failed to fetch tags:', error)
     }
@@ -766,7 +767,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
               <option value="">{getTranslation('allCategories', t, i18n)}</option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
-                  {cat.name}
+                  {cat.displayName || cat.name}
                 </option>
               ))}
             </select>
@@ -790,7 +791,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
               <option value="">{getTranslation('allTags', t, i18n)}</option>
               {tags.map((tag) => (
                 <option key={tag.id} value={tag.id}>
-                  {tag.name}
+                  {tag.displayName || tag.name}
                 </option>
               ))}
             </select>
