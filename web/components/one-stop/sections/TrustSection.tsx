@@ -95,7 +95,8 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
            <OptimizedImage image={bgImage} alt="Background" className="w-full h-full object-cover opacity-70" size="xlarge" />
          )}
          <div 
-           className="absolute inset-0 z-10 bg-black/60 backdrop-blur-[8px]"
+           className="absolute inset-0 z-10 backdrop-blur-[8px]"
+           style={{ backgroundColor: 'rgba(86, 76, 0, 0.5)' }}
          />
       </div>
 
