@@ -34,6 +34,7 @@ export interface ProductCarouselItem {
   showHighlights: boolean
   highlightsCount: number
   buttonText: string // Translatable
+  customName?: string // Translatable - Displayed instead of product name/category if provided
   openInNewTab: boolean
 }
 

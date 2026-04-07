@@ -38,9 +38,12 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
     const productName = activeProduct.name || ""
     
     if (item) {
-       // 只要定义了显示分类，或者明确定义了不显示产品名称，就显示分类
-       if (item.showCategory === true || item.showName === false) return categoryName
-       if (item.showName === true) return productName
+        // 如果填写了自定义名称且不为空，优先级最高
+        if (item.customName && item.customName.trim() !== "") return item.customName
+        
+        // 只要定义了显示分类，或者明确定义了不显示产品名称，就显示分类
+        if (item.showCategory === true || item.showName === false) return categoryName
+        if (item.showName === true) return productName
     }
     
     // 兜底逻辑：如果映射数据里原本就有处理过的 title，优先用处理好的

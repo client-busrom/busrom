@@ -88,7 +88,7 @@ export const ARRAY_ITEM_FIELDS: Record<string, string[]> = {
   'links': ['title'], // marqueeLinks
   'images': ['caption'], // image-gallery
   'slides': ['title', 'description', 'buttonText', 'caption'], // carousel
-  'items': ['buttonText'], // productCarousel - only buttonText is translatable per item
+  'items': ['buttonText', 'customName'], // productCarousel - buttonText and customName are translatable per item
 }
 
 /**
