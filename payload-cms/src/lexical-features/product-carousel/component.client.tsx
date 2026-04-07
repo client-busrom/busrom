@@ -148,6 +148,7 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
       showHighlights: true,
       highlightsCount: 4,
       buttonText: i18n?.language === 'zh' ? '查看全部' : 'See All',
+      customName: '',
       openInNewTab: false,
     }
     setLocalData({ ...localData, items: [...localData.items, newItem] })
@@ -799,14 +800,42 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                             style={{
                               width: '100%',
                               padding: '8px 10px',
-                              border: '1px solid #fef08a',
-                              borderRadius: '6px',
-                              fontSize: '12px',
                               backgroundColor: 'white',
+                              borderRadius: '6px',
+                              border: '1px solid #fef08a',
+                              fontSize: '12px',
+                              color: '#475569',
+                              outline: 'none',
                             }}
                           />
                         </div>
                       )}
+
+                      <div style={{ marginTop: '10px' }}>
+                        <label style={{ display: 'block', marginBottom: '4px', color: '#854d0e', fontWeight: 500 }}>
+                          {i18n?.language === 'zh' ? '显示自定义名称' : 'Custom Display Name'}
+                        </label>
+                        <input
+                          type="text"
+                          value={item.customName || ''}
+                          onChange={(e) => handleUpdateItem(index, { customName: e.target.value })}
+                          onKeyDown={(e) => e.stopPropagation()}
+                          placeholder={i18n?.language === 'zh' ? '输入自定义展示名称...' : 'Enter custom name...'}
+                          style={{
+                            width: '100%',
+                            padding: '8px 10px',
+                            backgroundColor: 'white',
+                            borderRadius: '6px',
+                            border: '1px solid #fef08a',
+                            fontSize: '12px',
+                            color: '#475569',
+                            outline: 'none',
+                          }}
+                        />
+                        <p style={{ fontSize: '10px', color: 'rgba(133, 77, 14, 0.6)', marginTop: '4px', fontStyle: 'italic' }}>
+                          {i18n?.language === 'zh' ? '填写后展示此文字，取代产品名称/分类' : 'If set, this text replaces product name/category'}
+                        </p>
+                      </div>
 
                       {item.showButton && (
                         <div style={{ marginTop: '10px' }}>

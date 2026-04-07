@@ -86,6 +86,12 @@ function extractSection(children: any[], markerId: string, mediaData: Record<str
         sourceType: node.type
       })))
     }
+    if (node.type === "productCarousel") {
+      items.push({
+        sourceType: "productCarousel",
+        carouselItems: node.data?.items || []
+      })
+    }
     if (node.type === "applicationCarousel") {
       const appIds = node.data?.applicationIds || node.data?.applications;
       if (appIds) {
@@ -338,20 +344,38 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
     })
   }, [contentChildren, locale])
 
-  const mapProductsWithCarouselConfig = (products: any[]) => {
-    return products.map((p: any) => ({
-      ...p,
-      title: p._carouselItem?.showName ? p.name : (p.category?.name || p.name),
-      showName: p._carouselItem?.showName !== false,
-      showCategory: !!p._carouselItem?.showCategory,
-      categoryName: p.category?.name || ""
-    }))
+  const mapProductsWithCarouselConfig = (products: any[], carouselItems: any[] = []) => {
+    return products.map((p: any) => {
+      const meta = carouselItems.find(it => {
+        if (it.selectionMode === 'manual') {
+          return String(it.product) === String(p.id) || (typeof it.product === 'object' && String(it.product.id) === String(p.id))
+        }
+        const pSeriesId = p.series?.id || p.series
+        return String(it.productSeries) === String(pSeriesId) || (typeof it.productSeries === 'object' && String(it.productSeries.id) === String(pSeriesId))
+      })
+      const getDisplayName = (item: any, productName: string, categoryName: string) => {
+        if (item?.customName?.trim()) return item.customName
+        if (item?.showCategory === true || item?.showName === false) return categoryName
+        return productName
+      }
+      return {
+        ...p,
+        _carouselItem: meta,
+        title: getDisplayName(meta, p.name, p.category?.name || ""),
+        showName: meta ? meta.showName !== false : true,
+        showCategory: !!meta?.showCategory,
+        categoryName: p.category?.name || ""
+      }
+    })
   }
 
   const mappedShowcaseProducts = useMemo(() => {
     const carouselItem = showcaseData.items.find((it: any) => it.sourceType === 'productCarousel')
-    if (carouselItem && carouselProductsData[carouselItem.carouselItems?.[0]?.id]) {
-      return mapProductsWithCarouselConfig(carouselProductsData[carouselItem.carouselItems[0].id])
+    if (carouselItem && carouselProductsData[carouselItem.carouselItems?.[0]?.id || 'default']) {
+      return mapProductsWithCarouselConfig(
+        carouselProductsData[carouselItem.carouselItems?.[0]?.id || 'default'] || [], 
+        carouselItem.carouselItems
+      )
     }
     return showcaseData.items.filter((it: any) => it.sourceType !== 'productCarousel').map((it: any, idx: number) => ({
       id: String(idx), image: it.image, title: it.title, link: it.link
@@ -368,8 +392,11 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
 
   const seriesProducts = useMemo(() => {
     const carouselItem = productSeriesData.items.find((it: any) => it.sourceType === 'productCarousel')
-    if (carouselItem && carouselProductsData[carouselItem.carouselItems?.[0]?.id]) {
-        return mapProductsWithCarouselConfig(carouselProductsData[carouselItem.carouselItems[0].id])
+    if (carouselItem) {
+        const carouselId = carouselItem.carouselItems?.[0]?.id || 'default'
+        if (carouselProductsData[carouselId]) {
+          return mapProductsWithCarouselConfig(carouselProductsData[carouselId], carouselItem.carouselItems)
+        }
     }
     return productsData
   }, [productSeriesData, productsData, carouselProductsData])
