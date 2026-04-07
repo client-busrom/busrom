@@ -31,17 +31,23 @@ interface OneStopSolutionTemplateProps {
  */
 function isMarkerNode(node: any, markerId: string) {
   if (!node) return false
-  const text = node.children?.map((c: any) => c.text || "").join("") || ""
+  const text = node.children?.[0]?.text || ""
   const isLexicalMarker = node.format === 16 || node.children?.some((c: any) => c.format === 16)
-  return isLexicalMarker || text.includes(markerId)
+  return isLexicalMarker && text === markerId
+}
+
+/**
+ * 判断是否为任何 Marker 节点（格式为 16）
+ */
+function isAnyMarkerNode(node: any) {
+  if (!node) return false
+  return node.format === 16 || node.children?.some((c: any) => c.format === 16)
 }
 
 /**
  * 提取特定“领土”内的所有数据项及其标题
- * Territory 定义：由相邻的 quote 分割而成的区域
  */
 function extractSection(children: any[], markerId: string, mediaData: Record<string, MediaObject>) {
-  // 1. 分割区域
   const sections: any[][] = []
   let currentSection: any[] = []
   for (const node of children) {
@@ -54,23 +60,37 @@ function extractSection(children: any[], markerId: string, mediaData: Record<str
   }
   if (currentSection.length > 0) sections.push(currentSection)
 
-  // 2. 找到包含 marker 的区域
   const targetSection = sections.find(sec => JSON.stringify(sec).includes(markerId))
   if (!targetSection) return { title: "", subtitle: "", items: [], titleNodes: [], autoplay: false, interval: 5 }
 
-  // Extract carousel configuration if present
   const carouselNode = targetSection.find(n => n.type === "carousel")
   const autoplay = carouselNode?.data?.autoplay ?? false
   const interval = carouselNode?.data?.interval ?? 5
 
-  const items = extractItems(targetSection, -1, mediaData)
+  const items: any[] = []
+  targetSection.forEach(node => {
+    if (node.type === "carousel" && node.data?.slides) {
+      items.push(...node.data.slides.map((s: any) => ({
+        title: s.title || "",
+        description: s.description || "",
+        image: s.image ? (mediaData[typeof s.image === 'object' && s.image ? s.image.id : String(s.image)] || null) : null,
+        sourceType: node.type
+      })))
+    }
+    if (node.type === "custom-image-gallery" && node.data?.images) {
+      items.push(...node.data.images.map((g: any) => ({
+        id: typeof g.image === 'object' && g.image ? g.image.id : String(g.image || ""),
+        image: mediaData[typeof g.image === 'object' && g.image ? g.image.id : String(g.image || "")],
+        title: g.title || "",
+        link: g.linkUrl || "",
+        sourceType: node.type
+      })))
+    }
+  })
   
-  // 3. 提取在该区域内且不是 marker 的标题节点
-  const titleNodes = targetSection.filter(n => (n.type === "heading" || n.type === "paragraph") && !isMarkerNode(n, markerId))
-  
+  const titleNodes = targetSection.filter(n => (n.type === "heading" || n.type === "paragraph") && !isMarkerNode(n, markerId) && !isAnyMarkerNode(n))
   let title = ""
   let subtitle = ""
-
   if (titleNodes.length > 0) {
     title = titleNodes[0].children?.map((c: any) => c.type === "linebreak" ? "\n" : c.text || "").join("").trim() || ""
     if (titleNodes.length > 1) {
@@ -81,117 +101,17 @@ function extractSection(children: any[], markerId: string, mediaData: Record<str
   return { title, subtitle, items, titleNodes, autoplay, interval }
 }
 
-function extractItems(flatNodes: any[], markerIndex: number, mediaData: Record<string, MediaObject>) {
-  const items: any[] = []
-  const nodesAfter = flatNodes.slice(markerIndex + 1)
-  
-  for (const node of nodesAfter) {
-    if (node.type === "carousel" && node.data?.slides) {
-      items.push(...node.data.slides.map((s: any) => ({
-        title: s.title || "",
-        description: s.description || "",
-        image: s.image ? (mediaData[typeof s.image === 'object' && s.image ? s.image.id : String(s.image)] || null) : null,
-        sourceType: node.type
-      })))
-    }
-
-    if (node.type === "custom-image-gallery" && node.data?.images) {
-      items.push(...node.data.images.map((g: any) => ({
-        id: typeof g.image === 'object' && g.image ? g.image.id : String(g.image || ""),
-        image: mediaData[typeof g.image === 'object' && g.image ? g.image.id : String(g.image || "")],
-        title: g.title || "",
-        link: g.linkUrl || "",
-        sourceType: node.type
-      })))
-    }
-
-    if (node.type === "applicationCarousel" && node.data?.applications) {
-      items.push({
-        sourceType: node.type,
-        applicationIds: node.data.applications.map((a: any) => a.id)
-      })
-    }
-
-    if (node.type === "productCarousel" && node.data?.items) {
-      const carouselItems = node.data.items.map((it: any) => {
-        const mapped = {
-          id: it.id,
-          selectionMode: it.selectionMode,
-          product: it.product,
-          productSeries: it.productSeries,
-          showName: it.showName !== false,
-          showCategory: !!it.showCategory,
-          showDescription: !!it.showDescription,
-          showButton: it.showButton !== false,
-          showHighlights: !!it.showHighlights,
-          highlightsCount: it.highlightsCount || 3,
-          buttonText: it.buttonText || "View More",
-          openInNewTab: !!it.openInNewTab,
-        }
-        return mapped
-      })
-      items.push({
-        sourceType: node.type,
-        carouselItems
-      })
-    }
-
-    if (node.type === "list") {
-      let currentItem: any = null
-      node.children?.forEach((listItem: any) => {
-        if (listItem.type === "listitem") {
-          const getOwnText = (n: any) => {
-            let t = ""
-            n.children?.forEach((c: any) => {
-              if (c.type === "text") t += c.text
-              else if (c.type === "paragraph") t += c.children?.map((pc: any) => pc.text || "").join("")
-            })
-            return t.trim()
-          }
-          const ownText = getOwnText(listItem)
-          const nestedList = listItem.children?.find((c: any) => c.type === "list")
-          if (ownText) {
-            currentItem = { title: ownText, description: "", sourceType: node.type }
-            items.push(currentItem)
-          } 
-          if (nestedList) {
-            const desc = nestedList.children?.map((li: any) => {
-              return li.children?.map((c: any) => {
-                if (c.text) return c.text
-                if (c.children) return c.children.map((cc: any) => cc.text || "").join("")
-                return ""
-              }).join("")
-            }).join("\n")
-            if (currentItem) currentItem.description = desc.trim()
-            else if (items.length > 0) items[items.length - 1].description = desc.trim()
-          }
-        }
-      })
-    }
-
-    if (node.type === "singleImage" && node.data?.image) {
-      items.push({
-        image: mediaData[typeof node.data.image === 'object' && node.data.image ? node.data.image.id : String(node.data.image || "")],
-        title: node.data.caption || "",
-        sourceType: node.type
-      })
-    }
-    if (node.type === "upload" && node.value) {
-      items.push({
-        image: mediaData[typeof node.value === 'object' && node.value ? node.value.id : String(node.value || "")],
-        title: node.label || "",
-        sourceType: node.type
-      })
-    }
-  }
-  return items
+function extractAfterMarker(children: any[], markerId: string): any[] {
+  const markerIndex = children.findIndex((node: any) => isMarkerNode(node, markerId))
+  if (markerIndex === -1) return []
+  return children.slice(markerIndex + 1)
 }
 
 export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolutionTemplateProps) {
   const [productsData, setProductsData] = useState<any[]>([])
   const [loadingProducts, setLoadingProducts] = useState(true)
   const [carouselProductsData, setCarouselProductsData] = useState<Record<string, any[]>>({})
-
+  
   const contentChildren = useMemo(() => 
     pageContent.content?.root?.children || pageContent.contentTranslation?.root?.children || [], 
     [pageContent]
@@ -202,10 +122,9 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
   const problemsData = useMemo(() => extractSection(contentChildren, "one-stop-shop-value-item", mediaData), [contentChildren, mediaData])
   const advantagesData = useMemo(() => extractSection(contentChildren, "one-stop-shop-advantage-item", mediaData), [contentChildren, mediaData])
   const processData = useMemo(() => extractSection(contentChildren, "how-to-make-item", mediaData), [contentChildren, mediaData])
+  
   const showcaseData = useMemo(() => {
     const res = extractSection(contentChildren, "product-show-item", mediaData)
-    
-    // 动态提取 View More 按钮数据
     let viewMoreText = "VIEW MORE"
     let viewMoreLink = `/${locale}/shop`
     const btnMarkerIndex = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("product-show-btn"))
@@ -215,14 +134,12 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
         viewMoreText = (btnNode.data.title || btnNode.data.description || "VIEW MORE").toUpperCase()
         if (btnNode.data.url) {
           viewMoreLink = btnNode.data.url.replace('/pages/', '/')
-          // 确保内部链接补充 locale
           if (viewMoreLink.startsWith('/') && !viewMoreLink.startsWith(`/${locale}`)) {
             viewMoreLink = `/${locale}${viewMoreLink}`
           }
         }
       }
     }
-    
     return { ...res, viewMoreText, viewMoreLink }
   }, [contentChildren, mediaData, locale])
   
@@ -233,29 +150,21 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
   
   const productSeriesData = useMemo(() => extractSection(contentChildren, "product-attribute", mediaData), [contentChildren, mediaData])
 
-  // Brand Highlights with special title parsing
   const brandHighlightsData = useMemo(() => {
     const res = extractSection(contentChildren, "brand-highlights-item", mediaData)
     let titleLine1 = ""
     let titleLine2 = ""
-    
-    // Use the already filtered titleNodes from extractSection
     res.titleNodes.forEach(node => {
-      // Small safety check: ensures we don't pick up markers that might have slipped through
       if (isMarkerNode(node, "brand-highlights-item")) return
-
       node.children?.forEach((child: any) => {
         const isBold = (child.format & 1) === 1
         if (child.type === "linebreak") {
-          if (titleLine2) titleLine2 += "\n"
-          else if (titleLine1) titleLine1 += "\n"
+          if (titleLine2) titleLine2 += "\n"; else if (titleLine1) titleLine1 += "\n";
         } else if (child.text) {
-          if (isBold) titleLine1 += child.text
-          else titleLine2 += child.text
+          if (isBold) titleLine1 += child.text; else titleLine2 += child.text;
         }
       })
     })
-
     return { titleLine1: titleLine1.trim(), titleLine2: titleLine2.trim(), items: res.items }
   }, [contentChildren, mediaData])
 
@@ -268,37 +177,55 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
   
   const trustBgImage = useMemo(() => {
     const bgMarker = "why-contractors-trust-us-bg-image"
-    const flatNodes = contentChildren
-    const markerIdx = flatNodes.findIndex((n: any) => JSON.stringify(n).includes(bgMarker))
-    if (markerIdx !== -1) {
-      const nextNode = flatNodes[markerIdx + 1]
-      if (nextNode?.data?.image) {
-        const id = typeof nextNode.data.image === 'object' && nextNode.data.image ? nextNode.data.image.id : String(nextNode.data.image || "")
-        return mediaData[id]
-      }
-      if (nextNode?.value) {
-        const id = typeof nextNode.value === 'object' && nextNode.value ? nextNode.value.id : String(nextNode.value || "")
-        return mediaData[id]
-      }
+    const markerIdx = contentChildren.findIndex((n: any) => JSON.stringify(n).includes(bgMarker))
+    if (markerIdx !== -1 && markerIdx + 1 < contentChildren.length) {
+      const node = contentChildren[markerIdx + 1]
+      const id = node.data?.image?.id || node.value?.id || String(node.value || "")
+      return mediaData[id] || null
     }
     return null
   }, [contentChildren, mediaData])
 
-  const ctaData = useMemo(() => {
-     const res = extractSection(contentChildren, "contact-form-block", mediaData)
-     const imgRes = extractSection(contentChildren, "contact-form-image", mediaData)
-     const image = imgRes.items[0]?.image || null
-     
-     // 提取表单配置
-     const blockMarkerNodes = contentChildren.filter((n: any, i: number) => i > 0 && isMarkerNode(contentChildren[i-1], "contact-form-block"))
-     const formNode = blockMarkerNodes.find((n: any) => n.type === "formBlock") || res.items.find(it => it.sourceType === "formBlock")?.node
-     
-     // 核心修复：如果找到的 formConfig 只有 ID 没有内容，且 PageContent 有默认配置，则使用 PageContent 的
-     const rawFormConfig = formNode?.data?.formConfig || formNode?.data || null
-     const formConfig = (rawFormConfig && rawFormConfig.fields) ? rawFormConfig : (pageContent.formConfig || rawFormConfig)
+  // 1. Initial Extraction (confirming the user's log: formNode exists, but no fields)
+  const rawCtaData = useMemo(() => {
+    const nodesAfterImg = extractAfterMarker(contentChildren, "contact-form-image");
+    const nodesAfterForm = extractAfterMarker(contentChildren, "contact-form-block");
+    const imageNode = nodesAfterImg.find(n => n.type === "singleImage");
+    const formNode = nodesAfterForm.find(n => n.type === "formBlock");
+    const resBase = extractSection(contentChildren, "contact-form", mediaData);
+    
+    const rawImageId = imageNode?.data?.image?.id || null;
+    const image = rawImageId ? mediaData[rawImageId] : null;
+    
+    const blockFormConfig = formNode?.data?.formConfig || formNode?.data || null;
+    const initialFormConfig = (blockFormConfig?.fields ? blockFormConfig : (pageContent as any).formConfig) || blockFormConfig;
 
-     return { title: res.title, description: res.subtitle, image, formConfig }
-  }, [contentChildren, mediaData, pageContent.formConfig])
+    return { title: resBase.title, description: resBase.subtitle, image, formConfig: initialFormConfig };
+  }, [contentChildren, mediaData, pageContent.formConfig]);
+
+  // 2. Async Patch: If fields are still missing (as seen in user log), fetch them manually
+  const [fetchedFields, setFetchedFields] = useState<any[] | null>(null);
+
+  useEffect(() => {
+    const formId = rawCtaData.formConfig?.id;
+    if (formId && !rawCtaData.formConfig?.fields && !fetchedFields) {
+      fetch(`/api/form-configs/${formId}?depth=2&locale=${locale}`)
+        .then(res => res.json())
+        .then(data => {
+          const config = data?.fields ? data : (data?.data?.fields ? data.data : data);
+          if (config?.fields) setFetchedFields(config.fields);
+        })
+        .catch(err => console.error("Form Config Patch Fetch Error:", err));
+    }
+  }, [rawCtaData.formConfig?.id, rawCtaData.formConfig?.fields, locale, fetchedFields]);
+
+  // 3. Final Merged Data
+  const ctaData = useMemo(() => {
+    const finalConfig = fetchedFields 
+      ? { ...rawCtaData.formConfig, fields: fetchedFields } 
+      : rawCtaData.formConfig;
+    return { ...rawCtaData, formConfig: finalConfig };
+  }, [rawCtaData, fetchedFields]);
 
   // Applications
   const [allApplications, setAllApplications] = useState<any[]>([])
@@ -319,17 +246,12 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
       const items = carouselItem.applicationIds.map((id: any) => {
         const app = allApplications.find(a => String(a.id) === String(id))
         if (!app) return null
-
-        // 提取逻辑：优先主图 -> 其次场景图集第一张 -> 最后列表图
         let appImage = app.mainImage
         if (!appImage && app.sceneGallery?.length > 0) {
           const firstGroup = app.sceneGallery.find((g: any) => g.images?.length > 0)
           if (firstGroup) appImage = firstGroup.images[0]
         }
-        if (!appImage && app.images?.length > 0) {
-          appImage = app.images[0].image
-        }
-
+        if (!appImage && app.images?.length > 0) appImage = app.images[0].image
         return {
           id: app.id,
           title: app.title || app.name || "",
@@ -344,36 +266,22 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
 
   const oemOdmGuideData = useMemo(() => {
      const res = extractSection(contentChildren, "oem-odm-guide", mediaData)
-     
-     // Find the title text (the paragraph immediately following oem-odm-guide-title)
      let title = res.title || "READY TO\nJOIN IN BUSROM?"
      const titleMarkerIndex = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("oem-odm-guide-title"))
      if (titleMarkerIndex !== -1 && titleMarkerIndex + 1 < contentChildren.length) {
        const titleNode = contentChildren[titleMarkerIndex + 1]
        if (titleNode && titleNode.children) {
-         title = titleNode.children.map((child: any) => {
-           if (child.type === 'linebreak') return '\n'
-           return child.text || ''
-         }).join('')
+         title = titleNode.children.map((child: any) => child.type === 'linebreak' ? '\n' : child.text || '').join('')
        }
      }
-
-     // Extract image by checking the node after the marker, or fallback to the first uploaded item in the section
      const bgImageIndex = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("oem-odm-guide-bg-image"))
      let bgImage = null
      if (bgImageIndex !== -1 && bgImageIndex + 1 < contentChildren.length) {
        const nextNode = contentChildren[bgImageIndex + 1]
-        if (nextNode.type === "upload" && nextNode.value) {
-          const id = typeof nextNode.value === 'object' && nextNode.value ? nextNode.value.id : String(nextNode.value || "")
-          bgImage = mediaData[id]
-        } else if (nextNode.type === "singleImage" && nextNode.data?.image) {
-         bgImage = mediaData[typeof nextNode.data.image === 'object' && nextNode.data.image ? nextNode.data.image.id : String(nextNode.data.image || "")]
-       }
+       const id = nextNode.data?.image?.id || nextNode.value?.id || String(nextNode.value || "")
+       bgImage = mediaData[id]
      }
-     if (!bgImage && res.items.length > 0 && res.items[0].image) {
-       bgImage = res.items[0].image
-     }
-     // Extract CTA Link
+     if (!bgImage && res.items.length > 0 && res.items[0].image) bgImage = res.items[0].image
      let ctaText = "READ MORE"
      let ctaLink = "/oem-odm"
      const ctaMarkerIndex = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("oem-odm-guide-cta"))
@@ -381,13 +289,9 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
        const ctaNode = contentChildren[ctaMarkerIndex + 1]
        if (ctaNode && ctaNode.type === "linkJump" && ctaNode.data) {
          ctaText = ctaNode.data.description || ctaNode.data.title || "READ MORE"
-         // Map internal page links to correct path if needed
-         if (ctaNode.data.url) {
-           ctaLink = ctaNode.data.url.replace('/pages/', '/')
-         }
+         if (ctaNode.data.url) ctaLink = ctaNode.data.url.replace('/pages/', '/')
        }
      }
-
      return { ...res, title, bgImage, ctaText, ctaLink }
   }, [contentChildren, mediaData])
 
@@ -398,92 +302,63 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
         const res = await fetch(`/api/products?locale=${locale}&pageSize=12`)
         const data = await res.json()
         setProductsData(data.products || [])
-      } catch (e) { console.error("Fetch failed", e) }
-      finally { setLoadingProducts(false) }
+      } catch (error) {
+        console.error("Failed to fetch products:", error)
+      } finally {
+        setLoadingProducts(false)
+      }
     }
     fetchProducts()
   }, [locale])
 
-  // Fetch data for productCarousel blocks
   useEffect(() => {
-    const fetchAllCarousels = async () => {
-      const allSections = [heroData, showcaseData, categoriesTitle, productSeriesData]
-      const fetchPromises: Promise<any>[] = []
-      
-      allSections.forEach((section: any) => {
-        section.items.forEach((item: any) => {
-          if (item.sourceType === 'productCarousel' && item.carouselItems?.length > 0) {
-            fetchPromises.push(
-              (async () => {
-                try {
-                  const res = await fetch('/api/products/carousel', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ items: item.carouselItems, locale }),
-                  })
-                  if (res.ok) {
-                    const data = await res.json()
-                    return { id: item.carouselItems[0].id, products: data.products || [] }
-                  }
-                } catch (e) {
-                  console.error('Failed to fetch carousel products', e)
-                }
-                return null
-              })()
-            )
-          }
-        })
-      })
+    const carouselItems = contentChildren.filter((n: any) => n.type === 'productCarousel')
+    carouselItems.forEach(async (node: any) => {
+        const carouselId = node.data?.items?.[0]?.id
+        if (carouselId && !carouselProductsData[carouselId]) {
+            try {
+                const res = await fetch(`/api/products?locale=${locale}&carouselId=${carouselId}`)
+                const data = await res.json()
+                setCarouselProductsData(prev => ({ ...prev, [carouselId]: data.products || [] }))
+            } catch (err) {
+                console.error("Failed to fetch carousel products:", err)
+            }
+        }
+    })
+  }, [contentChildren, locale])
 
-      const results = await Promise.all(fetchPromises)
-      const newData: Record<string, any[]> = {}
-      results.forEach(res => {
-        if (res) newData[res.id] = res.products
-      })
-      setCarouselProductsData(prev => ({ ...prev, ...newData }))
-    }
+  const mapProductsWithCarouselConfig = (products: any[]) => {
+    return products.map((p: any) => ({
+      ...p,
+      title: p._carouselItem?.showName ? p.name : (p.category?.name || p.name),
+      showName: p._carouselItem?.showName !== false,
+      showCategory: !!p._carouselItem?.showCategory,
+      categoryName: p.category?.name || ""
+    }))
+  }
 
-    fetchAllCarousels()
-  }, [heroData, showcaseData, categoriesTitle, productSeriesData, locale])
-
-  // 整理数据映射 - 让 HighlightShowcaseSection 支持控制开关
   const mappedShowcaseProducts = useMemo(() => {
-    const carouselItem = showcaseData.items.find(it => it.sourceType === 'productCarousel')
-    if (carouselItem && carouselProductsData[carouselItem.carouselItems[0].id]) {
-      return carouselProductsData[carouselItem.carouselItems[0].id].map(p => ({
-        id: p.id,
-        image: p.showImage,
-        title: p._carouselItem?.showName ? p.name : (p.category?.name || p.name),
-        link: p.slug ? `/${locale}/shop/${p.slug}` : undefined,
-        // 透传配置
-        showName: p._carouselItem?.showName !== false,
-        showCategory: !!p._carouselItem?.showCategory,
-        categoryName: p.category?.name || ""
-      }))
+    const carouselItem = showcaseData.items.find((it: any) => it.sourceType === 'productCarousel')
+    if (carouselItem && carouselProductsData[carouselItem.carouselItems?.[0]?.id]) {
+      return mapProductsWithCarouselConfig(carouselProductsData[carouselItem.carouselItems[0].id])
     }
-    // 默认映射
-    return showcaseData.items.filter(it => it.sourceType !== 'productCarousel').map((it, idx) => ({
-      id: String(idx),
-      image: it.image,
-      title: it.title,
-      link: it.link
+    return showcaseData.items.filter((it: any) => it.sourceType !== 'productCarousel').map((it: any, idx: number) => ({
+      id: String(idx), image: it.image, title: it.title, link: it.link
     }))
   }, [showcaseData, carouselProductsData, locale])
 
-  // 整理数据映射 - 让 CategoriesGridSection 也支持如果被替换为 Carousel 的情况
   const gridProducts = useMemo(() => {
-    const carouselItem = categoriesTitle.items.find(it => it.sourceType === 'productCarousel')
-    if (carouselItem && carouselProductsData[carouselItem.carouselItems[0].id]) {
-      return carouselProductsData[carouselItem.carouselItems[0].id]
+    const carouselItem = categoriesTitle.items.find((it: any) => it.sourceType === 'productCarousel')
+    if (carouselItem && carouselProductsData[carouselItem.carouselItems?.[0]?.id]) {
+      return mapProductsWithCarouselConfig(carouselProductsData[carouselItem.carouselItems[0].id])
     }
     return productsData
   }, [categoriesTitle, productsData, carouselProductsData])
 
-  // 整理数据映射 - 让 ProductSeriesShowcaseSection 也支持 Carousel 设置
   const seriesProducts = useMemo(() => {
-    const carouselItem = productSeriesData.items.find(it => it.sourceType === 'productCarousel')
-    if (carouselItem && carouselProductsData[carouselItem.carouselItems[0].id]) {
-        return carouselProductsData[carouselItem.carouselItems[0].id]
+    const carouselItem = productSeriesData.items.find((it: any) => it.sourceType === 'productCarousel')
+    if (carouselItem && carouselProductsData[carouselItem.carouselItems?.[0]?.id]) {
+        return mapProductsWithCarouselConfig(carouselProductsData[carouselItem.carouselItems[0].id])
     }
     return productsData
   }, [productSeriesData, productsData, carouselProductsData])
@@ -491,48 +366,34 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
   return (
     <div className="min-h-screen bg-[#f6f4ed] select-none">
       <style jsx global>{`
-        /* 锁定全页面图片物理拖拽，保护版权 */
         img {
-          -webkit-user-drag: none;
-          -khtml-user-drag: none;
-          -moz-user-drag: none;
-          -o-user-drag: none;
-          user-drag: none;
+          -webkit-user-drag: none; -khtml-user-drag: none; -moz-user-drag: none; -o-user-drag: none; user-drag: none;
         }
       `}</style>
       <HeroSection slides={heroData.items} locale={locale} />
       <ValuePropositionSection 
-        title={problemsData.title} 
-        subtitle={problemsData.subtitle} 
-        problems={problemsData.items} 
-        advantages={[]} 
-        autoplay={problemsData.autoplay}
-        interval={problemsData.interval}
+        title={problemsData.title} subtitle={problemsData.subtitle} 
+        problems={problemsData.items} advantages={[]} 
+        autoplay={problemsData.autoplay} interval={problemsData.interval}
       />
       <AdvantagesSection title={advantagesData.title} advantages={advantagesData.items} />
       <PurchaseProcessSection title={processData.title} slides={processData.items} />
       <CategoriesGridSection title={categoriesTitle.title} subtitle={categoriesTitle.subtitle} products={gridProducts} locale={locale} loading={loadingProducts} />
       {showcaseData.items.length > 0 && (
         <HighlightShowcaseSection 
-          title={showcaseData.title} 
-          products={mappedShowcaseProducts as any} 
-          locale={locale} 
-          viewMoreText={showcaseData.viewMoreText}
-          viewMoreLink={showcaseData.viewMoreLink}
+          title={showcaseData.title} products={mappedShowcaseProducts as any} locale={locale} 
+          viewMoreText={showcaseData.viewMoreText} viewMoreLink={showcaseData.viewMoreLink}
         />
       )}
       {productsData.length > 0 && <ProductSeriesShowcaseSection title={productSeriesData.title} products={seriesProducts} locale={locale} />}
       {brandHighlightsData.items.length > 0 && <BrandHighlightsSection titleLine1={brandHighlightsData.titleLine1} titleLine2={brandHighlightsData.titleLine2} items={brandHighlightsData.items} />}
       <TrustSection title={trustData.title} items={trustData.items} images={trustImages} bgImage={trustBgImage} />
-      <CtaSection title={ctaData.title} description={ctaData.description} image={ctaData.image} formConfig={ctaData.formConfig || pageContent.formConfig} />
+      <CtaSection title={ctaData.title} description={ctaData.description} image={ctaData.image} formConfig={ctaData.formConfig} />
       {applicationsData.items.length > 0 && <ApplicationsSection title={applicationsData.title} items={applicationsData.items} locale={locale} />}
       <OemOdmGuideSection 
-        title={oemOdmGuideData.title} 
-        description={oemOdmGuideData.subtitle} 
-        bgImage={oemOdmGuideData.bgImage} 
-        ctaText={oemOdmGuideData.ctaText}
-        ctaLink={oemOdmGuideData.ctaLink}
-        locale={locale} 
+        title={oemOdmGuideData.title} description={oemOdmGuideData.subtitle} 
+        bgImage={oemOdmGuideData.bgImage} ctaText={oemOdmGuideData.ctaText}
+        ctaLink={oemOdmGuideData.ctaLink} locale={locale} 
       />
     </div>
   )

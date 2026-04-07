@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Upload, ChevronDown, Check } from "lucide-react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
@@ -12,6 +12,7 @@ interface CtaSectionProps {
   description?: string
   image?: any
   formConfig?: any
+  locale?: string
 }
 
 /**
@@ -109,21 +110,50 @@ function CustomDropdown({ label, options, placeholder, value, onChange }: any) {
  * CtaSection (Contact Form)
  * Refined with Double-Layer Ghosting Effect and Lenis-compatible Dropdown.
  */
-export function CtaSection({ title, description, image, formConfig }: CtaSectionProps) {
+export function CtaSection({ title, description, image, formConfig, locale = "en" }: CtaSectionProps) {
   const [formState, setFormState] = useState<any>({
     'project-type': '',
     'primary-requirement': '',
     'whatsapp': ''
   })
+
+  // --- Fetch full form config if only an ID is provided ---
+  const [fetchedFormConfig, setFetchedFormConfig] = useState<any>(null)
+
+  useEffect(() => {
+    const configId = typeof formConfig === 'string' ? formConfig : formConfig?.id
+    if (!configId) return
+
+    const fetchFullConfig = async () => {
+      try {
+        const res = await fetch(`/api/form-configs/${configId}?locale=${locale}`)
+        if (res.ok) {
+          const data = await res.json()
+          setFetchedFormConfig(data)
+        }
+      } catch (error) {
+        console.error("[CtaSection] Failed to fetch full form config:", error)
+      }
+    }
+    fetchFullConfig()
+  }, [formConfig, locale])
+
+  const mergedConfig = useMemo(() => {
+    const baseConfig = typeof formConfig === 'string' ? { id: formConfig } : formConfig || {}
+    return {
+      ...baseConfig,
+      ...fetchedFormConfig,
+    }
+  }, [formConfig, fetchedFormConfig])
   const [privacyAccepted, setPrivacyAccepted] = useState(false)
   const [isGloballyAccepted, setIsGloballyAccepted] = useState(false)
   const STORAGE_KEY = 'busrom_privacy_consent'
 
-  const showPrivacy = formConfig?.privacyConsentText && !isGloballyAccepted
+  const showPrivacy = mergedConfig?.privacyConsentText && !isGloballyAccepted
   const SECTION_HEIGHT = showPrivacy ? 1100 : 922
-  const IMAGE_HEIGHT = SECTION_HEIGHT - 120
-  const IMAGE_WIDTH = 584.5
-  const BG_TOP_OFFSET_SCALED = 180
+  const IMAGE_HEIGHT = SECTION_HEIGHT
+  const IMAGE_WIDTH = 689
+  const BG_TOP_OFFSET_SCALED = 120
 
   // Check global consent status on mount
   useEffect(() => {
@@ -160,7 +190,7 @@ export function CtaSection({ title, description, image, formConfig }: CtaSection
     return () => window.removeEventListener('storage', handleStorageChange)
   }, [])
 
-  const fields = formConfig?.fields || []
+  const fields = mergedConfig?.fields || []
   const getField = (name: string) => fields.find((f: any) => f.fieldName === name)
 
   return (
@@ -206,7 +236,7 @@ export function CtaSection({ title, description, image, formConfig }: CtaSection
               */}
               <motion.div 
                 initial={{ opacity: 0, x: 0, y: 0 }}
-                whileInView={{ opacity: 0.25, x: -100, y: -100 }}
+                whileInView={{ opacity: 0.25, x: -80, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 1.5, ease: "easeOut" }}
                 className="absolute inset-0"
@@ -215,14 +245,14 @@ export function CtaSection({ title, description, image, formConfig }: CtaSection
                   image={image} 
                   alt="Ghost Layer" 
                   className="w-full h-full object-cover"
-                  size="large"
+                  size="xlarge"
                 />
               </motion.div>
 
               {/* FRONT LAYER (SOLID): Flush Bottom-Right */}
               <motion.div 
                 initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                whileInView={{ opacity: 1, x: 0, y: 30 }}
                 viewport={{ once: true }}
                 transition={{ duration: 1, delay: 0.2 }}
                 className="absolute inset-0 z-10"
@@ -231,7 +261,7 @@ export function CtaSection({ title, description, image, formConfig }: CtaSection
                   image={image} 
                   alt="Solid Layer" 
                   className="w-full h-full object-cover"
-                  size="large"
+                  size="xlarge"
                 />
               </motion.div>
            </div>
@@ -242,10 +272,10 @@ export function CtaSection({ title, description, image, formConfig }: CtaSection
       <div className="relative z-20 w-full xl:hidden flex flex-col items-center px-6 py-12 gap-10">
           <div className="w-full max-w-[500px] text-center space-y-4">
               <h2 className="text-[32px] md:text-[40px] font-extrabold text-[#FFF28E] leading-tight tracking-tighter" style={{ fontFamily: "var(--font-anaheim)" }}>
-                {title || formConfig?.displayName || "Get A Complete Solution"}
+                {title || mergedConfig?.displayName || "Get A Complete Solution"}
               </h2>
               <p className="text-[16px] md:text-[18px] font-semibold text-white/90 leading-relaxed" style={{ fontFamily: "var(--font-anaheim)" }}>
-                {description || formConfig?.description || ""}
+                {description || mergedConfig?.description || ""}
               </p>
           </div>
 
@@ -307,7 +337,7 @@ export function CtaSection({ title, description, image, formConfig }: CtaSection
               />
 
               <div className="flex flex-col gap-6 mt-4">
-                  {formConfig?.privacyConsentText && !isGloballyAccepted && (
+                  {mergedConfig?.privacyConsentText && !isGloballyAccepted && (
                     <div className="flex items-start gap-3 cursor-pointer" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
                       <div className={cn(
                         "mt-1 flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all",
@@ -316,7 +346,7 @@ export function CtaSection({ title, description, image, formConfig }: CtaSection
                         {privacyAccepted && <Check className="w-3 h-3 text-white" />}
                       </div>
                       <p className="text-[13px] leading-relaxed text-white/70 text-left select-none">
-                        {formConfig.privacyConsentText}
+                        {mergedConfig.privacyConsentText}
                       </p>
                     </div>
                   )}
@@ -330,17 +360,26 @@ export function CtaSection({ title, description, image, formConfig }: CtaSection
                     </button>
 
                     <motion.button 
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.96 }}
-                      disabled={(!!formConfig?.privacyConsentText && !privacyAccepted)}
+                      initial={{ scale: 1 }}
+                      animate={{ scale: [1, 1.3, 1] }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+                      whileHover={{ 
+                        scale: 1.1,
+                        transition: { duration: 0.2 },
+                        boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
+                      }}
+                      whileTap={{ scale: 0.96, transition: { duration: 0.1 } }}
+                      disabled={(!!mergedConfig?.privacyConsentText && !privacyAccepted)}
                       className={cn(
-                        "w-full max-w-[320px] bg-[#B2A224] text-white text-[24px] font-black rounded-full shadow-lg transition-all",
+                        "w-full max-w-[320px] bg-[#B2A224] text-white text-[24px] font-black rounded-full shadow-lg transition-colors duration-300",
                         "h-14 flex items-center justify-center",
-                        (!!formConfig?.privacyConsentText && !privacyAccepted) && "grayscale opacity-80 cursor-not-allowed"
+                        (!!mergedConfig?.privacyConsentText && !privacyAccepted) 
+                          ? "grayscale opacity-80 cursor-not-allowed"
+                          : "hover:bg-white hover:text-[#B2A224]"
                       )}
                       style={{ fontFamily: "var(--font-anaheim)" }}
                     >
-                      {formConfig?.submitButtonText || "Send Inquiry"}
+                      {mergedConfig?.submitButtonText || "Send Inquiry"}
                     </motion.button>
                   </div>
               </div>
@@ -359,10 +398,10 @@ export function CtaSection({ title, description, image, formConfig }: CtaSection
         <div className="pl-[153px] w-[1100px] pt-[350px]">
            <div className="mb-10">
               <h2 className="text-[60px] font-extrabold text-[#FFF28E] leading-[1.1] mb-6 tracking-tighter" style={{ fontFamily: "var(--font-anaheim)" }}>
-                {title || formConfig?.displayName || ""}
+                {title || mergedConfig?.displayName || ""}
               </h2>
               <p className="text-[24px] font-semibold text-white/90 leading-[41px] max-w-[823px]" style={{ fontFamily: "var(--font-anaheim)" }}>
-                {description || formConfig?.description || ""}
+                {description || mergedConfig?.description || ""}
               </p>
            </div>
 
@@ -431,7 +470,7 @@ export function CtaSection({ title, description, image, formConfig }: CtaSection
 
             <div className="mt-8 flex flex-col gap-6 w-[773px]">
                {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
-               {formConfig?.privacyConsentText && !isGloballyAccepted && (
+               {mergedConfig?.privacyConsentText && !isGloballyAccepted && (
                  <div className="flex items-start gap-4 cursor-pointer group" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
                    <div className={cn(
                      "mt-1 flex-shrink-0 w-6 h-6 rounded border flex items-center justify-center transition-all",
@@ -458,28 +497,27 @@ export function CtaSection({ title, description, image, formConfig }: CtaSection
               </button>
 
               <motion.button 
-                initial={{ rotate: 0, scale: 1 }}
-                animate={{ rotate: [0, -6, 6, -6, 6, -6, 6, 0] }}
+                initial={{ scale: 1, rotate: 0 }}
+                animate={{ scale: [1, 1.03, 1], rotate: 0 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 whileHover={{ 
                   scale: 1.05,
                   rotate: 0,
-                  filter: "brightness(1.1)",
+                  transition: { duration: 0.2 },
                   boxShadow: "0 20px 40px rgba(0,0,0,0.25)"
                 }}
-                whileTap={{ scale: 0.96 }}
-                transition={{ 
-                  rotate: { duration: 0.6, repeat: Infinity, repeatDelay: 1.5, ease: "easeInOut" },
-                  scale: { type: "tween", duration: 0.15, ease: "easeOut" }
-                }}
-                disabled={(!!formConfig?.privacyConsentText && !privacyAccepted)}
+                whileTap={{ scale: 0.96, rotate: 0, transition: { duration: 0.1 } }}
+                disabled={(!!mergedConfig?.privacyConsentText && !privacyAccepted)}
                 className={cn(
-                  "w-[419px] bg-[#B2A224] text-white text-[40px] font-black rounded-[63px] shadow-2xl transition-all self-center",
+                  "w-[419px] bg-[#B2A224] text-white text-[40px] font-black rounded-[63px] shadow-2xl transition-colors duration-300 self-center",
                   "min-h-[83px] h-auto py-4 whitespace-pre-line leading-tight px-8",
-                  (!!formConfig?.privacyConsentText && !privacyAccepted) && "grayscale opacity-80 cursor-not-allowed"
+                  (!!mergedConfig?.privacyConsentText && !privacyAccepted) 
+                    ? "grayscale opacity-80 cursor-not-allowed"
+                    : "hover:bg-white hover:text-[#B2A224]"
                 )}
                 style={{ fontFamily: "var(--font-anaheim)" }}
               >
-                {formConfig?.submitButtonText || "Send Inquiry"}
+                {mergedConfig?.submitButtonText || "Send Inquiry"}
               </motion.button>
            </div>
            </div>
