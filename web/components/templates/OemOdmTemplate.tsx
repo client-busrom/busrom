@@ -393,9 +393,17 @@ function extractGalleryAfterMarker(
     // 自定义图片画廊
     if (node.type === "custom-image-gallery" && node.data?.images) {
       for (const galleryItem of node.data.images) {
-        const imageId = typeof galleryItem?.image === "object" && galleryItem.image
-          ? galleryItem.image.id
-          : String(galleryItem?.image || "")
+        // 🚨 修正这里的 ID 获取逻辑
+        let imageId = ""
+        
+        if (galleryItem.sourceType === "application" && galleryItem.application) {
+          // 如果是案例，这个 ID 就是我们在后端建立映射时的 key
+          imageId = String(galleryItem.application)
+        } else {
+          // 普通图片选择方式
+          const image = galleryItem?.image
+          imageId = typeof image === "object" && image ? image.id : String(image || "")
+        }
           
         if (imageId && mediaData[imageId]) {
           const mediaObj = { ...mediaData[imageId] }
