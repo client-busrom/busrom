@@ -204,6 +204,16 @@ function resolveApplicationGalleryImages(
     if (node.children && Array.isArray(node.children)) {
       for (const child of node.children) traverse(child)
     }
+    
+    // Support for layout nodes with columns (common in free-layout landing pages)
+    if (node.type === 'layout' && Array.isArray(node.columns)) {
+      for (const col of node.columns) {
+        if (col.children && Array.isArray(col.children)) {
+          for (const child of col.children) traverse(child)
+        }
+      }
+    }
+
     if (node.root) traverse(node.root)
   }
 
