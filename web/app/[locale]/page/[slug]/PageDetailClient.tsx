@@ -20,6 +20,8 @@ interface PageContent {
   content: {
     document: any[]
   } | null
+  contentTranslation?: any
+  mediaData?: Record<string, any>
   locale: string
 }
 
@@ -149,14 +151,14 @@ export function PageDetailClient({ locale, slug }: PageDetailClientProps) {
         )}
 
         {/* Content */}
-        {page.content && (
+        {(page.contentTranslation || page.content) && (
           <div className="prose prose-lg max-w-none">
-            <LexicalRenderer content={page.content} />
+            <LexicalRenderer content={page.contentTranslation || page.content} mediaData={page.mediaData || {}} />
           </div>
         )}
 
         {/* No content placeholder */}
-        {!page.content && (
+        {!(page.contentTranslation || page.content) && (
           <div className="py-12 text-center">
             <p className="text-brand-accent-gold">
               {locale === "zh" ? "此页面暂无内容。" : "This page has no content yet."}

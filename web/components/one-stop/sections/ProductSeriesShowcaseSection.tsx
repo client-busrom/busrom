@@ -34,33 +34,46 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
 
   const getDisplayName = () => {
     const item = (activeProduct as any)._carouselItem
-    const categoryName = (activeProduct as any).category?.name || "Category"
+    const categoryName = (activeProduct as any).category?.name || (activeProduct as any).categoryName || "Category"
     const productName = activeProduct.name || ""
     
     if (item) {
-       if (item.showCategory === true) return categoryName
-       if (item.showName === false) return categoryName
+       // 只要定义了显示分类，或者明确定义了不显示产品名称，就显示分类
+       if (item.showCategory === true || item.showName === false) return categoryName
+       if (item.showName === true) return productName
     }
-    return productName
+    
+    // 兜底逻辑：如果映射数据里原本就有处理过的 title，优先用处理好的
+    return (activeProduct as any).title || productName
   }
 
   const displayedImages = useMemo(() => {
-    const images = activeProduct.mainImage && activeProduct.mainImage.length > 0 
-      ? [...activeProduct.mainImage] 
-      : (activeProduct.showImage ? [activeProduct.showImage] : [])
-    
-    if (images.length === 0) return [null, null]
-    if (images.length === 1) return [images[0], images[0]]
-    
-    const shuffled = [...images].sort(() => 0.5 - Math.random())
-    return [shuffled[0], shuffled[1]]
+    const mainImages = (activeProduct as any).mainImage || []
+    const showImgNode = (activeProduct as any).showImage
+
+    if (mainImages.length > 0) {
+      // 随机抓取两张不重复的图
+      const shuffled = [...mainImages].sort(() => 0.5 - Math.random())
+      const img1 = shuffled[0]
+      const img2 = shuffled.length > 1 ? shuffled[1] : (showImgNode || shuffled[0])
+      return [img1, img2]
+    }
+
+    // 兜底逻辑
+    return [showImgNode, showImgNode]
   }, [activeProduct])
 
   const attributes = useMemo(() => {
-    if (Array.isArray(activeProduct.productAttributes)) return activeProduct.productAttributes
+    const config = (activeProduct as any)._carouselItem
+    // 如果 CMS 明确关闭了“显示核心亮点”，则不显示任何属性
+    if (config && config.showHighlights === false) return []
+
+    if (Array.isArray(activeProduct.productAttributes) && activeProduct.productAttributes.length > 0) return activeProduct.productAttributes
     if (typeof activeProduct.productAttributes === 'string') {
-        return activeProduct.productAttributes.split('\n').filter(line => line.trim())
+        return (activeProduct.productAttributes as string).split('\n').filter(line => line.trim())
     }
+    
+    // 如果开启了显示但没数据，返回默认值
     return ["Robust and stable", "Resistant to moisture", "Minimalist aesthetics", "Versatile and adaptable"]
   }, [activeProduct])
 
@@ -105,19 +118,26 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
                   </div>
                 ))}
               </div>
-              <Link href={`/${locale}/shop/${activeProduct.slug}`} className="self-end flex items-center gap-3 mt-4 group">
-                <span className="text-xl font-bold text-[#756F3F] font-anaheim uppercase">SEE ALL</span>
-                <div className="w-12 h-12 rounded-full border border-[#756F3F] flex items-center justify-center group-hover:bg-[#756F3F] active:bg-[#756F3F] transition-colors">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="group-hover:stroke-white active:stroke-white transition-colors"><path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </div>
-              </Link>
+                <Link 
+                  href={`/${locale}/shop/${activeProduct.slug}`} 
+                  className="flex items-center gap-[0.78vw] xl:gap-[12px] group/see transition-all duration-300 transform translate-x-[40px] translate-y-[50px]"
+                >
+                  <span className="text-xl font-bold text-[#756F3F] font-anaheim transition-colors group-hover/see:text-black">
+                    {(activeProduct as any)._carouselItem?.buttonText || "SEE ALL"}
+                  </span>
+                  <div className="w-12 h-12 rounded-full border border-[#756F3F] flex items-center justify-center text-[#756F3F] group-hover/see:bg-[#756F3F] group-hover/see:text-white transition-all">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                </Link>
             </div>
 
             <div className="grid grid-cols-2 gap-4 w-full">
-              <div className="aspect-[3/4] rounded-[20px] overflow-hidden shadow-lg border border-black/5">
+              <div className="aspect-[3/4] rounded-[20px] overflow-hidden shadow-lg border-none">
                 <OptimizedImage image={displayedImages[0]} alt="Feature 1" className="w-full h-full object-cover" size="medium" />
               </div>
-              <div className="aspect-[3/4] rounded-[20px] overflow-hidden shadow-lg border border-black/5">
+              <div className="aspect-[3/4] rounded-[20px] overflow-hidden shadow-lg border-none">
                 <OptimizedImage image={displayedImages[1]} alt="Feature 2" className="w-full h-full object-cover" size="medium" />
               </div>
             </div>
@@ -185,12 +205,12 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="absolute inset-x-0 bottom-[4%] z-0 flex gap-8 pl-[7.97%]"
+            className="absolute inset-x-0 bottom-[4%] z-0 flex justify-center gap-8"
           >
             {/* Left Beige Card */}
-            <div className="w-[39.9%] aspect-[766/561] rounded-[1.56vw] xl:rounded-[22.8px] bg-[#F1E8CA] p-[4.68%] flex flex-col justify-between shadow-2xl relative">
+            <div className="w-[40%] aspect-[766/561] rounded-[1.56vw] xl:rounded-[22.8px] bg-[#F1E8CA] p-[4.68%] flex flex-col justify-between shadow-2xl relative">
               <div className="relative z-10">
-                <h3 className="text-[3.33vw] xl:text-[51.2px] font-[800] text-[#6D5400] leading-none mb-[1.56%] font-anaheim uppercase">
+                <h3 className="text-[3.33vw] xl:text-[48px] font-[800] text-[#6D5400] leading-none mb-6 font-anaheim uppercase">
                   {getDisplayName()}
                 </h3>
                 <div className="flex flex-col gap-2">
@@ -199,16 +219,21 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
                       <div className="w-[1.87vw] h-[2vw] xl:w-[28.8px] xl:h-[28.8px] rounded-full bg-[#A5A075] flex items-center justify-center shrink-0">
                         <svg width="60%" height="60%" viewBox="0 0 18 14" fill="none"><path d="M1.5 7L6.5 12L16.5 2" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
                       </div>
-                      <p className="text-[1.25vw] xl:text-[19.2px] font-semibold text-black font-anaheim uppercase leading-none truncate">{attr}</p>
+                      <p className="text-[1.25vw] xl:text-[20px] font-semibold text-black font-anaheim uppercase leading-none truncate">{attr}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
               <div className="self-end relative z-10">
-                <Link href={`/${locale}/shop/${activeProduct.slug}`} className="flex items-center gap-[0.625vw] group">
-                  <span className="text-[1.14vw] xl:text-[17.6px] font-bold text-[#756F3F] transition-colors group-hover:text-black font-anaheim uppercase">SEE ALL</span>
-                  <div className="w-[2.97vw] h-[2.97vw] xl:w-[45.6px] xl:h-[45.6px] rounded-full border border-[#756F3F] flex items-center justify-center text-[#756F3F] group-hover:bg-[#756F3F] group-hover:text-white transition-all">
+                <Link 
+                  href={`/${locale}/shop/${activeProduct.slug}`} 
+                  className="flex items-center gap-[0.78vw] xl:gap-[12px] group/see transition-all duration-300 transform translate-x-[40px] translate-y-[50px]"
+                >
+                  <span className="text-[1.14vw] xl:text-[17.6px] font-bold text-[#756F3F] transition-colors group-hover/see:text-black font-anaheim uppercase">
+                    {(activeProduct as any)._carouselItem?.buttonText || "SEE ALL"}
+                  </span>
+                  <div className="w-[2.97vw] h-[2.97vw] xl:w-[45.6px] xl:h-[45.6px] rounded-full border border-[#756F3F] flex items-center justify-center text-[#756F3F] group-hover/see:bg-[#756F3F] group-hover/see:text-white transition-all">
                     <svg width="42%" height="42%" viewBox="0 0 24 24" fill="none">
                       <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
@@ -217,11 +242,13 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
               </div>
             </div>
 
-            {/* Right Image Cards */}
-            <div className="w-[19.53%] aspect-[375/561] rounded-[1.56vw] xl:rounded-[22.8px] overflow-hidden shadow-2xl border border-black/5">
+            {/* Right Image Card 1 (Clean) */}
+            <div className="w-[19.53%] aspect-[375/561] rounded-[1.56vw] xl:rounded-[22.8px] overflow-hidden shadow-2xl border-none">
               <OptimizedImage image={displayedImages[0]} alt="Showcase 1" className="w-full h-full object-cover" size="large" />
             </div>
-            <div className="w-[19.53%] aspect-[375/561] rounded-[1.56vw] xl:rounded-[22.8px] overflow-hidden shadow-2xl border border-black/5">
+
+            {/* Right Image Card 2 (Clean) */}
+            <div className="w-[19.53%] aspect-[375/561] rounded-[1.56vw] xl:rounded-[22.8px] overflow-hidden shadow-2xl border-none">
               <OptimizedImage image={displayedImages[1]} alt="Showcase 2" className="w-full h-full object-cover" size="large" />
             </div>
           </motion.div>

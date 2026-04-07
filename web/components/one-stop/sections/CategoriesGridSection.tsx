@@ -84,10 +84,12 @@ export function CategoriesGridSection({
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
+                animate={{ filter: "drop-shadow(0 0 0 rgba(0,0,0,0))" }}
                 whileHover={{ 
                   scale: 1.02,
                   filter: `drop-shadow(0 ${vw(21)} ${vw(24)} rgba(0, 0, 0, 0.12))`
                 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
                 viewport={{ once: true }}
                 className="absolute inset-0 group p-5 lg:p-[1.45vw]"
               >
@@ -114,14 +116,14 @@ export function CategoriesGridSection({
                 <div 
                   className="absolute z-30 left-6 top-[22px] w-[80%] lg:left-[2.08vw] lg:top-[1.14vw] lg:w-[13.54vw]" 
                 >
-                  <h4 className="font-anaheim font-extrabold text-black text-[18px] lg:text-[1.51vw] leading-[1.25]">
+                  <h4 className="font-anaheim font-medium group-hover:font-extrabold text-black text-[18px] lg:text-[1.51vw] leading-[1.25] transition-all duration-300">
                     {item.category?.name || item.name}
                   </h4>
                 </div>
  
                 {/* Product Image */}
                 <div 
-                  className="absolute inset-0 flex items-end justify-start z-10 overflow-hidden"
+                  className="absolute inset-0 flex items-end justify-center z-10 overflow-hidden"
                   style={{ 
                     WebkitMaskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 505 466'%3E%3Cpath d='M391 0C413.091 0 431 17.9086 431 40V48C431 68.1152 447.052 84.4817 467.045 84.9883L468.955 85.0117C488.948 85.5183 505 101.885 505 122V426C505 448.091 487.091 466 465 466H40C17.9086 466 0 448.091 0 426V40C0 17.9086 17.9086 0 40 0H391Z' fill='black'/%3E%3C/svg%3E")`,
                     maskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 505 466'%3E%3Cpath d='M391 0C413.091 0 431 17.9086 431 40V48C431 68.1152 447.052 84.4817 467.045 84.9883L468.955 85.0117C488.948 85.5183 505 101.885 505 122V426C505 448.091 487.091 466 465 466H40C17.9086 466 0 448.091 0 426V40C0 17.9086 17.9086 0 40 0H391Z' fill='black'/%3E%3C/svg%3E")`,
@@ -129,13 +131,13 @@ export function CategoriesGridSection({
                   }}
                 >
                   <div 
-                    className="w-full h-full pointer-events-none transform translate-x-[-30px] translate-y-[30px] scale-[1.05]
-                               lg:translate-x-[-3.125vw] lg:translate-y-[3.125vw] lg:scale-[1.1] origin-bottom-left"
+                    className="w-full h-full pointer-events-none transform translate-y-[10px] scale-[0.85]
+                               lg:translate-y-[2.4vw] lg:scale-[0.9] origin-bottom"
                   >
                     <OptimizedImage
                       image={(item.showImage || item.image) as any}
                       alt={item.name}
-                      className="object-contain object-left-bottom w-full h-full"
+                      className="object-contain object-bottom w-full h-full"
                       size="medium"
                     />
                   </div>

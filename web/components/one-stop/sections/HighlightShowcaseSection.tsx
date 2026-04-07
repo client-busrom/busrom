@@ -41,7 +41,7 @@ export function HighlightShowcaseSection({ title, products, locale, viewMoreText
       <div className="lg:hidden w-full px-6 flex flex-col gap-12">
         <div className="flex flex-col gap-4">
           <h2 
-            className="font-anaheim font-bold text-[#756F3F] text-3xl md:text-5xl uppercase tracking-wider"
+            className="font-anaheim font-bold text-[#756F3F] text-3xl md:text-5xl tracking-wider"
             dangerouslySetInnerHTML={{ __html: (title || "Highlight Showcase").replace(/\n/g, '<br />') }}
           />
           <div className="h-1 w-20 bg-[#C7BB5D]" />
@@ -102,7 +102,7 @@ export function HighlightShowcaseSection({ title, products, locale, viewMoreText
           height: vw(860), 
           borderRadius: vw(30), 
           overflow: "visible", // Changed to visible for shadow/glow overflow
-          background: "linear-gradient(180deg, #756F3F 0%, #8F884E 100%)",
+          background: "linear-gradient(180deg, #756F3F 0%, #C0B985 100%)",
           zIndex: 0
         }}
       >
@@ -192,7 +192,7 @@ export function HighlightShowcaseSection({ title, products, locale, viewMoreText
                     <div className="absolute inset-[5%] bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-700 blur-[60px] translate-y-32 pointer-events-none group-hover:scale-[1.2] z-0 rounded-[vw(30)]" />
 
                     <Link href={item.link || "#"} className="block w-full h-full relative z-10">
-                      <div className="absolute inset-0 shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden transition-all duration-300 group-hover:scale-[1.04] border border-white/20" style={{ borderRadius: vw(30) }}>
+                      <div className="absolute inset-0 shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden transition-all duration-300 group-hover:scale-[1.04]" style={{ borderRadius: vw(30) }}>
                         <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-110">
                           <OptimizedImage image={item.image} alt={item.title || ""} className="w-full h-full object-cover" containerClassName="w-full h-full" size="small" />
                         </div>

@@ -116,11 +116,11 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
            <div className="relative mb-2">
              <motion.div 
                animate={{ 
-                 x: [0, 15, -15, 0],
-                 y: [0, -10, 10, 0],
+                 x: [0, 60, -60, 0],
+                 y: [0, -40, 40, 0],
                }}
-               transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-               className="bg-[#EDEBD8] rounded-full absolute -top-4 -right-4 -z-10 blur-[8px] opacity-70" 
+               transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+               className="bg-[#EDEBD8] rounded-full absolute -top-4 right-[64px] -z-10 opacity-70" 
                style={{ width: "80px", height: "80px" }}
              />
              <h3 

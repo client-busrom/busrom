@@ -100,7 +100,7 @@ function extractHighlights(productAttributes: any): { text: string; icon?: strin
 /**
  * Transform product data to frontend format
  */
-function transformProduct(product: any) {
+function transformProduct(product: any, locale: string = 'en') {
   const getName = (obj: any) => {
     if (!obj) return ''
     if (typeof obj === 'string') return obj
@@ -128,6 +128,15 @@ function transformProduct(product: any) {
           variants: transformImageVariants(product.showImage.sizes),
         }
       : null,
+    mainImage: Array.isArray(product.mainImage)
+      ? product.mainImage.map((img: any) => ({
+          id: img.id,
+          url: normalizeToCDN(img.url),
+          altText: img.alt || '',
+          cropFocalPoint: getCropFocalPoint(img),
+          variants: transformImageVariants(img.sizes),
+        }))
+      : [],
     series: product.series
       ? {
           id: typeof product.series === 'string' ? product.series : product.series.id,
@@ -142,9 +151,23 @@ function transformProduct(product: any) {
           name: categoryName,
         }
       : null,
-    productAttributes: {
-      highlights: extractHighlights(product.productAttributes)
-    },
+    productAttributes: (() => {
+      // 这里的 attributePage 可能是被深层 populated 后的对象也可能是个 ID
+      const page = product.attributePage
+      if (!page || typeof page !== 'object') return []
+      
+      // JSON 字段可能因为配置了 localized: true 而变成了 { en: [], zh: [] } 格式
+      let sourceArray = page.productAttributes
+      if (sourceArray && !Array.isArray(sourceArray) && typeof sourceArray === 'object') {
+        sourceArray = sourceArray[locale] || sourceArray['en'] || []
+      }
+
+      return Array.isArray(sourceArray)
+        ? sourceArray
+            .filter((attr: any) => attr.showOnFrontEnd !== false && attr.value)
+            .map((attr: any) => attr.value)
+        : []
+    })(),
   }
 }
 
@@ -220,7 +243,7 @@ export async function POST(request: NextRequest) {
     if (manualProductIds.length > 0) {
       const params = new URLSearchParams()
       params.append('locale', locale)
-      params.append('depth', '1')
+      params.append('depth', '2')
       params.append('limit', manualProductIds.length.toString())
       manualProductIds.forEach((id, index) => {
         params.append(`where[id][in][${index}]`, id)
@@ -253,7 +276,7 @@ export async function POST(request: NextRequest) {
     for (const seriesId of seriesIds) {
       const params = new URLSearchParams()
       params.append('locale', locale)
-      params.append('depth', '1')
+      params.append('depth', '2')
       params.append('limit', '100') // Get enough products for random selection
       params.append('where[series][equals]', seriesId)
       params.append('where[status][equals]', 'published')
@@ -281,7 +304,7 @@ export async function POST(request: NextRequest) {
         const product = manualProducts.get(item.product)
         if (product) {
           result.push({
-            ...transformProduct(product),
+            ...transformProduct(product, locale),
             _carouselItem: {
               showName: item.showName,
               showCategory: item.showCategory,
@@ -308,7 +331,7 @@ export async function POST(request: NextRequest) {
           usedProductIds.add(selectedProduct.id)
 
           result.push({
-            ...transformProduct(selectedProduct),
+            ...transformProduct(selectedProduct, locale),
             _carouselItem: {
               showName: item.showName,
               showCategory: item.showCategory,

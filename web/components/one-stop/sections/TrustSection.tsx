@@ -16,6 +16,11 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
   const [activeIndex, setActiveIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   
+  const scrollRef = React.useRef<HTMLDivElement>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [startX, setStartX] = useState(0)
+  const [scrollTop, setScrollTop] = useState(0)
+
   const defaultItems = [
     { title: "One-stop Full-range Supply", description: "Cover all parts of hardware, saving coordination costs" },
     { title: "Customize It Your Way", description: "Flexible manufacturing capabilities for your unique designs" },
@@ -27,24 +32,60 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
 
   const displayItems = items && items.length > 0 ? items : defaultItems
 
+  // Auto-play Logic
   useEffect(() => {
-    if (isPaused) return
+    if (isPaused || isDragging) return
     const timer = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % displayItems.length)
     }, 5000)
     return () => clearInterval(timer)
-  }, [isPaused, displayItems.length])
+  }, [isPaused, isDragging, displayItems.length])
+
+  // 1. Lenis Support - Reference handle scroll behavior similar to LocaleSwitcher
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+
+    const stopPropagation = (event: WheelEvent | TouchEvent) => {
+      event.stopPropagation()
+    }
+
+    el.addEventListener("wheel", stopPropagation, { passive: false })
+    el.addEventListener("touchmove", stopPropagation, { passive: false })
+
+    return () => {
+      el.removeEventListener("wheel", stopPropagation)
+      el.removeEventListener("touchmove", stopPropagation)
+    }
+  }, [])
+
+  // 2. Drag-to-Scroll logic
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollRef.current) return
+    setIsDragging(true)
+    setStartX(e.pageY - scrollRef.current.offsetTop)
+    setScrollTop(scrollRef.current.scrollTop)
+  }
+
+  const handleMouseLeave = () => setIsDragging(false)
+  const handleMouseUp = () => setIsDragging(false)
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollRef.current) return
+    e.preventDefault()
+    const y = e.pageY - scrollRef.current.offsetTop
+    const walk = (y - startX) * 1.5 // Scroll speed
+    scrollRef.current.scrollTop = scrollTop - walk
+  }
 
   const getImage = (index: number) => {
     if (!images[index]) return null
     return images[index].image || images[index]
   }
 
-  const getItemY = (globalY: number) => globalY - 10783
-
   return (
     <section 
-      className="relative w-full overflow-hidden flex flex-col items-center bg-black py-32 lg:py-0 min-h-[1100px] lg:h-[1150px] lg:min-h-[1150px]"
+      className="relative w-full overflow-hidden flex flex-col items-center bg-black py-32 lg:py-0 min-h-[922px] lg:h-[922px] lg:min-h-[922px]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -67,28 +108,46 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="text-[32px] lg:text-[60px] font-extrabold text-white leading-tight lg:leading-[70px] tracking-[0.05em] mb-8 lg:mb-12 text-center lg:text-left"
+            className="text-[32px] lg:text-[60px] font-extrabold text-white leading-tight lg:leading-[70px] tracking-[0.05em] mb-8 lg:mb-10 text-center lg:text-left select-none"
             style={{ fontFamily: "var(--font-anaheim)" }}
             dangerouslySetInnerHTML={{ __html: (title || "Why Contractors<br />Trust Us?").replace(/\n/g, '<br />') }}
           />
 
-          <div className="w-full lg:max-w-[640px] mx-auto lg:mx-0">
-              {displayItems.slice(0, 6).map((item, i) => {
+          {/* Scrollable Items Container with Drag/Wheel support */}
+          <div 
+            ref={scrollRef}
+            onMouseDown={handleMouseDown}
+            onMouseLeave={handleMouseLeave}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+            className={`w-full lg:max-w-[640px] mx-auto lg:mx-0 lg:max-h-[600px] lg:overflow-y-auto lg:pr-8 custom-scrollbar select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            style={{ 
+              scrollbarWidth: "none", // Hide default scrollbar thumb for cleaner look
+              msOverflowStyle: "none"
+            }}
+          >
+            <style jsx>{`
+              .custom-scrollbar::-webkit-scrollbar {
+                width: 0px; /* Hidden but scrollable */
+                display: none;
+              }
+            `}</style>
+              {displayItems.map((item, i) => {
                   const isActive = activeIndex === i
                   return (
-                      <div key={i} className="mb-6 lg:mb-8 group border-b border-white/10">
+                      <div key={i} className="mb-4 lg:mb-6 group border-b border-white/10">
                           <button 
-                              onClick={() => setActiveIndex(i)}
+                              onClick={() => !isDragging && setActiveIndex(i)}
                               className="w-full flex justify-between items-center text-left py-4 transition-all"
                           >
                               <h4 
-                                  className={`text-[18px] lg:text-[24px] font-bold leading-tight transition-colors duration-300 ${isActive ? 'text-[#FFF28E]' : 'text-white/60 group-hover:text-white'}`}
+                                  className={`text-[18px] lg:text-[22px] font-bold transition-colors duration-300 ${isActive ? 'text-[#FFF28E]' : 'text-white/60 group-hover:text-white'}`}
                                   style={{ fontFamily: "var(--font-anaheim)" }}
                               >
                                   {item.title}
                               </h4>
-                              <div className={`w-8 h-8 lg:w-[48px] lg:h-[48px] rounded-full border-2 flex items-center justify-center transition-all duration-300 shrink-0 ${isActive ? 'border-[#FFF28E] bg-[#FFF28E] text-black rotate-180' : 'border-white/20 text-white'}`}>
-                                  {isActive ? <Minus className="w-4 h-4 lg:w-[24px] lg:h-[24px]" strokeWidth={3} /> : <Plus className="w-4 h-4 lg:w-[24px] lg:h-[24px]" strokeWidth={3} />}
+                              <div className={`w-8 h-8 lg:w-[40px] lg:h-[40px] rounded-full border-2 flex items-center justify-center transition-all duration-300 shrink-0 ${isActive ? 'border-[#FFF28E] bg-[#FFF28E] text-black rotate-180' : 'border-white/20 text-white'}`}>
+                                  {isActive ? <Minus className="w-4 h-4 lg:w-[20px] lg:h-[20px]" strokeWidth={3} /> : <Plus className="w-4 h-4 lg:w-[20px] lg:h-[20px]" strokeWidth={3} />}
                               </div>
                           </button>
 
@@ -101,7 +160,7 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
                                       transition={{ duration: 0.4 }}
                                       className="overflow-hidden"
                                   >
-                                      <p className="text-[16px] lg:text-[20px] font-semibold text-white/80 leading-relaxed lg:leading-[32px] pb-8 lg:pr-[180px]" style={{ fontFamily: "var(--font-anaheim)" }}>
+                                      <p className="text-[16px] lg:text-[18px] font-medium text-white/80 leading-relaxed pb-8 lg:pr-[40px]" style={{ fontFamily: "var(--font-anaheim)" }}>
                                           {item.description || item.summary}
                                       </p>
                                   </motion.div>

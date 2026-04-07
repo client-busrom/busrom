@@ -138,7 +138,7 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
         {/* 1. Title - Fluid & Aligned */}
         <div 
           className="hidden lg:block relative lg:absolute z-30 lg:pointer-events-none mb-10 lg:mb-0 text-center lg:text-left"
-          style={{ left: vw(140), top: "0px" }}
+          style={{ left: vw(60), top: vw(-50) }}
         >
           <h2 
             className="font-semibold tracking-wide text-[32px] lg:text-[2.5vw] lg:leading-[1.2]"
