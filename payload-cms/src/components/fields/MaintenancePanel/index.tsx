@@ -17,6 +17,7 @@ const i18n = {
 
 export const MaintenancePanel: React.FC = () => {
   const [loading, setLoading] = useState<string | null>(null)
+  const [confirming, setConfirming] = useState<'cdn' | null>(null)
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
   const { i18n: { language } } = useTranslation()
   const t = (obj: { en: string; zh: string }) => language === 'zh' ? obj.zh : obj.en
@@ -26,14 +27,17 @@ export const MaintenancePanel: React.FC = () => {
   const frontendUrl = useFormFields(([fields]) => fields.frontendUrl?.value as string)
   const revalidateSecret = useFormFields(([fields]) => fields.revalidateSecret?.value as string)
 
-  const handleCdnInvalidation = async () => {
+  const triggerCdnInvalidation = () => {
     if (!distributionId) {
       setResult({ success: false, message: t(i18n.missingConfig) })
       return
     }
+    setConfirming('cdn')
+    setResult(null)
+  }
 
-    if (!confirm(t(i18n.confirmCdn))) return
-
+  const handleCdnInvalidation = async () => {
+    setConfirming(null)
     setLoading('cdn')
     setResult(null)
 
@@ -97,42 +101,96 @@ export const MaintenancePanel: React.FC = () => {
       <h4 style={{ margin: '0 0 8px 0' }}>{t(i18n.maintenanceTitle)}</h4>
       <p style={{ fontSize: '14px', opacity: 0.7, margin: '0 0 20px 0' }}>{t(i18n.maintenanceDesc)}</p>
 
-      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-        <button
-          type="button"
-          onClick={handleCdnInvalidation}
-          disabled={!!loading}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: loading === 'cdn' ? '#666' : '#222',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: !!loading ? 'not-allowed' : 'pointer',
-            fontSize: '14px',
-            fontWeight: '600'
-          }}
-        >
-          {loading === 'cdn' ? t(i18n.clearing) : t(i18n.clearCdn)}
-        </button>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+          {confirming === 'cdn' ? (
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: 'column',
+              gap: '12px', 
+              padding: '16px',
+              border: '1px solid #ffccc7',
+              backgroundColor: '#fff2f0',
+              borderRadius: '6px',
+              width: '100%',
+            }}>
+              <p style={{ margin: 0, fontSize: '14px', color: '#cf1322', fontWeight: '500' }}>
+                {t(i18n.confirmCdn)}
+              </p>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={handleCdnInvalidation}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: '#ff4d4f',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '600'
+                  }}
+                >
+                  {t(i18n.clearCdn)} (Confirm)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirming(null)}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: 'white',
+                    color: '#595959',
+                    border: '1px solid #d9d9d9',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={triggerCdnInvalidation}
+              disabled={!!loading}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: loading === 'cdn' ? '#666' : '#222',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: !!loading ? 'not-allowed' : 'pointer',
+                fontSize: '14px',
+                fontWeight: '600'
+              }}
+            >
+              {loading === 'cdn' ? t(i18n.clearing) : t(i18n.clearCdn)}
+            </button>
+          )}
 
-        <button
-          type="button"
-          onClick={handleFrontendRevalidation}
-          disabled={!!loading}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: loading === 'revalidate' ? '#666' : '#0070f3',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: !!loading ? 'not-allowed' : 'pointer',
-            fontSize: '14px',
-            fontWeight: '600'
-          }}
-        >
-          {loading === 'revalidate' ? t(i18n.clearing) : t(i18n.revalidateFrontend)}
-        </button>
+          {!confirming && (
+            <button
+              type="button"
+              onClick={handleFrontendRevalidation}
+              disabled={!!loading}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: loading === 'revalidate' ? '#666' : '#0070f3',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: !!loading ? 'not-allowed' : 'pointer',
+                fontSize: '14px',
+                fontWeight: '600'
+              }}
+            >
+              {loading === 'revalidate' ? t(i18n.clearing) : t(i18n.revalidateFrontend)}
+            </button>
+          )}
+        </div>
       </div>
 
       {result && (

@@ -263,7 +263,11 @@ export async function GET(request: NextRequest) {
         order: product.order || 0,
         shopOrder: product.shopOrder || 0,
         status: product.status === 'published' ? 'PUBLISHED' : 'DRAFT',
-        productAttributes: product.productAttributes || null,
+        productAttributes: Array.isArray(product.attributePage?.productAttributes)
+          ? product.attributePage.productAttributes
+              .filter((attr: any) => attr.showOnFrontEnd !== false && attr.value)
+              .map((attr: any) => attr.value)
+          : [],
         linkedForm: product.linkedForm || null,
         createdAt: product.createdAt,
         updatedAt: product.updatedAt,

@@ -205,12 +205,14 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
       </div>
 
       {/* Pagination Controls */}
-      <div className="absolute bottom-12 z-30 flex items-center gap-6 bg-black/20 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 scale-90">
+      <div className="absolute bottom-12 z-30 flex items-center gap-6 bg-black/20 backdrop-blur-md px-6 py-4 rounded-full border border-white/10 scale-90">
         <button 
           onClick={() => setCurrentIndex(prev => (prev - 1 + slides.length) % slides.length)}
-          className="text-white/60 hover:text-white transition-colors uppercase text-sm font-bold"
+          className="text-white/60 hover:text-white transition-colors flex items-center justify-center"
         >
-          PREV
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
         </button>
         <div className="flex gap-2">
           {slides.map((_, i) => (
@@ -223,9 +225,11 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
         </div>
         <button 
           onClick={() => setCurrentIndex(prev => (prev + 1) % slides.length)}
-          className="text-white/60 hover:text-white transition-colors uppercase text-sm font-bold"
+          className="text-white/60 hover:text-white transition-colors flex items-center justify-center"
         >
-          NEXT
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
         </button>
       </div>
     </section>

@@ -43,26 +43,27 @@ export function BrandHighlightsSection({
   const previewItem = items[nextIndex]
 
   return (
-    <section className="relative w-full overflow-hidden flex flex-col items-center justify-center pt-[120px] pb-[80px] md:h-[62.79vw] xl:h-[1205.7px]">
+    <section className="relative w-full flex flex-col items-center justify-center pt-[120px] pb-[80px] md:h-[62.79vw] xl:h-[1205.7px]">
       
       {/* Background Decorative Layer */}
       <div className="absolute inset-0 z-0 pointer-events-none hidden md:block">
         <motion.div 
           animate={{ 
-            y: [0, -40, 0],
+            y: [0, -120, 0],
+            x: [0, 50, 0],
             scale: [1, 1.1, 1]
           }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute left-[45%] top-[5%] w-[450px] h-[450px] rounded-full bg-[#E5E2D0] opacity-[0.5] blur-[20px]"
+          className="absolute left-[45%] top-[5%] w-[450px] h-[450px] rounded-full bg-[#E5E2D0] opacity-[0.4]"
         />
         <motion.div 
           animate={{ 
-            x: [0, 30, 0],
-            y: [0, 20, 0],
+            x: [0, 120, 0],
+            y: [0, 80, 0],
             scale: [1, 1.15, 1]
           }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute left-[10%] top-[50%] w-[200px] h-[200px] rounded-full bg-[#E5E2D0] opacity-[0.7] blur-[10px]"
+          className="absolute left-[10%] top-[50%] w-[200px] h-[200px] rounded-full bg-[#E5E2D0] opacity-[0.6]"
         />
       </div>
 
@@ -112,11 +113,11 @@ export function BrandHighlightsSection({
         </div>
 
         {/* 3. Navigation Buttons */}
-        <div className="absolute left-[40.6%] top-[92%] flex gap-8 z-30">
+        <div className="absolute left-[45%] top-[85%] flex gap-8 z-30">
            {/* Prev */}
            <button 
              onClick={handlePrev}
-             className="w-[5.4vw] h-[5.4vw] xl:w-[83.2px] xl:h-[83.2px] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95 group"
+             className="w-[3.78vw] h-[3.78vw] xl:w-[58px] xl:h-[58px] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95 group"
            >
               <svg width="40%" height="40%" viewBox="0 0 23 40" fill="none">
                 <path d="M21 2L2 20L21 38" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
@@ -125,7 +126,7 @@ export function BrandHighlightsSection({
            {/* Next */}
            <button 
              onClick={handleNext}
-             className="w-[5.4vw] h-[5.4vw] xl:w-[83.2px] xl:h-[83.2px] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95 group"
+             className="w-[3.78vw] h-[3.78vw] xl:w-[58px] xl:h-[58px] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95 group"
            >
               <svg width="40%" height="40%" viewBox="0 0 23 40" fill="none">
                 <path d="M2 2L21 20L2 38" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
@@ -134,7 +135,7 @@ export function BrandHighlightsSection({
         </div>
 
         {/* 4. Large Main Image (Right Side) */}
-        <div className="absolute left-[59%] top-[11.7%] w-[40.4%] h-[88.3%] z-10 pointer-events-none">
+        <div className="absolute left-[63%] top-[22%] w-[34.5%] h-[70%] z-10 pointer-events-none">
           <AnimatePresence mode="popLayout" custom={direction}>
             <motion.div
                 key={index}

@@ -71,7 +71,7 @@ export function OemOdmGuideSection({ title, description, bgImage, ctaText = "REA
            <div className="w-full md:w-[900px] mb-12 md:mb-0">
               {title && (
                 <h2 
-                  className="text-[40px] md:text-[100px] font-black leading-tight md:leading-[100px] text-[#C4B647] mb-6 md:mb-10 text-center md:text-left"
+                  className="text-[40px] md:text-[100px] font-black leading-tight md:leading-[100px] text-[#C4B647] mb-6 md:mb-24 text-center md:text-left"
                   style={{ fontFamily: "var(--font-anaheim)" }}
                 >
                   {title.split('\n').map((line, i) => (

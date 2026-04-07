@@ -218,11 +218,14 @@ export function ContactFormSection({
     const fetchFormConfig = async () => {
       try {
         const identifier = formId || formName
-        const res = await fetch(`/api/form-config/${identifier}?locale=${locale}`)
-        if (res.ok) {
-          const config = await res.json()
+        const res = await fetch(`/api/form-configs/${identifier}?depth=2&draft=false&locale=${locale}&trash=false`)
+        const data = await res.json()
+        
+        // Handle different data structures (Payload/Strapi/Direct)
+        const config = data?.fields ? data : (data?.data?.fields ? data.data : (data?.form?.fields ? data.form : data))
+        
+        if (config && config.fields) {
           setFormConfig(config)
-
           const initialData: Record<string, any> = {}
           config.fields.forEach((field: FormField) => {
             initialData[field.fieldName] = field.fieldType === "checkbox" ? [] : ""
