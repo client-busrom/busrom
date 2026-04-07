@@ -86,6 +86,15 @@ function extractSection(children: any[], markerId: string, mediaData: Record<str
         sourceType: node.type
       })))
     }
+    if (node.type === "applicationCarousel") {
+      const appIds = node.data?.applicationIds || node.data?.applications;
+      if (appIds) {
+        items.push({
+          sourceType: "applicationCarousel",
+          applicationIds: appIds
+        })
+      }
+    }
   })
   
   const titleNodes = targetSection.filter(n => (n.type === "heading" || n.type === "paragraph") && !isMarkerNode(n, markerId) && !isAnyMarkerNode(n))
@@ -243,7 +252,9 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
   const applicationsData = useMemo(() => {
     const carouselItem = applicationsDataRaw.items.find(it => it.sourceType === 'applicationCarousel')
     if (carouselItem && carouselItem.applicationIds) {
-      const items = carouselItem.applicationIds.map((id: any) => {
+      const items = carouselItem.applicationIds.map((item: any) => {
+        const id = typeof item === 'object' ? item.id : item;
+        if (!id) return null
         const app = allApplications.find(a => String(a.id) === String(id))
         if (!app) return null
         let appImage = app.mainImage

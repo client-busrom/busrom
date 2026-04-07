@@ -95,9 +95,9 @@ export function OemOdmGuideSection({ title, description, bgImage, ctaText = "REA
            </div>
 
            {/* Read More Link */}
-           <Link href={ctaLink} className="flex items-center gap-[15px] hover:opacity-80 transition-opacity self-center md:self-end md:mb-4">
+           <Link href={ctaLink} className="group flex items-center gap-[15px] self-center md:self-end md:mb-4 transition-all duration-300">
               <span 
-                className="text-[#756F3F] text-[20px] md:text-[36px] font-bold leading-tight"
+                className="text-[#756F3F] text-[20px] md:text-[36px] font-bold leading-tight group-hover:font-black transition-all duration-300"
                 style={{ fontFamily: "var(--font-anaheim)" }}
               >
                 {ctaText.split('\n').map((line, i) => (
@@ -108,7 +108,7 @@ export function OemOdmGuideSection({ title, description, bgImage, ctaText = "REA
                 ))}
               </span>
               
-              <div className="w-12 h-12 md:w-[84px] md:h-[84px] rounded-full border border-[#756F3F] flex items-center justify-center text-[#756F3F] group-hover:bg-[#756F3F] group-hover:text-white transition-colors duration-300">
+              <div className="w-12 h-12 md:w-[84px] md:h-[84px] rounded-full border border-[#756F3F] flex items-center justify-center text-[#756F3F] group-hover:bg-[#756F3F] group-hover:text-white transition-all duration-300">
                  <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                  </svg>
