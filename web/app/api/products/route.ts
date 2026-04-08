@@ -146,6 +146,25 @@ export async function GET(request: NextRequest) {
     params.append('limit', (productIds?.length || seriesIds?.length) ? '100' : pageSize.toString())
     params.append('page', page.toString())
     params.append('depth', '2') // Include series relationship
+    
+    // 只选择展示需要的字段，排除沉重的 description/content 字段
+    params.append('select[slug]', 'true')
+    params.append('select[name]', 'true')
+    params.append('select[shortDescription]', 'true')
+    params.append('select[showImage]', 'true')
+    params.append('select[mainImage]', 'true')
+    params.append('select[category]', 'true')
+    params.append('select[series]', 'true')
+    params.append('select[isFeatured]', 'true')
+    params.append('select[isHot]', 'true')
+    params.append('select[isNew]', 'true')
+    params.append('select[order]', 'true')
+    params.append('select[shopOrder]', 'true')
+    params.append('select[status]', 'true')
+    params.append('select[attributePage]', 'true')
+    params.append('select[linkedForm]', 'true')
+    params.append('select[updatedAt]', 'true')
+    params.append('select[createdAt]', 'true')
 
     // Status filter - only published products
     // TODO: Re-enable after setting product status to 'published' in Payload CMS

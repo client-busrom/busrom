@@ -100,8 +100,19 @@ export async function GET(request: NextRequest) {
     // 构建 Payload API URL
     const params = new URLSearchParams()
     params.append('locale', locale)
-    params.append('depth', '2') // Include media relationships
+    params.append('depth', '1') // 减少深度，只获取一层关联
     params.append('where[status][equals]', 'published')
+    
+    // 只选择需要的字段，大幅减少 JSON 体积
+    params.append('select[name]', 'true')
+    params.append('select[slug]', 'true')
+    params.append('select[subtitle]', 'true')
+    params.append('select[shortDescription]', 'true')
+    params.append('select[mainImage]', 'true')
+    params.append('select[sceneGallery]', 'true')
+    params.append('select[category]', 'true')
+    params.append('select[status]', 'true')
+    params.append('select[updatedAt]', 'true')
 
     // If specific IDs provided, fetch those applications
     if (ids) {
@@ -112,7 +123,7 @@ export async function GET(request: NextRequest) {
         params.append(`where[id][in][${index}]`, id)
       })
     } else {
-      params.append('limit', limit.toString())
+      params.append('limit', Math.min(limit, 20).toString()) // 限制最大拉取 20 条，防止体积超限
       params.append('page', page.toString())
       // Category filter
       if (category) {
