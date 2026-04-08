@@ -42,7 +42,7 @@ WORKDIR /app/web
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # CDN domain for production (CloudFront)
-ARG NEXT_PUBLIC_CDN_DOMAIN=https://d2kqew3hn5wphn.cloudfront.net
+ARG NEXT_PUBLIC_CDN_DOMAIN=https://cdn.busromhouse.com
 ENV NEXT_PUBLIC_CDN_DOMAIN=$NEXT_PUBLIC_CDN_DOMAIN
 
 # CMS URL for API calls (must be set during build for NEXT_PUBLIC_ vars)

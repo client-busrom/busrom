@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 
 // Allowed domains for image proxy (security measure)
 const ALLOWED_DOMAINS = [
-  "d2kqew3hn5wphn.cloudfront.net",
+  "cdn.busromhouse.com",
+  "d2kqew3hn5wphn.cloudfront.net", // Keep default for backward compatibility
   "localhost",
 ]
 

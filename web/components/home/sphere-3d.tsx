@@ -161,10 +161,10 @@ const CONFIG = {
     // 本地用 nginx 代理 MinIO，生产用 CloudFront
     imageUrl: process.env.NODE_ENV === 'development'
       ? "http://localhost:8080/media/globe/earth-blue-marble.webp"
-      : "https://d2kqew3hn5wphn.cloudfront.net/media/globe/earth-blue-marble.webp",
+      : "https://cdn.busromhouse.com/media/globe/earth-blue-marble.webp",
     backgroundUrl: process.env.NODE_ENV === 'development'
       ? "http://localhost:8080/media/globe/night-sky.webp"
-      : "https://d2kqew3hn5wphn.cloudfront.net/media/globe/night-sky.webp",
+      : "https://cdn.busromhouse.com/media/globe/night-sky.webp",
     atmosphereColor: "#87CEEB",
     atmosphereAltitude: 0.15,
   },

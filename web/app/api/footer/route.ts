@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
+const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.busromhouse.com';
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
 
     // 转换数据格式
     const footerData = {
+      formConfigName: data.formConfig?.name || 'footer-form', // 获取 CMS 中配置的表单名称
       contact: {
         title: data.contactInfoGroup?.contactTitle || 'Contact Us',
         emailLabel: data.contactInfoGroup?.contactEmailLabel || 'Email: ',
