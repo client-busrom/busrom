@@ -87,7 +87,7 @@ export function CategoriesGridSection({
                 animate={{ filter: "drop-shadow(0 0 0 rgba(0,0,0,0))" }}
                 whileHover={{ 
                   scale: 1.02,
-                  filter: `drop-shadow(0 ${vw(21)} ${vw(24)} rgba(0, 0, 0, 0.12))`
+                  filter: `drop-shadow(0 ${vw(21)} ${vw(24)} rgba(0, 0, 0, 0.5))`
                 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
                 viewport={{ once: true }}
@@ -116,7 +116,7 @@ export function CategoriesGridSection({
                 <div 
                   className="absolute z-30 left-6 top-[22px] w-[80%] lg:left-[2.08vw] lg:top-[1.14vw] lg:w-[13.54vw]" 
                 >
-                  <h4 className="font-anaheim font-medium group-hover:font-extrabold text-black text-[18px] lg:text-[1.51vw] leading-[1.25] transition-all duration-300">
+                  <h4 className="font-montserrat font-regular group-hover:font-extrabold text-black text-[18px] lg:text-[1.51vw] leading-[1.25] transition-all duration-300">
                     {item.category?.name || item.name}
                   </h4>
                 </div>
@@ -138,7 +138,7 @@ export function CategoriesGridSection({
                       image={(item.showImage || item.image) as any}
                       alt={item.name}
                       className="object-contain object-bottom w-full h-full"
-                      size="medium"
+                      size="large"
                     />
                   </div>
                 </div>

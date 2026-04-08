@@ -138,10 +138,10 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
 
             <div className="grid grid-cols-2 gap-4 w-full">
               <div className="aspect-[3/4] rounded-[20px] overflow-hidden shadow-lg border-none">
-                <OptimizedImage image={displayedImages[0]} alt="Feature 1" className="w-full h-full object-cover" size="medium" />
+                <OptimizedImage image={displayedImages[0]} alt="Feature 1" className="w-full h-full object-cover" size="large" />
               </div>
               <div className="aspect-[3/4] rounded-[20px] overflow-hidden shadow-lg border-none">
-                <OptimizedImage image={displayedImages[1]} alt="Feature 2" className="w-full h-full object-cover" size="medium" />
+                <OptimizedImage image={displayedImages[1]} alt="Feature 2" className="w-full h-full object-cover" size="large" />
               </div>
             </div>
 

@@ -68,8 +68,7 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
     >
       <div className="flex flex-col w-full h-full justify-center">
         
-        {/* 1. Background decorative circular element */}
-        <div 
+        <motion.div 
           className="absolute rounded-full pointer-events-none opacity-40 lg:opacity-80"
           style={{ 
             left: layout.type === 'desktop' ? vw(-328.3) : '-20vw', 
@@ -77,6 +76,15 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
             width: layout.type === 'desktop' ? vw(896) : '100vw',   
             height: layout.type === 'desktop' ? vw(896) : '100vw',
             background: "linear-gradient(to bottom, rgba(236, 232, 216, 0.28) 0%, rgba(236, 232, 216, 1) 100%)",
+            transformOrigin: "center center"
+          }}
+          animate={{
+            scale: [1, 1.15, 1],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut"
           }}
         />
 
@@ -160,7 +168,7 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
                         style={{ 
                         width: "100%", 
                         height: layout.type === 'desktop' ? vw(300) : "185px", 
-                        marginBottom: layout.type === 'desktop' ? vw(15) : "10px", 
+                        marginBottom: layout.type === 'desktop' ? vw(25) : "20px", 
                         }}
                     >
                         <OptimizedImage 

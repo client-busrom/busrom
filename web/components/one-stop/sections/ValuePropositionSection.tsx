@@ -134,17 +134,56 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
            </div>
         </div>
 
-        {/* 3. Static Background Box */}
+        {/* 3 & 6. Background Box + Navigation Controls - Grouped as a single unit */}
         <div 
-          className="hidden lg:block absolute shadow-[0_40px_35px_rgba(0,0,0,0.04)] bg-gradient-to-b from-[#F6F4ED] to-white z-0"
+          className="hidden lg:block absolute pointer-events-none" 
           style={{ 
             left: "15.6vw", 
             top: "180px", 
             width: "700px", 
-            height: "500px", 
-            borderRadius: "30px" 
+            height: "500px" 
           }}
-        />
+        >
+          {/* Static Background Box - z-0 to stay behind scrolling images */}
+          <div 
+            className="absolute inset-0 shadow-[0_40px_35px_rgba(0,0,0,0.04)] bg-gradient-to-b from-[#F6F4ED] to-white z-0"
+            style={{ borderRadius: "30px" }}
+          />
+
+          {/* Navigation Controls - Bound to box coordinates, z-30 to be clickable above scrolling images */}
+          <div 
+             className="absolute flex justify-start z-30 pointer-events-auto"
+             style={{ 
+               right: "20px", 
+               bottom: "80px" 
+             }}
+          >
+            <button 
+              onClick={handlePrev} 
+              className="group flex items-center justify-center bg-transparent transition-colors"
+              style={{ width: "78px", height: "77px" }}
+            >
+              <svg width="42px" height="42px" viewBox="0 0 78 77" fill="none">
+                <path 
+                  d="M30.4609 38.4697L45.6807 53.3662L47.8604 51.1514L35.0645 38.4697L47.8604 25.7881L45.6807 23.5732L30.4609 38.4697Z" 
+                  className="fill-[#B0B0B0] group-hover:fill-[#756F3F] transition-colors duration-300"
+                />
+              </svg>
+            </button>
+            <button 
+              onClick={handleNext} 
+              className="group flex items-center justify-center bg-transparent transition-colors"
+              style={{ width: "78px", height: "77px" }}
+            >
+              <svg width="42px" height="42px" viewBox="0 0 78 77" fill="none">
+                <path 
+                  d="M47.5391 38.4697L32.3193 53.3662L30.1396 51.1514L42.9355 38.4697L30.1396 25.7881L32.3193 23.5732L47.5391 38.4697Z" 
+                  className="fill-[#B0B0B0] group-hover:fill-[#756F3F] transition-colors duration-300"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
 
         {/* 4. Scrolling Area */}
         <div className="hidden lg:block absolute inset-0 z-10">
@@ -206,30 +245,6 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
             </AnimatePresence>
           </div>
 
-          {/* 6. Navigation Controls */}
-          <div 
-             className="absolute flex justify-start z-20"
-             style={{ left: "43.2vw", top: "530px" }}
-          >
-            <button 
-              onClick={handlePrev} 
-              className="flex items-center justify-center bg-transparent hover:bg-black/5 transition-colors"
-              style={{ width: "78px", height: "77px" }}
-            >
-              <svg width="42px" height="42px" viewBox="0 0 78 77" fill="none">
-                <path d="M30.4609 38.4697L45.6807 53.3662L47.8604 51.1514L35.0645 38.4697L47.8604 25.7881L45.6807 23.5732L30.4609 38.4697Z" fill="#B0B0B0"/>
-              </svg>
-            </button>
-            <button 
-              onClick={handleNext} 
-              className="flex items-center justify-center bg-transparent hover:bg-black/5 transition-colors"
-              style={{ width: "78px", height: "77px" }}
-            >
-              <svg width="42px" height="42px" viewBox="0 0 78 77" fill="none">
-                <path d="M47.5391 38.4697L32.3193 53.3662L30.1396 51.1514L42.9355 38.4697L30.1396 25.7881L32.3193 23.5732L47.5391 38.4697Z" fill="#756F3F"/>
-              </svg>
-            </button>
-          </div>
         </div>
 
         {/* 7. Footer Decorative Elements */}
@@ -278,8 +293,8 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
              <div 
                 className="absolute bg-[#D7D1A8] origin-bottom rotate-[44deg] z-10" 
                 style={{ 
-                  right: "140px", 
-                  bottom: "35px", 
+                  right: "150px", 
+                  bottom: "40px", 
                   width: "3px", 
                   height: "120px" 
                 }}

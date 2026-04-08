@@ -105,7 +105,7 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                   {slide.image && (
                     <OptimizedImage 
                       image={slide.image}
-                      size="small"
+                      size="xlarge"
                       className="w-full h-full object-cover opacity-50 grayscale-[0.3]"
                     />
                   )}
@@ -129,7 +129,7 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                  <div className="absolute inset-0 z-0">
                     <OptimizedImage 
                       image={slide.image}
-                      size="large"
+                      size="xlarge"
                       className="w-full h-full object-cover"
                       priority
                     />

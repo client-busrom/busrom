@@ -331,12 +331,22 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
   useEffect(() => {
     const carouselItems = contentChildren.filter((n: any) => n.type === 'productCarousel')
     carouselItems.forEach(async (node: any) => {
-        const carouselId = node.data?.items?.[0]?.id
-        if (carouselId && !carouselProductsData[carouselId]) {
+        const items = node.data?.items || []
+        if (items.length === 0) return
+
+        const manualIds = items.filter((it: any) => it.selectionMode === 'manual' && it.product).map((it: any) => typeof it.product === 'object' ? it.product.id : it.product)
+        const autoSeriesIds = items.filter((it: any) => it.selectionMode === 'auto' && it.productSeries).map((it: any) => typeof it.productSeries === 'object' ? it.productSeries.id : it.productSeries)
+        const blockKey = [...manualIds, ...autoSeriesIds].sort().join(',')
+
+        if (blockKey && !carouselProductsData[blockKey]) {
             try {
-                const res = await fetch(`/api/products?locale=${locale}&carouselId=${carouselId}`)
+                let url = `/api/products?locale=${locale}`
+                if (manualIds.length > 0) url += `&ids=${manualIds.join(',')}`
+                if (autoSeriesIds.length > 0) url += `&seriesIds=${autoSeriesIds.join(',')}`
+                
+                const res = await fetch(url)
                 const data = await res.json()
-                setCarouselProductsData(prev => ({ ...prev, [carouselId]: data.products || [] }))
+                setCarouselProductsData(prev => ({ ...prev, [blockKey]: data.products || [] }))
             } catch (err) {
                 console.error("Failed to fetch carousel products:", err)
             }
@@ -345,28 +355,40 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
   }, [contentChildren, locale])
 
   const mapProductsWithCarouselConfig = (products: any[], carouselItems: any[] = []) => {
-    return products.map((p: any) => {
-      const meta = carouselItems.find(it => {
-        if (it.selectionMode === 'manual') {
-          return String(it.product) === String(p.id) || (typeof it.product === 'object' && String(it.product.id) === String(p.id))
-        }
-        const pSeriesId = p.series?.id || p.series
-        return String(it.productSeries) === String(pSeriesId) || (typeof it.productSeries === 'object' && String(it.productSeries.id) === String(pSeriesId))
-      })
+    const usedProductIds = new Set<string>()
+
+    return carouselItems.map((item: any) => {
+      let product = null
+      if (item.selectionMode === 'manual') {
+        const targetId = typeof item.product === 'object' ? item.product.id : item.product
+        product = products.find(p => String(p.id) === String(targetId))
+      } else {
+        const targetSeriesId = typeof item.productSeries === 'object' ? item.productSeries.id : item.productSeries
+        // 查找属于该系列且未被使用的产品
+        product = products.find(p => {
+          const pSeriesId = p.series?.id || p.series
+          return String(pSeriesId) === String(targetSeriesId) && !usedProductIds.has(p.id)
+        })
+      }
+
+      if (!product) return null
+      usedProductIds.add(product.id)
+
       const getDisplayName = (item: any, productName: string, categoryName: string) => {
         if (item?.customName?.trim()) return item.customName
         if (item?.showCategory === true || item?.showName === false) return categoryName
         return productName
       }
+
       return {
-        ...p,
-        _carouselItem: meta,
-        title: getDisplayName(meta, p.name, p.category?.name || ""),
-        showName: meta ? meta.showName !== false : true,
-        showCategory: !!meta?.showCategory,
-        categoryName: p.category?.name || ""
+        ...product,
+        _carouselItem: item,
+        title: getDisplayName(item, product.name, product.category?.name || ""),
+        showName: item.showName !== false,
+        showCategory: !!item.showCategory,
+        categoryName: product.category?.name || ""
       }
-    })
+    }).filter(Boolean)
   }
 
   const mappedShowcaseProducts = useMemo(() => {
@@ -384,8 +406,16 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
 
   const gridProducts = useMemo(() => {
     const carouselItem = categoriesTitle.items.find((it: any) => it.sourceType === 'productCarousel')
-    if (carouselItem && carouselProductsData[carouselItem.carouselItems?.[0]?.id]) {
-      return mapProductsWithCarouselConfig(carouselProductsData[carouselItem.carouselItems[0].id])
+    if (carouselItem) {
+      const items = carouselItem.carouselItems || []
+      const manualIds = items.filter((it: any) => it.selectionMode === 'manual' && it.product).map((it: any) => typeof it.product === 'object' ? it.product.id : it.product)
+      const autoSeriesIds = items.filter((it: any) => it.selectionMode === 'auto' && it.productSeries).map((it: any) => typeof it.productSeries === 'object' ? it.productSeries.id : it.productSeries)
+      const blockKey = [...manualIds, ...autoSeriesIds].sort().join(',')
+      
+      if (carouselProductsData[blockKey]) {
+        return mapProductsWithCarouselConfig(carouselProductsData[blockKey], items)
+      }
+      return [] // If carousel is present but not loaded yet
     }
     return productsData
   }, [categoriesTitle, productsData, carouselProductsData])
@@ -393,10 +423,15 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
   const seriesProducts = useMemo(() => {
     const carouselItem = productSeriesData.items.find((it: any) => it.sourceType === 'productCarousel')
     if (carouselItem) {
-        const carouselId = carouselItem.carouselItems?.[0]?.id || 'default'
-        if (carouselProductsData[carouselId]) {
-          return mapProductsWithCarouselConfig(carouselProductsData[carouselId], carouselItem.carouselItems)
-        }
+      const items = carouselItem.carouselItems || []
+      const manualIds = items.filter((it: any) => it.selectionMode === 'manual' && it.product).map((it: any) => typeof it.product === 'object' ? it.product.id : it.product)
+      const autoSeriesIds = items.filter((it: any) => it.selectionMode === 'auto' && it.productSeries).map((it: any) => typeof it.productSeries === 'object' ? it.productSeries.id : it.productSeries)
+      const blockKey = [...manualIds, ...autoSeriesIds].sort().join(',')
+      
+      if (carouselProductsData[blockKey]) {
+        return mapProductsWithCarouselConfig(carouselProductsData[blockKey], items)
+      }
+      return []
     }
     return productsData
   }, [productSeriesData, productsData, carouselProductsData])
