@@ -117,7 +117,7 @@ export function CategoriesGridSection({
                   className="absolute z-30 left-6 top-[22px] w-[80%] lg:left-[2.08vw] lg:top-[1.14vw] lg:w-[13.54vw]" 
                 >
                   <h4 className="font-montserrat font-regular group-hover:font-extrabold text-black text-[18px] lg:text-[1.51vw] leading-[1.25] transition-all duration-300">
-                    {item.category?.name || item.name}
+                    {(item as any).title || item.category?.name || item.name}
                   </h4>
                 </div>
  

@@ -28,16 +28,7 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
     )
   }
 
-  const defaultItems = [
-    { title: "One-stop Full-range Supply", description: "Cover all parts of hardware, saving coordination costs" },
-    { title: "Customize It Your Way", description: "Flexible manufacturing capabilities for your unique designs" },
-    { title: "Consistent Finished Appearance", description: "Unified surface treatment across all components" },
-    { title: "Professional Engineer Technical Support", description: "Expert CAD reviews and architectural consulting" },
-    { title: "Fast Response", description: "Quick quote turnaround and dedicated support team" },
-    { title: "Rapid After-Sales Service & Spare Parts Support", description: "Global logistics for maintenance and replacements" }
-  ]
-
-  const displayItems = items && items.length > 0 ? items : defaultItems
+  const displayItems = items || []
 
 
   // Helper for item-level drag scroll
@@ -53,7 +44,7 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
         if (contentRef.current) {
           const style = window.getComputedStyle(contentRef.current)
           const lh = parseInt(style.lineHeight) || 24
-          const maxHeightPc = lh * 2.15 // Slightly more than 2 lines
+          const maxHeightPc = lh * 3.1 // 3 lines threshold
           if (contentRef.current.scrollHeight > maxHeightPc) {
             setShowScroll(true)
           } else {
@@ -96,7 +87,7 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
         onMouseLeave={onMouseLeave}
         onWheel={(e) => showScroll && e.stopPropagation()}
         data-lenis-prevent={showScroll}
-        className={`overflow-y-auto custom-scrollbar-inner transition-all ${showScroll ? 'max-h-[58px] lg:max-h-[66px] cursor-grab active:cursor-grabbing' : ''}`}
+        className={`overflow-y-auto custom-scrollbar-inner transition-all ${showScroll ? 'max-h-[72px] lg:max-h-[82px] cursor-grab active:cursor-grabbing' : ''}`}
       >
         <style jsx>{`
           .custom-scrollbar-inner::-webkit-scrollbar {
@@ -171,14 +162,16 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
           />
 
           {/* Items Container - Global Drag Scroll restored */}
-          <div 
-            ref={scrollRef}
-            onMouseDown={handleMouseDown}
-            onMouseLeave={handleMouseLeave}
-            onMouseUp={handleMouseUp}
-            onMouseMove={handleMouseMove}
-            className={`w-full lg:max-w-[640px] mx-auto lg:mx-0 lg:max-h-[540px] lg:overflow-y-auto lg:pr-8 custom-scrollbar select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-          >
+            <div 
+              ref={scrollRef}
+              onMouseDown={handleMouseDown}
+              onMouseLeave={handleMouseLeave}
+              onMouseUp={handleMouseUp}
+              onMouseMove={handleMouseMove}
+              onWheel={(e) => e.stopPropagation()}
+              data-lenis-prevent
+              className={`w-full lg:max-w-[640px] mx-auto lg:mx-0 lg:max-h-[540px] lg:overflow-y-auto lg:pr-8 custom-scrollbar select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            >
             <style jsx>{`
               .custom-scrollbar::-webkit-scrollbar {
                 width: 4px;

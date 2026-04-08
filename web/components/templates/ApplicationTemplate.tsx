@@ -9,13 +9,15 @@ import { ApplicationCasesSection, ApplicationCase } from "../application/section
 import { ApplicationMoreCasesSection } from "../application/sections/ApplicationMoreCasesSection"
 import { ApplicationContactFormSection } from "../application/sections/ApplicationContactFormSection"
 import { ApplicationGuideSection } from "../application/sections/ApplicationGuideSection"
+import { 
+  flattenLexicalChildren as flattenChildren, 
+  extractNodesAfterMarker as extractAfterMarker, 
+  resolveMediaFromNodes,
+  MediaObject
+} from "@/lib/lexical-utils"
 
-interface MediaObject {
-  id: string
-  url: string
-  alt?: string
-  [key: string]: any
-}
+// MediaObject moved to @/lib/lexical-utils
+
 
 interface ApplicationTemplateProps {
   locale: string
@@ -30,58 +32,8 @@ interface ApplicationTemplateProps {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function flattenChildren(children: any[]): any[] {
-  const result: any[] = []
-  for (const node of children) {
-    if (node.type === "layout" && node.columns) {
-      for (const col of node.columns) {
-        if (col.children) result.push(...flattenChildren(col.children))
-      }
-    } else {
-      result.push(node)
-    }
-  }
-  return result
-}
+// Helpers moved to @/lib/lexical-utils
 
-function extractAfterMarker(children: any[], markerId: string): any[] {
-  const flat = flattenChildren(children)
-  let found = false
-  const result: any[] = []
-  const targetMarker = markerId.toLowerCase().trim()
-  
-  // Standard sub-marker prefix logic (e.g. "contact-form-")
-  const subMarkerPrefix = targetMarker + '-'
-
-  for (const node of flat) {
-    if (node.type === "paragraph" || node.type === "quote" || node.type === "heading") {
-      const t = (node.children || []).map((c: any) => c.text || "").join("").trim().toLowerCase()
-      const isLexicalMarker = node.format === 16 || node.children?.some((c: any) => c.format === 16)
-      
-      // Found our start marker
-      if (t === targetMarker) { 
-        found = true
-        continue 
-      }
-      
-      // Stop condition:
-      // We found a different marker (format 16)
-      if (found && isLexicalMarker) {
-        // If it's a sub-marker (like contact-form-title for marker contact-form), don't stop.
-        const isSubMarker = t.startsWith(subMarkerPrefix)
-        const isSpecialExempt = t.startsWith("more-applications-")
-        
-        if (!isSubMarker && !isSpecialExempt) {
-          if (result.length > 0 || (t.includes('-') && !t.startsWith(targetMarker.split('-')[0]))) {
-            break
-          }
-        }
-      }
-    }
-    if (found) result.push(node)
-  }
-  return result
-}
 
 function parseHeroSlides(nodes: any[]): HeroSlide[] {
   const listNode = nodes.find(n => n.type === "list")
@@ -185,10 +137,9 @@ function parseWhyChooseUsItems(nodes: any[], imgNodes: any[], mediaData: any): W
     
     const description = descriptionParts.map(p => p.text).join("")
     const itemIdx = i / 2
-    const item1 = rawImages[itemIdx * 2]
-    const item2 = rawImages[itemIdx * 2 + 1]
-    const img1Id = typeof item1?.image === 'object' && item1.image ? item1.image.id : String(item1?.image || "")
-    const img2Id = typeof item2?.image === 'object' && item2.image ? item2.image.id : String(item2?.image || "")
+    const imgNodes = resolveMediaFromNodes([galleryNode], mediaData)
+    const item1 = imgNodes[itemIdx * 2]
+    const item2 = imgNodes[itemIdx * 2 + 1]
     
     items.push({
       id: String(itemIdx + 1),
@@ -196,8 +147,8 @@ function parseWhyChooseUsItems(nodes: any[], imgNodes: any[], mediaData: any): W
       title,
       description,
       descriptionParts,
-      imageLeft: img1Id ? mediaData[img1Id]?.url : "",
-      imageRight: img2Id ? mediaData[img2Id]?.url : ""
+      imageLeft: item1?.url || "",
+      imageRight: item2?.url || ""
     })
   }
   
@@ -213,12 +164,7 @@ function extractSections(pageContent: any) {
   const slides = parseHeroSlides(heroItemNodes)
 
   const heroImgNodes = extractAfterMarker(children, "hero-section-image")
-  const galleryNode = heroImgNodes.find(n => n.type === "custom-image-gallery")
-  const rawImages: any[] = galleryNode?.data?.images || []
-  const images = rawImages.map((img: any) => {
-    const id = typeof img.image === 'object' && img.image ? img.image.id : String(img.image || "")
-    return mediaData[id] || (id ? { id, url: "" } : null)
-  }).filter(Boolean)
+  const images = resolveMediaFromNodes(heroImgNodes, mediaData)
 
   const titleNodes = extractAfterMarker(children, "hero-section-title")
   const titleText = (titleNodes[0]?.children || []).map((c: any) => c.text).join("").trim()
@@ -495,10 +441,24 @@ export function ApplicationTemplate({ locale, pageContent }: ApplicationTemplate
   const [allApplications, setAllApplications] = useState<any[]>([])
 
   useEffect(() => {
-    fetch(`/api/applications?locale=${locale}&limit=100`)
-      .then(res => res.json())
-      .then(data => setAllApplications(data.docs || []))
-  }, [locale])
+    const allIds = Array.from(new Set([
+      ...(applicationIds || []),
+      ...(moreApplicationsData?.applicationIds || [])
+    ])).map((id: any) => typeof id === 'object' ? (id.id || id.value) : id).filter(Boolean)
+
+    if (allIds.length > 0) {
+      fetch(`/api/applications?locale=${locale}&ids=${allIds.join(',')}`)
+        .then(res => res.json())
+        .then(data => setAllApplications(data.docs || []))
+        .catch(err => console.error("Failed to fetch applications:", err))
+    } else {
+      // Fallback if no specific IDs but still want some applications
+      fetch(`/api/applications?locale=${locale}&limit=12`)
+        .then(res => res.json())
+        .then(data => setAllApplications(data.docs || []))
+        .catch(err => console.error("Failed to fetch applications fallback:", err))
+    }
+  }, [locale, applicationIds, moreApplicationsData?.applicationIds])
 
   const applicationCases = useMemo(() => {
     if (!applicationIds || applicationIds.length === 0) return []
