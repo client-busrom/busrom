@@ -13,6 +13,7 @@ import ConditionalFooter from "@/components/layout/conditional-footer";
 import { ClientLayoutWrapper } from "@/components/ClientLayoutWrapper";
 import { getPreloaderConfig } from "@/lib/api/preloader-config";
 import { getNavigation } from "@/lib/api/navigation";
+import NextTopLoader from "nextjs-toploader";
 import { GlobalScripts } from "@/components/GlobalScripts";
 import { ScriptDebugger } from "@/components/ScriptDebugger";
 import { OrganizationSchema } from "@/components/seo/OrganizationSchema";
@@ -339,6 +340,7 @@ export default async function RootLayout({
         </Suspense>
         {/* 👇 使用 ClientLayoutWrapper 包裹你的所有内容 */}
         <ClientLayoutWrapper preloaderConfig={preloaderConfig}>
+          <NextTopLoader color="#D58A00" showSpinner={false} height={3} shadow="0 0 10px #D58A00,0 0 5px #D58A00" />
           <LenisProvider easingKey={"easeOutQuad"} />
           <div className="flex flex-col min-h-screen overflow-x-hidden">
             <Header locale={validLocale} initialNavigation={initialNavigation} />
