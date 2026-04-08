@@ -41,39 +41,61 @@ function getPreferredLocale(request: NextRequest): string {
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // 1. 处理 /en 和 /en/* 的 301 重定向 (SEO 保护)
-  if (pathname === `/${defaultLocale}` || pathname.startsWith(`/${defaultLocale}/`)) {
-    // /en -> /
-    // /en/about -> /about
-    const newPath = pathname.replace(new RegExp(`^/${defaultLocale}/?`), '/') || '/';
-    const url = new URL(newPath, request.url);
-    url.search = request.nextUrl.search; // 保留查询参数
-    return NextResponse.redirect(url, 301);
+  // 1. 预先判定 CDN 策略
+  const urlParams = request.nextUrl.searchParams;
+  const cdnOverride = urlParams.get('cdn');
+  const country = request.headers.get('cloudfront-viewer-country');
+  const existingStrategy = request.cookies.get('cdn_strategy')?.value;
+  const isLocalhost = request.headers.get('host')?.includes('localhost') || request.headers.get('host')?.includes('127.0.0.1');
+
+  let newStrategy: string | null = null;
+  
+  // 优先级: 显式参数 > 地理位置 (非本地) > 保持现状
+  if (cdnOverride === 'china' || cdnOverride === 'global' || cdnOverride === 'local') {
+    newStrategy = cdnOverride;
+  } else if (country && !isLocalhost) {
+    // 只有在非本地环境下才根据国家自动设置 (避免在本地开发时干扰 Nginx 反代)
+    newStrategy = country === 'CN' ? 'china' : 'global';
   }
 
-  // 2. 检查路径是否已经有非默认语言前缀 (如 /zh, /fr)
+  const setStrategyCookie = (res: NextResponse) => {
+    if (newStrategy && existingStrategy !== newStrategy) {
+      res.cookies.set('cdn_strategy', newStrategy, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30, // 30 天
+        sameSite: 'lax',
+      });
+    }
+    // 增加缓存隔离头
+    res.headers.set('Vary', 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, CloudFront-Viewer-Country, Cookie');
+    return res;
+  };
+
+  // 2. 处理 /en 和 /en/* 的 301 重定向 (SEO 保护)
+  if (pathname === `/${defaultLocale}` || pathname.startsWith(`/${defaultLocale}/`)) {
+    const newPath = pathname.replace(new RegExp(`^/${defaultLocale}/?`), '/') || '/';
+    const url = new URL(newPath, request.url);
+    url.search = request.nextUrl.search;
+    const res = NextResponse.redirect(url, 301);
+    return setStrategyCookie(res);
+  }
+
+  // 3. 检查路径是否已经有非默认语言前缀 (如 /zh, /fr)
   const hasNonDefaultLocale = nonDefaultLocales.some(
     (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)
   );
 
-  // 3. 如果路径没有语言前缀，视为默认语言(英文)，直接通过
-  //    但需要通过 rewrite 将请求路由到 /en/* 的页面
+  // 4. 如果路径没有语言前缀，视为默认语言(英文)，执行 rewrite
   if (!hasNonDefaultLocale) {
-    // 没有语言前缀 = 英文内容
-    // 使用 rewrite 将 / 映射到 /en (内部路由，URL 不变)
     const url = request.nextUrl.clone();
     url.pathname = `/${defaultLocale}${pathname}`;
-    const response = NextResponse.rewrite(url);
-    // Add Vary header to prevent CDN from caching RSC payload for HTML requests
-    response.headers.set('Vary', 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch');
-    return response;
+    const res = NextResponse.rewrite(url);
+    return setStrategyCookie(res);
   }
 
-  // 4. 有非默认语言前缀的路径，直接通过
-  const response = NextResponse.next();
-  // Add Vary header to prevent CDN from caching RSC payload for HTML requests
-  response.headers.set('Vary', 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch');
-  return response;
+  // 5. 正常通过路径
+  const res = NextResponse.next();
+  return setStrategyCookie(res);
 }
 
 export const config = {

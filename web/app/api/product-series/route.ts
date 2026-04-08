@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { convertToCDNUrl } from '@/lib/cdn-url'
 
 // Payload CMS API 基础地址
 const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
@@ -13,8 +14,9 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const locale = searchParams.get('locale') || 'en'
+    const strategy = request.cookies.get('cdn_strategy')?.value
 
-    console.log('[Product Series API] Fetching from Payload CMS, locale:', locale)
+    console.log('[Product Series API] Fetching from Payload CMS, locale:', locale, 'strategy:', strategy)
 
     // 构建 Payload API URL
     const params = new URLSearchParams()
@@ -54,6 +56,19 @@ export async function GET(request: NextRequest) {
         finalImage = s.featuredImage;
       }
 
+      // Transform variants
+      const transformedVariants: any = {}
+      if (finalImage?.sizes) {
+        Object.entries(finalImage.sizes).forEach(([key, value]: [string, any]) => {
+          if (value?.url) {
+            transformedVariants[key] = {
+              ...value,
+              url: convertToCDNUrl(value.url, strategy)
+            }
+          }
+        })
+      }
+
       return {
         id: s.id,
         slug: s.slug,
@@ -61,10 +76,10 @@ export async function GET(request: NextRequest) {
         description: s.description,
         featuredImage: finalImage && finalImage.url ? {
           id: finalImage.id,
-          url: finalImage.url,
+          url: convertToCDNUrl(finalImage.url, strategy),
           altText: finalImage.alt || s.name,
           filename: finalImage.filename,
-          variants: finalImage.sizes,
+          variants: transformedVariants,
         } : null,
         order: s.order || 0,
         status: s.status === 'published' ? 'PUBLISHED' : 'DRAFT',

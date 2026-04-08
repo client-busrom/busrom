@@ -50,80 +50,36 @@ export interface MediaImage {
  * - Local (MinIO via Nginx): http://localhost:8080/busrom-media/...
  * - Production (CloudFront): https://xxx.cloudfront.net/...
  */
-const CDN_DOMAIN = process.env.NEXT_PUBLIC_CDN_DOMAIN || 'http://localhost:8080'
+import { convertToCDNUrl } from './cdn-url'
 
 /**
  * Normalize image URL to use CDN domain
- *
- * Handles different URL formats:
- * - Already CDN URL: return as-is
- * - MinIO URL (http://localhost:9000/...): convert to CDN
- * - S3 URL (https://xxx.s3.amazonaws.com/...): convert to CDN
- * - Relative path: prepend CDN domain
+ * 
+ * NOTE: This now delegates to convertToCDNUrl which handles the 
+ * dynamic strategy switching (China vs Global).
  */
-function normalizeToCDN(url: string | unknown): string {
+function normalizeToCDN(url: string | unknown, strategy?: string): string {
   // Ensure url is a valid string
   if (!url) return ''
+  
+  let stringUrl = ''
   if (typeof url !== 'string') {
-    // If it's an object with a url property, try to extract it
     if (typeof url === 'object' && url !== null && 'url' in url) {
       const extractedUrl = (url as { url: unknown }).url
       if (typeof extractedUrl === 'string') {
-        return normalizeToCDN(extractedUrl)
+        stringUrl = extractedUrl
       }
     }
-    console.warn('[normalizeToCDN] Received non-string url:', typeof url, url)
+  } else {
+    stringUrl = url
+  }
+
+  if (!stringUrl) {
+    if (url) console.warn('[normalizeToCDN] Could not extract string url from:', typeof url, url)
     return ''
   }
 
-  // Legacy: intercept old CloudFront domain and replace with custom CDN
-  if (url.includes('d2kqew3hn5wphn.cloudfront.net')) {
-    try {
-      const urlObj = new URL(url)
-      return `${CDN_DOMAIN}${urlObj.pathname}`
-    } catch {
-      return url.replace('https://d2kqew3hn5wphn.cloudfront.net', CDN_DOMAIN)
-    }
-  }
-
-  // Already using CDN domain
-  if (url.includes(CDN_DOMAIN)) {
-    return url
-  }
-
-  try {
-    const urlObj = new URL(url)
-
-    // MinIO URL: http://localhost:9000/busrom-media/...
-    if (url.includes('localhost:9000')) {
-      return `${CDN_DOMAIN}${urlObj.pathname}`
-    }
-
-    // S3 URL: https://bucket.s3.region.amazonaws.com/path/...
-    // or: https://s3.region.amazonaws.com/bucket/path/...
-    if (urlObj.hostname.includes('amazonaws.com')) {
-      const pathParts = urlObj.pathname.split('/').filter(Boolean)
-
-      // For local development (localhost CDN), map to MinIO structure
-      if (CDN_DOMAIN.includes('localhost')) {
-        // Get the bucket name from hostname (busrom-media.s3.region.amazonaws.com)
-        const bucketMatch = urlObj.hostname.match(/^([^.]+)\.s3\./)
-        const bucketName = bucketMatch ? bucketMatch[1] : 'busrom-media'
-
-        // Return local CDN URL with bucket name in path
-        return `${CDN_DOMAIN}/${bucketName}/${pathParts.join('/')}`
-      }
-
-      // For production CloudFront, it's already configured with origin path
-      // Just use the path without bucket name
-      return `${CDN_DOMAIN}/${pathParts.join('/')}`
-    }
-
-    return url
-  } catch {
-    // If URL parsing fails, return as-is
-    return url
-  }
+  return convertToCDNUrl(stringUrl, strategy)
 }
 
 /**
@@ -135,18 +91,14 @@ function normalizeToCDN(url: string | unknown): string {
  * @param image - Media object from Payload CMS
  * @param size - Desired image size (default: 'medium')
  * @param preferWebP - Whether to prefer WebP format (default: true)
+ * @param strategy - Optional forced strategy ('china' | 'global')
  * @returns Optimized image URL or placeholder
- *
- * @example
- * ```typescript
- * const url = getOptimizedImageUrl(product.image, 'medium', true)
- * // Returns WebP URL if available, otherwise medium size, or falls back
- * ```
  */
 export function getOptimizedImageUrl(
   image: MediaImage | null | undefined,
   size: 'thumbnail' | 'small' | 'medium' | 'large' | 'xlarge' = 'medium',
-  preferWebP: boolean = true
+  preferWebP: boolean = true,
+  strategy?: string
 ): string {
   // If no image, return placeholder
   if (!image) {
@@ -163,17 +115,17 @@ export function getOptimizedImageUrl(
 
   // 1. Try WebP format first (if enabled and available)
   if (preferWebP && variants?.webp) {
-    return normalizeToCDN(variants.webp)
+    return normalizeToCDN(variants.webp, strategy)
   }
 
   // 2. If xlarge requested, return original image directly
   if (size === 'xlarge') {
-    return normalizeToCDN(originalUrl)
+    return normalizeToCDN(originalUrl, strategy)
   }
 
   // 3. Try requested size variant
   if (variants && variants[size]) {
-    return normalizeToCDN(variants[size]!)
+    return normalizeToCDN(variants[size]!, strategy)
   }
 
   // 4. Fallback strategy: try other sizes from large to small (skip xlarge/original)
@@ -183,13 +135,13 @@ export function getOptimizedImageUrl(
 
   for (const fallbackSize of fallbackOrder) {
     if (variants && variants[fallbackSize]) {
-      return normalizeToCDN(variants[fallbackSize]!)
+      return normalizeToCDN(variants[fallbackSize]!, strategy)
     }
   }
 
   // 5. Last resort: return original URL (normalized to CDN)
   // This only happens if no variants exist at all
-  return normalizeToCDN(originalUrl)
+  return normalizeToCDN(originalUrl, strategy)
 }
 
 /**
@@ -198,16 +150,12 @@ export function getOptimizedImageUrl(
  * Generates a srcset string for use in <picture> tags or Next.js Image loader
  *
  * @param image - Media object from Payload CMS
+ * @param strategy - Optional forced strategy ('china' | 'global')
  * @returns srcset string with multiple sizes
- *
- * @example
- * ```typescript
- * const srcset = getImageSrcSet(image)
- * // Returns: "url1 400w, url2 800w, url3 1200w, url4 1920w"
- * ```
  */
 export function getImageSrcSet(
-  image: MediaImage | null | undefined
+  image: MediaImage | null | undefined,
+  strategy?: string
 ): string {
   if (!image || !image.variants) {
     return ''
@@ -216,11 +164,10 @@ export function getImageSrcSet(
   const { variants } = image
   const srcset: string[] = []
 
-  if (variants.thumbnail) srcset.push(`${normalizeToCDN(variants.thumbnail)} 400w`)
-  if (variants.small) srcset.push(`${normalizeToCDN(variants.small)} 768w`)
-  if (variants.medium) srcset.push(`${normalizeToCDN(variants.medium)} 1024w`)
-  if (variants.large) srcset.push(`${normalizeToCDN(variants.large)} 1920w`)
-  // Never use xlarge (original) - max is large (1920px desktop)
+  if (variants.thumbnail) srcset.push(`${normalizeToCDN(variants.thumbnail, strategy)} 400w`)
+  if (variants.small) srcset.push(`${normalizeToCDN(variants.small, strategy)} 768w`)
+  if (variants.medium) srcset.push(`${normalizeToCDN(variants.medium, strategy)} 1024w`)
+  if (variants.large) srcset.push(`${normalizeToCDN(variants.large, strategy)} 1920w`)
 
   return srcset.join(', ')
 }
