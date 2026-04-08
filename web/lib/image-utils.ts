@@ -76,8 +76,18 @@ function normalizeToCDN(url: string | unknown): string {
     return ''
   }
 
+  // Legacy: intercept old CloudFront domain and replace with custom CDN
+  if (url.includes('d2kqew3hn5wphn.cloudfront.net')) {
+    try {
+      const urlObj = new URL(url)
+      return `${CDN_DOMAIN}${urlObj.pathname}`
+    } catch {
+      return url.replace('https://d2kqew3hn5wphn.cloudfront.net', CDN_DOMAIN)
+    }
+  }
+
   // Already using CDN domain
-  if (url.includes(CDN_DOMAIN) || url.includes('cloudfront.net')) {
+  if (url.includes(CDN_DOMAIN)) {
     return url
   }
 
