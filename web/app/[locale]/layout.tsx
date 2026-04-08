@@ -324,6 +324,8 @@ export default async function RootLayout({
         {/* CDN 预连接 - 加速图片加载 */}
         <link rel="preconnect" href="https://cdn.busromhouse.com" />
         <link rel="dns-prefetch" href="https://cdn.busromhouse.com" />
+        <link rel="preconnect" href="https://d2kqew3hn5wphn.cloudfront.net" />
+        <link rel="dns-prefetch" href="https://d2kqew3hn5wphn.cloudfront.net" />
         {/* Organization Schema for Google Search logo */}
         <Suspense fallback={null}>
           <OrganizationSchema locale={validLocale} />

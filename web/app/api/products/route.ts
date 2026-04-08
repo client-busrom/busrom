@@ -4,57 +4,22 @@ import type { Product, ProductListResponse } from '@/lib/types/product'
 // Payload CMS API 基础地址
 const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
-// CDN Domain configuration
-const CDN_DOMAIN = process.env.NEXT_PUBLIC_CDN_DOMAIN || 'http://localhost:8080'
-
-/**
- * Normalize image URL to use CDN domain
- */
-function normalizeToCDN(url: string): string {
-  if (!url) return url
-  if (url.includes('d2kqew3hn5wphn.cloudfront.net')) {
-    try {
-      const urlObj = new URL(url)
-      return `${CDN_DOMAIN}${urlObj.pathname}`
-    } catch {
-      return url.replace('https://d2kqew3hn5wphn.cloudfront.net', CDN_DOMAIN)
-    }
-  }
-  if (url.includes(CDN_DOMAIN)) {
-    return url
-  }
-  try {
-    const urlObj = new URL(url)
-    if (url.includes('localhost:9000')) {
-      return `${CDN_DOMAIN}${urlObj.pathname}`
-    }
-    if (urlObj.hostname.includes('amazonaws.com')) {
-      const pathParts = urlObj.pathname.split('/').filter(Boolean)
-      if (pathParts.length > 1) {
-        pathParts.shift()
-      }
-      return `${CDN_DOMAIN}/${pathParts.join('/')}`
-    }
-    return url
-  } catch {
-    return url
-  }
-}
+import { convertToCDNUrl } from '@/lib/cdn-url'
 
 /**
  * Transform image variants to use CDN URLs
  */
-function transformImageVariants(variants: any) {
+function transformImageVariants(variants: any, strategy?: string) {
   if (!variants) return null
   const transformed: any = {}
   for (const [key, value] of Object.entries(variants)) {
     if (value && typeof value === 'object' && 'url' in value) {
       transformed[key] = {
         ...value,
-        url: normalizeToCDN((value as any).url)
+        url: convertToCDNUrl((value as any).url, strategy)
       }
     } else if (typeof value === 'string') {
-      transformed[key] = normalizeToCDN(value)
+      transformed[key] = convertToCDNUrl(value, strategy)
     } else {
       transformed[key] = value
     }
@@ -255,6 +220,8 @@ export async function GET(request: NextRequest) {
       return ''
     }
 
+    const strategy = request.cookies.get('cdn_strategy')?.value
+
     // Transform data to match frontend expectations
     const products = data.docs.map((product: any) => {
       const productName = getName(product.name)
@@ -271,19 +238,19 @@ export async function GET(request: NextRequest) {
         showImage: product.showImage
           ? {
               id: product.showImage.id,
-              url: normalizeToCDN(product.showImage.url),
+              url: convertToCDNUrl(product.showImage.url, strategy),
               altText: product.showImage.alt || '',
               cropFocalPoint: getCropFocalPoint(product.showImage),
-              variants: transformImageVariants(product.showImage.sizes),
+              variants: transformImageVariants(product.showImage.sizes, strategy),
             }
           : null,
         mainImage: product.mainImage && Array.isArray(product.mainImage)
           ? product.mainImage.map((img: any) => ({
               id: img.id,
-              url: normalizeToCDN(img.url),
+              url: convertToCDNUrl(img.url, strategy),
               altText: img.alt || '',
               cropFocalPoint: getCropFocalPoint(img),
-              variants: transformImageVariants(img.sizes),
+              variants: transformImageVariants(img.sizes, strategy),
             }))
           : [],
         category: product.category

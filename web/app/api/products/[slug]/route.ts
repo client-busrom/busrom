@@ -4,57 +4,12 @@ import { NextRequest, NextResponse } from 'next/server'
 const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 // CDN Domain configuration
-const CDN_DOMAIN = process.env.NEXT_PUBLIC_CDN_DOMAIN || 'http://localhost:8080'
-
-/**
- * Normalize image URL to use CDN domain
- * Converts MinIO URLs (localhost:9000) to CDN URLs (localhost:8080)
- */
-function normalizeToCDN(url: string): string {
-  if (!url) return url
-
-  // Legacy fallback
-  if (url.includes('d2kqew3hn5wphn.cloudfront.net')) {
-    try {
-      const urlObj = new URL(url)
-      return `${CDN_DOMAIN}${urlObj.pathname}`
-    } catch {
-      return url.replace('https://d2kqew3hn5wphn.cloudfront.net', CDN_DOMAIN)
-    }
-  }
-
-  // Already using CDN domain
-  if (url.includes(CDN_DOMAIN)) {
-    return url
-  }
-
-  try {
-    const urlObj = new URL(url)
-
-    // MinIO URL: http://localhost:9000/busrom-media/...
-    if (url.includes('localhost:9000')) {
-      return `${CDN_DOMAIN}${urlObj.pathname}`
-    }
-
-    // S3 URL: https://xxx.s3.amazonaws.com/bucket/...
-    if (urlObj.hostname.includes('amazonaws.com')) {
-      const pathParts = urlObj.pathname.split('/').filter(Boolean)
-      if (pathParts.length > 1) {
-        pathParts.shift() // Remove bucket name
-      }
-      return `${CDN_DOMAIN}/${pathParts.join('/')}`
-    }
-
-    return url
-  } catch {
-    return url
-  }
-}
+import { convertToCDNUrl } from '@/lib/cdn-url'
 
 /**
  * Transform image variants to use CDN URLs
  */
-function transformImageVariants(variants: any) {
+function transformImageVariants(variants: any, strategy?: string) {
   if (!variants) return null
 
   const transformed: any = {}
@@ -62,10 +17,10 @@ function transformImageVariants(variants: any) {
     if (value && typeof value === 'object' && 'url' in value) {
       transformed[key] = {
         ...value,
-        url: normalizeToCDN((value as any).url)
+        url: convertToCDNUrl((value as any).url, strategy)
       }
     } else if (typeof value === 'string') {
-      transformed[key] = normalizeToCDN(value)
+      transformed[key] = convertToCDNUrl(value, strategy)
     } else {
       transformed[key] = value
     }
@@ -87,14 +42,14 @@ function getCropFocalPoint(media: any): { x: number; y: number } | undefined {
 /**
  * Transform a media object to include CDN URLs
  */
-function transformMediaObject(media: any) {
+function transformMediaObject(media: any, strategy?: string) {
   if (!media || typeof media !== 'object') return media
   if (typeof media === 'string' || typeof media === 'number') return media
 
   return {
     ...media,
-    url: media.url ? normalizeToCDN(media.url) : undefined,
-    variants: transformImageVariants(media.sizes || media.variants),
+    url: media.url ? convertToCDNUrl(media.url, strategy) : undefined,
+    variants: transformImageVariants(media.sizes || media.variants, strategy),
   }
 }
 
@@ -152,7 +107,7 @@ function collectMediaIds(node: any, ids: Set<string>): void {
 /**
  * Batch fetch all media by IDs in parallel
  */
-async function batchFetchMedia(ids: Set<string>): Promise<Map<string, any>> {
+async function batchFetchMedia(ids: Set<string>, strategy?: string): Promise<Map<string, any>> {
   const cache = new Map<string, any>()
   if (ids.size === 0) return cache
 
@@ -161,7 +116,7 @@ async function batchFetchMedia(ids: Set<string>): Promise<Map<string, any>> {
       const res = await fetch(`${CMS_URL}/api/media/${id}`)
       if (res.ok) {
         const data = await res.json()
-        return { id, data: transformMediaObject(data) }
+        return { id, data: transformMediaObject(data, strategy) }
       }
     } catch (err) {
       console.error(`[batchFetchMedia] Failed to fetch media ${id}:`, err)
@@ -296,7 +251,7 @@ async function expandChildren(children: any[], locale: string): Promise<any[]> {
  * Populate all image references in Lexical content
  * Optimized: collects all IDs first, fetches in parallel, then populates
  */
-async function populateLexicalImages(content: any): Promise<{ content: any; mediaCount: number }> {
+async function populateLexicalImages(content: any, strategy?: string): Promise<{ content: any; mediaCount: number }> {
   // Step 1: Collect all media IDs
   const mediaIds = new Set<string>()
   collectMediaIds(content, mediaIds)
@@ -304,7 +259,7 @@ async function populateLexicalImages(content: any): Promise<{ content: any; medi
   console.log(`[populateLexicalImages] Found ${mediaIds.size} unique media references`)
 
   // Step 2: Batch fetch all media in parallel
-  const mediaCache = await batchFetchMedia(mediaIds)
+  const mediaCache = await batchFetchMedia(mediaIds, strategy)
 
   // Step 3: Populate content with cached media
   const populated = populateMediaFromCache(content, mediaCache)
@@ -326,8 +281,9 @@ export async function GET(
     const { slug } = await params
     const searchParams = request.nextUrl.searchParams
     const locale = searchParams.get('locale') || 'en'
+    const strategy = request.cookies.get('cdn_strategy')?.value
 
-    console.log('[Product Detail API] Fetching product from Payload CMS:', { slug, locale })
+    console.log('[Product Detail API] Fetching product from Payload CMS:', { slug, locale, strategy })
 
     // 从 Payload CMS 获取单个产品
     // TODO: Re-enable status filter after setting product status to 'published' in Payload CMS
@@ -394,7 +350,7 @@ export async function GET(
     if (contentToRender) {
       console.log('[Product Detail API] Expanding reusable blocks for main content...')
       const expanded = await expandReusableBlocks(contentToRender, locale)
-      const { content } = await populateLexicalImages(expanded)
+      const { content } = await populateLexicalImages(expanded, strategy)
       product.contentTranslation = content
     }
 
@@ -405,7 +361,7 @@ export async function GET(
     if (originalContentRaw && hasTemplate) {
       console.log('[Product Detail API] Expanding reusable blocks for original content...')
       const expanded = await expandReusableBlocks(originalContentRaw, locale)
-      const { content } = await populateLexicalImages(expanded)
+      const { content } = await populateLexicalImages(expanded, strategy)
       processedProductContent = content
     } else {
       processedProductContent = product.contentTranslation
@@ -424,7 +380,7 @@ export async function GET(
 
     if (attrMediaIds.size > 0) {
       console.log(`[Product Detail API] Found ${attrMediaIds.size} media in JSON attributes`)
-      const attrCache = await batchFetchMedia(attrMediaIds)
+      const attrCache = await batchFetchMedia(attrMediaIds, strategy)
       
       attributeFields.forEach(field => {
         // @ts-ignore
@@ -464,20 +420,20 @@ export async function GET(
             showImage: p.showImage
               ? {
                   id: p.showImage.id,
-                  url: normalizeToCDN(p.showImage.url),
+                  url: convertToCDNUrl(p.showImage.url, strategy),
                   altText: p.showImage.alt || '',
                   filename: p.showImage.filename,
-                  variants: transformImageVariants(p.showImage.sizes),
+                  variants: transformImageVariants(p.showImage.sizes, strategy),
                   cropFocalPoint: getCropFocalPoint(p.showImage),
                 }
               : null,
             mainImage: p.mainImage && Array.isArray(p.mainImage)
               ? p.mainImage.map((img: any) => ({
                   id: img.id,
-                  url: normalizeToCDN(img.url),
+                  url: convertToCDNUrl(img.url, strategy),
                   altText: img.alt || '',
                   filename: img.filename,
-                  variants: transformImageVariants(img.sizes),
+                  variants: transformImageVariants(img.sizes, strategy),
                   cropFocalPoint: getCropFocalPoint(img),
                 }))
               : [],
@@ -519,20 +475,20 @@ export async function GET(
       showImage: product.showImage
         ? {
             id: product.showImage.id,
-            url: normalizeToCDN(product.showImage.url),
+            url: convertToCDNUrl(product.showImage.url, strategy),
             altText: product.showImage.alt || '',
             filename: product.showImage.filename,
-            variants: transformImageVariants(product.showImage.sizes),
+            variants: transformImageVariants(product.showImage.sizes, strategy),
             cropFocalPoint: getCropFocalPoint(product.showImage),
           }
         : null,
       mainImage: product.mainImage && Array.isArray(product.mainImage)
         ? product.mainImage.map((img: any) => ({
             id: img.id,
-            url: normalizeToCDN(img.url),
+            url: convertToCDNUrl(img.url, strategy),
             altText: img.alt || '',
             filename: img.filename,
-            variants: transformImageVariants(img.sizes),
+            variants: transformImageVariants(img.sizes, strategy),
             cropFocalPoint: getCropFocalPoint(img),
           }))
         : [],

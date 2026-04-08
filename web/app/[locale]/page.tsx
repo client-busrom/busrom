@@ -71,9 +71,14 @@ function HomePageSkeleton() {
   )
 }
 
+import { cookies } from "next/headers";
+
 // 首页内容加载器
 async function HomeContentLoader({ locale }: { locale: Locale }) {
-  const content = await getHomeContent(locale) as HomeContent;
+  const cookieStore = await cookies();
+  const strategy = cookieStore.get('cdn_strategy')?.value;
+  
+  const content = await getHomeContent(locale, strategy) as HomeContent;
   const lcpImageUrls = getLCPImageUrls(content)
 
   return (

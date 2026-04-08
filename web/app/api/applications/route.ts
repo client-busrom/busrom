@@ -4,64 +4,30 @@ import { NextRequest, NextResponse } from 'next/server'
 const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 // CDN Domain configuration
-const CDN_DOMAIN = process.env.NEXT_PUBLIC_CDN_DOMAIN || 'http://localhost:8080'
-
-/**
- * Normalize image URL to use CDN domain
- */
-function normalizeToCDN(url: string): string {
-  if (!url) return url
-  if (url.includes('d2kqew3hn5wphn.cloudfront.net')) {
-    try {
-      const urlObj = new URL(url)
-      return `${CDN_DOMAIN}${urlObj.pathname}`
-    } catch {
-      return url.replace('https://d2kqew3hn5wphn.cloudfront.net', CDN_DOMAIN)
-    }
-  }
-  if (url.includes(CDN_DOMAIN)) {
-    return url
-  }
-  try {
-    const urlObj = new URL(url)
-    if (url.includes('localhost:9000')) {
-      return `${CDN_DOMAIN}${urlObj.pathname}`
-    }
-    if (urlObj.hostname.includes('amazonaws.com')) {
-      const pathParts = urlObj.pathname.split('/').filter(Boolean)
-      if (pathParts.length > 1) {
-        pathParts.shift()
-      }
-      return `${CDN_DOMAIN}/${pathParts.join('/')}`
-    }
-    return url
-  } catch {
-    return url
-  }
-}
+import { convertToCDNUrl } from '@/lib/cdn-url'
 
 /**
  * Transform Payload sizes to frontend variants format
  * Payload sizes: thumbnail (400x300), card (768x512), tablet (1024w), desktop (1920w)
  * Frontend variants: thumbnail, small, medium, large, xlarge
  */
-function transformImageVariants(sizes: any) {
+function transformImageVariants(sizes: any, strategy?: string) {
   if (!sizes) return null
 
   const variants: any = {}
 
   // Map Payload sizes to frontend variants
   if (sizes.thumbnail?.url) {
-    variants.thumbnail = normalizeToCDN(sizes.thumbnail.url)
+    variants.thumbnail = convertToCDNUrl(sizes.thumbnail.url, strategy)
   }
   if (sizes.card?.url) {
-    variants.small = normalizeToCDN(sizes.card.url)
+    variants.small = convertToCDNUrl(sizes.card.url, strategy)
   }
   if (sizes.tablet?.url) {
-    variants.medium = normalizeToCDN(sizes.tablet.url)
+    variants.medium = convertToCDNUrl(sizes.tablet.url, strategy)
   }
   if (sizes.desktop?.url) {
-    variants.large = normalizeToCDN(sizes.desktop.url)
+    variants.large = convertToCDNUrl(sizes.desktop.url, strategy)
   }
 
   return Object.keys(variants).length > 0 ? variants : null
@@ -96,6 +62,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const category = searchParams.get('category')
     const ids = searchParams.get('ids')
+    const strategy = request.cookies.get('cdn_strategy')?.value
 
     console.log('[Applications API] Fetching applications from Payload CMS:', {
       locale,
@@ -103,6 +70,7 @@ export async function GET(request: NextRequest) {
       page,
       category,
       ids,
+      strategy
     })
 
     // 构建 Payload API URL
@@ -168,10 +136,10 @@ export async function GET(request: NextRequest) {
         sceneName: scene.sceneName,
         images: scene.images?.map((img: any) => ({
           id: img.id,
-          url: normalizeToCDN(img.url),
+          url: convertToCDNUrl(img.url, strategy),
           alt: img.alt || '',
           cropFocalPoint: getCropFocalPoint(img),
-          variants: transformImageVariants(img.sizes),
+          variants: transformImageVariants(img.sizes, strategy),
           width: img.width,
           height: img.height,
         })) || [],

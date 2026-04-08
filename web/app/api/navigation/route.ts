@@ -22,6 +22,8 @@ interface PayloadNavMenu {
   }>;
 }
 
+import { convertToCDNUrl } from '@/lib/cdn-url';
+
 /**
  * 从媒体标签获取图片（确定性选择，基于菜单ID）
  * 注意：不使用随机选择，以确保图片URL稳定，便于浏览器缓存
@@ -29,13 +31,13 @@ interface PayloadNavMenu {
 async function getImageFromMediaTags(
   mediaTags: Array<{ id: string; name: string }>,
   locale: string,
-  menuId: string
+  menuId: string,
+  strategy?: string
 ): Promise<{ url: string; filename: string; sizes?: any } | null> {
   if (!mediaTags || mediaTags.length === 0) return null;
 
   try {
     // 使用第一个 mediaTag 的 ID 查询图片
-    // 只查询场景图 (primaryCategory = 2, name = "scene")
     const tagId = mediaTags[0].id;
     const response = await fetch(
       `${CMS_URL}/api/media?where[tags][in]=${tagId}&where[primaryCategory][equals]=2&limit=20&locale=${locale}`,
@@ -51,16 +53,28 @@ async function getImageFromMediaTags(
 
     const data = await response.json();
     if (data.docs && data.docs.length > 0) {
-      // 基于菜单ID确定性选择图片（相同菜单始终返回相同图片）
-      // 使用简单的哈希：将menuId转为数字后取模
       const menuIdStr = String(menuId || '');
       const hash = menuIdStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
       const index = hash % data.docs.length;
       const media = data.docs[index];
+
+      // Transform sizes
+      const transformedSizes: any = {}
+      if (media.sizes) {
+        Object.entries(media.sizes).forEach(([key, value]: [string, any]) => {
+          if (value?.url) {
+            transformedSizes[key] = {
+              ...value,
+              url: convertToCDNUrl(value.url, strategy)
+            }
+          }
+        })
+      }
+
       return {
-        url: media.url,
+        url: convertToCDNUrl(media.url, strategy),
         filename: media.filename,
-        sizes: media.sizes || {}, // Include sizes for optimized frontend loading
+        sizes: transformedSizes,
       };
     }
   } catch (error) {
@@ -72,18 +86,14 @@ async function getImageFromMediaTags(
 
 /**
  * 转换函数：将 Payload CMS 数据转换为前端期望的格式
- * @param item - 当前菜单项
- * @param locale - 语言
- * @param allMenus - 所有菜单（用于查找子菜单）
- * @param parentType - 父菜单的类型（用于子菜单继承）
  */
 async function transformNavigationItem(
   item: PayloadNavMenu,
   locale: string,
   allMenus: PayloadNavMenu[],
+  strategy?: string,
   parentType?: string
 ): Promise<NavItem> {
-  // 转换类型：小写转大写下划线
   const typeMap: Record<string, NavigationMenuType> = {
     'standard': NavigationMenuType.STANDARD,
     'product_cards': NavigationMenuType.PRODUCT_CARDS,
@@ -100,41 +110,34 @@ async function transformNavigationItem(
     order: item.order,
   };
 
-  // Fix mission-critical URL mismatch for One-Stop Shop
   if (result.url === '/service/one-stop') {
     result.url = '/service/one-stop-shop';
   }
 
-  // 添加询单链接
   if (item.inquiryLink) {
     result.inquiryLink = item.inquiryLink;
   }
 
-  // 获取图片的条件：
-  // 1. 自身是 product_cards 类型
-  // 2. 或者父菜单是 product_cards 类型（子菜单继承）
   const shouldFetchImage = item.type === 'product_cards' || parentType === 'product_cards';
 
   if (shouldFetchImage && item.mediaTags && item.mediaTags.length > 0) {
-    const image = await getImageFromMediaTags(item.mediaTags, locale, item.id);
+    const image = await getImageFromMediaTags(item.mediaTags, locale, item.id, strategy);
     if (image) {
       result.image = image;
     }
   }
 
-  // 查找子菜单
   const children = allMenus.filter(menu => {
     if (!menu.parent) return false;
     const parentId = typeof menu.parent === 'string' ? menu.parent : menu.parent.id;
     return parentId === item.id;
   });
 
-  // 递归转换子菜单，传递当前菜单的类型
   if (children.length > 0) {
     result.childMenus = await Promise.all(
       children
         .sort((a, b) => a.order - b.order)
-        .map(child => transformNavigationItem(child, locale, allMenus, item.type))
+        .map(child => transformNavigationItem(child, locale, allMenus, strategy, item.type))
     );
   }
 
@@ -145,8 +148,9 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const locale = searchParams.get('locale') || 'en';
+    const strategy = request.cookies.get('cdn_strategy')?.value;
 
-    console.log('[Navigation API] Fetching navigation from Payload CMS for locale:', locale);
+    console.log('[Navigation API] Fetching navigation from Payload CMS for locale:', locale, 'strategy:', strategy);
 
     // 从 Payload CMS 获取所有可见的导航菜单
     // 导航数据变化不频繁，缓存 5 分钟
@@ -182,7 +186,7 @@ export async function GET(request: NextRequest) {
     const transformedData = await Promise.all(
       topLevelMenus
         .sort((a, b) => a.order - b.order)
-        .map(item => transformNavigationItem(item, locale, allMenus))
+        .map(item => transformNavigationItem(item, locale, allMenus, strategy))
     );
 
     console.log('[Navigation API] Transformed data:', transformedData.length);

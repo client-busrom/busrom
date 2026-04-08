@@ -16,24 +16,20 @@ const CMS_URL = process.env.CMS_GRAPHQL_URL
   : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002')
 
 // Helper function to convert Media URL to CDN URL
-function getMediaUrl(fileUrl: string | null | undefined): string {
+function getMediaUrl(fileUrl: string | null | undefined, strategy?: string): string {
   if (!fileUrl) return '/images/placeholder.jpg'
   // Convert the fileUrl to CDN URL (handles both MinIO and S3)
-  return convertToCDNUrl(fileUrl)
+  return convertToCDNUrl(fileUrl, strategy)
 }
 
 /**
  * Fetch all home page content for a specific locale
  *
  * @param locale - Language code (e.g., 'en', 'zh', 'es')
+ * @param strategy - Optional forced strategy ('china' | 'global')
  * @returns Complete home page content
- *
- * @example
- * ```typescript
- * const homeContent = await getHomeContent('en')
- * ```
  */
-export async function getHomeContent(locale: string = 'en'): Promise<HomeContent> {
+export async function getHomeContent(locale: string = 'en', strategy?: string): Promise<HomeContent> {
   try {
     const response = await fetch(`${CMS_URL}/api/home?locale=${locale}`, {
       next: { revalidate: 60 },
@@ -46,25 +42,28 @@ export async function getHomeContent(locale: string = 'en'): Promise<HomeContent
     const data = await response.json()
 
     // Helper function to convert media data to ImageObject
-    // Supports both string URL (legacy) and object with url + variants + cropFocalPoint (new format)
-    const toImageObject = (mediaData: string | { url: string; variants?: Record<string, string>; cropFocalPoint?: { x: number; y: number }; altText?: string } | null | undefined, alt: string = ''): { url: string; altText: string; variants?: Record<string, string>; cropFocalPoint?: { x: number; y: number } } => {
+    const toImageObject = (
+      mediaData: string | { url: string; variants?: Record<string, string>; cropFocalPoint?: { x: number; y: number }; altText?: string } | null | undefined, 
+      alt: string = ''
+    ): { url: string; altText: string; variants?: Record<string, string>; cropFocalPoint?: { x: number; y: number } } => {
       if (!mediaData) {
         return { url: '/images/placeholder.jpg', altText: alt }
       }
       // Handle string URL (legacy format)
       if (typeof mediaData === 'string') {
         return {
-          url: getMediaUrl(mediaData),
+          url: getMediaUrl(mediaData, strategy),
           altText: alt
         }
       }
       // Handle object with url, variants, and cropFocalPoint
-      // Convert all variant URLs to CDN URLs
+      // Convert all variant URLs to CDN URLs using strategy
       const variants = mediaData.variants ? Object.fromEntries(
-        Object.entries(mediaData.variants).map(([key, url]) => [key, getMediaUrl(url)])
+        Object.entries(mediaData.variants).map(([key, url]) => [key, getMediaUrl(url, strategy)])
       ) : undefined
+      
       return {
-        url: getMediaUrl(mediaData.url),
+        url: getMediaUrl(mediaData.url, strategy),
         altText: mediaData.altText || alt,
         variants,
         cropFocalPoint: mediaData.cropFocalPoint
