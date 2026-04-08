@@ -13,8 +13,18 @@ const CDN_DOMAIN = process.env.NEXT_PUBLIC_CDN_DOMAIN || 'http://localhost:8080'
 function normalizeToCDN(url: string): string {
   if (!url) return url
 
+  // Legacy fallback
+  if (url.includes('d2kqew3hn5wphn.cloudfront.net')) {
+    try {
+      const urlObj = new URL(url)
+      return `${CDN_DOMAIN}${urlObj.pathname}`
+    } catch {
+      return url.replace('https://d2kqew3hn5wphn.cloudfront.net', CDN_DOMAIN)
+    }
+  }
+
   // Already using CDN domain
-  if (url.includes(CDN_DOMAIN) || url.includes('cloudfront.net')) {
+  if (url.includes(CDN_DOMAIN)) {
     return url
   }
 
