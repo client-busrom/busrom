@@ -29,6 +29,11 @@ const nextConfig = {
         hostname: '*.cloudfront.net',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.busromhouse.com',
+        pathname: '/**',
+      },
     ],
     formats: ['image/avif', 'image/webp'],
   },
@@ -235,15 +240,15 @@ const nextConfig = {
       // Styles: self + inline (Tailwind/styled-jsx 需要) + Google Fonts
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // Images: self + data + blob + CDN + unpkg (Globe textures) + Iconify API
-      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net https://unpkg.com https://api.iconify.design http://localhost:* http://127.0.0.1:* https://www.google-analytics.com https://www.googletagmanager.com",
+      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com https://unpkg.com https://api.iconify.design http://localhost:* http://127.0.0.1:* https://www.google-analytics.com https://www.googletagmanager.com",
       // Fonts: self + CDN + Google Fonts
       "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com",
       // Connect: self + API + CDN + Cloudflare Turnstile + jsdelivr (Three.js fonts) + WebSocket (HMR)
       isDev
-        ? "connect-src 'self' ws://localhost:* http://localhost:* http://127.0.0.1:* https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design https://www.google-analytics.com https://www.googletagmanager.com"
-        : "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design https://www.google-analytics.com https://www.googletagmanager.com",
+        ? "connect-src 'self' ws://localhost:* http://localhost:* http://127.0.0.1:* https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design https://www.google-analytics.com https://www.googletagmanager.com"
+        : "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design https://www.google-analytics.com https://www.googletagmanager.com",
       // Media: self + CDN
-      "media-src 'self' https://*.amazonaws.com https://*.cloudfront.net http://localhost:* http://127.0.0.1:*",
+      "media-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com http://localhost:* http://127.0.0.1:*",
       // Frame: Cloudflare Turnstile
       "frame-src 'self' https://challenges.cloudflare.com",
       // Object: none - 防止 Flash/Java 等插件攻击
