@@ -133,6 +133,21 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
       checkAndStartEndAnimation();
     }, MIN_LOADING_TIME);
 
+    // --- 新增：硬超时机制 (Hard Timeout) ---
+    // 为中国大陆等网络环境优化的“兜底”逻辑：如果 6 秒后还没加载完，强制解锁
+    const HARD_TIMEOUT = 6000; 
+    setTimeout(() => {
+      if (!allImagesLoaded || !fontAndLogoReady) {
+        console.warn("[Preloader] Hard timeout reached. Forcing site entry...");
+        allImagesLoaded = true;
+        fontAndLogoReady = true;
+        minTimeElapsed = true;
+        realProgress.value = 100;
+        updatePercentageDisplay();
+        checkAndStartEndAnimation();
+      }
+    }, HARD_TIMEOUT);
+
     // 更新百分比文字显示 - 只在百分比变化时更新
     const updatePercentageDisplay = () => {
       if (!font) return;
