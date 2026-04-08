@@ -15,12 +15,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const locale = new URL(request.url).searchParams.get('locale') || 'en'
     const cmsUrl = getCmsUrl()
     
+    // 智能路由策略
+    const strategy = request.cookies.get('cdn_strategy')?.value
+    
     // Standard normalizer for pages
     const normalize = (url: string) => {
       if (!url) return ''
-      if (url.startsWith('http')) return convertToCDNUrl(url)
+      if (url.startsWith('http')) return convertToCDNUrl(url, strategy)
       const normalizedPath = url.startsWith('/') ? url : `/${url}`
-      return convertToCDNUrl(`${cmsUrl}${normalizedPath}`)
+      return convertToCDNUrl(`${cmsUrl}${normalizedPath}`, strategy)
     }
 
     const pageRes = await fetch(`${cmsUrl}/api/pages?where[slug][equals]=${slug}&locale=${locale}&depth=2`)
