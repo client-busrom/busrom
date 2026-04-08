@@ -71,7 +71,13 @@ export function middleware(request: NextRequest) {
     return res;
   };
 
-  // 2. 处理 /en 和 /en/* 的 301 重定向 (SEO 保护)
+  // 2. 对 API 路径特殊处理：跳过语言重定向/重写，直接进行 CDN 策略判定
+  if (pathname.startsWith('/api/')) {
+    const res = NextResponse.next();
+    return setStrategyCookie(res);
+  }
+
+  // 3. 处理 /en 和 /en/* 的 301 重定向 (SEO 保护)
   if (pathname === `/${defaultLocale}` || pathname.startsWith(`/${defaultLocale}/`)) {
     const newPath = pathname.replace(new RegExp(`^/${defaultLocale}/?`), '/') || '/';
     const url = new URL(newPath, request.url);
@@ -99,6 +105,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Exclude: api, static files, sitemap routes, robots.txt, feed
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|sitemap|sitemaps\\.xml|robots\\.txt|feed|.*\\..*).*)'],
+  // 包含 api 路径，以便在 API 调用中也能实时检测并更新 cdn_strategy Cookie
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|sitemap|sitemaps\\.xml|robots\\.txt|feed|.*\\..*).*)'],
 };
