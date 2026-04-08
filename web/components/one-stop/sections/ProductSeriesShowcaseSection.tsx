@@ -28,60 +28,52 @@ export function ProductSeriesShowcaseSection({ title, products, locale }: Produc
     return products.filter(p => p.name && p.slug)
   }, [products])
 
-  if (validProducts.length === 0) return null
-
   const activeProduct = validProducts[currentIndex]
 
-  const getDisplayName = () => {
-    const item = (activeProduct as any)._carouselItem
-    const categoryName = (activeProduct as any).category?.name || (activeProduct as any).categoryName || "Category"
-    const productName = activeProduct.name || ""
-    
-    if (item) {
-        // 如果填写了自定义名称且不为空，优先级最高
-        if (item.customName && item.customName.trim() !== "") return item.customName
-        
-        // 只要定义了显示分类，或者明确定义了不显示产品名称，就显示分类
-        if (item.showCategory === true || item.showName === false) return categoryName
-        if (item.showName === true) return productName
-    }
-    
-    // 兜底逻辑：如果映射数据里原本就有处理过的 title，优先用处理好的
-    return (activeProduct as any).title || productName
-  }
-
   const displayedImages = useMemo(() => {
+    if (!activeProduct) return [null, null]
     const mainImages = (activeProduct as any).mainImage || []
     const showImgNode = (activeProduct as any).showImage
 
     if (mainImages.length > 0) {
-      // 随机抓取两张不重复的图
       const shuffled = [...mainImages].sort(() => 0.5 - Math.random())
       const img1 = shuffled[0]
       const img2 = shuffled.length > 1 ? shuffled[1] : (showImgNode || shuffled[0])
       return [img1, img2]
     }
-
-    // 兜底逻辑
     return [showImgNode, showImgNode]
   }, [activeProduct])
 
   const attributes = useMemo(() => {
+    if (!activeProduct) return []
     const config = (activeProduct as any)._carouselItem
-    // 如果 CMS 明确关闭了“显示核心亮点”，则不显示任何属性
     if (config && config.showHighlights === false) return []
 
     if (Array.isArray(activeProduct.productAttributes) && activeProduct.productAttributes.length > 0) return activeProduct.productAttributes
     if (typeof activeProduct.productAttributes === 'string') {
         return (activeProduct.productAttributes as string).split('\n').filter(line => line.trim())
     }
-    
-    // 如果开启了显示但没数据，返回默认值
     return ["Robust and stable", "Resistant to moisture", "Minimalist aesthetics", "Versatile and adaptable"]
   }, [activeProduct])
 
-  const nextProduct = () => setCurrentIndex((prev) => (prev + 1) % validProducts.length)
-  const prevProduct = () => setCurrentIndex((prev) => (prev - 1 + validProducts.length) % validProducts.length)
+  const nextProduct = () => setCurrentIndex((prev) => (prev + 1) % (validProducts.length || 1))
+  const prevProduct = () => setCurrentIndex((prev) => (prev - 1 + (validProducts.length || 1)) % (validProducts.length || 1))
+
+  const getDisplayName = () => {
+    if (!activeProduct) return ""
+    const item = (activeProduct as any)._carouselItem
+    const categoryName = (activeProduct as any).category?.name || (activeProduct as any).categoryName || "Category"
+    const productName = activeProduct.name || ""
+    
+    if (item) {
+        if (item.customName && item.customName.trim() !== "") return item.customName
+        if (item.showCategory === true || item.showName === false) return categoryName
+        if (item.showName === true) return productName
+    }
+    return (activeProduct as any).title || productName
+  }
+
+  if (validProducts.length === 0) return null
 
   return (
     <section className="relative w-full bg-transparent flex flex-col items-center py-8 lg:py-0 lg:h-[700px]">

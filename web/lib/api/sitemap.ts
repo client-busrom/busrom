@@ -16,7 +16,12 @@
 
 import { locales, defaultLocale } from '@/i18n.config'
 
-const GRAPHQL_ENDPOINT = process.env.CMS_GRAPHQL_URL || 'http://localhost:3000/api/graphql'
+const CMS_URL = process.env.CMS_GRAPHQL_URL
+  ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
+  : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'https://cms.busromhouse.com')
+
+const GRAPHQL_ENDPOINT = `${CMS_URL}/api/graphql`
+
 
 // Supported languages for sitemap
 export const SITEMAP_LOCALES = locales

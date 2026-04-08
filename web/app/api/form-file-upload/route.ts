@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
 
     // 4. Fetch form configuration to get file upload limits
     const cmsUrl = process.env.CMS_URL ||
-      (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : 'http://localhost:3000')
+      (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : (process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'https://cms.busromhouse.com'))
     const formConfigResponse = await fetch(`${cmsUrl}/api/graphql`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -341,7 +341,7 @@ export async function POST(request: NextRequest) {
     // 11. Record upload in TempFileUpload table (for orphan file cleanup)
     try {
       const cmsUrl = process.env.CMS_URL ||
-        (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : 'http://localhost:3000')
+        (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : (process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'https://cms.busromhouse.com'))
       await fetch(`${cmsUrl}/api/graphql`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

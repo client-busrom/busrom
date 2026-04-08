@@ -20,25 +20,15 @@ import { OemOdmCustomizationProcess } from "@/components/oem-odm/OemOdmCustomiza
 import { OemOdmContactForm } from "@/components/oem-odm/OemOdmContactForm"
 import { OemOdmApplications } from "@/components/oem-odm/OemOdmApplications"
 import { OemOdmProductGuide } from "@/components/oem-odm/OemOdmProductGuide"
+import { 
+  flattenLexicalChildren as flattenChildren, 
+  extractNodesAfterMarker as extractAfterMarker, 
+  resolveMediaFromNodes,
+  MediaObject
+} from "@/lib/lexical-utils"
 
-interface MediaObject {
-  id: string
-  url: string
-  alt?: string
-  variants?: {
-    thumbnail?: string
-    small?: string
-    medium?: string
-    large?: string
-    xlarge?: string
-  }
-  cropFocalPoint?: { x: number; y: number } | null
-  width?: number
-  height?: number
-  enableLink?: boolean
-  linkUrl?: string
-  openInNewTab?: boolean
-}
+// MediaObject interface moved to @/lib/lexical-utils
+
 
 interface FormField {
   label: string
@@ -102,85 +92,17 @@ interface OemOdmTemplateProps {
 // Helper 函数 - 解析 CMS 富文本内容
 // ========================================
 
-// 递归展平所有子节点，包括 layout 内部的节点
-function flattenChildren(children: any[]): any[] {
-  const result: any[] = []
-
-  for (const node of children) {
-    // 如果是 layout 节点，递归展平其内部的 columns
-    if (node.type === "layout" && node.columns) {
-      for (const column of node.columns) {
-        if (column.children) {
-          result.push(...flattenChildren(column.children))
-        }
-      }
-    } else {
-      result.push(node)
-    }
-  }
-
-  return result
-}
-
-// 提取标记符之后的所有节点
-// CMS 输入格式：使用引用块 (blockquote) + 代码格式 (format: 16) 作为标记符
-function extractAfterMarker(children: any[], markerId: string): any[] {
-  // 先展平所有节点，包括 layout 内部的
-  const flatChildren = flattenChildren(children)
-
-  let foundMarker = false
-  const result: any[] = []
-
-  for (const node of flatChildren) {
-    // 查找带有 format: 16 (代码格式) 的段落或引用块作为标记符
-    if (node.type === "paragraph" || node.type === "quote") {
-      const text = node.children?.[0]?.text || ""
-      if (text === markerId) {
-        foundMarker = true
-        continue
-      }
-      // 遇到新标记符则停止（代码格式 format: 16，且包含连字符）
-      // 如果新标记符是以当前 markerId 开头的子标记（例如 contact-form-tips 在 contact-form 内部），则不停止
-      if (foundMarker && node.children?.[0]?.format === 16 && text.includes("-")) {
-        if (!text.startsWith(markerId + "-")) {
-          break
-        }
-      }
-    }
-
-    if (foundMarker) {
-      result.push(node)
-    }
-  }
-
-  return result
-}
-
-// 提取标记符之后的单张图片
+// Helpers moved to @/lib/lexical-utils or simplified
 function extractImageAfterMarker(
   children: any[],
   markerId: string,
   mediaData: Record<string, MediaObject>
 ): MediaObject | null {
-  const nodesAfterMarker = extractAfterMarker(children, markerId)
-
-  for (const node of nodesAfterMarker) {
-    if (node.type === "singleImage" && node.data?.image) {
-      const image = node.data.image
-      const imageId = typeof image === "object" && image ? image.id : String(image || "")
-      if (imageId && mediaData[imageId]) {
-        const mediaObj = { ...mediaData[imageId] }
-        if (node.data.enableLink) {
-          mediaObj.enableLink = true
-          mediaObj.linkUrl = node.data.linkUrl
-          mediaObj.openInNewTab = node.data.openInNewTab
-        }
-        return mediaObj
-      }
-    }
-  }
-  return null
+  const nodes = extractAfterMarker(children, markerId)
+  const resolved = resolveMediaFromNodes(nodes, mediaData)
+  return resolved[0] || null
 }
+
 
 // 文本片段接口 - 支持格式化
 interface TextSegment {
@@ -372,53 +294,10 @@ function extractGalleryAfterMarker(
   markerId: string,
   mediaData: Record<string, MediaObject>
 ): MediaObject[] {
-  const nodesAfterMarker = extractAfterMarker(children, markerId)
-  const images: MediaObject[] = []
-
-  for (const node of nodesAfterMarker) {
-    // 单张图片
-    if (node.type === "singleImage" && node.data?.image) {
-      const image = node.data.image
-      const imageId = typeof image === "object" && image ? image.id : String(image || "")
-      if (imageId && mediaData[imageId]) {
-        const mediaObj = { ...mediaData[imageId] }
-        if (node.data.enableLink) {
-          mediaObj.enableLink = true
-          mediaObj.linkUrl = node.data.linkUrl
-          mediaObj.openInNewTab = node.data.openInNewTab
-        }
-        images.push(mediaObj)
-      }
-    }
-    // 自定义图片画廊
-    if (node.type === "custom-image-gallery" && node.data?.images) {
-      for (const galleryItem of node.data.images) {
-        // 🚨 修正这里的 ID 获取逻辑
-        let imageId = ""
-        
-        if (galleryItem.sourceType === "application" && galleryItem.application) {
-          // 如果是案例，这个 ID 就是我们在后端建立映射时的 key
-          imageId = String(galleryItem.application)
-        } else {
-          // 普通图片选择方式
-          const image = galleryItem?.image
-          imageId = typeof image === "object" && image ? image.id : String(image || "")
-        }
-          
-        if (imageId && mediaData[imageId]) {
-          const mediaObj = { ...mediaData[imageId] }
-          if (galleryItem.enableLink) {
-            mediaObj.enableLink = true
-            mediaObj.linkUrl = galleryItem.linkUrl
-            mediaObj.openInNewTab = galleryItem.openInNewTab
-          }
-          images.push(mediaObj)
-        }
-      }
-    }
-  }
-  return images
+  const nodes = extractAfterMarker(children, markerId)
+  return resolveMediaFromNodes(nodes, mediaData)
 }
+
 
 // 提取带图片的列表项（用于 Advantages 板块）
 // 支持 carousel 类型的 slides 数据结构

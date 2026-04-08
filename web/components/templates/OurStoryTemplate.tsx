@@ -300,11 +300,6 @@ function extractCustomGalleryAfterMarker(children: any[], markerId: string, medi
 export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps) {
   const [allApplications, setAllApplications] = useState<any[]>([])
 
-  useEffect(() => {
-    fetch(`/api/applications?locale=${locale}&limit=100`)
-      .then(res => res.json())
-      .then(data => setAllApplications(data.docs || []))
-  }, [locale])
 
   const contentChildren = useMemo(() => 
     pageContent.content?.root?.children || pageContent.contentTranslation?.root?.children || [],
@@ -610,6 +605,23 @@ export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps)
 
     return { title, titleNodes, description, descriptionNodes, viewButtonText, viewButtonLink, viewButtonNewTab, applicationIds }
   }, [contentChildren])
+
+  useEffect(() => {
+    const ids = (applicationsRawData.applicationIds || []).filter(Boolean).join(',')
+    
+    if (ids) {
+      fetch(`/api/applications?locale=${locale}&ids=${ids}`)
+        .then(res => res.json())
+        .then(data => setAllApplications(data.docs || []))
+        .catch(err => console.error("Failed to fetch applications:", err))
+    } else {
+      // Fallback for OurStory if no specific IDs are marked
+      fetch(`/api/applications?locale=${locale}&limit=12`)
+        .then(res => res.json())
+        .then(data => setAllApplications(data.docs || []))
+        .catch(err => console.error("Failed to fetch applications fallback:", err))
+    }
+  }, [locale, applicationsRawData.applicationIds])
 
   // Resolve application IDs to full data
   const applicationsData = useMemo(() => {

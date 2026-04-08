@@ -45,6 +45,55 @@ function isAnyMarkerNode(node: any) {
 }
 
 /**
+ * 递归抓取节点下所有文本（深度优先），处理深度嵌套的 List 结构
+ */
+function getDeepText(node: any): string {
+  if (!node) return ""
+  if (typeof node === "string") return node
+  if (node.text !== undefined) return node.text
+
+  if (node.children && Array.isArray(node.children)) {
+    return node.children
+      .map((child: any) => {
+        if (child.type === "linebreak") return "\n"
+        return getDeepText(child)
+      })
+      .join("")
+  }
+  return ""
+}
+
+/**
+ * 专门解析 TrustSection 的“奇偶配对”有序列表
+ * 奇数项（1, 3, 5...）为 Title
+ * 偶数项（2, 4, 6...）为包含嵌套内容的 Description
+ */
+function parseTrustItems(nodes: any[]): { title: string; description: string }[] {
+  const listNode = nodes.find((n) => n.type === "list")
+  if (!listNode || !listNode.children) return []
+
+  const pairs: { title: string; description: string }[] = []
+  const listItems = listNode.children
+
+  // 步长为 2 遍历直接子项（listitem）
+  for (let i = 0; i < listItems.length; i += 2) {
+    const titleItem = listItems[i]
+    const contentItem = listItems[i + 1]
+
+    if (titleItem) {
+      const title = getDeepText(titleItem).trim()
+      // 如果没有偶数项，或者偶数项为空，description 留空
+      const description = contentItem ? getDeepText(contentItem).trim() : ""
+      
+      if (title || description) {
+        pairs.push({ title, description })
+      }
+    }
+  }
+  return pairs
+}
+
+/**
  * 提取特定“领土”内的所有数据项及其标题
  */
 function extractSection(children: any[], markerId: string, mediaData: Record<string, MediaObject>) {
@@ -183,12 +232,18 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
     return { titleLine1: titleLine1.trim(), titleLine2: titleLine2.trim(), items: res.items }
   }, [contentChildren, mediaData])
 
-  const trustDataRaw = useMemo(() => extractSection(contentChildren, "why-contractors-trust-us-item", mediaData), [contentChildren, mediaData])
-  const trustData = useMemo(() => ({
-    ...trustDataRaw,
-    items: trustDataRaw.items.filter(it => it.title && !it.image)
-  }), [trustDataRaw])
-  const trustImages = useMemo(() => trustDataRaw.items.filter(it => it.image && it.sourceType === 'custom-image-gallery'), [trustDataRaw])
+  const trustData = useMemo(() => {
+    const nodes = extractAfterMarker(contentChildren, "why-contractors-trust-us-item")
+    const resBase = extractSection(contentChildren, "why-contractors-trust-us-item", mediaData)
+    const items = parseTrustItems(nodes)
+    return { ...resBase, items }
+  }, [contentChildren, mediaData])
+
+  const trustImages = useMemo(() => {
+    // 依然保留从 extractSection 获取图片的逻辑，因为图片通常在 custom-image-gallery 块中
+    const res = extractSection(contentChildren, "why-contractors-trust-us-item", mediaData)
+    return res.items.filter(it => it.image && it.sourceType === 'custom-image-gallery')
+  }, [contentChildren, mediaData])
   
   const trustBgImage = useMemo(() => {
     const bgMarker = "why-contractors-trust-us-bg-image"
@@ -248,10 +303,16 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
   
   useEffect(() => {
     const carouselItem = applicationsDataRaw.items.find(it => it.sourceType === 'applicationCarousel')
-    if (carouselItem && carouselItem.applicationIds?.length > 0) {
-      fetch(`/api/applications?locale=${locale}&limit=100`)
-        .then(res => res.json())
-        .then(data => setAllApplications(data.docs || []))
+    const applicationIds = carouselItem?.applicationIds || []
+    
+    if (applicationIds.length > 0) {
+      const ids = applicationIds.map((item: any) => typeof item === 'object' ? item.id : item).filter(Boolean).join(',')
+      if (ids) {
+        fetch(`/api/applications?locale=${locale}&ids=${ids}`)
+          .then(res => res.json())
+          .then(data => setAllApplications(data.docs || []))
+          .catch(err => console.error("Failed to fetch applications:", err))
+      }
     }
   }, [applicationsDataRaw, locale])
 
@@ -417,7 +478,11 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
       }
       return [] // If carousel is present but not loaded yet
     }
-    return productsData
+    // 回落模式：分类名 > 产品名
+    return productsData.map(p => ({
+      ...p,
+      title: p.category?.name || p.name
+    }))
   }, [categoriesTitle, productsData, carouselProductsData])
 
   const seriesProducts = useMemo(() => {
@@ -433,7 +498,11 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
       }
       return []
     }
-    return productsData
+    // 回落模式：分类名 > 产品名
+    return productsData.map(p => ({
+      ...p,
+      title: p.category?.name || p.name
+    }))
   }, [productSeriesData, productsData, carouselProductsData])
 
   return (
