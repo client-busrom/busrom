@@ -13,13 +13,20 @@ interface TrustSectionProps {
 }
 
 export function TrustSection({ title, items, images = [], bgImage }: TrustSectionProps) {
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [isPaused, setIsPaused] = useState(false)
+  const [expandedIndices, setExpandedIndices] = useState<number[]>([0])
   
   const scrollRef = React.useRef<HTMLDivElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
   const [scrollTop, setScrollTop] = useState(0)
+
+  const toggleIndex = (index: number) => {
+    setExpandedIndices(prev => 
+      prev.includes(index) 
+        ? prev.filter(i => i !== index) 
+        : [...prev, index]
+    )
+  }
 
   const defaultItems = [
     { title: "One-stop Full-range Supply", description: "Cover all parts of hardware, saving coordination costs" },
@@ -32,34 +39,85 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
 
   const displayItems = items && items.length > 0 ? items : defaultItems
 
-  // Auto-play Logic
-  useEffect(() => {
-    if (isPaused || isDragging) return
-    const timer = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % displayItems.length)
-    }, 5000)
-    return () => clearInterval(timer)
-  }, [isPaused, isDragging, displayItems.length])
 
-  // 1. Lenis Support - Reference handle scroll behavior similar to LocaleSwitcher
-  useEffect(() => {
-    const el = scrollRef.current
-    if (!el) return
+  // Helper for item-level drag scroll
+  const DescriptionContent = ({ text }: { text: string }) => {
+    const contentRef = React.useRef<HTMLDivElement>(null)
+    const [dragging, setDragging] = useState(false)
+    const [startY, setStartY] = useState(0)
+    const [scrollTop, setScrollTop] = useState(0)
+    const [showScroll, setShowScroll] = useState(false)
 
-    const stopPropagation = (event: WheelEvent | TouchEvent) => {
-      event.stopPropagation()
+    useEffect(() => {
+      const checkHeight = () => {
+        if (contentRef.current) {
+          const style = window.getComputedStyle(contentRef.current)
+          const lh = parseInt(style.lineHeight) || 24
+          const maxHeightPc = lh * 2.15 // Slightly more than 2 lines
+          if (contentRef.current.scrollHeight > maxHeightPc) {
+            setShowScroll(true)
+          } else {
+            setShowScroll(false)
+          }
+        }
+      }
+      checkHeight()
+      setTimeout(checkHeight, 50) // Re-check after layout stability
+      window.addEventListener('resize', checkHeight)
+      return () => window.removeEventListener('resize', checkHeight)
+    }, [text])
+
+    const onMouseDown = (e: React.MouseEvent) => {
+      // Prevent global scroll when interacting with item internal scroll
+      e.stopPropagation()
+      if (!showScroll || !contentRef.current) return
+      setDragging(true)
+      setStartY(e.pageY - contentRef.current.offsetTop)
+      setScrollTop(contentRef.current.scrollTop)
     }
 
-    el.addEventListener("wheel", stopPropagation, { passive: false })
-    el.addEventListener("touchmove", stopPropagation, { passive: false })
-
-    return () => {
-      el.removeEventListener("wheel", stopPropagation)
-      el.removeEventListener("touchmove", stopPropagation)
+    const onMouseMove = (e: React.MouseEvent) => {
+      if (!dragging || !contentRef.current) return
+      e.preventDefault()
+      const y = e.pageY - contentRef.current.offsetTop
+      const walk = (y - startY) * 1.5
+      contentRef.current.scrollTop = scrollTop - walk
     }
-  }, [])
 
-  // 2. Drag-to-Scroll logic
+    const onMouseUp = () => setDragging(false)
+    const onMouseLeave = () => setDragging(false)
+
+    return (
+      <div
+        ref={contentRef}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseLeave}
+        onWheel={(e) => showScroll && e.stopPropagation()}
+        data-lenis-prevent={showScroll}
+        className={`overflow-y-auto custom-scrollbar-inner transition-all ${showScroll ? 'max-h-[58px] lg:max-h-[66px] cursor-grab active:cursor-grabbing' : ''}`}
+      >
+        <style jsx>{`
+          .custom-scrollbar-inner::-webkit-scrollbar {
+            width: 2px;
+          }
+          .custom-scrollbar-inner::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          .custom-scrollbar-inner::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+          }
+        `}</style>
+        <p className="text-[16px] lg:text-[18px] font-medium text-white/80 leading-relaxed pb-4 lg:pr-[40px]" style={{ fontFamily: "var(--font-anaheim)" }}>
+          {text}
+        </p>
+      </div>
+    )
+  }
+
+  // 2. Global Drag-to-Scroll logic
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!scrollRef.current) return
     setIsDragging(true)
@@ -86,13 +144,11 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
   return (
     <section 
       className="relative w-full overflow-hidden flex flex-col items-center bg-black py-32 lg:py-0 min-h-[922px] lg:h-[922px] lg:min-h-[922px]"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
     >
       {/* 1. Background Layer */}
       <div className="absolute inset-0 z-0">
          {bgImage && (
-           <OptimizedImage image={bgImage} alt="Background" className="w-full h-full object-cover opacity-70" size="xlarge" />
+           <OptimizedImage image={bgImage} alt="Background" className="w-full h-full object-cover opacity-70" size="large" />
          )}
          <div 
            className="absolute inset-0 z-10 backdrop-blur-[8px]"
@@ -114,46 +170,53 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
             dangerouslySetInnerHTML={{ __html: (title || "Why Contractors<br />Trust Us?").replace(/\n/g, '<br />') }}
           />
 
-          {/* Scrollable Items Container with Drag/Wheel support */}
+          {/* Items Container - Global Drag Scroll restored */}
           <div 
             ref={scrollRef}
             onMouseDown={handleMouseDown}
             onMouseLeave={handleMouseLeave}
             onMouseUp={handleMouseUp}
             onMouseMove={handleMouseMove}
-            className={`w-full lg:max-w-[640px] mx-auto lg:mx-0 lg:max-h-[600px] lg:overflow-y-auto lg:pr-8 custom-scrollbar select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-            style={{ 
-              scrollbarWidth: "none", // Hide default scrollbar thumb for cleaner look
-              msOverflowStyle: "none"
-            }}
+            className={`w-full lg:max-w-[640px] mx-auto lg:mx-0 lg:max-h-[540px] lg:overflow-y-auto lg:pr-8 custom-scrollbar select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
           >
             <style jsx>{`
               .custom-scrollbar::-webkit-scrollbar {
-                width: 0px; /* Hidden but scrollable */
-                display: none;
+                width: 4px;
+              }
+              .custom-scrollbar::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 10px;
+              }
+              .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: rgba(255, 242, 142, 0.3);
+                border-radius: 10px;
+                transition: background 0.3s;
+              }
+              .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+                background: rgba(255, 242, 142, 0.6);
               }
             `}</style>
               {displayItems.map((item, i) => {
-                  const isActive = activeIndex === i
+                  const isExpanded = expandedIndices.includes(i)
                   return (
-                      <div key={i} className="mb-4 lg:mb-6 group border-b border-white/10">
+                      <div key={i} className="mb-2 lg:mb-4 group border-b border-white/10">
                           <button 
-                              onClick={() => !isDragging && setActiveIndex(i)}
+                              onClick={() => !isDragging && toggleIndex(i)}
                               className="w-full flex justify-between items-center text-left py-4 transition-all"
                           >
                               <h4 
-                                  className={`text-[18px] lg:text-[22px] font-bold transition-colors duration-300 ${isActive ? 'text-[#FFF28E]' : 'text-white/60 group-hover:text-white'}`}
+                                  className={`text-[18px] lg:text-[22px] font-bold transition-colors duration-300 ${isExpanded ? 'text-[#FFF28E]' : 'text-white/60 group-hover:text-white'}`}
                                   style={{ fontFamily: "var(--font-anaheim)" }}
                               >
                                   {item.title}
                               </h4>
-                              <div className={`w-8 h-8 lg:w-[40px] lg:h-[40px] rounded-full border-2 flex items-center justify-center transition-all duration-300 shrink-0 ${isActive ? 'border-[#FFF28E] bg-[#FFF28E] text-black rotate-180' : 'border-white/20 text-white'}`}>
-                                  {isActive ? <Minus className="w-4 h-4 lg:w-[20px] lg:h-[20px]" strokeWidth={3} /> : <Plus className="w-4 h-4 lg:w-[20px] lg:h-[20px]" strokeWidth={3} />}
+                              <div className={`w-8 h-8 lg:w-[40px] lg:h-[40px] rounded-full border-2 flex items-center justify-center transition-all duration-300 shrink-0 ${isExpanded ? 'border-[#FFF28E] bg-[#FFF28E] text-black rotate-180' : 'border-white/20 text-white'}`}>
+                                  {isExpanded ? <Minus className="w-4 h-4 lg:w-[20px] lg:h-[20px]" strokeWidth={3} /> : <Plus className="w-4 h-4 lg:w-[20px] lg:h-[20px]" strokeWidth={3} />}
                               </div>
                           </button>
-
+ 
                           <AnimatePresence initial={false}>
-                              {isActive && (
+                              {isExpanded && (
                                   <motion.div
                                       initial={{ height: 0, opacity: 0 }}
                                       animate={{ height: "auto", opacity: 1 }}
@@ -161,9 +224,7 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
                                       transition={{ duration: 0.4 }}
                                       className="overflow-hidden"
                                   >
-                                      <p className="text-[16px] lg:text-[18px] font-medium text-white/80 leading-relaxed pb-8 lg:pr-[40px]" style={{ fontFamily: "var(--font-anaheim)" }}>
-                                          {item.description || item.summary}
-                                      </p>
+                                      <DescriptionContent text={item.description || item.summary || ""} />
                                   </motion.div>
                               )}
                           </AnimatePresence>
@@ -177,96 +238,97 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
         <div className="relative w-full lg:w-auto h-[450px] lg:h-full lg:flex-grow flex items-center justify-center lg:block min-h-[750px] lg:min-h-[900px]">
             {/* Image 1 - top scatter (Pencil: image1) */}
             <motion.div 
-                initial={{ rotate: 2.19 }}
+                initial={{ rotate: 2.19, x: 0 }}
                 animate={{ 
-                    y: [0, -15]
+                    y: [0, -10]
                 }}
+                whileHover={{ scale: 1.05, x: -15, y: -15, rotate: 0 }}
+                whileTap={{ scale: 0.95 }}
                 transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                    ease: "easeInOut"
+                    y: { duration: 2, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" },
+                    scale: { type: "spring", stiffness: 300 },
+                    x: { type: "spring", stiffness: 300 }
                 }}
-                className="absolute shadow-2xl rounded-[30px] lg:rounded-[54px] overflow-hidden z-30 lg:left-[135px] lg:top-[40px]"
+                className="absolute shadow-2xl rounded-[30px] lg:rounded-[54px] overflow-hidden z-30 lg:left-[135px] lg:top-[20px] cursor-pointer"
                 style={{ 
                   left: "calc(50% - 200px)",
-                  top: "20px",
+                  top: "10px",
                 }}
             >
                 <div className="w-[180px] h-[124px] lg:w-[235px] lg:h-[162px]">
-                    {getImage(0) ? <OptimizedImage image={getImage(0)} alt="image1" className="w-full h-full object-cover" size="small" /> : <div className="w-full h-full bg-white/10" />}
+                    {getImage(0) ? <OptimizedImage image={getImage(0)} alt="image1" className="w-full h-full object-cover" size="medium" /> : <div className="w-full h-full bg-white/10" />}
                 </div>
             </motion.div>
 
             {/* Image 2 - Main Large Image (Pencil: image2) */}
             <motion.div 
-                initial={{ rotate: 8.15 }}
+                initial={{ rotate: 8.15, x: 0 }}
                 animate={{ 
-                    y: [0, 15]
+                    y: [0, 10]
                 }}
+                whileHover={{ scale: 1.03, x: 20, y: -20, rotate: 10 }}
+                whileTap={{ scale: 0.98 }}
                 transition={{
-                    duration: 2.5,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                    ease: "easeInOut",
-                    delay: 0.5
+                    y: { duration: 2.5, repeat: Infinity, repeatType: "reverse", ease: "easeInOut", delay: 0.5 },
+                    scale: { type: "spring", stiffness: 300 },
+                    x: { type: "spring", stiffness: 300 }
                 }}
-                className="absolute shadow-2xl rounded-[30px] lg:rounded-[54px] overflow-hidden z-0 lg:left-[333px] lg:top-[152px]"
+                className="absolute shadow-2xl rounded-[30px] lg:rounded-[54px] overflow-hidden z-0 lg:left-[333px] lg:top-[122px] cursor-pointer"
                 style={{ 
                   left: "calc(50% - 60px)",
-                  top: "180px",
+                  top: "160px",
                 }}
             >
                 <div className="w-[220px] h-[280px] lg:w-[331px] lg:h-[425px]">
-                    {getImage(1) ? <OptimizedImage image={getImage(1)} alt="image2" className="w-full h-full object-cover" size="large" /> : <div className="w-full h-full bg-white/10" />}
+                    {getImage(1) ? <OptimizedImage image={getImage(1)} alt="image2" className="w-full h-full object-cover" size="xlarge" /> : <div className="w-full h-full bg-white/10" />}
                 </div>
             </motion.div>
 
             {/* Image 3 - mid left scatter (Pencil: image3) */}
             <motion.div 
-                initial={{ rotate: -20.86 }}
+                initial={{ rotate: -20.86, x: 0 }}
                 animate={{ 
-                    y: [0, -20]
+                    y: [0, -15]
                 }}
+                whileHover={{ scale: 1.05, x: -25, y: 15, rotate: -25 }}
+                whileTap={{ scale: 0.95 }}
                 transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                    ease: "easeInOut",
-                    delay: 1
+                    y: { duration: 3, repeat: Infinity, repeatType: "reverse", ease: "easeInOut", delay: 1 },
+                    scale: { type: "spring", stiffness: 300 },
+                    x: { type: "spring", stiffness: 300 }
                 }}
-                className="hidden lg:block absolute shadow-2xl rounded-[40px] lg:rounded-[54px] overflow-hidden z-20"
+                className="hidden lg:block absolute shadow-2xl rounded-[40px] lg:rounded-[54px] overflow-hidden z-20 cursor-pointer"
                 style={{ 
                   left: "50px", 
-                  top: "372px"
+                  top: "300px"
                 }}
             >
                 <div className="w-[229px] h-[258px]">
-                    {getImage(2) ? <OptimizedImage image={getImage(2)} alt="image3" className="w-full h-full object-cover" size="small" /> : <div className="w-full h-full bg-white/10" />}
+                    {getImage(2) ? <OptimizedImage image={getImage(2)} alt="image3" className="w-full h-full object-cover" size="medium" /> : <div className="w-full h-full bg-white/10" />}
                 </div>
             </motion.div>
 
             {/* Image 4 - bottom scatter (Pencil: image4) */}
             <motion.div 
-                initial={{ rotate: -5.5 }}
+                initial={{ rotate: -5.5, x: 0 }}
                 animate={{ 
-                    y: [0, 10]
+                    y: [0, 8]
                 }}
+                whileHover={{ scale: 1.05, x: 20, y: 20, rotate: -2 }}
+                whileTap={{ scale: 0.95 }}
                 transition={{
-                    duration: 2.25,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                    ease: "easeInOut",
-                    delay: 0.2
+                    y: { duration: 2.25, repeat: Infinity, repeatType: "reverse", ease: "easeInOut", delay: 0.2 },
+                    scale: { type: "spring", stiffness: 300 },
+                    x: { type: "spring", stiffness: 300 }
                 }}
-                className="hidden lg:block absolute shadow-2xl rounded-[30px] lg:rounded-[54px] overflow-hidden z-10"
+                className="hidden lg:block absolute shadow-2xl rounded-[30px] lg:rounded-[54px] overflow-hidden z-10 cursor-pointer"
                 style={{ 
                   left: "268px", 
-                  top: "597px"
+                  top: "520px"
                 }}
             >
                 <div className="w-[245px] h-[234px]">
-                    {getImage(3) ? <OptimizedImage image={getImage(3)} alt="image4" className="w-full h-full object-cover" size="small" /> : <div className="w-full h-full bg-white/10" />}
+                    {getImage(3) ? <OptimizedImage image={getImage(3)} alt="image4" className="w-full h-full object-cover" size="medium" /> : <div className="w-full h-full bg-white/10" />}
                 </div>
             </motion.div>
         </div>

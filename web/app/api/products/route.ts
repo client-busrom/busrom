@@ -105,6 +105,8 @@ export async function GET(request: NextRequest) {
     const pageSize = parseInt(searchParams.get('pageSize') || '12')
     const sortBy = searchParams.get('sortBy') || 'order'
     const sortDir = (searchParams.get('sortDir') || 'asc') as 'asc' | 'desc'
+    const productIds = searchParams.get('ids')?.split(',').filter(Boolean)
+    const seriesIds = searchParams.get('seriesIds')?.split(',').filter(Boolean)
 
     console.log('[Products API] Fetching products from Payload CMS:', {
       locale,
@@ -141,7 +143,7 @@ export async function GET(request: NextRequest) {
     // 构建 Payload API URL
     const params = new URLSearchParams()
     params.append('locale', locale)
-    params.append('limit', pageSize.toString())
+    params.append('limit', (productIds?.length || seriesIds?.length) ? '100' : pageSize.toString())
     params.append('page', page.toString())
     params.append('depth', '2') // Include series relationship
 
@@ -172,6 +174,21 @@ export async function GET(request: NextRequest) {
     // Search filter (searches in name field)
     if (search) {
       params.append('where[name][contains]', search)
+    }
+
+    // Specific IDs filter
+    if (productIds && productIds.length > 0) {
+      productIds.forEach((id, i) => {
+        params.append(`where[or][${i}][id][equals]`, id)
+      })
+    }
+
+    // Specific Series IDs filter
+    if (seriesIds && seriesIds.length > 0) {
+      seriesIds.forEach((id, i) => {
+        const baseIdx = productIds?.length || 0
+        params.append(`where[or][${baseIdx + i}][series][equals]`, id)
+      })
     }
 
     // Sorting

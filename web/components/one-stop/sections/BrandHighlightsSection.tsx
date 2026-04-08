@@ -152,7 +152,7 @@ export function BrandHighlightsSection({
                   image={currentItem.image} 
                   alt="Highlight Main" 
                   className="w-full h-full object-cover"
-                  size="large"
+                  size="xlarge"
                 />
             </motion.div>
           </AnimatePresence>
@@ -175,7 +175,7 @@ export function BrandHighlightsSection({
                       image={items[nextIndex].image} 
                       alt="Next Preview" 
                       className="w-full h-full object-cover"
-                      size="small"
+                      size="medium"
                     />
                   </motion.div>
               </AnimatePresence>

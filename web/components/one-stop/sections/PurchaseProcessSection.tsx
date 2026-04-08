@@ -110,7 +110,7 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
                   <div className="w-full h-[220px] sm:h-[180px] rounded-[30px] overflow-hidden shadow-lg border-2 border-transparent group-hover:border-[#756F3F]/20 transition-all">
                      <OptimizedImage 
                         image={step.image}
-                        size="medium"
+                        size="xlarge"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         alt={`Step ${idx + 1}`}
                       />
@@ -176,7 +176,7 @@ export function PurchaseProcessSection({ title, slides }: PurchaseProcessSection
                >
                   <OptimizedImage 
                     image={slide.image} 
-                    size="large"
+                    size="xlarge"
                     className="w-full h-full object-cover"
                     alt={`Step ${i}`}
                   />
