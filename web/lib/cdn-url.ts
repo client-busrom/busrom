@@ -43,7 +43,13 @@ export function convertToCDNUrl(url: string): string {
       return `${CDN_DOMAIN}${path}`
     }
 
-    // If not a MinIO or S3 URL, return as-is
+    // Legacy: Convert old CloudFront domain to custom CDN domain
+    if (url.includes('d2kqew3hn5wphn.cloudfront.net')) {
+      const path = urlObj.pathname
+      return `${CDN_DOMAIN}${path}`
+    }
+
+    // If not a MinIO, S3, or old CloudFront URL, return as-is
     return url
   } catch (error) {
     console.error('Error converting URL to CDN:', error)
