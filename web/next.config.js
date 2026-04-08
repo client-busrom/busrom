@@ -232,12 +232,12 @@ const nextConfig = {
       isDev
         ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://www.googletagmanager.com"
         : "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.googletagmanager.com",
-      // Styles: self + inline (Tailwind/styled-jsx 需要)
-      "style-src 'self' 'unsafe-inline'",
+      // Styles: self + inline (Tailwind/styled-jsx 需要) + Google Fonts
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // Images: self + data + blob + CDN + unpkg (Globe textures) + Iconify API
       "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net https://unpkg.com https://api.iconify.design http://localhost:* http://127.0.0.1:* https://www.google-analytics.com https://www.googletagmanager.com",
-      // Fonts: self + CDN
-      "font-src 'self' https://cdn.jsdelivr.net",
+      // Fonts: self + CDN + Google Fonts
+      "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com",
       // Connect: self + API + CDN + Cloudflare Turnstile + jsdelivr (Three.js fonts) + WebSocket (HMR)
       isDev
         ? "connect-src 'self' ws://localhost:* http://localhost:* http://127.0.0.1:* https://*.amazonaws.com https://*.cloudfront.net https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design https://www.google-analytics.com https://www.googletagmanager.com"
