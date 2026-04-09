@@ -321,7 +321,7 @@ export function CtaSection({ title, description, image, formConfig, locale = "en
                   image={image} 
                   alt="Ghost Layer" 
                   className="w-full h-full object-cover"
-                  size="xlarge"
+                  size="large"
                 />
               </motion.div>
 
@@ -337,7 +337,7 @@ export function CtaSection({ title, description, image, formConfig, locale = "en
                   image={image} 
                   alt="Solid Layer" 
                   className="w-full h-full object-cover"
-                  size="xlarge"
+                  size="large"
                 />
               </motion.div>
            </div>

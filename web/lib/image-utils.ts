@@ -123,9 +123,16 @@ export function getOptimizedImageUrl(
     return normalizeToCDN(originalUrl, strategy)
   }
 
-  // 3. Try requested size variant
-  if (variants && variants[size]) {
-    return normalizeToCDN(variants[size]!, strategy)
+  // 3. Try requested size variant with name mapping for Payload CMS
+  const sizeMap: Record<string, string> = {
+    'small': 'card',
+    'medium': 'tablet',
+    'large': 'desktop'
+  }
+  
+  const mappedSize = sizeMap[size] || size
+  if (variants && (variants[size as keyof ImageVariants] || (variants as any)[mappedSize])) {
+    return normalizeToCDN((variants[size as keyof ImageVariants] || (variants as any)[mappedSize])!, strategy)
   }
 
   // 4. Fallback strategy: try other sizes from large to small (skip xlarge/original)
@@ -134,8 +141,10 @@ export function getOptimizedImageUrl(
   ]
 
   for (const fallbackSize of fallbackOrder) {
-    if (variants && variants[fallbackSize]) {
-      return normalizeToCDN(variants[fallbackSize]!, strategy)
+    const fMappedSize = sizeMap[fallbackSize] || fallbackSize
+    const variantUrl = variants && (variants[fallbackSize as keyof ImageVariants] || (variants as any)[fMappedSize])
+    if (variantUrl) {
+      return normalizeToCDN(variantUrl, strategy)
     }
   }
 
@@ -165,9 +174,15 @@ export function getImageSrcSet(
   const srcset: string[] = []
 
   if (variants.thumbnail) srcset.push(`${normalizeToCDN(variants.thumbnail, strategy)} 400w`)
-  if (variants.small) srcset.push(`${normalizeToCDN(variants.small, strategy)} 768w`)
-  if (variants.medium) srcset.push(`${normalizeToCDN(variants.medium, strategy)} 1024w`)
-  if (variants.large) srcset.push(`${normalizeToCDN(variants.large, strategy)} 1920w`)
+  
+  const small = variants.small || (variants as any).card
+  if (small) srcset.push(`${normalizeToCDN(small, strategy)} 768w`)
+  
+  const medium = variants.medium || (variants as any).tablet
+  if (medium) srcset.push(`${normalizeToCDN(medium, strategy)} 1024w`)
+  
+  const large = variants.large || (variants as any).desktop
+  if (large) srcset.push(`${normalizeToCDN(large, strategy)} 1920w`)
 
   return srcset.join(', ')
 }

@@ -77,13 +77,12 @@ export function ProductApplicationsSection({
               .map((id) => appMap.get(String(id)))
               .filter(Boolean)
               .map((app: any) => {
-                const firstScene = app.sceneGallery?.[0]
-                const firstImage = firstScene?.images?.[0]
+                const appImage = app.image || app.sceneGallery?.[0]?.images?.[0]
                 return {
                   id: app.id,
                   title: app.name || app.slug,
                   description: app.shortDescription || "",
-                  image: firstImage || null,
+                  image: appImage || null,
                   link: `/${locale}/applications/${app.slug}`,
                 }
               })
@@ -94,13 +93,12 @@ export function ProductApplicationsSection({
           if (res.ok) {
             const data = await res.json()
             const items: ApplicationItem[] = data.docs?.map((app: any) => {
-              const firstScene = app.sceneGallery?.[0]
-              const firstImage = firstScene?.images?.[0]
+              const appImage = app.image || app.sceneGallery?.[0]?.images?.[0]
               return {
                 id: app.id,
                 title: app.name || app.slug,
                 description: app.shortDescription || "",
-                image: firstImage || null,
+                image: appImage || null,
                 link: `/${locale}/applications/${app.slug}`,
               }
             }) || []
@@ -122,9 +120,16 @@ export function ProductApplicationsSection({
     return emblaApi?.plugins()?.autoScroll
   }, [emblaApi])
 
+  const lastActionTimeRef = React.useRef(0)
+  const ACTION_THROTTLE = 250
+
   // Navigation
   const goToPrev = useCallback(() => {
     if (!emblaApi) return
+    const now = Date.now()
+    if (now - lastActionTimeRef.current < ACTION_THROTTLE) return
+    lastActionTimeRef.current = now
+
     autoScrollPlugin?.stop()
     emblaApi.scrollPrev()
     setTimeout(() => autoScrollPlugin?.play(), 2000)
@@ -132,6 +137,10 @@ export function ProductApplicationsSection({
 
   const goToNext = useCallback(() => {
     if (!emblaApi) return
+    const now = Date.now()
+    if (now - lastActionTimeRef.current < ACTION_THROTTLE) return
+    lastActionTimeRef.current = now
+
     autoScrollPlugin?.stop()
     emblaApi.scrollNext()
     setTimeout(() => autoScrollPlugin?.play(), 2000)
@@ -324,6 +333,7 @@ export function ProductApplicationsSection({
                     image={app.image as any}
                     alt={app.title}
                     size="medium"
+                    loading="eager"
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                 ) : (

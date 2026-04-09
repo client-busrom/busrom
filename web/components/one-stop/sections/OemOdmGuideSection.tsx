@@ -40,7 +40,7 @@ export function OemOdmGuideSection({ title, description, bgImage, ctaText = "REA
                 >
                   <OptimizedImage 
                     image={bgImage} 
-                    size="xlarge" 
+                    size="large" 
                     className="absolute inset-0 w-full h-full object-cover" 
                   />
                 </div>

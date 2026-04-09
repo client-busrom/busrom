@@ -323,10 +323,10 @@ export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps)
       const app = allApplications.find((a: any) => String(a.id) === appId)
       if (!app) return null
 
-      // Check sceneGallery (Normalized by our /api/applications)
-      const firstImage = app.sceneGallery?.[0]?.images?.[0]
-      if (firstImage?.url) {
-        mediaObj = firstImage
+      // Check new slim image first, then sceneGallery
+      const appImage = app.image || app.sceneGallery?.[0]?.images?.[0]
+      if (appImage?.url) {
+        mediaObj = appImage
       } else if (app.mainImage?.url) {
         mediaObj = app.mainImage
       }
@@ -638,14 +638,11 @@ export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps)
       const app = allApplications.find((a: any) => String(a.id) === String(id))
       if (!app) return null
 
-      // Image priority: mainImage -> sceneGallery first -> images first
-      let appImage = app.mainImage
+      // Image priority: slim image -> mainImage -> sceneGallery first
+      let appImage = app.image || app.mainImage
       if (!appImage && app.sceneGallery?.length > 0) {
         const firstGroup = app.sceneGallery.find((g: any) => g.images?.length > 0)
         if (firstGroup) appImage = firstGroup.images[0]
-      }
-      if (!appImage && app.images?.length > 0) {
-        appImage = app.images[0].image
       }
 
       return {

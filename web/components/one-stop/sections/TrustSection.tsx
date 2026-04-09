@@ -273,7 +273,7 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
                 }}
             >
                 <div className="w-[220px] h-[280px] lg:w-[331px] lg:h-[425px]">
-                    {getImage(1) ? <OptimizedImage image={getImage(1)} alt="image2" className="w-full h-full object-cover" size="xlarge" /> : <div className="w-full h-full bg-white/10" />}
+                    {getImage(1) ? <OptimizedImage image={getImage(1)} alt="image2" className="w-full h-full object-cover" size="large" /> : <div className="w-full h-full bg-white/10" />}
                 </div>
             </motion.div>
 

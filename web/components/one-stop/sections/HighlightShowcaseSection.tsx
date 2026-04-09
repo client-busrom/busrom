@@ -63,7 +63,7 @@ export function HighlightShowcaseSection({ title, products, locale, viewMoreText
                     image={item.image} 
                     alt={item.title || ""} 
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    size="xlarge"
+                    size="large"
                   />
                 </div>
                 <div className="p-6 flex justify-between items-center bg-[#EEEACB]/10">
@@ -194,7 +194,7 @@ export function HighlightShowcaseSection({ title, products, locale, viewMoreText
                     <Link href={item.link || "#"} className="block w-full h-full relative z-10">
                       <div className="absolute inset-0 shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden transition-all duration-300 group-hover:scale-[1.04]" style={{ borderRadius: vw(30) }}>
                         <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-110">
-                          <OptimizedImage image={item.image} alt={item.title || ""} className="w-full h-full object-cover" containerClassName="w-full h-full" size="xlarge" />
+                          <OptimizedImage image={item.image} alt={item.title || ""} className="w-full h-full object-cover" containerClassName="w-full h-full" size="large" />
                         </div>
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
                            <h4 className="text-white font-bold drop-shadow-[0_2px_10px_rgba(0,0,0,1)] font-anaheim uppercase text-center" style={{ fontSize: vw(32), lineHeight: 1.2 }}>{item.title}</h4>

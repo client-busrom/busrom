@@ -39,6 +39,8 @@ interface StoryApplicationsSectionProps {
 
 export function StoryApplicationsSection({ data }: StoryApplicationsSectionProps) {
   const [activeIndex, setActiveIndex] = useState(0)
+  const lastActionTimeRef = React.useRef(0)
+  const ACTION_THROTTLE = 300
 
   const slides = data.items.slides || []
   const totalSlides = slides.length
@@ -95,10 +97,16 @@ export function StoryApplicationsSection({ data }: StoryApplicationsSectionProps
   };
 
   const handlePrev = () => {
+    const now = Date.now()
+    if (now - lastActionTimeRef.current < ACTION_THROTTLE) return
+    lastActionTimeRef.current = now
     setActiveIndex((prev) => (prev > 0 ? prev - 1 : totalSlides - 1))
   }
 
   const handleNext = () => {
+    const now = Date.now()
+    if (now - lastActionTimeRef.current < ACTION_THROTTLE) return
+    lastActionTimeRef.current = now
     setActiveIndex((prev) => (prev < totalSlides - 1 ? prev + 1 : 0))
   }
 
@@ -189,6 +197,7 @@ export function StoryApplicationsSection({ data }: StoryApplicationsSectionProps
                            image={item.image} 
                            alt={item.title} 
                            size="medium" 
+                           loading="eager"
                            containerClassName="w-full h-full absolute inset-0"
                            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
                          />
