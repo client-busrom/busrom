@@ -32,11 +32,23 @@ Instead of "Fetch-and-Filter" on the client, we use a "Slim-Response" architectu
 
 ## 3. Core Logic: Server-Side Randomization
 
-The selection logic previously in `getRandomAppImage` (frontend) is now standard in backend API routes to ensure:
+The selection logic previously in `getRandomAppImage` (frontend) is now standard.
 
-1.  **Network Efficiency**: No unnecessary data transfer.
-2.  **Visual Variety**: Each fetch provides a fresh random image from the pool.
-3.  **Consistency**: Unified selection logic (sceneGallery -> root images -> mainImage).
+* **Strategy**: Use query parameters `ids=1,2,3` to fetch specific items.
+* **Benefit**: Extreme precision; returns only what the editor selected.
+* **Data**: Each item contains a pre-selected `image` object.
+
+### Implementation Checklist
+1. **Backend**:
+   - `/api/applications`: Ensure `depth=2` and randomization logic is active.
+   - Response thinning: Only return `id`, `name`, `slug`, `shortDescription`, and `image`.
+2. **Frontend**:
+   - Navigation throttling: Minimum 150ms between slide changes.
+   - Image optimization: Use `OptimizedImage` with `variants`.
+   - Stable Keys: Always use `item.id + index`.
+3. **Validation**:
+   - Check Network tab: All images should be WebP variants.
+   - Verify Payload: Ensure `sceneGallery` images are randomized server-side.
 
 ## 4. Interaction & Rendering Performance
 
@@ -45,13 +57,13 @@ To eliminate "Jank" during rapid navigation in carousels, the following rules ar
 ### A. Stable Component Keys
 
 **Never use indices as keys.** Always use `item.id + index`.
--   Allows React to reuse DOM nodes during transitions.
--   Prevents image flickering and redundant decodes.
+- Allows React to reuse DOM nodes during transitions.
+- Prevents image flickering and redundant decodes.
 
 ### B. Interaction Throttling
 
--   **Cooldown**: 150ms - 250ms throttling on navigation buttons.
--   Prevents UI layout thrashing when users rapid-click arrows.
+- **Cooldown**: 150ms - 250ms throttling on navigation buttons.
+- Prevents UI layout thrashing when users rapid-click arrows.
 
 ### C. Eager Optimization
 

@@ -138,7 +138,7 @@ export function OemOdmContactForm({
 
   // Check if we need to show privacy text to determine layout spacing
   const hasPrivacyText = !!privacyText && !isGloballyAccepted
-  const containerHeight = hasPrivacyText ? 1742 : 1592
+  const containerHeight = hasPrivacyText ? 1800 : 1650
   const innerHeight = hasPrivacyText ? 1725 : 1575
   const captchaTop = hasPrivacyText ? 1480 : 1350
   const submitTop = hasPrivacyText ? 1500 : 1358
@@ -377,7 +377,7 @@ export function OemOdmContactForm({
           <div
             className="absolute overflow-hidden"
             style={{
-              left: 0,
+              left: rpx(24),
               top: 0,
               width: rpx(1860),
               height: rpx(426),
