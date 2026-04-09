@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo } from "react"
+import React, { useMemo, useEffect, useState } from "react"
 import { OemOdmValueGuide } from "@/components/oem-odm/OemOdmValueGuide"
 import { OemOdmBrandAdvantage } from "@/components/oem-odm/OemOdmBrandAdvantage"
 import { OemOdmServiceIntroduction } from "@/components/oem-odm/OemOdmServiceIntroduction"
@@ -626,6 +626,11 @@ export function OemOdmTemplate({ locale, pageContent }: OemOdmTemplateProps) {
   }, [contentChildren])
 
   // ========================================
+  // 基础状态定义
+  // ========================================
+  const [fetchedFormConfig, setFetchedFormConfig] = useState<any>(null)
+
+  // ========================================
   // 提取 Contact Form Section 数据
   // ========================================
   const contactFormData = useMemo(() => {
@@ -633,22 +638,37 @@ export function OemOdmTemplate({ locale, pageContent }: OemOdmTemplateProps) {
     const description = extractTextAfterMarker(contentChildren, "contact-form-description")
     const image = extractImageAfterMarker(contentChildren, "contact-form-image", mediaData)
 
-    // 从 formBlock 节点提取 formConfig ID
-    let formConfigId: string | null = null
-    const blockMarkerNodes = extractAfterMarker(contentChildren, "contact-form-block")
-    const formNode = blockMarkerNodes.find(n => n.type === "formBlock") || extractAfterMarker(contentChildren, "contact-form").find(n => n.type === "formBlock")
-    
-    if (formNode?.data?.formConfig?.id || formNode?.data?.id || formNode?.id) {
-      formConfigId = formNode.data?.formConfig?.id || formNode.data?.id || formNode.id
-    }
+    // 从 contentChildren 中直接寻找 formBlock 节点
+    const formNode = contentChildren.find(n => n.type === "formBlock") || extractAfterMarker(contentChildren, "contact-form").find(n => n.type === "formBlock")
+    const formId = formNode?.data?.formConfig?.id || formNode?.data?.id || formNode?.id
+
+    const formConfig = fetchedFormConfig || 
+                     (formNode?.data?.formConfig?.fields ? formNode.data.formConfig : null) || 
+                     (formNode?.data?.fields ? formNode.data : null) || 
+                     pageContent.formConfig
 
     return {
       title,
       description,
       image,
-      formConfigId,
+      formConfig,
+      formId
     }
-  }, [contentChildren, mediaData])
+  }, [contentChildren, mediaData, pageContent.formConfig, fetchedFormConfig])
+
+  // 动态补全表单配置
+  useEffect(() => {
+    const formId = contactFormData.formId
+    if (formId && !contactFormData.formConfig?.fields) {
+      fetch(`/api/form-configs/${formId}?depth=2&locale=${locale}`)
+        .then(res => res.json())
+        .then(data => {
+          const config = data?.fields ? data : (data?.data?.fields ? data.data : data)
+          if (config?.fields) setFetchedFormConfig(config)
+        })
+        .catch(err => console.error("OemOdm Form Config Fetch Error:", err))
+    }
+  }, [contactFormData.formId, contactFormData.formConfig?.fields, locale])
 
   // ========================================
   // 提取 Applications Section 数据
@@ -820,7 +840,7 @@ export function OemOdmTemplate({ locale, pageContent }: OemOdmTemplateProps) {
         title={contactFormData.title || undefined}
         description={contactFormData.description || undefined}
         image={contactFormData.image}
-        formConfig={pageContent.formConfig}
+        formConfig={contactFormData.formConfig || pageContent.formConfig}
         locale={locale as any}
       />
 

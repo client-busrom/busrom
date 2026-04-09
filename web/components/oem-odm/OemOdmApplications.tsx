@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import type { Locale } from "@/i18n.config"
@@ -68,16 +68,12 @@ export function OemOdmApplications({
           const data = await res.json()
           // 转换 API 返回的数据格式
           const transformedApps: ApplicationItem[] = (data.docs || []).map((app: any) => {
-            // 从 sceneGallery 获取第一张图片作为展示图
-            const firstScene = app.sceneGallery?.[0]
-            const firstImage = firstScene?.images?.[0] || null
-
             return {
               id: String(app.id),
               title: app.name || "",
               description: app.shortDescription || "",
-              image: firstImage,
-              link: app.slug ? `/applications/${app.slug}` : undefined,
+              image: app.image,
+              link: app.slug ? `/application/${app.slug}` : undefined,
             }
           })
 
@@ -101,13 +97,20 @@ export function OemOdmApplications({
   // 获取下一个索引
   const nextIndex = applications.length > 1 ? (currentIndex + 1) % applications.length : 0
 
+  const lastClickTime = useRef(0)
+
   // 切换到下一个
   const handleNext = () => {
+    const now = Date.now()
+    if (now - lastClickTime.current < 250) return
+    lastClickTime.current = now
     setCurrentIndex((prev) => (prev + 1) % applications.length)
   }
 
   // 点击跳转到当前应用详情
   const handleClick = () => {
+    const now = Date.now()
+    if (now - lastClickTime.current < 250) return
     if (applications[currentIndex]?.link) {
       window.location.href = applications[currentIndex].link
     }
@@ -142,19 +145,19 @@ export function OemOdmApplications({
     >
       {/* ========== PC端布局 ========== */}
       <div
-        className="hidden md:block relative w-full cursor-pointer"
+        className="hidden md:block relative w-full cursor-pointer bg-[#D9D9D9]"
         style={{ height: rpx(1086) }}
         onClick={handleClick}
       >
         {/* 背景大图 - 当前应用 */}
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           <motion.div
-            key={currentApp.id}
+            key={currentIndex}
             className="absolute inset-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
           >
             {currentApp.image ? (
               <OptimizedImage
