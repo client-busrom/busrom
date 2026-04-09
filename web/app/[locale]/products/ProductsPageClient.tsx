@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import type { Locale } from "@/i18n.config"
 import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
+import { Applications } from "@/components/product-series/Applications"
 
 interface PageContent {
   id: string
@@ -14,7 +15,11 @@ interface PageContent {
   status: string
   content: {
     document: any[]
+    root?: {
+      children: any[]
+    }
   }
+  mediaData?: any[]
   locale: string
 }
 
@@ -53,6 +58,67 @@ export function ProductsPageClient({ locale, pageId }: ProductsPageClientProps) 
 
     fetchPageContent()
   }, [locale])
+
+  // Parse sections and media mapping
+  const { sections, mediaMap } = useMemo(() => {
+    const nodes = pageContent?.content?.root?.children || pageContent?.content?.document || []
+    const sectionsMap = new Map<string, any[]>()
+    
+    if (nodes.length === 0) return { sections: sectionsMap, mediaMap: new Map() }
+    
+    let currentSection: string | null = null
+    let currentNodes: any[] = []
+
+    // Build media map for fast lookups
+    const mMap = new Map()
+    if (pageContent?.mediaData) {
+      pageContent.mediaData.forEach((m: any) => mMap.set(String(m.id), m.url))
+    }
+
+    for (const node of nodes) {
+      if (node.type === 'quote') {
+        const text = node.children?.[0]?.text?.trim()
+        if (text) {
+          if (currentSection) sectionsMap.set(currentSection, currentNodes)
+          currentSection = text
+          currentNodes = []
+          continue
+        }
+      }
+      currentNodes.push(node)
+    }
+    if (currentSection) sectionsMap.set(currentSection, currentNodes)
+
+    return { sections: sectionsMap, mediaMap: mMap }
+  }, [pageContent])
+
+  // Specialized Applications Parser (Fixed Images from Carousel)
+  const applicationsData = useMemo(() => {
+    if (!sections.has('applications')) return null
+    const nodes = sections.get('applications') || []
+    const images: string[] = []
+    
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i]
+      const text = node.children?.[0]?.text?.trim()
+      
+      // Look for the sentinel
+      if (node.type === 'paragraph' && text === 'applications-item') {
+        const nextNode = nodes[i + 1]
+        // Extract fixed images from carousel slides
+        if (nextNode?.type === 'carousel' && nextNode.data?.slides) {
+          nextNode.data.slides.forEach((slide: any) => {
+            const id = slide.image?.id || slide.image
+            if (id) {
+              const url = mediaMap.get(String(id)) || `/api/media/${id}`
+              images.push(url)
+            }
+          })
+        }
+      }
+    }
+    return images.length > 0 ? { images } : null
+  }, [sections, mediaMap])
 
   // Loading state
   if (loading) {
@@ -103,12 +169,37 @@ export function ProductsPageClient({ locale, pageId }: ProductsPageClientProps) 
           </h1>
         )}
 
-        {/* Document Content */}
-        {pageContent.content && (
-          <LexicalRenderer
-            content={pageContent.content}
-            className="prose prose-lg max-w-none"
-          />
+        {/* Sectional Rendering */}
+        {sections.size > 0 ? (
+          Array.from(sections.keys()).map((sectionId, idx) => {
+            // Specialized Application Handling
+            if (sectionId === 'applications' && applicationsData) {
+              return (
+                <div key={idx} className="my-12 -mx-6 md:-mx-8 lg:-mx-16">
+                  <Applications data={applicationsData} />
+                </div>
+              )
+            }
+
+            // Standard Lexical Rendering for other sections
+            const sectionNodes = sections.get(sectionId) || []
+            return (
+              <div key={idx} className="mb-12">
+                <LexicalRenderer
+                  content={{ root: { children: sectionNodes, type: 'root', format: '', indent: 0, version: 1 } }}
+                  className="prose prose-lg max-w-none"
+                />
+              </div>
+            )
+          })
+        ) : (
+          /* Fallback for unsectioned content */
+          pageContent.content && (
+            <LexicalRenderer
+              content={pageContent.content}
+              className="prose prose-lg max-w-none"
+            />
+          )
         )}
       </div>
     </div>
