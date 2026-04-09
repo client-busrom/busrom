@@ -4,6 +4,7 @@ import React, { useMemo, useState, useEffect } from "react"
 import { ApplicationHeroSection, HeroSlide } from "@/components/application/sections/ApplicationHeroSection"
 import { ApplicationProductNavigationSection } from "@/components/application/sections/ApplicationProductNavigationSection"
 import { ApplicationEngineerSaidSection } from "@/components/application/sections/ApplicationEngineerSaidSection"
+import { getRandomAppImage } from "@/lib/image-utils"
 import { ApplicationWhyChooseUsSection, WhyChooseUsItem } from "../application/sections/ApplicationWhyChooseUsSection"
 import { ApplicationCasesSection, ApplicationCase } from "../application/sections/ApplicationCasesSection"
 import { ApplicationMoreCasesSection } from "../application/sections/ApplicationMoreCasesSection"
@@ -15,6 +16,7 @@ import {
   resolveMediaFromNodes,
   MediaObject
 } from "@/lib/lexical-utils"
+import { convertToCDNUrl } from "@/lib/cdn-url"
 
 // MediaObject moved to @/lib/lexical-utils
 
@@ -229,8 +231,8 @@ function extractSections(pageContent: any) {
     
     const resolveMedia = (val: any) => {
       if (!val) return undefined
-      if (typeof val === 'string' && val.startsWith('http')) return val
-      if (val.url) return val.url
+      if (typeof val === 'string' && val.startsWith('http')) return convertToCDNUrl(val)
+      if (val.url) return convertToCDNUrl(val.url)
       const id = typeof val === 'object' ? val.id : String(val)
       return (id && mediaData[id]) ? mediaData[id].url : undefined
     }
@@ -439,6 +441,10 @@ export function ApplicationTemplate({ locale, pageContent }: ApplicationTemplate
   } = useMemo(() => extractSections(pageContent), [pageContent])
 
   const [allApplications, setAllApplications] = useState<any[]>([])
+  
+  // Stabilize IDs to prevent redundant fetches
+  const appIdsStr = JSON.stringify(applicationIds || [])
+  const moreAppIdsStr = JSON.stringify(moreApplicationsData?.applicationIds || [])
 
   useEffect(() => {
     const allIds = Array.from(new Set([
@@ -458,33 +464,22 @@ export function ApplicationTemplate({ locale, pageContent }: ApplicationTemplate
         .then(data => setAllApplications(data.docs || []))
         .catch(err => console.error("Failed to fetch applications fallback:", err))
     }
-  }, [locale, applicationIds, moreApplicationsData?.applicationIds])
+  }, [locale, appIdsStr, moreAppIdsStr])
 
   const applicationCases = useMemo(() => {
     if (!applicationIds || applicationIds.length === 0) return []
     return applicationIds.map((id: any) => {
-      const app = allApplications.find((a: any) => String(a.id) === String(id))
+      const targetId = typeof id === 'object' ? (id.id || id.value) : id
+      const app = allApplications.find((a: any) => String(a.id) === String(targetId))
       if (!app) return null
-      let appImage = app.mainImage
-      if (!appImage && app.images?.length > 0) {
-        appImage = app.images[0].image || app.images[0]
-      }
-      if (!appImage && app.sceneGallery?.length > 0) {
-        const firstGroup = app.sceneGallery.find((g: any) => g.images?.length > 0)
-        if (firstGroup) {
-          const firstImg = firstGroup.images[0]
-          appImage = firstImg.image || firstImg
-        }
-      }
-      const imageUrl = (typeof appImage === 'string' ? appImage : (appImage?.url || ""))
       return {
         id: app.id,
-        title: app.title || app.name || "",
-        image: imageUrl,
-        category: app.category?.title || app.category?.name || "Application"
+        title: app.name || "",
+        image: app.image,
+        category: app.category || "Application"
       }
     }).filter(Boolean) as ApplicationCase[]
-  }, [applicationIds, allApplications])
+  }, [applicationIds, allApplications, appIdsStr])
 
   const moreApplicationCases = useMemo(() => {
     const ids = moreApplicationsData?.applicationIds || []
@@ -493,26 +488,13 @@ export function ApplicationTemplate({ locale, pageContent }: ApplicationTemplate
       const targetId = typeof id === 'object' ? (id.id || id.value) : id
       const app = allApplications.find((a: any) => String(a.id) === String(targetId))
       if (!app) return null
-      
-      let appImage = app.mainImage
-      if (!appImage && app.images?.length > 0) {
-        appImage = app.images[0].image || app.images[0]
-      }
-      if (!appImage && app.sceneGallery?.length > 0) {
-        const firstGroup = app.sceneGallery.find((g: any) => g.images?.length > 0)
-        if (firstGroup) {
-          const firstImg = firstGroup.images[0]
-          appImage = firstImg.image || firstImg
-        }
-      }
-      const imageUrl = (typeof appImage === 'string' ? appImage : (appImage?.url || ""))
       return {
         id: String(app.id),
-        title: app.title || app.name || "",
-        image: imageUrl
+        title: app.name || "",
+        image: app.image
       }
     }).filter(Boolean)
-  }, [moreApplicationsData, allApplications])
+  }, [moreAppIdsStr, allApplications])
 
   console.log("[ApplicationTemplate] Form debug:", { 
     contactFormBlockFound: !!contactFormBlock,

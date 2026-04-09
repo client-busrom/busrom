@@ -52,33 +52,48 @@ export async function GET(request: NextRequest) {
     }
 
     const mediaData = await mediaRes.json()
-    const grouped: Record<string, string[]> = {}
+    const grouped: Record<string, any[]> = {}
 
     mediaData.docs?.forEach((m: any) => {
       const mTags = m.tags || []
-      const imageUrl = m.url ? convertToCDNUrl(m.url) : null
-      if (!imageUrl) return
+      
+      const mediaObj = {
+        id: m.id,
+        url: convertToCDNUrl(m.url),
+        alt: m.alt || '',
+        variants: m.sizes // No transformation needed here, OptimizedImage handles it
+      }
+
+      if (!mediaObj.url) return
 
       mTags.forEach((t: any) => {
         const id = String(typeof t === 'object' ? t.id : t)
         if (tagMap.has(id)) {
           if (!grouped[id]) grouped[id] = []
-          grouped[id].push(imageUrl)
+          grouped[id].push(mediaObj)
         }
       })
     })
 
-    const result: SeriesData[] = Array.from(tagMap.entries())
+    const result = Array.from(tagMap.entries())
       .map(([id, name]) => {
         const images = grouped[id] || []
-        // Ensure we have 5 slots (pad with the same image if needed)
-        const finalImages = images.length >= 5
-          ? images.slice(0, 5)
-          : images.length > 0
-            ? [...images, ...Array(5 - images.length).fill(images[0])]
-            : []
+        
+        // 3. Randomize selection if we have surplus images
+        let selectedImages = [...images]
+        if (selectedImages.length > 5) {
+          // Shuffle and pick 5
+          selectedImages = selectedImages
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 5)
+        } else if (selectedImages.length > 0 && selectedImages.length < 5) {
+          // Pad to 5 using the first image
+          while (selectedImages.length < 5) {
+            selectedImages.push(selectedImages[0])
+          }
+        }
 
-        return { id, name, images: finalImages }
+        return { id, name, images: selectedImages }
       })
       .filter(s => s.images.length === 5)
 

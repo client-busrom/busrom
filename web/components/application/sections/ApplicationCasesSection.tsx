@@ -8,10 +8,10 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage"
 const vw = (px: number) => `${(px / 1920) * 100}vw`
 
 export interface ApplicationCase {
-  id: string
+  id: string | number
   title: string
-  category?: string
-  image: string
+  category: string
+  image: any
 }
 
 interface Props {
@@ -33,13 +33,20 @@ export function ApplicationCasesSection({ title, subtitle = "Busrom", titleImage
   const [offset, setOffset] = useState(0)
   const [direction, setDirection] = useState(1)
   const [dragDirection, setDragDirection] = useState<'none' | 'left' | 'right'>('none')
+  const lastClickTime = React.useRef(0)
 
   const handleNext = useCallback(() => {
+    const now = Date.now()
+    if (now - lastClickTime.current < 150) return
+    lastClickTime.current = now
     setDirection(1)
     setOffset((o) => o + 1)
   }, [])
 
   const handlePrev = useCallback(() => {
+    const now = Date.now()
+    if (now - lastClickTime.current < 150) return
+    lastClickTime.current = now
     setDirection(-1)
     setOffset((o) => o - 1)
   }, [])
@@ -146,15 +153,15 @@ export function ApplicationCasesSection({ title, subtitle = "Busrom", titleImage
 
             return (
               <motion.div
-                key={p} 
+                key={item.id + "-" + (caseIdx % cases.length)} 
                 initial={{
                   x: direction > 0 ? vw(800) : vw(-800),
-                  y: vw(-92.24), // entering from lower sides
+                  y: vw(-92.24), 
                   width: vw(200.28),
                   height: vw(395.28),
-                  zIndex: 0,
                   opacity: 0,
-                  scale: 0.8
+                  scale: 0.8,
+                  zIndex: 0
                 }}
                 animate={{ 
                   x: vw(config.x),
@@ -170,11 +177,18 @@ export function ApplicationCasesSection({ title, subtitle = "Busrom", titleImage
                   y: vw(-92.24),
                   width: vw(200.28),
                   height: vw(395.28),
-                  zIndex: 0,
                   opacity: 0,
-                  scale: 0.8
+                  scale: 0.8,
+                  zIndex: 0
                 }}
-                transition={{ type: "spring", stiffness: 180, damping: 25, mass: 1 }}
+                transition={{ 
+                  x: { type: "spring", stiffness: 250, damping: 30, mass: 0.8 },
+                  y: { type: "spring", stiffness: 250, damping: 30, mass: 0.8 },
+                  width: { type: "spring", stiffness: 250, damping: 30, mass: 0.8 },
+                  height: { type: "spring", stiffness: 250, damping: 30, mass: 0.8 },
+                  opacity: { duration: 0.2 },
+                  scale: { duration: 0.2 }
+                }}
                 className="absolute overflow-hidden cursor-pointer"
                 style={{ 
                   WebkitMaskImage: config.mask,
@@ -183,11 +197,11 @@ export function ApplicationCasesSection({ title, subtitle = "Busrom", titleImage
                   maskImage: config.mask,
                   maskSize: '100% 100%',
                   maskRepeat: 'no-repeat',
-                  // Ensure fallbacks for smooth rounded behavior
                   borderRadius: vw(30), 
                   boxShadow: isCenter 
                     ? `0 ${vw(20)} ${vw(40)} rgba(84, 79, 37, 0.45)` 
-                    : 'none'
+                    : 'none',
+                  willChange: "transform, opacity, width, height"
                 }}
                 onClick={() => {
                   if (slotIdx < 2) handlePrev()
@@ -195,12 +209,14 @@ export function ApplicationCasesSection({ title, subtitle = "Busrom", titleImage
                 }}
               >
                 {/* Image Component */}
-                <div className="relative w-full h-full bg-[#D6D3C2]">
+                <div className="relative w-full h-full bg-[#D6D3C2]" style={{ willChange: "transform, opacity" }}>
                   {item.image ? (
-                    <img 
-                      src={item.image} 
+                    <OptimizedImage 
+                      image={item.image} 
                       alt={item.title} 
-                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" 
+                      className="w-full h-full object-cover select-none pointer-events-none"
+                      size="large"
+                      loading="eager"
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center p-4">
@@ -210,17 +226,6 @@ export function ApplicationCasesSection({ title, subtitle = "Busrom", titleImage
                       </span>
                     </div>
                   )}
-                  {/* Info Overlay - DISABLED per user request for CMS setting */}
-                  {/* <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-[vw(30)] transition-opacity duration-500 ${isCenter ? 'opacity-100' : 'opacity-0 hover:opacity-100'}`}>
-                    {item.category && (
-                      <span className="text-[#FFEE53] font-anaheim uppercase tracking-widest mb-[vw(5)]" style={{ fontSize: vw(16) }}>
-                        {item.category}
-                      </span>
-                    )}
-                    <h3 className="text-white font-anaheim font-bold" style={{ fontSize: vw(24), lineHeight: 1.2 }}>
-                      {item.title}
-                    </h3>
-                  </div> */}
                 </div>
               </motion.div>
             )

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from "framer-motion"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 const vw = (px: number) => `${(px / 1920) * 100}vw`
 
@@ -16,20 +17,31 @@ interface ApplicationMoreCasesSectionProps {
 interface SeriesData {
   id: string
   name: string
-  images: string[]
+  images: any[]
+}
+
+interface ApplicationMoreCasesSectionProps {
+  locale: string
+  data: {
+    title: { text: string; bold: boolean }[]
+    tips?: string
+    ctaText?: string
+    ctaHref?: string
+  }
 }
 
 export function ApplicationMoreCasesSection({ locale, data }: ApplicationMoreCasesSectionProps) {
   const [seriesList, setSeriesList] = useState<SeriesData[]>([])
   const [activeIndex, setActiveIndex] = useState(0)
+  const lastClickTime = React.useRef(0)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await fetch(`/api/more-cases?locale=${locale}`)
-        const data = await res.json()
-        if (data.series && data.series.length > 0) {
-          setSeriesList(data.series)
+        const json = await res.json()
+        if (json.series && json.series.length > 0) {
+          setSeriesList(json.series)
         }
       } catch (e) {
         console.error("Failed to fetch more cases data", e)
@@ -38,12 +50,15 @@ export function ApplicationMoreCasesSection({ locale, data }: ApplicationMoreCas
     fetchData()
   }, [locale])
 
-  const currentSeries = seriesList[activeIndex] || null
-
   const handleNext = () => {
     if (seriesList.length === 0) return
+    const now = Date.now()
+    if (now - lastClickTime.current < 200) return
+    lastClickTime.current = now
     setActiveIndex((prev) => (prev + 1) % seriesList.length)
   }
+
+  const currentSeries = seriesList[activeIndex] || null
 
   const baseLineY = 6693
   const S = 922 / 1190 // Height scale factor
@@ -73,10 +88,12 @@ export function ApplicationMoreCasesSection({ locale, data }: ApplicationMoreCas
                 borderBottomRightRadius: vw(60)
               }}
             >
-              <img 
-                src={currentSeries.images[0]} 
+              <OptimizedImage 
+                image={currentSeries.images[0]} 
                 className="w-full h-full object-cover" 
                 alt={currentSeries.name || "Main Case"} 
+                size="xlarge"
+                loading="eager"
               />
             </motion.div>
           )}
@@ -241,11 +258,13 @@ export function ApplicationMoreCasesSection({ locale, data }: ApplicationMoreCas
   )
 }
 
-function ImageBox({ src, id }: { src: string, id: string }) {
+function ImageBox({ src, id }: { src: any, id: string }) {
+  const imageUrl = typeof src === 'string' ? src : src?.url
+  
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={id + src}
+        key={id + imageUrl}
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 1.05 }}
@@ -253,7 +272,13 @@ function ImageBox({ src, id }: { src: string, id: string }) {
         className="w-full h-full overflow-hidden shadow-2xl"
         style={{ borderRadius: vw(30), backgroundColor: '#F0F0F0' }}
       >
-        <img src={src} className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" alt="Detail Case" />
+        <OptimizedImage 
+          image={src} 
+          className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" 
+          alt="Detail Case"
+          size="large"
+          loading="eager"
+        />
       </motion.div>
     </AnimatePresence>
   )

@@ -64,6 +64,26 @@ function getDeepText(node: any): string {
 }
 
 /**
+ * 从 Applications 数据结构中随机抓取一张图片 (Double-Random 逻辑)
+ * 1. 随机选一个有图的场景 (sceneGallery)
+ * 2. 从该场景中随机选一张图 (images)
+ */
+function getRandomAppImage(app: any) {
+  if (!app?.sceneGallery || app.sceneGallery.length === 0) return null
+  
+  const validScenes = app.sceneGallery.filter((s: any) => s.images && s.images.length > 0)
+  if (validScenes.length === 0) return null
+  
+  // 1. 随机场景
+  const randomScene = validScenes[Math.floor(Math.random() * validScenes.length)]
+  // 2. 随机图片
+  const randomImage = randomScene.images[Math.floor(Math.random() * randomScene.images.length)]
+  
+  return randomImage
+}
+
+
+/**
  * 专门解析 TrustSection 的“奇偶配对”有序列表
  * 奇数项（1, 3, 5...）为 Title
  * 偶数项（2, 4, 6...）为包含嵌套内容的 Description
@@ -324,23 +344,18 @@ export function OneStopSolutionTemplate({ locale, pageContent }: OneStopSolution
         if (!id) return null
         const app = allApplications.find(a => String(a.id) === String(id))
         if (!app) return null
-        let appImage = app.mainImage
-        if (!appImage && app.sceneGallery?.length > 0) {
-          const firstGroup = app.sceneGallery.find((g: any) => g.images?.length > 0)
-          if (firstGroup) appImage = firstGroup.images[0]
-        }
-        if (!appImage && app.images?.length > 0) appImage = app.images[0].image
         return {
-          id: app.id,
-          title: app.title || app.name || "",
-          image: appImage,
-          description: app.subtitle || app.shortDescription || ""
+          id: String(app.id),
+          title: app.name || "",
+          description: app.shortDescription || "",
+          image: app.image,
+          link: `/${locale}/application/${app.slug}`
         }
       }).filter(Boolean)
-      return { title: applicationsDataRaw.title, items }
+      return { ...applicationsDataRaw, items }
     }
     return applicationsDataRaw
-  }, [applicationsDataRaw, allApplications])
+  }, [applicationsDataRaw, allApplications, locale])
 
   const oemOdmGuideData = useMemo(() => {
      const res = extractSection(contentChildren, "oem-odm-guide", mediaData)

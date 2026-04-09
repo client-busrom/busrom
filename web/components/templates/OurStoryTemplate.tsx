@@ -13,6 +13,7 @@ import { StoryBrandProspectSection } from "@/components/story/StoryBrandProspect
 import { StoryContactFormSection } from "@/components/story/StoryContactFormSection"
 import { StoryApplicationsSection } from "@/components/story/StoryApplicationsSection"
 import { StoryQuoteSection } from "@/components/story/StoryQuoteSection"
+import { convertToCDNUrl } from "@/lib/cdn-url"
 
 interface MediaObject {
   id: string
@@ -315,6 +316,8 @@ export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps)
   const resolveImage = useMemo(() => (source: any, sourceType: "application" | "media" = "media") => {
     if (!source) return null
 
+    let mediaObj: any = null
+
     if (sourceType === "application") {
       const appId = typeof source === "object" ? source.id : String(source)
       const app = allApplications.find((a: any) => String(a.id) === appId)
@@ -322,16 +325,21 @@ export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps)
 
       // Check sceneGallery (Normalized by our /api/applications)
       const firstImage = app.sceneGallery?.[0]?.images?.[0]
-      if (firstImage?.url) return firstImage as MediaObject
-      
-      // Check mainImage
-      if (app.mainImage?.url) return app.mainImage as MediaObject
-      return null
+      if (firstImage?.url) {
+        mediaObj = firstImage
+      } else if (app.mainImage?.url) {
+        mediaObj = app.mainImage
+      }
+    } else {
+      // Default: Media source
+      const imageId = typeof source === "object" ? source.id : String(source)
+      mediaObj = mediaData[imageId] || (typeof source === "object" && source.url ? source : null)
     }
 
-    // Default: Media source
-    const imageId = typeof source === "object" ? source.id : String(source)
-    return mediaData[imageId] || (typeof source === "object" && source.url ? source : null)
+    if (mediaObj?.url) {
+      return { ...mediaObj, url: convertToCDNUrl(mediaObj.url) }
+    }
+    return null
   }, [allApplications, mediaData])
 
   // Helper to find specific block types within a major section, ignoring sub-markers
@@ -411,7 +419,7 @@ export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps)
       content,
       descriptionNodes,
       items,
-      heroImage: backgroundImage?.url || "/BusromFooterBg_original.webp"
+      heroImage: convertToCDNUrl(backgroundImage?.url || "/BusromFooterBg_original.webp")
     }
   }, [contentChildren, mediaData])
 
@@ -427,7 +435,7 @@ export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps)
       titleNodes,
       content,
       description,
-      bgImage: backgroundImage?.url || "/BusromFooterBg_original.webp"
+      bgImage: convertToCDNUrl(backgroundImage?.url || "/BusromFooterBg_original.webp")
     }
   }, [contentChildren, mediaData])
 
@@ -445,7 +453,7 @@ export function OurStoryTemplate({ locale, pageContent }: OurStoryTemplateProps)
       subtitle,
       description,
       items,
-      image: image?.url || "/BusromFooterBg_original.webp"
+      image: convertToCDNUrl(image?.url || "/BusromFooterBg_original.webp")
     }
   }, [contentChildren, mediaData])
 

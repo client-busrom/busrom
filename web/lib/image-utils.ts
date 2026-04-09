@@ -311,3 +311,52 @@ export function getRecommendedSize(
 ): 'thumbnail' | 'small' | 'medium' | 'large' | 'xlarge' {
   return IMAGE_SIZE_RECOMMENDATIONS[useCase]
 }
+
+/**
+ * 案例图集随机选图助手 (池化随机策略)
+ * 打平应用中所有场景的所有图片，从中随机抽取一张
+ */
+export function getRandomAppImage(app: any): any | null {
+  if (!app) return null
+
+  const allImages: any[] = []
+  
+  const isPopulatedMedia = (m: any) => {
+    if (!m) return false
+    if (typeof m === 'string') return m.startsWith('http') || m.startsWith('/')
+    return !!(m.url || m.fileUrl || (m.file && m.file.url))
+  }
+
+  // 1. 尝试从场景图集中收集 (池化)
+  if (Array.isArray(app.sceneGallery)) {
+    app.sceneGallery.forEach((scene: any) => {
+      if (Array.isArray(scene.images)) {
+        scene.images.forEach((img: any) => {
+          const mediaObj = img?.image || img
+          if (isPopulatedMedia(mediaObj)) {
+            allImages.push(mediaObj)
+          }
+        })
+      }
+    })
+  }
+
+  // 2. 如果场景图集为空，尝试回退到根路径的 images 字段
+  if (allImages.length === 0 && Array.isArray(app.images)) {
+    app.images.forEach((img: any) => {
+      const mediaObj = img?.image || img
+      if (isPopulatedMedia(mediaObj)) {
+        allImages.push(mediaObj)
+      }
+    })
+  }
+
+  // 3. 最终回退：主图
+  if (allImages.length === 0 && isPopulatedMedia(app.mainImage)) {
+    allImages.push(app.mainImage)
+  }
+
+  if (allImages.length === 0) return null
+  
+  return allImages[Math.floor(Math.random() * allImages.length)]
+}

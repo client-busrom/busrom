@@ -7,6 +7,7 @@ import { ContactFormSection } from "@/components/service/ContactFormSection"
 import { ApplicationsSection } from "@/components/service/ApplicationsSection"
 import { SimpleCtaSection } from "@/components/service/SimpleCtaSection"
 import { AnimationSection } from "@/components/service/AnimationSection"
+import { convertToCDNUrl } from "@/lib/cdn-url"
 
 interface MediaObject {
   id: string
@@ -103,7 +104,10 @@ function extractCarouselAfterMarker(
           description: slide.description || "",
           caption: slide.caption || "",
           link: slide.link || "",
-          image: imageId ? (mediaData[imageId] || null) : null,
+          image: imageId && mediaData[imageId] ? {
+            ...mediaData[imageId],
+            url: convertToCDNUrl((mediaData[imageId] as any).url)
+          } : null,
         }
       })
     }
@@ -124,13 +128,16 @@ function extractImageAfterMarker(
       const image = node.data.image
       const imageId = typeof image === "object" && image ? image.id : String(image || "")
       if (imageId && mediaData[imageId]) {
-        const mediaObj = { ...mediaData[imageId] }
+        const mediaObj = { 
+          ...mediaData[imageId],
+          url: convertToCDNUrl((mediaData[imageId] as any).url)
+        }
         if (node.data.enableLink) {
           mediaObj.enableLink = true
           mediaObj.linkUrl = node.data.linkUrl
           mediaObj.openInNewTab = node.data.openInNewTab
         }
-        return mediaObj
+        return mediaObj as MediaObject
       }
     }
   }
@@ -151,13 +158,16 @@ function extractGalleryImagesAfterMarker(
       for (const img of node.data.images) {
         const imageId = typeof img.image === "object" && img.image ? img.image.id : String(img.image || "")
         if (imageId && mediaData[imageId]) {
-          const mediaObj = { ...mediaData[imageId] }
+          const mediaObj = { 
+            ...mediaData[imageId],
+            url: convertToCDNUrl((mediaData[imageId] as any).url)
+          }
           if (img.enableLink) {
             mediaObj.enableLink = true
             mediaObj.linkUrl = img.linkUrl
             mediaObj.openInNewTab = img.openInNewTab
           }
-          images.push(mediaObj)
+          images.push(mediaObj as MediaObject)
         }
       }
       break
