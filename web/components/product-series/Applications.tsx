@@ -183,8 +183,9 @@ export function Applications({ data, className }: ApplicationsProps) {
                 <OptimizedImage
                   image={imageUrl}
                   alt=""
-                  size="medium"
+                  size="large"
                   loading="eager"
+                  priority={index < 4}
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 />
               </div>

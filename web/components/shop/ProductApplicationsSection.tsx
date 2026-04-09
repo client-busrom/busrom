@@ -196,7 +196,8 @@ export function ProductApplicationsSection({
                 <OptimizedImage
                   image={app.image as any}
                   alt={app.title}
-                  size="medium"
+                  size="large"
+                  priority={index < 4}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -332,8 +333,9 @@ export function ProductApplicationsSection({
                   <OptimizedImage
                     image={app.image as any}
                     alt={app.title}
-                    size="medium"
+                    size="large"
                     loading="eager"
+                    priority={index < 4}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                 ) : (

@@ -409,7 +409,7 @@ export function parseProductApplicationsData(content: LexicalContent) {
       }
     }
 
-    // Check for application IDs
+    // Check for application IDs from list
     if (node.type === 'paragraph' && nodeText === 'applications-ids') {
       const nextNode = nodes[i + 1]
       if (nextNode?.type === 'list' && nextNode.children) {
@@ -419,6 +419,16 @@ export function parseProductApplicationsData(content: LexicalContent) {
             applicationIds.push(idText)
           }
         }
+      }
+    }
+
+    // Check for applicationCarousel block with indicator
+    if (node.type === 'paragraph' && nodeText === 'applications-item') {
+      const nextNode = nodes[i + 1]
+      if (nextNode?.type === 'applicationCarousel' && nextNode.data?.applications) {
+        nextNode.data.applications.forEach((app: any) => {
+          if (app.id) applicationIds.push(String(app.id))
+        })
       }
     }
 

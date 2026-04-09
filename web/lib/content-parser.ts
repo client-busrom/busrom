@@ -8,46 +8,58 @@
 import { convertToCDNUrl } from '@/lib/cdn-url'
 
 // Types for Lexical nodes
-interface LexicalTextNode {
-  type: 'text'
-  text: string
-  format?: number
+export interface BaseLexicalNode {
+  type: string
+  version?: number
+  format?: string | number
+  indent?: number
+  direction?: string | null
 }
 
-interface LexicalListItemNode {
+export interface LexicalTextNode extends BaseLexicalNode {
+  type: 'text'
+  text: string
+  style?: string
+  mode?: string
+  detail?: number
+}
+
+export interface LexicalListItemNode extends BaseLexicalNode {
   type: 'listitem'
   children: LexicalNode[]
   value?: number
 }
 
-interface LexicalListNode {
+export interface LexicalListNode extends BaseLexicalNode {
   type: 'list'
   tag: 'ol' | 'ul'
   children: LexicalListItemNode[]
-  listType: 'number' | 'bullet'
+  listType?: 'number' | 'bullet'
 }
 
-interface LexicalQuoteNode {
+export interface LexicalQuoteNode extends BaseLexicalNode {
   type: 'quote'
   children: LexicalNode[]
 }
 
-interface LexicalParagraphNode {
+export interface LexicalParagraphNode extends BaseLexicalNode {
   type: 'paragraph'
   children: LexicalNode[]
+  textStyle?: string
+  textFormat?: number
 }
 
-interface LexicalHeadingNode {
+export interface LexicalHeadingNode extends BaseLexicalNode {
   type: 'heading'
   tag: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
   children: LexicalNode[]
 }
 
-interface LexicalHorizontalRuleNode {
+export interface LexicalHorizontalRuleNode extends BaseLexicalNode {
   type: 'horizontalrule'
 }
 
-interface LexicalImageGalleryNode {
+export interface LexicalImageGalleryNode extends BaseLexicalNode {
   type: 'custom-image-gallery'
   data: {
     images: Array<{
@@ -63,11 +75,11 @@ interface LexicalImageGalleryNode {
   }
 }
 
-interface LexicalCarouselNode {
+export interface LexicalCarouselNode extends BaseLexicalNode {
   type: 'carousel'
   data: {
     slides: Array<{
-      image: { id: string }
+      image: { id: string } | string | any
       title?: string
       description?: string
       buttonText?: string
@@ -81,7 +93,7 @@ interface LexicalCarouselNode {
   }
 }
 
-interface LexicalCtaButtonNode {
+export interface LexicalCtaButtonNode extends BaseLexicalNode {
   type: 'ctaButton'
   data: {
     url: string
@@ -92,12 +104,18 @@ interface LexicalCtaButtonNode {
   }
 }
 
-type LexicalNode =
+export type LexicalNode =
   | LexicalTextNode
   | LexicalListNode
   | LexicalListItemNode
   | LexicalQuoteNode
   | LexicalParagraphNode
+  | LexicalHeadingNode
+  | LexicalHorizontalRuleNode
+  | LexicalImageGalleryNode
+  | LexicalCarouselNode
+  | LexicalCtaButtonNode
+  | any // Fallback for other node types
   | LexicalHeadingNode
   | LexicalHorizontalRuleNode
   | LexicalImageGalleryNode
@@ -829,9 +847,29 @@ function parseApplications(
   mediaMap: Map<string, any>
 ): ApplicationsData | undefined {
   const images: any[] = []
+  let foundSentinel = false
 
-  for (const node of nodes) {
-    // Parse image gallery or carousel for application images
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i]
+    const text = extractText(node).trim()
+
+    // Support the new sentinel-based identification
+    if (node.type === 'paragraph' && text === 'applications-item') {
+      foundSentinel = true
+      const nextNode = nodes[i + 1]
+      if (nextNode?.type === 'carousel' && (nextNode as LexicalCarouselNode).data?.slides) {
+        const carousel = nextNode as LexicalCarouselNode
+        for (const slide of carousel.data.slides) {
+          const imageId = slide.image?.id ? String(slide.image.id) : 
+                          (typeof slide.image === 'string' || typeof slide.image === 'number' ? String(slide.image) : '')
+          const imageUrl = imageId ? (mediaMap.get(imageId) || `/api/media/${imageId}`) : ''
+          if (imageUrl) images.push(imageUrl)
+        }
+      }
+      continue
+    }
+
+    // Fallback: Parse image gallery or carousel if no sentinel found/matched yet
     if (node.type === 'custom-image-gallery') {
       const gallery = node as LexicalImageGalleryNode
       for (const img of gallery.data.images) {
@@ -840,7 +878,7 @@ function parseApplications(
       }
     }
 
-    if (node.type === 'carousel') {
+    if (!foundSentinel && node.type === 'carousel') {
       const carousel = node as LexicalCarouselNode
       for (const slide of carousel.data.slides) {
         const imageUrl = mediaMap.get(slide.image.id) || `/api/media/${slide.image.id}`
