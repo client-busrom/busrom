@@ -62,6 +62,8 @@ export function Applications({ data, className }: ApplicationsProps) {
   // 当前选中的索引
   const [selectedIndex, setSelectedIndex] = React.useState(0)
   const [scrollProgress, setScrollProgress] = React.useState(0)
+  const lastActionTimeRef = React.useRef(0)
+  const ACTION_THROTTLE = 300
 
   // 监听选中变化
   const onSelect = React.useCallback(() => {
@@ -100,6 +102,10 @@ export function Applications({ data, className }: ApplicationsProps) {
   // 导航 - 点击时先停止自动滚动，滚动完成后恢复
   const goToPrev = React.useCallback(() => {
     if (!emblaApi) return
+    const now = Date.now()
+    if (now - lastActionTimeRef.current < ACTION_THROTTLE) return
+    lastActionTimeRef.current = now
+
     autoScrollPlugin?.stop()
     emblaApi.scrollPrev()
     // 短暂延迟后恢复自动滚动
@@ -108,6 +114,10 @@ export function Applications({ data, className }: ApplicationsProps) {
 
   const goToNext = React.useCallback(() => {
     if (!emblaApi) return
+    const now = Date.now()
+    if (now - lastActionTimeRef.current < ACTION_THROTTLE) return
+    lastActionTimeRef.current = now
+
     autoScrollPlugin?.stop()
     emblaApi.scrollNext()
     // 短暂延迟后恢复自动滚动
@@ -174,6 +184,7 @@ export function Applications({ data, className }: ApplicationsProps) {
                   image={imageUrl}
                   alt=""
                   size="medium"
+                  loading="eager"
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 />
               </div>

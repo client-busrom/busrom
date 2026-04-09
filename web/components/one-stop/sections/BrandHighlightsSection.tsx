@@ -152,7 +152,7 @@ export function BrandHighlightsSection({
                   image={currentItem.image} 
                   alt="Highlight Main" 
                   className="w-full h-full object-cover"
-                  size="xlarge"
+                  size="large"
                 />
             </motion.div>
           </AnimatePresence>

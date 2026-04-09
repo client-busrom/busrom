@@ -1,23 +1,24 @@
 "use client"
-
-import React, { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+ 
+import React, { useState, useEffect, useCallback } from "react"
+import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
-
+import useEmblaCarousel from "embla-carousel-react"
+ 
 interface SectionSlide {
   title: string
   description: string
   image: { url: string } | any
 }
-
+ 
 interface AdvantagesSectionProps {
   title?: string
   advantages: SectionSlide[]
 }
-
+ 
 const DESIGN_WIDTH = 1920
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
-
+ 
 export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps) {
   const [index, setIndex] = useState(0)
   
@@ -30,44 +31,67 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
     cardH: 450
   })
 
-  React.useEffect(() => {
+  // 1. Embla Carousel Setup
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: 'center', // USE CENTER FOR ALL to fix the "last item not active" issue
+    skipSnaps: false,
+    dragFree: false, 
+    containScroll: false 
+  })
+
+  // Sync internal Embla state with our index state
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return
+    setIndex(emblaApi.selectedScrollSnap())
+  }, [emblaApi])
+
+  useEffect(() => {
+    if (!emblaApi) return
+    onSelect()
+    emblaApi.on('select', onSelect)
+    emblaApi.on('reInit', onSelect)
+  }, [emblaApi, onSelect])
+
+  // External control: clicking a card scrolls to it
+  const scrollTo = useCallback((idx: number) => {
+    if (emblaApi) emblaApi.scrollTo(idx)
+  }, [emblaApi])
+ 
+  useEffect(() => {
     const handleResize = () => {
       const w = window.innerWidth
       if (w < 640) {
-        // MOBILE: Dynamic Heights
-        setLayout({ type: 'mobile', width: w * 0.66, gap: 16, padding: 30, cardH: 400 })
+        // Narrower cards on MB to see neighbors
+        setLayout({ type: 'mobile', width: w * 0.75, gap: 16, padding: 0, cardH: 400 })
       } else if (w < 1024) {
-        // TABLET: Dynamic Heights
-        setLayout({ type: 'tablet', width: w * 0.35, gap: 20, padding: 60, cardH: 450 })
+        setLayout({ type: 'tablet', width: w * 0.45, gap: 24, padding: 0, cardH: 450 })
       } else {
-        // DESKTOP: Precise Design Parity (465x766)
+        // Desktop: Center focus with visible side cards
         setLayout({ 
           type: 'desktop', 
-          width: (465 / 1920) * w, 
-          gap: (30 / 1920) * w, 
-          padding: (140 / 1920) * w, 
+          width: (500 / 1920) * w, 
+          gap: (40 / 1920) * w, 
+          padding: 0, 
           cardH: (766 / 1920) * w
         })
       }
+      if (emblaApi) emblaApi.reInit()
     }
     handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  // Calculate dynamic scroll offset - Centering logic for Mobile/Tablet
-  const scrollValue = layout.type === 'desktop' 
-    ? -index * (layout.width + layout.gap)
-    : (typeof window !== 'undefined' ? window.innerWidth / 2 - layout.width / 2 : 0) - (index * (layout.width + layout.gap))
-
+  }, [emblaApi])
+ 
   if (!advantages || advantages.length === 0) return null
-
+ 
   return (
     <section 
       className="relative w-full bg-transparent select-none py-12 lg:py-0 lg:h-[48vw]"
     >
       <div className="flex flex-col w-full h-full justify-center">
         
+        {/* 1. Animated Background Circle (Breathing effect) */}
         <motion.div 
           className="absolute rounded-full pointer-events-none opacity-40 lg:opacity-80"
           style={{ 
@@ -87,7 +111,7 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
             ease: "easeInOut"
           }}
         />
-
+ 
         {/* 2. Section Title */}
         <div className="relative z-20 pointer-events-none px-10 lg:pl-[140px] mb-8 lg:mb-[16px] w-full lg:w-[1000px] text-center lg:text-left">
           <h2 
@@ -101,18 +125,18 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
             dangerouslySetInnerHTML={{ __html: (title || "Advantages And Features<br />Of Busrom's One-Stop Purchasing").replace(/\n/g, '<br />') }}
           />
         </div>
-
-        {/* 3. Carousel - Dynamic Height (Tallest Wins) */}
-        <div className="relative w-full h-auto pb-20">
-            <motion.div
+ 
+        {/* 3. Carousel - Embla Implementation */}
+        <div 
+          className="relative w-full h-auto pb-20 overflow-hidden lg:overflow-visible" 
+          ref={emblaRef}
+        >
+            <div
                 className="flex relative items-stretch"
                 style={{ 
-                    left: layout.type === 'desktop' ? layout.padding : 0,
-                    gap: layout.gap,
-                    paddingTop: layout.type === 'desktop' ? vw(50) : '20px',     
+                    paddingLeft: layout.type === 'desktop' ? layout.padding : 0,
+                    paddingTop: layout.type === 'desktop' ? vw(50) : '20px',
                 }}
-                animate={{ x: scrollValue }}
-                transition={{ type: "spring", stiffness: 100, damping: 20 }}
             >
                 {advantages.map((item, idx) => {
                 const isActive = idx === index
@@ -128,18 +152,19 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
                         opacity: isActive ? 1 : 0.8
                     }}
                     transition={{ duration: 0.5 }}
-                    className="bg-white flex-shrink-0 relative overflow-hidden select-none cursor-pointer flex flex-col"
+                    className="bg-white flex-shrink-0 relative overflow-hidden flex flex-col cursor-grab active:cursor-grabbing"
                     style={{ 
                         width: layout.width,
                         minHeight: layout.cardH,
                         height: 'auto',
                         borderRadius: vw(21), 
-                        padding: layout.type === 'desktop' ? vw(30) : "24px"     
+                        padding: layout.type === 'desktop' ? vw(30) : "24px",
+                        marginRight: layout.gap,     
                     }}
-                    onClick={() => setIndex(idx)}
+                    onClick={() => scrollTo(idx)}
                     >
                     {/* Card Header */}
-                    <div className="relative" style={{ height: layout.type === 'desktop' ? vw(105) : "80px", marginBottom: vw(5) }}>
+                    <div className="relative pointer-events-none" style={{ height: layout.type === 'desktop' ? vw(105) : "80px", marginBottom: vw(5) }}>
                         <motion.div 
                             className="absolute left-0 top-0 bg-[#BCB158] rounded-full shrink-0 z-0" 
                             style={{ width: layout.type === 'desktop' ? vw(56.7) : "40px", height: layout.type === 'desktop' ? vw(56.7) : "40px" }}
@@ -161,26 +186,28 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
                             {item.title}
                         </h3>
                     </div>
-
+ 
                     {/* Card Image */}
                     <div 
-                        className="rounded-[20px] lg:rounded-[30px] shadow-[0_31px_38.4px_rgba(0,0,0,0.17)] overflow-hidden bg-gray-50"
+                        className="rounded-[20px] lg:rounded-[30px] shadow-[0_31px_38.4px_rgba(0,0,0,0.17)] overflow-hidden bg-gray-50 pointer-events-none"
                         style={{ 
                         width: "100%", 
                         height: layout.type === 'desktop' ? vw(300) : "185px", 
-                        marginBottom: layout.type === 'desktop' ? vw(25) : "20px", 
+                        marginBottom: layout.type === 'desktop' ? vw(48) : "36px", 
                         }}
                     >
                         <OptimizedImage 
                             image={item.image}
                             size="large"
+                            priority={idx < 2}
+                            loading={idx < 2 ? "eager" : "lazy"}
                             className="w-full h-full object-cover"
                             alt={item.title}
                         />
                     </div>
-
+ 
                     {/* Description Text */}
-                    <div className="w-full">
+                    <div className="w-full pointer-events-none">
                         <p 
                         className="font-medium leading-normal text-black text-justify"
                         style={{ 
@@ -194,7 +221,7 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
                     </motion.div>
                 )
                 })}
-            </motion.div>
+            </div>
         </div>
       </div>
     </section>

@@ -326,9 +326,9 @@ export function OptimizedImage({
         width={imgWidth}
         height={imgHeight}
       >
-        {/* Blur placeholder */}
-        {showBlurPlaceholder && !isLoaded && (
-          <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+        {/* Default Skeleton / Blur placeholder while loading */}
+        {!isLoaded && !hasError && (
+          <div className="absolute inset-0 bg-[#E8E4D8]/30 animate-pulse transition-opacity duration-300" />
         )}
 
         <picture>
@@ -348,8 +348,8 @@ export function OptimizedImage({
             width={imgWidth}
             height={imgHeight}
             className={`${className} ${objectFit ? `object-${objectFit}` : ''} ${
-              showBlurPlaceholder && !isLoaded ? 'opacity-0' : 'opacity-100'
-            } transition-opacity duration-300`}
+              isLoaded ? 'opacity-100' : 'opacity-0'
+            } transition-opacity duration-500 ease-in-out`}
             style={{ objectPosition: calculatedObjectPosition }}
             loading={loadingStrategy}
             fetchPriority={priority ? 'high' : undefined}
@@ -373,9 +373,9 @@ export function OptimizedImage({
       width={imgWidth}
       height={imgHeight}
     >
-      {/* Blur placeholder */}
-      {showBlurPlaceholder && !isLoaded && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+      {/* Default Skeleton / Blur placeholder while loading */}
+      {!isLoaded && !hasError && (
+        <div className="absolute inset-0 bg-[#E8E4D8]/30 animate-pulse transition-opacity duration-300" />
       )}
 
       <picture>
@@ -391,8 +391,8 @@ export function OptimizedImage({
           width={imgWidth}
           height={imgHeight}
           className={`${className} ${objectFit ? `object-${objectFit}` : ''} ${
-            showBlurPlaceholder && !isLoaded ? 'opacity-0' : 'opacity-100'
-          } transition-opacity duration-300`}
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          } transition-opacity duration-500 ease-in-out`}
           style={{ objectPosition: calculatedObjectPosition }}
           loading={loadingStrategy}
           fetchPriority={priority ? 'high' : undefined}

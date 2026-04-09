@@ -34,11 +34,14 @@ Instead of "Fetch-and-Filter" on the client, we use a "Slim-Response" architectu
 
 The selection logic previously in `getRandomAppImage` (frontend) is now standard.
 
-* **Strategy**: Use query parameters `ids=1,2,3` to fetch specific items.
-* **Benefit**: Extreme precision; returns only what the editor selected.
-* **Data**: Each item contains a pre-selected `image` object.
+- **Strategy**: Use query parameters `ids=1,2,3` to fetch specific items.
+- **Benefit**: Extreme precision; returns only what the editor selected.
+- **Mode**: `cross-fade` (default AnimatePresence without `wait`).
+- **Duration**: `0.8s` (matching the high-end feel).
+- **Transition**: `[0.32, 0.72, 0, 1]` cubic-bezier.
 
 ### Implementation Checklist
+
 1. **Backend**:
    - `/api/applications`: Ensure `depth=2` and randomization logic is active.
    - Response thinning: Only return `id`, `name`, `slug`, `shortDescription`, and `image`.
@@ -67,12 +70,19 @@ To eliminate "Jank" during rapid navigation in carousels, the following rules ar
 
 ### C. Eager Optimization
 
--   **Loading**: Use `loading="eager"` for the immediate carousel items.
--   **Sizes**: Map `OptimizedImage` sizes to match visual weight (e.g., `xlarge` for main hero images, `large` for grid items).
+- **Loading**: Use `loading="eager"` for the immediate carousel items.
+- **Sizes**: Map `OptimizedImage` sizes to match visual weight (e.g., `xlarge` for main hero images, `large` for grid items).
+
+### D. OEM/ODM & Service Overview
+
+- **Interaction**: Throttled (250ms) using `useRef`.
+- **Navigation**: Interaction-throttled to prevent rapid-fire jank.
+- **Loading**: `loading="eager"` for the current and adjacent slides.
+- **Data Flow**: `OurStoryTemplate` -> `StoryApplicationsSection` via `app.image` priority.
 
 ## 5. Key Improvements (Summary)
 
--   **Selection Logic**: Moved from Client -> Server (API Level).
--   **Payload**: JSON response optimized for 1:1 card mapping.
--   **Stability**: Ref-based click locking + stable React keys.
--   **Media Delivery**: Mandatory use of rich `image` objects with WebP variants.
+- **Selection Logic**: Moved from Client -> Server (API Level).
+- **Payload**: JSON response optimized for 1:1 card mapping.
+- **Stability**: Ref-based click locking + stable React keys.
+- **Media Delivery**: Mandatory use of rich `image` objects with WebP variants.
