@@ -10,6 +10,7 @@ const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
 interface SupportApplicationsSectionProps {
   title?: string
   items?: any[]
+  carouselConfig?: any
   applicationIds?: number[]
   locale?: string
 }
@@ -24,11 +25,15 @@ const ITEM_CONFIGS = [
 export const SupportApplicationsSection: React.FC<SupportApplicationsSectionProps> = ({ 
   title, 
   items = [],
+  carouselConfig,
   applicationIds = [],
   locale = 'en'
 }) => {
   const [fetchedApplications, setFetchedApplications] = useState<any[]>([])
-  const [loading, setLoading] = useState(applicationIds.length > 0)
+  const [loading, setLoading] = useState(true)
+
+  // 从配置中获取项数，默认为 4
+  const itemsPerView = carouselConfig?.itemsPerView || 4
   
   const x = useMotionValue(0)
   const translateX = useTransform(x, (v: number) => `${v}vw`)
@@ -37,27 +42,34 @@ export const SupportApplicationsSection: React.FC<SupportApplicationsSectionProp
   const isHovering = useRef(false)
   const isDragging = useRef(false)
 
+  const lastFetchedIdsRef = useRef<string>("")
+  
   useEffect(() => {
     const fetchApps = async () => {
-      if (applicationIds.length === 0) {
+      const ids = carouselConfig?.applications?.map((a: any) => a.id).filter(Boolean) || applicationIds || []
+      const idsStr = ids.join(',')
+      
+      if (idsStr === lastFetchedIdsRef.current && fetchedApplications.length > 0) return
+      
+      if (ids.length === 0) {
         setLoading(false)
         return
       }
+      
+      lastFetchedIdsRef.current = idsStr
       try {
-        const res = await fetch(`/api/applications?ids=${applicationIds.join(",")}&locale=${locale}`)
+        const res = await fetch(`/api/applications?ids=${ids.join(",")}&locale=${locale}`)
         if (res.ok) {
           const data = await res.json()
           const transformedApps = (data.docs || []).map((app: any) => {
-            const firstScene = app.sceneGallery?.[0]
-            const firstImage = firstScene?.images?.[0] || null
             return {
               id: String(app.id),
               title: app.name || "",
-              image: firstImage,
+              image: app.image,
             }
           })
-          const ordered = applicationIds
-            .map(id => transformedApps.find((app: any) => app.id === String(id)))
+          const ordered = ids
+            .map((id: any) => transformedApps.find((app: any) => String(app.id) === String(id)))
             .filter(Boolean)
           setFetchedApplications(ordered)
         }
@@ -68,12 +80,13 @@ export const SupportApplicationsSection: React.FC<SupportApplicationsSectionProp
       }
     }
     fetchApps()
-  }, [applicationIds, locale])
+  }, [applicationIds?.join(','), locale, JSON.stringify(carouselConfig?.applications)])
 
   const validItems = useMemo(() => {
-    if (applicationIds.length > 0) return fetchedApplications
+    const hasDynamicApps = applicationIds.length > 0 || (carouselConfig?.applications && carouselConfig.applications.length > 0)
+    if (hasDynamicApps) return fetchedApplications
     return items?.length > 0 ? items : []
-  }, [applicationIds.length, fetchedApplications, items])
+  }, [applicationIds.length, carouselConfig?.applications?.length, fetchedApplications, items])
   
   const duplicatedItems = useMemo(() => {
     if (validItems.length === 0) return []
@@ -193,14 +206,26 @@ export const SupportApplicationsSection: React.FC<SupportApplicationsSectionProp
                   style={{ 
                     left: vw(config.imagePos.left), top: vw(config.imagePos.top), width: vw(config.imagePos.width), height: vw(config.imagePos.height),
                     maskImage: `url(/images/support/image${styleIdx + 1}.svg)`, WebkitMaskImage: `url(/images/support/image${styleIdx + 1}.svg)`,
-                    maskSize: "contain", WebkitMaskSize: "contain", maskRepeat: "no-repeat", WebkitMaskRepeat: "no-repeat", zIndex: 10
+                    maskSize: "contain", WebkitMaskSize: "contain", maskRepeat: "no-repeat", WebkitMaskRepeat: "no-repeat", zIndex: 10,
+                    willChange: "transform, opacity"
                   }}
                   onMouseEnter={onMouseEnter}
                   onMouseLeave={onMouseLeave}
                   animate={{ rotate: [index % 2 === 0 ? -0.5 : 0.5, index % 2 === 0 ? 0.5 : -0.5, index % 2 === 0 ? -0.5 : 0.5] }}
-                  transition={{ duration: 6 + Math.random() * 2, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{ 
+                    duration: 7, // 使用固定时长，辅以 index 偏移来打破整齐感
+                    delay: (index % 5) * 0.5,
+                    repeat: Infinity, 
+                    ease: "easeInOut" 
+                  }}
                 >
-                  <OptimizedImage image={item.image} alt={item.title} className="w-full h-full object-cover transition-all duration-500 select-none pointer-events-none" size="medium" />
+                  <OptimizedImage 
+                    image={item.image} 
+                    alt={item.title} 
+                    className="w-full h-full object-cover transition-all duration-500 select-none pointer-events-none" 
+                    size="large"
+                    loading="eager"
+                  />
                 </motion.div>
               </div>
             )

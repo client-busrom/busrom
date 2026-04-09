@@ -60,16 +60,24 @@ export const resolveAllMedia = async (content: any, cmsUrl: string, normalize: (
 
   const appToImageId: Record<string, string> = {};
 
-  // 2. 解析案例图集：去案例库里随机捡一张图
+  // 2. 解析案例图集：去案例库里批量拉取元数据并随机捡图
   if (applicationIds.size > 0) {
-    const appPromises = Array.from(applicationIds).map(async (id) => {
-      try {
-        const res = await fetch(`${cmsUrl}/api/applications/${id}`);
-        if (res.ok) {
-          const appDoc = await res.json();
+    try {
+      const idsArr = Array.from(applicationIds);
+      const query = idsArr.map(id => `where[id][in]=${id}`).join('&');
+      // Payload typically allows many 'in' filters or we can use a single array if the API supports it
+      // Standard Payload REST way: where[id][in][]=id1&where[id][in][]=id2
+      const queryString = idsArr.map(id => `where[id][in][]=${id}`).join('&');
+      
+      const res = await fetch(`${cmsUrl}/api/applications?${queryString}&limit=100&depth=2`);
+      if (res.ok) {
+        const data = await res.json();
+        const docs = data.docs || [];
+        
+        docs.forEach((appDoc: any) => {
+          const id = String(appDoc.id);
           const allSceneImages: any[] = [];
           
-          // 逻辑核心：遍历 sceneGallery 里的每一场图片，打平到一个池子里
           if (Array.isArray(appDoc.sceneGallery)) {
             appDoc.sceneGallery.forEach((scene: any) => {
               if (Array.isArray(scene.images)) {
@@ -82,10 +90,8 @@ export const resolveAllMedia = async (content: any, cmsUrl: string, normalize: (
 
           let selectedImage: any = null;
           if (allSceneImages.length > 0) {
-            // 💡 随机之选
             selectedImage = allSceneImages[Math.floor(Math.random() * allSceneImages.length)];
           } else {
-            // 兜底：主图
             selectedImage = appDoc.mainImage || appDoc.image;
           }
 
@@ -93,45 +99,62 @@ export const resolveAllMedia = async (content: any, cmsUrl: string, normalize: (
           if (selectedImageId) {
             mediaIds.add(selectedImageId);
             appToImageId[id] = selectedImageId;
+            // 如果 selectedImage 是完整对象且已填充，可以直接存入
+            if (typeof selectedImage === 'object' && selectedImage.url) {
+              mediaData[selectedImageId] = {
+                ...selectedImage,
+                id: String(selectedImage.id),
+                url: normalize(selectedImage.url),
+                variants: selectedImage.sizes ? Object.fromEntries(
+                  Object.entries(selectedImage.sizes).map(([k, v]: [string, any]) => [k, { ...v, url: normalize(v.url) }])
+                ) : {}
+              };
+            }
           }
-        }
-      } catch (err) {
-        console.error(`[MediaResolver] Application ${id} fetch error:`, err);
+        });
       }
-    });
-    await Promise.all(appPromises);
+    } catch (err) {
+      console.error(`[MediaResolver] Batch Applications fetch error:`, err);
+    }
   }
 
   // 3. 批量拉取所有真实的媒体元数据
-  if (mediaIds.size > 0) {
-    const uniqueIds = Array.from(mediaIds);
-    await Promise.all(uniqueIds.map(async (id) => {
+  // 排除掉已经在应用步骤里获取到的媒体
+  const missingMediaIds = Array.from(mediaIds).filter(id => !mediaData[id]);
+  
+  if (missingMediaIds.length > 0) {
+    // 分片处理，防止 URL 过长 (每 50 个一组)
+    const chunkSize = 50;
+    for (let i = 0; i < missingMediaIds.length; i += chunkSize) {
+      const chunk = missingMediaIds.slice(i, i + chunkSize);
       try {
-        const res = await fetch(`${cmsUrl}/api/media/${id}`);
+        const queryString = chunk.map(id => `where[id][in][]=${id}`).join('&');
+        const res = await fetch(`${cmsUrl}/api/media?${queryString}&limit=${chunkSize}&depth=1`);
         if (res.ok) {
-          const doc = await res.json();
-          // transform & normalize
-          mediaData[id] = {
-            ...doc,
-            id: String(doc.id),
-            url: doc.url ? normalize(doc.url) : '',
-            variants: doc.sizes ? Object.fromEntries(
-              Object.entries(doc.sizes).map(([k, v]: [string, any]) => [k, { ...v, url: normalize(v.url) }])
-            ) : {}
-          };
+          const data = await res.json();
+          (data.docs || []).forEach((doc: any) => {
+            const id = String(doc.id);
+            mediaData[id] = {
+              ...doc,
+              url: doc.url ? normalize(doc.url) : '',
+              variants: doc.sizes ? Object.fromEntries(
+                Object.entries(doc.sizes).map(([k, v]: [string, any]) => [k, { ...v, url: normalize(v.url) }])
+              ) : {}
+            };
+          });
         }
       } catch (err) {
-        console.error(`[MediaResolver] Media ${id} fetch error:`, err);
+        console.error(`[MediaResolver] Batch Media fetch error:`, err);
       }
-    }));
-
-    // 4. 将案例映射关系回灌到 mediaData
-    Object.entries(appToImageId).forEach(([appId, imageId]) => {
-      if (mediaData[imageId]) {
-        mediaData[appId] = { ...mediaData[imageId], id: appId };
-      }
-    });
+    }
   }
+
+  // 4. 将案例映射关系回灌到 mediaData
+  Object.entries(appToImageId).forEach(([appId, imageId]) => {
+    if (mediaData[imageId]) {
+      mediaData[appId] = { ...mediaData[imageId], id: appId };
+    }
+  });
 
   return { content, mediaData };
 };

@@ -12,6 +12,7 @@ import { SupportMarketingSalesSection } from "@/components/support/SupportMarket
 import { SupportContactFormSection } from "@/components/support/SupportContactFormSection"
 import { SupportApplicationsSection } from "@/components/support/SupportApplicationsSection"
 import { SupportQuoteSection } from "@/components/support/SupportQuoteSection"
+import { convertToCDNUrl } from "@/lib/cdn-url"
 
 interface MediaObject {
   id: string
@@ -340,7 +341,7 @@ export function SupportTemplate({ locale, pageContent }: SupportTemplateProps) {
           id: `item-${idx + 1}`,
           title: item.title,
           content: [{ type: "text", text: item.title, format: 0 }], // Convert title to node format for rendering
-          icon: item.icon ? { url: item.icon } : null
+          icon: item.icon ? { url: convertToCDNUrl(item.icon) } : null
         })
       })
     }
@@ -483,6 +484,7 @@ export function SupportTemplate({ locale, pageContent }: SupportTemplateProps) {
   }, [children, mediaData])
 
   const applicationsData = useMemo(() => {
+    let carouselConfig = {} as any
     try {
       // Find correctly labeled nodes
       let territoryNodes = extractAfterMarker(children, "applications") || []
@@ -500,6 +502,7 @@ export function SupportTemplate({ locale, pageContent }: SupportTemplateProps) {
           // Handle applicationCarousel (IDs only, fetch on client)
           if (node.type === "applicationCarousel" && node.data?.applications) {
             applicationIds = node.data.applications.map((a: any) => a.id).filter(Boolean)
+            carouselConfig = node.data
             if (applicationIds.length > 0) break
           }
           
@@ -520,16 +523,17 @@ export function SupportTemplate({ locale, pageContent }: SupportTemplateProps) {
         const globalNode = children.find((n: any) => n.type === "applicationCarousel")
         if (globalNode?.data?.applications) {
           applicationIds = globalNode.data.applications.map((a: any) => a.id).filter(Boolean)
+          carouselConfig = globalNode.data
         }
       }
 
       const found = items.length > 0 || applicationIds.length > 0
       console.log("[SupportTemplate] Applications data status:", { found, itemCount: items.length, idCount: applicationIds.length })
 
-      return { items, applicationIds }
+      return { items, applicationIds, carouselConfig }
     } catch (err) {
       console.error("[SupportTemplate] Error in applicationsData useMemo:", err)
-      return { items: [], applicationIds: [] }
+      return { items: [], applicationIds: [], carouselConfig: {} }
     }
   }, [children, mediaData])
 
@@ -635,7 +639,7 @@ export function SupportTemplate({ locale, pageContent }: SupportTemplateProps) {
       {(applicationsData?.items.length > 0 || applicationsData?.applicationIds.length > 0) && (
         <SupportApplicationsSection 
           items={applicationsData.items} 
-          applicationIds={applicationsData.applicationIds}
+          carouselConfig={applicationsData.carouselConfig}
           locale={locale}
         />
       )}

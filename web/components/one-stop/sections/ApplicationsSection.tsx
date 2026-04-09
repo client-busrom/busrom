@@ -94,8 +94,14 @@ export function ApplicationsSection({ title, items, locale }: ApplicationsSectio
     }
   }, [emblaApi, applyParallax])
 
+  const lastClickTime = useRef(0)
+
   const scrollPrev = useCallback(() => {
     if (!emblaApi) return
+    const now = Date.now()
+    if (now - lastClickTime.current < 250) return
+    lastClickTime.current = now
+    
     emblaApi.plugins().autoScroll?.stop()
     emblaApi.scrollPrev()
     setTimeout(() => emblaApi.plugins().autoScroll?.play(), 2000)
@@ -103,6 +109,10 @@ export function ApplicationsSection({ title, items, locale }: ApplicationsSectio
 
   const scrollNext = useCallback(() => {
     if (!emblaApi) return
+    const now = Date.now()
+    if (now - lastClickTime.current < 250) return
+    lastClickTime.current = now
+
     emblaApi.plugins().autoScroll?.stop()
     emblaApi.scrollNext()
     setTimeout(() => emblaApi.plugins().autoScroll?.play(), 2000)
@@ -226,7 +236,13 @@ export function ApplicationsSection({ title, items, locale }: ApplicationsSectio
                       boxShadow: "0px 16px 24px rgba(0, 0, 0, 0.12)"
                     }}
                   >
-                     <OptimizedImage image={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" size="large" />
+                     <OptimizedImage 
+                       image={item.image} 
+                       alt={item.title} 
+                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                       size="large"
+                       loading="eager"
+                     />
                      <div className="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <h3 className="text-white text-[24px] font-bold" style={{ fontFamily: "var(--font-anaheim)" }}>{item.title}</h3>
                         <p className="text-white/80 text-[16px] mt-2 line-clamp-2">{item.description}</p>

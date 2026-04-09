@@ -76,19 +76,8 @@ export async function GET(request: NextRequest) {
     // 构建 Payload API URL
     const params = new URLSearchParams()
     params.append('locale', locale)
-    params.append('depth', '1') // 减少深度，只获取一层关联
+    params.append('depth', '2')
     params.append('where[status][equals]', 'published')
-    
-    // 只选择需要的字段，大幅减少 JSON 体积
-    params.append('select[name]', 'true')
-    params.append('select[slug]', 'true')
-    params.append('select[subtitle]', 'true')
-    params.append('select[shortDescription]', 'true')
-    params.append('select[mainImage]', 'true')
-    params.append('select[sceneGallery]', 'true')
-    params.append('select[category]', 'true')
-    params.append('select[status]', 'true')
-    params.append('select[updatedAt]', 'true')
 
     // If specific IDs provided, fetch those applications
     if (ids) {
@@ -129,44 +118,59 @@ export async function GET(request: NextRequest) {
     const data = await response.json()
     console.log('[Applications API] Received applications:', data.totalDocs)
 
-    // Transform data to match frontend expectations
-    const docs = data.docs.map((app: any) => {
-      // Transform sceneGallery images
-      const sceneGallery = app.sceneGallery?.map((scene: any) => ({
-        sceneName: scene.sceneName,
-        images: scene.images?.map((img: any) => ({
-          id: img.id,
-          url: convertToCDNUrl(img.url, strategy),
-          alt: img.alt || '',
-          cropFocalPoint: getCropFocalPoint(img),
-          variants: transformImageVariants(img.sizes, strategy),
-          width: img.width,
-          height: img.height,
-        })) || [],
-      })) || []
+    // Server-side Pooled Random Selection & Data Thinning
+    const optimizedDocs = (data.docs || []).map((app: any) => {
+      // 1. Collect all potential images into a flat pool
+      const pool: any[] = []
+      
+      // Root images
+      if (app.images && Array.isArray(app.images)) {
+        app.images.forEach((item: any) => {
+          const img = item.image || item
+          if (img && (img.url || img.file?.url)) pool.push(img)
+        })
+      }
+      
+      // Scene gallery images
+      if (app.sceneGallery && Array.isArray(app.sceneGallery)) {
+        app.sceneGallery.forEach((scene: any) => {
+          if (scene.images && Array.isArray(scene.images)) {
+            scene.images.forEach((item: any) => {
+              const img = item.image || item
+              if (img && (img.url || img.file?.url)) pool.push(img)
+            })
+          }
+        })
+      }
+      
+      // Main image fallback
+      if (app.mainImage && (app.mainImage.url || app.mainImage.file?.url)) {
+        pool.push(app.mainImage)
+      }
 
+      // 2. Pick ONE random image
+      const selectedImage = pool.length > 0 
+        ? pool[Math.floor(Math.random() * pool.length)] 
+        : null
+
+      // 3. Construct a lean object for the frontend
       return {
         id: app.id,
         slug: app.slug,
-        name: app.name,
-        shortDescription: app.shortDescription,
-        description: app.description,
-        category: app.category
-          ? {
-              id: app.category.id,
-              slug: app.category.slug,
-              name: app.category.name,
-            }
-          : null,
-        sceneGallery,
-        status: app.status,
-        createdAt: app.createdAt,
-        updatedAt: app.updatedAt,
+        name: app.title || app.name || "",
+        category: app.category?.name || app.category?.title || "",
+        // Just return the one selected image with its essential metadata
+        image: selectedImage ? {
+          id: selectedImage.id,
+          url: convertToCDNUrl(selectedImage.url || selectedImage.file?.url, strategy),
+          alt: selectedImage.alt || app.name,
+          variants: transformImageVariants(selectedImage.sizes, strategy)
+        } : null
       }
     })
 
     return NextResponse.json({
-      docs,
+      docs: optimizedDocs,
       totalDocs: data.totalDocs,
       page: data.page,
       limit: data.limit,

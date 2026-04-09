@@ -78,7 +78,7 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
                   <div className="w-full h-[200px] sm:h-[180px] lg:h-[220px] rounded-[24px] overflow-hidden shadow-md">
                      <OptimizedImage 
                         image={item.image}
-                        size="medium"
+                        size="large"
                         className="w-full h-full object-cover"
                         alt={`Slide ${idx}`}
                       />
@@ -207,7 +207,7 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
               >
                 <OptimizedImage 
                   image={item.image}
-                  size="small"
+                  size="large"
                   className={`w-full h-full object-cover transition-all duration-700 ${idx !== currentIndex ? 'grayscale opacity-50' : 'grayscale-0 opacity-100'}`}
                   alt={`Slide ${idx}`}
                 />
