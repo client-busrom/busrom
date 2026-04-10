@@ -12,7 +12,7 @@ This document outlines the standardized rendering methodologies for "Application
 - **Timing**: Server-side, during initial page generation (SSR/SSG).
 - **Logic**:
   - Proactively fetches application data during node traversal.
-  - Implements **Global Pool Random** strategy: flattens all images into one large pool for the entire gallery.
+  - Implements **Double-Random (Scene -> Image)** strategy: first picks a random scene, then a random image from that scene. This prevents scenes with many images from dominating the display and is more memory-efficient.
 - **Data Shape**: `mediaData` dictionary contains pre-resolved media objects.
 
 ## 2. Server-Side Optimized Strategy (Dynamic Carousels)
@@ -24,8 +24,9 @@ This document outlines the standardized rendering methodologies for "Application
 Instead of "Fetch-and-Filter" on the client, we use a "Slim-Response" architecture:
 
 - **Backend Selection (`/api/applications/route.ts`)**:
-  - The API performs the "Flat Pool" random selection internally.
+  - The API performs the **Double-Random** selection internally.
   - **Payload Thinning**: It returns only a single, pre-selected `image` object per application.
+  - **Efficiency**: Avoids creating large flattened arrays in memory, reducing backend GC pressure.
   - **JSON Reduction**: Removes heavy `sceneGallery` and full collections, reducing payload size by ~90%.
 - **Rich Media Objects**:
   - The client receives a full media object containing `variants` (sizes), enabling `OptimizedImage` to pull the correct WebP variant (e.g., `xlarge` for hero blocks).
