@@ -22,7 +22,6 @@ interface MediaObject {
 
 interface StoryBrandPositionSectionProps {
   data: {
-    titleGraphic: string
     title: string
     subtitle: string
     description: string

@@ -236,7 +236,17 @@ export function ApplicationProductNavigationSection({
                   }}
                   transition={{ type: "spring", stiffness: 200, damping: 25 }}
                   onClick={() => {
-                    if (!isCenter) handleManualSwap(slotIdx)
+                    if (!isCenter) {
+                      handleManualSwap(slotIdx)
+                    } else {
+                      const slug = product.slug || product.id
+                      const url = `/${locale}/shop/${slug}`
+                      if (product._carouselItem?.openInNewTab) {
+                        window.open(url, '_blank')
+                      } else {
+                        window.location.href = url
+                      }
+                    }
                   }}
                   className="absolute overflow-hidden group cursor-pointer"
                   style={{

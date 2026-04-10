@@ -1,13 +1,13 @@
 "use client"
 
-import React, { useMemo, useEffect, useState } from "react"
+import React from "react"
 import { OemOdmValueGuide } from "@/components/oem-odm/OemOdmValueGuide"
 import { OemOdmBrandAdvantage } from "@/components/oem-odm/OemOdmBrandAdvantage"
 import { OemOdmServiceIntroduction } from "@/components/oem-odm/OemOdmServiceIntroduction"
 import { OemOdmWhatIsOem } from "@/components/oem-odm/OemOdmWhatIsOem"
 import { OemOdmProductSeries } from "@/components/oem-odm/OemOdmProductSeries"
 import { OemOdmPartner } from "@/components/oem-odm/OemOdmPartner"
-import { OemOdmAdvantages } from "@/components/oem-odm/OemOdmAdvantages"
+import { OemAdvantages } from "@/components/oem-odm/OemOdmAdvantages"
 // ODM components
 import { OdmServiceIntroduction } from "@/components/oem-odm/OdmServiceIntroduction"
 import { OdmWhatIsOdm } from "@/components/oem-odm/OdmWhatIsOdm"
@@ -70,22 +70,7 @@ interface FormConfig {
 
 interface OemOdmTemplateProps {
   locale: string
-  pageContent: {
-    title: string
-    content?: {
-      root?: {
-        children?: any[]
-      }
-      document?: any[]
-    } | null
-    contentTranslation?: {
-      root?: {
-        children?: any[]
-      }
-    } | null
-    mediaData?: Record<string, MediaObject>
-    formConfig?: FormConfig | null
-  }
+  data: any // The parsed data from parseOemOdmData
 }
 
 // ========================================
@@ -376,364 +361,36 @@ function extractAdvantageItemsAfterMarker(
 // OemOdmTemplate 组件
 // ========================================
 
-export function OemOdmTemplate({ locale, pageContent }: OemOdmTemplateProps) {
-  // 获取内容节点
-  const contentChildren = useMemo(() =>
-    pageContent.content?.root?.children || pageContent.contentTranslation?.root?.children || [],
-    [pageContent]
-  )
-
-  const mediaData = pageContent.mediaData || {}
-
-  // ========================================
-  // 提取 Value Guide (Hero) Section 数据
-  // 对应 CMS 中的 oem-odm-value-guide 板块
-  // ========================================
-  const heroData = useMemo(() => {
-    // 提取标题 - 需要分割成多行
-    const titleText = extractTextAfterMarker(contentChildren, "oem-odm-value-guide-title")
-    const titleLines = titleText ? titleText.split("\n").filter(l => l.trim()) : []
-
-    // 提取副标题/特性 - "Professional Efficient Reliable" 需要分割
-    const subtitleText = extractTextAfterMarker(contentChildren, "oem-odm-value-guide-subtitle")
-    const features = subtitleText ? subtitleText.split("\n").filter(l => l.trim()) : []
-
-    // 左侧和右侧描述
-    const descriptionLeft = extractTextAfterMarker(contentChildren, "oem-odm-value-guide-description-left")
-    const descriptionRight = extractTextAfterMarker(contentChildren, "oem-odm-value-guide-description-right")
-
-    // 图片 - 从图片画廊中获取（第一张为左图，第二张为右图）
-    const galleryImages = extractGalleryAfterMarker(contentChildren, "oem-odm-value-guide-image", mediaData)
-    const leftImage = galleryImages[0] || null
-    const rightImage = galleryImages[1] || null
-
-    return {
-      titleLines,
-      features,
-      description: descriptionLeft,
-      rightDescription: descriptionRight,
-      leftImage,
-      rightImage,
-    }
-  }, [contentChildren, mediaData])
-
-  // ========================================
-  // 提取 Brand Advantage Section 数据
-  // 对应 CMS 中的 oem-odm-brand-advantage 板块
-  // ========================================
-  const brandAdvantageData = useMemo(() => {
-    const title = extractTextAfterMarker(contentChildren, "oem-odm-brand-advantage-title")
-    const items = extractListItemsAfterMarker(contentChildren, "oem-odm-brand-advantage-item")
-    const tagOem = extractTextAfterMarker(contentChildren, "oem-odm-brand-advantage-tag-oem")
-    const tagOdm = extractTextAfterMarker(contentChildren, "oem-odm-brand-advantage-tag-odm")
-    const tagTips = extractTextAfterMarker(contentChildren, "oem-odm-brand-advantage-tag-tips")
-    const images = extractGalleryAfterMarker(contentChildren, "oem-odm-brand-advantage-tag-image", mediaData)
-
-    return {
-      title,
-      items,
-      tagOem,
-      tagOdm,
-      tagTips,
-      images,
-    }
-  }, [contentChildren, mediaData])
-
-  // ========================================
-  // 提取 OEM Service Introduction Section 数据
-  // 注意：设计稿命名为 oem-service-introduction (少了一个 i)
-  // ========================================
-  const oemServiceData = useMemo(() => {
-    const title = extractTextAfterMarker(contentChildren, "oem-service-introduction-title")
-    const subtitle = extractTextAfterMarker(contentChildren, "oem-service-introduction-subtitle")
-    // 右上角描述文字 - 支持加粗和下划线格式
-    const description = extractFormattedTextAfterMarker(contentChildren, "oem-service-introduction-description")
-    const image = extractImageAfterMarker(contentChildren, "oem-service-introduction-image", mediaData)
-
-    // 左下角描述文字 - 支持加粗和下划线格式（使用 subtitle 标记）
-    const leftDescription = extractFormattedTextAfterMarker(contentChildren, "oem-service-introduction-subtitle")
-
-    // What Is OEM 子板块
-    const whatTitle = extractTextAfterMarker(contentChildren, "oem-service-introduction-what-title")
-    const whatSubtitle = extractTextAfterMarker(contentChildren, "oem-service-introduction-what-subtitle")
-    const whatDescriptionSegments = extractFormattedTextAfterMarker(contentChildren, "oem-service-introduction-what-description")
-    const whatImage = extractImageAfterMarker(contentChildren, "oem-service-introduction-what-image", mediaData)
-
-    // Series of Products 子板块
-    const seriesTitle = extractTextAfterMarker(contentChildren, "oem-service-introduction-series-title")
-    const seriesDescription = extractTextAfterMarker(contentChildren, "oem-service-introduction-series-description")
-    const seriesImage = extractImageAfterMarker(contentChildren, "oem-service-introduction-series-image", mediaData)
-
-    // Partner 子板块
-    const partnerTitle = extractTextAfterMarker(contentChildren, "oem-service-introduction-partner-title")
-    const partnerItems = extractListItemsAfterMarker(contentChildren, "oem-service-introduction-partner-item")
-    const partnerImages = extractGalleryAfterMarker(contentChildren, "oem-service-introduction-partner-image", mediaData)
-
-    return {
-      title,
-      subtitle,
-      description,
-      image,
-      leftDescription,
-      what: {
-        title: whatTitle,
-        subtitle: whatSubtitle,
-        descriptionSegments: whatDescriptionSegments,
-        image: whatImage,
-      },
-      series: {
-        title: seriesTitle,
-        description: seriesDescription,
-        image: seriesImage,
-      },
-      partner: {
-        title: partnerTitle,
-        items: partnerItems,
-        images: partnerImages,
-      },
-      // Advantages 子板块 - 每个item带有自己的图片
-      advantages: {
-        title: extractTextAfterMarker(contentChildren, "oem-service-introduction-advantages-title"),
-        items: extractAdvantageItemsAfterMarker(contentChildren, "oem-service-introduction-advantages-item", mediaData),
-      }
-    }
-  }, [contentChildren, mediaData])
-
-  // ========================================
-  // 提取 ODM Service Introduction Section 数据
-  // ========================================
-  const odmServiceData = useMemo(() => {
-    const title = extractTextAfterMarker(contentChildren, "odm-service-introduction-title")
-    const subtitle = extractTextAfterMarker(contentChildren, "odm-service-introduction-subtitle")
-    // 右上角描述文字 - 支持加粗和下划线格式
-    const description = extractFormattedTextAfterMarker(contentChildren, "odm-service-introduction-description")
-    const image = extractImageAfterMarker(contentChildren, "odm-service-introduction-image", mediaData)
-
-    // 左下角描述文字 - 支持加粗和下划线格式（使用 subtitle 标记）
-    const leftDescription = extractFormattedTextAfterMarker(contentChildren, "odm-service-introduction-subtitle")
-
-    // What Is ODM 子板块
-    const whatTitle = extractTextAfterMarker(contentChildren, "odm-service-introduction-what-title")
-    const whatSubtitle = extractTextAfterMarker(contentChildren, "odm-service-introduction-what-subtitle")
-    const whatDescriptionSegments = extractFormattedTextAfterMarker(contentChildren, "odm-service-introduction-what-description")
-    const whatImage = extractImageAfterMarker(contentChildren, "odm-service-introduction-what-image", mediaData)
-
-    // Series of Products 子板块
-    const seriesTitle = extractTextAfterMarker(contentChildren, "odm-service-introduction-series-title")
-    const seriesDescription = extractTextAfterMarker(contentChildren, "odm-service-introduction-series-description")
-    const seriesImage = extractImageAfterMarker(contentChildren, "odm-service-introduction-series-image", mediaData)
-
-    // Partner 子板块
-    const partnerTitle = extractTextAfterMarker(contentChildren, "odm-service-introduction-partner-title")
-    const partnerItems = extractListItemsAfterMarker(contentChildren, "odm-service-introduction-partner-item")
-    const partnerImages = extractGalleryAfterMarker(contentChildren, "odm-service-introduction-partner-image", mediaData)
-
-    return {
-      title,
-      subtitle,
-      description,
-      image,
-      leftDescription,
-      what: {
-        title: whatTitle,
-        subtitle: whatSubtitle,
-        descriptionSegments: whatDescriptionSegments,
-        image: whatImage,
-      },
-      series: {
-        title: seriesTitle,
-        description: seriesDescription,
-        image: seriesImage,
-      },
-      partner: {
-        title: partnerTitle,
-        items: partnerItems,
-        images: partnerImages,
-      },
-      // Advantages 子板块 - 每个item带有自己的图片
-      advantages: {
-        title: extractTextAfterMarker(contentChildren, "odm-service-introduction-advantages-title"),
-        items: extractAdvantageItemsAfterMarker(contentChildren, "odm-service-introduction-advantages-item", mediaData),
-      }
-    }
-  }, [contentChildren, mediaData])
-
-  // ========================================
-  // 提取 What We Offer You Section 数据
-  // ========================================
-  const whatWeOfferData = useMemo(() => {
-    const title = extractTextAfterMarker(contentChildren, "what-we-offer-title")
-
-    // 从图片画廊获取卡片图片（3张）
-    const images = extractGalleryAfterMarker(contentChildren, "what-we-offer-image", mediaData)
-    const item1Image = images[0] || null
-    const item2Image = images[1] || null
-    const item3Image = images[2] || null
-
-    // 提取2层有序列表（标题+描述）
-    const listItems = extractTwoLevelListAfterMarker(contentChildren, "what-we-offer-item")
-
-    return {
-      title,
-      items: [
-        {
-          number: "01",
-          title: listItems[0]?.title || "Product Development",
-          description: listItems[0]?.description || "",
-          image: item1Image,
-        },
-        {
-          number: "02",
-          title: listItems[1]?.title || "Experienced Experts",
-          description: listItems[1]?.description || "",
-          image: item2Image,
-        },
-        {
-          number: "03",
-          title: listItems[2]?.title || "Marketing Support",
-          description: listItems[2]?.description || "",
-          image: item3Image,
-        },
-      ],
-    }
-  }, [contentChildren, mediaData])
-
-  // ========================================
-  // 提取 Customization Process Section 数据
-  // ========================================
-  const customizationProcessData = useMemo(() => {
-    const title = extractTextAfterMarker(contentChildren, "customization-process-title")
-    const subtitle = extractTextAfterMarker(contentChildren, "customization-process-subtitle")
-    const hint = extractTextAfterMarker(contentChildren, "customization-process-hint")
-    const stepItems = extractListItemsAfterMarker(contentChildren, "customization-process-step")
-
-    // 将步骤解析为多行格式
-    const steps = stepItems.map(item => {
-      // 按换行符分割成多行
-      const lines = item.split("\n").filter(l => l.trim())
-      return {
-        title: item,
-        lines: lines.length > 1 ? lines : undefined,
-      }
-    })
-
-    return {
-      title,
-      subtitle,
-      hint,
-      steps,
-    }
-  }, [contentChildren])
-
-  // ========================================
-  // 基础状态定义
-  // ========================================
-  const [fetchedFormConfig, setFetchedFormConfig] = useState<any>(null)
-
-  // ========================================
-  // 提取 Contact Form Section 数据
-  // ========================================
-  const contactFormData = useMemo(() => {
-    const title = extractTextAfterMarker(contentChildren, "contact-form-title")
-    const description = extractTextAfterMarker(contentChildren, "contact-form-description")
-    const image = extractImageAfterMarker(contentChildren, "contact-form-image", mediaData)
-
-    // 从 contentChildren 中直接寻找 formBlock 节点
-    const formNode = contentChildren.find(n => n.type === "formBlock") || extractAfterMarker(contentChildren, "contact-form").find(n => n.type === "formBlock")
-    const formId = formNode?.data?.formConfig?.id || formNode?.data?.id || formNode?.id
-
-    const formConfig = fetchedFormConfig || 
-                     (formNode?.data?.formConfig?.fields ? formNode.data.formConfig : null) || 
-                     (formNode?.data?.fields ? formNode.data : null) || 
-                     pageContent.formConfig
-
-    return {
-      title,
-      description,
-      image,
-      formConfig,
-      formId
-    }
-  }, [contentChildren, mediaData, pageContent.formConfig, fetchedFormConfig])
-
-  // 动态补全表单配置
-  useEffect(() => {
-    const formId = contactFormData.formId
-    if (formId && !contactFormData.formConfig?.fields) {
-      fetch(`/api/form-configs/${formId}?depth=2&locale=${locale}`)
-        .then(res => res.json())
-        .then(data => {
-          const config = data?.fields ? data : (data?.data?.fields ? data.data : data)
-          if (config?.fields) setFetchedFormConfig(config)
-        })
-        .catch(err => console.error("OemOdm Form Config Fetch Error:", err))
-    }
-  }, [contactFormData.formId, contactFormData.formConfig?.fields, locale])
-
-  // ========================================
-  // 提取 Applications Section 数据
-  // 使用 applicationCarousel 类型
-  // ========================================
-  const applicationsData = useMemo(() => {
-    const applicationIds: number[] = []
-
-    // 直接遍历所有节点查找 applicationCarousel，因为它在 applications 标记后但会被子标记中断
-    for (const node of contentChildren) {
-      // 处理 applicationCarousel 类型 - applications 数组包含 {id: number}
-      if (node.type === "applicationCarousel" && node.data?.applications) {
-        for (const app of node.data.applications) {
-          if (app.id) {
-            applicationIds.push(app.id)
-          }
-        }
-        break // 只取第一个 applicationCarousel
-      }
-    }
-
-    // 提取 Find Out More 和 Next 文本
-    const findOutMoreText = extractTextAfterMarker(contentChildren, "applications-find-out-more")
-    const nextText = extractTextAfterMarker(contentChildren, "applications-next")
-
-    return { applicationIds, findOutMoreText, nextText }
-  }, [contentChildren])
-
-  // ========================================
-  // 提取 Product Guide Section 数据
-  // 图片从产品 API 获取，不从 CMS 标记获取
-  // ========================================
-  const productGuideData = useMemo(() => {
-    const title = extractTextAfterMarker(contentChildren, "product-guide-title")
-    const description = extractTextAfterMarker(contentChildren, "product-guide-description")
-    const buttonText = extractTextAfterMarker(contentChildren, "product-guide-button")
-    const buttonLink = extractTextAfterMarker(contentChildren, "product-guide-link")
-    const exploreText = extractTextAfterMarker(contentChildren, "product-guide-explore")
-
-    return {
-      title,
-      description,
-      buttonText,
-      buttonLink,
-      exploreText,
-    }
-  }, [contentChildren])
+export function OemOdmTemplate({ locale, data }: OemOdmTemplateProps) {
+  const {
+    valueGuide,
+    brandAdvantage,
+    oemService,
+    odmService,
+    whatWeOffer,
+    customizationProcess,
+    contactForm,
+    applications,
+    productGuide,
+  } = data
 
   return (
     <main className="min-h-screen" data-header-theme="dark">
       {/* Hero Section - Value Guide */}
       <OemOdmValueGuide
-        titleLines={heroData.titleLines}
-        features={heroData.features}
-        leftDescription={heroData.description || undefined}
-        rightDescription={heroData.rightDescription || undefined}
-        leftImage={heroData.leftImage}
-        rightImage={heroData.rightImage}
+        titleLines={valueGuide.titleLines}
+        features={valueGuide.features}
+        leftDescription={valueGuide.description || undefined}
+        rightDescription={valueGuide.rightDescription || undefined}
+        leftImage={valueGuide.leftImage}
+        rightImage={valueGuide.rightImage}
       />
 
       {/* Brand Advantage Section */}
       <OemOdmBrandAdvantage
-        brandAdvantages={brandAdvantageData.items.length > 0 ? brandAdvantageData.items : undefined}
-        leftImage={brandAdvantageData.images[0] || null}
-        rightImage={brandAdvantageData.images[1] || null}
+        brandAdvantages={brandAdvantage.items.length > 0 ? brandAdvantage.items : undefined}
+        leftImage={brandAdvantage.images[0] || null}
+        rightImage={brandAdvantage.images[1] || null}
         onOemClick={() => {
           document.getElementById('oem-service-section')?.scrollIntoView({ behavior: 'smooth' })
         }}
@@ -746,36 +403,36 @@ export function OemOdmTemplate({ locale, pageContent }: OemOdmTemplateProps) {
       <div id="oem-service-section" style={{ backgroundColor: "#756f3f" }}>
         {/* OEM Service Introduction Section */}
         <OemOdmServiceIntroduction
-          image={oemServiceData.image}
-          topDescriptionSegments={oemServiceData.description.length > 0 ? oemServiceData.description : undefined}
-          leftDescriptionSegments={oemServiceData.leftDescription.length > 0 ? oemServiceData.leftDescription : undefined}
+          image={oemService.image}
+          topDescriptionSegments={oemService.description.length > 0 ? oemService.description : undefined}
+          leftDescriptionSegments={oemService.leftDescription.length > 0 ? oemService.leftDescription : undefined}
         />
 
         {/* What Is OEM Section */}
         <OemOdmWhatIsOem
-          image={oemServiceData.what.image}
-          subtitle={oemServiceData.what.subtitle || undefined}
-          descriptionSegments={oemServiceData.what.descriptionSegments.length > 0 ? oemServiceData.what.descriptionSegments : undefined}
+          image={oemService.what.image}
+          subtitle={oemService.what.subtitle || undefined}
+          descriptionSegments={oemService.what.descriptionSegments.length > 0 ? oemService.what.descriptionSegments : undefined}
         />
 
         {/* OEM Product Series Section */}
         <OemOdmProductSeries
-          title={oemServiceData.series.title || undefined}
-          description={oemServiceData.series.description || undefined}
-          image={oemServiceData.series.image}
+          title={oemService.series.title || undefined}
+          description={oemService.series.description || undefined}
+          image={oemService.series.image}
         />
 
         {/* OEM Partner Section */}
         <OemOdmPartner
-          title={oemServiceData.partner.title || undefined}
-          items={oemServiceData.partner.items.length > 0 ? oemServiceData.partner.items.map(item => ({ title: item })) : undefined}
-          images={oemServiceData.partner.images}
+          title={oemService.partner.title || undefined}
+          items={oemService.partner.items.length > 0 ? oemService.partner.items.map((item: any) => ({ title: item })) : undefined}
+          images={oemService.partner.images}
         />
 
         {/* OEM Advantages Section */}
-        <OemOdmAdvantages
-          title={oemServiceData.advantages.title || undefined}
-          items={oemServiceData.advantages.items.length > 0 ? oemServiceData.advantages.items : undefined}
+        <OemAdvantages
+          title={oemService.advantages.title || undefined}
+          items={oemService.advantages.items.length > 0 ? oemService.advantages.items : undefined}
         />
       </div>
 
@@ -788,81 +445,74 @@ export function OemOdmTemplate({ locale, pageContent }: OemOdmTemplateProps) {
       >
         {/* ODM Service Introduction Section */}
         <OdmServiceIntroduction
-          image={odmServiceData.image}
-          topDescriptionSegments={odmServiceData.description.length > 0 ? odmServiceData.description : undefined}
-          leftDescriptionSegments={odmServiceData.leftDescription.length > 0 ? odmServiceData.leftDescription : undefined}
+          image={odmService.image}
+          topDescriptionSegments={odmService.description.length > 0 ? odmService.description : undefined}
+          leftDescriptionSegments={odmService.leftDescription.length > 0 ? odmService.leftDescription : undefined}
         />
 
         {/* What Is ODM Section */}
         <OdmWhatIsOdm
-          image={odmServiceData.what.image}
-          subtitle={odmServiceData.what.subtitle || undefined}
-          descriptionSegments={odmServiceData.what.descriptionSegments.length > 0 ? odmServiceData.what.descriptionSegments : undefined}
+          image={odmService.what.image}
+          subtitle={odmService.what.subtitle || undefined}
+          descriptionSegments={odmService.what.descriptionSegments.length > 0 ? odmService.what.descriptionSegments : undefined}
         />
 
         {/* ODM Product Series Section */}
         <OdmProductSeries
-          title={odmServiceData.series.title || undefined}
-          description={odmServiceData.series.description || undefined}
-          image={odmServiceData.series.image}
+          title={odmService.series.title || undefined}
+          description={odmService.series.description || undefined}
+          image={odmService.series.image}
         />
 
         {/* ODM Partner Section */}
         <OdmPartner
-          title={odmServiceData.partner.title || undefined}
-          items={odmServiceData.partner.items.length > 0 ? odmServiceData.partner.items.map(item => ({ title: item })) : undefined}
-          images={odmServiceData.partner.images}
+          title={odmService.partner.title || undefined}
+          items={odmService.partner.items.length > 0 ? odmService.partner.items.map((item: any) => ({ title: item })) : undefined}
+          images={odmService.partner.images}
         />
 
         {/* ODM Advantages Section */}
         <OdmAdvantages
-          title={odmServiceData.advantages.title || undefined}
-          items={odmServiceData.advantages.items.length > 0 ? odmServiceData.advantages.items : undefined}
+          title={odmService.advantages.title || undefined}
+          items={odmService.advantages.items.length > 0 ? odmService.advantages.items : undefined}
         />
       </div>
 
-      {/* What We Offer You Section */}
+      {/* Common Sections */}
       <OemOdmWhatWeOffer
-        title={whatWeOfferData.title || undefined}
-        items={whatWeOfferData.items}
+        title={whatWeOffer.title || undefined}
+        items={whatWeOffer.items}
       />
 
-      {/* Customization Process Section */}
       <OemOdmCustomizationProcess
-        title={customizationProcessData.title || undefined}
-        tips={customizationProcessData.subtitle || undefined}
-        hint={customizationProcessData.hint || undefined}
-        steps={customizationProcessData.steps.length > 0 ? customizationProcessData.steps : undefined}
+        title={customizationProcess.title || undefined}
+        tips={customizationProcess.subtitle || undefined}
+        hint={customizationProcess.hint || undefined}
+        steps={customizationProcess.steps}
       />
 
-      {/* Contact Form Section */}
       <OemOdmContactForm
-        title={contactFormData.title || undefined}
-        description={contactFormData.description || undefined}
-        image={contactFormData.image}
-        formConfig={contactFormData.formConfig || pageContent.formConfig}
-        locale={locale as any}
+        title={contactForm.title || undefined}
+        description={contactForm.description || undefined}
+        image={contactForm.image}
+        formConfig={contactForm.formConfig}
       />
 
-      {/* Applications Section */}
       <OemOdmApplications
-        applicationIds={applicationsData.applicationIds}
-        locale={locale as any}
-        findOutMoreText={applicationsData.findOutMoreText || undefined}
-        nextText={applicationsData.nextText || undefined}
+        applicationIds={applications}
+        findOutMoreText={data.applicationsData?.findOutMoreText} 
+        nextText={data.applicationsData?.nextText}
       />
 
-      {/* Product Guide Section */}
       <OemOdmProductGuide
-        title={productGuideData.title || undefined}
-        description={productGuideData.description || undefined}
-        buttonText={productGuideData.buttonText || undefined}
-        buttonLink={productGuideData.buttonLink || undefined}
-        exploreText={productGuideData.exploreText || undefined}
-        locale={locale as any}
+        title={productGuide.title || undefined}
+        description={productGuide.description || undefined}
+        buttonText={productGuide.buttonText || undefined}
+        buttonLink={productGuide.buttonLink || undefined}
+        exploreText={productGuide.exploreText || undefined}
       />
     </main>
   )
 }
 
-export default OemOdmTemplate
+export default OemAdvantages

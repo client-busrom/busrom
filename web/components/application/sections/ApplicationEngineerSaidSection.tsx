@@ -10,6 +10,7 @@ function vw(px: number) {
 }
 
 interface ApplicationEngineerSaidSectionProps {
+  title?: string
   mainQuote?: string
   leftQuote?: string
   rightQuote?: string
@@ -20,6 +21,7 @@ interface ApplicationEngineerSaidSectionProps {
 }
 
 export function ApplicationEngineerSaidSection({
+  title = "The Engineer\nSaid",
   mainQuote = "For Busrom, design is never mere fantasy, but a precise balance of mechanics and aesthetics.",
   leftQuote = "Through a rigorous manufacturing system, Busrom transforms abstract concepts into tangible works of art.",
   rightQuote = "Every adjustment in craftsmanship and every dimension controlled embodies our pursuit of ultimate reliability.",
@@ -70,7 +72,7 @@ export function ApplicationEngineerSaidSection({
             style={{ left: vw(155), top: vw(152), width: vw(305), height: vw(215) }}
           >
             <p 
-              className="text-black" 
+              className="text-black whitespace-pre-line" 
               style={{ 
                 fontSize: vw(30), 
                 lineHeight: vw(43),
@@ -81,20 +83,30 @@ export function ApplicationEngineerSaidSection({
             </p>
           </motion.div>
 
-          {/* Right Quote - Amiri Quran (Scaled position) */}
+          {/* 1. Right Top Stadium-Oval */}
           <motion.div 
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-            className="absolute" 
-            style={{ left: vw(1539), top: vw(64), width: vw(203), height: vw(210) }}
+            className="absolute flex items-center justify-center translate-x-[-2vw]" 
+            style={{ 
+              left: vw(1446), 
+              top: vw(0), 
+              width: vw(340), 
+              height: 'auto',
+              minHeight: vw(450),
+              border: '0.5px solid rgba(0,0,0,0.7)', 
+              borderRadius: '50% / 30%', 
+              zIndex: 20,
+              padding: `${vw(100)} ${vw(50)}`
+            }}
           >
             <p 
-              className="text-black" 
+              className="text-black text-center whitespace-pre-line" 
               style={{ 
-                fontSize: vw(24), 
-                lineHeight: vw(35),
+                fontSize: vw(26), 
+                lineHeight: vw(38),
                 fontFamily: 'var(--font-amiri), serif'
               }}
             >
@@ -102,60 +114,51 @@ export function ApplicationEngineerSaidSection({
             </p>
           </motion.div>
 
-          {/* Engineer Identity (Center Bottom) */}
-          <div className="absolute flex flex-col items-center" style={{ left: vw(805), top: vw(626), width: vw(316) }}>
-            <span 
-              className="text-black" 
-              style={{ 
-                fontSize: vw(60), 
-                lineHeight: vw(76),
-                fontFamily: 'Jomhuria, sans-serif'
-              }}
-            >
-              The engineer
-            </span>
-            <span 
-              className="text-black" 
-              style={{ 
-                fontSize: vw(150), 
-                lineHeight: vw(91),
-                fontFamily: 'Jomhuria, sans-serif',
-                marginTop: vw(-15)
-              }}
-            >
-              said
-            </span>
+          {/* 2. Center Bottom Stadium-Oval */}
+          <div 
+            className="absolute flex flex-col items-center justify-center" 
+            style={{ 
+              left: vw(743), 
+              top: vw(453), 
+              width: vw(440), 
+              height: 'auto',
+              minHeight: vw(500),
+              border: '0.5px solid rgba(0,0,0,0.7)', 
+              borderRadius: '50% / 30%', 
+              zIndex: 20,
+              padding: `${vw(120)} 0`
+            }}
+          >
+            {/* translate-y moved to 4vw to push it even lower given larger text */}
+            <div className="flex flex-col items-center translate-y-[4vw]">
+              <div 
+                className="text-black text-center whitespace-pre-line" 
+                style={{ 
+                  fontFamily: 'Jomhuria, sans-serif'
+                }}
+              >
+                <span style={{ fontSize: vw(60), lineHeight: vw(70), display: 'block' }}>
+                  {title.split('\n')[0]}
+                </span>
+                {title.includes('\n') && (
+                  <span style={{ fontSize: vw(140), lineHeight: vw(110), display: 'block', marginTop: vw(-15) }}>
+                    {title.split('\n')[1]}
+                  </span>
+                )}
+              </div>
+              
+              {/* Group 246 (Dots under title) */}
+              <motion.div 
+                initial={{ opacity: 0.6 }}
+                animate={{ opacity: [0.6, 1, 0.6] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="mt-[2vw]"
+                style={{ width: vw(86), height: vw(16) }}
+              >
+                <Image src="/images/application/Group 246.svg" alt="vector" width={86} height={16} className="object-contain" unoptimized />
+              </motion.div>
+            </div>
           </div>
-
-          {/* Image Containers */}
-          
-          {/* Rectangle 431 - Top Right smaller image */}
-          <motion.div 
-            whileHover={{ 
-              x: [0, -2, 2, -2, 2, 0],
-              y: [0, 1, -1, 1, -1, 0],
-              rotate: [0, -1, 1, -1, 1, 0],
-              transition: { duration: 0.2, repeat: Infinity, ease: "linear" } 
-            }}
-            className="absolute overflow-hidden cursor-pointer" 
-            style={{ left: vw(1516), top: vw(0), width: vw(241), height: vw(347), border: '1px solid black', borderRadius: vw(184), zIndex: 20 }}
-          >
-            <Image src={workImage} alt="Work" fill className="object-cover" unoptimized />
-          </motion.div>
-
-          {/* Rectangle 430 - Center large engineer image */}
-          <motion.div 
-            whileHover={{ 
-              x: [0, -1, 1, -1, 1, 0],
-              y: [0, 2, -2, 2, -2, 0],
-              rotate: [0, 0.5, -0.5, 0.5, -0.5, 0],
-              transition: { duration: 0.15, repeat: Infinity, ease: "linear" } 
-            }}
-            className="absolute overflow-hidden cursor-pointer" 
-            style={{ left: vw(779), top: vw(453), width: vw(368), height: vw(459), border: '1px solid black', borderRadius: vw(184), zIndex: 20 }}
-          >
-            <Image src={engineerImage} alt="Engineer" fill className="object-cover" unoptimized />
-          </motion.div>
 
           {/* Explore More Button — Layered Clipping Approach (Black outside, White inside) */}
           <Link
@@ -223,16 +226,54 @@ export function ApplicationEngineerSaidSection({
           </Link>
 
 
-          {/* Background Decorative Blobs (Boolean Operations) */}
-          {/* ImageSvg1 - Left middle */}
-          <div className="absolute pointer-events-none" style={{ left: vw(166), top: vw(512), width: vw(466), height: vw(365) }}>
-             <Image src="/images/application/ImageSvg1.svg" alt="Decoration 1" fill className="object-contain" unoptimized />
-          </div>
+          {/* Background Decorative Blobs (Masked Image Approach) */}
+          {/* ImageSvg1 - Left middle BOTTOM - Rendering workImage */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="absolute overflow-hidden" 
+            style={{ 
+              left: vw(166), 
+              top: vw(512), 
+              width: vw(466), 
+              height: vw(365),
+              maskImage: 'url(/images/application/ImageSvg1.svg)',
+              maskRepeat: 'no-repeat',
+              maskSize: 'contain',
+              maskPosition: 'center',
+              WebkitMaskImage: 'url(/images/application/ImageSvg1.svg)',
+              WebkitMaskRepeat: 'no-repeat',
+              WebkitMaskSize: 'contain',
+              WebkitMaskPosition: 'center',
+            }}
+          >
+             {workImage && <Image src={workImage} alt="Work Decoration" fill className="object-cover" unoptimized />}
+          </motion.div>
 
-          {/* ImageSvg2 - Right Bottom */}
-          <div className="absolute pointer-events-none" style={{ left: vw(1357), top: vw(489), width: vw(407), height: vw(417) }}>
-             <Image src="/images/application/ImageSvg2.svg" alt="Decoration 2" fill className="object-contain" unoptimized />
-          </div>
+          {/* ImageSvg2 - Right Bottom - Rendering engineerImage */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="absolute overflow-hidden" 
+            style={{ 
+              left: vw(1357), 
+              top: vw(489), 
+              width: vw(407), 
+              height: vw(417),
+              maskImage: 'url(/images/application/ImageSvg2.svg)',
+              maskRepeat: 'no-repeat',
+              maskSize: 'contain',
+              maskPosition: 'center',
+              WebkitMaskImage: 'url(/images/application/ImageSvg2.svg)',
+              WebkitMaskRepeat: 'no-repeat',
+              WebkitMaskSize: 'contain',
+              WebkitMaskPosition: 'center',
+            }}
+          >
+             {engineerImage && <Image src={engineerImage} alt="Engineer Decoration" fill className="object-cover" unoptimized />}
+          </motion.div>
 
           {/* Floating Vectors */}
 
@@ -271,16 +312,6 @@ export function ApplicationEngineerSaidSection({
             className="absolute" style={{ transformOrigin: 'bottom right', left: vw(1334), top: vw(450), width: vw(76), height: vw(64) }}
           >
              <Image src="/images/application/Group 253.svg" alt="vector" fill className="object-contain" unoptimized />
-          </motion.div>
-
-          {/* Group 246 (Bottom Center near Said) */}
-          <motion.div 
-            initial={{ opacity: 0.6 }}
-            animate={{ opacity: [0.6, 1, 0.6] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="absolute" style={{ left: vw(917), top: vw(829), width: vw(86), height: vw(16) }}
-          >
-             <Image src="/images/application/Group 246.svg" alt="vector" fill className="object-contain" unoptimized />
           </motion.div>
         </div>
 

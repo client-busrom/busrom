@@ -7,10 +7,11 @@ const vw = (px: number) => `${(px / 1920) * 100}vw`
 interface ApplicationMoreCasesSectionProps {
   locale: string
   data: {
-    title: { text: string; bold: boolean }[]
+    title: { text: string; bold?: boolean }[]
     tips?: string
     ctaText?: string
     ctaHref?: string
+    applications?: any[]
   }
 }
 
@@ -20,22 +21,25 @@ interface SeriesData {
   images: any[]
 }
 
-interface ApplicationMoreCasesSectionProps {
-  locale: string
-  data: {
-    title: { text: string; bold: boolean }[]
-    tips?: string
-    ctaText?: string
-    ctaHref?: string
-  }
-}
-
 export function ApplicationMoreCasesSection({ locale, data }: ApplicationMoreCasesSectionProps) {
-  const [seriesList, setSeriesList] = useState<SeriesData[]>([])
+  const [seriesList, setSeriesList] = useState<SeriesData[]>(() => {
+    // Initialize from props if available
+    if (data.applications && data.applications.length > 0) {
+      return data.applications.map(app => ({
+        id: String(app.id),
+        name: app.title || "",
+        images: Array.isArray(app.image) ? app.image : [app.image]
+      }))
+    }
+    return []
+  })
   const [activeIndex, setActiveIndex] = useState(0)
   const lastClickTime = React.useRef(0)
 
   useEffect(() => {
+    // Only fetch if we don't have data from props
+    if (data.applications && data.applications.length > 0) return
+
     const fetchData = async () => {
       try {
         const res = await fetch(`/api/more-cases?locale=${locale}`)
@@ -48,7 +52,7 @@ export function ApplicationMoreCasesSection({ locale, data }: ApplicationMoreCas
       }
     }
     fetchData()
-  }, [locale])
+  }, [locale, data.applications])
 
   const handleNext = () => {
     if (seriesList.length === 0) return
