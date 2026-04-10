@@ -143,3 +143,19 @@ export function resolveMediaFromNodes(
   
   return result;
 }
+
+/**
+ * Extracts total text content from a Lexical node or array of nodes
+ */
+export function getNodeTotalText(node: any): string {
+  if (!node) return "";
+  if (Array.isArray(node)) return node.map(getNodeTotalText).join("");
+  if (typeof node === "string") return node;
+  if (node.type === "linebreak") return "\n";
+  if (node.type === "paragraph" || node.type === "quote" || node.type === "heading" || node.type === "listitem") {
+    return getNodeTotalText(node.children) + "\n";
+  }
+  if (node.text) return node.text;
+  if (node.children) return getNodeTotalText(node.children);
+  return "";
+}

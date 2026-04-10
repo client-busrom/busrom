@@ -3,13 +3,6 @@
 import { useState, useEffect } from "react"
 import type { Locale } from "@/i18n.config"
 import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
-import { ServiceOverviewTemplate } from "./ServiceOverviewTemplate"
-import { ContactUsTemplate } from "./ContactUsTemplate"
-import { OemOdmTemplate } from "./OemOdmTemplate"
-import { OneStopSolutionTemplate } from "./OneStopSolutionTemplate"
-import { ApplicationTemplate } from "./ApplicationTemplate"
-import { OurStoryTemplate } from "./OurStoryTemplate"
-import { SupportTemplate } from "./SupportTemplate"
 
 interface PageContent {
   id: string
@@ -41,6 +34,10 @@ interface TemplatePageProps {
   template?: string
 }
 
+/**
+ * TemplatePage - Legacy Generic Template Router (CSR)
+ * Now primarily acts as a fallback for pages that haven't been migrated to SSR.
+ */
 export function TemplatePage({ locale, slug, template }: TemplatePageProps) {
   const [pageContent, setPageContent] = useState<PageContent | null>(null)
   const [loading, setLoading] = useState(true)
@@ -109,52 +106,6 @@ export function TemplatePage({ locale, slug, template }: TemplatePageProps) {
     )
   }
 
-  // Render template-specific content
-  // SERVICE_OVERVIEW template
-  if (template === "SERVICE_OVERVIEW") {
-    return (
-      <ServiceOverviewTemplate
-        locale={locale}
-        pageContent={pageContent}
-      />
-    )
-  }
-
-  // CONTACT_US template
-  if (template === "CONTACT_US") {
-    return (
-      <ContactUsTemplate
-        locale={locale}
-        pageContent={pageContent}
-      />
-    )
-  }
-
-  // OEM_ODM template
-  if (template === "OEM_ODM") {
-    return <OemOdmTemplate locale={locale} pageContent={pageContent} />
-  }
-
-  // ONE_STOP_SOLUTION template (legacy ONE_STOP_SHOP)
-  if (template === "ONE_STOP_SHOP" || template === "ONE_STOP_SOLUTION") {
-    return <OneStopSolutionTemplate locale={locale} pageContent={pageContent} />
-  }
-
-  // APPLICATION template
-  if (template === "APPLICATION") {
-    return <ApplicationTemplate locale={locale} pageContent={pageContent as any} />
-  }
-
-  // OUR_STORY template
-  if (template === "OUR_STORY") {
-    return <OurStoryTemplate locale={locale} pageContent={pageContent as any} />
-  }
-
-  // SUPPORT template
-  if (template === "SUPPORT") {
-    return <SupportTemplate locale={locale} pageContent={pageContent as any} />
-  }
-
   // Default fallback to document renderer
   return (
     <div className="min-h-screen bg-background pt-20" data-header-theme="light">
@@ -172,9 +123,6 @@ export function TemplatePage({ locale, slug, template }: TemplatePageProps) {
             {pageContent.title}
           </h1>
         )}
-
-        {/* Template-specific rendering will be added here in the future */}
-        {/* For now, we'll use the document renderer as a placeholder */}
 
         {pageContent.content && (
           <div className="prose prose-lg max-w-none">
