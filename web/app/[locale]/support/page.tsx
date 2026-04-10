@@ -1,9 +1,12 @@
 import type { Locale } from "@/i18n.config"
-import { TemplatePage } from "@/components/templates/TemplatePage"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import { getPageMetadata } from "@/lib/api/seo-settings"
 import type { Metadata } from "next"
+import { fetchPageData } from "@/lib/api/pages"
+import { parseSupportData } from "@/lib/parsers/support-parser"
+import { SupportTemplate } from "@/components/templates/SupportTemplate"
+import { notFound } from "next/navigation"
 
 export async function generateMetadata({
   params,
@@ -26,13 +29,47 @@ export default async function SupportPage({
   params: Promise<{ locale: Locale }>
 }) {
   const { locale } = await params
+  const rawData = await fetchPageData("support", locale)
+
+  if (!rawData) {
+    return notFound()
+  }
+
+  const parsedData = parseSupportData(locale, rawData)
+
+  // Resolve applications data for the support applications section
+  const allApplications = rawData.applications || []
+  const resolvedApplications = parsedData.applications.applicationIds.map(id => {
+    const app = allApplications.find((a: any) => String(a.id || a) === String(id))
+    if (!app) return null
+
+    // Image priority: slim image -> mainImage -> sceneGallery fallback
+    let appImage = app.image || app.mainImage
+    if (!appImage && app.sceneGallery?.length > 0) {
+      const firstGroup = app.sceneGallery.find((g: any) => g.images?.length > 0)
+      if (firstGroup) appImage = firstGroup.images[0]
+    }
+
+    return {
+      id: app.id,
+      title: app.title || app.name || "",
+      image: appImage,
+      description: app.subtitle || app.shortDescription || ""
+    }
+  }).filter(Boolean)
 
   return (
     <>
       <PageScripts path="/support" pageType="support" position="header" />
       <PageScripts path="/support" pageType="support" position="body_start" />
       <PageSeoInjector path="/support" pageType="support" locale={locale} />
-      <TemplatePage locale={locale} slug="support" template="SUPPORT" />
+      
+      <SupportTemplate 
+        locale={locale} 
+        data={parsedData} 
+        resolvedApplications={resolvedApplications as any[]} 
+      />
+      
       <PageScripts path="/support" pageType="support" position="footer" />
     </>
   )

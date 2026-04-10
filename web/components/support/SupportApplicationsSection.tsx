@@ -45,8 +45,14 @@ export const SupportApplicationsSection: React.FC<SupportApplicationsSectionProp
   const lastFetchedIdsRef = useRef<string>("")
   
   useEffect(() => {
+    // Skip client-side fetch if items are already provided (SSR)
+    if (items && items.length > 0) {
+      setLoading(false)
+      return
+    }
+
     const fetchApps = async () => {
-      const ids = carouselConfig?.applications?.map((a: any) => a.id).filter(Boolean) || applicationIds || []
+      const ids = applicationIds.length > 0 ? applicationIds : (carouselConfig?.applications?.map((a: any) => a.id).filter(Boolean) || [])
       const idsStr = ids.join(',')
       
       if (idsStr === lastFetchedIdsRef.current && fetchedApplications.length > 0) return
@@ -80,13 +86,12 @@ export const SupportApplicationsSection: React.FC<SupportApplicationsSectionProp
       }
     }
     fetchApps()
-  }, [applicationIds?.join(','), locale, JSON.stringify(carouselConfig?.applications)])
+  }, [applicationIds?.join(','), locale, JSON.stringify(carouselConfig?.applications), items?.length])
 
   const validItems = useMemo(() => {
-    const hasDynamicApps = applicationIds.length > 0 || (carouselConfig?.applications && carouselConfig.applications.length > 0)
-    if (hasDynamicApps) return fetchedApplications
-    return items?.length > 0 ? items : []
-  }, [applicationIds.length, carouselConfig?.applications?.length, fetchedApplications, items])
+    if (items && items.length > 0) return items
+    return fetchedApplications
+  }, [fetchedApplications, items])
   
   const duplicatedItems = useMemo(() => {
     if (validItems.length === 0) return []

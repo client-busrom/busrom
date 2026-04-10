@@ -1,9 +1,12 @@
 import type { Locale } from "@/i18n.config"
-import { TemplatePage } from "@/components/templates/TemplatePage"
+import { OneStopSolutionTemplate } from "@/components/templates/OneStopSolutionTemplate"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import { getPageMetadata } from "@/lib/api/seo-settings"
+import { fetchPageData } from "@/lib/api/pages"
+import { parseOneStopData } from "@/lib/parsers/one-stop-solution-parser"
 import type { Metadata } from "next"
+import { notFound } from "next/navigation"
 
 export async function generateMetadata({
   params,
@@ -20,6 +23,9 @@ export async function generateMetadata({
   return getPageMetadata('/service/one-stop-solution', 'one_stop_solution', locale, defaultMetadata)
 }
 
+/**
+ * OneStopSolutionPage - High-Performance SSR Entry Point
+ */
 export default async function OneStopSolutionPage({
   params,
 }: {
@@ -27,12 +33,25 @@ export default async function OneStopSolutionPage({
 }) {
   const { locale } = await params
 
+  // 1. 服务端获取多维数据 (应用了 ISR 缓存)
+  const pageData = await fetchPageData("one-stop-solution", locale)
+  
+  if (!pageData) {
+    notFound()
+  }
+
+  // 2. 服务端数据映射与脱水逻辑
+  const parsedData = parseOneStopData(pageData, locale)
+
   return (
     <>
       <PageScripts path="/service/one-stop-solution" pageType="one_stop_solution" position="header" />
       <PageScripts path="/service/one-stop-solution" pageType="one_stop_solution" position="body_start" />
       <PageSeoInjector path="/service/one-stop-solution" pageType="one_stop_solution" locale={locale} />
-      <TemplatePage locale={locale} slug="one-stop-solution" template="ONE_STOP_SOLUTION" />
+      
+      {/* 渲染 SSR 模板 */}
+      <OneStopSolutionTemplate locale={locale} data={parsedData} />
+      
       <PageScripts path="/service/one-stop-solution" pageType="one_stop_solution" position="footer" />
     </>
   )

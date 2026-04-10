@@ -11,9 +11,26 @@ export const resolveAllMedia = async (content: any, cmsUrl: string, normalize: (
 
   const extractId = (val: any): string | null => {
     if (!val) return null;
-    if (typeof val === 'string' || typeof val === 'number') return String(val);
-    if (typeof val === 'object' && val.id) return String(val.id);
-    return null;
+    let id: string = "";
+    
+    if (typeof val === 'string' || typeof val === 'number') {
+      id = String(val);
+    } else if (typeof val === 'object' && val.id) {
+      id = String(val.id);
+    } else {
+      return null;
+    }
+
+    // Filter out obvious non-ID strings that cause 500 errors in Payload/Postgres
+    // 1. Icon identifiers (contain colons like 'lucide:user')
+    if (id.includes(':')) return null;
+    // 2. Common markers or field names accidentally passed as values
+    const blacklisted = ['image', 'icon', 'media', 'none', 'null', 'undefined', 'true', 'false'];
+    if (blacklisted.includes(id.toLowerCase())) return null;
+    // 3. If the ID is purely non-alphanumeric and not a number, it's likely garbage
+    if (!/^[a-zA-Z0-9_\-]+$/.test(id)) return null;
+
+    return id;
   };
 
   // 1. 深度递归扫描：收集所有常规媒体 ID 和案例 (Application) ID
@@ -33,7 +50,7 @@ export const resolveAllMedia = async (content: any, cmsUrl: string, normalize: (
     }
 
     // 提取媒体 ID
-    const mediaFields = ['image', 'icon', 'media', 'backgroundImage', 'mainImage'];
+    const mediaFields = ['image', 'icon', 'media', 'backgroundImage', 'mainImage', 'showImage', 'featuredImage', 'bgImage', 'logo', 'avatar'];
     mediaFields.forEach(f => {
       const id = extractId(node[f]);
       if (id) mediaIds.add(id);
@@ -43,6 +60,20 @@ export const resolveAllMedia = async (content: any, cmsUrl: string, normalize: (
     if (node.application) {
       const id = extractId(node.application);
       if (id) applicationIds.add(id);
+    }
+    // Handle array of applications (e.g. in applicationCarousel)
+    if (node.applications && Array.isArray(node.applications)) {
+      node.applications.forEach((app: any) => {
+        const id = extractId(app);
+        if (id) applicationIds.add(id);
+      });
+    }
+    // Also handle applicationIds field occasionally used
+    if (node.applicationIds && Array.isArray(node.applicationIds)) {
+      node.applicationIds.forEach((id: any) => {
+        const extracted = extractId(id);
+        if (extracted) applicationIds.add(extracted);
+      });
     }
 
     // 递归处理数组和对象
@@ -142,5 +173,5 @@ export const resolveAllMedia = async (content: any, cmsUrl: string, normalize: (
     }
   });
 
-  return { content, mediaData };
+  return { content, mediaData, products: Array.isArray(content) ? content : undefined };
 };

@@ -2,18 +2,18 @@ import type { Metadata } from "next"
 import type { Locale } from "@/i18n.config"
 import { Suspense } from "react"
 import { HomeContent } from "@/lib/content-data"
-import { getHomeContent } from "@/lib/api/home"
+import { getHomeRawData } from "@/lib/api/home"
+import { parseHomeData } from "@/lib/parsers/home-parser"
 import { getHomePageSeo, buildMetadata } from "@/lib/api/seo-settings"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
-
-// 首页客户端组件 (带轮播)
 import { HomePageClient } from "./HomePageClient"
+import { cookies } from "next/headers"
 
-// 强制动态渲染，避免构建时预渲染失败（CMS 不可用）
+// Force dynamic rendering to ensure fresh content and cookie-based strategy support
 export const dynamic = 'force-dynamic'
 
-// 动态 SEO 元数据
+// Generate SEO Metadata
 export async function generateMetadata({
   params
 }: {
@@ -21,7 +21,6 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params
 
-  // 默认首页元数据
   const defaultMetadata: Metadata = {
     title: locale === 'zh' ? 'Busrom - 专业玻璃五金制造商' : 'Busrom - Professional Glass Hardware Manufacturer',
     description: locale === 'zh'
@@ -29,40 +28,28 @@ export async function generateMetadata({
       : 'Leading manufacturer of premium glass hardware products for global markets.',
   }
 
-  // 首页使用 global 的 title 和 description
   const { setting } = await getHomePageSeo(locale)
   return buildMetadata(setting, defaultMetadata)
 }
 
-// Helper: 从 variant 提取 URL
-function getVariantUrl(variant: string | { url?: string } | undefined): string | null {
-  if (!variant) return null
-  if (typeof variant === 'string') return variant
-  return variant.url || null
-}
-
-// 提取 LCP 图片 URLs 用于 preload
+// Helper: Extract LCP image URLs for preloading
 function getLCPImageUrls(content: HomeContent): string[] {
   const urls: string[] = []
   const firstBanner = content.heroBanner?.[0]
   if (!firstBanner?.images) return urls
 
-  // 预加载前3张图片（背景图 + 两张装饰图）
+  // Preload first 3 images (background + decorative elements)
   for (let i = 0; i < Math.min(3, firstBanner.images.length); i++) {
     const image = firstBanner.images[i]
     if (!image) continue
-
-    const url = getVariantUrl(image.variants?.large)
-      || getVariantUrl(image.variants?.desktop)
-      || image.url
-
-    if (url) urls.push(url)
+    const url = image.variants?.large || image.variants?.desktop || image.url
+    if (typeof url === 'string') urls.push(url)
   }
 
   return urls
 }
 
-// 首屏骨架屏
+// Skeleton loading state
 function HomePageSkeleton() {
   return (
     <main className="min-h-screen">
@@ -71,19 +58,29 @@ function HomePageSkeleton() {
   )
 }
 
-import { cookies } from "next/headers";
-
-// 首页内容加载器
+// Home content loader with SSR Parser
 async function HomeContentLoader({ locale }: { locale: Locale }) {
-  const cookieStore = await cookies();
-  const strategy = cookieStore.get('cdn_strategy')?.value;
+  const cookieStore = await cookies()
+  const strategy = cookieStore.get('cdn_strategy')?.value
   
-  const content = await getHomeContent(locale, strategy) as HomeContent;
+  // 1. Fetch Raw Data
+  const rawData = await getHomeRawData(locale)
+  
+  if (!rawData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Service Temporarily Unavailable</p>
+      </div>
+    )
+  }
+
+  // 2. Parse Data on Server
+  const content = parseHomeData(rawData, locale, strategy)
   const lcpImageUrls = getLCPImageUrls(content)
 
   return (
     <>
-      {/* Preload LCP images */}
+      {/* Preload critical LCP images */}
       {lcpImageUrls.map((url) => (
         <link
           key={url}
@@ -107,15 +104,12 @@ export default async function Home({
 }: {
   params: Promise<{ locale: Locale }>
 }) {
-  const { locale } = await params;
+  const { locale } = await params
 
   return (
     <>
-      {/* Page-specific scripts for homepage */}
       <PageScripts path="/" pageType="home" position="header" />
       <PageScripts path="/" pageType="home" position="body_start" />
-
-      {/* Hidden SEO content injection - Homepage special logic */}
       <PageSeoInjector path="/" pageType="home" locale={locale} isHomePage={true} />
 
       <Suspense fallback={<HomePageSkeleton />}>

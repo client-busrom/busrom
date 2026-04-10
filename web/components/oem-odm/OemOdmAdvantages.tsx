@@ -129,7 +129,7 @@ function BubbleText({ text, isActive }: { text: string; isActive: boolean }) {
   )
 }
 
-export function OemOdmAdvantages({
+export function OemAdvantages({
   title = defaultContent.title,
   items = defaultContent.items,
 }: OemOdmAdvantagesProps) {
@@ -608,4 +608,4 @@ export function OemOdmAdvantages({
   )
 }
 
-export default OemOdmAdvantages
+export default OemAdvantages
