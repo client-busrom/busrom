@@ -5,6 +5,7 @@ const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || proces
 
 // CDN Domain configuration
 import { convertToCDNUrl } from '@/lib/cdn-url'
+import { getRandomAppImage } from '@/lib/image-utils'
 
 /**
  * Transform Payload sizes to frontend variants format
@@ -119,24 +120,10 @@ export async function GET(request: NextRequest) {
     console.log('[Applications API] Received applications:', data.totalDocs)
 
     // Server-side Double-Random Selection (Scene -> Image)
-    // This approach is more memory-efficient and ensures equal weight for each scene
+    // This approach uses the shared getRandomAppImage utility for consistency
     const optimizedDocs = (data.docs || []).map((app: any) => {
-      let selectedImage = null
-
-      // Filter scenes that have valid images
-      const validScenes = (app.sceneGallery || []).filter((scene: any) => 
-        scene.images && Array.isArray(scene.images) && scene.images.length > 0
-      )
-
-      if (validScenes.length > 0) {
-        // 1. Randomly pick a scene
-        const randomScene = validScenes[Math.floor(Math.random() * validScenes.length)]
-        
-        // 2. Randomly pick an image from that scene
-        const images = randomScene.images
-        const picked = images[Math.floor(Math.random() * images.length)]
-        selectedImage = picked?.image || picked
-      }
+      // 1. Pick a random image using the standardized utility
+      const selectedImage = getRandomAppImage(app)
 
       // 3. Construct a lean object for the frontend
       return {
