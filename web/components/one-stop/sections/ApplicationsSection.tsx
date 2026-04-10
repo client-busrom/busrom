@@ -240,8 +240,7 @@ export function ApplicationsSection({ title, items, locale }: ApplicationsSectio
                        image={item.image} 
                        alt={item.title} 
                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                       size="large"
-                       loading="eager"
+                       size="medium"
                      />
                      <div className="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <h3 className="text-white text-[24px] font-bold" style={{ fontFamily: "var(--font-anaheim)" }}>{item.title}</h3>
