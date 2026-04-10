@@ -1,4 +1,5 @@
 import { convertToCDNUrl } from "./cdn-url";
+import { getRandomAppImage } from "./image-utils";
 
 /**
  * 递归扫描 Lexical 内容中的媒体 ID 和案例 ID
@@ -76,24 +77,9 @@ export const resolveAllMedia = async (content: any, cmsUrl: string, normalize: (
         
         docs.forEach((appDoc: any) => {
           const id = String(appDoc.id);
-          const allSceneImages: any[] = [];
           
-          if (Array.isArray(appDoc.sceneGallery)) {
-            appDoc.sceneGallery.forEach((scene: any) => {
-              if (Array.isArray(scene.images)) {
-                scene.images.forEach((img: any) => {
-                  if (img) allSceneImages.push(img);
-                });
-              }
-            });
-          }
-
-          let selectedImage: any = null;
-          if (allSceneImages.length > 0) {
-            selectedImage = allSceneImages[Math.floor(Math.random() * allSceneImages.length)];
-          } else {
-            selectedImage = appDoc.mainImage || appDoc.image;
-          }
+          // Use the standardized Double-Random selector
+          const selectedImage = getRandomAppImage(appDoc);
 
           const selectedImageId = extractId(selectedImage);
           if (selectedImageId) {

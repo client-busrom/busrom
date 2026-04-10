@@ -66,7 +66,10 @@ export function middleware(request: NextRequest) {
         sameSite: 'lax',
       });
     }
-    // 增加缓存隔离头
+    // 增加调试头和缓存隔离头
+    res.headers.set('x-cdn-strategy-debug', newStrategy || existingStrategy || 'none');
+    res.headers.set('x-viewer-country', country || 'unknown');
+    res.headers.set('x-is-localhost', String(isLocalhost));
     res.headers.set('Vary', 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, CloudFront-Viewer-Country, Cookie');
     return res;
   };
