@@ -259,7 +259,14 @@ export function TrustSection({ title, items, images = [], bgImage }: TrustSectio
                 animate={{ 
                     y: [0, 10]
                 }}
-                whileHover={{ scale: 1.03, x: 20, y: -20, rotate: 10 }}
+                whileHover={{ 
+                  scale: 1.03, 
+                  x: 20, 
+                  y: -20, 
+                  rotate: 10,
+                  zIndex: 50,
+                  transition: { duration: 0.3 }
+                }}
                 whileTap={{ scale: 0.98 }}
                 transition={{
                     y: { duration: 2.5, repeat: Infinity, repeatType: "reverse", ease: "easeInOut", delay: 0.5 },

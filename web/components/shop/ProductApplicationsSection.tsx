@@ -334,8 +334,6 @@ export function ProductApplicationsSection({
                     image={app.image as any}
                     alt={app.title}
                     size="large"
-                    loading="eager"
-                    priority={index < 4}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                 ) : (
