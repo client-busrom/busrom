@@ -118,40 +118,25 @@ export async function GET(request: NextRequest) {
     const data = await response.json()
     console.log('[Applications API] Received applications:', data.totalDocs)
 
-    // Server-side Pooled Random Selection & Data Thinning
+    // Server-side Double-Random Selection (Scene -> Image)
+    // This approach is more memory-efficient and ensures equal weight for each scene
     const optimizedDocs = (data.docs || []).map((app: any) => {
-      // 1. Collect all potential images into a flat pool
-      const pool: any[] = []
-      
-      // Root images
-      if (app.images && Array.isArray(app.images)) {
-        app.images.forEach((item: any) => {
-          const img = item.image || item
-          if (img && (img.url || img.file?.url)) pool.push(img)
-        })
-      }
-      
-      // Scene gallery images
-      if (app.sceneGallery && Array.isArray(app.sceneGallery)) {
-        app.sceneGallery.forEach((scene: any) => {
-          if (scene.images && Array.isArray(scene.images)) {
-            scene.images.forEach((item: any) => {
-              const img = item.image || item
-              if (img && (img.url || img.file?.url)) pool.push(img)
-            })
-          }
-        })
-      }
-      
-      // Main image fallback
-      if (app.mainImage && (app.mainImage.url || app.mainImage.file?.url)) {
-        pool.push(app.mainImage)
-      }
+      let selectedImage = null
 
-      // 2. Pick ONE random image
-      const selectedImage = pool.length > 0 
-        ? pool[Math.floor(Math.random() * pool.length)] 
-        : null
+      // Filter scenes that have valid images
+      const validScenes = (app.sceneGallery || []).filter((scene: any) => 
+        scene.images && Array.isArray(scene.images) && scene.images.length > 0
+      )
+
+      if (validScenes.length > 0) {
+        // 1. Randomly pick a scene
+        const randomScene = validScenes[Math.floor(Math.random() * validScenes.length)]
+        
+        // 2. Randomly pick an image from that scene
+        const images = randomScene.images
+        const picked = images[Math.floor(Math.random() * images.length)]
+        selectedImage = picked?.image || picked
+      }
 
       // 3. Construct a lean object for the frontend
       return {
@@ -160,7 +145,7 @@ export async function GET(request: NextRequest) {
         name: app.title || app.name || "",
         category: app.category?.name || app.category?.title || "",
         // Just return the one selected image with its essential metadata
-        image: selectedImage ? {
+        image: (selectedImage && (selectedImage.url || selectedImage.file?.url)) ? {
           id: selectedImage.id,
           url: convertToCDNUrl(selectedImage.url || selectedImage.file?.url, strategy),
           alt: selectedImage.alt || app.name,
