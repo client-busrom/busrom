@@ -114,10 +114,10 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
         <Preloader onLoadingComplete={handlePreloaderComplete} config={preloaderConfig} />
       )}
 
-      {/* ImageWall - 只在图片墙阶段渲染 */}
-      {showImageWall && (
+      {/* ImageWall - 始终渲染但控制可见性，避免加载 JS 导致的白屏 */}
+      {preloaderConfig.imageWallEnabled && (
         <ImageWall
-          isActive={true}
+          isActive={loadingStage === "imageWall"}
           onComplete={handleImageWallComplete}
           images={preloaderConfig.images}
           backgroundColor={preloaderConfig.backgroundColor}

@@ -2,9 +2,8 @@
 
 import * as React from "react";
 import type { HomeContent } from "@/lib/content-data";
-import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { OptimizedBackgroundImage } from "@/components/ui/OptimizedImage";
+import { OptimizedImage, OptimizedBackgroundImage } from "@/components/ui/OptimizedImage";
 import {
   Carousel,
   CarouselContent,
@@ -169,12 +168,11 @@ export default function BrandAnalysis({ data }: Props) {
                       }}
                     >
                       {center.largeImage && (
-                        <Image
-                          src={center.largeImage}
+                        <OptimizedImage
+                          image={center.largeImage}
                           alt={center.title}
-                          fill
-                          className="object-cover"
-                          unoptimized
+                          size="medium"
+                          className="object-cover w-full h-full"
                         />
                       )}
                     </div>
@@ -203,12 +201,11 @@ export default function BrandAnalysis({ data }: Props) {
                       }}
                     >
                       {center.smallImage && (
-                        <Image
-                          src={center.smallImage}
+                        <OptimizedImage
+                          image={center.smallImage}
                           alt={`${center.title} detail`}
-                          fill
-                          className="object-cover"
-                          unoptimized
+                          size="small"
+                          className="object-cover w-full h-full"
                         />
                       )}
                     </div>
@@ -322,12 +319,11 @@ export default function BrandAnalysis({ data }: Props) {
                         }}
                       >
                         {center.largeImage && (
-                          <Image
-                            src={center.largeImage}
+                          <OptimizedImage
+                            image={center.largeImage}
                             alt={center.title}
-                            fill
-                            className="object-cover"
-                            unoptimized
+                            size="medium"
+                            className="object-cover w-full h-full"
                           />
                         )}
                       </div>
@@ -354,12 +350,11 @@ export default function BrandAnalysis({ data }: Props) {
                         }}
                       >
                         {center.smallImage && (
-                          <Image
-                            src={center.smallImage}
+                          <OptimizedImage
+                            image={center.smallImage}
                             alt={`${center.title} detail`}
-                            fill
-                            className="object-cover"
-                            unoptimized
+                            size="small"
+                            className="object-cover w-full h-full"
                           />
                         )}
                       </div>

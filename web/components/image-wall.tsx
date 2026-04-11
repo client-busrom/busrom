@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import gsap from "gsap"
 import type { ImageWallItem } from "@/lib/api/preloader-config"
 
@@ -52,11 +52,16 @@ export function ImageWall({
       return
     }
 
-    // 只有在 isActive 为 true 且所有图片都已加载时才执行动画
-    if (!isActive || !allImagesReady) return;
-
     const container = containerRef.current
     if (!container) return
+
+    // 当 isActive 变为 true 时，立即显示背景色，避免白屏
+    if (isActive) {
+      gsap.set(container, { opacity: 1, pointerEvents: 'auto' });
+    }
+
+    // 只有在 isActive 为 true 且所有图片都已加载时才执行动画
+    if (!isActive || !allImagesReady) return;
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -97,8 +102,10 @@ export function ImageWall({
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-40 opacity-0 pointer-events-none"
-      style={{ backgroundColor }}
+      className={`fixed inset-0 z-40 pointer-events-none ${isActive ? 'opacity-100' : 'opacity-0'}`}
+      style={{ 
+        backgroundColor,
+      }}
     >
       {images.map((item, index) => {
         const width = BASE_WIDTH * item.widthScale;

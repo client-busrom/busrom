@@ -313,11 +313,13 @@ export default function ProductSeriesCarousel({ data }: Props) {
           {/* 左侧图片 + 标题 */}
           <div className="flex flex-col items-center w-[45%]">
             <Link href={visibleItems[1]?.item?.href || "#"} className="block w-full">
-              <img
-                src={visibleItems[1]?.item?.image?.url || visibleItems[1]?.item?.image?.variants?.small || ''}
+              <OptimizedImage
+                image={visibleItems[1]?.item?.image}
                 alt={visibleItems[1]?.item?.image?.altText || visibleItems[1]?.item?.name || ""}
+                size="small"
+                width={640}
+                height={640}
                 className="w-full h-auto"
-                suppressHydrationWarning
               />
             </Link>
             <span className="font-anaheim font-extrabold text-white text-xs mt-2 text-center">
@@ -327,11 +329,13 @@ export default function ProductSeriesCarousel({ data }: Props) {
           {/* 右侧图片 + 标题 */}
           <div className="flex flex-col items-center w-[45%]">
             <Link href={visibleItems[2]?.item?.href || "#"} className="block w-full">
-              <img
-                src={visibleItems[2]?.item?.image?.url || visibleItems[2]?.item?.image?.variants?.small || ''}
+              <OptimizedImage
+                image={visibleItems[2]?.item?.image}
                 alt={visibleItems[2]?.item?.image?.altText || visibleItems[2]?.item?.name || ""}
+                size="small"
+                width={640}
+                height={640}
                 className="w-full h-auto"
-                suppressHydrationWarning
               />
             </Link>
             <span className="font-anaheim font-extrabold text-white text-xs mt-2 text-center">
