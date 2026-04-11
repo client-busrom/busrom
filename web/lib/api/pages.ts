@@ -61,7 +61,7 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
     let applications: any[] = [];
     let formConfig: any = null;
 
-    if (slug === 'one-stop-solution' || slug === 'oem-odm' || slug === 'application' || slug === 'our-story' || slug === 'support' || slug === 'contact-us') {
+    if (slug === 'one-stop-solution' || slug === 'oem-odm' || slug === 'application' || slug === 'our-story' || slug === 'support' || slug === 'contact-us' || slug === 'product-overview') {
       let contentChildren = page.content?.root?.children || page.contentTranslation?.root?.children || [];
       // Flatten children to find nested carousels (especially important for Application template)
       contentChildren = flattenLexicalChildren(contentChildren);

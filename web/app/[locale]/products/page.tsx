@@ -1,9 +1,12 @@
 import type { Locale } from "@/i18n.config"
-import { ProductsPageClient } from "./ProductsPageClient"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import { getPageMetadata } from "@/lib/api/seo-settings"
 import type { Metadata } from "next"
+import { fetchPageData } from "@/lib/api/pages"
+import { parseProductOverviewData } from "@/lib/parsers/product-overview-parser"
+import { ProductOverviewTemplate } from "@/components/templates/ProductOverviewTemplate"
+import { notFound } from "next/navigation"
 
 export async function generateMetadata({
   params,
@@ -13,30 +16,41 @@ export async function generateMetadata({
   const { locale } = await params
 
   const defaultMetadata: Metadata = {
-    title: "Products | Busrom",
-    description: "Explore Busrom's comprehensive range of high-quality stainless steel glass hardware solutions",
+    title: "Product Overview | Busrom",
+    description: "Explore our range of professional project solutions and products",
   }
 
-  return getPageMetadata('/products', 'product_series_list', locale, defaultMetadata)
+  return getPageMetadata('/products', 'product_overview', locale, defaultMetadata)
 }
 
-export default async function ProductsPage({
+export default async function ProductOverviewPage({
   params,
 }: {
   params: Promise<{ locale: Locale }>
 }) {
   const { locale } = await params
+  
+  // Use the slug 'product-overview' as requested
+  const rawData = await fetchPageData("product-overview", locale)
 
-  // Page ID from CMS
-  const pageId = "be2d59b9-dc31-4298-9d33-a956eadd52de"
+  if (!rawData) {
+    return notFound()
+  }
+
+  const parsedData = parseProductOverviewData(locale, rawData)
 
   return (
     <>
-      <PageScripts path="/products" pageType="product_series_list" position="header" />
-      <PageScripts path="/products" pageType="product_series_list" position="body_start" />
-      <PageSeoInjector path="/products" pageType="product_series_list" locale={locale} />
-      <ProductsPageClient locale={locale} pageId={pageId} />
-      <PageScripts path="/products" pageType="product_series_list" position="footer" />
+      <PageScripts path="/products" pageType="product_overview" position="header" />
+      <PageScripts path="/products" pageType="product_overview" position="body_start" />
+      <PageSeoInjector path="/products" pageType="product_overview" locale={locale} />
+      
+      <ProductOverviewTemplate 
+        locale={locale} 
+        data={parsedData} 
+      />
+      
+      <PageScripts path="/products" pageType="product_overview" position="footer" />
     </>
   )
 }
