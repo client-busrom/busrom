@@ -24,12 +24,16 @@ const toImageObject = (
     };
   }
   // Handle object with url, variants, and cropFocalPoint
+  // Some variants from Payload are objects { url, width, height }, we need just the url
   const variants = mediaData.variants ? Object.fromEntries(
-    Object.entries(mediaData.variants).map(([key, url]) => [key, getMediaUrl(url as string, strategy)])
+    Object.entries(mediaData.variants).map(([key, value]) => {
+      const url = typeof value === 'string' ? value : (value as any)?.url;
+      return [key, getMediaUrl(url, strategy)];
+    })
   ) : undefined;
   
   return {
-    url: getMediaUrl(mediaData.url, strategy),
+    url: getMediaUrl(mediaData.url || mediaData.file?.url || mediaData.fileUrl, strategy),
     altText: mediaData.altText || alt,
     variants,
     cropFocalPoint: mediaData.cropFocalPoint
