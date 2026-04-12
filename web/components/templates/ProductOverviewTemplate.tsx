@@ -42,22 +42,31 @@ export function ProductOverviewTemplate({ locale, data }: ProductOverviewTemplat
       {/* 5. Selection Guide & Brand Trust - Shared Background */}
       {(data.selectionGuide || data.brandTrust) && (
         <div 
-          className="relative w-full overflow-hidden"
-          style={{ 
-            background: 'linear-gradient(180deg, #756f3f 0%, #fffad3 100%)',
-            paddingTop: vw(150),
-            paddingBottom: vw(100)
-          }}
+          className="relative w-full"
         >
-          {data.selectionGuide && (
-            <SelectionGuideSection data={data.selectionGuide} />
-          )}
-          
-          <div style={{ height: vw(150) }} /> {/* Spacer between sections */}
+          {/* Shared Background Box with Margins and Rounded Corners */}
+          <div 
+            className="absolute z-0"
+            style={{ 
+              left: vw(30), 
+              right: vw(30), 
+              top: 0, 
+              bottom: 0,
+              background: 'linear-gradient(180deg, #756f3f 0%, #fffad3 100%)',
+              borderRadius: vw(30),
+              overflow: 'hidden'
+            }}
+          />
 
-          {data.brandTrust && (
-            <BrandTrustSection data={data.brandTrust} />
-          )}
+          <div className="relative z-10">
+            {data.selectionGuide && (
+              <SelectionGuideSection data={data.selectionGuide} />
+            )}
+
+            {data.brandTrust && (
+              <BrandTrustSection data={data.brandTrust} />
+            )}
+          </div>
         </div>
       )}
     </div>
