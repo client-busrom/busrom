@@ -26,7 +26,7 @@ export function SupportTemplate({ locale, data, resolvedApplications }: SupportT
   }
 
   return (
-    <main className="relative bg-[#FBF9F1]">
+    <main className="relative bg-[#FBF9F1]" data-header-theme="dark">
       {data.hero && <SupportHeroSection data={data.hero} />}
 
       {data.commitment && (
