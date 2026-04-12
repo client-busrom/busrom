@@ -346,7 +346,7 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
       break;
     }
     // Fallback if it's a direct image block
-    if (node.type === 'image' && node.data?.image) {
+    if ((node.type === 'image' || node.type === 'singleImage') && node.data?.image) {
       brandTrustImage = resolveMedia(node.data.image);
       break;
     }

@@ -42,8 +42,8 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
   )
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ minHeight: vw(1145), paddingTop: vw(100), paddingBottom: vw(50) }}>
-      <div className="mx-auto relative" style={{ width: vw(1920), height: vw(1145) }}>
+    <section className="relative w-full overflow-hidden" style={{ minHeight: vw(1000), paddingTop: vw(100), paddingBottom: vw(50) }}>
+      <div className="mx-auto relative" style={{ width: vw(1920), height: vw(1000) }}>
         
         {/* Navigation Buttons */}
         <button

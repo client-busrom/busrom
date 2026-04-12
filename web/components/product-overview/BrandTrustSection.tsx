@@ -16,80 +16,115 @@ export function BrandTrustSection({ data }: BrandTrustSectionProps) {
   if (!data) return null;
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ minHeight: vw(896), paddingBottom: vw(100) }}>
-      <div className="mx-auto flex items-stretch" style={{ width: vw(1727) }}>
-        {/* Left Column: Image Area */}
-        <div className="relative" style={{ width: vw(665) }}>
-          {/* Decorative Ellipse Background */}
-          <div 
-            className="absolute rounded-full border-2 border-white/30" 
-            style={{ 
-              width: vw(309), 
-              height: vw(309), 
-              left: vw(287), 
-              top: vw(530),
-              zIndex: 1
-            }} 
-          />
-          
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            className="relative overflow-hidden"
-            style={{ 
-              width: vw(476), 
-              height: vw(792), 
-              borderRadius: `0 0 0 ${vw(310.5)}`,
-              border: `${vw(1)} solid rgba(255, 255, 255, 0.2)`,
-              zIndex: 2
-            }}
-          >
+    <section className="relative w-full" style={{ height: vw(896), marginTop: vw(150), marginBottom: vw(150) }}>
+      <div className="mx-auto relative" style={{ width: vw(1920), height: vw(896) }}>
+        
+        {/* 1. Left Gradient Block */}
+        <div 
+          className="absolute"
+          style={{ 
+            left: vw(30), 
+            top: 0, 
+            width: vw(440), 
+            height: vw(896),
+            background: 'linear-gradient(180deg, #756f3f 0%, #dbd076 100%)',
+            borderRadius: `0 0 0 ${vw(30)}`
+          }}
+        />
+
+        {/* 2.5 Bottom Olivine Circle: True Orbital Rotation */}
+        <motion.div 
+          animate={{ rotate: 360 }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          className="absolute rounded-full border-2 border-[#756f3f] z-0 pointer-events-none"
+          style={{ 
+            left: vw(506), 
+            top: vw(530), 
+            width: vw(309), 
+            height: vw(309),
+            transformOrigin: '60% 60%'
+          }}
+        />
+
+        {/* 2. Capsule Image Wrapper */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="absolute overflow-hidden shadow-2xl z-10"
+          style={{ 
+            left: vw(219), 
+            top: 0, 
+            width: vw(476), 
+            height: vw(792),
+            borderRadius: vw(238),
+            border: `${vw(1)} solid rgba(255, 255, 255, 0.2)`
+          }}
+        >
+          {data.image && (
             <OptimizedImage 
-              image={data.image?.url} 
-              alt="Brand Trust" 
-              width={476} 
-              height={792} 
-              className="w-full h-full object-cover"
+               image={data.image} 
+               alt="Brand Trust" 
+               width={476} 
+               height={792} 
+               className="w-full h-full object-cover"
             />
-          </motion.div>
-        </div>
+          )}
 
-        {/* Right Column: Text Content */}
-        <div className="relative flex-1 flex flex-col justify-center" style={{ paddingLeft: vw(60) }}>
-          <motion.h2 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="font-berkshire-swash text-black leading-tight"
-            style={{ fontSize: vw(88), maxWidth: vw(1001), marginBottom: vw(60) }}
-          >
-            {data.title}
-          </motion.h2>
+          {/* 2.6 Inside White Circle: True Orbital Rotation Synced */}
+          <motion.div 
+            animate={{ rotate: 360 }}
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            className="absolute rounded-full border-2 border-white pointer-events-none"
+            style={{ 
+              left: vw(506 - 219), 
+              top: vw(530), 
+              width: vw(309), 
+              height: vw(309),
+              transformOrigin: '60% 60%'
+            }}
+          />
+        </motion.div>
 
-          <div className="relative" style={{ width: vw(767), minHeight: vw(349) }}>
-            {/* SVG Background for content (Matches brand-trust-content-bg) */}
-            <div className="absolute inset-0" style={{ zIndex: 0 }}>
-               <svg width="100%" height="100%" viewBox="0 0 767 349" fill="none" preserveAspectRatio="none">
-                  <path 
-                    d="M0 40C0 17.9086 17.9086 0 40 0H727C749.091 0 767 17.9086 767 40V309C767 331.091 749.091 349 727 349H40C17.9086 349 0 331.091 0 309V40Z" 
-                    fill="#756f3f" 
-                  />
-               </svg>
-            </div>
-            
-            <div className="relative p-10" style={{ zIndex: 1, padding: `${vw(40)} ${vw(50)}` }}>
-               <motion.div
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-               >
-                  <svg width={vw(96)} height={vw(98)} viewBox="0 0 96 98" fill="none" className="mb-6 opacity-50">
-                     <path d="M48 0L58.5 39.5H96L65.5 64L76 98L48 76.5L20 98L30.5 64L0 39.5H37.5L48 0Z" fill="#464010" />
-                  </svg>
-                  <p className="font-josefin-sans text-[#fffad3] leading-relaxed" style={{ fontSize: vw(28), opacity: 0.9 }}>
-                    {data.content}
-                  </p>
-               </motion.div>
-            </div>
+        {/* 3. Title */}
+        <motion.h2 
+          initial={{ opacity: 0, x: 20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          className="absolute font-berkshire-swash text-[#000000] leading-[1.26] z-0"
+          style={{ 
+            fontSize: vw(88), 
+            left: vw(756), 
+            top: vw(37), 
+            width: vw(1001) 
+          }}
+        >
+          {data.title}
+        </motion.h2>
+
+        {/* 4. Content Area with Static SVG Box */}
+        <div 
+          className="absolute z-10 flex flex-col justify-center"
+          style={{ 
+            left: vw(800), 
+            top: vw(431), 
+            width: 'fit-content',
+            padding: `${vw(70)} ${vw(90)} ${vw(30)} ${vw(190)}`
+          }}
+        >
+          {/* Static SVG Background */}
+          <div 
+            className="absolute inset-0 -z-10"
+            style={{ 
+              backgroundImage: 'url("/product-overview/product-overview-brand-trust-content-box.svg")',
+              backgroundSize: '100% 100%',
+              backgroundRepeat: 'no-repeat'
+            }}
+          />
+
+          <div className="relative">
+            <p className="font-josefin-sans text-[#4b4512] leading-[1.46] whitespace-pre-line" style={{ fontSize: vw(28) }}>
+              {data.content}
+            </p>
           </div>
         </div>
       </div>
