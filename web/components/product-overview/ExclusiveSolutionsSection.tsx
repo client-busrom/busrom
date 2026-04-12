@@ -93,7 +93,8 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
       style={{ 
         paddingTop: vw(125),
         paddingBottom: vw(125),
-        background: 'linear-gradient(180deg, #fff6d4 0%, 70%, #f6f4ed 100%)'
+        background: 'linear-gradient(180deg, #fff6d4 0%, #fff6d4 70%, #f6f4ed 100%)',
+        borderRadius: vw(80),
       }}
     >
       <div className="mx-auto" style={{ width: vw(1604) }}>
