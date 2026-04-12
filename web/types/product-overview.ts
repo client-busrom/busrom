@@ -48,6 +48,14 @@ export interface BrandTrust {
   image?: any;
 }
 
+export interface QuoteSection {
+  title: any;
+  description: string;
+  cta: CMSLink;
+  logo?: any;
+  image?: any;
+}
+
 export interface ProductOverviewData {
   hero: {
     content1: string[];
@@ -86,4 +94,5 @@ export interface ProductOverviewData {
   };
   selectionGuide?: SelectionGuide;
   brandTrust?: BrandTrust;
+  quote?: QuoteSection;
 }

@@ -20,8 +20,40 @@ function getNodeTotalText(node: any): string {
 }
 
 /**
+ * Extracts rich text fragments for specific styling (e.g. bold color).
+ */
+function getRichText(nodes: any[]): { text: string; bold: boolean; italic: boolean; linebreak?: boolean }[] {
+  if (!nodes) return [];
+  const result: any[] = [];
+
+  const processNode = (node: any) => {
+    if (typeof node === "string") {
+      result.push({ text: node, bold: false, italic: false });
+      return;
+    }
+    if (node.type === "linebreak") {
+      result.push({ text: "", bold: false, italic: false, linebreak: true });
+      return;
+    }
+    if (node.text !== undefined) {
+      result.push({ 
+        text: node.text, 
+        bold: !!(node.format & 1), 
+        italic: !!(node.format & 2) 
+      });
+      return;
+    }
+    if (node.children) {
+      node.children.forEach(processNode);
+    }
+  };
+
+  nodes.forEach(processNode);
+  return result;
+}
+
+/**
  * Finds content after a specific marker string in the Lexical tree.
- * Uses aggressive fuzzy matching to prevent minor character differences from breaking the site.
  */
 function extractAfterMarker(children: any[], markerId: string): any[] {
   let foundMarker = false;
@@ -32,7 +64,6 @@ function extractAfterMarker(children: any[], markerId: string): any[] {
     const rawText = getNodeTotalText(node);
     const text = rawText.toLowerCase().trim();
     
-    // Aggressive matching: includes, paragraph/heading/quote/code
     const isMarkerBlock = (
         node.type === "paragraph" || 
         node.type === "heading" || 
@@ -42,37 +73,36 @@ function extractAfterMarker(children: any[], markerId: string): any[] {
     
     if (isMarkerBlock && !foundMarker) {
       foundMarker = true;
-      
-      // Check if there's content AFTER the marker within the SAME node
       const markerPos = rawText.toLowerCase().indexOf(target);
       const contentAfterMarker = rawText.substring(markerPos + target.length).trim();
-      
       if (contentAfterMarker.length > 0) {
-        // Create a synthetic node for the remaining text so extraction functions can pick it up
-        result.push({
-          type: "paragraph",
-          children: [{ text: contentAfterMarker }]
-        });
+        result.push({ type: "paragraph", children: [{ text: contentAfterMarker }] });
       }
       continue;
     }
     
     if (foundMarker) {
-      // Logic to stop at the next marker: starts with [something]-marker-name
-      // or looks like a typical marker key (lowercase-with-dashes)
-      // Tightened logic: starts with a known marker prefix AND is short (likely a tag)
       const isNextMarker = text.length < 50 && text.includes("-") && 
         (text.startsWith("title") || text.startsWith("image") || text.startsWith("item") || 
          text.startsWith("cta") || text.startsWith("content") || text.startsWith("subtitle") || 
-         text.startsWith("logo") || text.startsWith("product-guide") || text.startsWith("brand-trust"));
-         
-      if (isNextMarker) {
-         break;
-      }
+         text.startsWith("logo") || text.startsWith("product-guide") || text.startsWith("brand-trust") ||
+         text.startsWith("quote"));
+          
+      if (isNextMarker) break;
       result.push(node);
     }
   }
   return result;
+}
+
+function extractRichTextAfterMarker(children: any[], markerId: string): any[] {
+  const nodes = extractAfterMarker(children, markerId);
+  for (const node of nodes) {
+    if (node.type === "paragraph" || node.type === "heading" || node.type === "quote") {
+      return getRichText(node.children || []);
+    }
+  }
+  return [];
 }
 
 function extractSingleTextAfterMarker(children: any[], markerId: string): string {
@@ -90,7 +120,6 @@ function extractListAfterMarker(children: any[], markerId: string): string[] {
   for (const node of nodesAfterMarker) {
     if (node.type === "list") {
       return (node.children || []).map((li: any) => {
-        // Flatten list items and preserve linebreaks in each item
         return (li.children || []).map((c: any) => getNodeTotalText(c)).join("").trim();
       }).filter(Boolean);
     }
@@ -130,18 +159,11 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
 
   const resolveMedia = (img: any) => {
     if (!img) return null;
-    
-    // 1. Direct object with URL
     if (img.url) return { ...img, url: convertToCDNUrl(img.url) };
-    
-    // 2. Lexical mediaData lookup
     const id = typeof img === 'object' ? img.id : img;
     const media = mediaData[id];
     if (media) return { ...media, url: convertToCDNUrl(media.url) };
-    
-    // 3. Last resort: Return raw object (OptimizedImage might handle it)
     if (typeof img === 'object' && (img.url || img.id)) return img;
-    
     return null;
   }
 
@@ -179,16 +201,10 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
     } else {
       rightImg = resolveMedia(galleryImageConfig?.image);
     }
-    return {
-      id: idx,
-      title: slide.title,
-      description: slide.description,
-      leftImage: resolveMedia(slide.image), 
-      rightImage: rightImg 
-    };
+    return { id: idx, title: slide.title, description: slide.description, leftImage: resolveMedia(slide.image), rightImage: rightImg };
   });
 
-  // --- Hero Section ---
+  // --- Hero Section (RESTORED FULL FIELDS) ---
   const heroContent1 = extractListAfterMarker(children, "hero-section-content-1");
   const heroContent2 = extractListAfterMarker(children, "hero-section-content-2");
   const heroContent3 = extractListAfterMarker(children, "hero-section-content-3");
@@ -208,21 +224,18 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
     if (node.type === "productCarousel" && node.data?.items) {
       heroProductItems = node.data.items.map((item: any) => {
         let product = null;
-        
         if (item.selectionMode === 'manual') {
           const prodId = typeof item.product === 'object' ? item.product.id : item.product;
           product = products.find((p: any) => String(p.id) === String(prodId));
         } else {
           const seriesId = typeof item.productSeries === 'object' ? item.productSeries.id : item.productSeries;
-          // For auto mode, find products belonging to this series
           product = products.find((p: any) => String(p.series?.id || p.series) === String(seriesId));
         }
-
         if (!product) return null;
 
-        const seriesId = typeof item.productSeries === 'object' ? item.productSeries.id : item.productSeries;
-        const seriesObj = allSeries.find((s: any) => String(s.id) === String(seriesId || product.series?.id || product.series));
-        const targetPath = resolveTargetLink(seriesObj?.category?.name || "", seriesObj?.slug || seriesId);
+        const seriesIdField = typeof item.productSeries === 'object' ? item.productSeries.id : item.productSeries;
+        const seriesObj = allSeries.find((s: any) => String(s.id) === String(seriesIdField || product.series?.id || product.series));
+        const targetPath = resolveTargetLink(seriesObj?.category?.name || "", seriesObj?.slug || seriesIdField);
         
         return { 
           id: product.id, 
@@ -247,26 +260,18 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
   const seriesNodes = extractAfterMarker(children, "product-overview-item");
   for (const node of seriesNodes) {
     if (node.type === "productCarousel" && node.data?.items) {
-      seriesConfig = { 
-        autoplay: node.data.autoplay !== false, 
-        interval: node.data.interval || 5, 
-        itemsPerView: node.data.itemsPerView || 5 
-      };
+      seriesConfig = { autoplay: node.data.autoplay !== false, interval: node.data.interval || 5, itemsPerView: node.data.itemsPerView || 5 };
       seriesItems = node.data.items.map((item: any) => {
         const seriesId = typeof item.productSeries === 'object' ? item.productSeries.id : item.productSeries;
         const seriesObj = allSeries.find((s: any) => String(s.id) === String(seriesId));
-        
-        // Find a representative product from this series just for the image
         const repProduct = products.find((p: any) => String(p.series?.id || p.series) === String(seriesId));
         const targetPath = resolveTargetLink(seriesObj?.category?.name || "", seriesObj?.slug || seriesId);
-
         if (!seriesObj) return null;
-
-        return {
-          id: seriesId,
-          title: item.customName || seriesObj.name || seriesObj.title || "",
-          image: resolveMedia(repProduct?.showImage || repProduct?.image || repProduct?.featuredImage),
-          href: `/${locale}${targetPath}`
+        return { 
+          id: seriesId, 
+          title: item.customName || seriesObj.name || seriesObj.title || "", 
+          image: resolveMedia(repProduct?.showImage || repProduct?.image || repProduct?.featuredImage), 
+          href: `/${locale}${targetPath}` 
         };
       }).filter(Boolean);
       break;
@@ -301,12 +306,8 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
 
   // --- Selection Guide Section ---
   const selectionGuideSlides: any[] = [];
-  // Support more slides dynamically (up to 5 for now)
   for (let i = 1; i <= 5; i++) {
     const list = extractListAfterMarker(children, `product-guide-${i}`);
-    
-    // Also try to find a heading or paragraph that just says "product-guide-i" 
-    // in case it's nested or slightly different.
     if (list.length > 0) {
       let slideImages: any[] = [];
       const imageNodes = extractAfterMarker(children, `product-guide-image-${i}`);
@@ -322,16 +323,7 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
           break;
         }
       }
-
-      selectionGuideSlides.push({
-        id: `slide-${i}-${Date.now()}`, // Unique ID
-        title1: list[0] || "",
-        title2: list[1] || "",
-        highlightText: list[2] || "",
-        content1: list[3] || "",
-        content2: list[4] || "",
-        images: slideImages
-      });
+      selectionGuideSlides.push({ id: `slide-${i}-${Date.now()}`, title1: list[0] || "", title2: list[1] || "", highlightText: list[2] || "", content1: list[3] || "", content2: list[4] || "", images: slideImages });
     }
   }
 
@@ -345,9 +337,36 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
       brandTrustImage = resolveMedia(node.data.images[0].image);
       break;
     }
-    // Fallback if it's a direct image block
     if ((node.type === 'image' || node.type === 'singleImage') && node.data?.image) {
       brandTrustImage = resolveMedia(node.data.image);
+      break;
+    }
+  }
+
+  // --- Quote Section ---
+  const quoteTitleFragments = extractRichTextAfterMarker(children, "quote-title");
+  const quoteDescription = extractSingleTextAfterMarker(children, "quote-description");
+  let quoteCta: CMSLink = { title: "Contact Us", url: "/contact-us", openInNewTab: false };
+  const quoteCtaNodes = extractAfterMarker(children, "quote-cta");
+  for (const node of quoteCtaNodes) {
+    if (node.type === "linkJump" && node.data) {
+      quoteCta = { title: node.data.title || "Contact Us", url: (node.data.url || "/contact-us").replace('/pages/', '/'), openInNewTab: !!node.data.openInNewTab };
+      break;
+    }
+  }
+  let quoteLogo = null;
+  const quoteLogoNodes = extractAfterMarker(children, "quote-logo");
+  for (const node of quoteLogoNodes) {
+    if ((node.type === 'image' || node.type === 'singleImage') && node.data?.image) {
+      quoteLogo = resolveMedia(node.data.image);
+      break;
+    }
+  }
+  let quoteImage = null;
+  const quoteImageNodes = extractAfterMarker(children, "quote-image");
+  for (const node of quoteImageNodes) {
+    if ((node.type === 'image' || node.type === 'singleImage') && node.data?.image) {
+      quoteImage = resolveMedia(node.data.image);
       break;
     }
   }
@@ -358,6 +377,7 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
     applications: { title: appTitle || "APPLICATIONS", subtitle: appSubtitle || "Professional project support and cases", cta: appCta, items: appItems, config: appConfig },
     exclusiveSolutions: { logoText, title, subtitle, content, items },
     selectionGuide: selectionGuideSlides.length > 0 ? { slides: selectionGuideSlides } : undefined,
-    brandTrust: brandTrustTitle ? { title: brandTrustTitle, content: brandTrustContent, image: brandTrustImage } : undefined
+    brandTrust: brandTrustTitle ? { title: brandTrustTitle, content: brandTrustContent, image: brandTrustImage } : undefined,
+    quote: quoteTitleFragments.length > 0 ? { title: quoteTitleFragments, description: quoteDescription, cta: quoteCta, logo: quoteLogo, image: quoteImage } : undefined
   };
 }

@@ -110,7 +110,8 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
     )
   }
 
-  const maskSvgBase64 = typeof window !== 'undefined' ? btoa(`<svg width="1499" height="348" viewBox="0 0 1499 348" xmlns="http://www.w3.org/2000/svg"><path d="${titleMaskPath}" fill="black"/></svg>`) : ""
+  const maskSvg = `<svg width="1499" height="348" viewBox="0 0 1499 348" xmlns="http://www.w3.org/2000/svg"><path d="${titleMaskPath}" fill="black"/></svg>`
+  const maskUrl = `url("data:image/svg+xml,${encodeURIComponent(maskSvg)}")`
 
   return (
     <section 
@@ -141,8 +142,8 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
             <div 
               className="absolute inset-0 z-2"
               style={{ 
-                WebkitMaskImage: `url(data:image/svg+xml;base64,${maskSvgBase64})`,
-                maskImage: `url(data:image/svg+xml;base64,${maskSvgBase64})`,
+                WebkitMaskImage: maskUrl,
+                maskImage: maskUrl,
                 WebkitMaskRepeat: "no-repeat",
                 maskRepeat: "no-repeat",
                 WebkitMaskSize: "100% 100%",
@@ -190,7 +191,7 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
         {/* 4. Hero Image */}
         {(() => {
           const imageMaskSvg = `<svg width="700" height="450" viewBox="0 0 700 450" xmlns="http://www.w3.org/2000/svg"><path d="${imageClipPath}" fill="black"/></svg>`
-          const imageMaskBase64 = typeof window !== 'undefined' ? btoa(imageMaskSvg) : ""
+          const imgMaskUrl = `url("data:image/svg+xml,${encodeURIComponent(imageMaskSvg)}")`
           
           return (
             <div 
@@ -200,8 +201,8 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
                 top: vw(822), 
                 width: vw(700), 
                 height: vw(450),
-                WebkitMaskImage: `url(data:image/svg+xml;base64,${imageMaskBase64})`,
-                maskImage: `url(data:image/svg+xml;base64,${imageMaskBase64})`,
+                WebkitMaskImage: imgMaskUrl,
+                maskImage: imgMaskUrl,
                 WebkitMaskRepeat: "no-repeat",
                 maskRepeat: "no-repeat",
                 WebkitMaskSize: "100% 100%",

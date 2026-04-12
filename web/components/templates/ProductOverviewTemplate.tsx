@@ -7,6 +7,7 @@ import { ApplicationsSection } from "../product-overview/ApplicationsSection"
 import { ExclusiveSolutionsSection } from "../product-overview/ExclusiveSolutionsSection"
 import { SelectionGuideSection } from "../product-overview/SelectionGuideSection"
 import { BrandTrustSection } from "../product-overview/BrandTrustSection"
+import { QuoteSection } from "../product-overview/QuoteSection"
 
 import { ProductOverviewData } from "@/types/product-overview"
 
@@ -68,6 +69,11 @@ export function ProductOverviewTemplate({ locale, data }: ProductOverviewTemplat
             )}
           </div>
         </div>
+      )}
+
+      {/* 6. Quote Section */}
+      {data.quote && (
+        <QuoteSection data={data.quote} />
       )}
     </div>
   )
