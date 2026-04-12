@@ -1,27 +1,27 @@
 "use client"
 
-import React from "react"
-import { ProductOverviewHeroSection } from "@/components/product-overview/HeroSection"
-import type { ProductOverviewData } from "@/lib/parsers/product-overview-parser"
+import React, { useMemo } from "react"
+import { ProductOverviewHeroSection } from "../product-overview/HeroSection"
+import { SeriesOverviewSection } from "../product-overview/SeriesOverviewSection"
 
 interface ProductOverviewTemplateProps {
-  locale: string
-  data: ProductOverviewData
+  locale: string;
+  data: any;
 }
 
 export function ProductOverviewTemplate({ locale, data }: ProductOverviewTemplateProps) {
+  if (!data) return null;
+
   return (
-    <div className="min-h-screen bg-[#0D0D0D]" data-header-theme="dark">
+    <div className="w-full bg-[#F6F4ED]">
+      {/* 1. Hero Section */}
       <ProductOverviewHeroSection data={data.hero} />
-      {/* 
-        Other sections will be added here:
-        - product-overview
-        - applications
-        - exclusive-solutions
-        - product-guide
-        - brand-trust
-        - quote
-      */}
+
+      {/* 2. Series Overview Section */}
+      <SeriesOverviewSection data={data.seriesOverview} />
+
+      {/* Placeholder for future sections */}
+      <div className="h-[200px]" />
     </div>
   )
 }
