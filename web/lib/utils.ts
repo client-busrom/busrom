@@ -57,10 +57,10 @@ export function resolveInternalLink(url: string | null | undefined): string {
     return path
   }
 
-  // 1. 修正详解页前缀: /product/xxx -> /products/xxx
+  // 1. 修正详解页前缀: /product/xxx -> /products/xxx 或 /product -> /products
   // (注意: 这里是单数变复数)
-  if (path.startsWith('/product/')) {
-    path = path.replace(/^\/product\//, '/products/')
+  if (path === '/product' || path.startsWith('/product?') || path.startsWith('/product/')) {
+    path = path.replace(/^\/product/, '/products')
   }
 
   // 2. 修正 One-Stop Solution 特定路径
