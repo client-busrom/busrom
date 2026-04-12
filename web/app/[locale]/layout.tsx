@@ -236,6 +236,14 @@ const katibeh = Katibeh({
   preload: false,
 });
 
+const bagelFatOne = localFont({
+  src: "../../public/fonts/BagelFatOne-Regular.ttf",
+  weight: "400",
+  variable: "--font-bagel-fat-one",
+  display: "swap",
+  preload: false,
+});
+
 export function generateStaticParams() {
   // 动态生成所有支持的 locale 参数
   return locales.map(locale => ({ locale }));
@@ -317,6 +325,7 @@ export default async function RootLayout({
       ${lemon.variable}
       ${lobster.variable}
       ${katibeh.variable}
+      ${bagelFatOne.variable}
       font-sans
     `}
     >

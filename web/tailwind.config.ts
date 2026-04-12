@@ -178,6 +178,7 @@ const config: Config = {
         'quicksand': ['var(--font-quicksand)', 'sans-serif'],
         'lemon': ['var(--font-lemon)', 'serif'],
         'lobster': ['var(--font-lobster)', 'cursive'],
+        'bagel-fat-one': ['var(--font-bagel-fat-one)', 'cursive'],
         'kavivanar': ['Kavivanar', 'cursive'],
 
         // --- 系统字体 (直接使用名字) ---

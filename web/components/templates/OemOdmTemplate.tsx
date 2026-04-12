@@ -7,7 +7,7 @@ import { OemOdmServiceIntroduction } from "@/components/oem-odm/OemOdmServiceInt
 import { OemOdmWhatIsOem } from "@/components/oem-odm/OemOdmWhatIsOem"
 import { OemOdmProductSeries } from "@/components/oem-odm/OemOdmProductSeries"
 import { OemOdmPartner } from "@/components/oem-odm/OemOdmPartner"
-import { OemAdvantages } from "@/components/oem-odm/OemOdmAdvantages"
+import { OemAdvantages } from "@/components/oem-odm/OemAdvantages"
 // ODM components
 import { OdmServiceIntroduction } from "@/components/oem-odm/OdmServiceIntroduction"
 import { OdmWhatIsOdm } from "@/components/oem-odm/OdmWhatIsOdm"

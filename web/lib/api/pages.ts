@@ -14,10 +14,6 @@ const getCmsUrl = () => {
  */
 export async function fetchPageData(slug: string, locale: string = 'en') {
   const cmsUrl = getCmsUrl();
-  
-  // Note: In Server Components, we don't have easy access to cookies 
-  // unless we explicitly pass them or use 'headers' from 'next/headers'. 
-  // defaulting to null/undefined or global strategy.
   const strategy = undefined; 
 
   const normalize = (url: string) => {
@@ -29,7 +25,7 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
 
   try {
     const pageRes = await fetch(`${cmsUrl}/api/pages?where[slug][equals]=${slug}&locale=${locale}&depth=2`, {
-      next: { revalidate: 3600 } // Enable ISR by default (1 hour)
+      next: { revalidate: 3600 } 
     });
     
     if (!pageRes.ok) return null;
@@ -40,7 +36,6 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
     const page = result.docs[0];
     const { mediaData } = await resolveAllMedia(page, cmsUrl, normalize);
     
-    // Helper to normalize media in nested objects (products/apps)
     const normalizeMediaObject = (obj: any): any => {
       if (!obj || typeof obj !== 'object') return obj;
       if (Array.isArray(obj)) return obj.map(normalizeMediaObject);
@@ -56,21 +51,19 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
       return newObj;
     };
 
-    // Check if we need products or applications (for One-Stop Shop)
     let products: any[] = [];
+    let series: any[] = [];
     let applications: any[] = [];
     let formConfig: any = null;
 
     if (slug === 'one-stop-solution' || slug === 'oem-odm' || slug === 'application' || slug === 'our-story' || slug === 'support' || slug === 'contact-us' || slug === 'product-overview') {
       let contentChildren = page.content?.root?.children || page.contentTranslation?.root?.children || [];
-      // Flatten children to find nested carousels (especially important for Application template)
       contentChildren = flattenLexicalChildren(contentChildren);
 
       const productCarouselNodes = contentChildren.filter((n: any) => n.type === 'productCarousel');
       const applicationCarouselNodes = contentChildren.filter((n: any) => n.type === 'applicationCarousel');
       const formBlockNodes = contentChildren.filter((n: any) => n.type === 'formBlock');
 
-      // 1. Fetch Products
       const manualIds: string[] = [];
       const seriesIds: string[] = [];
       productCarouselNodes.forEach((node: any) => {
@@ -80,10 +73,22 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
         });
       });
 
-      if (manualIds.length > 0 || seriesIds.length > 0) {
-        // Use 'limit' instead of 'pageSize' as it's the standard for Payload
-        let productUrl = `${cmsUrl}/api/products?locale=${locale}&limit=1000&depth=2`;
+      if (seriesIds.length > 0 || slug === 'product-overview') {
+        const seriesIdsSet = Array.from(new Set(seriesIds));
+        let seriesUrl = `${cmsUrl}/api/product-series?locale=${locale}&limit=1000&depth=3`;
+        if (seriesIdsSet.length > 0 && slug !== 'product-overview') {
+          seriesUrl += `&where[id][in]=${seriesIdsSet.join(',')}`;
+        }
         
+        const seriesRes = await fetch(seriesUrl, { next: { revalidate: 3600 } });
+        if (seriesRes.ok) {
+          const seriesData = await seriesRes.json();
+          series = (seriesData.docs || []).map(normalizeMediaObject);
+        }
+      }
+
+      if (manualIds.length > 0 || seriesIds.length > 0) {
+        let productUrl = `${cmsUrl}/api/products?locale=${locale}&limit=1000&depth=3`;
         const manualIdsSet = Array.from(new Set(manualIds));
         const seriesIdsSet = Array.from(new Set(seriesIds));
 
@@ -102,7 +107,6 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
         }
       }
 
-      // 2. Fetch Applications
       const appIds: string[] = [];
       applicationCarouselNodes.forEach((node: any) => {
         const ids = node.data?.applicationIds || node.data?.applications || [];
@@ -117,7 +121,6 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
         }
       }
 
-      // 3. Fetch Form Config
       if (formBlockNodes.length > 0) {
         const formId = formBlockNodes[0].data?.formConfig?.id || formBlockNodes[0].data?.formConfig;
         if (formId) {
@@ -127,17 +130,20 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
       }
     }
 
-    // 4. Resolve media for products and applications
     if (products.length > 0) {
       const { mediaData: productMediaData } = await resolveAllMedia(products, cmsUrl, normalize);
       Object.assign(mediaData, productMediaData);
+    }
+    if (series.length > 0) {
+      const { mediaData: seriesMediaData } = await resolveAllMedia(series, cmsUrl, normalize);
+      Object.assign(mediaData, seriesMediaData);
     }
     if (applications.length > 0) {
       const { mediaData: appMediaData } = await resolveAllMedia(applications, cmsUrl, normalize);
       Object.assign(mediaData, appMediaData);
     }
 
-    return { ...page, mediaData, products, applications, formConfig };
+    return { ...page, mediaData, products, series, applications, formConfig };
   } catch (e) {
     console.error(`Error fetching page data for ${slug}:`, e);
     return null;
