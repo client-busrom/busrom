@@ -1,5 +1,6 @@
 import { convertToCDNUrl } from "../cdn-url";
 import { ProductOverviewData, CMSLink } from "@/types/product-overview";
+import { resolveInternalLink } from "@/lib/utils";
 
 /**
  * Extracts raw text from Lexical nodes, preserving linebreaks.
@@ -144,17 +145,17 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
   const navigationMenus = rawData.navigationMenus || [];
   const mediaData = rawData.mediaData || {}; 
 
-  const productRootMenu = navigationMenus.find((m: any) => m.slug === 'product' || (m.type === 'product_cards' && m.link?.includes('products')));
+  const productRootMenu = navigationMenus.find((m: any) => m.slug === 'product' || m.name === 'Product' || (m.type === 'product_cards' && (m.link?.includes('products') || m.link?.includes('product'))));
   const productRootId = productRootMenu?.id;
-  const productRootPath = (productRootMenu?.link || "/products").replace('/pages/', '/');
+  const productRootPath = resolveInternalLink(productRootMenu?.link || "/products");
 
   const resolveTargetLink = (categoryName: string, fallbackSlug: string) => {
-    if (!navigationMenus.length) return `${productRootPath}/${fallbackSlug}`;
+    if (!navigationMenus.length) return resolveInternalLink(`${productRootPath}/${fallbackSlug}`);
     const match = navigationMenus.find((m: any) => {
-      const isCorrectParent = m.parent?.id === productRootId || (m.link && m.link.startsWith(productRootPath));
+      const isCorrectParent = m.parent?.id === productRootId || (m.link && (m.link.startsWith(productRootPath) || m.link.includes('/product/')));
       return isCorrectParent && (m.name === categoryName || m.slug?.includes(fallbackSlug));
     });
-    return (match?.link || `${productRootPath}/${fallbackSlug}`).replace('/pages/', '/');
+    return resolveInternalLink(match?.link || `${productRootPath}/${fallbackSlug}`);
   };
 
   const resolveMedia = (img: any) => {
@@ -213,7 +214,7 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
   const heroCtaNodes = extractAfterMarker(children, "hero-section-cta");
   for (const node of heroCtaNodes) {
     if (node.type === "linkJump" && node.data) {
-      heroCta = { title: node.data.title || "View More", url: (node.data.url || productRootPath).replace('/pages/', '/'), openInNewTab: !!node.data.openInNewTab };
+      heroCta = { title: node.data.title || "View More", url: resolveInternalLink(node.data.url || productRootPath), openInNewTab: !!node.data.openInNewTab };
       break;
     }
   }
@@ -287,7 +288,7 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
   const appCtaNodes = extractAfterMarker(children, "applications-cta");
   for (const node of appCtaNodes) {
     if (node.type === "linkJump" && node.data) {
-      appCta = { title: node.data.title || "View More", url: (node.data.url || "/application").replace('/pages/', '/'), openInNewTab: !!node.data.openInNewTab };
+      appCta = { title: node.data.title || "View More", url: resolveInternalLink(node.data.url || "/application"), openInNewTab: !!node.data.openInNewTab };
       break;
     }
   }
@@ -350,7 +351,7 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
   const quoteCtaNodes = extractAfterMarker(children, "quote-cta");
   for (const node of quoteCtaNodes) {
     if (node.type === "linkJump" && node.data) {
-      quoteCta = { title: node.data.title || "Contact Us", url: (node.data.url || "/contact-us").replace('/pages/', '/'), openInNewTab: !!node.data.openInNewTab };
+      quoteCta = { title: node.data.title || "Contact Us", url: resolveInternalLink(node.data.url || "/contact-us"), openInNewTab: !!node.data.openInNewTab };
       break;
     }
   }
