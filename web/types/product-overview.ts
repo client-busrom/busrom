@@ -24,6 +24,28 @@ export interface ExclusiveSolutionItem {
   title: string;
   description: string;
   image?: any;
+  rightImage?: any;
+  leftImage?: any;
+}
+
+export interface SelectionGuideSlide {
+  id: number;
+  title1: string;
+  title2: string;
+  highlightText: string;
+  content1: string;
+  content2: string;
+  images: any[];
+}
+
+export interface SelectionGuide {
+  slides: SelectionGuideSlide[];
+}
+
+export interface BrandTrust {
+  title: string;
+  content: string;
+  image?: any;
 }
 
 export interface ProductOverviewData {
@@ -62,4 +84,6 @@ export interface ProductOverviewData {
     content: string;
     items: ExclusiveSolutionItem[];
   };
+  selectionGuide?: SelectionGuide;
+  brandTrust?: BrandTrust;
 }

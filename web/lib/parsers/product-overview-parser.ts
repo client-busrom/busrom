@@ -60,10 +60,11 @@ function extractAfterMarker(children: any[], markerId: string): any[] {
     if (foundMarker) {
       // Logic to stop at the next marker: starts with [something]-marker-name
       // or looks like a typical marker key (lowercase-with-dashes)
-      const isNextMarker = text.length > 5 && text.includes("-") && 
-        (text.includes("title") || text.includes("image") || text.includes("item") || 
-         text.includes("cta") || text.includes("content") || text.includes("subtitle") || 
-         text.includes("logo") || text.includes("guide") || text.includes("trust"));
+      // Tightened logic: starts with a known marker prefix AND is short (likely a tag)
+      const isNextMarker = text.length < 50 && text.includes("-") && 
+        (text.startsWith("title") || text.startsWith("image") || text.startsWith("item") || 
+         text.startsWith("cta") || text.startsWith("content") || text.startsWith("subtitle") || 
+         text.startsWith("logo") || text.startsWith("product-guide") || text.startsWith("brand-trust"));
          
       if (isNextMarker) {
          break;
@@ -298,10 +299,65 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
     }
   }
 
+  // --- Selection Guide Section ---
+  const selectionGuideSlides: any[] = [];
+  // Support more slides dynamically (up to 5 for now)
+  for (let i = 1; i <= 5; i++) {
+    const list = extractListAfterMarker(children, `product-guide-${i}`);
+    
+    // Also try to find a heading or paragraph that just says "product-guide-i" 
+    // in case it's nested or slightly different.
+    if (list.length > 0) {
+      let slideImages: any[] = [];
+      const imageNodes = extractAfterMarker(children, `product-guide-image-${i}`);
+      for (const node of imageNodes) {
+        if (node.type === 'custom-image-gallery' && node.data?.images) {
+          slideImages = node.data.images.map((imgConfig: any) => {
+            if (imgConfig.sourceType === 'application' && imgConfig.application) {
+              const app = applications.find((a: any) => String(a.id) === String(imgConfig.application));
+              return app ? resolveMedia(getRandomAppImage(app)) : null;
+            }
+            return resolveMedia(imgConfig.image);
+          }).filter(Boolean);
+          break;
+        }
+      }
+
+      selectionGuideSlides.push({
+        id: `slide-${i}-${Date.now()}`, // Unique ID
+        title1: list[0] || "",
+        title2: list[1] || "",
+        highlightText: list[2] || "",
+        content1: list[3] || "",
+        content2: list[4] || "",
+        images: slideImages
+      });
+    }
+  }
+
+  // --- Brand Trust Section ---
+  const brandTrustTitle = extractSingleTextAfterMarker(children, "brand-trust-title");
+  const brandTrustContent = extractSingleTextAfterMarker(children, "brand-trust-content");
+  let brandTrustImage = null;
+  const brandTrustImageNodes = extractAfterMarker(children, "brand-trust-image");
+  for (const node of brandTrustImageNodes) {
+    if (node.type === 'custom-image-gallery' && node.data?.images?.[0]) {
+      brandTrustImage = resolveMedia(node.data.images[0].image);
+      break;
+    }
+    // Fallback if it's a direct image block
+    if (node.type === 'image' && node.data?.image) {
+      brandTrustImage = resolveMedia(node.data.image);
+      break;
+    }
+  }
+
   return {
     hero: { content1: heroContent1, content2: heroContent2, content3: heroContent3, cta: heroCta, productItems: heroProductItems },
     seriesOverview: { title: seriesTitle || "Product Series", subtitle: seriesSubtitle || "Overview", items: seriesItems, config: seriesConfig },
     applications: { title: appTitle || "APPLICATIONS", subtitle: appSubtitle || "Professional project support and cases", cta: appCta, items: appItems, config: appConfig },
-    exclusiveSolutions: { logoText, title, subtitle, content, items }
+    exclusiveSolutions: { logoText, title, subtitle, content, items },
+    selectionGuide: selectionGuideSlides.length > 0 ? { slides: selectionGuideSlides } : undefined,
+    brandTrust: brandTrustTitle ? { title: brandTrustTitle, content: brandTrustContent, image: brandTrustImage } : undefined
   };
 }
