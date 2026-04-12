@@ -153,6 +153,15 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
       Object.assign(mediaData, appMediaData);
     }
 
+    // Flatten the Lexical tree before returning to ensure parsers can find markers inside layouts
+    const resolvedPage = { ...page };
+    if (resolvedPage.content?.root?.children) {
+      resolvedPage.content.root.children = flattenLexicalChildren(resolvedPage.content.root.children);
+    }
+    if (resolvedPage.contentTranslation?.root?.children) {
+      resolvedPage.contentTranslation.root.children = flattenLexicalChildren(resolvedPage.contentTranslation.root.children);
+    }
+
     let navigationMenus: any[] = [];
     const navRes = await fetch(`${cmsUrl}/api/navigation-menus?locale=${locale}&limit=1000&depth=2`, { 
       next: { revalidate: 3600 } 
@@ -162,7 +171,7 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
       navigationMenus = (navData.docs || []).map(normalizeMediaObject);
     }
 
-    return { ...page, mediaData, products, series, applications, formConfig, navigationMenus };
+    return { ...resolvedPage, mediaData, products, series, applications, formConfig, navigationMenus };
   } catch (e) {
     console.error(`Error fetching page data for ${slug}:`, e);
     return null;
