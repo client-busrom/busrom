@@ -108,11 +108,27 @@
     @apply border-border;
   }
   body {
-    /* 这里是关键！
-      你的 body 会自动使用你的主选色 #F6F4ED 
-      和你的主要文字颜色 #3C3C3C
-    */
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+  }
+
+  /* Restore selection for form elements */
+  input, 
+  textarea, 
+  [contenteditable="true"] {
+    user-select: auto;
+    -webkit-user-select: auto;
   }
 }
 
