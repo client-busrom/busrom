@@ -19,8 +19,18 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
   const normalize = (url: string) => {
     if (!url) return '';
     if (url.startsWith('http')) return convertToCDNUrl(url, strategy);
-    const normalizedPath = url.startsWith('/') ? url : `/${url}`;
-    return convertToCDNUrl(`${cmsUrl}${normalizedPath}`, strategy);
+
+    // Only prepend cmsUrl if it's a media path or looks like a file asset.
+    // We want to keep regular internal navigation links (like /contact-us) as relative paths.
+    const isMediaPath = url.startsWith('/api/media') || url.startsWith('/media') || /\.(jpg|jpeg|png|gif|svg|webp|avif|pdf|docx|zip)$/i.test(url);
+    
+    if (isMediaPath) {
+      const normalizedPath = url.startsWith('/') ? url : `/${url}`;
+      return convertToCDNUrl(`${cmsUrl}${normalizedPath}`, strategy);
+    }
+
+    // For other links (internal navigation), just ensure it starts with / and keep it relative
+    return url.startsWith('/') ? url : `/${url}`;
   };
 
   try {
