@@ -42,154 +42,215 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
   )
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ minHeight: vw(1000), paddingTop: vw(100), paddingBottom: vw(50) }}>
-      <div className="mx-auto relative" style={{ width: vw(1920), height: vw(1000) }}>
-        
-        {/* Navigation Buttons */}
-        <button
-          onClick={handlePrev}
-          className="absolute z-[100] group cursor-pointer"
-          style={{ left: vw(120), top: vw(800), width: vw(82), height: vw(82) }}
-        >
-          <div className="w-full h-full rounded-full border border-[#464010] flex items-center justify-center transition-all duration-300 group-hover:bg-[#464010]">
-            <ChevronLeft style={{ width: vw(32), height: vw(32) }} className="text-[#464010] group-hover:text-white transition-colors" />
-          </div>
-        </button>
+    <section className="relative w-full overflow-hidden" id="selection-guide">
+      {/* ==================== 1. Desktop Layout (>= md) ==================== */}
+      <div className="hidden md:block w-full" style={{ minHeight: vw(1000), paddingTop: vw(100), paddingBottom: vw(50) }}>
+        <div className="mx-auto relative" style={{ width: vw(1920), height: vw(1000) }}>
+          {/* Navigation Buttons */}
+          <button
+            onClick={handlePrev}
+            className="absolute z-[100] group cursor-pointer"
+            style={{ left: vw(120), top: vw(800), width: vw(82), height: vw(82) }}
+          >
+            <div className="w-full h-full rounded-full border border-[#464010] flex items-center justify-center transition-all duration-300 group-hover:bg-[#464010]">
+              <ChevronLeft style={{ width: vw(32), height: vw(32) }} className="text-[#464010] group-hover:text-white transition-colors" />
+            </div>
+          </button>
 
-        <button
-          onClick={handleNext}
-          className="absolute z-[100] group cursor-pointer"
-          style={{ left: vw(1700), top: vw(800), width: vw(82), height: vw(82) }}
-        >
-          <div className="w-full h-full rounded-full border border-[#464010] flex items-center justify-center transition-all duration-300 group-hover:bg-[#464010]">
-            <ChevronRight style={{ width: vw(32), height: vw(32) }} className="text-[#464010] group-hover:text-white transition-colors" />
-          </div>
-        </button>
+          <button
+            onClick={handleNext}
+            className="absolute z-[100] group cursor-pointer"
+            style={{ left: vw(1700), top: vw(800), width: vw(82), height: vw(82) }}
+          >
+            <div className="w-full h-full rounded-full border border-[#464010] flex items-center justify-center transition-all duration-300 group-hover:bg-[#464010]">
+              <ChevronRight style={{ width: vw(32), height: vw(32) }} className="text-[#464010] group-hover:text-white transition-colors" />
+            </div>
+          </button>
 
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeIndex}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="absolute inset-0"
+            >
+              {/* Decorative "X" Icon */}
+              <div className="absolute opacity-90" style={{ left: vw(138), top: vw(20), width: vw(185), height: vw(185) }}>
+                <CrossIcon />
+              </div>
+
+              {/* Titles: Corrected to 60px */}
+              <h2 className="absolute font-limelight text-white leading-[1.1] whitespace-nowrap z-40" style={{ fontSize: vw(80), left: vw(149), top: vw(-12) }}>
+                {currentSlide.title1}
+              </h2>
+              <h2 className="absolute font-limelight text-white leading-[1.1] whitespace-nowrap z-40" style={{ fontSize: vw(80), left: vw(246), top: vw(118) }}>
+                {currentSlide.title2}
+              </h2>
+
+              {/* Highlight Box: Text corrected to 29px */}
+              <motion.div 
+                className="absolute rounded-[40px] overflow-hidden z-10 flex flex-col justify-start"
+                style={{ 
+                  left: vw(166), 
+                  top: vw(301), 
+                  minHeight: vw(342),
+                  padding: `${vw(60)} ${vw(50)} ${vw(100)}`,
+                  background: 'linear-gradient(180deg, rgba(255, 240, 122, 0.75) 0%, rgba(153, 141, 41, 0) 100%)',
+                  backdropFilter: 'blur(12px)'
+                }}
+              >
+                <p className="font-josefin-sans font-semibold text-[#635700] whitespace-pre-line text-left" style={{ fontSize: vw(29), lineHeight: 1.3 }}>
+                  {currentSlide.highlightText}
+                </p>
+              </motion.div>
+
+              {/* Small Image */}
+              {currentSlide.images[1] && (
+                <motion.div 
+                  className="absolute shadow-xl overflow-hidden z-20" 
+                  style={{ 
+                    left: vw(605),
+                    top: vw(350),
+                    width: vw(517), 
+                    height: vw(612), 
+                    borderRadius: `${vw(258.5)} ${vw(258.5)} 0 0`,
+                    border: `${vw(1)} solid rgba(255, 255, 255, 0.1)` 
+                  }}
+                >
+                  <OptimizedImage 
+                    image={currentSlide.images[1].url} 
+                    alt="Guide 2" 
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 z-10" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 33.5%, rgba(0,0,0,0.8) 100%)' }} />
+                  <div className="absolute z-30 flex flex-col justify-end" style={{ left: vw(665 - 605), bottom: vw(40), width: vw(413), minHeight: vw(229) }}>
+                    <p className="font-josefin-sans text-white leading-relaxed" style={{ fontSize: vw(24), textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                      {currentSlide.content2}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Large Image */}
+              {currentSlide.images[0] && (
+                <motion.div 
+                  className="absolute overflow-hidden z-20" 
+                  style={{ 
+                    left: vw(1193),
+                    top: vw(-50),
+                    width: vw(564), 
+                    height: vw(933), 
+                    borderRadius: vw(282), 
+                    border: `${vw(1)} solid rgba(255, 255, 255, 0.2)` 
+                  }}
+                >
+                  <OptimizedImage 
+                    image={currentSlide.images[0].url} 
+                    alt="Guide 1" 
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 z-10" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 26.5%, rgba(0,0,0,0.95) 100%)' }} />
+                  <div className="absolute z-30 flex flex-col justify-end" style={{ left: vw(1266 - 1193), bottom: vw(100), width: vw(425), minHeight: vw(384) }}>
+                    <p className="font-josefin-sans text-white leading-relaxed" style={{ fontSize: vw(24), textShadow: '0 2px 10px rgba(0,0,0,0.7)' }}>
+                      {currentSlide.content1}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* ==================== 2. Mobile Layout (< md) ==================== */}
+      <div className="md:hidden w-full px-6 py-12 flex flex-col min-h-[600px] relative">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeIndex}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="absolute inset-0"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="flex flex-col w-full"
           >
-            {/* Decorative "X" Icon */}
-            <div className="absolute opacity-90" style={{ left: vw(138), top: vw(20), width: vw(185), height: vw(185) }}>
-              <CrossIcon />
+            {/* Header Area with Icon and Titles */}
+            <div className="relative mb-8 pt-4">
+              {/* Keep the icon near the title */}
+              <div className="absolute -top-4 -left-2 w-20 h-20 opacity-40 pointer-events-none">
+                <CrossIcon />
+              </div>
+              <div className="relative z-10">
+                <h2 className="font-limelight text-white text-4xl leading-tight">
+                  {currentSlide.title1}
+                </h2>
+                <h2 className="font-limelight text-white text-4xl leading-tight ml-6">
+                  {currentSlide.title2}
+                </h2>
+              </div>
             </div>
 
-            {/* Titles: Corrected to 60px */}
-            <h2 
-              className="absolute font-limelight text-white leading-[1.1] whitespace-nowrap z-40" 
-              style={{ fontSize: vw(80), left: vw(149), top: vw(-12) }}
-            >
-              {currentSlide.title1}
-            </h2>
-            <h2 
-              className="absolute font-limelight text-white leading-[1.1] whitespace-nowrap z-40" 
-              style={{ fontSize: vw(80), left: vw(246), top: vw(118) }}
-            >
-              {currentSlide.title2}
-            </h2>
+            {/* Highlight Box */}
+            <div className="rounded-[24px] p-6 mb-10 bg-gradient-to-b from-yellow-200/50 to-transparent backdrop-blur-md border border-white/10">
+              <p className="font-josefin-sans font-semibold text-[#464010] text-lg leading-relaxed">
+                {currentSlide.highlightText}
+              </p>
+            </div>
 
-            {/* Highlight Box: Text corrected to 29px */}
-            <motion.div 
-               className="absolute rounded-[40px] overflow-hidden z-10 flex flex-col justify-start"
-               style={{ 
-                 left: vw(166), 
-                 top: vw(301), 
-                 minHeight: vw(342),
-                 padding: `${vw(60)} ${vw(50)} ${vw(100)}`,
-                 background: 'linear-gradient(180deg, rgba(255, 240, 122, 0.75) 0%, rgba(153, 141, 41, 0) 100%)',
-                 backdropFilter: 'blur(12px)'
-               }}
-            >
-               <p className="font-josefin-sans font-semibold text-[#635700] whitespace-pre-line text-left" style={{ fontSize: vw(29), lineHeight: 1.3 }}>
-                 {currentSlide.highlightText}
-               </p>
-            </motion.div>
-
-            {/* Small Image */}
-            {currentSlide.images[1] && (
-              <motion.div 
-                className="absolute shadow-xl overflow-hidden z-20" 
-                style={{ 
-                  left: vw(605),
-                  top: vw(350),
-                  width: vw(517), 
-                  height: vw(612), 
-                  borderRadius: `${vw(258.5)} ${vw(258.5)} 0 0`,
-                  border: `${vw(1)} solid rgba(255, 255, 255, 0.1)` 
-                }}
-              >
-                <OptimizedImage 
-                  image={currentSlide.images[1].url} 
-                  alt="Guide 2" 
-                  width={517} 
-                  height={612} 
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 z-10" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 33.5%, rgba(0,0,0,0.8) 100%)' }} />
-                
-                {/* 1-5 Text: Corrected to 24px */}
-                <div 
-                  className="absolute z-30 flex flex-col justify-end" 
-                  style={{ 
-                    left: vw(665 - 605), 
-                    bottom: vw(40), 
-                    width: vw(413),
-                    minHeight: vw(229)
-                  }}
-                >
-                  <p className="font-josefin-sans text-white leading-relaxed" style={{ fontSize: vw(24), textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-                    {currentSlide.content2}
-                  </p>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Large Image */}
-            {currentSlide.images[0] && (
-              <motion.div 
-                className="absolute overflow-hidden z-20" 
-                style={{ 
-                  left: vw(1193),
-                  top: vw(-50),
-                  width: vw(564), 
-                  height: vw(933), 
-                  borderRadius: vw(282), 
-                  border: `${vw(1)} solid rgba(255, 255, 255, 0.2)` 
-                }}
-              >
+            {/* Content Cards in 2 Columns */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Image 1 Card */}
+              <div className="relative w-full aspect-[2/3] rounded-[24px] overflow-hidden shadow-lg border border-white/20">
                 <OptimizedImage 
                   image={currentSlide.images[0].url} 
-                  alt="Guide 1" 
-                  width={564} 
-                  height={933} 
+                  alt="Guide Mobile 1" 
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 z-10" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 26.5%, rgba(0,0,0,0.95) 100%)' }} />
-
-                {/* 1-4 Text: Corrected to 24px */}
-                <div 
-                  className="absolute z-30 flex flex-col justify-end" 
-                  style={{ 
-                    left: vw(1266 - 1193), 
-                    bottom: vw(100), 
-                    width: vw(425),
-                    minHeight: vw(384)
-                  }}
-                >
-                  <p className="font-josefin-sans text-white leading-relaxed" style={{ fontSize: vw(24), textShadow: '0 2px 10px rgba(0,0,0,0.7)' }}>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <p className="font-josefin-sans text-white text-xs leading-relaxed">
                     {currentSlide.content1}
                   </p>
                 </div>
-              </motion.div>
-            )}
+              </div>
+
+              {/* Image 2 Card */}
+              <div className="relative w-full aspect-[2/3] rounded-[24px] overflow-hidden shadow-lg border border-white/20">
+                <OptimizedImage 
+                  image={currentSlide.images[1].url} 
+                  alt="Guide Mobile 2" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <p className="font-josefin-sans text-white text-xs leading-relaxed">
+                    {currentSlide.content2}
+                  </p>
+                </div>
+              </div>
+            </div>
           </motion.div>
         </AnimatePresence>
+
+        {/* Mobile Navigation Controls */}
+        <div className="flex justify-between items-center mt-12 px-2">
+          <button onClick={handlePrev} className="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center text-white active:bg-white/10">
+            <ChevronLeft size={24} />
+          </button>
+          
+          <div className="flex gap-2">
+            {slides.map((_, i) => (
+              <div 
+                key={i} 
+                className={`h-1.5 rounded-full transition-all duration-300 ${i === activeIndex ? 'w-6 bg-white' : 'w-1.5 bg-white/30'}`} 
+              />
+            ))}
+          </div>
+
+          <button onClick={handleNext} className="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center text-white active:bg-white/10">
+            <ChevronRight size={24} />
+          </button>
+        </div>
       </div>
     </section>
   )
