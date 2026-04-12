@@ -90,157 +90,257 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
   return (
     <section 
       className="relative w-full overflow-hidden" 
-      style={{ 
-        paddingTop: vw(125),
-        paddingBottom: vw(125),
-        background: 'linear-gradient(180deg, #fff6d4 0%, #fff6d4 70%, #f6f4ed 100%)',
-        borderRadius: vw(80),
-      }}
+      id="exclusive-solutions"
     >
-      <div className="mx-auto" style={{ width: vw(1604) }}>
-        {/* Header Info - Strict Design Alignment */}
-        <div className="relative" style={{ marginBottom: vw(80), paddingLeft: vw(42) }}>
-          <div className="flex">
-            <motion.p
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              className="font-katibeh flex items-center justify-center bg-[#ffe484] text-black leading-none rounded-full relative"
-              style={{ 
-                fontSize: vw(40), 
-                padding: `${vw(15)} ${vw(60)} ${vw(0)} ${vw(60)}`,
-                marginBottom: vw(40),
-                lineHeight: 1,
-              }}
-            >
-              {logoText}
-            </motion.p>
-          </div>
-          
-          <div className="flex justify-between items-start gap-10">
-            <div className="flex flex-col" style={{ width: vw(800) }}>
-              <motion.h2
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                className="font-katibeh leading-none text-black"
-                style={{ fontSize: vw(110) }}
-              >
-                {title}
-              </motion.h2>
-              
+      {/* ==================== 1. Desktop Layout (>= md) ==================== */}
+      <div className="hidden md:block w-full" 
+        style={{ 
+          paddingTop: vw(125),
+          paddingBottom: vw(125),
+          background: 'linear-gradient(180deg, #fff6d4 0%, #fff6d4 70%, #f6f4ed 100%)',
+          borderRadius: vw(80),
+        }}
+      >
+        <div className="mx-auto" style={{ width: vw(1604) }}>
+          {/* Header Info */}
+          <div className="relative" style={{ marginBottom: vw(80), paddingLeft: vw(42) }}>
+            <div className="flex">
               <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                className="font-katibeh text-black whitespace-pre-line"
-                style={{ fontSize: vw(42), lineHeight: 1.3, marginTop: vw(30) }}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                className="font-katibeh flex items-center justify-center bg-[#ffe484] text-black leading-none rounded-full relative"
+                style={{ 
+                  fontSize: vw(40), 
+                  padding: `${vw(15)} ${vw(60)} ${vw(0)} ${vw(60)}`,
+                  marginBottom: vw(40),
+                }}
               >
-                {subtitle}
+                {logoText}
               </motion.p>
             </div>
+            
+            <div className="flex justify-between items-start" style={{ gap: vw(40) }}>
+              <div className="flex flex-col" style={{ width: vw(800) }}>
+                <motion.h2
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  className="font-katibeh leading-none text-black"
+                  style={{ fontSize: vw(110) }}
+                >
+                  {title}
+                </motion.h2>
+                
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  className="font-katibeh text-black whitespace-pre-line"
+                  style={{ fontSize: vw(42), lineHeight: 1.3, marginTop: vw(30) }}
+                >
+                  {subtitle}
+                </motion.p>
+              </div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              className="relative bg-[#FFBB3220] border-2 border-dashed border-[#E9D89E] backdrop-blur-sm self-start flex items-center"
-              style={{ 
-                width: "fit-content",
-                padding: `${vw(30)} ${vw(40)}`,
-                borderRadius: vw(35),
-                marginTop: vw(-20),
-              }}
-            >
-              <p className="font-katibeh text-[#965200] whitespace-pre-line leading-relaxed" style={{ fontSize: vw(40) }}>
-                {content}
-              </p>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* 3-Column Split Carousel Box - Strict Coordinates */}
-        <div 
-          className="relative overflow-hidden w-full"
-          style={{ 
-            height: vw(896), 
-            background: "linear-gradient(180deg, #464010 0%, rgba(172, 157, 39, 0.55) 100%)",
-            borderRadius: vw(60),
-          }}
-        >
-          {/* Navigation Buttons - Use Style for absolute positioning to avoid Tailwind bracket issues */}
-          <div className="absolute z-30" style={{ left: vw(42), top: vw(70) }}>
-            <NavButton direction="prev" onClick={scrollPrev} />
-          </div>
-          <div className="absolute z-30" style={{ left: vw(1426), top: vw(64) }}>
-            <NavButton direction="next" onClick={scrollNext} />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                className="relative bg-[#FFBB3220] border-2 border-dashed border-[#E9D89E] backdrop-blur-sm self-start flex items-center flex-shrink-0"
+                style={{ 
+                  width: "fit-content",
+                  padding: `${vw(30)} ${vw(40)}`,
+                  borderRadius: vw(35),
+                  marginTop: vw(-20),
+                }}
+              >
+                <p className="font-katibeh text-[#965200] whitespace-pre-line leading-relaxed" style={{ fontSize: vw(40) }}>
+                  {content}
+                </p>
+              </motion.div>
+            </div>
           </div>
 
-          <div className="overflow-visible h-full" ref={emblaRef}>
-            <div className="flex h-full">
-              {items.map((item: any, idx: number) => (
-                <div key={idx} className="flex-shrink-0 w-full relative h-full">
-                   {/* Column 1: Left Text Block (x_abs: 195, relative_to_box: 42) */}
-                   <div 
-                    className="absolute z-20 flex flex-col justify-between"
-                    style={{ 
-                      left: vw(42), 
-                      top: vw(165), 
-                      width: vw(435),
-                      height: vw(668)
-                    }}
-                   >
-                      <div 
-                        className="bg-[#5a5319] flex items-center shadow-lg"
-                        style={{ width: 'fit-content', maxWidth: vw(520), borderRadius: vw(60), padding: vw(40) }}
-                      >
+          {/* Carousel Box */}
+          <div 
+            className="relative overflow-hidden w-full"
+            style={{ 
+              height: vw(896), 
+              background: "linear-gradient(180deg, #464010 0%, rgba(172, 157, 39, 0.55) 100%)",
+              borderRadius: vw(60),
+            }}
+          >
+            <div className="absolute z-30" style={{ left: vw(42), top: vw(70) }}>
+              <NavButton direction="prev" onClick={scrollPrev} />
+            </div>
+            <div className="absolute z-30" style={{ left: vw(1426), top: vw(64) }}>
+              <NavButton direction="next" onClick={scrollNext} />
+            </div>
+
+            <div className="overflow-visible h-full" ref={emblaRef}>
+              <div className="flex h-full">
+                {items.map((item: any, idx: number) => (
+                  <div key={idx} className="flex-shrink-0 w-full relative h-full">
+                    {/* Left Text */}
+                    <div 
+                      className="absolute z-20 flex flex-col justify-between"
+                      style={{ 
+                        left: vw(42), 
+                        top: vw(165), 
+                        width: vw(435),
+                        height: vw(668)
+                      }}
+                    >
+                      <div className="bg-[#5a5319] flex items-center shadow-lg" style={{ borderRadius: vw(60), padding: vw(40) }}>
                         <p className="font-josefin-sans text-white opacity-90 whitespace-pre-line" style={{ fontSize: vw(30), lineHeight: 1.4 }}>
-                           {item.description}
+                          {item.description}
                         </p>
                       </div>
-
                       <h3 className="font-josefin-sans font-bold text-white uppercase tracking-tight whitespace-pre-line" style={{ fontSize: vw(48), lineHeight: 1.1, width: vw(900) }}>
                         {item.title}
                       </h3>
-                   </div>
+                    </div>
 
-                   {/* Column 2: Middle Image (x_abs: 797, relative_to_box: 644) */}
-                   <div 
-                    className="absolute z-10 overflow-hidden shadow-xl"
-                    style={{ 
-                      left: vw(644), 
-                      top: vw(165),
-                      width: vw(447),
-                      height: vw(668),
-                      borderRadius: vw(60)
-                    }}
-                   >
+                    {/* Middle Image */}
+                    <div 
+                      className="absolute z-10 overflow-hidden shadow-xl"
+                      style={{ 
+                        left: vw(644), 
+                        top: vw(165),
+                        width: vw(447),
+                        height: vw(668),
+                        borderRadius: vw(60)
+                      }}
+                    >
                       {item.leftImage && (
                         <OptimizedImage 
                           image={item.leftImage} 
                           alt="Solution Detail" 
-                          size="medium"
                           className="w-full h-full object-cover"
                         />
                       )}
-                   </div>
+                    </div>
 
-                   {/* Column 3: Right Image (x_abs: 1264, relative_to_box: 1111) */}
-                   <div 
-                    className="absolute z-10 overflow-hidden shadow-xl"
-                    style={{ 
-                      left: vw(1111), 
-                      top: vw(165),
-                      width: vw(447),
-                      height: vw(668),
-                      borderRadius: vw(60)
-                    }}
-                   >
+                    {/* Right Image */}
+                    <div 
+                      className="absolute z-10 overflow-hidden shadow-xl"
+                      style={{ 
+                        left: vw(1111), 
+                        top: vw(165),
+                        width: vw(447),
+                        height: vw(668),
+                        borderRadius: vw(60)
+                      }}
+                    >
                       {item.rightImage && (
                         <OptimizedImage 
                           image={item.rightImage} 
                           alt="Application Case" 
-                          size="medium"
                           className="w-full h-full object-cover"
                         />
                       )}
-                   </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ==================== 2. Mobile Layout (< md) ==================== */}
+      <div className="md:hidden w-full pt-16 pb-12 px-6 flex flex-col bg-[#fff6d4]">
+        {/* Header Badge */}
+        <div className="flex mb-4">
+          <p className="font-katibeh px-6 py-1 bg-[#ffe484] text-black text-xl rounded-full">
+            {logoText}
+          </p>
+        </div>
+
+        {/* Title & Subtitle Stack */}
+        <div className="flex flex-col mb-6">
+          <h2 className="font-katibeh text-5xl text-black leading-tight mb-3">
+            {title}
+          </h2>
+          <p className="font-katibeh text-xl text-black/80 leading-snug">
+            {subtitle}
+          </p>
+        </div>
+
+        {/* Content Box */}
+        <div className="bg-[#FFBB3220] border-2 border-dashed border-[#E9D89E] rounded-[24px] p-5 mb-8">
+          <p className="font-katibeh text-[#965200] text-xl leading-relaxed text-center sm:text-left">
+            {content}
+          </p>
+        </div>
+
+        {/* Carousel Container */}
+        <div 
+          className="relative w-full rounded-[30px] overflow-hidden"
+          style={{ 
+            background: "linear-gradient(180deg, #464010 0%, rgba(172, 157, 39, 0.55) 100%)",
+            padding: "24px 12px"
+          }}
+        >
+          {/* Navigation Overlay - Clean Mobile Implementation */}
+          <div className="flex justify-between items-center mb-5 px-2">
+            <button 
+              onClick={scrollPrev} 
+              className="w-12 h-12 flex items-center justify-center rounded-full border border-white/30 bg-white/5 active:bg-white/20 transition-colors"
+              aria-label="Previous slide"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 18L9 12L15 6" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            <button 
+              onClick={scrollNext} 
+              className="w-12 h-12 flex items-center justify-center rounded-full border border-white/30 bg-white/5 active:bg-white/20 transition-colors"
+              aria-label="Next slide"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 18L15 12L9 6" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
+
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex">
+              {items.map((item: any, idx: number) => (
+                <div key={idx} className="flex-shrink-0 w-full flex flex-col gap-5">
+                  {/* Mobile Text Block */}
+                  <div className="flex flex-col gap-3">
+                    <h3 className="font-josefin-sans font-bold text-white text-xl uppercase leading-tight">
+                      {item.title}
+                    </h3>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-[18px] p-4">
+                      <p className="font-josefin-sans text-white/90 text-[13px] leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Image Grid - 2 Columns */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="aspect-[4/5] rounded-[20px] overflow-hidden shadow-lg">
+                      {item.leftImage && (
+                        <OptimizedImage 
+                          image={item.leftImage} 
+                          alt="Detail 1" 
+                          size="small"
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
+
+                    <div className="aspect-[4/5] rounded-[20px] overflow-hidden shadow-lg">
+                      {item.rightImage && (
+                        <OptimizedImage 
+                          image={item.rightImage} 
+                          alt="Detail 2" 
+                          size="small"
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
