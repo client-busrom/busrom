@@ -333,15 +333,20 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
               transition={{ duration: 0.5 }}
               className="relative w-[300px] h-[300px] flex items-center justify-center"
             >
-              <div className="absolute inset-0 rounded-full bg-white border border-[#ffea44] shadow-2xl z-0" />
-              <div className="relative w-[240px] h-[240px] rounded-full overflow-hidden z-10">
-                <OptimizedImage
-                  image={items[activeIndex].image}
-                  alt={items[activeIndex].title}
-                  className="w-full h-full object-cover"
-                  size="large"
-                />
-              </div>
+              <Link 
+                href={items[activeIndex].href} 
+                className="relative w-full h-full flex items-center justify-center block"
+              >
+                <div className="absolute inset-0 rounded-full bg-white border border-[#ffea44] shadow-2xl z-0" />
+                <div className="relative w-[240px] h-[240px] rounded-full overflow-hidden z-10">
+                  <OptimizedImage
+                    image={items[activeIndex].image}
+                    alt={items[activeIndex].title}
+                    className="w-full h-full object-cover"
+                    size="large"
+                  />
+                </div>
+              </Link>
             </motion.div>
           </AnimatePresence>
 
