@@ -1,19 +1,25 @@
-"use client"
+"use client";
 
-import React, { useCallback, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { OptimizedImage } from "@/components/ui/OptimizedImage"
-import { ProductOverviewData } from "@/types/product-overview"
-import useEmblaCarousel from "embla-carousel-react"
+import React, { useCallback, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { ProductOverviewData } from "@/types/product-overview";
+import useEmblaCarousel from "embla-carousel-react";
 
 interface ExclusiveSolutionsSectionProps {
-  data: ProductOverviewData["exclusiveSolutions"]
+  data: ProductOverviewData["exclusiveSolutions"];
 }
 
-const DESIGN_WIDTH = 1920
-const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
+const DESIGN_WIDTH = 1920;
+const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
 
-const NavButton = ({ direction, onClick }: { direction: 'prev' | 'next', onClick: () => void }) => {
+const NavButton = ({
+  direction,
+  onClick,
+}: {
+  direction: "prev" | "next";
+  onClick: () => void;
+}) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -36,16 +42,25 @@ const NavButton = ({ direction, onClick }: { direction: 'prev' | 'next', onClick
             viewBox="0 0 115 61"
             fill="none"
           >
-            <path 
-              d={direction === 'prev' 
-                ? "M36.7383 28.2695H94V32.7559H36.7383V37.2422L21.2627 30.5127L36.7383 23.7832V28.2695Z" 
-                : "M78.2617 28.2695H21V32.7559H78.2617V37.2422L93.7373 30.5127L78.2617 23.7832V28.2695Z"} 
+            <path
+              d={
+                direction === "prev"
+                  ? "M36.7383 28.2695H94V32.7559H36.7383V37.2422L21.2627 30.5127L36.7383 23.7832V28.2695Z"
+                  : "M78.2617 28.2695H21V32.7559H78.2617V37.2422L93.7373 30.5127L78.2617 23.7832V28.2695Z"
+              }
               fill="white"
             />
-            <rect 
-              x="1" y="1" width="113" height="59" rx="29.5" 
-              stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" 
-              strokeDasharray="6 6" 
+            <rect
+              x="1"
+              y="1"
+              width="113"
+              height="59"
+              rx="29.5"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeDasharray="6 6"
             />
           </motion.svg>
         ) : (
@@ -59,11 +74,14 @@ const NavButton = ({ direction, onClick }: { direction: 'prev' | 'next', onClick
             viewBox="0 0 113 58"
             fill="none"
           >
-            <path 
-              fillRule="evenodd" clipRule="evenodd" 
-              d={direction === 'next'
-                ? "M84 0C100.016 0 113 12.9837 113 29C113 45.0163 100.016 58 84 58H29C12.9837 58 0 45.0163 0 29C0 12.9837 12.9837 0 29 0H84ZM78.3271 27.2803H24V31.7676H78.3271V36.2539L93.0098 29.5244L78.3271 22.7949V27.2803Z"
-                : "M29 0C12.9837 0 0 12.9837 0 29C0 45.0163 12.9837 58 29 58H84C100.016 58 113 45.0163 113 29C113 12.9837 100.016 0 84 0H29ZM34.6729 27.2803H89V31.7676H34.6729V36.2539L19.9902 29.5244L34.6729 22.7949V27.2803Z"} 
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d={
+                direction === "next"
+                  ? "M84 0C100.016 0 113 12.9837 113 29C113 45.0163 100.016 58 84 58H29C12.9837 58 0 45.0163 0 29C0 12.9837 12.9837 0 29 0H84ZM78.3271 27.2803H24V31.7676H78.3271V36.2539L93.0098 29.5244L78.3271 22.7949V27.2803Z"
+                  : "M29 0C12.9837 0 0 12.9837 0 29C0 45.0163 12.9837 58 29 58H84C100.016 58 113 45.0163 113 29C113 12.9837 100.016 0 84 0H29ZM34.6729 27.2803H89V31.7676H34.6729V36.2539L19.9902 29.5244L34.6729 22.7949V27.2803Z"
+              }
               fill="white"
             />
           </motion.svg>
@@ -73,53 +91,72 @@ const NavButton = ({ direction, onClick }: { direction: 'prev' | 'next', onClick
   );
 };
 
-export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionProps) {
-  const [desktopRef, desktopApi] = useEmblaCarousel({ 
-    loop: true, 
+export function ExclusiveSolutionsSection({
+  data,
+}: ExclusiveSolutionsSectionProps) {
+  const [desktopRef, desktopApi] = useEmblaCarousel({
+    loop: true,
     align: "start",
-    skipSnaps: false
-  })
+    skipSnaps: false,
+  });
 
-  const [mobileRef, mobileApi] = useEmblaCarousel({ 
-    loop: true, 
+  const [mobileRef, mobileApi] = useEmblaCarousel({
+    loop: true,
     align: "start",
-    skipSnaps: false
-  })
+    skipSnaps: false,
+  });
 
-  const scrollPrevDesktop = useCallback(() => desktopApi && desktopApi.scrollPrev(), [desktopApi])
-  const scrollNextDesktop = useCallback(() => desktopApi && desktopApi.scrollNext(), [desktopApi])
-  
-  const scrollPrevMobile = useCallback(() => mobileApi && mobileApi.scrollPrev(), [mobileApi])
-  const scrollNextMobile = useCallback(() => mobileApi && mobileApi.scrollNext(), [mobileApi])
+  const scrollPrevDesktop = useCallback(
+    () => desktopApi && desktopApi.scrollPrev(),
+    [desktopApi],
+  );
+  const scrollNextDesktop = useCallback(
+    () => desktopApi && desktopApi.scrollNext(),
+    [desktopApi],
+  );
 
-  if (!data || !data.items || data.items.length === 0) return null
+  const scrollPrevMobile = useCallback(
+    () => mobileApi && mobileApi.scrollPrev(),
+    [mobileApi],
+  );
+  const scrollNextMobile = useCallback(
+    () => mobileApi && mobileApi.scrollNext(),
+    [mobileApi],
+  );
 
-  const { logoText, title, subtitle, content, items } = data
+  if (!data || !data.items || data.items.length === 0) return null;
+
+  const { logoText, title, subtitle, content, items } = data;
 
   return (
-    <section 
-      className="relative w-full overflow-hidden" 
+    <section
+      className="relative w-full overflow-hidden"
       id="exclusive-solutions"
     >
       {/* ==================== 1. Desktop Layout (>= md) ==================== */}
-      <div className="hidden md:block w-full" 
-        style={{ 
+      <div
+        className="hidden md:block w-full"
+        style={{
           paddingTop: vw(125),
           paddingBottom: vw(125),
-          background: 'linear-gradient(180deg, #fff6d4 0%, #fff6d4 70%, #f6f4ed 100%)',
+          background:
+            "linear-gradient(180deg, #fff6d4 0%, #fff6d4 70%, #f6f4ed 100%)",
           borderRadius: vw(80),
         }}
       >
         <div className="mx-auto" style={{ width: vw(1604) }}>
           {/* Header Info */}
-          <div className="relative" style={{ marginBottom: vw(80), paddingLeft: vw(42) }}>
+          <div
+            className="relative"
+            style={{ marginBottom: vw(80), paddingLeft: vw(42) }}
+          >
             <div className="flex">
               <motion.p
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 className="font-katibeh flex items-center justify-center bg-[#ffe484] text-black leading-none rounded-full relative"
-                style={{ 
-                  fontSize: vw(40), 
+                style={{
+                  fontSize: vw(40),
                   padding: `${vw(15)} ${vw(60)} ${vw(0)} ${vw(60)}`,
                   marginBottom: vw(40),
                 }}
@@ -127,8 +164,11 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
                 {logoText}
               </motion.p>
             </div>
-            
-            <div className="flex justify-between items-start" style={{ gap: vw(40) }}>
+
+            <div
+              className="flex justify-between items-start"
+              style={{ gap: vw(40) }}
+            >
               <div className="flex flex-col" style={{ width: vw(800) }}>
                 <motion.h2
                   initial={{ opacity: 0, y: 30 }}
@@ -138,12 +178,16 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
                 >
                   {title}
                 </motion.h2>
-                
+
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   className="font-katibeh text-black whitespace-pre-line"
-                  style={{ fontSize: vw(42), lineHeight: 1.3, marginTop: vw(30) }}
+                  style={{
+                    fontSize: vw(42),
+                    lineHeight: 1.3,
+                    marginTop: vw(30),
+                  }}
                 >
                   {subtitle}
                 </motion.p>
@@ -153,14 +197,17 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 className="relative bg-[#FFBB3220] border-2 border-dashed border-[#E9D89E] backdrop-blur-sm self-start flex items-center flex-shrink-0"
-                style={{ 
+                style={{
                   width: "fit-content",
                   padding: `${vw(30)} ${vw(40)}`,
                   borderRadius: vw(35),
                   marginTop: vw(-20),
                 }}
               >
-                <p className="font-katibeh text-[#965200] whitespace-pre-line leading-relaxed" style={{ fontSize: vw(40) }}>
+                <p
+                  className="font-katibeh text-[#965200] whitespace-pre-line leading-relaxed"
+                  style={{ fontSize: vw(40) }}
+                >
                   {content}
                 </p>
               </motion.div>
@@ -168,81 +215,106 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
           </div>
 
           {/* Carousel Box */}
-          <div 
+          <div
             className="relative overflow-hidden w-full"
-            style={{ 
-              height: vw(896), 
-              background: "linear-gradient(180deg, #464010 0%, rgba(172, 157, 39, 0.55) 100%)",
+            style={{
+              height: vw(896),
+              background:
+                "linear-gradient(180deg, #464010 0%, rgba(172, 157, 39, 0.55) 100%)",
               borderRadius: vw(60),
             }}
           >
-            <div className="absolute z-30" style={{ left: vw(42), top: vw(70) }}>
+            <div
+              className="absolute z-30"
+              style={{ left: vw(42), top: vw(70) }}
+            >
               <NavButton direction="prev" onClick={scrollPrevDesktop} />
             </div>
-            <div className="absolute z-30" style={{ left: vw(1426), top: vw(64) }}>
+            <div
+              className="absolute z-30"
+              style={{ left: vw(1426), top: vw(64) }}
+            >
               <NavButton direction="next" onClick={scrollNextDesktop} />
             </div>
 
             <div className="overflow-hidden h-full" ref={desktopRef}>
               <div className="flex h-full">
                 {items.map((item: any, idx: number) => (
-                  <div key={idx} className="flex-shrink-0 w-full relative h-full">
+                  <div
+                    key={idx}
+                    className="flex-shrink-0 w-full relative h-full"
+                  >
                     {/* Left Text */}
-                    <div 
+                    <div
                       className="absolute z-20 flex flex-col justify-between"
-                      style={{ 
-                        left: vw(42), 
-                        top: vw(165), 
+                      style={{
+                        left: vw(42),
+                        top: vw(165),
                         width: vw(435),
-                        height: vw(668)
+                        height: vw(668),
                       }}
                     >
-                      <div className="bg-[#5a5319] flex items-center shadow-lg" style={{ borderRadius: vw(60), padding: vw(40) }}>
-                        <p className="font-josefin-sans text-white opacity-90 whitespace-pre-line" style={{ fontSize: vw(30), lineHeight: 1.4 }}>
+                      <div
+                        className="bg-[#5a5319] flex items-center shadow-lg"
+                        style={{ borderRadius: vw(60), padding: vw(40) }}
+                      >
+                        <p
+                          className="font-josefin-sans text-white opacity-90 whitespace-pre-line"
+                          style={{ fontSize: vw(30), lineHeight: 1.4 }}
+                        >
                           {item.description}
                         </p>
                       </div>
-                      <h3 className="font-josefin-sans font-bold text-white uppercase tracking-tight whitespace-pre-line" style={{ fontSize: vw(48), lineHeight: 1.1, width: vw(900) }}>
+                      <h3
+                        className="font-josefin-sans font-bold text-white uppercase tracking-tight whitespace-pre-line"
+                        style={{
+                          fontSize: vw(48),
+                          lineHeight: 1.1,
+                          width: vw(900),
+                        }}
+                      >
                         {item.title}
                       </h3>
                     </div>
 
                     {/* Middle Image */}
-                    <div 
+                    <div
                       className="absolute z-10 overflow-hidden shadow-xl"
-                      style={{ 
-                        left: vw(644), 
+                      style={{
+                        left: vw(644),
                         top: vw(165),
                         width: vw(447),
                         height: vw(668),
-                        borderRadius: vw(60)
+                        borderRadius: vw(60),
                       }}
                     >
                       {item.leftImage && (
-                        <OptimizedImage 
-                          image={item.leftImage} 
-                          alt="Solution Detail" 
+                        <OptimizedImage
+                          image={item.leftImage}
+                          alt="Solution Detail"
                           className="w-full h-full object-cover"
+                          size="large"
                         />
                       )}
                     </div>
 
                     {/* Right Image */}
-                    <div 
+                    <div
                       className="absolute z-10 overflow-hidden shadow-xl"
-                      style={{ 
-                        left: vw(1111), 
+                      style={{
+                        left: vw(1111),
                         top: vw(165),
                         width: vw(447),
                         height: vw(668),
-                        borderRadius: vw(60)
+                        borderRadius: vw(60),
                       }}
                     >
                       {item.rightImage && (
-                        <OptimizedImage 
-                          image={item.rightImage} 
-                          alt="Application Case" 
+                        <OptimizedImage
+                          image={item.rightImage}
+                          alt="Application Case"
                           className="w-full h-full object-cover"
+                          size="large"
                         />
                       )}
                     </div>
@@ -281,31 +353,56 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
         </div>
 
         {/* Carousel Container */}
-        <div 
+        <div
           className="relative w-full rounded-[30px] overflow-hidden"
-          style={{ 
-            background: "linear-gradient(180deg, #464010 0%, rgba(172, 157, 39, 0.55) 100%)",
-            padding: "24px 12px"
+          style={{
+            background:
+              "linear-gradient(180deg, #464010 0%, rgba(172, 157, 39, 0.55) 100%)",
+            padding: "24px 12px",
           }}
         >
           {/* Navigation Overlay - Clean Mobile Implementation */}
           <div className="flex justify-between items-center mb-5 px-2">
-            <button 
-              onClick={scrollPrevMobile} 
+            <button
+              onClick={scrollPrevMobile}
               className="w-12 h-12 flex items-center justify-center rounded-full border border-white/30 bg-white/5 active:bg-white/20 transition-colors"
               aria-label="Previous slide"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 18L9 12L15 6" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M15 18L9 12L15 6"
+                  stroke="white"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
-            <button 
-              onClick={scrollNextMobile} 
+            <button
+              onClick={scrollNextMobile}
               className="w-12 h-12 flex items-center justify-center rounded-full border border-white/30 bg-white/5 active:bg-white/20 transition-colors"
               aria-label="Next slide"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 18L15 12L9 6" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M9 18L15 12L9 6"
+                  stroke="white"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
           </div>
@@ -313,7 +410,10 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
           <div className="overflow-hidden" ref={mobileRef}>
             <div className="flex">
               {items.map((item: any, idx: number) => (
-                <div key={idx} className="flex-shrink-0 w-full flex flex-col gap-5">
+                <div
+                  key={idx}
+                  className="flex-shrink-0 w-full flex flex-col gap-5"
+                >
                   {/* Mobile Text Block */}
                   <div className="flex flex-col gap-3">
                     <h3 className="font-josefin-sans font-bold text-white text-xl uppercase leading-tight">
@@ -330,10 +430,10 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
                   <div className="grid grid-cols-2 gap-3">
                     <div className="aspect-[4/5] rounded-[20px] overflow-hidden shadow-lg">
                       {item.leftImage && (
-                        <OptimizedImage 
-                          image={item.leftImage} 
-                          alt="Detail 1" 
-                          size="small"
+                        <OptimizedImage
+                          image={item.leftImage}
+                          alt="Detail 1"
+                          size="large"
                           className="w-full h-full object-cover"
                         />
                       )}
@@ -341,10 +441,10 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
 
                     <div className="aspect-[4/5] rounded-[20px] overflow-hidden shadow-lg">
                       {item.rightImage && (
-                        <OptimizedImage 
-                          image={item.rightImage} 
-                          alt="Detail 2" 
-                          size="small"
+                        <OptimizedImage
+                          image={item.rightImage}
+                          alt="Detail 2"
+                          size="large"
                           className="w-full h-full object-cover"
                         />
                       )}
@@ -357,5 +457,5 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -144,6 +144,7 @@ export function QuoteSection({ data }: QuoteSectionProps) {
                   image={data.image}
                   alt="Quote"
                   className="w-full h-full object-cover"
+                  size="large"
                 />
               )}
             </motion.div>
@@ -185,6 +186,7 @@ export function QuoteSection({ data }: QuoteSectionProps) {
                 image={data.logo}
                 alt="Decorative Logo"
                 className="w-full h-full object-contain"
+                size="large"
               />
             )}
           </motion.div>
@@ -205,6 +207,7 @@ export function QuoteSection({ data }: QuoteSectionProps) {
                 image={data.image}
                 alt="Quote Mobile"
                 className="w-full h-full object-cover"
+                size="large"
               />
             )}
           </motion.div>
@@ -283,6 +286,7 @@ export function QuoteSection({ data }: QuoteSectionProps) {
               image={data.logo}
               alt="Decorative Logo Mobile"
               className="w-full h-full object-contain object-left-bottom"
+              size="large"
             />
           )}
         </div>

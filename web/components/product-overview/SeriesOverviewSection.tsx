@@ -149,8 +149,8 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
         style={{ height: vw(1200), paddingTop: vw(300) }}
       >
         {/* Title */}
-        <div 
-          className="relative z-[60] text-center" 
+        <div
+          className="relative z-[60] text-center"
           style={{ height: vw(65), marginBottom: vw(240) }}
         >
           <h2
@@ -238,7 +238,7 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
                         <OptimizedImage
                           image={item.image}
                           alt={item.title}
-                          size="medium"
+                          size="large"
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -333,8 +333,8 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
               transition={{ duration: 0.5 }}
               className="relative w-[300px] h-[300px] flex items-center justify-center"
             >
-              <Link 
-                href={items[activeIndex].href} 
+              <Link
+                href={items[activeIndex].href}
                 className="relative w-full h-full flex items-center justify-center block"
               >
                 <div className="absolute inset-0 rounded-full bg-white border border-[#ffea44] shadow-2xl z-0" />
