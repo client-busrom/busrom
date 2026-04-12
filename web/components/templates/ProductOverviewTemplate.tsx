@@ -3,10 +3,14 @@
 import React, { useMemo } from "react"
 import { ProductOverviewHeroSection } from "../product-overview/HeroSection"
 import { SeriesOverviewSection } from "../product-overview/SeriesOverviewSection"
+import { ApplicationsSection } from "../product-overview/ApplicationsSection"
+import { ExclusiveSolutionsSection } from "../product-overview/ExclusiveSolutionsSection"
+
+import { ProductOverviewData } from "@/types/product-overview"
 
 interface ProductOverviewTemplateProps {
   locale: string;
-  data: any;
+  data: ProductOverviewData;
 }
 
 export function ProductOverviewTemplate({ locale, data }: ProductOverviewTemplateProps) {
@@ -20,8 +24,15 @@ export function ProductOverviewTemplate({ locale, data }: ProductOverviewTemplat
       {/* 2. Series Overview Section */}
       <SeriesOverviewSection data={data.seriesOverview} />
 
-      {/* Placeholder for future sections */}
-      <div className="h-[200px]" />
+      {/* 3. Applications Section */}
+      {data.applications?.items?.length > 0 && (
+        <ApplicationsSection data={data.applications} />
+      )}
+
+      {/* 4. Exclusive Solutions Section */}
+      {data.exclusiveSolutions && (
+        <ExclusiveSolutionsSection data={data.exclusiveSolutions} />
+      )}
     </div>
   )
 }
