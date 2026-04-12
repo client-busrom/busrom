@@ -143,7 +143,16 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
       Object.assign(mediaData, appMediaData);
     }
 
-    return { ...page, mediaData, products, series, applications, formConfig };
+    let navigationMenus: any[] = [];
+    const navRes = await fetch(`${cmsUrl}/api/navigation-menus?locale=${locale}&limit=1000&depth=2`, { 
+      next: { revalidate: 3600 } 
+    });
+    if (navRes.ok) {
+      const navData = await navRes.json();
+      navigationMenus = (navData.docs || []).map(normalizeMediaObject);
+    }
+
+    return { ...page, mediaData, products, series, applications, formConfig, navigationMenus };
   } catch (e) {
     console.error(`Error fetching page data for ${slug}:`, e);
     return null;

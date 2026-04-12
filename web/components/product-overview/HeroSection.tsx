@@ -58,15 +58,8 @@ const MaskedImage = ({ item, index, config }: { item: any; index: number; config
 
   if (!resolvedImage) return null
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.15, duration: 1, ease: "easeOut" }}
-      className="absolute group pointer-events-auto z-20"
-      style={{ left: config.left, top: config.top, width: config.width, height: config.height }}
-    >
+  const Content = (
+    <>
       <div
         className="relative w-full h-full overflow-hidden"
         style={{ 
@@ -97,6 +90,23 @@ const MaskedImage = ({ item, index, config }: { item: any; index: number; config
           {item.title}
         </span>
       </div>
+    </>
+  )
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.15, duration: 1, ease: "easeOut" }}
+      className="absolute group pointer-events-auto z-20"
+      style={{ left: config.left, top: config.top, width: config.width, height: config.height }}
+    >
+      {item.href ? (
+        <Link href={item.href} className="block w-full h-full">
+          {Content}
+        </Link>
+      ) : Content}
     </motion.div>
   )
 }
