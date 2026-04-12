@@ -74,14 +74,23 @@ const NavButton = ({ direction, onClick }: { direction: 'prev' | 'next', onClick
 };
 
 export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionProps) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+  const [desktopRef, desktopApi] = useEmblaCarousel({ 
     loop: true, 
     align: "start",
     skipSnaps: false
   })
 
-  const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi])
-  const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi])
+  const [mobileRef, mobileApi] = useEmblaCarousel({ 
+    loop: true, 
+    align: "start",
+    skipSnaps: false
+  })
+
+  const scrollPrevDesktop = useCallback(() => desktopApi && desktopApi.scrollPrev(), [desktopApi])
+  const scrollNextDesktop = useCallback(() => desktopApi && desktopApi.scrollNext(), [desktopApi])
+  
+  const scrollPrevMobile = useCallback(() => mobileApi && mobileApi.scrollPrev(), [mobileApi])
+  const scrollNextMobile = useCallback(() => mobileApi && mobileApi.scrollNext(), [mobileApi])
 
   if (!data || !data.items || data.items.length === 0) return null
 
@@ -168,13 +177,13 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
             }}
           >
             <div className="absolute z-30" style={{ left: vw(42), top: vw(70) }}>
-              <NavButton direction="prev" onClick={scrollPrev} />
+              <NavButton direction="prev" onClick={scrollPrevDesktop} />
             </div>
             <div className="absolute z-30" style={{ left: vw(1426), top: vw(64) }}>
-              <NavButton direction="next" onClick={scrollNext} />
+              <NavButton direction="next" onClick={scrollNextDesktop} />
             </div>
 
-            <div className="overflow-visible h-full" ref={emblaRef}>
+            <div className="overflow-hidden h-full" ref={desktopRef}>
               <div className="flex h-full">
                 {items.map((item: any, idx: number) => (
                   <div key={idx} className="flex-shrink-0 w-full relative h-full">
@@ -282,7 +291,7 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
           {/* Navigation Overlay - Clean Mobile Implementation */}
           <div className="flex justify-between items-center mb-5 px-2">
             <button 
-              onClick={scrollPrev} 
+              onClick={scrollPrevMobile} 
               className="w-12 h-12 flex items-center justify-center rounded-full border border-white/30 bg-white/5 active:bg-white/20 transition-colors"
               aria-label="Previous slide"
             >
@@ -291,7 +300,7 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
               </svg>
             </button>
             <button 
-              onClick={scrollNext} 
+              onClick={scrollNextMobile} 
               className="w-12 h-12 flex items-center justify-center rounded-full border border-white/30 bg-white/5 active:bg-white/20 transition-colors"
               aria-label="Next slide"
             >
@@ -301,7 +310,7 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
             </button>
           </div>
 
-          <div className="overflow-hidden" ref={emblaRef}>
+          <div className="overflow-hidden" ref={mobileRef}>
             <div className="flex">
               {items.map((item: any, idx: number) => (
                 <div key={idx} className="flex-shrink-0 w-full flex flex-col gap-5">
