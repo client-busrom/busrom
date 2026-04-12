@@ -5,19 +5,10 @@ import { motion, AnimatePresence } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import Link from "next/link"
 import Image from "next/image"
+import { ProductOverviewData } from "@/types/product-overview"
 
 interface ProductOverviewHeroSectionProps {
-  data: {
-    content1: string[];
-    content2: string[];
-    content3: string[];
-    cta: {
-      title: string;
-      url: string;
-      openInNewTab: boolean;
-    };
-    productItems: any[];
-  }
+  data: ProductOverviewData["hero"]
 }
 
 const DESIGN_WIDTH = 1920

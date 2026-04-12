@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { HollowText } from "@/components/common/HollowText"
+import { ProductOverviewData } from "@/types/product-overview"
 
 const DESIGN_WIDTH = 1920
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
@@ -80,24 +81,8 @@ function StackedSubtitle({ text }: { text: string }) {
   )
 }
 
-interface SeriesItem {
-  id: string;
-  title: string;
-  image: any;
-  href: string;
-}
-
 interface SeriesOverviewSectionProps {
-  data: {
-    title: string;
-    subtitle: string;
-    items: SeriesItem[];
-    config: {
-      autoplay: boolean;
-      interval: number;
-      itemsPerView: number;
-    }
-  }
+  data: ProductOverviewData["seriesOverview"]
 }
 
 function circularDist(index: number, active: number, total: number) {
@@ -280,8 +265,8 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
           className="absolute left-[8vw] z-[110] group"
           style={{ width: vw(82), height: vw(82), top: vw(-85) }}
         >
-          <div className="w-full h-full rounded-full border border-[#464010] flex items-center justify-center transition-colors group-hover:bg-[#464010]/10">
-            <ChevronLeft style={{ width: vw(32), height: vw(32) }} className="text-[#464010]" />
+          <div className="w-full h-full rounded-full border border-[#464010] flex items-center justify-center transition-all duration-300 group-hover:bg-[#464010]">
+            <ChevronLeft style={{ width: vw(32), height: vw(32) }} className="text-[#464010] group-hover:text-white transition-colors" />
           </div>
         </button>
 
@@ -290,8 +275,8 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
           className="absolute right-[8vw] z-[110] group"
           style={{ width: vw(82), height: vw(82), top: vw(-85) }}
         >
-          <div className="w-full h-full rounded-full bg-[#756F3F] flex items-center justify-center transition-transform group-hover:scale-110">
-            <ChevronRight style={{ width: vw(32), height: vw(32) }} className="text-white" />
+          <div className="w-full h-full rounded-full border border-[#464010] flex items-center justify-center transition-all duration-300 group-hover:bg-[#464010]">
+            <ChevronRight style={{ width: vw(32), height: vw(32) }} className="text-[#464010] group-hover:text-white transition-colors" />
           </div>
         </button>
       </div>

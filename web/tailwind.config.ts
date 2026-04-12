@@ -179,6 +179,8 @@ const config: Config = {
         'lemon': ['var(--font-lemon)', 'serif'],
         'lobster': ['var(--font-lobster)', 'cursive'],
         'bagel-fat-one': ['var(--font-bagel-fat-one)', 'cursive'],
+        'limelight': ['var(--font-limelight)', 'cursive'],
+        'katibeh': ['var(--font-katibeh)', 'cursive'],
         'kavivanar': ['Kavivanar', 'cursive'],
 
         // --- 系统字体 (直接使用名字) ---

@@ -22,14 +22,14 @@
           "id": "Ox5sW",
           "x": 0,
           "y": 0,
-          "name": "Group 288",
+          "name": "hero-section",
           "children": [
             {
               "type": "rectangle",
               "id": "27z3M",
               "x": 0,
               "y": 0,
-              "name": "Glass Clip（4）",
+              "name": "bg-color",
               "fill": "#fffce2ff",
               "width": 1920,
               "height": 968,
@@ -43,7 +43,7 @@
               "id": "5hDsK",
               "x": 396,
               "y": 114,
-              "name": "Masterful Craftsmanship",
+              "name": "hero-section-content-1-1",
               "fill": "#464010ff",
               "content": "Masterful Craftsmanship",
               "lineHeight": 1.0833333333333333,
@@ -57,7 +57,7 @@
               "id": "rw0WK",
               "x": 567,
               "y": 236,
-              "name": "Reimagining Home Design",
+              "name": "hero-section-content-1-2",
               "fill": "#464010ff",
               "textGrowth": "fixed-width",
               "width": 787,
@@ -73,7 +73,7 @@
               "id": "cCqSg",
               "x": 691,
               "y": 379,
-              "name": "Explore The Fusion Of Function & Art In High-end Hardware",
+              "name": "hero-section-content-1-3",
               "fill": "#464010ff",
               "textGrowth": "fixed-width-height",
               "width": 539,
@@ -90,7 +90,7 @@
               "id": "OQTE0",
               "x": 818,
               "y": 489.98765966636347,
-              "name": "Group 273",
+              "name": "hero-section-cta",
               "children": [
                 {
                   "type": "rectangle",
@@ -137,21 +137,26 @@
             },
             {
               "type": "group",
-              "id": "qIIWI",
-              "x": 270,
-              "y": 309,
-              "name": "Group 275",
+              "id": "RUd2T",
+              "x": 429,
+              "y": 277,
+              "name": "line-1",
               "children": [
                 {
-                  "type": "ellipse",
-                  "id": "ZeiRl",
+                  "type": "rectangle",
+                  "cornerRadius": [
+                    13,
+                    0,
+                    0,
+                    0
+                  ],
+                  "id": "Lxmqu",
                   "x": 0,
                   "y": 0,
-                  "name": "Ellipse 169",
-                  "sweepAngle": -360.00001001791264,
-                  "fill": "#756f3fff",
-                  "width": 69.77884674072266,
-                  "height": 69.77884674072266,
+                  "name": "Rectangle 670",
+                  "fill": "#bab377ff",
+                  "width": 142,
+                  "height": 1,
                   "stroke": {
                     "align": "inside",
                     "thickness": 1
@@ -159,86 +164,23 @@
                 },
                 {
                   "type": "rectangle",
-                  "cornerRadius": 2,
-                  "id": "ujz1n",
-                  "x": 28.384765625,
-                  "y": 29.5673828125,
-                  "name": "Rectangle 638",
-                  "width": 11.826923370361328,
-                  "height": 11.826923370361328,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1,
-                    "fill": "#ffffffff"
-                  }
-                },
-                {
-                  "type": "rectangle",
-                  "cornerRadius": 2,
-                  "id": "TRbb0",
-                  "x": 34.29826354980469,
-                  "y": 23.654296875,
-                  "name": "Rectangle 639",
-                  "width": 13.009614944458008,
-                  "height": 13.009614944458008,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1,
-                    "fill": "#ffffffff"
-                  }
-                },
-                {
-                  "type": "rectangle",
-                  "cornerRadius": 2,
-                  "id": "CdegD",
-                  "x": 22.47119140625,
-                  "y": 34.298828125,
-                  "name": "Rectangle 640",
-                  "width": 11.826923370361328,
-                  "height": 13.009614944458008,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1,
-                    "fill": "#ffffffff"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "group",
-              "id": "TAZHN",
-              "x": 1649.77880859375,
-              "y": 309,
-              "name": "Group 276",
-              "flipX": true,
-              "children": [
-                {
-                  "type": "ellipse",
-                  "id": "4RX43",
-                  "x": 0,
+                  "cornerRadius": [
+                    13,
+                    0,
+                    0,
+                    0
+                  ],
+                  "id": "W0TZD",
+                  "x": 921,
                   "y": 0,
-                  "name": "Ellipse 169",
-                  "sweepAngle": -360.00001001791264,
-                  "width": 69.77884674072266,
-                  "height": 69.77884674072266,
+                  "name": "Rectangle 671",
+                  "fill": "#bab377ff",
+                  "width": 142,
+                  "height": 1,
                   "stroke": {
                     "align": "inside",
-                    "thickness": 2,
-                    "fill": "#464010ff"
+                    "thickness": 1
                   }
-                },
-                {
-                  "type": "path",
-                  "id": "CaVbF",
-                  "x": 33.716796875,
-                  "y": 46.7060546875,
-                  "name": "Vector",
-                  "rotation": -135.0000024148365,
-                  "flipX": true,
-                  "geometry": "M314.06024 0.00004l-0.578 0c-7.69757 0.10974-15.17822 2.56654-21.44199 7.042l-0.36401 0.263 0.10501-0.067c-2.48227 1.59986-4.80316 3.43716-6.92999 5.486l-0.59803 0.587-270.94598 270.61999c-17.743 17.72101-17.743 46.45599 0 64.17801l0.536 0.526c17.78 17.19 46.142 17.01498 63.705-0.526l198.59698-198.36 0 612.38402c0 20.914 16.97403 37.867 37.90802 37.867l5.30899 0c20.64499-0.34003 37.28003-17.16199 37.28003-37.867l0-612.38503 198.59796 198.36c17.73999 17.72 46.5 17.72 64.24103 0 17.74298-17.72 17.74396-46.45501 0.00196-64.177l-270.96796-270.64199-0.57501-0.564c-1.93302-1.86265-4.02686-3.55088-6.25702-5.045l-0.56897-0.375 0.104 0.076c-6.51166-4.80527-14.39425-7.3926-22.487-7.381l-4.67102 0z",
-                  "fill": "#464010ff",
-                  "width": 15.875584602355957,
-                  "height": 20.07061767578125
                 }
               ]
             },
@@ -247,7 +189,7 @@
               "id": "NUSc3",
               "x": 169.00003756582737,
               "y": 84.00000000000182,
-              "name": "Group 274",
+              "name": "icon-1",
               "children": [
                 {
                   "type": "ellipse",
@@ -316,7 +258,7 @@
               "id": "ZTDTu",
               "x": 1747.1440805345774,
               "y": 84.00000000000182,
-              "name": "Group 277",
+              "name": "icon-2",
               "flipX": true,
               "children": [
                 {
@@ -354,26 +296,21 @@
             },
             {
               "type": "group",
-              "id": "RUd2T",
-              "x": 429,
-              "y": 277,
-              "name": "Group 283",
+              "id": "qIIWI",
+              "x": 270,
+              "y": 309,
+              "name": "icon-3",
               "children": [
                 {
-                  "type": "rectangle",
-                  "cornerRadius": [
-                    13,
-                    0,
-                    0,
-                    0
-                  ],
-                  "id": "Lxmqu",
+                  "type": "ellipse",
+                  "id": "ZeiRl",
                   "x": 0,
                   "y": 0,
-                  "name": "Rectangle 670",
-                  "fill": "#bab377ff",
-                  "width": 142,
-                  "height": 1,
+                  "name": "Ellipse 169",
+                  "sweepAngle": -360.00001001791264,
+                  "fill": "#756f3fff",
+                  "width": 69.77884674072266,
+                  "height": 69.77884674072266,
                   "stroke": {
                     "align": "inside",
                     "thickness": 1
@@ -381,23 +318,86 @@
                 },
                 {
                   "type": "rectangle",
-                  "cornerRadius": [
-                    13,
-                    0,
-                    0,
-                    0
-                  ],
-                  "id": "W0TZD",
-                  "x": 921,
-                  "y": 0,
-                  "name": "Rectangle 671",
-                  "fill": "#bab377ff",
-                  "width": 142,
-                  "height": 1,
+                  "cornerRadius": 2,
+                  "id": "ujz1n",
+                  "x": 28.384765625,
+                  "y": 29.5673828125,
+                  "name": "Rectangle 638",
+                  "width": 11.826923370361328,
+                  "height": 11.826923370361328,
                   "stroke": {
                     "align": "inside",
-                    "thickness": 1
+                    "thickness": 1,
+                    "fill": "#ffffffff"
                   }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "TRbb0",
+                  "x": 34.29826354980469,
+                  "y": 23.654296875,
+                  "name": "Rectangle 639",
+                  "width": 13.009614944458008,
+                  "height": 13.009614944458008,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#ffffffff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 2,
+                  "id": "CdegD",
+                  "x": 22.47119140625,
+                  "y": 34.298828125,
+                  "name": "Rectangle 640",
+                  "width": 11.826923370361328,
+                  "height": 13.009614944458008,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#ffffffff"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "TAZHN",
+              "x": 1649.77880859375,
+              "y": 309,
+              "name": "icon-4",
+              "flipX": true,
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "4RX43",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Ellipse 169",
+                  "sweepAngle": -360.00001001791264,
+                  "width": 69.77884674072266,
+                  "height": 69.77884674072266,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 2,
+                    "fill": "#464010ff"
+                  }
+                },
+                {
+                  "type": "path",
+                  "id": "CaVbF",
+                  "x": 33.716796875,
+                  "y": 46.7060546875,
+                  "name": "Vector",
+                  "rotation": -135.0000024148365,
+                  "flipX": true,
+                  "geometry": "M314.06024 0.00004l-0.578 0c-7.69757 0.10974-15.17822 2.56654-21.44199 7.042l-0.36401 0.263 0.10501-0.067c-2.48227 1.59986-4.80316 3.43716-6.92999 5.486l-0.59803 0.587-270.94598 270.61999c-17.743 17.72101-17.743 46.45599 0 64.17801l0.536 0.526c17.78 17.19 46.142 17.01498 63.705-0.526l198.59698-198.36 0 612.38402c0 20.914 16.97403 37.867 37.90802 37.867l5.30899 0c20.64499-0.34003 37.28003-17.16199 37.28003-37.867l0-612.38503 198.59796 198.36c17.73999 17.72 46.5 17.72 64.24103 0 17.74298-17.72 17.74396-46.45501 0.00196-64.177l-270.96796-270.64199-0.57501-0.564c-1.93302-1.86265-4.02686-3.55088-6.25702-5.045l-0.56897-0.375 0.104 0.076c-6.51166-4.80527-14.39425-7.3926-22.487-7.381l-4.67102 0z",
+                  "fill": "#464010ff",
+                  "width": 15.875584602355957,
+                  "height": 20.07061767578125
                 }
               ]
             },
@@ -406,7 +406,7 @@
               "id": "clBkT",
               "x": 0,
               "y": 630,
-              "name": "product-overview-svg-1",
+              "name": "hero-section-image-1",
               "geometry": "M378 270c16.56854 0 30 13.43146 30 30l0 170c0 16.56854-13.43146 30-30 30l-288 0c-49.70563 0-90-40.29437-90-90l0-110c0-16.56854 13.43146-30 30-30l348 0z m-208-201c16.56854 0 30 13.43146 30 30l0 131c0 16.56854-13.43146 30-30 30l-80 0c-49.70563 0-90-40.29437-90-90l0-71c0-16.56854 13.43146-30 30-30l140 0z m208-69c16.56854 0 30 13.43146 30 30l0 200c0 16.56854-13.43146 30-30 30l-80 0c-49.70563 0-90-40.29437-90-90l0-140c0-16.56854 13.43146-30 30-30l140 0z",
               "fill": {
                 "type": "image",
@@ -422,7 +422,7 @@
               "id": "tr8I0",
               "x": 421,
               "y": 630,
-              "name": "product-overview-svg-2",
+              "name": "hero-section-image-2",
               "geometry": "M327 224c16.56854 0 30 13.43146 30 30l0 155c0 16.56854-13.43146 30-30 30l-297 0c-16.56854 0-30-13.43146-30-30l0-155c0-16.56854 13.43146-30 30-30l297 0z m0-224c16.56854 0 30 13.43146 30 30l0 155c0 16.56854-13.43146 30-30 30l-297 0c-16.56854 0-30-13.43146-30-30l0-155c0-16.56854 13.43146-30 30-30l297 0z",
               "fill": {
                 "type": "image",
@@ -438,7 +438,7 @@
               "id": "fZF24",
               "x": 791,
               "y": 737,
-              "name": "product-overview-svg-3",
+              "name": "hero-section-image-3",
               "geometry": "M343 187c16.56854 0 30 13.43146 30 30l0 123c0 16.56854-13.43146 30-30 30l-313 0c-16.56854 0-30-13.43146-30-30l0-123c0-16.56854 13.43146-30 30-30l313 0z m0-187c16.56854 0 30 13.43146 30 30l0 118c0 16.56854-13.43146 30-30 30l-313 0c-16.56854 0-30-13.43146-30-30l0-118c0-16.56854 13.43146-30 30-30l313 0z",
               "fill": {
                 "type": "image",
@@ -454,7 +454,7 @@
               "id": "fjQsI",
               "x": 1174,
               "y": 654,
-              "name": "product-overview-svg-4",
+              "name": "hero-section-image-4",
               "geometry": "M446 295c16.56854 0 30 13.43146 30 30l0 123c0 16.56854-13.43146 30-30 30l-416 0c-16.56854 0-30-13.43146-30-30l0-123c0-16.56854 13.43146-30 30-30l416 0z m-208-295c16.56854 0 30 13.43146 30 30l0 227c0 16.56854-13.43146 30-30 30l-208 0c-16.56854 0-30-13.43146-30-30l0-227c0-16.56854 13.43146-30 30-30l208 0z m208 55c16.56854 0 30 13.43146 30 30l0 172c0 16.56854-13.43146 30-30 30l-136 0c-16.56854 0-30-13.43146-30-30l0-172c0-16.56854 13.43146-30 30-30l136 0z",
               "fill": {
                 "type": "image",
@@ -470,7 +470,7 @@
               "id": "WlhMZ",
               "x": 1660,
               "y": 601,
-              "name": "product-overview-svg-5",
+              "name": "hero-section-image-5",
               "geometry": "M230 328c16.56854 0 30 13.43146 30 30l0 85c0 33.13708-26.86292 60-60 60l-170 0c-16.56854 0-30-13.43146-30-30l0-115c0-16.56854 13.43146-30 30-30l200 0z m0-328c16.56854 0 30 13.43146 30 30l0 230c0 33.13708-26.86292 60-60 60l-170 0c-16.56854 0-30-13.43146-30-30l0-260c0-16.56854 13.43146-30 30-30l200 0z",
               "fill": {
                 "type": "image",
@@ -488,7 +488,7 @@
           "id": "weADC",
           "x": -3,
           "y": 1138,
-          "name": "Frame 1",
+          "name": "product-overview",
           "clip": true,
           "width": 1920,
           "height": 922,
@@ -499,28 +499,309 @@
           "layout": "none",
           "children": [
             {
-              "type": "text",
-              "id": "5zFPB",
-              "x": 625,
-              "y": 131,
-              "name": "Product Series",
-              "fill": "#000000ff",
-              "textGrowth": "fixed-width-height",
-              "width": 668,
-              "height": 70,
-              "content": "Product Series",
-              "lineHeight": 0.8068181818181818,
-              "textAlign": "center",
-              "fontFamily": "Josefin Sans",
-              "fontSize": 88,
-              "fontWeight": "700"
+              "type": "group",
+              "id": "WZfay",
+              "x": 145,
+              "y": 267,
+              "name": "product-overview-item",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "SpHAX",
+                  "x": 158,
+                  "y": 163,
+                  "name": "Ellipse 180",
+                  "flipX": true,
+                  "sweepAngle": -360.00001001791264,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "width": 158,
+                  "height": 158,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "7NCM1",
+                  "x": 1471,
+                  "y": 321,
+                  "name": "Ellipse 181",
+                  "rotation": 180,
+                  "flipX": true,
+                  "sweepAngle": -360.00001001791264,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "width": 158,
+                  "height": 158,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "PMLpJ",
+                  "x": 319,
+                  "y": 135,
+                  "name": "Ellipse 179",
+                  "flipX": true,
+                  "sweepAngle": -360.00001001791264,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "width": 214,
+                  "height": 214,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "Q3yJF",
+                  "x": 514,
+                  "y": 108,
+                  "name": "Ellipse 178",
+                  "flipX": true,
+                  "sweepAngle": -360.00001001791264,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "width": 268,
+                  "height": 268,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "kt8F1",
+                  "x": 1310,
+                  "y": 135,
+                  "name": "Ellipse 176",
+                  "sweepAngle": -360.00001001791264,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "width": 214,
+                  "height": 214,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "WRXUG",
+                  "x": 1115,
+                  "y": 108,
+                  "name": "Ellipse 175",
+                  "sweepAngle": -360.00001001791264,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "width": 268,
+                  "height": 268,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "mSwDv",
+                  "x": 902,
+                  "y": 78,
+                  "name": "Ellipse 174",
+                  "sweepAngle": -360.00001001791264,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "width": 328,
+                  "height": 328,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "IynrK",
+                  "x": 399,
+                  "y": 78,
+                  "name": "Ellipse 177",
+                  "sweepAngle": -360.00001001791264,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "fill"
+                  },
+                  "width": 328,
+                  "height": 328,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "group",
+                  "id": "G3YTr",
+                  "x": 582,
+                  "y": 0,
+                  "name": "item-active",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "QiZbz",
+                      "x": 0,
+                      "y": 0,
+                      "name": "Ellipse 183",
+                      "sweepAngle": -360.00001001791264,
+                      "fill": "#ffffffff",
+                      "width": 484,
+                      "height": 484,
+                      "stroke": {
+                        "align": "outside",
+                        "thickness": 1,
+                        "fill": "#ffea44ff"
+                      },
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#00000040",
+                        "offset": {
+                          "x": 0,
+                          "y": 4
+                        },
+                        "blur": 20.21250033378601
+                      }
+                    },
+                    {
+                      "type": "ellipse",
+                      "id": "nyR5z",
+                      "x": 60,
+                      "y": 34,
+                      "name": "Ellipse 182",
+                      "sweepAngle": -360.00001001791264,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "",
+                        "mode": "stretch"
+                      },
+                      "width": 364,
+                      "height": 364,
+                      "stroke": {
+                        "align": "outside",
+                        "thickness": 2
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "33mMK",
+                      "x": 127,
+                      "y": 389,
+                      "name": "glass standoff",
+                      "fill": "#000000ff",
+                      "content": "glass standoff",
+                      "lineHeight": 2.21875,
+                      "textAlign": "center",
+                      "fontFamily": "Inter",
+                      "fontSize": 32,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "path",
+              "id": "cto7N",
+              "x": 1654,
+              "y": 235,
+              "name": "next-btn",
+              "rotation": 9.826939576278036e-14,
+              "geometry": "M41.5 0c22.91981 0 41.5 18.35632 41.5 41 0 22.64367-18.58019 41-41.5 41-22.91982 0-41.5-18.35633-41.5-41 0-22.64368 18.58018-41 41.5-41z m-9.42773 27.52246l13.61621 13.53418-13.61621 13.53516 2.31933 2.36328 16.19531-15.89844-16.19531-15.89746-2.31933 2.36328z",
+              "fillRule": "evenodd",
+              "fill": "#756f3fff",
+              "width": 83,
+              "height": 82
+            },
+            {
+              "type": "group",
+              "id": "OB3Ia",
+              "x": 181,
+              "y": 235,
+              "name": "prev-btn",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "GCPAB",
+                  "x": 83,
+                  "y": 0,
+                  "name": "Ellipse 3",
+                  "rotation": 9.826939576278036e-14,
+                  "flipX": true,
+                  "sweepAngle": -360.00001001791264,
+                  "width": 83,
+                  "height": 82,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#464010ff"
+                  }
+                },
+                {
+                  "type": "path",
+                  "id": "1jv1U",
+                  "x": 32.4130859375,
+                  "y": 25.1591796875,
+                  "name": "Vector",
+                  "rotation": 9.826939576278036e-14,
+                  "geometry": "M591.21997 76.388l-74.07996-76.388-517.14001 513.84003 517.13696 513.83407 74.08405-76.38406-434.79802-437.45105 434.79698-437.45099z",
+                  "fill": "#464010ff",
+                  "width": 18.515018463134766,
+                  "height": 31.795486450195312,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 0.1953125
+                  }
+                }
+              ]
             },
             {
               "type": "group",
               "id": "Zipd7",
               "x": 646.6220703125,
               "y": 759.232421875,
-              "name": "Group 280",
+              "name": "product-overview-subtitle",
               "children": [
                 {
                   "type": "group",
@@ -654,347 +935,21 @@
               ]
             },
             {
-              "type": "group",
-              "id": "WZfay",
-              "x": 145,
-              "y": 267,
-              "name": "Group 279",
-              "children": [
-                {
-                  "type": "ellipse",
-                  "id": "SpHAX",
-                  "x": 158,
-                  "y": 163,
-                  "name": "Ellipse 180",
-                  "flipX": true,
-                  "sweepAngle": -360.00001001791264,
-                  "fill": [
-                    "#ffffffff",
-                    {
-                      "type": "image",
-                      "enabled": true,
-                      "url": "",
-                      "mode": "stretch"
-                    }
-                  ],
-                  "width": 158,
-                  "height": 158,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1
-                  }
-                },
-                {
-                  "type": "ellipse",
-                  "id": "7NCM1",
-                  "x": 1471,
-                  "y": 321,
-                  "name": "Ellipse 181",
-                  "rotation": 180,
-                  "flipX": true,
-                  "sweepAngle": -360.00001001791264,
-                  "fill": [
-                    "#ffffffff",
-                    {
-                      "type": "image",
-                      "enabled": true,
-                      "url": "",
-                      "mode": "stretch"
-                    }
-                  ],
-                  "width": 158,
-                  "height": 158,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1
-                  }
-                },
-                {
-                  "type": "ellipse",
-                  "id": "PMLpJ",
-                  "x": 319,
-                  "y": 135,
-                  "name": "Ellipse 179",
-                  "flipX": true,
-                  "sweepAngle": -360.00001001791264,
-                  "fill": [
-                    "#ffffffff",
-                    {
-                      "type": "image",
-                      "enabled": true,
-                      "url": "",
-                      "mode": "stretch"
-                    }
-                  ],
-                  "width": 214,
-                  "height": 214,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1
-                  }
-                },
-                {
-                  "type": "ellipse",
-                  "id": "Q3yJF",
-                  "x": 514,
-                  "y": 108,
-                  "name": "Ellipse 178",
-                  "flipX": true,
-                  "sweepAngle": -360.00001001791264,
-                  "fill": {
-                    "type": "image",
-                    "enabled": true,
-                    "url": "",
-                    "mode": "stretch"
-                  },
-                  "width": 268,
-                  "height": 268,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1
-                  }
-                },
-                {
-                  "type": "ellipse",
-                  "id": "kt8F1",
-                  "x": 1310,
-                  "y": 135,
-                  "name": "Ellipse 176",
-                  "sweepAngle": -360.00001001791264,
-                  "fill": [
-                    "#ffffffff",
-                    {
-                      "type": "image",
-                      "enabled": true,
-                      "url": "",
-                      "mode": "stretch"
-                    }
-                  ],
-                  "width": 214,
-                  "height": 214,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1
-                  }
-                },
-                {
-                  "type": "ellipse",
-                  "id": "WRXUG",
-                  "x": 1115,
-                  "y": 108,
-                  "name": "Ellipse 175",
-                  "sweepAngle": -360.00001001791264,
-                  "fill": [
-                    "#ffffffff",
-                    {
-                      "type": "image",
-                      "enabled": true,
-                      "url": "",
-                      "mode": "stretch"
-                    }
-                  ],
-                  "width": 268,
-                  "height": 268,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1
-                  }
-                },
-                {
-                  "type": "ellipse",
-                  "id": "mSwDv",
-                  "x": 902,
-                  "y": 78,
-                  "name": "Ellipse 174",
-                  "sweepAngle": -360.00001001791264,
-                  "fill": [
-                    "#ffffffff",
-                    {
-                      "type": "image",
-                      "enabled": true,
-                      "url": "",
-                      "mode": "stretch"
-                    }
-                  ],
-                  "width": 328,
-                  "height": 328,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1
-                  }
-                },
-                {
-                  "type": "ellipse",
-                  "id": "IynrK",
-                  "x": 399,
-                  "y": 78,
-                  "name": "Ellipse 177",
-                  "sweepAngle": -360.00001001791264,
-                  "fill": {
-                    "type": "image",
-                    "enabled": true,
-                    "url": "",
-                    "mode": "fill"
-                  },
-                  "width": 328,
-                  "height": 328,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1
-                  }
-                },
-                {
-                  "type": "ellipse",
-                  "id": "QiZbz",
-                  "x": 582,
-                  "y": 0,
-                  "name": "Ellipse 183",
-                  "sweepAngle": -360.00001001791264,
-                  "fill": "#ffffffff",
-                  "width": 484,
-                  "height": 484,
-                  "stroke": {
-                    "align": "outside",
-                    "thickness": 1,
-                    "fill": "#ffea44ff"
-                  },
-                  "effect": {
-                    "type": "shadow",
-                    "shadowType": "outer",
-                    "color": "#00000040",
-                    "offset": {
-                      "x": 0,
-                      "y": 4
-                    },
-                    "blur": 20.21250033378601
-                  }
-                },
-                {
-                  "type": "group",
-                  "id": "G3YTr",
-                  "x": 582,
-                  "y": 0,
-                  "name": "Mask group",
-                  "children": [
-                    {
-                      "type": "ellipse",
-                      "id": "7ylRd",
-                      "x": 0,
-                      "y": 0,
-                      "name": "Ellipse 173",
-                      "sweepAngle": -360.00001001791264,
-                      "width": 484,
-                      "height": 484,
-                      "stroke": {
-                        "align": "outside",
-                        "thickness": 2
-                      },
-                      "effect": {
-                        "type": "shadow",
-                        "shadowType": "outer",
-                        "color": "#00000040",
-                        "offset": {
-                          "x": 0,
-                          "y": 4
-                        },
-                        "blur": 20.21250033378601
-                      }
-                    },
-                    {
-                      "type": "ellipse",
-                      "id": "nyR5z",
-                      "x": 60,
-                      "y": 34,
-                      "name": "Ellipse 182",
-                      "sweepAngle": -360.00001001791264,
-                      "fill": [
-                        "#ffffffff",
-                        {
-                          "type": "image",
-                          "enabled": true,
-                          "url": "",
-                          "mode": "stretch"
-                        }
-                      ],
-                      "width": 364,
-                      "height": 364,
-                      "stroke": {
-                        "align": "outside",
-                        "thickness": 2
-                      }
-                    }
-                  ]
-                },
-                {
-                  "type": "text",
-                  "id": "33mMK",
-                  "x": 709,
-                  "y": 389,
-                  "name": "glass standoff",
-                  "fill": "#000000ff",
-                  "content": "glass standoff",
-                  "lineHeight": 2.21875,
-                  "textAlign": "center",
-                  "fontFamily": "Inter",
-                  "fontSize": 32,
-                  "fontWeight": "600"
-                }
-              ]
-            },
-            {
-              "type": "path",
-              "id": "cto7N",
-              "x": 1654,
-              "y": 235,
-              "name": "Subtract",
-              "rotation": 9.826939576278036e-14,
-              "geometry": "M41.5 0c22.91981 0 41.5 18.35632 41.5 41 0 22.64367-18.58019 41-41.5 41-22.91982 0-41.5-18.35633-41.5-41 0-22.64368 18.58018-41 41.5-41z m-9.42773 27.52246l13.61621 13.53418-13.61621 13.53516 2.31933 2.36328 16.19531-15.89844-16.19531-15.89746-2.31933 2.36328z",
-              "fillRule": "evenodd",
-              "fill": "#756f3fff",
-              "width": 83,
-              "height": 82
-            },
-            {
-              "type": "group",
-              "id": "OB3Ia",
-              "x": 181,
-              "y": 235,
-              "name": "Group 281",
-              "children": [
-                {
-                  "type": "ellipse",
-                  "id": "GCPAB",
-                  "x": 83,
-                  "y": 0,
-                  "name": "Ellipse 3",
-                  "rotation": 9.826939576278036e-14,
-                  "flipX": true,
-                  "sweepAngle": -360.00001001791264,
-                  "width": 83,
-                  "height": 82,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1,
-                    "fill": "#464010ff"
-                  }
-                },
-                {
-                  "type": "path",
-                  "id": "1jv1U",
-                  "x": 32.4130859375,
-                  "y": 25.1591796875,
-                  "name": "Vector",
-                  "rotation": 9.826939576278036e-14,
-                  "geometry": "M591.21997 76.388l-74.07996-76.388-517.14001 513.84003 517.13696 513.83407 74.08405-76.38406-434.79802-437.45105 434.79698-437.45099z",
-                  "fill": "#464010ff",
-                  "width": 18.515018463134766,
-                  "height": 31.795486450195312,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 0.1953125
-                  }
-                }
-              ]
+              "type": "text",
+              "id": "5zFPB",
+              "x": 625,
+              "y": 131,
+              "name": "product-overview-title",
+              "fill": "#000000ff",
+              "textGrowth": "fixed-width-height",
+              "width": 668,
+              "height": 70,
+              "content": "Product Series",
+              "lineHeight": 0.8068181818181818,
+              "textAlign": "center",
+              "fontFamily": "Josefin Sans",
+              "fontSize": 88,
+              "fontWeight": "700"
             }
           ]
         },
@@ -1003,7 +958,7 @@
           "id": "PVoMQ",
           "x": -3,
           "y": 2060,
-          "name": "Frame 2",
+          "name": "applications",
           "clip": true,
           "width": 1920,
           "height": 922,
@@ -1014,76 +969,27 @@
           "layout": "none",
           "children": [
             {
-              "type": "rectangle",
-              "cornerRadius": 60,
-              "id": "k3nxA",
-              "x": 590,
-              "y": 367,
-              "name": "Rectangle 642",
-              "fill": {
-                "type": "image",
-                "enabled": true,
-                "url": "",
-                "mode": "stretch"
-              },
-              "width": 390,
-              "height": 522,
-              "stroke": {
-                "align": "inside",
-                "thickness": 1
-              }
-            },
-            {
-              "type": "rectangle",
-              "cornerRadius": 60,
-              "id": "d2sEO",
-              "x": 1041,
-              "y": 33,
-              "name": "Rectangle 643",
-              "fill": {
-                "type": "image",
-                "enabled": true,
-                "url": "",
-                "mode": "stretch"
-              },
-              "width": 512,
-              "height": 743,
-              "stroke": {
-                "align": "inside",
-                "thickness": 1
-              }
-            },
-            {
-              "type": "rectangle",
-              "cornerRadius": 60,
-              "id": "M1pje",
-              "x": 1613,
-              "y": 217,
-              "name": "Rectangle 644",
-              "fill": {
-                "type": "image",
-                "enabled": true,
-                "url": "",
-                "mode": "stretch"
-              },
-              "width": 307,
-              "height": 374,
-              "stroke": {
-                "align": "inside",
-                "thickness": 1
-              }
-            },
-            {
               "type": "text",
               "id": "yNv8h",
               "x": 156,
               "y": 74,
-              "name": "Application scenarios",
+              "name": "applications-title",
               "fill": "#464010ff",
-              "textGrowth": "fixed-width-height",
-              "width": 829,
-              "height": 218,
-              "content": "Application   \n        scenarios",
+              "content": "Application",
+              "lineHeight": 1.1354166666666667,
+              "fontFamily": "Limelight",
+              "fontSize": 96,
+              "fontWeight": "normal",
+              "letterSpacing": 5.76
+            },
+            {
+              "type": "text",
+              "id": "XU19O",
+              "x": 373,
+              "y": 183,
+              "name": "applications-subtitle",
+              "fill": "#464010ff",
+              "content": "scenarios",
               "lineHeight": 1.1354166666666667,
               "fontFamily": "Limelight",
               "fontSize": 96,
@@ -1095,7 +1001,7 @@
               "id": "IV7QH",
               "x": 1658,
               "y": 694,
-              "name": "Subtract",
+              "name": "next-btn",
               "rotation": 9.826939576278036e-14,
               "geometry": "M41.5 0c22.91981 0 41.5 18.35632 41.5 41 0 22.64367-18.58019 41-41.5 41-22.91982 0-41.5-18.35633-41.5-41 0-22.64368 18.58018-41 41.5-41z m-9.42773 27.52246l13.61621 13.53418-13.61621 13.53516 2.31933 2.36328 16.19531-15.89844-16.19531-15.89746-2.31933 2.36328z",
               "fillRule": "evenodd",
@@ -1108,7 +1014,7 @@
               "id": "9a1iP",
               "x": 156,
               "y": 694,
-              "name": "Group 282",
+              "name": "prev-btn",
               "children": [
                 {
                   "type": "ellipse",
@@ -1150,7 +1056,7 @@
               "id": "bQkQU",
               "x": 156,
               "y": 385.21046428529246,
-              "name": "Group 286",
+              "name": "applications-cta",
               "children": [
                 {
                   "type": "rectangle",
@@ -1225,6 +1131,75 @@
                   ]
                 }
               ]
+            },
+            {
+              "type": "group",
+              "id": "6mp4Y",
+              "x": 590,
+              "y": 33,
+              "name": "applications-item",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 60,
+                  "id": "k3nxA",
+                  "x": 0,
+                  "y": 334,
+                  "name": "Rectangle 642",
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "width": 390,
+                  "height": 522,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 60,
+                  "id": "M1pje",
+                  "x": 1023,
+                  "y": 184,
+                  "name": "Rectangle 644",
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "width": 307,
+                  "height": 374,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 60,
+                  "id": "d2sEO",
+                  "x": 451,
+                  "y": 0,
+                  "name": "Rectangle 643",
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "width": 512,
+                  "height": 743,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                }
+              ]
             }
           ]
         },
@@ -1233,7 +1208,7 @@
           "id": "9lfHm",
           "x": 0,
           "y": 2982,
-          "name": "Group 289",
+          "name": "exclusive-solutions",
           "children": [
             {
               "type": "rectangle",
@@ -1241,7 +1216,7 @@
               "id": "fC9TE",
               "x": 0,
               "y": 0,
-              "name": "Rectangle 684",
+              "name": "bg",
               "fill": {
                 "type": "gradient",
                 "gradientType": "linear",
@@ -1273,27 +1248,11 @@
               }
             },
             {
-              "type": "text",
-              "id": "M7bcq",
-              "x": 153,
-              "y": 196,
-              "name": "Comprehensive Home Hardware Solution",
-              "fill": "#000000ff",
-              "textGrowth": "fixed-width-height",
-              "width": 804,
-              "height": 140,
-              "content": "Comprehensive \nHome Hardware Solution",
-              "lineHeight": 0.8645833333333334,
-              "fontFamily": "Katibeh",
-              "fontSize": 96,
-              "fontWeight": "normal"
-            },
-            {
               "type": "group",
               "id": "6QLq1",
               "x": 153,
               "y": 84,
-              "name": "Group 284",
+              "name": "exclusive-solutions-logo-text",
               "children": [
                 {
                   "type": "rectangle",
@@ -1336,10 +1295,26 @@
             },
             {
               "type": "text",
+              "id": "M7bcq",
+              "x": 153,
+              "y": 196,
+              "name": "exclusive-solutions-title",
+              "fill": "#000000ff",
+              "textGrowth": "fixed-width-height",
+              "width": 804,
+              "height": 140,
+              "content": "Comprehensive \nHome Hardware Solution",
+              "lineHeight": 0.8645833333333334,
+              "fontFamily": "Katibeh",
+              "fontSize": 96,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
               "id": "uXKgo",
               "x": 159,
               "y": 371,
-              "name": "From Architectural Precision To Everyday Durability, Busrom Delivers Comprehensive Hardware Solutions That Elevate Modern Spaces.",
+              "name": "exclusive-solutions-subtitle",
               "fill": "#4a4a4aff",
               "textGrowth": "fixed-width",
               "width": 662,
@@ -1355,7 +1330,7 @@
               "id": "P6sII",
               "x": 1049,
               "y": 166,
-              "name": "Rectangle 686",
+              "name": "exclusive-solutions-content-bg",
               "fill": "#ffbb3233",
               "width": 708,
               "height": 308,
@@ -1372,7 +1347,7 @@
               "id": "Gq0jb",
               "x": 1091,
               "y": 193,
-              "name": "Busrom Provides A Complete Series Of Glass And Architectural Hardware Designed To Meet The Diverse Needs Of Residential, Commercial, And Engineering Projects.Our Product Lines Form A Cohesive System That Combines Safety, Performance, And Aesthetics In Every Detail.",
+              "name": "exclusive-solutions-content",
               "fill": "#965200ff",
               "textGrowth": "fixed-width-height",
               "width": 629,
@@ -1389,7 +1364,7 @@
               "id": "GHlhj",
               "x": 153,
               "y": 520,
-              "name": "Rectangle 658",
+              "name": "exclusive-solutions-item-bg-box",
               "fill": {
                 "type": "gradient",
                 "gradientType": "linear",
@@ -1423,25 +1398,10 @@
             {
               "type": "rectangle",
               "cornerRadius": 60,
-              "id": "p6tDz",
-              "x": 195,
-              "y": 698,
-              "name": "Rectangle 672",
-              "fill": "#5a5319ff",
-              "width": 435,
-              "height": 396,
-              "stroke": {
-                "align": "inside",
-                "thickness": 1
-              }
-            },
-            {
-              "type": "rectangle",
-              "cornerRadius": 60,
               "id": "wbQvw",
               "x": 1264,
               "y": 685,
-              "name": "Rectangle 682",
+              "name": "exclusive-solutions-image",
               "fill": [
                 "#ffffffff",
                 {
@@ -1457,68 +1417,13 @@
                 "align": "inside",
                 "thickness": 1
               }
-            },
-            {
-              "type": "rectangle",
-              "cornerRadius": 60,
-              "id": "Pf25r",
-              "x": 797,
-              "y": 685,
-              "name": "Rectangle 685",
-              "fill": [
-                "#ffffffff",
-                {
-                  "type": "image",
-                  "enabled": true,
-                  "url": "",
-                  "mode": "stretch"
-                }
-              ],
-              "width": 447,
-              "height": 668,
-              "stroke": {
-                "align": "inside",
-                "thickness": 1
-              }
-            },
-            {
-              "type": "text",
-              "id": "EtvOY",
-              "x": 215,
-              "y": 1137,
-              "name": "Glass Standoff & Glass Connected Fitting",
-              "fill": "#ffffffff",
-              "textGrowth": "fixed-width-height",
-              "width": 403,
-              "height": 198,
-              "content": "Glass Standoff & Glass Connected Fitting",
-              "lineHeight": 1.375,
-              "fontFamily": "Josefin Sans",
-              "fontSize": 48,
-              "fontWeight": "700"
-            },
-            {
-              "type": "text",
-              "id": "BgK7L",
-              "x": 230,
-              "y": 768,
-              "name": "Built For Precise Installation And Strong Structural Support, Ensuring Seamless Glass-To-Glass And Glass-To-Wall Connections.",
-              "fill": "#ffffffff",
-              "textGrowth": "fixed-width-height",
-              "width": 365,
-              "height": 270,
-              "content": "Built For Precise Installation And Strong Structural Support, Ensuring Seamless Glass-To-Glass And Glass-To-Wall Connections.",
-              "lineHeight": 1.40625,
-              "fontFamily": "Josefin Sans",
-              "fontSize": 32,
-              "fontWeight": "normal"
             },
             {
               "type": "path",
               "id": "TGWxi",
               "x": 1579,
               "y": 584,
-              "name": "Subtract",
+              "name": "next-btn",
               "geometry": "M84 0c16.01626 0 29 12.98374 29 29 0 16.01626-12.98374 29-29 29l-55 0c-16.01626 0-29-12.98374-29-29 0-16.01626 12.98374-29 29-29l55 0z m-5.67285 27.28027l-54.32715 0 0 4.48731 54.32715 0 0 4.48633 14.68262-6.7295-14.68262-6.72949 0 4.48535z",
               "fillRule": "evenodd",
               "fill": "#ffffffff",
@@ -1530,7 +1435,7 @@
               "id": "75OFh",
               "x": 195,
               "y": 590,
-              "name": "Group 278",
+              "name": "prev-btn",
               "children": [
                 {
                   "type": "path",
@@ -1561,52 +1466,167 @@
                   }
                 }
               ]
+            },
+            {
+              "type": "group",
+              "id": "vFr3D",
+              "x": 215,
+              "y": 685,
+              "name": "exclusive-solutions-item",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 60,
+                  "id": "p6tDz",
+                  "x": -20,
+                  "y": 13,
+                  "name": "exclusive-solutions-item-description-bg",
+                  "fill": "#5a5319ff",
+                  "width": 435,
+                  "height": 396,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "text",
+                  "id": "BgK7L",
+                  "x": 15,
+                  "y": 83,
+                  "name": "exclusive-solutions-item-description",
+                  "fill": "#ffffffff",
+                  "textGrowth": "fixed-width-height",
+                  "width": 365,
+                  "height": 270,
+                  "content": "Built For Precise Installation And Strong Structural Support, Ensuring Seamless Glass-To-Glass And Glass-To-Wall Connections.",
+                  "lineHeight": 1.40625,
+                  "fontFamily": "Josefin Sans",
+                  "fontSize": 32,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "EtvOY",
+                  "x": 0,
+                  "y": 452,
+                  "name": "exclusive-solutions-item-title",
+                  "fill": "#ffffffff",
+                  "textGrowth": "fixed-width-height",
+                  "width": 403,
+                  "height": 198,
+                  "content": "Glass Standoff & Glass Connected Fitting",
+                  "lineHeight": 1.375,
+                  "fontFamily": "Josefin Sans",
+                  "fontSize": 48,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 60,
+                  "id": "Pf25r",
+                  "x": 582,
+                  "y": 0,
+                  "name": "exclusive-solutions-item-image",
+                  "fill": [
+                    "#ffffffff",
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "",
+                      "mode": "stretch"
+                    }
+                  ],
+                  "width": 447,
+                  "height": 668,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                }
+              ]
             }
           ]
         },
         {
-          "type": "group",
-          "id": "159xp",
+          "type": "rectangle",
+          "cornerRadius": 30,
+          "id": "3ROlx",
           "x": 30,
-          "y": 4513,
-          "name": "Group 290",
+          "y": 6880,
+          "name": "box-bg",
+          "rotation": 180,
+          "flipX": true,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": -179.99999999999994,
+            "size": {
+              "height": 0.8517034662265366
+            },
+            "colors": [
+              {
+                "color": "#fffad3ff",
+                "position": 0
+              },
+              {
+                "color": "#756f3fff",
+                "position": 1
+              }
+            ],
+            "center": {
+              "x": 0.5000000000000002,
+              "y": 0.5603668598056369
+            }
+          },
+          "width": 1860,
+          "height": 2367,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1
+          }
+        },
+        {
+          "type": "group",
+          "id": "IjU8U",
+          "x": 138,
+          "y": 4665,
+          "name": "product-guide",
           "children": [
             {
-              "type": "rectangle",
-              "cornerRadius": 30,
-              "id": "3ROlx",
+              "type": "path",
+              "id": "txzLy",
               "x": 0,
-              "y": 2367,
-              "name": "Rectangle 395",
-              "rotation": 180,
-              "flipX": true,
+              "y": 57,
+              "name": "×",
+              "geometry": "M16.32 9.312c1.536-1.536 3.04-3.04 4.512-4.512 1.536-1.472 3.072-3.008 4.608-4.608 1.088 1.088 2.176 2.24 3.264 3.456 1.152 1.216 2.272 2.368 3.36 3.456-1.472 1.472-2.976 2.976-4.512 4.512-1.472 1.472-2.912 2.976-4.32 4.512 1.536 1.536 3.04 3.072 4.512 4.608 1.472 1.536 3.008 3.10399 4.608 4.704l-7.104 6.912c-1.472-1.536-3.008-3.04-4.608-4.512-1.536-1.536-3.104-3.072-4.704-4.608-1.408 1.472-2.88 2.976-4.416 4.512-1.536 1.472-3.04 2.976-4.512 4.512-1.152-1.152-2.304-2.272-3.456-3.36-1.152-1.152-2.272-2.304-3.36-3.456 1.536-1.536 3.04-3.04 4.512-4.512 1.536-1.472 3.072-3.00799 4.608-4.608l-9.312-9.216 6.912-7.104 9.408 9.312z",
               "fill": {
                 "type": "gradient",
                 "gradientType": "linear",
                 "enabled": true,
-                "rotation": -179.99999999999994,
+                "rotation": -180,
                 "size": {
-                  "height": 0.8517034662265366
+                  "height": 0.9999999999999999
                 },
                 "colors": [
                   {
-                    "color": "#fffad3ff",
+                    "color": "#cbc382ff",
                     "position": 0
                   },
                   {
-                    "color": "#756f3fff",
+                    "color": "#9f9335ff",
                     "position": 1
                   }
                 ],
                 "center": {
-                  "x": 0.5000000000000002,
-                  "y": 0.5603668598056369
+                  "y": 0.49999999999999994
                 }
               },
-              "width": 1860,
-              "height": 2367,
+              "width": 185,
+              "height": 185,
               "stroke": {
-                "align": "inside",
+                "align": "outside",
                 "thickness": 1
               }
             },
@@ -1614,9 +1634,9 @@
               "type": "rectangle",
               "cornerRadius": 40,
               "id": "5lWMs",
-              "x": 136,
-              "y": 465,
-              "name": "Rectangle 681",
+              "x": 28,
+              "y": 313,
+              "name": "product-guide-1-3-bg",
               "fill": {
                 "type": "gradient",
                 "gradientType": "linear",
@@ -1647,11 +1667,185 @@
               }
             },
             {
+              "type": "group",
+              "id": "LFPbh",
+              "x": 1055,
+              "y": 7,
+              "name": "product-guide-image-1-1",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 282,
+                  "id": "DGOH2",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Rectangle 654",
+                  "fill": [
+                    "#d9d9d9ff",
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "",
+                      "mode": "stretch"
+                    }
+                  ],
+                  "width": 564,
+                  "height": 933,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 282,
+                  "id": "cXFmp",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Rectangle 676",
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "linear",
+                    "enabled": true,
+                    "rotation": -179.99999851639623,
+                    "size": {
+                      "height": 0.9308681836158652
+                    },
+                    "colors": [
+                      {
+                        "color": "#00000000",
+                        "position": 0
+                      },
+                      {
+                        "color": "#000000ff",
+                        "position": 1
+                      }
+                    ],
+                    "center": {
+                      "x": 0.4999999407717223,
+                      "y": 0.7301714794280519
+                    }
+                  },
+                  "width": 564,
+                  "height": 933,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "iT4gJ",
+              "x": 467,
+              "y": 532,
+              "name": "product-guide-image-1-2",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": [
+                    258.5,
+                    258.5,
+                    0,
+                    0
+                  ],
+                  "id": "l8rsz",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Rectangle 655",
+                  "fill": [
+                    "#d9d9d9ff",
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "",
+                      "mode": "stretch"
+                    }
+                  ],
+                  "width": 517,
+                  "height": 612,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": [
+                    282,
+                    282,
+                    0,
+                    0
+                  ],
+                  "id": "V0mFK",
+                  "x": 0,
+                  "y": 1,
+                  "name": "Rectangle 677",
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "linear",
+                    "enabled": true,
+                    "rotation": -180.0000014137479,
+                    "size": {
+                      "height": 0.7303920958287167
+                    },
+                    "colors": [
+                      {
+                        "color": "#00000000",
+                        "position": 0
+                      },
+                      {
+                        "color": "#000000ff",
+                        "position": 1
+                      }
+                    ],
+                    "center": {
+                      "x": 0.4999998693957137,
+                      "y": 0.7009803498622799
+                    }
+                  },
+                  "width": 517,
+                  "height": 612,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "92qba",
+              "x": 11,
+              "y": 0,
+              "name": "product-guide-1-1",
+              "fill": "#fffdfdff",
+              "content": "Professional Selection",
+              "lineHeight": 1.4772727272727273,
+              "fontFamily": "Limelight",
+              "fontSize": 88,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "ZKVU8",
+              "x": 108,
+              "y": 130,
+              "name": "product-guide-1-2",
+              "fill": "#fffdfdff",
+              "content": "Stringent Standard",
+              "lineHeight": 1.4772727272727273,
+              "fontFamily": "Limelight",
+              "fontSize": 88,
+              "fontWeight": "normal"
+            },
+            {
               "type": "text",
               "id": "2z56p",
-              "x": 174,
-              "y": 498,
-              "name": "Precision Choice, Busrom Enables Every Detail To Come To Life.",
+              "x": 66,
+              "y": 346,
+              "name": "product-guide-1-3",
               "fill": "#635700ff",
               "textGrowth": "fixed-width-height",
               "width": 611,
@@ -1663,11 +1857,43 @@
               "fontWeight": "600"
             },
             {
+              "type": "text",
+              "id": "IUAyS",
+              "x": 1128,
+              "y": 454,
+              "name": "product-guide-1-4",
+              "fill": "#ffffffff",
+              "textGrowth": "fixed-width-height",
+              "width": 425,
+              "height": 384,
+              "content": "Busrom Understands That Every Space Has Unique Dimensional And Structural Requirements For Fittings. Through Comprehensive Selection Guidance And Customization Services, Busrom Helps Customers Quickly Identify Ideal Solutions From A Wide Range Of Models, Materials, And Surface Finishes. ",
+              "lineHeight": 1.2857142857142858,
+              "fontFamily": "Josefin Sans",
+              "fontSize": 28,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "ilCeg",
+              "x": 527,
+              "y": 889,
+              "name": "product-guide-1-5",
+              "fill": "#ffffffff",
+              "textGrowth": "fixed-width-height",
+              "width": 413,
+              "height": 229,
+              "content": "All Products Comply With International Standards And Undergo Rigorous Testing And Validation To Ensure Stable Performance And Reliable Safety During Long-Term Use.",
+              "lineHeight": 1.2857142857142858,
+              "fontFamily": "Josefin Sans",
+              "fontSize": 28,
+              "fontWeight": "normal"
+            },
+            {
               "type": "path",
               "id": "SWvP3",
-              "x": 1599,
-              "y": 1066,
-              "name": "Subtract",
+              "x": 1491,
+              "y": 914,
+              "name": "next-btn",
               "rotation": 9.826939576278036e-14,
               "geometry": "M64 0c35.34622 0 64 28.42992 64 63.5 0 35.07008-28.65378 63.5-64 63.5-35.34622 0-64-28.42992-64-63.5 0-35.07008 28.65378-63.5 64-63.5z m-14.54004 42.62598l20.99902 20.96191-20.99902 20.96192 3.57813 3.66015 24.97558-24.62207-24.97558-24.62207-3.57813 3.66016z",
               "fillRule": "evenodd",
@@ -1678,9 +1904,9 @@
             {
               "type": "group",
               "id": "rH3as",
-              "x": 124,
-              "y": 1066,
-              "name": "Group 285",
+              "x": 16,
+              "y": 914,
+              "name": "prev-btn",
               "children": [
                 {
                   "type": "ellipse",
@@ -1716,7 +1942,16 @@
                   }
                 }
               ]
-            },
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "id": "6qdHs",
+          "x": 30,
+          "y": 5984,
+          "name": "brand-trust",
+          "children": [
             {
               "type": "rectangle",
               "cornerRadius": [
@@ -1727,7 +1962,7 @@
               ],
               "id": "JUNit",
               "x": 0,
-              "y": 1471,
+              "y": 0,
               "name": "Rectangle 635",
               "fill": {
                 "type": "gradient",
@@ -1759,44 +1994,27 @@
               }
             },
             {
-              "type": "text",
-              "id": "V3f60",
-              "x": 726,
-              "y": 1508,
-              "name": "Trust Is Not Just About Products, But Also About Attitude.",
-              "fill": "#000000ff",
-              "textGrowth": "fixed-width-height",
-              "width": 1001,
-              "height": 346,
-              "content": "Trust  Is Not Just About Products, But Also About Attitude.",
-              "lineHeight": 1.2613636363636365,
-              "fontFamily": "Berkshire Swash",
-              "fontSize": 88,
-              "fontWeight": "normal"
-            },
-            {
-              "type": "text",
-              "id": "0OM8z",
-              "x": 944,
-              "y": 1940,
-              "name": "We Understand That In The Fiercely Competitive Engineering And Construction Industry, Trust Matters More Than Promises. Busrom Has Earned Its Reputation Through High-Standard Manufacturing, Reliable Delivery, And Continuous Improvement. Every Product We Deliver Stands As A Testament To Our Commitment To Responsibility.",
-              "fill": "#4b4512ff",
-              "textGrowth": "fixed-width-height",
-              "width": 678,
-              "height": 287,
-              "content": "We Understand That In The Fiercely Competitive Engineering And Construction Industry, Trust Matters More Than Promises. Busrom Has Earned Its Reputation Through High-Standard Manufacturing, Reliable Delivery, And Continuous Improvement. Every Product We Deliver Stands As A Testament To Our Commitment To Responsibility.",
-              "lineHeight": 1.4642857142857142,
-              "fontFamily": "Josefin Sans",
-              "fontSize": 28,
-              "fontWeight": "normal"
+              "type": "ellipse",
+              "id": "haDdm",
+              "x": 476,
+              "y": 530,
+              "name": "Ellipse 164",
+              "sweepAngle": -360.00001001791264,
+              "width": 309,
+              "height": 309,
+              "stroke": {
+                "align": "inside",
+                "thickness": 2,
+                "fill": "#ffffffff"
+              }
             },
             {
               "type": "rectangle",
               "cornerRadius": 310.5,
               "id": "l9oOW",
               "x": 189,
-              "y": 1471,
-              "name": "Rectangle 634",
+              "y": 0,
+              "name": "brand-trust-image",
               "fill": [
                 "#d9d9d9ff",
                 {
@@ -1814,278 +2032,27 @@
               }
             },
             {
-              "type": "ellipse",
-              "id": "C4dRL",
-              "x": 476,
-              "y": 2001,
-              "name": "Ellipse 165",
-              "sweepAngle": -360.00001001791264,
-              "width": 309,
-              "height": 309,
-              "stroke": {
-                "align": "inside",
-                "thickness": 2,
-                "fill": "#756f3fff"
-              }
-            },
-            {
-              "type": "group",
-              "id": "diKUB",
-              "x": 189,
-              "y": 1471,
-              "name": "Mask group",
-              "children": [
-                {
-                  "type": "rectangle",
-                  "cornerRadius": 310.5,
-                  "id": "KylQo",
-                  "x": 0,
-                  "y": 0,
-                  "name": "Rectangle 680",
-                  "width": 476,
-                  "height": 792,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1
-                  }
-                },
-                {
-                  "type": "ellipse",
-                  "id": "haDdm",
-                  "x": 287,
-                  "y": 530,
-                  "name": "Ellipse 164",
-                  "sweepAngle": -360.00001001791264,
-                  "width": 309,
-                  "height": 309,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 2,
-                    "fill": "#ffffffff"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "rectangle",
-              "cornerRadius": 282,
-              "id": "DGOH2",
-              "x": 1163,
-              "y": 159,
-              "name": "Rectangle 654",
-              "fill": [
-                "#d9d9d9ff",
-                {
-                  "type": "image",
-                  "enabled": true,
-                  "url": "",
-                  "mode": "stretch"
-                }
-              ],
-              "width": 564,
-              "height": 933,
-              "stroke": {
-                "align": "inside",
-                "thickness": 1
-              }
-            },
-            {
-              "type": "rectangle",
-              "cornerRadius": 282,
-              "id": "cXFmp",
-              "x": 1163,
-              "y": 159,
-              "name": "Rectangle 676",
-              "fill": {
-                "type": "gradient",
-                "gradientType": "linear",
-                "enabled": true,
-                "rotation": -179.99999851639623,
-                "size": {
-                  "height": 0.9308681836158652
-                },
-                "colors": [
-                  {
-                    "color": "#00000000",
-                    "position": 0
-                  },
-                  {
-                    "color": "#000000ff",
-                    "position": 1
-                  }
-                ],
-                "center": {
-                  "x": 0.4999999407717223,
-                  "y": 0.7301714794280519
-                }
-              },
-              "width": 564,
-              "height": 933,
-              "stroke": {
-                "align": "inside",
-                "thickness": 1
-              }
-            },
-            {
-              "type": "path",
-              "id": "txzLy",
-              "x": 108,
-              "y": 209,
-              "name": "×",
-              "geometry": "M16.32 9.312c1.536-1.536 3.04-3.04 4.512-4.512 1.536-1.472 3.072-3.008 4.608-4.608 1.088 1.088 2.176 2.24 3.264 3.456 1.152 1.216 2.272 2.368 3.36 3.456-1.472 1.472-2.976 2.976-4.512 4.512-1.472 1.472-2.912 2.976-4.32 4.512 1.536 1.536 3.04 3.072 4.512 4.608 1.472 1.536 3.008 3.10399 4.608 4.704l-7.104 6.912c-1.472-1.536-3.008-3.04-4.608-4.512-1.536-1.536-3.104-3.072-4.704-4.608-1.408 1.472-2.88 2.976-4.416 4.512-1.536 1.472-3.04 2.976-4.512 4.512-1.152-1.152-2.304-2.272-3.456-3.36-1.152-1.152-2.272-2.304-3.36-3.456 1.536-1.536 3.04-3.04 4.512-4.512 1.536-1.472 3.072-3.00799 4.608-4.608l-9.312-9.216 6.912-7.104 9.408 9.312z",
-              "fill": {
-                "type": "gradient",
-                "gradientType": "linear",
-                "enabled": true,
-                "rotation": -180,
-                "size": {
-                  "height": 0.9999999999999999
-                },
-                "colors": [
-                  {
-                    "color": "#cbc382ff",
-                    "position": 0
-                  },
-                  {
-                    "color": "#9f9335ff",
-                    "position": 1
-                  }
-                ],
-                "center": {
-                  "y": 0.49999999999999994
-                }
-              },
-              "width": 185,
-              "height": 185,
-              "stroke": {
-                "align": "outside",
-                "thickness": 1
-              }
-            },
-            {
-              "type": "rectangle",
-              "cornerRadius": [
-                258.5,
-                258.5,
-                0,
-                0
-              ],
-              "id": "l8rsz",
-              "x": 575,
-              "y": 684,
-              "name": "Rectangle 655",
-              "fill": [
-                "#d9d9d9ff",
-                {
-                  "type": "image",
-                  "enabled": true,
-                  "url": "",
-                  "mode": "stretch"
-                }
-              ],
-              "width": 517,
-              "height": 612,
-              "stroke": {
-                "align": "inside",
-                "thickness": 1
-              }
-            },
-            {
-              "type": "rectangle",
-              "cornerRadius": [
-                282,
-                282,
-                0,
-                0
-              ],
-              "id": "lJcyN",
-              "x": 575,
-              "y": 684,
-              "name": "Rectangle 677",
-              "fill": {
-                "type": "gradient",
-                "gradientType": "linear",
-                "enabled": true,
-                "rotation": -180.0000014137479,
-                "size": {
-                  "height": 0.7303920958287167
-                },
-                "colors": [
-                  {
-                    "color": "#00000000",
-                    "position": 0
-                  },
-                  {
-                    "color": "#000000ff",
-                    "position": 1
-                  }
-                ],
-                "center": {
-                  "x": 0.4999998693957137,
-                  "y": 0.7009803498622799
-                }
-              },
-              "width": 517,
-              "height": 612,
-              "stroke": {
-                "align": "inside",
-                "thickness": 1
-              }
-            },
-            {
               "type": "text",
-              "id": "92qba",
-              "x": 119,
-              "y": 152,
-              "name": "Professional Selection Stringent Standard",
-              "fill": "#fffdfdff",
+              "id": "V3f60",
+              "x": 726,
+              "y": 37,
+              "name": "brand-trust-title",
+              "fill": "#000000ff",
               "textGrowth": "fixed-width-height",
-              "width": 1164,
-              "height": 260,
-              "content": "Professional Selection \n     Stringent Standard",
-              "lineHeight": 1.4772727272727273,
-              "fontFamily": "Limelight",
+              "width": 1001,
+              "height": 346,
+              "content": "Trust  Is Not Just About Products, But Also About Attitude.",
+              "lineHeight": 1.2613636363636365,
+              "fontFamily": "Berkshire Swash",
               "fontSize": 88,
-              "fontWeight": "normal"
-            },
-            {
-              "type": "text",
-              "id": "IUAyS",
-              "x": 1236,
-              "y": 606,
-              "name": "Busrom Understands That Every Space Has Unique Dimensional And Structural Requirements For Fittings. Through Comprehensive Selection Guidance And Customization Services, Busrom Helps Customers Quickly Identify Ideal Solutions From A Wide Range Of Models, Materials, And Surface Finishes.",
-              "fill": "#ffffffff",
-              "textGrowth": "fixed-width-height",
-              "width": 425,
-              "height": 384,
-              "content": "Busrom Understands That Every Space Has Unique Dimensional And Structural Requirements For Fittings. Through Comprehensive Selection Guidance And Customization Services, Busrom Helps Customers Quickly Identify Ideal Solutions From A Wide Range Of Models, Materials, And Surface Finishes. ",
-              "lineHeight": 1.2857142857142858,
-              "fontFamily": "Josefin Sans",
-              "fontSize": 28,
-              "fontWeight": "normal"
-            },
-            {
-              "type": "text",
-              "id": "ilCeg",
-              "x": 635,
-              "y": 1041,
-              "name": "All Products Comply With International Standards And Undergo Rigorous Testing And Validation To Ensure Stable Performance And Reliable Safety During Long-Term Use.",
-              "fill": "#ffffffff",
-              "textGrowth": "fixed-width-height",
-              "width": 413,
-              "height": 229,
-              "content": "All Products Comply With International Standards And Undergo Rigorous Testing And Validation To Ensure Stable Performance And Reliable Safety During Long-Term Use.",
-              "lineHeight": 1.2857142857142858,
-              "fontFamily": "Josefin Sans",
-              "fontSize": 28,
               "fontWeight": "normal"
             },
             {
               "type": "path",
               "id": "dfK4A",
               "x": 834,
-              "y": 1870,
-              "name": "Union",
+              "y": 399,
+              "name": "brand-trust-content-icon",
               "rotation": 1.2722218725854067e-14,
               "geometry": "M96 53c-23.90807 0-43.5 20.02905-43.5 45l-8 0c0-18.92863 9.67152-35.62015 24.27246-45l-68.77246 0 0-8 68.77246 0c-14.60095-9.37985-24.27246-26.07137-24.27246-45l8 0c0 24.97095 19.59192 45 43.5 45l0 8z",
               "fill": "#464010ff",
@@ -2096,8 +2063,8 @@
               "type": "path",
               "id": "vSrQZ",
               "x": 896,
-              "y": 1902,
-              "name": "Rectangle 679 (Stroke)",
+              "y": 431,
+              "name": "brand-trust-content-bg",
               "geometry": "M32.22168 346.44727c0.16085-0.81253 0.95013-1.34037 1.7627-1.17969 2.42946 0.48062 4.94247 0.73242 7.51562 0.73242l6.57715 0c0.82832 0.00012 1.5 0.67166 1.5 1.5 0 0.82834-0.67168 1.49988-1.5 1.5l-6.57715 0c-2.76967 0-5.47749-0.2717-8.09766-0.79004-0.81263-0.1608-1.34143-0.95004-1.18066-1.76269z m42.16309-0.44727c0.82835 0.00009 1.5 0.67163 1.5 1.5 0 0.82837-0.67165 1.49991-1.5 1.5l-13.1543 0c-0.82829-0.00015-1.5-0.67166-1.5-1.5 0-0.82834 0.67171-1.49985 1.5-1.5l13.1543 0z m26.30761 0c0.82839 0.00003 1.5 0.6716 1.5 1.5 0 0.8284-0.67161 1.49997-1.5 1.5l-13.15429 0c-0.82826-0.00018-1.5-0.67169-1.5-1.5 0-0.82831 0.67174-1.49982 1.5-1.5l13.15429 0z m26.30762 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.1543 0c-0.82821-0.00024-1.5-0.67172-1.5-1.5 0-0.82828 0.67179-1.49976 1.5-1.5l13.1543 0z m26.30762 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.15332 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.15332 0z m26.30761 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.15332 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.15332 0z m26.30762 0c0.82842 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67158 1.5-1.5 1.5l-13.15332 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.15332 0z m26.30762 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.15332 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.15332 0z m26.30762 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.15332 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.15332 0z m26.30859 0c0.82822 0.00027 1.5 0.67172 1.5 1.5 0 0.82828-0.67178 1.49973-1.5 1.5l-13.1543 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.1543 0z m26.30762 0c0.82821 0.00018 1.5 0.67169 1.5 1.5 0 0.82831-0.67179 1.49982-1.5 1.5l-13.1543 0c-0.8284-0.00003-1.5-0.6716-1.5-1.5 0-0.8284 0.6716-1.49997 1.5-1.5l13.1543 0z m26.30761 0c0.82828 0.00018 1.5 0.67169 1.5 1.5 0 0.82831-0.67172 1.49982-1.5 1.5l-13.15429 0c-0.82834-0.00006-1.5-0.6716-1.5-1.5 0-0.8284 0.67166-1.49994 1.5-1.5l13.15429 0z m26.30762 0c0.82831 0.00015 1.5 0.67166 1.5 1.5 0 0.82834-0.67169 1.49985-1.5 1.5l-13.1543 0c-0.82833-0.00009-1.5-0.67163-1.5-1.5 0-0.82837 0.67167-1.49991 1.5-1.5l13.1543 0z m26.30762 0c0.82834 0.00009 1.5 0.67163 1.5 1.5 0 0.82837-0.67166 1.49991-1.5 1.5l-13.1543 0c-0.82831-0.00012-1.5-0.67166-1.5-1.5 0-0.82834 0.67169-1.49988 1.5-1.5l13.1543 0z m26.30762 0c0.82836 0.00009 1.5 0.67163 1.5 1.5 0 0.82837-0.67164 1.49991-1.5 1.5l-13.1543 0c-0.82828-0.00015-1.5-0.67166-1.5-1.5 0-0.82834 0.67172-1.49985 1.5-1.5l13.1543 0z m26.30761 0c0.8284 0.00006 1.5 0.6716 1.5 1.5 0 0.8284-0.6716 1.49994-1.5 1.5l-13.15429 0c-0.82825-0.00018-1.5-0.67169-1.5-1.5 0-0.82831 0.67175-1.49982 1.5-1.5l13.15429 0z m26.30762 0c0.82843 0.00003 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.49997-1.5 1.5l-13.1543 0c-0.82824-0.00021-1.5-0.67169-1.5-1.5 0-0.82831 0.67176-1.49979 1.5-1.5l13.1543 0z m26.30762 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.15332 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.15332 0z m26.30761 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.15332 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.15332 0z m26.30762 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.15332 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.15332 0z m26.30762 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.15332 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.15332 0z m26.30762 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.15332 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.15332 0z m26.30859 0c0.82819 0.00027 1.5 0.67172 1.5 1.5 0 0.82828-0.67181 1.49973-1.5 1.5l-13.1543 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.1543 0z m26.30762 0c0.82824 0.00018 1.5 0.67169 1.5 1.5 0 0.82831-0.67176 1.49982-1.5 1.5l-13.1543 0c-0.82837-0.00006-1.5-0.6716-1.5-1.5 0-0.8284 0.67163-1.49994 1.5-1.5l13.1543 0z m26.30761 0c0.82837 0.00009 1.5 0.67163 1.5 1.5 0 0.82837-0.67163 1.49991-1.5 1.5l-13.15429 0c-0.82837-0.00009-1.5-0.67163-1.5-1.5 0-0.82837 0.67163-1.49991 1.5-1.5l13.15429 0z m26.30762 0c0.82837 0.00006 1.5 0.6716 1.5 1.5 0 0.8284-0.67163 1.49994-1.5 1.5l-13.1543 0c-0.8283-0.00015-1.5-0.67166-1.5-1.5 0-0.82834 0.6717-1.49985 1.5-1.5l13.1543 0z m27.24609-0.73242c0.81257-0.16065 1.60187 0.36716 1.7627 1.17969 0.16083 0.81265-0.36804 1.60189-1.18066 1.76269-2.62018 0.51834-5.32795 0.79004-8.09766 0.79004l-6.57617 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l6.57617 0c2.57318 0 5.08618-0.2518 7.51562-0.73242z m-725.6123-16.78906c0.68838-0.46076 1.61924-0.27625 2.08008 0.4121 2.8112 4.19904 6.42695 7.81476 10.62597 10.62598 0.68835 0.46082 0.87286 1.39166 0.41211 2.08008-0.46087 0.68838-1.39266 0.87299-2.08105 0.41211-4.52465-3.02924-8.41996-6.92456-11.44922-11.44922-0.46087-0.68842-0.27629-1.62018 0.41211-2.08105z m750.11328 0.4121c0.46082-0.68832 1.39166-0.87286 2.08008-0.4121 0.68842 0.46084 0.87299 1.39267 0.41211 2.08105-3.0293 4.52466-6.92462 8.41995-11.44922 11.44922-0.68842 0.46088-1.62018 0.27631-2.08105-0.41211-0.46076-0.68839-0.27625-1.61926 0.4121-2.08008 4.19904-2.81122 7.81482-6.42694 10.62598-10.62598z m-757.5166-21.39062l0-6.35938c0-0.82843 0.67157-1.5 1.5-1.5 0.82843 0 1.5 0.67157 1.5 1.5l0 6.35938c0 2.57315 0.2518 5.08615 0.73242 7.51562 0.16066 0.81257-0.36717 1.60187-1.17969 1.7627-0.81265 0.16077-1.60188-0.36807-1.76269-1.18066-0.51835-2.62018-0.79004-5.32798-0.79004-8.09766z m764 0l0-6.65039c0.00018-0.82822 0.67169-1.5 1.5-1.5 0.82831 0 1.49982 0.67178 1.5 1.5l0 6.65039c0 2.76965-0.27167 5.47751-0.79004 8.09766-0.16083 0.81262-0.95007 1.34143-1.76269 1.18066-0.8125-0.16086-1.34034-0.95016-1.17969-1.7627 0.48065-2.42947 0.73242-4.94247 0.73242-7.51562z m-764-19.07812l0-12.71876c0-0.82843 0.67157-1.5 1.5-1.5 0.82843 0 1.5 0.67157 1.5 1.5l0 12.71876c0 0.82843-0.67157 1.5-1.5 1.5-0.82843 0-1.5-0.67157-1.5-1.5z m764-0.87208l0-13.2998c0-0.82843 0.67157-1.5 1.5-1.5 0.82843 0 1.5 0.67157 1.5 1.5l0 13.2998c0 0.82843-0.67157 1.5-1.5 1.5-0.82843 0-1.5-0.67157-1.5-1.5z m-764-24.56542l0-12.71876c0-0.82843 0.67157-1.5 1.5-1.5 0.82843 0 1.5 0.67157 1.5 1.5l0 12.71876c0 0.82843-0.67157 1.5-1.5 1.5-0.82843 0-1.5-0.67157-1.5-1.5z m764-2.03418l0-13.29981c0-0.82843 0.67157-1.5 1.5-1.5 0.82843 0 1.5 0.67157 1.5 1.5l0 13.29981c-0.00012 0.82833-0.67163 1.5-1.5 1.5-0.82837 0-1.49988-0.67167-1.5-1.5z m-764-23.40332l0-12.71876c0-0.82843 0.67157-1.5 1.5-1.5 0.82843 0 1.5 0.67157 1.5 1.5l0 12.71876c0 0.82843-0.67157 1.5-1.5 1.5-0.82843 0-1.5-0.67157-1.5-1.5z m764-3.19727l0-13.29981c0.00012-0.82833 0.67163-1.5 1.5-1.5 0.82837 0 1.49988 0.67167 1.5 1.5l0 13.29981c0 0.82843-0.67157 1.5-1.5 1.5-0.82843 0-1.5-0.67157-1.5-1.5z m-764-22.24023l0-12.71876c0-0.82843 0.67157-1.5 1.5-1.5 0.82843 0 1.5 0.67157 1.5 1.5l0 12.71876c0 0.82843-0.67157 1.5-1.5 1.5-0.82843 0-1.5-0.67157-1.5-1.5z m764-4.35938l0-13.2998c0-0.82843 0.67157-1.5 1.5-1.5 0.82843 0 1.5 0.67157 1.5 1.5l0 13.2998c0 0.82843-0.67157 1.5-1.5 1.5-0.82843 0-1.5-0.67157-1.5-1.5z m-764-21.07812l0-12.71876c0-0.82843 0.67157-1.5 1.5-1.5 0.82843 0 1.5 0.67157 1.5 1.5l0 12.71876c0 0.82843-0.67157 1.5-1.5 1.5-0.82843 0-1.5-0.67157-1.5-1.5z m764-5.52149l0-13.30078c0.00018-0.82826 0.67169-1.5 1.5-1.5 0.82831 0 1.49982 0.67174 1.5 1.5l0 13.30078c-0.00024 0.82825-0.67169 1.5-1.5 1.5-0.82831 0-1.49976-0.67175-1.5-1.5z m-764-19.91601l0-12.71876c0-0.82843 0.67157-1.5 1.5-1.5 0.82843 0 1.5 0.67157 1.5 1.5l0 12.71876c0 0.82843-0.67157 1.5-1.5 1.5-0.82843 0-1.5-0.67157-1.5-1.5z m764-6.68458l0-13.2998c0-0.82843 0.67157-1.5 1.5-1.5 0.82843 0 1.5 0.67157 1.5 1.5l0 13.2998c0 0.82842-0.67157 1.5-1.5 1.5-0.82843 0-1.5-0.67158-1.5-1.5z m-764-18.75292l0-12.71876c0-0.82843 0.67157-1.5 1.5-1.5 0.82843 0 1.5 0.67157 1.5 1.5l0 12.71876c0 0.82843-0.67157 1.5-1.5 1.5-0.82843 0-1.5-0.67157-1.5-1.5z m764-7.84668l0-13.29981c0-0.82842 0.67157-1.5 1.5-1.5 0.82843 0 1.5 0.67158 1.5 1.5l0 13.29981c-0.00012 0.82832-0.67163 1.5-1.5 1.5-0.82837 0-1.49988-0.67168-1.5-1.5z m-764-17.59082l0-6.35938c0-0.82843 0.67157-1.5 1.5-1.5 0.82843 0 1.5 0.67157 1.5 1.5l0 6.35938c0 0.82843-0.67157 1.5-1.5 1.5-0.82843 0-1.5-0.67157-1.5-1.5z m764-9.00977l0-13.29981c0.00006-0.82835 0.67163-1.5 1.5-1.5 0.82837 0 1.49994 0.67165 1.5 1.5l0 13.29981c0 0.82842-0.67157 1.5-1.5 1.5-0.82843 0-1.5-0.67158-1.5-1.5z m0-26.59961l0-13.29981c0-0.82843 0.67157-1.5 1.5-1.5 0.82843 0 1.5 0.67157 1.5 1.5l0 13.29981c0 0.82841-0.67157 1.5-1.5 1.5-0.82843 0-1.5-0.67159-1.5-1.5z m0-26.59961l0-6.65039c0-2.57316-0.25177-5.08617-0.73242-7.51563-0.16065-0.81255 0.36719-1.60183 1.17969-1.76269 0.81262-0.16077 1.60186 0.36804 1.76269 1.18066 0.51837 2.62017 0.79004 5.32798 0.79004 8.09766l0 6.65039c-0.00024 0.82823-0.67169 1.5-1.5 1.5-0.82831 0-1.49976-0.67177-1.5-1.5z m-17.52148-40.74707c0.46087-0.6884 1.3927-0.87298 2.08105-0.41211 4.52466 3.02926 8.41992 6.92459 11.44922 11.44922 0.46088 0.6884 0.27631 1.62018-0.41211 2.08105-0.68842 0.46075-1.61926 0.27624-2.08008-0.41211-2.81122-4.19902-6.42694-7.81477-10.62598-10.62597-0.68835-0.46084-0.87286-1.39169-0.4121-2.08008z m-20.97852-7.40332c2.76965 0 5.47748 0.27169 8.09766 0.79004 0.81256 0.16081 1.34143 0.95005 1.18066 1.76269-0.16083 0.81252-0.95013 1.34035-1.7627 1.17969-2.4295-0.48062-4.9425-0.73242-7.51562-0.73242l-6.60547 0c-0.82825-0.00023-1.5-0.67172-1.5-1.5 0-0.82828 0.67175-1.49977 1.5-1.5l6.60547 0z m-653.89746 0c0.82823 0.00022 1.5 0.67171 1.5 1.5 0 0.82829-0.67177 1.49978-1.5 1.5l-6.60547 0c-0.8283-0.00015-1.5-0.67166-1.5-1.5 0-0.82834 0.6717-1.49985 1.5-1.5l6.60547 0z m26.41992 0c0.82837 0.00007 1.5 0.67162 1.5 1.5 0 0.82838-0.67163 1.49993-1.5 1.5l-13.20996 0c-0.82842 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67158-1.5 1.5-1.5l13.20996 0z m26.41992 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.20996 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.20996 0z m26.41992 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.20996 0c-0.82832-0.00012-1.5-0.67164-1.5-1.5 0-0.82836 0.67168-1.49988 1.5-1.5l13.20996 0z m26.4209 0c0.82825 0.00021 1.5 0.67171 1.5 1.5 0 0.82829-0.67175 1.49979-1.5 1.5l-13.21093 0c-0.82822-0.00025-1.5-0.67173-1.5-1.5 0-0.82827 0.67178-1.49975 1.5-1.5l13.21093 0z m26.41992 0c0.82833 0.00011 1.5 0.67164 1.5 1.5 0 0.82836-0.67167 1.49989-1.5 1.5l-13.20996 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.20996 0z m26.41993 0c0.82841 0.00002 1.5 0.67159 1.5 1.5 0 0.82841-0.67159 1.49998-1.5 1.5l-13.20996 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.20996 0z m26.41992 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.20996 0c-0.8284-0.00004-1.5-0.6716-1.5-1.5 0-0.8284 0.6716-1.49996 1.5-1.5l13.20996 0z m26.41992 0c0.8284 0 1.5 0.67157 1.5 1.5 0 0.82843-0.6716 1.5-1.5 1.5l-13.20996 0c-0.82831-0.00013-1.5-0.67165-1.5-1.5 0-0.82835 0.67169-1.49987 1.5-1.5l13.20996 0z m26.4209 0c0.82822 0.00025 1.5 0.67173 1.5 1.5 0 0.82827-0.67178 1.49975-1.5 1.5l-13.21094 0c-0.82825-0.00023-1.5-0.67172-1.5-1.5 0-0.82828 0.67175-1.49977 1.5-1.5l13.21094 0z m26.41992 0c0.82831 0.00015 1.5 0.67166 1.5 1.5 0 0.82834-0.67169 1.49985-1.5 1.5l-13.20996 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.20996 0z m26.41992 0c0.8284 0.00003 1.5 0.67159 1.5 1.5 0 0.82841-0.6716 1.49997-1.5 1.5l-13.20996 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.20996 0z m26.41992 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.20996 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.20996 0z m26.41993 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.20996 0c-0.82834-0.0001-1.5-0.67163-1.5-1.5 0-0.82837 0.67166-1.4999 1.5-1.5l13.20996 0z m26.41992 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.20996 0c-0.82825-0.0002-1.5-0.6717-1.5-1.5 0-0.82831 0.67175-1.4998 1.5-1.5l13.20996 0z m26.4209 0c0.82827 0.00018 1.5 0.67168 1.5 1.5 0 0.82832-0.67173 1.49982-1.5 1.5l-13.20996 0c-0.8284 0-1.5-0.67157-1.5-1.5 0-0.82843 0.6716-1.5 1.5-1.5l13.20996 0z m26.41992 0c0.82837 0.00008 1.5 0.67162 1.5 1.5 0 0.82838-0.67163 1.49992-1.5 1.5l-13.20996 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.20996 0z m26.41992 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.20996 0c-0.8284 0-1.5-0.67157-1.5-1.5 0-0.82843 0.6716-1.5 1.5-1.5l13.20996 0z m26.41992 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.20996 0c-0.82837-0.00007-1.5-0.67161-1.5-1.5 0-0.82839 0.67163-1.49993 1.5-1.5l13.20996 0z m26.41992 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.20996 0c-0.8283-0.00016-1.5-0.67167-1.5-1.5 0-0.82833 0.6717-1.49984 1.5-1.5l13.20996 0z m26.4209 0c0.82825 0.00023 1.5 0.67172 1.5 1.5 0 0.82828-0.67175 1.49977-1.5 1.5l-13.20996 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.20996 0z m26.41992 0c0.82831 0.00013 1.5 0.67165 1.5 1.5 0 0.82835-0.67169 1.49987-1.5 1.5l-13.20996 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.20996 0z m26.41993 0c0.82843 0.00003 1.5 0.67159 1.5 1.5 0 0.82841-0.67157 1.49997-1.5 1.5l-13.20996 0c-0.82843 0-1.5-0.67157-1.5-1.5 0-0.82843 0.67157-1.5 1.5-1.5l13.20996 0z m26.41992 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.20996 0c-0.82843-0.00003-1.5-0.67159-1.5-1.5 0-0.82841 0.67157-1.49997 1.5-1.5l13.20996 0z m26.41992 0c0.82843 0 1.5 0.67157 1.5 1.5 0 0.82843-0.67157 1.5-1.5 1.5l-13.20996 0c-0.82831-0.00013-1.5-0.67165-1.5-1.5 0-0.82835 0.67169-1.49987 1.5-1.5l13.20996 0z",
               "fill": "#756f3fff",
               "width": 767,
@@ -2108,6 +2075,37 @@
                 "join": "round",
                 "cap": "round"
               }
+            },
+            {
+              "type": "text",
+              "id": "0OM8z",
+              "x": 944,
+              "y": 469,
+              "name": "brand-trust-content",
+              "fill": "#4b4512ff",
+              "textGrowth": "fixed-width-height",
+              "width": 678,
+              "height": 287,
+              "content": "We Understand That In The Fiercely Competitive Engineering And Construction Industry, Trust Matters More Than Promises. Busrom Has Earned Its Reputation Through High-Standard Manufacturing, Reliable Delivery, And Continuous Improvement. Every Product We Deliver Stands As A Testament To Our Commitment To Responsibility.",
+              "lineHeight": 1.4642857142857142,
+              "fontFamily": "Josefin Sans",
+              "fontSize": 28,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "ellipse",
+              "id": "C4dRL",
+              "x": 476,
+              "y": 530,
+              "name": "Ellipse 165",
+              "sweepAngle": -360.00001001791264,
+              "width": 309,
+              "height": 309,
+              "stroke": {
+                "align": "inside",
+                "thickness": 2,
+                "fill": "#756f3fff"
+              }
             }
           ]
         },
@@ -2116,7 +2114,7 @@
           "id": "TaxHm",
           "x": 4,
           "y": 6949,
-          "name": "Frame 3",
+          "name": "quote",
           "clip": true,
           "width": 1916,
           "height": 899,
@@ -2131,7 +2129,7 @@
               "id": "OmaqQ",
               "x": 185,
               "y": 86,
-              "name": "Connect With Busrom Create With Confidence",
+              "name": "quote-title",
               "fill": "#000000ff",
               "textGrowth": "fixed-width-height",
               "width": 1149,
@@ -2143,34 +2141,27 @@
               "fontWeight": "normal"
             },
             {
-              "type": "rectangle",
-              "cornerRadius": 247,
-              "id": "R5trx",
-              "x": 1422,
-              "y": 1,
-              "name": "Rectangle 633",
-              "fill": [
-                "#d9d9d9ff",
-                {
-                  "type": "image",
-                  "enabled": true,
-                  "url": "",
-                  "mode": "stretch"
-                }
-              ],
-              "width": 494,
-              "height": 698,
-              "stroke": {
-                "align": "inside",
-                "thickness": 1
-              }
+              "type": "text",
+              "id": "icO7I",
+              "x": 187,
+              "y": 355,
+              "name": "quote-description",
+              "fill": "#000000ff",
+              "textGrowth": "fixed-width-height",
+              "width": 686,
+              "height": 175,
+              "content": "Communication Is The Foundation Of Collaboration. Let Us Work Together To Achieve Your Project Goals With The Highest Standards.",
+              "lineHeight": 1.375,
+              "fontFamily": "Anaheim",
+              "fontSize": 32,
+              "fontWeight": "500"
             },
             {
               "type": "group",
               "id": "oPXjg",
               "x": 981.9998899698257,
               "y": 357.8790049500112,
-              "name": "Group 287",
+              "name": "quote-cta",
               "children": [
                 {
                   "type": "rectangle",
@@ -2251,11 +2242,34 @@
               ]
             },
             {
+              "type": "rectangle",
+              "cornerRadius": 247,
+              "id": "R5trx",
+              "x": 1422,
+              "y": 1,
+              "name": "quote-image",
+              "fill": [
+                "#d9d9d9ff",
+                {
+                  "type": "image",
+                  "enabled": true,
+                  "url": "",
+                  "mode": "stretch"
+                }
+              ],
+              "width": 494,
+              "height": 698,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
               "type": "path",
               "id": "9RxRW",
               "x": 1400.0004596710205,
               "y": 18.000132083892822,
-              "name": "Union",
+              "name": "quote-image-icon",
               "geometry": "M70.15039 0c0 31.64436 26.51041 57.57593 59.56152 57.57617l0 10.58887c-25.05396-0.00015-47.14662-12.80187-59.56152-32.12793l0 91.02734-10.58789 0 0-91.02734c-12.41497 19.32619-34.50834 32.12793-59.5625 32.12793l0-10.58887c32.79324 0 59.14805-25.52827 59.55762-56.83594l0.00488-0.74023 10.58789 0z",
               "fill": "#464010ff",
               "width": 129.7119140625,
@@ -2266,7 +2280,7 @@
               "id": "0BuJj",
               "x": -7.999684244394302,
               "y": 565,
-              "name": "Union",
+              "name": "quote-logo",
               "children": [
                 {
                   "type": "group",
@@ -2398,22 +2412,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "type": "text",
-              "id": "icO7I",
-              "x": 187,
-              "y": 355,
-              "name": "Communication Is The Foundation Of Collaboration. Let Us Work Together To Achieve Your Project Goals With The Highest Standards.",
-              "fill": "#000000ff",
-              "textGrowth": "fixed-width-height",
-              "width": 686,
-              "height": 175,
-              "content": "Communication Is The Foundation Of Collaboration. Let Us Work Together To Achieve Your Project Goals With The Highest Standards.",
-              "lineHeight": 1.375,
-              "fontFamily": "Anaheim",
-              "fontSize": 32,
-              "fontWeight": "500"
             }
           ]
         }

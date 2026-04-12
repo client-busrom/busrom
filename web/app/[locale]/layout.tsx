@@ -25,14 +25,13 @@ const LenisProvider = dynamic(
   { loading: () => null }
 );
 
-// --- 配置所有本地字体 ---
-// 首屏关键字体 - 优先加载
+// --- 配置所有字体 ---
 const paytoneOne = localFont({
   src: "../../public/fonts/PaytoneOne-Regular.woff2",
   weight: "400",
   variable: "--font-paytone-one",
   display: "swap",
-  preload: true, // Logo 字体 - 首屏必需
+  preload: true,
 });
 
 const anaheim = localFont({
@@ -40,38 +39,13 @@ const anaheim = localFont({
   weight: "400 800",
   variable: "--font-anaheim",
   display: "swap",
-  preload: true, // 主要正文字体 - 首屏必需
+  preload: true,
 });
 
 const inter = localFont({
   src: "../../public/fonts/Inter-VariableFont.woff2",
   weight: "100 900",
   variable: "--font-inter",
-  display: "swap",
-  preload: false, // 延迟加载 - 343KB 太大，影响 Speed Index
-});
-
-// 非首屏字体 - 按需加载
-const pollerOne = localFont({
-  src: "../../public/fonts/PollerOne-Regular.woff2",
-  weight: "400",
-  variable: "--font-poller-one",
-  display: "swap",
-  preload: false,
-});
-
-const pavanam = localFont({
-  src: "../../public/fonts/Pavanam-Regular.woff2",
-  weight: "400",
-  variable: "--font-pavanam",
-  display: "swap",
-  preload: false,
-});
-
-const phudu = localFont({
-  src: "../../public/fonts/Phudu-Variable.woff2",
-  weight: "400 900",
-  variable: "--font-phudu",
   display: "swap",
   preload: false,
 });
@@ -81,7 +55,7 @@ const montserrat = localFont({
   weight: "100 900",
   variable: "--font-montserrat",
   display: "swap",
-  preload: false, // 非首屏字体，按需加载
+  preload: false,
 });
 
 const bebasNeue = localFont({
@@ -152,6 +126,14 @@ const orbitron = localFont({
   src: "../../public/fonts/Orbitron-Medium.ttf",
   weight: "500",
   variable: "--font-orbitron",
+  display: "swap",
+  preload: false,
+});
+
+const limelight = localFont({
+  src: "../../public/fonts/Limelight-Regular.ttf",
+  weight: "400",
+  variable: "--font-limelight",
   display: "swap",
   preload: false,
 });
@@ -233,7 +215,7 @@ const katibeh = Katibeh({
   variable: "--font-katibeh",
   display: "swap",
   subsets: ["latin"],
-  preload: false,
+  preload: true,
 });
 
 const bagelFatOne = localFont({
@@ -245,34 +227,24 @@ const bagelFatOne = localFont({
 });
 
 export function generateStaticParams() {
-  // 动态生成所有支持的 locale 参数
   return locales.map(locale => ({ locale }));
 }
 
-/**
- * Generate dynamic metadata including favicon from CMS
- */
 export async function generateMetadata(): Promise<Metadata> {
   const siteConfig = await getSiteConfig()
   const faviconUrl = getMediaUrl(siteConfig.favicon)
   const logoUrl = getMediaUrl(siteConfig.logo)
-
-  // Use CMS favicon or fallback to local favicon-gold-b.svg
   const finalFaviconUrl = faviconUrl || '/favicon-gold-b.svg'
 
-  const icons: Metadata['icons'] = {
-    icon: [
-      // Standard .ico for broad compatibility (search engines, legacy browsers)
-      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
-      // SVG for modern browsers (sharp at any size)
-      { url: finalFaviconUrl, type: 'image/svg+xml' },
-    ],
-    shortcut: '/favicon.ico',
-    apple: finalFaviconUrl,
-  }
-
   return {
-    icons,
+    icons: {
+      icon: [
+        { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
+        { url: finalFaviconUrl, type: 'image/svg+xml' },
+      ],
+      shortcut: '/favicon.ico',
+      apple: finalFaviconUrl,
+    },
     openGraph: {
       ...(logoUrl && { images: [{ url: logoUrl }] }),
     },
@@ -288,8 +260,6 @@ export default async function RootLayout({
 }) {
   const { locale } = await params;
   const validLocale = isValidLocale(locale) ? locale : defaultLocale;
-
-  // 并行获取 preloader 配置和导航数据，避免串行等待
   const [preloaderConfig, initialNavigation] = await Promise.all([
     getPreloaderConfig(),
     getNavigation(validLocale),
@@ -299,61 +269,54 @@ export default async function RootLayout({
     <html
       lang={validLocale}
       className={`
-      ${paytoneOne.variable}
-      ${pollerOne.variable}
-      ${pavanam.variable}
-      ${phudu.variable}
-      ${anaheim.variable}
-      ${montserrat.variable}
-      ${bebasNeue.variable}
-      ${oswald.variable}
-      ${inter.variable}
-      ${jomhuria.variable}
-      ${josefinSans.variable}
-      ${joan.variable}
-      ${lilitaOne.variable}
-      ${kaushanScript.variable}
-      ${moul.variable}
-      ${orbitron.variable}
-      ${frederickaTheGreat.variable}
-      ${amiri.variable}
-      ${blackHanSans.variable}
-      ${berkshireSwash.variable}
-      ${cherryBomb.variable}
-      ${amarante.variable}
-      ${quicksand.variable}
-      ${lemon.variable}
-      ${lobster.variable}
-      ${katibeh.variable}
-      ${bagelFatOne.variable}
-      font-sans
-    `}
+        ${paytoneOne.variable}
+        ${anaheim.variable}
+        ${inter.variable}
+        ${montserrat.variable}
+        ${bebasNeue.variable}
+        ${oswald.variable}
+        ${jomhuria.variable}
+        ${josefinSans.variable}
+        ${joan.variable}
+        ${lilitaOne.variable}
+        ${kaushanScript.variable}
+        ${moul.variable}
+        ${orbitron.variable}
+        ${limelight.variable}
+        ${frederickaTheGreat.variable}
+        ${amiri.variable}
+        ${blackHanSans.variable}
+        ${berkshireSwash.variable}
+        ${cherryBomb.variable}
+        ${amarante.variable}
+        ${quicksand.variable}
+        ${lemon.variable}
+        ${lobster.variable}
+        ${katibeh.variable}
+        ${bagelFatOne.variable}
+        antialiased
+      `}
     >
       <head>
-        {/* CDN 预连接 - 加速图片加载 */}
         <link rel="preconnect" href="https://cdn.busromhouse.com" />
         <link rel="dns-prefetch" href="https://cdn.busromhouse.com" />
         <link rel="preconnect" href="https://d2kqew3hn5wphn.cloudfront.net" />
         <link rel="dns-prefetch" href="https://d2kqew3hn5wphn.cloudfront.net" />
-        {/* Organization Schema for Google Search logo */}
         <Suspense fallback={null}>
           <OrganizationSchema locale={validLocale} />
         </Suspense>
-        {/* 全局自定义脚本 - Header */}
         <Suspense fallback={null}>
           <GlobalScripts position="header" />
         </Suspense>
       </head>
-      <body className={`font-sans overflow-x-hidden`}>
-        {/* 全局自定义脚本 - Body Start */}
+      <body className="font-sans overflow-x-hidden">
         <Suspense fallback={null}>
           <GlobalScripts position="body_start" />
         </Suspense>
-        {/* 👇 使用 ClientLayoutWrapper 包裹你的所有内容 */}
         <ClientLayoutWrapper preloaderConfig={preloaderConfig}>
           <NextTopLoader color="#D58A00" showSpinner={false} height={3} shadow="0 0 10px #D58A00,0 0 5px #D58A00" />
           <LenisProvider easingKey={"easeOutQuad"} />
-          <div className="flex flex-col min-h-screen overflow-x-hidden">
+          <div className="flex flex-col min-h-screen">
             <Header locale={validLocale} initialNavigation={initialNavigation} />
             {children}
             <Suspense fallback={null}>
@@ -362,11 +325,9 @@ export default async function RootLayout({
             </Suspense>
             <ConditionalFooter locale={validLocale} />
           </div>
-          {/* 全局自定义脚本 - Footer */}
           <Suspense fallback={null}>
             <GlobalScripts position="footer" />
           </Suspense>
-          {/* Script Debugger - only visible in debug mode */}
           <Suspense fallback={null}>
             <ScriptDebugger />
           </Suspense>
