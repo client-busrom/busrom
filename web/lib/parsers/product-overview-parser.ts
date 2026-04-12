@@ -137,7 +137,7 @@ function getRandomAppImage(app: any) {
 }
 
 export function parseProductOverviewData(locale: string, rawData: any): ProductOverviewData {
-  const children = rawData.contentTranslation?.root?.children || rawData.content?.root?.children || [];
+  const children = rawData.content?.root?.children || rawData.contentTranslation?.root?.children || [];
   const products = rawData.products || [];
   const allSeries = rawData.productSeries || rawData.series || rawData.allSeries || [];
   const applications = rawData.applications || [];
