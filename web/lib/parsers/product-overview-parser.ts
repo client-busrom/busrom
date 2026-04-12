@@ -73,18 +73,40 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
   const children = rawData.contentTranslation?.root?.children || rawData.content?.root?.children || [];
   const products = rawData.products || [];
   const allSeries = rawData.productSeries || rawData.series || rawData.allSeries || [];
+  const navigationMenus = rawData.navigationMenus || [];
+
+  // 1. Identify the "Product" (Overview/Detail) root menu item
+  const productRootMenu = navigationMenus.find((m: any) => m.slug === 'product' || (m.type === 'product_cards' && m.link?.includes('products')));
+  const productRootId = productRootMenu?.id;
+  const productRootPath = (productRootMenu?.link || "/products").replace('/pages/', '/');
+
+  /**
+   * Helper to find the actual configured link in NavigationMenus
+   * based on the series category or title.
+   */
+  const resolveTargetLink = (categoryName: string, fallbackSlug: string) => {
+    if (!navigationMenus.length) return `${productRootPath}/${fallbackSlug}`;
+
+    // Look for a menu item with the same name whose parent is the Product root
+    const match = navigationMenus.find((m: any) => {
+      const isCorrectParent = m.parent?.id === productRootId || (m.link && m.link.startsWith(productRootPath));
+      return isCorrectParent && (m.name === categoryName || m.slug?.includes(fallbackSlug));
+    });
+
+    return (match?.link || `${productRootPath}/${fallbackSlug}`).replace('/pages/', '/');
+  };
 
   const heroContent1 = extractListAfterMarker(children, "hero-section-content-1");
   const heroContent2 = extractListAfterMarker(children, "hero-section-content-2");
   const heroContent3 = extractListAfterMarker(children, "hero-section-content-3");
 
-  let heroCta = { title: "View More", url: "/products", openInNewTab: false };
+  let heroCta = { title: "View More", url: productRootPath, openInNewTab: false };
   const heroCtaNodes = extractAfterMarker(children, "hero-section-cta");
   for (const node of heroCtaNodes) {
     if (node.type === "linkJump" && node.data) {
       heroCta = {
         title: node.data.title || "View More",
-        url: (node.data.url || "/products").replace('/pages/', '/'),
+        url: (node.data.url || productRootPath).replace('/pages/', '/'),
         openInNewTab: !!node.data.openInNewTab
       };
       break;
@@ -98,8 +120,25 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
       heroProductItems = node.data.items.map((item: any) => {
         const prodId = typeof item.product === 'object' ? item.product.id : item.product;
         const seriesId = typeof item.productSeries === 'object' ? item.productSeries.id : item.productSeries;
+        
         let product = products.find((p: any) => String(p.id) === String(prodId) || String(p.series?.id || p.series) === String(seriesId));
-        return product ? { id: product.id, title: product.title, mainImage: product.mainImage, image: product.image } : null;
+        
+        let seriesObj = allSeries.find((s: any) => String(s.id) === String(seriesId));
+        if (!seriesObj && typeof product?.series === 'object') {
+          seriesObj = product.series;
+        }
+
+        const fallbackSlug = seriesObj?.slug || product?.slug || seriesId;
+        const categoryName = seriesObj?.category?.name || "";
+        const targetPath = resolveTargetLink(categoryName, fallbackSlug);
+
+        return product ? { 
+          id: product.id, 
+          title: product.title, 
+          mainImage: product.mainImage, 
+          image: product.image,
+          href: `/${locale}${targetPath}`
+        } : null;
       }).filter(Boolean);
       break;
     }
@@ -123,22 +162,21 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
       seriesItems = node.data.items.map((item: any) => {
         const seriesId = typeof item.productSeries === 'object' ? item.productSeries.id : item.productSeries;
         
-        // Find a representative product belonging to this series
-        // showImage is on the Product (产品链接整合页), not on the series collection
         const repProduct = products.find((p: any) => {
           const pSeriesId = typeof p.series === 'object' ? p.series?.id : p.series;
           return String(pSeriesId) === String(seriesId);
         });
 
-        // Also try to get series info for name/slug
         let seriesObj = allSeries.find((s: any) => String(s.id) === String(seriesId));
         if (!seriesObj && typeof repProduct?.series === 'object') {
           seriesObj = repProduct.series;
         }
 
         const title = seriesObj?.name || seriesObj?.title || repProduct?.name || "";
-        const slug = seriesObj?.slug || seriesId;
-        // showImage comes from the product (产品链接整合页)
+        const fallbackSlug = seriesObj?.slug || seriesId;
+        const categoryName = seriesObj?.category?.name || "";
+        const targetPath = resolveTargetLink(categoryName, fallbackSlug);
+
         const image = repProduct?.showImage || null;
 
         if (title) {
@@ -146,7 +184,7 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
             id: seriesId,
             title,
             image,
-            href: `/${locale}/product-overview/${slug}`
+            href: `/${locale}${targetPath}`
           };
         }
         return null;
