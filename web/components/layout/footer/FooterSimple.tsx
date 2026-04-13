@@ -10,7 +10,11 @@ interface Props {
   siteLogoUrl: string | null;
 }
 
-export default function FooterSimple({ footerData, locale, siteLogoUrl }: Props) {
+export default function FooterSimple({
+  footerData,
+  locale,
+  siteLogoUrl,
+}: Props) {
   return (
     <footer
       className="relative bg-brand-secondary text-brand-text-inverse pt-12 pb-[40px]"
@@ -33,31 +37,56 @@ export default function FooterSimple({ footerData, locale, siteLogoUrl }: Props)
             <ul className="space-y-2 text-sm font-anaheim">
               {footerData.contact.email && (
                 <li>
-                  {footerData.contact.emailLabel && <span className="font-semibold">{footerData.contact.emailLabel}</span>}
-                  <a href={`mailto:${footerData.contact.email}`} className="hover:text-brand-primary transition-colors">
+                  {footerData.contact.emailLabel && (
+                    <span className="font-semibold">
+                      {footerData.contact.emailLabel}
+                    </span>
+                  )}
+                  <a
+                    href={`mailto:${footerData.contact.email}`}
+                    className="hover:text-brand-primary transition-colors"
+                  >
                     {footerData.contact.email}
                   </a>
                 </li>
               )}
               {footerData.contact.afterSales && (
                 <li>
-                  {footerData.contact.afterSalesLabel && <span className="font-semibold">{footerData.contact.afterSalesLabel}</span>}
-                  <a href={`mailto:${footerData.contact.afterSales}`} className="hover:text-brand-primary transition-colors">
+                  {footerData.contact.afterSalesLabel && (
+                    <span className="font-semibold">
+                      {footerData.contact.afterSalesLabel}
+                    </span>
+                  )}
+                  <a
+                    href={`mailto:${footerData.contact.afterSales}`}
+                    className="hover:text-brand-primary transition-colors"
+                  >
                     {footerData.contact.afterSales}
                   </a>
                 </li>
               )}
               {footerData.contact.whatsapp && (
                 <li>
-                  {footerData.contact.whatsappLabel && <span className="font-semibold">{footerData.contact.whatsappLabel}</span>}
-                  <a href={`https://wa.me/${footerData.contact.whatsapp.replace(/[^0-9]/g, '')}`} className="hover:text-brand-primary transition-colors">
+                  {footerData.contact.whatsappLabel && (
+                    <span className="font-semibold">
+                      {footerData.contact.whatsappLabel}
+                    </span>
+                  )}
+                  <a
+                    href={`https://wa.me/${footerData.contact.whatsapp.replace(/[^0-9]/g, "")}`}
+                    className="hover:text-brand-primary transition-colors"
+                  >
                     {footerData.contact.whatsapp}
                   </a>
                 </li>
               )}
               {footerData.contact.address && (
                 <li>
-                  {footerData.contact.addressLabel && <span className="font-semibold">{footerData.contact.addressLabel} </span>}
+                  {footerData.contact.addressLabel && (
+                    <span className="font-semibold">
+                      {footerData.contact.addressLabel}{" "}
+                    </span>
+                  )}
                   {footerData.contact.address}
                 </li>
               )}
@@ -66,7 +95,9 @@ export default function FooterSimple({ footerData, locale, siteLogoUrl }: Props)
 
           {/* 右侧：Official Notice */}
           <div className="pl-4">
-            <h4 className="font-bold text-lg leading-loose font-anaheim">{footerData.notice.title}</h4>
+            <h4 className="font-bold text-lg leading-loose font-anaheim">
+              {footerData.notice.title}
+            </h4>
             <ul className="text-sm leading-loose space-y-0 font-anaheim">
               {footerData.notice.lines.map((line, index) => (
                 <li key={index} className="flex items-start">

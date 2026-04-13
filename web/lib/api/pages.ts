@@ -66,7 +66,7 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
     let applications: any[] = [];
     let formConfig: any = null;
 
-    if (slug === 'one-stop-solution' || slug === 'oem-odm' || slug === 'application' || slug === 'our-story' || slug === 'support' || slug === 'contact-us' || slug === 'product-overview') {
+    if (slug === 'one-stop-solution' || slug === 'oem-odm' || slug === 'application' || slug === 'our-story' || slug === 'support' || slug === 'contact-us' || slug === 'product-overview' || slug === 'service-overview') {
       let contentChildren = page.content?.root?.children || page.contentTranslation?.root?.children || [];
       contentChildren = flattenLexicalChildren(contentChildren);
 
