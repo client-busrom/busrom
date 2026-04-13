@@ -288,7 +288,7 @@ export const parseServiceOverviewData = (pageContent: any): ParsedServiceOvervie
     backgroundImage: extractImageAfterMarker(contentChildren, "contact-form-bg-image", mediaData),
     title: extractTextAfterMarker(contentChildren, "contact-form-title"),
     description: extractTextAfterMarker(contentChildren, "contact-form-description"),
-    formConfig: (contentChildren.find((n: any) => n.type === "formBlock")?.data?.formConfig) || null,
+    formConfig: pageContent.formConfig || (contentChildren.find((n: any) => n.type === "formBlock")?.data?.formConfig) || null,
   };
 
   // 4. Applications

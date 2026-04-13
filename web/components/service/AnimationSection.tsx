@@ -1,121 +1,127 @@
-"use client"
+"use client";
 
-import React, { useRef, useEffect, useCallback } from "react"
-import Link from "next/link"
+import React, { useRef, useEffect, useCallback } from "react";
+import Link from "next/link";
 
-const DESIGN_WIDTH = 1920
+const DESIGN_WIDTH = 1920;
 
 interface MediaObject {
-  id: string
-  url: string
-  alt?: string
+  id: string;
+  url: string;
+  alt?: string;
   variants?: {
-    thumbnail?: string
-    small?: string
-    medium?: string
-    large?: string
-    xlarge?: string
-  }
-  enableLink?: boolean
-  linkUrl?: string
-  openInNewTab?: boolean
+    thumbnail?: string;
+    small?: string;
+    medium?: string;
+    large?: string;
+    xlarge?: string;
+  };
+  enableLink?: boolean;
+  linkUrl?: string;
+  openInNewTab?: boolean;
 }
 
 interface AnimationSectionProps {
-  locale: string
-  backgroundImage?: MediaObject | null
+  locale: string;
+  backgroundImage?: MediaObject | null;
 }
 
 // Water ripple effect using Canvas
 // Performance optimization: use lower resolution for calculations
-const RIPPLE_SCALE = 0.5 // Calculate at 50% resolution for better performance
+const RIPPLE_SCALE = 0.5; // Calculate at 50% resolution for better performance
 
 class WaterRipple {
-  private canvas: HTMLCanvasElement
-  private ctx: CanvasRenderingContext2D
-  private width: number
-  private height: number
-  private halfWidth: number
-  private halfHeight: number
-  private rippleRadius: number
-  private rippleMap: Int32Array
-  private lastMap: Int32Array
-  private texture: ImageData | null = null
-  private ripple: ImageData | null = null
-  private animationId: number | null = null
-  private dropInterval: number | null = null
-  private lastFrameTime: number = 0
-  private targetFPS: number = 30 // Limit to 30fps for smoother scrolling
-  private frameInterval: number = 1000 / 30
-  private isVisible: boolean = true
+  private canvas: HTMLCanvasElement;
+  private ctx: CanvasRenderingContext2D;
+  private width: number;
+  private height: number;
+  private halfWidth: number;
+  private halfHeight: number;
+  private rippleRadius: number;
+  private rippleMap: Int32Array;
+  private lastMap: Int32Array;
+  private texture: ImageData | null = null;
+  private ripple: ImageData | null = null;
+  private animationId: number | null = null;
+  private dropInterval: number | null = null;
+  private lastFrameTime: number = 0;
+  private targetFPS: number = 30; // Limit to 30fps for smoother scrolling
+  private frameInterval: number = 1000 / 30;
+  private isVisible: boolean = true;
 
   constructor(canvas: HTMLCanvasElement, image: HTMLImageElement) {
-    this.canvas = canvas
-    this.ctx = canvas.getContext("2d", { alpha: false })! // Disable alpha for performance
-    this.width = canvas.width
-    this.height = canvas.height
-    this.halfWidth = this.width >> 1
-    this.halfHeight = this.height >> 1
-    this.rippleRadius = 3
+    this.canvas = canvas;
+    this.ctx = canvas.getContext("2d", { alpha: false })!; // Disable alpha for performance
+    this.width = canvas.width;
+    this.height = canvas.height;
+    this.halfWidth = this.width >> 1;
+    this.halfHeight = this.height >> 1;
+    this.rippleRadius = 3;
 
-    const size = this.width * (this.height + 2) * 2
-    this.rippleMap = new Int32Array(size)
-    this.lastMap = new Int32Array(size)
+    const size = this.width * (this.height + 2) * 2;
+    this.rippleMap = new Int32Array(size);
+    this.lastMap = new Int32Array(size);
 
     // Draw the image to canvas with object-fit: cover behavior
-    const imgRatio = image.naturalWidth / image.naturalHeight
-    const canvasRatio = this.width / this.height
+    const imgRatio = image.naturalWidth / image.naturalHeight;
+    const canvasRatio = this.width / this.height;
 
-    let drawWidth, drawHeight, drawX, drawY
+    let drawWidth, drawHeight, drawX, drawY;
 
     if (imgRatio > canvasRatio) {
       // Image is wider - fit height, crop width
-      drawHeight = this.height
-      drawWidth = this.height * imgRatio
-      drawX = (this.width - drawWidth) / 2
-      drawY = 0
+      drawHeight = this.height;
+      drawWidth = this.height * imgRatio;
+      drawX = (this.width - drawWidth) / 2;
+      drawY = 0;
     } else {
       // Image is taller - fit width, crop height
-      drawWidth = this.width
-      drawHeight = this.width / imgRatio
-      drawX = 0
-      drawY = (this.height - drawHeight) / 2
+      drawWidth = this.width;
+      drawHeight = this.width / imgRatio;
+      drawX = 0;
+      drawY = (this.height - drawHeight) / 2;
     }
 
-    this.ctx.drawImage(image, drawX, drawY, drawWidth, drawHeight)
-    this.texture = this.ctx.getImageData(0, 0, this.width, this.height)
-    this.ripple = this.ctx.getImageData(0, 0, this.width, this.height)
+    this.ctx.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+    this.texture = this.ctx.getImageData(0, 0, this.width, this.height);
+    this.ripple = this.ctx.getImageData(0, 0, this.width, this.height);
 
-    this.animate = this.animate.bind(this)
+    this.animate = this.animate.bind(this);
   }
 
   setVisible(visible: boolean) {
-    this.isVisible = visible
+    this.isVisible = visible;
   }
 
-  drop(x: number, y: number, radius: number = 15, strength: number = 256, isRaw: boolean = false) {
+  drop(
+    x: number,
+    y: number,
+    radius: number = 15,
+    strength: number = 256,
+    isRaw: boolean = false,
+  ) {
     // If isRaw is true, x and y are already in canvas coordinates
     // Otherwise, normalize from element coordinates to canvas coordinates
-    let dropX: number, dropY: number
+    let dropX: number, dropY: number;
     if (isRaw) {
-      dropX = Math.floor(x)
-      dropY = Math.floor(y)
+      dropX = Math.floor(x);
+      dropY = Math.floor(y);
     } else {
-      const offsetW = this.canvas.offsetWidth || this.width
-      const offsetH = this.canvas.offsetHeight || this.height
-      dropX = Math.floor((x / offsetW) * this.width)
-      dropY = Math.floor((y / offsetH) * this.height)
+      const offsetW = this.canvas.offsetWidth || this.width;
+      const offsetH = this.canvas.offsetHeight || this.height;
+      dropX = Math.floor((x / offsetW) * this.width);
+      dropY = Math.floor((y / offsetH) * this.height);
     }
 
     for (let j = -radius; j < radius; j++) {
       for (let k = -radius; k < radius; k++) {
-        const dist = Math.sqrt(j * j + k * k)
+        const dist = Math.sqrt(j * j + k * k);
         if (dist < radius) {
-          const px = dropX + k
-          const py = dropY + j
+          const px = dropX + k;
+          const py = dropY + j;
           if (px >= 0 && px < this.width && py >= 0 && py < this.height) {
-            const idx = (this.width + 2) * (py + 1) + px + 1
-            this.rippleMap[idx] += Math.floor(strength * (1 - dist / radius))
+            const idx = (this.width + 2) * (py + 1) + px + 1;
+            this.rippleMap[idx] += Math.floor(strength * (1 - dist / radius));
           }
         }
       }
@@ -123,19 +129,19 @@ class WaterRipple {
   }
 
   private processRipple() {
-    const width = this.width
-    const height = this.height
-    const w2 = width + 2
+    const width = this.width;
+    const height = this.height;
+    const w2 = width + 2;
 
     // Swap buffers
-    const temp = this.lastMap
-    this.lastMap = this.rippleMap
-    this.rippleMap = temp
+    const temp = this.lastMap;
+    this.lastMap = this.rippleMap;
+    this.rippleMap = temp;
 
     for (let y = 1; y <= height; y++) {
-      const prevRow = (y - 1) * w2
-      const currRow = y * w2
-      const nextRow = (y + 1) * w2
+      const prevRow = (y - 1) * w2;
+      const currRow = y * w2;
+      const nextRow = (y + 1) * w2;
 
       for (let x = 1; x <= width; x++) {
         // Wave equation
@@ -145,94 +151,102 @@ class WaterRipple {
             this.lastMap[currRow + x - 1] +
             this.lastMap[currRow + x + 1]) >>
             1) -
-          this.rippleMap[currRow + x]
+          this.rippleMap[currRow + x];
 
         // Damping
-        val -= val >> 5
+        val -= val >> 5;
 
-        this.rippleMap[currRow + x] = val
+        this.rippleMap[currRow + x] = val;
       }
     }
   }
 
   private renderRipple() {
-    if (!this.texture || !this.ripple) return
+    if (!this.texture || !this.ripple) return;
 
-    const width = this.width
-    const height = this.height
-    const w2 = width + 2
-    const textureData = this.texture.data
-    const rippleData = this.ripple.data
+    const width = this.width;
+    const height = this.height;
+    const w2 = width + 2;
+    const textureData = this.texture.data;
+    const rippleData = this.ripple.data;
 
     for (let y = 1; y <= height; y++) {
-      const currRow = y * w2
+      const currRow = y * w2;
 
       for (let x = 1; x <= width; x++) {
         // Calculate displacement
-        const dx = this.rippleMap[currRow + x - 1] - this.rippleMap[currRow + x + 1]
-        const dy = this.rippleMap[currRow - w2 + x] - this.rippleMap[currRow + w2 + x]
+        const dx =
+          this.rippleMap[currRow + x - 1] - this.rippleMap[currRow + x + 1];
+        const dy =
+          this.rippleMap[currRow - w2 + x] - this.rippleMap[currRow + w2 + x];
 
         // Apply displacement with bounds checking
-        let sx = x + (dx >> 3)
-        let sy = y + (dy >> 3)
+        let sx = x + (dx >> 3);
+        let sy = y + (dy >> 3);
 
-        if (sx < 0) sx = 0
-        if (sx >= width) sx = width - 1
-        if (sy < 0) sy = 0
-        if (sy >= height) sy = height - 1
+        if (sx < 0) sx = 0;
+        if (sx >= width) sx = width - 1;
+        if (sy < 0) sy = 0;
+        if (sy >= height) sy = height - 1;
 
         // Source and destination indices
-        const srcIdx = (sy * width + sx) << 2
-        const dstIdx = ((y - 1) * width + (x - 1)) << 2
+        const srcIdx = (sy * width + sx) << 2;
+        const dstIdx = ((y - 1) * width + (x - 1)) << 2;
 
         // Copy pixel with slight shading based on displacement
-        const shade = Math.min(255, Math.max(0, 128 + (dx >> 1)))
-        const shadeRatio = shade / 128
+        const shade = Math.min(255, Math.max(0, 128 + (dx >> 1)));
+        const shadeRatio = shade / 128;
 
-        rippleData[dstIdx] = Math.min(255, textureData[srcIdx] * shadeRatio)
-        rippleData[dstIdx + 1] = Math.min(255, textureData[srcIdx + 1] * shadeRatio)
-        rippleData[dstIdx + 2] = Math.min(255, textureData[srcIdx + 2] * shadeRatio)
-        rippleData[dstIdx + 3] = textureData[srcIdx + 3]
+        rippleData[dstIdx] = Math.min(255, textureData[srcIdx] * shadeRatio);
+        rippleData[dstIdx + 1] = Math.min(
+          255,
+          textureData[srcIdx + 1] * shadeRatio,
+        );
+        rippleData[dstIdx + 2] = Math.min(
+          255,
+          textureData[srcIdx + 2] * shadeRatio,
+        );
+        rippleData[dstIdx + 3] = textureData[srcIdx + 3];
       }
     }
 
-    this.ctx.putImageData(this.ripple, 0, 0)
+    this.ctx.putImageData(this.ripple, 0, 0);
   }
 
   animate(timestamp: number = 0) {
-    this.animationId = requestAnimationFrame(this.animate)
+    this.animationId = requestAnimationFrame(this.animate);
 
     // Skip processing if not visible (saves CPU when scrolled away)
-    if (!this.isVisible) return
+    if (!this.isVisible) return;
 
     // Limit frame rate to reduce CPU usage
-    const elapsed = timestamp - this.lastFrameTime
-    if (elapsed < this.frameInterval) return
+    const elapsed = timestamp - this.lastFrameTime;
+    if (elapsed < this.frameInterval) return;
 
-    this.lastFrameTime = timestamp - (elapsed % this.frameInterval)
+    this.lastFrameTime = timestamp - (elapsed % this.frameInterval);
 
-    this.processRipple()
-    this.renderRipple()
+    this.processRipple();
+    this.renderRipple();
   }
 
   start() {
-    this.animate(0)
+    this.animate(0);
 
     // Use canvas internal width/height
-    const w = this.width
-    const h = this.height
+    const w = this.width;
+    const h = this.height;
 
     // Initial drops to show effect immediately (use raw canvas coordinates)
     // Adjusted radius for scaled resolution
     setTimeout(() => {
-      this.drop(w * 0.3, h * 0.4, 8, 300, true)
-    }, 100)
+      this.drop(w * 0.3, h * 0.4, 8, 300, true);
+    }, 100);
     setTimeout(() => {
-      this.drop(w * 0.7, h * 0.6, 6, 250, true)
-    }, 400)
+      this.drop(w * 0.7, h * 0.6, 6, 250, true);
+    }, 400);
     setTimeout(() => {
-      this.drop(w * 0.5, h * 0.3, 9, 350, true)
-    }, 800)
+      this.drop(w * 0.5, h * 0.3, 9, 350, true);
+    }, 800);
 
     // Auto drop ripples disabled to prevent memory leaks
     // this.dropInterval = window.setInterval(() => {
@@ -259,17 +273,17 @@ class WaterRipple {
 
   stop() {
     if (this.animationId) {
-      cancelAnimationFrame(this.animationId)
-      this.animationId = null
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
     }
     if (this.dropInterval) {
-      clearInterval(this.dropInterval)
-      this.dropInterval = null
+      clearInterval(this.dropInterval);
+      this.dropInterval = null;
     }
   }
 
   destroy() {
-    this.stop()
+    this.stop();
   }
 }
 
@@ -278,119 +292,119 @@ export function AnimationSection({
   backgroundImage,
 }: AnimationSectionProps) {
   // Full width, no 0.7 scale
-  const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const rippleRef = useRef<WaterRipple | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rippleRef = useRef<WaterRipple | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const imageUrl = backgroundImage?.url
+  const imageUrl = backgroundImage?.url;
 
   useEffect(() => {
-    if (!canvasRef.current || !imageUrl) return
+    if (!canvasRef.current || !imageUrl) return;
 
-    const canvas = canvasRef.current
-    const container = containerRef.current
-    let blobUrl: string | null = null
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    let blobUrl: string | null = null;
 
     // Set canvas size based on container - use lower resolution for performance
     const updateCanvasSize = () => {
       if (container) {
-        const rect = container.getBoundingClientRect()
+        const rect = container.getBoundingClientRect();
         // Use scaled resolution for better performance
-        canvas.width = Math.floor(rect.width * RIPPLE_SCALE)
-        canvas.height = Math.floor(rect.height * RIPPLE_SCALE)
+        canvas.width = Math.floor(rect.width * RIPPLE_SCALE);
+        canvas.height = Math.floor(rect.height * RIPPLE_SCALE);
       }
-    }
+    };
 
-    const image = new Image()
+    const image = new Image();
 
     // Use internal API proxy to avoid CORS issues with Canvas getImageData
     // CloudFront doesn't return CORS headers, so we proxy through Next.js
-    const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(imageUrl)}`
+    const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(imageUrl)}`;
 
     fetch(proxyUrl)
-      .then(response => response.blob())
-      .then(blob => {
-        blobUrl = URL.createObjectURL(blob)
+      .then((response) => response.blob())
+      .then((blob) => {
+        blobUrl = URL.createObjectURL(blob);
         image.onload = () => {
-          updateCanvasSize()
+          updateCanvasSize();
 
           // Clean up previous instance
           if (rippleRef.current) {
-            rippleRef.current.destroy()
+            rippleRef.current.destroy();
           }
 
           // Create new ripple effect
-          rippleRef.current = new WaterRipple(canvas, image)
-          rippleRef.current.start()
-        }
-        image.src = blobUrl
+          rippleRef.current = new WaterRipple(canvas, image);
+          rippleRef.current.start();
+        };
+        image.src = blobUrl;
       })
-      .catch(err => {
-        console.error('Failed to load animation background image:', err)
-      })
+      .catch((err) => {
+        console.error("Failed to load animation background image:", err);
+      });
 
     // Handle resize with debounce
-    let resizeTimeout: NodeJS.Timeout
+    let resizeTimeout: NodeJS.Timeout;
     const handleResize = () => {
-      clearTimeout(resizeTimeout)
+      clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
         if (image.complete && image.naturalWidth > 0) {
-          updateCanvasSize()
+          updateCanvasSize();
           if (rippleRef.current) {
-            rippleRef.current.destroy()
+            rippleRef.current.destroy();
           }
-          rippleRef.current = new WaterRipple(canvas, image)
-          rippleRef.current.start()
+          rippleRef.current = new WaterRipple(canvas, image);
+          rippleRef.current.start();
         }
-      }, 200)
-    }
+      }, 200);
+    };
 
     // Use IntersectionObserver to pause animation when not visible
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (rippleRef.current) {
-            rippleRef.current.setVisible(entry.isIntersecting)
+            rippleRef.current.setVisible(entry.isIntersecting);
           }
-        })
+        });
       },
-      { threshold: 0, rootMargin: "100px" }
-    )
+      { threshold: 0, rootMargin: "100px" },
+    );
 
     if (container) {
-      observer.observe(container)
+      observer.observe(container);
     }
 
-    window.addEventListener("resize", handleResize)
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      clearTimeout(resizeTimeout)
-      window.removeEventListener("resize", handleResize)
-      observer.disconnect()
+      clearTimeout(resizeTimeout);
+      window.removeEventListener("resize", handleResize);
+      observer.disconnect();
       if (rippleRef.current) {
-        rippleRef.current.destroy()
+        rippleRef.current.destroy();
       }
       // Clean up blob URL to prevent memory leak
       if (blobUrl) {
-        URL.revokeObjectURL(blobUrl)
+        URL.revokeObjectURL(blobUrl);
       }
-    }
-  }, [imageUrl])
+    };
+  }, [imageUrl]);
 
   // Handle click interaction only - use drop's non-raw mode to let it handle coordinate conversion
   const handleClick = useCallback((e: React.MouseEvent) => {
     if (rippleRef.current && containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
       // Pass false for isRaw so drop() converts coordinates using canvas.offsetWidth/Height
-      rippleRef.current.drop(x, y, 10, 400, false)
+      rippleRef.current.drop(x, y, 10, 400, false);
     }
-  }, [])
+  }, []);
 
   if (!backgroundImage) {
-    return null
+    return null;
   }
 
   return (
@@ -424,9 +438,16 @@ export function AnimationSection({
 
       {/* Mobile Layout - Simple image display */}
       <div className="lg:hidden relative w-full aspect-video overflow-hidden">
-        {imageUrl && (
-          backgroundImage.enableLink && backgroundImage.linkUrl ? (
-            <Link href={backgroundImage.linkUrl} target={backgroundImage.openInNewTab ? "_blank" : undefined} rel={backgroundImage.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+        {imageUrl &&
+          (backgroundImage.enableLink && backgroundImage.linkUrl ? (
+            <Link
+              href={backgroundImage.linkUrl}
+              target={backgroundImage.openInNewTab ? "_blank" : undefined}
+              rel={
+                backgroundImage.openInNewTab ? "noopener noreferrer" : undefined
+              }
+              className="block w-full h-full"
+            >
               <img
                 src={imageUrl}
                 alt={backgroundImage.alt || "Animation background"}
@@ -439,9 +460,8 @@ export function AnimationSection({
               alt={backgroundImage.alt || "Animation background"}
               className="w-full h-full object-cover"
             />
-          )
-        )}
+          ))}
       </div>
     </section>
-  )
+  );
 }

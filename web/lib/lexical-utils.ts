@@ -15,18 +15,27 @@ export interface MediaObject {
   [key: string]: any;
 }
 
-/**
- * Recursively flattens Lexical nodes, extracting children from layout columns
- */
 export function flattenLexicalChildren(children: any[]): any[] {
   const result: any[] = [];
   if (!children || !Array.isArray(children)) return result;
 
   for (const node of children) {
     if (node.type === "layout" && node.columns) {
+      // Handle Column Layouts
       for (const col of node.columns) {
         if (col.children) {
           result.push(...flattenLexicalChildren(col.children));
+        }
+      }
+    } else if (node.type === "block" && (node.fields || node.data)) {
+      // Handle Nested Blocks (like Sidebar, Tabs, etc.)
+      result.push(node); // Keep the block itself
+      const source = node.fields || node.data;
+      for (const key in source) {
+        const field = source[key];
+        // If this field contains a nested Lexical editor structure, recurse into its children
+        if (field?.root?.children) {
+          result.push(...flattenLexicalChildren(field.root.children));
         }
       }
     } else {
