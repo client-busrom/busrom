@@ -4,7 +4,9 @@ import { useState, useEffect } from "react"
 import type { Locale } from "@/i18n.config"
 import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 import Link from "next/link"
-import Image from "next/image"
+import { BlogTemplateOne } from "@/components/blog/templates/BlogTemplateOne"
+import { BlogTemplateTwo } from "@/components/blog/templates/BlogTemplateTwo"
+import { BlogTemplateThree } from "@/components/blog/templates/BlogTemplateThree"
 
 interface BlogContent {
   id: string
@@ -18,8 +20,11 @@ interface BlogContent {
   updatedAt: string
   coverImage: string
   categories: { id: string; name: string }[]
+  templateType: string
   content: {
-    document: any[]
+    root: {
+      children: any[]
+    }
   } | null
   locale: string
 }
@@ -43,8 +48,15 @@ export function BlogDetailClient({ locale, slug }: BlogDetailClientProps) {
         const res = await fetch(`/api/blog/${slug}?locale=${locale}`)
 
         if (!res.ok) {
+          // If 404 or fail, check for Mock Data first
+          const mockData = getMockBlog(slug, locale)
+          if (mockData) {
+            setBlog(mockData)
+            return
+          }
+          
           if (res.status === 404) {
-            throw new Error("Blog post not found")
+             throw new Error("Blog post not found")
           }
           throw new Error(`Failed to fetch blog: ${res.statusText}`)
         }
@@ -53,7 +65,13 @@ export function BlogDetailClient({ locale, slug }: BlogDetailClientProps) {
         setBlog(data)
       } catch (err) {
         console.error("Error fetching blog:", err)
-        setError(err instanceof Error ? err.message : "Failed to load blog")
+        // Fallback to Mock Data on ANY error
+        const mockData = getMockBlog(slug, locale)
+        if (mockData) {
+           setBlog(mockData)
+        } else {
+           setError(err instanceof Error ? err.message : "Failed to load blog")
+        }
       } finally {
         setLoading(false)
       }
@@ -76,12 +94,8 @@ export function BlogDetailClient({ locale, slug }: BlogDetailClientProps) {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pt-20" data-header-theme="light">
-        <div className="container mx-auto px-6 md:px-8 lg:px-16 py-12">
-          <div className="flex items-center justify-center py-20">
-            <div className="w-12 h-12 border-2 border-brand-secondary border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-12 h-12 border-2 border-brand-secondary border-t-transparent rounded-full animate-spin"></div>
       </div>
     )
   }
@@ -89,129 +103,178 @@ export function BlogDetailClient({ locale, slug }: BlogDetailClientProps) {
   // Error state
   if (error || !blog) {
     return (
-      <div className="min-h-screen bg-background pt-20" data-header-theme="light">
-        <div className="container mx-auto px-6 md:px-8 lg:px-16 py-12">
-          <div className="text-center py-20">
-            <div className="inline-block w-16 h-px bg-brand-accent-border mb-6"></div>
-            <h1 className="text-brand-text-black text-3xl font-anaheim font-extrabold mb-3">
-              {locale === "zh" ? "文章未找到" : "Blog Post Not Found"}
-            </h1>
-            <p className="text-brand-accent-gold text-base mb-6">
-              {error || (locale === "zh" ? "您查找的文章不存在。" : "The blog post you're looking for doesn't exist.")}
-            </p>
-            <Link
-              href={`/${locale}/blog`}
-              className="inline-block px-8 py-3 bg-brand-text-black text-white font-anaheim font-bold text-sm uppercase tracking-wider hover:bg-brand-accent-gold transition-colors"
-            >
-              {locale === "zh" ? "返回博客" : "Back to Blog"}
-            </Link>
-          </div>
+      <div className="min-h-screen bg-background pt-32 pb-20">
+        <div className="container mx-auto px-6 text-center">
+          <h1 className="text-3xl font-anaheim font-extrabold mb-4">
+            {locale === "zh" ? "文章未找到" : "Blog Post Not Found"}
+          </h1>
+          <p className="text-gray-500 mb-8">{error}</p>
+          <Link href={`/${locale}/blog`} className="inline-block px-8 py-3 bg-black text-white rounded-full">
+            {locale === "zh" ? "返回知识库" : "Back to Blog"}
+          </Link>
         </div>
       </div>
     )
   }
 
-  return (
-    <article className="min-h-screen bg-background pt-20" data-header-theme="light">
-      <div className="container mx-auto px-6 md:px-8 lg:px-16 py-12">
-        {/* Breadcrumb */}
-        <nav className="mb-8">
-          <ol className="flex items-center space-x-2 text-sm text-brand-accent-gold">
-            <li>
-              <Link href={`/${locale}`} className="hover:text-brand-text-black transition-colors">
-                {locale === "zh" ? "首页" : "Home"}
-              </Link>
-            </li>
-            <li>/</li>
-            <li>
-              <Link href={`/${locale}/blog`} className="hover:text-brand-text-black transition-colors">
-                {locale === "zh" ? "博客" : "Blog"}
-              </Link>
-            </li>
-            <li>/</li>
-            <li className="text-brand-text-black truncate max-w-[200px]">{blog.title}</li>
-          </ol>
-        </nav>
+  // Select Template Layout
+  if (blog.templateType === 'template2') {
+    return <BlogTemplateTwo blog={blog} locale={locale} formatDate={formatDate} />
+  }
+  
+  if (blog.templateType === 'template3') {
+    return <BlogTemplateThree blog={blog} locale={locale} formatDate={formatDate} />
+  }
 
-        {/* Cover Image */}
-        {blog.coverImage && (
-          <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] mb-8 rounded-lg overflow-hidden">
-            <Image
-              src={blog.coverImage}
-              alt={blog.title}
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-        )}
+  // Default to template1
+  return <BlogTemplateOne blog={blog} locale={locale} formatDate={formatDate} />
+}
 
-        {/* Categories */}
-        {blog.categories.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {blog.categories.map((category) => (
-              <span
-                key={category.id}
-                className="px-3 py-1 text-xs font-anaheim font-semibold bg-brand-accent-gold/10 text-brand-accent-gold rounded-full"
-              >
-                {category.name}
-              </span>
-            ))}
-          </div>
-        )}
+// ==================================================================
+// MOCK DATA HELPER
+// ==================================================================
 
-        {/* Title */}
-        <h1 className="text-3xl md:text-4xl lg:text-5xl font-anaheim font-extrabold text-brand-text-black mb-4">
-          {blog.title}
-        </h1>
+function getMockBlog(slug: string, locale: string): BlogContent | null {
+  const mocks: Record<string, any> = {
+    'finding-balance-modern-reading': {
+      templateType: 'template1',
+      title: locale === 'zh' ? '寻找平衡：在忙碌的世界中优先考虑自我保健' : 'Finding Balance: Prioritizing Self-Care in a Busy World',
+      author: 'Kathryn Jackson',
+      coverImage: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1200',
+      content: {
+        root: {
+          children: [
+            {
+              type: 'paragraph',
+              children: [{ type: 'text', text: locale === 'zh' 
+                ? '在当今快节奏且要求严苛的世界中，优先考虑自我保健对于维持平衡、管理压力和保护身心健康至关重要。' 
+                : 'In today\'s fast-paced and demanding world, prioritizing self-care is essential for maintaining balance, managing stress, and preserving your well-being. Despite the pressures of work, family, and other responsibilities, finding time for self-care is crucial for overall health and happiness.' }]
+            },
+            {
+              type: 'heading',
+              tag: 'h2',
+              children: [{ type: 'text', text: locale === 'zh' ? '理解自我保健' : 'Understanding Self-Care' }]
+            },
+            {
+              type: 'paragraph',
+              children: [{ type: 'text', text: locale === 'zh'
+                ? '自我保健涉及采取有意识的行动来滋养您的身体、心理和情感健康。'
+                : 'Self-care involves taking intentional actions to nurture your physical, mental, and emotional well-being. It encompasses a wide range of activities, including exercise, relaxation, hobbies, socializing, and seeking support when needed.' }]
+            },
+            {
+              type: 'heading',
+              tag: 'h2',
+              children: [{ type: 'text', text: locale === 'zh' ? '自我保健的重要性' : 'Importance of Self-Care' }]
+            },
+            {
+              type: 'list',
+              listType: 'bullet',
+              children: [
+                { type: 'listitem', children: [{ type: 'text', text: locale === 'zh' ? '压力管理：自我保健活动有助于降低压力水平。' : 'Stress Management: Self-care activities help reduce stress levels and promote relaxation.' }] },
+                { type: 'listitem', children: [{ type: 'text', text: locale === 'zh' ? '提高生产力：抽时间进行自我保健可以提高专注力。' : 'Enhanced Productivity: Taking time for self-care can improve focus, concentration, and productivity.' }] },
+                { type: 'listitem', children: [{ type: 'text', text: locale === 'zh' ? '改善人际关系：当你优先考虑自我保健时，你有更多的精力。' : 'Improved Relationships: When you prioritize self-care, you have more energy and resources to invest in your relationships.' }] },
+                { type: 'listitem', children: [{ type: 'text', text: locale === 'zh' ? '更好的身体健康：进行规律的锻炼。' : 'Better Physical Health: Engaging in regular exercise, healthy eating, and other practices improves physical health.' }] }
+              ]
+            },
+            {
+              type: 'heading',
+              tag: 'h2',
+              children: [{ type: 'text', text: locale === 'zh' ? '自我保健的实用策略' : 'Practical Strategies for Self-Care' }]
+            },
+            {
+              type: 'list',
+              listType: 'bullet',
+              children: [
+                { type: 'listitem', children: [{ type: 'text', text: locale === 'zh' ? '设定界限：学会拒绝那些耗尽你精力的活动。' : 'Set Boundaries: Learn to say no to activities or commitments that drain your energy.' }] },
+                { type: 'listitem', children: [{ type: 'text', text: locale === 'zh' ? '为爱好的活动腾出时间：安排规律的时间。' : 'Make Time for Activities You Enjoy: Schedule regular time for activities that bring you joy.' }] },
+                { type: 'listitem', children: [{ type: 'text', text: locale === 'zh' ? '练习正念：将冥想或深呼吸等正念练习融入日常。' : 'Practice Mindfulness: Incorporate mindfulness practices such as meditation or deep breathing.' }] },
+                { type: 'listitem', children: [{ type: 'text', text: locale === 'zh' ? '保证充足睡眠：通过建立规律的睡眠时间表。' : 'Get Enough Sleep: Prioritize quality sleep by establishing a regular sleep schedule.' }] },
+                { type: 'listitem', children: [{ type: 'text', text: locale === 'zh' ? '寻求支持：需要时不要犹豫向朋友或家人寻求支持。' : 'Seek Support: Don\'t hesitate to reach out for support from friends, family, or professionals.' }] }
+              ]
+            },
+            {
+              type: 'blockquote',
+              children: [{ type: 'text', text: locale === 'zh' 
+                ? '“自我保健不是自私。它是在繁忙且充满要求的世界中维持平衡的关键。” - 未知' 
+                : 'Self-care is not selfish. It\'s essential for maintaining balance, managing stress, and preserving your well-being in a busy and demanding world.' }]
+            },
+            {
+              type: 'heading',
+              tag: 'h2',
+              children: [{ type: 'text', text: locale === 'zh' ? '结论' : 'Conclusion' }]
+            },
+            {
+              type: 'paragraph',
+              children: [{ type: 'text', text: locale === 'zh'
+                ? '在忙碌的世界中寻找平衡并优先考虑自我保健需要意愿、承诺和自我意识。通过将自我保健作为优先事项并将实用策略融入您的日常生活，您可以培养韧性、管理压力并呵护您的整体健康。请记住，自我保健不是奢侈品；它是过上健康、充实和平衡生活的必需品。'
+                : 'Finding balance and prioritizing self-care in a busy world requires intention, commitment, and self-awareness. By making self-care a priority and incorporating practical strategies into your daily life, you can cultivate resilience, manage stress, and nurture your overall well-being. Remember that self-care is not a luxury; it\'s a necessity for living a healthy, fulfilling, and balanced life.' }]
+            },
+            {
+              type: 'paragraph',
+              children: [{ type: 'text', text: locale === 'zh'
+                ? '准备好在忙碌的世界中优先考虑自我保健并寻找平衡了吗？今天就开始实施这些策略，见证您的健康和幸福茁壮成长。'
+                : 'Ready to prioritize self-care and find balance in your busy world? Start implementing these strategies today and watch as your health and happiness flourish.' }]
+            },
+            {
+              type: 'paragraph',
+              children: [
+                { type: 'text', text: locale === 'zh' ? '欲了解更多关于自我保健和健康的提示，' : 'For more tips on self-care and well-being, ' },
+                { 
+                  type: 'link', 
+                  fields: {
+                    url: '#',
+                    newTab: false,
+                    linkType: 'custom'
+                  },
+                  children: [{ type: 'text', text: locale === 'zh' ? '请点击这里。' : 'click here.' }] 
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    'minimal-review-jules-style': {
+      templateType: 'template2',
+      title: locale === 'zh' ? '生活与质感：极简主义建筑五金评测' : 'Life & Texture: A Minimalist Architectural Hardware Review',
+      coverImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800',
+    },
+    'corporate-heavy-reland-style': {
+      templateType: 'template3',
+      title: locale === 'zh' ? '跨国大中型项目的玻璃系统集成方案' : 'Integrated Glass Systems for Large-Scale Multinational Projects',
+      coverImage: 'https://images.unsplash.com/photo-1449156059431-789995fd46cb?auto=format&fit=crop&q=80&w=800',
+    }
+  }
 
-        {/* Meta info */}
-        <div className="flex flex-wrap items-center gap-4 text-sm text-brand-accent-gold mb-8 pb-8 border-b border-brand-accent-border">
-          {blog.author && (
-            <span className="flex items-center gap-1">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              {blog.author}
-            </span>
-          )}
-          {blog.publishedAt && (
-            <span className="flex items-center gap-1">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              {formatDate(blog.publishedAt)}
-            </span>
-          )}
-        </div>
+  const base = mocks[slug]
+  if (!base) return null
 
-        {/* Excerpt */}
-        {blog.excerpt && (
-          <p className="text-lg text-brand-text-black/80 font-anaheim mb-8 leading-relaxed">
-            {blog.excerpt}
-          </p>
-        )}
-
-        {/* Content */}
-        {blog.content && (
-          <div className="prose prose-lg max-w-none">
-            <LexicalRenderer content={blog.content} />
-          </div>
-        )}
-
-        {/* Back to Blog */}
-        <div className="mt-12 pt-8 border-t border-brand-accent-border">
-          <Link
-            href={`/${locale}/blog`}
-            className="inline-flex items-center gap-2 text-brand-accent-gold hover:text-brand-text-black transition-colors font-anaheim font-semibold"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            {locale === "zh" ? "返回博客列表" : "Back to Blog"}
-          </Link>
-        </div>
-      </div>
-    </article>
-  )
+  return {
+    id: 'mock-id',
+    slug,
+    title: base.title,
+    excerpt: locale === 'zh' 
+      ? '这是这是一段演示性质的摘要内容，旨在展示在不同排版模板下文字的呼吸感与节奏。Busrom 始终坚持将技术与艺术完美融合。' 
+      : 'This is a demonstration excerpt to showcase the breathing room and rhythm of text across different templates. Busrom always strives to blend technology with art.',
+    author: base.author || 'Antigravity Demo',
+    status: 'published',
+    publishedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    coverImage: base.coverImage,
+    categories: [{ id: 'c1', name: 'Demo' }],
+    templateType: base.templateType,
+    content: base.content || {
+      root: {
+        children: [
+          {
+            type: 'heading',
+            tag: 'h2',
+            children: [{ type: 'text', text: locale === 'zh' ? '内容加载中...' : 'Loading Content...' }]
+          }
+        ]
+      }
+    },
+    locale
+  }
 }

@@ -75,6 +75,15 @@
     /* 焦点环: #756F3F (使用主交互色) */
     --ring: 55 18% 44%;
 
+    /* ========== Replica Specific Colors ========== */
+    --eyolo-red: 0 100% 64%; /* #ff4848 */
+    --eyolo-beige: 48 27% 95%; /* #E7E5D4 */
+    --eyolo-dark: 210 50% 5%; /* #060C14 */
+    --eyolo-border: 48 10% 84%; /* #DCDBD0 */
+    --jules-cream: 30 50% 98%; /* #FDFCFB */
+    --reland-sand: 45 40% 95%; /* #F8F6F0 */
+    --reland-gold: 44 38% 45%; /* #C19A6B */
+
     /* 圆角: (保持不变) */
     --radius: 0.5rem;
   }

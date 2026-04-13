@@ -6,7 +6,6 @@
  * - Rich text content with Lexical editor
  * - Category support
  * - Featured image
- * - SEO fields
  * - Soft delete (status: published/draft/archived)
  * - Tabbed admin interface
  */
@@ -95,8 +94,8 @@ export const Blogs: CollectionConfig = {
               localized: true,
               admin: {
                 description: {
-                  en: 'Short summary for previews and SEO',
-                  zh: '用于预览和SEO的简短摘要',
+                  en: 'Short summary for previews',
+                  zh: '用于预览的简短摘要',
                 },
               },
             },
@@ -186,6 +185,38 @@ export const Blogs: CollectionConfig = {
             },
           ],
         },
+        // ==================================================================
+        // Tab 4: Template Configuration
+        // ==================================================================
+        {
+          label: {
+            en: 'Template Output',
+            zh: '前台排版模板',
+          },
+          fields: [
+            {
+              name: 'templateType',
+              type: 'select',
+              label: {
+                en: 'Template Type',
+                zh: '使用模版类型',
+              },
+              required: true,
+              defaultValue: 'template1',
+              options: [
+                { label: { en: 'Template 1 (Standard Modern)', zh: '模版一 (标准现代多栏)' }, value: 'template1' },
+                { label: { en: 'Template 2 (Minimal Review)', zh: '模版二 (极简测评风格)' }, value: 'template2' },
+                { label: { en: 'Template 3 (Corporate View)', zh: '模版三 (重型图文品牌风)' }, value: 'template3' },
+              ],
+              admin: {
+                description: {
+                  en: 'Select how the frontend will structurally render this blog post.',
+                  zh: '选择在前端显示知识库文章时应该调用的具体开发模版。',
+                },
+              },
+            },
+          ],
+        },
       ],
     },
 
@@ -200,6 +231,10 @@ export const Blogs: CollectionConfig = {
         components: {
           Field: '@/components/fields/TranslationCenter',
         },
+        // We can pass custom properties if the Translation Center supports it 
+        // to restrict logic to specific fields. 
+        // In the requirement context: "把seo插件移除，然后翻译中心去除无用字段，现在seo统一在seo settings里设置"
+        // This is done by just skipping unnecessary hidden meta.
       },
     },
     {

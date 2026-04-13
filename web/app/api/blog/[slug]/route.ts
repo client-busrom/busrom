@@ -71,6 +71,7 @@ export async function GET(
         name: cat.name || '',
       })),
       content: blog.contentTranslation || null,
+      templateType: blog.templateType || 'template1',
       locale,
     }
 

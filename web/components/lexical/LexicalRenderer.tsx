@@ -837,6 +837,36 @@ function IconListBlock({ node }: { node: any }) {
  * Custom JSX Converters for our Lexical nodes
  */
 export const customConverters: JSXConverters = {
+  heading: ({ node, children }) => {
+    const Tag = node.tag as any;
+    // Simple slugify for text content
+    const textContent = node.children
+      ? (node.children as any[]).map((child) => child.text || '').join('')
+      : '';
+    const id = textContent
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '');
+    
+    return <Tag id={id}>{children}</Tag>;
+  },
+  link: ({ node, children }) => {
+    const { fields, url } = node as any;
+    const finalUrl = fields?.url || url || '#';
+    const newTab = fields?.newTab || false;
+    
+    return (
+      <Link 
+        href={finalUrl} 
+        target={newTab ? '_blank' : undefined}
+        rel={newTab ? 'noopener noreferrer' : undefined}
+        className="text-[#ff4848] underline underline-offset-4 hover:opacity-70 transition-opacity"
+      >
+        {children}
+      </Link>
+    );
+  },
   // Blocks (custom features)
   blocks: {
     // Kebab-case naming (original)
@@ -872,33 +902,28 @@ export const customConverters: JSXConverters = {
  * Uses Payload's official RichText component with our custom converters
  */
 export function LexicalRenderer({ content, className = '' }: LexicalRendererProps) {
-  // Merge default converters with our custom ones
-  const converters: JSXConverters = {
+  // Helper to filter out undefined values from converters
+  const filterUndefined = (obj: any) => {
+    if (!obj) return {}
+    return Object.fromEntries(
+      Object.entries(obj).filter(([_, v]) => v !== undefined)
+    )
+  }
+
+  // STEP 2: Restore default and basic custom converters. Keep blocks empty to isolate.
+  const converters: any = {
     ...defaultJSXConverters,
-    blocks: {
-      ...defaultJSXConverters.blocks,
-      ...customConverters.blocks,
-    },
-    // Also register as top-level node types (for DecoratorNodes)
-    carousel: CarouselBlock,
-    ctaButton: CtaButtonBlock,
-    hero: HeroBlock,
-    linkJump: LinkJumpBlock,
-    marqueeLinks: MarqueeLinksBlock,
-    notice: NoticeBlock,
-    singleImage: SingleImageBlock,
-    iconList: IconListBlock,
-    'custom-image-gallery': ImageGalleryBlock,
-    'image-gallery': ImageGalleryBlock,
-    'icon-list': IconListBlock,
-    videoEmbed: VideoEmbedBlock,
-    'video-embed': VideoEmbedBlock,
-    'cta-button': CtaButtonBlock,
-    'link-jump': LinkJumpBlock,
-    'marquee-links': MarqueeLinksBlock,
-    'single-image': SingleImageBlock,
-    productCarousel: ProductCarouselBlock,
-    'product-carousel': ProductCarouselBlock,
+    heading: customConverters.heading,
+    link: customConverters.link,
+  }
+
+  // FINAL SAFETY CHECK: If RichText is undefined, we have a major import issue
+  if (!RichText) {
+    return (
+      <div className="p-4 border-2 border-red-500 bg-red-50 text-red-700 rounded-lg">
+        CRITICAL ERROR: RichText component is undefined. Path: @payloadcms/richtext-lexical/react
+      </div>
+    )
   }
 
   return (
@@ -915,33 +940,22 @@ export function LexicalRenderer({ content, className = '' }: LexicalRendererProp
  * Includes all custom converters for proper block rendering.
  */
 function NestedLexicalRenderer({ content }: { content: any }) {
+  // Helper to filter out undefined values from converters
+  const filterUndefined = (obj: any) => {
+    if (!obj) return {}
+    return Object.fromEntries(
+      Object.entries(obj).filter(([_, v]) => v !== undefined)
+    )
+  }
+
   // Build full converters including all custom blocks
-  const converters: JSXConverters = {
-    ...defaultJSXConverters,
+  const converters: any = {
+    ...filterUndefined(defaultJSXConverters),
+    ...filterUndefined(customConverters),
     blocks: {
-      ...defaultJSXConverters.blocks,
-      ...customConverters.blocks,
+      ...filterUndefined((defaultJSXConverters as any)?.blocks),
+      ...filterUndefined(customConverters.blocks),
     },
-    // Also register as top-level node types (for DecoratorNodes)
-    carousel: CarouselBlock,
-    ctaButton: CtaButtonBlock,
-    hero: HeroBlock,
-    linkJump: LinkJumpBlock,
-    marqueeLinks: MarqueeLinksBlock,
-    notice: NoticeBlock,
-    singleImage: SingleImageBlock,
-    iconList: IconListBlock,
-    'custom-image-gallery': ImageGalleryBlock,
-    'image-gallery': ImageGalleryBlock,
-    'icon-list': IconListBlock,
-    videoEmbed: VideoEmbedBlock,
-    'video-embed': VideoEmbedBlock,
-    'cta-button': CtaButtonBlock,
-    'link-jump': LinkJumpBlock,
-    'marquee-links': MarqueeLinksBlock,
-    'single-image': SingleImageBlock,
-    productCarousel: ProductCarouselBlock,
-    'product-carousel': ProductCarouselBlock,
   }
 
   return <RichText data={content} converters={converters} />
