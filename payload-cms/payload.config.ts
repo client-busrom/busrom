@@ -59,7 +59,7 @@ import { SeriesReusableBlockFeature } from './src/lexical-features/series-reusab
 import { IconListFeature } from './src/lexical-features/icon-list'
 import { ChecklistFeature } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
-import { seoPlugin } from '@payloadcms/plugin-seo'
+
 import { auditorPlugin } from 'payload-auditor'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -459,24 +459,7 @@ export default buildConfig({
       config: s3Config.config,
     }),
 
-    // SEO Plugin
-    seoPlugin({
-      collections: ['blogs'],
-      generateTitle: ({ doc }) => `${doc?.title || doc?.name || 'Busrom'} | Busrom`,
-      generateDescription: ({ doc }) => doc?.excerpt || doc?.description || doc?.shortDescription || '',
-      tabbedUI: true,
-      fields: ({ defaultFields }) => {
-        return defaultFields.map((field) => {
-          if ('name' in field && (field.name === 'title' || field.name === 'description')) {
-            return {
-              ...field,
-              localized: true,
-            }
-          }
-          return field
-        })
-      },
-    }),
+
 
     // Auditor Plugin - 操作审计日志
     // 注意：不追踪 users/roles/permissions，会导致 User 字段验证错误
