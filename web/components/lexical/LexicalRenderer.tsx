@@ -837,6 +837,46 @@ function IconListBlock({ node }: { node: any }) {
  * Custom JSX Converters for our Lexical nodes
  */
 export const customConverters: JSXConverters = {
+  text: ({ node }: any) => {
+    let text = node.text;
+    const format = node.format || 0;
+
+    // Standard Lexical formats (mimics official logic but allows our extension)
+    if (format & 1) text = <strong key="bold">{text}</strong>;
+    if (format & 2) text = <em key="italic">{text}</em>;
+    if (format & 4) text = <span key="strikethrough" style={{ textDecoration: 'line-through' }}>{text}</span>;
+    if (format & 8) text = <span key="underline" style={{ textDecoration: 'underline' }}>{text}</span>;
+    if (format & 16) text = <code key="code">{text}</code>;
+    if (format & 32) text = <sub key="sub">{text}</sub>;
+    if (format & 64) text = <sup key="sup">{text}</sup>;
+
+    // Handle TextStateFeature ($ property) provided by Payload CMS
+    // We map the IDs used in payload.config.ts to our brand colors
+    const state = node.$;
+    if (state) {
+      const styles: React.CSSProperties = {};
+      
+      // Color Mapping aligned with our brand and background context
+      if (state.color) {
+        const colorMap: Record<string, string> = {
+          'brand-primary': '#756F3F',   // Main Olive
+          'brand-secondary': '#A08745', // Gold accent
+          'brand-cream': '#F6F4ED',     // Light background base
+          'brand-red': '#E53E3E',       // Alert
+          'white': '#FFFFFF',           // Readable on dark
+        };
+        if (colorMap[state.color]) {
+          styles.color = colorMap[state.color];
+        }
+      }
+
+      if (Object.keys(styles).length > 0) {
+        text = <span key="custom-color" style={styles}>{text}</span>;
+      }
+    }
+
+    return text;
+  },
   heading: ({ node, children }) => {
     const Tag = node.tag as any;
     // Simple slugify for text content

@@ -18,6 +18,7 @@ import {
   SubscriptFeature,
   SuperscriptFeature,
   InlineCodeFeature,
+  TextStateFeature,
   // Structure
   ParagraphFeature,
   HeadingFeature,
@@ -36,6 +37,8 @@ import {
   // Layout
   AlignFeature,
   IndentFeature,
+  defaultColors,
+  ChecklistFeature,
 } from '@payloadcms/richtext-lexical'
 // Custom Features
 import { ImageGalleryFeature } from './src/lexical-features/image-gallery'
@@ -57,7 +60,6 @@ import { ProductCarouselFeature } from './src/lexical-features/product-carousel'
 import { ProductReusableBlockFeature } from './src/lexical-features/product-reusable-block'
 import { SeriesReusableBlockFeature } from './src/lexical-features/series-reusable-block'
 import { IconListFeature } from './src/lexical-features/icon-list'
-import { ChecklistFeature } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 
 import { auditorPlugin } from 'payload-auditor'
@@ -385,6 +387,32 @@ export default buildConfig({
         // ==========================================
         AlignFeature(),
         IndentFeature(),
+        TextStateFeature({
+          state: {
+            color: {
+              'brand-primary': { 
+                label: 'Primary Olive (主色-深橄榄)', 
+                css: { color: '#756F3F' } 
+              },
+              'brand-secondary': { 
+                label: 'Brand Gold (金色强调)', 
+                css: { color: '#A08745' } 
+              },
+              'brand-cream': { 
+                label: 'Cream (奶油米白)', 
+                css: { color: '#F6F4ED' } 
+              },
+              'brand-red': { 
+                label: 'Alert Red (警示红)', 
+                css: { color: '#E53E3E' } 
+              },
+              'white': { 
+                label: 'Pure White (纯白)', 
+                css: { color: '#FFFFFF' } 
+              },
+            },
+          },
+        }),
 
         // ==========================================
         // 🧩 Custom Content Blocks
