@@ -51,14 +51,11 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { TextStateFeatureClient as TextStateFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { default as default_1b0cad300e9d837c9be64413930f499e } from '@/components/fields/MultiLocaleRichTextField'
 import { default as default_8eace7ae1118053face74cf3167249d9 } from '@/components/fields/TagBasedRandomImages'
 import { default as default_a3a3aa8bfebcaf82c7d4953fe2175cbd } from '@/components/fields/IconPicker'
 import { default as default_f2f012c65168d1c448e59ecd59a1bae5 } from '@/components/admin/NavigationManagerLink'
-import { OverviewComponent as OverviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
-import { MetaTitleComponent as MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
-import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
-import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { CategoryProductManager as CategoryProductManager_0f5a766bac8fcce623fd73b84d4fc7b6 } from '@/components/fields/CategoryProductManager'
 import { default as default_a3e549dccdd3ea0f10d6ba87c5f4df9b } from '@/components/fields/PathSelector'
 import { default as default_27a145562c8e9424ddd39c471f5ea155 } from '@/components/fields/AutoDraft'
@@ -136,14 +133,11 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@payloadcms/richtext-lexical/client#TextStateFeatureClient": TextStateFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/components/fields/MultiLocaleRichTextField#default": default_1b0cad300e9d837c9be64413930f499e,
   "@/components/fields/TagBasedRandomImages#default": default_8eace7ae1118053face74cf3167249d9,
   "@/components/fields/IconPicker#default": default_a3a3aa8bfebcaf82c7d4953fe2175cbd,
   "@/components/admin/NavigationManagerLink#default": default_f2f012c65168d1c448e59ecd59a1bae5,
-  "@payloadcms/plugin-seo/client#OverviewComponent": OverviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
-  "@payloadcms/plugin-seo/client#MetaTitleComponent": MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c0860,
-  "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860,
-  "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@/components/fields/CategoryProductManager#CategoryProductManager": CategoryProductManager_0f5a766bac8fcce623fd73b84d4fc7b6,
   "@/components/fields/PathSelector#default": default_a3e549dccdd3ea0f10d6ba87c5f4df9b,
   "@/components/fields/AutoDraft#default": default_27a145562c8e9424ddd39c471f5ea155,
