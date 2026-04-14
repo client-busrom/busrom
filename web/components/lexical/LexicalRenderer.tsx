@@ -859,11 +859,11 @@ export const customConverters: JSXConverters = {
       // Color Mapping aligned with our brand and background context
       if (state.color) {
         const colorMap: Record<string, string> = {
-          'brand-primary': '#756F3F',   // Main Olive
-          'brand-secondary': '#A08745', // Gold accent
-          'brand-cream': '#F6F4ED',     // Light background base
-          'brand-red': '#E53E3E',       // Alert
-          'white': '#FFFFFF',           // Readable on dark
+          'brand-primary': '#756F3F',   // Olive
+          'brand-secondary': '#B06E4E', // Clay (Jules Accent)
+          'brand-cream': '#F4F1ED',     // Jules Warm Sand
+          'brand-red': '#D8A484',       // Salmon
+          'white': '#FFFFFF',
         };
         if (colorMap[state.color]) {
           styles.color = colorMap[state.color];
@@ -877,20 +877,13 @@ export const customConverters: JSXConverters = {
 
     return text;
   },
-  heading: ({ node, children }) => {
-    const Tag = node.tag as any;
-    // Simple slugify for text content
-    const textContent = node.children
-      ? (node.children as any[]).map((child) => child.text || '').join('')
-      : '';
-    const id = textContent
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w-]+/g, '');
-    
-    return <Tag id={id}>{children}</Tag>;
+  heading: ({ node, children }: any) => {
+    const Tag = (node.tag || 'h2') as any;
+    return <Tag className="font-serif text-[#474642] mb-4 mt-12 border-b border-[#474642]/10 pb-4">{children}</Tag>;
   },
+  h1: ({ children }: any) => <h1 className="text-4xl font-serif text-[#474642] mb-6 mt-16">{children}</h1>,
+  h2: ({ children }: any) => <h2 className="text-3xl font-serif text-[#474642] mb-4 mt-12 border-b border-[#474642]/10 pb-4">{children}</h2>,
+  h3: ({ children }: any) => <h3 className="text-2xl font-serif text-[#474642] mb-4 mt-8">{children}</h3>,
   link: ({ node, children }) => {
     const { fields, url } = node as any;
     const finalUrl = fields?.url || url || '#';
@@ -953,8 +946,7 @@ export function LexicalRenderer({ content, className = '' }: LexicalRendererProp
   // STEP 2: Restore default and basic custom converters. Keep blocks empty to isolate.
   const converters: any = {
     ...defaultJSXConverters,
-    heading: customConverters.heading,
-    link: customConverters.link,
+    ...customConverters,
   }
 
   // FINAL SAFETY CHECK: If RichText is undefined, we have a major import issue
