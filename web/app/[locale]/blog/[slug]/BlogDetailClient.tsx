@@ -132,92 +132,26 @@ function getMockBlog(slug: string, locale: string): BlogContent | null {
                 { type: 'text', text: 'Welcome to my kitchen! I’m excited to dive in and do a full on, in-depth kitchen tour today.', version: 1 }
               ],
               version: 1
-            },
+            }
+          ]
+        }
+      }
+    },
+    'modern-architecture-reland-style': {
+      id: 'reland-style',
+      title: 'The Future of Modern Architecture: Reland\'s Innovative Approach',
+      author: 'S. Thompson',
+      publishedAt: '2024-03-20T10:00:00Z',
+      categories: [{ name: 'Architecture' }],
+      templateType: 'template3',
+      coverImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1600',
+      content: {
+        root: {
+          children: [
             {
               type: 'paragraph',
               children: [
-                { type: 'text', text: 'I will walk you through everything from the custom woodworking, my favorite appliances, my coffee and matcha corner, and speak more on the decor and choices we made to bring the space to life. I\'ll be sure to link* as much as I can below! (*may contain affiliate links)', version: 1 }
-              ],
-              version: 1
-            },
-            {
-              type: 'paragraph',
-              children: [
-                { type: 'text', text: 'Be sure to watch the full video to catch all of the deets!', version: 1 }
-              ],
-              version: 1
-            },
-            {
-              type: 'heading',
-              tag: 'h2',
-              children: [
-                { type: 'text', text: 'Island', version: 1 }
-              ],
-              version: 1,
-              direction: 'ltr'
-            },
-            {
-              type: 'paragraph',
-              children: [
-                { type: 'text', text: 'First we\'ll start with the island. I really love our island. It fits four people comfortably and we customized it to warm up the space.', version: 1 }
-              ],
-              version: 1
-            },
-            {
-              type: 'paragraph',
-              children: [
-                { type: 'text', text: 'Custom Woodworking:', bold: true, $: { color: 'brand-secondary' }, version: 1 },
-                { type: 'text', text: ' When we first moved into the house, the island was white drywall. We knew that we wanted to add wood to help add some depth to the kitchen and ground the space a little bit more. We ended up finding a woodworker here in Austin and we installed white oak panels around the entire thing.', version: 1 }
-              ],
-              version: 1
-            },
-            {
-              type: 'heading',
-              tag: 'h2',
-              children: [
-                { type: 'text', text: 'The Fridge', version: 1 }
-              ],
-              version: 1,
-              direction: 'ltr'
-            },
-            {
-              type: 'paragraph',
-              children: [
-                { type: 'text', text: 'Fridge Drawer:', bold: true, $: { color: 'brand-secondary' }, version: 1 },
-                { type: 'text', text: ' We decided to go with the Dacor brand for all of our appliances. The fridge has been a game-changer with its flex-zone drawer where I keep all of our favorite beverages and snacks organized and within reach.', version: 1 }
-              ],
-              version: 1
-            },
-            {
-              type: 'heading',
-              tag: 'h2',
-              children: [
-                { type: 'text', text: 'Coffee & Matcha Corner', version: 1 }
-              ],
-              version: 1,
-              direction: 'ltr'
-            },
-            {
-              type: 'paragraph',
-              children: [
-                { type: 'text', text: 'It wouldn\'t be a kitchen tour without showing my favorite nook. This is where I start every morning. I love having everything in one place, from the espresso machine to my favorite matcha bowls.', version: 1 }
-              ],
-              version: 1
-            },
-            {
-              type: 'heading',
-              tag: 'h2',
-              children: [
-                { type: 'text', text: 'Dining Area', version: 1 }
-              ],
-              version: 1,
-              direction: 'ltr'
-            },
-            {
-              type: 'paragraph',
-              children: [
-                { type: 'text', text: 'Dining Table:', bold: true, $: { color: 'brand-secondary' }, version: 1 },
-                { type: 'text', text: ' This is where we host most of our friends. It fits 8 people comfortably and the light fixture above adds that cozy, intentional touch to every meal.', version: 1 }
+                { type: 'text', text: 'Reland represents a shift in modern corporate identity. We don\'t just build spaces; we cultivate environments where ideas can breathe and structures can evolve.', version: 1 }
               ],
               version: 1
             }
