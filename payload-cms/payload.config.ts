@@ -96,10 +96,12 @@ import { Permissions } from './src/collections/Permissions'
 // Content Collections
 import { Pages } from './src/collections/Pages'
 import { Blogs } from './src/collections/Blogs'
+import { BlogTags } from './src/collections/BlogTags'
 import { Applications } from './src/collections/Applications'
 import { Categories } from './src/collections/Categories'
 import { FaqItems } from './src/collections/FaqItems'
 import { ReusableBlocks } from './src/collections/ReusableBlocks'
+import { Authors } from './src/collections/Authors'
 import { DocumentTemplates } from './src/collections/DocumentTemplates'
 import { TemplateCategories } from './src/collections/TemplateCategories'
 // Config Collections
@@ -249,8 +251,10 @@ export default buildConfig({
     // Site Structure
     NavigationMenus,
     // Content Management
+    Authors,
     Pages,
     Blogs,
+    BlogTags,
     Applications,
     Categories,
     FaqItems,
@@ -357,7 +361,7 @@ export default buildConfig({
         // 🔗 Rich Content Features
         // ==========================================
         LinkFeature({
-          enabledCollections: ['pages', 'products', 'blogs'],
+          enabledCollections: ['pages', 'products', 'blogs', 'blog-tags', 'authors'],
         }),
         UploadFeature({
           collections: {
@@ -373,7 +377,7 @@ export default buildConfig({
           },
         }),
         RelationshipFeature({
-          enabledCollections: ['products', 'product-series', 'blogs', 'pages', 'product-attributes', 'product-templates'],
+          enabledCollections: ['products', 'product-series', 'blogs', 'blog-tags', 'pages', 'product-attributes', 'product-templates', 'authors'],
         }),
 
         // ==========================================
@@ -607,6 +611,13 @@ export default buildConfig({
           },
           {
             slug: 'blogs',
+            hooks: {
+              afterChange: { update: { enabled: true }, create: { enabled: true } },
+              afterDelete: { enabled: true },
+            },
+          },
+          {
+            slug: 'blog-tags',
             hooks: {
               afterChange: { update: { enabled: true }, create: { enabled: true } },
               afterDelete: { enabled: true },

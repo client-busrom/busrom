@@ -22,6 +22,10 @@ export interface IconListItem {
   icon: string // Iconify format: "lucide:arrow-right", "mdi:home"
   title: string
   subtitle?: string
+  enableLink?: boolean
+  url?: string
+  openInNewTab?: boolean
+  borderStyle?: 'none' | 'circle' | 'square'
 }
 
 export interface IconListData {

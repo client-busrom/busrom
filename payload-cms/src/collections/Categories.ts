@@ -14,6 +14,7 @@
  */
 
 import type { CollectionConfig } from 'payload'
+import { syncM2M, cleanupM2M } from '../hooks/syncM2M'
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
@@ -140,6 +141,12 @@ export const Categories: CollectionConfig = {
 
         return data
       },
+    ],
+    afterChange: [
+      syncM2M('blogs', 'categories', 'blogPosts'),
+    ],
+    afterDelete: [
+      cleanupM2M('blogs', 'categories', 'blogPosts'),
     ],
   },
   fields: [
@@ -395,6 +402,44 @@ export const Categories: CollectionConfig = {
         condition: (data) => data?.type === 'PRODUCT',
         components: {
           Field: '@/components/fields/CategoryProductManager#CategoryProductManager',
+        },
+      },
+    },
+    // ==================================================================
+    // Blog Management (Category managing blog posts)
+    // ==================================================================
+    {
+      name: 'blogPosts',
+      type: 'relationship',
+      relationTo: 'blogs',
+      hasMany: true,
+      label: {
+        en: 'Associated Blogs Management',
+        zh: '属下知识库管理',
+      },
+      filterOptions: ({ id }) => {
+        if (!id) return true
+        return {
+          categories: {
+            contains: id,
+          },
+        }
+      },
+      admin: {
+        condition: (data) => data?.type === 'BLOG',
+        description: {
+          en: 'Manually manage and sort blog posts under this category. (Only blogs belonging to this category are shown)',
+          zh: '手动管理并排序该分类下的文章（仅限属于该分类的文章，用于控制展示顺序）',
+        },
+      },
+    },
+    {
+      name: 'blogPostsManager',
+      type: 'ui',
+      admin: {
+        condition: (data) => data?.type === 'BLOG',
+        components: {
+          Field: '@/components/fields/CategoryBlogManager#CategoryBlogManager',
         },
       },
     },

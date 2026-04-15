@@ -29,6 +29,7 @@ export { HeroBannerItems } from './HeroBannerItems'
 export { SeriesIntroItems } from './SeriesIntroItems'
 
 // Content Collections
+export { Authors } from './Authors'
 export { Pages } from './Pages'
 export { Blogs } from './Blogs'
 export { Applications } from './Applications'

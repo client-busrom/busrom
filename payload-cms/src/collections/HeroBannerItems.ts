@@ -18,11 +18,11 @@ export const HeroBannerItems: CollectionConfig = {
   labels: {
     singular: {
       en: 'Hero Banner Item',
-      zh: '轮播图项目',
+      zh: '首页首屏轮播图',
     },
     plural: {
       en: 'Hero Banner Items',
-      zh: '轮播图项目',
+      zh: '首页首屏轮播图',
     },
   },
   admin: {

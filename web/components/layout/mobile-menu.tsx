@@ -203,10 +203,7 @@ export function MobileMenu({ isOpen, onClose, navigationItems = [] }: MobileMenu
                               >
                                 {item.childMenus.map((child) => {
                                   const imageUrl = getProductImage(child.url, child.image)
-                                  const isShopMenu = item.url === '/shop'
-                                  const childUrl = isShopMenu
-                                    ? `/shop?category=${getProductSlug(child.url)}`
-                                    : child.url
+                                  const childUrl = child.url
 
                                   return (
                                     <Link
