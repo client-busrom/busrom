@@ -25,10 +25,12 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
   const [isLoading, setIsLoading] = useState(false)
 
   const collections = [
-    { value: 'products', label: '产品', pathPrefix: '/shop' }, // Corrected to /shop
-    { value: 'product-series', label: '产品系列', pathPrefix: '/products' }, // Corrected to /products
-    { value: 'pages', label: '页面', pathPrefix: '' }, // Use path field if available
-    { value: 'blogs', label: '博客', pathPrefix: '/blog' },
+    { value: 'products', label: '产品链接页', pathPrefix: '/shop' },
+    { value: 'product-series', label: '产品详解页', pathPrefix: '/products' },
+    { value: 'categories-product', label: 'shop列表页分类', pathPrefix: '/shop', categoryType: 'PRODUCT' },
+    { value: 'categories-blog', label: '知识库列表页分类', pathPrefix: '/blog', categoryType: 'BLOG' },
+    { value: 'pages', label: '其他子页', pathPrefix: '' },
+    { value: 'blogs', label: '知识库', pathPrefix: '/blog' },
   ]
 
   useEffect(() => {
@@ -40,20 +42,29 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
   const fetchItems = async () => {
     setIsLoading(true)
     try {
+      const collectionConfig = collections.find(c => c.value === selectedCollection)
+      if (!collectionConfig) return
+
+      // Determine actual collection name for API
+      const apiCollection = selectedCollection.startsWith('categories-') ? 'categories' : selectedCollection
+      
       const params = new URLSearchParams({
         limit: '10',
         page: currentPage.toString(),
       })
 
       if (searchQuery) {
-        // Support searching by multiple fields
-        // In Payload 3.x, searching on relationship target might need better query
         params.append('where[or][0][title][contains]', searchQuery)
         params.append('where[or][1][name][contains]', searchQuery)
         params.append('where[or][2][slug][contains]', searchQuery)
       }
 
-      const response = await fetch(`/api/${selectedCollection}?${params}`)
+      // Add type filtering for categories
+      if (collectionConfig.categoryType) {
+        params.append('where[type][equals]', collectionConfig.categoryType)
+      }
+
+      const response = await fetch(`/api/${apiCollection}?${params}`)
       const data = await response.json()
 
       setItems(data.docs || [])
@@ -70,11 +81,15 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
     if (!collection) return
 
     // Priority 1: Use specific fields from the document itself if they exist
-    // This handles the 'Pages' collection which has a dedicated 'path' field
     const itemPath = item.path || item.url
     
     let path = ''
-    if (itemPath && typeof itemPath === 'string') {
+    
+    // Check if it's a category
+    if (collection.categoryType) {
+      const slugValue = item.slug || item.id
+      path = `${collection.pathPrefix}?category=${slugValue}`
+    } else if (itemPath && typeof itemPath === 'string') {
       path = itemPath.startsWith('/') ? itemPath : `/${itemPath}`
     } else {
       // Priority 2: Fallback to collection prefix + slug
@@ -208,7 +223,12 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
                     </div>
                     {item.slug && (
                       <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>
-                        {collections.find((c) => c.value === selectedCollection)?.pathPrefix}/{item.slug}
+                        {(() => {
+                          const col = collections.find((c) => c.value === selectedCollection)
+                          return col?.categoryType 
+                            ? `${col.pathPrefix}?category=${item.slug}`
+                            : `${col?.pathPrefix || ''}/${item.slug}`
+                        })()}
                       </div>
                     )}
                   </div>

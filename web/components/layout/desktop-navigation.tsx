@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Link } from "@/lib/navigation"
 import { cn } from "@/lib/utils"
@@ -108,8 +108,9 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
   }, [activeMenuId, onMenuOpen])
 
   // 按 order 排序所有菜单项
-  const sortedItems = [...navigationItems]
-    .sort((a, b) => a.order - b.order)
+  const sortedItems = useMemo(() => {
+    return [...navigationItems].sort((a, b) => a.order - b.order)
+  }, [navigationItems])
 
   // 点击菜单项
   const handleMenuClick = (item: NavItem, e: React.MouseEvent) => {
@@ -211,16 +212,16 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
       </div>
 
       {/* 二级菜单下拉 - 全屏宽度 */}
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {activeItem && activeItem.childMenus && activeItem.childMenus.length > 0 && (
           <>
             {/* 背景遮罩 - 从 header 下方开始 */}
             <motion.div
-              key="overlay"
+              key="nav-overlay"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.08 }}
+              transition={{ duration: 0.15 }}
               className="fixed inset-0 z-40 bg-black/30"
               style={{ top: "46px" }}
               onClick={() => setActiveMenuId(null)}
@@ -230,10 +231,10 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
             <motion.div
               key={activeItem.id}
               ref={dropdownRef}
-              initial={{ opacity: 0, y: -8 }}
+              initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.12, ease: "easeOut" }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.2, ease: "circOut" }}
               className="fixed left-0 right-0 z-[55] bg-brand-main shadow-lg"
               style={{ top: "46px", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
               onWheel={(e) => e.stopPropagation()}
@@ -287,7 +288,7 @@ export function DesktopNavigation({ navigationItems, theme, onMenuOpen }: Deskto
 
                               <div className="absolute bottom-0 left-0 right-0 flex gap-2 p-4 translate-y-full opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                                 <Link
-                                  href={isShopMenu ? `/shop?category=${getProductSlug(child.url)}` : child.url}
+                                  href={child.url}
                                   className="flex-1 py-2 px-4 text-center text-sm font-montserrat font-bold bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
                                   onClick={() => setActiveMenuId(null)}
                                 >

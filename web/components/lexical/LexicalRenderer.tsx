@@ -762,12 +762,6 @@ const MarqueeLinksBlock = ({ node }: any) => {
   )
 }
 
-/**
- * Two Columns Block
- *
- * Uses a separate NestedLexicalRenderer component that builds full converters
- * including all custom blocks for proper nested rendering.
- */
 const TwoColumnsBlock = ({ node }: any) => {
   const { leftColumn, rightColumn, gap, columnRatio, verticalAlign } = node.data || node.fields || {}
 
@@ -806,6 +800,100 @@ const TwoColumnsBlock = ({ node }: any) => {
 }
 
 /**
+ * Fluid Layout Block
+ * 
+ * Supports two modes: 
+ * 1. sideBySide: Traditional flex columns
+ * 2. float: True CSS float wrapping
+ */
+const AuthorCardBlock = ({ node }: any) => {
+  const { author, displayFields, customBio, backgroundColor } = node.data || node.fields || {}
+  
+  if (!author) return null
+
+  // Helper to check if a field should be displayed
+  const isVisible = (field: string) => displayFields?.includes(field)
+
+  const { name, avatar, role, bio, socialLinks } = author
+  const displayBio = customBio || bio
+  const imageUrl = avatar?.url || ''
+
+  // Social icons mapping
+  const socialIcons: Record<string, string> = {
+    instagram: 'ant-design:instagram-filled',
+    linkedin: 'entypo-social:linkedin-with-circle',
+    twitter: 'ant-design:twitter-circle-filled',
+    facebook: 'entypo-social:facebook-with-circle',
+    pinterest: 'entypo-social:pinterest-with-circle',
+    youtube: 'ant-design:youtube-filled',
+    website: 'gg:website',
+  }
+
+  return (
+    <div 
+      className="my-12 p-8 md:p-12 rounded-[32px] flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12"
+      style={{ backgroundColor: backgroundColor || '#fbfcf4' }}
+    >
+      {/* Avatar */}
+      {isVisible('avatar') && imageUrl && (
+        <div className="shrink-0">
+          <div className="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-white shadow-sm">
+            <img 
+              src={imageUrl} 
+              alt={name} 
+              className="w-full h-auto"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="flex-1 flex flex-col justify-center">
+        {/* Bio / Quote */}
+        {isVisible('bio') && displayBio && (
+          <p className="font-josefin-sans text-[#474642] text-lg md:text-xl leading-relaxed italic mb-8 opacity-80">
+            "{displayBio}"
+          </p>
+        )}
+
+        <div className="mt-auto">
+          {/* Name */}
+          {isVisible('name') && (
+            <h4 className="font-josefin-sans font-bold text-[#b06e4e] text-lg uppercase tracking-wider mb-1">
+              {name}
+            </h4>
+          )}
+
+          {/* Role */}
+          {isVisible('role') && role && (
+            <p className="font-josefin-sans text-[#756f3f] text-sm uppercase tracking-[0.2em] font-medium">
+              {role}
+            </p>
+          )}
+
+          {/* Social Links */}
+          {isVisible('socialLinks') && socialLinks && socialLinks.length > 0 && (
+            <div className="flex gap-4 mt-6">
+              {socialLinks.map((link: any, idx: number) => (
+                <a 
+                  key={idx} 
+                  href={link.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-[#b06e4e] hover:opacity-70 transition-opacity"
+                >
+                  <IconifyIcon name={socialIcons[link.platform] || 'gg:link'} size={24} />
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/**
  * Icon List Block - renders icon + title + subtitle items
  */
 function IconListBlock({ node }: { node: any }) {
@@ -814,21 +902,47 @@ function IconListBlock({ node }: { node: any }) {
 
   return (
     <div className="flex justify-between items-start gap-2 py-4">
-      {items.slice(0, 8).map((item: any, index: number) => (
-        <div key={index} className="flex flex-col items-center text-center flex-1 min-w-0">
-          <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#e8e4d9] flex items-center justify-center mb-2">
-            {item.icon && <IconifyIcon name={item.icon} size={24} color="#5d6b4a" />}
+      {items.slice(0, 8).map((item: any, index: number) => {
+        const content = (
+          <div className="flex flex-col items-center text-center flex-1 min-w-0">
+            <div
+              className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center mb-2"
+              style={{
+                borderRadius: item.borderStyle === 'circle' ? '50%' : item.borderStyle === 'square' ? '12px' : '0',
+                backgroundColor: item.borderStyle !== 'none' ? '#e8e4d9' : 'transparent',
+              }}
+            >
+              {item.icon && <IconifyIcon name={item.icon} size={24} color="#5d6b4a" />}
+            </div>
+            {item.title && (
+              <p className="font-josefin-sans font-semibold text-xs md:text-sm text-[#3a3a3a] leading-tight whitespace-pre-line">
+                {item.title}
+              </p>
+            )}
+            {item.subtitle && (
+              <p className="font-josefin-sans text-xs md:text-sm text-[#3a3a3a] leading-tight whitespace-pre-line">
+                {item.subtitle}
+              </p>
+            )}
           </div>
-          <p className="font-josefin-sans font-semibold text-xs md:text-sm text-[#3a3a3a] leading-tight whitespace-pre-line">
-            {item.title}
-          </p>
-          {item.subtitle && (
-            <p className="font-josefin-sans text-xs md:text-sm text-[#3a3a3a] leading-tight whitespace-pre-line">
-              {item.subtitle}
-            </p>
-          )}
-        </div>
-      ))}
+        )
+
+        if (item.enableLink && item.url) {
+          return (
+            <Link
+              key={index}
+              href={item.url}
+              target={item.openInNewTab ? '_blank' : undefined}
+              rel={item.openInNewTab ? 'noopener noreferrer' : undefined}
+              className="flex-1 min-w-0 hover:opacity-70 transition-opacity"
+            >
+              {content}
+            </Link>
+          )
+        }
+
+        return <React.Fragment key={index}>{content}</React.Fragment>
+      })}
     </div>
   )
 }
@@ -913,6 +1027,7 @@ export const customConverters: JSXConverters = {
     'hero': HeroBlock,
     'marquee-links': MarqueeLinksBlock,
     'twoColumns': TwoColumnsBlock,
+    'fluidLayout': FluidLayoutBlock,
 
     'icon-list': IconListBlock,
 

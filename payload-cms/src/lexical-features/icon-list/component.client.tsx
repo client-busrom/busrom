@@ -11,9 +11,10 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $getNodeByKey } from 'lexical'
 import { useTranslation } from '@payloadcms/ui'
 import { IconListNode, IconListData, IconListItem } from './node'
-import { Plus, Trash2, GripVertical } from 'lucide-react'
+import { Plus, Trash2, GripVertical, Link as LinkIcon } from 'lucide-react'
 import { InlineIconSearch } from '../../components/fields/IconPicker/InlineIconSearch'
 import { getIconSvgUrl, normalizeIconName } from '../../components/fields/IconPicker/iconify-utils'
+import { LinkPickerModal } from '../shared/LinkPickerModal'
 
 interface IconListComponentProps {
   nodeKey: string
@@ -26,6 +27,8 @@ export const IconListComponent: React.FC<IconListComponentProps> = ({ nodeKey, d
   const [isEditing, setIsEditing] = useState(false)
   const [localData, setLocalData] = useState<IconListData>(data)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+  const [isLinkPickerOpen, setIsLinkPickerOpen] = useState(false)
+  const [pickingLinkIndex, setPickingLinkIndex] = useState<number | null>(null)
 
   const isZh = i18n?.language === 'zh'
 
@@ -49,7 +52,15 @@ export const IconListComponent: React.FC<IconListComponentProps> = ({ nodeKey, d
   const handleAddItem = () => {
     setLocalData({
       ...localData,
-      items: [...localData.items, { icon: 'lucide:star', title: '', subtitle: '' }],
+      items: [...localData.items, {
+        icon: 'lucide:star',
+        title: '',
+        subtitle: '',
+        enableLink: false,
+        url: '',
+        openInNewTab: false,
+        borderStyle: 'circle'
+      }],
     })
   }
 
@@ -59,10 +70,15 @@ export const IconListComponent: React.FC<IconListComponentProps> = ({ nodeKey, d
     setLocalData({ ...localData, items: newItems })
   }
 
-  const handleItemChange = (index: number, field: keyof IconListItem, value: string) => {
+  const handleItemChange = (index: number, field: keyof IconListItem, value: any) => {
     const newItems = [...localData.items]
     newItems[index] = { ...newItems[index], [field]: value }
     setLocalData({ ...localData, items: newItems })
+  }
+
+  const openLinkPicker = (index: number) => {
+    setPickingLinkIndex(index)
+    setIsLinkPickerOpen(true)
   }
 
   const handleDragStart = (index: number) => {
@@ -83,11 +99,26 @@ export const IconListComponent: React.FC<IconListComponentProps> = ({ nodeKey, d
     setDraggedIndex(null)
   }
 
+  const modal = (
+    <LinkPickerModal
+      isOpen={isLinkPickerOpen}
+      onClose={() => setIsLinkPickerOpen(false)}
+      onSelect={(path) => {
+        if (pickingLinkIndex !== null) {
+          handleItemChange(pickingLinkIndex, 'url', path)
+        }
+        setIsLinkPickerOpen(false)
+      }}
+    />
+  )
+
   // Edit Mode
   if (isEditing) {
     return (
       <div style={{ margin: '16px 0', padding: '16px', border: '2px solid #A08745', borderRadius: '8px', backgroundColor: '#ffffff' }}>
-        {/* Header */}
+        {/* ... Rest of Edit Mode UI ... */}
+        {/* (Existing Edit UI code remains) */}
+        {/* I will use a Fragment to include the modal */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>
             {isZh ? '编辑图标列表' : 'Edit Icon List'}
@@ -110,7 +141,6 @@ export const IconListComponent: React.FC<IconListComponentProps> = ({ nodeKey, d
           </div>
         </div>
 
-        {/* Items */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '12px' }}>
           {localData.items.map((item, index) => (
             <div
@@ -128,7 +158,6 @@ export const IconListComponent: React.FC<IconListComponentProps> = ({ nodeKey, d
                 transition: 'opacity 0.15s ease',
               }}
             >
-              {/* Drag Handle - only this element is draggable */}
               <div
                 draggable
                 onDragStart={() => handleDragStart(index)}
@@ -138,21 +167,33 @@ export const IconListComponent: React.FC<IconListComponentProps> = ({ nodeKey, d
                 <GripVertical size={16} />
               </div>
 
-              {/* Item Fields */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {/* Icon */}
                 <div>
                   <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, marginBottom: '4px', color: '#6b7280' }}>
                     {isZh ? '图标' : 'Icon'}
                   </label>
-                  <InlineIconSearch
-                    value={item.icon || ''}
-                    onChange={(iconName) => handleItemChange(index, 'icon', iconName)}
-                    isZh={isZh}
-                  />
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '4px' }}>
+                    <div style={{ flex: 1 }}>
+                      <InlineIconSearch
+                        value={item.icon || ''}
+                        onChange={(iconName) => handleItemChange(index, 'icon', iconName)}
+                        isZh={isZh}
+                      />
+                    </div>
+                    <div style={{ width: '120px' }}>
+                      <select
+                        value={item.borderStyle || 'none'}
+                        onChange={(e) => handleItemChange(index, 'borderStyle', e.target.value)}
+                        style={{ width: '100%', padding: '6px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '12px' }}
+                      >
+                        <option value="none">{isZh ? '无边框' : 'No Border'}</option>
+                        <option value="circle">{isZh ? '圆形' : 'Circle'}</option>
+                        <option value="square">{isZh ? '圆角矩形' : 'Rounded Rect'}</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Title + Subtitle in row */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, marginBottom: '4px', color: '#6b7280' }}>
@@ -185,9 +226,95 @@ export const IconListComponent: React.FC<IconListComponentProps> = ({ nodeKey, d
                     />
                   </div>
                 </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '8px', backgroundColor: '#f0f0f0', borderRadius: '4px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleItemChange(index, 'enableLink', !item.enableLink)}
+                      style={{
+                        padding: '4px 8px',
+                        backgroundColor: item.enableLink ? '#A08745' : '#d1d5db',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontSize: '11px',
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {item.enableLink
+                        ? (isZh ? '开启链接' : 'Link Enabled')
+                        : (isZh ? '关闭链接' : 'Link Disabled')
+                      }
+                    </button>
+                    <span style={{ fontSize: '11px', color: '#6b7280' }}>
+                      {isZh ? '点击切换链接状态' : 'Toggle to enable/disable link'}
+                    </span>
+                  </div>
+
+                  {item.enableLink && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <div style={{ flex: 1, position: 'relative' }}>
+                          <input
+                            type="text"
+                            value={item.url || ''}
+                            onChange={(e) => handleItemChange(index, 'url', e.target.value)}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onDragStart={(e) => e.stopPropagation()}
+                            placeholder={isZh ? '输入链接地址' : 'Enter URL'}
+                            style={{
+                              width: '100%',
+                              padding: '6px 32px 6px 8px',
+                              border: '1px solid #d1d5db',
+                              borderRadius: '4px',
+                              fontSize: '12px',
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => openLinkPicker(index)}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            style={{
+                              position: 'absolute',
+                              right: '4px',
+                              top: '50%',
+                              transform: 'translateY(-50%)',
+                              padding: '4px',
+                              border: 'none',
+                              background: 'none',
+                              cursor: 'pointer',
+                              color: '#6b7280',
+                              display: 'flex',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <LinkIcon size={14} />
+                          </button>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <input
+                          type="checkbox"
+                          id={`newTab-${index}`}
+                          checked={item.openInNewTab || false}
+                          onChange={(e) => handleItemChange(index, 'openInNewTab', e.target.checked)}
+                          style={{ width: '13px', height: '13px', cursor: 'pointer' }}
+                        />
+                        <label
+                          htmlFor={`newTab-${index}`}
+                          style={{ fontSize: '11px', color: '#4b5563', cursor: 'pointer', userSelect: 'none' }}
+                        >
+                          {isZh ? '在新标签页打开' : 'Open in New Tab'}
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Delete Button */}
               {localData.items.length > 1 && (
                 <button
                   type="button"
@@ -202,7 +329,6 @@ export const IconListComponent: React.FC<IconListComponentProps> = ({ nodeKey, d
           ))}
         </div>
 
-        {/* Add Button */}
         <button
           type="button"
           onClick={handleAddItem}
@@ -214,6 +340,7 @@ export const IconListComponent: React.FC<IconListComponentProps> = ({ nodeKey, d
         >
           <Plus size={16} /> {isZh ? '添加项目' : 'Add Item'}
         </button>
+        {modal}
       </div>
     )
   }
@@ -231,17 +358,17 @@ export const IconListComponent: React.FC<IconListComponentProps> = ({ nodeKey, d
         backgroundColor: 'white',
       }}
     >
-      {/* Preview Grid */}
       <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'flex-start', gap: '16px', flexWrap: 'wrap' }}>
         {localData.items.map((item, index) => {
           const normalizedIcon = item.icon ? normalizeIconName(item.icon) : ''
           return (
             <div key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', minWidth: '80px', flex: '1 1 0' }}>
-              {/* Icon Circle */}
               <div style={{
-                width: '48px', height: '48px', borderRadius: '50%',
-                backgroundColor: '#e8e4d9', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                marginBottom: '8px',
+                width: '48px', height: '48px',
+                borderRadius: item.borderStyle === 'circle' ? '50%' : item.borderStyle === 'square' ? '12px' : '0',
+                backgroundColor: item.borderStyle !== 'none' ? '#e8e4d9' : 'transparent',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                marginBottom: '8px', position: 'relative'
               }}>
                 {normalizedIcon ? (
                   <img
@@ -252,12 +379,26 @@ export const IconListComponent: React.FC<IconListComponentProps> = ({ nodeKey, d
                 ) : (
                   <span style={{ fontSize: '20px', color: '#5d6b4a' }}>?</span>
                 )}
+                {item.enableLink && (
+                  <div style={{
+                    position: 'absolute',
+                    right: '-4px',
+                    top: '-4px',
+                    backgroundColor: '#A08745',
+                    color: 'white',
+                    borderRadius: '50%',
+                    padding: '3px',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                  }}>
+                    <LinkIcon size={10} />
+                  </div>
+                )}
               </div>
-              {/* Title */}
-              <div style={{ fontSize: '14px', fontWeight: 600, color: '#1f2937', lineHeight: 1.3, whiteSpace: 'pre-line' }}>
-                {item.title || (isZh ? '标题' : 'Title')}
-              </div>
-              {/* Subtitle */}
+              {item.title && (
+                <div style={{ fontSize: '14px', fontWeight: 600, color: '#1f2937', lineHeight: 1.3, whiteSpace: 'pre-line' }}>
+                  {item.title}
+                </div>
+              )}
               {item.subtitle && (
                 <div style={{ fontSize: '12px', color: '#6b7280', lineHeight: 1.3, marginTop: '2px', whiteSpace: 'pre-line' }}>
                   {item.subtitle}
@@ -268,10 +409,10 @@ export const IconListComponent: React.FC<IconListComponentProps> = ({ nodeKey, d
         })}
       </div>
 
-      {/* Info Bar */}
       <div style={{ marginTop: '12px', fontSize: '12px', color: '#6b7280', textAlign: 'center' }}>
         {isZh ? '图标列表' : 'Icon List'} ({localData.items.length} {isZh ? '项' : 'items'}) {isZh ? '· 点击编辑' : '· Click to edit'}
       </div>
+      {modal}
     </div>
   )
 }

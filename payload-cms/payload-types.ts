@@ -81,7 +81,9 @@ export interface Config {
     'series-intro-items': SeriesIntroItem;
     'navigation-menus': NavigationMenu;
     pages: Page;
+    authors: Author;
     blogs: Blog;
+    'blog-tags': BlogTag;
     applications: Application;
     categories: Category;
     'faq-items': FaqItem;
@@ -127,7 +129,9 @@ export interface Config {
     'series-intro-items': SeriesIntroItemsSelect<false> | SeriesIntroItemsSelect<true>;
     'navigation-menus': NavigationMenusSelect<false> | NavigationMenusSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    authors: AuthorsSelect<false> | AuthorsSelect<true>;
     blogs: BlogsSelect<false> | BlogsSelect<true>;
+    'blog-tags': BlogTagsSelect<false> | BlogTagsSelect<true>;
     applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     'faq-items': FaqItemsSelect<false> | FaqItemsSelect<true>;
@@ -417,8 +421,16 @@ export interface Permission {
     | 'AUDIT_LOG'
     | 'PRODUCT'
     | 'PRODUCT_SERIES'
+    | 'PRODUCT_ATTRIBUTE'
+    | 'PRODUCT_TEMPLATE'
+    | 'PRODUCT_REUSABLE_BLOCK'
+    | 'SERIES_TEMPLATE'
+    | 'SERIES_REUSABLE_BLOCK'
+    | 'SERIES_INTRO_ITEM'
     | 'PAGE'
     | 'BLOG'
+    | 'BLOG_TAG'
+    | 'AUTHOR'
     | 'APPLICATION'
     | 'CATEGORY'
     | 'FAQ_ITEM'
@@ -440,7 +452,9 @@ export interface Permission {
     | 'EMAIL_CONFIG'
     | 'CONTACT_CONFIG'
     | 'SOCIAL_CONFIG'
-    | 'TRANSLATION_CONFIG';
+    | 'TRANSLATION_CONFIG'
+    | 'SHOP_PAGE_CONFIG'
+    | 'PRELOADER_CONFIG';
   /**
    * The action allowed on the resource
    */
@@ -1078,6 +1092,17 @@ export interface Blog {
   };
   status?: ('published' | 'draft' | 'archived') | null;
   publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-tags".
+ */
+export interface BlogTag {
+  id: number;
+  name: string;
+  slug: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -2300,6 +2325,16 @@ export interface BlogsSelect<T extends boolean = true> {
       };
   status?: T;
   publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog_tags_select".
+ */
+export interface BlogTagsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3983,6 +4018,43 @@ export interface ContainerBlock {
  */
 export interface Auth {
   [k: string]: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "authors".
+ */
+export interface Author {
+  id: number;
+  name: string;
+  role?: string | null;
+  avatar: number | Media;
+  bio?: string | null;
+  socialLinks?:
+    | {
+        platform: 'instagram' | 'linkedin' | 'twitter' | 'facebook' | 'pinterest' | 'youtube' | 'website';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+export interface AuthorsSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  avatar?: T;
+  bio?: T;
+  socialLinks?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 
 

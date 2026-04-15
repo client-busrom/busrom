@@ -10,12 +10,16 @@ export { TwoColumns } from './TwoColumns'
 export { ThreeColumns } from './ThreeColumns'
 export { Sidebar } from './Sidebar'
 export { Container } from './Container'
+export { FluidLayout } from './FluidLayout'
+export { AuthorCard } from './AuthorCard'
 
 // Export as array for easy configuration
 import { TwoColumns } from './TwoColumns'
 import { ThreeColumns } from './ThreeColumns'
 import { Sidebar } from './Sidebar'
 import { Container } from './Container'
+import { FluidLayout } from './FluidLayout'
+import { AuthorCard } from './AuthorCard'
 
 export const contentBlocks = [
   // Layout Blocks - 类似 Keystone document layout
@@ -23,6 +27,12 @@ export const contentBlocks = [
   ThreeColumns,
   Sidebar,
   Container,
+  FluidLayout,
+]
+
+export const blogBlocks = [
+  ...contentBlocks,
+  AuthorCard,
 ]
 
 /**

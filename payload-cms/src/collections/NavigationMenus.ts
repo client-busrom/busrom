@@ -159,9 +159,12 @@ export const NavigationMenus: CollectionConfig = {
         zh: '链接',
       },
       admin: {
+        components: {
+          Field: '@/components/fields/SmartLinkField#SmartLinkField',
+        },
         description: {
-          en: 'External URL https://... or internal path /product, /service',
-          zh: '外链 https://... 或内部路径 /product, /service',
+          en: 'External URL https://... or internal path /product, /service. Click search icon to select internal items.',
+          zh: '外链 https://... 或内部路径 /product, /service。点击搜索图标选择站内项。',
         },
       },
     },

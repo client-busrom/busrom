@@ -11,6 +11,7 @@
  */
 
 import type { CollectionConfig } from 'payload'
+import { syncM2M, cleanupM2M } from '../hooks/syncM2M'
 
 export const Blogs: CollectionConfig = {
   slug: 'blogs',
@@ -38,13 +39,16 @@ export const Blogs: CollectionConfig = {
     update: ({ req }) => !!req.user,
     delete: ({ req }) => !!req.user,
   },
-  // 版本控制 - 保留修改历史
-  // versions: {
-
-  // maxPerDoc: 10,
-
-  // },
-
+  hooks: {
+    afterChange: [
+      syncM2M('categories', 'blogPosts', 'categories'),
+      syncM2M('blog-tags', 'blogs', 'tags'),
+    ],
+    afterDelete: [
+      cleanupM2M('categories', 'blogPosts', 'categories'),
+      cleanupM2M('blog-tags', 'blogs', 'tags'),
+    ],
+  },
   fields: [
     {
       type: 'tabs',
@@ -101,12 +105,19 @@ export const Blogs: CollectionConfig = {
             },
             {
               name: 'author',
-              type: 'text',
+              type: 'relationship',
+              relationTo: 'authors',
               label: {
                 en: 'Author',
                 zh: '作者',
               },
-              defaultValue: 'Busrom Team',
+              required: true,
+              admin: {
+                description: {
+                  en: 'Select the writer for this post',
+                  zh: '选择这篇文章的作者',
+                },
+              },
             },
           ],
         },
@@ -180,6 +191,22 @@ export const Blogs: CollectionConfig = {
                 description: {
                   en: 'Select blog categories',
                   zh: '选择博客分类',
+                },
+              },
+            },
+            {
+              name: 'tags',
+              type: 'relationship',
+              relationTo: 'blog-tags',
+              hasMany: true,
+              label: {
+                en: 'Tags',
+                zh: '标签',
+              },
+              admin: {
+                description: {
+                  en: 'Assign tags to this blog post',
+                  zh: '为这篇文章分配标签',
                 },
               },
             },
