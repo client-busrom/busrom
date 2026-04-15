@@ -42,59 +42,95 @@ const PERMISSIONS = [
 
   // ==================== 内容管理 (Content) ====================
   // Products
-  { resource: 'PRODUCT', action: 'CREATE', name: '创建产品', category: 'CONTENT' },
-  { resource: 'PRODUCT', action: 'READ', name: '查看产品', category: 'CONTENT' },
-  { resource: 'PRODUCT', action: 'UPDATE', name: '更新产品', category: 'CONTENT' },
-  { resource: 'PRODUCT', action: 'DELETE', name: '删除产品', category: 'CONTENT' },
-  { resource: 'PRODUCT', action: 'PUBLISH', name: '发布产品', category: 'CONTENT' },
+  { resource: 'PRODUCT', action: 'CREATE', name: '创建产品链接整合页', category: 'CONTENT' },
+  { resource: 'PRODUCT', action: 'READ', name: '查看产品链接整合页', category: 'CONTENT' },
+  { resource: 'PRODUCT', action: 'UPDATE', name: '更新产品链接整合页', category: 'CONTENT' },
+  { resource: 'PRODUCT', action: 'DELETE', name: '删除产品链接整合页', category: 'CONTENT' },
+  { resource: 'PRODUCT', action: 'PUBLISH', name: '发布产品链接整合页', category: 'CONTENT' },
 
-  { resource: 'PRODUCT_SERIES', action: 'CREATE', name: '创建产品系列', category: 'CONTENT' },
-  { resource: 'PRODUCT_SERIES', action: 'READ', name: '查看产品系列', category: 'CONTENT' },
-  { resource: 'PRODUCT_SERIES', action: 'UPDATE', name: '更新产品系列', category: 'CONTENT' },
-  { resource: 'PRODUCT_SERIES', action: 'DELETE', name: '删除产品系列', category: 'CONTENT' },
+  { resource: 'PRODUCT_SERIES', action: 'CREATE', name: '创建产品详解整合页', category: 'CONTENT' },
+  { resource: 'PRODUCT_SERIES', action: 'READ', name: '查看产品详解整合页', category: 'CONTENT' },
+  { resource: 'PRODUCT_SERIES', action: 'UPDATE', name: '更新产品详解整合页', category: 'CONTENT' },
+  { resource: 'PRODUCT_SERIES', action: 'DELETE', name: '删除产品详解整合页', category: 'CONTENT' },
+
+  { resource: 'PRODUCT_ATTRIBUTE', action: 'CREATE', name: '创建产品链接页属性', category: 'CONTENT' },
+  { resource: 'PRODUCT_ATTRIBUTE', action: 'READ', name: '查看产品链接页属性', category: 'CONTENT' },
+  { resource: 'PRODUCT_ATTRIBUTE', action: 'UPDATE', name: '更新产品链接页属性', category: 'CONTENT' },
+  { resource: 'PRODUCT_ATTRIBUTE', action: 'DELETE', name: '删除产品链接页属性', category: 'CONTENT' },
+
+  { resource: 'PRODUCT_TEMPLATE', action: 'CREATE', name: '创建产品链接模版页', category: 'CONTENT' },
+  { resource: 'PRODUCT_TEMPLATE', action: 'READ', name: '查看产品链接模版页', category: 'CONTENT' },
+  { resource: 'PRODUCT_TEMPLATE', action: 'UPDATE', name: '更新产品链接模版页', category: 'CONTENT' },
+  { resource: 'PRODUCT_TEMPLATE', action: 'DELETE', name: '删除产品链接模版页', category: 'CONTENT' },
+  { resource: 'PRODUCT_REUSABLE_BLOCK', action: 'CREATE', name: '创建产品链接复用块', category: 'CONTENT' },
+  { resource: 'PRODUCT_REUSABLE_BLOCK', action: 'READ', name: '查看产品链接复用块', category: 'CONTENT' },
+  { resource: 'PRODUCT_REUSABLE_BLOCK', action: 'UPDATE', name: '更新产品链接复用块', category: 'CONTENT' },
+  { resource: 'PRODUCT_REUSABLE_BLOCK', action: 'DELETE', name: '删除产品链接复用块', category: 'CONTENT' },
+
+  { resource: 'SERIES_TEMPLATE', action: 'CREATE', name: '创建产品详解模版页', category: 'CONTENT' },
+  { resource: 'SERIES_TEMPLATE', action: 'READ', name: '查看产品详解模版页', category: 'CONTENT' },
+  { resource: 'SERIES_TEMPLATE', action: 'UPDATE', name: '更新产品详解模版页', category: 'CONTENT' },
+  { resource: 'SERIES_TEMPLATE', action: 'DELETE', name: '删除产品详解模版页', category: 'CONTENT' },
+  { resource: 'SERIES_REUSABLE_BLOCK', action: 'CREATE', name: '创建产品详解复用块', category: 'CONTENT' },
+  { resource: 'SERIES_REUSABLE_BLOCK', action: 'READ', name: '查看产品详解复用块', category: 'CONTENT' },
+  { resource: 'SERIES_REUSABLE_BLOCK', action: 'UPDATE', name: '更新产品详解复用块', category: 'CONTENT' },
+  { resource: 'SERIES_REUSABLE_BLOCK', action: 'DELETE', name: '删除产品详解复用块', category: 'CONTENT' },
+
+  { resource: 'SERIES_INTRO_ITEM', action: 'CREATE', name: '创建系列介绍', category: 'CONTENT' },
+  { resource: 'SERIES_INTRO_ITEM', action: 'READ', name: '查看系列介绍', category: 'CONTENT' },
+  { resource: 'SERIES_INTRO_ITEM', action: 'UPDATE', name: '更新系列介绍', category: 'CONTENT' },
+  { resource: 'SERIES_INTRO_ITEM', action: 'DELETE', name: '删除系列介绍', category: 'CONTENT' },
 
   // Pages
-  { resource: 'PAGE', action: 'CREATE', name: '创建页面', category: 'CONTENT' },
-  { resource: 'PAGE', action: 'READ', name: '查看页面', category: 'CONTENT' },
-  { resource: 'PAGE', action: 'UPDATE', name: '更新页面', category: 'CONTENT' },
-  { resource: 'PAGE', action: 'DELETE', name: '删除页面', category: 'CONTENT' },
+  { resource: 'PAGE', action: 'CREATE', name: '创建页面', category: 'WEBSITE_PAGES' },
+  { resource: 'PAGE', action: 'READ', name: '查看页面', category: 'WEBSITE_PAGES' },
+  { resource: 'PAGE', action: 'UPDATE', name: '更新页面', category: 'WEBSITE_PAGES' },
+  { resource: 'PAGE', action: 'DELETE', name: '删除页面', category: 'WEBSITE_PAGES' },
 
-  // Blogs
-  { resource: 'BLOG', action: 'CREATE', name: '创建博客', category: 'CONTENT' },
-  { resource: 'BLOG', action: 'READ', name: '查看博客', category: 'CONTENT' },
-  { resource: 'BLOG', action: 'UPDATE', name: '更新博客', category: 'CONTENT' },
-  { resource: 'BLOG', action: 'DELETE', name: '删除博客', category: 'CONTENT' },
-  { resource: 'BLOG', action: 'PUBLISH', name: '发布博客', category: 'CONTENT' },
+  // Blogs (Knowledge Base)
+  { resource: 'BLOG', action: 'CREATE', name: '创建知识库文章', category: 'CONTENT' },
+  { resource: 'BLOG', action: 'READ', name: '查看知识库文章', category: 'CONTENT' },
+  { resource: 'BLOG', action: 'UPDATE', name: '更新知识库文章', category: 'CONTENT' },
+  { resource: 'BLOG', action: 'DELETE', name: '删除知识库文章', category: 'CONTENT' },
+  { resource: 'BLOG', action: 'PUBLISH', name: '发布知识库文章', category: 'CONTENT' },
+  { resource: 'BLOG_TAG', action: 'CREATE', name: '创建知识库标签', category: 'CONTENT' },
+  { resource: 'BLOG_TAG', action: 'READ', name: '查看知识库标签', category: 'CONTENT' },
+  { resource: 'BLOG_TAG', action: 'UPDATE', name: '更新知识库标签', category: 'CONTENT' },
+  { resource: 'BLOG_TAG', action: 'DELETE', name: '删除知识库标签', category: 'CONTENT' },
+  { resource: 'AUTHOR', action: 'CREATE', name: '创建作者', category: 'CONTENT' },
+  { resource: 'AUTHOR', action: 'READ', name: '查看作者', category: 'CONTENT' },
+  { resource: 'AUTHOR', action: 'UPDATE', name: '更新作者', category: 'CONTENT' },
+  { resource: 'AUTHOR', action: 'DELETE', name: '删除作者', category: 'CONTENT' },
 
   // Applications
-  { resource: 'APPLICATION', action: 'CREATE', name: '创建应用案例', category: 'CONTENT' },
-  { resource: 'APPLICATION', action: 'READ', name: '查看应用案例', category: 'CONTENT' },
-  { resource: 'APPLICATION', action: 'UPDATE', name: '更新应用案例', category: 'CONTENT' },
-  { resource: 'APPLICATION', action: 'DELETE', name: '删除应用案例', category: 'CONTENT' },
+  { resource: 'APPLICATION', action: 'CREATE', name: '创建案例图集', category: 'MEDIA' },
+  { resource: 'APPLICATION', action: 'READ', name: '查看案例图集', category: 'MEDIA' },
+  { resource: 'APPLICATION', action: 'UPDATE', name: '更新案例图集', category: 'MEDIA' },
+  { resource: 'APPLICATION', action: 'DELETE', name: '删除案例图集', category: 'MEDIA' },
 
   // Categories
-  { resource: 'CATEGORY', action: 'CREATE', name: '创建分类', category: 'CONTENT' },
-  { resource: 'CATEGORY', action: 'READ', name: '查看分类', category: 'CONTENT' },
-  { resource: 'CATEGORY', action: 'UPDATE', name: '更新分类', category: 'CONTENT' },
-  { resource: 'CATEGORY', action: 'DELETE', name: '删除分类', category: 'CONTENT' },
+  { resource: 'CATEGORY', action: 'CREATE', name: '创建分类结构管理', category: 'CONTENT' },
+  { resource: 'CATEGORY', action: 'READ', name: '查看分类结构管理', category: 'CONTENT' },
+  { resource: 'CATEGORY', action: 'UPDATE', name: '更新分类结构管理', category: 'CONTENT' },
+  { resource: 'CATEGORY', action: 'DELETE', name: '删除分类结构管理', category: 'CONTENT' },
 
   // FAQ Items
-  { resource: 'FAQ_ITEM', action: 'CREATE', name: '创建FAQ', category: 'CONTENT' },
-  { resource: 'FAQ_ITEM', action: 'READ', name: '查看FAQ', category: 'CONTENT' },
-  { resource: 'FAQ_ITEM', action: 'UPDATE', name: '更新FAQ', category: 'CONTENT' },
-  { resource: 'FAQ_ITEM', action: 'DELETE', name: '删除FAQ', category: 'CONTENT' },
+  { resource: 'FAQ_ITEM', action: 'CREATE', name: '创建常见问题', category: 'CONTENT' },
+  { resource: 'FAQ_ITEM', action: 'READ', name: '查看常见问题', category: 'CONTENT' },
+  { resource: 'FAQ_ITEM', action: 'UPDATE', name: '更新常见问题', category: 'CONTENT' },
+  { resource: 'FAQ_ITEM', action: 'DELETE', name: '删除常见问题', category: 'CONTENT' },
 
   // Reusable Blocks
-  { resource: 'REUSABLE_BLOCK', action: 'CREATE', name: '创建复用块', category: 'CONTENT' },
-  { resource: 'REUSABLE_BLOCK', action: 'READ', name: '查看复用块', category: 'CONTENT' },
-  { resource: 'REUSABLE_BLOCK', action: 'UPDATE', name: '更新复用块', category: 'CONTENT' },
-  { resource: 'REUSABLE_BLOCK', action: 'DELETE', name: '删除复用块', category: 'CONTENT' },
+  { resource: 'REUSABLE_BLOCK', action: 'CREATE', name: '创建可复用块', category: 'CONTENT' },
+  { resource: 'REUSABLE_BLOCK', action: 'READ', name: '查看可复用块', category: 'CONTENT' },
+  { resource: 'REUSABLE_BLOCK', action: 'UPDATE', name: '更新可复用块', category: 'CONTENT' },
+  { resource: 'REUSABLE_BLOCK', action: 'DELETE', name: '删除可复用块', category: 'CONTENT' },
 
   // Document Templates
-  { resource: 'DOCUMENT_TEMPLATE', action: 'CREATE', name: '创建文档模板', category: 'CONTENT' },
-  { resource: 'DOCUMENT_TEMPLATE', action: 'READ', name: '查看文档模板', category: 'CONTENT' },
-  { resource: 'DOCUMENT_TEMPLATE', action: 'UPDATE', name: '更新文档模板', category: 'CONTENT' },
-  { resource: 'DOCUMENT_TEMPLATE', action: 'DELETE', name: '删除文档模板', category: 'CONTENT' },
+  { resource: 'DOCUMENT_TEMPLATE', action: 'CREATE', name: '创建页面板块模板库', category: 'CONTENT' },
+  { resource: 'DOCUMENT_TEMPLATE', action: 'READ', name: '查看页面板块模板库', category: 'CONTENT' },
+  { resource: 'DOCUMENT_TEMPLATE', action: 'UPDATE', name: '更新页面板块模板库', category: 'CONTENT' },
+  { resource: 'DOCUMENT_TEMPLATE', action: 'DELETE', name: '删除页面板块模板库', category: 'CONTENT' },
 
   // Template Categories
   { resource: 'TEMPLATE_CATEGORY', action: 'CREATE', name: '创建模板分类', category: 'CONTENT' },
@@ -103,16 +139,16 @@ const PERMISSIONS = [
   { resource: 'TEMPLATE_CATEGORY', action: 'DELETE', name: '删除模板分类', category: 'CONTENT' },
 
   // Navigation Menus
-  { resource: 'NAVIGATION_MENU', action: 'CREATE', name: '创建导航菜单', category: 'CONTENT' },
-  { resource: 'NAVIGATION_MENU', action: 'READ', name: '查看导航菜单', category: 'CONTENT' },
-  { resource: 'NAVIGATION_MENU', action: 'UPDATE', name: '更新导航菜单', category: 'CONTENT' },
-  { resource: 'NAVIGATION_MENU', action: 'DELETE', name: '删除导航菜单', category: 'CONTENT' },
+  { resource: 'NAVIGATION_MENU', action: 'CREATE', name: '创建导航菜单', category: 'NAVIGATION' },
+  { resource: 'NAVIGATION_MENU', action: 'READ', name: '查看导航菜单', category: 'NAVIGATION' },
+  { resource: 'NAVIGATION_MENU', action: 'UPDATE', name: '更新导航菜单', category: 'NAVIGATION' },
+  { resource: 'NAVIGATION_MENU', action: 'DELETE', name: '删除导航菜单', category: 'NAVIGATION' },
 
   // Hero Banner Items
-  { resource: 'HERO_BANNER_ITEM', action: 'CREATE', name: '创建轮播图', category: 'CONTENT' },
-  { resource: 'HERO_BANNER_ITEM', action: 'READ', name: '查看轮播图', category: 'CONTENT' },
-  { resource: 'HERO_BANNER_ITEM', action: 'UPDATE', name: '更新轮播图', category: 'CONTENT' },
-  { resource: 'HERO_BANNER_ITEM', action: 'DELETE', name: '删除轮播图', category: 'CONTENT' },
+  { resource: 'HERO_BANNER_ITEM', action: 'CREATE', name: '创建首页首屏轮播图', category: 'WEBSITE_PAGES' },
+  { resource: 'HERO_BANNER_ITEM', action: 'READ', name: '查看首页首屏轮播图', category: 'WEBSITE_PAGES' },
+  { resource: 'HERO_BANNER_ITEM', action: 'UPDATE', name: '更新首页首屏轮播图', category: 'WEBSITE_PAGES' },
+  { resource: 'HERO_BANNER_ITEM', action: 'DELETE', name: '删除首页首屏轮播图', category: 'WEBSITE_PAGES' },
 
   // ==================== 媒体库 (Media Library) ====================
   { resource: 'MEDIA', action: 'CREATE', name: '上传媒体', category: 'MEDIA' },
@@ -136,46 +172,50 @@ const PERMISSIONS = [
   { resource: 'FORM_CONFIG', action: 'UPDATE', name: '更新表单配置', category: 'FORMS' },
   { resource: 'FORM_CONFIG', action: 'DELETE', name: '删除表单配置', category: 'FORMS' },
 
-  { resource: 'FORM_SUBMISSION', action: 'READ', name: '查看表单提交', category: 'FORMS' },
-  { resource: 'FORM_SUBMISSION', action: 'UPDATE', name: '更新表单提交', category: 'FORMS' },
-  { resource: 'FORM_SUBMISSION', action: 'DELETE', name: '删除表单提交', category: 'FORMS' },
-  { resource: 'FORM_SUBMISSION', action: 'EXPORT', name: '导出表单提交', category: 'FORMS' },
+  { resource: 'FORM_SUBMISSION', action: 'READ', name: '查看表单提交记录', category: 'FORMS' },
+  { resource: 'FORM_SUBMISSION', action: 'UPDATE', name: '更新表单提交记录', category: 'FORMS' },
+  { resource: 'FORM_SUBMISSION', action: 'DELETE', name: '删除表单提交记录', category: 'FORMS' },
+  { resource: 'FORM_SUBMISSION', action: 'EXPORT', name: '导出表单提交记录', category: 'FORMS' },
 
   // ==================== 首页管理 (Homepage) ====================
-  { resource: 'HOME_CONTENT', action: 'READ', name: '查看首页内容', category: 'HOMEPAGE' },
-  { resource: 'HOME_CONTENT', action: 'UPDATE', name: '更新首页内容', category: 'HOMEPAGE' },
+  { resource: 'HOME_CONTENT', action: 'READ', name: '查看首页内容配置', category: 'WEBSITE_PAGES' },
+  { resource: 'HOME_CONTENT', action: 'UPDATE', name: '更新首页内容配置', category: 'WEBSITE_PAGES' },
 
-  { resource: 'FOOTER', action: 'READ', name: '查看页脚', category: 'HOMEPAGE' },
-  { resource: 'FOOTER', action: 'UPDATE', name: '更新页脚', category: 'HOMEPAGE' },
+  { resource: 'FOOTER', action: 'READ', name: '查看页脚', category: 'WEBSITE_SETTINGS' },
+  { resource: 'FOOTER', action: 'UPDATE', name: '更新页脚', category: 'WEBSITE_SETTINGS' },
 
-  { resource: 'HOMEPAGE_GLOBAL', action: 'READ', name: '查看首页组件', category: 'HOMEPAGE' },
-  { resource: 'HOMEPAGE_GLOBAL', action: 'UPDATE', name: '更新首页组件', category: 'HOMEPAGE' },
+  { resource: 'HOMEPAGE_GLOBAL', action: 'READ', name: '查看首页管理', category: 'WEBSITE_PAGES' },
+  { resource: 'HOMEPAGE_GLOBAL', action: 'UPDATE', name: '更新首页管理', category: 'WEBSITE_PAGES' },
 
   // ==================== 系统设置 (System Settings) ====================
-  { resource: 'SITE_CONFIG', action: 'READ', name: '查看站点配置', category: 'SYSTEM' },
-  { resource: 'SITE_CONFIG', action: 'UPDATE', name: '更新站点配置', category: 'SYSTEM' },
+  { resource: 'SITE_CONFIG', action: 'READ', name: '查看站点配置', category: 'WEBSITE_SETTINGS' },
+  { resource: 'SITE_CONFIG', action: 'UPDATE', name: '更新站点配置', category: 'WEBSITE_SETTINGS' },
 
-  { resource: 'SEO_SETTING', action: 'CREATE', name: '创建SEO设置', category: 'SYSTEM' },
-  { resource: 'SEO_SETTING', action: 'READ', name: '查看SEO设置', category: 'SYSTEM' },
-  { resource: 'SEO_SETTING', action: 'UPDATE', name: '更新SEO设置', category: 'SYSTEM' },
-  { resource: 'SEO_SETTING', action: 'DELETE', name: '删除SEO设置', category: 'SYSTEM' },
+  { resource: 'SEO_SETTING', action: 'CREATE', name: '创建SEO设置', category: 'ADVANCED' },
+  { resource: 'SEO_SETTING', action: 'READ', name: '查看SEO设置', category: 'ADVANCED' },
+  { resource: 'SEO_SETTING', action: 'UPDATE', name: '更新SEO设置', category: 'ADVANCED' },
+  { resource: 'SEO_SETTING', action: 'DELETE', name: '删除SEO设置', category: 'ADVANCED' },
 
-  { resource: 'CUSTOM_SCRIPT', action: 'CREATE', name: '创建自定义脚本', category: 'SYSTEM' },
-  { resource: 'CUSTOM_SCRIPT', action: 'READ', name: '查看自定义脚本', category: 'SYSTEM' },
-  { resource: 'CUSTOM_SCRIPT', action: 'UPDATE', name: '更新自定义脚本', category: 'SYSTEM' },
-  { resource: 'CUSTOM_SCRIPT', action: 'DELETE', name: '删除自定义脚本', category: 'SYSTEM' },
+  { resource: 'CUSTOM_SCRIPT', action: 'CREATE', name: '创建自定义脚本', category: 'ADVANCED' },
+  { resource: 'CUSTOM_SCRIPT', action: 'READ', name: '查看自定义脚本', category: 'ADVANCED' },
+  { resource: 'CUSTOM_SCRIPT', action: 'UPDATE', name: '更新自定义脚本', category: 'ADVANCED' },
+  { resource: 'CUSTOM_SCRIPT', action: 'DELETE', name: '删除自定义脚本', category: 'ADVANCED' },
 
-  { resource: 'EMAIL_CONFIG', action: 'READ', name: '查看邮件配置', category: 'SYSTEM' },
-  { resource: 'EMAIL_CONFIG', action: 'UPDATE', name: '更新邮件配置', category: 'SYSTEM' },
+  { resource: 'EMAIL_CONFIG', action: 'READ', name: '查看邮件配置', category: 'FORMS' },
+  { resource: 'EMAIL_CONFIG', action: 'UPDATE', name: '更新邮件配置', category: 'FORMS' },
 
-  { resource: 'CONTACT_CONFIG', action: 'READ', name: '查看联系配置', category: 'SYSTEM' },
-  { resource: 'CONTACT_CONFIG', action: 'UPDATE', name: '更新联系配置', category: 'SYSTEM' },
+  { resource: 'CONTACT_CONFIG', action: 'READ', name: '查看联系配置', category: 'WEBSITE_SETTINGS' },
+  { resource: 'CONTACT_CONFIG', action: 'UPDATE', name: '更新联系配置', category: 'WEBSITE_SETTINGS' },
 
-  { resource: 'SOCIAL_CONFIG', action: 'READ', name: '查看社交配置', category: 'SYSTEM' },
-  { resource: 'SOCIAL_CONFIG', action: 'UPDATE', name: '更新社交配置', category: 'SYSTEM' },
+  { resource: 'SOCIAL_CONFIG', action: 'READ', name: '查看社交配置', category: 'WEBSITE_SETTINGS' },
+  { resource: 'SOCIAL_CONFIG', action: 'UPDATE', name: '更新社交配置', category: 'WEBSITE_SETTINGS' },
 
-  { resource: 'TRANSLATION_CONFIG', action: 'READ', name: '查看翻译配置', category: 'SYSTEM' },
-  { resource: 'TRANSLATION_CONFIG', action: 'UPDATE', name: '更新翻译配置', category: 'SYSTEM' },
+  { resource: 'TRANSLATION_CONFIG', action: 'READ', name: '查看翻译配置（全局）', category: 'CMS_SETTINGS' },
+  { resource: 'TRANSLATION_CONFIG', action: 'UPDATE', name: '更新翻译配置（全局）', category: 'CMS_SETTINGS' },
+  { resource: 'SHOP_PAGE_CONFIG', action: 'READ', name: '查看Shop 列表页管理', category: 'WEBSITE_PAGES' },
+  { resource: 'SHOP_PAGE_CONFIG', action: 'UPDATE', name: '更新Shop 列表页管理', category: 'WEBSITE_PAGES' },
+  { resource: 'PRELOADER_CONFIG', action: 'READ', name: '查看加载动画配置', category: 'WEBSITE_SETTINGS' },
+  { resource: 'PRELOADER_CONFIG', action: 'UPDATE', name: '更新加载动画配置', category: 'WEBSITE_SETTINGS' },
 ]
 
 /**
@@ -202,8 +242,16 @@ const ROLES = [
       // Content - CRUD (no delete for most)
       'PRODUCT_CREATE', 'PRODUCT_READ', 'PRODUCT_UPDATE',
       'PRODUCT_SERIES_READ', 'PRODUCT_SERIES_UPDATE',
+      'PRODUCT_ATTRIBUTE_READ', 'PRODUCT_ATTRIBUTE_UPDATE',
+      'PRODUCT_TEMPLATE_READ', 'PRODUCT_TEMPLATE_UPDATE',
+      'PRODUCT_REUSABLE_BLOCK_READ', 'PRODUCT_REUSABLE_BLOCK_UPDATE', 'PRODUCT_REUSABLE_BLOCK_CREATE', 'PRODUCT_REUSABLE_BLOCK_DELETE',
+      'SERIES_TEMPLATE_READ', 'SERIES_TEMPLATE_UPDATE',
+      'SERIES_REUSABLE_BLOCK_READ', 'SERIES_REUSABLE_BLOCK_UPDATE', 'SERIES_REUSABLE_BLOCK_CREATE', 'SERIES_REUSABLE_BLOCK_DELETE',
+      'SERIES_INTRO_ITEM_READ', 'SERIES_INTRO_ITEM_UPDATE',
       'PAGE_CREATE', 'PAGE_READ', 'PAGE_UPDATE',
       'BLOG_CREATE', 'BLOG_READ', 'BLOG_UPDATE',
+      'BLOG_TAG_CREATE', 'BLOG_TAG_READ', 'BLOG_TAG_UPDATE', 'BLOG_TAG_DELETE',
+      'AUTHOR_CREATE', 'AUTHOR_READ', 'AUTHOR_UPDATE', 'AUTHOR_DELETE',
       'APPLICATION_CREATE', 'APPLICATION_READ', 'APPLICATION_UPDATE',
       'FAQ_ITEM_CREATE', 'FAQ_ITEM_READ', 'FAQ_ITEM_UPDATE',
       'REUSABLE_BLOCK_CREATE', 'REUSABLE_BLOCK_READ', 'REUSABLE_BLOCK_UPDATE', 'REUSABLE_BLOCK_DELETE',
@@ -221,6 +269,8 @@ const ROLES = [
       'HOME_CONTENT_READ', 'HOME_CONTENT_UPDATE',
       'FOOTER_READ', 'FOOTER_UPDATE',
       'HOMEPAGE_GLOBAL_READ', 'HOMEPAGE_GLOBAL_UPDATE',
+      'SHOP_PAGE_CONFIG_READ', 'SHOP_PAGE_CONFIG_UPDATE',
+      'PRELOADER_CONFIG_READ', 'PRELOADER_CONFIG_UPDATE',
     ],
   },
   {
@@ -234,6 +284,8 @@ const ROLES = [
       'PRODUCT_SERIES_READ',
       'PAGE_READ', 'PAGE_UPDATE',
       'BLOG_READ', 'BLOG_UPDATE', 'BLOG_PUBLISH',
+      'BLOG_TAG_READ', 'BLOG_TAG_UPDATE',
+      'AUTHOR_READ', 'AUTHOR_UPDATE',
       'APPLICATION_READ', 'APPLICATION_UPDATE',
       'FAQ_ITEM_READ', 'FAQ_ITEM_UPDATE',
       'MEDIA_READ',
@@ -322,9 +374,23 @@ async function seedPermissions(payload: Payload): Promise<Map<string, string | n
     const identifier = `${perm.resource}_${perm.action}`
 
     if (existingMap.has(identifier)) {
-      // Permission already exists
-      permissionMap.set(identifier, existingMap.get(identifier)!)
-      existingCount++
+      // Permission already exists - update description to match new naming
+      const existingId = existingMap.get(identifier)!
+      try {
+        await payload.update({
+          collection: 'permissions',
+          id: existingId,
+          data: {
+            description: perm.name,
+            category: perm.category,
+            isSystem: true,
+          },
+        })
+        permissionMap.set(identifier, existingId)
+        existingCount++
+      } catch (error) {
+        payload.logger.error(`Failed to update permission ${identifier}:`, error)
+      }
     } else {
       // Create new permission
       try {
