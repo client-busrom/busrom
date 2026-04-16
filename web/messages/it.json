@@ -1,0 +1,43 @@
+{
+  "common": {
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "viewAll": "Mostra tutto",
+    "learnMore": "Scopri di più",
+    "contactUs": "Contattaci"
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Prodotti",
+    "services": "Servizi",
+    "about": "Chi siamo",
+    "contact": "Contatti",
+    "viewAllProducts": "Mostra tutti i prodotti"
+  },
+  "shop": {
+    "viewDetails": "Vedi dettagli",
+    "sendInquiry": "Invia richiesta",
+    "allProducts": "Tutti i prodotti",
+    "searchProducts": "Cerca prodotti...",
+    "applyFilter": "Applica filtro",
+    "featuredOnly": "Solo in primo piano",
+    "sortBy": "Ordina per"
+  },
+  "ContactPage": {
+    "title": "Contattaci",
+    "subtitle": "Contattaci per soluzioni di ferramenta per vetro di alta qualità",
+    "formTitle": "Inviaci un messaggio",
+    "formDescription": "Compila il modulo e ti risponderemo presto.",
+    "infoTitle": "Informazioni di contatto",
+    "address": "Indirizzo",
+    "email": "Email",
+    "phone": "Telefono",
+    "businessHours": "Orari di apertura",
+    "businessHoursValue": "Lunedì - Venerdì: 9:00 - 18:00 (GMT+8)",
+    "mapPlaceholder": "La mappa sarà integrata qui",
+    "followUs": "Seguici"
+  },
+  "blog": {
+    "all": "tutto"
+  }
+}

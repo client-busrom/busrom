@@ -1,0 +1,43 @@
+{
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "viewAll": "عرض الكل",
+    "learnMore": "تعرف على المزيد",
+    "contactUs": "اتصل بنا"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "products": "المنتجات",
+    "services": "الخدمات",
+    "about": "من نحن",
+    "contact": "اتصل بنا",
+    "viewAllProducts": "عرض جميع المنتجات"
+  },
+  "shop": {
+    "viewDetails": "عرض التفاصيل",
+    "sendInquiry": "إرسال استفسار",
+    "allProducts": "جميع المنتجات",
+    "searchProducts": "البحث عن المنتجات...",
+    "applyFilter": "تطبيق الفلتر",
+    "featuredOnly": "المميزة فقط",
+    "sortBy": "ترتيب حسب"
+  },
+  "ContactPage": {
+    "title": "اتصل بنا",
+    "subtitle": "تواصل معنا للحصول على حلول أجهزة الزجاج عالية الجودة",
+    "formTitle": "أرسل لنا رسالة",
+    "formDescription": "املأ النموذج أدناه وسنقوم بالرد عليك في أقرب وقت ممكن.",
+    "infoTitle": "معلومات الاتصال",
+    "address": "العنوان",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "businessHours": "ساعات العمل",
+    "businessHoursValue": "الإثنين - الجمعة: 9:00 صباحاً - 6:00 مساءً (GMT+8)",
+    "mapPlaceholder": "سيتم دمج الخريطة هنا",
+    "followUs": "تابعنا"
+  },
+  "blog": {
+    "all": "الكل"
+  }
+}

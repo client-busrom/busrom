@@ -1,0 +1,43 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "viewAll": "Voir tout",
+    "learnMore": "En savoir plus",
+    "contactUs": "Contactez-nous"
+  },
+  "nav": {
+    "home": "Accueil",
+    "products": "Produits",
+    "services": "Services",
+    "about": "À propos",
+    "contact": "Contact",
+    "viewAllProducts": "Voir tous les produits"
+  },
+  "shop": {
+    "viewDetails": "Voir détails",
+    "sendInquiry": "Envoyer une demande",
+    "allProducts": "Tous les produits",
+    "searchProducts": "Rechercher...",
+    "applyFilter": "Filtrer",
+    "featuredOnly": "Sélectionnés",
+    "sortBy": "Trier par"
+  },
+  "ContactPage": {
+    "title": "Contactez-nous",
+    "subtitle": "Contactez-nous pour des ferrures en verre de haute qualité",
+    "formTitle": "Envoyez-nous un message",
+    "formDescription": "Remplissez le formulaire et nous vous répondrons bientôt.",
+    "infoTitle": "Informations de contact",
+    "address": "Adresse",
+    "email": "Email",
+    "phone": "Téléphone",
+    "businessHours": "Heures d'ouverture",
+    "businessHoursValue": "Lundi - Vendredi : 9:00 - 18:00 (GMT+8)",
+    "mapPlaceholder": "La carte sera intégrée ici",
+    "followUs": "Suivez-nous"
+  },
+  "blog": {
+    "all": "tout"
+  }
+}

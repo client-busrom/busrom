@@ -1,0 +1,43 @@
+{
+  "common": {
+    "loading": "Laden...",
+    "error": "Fout",
+    "viewAll": "Alle bekijken",
+    "learnMore": "Meer informatie",
+    "contactUs": "Neem contact op"
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Producten",
+    "services": "Diensten",
+    "about": "Over ons",
+    "contact": "Contact",
+    "viewAllProducts": "Bekijk alle producten"
+  },
+  "shop": {
+    "viewDetails": "Details bekijken",
+    "sendInquiry": "Aanvraag verzenden",
+    "allProducts": "Alle producten",
+    "searchProducts": "Producten zoeken...",
+    "applyFilter": "Filter toepassen",
+    "featuredOnly": "Alleen uitgelicht",
+    "sortBy": "Sorteren op"
+  },
+  "ContactPage": {
+    "title": "Neem contact op",
+    "subtitle": "Neem contact op voor hoogwaardige glasbeslagoplossingen",
+    "formTitle": "Stuur ons een bericht",
+    "formDescription": "Vul het formulier in en we nemen snel contact op.",
+    "infoTitle": "Contactgegevens",
+    "address": "Adres",
+    "email": "E-mail",
+    "phone": "Telefoon",
+    "businessHours": "Openingstijden",
+    "businessHoursValue": "Maandag - Vrijdag: 09:00 - 18:00 (GMT+8)",
+    "mapPlaceholder": "De kaart wordt hier geïntegreerd",
+    "followUs": "Volg ons"
+  },
+  "blog": {
+    "all": "alle"
+  }
+}

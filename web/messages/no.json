@@ -1,0 +1,43 @@
+{
+  "common": {
+    "loading": "Laster...",
+    "error": "Feil",
+    "viewAll": "Se alle",
+    "learnMore": "Les mer",
+    "contactUs": "Kontakt oss"
+  },
+  "nav": {
+    "home": "Hjem",
+    "products": "Produkter",
+    "services": "Tjenester",
+    "about": "Om oss",
+    "contact": "Kontakt",
+    "viewAllProducts": "Se alle produkter"
+  },
+  "shop": {
+    "viewDetails": "Se detaljer",
+    "sendInquiry": "Send forespørsel",
+    "allProducts": "Alle produkter",
+    "searchProducts": "Søk produkter...",
+    "applyFilter": "Bruk filter",
+    "featuredOnly": "Kun utvalgte",
+    "sortBy": "Sorter etter"
+  },
+  "ContactPage": {
+    "title": "Kontakt oss",
+    "subtitle": "Kontakt oss for glassbeslagsløsninger av høy chất lượng",
+    "formTitle": "Send oss en melding",
+    "formDescription": "Fyll ut skjemaet under så kommer vi tilbake til deg så snart som mulig.",
+    "infoTitle": "Kontaktinformasjon",
+    "address": "Adresse",
+    "email": "E-post",
+    "phone": "Telefon",
+    "businessHours": "Åpningstider",
+    "businessHoursValue": "Mandag - Fredag: 09:00 - 18:00 (GMT+8)",
+    "mapPlaceholder": "Kartet vil bli integrert her",
+    "followUs": "Følg oss"
+  },
+  "blog": {
+    "all": "alle"
+  }
+}

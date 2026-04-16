@@ -1,0 +1,43 @@
+{
+  "common": {
+    "loading": "Ladataan...",
+    "error": "Virhe",
+    "viewAll": "Näytä kaikki",
+    "learnMore": "Lue lisää",
+    "contactUs": "Ota yhteyttä"
+  },
+  "nav": {
+    "home": "Etusivu",
+    "products": "Tuotteet",
+    "services": "Palvelut",
+    "about": "Tietoa meistä",
+    "contact": "Ota yhteyttä",
+    "viewAllProducts": "Näytä kaikki tuotteet"
+  },
+  "shop": {
+    "viewDetails": "Näytä tiedot",
+    "sendInquiry": "Lähetä kysely",
+    "allProducts": "Kaikki tuotteet",
+    "searchProducts": "Hae tuotteita...",
+    "applyFilter": "Käytä suodatinta",
+    "featuredOnly": "Vain suositellut",
+    "sortBy": "Järjestä"
+  },
+  "ContactPage": {
+    "title": "Ota yhteyttä",
+    "subtitle": "Ota yhteyttä korkealaatuisten lasihelojen ratkaisuihin",
+    "formTitle": "Lähetä meille viesti",
+    "formDescription": "Täytä alla oleva lomake, niin palaamme asiaan mahdollisimman pian.",
+    "infoTitle": "Yhteystiedot",
+    "address": "Osoite",
+    "email": "Sähköposti",
+    "phone": "Puhelin",
+    "businessHours": "Aukioloajat",
+    "businessHoursValue": "Maanantai - Perjantai: 09:00 - 18:00 (GMT+8)",
+    "mapPlaceholder": "Kartta integroidaan tähän",
+    "followUs": "Seuraa meitä"
+  },
+  "blog": {
+    "all": "kaikki"
+  }
+}

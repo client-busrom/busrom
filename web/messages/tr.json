@@ -1,0 +1,43 @@
+{
+  "common": {
+    "loading": "Yükleniyor...",
+    "error": "Hata",
+    "viewAll": "Hepsini Gör",
+    "learnMore": "Daha Fazla Bilgi",
+    "contactUs": "Bize Ulaşın"
+  },
+  "nav": {
+    "home": "Anasayfa",
+    "products": "Ürünler",
+    "services": "Hizmetler",
+    "about": "Hakkımızda",
+    "contact": "İletişim",
+    "viewAllProducts": "Tüm Ürünleri Gör"
+  },
+  "shop": {
+    "viewDetails": "Detayları Gör",
+    "sendInquiry": "Teklif İste",
+    "allProducts": "Tüm Ürünler",
+    "searchProducts": "Ürün ara...",
+    "applyFilter": "Filtre Uygula",
+    "featuredOnly": "Sadece Öne Çıkanlar",
+    "sortBy": "Sırala"
+  },
+  "ContactPage": {
+    "title": "Bize Ulaşın",
+    "subtitle": "Yüksek kaliteli cam donanım çözümleri için bizimle iletişime geçin",
+    "formTitle": "Bize Mesaj Gönderin",
+    "formDescription": "Aşağıdaki formu doldurun, size en kısa sürede geri dönelim.",
+    "infoTitle": "İletişim Bilgileri",
+    "address": "Adres",
+    "email": "E-posta",
+    "phone": "Telefon",
+    "businessHours": "Çalışma Saatleri",
+    "businessHoursValue": "Pazartesi - Cuma: 09:00 - 18:00 (GMT+8)",
+    "mapPlaceholder": "Harita buraya entegre edilecek",
+    "followUs": "Bizi Takip Edin"
+  },
+  "blog": {
+    "all": "tümü"
+  }
+}

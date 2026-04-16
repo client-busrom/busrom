@@ -1,0 +1,43 @@
+{
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "viewAll": "すべて表示",
+    "learnMore": "詳細を見る",
+    "contactUs": "お問い合わせ"
+  },
+  "nav": {
+    "home": "ホーム",
+    "products": "製品",
+    "services": "サービス",
+    "about": "私たちについて",
+    "contact": "連絡先",
+    "viewAllProducts": "すべての製品を見る"
+  },
+  "shop": {
+    "viewDetails": "詳細を見る",
+    "sendInquiry": "お問い合わせを送信",
+    "allProducts": "すべての製品",
+    "searchProducts": "製品を検索...",
+    "applyFilter": "フィルターを適用",
+    "featuredOnly": "おすすめのみ",
+    "sortBy": "並べ替え"
+  },
+  "ContactPage": {
+    "title": "お問い合わせ",
+    "subtitle": "高品質なガラス金物ソリューションについては、お問い合わせください",
+    "formTitle": "メッセージを送信",
+    "formDescription": "以下のフォームにご記入ください。すぐにご連絡いたします。",
+    "infoTitle": "連絡先情報",
+    "address": "住所",
+    "email": "メールアドレス",
+    "phone": "電話番号",
+    "businessHours": "営業時間",
+    "businessHoursValue": "月曜日 - 金曜日: 9:00 AM - 6:00 PM (GMT+8)",
+    "mapPlaceholder": "地図がここに統合されます",
+    "followUs": "フォローする"
+  },
+  "blog": {
+    "all": "すべて"
+  }
+}

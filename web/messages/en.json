@@ -36,5 +36,8 @@
     "businessHoursValue": "Monday - Friday: 9:00 AM - 6:00 PM (GMT+8)",
     "mapPlaceholder": "Map will be integrated here",
     "followUs": "Follow Us"
+  },
+  "blog": {
+    "all": "all"
   }
 }

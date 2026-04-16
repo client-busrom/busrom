@@ -1,0 +1,43 @@
+{
+  "common": {
+    "loading": "Indlæser...",
+    "error": "Fejl",
+    "viewAll": "Se alle",
+    "learnMore": "Læs mere",
+    "contactUs": "Kontakt os"
+  },
+  "nav": {
+    "home": "Hjem",
+    "products": "Produkter",
+    "services": "Ydelser",
+    "about": "Om os",
+    "contact": "Kontakt",
+    "viewAllProducts": "Se alle produkter"
+  },
+  "shop": {
+    "viewDetails": "Se detaljer",
+    "sendInquiry": "Send forespørgsel",
+    "allProducts": "Alle produkter",
+    "searchProducts": "Søg produkter...",
+    "applyFilter": "Anvend filter",
+    "featuredOnly": "Kun udvalgte",
+    "sortBy": "Sortér efter"
+  },
+  "ContactPage": {
+    "title": "Kontakt os",
+    "subtitle": "Kontakt os for glasbeslagsløsninger af høj kvalitet",
+    "formTitle": "Send os en besked",
+    "formDescription": "Udfyld formularen nedenfor, så vender vi tilbage hurtigst muligt.",
+    "infoTitle": "Kontaktoplysninger",
+    "address": "Adresse",
+    "email": "E-mail",
+    "phone": "Telefon",
+    "businessHours": "Åbningstider",
+    "businessHoursValue": "Mandag - Fredag: 09:00 - 18:00 (GMT+8)",
+    "mapPlaceholder": "Kortet vil blive integreret her",
+    "followUs": "Følg os"
+  },
+  "blog": {
+    "all": "alle"
+  }
+}

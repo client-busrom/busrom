@@ -36,5 +36,8 @@
     "businessHoursValue": "周一至周五：上午9:00 - 下午6:00 (GMT+8)",
     "mapPlaceholder": "地图将在此处集成",
     "followUs": "关注我们"
+  },
+  "blog": {
+    "all": "全部项目"
   }
 }

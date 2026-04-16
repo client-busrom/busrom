@@ -1,0 +1,43 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "viewAll": "Ver todo",
+    "learnMore": "Más información",
+    "contactUs": "Contáctanos"
+  },
+  "nav": {
+    "home": "Inicio",
+    "products": "Productos",
+    "services": "Servicios",
+    "about": "Sobre nosotros",
+    "contact": "Contacto",
+    "viewAllProducts": "Ver todos los productos"
+  },
+  "shop": {
+    "viewDetails": "Ver detalles",
+    "sendInquiry": "Enviar consulta",
+    "allProducts": "Todos los productos",
+    "searchProducts": "Buscar productos...",
+    "applyFilter": "Aplicar filtro",
+    "featuredOnly": "Solo destacados",
+    "sortBy": "Ordenar por"
+  },
+  "ContactPage": {
+    "title": "Contáctanos",
+    "subtitle": "Ponte en contacto para soluciones de herrajes para vidrio de alta calidad",
+    "formTitle": "Envíanos un mensaje",
+    "formDescription": "Completa el formulario y te responderemos pronto.",
+    "infoTitle": "Información de contacto",
+    "address": "Dirección",
+    "email": "Correo electrónico",
+    "phone": "Teléfono",
+    "businessHours": "Horario comercial",
+    "businessHoursValue": "Lunes - Viernes: 9:00 AM - 6:00 PM (GMT+8)",
+    "mapPlaceholder": "El mapa se integrará aquí",
+    "followUs": "Síguenos"
+  },
+  "blog": {
+    "all": "todo"
+  }
+}
