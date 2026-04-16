@@ -1,0 +1,43 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류",
+    "viewAll": "모두 보기",
+    "learnMore": "더 알아보기",
+    "contactUs": "문의하기"
+  },
+  "nav": {
+    "home": "홈",
+    "products": "제품",
+    "services": "서비스",
+    "about": "회사 소개",
+    "contact": "연락처",
+    "viewAllProducts": "모든 제품 보기"
+  },
+  "shop": {
+    "viewDetails": "상세 보기",
+    "sendInquiry": "문의 보내기",
+    "allProducts": "모든 제품",
+    "searchProducts": "제품 검색...",
+    "applyFilter": "필터 적용",
+    "featuredOnly": "추천 제품만",
+    "sortBy": "정렬 기준"
+  },
+  "ContactPage": {
+    "title": "문의하기",
+    "subtitle": "고품질 유리 하드웨어 솔루션에 대해 문의해 주세요",
+    "formTitle": "메시지 보내기",
+    "formDescription": "아래 양식을 작성해 주시면 최대한 빨리 연락드리겠습니다.",
+    "infoTitle": "연락처 정보",
+    "address": "주소",
+    "email": "이메일",
+    "phone": "전화번호",
+    "businessHours": "영업 시간",
+    "businessHoursValue": "월요일 - 금요일: 오전 9:00 - 오후 6:00 (GMT+8)",
+    "mapPlaceholder": "지도가 여기에 통합됩니다",
+    "followUs": "팔로우하기"
+  },
+  "blog": {
+    "all": "전체"
+  }
+}

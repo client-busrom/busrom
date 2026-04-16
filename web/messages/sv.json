@@ -1,0 +1,43 @@
+{
+  "common": {
+    "loading": "Laddar...",
+    "error": "Fel",
+    "viewAll": "Visa alla",
+    "learnMore": "Läs mer",
+    "contactUs": "Kontakta oss"
+  },
+  "nav": {
+    "home": "Hem",
+    "products": "Produkter",
+    "services": "Tjänster",
+    "about": "Om oss",
+    "contact": "Kontakt",
+    "viewAllProducts": "Visa alla produkter"
+  },
+  "shop": {
+    "viewDetails": "Visa detaljer",
+    "sendInquiry": "Skicka förfrågan",
+    "allProducts": "Alla produkter",
+    "searchProducts": "Sök produkter...",
+    "applyFilter": "Använd filter",
+    "featuredOnly": "Endast utvalda",
+    "sortBy": "Sortera efter"
+  },
+  "ContactPage": {
+    "title": "Kontakta oss",
+    "subtitle": "Kontakta oss för högkvalitativa glasbeslagslösningar",
+    "formTitle": "Skicka ett meddelande",
+    "formDescription": "Fyll i formuläret nedan så återkommer vi så snart som möjligt.",
+    "infoTitle": "Kontaktinformation",
+    "address": "Adress",
+    "email": "E-post",
+    "phone": "Telefon",
+    "businessHours": "Öppettider",
+    "businessHoursValue": "Måndag - Fredag: 09:00 - 18:00 (GMT+8)",
+    "mapPlaceholder": "Kartan kommer att integreras här",
+    "followUs": "Följ oss"
+  },
+  "blog": {
+    "all": "alla"
+  }
+}

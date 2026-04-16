@@ -1,0 +1,43 @@
+{
+  "common": {
+    "loading": "Laden...",
+    "error": "Fehler",
+    "viewAll": "Alle ansehen",
+    "learnMore": "Mehr erfahren",
+    "contactUs": "Kontaktieren Sie uns"
+  },
+  "nav": {
+    "home": "Startseite",
+    "products": "Produkte",
+    "services": "Dienstleistungen",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "viewAllProducts": "Alle Produkte anzeigen"
+  },
+  "shop": {
+    "viewDetails": "Details anzeigen",
+    "sendInquiry": "Anfrage senden",
+    "allProducts": "Alle Produkte",
+    "searchProducts": "Produkte suchen...",
+    "applyFilter": "Filter anwenden",
+    "featuredOnly": "Nur Highlights",
+    "sortBy": "Sortieren nach"
+  },
+  "ContactPage": {
+    "title": "Kontaktieren Sie uns",
+    "subtitle": "Kontaktieren Sie uns für hochwertige Glasbeschlaglösungen",
+    "formTitle": "Senden Sie uns eine Nachricht",
+    "formDescription": "Füllen Sie das Formular aus und wir melden uns bald.",
+    "infoTitle": "Kontaktinformationen",
+    "address": "Adresse",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "businessHours": "Geschäftszeiten",
+    "businessHoursValue": "Montag - Freitag: 9:00 - 18:00 (GMT+8)",
+    "mapPlaceholder": "Die Karte wird hier integriert",
+    "followUs": "Folgen Sie uns"
+  },
+  "blog": {
+    "all": "alle"
+  }
+}

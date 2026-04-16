@@ -1,0 +1,43 @@
+{
+  "common": {
+    "loading": "Ładowanie...",
+    "error": "Błąd",
+    "viewAll": "Zobacz wszystko",
+    "learnMore": "Dowiedz się więcej",
+    "contactUs": "Skontaktuj się z nami"
+  },
+  "nav": {
+    "home": "Strona główna",
+    "products": "Produkty",
+    "services": "Usługi",
+    "about": "O nas",
+    "contact": "Kontakt",
+    "viewAllProducts": "Zobacz wszystkie produkty"
+  },
+  "shop": {
+    "viewDetails": "Zobacz szczegóły",
+    "sendInquiry": "Wyślij zapytanie",
+    "allProducts": "Wszystkie produkty",
+    "searchProducts": "Szukaj produktów...",
+    "applyFilter": "Zastosuj filtr",
+    "featuredOnly": "Tylko wyróżnione",
+    "sortBy": "Sortuj według"
+  },
+  "ContactPage": {
+    "title": "Skontaktuj się z nami",
+    "subtitle": "Skontaktuj się z nami w sprawie wysokiej jakości okuć do szkła",
+    "formTitle": "Wyślij nam wiadomość",
+    "formDescription": "Wypełnij poniższy formularz, a skontaktujemy się z Tobą tak szybko, jak to możliwe.",
+    "infoTitle": "Informacje kontaktowe",
+    "address": "Adres",
+    "email": "E-mail",
+    "phone": "Telefon",
+    "businessHours": "Godziny otwarcia",
+    "businessHoursValue": "Poniedziałek - Piątek: 9:00 - 18:00 (GMT+8)",
+    "mapPlaceholder": "Mapa zostanie tutaj zintegrowana",
+    "followUs": "Obserwuj nas"
+  },
+  "blog": {
+    "all": "wszystko"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "error": "Erro",
+    "viewAll": "Ver tudo",
+    "learnMore": "Saiba mais",
+    "contactUs": "Contate-nos"
+  },
+  "nav": {
+    "home": "Início",
+    "products": "Produtos",
+    "services": "Serviços",
+    "about": "Sobre nós",
+    "contact": "Contato",
+    "viewAllProducts": "Ver todos os produtos"
+  },
+  "shop": {
+    "viewDetails": "Ver detalhes",
+    "sendInquiry": "Enviar consulta",
+    "allProducts": "Todos os produtos",
+    "searchProducts": "Buscar produtos...",
+    "applyFilter": "Aplicar filtro",
+    "featuredOnly": "Apenas destaques",
+    "sortBy": "Ordenar por"
+  },
+  "ContactPage": {
+    "title": "Contate-nos",
+    "subtitle": "Entre em contato para soluções de ferragens de vidro de alta qualidade",
+    "formTitle": "Envie-nos uma mensagem",
+    "formDescription": "Preencha o formulário e responderemos em breve.",
+    "infoTitle": "Informações de contato",
+    "address": "Endereço",
+    "email": "E-mail",
+    "phone": "Telefone",
+    "businessHours": "Horário comercial",
+    "businessHoursValue": "Segunda - Sexta: 09:00 - 18:00 (GMT+8)",
+    "mapPlaceholder": "O mapa será integrado aqui",
+    "followUs": "Siga-nos"
+  },
+  "blog": {
+    "all": "tudo"
+  }
+}
