@@ -153,14 +153,14 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'description', labelKey: 'custom:translationCenter:description', type: 'textarea' },
   ],
   'knowledge-base-settings': [
-    { name: 'heroTitle', labelKey: 'Hero Tag Title', type: 'textarea' },
-    { name: 'navTitle', labelKey: 'Nav Tag Title', type: 'textarea' },
-    { name: 'shareConfig.title', labelKey: 'Share Title', type: 'textarea' },
-    { name: 'searchBox.placeholder', labelKey: 'Search Placeholder', type: 'textarea' },
-    { name: 'categoryList.title', labelKey: 'Category List Title', type: 'textarea' },
-    { name: 'recommendedPosts.title', labelKey: 'Recommended Blogs Title', type: 'textarea' },
-    { name: 'followUs.title', labelKey: 'Follow Us Title', type: 'textarea' },
-    { name: 'bottomRecommended.title', labelKey: 'Bottom Recommended Title', type: 'textarea' },
+    { name: 'heroTitle', labelKey: 'custom:translationCenter:heroTagTitle', type: 'textarea' },
+    { name: 'navTitle', labelKey: 'custom:translationCenter:navTagTitle', type: 'textarea' },
+    { name: 'shareConfig.title', labelKey: 'custom:translationCenter:shareTitle', type: 'textarea' },
+    { name: 'searchBox.placeholder', labelKey: 'custom:translationCenter:searchPlaceholder', type: 'textarea' },
+    { name: 'categoryList.title', labelKey: 'custom:translationCenter:categoryListTitle', type: 'textarea' },
+    { name: 'recommendedPosts.title', labelKey: 'custom:translationCenter:recommendedBlogsTitle', type: 'textarea' },
+    { name: 'followUs.title', labelKey: 'custom:translationCenter:followUsTitle', type: 'textarea' },
+    { name: 'bottomRecommended.title', labelKey: 'custom:translationCenter:bottomRecommendedTitle', type: 'textarea' },
   ],
 }
 
@@ -230,8 +230,8 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
     setStatusMessage(null)
     setModifiedLocales(new Set()) // 重置修改追踪
     try {
-      // 使用 Globals API endpoint 获取所有语言数据
-      const res = await fetch(`/api/globals/${globalSlug}/all-locales`)
+      // 使用自定义 API endpoint 获取所有语言数据，支持 locale: 'all'
+      const res = await fetch(`/api/custom-globals/${globalSlug}`)
 
       if (!res.ok) {
         throw new Error(`Failed to fetch: ${res.status}`)
@@ -476,54 +476,47 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
         return
       }
 
-      for (const localeCode of localesToSave) {
-        const locale = SUPPORTED_LOCALES.find(l => l.code === localeCode)
-        if (!locale) continue
+      // 准备批量更新数据
+      const bulkData: Record<string, any> = {
+        localesData: {}
+      }
 
+      for (const localeCode of localesToSave) {
         const dataToSave: Record<string, any> = {}
         for (const field of fieldsData) {
-          const value = field.values.find(v => v.locale === locale.code)?.value
+          const value = field.values.find(v => v.locale === localeCode)?.value
           if (value !== undefined) {
-            // Support nested fields like 'brandNameAnalysis.titlePart1'
+             // Support nested fields
             const fieldPath = field.config.name.split('.')
             if (fieldPath.length === 1) {
-              // Simple field
               dataToSave[field.config.name] = value
             } else {
-              // Nested field
               let current = dataToSave
               for (let i = 0; i < fieldPath.length - 1; i++) {
-                if (!current[fieldPath[i]]) {
-                  current[fieldPath[i]] = {}
-                }
+                if (!current[fieldPath[i]]) current[fieldPath[i]] = {}
                 current = current[fieldPath[i]]
               }
               current[fieldPath[fieldPath.length - 1]] = value
             }
           }
         }
-
-        // Globals 使用 POST 更新（Payload 不支持 PATCH）
-        const saveRes = await fetch(`/api/globals/${globalSlug}?locale=${locale.code}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(dataToSave),
-        })
-
-        if (saveRes.ok) {
-          successCount++
-        } else {
-          failCount++
-        }
+        bulkData.localesData[localeCode] = dataToSave
       }
 
-      if (failCount === 0) {
-        setStatusMessage({ type: 'success', key: 'custom:translationCenter:saveSuccess', params: { count: successCount } })
-        setModifiedLocales(new Set()) // 保存成功后清空修改追踪
+      const saveRes = await fetch(`/api/custom-globals/${globalSlug}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bulkData),
+      })
+
+      if (saveRes.ok) {
+        successCount = localesToSave.length
       } else {
-        setStatusMessage({ type: 'warning', key: 'custom:translationCenter:partialSave', params: { success: successCount, fail: failCount } })
+        throw new Error('Bulk save failed')
       }
 
+      setStatusMessage({ type: 'success', key: 'custom:translationCenter:saveSuccess', params: { count: successCount } })
+      setModifiedLocales(new Set()) // 保存成功后清空修改追踪
       window.dispatchEvent(new Event('multilocale-refresh'))
     } catch (error) {
       console.error('[GlobalTranslationCenter] Save error:', error)

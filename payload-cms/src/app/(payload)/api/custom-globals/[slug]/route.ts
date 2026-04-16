@@ -43,9 +43,14 @@ function cleanInternalFields(data: any): any {
   if (typeof data === 'object') {
     const newObj: any = {}
     for (const key in data) {
-      // Aggressively remove EVERY field starting with underscores
-      // ALSO remove 'id' from blocks as Payload might be picky about it in localized updates
-      if (key.startsWith('_') || key === 'id') {
+      if (key.startsWith('_')) {
+        // console.log(`[cleanInternalFields] Stripping: ${key}`)
+        continue
+      }
+      if (key === 'id') {
+        // Keep IDs for array items/blocks ONLY if they are strings or numbers
+        // Payload sometimes needs them for reconciliation, but let's try stripping them too
+        // since the error mentioned _locale and _parent_id specifically
         continue
       }
       newObj[key] = cleanInternalFields(data[key])
@@ -73,23 +78,43 @@ export async function PATCH(
       const locales = Object.keys(body.localesData)
       console.log(`[custom-globals PATCH] Bulk updating global "${slug}" for locales:`, locales)
       
-      const updatePromises = locales.map((loc, i) => {
-        // Clean data for each locale before updating
-        const cleanedData = cleanInternalFields(body.localesData[loc])
+      const results = []
+      for (const loc of locales) {
+        const data = body.localesData[loc]
         
-        // Log a sample for the first locale
-        if (i === 0 && cleanedData.sections && cleanedData.sections[0]) {
-          console.log(`[custom-globals PATCH] Sample cleaned block 0 keys for ${loc}:`, Object.keys(cleanedData.sections[0]))
+        // Fetch existing data for the SPECIFIC locale being updated
+        const existingLocaleDoc = await payload.findGlobal({
+          slug: slug as any,
+          locale: loc as any,
+          depth: 0,
+        })
+
+        // Merge existing data with new localized data
+        const mergedData = {
+          ...existingLocaleDoc,
+          ...data,
         }
         
-        return payload.updateGlobal({
+        // Deep merge groups to preserve non-translatable fields
+        for (const key in data) {
+          if (typeof data[key] === 'object' && data[key] !== null && !Array.isArray(data[key])) {
+            mergedData[key] = {
+              ...(existingLocaleDoc[key] || {}),
+              ...data[key]
+            }
+          }
+        }
+
+        const cleanedData = cleanInternalFields(mergedData)
+        
+        const result = await payload.updateGlobal({
           slug: slug as any,
           locale: loc as any,
           data: cleanedData,
         })
-      })
+        results.push(result)
+      }
 
-      await Promise.all(updatePromises)
       return NextResponse.json({ success: true, message: 'Bulk update successful' })
     }
 

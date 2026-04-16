@@ -80,6 +80,15 @@ export const customTranslationsEn = {
       name: 'Name',
       image: 'Image',
       icon: 'Icon',
+      // Knowledge Base Settings
+      heroTagTitle: 'Hero Tag Title',
+      navTagTitle: 'Nav Tag Title',
+      shareTitle: 'Share Title',
+      searchPlaceholder: 'Search Placeholder',
+      categoryListTitle: 'Category List Title',
+      recommendedBlogsTitle: 'Recommended Blogs Title',
+      followUsTitle: 'Follow Us Title',
+      bottomRecommendedTitle: 'Bottom Recommended Title',
     },
 
     // ========================================================================
@@ -470,6 +479,15 @@ export const customTranslationsZh = {
       name: '名称',
       image: '图片',
       icon: '图标',
+      // 知识库设置
+      heroTagTitle: 'Hero 标签标题',
+      navTagTitle: '导航标签标题',
+      shareTitle: '分享标题',
+      searchPlaceholder: '搜索占位符',
+      categoryListTitle: '分类列表标题',
+      recommendedBlogsTitle: '推荐博文标题',
+      followUsTitle: '关注我们标题',
+      bottomRecommendedTitle: '底部推荐标题',
     },
 
     // ========================================================================
