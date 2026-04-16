@@ -2,6 +2,7 @@ import type { Locale } from "@/i18n.config"
 import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 import Link from "next/link"
 import { useState, useEffect } from "react"
+import { IconifyIcon } from "@/components/ui/IconifyIcon"
 
 interface BlogTemplateProps {
   blog: any
@@ -17,20 +18,19 @@ export function BlogTemplateThree({ blog, locale, formatDate, config }: BlogTemp
   const [activeId, setActiveId] = useState<string>("")
   const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([])
 
-  // Configuration toggles
-  // Configuration toggles (Decentralized)
-  const showToc = config?.toc?.enabled && config?.toc?.templates?.includes('template3')
-  const showShare = config?.shareConfig?.enabled && config?.shareConfig?.templates?.includes('template3')
-  const showSearch = config?.searchBox?.enabled && config?.searchBox?.templates?.includes('template3')
-  const showCategoryList = config?.categoryList?.enabled && config?.categoryList?.templates?.includes('template3')
-  const showRecommended = config?.recommendedPosts?.enabled && config?.recommendedPosts?.templates?.includes('template3')
-  const showFollowUs = config?.followUs?.enabled && config?.followUs?.templates?.includes('template3')
+  // Configuration toggles (Safe access)
+  const showToc = !!(config?.toc?.enabled && config?.toc?.templates?.includes('template3'))
+  const showShare = !!(config?.shareConfig?.enabled && config?.shareConfig?.templates?.includes('template3'))
+  const showSearch = !!(config?.searchBox?.enabled && config?.searchBox?.templates?.includes('template3'))
+  const showCategoryList = !!(config?.categoryList?.enabled && config?.categoryList?.templates?.includes('template3'))
+  const showRecommended = !!(config?.recommendedPosts?.enabled && config?.recommendedPosts?.templates?.includes('template3'))
+  const showFollowUs = !!(config?.followUs?.enabled && config?.followUs?.templates?.includes('template3'))
 
   const showSidebar = showToc || showShare || showSearch || showCategoryList || showRecommended || showFollowUs
 
-  const showFooterCategories = config?.bottomCategories?.enabled && config?.bottomCategories?.templates?.includes('template3')
-  const showPagination = config?.pagination?.enabled && config?.pagination?.templates?.includes('template3')
-  const showFooterRecommended = config?.bottomRecommended?.enabled && config?.bottomRecommended?.templates?.includes('template3')
+  const showFooterCategories = !!(config?.bottomCategories?.enabled && config?.bottomCategories?.templates?.includes('template3'))
+  const showPagination = !!(config?.pagination?.enabled && config?.pagination?.templates?.includes('template3'))
+  const showFooterRecommended = !!(config?.bottomRecommended?.enabled && config?.bottomRecommended?.templates?.includes('template3'))
   
   const showFooter = showFooterCategories || showPagination || showFooterRecommended
 
@@ -95,7 +95,7 @@ export function BlogTemplateThree({ blog, locale, formatDate, config }: BlogTemp
 
             {/* Body Content */}
             <div id="blog-content" className="prose prose-lg max-w-none text-[#060C14]/80 leading-relaxed font-lexend-deca italic-none">
-              <LexicalRenderer content={blog.content} />
+              <LexicalRenderer content={blog.content} mediaData={blog.mediaData} />
             </div>
 
             {/* Social Share Buttons */}
@@ -142,6 +142,46 @@ export function BlogTemplateThree({ blog, locale, formatDate, config }: BlogTemp
               </div>
             </div>
 
+            {/* Bottom Content Footer (Categories & Pagination) */}
+            {(showFooterCategories || showPagination) && (
+              <div className="mt-20 pt-16 border-t border-gray-100 space-y-16">
+                
+                {/* Category Tags */}
+                {showFooterCategories && config.bottomCategories?.categories?.length > 0 && (
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                    {config.bottomCategories.categories.map((cat: any) => (
+                      <Link
+                        key={cat.id}
+                        href={`/${locale}/blog?category=${cat.slug || cat.id}`}
+                        className="px-6 py-2.5 rounded-full border border-gray-200 text-[11px] font-bold uppercase tracking-widest text-gray-500 hover:border-[#060C14] hover:text-[#060C14] transition-all"
+                      >
+                        {cat.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+
+                {/* Pagination (Previous / Next Post) */}
+                {showPagination && (blog.prevPost || blog.nextPost) && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {blog.prevPost ? (
+                       <Link href={`/${locale}/blog/${blog.prevPost.slug}`} className="group p-8 md:p-10 bg-white rounded-[32px] shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-10px_rgba(0,0,0,0.1)] transition-all">
+                          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#ff4848] block mb-4">Previous</span>
+                          <h4 className="text-xl md:text-2xl font-prata text-[#060C14] group-hover:text-[#ff4848] transition-colors leading-tight line-clamp-2">{blog.prevPost.title}</h4>
+                       </Link>
+                    ) : <div className="hidden md:block" />}
+                    
+                    {blog.nextPost ? (
+                       <Link href={`/${locale}/blog/${blog.nextPost.slug}`} className="group p-8 md:p-10 bg-white rounded-[32px] shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-10px_rgba(0,0,0,0.1)] transition-all text-right md:text-left xl:text-right">
+                          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#ff4848] block mb-4 xl:text-right">Next</span>
+                          <h4 className="text-xl md:text-2xl font-prata text-[#060C14] group-hover:text-[#ff4848] transition-colors leading-tight line-clamp-2">{blog.nextPost.title}</h4>
+                       </Link>
+                    ) : <div className="hidden md:block" />}
+                  </div>
+                )}
+              </div>
+            )}
+
           </div>
 
           {/* RIGHT COLUMN: Sidebar */}
@@ -165,7 +205,10 @@ export function BlogTemplateThree({ blog, locale, formatDate, config }: BlogTemp
               {/* Table of Contents */}
               {showToc && headings.length > 0 && (
                 <div className="p-8 bg-white rounded-3xl shadow-sm">
-                  <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-gray-400 mb-8 border-b border-gray-50 pb-4">Contents</h4>
+                  <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#060C14] mb-10 pb-4 border-b border-[#F0EBE6] flex items-center gap-4">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff4848]" />
+                    In this story
+                  </h4>
                   <nav className="space-y-5">
                     {headings.map((h) => (
                       <a
@@ -189,7 +232,10 @@ export function BlogTemplateThree({ blog, locale, formatDate, config }: BlogTemp
 
               {showCategoryList && config?.categoryList?.categories?.length > 0 && (
                 <div className="p-8 bg-white rounded-3xl shadow-sm">
-                  <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-gray-400 mb-8">{config.categoryList.title || 'Categories'}</h4>
+                  <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#060C14] mb-10 pb-4 border-b border-[#F0EBE6] flex items-center gap-4">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff4848]" />
+                    {config.categoryList.title || 'Categories'}
+                  </h4>
                   <ul className="space-y-4">
                     {config.categoryList.categories.map((cat: any) => (
                       <li key={cat.id}>
@@ -202,6 +248,52 @@ export function BlogTemplateThree({ blog, locale, formatDate, config }: BlogTemp
                       </li>
                     ))}
                   </ul>
+                </div>
+              )}
+
+              {/* Recommended Posts (Sidebar) */}
+              {showRecommended && config?.recommendedPosts?.posts?.length > 0 && (
+                <div className="p-8 bg-white rounded-3xl shadow-sm">
+                  <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#060C14] mb-10 pb-4 border-b border-[#F0EBE6] flex items-center gap-4">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff4848]" />
+                    {config.recommendedPosts.title || 'Recommended'}
+                  </h4>
+                  <div className="space-y-8">
+                    {config.recommendedPosts.posts.slice(0, 3).map((p: any) => (
+                      <Link key={p.id} href={`/${locale}/blog/${p.slug}`} className="group flex gap-4 items-start">
+                        <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 shadow-sm">
+                          <img src={p.coverImage?.url || p.coverImage} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="" />
+                        </div>
+                        <div className="space-y-1">
+                          <h5 className="text-sm font-bold leading-snug group-hover:text-[#ff4848] transition-colors line-clamp-2">{p.title}</h5>
+                          <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">{formatDate(p.publishedAt)}</span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Follow Us */}
+              {showFollowUs && config?.followUs?.socials?.length > 0 && (
+                <div className="p-8 bg-white rounded-3xl shadow-sm">
+                  <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#060C14] mb-10 pb-4 border-b border-[#F0EBE6] flex items-center gap-4">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff4848]" />
+                    {config.followUs.title || 'Follow Us'}
+                  </h4>
+                  <div className="flex flex-wrap gap-3">
+                    {config.followUs.socials.map((social: any, idx: number) => (
+                      <a 
+                        key={idx} 
+                        href={social.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 rounded-full border border-[#5d6b4a] flex items-center justify-center text-[#5d6b4a] hover:bg-[#060C14] hover:border-[#060C14] hover:text-white transition-all group shrink-0"
+                      >
+                         <IconifyIcon name={social.icon} size={18} />
+                      </a>
+                    ))}
+                  </div>
                 </div>
               )}
 

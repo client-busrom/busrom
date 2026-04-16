@@ -35,6 +35,7 @@ interface BlogDetailClientProps {
 }
 
 export function BlogDetailClient({ locale, slug }: BlogDetailClientProps) {
+  const [blog, setBlog] = useState<any>(null)
   const [config, setConfig] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -54,8 +55,8 @@ export function BlogDetailClient({ locale, slug }: BlogDetailClientProps) {
           blogData = getMockBlog(slug, locale)
         }
 
-        // 2. Fetch Settings
-        const configRes = await fetch(`/api/payload/globals/knowledge-base-settings?locale=${locale}`)
+        // 2. Fetch Settings (Increase depth to 2 to get post/category details)
+        const configRes = await fetch(`/api/payload/globals/knowledge-base-settings?locale=${locale}&depth=2`)
         if (configRes.ok) {
           const configData = await configRes.json()
           setConfig(configData)

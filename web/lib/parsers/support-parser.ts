@@ -179,7 +179,7 @@ export function parseSupportData(locale: string, rawData: any): SupportData {
     const ctaBtn = getNodeTotalText(extractAfterMarker(children, "hero-section-cta-btn")).trim();
 
     const imgNodes = extractAfterMarker(children, "hero-section-image");
-    const imgId = imgNodes.length > 0 && imgNodes[0].type === "singleImage" 
+    const imgId = imgNodes.length > 0 && (imgNodes[0].type === "singleImage" || imgNodes[0].type === "single-image")
        ? imgNodes[0].data?.image?.id 
        : null;
     const image = resolveMedia(imgId);
@@ -293,7 +293,7 @@ export function parseSupportData(locale: string, rawData: any): SupportData {
   const rightText = decoratorRightNodes.length > 0 ? getNodeTotalText(decoratorRightNodes[0]).trim() : "support";
   
   let decoratorImage = null;
-  const decImgNode = decoratorImageNodes.find(n => n.type === "image" || n.type === "singleImage");
+  const decImgNode = decoratorImageNodes.find(n => n.type === "image" || n.type === "singleImage" || n.type === "single-image");
   if (decImgNode) {
     decoratorImage = resolveMedia(decImgNode.type === "singleImage" ? decImgNode.data?.image?.id : decImgNode.image?.id);
   }
@@ -317,7 +317,7 @@ export function parseSupportData(locale: string, rawData: any): SupportData {
   }
 
   let remoteImage = null;
-  const remImgNode = remoteImageNodes.find(n => n.type === "singleImage" || n.type === "image");
+  const remImgNode = remoteImageNodes.find(n => n.type === "singleImage" || n.type === "single-image" || n.type === "image");
   if (remImgNode) {
     remoteImage = resolveMedia(remImgNode.type === "singleImage" ? remImgNode.data?.image?.id : (remImgNode as any).image?.id);
   }
@@ -409,7 +409,7 @@ export function parseSupportData(locale: string, rawData: any): SupportData {
     if (node.type === "carousel" && node.data?.slides) {
       contactImages.push(...node.data.slides.map((s: any) => resolveMedia(s.image?.id || s.image)).filter(Boolean));
     }
-    if (node.type === "custom-image-gallery" && node.data?.images) {
+    if ((node.type === "custom-image-gallery" || node.type === "imageGallery" || node.type === "image-gallery") && node.data?.images) {
       contactImages.push(...node.data.images.map((s: any) => resolveMedia(s.image?.id || s.image || s.media?.id || s.media)).filter(Boolean));
     }
   });

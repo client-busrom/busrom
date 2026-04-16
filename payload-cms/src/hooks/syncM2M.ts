@@ -16,12 +16,12 @@ export const syncM2M = (
     // Prevent infinite loop - Use unique key for context
     if (context.isSyncing) return doc
 
-    const sourceId = doc.id
-    const prevTargets = (previousDoc?.[sourceField] || []).map((t: any) => typeof t === 'object' ? t.id : (t?.id || t))
-    const nextTargets = (doc?.[sourceField] || []).map((t: any) => typeof t === 'object' ? t.id : (t?.id || t))
+    const sourceId = String(doc.id)
+    const prevTargets = (previousDoc?.[sourceField] || []).map((t: any) => String(typeof t === 'object' ? t.id : (t?.id || t)))
+    const nextTargets = (doc?.[sourceField] || []).map((t: any) => String(typeof t === 'object' ? t.id : (t?.id || t)))
 
-    const added = nextTargets.filter((id: any) => !prevTargets.includes(id))
-    const removed = prevTargets.filter((id: any) => !nextTargets.includes(id))
+    const added = nextTargets.filter((id: string) => !prevTargets.includes(id))
+    const removed = prevTargets.filter((id: string) => !nextTargets.includes(id))
 
     // Handle added targets: add this sourceId to their targetField
     for (const targetId of added) {
@@ -32,13 +32,13 @@ export const syncM2M = (
           depth: 0,
         })
         if (target) {
-          const currentLinks = (target[targetField] || []).map((l: any) => typeof l === 'object' ? l.id : (l?.id || l))
+          const currentLinks = (target[targetField] || []).map((l: any) => String(typeof l === 'object' ? l.id : (l?.id || l)))
           if (!currentLinks.includes(sourceId)) {
             await payload.update({
               collection: targetCollection as any,
               id: targetId,
               data: {
-                [targetField]: [...currentLinks, sourceId],
+                [targetField]: Array.from(new Set([...currentLinks, sourceId])),
               },
               context: { isSyncing: true },
             })
@@ -58,13 +58,13 @@ export const syncM2M = (
           depth: 0,
         })
         if (target) {
-          const currentLinks = (target[targetField] || []).map((l: any) => typeof l === 'object' ? l.id : (l?.id || l))
+          const currentLinks = (target[targetField] || []).map((l: any) => String(typeof l === 'object' ? l.id : (l?.id || l)))
           if (currentLinks.includes(sourceId)) {
             await payload.update({
               collection: targetCollection as any,
               id: targetId,
               data: {
-                [targetField]: currentLinks.filter((l: any) => l !== sourceId),
+                [targetField]: currentLinks.filter((l: string) => l !== sourceId),
               },
               context: { isSyncing: true },
             })
@@ -91,7 +91,8 @@ export const cleanupM2M = (
     // If we're already syncing, don't trigger cleanup that might cause loops
     if (context.isSyncing) return
 
-    const targets = (doc?.[sourceField] || []).map((t: any) => typeof t === 'object' ? t.id : (t?.id || t))
+    const sourceIdStr = String(sourceId)
+    const targets = (doc?.[sourceField] || []).map((t: any) => String(typeof t === 'object' ? t.id : (t?.id || t)))
 
     for (const targetId of targets) {
       try {
@@ -101,13 +102,13 @@ export const cleanupM2M = (
           depth: 0,
         })
         if (target) {
-          const currentLinks = (target[targetField] || []).map((l: any) => typeof l === 'object' ? l.id : (l?.id || l))
-          if (currentLinks.includes(sourceId)) {
+          const currentLinks = (target[targetField] || []).map((l: any) => String(typeof l === 'object' ? l.id : (l?.id || l)))
+          if (currentLinks.includes(sourceIdStr)) {
             await payload.update({
               collection: targetCollection as any,
               id: targetId,
               data: {
-                [targetField]: currentLinks.filter((l: any) => l !== sourceId),
+                [targetField]: currentLinks.filter((l: string) => l !== sourceIdStr),
               },
               context: { isSyncing: true },
             })

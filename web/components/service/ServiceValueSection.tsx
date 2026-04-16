@@ -246,7 +246,6 @@ export function ServiceValueSection({
     <section
       ref={containerRef}
       className="relative w-full overflow-hidden mt-[46px] lg:h-[48.020833vw]"
-      style={{ height: 'auto' } as any}
     >
       {/* ==================== Mobile Layout ==================== */}
       <div className="lg:hidden relative min-h-[500px] py-6">
