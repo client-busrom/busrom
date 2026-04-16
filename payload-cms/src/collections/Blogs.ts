@@ -284,10 +284,17 @@ export const Blogs: CollectionConfig = {
           fields: [
             {
               name: 'templateType',
-              type: 'select',
+              type: 'radio',
               label: {
                 en: 'Template Type',
                 zh: '使用模版类型',
+              },
+              admin: {
+                layout: 'horizontal',
+                description: {
+                  en: 'Select how the frontend will structurally render this blog post.',
+                  zh: '选择在前端显示知识库文章时应该调用的具体开发模版。',
+                },
               },
               required: true,
               defaultValue: 'template1',
@@ -296,12 +303,6 @@ export const Blogs: CollectionConfig = {
                 { label: { en: 'Template 2 (Minimal Review)', zh: '模版二 (极简测评风格)' }, value: 'template2' },
                 { label: { en: 'Template 3 (Corporate View)', zh: '模版三 (重型图文品牌风)' }, value: 'template3' },
               ],
-              admin: {
-                description: {
-                  en: 'Select how the frontend will structurally render this blog post.',
-                  zh: '选择在前端显示知识库文章时应该调用的具体开发模版。',
-                },
-              },
             },
           ],
         },
