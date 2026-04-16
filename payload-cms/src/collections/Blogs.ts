@@ -40,6 +40,67 @@ export const Blogs: CollectionConfig = {
     delete: ({ req }) => !!req.user,
   },
   hooks: {
+    beforeChange: [
+      ({ data, originalDoc }) => {
+        // If status is becoming 'published' and there's no publishedAt date set yet, set it to now
+        if (data.status === 'published' && !data.publishedAt && (!originalDoc || !originalDoc.publishedAt)) {
+          return {
+            ...data,
+            publishedAt: new Date().toISOString(),
+          }
+        }
+        return data;
+      }
+    ],
+    afterRead: [
+      async ({ doc, req, query }) => {
+        // Use publishedAt, fall back to createdAt
+        const referenceDate = doc.publishedAt || doc.createdAt;
+        if (!referenceDate || doc.status !== 'published') return doc;
+
+        const { payload, locale } = req;
+        
+        try {
+          const [prev, next] = await Promise.all([
+            payload.find({
+              collection: 'blogs',
+              where: {
+                and: [
+                  { publishedAt: { less_than: referenceDate } },
+                  { status: { equals: 'published' } }
+                ]
+              },
+              sort: '-publishedAt',
+              limit: 1,
+              locale,
+              depth: 0,
+              select: { title: true, slug: true, coverImage: true }
+            }),
+            payload.find({
+              collection: 'blogs',
+              where: {
+                and: [
+                  { publishedAt: { greater_than: referenceDate } },
+                  { status: { equals: 'published' } }
+                ]
+              },
+              sort: 'publishedAt',
+              limit: 1,
+              locale,
+              depth: 0,
+              select: { title: true, slug: true, coverImage: true }
+            })
+          ]);
+
+          doc.prevPost = prev.docs[0] || null;
+          doc.nextPost = next.docs[0] || null;
+        } catch (error) {
+          console.error('Error fetching blog pagination:', error);
+        }
+
+        return doc;
+      }
+    ],
     afterChange: [
       syncM2M('categories', 'blogPosts', 'categories'),
       syncM2M('blog-tags', 'blogs', 'tags'),

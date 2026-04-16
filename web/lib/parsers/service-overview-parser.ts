@@ -78,21 +78,40 @@ export interface ParsedServiceOverviewData {
 }
 
 // Logic extracted from ServiceOverviewTemplate.tsx
+const isMarkerNode = (node: any, markerId?: string): boolean => {
+  if (node.type !== "paragraph" && node.type !== "quote") return false;
+  const children = node.children || [];
+  return children.some((child: any) => {
+    const isCode = child.format === 16 || child.textFormat === 16;
+    const text = (child.text || "").trim();
+    return isCode && (markerId ? text === markerId : text.length > 0);
+  });
+};
+
 const extractAfterMarker = (children: any[], markerId: string): any[] => {
   let foundMarker = false;
   const result: any[] = [];
   for (const node of children) {
-    if (node.type === "paragraph" || node.type === "quote") {
-      const text = node.children?.[0]?.text || "";
-      if (text === markerId) {
+    if (!foundMarker) {
+      if (isMarkerNode(node, markerId)) {
         foundMarker = true;
-        continue;
       }
-      if (foundMarker && node.children?.[0]?.format === 16 && text.includes("-")) {
-        if (!text.startsWith(markerId + "-")) break;
-      }
+      continue;
     }
-    if (foundMarker) result.push(node);
+    
+    // Stop if we hit a different MAJOR marker (quote type usually defines a new section)
+    // or if we hit another paragraph marker that is definitely NOT related to the current search
+    if (isMarkerNode(node)) {
+      const text = (node.children?.find((c: any) => c.format === 16 || c.textFormat === 16)?.text || "").trim();
+      // If the marker text is different from what we are looking for and doesn't share the prefix, stop
+      if (text !== markerId && !text.startsWith(markerId.split('-')[0])) {
+        break;
+      }
+      // If it's a quote, it's always a new section
+      if (node.type === "quote" && text !== markerId) break;
+    }
+    
+    result.push(node);
   }
   return result;
 };
@@ -108,9 +127,9 @@ const extractCarouselAfterMarker = (children: any[], markerId: string, mediaData
           description: slide.description || "",
           caption: slide.caption || "",
           link: slide.link || "",
-          image: imageId && mediaData[imageId] ? {
-            ...mediaData[imageId],
-            url: convertToCDNUrl(mediaData[imageId].url)
+          image: imageId && (mediaData[imageId] || Object.values(mediaData).find((m: any) => String(m.id) === String(imageId))) ? {
+            ...(mediaData[imageId] || Object.values(mediaData).find((m: any) => String(m.id) === String(imageId))),
+            url: convertToCDNUrl((mediaData[imageId] || Object.values(mediaData).find((m: any) => String(m.id) === String(imageId))).url)
           } : null,
         };
       });
@@ -122,10 +141,11 @@ const extractCarouselAfterMarker = (children: any[], markerId: string, mediaData
 const extractImageAfterMarker = (children: any[], markerId: string, mediaData: Record<string, any>): MediaObject | null => {
   const nodesAfterMarker = extractAfterMarker(children, markerId);
   for (const node of nodesAfterMarker) {
-    if (node.type === "singleImage" && node.data?.image) {
+    if ((node.type === "singleImage" || node.type === "single-image") && node.data?.image) {
       const imageId = typeof node.data.image === "object" && node.data.image ? node.data.image.id : String(node.data.image || "");
-      if (imageId && mediaData[imageId]) {
-        const mediaObj = { ...mediaData[imageId], url: convertToCDNUrl(mediaData[imageId].url) };
+      const mediaInfo = mediaData[imageId] || Object.values(mediaData).find((m: any) => String(m.id) === String(imageId));
+      if (imageId && mediaInfo) {
+        const mediaObj = { ...mediaInfo, url: convertToCDNUrl(mediaInfo.url) };
         if (node.data.enableLink) {
           mediaObj.enableLink = true;
           mediaObj.linkUrl = node.data.linkUrl;
@@ -142,11 +162,12 @@ const extractGalleryImagesAfterMarker = (children: any[], markerId: string, medi
   const nodesAfterMarker = extractAfterMarker(children, markerId);
   const images: MediaObject[] = [];
   for (const node of nodesAfterMarker) {
-    if (node.type === "custom-image-gallery" && node.data?.images) {
+    if ((node.type === "custom-image-gallery" || node.type === "imageGallery" || node.type === "image-gallery") && node.data?.images) {
       for (const img of node.data.images) {
         const imageId = typeof img.image === "object" && img.image ? img.image.id : String(img.image || "");
-        if (imageId && mediaData[imageId]) {
-          const mediaObj = { ...mediaData[imageId], url: convertToCDNUrl(mediaData[imageId].url) };
+        const mediaInfo = mediaData[imageId] || Object.values(mediaData).find((m: any) => String(m.id) === String(imageId));
+        if (imageId && mediaInfo) {
+          const mediaObj = { ...mediaInfo, url: convertToCDNUrl(mediaInfo.url) };
           if (img.enableLink) {
             mediaObj.enableLink = true;
             mediaObj.linkUrl = img.linkUrl;
@@ -164,10 +185,33 @@ const extractGalleryImagesAfterMarker = (children: any[], markerId: string, medi
 const extractSectionTitle = (children: any[], sectionId: string): string | null => {
   let foundSection = false;
   for (const node of children) {
-    if (node.type === "quote") {
-      if ((node.children?.[0]?.text || "") === sectionId) { foundSection = true; continue; }
+    if (!foundSection) {
+      if (isMarkerNode(node, sectionId)) {
+        foundSection = true;
+      }
+      continue;
     }
-    if (foundSection && node.type === "heading") return node.children?.[0]?.text || null;
+    
+    // Skip other marker sub-nodes
+    if (isMarkerNode(node)) continue;
+    
+    if (node.type === "heading") return node.children?.[0]?.text || null;
+    
+    // Stop if we hit another section marker
+    if (node.type === "quote") break;
+  }
+  return null;
+};
+
+const extractCTAAfterMarker = (children: any[], markerId: string): { text: string, link: string } | null => {
+  const nodesAfterMarker = extractAfterMarker(children, markerId);
+  for (const node of nodesAfterMarker) {
+    if ((node.type === "ctaButton" || node.type === "linkJump") && node.data) {
+      return {
+        text: node.data.text || node.data.title || "Learn More",
+        link: node.data.url || node.data.linkUrl || "#"
+      };
+    }
   }
   return null;
 };
@@ -193,7 +237,7 @@ const extractItemImages = (children: any[], categoryIndex: number, itemIndex: nu
   const markerId = `brand-service-item-${categoryIndex + 1}-${itemIndex + 1}`;
   const nodesAfterMarker = extractAfterMarker(children, markerId);
   for (const node of nodesAfterMarker) {
-    if (node.type === "custom-image-gallery" && node.data?.images) {
+    if ((node.type === "custom-image-gallery" || node.type === "imageGallery" || node.type === "image-gallery") && node.data?.images) {
       return node.data.images.map((img: any) => {
         const imageId = typeof img.image === "object" && img.image ? img.image.id : String(img.image || "");
         return mediaData[imageId] ? {
@@ -309,18 +353,22 @@ export const parseServiceOverviewData = (pageContent: any): ParsedServiceOvervie
   const appLinkNodes = extractAfterMarker(contentChildren, "applications-fast-link");
   let link = "/applications", linkText = "VIEW MORE", appIds: string[] = [];
   for (const n of appLinkNodes) {
-    if (n.type === "fast-link") { linkText = n.data.title; link = n.data.link; }
-    if (n.type === "applicationCarousel") appIds = n.data.applications?.map((a: any) => typeof a === 'string' ? a : String(a.id)) || [];
+    if (n.type === "linkJump" || n.type === "fast-link") { 
+      linkText = n.data.title || n.data.text || "VIEW MORE"; 
+      link = n.data.url || n.data.linkUrl || "/applications"; 
+    }
+    if (n.type === "applicationCarousel") appIds = n.data.applications?.map((a: any) => typeof a === 'object' ? String(a.id) : String(a)) || [];
   }
   const applications = { titleLine1: t1, titleLine2: t2, highlightText: ht, viewMoreLink: link, viewMoreText: linkText, applicationIds: appIds };
 
   // 5. Simple CTA
+  const ctaBtnData = extractCTAAfterMarker(contentChildren, "simple-cta-button-button");
   const simpleCta = {
     title: extractTextAfterMarker(contentChildren, "simple-cta-title") || "Transform Ideas into Reality",
     description: extractTextAfterMarker(contentChildren, "simple-cta-description") || "Busrom's business scope...",
-    ctaText: extractTextAfterMarker(contentChildren, "simple-cta-text") || "Talk to Our Specialists...",
-    buttonText: extractTextAfterMarker(contentChildren, "simple-cta-button-text") || "Get Started",
-    buttonLink: extractTextAfterMarker(contentChildren, "simple-cta-button-link") || "/contact-us",
+    ctaText: extractTextAfterMarker(contentChildren, "simple-cta-button-description") || "Talk to Our Specialists...",
+    buttonText: ctaBtnData?.text || "Get Started",
+    buttonLink: ctaBtnData?.link || "/contact-us",
     images: extractGalleryImagesAfterMarker(contentChildren, "simple-cta-image", mediaData),
   };
 

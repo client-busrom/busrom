@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { convertToCDNUrl } from '@/lib/cdn-url'
+import { resolveAllMedia } from '@/lib/media-resolver'
 
 // Use runtime environment variable for server-side API calls
 const CMS_URL = process.env.CMS_GRAPHQL_URL
@@ -55,14 +56,14 @@ export async function GET(
     }
 
     // Transform blog data
-    const transformedBlog = {
+    const transformedBlog: any = {
       id: blog.id,
       slug: blog.slug,
       title: blog.title || '',
       excerpt: blog.excerpt || '',
       author: blog.author || 'Busrom Team',
       status: blog.status,
-      publishedAt: blog.publishedAt,
+      publishedAt: blog.publishedAt || blog.createdAt,
       createdAt: blog.createdAt,
       updatedAt: blog.updatedAt,
       coverImage: getCoverImageUrl(blog.coverImage),
@@ -73,6 +74,30 @@ export async function GET(
       content: blog.contentTranslation || null,
       templateType: blog.templateType || 'template1',
       locale,
+      // Include pagination data from afterRead hook
+      prevPost: blog.prevPost ? {
+        id: blog.prevPost.id,
+        slug: blog.prevPost.slug,
+        title: blog.prevPost.title,
+        coverImage: getCoverImageUrl(blog.prevPost.coverImage)
+      } : null,
+      nextPost: blog.nextPost ? {
+        id: blog.nextPost.id,
+        slug: blog.nextPost.slug,
+        title: blog.nextPost.title,
+        coverImage: getCoverImageUrl(blog.nextPost.coverImage)
+      } : null,
+    }
+
+    // Resolve mediaData for Lexical blocks
+    const normalize = (url: string) => {
+      if (!url) return ''
+      return url.startsWith('http') ? convertToCDNUrl(url) : convertToCDNUrl(`${CMS_URL}${url.startsWith('/') ? '' : '/'}${url}`)
+    }
+
+    if (transformedBlog.content) {
+      const { mediaData } = await resolveAllMedia(transformedBlog.content, CMS_URL, normalize)
+      transformedBlog.mediaData = mediaData
     }
 
     return NextResponse.json(transformedBlog)

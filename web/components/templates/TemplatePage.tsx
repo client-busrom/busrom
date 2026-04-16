@@ -126,7 +126,7 @@ export function TemplatePage({ locale, slug, template }: TemplatePageProps) {
 
         {pageContent.content && (
           <div className="prose prose-lg max-w-none">
-            <LexicalRenderer content={pageContent.content} />
+            <LexicalRenderer content={pageContent.content} mediaData={pageContent.mediaData} />
           </div>
         )}
 

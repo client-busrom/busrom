@@ -95,12 +95,13 @@ export const RelationshipPicker: React.FC<RelationshipPickerProps> = (props) => 
 
   const handleSelect = (item: RelationshipItem) => {
     if (hasMany) {
-      const currentIds = Array.isArray(value) ? value : []
-      if (currentIds.includes(item.id)) {
-        const nextValue = (currentIds as any[]).filter(id => id !== item.id)
+      const currentIds = (Array.isArray(value) ? value : []).map(id => String(id))
+      const itemIdStr = String(item.id)
+      if (currentIds.includes(itemIdStr)) {
+        const nextValue = currentIds.filter(id => id !== itemIdStr)
         onChange(nextValue.length > 0 ? nextValue : null)
       } else {
-        onChange([...currentIds, item.id])
+        onChange([...currentIds, itemIdStr])
       }
     } else {
       onChange(item.id)
@@ -110,8 +111,9 @@ export const RelationshipPicker: React.FC<RelationshipPickerProps> = (props) => 
 
   const handleRemove = (id: string | number) => {
     if (hasMany) {
-      const currentIds = Array.isArray(value) ? value : []
-      const nextValue = (currentIds as any[]).filter(v => v !== id)
+      const currentIds = (Array.isArray(value) ? value : []).map(v => String(v))
+      const idStr = String(id)
+      const nextValue = currentIds.filter(v => v !== idStr)
       onChange(nextValue.length > 0 ? nextValue : null)
     } else {
       onChange(null)
@@ -168,8 +170,8 @@ export const RelationshipPicker: React.FC<RelationshipPickerProps> = (props) => 
               ) : (
                 items.map((item) => {
                   const isSelected = Array.isArray(value) 
-                    ? (value as any[]).includes(item.id)
-                    : value === item.id
+                    ? (value as any[]).some(v => String(v) === String(item.id))
+                    : String(value) === String(item.id)
                   
                   return (
                     <div
