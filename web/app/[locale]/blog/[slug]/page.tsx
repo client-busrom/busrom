@@ -3,7 +3,12 @@ import { BlogDetailClient } from "./BlogDetailClient"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import { getPageMetadata } from "@/lib/api/seo-settings"
+import { getBlogBySlug, getBlogSettings } from "@/lib/api/blog"
 import type { Metadata } from "next"
+
+const CMS_URL = process.env.CMS_GRAPHQL_URL
+  ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
+  : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002')
 
 // Generate metadata for SEO
 export async function generateMetadata({
@@ -37,12 +42,18 @@ export default async function BlogDetailPage({
   const { locale, slug } = await params
   const path = `/blog/${slug}`
 
+  // 1. Fetch Blog Data server-side
+  const blogData = await getBlogBySlug(slug, locale)
+
+  // 2. Fetch Settings Data server-side
+  const configData = await getBlogSettings(locale)
+
   return (
     <>
       <PageScripts path={path} pageType="blog_detail" position="header" />
       <PageScripts path={path} pageType="blog_detail" position="body_start" />
       <PageSeoInjector path={path} pageType="blog_detail" locale={locale} />
-      <BlogDetailClient locale={locale} slug={slug} />
+      <BlogDetailClient locale={locale} slug={slug} blog={blogData} config={configData} />
       <PageScripts path={path} pageType="blog_detail" position="footer" />
     </>
   )

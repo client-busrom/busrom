@@ -32,50 +32,13 @@ interface BlogContent {
 interface BlogDetailClientProps {
   locale: Locale
   slug: string
+  blog: any
+  config: any
 }
 
-export function BlogDetailClient({ locale, slug }: BlogDetailClientProps) {
-  const [blog, setBlog] = useState<any>(null)
-  const [config, setConfig] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        
-        // 1. Fetch Blog
-        const blogRes = await fetch(`/api/blog/${slug}?locale=${locale}`)
-        let blogData = null
-        if (blogRes.ok) {
-          blogData = await blogRes.json()
-        } else {
-          blogData = getMockBlog(slug, locale)
-        }
-
-        // 2. Fetch Settings (Increase depth to 2 to get post/category details)
-        const configRes = await fetch(`/api/payload/globals/knowledge-base-settings?locale=${locale}&depth=2`)
-        if (configRes.ok) {
-          const configData = await configRes.json()
-          setConfig(configData)
-        }
-
-        if (blogData) {
-          setBlog(blogData)
-        } else {
-          setError("Blog post not found")
-        }
-      } catch (err) {
-        console.error("Error fetching blog data:", err)
-        setError("Failed to load blog data")
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
-  }, [locale, slug])
+export function BlogDetailClient({ locale, slug, blog, config }: BlogDetailClientProps) {
+  const loading = false;
+  const error = !blog ? "Blog post not found" : null;
 
   const formatDate = (dateString: string) => {
     if (!dateString) return ""
@@ -120,73 +83,4 @@ export function BlogDetailClient({ locale, slug }: BlogDetailClientProps) {
   }
 
   return <BlogTemplateOne blog={blog} locale={locale} formatDate={formatDate} config={config} />
-}
-
-function getMockBlog(slug: string, locale: string): BlogContent | null {
-  const mocks: Record<string, any> = {
-    'minimal-review-jules-style': {
-      id: 'jules-style',
-      title: 'Full Kitchen Tour | Intentional Organization, Design Inspo, & Favorite Products',
-      author: 'Jules Acree',
-      publishedAt: '2023-07-15T12:00:00Z',
-      categories: [{ name: 'Mindful Home' }],
-      templateType: 'template2',
-      coverImage: 'https://images.unsplash.com/photo-1556911220-e1502434938a?auto=format&fit=crop&q=80&w=1600',
-      content: {
-        root: {
-          children: [
-            {
-              type: 'paragraph',
-              children: [
-                { type: 'text', text: 'Welcome to my kitchen! I’m excited to dive in and do a full on, in-depth kitchen tour today.', version: 1 }
-              ],
-              version: 1
-            }
-          ]
-        }
-      }
-    },
-    'modern-architecture-reland-style': {
-      id: 'reland-style',
-      title: 'The Future of Modern Architecture: Reland\'s Innovative Approach',
-      author: 'S. Thompson',
-      publishedAt: '2024-03-20T10:00:00Z',
-      categories: [{ name: 'Architecture' }],
-      templateType: 'template3',
-      coverImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1600',
-      content: {
-        root: {
-          children: [
-            {
-              type: 'paragraph',
-              children: [
-                { type: 'text', text: 'Reland represents a shift in modern corporate identity. We don\'t just build spaces; we cultivate environments where ideas can breathe and structures can evolve.', version: 1 }
-              ],
-              version: 1
-            }
-          ]
-        }
-      }
-    }
-  }
-
-  const base = mocks[slug]
-  if (!base) return null
-
-  return {
-    id: 'mock-id',
-    slug,
-    title: base.title,
-    excerpt: 'Kitchen tour demonstration content showing intentional organization and design inspiration.',
-    author: base.author,
-    status: 'published',
-    publishedAt: base.publishedAt,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    coverImage: base.coverImage,
-    categories: base.categories,
-    templateType: base.templateType,
-    content: base.content,
-    locale
-  }
 }

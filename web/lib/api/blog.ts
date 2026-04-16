@@ -1,6 +1,10 @@
 import type { Locale } from "@/i18n.config"
+import { convertToCDNUrl } from "@/lib/cdn-url"
+import { resolveAllMedia } from "@/lib/media-resolver"
 
-const PAYLOAD_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://127.0.0.1:3002'
+const PAYLOAD_URL = process.env.CMS_GRAPHQL_URL
+  ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
+  : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3002')
 
 export async function getBlogSettings(locale: Locale) {
   try {
@@ -29,3 +33,81 @@ export async function getInitialBlogs(locale: Locale, limit = 10) {
     return []
   }
 }
+
+export async function getBlogBySlug(slug: string, locale: string) {
+  try {
+    const response = await fetch(
+      `${PAYLOAD_URL}/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&locale=${locale}&depth=2`,
+      { next: { revalidate: 60 } }
+    )
+
+    if (!response.ok) {
+      console.error('Payload API Error:', response.status, response.statusText)
+      return null
+    }
+
+    const data = await response.json()
+    const blogs = data?.docs || []
+
+    if (blogs.length === 0) {
+      return null
+    }
+
+    const blog = blogs[0]
+
+    const getCoverImageUrl = (coverImage: any): string => {
+      if (!coverImage) return ''
+      if (typeof coverImage === 'string') return coverImage
+      const url = coverImage.url || coverImage.sizes?.large?.url || ''
+      return url ? convertToCDNUrl(url) : ''
+    }
+
+    const transformedBlog: any = {
+      id: blog.id,
+      slug: blog.slug,
+      title: blog.title || '',
+      excerpt: blog.excerpt || '',
+      author: blog.author || 'Busrom Team',
+      status: blog.status,
+      publishedAt: blog.publishedAt || blog.createdAt,
+      createdAt: blog.createdAt,
+      updatedAt: blog.updatedAt,
+      coverImage: getCoverImageUrl(blog.coverImage),
+      categories: (blog.categories || []).map((cat: any) => ({
+        id: cat.id,
+        name: cat.name || '',
+      })),
+      content: blog.contentTranslation || null,
+      templateType: blog.templateType || 'template1',
+      locale,
+      prevPost: blog.prevPost ? {
+        id: blog.prevPost.id,
+        slug: blog.prevPost.slug,
+        title: blog.prevPost.title,
+        coverImage: getCoverImageUrl(blog.prevPost.coverImage)
+      } : null,
+      nextPost: blog.nextPost ? {
+        id: blog.nextPost.id,
+        slug: blog.nextPost.slug,
+        title: blog.nextPost.title,
+        coverImage: getCoverImageUrl(blog.nextPost.coverImage)
+      } : null,
+    }
+
+    const normalize = (url: string) => {
+      if (!url) return ''
+      return url.startsWith('http') ? convertToCDNUrl(url) : convertToCDNUrl(`${PAYLOAD_URL}${url.startsWith('/') ? '' : '/'}${url}`)
+    }
+
+    if (transformedBlog.content) {
+      const { mediaData } = await resolveAllMedia(transformedBlog.content, PAYLOAD_URL, normalize)
+      transformedBlog.mediaData = mediaData
+    }
+
+    return transformedBlog
+  } catch (error) {
+    console.error('API Error:', error)
+    return null
+  }
+}
+

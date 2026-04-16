@@ -11,6 +11,29 @@ import {
   EyoloScrollBadge,
 } from "@/components/blog/ReplicaAssets";
 
+const getReadTime = (content: any): number => {
+  if (!content?.root) return 3; // Default 3 min if empty
+  
+  let totalText = "";
+  const traverse = (node: any) => {
+    if (node.type === "text" && node.text) {
+      totalText += node.text + " ";
+    }
+    if (node.children && Array.isArray(node.children)) {
+      node.children.forEach(traverse);
+    }
+  };
+  traverse(content.root);
+  
+  // Count words: English words separated by space, plus CJK characters.
+  const wordCount = totalText.split(/\s+/).filter(Boolean).length;
+  const cjkChars = (totalText.match(/[\u4e00-\u9fa5]/g) || []).length;
+  
+  const totalWords = wordCount + cjkChars;
+  const readTime = Math.ceil(totalWords / 250); // Given ~250 WPM reading speed
+  return Math.max(1, readTime); // At least 1 min
+};
+
 export function BlogTemplateOne({
   blog,
   locale,
@@ -146,66 +169,63 @@ export function BlogTemplateOne({
       data-header-theme="light"
     >
       {/* 1. Post Header Info */}
-      <div id="post-header" className="py-16 sm:py-20 overflow-clip">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col lg:flex-row lg:flex-nowrap items-center">
-            <div className="lg:w-6/12 text-center lg:text-left">
-              <div className="mb-6 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-x-4 gap-y-1">
-                <Link
-                  href={`/${locale}/blog`}
-                  className="uppercase bg-white/10 border border-[#DCDBD0] rounded-md px-4 py-2 text-[10px] font-bold tracking-widest block text-[#ff4848] hover:text-white hover:bg-[#ff4848] transition-all duration-300 w-fit lg:mx-0"
-                >
-                  {blog.categories?.[0]?.name || "self-care"}
-                </Link>
-                <span className="font-extralight opacity-40">—</span>
-                <p className="text-gray-500 text-xs font-medium">
-                  {formatDate(blog.publishedAt)}
-                </p>
-              </div>
-
-              <h1 className="text-[29px] font-prata !leading-[1.4] mb-10 text-[#060C14]">
-                {blog.title}
-              </h1>
-
-              <ul className="flex flex-wrap items-center justify-center lg:justify-start gap-3 gap-y-1 uppercase text-[10px] font-bold tracking-[0.2em] text-[#060C14] mb-12">
-                <li className="flex items-center gap-2">
-                  <span className="text-gray-400 font-medium lowercase italic opacity-80">
-                    Author of the post -
-                  </span>
-                  <Link
-                    href="#"
-                    className="hover:text-[#ff4848] transition-all duration-300 underline underline-offset-4"
-                  >
-                    {blog.author?.name || "Kathryn Jackson"}
-                  </Link>
-                </li>
-                <li className="text-gray-300 opacity-40">•</li>
-                <li>03 MIN TO READ</li>
-              </ul>
-
-              <div className="flex items-center justify-center lg:justify-start gap-4 text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">
-                <span>— scroll down</span>
-                <span className="opacity-40">—</span>
-                <span>read more</span>
-              </div>
+      <div id="post-header" className="relative py-16 sm:py-32 overflow-x-clip">
+        <div className="container mx-auto px-6 relative z-10 flex flex-col lg:flex-row">
+          <div className="lg:w-5/12 text-center lg:text-left py-12 lg:py-0">
+            <div className="mb-6 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-x-4 gap-y-1">
+              <Link
+                href={`/${locale}/blog`}
+                className="uppercase bg-white/50 backdrop-blur-sm border border-[#DCDBD0] rounded-md px-4 py-2 text-[10px] font-bold tracking-widest block text-[#ff4848] hover:text-white hover:bg-[#ff4848] transition-all duration-300 w-fit lg:mx-0"
+              >
+                {blog.categories?.[0]?.name || "self-care"}
+              </Link>
+              <span className="font-extralight opacity-40">—</span>
+              <p className="text-gray-500 text-xs font-medium">
+                {formatDate(blog.publishedAt)}
+              </p>
             </div>
 
-            <div className="lg:w-8/12 w-full mt-12 lg:mt-0 lg:pl-12">
-              <div className="relative w-full aspect-[16/11]">
+            <h1 className="text-[40px] sm:text-[60px] font-prata !leading-[1.1] mb-10 text-[#060C14]">
+              {blog.title}
+            </h1>
+
+            <ul className="flex flex-wrap items-center justify-center lg:justify-start gap-4 gap-y-2 uppercase text-[10px] font-bold tracking-[0.2em] text-[#060C14] mb-12">
+              <li className="flex items-center gap-3">
                 <img
-                  className="rounded-3xl object-cover bg-dark/10 w-full h-full shadow-2xl"
                   src={
-                    blog.coverImage ||
-                    "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1200"
+                    blog.author?.avatar?.url ||
+                    "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=300&h=300&fit=crop"
                   }
-                  alt={blog.title}
+                  alt={blog.author?.name || "Kathryn Jackson"}
+                  className="w-6 h-6 rounded-full object-cover shadow-sm bg-[#DCDBD0]"
                 />
-                <EyoloCornerRound className="absolute bottom-0 left-0 z-20 rotate-90 w-6 h-6 text-white" />
-                <EyoloCornerRound className="absolute top-0 right-0 z-20 -rotate-90 w-6 h-6 text-white" />
-                <div className="absolute -bottom-10 left-3 lg:-left-12">
-                  <EyoloScrollBadge />
-                </div>
-              </div>
+                <Link
+                  href="#"
+                  className="hover:text-[#ff4848] transition-all duration-300 underline underline-offset-4"
+                >
+                  {blog.author?.name || "Kathryn Jackson"}
+                </Link>
+              </li>
+              <li className="text-gray-300 opacity-40">•</li>
+              <li>{getReadTime(blog.content)} MIN TO READ</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:right-0 lg:w-1/2 w-full mt-12 lg:mt-0 px-6 lg:px-0 z-0 pointer-events-none">
+          <div className="relative w-full aspect-[16/11] lg:aspect-[16/9]">
+            <img
+              className="lg:rounded-l-3xl rounded-3xl lg:rounded-r-none object-cover bg-dark/10 w-full h-full shadow-2xl pointer-events-auto"
+              src={
+                blog.coverImage ||
+                "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1200"
+              }
+              alt={blog.title}
+            />
+            <EyoloCornerRound className="absolute bottom-0 left-0 z-20 rotate-90 w-6 h-6 text-white" />
+            <EyoloCornerRound className="absolute top-0 right-0 z-20 -rotate-90 w-6 h-6 text-white lg:hidden" />
+            <div className="absolute -bottom-10 left-3 lg:-left-6 pointer-events-auto">
+              <EyoloScrollBadge />
             </div>
           </div>
         </div>
@@ -229,12 +249,14 @@ export function BlogTemplateOne({
               <div
                 id="post-content"
                 className="prose prose-lg max-w-none font-montserrat
-                prose-headings:font-montserrat prose-headings:font-extrabold prose-headings:text-[#060C14] prose-headings:!leading-tight
-                prose-h2:text-[26px] prose-h2:mt-16 prose-h2:mb-8
-                prose-p:text-[16px] prose-p:font-medium prose-p:text-gray-600 prose-p:leading-[1.8] prose-p:mb-8
-                prose-li:text-[16px] prose-li:font-medium prose-li:text-gray-600 prose-li:mb-2
-                prose-blockquote:border-0 prose-blockquote:p-0 prose-blockquote:my-16 
-                prose-blockquote:text-[24px] prose-blockquote:italic prose-blockquote:text-[#060C14] prose-blockquote:text-center prose-blockquote:mx-auto prose-blockquote:max-w-3xl"
+                prose-headings:font-montserrat prose-headings:font-extrabold prose-headings:text-[#060C14] prose-headings:!leading-[1.2]
+                prose-h2:text-[48px] prose-h2:mt-24 prose-h2:mb-10
+                prose-h3:text-[36px] prose-h3:mt-16 prose-h3:mb-8
+                prose-p:text-[20px] prose-p:font-medium prose-p:text-gray-600 prose-p:leading-[1.8] prose-p:mb-8
+                prose-li:text-[20px] prose-li:font-medium prose-li:text-gray-600 prose-li:mb-2
+                prose-strong:text-[24px] prose-strong:text-[#060C14] prose-strong:font-bold
+                prose-blockquote:border-0 prose-blockquote:p-0 prose-blockquote:my-20 
+                prose-blockquote:text-[29px] prose-blockquote:leading-[1.4] prose-blockquote:text-[#ff4848] prose-blockquote:text-center prose-blockquote:mx-auto prose-blockquote:max-w-4xl"
               >
                 {blog.content ? (
                   <LexicalRenderer
