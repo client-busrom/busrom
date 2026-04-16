@@ -124,6 +124,17 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'notificationSubject', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
     { name: 'autoReplySubject', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
   ],
+  'knowledge-base-settings': [
+    { name: 'heroTitle', labelKey: 'custom:translationCenter:heroText', type: 'textarea' },
+    { name: 'navTitle', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
+    { name: 'shareConfig.title', labelKey: 'custom:fields:title', type: 'textarea' },
+    { name: 'searchBox.placeholder', labelKey: 'custom:fields:placeholder', type: 'textarea' },
+    { name: 'categoryList.title', labelKey: 'custom:fields:title', type: 'textarea' },
+    { name: 'recommendedPosts.title', labelKey: 'custom:fields:title', type: 'textarea' },
+    { name: 'followUs.title', labelKey: 'custom:fields:title', type: 'textarea' },
+    { name: 'bottomCategories.title', labelKey: 'custom:fields:title', type: 'textarea' },
+    { name: 'bottomRecommended.title', labelKey: 'custom:fields:title', type: 'textarea' },
+  ],
 }
 
 interface FieldValue {
@@ -145,11 +156,13 @@ interface TranslationCenterProps {
 }
 
 export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
-  const { id, collectionSlug } = useDocumentInfo()
+  const { id, collectionSlug, globalSlug } = useDocumentInfo()
+  const activeSlug = collectionSlug || globalSlug
+  const isGlobal = !!globalSlug
   const currentLocale = useLocale()
   const { t, i18n } = useTranslation()
 
-  const fieldConfigs = collectionSlug ? TRANSLATABLE_FIELDS[collectionSlug] : []
+  const fieldConfigs = activeSlug ? TRANSLATABLE_FIELDS[activeSlug] : []
   const [formFields] = useAllFormFields()
 
   // 动态计算可翻译字段总数（展开数组字段为实际行数）
@@ -217,7 +230,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
 
   // 打开弹窗时加载数据
   const handleOpenModal = useCallback(async () => {
-    if (!id || !collectionSlug || !fieldConfigs || fieldConfigs.length === 0) return
+    if (!activeSlug || !fieldConfigs || fieldConfigs.length === 0 || (!isGlobal && !id)) return
 
     setIsModalOpen(true)
     setIsLoading(true)
@@ -226,7 +239,10 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
     const docId = String(id)
     try {
       // 使用自定义 endpoint 一次性获取所有语言数据
-      const res = await fetch(`/api/${collectionSlug}/${docId}/all-locales`)
+      const apiUrl = isGlobal 
+        ? `/api/globals/${activeSlug}/all-locales`
+        : `/api/${activeSlug}/${docId}/all-locales`
+      const res = await fetch(apiUrl)
 
       if (!res.ok) {
         throw new Error(`Failed to fetch: ${res.status}`)
@@ -499,7 +515,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
 
   // 保存
   const handleSave = useCallback(async () => {
-    if (!id || !collectionSlug || !fieldConfigs) return
+    if (!activeSlug || !fieldConfigs || (!isGlobal && !id)) return
 
     setIsSaving(true)
     setProgress({ current: 0, total: 1 }) // Will be updated
@@ -507,7 +523,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
 
     let successCount = 0
     let failCount = 0
-    const docId = String(id)
+    const docId = id ? String(id) : ''
 
     try {
       // 只保存修改过的语言
@@ -565,9 +581,10 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
         }
 
         // 获取源语言数据用于填充必填字段 + array field base data
-        const sourceRes = await fetch(
-          `/api/${collectionSlug}/${docId}?locale=${sourceLocale}&depth=0`
-        )
+        const dataUrl = isGlobal
+          ? `/api/globals/${activeSlug}?locale=${sourceLocale}&depth=0`
+          : `/api/${activeSlug}/${docId}?locale=${sourceLocale}&depth=0`
+        const sourceRes = await fetch(dataUrl)
         const sourceData = await sourceRes.json()
 
         // Merge array field updates: preserve all existing fields (images, id, etc.), only update translated sub-fields
@@ -593,8 +610,12 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
           }
         }
 
-        const saveRes = await fetch(`/api/${collectionSlug}/${docId}?locale=${locale.code}`, {
-          method: 'PATCH',
+        const saveUrl = isGlobal
+          ? `/api/globals/${activeSlug}?locale=${locale.code}`
+          : `/api/${activeSlug}/${docId}?locale=${locale.code}`
+        
+        const saveRes = await fetch(saveUrl, {
+          method: isGlobal ? 'POST' : 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(dataToSave),
         })
@@ -669,14 +690,19 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
     return `${icon} ${messages[status.key] || status.key}`
   }, [t, i18n])
 
-  if (!collectionSlug || !fieldConfigs || fieldConfigs.length === 0 || !id) {
+  // Check if button should be disabled
+  const isTriggerDisabled = !activeSlug || !fieldConfigs || fieldConfigs.length === 0 || (!isGlobal && !id)
+
+  console.log('[TranslationCenter Debug]', { activeSlug, isGlobal, id, fieldConfigsCount: fieldConfigs?.length, isTriggerDisabled })
+
+  if (isTriggerDisabled) {
     return (
       <div className="tc-trigger tc-trigger--disabled">
         <button type="button" disabled>
           {t('custom:translationCenter:triggerButton' as any)}
         </button>
         <span className="tc-trigger__hint">
-          {!id ? t('custom:translationCenter:saveFirst' as any) : t('custom:translationCenter:notAvailable' as any)}
+          {(!isGlobal && !id) ? t('custom:translationCenter:saveFirst' as any) : t('custom:translationCenter:notAvailable' as any)}
         </span>
       </div>
     )

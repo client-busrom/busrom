@@ -35,37 +35,45 @@ interface BlogDetailClientProps {
 }
 
 export function BlogDetailClient({ locale, slug }: BlogDetailClientProps) {
-  const [blog, setBlog] = useState<BlogContent | null>(null)
+  const [config, setConfig] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchBlog = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true)
         setError(null)
-        const res = await fetch(`/api/blog/${slug}?locale=${locale}`)
-        if (!res.ok) {
-          const mockData = getMockBlog(slug, locale)
-          if (mockData) {
-            setBlog(mockData)
-            return
-          }
-          if (res.status === 404) throw new Error("Blog post not found")
-          throw new Error(`Failed to fetch blog: ${res.statusText}`)
+        
+        // 1. Fetch Blog
+        const blogRes = await fetch(`/api/blog/${slug}?locale=${locale}`)
+        let blogData = null
+        if (blogRes.ok) {
+          blogData = await blogRes.json()
+        } else {
+          blogData = getMockBlog(slug, locale)
         }
-        const data = await res.json()
-        setBlog(data)
+
+        // 2. Fetch Settings
+        const configRes = await fetch(`/api/payload/globals/knowledge-base-settings?locale=${locale}`)
+        if (configRes.ok) {
+          const configData = await configRes.json()
+          setConfig(configData)
+        }
+
+        if (blogData) {
+          setBlog(blogData)
+        } else {
+          setError("Blog post not found")
+        }
       } catch (err) {
-        console.error("Error fetching blog:", err)
-        const mockData = getMockBlog(slug, locale)
-        if (mockData) setBlog(mockData)
-        else setError(err instanceof Error ? err.message : "Failed to load blog")
+        console.error("Error fetching blog data:", err)
+        setError("Failed to load blog data")
       } finally {
         setLoading(false)
       }
     }
-    fetchBlog()
+    fetchData()
   }, [locale, slug])
 
   const formatDate = (dateString: string) => {
@@ -103,14 +111,14 @@ export function BlogDetailClient({ locale, slug }: BlogDetailClientProps) {
   }
 
   if (blog.templateType === 'template2') {
-    return <BlogTemplateTwo blog={blog} locale={locale} formatDate={formatDate} />
+    return <BlogTemplateTwo blog={blog} locale={locale} formatDate={formatDate} config={config} />
   }
   
   if (blog.templateType === 'template3') {
-    return <BlogTemplateThree blog={blog} locale={locale} formatDate={formatDate} />
+    return <BlogTemplateThree blog={blog} locale={locale} formatDate={formatDate} config={config} />
   }
 
-  return <BlogTemplateOne blog={blog} locale={locale} formatDate={formatDate} />
+  return <BlogTemplateOne blog={blog} locale={locale} formatDate={formatDate} config={config} />
 }
 
 function getMockBlog(slug: string, locale: string): BlogContent | null {

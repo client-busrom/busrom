@@ -12,7 +12,7 @@ export { HomeContent } from './HomeContent'
 export { Footer } from './Footer'
 export { SiteConfig } from './SiteConfig'
 export { ShopPageConfig } from './ShopPageConfig'
-export { BlogPageConfig } from './BlogPageConfig'
+export { KnowledgeBaseSettings } from './KnowledgeBaseSettings'
 export { PreloaderConfig } from './PreloaderConfig'
 
 // Homepage Sections (按前端 HomePageClient.tsx 顺序排列)

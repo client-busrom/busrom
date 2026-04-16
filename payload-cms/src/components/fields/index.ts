@@ -6,3 +6,4 @@ export { MultiLocaleField, MultiLocaleTextField, MultiLocaleTextareaField } from
 export { MultiLocaleRichTextField } from './MultiLocaleRichTextField'
 export { GlobalTranslationCenter } from './GlobalTranslationCenter'
 export { MediaThumbnailCell } from './MediaThumbnailCell'
+export { RelationshipPicker } from './RelationshipPicker'
