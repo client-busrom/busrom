@@ -98,6 +98,14 @@ export const customTranslationsEn = {
       failed: 'failed',
       loadFailed: 'Failed to load form fields data',
     },
+    knowledgeSectionsTranslation: {
+      title: 'Knowledge Sections Translation',
+      trigger: 'Translate Sections Content',
+      triggerHint: 'Quickly translate all text content within blocks across all supported languages.',
+      saveAll: 'Save All Section Translations',
+      noFields: 'No translatable fields found in sections. Please save sections first.',
+      batchTranslate: 'Batch Translate Content',
+    },
 
     // ========================================================================
     // Auto Draft Component
@@ -225,6 +233,7 @@ export const customTranslationsEn = {
       PRODUCT_SERIES: 'Product Series',
       PAGE: 'Pages',
       BLOG: 'Blogs',
+      KNOWLEDGE_BASE_SETTINGS: 'KB Settings',
       APPLICATION: 'Applications',
       CATEGORY: 'Categories',
       FAQ_ITEM: 'FAQ Items',
@@ -267,12 +276,16 @@ export const customTranslationsEn = {
     // Permission Categories
     // ========================================================================
     permissionCategories: {
-      USER: 'User Management',
+      USER: 'Users & Access',
+      NAVIGATION: 'Navigation',
+      WEBSITE_PAGES: 'Website Pages',
+      PRODUCTS: 'Products',
       CONTENT: 'Content Management',
-      MEDIA: 'Media Management',
-      FORMS: 'Form Management',
-      HOMEPAGE: 'Homepage Management',
-      SYSTEM: 'System Configuration',
+      MEDIA: 'Media Library',
+      FORMS: 'Forms',
+      ADVANCED: 'Advanced',
+      WEBSITE_SETTINGS: 'Website Settings',
+      CMS_SETTINGS: 'CMS Settings',
     },
 
     // ========================================================================
@@ -361,6 +374,7 @@ export const customTranslationsEn = {
       categories: 'Categories',
       blogs: 'Blogs',
       blogTags: 'Blog Tags',
+      knowledgeBaseSettings: 'Knowledge Base Settings',
       applications: 'Applications',
       pages: 'Pages',
       homepageManager: 'Homepage Manager',
@@ -473,6 +487,14 @@ export const customTranslationsZh = {
       success: '成功',
       failed: '失败',
       loadFailed: '加载表单字段数据失败',
+    },
+    knowledgeSectionsTranslation: {
+      title: '页面拼板块翻译',
+      trigger: '翻译板块内容',
+      triggerHint: '快速在所有支持的语言中翻译块内的所有文本内容。',
+      saveAll: '保存所有板块翻译',
+      noFields: '未在板块中找到可翻译字段，请先保存板块。',
+      batchTranslate: '批量翻译内容',
     },
 
     // ========================================================================
@@ -600,7 +622,8 @@ export const customTranslationsZh = {
       PRODUCT: '产品',
       PRODUCT_SERIES: '产品系列',
       PAGE: '页面',
-      BLOG: '博客',
+      BLOG: '知识库',
+      KNOWLEDGE_BASE_SETTINGS: '知识库全局管理',
       APPLICATION: '应用案例',
       CATEGORY: '分类',
       FAQ_ITEM: '常见问题',
@@ -644,11 +667,15 @@ export const customTranslationsZh = {
     // ========================================================================
     permissionCategories: {
       USER: '用户与权限',
+      NAVIGATION: '导航管理',
+      WEBSITE_PAGES: '网站页面管理',
+      PRODUCTS: '产品管理',
       CONTENT: '内容管理',
       MEDIA: '媒体库',
       FORMS: '表单管理',
-      HOMEPAGE: '首页管理',
-      SYSTEM: '系统设置',
+      ADVANCED: '高级设置',
+      WEBSITE_SETTINGS: '网站设置',
+      CMS_SETTINGS: 'CMS 配置',
     },
 
     // ========================================================================
@@ -737,6 +764,7 @@ export const customTranslationsZh = {
       categories: '分类结构管理',
       blogs: '知识库',
       blogTags: '知识库标签管理',
+      knowledgeBaseSettings: '知识库全局管理',
       applications: '案例图集',
       pages: '页面',
       homepageManager: '首页管理',

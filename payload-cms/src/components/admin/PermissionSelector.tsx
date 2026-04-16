@@ -29,6 +29,8 @@ const CATEGORY_LABELS: Record<string, { en: string; zh: string }> = {
   ADVANCED: { en: "Advanced", zh: "高级设置" },
   WEBSITE_SETTINGS: { en: "Website Settings", zh: "网站设置" },
   CMS_SETTINGS: { en: "CMS Settings", zh: "CMS 配置" },
+  HOMEPAGE: { en: "Homepage (Legacy)", zh: "首页管理 (旧)" },
+  SYSTEM: { en: "System (Legacy)", zh: "系统设置 (旧)" },
 };
 // Resource labels mapping
 const RESOURCE_LABELS: Record<string, { en: string; zh: string }> = {
@@ -51,6 +53,7 @@ const RESOURCE_LABELS: Record<string, { en: string; zh: string }> = {
   PAGE: { en: "Pages", zh: "页面" },
   BLOG: { en: "Knowledge Base", zh: "知识库" },
   BLOG_TAG: { en: "KB Tags", zh: "知识库标签管理" },
+  KNOWLEDGE_BASE_SETTINGS: { en: "KB Settings", zh: "知识库全局管理" },
   AUTHOR: { en: "Authors", zh: "作者管理" },
   APPLICATION: { en: "Apps & Cases", zh: "案例图集" },
   CATEGORY: { en: "Category Structure", zh: "分类结构管理" },
@@ -102,6 +105,8 @@ const CATEGORY_ORDER = [
   "ADVANCED",
   "WEBSITE_SETTINGS",
   "CMS_SETTINGS",
+  "HOMEPAGE",
+  "SYSTEM",
 ];
 
 interface Permission {

@@ -142,6 +142,7 @@ import { SiteConfig } from './src/globals/SiteConfig'
 import { PreloaderConfig } from './src/globals/PreloaderConfig'
 import { SocialConfig } from './src/globals/SocialConfig'
 import { ShopPageConfig } from './src/globals/ShopPageConfig'
+import { KnowledgeBaseSettings } from './src/globals/KnowledgeBaseSettings'
 // Globals - Homepage Sections (ordered to match frontend)
 import { ProductSeriesCarousel } from './src/globals/ProductSeriesCarousel'
 import { ServiceFeatures } from './src/globals/ServiceFeatures'
@@ -280,6 +281,7 @@ export default buildConfig({
     PreloaderConfig,
     SocialConfig,
     ShopPageConfig,
+    KnowledgeBaseSettings,
     // Homepage Sections (ordered to match frontend HomePageClient.tsx)
     // Note: HeroBanner (1) and SeriesIntro (6) are Collections, not Globals
     ProductSeriesCarousel,  // 2

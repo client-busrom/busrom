@@ -72,6 +72,7 @@ import { InfoBox as InfoBox_b22e71a418305e9daff93fec26c20e4b } from '@/component
 import { default as default_8ac62ba4e71f0c3c16a780b7cf6afb1f } from '@/components/fields/MaintenancePanel'
 import { default as default_9a107ffbbe803e3cdf3dee39c142fca4 } from '@/components/fields/MediaArrayRowLabel'
 import { default as default_aef68a35a640877d18ec36dfae6830f7 } from '@/components/fields/SocialPlatformIcon'
+import { default as default_7ec45b627dc85426c7a5b3777a8024c0 } from '@/components/fields/MultilingualKnowledgeSections'
 import { default as default_eba90d60bdfe915607fa737bdb8554fb } from '@/components/fields/MultilingualCarouselItems'
 import { default as default_9870fd18da5f585b086dac7c5b924c68 } from '@/components/admin/CustomNav'
 import { Icon as Icon_a44df17d0fc3dcd873dae43dc3bf66bd } from '@/components/admin/Logo'
@@ -156,6 +157,7 @@ export const importMap = {
   "@/components/fields/MaintenancePanel#default": default_8ac62ba4e71f0c3c16a780b7cf6afb1f,
   "@/components/fields/MediaArrayRowLabel#default": default_9a107ffbbe803e3cdf3dee39c142fca4,
   "@/components/fields/SocialPlatformIcon#default": default_aef68a35a640877d18ec36dfae6830f7,
+  "@/components/fields/MultilingualKnowledgeSections#default": default_7ec45b627dc85426c7a5b3777a8024c0,
   "@/components/fields/MultilingualCarouselItems#default": default_eba90d60bdfe915607fa737bdb8554fb,
   "@/components/admin/CustomNav#default": default_9870fd18da5f585b086dac7c5b924c68,
   "@/components/admin/Logo#Icon": Icon_a44df17d0fc3dcd873dae43dc3bf66bd,

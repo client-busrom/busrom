@@ -29,6 +29,7 @@ const RESOURCES = [
   { value: 'PAGE', label: { en: 'Pages', zh: '页面' } },
   { value: 'BLOG', label: { en: 'Knowledge Base', zh: '知识库' } },
   { value: 'BLOG_TAG', label: { en: 'KB Tags', zh: '知识库标签管理' } },
+  { value: 'KNOWLEDGE_BASE_SETTINGS', label: { en: 'KB Settings', zh: '知识库全局管理' } },
   { value: 'AUTHOR', label: { en: 'Authors', zh: '作者管理' } },
   { value: 'APPLICATION', label: { en: 'Apps & Cases', zh: '案例图集' } },
   { value: 'CATEGORY', label: { en: 'Category Structure', zh: '分类结构管理' } },
@@ -75,12 +76,19 @@ const ACTIONS = [
 
 // Permission categories for grouping with i18n labels
 const CATEGORIES = [
-  { value: 'USER', label: { en: 'User Management', zh: '用户与权限' } },
+  { value: 'USER', label: { en: 'Users & Access', zh: '用户与权限' } },
+  { value: 'NAVIGATION', label: { en: 'Navigation', zh: '导航管理' } },
+  { value: 'WEBSITE_PAGES', label: { en: 'Website Pages', zh: '网站页面管理' } },
+  { value: 'PRODUCTS', label: { en: 'Products', zh: '产品管理' } },
   { value: 'CONTENT', label: { en: 'Content Management', zh: '内容管理' } },
-  { value: 'MEDIA', label: { en: 'Media Management', zh: '媒体库' } },
-  { value: 'FORMS', label: { en: 'Form Management', zh: '表单管理' } },
-  { value: 'HOMEPAGE', label: { en: 'Homepage Management', zh: '首页管理' } },
-  { value: 'SYSTEM', label: { en: 'System Configuration', zh: '系统设置' } },
+  { value: 'MEDIA', label: { en: 'Media Library', zh: '媒体库' } },
+  { value: 'FORMS', label: { en: 'Forms', zh: '表单管理' } },
+  { value: 'ADVANCED', label: { en: 'Advanced', zh: '高级设置' } },
+  { value: 'WEBSITE_SETTINGS', label: { en: 'Website Settings', zh: '网站设置' } },
+  { value: 'CMS_SETTINGS', label: { en: 'CMS Settings', zh: 'CMS 配置' } },
+  // Legacy categories to prevent migration errors
+  { value: 'HOMEPAGE', label: { en: 'Homepage (Legacy)', zh: '首页管理 (旧)' } },
+  { value: 'SYSTEM', label: { en: 'System (Legacy)', zh: '系统设置 (旧)' } },
 ] as const
 
 export const Permissions: CollectionConfig = {

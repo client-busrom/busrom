@@ -152,6 +152,16 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
     { name: 'description', labelKey: 'custom:translationCenter:description', type: 'textarea' },
   ],
+  'knowledge-base-settings': [
+    { name: 'heroTitle', labelKey: 'Hero Tag Title', type: 'textarea' },
+    { name: 'navTitle', labelKey: 'Nav Tag Title', type: 'textarea' },
+    { name: 'shareConfig.title', labelKey: 'Share Title', type: 'textarea' },
+    { name: 'searchBox.placeholder', labelKey: 'Search Placeholder', type: 'textarea' },
+    { name: 'categoryList.title', labelKey: 'Category List Title', type: 'textarea' },
+    { name: 'recommendedPosts.title', labelKey: 'Recommended Blogs Title', type: 'textarea' },
+    { name: 'followUs.title', labelKey: 'Follow Us Title', type: 'textarea' },
+    { name: 'bottomRecommended.title', labelKey: 'Bottom Recommended Title', type: 'textarea' },
+  ],
 }
 
 interface FieldValue {

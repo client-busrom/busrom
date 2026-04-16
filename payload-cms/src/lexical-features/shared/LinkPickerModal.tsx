@@ -31,6 +31,7 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
     { value: 'categories-blog', label: '知识库列表页分类', pathPrefix: '/blog', categoryType: 'BLOG' },
     { value: 'pages', label: '其他子页', pathPrefix: '' },
     { value: 'blogs', label: '知识库', pathPrefix: '/blog' },
+    { value: 'blog-tags', label: '知识库标签', pathPrefix: '/blog' },
   ]
 
   useEffect(() => {
@@ -89,6 +90,9 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
     if (collection.categoryType) {
       const slugValue = item.slug || item.id
       path = `${collection.pathPrefix}?category=${slugValue}`
+    } else if (selectedCollection === 'blog-tags') {
+      const slugValue = item.slug || item.id
+      path = `${collection.pathPrefix}?tag=${slugValue}`
     } else if (itemPath && typeof itemPath === 'string') {
       path = itemPath.startsWith('/') ? itemPath : `/${itemPath}`
     } else {
@@ -227,6 +231,8 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
                           const col = collections.find((c) => c.value === selectedCollection)
                           return col?.categoryType 
                             ? `${col.pathPrefix}?category=${item.slug}`
+                            : col?.value === 'blog-tags'
+                            ? `${col.pathPrefix}?tag=${item.slug}`
                             : `${col?.pathPrefix || ''}/${item.slug}`
                         })()}
                       </div>
