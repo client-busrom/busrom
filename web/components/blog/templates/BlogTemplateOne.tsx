@@ -113,19 +113,35 @@ export function BlogTemplateOne({
   if (showToc && blog.content?.root?.children) {
     const traverse = (nodes: any[]) => {
       for (const node of nodes) {
+        // 1. Direct Headings
         if (
           node.type === "heading" &&
           (node.tag === "h2" || node.tag === "h3")
         ) {
           const text = node.children?.map((c: any) => c.text).join("") || "";
           if (text) {
-            const id = text
-              .toLowerCase()
-              .replace(/\s+/g, "-")
-              .replace(/[^\w-]/g, "");
+            const id = text.toLowerCase().trim().replace(/\s+/g, "-");
             extractedToc.push({ id, title: text });
           }
         }
+        
+        // 2. Headings inside Blocks (Nested Content)
+        if (node.type === "block") {
+          const fields = node.fields || node.data || {};
+          // Fluid Layout / Float Layout
+          if (fields.content?.root?.children) {
+            traverse(fields.content.root.children);
+          }
+          // Two Columns
+          if (fields.leftColumn?.root?.children) {
+            traverse(fields.leftColumn.root.children);
+          }
+          if (fields.rightColumn?.root?.children) {
+            traverse(fields.rightColumn.root.children);
+          }
+        }
+
+        // 3. Regular Children Recursion
         if (node.children) {
           traverse(node.children);
         }
@@ -146,13 +162,13 @@ export function BlogTemplateOne({
     if (!showToc) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
+        // Find the first intersecting entry
+        const visibleEntry = entries.find(entry => entry.isIntersecting);
+        if (visibleEntry) {
+          setActiveSection(visibleEntry.target.id);
+        }
       },
-      { rootMargin: "-20% 0px -70% 0px" },
+      { rootMargin: "-80px 0px -80% 0px" },
     );
 
     tocItems.forEach((item: any) => {
