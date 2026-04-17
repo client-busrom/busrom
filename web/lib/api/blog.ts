@@ -10,7 +10,7 @@ export async function getBlogSettings(locale: Locale) {
   try {
     // Increased depth to 3 to ensure nested relationships (sections -> tags -> blogs -> images) are populated
     const res = await fetch(`${PAYLOAD_URL}/api/globals/knowledge-base-settings?locale=${locale}&depth=3`, {
-      cache: 'no-store'
+      next: { revalidate: 60 }
     })
     if (!res.ok) return null
     return await res.json()
@@ -23,7 +23,7 @@ export async function getBlogSettings(locale: Locale) {
 export async function getInitialBlogs(locale: Locale, limit = 10) {
   try {
     const res = await fetch(`${PAYLOAD_URL}/api/blogs?locale=${locale}&limit=${limit}&where[status][equals]=published`, {
-      cache: 'no-store'
+      next: { revalidate: 60 }
     })
     if (!res.ok) return []
     const data = await res.json()
