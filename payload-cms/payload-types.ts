@@ -77,11 +77,14 @@ export interface Config {
     'product-series': ProductSery;
     'product-attributes': ProductAttribute;
     'product-templates': ProductTemplate;
+    'product-reusable-blocks': ProductReusableBlock;
+    'series-templates': SeriesTemplate;
+    'series-reusable-blocks': SeriesReusableBlock;
     'hero-banner-items': HeroBannerItem;
     'series-intro-items': SeriesIntroItem;
     'navigation-menus': NavigationMenu;
-    pages: Page;
     authors: Author;
+    pages: Page;
     blogs: Blog;
     'blog-tags': BlogTag;
     applications: Application;
@@ -113,6 +116,9 @@ export interface Config {
     'product-series': {
       products: 'products';
     };
+    'template-categories': {
+      templates: 'document-templates';
+    };
   };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
@@ -125,11 +131,14 @@ export interface Config {
     'product-series': ProductSeriesSelect<false> | ProductSeriesSelect<true>;
     'product-attributes': ProductAttributesSelect<false> | ProductAttributesSelect<true>;
     'product-templates': ProductTemplatesSelect<false> | ProductTemplatesSelect<true>;
+    'product-reusable-blocks': ProductReusableBlocksSelect<false> | ProductReusableBlocksSelect<true>;
+    'series-templates': SeriesTemplatesSelect<false> | SeriesTemplatesSelect<true>;
+    'series-reusable-blocks': SeriesReusableBlocksSelect<false> | SeriesReusableBlocksSelect<true>;
     'hero-banner-items': HeroBannerItemsSelect<false> | HeroBannerItemsSelect<true>;
     'series-intro-items': SeriesIntroItemsSelect<false> | SeriesIntroItemsSelect<true>;
     'navigation-menus': NavigationMenusSelect<false> | NavigationMenusSelect<true>;
-    pages: PagesSelect<false> | PagesSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     blogs: BlogsSelect<false> | BlogsSelect<true>;
     'blog-tags': BlogTagsSelect<false> | BlogTagsSelect<true>;
     applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
@@ -215,6 +224,8 @@ export interface Config {
     'site-config': SiteConfig;
     'preloader-config': PreloaderConfig;
     'social-config': SocialConfig;
+    'shop-page-config': ShopPageConfig;
+    'knowledge-base-settings': KnowledgeBaseSetting;
     'product-series-carousel': ProductSeriesCarousel;
     'service-features': ServiceFeature;
     'sphere-3d': Sphere3D;
@@ -237,6 +248,8 @@ export interface Config {
     'site-config': SiteConfigSelect<false> | SiteConfigSelect<true>;
     'preloader-config': PreloaderConfigSelect<false> | PreloaderConfigSelect<true>;
     'social-config': SocialConfigSelect<false> | SocialConfigSelect<true>;
+    'shop-page-config': ShopPageConfigSelect<false> | ShopPageConfigSelect<true>;
+    'knowledge-base-settings': KnowledgeBaseSettingsSelect<false> | KnowledgeBaseSettingsSelect<true>;
     'product-series-carousel': ProductSeriesCarouselSelect<false> | ProductSeriesCarouselSelect<true>;
     'service-features': ServiceFeaturesSelect<false> | ServiceFeaturesSelect<true>;
     'sphere-3d': Sphere3DSelect<false> | Sphere3DSelect<true>;
@@ -430,12 +443,14 @@ export interface Permission {
     | 'PAGE'
     | 'BLOG'
     | 'BLOG_TAG'
+    | 'KNOWLEDGE_BASE_SETTINGS'
     | 'AUTHOR'
     | 'APPLICATION'
     | 'CATEGORY'
     | 'FAQ_ITEM'
     | 'REUSABLE_BLOCK'
     | 'DOCUMENT_TEMPLATE'
+    | 'TEMPLATE_CATEGORY'
     | 'NAVIGATION_MENU'
     | 'HERO_BANNER_ITEM'
     | 'MEDIA'
@@ -466,7 +481,22 @@ export interface Permission {
   /**
    * Group permissions by category
    */
-  category?: ('USER' | 'CONTENT' | 'MEDIA' | 'FORMS' | 'HOMEPAGE' | 'SYSTEM') | null;
+  category?:
+    | (
+        | 'USER'
+        | 'NAVIGATION'
+        | 'WEBSITE_PAGES'
+        | 'PRODUCTS'
+        | 'CONTENT'
+        | 'MEDIA'
+        | 'FORMS'
+        | 'ADVANCED'
+        | 'WEBSITE_SETTINGS'
+        | 'CMS_SETTINGS'
+        | 'HOMEPAGE'
+        | 'SYSTEM'
+      )
+    | null;
   /**
    * Optional description of what this permission allows
    */
@@ -674,13 +704,21 @@ export interface Product {
    */
   series?: (number | null) | ProductSery;
   /**
-   * Select the attribute/specification page for this product
+   * Primary category for this product (helps in filtering attributes and templates)
+   */
+  category?: (number | null) | Category;
+  /**
+   * Select the attribute/specification page for this product (filtered by category)
    */
   attributePage?: (number | null) | ProductAttribute;
   /**
-   * Select the rich text content template for this product
+   * Select the rich text content template for this product (filtered by category)
    */
   contentTemplate?: (number | null) | ProductTemplate;
+  /**
+   * Select a form to display in the main content section (overrides form-block in template)
+   */
+  linkedForm?: (number | null) | FormConfig;
   /**
    * Product list display image
    */
@@ -689,13 +727,22 @@ export interface Product {
    * Product detail page images (gallery with hover carousel)
    */
   mainImage?: (number | Media)[] | null;
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-  };
   status?: ('published' | 'draft' | 'archived') | null;
   isFeatured?: boolean | null;
+  /**
+   * Generic order for this document in all lists
+   */
   order?: number | null;
+  /**
+   * Toggle visibility of this product in the Shop gallery
+   */
+  shopVisibility?: boolean | null;
+  isHot?: boolean | null;
+  isNew?: boolean | null;
+  /**
+   * Higher number = appears first in the shop list
+   */
+  shopOrder?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -722,23 +769,9 @@ export interface ProductSery {
    */
   category?: (number | null) | Category;
   /**
-   * Rich text content - use language tabs above to switch locales
+   * Select the rich text content template for this series
    */
-  contentTranslation?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  seriesTemplate?: (number | null) | SeriesTemplate;
   /**
    * Main image for this series
    */
@@ -766,6 +799,7 @@ export interface ProductSery {
  */
 export interface Category {
   id: number;
+  fullTitle?: string | null;
   /**
    * Bilingual category name
    */
@@ -776,9 +810,13 @@ export interface Category {
   slug: string;
   type: 'PAGE' | 'PRODUCT' | 'BLOG' | 'APPLICATION' | 'FAQ';
   /**
-   * Parent category for hierarchical structure
+   * Parent category for hierarchical structure (filtered by same type)
    */
   parent?: (number | null) | Category;
+  /**
+   * Select existing categories to be sub-categories of this category
+   */
+  children?: (number | Category)[] | null;
   /**
    * Localized description of this category
    */
@@ -788,23 +826,45 @@ export interface Category {
    */
   order?: number | null;
   status?: ('published' | 'draft' | 'archived') | null;
+  showInShop?: boolean | null;
+  /**
+   * Determines the position of this category in the Shop top navigation
+   */
+  shopTabOrder?: number | null;
+  /**
+   * Manually manage and sort product links under this category for the Shop page. (Only products belonging to this category are shown)
+   */
+  shopProducts?: (number | Product)[] | null;
+  /**
+   * Manually manage and sort blog posts under this category. (Only blogs belonging to this category are shown)
+   */
+  blogPosts?: (number | Blog)[] | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-attributes".
+ * via the `definition` "blogs".
  */
-export interface ProductAttribute {
+export interface Blog {
   id: number;
   /**
-   * Internal name for identification (e.g., "Glass Standoff Standard Attributes")
+   * URL-friendly identifier (e.g., "how-to-install-glass-standoff")
    */
-  name: string;
+  slug: string;
+  title: string;
   /**
-   * Rich text for specific product attributes and highlights
+   * Short summary for previews
    */
-  productAttributes?: {
+  excerpt?: string | null;
+  /**
+   * Select the writer for this post
+   */
+  author: number | Author;
+  /**
+   * Rich text content - use language tabs above to switch locales
+   */
+  contentTranslation?: {
     root: {
       type: string;
       children: {
@@ -819,6 +879,118 @@ export interface ProductAttribute {
     };
     [k: string]: unknown;
   } | null;
+  coverImage?: (number | null) | Media;
+  /**
+   * Select blog categories
+   */
+  categories?: (number | Category)[] | null;
+  /**
+   * Assign tags to this blog post
+   */
+  tags?: (number | BlogTag)[] | null;
+  /**
+   * Select how the frontend will structurally render this blog post.
+   */
+  templateType: 'template1' | 'template2' | 'template3';
+  status?: ('published' | 'draft' | 'archived') | null;
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "authors".
+ */
+export interface Author {
+  id: number;
+  name: string;
+  role?: string | null;
+  avatar: number | Media;
+  bio?: string | null;
+  socialLinks?:
+    | {
+        platform: 'instagram' | 'linkedin' | 'twitter' | 'facebook' | 'pinterest' | 'youtube' | 'website';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Used for author profile pages
+   */
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-tags".
+ */
+export interface BlogTag {
+  id: number;
+  name: string;
+  /**
+   * URL-friendly identifier (e.g., "installation-guide")
+   */
+  slug: string;
+  /**
+   * Assign blogs to this tag. This relationship is shared with the Blogs collection.
+   */
+  blogs?: (number | Blog)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "series-templates".
+ */
+export interface SeriesTemplate {
+  id: number;
+  name: string;
+  category?: (number | null) | Category;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-attributes".
+ */
+export interface ProductAttribute {
+  id: number;
+  /**
+   * Internal name for identification (e.g., "Glass Standoff Standard Attributes")
+   */
+  name: string;
+  /**
+   * Associate this attribute page with a product category for easier filtering
+   */
+  category?: (number | null) | Category;
+  /**
+   * Excel-like grid for product attributes
+   */
+  productAttributes?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   /**
    * Product variants specifications (colors, sizes, etc.)
    */
@@ -831,13 +1003,17 @@ export interface ProductAttribute {
     | number
     | boolean
     | null;
+  /**
+   * Excel-like grid for custom additional attributes
+   */
   customAttributes?:
     | {
-        label: string;
-        value: string;
-        show?: boolean | null;
-        id?: string | null;
-      }[]
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
     | null;
   updatedAt: string;
   createdAt: string;
@@ -849,11 +1025,15 @@ export interface ProductAttribute {
 export interface ProductTemplate {
   id: number;
   /**
-   * Internal name for identification (e.g., "Glass Panel Connection Template")
+   * Internal name for this template (e.g., "Standard Glass Standoff Detail")
    */
   name: string;
   /**
-   * Rich text content for product details
+   * Associate this template with a product category for easier filtering
+   */
+  category?: (number | null) | Category;
+  /**
+   * Rich text content for product details (Forms should be linked in the Integration Page now)
    */
   content?: {
     root: {
@@ -870,6 +1050,188 @@ export interface ProductTemplate {
     };
     [k: string]: unknown;
   } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Configure dynamic form fields
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "form-configs".
+ */
+export interface FormConfig {
+  id: number;
+  /**
+   * e.g., "main-form", "footer-form", "contact-us-form"
+   */
+  name: string;
+  displayName?: string | null;
+  description?: string | null;
+  /**
+   * Only selected users (and super admins) will be able to see and manage submissions from this form.
+   */
+  assignedOperators?: (number | User)[] | null;
+  /**
+   * Configure dynamic form fields
+   */
+  fields?:
+    | {
+        /**
+         * Internal field name (e.g., "email", "company")
+         */
+        fieldName: string;
+        label: string;
+        placeholder?: string | null;
+        fieldType:
+          | 'text'
+          | 'email'
+          | 'phone'
+          | 'textarea'
+          | 'select'
+          | 'checkbox'
+          | 'radio'
+          | 'number'
+          | 'date'
+          | 'file'
+          | 'country';
+        options?:
+          | {
+              value: string;
+              label: string;
+              /**
+               * If checked, selecting this option will show a text input for the user to type manually.
+               */
+              hasCustomInput?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        /**
+         * Only for checkbox fields. When unchecked, checkbox acts as single-selection (like radio)
+         */
+        allowMultiple?: boolean | null;
+        required?: boolean | null;
+        width?: ('full' | 'half' | 'third') | null;
+        id?: string | null;
+      }[]
+    | null;
+  submitButtonText?: string | null;
+  submittingText?: string | null;
+  successMessage?: string | null;
+  errorRequiredFields?: string | null;
+  errorNetworkMessage?: string | null;
+  errorCaptchaMessage?: string | null;
+  /**
+   * Privacy consent text displayed below the submit button. Leave empty to hide.
+   */
+  privacyConsentText?: string | null;
+  rateLimitEnabled?: boolean | null;
+  /**
+   * Maximum submissions allowed from same IP within 1 hour
+   */
+  rateLimitPerIP?: number | null;
+  /**
+   * Maximum total submissions for this form per day (0 = unlimited)
+   */
+  rateLimitPerDay?: number | null;
+  /**
+   * Minimum seconds between submissions from same IP
+   */
+  minSubmitInterval?: number | null;
+  captchaEnabled?: boolean | null;
+  captchaTheme?: ('auto' | 'light' | 'dark') | null;
+  captchaSize?: ('normal' | 'compact') | null;
+  /**
+   * Choose whether to enable auto-reply for this form
+   */
+  autoReplyEnabled?: ('inherit' | 'enabled' | 'disabled') | null;
+  /**
+   * Leave empty to use SMTP config default
+   */
+  autoReplySubject?: string | null;
+  /**
+   * Leave empty to use SMTP config default. "Dear [Name]," is added automatically.
+   */
+  autoReplyTemplate?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  status?: ('published' | 'draft') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-reusable-blocks".
+ */
+export interface ProductReusableBlock {
+  id: number;
+  /**
+   * Unique identifier (e.g., "warranty-info", "shipping-details")
+   */
+  slug: string;
+  /**
+   * Associate this block with a product category
+   */
+  category?: (number | null) | Category;
+  title?: string | null;
+  /**
+   * Rich text content for this product block
+   */
+  contentTranslation?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  status?: ('published' | 'draft' | 'archived') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "series-reusable-blocks".
+ */
+export interface SeriesReusableBlock {
+  id: number;
+  slug: string;
+  category?: (number | null) | Category;
+  title?: string | null;
+  contentTranslation?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  status?: ('published' | 'draft' | 'archived') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -925,7 +1287,7 @@ export interface SeriesIntroItem {
   title?: string | null;
   description?: string | null;
   /**
-   * Choose manual selection (up to 5 images) or auto random by category/tags
+   * Choose manual selection, auto random by category/tags, or random from a Case Gallery (Application)
    */
   images?:
     | {
@@ -965,7 +1327,7 @@ export interface NavigationMenu {
    */
   parent?: (number | null) | NavigationMenu;
   /**
-   * External URL https://... or internal path /product, /service
+   * External URL https://... or internal path /product, /service. Click search icon to select internal items.
    */
   link?: string | null;
   /**
@@ -997,7 +1359,7 @@ export interface Page {
    */
   slug: string;
   /**
-   * Full URL path for frontend routing. e.g.: /service/one-stop-shop, /about-us/story
+   * Full URL path for frontend routing. e.g.: /service/one-stop-solution, /about-us/story
    */
   path: string;
   /**
@@ -1044,65 +1406,6 @@ export interface Page {
    */
   order?: number | null;
   author?: (number | null) | User;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blogs".
- */
-export interface Blog {
-  id: number;
-  /**
-   * URL-friendly identifier (e.g., "how-to-install-glass-standoff")
-   */
-  slug: string;
-  title: string;
-  /**
-   * Short summary for previews and SEO
-   */
-  excerpt?: string | null;
-  author?: string | null;
-  /**
-   * Rich text content - use language tabs above to switch locales
-   */
-  contentTranslation?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  coverImage?: (number | null) | Media;
-  /**
-   * Select blog categories
-   */
-  categories?: (number | Category)[] | null;
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-  };
-  status?: ('published' | 'draft' | 'archived') | null;
-  publishedAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blog-tags".
- */
-export interface BlogTag {
-  id: number;
-  name: string;
-  slug: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -1192,7 +1495,7 @@ export interface ReusableBlock {
    * Unique identifier (e.g., "cta-contact-us", "feature-quality")
    */
   slug: string;
-  blockType: 'CTA' | 'FEATURE' | 'TESTIMONIAL' | 'CONTACT' | 'PRODUCT' | 'CUSTOM';
+  blockType: 'CTA' | 'FEATURE' | 'TESTIMONIAL' | 'CONTACT' | 'CUSTOM';
   title?: string | null;
   subtitle?: string | null;
   /**
@@ -1281,6 +1584,14 @@ export interface TemplateCategory {
    */
   slug: string;
   order?: number | null;
+  /**
+   * Templates belonging to this category
+   */
+  templates?: {
+    docs?: (number | DocumentTemplate)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -1385,6 +1696,10 @@ export interface SeoSetting {
   exactPath?: string | null;
   pathPattern?: string | null;
   /**
+   * If checked, this item will provide the Meta Title and Description for the page. Other matching items will only be used for hidden long-tail keywords.
+   */
+  isMainSeo?: boolean | null;
+  /**
    * Override page title for SEO (50-60 characters recommended)
    */
   metaTitle?: string | null;
@@ -1440,116 +1755,6 @@ export interface SeoSetting {
   createdAt: string;
 }
 /**
- * Configure dynamic form fields
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "form-configs".
- */
-export interface FormConfig {
-  id: number;
-  /**
-   * e.g., "main-form", "footer-form", "contact-us-form"
-   */
-  name: string;
-  displayName?: string | null;
-  description?: string | null;
-  location: 'HOME_MAIN' | 'FOOTER' | 'CONTACT_US' | 'QUICK_INQUIRY' | 'CUSTOM';
-  /**
-   * Configure dynamic form fields
-   */
-  fields?:
-    | {
-        /**
-         * Internal field name (e.g., "email", "company")
-         */
-        fieldName: string;
-        label: string;
-        placeholder?: string | null;
-        fieldType:
-          | 'text'
-          | 'email'
-          | 'phone'
-          | 'textarea'
-          | 'select'
-          | 'checkbox'
-          | 'radio'
-          | 'number'
-          | 'date'
-          | 'file';
-        options?:
-          | {
-              value: string;
-              label: string;
-              /**
-               * If checked, selecting this option will show a text input for the user to type manually.
-               */
-              hasCustomInput?: boolean | null;
-              id?: string | null;
-            }[]
-          | null;
-        /**
-         * Only for checkbox fields. When unchecked, checkbox acts as single-selection (like radio)
-         */
-        allowMultiple?: boolean | null;
-        required?: boolean | null;
-        width?: ('full' | 'half' | 'third') | null;
-        order?: number | null;
-        id?: string | null;
-      }[]
-    | null;
-  submitButtonText?: string | null;
-  submittingText?: string | null;
-  successMessage?: string | null;
-  errorRequiredFields?: string | null;
-  errorNetworkMessage?: string | null;
-  errorCaptchaMessage?: string | null;
-  rateLimitEnabled?: boolean | null;
-  /**
-   * Maximum submissions allowed from same IP within 1 hour
-   */
-  rateLimitPerIP?: number | null;
-  /**
-   * Maximum total submissions for this form per day (0 = unlimited)
-   */
-  rateLimitPerDay?: number | null;
-  /**
-   * Minimum seconds between submissions from same IP
-   */
-  minSubmitInterval?: number | null;
-  captchaEnabled?: boolean | null;
-  captchaTheme?: ('auto' | 'light' | 'dark') | null;
-  captchaSize?: ('normal' | 'compact') | null;
-  /**
-   * Choose whether to enable auto-reply for this form
-   */
-  autoReplyEnabled?: ('inherit' | 'enabled' | 'disabled') | null;
-  /**
-   * Leave empty to use SMTP config default
-   */
-  autoReplySubject?: string | null;
-  /**
-   * Leave empty to use SMTP config default. Use {name}, {email}, {formName} as placeholders.
-   */
-  autoReplyTemplate?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  status?: ('published' | 'draft') | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * View and manage form submissions
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1565,6 +1770,10 @@ export interface FormSubmission {
    * Auto-populated from form config
    */
   formName?: string | null;
+  /**
+   * Assign this submission to a specific operator
+   */
+  assignedTo?: (number | null) | User;
   /**
    * All submitted form field values
    */
@@ -1604,6 +1813,14 @@ export interface FormSubmission {
    */
   sourcePage?: string | null;
   ipAddress?: string | null;
+  /**
+   * Resolved from IP address
+   */
+  country?: string | null;
+  /**
+   * Resolved from IP address
+   */
+  city?: string | null;
   userAgent?: string | null;
   /**
    * Internal notes about this submission
@@ -1615,6 +1832,14 @@ export interface FormSubmission {
   emailSent?: boolean | null;
   submittedAt?: string | null;
   readAt?: string | null;
+  /**
+   * Captured from the user browser
+   */
+  userLocalTime?: string | null;
+  /**
+   * Calculated as UTC+8
+   */
+  chinaTime?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1655,7 +1880,7 @@ export interface SmtpConfig {
   formConfigs?: (number | FormConfig)[] | null;
   notificationEnabled?: boolean | null;
   /**
-   * Comma-separated list of emails to notify on form submissions
+   * Enter emails separated by commas or newlines
    */
   notificationEmails?: string | null;
   /**
@@ -1667,11 +1892,11 @@ export interface SmtpConfig {
    */
   autoReplyEnabled?: boolean | null;
   /**
-   * Use {name}, {email}, {formName} as placeholders
+   * Email subject. Supports placeholders like {name}, {company}.
    */
   autoReplySubject?: string | null;
   /**
-   * Use {name}, {email}, {formName} as placeholders
+   * Write only the core message. "Dear [Name]," is added automatically at the top. {company}, {formName} are still available.
    */
   autoReplyTemplate?: {
     root: {
@@ -1873,6 +2098,18 @@ export interface PayloadLockedDocument {
         value: number | ProductTemplate;
       } | null)
     | ({
+        relationTo: 'product-reusable-blocks';
+        value: number | ProductReusableBlock;
+      } | null)
+    | ({
+        relationTo: 'series-templates';
+        value: number | SeriesTemplate;
+      } | null)
+    | ({
+        relationTo: 'series-reusable-blocks';
+        value: number | SeriesReusableBlock;
+      } | null)
+    | ({
         relationTo: 'hero-banner-items';
         value: number | HeroBannerItem;
       } | null)
@@ -1885,12 +2122,20 @@ export interface PayloadLockedDocument {
         value: number | NavigationMenu;
       } | null)
     | ({
+        relationTo: 'authors';
+        value: number | Author;
+      } | null)
+    | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
     | ({
         relationTo: 'blogs';
         value: number | Blog;
+      } | null)
+    | ({
+        relationTo: 'blog-tags';
+        value: number | BlogTag;
       } | null)
     | ({
         relationTo: 'applications';
@@ -2160,19 +2405,19 @@ export interface ProductsSelect<T extends boolean = true> {
   shortDescription?: T;
   description?: T;
   series?: T;
+  category?: T;
   attributePage?: T;
   contentTemplate?: T;
+  linkedForm?: T;
   showImage?: T;
   mainImage?: T;
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-      };
   status?: T;
   isFeatured?: T;
   order?: T;
+  shopVisibility?: T;
+  isHot?: T;
+  isNew?: T;
+  shopOrder?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2185,7 +2430,7 @@ export interface ProductSeriesSelect<T extends boolean = true> {
   name?: T;
   description?: T;
   category?: T;
-  contentTranslation?: T;
+  seriesTemplate?: T;
   featuredImage?: T;
   products?: T;
   status?: T;
@@ -2200,16 +2445,10 @@ export interface ProductSeriesSelect<T extends boolean = true> {
  */
 export interface ProductAttributesSelect<T extends boolean = true> {
   name?: T;
+  category?: T;
   productAttributes?: T;
   specifications?: T;
-  customAttributes?:
-    | T
-    | {
-        label?: T;
-        value?: T;
-        show?: T;
-        id?: T;
-      };
+  customAttributes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2219,7 +2458,45 @@ export interface ProductAttributesSelect<T extends boolean = true> {
  */
 export interface ProductTemplatesSelect<T extends boolean = true> {
   name?: T;
+  category?: T;
   content?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-reusable-blocks_select".
+ */
+export interface ProductReusableBlocksSelect<T extends boolean = true> {
+  slug?: T;
+  category?: T;
+  title?: T;
+  contentTranslation?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "series-templates_select".
+ */
+export interface SeriesTemplatesSelect<T extends boolean = true> {
+  name?: T;
+  category?: T;
+  content?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "series-reusable-blocks_select".
+ */
+export interface SeriesReusableBlocksSelect<T extends boolean = true> {
+  slug?: T;
+  category?: T;
+  title?: T;
+  contentTranslation?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2285,6 +2562,26 @@ export interface NavigationMenusSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "authors_select".
+ */
+export interface AuthorsSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  avatar?: T;
+  bio?: T;
+  socialLinks?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages_select".
  */
 export interface PagesSelect<T extends boolean = true> {
@@ -2317,12 +2614,8 @@ export interface BlogsSelect<T extends boolean = true> {
   contentTranslation?: T;
   coverImage?: T;
   categories?: T;
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-      };
+  tags?: T;
+  templateType?: T;
   status?: T;
   publishedAt?: T;
   updatedAt?: T;
@@ -2330,11 +2623,12 @@ export interface BlogsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blog_tags_select".
+ * via the `definition` "blog-tags_select".
  */
 export interface BlogTagsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
+  blogs?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2364,13 +2658,19 @@ export interface ApplicationsSelect<T extends boolean = true> {
  * via the `definition` "categories_select".
  */
 export interface CategoriesSelect<T extends boolean = true> {
+  fullTitle?: T;
   name?: T;
   slug?: T;
   type?: T;
   parent?: T;
+  children?: T;
   description?: T;
   order?: T;
   status?: T;
+  showInShop?: T;
+  shopTabOrder?: T;
+  shopProducts?: T;
+  blogPosts?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2428,6 +2728,7 @@ export interface TemplateCategoriesSelect<T extends boolean = true> {
   label?: T;
   slug?: T;
   order?: T;
+  templates?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2466,6 +2767,7 @@ export interface SeoSettingsSelect<T extends boolean = true> {
   pageType?: T;
   exactPath?: T;
   pathPattern?: T;
+  isMainSeo?: T;
   metaTitle?: T;
   metaDescription?: T;
   metaKeywords?: T;
@@ -2490,7 +2792,7 @@ export interface FormConfigsSelect<T extends boolean = true> {
   name?: T;
   displayName?: T;
   description?: T;
-  location?: T;
+  assignedOperators?: T;
   fields?:
     | T
     | {
@@ -2509,7 +2811,6 @@ export interface FormConfigsSelect<T extends boolean = true> {
         allowMultiple?: T;
         required?: T;
         width?: T;
-        order?: T;
         id?: T;
       };
   submitButtonText?: T;
@@ -2518,6 +2819,7 @@ export interface FormConfigsSelect<T extends boolean = true> {
   errorRequiredFields?: T;
   errorNetworkMessage?: T;
   errorCaptchaMessage?: T;
+  privacyConsentText?: T;
   rateLimitEnabled?: T;
   rateLimitPerIP?: T;
   rateLimitPerDay?: T;
@@ -2539,6 +2841,7 @@ export interface FormConfigsSelect<T extends boolean = true> {
 export interface FormSubmissionsSelect<T extends boolean = true> {
   formConfig?: T;
   formName?: T;
+  assignedTo?: T;
   data?: T;
   attachments?: T;
   totalAttachmentSize?: T;
@@ -2547,11 +2850,15 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
   locale?: T;
   sourcePage?: T;
   ipAddress?: T;
+  country?: T;
+  city?: T;
   userAgent?: T;
   adminNotes?: T;
   emailSent?: T;
   submittedAt?: T;
   readAt?: T;
+  userLocalTime?: T;
+  chinaTime?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2724,7 +3031,9 @@ export interface Footer {
     afterSalesEmail?: string | null;
     whatsappLabel?: string | null;
     whatsappNumber?: string | null;
+    addressLabel?: string | null;
     address?: string | null;
+    workingHoursLabel?: string | null;
     workingHours?: string | null;
   };
   officialNoticeGroup?: {
@@ -2926,6 +3235,119 @@ export interface SocialConfig {
         id?: string | null;
       }[]
     | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Independent management of the Shop gallery page, including category tabs and product display settings.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shop-page-config".
+ */
+export interface ShopPageConfig {
+  id: number;
+  /**
+   * Select and order the product categories to display in the Shop top navigation. (Only "Product" type categories are allowed)
+   */
+  categoryTabs: (number | Category)[];
+  showAllTab?: boolean | null;
+  pageSize?: number | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "knowledge-base-settings".
+ */
+export interface KnowledgeBaseSetting {
+  id: number;
+  status?: ('published' | 'draft') | null;
+  heroTitle?: string | null;
+  /**
+   * Left: Meta info, Right: Cover & Category
+   */
+  featuredPost?: (number | null) | Blog;
+  navTitle?: string | null;
+  showAll?: boolean | null;
+  kbCategoryTabs?: (number | Category)[] | null;
+  /**
+   * Configure content sections for all languages. Each language shares the same sections but has localized content.
+   */
+  sectionsData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  toc?: {
+    enabled?: boolean | null;
+    templates?: ('template1' | 'template2' | 'template3')[] | null;
+  };
+  shareConfig?: {
+    enabled?: boolean | null;
+    templates?: ('template1' | 'template2' | 'template3')[] | null;
+    title?: string | null;
+    networks?:
+      | {
+          icon?: string | null;
+          /**
+           * Use {{URL}} and {{TITLE}} as placeholders. Example: https://twitter.com/intent/tweet?url={{URL}}&text={{TITLE}}
+           */
+          url?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  searchBox?: {
+    enabled?: boolean | null;
+    templates?: ('template1' | 'template2' | 'template3')[] | null;
+    placeholder?: string | null;
+  };
+  categoryList?: {
+    enabled?: boolean | null;
+    templates?: ('template1' | 'template2' | 'template3')[] | null;
+    title?: string | null;
+    categories?: (number | Category)[] | null;
+  };
+  recommendedPosts?: {
+    enabled?: boolean | null;
+    templates?: ('template1' | 'template2' | 'template3')[] | null;
+    title?: string | null;
+    posts?: (number | Blog)[] | null;
+  };
+  followUs?: {
+    enabled?: boolean | null;
+    templates?: ('template1' | 'template2' | 'template3')[] | null;
+    title?: string | null;
+    socials?:
+      | {
+          icon?: string | null;
+          url?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  bottomCategories?: {
+    enabled?: boolean | null;
+    templates?: ('template1' | 'template2' | 'template3')[] | null;
+    categories?: (number | Category)[] | null;
+  };
+  /**
+   * Ordered by publish date
+   */
+  pagination?: {
+    enabled?: boolean | null;
+    templates?: ('template1' | 'template2' | 'template3')[] | null;
+  };
+  bottomRecommended?: {
+    enabled?: boolean | null;
+    templates?: ('template1' | 'template2' | 'template3')[] | null;
+    title?: string | null;
+    posts?: (number | Blog)[] | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -3258,10 +3680,6 @@ export interface CaseStudy {
 export interface BrandAnalysis {
   id: number;
   status?: ('published' | 'draft') | null;
-  /**
-   * Background image for the Brand Analysis section
-   */
-  backgroundImage?: (number | null) | Media;
   brandCenter?: {
     title?: string | null;
     description?: string | null;
@@ -3405,7 +3823,9 @@ export interface FooterSelect<T extends boolean = true> {
         afterSalesEmail?: T;
         whatsappLabel?: T;
         whatsappNumber?: T;
+        addressLabel?: T;
         address?: T;
+        workingHoursLabel?: T;
         workingHours?: T;
       };
   officialNoticeGroup?:
@@ -3492,6 +3912,112 @@ export interface SocialConfigSelect<T extends boolean = true> {
         icon?: T;
         order?: T;
         id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shop-page-config_select".
+ */
+export interface ShopPageConfigSelect<T extends boolean = true> {
+  categoryTabs?: T;
+  showAllTab?: T;
+  pageSize?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "knowledge-base-settings_select".
+ */
+export interface KnowledgeBaseSettingsSelect<T extends boolean = true> {
+  status?: T;
+  heroTitle?: T;
+  featuredPost?: T;
+  navTitle?: T;
+  showAll?: T;
+  kbCategoryTabs?: T;
+  sectionsData?: T;
+  toc?:
+    | T
+    | {
+        enabled?: T;
+        templates?: T;
+      };
+  shareConfig?:
+    | T
+    | {
+        enabled?: T;
+        templates?: T;
+        title?: T;
+        networks?:
+          | T
+          | {
+              icon?: T;
+              url?: T;
+              id?: T;
+            };
+      };
+  searchBox?:
+    | T
+    | {
+        enabled?: T;
+        templates?: T;
+        placeholder?: T;
+      };
+  categoryList?:
+    | T
+    | {
+        enabled?: T;
+        templates?: T;
+        title?: T;
+        categories?: T;
+      };
+  recommendedPosts?:
+    | T
+    | {
+        enabled?: T;
+        templates?: T;
+        title?: T;
+        posts?: T;
+      };
+  followUs?:
+    | T
+    | {
+        enabled?: T;
+        templates?: T;
+        title?: T;
+        socials?:
+          | T
+          | {
+              icon?: T;
+              url?: T;
+              id?: T;
+            };
+      };
+  bottomCategories?:
+    | T
+    | {
+        enabled?: T;
+        templates?: T;
+        categories?: T;
+      };
+  pagination?:
+    | T
+    | {
+        enabled?: T;
+        templates?: T;
+      };
+  bottomRecommended?:
+    | T
+    | {
+        enabled?: T;
+        templates?: T;
+        title?: T;
+        posts?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -3739,7 +4265,6 @@ export interface CaseStudiesSelect<T extends boolean = true> {
  */
 export interface BrandAnalysisSelect<T extends boolean = true> {
   status?: T;
-  backgroundImage?: T;
   brandCenter?:
     | T
     | {
@@ -4014,47 +4539,41 @@ export interface ContainerBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FluidLayoutBlock".
+ */
+export interface FluidLayoutBlock {
+  /**
+   * Side by Side is better for lists/grid feel. Float is better for stories where text wraps below the image.
+   */
+  layoutType?: ('sideBySide' | 'float') | null;
+  image: number | Media;
+  imagePosition?: ('left' | 'right') | null;
+  imageWidth?: ('25' | '33' | '40' | '50' | '60' | '75') | null;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'fluidLayout';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "auth".
  */
 export interface Auth {
   [k: string]: unknown;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "authors".
- */
-export interface Author {
-  id: number;
-  name: string;
-  role?: string | null;
-  avatar: number | Media;
-  bio?: string | null;
-  socialLinks?:
-    | {
-        platform: 'instagram' | 'linkedin' | 'twitter' | 'facebook' | 'pinterest' | 'youtube' | 'website';
-        url: string;
-        id?: string | null;
-      }[]
-    | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-}
-export interface AuthorsSelect<T extends boolean = true> {
-  name?: T;
-  role?: T;
-  avatar?: T;
-  bio?: T;
-  socialLinks?:
-    | T
-    | {
-        platform?: T;
-        url?: T;
-        id?: T;
-      };
-  slug?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 
 

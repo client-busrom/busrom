@@ -11,7 +11,6 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $getRoot, $insertNodes, COMMAND_PRIORITY_EDITOR, createCommand, LexicalCommand } from 'lexical'
 import { useEffect, useState } from 'react'
-import { useTranslation } from '@payloadcms/ui'
 
 export const INSERT_DOCUMENT_TEMPLATE_COMMAND: LexicalCommand<string> = createCommand(
   'INSERT_DOCUMENT_TEMPLATE_COMMAND'
@@ -30,7 +29,6 @@ interface DocumentTemplate {
 
 export function DocumentTemplatePlugin(): null {
   const [editor] = useLexicalComposerContext()
-  const { i18n } = useTranslation()
   const [templates, setTemplates] = useState<DocumentTemplate[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
