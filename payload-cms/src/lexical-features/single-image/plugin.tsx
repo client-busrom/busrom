@@ -5,9 +5,9 @@
 
 'use client'
 
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $insertNodeToNearestRoot } from '@lexical/utils'
-import { COMMAND_PRIORITY_EDITOR, createCommand, type LexicalCommand } from 'lexical'
+import { useLexicalComposerContext } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposerContext'
+import { $insertNodeToNearestRoot } from '@payloadcms/richtext-lexical/lexical/utils'
+import { COMMAND_PRIORITY_EDITOR, createCommand, type LexicalCommand } from '@payloadcms/richtext-lexical/lexical'
 import { useEffect } from 'react'
 
 import { $createSingleImageNode, type SingleImageData } from './node'

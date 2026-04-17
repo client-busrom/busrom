@@ -4,7 +4,7 @@
  * 图片画廊节点定义
  */
 
-import type { Spread } from 'lexical'
+import type { Spread } from '@payloadcms/richtext-lexical/lexical'
 import {
   DecoratorNode,
   type DOMConversionMap,
@@ -14,7 +14,7 @@ import {
   type LexicalNode,
   type NodeKey,
   type SerializedLexicalNode,
-} from 'lexical'
+} from '@payloadcms/richtext-lexical/lexical'
 import React from 'react'
 
 export interface ImageGalleryData {

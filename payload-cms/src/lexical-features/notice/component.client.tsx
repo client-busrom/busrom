@@ -6,8 +6,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $getNodeByKey } from 'lexical'
+import { useLexicalComposerContext } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposerContext'
+import { $getNodeByKey } from '@payloadcms/richtext-lexical/lexical'
 import { useTranslation } from '@payloadcms/ui'
 import { Info as InfoIcon, CheckCircle as SuccessIcon, AlertTriangle as WarningIcon, XCircle as ErrorIcon } from 'lucide-react'
 import type { NoticeData, NoticeType } from './node'

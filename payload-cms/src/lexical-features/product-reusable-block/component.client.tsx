@@ -7,8 +7,8 @@
 
 'use client'
 
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $getNodeByKey } from 'lexical'
+import { useLexicalComposerContext } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposerContext'
+import { $getNodeByKey } from '@payloadcms/richtext-lexical/lexical'
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from '@payloadcms/ui'
 import { ProductReusableBlockData, ProductReusableBlockNode } from './node'

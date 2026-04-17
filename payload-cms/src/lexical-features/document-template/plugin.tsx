@@ -8,8 +8,8 @@
 
 'use client'
 
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $getRoot, $insertNodes, COMMAND_PRIORITY_EDITOR, createCommand, LexicalCommand } from 'lexical'
+import { useLexicalComposerContext } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposerContext'
+import { $getRoot, $insertNodes, COMMAND_PRIORITY_EDITOR, createCommand, LexicalCommand } from '@payloadcms/richtext-lexical/lexical'
 import { useEffect, useState } from 'react'
 
 export const INSERT_DOCUMENT_TEMPLATE_COMMAND: LexicalCommand<string> = createCommand(

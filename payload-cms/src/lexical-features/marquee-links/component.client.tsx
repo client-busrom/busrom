@@ -5,8 +5,8 @@
 
 'use client'
 
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $getNodeByKey } from 'lexical'
+import { useLexicalComposerContext } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposerContext'
+import { $getNodeByKey } from '@payloadcms/richtext-lexical/lexical'
 import React, { useState, useEffect } from 'react'
 import { MarqueeLinksData, MarqueeLinksNode, MarqueeLink } from './node'
 import { X, Plus, Link as LinkIcon, GripVertical } from 'lucide-react'

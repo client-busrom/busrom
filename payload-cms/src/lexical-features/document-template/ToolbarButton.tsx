@@ -7,8 +7,8 @@
 
 'use client'
 
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $getRoot, $getSelection, $insertNodes } from 'lexical'
+import { useLexicalComposerContext } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposerContext'
+import { $getRoot, $getSelection, $insertNodes } from '@payloadcms/richtext-lexical/lexical'
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '@payloadcms/ui'

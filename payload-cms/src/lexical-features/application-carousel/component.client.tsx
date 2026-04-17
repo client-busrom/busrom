@@ -6,8 +6,8 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $getNodeByKey } from 'lexical'
+import { useLexicalComposerContext } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposerContext'
+import { $getNodeByKey } from '@payloadcms/richtext-lexical/lexical'
 import { useTranslation } from '@payloadcms/ui'
 import { ApplicationCarouselNode, ApplicationCarouselData } from './node'
 import { ChevronLeft, ChevronRight, Plus, Trash2, Image as ImageIcon, Search, X, Check } from 'lucide-react'

@@ -16,9 +16,9 @@ import type {
   NodeKey,
   SerializedLexicalNode,
   Spread,
-} from 'lexical'
+} from '@payloadcms/richtext-lexical/lexical'
 
-import { DecoratorNode } from 'lexical'
+import { DecoratorNode } from '@payloadcms/richtext-lexical/lexical'
 import * as React from 'react'
 
 export interface ProductCarouselItem {
