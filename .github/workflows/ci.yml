@@ -13,7 +13,7 @@ jobs:
   # ==================== Lint & Type Check ====================
   lint:
     name: Lint & Type Check
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -39,7 +39,7 @@ jobs:
   # ==================== Build Payload CMS ====================
   build-payload-cms:
     name: Build Payload CMS
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -63,7 +63,7 @@ jobs:
   # ==================== Build Web ====================
   build-web:
     name: Build Web
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -87,7 +87,7 @@ jobs:
   # ==================== Docker Build Test ====================
   docker-build:
     name: Docker Build Test
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
@@ -120,7 +120,7 @@ jobs:
   # ==================== Security Scan ====================
   security:
     name: Security Audit
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
