@@ -59,6 +59,9 @@ export function getCDNDomain(strategy?: string): string {
 export function convertToCDNUrl(url: string, strategy?: string): string {
   if (!url) return url
 
+  // Skip CDN conversion for local relative paths (e.g. /BusromFooterBg_original.webp)
+  if (url.startsWith('/')) return url
+
   try {
     const domain = getCDNDomain(strategy);
     const urlObj = new URL(url)
