@@ -30,7 +30,7 @@ jobs:
   # =============================================================================
   setup:
     name: Setup Deployment
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       environment: ${{ steps.set-env.outputs.environment }}
       deploy: ${{ steps.check.outputs.deploy }}
@@ -63,7 +63,7 @@ jobs:
   # =============================================================================
   build-payload-cms:
     name: Build & Push Payload CMS Image
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: setup
     if: needs.setup.outputs.deploy == 'true'
 
@@ -120,7 +120,7 @@ jobs:
   # =============================================================================
   build-web:
     name: Build & Push Web Image
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: setup
     if: needs.setup.outputs.deploy == 'true'
 
@@ -179,7 +179,7 @@ jobs:
   # =============================================================================
   deploy-payload-cms:
     name: Deploy Payload CMS to ECS
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [setup, build-payload-cms]
     environment: ${{ needs.setup.outputs.environment }}
 
@@ -257,7 +257,7 @@ jobs:
   # =============================================================================
   deploy-web:
     name: Deploy Web to ECS
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [setup, build-web]
     environment: ${{ needs.setup.outputs.environment }}
 
@@ -335,7 +335,7 @@ jobs:
   # =============================================================================
   health-check:
     name: Health Check & Cache Warmup
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [setup, deploy-payload-cms, deploy-web]
 
     steps:
