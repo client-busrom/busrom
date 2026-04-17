@@ -101,7 +101,9 @@ export const resolveAllMedia = async (content: any, cmsUrl: string, normalize: (
       // Standard Payload REST way: where[id][in][]=id1&where[id][in][]=id2
       const queryString = idsArr.map(id => `where[id][in][]=${id}`).join('&');
       
-      const res = await fetch(`${cmsUrl}/api/applications?${queryString}&limit=100&depth=2`);
+      const res = await fetch(`${cmsUrl}/api/applications?${queryString}&limit=100&depth=2`, {
+        next: { revalidate: 3600 }
+      });
       if (res.ok) {
         const data = await res.json();
         const docs = data.docs || [];
@@ -146,7 +148,9 @@ export const resolveAllMedia = async (content: any, cmsUrl: string, normalize: (
       const chunk = missingMediaIds.slice(i, i + chunkSize);
       try {
         const queryString = chunk.map(id => `where[id][in][]=${id}`).join('&');
-        const res = await fetch(`${cmsUrl}/api/media?${queryString}&limit=${chunkSize}&depth=1`);
+        const res = await fetch(`${cmsUrl}/api/media?${queryString}&limit=${chunkSize}&depth=1`, {
+          next: { revalidate: 3600 }
+        });
         if (res.ok) {
           const data = await res.json();
           (data.docs || []).forEach((doc: any) => {

@@ -8,6 +8,8 @@ import { fetchPageData } from "@/lib/api/pages"
 import { parseApplicationData } from "@/lib/parsers/application-parser"
 import { notFound } from "next/navigation"
 
+export const revalidate = 3600;
+
 export async function generateMetadata({
   params,
 }: {

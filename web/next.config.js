@@ -46,6 +46,7 @@ const nextConfig = {
    */
   output: 'standalone',
   compress: true,
+  staticPageGenerationTimeout: 300,
 
   /**
    * Internationalization (i18n)
