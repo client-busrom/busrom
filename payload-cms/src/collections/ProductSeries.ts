@@ -123,7 +123,6 @@ export const ProductSeries: CollectionConfig = {
             {
               name: 'seriesTemplate',
               type: 'relationship',
-              // @ts-expect-error - series-templates slug is valid but types need regeneration
               relationTo: 'series-templates',
               label: {
                 en: 'Series Template',

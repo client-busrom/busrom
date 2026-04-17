@@ -19,7 +19,8 @@ export const syncM2M = (
   targetField: string,
   sourceField: string
 ): CollectionAfterChangeHook => {
-  return async ({ doc, previousDoc, req: { payload, context } }) => {
+  return async ({ doc, previousDoc, req }) => {
+    const { payload, context } = req
     if (context.isSyncing) return doc
 
     const sourceId = doc.id
@@ -48,8 +49,8 @@ export const syncM2M = (
               },
               context: { isSyncing: true },
               depth: 0,
-              validate: false,
               overrideAccess: true,
+              req,
             })
           }
         }
@@ -78,8 +79,8 @@ export const syncM2M = (
               },
               context: { isSyncing: true },
               depth: 0,
-              validate: false,
               overrideAccess: true,
+              req,
             })
           }
         }
@@ -100,7 +101,8 @@ export const cleanupM2M = (
   targetField: string,
   sourceField: string
 ): CollectionAfterDeleteHook => {
-  return async ({ id: sourceId, doc, req: { payload, context } }) => {
+  return async ({ id: sourceId, doc, req }) => {
+    const { payload, context } = req
     if (context.isSyncing) return
 
     const sourceIdVal = sourceId
@@ -124,8 +126,8 @@ export const cleanupM2M = (
               },
               context: { isSyncing: true },
               depth: 0,
-              validate: false,
               overrideAccess: true,
+              req,
             })
           }
         }
