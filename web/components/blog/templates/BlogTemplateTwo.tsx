@@ -53,11 +53,10 @@ export function BlogTemplateTwo({ blog, locale, formatDate, config }: BlogTempla
 
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActiveId(entry.target.id)
-        })
+        const visibleEntry = entries.find((entry) => entry.isIntersecting);
+        if (visibleEntry) setActiveId(visibleEntry.target.id);
       },
-      { rootMargin: "-20% 0% -35% 0%" }
+      { rootMargin: "-80px 0% -80% 0%" },
     )
 
     document.querySelectorAll("#blog-content h1, #blog-content h2, #blog-content h3").forEach((h) => observer.observe(h))

@@ -952,12 +952,13 @@ const TwoColumnsBlock = ({ node }: any) => {
  * 2. float: True CSS float wrapping
  */
 const FluidLayoutBlock = ({ node }: any) => {
-  const { image, imagePosition, imageWidth, content } =
+  const { image, imagePosition, imageWidth, content, layoutType } =
     node.fields || node.data || {};
 
   const imageUrl = image?.url || "";
   const isRight = imagePosition === "right";
   const widthStr = imageWidth?.toString() || "40";
+  const isFloat = layoutType === "float";
 
   // Responsive width mapping
   const widthClass =
@@ -970,11 +971,48 @@ const FluidLayoutBlock = ({ node }: any) => {
       "75": "md:w-3/4",
     }[widthStr] || "md:w-2/5";
 
+  // Content width for sideBySide
+  const contentWidthClass =
+    {
+      "25": "md:w-3/4",
+      "33": "md:w-2/3",
+      "40": "md:w-3/5",
+      "50": "md:w-1/2",
+      "60": "md:w-2/5",
+      "75": "md:w-1/4",
+    }[widthStr] || "md:w-3/5";
+
+  if (isFloat) {
+    return (
+      <div className="flow-root my-10 clear-both">
+        {imageUrl && (
+          <div
+            className={`w-full ${widthClass} ${isRight ? "md:float-right md:ml-10" : "md:float-left md:mr-10"} mb-6 rounded-3xl overflow-hidden shadow-sm`}
+          >
+            <img
+              src={imageUrl}
+              alt={image?.alt || ""}
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        )}
+        {content && (
+          <div className="nested-content-wrapper">
+            <NestedLexicalRenderer content={content} />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // sideBySide (Flex layout with vertical centering)
   return (
-    <div className="flow-root my-10 clear-both">
+    <div
+      className={`flex flex-col ${isRight ? "md:flex-row-reverse" : "md:flex-row"} md:items-center gap-10 my-10`}
+    >
       {imageUrl && (
         <div
-          className={`w-full ${widthClass} ${isRight ? "md:float-right md:ml-10" : "md:float-left md:mr-10"} mb-6 rounded-3xl overflow-hidden shadow-sm`}
+          className={`w-full ${widthClass} flex-shrink-0 rounded-3xl overflow-hidden shadow-sm`}
         >
           <img
             src={imageUrl}
@@ -983,8 +1021,11 @@ const FluidLayoutBlock = ({ node }: any) => {
           />
         </div>
       )}
-      {/* Text content - removed block wrapper to allow wrapping */}
-      {content && <NestedLexicalRenderer content={content} />}
+      {content && (
+        <div className={`w-full ${contentWidthClass} nested-content-wrapper`}>
+          <NestedLexicalRenderer content={content} />
+        </div>
+      )}
     </div>
   );
 };
@@ -1215,8 +1256,8 @@ export const customConverters: JSXConverters = {
     const id = textContent
       ? textContent
           .toLowerCase()
+          .trim()
           .replace(/\s+/g, "-")
-          .replace(/[^\w-]/g, "")
       : undefined;
 
     return (
@@ -1233,8 +1274,8 @@ export const customConverters: JSXConverters = {
     const id = textContent
       ? textContent
           .toLowerCase()
+          .trim()
           .replace(/\s+/g, "-")
-          .replace(/[^\w-]/g, "")
       : undefined;
     return (
       <h1
@@ -1250,8 +1291,8 @@ export const customConverters: JSXConverters = {
     const id = textContent
       ? textContent
           .toLowerCase()
+          .trim()
           .replace(/\s+/g, "-")
-          .replace(/[^\w-]/g, "")
       : undefined;
     return (
       <h2
@@ -1267,8 +1308,8 @@ export const customConverters: JSXConverters = {
     const id = textContent
       ? textContent
           .toLowerCase()
+          .trim()
           .replace(/\s+/g, "-")
-          .replace(/[^\w-]/g, "")
       : undefined;
     return (
       <h3
@@ -1530,5 +1571,9 @@ function NestedLexicalRenderer({ content }: { content: any }) {
     },
   };
 
-  return <RichText data={content} converters={converters} />;
+  return (
+    <div className="nested-lexical-content">
+      <RichText data={content} converters={converters} />
+    </div>
+  );
 }

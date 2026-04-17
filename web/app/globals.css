@@ -759,3 +759,13 @@ select:-webkit-autofill:active {
   white-space: nowrap;
   border-width: 0;
 }
+/* ========== Lexical Renderer & Layout Fixes ========== */
+.nested-content-wrapper .nested-lexical-content *:first-child > *:first-child,
+.nested-content-wrapper .nested-lexical-content > *:first-child {
+  margin-top: 0 !important;
+}
+
+/* Ensure headings inside float layouts don't jump below the image */
+.flow-root h1, .flow-root h2, .flow-root h3 {
+  clear: none !important;
+}
