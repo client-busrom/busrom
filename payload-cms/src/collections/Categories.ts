@@ -379,13 +379,9 @@ export const Categories: CollectionConfig = {
         en: 'Product Links Management',
         zh: '属下产品链接管理',
       },
-      filterOptions: ({ id }) => {
-        if (!id) return true
-        return {
-          category: {
-            equals: id,
-          },
-        }
+      filterOptions: {
+        // Only allow products to be linked here
+        status: { equals: 'published' }
       },
       admin: {
         condition: (data) => data?.type === 'PRODUCT',
@@ -417,13 +413,9 @@ export const Categories: CollectionConfig = {
         en: 'Associated Blogs Management',
         zh: '属下知识库管理',
       },
-      filterOptions: ({ id }) => {
-        if (!id) return true
-        return {
-          categories: {
-            contains: id,
-          },
-        }
+      filterOptions: {
+        // Only allow blogs to be linked here
+        status: { in: ['published', 'draft'] }
       },
       admin: {
         condition: (data) => data?.type === 'BLOG',

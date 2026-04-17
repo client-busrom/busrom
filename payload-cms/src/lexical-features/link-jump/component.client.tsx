@@ -6,8 +6,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $getNodeByKey } from 'lexical'
+import { useLexicalComposerContext } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposerContext'
+import { $getNodeByKey } from '@payloadcms/richtext-lexical/lexical'
 import { useTranslation } from '@payloadcms/ui'
 import { Link as LinkIcon, ExternalLink } from 'lucide-react'
 import { getIconSvgUrl, normalizeIconName } from '../../components/fields/IconPicker/iconify-utils'

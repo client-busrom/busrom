@@ -12,9 +12,9 @@ import type {
   NodeKey,
   SerializedLexicalNode,
   Spread,
-} from 'lexical'
+} from '@payloadcms/richtext-lexical/lexical'
 
-import { DecoratorNode } from 'lexical'
+import { DecoratorNode } from '@payloadcms/richtext-lexical/lexical'
 import * as React from 'react'
 
 export type VideoAspectRatio = '16:9' | '4:3' | '1:1'

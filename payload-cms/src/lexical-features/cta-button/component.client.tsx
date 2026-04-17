@@ -6,8 +6,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $getNodeByKey } from 'lexical'
+import { useLexicalComposerContext } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposerContext'
+import { $getNodeByKey } from '@payloadcms/richtext-lexical/lexical'
 import { useTranslation } from '@payloadcms/ui'
 import { MousePointerClick as ClickIcon, Link as LinkIcon } from 'lucide-react'
 import type { CtaButtonData } from './node'

@@ -1,11 +1,18 @@
 import { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
 /**
+ * Helper to sanitize IDs and ensure they are valid for the database
+ */
+const sanitizeIds = (ids: any[]): (string | number)[] => {
+  return Array.from(new Set(
+    ids
+      .map((t: any) => (typeof t === 'object' ? (t?.id || t) : t))
+      .filter((id: any) => id !== null && id !== undefined && id !== '')
+  ))
+}
+
+/**
  * Synchronizes a Many-to-Many relationship between two collections.
- * 
- * @param targetCollection The slug of the other collection to sync with
- * @param targetField The field name in the other collection that stores references to this collection
- * @param sourceField The field name in this collection that stores references to the other collection
  */
 export const syncM2M = (
   targetCollection: string,
@@ -13,17 +20,16 @@ export const syncM2M = (
   sourceField: string
 ): CollectionAfterChangeHook => {
   return async ({ doc, previousDoc, req: { payload, context } }) => {
-    // Prevent infinite loop - Use unique key for context
     if (context.isSyncing) return doc
 
-    const sourceId = String(doc.id)
-    const prevTargets = (previousDoc?.[sourceField] || []).map((t: any) => String(typeof t === 'object' ? t.id : (t?.id || t)))
-    const nextTargets = (doc?.[sourceField] || []).map((t: any) => String(typeof t === 'object' ? t.id : (t?.id || t)))
+    const sourceId = doc.id
+    const prevTargets = sanitizeIds(previousDoc?.[sourceField] || [])
+    const nextTargets = sanitizeIds(doc?.[sourceField] || [])
 
-    const added = nextTargets.filter((id: string) => !prevTargets.includes(id))
-    const removed = prevTargets.filter((id: string) => !nextTargets.includes(id))
+    const added = nextTargets.filter((id: any) => !prevTargets.includes(id))
+    const removed = prevTargets.filter((id: any) => !nextTargets.includes(id))
 
-    // Handle added targets: add this sourceId to their targetField
+    // Handle added targets
     for (const targetId of added) {
       try {
         const target = await payload.findByID({
@@ -32,24 +38,28 @@ export const syncM2M = (
           depth: 0,
         })
         if (target) {
-          const currentLinks = (target[targetField] || []).map((l: any) => String(typeof l === 'object' ? l.id : (l?.id || l)))
+          const currentLinks = sanitizeIds(target[targetField] || [])
           if (!currentLinks.includes(sourceId)) {
             await payload.update({
               collection: targetCollection as any,
               id: targetId,
               data: {
-                [targetField]: Array.from(new Set([...currentLinks, sourceId])),
+                [targetField]: [...currentLinks, sourceId],
               },
               context: { isSyncing: true },
+              depth: 0,
+              validate: false,
+              overrideAccess: true,
             })
           }
         }
-      } catch (e) {
-        console.error(`Sync error (added) in ${targetCollection}/${targetId}:`, e)
+      } catch (e: any) {
+        console.error(`[syncM2M] ❌ FAILED to link ${targetCollection}/${targetId}:`, e.message)
+        if (e.data?.errors) console.error('Validation errors:', JSON.stringify(e.data.errors, null, 2))
       }
     }
 
-    // Handle removed targets: remove this sourceId from their targetField
+    // Handle removed targets
     for (const targetId of removed) {
       try {
         const target = await payload.findByID({
@@ -58,20 +68,23 @@ export const syncM2M = (
           depth: 0,
         })
         if (target) {
-          const currentLinks = (target[targetField] || []).map((l: any) => String(typeof l === 'object' ? l.id : (l?.id || l)))
+          const currentLinks = sanitizeIds(target[targetField] || [])
           if (currentLinks.includes(sourceId)) {
             await payload.update({
               collection: targetCollection as any,
               id: targetId,
               data: {
-                [targetField]: currentLinks.filter((l: string) => l !== sourceId),
+                [targetField]: currentLinks.filter((l: any) => l !== sourceId),
               },
               context: { isSyncing: true },
+              depth: 0,
+              validate: false,
+              overrideAccess: true,
             })
           }
         }
-      } catch (e) {
-        console.error(`Sync error (removed) in ${targetCollection}/${targetId}:`, e)
+      } catch (e: any) {
+        console.error(`[syncM2M] ❌ FAILED to unlink ${targetCollection}/${targetId}:`, e.message)
       }
     }
 
@@ -88,11 +101,10 @@ export const cleanupM2M = (
   sourceField: string
 ): CollectionAfterDeleteHook => {
   return async ({ id: sourceId, doc, req: { payload, context } }) => {
-    // If we're already syncing, don't trigger cleanup that might cause loops
     if (context.isSyncing) return
 
-    const sourceIdStr = String(sourceId)
-    const targets = (doc?.[sourceField] || []).map((t: any) => String(typeof t === 'object' ? t.id : (t?.id || t)))
+    const sourceIdVal = sourceId
+    const targets = sanitizeIds(doc?.[sourceField] || [])
 
     for (const targetId of targets) {
       try {
@@ -102,21 +114,25 @@ export const cleanupM2M = (
           depth: 0,
         })
         if (target) {
-          const currentLinks = (target[targetField] || []).map((l: any) => String(typeof l === 'object' ? l.id : (l?.id || l)))
-          if (currentLinks.includes(sourceIdStr)) {
+          const currentLinks = sanitizeIds(target[targetField] || [])
+          if (currentLinks.includes(sourceIdVal)) {
             await payload.update({
               collection: targetCollection as any,
               id: targetId,
               data: {
-                [targetField]: currentLinks.filter((l: string) => l !== sourceIdStr),
+                [targetField]: currentLinks.filter((l: any) => l !== sourceIdVal),
               },
               context: { isSyncing: true },
+              depth: 0,
+              validate: false,
+              overrideAccess: true,
             })
           }
         }
-      } catch (e) {
-        console.error(`Cleanup error in ${targetCollection}/${targetId}:`, e)
+      } catch (e: any) {
+        console.error(`[cleanupM2M] ❌ FAILED cleanup ${targetCollection}/${targetId}:`, e.message)
       }
     }
   }
 }
+
