@@ -180,7 +180,7 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
                   }}
                 >
                   <OptimizedImage
-                    image={currentSlide.images[1].url}
+                    image={currentSlide.images[1]}
                     alt="Guide 2"
                     className="w-full h-full object-cover"
                     size="large"
@@ -228,7 +228,7 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
                   }}
                 >
                   <OptimizedImage
-                    image={currentSlide.images[0].url}
+                    image={currentSlide.images[0]}
                     alt="Guide 1"
                     className="w-full h-full object-cover"
                     size="large"
@@ -302,36 +302,40 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
             {/* Content Cards in 2 Columns */}
             <div className="grid grid-cols-2 gap-4">
               {/* Image 1 Card */}
-              <div className="relative w-full aspect-[2/3] rounded-[24px] overflow-hidden shadow-lg border border-white/20">
-                <OptimizedImage
-                  image={currentSlide.images[0].url}
-                  alt="Guide Mobile 1"
-                  className="w-full h-full object-cover"
-                  size="large"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <p className="font-josefin-sans text-white text-xs leading-relaxed">
-                    {currentSlide.content1}
-                  </p>
+              {currentSlide.images[0] && (
+                <div className="relative w-full aspect-[2/3] rounded-[24px] overflow-hidden shadow-lg border border-white/20">
+                  <OptimizedImage
+                    image={currentSlide.images[0]}
+                    alt="Guide Mobile 1"
+                    className="w-full h-full object-cover"
+                    size="large"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <p className="font-josefin-sans text-white text-xs leading-relaxed">
+                      {currentSlide.content1}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Image 2 Card */}
-              <div className="relative w-full aspect-[2/3] rounded-[24px] overflow-hidden shadow-lg border border-white/20">
-                <OptimizedImage
-                  image={currentSlide.images[1].url}
-                  alt="Guide Mobile 2"
-                  className="w-full h-full object-cover"
-                  size="large"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <p className="font-josefin-sans text-white text-xs leading-relaxed">
-                    {currentSlide.content2}
-                  </p>
+              {currentSlide.images[1] && (
+                <div className="relative w-full aspect-[2/3] rounded-[24px] overflow-hidden shadow-lg border border-white/20">
+                  <OptimizedImage
+                    image={currentSlide.images[1]}
+                    alt="Guide Mobile 2"
+                    className="w-full h-full object-cover"
+                    size="large"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <p className="font-josefin-sans text-white text-xs leading-relaxed">
+                      {currentSlide.content2}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </motion.div>
         </AnimatePresence>
