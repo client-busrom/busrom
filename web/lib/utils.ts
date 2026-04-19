@@ -68,6 +68,11 @@ export function resolveInternalLink(url: string | null | undefined): string {
     path = '/service/one-stop-solution'
   }
 
+  // 3. 修正 FAQ 路径从 /service/faq 移动到 /faq
+  if (path === '/service/faq' || path.startsWith('/service/faq?')) {
+    path = path.replace(/^\/service\/faq/, '/faq')
+  }
+
   // 3. 修正旧版 series 参数
   if (path.includes('/shop?series=')) {
     path = path.replace('/shop?series=', '/shop?category=')
