@@ -118,6 +118,14 @@ export class FaqSelectionNode extends DecoratorNode<React.JSX.Element> {
       </React.Suspense>
     )
   }
+
+  isInline(): boolean {
+    return false
+  }
+
+  isIsolated(): boolean {
+    return true
+  }
 }
 
 export function $createFaqSelectionNode(data: FaqSelectionData): FaqSelectionNode {

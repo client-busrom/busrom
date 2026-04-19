@@ -12,6 +12,7 @@ import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8c
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { BlocksToolbarDropdownFeatureClient as BlocksToolbarDropdownFeatureClient_669410b80561d416638c54872826e396 } from '@/lexical-features/blocks-toolbar-dropdown/feature.client'
 import { DocumentTemplateFeatureClient as DocumentTemplateFeatureClient_dcfc2a8f560838093c5dfa7b3826380f } from '@/lexical-features/document-template/feature.client'
+import { FaqCarouselFeatureClient as FaqCarouselFeatureClient_1c20978e5dc0d6416b61511e622ea0d1 } from '@/lexical-features/faq-carousel/feature.client'
 import { FaqSelectionFeatureClient as FaqSelectionFeatureClient_a386787af49e33a604a3dbae0e0e7128 } from '@/lexical-features/faq-selection/feature.client'
 import { IconListFeatureClient as IconListFeatureClient_3641d6c34e022d74a716fcef2ed947a4 } from '@/lexical-features/icon-list/feature.client'
 import { SeriesReusableBlockFeatureClient as SeriesReusableBlockFeatureClient_4121f81ca5377e897b4b35949db93b0e } from '@/lexical-features/series-reusable-block/feature.client'
@@ -98,6 +99,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
   "@/lexical-features/blocks-toolbar-dropdown/feature.client#BlocksToolbarDropdownFeatureClient": BlocksToolbarDropdownFeatureClient_669410b80561d416638c54872826e396,
   "@/lexical-features/document-template/feature.client#DocumentTemplateFeatureClient": DocumentTemplateFeatureClient_dcfc2a8f560838093c5dfa7b3826380f,
+  "@/lexical-features/faq-carousel/feature.client#FaqCarouselFeatureClient": FaqCarouselFeatureClient_1c20978e5dc0d6416b61511e622ea0d1,
   "@/lexical-features/faq-selection/feature.client#FaqSelectionFeatureClient": FaqSelectionFeatureClient_a386787af49e33a604a3dbae0e0e7128,
   "@/lexical-features/icon-list/feature.client#IconListFeatureClient": IconListFeatureClient_3641d6c34e022d74a716fcef2ed947a4,
   "@/lexical-features/series-reusable-block/feature.client#SeriesReusableBlockFeatureClient": SeriesReusableBlockFeatureClient_4121f81ca5377e897b4b35949db93b0e,

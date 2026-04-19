@@ -298,7 +298,7 @@ export const FaqSelectionComponent: React.FC<{ nodeKey: string; data: FaqSelecti
     return (
       <div 
         onClick={() => setIsEditing(true)}
-        style={{ margin: '24px 0', padding: '32px', border: '1px solid #f3f4f6', borderRadius: '24px', cursor: 'pointer', backgroundColor: '#ffffff', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', position: 'relative' }}
+        style={{ margin: '16px 0 8px 0', padding: '32px', border: '1px solid #f3f4f6', borderRadius: '24px', cursor: 'pointer', backgroundColor: '#ffffff', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', position: 'relative' }}
       >
         {!hasData ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
@@ -505,7 +505,8 @@ export const FaqSelectionComponent: React.FC<{ nodeKey: string; data: FaqSelecti
       {showCategoryPicker && (
         <GenericPickerModal 
           title={isZh ? '选择展示分类' : 'SELECT CATEGORIES'}
-          collection="faq-categories"
+          collection="categories"
+          filter={{ type: { equals: 'FAQ' } }}
           isZh={isZh}
           onClose={() => setShowCategoryPicker(false)}
           onSelect={(items) => {
@@ -531,7 +532,7 @@ export const FaqSelectionComponent: React.FC<{ nodeKey: string; data: FaqSelecti
 
       {showFaqPicker && (
         <GenericPickerModal 
-          title={isZh ? '挑选精选问答' : 'PICK FAQS'}
+          title={isZh ? '选择 FAQ 项目' : 'SELECT FAQ ITEMS'}
           collection="faq-items"
           isZh={isZh}
           filter={{ category: { equals: typeof localData.categories[showFaqPicker.catIndex].category === 'object' ? localData.categories[showFaqPicker.catIndex].category.id : localData.categories[showFaqPicker.catIndex].category } }}
@@ -608,7 +609,7 @@ const GenericPickerModal = ({ title, collection, isZh, onClose, onSelect, select
         page: String(page),
         sort: '-createdAt',
         depth: '0',
-        locale: i18n?.language || 'en'
+        locale: i18n?.language?.split('-')[0] || 'zh'
       })
       
       // Add filters
