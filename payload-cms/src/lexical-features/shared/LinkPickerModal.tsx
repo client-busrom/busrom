@@ -32,6 +32,9 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
     { value: 'pages', label: '其他子页', pathPrefix: '' },
     { value: 'blogs', label: '知识库', pathPrefix: '/blog' },
     { value: 'blog-tags', label: '知识库标签', pathPrefix: '/blog' },
+    { value: 'applications', label: '应用案例', pathPrefix: '/applications' },
+    { value: 'categories-faq', label: 'FAQ 分类 (锚点跳转)', pathPrefix: '/faq', categoryType: 'FAQ', isFaq: true },
+    { value: 'categories', label: '所有分类 (通用)', pathPrefix: '/category' },
   ]
 
   useEffect(() => {
@@ -89,7 +92,11 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
     // Check if it's a category
     if (collection.categoryType) {
       const slugValue = item.slug || item.id
-      path = `${collection.pathPrefix}?category=${slugValue}`
+      if (collection.isFaq) {
+        path = `${collection.pathPrefix}#faq-${slugValue}`
+      } else {
+        path = `${collection.pathPrefix}?category=${slugValue}`
+      }
     } else if (selectedCollection === 'blog-tags') {
       const slugValue = item.slug || item.id
       path = `${collection.pathPrefix}?tag=${slugValue}`
