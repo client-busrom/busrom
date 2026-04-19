@@ -61,6 +61,7 @@ import { ProductReusableBlockFeature } from './src/lexical-features/product-reus
 import { SeriesReusableBlockFeature } from './src/lexical-features/series-reusable-block'
 import { IconListFeature } from './src/lexical-features/icon-list'
 import { FaqSelectionFeatureDefinition } from './src/lexical-features/faq-selection'
+import { FaqCarouselFeature } from './src/lexical-features/faq-carousel'
 import { s3Storage } from '@payloadcms/storage-s3'
 
 import { auditorPlugin } from 'payload-auditor'
@@ -449,6 +450,7 @@ export default buildConfig({
         SeriesReusableBlockFeature(), // Custom Feature 产品详解块 - WYSIWYG
         IconListFeature(), // Custom Feature 图标列表 - WYSIWYG
         FaqSelectionFeatureDefinition(), // Custom Feature FAQ 智能选择 - WYSIWYG
+        FaqCarouselFeature(), // Custom Feature FAQ 轮播推荐 - WYSIWYG
         DocumentTemplateFeature(), // Custom Feature 文档模板 - 工具栏按钮
         BlocksToolbarDropdownFeature(), // 工具栏右侧自定义块按钮
       ]

@@ -40,6 +40,7 @@ import { INSERT_PRODUCT_REUSABLE_BLOCK_COMMAND } from '../product-reusable-block
 import { INSERT_SERIES_REUSABLE_BLOCK_COMMAND } from '../series-reusable-block/plugin'
 import { INSERT_ICON_LIST_COMMAND } from '../icon-list/plugin'
 import { INSERT_FAQ_SELECTION_COMMAND } from '../faq-selection/plugin'
+import { INSERT_FAQ_CAROUSEL_COMMAND } from '../faq-carousel/plugin'
 // import { INSERT_CHECK_LIST_COMMAND } from '@lexical/list' // 已使用内置 ChecklistFeature
 import { INSERT_BLOCK_COMMAND } from '@payloadcms/richtext-lexical/client'
 
@@ -656,7 +657,7 @@ export const ToolbarButton: React.FC = () => {
             type="button"
             onClick={() => {
               editor.dispatchCommand(INSERT_FAQ_SELECTION_COMMAND, undefined)
-              toggleModal(modalSlug)
+              setIsOpen(false)
             }}
             style={{
               all: 'unset',
@@ -682,6 +683,38 @@ export const ToolbarButton: React.FC = () => {
           >
             <HelpCircle size={18} style={{ opacity: 0.7 }} />
             <span>{i18n?.language === 'zh' ? 'FAQ 智能选择' : 'FAQ Selection'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              editor.dispatchCommand(INSERT_FAQ_CAROUSEL_COMMAND, undefined)
+              setIsOpen(false)
+            }}
+            style={{
+              all: 'unset',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              width: '100%',
+              padding: '8px 12px',
+              cursor: 'pointer',
+              fontSize: '13px',
+              color: 'var(--theme-elevation-800, #1f2937)',
+              backgroundColor: 'transparent',
+              transition: 'background-color 0.15s ease',
+              boxSizing: 'border-box',
+              fontFamily: 'var(--font-body)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--theme-elevation-100, #f9fafb)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent'
+            }}
+          >
+            <HelpCircle size={18} style={{ opacity: 0.7 }} />
+            <span>{i18n?.language === 'zh' ? 'FAQ 轮播推荐' : 'FAQ Carousel'}</span>
           </button>
 
           {/* 表单块 - Custom Feature */}
