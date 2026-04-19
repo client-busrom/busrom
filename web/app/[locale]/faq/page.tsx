@@ -1,9 +1,12 @@
+import type { Metadata } from "next"
+import { notFound } from "next/navigation"
 import type { Locale } from "@/i18n.config"
-import { TemplatePage } from "@/components/templates/TemplatePage"
+import { fetchPageData } from "@/lib/api/pages"
+import { parseFaqData } from "@/lib/parsers/faq-parser"
+import { FaqTemplate } from "@/components/templates/FaqTemplate"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import { getPageMetadata } from "@/lib/api/seo-settings"
-import type { Metadata } from "next"
 
 export async function generateMetadata({
   params,
@@ -27,12 +30,24 @@ export default async function FaqPage({
 }) {
   const { locale } = await params
 
+  // 1. Fetch raw page data from CMS
+  const rawData = await fetchPageData('faq', locale)
+  
+  if (!rawData) {
+    return notFound()
+  }
+
+  // 2. Parse the data into structured sections
+  const parsedData = parseFaqData(locale, rawData)
+
   return (
     <>
       <PageScripts path="/faq" pageType="faq" position="header" />
       <PageScripts path="/faq" pageType="faq" position="body_start" />
       <PageSeoInjector path="/faq" pageType="faq" locale={locale} />
-      <TemplatePage locale={locale} slug="faq" template="FAQ" />
+      
+      <FaqTemplate locale={locale} data={parsedData} />
+      
       <PageScripts path="/faq" pageType="faq" position="footer" />
     </>
   )
