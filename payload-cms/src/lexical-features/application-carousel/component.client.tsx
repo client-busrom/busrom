@@ -541,9 +541,16 @@ interface ApplicationPickerModalProps {
   onClose: () => void
   onSelect: (ids: string[]) => void
   selectedIds: string[]
+  multiple?: boolean
 }
 
-export const ApplicationPickerModal: React.FC<ApplicationPickerModalProps> = ({ isOpen, onClose, onSelect, selectedIds }) => {
+export const ApplicationPickerModal: React.FC<ApplicationPickerModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  onSelect, 
+  selectedIds = [], 
+  multiple = true 
+}) => {
   const { i18n } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
   const [allApplications, setAllApplications] = useState<Application[]>([])
@@ -590,10 +597,14 @@ export const ApplicationPickerModal: React.FC<ApplicationPickerModalProps> = ({ 
   }, [isOpen, searchTerm, currentPage])
 
   const toggleApplication = (id: string) => {
-    if (localSelectedIds.includes(id)) {
-      setLocalSelectedIds(localSelectedIds.filter((i) => i !== id))
+    if (multiple) {
+      if (localSelectedIds.includes(id)) {
+        setLocalSelectedIds(localSelectedIds.filter((i) => i !== id))
+      } else {
+        setLocalSelectedIds([...localSelectedIds, id])
+      }
     } else {
-      setLocalSelectedIds([...localSelectedIds, id])
+      setLocalSelectedIds([id])
     }
   }
 

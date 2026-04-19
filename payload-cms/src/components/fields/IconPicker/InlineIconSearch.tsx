@@ -23,70 +23,74 @@ export const InlineIconSearch: React.FC<InlineIconSearchProps> = ({ value, onCha
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        {normalizedValue && (
-          <img
-            src={getIconSvgUrl(normalizedValue, '#333')}
-            alt={value}
-            style={{ width: '28px', height: '28px', flexShrink: 0 }}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {normalizedValue && (
+            <div style={{ padding: '4px', backgroundColor: '#f9fafb', borderRadius: '6px', border: '1px solid #f3f4f6' }}>
+              <img
+                src={getIconSvgUrl(normalizedValue, '#333')}
+                alt={value}
+                style={{ width: '20px', height: '20px', display: 'block' }}
+              />
+            </div>
+          )}
+          <input
+            type="text"
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            onMouseDown={(e) => e.stopPropagation()}
+            onDragStart={(e) => e.stopPropagation()}
+            placeholder="lucide:arrow-right..."
+            disabled={disabled}
+            style={{
+              flex: 1,
+              padding: '6px 10px',
+              border: '1px solid #d1d5db',
+              borderRadius: '6px',
+              fontSize: '12px',
+              backgroundColor: disabled ? '#f3f4f6' : 'white',
+              cursor: disabled ? 'not-allowed' : 'text',
+              minWidth: 0
+            }}
           />
-        )}
-        <input
-          type="text"
-          value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
-          onMouseDown={(e) => e.stopPropagation()}
-          onDragStart={(e) => e.stopPropagation()}
-          placeholder="lucide:arrow-right, mdi:home..."
-          disabled={disabled}
-          style={{
-            flex: 1,
-            padding: '8px 12px',
-            border: '1px solid #d1d5db',
-            borderRadius: '6px',
-            fontSize: '13px',
-            backgroundColor: disabled ? '#f3f4f6' : 'white',
-            cursor: disabled ? 'not-allowed' : 'text',
-          }}
-        />
+          {normalizedValue && (
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); e.preventDefault(); onChange(''); }}
+              style={{
+                all: 'unset',
+                cursor: 'pointer',
+                color: '#ef4444',
+                fontSize: '16px',
+                padding: '0 4px'
+              }}
+              title={isZh ? '清除' : 'Clear'}
+            >
+              ×
+            </button>
+          )}
+        </div>
         <button
           type="button"
-          onClick={() => setIsSearchOpen(true)}
+          onClick={(e) => { e.stopPropagation(); e.preventDefault(); setIsSearchOpen(true); }}
           disabled={disabled}
           style={{
+            width: '100%',
             padding: '8px 12px',
-            border: '1px solid #A08745',
+            border: 'none',
             borderRadius: '6px',
             backgroundColor: '#A08745',
             color: 'white',
             cursor: disabled ? 'not-allowed' : 'pointer',
-            fontSize: '13px',
-            fontWeight: 500,
+            fontSize: '12px',
+            fontWeight: 700,
             whiteSpace: 'nowrap',
             opacity: disabled ? 0.5 : 1,
+            boxShadow: '0 2px 4px rgba(160, 135, 69, 0.1)'
           }}
         >
           {isZh ? '搜索图标' : 'Search Icons'}
         </button>
-        {normalizedValue && (
-          <button
-            type="button"
-            onClick={() => onChange('')}
-            style={{
-              padding: '8px',
-              border: 'none',
-              background: 'none',
-              cursor: 'pointer',
-              color: '#ef4444',
-              fontSize: '18px',
-              lineHeight: 1,
-              flexShrink: 0,
-            }}
-            title={isZh ? '清除' : 'Clear'}
-          >
-            ×
-          </button>
-        )}
       </div>
 
       {/* 搜索弹窗 - 使用 Portal 渲染到 body，避免被 Lexical DecoratorNode 容器限制 */}
