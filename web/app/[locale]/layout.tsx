@@ -2,7 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
-import { Fredericka_the_Great, Amiri, Black_Han_Sans, Berkshire_Swash, Cherry_Bomb_One, Amarante, Quicksand, Lemon, Lobster, Katibeh, Prata, Lexend_Deca } from "next/font/google";
+import { Fredericka_the_Great, Amiri, Black_Han_Sans, Berkshire_Swash, Cherry_Bomb_One, Amarante, Quicksand, Lemon, Lobster, Katibeh, Prata, Lexend_Deca, Anton } from "next/font/google";
 import dynamic from "next/dynamic";
 import "../globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -234,6 +234,14 @@ const fontLexendDeca = Lexend_Deca({
   preload: false,
 });
 
+const anton = Anton({
+  weight: "400",
+  variable: "--font-anton",
+  display: "swap",
+  subsets: ["latin"],
+  preload: false,
+});
+
 const bagelFatOne = localFont({
   src: "../../public/fonts/BagelFatOne-Regular.ttf",
   weight: "400",
@@ -311,6 +319,7 @@ export default async function RootLayout({
         ${katibeh.variable}
         ${fontPrata.variable}
         ${fontLexendDeca.variable}
+        ${anton.variable}
         ${bagelFatOne.variable}
         antialiased
       `}

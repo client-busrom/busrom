@@ -1,0 +1,227 @@
+import { convertToCDNUrl } from "../cdn-url";
+
+interface MediaObject {
+  id: string;
+  url: string;
+  alt?: string;
+}
+
+export interface FaqData {
+  hero: {
+    title: any[];
+    text: any[];
+    bgImage: MediaObject | null;
+    btnText: string;
+    cta: any[];
+    linkJump: any;
+    items: any[];
+  } | null;
+  search: {
+    title: any[];
+    image: MediaObject | null;
+    btnText: string;
+    linkJump: any;
+  } | null;
+  guide: {
+    title: any[];
+    subtitle: any[];
+    items: any[];
+  } | null;
+  popular: {
+    title: any[];
+    subtitle: any[];
+    carousel: any;
+  } | null;
+  detail: {
+    items: any[];
+    selection: any;
+  } | null;
+  contact: {
+    title: any[];
+    formConfig: any;
+    image: MediaObject | null;
+  } | null;
+  quote: {
+    image: MediaObject | null;
+    title: any[];
+    description: any[];
+    iconList: any;
+  } | null;
+}
+
+function getNodeTotalText(node: any): string {
+  if (!node) return "";
+  if (Array.isArray(node)) return node.map(getNodeTotalText).join("");
+  if (typeof node === "string") return node;
+  if (node.type === "linebreak") return "\n";
+  if (node.type === "paragraph" || node.type === "quote" || node.type === "heading") return getNodeTotalText(node.children) + "\n";
+  if (node.text) return node.text;
+  if (node.children) return getNodeTotalText(node.children);
+  return "";
+}
+
+function extractAfterMarker(children: any[], markerId: string): any[] {
+  let foundMarker = false;
+  const result: any[] = [];
+  const target = markerId.toLowerCase().trim();
+
+  for (const node of children) {
+    const totalText = getNodeTotalText(node).trim().toLowerCase();
+    
+    // Fuzzy match for marker block
+    const isMarkerBlock = 
+      (node.type === "paragraph" || node.type === "quote" || node.type === "code") &&
+      (totalText === target || (totalText.includes(target) && node.children?.[0]?.format === 16));
+
+    if (isMarkerBlock) {
+      if (foundMarker) break; 
+      foundMarker = true;
+      continue;
+    }
+
+    // Check for next marker: format 16 or standard names, but EXCLUDE current target
+    const isNewMarker = 
+      foundMarker && 
+      (node.type === "paragraph" || node.type === "code" || node.type === "quote") && 
+      (node.children?.[0]?.format === 16 || (totalText.includes("-") && totalText.length > 5 && !totalText.includes(" "))) &&
+      !totalText.includes(target);
+
+    if (isNewMarker) break;
+
+    if (foundMarker) result.push(node);
+  }
+  
+  return result;
+}
+
+export function parseFaqData(locale: string, rawData: any): FaqData {
+  const children = rawData.contentTranslation?.root?.children || 
+                   rawData.content?.root?.children || 
+                   rawData.content?.children || [];
+  
+  const mediaData = rawData.mediaData || {};
+
+  const resolveMedia = (id: any): MediaObject | null => {
+    if (!id) return null;
+    const mediaId = typeof id === "object" ? id.id : String(id);
+    const media = mediaData[mediaId];
+    if (media) return media;
+    
+    // If not in mediaData, it might be a raw object with URL from elsewhere
+    if (typeof id === "object" && id.url) return id;
+
+    // Fallback: construct a direct API URL for the media
+    return { 
+      id: mediaId, 
+      url: `/api/media/file/${mediaId}` 
+    };
+  };
+
+  // 1. Hero
+  const heroTitleNodes = extractAfterMarker(children, "hero-section");
+  const heroTextNodes = extractAfterMarker(children, "hero-section-text");
+  
+  // Extract list items for hero texts 1-3
+  let heroTexts: any[] = [];
+  const heroList = heroTextNodes.find(n => n.type === 'list');
+  if (heroList?.children) {
+    heroTexts = heroList.children.map((item: any) => item.children);
+  }
+
+  const heroCtaNodes = extractAfterMarker(children, "hero-section-cta");
+  const heroLinkJumpNode = heroCtaNodes.find(n => n.type === "linkJump");
+  const heroItemsNodes = extractAfterMarker(children, "hero-section-item");
+  const heroCarousel = heroItemsNodes.find(n => n.type === "carousel");
+
+  // 2. Search
+  const searchTitleNodes = extractAfterMarker(children, "faq-search-title");
+  const searchImageSection = extractAfterMarker(children, "faq-search-image");
+  const searchImageNode = searchImageSection.find(n => n.type === "singleImage" || n.type === "single-image");
+  const searchBtnSection = extractAfterMarker(children, "faq-search-btn");
+  const searchLinkJumpNode = searchBtnSection.find(n => n.type === "linkJump");
+
+  // 3. Guide
+  const guideTitle = extractAfterMarker(children, "faq-guide-title");
+  const guideSubtitle = extractAfterMarker(children, "faq-guide-subtitle");
+  const guideItemSection = extractAfterMarker(children, "faq-guide-item");
+  const guideCarousel = guideItemSection.find(n => n.type === "carousel");
+
+  // 4. Popular
+  const popularTitle = extractAfterMarker(children, "faq-popular-title");
+  const popularSubtitle = extractAfterMarker(children, "faq-popular-subtitle");
+  const popularItemSection = extractAfterMarker(children, "faq-popular-item");
+  const popularCarouselNode = popularItemSection.find(n => n.type === "faqCarousel");
+
+  // 5. Detail
+  const detailItemSection = extractAfterMarker(children, "faq-detail-item");
+  const faqSelectionNode = detailItemSection.find(n => n.type === "faqSelection");
+
+  // 6. Contact
+  const contactFormBlock = extractAfterMarker(children, "contact-form-block");
+  const formNode = contactFormBlock.find(n => n.type === "formBlock");
+  const contactImageSection = extractAfterMarker(children, "contact-form-image");
+  const contactImageNode = contactImageSection.find(n => n.type === "singleImage" || n.type === "single-image");
+
+  // 7. Quote Guide
+  const quoteImageSection = extractAfterMarker(children, "quote-guide-image");
+  const quoteImageNode = quoteImageSection.find(n => n.type === "singleImage" || n.type === "single-image");
+  const quoteTitleSection = extractAfterMarker(children, "quote-guide-title");
+  const quoteDescSection = extractAfterMarker(children, "quote-guide-description");
+  const quoteCtaSection = extractAfterMarker(children, "quote-guide-cta");
+  const iconListNode = quoteCtaSection.find(n => n.type === "iconList");
+
+  const heroBgImageNodes = extractAfterMarker(children, "hero-section-image");
+  const heroBgImageNode = heroBgImageNodes.find(n => 
+    n.type === "singleImage" || 
+    n.type === "single-image" || 
+    n.type === "image" || 
+    n.type === "singleImageBlock"
+  );
+
+  return {
+    hero: {
+      title: heroTitleNodes,
+      text: heroTexts,
+      bgImage: resolveMedia(heroBgImageNode?.data?.image?.id || heroBgImageNode?.data?.image),
+      btnText: getNodeTotalText(extractAfterMarker(children, "hero-section-btn-text")).trim(),
+      cta: heroCtaNodes,
+      linkJump: heroLinkJumpNode?.data,
+      items: (heroCarousel?.data?.slides || heroCarousel?.data?.items || []).map((s: any, i: number) => ({
+        id: s.id || `item-${i}`,
+        ...s,
+        image: resolveMedia(s.image?.id || s.image)
+      }))
+    },
+    search: {
+      title: searchTitleNodes,
+      image: resolveMedia(searchImageNode?.data?.image?.id),
+      btnText: getNodeTotalText(searchBtnSection).trim(),
+      linkJump: searchLinkJumpNode?.data
+    },
+    guide: {
+      title: guideTitle,
+      subtitle: guideSubtitle,
+      items: guideCarousel?.data?.slides || []
+    },
+    popular: {
+      title: popularTitle,
+      subtitle: popularSubtitle,
+      carousel: popularCarouselNode?.data
+    },
+    detail: {
+      items: detailItemSection,
+      selection: faqSelectionNode?.data
+    },
+    contact: {
+      title: extractAfterMarker(children, "contact-form"),
+      formConfig: formNode?.data?.formConfig,
+      image: resolveMedia(contactImageNode?.data?.image?.id)
+    },
+    quote: {
+      image: resolveMedia(quoteImageNode?.data?.image?.id),
+      title: quoteTitleSection,
+      description: quoteDescSection,
+      iconList: iconListNode?.data
+    }
+  };
+}
