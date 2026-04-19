@@ -18,6 +18,12 @@ import type {
 import { DecoratorNode } from '@payloadcms/richtext-lexical/lexical'
 import * as React from 'react'
 
+const IconListComponent = React.lazy(() =>
+  import('./component.client').then((module) => ({
+    default: module.IconListComponent,
+  })),
+)
+
 export interface IconListItem {
   icon: string // Iconify format: "lucide:arrow-right", "mdi:home"
   title: string
@@ -109,12 +115,6 @@ export class IconListNode extends DecoratorNode<React.ReactElement> {
   }
 
   decorate(): React.ReactElement {
-    const IconListComponent = React.lazy(() =>
-      import('./component.client').then((module) => ({
-        default: module.IconListComponent,
-      })),
-    )
-
     return (
       <React.Suspense fallback={<div>Loading icon list...</div>}>
         <IconListComponent nodeKey={this.__key} data={this.__data} />
