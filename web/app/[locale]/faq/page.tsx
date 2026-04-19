@@ -17,7 +17,7 @@ export async function generateMetadata({
     description: "Frequently asked questions about Busrom products and services",
   }
 
-  return getPageMetadata('/service/faq', 'faq', locale, defaultMetadata)
+  return getPageMetadata('/faq', 'faq', locale, defaultMetadata)
 }
 
 export default async function FaqPage({
@@ -29,11 +29,11 @@ export default async function FaqPage({
 
   return (
     <>
-      <PageScripts path="/service/faq" pageType="faq" position="header" />
-      <PageScripts path="/service/faq" pageType="faq" position="body_start" />
-      <PageSeoInjector path="/service/faq" pageType="faq" locale={locale} />
+      <PageScripts path="/faq" pageType="faq" position="header" />
+      <PageScripts path="/faq" pageType="faq" position="body_start" />
+      <PageSeoInjector path="/faq" pageType="faq" locale={locale} />
       <TemplatePage locale={locale} slug="faq" template="FAQ" />
-      <PageScripts path="/service/faq" pageType="faq" position="footer" />
+      <PageScripts path="/faq" pageType="faq" position="footer" />
     </>
   )
 }
