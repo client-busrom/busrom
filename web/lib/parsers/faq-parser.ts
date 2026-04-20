@@ -150,7 +150,26 @@ export function parseFaqData(locale: string, rawData: any): FaqData {
   const popularTitle = extractAfterMarker(children, "faq-popular-title");
   const popularSubtitle = extractAfterMarker(children, "faq-popular-subtitle");
   const popularItemSection = extractAfterMarker(children, "faq-popular-item");
-  const popularCarouselNode = popularItemSection.find(n => n.type === "faqCarousel");
+  
+  // Try to find a single carousel node first
+  let popularCarouselNode = popularItemSection.find(n => 
+    n.type === "faqCarousel" || 
+    n.type === "carousel" || 
+    n.type === "faq-carousel"
+  );
+
+  // If not found, check if the section items themselves are the slides (Standalone items)
+  if (!popularCarouselNode && popularItemSection.length > 0) {
+    const standaloneSlides = popularItemSection.filter(n => n.type === "block" || n.data?.slides || n.data?.question);
+    if (standaloneSlides.length > 0) {
+       // Mock a carousel node structure
+       popularCarouselNode = {
+         data: {
+           slides: standaloneSlides.map(n => n.data || n)
+         }
+       };
+    }
+  }
 
   // 5. Detail
   const detailItemSection = extractAfterMarker(children, "faq-detail-item");
@@ -201,15 +220,47 @@ export function parseFaqData(locale: string, rawData: any): FaqData {
     guide: {
       title: guideTitle,
       subtitle: guideSubtitle,
-      items: guideCarousel?.data?.slides || []
+      items: (guideCarousel?.data?.slides || []).map((s: any, i: number) => ({
+        id: s.id || `guide-${i}`,
+        ...s,
+        image: resolveMedia(s.image?.id || s.image)
+      }))
     },
     popular: {
       title: popularTitle,
       subtitle: popularSubtitle,
-      carousel: popularCarouselNode?.data
+      carousel: {
+        slides: (popularCarouselNode?.data?.items || []).map((item: any, i: number) => {
+          const s = item.faq || {};
+          const allItems = popularCarouselNode?.data?.items || [];
+          
+          return {
+            id: s.id || `pop-${i}`,
+            question: { root: { children: [{ type: 'paragraph', children: [{ type: 'text', text: s.question || "" }] }] } },
+            answer: s.contentTranslation || { root: { children: [] } },
+            // Artistic Collage images
+            image1: resolveMedia(item.image),
+            image2: resolveMedia(allItems[(i + 1) % allItems.length]?.image),
+            image3: resolveMedia(allItems[(i + 2) % allItems.length]?.image),
+          };
+        })
+      }
     },
     detail: {
-      items: detailItemSection,
+      items: (faqSelectionNode?.data?.categories || []).map((cat: any, i: number) => ({
+        id: cat.category?.id || `cat-${i}`,
+        title: cat.category?.name || cat.title || "",
+        artText: cat.category?.slug?.split('-').join(' ').toUpperCase() || "",
+        image: resolveMedia(cat.image?.id || cat.image),
+        faqs: (cat.questions || []).map((q: any, j: number) => {
+          const f = q.faqItem || {};
+          return {
+            id: f.id || `faq-${i}-${j}`,
+            question: f.question || "",
+            answer: f.contentTranslation || { root: { children: [] } }
+          };
+        })
+      })),
       selection: faqSelectionNode?.data
     },
     contact: {
