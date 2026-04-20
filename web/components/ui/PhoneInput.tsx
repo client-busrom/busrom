@@ -109,6 +109,9 @@ interface PhoneInputProps {
   containerClassName?: string
   buttonClassName?: string
   inputClassName?: string
+  dropdownClassName?: string
+  searchInputClassName?: string
+  countryItemClassName?: string
   dialCodeClassName?: string
   chevronClassName?: string
   error?: boolean
@@ -127,6 +130,9 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   containerClassName,
   buttonClassName,
   inputClassName,
+  dropdownClassName,
+  searchInputClassName,
+  countryItemClassName,
   dialCodeClassName,
   chevronClassName,
   error,
@@ -223,27 +229,50 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
     : COUNTRIES
 
   return (
-    <div className={cn("relative w-full", isOpen ? "z-[1001]" : "z-10", containerClassName)} ref={dropdownRef} data-lenis-prevent style={{ ...style, height: style?.height || '100%' }}>
-      <div className={cn(
-        "flex items-stretch rounded-lg border border-gray-300 bg-white overflow-hidden transition-colors w-full h-full",
-        error && "border-red-500",
-        disabled && "opacity-50 cursor-not-allowed",
-        className
-      )}>
-        {/* Country selector button */}
+    <div 
+      className={cn("relative w-full transition-all", className?.includes('z-') ? "" : (isOpen ? "z-[1001]" : "z-10"), containerClassName)} 
+      ref={dropdownRef} 
+      data-lenis-prevent 
+      style={{ 
+        ...style, 
+        height: style?.height || '100%', 
+        background: 'transparent',
+        '--text-color': style?.color || 'white'
+      } as any}
+    >
+      <div 
+        className={cn(
+          "w-full h-full overflow-hidden flex items-center transition-all",
+          !className?.includes('bg-') && !style?.background && "bg-white",
+          !className?.includes('border-') && !style?.border && "border-none",
+          !className?.includes('rounded-') && !style?.borderRadius && "rounded-lg",
+          className
+        )}
+        style={{ background: style?.background, borderRadius: style?.borderRadius }}
+      >
         <button
           type="button"
           onClick={() => !disabled && setIsOpen(!isOpen)}
           disabled={disabled}
           className={cn(
-            "flex items-center gap-1.5 px-3 bg-transparent transition-colors flex-shrink-0 h-full",
-            "hover:bg-black/5 focus:outline-none",
+            "h-full flex items-center px-3 transition-all",
+            !buttonClassName?.includes('hover:') && "hover:bg-transparent",
+            !className?.includes('border-') && "border-r",
+            dialCodeClassName?.includes('border-') ? "" : "border-r-gray-200",
             buttonClassName
           )}
         >
           <CountryFlag countryCode={selectedCountry[1]} className="w-[1.25vw] h-[0.94vw] rounded-sm flex-shrink-0" />
-          <span className={cn("text-sm font-medium text-brand-text-black", dialCodeClassName)}>+{selectedCountry[2]}</span>
-          <ChevronDown className={cn("w-3.5 h-3.5 text-gray-400 transition-transform ml-0.5", isOpen && "rotate-180", chevronClassName)} />
+          <span 
+            className={cn("ml-2 font-medium text-[vw(20)]", !dialCodeClassName?.includes('text-') && !style?.color && "text-white", dialCodeClassName)}
+            style={{ color: 'var(--text-color)' }}
+          >
+            +{selectedCountry[2]}
+          </span>
+          <ChevronDown 
+            className={cn("w-3.5 h-3.5 transition-transform ml-0.5", isOpen && "rotate-180", !chevronClassName?.includes('text-') && !style?.color && "text-white opacity-50", chevronClassName)} 
+            style={{ color: 'var(--text-color)' }}
+          />
         </button>
 
         {/* Phone number input */}
@@ -257,8 +286,10 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
           onChange={handlePhoneChange}
           placeholder={placeholder}
           className={cn(
-            "flex-1 min-w-0 px-4 py-2.5 bg-white font-medium text-brand-text-black text-sm h-full",
-            "placeholder:text-gray-400",
+            "flex-1 min-w-0 px-4 py-2.5 font-medium text-sm h-full",
+            !inputClassName?.includes('bg-') && "bg-white",
+            !inputClassName?.includes('text-') && "text-brand-text-black",
+            !inputClassName?.includes('placeholder:') && "placeholder:text-gray-400",
             "focus:outline-none",
             disabled && "cursor-not-allowed",
             inputClassName
@@ -269,20 +300,32 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
       {/* Dropdown */}
       {isOpen && (
         <div
-          className="absolute left-0 top-full mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-xl z-[1002] overflow-hidden"
+          className={cn(
+            "absolute left-0 top-full mt-1 w-full border shadow-xl z-[1002] overflow-hidden",
+            !dropdownClassName?.includes('bg-') && "bg-white",
+            !dropdownClassName?.includes('border-') && "border-gray-200",
+            !dropdownClassName?.includes('rounded-') && "rounded-lg",
+            dropdownClassName
+          )}
           style={{ maxHeight: '320px' }}
         >
           {/* Search */}
-          <div className="p-2 border-b border-gray-100">
+          <div className={cn("p-2 border-b", !dropdownClassName?.includes('border-') ? "border-gray-100" : "border-inherit")}>
             <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               <input
                 ref={searchInputRef}
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search country..."
-                className="w-full pl-8 pr-3 py-2 text-base border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-secondary focus:border-brand-secondary"
+                className={cn(
+                  "w-full pl-8 pr-3 py-2 text-base rounded-md focus:outline-none",
+                  !searchInputClassName?.includes('bg-') && "bg-white",
+                  !searchInputClassName?.includes('border-') && "border border-gray-200",
+                  !searchInputClassName?.includes('text-') && "text-brand-text-black",
+                  searchInputClassName
+                )}
               />
             </div>
           </div>
@@ -303,13 +346,15 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
                   type="button"
                   onClick={() => handleCountrySelect([countryName, iso2, dialCode])}
                   className={cn(
-                    "w-full flex items-center gap-4 px-4 py-3.5 text-left transition-colors hover:bg-gray-50",
-                    selectedCountry[1] === iso2 && selectedCountry[2] === dialCode && "bg-white"
+                    "w-full flex items-center gap-4 px-4 py-3.5 text-left transition-all",
+                    !countryItemClassName?.includes('bg-') ? "hover:bg-white/5" : "hover:bg-black/5",
+                    !countryItemClassName?.includes('text-') && "text-brand-text-black",
+                    countryItemClassName
                   )}
                 >
                   <CountryFlag countryCode={iso2} className="w-6 h-5 rounded-sm flex-shrink-0" />
-                  <span className="text-sm font-semibold text-brand-text-black truncate flex-1 leading-tight">{countryName}</span>
-                  <span className="text-xs text-gray-500 font-medium flex-shrink-0">+{dialCode}</span>
+                  <span className="text-sm font-semibold truncate flex-1 leading-tight">{countryName}</span>
+                  <span className="text-xs opacity-50 font-medium flex-shrink-0">+{dialCode}</span>
                 </button>
               ))
             )}

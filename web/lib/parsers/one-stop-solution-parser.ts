@@ -295,18 +295,28 @@ export const parseOneStopData = (pageContent: any, locale: string): ParsedOneSto
   const oemBgIdx = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("oem-odm-guide-bg-image"));
   const oemBgImage = oemBgIdx !== -1 && oemBgIdx + 1 < contentChildren.length ? mediaData[contentChildren[oemBgIdx + 1].data?.image?.id || String(contentChildren[oemBgIdx + 1].value || "")] : (oemRaw.items[0]?.image || null);
 
-  return {
-    hero: { ...heroRaw },
-    problems: { ...problemsRaw },
-    advantages: { title: advantagesRaw.title, subtitle: "", items: advantagesRaw.items },
-    process: { title: processRaw.title, subtitle: "", items: processRaw.items },
-    showcase: { ...showcaseRaw, viewMoreText, viewMoreLink, products: showcaseProducts },
-    categories: { title: categoriesRaw.title, subtitle: categoriesRaw.subtitle, products: categoriesProducts },
-    productSeries: { title: seriesRaw.title, products: seriesProducts },
-    brandHighlights: { titleLine1: brandHighlightsRaw.title, titleLine2: brandHighlightsRaw.subtitle, items: brandHighlightsRaw.items },
-    trust: { title: trustRaw.title, items: trustItems, images: trustRaw.items.filter((it: any) => it.sourceType === 'custom-image-gallery' || it.sourceType === 'carousel'), bgImage: trustBgImage },
-    cta: { title: ctaRaw.title, description: ctaRaw.subtitle, image: ctaImage, formConfig: formNode?.data?.formConfig || pageContent.formConfig },
-    applications: { title: appsSectionRaw.title, items: finalApps },
-    oemOdmGuide: { title: oemTitle, description: oemRaw.subtitle, bgImage: oemBgImage, ctaText: "READ MORE", ctaLink: `/${locale}/oem-odm` }
-  };
+    const blockConfig = formNode?.data?.formConfig;
+    const pageConfig = pageContent.formConfig;
+    // Prefer populated object with fields, fallback to whatever is available
+    const bestFormConfig = (blockConfig?.fields ? blockConfig : (pageConfig?.fields ? pageConfig : (blockConfig || pageConfig)));
+
+    return { 
+      hero: { ...heroRaw },
+      problems: { ...problemsRaw },
+      advantages: { title: advantagesRaw.title, subtitle: "", items: advantagesRaw.items },
+      process: { title: processRaw.title, subtitle: "", items: processRaw.items },
+      showcase: { ...showcaseRaw, viewMoreText, viewMoreLink, products: showcaseProducts },
+      categories: { title: categoriesRaw.title, subtitle: categoriesRaw.subtitle, products: categoriesProducts },
+      productSeries: { title: seriesRaw.title, products: seriesProducts },
+      brandHighlights: { titleLine1: brandHighlightsRaw.title, titleLine2: brandHighlightsRaw.subtitle, items: brandHighlightsRaw.items },
+      trust: { title: trustRaw.title, items: trustItems, images: trustRaw.items.filter((it: any) => it.sourceType === 'custom-image-gallery' || it.sourceType === 'carousel'), bgImage: trustBgImage },
+      cta: { 
+        title: ctaRaw.title || (typeof bestFormConfig === 'object' ? bestFormConfig?.displayName : undefined), 
+        description: ctaRaw.subtitle || (typeof bestFormConfig === 'object' ? bestFormConfig?.description : undefined), 
+        image: ctaImage, 
+        formConfig: bestFormConfig
+      },
+      applications: { title: appsSectionRaw.title, items: finalApps },
+      oemOdmGuide: { title: oemTitle, description: oemRaw.subtitle, bgImage: oemBgImage, ctaText: locale === 'cn' ? "了解更多" : "READ MORE", ctaLink: `/${locale}/oem-odm` }
+    };
 };

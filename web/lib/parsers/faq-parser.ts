@@ -1,4 +1,5 @@
 import { convertToCDNUrl } from "../cdn-url";
+import { getRandomAppImage } from "../image-utils";
 
 interface MediaObject {
   id: string;
@@ -68,7 +69,6 @@ function extractAfterMarker(children: any[], markerId: string): any[] {
   for (const node of children) {
     const totalText = getNodeTotalText(node).trim().toLowerCase();
     
-    // Fuzzy match for marker block
     const isMarkerBlock = 
       (node.type === "paragraph" || node.type === "quote" || node.type === "code") &&
       (totalText === target || (totalText.includes(target) && node.children?.[0]?.format === 16));
@@ -79,7 +79,6 @@ function extractAfterMarker(children: any[], markerId: string): any[] {
       continue;
     }
 
-    // Check for next marker: format 16 or standard names, but EXCLUDE current target
     const isNewMarker = 
       foundMarker && 
       (node.type === "paragraph" || node.type === "code" || node.type === "quote") && 
@@ -100,6 +99,7 @@ export function parseFaqData(locale: string, rawData: any): FaqData {
                    rawData.content?.children || [];
   
   const mediaData = rawData.mediaData || {};
+  const galleriesData = rawData.galleriesData || {};
 
   const resolveMedia = (id: any): MediaObject | null => {
     if (!id) return null;
@@ -107,31 +107,68 @@ export function parseFaqData(locale: string, rawData: any): FaqData {
     const media = mediaData[mediaId];
     if (media) return media;
     
-    // If not in mediaData, it might be a raw object with URL from elsewhere
     if (typeof id === "object" && id.url) return id;
 
-    // Fallback: construct a direct API URL for the media
+    const fallbackUrl = `/api/media/file/${mediaId}`;
     return { 
       id: mediaId, 
-      url: `/api/media/file/${mediaId}` 
+      url: convertToCDNUrl(fallbackUrl)
     };
+  };
+
+  const resolveQuestionImage = (q: any) => {
+    // 1. Step 1: Case/Application Gallery - Standard "Double Random" via pre-resolved mediaData
+    const galleryId = 
+      (typeof q.gallery === "object" ? q.gallery.id : q.gallery) || 
+      (typeof q.application === "object" ? q.application.id : q.application);
+
+    const gidStr = galleryId ? String(galleryId) : null;
+
+    if (gidStr && mediaData[gidStr]) {
+      return mediaData[gidStr];
+    }
+
+    // 2. Step 2: Emergency Fallback - If mediaData missed it, check rawData.applications directly
+    // This handles cases where resolveAllMedia didn't drill deep enough or failed its fetch
+    if (gidStr) {
+      const allApps = (rawData as any).applications || [];
+      const matchedApp = allApps.find((a: any) => String(a.id) === gidStr);
+      if (matchedApp) {
+        // Use the same double-random utility
+        const randomImg = getRandomAppImage(matchedApp);
+        if (randomImg) return resolveMedia(randomImg);
+      }
+    }
+
+    // 3. Step 3: Direct image field (High priority override)
+    if (q.image) {
+      const img = resolveMedia(q.image?.id || q.image);
+      if (img?.url) return img;
+    }
+    
+    // 4. Step 4: Fallback to FAQ item canonical image
+    const fallback = q.faqItem?.image || q.faqItem?.featuredImage;
+    if (fallback) return resolveMedia(fallback);
+
+    return null;
   };
 
   // 1. Hero
   const heroTitleNodes = extractAfterMarker(children, "hero-section");
   const heroTextNodes = extractAfterMarker(children, "hero-section-text");
-  
-  // Extract list items for hero texts 1-3
   let heroTexts: any[] = [];
   const heroList = heroTextNodes.find(n => n.type === 'list');
   if (heroList?.children) {
     heroTexts = heroList.children.map((item: any) => item.children);
   }
-
   const heroCtaNodes = extractAfterMarker(children, "hero-section-cta");
   const heroLinkJumpNode = heroCtaNodes.find(n => n.type === "linkJump");
   const heroItemsNodes = extractAfterMarker(children, "hero-section-item");
   const heroCarousel = heroItemsNodes.find(n => n.type === "carousel");
+  const heroBgImageNodes = extractAfterMarker(children, "hero-section-image");
+  const heroBgImageNode = heroBgImageNodes.find(n => 
+    n.type === "singleImage" || n.type === "single-image" || n.type === "image" || n.type === "singleImageBlock"
+  );
 
   // 2. Search
   const searchTitleNodes = extractAfterMarker(children, "faq-search-title");
@@ -150,24 +187,11 @@ export function parseFaqData(locale: string, rawData: any): FaqData {
   const popularTitle = extractAfterMarker(children, "faq-popular-title");
   const popularSubtitle = extractAfterMarker(children, "faq-popular-subtitle");
   const popularItemSection = extractAfterMarker(children, "faq-popular-item");
-  
-  // Try to find a single carousel node first
-  let popularCarouselNode = popularItemSection.find(n => 
-    n.type === "faqCarousel" || 
-    n.type === "carousel" || 
-    n.type === "faq-carousel"
-  );
-
-  // If not found, check if the section items themselves are the slides (Standalone items)
+  let popularCarouselNode = popularItemSection.find(n => n.type === "faqCarousel" || n.type === "carousel" || n.type === "faq-carousel");
   if (!popularCarouselNode && popularItemSection.length > 0) {
     const standaloneSlides = popularItemSection.filter(n => n.type === "block" || n.data?.slides || n.data?.question);
     if (standaloneSlides.length > 0) {
-       // Mock a carousel node structure
-       popularCarouselNode = {
-         data: {
-           slides: standaloneSlides.map(n => n.data || n)
-         }
-       };
+       popularCarouselNode = { data: { slides: standaloneSlides.map(n => n.data || n) } };
     }
   }
 
@@ -188,14 +212,6 @@ export function parseFaqData(locale: string, rawData: any): FaqData {
   const quoteDescSection = extractAfterMarker(children, "quote-guide-description");
   const quoteCtaSection = extractAfterMarker(children, "quote-guide-cta");
   const iconListNode = quoteCtaSection.find(n => n.type === "iconList");
-
-  const heroBgImageNodes = extractAfterMarker(children, "hero-section-image");
-  const heroBgImageNode = heroBgImageNodes.find(n => 
-    n.type === "singleImage" || 
-    n.type === "single-image" || 
-    n.type === "image" || 
-    n.type === "singleImageBlock"
-  );
 
   return {
     hero: {
@@ -233,12 +249,10 @@ export function parseFaqData(locale: string, rawData: any): FaqData {
         slides: (popularCarouselNode?.data?.items || []).map((item: any, i: number) => {
           const s = item.faq || {};
           const allItems = popularCarouselNode?.data?.items || [];
-          
           return {
             id: s.id || `pop-${i}`,
             question: { root: { children: [{ type: 'paragraph', children: [{ type: 'text', text: s.question || "" }] }] } },
             answer: s.contentTranslation || { root: { children: [] } },
-            // Artistic Collage images
             image1: resolveMedia(item.image),
             image2: resolveMedia(allItems[(i + 1) % allItems.length]?.image),
             image3: resolveMedia(allItems[(i + 2) % allItems.length]?.image),
@@ -252,20 +266,22 @@ export function parseFaqData(locale: string, rawData: any): FaqData {
         title: cat.category?.name || cat.title || "",
         artText: cat.category?.slug?.split('-').join(' ').toUpperCase() || "",
         image: resolveMedia(cat.image?.id || cat.image),
+        icon: cat.icon || "lucide:help-circle",
         faqs: (cat.questions || []).map((q: any, j: number) => {
           const f = q.faqItem || {};
           return {
             id: f.id || `faq-${i}-${j}`,
             question: f.question || "",
-            answer: f.contentTranslation || { root: { children: [] } }
+            answer: f.contentTranslation || { root: { children: [] } },
+            image: resolveQuestionImage(q),
           };
-        })
+        }),
       })),
       selection: faqSelectionNode?.data
     },
     contact: {
-      title: extractAfterMarker(children, "contact-form"),
-      formConfig: formNode?.data?.formConfig,
+      title: extractAfterMarker(children, "contact-form-title"), // Keep this as fallback for custom titles
+      formConfig: formNode?.data?.formConfig || rawData.formConfig,
       image: resolveMedia(contactImageNode?.data?.image?.id)
     },
     quote: {

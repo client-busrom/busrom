@@ -119,6 +119,7 @@ export function OneStopSolutionTemplate({ locale, data }: OneStopSolutionTemplat
         description={cta.description || ""} 
         image={cta.image as any} 
         formConfig={cta.formConfig} 
+        locale={locale}
       />
 
       {/* Applications Section */}

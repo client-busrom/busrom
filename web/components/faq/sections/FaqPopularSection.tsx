@@ -153,8 +153,8 @@ export function FaqPopularSection({ data }: FaqPopularSectionProps) {
           {/* Previous Button */}
           <button
             onClick={handlePrev}
-            className="relative flex items-center justify-center rounded-full border-2 border-white/70 transition-all duration-300 group overflow-hidden"
-            style={{ width: vw(88), height: vw(88) }}
+            className="relative flex items-center justify-center rounded-full transition-all duration-300 group overflow-hidden"
+            style={{ width: vw(88), height: vw(88), border: `${vw(2)} solid rgba(255, 255, 255, 0.7)` }}
           >
             <div className="absolute inset-0 bg-white/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div
@@ -166,25 +166,13 @@ export function FaqPopularSection({ data }: FaqPopularSectionProps) {
                 WebkitMaskSize: vw(48),
               }}
             />
-            <div
-              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-              style={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)",
-                WebkitMaskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m15 18-6-6 6-6'/%3E%3C/svg%3E"), linear-gradient(black, black)`,
-                WebkitMaskComposite: "xor",
-                maskComposite: "exclude",
-                WebkitMaskRepeat: "no-repeat",
-                WebkitMaskPosition: "center",
-                WebkitMaskSize: `${vw(48)} ${vw(48)}, 100% 100%`,
-              }}
-            />
           </button>
 
           {/* Next Button */}
           <button
             onClick={handleNext}
-            className="relative flex items-center justify-center rounded-full border-2 border-white/70 transition-all duration-300 group overflow-hidden"
-            style={{ width: vw(88), height: vw(88) }}
+            className="relative flex items-center justify-center rounded-full transition-all duration-300 group overflow-hidden"
+            style={{ width: vw(88), height: vw(88), border: `${vw(2)} solid rgba(255, 255, 255, 0.7)` }}
           >
             <div className="absolute inset-0 bg-white/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div
@@ -194,18 +182,6 @@ export function FaqPopularSection({ data }: FaqPopularSectionProps) {
                 WebkitMaskRepeat: "no-repeat",
                 WebkitMaskPosition: "center",
                 WebkitMaskSize: vw(48),
-              }}
-            />
-            <div
-              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-              style={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)",
-                WebkitMaskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E"), linear-gradient(black, black)`,
-                WebkitMaskComposite: "xor",
-                maskComposite: "exclude",
-                WebkitMaskRepeat: "no-repeat",
-                WebkitMaskPosition: "center",
-                WebkitMaskSize: `${vw(48)} ${vw(48)}, 100% 100%`,
               }}
             />
           </button>
