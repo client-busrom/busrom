@@ -15,6 +15,7 @@
 
 import type { CollectionConfig } from 'payload'
 import { syncM2M, cleanupM2M } from '../hooks/syncM2M'
+import { formatSlug } from '../hooks/formatSlug'
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
@@ -178,18 +179,36 @@ export const Categories: CollectionConfig = {
       },
     },
     {
+      name: 'adminLabel',
+      type: 'text',
+      label: {
+        en: 'Admin Identification',
+        zh: '内部管理标识',
+      },
+      admin: {
+        description: {
+          en: 'Friendly name for internal management (not used in URLs)',
+          zh: '仅供内部管理查看，不影响公开 URL',
+        },
+      },
+    },
+    {
       name: 'slug',
       type: 'text',
       label: {
-        en: 'Slug (URL ID)',
-        zh: 'Slug (URL标识)',
+        en: 'Technical Slug',
+        zh: '技术标识 (自动生成)',
+      },
+      hooks: {
+        beforeValidate: [formatSlug('name')],
       },
       required: true,
       unique: true,
       admin: {
+        readOnly: true,
         description: {
-          en: 'URL-friendly identifier (e.g., "door-hardware")',
-          zh: 'URL友好标识符（例如："door-hardware"）',
+          en: 'This is automatically generated from the English Name.',
+          zh: '此字段根据英文名称自动生成。',
         },
       },
     },
