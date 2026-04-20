@@ -99,7 +99,12 @@ export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionPro
                   onMouseLeave={() => setHoverIndex(null)}
                   onClick={() => {
                     if (index === 5) onNavigate?.("contact");
-                    else if (item.id) onNavigate?.("category", item.id);
+                    else {
+                      // Extract slug from "/faq#faq-collaboration-consultation"
+                      const link = item.buttonLink || "";
+                      const slug = link.includes("#faq-") ? link.split("#faq-")[1] : item.id;
+                      onNavigate?.("category", slug);
+                    }
                   }}
                 >
                   {/* Giant Letter */}
