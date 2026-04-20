@@ -18,6 +18,7 @@ interface FaqItem {
 
 interface CategoryData {
   id: string;
+  slug: string;
   title: string;
   artText: string;
   image: any;
@@ -41,14 +42,25 @@ export function FaqDetailSection({
   activeId,
   setActiveId,
 }: FaqDetailSectionProps) {
-  const categories: CategoryData[] = (data.items || []).map((cat, idx) => ({
-    id: cat.id || `cat-${idx}`,
-    title: cat.title || "",
-    artText: cat.artText || "",
-    image: cat.image,
-    faqs: cat.faqs || [],
-    icon: cat.icon || "lucide:message-circle",
-  }));
+  const categories: CategoryData[] = (data.items || []).map((cat, idx) => {
+    // Generate slug from title since the 'slug' field is missing after parsing
+    const generatedSlug = (cat.title || "")
+      .toLowerCase()
+      .trim()
+      .replace(/[&\s]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/[^\w-]/g, "");
+
+    return {
+      id: cat.id || `cat-${idx}`,
+      slug: generatedSlug, // Use the generated slug
+      title: cat.title || "",
+      artText: cat.artText || "",
+      image: cat.image,
+      faqs: cat.faqs || [],
+      icon: cat.icon || "lucide:message-circle",
+    };
+  });
 
   React.useEffect(() => {
     if (!activeId && categories.length > 0) {
@@ -88,7 +100,12 @@ export function FaqDetailSection({
       <div
         className="relative w-full flex justify-center z-50"
         ref={constraintsRef}
-        style={{ paddingTop: vw(50), marginBottom: vw(100), paddingLeft: vw(100), paddingRight: vw(100) }}
+        style={{
+          paddingTop: vw(50),
+          marginBottom: vw(60),
+          paddingLeft: vw(100),
+          paddingRight: vw(100),
+        }}
       >
         <motion.div
           drag="x"
@@ -98,12 +115,15 @@ export function FaqDetailSection({
         >
           {categories.map((cat) => {
             const isActive = cat.id === activeId;
+            const slug = cat.slug;
+
             return (
               <button
                 key={cat.id}
+                id={slug ? `faq-${slug}` : undefined}
                 onClick={() => setActiveId(cat.id)}
                 className={`flex items-center transition-all duration-500 relative shrink-0 ${
-                  isActive ? "opacity-100" : "opacity-40 grayscale hover:opacity-100"
+                  isActive ? "opacity-100" : "opacity-80 hover:opacity-100"
                 }`}
               >
                 <div
@@ -121,12 +141,12 @@ export function FaqDetailSection({
 
                 <div
                   className="bg-[#dbd5ab] rounded-full border border-[#a0974d] flex flex-col justify-center"
-                  style={{ 
-                    height: vw(72), 
-                    minWidth: vw(180), 
-                    marginLeft: vw(-18), 
-                    paddingLeft: vw(35), 
-                    paddingRight: vw(30) 
+                  style={{
+                    height: vw(72),
+                    minWidth: vw(180),
+                    marginLeft: vw(-18),
+                    paddingLeft: vw(35),
+                    paddingRight: vw(30),
                   }}
                 >
                   <span
@@ -152,31 +172,31 @@ export function FaqDetailSection({
         </motion.div>
       </div>
 
-      <div className="flex relative items-start" style={{ paddingLeft: vw(230), paddingRight: vw(230), gap: vw(100) }}>
+      <div
+        className="flex relative items-start"
+        style={{ paddingLeft: vw(230), paddingRight: vw(230), gap: vw(100) }}
+      >
         {/* 2. Left Column */}
         <div className="flex flex-col relative" style={{ width: vw(520) }}>
           <div
             className="absolute z-0 pointer-events-none select-none"
-            style={{ left: vw(-80), top: vw(-60) }}
+            style={{ left: vw(-140), top: vw(-240) }}
           >
             <motion.div
               key={`amp-decor-${activeId}`}
               initial={{ opacity: 0, rotate: -15, scale: 0.8 }}
               animate={{ opacity: 0.7, rotate: -25, scale: 1.2 }}
               transition={{ duration: 1.5, ease: "easeOut" }}
+              className="font-paytone-one leading-none select-none"
+              style={{
+                fontSize: vw(320),
+                background:
+                  "linear-gradient(to bottom, #f6f4ed 20%, #e6e0cc 80%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
             >
-              <svg width={vw(248)} height={vw(300)} viewBox="0 0 248 300" fill="none">
-                <defs>
-                  <linearGradient id="ampGradPrecise" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#efead8" />
-                    <stop offset="100%" stopColor="#e2dcc5" />
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M124 280C140 280 160 260 160 230C160 210 150 195 130 185C160 170 185 140 185 100C185 50 150 20 110 20C65 20 30 60 30 110C30 140 45 165 70 185C50 195 40 210 40 230C40 260 60 280 76 280H124V280ZM124 165C138 155 145 130 145 100C145 70 135 45 110 45C85 45 70 70 70 100C70 130 77 155 91 165H124ZM120 255H80C75 255 70 250 70 240C70 230 75 225 80 225H120C125 225 130 230 130 240C130 250 125 255 120 255Z"
-                  fill="url(#ampGradPrecise)"
-                />
-              </svg>
+              &
             </motion.div>
           </div>
 
@@ -184,13 +204,13 @@ export function FaqDetailSection({
             key={`title-main-${activeId}`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-[#645c1d] font-bold z-10 uppercase"
+            className="text-[#635B15] font-regular z-10 uppercase"
             style={{
-              fontSize: vw(54),
+              fontSize: vw(60),
               fontFamily: "var(--font-fredericka), serif",
               lineHeight: 1.1,
               whiteSpace: "pre-line",
-              marginBottom: vw(35)
+              marginBottom: vw(35),
             }}
           >
             {activeCategory.title.split("&").join("\n")}
@@ -217,7 +237,7 @@ export function FaqDetailSection({
             ref={scrollRef}
             onScroll={handleScroll}
             className="overflow-y-auto custom-scrollbar"
-            style={{ height: vw(520), paddingRight: vw(60) }}
+            style={{ height: vw(580), paddingRight: vw(60) }}
             data-lenis-prevent
           >
             {activeCategory.faqs.map((faq, fIdx) => {
@@ -225,10 +245,17 @@ export function FaqDetailSection({
               const numStr = (fIdx + 1).toString().padStart(2, "0") + ".";
 
               return (
-                <div key={faq.id} className="w-full border-t border-[#c7c3a5] first:border-t-2">
+                <div
+                  key={faq.id}
+                  className="w-full border-t border-[#c7c3a5] first:border-t-2"
+                >
                   <div
                     className="group cursor-pointer flex items-start"
-                    style={{ paddingTop: vw(35), paddingBottom: vw(35), gap: vw(30) }}
+                    style={{
+                      paddingTop: vw(35),
+                      paddingBottom: vw(35),
+                      gap: vw(30),
+                    }}
                     onClick={() => toggleFaq(faq.id)}
                   >
                     <span
@@ -236,7 +263,7 @@ export function FaqDetailSection({
                       style={{
                         fontSize: vw(36),
                         fontFamily: "var(--font-anaheim), sans-serif",
-                        marginTop: vw(8)
+                        marginTop: vw(8),
                       }}
                     >
                       {numStr}
@@ -246,14 +273,17 @@ export function FaqDetailSection({
                       className="text-black font-bold flex-1 leading-[1.2]"
                       style={{
                         fontSize: vw(38),
-                        fontFamily: "var(--font-anaheim), sans-serif"
+                        fontFamily: "var(--font-anaheim), sans-serif",
                       }}
                     >
                       {faq.question}
                     </h1>
 
                     {/* Action Slot: Shows Arrow when closed, Image when open */}
-                    <div className="relative shrink-0" style={{ width: vw(180), height: vw(60) }}>
+                    <div
+                      className="relative shrink-0"
+                      style={{ width: vw(180), height: vw(60) }}
+                    >
                       <AnimatePresence mode="wait">
                         {!isOpen ? (
                           <motion.div
@@ -262,10 +292,25 @@ export function FaqDetailSection({
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.8 }}
                             className="flex items-center justify-center rounded-full bg-[#ece6d0] absolute right-0"
-                            style={{ width: vw(60), height: vw(60), marginTop: vw(4) }}
+                            style={{
+                              width: vw(60),
+                              height: vw(60),
+                              marginTop: vw(4),
+                            }}
                           >
-                            <svg width={vw(24)} height={vw(24)} viewBox="0 0 24 24" fill="none">
-                              <path d="M9 5L16 12L9 19" stroke="#676767" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <svg
+                              width={vw(24)}
+                              height={vw(24)}
+                              viewBox="0 0 24 24"
+                              fill="none"
+                            >
+                              <path
+                                d="M9 5L16 12L9 19"
+                                stroke="#676767"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
                             </svg>
                           </motion.div>
                         ) : (
@@ -297,13 +342,20 @@ export function FaqDetailSection({
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                       >
-                        <div className="flex" style={{ paddingBottom: vw(40), paddingLeft: vw(88), paddingRight: vw(220) }}>
+                        <div
+                          className="flex"
+                          style={{
+                            paddingBottom: vw(40),
+                            paddingLeft: vw(88),
+                            paddingRight: vw(220),
+                          }}
+                        >
                           <div
                             className="flex-1 text-[#605b37]"
                             style={{
                               fontSize: vw(22),
                               lineHeight: 1.4,
-                              fontFamily: "var(--font-anaheim), sans-serif"
+                              fontFamily: "var(--font-anaheim), sans-serif",
                             }}
                           >
                             <LexicalRenderer content={faq.answer} />
@@ -320,7 +372,12 @@ export function FaqDetailSection({
           {/* Scrollbar */}
           <div
             className="absolute bg-[#e0dbbc] rounded-full"
-            style={{ width: vw(6), height: vw(520), right: vw(10), top: vw(10) }}
+            style={{
+              width: vw(6),
+              height: vw(580),
+              right: vw(10),
+              top: vw(10),
+            }}
           >
             <motion.div
               className="w-full bg-[#756f3f] rounded-full"
@@ -335,7 +392,10 @@ export function FaqDetailSection({
       </div>
 
       {/* 4. Action Button */}
-      <div className="absolute z-[100]" style={{ right: vw(80), bottom: vw(80) }}>
+      <div
+        className="absolute z-[100]"
+        style={{ right: vw(240), bottom: vw(40) }}
+      >
         <a
           href={data.selection?.viewButtonLink || "#"}
           className="group/btn block"
@@ -347,14 +407,14 @@ export function FaqDetailSection({
               width: vw(320),
               height: vw(76),
               paddingLeft: vw(26),
-              paddingRight: vw(9)
+              paddingRight: vw(9),
             }}
           >
             <span
               className="text-white font-bold tracking-widest"
               style={{
                 fontSize: vw(20),
-                fontFamily: "var(--font-lexend-deca), sans-serif"
+                fontFamily: "var(--font-lexend-deca), sans-serif",
               }}
             >
               {data.selection?.viewButtonText || "VIEW MORE"}
