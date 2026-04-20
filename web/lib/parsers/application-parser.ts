@@ -74,6 +74,7 @@ export interface ApplicationData {
     logoImage?: string;
     richText: { text: string; bold?: boolean }[];
     formId?: string;
+    formConfig?: any;
   };
   guide: {
     title: { text: string; bold?: boolean; linebreak?: boolean }[];
@@ -245,8 +246,8 @@ export function parseApplicationData(locale: string, pageContent: any): Applicat
   const moreCarousel = moreAppNodes.find(n => n.type === "applicationCarousel" || n.type === "productCarousel");
 
   // 7. Contact Form
-  const contactFormNodes = extractNodesAfterMarker(children, "contact-form");
-  const formBlock = contactFormNodes.find(n => n.type === 'formBlock') || children.find((n: any) => n.type === 'formBlock');
+  const contactFormNodes = extractNodesAfterMarker(children, "contact-form-block");
+  const formNode = contactFormNodes.find(n => n.type === 'formBlock');
 
   return {
     hero: {
@@ -299,7 +300,7 @@ export function parseApplicationData(locale: string, pageContent: any): Applicat
       displayImage: findImgUrlByMarker("contact-form-image") || findImgUrlByMarker("contact-form-display-image"),
       logoImage: findImgUrlByMarker("contact-form-logo"),
       richText: findRichTextByMarker("contact-form-title"),
-      formId: typeof formBlock?.data?.formConfig === 'string' ? formBlock.data.formConfig : formBlock?.data?.formConfig?.id || formBlock?.data?.id
+      formConfig: formNode?.data?.formConfig
     },
     guide: {
       title: findRichTextByMarker("application-guide-title"),

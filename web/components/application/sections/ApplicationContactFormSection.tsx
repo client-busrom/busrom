@@ -39,6 +39,7 @@ interface Props {
   logoImage?: string;
   richText?: RichTextSegment[];
   formId?: string;
+  formConfig?: any;
 }
 
 // Custom Dropdown for "Beautification"
@@ -145,8 +146,8 @@ export function ApplicationContactFormSection({
   logoImage,
   richText,
   formId,
+  formConfig: propFormConfig,
 }: Props) {
-  const [formConfig, setFormConfig] = useState<FormConfig | null>(null);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<
@@ -167,44 +168,28 @@ export function ApplicationContactFormSection({
   const marginTopL = 75;
   const marginTopR = 87;
 
-  useEffect(() => {
-    const fetchConfig = async () => {
-      console.log(
-        "[ApplicationContactFormSection] Starting fetch for formId:",
-        formId,
-      );
-      if (!formId) return;
-      try {
-        const res = await fetch(`/api/form-configs/${formId}?locale=${locale}`);
-        if (res.ok) {
-          const data = await res.json();
-          console.log(
-            "[ApplicationContactFormSection] Received API data:",
-            data,
-          );
-          setFormConfig(data);
+  const formConfig = useMemo(() => {
+    return propFormConfig;
+  }, [propFormConfig]);
 
-          // Safer field extraction for initial data state
-          const rawFields = data?.fields || data?.data?.fields;
-          if (rawFields) {
-            const fieldsArr = Array.isArray(rawFields)
-              ? rawFields
-              : rawFields[locale] || rawFields["en"] || [];
-            const initialData: Record<string, any> = {};
-            if (Array.isArray(fieldsArr)) {
-              fieldsArr.forEach((f: FormField) => {
-                initialData[f.fieldName] = "";
-              });
-              setFormData(initialData);
-            }
-          }
+  // Handle initial form data state from fields
+  useEffect(() => {
+    if (formConfig) {
+      const rawFields = formConfig?.fields || formConfig?.data?.fields;
+      if (rawFields) {
+        const fieldsArr = Array.isArray(rawFields)
+          ? rawFields
+          : rawFields[locale] || rawFields["en"] || [];
+        const initialData: Record<string, any> = {};
+        if (Array.isArray(fieldsArr)) {
+          fieldsArr.forEach((f: FormField) => {
+            initialData[f.fieldName] = "";
+          });
+          setFormData(initialData);
         }
-      } catch (err) {
-        console.error("Failed to fetch form config:", err);
       }
-    };
-    fetchConfig();
-  }, [formId, locale]);
+    }
+  }, [formConfig, locale]);
 
   const handleInputChange = (fieldName: string, value: any) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }));

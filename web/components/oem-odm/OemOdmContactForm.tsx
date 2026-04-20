@@ -251,7 +251,24 @@ export function OemOdmContactForm({
         return
       }
 
-      // 提交表单
+      // 1. Upload files first if any
+      const fileIds: string[] = [];
+      if (uploadedFiles.length > 0) {
+        const fileFormData = new FormData();
+        uploadedFiles.forEach(file => fileFormData.append('files', file));
+        
+        const uploadRes = await fetch('/api/form-file-upload', {
+          method: 'POST',
+          body: fileFormData,
+        });
+        
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          fileIds.push(...(uploadData.fileIds || []));
+        }
+      }
+
+      // 2. Submit form with file IDs
       const res = await fetch("/api/form-submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -259,6 +276,7 @@ export function OemOdmContactForm({
           formId: formConfig?.id || configData?.id,
           formName: configData?.name,
           data: formData,
+          fileIds,
           locale,
           sourcePage: typeof window !== "undefined" ? window.location.href : "",
           userLocalTime: typeof window !== "undefined" ? new Date().toString() : "",

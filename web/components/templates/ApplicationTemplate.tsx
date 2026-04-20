@@ -86,6 +86,7 @@ export function ApplicationTemplate({ locale, data, applications, moreApplicatio
         logoImage={contactForm.logoImage}
         richText={contactForm.richText}
         formId={contactForm.formId}
+        formConfig={contactForm.formConfig}
       />
       <ApplicationGuideSection 
         title={guide.title}
