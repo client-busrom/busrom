@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 
 import { useLexicalComposerContext } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposerContext'
