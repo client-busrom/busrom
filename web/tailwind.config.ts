@@ -167,6 +167,7 @@ const config: Config = {
         'jomhuria':    ['var(--font-jomhuria)', 'sans-serif'],
         'josefin-sans': ['var(--font-josefin-sans)', 'sans-serif'],
         'joan':          ['var(--font-joan)', 'serif'],
+        'tenor-sans':    ['var(--font-tenor-sans)', 'serif'],
         'lilita-one':    ['var(--font-lilita-one)', 'sans-serif'],
         'kaushan-script': ['var(--font-kaushan-script)', 'cursive'],
         'cherry-bomb': ['var(--font-cherry-bomb)', 'cursive'],
