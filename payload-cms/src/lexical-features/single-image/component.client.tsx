@@ -13,7 +13,7 @@ import { Image as ImageIcon, Link as LinkIcon } from 'lucide-react'
 import type { SingleImageData } from './node'
 import { $createSingleImageNode, SingleImageNode } from './node'
 import { MediaPickerModal } from '../image-gallery/component.client'
-import { LinkPickerModal } from '../carousel/component.client'
+import { LinkPickerModal } from '../shared/LinkPickerModal'
 
 interface MediaItem {
   id: number
