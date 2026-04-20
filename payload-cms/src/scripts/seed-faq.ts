@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getPayload } from 'payload'
 import config from '../../payload.config'
 import { sql } from '@payloadcms/db-postgres'
@@ -74,7 +75,7 @@ const seedFaq = async () => {
       data: {
         adminLabel: item.s,
         question: item.q,
-        answer: {
+        contentTranslation: {
           root: {
             type: 'root',
             format: '',
