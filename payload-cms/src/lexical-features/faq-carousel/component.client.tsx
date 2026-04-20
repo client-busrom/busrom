@@ -24,11 +24,25 @@ const getLocalizedString = (val: any, lang: string = 'en') => {
 
 // --- GenericPickerModal (Shared Internal) ---
 
-const GenericPickerModal = ({ title, collection, isZh, onClose, onSelect, selectedIds, i18n, multiple = true, filter = {} }) => {
+interface GenericPickerModalProps {
+  title: string
+  collection: string
+  isZh: boolean
+  onClose: () => void
+  onSelect: (selected: any[]) => void
+  selectedIds: any[]
+  i18n: any
+  multiple?: boolean
+  filter?: Record<string, any>
+}
+
+const GenericPickerModal: React.FC<GenericPickerModalProps> = ({ 
+  title, collection, isZh, onClose, onSelect, selectedIds, i18n, multiple = true, filter = {} 
+}) => {
   const [searchTerm, setSearchTerm] = useState('')
-  const [items, setItems] = useState([])
+  const [items, setItems] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
-  const [localSelected, setLocalSelected] = useState([])
+  const [localSelected, setLocalSelected] = useState<any[]>([])
   const [page, setPage] = useState(1)
   const [hasNext, setHasNext] = useState(false)
 
