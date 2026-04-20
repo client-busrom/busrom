@@ -170,38 +170,11 @@ export function ContactFormSection({
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null)
   const [turnstileKey, setTurnstileKey] = useState(0)
-  const [fetchedFormConfig, setFetchedFormConfig] = useState<any>(null)
 
-  // Fetch full form config if we only have an ID or if we want to ensure we have the latest messages
-  useEffect(() => {
-    const fetchFullConfig = async () => {
-      const configId = formConfig?.id || (typeof formConfig === 'string' ? formConfig : null);
-      if (!configId) return;
-
-      try {
-        const res = await fetch(`/api/form-configs/${configId}?locale=${locale}`);
-        if (res.ok) {
-          const data = await res.json();
-          setFetchedFormConfig(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch full form config:", error);
-      }
-    };
-
-    fetchFullConfig();
-  }, [formConfig?.id, locale]);
-
-  // Merge provided config with fetched config
+  // Merge provided config
   const mergedConfig = useMemo(() => {
-    return {
-      ...formConfig,
-      ...fetchedFormConfig,
-      // Prioritize fetched messages for privacy and submit button
-      privacyConsentText: fetchedFormConfig?.privacyConsentText || formConfig?.privacyConsentText,
-      submitButtonText: fetchedFormConfig?.submitButtonText || formConfig?.submitButtonText || submitButtonText,
-    };
-  }, [formConfig, fetchedFormConfig, submitButtonText]);
+    return typeof formConfig === "string" ? { id: formConfig } : formConfig || {};
+  }, [formConfig]);
 
   // Fetch Turnstile site key
   const effectivePrivacyText = useMemo(() => {

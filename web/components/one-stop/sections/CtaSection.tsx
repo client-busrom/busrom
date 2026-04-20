@@ -141,38 +141,9 @@ export function CtaSection({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // --- Fetch full form config if only an ID is provided ---
-  const [fetchedFormConfig, setFetchedFormConfig] = useState<any>(null);
-
-  useEffect(() => {
-    const configId =
-      typeof formConfig === "string" ? formConfig : formConfig?.id;
-    if (!configId) return;
-
-    const fetchFullConfig = async () => {
-      try {
-        const res = await fetch(
-          `/api/form-configs/${configId}?locale=${locale}&depth=2`,
-        );
-        if (res.ok) {
-          const data = await res.json();
-          setFetchedFormConfig(data);
-        }
-      } catch (error) {
-        console.error("[CtaSection] Failed to fetch full form config:", error);
-      }
-    };
-    fetchFullConfig();
-  }, [formConfig, locale]);
-
   const mergedConfig = useMemo(() => {
-    const baseConfig =
-      typeof formConfig === "string" ? { id: formConfig } : formConfig || {};
-    return {
-      ...baseConfig,
-      ...fetchedFormConfig,
-    };
-  }, [formConfig, fetchedFormConfig]);
+    return typeof formConfig === "string" ? { id: formConfig } : formConfig || {};
+  }, [formConfig]);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [isGloballyAccepted, setIsGloballyAccepted] = useState(false);
   const STORAGE_KEY = "busrom_privacy_consent";

@@ -48,8 +48,6 @@ export function SupportContactFormSection({
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   
-  const [fetchedFormConfig, setFetchedFormConfig] = useState<any>(null)
-  
   const getLocalizedString = useCallback((value: any, locale: string) => {
     if (!value) return null
     if (typeof value === 'string') return value
@@ -59,32 +57,9 @@ export function SupportContactFormSection({
     return null
   }, [])
 
-  // Fetch full config if needed
-  useEffect(() => {
-    const configId = typeof formConfig === 'string' ? formConfig : formConfig?.id
-    if (!configId) return
-
-    const fetchFullConfig = async () => {
-      try {
-        const res = await fetch(`/api/form-configs/${configId}?locale=${locale}`)
-        if (res.ok) {
-          const data = await res.json()
-          setFetchedFormConfig(data)
-        }
-      } catch (error) {
-        console.error("Failed to fetch full form config:", error)
-      }
-    }
-    fetchFullConfig()
-  }, [formConfig, locale])
-
   const mergedConfig = useMemo(() => {
-    const baseConfig = typeof formConfig === 'string' ? { id: formConfig } : formConfig || {}
-    return {
-      ...baseConfig,
-      ...fetchedFormConfig
-    }
-  }, [formConfig, fetchedFormConfig])
+    return typeof formConfig === 'string' ? { id: formConfig } : formConfig || {}
+  }, [formConfig])
 
   const validImages = useMemo(() => {
     return images.filter((img): img is MediaObject => !!img?.url)

@@ -113,7 +113,6 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null)
   const [turnstileKey, setTurnstileKey] = useState(0)
-  const [fetchedFormConfig, setFetchedFormConfig] = useState<any>(null)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [extraHeight, setExtraHeight] = useState(0)
@@ -172,31 +171,9 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
     return () => observer.disconnect()
   }, [])
 
-  useEffect(() => {
-    const fetchFullConfig = async () => {
-      const configId = formConfig?.id || (typeof formConfig === 'string' ? formConfig : null);
-      if (!configId) return;
-      try {
-        const res = await fetch(`/api/form-configs/${configId}?locale=${locale}`);
-        if (res.ok) {
-          const fetchedData = await res.json();
-          setFetchedFormConfig(fetchedData);
-        }
-      } catch (error) {
-        console.error("Failed to fetch full form config:", error);
-      }
-    };
-    fetchFullConfig();
-  }, [formConfig?.id, locale]);
-
   const mergedConfig = useMemo(() => {
-    return {
-      ...formConfig,
-      ...fetchedFormConfig,
-      privacyConsentText: fetchedFormConfig?.privacyConsentText || formConfig?.privacyConsentText,
-      submitButtonText: fetchedFormConfig?.submitButtonText || formConfig?.submitButtonText || "Submit",
-    };
-  }, [formConfig, fetchedFormConfig]);
+    return typeof formConfig === "string" ? { id: formConfig } : formConfig || {};
+  }, [formConfig]);
 
   const effectivePrivacyText = useMemo(() => {
     return getLocalizedString(mergedConfig?.privacyConsentText, locale || 'en');

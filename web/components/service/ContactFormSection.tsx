@@ -143,6 +143,18 @@ export function ContactFormSection({
   const [isGloballyAccepted, setIsGloballyAccepted] = useState(false)
   const STORAGE_KEY = 'busrom_privacy_consent'
 
+  // Initial form data state from fields
+  useEffect(() => {
+    if (initialFormConfig) {
+      const initialData: Record<string, any> = {}
+      initialFormConfig.fields?.forEach((field: FormField) => {
+        initialData[field.fieldName] = field.fieldType === "checkbox" ? [] : ""
+      })
+      setFormData(initialData)
+      setSubmissionCount(getSubmissionCount(formName))
+    }
+  }, [initialFormConfig, formName])
+
   // Check global consent status on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -200,51 +212,6 @@ export function ContactFormSection({
   const handleTurnstileExpire = useCallback(() => {
     setTurnstileToken(null)
   }, [])
-
-  // Fetch form configuration
-  useEffect(() => {
-    if (initialFormConfig) {
-      setFormConfig(initialFormConfig)
-      const initialData: Record<string, any> = {}
-      initialFormConfig.fields.forEach((field: FormField) => {
-        initialData[field.fieldName] = field.fieldType === "checkbox" ? [] : ""
-      })
-      setFormData(initialData)
-      setSubmissionCount(getSubmissionCount(formName))
-      setLoading(false)
-      return
-    }
-
-    const fetchFormConfig = async () => {
-      try {
-        const identifier = formId || formName
-        const res = await fetch(`/api/form-configs/${identifier}?depth=2&draft=false&locale=${locale}&trash=false`)
-        const data = await res.json()
-        
-        // Handle different data structures (Payload/Strapi/Direct)
-        const config = data?.fields ? data : (data?.data?.fields ? data.data : (data?.form?.fields ? data.form : data))
-        
-        if (config && config.fields) {
-          setFormConfig(config)
-          const initialData: Record<string, any> = {}
-          config.fields.forEach((field: FormField) => {
-            initialData[field.fieldName] = field.fieldType === "checkbox" ? [] : ""
-          })
-          setFormData(initialData)
-          setSubmissionCount(getSubmissionCount(formName))
-        } else {
-          setError("Failed to load form configuration")
-        }
-      } catch (err) {
-        console.error("Error fetching form config:", err)
-        setError("Failed to load form")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchFormConfig()
-  }, [formName, formId, initialFormConfig, locale])
 
   const handleChange = (fieldName: string, value: any) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }))
