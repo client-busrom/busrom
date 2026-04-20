@@ -805,7 +805,11 @@ export interface Category {
    */
   name: string;
   /**
-   * URL-friendly identifier (e.g., "door-hardware")
+   * Friendly name for internal management (not used in URLs)
+   */
+  adminLabel?: string | null;
+  /**
+   * This is automatically generated from the English Name.
    */
   slug: string;
   type: 'PAGE' | 'PRODUCT' | 'BLOG' | 'APPLICATION' | 'FAQ';
@@ -1447,7 +1451,11 @@ export interface Application {
 export interface FaqItem {
   id: number;
   /**
-   * Unique identifier (e.g., "shipping-policy")
+   * This identifier is for internal management and can contain spaces/caps. (e.g. "FAQ- Shipping Policy")
+   */
+  adminLabel: string;
+  /**
+   * This is automatically generated and used for deep linking anchors.
    */
   slug: string;
   question: string;
@@ -2660,6 +2668,7 @@ export interface ApplicationsSelect<T extends boolean = true> {
 export interface CategoriesSelect<T extends boolean = true> {
   fullTitle?: T;
   name?: T;
+  adminLabel?: T;
   slug?: T;
   type?: T;
   parent?: T;
@@ -2679,6 +2688,7 @@ export interface CategoriesSelect<T extends boolean = true> {
  * via the `definition` "faq-items_select".
  */
 export interface FaqItemsSelect<T extends boolean = true> {
+  adminLabel?: T;
   slug?: T;
   question?: T;
   contentTranslation?: T;

@@ -10,6 +10,7 @@
  */
 
 import type { CollectionConfig } from 'payload'
+import { formatSlug } from '../hooks/formatSlug'
 
 export const FaqItems: CollectionConfig = {
   slug: 'faq-items',
@@ -24,8 +25,8 @@ export const FaqItems: CollectionConfig = {
     },
   },
   admin: {
-    useAsTitle: 'slug',
-    defaultColumns: ['slug', 'category', 'order', 'status'],
+    useAsTitle: 'adminLabel',
+    defaultColumns: ['adminLabel', 'slug', 'category', 'status'],
     group: {
       en: 'Content',
       zh: '内容管理',
@@ -66,18 +67,37 @@ export const FaqItems: CollectionConfig = {
           },
           fields: [
             {
+              name: 'adminLabel',
+              type: 'text',
+              label: {
+                en: 'Admin Identification (Internal Use)',
+                zh: '内部管理标识（不影响URL）',
+              },
+              admin: {
+                description: {
+                  en: 'This identifier is for internal management and can contain spaces/caps. (e.g. "FAQ- Shipping Policy")',
+                  zh: '仅用于后台管理区分，可以包含空格和大小写（例如："FAQ- 配送政策"）',
+                },
+              },
+              required: true,
+            },
+            {
               name: 'slug',
               type: 'text',
               label: {
-                en: 'Slug',
-                zh: '标识',
+                en: 'Technical Slug (URL Anchor)',
+                zh: '技术标识 (自动生成)',
+              },
+              hooks: {
+                beforeValidate: [formatSlug('question')],
               },
               required: true,
               unique: true,
               admin: {
+                readOnly: true,
                 description: {
-                  en: 'Unique identifier (e.g., "shipping-policy")',
-                  zh: '唯一标识符（例如："shipping-policy"）',
+                  en: 'This is automatically generated and used for deep linking anchors.',
+                  zh: '此字段自动生成，用于前端锚点跳转，不可手动修改。',
                 },
               },
             },
