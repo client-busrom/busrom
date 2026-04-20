@@ -2,7 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
-import { Fredericka_the_Great, Amiri, Black_Han_Sans, Berkshire_Swash, Cherry_Bomb_One, Amarante, Quicksand, Lemon, Lobster, Katibeh, Prata, Lexend_Deca, Anton } from "next/font/google";
+import { Agbalumo, Fredericka_the_Great, Amiri, Black_Han_Sans, Berkshire_Swash, Cherry_Bomb_One, Amarante, Quicksand, Lemon, Lobster, Katibeh, Prata, Lexend_Deca, Anton, Abhaya_Libre } from "next/font/google";
 import dynamic from "next/dynamic";
 import "../globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -242,6 +242,22 @@ const anton = Anton({
   preload: false,
 });
 
+const abhayaLibre = Abhaya_Libre({
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-abhaya-libre",
+  display: "swap",
+  subsets: ["latin"],
+  preload: false,
+});
+
+const agbalumo = Agbalumo({
+  weight: "400",
+  variable: "--font-agbalumo",
+  display: "swap",
+  subsets: ["latin"],
+  preload: false,
+});
+
 const bagelFatOne = localFont({
   src: "../../public/fonts/BagelFatOne-Regular.ttf",
   weight: "400",
@@ -320,6 +336,8 @@ export default async function RootLayout({
         ${fontPrata.variable}
         ${fontLexendDeca.variable}
         ${anton.variable}
+        ${abhayaLibre.variable}
+        ${agbalumo.variable}
         ${bagelFatOne.variable}
         antialiased
       `}

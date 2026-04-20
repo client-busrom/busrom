@@ -59,10 +59,12 @@ interface FormConfig {
 }
 
 interface DynamicFormProps {
-  formName: string
+  formConfig?: any
+  formName?: string
   locale: Locale
   className?: string
   onSuccess?: () => void
+  style?: React.CSSProperties
 }
 
 // Helper to get submission count from sessionStorage
@@ -80,10 +82,10 @@ const incrementSubmissionCount = (formName: string): void => {
   sessionStorage.setItem(key, String(current + 1))
 }
 
-export function DynamicForm({ formName, locale, className, onSuccess }: DynamicFormProps) {
-  const [formConfig, setFormConfig] = useState<FormConfig | null>(null)
+export function DynamicForm({ formConfig: initialFormConfig, formName, locale, className, onSuccess, style }: DynamicFormProps) {
+  const [formConfig, setFormConfig] = useState<FormConfig | null>(initialFormConfig || null)
   const [formData, setFormData] = useState<Record<string, any>>({})
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!initialFormConfig)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -142,9 +144,24 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
     setTurnstileToken(null)
   }, [])
 
-  // Fetch form configuration and submission count
+  // Initialize form data if config is already available
   useEffect(() => {
-    const fetchFormConfig = async () => {
+    if (initialFormConfig && initialFormConfig.fields) {
+      const initialData: Record<string, any> = {}
+      initialFormConfig.fields.forEach((field: FormField) => {
+        initialData[field.fieldName] = field.fieldType === 'checkbox' ? [] : ''
+      })
+      setFormData(initialData)
+      setSubmissionCount(getSubmissionCount(formName || initialFormConfig.name || 'default'))
+    }
+  }, [initialFormConfig, formName])
+
+  // Fetch form configuration ONLY if not provided via props
+  useEffect(() => {
+    if (initialFormConfig) return
+
+    const fetchFormConfigData = async () => {
+      if (!formName) return
       try {
         const res = await fetch(`/api/form-config/${formName}?locale=${locale}`)
         if (res.ok) {
@@ -171,8 +188,8 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
       }
     }
 
-    fetchFormConfig()
-  }, [formName, locale])
+    fetchFormConfigData()
+  }, [formName, locale, initialFormConfig])
 
   // Close file help popup when clicking outside
   useEffect(() => {
@@ -433,7 +450,8 @@ export function DynamicForm({ formName, locale, className, onSuccess }: DynamicF
         }
 
         // Increment submission count for next time
-        incrementSubmissionCount(formName)
+        const finalFormName = formName || formConfig?.name || 'default-form';
+        incrementSubmissionCount(finalFormName)
         setSubmissionCount(prev => prev + 1)
 
         // Reset form after 5 seconds

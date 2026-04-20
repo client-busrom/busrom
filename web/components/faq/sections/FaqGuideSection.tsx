@@ -15,82 +15,19 @@ interface FaqGuideSectionProps {
     items: any[];
   };
   locale: string;
+  onNavigate?: (type: "category" | "contact", id?: string) => void;
 }
 
-/**
- * Layout configuration for the 6 visual tracks (Staged Mask Slits)
- * Based on the precise Pencil design file measurements.
- */
 const STRIPS_CONFIG = [
-  {
-    id: 1,
-    w: 267,
-    charX: 156,
-    charY: 52,
-    imgW: 320,
-    imgH: 320,
-    imgX: -1,
-    imgY: 266,
-    charW: 153,
-  },
-  {
-    id: 2,
-    w: 265,
-    charX: 14,
-    charY: 397,
-    imgW: 341,
-    imgH: 341,
-    imgX: -33,
-    imgY: 99,
-    charW: 153,
-  },
-  {
-    id: 3,
-    w: 265,
-    charX: 95,
-    charY: 73,
-    imgW: 355,
-    imgH: 355,
-    imgX: -44,
-    imgY: 216,
-    charW: 153,
-  },
-  {
-    id: 4,
-    w: 265,
-    charX: 20,
-    charY: 440,
-    imgW: 418,
-    imgH: 417,
-    imgX: -86,
-    imgY: 60,
-    charW: 153,
-  },
-  {
-    id: 5,
-    w: 265,
-    charX: -32,
-    charY: 56,
-    imgW: 414,
-    imgH: 414,
-    imgX: -47,
-    imgY: 154,
-    charW: 153,
-  },
-  {
-    id: 6,
-    w: 288,
-    charX: 59,
-    charY: 161,
-    imgW: 364,
-    imgH: 364,
-    imgX: -76,
-    imgY: 239,
-    charW: 218,
-  },
+  { id: 1, w: 267, charX: 156, charY: 52, imgW: 320, imgH: 320, imgX: -1, imgY: 266, charW: 153 },
+  { id: 2, w: 265, charX: 14, charY: 397, imgW: 341, imgH: 341, imgX: -33, imgY: 99, charW: 153 },
+  { id: 3, w: 265, charX: 95, charY: 73, imgW: 355, imgH: 355, imgX: -44, imgY: 216, charW: 153 },
+  { id: 4, w: 265, charX: 20, charY: 440, imgW: 418, imgH: 417, imgX: -86, imgY: 60, charW: 153 },
+  { id: 5, w: 265, charX: -32, charY: 56, imgW: 414, imgH: 414, imgX: -47, imgY: 154, charW: 153 },
+  { id: 6, w: 288, charX: 59, charY: 161, imgW: 364, imgH: 364, imgX: -76, imgY: 239, charW: 218 },
 ];
 
-export function FaqGuideSection({ data, locale }: FaqGuideSectionProps) {
+export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionProps) {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   const getNodesText = (nodes: any[] | undefined | null): string => {
@@ -108,19 +45,10 @@ export function FaqGuideSection({ data, locale }: FaqGuideSectionProps) {
   const subtitleText = getNodesText(data.subtitle) || "NAVIGATION";
 
   return (
-    <section
-      className="relative w-full overflow-hidden"
-      style={{ height: vw(922) }}
-    >
+    <section className="relative w-full overflow-hidden" style={{ height: vw(922) }}>
       {/* Header Area */}
-      <div
-        className="relative w-full"
-        style={{ marginTop: vw(65), marginBottom: vw(60) }}
-      >
-        <div
-          className="absolute pointer-events-none select-none right-0 top-0"
-          style={{ marginRight: vw(0), marginTop: vw(-60) }}
-        >
+      <div className="relative w-full" style={{ marginTop: vw(65), marginBottom: vw(60) }}>
+        <div className="absolute pointer-events-none select-none right-0 top-0" style={{ marginTop: vw(-60) }}>
           <HollowText
             strokeColor="#c6c091"
             strokeWidth={2}
@@ -156,41 +84,32 @@ export function FaqGuideSection({ data, locale }: FaqGuideSectionProps) {
       </div>
 
       {/* The Striped Container */}
-      <div
-        className="relative flex justify-center w-full"
-        style={{ marginTop: vw(20) }}
-      >
+      <div className="relative flex justify-center w-full" style={{ marginTop: vw(20) }}>
         <div className="flex bg-transparent">
           {STRIPS_CONFIG.map((config, index) => {
             const item = data.items?.[index];
-            if (!item) return null; // Skip if no dynamic data for this track
+            if (!item) return null;
 
             return (
               <React.Fragment key={item.id || index}>
-                {/* Each Strip is a Mask Window */}
                 <div
                   className="relative overflow-hidden cursor-pointer group"
                   style={{ width: vw(config.w), height: vw(670) }}
                   onMouseEnter={() => setHoverIndex(index)}
                   onMouseLeave={() => setHoverIndex(null)}
+                  onClick={() => {
+                    if (index === 5) onNavigate?.("contact");
+                    else if (item.id) onNavigate?.("category", item.id);
+                  }}
                 >
-                  {/* Giant Letter - Bottom Layer with Floating Effect */}
+                  {/* Giant Letter */}
                   <motion.span
                     initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{
-                      opacity: 1,
-                      scale: 1,
-                      y: [0, -8, 0], // Gentle float
-                    }}
+                    whileInView={{ opacity: 1, scale: 1, y: [0, -8, 0] }}
                     transition={{
                       opacity: { duration: 0.8 },
                       scale: { duration: 0.8 },
-                      y: {
-                        duration: 3,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                        delay: index * 0.2, // Stagger the wave
-                      },
+                      y: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 },
                     }}
                     viewport={{ once: true }}
                     className="absolute select-none pointer-events-none leading-none z-0"
@@ -208,21 +127,13 @@ export function FaqGuideSection({ data, locale }: FaqGuideSectionProps) {
                     {item.title}
                   </motion.span>
 
-                  {/* Giant Circle Image - Foreground with faster Float */}
+                  {/* Giant Circle Image */}
                   <motion.div
                     initial={{ opacity: 0, y: 0 }}
-                    whileInView={{
-                      opacity: 1,
-                      y: [0, -15, 0], // Slightly bigger float range
-                    }}
+                    whileInView={{ opacity: 1, y: [0, -15, 0] }}
                     transition={{
                       opacity: { duration: 1 },
-                      y: {
-                        duration: 3.5,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                        delay: index * 0.3, // Different sync for wave feel
-                      },
+                      y: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: index * 0.3 },
                     }}
                     viewport={{ once: true }}
                     className="absolute rounded-full overflow-hidden shadow-2xl transition-transform duration-[1.5s] group-hover:scale-105 z-10"
@@ -240,7 +151,7 @@ export function FaqGuideSection({ data, locale }: FaqGuideSectionProps) {
                       size="medium"
                     />
 
-                    {/* Hover Overlay - Circular mask */}
+                    {/* Hover Overlay */}
                     <AnimatePresence>
                       {hoverIndex === index && (
                         <motion.div
@@ -249,14 +160,12 @@ export function FaqGuideSection({ data, locale }: FaqGuideSectionProps) {
                           exit={{ opacity: 0 }}
                           className="absolute inset-0 bg-black/70 backdrop-blur-[4px] flex items-center justify-center rounded-full pointer-events-none"
                         >
-                          {/* Text container offset to match strip center */}
                           <div
-                            className="absolute flex items-center justify-center p-[vw(20)] text-center"
+                            className="absolute flex items-center justify-center text-center"
                             style={{
                               width: vw(config.w),
                               left: vw(-config.imgX),
-                              top: 0,
-                              bottom: 0,
+                              padding: vw(20),
                             }}
                           >
                             <p
@@ -264,8 +173,7 @@ export function FaqGuideSection({ data, locale }: FaqGuideSectionProps) {
                               style={{
                                 fontSize: vw(24),
                                 lineHeight: 1.2,
-                                fontFamily:
-                                  "var(--font-lexend-deca), sans-serif",
+                                fontFamily: "var(--font-lexend-deca), sans-serif",
                                 width: vw(220),
                               }}
                             >
@@ -281,8 +189,9 @@ export function FaqGuideSection({ data, locale }: FaqGuideSectionProps) {
                 {/* Vertical Stripe Line */}
                 {index < data.items.length - 1 && index < 5 && (
                   <div
-                    className="z-20 w-[2px]"
+                    className="z-20"
                     style={{
+                      width: vw(2),
                       height: vw(595),
                       backgroundColor: "#383417",
                       marginTop: vw(32),

@@ -43,30 +43,30 @@ export function FaqQuoteSection({ data, locale }: FaqQuoteSectionProps) {
       className="relative w-full overflow-hidden bg-[#f6f4ed]"
       style={{ height: vw(922) }}
     >
-      {/* Background Decorators (B-U-S-R-O-m Vectors) */}
+      {/* Background Decorators */}
       <div 
         className="absolute inset-0 opacity-10 pointer-events-none flex justify-center"
         style={{ top: vw(23) }}
       >
-         <div className="flex gap-[vw(100)]">
-           {["B", "U", "S", "R", "O", "M"].map((letter, i) => (
-             <HollowText
-                key={i}
-                strokeColor="#756f3f"
-                strokeWidth={1}
-                style={{ fontSize: vw(220), fontFamily: "var(--font-anaheim), sans-serif" }}
-                className="font-black"
-             >
-               {letter}
-             </HollowText>
-           ))}
+         <div className="flex" style={{ gap: vw(100) }}>
+            {["B", "U", "S", "R", "O", "M"].map((letter, i) => (
+              <HollowText
+                 key={i}
+                 strokeColor="#756f3f"
+                 strokeWidth={1}
+                 style={{ fontSize: vw(220), fontFamily: "var(--font-anaheim), sans-serif" }}
+                 className="font-black"
+              >
+                {letter}
+              </HollowText>
+            ))}
          </div>
       </div>
 
       {/* Top Banner Image */}
       <div 
-        className="absolute left-1/2 -translate-x-1/2 top-[vw(48)] rounded-[30px] overflow-hidden"
-        style={{ width: vw(1737), height: vw(268) }}
+        className="absolute left-1/2 -translate-x-1/2 rounded-[30px] overflow-hidden"
+        style={{ width: vw(1737), height: vw(268), top: vw(48) }}
       >
         <div className="absolute inset-0 bg-[#464010] opacity-30 z-10" />
         <OptimizedImage 
@@ -75,17 +75,18 @@ export function FaqQuoteSection({ data, locale }: FaqQuoteSectionProps) {
         />
       </div>
 
-      <div className="container mx-auto h-full flex items-center px-[vw(220)] pt-[vw(200)] gap-[vw(160)] relative z-10">
+      <div className="container mx-auto h-full flex items-center relative z-10" style={{ paddingLeft: vw(220), paddingRight: vw(220), paddingTop: vw(200), gap: vw(160) }}>
         {/* Left: Slogan Text */}
-        <div className="flex flex-col w-[vw(737)]">
+        <div className="flex flex-col" style={{ width: vw(737) }}>
           <motion.h2 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="text-[#363105] mb-[vw(30)]"
+            className="text-[#363105]"
             style={{ 
               fontSize: vw(78), 
               lineHeight: 1.08, 
-              fontFamily: "var(--font-agbalumo), cursive" 
+              fontFamily: "var(--font-agbalumo), cursive",
+              marginBottom: vw(30)
             }}
           >
             {getNodesText(data.title) || "Every Detail Is The Beginning Of Better Cooperation"}
@@ -106,15 +107,15 @@ export function FaqQuoteSection({ data, locale }: FaqQuoteSectionProps) {
         </div>
 
         {/* Right: Exit Navigation Buttons */}
-        <div className="flex flex-col gap-[vw(40)] flex-1">
+        <div className="flex flex-col flex-1" style={{ gap: vw(40) }}>
           {EXIT_LINKS.map((link, i) => (
             <motion.button
               key={link.id}
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 * i }}
-              className="flex items-center justify-between bg-[#756f3f] hover:bg-[#58542f] transition-all rounded-[44.5px] px-[vw(36)] relative group"
-              style={{ width: vw(517), height: vw(89) }}
+              className="flex items-center justify-between bg-[#756f3f] hover:bg-[#58542f] transition-all rounded-full relative group"
+              style={{ width: vw(517), height: vw(89), paddingLeft: vw(36), paddingRight: vw(36) }}
             >
               <span 
                 className="text-white font-semibold"
@@ -124,9 +125,9 @@ export function FaqQuoteSection({ data, locale }: FaqQuoteSectionProps) {
               </span>
               <div 
                 className="bg-white rounded-full flex items-center justify-center transition-transform group-hover:rotate-[-12deg]"
-                style={{ width: vw(50), height: vw(50) }}
+                style={{ width: vw(50), height: vw(50), padding: vw(12) }}
               >
-                <IconifyIcon name="lucide:arrow-up-right" color="#756f3f" size={24} />
+                <IconifyIcon name="lucide:arrow-up-right" color="#756f3f" size="100%" />
               </div>
             </motion.button>
           ))}

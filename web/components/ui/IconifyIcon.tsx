@@ -20,7 +20,7 @@ function normalizeIconName(name: string): string {
 
 interface IconifyIconProps {
   name: string
-  size?: number
+  size?: number | string
   className?: string
   color?: string
   style?: React.CSSProperties

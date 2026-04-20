@@ -70,8 +70,68 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
       let contentChildren = page.content?.root?.children || page.contentTranslation?.root?.children || [];
       contentChildren = flattenLexicalChildren(contentChildren);
 
+      // Utility to check if a node is the "contact-form-block" marker
+      const isFormMarker = (node: any) => {
+        if (node.type !== 'paragraph') return false;
+        const text = node.children?.map((c: any) => c.text).join('').trim().toLowerCase();
+        return text === 'contact-form-block';
+      };
+
+      // 1. Identify pairs of (Marker -> FormBlock)
+      const formBlockPairs: Array<{ markerIdx: number, formNode: any }> = [];
+      contentChildren.forEach((node: any, idx: number) => {
+        if (isFormMarker(node)) {
+          // Look at next few nodes for the formBlock (handling potential linebreaks/formatting nodes)
+          for (let i = idx + 1; i < Math.min(idx + 5, contentChildren.length); i++) {
+            if (contentChildren[i].type === 'formBlock') {
+              formBlockPairs.push({ markerIdx: idx, formNode: contentChildren[i] });
+              break;
+            }
+          }
+        }
+      });
+
+      // 2. Extract IDs and Fetch
+      const uniqueFormIds = Array.from(new Set(
+        formBlockPairs.map(p => p.formNode.data?.formConfig?.id || p.formNode.data?.formConfig).filter(Boolean)
+      ));
+
+      if (uniqueFormIds.length > 0) {
+        const formConfigsMap: Record<string, any> = {};
+        await Promise.all(uniqueFormIds.map(async (id: any) => {
+          try {
+            // Using the requested URL format with depth=2
+            const res = await fetch(`${cmsUrl}/api/form-configs/${id}?depth=2&draft=false&locale=${locale}&trash=false`, { 
+              next: { revalidate: 3600 } 
+            });
+            if (res.ok) {
+              formConfigsMap[id] = normalizeMediaObject(await res.json());
+            }
+          } catch (e) {
+            console.error(`[SSR Enrichment] Failed to fetch formConfig ${id}:`, e);
+          }
+        }));
+
+        // 3. Inject Full Objects back into the Lexical Tree
+        formBlockPairs.forEach(pair => {
+          const fid = pair.formNode.data?.formConfig?.id || pair.formNode.data?.formConfig;
+          if (fid && formConfigsMap[fid]) {
+            pair.formNode.data = {
+              ...pair.formNode.data,
+              formConfig: formConfigsMap[fid]
+            };
+            console.log(`[SSR Enrichment] Injected full formConfig for ID: ${fid}`);
+          }
+        });
+
+        // Set the global formConfig for templates that still rely on it
+        formConfig = Object.values(formConfigsMap)[0] || null;
+      }
+
+      // Existing Carousel/Other enrichment logic...
       const productCarouselNodes = contentChildren.filter((n: any) => n.type === 'productCarousel');
       const applicationCarouselNodes = contentChildren.filter((n: any) => n.type === 'applicationCarousel');
+      const faqSelectionNodes = contentChildren.filter((n: any) => n.type === 'faqSelection');
       const formBlockNodes = contentChildren.filter((n: any) => n.type === 'formBlock');
 
       const manualIds: string[] = [];
@@ -123,8 +183,21 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
         appIds.push(...ids.map((id: any) => typeof id === 'object' ? id.id : id));
       });
 
+      // Special case: Scan faqSelection for galleries (Case Galleries)
+      faqSelectionNodes.forEach((node: any) => {
+        (node.data?.categories || []).forEach((cat: any) => {
+          (cat.questions || []).forEach((q: any) => {
+            if (q.gallery) {
+              const gid = typeof q.gallery === 'object' ? q.gallery.id : q.gallery;
+              if (gid) appIds.push(String(gid));
+            }
+          });
+        });
+      });
+
       if (appIds.length > 0) {
-        const appRes = await fetch(`${cmsUrl}/api/applications?locale=${locale}&where[id][in]=${appIds.join(',')}&depth=2`, { next: { revalidate: 3600 } });
+        const uniqueAppIds = Array.from(new Set(appIds));
+        const appRes = await fetch(`${cmsUrl}/api/applications?locale=${locale}&where[id][in]=${uniqueAppIds.join(',')}&depth=2`, { next: { revalidate: 3600 } });
         if (appRes.ok) {
           const appData = await appRes.json();
           applications = (appData.docs || []).map(normalizeMediaObject);
