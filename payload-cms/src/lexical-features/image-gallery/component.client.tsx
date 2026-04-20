@@ -31,7 +31,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import type { ImageGalleryData } from './node.tsx'
 import { $createImageGalleryNode, ImageGalleryNode } from './node.tsx'
-import { LinkPickerModal } from '../carousel/component.client'
+import { LinkPickerModal } from '../shared/LinkPickerModal'
 import { fetchMediaCategories, fetchMediaTags } from '../../lib/media-filters-cache'
 
 // 翻译辅助函数

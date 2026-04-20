@@ -16,10 +16,6 @@ export const FaqSelection: Block = {
     },
   },
   admin: {
-    description: {
-      en: 'Select FAQ categories and specific questions to display in a structured way.',
-      zh: '结构化选择展示 FAQ 分类及具体问题。',
-    },
     components: {
       Block: '@/blocks/previews/FaqSelectionPreview#FaqSelectionPreview',
     },
