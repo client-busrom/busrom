@@ -2,7 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
-import { Agbalumo, Fredericka_the_Great, Amiri, Black_Han_Sans, Berkshire_Swash, Cherry_Bomb_One, Amarante, Quicksand, Lemon, Lobster, Katibeh, Prata, Lexend_Deca, Anton, Abhaya_Libre } from "next/font/google";
+import { Agbalumo, Fredericka_the_Great, Amiri, Black_Han_Sans, Berkshire_Swash, Cherry_Bomb_One, Amarante, Quicksand, Lemon, Lobster, Katibeh, Prata, Lexend_Deca, Anton, Abhaya_Libre, Tenor_Sans } from "next/font/google";
 import dynamic from "next/dynamic";
 import "../globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -250,6 +250,14 @@ const abhayaLibre = Abhaya_Libre({
   preload: false,
 });
 
+const tenorSans = Tenor_Sans({
+  weight: "400",
+  variable: "--font-tenor-sans",
+  display: "swap",
+  subsets: ["latin"],
+  preload: false,
+});
+
 const agbalumo = Agbalumo({
   weight: "400",
   variable: "--font-agbalumo",
@@ -338,6 +346,7 @@ export default async function RootLayout({
         ${anton.variable}
         ${abhayaLibre.variable}
         ${agbalumo.variable}
+        ${tenorSans.variable}
         ${bagelFatOne.variable}
         antialiased
       `}

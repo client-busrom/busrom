@@ -47,6 +47,7 @@ export interface FaqData {
     title: any[];
     description: any[];
     iconList: any;
+    decoratorText: string;
   } | null;
 }
 
@@ -288,7 +289,8 @@ export function parseFaqData(locale: string, rawData: any): FaqData {
       image: resolveMedia(quoteImageNode?.data?.image?.id),
       title: quoteTitleSection,
       description: quoteDescSection,
-      iconList: iconListNode?.data
+      iconList: iconListNode?.data,
+      decoratorText: getNodeTotalText(extractAfterMarker(children, "quote-guide-decorator")).trim()
     }
   };
 }
