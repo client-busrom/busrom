@@ -15,6 +15,7 @@ const migrate = async () => {
   for (const doc of categories.docs) {
     if (doc.slug && !doc.adminLabel) {
       console.log(`Migrating Category: ${doc.slug} -> adminLabel`)
+      // @ts-ignore
       await payload.update({
         collection: 'categories',
         id: doc.id,
@@ -38,6 +39,7 @@ const migrate = async () => {
     // Only migrate if adminLabel is empty and slug exists
     if (doc.slug && !doc.adminLabel) {
       console.log(`Migrating FAQ Item: ${doc.slug} -> adminLabel`)
+      // @ts-ignore
       await payload.update({
         collection: 'faq-items',
         id: doc.id,

@@ -25,6 +25,7 @@ const seedFaq = async () => {
 
   const catMap = new Map();
   for (const catName of categories) {
+    // @ts-ignore
     const newCat = await payload.create({
       collection: 'categories',
       data: {
@@ -67,6 +68,7 @@ const seedFaq = async () => {
   let order = 1;
   for (const item of faqData) {
     const catId = catMap.get(item.cat);
+    // @ts-ignore
     await payload.create({
       collection: 'faq-items',
       data: {
