@@ -23,9 +23,14 @@ export const syncM2M = (
     const { payload, context } = req
     if (context.isSyncing) return doc
 
-    const sourceId = doc.id
+    // If there are no relationships to sync (both previous and current are empty), skip processing.
     const prevTargets = sanitizeIds(previousDoc?.[sourceField] || [])
     const nextTargets = sanitizeIds(doc?.[sourceField] || [])
+    if (prevTargets.length === 0 && nextTargets.length === 0) {
+      return doc
+    }
+
+    const sourceId = doc.id
 
     const added = nextTargets.filter((id: any) => !prevTargets.includes(id))
     const removed = prevTargets.filter((id: any) => !nextTargets.includes(id))

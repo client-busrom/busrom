@@ -811,7 +811,7 @@ export interface Category {
   /**
    * This is automatically generated from the English Name.
    */
-  slug: string;
+  slug?: string | null;
   type: 'PAGE' | 'PRODUCT' | 'BLOG' | 'APPLICATION' | 'FAQ';
   /**
    * Parent category for hierarchical structure (filtered by same type)
@@ -1259,12 +1259,48 @@ export interface HeroBannerItem {
    * Background image for Banner 1,2,6,7,8,9
    */
   image1?: (number | null) | Media;
+  image1CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   /**
    * Decoration image used in all banners
    */
   image2?: (number | null) | Media;
+  image2CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   image3?: (number | null) | Media;
+  image3CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   image4?: (number | null) | Media;
+  image4CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   ctaButton?: {
     text?: string | null;
     link?: string | null;
@@ -2521,9 +2557,13 @@ export interface HeroBannerItemsSelect<T extends boolean = true> {
   feature4?: T;
   feature5?: T;
   image1?: T;
+  image1CropData?: T;
   image2?: T;
+  image2CropData?: T;
   image3?: T;
+  image3CropData?: T;
   image4?: T;
+  image4CropData?: T;
   ctaButton?:
     | T
     | {

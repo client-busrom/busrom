@@ -228,6 +228,8 @@ export function parseHomeData(data: any, locale: string, strategy?: string): Hom
   const heroBanner = (data.heroBanner || []).map((item: any) => ({
     ...item,
     images: (item.images || []).map((imgData: any) => toImageObject(imgData, item.title, strategy)),
+    // 裁剪数据直接透传（后端已处理好）
+    imageCropDataList: item.imageCropDataList || undefined,
   }));
 
   // 12. Transform FeaturedProducts

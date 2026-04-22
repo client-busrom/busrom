@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useField, useLocale, useTranslation } from '@payloadcms/ui'
 import { fetchMediaCategories, fetchMediaTags } from '../../../lib/media-filters-cache'
 import { fetchMediaItems } from '../../../lib/media-cache'
+import { ImageCropEditor, type ImageCropData, type MediaSizes } from '../ImageCropEditor'
 import './styles.scss'
 
 interface MediaItem {
@@ -26,6 +27,7 @@ interface MediaItem {
     id: number
     name: string
   }>
+  sizes?: MediaSizes
 }
 
 interface MediaCategory {
@@ -52,6 +54,13 @@ interface MediaPickerProps {
   // Optional controlled mode - when provided, bypasses useField
   value?: number | number[] | null
   onChange?: (value: number | number[] | null) => void
+  // Crop editor integration
+  /** 是否显示裁剪按钮 */
+  showCropButton?: boolean
+  /** 已有的裁剪数据 */
+  cropData?: ImageCropData | null
+  /** 裁剪数据变更回调 */
+  onCropDataChange?: (cropData: ImageCropData | null) => void
 }
 
 // Format file size
@@ -63,7 +72,7 @@ const formatFileSize = (bytes?: number): string => {
 }
 
 export const MediaPicker: React.FC<MediaPickerProps> = (props) => {
-  const { path, field, value: controlledValue, onChange } = props;
+  const { path, field, value: controlledValue, onChange, showCropButton, cropData, onCropDataChange } = props;
   // Use controlled mode if value/onChange provided, otherwise use useField
   const fieldHook = useField<number | number[] | null>({ path: path || field.name })
   const value = controlledValue !== undefined ? controlledValue : fieldHook.value
@@ -93,6 +102,10 @@ export const MediaPicker: React.FC<MediaPickerProps> = (props) => {
   const [totalDocs, setTotalDocs] = useState(0)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [sortField, setSortField] = useState<string>('-createdAt')
+
+  // Crop editor state
+  const [cropEditorOpen, setCropEditorOpen] = useState(false)
+  const [cropEditorMediaItem, setCropEditorMediaItem] = useState<MediaItem | null>(null)
 
   console.log('[MediaPicker DEBUG props]', props);
   
@@ -323,15 +336,35 @@ export const MediaPicker: React.FC<MediaPickerProps> = (props) => {
               {item.width && item.height && (
                 <span className="dimensions">{item.width}×{item.height}</span>
               )}
+              {cropData && (
+                <span className="dimensions" style={{ color: 'var(--theme-success-500)' }}>
+                  ✂️ {cropData.cropWidth}×{cropData.cropHeight} @ {Math.round(cropData.scale * 100)}%
+                </span>
+              )}
             </div>
-            <button
-              type="button"
-              className="media-picker__remove"
-              onClick={() => handleRemove(item.id)}
-              title={t('custom:mediaPicker:removeMedia' as any) as string}
-            >
-              ✕
-            </button>
+            <div className="media-picker__selected-actions">
+              {showCropButton && (
+                <button
+                  type="button"
+                  className="media-picker__crop"
+                  onClick={() => {
+                    setCropEditorMediaItem(item)
+                    setCropEditorOpen(true)
+                  }}
+                  title="裁剪图片"
+                >
+                  ✂️
+                </button>
+              )}
+              <button
+                type="button"
+                className="media-picker__remove"
+                onClick={() => handleRemove(item.id)}
+                title={t('custom:mediaPicker:removeMedia' as any) as string}
+              >
+                ✕
+              </button>
+            </div>
           </div>
         ))}
 
@@ -345,6 +378,26 @@ export const MediaPicker: React.FC<MediaPickerProps> = (props) => {
             : `+ ${t('custom:mediaPicker:selectImage' as any)}`}
         </button>
       </div>
+
+      {/* Crop Editor */}
+      {cropEditorOpen && cropEditorMediaItem && (
+        <ImageCropEditor
+          imageUrl={cropEditorMediaItem.url}
+          imageWidth={cropEditorMediaItem.width}
+          imageHeight={cropEditorMediaItem.height}
+          sizes={cropEditorMediaItem.sizes}
+          initialCropData={cropData}
+          onConfirm={(data) => {
+            onCropDataChange?.(data)
+            setCropEditorOpen(false)
+            setCropEditorMediaItem(null)
+          }}
+          onClose={() => {
+            setCropEditorOpen(false)
+            setCropEditorMediaItem(null)
+          }}
+        />
+      )}
 
       {/* Modal */}
       {isOpen && (

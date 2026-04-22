@@ -1,0 +1,327 @@
+.crop-editor__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  backdrop-filter: blur(4px);
+}
+
+.crop-editor__panel {
+  width: 96vw;
+  max-width: 1600px;
+  height: 92vh;
+  background: var(--theme-elevation-0, #fff);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+// ============================================================
+// Header
+// ============================================================
+.crop-editor__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--theme-elevation-150, #e0e0e0);
+  background: var(--theme-elevation-50, #fafafa);
+  flex-shrink: 0;
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--theme-elevation-800, #333);
+  }
+}
+
+.crop-editor__close-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: var(--theme-elevation-600, #666);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+
+  &:hover {
+    background: var(--theme-elevation-150, #eee);
+    color: var(--theme-elevation-800, #333);
+  }
+}
+
+// ============================================================
+// Toolbar
+// ============================================================
+.crop-editor__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1.25rem;
+  border-bottom: 1px solid var(--theme-elevation-150, #e0e0e0);
+  background: var(--theme-elevation-25, #fdfdfd);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  min-height: 48px;
+}
+
+.crop-editor__toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.crop-editor__toolbar-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--theme-elevation-500, #888);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.crop-editor__toolbar-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--theme-elevation-200, #ddd);
+  flex-shrink: 0;
+}
+
+.crop-editor__select {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--theme-elevation-200, #ddd);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  background: var(--theme-elevation-0, #fff);
+  cursor: pointer;
+  min-width: 140px;
+  color: var(--theme-elevation-800, #333);
+
+  &:focus {
+    outline: none;
+    border-color: var(--theme-elevation-400, #aaa);
+  }
+}
+
+// --- Size inputs ---
+.crop-editor__size-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.crop-editor__size-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--theme-elevation-400, #999);
+  width: 14px;
+  text-align: center;
+}
+
+.crop-editor__size-input {
+  width: 64px;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid var(--theme-elevation-200, #ddd);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  text-align: center;
+  background: var(--theme-elevation-0, #fff);
+  color: var(--theme-elevation-800, #333);
+
+  &:focus {
+    outline: none;
+    border-color: var(--theme-elevation-400, #aaa);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+  }
+
+  // Hide number input spinners
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  -moz-appearance: textfield;
+}
+
+.crop-editor__size-separator {
+  font-size: 0.8rem;
+  color: var(--theme-elevation-400, #999);
+  padding: 0 0.125rem;
+}
+
+.crop-editor__lock-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--theme-elevation-200, #ddd);
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+
+  &:hover {
+    background: var(--theme-elevation-100, #f0f0f0);
+  }
+
+  &.active {
+    background: var(--theme-elevation-150, #eee);
+    border-color: var(--theme-elevation-400, #aaa);
+  }
+}
+
+// --- Presets ---
+.crop-editor__presets {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.crop-editor__preset-btn {
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--theme-elevation-200, #ddd);
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.7rem;
+  color: var(--theme-elevation-600, #666);
+  transition: all 0.15s;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--theme-elevation-100, #f0f0f0);
+    border-color: var(--theme-elevation-300, #ccc);
+  }
+
+  &.active {
+    background: var(--theme-elevation-800, #333);
+    color: white;
+    border-color: var(--theme-elevation-800, #333);
+  }
+}
+
+// --- Zoom slider ---
+.crop-editor__zoom-slider {
+  width: 120px;
+  height: 4px;
+  cursor: pointer;
+  accent-color: var(--theme-elevation-600, #666);
+}
+
+// ============================================================
+// Canvas / Crop Area
+// ============================================================
+.crop-editor__canvas {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #1a1a1a;
+  min-height: 300px;
+}
+
+// Override react-easy-crop styles for dashed border
+.crop-editor__crop-area {
+  border: 2px dashed rgba(255, 255, 255, 0.8) !important;
+  box-shadow: none !important;
+
+  &::before,
+  &::after {
+    display: none !important;
+  }
+}
+
+.crop-editor__cropper-container {
+  // Overlay outside crop area - semi-transparent dark
+  // react-easy-crop uses color prop on cropAreaStyle for the overlay
+}
+
+// ============================================================
+// Footer
+// ============================================================
+.crop-editor__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 1.25rem;
+  border-top: 1px solid var(--theme-elevation-150, #e0e0e0);
+  background: var(--theme-elevation-50, #fafafa);
+  flex-shrink: 0;
+  gap: 1rem;
+}
+
+.crop-editor__info {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.crop-editor__info-item {
+  font-size: 0.75rem;
+  color: var(--theme-elevation-500, #888);
+
+  strong {
+    color: var(--theme-elevation-800, #333);
+    font-weight: 600;
+  }
+}
+
+.crop-editor__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.crop-editor__btn {
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--theme-elevation-200, #ddd);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.15s;
+
+  &--cancel {
+    background: transparent;
+    color: var(--theme-elevation-600, #666);
+
+    &:hover {
+      background: var(--theme-elevation-100, #f0f0f0);
+    }
+  }
+
+  &--clear {
+    background: transparent;
+    color: var(--theme-error-500, #e74c3c);
+    border-color: var(--theme-error-300, #f0a0a0);
+
+    &:hover {
+      background: var(--theme-error-50, #fef0f0);
+    }
+  }
+
+  &--confirm {
+    background: var(--theme-success-500, #2ecc71);
+    color: white;
+    border-color: var(--theme-success-500, #2ecc71);
+
+    &:hover {
+      background: var(--theme-success-600, #27ae60);
+      border-color: var(--theme-success-600, #27ae60);
+    }
+  }
+}

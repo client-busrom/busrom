@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import type { ImageObject } from "./content-data"
+import type { ImageObject, ImageCropData } from "./content-data"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -16,6 +16,95 @@ export function getObjectPosition(image?: ImageObject | null): string {
     return "50% 50%"
   }
   return `${image.cropFocalPoint.x}% ${image.cropFocalPoint.y}%`
+}
+
+/**
+ * 根据 ImageCropData 生成裁剪渲染所需的 CSS 样式
+ * 
+ * 使用方式：
+ * ```tsx
+ * const cropStyles = getCropStyles(cropData, containerWidth, containerHeight)
+ * if (cropStyles) {
+ *   // 有裁剪数据 — 用 overflow:hidden 容器 + transform 定位
+ *   <div style={cropStyles.container}>
+ *     <img style={cropStyles.image} src={...} />
+ *   </div>
+ * } else {
+ *   // 无裁剪数据 — 用 object-fit:cover + objectPosition 的旧方式
+ *   <img style={{ objectFit: 'cover', objectPosition: getObjectPosition(image) }} />
+ * }
+ * ```
+ * 
+ * @param cropData - 后台裁剪编辑器输出的数据
+ * @param displayWidth - 实际渲染容器的宽度（px 或 CSS 值）
+ * @param displayHeight - 实际渲染容器的高度（px 或 CSS 值）
+ * @returns 容器和图片的 CSS 样式对象，或 null（无裁剪数据时）
+ */
+export function getCropStyles(
+  cropData?: ImageCropData | null,
+  displayWidth?: number,
+  displayHeight?: number,
+): { container: React.CSSProperties; image: React.CSSProperties } | null {
+  if (!cropData || !cropData.croppedAreaPixels) return null
+
+  const { croppedAreaPixels, variantWidth, variantHeight } = cropData
+
+  // 如果没有有效裁剪区域，返回 null
+  if (!croppedAreaPixels.width || !croppedAreaPixels.height) return null
+
+  // 容器需要 overflow:hidden，显示裁剪框大小的区域
+  const container: React.CSSProperties = {
+    overflow: 'hidden',
+    position: 'relative',
+    width: displayWidth ? `${displayWidth}px` : '100%',
+    height: displayHeight ? `${displayHeight}px` : '100%',
+  }
+
+  // 计算缩放：容器显示尺寸 / 裁剪区域像素尺寸
+  // 如果没有指定 displayWidth/displayHeight，就用 100% 并让 CSS 自适应
+  const scaleX = displayWidth ? displayWidth / croppedAreaPixels.width : 1
+  const scaleY = displayHeight ? displayHeight / croppedAreaPixels.height : 1
+  const scale = Math.max(scaleX, scaleY)
+
+  // 图片定位：将裁剪区域的左上角对齐到容器左上角
+  const image: React.CSSProperties = {
+    position: 'absolute',
+    width: `${variantWidth * scale}px`,
+    height: `${variantHeight * scale}px`,
+    left: `${-croppedAreaPixels.x * scale}px`,
+    top: `${-croppedAreaPixels.y * scale}px`,
+    maxWidth: 'none',
+  }
+
+  return { container, image }
+}
+
+/**
+ * 根据 cropData.variant 获取对应的图片变体 URL
+ * 
+ * 变体映射：
+ *   original → image.url (xlarge)
+ *   desktop  → variants.large (1920px)
+ *   tablet   → variants.medium (1024px)
+ *   card     → variants.small (768px)
+ *   thumbnail → variants.thumbnail (400px)
+ */
+export function getCropImageUrl(
+  image: ImageObject | null | undefined,
+  cropData: ImageCropData | null | undefined,
+): string {
+  if (!image) return ''
+  if (!cropData?.variant) return image.variants?.large || image.url || ''
+
+  const variantMap: Record<string, string | undefined> = {
+    original: image.url || (image.variants?.xlarge as string | undefined),
+    desktop: (image.variants?.large || image.variants?.desktop) as string | undefined,
+    tablet: (image.variants?.medium || image.variants?.tablet) as string | undefined,
+    card: (image.variants?.small || image.variants?.card) as string | undefined,
+    thumbnail: image.variants?.thumbnail as string | undefined,
+  }
+
+  return variantMap[cropData.variant] || image.variants?.large || image.url || ''
 }
 
 /**

@@ -1415,14 +1415,15 @@ export const customConverters: JSXConverters = {
   link: ({ node, nodesToJSX }: any) => {
     const { fields, url } = node as any;
     const finalUrl = fields?.url || url || "#";
-    const newTab = fields?.newTab || false;
+    // Always open in new tab as per client request
+    const isExternal = finalUrl.startsWith('http');
 
     return (
       <Link
         href={finalUrl}
-        target={newTab ? "_blank" : undefined}
-        rel={newTab ? "noopener noreferrer" : undefined}
-        className="text-[#B06E4E] underline underline-offset-4 font-semibold hover:opacity-70 transition-opacity"
+        target={isExternal ? "_blank" : undefined}
+        rel={isExternal ? "noopener noreferrer" : undefined}
+        className="text-[#B06E4E] underline underline-offset-8 decoration-1 decoration-[#B06E4E]/40 font-semibold hover:text-[#756F3F] hover:decoration-[#756F3F] transition-all"
       >
         {nodesToJSX({ nodes: node.children })}
       </Link>
