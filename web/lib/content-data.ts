@@ -66,6 +66,21 @@ export interface ImageObject {
 }
 
 /**
+ * 图片裁剪数据 — 来自后台 ImageCropEditor
+ */
+export interface ImageCropData {
+  variant: string
+  variantWidth: number
+  variantHeight: number
+  cropWidth: number
+  cropHeight: number
+  scale: number
+  cropPosition: { x: number; y: number }
+  croppedArea: { x: number; y: number; width: number; height: number }
+  croppedAreaPixels: { x: number; y: number; width: number; height: number }
+}
+
+/**
  * ===================================
  * Home Page Module Types (按照API文档定义)
  * ===================================
@@ -78,6 +93,8 @@ export interface HeroBannerItem {
   title: string
   features: string[]
   images: ImageObject[]
+  /** 裁剪数据列表 — 与 images 数组索引一一对应，null 表示未设置裁剪 */
+  imageCropDataList?: (ImageCropData | null)[]
 }
 
 /**

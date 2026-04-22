@@ -202,7 +202,6 @@ export const Categories: CollectionConfig = {
       hooks: {
         beforeValidate: [formatSlug('name')],
       },
-      required: true,
       unique: true,
       admin: {
         readOnly: true,

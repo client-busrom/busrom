@@ -62,12 +62,38 @@
     }
   }
 
-  &__remove {
+  &__selected-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     position: absolute;
     top: -8px;
     right: -8px;
-    width: 20px;
-    height: 20px;
+  }
+
+  &__crop {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--theme-elevation-600);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+
+    &:hover {
+      background: var(--theme-elevation-800);
+      transform: scale(1.1);
+    }
+  }
+
+  &__remove {
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: var(--theme-error-500);
     color: white;

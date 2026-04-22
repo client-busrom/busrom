@@ -55,6 +55,7 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { TextStateFeatureClient as TextStateFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { default as default_1b0cad300e9d837c9be64413930f499e } from '@/components/fields/MultiLocaleRichTextField'
+import { default as default_eb82d7385b20d8d41002bf481e15f40f } from '@/components/fields/MediaPickerWithCrop'
 import { default as default_8eace7ae1118053face74cf3167249d9 } from '@/components/fields/TagBasedRandomImages'
 import { default as default_a3a3aa8bfebcaf82c7d4953fe2175cbd } from '@/components/fields/IconPicker'
 import { SmartLinkField as SmartLinkField_e635f1e069dfeac8bac1a8b34ec70fb8 } from '@/components/fields/SmartLinkField'
@@ -142,6 +143,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#TextStateFeatureClient": TextStateFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/components/fields/MultiLocaleRichTextField#default": default_1b0cad300e9d837c9be64413930f499e,
+  "@/components/fields/MediaPickerWithCrop#default": default_eb82d7385b20d8d41002bf481e15f40f,
   "@/components/fields/TagBasedRandomImages#default": default_8eace7ae1118053face74cf3167249d9,
   "@/components/fields/IconPicker#default": default_a3a3aa8bfebcaf82c7d4953fe2175cbd,
   "@/components/fields/SmartLinkField#SmartLinkField": SmartLinkField_e635f1e069dfeac8bac1a8b34ec70fb8,

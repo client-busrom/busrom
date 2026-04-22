@@ -23,6 +23,12 @@ interface MediaItem {
     id: number
     name: string
   }>
+  sizes?: {
+    thumbnail?: { url?: string; width?: number; height?: number }
+    card?: { url?: string; width?: number; height?: number }
+    tablet?: { url?: string; width?: number; height?: number }
+    desktop?: { url?: string; width?: number; height?: number }
+  }
 }
 
 interface CacheEntry {

@@ -282,26 +282,32 @@ export const homeContentHandler: PayloadHandler = async (req) => {
       locale,
 
       // Hero Banner Items
-      heroBanner: heroBannerItems.docs.map((item: any) => ({
-        id: item.id,
-        title: item.title,
-        subtitle: item.subtitle,
-        ctaText: item.ctaButton?.text || item.ctaText,
-        ctaUrl: item.ctaButton?.link || item.ctaUrl,
-        features: [
-          item.feature1,
-          item.feature2,
-          item.feature3,
-          item.feature4,
-          item.feature5,
-        ].filter(Boolean),
-        images: [
-          getMediaWithVariants(item.image1),
-          getMediaWithVariants(item.image2),
-          getMediaWithVariants(item.image3),
-          getMediaWithVariants(item.image4),
-        ].filter(Boolean),
-      })),
+      heroBanner: heroBannerItems.docs.map((item: any) => {
+        // 先配对 image 和 cropData，然后一起过滤，保证索引对齐
+        const imagePairs = [
+          { image: getMediaWithVariants(item.image1), cropData: item.image1CropData || null },
+          { image: getMediaWithVariants(item.image2), cropData: item.image2CropData || null },
+          { image: getMediaWithVariants(item.image3), cropData: item.image3CropData || null },
+          { image: getMediaWithVariants(item.image4), cropData: item.image4CropData || null },
+        ].filter(pair => pair.image !== null)
+
+        return {
+          id: item.id,
+          title: item.title,
+          subtitle: item.subtitle,
+          ctaText: item.ctaButton?.text || item.ctaText,
+          ctaUrl: item.ctaButton?.link || item.ctaUrl,
+          features: [
+            item.feature1,
+            item.feature2,
+            item.feature3,
+            item.feature4,
+            item.feature5,
+          ].filter(Boolean),
+          images: imagePairs.map(p => p.image),
+          imageCropDataList: imagePairs.map(p => p.cropData),
+        }
+      }),
 
       // Product Series Carousel (only if published)
       // Note: items is a JSON field, so media references are IDs that need to be resolved

@@ -108,35 +108,26 @@ export function TemplatePage({ locale, slug, template }: TemplatePageProps) {
 
   // Default fallback to document renderer
   return (
-    <div className="min-h-screen bg-background pt-20" data-header-theme="light">
+    <div className="min-h-screen bg-[#f6f4ed] pt-20" data-header-theme="light">
       <div className="container mx-auto px-6 md:px-8 lg:px-16 py-12">
-        {/* Template identifier for future UI customization */}
-        {template && (
-          <div className="text-xs text-brand-accent-gold mb-4 opacity-50">
-            Template: {template}
-          </div>
-        )}
+        {/* Template identifier removed */}
 
-        {/* Page Title */}
-        {pageContent.title && (
-          <h1 className="text-4xl md:text-5xl font-anaheim font-extrabold text-brand-text-black mb-8">
-            {pageContent.title}
-          </h1>
-        )}
-
-        {pageContent.content && (
+        {(pageContent.content || pageContent.contentTranslation) ? (
           <div className="prose prose-lg max-w-none">
-            <LexicalRenderer content={pageContent.content} mediaData={pageContent.mediaData} />
+            <LexicalRenderer 
+              content={pageContent.content || pageContent.contentTranslation} 
+              mediaData={pageContent.mediaData} 
+            />
+          </div>
+        ) : (
+          /* Placeholder notice only if no content exists */
+          <div className="mt-12 p-6 bg-brand-accent-gold/10 border border-brand-accent-gold/30 rounded-lg">
+            <p className="text-brand-text-black font-anaheim">
+              <strong>🎨 UI Design Pending:</strong> This page is using a template placeholder.
+              Custom UI design will be implemented based on client requirements.
+            </p>
           </div>
         )}
-
-        {/* Placeholder notice */}
-        <div className="mt-12 p-6 bg-brand-accent-gold/10 border border-brand-accent-gold/30 rounded-lg">
-          <p className="text-brand-text-black font-anaheim">
-            <strong>🎨 UI Design Pending:</strong> This page is using a template placeholder.
-            Custom UI design will be implemented based on client requirements.
-          </p>
-        </div>
       </div>
     </div>
   )

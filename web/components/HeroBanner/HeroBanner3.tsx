@@ -5,7 +5,8 @@ import type { HomeContent } from "@/lib/content-data";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // 处理换行符：支持 /n 和 \n
-const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
+const formatText = (text: string | undefined) =>
+  text?.replace(/\/n|\\n/g, "\n") || "";
 
 // --- BannerProps Definition ---
 type BannerData = HomeContent["heroBanner"][number];
@@ -19,7 +20,7 @@ const rpx = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
 
 // 背景配置
 const BACKGROUND_CONFIG = {
-  backgroundColor: '#6E6941',
+  backgroundColor: "#6E6941",
 };
 
 // UI装饰元素配置
@@ -30,20 +31,20 @@ const UI_CONFIG = {
   rectWidth: 413,
   rectHeight: 1044,
   // 装饰颜色
-  decorColor: '#FFFCE8',
+  decorColor: "#FFFCE8",
   // 各区域 left 位置
-  zone1Left: 24,    // 第一区域
-  zone2Left: 96,   // 第二区域
-  zone3Left: 516,   // 第三区域
-  zone4Left: 996,  // 第四区域
+  zone1Left: 24, // 第一区域
+  zone2Left: 96, // 第二区域
+  zone3Left: 516, // 第三区域
+  zone4Left: 996, // 第四区域
   // 第一区域
-  zone1CircleTop: -33,        // 小圆距离顶部
-  zone1CircleOffsetX: 5,    // 小圆向右偏移
-  zone1SvgTop: 420,          // SVG距离顶部 (下移)
+  zone1CircleTop: -33, // 小圆距离顶部
+  zone1CircleOffsetX: 5, // 小圆向右偏移
+  zone1SvgTop: 420, // SVG距离顶部 (下移)
   // 第四区域
-  zone4CircleBottom: -33,     // 小圆距离底部
-  zone4CircleOffsetX: 5,    // 小圆向右偏移
-  zone4SvgTop: 40,          // SVG距离顶部 (上移)
+  zone4CircleBottom: -33, // 小圆距离底部
+  zone4CircleOffsetX: 5, // 小圆向右偏移
+  zone4SvgTop: 40, // SVG距离顶部 (上移)
   // SVG原始尺寸 (36x285) - 基于 1920x1080 设计稿
   svgWidth: 36,
   svgHeight: 285,
@@ -53,13 +54,13 @@ const UI_CONFIG = {
 // 配置
 const CONFIG = {
   // 右侧三个圆柱图
-  imagesContainerRight: 24,  // 距离右边的距离
+  imagesContainerRight: 24, // 距离右边的距离
   imageWidth: 259,
   imageHeight: 1044,
   imageGap: 12,
   // 左侧文字
   subtitleFontSize: 36,
-  titleFontSize: 90,  // 设计稿 90px
+  titleFontSize: 90, // 设计稿 90px
   // Feature 圆角矩形 (基于 Figma)
   featureLeft: 186,
   featureFirstTop: 671,
@@ -110,7 +111,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
             width: rpx(UI_CONFIG.circleDiameter),
             height: rpx(UI_CONFIG.circleDiameter),
             backgroundColor: UI_CONFIG.decorColor,
-            borderRadius: '50%',
+            borderRadius: "50%",
           }}
         />
         {/* SVG */}
@@ -188,7 +189,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
             width: rpx(UI_CONFIG.circleDiameter),
             height: rpx(UI_CONFIG.circleDiameter),
             backgroundColor: UI_CONFIG.decorColor,
-            borderRadius: '50%',
+            borderRadius: "50%",
           }}
         />
       </div>
@@ -198,7 +199,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
         {/* 左侧文字内容 */}
         <div
           className="flex flex-col justify-center h-full text-left"
-          style={{ width: '55%', paddingTop: rpx(140), paddingLeft: rpx(120) }}
+          style={{ width: "55%", paddingTop: rpx(140), paddingLeft: rpx(120) }}
         >
           {/* Feature[1] - 副标题 */}
           <p
@@ -207,20 +208,22 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
               fontSize: rpx(40),
               marginLeft: rpx(14),
               fontWeight: 400,
-              letterSpacing: '0.05em',
+              letterSpacing: "0.05em",
             }}
           >
             {feature1Rest}{" "}
-            <span className="text-[#F98538]" style={{ fontWeight: 900 }}>{feature1LastWord}</span>
+            <span className="text-[#F98538]" style={{ fontWeight: 900 }}>
+              {feature1LastWord}
+            </span>
           </p>
           {/* Feature[0] - 主标题 */}
           <h1
-            className="font-poller-one font-normal text-[#332E0B] mb-8 antialiased whitespace-pre-line"
+            className="font-poller-one font-extrabold text-[#332E0B] mb-8 antialiased whitespace-pre-line"
             style={{
               fontSize: rpx(CONFIG.titleFontSize),
               lineHeight: 1.1,
               WebkitTextStroke: `${rpx(6)} #FDF6C2`,
-              paintOrder: 'stroke fill',
+              paintOrder: "stroke fill",
             }}
           >
             {formatText(data.features[0])}
@@ -228,26 +231,35 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
           {/* Feature Stack */}
           <div
             className="flex flex-col"
-            style={{ gap: rpx(26), marginLeft: rpx(CONFIG.featureLeft - 120), marginTop: rpx(20) }}
+            style={{
+              gap: rpx(26),
+              marginLeft: rpx(CONFIG.featureLeft - 120),
+              marginTop: rpx(20),
+            }}
           >
-            {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
-              <div
-                key={index}
-                className="flex items-center font-montserrat font-bold antialiased whitespace-nowrap"
-                style={{
-                  width: rpx(CONFIG.featureWidth),
-                  height: rpx(CONFIG.featureHeight),
-                  backgroundColor: featureBgColors[index % featureBgColors.length],
-                  borderRadius: rpx(CONFIG.featureBorderRadius),
-                  paddingLeft: rpx(CONFIG.featureTextLeft - CONFIG.featureLeft),
-                  fontSize: rpx(CONFIG.featureFontSize),
-                  letterSpacing: '0.06em',
-                  color: featureTextColors[index % featureTextColors.length],
-                }}
-              >
-                {feature}
-              </div>
-            ))}
+            {[data.features[2], data.features[3], data.features[4]].map(
+              (feature, index) => (
+                <div
+                  key={index}
+                  className="flex items-center font-montserrat font-bold antialiased whitespace-nowrap"
+                  style={{
+                    width: rpx(CONFIG.featureWidth),
+                    height: rpx(CONFIG.featureHeight),
+                    backgroundColor:
+                      featureBgColors[index % featureBgColors.length],
+                    borderRadius: rpx(CONFIG.featureBorderRadius),
+                    paddingLeft: rpx(
+                      CONFIG.featureTextLeft - CONFIG.featureLeft,
+                    ),
+                    fontSize: rpx(CONFIG.featureFontSize),
+                    letterSpacing: "0.06em",
+                    color: featureTextColors[index % featureTextColors.length],
+                  }}
+                >
+                  {feature}
+                </div>
+              ),
+            )}
           </div>
         </div>
 
@@ -267,7 +279,13 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
               height: `${(CONFIG.imageHeight / 1080) * 100}%`,
             }}
           >
-            <OptimizedImage image={data.images[1]} alt="Feature image 1" size="medium" className="w-full h-full object-cover" priority />
+            <OptimizedImage
+              image={data.images[1]}
+              alt="Feature image 1"
+              size="medium"
+              className="w-full h-full object-cover"
+              priority
+            />
           </div>
           {/* 第二个：贴底，上方圆角 */}
           <div
@@ -277,7 +295,13 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
               height: `${(CONFIG.imageHeight / 1080) * 100}%`,
             }}
           >
-            <OptimizedImage image={data.images[2]} alt="Feature image 2" size="medium" className="w-full h-full object-cover" priority />
+            <OptimizedImage
+              image={data.images[2]}
+              alt="Feature image 2"
+              size="medium"
+              className="w-full h-full object-cover"
+              priority
+            />
           </div>
           {/* 第三个：贴顶，下方圆角 */}
           <div
@@ -287,7 +311,13 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
               height: `${(CONFIG.imageHeight / 1080) * 100}%`,
             }}
           >
-            <OptimizedImage image={data.images[3]} alt="Feature image 3" size="medium" className="w-full h-full object-cover" priority />
+            <OptimizedImage
+              image={data.images[3]}
+              alt="Feature image 3"
+              size="medium"
+              className="w-full h-full object-cover"
+              priority
+            />
           </div>
         </div>
       </div>
@@ -304,12 +334,12 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
               <div
                 className="absolute"
                 style={{
-                  left: '60%',
+                  left: "60%",
                   top: 16,
                   width: 32,
                   height: 32,
                   backgroundColor: UI_CONFIG.decorColor,
-                  borderRadius: '50%',
+                  borderRadius: "50%",
                 }}
               />
               {/* SVG - 中间 */}
@@ -338,12 +368,12 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
               <div
                 className="absolute"
                 style={{
-                  left: '60%',
+                  left: "60%",
                   bottom: 16,
                   width: 32,
                   height: 32,
                   backgroundColor: UI_CONFIG.decorColor,
-                  borderRadius: '50%',
+                  borderRadius: "50%",
                 }}
               />
             </div>
@@ -361,26 +391,30 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
               className="text-3xl sm:text-4xl font-poller-one text-[#332E0B] mb-6 text-center whitespace-pre-line"
               style={{
                 lineHeight: 1.1,
-                WebkitTextStroke: '1.5px #FDF6C2',
-                paintOrder: 'stroke fill',
+                WebkitTextStroke: "1.5px #FDF6C2",
+                paintOrder: "stroke fill",
               }}
             >
               {formatText(data.features[0])}
             </h1>
             {/* Feature Stack */}
             <div className="flex flex-col gap-4 w-full max-w-[340px]">
-              {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
-                <div
-                  key={index}
-                  className="px-6 py-4 rounded-full font-montserrat font-bold text-center text-lg sm:text-xl"
-                  style={{
-                    backgroundColor: featureBgColors[index % featureBgColors.length],
-                    color: featureTextColors[index % featureTextColors.length],
-                  }}
-                >
-                  {feature}
-                </div>
-              ))}
+              {[data.features[2], data.features[3], data.features[4]].map(
+                (feature, index) => (
+                  <div
+                    key={index}
+                    className="px-6 py-4 rounded-full font-montserrat font-bold text-center text-lg sm:text-xl"
+                    style={{
+                      backgroundColor:
+                        featureBgColors[index % featureBgColors.length],
+                      color:
+                        featureTextColors[index % featureTextColors.length],
+                    }}
+                  >
+                    {feature}
+                  </div>
+                ),
+              )}
             </div>
           </div>
         </div>
@@ -388,13 +422,31 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
         {/* 下方：三个图片横排，四角小圆边 */}
         <div className="relative h-[45%] flex justify-center items-stretch gap-3 px-4 pb-4">
           <div className="flex-1 overflow-hidden rounded-2xl">
-            <OptimizedImage image={data.images[1]} alt="Feature image 1" size="medium" className="w-full h-full object-cover" priority />
+            <OptimizedImage
+              image={data.images[1]}
+              alt="Feature image 1"
+              size="medium"
+              className="w-full h-full object-cover"
+              priority
+            />
           </div>
           <div className="flex-1 overflow-hidden rounded-2xl">
-            <OptimizedImage image={data.images[2]} alt="Feature image 2" size="medium" className="w-full h-full object-cover" priority />
+            <OptimizedImage
+              image={data.images[2]}
+              alt="Feature image 2"
+              size="medium"
+              className="w-full h-full object-cover"
+              priority
+            />
           </div>
           <div className="flex-1 overflow-hidden rounded-2xl">
-            <OptimizedImage image={data.images[3]} alt="Feature image 3" size="medium" className="w-full h-full object-cover" priority />
+            <OptimizedImage
+              image={data.images[3]}
+              alt="Feature image 3"
+              size="medium"
+              className="w-full h-full object-cover"
+              priority
+            />
           </div>
         </div>
       </div>
