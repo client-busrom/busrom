@@ -317,6 +317,7 @@ export const Blogs: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },
@@ -341,6 +342,7 @@ export const Blogs: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
     {
@@ -352,6 +354,7 @@ export const Blogs: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         date: {
           pickerAppearance: 'dayAndTime',
         },

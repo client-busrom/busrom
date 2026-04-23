@@ -56,6 +56,7 @@ export const SeoSettings: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/AutoDraft',
         },
@@ -67,6 +68,7 @@ export const SeoSettings: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },
@@ -179,6 +181,7 @@ export const SeoSettings: CollectionConfig = {
       defaultValue: false,
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         description: {
           en: 'If checked, this item will provide the Meta Title and Description for the page. Other matching items will only be used for hidden long-tail keywords.',
           zh: '勾选后，该项将提供页面的主标题和描述。同路径下的其他配置将仅作为隐藏长尾词使用。',

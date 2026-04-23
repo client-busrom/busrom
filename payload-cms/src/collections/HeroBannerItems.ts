@@ -53,6 +53,7 @@ export const HeroBannerItems: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },
@@ -339,6 +340,7 @@ export const HeroBannerItems: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
     {
@@ -355,6 +357,7 @@ export const HeroBannerItems: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
   ],

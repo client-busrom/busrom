@@ -430,6 +430,7 @@ export const Products: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },
@@ -450,6 +451,7 @@ export const Products: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
     {
@@ -462,6 +464,7 @@ export const Products: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
     {
@@ -474,6 +477,7 @@ export const Products: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         description: {
           en: 'Generic order for this document in all lists',
           zh: '该文档在所有列表中的通用顺序',
@@ -488,6 +492,7 @@ export const Products: CollectionConfig = {
       type: 'collapsible',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
       fields: [
         {

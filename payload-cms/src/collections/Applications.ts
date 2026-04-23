@@ -189,6 +189,7 @@ export const Applications: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },
@@ -209,6 +210,7 @@ export const Applications: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
   ],

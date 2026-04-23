@@ -63,6 +63,7 @@ export const SeriesIntroItems: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },
@@ -166,6 +167,7 @@ export const SeriesIntroItems: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
   ],

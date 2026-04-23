@@ -157,6 +157,7 @@ export const DocumentTemplates: CollectionConfig = {
       admin: {
         readOnly: true,
         position: 'sidebar',
+        disableListColumn: true,
         description: {
           en: 'Number of times this template has been used',
           zh: '此模板的使用次数',
@@ -182,6 +183,7 @@ export const DocumentTemplates: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         description: {
           en: 'Only ACTIVE templates appear in the template selector',
           zh: '只有"启用"状态的模板会显示在模板选择器中',
@@ -193,6 +195,7 @@ export const DocumentTemplates: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },

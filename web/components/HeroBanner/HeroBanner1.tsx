@@ -25,55 +25,6 @@ const rpx = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
 const DESIGN_WIDTH = 1920;
 const DESIGN_HEIGHT = 1080;
 
-// ========================================
-// 装饰图片配置 - 可在这里调整参数
-// ========================================
-const IMAGE_1_CONFIG = {
-  // 位置 (基于1920x1080设计稿的像素值)
-  left: -134, // 左边距 (负值表示超出左边界)
-  top: -164, // 上边距 (负值表示超出上边界)
-  // 尺寸
-  width: 800, // 宽度
-  height: 700, // 高度
-  // 旋转角度 (正值顺时针，负值逆时针)
-  rotate: 30, // 旋转角度
-  // 图片缩放 (用于填满旋转后的容器)
-  imageScale: 1.2,
-  // 图片偏移 (用于调整图片在框内的位置)
-  imageOffsetX: 0, // 负值往左，正值往右 (百分比)
-  imageOffsetY: 12, // 负值往上，正值往下 (百分比)
-  // 边框
-  borderWidth: 24, // 边框宽度
-  borderColor: "#FDF6C2",
-  // 圆角 (左上 右上 右下 左下)
-  borderRadius: "0% 35% 10% 0%",
-  // z-index (在SVG上层)
-  zIndex: 15,
-};
-
-const IMAGE_2_CONFIG = {
-  // 位置 (基于1920x1080设计稿的像素值)
-  right: -138, // 右边距
-  bottom: -138, // 下边距
-  // 尺寸
-  width: 700, // 宽度
-  height: 800, // 高度
-  // 旋转角度 (正值顺时针，负值逆时针)
-  rotate: 126, // 旋转角度
-  // 图片缩放 (用于填满旋转后的容器)
-  imageScale: 1.05,
-  // 图片偏移 (用于调整图片在框内的位置)
-  imageOffsetX: -10, // 负值往左，正值往右 (百分比)
-  imageOffsetY: -10, // 负值往上，正值往下 (百分比)
-  // 边框
-  borderWidth: 24, // 边框宽度
-  borderColor: "#FDF6C2",
-  // 圆角 (左上 右上 右下 左下)
-  borderRadius: "0% 0% 35% 10%",
-  // z-index (在SVG上层)
-  zIndex: 15,
-};
-
 // SVG UI 元素配置
 const SVG_1_CONFIG = {
   // hero-banner-1-1.svg 左上角 (830x716)
@@ -93,8 +44,15 @@ const SVG_2_CONFIG = {
   zIndex: 10,
 };
 
+// hero-banner-1-1-image.svg 图片 clipPath (666x634)
+const IMAGE_CLIP_1_CONFIG = {
+  width: 666,
+  height: 634,
+  zIndex: 12,
+};
+
 // hero-banner-1-2-image.svg 图片 clipPath (617x722)
-const IMAGE_CLIP_CONFIG = {
+const IMAGE_CLIP_2_CONFIG = {
   width: 617,
   height: 722,
   zIndex: 12,
@@ -245,70 +203,93 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
         }}
       />
 
-      {/* 装饰图片1 - 左上角 - 桌面端 (独立定位，不受SVG容器限制) */}
+      {/* ===== 左上角区域 — 新方案: SVG clipPath 裁切图片 + 装饰层 ===== */}
+
+      {/* 图片层 - 桌面端 — 用 hero-banner-1-1-image.svg 的 path 做 clipPath */}
       {data.images[1] && (
         <div
-          className="hidden md:block absolute overflow-hidden"
+          className="hidden md:block absolute"
           style={{
-            left: rpx(IMAGE_1_CONFIG.left),
-            top: rpx(IMAGE_1_CONFIG.top),
-            width: rpx(IMAGE_1_CONFIG.width),
-            height: rpx(IMAGE_1_CONFIG.height),
-            transform: `rotate(${IMAGE_1_CONFIG.rotate}deg)`,
-            border: `${rpx(IMAGE_1_CONFIG.borderWidth)} solid ${IMAGE_1_CONFIG.borderColor}`,
-            borderRadius: IMAGE_1_CONFIG.borderRadius,
-            zIndex: IMAGE_1_CONFIG.zIndex,
+            left: 0,
+            top: 0,
+            width: rpx(IMAGE_CLIP_1_CONFIG.width),
+            aspectRatio: `${IMAGE_CLIP_1_CONFIG.width} / ${IMAGE_CLIP_1_CONFIG.height}`,
+            zIndex: IMAGE_CLIP_1_CONFIG.zIndex,
           }}
         >
-          {(() => {
-            const cropData = data.imageCropDataList?.[1];
-            const cropStyles = getCropStyles(cropData);
-            if (cropStyles && cropData) {
-              // 有裁剪数据 — 用裁剪渲染替代硬编码偏移
-              return (
-                <div
-                  className="w-full h-full"
-                  style={{
-                    transform: `rotate(${-IMAGE_1_CONFIG.rotate}deg)`,
-                    overflow: "hidden",
-                    position: "relative",
-                  }}
-                >
-                  <img
-                    src={getCropImageUrl(data.images[1], cropData)}
-                    alt="装饰图1"
+          {/* SVG clipPath 定义 + 被裁切的图片 */}
+          <svg
+            viewBox="0 0 666 634"
+            className="absolute inset-0 w-full h-full"
+            style={{ overflow: "visible" }}
+          >
+            <defs>
+              <clipPath id="hero1-clip-left-desktop">
+                <path d="M589.755 0C670.243 76.4486 690.517 200.879 631.775 300.626L452.879 604.404C436.344 632.482 400.178 641.839 372.101 625.304L0 406.172V0H589.755Z" />
+              </clipPath>
+            </defs>
+            <foreignObject
+              x="0"
+              y="0"
+              width="666"
+              height="634"
+              clipPath="url(#hero1-clip-left-desktop)"
+            >
+              {(() => {
+                const cropData = data.imageCropDataList?.[1];
+                if (cropData?.croppedAreaPixels?.width) {
+                  // 有裁剪数据
+                  return (
+                    <div
+                      style={{
+                        width: "666px",
+                        height: "634px",
+                        overflow: "hidden",
+                        position: "relative",
+                      }}
+                    >
+                      <img
+                        src={getCropImageUrl(data.images[1], cropData)}
+                        alt="装饰图1"
+                        style={{
+                          position: "absolute",
+                          width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                          height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                          left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                          top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                          maxWidth: "none",
+                        }}
+                      />
+                    </div>
+                  );
+                }
+                // 无裁剪数据 — object-cover + focalPoint
+                return (
+                  <div
                     style={{
-                      position: "absolute",
-                      width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
-                      height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
-                      left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
-                      top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
-                      maxWidth: "none",
+                      width: "666px",
+                      height: "634px",
                     }}
-                  />
-                </div>
-              );
-            }
-            // 无裁剪数据 — 使用硬编码偏移
-            return (
-              <div
-                className="w-full h-full"
-                style={{
-                  transform: `rotate(${-IMAGE_1_CONFIG.rotate}deg) scale(${IMAGE_1_CONFIG.imageScale}) translate(${IMAGE_1_CONFIG.imageOffsetX}%, ${IMAGE_1_CONFIG.imageOffsetY}%)`,
-                }}
-              >
-                <ServerImage
-                  image={data.images[1]}
-                  alt="装饰图1"
-                  size="small"
-                  fill
-                  className="w-full h-full object-cover"
-                  objectPosition="center center"
-                  priority
-                />
-              </div>
-            );
-          })()}
+                  >
+                    <img
+                      src={
+                        data.images[1]?.variants?.small ||
+                        data.images[1]?.url ||
+                        ""
+                      }
+                      alt="装饰图1"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        objectPosition: getObjectPosition(data.images[1]),
+                      }}
+                    />
+                  </div>
+                );
+              })()}
+            </foreignObject>
+          </svg>
         </div>
       )}
 
@@ -348,33 +329,52 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
         {/* 装饰图片1 - 相对于SVG容器定位 */}
         {data.images[1] && (
           <div
-            className="absolute overflow-hidden"
+            className="absolute left-0 top-0 w-full"
             style={{
-              left: `${(IMAGE_1_CONFIG.left / SVG_1_CONFIG.width) * 100}%`,
-              top: `${(IMAGE_1_CONFIG.top / SVG_1_CONFIG.height) * 100}%`,
-              width: `${(IMAGE_1_CONFIG.width / SVG_1_CONFIG.width) * 100}%`,
-              height: `${(IMAGE_1_CONFIG.height / SVG_1_CONFIG.height) * 100}%`,
-              transform: `rotate(${IMAGE_1_CONFIG.rotate}deg)`,
-              border: `8px solid ${IMAGE_1_CONFIG.borderColor}`,
-              borderRadius: IMAGE_1_CONFIG.borderRadius,
-              zIndex: IMAGE_1_CONFIG.zIndex,
+              aspectRatio: `${IMAGE_CLIP_1_CONFIG.width} / ${IMAGE_CLIP_1_CONFIG.height}`,
+              zIndex: IMAGE_CLIP_1_CONFIG.zIndex,
             }}
           >
-            <div
-              className="w-full h-full"
-              style={{
-                transform: `rotate(${-IMAGE_1_CONFIG.rotate}deg) scale(${IMAGE_1_CONFIG.imageScale}) translate(${IMAGE_1_CONFIG.imageOffsetX}%, ${IMAGE_1_CONFIG.imageOffsetY}%)`,
-              }}
+            <svg
+              viewBox="0 0 666 634"
+              className="absolute inset-0 w-full h-full"
+              style={{ overflow: "visible" }}
             >
-              <ServerImage
-                image={data.images[1]}
-                alt="装饰图1"
-                size="small"
-                fill
-                className="w-full h-full object-cover"
-                objectPosition="center center"
-              />
-            </div>
+              <defs>
+                <clipPath id="hero1-clip-left-mobile">
+                  <path d="M589.755 0C670.243 76.4486 690.517 200.879 631.775 300.626L452.879 604.404C436.344 632.482 400.178 641.839 372.101 625.304L0 406.172V0H589.755Z" />
+                </clipPath>
+              </defs>
+              <foreignObject
+                x="0"
+                y="0"
+                width="666"
+                height="634"
+                clipPath="url(#hero1-clip-left-mobile)"
+              >
+                <div
+                  style={{
+                    width: "666px",
+                    height: "634px",
+                  }}
+                >
+                  <img
+                    src={
+                      data.images[1]?.variants?.small ||
+                      data.images[1]?.url ||
+                      ""
+                    }
+                    alt="装饰图1"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      objectPosition: getObjectPosition(data.images[1]),
+                    }}
+                  />
+                </div>
+              </foreignObject>
+            </svg>
           </div>
         )}
       </div>
@@ -388,9 +388,9 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
           style={{
             right: 0,
             bottom: 0,
-            width: rpx(IMAGE_CLIP_CONFIG.width),
-            aspectRatio: `${IMAGE_CLIP_CONFIG.width} / ${IMAGE_CLIP_CONFIG.height}`,
-            zIndex: IMAGE_CLIP_CONFIG.zIndex,
+            width: rpx(IMAGE_CLIP_2_CONFIG.width),
+            aspectRatio: `${IMAGE_CLIP_2_CONFIG.width} / ${IMAGE_CLIP_2_CONFIG.height}`,
+            zIndex: IMAGE_CLIP_2_CONFIG.zIndex,
           }}
         >
           {/* SVG clipPath 定义 + 被裁切的图片 */}
@@ -500,8 +500,8 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
           <div
             className="absolute right-0 bottom-0 w-full"
             style={{
-              aspectRatio: `${IMAGE_CLIP_CONFIG.width} / ${IMAGE_CLIP_CONFIG.height}`,
-              zIndex: IMAGE_CLIP_CONFIG.zIndex,
+              aspectRatio: `${IMAGE_CLIP_2_CONFIG.width} / ${IMAGE_CLIP_2_CONFIG.height}`,
+              zIndex: IMAGE_CLIP_2_CONFIG.zIndex,
             }}
           >
             <svg

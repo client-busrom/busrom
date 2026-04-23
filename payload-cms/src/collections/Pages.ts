@@ -270,6 +270,7 @@ export const Pages: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },
@@ -285,6 +286,7 @@ export const Pages: CollectionConfig = {
       defaultValue: false,
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         description: {
           en: 'System pages cannot be deleted',
           zh: '系统页面无法删除',
@@ -306,6 +308,7 @@ export const Pages: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
     {
@@ -317,6 +320,7 @@ export const Pages: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         date: {
           pickerAppearance: 'dayAndTime',
         },
@@ -332,6 +336,7 @@ export const Pages: CollectionConfig = {
       defaultValue: 0,
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         description: {
           en: 'Lower number = higher priority',
           zh: '数字越小优先级越高',
@@ -348,6 +353,7 @@ export const Pages: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
   ],

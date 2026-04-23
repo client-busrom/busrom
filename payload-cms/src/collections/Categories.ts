@@ -315,6 +315,7 @@ export const Categories: CollectionConfig = {
       defaultValue: 0,
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         description: {
           en: 'Lower number = higher priority',
           zh: '数字越小优先级越高',
@@ -336,6 +337,7 @@ export const Categories: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
     {
@@ -343,6 +345,7 @@ export const Categories: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },
@@ -357,6 +360,7 @@ export const Categories: CollectionConfig = {
       admin: {
         condition: (data) => data?.type === 'PRODUCT',
         position: 'sidebar',
+        disableListColumn: true,
       },
       fields: [
         {

@@ -173,7 +173,7 @@ export const homeContentHandler: PayloadHandler = async (req) => {
       footer,
     ] = await Promise.all([
       // Collections
-      payload.find({
+      safeFetch(() => payload.find({
         collection: 'hero-banner-items',
         locale,
         depth: 2,
@@ -182,40 +182,33 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         },
         sort: 'order',
         limit: 100,
-      }),
+      })),
 
       // Globals
-      payload.findGlobal({
+      safeFetch(() => payload.findGlobal({
         slug: 'product-series-carousel',
         locale,
         depth: 2,
-      }),
-      payload.findGlobal({
+      })),
+      safeFetch(() => payload.findGlobal({
         slug: 'service-features',
         locale,
         depth: 2,
-      }),
-      // Sphere 3D - wrap in try-catch to handle missing table gracefully
-      (async () => {
-        try {
-          return await payload.findGlobal({
-            slug: 'sphere-3d',
-            locale,
-            depth: 2,
-          })
-        } catch (error) {
-          console.warn('sphere-3d table not found, returning null')
-          return null
-        }
-      })(),
-      payload.findGlobal({
+      })),
+      // Sphere 3D
+      safeFetch(() => payload.findGlobal({
+        slug: 'sphere-3d',
+        locale,
+        depth: 2,
+      })),
+      safeFetch(() => payload.findGlobal({
         slug: 'simple-cta',
         locale,
         depth: 2,
-      }),
+      })),
 
       // Series Intro Items Collection
-      payload.find({
+      safeFetch(() => payload.find({
         collection: 'series-intro-items',
         locale,
         depth: 2,
@@ -223,58 +216,58 @@ export const homeContentHandler: PayloadHandler = async (req) => {
           status: { equals: 'published' },
         },
         limit: 100,
-      }),
+      })),
 
-      payload.findGlobal({
+      safeFetch(() => payload.findGlobal({
         slug: 'featured-products',
         locale,
         depth: 2,
-      }),
-      payload.findGlobal({
+      })),
+      safeFetch(() => payload.findGlobal({
         slug: 'brand-advantages',
         locale,
         depth: 2,
-      }),
-      payload.findGlobal({
+      })),
+      safeFetch(() => payload.findGlobal({
         slug: 'oem-odm',
         locale,
         depth: 2,
-      }),
-      payload.findGlobal({
+      })),
+      safeFetch(() => payload.findGlobal({
         slug: 'quote-steps',
         locale,
         depth: 2,
-      }),
-      payload.findGlobal({
+      })),
+      safeFetch(() => payload.findGlobal({
         slug: 'main-form',
         locale,
         depth: 2,
-      }),
-      payload.findGlobal({
+      })),
+      safeFetch(() => payload.findGlobal({
         slug: 'why-choose-busrom',
         locale,
         depth: 2,
-      }),
-      payload.findGlobal({
+      })),
+      safeFetch(() => payload.findGlobal({
         slug: 'case-studies',
         locale,
         depth: 2,
-      }),
-      payload.findGlobal({
+      })),
+      safeFetch(() => payload.findGlobal({
         slug: 'brand-analysis',
         locale,
         depth: 2,
-      }),
-      payload.findGlobal({
+      })),
+      safeFetch(() => payload.findGlobal({
         slug: 'brand-value',
         locale,
         depth: 2,
-      }),
-      payload.findGlobal({
+      })),
+      safeFetch(() => payload.findGlobal({
         slug: 'footer',
         locale,
         depth: 2,
-      }),
+      })),
     ])
 
     // Transform data to match frontend expectations

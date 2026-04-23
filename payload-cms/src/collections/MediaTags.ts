@@ -110,6 +110,7 @@ export const MediaTags: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         description: {
           en: 'Color code for UI display',
           zh: 'UI显示的颜色代码',
@@ -121,6 +122,7 @@ export const MediaTags: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },

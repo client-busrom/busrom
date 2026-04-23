@@ -133,6 +133,7 @@ export const TemplateCategories: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
     {
@@ -156,6 +157,7 @@ export const TemplateCategories: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },

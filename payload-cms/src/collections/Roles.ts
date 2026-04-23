@@ -202,6 +202,7 @@ export const Roles: CollectionConfig = {
           zh: '解决权限冲突的优先级(1-10,数值越大优先级越高)',
         },
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
 
@@ -218,6 +219,7 @@ export const Roles: CollectionConfig = {
       defaultValue: false,
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         description: {
           en: 'System roles cannot be deleted',
           zh: '系统角色不能被删除',
@@ -235,6 +237,7 @@ export const Roles: CollectionConfig = {
       defaultValue: true,
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
 
@@ -246,6 +249,7 @@ export const Roles: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },

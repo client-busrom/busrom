@@ -200,6 +200,7 @@ export const FaqItems: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },
@@ -215,6 +216,7 @@ export const FaqItems: CollectionConfig = {
       defaultValue: 0,
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         description: {
           en: 'Lower number = higher priority',
           zh: '数字越小优先级越高',
@@ -236,6 +238,7 @@ export const FaqItems: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
   ],

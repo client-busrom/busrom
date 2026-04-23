@@ -71,6 +71,7 @@ export const SeriesReusableBlocks: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },
@@ -88,6 +89,7 @@ export const SeriesReusableBlocks: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
   ],

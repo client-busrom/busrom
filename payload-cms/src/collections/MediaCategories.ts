@@ -122,6 +122,7 @@ export const MediaCategories: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         description: {
           en: 'Display order in lists',
           zh: '列表中的显示顺序',
@@ -133,6 +134,7 @@ export const MediaCategories: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },

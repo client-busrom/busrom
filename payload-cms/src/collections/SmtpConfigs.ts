@@ -430,6 +430,7 @@ export const SmtpConfigs: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
     {
@@ -437,6 +438,7 @@ export const SmtpConfigs: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },

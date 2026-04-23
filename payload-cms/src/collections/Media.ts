@@ -185,6 +185,7 @@ export const Media: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },
@@ -320,6 +321,7 @@ export const Media: CollectionConfig = {
       label: { en: 'Status', zh: '状态' },
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         description: {
           en: 'Media status (archived = soft delete)',
           zh: '媒体状态（归档=软删除）',
@@ -341,6 +343,7 @@ export const Media: CollectionConfig = {
       admin: {
         readOnly: true,
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
   ],

@@ -154,6 +154,7 @@ export const FormConfigs: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         description: {
           en: 'Only selected users (and super admins) will be able to see and manage submissions from this form.',
           zh: '只有被选中的人员（以及超级管理员）才能看到并管理此表单的提交。',
@@ -627,6 +628,7 @@ export const FormConfigs: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/TranslationCenter',
         },
@@ -637,6 +639,7 @@ export const FormConfigs: CollectionConfig = {
       type: 'ui',
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
         components: {
           Field: '@/components/fields/FormFieldsTranslationCenter',
         },
@@ -656,6 +659,7 @@ export const FormConfigs: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
+        disableListColumn: true,
       },
     },
   ],
