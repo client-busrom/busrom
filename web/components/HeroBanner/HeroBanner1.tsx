@@ -27,9 +27,9 @@ const DESIGN_HEIGHT = 1080;
 
 // SVG UI 元素配置
 const SVG_1_CONFIG = {
-  // hero-banner-1-1.svg 左上角 (830x716)
-  width: 830,
-  height: 716,
+  // hero-banner-1-1.svg 左上角 (740x693)
+  width: 740,
+  height: 693,
   left: 0,
   top: 0,
   zIndex: 10,
@@ -219,7 +219,7 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
         >
           {/* SVG clipPath 定义 + 被裁切的图片 */}
           <svg
-            viewBox="0 0 666 634"
+            viewBox={`0 0 ${IMAGE_CLIP_1_CONFIG.width} ${IMAGE_CLIP_1_CONFIG.height}`}
             className="absolute inset-0 w-full h-full"
             style={{ overflow: "visible" }}
           >
@@ -231,8 +231,8 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
             <foreignObject
               x="0"
               y="0"
-              width="666"
-              height="634"
+              width={IMAGE_CLIP_1_CONFIG.width}
+              height={IMAGE_CLIP_1_CONFIG.height}
               clipPath="url(#hero1-clip-left-desktop)"
             >
               {(() => {
@@ -242,8 +242,8 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
                   return (
                     <div
                       style={{
-                        width: "666px",
-                        height: "634px",
+                        width: "100%",
+                        height: "100%",
                         overflow: "hidden",
                         position: "relative",
                       }}
@@ -267,8 +267,8 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
                 return (
                   <div
                     style={{
-                      width: "666px",
-                      height: "634px",
+                      width: "100%",
+                      height: "100%",
                     }}
                   >
                     <img
@@ -336,7 +336,7 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
             }}
           >
             <svg
-              viewBox="0 0 666 634"
+              viewBox={`0 0 ${IMAGE_CLIP_1_CONFIG.width} ${IMAGE_CLIP_1_CONFIG.height}`}
               className="absolute inset-0 w-full h-full"
               style={{ overflow: "visible" }}
             >
@@ -348,14 +348,14 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
               <foreignObject
                 x="0"
                 y="0"
-                width="666"
-                height="634"
+                width={IMAGE_CLIP_1_CONFIG.width}
+                height={IMAGE_CLIP_1_CONFIG.height}
                 clipPath="url(#hero1-clip-left-mobile)"
               >
                 <div
                   style={{
-                    width: "666px",
-                    height: "634px",
+                    width: "100%",
+                    height: "100%",
                   }}
                 >
                   <img
@@ -395,7 +395,7 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
         >
           {/* SVG clipPath 定义 + 被裁切的图片 */}
           <svg
-            viewBox="0 0 617 722"
+            viewBox={`0 0 ${IMAGE_CLIP_2_CONFIG.width} ${IMAGE_CLIP_2_CONFIG.height}`}
             className="absolute inset-0 w-full h-full"
             style={{ overflow: "visible" }}
           >
@@ -407,8 +407,8 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
             <foreignObject
               x="0"
               y="0"
-              width="617"
-              height="722"
+              width={IMAGE_CLIP_2_CONFIG.width}
+              height={IMAGE_CLIP_2_CONFIG.height}
               clipPath="url(#hero1-clip-right-desktop)"
             >
               {(() => {
@@ -418,8 +418,8 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
                   return (
                     <div
                       style={{
-                        width: "617px",
-                        height: "722px",
+                        width: "100%",
+                        height: "100%",
                         overflow: "hidden",
                         position: "relative",
                       }}
@@ -443,8 +443,8 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
                 return (
                   <div
                     style={{
-                      width: "617px",
-                      height: "722px",
+                      width: "100%",
+                      height: "100%",
                     }}
                   >
                     <img
@@ -505,7 +505,7 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
             }}
           >
             <svg
-              viewBox="0 0 617 722"
+              viewBox={`0 0 ${IMAGE_CLIP_2_CONFIG.width} ${IMAGE_CLIP_2_CONFIG.height}`}
               className="absolute inset-0 w-full h-full"
               style={{ overflow: "visible" }}
             >
@@ -517,14 +517,14 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
               <foreignObject
                 x="0"
                 y="0"
-                width="617"
-                height="722"
+                width={IMAGE_CLIP_2_CONFIG.width}
+                height={IMAGE_CLIP_2_CONFIG.height}
                 clipPath="url(#hero1-clip-right-mobile)"
               >
                 <div
                   style={{
-                    width: "617px",
-                    height: "722px",
+                    width: "100%",
+                    height: "100%",
                   }}
                 >
                   <img
