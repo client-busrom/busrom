@@ -145,6 +145,18 @@ async function resolveCarouselItems(items: any[], payload: any) {
 }
 
 /**
+ * Helper function to safely fetch data from Payload and prevent Promise.all from failing
+ */
+const safeFetch = async (task: () => Promise<any>, fallback: any = null) => {
+  try {
+    return await task()
+  } catch (error) {
+    console.error(`[Home API] Fetch failed:`, error)
+    return fallback
+  }
+}
+
+/**
  * Home Content Handler
  */
 export const homeContentHandler: PayloadHandler = async (req) => {
@@ -182,7 +194,7 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         },
         sort: 'order',
         limit: 100,
-      })),
+      }), { docs: [] }),
 
       // Globals
       safeFetch(() => payload.findGlobal({
@@ -216,7 +228,7 @@ export const homeContentHandler: PayloadHandler = async (req) => {
           status: { equals: 'published' },
         },
         limit: 100,
-      })),
+      }), { docs: [] }),
 
       safeFetch(() => payload.findGlobal({
         slug: 'featured-products',
