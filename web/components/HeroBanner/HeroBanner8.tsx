@@ -5,13 +5,16 @@ import { Locale } from "@/i18n.config";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // 处理换行符：支持 /n 和 \n
-const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
+const formatText = (text: string | undefined) =>
+  text?.replace(/\/n|\\n/g, "\n") || "";
 
 // --- 响应式尺寸函数 ---
 const rpx = (designValue: number) => `calc(var(--rpx) * ${designValue})`;
-const rpxHero = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
+const rpxHero = (designValue: number) =>
+  `calc(var(--rpx-hero) * ${designValue})`;
 // 带最小值的版本，防止在中等屏幕下缩放太严重
-const rpxHeroMin = (designValue: number, minValue: number) => `max(${minValue}px, calc(var(--rpx-hero) * ${designValue}))`;
+const rpxHeroMin = (designValue: number, minValue: number) =>
+  `max(${minValue}px, calc(var(--rpx-hero) * ${designValue}))`;
 
 // --- BannerProps Definition ---
 type BannerData = HomeContent["heroBanner"][number];
@@ -23,58 +26,58 @@ type BannerProps = {
 // --- 桌面端配置 (基于 Figma 设计稿 1920x1080) ---
 const DESKTOP_CONFIG = {
   // 背景色
-  backgroundColor: '#544F22',
+  backgroundColor: "#544F22",
 
   // SVG 遮罩图片配置 (黑色区域用于填充 data.images[0])
   // SVG viewBox 1920x1080，黑色路径从 x≈865 到右边缘
   maskImage: {
     // 用宽高比来计算，这样不受地址栏影响
-    aspectRatio: 1055 / 1080,  // 遮罩可见区域宽高比
-    svgAspectRatio: 1920 / 1080,  // 完整 SVG 宽高比
+    aspectRatio: 1055 / 1080, // 遮罩可见区域宽高比
+    svgAspectRatio: 1920 / 1080, // 完整 SVG 宽高比
   },
 
   // 左侧内容区域 (Figma: x 132, y 85)
   leftContent: {
-    left: 132,             // 左边距 - 设计稿尺寸
-    top: 85,               // 顶部距离 - 设计稿尺寸
+    left: 132, // 左边距 - 设计稿尺寸
+    top: 85, // 顶部距离 - 设计稿尺寸
   },
 
   // 标题配置 (Figma: 96px, lineHeight: 113px)
   title: {
-    fontSize: 96,          // 字体大小 - 设计稿尺寸
-    fontSizeSmall: 96,     // 保持一致
-    lineHeight: 113 / 96,  // 约 1.177
+    fontSize: 96, // 字体大小 - 设计稿尺寸
+    fontSizeSmall: 96, // 保持一致
+    lineHeight: 113 / 96, // 约 1.177
   },
 
   // Feature 胶囊配置 [2,3,4] - 文字 + 内边距撑开
   featureCards: {
-    bottom: 130,           // 底部距离
-    gap: 20,               // 卡片间距
-    fontSize: 40,          // 字体大小
-    paddingX: 44,          // 水平内边距
-    paddingY: 18,          // 垂直内边距
-    borderRadius: 30,      // 圆角
+    bottom: 130, // 底部距离
+    gap: 20, // 卡片间距
+    fontSize: 40, // 字体大小
+    paddingX: 44, // 水平内边距
+    paddingY: 18, // 垂直内边距
+    borderRadius: 30, // 圆角
     borderWidth: 1,
   },
 
   // 右上角 Feature[1] 胶囊 (Figma: top 150, fontSize 48)
   feature1: {
-    top: 124,              // 顶部距离 - 设计稿尺寸
-    paddingX: 44,          // 水平内边距
-    paddingY: 54,          // 垂直内边距
-    fontSize: 48,          // 字体大小 - 设计稿尺寸
-    borderRadius: 100,     // 左侧圆角 (rounded-l-full)
+    top: 124, // 顶部距离 - 设计稿尺寸
+    paddingX: 44, // 水平内边距
+    paddingY: 54, // 垂直内边距
+    fontSize: 48, // 字体大小 - 设计稿尺寸
+    borderRadius: 100, // 左侧圆角 (rounded-l-full)
   },
 
   // 底部三张图片
   bottomImages: {
-    bottom: 100,           // 底部距离
-    right: 60,             // 右边距
-    gap: 42,               // 图片间距
-    width: 318,            // 单张图片宽度
-    height: 291,           // 单张图片高度
-    borderRadius: 34,      // 圆角
-    borderWidth: 10,        // 边框宽度
+    bottom: 100, // 底部距离
+    right: 60, // 右边距
+    gap: 42, // 图片间距
+    width: 318, // 单张图片宽度
+    height: 291, // 单张图片高度
+    borderRadius: 34, // 圆角
+    borderWidth: 10, // 边框宽度
   },
 };
 
@@ -85,19 +88,19 @@ const MOBILE_CONFIG = {
 
   // 标题
   title: {
-    fontSize: 'text-4xl',
+    fontSize: "text-4xl",
   },
 
   // Feature 胶囊
   featureCards: {
     marginTop: 24,
-    fontSize: 'text-lg',
+    fontSize: "text-lg",
   },
 
   // Feature[1] 右上角
   feature1: {
     top: 60,
-    fontSize: 'text-xl',
+    fontSize: "text-xl",
   },
 
   // 底部图片
@@ -113,7 +116,7 @@ const MOBILE_CONFIG = {
 const HeroBanner8: FC<BannerProps> = ({ data }) => {
   // --- Split Feature[0] (支持换行: \n, \\n, /n) ---
   const feature0Text = formatText(data.features[0]);
-  const feature0Lines = feature0Text.split('\n');
+  const feature0Lines = feature0Text.split("\n");
 
   return (
     <section
@@ -127,16 +130,16 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
         style={{
           // 宽度 = 高度 × 遮罩区域宽高比 (1055/1080)
           aspectRatio: DESKTOP_CONFIG.maskImage.aspectRatio,
-          maskImage: 'url(/hero-banner-8-mask.svg)',
-          WebkitMaskImage: 'url(/hero-banner-8-mask.svg)',
+          maskImage: "url(/hero-banner-8-mask.svg)",
+          WebkitMaskImage: "url(/hero-banner-8-mask.svg)",
           // 遮罩大小：SVG 原始比例 (1920/1080)，高度 100%
           maskSize: `${100 * (1920 / 1055)}% 100%`,
           WebkitMaskSize: `${100 * (1920 / 1055)}% 100%`,
           // 遮罩右对齐，让黑色区域和容器对齐
-          maskPosition: 'right center',
-          WebkitMaskPosition: 'right center',
-          maskRepeat: 'no-repeat',
-          WebkitMaskRepeat: 'no-repeat',
+          maskPosition: "right center",
+          WebkitMaskPosition: "right center",
+          maskRepeat: "no-repeat",
+          WebkitMaskRepeat: "no-repeat",
         }}
       >
         <OptimizedImage
@@ -152,10 +155,10 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
       <div
         className="absolute inset-0 z-10 pointer-events-none"
         style={{
-          backgroundImage: 'url(/hero-banner-8-1.svg?v=2)',
-          backgroundSize: 'auto 100%',
-          backgroundPosition: 'right center',
-          backgroundRepeat: 'no-repeat',
+          backgroundImage: "url(/hero-banner-8-1.svg?v=2)",
+          backgroundSize: "auto 100%",
+          backgroundPosition: "right center",
+          backgroundRepeat: "no-repeat",
         }}
       />
 
@@ -171,8 +174,14 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
             paddingRight: rpxHeroMin(DESKTOP_CONFIG.feature1.paddingX, 24),
             paddingTop: rpxHeroMin(DESKTOP_CONFIG.feature1.paddingY, 12),
             paddingBottom: rpxHeroMin(DESKTOP_CONFIG.feature1.paddingY, 12),
-            borderTopLeftRadius: rpxHeroMin(DESKTOP_CONFIG.feature1.borderRadius, 50),
-            borderBottomLeftRadius: rpxHeroMin(DESKTOP_CONFIG.feature1.borderRadius, 50),
+            borderTopLeftRadius: rpxHeroMin(
+              DESKTOP_CONFIG.feature1.borderRadius,
+              50,
+            ),
+            borderBottomLeftRadius: rpxHeroMin(
+              DESKTOP_CONFIG.feature1.borderRadius,
+              50,
+            ),
             fontSize: rpxHeroMin(DESKTOP_CONFIG.feature1.fontSize, 24),
           }}
         >
@@ -198,15 +207,18 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
           }}
         >
           {feature0Lines.map((line, index) => {
-            const isLastLine = feature0Lines.length > 1 && index === feature0Lines.length - 1;
+            const isLastLine =
+              feature0Lines.length > 1 && index === feature0Lines.length - 1;
             return (
               <div
                 key={index}
-                className={isLastLine ? 'text-[#FDF6C2]' : 'text-black'}
+                className={isLastLine ? "text-white" : "text-black"}
                 style={{
-                  WebkitTextStroke: isLastLine ? `${rpx(6)} #000000` : `${rpx(6)} #FDF6C2`,
-                  paintOrder: 'stroke fill',
-                  letterSpacing: '0.06em',
+                  WebkitTextStroke: isLastLine
+                    ? `${rpx(6)} #000000`
+                    : `${rpx(6)} #FDF6C2`,
+                  paintOrder: "stroke fill",
+                  letterSpacing: "0.06em",
                 }}
               >
                 {line}
@@ -225,31 +237,51 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
           gap: rpxHeroMin(DESKTOP_CONFIG.featureCards.gap, 12),
         }}
       >
-        {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
-          <div
-            key={index}
-            className="bg-[#FFFB1B]/[0.17] border border-[#CFBC37] flex items-center"
-            style={{
-              borderRadius: rpxHeroMin(DESKTOP_CONFIG.featureCards.borderRadius, 12),
-              borderWidth: `max(1.5px, ${rpxHero(DESKTOP_CONFIG.featureCards.borderWidth)})`,
-              paddingLeft: rpxHeroMin(DESKTOP_CONFIG.featureCards.paddingX, 20),
-              paddingRight: rpxHeroMin(DESKTOP_CONFIG.featureCards.paddingX, 20),
-              paddingTop: rpxHeroMin(DESKTOP_CONFIG.featureCards.paddingY, 12),
-              paddingBottom: rpxHeroMin(DESKTOP_CONFIG.featureCards.paddingY, 12),
-            }}
-          >
-            <p
-              className="font-montserrat font-bold text-[#CFBC37] text-left whitespace-nowrap"
+        {[data.features[2], data.features[3], data.features[4]].map(
+          (feature, index) => (
+            <div
+              key={index}
+              className="bg-[#FFFB1B]/[0.17] border border-[#CFBC37] flex items-center"
               style={{
-                fontSize: rpxHeroMin(DESKTOP_CONFIG.featureCards.fontSize, 18),
-                letterSpacing: '0.09em',
-                textShadow: '0 4px 12px rgba(86, 80, 32, 1)',
+                borderRadius: rpxHeroMin(
+                  DESKTOP_CONFIG.featureCards.borderRadius,
+                  12,
+                ),
+                borderWidth: `max(1.5px, ${rpxHero(DESKTOP_CONFIG.featureCards.borderWidth)})`,
+                paddingLeft: rpxHeroMin(
+                  DESKTOP_CONFIG.featureCards.paddingX,
+                  20,
+                ),
+                paddingRight: rpxHeroMin(
+                  DESKTOP_CONFIG.featureCards.paddingX,
+                  20,
+                ),
+                paddingTop: rpxHeroMin(
+                  DESKTOP_CONFIG.featureCards.paddingY,
+                  12,
+                ),
+                paddingBottom: rpxHeroMin(
+                  DESKTOP_CONFIG.featureCards.paddingY,
+                  12,
+                ),
               }}
             >
-              {feature}
-            </p>
-          </div>
-        ))}
+              <p
+                className="font-montserrat font-bold text-[#CFBC37] text-left whitespace-nowrap"
+                style={{
+                  fontSize: rpxHeroMin(
+                    DESKTOP_CONFIG.featureCards.fontSize,
+                    18,
+                  ),
+                  letterSpacing: "0.09em",
+                  textShadow: "0 4px 12px rgba(86, 80, 32, 1)",
+                }}
+              >
+                {feature}
+              </p>
+            </div>
+          ),
+        )}
       </div>
 
       {/* Layer 4: 底部三张图片 - 桌面端 (lg及以上横向，md到lg竖向) */}
@@ -261,26 +293,31 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
           gap: rpxHeroMin(DESKTOP_CONFIG.bottomImages.gap, 12),
         }}
       >
-        {[data.images[1], data.images[2], data.images[3]].map((image, index) => (
-          <div
-            key={index}
-            className="relative overflow-hidden"
-            style={{
-              width: rpxHeroMin(DESKTOP_CONFIG.bottomImages.width, 160),
-              height: rpxHeroMin(DESKTOP_CONFIG.bottomImages.height, 130),
-              borderRadius: rpxHeroMin(DESKTOP_CONFIG.bottomImages.borderRadius, 20),
-              boxShadow: `0 0 0 ${rpx(DESKTOP_CONFIG.bottomImages.borderWidth)} #FFFFFF`,
-            }}
-          >
-            <OptimizedImage
-              image={image}
-              alt={`Feature image ${index + 1}`}
-              size="medium"
-              className="absolute inset-0 w-full h-full object-cover"
-              priority
-            />
-          </div>
-        ))}
+        {[data.images[1], data.images[2], data.images[3]].map(
+          (image, index) => (
+            <div
+              key={index}
+              className="relative overflow-hidden"
+              style={{
+                width: rpxHeroMin(DESKTOP_CONFIG.bottomImages.width, 160),
+                height: rpxHeroMin(DESKTOP_CONFIG.bottomImages.height, 130),
+                borderRadius: rpxHeroMin(
+                  DESKTOP_CONFIG.bottomImages.borderRadius,
+                  20,
+                ),
+                boxShadow: `0 0 0 ${rpx(DESKTOP_CONFIG.bottomImages.borderWidth)} #FFFFFF`,
+              }}
+            >
+              <OptimizedImage
+                image={image}
+                alt={`Feature image ${index + 1}`}
+                size="medium"
+                className="absolute inset-0 w-full h-full object-cover"
+                priority
+              />
+            </div>
+          ),
+        )}
       </div>
 
       {/* ==================== 移动端布局 ==================== */}
@@ -291,7 +328,9 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
         style={{ top: MOBILE_CONFIG.feature1.top }}
       >
         <div className="bg-[#665F1F] text-[#FEFFD8] rounded-l-full px-6 py-3">
-          <p className={`${MOBILE_CONFIG.feature1.fontSize} font-paytone-one font-regular whitespace-pre-line`}>
+          <p
+            className={`${MOBILE_CONFIG.feature1.fontSize} font-paytone-one font-regular whitespace-pre-line`}
+          >
             {formatText(data.features[1])}
           </p>
         </div>
@@ -303,17 +342,20 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
         style={{ top: MOBILE_CONFIG.topPadding, left: 0 }}
       >
         {/* 标题 */}
-        <h1 className={`${MOBILE_CONFIG.title.fontSize} font-paytone-one font-regular leading-tight`}>
+        <h1
+          className={`${MOBILE_CONFIG.title.fontSize} font-paytone-one font-regular leading-tight`}
+        >
           {feature0Lines.map((line, index) => {
-            const isLastLine = feature0Lines.length > 1 && index === feature0Lines.length - 1;
+            const isLastLine =
+              feature0Lines.length > 1 && index === feature0Lines.length - 1;
             return (
               <div
                 key={index}
-                className={isLastLine ? 'text-[#FDF6C2]' : 'text-black'}
+                className={isLastLine ? "text-[#FDF6C2]" : "text-black"}
                 style={{
-                  WebkitTextStroke: isLastLine ? '2px #000000' : '2px #FDF6C2',
-                  paintOrder: 'stroke fill',
-                  letterSpacing: '0.06em',
+                  WebkitTextStroke: isLastLine ? "2px #000000" : "2px #FDF6C2",
+                  paintOrder: "stroke fill",
+                  letterSpacing: "0.06em",
                 }}
               >
                 {line}
@@ -327,19 +369,21 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
           className="flex flex-col gap-2 w-full"
           style={{ marginTop: MOBILE_CONFIG.featureCards.marginTop }}
         >
-          {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
-            <div
-              key={index}
-              className="bg-[#FFFB1B]/[0.17] border border-[#CFBC37] rounded-lg px-3 py-1.5"
-            >
-              <p
-                className="text-sm font-montserrat font-bold text-[#CFBC37] text-left whitespace-nowrap"
-                style={{ textShadow: '0 2px 6px rgba(86, 80, 32, 1)' }}
+          {[data.features[2], data.features[3], data.features[4]].map(
+            (feature, index) => (
+              <div
+                key={index}
+                className="bg-[#FFFB1B]/[0.17] border border-[#CFBC37] rounded-lg px-3 py-1.5"
               >
-                {feature}
-              </p>
-            </div>
-          ))}
+                <p
+                  className="text-sm font-montserrat font-bold text-[#CFBC37] text-left whitespace-nowrap"
+                  style={{ textShadow: "0 2px 6px rgba(86, 80, 32, 1)" }}
+                >
+                  {feature}
+                </p>
+              </div>
+            ),
+          )}
         </div>
       </div>
 
@@ -351,24 +395,26 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
           gap: MOBILE_CONFIG.bottomImages.gap,
         }}
       >
-        {[data.images[1], data.images[2], data.images[3]].map((image, index) => (
-          <div
-            key={index}
-            className="relative flex-1 overflow-hidden"
-            style={{
-              height: MOBILE_CONFIG.bottomImages.height,
-              borderRadius: MOBILE_CONFIG.bottomImages.borderRadius,
-              boxShadow: `0 0 0 ${MOBILE_CONFIG.bottomImages.borderWidth}px #FFFFFF`,
-            }}
-          >
-            <OptimizedImage
-              image={image}
-              alt={`Feature image ${index + 1}`}
-              size="medium"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          </div>
-        ))}
+        {[data.images[1], data.images[2], data.images[3]].map(
+          (image, index) => (
+            <div
+              key={index}
+              className="relative flex-1 overflow-hidden"
+              style={{
+                height: MOBILE_CONFIG.bottomImages.height,
+                borderRadius: MOBILE_CONFIG.bottomImages.borderRadius,
+                boxShadow: `0 0 0 ${MOBILE_CONFIG.bottomImages.borderWidth}px #FFFFFF`,
+              }}
+            >
+              <OptimizedImage
+                image={image}
+                alt={`Feature image ${index + 1}`}
+                size="medium"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </div>
+          ),
+        )}
       </div>
     </section>
   );

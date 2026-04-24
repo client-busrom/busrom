@@ -15,7 +15,7 @@ type Props = {
 
 // 设计稿基准
 const DESIGN_WIDTH = 1920;
-const DESIGN_HEIGHT = 1200;
+const DESIGN_HEIGHT = 922;
 
 // 图片尺寸
 const IMG_SIZE_DEFAULT = 640;
@@ -30,38 +30,42 @@ const IMG_SIZE_SHRINK = 480;
 // 位置 3: 屏外右（即将退出）
 // 位置 4: 更远的右侧屏外（隐藏）
 const POSITIONS: Record<number, { x: number; y: number; scale: number; opacity: number }> = {
-  [-1]: { x: -1400, y: 300, scale: 0.7, opacity: 0 },  // 更远左侧
-  [0]: { x: -700, y: 260, scale: 0.85, opacity: 0 },   // 屏外左
-  [1]: { x: 220, y: 217, scale: 1, opacity: 1 },       // 屏内左
-  [2]: { x: 1060, y: 217, scale: 1, opacity: 1 },      // 屏内右
-  [3]: { x: 1980, y: 260, scale: 0.85, opacity: 0 },   // 屏外右
-  [4]: { x: 2680, y: 300, scale: 0.7, opacity: 0 },    // 更远右侧
+  [-1]: { x: -1400, y: 358, scale: 0.7, opacity: 0 },  // 更远左侧
+  [0]: { x: -700, y: 310, scale: 0.85, opacity: 0 },   // 屏外左
+  [1]: { x: 220, y: 262, scale: 1, opacity: 1 },       // 屏内左
+  [2]: { x: 1060, y: 262, scale: 1, opacity: 1 },      // 屏内右
+  [3]: { x: 1980, y: 310, scale: 0.85, opacity: 0 },   // 屏外右
+  [4]: { x: 2680, y: 358, scale: 0.7, opacity: 0 },    // 更远右侧
 };
 
-// Hover 时的位置调整
-const LEFT_IMG_X_HOVER = 180;
-const LEFT_IMG_Y_HOVER = 177;
-const RIGHT_IMG_X_HOVER = 1140;
-const RIGHT_IMG_Y_HOVER = 297;
+// Hover 时的位置调整 (比例参考比亚迪: Active 1.15, Inactive 0.85; 锚点为底部)
+// Base y: 262, Base size: 640 => Bottom: 902
+const POS1_HOVER_X = 268;
+const POS1_HOVER_Y = 214;
+const POS1_SHRINK_X = 172;
+const POS1_SHRINK_Y = 310;
 
-// 标题位置
+const POS2_HOVER_X = 1012;
+const POS2_HOVER_Y = 214;
+const POS2_SHRINK_X = 1108;
+const POS2_SHRINK_Y = 310;
+
+// 标题基准相对位置 (距离图片顶部)
 const TITLE_Y = 155;
 
 // 按钮位置
-const NAV_BTN_Y = 861;
-const LEFT_NAV_X = 205;
-const RIGHT_NAV_X = 1604;
-const NAV_BTN_SIZE = 129;
+const NAV_BTN_Y = 550;
+const LEFT_NAV_X = 60;
+const RIGHT_NAV_X = 1796;
+const NAV_BTN_SIZE = 64;
 
 // View More 按钮
-const VIEW_BTN_Y = 892;
+const VIEW_BTN_Y = 830;
 const VIEW_BTN_W = 414;
 const VIEW_BTN_H = 67;
 
 // 字体尺寸
 const TITLE_SIZE_DEFAULT = 64;
-const TITLE_SIZE_HOVER = 72;
-const TITLE_SIZE_SHRINK = 48;
 
 export default function ProductSeriesCarousel({ data }: Props) {
   // currentIndex 表示当前在"屏内左"位置的 item 索引
@@ -147,19 +151,19 @@ export default function ProductSeriesCarousel({ data }: Props) {
 
       if (isHovered) {
         return {
-          left: `${(LEFT_IMG_X_HOVER / DESIGN_WIDTH) * 100}%`,
-          top: `${(LEFT_IMG_Y_HOVER / DESIGN_HEIGHT) * 100}%`,
-          width: `${(IMG_SIZE_HOVER / DESIGN_WIDTH) * 100}%`,
+          left: `${(POS1_HOVER_X / DESIGN_WIDTH) * 100}%`,
+          top: `${(POS1_HOVER_Y / DESIGN_HEIGHT) * 100}%`,
+          width: `${(IMG_SIZE_DEFAULT / DESIGN_WIDTH) * 100}%`,
           opacity: 1,
-          scale: 1,
+          scale: 1.125,
         };
       } else if (isOtherHovered) {
         return {
-          left: `${((220 + 80) / DESIGN_WIDTH) * 100}%`,
-          top: `${((217 + 80) / DESIGN_HEIGHT) * 100}%`,
-          width: `${(IMG_SIZE_SHRINK / DESIGN_WIDTH) * 100}%`,
+          left: `${(POS1_SHRINK_X / DESIGN_WIDTH) * 100}%`,
+          top: `${(POS1_SHRINK_Y / DESIGN_HEIGHT) * 100}%`,
+          width: `${(IMG_SIZE_DEFAULT / DESIGN_WIDTH) * 100}%`,
           opacity: 1,
-          scale: 1,
+          scale: 0.75,
         };
       }
     }
@@ -171,19 +175,19 @@ export default function ProductSeriesCarousel({ data }: Props) {
 
       if (isHovered) {
         return {
-          left: `${((DESIGN_WIDTH - LEFT_IMG_X_HOVER - IMG_SIZE_HOVER) / DESIGN_WIDTH) * 100}%`,
-          top: `${(LEFT_IMG_Y_HOVER / DESIGN_HEIGHT) * 100}%`,
-          width: `${(IMG_SIZE_HOVER / DESIGN_WIDTH) * 100}%`,
+          left: `${(POS2_HOVER_X / DESIGN_WIDTH) * 100}%`,
+          top: `${(POS2_HOVER_Y / DESIGN_HEIGHT) * 100}%`,
+          width: `${(IMG_SIZE_DEFAULT / DESIGN_WIDTH) * 100}%`,
           opacity: 1,
-          scale: 1,
+          scale: 1.125,
         };
       } else if (isOtherHovered) {
         return {
-          left: `${(RIGHT_IMG_X_HOVER / DESIGN_WIDTH) * 100}%`,
-          top: `${(RIGHT_IMG_Y_HOVER / DESIGN_HEIGHT) * 100}%`,
-          width: `${(IMG_SIZE_SHRINK / DESIGN_WIDTH) * 100}%`,
+          left: `${(POS2_SHRINK_X / DESIGN_WIDTH) * 100}%`,
+          top: `${(POS2_SHRINK_Y / DESIGN_HEIGHT) * 100}%`,
+          width: `${(IMG_SIZE_DEFAULT / DESIGN_WIDTH) * 100}%`,
           opacity: 1,
-          scale: 1,
+          scale: 0.75,
         };
       }
     }
@@ -198,35 +202,6 @@ export default function ProductSeriesCarousel({ data }: Props) {
     };
   };
 
-  // 获取标题位置和大小
-  const getTitleStyle = (position: number) => {
-    const baseX = position === 1 ? 220 + IMG_SIZE_DEFAULT / 2 : 1060 + IMG_SIZE_DEFAULT / 2;
-    let fontSize = TITLE_SIZE_DEFAULT;
-    let x = baseX;
-
-    if (position === 1) {
-      if (hoveredPosition === 1) {
-        fontSize = TITLE_SIZE_HOVER;
-        x = LEFT_IMG_X_HOVER + IMG_SIZE_HOVER / 2;
-      } else if (hoveredPosition === 2) {
-        fontSize = TITLE_SIZE_SHRINK;
-        x = 220 + 80 + IMG_SIZE_SHRINK / 2;
-      }
-    } else if (position === 2) {
-      if (hoveredPosition === 2) {
-        fontSize = TITLE_SIZE_HOVER;
-        x = DESIGN_WIDTH - LEFT_IMG_X_HOVER - IMG_SIZE_HOVER / 2;
-      } else if (hoveredPosition === 1) {
-        fontSize = TITLE_SIZE_SHRINK;
-        x = RIGHT_IMG_X_HOVER + IMG_SIZE_SHRINK / 2;
-      }
-    }
-
-    return {
-      left: `${(x / DESIGN_WIDTH) * 100}%`,
-      fontSize: `${(fontSize / DESIGN_WIDTH) * 100}vw`,
-    };
-  };
 
   // 计算每个 item 当前应该在哪个位置
   // 返回 0-3 的位置，或者 -1/4（隐藏在更远的地方）
@@ -284,6 +259,16 @@ export default function ProductSeriesCarousel({ data }: Props) {
       className="relative bg-[#756F3F] overflow-hidden"
       data-header-theme="transparent"
       style={{ aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` }}
+      onMouseMove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        if (x < rect.width / 2) {
+          setHoveredPosition(1);
+        } else {
+          setHoveredPosition(2);
+        }
+      }}
+      onMouseLeave={() => setHoveredPosition(null)}
     >
       {/* 场景图背景 - 全屏显示需要 large 尺寸 */}
       {hoveredItem?.sceneImage && (
@@ -300,7 +285,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
             alt={hoveredItem.sceneImage.altText || "Scene"}
             size="large"
             width={1920}
-            height={1200}
+            height={922}
             className="object-cover w-full h-full"
           />
         </motion.div>
@@ -357,40 +342,6 @@ export default function ProductSeriesCarousel({ data }: Props) {
 
       {/* ==================== 桌面端布局 - 旋转木马 ==================== */}
       <div className="hidden lg:block absolute inset-0">
-        {/* 标题 - 屏内左 */}
-        {visibleItems[1]?.item && (
-          <motion.h3
-            className="absolute font-anaheim font-extrabold text-white whitespace-nowrap z-20"
-            style={{
-              top: `${(TITLE_Y / DESIGN_HEIGHT) * 100}%`,
-              transform: "translate(-50%, -50%)",
-              fontWeight: 800,
-              lineHeight: 0.47,
-            }}
-            animate={getTitleStyle(1)}
-            transition={{ duration: 0.3 }}
-          >
-            {visibleItems[1].item.name}
-          </motion.h3>
-        )}
-
-        {/* 标题 - 屏内右 */}
-        {visibleItems[2]?.item && (
-          <motion.h3
-            className="absolute font-anaheim font-extrabold text-white whitespace-nowrap z-20"
-            style={{
-              top: `${(TITLE_Y / DESIGN_HEIGHT) * 100}%`,
-              transform: "translate(-50%, -50%)",
-              fontWeight: 800,
-              lineHeight: 0.47,
-            }}
-            animate={getTitleStyle(2)}
-            transition={{ duration: 0.3 }}
-          >
-            {visibleItems[2].item.name}
-          </motion.h3>
-        )}
-
         {/* 所有 item - 根据当前位置动画移动 */}
         {data.map((item, itemIndex) => {
           const position = getItemPosition(itemIndex);
@@ -414,9 +365,24 @@ export default function ProductSeriesCarousel({ data }: Props) {
                 zIndex: hoveredPosition === position ? 10 : isOnScreen ? 5 : 1,
                 pointerEvents: isOnScreen ? "auto" : "none",
               }}
-              onMouseEnter={() => isOnScreen && setHoveredPosition(position)}
-              onMouseLeave={() => setHoveredPosition(null)}
             >
+              {/* 标题移入容器内部，利用 scale 属性实现真正的“共进退” */}
+              <h3
+                className={`absolute font-anaheim font-extrabold text-white whitespace-nowrap z-20 transition-opacity duration-300 ${
+                  isOnScreen ? 'opacity-100' : 'opacity-0'
+                }`}
+                style={{
+                  top: `${(-62 / IMG_SIZE_DEFAULT) * 100}%`, // 距离顶部 62px
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  fontWeight: 800,
+                  lineHeight: 0.47,
+                  fontSize: `${(TITLE_SIZE_DEFAULT / DESIGN_WIDTH) * 100}vw`,
+                }}
+              >
+                {item.name}
+              </h3>
+
               <Link href={item.href} className="block w-full h-full">
                 <OptimizedImage
                   image={item.image}
@@ -509,15 +475,13 @@ export default function ProductSeriesCarousel({ data }: Props) {
           >
             <Link
               href={hoveredItem.href}
-              className="flex items-center justify-center font-anaheim font-semibold whitespace-nowrap transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95"
+              className="flex items-center justify-center font-anaheim font-semibold whitespace-nowrap transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 bg-[#d4cc8e] text-[#625d2f] hover:bg-[#625d2f] hover:text-[#d4cc8e]"
               style={{
                 minWidth: `${(VIEW_BTN_W / DESIGN_WIDTH) * 100}vw`,
                 height: `${(VIEW_BTN_H / DESIGN_HEIGHT) * 100}vh`,
                 paddingLeft: `${(40 / DESIGN_WIDTH) * 100}vw`,
                 paddingRight: `${(40 / DESIGN_WIDTH) * 100}vw`,
                 borderRadius: `${(VIEW_BTN_H / 2 / DESIGN_WIDTH) * 100}vw`,
-                backgroundColor: "#d4cc8e",
-                color: "#625d2f",
                 fontSize: `${(32 / DESIGN_WIDTH) * 100}vw`,
               }}
             >
