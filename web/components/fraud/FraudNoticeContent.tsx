@@ -12,7 +12,10 @@ interface FraudNoticeContentProps {
   fraudConverters: any;
 }
 
-export function FraudNoticeContent({ content, fraudConverters }: FraudNoticeContentProps) {
+export function FraudNoticeContent({
+  content,
+  fraudConverters,
+}: FraudNoticeContentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
 
@@ -47,38 +50,55 @@ export function FraudNoticeContent({ content, fraudConverters }: FraudNoticeCont
   }, [content]);
 
   if (!content) return null;
-  
+
   return (
     <section className="py-24">
       <div className="container mx-auto px-6">
         <div className="max-w-5xl mx-auto">
           <div className="prose-none mb-20">
-            <RichText data={{ root: { children: content.text } } as any} converters={fraudConverters} />
+            <RichText
+              data={{ root: { children: content.text } } as any}
+              converters={fraudConverters}
+            />
           </div>
 
           {content.block && (
-            <div 
+            <div
               ref={containerRef}
               className={`grid grid-cols-1 ${
-                content.block.columnRatio === '1:2' ? 'md:grid-cols-[1fr_2fr]' : 
-                content.block.columnRatio === '2:1' ? 'md:grid-cols-[2fr_1fr]' : 
-                'md:grid-cols-2'
+                content.block.columnRatio === "1:2"
+                  ? "md:grid-cols-[1fr_2fr]"
+                  : content.block.columnRatio === "2:1"
+                    ? "md:grid-cols-[2fr_1fr]"
+                    : "md:grid-cols-2"
               } ${
-                content.block.gap === 'small' ? 'gap-8' : 
-                content.block.gap === 'large' ? 'gap-24' : 
-                'gap-16'
+                content.block.gap === "small"
+                  ? "gap-8"
+                  : content.block.gap === "large"
+                    ? "gap-24"
+                    : "gap-16"
               } items-start`}
             >
               <div className="relative">
                 <div ref={stickyRef} className="z-10 w-full">
-                  <div className="font-montserrat font-black text-[#060C14] text-3xl leading-tight m-0 p-0">
-                    <RichText data={{ root: { children: content.block.title } } as any} converters={fraudConverters} />
+                  <div className="font-montserrat font-black text-[#060C14] text-[32px] leading-tight m-0 p-0">
+                    <RichText
+                      data={{ root: { children: content.block.title } } as any}
+                      converters={{
+                        ...fraudConverters,
+                        heading: ({ node, nodesToJSX }: any) => (
+                          <h2 className="text-[32px] font-black text-[#060C14] leading-tight m-0">
+                            {nodesToJSX({ nodes: node.children })}
+                          </h2>
+                        )
+                      }}
+                    />
                   </div>
                 </div>
               </div>
               <div className="prose text-gray-600 leading-loose">
-                <RichText 
-                  data={{ root: { children: content.block.text } } as any} 
+                <RichText
+                  data={{ root: { children: content.block.text } } as any}
                   converters={{
                     ...fraudConverters,
                     paragraph: ({ nodesToJSX, node }: any) => (
@@ -89,14 +109,18 @@ export function FraudNoticeContent({ content, fraudConverters }: FraudNoticeCont
                     text: ({ node }: any) => {
                       const isBold = node.format & 1; // Standard Lexical IS_BOLD
                       return (
-                        <span 
-                          className={isBold ? "text-[20px] font-bold text-[#060C14]" : "text-[16px] font-normal text-gray-600"}
+                        <span
+                          className={
+                            isBold
+                              ? "text-[28px] font-bold text-[#060C14]"
+                              : "text-[18px] font-normal text-gray-600"
+                          }
                         >
                           {node.text}
                         </span>
                       );
-                    }
-                  }} 
+                    },
+                  }}
                 />
               </div>
             </div>

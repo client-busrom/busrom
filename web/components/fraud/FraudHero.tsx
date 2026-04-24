@@ -25,32 +25,32 @@ export function FraudHero({ hero, fraudConverters }: FraudHeroProps) {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
         </div>
       )}
-      
+
       <div className="container mx-auto px-6 relative z-10 text-center">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8 flex justify-center text-white">
-            <RichText 
-              data={{ root: { children: hero.title } } as any} 
+            <RichText
+              data={{ root: { children: hero.title } } as any}
               converters={{
                 ...fraudConverters,
                 paragraph: ({ nodesToJSX, node }: any) => (
-                  <h1 className="font-montserrat text-white text-5xl md:text-8xl font-black tracking-tighter uppercase m-0 drop-shadow-2xl">
+                  <h1 className="font-montserrat font-bold text-white text-5xl md:text-8xl tracking-tighter uppercase m-0 drop-shadow-2xl">
                     {nodesToJSX({ nodes: node.children })}
                   </h1>
-                )
+                ),
               }}
             />
           </div>
           <div className="mb-12 mx-auto">
-            <RichText 
-              data={{ root: { children: hero.description } } as any} 
+            <RichText
+              data={{ root: { children: hero.description } } as any}
               converters={{
                 ...fraudConverters,
                 paragraph: ({ nodesToJSX, node }: any) => (
-                  <p className="font-montserrat text-white/90 m-0 text-xl md:text-2xl font-medium leading-relaxed drop-shadow-lg">
+                  <p className="font-montserrat text-white/90 m-0 text-xl md:text-[28px] font-bold leading-relaxed drop-shadow-lg">
                     {nodesToJSX({ nodes: node.children })}
                   </p>
-                )
+                ),
               }}
             />
           </div>
