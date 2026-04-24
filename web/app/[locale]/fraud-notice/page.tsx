@@ -4,6 +4,7 @@ import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import { getPageMetadata } from "@/lib/api/seo-settings"
 import type { Metadata } from "next"
+import { PAGE_TEMPLATES, PAGE_SLUGS } from "@/lib/constants"
 
 export async function generateMetadata({
   params,
@@ -17,7 +18,7 @@ export async function generateMetadata({
     description: "Important fraud prevention notice and security information",
   }
 
-  return getPageMetadata('/fraud-notice', 'fraud_notice', locale, defaultMetadata)
+  return getPageMetadata('/fraud-notice', PAGE_SLUGS.FRAUD_NOTICE, locale, defaultMetadata)
 }
 
 export default async function FraudNoticePage({
@@ -32,7 +33,7 @@ export default async function FraudNoticePage({
       <PageScripts path="/fraud-notice" pageType="fraud_notice" position="header" />
       <PageScripts path="/fraud-notice" pageType="fraud_notice" position="body_start" />
       <PageSeoInjector path="/fraud-notice" pageType="fraud_notice" locale={locale} />
-      <TemplatePage locale={locale} slug="fraud-notice" template="FRAUD_NOTICE" />
+      <TemplatePage locale={locale} slug={PAGE_SLUGS.FRAUD_NOTICE} template={PAGE_TEMPLATES.FRAUD_NOTICE} />
       <PageScripts path="/fraud-notice" pageType="fraud_notice" position="footer" />
     </>
   )

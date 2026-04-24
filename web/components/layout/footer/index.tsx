@@ -13,13 +13,14 @@ import SuccessModal from "./SuccessModal";
 type Props = {
   locale: Locale;
   showForm?: boolean; 
+  ssrData?: FooterApiData | null;
 };
 
-export default function Footer({ locale, showForm = true }: Props) {
+export default function Footer({ locale, showForm = true, ssrData }: Props) {
   const content = useMemo(() => getHomeContent(locale).footer, [locale]);
 
-  // States
-  const [footerData, setFooterData] = useState<FooterApiData | null>(null);
+  // States initialized with SSR data if available
+  const [footerData, setFooterData] = useState<FooterApiData | null>(ssrData || null);
   const [formConfig, setFormConfig] = useState<FormConfig | null>(null);
   const [siteLogoUrl, setSiteLogoUrl] = useState<string | null>(null);
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
@@ -30,15 +31,17 @@ export default function Footer({ locale, showForm = true }: Props) {
   useEffect(() => {
     const fetchAllData = async () => {
       try {
-        // 1. Fetch Footer GLobal (contains formConfigName)
-        const footerRes = await fetch(`/api/footer?locale=${locale}`);
-        let currentFormName = 'footer-form'; // Fallback
+        let currentFormName = footerData?.formConfigName || 'footer-form';
 
-        if (footerRes.ok) {
-          const data = await footerRes.json();
-          setFooterData(data);
-          if (data.formConfigName) {
-            currentFormName = data.formConfigName; // --- 解决本地和线上表单名不一致的关键 ---
+        // Only fetch if we don't have footerData from SSR
+        if (!ssrData) {
+          const footerRes = await fetch(`/api/footer?locale=${locale}`);
+          if (footerRes.ok) {
+            const data = await footerRes.json();
+            setFooterData(data);
+            if (data.formConfigName) {
+              currentFormName = data.formConfigName;
+            }
           }
         }
 
@@ -64,7 +67,7 @@ export default function Footer({ locale, showForm = true }: Props) {
     };
 
     fetchAllData();
-  }, [locale]);
+  }, [locale, ssrData]);
 
   const handleFormSuccess = (msg: string) => {
     setSuccessMessage(msg);

@@ -95,7 +95,6 @@ interface TurnstileConfig {
 }
 
 export default function MainForm({ data, locale = "en" }: Props) {
-  const [scrollY, setScrollY] = useState(0);
   const sectionRef = useRef<HTMLDivElement>(null);
   const leftImageRef = useRef<HTMLDivElement>(null);
   const rightImageRef = useRef<HTMLDivElement>(null);
@@ -303,14 +302,6 @@ export default function MainForm({ data, locale = "en" }: Props) {
     }
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // 检测是否为桌面端 (lg 及以上)
   useEffect(() => {
@@ -379,32 +370,51 @@ export default function MainForm({ data, locale = "en" }: Props) {
   // 固定的宽高比容器 (404x837)
   const imageCardContainerClass = `bg-[var(--card-default-background)] w-full aspect-[404/837] relative overflow-hidden`;
 
-  // 滚动视差动画逻辑
-  // 左侧：从上往下移动进入，往下移出
-  // 右侧：从下往上移动进入，往上移出
-  const getSlideInTransform = (index: number) => {
-    if (!sectionRef.current) return `translateY(0)`;
+  // 滚动视差动画逻辑（优化版：直接操纵 DOM，避免触发整个表单的 React Re-render）
+  useEffect(() => {
+    if (!isDesktop) return;
 
-    const element = sectionRef.current;
-    const rect = element.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
+    let ticking = false;
+    const updateTransforms = () => {
+      if (!sectionRef.current) return;
 
-    // progress: 0 = 板块刚进入视口底部, 1 = 板块顶部到达视口顶部
-    const progress = Math.max(0, Math.min(1, (windowHeight - rect.top) / (windowHeight + rect.height)));
-    // 移动幅度：500px
-    const maxOffset = 500;
+      const element = sectionRef.current;
+      const rect = element.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
 
-    if (index === 0) {
-      // 左侧：从上方进入，滚动时往下移动，出场继续往下
-      const offset = (1 - progress * 2) * maxOffset;
-      return `translateY(${offset}px)`;
-    } else if (index === 2) {
-      // 右侧：从下方进入，滚动时往上移动，出场继续往上
-      const offset = (1 - progress * 2) * maxOffset;
-      return `translateY(${-offset}px)`;
-    }
-    return `translateY(0)`;
-  };
+      // progress: 0 = 板块刚进入视口底部, 1 = 板块顶部到达视口顶部
+      const progress = Math.max(0, Math.min(1, (windowHeight - rect.top) / (windowHeight + rect.height)));
+      const maxOffset = 500;
+
+      // 左侧：从上方进入，往下移动
+      if (leftImageRef.current) {
+        const offsetLeft = (1 - progress * 2) * maxOffset;
+        leftImageRef.current.style.transform = `translateY(${offsetLeft}px)`;
+      }
+
+      // 右侧：从下方进入，往上移动
+      if (rightImageRef.current) {
+        const offsetRight = (1 - progress * 2) * maxOffset;
+        rightImageRef.current.style.transform = `translateY(${-offsetRight}px)`;
+      }
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          updateTransforms();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    // 初始化执行一次
+    updateTransforms();
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isDesktop]);
 
   // ------------------------------------------------------------------
   // JSX 渲染
@@ -421,17 +431,12 @@ export default function MainForm({ data, locale = "en" }: Props) {
           <div
             ref={leftImageRef}
             className={cn(
-              "lg:w-[30%] w-[60%]",
+              "lg:w-[30%] w-[60%] will-change-transform",
               // lg 以下 (手机/平板) 淡入效果
               !isDesktop && "transition-opacity duration-700 ease-out",
               !isDesktop && (leftVisible ? "opacity-100" : "opacity-0")
             )}
-            style={
-              // lg 及以上 (桌面端) 保持原有视差效果
-              isDesktop
-                ? { transform: getSlideInTransform(0), transition: "transform 0.5s ease-out" }
-                : undefined
-            }
+            style={isDesktop ? { transform: 'translateY(500px)' } : undefined}
           >
             <div className={imageCardContainerClass}>
               {/* 1. 底层内容图片 (z-10) */}
@@ -644,17 +649,12 @@ export default function MainForm({ data, locale = "en" }: Props) {
           <div
             ref={rightImageRef}
             className={cn(
-              "lg:w-[30%] w-[60%]",
+              "lg:w-[30%] w-[60%] will-change-transform",
               // lg 以下 (手机/平板) 淡入效果
               !isDesktop && "transition-opacity duration-700 ease-out delay-150",
               !isDesktop && (rightVisible ? "opacity-100" : "opacity-0")
             )}
-            style={
-              // lg 及以上 (桌面端) 保持原有视差效果
-              isDesktop
-                ? { transform: getSlideInTransform(2), transition: "transform 0.5s ease-out" }
-                : undefined
-            }
+            style={isDesktop ? { transform: 'translateY(-500px)' } : undefined}
           >
             {/* 3. 文字遮罩 (z-30) */}
             <div className="w-full p-4 lg:p-8 z-30 flex justify-center">

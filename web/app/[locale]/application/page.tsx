@@ -7,6 +7,7 @@ import type { Metadata } from "next"
 import { fetchPageData } from "@/lib/api/pages"
 import { parseApplicationData } from "@/lib/parsers/application-parser"
 import { notFound } from "next/navigation"
+import { PAGE_SLUGS } from "@/lib/constants"
 
 export const revalidate = 3600;
 
@@ -22,7 +23,7 @@ export async function generateMetadata({
     description: "Explore real-world applications and case studies of Busrom glass hardware solutions",
   }
 
-  return getPageMetadata('/application', 'application', locale, defaultMetadata)
+  return getPageMetadata('/application', PAGE_SLUGS.APPLICATION, locale, defaultMetadata)
 }
 
 export default async function ApplicationsPage({
@@ -31,7 +32,7 @@ export default async function ApplicationsPage({
   params: Promise<{ locale: Locale }>
 }) {
   const { locale } = await params
-  const rawData = await fetchPageData("application", locale)
+  const rawData = await fetchPageData(PAGE_SLUGS.APPLICATION, locale)
 
   if (!rawData) {
     return notFound()

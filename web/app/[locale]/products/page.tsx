@@ -7,6 +7,7 @@ import { fetchPageData } from "@/lib/api/pages"
 import { parseProductOverviewData } from "@/lib/parsers/product-overview-parser"
 import { ProductOverviewTemplate } from "@/components/templates/ProductOverviewTemplate"
 import { notFound } from "next/navigation"
+import { PAGE_SLUGS } from "@/lib/constants"
 
 export async function generateMetadata({
   params,
@@ -20,7 +21,7 @@ export async function generateMetadata({
     description: "Explore our range of professional project solutions and products",
   }
 
-  return getPageMetadata('/products', 'product_overview', locale, defaultMetadata)
+  return getPageMetadata('/products', PAGE_SLUGS.PRODUCT_OVERVIEW, locale, defaultMetadata)
 }
 
 export default async function ProductOverviewPage({
@@ -31,7 +32,7 @@ export default async function ProductOverviewPage({
   const { locale } = await params
   
   // Use the slug 'product-overview' as requested
-  const rawData = await fetchPageData("product-overview", locale)
+  const rawData = await fetchPageData(PAGE_SLUGS.PRODUCT_OVERVIEW, locale)
 
   if (!rawData) {
     return notFound()

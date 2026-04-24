@@ -243,29 +243,35 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
     if (!container) return;
 
     const updateSize = () => {
-      setIsMobile(window.innerWidth < 1024);
       const width = container.offsetWidth;
       const height = container.offsetHeight;
-      if (width > 0 && height > 0) {
-        setSize({ width, height });
-      }
+      setIsMobile(window.innerWidth < 1024);
+      
+      setSize((prev) => {
+        // 如果宽度没变，高度变化小于 120px（通常是移动端浏览器地址栏隐藏/显示），则忽略，避免 Canvas 重绘导致的严重卡顿
+        if (prev.width === width && Math.abs(prev.height - height) < 120) {
+          return prev;
+        }
+        return { width, height };
+      });
     };
 
-    // 使用 ResizeObserver 监听容器尺寸变化
+    // 使用 ResizeObserver 监听容器尺寸变化并加入防抖（Debounce）
+    let resizeTimer: NodeJS.Timeout;
     const resizeObserver = new ResizeObserver(() => {
-      updateSize();
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(updateSize, 100);
     });
     resizeObserver.observe(container);
 
-    // 初始化尺寸（添加小延迟确保布局完成）
+    // 初始化尺寸
     updateSize();
-    const timer = setTimeout(updateSize, 100);
 
     window.addEventListener("resize", updateSize);
     return () => {
       resizeObserver.disconnect();
       window.removeEventListener("resize", updateSize);
-      clearTimeout(timer);
+      clearTimeout(resizeTimer);
     };
   }, []);
 
@@ -282,7 +288,7 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
           setSelectedPoint(null);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 } // 降低阈值，更早暂停
     );
 
     observer.observe(section);
@@ -344,9 +350,7 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
       controls.dampingFactor = 0.05;
       controls.autoRotate = true;
       controls.autoRotateSpeed = 0.5;
-      // 桌面端禁用滚轮缩放（避免与 Lenis 冲突），移动端启用手势缩放
       controls.enableZoom = isMobile;
-      // 放宽 OrbitControls 限制，让 handleZoom 通过 altitude 来控制范围
       controls.minDistance = 50;
       controls.maxDistance = 1000;
     }
@@ -358,12 +362,10 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
     const controls = globeRef.current.controls();
     if (controls) {
       if (isMobile) {
-        // 移动端：只有进入交互模式才能操作
         controls.enableZoom = isInteractive;
         controls.enableRotate = isInteractive;
         controls.enablePan = isInteractive;
       } else {
-        // 桌面端：始终可以拖拽，但禁用滚轮缩放
         controls.enableZoom = false;
         controls.enableRotate = true;
         controls.enablePan = false;
@@ -388,7 +390,6 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
   // 进入/退出交互模式
   const enterInteractiveMode = useCallback(() => {
     setIsInteractive(true);
-    // 停止 Lenis 滚动
     if (typeof window !== "undefined" && (window as any).lenis) {
       (window as any).lenis.stop();
     }
@@ -397,7 +398,6 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
   const exitInteractiveMode = useCallback(() => {
     setIsInteractive(false);
     setSelectedPoint(null);
-    // 恢复 Lenis 滚动
     if (typeof window !== "undefined" && (window as any).lenis) {
       (window as any).lenis.start();
     }
@@ -406,24 +406,51 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
   // 阻止触摸事件冒泡（交互模式下）
   useEffect(() => {
     if (!isMobile) return;
-
     const container = containerRef.current;
     if (!container) return;
-
     const preventScroll = (e: TouchEvent) => {
       if (isInteractive) {
         e.stopPropagation();
       }
     };
-
     container.addEventListener("touchstart", preventScroll, { passive: false });
     container.addEventListener("touchmove", preventScroll, { passive: false });
-
     return () => {
       container.removeEventListener("touchstart", preventScroll);
       container.removeEventListener("touchmove", preventScroll);
     };
   }, [isMobile, isInteractive]);
+
+  // --- 将所有传递给 Globe 的回调函数使用 useCallback 缓存，避免由于组件 state 变化引发 WebGL 全量重绘 ---
+  const getArcColor = useCallback(() => CONFIG.arc.color, []);
+  
+  const getArcAltitude = useCallback((d: any) => {
+    const lat1 = d.startLat * Math.PI / 180;
+    const lat2 = d.endLat * Math.PI / 180;
+    const dLng = (d.endLng - d.startLng) * Math.PI / 180;
+    const dist = Math.acos(
+      Math.sin(lat1) * Math.sin(lat2) +
+      Math.cos(lat1) * Math.cos(lat2) * Math.cos(dLng)
+    );
+    return Math.min(0.6, Math.max(0.2, dist / Math.PI * 0.8));
+  }, []);
+
+  const getPointColor = useCallback((d: any) => d.isOrigin ? CONFIG.point.originColor : CONFIG.point.color, []);
+  const getPointRadius = useCallback((d: any) => d.isOrigin ? CONFIG.point.originRadius : CONFIG.point.radius, []);
+  const getPointLabel = useCallback((d: any) => `<div class="globe-label">${d.label}</div>`, []);
+  
+  const handlePointClick = useCallback((point: any) => {
+    if (!isInteractive && isMobile) return;
+    setSelectedPoint((prev) => (prev === point.id ? null : point.id));
+  }, [isInteractive, isMobile]);
+
+  const renderHtmlElement = useCallback((d: any) => {
+    const el = document.createElement("div");
+    el.className = "globe-label globe-label-fixed";
+    el.innerHTML = d.label;
+    el.onclick = () => setSelectedPoint(null);
+    return el;
+  }, []);
 
   return (
     <section
@@ -442,7 +469,6 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
             </div>
           </div>
         )}
-        {/* Globe 始终渲染，避免重复初始化导致卡顿；离开视口时只暂停动画 */}
         {size.width > 0 && size.height > 0 && (
           <Globe
             ref={globeRef}
@@ -454,59 +480,34 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
             atmosphereAltitude={CONFIG.globe.atmosphereAltitude}
             backgroundColor="rgba(0,0,0,0)"
             onGlobeReady={handleGlobeReady}
-            // 弧线配置
             arcsData={arcsData}
             arcStartLat="startLat"
             arcStartLng="startLng"
             arcEndLat="endLat"
             arcEndLng="endLng"
-            arcColor={() => CONFIG.arc.color}
+            arcColor={getArcColor}
             arcStroke={CONFIG.arc.strokeWidth}
             arcDashLength={CONFIG.arc.dashLength}
             arcDashGap={CONFIG.arc.dashGap}
             arcDashAnimateTime={CONFIG.arc.dashAnimateTime}
             arcAltitudeAutoScale={0.5}
-            arcAltitude={(d: any) => {
-              // 根据两点间距离动态计算弧线高度
-              const lat1 = d.startLat * Math.PI / 180;
-              const lat2 = d.endLat * Math.PI / 180;
-              const dLng = (d.endLng - d.startLng) * Math.PI / 180;
-              // 大圆距离（弧度）
-              const dist = Math.acos(
-                Math.sin(lat1) * Math.sin(lat2) +
-                Math.cos(lat1) * Math.cos(lat2) * Math.cos(dLng)
-              );
-              // 距离越远，弧线越高（最小0.2，最大0.6）
-              return Math.min(0.6, Math.max(0.2, dist / Math.PI * 0.8));
-            }}
+            arcAltitude={getArcAltitude}
             arcsTransitionDuration={300}
-            // 点配置 (悬停显示地名)
             pointsData={pointsData}
             pointLat="lat"
             pointLng="lng"
-            pointColor={(d: any) => d.isOrigin ? CONFIG.point.originColor : CONFIG.point.color}
-            pointRadius={(d: any) => d.isOrigin ? CONFIG.point.originRadius : CONFIG.point.radius}
+            pointColor={getPointColor}
+            pointRadius={getPointRadius}
             pointAltitude={0.01}
             pointResolution={12}
-            pointLabel={(d: any) => `<div class="globe-label">${d.label}</div>`}
-            onPointClick={(point: any) => {
-              if (!isInteractive && isMobile) return;
-              setSelectedPoint((prev) => (prev === point.id ? null : point.id));
-            }}
-            // 光环层 - 暂时禁用来测试内存
+            pointLabel={getPointLabel}
+            onPointClick={handlePointClick}
             ringsData={[]}
-            // HTML elements 层 - 选中时显示固定标签
             htmlElementsData={pointsData.filter((d) => d.id === selectedPoint)}
             htmlLat="lat"
             htmlLng="lng"
             htmlAltitude={0.02}
-            htmlElement={(d: any) => {
-              const el = document.createElement("div");
-              el.className = "globe-label globe-label-fixed";
-              el.innerHTML = d.label;
-              el.onclick = () => setSelectedPoint(null);
-              return el;
-            }}
+            htmlElement={renderHtmlElement}
             enablePointerInteraction={true}
           />
         )}

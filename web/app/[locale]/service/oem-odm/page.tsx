@@ -7,6 +7,7 @@ import { fetchPageData } from "@/lib/api/pages"
 import { parseOemOdmData } from "@/lib/parsers/oem-odm-parser"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { PAGE_SLUGS } from "@/lib/constants"
 
 export async function generateMetadata({
   params,

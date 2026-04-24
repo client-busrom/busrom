@@ -7,6 +7,7 @@ import { parseContactUsData } from "@/lib/parsers/contact-us-parser"
 import { ContactUsTemplate } from "@/components/templates/ContactUsTemplate"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { PAGE_SLUGS } from "@/lib/constants"
 
 export async function generateMetadata({
   params,
@@ -20,7 +21,7 @@ export async function generateMetadata({
     description: "Get in touch with Busrom for high-quality stainless steel glass hardware solutions",
   }
 
-  return getPageMetadata('/contact-us', 'contact_us', locale, defaultMetadata)
+  return getPageMetadata('/contact-us', PAGE_SLUGS.CONTACT_US, locale, defaultMetadata)
 }
 
 export default async function ContactPage({
@@ -31,7 +32,7 @@ export default async function ContactPage({
   const { locale } = await params
   
   // SSR Data Fetching
-  const pageData = await fetchPageData('contact-us', locale)
+  const pageData = await fetchPageData(PAGE_SLUGS.CONTACT_US, locale)
   
   if (!pageData) {
     notFound()

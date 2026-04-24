@@ -141,7 +141,7 @@ export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionPro
                       y: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: index * 0.3 },
                     }}
                     viewport={{ once: true }}
-                    className="absolute rounded-full overflow-hidden shadow-2xl transition-transform duration-[1.5s] group-hover:scale-105 z-10"
+                    className="absolute rounded-full overflow-hidden shadow-2xl transition-transform duration-1000 group-hover:scale-105 z-10"
                     style={{
                       width: vw(config.imgW),
                       height: vw(config.imgH),

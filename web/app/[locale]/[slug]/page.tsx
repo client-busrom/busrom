@@ -1,21 +1,25 @@
-import type { Locale } from "@/i18n.config"
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
+import type { Locale } from "@/i18n.config"
+import { fetchPageData } from "@/lib/api/pages"
+import { getPageMetadata } from "@/lib/api/seo-settings"
+import { TemplateSwitcher } from "@/components/templates/TemplateSwitcher"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
-import { getPageMetadata } from "@/lib/api/seo-settings"
-import { fetchPageData } from "@/lib/api/pages"
-import { TemplateSwitcher } from "@/components/templates/TemplateSwitcher"
-import type { Metadata } from "next"
 
-// Generate metadata for SEO
+interface DynamicPageProps {
+  params: Promise<{ locale: Locale; slug: string }>
+}
+
+/**
+ * Universal Dynamic Route - Handles any slug by matching its template in the CMS
+ */
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ locale: Locale; slug: string }>
-}): Promise<Metadata> {
+}: DynamicPageProps): Promise<Metadata> {
   const { locale, slug } = await params
-  const path = `/page/${slug}`
   
+  // Try to fetch page data to get title/SEO info
   const pageData = await fetchPageData(slug, locale)
   
   if (!pageData) {
@@ -24,34 +28,28 @@ export async function generateMetadata({
     }
   }
 
-  const title = pageData.title || slug
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
-
   const defaultMetadata: Metadata = {
-    title: `${title} | Busrom`,
-    description: `${title} - Busrom Industrial Glass Hardware Solutions`,
+    title: `${pageData.title || pageData.name} | Busrom`,
+    description: "Busrom Industrial Glass Hardware Solutions",
   }
 
-  return getPageMetadata(path, 'custom_page', locale, defaultMetadata)
+  return getPageMetadata(`/${slug}`, slug, locale, defaultMetadata)
 }
 
-export default async function DynamicPage({
+export default async function UniversalDynamicPage({
   params,
-}: {
-  params: Promise<{ locale: Locale; slug: string }>
-}) {
+}: DynamicPageProps) {
   const { locale, slug } = await params
-  const path = `/page/${slug}`
   
-  // SSR Data Fetching
+  // Fetch page data from CMS
   const rawData = await fetchPageData(slug, locale)
   
   if (!rawData) {
     notFound()
   }
 
+  // Common scripts and SEO injection
+  const path = `/${slug}`
   const pageType = rawData.template?.toLowerCase() || "custom_page"
 
   return (
@@ -60,7 +58,6 @@ export default async function DynamicPage({
       <PageScripts path={path} pageType={pageType} position="body_start" />
       <PageSeoInjector path={path} pageType={pageType} locale={locale} />
       
-      {/* Universal Template Switcher with SSR Data */}
       <TemplateSwitcher locale={locale} rawData={rawData} />
       
       <PageScripts path={path} pageType={pageType} position="footer" />

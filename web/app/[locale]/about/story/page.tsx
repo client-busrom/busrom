@@ -7,6 +7,7 @@ import { fetchPageData } from "@/lib/api/pages"
 import { parseOurStoryData } from "@/lib/parsers/our-story-parser"
 import { OurStoryTemplate } from "@/components/templates/OurStoryTemplate"
 import { notFound } from "next/navigation"
+import { PAGE_SLUGS } from "@/lib/constants"
 
 export async function generateMetadata({
   params,
@@ -20,7 +21,7 @@ export async function generateMetadata({
     description: "Learn about Busrom's journey and commitment to excellence",
   }
 
-  return getPageMetadata('/about/story', 'our_story', locale, defaultMetadata)
+  return getPageMetadata('/about/story', PAGE_SLUGS.OUR_STORY, locale, defaultMetadata)
 }
 
 export default async function OurStoryPage({
@@ -29,7 +30,7 @@ export default async function OurStoryPage({
   params: Promise<{ locale: Locale }>
 }) {
   const { locale } = await params
-  const rawData = await fetchPageData("our-story", locale)
+  const rawData = await fetchPageData(PAGE_SLUGS.OUR_STORY, locale)
 
   if (!rawData) {
     return notFound()

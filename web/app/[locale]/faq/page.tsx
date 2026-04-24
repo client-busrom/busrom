@@ -4,6 +4,7 @@ import type { Locale } from "@/i18n.config"
 import { fetchPageData } from "@/lib/api/pages"
 import { parseFaqData } from "@/lib/parsers/faq-parser"
 import { FaqTemplate } from "@/components/templates/FaqTemplate"
+import { PAGE_SLUGS } from "@/lib/constants"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import { getPageMetadata } from "@/lib/api/seo-settings"
@@ -31,7 +32,7 @@ export default async function FaqPage({
   const { locale } = await params
 
   // 1. Fetch raw page data from CMS
-  const rawData = await fetchPageData('faq', locale)
+  const rawData = await fetchPageData(PAGE_SLUGS.FAQ, locale)
   
   if (!rawData) {
     return notFound()

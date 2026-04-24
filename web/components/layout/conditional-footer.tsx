@@ -6,9 +6,10 @@ import Footer from "./footer";
 
 type Props = {
   locale: Locale;
+  ssrData?: any;
 };
 
-export default function ConditionalFooter({ locale }: Props) {
+export default function ConditionalFooter({ locale, ssrData }: Props) {
   const pathname = usePathname();
 
   // 判断是否是首页
@@ -21,5 +22,5 @@ export default function ConditionalFooter({ locale }: Props) {
   }
 
   // 其他页面显示四列布局版Footer
-  return <Footer locale={locale} showForm={false} />;
+  return <Footer locale={locale} showForm={false} ssrData={ssrData} />;
 }

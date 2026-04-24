@@ -18,6 +18,7 @@ import { GlobalScripts } from "@/components/GlobalScripts";
 import { ScriptDebugger } from "@/components/ScriptDebugger";
 import { OrganizationSchema } from "@/components/seo/OrganizationSchema";
 import { getSiteConfig, getMediaUrl } from "@/lib/api/site-config";
+import { getFooterData } from "@/lib/api/footer";
 
 // 延迟加载 LenisProvider（包含 GSAP），不阻塞首屏渲染
 const LenisProvider = dynamic(
@@ -308,14 +309,16 @@ export default async function RootLayout({
 }) {
   const { locale } = await params;
   const validLocale = isValidLocale(locale) ? locale : defaultLocale;
-  const [preloaderConfig, initialNavigation] = await Promise.all([
+  const [preloaderConfig, initialNavigation, footerData] = await Promise.all([
     getPreloaderConfig(),
     getNavigation(validLocale),
+    getFooterData(validLocale),
   ]);
 
   return (
     <html
       lang={validLocale}
+      suppressHydrationWarning
       className={`
         ${paytoneOne.variable}
         ${anaheim.variable}
@@ -377,7 +380,7 @@ export default async function RootLayout({
               <ScrollToTopOnRouteChange />
               <ScrollToTop />
             </Suspense>
-            <ConditionalFooter locale={validLocale} />
+            <ConditionalFooter locale={validLocale} ssrData={footerData} />
           </div>
           <Suspense fallback={null}>
             <GlobalScripts position="footer" />

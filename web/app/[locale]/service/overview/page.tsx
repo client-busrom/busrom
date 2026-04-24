@@ -7,6 +7,7 @@ import { fetchPageData } from "@/lib/api/pages"
 import { parseServiceOverviewData } from "@/lib/parsers/service-overview-parser"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { PAGE_SLUGS } from "@/lib/constants"
 
 export async function generateMetadata({
   params,
@@ -20,7 +21,7 @@ export async function generateMetadata({
     description: "Explore Busrom's comprehensive service offerings and solutions",
   }
 
-  return getPageMetadata('/service/overview', 'service_overview', locale, defaultMetadata)
+  return getPageMetadata('/service/overview', PAGE_SLUGS.SERVICE_OVERVIEW, locale, defaultMetadata)
 }
 
 /**
@@ -34,7 +35,7 @@ export default async function ServiceOverviewPage({
   const { locale } = await params
 
   // 1. 服务端获取数据
-  const pageData = await fetchPageData("service-overview", locale)
+  const pageData = await fetchPageData(PAGE_SLUGS.SERVICE_OVERVIEW, locale)
   
   if (!pageData) {
     notFound()

@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react"
 import type { Locale } from "@/i18n.config"
-import { LexicalRenderer } from "@/components/lexical/LexicalRenderer"
 import Link from "next/link"
-import Image from "next/image"
+import { TemplateSwitcher } from "@/components/templates/TemplateSwitcher"
 
 interface PageContent {
   id: string
@@ -14,15 +13,21 @@ interface PageContent {
   template: string
   title: string
   status: string
-  heroText?: string
-  heroSubtitle?: string
-  heroMediaPreview?: { url: string }[]
   content: {
-    document: any[]
-  } | null
-  contentTranslation?: any
+    document?: any[]
+    root?: {
+      children?: any[]
+    }
+  }
+  contentTranslation?: {
+    root?: {
+      children?: any[]
+    }
+  }
   mediaData?: Record<string, any>
   locale: string
+  applications?: any[]
+  products?: any[]
 }
 
 interface PageDetailClientProps {
@@ -30,6 +35,9 @@ interface PageDetailClientProps {
   slug: string
 }
 
+/**
+ * PageDetailClient - Now uses TemplateSwitcher to handle all rendering based on template identifiers.
+ */
 export function PageDetailClient({ locale, slug }: PageDetailClientProps) {
   const [page, setPage] = useState<PageContent | null>(null)
   const [loading, setLoading] = useState(true)
@@ -101,71 +109,5 @@ export function PageDetailClient({ locale, slug }: PageDetailClientProps) {
     )
   }
 
-  return (
-    <div className="min-h-screen bg-background pt-20" data-header-theme="light">
-      {/* Hero Section (if has hero content) */}
-      {(page.heroText || page.heroMediaPreview?.length) && (
-        <div className="relative bg-brand-secondary text-white py-16 md:py-24">
-          {page.heroMediaPreview?.[0]?.url && (
-            <Image
-              src={page.heroMediaPreview[0].url}
-              alt={page.title || ""}
-              fill
-              className="object-cover opacity-30"
-            />
-          )}
-          <div className="container mx-auto px-6 md:px-8 lg:px-16 relative z-10">
-            {page.heroText && (
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-anaheim font-extrabold mb-4">
-                {page.heroText}
-              </h1>
-            )}
-            {page.heroSubtitle && (
-              <p className="text-lg md:text-xl text-white/80 max-w-2xl">
-                {page.heroSubtitle}
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-
-      <div className="container mx-auto px-6 md:px-8 lg:px-16 py-12">
-        {/* Breadcrumb */}
-        <nav className="mb-8">
-          <ol className="flex items-center space-x-2 text-sm text-brand-accent-gold">
-            <li>
-              <Link href={`/${locale}`} className="hover:text-brand-text-black transition-colors">
-                {locale === "zh" ? "首页" : "Home"}
-              </Link>
-            </li>
-            <li>/</li>
-            <li className="text-brand-text-black truncate max-w-[200px]">{page.title}</li>
-          </ol>
-        </nav>
-
-        {/* Page Title (if no hero) */}
-        {!page.heroText && page.title && (
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-anaheim font-extrabold text-brand-text-black mb-8">
-            {page.title}
-          </h1>
-        )}
-
-        {/* Content */}
-        {(page.contentTranslation || page.content) && (
-          <div className="prose prose-lg max-w-none">
-            <LexicalRenderer content={page.contentTranslation || page.content} mediaData={page.mediaData || {}} />
-          </div>
-        )}
-
-        {/* No content placeholder */}
-        {!(page.contentTranslation || page.content) && (
-          <div className="py-12 text-center">
-            <p className="text-brand-accent-gold">
-              {locale === "zh" ? "此页面暂无内容。" : "This page has no content yet."}
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
-  )
+  return <TemplateSwitcher locale={locale} rawData={page} />
 }

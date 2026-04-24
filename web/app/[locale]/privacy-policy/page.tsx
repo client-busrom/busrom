@@ -4,6 +4,7 @@ import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import { getPageMetadata } from "@/lib/api/seo-settings"
 import type { Metadata } from "next"
+import { PAGE_TEMPLATES, PAGE_SLUGS } from "@/lib/constants"
 
 export async function generateMetadata({
   params,
@@ -17,7 +18,7 @@ export async function generateMetadata({
     description: "Busrom's privacy policy and data protection practices",
   }
 
-  return getPageMetadata('/privacy-policy', 'privacy_policy', locale, defaultMetadata)
+  return getPageMetadata('/privacy-policy', PAGE_SLUGS.PRIVACY_POLICY, locale, defaultMetadata)
 }
 
 export default async function PrivacyPolicyPage({
@@ -32,7 +33,7 @@ export default async function PrivacyPolicyPage({
       <PageScripts path="/privacy-policy" pageType="privacy_policy" position="header" />
       <PageScripts path="/privacy-policy" pageType="privacy_policy" position="body_start" />
       <PageSeoInjector path="/privacy-policy" pageType="privacy_policy" locale={locale} />
-      <TemplatePage locale={locale} slug="privacy-policy" template="PRIVACY_POLICY" />
+      <TemplatePage locale={locale} slug={PAGE_SLUGS.PRIVACY_POLICY} template={PAGE_TEMPLATES.PRIVACY_POLICY} />
       <PageScripts path="/privacy-policy" pageType="privacy_policy" position="footer" />
     </>
   )

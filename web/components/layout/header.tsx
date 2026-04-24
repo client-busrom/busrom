@@ -51,11 +51,17 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
     let intersectionObserver: IntersectionObserver | null = null;
     let mutationObserver: MutationObserver | null = null;
     let observedElements = new Set<Element>();
+    
+    // 缓存所有带有 data-header-theme 的元素，避免滚动时频繁查询 DOM
+    let cachedSections: HTMLElement[] = [];
+
+    const updateCachedSections = () => {
+      cachedSections = Array.from(document.querySelectorAll("[data-header-theme]")) as HTMLElement[];
+    };
 
     // 计算当前应该激活的主题
     const calculateActiveTheme = () => {
-      const allSections = Array.from(document.querySelectorAll("[data-header-theme]"));
-      if (allSections.length === 0) {
+      if (cachedSections.length === 0) {
         setTheme("light");
         return;
       }
@@ -65,7 +71,7 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
       let activeSection: Element | null = null;
       let minTop = Infinity;
 
-      allSections.forEach((section) => {
+      cachedSections.forEach((section) => {
         const rect = section.getBoundingClientRect();
         // 元素的顶部已经到达或通过了 header 底部，且元素底部还在视口中
         const hasPassedHeader = rect.top <= triggerPoint && rect.bottom > 0;
@@ -84,12 +90,11 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
 
     // 设置或更新 IntersectionObserver
     const setupIntersectionObserver = () => {
-      const sections = document.querySelectorAll("[data-header-theme]");
+      updateCachedSections(); // 更新缓存
 
-      // 创建 observer（如果还没有）
       if (!intersectionObserver) {
         intersectionObserver = new IntersectionObserver(
-          calculateActiveTheme,
+          () => calculateActiveTheme(),
           {
             rootMargin: "0px 0px -90% 0px",
             threshold: [0],
@@ -97,15 +102,13 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
         );
       }
 
-      // 观察新元素
-      sections.forEach((section) => {
+      cachedSections.forEach((section) => {
         if (!observedElements.has(section)) {
           intersectionObserver!.observe(section);
           observedElements.add(section);
         }
       });
 
-      // 移除已不存在的元素
       observedElements.forEach((element) => {
         if (!document.body.contains(element)) {
           intersectionObserver!.unobserve(element);
@@ -113,65 +116,53 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
         }
       });
 
-      // 立即计算一次
       calculateActiveTheme();
     };
 
-    // 使用 setTimeout 确保 DOM 已经渲染完成
     const timer = setTimeout(() => {
       setupIntersectionObserver();
 
-      // 使用 MutationObserver 监听 DOM 变化（LazySection 渲染新内容时）
       mutationObserver = new MutationObserver((mutations) => {
         let needsUpdate = false;
-
         mutations.forEach((mutation) => {
-          // 检查是否有新增或移除的 data-header-theme 元素
           mutation.addedNodes.forEach((node) => {
-            if (node instanceof Element) {
-              if (node.hasAttribute('data-header-theme') ||
-                  node.querySelector('[data-header-theme]')) {
-                needsUpdate = true;
-              }
+            if (node instanceof Element && (node.hasAttribute('data-header-theme') || node.querySelector('[data-header-theme]'))) {
+              needsUpdate = true;
             }
           });
           mutation.removedNodes.forEach((node) => {
-            if (node instanceof Element) {
-              if (node.hasAttribute('data-header-theme') ||
-                  node.querySelector('[data-header-theme]')) {
-                needsUpdate = true;
-              }
+            if (node instanceof Element && (node.hasAttribute('data-header-theme') || node.querySelector('[data-header-theme]'))) {
+              needsUpdate = true;
             }
           });
         });
 
         if (needsUpdate) {
-          // 延迟一帧确保 DOM 更新完成
           requestAnimationFrame(setupIntersectionObserver);
         }
       });
 
-      mutationObserver.observe(document.body, {
-        childList: true,
-        subtree: true,
-      });
+      mutationObserver.observe(document.body, { childList: true, subtree: true });
     }, 100);
 
-    // 滚动时也需要重新计算（处理快速滚动的情况）
+    // 滚动节流优化（Throttle）：限制计算频率，彻底解决滚动卡顿（Layout Thrashing）
+    let throttleTimer: NodeJS.Timeout | null = null;
     const handleScroll = () => {
-      requestAnimationFrame(calculateActiveTheme);
+      if (throttleTimer) return;
+      throttleTimer = setTimeout(() => {
+        calculateActiveTheme();
+        throttleTimer = null;
+      }, 50); // 每 50ms 计算一次，足够平滑且极大地降低了性能消耗
     };
+    
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       clearTimeout(timer);
+      if (throttleTimer) clearTimeout(throttleTimer);
       window.removeEventListener('scroll', handleScroll);
-      if (intersectionObserver) {
-        intersectionObserver.disconnect();
-      }
-      if (mutationObserver) {
-        mutationObserver.disconnect();
-      }
+      if (intersectionObserver) intersectionObserver.disconnect();
+      if (mutationObserver) mutationObserver.disconnect();
     };
   }, [pathname]); // 当路由变化时重新运行
 

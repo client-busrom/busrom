@@ -7,6 +7,7 @@ import { fetchPageData } from "@/lib/api/pages"
 import { parseSupportData } from "@/lib/parsers/support-parser"
 import { SupportTemplate } from "@/components/templates/SupportTemplate"
 import { notFound } from "next/navigation"
+import { PAGE_SLUGS } from "@/lib/constants"
 
 export async function generateMetadata({
   params,
@@ -20,7 +21,7 @@ export async function generateMetadata({
     description: "Technical support and assistance for Busrom products",
   }
 
-  return getPageMetadata('/support', 'support', locale, defaultMetadata)
+  return getPageMetadata('/support', PAGE_SLUGS.SUPPORT, locale, defaultMetadata)
 }
 
 export default async function SupportPage({
@@ -29,7 +30,7 @@ export default async function SupportPage({
   params: Promise<{ locale: Locale }>
 }) {
   const { locale } = await params
-  const rawData = await fetchPageData("support", locale)
+  const rawData = await fetchPageData(PAGE_SLUGS.SUPPORT, locale)
 
   if (!rawData) {
     return notFound()

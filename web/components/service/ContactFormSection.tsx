@@ -780,7 +780,7 @@ export function ContactFormSection({
 
   // Group fields for layout
   const getFieldsByType = () => {
-    if (!formConfig) return { nameEmail: [], serviceType: null, description: null, file: null }
+    if (!formConfig || !Array.isArray(formConfig.fields)) return { nameEmail: [], serviceType: null, description: null, file: null }
 
     const sorted = [...formConfig.fields].sort((a, b) => (a.order || 0) - (b.order || 0))
 

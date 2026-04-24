@@ -87,7 +87,7 @@ export function BlogTemplateTwo({ blog, locale, formatDate, config }: BlogTempla
              <img 
                src={blog.coverImage?.url || blog.coverImage} 
                alt={blog.title} 
-               className="w-full h-full object-cover transition-transform duration-[2s] hover:scale-105" 
+               className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105" 
              />
           </div>
         </div>

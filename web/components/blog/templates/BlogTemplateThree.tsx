@@ -458,7 +458,7 @@ export function BlogTemplateThree({
                       p.coverImage ||
                       `https://images.unsplash.com/photo-${1500000000000 + idx * 200000}?w=600`
                     }
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1.5s]"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                     alt=""
                   />
                 </Link>
