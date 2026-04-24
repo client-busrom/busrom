@@ -10,6 +10,7 @@ import { PrivacyPolicyTemplate } from "./PrivacyPolicyTemplate";
 import { ProductOverviewTemplate } from "./ProductOverviewTemplate";
 import { ServiceOverviewTemplate } from "./ServiceOverviewTemplate";
 import { SupportTemplate } from "./SupportTemplate";
+import { FraudNoticeTemplate } from "./FraudNoticeTemplate";
 import type { ApplicationCase } from "../application/sections/ApplicationCasesSection";
 
 // Parsers
@@ -22,6 +23,7 @@ import { parseOurStoryData } from "@/lib/parsers/our-story-parser";
 import { parseProductOverviewData } from "@/lib/parsers/product-overview-parser";
 import { parseServiceOverviewData } from "@/lib/parsers/service-overview-parser";
 import { parseSupportData } from "@/lib/parsers/support-parser";
+import { parseFraudNoticeData } from "@/lib/parsers/fraud-notice-parser";
 
 interface TemplateSwitcherProps {
   locale: string;
@@ -80,6 +82,11 @@ export function TemplateSwitcher({ locale, rawData }: TemplateSwitcherProps) {
     case PAGE_TEMPLATES.FAQ: {
       const parsedData = parseFaqData(locale, rawData);
       return <FaqTemplate locale={locale} data={parsedData} />;
+    }
+
+    case PAGE_TEMPLATES.FRAUD_NOTICE: {
+      const parsedData = parseFraudNoticeData(locale, rawData);
+      return <FraudNoticeTemplate locale={locale} data={parsedData} />;
     }
 
     case PAGE_TEMPLATES.OEM_ODM: {

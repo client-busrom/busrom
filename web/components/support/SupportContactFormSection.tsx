@@ -48,6 +48,8 @@ export function SupportContactFormSection({
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   
+  const [fetchedFormConfig, setFetchedFormConfig] = useState<any>(null)
+  
   const getLocalizedString = useCallback((value: any, locale: string) => {
     if (!value) return null
     if (typeof value === 'string') return value
@@ -57,9 +59,32 @@ export function SupportContactFormSection({
     return null
   }, [])
 
+  // Fetch full config if needed
+  useEffect(() => {
+    const configId = typeof formConfig === 'string' ? formConfig : formConfig?.id
+    if (!configId) return
+
+    const fetchFullConfig = async () => {
+      try {
+        const res = await fetch(`/api/form-configs/${configId}?locale=${locale}`)
+        if (res.ok) {
+          const data = await res.json()
+          setFetchedFormConfig(data)
+        }
+      } catch (error) {
+        console.error("Failed to fetch full form config:", error)
+      }
+    }
+    fetchFullConfig()
+  }, [formConfig, locale])
+
   const mergedConfig = useMemo(() => {
-    return typeof formConfig === 'string' ? { id: formConfig } : formConfig || {}
-  }, [formConfig])
+    const baseConfig = typeof formConfig === 'string' ? { id: formConfig } : formConfig || {}
+    return {
+      ...baseConfig,
+      ...fetchedFormConfig
+    }
+  }, [formConfig, fetchedFormConfig])
 
   const validImages = useMemo(() => {
     return images.filter((img): img is MediaObject => !!img?.url)
@@ -277,7 +302,8 @@ export function SupportContactFormSection({
          <form onSubmit={handleSubmit} className="flex flex-col" style={{ gap: vw(12) }}>
             {fields.map((field) => {
                  const isTextarea = field.fieldType === 'textarea' || field.fieldName.toLowerCase().includes('message')
-                 if (isTextarea) return null
+                 const isFile = field.fieldType === 'file' || field.fieldName.toLowerCase().includes('file') || field.fieldName.toLowerCase().includes('attachment')
+                 if (isTextarea || isFile) return null
                  
                  const fName = field.fieldName.toLowerCase()
                  const isPhone = fName.includes('phone') || fName.includes('whatsapp') || field.fieldType === 'tel'
@@ -308,6 +334,38 @@ export function SupportContactFormSection({
                         </div>
                       )
                     }
+
+                   const isSelect = field.fieldType === 'select'
+                  
+                  if (isSelect) {
+                    const label = getLocalizedString(field.label, locale)
+                    return (
+                      <div key={field.fieldName} className="space-y-3">
+                        {label && <label className="block text-white font-anaheim font-semibold text-[18px] ml-1">{label}</label>}
+                        <div className="relative">
+                          <select
+                            required={field.required}
+                            value={formData[field.fieldName] || ""}
+                            onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
+                            className="w-full appearance-none bg-[#746D37] border border-white/34 text-white font-[family-name:var(--font-anaheim)] font-semibold placeholder:text-white/50 focus:outline-none"
+                            style={{ height: vw(63), borderRadius: vw(15), paddingLeft: vw(24), fontSize: vw(20) }}
+                          >
+                            <option value="" disabled className="bg-[#746D37]">
+                              {getLocalizedString(field.placeholder || field.label, locale) || "Select..."}
+                            </option>
+                            {field.options?.map((opt: any) => (
+                              <option key={opt.value} value={opt.value} className="bg-[#746D37]">
+                                {getLocalizedString(opt.label, locale) || opt.label}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                            <ChevronDown className="text-white/50" size={20} />
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  }
 
                  return (
                    <input
