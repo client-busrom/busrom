@@ -2,7 +2,8 @@
 import type { FC } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
-import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { getCropStyles, getCropImageUrl, getObjectPosition } from "@/lib/utils";
+import { ServerImage } from "@/components/ui/ServerImage";
 
 // 处理换行符：支持 /n 和 \n
 const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
@@ -349,21 +350,52 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
         }}
       >
         <div
+          className="w-full h-full"
           style={{
-            width: '100%',
-            height: '100%',
             transform: `scale(${MASK_IMAGE_CONFIG.imageScale}) translate(${rpxHero(MASK_IMAGE_CONFIG.imageOffsetX)}, ${rpxHero(MASK_IMAGE_CONFIG.imageOffsetY)})`,
             transformOrigin: 'center center',
           }}
         >
-          <OptimizedImage
-            image={data.images[0]}
-            alt="Background"
-            size="medium"
-            className="w-full h-full object-cover"
-            objectPosition={maskImagePosition}
-            priority
-          />
+          {(() => {
+            const cropData = data.imageCropDataList?.[0];
+            const cropStyles = getCropStyles(cropData);
+            if (cropStyles && cropData && cropData.croppedAreaPixels) {
+              return (
+                <div
+                  className="absolute inset-0 w-full h-full"
+                  style={{
+                    ...cropStyles.container,
+                    width: "100%",
+                    height: "100%",
+                  }}
+                >
+                  <img
+                    src={getCropImageUrl(data.images[0], cropData)}
+                    alt="Background"
+                    style={{
+                      ...cropStyles.image,
+                      width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                      height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                      left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                      top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                      maxWidth: "none",
+                    }}
+                  />
+                </div>
+              );
+            }
+            return (
+              <ServerImage
+                image={data.images[0]}
+                alt="Background"
+                size="medium"
+                fill
+                className="absolute inset-0 w-full h-full object-cover"
+                objectPosition={maskImagePosition}
+                priority
+              />
+            );
+          })()}
         </div>
       </div>
 
@@ -390,16 +422,48 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
             className="w-full h-full"
             style={{
               transform: `scale(${DIAMOND_TOP_CONFIG.imageScale})`,
-              transformOrigin: diamondTopPosition,
             }}
           >
-            <OptimizedImage
-              image={data.images[1]}
-              alt="Top rotated image"
-              size="large"
-              className="absolute inset-0 w-full h-full object-cover"
-              priority
-            />
+            {(() => {
+              const cropData = data.imageCropDataList?.[1];
+              const cropStyles = getCropStyles(cropData);
+              if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                return (
+                  <div
+                    className="absolute inset-0 w-full h-full"
+                    style={{
+                      ...cropStyles.container,
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  >
+                    <img
+                      src={getCropImageUrl(data.images[1], cropData)}
+                      alt="Top rotated image"
+                      style={{
+                        ...cropStyles.image,
+                        width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                        height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                        left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                        top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                        maxWidth: "none",
+                      }}
+                    />
+                  </div>
+                );
+              }
+              return (
+                <ServerImage
+                  image={data.images[1]}
+                  alt="Top rotated image"
+                  size="large"
+                  fill
+                  className="absolute inset-0 w-full h-full object-cover"
+                  objectPosition={getObjectPosition(data.images[1])}
+                  priority
+                />
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -426,16 +490,48 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
             className="w-full h-full"
             style={{
               transform: `scale(${DIAMOND_MIDDLE_CONFIG.imageScale})`,
-              transformOrigin: diamondMiddlePosition,
             }}
           >
-            <OptimizedImage
-              image={data.images[2]}
-              alt="Middle rotated image"
-              size="large"
-              className="absolute inset-0 w-full h-full object-cover"
-              priority
-            />
+            {(() => {
+              const cropData = data.imageCropDataList?.[2];
+              const cropStyles = getCropStyles(cropData);
+              if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                return (
+                  <div
+                    className="absolute inset-0 w-full h-full"
+                    style={{
+                      ...cropStyles.container,
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  >
+                    <img
+                      src={getCropImageUrl(data.images[2], cropData)}
+                      alt="Middle rotated image"
+                      style={{
+                        ...cropStyles.image,
+                        width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                        height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                        left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                        top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                        maxWidth: "none",
+                      }}
+                    />
+                  </div>
+                );
+              }
+              return (
+                <ServerImage
+                  image={data.images[2]}
+                  alt="Middle rotated image"
+                  size="large"
+                  fill
+                  className="absolute inset-0 w-full h-full object-cover"
+                  objectPosition={getObjectPosition(data.images[2])}
+                  priority
+                />
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -462,16 +558,48 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
             className="w-full h-full"
             style={{
               transform: `scale(${DIAMOND_BOTTOM_CONFIG.imageScale})`,
-              transformOrigin: diamondBottomPosition,
             }}
           >
-            <OptimizedImage
-              image={data.images[3]}
-              alt="Bottom rotated image"
-              size="large"
-              className="absolute inset-0 w-full h-full object-cover"
-              priority
-            />
+            {(() => {
+              const cropData = data.imageCropDataList?.[3];
+              const cropStyles = getCropStyles(cropData);
+              if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                return (
+                  <div
+                    className="absolute inset-0 w-full h-full"
+                    style={{
+                      ...cropStyles.container,
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  >
+                    <img
+                      src={getCropImageUrl(data.images[3], cropData)}
+                      alt="Bottom rotated image"
+                      style={{
+                        ...cropStyles.image,
+                        width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                        height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                        left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                        top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                        maxWidth: "none",
+                      }}
+                    />
+                  </div>
+                );
+              }
+              return (
+                <ServerImage
+                  image={data.images[3]}
+                  alt="Bottom rotated image"
+                  size="large"
+                  fill
+                  className="absolute inset-0 w-full h-full object-cover"
+                  objectPosition={getObjectPosition(data.images[3])}
+                  priority
+                />
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -659,13 +787,45 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
                 transformOrigin: 'center center',
               }}
             >
-              <OptimizedImage
-                image={data.images[0]}
-                alt="Background"
-                size="thumbnail"
-                className="w-full h-full object-cover"
-                objectPosition={MOBILE_CONFIG.svg.imagePosition}
-              />
+              {(() => {
+                const cropData = data.imageCropDataList?.[0];
+                const cropStyles = getCropStyles(cropData);
+                if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                  return (
+                    <div
+                      className="absolute inset-0 w-full h-full"
+                      style={{
+                        ...cropStyles.container,
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    >
+                      <img
+                        src={getCropImageUrl(data.images[0], cropData)}
+                        alt="Background"
+                        style={{
+                          ...cropStyles.image,
+                          width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                          height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                          left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                          top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                          maxWidth: "none",
+                        }}
+                      />
+                    </div>
+                  );
+                }
+                return (
+                  <ServerImage
+                    image={data.images[0]}
+                    alt="Background"
+                    size="thumbnail"
+                    fill
+                    className="absolute inset-0 w-full h-full object-cover"
+                    objectPosition={MOBILE_CONFIG.svg.imagePosition}
+                  />
+                );
+              })()}
             </div>
           </div>
 
@@ -692,16 +852,48 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
                 className="w-full h-full"
                 style={{
                   transform: `scale(${MOBILE_CONFIG.diamondTop.imageScale})`,
-                  transformOrigin: diamondTopPosition,
                 }}
               >
-                <OptimizedImage
-                  image={data.images[1]}
-                  alt="Top rotated image"
-                  size="large"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  priority
-                />
+                {(() => {
+                  const cropData = data.imageCropDataList?.[1];
+                  const cropStyles = getCropStyles(cropData);
+                  if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                    return (
+                      <div
+                        className="absolute inset-0 w-full h-full"
+                        style={{
+                          ...cropStyles.container,
+                          width: "100%",
+                          height: "100%",
+                        }}
+                      >
+                        <img
+                          src={getCropImageUrl(data.images[1], cropData)}
+                          alt="Top rotated image"
+                          style={{
+                            ...cropStyles.image,
+                            width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                            height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                            left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                            top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                            maxWidth: "none",
+                          }}
+                        />
+                      </div>
+                    );
+                  }
+                  return (
+                    <ServerImage
+                      image={data.images[1]}
+                      alt="Top rotated image"
+                      size="large"
+                      fill
+                      className="absolute inset-0 w-full h-full object-cover"
+                      objectPosition={getObjectPosition(data.images[1])}
+                      priority
+                    />
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -728,16 +920,48 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
                 className="w-full h-full"
                 style={{
                   transform: `scale(${MOBILE_CONFIG.diamondMiddle.imageScale})`,
-                  transformOrigin: diamondMiddlePosition,
                 }}
               >
-                <OptimizedImage
-                  image={data.images[2]}
-                  alt="Middle rotated image"
-                  size="large"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  priority
-                />
+                {(() => {
+                  const cropData = data.imageCropDataList?.[2];
+                  const cropStyles = getCropStyles(cropData);
+                  if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                    return (
+                      <div
+                        className="absolute inset-0 w-full h-full"
+                        style={{
+                          ...cropStyles.container,
+                          width: "100%",
+                          height: "100%",
+                        }}
+                      >
+                        <img
+                          src={getCropImageUrl(data.images[2], cropData)}
+                          alt="Middle rotated image"
+                          style={{
+                            ...cropStyles.image,
+                            width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                            height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                            left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                            top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                            maxWidth: "none",
+                          }}
+                        />
+                      </div>
+                    );
+                  }
+                  return (
+                    <ServerImage
+                      image={data.images[2]}
+                      alt="Middle rotated image"
+                      size="large"
+                      fill
+                      className="absolute inset-0 w-full h-full object-cover"
+                      objectPosition={getObjectPosition(data.images[2])}
+                      priority
+                    />
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -764,16 +988,48 @@ const HeroBanner7: FC<BannerProps> = ({ data, locale }) => {
                 className="w-full h-full"
                 style={{
                   transform: `scale(${MOBILE_CONFIG.diamondBottom.imageScale})`,
-                  transformOrigin: diamondBottomPosition,
                 }}
               >
-                <OptimizedImage
-                  image={data.images[3]}
-                  alt="Bottom rotated image"
-                  size="large"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  priority
-                />
+                {(() => {
+                  const cropData = data.imageCropDataList?.[3];
+                  const cropStyles = getCropStyles(cropData);
+                  if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                    return (
+                      <div
+                        className="absolute inset-0 w-full h-full"
+                        style={{
+                          ...cropStyles.container,
+                          width: "100%",
+                          height: "100%",
+                        }}
+                      >
+                        <img
+                          src={getCropImageUrl(data.images[3], cropData)}
+                          alt="Bottom rotated image"
+                          style={{
+                            ...cropStyles.image,
+                            width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                            height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                            left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                            top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                            maxWidth: "none",
+                          }}
+                        />
+                      </div>
+                    );
+                  }
+                  return (
+                    <ServerImage
+                      image={data.images[3]}
+                      alt="Bottom rotated image"
+                      size="large"
+                      fill
+                      className="absolute inset-0 w-full h-full object-cover"
+                      objectPosition={getObjectPosition(data.images[3])}
+                      priority
+                    />
+                  );
+                })()}
               </div>
             </div>
           </div>

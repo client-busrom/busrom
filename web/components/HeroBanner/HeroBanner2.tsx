@@ -2,8 +2,8 @@
 import type { FC } from "react";
 import Image from "next/image";
 import type { HomeContent } from "@/lib/content-data";
-import { getObjectPosition } from "@/lib/utils";
-import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { getObjectPosition, getCropStyles, getCropImageUrl } from "@/lib/utils";
+import { ServerImage } from "@/components/ui/ServerImage";
 
 type BannerData = HomeContent["heroBanner"][number];
 type BannerProps = {
@@ -115,14 +115,46 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
           filter: `blur(${BACKGROUND_CONFIG.blurAmount}px)`,
         }}
       >
-        <OptimizedImage
-          image={data.images[0]}
-          alt="Background"
-          size="small"
-          className="absolute inset-0 w-full h-full object-cover"
-          objectPosition={getObjectPosition(data.images[0])}
-          priority
-        />
+        {(() => {
+          const cropData = data.imageCropDataList?.[0];
+          const cropStyles = getCropStyles(cropData);
+          if (cropStyles && cropData && cropData.croppedAreaPixels) {
+            return (
+              <div
+                className="absolute inset-0 w-full h-full"
+                style={{
+                  ...cropStyles.container,
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                <img
+                  src={getCropImageUrl(data.images[0], cropData)}
+                  alt="Background"
+                  style={{
+                    ...cropStyles.image,
+                    width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                    height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                    left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                    top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                    maxWidth: "none",
+                  }}
+                />
+              </div>
+            );
+          }
+          return (
+            <ServerImage
+              image={data.images[0]}
+              alt="Background"
+              size="large"
+              fill
+              className="absolute inset-0 w-full h-full object-cover"
+              objectPosition={getObjectPosition(data.images[0])}
+              priority
+            />
+          );
+        })()}
       </div>
 
       {/* SVG 装饰元素 - 桌面端 (z-5) */}
@@ -462,13 +494,45 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
           border: `${rpx(RIGHT_CONTENT_CONFIG.largeImageBorderWidth)} solid white`,
         }}
       >
-        <OptimizedImage
-          image={data.images[2]}
-          alt="Large feature image"
-          size="small"
-          className="absolute inset-0 w-full h-full object-cover"
-          priority
-        />
+        {(() => {
+          const cropData = data.imageCropDataList?.[2];
+          const cropStyles = getCropStyles(cropData);
+          if (cropStyles && cropData && cropData.croppedAreaPixels) {
+            return (
+              <div
+                className="absolute inset-0 w-full h-full"
+                style={{
+                  ...cropStyles.container,
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                <img
+                  src={getCropImageUrl(data.images[2], cropData)}
+                  alt="Large feature image"
+                  style={{
+                    ...cropStyles.image,
+                    width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                    height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                    left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                    top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                    maxWidth: "none",
+                  }}
+                />
+              </div>
+            );
+          }
+          return (
+            <ServerImage
+              image={data.images[2]}
+              alt="Large feature image"
+              size="small"
+              fill
+              className="absolute inset-0 w-full h-full object-cover"
+              priority
+            />
+          );
+        })()}
       </div>
 
       {/* 小图 - 桌面端 (lg+) - 在大图之上，左侧文字之下 */}
@@ -485,13 +549,45 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
           border: `${rpx(RIGHT_CONTENT_CONFIG.smallImageBorderWidth)} solid white`,
         }}
       >
-        <OptimizedImage
-          image={data.images[1]}
-          alt="Small feature image"
-          size="small"
-          className="absolute inset-0 w-full h-full object-cover"
-          priority
-        />
+        {(() => {
+          const cropData = data.imageCropDataList?.[1];
+          const cropStyles = getCropStyles(cropData);
+          if (cropStyles && cropData && cropData.croppedAreaPixels) {
+            return (
+              <div
+                className="absolute inset-0 w-full h-full"
+                style={{
+                  ...cropStyles.container,
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                <img
+                  src={getCropImageUrl(data.images[1], cropData)}
+                  alt="Small feature image"
+                  style={{
+                    ...cropStyles.image,
+                    width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                    height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                    left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                    top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                    maxWidth: "none",
+                  }}
+                />
+              </div>
+            );
+          }
+          return (
+            <ServerImage
+              image={data.images[1]}
+              alt="Small feature image"
+              size="small"
+              fill
+              className="absolute inset-0 w-full h-full object-cover"
+              priority
+            />
+          );
+        })()}
       </div>
 
       {/* 右侧标题 - 桌面端 (lg+) - 最上层 z-30 */}
@@ -527,26 +623,90 @@ const HeroBanner2: FC<BannerProps> = ({ data }) => {
           {/* 大图 */}
           <div className="overflow-hidden shadow-lg bg-white p-2 sm:p-2.5 rounded-2xl w-44 h-40 sm:w-56 sm:h-52 md:w-72 md:h-64">
             <div className="relative w-full h-full overflow-hidden rounded-xl">
-              <OptimizedImage
-                image={data.images[1]}
-                alt="Large feature image"
-                size="thumbnail"
-                className="absolute inset-0 w-full h-full object-cover"
-                priority
-              />
+              {(() => {
+                const cropData = data.imageCropDataList?.[1];
+                const cropStyles = getCropStyles(cropData);
+                if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                  return (
+                    <div
+                      className="absolute inset-0 w-full h-full"
+                      style={{
+                        ...cropStyles.container,
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    >
+                      <img
+                        src={getCropImageUrl(data.images[1], cropData)}
+                        alt="Large feature image"
+                        style={{
+                          ...cropStyles.image,
+                          width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                          height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                          left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                          top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                          maxWidth: "none",
+                        }}
+                      />
+                    </div>
+                  );
+                }
+                return (
+                  <ServerImage
+                    image={data.images[1]}
+                    alt="Large feature image"
+                    size="thumbnail"
+                    fill
+                    className="absolute inset-0 w-full h-full object-cover"
+                    priority
+                  />
+                );
+              })()}
             </div>
           </div>
 
           {/* 小图 - 移动端偏移较小 */}
           <div className="absolute overflow-hidden shadow-lg bg-white z-20 p-1.5 sm:p-2 rounded-xl -left-20 sm:-left-28 md:-left-36 top-12 sm:top-16 md:top-20 w-32 h-28 sm:w-40 sm:h-36 md:w-48 md:h-44">
             <div className="relative w-full h-full overflow-hidden rounded-lg">
-              <OptimizedImage
-                image={data.images[2]}
-                alt="Small feature image"
-                size="thumbnail"
-                className="absolute inset-0 w-full h-full object-cover"
-                priority
-              />
+              {(() => {
+                const cropData = data.imageCropDataList?.[2];
+                const cropStyles = getCropStyles(cropData);
+                if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                  return (
+                    <div
+                      className="absolute inset-0 w-full h-full"
+                      style={{
+                        ...cropStyles.container,
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    >
+                      <img
+                        src={getCropImageUrl(data.images[2], cropData)}
+                        alt="Small feature image"
+                        style={{
+                          ...cropStyles.image,
+                          width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                          height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                          left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                          top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                          maxWidth: "none",
+                        }}
+                      />
+                    </div>
+                  );
+                }
+                return (
+                  <ServerImage
+                    image={data.images[2]}
+                    alt="Small feature image"
+                    size="thumbnail"
+                    fill
+                    className="absolute inset-0 w-full h-full object-cover"
+                    priority
+                  />
+                );
+              })()}
             </div>
           </div>
         </div>

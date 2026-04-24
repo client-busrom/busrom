@@ -269,21 +269,16 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
                     style={{
                       width: "100%",
                       height: "100%",
+                      position: "relative",
                     }}
                   >
-                    <img
-                      src={
-                        data.images[1]?.variants?.small ||
-                        data.images[1]?.url ||
-                        ""
-                      }
+                    <ServerImage
+                      image={data.images[1]}
                       alt="装饰图1"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        objectPosition: getObjectPosition(data.images[1]),
-                      }}
+                      size="medium"
+                      fill
+                      className="object-cover"
+                      objectPosition={getObjectPosition(data.images[1])}
                     />
                   </div>
                 );
@@ -356,22 +351,40 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
                   style={{
                     width: "100%",
                     height: "100%",
+                    overflow: "hidden",
+                    position: "relative",
                   }}
                 >
-                  <img
-                    src={
-                      data.images[1]?.variants?.small ||
-                      data.images[1]?.url ||
-                      ""
+                  {(() => {
+                    const cropData = data.imageCropDataList?.[1];
+                    const cropStyles = getCropStyles(cropData);
+                    if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                      return (
+                        <img
+                          src={getCropImageUrl(data.images[1], cropData)}
+                          alt="装饰图1"
+                          style={{
+                            ...cropStyles.image,
+                            width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                            height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                            left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                            top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                            maxWidth: "none",
+                          }}
+                        />
+                      );
                     }
-                    alt="装饰图1"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      objectPosition: getObjectPosition(data.images[1]),
-                    }}
-                  />
+                    return (
+                      <ServerImage
+                        image={data.images[1]}
+                        alt="装饰图1"
+                        size="small"
+                        fill
+                        className="object-cover"
+                        objectPosition={getObjectPosition(data.images[1])}
+                      />
+                    );
+                  })()}
                 </div>
               </foreignObject>
             </svg>
@@ -445,21 +458,16 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
                     style={{
                       width: "100%",
                       height: "100%",
+                      position: "relative",
                     }}
                   >
-                    <img
-                      src={
-                        data.images[2]?.variants?.small ||
-                        data.images[2]?.url ||
-                        ""
-                      }
+                    <ServerImage
+                      image={data.images[2]}
                       alt="装饰图2"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        objectPosition: getObjectPosition(data.images[2]),
-                      }}
+                      size="medium"
+                      fill
+                      className="object-cover"
+                      objectPosition={getObjectPosition(data.images[2])}
                     />
                   </div>
                 );
@@ -525,22 +533,40 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
                   style={{
                     width: "100%",
                     height: "100%",
+                    overflow: "hidden",
+                    position: "relative",
                   }}
                 >
-                  <img
-                    src={
-                      data.images[2]?.variants?.small ||
-                      data.images[2]?.url ||
-                      ""
+                  {(() => {
+                    const cropData = data.imageCropDataList?.[2];
+                    const cropStyles = getCropStyles(cropData);
+                    if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                      return (
+                        <img
+                          src={getCropImageUrl(data.images[2], cropData)}
+                          alt="装饰图2"
+                          style={{
+                            ...cropStyles.image,
+                            width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                            height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                            left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                            top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                            maxWidth: "none",
+                          }}
+                        />
+                      );
                     }
-                    alt="装饰图2"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      objectPosition: getObjectPosition(data.images[2]),
-                    }}
-                  />
+                    return (
+                      <ServerImage
+                        image={data.images[2]}
+                        alt="装饰图2"
+                        size="small"
+                        fill
+                        className="object-cover"
+                        objectPosition={getObjectPosition(data.images[2])}
+                      />
+                    );
+                  })()}
                 </div>
               </foreignObject>
             </svg>

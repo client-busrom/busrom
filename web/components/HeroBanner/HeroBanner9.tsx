@@ -2,14 +2,17 @@
 import type { FC } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
-import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { getCropStyles, getCropImageUrl, getObjectPosition } from "@/lib/utils";
+import { ServerImage } from "@/components/ui/ServerImage";
 
 // 处理换行符：支持 /n 和 \n
-const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
+const formatText = (text: string | undefined) =>
+  text?.replace(/\/n|\\n/g, "\n") || "";
 
 // --- 响应式尺寸函数 ---
 const rpx = (designValue: number) => `calc(var(--rpx) * ${designValue})`;
-const rpxHero = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
+const rpxHero = (designValue: number) =>
+  `calc(var(--rpx-hero) * ${designValue})`;
 
 // --- BannerProps Definition ---
 type BannerData = HomeContent["heroBanner"][number];
@@ -21,7 +24,7 @@ type BannerProps = {
 // --- 桌面端配置 (基于 Figma 设计稿 1920x1080) ---
 const DESKTOP_CONFIG = {
   // 背景色
-  backgroundColor: '#99935f',
+  backgroundColor: "#99935f",
 
   // SVG 遮罩图片配置 (黑色区域用于填充 data.images[0])
   // 黑色多边形大约从 x=-262 到 x=1332，宽度约 1594
@@ -30,93 +33,91 @@ const DESKTOP_CONFIG = {
     // 遮罩区域的边界框（用于计算图片容器尺寸）
     // 左边界约 0（clipPath 裁剪），右边界约 1332
     width: 1332,
-    aspectRatio: 1332 / 1080,  // 遮罩可见区域宽高比
-    svgAspectRatio: 1920 / 1080,  // 完整 SVG 宽高比
+    aspectRatio: 1332 / 1080, // 遮罩可见区域宽高比
+    svgAspectRatio: 1920 / 1080, // 完整 SVG 宽高比
     // 图片在遮罩内的位置调整
-    imagePosition: 'center center',  // object-position 值
-    imageScale: 1.2,                    // 图片缩放比例 (1 = 100%)
-    imageOffsetX: -5,                  // 水平偏移 (百分比)
-    imageOffsetY: 0,                  // 垂直偏移 (百分比)
+    imagePosition: "center center", // object-position 值
+    imageScale: 1.2, // 图片缩放比例 (1 = 100%)
+    imageOffsetX: -5, // 水平偏移 (百分比)
+    imageOffsetY: 0, // 垂直偏移 (百分比)
   },
 
   // 装饰 SVG (hero-banner-9-2.svg) 配置
   decorativeSvg: {
-    width: 800,            // SVG 原始宽度
-    height: 440,           // SVG 原始高度
-    bottom: 0,             // 底部定位
-    left: 0,               // 左侧定位
+    width: 824, // SVG 原始宽度
+    height: 411, // SVG 原始高度
+    bottom: 0, // 底部定位
+    left: 0, // 左侧定位
   },
 
   // 左下角菱形图片 (data.images[1])
   diamondImage: {
-    size: 370,             // 正方形尺寸
-    borderRadius: 80,      // 圆角
-    rotation: 45,          // 旋转角度 (正45度形成菱形)
-    bottom: -50,           // 底部定位
-    left: -20,             // 左侧定位
-    imageScale: 1.4,       // 图片缩放比例
-    imageOffsetX: 20,       // 图片水平偏移
-    imageOffsetY: -20,       // 图片垂直偏移
+    width: 433, // SVG 原始宽度
+    height: 402, // SVG 原始高度
+    bottom: 0, // 底部定位
+    left: 0, // 左侧定位
+    imageScale: 1.1, // 图片缩放比例
+    imageOffsetX: 0, // 图片水平偏移
+    imageOffsetY: 0, // 图片垂直偏移
   },
 
   // 左下角 Feature 文字 [2,3,4]
   featureText: {
-    bottom: 80,            // 底部定位
-    left: 390,             // 左侧定位
-    fontSize: 28,          // 字体大小
-    strokeColor: '#6B4E00', // 描边颜色
-    strokeWidth: 2,        // 描边宽度
-    gap: 8,                // 文字间距
-    color: '#FFA836',      // 文字颜色
+    bottom: 70, // 底部定位
+    left: 360, // 左侧定位
+    fontSize: 28, // 字体大小
+    strokeColor: "#6B4E00", // 描边颜色
+    strokeWidth: 2, // 描边宽度
+    gap: 8, // 文字间距
+    color: "#FFA836", // 文字颜色
   },
 
   // 左下角元素容器
   leftContainer: {
-    width: 900,            // 容器宽度
-    height: 600,           // 容器高度
+    width: 900, // 容器宽度
+    height: 600, // 容器高度
   },
 
   // 右侧标题区域
   title: {
-    fontSize: 100,         // 字体大小
-    rotation: -1.81,       // 旋转角度
+    fontSize: 100, // 字体大小
+    rotation: -1.81, // 旋转角度
     lineHeight: 1.1,
-    right: '5%',           // 右边距（百分比）
-    top: 200,               // 顶部距离
-    color: '#3C3712',      // 文字颜色
-    strokeColor: '#ffffff', // 描边颜色
-    strokeWidth: 2,        // 描边宽度
+    right: "5%", // 右边距（百分比）
+    top: 200, // 顶部距离
+    color: "#3C3712", // 文字颜色
+    strokeColor: "#ffffff", // 描边颜色
+    strokeWidth: 2, // 描边宽度
     // SVG 背景框参数
-    svgPaddingLeft: 16,    // 文字左内边距
-    svgPaddingRight: 100,  // 文字右内边距
-    svgPaddingTop: 14,     // 文字上内边距
-    svgPaddingBottom: 10,  // 文字下内边距
-    svgOffsetLeft: -30,    // SVG 左偏移
-    svgOffsetTop: -30,     // SVG 上偏移
-    svgExtraWidth: 160,    // SVG 额外宽度
-    svgExtraHeight: 60,    // SVG 额外高度
-    gap: 36,               // 行间距
+    svgPaddingLeft: 16, // 文字左内边距
+    svgPaddingRight: 100, // 文字右内边距
+    svgPaddingTop: 14, // 文字上内边距
+    svgPaddingBottom: 10, // 文字下内边距
+    svgOffsetLeft: -30, // SVG 左偏移
+    svgOffsetTop: -30, // SVG 上偏移
+    svgExtraWidth: 160, // SVG 额外宽度
+    svgExtraHeight: 60, // SVG 额外高度
+    gap: 36, // 行间距
     firstLineOffsetY: -10, // 第一行额外上移（负值往上）
   },
 
   // 右侧 Feature[1] 文字
   feature1: {
-    fontSize: 64,          // 字体大小
-    right: '5%',           // 右边距（百分比）
-    topOffset: 580,        // 相对标题的顶部偏移
+    fontSize: 64, // 字体大小
+    right: "5%", // 右边距（百分比）
+    topOffset: 580, // 相对标题的顶部偏移
   },
 };
 
-
 // --- 背景 SVG 配置 ---
 const BLOCK_SVGS = [
-  '/bannerBlock1.svg',
-  '/bannerBlock2.svg',
-  '/bannerBlock3.svg',
+  "/bannerBlock1.svg",
+  "/bannerBlock2.svg",
+  "/bannerBlock3.svg",
 ];
 
 // --- 断点缩放比例 ---
-const LG_SCALE = 1024 / 1920;  // lg 断点时 (1024px)
+const LG_SCALE = 1024 / 1920; // lg 断点时 (1024px)
 
 // --- FeatureBlock 组件 (右侧标题块，使用 SVG 背景框) ---
 type FeatureBlockProps = {
@@ -127,10 +128,17 @@ type FeatureBlockProps = {
   useRpxHero?: boolean;
 };
 
-const FeatureBlock: FC<FeatureBlockProps> = ({ lines, fontSize, rotation, lineHeight, useRpxHero = true }) => {
+const FeatureBlock: FC<FeatureBlockProps> = ({
+  lines,
+  fontSize,
+  rotation,
+  lineHeight,
+  useRpxHero = true,
+}) => {
   const config = DESKTOP_CONFIG.title;
   // lg 以上用 rpxHero 缩放，lg 以下用 1024 时的固定像素
-  const size = (value: number) => useRpxHero ? rpxHero(value) : `${value * LG_SCALE}px`;
+  const size = (value: number) =>
+    useRpxHero ? rpxHero(value) : `${value * LG_SCALE}px`;
 
   return (
     <div className="relative inline-block overflow-visible">
@@ -140,10 +148,7 @@ const FeatureBlock: FC<FeatureBlockProps> = ({ lines, fontSize, rotation, lineHe
         style={{ gap: size(config.gap) }}
       >
         {lines.map((line, index) => (
-          <div
-            key={index}
-            className="relative overflow-visible"
-          >
+          <div key={index} className="relative overflow-visible">
             {/* SVG 背景块 - 不旋转 */}
             <img
               src={BLOCK_SVGS[index % BLOCK_SVGS.length]}
@@ -166,12 +171,13 @@ const FeatureBlock: FC<FeatureBlockProps> = ({ lines, fontSize, rotation, lineHe
                 paddingRight: size(config.svgPaddingRight),
                 paddingTop: size(config.svgPaddingTop),
                 paddingBottom: size(config.svgPaddingBottom),
-                transform: index === 0
-                  ? `rotate(${rotation}deg) translateY(${size(config.firstLineOffsetY)})`
-                  : `rotate(${rotation}deg)`,
+                transform:
+                  index === 0
+                    ? `rotate(${rotation}deg) translateY(${size(config.firstLineOffsetY)})`
+                    : `rotate(${rotation}deg)`,
                 color: config.color,
                 WebkitTextStroke: `${rpx(6)} ${config.strokeColor}`,
-                paintOrder: 'stroke fill',
+                paintOrder: "stroke fill",
               }}
             >
               {line}
@@ -187,7 +193,7 @@ const FeatureBlock: FC<FeatureBlockProps> = ({ lines, fontSize, rotation, lineHe
 const HeroBanner9: FC<BannerProps> = ({ data }) => {
   // --- Split Feature[0] (支持换行: \n, \\n, /n) ---
   const feature0Text = formatText(data.features[0]);
-  const feature0Lines = feature0Text.split('\n');
+  const feature0Lines = feature0Text.split("\n");
 
   return (
     <section
@@ -198,10 +204,10 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
       <div
         className="absolute inset-0 z-0 pointer-events-none"
         style={{
-          backgroundImage: 'url(/hero-banner-9-1.svg)',
-          backgroundSize: 'auto 100%',
-          backgroundPosition: 'left center',
-          backgroundRepeat: 'no-repeat',
+          backgroundImage: "url(/hero-banner-9-1.svg)",
+          backgroundSize: "auto 100%",
+          backgroundPosition: "left center",
+          backgroundRepeat: "no-repeat",
         }}
       />
 
@@ -211,76 +217,149 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
         style={{
           // 宽度 = 高度 × 遮罩区域宽高比
           aspectRatio: DESKTOP_CONFIG.maskImage.aspectRatio,
-          maskImage: 'url(/hero-banner-9-mask.svg)',
-          WebkitMaskImage: 'url(/hero-banner-9-mask.svg)',
+          maskImage: "url(/hero-banner-9-mask.svg)",
+          WebkitMaskImage: "url(/hero-banner-9-mask.svg)",
           // 遮罩大小：让 SVG 高度 = 容器高度
           maskSize: `${100 * (1920 / DESKTOP_CONFIG.maskImage.width)}% 100%`,
           WebkitMaskSize: `${100 * (1920 / DESKTOP_CONFIG.maskImage.width)}% 100%`,
           // 遮罩左对齐
-          maskPosition: 'left center',
-          WebkitMaskPosition: 'left center',
-          maskRepeat: 'no-repeat',
-          WebkitMaskRepeat: 'no-repeat',
+          maskPosition: "left center",
+          WebkitMaskPosition: "left center",
+          maskRepeat: "no-repeat",
+          WebkitMaskRepeat: "no-repeat",
         }}
       >
         <div
           className="w-full h-full"
           style={{
             transform: `scale(${DESKTOP_CONFIG.maskImage.imageScale}) translate(${DESKTOP_CONFIG.maskImage.imageOffsetX}%, ${DESKTOP_CONFIG.maskImage.imageOffsetY}%)`,
-            transformOrigin: 'center center',
+            transformOrigin: "center center",
           }}
         >
-          <OptimizedImage
-            image={data.images[0]}
-            alt="Background"
-            size="medium"
-            className="w-full h-full object-cover"
-            priority
-          />
+          {(() => {
+            const cropData = data.imageCropDataList?.[0];
+            const cropStyles = getCropStyles(cropData);
+            if (cropStyles && cropData && cropData.croppedAreaPixels) {
+              return (
+                <div
+                  className="absolute inset-0 w-full h-full"
+                  style={{
+                    ...cropStyles.container,
+                    width: "100%",
+                    height: "100%",
+                  }}
+                >
+                  <img
+                    src={getCropImageUrl(data.images[0], cropData)}
+                    alt="Background"
+                    style={{
+                      ...cropStyles.image,
+                      width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                      height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                      left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                      top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                      maxWidth: "none",
+                    }}
+                  />
+                </div>
+              );
+            }
+            return (
+              <ServerImage
+                image={data.images[0]}
+                alt="Background"
+                size="medium"
+                fill
+                className="absolute inset-0 w-full h-full object-cover"
+                objectPosition={DESKTOP_CONFIG.maskImage.imagePosition}
+                priority
+              />
+            );
+          })()}
         </div>
       </div>
 
-      {/* 左下角元素容器 - lg 及以上固定像素 */}
-      <div className="hidden lg:block absolute bottom-0 left-0 z-[15] overflow-visible" style={{ width: DESKTOP_CONFIG.leftContainer.width, height: DESKTOP_CONFIG.leftContainer.height }}>
+      {/* 左下角元素容器 - lg 及以上使用 rpxHero 缩放 */}
+      <div
+        className="hidden lg:block absolute bottom-0 left-0 z-[15] overflow-visible"
+        style={{
+          width: rpxHero(DESKTOP_CONFIG.leftContainer.width),
+          height: rpxHero(DESKTOP_CONFIG.leftContainer.height),
+        }}
+      >
         {/* Layer 3: 装饰 SVG (hero-banner-9-2.svg) */}
         <div
           className="absolute pointer-events-none"
           style={{
-            bottom: DESKTOP_CONFIG.decorativeSvg.bottom,
-            left: DESKTOP_CONFIG.decorativeSvg.left,
-            width: DESKTOP_CONFIG.decorativeSvg.width,
-            height: DESKTOP_CONFIG.decorativeSvg.height,
-            backgroundImage: 'url(/hero-banner-9-2.svg)',
-            backgroundSize: 'contain',
-            backgroundRepeat: 'no-repeat',
+            bottom: rpxHero(DESKTOP_CONFIG.decorativeSvg.bottom),
+            left: rpxHero(DESKTOP_CONFIG.decorativeSvg.left),
+            width: rpxHero(DESKTOP_CONFIG.decorativeSvg.width),
+            height: rpxHero(DESKTOP_CONFIG.decorativeSvg.height),
+            backgroundImage: "url(/hero-banner-9-2.svg)",
+            backgroundSize: "contain",
+            backgroundRepeat: "no-repeat",
           }}
         />
         {/* Layer 4: 左下角菱形图片 (data.images[1]) */}
         <div
-          className="absolute overflow-hidden shadow-2xl z-20"
+          className="absolute z-20"
           style={{
-            bottom: DESKTOP_CONFIG.diamondImage.bottom,
-            left: DESKTOP_CONFIG.diamondImage.left,
-            width: DESKTOP_CONFIG.diamondImage.size,
-            height: DESKTOP_CONFIG.diamondImage.size,
-            borderRadius: DESKTOP_CONFIG.diamondImage.borderRadius,
-            transform: `rotate(${DESKTOP_CONFIG.diamondImage.rotation}deg)`,
+            bottom: rpxHero(DESKTOP_CONFIG.diamondImage.bottom),
+            left: rpxHero(DESKTOP_CONFIG.diamondImage.left),
+            width: rpxHero(DESKTOP_CONFIG.diamondImage.width),
+            height: rpxHero(DESKTOP_CONFIG.diamondImage.height),
+            clipPath: "url(#hero9DiamondClip2)",
+            WebkitClipPath: "url(#hero9DiamondClip2)",
+            filter: "drop-shadow(0 25px 50px rgba(0, 0, 0, 0.25))",
           }}
         >
           <div
             className="relative w-full h-full"
             style={{
               transform: `scale(${DESKTOP_CONFIG.diamondImage.imageScale}) translate(${DESKTOP_CONFIG.diamondImage.imageOffsetX}px, ${DESKTOP_CONFIG.diamondImage.imageOffsetY}px)`,
-              transformOrigin: 'center center',
+              transformOrigin: "center center",
             }}
           >
-            <OptimizedImage
-              image={data.images[1]}
-              alt="Product Focus"
-              size="medium"
-              className="absolute inset-0 w-full h-full object-cover -rotate-45"
-              priority
-            />
+            {(() => {
+              const cropData = data.imageCropDataList?.[1];
+              const cropStyles = getCropStyles(cropData);
+              if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                return (
+                  <div
+                    className="absolute inset-0 w-full h-full"
+                    style={{
+                      ...cropStyles.container,
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  >
+                    <img
+                      src={getCropImageUrl(data.images[1], cropData)}
+                      alt="Product Focus"
+                      style={{
+                        ...cropStyles.image,
+                        width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                        height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                        left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                        top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                        maxWidth: "none",
+                      }}
+                    />
+                  </div>
+                );
+              }
+              return (
+                <ServerImage
+                  image={data.images[1]}
+                  alt="Product Focus"
+                  size="medium"
+                  fill
+                  className="absolute inset-0 w-full h-full object-cover"
+                  objectPosition={getObjectPosition(data.images[1])}
+                  priority
+                />
+              );
+            })()}
           </div>
         </div>
         {/* Layer 5: 左下角 Feature 文字 [2,3,4] */}
@@ -292,21 +371,23 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
             gap: DESKTOP_CONFIG.featureText.gap,
           }}
         >
-          {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
-            <h2
-              key={index}
-              className="font-montserrat font-bold text-center"
-              style={{
-                fontSize: DESKTOP_CONFIG.featureText.fontSize,
-                color: DESKTOP_CONFIG.featureText.color,
-                WebkitTextStroke: `${rpx(4)} #6B4E00`,
-                paintOrder: 'stroke fill',
-                letterSpacing: '0.03em',
-              }}
-            >
-              {feature}
-            </h2>
-          ))}
+          {[data.features[2], data.features[3], data.features[4]].map(
+            (feature, index) => (
+              <h2
+                key={index}
+                className="font-montserrat font-bold text-center"
+                style={{
+                  fontSize: DESKTOP_CONFIG.featureText.fontSize,
+                  color: DESKTOP_CONFIG.featureText.color,
+                  WebkitTextStroke: `${rpx(4)} #6B4E00`,
+                  paintOrder: "stroke fill",
+                  letterSpacing: "0.03em",
+                }}
+              >
+                {feature}
+              </h2>
+            ),
+          )}
         </div>
       </div>
 
@@ -327,63 +408,99 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
             left: DESKTOP_CONFIG.decorativeSvg.left,
             width: DESKTOP_CONFIG.decorativeSvg.width,
             height: DESKTOP_CONFIG.decorativeSvg.height,
-            backgroundImage: 'url(/hero-banner-9-2.svg)',
-            backgroundSize: 'contain',
-            backgroundRepeat: 'no-repeat',
+            backgroundImage: "url(/hero-banner-9-2.svg)",
+            backgroundSize: "contain",
+            backgroundRepeat: "no-repeat",
           }}
         />
         {/* Layer 4: 左下角菱形图片 (data.images[1]) */}
         <div
-          className="absolute overflow-hidden shadow-2xl z-20"
+          className="absolute z-20"
           style={{
             bottom: DESKTOP_CONFIG.diamondImage.bottom,
             left: DESKTOP_CONFIG.diamondImage.left,
-            width: DESKTOP_CONFIG.diamondImage.size,
-            height: DESKTOP_CONFIG.diamondImage.size,
-            borderRadius: DESKTOP_CONFIG.diamondImage.borderRadius,
-            transform: `rotate(${DESKTOP_CONFIG.diamondImage.rotation}deg)`,
+            width: DESKTOP_CONFIG.diamondImage.width,
+            height: DESKTOP_CONFIG.diamondImage.height,
+            clipPath: "url(#hero9DiamondClip2)",
+            WebkitClipPath: "url(#hero9DiamondClip2)",
+            filter: "drop-shadow(0 15px 30px rgba(0, 0, 0, 0.25))",
           }}
         >
           <div
             className="relative w-full h-full"
             style={{
               transform: `scale(${DESKTOP_CONFIG.diamondImage.imageScale}) translate(${DESKTOP_CONFIG.diamondImage.imageOffsetX}px, ${DESKTOP_CONFIG.diamondImage.imageOffsetY}px)`,
-              transformOrigin: 'center center',
+              transformOrigin: "center center",
             }}
           >
-            <OptimizedImage
-              image={data.images[1]}
-              alt="Product Focus"
-              size="thumbnail"
-              className="absolute inset-0 w-full h-full object-cover -rotate-45"
-              priority
-            />
+            {(() => {
+              const cropData = data.imageCropDataList?.[1];
+              const cropStyles = getCropStyles(cropData);
+              if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                return (
+                  <div
+                    className="absolute inset-0 w-full h-full"
+                    style={{
+                      ...cropStyles.container,
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  >
+                    <img
+                      src={getCropImageUrl(data.images[1], cropData)}
+                      alt="Product Focus"
+                      style={{
+                        ...cropStyles.image,
+                        width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                        height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                        left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                        top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                        maxWidth: "none",
+                      }}
+                    />
+                  </div>
+                );
+              }
+              return (
+                <ServerImage
+                  image={data.images[1]}
+                  alt="Product Focus"
+                  size="thumbnail"
+                  fill
+                  className="absolute inset-0 w-full h-full object-cover"
+                  objectPosition={getObjectPosition(data.images[1])}
+                  priority
+                />
+              );
+            })()}
           </div>
         </div>
         {/* Layer 5: 左下角 Feature 文字 [2,3,4] */}
         <div
           className="absolute z-30 flex flex-col"
           style={{
-            bottom: DESKTOP_CONFIG.featureText.bottom,
-            left: DESKTOP_CONFIG.featureText.left,
-            gap: DESKTOP_CONFIG.featureText.gap,
+            bottom: rpxHero(DESKTOP_CONFIG.featureText.bottom),
+            left: rpxHero(DESKTOP_CONFIG.featureText.left),
+            gap: rpxHero(DESKTOP_CONFIG.featureText.gap),
           }}
         >
-          {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
-            <h2
-              key={index}
-              className="font-montserrat font-bold text-center"
-              style={{
-                fontSize: DESKTOP_CONFIG.featureText.fontSize,
-                color: DESKTOP_CONFIG.featureText.color,
-                WebkitTextStroke: `${rpx(4)} #6B4E00`,
-                paintOrder: 'stroke fill',
-                letterSpacing: '0.03em',
-              }}
-            >
-              {feature}
-            </h2>
-          ))}
+          {[data.features[2], data.features[3], data.features[4]].map(
+            (feature, index) => (
+              <h2
+                key={index}
+                className="font-montserrat font-bold text-center"
+                style={{
+                  fontSize: rpxHero(DESKTOP_CONFIG.featureText.fontSize),
+                  color: DESKTOP_CONFIG.featureText.color,
+                  WebkitTextStroke: `${rpx(4)} #6B4E00`,
+                  paintOrder: "stroke fill",
+                  letterSpacing: "0.03em",
+                }}
+              >
+                {feature}
+              </h2>
+            ),
+          )}
         </div>
       </div>
 
@@ -426,7 +543,9 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
         className="hidden lg:block absolute z-20"
         style={{
           right: DESKTOP_CONFIG.feature1.right,
-          top: rpxHero(DESKTOP_CONFIG.title.top + DESKTOP_CONFIG.feature1.topOffset),
+          top: rpxHero(
+            DESKTOP_CONFIG.title.top + DESKTOP_CONFIG.feature1.topOffset,
+          ),
         }}
       >
         <h1
@@ -434,7 +553,7 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
           style={{
             fontSize: rpxHero(DESKTOP_CONFIG.feature1.fontSize),
             WebkitTextStroke: `${rpx(7)} #6B4E00`,
-            paintOrder: 'stroke fill',
+            paintOrder: "stroke fill",
           }}
         >
           {formatText(data.features[1])}
@@ -446,7 +565,9 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
         className="lg:hidden absolute z-20"
         style={{
           right: DESKTOP_CONFIG.feature1.right,
-          top: (DESKTOP_CONFIG.title.top + DESKTOP_CONFIG.feature1.topOffset) * LG_SCALE,
+          top:
+            (DESKTOP_CONFIG.title.top + DESKTOP_CONFIG.feature1.topOffset) *
+            LG_SCALE,
         }}
       >
         <h1
@@ -454,13 +575,21 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
           style={{
             fontSize: DESKTOP_CONFIG.feature1.fontSize * LG_SCALE,
             WebkitTextStroke: `${3 * LG_SCALE}px #6B4E00`,
-            paintOrder: 'stroke fill',
+            paintOrder: "stroke fill",
           }}
         >
           {formatText(data.features[1])}
         </h1>
       </div>
 
+      {/* SVG ClipPath Definition */}
+      <svg width="0" height="0" className="absolute pointer-events-none">
+        <defs>
+          <clipPath id="hero9DiamondClip2" clipPathUnits="objectBoundingBox">
+            <path d="M0.256977 0.0706721C0.344459 -0.0235574 0.486297 -0.0235573 0.57378 0.0706721L0.933325 0.45794C1.02081 0.55217 1.02081 0.704948 0.933325 0.799178L0.747293 0.999554H0.0834656L0 0.909653V0.347466L0.256977 0.0706721Z" />
+          </clipPath>
+        </defs>
+      </svg>
     </section>
   );
 };
