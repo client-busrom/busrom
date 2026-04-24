@@ -1,8 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence, Transition } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { cn, getCropStyles, getObjectPosition } from "@/lib/utils";
+import { ServerImage } from "@/components/ui/ServerImage";
 
 interface FeatureImageLayoutProps {
   activeFeature: any;
@@ -11,275 +11,281 @@ interface FeatureImageLayoutProps {
 
 const layoutTransition = { duration: 0.5, ease: "easeInOut" } as Transition;
 
-// 图片容器基础样式
-const imageContainerBaseStyle =
-  "relative block overflow-hidden bg-gray-100";
-
-// 普通矩形图片样式（带圆角和边框）- 4px 边框
-const rectangleImageStyle =
-  "rounded-[12px] lg:rounded-[16px] border-[4px] border-[#CDC094] shadow-[0_4px_7px_rgba(0,0,0,0.25)]";
-
-// 平行四边形 SVG viewBox 尺寸
-const TRAPEZOID_WIDTH = 300;
-const TRAPEZOID_HEIGHT = 500;
-const CORNER_RADIUS = 16; // 圆角更小
-const SLANT = 54; // 向右倾斜量
-
-// 平行四边形：整体向右倾斜
-// 左上角钝角，右上角锐角，左下角锐角，右下角钝角
-//     ________
-//    /       /
-//   /       /
-//  /       /
-// /_______/
-
-const parallelogramPath = `
-  M ${SLANT + CORNER_RADIUS} 0
-  L ${TRAPEZOID_WIDTH - CORNER_RADIUS} 0
-  Q ${TRAPEZOID_WIDTH} 0 ${TRAPEZOID_WIDTH} ${CORNER_RADIUS}
-  L ${TRAPEZOID_WIDTH - SLANT} ${TRAPEZOID_HEIGHT - CORNER_RADIUS}
-  Q ${TRAPEZOID_WIDTH - SLANT} ${TRAPEZOID_HEIGHT} ${TRAPEZOID_WIDTH - SLANT - CORNER_RADIUS} ${TRAPEZOID_HEIGHT}
-  L ${CORNER_RADIUS} ${TRAPEZOID_HEIGHT}
-  Q 0 ${TRAPEZOID_HEIGHT} 0 ${TRAPEZOID_HEIGHT - CORNER_RADIUS}
-  L ${SLANT} ${CORNER_RADIUS}
-  Q ${SLANT} 0 ${SLANT + CORNER_RADIUS} 0
-  Z
-`;
-
-// 两张图都用同样的平行四边形
-const trapezoidLeftPath = parallelogramPath;
-const trapezoidRightPath = parallelogramPath;
-
-export default function FeatureImageLayout({ activeFeature, activeIndex }: FeatureImageLayoutProps) {
-  if (!activeFeature || !activeFeature.images || activeFeature.images.length === 0) {
-    return (
-      <div className={cn(imageContainerBaseStyle, rectangleImageStyle, "w-full h-[400px] flex items-center justify-center")}>
-        <span className="text-gray-400">Image Data Missing</span>
-      </div>
-    );
-  }
-
-  const layoutType = activeIndex % 5;
-  const images = activeFeature.images;
-  const requiredImages = layoutType === 0 ? 4 : layoutType === 1 ? 2 : layoutType === 2 ? 6 : 2;
-
-  if (images.length < requiredImages) {
-    return (
-      <div className={cn(imageContainerBaseStyle, rectangleImageStyle, "w-full h-[400px] flex items-center justify-center")}>
-        <span className="text-gray-400">Need {requiredImages} images, got {images.length}</span>
-      </div>
-    );
-  }
-
-  // 统一的图片区域高度 - 增大图片，留出阴影空间
-  const containerHeight = "h-[210px] lg:h-[280px] xl:h-[320px] 2xl:h-[370px]";
-  const containerWidth = "w-full max-w-[280px] lg:max-w-[360px] xl:max-w-[420px] 2xl:max-w-[500px]";
-
-  return (
-    <div className={cn("w-full flex items-start justify-center", containerHeight)}>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeIndex}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={layoutTransition}
-          className="w-full h-full flex items-start justify-center"
-        >
-          {/* Layout 0: 2x2 不规则网格 (4张图) */}
-          {layoutType === 0 && (
-            <div className={cn(containerWidth, "h-full pb-2")}>
-              <div className="flex flex-col gap-[6px] lg:gap-[8px] xl:gap-[10px] 2xl:gap-[12px] h-full">
-                {/* 第一行 - 42% 高度 */}
-                <div className="flex gap-[6px] lg:gap-[8px] xl:gap-[10px] 2xl:gap-[12px]" style={{ height: "42%" }}>
-                  <div
-                    className={cn(imageContainerBaseStyle, rectangleImageStyle, "h-full")}
-                    style={{ flex: "242 1 0" }}
-                  >
-                    <FeatureImage
-                      image={images[0]}
-                      alt={images[0]?.altText || `${activeFeature.title} 1`}
-                    />
-                  </div>
-                  <div
-                    className={cn(imageContainerBaseStyle, rectangleImageStyle, "h-full")}
-                    style={{ flex: "350 1 0" }}
-                  >
-                    <FeatureImage
-                      image={images[1]}
-                      alt={images[1]?.altText || `${activeFeature.title} 2`}
-                    />
-                  </div>
-                </div>
-                {/* 第二行 - 58% 高度 */}
-                <div className="flex gap-[6px] lg:gap-[8px] xl:gap-[10px] 2xl:gap-[12px]" style={{ height: "55%" }}>
-                  <div
-                    className={cn(imageContainerBaseStyle, rectangleImageStyle, "h-full")}
-                    style={{ flex: "412 1 0" }}
-                  >
-                    <FeatureImage
-                      image={images[2]}
-                      alt={images[2]?.altText || `${activeFeature.title} 3`}
-                    />
-                  </div>
-                  <div
-                    className={cn(imageContainerBaseStyle, rectangleImageStyle, "h-full")}
-                    style={{ flex: "181 1 0" }}
-                  >
-                    <FeatureImage
-                      image={images[3]}
-                      alt={images[3]?.altText || `${activeFeature.title} 4`}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Layout 1: 1x2 垂直并排 (2张图) */}
-          {layoutType === 1 && (
-            <div className={cn(containerWidth, "h-full pb-2 flex gap-[6px] lg:gap-[8px] xl:gap-[10px] 2xl:gap-[12px]")}>
-              <div className={cn(imageContainerBaseStyle, rectangleImageStyle, "flex-1 h-full")}>
-                <FeatureImage
-                  image={images[0]}
-                  alt={images[0]?.altText || `${activeFeature.title} 1`}
-                />
-              </div>
-              <div className={cn(imageContainerBaseStyle, rectangleImageStyle, "flex-1 h-full")}>
-                <FeatureImage
-                  image={images[1]}
-                  alt={images[1]?.altText || `${activeFeature.title} 2`}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Layout 2: 2x3 网格 (6张图) */}
-          {layoutType === 2 && (
-            <div className={cn(containerWidth, "h-full pb-2 grid grid-cols-3 grid-rows-2 gap-[6px] lg:gap-[8px] xl:gap-[10px] 2xl:gap-[12px]")}>
-              {[0, 1, 2, 3, 4, 5].map((idx) => (
-                <div
-                  key={idx}
-                  className={cn(imageContainerBaseStyle, rectangleImageStyle)}
-                >
-                  <FeatureImage
-                    image={images[idx]}
-                    alt={images[idx]?.altText || `${activeFeature.title} ${idx + 1}`}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Layout 3 & 4: 平行四边形布局 (2张图) */}
-          {(layoutType === 3 || layoutType === 4) && (
-            <div className={cn(containerWidth, "h-full pb-2 flex items-start gap-[2px] lg:gap-[3px] xl:gap-[4px] 2xl:gap-[5px]")}>
-              {/* 左侧平行四边形 */}
-              <div className="relative h-full flex-1">
-                <TrapezoidImage
-                  image={images[0]}
-                  alt={images[0]?.altText || `${activeFeature.title} 1`}
-                  direction="left"
-                />
-              </div>
-              {/* 右侧平行四边形 */}
-              <div className="relative h-full flex-1">
-                <TrapezoidImage
-                  image={images[1]}
-                  alt={images[1]?.altText || `${activeFeature.title} 2`}
-                  direction="right"
-                />
-              </div>
-            </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-}
-
-// 普通图片组件
-const FeatureImage = ({ image, alt }: { image: any; alt: string }) => (
-  <OptimizedImage
-    image={image}
-    alt={alt}
-    size="small"
-    className="object-cover absolute inset-0 w-full h-full"
-  />
-);
-
-// 平行四边形图片组件（SVG 实现带圆角）
-// 倾斜比例：约 15% 的宽度
-const TrapezoidImage = ({
+/**
+ * 通用图片项组件
+ * 使用 SVG 作为遮罩/边框
+ */
+const FeatureImageItem = ({
   image,
   alt,
-  direction
+  cropData,
+  svgMask,
+  className,
+  style,
+  isSpecialLayout4 = false,
 }: {
   image: any;
   alt: string;
-  direction: "left" | "right"
+  cropData?: any;
+  svgMask?: string;
+  className?: string;
+  style?: React.CSSProperties;
+  isSpecialLayout4?: boolean;
 }) => {
-  const clipPathId = `trapezoid-${direction}-${Math.random().toString(36).substring(2, 11)}`;
+  const cropStyles = getCropStyles(cropData);
 
-  // 使用百分比坐标的 SVG path，倾斜 15%
-  // viewBox 100x100 便于百分比计算
-  const r = 8; // 圆角半径（相对于100的比例）
-  const slant = 15; // 倾斜量 15%
-
-  // 平行四边形向右倾斜
-  // 左上(slant,0) -> 右上(100,0) -> 右下(100-slant,100) -> 左下(0,100)
-  const path = `
-    M ${slant + r} 0
-    L ${100 - r} 0
-    Q 100 0 100 ${r}
-    L ${100 - slant} ${100 - r}
-    Q ${100 - slant} 100 ${100 - slant - r} 100
-    L ${r} 100
-    Q 0 100 0 ${100 - r}
-    L ${slant} ${r}
-    Q ${slant} 0 ${slant + r} 0
-    Z
-  `;
-
-  return (
-    <div
-      className="h-full w-full relative"
-      style={{
-        filter: "drop-shadow(0px 4px 7px rgba(0,0,0,0.25))"
-      }}
-    >
-      <svg
-        viewBox="0 0 100 100"
-        className="absolute inset-0 w-full h-full"
-        preserveAspectRatio="none"
-      >
-        <defs>
-          <clipPath id={clipPathId} clipPathUnits="objectBoundingBox" transform="scale(0.01)">
-            <path d={path} />
-          </clipPath>
-        </defs>
-        {/* 边框背景 */}
-        <path d={path} fill="#CDC094" />
-      </svg>
-
-      {/* 图片层 */}
+  if (isSpecialLayout4) {
+    // Layout 4 特殊处理：边框 352x408，图片 346x400
+    return (
       <div
-        className="absolute bg-gray-100 overflow-hidden"
+        className={cn("relative flex-shrink-0", className)}
         style={{
-          clipPath: `url(#${clipPathId})`,
-          top: "4px",
-          left: "4px",
-          right: "4px",
-          bottom: "4px"
+          ...style,
+          width: "calc(352 * var(--rpx))",
+          height: "calc(408 * var(--rpx))",
         }}
       >
-        <OptimizedImage
+        {/* 图片层 - 使用 346x400 遮罩，居中于 352x408 边框 */}
+        <div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{
+            width: "calc(346 * var(--rpx))",
+            height: "calc(400 * var(--rpx))",
+            maskImage: `url(/service-features/feature-image-layout-4-image.svg)`,
+            maskSize: "100% 100%",
+            WebkitMaskImage: `url(/service-features/feature-image-layout-4-image.svg)`,
+            WebkitMaskSize: "100% 100%",
+            ...cropStyles?.container,
+          }}
+        >
+          <ServerImage
+            image={image}
+            alt={alt}
+            size="medium"
+            className="object-cover w-full h-full"
+            style={{
+              ...cropStyles?.image,
+              objectPosition: getObjectPosition(image),
+            }}
+          />
+        </div>
+        {/* 边框层 - 在最上方 352x408 */}
+        <div
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{
+            backgroundImage: `url(/service-features/feature-image-layout-4.svg)`,
+            backgroundSize: "100% 100%",
+            backgroundRepeat: "no-repeat",
+          }}
+        />
+      </div>
+    );
+  }
+
+  // 普通布局 (Layout 1, 2, 3)
+  // 这些布局在 SVG 中仅仅是 rx="31" 的圆角矩形和 4px 的边框。
+  // 因为导出的 SVG 包含 fill="white"，作为 overlay 会完全遮挡底层图片，
+  // 所以对于标准圆角矩形，直接使用原生 CSS 进行精准等比渲染是最佳方案。
+  return (
+    <div
+      className={cn("relative overflow-hidden group", className)}
+      style={{
+        ...style,
+        border: "calc(4 * var(--rpx)) solid #CDC094",
+        borderRadius: "calc(31 * var(--rpx))",
+      }}
+    >
+      {/* 图片层 */}
+      <div
+        className="absolute inset-0 w-full h-full overflow-hidden"
+        style={cropStyles?.container}
+      >
+        <ServerImage
           image={image}
           alt={alt}
           size="medium"
-          className="object-cover w-full h-full"
+          className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+          style={{
+            ...cropStyles?.image,
+            objectPosition: getObjectPosition(image),
+          }}
         />
       </div>
     </div>
   );
 };
+
+export default function FeatureImageLayout({
+  activeFeature,
+  activeIndex,
+}: FeatureImageLayoutProps) {
+  if (
+    !activeFeature ||
+    !activeFeature.images ||
+    activeFeature.images.length === 0
+  ) {
+    return (
+      <div className="w-full h-full min-h-[300px] flex items-center justify-center bg-gray-100 rounded-[31px]">
+        <span className="text-gray-400">Image Data Missing</span>
+      </div>
+    );
+  }
+
+  // 五个 Feature 对应的四种布局模式 (0: 4张图, 1: 2张图, 2: 6张图, 3: 特殊2张图)
+  const layoutMap = [0, 1, 2, 3, 3];
+  const layoutType = layoutMap[activeIndex] ?? 0;
+  const images = activeFeature.images;
+  const cropDataList = activeFeature.imageCropDataList || [];
+
+  // 按照设计稿的原始尺寸定义每个 Layout 的外框宽高比
+  const layoutDimensions = [
+    { w: 593, h: 420 }, // Layout 0: 243+332 (+18 gap) x 170+232 (+18 gap)
+    { w: 614, h: 416 }, // Layout 1: 298+298 (+18 gap) x 416
+    { w: 600, h: 424 }, // Layout 2: 188*3 (+36 gap) x 203*2 (+18 gap)
+    { w: 722, h: 408 }, // Layout 3: 352+352 (+18 gap) x 408
+  ];
+  const { w: nativeW, h: nativeH } = layoutDimensions[layoutType];
+
+  return (
+    <div className="w-full h-full flex items-center justify-center overflow-hidden p-2">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeIndex}
+          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: -10 }}
+          transition={layoutTransition}
+          className="w-full flex items-center justify-center"
+          style={{ height: "100%" }}
+        >
+          {/* 
+            关键点：使用 aspect-ratio 保证内部元素比例与 SVG 完美契合，防止拉伸变形。
+            限制 maxWidth 和 maxHeight 使用 var(--rpx) 进行等比缩放。
+          */}
+          <div
+            className="relative flex justify-center items-center"
+            style={{
+              aspectRatio: `${nativeW} / ${nativeH}`,
+              width: "100%",
+              maxWidth: `calc(${nativeW} * var(--rpx))`,
+              maxHeight: `calc(${nativeH} * var(--rpx))`,
+            }}
+          >
+            {/* Layout 0: 四张图 (1-1 ~ 1-4) */}
+            {layoutType === 0 && (
+              <div
+                className="w-full h-full flex flex-col"
+                style={{ gap: "calc(18 * var(--rpx))" }}
+              >
+                <div
+                  className="w-full flex"
+                  style={{ flex: "170 1 0", gap: "calc(18 * var(--rpx))" }}
+                >
+                  <FeatureImageItem
+                    image={images[0]}
+                    alt={images[0]?.alt || "Feature 1"}
+                    cropData={cropDataList[0]}
+                    svgMask="feature-image-layout-1-1.svg"
+                    style={{ flex: "243 1 0" }}
+                    className="h-full"
+                  />
+                  <FeatureImageItem
+                    image={images[1]}
+                    alt={images[1]?.alt || "Feature 2"}
+                    cropData={cropDataList[1]}
+                    svgMask="feature-image-layout-1-2.svg"
+                    style={{ flex: "332 1 0" }}
+                    className="h-full"
+                  />
+                </div>
+                <div
+                  className="w-full flex"
+                  style={{ flex: "232 1 0", gap: "calc(18 * var(--rpx))" }}
+                >
+                  <FeatureImageItem
+                    image={images[2]}
+                    alt={images[2]?.alt || "Feature 3"}
+                    cropData={cropDataList[2]}
+                    svgMask="feature-image-layout-1-3.svg"
+                    style={{ flex: "382 1 0" }}
+                    className="h-full"
+                  />
+                  <FeatureImageItem
+                    image={images[3]}
+                    alt={images[3]?.alt || "Feature 4"}
+                    cropData={cropDataList[3]}
+                    svgMask="feature-image-layout-1-4.svg"
+                    style={{ flex: "192 1 0" }}
+                    className="h-full"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Layout 1: 两张图 (Layout 2) */}
+            {layoutType === 1 && (
+              <div
+                className="w-full h-full flex"
+                style={{ gap: "calc(18 * var(--rpx))" }}
+              >
+                <FeatureImageItem
+                  image={images[0]}
+                  alt={images[0]?.alt || "Feature 1"}
+                  cropData={cropDataList[0]}
+                  svgMask="feature-image-layout-2.svg"
+                  className="flex-1 h-full"
+                />
+                <FeatureImageItem
+                  image={images[1]}
+                  alt={images[1]?.alt || "Feature 2"}
+                  cropData={cropDataList[1]}
+                  svgMask="feature-image-layout-2.svg"
+                  className="flex-1 h-full"
+                />
+              </div>
+            )}
+
+            {/* Layout 2: 六张图 (Layout 3) */}
+            {layoutType === 2 && (
+              <div
+                className="w-full h-full grid grid-cols-3 grid-rows-2"
+                style={{ gap: "calc(18 * var(--rpx))" }}
+              >
+                {[0, 1, 2, 3, 4, 5].map((idx) => (
+                  <FeatureImageItem
+                    key={idx}
+                    image={images[idx]}
+                    alt={images[idx]?.alt || `Feature ${idx + 1}`}
+                    cropData={cropDataList[idx]}
+                    svgMask="feature-image-layout-3.svg"
+                    className="w-full h-full"
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Layout 3: 两张图 (Layout 4) - 特殊处理 */}
+            {layoutType === 3 && (
+              <div className="w-full h-full flex" style={{ gap: 0 }}>
+                <FeatureImageItem
+                  image={images[0]}
+                  alt={images[0]?.alt || "Feature 1"}
+                  cropData={cropDataList[0]}
+                  isSpecialLayout4={true}
+                  style={{ marginLeft: "calc(20 * var(--rpx))" }}
+                />
+                <FeatureImageItem
+                  image={images[1]}
+                  alt={images[1]?.alt || "Feature 2"}
+                  cropData={cropDataList[1]}
+                  isSpecialLayout4={true}
+                  style={{ marginLeft: "calc(-56 * var(--rpx))" }}
+                />
+              </div>
+            )}
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}

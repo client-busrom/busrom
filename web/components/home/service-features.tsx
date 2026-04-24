@@ -34,7 +34,7 @@ export default function ServiceFeatures({ data }: Props) {
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     observer.observe(section);
@@ -126,27 +126,23 @@ export default function ServiceFeatures({ data }: Props) {
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      <div className="container mx-auto px-4">
+      <div className="w-full max-w-[1920px] mx-auto px-4 md:px-8 xl:px-12 2xl:px-[80px]">
         {/* 主容器：米色圆角背景 */}
         <div
           className={cn(
-            "relative overflow-hidden rounded-[20px] lg:rounded-[30px]",
+            "relative overflow-hidden rounded-[20px] lg:rounded-[calc(30*var(--rpx))]",
             "bg-[#F0EBDB]", // 米色背景
-            "w-full max-w-[1860px] mx-auto"
+            "w-full lg:max-w-[calc(1860*var(--rpx))] mx-auto",
           )}
         >
-          {/* 装饰性模糊椭圆 - 只在桌面端显示 */}
+          {/* 装饰性背景 SVG - 替代原有的模糊椭圆 */}
           <div
-            className="hidden lg:block absolute pointer-events-none"
+            className="absolute inset-0 pointer-events-none"
             style={{
-              left: "62px",
-              top: "197px",
-              width: "1571px",
-              height: "392px",
-              background:
-                "linear-gradient(to bottom, rgba(255,255,255,1), rgba(218,201,142,1))",
-              filter: "blur(67px)",
-              borderRadius: "50%",
+              backgroundImage: "url(/service-features/service-feature-bg.svg)",
+              backgroundSize: "100% 100%",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "center",
             }}
           />
 
@@ -157,38 +153,26 @@ export default function ServiceFeatures({ data }: Props) {
               className={cn(
                 "flex flex-col justify-center",
                 "px-6 py-8",
-                "lg:px-10 lg:py-0 lg:w-[380px] lg:flex-shrink-0",
-                "xl:px-14 xl:w-[440px]",
-                "2xl:px-[80px] 2xl:w-[520px]"
+                "lg:px-[calc(80*var(--rpx))] lg:py-0 lg:w-[calc(520*var(--rpx))] lg:flex-shrink-0",
               )}
             >
               {/* 主标题 */}
               <h2
                 className={cn(
-                  "font-anaheim font-extrabold text-black",
+                  "font-anaheim font-extrabold text-black whitespace-pre-wrap",
                   "text-2xl leading-tight",
-                  "lg:text-[32px] lg:leading-[42px]",
-                  "xl:text-[40px] xl:leading-[52px]",
-                  "2xl:text-[48px] 2xl:leading-[62px]"
+                  "lg:text-[calc(48*var(--rpx))] lg:leading-[calc(62*var(--rpx))]",
                 )}
               >
-                {data.title.split("\n").map((line, i) => (
-                  <span key={i}>
-                    {line}
-                    {i < data.title.split("\n").length - 1 && <br />}
-                  </span>
-                ))}
+                {data.title}
               </h2>
 
-              {/* 副标题 */}
               <p
                 className={cn(
-                  "font-anaheim font-medium text-[#756F3F]",
+                  "font-anaheim font-medium text-[#756F3F] whitespace-pre-wrap",
                   "text-sm leading-relaxed mt-4",
-                  "lg:text-[14px] lg:leading-[22px] lg:mt-4",
-                  "xl:text-[16px] xl:leading-[24px]",
-                  "2xl:text-[18px] 2xl:leading-[28px]",
-                  "max-w-[320px]"
+                  "lg:text-[calc(18*var(--rpx))] lg:leading-[calc(28*var(--rpx))] lg:mt-[calc(16*var(--rpx))]",
+                  "max-w-[320px] lg:max-w-none",
                 )}
               >
                 {data.subtitle}
@@ -200,28 +184,28 @@ export default function ServiceFeatures({ data }: Props) {
               className={cn(
                 "flex-1 flex items-stretch",
                 "px-4 lg:px-0",
-                "lg:pr-4 xl:pr-6 2xl:pr-10"
+                "lg:pr-[calc(40*var(--rpx))]",
               )}
             >
-              {/* 白色圆角卡片 - 桌面端固定高度 */}
               <div
                 className={cn(
-                  "bg-white rounded-[20px] lg:rounded-[24px]",
-                  "w-full",
-                  "lg:h-[420px] xl:h-[480px] 2xl:h-[560px]",
-                  "flex flex-col",
-                  "shadow-lg"
+                  "item-box relative bg-white rounded-[20px] lg:rounded-[calc(24*var(--rpx))]",
+                  "w-full h-auto",
+                  "lg:w-[calc(1123*var(--rpx))] lg:h-[calc(622*var(--rpx))]",
+                  "flex flex-col flex-shrink-0",
+                  "shadow-lg overflow-hidden",
                 )}
               >
+                {/* Item 背景层 - 可选装饰 */}
+                <div className="item-bg absolute inset-0 pointer-events-none z-0" />
+
                 {/* 卡片内容区域 */}
-                <div className="flex-1 flex flex-col lg:flex-row p-4 lg:p-0">
+                <div className="relative z-10 flex-1 flex flex-col lg:flex-row p-4 lg:p-0">
                   {/* 文字内容区 */}
                   <div
                     className={cn(
                       "flex flex-col justify-start flex-shrink-0",
-                      "lg:w-[340px] lg:pt-[50px] lg:pl-[30px] lg:pr-4",
-                      "xl:w-[380px] xl:pt-[60px] xl:pl-[40px]",
-                      "2xl:w-[440px] 2xl:pt-[70px] 2xl:pl-[50px]"
+                      "lg:w-[calc(401*var(--rpx))] lg:pt-[calc(80*var(--rpx))] lg:pl-[calc(40*var(--rpx))] lg:pr-[calc(10*var(--rpx))]",
                     )}
                   >
                     <AnimatePresence mode="wait">
@@ -234,16 +218,14 @@ export default function ServiceFeatures({ data }: Props) {
                           transition={featureTransition as Transition}
                         >
                           {/* 装饰线条 */}
-                          <div className="bg-[#7E7A4F] w-[50px] h-[10px] lg:w-[60px] lg:h-[11px] 2xl:w-[73px] 2xl:h-[13px] mb-4 lg:mb-6" />
+                          <div className="bg-[#7E7A4F] w-[50px] h-[10px] lg:w-[calc(73*var(--rpx))] lg:h-[calc(13*var(--rpx))] mb-4 lg:mb-[calc(24*var(--rpx))]" />
 
                           {/* 标题 */}
                           <h3
                             className={cn(
-                              "font-anaheim font-extrabold text-black",
+                              "font-anaheim font-extrabold text-black whitespace-pre-wrap",
                               "text-xl leading-tight mb-3",
-                              "lg:text-[22px] lg:leading-[28px] lg:mb-3",
-                              "xl:text-[26px] xl:leading-[32px]",
-                              "2xl:text-[32px] 2xl:leading-[40px] 2xl:mb-4"
+                              "lg:text-[calc(32*var(--rpx))] lg:leading-[calc(40*var(--rpx))] lg:mb-[calc(16*var(--rpx))]",
                             )}
                           >
                             {activeFeature.title}
@@ -252,15 +234,16 @@ export default function ServiceFeatures({ data }: Props) {
                           {/* 描述 */}
                           <p
                             className={cn(
-                              "font-anaheim font-medium text-black",
-                              "text-sm leading-relaxed",
-                              "lg:text-[14px] lg:leading-[21px]",
-                              "xl:text-[16px] xl:leading-[24px]",
-                              "2xl:text-[18px] 2xl:leading-[27px]"
+                              "font-anaheim font-medium text-black whitespace-pre-wrap",
+                              "text-sm leading-relaxed mb-6",
+                              "lg:text-[calc(16*var(--rpx))] lg:leading-[calc(24*var(--rpx))] lg:mb-[calc(32*var(--rpx))]",
                             )}
                           >
                             {activeFeature.description}
                           </p>
+
+                          {/* 更多按钮 */}
+                          <div className="mt-auto lg:mt-[calc(40*var(--rpx))] pb-6 lg:pb-[calc(40*var(--rpx))]" />
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -271,9 +254,7 @@ export default function ServiceFeatures({ data }: Props) {
                     className={cn(
                       "flex-1 flex items-start justify-center",
                       "mt-4 lg:mt-0",
-                      "lg:pt-[50px] lg:pr-[16px] lg:pb-[8px]",
-                      "xl:pt-[60px] xl:pr-[20px] xl:pb-[10px]",
-                      "2xl:pt-[70px] 2xl:pr-[24px] 2xl:pb-[12px]"
+                      "lg:pt-[calc(70*var(--rpx))] lg:pb-[calc(12*var(--rpx))]",
                     )}
                   >
                     <FeatureImageLayout
@@ -315,14 +296,20 @@ export default function ServiceFeatures({ data }: Props) {
                           // 当前点的位置
                           const currentDotPos = dotPositions[activeIndex];
                           // 下一个点的位置（最后一个item特殊处理）
-                          const nextDotPos = activeIndex === featuresLength - 1 ? 100 : dotPositions[activeIndex + 1];
+                          const nextDotPos =
+                            activeIndex === featuresLength - 1
+                              ? 100
+                              : dotPositions[activeIndex + 1];
                           // 当前段的长度
-                          const currentSegmentLength = nextDotPos - currentDotPos;
+                          const currentSegmentLength =
+                            nextDotPos - currentDotPos;
 
                           // 进度条宽度 = 当前点位置 + 当前段进度
-                          const progressWidth = currentDotPos + (progress / 100) * currentSegmentLength;
+                          const progressWidth =
+                            currentDotPos +
+                            (progress / 100) * currentSegmentLength;
                           return `${progressWidth}%`;
-                        })()
+                        })(),
                       }}
                     />
 
@@ -341,7 +328,7 @@ export default function ServiceFeatures({ data }: Props) {
                             className="absolute bottom-0 flex flex-col items-center group"
                             style={{
                               left: `${dotPosition}%`,
-                              transform: "translateX(-50%)"
+                              transform: "translateX(-50%)",
                             }}
                           >
                             {/* 标签文字 - 移动端隐藏，桌面端活跃时有上下浮动动画 */}
@@ -350,7 +337,7 @@ export default function ServiceFeatures({ data }: Props) {
                                 "hidden lg:block",
                                 "text-[12px] xl:text-[14px] font-anaheim font-semibold",
                                 "whitespace-nowrap mb-2",
-                                "text-[#756F3F]"
+                                "text-[#756F3F]",
                               )}
                               initial={false}
                               animate={
@@ -387,7 +374,7 @@ export default function ServiceFeatures({ data }: Props) {
                                 "w-2.5 h-2.5 lg:w-3 lg:h-3 rounded-full transition-colors duration-300",
                                 isActive || isPassed
                                   ? "bg-[#756F3F]"
-                                  : "bg-[#D9D9D9] group-hover:bg-[#756F3F]"
+                                  : "bg-[#D9D9D9] group-hover:bg-[#756F3F]",
                               )}
                             />
                           </button>
