@@ -104,6 +104,9 @@ const nextConfig = {
       '@radix-ui/react-dialog',
       '@radix-ui/react-dropdown-menu',
     ],
+    // 限制并发构建，防止压垮本地 CMS 导致 fetch ETIMEDOUT
+    workerThreads: false,
+    cpus: 1,
   },
 
   /**
