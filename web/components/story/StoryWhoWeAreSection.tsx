@@ -18,7 +18,7 @@ interface StoryWhoWeAreSectionProps {
     titleNodes: LexicalTextNode[] | null
     content: string
     description: string
-    bgImage: string
+    bgImage: any
   }
 }
 

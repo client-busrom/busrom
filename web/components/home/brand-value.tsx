@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import type { BrandValueData } from "@/lib/content-data";
 import { cn } from "@/lib/utils";
@@ -16,7 +16,14 @@ const DESIGN_WIDTH = 1920;
 
 export default function BrandValue({ data }: Props) {
   // Guard: if no data, don't render
-  if (!data || !data.param1 || !data.param2 || !data.slogan || !data.value || !data.vision) {
+  if (
+    !data ||
+    !data.param1 ||
+    !data.param2 ||
+    !data.slogan ||
+    !data.value ||
+    !data.vision
+  ) {
     return null;
   }
 
@@ -32,12 +39,14 @@ export default function BrandValue({ data }: Props) {
   ];
 
   return (
-    <section className="pt-20 pb-16 lg:pt-24 lg:pb-16 bg-brand-main" data-header-theme="light">
+    <section
+      className="pt-20 pb-16 lg:pt-24 lg:pb-16 bg-brand-main"
+      data-header-theme="light"
+    >
       <div className="container mx-auto">
-
         {/* 移动端标题 */}
         <div className="flex flex-col md:hidden mb-6">
-          <h2 className="font-anaheim font-extrabold text-2xl text-stroke-black mb-1">
+          <h2 className="font-anaheim font-extrabold text-xl text-stroke-black mb-1">
             {data.title}
           </h2>
           <p className="font-anaheim font-extrabold text-2xl text-brand-text-black">
@@ -50,7 +59,7 @@ export default function BrandValue({ data }: Props) {
           <h2
             className="font-anaheim font-extrabold text-stroke-black"
             style={{
-              fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
+              fontSize: `${(70 / DESIGN_WIDTH) * 100}vw`,
               lineHeight: `${(67 / DESIGN_WIDTH) * 100}vw`,
               marginBottom: `${(16 / DESIGN_WIDTH) * 100}vw`,
             }}
@@ -60,7 +69,7 @@ export default function BrandValue({ data }: Props) {
           <p
             className="font-anaheim font-extrabold text-brand-text-black"
             style={{
-              fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
+              fontSize: `${(80 / DESIGN_WIDTH) * 100}vw`,
               lineHeight: `${(67 / DESIGN_WIDTH) * 100}vw`,
             }}
           >
@@ -89,14 +98,18 @@ export default function BrandValue({ data }: Props) {
                 key={index}
                 className={cn(
                   "relative flex flex-col items-center justify-center group",
-                  extendsDown ? "self-end" : "self-start"
+                  extendsDown ? "self-end" : "self-start",
                 )}
                 style={{
                   width: `${(304 / DESIGN_WIDTH) * 100}vw`,
                   height: `${(262 / DESIGN_WIDTH) * 100}vw`,
                   // 初始位置在容器中间
-                  marginTop: !extendsDown ? `${(261.5 / DESIGN_WIDTH) * 100}vw` : undefined,
-                  marginBottom: extendsDown ? `${(261.5 / DESIGN_WIDTH) * 100}vw` : undefined,
+                  marginTop: !extendsDown
+                    ? `${(261.5 / DESIGN_WIDTH) * 100}vw`
+                    : undefined,
+                  marginBottom: extendsDown
+                    ? `${(261.5 / DESIGN_WIDTH) * 100}vw`
+                    : undefined,
                 }}
               >
                 {/* 图片容器：只改变 height，定位从一开始就固定 */}
@@ -104,7 +117,7 @@ export default function BrandValue({ data }: Props) {
                   id={imageContainerId}
                   className={cn(
                     "absolute left-0 right-0 rounded-xl overflow-hidden transition-[height] duration-500 ease-in-out",
-                    extendsDown ? "top-0" : "bottom-0"
+                    extendsDown ? "top-0" : "bottom-0",
                   )}
                   style={{ height: `${(262 / DESIGN_WIDTH) * 100}vw` }}
                   onMouseEnter={(e) => {
@@ -129,19 +142,23 @@ export default function BrandValue({ data }: Props) {
                   {item.title && (
                     <h3
                       className="font-anaheim font-semibold text-white tracking-wider whitespace-pre-line"
-                      style={{ fontSize: `${(24 / DESIGN_WIDTH) * 100}vw` }}
+                      style={{ fontSize: `${(20 / DESIGN_WIDTH) * 100}vw` }}
                     >
-                      {item.title.replace(/\\n|\/n/g, '\n')}
+                      {item.title.replace(/\\n|\/n/g, "\n")}
                     </h3>
                   )}
                   <p
                     className="font-anaheim font-medium text-white whitespace-pre-line"
                     style={{
-                      fontSize: item.title ? `${(20 / DESIGN_WIDTH) * 100}vw` : `${(24 / DESIGN_WIDTH) * 100}vw`,
-                      marginTop: item.title ? `${(4 / DESIGN_WIDTH) * 100}vw` : 0,
+                      fontSize: item.title
+                        ? `${(16 / DESIGN_WIDTH) * 100}vw`
+                        : `${(20 / DESIGN_WIDTH) * 100}vw`,
+                      marginTop: item.title
+                        ? `${(4 / DESIGN_WIDTH) * 100}vw`
+                        : 0,
                     }}
                   >
-                    {item.description.replace(/\\n|\/n/g, '\n')}
+                    {item.description.replace(/\\n|\/n/g, "\n")}
                   </p>
                 </div>
               </div>
@@ -174,17 +191,18 @@ export default function BrandValue({ data }: Props) {
                     {item.title}
                   </h3>
                 )}
-                <p className={cn(
-                  "text-white/90 text-sm",
-                  item.title ? "mt-1" : "mt-0"
-                )}>
+                <p
+                  className={cn(
+                    "text-white/90 text-sm",
+                    item.title ? "mt-1" : "mt-0",
+                  )}
+                >
                   {item.description}
                 </p>
               </div>
             </div>
           ))}
         </div>
-
       </div>
     </section>
   );

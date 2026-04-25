@@ -43,13 +43,13 @@ export interface OurStoryData {
     content: string;
     descriptionNodes: any[];
     items: string[];
-    heroImage: string;
+    heroImage: MediaObject | null;
   };
   whoWeAre: {
     titleNodes: any[];
     content: string;
     description: string;
-    bgImage: string;
+    bgImage: MediaObject | null;
   };
   brandPosition: {
     title: string;
@@ -60,7 +60,7 @@ export interface OurStoryData {
       autoplay: boolean;
       interval: number;
     };
-    image: string;
+    image: MediaObject | null;
   };
   brandStory: {
     title: string;
@@ -68,7 +68,7 @@ export interface OurStoryData {
     bgTextTop: string;
     bgTextBottom: string;
     items: CarouselData;
-    bgImage: string;
+    bgImage: MediaObject | null;
   };
   brandHighlights: {
     title: string;
@@ -80,7 +80,7 @@ export interface OurStoryData {
   };
   brandTravel: {
     title: string;
-    image: string;
+    image: MediaObject | null;
     items: CarouselSlide[];
   };
   sustainability: {
@@ -349,7 +349,7 @@ export function parseOurStoryData(locale: string, rawData: any): OurStoryData {
     content: extractTextAfterMarker(children, "hero-section-content") || "",
     descriptionNodes: extractNodeChildrenAfterMarker(children, "hero-section-description") || [],
     items: extractListAfterMarker(children, "hero-section-item"),
-    heroImage: convertToCDNUrl(extractImageAfterMarker(children, "hero-section-image", mediaData)?.url || "/BusromFooterBg_original.webp")
+    heroImage: resolveImage(extractImageAfterMarker(children, "hero-section-image", mediaData)) || "/BusromFooterBg_original.webp"
   };
 
   // Who We Are
@@ -358,7 +358,7 @@ export function parseOurStoryData(locale: string, rawData: any): OurStoryData {
     content: extractTextAfterMarker(children, "who-we-are-content") || "",
     description: extractTextAfterMarker(children, "who-we-are-description") || 
                   extractTextAfterMarker(children, "who-we-are-descripition") || "",
-    bgImage: convertToCDNUrl(extractImageAfterMarker(children, "who-we-are-bg-image", mediaData)?.url || "/BusromFooterBg_original.webp")
+    bgImage: resolveImage(extractImageAfterMarker(children, "who-we-are-bg-image", mediaData)) || "/BusromFooterBg_original.webp"
   };
 
   // Brand Position
@@ -367,7 +367,7 @@ export function parseOurStoryData(locale: string, rawData: any): OurStoryData {
     subtitle: extractTextAfterMarker(children, "brand-position-subtitle") || "BRAND Philosophy",
     description: extractTextAfterMarker(children, "brand-position-description") || "",
     items: extractCarouselAfterMarker(children, "brand-position-item", mediaData),
-    image: convertToCDNUrl(extractImageAfterMarker(children, "brand-position-image", mediaData)?.url || "/BusromFooterBg_original.webp")
+    image: resolveImage(extractImageAfterMarker(children, "brand-position-image", mediaData)) || "/BusromFooterBg_original.webp"
   };
 
   // Brand Story
@@ -377,7 +377,7 @@ export function parseOurStoryData(locale: string, rawData: any): OurStoryData {
     bgTextTop: extractTextAfterMarker(children, "brand-story-bg-text-top") || "HISTORY",
     bgTextBottom: extractTextAfterMarker(children, "brand-story-bg-text-bottom") || "STORY",
     items: extractCarouselAfterMarker(children, "brand-story-item", mediaData),
-    bgImage: extractImageAfterMarker(children, "brand-story-bg-image", mediaData)?.url || "/BusromFooterBg_original.webp"
+    bgImage: resolveImage(extractImageAfterMarker(children, "brand-story-bg-image", mediaData)) || "/BusromFooterBg_original.webp"
   };
 
   // Highlights
@@ -398,7 +398,7 @@ export function parseOurStoryData(locale: string, rawData: any): OurStoryData {
   // Travel/Journey
   const brandTravelData = {
     title: extractTextAfterMarker(children, "brand-travel-title") || "Brand Journey",
-    image: extractImageAfterMarker(children, "brand-travel-image", mediaData)?.url || "/BusromFooterBg_original.webp",
+    image: resolveImage(extractImageAfterMarker(children, "brand-travel-image", mediaData)) || "/BusromFooterBg_original.webp",
     items: extractCarouselAfterMarker(children, "brand-travel-item", mediaData).slides
   };
 

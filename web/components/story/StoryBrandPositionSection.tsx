@@ -30,7 +30,7 @@ interface StoryBrandPositionSectionProps {
       autoplay: boolean
       interval: number
     }
-    image: string
+    image: any
   }
 }
 

@@ -20,7 +20,7 @@ interface StoryHeroSectionProps {
     content: string
     descriptionNodes: LexicalTextNode[] | null
     items: string[]
-    heroImage: string
+    heroImage: any // Use any or specific MediaObject to be safe
   }
 }
 

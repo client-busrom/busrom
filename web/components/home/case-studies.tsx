@@ -1,11 +1,21 @@
 "use client";
 
 import * as React from "react";
+import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
-import type { CaseStudiesData, CaseStudyApplication, ImageObject } from "@/lib/content-data";
+import type {
+  CaseStudiesData,
+  CaseStudyApplication,
+  ImageObject,
+} from "@/lib/content-data";
 
 type Props = {
   data: CaseStudiesData;
@@ -31,10 +41,9 @@ const LAYOUT = {
   // 导航按钮
   nav: {
     y: 62,
-    size: 88,
-    leftX: 1485,
-    rightX: 1673,
-    gap: 100, // 1673 - 1485 - 88 = 100
+    size: 64,
+    leftX: 1580,
+    gap: 24,
   },
 
   // 图片区域
@@ -105,35 +114,38 @@ export default function CaseStudies({ data }: Props) {
   }
 
   // 获取展示图片：优先使用后端预选的 displayImages，否则回退到 sceneGallery
-  const getDisplayImages = React.useCallback((app: CaseStudyApplication): ImageObject[] => {
-    // 优先使用后端预选的 displayImages
-    if (app.displayImages && app.displayImages.length > 0) {
-      return app.displayImages.slice(0, 3);
-    }
+  const getDisplayImages = React.useCallback(
+    (app: CaseStudyApplication): ImageObject[] => {
+      // 优先使用后端预选的 displayImages
+      if (app.displayImages && app.displayImages.length > 0) {
+        return app.displayImages.slice(0, 3);
+      }
 
-    // 回退逻辑：从 sceneGallery 中提取（兼容旧数据）
-    const images: ImageObject[] = [];
-    const scenes = app.sceneGallery || [];
+      // 回退逻辑：从 sceneGallery 中提取（兼容旧数据）
+      const images: ImageObject[] = [];
+      const scenes = app.sceneGallery || [];
 
-    for (let i = 0; i < Math.min(3, scenes.length); i++) {
-      const scene = scenes[i];
-      if (scene.images && scene.images.length > 0) {
-        const img = scene.images[0];
-        if (img) {
-          images.push(img);
+      for (let i = 0; i < Math.min(3, scenes.length); i++) {
+        const scene = scenes[i];
+        if (scene.images && scene.images.length > 0) {
+          const img = scene.images[0];
+          if (img) {
+            images.push(img);
+          }
         }
       }
-    }
 
-    return images;
-  }, []);
+      return images;
+    },
+    [],
+  );
 
   // rpx 转换函数
   const rpx = (px: number) => `calc(var(--rpx) * ${px})`;
 
   return (
     <section
-      className="relative bg-brand-main md:py-0 py-12"
+      className="relative bg-brand-main md:pb-24 py-12"
       data-header-theme="light"
     >
       {/* ==================== 移动端布局 ==================== */}
@@ -153,17 +165,22 @@ export default function CaseStudies({ data }: Props) {
             <Button
               variant="outline"
               size="icon"
-              className="w-10 h-10 rounded-full border-[#756F3F] text-[#756F3F] hover:bg-[#756F3F] hover:text-white disabled:opacity-50"
-              onClick={() => mobileApi?.scrollPrev()}
-              disabled={!mobileCanScrollPrev}
+              className={cn(
+                "w-10 h-10 rounded-full border-[#756F3F] text-[#756F3F] hover:bg-[#756F3F] hover:text-white transition-colors",
+                !mobileCanScrollPrev && "opacity-50 cursor-not-allowed",
+              )}
+              onClick={() => mobileCanScrollPrev && mobileApi?.scrollPrev()}
             >
               <ChevronLeft className="w-5 h-5" />
             </Button>
             <Button
+              variant="outline"
               size="icon"
-              className="w-10 h-10 rounded-full bg-[#756F3F] text-white hover:bg-[#5a5530] disabled:opacity-50"
-              onClick={() => mobileApi?.scrollNext()}
-              disabled={!mobileCanScrollNext}
+              className={cn(
+                "w-10 h-10 rounded-full border-[#756F3F] text-[#756F3F] hover:bg-[#756F3F] hover:text-white transition-colors",
+                !mobileCanScrollNext && "opacity-50 cursor-not-allowed",
+              )}
+              onClick={() => mobileCanScrollNext && mobileApi?.scrollNext()}
             >
               <ChevronRight className="w-5 h-5" />
             </Button>
@@ -183,12 +200,18 @@ export default function CaseStudies({ data }: Props) {
                     <div className="relative aspect-[16/10] rounded-xl overflow-hidden">
                       <OptimizedImage
                         image={displayImages[0]}
-                        alt={displayImages[0]?.altText || application.name || "Case study"}
+                        alt={
+                          displayImages[0]?.altText ||
+                          application.name ||
+                          "Case study"
+                        }
                         size="medium"
                         className="object-cover w-full h-full"
                       />
                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                        <h3 className="text-white font-bold font-anaheim text-lg">{application.name}</h3>
+                        <h3 className="text-white font-bold font-anaheim text-lg">
+                          {application.name}
+                        </h3>
                       </div>
                     </div>
                     {/* 小图 */}
@@ -240,7 +263,7 @@ export default function CaseStudies({ data }: Props) {
             fontSize: rpx(LAYOUT.header.titleFontSize),
             lineHeight: rpx(LAYOUT.header.titleLineHeight),
             WebkitTextStroke: `calc(4 * var(--rpx)) #756f3f`,
-            paintOrder: 'stroke fill',
+            paintOrder: "stroke fill",
           }}
         >
           {data.title}
@@ -252,7 +275,11 @@ export default function CaseStudies({ data }: Props) {
           style={{
             fontSize: rpx(LAYOUT.header.subtitleFontSize),
             lineHeight: rpx(LAYOUT.header.subtitleLineHeight),
-            marginTop: rpx(LAYOUT.header.subtitleY - LAYOUT.header.titleY - LAYOUT.header.titleLineHeight),
+            marginTop: rpx(
+              LAYOUT.header.subtitleY -
+                LAYOUT.header.titleY -
+                LAYOUT.header.titleLineHeight,
+            ),
           }}
         >
           {data.description}
@@ -260,7 +287,7 @@ export default function CaseStudies({ data }: Props) {
 
         {/* 导航按钮 - 绝对定位 */}
         <div
-          className="absolute flex"
+          className="absolute flex z-20"
           style={{
             top: rpx(LAYOUT.nav.y),
             left: rpx(LAYOUT.nav.leftX),
@@ -270,28 +297,33 @@ export default function CaseStudies({ data }: Props) {
           <Button
             variant="outline"
             size="icon"
-            className="rounded-full border-[#756F3F] text-[#756F3F] transition-colors hover:bg-[#756F3F] hover:text-white disabled:opacity-50"
+            className={cn(
+              "rounded-full border-[#756F3F] text-[#756F3F] transition-colors hover:bg-[#756F3F] hover:text-white",
+              !desktopCanScrollPrev && "opacity-50 cursor-not-allowed",
+            )}
             style={{
               width: rpx(LAYOUT.nav.size),
               height: rpx(LAYOUT.nav.size),
             }}
-            onClick={() => desktopApi?.scrollPrev()}
-            disabled={!desktopCanScrollPrev}
+            onClick={() => desktopCanScrollPrev && desktopApi?.scrollPrev()}
           >
-            <ChevronLeft style={{ width: rpx(20), height: rpx(34) }} />
+            <ChevronLeft style={{ width: rpx(32), height: rpx(32) }} />
             <span className="sr-only">Previous slide</span>
           </Button>
           <Button
+            variant="outline"
             size="icon"
-            className="rounded-full bg-[#756F3F] text-white transition-colors hover:bg-[#5a5530] disabled:opacity-50"
+            className={cn(
+              "rounded-full border-[#756F3F] text-[#756F3F] transition-colors hover:bg-[#756F3F] hover:text-white",
+              !desktopCanScrollNext && "opacity-50 cursor-not-allowed",
+            )}
             style={{
               width: rpx(LAYOUT.nav.size),
               height: rpx(LAYOUT.nav.size),
             }}
-            onClick={() => desktopApi?.scrollNext()}
-            disabled={!desktopCanScrollNext}
+            onClick={() => desktopCanScrollNext && desktopApi?.scrollNext()}
           >
-            <ChevronRight style={{ width: rpx(20), height: rpx(34) }} />
+            <ChevronRight style={{ width: rpx(32), height: rpx(32) }} />
             <span className="sr-only">Next slide</span>
           </Button>
         </div>
@@ -299,11 +331,18 @@ export default function CaseStudies({ data }: Props) {
         {/* 轮播图区域 */}
         <div
           style={{
-            marginTop: rpx(LAYOUT.images.mainY - LAYOUT.header.subtitleY - LAYOUT.header.subtitleLineHeight),
+            marginTop: rpx(
+              LAYOUT.images.mainY -
+                LAYOUT.header.subtitleY -
+                LAYOUT.header.subtitleLineHeight,
+            ),
             marginLeft: rpx(LAYOUT.images.mainX - LAYOUT.paddingLeft),
           }}
         >
-          <Carousel setApi={setDesktopApi} opts={{ loop: false, align: "start" }}>
+          <Carousel
+            setApi={setDesktopApi}
+            opts={{ loop: false, align: "start" }}
+          >
             <CarouselContent>
               {data.applications.map((application, appIndex) => {
                 const displayImages = getDisplayImages(application);
@@ -326,7 +365,11 @@ export default function CaseStudies({ data }: Props) {
                       >
                         <OptimizedImage
                           image={displayImages[0]}
-                          alt={displayImages[0]?.altText || application.name || "Case study main"}
+                          alt={
+                            displayImages[0]?.altText ||
+                            application.name ||
+                            "Case study main"
+                          }
                           size="large"
                           className="object-cover w-full h-full"
                         />
@@ -363,8 +406,12 @@ export default function CaseStudies({ data }: Props) {
                         <div
                           className="absolute flex flex-col"
                           style={{
-                            left: rpx(LAYOUT.images.smallX - LAYOUT.images.mainX),
-                            top: rpx(LAYOUT.images.small1Y - LAYOUT.images.mainY),
+                            left: rpx(
+                              LAYOUT.images.smallX - LAYOUT.images.mainX,
+                            ),
+                            top: rpx(
+                              LAYOUT.images.small1Y - LAYOUT.images.mainY,
+                            ),
                             gap: rpx(LAYOUT.images.smallGap),
                           }}
                         >
@@ -380,7 +427,10 @@ export default function CaseStudies({ data }: Props) {
                             >
                               <OptimizedImage
                                 image={displayImages[1]}
-                                alt={displayImages[1]?.altText || "Case study detail 1"}
+                                alt={
+                                  displayImages[1]?.altText ||
+                                  "Case study detail 1"
+                                }
                                 size="small"
                                 className="object-cover w-full h-full"
                               />
@@ -399,7 +449,10 @@ export default function CaseStudies({ data }: Props) {
                             >
                               <OptimizedImage
                                 image={displayImages[2]}
-                                alt={displayImages[2]?.altText || "Case study detail 2"}
+                                alt={
+                                  displayImages[2]?.altText ||
+                                  "Case study detail 2"
+                                }
                                 size="small"
                                 className="object-cover w-full h-full"
                               />

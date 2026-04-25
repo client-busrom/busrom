@@ -32,7 +32,7 @@ interface StoryBrandStorySectionProps {
       autoplay: boolean
       interval: number
     }
-    bgImage: string
+    bgImage: any
   }
 }
 

@@ -190,7 +190,7 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
 
         {/* 4. Hero Image */}
         {(() => {
-          const imageMaskSvg = `<svg width="700" height="450" viewBox="0 0 700 450" xmlns="http://www.w3.org/2000/svg"><path d="${imageClipPath}" fill="black"/></svg>`
+          const imageMaskSvg = `<svg xmlns='http://www.w3.org/2000/svg' width='700' height='450' viewBox='0 0 700 450'><path d='${imageClipPath}' fill='black'/></svg>`
           const imgMaskUrl = `url("data:image/svg+xml,${encodeURIComponent(imageMaskSvg)}")`
           
           return (
@@ -206,11 +206,12 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
                 WebkitMaskRepeat: "no-repeat",
                 maskRepeat: "no-repeat",
                 WebkitMaskSize: "100% 100%",
-                maskSize: "100% 100%"
+                maskSize: "100% 100%",
+                backgroundColor: "#ede8c2" // Background fallback to see the shape if image fails
               }}
             >
               <OptimizedImage 
-                image={data.image?.url || "/BusromFooterBg_original.webp"} 
+                image={data.image || "/BusromFooterBg_original.webp"} 
                 alt="Support Hero" 
                 className="object-cover w-full h-full"
                 size="large"

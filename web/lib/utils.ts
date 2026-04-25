@@ -134,8 +134,8 @@ export function getVariantUrl(
     }
   }
 
-  // 最后后备：原始图 (xlarge/original) -> 占位图
-  const finalUrl = image.url || getUrl(variants.xlarge)
+  // 最后后备：原始图 (xlarge/original) -> 原始 url/fileUrl -> 占位图
+  const finalUrl = image.url || (image as any).fileUrl || (image as any).file?.url || getUrl(variants.xlarge)
   return finalUrl ? convertToCDNUrl(finalUrl, strategy) : '/images/placeholder.jpg'
 }
 

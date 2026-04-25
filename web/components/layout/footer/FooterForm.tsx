@@ -26,6 +26,8 @@ const formButtonClasses = `
   w-1/3 rounded-full bg-brand-footer-button-bg
   text-brand-footer-button-text font-anaheim font-semibold
   hover:bg-brand-footer-button-bg/90
+  transition-all duration-300
+  hover:scale-110 active:scale-95
 `;
 
 export default function FooterForm({ locale, formConfig, content, turnstileSiteKey, onSuccess }: Props) {
@@ -103,7 +105,7 @@ export default function FooterForm({ locale, formConfig, content, turnstileSiteK
   };
 
   return (
-    <div className="w-full lg:w-[40%]">
+    <div className="w-full lg:w-[45%]">
       <h3 className="relative font-bold font-anaheim text-4xl md:text-5xl lg:text-5xl xl:text-6xl mb-8 lg:mb-12">
         <span className="absolute text-transparent" style={{ WebkitTextStroke: '1px white', top: '2px', left: '2px' }}>
           {content.form.title}
@@ -111,9 +113,9 @@ export default function FooterForm({ locale, formConfig, content, turnstileSiteK
         <span className="relative text-white">{content.form.title}</span>
       </h3>
 
-      <form className="flex flex-col gap-4 lg:gap-5" onSubmit={handleSubmit}>
+      <form className="flex flex-col gap-6 lg:gap-8" onSubmit={handleSubmit}>
         <Input
-          placeholder={content.form.placeholders.name}
+          placeholder={`${content.form.placeholders.name} *`}
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           className={cn(formInputClasses, "text-base md:text-lg lg:text-xl xl:text-2xl")}
@@ -121,17 +123,17 @@ export default function FooterForm({ locale, formConfig, content, turnstileSiteK
         />
         <Input
           type="email"
-          placeholder={content.form.placeholders.email}
+          placeholder={`${content.form.placeholders.email} *`}
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           className={cn(formInputClasses, "text-base md:text-lg lg:text-xl xl:text-2xl")}
           disabled={isSubmitting}
         />
         <Textarea
-          placeholder={content.form.placeholders.message}
+          placeholder={`${content.form.placeholders.message} *`}
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          className={cn(formInputClasses, "min-h-[60px] text-base md:text-lg lg:text-xl xl:text-2xl")}
+          className={cn(formInputClasses, "min-h-[80px] text-base md:text-lg lg:text-xl xl:text-2xl")}
           disabled={isSubmitting}
         />
 

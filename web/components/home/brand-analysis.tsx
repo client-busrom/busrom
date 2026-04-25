@@ -3,7 +3,10 @@
 import * as React from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { OptimizedImage, OptimizedBackgroundImage } from "@/components/ui/OptimizedImage";
+import {
+  OptimizedImage,
+  OptimizedBackgroundImage,
+} from "@/components/ui/OptimizedImage";
 import {
   Carousel,
   CarouselContent,
@@ -112,7 +115,7 @@ export default function BrandAnalysis({ data }: Props) {
             <div
               key={index}
               className="absolute inset-0 z-0 transition-opacity duration-700"
-              style={{ opacity: currentSlide === index ? 1 : 0 }}
+              style={{ opacity: currentSlide === index ? 0.35 : 0 }}
             >
               <OptimizedBackgroundImage
                 image={bgImage}
@@ -127,7 +130,10 @@ export default function BrandAnalysis({ data }: Props) {
       {/* ==================== 移动端布局 (<1024px) ==================== */}
       <div className="lg:hidden relative px-4 pt-16 pb-12 overflow-hidden">
         {/* 图形区域 - 与桌面端结构一致，圆心水平对齐，整体居中 */}
-        <div className="relative w-full mb-4" style={{ aspectRatio: "1 / 0.55" }}>
+        <div
+          className="relative w-full mb-4"
+          style={{ aspectRatio: "1 / 0.55" }}
+        >
           <Carousel
             setApi={setMobileApi}
             className="w-full h-full"
@@ -140,77 +146,77 @@ export default function BrandAnalysis({ data }: Props) {
               {data.centers.map((center, index) => {
                 const isActive = currentSlide === index;
                 return (
-                <CarouselItem
-                  key={center.title || index}
-                  className="relative h-full p-0"
-                  style={{
-                    zIndex: isActive ? 10 : 1,
-                    pointerEvents: isActive ? 'auto' : 'none',
-                  }}
-                >
-                  <div className="relative w-full h-full">
-                    {/*
+                  <CarouselItem
+                    key={center.title || index}
+                    className="relative h-full p-0"
+                    style={{
+                      zIndex: isActive ? 10 : 1,
+                      pointerEvents: isActive ? "auto" : "none",
+                    }}
+                  >
+                    <div className="relative w-full h-full">
+                      {/*
                       圆心水平对齐计算（居中布局）：
                       - 整体宽度约 85%，left 偏移 7.5% 实现居中
                       - 大圆: 50% 宽度
                       - 外环: 38% 宽度
                       - 小圆: 14% 宽度，在外环中心
                     */}
-                    {/* 大圆 */}
-                    <div
-                      className="absolute rounded-full overflow-hidden bg-[#d9d9d9]"
-                      style={{
-                        width: "50%",
-                        aspectRatio: "1",
-                        left: "8%",
-                        top: "50%",
-                        transform: "translateY(-50%)"
-                      }}
-                    >
-                      {center.largeImage && (
-                        <OptimizedImage
-                          image={center.largeImage}
-                          alt={center.title}
-                          size="medium"
-                          className="object-cover w-full h-full"
-                        />
-                      )}
-                    </div>
+                      {/* 大圆 */}
+                      <div
+                        className="absolute rounded-full overflow-hidden bg-[#d9d9d9]"
+                        style={{
+                          width: "50%",
+                          aspectRatio: "1",
+                          left: "8%",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                        }}
+                      >
+                        {center.largeImage && (
+                          <OptimizedImage
+                            image={center.largeImage}
+                            alt={center.title}
+                            size="medium"
+                            className="object-cover w-full h-full"
+                          />
+                        )}
+                      </div>
 
-                    {/* 外环 */}
-                    <div
-                      className="absolute rounded-full border border-white"
-                      style={{
-                        width: "38%",
-                        aspectRatio: "1",
-                        left: "46%",
-                        top: "50%",
-                        transform: "translateY(-50%)"
-                      }}
-                    />
+                      {/* 外环 */}
+                      <div
+                        className="absolute rounded-full border border-white"
+                        style={{
+                          width: "38%",
+                          aspectRatio: "1",
+                          left: "46%",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                        }}
+                      />
 
-                    {/* 小圆 - 在外环中心 */}
-                    <div
-                      className="absolute rounded-full overflow-hidden bg-[#d9d9d9]"
-                      style={{
-                        width: "14%",
-                        aspectRatio: "1",
-                        left: "58%",
-                        top: "50%",
-                        transform: "translateY(-50%)"
-                      }}
-                    >
-                      {center.smallImage && (
-                        <OptimizedImage
-                          image={center.smallImage}
-                          alt={`${center.title} detail`}
-                          size="small"
-                          className="object-cover w-full h-full"
-                        />
-                      )}
+                      {/* 小圆 - 在外环中心 */}
+                      <div
+                        className="absolute rounded-full overflow-hidden bg-[#d9d9d9]"
+                        style={{
+                          width: "14%",
+                          aspectRatio: "1",
+                          left: "58%",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                        }}
+                      >
+                        {center.smallImage && (
+                          <OptimizedImage
+                            image={center.smallImage}
+                            alt={`${center.title} detail`}
+                            size="small"
+                            className="object-cover w-full h-full"
+                          />
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </CarouselItem>
+                  </CarouselItem>
                 );
               })}
             </CarouselContent>
@@ -232,20 +238,18 @@ export default function BrandAnalysis({ data }: Props) {
           <button
             onClick={() => mobileApi?.scrollPrev()}
             disabled={!canScrollPrev}
-            className="w-12 h-12 rounded-full flex items-center justify-center disabled:opacity-30"
-            style={{ background: "rgba(255, 255, 255, 0.23)" }}
+            className="w-12 h-12 rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
             aria-label="Previous slide"
           >
-            <ChevronLeft className="w-5 h-5 text-white" />
+            <ChevronLeft className="w-8 h-8 text-white" />
           </button>
           <button
             onClick={() => mobileApi?.scrollNext()}
             disabled={!canScrollNext}
-            className="w-12 h-12 rounded-full flex items-center justify-center disabled:opacity-30"
-            style={{ background: "rgba(255, 255, 255, 0.54)" }}
+            className="w-12 h-12 rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
             aria-label="Next slide"
           >
-            <ChevronRight className="w-5 h-5 text-white" />
+            <ChevronRight className="w-8 h-8 text-white" />
           </button>
         </div>
 
@@ -299,79 +303,79 @@ export default function BrandAnalysis({ data }: Props) {
                 {data.centers.map((center, index) => {
                   const isActive = currentSlide === index;
                   return (
-                  <CarouselItem
-                    key={center.title || index}
-                    className="relative h-full p-0"
-                    style={{
-                      zIndex: isActive ? 10 : 1,
-                      pointerEvents: isActive ? 'auto' : 'none',
-                    }}
-                  >
-                    <div className="relative w-full h-full">
-                      {/* 大圆 - x:0, y:0, 555x555 相对于 939x555 容器 */}
-                      <div
-                        className="absolute rounded-full overflow-hidden bg-[#d9d9d9]"
-                        style={{
-                          left: "0%",
-                          top: "0%",
-                          width: `${(555 / 939) * 100}%`,
-                          height: "100%",
-                        }}
-                      >
-                        {center.largeImage && (
-                          <OptimizedImage
-                            image={center.largeImage}
-                            alt={center.title}
-                            size="medium"
-                            className="object-cover w-full h-full"
-                          />
-                        )}
+                    <CarouselItem
+                      key={center.title || index}
+                      className="relative h-full p-0"
+                      style={{
+                        zIndex: isActive ? 10 : 1,
+                        pointerEvents: isActive ? "auto" : "none",
+                      }}
+                    >
+                      <div className="relative w-full h-full">
+                        {/* 大圆 - x:0, y:0, 555x555 相对于 939x555 容器 */}
+                        <div
+                          className="absolute rounded-full overflow-hidden bg-[#d9d9d9]"
+                          style={{
+                            left: "0%",
+                            top: "0%",
+                            width: `${(555 / 939) * 100}%`,
+                            height: "100%",
+                          }}
+                        >
+                          {center.largeImage && (
+                            <OptimizedImage
+                              image={center.largeImage}
+                              alt={center.title}
+                              size="medium"
+                              className="object-cover w-full h-full"
+                            />
+                          )}
+                        </div>
+
+                        {/* 外环 - x:441, y:29, 498x498 */}
+                        <div
+                          className="absolute rounded-full border border-white"
+                          style={{
+                            left: `${(441 / 939) * 100}%`,
+                            top: `${(29 / TOP_HEIGHT) * 100}%`,
+                            width: `${(498 / 939) * 100}%`,
+                            height: `${(498 / TOP_HEIGHT) * 100}%`,
+                          }}
+                        />
+
+                        {/* 小圆 - x:606, y:194, 168x168 */}
+                        <div
+                          className="absolute rounded-full overflow-hidden bg-[#d9d9d9]"
+                          style={{
+                            left: `${(606 / 939) * 100}%`,
+                            top: `${(194 / TOP_HEIGHT) * 100}%`,
+                            width: `${(168 / 939) * 100}%`,
+                            height: `${(168 / TOP_HEIGHT) * 100}%`,
+                          }}
+                        >
+                          {center.smallImage && (
+                            <OptimizedImage
+                              image={center.smallImage}
+                              alt={`${center.title} detail`}
+                              size="small"
+                              className="object-cover w-full h-full"
+                            />
+                          )}
+                        </div>
+
+                        {/* 标题 - x:597, y:406, 32px */}
+                        <h3
+                          className="absolute font-anaheim font-bold text-white text-center capitalize"
+                          style={{
+                            left: `${(597 / 939) * 100}%`,
+                            top: `${(406 / TOP_HEIGHT) * 100}%`,
+                            fontSize: `${(32 / DESIGN_WIDTH) * 100}vw`,
+                          }}
+                        >
+                          {center.title}
+                        </h3>
                       </div>
-
-                      {/* 外环 - x:441, y:29, 498x498 */}
-                      <div
-                        className="absolute rounded-full border border-white"
-                        style={{
-                          left: `${(441 / 939) * 100}%`,
-                          top: `${(29 / TOP_HEIGHT) * 100}%`,
-                          width: `${(498 / 939) * 100}%`,
-                          height: `${(498 / TOP_HEIGHT) * 100}%`,
-                        }}
-                      />
-
-                      {/* 小圆 - x:606, y:194, 168x168 */}
-                      <div
-                        className="absolute rounded-full overflow-hidden bg-[#d9d9d9]"
-                        style={{
-                          left: `${(606 / 939) * 100}%`,
-                          top: `${(194 / TOP_HEIGHT) * 100}%`,
-                          width: `${(168 / 939) * 100}%`,
-                          height: `${(168 / TOP_HEIGHT) * 100}%`,
-                        }}
-                      >
-                        {center.smallImage && (
-                          <OptimizedImage
-                            image={center.smallImage}
-                            alt={`${center.title} detail`}
-                            size="small"
-                            className="object-cover w-full h-full"
-                          />
-                        )}
-                      </div>
-
-                      {/* 标题 - x:597, y:406, 32px */}
-                      <h3
-                        className="absolute font-anaheim font-bold text-white text-center capitalize"
-                        style={{
-                          left: `${(597 / 939) * 100}%`,
-                          top: `${(406 / TOP_HEIGHT) * 100}%`,
-                          fontSize: `${(32 / DESIGN_WIDTH) * 100}vw`,
-                        }}
-                      >
-                        {center.title}
-                      </h3>
-                    </div>
-                  </CarouselItem>
+                    </CarouselItem>
                   );
                 })}
               </CarouselContent>
@@ -405,28 +409,26 @@ export default function BrandAnalysis({ data }: Props) {
             <button
               onClick={() => desktopApi?.scrollPrev()}
               disabled={!canScrollPrev}
-              className="rounded-full flex items-center justify-center disabled:opacity-30"
+              className="rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
               style={{
                 width: `${(88 / DESIGN_WIDTH) * 100}vw`,
                 height: `${(88 / DESIGN_WIDTH) * 100}vw`,
-                background: "rgba(255, 255, 255, 0.23)",
               }}
               aria-label="Previous slide"
             >
-              <ChevronLeft className="w-[35%] h-[35%] text-white" />
+              <ChevronLeft className="w-[50%] h-[50%] text-white" />
             </button>
             <button
               onClick={() => desktopApi?.scrollNext()}
               disabled={!canScrollNext}
-              className="rounded-full flex items-center justify-center disabled:opacity-30"
+              className="rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
               style={{
                 width: `${(88 / DESIGN_WIDTH) * 100}vw`,
                 height: `${(88 / DESIGN_WIDTH) * 100}vw`,
-                background: "rgba(255, 255, 255, 0.54)",
               }}
               aria-label="Next slide"
             >
-              <ChevronRight className="w-[35%] h-[35%] text-white" />
+              <ChevronRight className="w-[50%] h-[50%] text-white" />
             </button>
           </div>
         </div>
@@ -437,7 +439,7 @@ export default function BrandAnalysis({ data }: Props) {
           className="absolute flex justify-center"
           style={{
             left: `${(384 / DESIGN_WIDTH) * 100}%`,
-            top: `${(780 / 1150) * 100}%`,
+            top: `${(720 / 1150) * 100}%`,
             width: `${(BOTTOM_WIDTH / DESIGN_WIDTH) * 100}%`,
             aspectRatio: `${BOTTOM_WIDTH} / ${BOTTOM_HEIGHT}`,
             gap: `${(120 / DESIGN_WIDTH) * 100}vw`,

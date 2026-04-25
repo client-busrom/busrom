@@ -20,13 +20,13 @@ const TimelineIcon = () => (
 interface CarouselSlide {
   title: string
   description: string
-  image: { url: string } | null
+  image: any
 }
 
 interface StoryBrandMilestonesSectionProps {
   data: {
     title: string 
-    image: string
+    image: any
     items: CarouselSlide[]
   }
 }

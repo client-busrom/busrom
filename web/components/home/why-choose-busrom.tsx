@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef } from "react";
 import type { HomeContent } from "@/lib/content-data";
@@ -7,6 +7,7 @@ import { LucideIcon, HelpCircle, Lightbulb, ShieldCheck, Factory, Globe, Users }
 import { IconifyIcon } from "@/components/ui/IconifyIcon";
 import { cn } from "@/lib/utils";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { HollowText } from "@/components/common/HollowText";
 
 type Props = {
   data: HomeContent["whyChooseBusrom"];
@@ -128,14 +129,38 @@ export default function WhyChooseBusrom({ data }: Props) {
 
   return (
     <section ref={sectionRef} className="py-12 lg:py-0 bg-brand-main" data-header-theme="light">
+      <style jsx>{`
+        @keyframes custom-float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        .animate-custom-float {
+          animation: custom-float 3s ease-in-out infinite;
+          display: inline-block;
+          will-change: transform;
+          backface-visibility: hidden;
+        }
+      `}</style>
       <div className="container mx-auto px-4 lg:px-0" style={{ maxWidth: '100%' }}>
 
         {/* ==================== 移动端布局 ==================== */}
         <div className="lg:hidden">
-          {/* 标题 */}
           <div className="mb-6">
-            <h2 className="font-anaheim font-extrabold text-2xl text-brand-text-black">
-              {data.title} <span className="text-stroke-black">{data.title2}</span>
+            <h2 className="font-anaheim font-extrabold text-2xl text-brand-text-black flex flex-wrap gap-x-2">
+              <span
+                style={{
+                  color: "#000000",
+                  WebkitTextStroke: "0.8px #756f3f",
+                  paintOrder: "stroke fill",
+                }}
+              >
+                {data.title}
+              </span>
+              <span className="animate-custom-float">
+                <HollowText strokeColor="#756f3f" strokeWidth={0.8}>
+                  {data.title2}
+                </HollowText>
+              </span>
             </h2>
           </div>
 
@@ -186,7 +211,7 @@ export default function WhyChooseBusrom({ data }: Props) {
           <div className="flex justify-between items-end">
             {/* 左侧标题 */}
             <h2
-              className="font-anaheim font-extrabold"
+              className="font-anaheim font-extrabold flex flex-wrap gap-x-4 items-baseline"
               style={{
                 fontSize: vw(LAYOUT.header.titleFontSize),
                 lineHeight: vw(LAYOUT.header.titleLineHeight),
@@ -201,20 +226,22 @@ export default function WhyChooseBusrom({ data }: Props) {
               >
                 {data.title}
               </span>{' '}
-              <span
-                style={{
-                  color: '#f6f4ed',
-                  WebkitTextStroke: `calc(4 * var(--rpx)) #756f3f`,
-                  paintOrder: 'stroke fill',
-                }}
-              >
-                {data.title2}
+              <span className="animate-custom-float">
+                <HollowText
+                  strokeColor="#756f3f"
+                  strokeWidth={1.2}
+                >
+                  {data.title2}
+                </HollowText>
               </span>
             </h2>
 
             {/* 右侧 VIEW MORE */}
             <AnimatedLinkButton>
               VIEW MORE INFORMATION
+              <span className="ml-2 inline-block transition-transform duration-300 group-hover:translate-x-1">
+                »
+              </span>
             </AnimatedLinkButton>
           </div>
 
