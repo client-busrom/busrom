@@ -270,7 +270,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
             +{selectedCountry[2]}
           </span>
           <ChevronDown 
-            className={cn("w-3.5 h-3.5 transition-transform ml-0.5", isOpen && "rotate-180", !chevronClassName?.includes('text-') && !style?.color && "text-white opacity-50", chevronClassName)} 
+            className={cn("w-3.5 h-3.5 transition-transform ml-0.5", isOpen && "rotate-180", !chevronClassName?.includes('text-') && !style?.color && "text-white", chevronClassName)} 
             style={{ color: 'var(--text-color)' }}
           />
         </button>

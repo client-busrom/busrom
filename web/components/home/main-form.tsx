@@ -43,7 +43,7 @@ const formLabelClasses = "block font-anaheim font-bold text-brand-form-input-tex
 
 const formInputClasses = `
   mt-1 block w-full bg-transparent text-brand-form-input-text
-  placeholder:text-muted-foreground
+  placeholder:text-white/50 font-anaheim font-bold text-base
   !border-0 !border-b !border-white !rounded-none
   !outline-none !ring-0 !shadow-none
   focus:!outline-none focus:!ring-0 focus:!border-b focus:!border-white focus:!shadow-none
@@ -368,7 +368,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
   const cardContainerClass = `bg-brand-form-bg rounded-2xl px-8 py-12`;
 
   // 固定的宽高比容器 (404x837)
-  const imageCardContainerClass = `bg-[var(--card-default-background)] w-full aspect-[404/837] relative overflow-hidden`;
+  const imageCardContainerClass = `bg-transparent w-full aspect-[404/837] relative rounded-[3rem] shadow-[0_0_20px_rgba(255,255,255,0.3),0_0_60px_rgba(255,255,255,0.15),0_0_120px_rgba(255,255,255,0.1)]`;
 
   // 滚动视差动画逻辑（优化版：直接操纵 DOM，避免触发整个表单的 React Re-render）
   useEffect(() => {
@@ -439,21 +439,27 @@ export default function MainForm({ data, locale = "en" }: Props) {
             style={isDesktop ? { transform: 'translateY(500px)' } : undefined}
           >
             <div className={imageCardContainerClass}>
-              {/* 1. 底层内容图片 (z-10) */}
+              {/* 1. 底层手机框 (z-10) */}
+              <Image src="/iPhoneFrame.svg" alt="iPhone Frame" fill className="object-cover z-10" />
+
+              {/* 2. 顶层内容图片 (z-20) + SVG Mask */}
               <div
-                className="absolute overflow-hidden lg:rounded-[48px] md:rounded-[54px] sm:rounded-[30px] rounded-[24px] z-10"
+                className="absolute z-20"
                 style={{
                   top: "1.4%",
                   bottom: "1.4%",
                   left: "3.6%",
                   right: "3.6%",
+                  maskImage: "url('/iPhoneFrame-image.svg')",
+                  maskSize: "100% 100%",
+                  maskRepeat: "no-repeat",
+                  WebkitMaskImage: "url('/iPhoneFrame-image.svg')",
+                  WebkitMaskSize: "100% 100%",
+                  WebkitMaskRepeat: "no-repeat",
                 }}
               >
-                <OptimizedImage image={data.image1} alt={data.image1?.altText || data.designTextLeft} size="medium" className="object-contain w-full h-full absolute inset-0" />
+                <OptimizedImage image={data.image1} alt={data.image1?.altText || data.designTextLeft} size="medium" className="object-cover w-full h-full absolute inset-0" />
               </div>
-
-              {/* 2. 顶层手机框 (z-20) */}
-              <Image src="/iPhoneFrame.svg" alt="iPhone Frame" fill className="object-cover z-20" />
             </div>
             {/* 3. 文字遮罩 (z-30) */}
             <div className="w-full p-4 lg:p-8 z-30 flex justify-center">
@@ -496,8 +502,8 @@ export default function MainForm({ data, locale = "en" }: Props) {
                       id="name"
                       value={formData.name}
                       onChange={(e) => handleInputChange("name", e.target.value)}
+                      placeholder={getFieldPlaceholder("name", data.placeholderName)}
                       className={formInputClasses}
-                      style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
                       required={isFieldRequired("name", true)}
                     />
                   </div>
@@ -515,8 +521,8 @@ export default function MainForm({ data, locale = "en" }: Props) {
                       id="email"
                       value={formData.email}
                       onChange={(e) => handleInputChange("email", e.target.value)}
+                      placeholder={getFieldPlaceholder("email", data.placeholderEmail)}
                       className={formInputClasses}
-                      style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
                       required={isFieldRequired("email", true)}
                     />
                   </div>
@@ -537,9 +543,10 @@ export default function MainForm({ data, locale = "en" }: Props) {
                       required={isFieldRequired("whatsapp")}
                       disabled={submitting}
                       className="!bg-transparent !border-0 !border-b !border-white !rounded-none !h-[45px]"
-                      buttonClassName="!bg-transparent !border-0 !border-r !border-white/20 !text-white hover:!bg-white/5 !rounded-none !px-0 !mr-2"
+                      buttonClassName="!bg-transparent !border-0 !border-r !border-white/20 !text-brand-form-input-text hover:!bg-white/5 !rounded-none !px-0 !mr-2"
                       inputClassName="!bg-transparent !text-brand-form-input-text !placeholder-white/50 !font-anaheim !font-bold !text-base"
-                      dialCodeClassName="!text-white !text-base"
+                      dialCodeClassName="!text-brand-form-input-text !text-base"
+                      chevronClassName="!text-brand-form-input-text"
                       containerClassName="mt-1"
                     />
                   </div>
@@ -557,8 +564,8 @@ export default function MainForm({ data, locale = "en" }: Props) {
                       id="company"
                       value={formData.company}
                       onChange={(e) => handleInputChange("company", e.target.value)}
+                      placeholder={getFieldPlaceholder("company", data.placeholderCompany)}
                       className={formInputClasses}
-                      style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
                       required={isFieldRequired("company")}
                     />
                   </div>
@@ -575,8 +582,8 @@ export default function MainForm({ data, locale = "en" }: Props) {
                       id="message"
                       value={formData.message}
                       onChange={(e) => handleInputChange("message", e.target.value)}
+                      placeholder={getFieldPlaceholder("message", data.placeholderMessage)}
                       className={cn(formInputClasses, "min-h-[40px]")}
-                      style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
                       required={isFieldRequired("message")}
                     />
                   </div>
@@ -661,21 +668,27 @@ export default function MainForm({ data, locale = "en" }: Props) {
               <p className="text-white text-center text-base lg:text-xl text-stroke-black font-anaheim font-bold">{data.designTextRight}</p>
             </div>
             <div className={imageCardContainerClass}>
-              {/* 1. 底层内容图片 (z-10) */}
+              {/* 1. 底层手机框 (z-10) */}
+              <Image src="/iPhoneFrame.svg" alt="iPhone Frame" fill className="object-cover z-10" />
+
+              {/* 2. 顶层内容图片 (z-20) + SVG Mask */}
               <div
-                className="absolute overflow-hidden lg:rounded-[48px] md:rounded-[54px] sm:rounded-[30px] rounded-[24px] z-10"
+                className="absolute z-20"
                 style={{
                   top: "1.4%",
                   bottom: "1.4%",
                   left: "3.6%",
                   right: "3.6%",
+                  maskImage: "url('/iPhoneFrame-image.svg')",
+                  maskSize: "100% 100%",
+                  maskRepeat: "no-repeat",
+                  WebkitMaskImage: "url('/iPhoneFrame-image.svg')",
+                  WebkitMaskSize: "100% 100%",
+                  WebkitMaskRepeat: "no-repeat",
                 }}
               >
-                <OptimizedImage image={data.image2} alt={data.image2?.altText || data.designTextRight} size="medium" className="object-contain w-full h-full absolute inset-0" />
+                <OptimizedImage image={data.image2} alt={data.image2?.altText || data.designTextRight} size="medium" className="object-cover w-full h-full absolute inset-0" />
               </div>
-
-              {/* 2. 顶层手机框 (z-20) */}
-              <Image src="/iPhoneFrame.svg" alt="iPhone Frame" fill className="object-cover z-20" />
             </div>
           </div>
         </div>
