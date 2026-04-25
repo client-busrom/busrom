@@ -305,10 +305,6 @@ const config: Config = {
             opacity: "0",
           },
         },
-        "float": {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-10px)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -323,7 +319,6 @@ const config: Config = {
         "arrow-right": "arrow-right 1.2s ease-in-out infinite",
         "arrow-left": "arrow-left 1.2s ease-in-out infinite",
         "arrow-down": "arrow-down 1.2s ease-in-out infinite",
-        "float": "float 3s ease-in-out infinite",
       },
     },
   },
