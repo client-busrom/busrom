@@ -1,0 +1,696 @@
+{
+  "version": "2.11",
+  "children": [
+    {
+      "type": "frame",
+      "id": "pctxu",
+      "x": -667.430035771976,
+      "y": -108.25188932273704,
+      "name": "service-features",
+      "clip": true,
+      "width": 1920,
+      "height": 922,
+      "fill": "#ffffffff",
+      "stroke": {
+        "align": "inside",
+        "thickness": 1
+      },
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "cornerRadius": 30,
+          "id": "FxCi8",
+          "x": 130,
+          "y": 91,
+          "name": "bg-color",
+          "fill": "#f0ebdbff",
+          "width": 1660,
+          "height": 740,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1
+          }
+        },
+        {
+          "type": "group",
+          "id": "ZPgp2",
+          "x": 174,
+          "y": 290,
+          "name": "bg-decorator",
+          "effect": {
+            "type": "blur",
+            "radius": 58.71249866485596
+          },
+          "children": [
+            {
+              "type": "ellipse",
+              "id": "sYeFO",
+              "x": 0,
+              "y": 0,
+              "name": "Ellipse",
+              "sweepAngle": -360.00001001791264,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "height": 0.5
+                },
+                "colors": [
+                  {
+                    "color": "#dac98e",
+                    "position": 0
+                  },
+                  {
+                    "color": "#ffffff",
+                    "position": 1
+                  }
+                ],
+                "center": {
+                  "y": 0.6
+                }
+              },
+              "width": 1571,
+              "height": 392,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "effect": {
+                "type": "blur",
+                "radius": 58.71249866485596
+              }
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "KhkbW",
+          "x": 186,
+          "y": 238,
+          "name": "service-feature-title",
+          "fill": "#000000ff",
+          "content": "Premium  Architectural  Glass Hardware",
+          "lineHeight": 1.6458333333333333,
+          "fontFamily": "Anaheim",
+          "fontSize": 48,
+          "fontWeight": "800"
+        },
+        {
+          "type": "text",
+          "id": "GGt7L",
+          "x": 186,
+          "y": 551,
+          "name": "service-feature-description",
+          "fill": "#756f3fff",
+          "textGrowth": "fixed-width",
+          "width": 378,
+          "content": "Fully Customized Glass Hardware by Busrom (Serving USA, CA, UK, AU, KSA, UAE, and clients worldwide to create the ideal indoor & outdoor space.)",
+          "lineHeight": 1.5,
+          "fontFamily": "Anaheim",
+          "fontSize": 20,
+          "fontWeight": "500"
+        },
+        {
+          "type": "group",
+          "id": "V3tBa",
+          "x": 607,
+          "y": 148,
+          "name": "item-box",
+          "children": [
+            {
+              "type": "rectangle",
+              "cornerRadius": 30,
+              "id": "Y2rMu",
+              "x": 0,
+              "y": 0,
+              "name": "item-bg",
+              "fill": "#ffffffff",
+              "width": 1123,
+              "height": 622,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "group",
+              "id": "LLVrk",
+              "x": 8,
+              "y": 523,
+              "name": "item-point-title",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "tspCG",
+                  "x": 914,
+                  "y": 0,
+                  "name": "item-5-active",
+                  "fill": "#756f3fff",
+                  "textGrowth": "fixed-width",
+                  "width": 185,
+                  "content": "Global Quality Standards",
+                  "lineHeight": 1.875,
+                  "textAlign": "center",
+                  "fontFamily": "Anaheim",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "egUeb",
+                  "x": 684,
+                  "y": 0,
+                  "name": "item-4",
+                  "enabled": false,
+                  "fill": "#756f3fff",
+                  "textGrowth": "fixed-width",
+                  "width": 185,
+                  "content": "OEM / ODM",
+                  "lineHeight": 1.875,
+                  "textAlign": "center",
+                  "fontFamily": "Anaheim",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "KhM68",
+                  "x": 461,
+                  "y": 0,
+                  "name": "item-3",
+                  "enabled": false,
+                  "fill": "#756f3fff",
+                  "textGrowth": "fixed-width",
+                  "width": 185,
+                  "content": "A Color That’s So You",
+                  "lineHeight": 1.875,
+                  "textAlign": "center",
+                  "fontFamily": "Anaheim",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "6BrUr",
+                  "x": 222,
+                  "y": 0,
+                  "name": "item-2",
+                  "enabled": false,
+                  "fill": "#756f3fff",
+                  "textGrowth": "fixed-width",
+                  "width": 185,
+                  "content": "Flexible Installation",
+                  "lineHeight": 1.875,
+                  "textAlign": "center",
+                  "fontFamily": "Anaheim",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "r1SPO",
+                  "x": 0,
+                  "y": 0,
+                  "name": "item-1",
+                  "enabled": false,
+                  "fill": "#756f3fff",
+                  "textGrowth": "fixed-width",
+                  "width": 185,
+                  "content": "Any Size",
+                  "lineHeight": 1.875,
+                  "textAlign": "center",
+                  "fontFamily": "Anaheim",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "7aOR0",
+              "x": 56,
+              "y": 567,
+              "name": "item-point",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "id": "ajNr9",
+                  "x": 0,
+                  "y": 5,
+                  "name": "line",
+                  "fill": "#d9d9d9ff",
+                  "width": 1000,
+                  "height": 2,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "yXlyL",
+                  "x": 951,
+                  "y": 0,
+                  "name": "point-5-active",
+                  "sweepAngle": -360.00001001791264,
+                  "fill": "#756f3fff",
+                  "width": 12,
+                  "height": 12,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "xkz5b",
+                  "x": 723,
+                  "y": 0,
+                  "name": "point-4",
+                  "sweepAngle": -360.00001001791264,
+                  "fill": "#d9d9d9ff",
+                  "width": 12,
+                  "height": 12,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "lV7pO",
+                  "x": 495,
+                  "y": 0,
+                  "name": "point-3",
+                  "sweepAngle": -360.00001001791264,
+                  "fill": "#d9d9d9ff",
+                  "width": 12,
+                  "height": 12,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "JIjLC",
+                  "x": 267,
+                  "y": 0,
+                  "name": "point-2",
+                  "sweepAngle": -360.00001001791264,
+                  "fill": "#d9d9d9ff",
+                  "width": 12,
+                  "height": 12,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "scW4T",
+                  "x": 39,
+                  "y": 1,
+                  "name": "point-1",
+                  "sweepAngle": -360.00001001791264,
+                  "fill": "#d9d9d9ff",
+                  "width": 12,
+                  "height": 12,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "glsyW",
+              "x": 56.43003577197601,
+              "y": 224.25188932273704,
+              "name": "item-description",
+              "fill": "#000000ff",
+              "content": "From classic brushed stainless steel and \nmatte black to any RAL color or custom \nPVD finish, Busrom's bespoke \ncraftsmanship elevates projects into the \ncrowning touch of any space. Durable \ncoatings resist corrosion and wear, \nmaintaining their aesthetic appeal for \nyears to come.",
+              "lineHeight": 1.65,
+              "fontFamily": "Anaheim",
+              "fontSize": 20,
+              "fontWeight": "500"
+            },
+            {
+              "type": "text",
+              "id": "WIDh6",
+              "x": 56.43003577197601,
+              "y": 112.25188932273704,
+              "name": "item-title",
+              "fill": "#000000ff",
+              "content": "Global Quality Standards \n& After-Sales Support",
+              "lineHeight": 1.5,
+              "fontFamily": "Anaheim",
+              "fontSize": 32,
+              "fontWeight": "800"
+            },
+            {
+              "type": "rectangle",
+              "id": "ts85y",
+              "x": 56.43003577197601,
+              "y": 77.25188932273704,
+              "name": "item-decorator",
+              "fill": "#7e7a4fff",
+              "width": 73,
+              "height": 13,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "group",
+              "id": "fAzNU",
+              "x": 447.430035771976,
+              "y": 65.25188932273704,
+              "name": "feature-image-layout-4",
+              "enabled": false,
+              "children": [
+                {
+                  "type": "group",
+                  "id": "D07Kl",
+                  "x": 299.5347900390625,
+                  "y": 0,
+                  "name": "image-2",
+                  "children": [
+                    {
+                      "type": "path",
+                      "id": "sbsR8",
+                      "x": 0,
+                      "y": 0,
+                      "name": "Glass Connected Fitting 11 (Stroke)",
+                      "geometry": "M318.47333 0c21.51462 0 37.27542 20.25673 31.9873 41.11133l-86.7207 342c-3.71185 14.638-16.88698 24.88867-31.98827 24.88867l-198.73535 0c-21.5146 0-37.27543-20.25674-31.9873-41.11133l86.7207-342c3.71184-14.63798 16.887-24.88867 31.98828-24.88867l0 4-0.62109 0.00684c-13.00983 0.27584-24.27832 9.2025-27.48926 21.86523l-86.72168 342-0.2041 0.8584c-3.94525 17.73407 9.27198 34.72189 27.43164 35.25683l0.88281 0.0127 198.73535 0 0.6211-0.00684c13.00982-0.27584 24.2783-9.20248 27.48924-21.86523l86.72168-342c4.64712-18.32675-9.20358-36.12793-28.11035-36.12793l0-4z m0 0l0 4-198.73534 0 0-4 198.73534 0z",
+                      "fill": "#cdc094ff",
+                      "width": 351.4896545410156,
+                      "height": 408,
+                      "stroke": {
+                        "align": "outside",
+                        "thickness": 4
+                      },
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#00000040",
+                        "offset": {
+                          "x": 0,
+                          "y": 4
+                        },
+                        "blur": 6.125
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "id": "mGxfZ",
+                      "x": 4.001586437225342,
+                      "y": 4,
+                      "name": "Glass Connected Fitting 12",
+                      "geometry": "M87.62569 21.87204c3.26188-12.86374 14.8395-21.87204 28.11036-21.87204l198.73578 0c18.90677 0 32.75754 17.80122 28.11038 36.12798l-86.72142 341.99998c-3.26187 12.86374-14.83947 21.87204-28.11033 21.87204l-198.73582 0c-18.90677 0-32.75752-17.80121-28.11038-36.12796l86.72143-342z",
+                      "fill": "#ffffffff",
+                      "width": 343.4864807128906,
+                      "height": 400,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 4
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "group",
+                  "id": "KjAiB",
+                  "x": 0,
+                  "y": 0,
+                  "name": "image-1",
+                  "children": [
+                    {
+                      "type": "path",
+                      "id": "ZdTzi",
+                      "x": 0,
+                      "y": 0,
+                      "name": "Glass Connected Fitting 11 (Stroke)",
+                      "geometry": "M318.47333 0c21.51462 0 37.27542 20.25673 31.9873 41.11133l-86.7207 342c-3.71185 14.638-16.88698 24.88867-31.98827 24.88867l-198.73535 0c-21.5146 0-37.27543-20.25674-31.9873-41.11133l86.7207-342c3.71184-14.63798 16.887-24.88867 31.98828-24.88867l0 4-0.62109 0.00684c-13.00983 0.27584-24.27832 9.2025-27.48926 21.86523l-86.72168 342-0.2041 0.8584c-3.94525 17.73407 9.27198 34.72189 27.43164 35.25683l0.88281 0.0127 198.73535 0 0.6211-0.00684c13.00982-0.27584 24.2783-9.20248 27.48924-21.86523l86.72168-342c4.64712-18.32675-9.20358-36.12793-28.11035-36.12793l0-4z m0 0l0 4-198.73534 0 0-4 198.73534 0z",
+                      "fill": "#cdc094ff",
+                      "width": 351.4896545410156,
+                      "height": 408,
+                      "stroke": {
+                        "align": "outside",
+                        "thickness": 4
+                      },
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#00000040",
+                        "offset": {
+                          "x": 0,
+                          "y": 4
+                        },
+                        "blur": 6.125
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "id": "cfAdf",
+                      "x": 4.001586437225342,
+                      "y": 4,
+                      "name": "Glass Connected Fitting 12",
+                      "geometry": "M87.62569 21.87204c3.26188-12.86374 14.8395-21.87204 28.11036-21.87204l198.73578 0c18.90677 0 32.75754 17.80122 28.11038 36.12798l-86.72142 341.99998c-3.26187 12.86374-14.83947 21.87204-28.11033 21.87204l-198.73582 0c-18.90677 0-32.75752-17.80121-28.11038-36.12796l86.72143-342z",
+                      "fill": "#ffffffff",
+                      "width": 343.4864807128906,
+                      "height": 400,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 4
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "yEm0d",
+              "x": 484.94225806201484,
+              "y": 65.25188932273704,
+              "name": "feature-image-layout-3",
+              "enabled": false,
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 29,
+                  "id": "4WGZh",
+                  "x": 576.0000000000002,
+                  "y": 213,
+                  "name": "image-6",
+                  "flipX": true,
+                  "width": 180,
+                  "height": 195,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 4,
+                    "fill": "#cdc094ff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 29,
+                  "id": "fYGIJ",
+                  "x": 198.00000000000023,
+                  "y": 213,
+                  "name": "image-5",
+                  "width": 180,
+                  "height": 195,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 4,
+                    "fill": "#cdc094ff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 29,
+                  "id": "jht2d",
+                  "x": 0,
+                  "y": 213,
+                  "name": "image-4",
+                  "width": 180,
+                  "height": 195,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 4,
+                    "fill": "#cdc094ff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 29,
+                  "id": "wpHo9",
+                  "x": 396.0000000000002,
+                  "y": 0,
+                  "name": "image-3",
+                  "width": 180,
+                  "height": 195,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 4,
+                    "fill": "#cdc094ff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 29,
+                  "id": "swtaC",
+                  "x": 378.0000000000002,
+                  "y": 0,
+                  "name": "image-2",
+                  "flipX": true,
+                  "width": 180,
+                  "height": 195,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 4,
+                    "fill": "#cdc094ff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 29,
+                  "id": "XpNCA",
+                  "x": 2.2737367544323206e-13,
+                  "y": 0,
+                  "name": "image-1",
+                  "width": 180,
+                  "height": 195,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 4,
+                    "fill": "#cdc094ff"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "NYbyb",
+              "x": 473.94225806201496,
+              "y": 65.25188932273704,
+              "name": "feature-image-layout-2",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 29,
+                  "id": "hLZYQ",
+                  "x": 308,
+                  "y": 0,
+                  "name": "image-2",
+                  "width": 290,
+                  "height": 408,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 4,
+                    "fill": "#cdc094ff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 29,
+                  "id": "GAnJH",
+                  "x": 0,
+                  "y": 0,
+                  "name": "image-1",
+                  "width": 290,
+                  "height": 408,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 4,
+                    "fill": "#cdc094ff"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "4czvs",
+              "x": 485.430035771976,
+              "y": 65.25188932273704,
+              "name": "feature-image-layout-1",
+              "enabled": false,
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 29,
+                  "id": "qQOjI",
+                  "x": 392,
+                  "y": 184,
+                  "name": "image-4",
+                  "width": 184,
+                  "height": 224,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 4,
+                    "fill": "#cdc094ff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 29,
+                  "id": "VLd1D",
+                  "x": 0,
+                  "y": 184,
+                  "name": "image-3",
+                  "fill": "#ffffffff",
+                  "width": 374,
+                  "height": 224,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 4,
+                    "fill": "#cdc094ff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 29,
+                  "id": "OxzGg",
+                  "x": 252.71240234375,
+                  "y": 0,
+                  "name": "image-2",
+                  "fill": "#ffffffff",
+                  "width": 323.28759765625,
+                  "height": 161.76470947265625,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 4,
+                    "fill": "#cdc094ff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 29,
+                  "id": "5L6g0",
+                  "x": 0,
+                  "y": 0,
+                  "name": "image-1",
+                  "fill": "#ffffffff",
+                  "width": 234.71241760253906,
+                  "height": 161.76470947265625,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 4,
+                    "fill": "#cdc094ff"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

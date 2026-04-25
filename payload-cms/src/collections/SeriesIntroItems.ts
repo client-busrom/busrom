@@ -149,6 +149,17 @@ export const SeriesIntroItems: CollectionConfig = {
         },
       },
     },
+    {
+      name: 'imageCropDataList',
+      type: 'json',
+      label: {
+        en: 'Image Crop Data List',
+        zh: '图片裁剪数据列表',
+      },
+      admin: {
+        hidden: true,
+      },
+    },
 
     // ==================================================================
     // 📊 Status

@@ -16,6 +16,10 @@ interface TagBasedRandomImagesProps {
 export const TagBasedRandomImages: React.FC<TagBasedRandomImagesProps> = ({ path }) => {
   const { value, setValue } = useField<any>({ path })
 
+  // 获取裁剪数据列表字段 (同级字段)
+  const cropDataListPath = path.replace(/(\.)?images$/, (match, p1) => (p1 ? '.imageCropDataList' : 'imageCropDataList'))
+  const { value: cropDataList, setValue: setCropDataList } = useField<any[]>({ path: cropDataListPath })
+
   const [mode, setMode] = useState<'manual' | 'auto' | 'application'>(value?.mode || 'manual')
   const [selectedImages, setSelectedImages] = useState<number[]>(value?.manualImages || [])
   const [selectedCategories, setSelectedCategories] = useState<number[]>(value?.categories || [])
@@ -270,6 +274,9 @@ export const TagBasedRandomImages: React.FC<TagBasedRandomImagesProps> = ({ path
               hasMany: true,
               relationTo: 'media',
             }}
+            showCropButton={true}
+            cropDataList={cropDataList}
+            onCropDataListChange={setCropDataList}
           />
           <p className="hint">
             Click "Select Media" to choose up to 5 images manually.

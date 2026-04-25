@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Busrom Website - Home Page Content (English)
  * Data structure follows REST API specification
  */
@@ -91,8 +91,10 @@ interface SimpleCtaData {
   title2: string;
   subtitle: string;
   description: string;
-  buttonText: string;
+  ctaText: string;
+  ctaLink?: string;
   images: ImageObject[];
+  marqueeContent?: any;
 }
 
 interface SeriesIntroItem {
@@ -623,12 +625,39 @@ export const homeContent_EN: HomeContentData = {
     subtitle: "Let's Build Something Exceptional!",
     description:
       "Connect with Busrom's Team for precision hardware and complete solutions tailored to your project.",
-    buttonText: 'Contact Us Now！',
+    ctaText: 'Contact Us Now！',
     images: [
       createImageObject('1.jpg', 'Contact Busrom team'),
       createImageObject('2.jpg', 'Start your project'),
       createImageObject('3.jpg', 'Build with Busrom'),
     ],
+    marqueeContent: {
+      root: {
+        type: 'root',
+        format: '',
+        indent: 0,
+        version: 1,
+        children: [
+          {
+            type: 'block',
+            fields: {
+              speed: 'medium',
+              theme: 'dark',
+              links: [
+                { title: 'Any Size, Any Structure, Any Shape', url: '#', iconName: 'tabler:box-model-2' },
+                { title: 'Flexible Installation', url: '#', iconName: 'tabler:tool' },
+                { title: ' Bespoke Craftsmanship Elevates Projects', url: '#', iconName: 'tabler:palette' },
+                { title: 'Global Quality Standards', url: '#', iconName: 'tabler:world' },
+                { title: 'OEM / ODM & Project Customization', url: '#', iconName: 'tabler:settings' }
+              ]
+            },
+            format: '',
+            blockType: 'marqueeLinks',
+            version: 2
+          }
+        ]
+      }
+    }
   },
 
   // Module 6: Series Introduction
@@ -708,7 +737,7 @@ export const homeContent_EN: HomeContentData = {
               'Minimalist Standoff'
             ),
             title: 'Minimalist Standoff',
-            features: ['Ø50mm', 'SS316', 'Brushed Finish'],
+            features: ['Easy Replacement', 'Easy Pairing', 'Mix Match', 'Custom Color'],
           },
           {
             image: createImageObject(
@@ -716,7 +745,7 @@ export const homeContent_EN: HomeContentData = {
               'Adjustable Standoff'
             ),
             title: 'Adjustable Standoff',
-            features: ['Adjustable', 'SS304', 'Matte Black'],
+            features: ['Invisible Design', 'Moisture Resistant', 'Scratch Resistant', 'Heavy Load'],
           },
           {
             image: createImageObject(
@@ -724,7 +753,7 @@ export const homeContent_EN: HomeContentData = {
               'Heavy-Duty Standoff'
             ),
             title: 'Heavy-Duty Standoff',
-            features: ['Ø70mm', 'SS316L', 'Polished'],
+            features: ['Multi-Scenario', 'Easy to install', 'Anti-Corrosion', 'Foldable'],
           },
         ],
       },

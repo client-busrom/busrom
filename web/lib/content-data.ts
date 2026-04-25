@@ -108,6 +108,8 @@ export interface ProductSeriesItem {
   sceneImage: ImageObject
   buttonText: string
   href: string
+  /** 裁剪数据列表 — [0]: image, [1]: sceneImage */
+  imageCropDataList?: (ImageCropData | null)[]
 }
 
 /**
@@ -135,7 +137,9 @@ export interface SimpleCtaData {
   subtitle: string
   description: string
   ctaText: string
+  ctaLink?: string
   images: ImageObject[]
+  marqueeContent?: any
 }
 
 /**
@@ -154,6 +158,8 @@ export interface SeriesIntroItem {
   description: string
   images: ImageObject[]
   href: string
+  /** 裁剪数据列表 — 与 images 数组索引一一对应 */
+  imageCropDataList?: (ImageCropData | null)[]
 }
 
 /**

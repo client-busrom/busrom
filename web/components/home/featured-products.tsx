@@ -115,8 +115,9 @@ const ProductCard = ({ product, index, isMobile = false, locale }: ProductCardPr
       {/* 图片容器 */}
       <div
         className={cn(
-          "relative w-full overflow-hidden shadow-lg bg-white",
-          isMobile ? "aspect-[3/4] mb-3 rounded-xl" : ""
+          "relative w-full overflow-hidden bg-white transition-shadow duration-500",
+          !isMobile && (isHovered ? "shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)]" : "shadow-none"),
+          isMobile ? "aspect-[3/4] mb-3 rounded-xl shadow-none" : ""
         )}
         style={!isMobile ? {
           aspectRatio: `${LAYOUT.cards.width} / ${LAYOUT.cards.imageHeight}`,

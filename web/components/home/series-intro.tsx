@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { cn } from "@/lib/utils";
-import { OptimizedImage } from "@/components/ui/OptimizedImage";
-import { getOptimizedImageUrl, type MediaImage } from "@/lib/image-utils";
+import { ServerImage } from "@/components/ui/ServerImage";
+import { getCropStyles, getCropImageUrl, getObjectPosition } from "@/lib/utils";
 
 type Props = {
   data: HomeContent["seriesIntro"];
@@ -54,7 +54,8 @@ export default function SeriesIntro({ data }: Props) {
     seriesData.forEach((series) => {
       series.images?.forEach((imageObj) => {
         if (imageObj) {
-          const url = getOptimizedImageUrl(imageObj as unknown as MediaImage, 'medium', true);
+          // 使用中型或大型变体预加载
+          const url = imageObj.variants?.medium || imageObj.url;
           if (url && !url.includes('placeholder')) {
             const img = new Image();
             img.src = url;
@@ -398,12 +399,46 @@ export default function SeriesIntro({ data }: Props) {
                       key={`${activeSeries?.title}-img-${idx}`}
                       className="flex-shrink-0 w-[75%] aspect-[2/1] relative rounded-2xl overflow-hidden"
                     >
-                      <OptimizedImage
-                        image={imageObj}
-                        alt={imageObj?.altText || `${activeSeries?.title} - Image ${(idx % totalImages) + 1}`}
-                        size="medium"
-                        className="w-full h-full object-cover"
-                      />
+                      {(() => {
+                        const originalIdx = idx % totalImages;
+                        const cropData = activeSeries.imageCropDataList?.[originalIdx];
+                        const cropStyles = getCropStyles(cropData);
+                        if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                          return (
+                            <div
+                              className="absolute inset-0 w-full h-full"
+                              style={{
+                                ...cropStyles.container,
+                                width: "100%",
+                                height: "100%",
+                              }}
+                            >
+                              <img
+                                src={getCropImageUrl(imageObj, cropData)}
+                                alt={imageObj?.altText || `${activeSeries?.title} - Image ${originalIdx + 1}`}
+                                style={{
+                                  ...cropStyles.image,
+                                  width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                                  height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                                  left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                                  top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                                  maxWidth: "none",
+                                }}
+                              />
+                            </div>
+                          );
+                        }
+                        return (
+                          <ServerImage
+                            image={imageObj}
+                            alt={imageObj?.altText || `${activeSeries?.title} - Image ${originalIdx + 1}`}
+                            size="medium"
+                            fill
+                            className="w-full h-full object-cover"
+                            objectPosition={getObjectPosition(imageObj)}
+                          />
+                        );
+                      })()}
                     </div>
                   ))}
                 </div>
@@ -450,12 +485,45 @@ export default function SeriesIntro({ data }: Props) {
                     key={`${activeSeries?.title}-mobile-img-${idx}`}
                     className="flex-shrink-0 w-[85%] aspect-[16/9] relative rounded-xl overflow-hidden"
                   >
-                    <OptimizedImage
-                      image={imageObj}
-                      alt={imageObj?.altText || `${activeSeries?.title} - Image ${idx + 1}`}
-                      size="medium"
-                      className="w-full h-full object-cover"
-                    />
+                    {(() => {
+                      const cropData = activeSeries.imageCropDataList?.[idx];
+                      const cropStyles = getCropStyles(cropData);
+                      if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                        return (
+                          <div
+                            className="absolute inset-0 w-full h-full"
+                            style={{
+                              ...cropStyles.container,
+                              width: "100%",
+                              height: "100%",
+                            }}
+                          >
+                            <img
+                              src={getCropImageUrl(imageObj, cropData)}
+                              alt={imageObj?.altText || `${activeSeries?.title} - Image ${idx + 1}`}
+                              style={{
+                                ...cropStyles.image,
+                                width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                                height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                                left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                                top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                                maxWidth: "none",
+                              }}
+                            />
+                          </div>
+                        );
+                      }
+                      return (
+                        <ServerImage
+                          image={imageObj}
+                          alt={imageObj?.altText || `${activeSeries?.title} - Image ${idx + 1}`}
+                          size="medium"
+                          fill
+                          className="w-full h-full object-cover"
+                          objectPosition={getObjectPosition(imageObj)}
+                        />
+                      );
+                    })()}
                   </div>
                 ))}
               </div>

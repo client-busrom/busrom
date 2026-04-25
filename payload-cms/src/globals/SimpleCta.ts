@@ -99,6 +99,21 @@ export const SimpleCta: GlobalConfig = {
         zh: '按钮链接',
       },
     },
+    {
+      name: 'marqueeContent',
+      type: 'richText',
+      label: {
+        en: 'Marquee Content',
+        zh: '跑马灯带内容',
+      },
+      localized: true,
+      admin: {
+        description: {
+          en: 'Rich text content for the marquee belt. Use the "Marquee Links" block for scrolling items.',
+          zh: '跑马灯带的富文本内容。使用“滚动链接”块来添加滚动项。',
+        },
+      },
+    },
 
     // ==================================================================
     // Images (3 images)

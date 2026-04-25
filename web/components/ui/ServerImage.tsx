@@ -32,6 +32,8 @@ type ServerImageProps = {
   width?: number
   height?: number
   objectPosition?: string
+  style?: React.CSSProperties
+  cropData?: any
 }
 
 /**
@@ -91,6 +93,8 @@ export function ServerImage({
   width,
   height,
   objectPosition,
+  style,
+  cropData,
 }: ServerImageProps) {
   const src = getImageUrl(image, size)
   const altText = alt || image?.altText || ''
@@ -105,9 +109,11 @@ export function ServerImage({
         inset: 0,
         objectFit: 'cover',
         objectPosition: objectPosition || 'center',
+        ...style,
       }
     : {
         objectPosition: objectPosition || 'center',
+        ...style,
       }
 
   // For LCP images with priority, use simple img tag with correct size

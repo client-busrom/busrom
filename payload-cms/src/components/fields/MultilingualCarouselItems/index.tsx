@@ -50,7 +50,9 @@ const i18n = {
 interface CarouselItem {
   title?: string
   image?: number | string
+  imageCropData?: any
   sceneImage?: number | string
+  sceneImageCropData?: any
   buttonText?: string
   linkUrl?: string
   isShow?: boolean
@@ -142,6 +144,8 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
         buttonText: '',
         linkUrl: '',
         isShow: true,
+        imageCropData: null,
+        sceneImageCropData: null,
       })
     })
     setValue(newValue)
@@ -586,6 +590,9 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
                     }}
                     value={item.image as number | null}
                     onChange={(newValue) => updateItem(index, 'image', newValue)}
+                    showCropButton={true}
+                    cropData={item.imageCropData}
+                    onCropDataChange={(newCropData) => updateItem(index, 'imageCropData', newCropData)}
                   />
                 </div>
 
@@ -599,6 +606,9 @@ export const MultilingualCarouselItemsField: React.FC<any> = ({ path }) => {
                     }}
                     value={item.sceneImage as number | null}
                     onChange={(newValue) => updateItem(index, 'sceneImage', newValue)}
+                    showCropButton={true}
+                    cropData={item.sceneImageCropData}
+                    onCropDataChange={(newCropData) => updateItem(index, 'sceneImageCropData', newCropData)}
                   />
                 </div>
               </div>

@@ -1338,6 +1338,15 @@ export interface SeriesIntroItem {
     | number
     | boolean
     | null;
+  imageCropDataList?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   status?: ('published' | 'draft') | null;
   updatedAt: string;
   createdAt: string;
@@ -2585,6 +2594,7 @@ export interface SeriesIntroItemsSelect<T extends boolean = true> {
   title?: T;
   description?: T;
   images?: T;
+  imageCropDataList?: T;
   status?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3448,33 +3458,177 @@ export interface ServiceFeature {
   feature01ShortTitle?: string | null;
   feature01Description?: string | null;
   feature01Image1?: (number | null) | Media;
+  feature01Image1CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   feature01Image2?: (number | null) | Media;
+  feature01Image2CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   feature01Image3?: (number | null) | Media;
+  feature01Image3CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   feature01Image4?: (number | null) | Media;
+  feature01Image4CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   feature02Title?: string | null;
   feature02ShortTitle?: string | null;
   feature02Description?: string | null;
   feature02Image1?: (number | null) | Media;
+  feature02Image1CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   feature02Image2?: (number | null) | Media;
+  feature02Image2CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   feature03Title?: string | null;
   feature03ShortTitle?: string | null;
   feature03Description?: string | null;
   feature03Image1?: (number | null) | Media;
+  feature03Image1CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   feature03Image2?: (number | null) | Media;
+  feature03Image2CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   feature03Image3?: (number | null) | Media;
+  feature03Image3CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   feature03Image4?: (number | null) | Media;
+  feature03Image4CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   feature03Image5?: (number | null) | Media;
+  feature03Image5CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   feature03Image6?: (number | null) | Media;
+  feature03Image6CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   feature04Title?: string | null;
   feature04ShortTitle?: string | null;
   feature04Description?: string | null;
   feature04Image1?: (number | null) | Media;
+  feature04Image1CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   feature04Image2?: (number | null) | Media;
+  feature04Image2CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   feature05Title?: string | null;
   feature05ShortTitle?: string | null;
   feature05Description?: string | null;
   feature05Image1?: (number | null) | Media;
+  feature05Image1CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   feature05Image2?: (number | null) | Media;
+  feature05Image2CropData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -3508,6 +3662,24 @@ export interface SimpleCta {
   description?: string | null;
   ctaText?: string | null;
   ctaLink?: string | null;
+  /**
+   * Rich text content for the marquee belt. Use the "Marquee Links" block for scrolling items.
+   */
+  marqueeContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   image1?: (number | null) | Media;
   image2?: (number | null) | Media;
   image3?: (number | null) | Media;
@@ -4099,33 +4271,49 @@ export interface ServiceFeaturesSelect<T extends boolean = true> {
   feature01ShortTitle?: T;
   feature01Description?: T;
   feature01Image1?: T;
+  feature01Image1CropData?: T;
   feature01Image2?: T;
+  feature01Image2CropData?: T;
   feature01Image3?: T;
+  feature01Image3CropData?: T;
   feature01Image4?: T;
+  feature01Image4CropData?: T;
   feature02Title?: T;
   feature02ShortTitle?: T;
   feature02Description?: T;
   feature02Image1?: T;
+  feature02Image1CropData?: T;
   feature02Image2?: T;
+  feature02Image2CropData?: T;
   feature03Title?: T;
   feature03ShortTitle?: T;
   feature03Description?: T;
   feature03Image1?: T;
+  feature03Image1CropData?: T;
   feature03Image2?: T;
+  feature03Image2CropData?: T;
   feature03Image3?: T;
+  feature03Image3CropData?: T;
   feature03Image4?: T;
+  feature03Image4CropData?: T;
   feature03Image5?: T;
+  feature03Image5CropData?: T;
   feature03Image6?: T;
+  feature03Image6CropData?: T;
   feature04Title?: T;
   feature04ShortTitle?: T;
   feature04Description?: T;
   feature04Image1?: T;
+  feature04Image1CropData?: T;
   feature04Image2?: T;
+  feature04Image2CropData?: T;
   feature05Title?: T;
   feature05ShortTitle?: T;
   feature05Description?: T;
   feature05Image1?: T;
+  feature05Image1CropData?: T;
   feature05Image2?: T;
+  feature05Image2CropData?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -4153,6 +4341,7 @@ export interface SimpleCtaSelect<T extends boolean = true> {
   description?: T;
   ctaText?: T;
   ctaLink?: T;
+  marqueeContent?: T;
   image1?: T;
   image2?: T;
   image3?: T;

@@ -141,6 +141,10 @@ async function resolveCarouselItems(items: any[], payload: any) {
     sceneImage: getMediaWithVariants(
       typeof item.sceneImage === 'number' ? mediaMap.get(item.sceneImage) : item.sceneImage
     ),
+    imageCropDataList: [
+      item.imageCropData || null,
+      item.sceneImageCropData || null,
+    ],
   }))
 }
 
@@ -339,20 +343,38 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         status: serviceFeatures?.status,
         title: serviceFeatures?.title,
         subtitle: serviceFeatures?.subtitle,
-        features: [1, 2, 3, 4, 5].map(num => ({
-          title: serviceFeatures[`feature0${num}Title`],
-          shortTitle: serviceFeatures[`feature0${num}ShortTitle`],
-          description: serviceFeatures[`feature0${num}Description`],
-          images: [
-            getMediaWithVariants(serviceFeatures[`feature0${num}Image1`]),
-            getMediaWithVariants(serviceFeatures[`feature0${num}Image2`]),
+        features: [1, 2, 3, 4, 5].map(num => {
+          // 配对图片和裁剪数据
+          const imagePairs = [
+            { image: getMediaWithVariants(serviceFeatures[`feature0${num}Image1`]), cropData: serviceFeatures[`feature0${num}Image1CropData`] || null },
+            { image: getMediaWithVariants(serviceFeatures[`feature0${num}Image2`]), cropData: serviceFeatures[`feature0${num}Image2CropData`] || null },
             // Feature 01 has 4 images, Feature 03 has 6 images
-            (num === 1 || num === 3) && getMediaWithVariants(serviceFeatures[`feature0${num}Image3`]),
-            (num === 1 || num === 3) && getMediaWithVariants(serviceFeatures[`feature0${num}Image4`]),
-            num === 3 && getMediaWithVariants(serviceFeatures[`feature0${num}Image5`]),
-            num === 3 && getMediaWithVariants(serviceFeatures[`feature0${num}Image6`]),
-          ].filter(Boolean),
-        })),
+            {
+              image: (num === 1 || num === 3) ? getMediaWithVariants(serviceFeatures[`feature0${num}Image3`]) : null,
+              cropData: (num === 1 || num === 3) ? (serviceFeatures[`feature0${num}Image3CropData`] || null) : null
+            },
+            {
+              image: (num === 1 || num === 3) ? getMediaWithVariants(serviceFeatures[`feature0${num}Image4`]) : null,
+              cropData: (num === 1 || num === 3) ? (serviceFeatures[`feature0${num}Image4CropData`] || null) : null
+            },
+            {
+              image: num === 3 ? getMediaWithVariants(serviceFeatures[`feature0${num}Image5`]) : null,
+              cropData: num === 3 ? (serviceFeatures[`feature0${num}Image5CropData`] || null) : null
+            },
+            {
+              image: num === 3 ? getMediaWithVariants(serviceFeatures[`feature0${num}Image6`]) : null,
+              cropData: num === 3 ? (serviceFeatures[`feature0${num}Image6CropData`] || null) : null
+            },
+          ].filter(pair => pair.image !== null)
+
+          return {
+            title: serviceFeatures[`feature0${num}Title`],
+            shortTitle: serviceFeatures[`feature0${num}ShortTitle`],
+            description: serviceFeatures[`feature0${num}Description`],
+            images: imagePairs.map(p => p.image),
+            imageCropDataList: imagePairs.map(p => p.cropData),
+          }
+        }),
       } : null,
 
       // Sphere 3D (only if published)
@@ -370,6 +392,7 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         description: simpleCta?.description,
         ctaText: simpleCta?.ctaText,
         ctaUrl: simpleCta?.ctaLink, // Field name in DB is ctaLink
+        marqueeContent: simpleCta?.marqueeContent,
         images: [
           getMediaWithVariants(simpleCta.image1),
           getMediaWithVariants(simpleCta.image2),
@@ -384,6 +407,7 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         description: item.description,
         productSeries: item.productSeries,
         images: (item.resolvedImages || []).map((img: any) => getMediaWithVariants(img)),
+        imageCropDataList: item.imageCropDataList || [],
       })),
 
       // Featured Products (only if published)
@@ -422,10 +446,14 @@ export const homeContentHandler: PayloadHandler = async (req) => {
                 slug: product.slug,
                 title: product.name || product.localizedName || '',
                 image: getMediaWithVariants(product.showImage),
-                features: (product.attributes || [])
-                  .filter((attr: any) => attr.isShow)
-                  .slice(0, 3)
-                  .map((attr: any) => `${attr.key}: ${attr.value}`),
+                features: (() => {
+                  const attrs = product.attributePage?.productAttributes;
+                  const attrList = Array.isArray(attrs) ? attrs : (attrs?.[locale] || attrs?.en || []);
+                  return attrList
+                    .filter((attr: any) => attr.showOnFrontEnd !== false)
+                    .slice(0, 4)
+                    .map((attr: any) => attr.value);
+                })(),
               })),
             }
           })

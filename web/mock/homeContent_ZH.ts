@@ -91,8 +91,10 @@ interface SimpleCtaData {
   title2: string;
   subtitle: string;
   description: string;
-  buttonText: string;
+  ctaText: string;
+  ctaLink?: string;
   images: ImageObject[];
+  marqueeContent?: any;
 }
 
 interface SeriesIntroItem {
@@ -619,12 +621,39 @@ export const homeContent_ZH: HomeContentData = {
     subtitle: '让我们共筑卓越!',
     description:
       '联系 Busrom 团队,获取为您的项目量身定制的精密五金和完整解决方案。',
-    buttonText: '立即联系我们!',
+    ctaText: '立即联系我们!',
     images: [
       createImageObject('1.jpg', '联系 Busrom 团队'),
       createImageObject('2.jpg', '启动您的项目'),
       createImageObject('3.jpg', '与 Busrom 共建'),
     ],
+    marqueeContent: {
+      root: {
+        type: 'root',
+        format: '',
+        indent: 0,
+        version: 1,
+        children: [
+          {
+            type: 'block',
+            fields: {
+              speed: 'medium',
+              theme: 'dark',
+              links: [
+                { title: '任意尺寸、任意结构、任意形状', url: '#', iconName: 'tabler:box-model-2' },
+                { title: '灵活安装', url: '#', iconName: 'tabler:tool' },
+                { title: '专属定制工艺提升项目质感', url: '#', iconName: 'tabler:palette' },
+                { title: '全球质量标准', url: '#', iconName: 'tabler:world' },
+                { title: 'OEM / ODM 及项目定制', url: '#', iconName: 'tabler:settings' }
+              ]
+            },
+            format: '',
+            blockType: 'marqueeLinks',
+            version: 2
+          }
+        ]
+      }
+    }
   },
 
   // 模块 6: 系列产品介绍

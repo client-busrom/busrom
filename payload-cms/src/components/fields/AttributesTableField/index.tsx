@@ -47,8 +47,17 @@ interface AttributesTableFieldProps {
 const generateId = () => Math.random().toString(36).substr(2, 9)
 
 export const AttributesTableField: React.FC<AttributesTableFieldProps> = ({ path, field }) => {
-  const { value, setValue } = useField<AttributeItem[] | null>({ path })
+  const { value: rawValue, setValue } = useField<any | null>({ path })
   const currentLocale = useLocale()
+  
+  // Defensive: Handle case where value might be an object {en: [], zh: []} if localized logic is bypassed
+  const value = React.useMemo(() => {
+    if (Array.isArray(rawValue)) return rawValue
+    if (rawValue && typeof rawValue === 'object') {
+      return (rawValue as any)[currentLocale.code] || (rawValue as any).en || []
+    }
+    return []
+  }, [rawValue, currentLocale.code])
   const { i18n } = useTranslation()
   const isZh = i18n.language === 'zh'
   const { id, collectionSlug } = useDocumentInfo()
@@ -113,7 +122,7 @@ export const AttributesTableField: React.FC<AttributesTableFieldProps> = ({ path
   }, [value, currentLocale.code])
 
   const activeData = localeData.find(l => l.locale === activeLocale)
-  const items = activeData?.items || []
+  const items = Array.isArray(activeData?.items) ? activeData.items : []
 
   const updateLocaleItems = useCallback((locale: LocaleCode, newItems: AttributeItem[]) => {
     setLocaleData(prev => prev.map(l => l.locale === locale ? { ...l, items: newItems } : l))

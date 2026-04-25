@@ -57,10 +57,14 @@ interface MediaPickerProps {
   // Crop editor integration
   /** 是否显示裁剪按钮 */
   showCropButton?: boolean
-  /** 已有的裁剪数据 */
+  /** 已有的裁剪数据 (单图模式) */
   cropData?: ImageCropData | null
-  /** 裁剪数据变更回调 */
+  /** 裁剪数据变更回调 (单图模式) */
   onCropDataChange?: (cropData: ImageCropData | null) => void
+  /** 已有的裁剪数据列表 (多图模式) */
+  cropDataList?: (ImageCropData | null)[]
+  /** 裁剪数据变更回调 (多图模式) */
+  onCropDataListChange?: (list: (ImageCropData | null)[]) => void
 }
 
 // Format file size
@@ -72,7 +76,7 @@ const formatFileSize = (bytes?: number): string => {
 }
 
 export const MediaPicker: React.FC<MediaPickerProps> = (props) => {
-  const { path, field, value: controlledValue, onChange, showCropButton, cropData, onCropDataChange } = props;
+  const { path, field, value: controlledValue, onChange, showCropButton, cropData, onCropDataChange, cropDataList, onCropDataListChange } = props;
   // Use controlled mode if value/onChange provided, otherwise use useField
   const fieldHook = useField<number | number[] | null>({ path: path || field.name })
   const value = controlledValue !== undefined ? controlledValue : fieldHook.value
@@ -106,10 +110,8 @@ export const MediaPicker: React.FC<MediaPickerProps> = (props) => {
   // Crop editor state
   const [cropEditorOpen, setCropEditorOpen] = useState(false)
   const [cropEditorMediaItem, setCropEditorMediaItem] = useState<MediaItem | null>(null)
+  const [cropEditorItemIndex, setCropEditorItemIndex] = useState<number | null>(null)
 
-  console.log('[MediaPicker DEBUG props]', props);
-  
-  // In Payload 3.x, some UI fields receive `clientField` which contains the schema metadata
   const hasMany = field?.hasMany || 
                   (field as any)?.admin?.hasMany || 
                   (fieldHook as any)?.field?.hasMany || 
@@ -272,6 +274,11 @@ export const MediaPicker: React.FC<MediaPickerProps> = (props) => {
           const newSelected = [...selectedMedia, item]
           setSelectedMedia(newSelected)
           setValue(newSelected.map(m => m.id))
+          
+          // 如果有 cropDataList，也需要追加一个空值
+          if (onCropDataListChange) {
+            onCropDataListChange([...(cropDataList || []), null])
+          }
         }
       }
       setLastSelectedIndex(index)
@@ -283,12 +290,21 @@ export const MediaPicker: React.FC<MediaPickerProps> = (props) => {
   }
 
   const handleRemove = (id: number) => {
+    const removeIndex = selectedMedia.findIndex(m => m.id === id)
     const newSelected = selectedMedia.filter(m => m.id !== id)
     setSelectedMedia(newSelected)
+    
     if (hasMany) {
       setValue(newSelected.length > 0 ? newSelected.map(m => m.id) : null)
+      // 如果有 cropDataList，也要移除对应的项
+      if (onCropDataListChange && cropDataList && removeIndex !== -1) {
+        const newList = [...cropDataList]
+        newList.splice(removeIndex, 1)
+        onCropDataListChange(newList)
+      }
     } else {
       setValue(null)
+      onCropDataChange?.(null)
     }
   }
 
@@ -325,7 +341,7 @@ export const MediaPicker: React.FC<MediaPickerProps> = (props) => {
 
       {/* Selected Media Preview */}
       <div className="media-picker__selected">
-        {selectedMedia.map((item) => (
+        {selectedMedia.map((item, itemIndex) => (
           <div key={item.id} className="media-picker__selected-item">
             <img
               src={item.thumbnailURL || item.url}
@@ -336,10 +352,26 @@ export const MediaPicker: React.FC<MediaPickerProps> = (props) => {
               {item.width && item.height && (
                 <span className="dimensions">{item.width}×{item.height}</span>
               )}
-              {cropData && (
-                <span className="dimensions" style={{ color: 'var(--theme-success-500)' }}>
-                  ✂️ {cropData.cropWidth}×{cropData.cropHeight} @ {Math.round(cropData.scale * 100)}%
-                </span>
+              {hasMany ? (
+                cropDataList?.[itemIndex] && (
+                  <span className="dimensions" style={{ color: 'var(--theme-success-500)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M6.13 1L6 16a2 2 0 0 0 2 2h15" />
+                      <path d="M1 6.13L16 6a2 2 0 0 1 2 2v15" />
+                    </svg>
+                    {cropDataList[itemIndex]?.cropWidth}×{cropDataList[itemIndex]?.cropHeight} @ {Math.round((cropDataList[itemIndex]?.scale || 0) * 100)}%
+                  </span>
+                )
+              ) : (
+                cropData && (
+                  <span className="dimensions" style={{ color: 'var(--theme-success-500)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M6.13 1L6 16a2 2 0 0 0 2 2h15" />
+                      <path d="M1 6.13L16 6a2 2 0 0 1 2 2v15" />
+                    </svg>
+                    {cropData.cropWidth}×{cropData.cropHeight} @ {Math.round(cropData.scale * 100)}%
+                  </span>
+                )
               )}
             </div>
             <div className="media-picker__selected-actions">
@@ -349,11 +381,15 @@ export const MediaPicker: React.FC<MediaPickerProps> = (props) => {
                   className="media-picker__crop"
                   onClick={() => {
                     setCropEditorMediaItem(item)
+                    setCropEditorItemIndex(itemIndex)
                     setCropEditorOpen(true)
                   }}
                   title="裁剪图片"
                 >
-                  ✂️
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6.13 1L6 16a2 2 0 0 0 2 2h15" />
+                    <path d="M1 6.13L16 6a2 2 0 0 1 2 2v15" />
+                  </svg>
                 </button>
               )}
               <button
@@ -386,15 +422,25 @@ export const MediaPicker: React.FC<MediaPickerProps> = (props) => {
           imageWidth={cropEditorMediaItem.width}
           imageHeight={cropEditorMediaItem.height}
           sizes={cropEditorMediaItem.sizes}
-          initialCropData={cropData}
+          initialCropData={hasMany ? (cropDataList?.[cropEditorItemIndex ?? -1] || null) : (cropData || null)}
           onConfirm={(data) => {
-            onCropDataChange?.(data)
+            if (hasMany && onCropDataListChange && cropEditorItemIndex !== null) {
+              const newList = [...(cropDataList || [])]
+              // 确保数组长度足够
+              while (newList.length <= cropEditorItemIndex) newList.push(null)
+              newList[cropEditorItemIndex] = data
+              onCropDataListChange(newList)
+            } else {
+              onCropDataChange?.(data)
+            }
             setCropEditorOpen(false)
             setCropEditorMediaItem(null)
+            setCropEditorItemIndex(null)
           }}
           onClose={() => {
             setCropEditorOpen(false)
             setCropEditorMediaItem(null)
+            setCropEditorItemIndex(null)
           }}
         />
       )}

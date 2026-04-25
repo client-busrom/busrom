@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 import { Link } from "@/lib/navigation";
 import type { HomeContent } from "@/lib/content-data";
 import type { Locale } from "@/i18n.config";
-import { OptimizedImage } from "@/components/ui/OptimizedImage";
-import { getOptimizedImageUrl, type MediaImage } from "@/lib/image-utils";
+import { ServerImage } from "@/components/ui/ServerImage";
+import { getCropStyles, getCropImageUrl, getObjectPosition } from "@/lib/utils";
 
 type Props = {
   data: HomeContent["productSeriesCarousel"];
@@ -91,7 +91,8 @@ export default function ProductSeriesCarousel({ data }: Props) {
 
     data.forEach((item) => {
       if (item.sceneImage) {
-        const url = getOptimizedImageUrl(item.sceneImage as unknown as MediaImage, 'large', true);
+        // 使用大型变体作为预加载场景图
+        const url = item.sceneImage.variants?.large || item.sceneImage.url;
         if (url && !url.includes('placeholder')) {
           const img = new Image();
           img.src = url;
@@ -280,14 +281,45 @@ export default function ProductSeriesCarousel({ data }: Props) {
           transition={{ duration: 0.3 }}
           className="absolute inset-0 z-0"
         >
-          <OptimizedImage
-            image={hoveredItem.sceneImage}
-            alt={hoveredItem.sceneImage.altText || "Scene"}
-            size="large"
-            width={1920}
-            height={922}
-            className="object-cover w-full h-full"
-          />
+          {(() => {
+            const cropData = hoveredItem.imageCropDataList?.[1];
+            const cropStyles = getCropStyles(cropData);
+            if (cropStyles && cropData && cropData.croppedAreaPixels) {
+              return (
+                <div
+                  className="absolute inset-0 w-full h-full"
+                  style={{
+                    ...cropStyles.container,
+                    width: "100%",
+                    height: "100%",
+                  }}
+                >
+                  <img
+                    src={getCropImageUrl(hoveredItem.sceneImage, cropData)}
+                    alt={hoveredItem.sceneImage.altText || "Scene"}
+                    style={{
+                      ...cropStyles.image,
+                      width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                      height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                      left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                      top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                      maxWidth: "none",
+                    }}
+                  />
+                </div>
+              );
+            }
+            return (
+              <ServerImage
+                image={hoveredItem.sceneImage}
+                alt={hoveredItem.sceneImage.altText || "Scene"}
+                size="large"
+                fill
+                className="object-cover w-full h-full"
+                objectPosition={getObjectPosition(hoveredItem.sceneImage)}
+              />
+            );
+          })()}
         </motion.div>
       )}
 
@@ -298,14 +330,42 @@ export default function ProductSeriesCarousel({ data }: Props) {
           {/* 左侧图片 + 标题 */}
           <div className="flex flex-col items-center w-[45%]">
             <Link href={visibleItems[1]?.item?.href || "#"} className="block w-full">
-              <OptimizedImage
-                image={visibleItems[1]?.item?.image}
-                alt={visibleItems[1]?.item?.image?.altText || visibleItems[1]?.item?.name || ""}
-                size="small"
-                width={640}
-                height={640}
-                className="w-full h-auto"
-              />
+              {(() => {
+                const item = visibleItems[1]?.item;
+                if (!item) return null;
+                const cropData = item.imageCropDataList?.[0];
+                const cropStyles = getCropStyles(cropData);
+                if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                  return (
+                    <div
+                      className="relative w-full aspect-square overflow-hidden"
+                      style={cropStyles.container}
+                    >
+                      <img
+                        src={getCropImageUrl(item.image, cropData)}
+                        alt={item.image?.altText || item.name || ""}
+                        style={{
+                          ...cropStyles.image,
+                          width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                          height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                          left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                          top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                          maxWidth: "none",
+                        }}
+                      />
+                    </div>
+                  );
+                }
+                return (
+                  <ServerImage
+                    image={item.image}
+                    alt={item.image?.altText || item.name || ""}
+                    size="small"
+                    className="w-full h-auto"
+                    objectPosition={getObjectPosition(item.image)}
+                  />
+                );
+              })()}
             </Link>
             <span className="font-anaheim font-extrabold text-white text-xs mt-2 text-center">
               {visibleItems[1]?.item?.name}
@@ -314,14 +374,42 @@ export default function ProductSeriesCarousel({ data }: Props) {
           {/* 右侧图片 + 标题 */}
           <div className="flex flex-col items-center w-[45%]">
             <Link href={visibleItems[2]?.item?.href || "#"} className="block w-full">
-              <OptimizedImage
-                image={visibleItems[2]?.item?.image}
-                alt={visibleItems[2]?.item?.image?.altText || visibleItems[2]?.item?.name || ""}
-                size="small"
-                width={640}
-                height={640}
-                className="w-full h-auto"
-              />
+              {(() => {
+                const item = visibleItems[2]?.item;
+                if (!item) return null;
+                const cropData = item.imageCropDataList?.[0];
+                const cropStyles = getCropStyles(cropData);
+                if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                  return (
+                    <div
+                      className="relative w-full aspect-square overflow-hidden"
+                      style={cropStyles.container}
+                    >
+                      <img
+                        src={getCropImageUrl(item.image, cropData)}
+                        alt={item.image?.altText || item.name || ""}
+                        style={{
+                          ...cropStyles.image,
+                          width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                          height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                          left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                          top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                          maxWidth: "none",
+                        }}
+                      />
+                    </div>
+                  );
+                }
+                return (
+                  <ServerImage
+                    image={item.image}
+                    alt={item.image?.altText || item.name || ""}
+                    size="small"
+                    className="w-full h-auto"
+                    objectPosition={getObjectPosition(item.image)}
+                  />
+                );
+              })()}
             </Link>
             <span className="font-anaheim font-extrabold text-white text-xs mt-2 text-center">
               {visibleItems[2]?.item?.name}
@@ -384,15 +472,46 @@ export default function ProductSeriesCarousel({ data }: Props) {
               </h3>
 
               <Link href={item.href} className="block w-full h-full">
-                <OptimizedImage
-                  image={item.image}
-                  alt={item.image?.altText || item.name}
-                  size="medium"
-                  width={800}
-                  height={800}
-                  className="object-cover w-full h-full"
-                  priority={isOnScreen}
-                />
+                {(() => {
+                  const cropData = item.imageCropDataList?.[0];
+                  const cropStyles = getCropStyles(cropData);
+                  if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                    return (
+                      <div
+                        className="absolute inset-0 w-full h-full"
+                        style={{
+                          ...cropStyles.container,
+                          width: "100%",
+                          height: "100%",
+                        }}
+                      >
+                        <img
+                          src={getCropImageUrl(item.image, cropData)}
+                          alt={item.image?.altText || item.name}
+                          style={{
+                            ...cropStyles.image,
+                            width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                            height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                            left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                            top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                            maxWidth: "none",
+                          }}
+                        />
+                      </div>
+                    );
+                  }
+                  return (
+                    <ServerImage
+                      image={item.image}
+                      alt={item.image?.altText || item.name}
+                      size="medium"
+                      fill
+                      className="object-cover w-full h-full"
+                      objectPosition={getObjectPosition(item.image)}
+                      priority={isOnScreen}
+                    />
+                  );
+                })()}
               </Link>
             </motion.div>
           );

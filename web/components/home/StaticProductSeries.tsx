@@ -5,7 +5,8 @@
 import type { HomeContent } from "@/lib/content-data";
 import type { Locale } from "@/i18n.config";
 import Link from "next/link";
-import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { ServerImage } from "@/components/ui/ServerImage";
+import { getCropStyles, getCropImageUrl, getObjectPosition } from "@/lib/utils";
 
 type Props = {
   data: HomeContent["productSeriesCarousel"];
@@ -45,16 +46,45 @@ export default function StaticProductSeries({ data, locale }: Props) {
           >
             {/* 图片容器 */}
             <div className="relative w-full h-full rounded-3xl overflow-hidden bg-white shadow-lg">
-              {series.image && (
-                <OptimizedImage
-                  image={series.image}
-                  alt={series.name || `Series ${index + 1}`}
-                  size="medium"
-                  width={480}
-                  height={480}
-                  className="object-cover w-full h-full"
-                />
-              )}
+              {series.image && (() => {
+                  const cropData = series.imageCropDataList?.[0];
+                  const cropStyles = getCropStyles(cropData);
+                  if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                    return (
+                      <div
+                        className="absolute inset-0 w-full h-full"
+                        style={{
+                          ...cropStyles.container,
+                          width: "100%",
+                          height: "100%",
+                        }}
+                      >
+                        <img
+                          src={getCropImageUrl(series.image, cropData)}
+                          alt={series.name || `Series ${index + 1}`}
+                          style={{
+                            ...cropStyles.image,
+                            width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                            height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                            left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                            top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                            maxWidth: "none",
+                          }}
+                        />
+                      </div>
+                    );
+                  }
+                  return (
+                    <ServerImage
+                      image={series.image}
+                      alt={series.name || `Series ${index + 1}`}
+                      size="medium"
+                      fill
+                      className="object-cover w-full h-full"
+                      objectPosition={getObjectPosition(series.image)}
+                    />
+                  );
+                })()}
 
               {/* 底部渐变遮罩 */}
               <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />

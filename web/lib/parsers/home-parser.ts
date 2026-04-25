@@ -94,20 +94,56 @@ export function parseHomeData(data: any, locale: string, strategy?: string): Hom
   };
 
   // 3. Transform SimpleCta
-  const simpleCta = data.simpleCta ? {
-    title: data.simpleCta.title || '',
-    title2: data.simpleCta.title2 || '',
-    subtitle: data.simpleCta.subtitle || '',
-    description: data.simpleCta.description || '',
-    ctaText: data.simpleCta.ctaText || data.simpleCta.buttonText || '',
-    images: (data.simpleCta.images || []).map((imgData: any) => toImageObject(imgData, data.simpleCta.title, strategy)),
-  } : {
-    title: '',
-    title2: '',
-    subtitle: '',
-    description: '',
-    ctaText: '',
-    images: []
+  const simpleCtaRaw = data.simpleCta || {};
+  
+  // Extract marquee content after "scrolling-link" marker if it exists
+  let marqueeContent = simpleCtaRaw.marqueeContent;
+  if (marqueeContent?.root?.children) {
+    const children = marqueeContent.root.children;
+    let foundMarker = false;
+    const filteredChildren = [];
+    
+    for (const node of children) {
+      const totalText = (node.children?.map((c: any) => c.text).join('') || '').trim().toLowerCase();
+      const isMarker = (node.type === 'paragraph' || node.type === 'quote' || node.type === 'code') && 
+                       (totalText === 'scrolling-link' || node.children?.[0]?.format === 16 && totalText === 'scrolling-link');
+      
+      if (isMarker) {
+        foundMarker = true;
+        continue;
+      }
+      
+      if (foundMarker) {
+        filteredChildren.push(node);
+      }
+    }
+    
+    if (foundMarker) {
+      marqueeContent = {
+        ...marqueeContent,
+        root: {
+          ...marqueeContent.root,
+          children: filteredChildren
+        }
+      };
+    }
+  }
+
+  const simpleCta = {
+    title: simpleCtaRaw.title || '',
+    title2: simpleCtaRaw.title2 || '',
+    subtitle: simpleCtaRaw.subtitle || '',
+    description: simpleCtaRaw.description || '',
+    ctaText: simpleCtaRaw.ctaText || simpleCtaRaw.buttonText || '',
+    ctaLink: simpleCtaRaw.ctaLink || '/contact-us',
+    marqueeContent: marqueeContent || null,
+    images: simpleCtaRaw.images 
+      ? simpleCtaRaw.images.map((imgData: any) => toImageObject(imgData, simpleCtaRaw.title, strategy))
+      : [
+          toImageObject(simpleCtaRaw.image1, simpleCtaRaw.title, strategy),
+          toImageObject(simpleCtaRaw.image2, simpleCtaRaw.title, strategy),
+          toImageObject(simpleCtaRaw.image3, simpleCtaRaw.title, strategy),
+        ].filter(img => img.url !== '/images/placeholder.jpg' || img.altText !== '')
   };
 
   // 4. Transform OemOdm

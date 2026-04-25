@@ -134,8 +134,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature01Image1CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 01 - Image 1 Crop Data',
+        zh: '特点01 - 图片1裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
     {
@@ -148,8 +159,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature01Image2CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 01 - Image 2 Crop Data',
+        zh: '特点01 - 图片2裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
     {
@@ -162,8 +184,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature01Image3CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 01 - Image 3 Crop Data',
+        zh: '特点01 - 图片3裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
     {
@@ -176,8 +209,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature01Image4CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 01 - Image 4 Crop Data',
+        zh: '特点01 - 图片4裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
 
@@ -221,8 +265,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature02Image1CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 02 - Image 1 Crop Data',
+        zh: '特点02 - 图片1裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
     {
@@ -235,8 +290,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature02Image2CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 02 - Image 2 Crop Data',
+        zh: '特点02 - 图片2裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
 
@@ -280,8 +346,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature03Image1CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 03 - Image 1 Crop Data',
+        zh: '特点03 - 图片1裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
     {
@@ -294,8 +371,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature03Image2CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 03 - Image 2 Crop Data',
+        zh: '特点03 - 图片2裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
     {
@@ -308,8 +396,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature03Image3CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 03 - Image 3 Crop Data',
+        zh: '特点03 - 图片3裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
     {
@@ -322,8 +421,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature03Image4CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 03 - Image 4 Crop Data',
+        zh: '特点03 - 图片4裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
     {
@@ -336,8 +446,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature03Image5CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 03 - Image 5 Crop Data',
+        zh: '特点03 - 图片5裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
     {
@@ -350,8 +471,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature03Image6CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 03 - Image 6 Crop Data',
+        zh: '特点03 - 图片6裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
 
@@ -395,8 +527,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature04Image1CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 04 - Image 1 Crop Data',
+        zh: '特点04 - 图片1裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
     {
@@ -409,8 +552,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature04Image2CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 04 - Image 2 Crop Data',
+        zh: '特点04 - 图片2裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
 
@@ -454,8 +608,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature05Image1CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 05 - Image 1 Crop Data',
+        zh: '特点05 - 图片1裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
     {
@@ -468,8 +633,19 @@ export const ServiceFeatures: GlobalConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPicker',
+          Field: '@/components/fields/MediaPickerWithCrop',
         },
+      },
+    },
+    {
+      name: 'feature05Image2CropData',
+      type: 'json',
+      label: {
+        en: 'Feature 05 - Image 2 Crop Data',
+        zh: '特点05 - 图片2裁剪数据',
+      },
+      admin: {
+        hidden: true,
       },
     },
   ],

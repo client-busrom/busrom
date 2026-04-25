@@ -6,6 +6,7 @@ import { Link } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { motion } from "framer-motion";
+import { LexicalRenderer } from "@/components/lexical/LexicalRenderer";
 
 type Props = {
   data: HomeContent["simpleCta"];
@@ -17,8 +18,8 @@ type Props = {
 const LAYOUT_CONFIG = {
   // === 整体容器 ===
   section: {
-    paddingY: "py-8",                    // 上下内边距
-    marginTop: "mt-8 lg:mt-12",          // 内容区域顶部间距
+    paddingY: "pb-8", // 上下内边距
+    marginTop: "mt-8 lg:mt-24", // 内容区域顶部间距
   },
 
   // === 左右两栏布局 ===
@@ -26,10 +27,10 @@ const LAYOUT_CONFIG = {
   // 原始: w=1459 → 缩放后: w=1313
   // 原始左侧701 → 631, 间距161 → 145, 右侧597 → 537
   columns: {
-    totalWidth: "1313px",      // 1459 × 0.9
-    leftWidth: "631px",        // 701 × 0.9
-    gap: "145px",              // 161 × 0.9
-    rightWidth: "537px",       // 597 × 0.9
+    totalWidth: "1313px", // 1459 × 0.9
+    leftWidth: "631px", // 701 × 0.9
+    gap: "145px", // 161 × 0.9
+    rightWidth: "580px", // 597 × 0.9
   },
 
   // === 左侧图片区域 - 桌面端 ===
@@ -37,44 +38,44 @@ const LAYOUT_CONFIG = {
   // 原始: 宽701, 高852 → 缩放后: 宽631, 高767
   desktop: {
     // 整体容器尺寸
-    containerWidth: "631px",   // 701 × 0.9
-    containerHeight: "767px",  // 852 × 0.9
+    containerWidth: "631px", // 701 × 0.9
+    containerHeight: "767px", // 852 × 0.9
 
     // 米色背景矩形: 原始 546×472 → 491×425
     bgRect: {
-      width: "491px",          // 546 × 0.9
-      height: "425px",         // 472 × 0.9
-      left: "79px",            // 88 × 0.9 (原始偏移 274-186=88)
-      top: "166px",            // 184 × 0.9 (原始偏移 3759-3575=184)
+      width: "491px", // 546 × 0.9
+      height: "425px", // 472 × 0.9
+      left: "79px", // 88 × 0.9 (原始偏移 274-186=88)
+      top: "166px", // 184 × 0.9 (原始偏移 3759-3575=184)
     },
 
     // 图片1 - 上方大图: 原始 549×324 → 494×292
     image1: {
-      width: "494px",          // 549 × 0.9
-      height: "292px",         // 324 × 0.9
-      left: "137px",           // 152 × 0.9 (原始偏移 338-186=152)
+      width: "494px", // 549 × 0.9
+      height: "292px", // 324 × 0.9
+      left: "137px", // 152 × 0.9 (原始偏移 338-186=152)
       top: "0px",
-      borderRadius: "rounded-[18px]",  // 20 × 0.9
+      borderRadius: "rounded-[18px]", // 20 × 0.9
       zIndex: "z-20",
     },
 
     // 图片2 - 左下图: 原始 326×387 → 293×348
     image2: {
-      width: "293px",          // 326 × 0.9
-      height: "348px",         // 387 × 0.9
+      width: "293px", // 326 × 0.9
+      height: "348px", // 387 × 0.9
       left: "0px",
-      bottom: "43px",          // 48 × 0.9 (原始偏移 4427-(3992+387)=48)
+      bottom: "43px", // 48 × 0.9 (原始偏移 4427-(3992+387)=48)
       borderRadius: "rounded-[18px]",
       zIndex: "z-30",
     },
 
     // 图片3 - 右下图: 原始 327×482 → 294×434
     image3: {
-      width: "294px",          // 327 × 0.9
-      height: "434px",         // 482 × 0.9
-      left: "337px",           // 374 × 0.9 (原始偏移 560-186=374)
+      width: "294px", // 327 × 0.9
+      height: "434px", // 482 × 0.9
+      left: "337px", // 374 × 0.9 (原始偏移 560-186=374)
       bottom: "0px",
-      borderRadius: "rounded-[17px]",  // 19 × 0.9
+      borderRadius: "rounded-[17px]", // 19 × 0.9
       zIndex: "z-30",
     },
   },
@@ -128,7 +129,7 @@ const LAYOUT_CONFIG = {
       fontSize: "text-3xl lg:text-4xl xl:text-[48px] 2xl:text-[58px]",
       lineHeight: "leading-tight 2xl:leading-[84px]",
       color: "text-brand-text-black",
-      marginBottom: "mb-[-9px]",  // -10 × 0.9
+      marginBottom: "mb-[-9px]", // -10 × 0.9
     },
 
     // 标题第二行 (Your Project?) - fontSize: 96 × 0.9 = 86
@@ -136,7 +137,7 @@ const LAYOUT_CONFIG = {
       fontSize: "text-4xl lg:text-5xl xl:text-[72px] 2xl:text-[86px]",
       lineHeight: "leading-none 2xl:leading-[84px]",
       color: "text-brand-text-black",
-      marginBottom: "mb-[41px]",   // 46 × 0.9
+      marginBottom: "mb-[41px]", // 46 × 0.9
     },
 
     // 副标题 (Let's Build Something Exceptional!) - fontSize: 36 × 0.9 = 32
@@ -144,17 +145,16 @@ const LAYOUT_CONFIG = {
       fontSize: "text-xl lg:text-2xl xl:text-[28px] 2xl:text-[32px]",
       lineHeight: "leading-tight 2xl:leading-[27px]",
       color: "text-[#978350]",
-      marginBottom: "mb-[77px]",   // 86 × 0.9
-      noWrap: true,                // 不换行
+      marginBottom: "mb-[77px]", // 86 × 0.9
+      noWrap: true, // 不换行
     },
 
-    // 描述文字 - fontSize: 32 × 0.9 = 29
+    // 描述文字 - fontSize: 24
     description: {
-      fontSize: "text-base lg:text-lg xl:text-[24px] 2xl:text-[29px]",
-      lineHeight: "leading-relaxed 2xl:leading-[48px]",
-      maxWidth: "max-w-[537px]",   // 597 × 0.9
+      fontSize: "text-base lg:text-lg xl:text-[20px] 2xl:text-[24px]",
+      lineHeight: "leading-relaxed 2xl:leading-[38px]",
       color: "text-[#3C3C3C]",
-      marginBottom: "mb-[124px]",  // 138 × 0.9
+      marginBottom: "mb-[124px]", // 138 × 0.9
     },
   },
 
@@ -179,50 +179,13 @@ const LAYOUT_CONFIG = {
   },
 };
 
-// --- 走马灯组件 ---
-const MarqueeText = ({
-  direction = "left",
-  textColor = "white",
-}: {
-  direction?: "left" | "right";
-  textColor?: string;
-}) => {
-  const texts = Array(20).fill("Busrom");
+// --- 跑马灯带组件 ---
+const MarqueeBelt = ({ content }: { content: any }) => {
+  if (!content) return null;
 
   return (
-    <div className="flex whitespace-nowrap overflow-hidden">
-      <div
-        className={cn(
-          "flex gap-[65px] animate-marquee",
-          direction === "right" && "animate-marquee-reverse"
-        )}
-        style={{ color: textColor }}
-      >
-        {texts.map((text, i) => (
-          <span
-            key={i}
-            className="font-anaheim font-semibold text-[16px] lg:text-[20px]"
-          >
-            {text}
-          </span>
-        ))}
-      </div>
-      <div
-        className={cn(
-          "flex gap-[65px] animate-marquee",
-          direction === "right" && "animate-marquee-reverse"
-        )}
-        style={{ color: textColor }}
-      >
-        {texts.map((text, i) => (
-          <span
-            key={`dup-${i}`}
-            className="font-anaheim font-semibold text-[16px] lg:text-[20px]"
-          >
-            {text}
-          </span>
-        ))}
-      </div>
+    <div className="w-full overflow-hidden">
+      <LexicalRenderer content={content} />
     </div>
   );
 };
@@ -235,7 +198,12 @@ type ImagePlaceholderProps = {
   image?: any;
 };
 
-const ImagePlaceholder = ({ ratio, alt, className, image }: ImagePlaceholderProps) => {
+const ImagePlaceholder = ({
+  ratio,
+  alt,
+  className,
+  image,
+}: ImagePlaceholderProps) => {
   const [w, h] = ratio.split("/").map(Number);
   const paddingBottom = ((h / w) * 100).toFixed(2) + "%";
 
@@ -267,60 +235,29 @@ export default function SimpleCta({ data }: Props) {
 
   // 解析标题（支持 /n 或 \n 换行）
   const titleParts = data.title?.split(/\/n|\n/) || [];
-  const firstLine = titleParts[0]?.trim() || '';
-  const secondLine = titleParts.slice(1).map(s => s.trim()).join(' ') || '';
+  const firstLine = titleParts[0]?.trim() || "";
+  const secondLine =
+    titleParts
+      .slice(1)
+      .map((s) => s.trim())
+      .join(" ") || "";
 
   return (
-    <section className={cn(cfg.section.paddingY, "bg-brand-main")} data-header-theme="light">
-      {/* --- 顶部装饰条（两条交叉的走马灯） --- */}
-      <motion.div
-        className="relative h-[180px] lg:h-[230px] w-full overflow-hidden"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-      >
-        {/* 下层装饰条 */}
-        <motion.div
-          className="absolute w-[120%] left-[-10%] flex items-center justify-center"
-          style={{
-            height: "48px",
-            top: "50%",
-            backgroundColor: "#EBE6D7",
-            transformOrigin: "center center",
-          }}
-          variants={{
-            hidden: { x: "-100%", rotate: 4.53, y: "-50%" },
-            visible: { x: 0, rotate: 4.53, y: "-50%" },
-          }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-        >
-          <MarqueeText direction="right" textColor="#756F3F" />
-        </motion.div>
-
-        {/* 上层装饰条 */}
-        <motion.div
-          className="absolute w-[120%] left-[-10%] flex items-center justify-center"
-          style={{
-            height: "48px",
-            top: "50%",
-            backgroundColor: "#756F3F",
-            transformOrigin: "center center",
-          }}
-          variants={{
-            hidden: { x: "100%", rotate: -2.78, y: "-50%" },
-            visible: { x: 0, rotate: -2.78, y: "-50%" },
-          }}
-          transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-        >
-          <MarqueeText direction="left" textColor="#FFFFFF" />
-        </motion.div>
-      </motion.div>
+    <section
+      className={cn(cfg.section.paddingY, "bg-brand-main")}
+      data-header-theme="light"
+    >
+      {/* --- 跑马灯带 (Marquee Belt) --- */}
+      <MarqueeBelt content={data.marqueeContent} />
 
       {/* ==================== 移动端布局 ==================== */}
       <div className={cn("lg:hidden px-4", cfg.section.marginTop)}>
         <div className="flex flex-col items-center gap-8">
           {/* 移动端图片区域 */}
-          <div className="w-full relative" style={{ aspectRatio: cfg.mobile.containerAspectRatio }}>
+          <div
+            className="w-full relative"
+            style={{ aspectRatio: cfg.mobile.containerAspectRatio }}
+          >
             {/* 米色背景 */}
             <div
               className="absolute bg-[#F2EEDF] z-0 rounded-lg"
@@ -396,14 +333,18 @@ export default function SimpleCta({ data }: Props) {
             <h4 className="font-anaheim font-bold text-xl text-[#978350] leading-tight whitespace-nowrap">
               {data.subtitle}
             </h4>
-            <p className="font-montserrat font-normal text-base text-[#3C3C3C] leading-relaxed">
+            <p className="font-montserrat font-normal text-base text-[#3C3C3C] leading-relaxed whitespace-pre-wrap">
               {data.description}
             </p>
             <div className="pt-4">
               <Link href="/contact-us">
                 <motion.div
                   animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
                 >
                   <Button
                     className={cn(
@@ -411,7 +352,7 @@ export default function SimpleCta({ data }: Props) {
                       cfg.button.mobile.borderRadius,
                       cfg.button.mobile.fontSize,
                       cfg.button.mobile.width,
-                      cfg.button.mobile.height
+                      cfg.button.mobile.height,
                     )}
                   >
                     {data.ctaText}
@@ -509,59 +450,65 @@ export default function SimpleCta({ data }: Props) {
             className="text-left shrink-0"
             style={{ width: cfg.columns.rightWidth }}
           >
-
             {/* 标题第一行 - Ready to Start */}
             {firstLine && (
-              <h3 className={cn(
-                "font-anaheim font-bold",
-                cfg.text.title1.fontSize,
-                cfg.text.title1.lineHeight,
-                cfg.text.title1.color,
-                cfg.text.title1.marginBottom
-              )}>
+              <h3
+                className={cn(
+                  "font-anaheim font-bold",
+                  cfg.text.title1.fontSize,
+                  cfg.text.title1.lineHeight,
+                  cfg.text.title1.color,
+                  cfg.text.title1.marginBottom,
+                )}
+              >
                 {firstLine}
               </h3>
             )}
 
             {/* 标题第二行 - Your Project? */}
             {secondLine && (
-              <h3 className={cn(
-                "font-anaheim font-bold whitespace-nowrap",
-                cfg.text.title2.fontSize,
-                cfg.text.title2.lineHeight,
-                cfg.text.title2.color,
-                cfg.text.title2.marginBottom
-              )}>
+              <h3
+                className={cn(
+                  "font-anaheim font-bold whitespace-nowrap",
+                  cfg.text.title2.fontSize,
+                  cfg.text.title2.lineHeight,
+                  cfg.text.title2.color,
+                  cfg.text.title2.marginBottom,
+                )}
+              >
                 {secondLine}
               </h3>
             )}
 
             {/* 副标题 - Let's Build Something Exceptional! */}
-            <h4 className={cn(
-              "font-anaheim font-bold whitespace-nowrap",
-              cfg.text.subtitle.fontSize,
-              cfg.text.subtitle.lineHeight,
-              cfg.text.subtitle.color,
-              cfg.text.subtitle.marginBottom
-            )}>
+            <h4
+              className={cn(
+                "font-anaheim font-bold whitespace-nowrap",
+                cfg.text.subtitle.fontSize,
+                cfg.text.subtitle.lineHeight,
+                cfg.text.subtitle.color,
+                cfg.text.subtitle.marginBottom,
+              )}
+            >
               {data.subtitle}
             </h4>
 
             {/* 描述文字 */}
-            <p className={cn(
-              "font-montserrat font-normal",
-              cfg.text.description.fontSize,
-              cfg.text.description.lineHeight,
-              cfg.text.description.maxWidth,
-              cfg.text.description.color,
-              cfg.text.description.marginBottom
-            )}>
+            <p
+              className={cn(
+                "font-montserrat font-normal whitespace-pre-wrap",
+                cfg.text.description.fontSize,
+                cfg.text.description.lineHeight,
+                cfg.text.description.color,
+                cfg.text.description.marginBottom,
+              )}
+            >
               {data.description}
             </p>
 
             {/* CTA 按钮 */}
             <div>
-              <Link href="/contact-us">
+              <Link href={data.ctaLink || "/contact-us"}>
                 <motion.div
                   className="origin-center inline-block"
                   style={{ transformOrigin: "50% 50%" }}
@@ -573,7 +520,12 @@ export default function SimpleCta({ data }: Props) {
                     transition: { scale: { duration: 0.3, ease: "easeOut" } },
                   }}
                   transition={{
-                    rotate: { duration: 0.5, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" },
+                    rotate: {
+                      duration: 0.5,
+                      repeat: Infinity,
+                      repeatDelay: 2,
+                      ease: "easeInOut",
+                    },
                   }}
                 >
                   <Button
@@ -582,7 +534,7 @@ export default function SimpleCta({ data }: Props) {
                       cfg.button.desktop.borderRadius,
                       cfg.button.desktop.fontSize,
                       cfg.button.desktop.width,
-                      cfg.button.desktop.height
+                      cfg.button.desktop.height,
                     )}
                   >
                     {data.ctaText}
