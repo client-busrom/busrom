@@ -79,32 +79,116 @@ export function getCropStyles(
   return { container, image }
 }
 
+import { convertToCDNUrl } from './cdn-url'
+
+/**
+ * 统一的图片变体获取逻辑
+ * 兼容 Home API (small/medium/large) 和 Product API (card/tablet/desktop) 格式
+ * 
+ * @param image - ImageObject 对象
+ * @param size - 期望的尺寸级别
+ * @param strategy - 可选的 CDN 策略 ('china' | 'global')
+ * @returns 最终的图片 URL
+ */
+export function getVariantUrl(
+  image: ImageObject | null | undefined,
+  size: 'thumbnail' | 'small' | 'medium' | 'large' | 'xlarge' | string,
+  strategy?: string
+): string {
+  if (!image) return '/images/placeholder.jpg'
+
+  const variants = image.variants as any || {}
+  const getUrl = (val: any) => (typeof val === 'string' ? val : val?.url)
+
+  // 尺寸映射表
+  const mapping: Record<string, string[]> = {
+    thumbnail: ['thumbnail'],
+    small: ['small', 'card'],
+    medium: ['medium', 'tablet'],
+    large: ['large', 'desktop'],
+    xlarge: ['xlarge', 'original']
+  }
+
+  // 定义后备查找顺序 (不包含 thumbnail，除非明确请求它)
+  const getFallbackChain = (target: string): string[] => {
+    switch (target) {
+      case 'large': return ['large', 'medium', 'small']
+      case 'medium': return ['medium', 'small']
+      case 'small': return ['small']
+      case 'xlarge': return ['xlarge']
+      default: return [target]
+    }
+  }
+
+  const chain = getFallbackChain(size)
+  const thumbUrl = getUrl(variants.thumbnail)
+
+  for (const s of chain) {
+    const keys = mapping[s] || [s]
+    for (const key of keys) {
+      const url = getUrl(variants[key])
+      // 关键逻辑：如果是大中尺寸请求，且找到的 URL 跟缩略图一样，则跳过
+      if (url && (size === 'thumbnail' || url !== thumbUrl)) {
+        return convertToCDNUrl(url, strategy)
+      }
+    }
+  }
+
+  // 最后后备：原始图 (xlarge/original) -> 占位图
+  const finalUrl = image.url || getUrl(variants.xlarge)
+  return finalUrl ? convertToCDNUrl(finalUrl, strategy) : '/images/placeholder.jpg'
+}
+
+/**
+ * 统一生成 srcset 的逻辑
+ * 
+ * @param image - ImageObject 对象
+ * @param strategy - 可选的 CDN 策略
+ * @returns srcset 字符串
+ */
+export function getSrcSet(image: ImageObject | null | undefined, strategy?: string): string | undefined {
+  if (!image || !image.variants) return undefined
+
+  const v = image.variants as any
+  const srcsetParts: string[] = []
+  const getUrl = (val: any) => (typeof val === 'string' ? val : val?.url)
+
+  const thumbUrl = getUrl(v.thumbnail)
+  const smallUrl = getUrl(v.small || v.card)
+  const mediumUrl = getUrl(v.medium || v.tablet)
+  const largeUrl = getUrl(v.large || v.desktop)
+
+  // 1. 缩略图总是可以作为 400w
+  if (thumbUrl) srcsetParts.push(`${convertToCDNUrl(thumbUrl, strategy)} 400w`)
+
+  // 2. 其他尺寸只有在非回退（不等于缩略图）时才加入，防止浏览器误加载
+  if (smallUrl && smallUrl !== thumbUrl) {
+    srcsetParts.push(`${convertToCDNUrl(smallUrl, strategy)} 768w`)
+  }
+  if (mediumUrl && mediumUrl !== thumbUrl && mediumUrl !== smallUrl) {
+    srcsetParts.push(`${convertToCDNUrl(mediumUrl, strategy)} 1024w`)
+  }
+  if (largeUrl && largeUrl !== thumbUrl && largeUrl !== mediumUrl) {
+    srcsetParts.push(`${convertToCDNUrl(largeUrl, strategy)} 1920w`)
+  }
+
+  return srcsetParts.length > 0 ? srcsetParts.join(', ') : undefined
+}
+
 /**
  * 根据 cropData.variant 获取对应的图片变体 URL
- * 
- * 变体映射：
- *   original → image.url (xlarge)
- *   desktop  → variants.large (1920px)
- *   tablet   → variants.medium (1024px)
- *   card     → variants.small (768px)
- *   thumbnail → variants.thumbnail (400px)
  */
 export function getCropImageUrl(
   image: ImageObject | null | undefined,
   cropData: ImageCropData | null | undefined,
 ): string {
   if (!image) return ''
-  if (!cropData?.variant) return image.variants?.large || image.url || ''
-
-  const variantMap: Record<string, string | undefined> = {
-    original: image.url || (image.variants?.xlarge as string | undefined),
-    desktop: (image.variants?.large || image.variants?.desktop) as string | undefined,
-    tablet: (image.variants?.medium || image.variants?.tablet) as string | undefined,
-    card: (image.variants?.small || image.variants?.card) as string | undefined,
-    thumbnail: image.variants?.thumbnail as string | undefined,
-  }
-
-  return variantMap[cropData.variant] || image.variants?.large || image.url || ''
+  
+  // 如果是 original，映射到 xlarge (原始图)
+  // 否则根据 variant 映射，默认大图
+  const size = cropData?.variant === 'original' ? 'xlarge' : (cropData?.variant || 'large')
+  
+  return getVariantUrl(image, size)
 }
 
 /**

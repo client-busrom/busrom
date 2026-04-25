@@ -12,15 +12,7 @@
  */
 
 import type { ImageObject } from '@/lib/content-data'
-
-type ImageVariants = {
-  thumbnail?: string  // 400x300
-  card?: string       // 768x512
-  tablet?: string     // 1024x683
-  desktop?: string    // 1920x1280
-  webp?: string       // Original WebP (avoid using - too large)
-  [key: string]: string | undefined
-}
+import { getVariantUrl, getSrcSet } from '@/lib/utils'
 
 type ServerImageProps = {
   image: ImageObject | null | undefined
@@ -40,49 +32,6 @@ type ServerImageProps = {
  * Get the best image URL based on size preset
  * Returns the appropriately sized variant URL
  */
-function getImageUrl(image: ImageObject | null | undefined, size: string): string {
-  if (!image) return '/images/placeholder.jpg'
-
-  const variants = image.variants as ImageVariants | undefined
-
-  // Map size to variant name (use sized variants, NOT the full webp)
-  const variantMap: Record<string, string> = {
-    thumbnail: 'thumbnail',  // 400px
-    small: 'card',           // 768px
-    medium: 'tablet',        // 1024px
-    large: 'desktop',        // 1920px
-  }
-
-  const variantKey = variantMap[size] || 'desktop'
-  const variantUrl = variants?.[variantKey]
-
-  // Return the sized variant, or fall back to original URL
-  // Avoid using variants.webp as it's the full-size original
-  return variantUrl || image.url || '/images/placeholder.jpg'
-}
-
-/**
- * Generate srcset for responsive images
- * Uses CDN variants directly without Next.js Image optimization
- */
-function generateSrcSet(image: ImageObject | null | undefined): string | undefined {
-  if (!image) return undefined
-
-  const variants = image.variants as ImageVariants | undefined
-  if (!variants) return undefined
-
-  const srcsetParts: string[] = []
-
-  // Map variants to widths (based on Payload image sizes)
-  // All CDN variants are already WebP format
-  if (variants.thumbnail) srcsetParts.push(`${variants.thumbnail} 400w`)
-  if (variants.card) srcsetParts.push(`${variants.card} 768w`)
-  if (variants.tablet) srcsetParts.push(`${variants.tablet} 1024w`)
-  if (variants.desktop) srcsetParts.push(`${variants.desktop} 1920w`)
-
-  return srcsetParts.length > 0 ? srcsetParts.join(', ') : undefined
-}
-
 export function ServerImage({
   image,
   alt,
@@ -96,9 +45,9 @@ export function ServerImage({
   style,
   cropData,
 }: ServerImageProps) {
-  const src = getImageUrl(image, size)
+  const src = getVariantUrl(image, size)
   const altText = alt || image?.altText || ''
-  const srcSet = generateSrcSet(image)
+  const srcSet = getSrcSet(image)
 
   // Common style for fill mode
   const fillStyle: React.CSSProperties = fill

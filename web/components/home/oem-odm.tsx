@@ -27,9 +27,7 @@ export default function OemOdm({ data }: Props) {
   const { oem: OEM, odm: ODM } = data;
 
   // clip-path for desktop diagonal split
-  // 左侧：右边斜切
   const clipPathLeft = "polygon(0% 0%, 100% 0%, 85% 100%, 0% 100%)";
-  // 右侧：左边斜切
   const clipPathRight = "polygon(15% 0%, 100% 0%, 100% 100%, 0% 100%)";
 
   // 动画配置
@@ -39,7 +37,8 @@ export default function OemOdm({ data }: Props) {
     hidden: { x: "-100%", opacity: 0 },
     visible: {
       x: 0,
-      opacity: 1,
+      opacity: 0.6,
+      filter: "blur(2.3px)",
       transition: { duration: 0.6, ease: easeOutQuad },
     },
   };
@@ -48,17 +47,18 @@ export default function OemOdm({ data }: Props) {
     hidden: { x: "100%", opacity: 0 },
     visible: {
       x: 0,
-      opacity: 1,
+      opacity: 0.6,
+      filter: "blur(2.3px)",
       transition: { duration: 0.6, ease: easeOutQuad },
     },
   };
 
-  // 移动端背景动画 - 从上/下滑入
   const bgTopVariants = {
     hidden: { y: "-100%", opacity: 0 },
     visible: {
       y: 0,
-      opacity: 1,
+      opacity: 0.6,
+      filter: "blur(2.3px)",
       transition: { duration: 0.6, ease: easeOutQuad },
     },
   };
@@ -67,7 +67,8 @@ export default function OemOdm({ data }: Props) {
     hidden: { y: "100%", opacity: 0 },
     visible: {
       y: 0,
-      opacity: 1,
+      opacity: 0.6,
+      filter: "blur(2.3px)",
       transition: { duration: 0.6, ease: easeOutQuad },
     },
   };
@@ -107,7 +108,6 @@ export default function OemOdm({ data }: Props) {
     },
   };
 
-  // 移动端内容动画
   const contentTopVariants = {
     hidden: { opacity: 0, y: -20 },
     visible: {
@@ -149,7 +149,7 @@ export default function OemOdm({ data }: Props) {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-[#1a1a1a] text-white overflow-hidden"
+      className="relative bg-[#000000] text-white overflow-hidden"
       data-header-theme="light"
     >
       {/* ==================== Desktop Layout (md+) ==================== */}
@@ -157,11 +157,11 @@ export default function OemOdm({ data }: Props) {
         className="hidden md:block relative"
         style={{ height: "clamp(400px, 51.5vw, 988px)" }}
       >
-        {/* OEM 背景图片 (左侧) - 按实际图片尺寸 1106x988 */}
+        {/* OEM 背景图片 (左侧) */}
         <motion.div
           className="absolute inset-y-0 left-0 z-[1]"
           style={{
-            width: "57.6%", // 1106 / 1920
+            width: "57.6%",
             clipPath: clipPathLeft,
           }}
           variants={bgLeftVariants}
@@ -174,15 +174,13 @@ export default function OemOdm({ data }: Props) {
             size="large"
             className="object-cover absolute inset-0 w-full h-full"
           />
-          {/* 轻微遮罩增加文字可读性 */}
-          <div className="absolute inset-0 bg-black/30 z-[1]" />
         </motion.div>
 
-        {/* ODM 背景图片 (右侧) - 按实际图片尺寸 1034x988 */}
+        {/* ODM 背景图片 (右侧) */}
         <motion.div
           className="absolute inset-y-0 right-0 z-[2]"
           style={{
-            width: "53.8%", // 1034 / 1920
+            width: "53.8%",
             clipPath: clipPathRight,
           }}
           variants={bgRightVariants}
@@ -195,8 +193,6 @@ export default function OemOdm({ data }: Props) {
             size="large"
             className="object-cover absolute inset-0 w-full h-full"
           />
-          {/* 轻微遮罩增加文字可读性 */}
-          <div className="absolute inset-0 bg-black/30 z-[1]" />
         </motion.div>
 
         {/* 闪电分割线 */}
@@ -339,9 +335,7 @@ export default function OemOdm({ data }: Props) {
             animate={isInView ? "visible" : "hidden"}
           >
             {ODM.description.map((paragraph, index) => (
-              <p key={index}>
-                {paragraph}
-              </p>
+              <p key={index}>{paragraph}</p>
             ))}
           </motion.div>
         </div>
@@ -350,22 +344,21 @@ export default function OemOdm({ data }: Props) {
       {/* ==================== Mobile Layout ==================== */}
       <div className="md:hidden relative">
         {/* OEM 区块 */}
-        <motion.div
-          className="relative min-h-[50vh]"
-          variants={bgTopVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-        >
-          {/* OEM 背景图片 - 在深色背景上方 */}
-          <div className="absolute inset-0 z-[1]">
+        <div className="relative min-h-[50vh]">
+          {/* OEM 背景图片 */}
+          <motion.div
+            className="absolute inset-0 z-[1]"
+            variants={bgTopVariants}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+          >
             <OptimizedImage
               image={OEM.bgImage}
               alt={OEM.bgImage?.altText || "OEM Background"}
               size="small"
               className="object-cover absolute inset-0 w-full h-full"
             />
-            <div className="absolute inset-0 bg-black/30 z-[1]" />
-          </div>
+          </motion.div>
 
           {/* OEM 内容 */}
           <motion.div
@@ -377,7 +370,6 @@ export default function OemOdm({ data }: Props) {
             <h2 className="text-5xl font-extrabold font-anaheim mb-4">
               {OEM.title}
             </h2>
-            {/* 移动端显示两段文案 */}
             <div className="text-sm leading-relaxed mb-6 opacity-90 space-y-3">
               <p>{OEM.description[0]}</p>
               {OEM.description[1] && <p>{OEM.description[1]}</p>}
@@ -398,25 +390,24 @@ export default function OemOdm({ data }: Props) {
               />
             </div>
           </motion.div>
-        </motion.div>
+        </div>
 
         {/* ODM 区块 */}
-        <motion.div
-          className="relative min-h-[50vh]"
-          variants={bgBottomVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-        >
-          {/* ODM 背景图片 - 在深色背景上方 */}
-          <div className="absolute inset-0 z-[1]">
+        <div className="relative min-h-[50vh]">
+          {/* ODM 背景图片 */}
+          <motion.div
+            className="absolute inset-0 z-[1]"
+            variants={bgBottomVariants}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+          >
             <OptimizedImage
               image={ODM.bgImage}
               alt={ODM.bgImage?.altText || "ODM Background"}
               size="small"
               className="object-cover absolute inset-0 w-full h-full"
             />
-            <div className="absolute inset-0 bg-black/30 z-[1]" />
-          </div>
+          </motion.div>
 
           {/* ODM 内容 */}
           <motion.div
@@ -425,20 +416,17 @@ export default function OemOdm({ data }: Props) {
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
           >
-            {/* ODM 文字 - 居右对齐，确保不溢出 */}
             <div className="text-right mb-6 w-full">
               <h2 className="text-5xl font-extrabold font-anaheim mb-4">
                 {ODM.title}
               </h2>
               <div className="text-sm leading-relaxed opacity-90 space-y-3">
                 {ODM.description.map((paragraph, index) => (
-                  <p key={index}>
-                    {paragraph}
-                  </p>
+                  <p key={index}>{paragraph}</p>
                 ))}
               </div>
             </div>
-            {/* ODM 产品图片 - 居中，和 OEM 完全一样的尺寸 */}
+            {/* ODM 产品图片 */}
             <div
               className="rounded-2xl overflow-hidden mx-auto w-[70%]"
               style={{
@@ -454,7 +442,7 @@ export default function OemOdm({ data }: Props) {
               />
             </div>
           </motion.div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

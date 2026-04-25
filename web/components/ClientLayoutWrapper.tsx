@@ -44,10 +44,18 @@ type LoadingStage = "loading" | "imageWall" | "done";
 export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutWrapperProps) {
   const pathname = usePathname();
 
-  // 初始状态：只有首页 + preloader 启用时才设为 loading
-  const [loadingStage, setLoadingStage] = useState<LoadingStage>(
-    preloaderConfig.enabled ? "loading" : "done"
-  );
+  // 初始状态：优先从 sessionStorage 恢复，避免重渲染导致的二次加载
+  const [loadingStage, setLoadingStage] = useState<LoadingStage>(() => {
+    // 只有在客户端且开启了配置时才尝试恢复
+    if (typeof window !== 'undefined' && preloaderConfig.enabled) {
+      try {
+        if (sessionStorage.getItem(PRELOADER_SHOWN_KEY) === 'true') {
+          return "done";
+        }
+      } catch (e) {}
+    }
+    return preloaderConfig.enabled ? "loading" : "done";
+  });
 
   // 客户端检查：非首页直接跳过、sessionStorage 已标记跳过、性能测试工具跳过
   // Preloader 使用 dynamic({ ssr: false })，在 useEffect 执行前不会渲染，
@@ -103,6 +111,20 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
     markPreloaderShown();
     setLoadingStage("done");
   }, [markPreloaderShown]);
+
+  // --- 动态管理 Body 滚动锁定 ---
+  useEffect(() => {
+    if (loadingStage !== "done") {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
+    // 组件卸载时确保恢复
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [loadingStage]);
 
   const isLoading = loadingStage !== "done";
   const showImageWall = loadingStage === "imageWall" && preloaderConfig.imageWallEnabled;

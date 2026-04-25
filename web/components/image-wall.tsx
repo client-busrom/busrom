@@ -45,58 +45,61 @@ export function ImageWall({
     setLoadedCount(prev => prev + 1)
   }
 
+  const hasStarted = useRef(false)
+
   useEffect(() => {
-    // 如果没有图片且 isActive，直接完成
-    if (isActive && images.length === 0) {
-      onComplete()
-      return
-    }
+    // 1. 基础条件检查
+    if (!isActive || !allImagesReady || hasStarted.current) return;
 
     const container = containerRef.current
     if (!container) return
 
-    // 当 isActive 变为 true 时，立即显示背景色，避免白屏
-    if (isActive) {
-      gsap.set(container, { opacity: 1, pointerEvents: 'auto' });
-    }
+    // 2. 标记为已启动，防止重复触发
+    hasStarted.current = true;
 
-    // 只有在 isActive 为 true 且所有图片都已加载时才执行动画
-    if (!isActive || !allImagesReady) return;
-
-    const tl = gsap.timeline({
-      onComplete: () => {
-        gsap.to(container, {
-          opacity: 0,
-          duration: 1,
-          onComplete: onComplete,
-        })
-      },
-    })
-
-    // 在动画开始前，立即让容器可见
-    gsap.set(container, { opacity: 1, pointerEvents: 'auto' });
-
-    // 使用 transform 而不是 scale，启用硬件加速
-    tl.fromTo(
-      ".image-item",
-      {
-        scale: 0,
-        opacity: 0,
-        willChange: "transform, opacity"
-      },
-      {
-        scale: 1,
-        opacity: 1,
-        duration: duration,
-        ease: "power2.out",
-        stagger: stagger,
-        force3D: true, // 强制使用 GPU 加速
+    // 3. 使用 GSAP Context 进行安全管理
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
         onComplete: () => {
-          // 动画结束后移除 will-change 以释放资源
-          gsap.set(".image-item", { willChange: "auto" });
+          // 4. 关键改进：淡出开始时就通知外部“加载已完成”
+          // 这样父组件会立刻切换到 done 状态，避免状态滞留导致的重复触发
+          onComplete();
+
+          gsap.to(container, {
+            opacity: 0,
+            duration: 1,
+            pointerEvents: 'none',
+            ease: "power2.inOut",
+          })
+        },
+      })
+
+      // 初始设置
+      gsap.set(container, { opacity: 1, pointerEvents: 'auto' });
+
+      // 执行图片弹出动画
+      tl.fromTo(
+        ".image-item",
+        {
+          scale: 0,
+          opacity: 0,
+          willChange: "transform, opacity"
+        },
+        {
+          scale: 1,
+          opacity: 1,
+          duration: duration,
+          ease: "power2.out",
+          stagger: stagger,
+          force3D: true,
+          onComplete: () => {
+            gsap.set(".image-item", { willChange: "auto" });
+          }
         }
-      }
-    )
+      )
+    }, containerRef);
+
+    return () => ctx.revert(); // 清理动画
   }, [isActive, allImagesReady, onComplete, duration, stagger])
 
   return (

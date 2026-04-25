@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import type { HomeContent } from "@/lib/content-data";
 import { cn } from "@/lib/utils";
 import { ServerImage } from "@/components/ui/ServerImage";
@@ -281,28 +282,40 @@ export default function SeriesIntro({ data }: Props) {
                 <div className="flex-1">
                   <div className="h-72 overflow-hidden relative">
                     <div className="flex flex-col absolute w-full top-0 left-0">
-                      {renderWindow.map((item, idx) => (
-                        <button
-                          key={`${item.title}-${idx}`}
-                          className="w-full text-left py-4 transition-all duration-300 h-14"
-                          style={{ opacity: getOpacity(item.distanceFromFocus) }}
-                          onClick={() => {
-                            setActiveSeriesIndex(item.originalIndex);
-                            setActiveImageIndex(0);
-                          }}
-                        >
-                          <span
-                            className={cn(
-                              "text-lg font-anaheim font-bold transition-colors duration-300",
-                              item.isCurrent
-                                ? "text-brand-cream"
-                                : "text-brand-cream/70 hover:text-brand-cream"
-                            )}
+                      <AnimatePresence initial={false}>
+                        {renderWindow.map((item) => (
+                          <motion.button
+                            key={item.title}
+                            layout
+                            initial={{ opacity: 0 }}
+                            animate={{ 
+                              opacity: getOpacity(item.distanceFromFocus),
+                              scale: item.isCurrent ? 1.05 : 1,
+                            }}
+                            exit={{ opacity: 0 }}
+                            transition={{
+                              layout: { type: "spring", stiffness: 300, damping: 30 },
+                              opacity: { duration: 0.2 }
+                            }}
+                            className="w-full text-left py-4 pl-6 transition-colors duration-300 h-14 origin-left"
+                            onClick={() => {
+                              setActiveSeriesIndex(item.originalIndex);
+                              setActiveImageIndex(0);
+                            }}
                           >
-                            {item.title}
-                          </span>
-                        </button>
-                      ))}
+                            <span
+                              className={cn(
+                                "text-lg font-anaheim font-bold transition-colors duration-300",
+                                item.isCurrent
+                                  ? "text-brand-cream"
+                                  : "text-brand-cream/70 hover:text-brand-cream",
+                              )}
+                            >
+                              {item.title}
+                            </span>
+                          </motion.button>
+                        ))}
+                      </AnimatePresence>
                     </div>
                   </div>
                 </div>
@@ -397,8 +410,10 @@ export default function SeriesIntro({ data }: Props) {
                   {[...currentImages, ...currentImages.slice(0, Math.min(2, totalImages))].map((imageObj, idx) => (
                     <div
                       key={`${activeSeries?.title}-img-${idx}`}
-                      className="flex-shrink-0 w-[75%] aspect-[2/1] relative rounded-2xl overflow-hidden"
+                      className="flex-shrink-0 w-[75%] aspect-[2/1] relative rounded-2xl overflow-hidden group cursor-pointer"
                     >
+                      {/* 内部阴影遮罩 (仅悬停展示) */}
+                      <div className="absolute inset-0 z-10 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none shadow-[inset_0_0_120px_rgba(0,0,0,0.5)]" />
                       {(() => {
                         const originalIdx = idx % totalImages;
                         const cropData = activeSeries.imageCropDataList?.[originalIdx];
@@ -431,9 +446,10 @@ export default function SeriesIntro({ data }: Props) {
                         return (
                           <ServerImage
                             image={imageObj}
-                            alt={imageObj?.altText || `${activeSeries?.title} - Image ${originalIdx + 1}`}
-                            size="medium"
+                            alt={imageObj?.altText || `${activeSeries?.title} - Image ${idx % totalImages + 1}`}
+                            size="large"
                             fill
+                            priority={idx % totalImages === activeImageIndex}
                             className="w-full h-full object-cover"
                             objectPosition={getObjectPosition(imageObj)}
                           />
@@ -483,8 +499,10 @@ export default function SeriesIntro({ data }: Props) {
                 {currentImages.map((imageObj, idx) => (
                   <div
                     key={`${activeSeries?.title}-mobile-img-${idx}`}
-                    className="flex-shrink-0 w-[85%] aspect-[16/9] relative rounded-xl overflow-hidden"
+                    className="flex-shrink-0 w-[85%] aspect-[16/9] relative rounded-xl overflow-hidden group"
                   >
+                    {/* 内部阴影遮罩 (仅悬停展示) */}
+                    <div className="absolute inset-0 z-10 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none shadow-[inset_0_0_80px_rgba(0,0,0,0.4)]" />
                     {(() => {
                       const cropData = activeSeries.imageCropDataList?.[idx];
                       const cropStyles = getCropStyles(cropData);

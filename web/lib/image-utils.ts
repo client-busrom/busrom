@@ -58,41 +58,10 @@ import { convertToCDNUrl } from './cdn-url'
  * NOTE: This now delegates to convertToCDNUrl which handles the 
  * dynamic strategy switching (China vs Global).
  */
-function normalizeToCDN(url: string | unknown, strategy?: string): string {
-  // Ensure url is a valid string
-  if (!url) return ''
-  
-  let stringUrl = ''
-  if (typeof url !== 'string') {
-    if (typeof url === 'object' && url !== null && 'url' in url) {
-      const extractedUrl = (url as { url: unknown }).url
-      if (typeof extractedUrl === 'string') {
-        stringUrl = extractedUrl
-      }
-    }
-  } else {
-    stringUrl = url
-  }
-
-  if (!stringUrl) {
-    if (url) console.warn('[normalizeToCDN] Could not extract string url from:', typeof url, url)
-    return ''
-  }
-
-  return convertToCDNUrl(stringUrl, strategy)
-}
+import { getVariantUrl, getSrcSet } from './utils'
 
 /**
  * Get optimized image URL
- *
- * Returns the best image URL based on requested size and format preference.
- * Falls back to smaller/larger sizes if the requested size is not available.
- *
- * @param image - Media object from Payload CMS
- * @param size - Desired image size (default: 'medium')
- * @param preferWebP - Whether to prefer WebP format (default: true)
- * @param strategy - Optional forced strategy ('china' | 'global')
- * @returns Optimized image URL or placeholder
  */
 export function getOptimizedImageUrl(
   image: MediaImage | null | undefined,
@@ -100,91 +69,18 @@ export function getOptimizedImageUrl(
   preferWebP: boolean = true,
   strategy?: string
 ): string {
-  // If no image, return placeholder
-  if (!image) {
-    return '/images/placeholder.jpg'
-  }
-
-  // Get the original URL (support both file.url and fileUrl)
-  const originalUrl = image.file?.url || image.fileUrl
-  if (!originalUrl) {
-    return '/images/placeholder.jpg'
-  }
-
-  const { variants } = image
-
-  // 1. Try WebP format first (if enabled and available)
-  if (preferWebP && variants?.webp) {
-    return normalizeToCDN(variants.webp, strategy)
-  }
-
-  // 2. If xlarge requested, return original image directly
-  if (size === 'xlarge') {
-    return normalizeToCDN(originalUrl, strategy)
-  }
-
-  // 3. Try requested size variant with name mapping for Payload CMS
-  const sizeMap: Record<string, string> = {
-    'small': 'card',
-    'medium': 'tablet',
-    'large': 'desktop'
-  }
-  
-  const mappedSize = sizeMap[size] || size
-  if (variants && (variants[size as keyof ImageVariants] || (variants as any)[mappedSize])) {
-    return normalizeToCDN((variants[size as keyof ImageVariants] || (variants as any)[mappedSize])!, strategy)
-  }
-
-  // 4. Fallback strategy: try other sizes from large to small (skip xlarge/original)
-  const fallbackOrder: Array<keyof ImageVariants> = [
-    'large', 'medium', 'small', 'thumbnail'
-  ]
-
-  for (const fallbackSize of fallbackOrder) {
-    const fMappedSize = sizeMap[fallbackSize] || fallbackSize
-    const variantUrl = variants && (variants[fallbackSize as keyof ImageVariants] || (variants as any)[fMappedSize])
-    if (variantUrl) {
-      return normalizeToCDN(variantUrl, strategy)
-    }
-  }
-
-  // 5. Last resort: return original URL (normalized to CDN)
-  // This only happens if no variants exist at all
-  return normalizeToCDN(originalUrl, strategy)
+  // 转换 MediaImage 到 ImageObject (内部结构是一致的，主要是 variants)
+  return getVariantUrl(image as any, size, strategy)
 }
 
 /**
  * Get responsive image srcset
- *
- * Generates a srcset string for use in <picture> tags or Next.js Image loader
- *
- * @param image - Media object from Payload CMS
- * @param strategy - Optional forced strategy ('china' | 'global')
- * @returns srcset string with multiple sizes
  */
 export function getImageSrcSet(
   image: MediaImage | null | undefined,
   strategy?: string
 ): string {
-  if (!image || !image.variants) {
-    return ''
-  }
-
-  const { variants } = image
-  const srcset: string[] = []
-
-  if (variants.thumbnail) srcset.push(`${normalizeToCDN(variants.thumbnail, strategy)} 400w`)
-  
-  const small = variants.small || (variants as any).card
-  if (small) srcset.push(`${normalizeToCDN(small, strategy)} 768w`)
-  
-  const medium = variants.medium || (variants as any).tablet
-  if (medium) srcset.push(`${normalizeToCDN(medium, strategy)} 1024w`)
-  
-  const large = variants.large || (variants as any).desktop
-  if (large) srcset.push(`${normalizeToCDN(large, strategy)} 1920w`)
-
-  return srcset.join(', ')
+  return getSrcSet(image as any, strategy) || ''
 }
 
 /**

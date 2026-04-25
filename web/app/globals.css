@@ -132,18 +132,20 @@
     user-drag: none;
   }
 
-  /* Restore selection for form elements */
+  /* Restore selection for form elements and ensure buttons/links are responsive */
   input, 
   textarea, 
+  button,
+  a,
   [contenteditable="true"] {
     user-select: auto;
     -webkit-user-select: auto;
   }
 }
 
+/* 移除硬编码的 overflow: hidden，改由 ClientLayoutWrapper 动态控制 */
 html, body {
-  /* 在加载完成前，我们依然禁用滚动条，避免布局问题 */
-  overflow: hidden;
+  /* overflow: hidden;  <-- 移除这一行，避免 JS 未执行时全站锁死 */
 }
 
 /* 添加用于文字光泽扫过效果的动画 */

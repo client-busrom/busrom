@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { OptimizedBackgroundImage } from "@/components/ui/OptimizedImage";
@@ -54,24 +54,24 @@ const ADVANTAGE_POSITIONS_DESIGN = [
 
 // "Busrom" 标题位置 - 视口中心偏上
 const TITLE_Y = 278;
-const TITLE_FONT_SIZE = 300;
+const TITLE_FONT_SIZE = 260;
 
 // 图标圆圈尺寸
 const ICON_SIZE = 66;
 
 // 右上角 "Brand Advantage" 标题配置
 const SECTION_TITLE = {
-  x: 140,           // 距离右边的距离 (px, 基于 1920)
-  y: -420,           // 距离顶部的距离 (px, 基于 1080)
-  fontSize: 60,     // 字体大小 (px, 基于 1920)
-  lineHeight: 1.1,  // 行高
+  x: 140, // 距离右边的距离 (px, 基于 1920)
+  y: -220, // 距离顶部的距离 (px, 基于 1080)
+  fontSize: 60, // 字体大小 (px, 基于 1920)
+  lineHeight: 1.1, // 行高
 };
 
 /**
  * Check if a CMS icon value is valid (not empty / not default placeholder)
  */
 function isValidCmsIcon(icon: string | undefined): icon is string {
-  return !!icon && icon !== 'lucide:sparkles'
+  return !!icon && icon !== "lucide:sparkles";
 }
 
 export default function BrandAdvantages({ data }: Props) {
@@ -105,7 +105,8 @@ export default function BrandAdvantages({ data }: Props) {
 
     const stickyEndPoint = sectionBottom - imageOriginalHeight - HIDE_OFFSET;
 
-    const isScrollingWithinSection = scrollY >= stickyStartPoint && scrollY <= sectionBottom;
+    const isScrollingWithinSection =
+      scrollY >= stickyStartPoint && scrollY <= sectionBottom;
 
     if (isScrollingWithinSection) {
       if (scrollY >= stickyStartPoint && scrollY < stickyEndPoint) {
@@ -126,7 +127,10 @@ export default function BrandAdvantages({ data }: Props) {
 
       const revealEnd = stickyEndPoint;
 
-      const scrollProgress = Math.min(1, Math.max(0, (scrollY - revealStart) / (revealEnd - revealStart)));
+      const scrollProgress = Math.min(
+        1,
+        Math.max(0, (scrollY - revealStart) / (revealEnd - revealStart)),
+      );
 
       setContentOpacity(scrollProgress);
     } else if (scrollY < stickyStartPoint) {
@@ -201,7 +205,13 @@ export default function BrandAdvantages({ data }: Props) {
           style={imageStyle}
         >
           {isSticky && <div style={imageSpacerStyle} />}
-          <Image src={svgSrc} alt={"Busrom Band"} fill sizes="100vw" className="object-cover" />
+          <Image
+            src={svgSrc}
+            alt={"Busrom Band"}
+            fill
+            sizes="100vw"
+            className="object-cover"
+          />
         </div>
 
         {/* 2. 下方内容区域 (揭示文字) */}
@@ -222,7 +232,10 @@ export default function BrandAdvantages({ data }: Props) {
                 <span>Brand Advantage</span>
               </div>
               {/* Busrom */}
-              <h1 className="font-pingfang font-semibold text-white" style={{ fontSize: '18vw' }}>
+              <h1
+                className="font-pingfang font-semibold text-white"
+                style={{ fontSize: "18vw" }}
+              >
                 Busrom
               </h1>
             </div>
@@ -243,21 +256,33 @@ export default function BrandAdvantages({ data }: Props) {
                       key={advantage}
                       className={cn(
                         "relative flex items-center gap-2",
-                        isLeft ? "flex-row pr-[52%]" : "flex-row-reverse pl-[52%]"
+                        isLeft
+                          ? "flex-row pr-[52%]"
+                          : "flex-row-reverse pl-[52%]",
                       )}
                     >
                       {/* 横向分支线 */}
                       <div
                         className={cn(
                           "absolute top-1/2 h-0.5 bg-white/30 -translate-y-1/2",
-                          isLeft ? "right-[48%] w-[8%]" : "left-[48%] w-[8%]"
+                          isLeft ? "right-[48%] w-[8%]" : "left-[48%] w-[8%]",
                         )}
                       />
 
-                      {/* 图标 - CMS有值则用Iconify，否则用默认SVG */}
-                      <div className="w-8 h-8 flex-shrink-0 relative z-10 flex items-center justify-center">
+                      {/* 图标 - CMS有值则用Iconify并加圆圈描边，否则用默认SVG */}
+                      <div
+                        className={cn(
+                          "w-8 h-8 flex-shrink-0 relative z-10 flex items-center justify-center",
+                          isValidCmsIcon(data.icons[index]) &&
+                            "rounded-full border border-white/40",
+                        )}
+                      >
                         {isValidCmsIcon(data.icons[index]) ? (
-                          <IconifyIcon name={data.icons[index]} size={32} className="text-white" />
+                          <IconifyIcon
+                            name={data.icons[index]}
+                            size={18}
+                            className="text-white"
+                          />
                         ) : (
                           <Image
                             src={`/brand-adv-${iconIndex}.svg`}
@@ -273,10 +298,10 @@ export default function BrandAdvantages({ data }: Props) {
                       <span
                         className={cn(
                           "font-anaheim text-white text-xs leading-tight whitespace-pre-line",
-                          isLeft ? "text-right" : "text-left"
+                          isLeft ? "text-right" : "text-left",
                         )}
                       >
-                        {advantage.replace(/\\n|\/n/g, '\n')}
+                        {advantage.replace(/\\n|\/n/g, "\n")}
                       </span>
                     </div>
                   );
@@ -320,7 +345,10 @@ export default function BrandAdvantages({ data }: Props) {
 
             {/* Advantages 按设计稿位置分布 */}
             {data.advantages.map((advantage, index) => {
-              const pos = ADVANTAGE_POSITIONS_DESIGN[index % ADVANTAGE_POSITIONS_DESIGN.length];
+              const pos =
+                ADVANTAGE_POSITIONS_DESIGN[
+                  index % ADVANTAGE_POSITIONS_DESIGN.length
+                ];
               const iconIndex = index + 1; // SVG 文件从 1 开始编号
 
               return (
@@ -332,9 +360,13 @@ export default function BrandAdvantages({ data }: Props) {
                     top: `${(pos.y / DESIGN_HEIGHT) * 100}%`,
                   }}
                 >
-                  {/* 图标 - CMS有值则用Iconify，否则用默认SVG */}
+                  {/* 图标 - CMS有值则用Iconify并加圆圈描边，否则用默认SVG */}
                   <div
-                    className="flex-shrink-0 flex items-center justify-center"
+                    className={cn(
+                      "flex-shrink-0 flex items-center justify-center",
+                      isValidCmsIcon(data.icons[index]) &&
+                        "rounded-full border border-white/40",
+                    )}
                     style={{
                       width: `${(ICON_SIZE / DESIGN_WIDTH) * 100}vw`,
                       height: `${(ICON_SIZE / DESIGN_WIDTH) * 100}vw`,
@@ -343,11 +375,8 @@ export default function BrandAdvantages({ data }: Props) {
                     {isValidCmsIcon(data.icons[index]) ? (
                       <IconifyIcon
                         name={data.icons[index]}
-                        className="text-white w-full h-full"
-                        style={{
-                          width: `${(ICON_SIZE / DESIGN_WIDTH) * 100}vw`,
-                          height: `${(ICON_SIZE / DESIGN_WIDTH) * 100}vw`,
-                        }}
+                        className="text-white"
+                        size={32}
                       />
                     ) : (
                       <Image
@@ -367,7 +396,7 @@ export default function BrandAdvantages({ data }: Props) {
                       lineHeight: 1.3,
                     }}
                   >
-                    {advantage.replace(/\\n|\/n/g, '\n')}
+                    {advantage.replace(/\\n|\/n/g, "\n")}
                   </span>
                 </div>
               );
