@@ -1,12 +1,21 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { AnimatedLinkButton } from "@/components/ui/animated-link-button";
-import { LucideIcon, HelpCircle, Lightbulb, ShieldCheck, Factory, Globe, Users } from "lucide-react";
+import {
+  LucideIcon,
+  HelpCircle,
+  Lightbulb,
+  ShieldCheck,
+  Factory,
+  Globe,
+  Users,
+} from "lucide-react";
 import { IconifyIcon } from "@/components/ui/IconifyIcon";
 import { cn } from "@/lib/utils";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { HollowText } from "@/components/common/HollowText";
 
 type Props = {
   data: HomeContent["whyChooseBusrom"];
@@ -63,11 +72,11 @@ const iconMap: { [key: string]: LucideIcon } = {
   "Years of Global Expertise": Globe,
   "Collaborative R&D Partnership": Users,
   // 中文映射
-  "原创与专有设计": Lightbulb,
-  "严格质量与整合": ShieldCheck,
-  "工厂直接生产": Factory,
-  "多年全球专业经验": Globe,
-  "合作研发伙伴关系": Users,
+  原创与专有设计: Lightbulb,
+  严格质量与整合: ShieldCheck,
+  工厂直接生产: Factory,
+  多年全球专业经验: Globe,
+  合作研发伙伴关系: Users,
   default: HelpCircle,
 };
 
@@ -92,7 +101,7 @@ export default function WhyChooseBusrom({ data }: Props) {
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     observer.observe(section);
@@ -127,15 +136,49 @@ export default function WhyChooseBusrom({ data }: Props) {
   }
 
   return (
-    <section ref={sectionRef} className="py-12 lg:py-0 bg-brand-main" data-header-theme="light">
-      <div className="container mx-auto px-4 lg:px-0" style={{ maxWidth: '100%' }}>
-
+    <section
+      ref={sectionRef}
+      className="py-12 lg:pb-24 bg-brand-main"
+      data-header-theme="light"
+    >
+      <style jsx>{`
+        @keyframes custom-float {
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+        .animate-custom-float {
+          animation: custom-float 3s ease-in-out infinite;
+          display: inline-block;
+          will-change: transform;
+          backface-visibility: hidden;
+        }
+      `}</style>
+      <div
+        className="container mx-auto px-4 lg:px-0"
+        style={{ maxWidth: "100%" }}
+      >
         {/* ==================== 移动端布局 ==================== */}
         <div className="lg:hidden">
           {/* 标题 */}
           <div className="mb-6">
-            <h2 className="font-anaheim font-extrabold text-2xl text-brand-text-black">
-              {data.title} <span className="text-stroke-black">{data.title2}</span>
+            <h2 className="font-anaheim font-extrabold text-2xl text-brand-text-black flex flex-wrap gap-x-2">
+              <HollowText
+                strokeColor="#756f3f"
+                strokeWidth={0.8}
+                fillColor="#000000"
+              >
+                {data.title}
+              </HollowText>
+              <span className="animate-custom-float">
+                <HollowText strokeColor="#756f3f" strokeWidth={0.8}>
+                  {data.title2}
+                </HollowText>
+              </span>
             </h2>
           </div>
 
@@ -158,13 +201,21 @@ export default function WhyChooseBusrom({ data }: Props) {
                   <div className="relative z-20 h-full p-6 flex flex-col items-center justify-end text-center">
                     <div className="w-12 h-12 mb-2 flex items-center justify-center">
                       {reason.icon ? (
-                        <IconifyIcon name={reason.icon} size={32} color="white" />
+                        <IconifyIcon
+                          name={reason.icon}
+                          size={32}
+                          color="white"
+                        />
                       ) : (
                         <IconComponent className="w-8 h-8 text-white" />
                       )}
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-1">{reason.title}</h3>
-                    <p className="text-white/90 text-sm">{reason.description}</p>
+                    <h3 className="text-xl font-semibold text-white mb-1">
+                      {reason.title}
+                    </h3>
+                    <p className="text-white/90 text-sm">
+                      {reason.description}
+                    </p>
                   </div>
                 </div>
               );
@@ -192,29 +243,30 @@ export default function WhyChooseBusrom({ data }: Props) {
                 lineHeight: vw(LAYOUT.header.titleLineHeight),
               }}
             >
-              <span
-                style={{
-                  color: '#000000',
-                  WebkitTextStroke: `calc(4 * var(--rpx)) #756f3f`,
-                  paintOrder: 'stroke fill',
-                }}
+              <HollowText
+                strokeColor="#756f3f"
+                strokeWidth={1.2}
+                fillColor="#000000"
               >
                 {data.title}
-              </span>{' '}
-              <span
-                style={{
-                  color: '#f6f4ed',
-                  WebkitTextStroke: `calc(4 * var(--rpx)) #756f3f`,
-                  paintOrder: 'stroke fill',
-                }}
-              >
-                {data.title2}
+              </HollowText>{" "}
+              <span className="animate-custom-float">
+                <HollowText
+                  strokeColor="#756f3f"
+                  strokeWidth={1.2}
+                  style={{ color: "#f6f4ed" }}
+                >
+                  {data.title2}
+                </HollowText>
               </span>
             </h2>
 
             {/* 右侧 VIEW MORE */}
             <AnimatedLinkButton>
               VIEW MORE INFORMATION
+              <span className="ml-2 inline-block transition-transform duration-300 group-hover:translate-x-1">
+                »
+              </span>
             </AnimatedLinkButton>
           </div>
 
@@ -222,7 +274,11 @@ export default function WhyChooseBusrom({ data }: Props) {
           <div
             className="flex"
             style={{
-              marginTop: vw(LAYOUT.accordion.y - LAYOUT.header.titleY - LAYOUT.header.titleLineHeight),
+              marginTop: vw(
+                LAYOUT.accordion.y -
+                  LAYOUT.header.titleY -
+                  LAYOUT.header.titleLineHeight,
+              ),
               height: vw(LAYOUT.accordion.height),
               gap: vw(LAYOUT.accordion.gap),
             }}
@@ -238,9 +294,13 @@ export default function WhyChooseBusrom({ data }: Props) {
                   key={reason.title}
                   className="relative overflow-hidden transition-all duration-500 ease-in-out cursor-pointer group"
                   style={{
-                    width: isExpanded ? vw(LAYOUT.accordion.cardExpandedWidth) : vw(LAYOUT.accordion.cardCollapsedWidth),
+                    width: isExpanded
+                      ? vw(LAYOUT.accordion.cardExpandedWidth)
+                      : vw(LAYOUT.accordion.cardCollapsedWidth),
                     borderRadius: vw(LAYOUT.accordion.cardBorderRadius),
-                    boxShadow: isExpanded ? '0 4px 15px rgba(0, 0, 0, 0.5)' : 'none',
+                    boxShadow: isExpanded
+                      ? "0 4px 15px rgba(0, 0, 0, 0.5)"
+                      : "none",
                   }}
                   onMouseEnter={() => setActiveIndex(index)}
                 >
@@ -259,11 +319,12 @@ export default function WhyChooseBusrom({ data }: Props) {
                       "transition-opacity ease-in-out",
                       isExpanded
                         ? "opacity-100 duration-200 delay-300"
-                        : "opacity-0 duration-200"
+                        : "opacity-0 duration-200",
                     )}
                     style={{
-                      height: '63%',
-                      background: 'linear-gradient(to top, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0) 100%)',
+                      height: "63%",
+                      background:
+                        "linear-gradient(to top, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0) 100%)",
                     }}
                   />
 
@@ -275,7 +336,7 @@ export default function WhyChooseBusrom({ data }: Props) {
                       "transition-opacity ease-in-out",
                       isExpanded
                         ? "opacity-100 duration-200 delay-300"
-                        : "opacity-0 duration-200"
+                        : "opacity-0 duration-200",
                     )}
                     style={{
                       padding: vw(30),
@@ -292,7 +353,12 @@ export default function WhyChooseBusrom({ data }: Props) {
                       }}
                     >
                       {reason.icon ? (
-                        <IconifyIcon name={reason.icon} size={78} color="white" className="w-full h-full" />
+                        <IconifyIcon
+                          name={reason.icon}
+                          size={78}
+                          color="white"
+                          className="w-full h-full"
+                        />
                       ) : (
                         <IconComponent className="w-full h-full text-white" />
                       )}
@@ -324,7 +390,6 @@ export default function WhyChooseBusrom({ data }: Props) {
             })}
           </div>
         </div>
-
       </div>
     </section>
   );
