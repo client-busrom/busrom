@@ -3,6 +3,8 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import type { HomeContent, FeaturedProduct } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
+import useEmblaCarousel from "embla-carousel-react";
+import AutoScroll from "embla-carousel-auto-scroll";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { AnimatedLinkButton } from "../ui/animated-link-button";
@@ -148,7 +150,7 @@ const ProductCard = ({ product, index, isMobile = false, locale }: ProductCardPr
           )}
           style={!isMobile ? {
             fontSize: vw(LAYOUT.cards.titleFontSize),
-            marginBottom: vw(34),  // 942 - 871 - 57 ≈ 间距
+            marginBottom: vw(15),
           } : undefined}
         >
           {product.title}
@@ -165,23 +167,23 @@ const ProductCard = ({ product, index, isMobile = false, locale }: ProductCardPr
           } : undefined}
         >
           {product.features.map((feature, idx) => (
-            <li key={idx} className="flex items-start">
+            <li key={idx} className="flex items-center">
               <svg
                 className={cn(
-                  "text-brand-secondary flex-shrink-0",
-                  isMobile ? "w-3 h-3 mr-1.5 mt-0.5" : ""
+                  "flex-shrink-0",
+                  isMobile ? "w-4 h-4 mr-1.5" : ""
                 )}
                 style={!isMobile ? {
-                  width: vw(32),
-                  height: vw(32),
-                  marginRight: vw(27),
-                  marginTop: vw(6),
+                  width: vw(28),
+                  height: vw(28),
+                  marginRight: vw(14),
                 } : undefined}
+                viewBox="0 0 28 28"
                 fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                <path d="M14 28C6.2825 28 0 21.7175 0 14C0 6.2825 6.2825 0 14 0C21.7175 0 28 6.2825 28 14C28 21.7175 21.7175 28 14 28Z" fill="#F6F4ED"/>
+                <path d="M12.2508 18.1997C12.0758 18.1997 11.9008 18.1297 11.7608 17.9897L8.26078 14.4897C7.98078 14.2097 7.98078 13.7722 8.26078 13.4922C8.54078 13.2122 8.97828 13.2122 9.25828 13.4922L12.7583 16.9922C13.0383 17.2722 13.0383 17.7097 12.7583 17.9897C12.6008 18.1297 12.4258 18.1997 12.2508 18.1997Z" fill="#756F3F"/>
+                <path d="M12.2508 18.1997C12.0758 18.1997 11.9008 18.1297 11.7608 17.9897C11.4808 17.7097 11.4808 17.2722 11.7608 16.9922L18.7608 9.99223C19.0408 9.71223 19.4783 9.71223 19.7583 9.99223C20.0383 10.2722 20.0383 10.7097 19.7583 10.9897L12.7583 17.9897C12.6008 18.1297 12.4258 18.1997 12.2508 18.1997Z" fill="#756F3F"/>
               </svg>
               <span>{feature}</span>
             </li>
@@ -192,7 +194,7 @@ const ProductCard = ({ product, index, isMobile = false, locale }: ProductCardPr
   );
 };
 
-// --- 走马灯系列标签组件 (CSS 动画版本) ---
+// --- 走马灯系列标签组件 (Embla Carousel 版本) ---
 const SeriesCarousel = ({
   series,
   activeIndex,
@@ -208,38 +210,37 @@ const SeriesCarousel = ({
   onMouseEnter: () => void;
   onMouseLeave: () => void;
 }) => {
-  // vw 转换函数
   const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
 
-  const renderItems = (keyPrefix: string) => (
-    series.map((s, index) => (
-      <button
-        key={`${keyPrefix}-${s.seriesTitle}`}
-        onClick={() => onSelect(index)}
-        className={cn(
-          "whitespace-nowrap transition-colors duration-300 flex-shrink-0 flex items-center justify-center font-pingfang font-semibold",
-          index === activeIndex
-            ? "bg-brand-secondary text-white shadow-md"
-            : "bg-[#f6f4ed] border border-brand-text-black/10 hover:bg-brand-secondary/10 hover:border-brand-secondary/30"
-        )}
-        style={{
-          height: vw(LAYOUT.tags.height),
-          borderRadius: vw(LAYOUT.tags.borderRadius),
-          fontSize: vw(LAYOUT.tags.fontSize),
-          paddingLeft: vw(40),
-          paddingRight: vw(40),
-          letterSpacing: '0.02em',
-          color: index === activeIndex ? '#FFFFFF' : '#756F3F',
-        }}
-      >
-        {s.seriesTitle}
-      </button>
-    ))
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: true,
+      align: "start",
+      dragFree: true,
+      containScroll: "trimSnaps",
+    },
+    [
+      AutoScroll({
+        speed: 1,
+        stopOnInteraction: false,
+        stopOnMouseEnter: true,
+        playOnInit: true,
+      }),
+    ]
   );
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    if (isPaused) {
+      emblaApi.plugins().autoScroll?.stop();
+    } else {
+      emblaApi.plugins().autoScroll?.play();
+    }
+  }, [emblaApi, isPaused]);
 
   return (
     <div
-      className="relative overflow-hidden"
+      className="relative w-full cursor-grab active:cursor-grabbing select-none"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       style={{
@@ -247,21 +248,40 @@ const SeriesCarousel = ({
         paddingBottom: vw(10),
       }}
     >
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex -ml-4 md:-ml-[1.25vw]">
+          {series.map((s, index) => (
+            <div 
+              key={`${s.seriesTitle}-${index}`}
+              className="flex-shrink-0 pl-4 md:pl-[1.25vw] min-w-0"
+            >
+              <button
+                onClick={() => onSelect(index)}
+                className={cn(
+                  "whitespace-nowrap transition-all duration-300 flex items-center justify-center font-pingfang font-semibold",
+                  index === activeIndex
+                    ? "bg-brand-secondary text-white shadow-lg scale-105"
+                    : "bg-[#f6f4ed] border border-brand-text-black/10 text-[#756F3F] hover:bg-brand-secondary/10 hover:border-brand-secondary/30"
+                )}
+                style={{
+                  height: vw(LAYOUT.tags.height),
+                  borderRadius: vw(LAYOUT.tags.borderRadius),
+                  fontSize: vw(LAYOUT.tags.fontSize),
+                  paddingLeft: vw(40),
+                  paddingRight: vw(40),
+                  letterSpacing: "0.02em",
+                }}
+              >
+                {s.seriesTitle}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
       {/* 左右渐变遮罩 */}
       <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-brand-main to-transparent z-10 pointer-events-none" />
       <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-brand-main to-transparent z-10 pointer-events-none" />
 
-      <div
-        className="flex animate-carousel-desktop"
-        style={{
-          width: 'max-content',
-          animationPlayState: isPaused ? 'paused' : 'running',
-          gap: vw(LAYOUT.tags.gap),
-        }}
-      >
-        {renderItems('first')}
-        {renderItems('second')}
-      </div>
     </div>
   );
 };
@@ -517,9 +537,10 @@ export default function FeaturedProducts({ data, locale }: Props) {
           <div className="text-center mt-4">
             <Button
               variant="outline"
-              className="text-brand-secondary border-brand-secondary/30 text-sm"
+              className="text-brand-secondary border-brand-secondary/30 text-sm flex items-center gap-1 mx-auto"
             >
               {data.viewAllButton || "View All Products"}
+              <span>»</span>
             </Button>
           </div>
         </div>
@@ -566,6 +587,7 @@ export default function FeaturedProducts({ data, locale }: Props) {
             {/* 右侧 VIEW MORE */}
             <AnimatedLinkButton>
               {data.viewAllButton || "VIEW MORE INFORMATION"}
+              <span className="ml-2 inline-block transition-transform duration-300 group-hover:translate-x-1">»</span>
             </AnimatedLinkButton>
           </div>
 

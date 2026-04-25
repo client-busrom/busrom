@@ -447,11 +447,21 @@ export const homeContentHandler: PayloadHandler = async (req) => {
                 title: product.name || product.localizedName || '',
                 image: getMediaWithVariants(product.showImage),
                 features: (() => {
-                  const attrs = product.attributePage?.productAttributes;
-                  const attrList = Array.isArray(attrs) ? attrs : (attrs?.[locale] || attrs?.en || []);
+                  const attrPage = product.attributePage as any;
+                  if (!attrPage || !attrPage.productAttributes) return [];
+                  
+                  const attrs = attrPage.productAttributes;
+                  let attrList: any[] = [];
+                  
+                  if (Array.isArray(attrs)) {
+                    attrList = attrs;
+                  } else if (typeof attrs === 'object') {
+                    attrList = attrs[locale] || attrs['en'] || attrs['zh'] || [];
+                  }
+                  
                   return attrList
                     .filter((attr: any) => attr.showOnFrontEnd !== false)
-                    .slice(0, 4)
+                    .slice(0, 3)
                     .map((attr: any) => attr.value);
                 })(),
               })),

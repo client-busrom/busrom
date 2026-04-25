@@ -18,7 +18,7 @@ const CMS_URL = process.env.CMS_GRAPHQL_URL
 export async function getHomeRawData(locale: string = 'en'): Promise<any> {
   try {
     const response = await fetch(`${CMS_URL}/api/home?locale=${locale}`, {
-      next: { revalidate: 3600 }, // Standard 1 hour revalidation
+      cache: 'no-store', // Disable cache to see backend changes immediately
     })
 
     if (!response.ok) {
