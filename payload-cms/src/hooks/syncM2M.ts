@@ -19,33 +19,47 @@ export const syncM2M = (
   targetField: string,
   sourceField: string
 ): CollectionAfterChangeHook => {
-  return async ({ doc, previousDoc, req }) => {
-    const { payload, context } = req
-    if (context.isSyncing) return doc
+  return async ({ doc, previousDoc, req, operation, context }) => {
+    const { payload } = req
+    
+    // Prevent infinite recursion during sync
+    if (context?.isSyncing) return doc
 
+    const isCreate = operation === 'create'
+    
     // If there are no relationships to sync (both previous and current are empty), skip processing.
-    const prevTargets = sanitizeIds(previousDoc?.[sourceField] || [])
+    const prevTargets = isCreate ? [] : sanitizeIds(previousDoc?.[sourceField] || [])
     const nextTargets = sanitizeIds(doc?.[sourceField] || [])
+    
     if (prevTargets.length === 0 && nextTargets.length === 0) {
       return doc
     }
 
     const sourceId = doc.id
+    if (sourceId === undefined || sourceId === null) return doc
 
-    const added = nextTargets.filter((id: any) => !prevTargets.includes(id))
-    const removed = prevTargets.filter((id: any) => !nextTargets.includes(id))
+    // Convert to string for safer comparison
+    const sourceIdStr = String(sourceId)
+
+    const added = nextTargets.filter((id: any) => !prevTargets.map(String).includes(String(id)))
+    const removed = prevTargets.filter((id: any) => !nextTargets.map(String).includes(String(id)))
 
     // Handle added targets
     for (const targetId of added) {
       try {
+        console.log(`[syncM2M] Linking ${targetCollection}/${targetId} to ${sourceField}/${sourceIdStr}`)
+        
         const target = await payload.findByID({
           collection: targetCollection as any,
           id: targetId,
           depth: 0,
+          req, // Crucial for transaction visibility
         })
+        
         if (target) {
           const currentLinks = sanitizeIds(target[targetField] || [])
-          if (!currentLinks.includes(sourceId)) {
+          if (!currentLinks.map(String).includes(sourceIdStr)) {
+            console.log(`[syncM2M] Updating ${targetCollection}/${targetId} with new link to ${sourceIdStr}`)
             await payload.update({
               collection: targetCollection as any,
               id: targetId,
@@ -62,6 +76,9 @@ export const syncM2M = (
       } catch (e: any) {
         console.error(`[syncM2M] ❌ FAILED to link ${targetCollection}/${targetId}:`, e.message)
         if (e.data?.errors) console.error('Validation errors:', JSON.stringify(e.data.errors, null, 2))
+        // Re-throw to ensure transaction rollback if this is critical, 
+        // or keep catching if you want the main document to be saved anyway.
+        // Given the FK violation issue, we might want to know why it fails.
       }
     }
 
@@ -72,15 +89,16 @@ export const syncM2M = (
           collection: targetCollection as any,
           id: targetId,
           depth: 0,
+          req, // Crucial for transaction visibility
         })
         if (target) {
           const currentLinks = sanitizeIds(target[targetField] || [])
-          if (currentLinks.includes(sourceId)) {
+          if (currentLinks.map(String).includes(sourceIdStr)) {
             await payload.update({
               collection: targetCollection as any,
               id: targetId,
               data: {
-                [targetField]: currentLinks.filter((l: any) => l !== sourceId),
+                [targetField]: currentLinks.filter((l: any) => String(l) !== sourceIdStr),
               },
               context: { isSyncing: true },
               depth: 0,
@@ -106,11 +124,13 @@ export const cleanupM2M = (
   targetField: string,
   sourceField: string
 ): CollectionAfterDeleteHook => {
-  return async ({ id: sourceId, doc, req }) => {
-    const { payload, context } = req
-    if (context.isSyncing) return
+  return async ({ id: sourceId, doc, req, context }) => {
+    const { payload } = req
+    
+    // Prevent infinite recursion during sync
+    if (context?.isSyncing) return
 
-    const sourceIdVal = sourceId
+    const sourceIdStr = String(sourceId)
     const targets = sanitizeIds(doc?.[sourceField] || [])
 
     for (const targetId of targets) {
@@ -119,15 +139,16 @@ export const cleanupM2M = (
           collection: targetCollection as any,
           id: targetId,
           depth: 0,
+          req,
         })
         if (target) {
           const currentLinks = sanitizeIds(target[targetField] || [])
-          if (currentLinks.includes(sourceIdVal)) {
+          if (currentLinks.map(String).includes(sourceIdStr)) {
             await payload.update({
               collection: targetCollection as any,
               id: targetId,
               data: {
-                [targetField]: currentLinks.filter((l: any) => l !== sourceIdVal),
+                [targetField]: currentLinks.filter((l: any) => String(l) !== sourceIdStr),
               },
               context: { isSyncing: true },
               depth: 0,
@@ -142,4 +163,6 @@ export const cleanupM2M = (
     }
   }
 }
+
+
 
