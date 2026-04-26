@@ -60,11 +60,8 @@ export interface ParsedServiceOverviewData {
     title: RichText[];
     subtitle: string | null;
     description: string | null;
-    email: string | null;
-    phone: string | null;
     footerNote: string | null;
     displayName: string | null;
-    decorator: string | null;
     info: string[];
     formConfig: any;
   };
