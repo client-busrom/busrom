@@ -63,8 +63,8 @@ const DESKTOP_CONFIG = {
 
   // 左下角 Feature 文字 [2,3,4]
   featureText: {
-    bottom: 70, // 底部定位
-    left: 360, // 左侧定位
+    bottom: 100, // 底部定位
+    right: 80, // 右侧定位 (相对于 SVG 宽度 824)
     fontSize: 28, // 字体大小
     strokeColor: "#6B4E00", // 描边颜色
     strokeWidth: 2, // 描边宽度
@@ -287,19 +287,54 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
           height: rpxHero(DESKTOP_CONFIG.leftContainer.height),
         }}
       >
-        {/* Layer 3: 装饰 SVG (hero-banner-9-2.svg) */}
+        {/* Layer 3 & 5: 装饰 SVG + 文字容器 */}
         <div
-          className="absolute pointer-events-none"
+          className="absolute z-[16]"
           style={{
             bottom: rpxHero(DESKTOP_CONFIG.decorativeSvg.bottom),
             left: rpxHero(DESKTOP_CONFIG.decorativeSvg.left),
             width: rpxHero(DESKTOP_CONFIG.decorativeSvg.width),
             height: rpxHero(DESKTOP_CONFIG.decorativeSvg.height),
-            backgroundImage: "url(/hero-banner-9-2.svg)",
-            backgroundSize: "contain",
-            backgroundRepeat: "no-repeat",
           }}
-        />
+        >
+          {/* 背景 SVG */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage: "url(/hero-banner-9-2.svg)",
+              backgroundSize: "contain",
+              backgroundRepeat: "no-repeat",
+            }}
+          />
+          {/* 文字 - 使用 right/bottom 定位，相对于 SVG 容器 */}
+          <div
+            className="absolute z-30 flex flex-col items-center"
+            style={{
+              bottom: rpxHero(DESKTOP_CONFIG.featureText.bottom),
+              right: rpxHero(DESKTOP_CONFIG.featureText.right),
+              gap: rpxHero(DESKTOP_CONFIG.featureText.gap),
+            }}
+          >
+            {[data.features[2], data.features[3], data.features[4]].map(
+              (feature, index) => (
+                <h2
+                  key={index}
+                  className="font-montserrat font-bold text-center whitespace-nowrap"
+                  style={{
+                    fontSize: rpxHero(DESKTOP_CONFIG.featureText.fontSize),
+                    color: DESKTOP_CONFIG.featureText.color,
+                    WebkitTextStroke: `${rpx(4)} #6B4E00`,
+                    paintOrder: "stroke fill",
+                    letterSpacing: "0.03em",
+                  }}
+                >
+                  {feature}
+                </h2>
+              ),
+            )}
+          </div>
+        </div>
+
         {/* Layer 4: 左下角菱形图片 (data.images[1]) */}
         <div
           className="absolute z-20"
@@ -362,33 +397,6 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
             })()}
           </div>
         </div>
-        {/* Layer 5: 左下角 Feature 文字 [2,3,4] */}
-        <div
-          className="absolute z-30 flex flex-col"
-          style={{
-            bottom: DESKTOP_CONFIG.featureText.bottom,
-            left: DESKTOP_CONFIG.featureText.left,
-            gap: DESKTOP_CONFIG.featureText.gap,
-          }}
-        >
-          {[data.features[2], data.features[3], data.features[4]].map(
-            (feature, index) => (
-              <h2
-                key={index}
-                className="font-montserrat font-bold text-center"
-                style={{
-                  fontSize: DESKTOP_CONFIG.featureText.fontSize,
-                  color: DESKTOP_CONFIG.featureText.color,
-                  WebkitTextStroke: `${rpx(4)} #6B4E00`,
-                  paintOrder: "stroke fill",
-                  letterSpacing: "0.03em",
-                }}
-              >
-                {feature}
-              </h2>
-            ),
-          )}
-        </div>
       </div>
 
       {/* 左下角元素容器 - lg 以下用 LG_SCALE 固定缩放 */}
@@ -400,19 +408,54 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
           transform: `scale(${LG_SCALE})`,
         }}
       >
-        {/* Layer 3: 装饰 SVG (hero-banner-9-2.svg) */}
+        {/* Layer 3 & 5: 装饰 SVG + 文字容器 */}
         <div
-          className="absolute pointer-events-none"
+          className="absolute z-[16]"
           style={{
             bottom: DESKTOP_CONFIG.decorativeSvg.bottom,
             left: DESKTOP_CONFIG.decorativeSvg.left,
             width: DESKTOP_CONFIG.decorativeSvg.width,
             height: DESKTOP_CONFIG.decorativeSvg.height,
-            backgroundImage: "url(/hero-banner-9-2.svg)",
-            backgroundSize: "contain",
-            backgroundRepeat: "no-repeat",
           }}
-        />
+        >
+          {/* 背景 SVG */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage: "url(/hero-banner-9-2.svg)",
+              backgroundSize: "contain",
+              backgroundRepeat: "no-repeat",
+            }}
+          />
+          {/* 文字 - 使用 right/bottom 定位 */}
+          <div
+            className="absolute z-30 flex flex-col items-center"
+            style={{
+              bottom: DESKTOP_CONFIG.featureText.bottom,
+              right: DESKTOP_CONFIG.featureText.right,
+              gap: DESKTOP_CONFIG.featureText.gap,
+            }}
+          >
+            {[data.features[2], data.features[3], data.features[4]].map(
+              (feature, index) => (
+                <h2
+                  key={index}
+                  className="font-montserrat font-bold text-center whitespace-nowrap"
+                  style={{
+                    fontSize: DESKTOP_CONFIG.featureText.fontSize,
+                    color: DESKTOP_CONFIG.featureText.color,
+                    WebkitTextStroke: `${rpx(4)} #6B4E00`,
+                    paintOrder: "stroke fill",
+                    letterSpacing: "0.03em",
+                  }}
+                >
+                  {feature}
+                </h2>
+              ),
+            )}
+          </div>
+        </div>
+
         {/* Layer 4: 左下角菱形图片 (data.images[1]) */}
         <div
           className="absolute z-20"
@@ -474,33 +517,6 @@ const HeroBanner9: FC<BannerProps> = ({ data }) => {
               );
             })()}
           </div>
-        </div>
-        {/* Layer 5: 左下角 Feature 文字 [2,3,4] */}
-        <div
-          className="absolute z-30 flex flex-col"
-          style={{
-            bottom: rpxHero(DESKTOP_CONFIG.featureText.bottom),
-            left: rpxHero(DESKTOP_CONFIG.featureText.left),
-            gap: rpxHero(DESKTOP_CONFIG.featureText.gap),
-          }}
-        >
-          {[data.features[2], data.features[3], data.features[4]].map(
-            (feature, index) => (
-              <h2
-                key={index}
-                className="font-montserrat font-bold text-center"
-                style={{
-                  fontSize: rpxHero(DESKTOP_CONFIG.featureText.fontSize),
-                  color: DESKTOP_CONFIG.featureText.color,
-                  WebkitTextStroke: `${rpx(4)} #6B4E00`,
-                  paintOrder: "stroke fill",
-                  letterSpacing: "0.03em",
-                }}
-              >
-                {feature}
-              </h2>
-            ),
-          )}
         </div>
       </div>
 

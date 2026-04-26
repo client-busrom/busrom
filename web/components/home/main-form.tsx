@@ -11,6 +11,7 @@ import type { MainFormData } from "@/lib/content-data";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { Turnstile } from "@/components/ui/turnstile";
 import { PhoneInput } from "@/components/ui/PhoneInput";
+import { HollowText } from "@/components/common/HollowText";
 
 // lg 断点 (1024px) - 与 Tailwind 一致
 const LG_BREAKPOINT = 1024;
@@ -463,7 +464,18 @@ export default function MainForm({ data, locale = "en" }: Props) {
             </div>
             {/* 3. 文字遮罩 (z-30) */}
             <div className="w-full p-4 lg:p-8 z-30 flex justify-center">
-              <p className="text-white text-center text-base lg:text-xl text-stroke-black font-anaheim font-bold">{data.designTextLeft}</p>
+              <div className="relative inline-block">
+                {/* 背景空心描边层 - 偏移 2px */}
+                <div className="absolute left-[2px] top-[2px] w-full pointer-events-none">
+                  <HollowText strokeColor="#f6f4ed" strokeWidth={1}>
+                    <span className="text-base lg:text-xl font-anaheim font-bold block text-center leading-tight">{data.designTextLeft}</span>
+                  </HollowText>
+                </div>
+                {/* 原本的文字 */}
+                <p className="text-white text-center text-base lg:text-xl text-stroke-black font-anaheim font-bold relative z-10">
+                  {data.designTextLeft}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -665,7 +677,18 @@ export default function MainForm({ data, locale = "en" }: Props) {
           >
             {/* 3. 文字遮罩 (z-30) */}
             <div className="w-full p-4 lg:p-8 z-30 flex justify-center">
-              <p className="text-white text-center text-base lg:text-xl text-stroke-black font-anaheim font-bold">{data.designTextRight}</p>
+              <div className="relative inline-block">
+                {/* 背景空心描边层 - 偏移 2px */}
+                <div className="absolute left-[2px] top-[2px] w-full pointer-events-none">
+                  <HollowText strokeColor="#f6f4ed" strokeWidth={1}>
+                    <span className="text-base lg:text-xl font-anaheim font-bold block text-center leading-tight">{data.designTextRight}</span>
+                  </HollowText>
+                </div>
+                {/* 原本的文字 */}
+                <p className="text-white text-center text-base lg:text-xl text-stroke-black font-anaheim font-bold relative z-10">
+                  {data.designTextRight}
+                </p>
+              </div>
             </div>
             <div className={imageCardContainerClass}>
               {/* 1. 底层手机框 (z-10) */}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 import { Link } from "@/lib/navigation";
 import type { HomeContent } from "@/lib/content-data";
 import type { Locale } from "@/i18n.config";
@@ -74,6 +74,20 @@ export default function ProductSeriesCarousel({ data }: Props) {
   const [isAnimating, setIsAnimating] = useState(false); // 动画锁
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // 专属自定义光标状态
+  const [isHoveringContainer, setIsHoveringContainer] = useState(false);
+  const cursorX = useMotionValue(-100);
+  const cursorY = useMotionValue(-100);
+  const springConfig = { damping: 25, stiffness: 300, mass: 0.5 };
+  const cursorXSpring = useSpring(cursorX, springConfig);
+  const cursorYSpring = useSpring(cursorY, springConfig);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    cursorX.set(e.clientX - rect.left);
+    cursorY.set(e.clientY - rect.top);
+  }, [cursorX, cursorY]);
+
   const seriesCount = data?.length || 0;
 
   // 清理 timeout 防止内存泄漏
@@ -144,6 +158,16 @@ export default function ProductSeriesCarousel({ data }: Props) {
   const getPositionStyle = (position: number) => {
     const basePos = POSITIONS[position] || POSITIONS[position > 2 ? 4 : -1];
 
+    const baseStyle = {
+      left: `${(basePos.x / DESIGN_WIDTH) * 100}%`,
+      top: `${(basePos.y / DESIGN_HEIGHT) * 100}%`,
+      width: `${(IMG_SIZE_DEFAULT / DESIGN_WIDTH) * 100}%`,
+      opacity: basePos.opacity,
+      scale: basePos.scale,
+      x: "0vw",
+      transformOrigin: position <= 1 ? "left center" : "right center",
+    };
+
     // 只有屏内的两个位置(1和2)才有 hover 效果
     if (position === 1) {
       // 屏内左
@@ -151,21 +175,10 @@ export default function ProductSeriesCarousel({ data }: Props) {
       const isOtherHovered = hoveredPosition === 2;
 
       if (isHovered) {
-        return {
-          left: `${(POS1_HOVER_X / DESIGN_WIDTH) * 100}%`,
-          top: `${(POS1_HOVER_Y / DESIGN_HEIGHT) * 100}%`,
-          width: `${(IMG_SIZE_DEFAULT / DESIGN_WIDTH) * 100}%`,
-          opacity: 1,
-          scale: 1.125,
-        };
+        return { ...baseStyle, scale: 1.15 };
       } else if (isOtherHovered) {
-        return {
-          left: `${(POS1_SHRINK_X / DESIGN_WIDTH) * 100}%`,
-          top: `${(POS1_SHRINK_Y / DESIGN_HEIGHT) * 100}%`,
-          width: `${(IMG_SIZE_DEFAULT / DESIGN_WIDTH) * 100}%`,
-          opacity: 1,
-          scale: 0.75,
-        };
+        // 当右边悬停时 左侧item: transform: scale(0.85) translateX(3vw)
+        return { ...baseStyle, scale: 0.85, x: "3vw" };
       }
     }
 
@@ -175,32 +188,15 @@ export default function ProductSeriesCarousel({ data }: Props) {
       const isOtherHovered = hoveredPosition === 1;
 
       if (isHovered) {
-        return {
-          left: `${(POS2_HOVER_X / DESIGN_WIDTH) * 100}%`,
-          top: `${(POS2_HOVER_Y / DESIGN_HEIGHT) * 100}%`,
-          width: `${(IMG_SIZE_DEFAULT / DESIGN_WIDTH) * 100}%`,
-          opacity: 1,
-          scale: 1.125,
-        };
+        return { ...baseStyle, scale: 1.15 };
       } else if (isOtherHovered) {
-        return {
-          left: `${(POS2_SHRINK_X / DESIGN_WIDTH) * 100}%`,
-          top: `${(POS2_SHRINK_Y / DESIGN_HEIGHT) * 100}%`,
-          width: `${(IMG_SIZE_DEFAULT / DESIGN_WIDTH) * 100}%`,
-          opacity: 1,
-          scale: 0.75,
-        };
+        // 当悬停左边时 右边item: transform: scale(0.85) translateX(-3vw)
+        return { ...baseStyle, scale: 0.85, x: "-3vw" };
       }
     }
 
     // 默认返回基础位置
-    return {
-      left: `${(basePos.x / DESIGN_WIDTH) * 100}%`,
-      top: `${(basePos.y / DESIGN_HEIGHT) * 100}%`,
-      width: `${(IMG_SIZE_DEFAULT / DESIGN_WIDTH) * 100}%`,
-      opacity: basePos.opacity,
-      scale: basePos.scale,
-    };
+    return baseStyle;
   };
 
 
@@ -429,7 +425,32 @@ export default function ProductSeriesCarousel({ data }: Props) {
       </div>
 
       {/* ==================== 桌面端布局 - 旋转木马 ==================== */}
-      <div className="hidden lg:block absolute inset-0">
+      <div 
+        className="hidden lg:block absolute inset-0 cursor-none"
+        onMouseMove={handleMouseMove}
+        onMouseEnter={() => setIsHoveringContainer(true)}
+        onMouseLeave={() => setIsHoveringContainer(false)}
+      >
+        {/* 自定义跟随光标 */}
+        <motion.div
+          className="pointer-events-none absolute z-50 flex items-center justify-center rounded-full backdrop-blur-md"
+          style={{
+            width: 120,
+            height: 120,
+            x: cursorXSpring,
+            y: cursorYSpring,
+            translateX: "-50%",
+            translateY: "-50%",
+            backgroundColor: "rgba(255, 255, 255, 0.2)",
+            border: "1px solid rgba(255, 255, 255, 0.3)",
+            opacity: isHoveringContainer ? 1 : 0,
+          }}
+        >
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="7" y1="17" x2="17" y2="7"></line>
+            <polyline points="7 7 17 7 17 17"></polyline>
+          </svg>
+        </motion.div>
         {/* 所有 item - 根据当前位置动画移动 */}
         {data.map((item, itemIndex) => {
           const position = getItemPosition(itemIndex);
@@ -439,19 +460,26 @@ export default function ProductSeriesCarousel({ data }: Props) {
           return (
             <motion.div
               key={`carousel-item-${itemIndex}`}
-              className="absolute cursor-pointer"
+              className="absolute cursor-none"
               animate={{
                 left: style.left,
                 top: style.top,
                 width: style.width,
                 opacity: style.opacity,
                 scale: style.scale,
+                x: style.x,
               }}
-              transition={arcTransition}
+              transition={{
+                ...arcTransition,
+                // 使用更舒缓的 tween 动画，匹配比亚迪那种缓慢、优雅的过渡感
+                scale: { type: "tween", duration: 0.75, ease: [0.25, 0.1, 0.25, 1] },
+                x: { type: "tween", duration: 0.75, ease: [0.25, 0.1, 0.25, 1] },
+              }}
               style={{
                 aspectRatio: "1",
                 zIndex: hoveredPosition === position ? 10 : isOnScreen ? 5 : 1,
                 pointerEvents: isOnScreen ? "auto" : "none",
+                transformOrigin: style.transformOrigin,
               }}
             >
               {/* 标题移入容器内部，利用 scale 属性实现真正的“共进退” */}
@@ -471,7 +499,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
                 {item.name}
               </h3>
 
-              <Link href={item.href} className="block w-full h-full">
+              <Link href={item.href} className="block w-full h-full cursor-none">
                 {(() => {
                   const cropData = item.imageCropDataList?.[0];
                   const cropStyles = getCropStyles(cropData);
@@ -520,7 +548,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
         {/* 左导航按钮 */}
         <button
           onClick={() => paginate(-1)}
-          className="absolute z-20 cursor-pointer group transition-transform duration-150 active:scale-90"
+          className="absolute z-20 cursor-none group transition-transform duration-150 active:scale-90"
           style={{
             left: `${(LEFT_NAV_X / DESIGN_WIDTH) * 100}%`,
             top: `${(NAV_BTN_Y / DESIGN_HEIGHT) * 100}%`,
@@ -551,7 +579,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
         {/* 右导航按钮 */}
         <button
           onClick={() => paginate(1)}
-          className="absolute z-20 cursor-pointer group transition-transform duration-150 active:scale-90"
+          className="absolute z-20 cursor-none group transition-transform duration-150 active:scale-90"
           style={{
             left: `${(RIGHT_NAV_X / DESIGN_WIDTH) * 100}%`,
             top: `${(NAV_BTN_Y / DESIGN_HEIGHT) * 100}%`,
@@ -594,7 +622,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
           >
             <Link
               href={hoveredItem.href}
-              className="flex items-center justify-center font-anaheim font-semibold whitespace-nowrap transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 bg-[#d4cc8e] text-[#625d2f] hover:bg-[#625d2f] hover:text-[#d4cc8e]"
+              className="flex items-center justify-center font-anaheim font-semibold whitespace-nowrap transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 bg-[#d4cc8e] text-[#625d2f] hover:bg-[#625d2f] hover:text-[#d4cc8e] cursor-none"
               style={{
                 minWidth: `${(VIEW_BTN_W / DESIGN_WIDTH) * 100}vw`,
                 height: `${(VIEW_BTN_H / DESIGN_HEIGHT) * 100}vh`,

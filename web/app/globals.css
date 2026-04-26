@@ -24,14 +24,15 @@
 
     /* 主背景: #F6F4ED (主选色) */
     --background: 48 27% 95%;
-    
+
     /* 主文字: #3C3C3C (来自第5点，比纯黑更柔和) */
     --foreground: 0 0% 24%;
-    
+
     /* 卡片/弹出框背景: #FFFFFF */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 24%; /* (卡片上的文字) */
-    
+    --card-foreground: 0 0% 24%;
+    /* (卡片上的文字) */
+
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 24%;
 
@@ -59,7 +60,8 @@
     /* 悬停/强调状态: (使用与 muted 相同的颜色)
     */
     --accent: 44 46% 76%;
-    --accent-foreground: 0 0% 24%; /* (悬停时文字变为深色) */
+    --accent-foreground: 0 0% 24%;
+    /* (悬停时文字变为深色) */
 
     /* 破坏性/错误色: (保持 shadcn 默认) */
     --destructive: 0 84.2% 60.2%;
@@ -70,19 +72,27 @@
       - Input: 使用 #FFFFFF (默认输入框为白色背景更常见)
     */
     --border: 48 30% 72%;
-    --input: 0 0% 100%; /* (保持白色，而不是 #BFB672，因为那太特殊了) */
-    
+    --input: 0 0% 100%;
+    /* (保持白色，而不是 #BFB672，因为那太特殊了) */
+
     /* 焦点环: #756F3F (使用主交互色) */
     --ring: 55 18% 44%;
 
     /* ========== Replica Specific Colors ========== */
-    --eyolo-red: 0 100% 64%; /* #ff4848 */
-    --eyolo-beige: 48 27% 95%; /* #E7E5D4 */
-    --eyolo-dark: 210 50% 5%; /* #060C14 */
-    --eyolo-border: 48 10% 84%; /* #DCDBD0 */
-    --jules-cream: 30 50% 98%; /* #FDFCFB */
-    --reland-sand: 45 40% 95%; /* #F8F6F0 */
-    --reland-gold: 44 38% 45%; /* #C19A6B */
+    --eyolo-red: 0 100% 64%;
+    /* #ff4848 */
+    --eyolo-beige: 48 27% 95%;
+    /* #E7E5D4 */
+    --eyolo-dark: 210 50% 5%;
+    /* #060C14 */
+    --eyolo-border: 48 10% 84%;
+    /* #DCDBD0 */
+    --jules-cream: 30 50% 98%;
+    /* #FDFCFB */
+    --reland-sand: 45 40% 95%;
+    /* #F8F6F0 */
+    --reland-gold: 44 38% 45%;
+    /* #C19A6B */
 
     /* 圆角: (保持不变) */
     --radius: 0.5rem;
@@ -116,6 +126,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
@@ -124,6 +135,7 @@
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
   }
+
   img {
     -webkit-user-drag: none;
     -khtml-user-drag: none;
@@ -133,641 +145,787 @@
   }
 
   /* Restore selection for form elements and ensure buttons/links are responsive */
-  input, 
-  textarea, 
+  input,
+  textarea,
   button,
   a,
   [contenteditable="true"] {
     user-select: auto;
     -webkit-user-select: auto;
   }
-}
 
-/* 移除硬编码的 overflow: hidden，改由 ClientLayoutWrapper 动态控制 */
-html, body {
-  /* overflow: hidden;  <-- 移除这一行，避免 JS 未执行时全站锁死 */
-}
+  @layer base {
 
-/* 添加用于文字光泽扫过效果的动画 */
-@layer utilities {
-  @keyframes shine {
-    to {
-      background-position-x: -250%;
+    /* 移除硬编码的 overflow: hidden，改由 ClientLayoutWrapper 动态控制 */
+    html,
+    body {
+      /* overflow: hidden;  <-- 移除这一行，避免 JS 未执行时全站锁死 */
     }
-  }
-}
-
-/* Moon orbit animation along image mask edge */
-@keyframes moon-orbit {
-  0% {
-    offset-distance: 0%;
-  }
-  100% {
-    offset-distance: 100%;
-  }
-}
-
-.animate-moon-orbit {
-  animation: moon-orbit 30s linear infinite;
-}
-
-/* 将动画应用封装成一个工具类 */
-.animate-shine {
-  animation: shine 2s linear infinite;
-}
-
-.text-stroke-black {
-  color: hsl(var(--background)) !important;
-  /* 兼容性更好的描边模拟：四向无模糊阴影 */
-  text-shadow: 
-    -1px -1px 0 #000, 
-     1px -1px 0 #000, 
-    -1px  1px 0 #000, 
-     1px  1px 0 #000; 
-     
-  /* WebKit 浏览器 (Chrome/Safari) 专用，提供更清晰的描边效果 */
-
-}
-
-.text-stroke-custom {
-  -webkit-text-stroke: 0.04em #443D05;
-  text-stroke: 0.04em #443D05;
-}
-
-.text-stroke-custom-light {
-  -webkit-text-stroke: 0.03em #FDF6C2;
-  text-stroke: 0.03em #FDF6C2;
-  
-}
-
-.text-stroke-custom-orange {
-  -webkit-text-stroke: 0.04em #75703F;
-  text-stroke: 0.04em #75703F;
-}
-
-.text-stroke-custom-white {
-  -webkit-text-stroke: 0.06em#6B4E00;
-  text-stroke: 0.06em#6B4E00;
-}
-
-.text-stroke-custom-gold {
-  -webkit-text-stroke: 0.04em#565020;
-  text-stroke: 0.04em#565020;
-}
-
-.text-stroke-dark-olive {
-  text-shadow:
-    -1px -1px 0 #464010,
-     1px -1px 0 #464010,
-    -1px  1px 0 #464010,
-     1px  1px 0 #464010;
-}
-/* Skeleton shimmer animation */
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-.animate-shimmer {
-  animation: shimmer 2s infinite linear;
-  background-size: 1000px 100%;
-}
-
-/* 按钮圆球左右移动动画 */
-@keyframes ballBounce {
-  0% {
-    left: 4px;
-    transform: translateY(-50%);
-  }
-  50% {
-    left: calc(100% - 3.125vw - 4px);
-    transform: translateY(-50%);
-  }
-  100% {
-    left: 4px;
-    transform: translateY(-50%);
-  }
-}
-
-/* 淡入动画 */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.4s ease-out forwards;
-}
-
-/* 字符跳动动画 - 带暂停间隔 */
-@keyframes charBounce {
-  0%, 14%, 100% {
-    transform: translateY(0);
-  }
-  7% {
-    transform: translateY(-20px);
-  }
-}
-
-.animate-char-bounce {
-  animation: charBounce 4s ease-in-out infinite;
-}
-
-/* 箭头循环移动动画 */
-@keyframes arrowFloat {
-  0%, 100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(3px, -3px);
-  }
-}
-
-@keyframes arrowFloatLarge {
-  0%, 100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(8px, -8px);
-  }
-}
-
-.animate-arrow-float {
-  animation: arrowFloat 2s ease-in-out infinite;
-}
-
-.animate-arrow-float-large {
-  animation: arrowFloatLarge 1s ease-in-out infinite;
-}
-
-/* 箭头链接 - 默认小幅度循环，悬停时大幅度 */
-.arrow-link {
-  animation: arrowFloat 2s ease-in-out infinite;
-}
-
-.group\/title:hover .arrow-link {
-  animation: arrowFloatLarge 1s ease-in-out infinite;
-}
-
-/* 百叶窗条纹收起动画 - 水平方向，从左到右 */
-@keyframes blindStripHorizontal {
-  0%, 10% {
-    transform: scaleX(1);
-  }
-  40%, 100% {
-    transform: scaleX(0);
-  }
-}
-
-.animate-blind-strip-horizontal {
-  transform-origin: left center;
-  animation: blindStripHorizontal 3s ease-out infinite;
-}
-
-/* 装饰小球弹跳动画 - 模拟物理弹跳到边缘 */
-@keyframes bounceAround {
-  0% {
-    transform: translate(0, 0);
-  }
-  8% {
-    transform: translate(-450px, 180px);
-  }
-  16% {
-    transform: translate(-480px, 550px);
-  }
-  24% {
-    transform: translate(-100px, 700px);
-  }
-  32% {
-    transform: translate(400px, 500px);
-  }
-  40% {
-    transform: translate(500px, 150px);
-  }
-  48% {
-    transform: translate(200px, -200px);
-  }
-  56% {
-    transform: translate(-300px, -250px);
-  }
-  64% {
-    transform: translate(-500px, 100px);
-  }
-  72% {
-    transform: translate(-350px, 450px);
-  }
-  80% {
-    transform: translate(100px, 600px);
-  }
-  88% {
-    transform: translate(350px, 300px);
-  }
-  94% {
-    transform: translate(150px, 50px);
-  }
-  100% {
-    transform: translate(0, 0);
-  }
-}
-
-.ball-animated {
-  animation: ballBounce 3s ease-in-out infinite;
-}
-
-/* 黄点环绕圆形动画 - 外层容器旋转3圈 */
-@keyframes orbitSpin {
-  0%, 8% {
-    transform: rotate(0deg);
-  }
-  92%, 100% {
-    transform: rotate(1080deg);
-  }
-}
-
-/* 黄点位移动画 - 从中心向右移到边缘再回来 */
-@keyframes orbitRadius {
-  0%, 5% {
-    transform: translateX(0);
-  }
-  10%, 90% {
-    transform: translateX(300%);
-  }
-  95%, 100% {
-    transform: translateX(0);
-  }
-}
-
-/* 黄点自身反向旋转保持不转 */
-@keyframes orbitCounter {
-  0%, 8% {
-    transform: rotate(0deg);
-  }
-  92%, 100% {
-    transform: rotate(-360deg);
-  }
-}
-
-/* 呼吸效果 - 放大缩小 */
-@keyframes breathe {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-/* CTA按钮胶囊hover时呼吸效果 */
-.group:hover .cta-capsule-breathe {
-  animation: breathe 2s ease-in-out infinite;
-}
-
-/* 文字默认呼吸效果，hover时停止 */
-.group:hover .cta-text-breathe {
-  animation: none !important;
-}
-
-.ball-static {
-  animation: none;
-  left: 4px;
-  transform: translateY(-50%);
-}
-
-/* 数字弹跳动画 */
-@keyframes bounce-number {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-  }
-  25% {
-    transform: translateY(-8%) scale(1.05);
-  }
-  50% {
-    transform: translateY(0) scale(1);
-  }
-  75% {
-    transform: translateY(-4%) scale(1.02);
-  }
-}
-
-.animate-bounce-number {
-  animation: bounce-number 2s ease-in-out infinite;
-}
-
-/* Globe.gl 标签样式 - 深空科技风 */
-.globe-label {
-  background: rgba(0, 20, 40, 0.85);
-  color: #00FFFF;
-  padding: 6px 12px;
-  border-radius: 2px;
-  font-size: 11px;
-  font-family: var(--font-montserrat), 'Montserrat', sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 255, 255, 0.4);
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2), inset 0 0 10px rgba(0, 255, 255, 0.05);
-  text-transform: capitalize;
-  pointer-events: none;
-}
-
-/* 点击固定显示的标签 */
-.globe-label-fixed {
-  pointer-events: auto;
-  cursor: pointer;
-  animation: label-pulse 2s ease-in-out infinite;
-  border-color: rgba(0, 255, 255, 0.8);
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(0, 255, 255, 0.1);
-}
-
-.globe-label-fixed:hover {
-  background: rgba(0, 40, 60, 0.9);
-}
-
-@keyframes label-pulse {
-  0%, 100% {
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 255, 255, 0.05);
-  }
-  50% {
-    box-shadow: 0 0 25px rgba(0, 255, 255, 0.5), inset 0 0 15px rgba(0, 255, 255, 0.1);
-  }
-}
-
-/* 走马灯动画 - 使用 CSS 动画更省电 */
-@keyframes carousel-scroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-/* 桌面端走马灯 */
-.animate-carousel-desktop {
-  animation: carousel-scroll 25s linear infinite;
-}
-
-/* 移动端走马灯 */
-.animate-carousel-mobile {
-  animation: carousel-scroll 20s linear infinite;
-}
-
-/* 移动端产品走马灯 */
-.animate-carousel-products {
-  animation: carousel-scroll 30s linear infinite;
-}
-
-/* 当元素不在视口内时暂停动画 (配合 IntersectionObserver 使用) */
-.carousel-paused {
-  animation-play-state: paused;
-}
-
-/* ========== 浏览器自动填充样式修复 ========== */
-/* 修复深色背景表单的autofill样式 */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active,
-textarea:-webkit-autofill,
-textarea:-webkit-autofill:hover,
-textarea:-webkit-autofill:focus,
-textarea:-webkit-autofill:active,
-select:-webkit-autofill,
-select:-webkit-autofill:hover,
-select:-webkit-autofill:focus,
-select:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
-  -webkit-text-fill-color: inherit !important;
-  transition: background-color 5000s ease-in-out 0s;
-  background-color: transparent !important;
-}
-
-/* 深色背景表单专用 autofill 样式 */
-.bg-brand-secondary input:-webkit-autofill,
-.bg-brand-secondary textarea:-webkit-autofill,
-[data-theme="dark"] input:-webkit-autofill,
-[data-theme="dark"] textarea:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 1000px hsl(var(--secondary)) inset !important;
-  -webkit-text-fill-color: white !important;
-}
-
-/* 标题光泽扫过动画 - 金属反光效果 */
-@keyframes textShine {
-  0% {
-    background-position: -200% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
-}
-
-.text-shine {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 1) 35%,
-    rgba(255, 255, 150, 1) 45%,
-    rgba(255, 255, 255, 1) 50%,
-    rgba(255, 255, 150, 1) 55%,
-    rgba(255, 255, 255, 1) 65%,
-    rgba(255, 255, 255, 1) 100%
-  );
-  background-size: 200% auto;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: textShine 6s ease-in-out infinite;
-}
-
-/* 缩放呼吸动画 - 轻柔的放大缩小效果 */
-@keyframes pulseScale {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.03);
-  }
-}
-
-.animate-pulse-scale {
-  animation: pulseScale 3s ease-in-out infinite;
-}
-
-/* Logo 左右缓动动画 - 配合箭头形成指向效果 */
-@keyframes logoSway {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(1.5vw);
-  }
-}
-
-.animate-logo-sway {
-  animation: logoSway 3s ease-in-out infinite;
-}
-
-/* 箭头脉冲动画 - 配合 logo 缓动 */
-@keyframes arrowPulse {
-  0%, 100% {
-    transform: translateX(0) scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(1.5vw) scale(1.1);
-    opacity: 0.9;
-  }
-}
-
-.animate-arrow-pulse {
-  animation: arrowPulse 3s ease-in-out infinite;
-}
-
-/* 波浪透明度动画 - 用于箭头从左到右依次亮起 */
-@keyframes pulseWave {
-  0%, 100% {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.animate-pulse-wave {
-  animation: pulseWave 2s ease-in-out infinite;
-}
-
-/* 虚线流动动画 - 顺时针方向 */
-@keyframes dashFlow {
-  0% {
-    stroke-dashoffset: 0;
-  }
-  100% {
-    stroke-dashoffset: -48; /* dasharray 10+14=24，两个周期 */
-  }
-}
-
-.animate-dash-flow {
-  animation: dashFlow 1.5s linear infinite;
-}
-
-/* 虚线流动动画 - 逆时针方向 */
-@keyframes dashFlowReverse {
-  0% {
-    stroke-dashoffset: 0;
-  }
-  100% {
-    stroke-dashoffset: 48;
-  }
-}
-
-.animate-dash-flow-reverse {
-  animation: dashFlowReverse 1.5s linear infinite;
-}
-
-/* 慢速旋转动画 - 用于虚线圆圈 */
-@keyframes spinSlow {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin-slow {
-  animation: spinSlow 10s linear infinite;
-}
-
-/* 渐变文字光泽扫过动画 - 白色渐变版本 (从左上往右下扫过) */
-@keyframes gradientSweepWhiteDiagonal {
-  0%, 100% {
-    background-position: 200% -100%;
-  }
-  40%, 60% {
-    background-position: -200% 200%;
-  }
-}
-
-.gradient-text-shine-white {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 250, 209, 0.48) 0%,
-    rgba(255, 250, 209, 0.48) 40%,
-    #FFFFD0 45%,
-    #FFFFFF 50%,
-    #FFFFD0 55%,
-    rgba(255, 250, 209, 0.48) 60%,
-    rgba(255, 250, 209, 0.48) 100%
-  );
-  background-size: 200% 200%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientSweepWhiteDiagonal 6s ease-in-out infinite;
-}
-
-/* 渐变文字光泽扫过动画 - 橄榄色渐变版本 (从左到右扫过) */
-@keyframes gradientSweepOlive {
-  0% {
-    background-position: 200% center;
-  }
-  100% {
-    background-position: -200% center;
-  }
-}
-
-.gradient-text-shine-olive {
-  background: linear-gradient(
-    90deg,
-    #756F3F 0%,
-    #756F3F 30%,
-    #F0E68C 40%,
-    #DBD076 50%,
-    #DBD076 100%
-  );
-  background-size: 200% 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientSweepOlive 6s ease-in-out infinite;
-}
-
-/* ========== Accessibility Utilities ========== */
-/*
+
+    /* 添加用于文字光泽扫过效果的动画 */
+    @layer utilities {
+      @keyframes shine {
+        to {
+          background-position-x: -250%;
+        }
+      }
+    }
+
+    /* Moon orbit animation along image mask edge */
+    @keyframes moon-orbit {
+      0% {
+        offset-distance: 0%;
+      }
+
+      100% {
+        offset-distance: 100%;
+      }
+    }
+
+    .animate-moon-orbit {
+      animation: moon-orbit 30s linear infinite;
+    }
+
+    /* 将动画应用封装成一个工具类 */
+    .animate-shine {
+      animation: shine 2s linear infinite;
+    }
+
+    .text-stroke-black {
+      color: hsl(var(--background)) !important;
+      /* 兼容性更好的描边模拟：四向无模糊阴影 */
+      text-shadow:
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;
+
+      /* WebKit 浏览器 (Chrome/Safari) 专用，提供更清晰的描边效果 */
+
+    }
+
+    .text-stroke-custom {
+      -webkit-text-stroke: 0.04em #443D05;
+      text-stroke: 0.04em #443D05;
+    }
+
+    .text-stroke-custom-light {
+      -webkit-text-stroke: 0.03em #FDF6C2;
+      text-stroke: 0.03em #FDF6C2;
+
+    }
+
+    .text-stroke-custom-orange {
+      -webkit-text-stroke: 0.04em #75703F;
+      text-stroke: 0.04em #75703F;
+    }
+
+    .text-stroke-custom-white {
+      -webkit-text-stroke: 0.06em#6B4E00;
+      text-stroke: 0.06em#6B4E00;
+    }
+
+    .text-stroke-custom-gold {
+      -webkit-text-stroke: 0.04em#565020;
+      text-stroke: 0.04em#565020;
+    }
+
+    .text-stroke-dark-olive {
+      text-shadow:
+        -1px -1px 0 #464010,
+        1px -1px 0 #464010,
+        -1px 1px 0 #464010,
+        1px 1px 0 #464010;
+    }
+
+    /* Skeleton shimmer animation */
+    @keyframes shimmer {
+      0% {
+        background-position: -1000px 0;
+      }
+
+      100% {
+        background-position: 1000px 0;
+      }
+    }
+
+    .animate-shimmer {
+      animation: shimmer 2s infinite linear;
+      background-size: 1000px 100%;
+    }
+
+    /* 按钮圆球左右移动动画 */
+    @keyframes ballBounce {
+      0% {
+        left: 4px;
+        transform: translateY(-50%);
+      }
+
+      50% {
+        left: calc(100% - 3.125vw - 4px);
+        transform: translateY(-50%);
+      }
+
+      100% {
+        left: 4px;
+        transform: translateY(-50%);
+      }
+    }
+
+    /* 淡入动画 */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    /* 字符跳动动画 - 带暂停间隔 */
+    @keyframes charBounce {
+
+      0%,
+      14%,
+      100% {
+        transform: translateY(0);
+      }
+
+      7% {
+        transform: translateY(-20px);
+      }
+    }
+
+    .animate-char-bounce {
+      animation: charBounce 4s ease-in-out infinite;
+    }
+
+    /* 箭头循环移动动画 */
+    @keyframes arrowFloat {
+
+      0%,
+      100% {
+        transform: translate(0, 0);
+      }
+
+      50% {
+        transform: translate(3px, -3px);
+      }
+    }
+
+    @keyframes arrowFloatLarge {
+
+      0%,
+      100% {
+        transform: translate(0, 0);
+      }
+
+      50% {
+        transform: translate(8px, -8px);
+      }
+    }
+
+    .animate-arrow-float {
+      animation: arrowFloat 2s ease-in-out infinite;
+    }
+
+    .animate-arrow-float-large {
+      animation: arrowFloatLarge 1s ease-in-out infinite;
+    }
+
+    /* 箭头链接 - 默认小幅度循环，悬停时大幅度 */
+    .arrow-link {
+      animation: arrowFloat 2s ease-in-out infinite;
+    }
+
+    .group\/title:hover .arrow-link {
+      animation: arrowFloatLarge 1s ease-in-out infinite;
+    }
+
+    /* 百叶窗条纹收起动画 - 水平方向，从左到右 */
+    @keyframes blindStripHorizontal {
+
+      0%,
+      10% {
+        transform: scaleX(1);
+      }
+
+      40%,
+      100% {
+        transform: scaleX(0);
+      }
+    }
+
+    .animate-blind-strip-horizontal {
+      transform-origin: left center;
+      animation: blindStripHorizontal 3s ease-out infinite;
+    }
+
+    /* 装饰小球弹跳动画 - 模拟物理弹跳到边缘 */
+    @keyframes bounceAround {
+      0% {
+        transform: translate(0, 0);
+      }
+
+      8% {
+        transform: translate(-450px, 180px);
+      }
+
+      16% {
+        transform: translate(-480px, 550px);
+      }
+
+      24% {
+        transform: translate(-100px, 700px);
+      }
+
+      32% {
+        transform: translate(400px, 500px);
+      }
+
+      40% {
+        transform: translate(500px, 150px);
+      }
+
+      48% {
+        transform: translate(200px, -200px);
+      }
+
+      56% {
+        transform: translate(-300px, -250px);
+      }
+
+      64% {
+        transform: translate(-500px, 100px);
+      }
+
+      72% {
+        transform: translate(-350px, 450px);
+      }
+
+      80% {
+        transform: translate(100px, 600px);
+      }
+
+      88% {
+        transform: translate(350px, 300px);
+      }
+
+      94% {
+        transform: translate(150px, 50px);
+      }
+
+      100% {
+        transform: translate(0, 0);
+      }
+    }
+
+    .ball-animated {
+      animation: ballBounce 3s ease-in-out infinite;
+    }
+
+    /* 黄点环绕圆形动画 - 外层容器旋转3圈 */
+    @keyframes orbitSpin {
+
+      0%,
+      8% {
+        transform: rotate(0deg);
+      }
+
+      92%,
+      100% {
+        transform: rotate(1080deg);
+      }
+    }
+
+    /* 黄点位移动画 - 从中心向右移到边缘再回来 */
+    @keyframes orbitRadius {
+
+      0%,
+      5% {
+        transform: translateX(0);
+      }
+
+      10%,
+      90% {
+        transform: translateX(300%);
+      }
+
+      95%,
+      100% {
+        transform: translateX(0);
+      }
+    }
+
+    /* 黄点自身反向旋转保持不转 */
+    @keyframes orbitCounter {
+
+      0%,
+      8% {
+        transform: rotate(0deg);
+      }
+
+      92%,
+      100% {
+        transform: rotate(-360deg);
+      }
+    }
+
+    /* 呼吸效果 - 放大缩小 */
+    @keyframes breathe {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    /* CTA按钮胶囊hover时呼吸效果 */
+    .group:hover .cta-capsule-breathe {
+      animation: breathe 2s ease-in-out infinite;
+    }
+
+    /* 文字默认呼吸效果，hover时停止 */
+    .group:hover .cta-text-breathe {
+      animation: none !important;
+    }
+
+    .ball-static {
+      animation: none;
+      left: 4px;
+      transform: translateY(-50%);
+    }
+
+    /* 数字弹跳动画 */
+    @keyframes bounce-number {
+
+      0%,
+      100% {
+        transform: translateY(0) scale(1);
+      }
+
+      25% {
+        transform: translateY(-8%) scale(1.05);
+      }
+
+      50% {
+        transform: translateY(0) scale(1);
+      }
+
+      75% {
+        transform: translateY(-4%) scale(1.02);
+      }
+    }
+
+    .animate-bounce-number {
+      animation: bounce-number 2s ease-in-out infinite;
+    }
+
+    /* Globe.gl 标签样式 - 深空科技风 */
+    .globe-label {
+      background: rgba(0, 20, 40, 0.85);
+      color: #00FFFF;
+      padding: 6px 12px;
+      border-radius: 2px;
+      font-size: 11px;
+      font-family: var(--font-montserrat), 'Montserrat', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(0, 255, 255, 0.4);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.2), inset 0 0 10px rgba(0, 255, 255, 0.05);
+      text-transform: capitalize;
+      pointer-events: none;
+    }
+
+    /* 点击固定显示的标签 */
+    .globe-label-fixed {
+      pointer-events: auto;
+      cursor: pointer;
+      animation: label-pulse 2s ease-in-out infinite;
+      border-color: rgba(0, 255, 255, 0.8);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(0, 255, 255, 0.1);
+    }
+
+    .globe-label-fixed:hover {
+      background: rgba(0, 40, 60, 0.9);
+    }
+
+    @keyframes label-pulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 255, 255, 0.05);
+      }
+
+      50% {
+        box-shadow: 0 0 25px rgba(0, 255, 255, 0.5), inset 0 0 15px rgba(0, 255, 255, 0.1);
+      }
+    }
+
+    /* 走马灯动画 - 使用 CSS 动画更省电 */
+    @keyframes carousel-scroll {
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+
+    /* 桌面端走马灯 */
+    .animate-carousel-desktop {
+      animation: carousel-scroll 25s linear infinite;
+    }
+
+    /* 移动端走马灯 */
+    .animate-carousel-mobile {
+      animation: carousel-scroll 20s linear infinite;
+    }
+
+    /* 移动端产品走马灯 */
+    .animate-carousel-products {
+      animation: carousel-scroll 30s linear infinite;
+    }
+
+    /* 当元素不在视口内时暂停动画 (配合 IntersectionObserver 使用) */
+    .carousel-paused {
+      animation-play-state: paused;
+    }
+
+    /* ========== 浏览器自动填充样式修复 ========== */
+    /* 修复深色背景表单的autofill样式 */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active,
+    textarea:-webkit-autofill,
+    textarea:-webkit-autofill:hover,
+    textarea:-webkit-autofill:focus,
+    textarea:-webkit-autofill:active,
+    select:-webkit-autofill,
+    select:-webkit-autofill:hover,
+    select:-webkit-autofill:focus,
+    select:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+      -webkit-text-fill-color: inherit !important;
+      transition: background-color 5000s ease-in-out 0s;
+      background-color: transparent !important;
+    }
+
+    /* 深色背景表单专用 autofill 样式 */
+    .bg-brand-secondary input:-webkit-autofill,
+    .bg-brand-secondary textarea:-webkit-autofill,
+    [data-theme="dark"] input:-webkit-autofill,
+    [data-theme="dark"] textarea:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0 1000px hsl(var(--secondary)) inset !important;
+      -webkit-text-fill-color: white !important;
+    }
+
+    /* 标题光泽扫过动画 - 金属反光效果 */
+    @keyframes textShine {
+      0% {
+        background-position: -200% center;
+      }
+
+      100% {
+        background-position: 200% center;
+      }
+    }
+
+    .text-shine {
+      background: linear-gradient(90deg,
+          rgba(255, 255, 255, 1) 0%,
+          rgba(255, 255, 255, 1) 35%,
+          rgba(255, 255, 150, 1) 45%,
+          rgba(255, 255, 255, 1) 50%,
+          rgba(255, 255, 150, 1) 55%,
+          rgba(255, 255, 255, 1) 65%,
+          rgba(255, 255, 255, 1) 100%);
+      background-size: 200% auto;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: textShine 6s ease-in-out infinite;
+    }
+
+    /* 缩放呼吸动画 - 轻柔的放大缩小效果 */
+    @keyframes pulseScale {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.03);
+      }
+    }
+
+    .animate-pulse-scale {
+      animation: pulseScale 3s ease-in-out infinite;
+    }
+
+    /* Logo 左右缓动动画 - 配合箭头形成指向效果 */
+    @keyframes logoSway {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      50% {
+        transform: translateX(1.5vw);
+      }
+    }
+
+    .animate-logo-sway {
+      animation: logoSway 3s ease-in-out infinite;
+    }
+
+    /* 箭头脉冲动画 - 配合 logo 缓动 */
+    @keyframes arrowPulse {
+
+      0%,
+      100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: translateX(1.5vw) scale(1.1);
+        opacity: 0.9;
+      }
+    }
+
+    .animate-arrow-pulse {
+      animation: arrowPulse 3s ease-in-out infinite;
+    }
+
+    /* 波浪透明度动画 - 用于箭头从左到右依次亮起 */
+    @keyframes pulseWave {
+
+      0%,
+      100% {
+        opacity: 0.3;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    .animate-pulse-wave {
+      animation: pulseWave 2s ease-in-out infinite;
+    }
+
+    /* 虚线流动动画 - 顺时针方向 */
+    @keyframes dashFlow {
+      0% {
+        stroke-dashoffset: 0;
+      }
+
+      100% {
+        stroke-dashoffset: -48;
+        /* dasharray 10+14=24，两个周期 */
+      }
+    }
+
+    .animate-dash-flow {
+      animation: dashFlow 1.5s linear infinite;
+    }
+
+    /* 虚线流动动画 - 逆时针方向 */
+    @keyframes dashFlowReverse {
+      0% {
+        stroke-dashoffset: 0;
+      }
+
+      100% {
+        stroke-dashoffset: 48;
+      }
+    }
+
+    .animate-dash-flow-reverse {
+      animation: dashFlowReverse 1.5s linear infinite;
+    }
+
+    /* 慢速旋转动画 - 用于虚线圆圈 */
+    @keyframes spinSlow {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .animate-spin-slow {
+      animation: spinSlow 10s linear infinite;
+    }
+
+    /* 渐变文字光泽扫过动画 - 白色渐变版本 (从左上往右下扫过) */
+    @keyframes gradientSweepWhiteDiagonal {
+
+      0%,
+      100% {
+        background-position: 200% -100%;
+      }
+
+      40%,
+      60% {
+        background-position: -200% 200%;
+      }
+    }
+
+    .gradient-text-shine-white {
+      background: linear-gradient(135deg,
+          rgba(255, 250, 209, 0.48) 0%,
+          rgba(255, 250, 209, 0.48) 40%,
+          #FFFFD0 45%,
+          #FFFFFF 50%,
+          #FFFFD0 55%,
+          rgba(255, 250, 209, 0.48) 60%,
+          rgba(255, 250, 209, 0.48) 100%);
+      background-size: 200% 200%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientSweepWhiteDiagonal 6s ease-in-out infinite;
+    }
+
+    /* 渐变文字光泽扫过动画 - 橄榄色渐变版本 (从左到右扫过) */
+    @keyframes gradientSweepOlive {
+      0% {
+        background-position: 200% center;
+      }
+
+      100% {
+        background-position: -200% center;
+      }
+    }
+
+    .gradient-text-shine-olive {
+      background: linear-gradient(90deg,
+          #756F3F 0%,
+          #756F3F 30%,
+          #F0E68C 40%,
+          #DBD076 50%,
+          #DBD076 100%);
+      background-size: 200% 100%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientSweepOlive 6s ease-in-out infinite;
+    }
+
+    /* ========== Accessibility Utilities ========== */
+    /*
  * Screen reader only content - accessible to screen readers but visually hidden
  * This is a legitimate accessibility pattern (not black-hat SEO)
  */
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-/* ========== Lexical Renderer & Layout Fixes ========== */
-.nested-content-wrapper .nested-lexical-content *:first-child > *:first-child,
-.nested-content-wrapper .nested-lexical-content > *:first-child {
-  margin-top: 0 !important;
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    /* ========== Lexical Renderer & Layout Fixes ========== */
+    .nested-content-wrapper .nested-lexical-content *:first-child>*:first-child,
+    .nested-content-wrapper .nested-lexical-content>*:first-child {
+      margin-top: 0 !important;
+    }
+
+    /* Ensure headings inside float layouts don't jump below the image */
+    .flow-root h1,
+    .flow-root h2,
+    .flow-root h3 {
+      clear: none !important;
+    }
+  }
 }
 
-/* Ensure headings inside float layouts don't jump below the image */
-.flow-root h1, .flow-root h2, .flow-root h3 {
-  clear: none !important;
+/* 自定义全站滚动条 - macOS 原生风格 (10px 宽度) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2); /* 默认淡色 */
+  border-radius: 10px;
+  /* 利用透明边框和 background-clip 实现 macOS 风格的悬浮内缩效果 */
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.4); /* 悬停时加深 */
+}
+
+/* macOS 风格配合甲方要求的箭头按钮 */
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* 仅显示顶部向上和底部向下 */
+::-webkit-scrollbar-button:vertical:start:decrement,
+::-webkit-scrollbar-button:vertical:end:increment {
+  display: block;
+  height: 14px;
+  width: 18px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 8px;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+/* 向上箭头图标 (颜色使用淡灰色以匹配 macOS 风格) */
+::-webkit-scrollbar-button:vertical:start:decrement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 8l-6 6h12z'/%3E%3C/svg%3E");
+}
+
+/* 向下箭头图标 */
+::-webkit-scrollbar-button:vertical:end:increment {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 16l-6-6h12z'/%3E%3C/svg%3E");
+}
+
+/* 悬停时图标稍微加深 */
+::-webkit-scrollbar-button:hover {
+  opacity: 0.7;
+}
+
+/* 针对 Firefox 的兼容性写法 */
+@supports (-moz-appearance: none) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+  }
 }
