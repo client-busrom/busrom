@@ -22,7 +22,12 @@ export async function OrganizationSchema({ locale = 'en' }: OrganizationSchemaPr
     '@type': 'Organization',
     name: siteConfig.siteName || 'Busrom',
     url: siteUrl,
-    ...(logoUrl && { logo: logoUrl }),
+    ...(logoUrl && {
+      logo: {
+        '@type': 'ImageObject',
+        url: logoUrl,
+      }
+    }),
     description: siteConfig.siteTagline || 'Professional Glass Hardware Manufacturer',
     sameAs: [
       // Add social media links here if available

@@ -288,14 +288,28 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     icons: {
       icon: [
-        { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
+        { url: '/favicon.ico', sizes: 'any' },
         { url: finalFaviconUrl, type: 'image/svg+xml' },
+        { url: '/favicon-gold-b.svg', type: 'image/svg+xml' },
       ],
       shortcut: '/favicon.ico',
-      apple: finalFaviconUrl,
+      apple: [
+        { url: finalFaviconUrl, type: 'image/svg+xml' },
+        { url: '/favicon-gold-b.svg', type: 'image/svg+xml' },
+      ],
     },
     openGraph: {
-      ...(logoUrl && { images: [{ url: logoUrl }] }),
+      type: 'website',
+      siteName: siteConfig.siteName || 'Busrom',
+      ...(logoUrl && { images: [{ url: logoUrl, width: 1200, height: 630, alt: siteConfig.siteName }] }),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      ...(logoUrl && { images: [logoUrl] }),
+    },
+    other: {
+      'msapplication-TileImage': finalFaviconUrl,
+      'msapplication-TileColor': '#756F3F',
     },
   }
 }
