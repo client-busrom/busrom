@@ -75,8 +75,10 @@ Disallow: /api/
 Disallow: /_next/
 Disallow: /static/
 
-# Sitemap
+# Sitemaps
+Sitemap: ${siteUrl}/sitemaps.xml
 Sitemap: ${siteUrl}/sitemap.xml
+${localeSitemaps}
 `
 }
 

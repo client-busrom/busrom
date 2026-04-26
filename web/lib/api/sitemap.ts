@@ -58,7 +58,7 @@ async function fetchProducts(): Promise<{ slug: string; updatedAt: string }[]> {
       body: JSON.stringify({
         query: `
           query GetProductsForSitemap {
-            products(where: { status: { equals: "PUBLISHED" } }) {
+            products(where: { status: { equals: "published" } }) {
               slug
               updatedAt
             }
@@ -87,7 +87,7 @@ async function fetchProductSeries(): Promise<{ slug: string; updatedAt: string }
       body: JSON.stringify({
         query: `
           query GetProductSeriesForSitemap {
-            productSeries(where: { status: { equals: "PUBLISHED" } }) {
+            productSeries(where: { status: { equals: "published" } }) {
               slug
               updatedAt
             }
@@ -116,7 +116,7 @@ async function fetchBlogs(): Promise<{ slug: string; updatedAt: string }[]> {
       body: JSON.stringify({
         query: `
           query GetBlogsForSitemap {
-            blogs(where: { status: { equals: "PUBLISHED" } }) {
+            blogs(where: { status: { equals: "published" } }) {
               slug
               updatedAt
             }
@@ -145,7 +145,7 @@ async function fetchApplications(): Promise<{ slug: string; updatedAt: string }[
       body: JSON.stringify({
         query: `
           query GetApplicationsForSitemap {
-            applications(where: { status: { equals: "PUBLISHED" } }) {
+            applications(where: { status: { equals: "published" } }) {
               slug
               updatedAt
             }
@@ -176,7 +176,7 @@ async function fetchPages(): Promise<{ slug: string; updatedAt: string }[]> {
         query: `
           query GetPagesForSitemap {
             pages(where: {
-              status: { equals: "PUBLISHED" }
+              status: { equals: "published" }
               isSystem: { equals: false }
             }) {
               slug
@@ -291,11 +291,12 @@ export async function getSitemapUrlsForLocale(locale: string, baseUrl: string): 
 
   try {
     // Fetch all dynamic routes
-    const [products, productSeries, blogs, pages] = await Promise.all([
+    const [products, productSeries, blogs, pages, applications] = await Promise.all([
       fetchProducts(),
       fetchProductSeries(),
       fetchBlogs(),
       fetchPages(),
+      fetchApplications(),
     ])
 
     const urls: SitemapUrl[] = []
@@ -347,6 +348,20 @@ export async function getSitemapUrlsForLocale(locale: string, baseUrl: string): 
       )
     }
 
+    // Add applications -> /applications/[slug]
+    for (const app of applications) {
+      urls.push(
+        generateUrlWithAlternates(
+          `/applications/${app.slug}`,
+          app.updatedAt,
+          'weekly',
+          0.7,
+          locale,
+          baseUrl
+        )
+      )
+    }
+
     // Add CMS pages -> /page/[slug]
     for (const page of pages) {
       urls.push(
@@ -379,11 +394,12 @@ export async function getAllSitemapUrls(): Promise<SitemapUrl[]> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busrom.com'
 
   try {
-    const [products, productSeries, blogs, pages] = await Promise.all([
+    const [products, productSeries, blogs, pages, applications] = await Promise.all([
       fetchProducts(),
       fetchProductSeries(),
       fetchBlogs(),
       fetchPages(),
+      fetchApplications(),
     ])
 
     const urls: SitemapUrl[] = []
@@ -423,6 +439,16 @@ export async function getAllSitemapUrls(): Promise<SitemapUrl[]> {
       urls.push({
         url: `/blog/${blog.slug}`,
         lastmod: blog.updatedAt,
+        changefreq: 'weekly',
+        priority: 0.7,
+      })
+    }
+
+    // Add applications -> /applications/[slug]
+    for (const app of applications) {
+      urls.push({
+        url: `/applications/${app.slug}`,
+        lastmod: app.updatedAt,
         changefreq: 'weekly',
         priority: 0.7,
       })
