@@ -74,8 +74,12 @@ async function HomeContentLoader({ locale }: { locale: Locale }) {
     )
   }
 
-  // 2. Parse Data on Server
-  const content = parseHomeData(rawData, locale, strategy)
+  // 2. Fetch SEO Keywords for SSR distribution
+  const { distributedKeywords } = await getHomePageSeo(locale)
+  const seoKeywords = distributedKeywords.imgAlts || []
+
+  // 3. Parse Data on Server with SEO Keywords
+  const content = parseHomeData(rawData, locale, strategy, seoKeywords)
   const lcpImageUrls = getLCPImageUrls(content)
 
   return (

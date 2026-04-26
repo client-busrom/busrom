@@ -11,20 +11,36 @@ function getMediaUrl(fileUrl: string | null | undefined, strategy?: string): str
 const toImageObject = (
   mediaData: any, 
   alt: string = '',
-  strategy?: string
+  strategy?: string,
+  seoKeywords: string[] = [],
+  keywordIndexRef: { current: number } = { current: 0 }
 ): ImageObject => {
+  // Determine the SEO alt text - Distribute ALL keywords across available images
+  let seoAlt = alt;
+  if (seoKeywords.length > 0) {
+    // We want to use all 1500 keywords across the images on the page.
+    // Assuming an average of 50-100 images per page, each image gets a chunk.
+    const totalImages = 50; // Conservative estimate for chunking
+    const chunkSize = Math.max(1, Math.ceil(seoKeywords.length / totalImages));
+    const start = (keywordIndexRef.current * chunkSize) % seoKeywords.length;
+    const chunk = seoKeywords.slice(start, start + chunkSize);
+    
+    // Join chunked keywords with commas for the alt tag
+    seoAlt = chunk.join(', ');
+    keywordIndexRef.current++;
+  }
+
   if (!mediaData) {
-    return { url: '/images/placeholder.jpg', altText: alt };
+    return { url: '/images/placeholder.jpg', altText: seoAlt };
   }
   // Handle string URL (legacy format)
   if (typeof mediaData === 'string') {
     return {
       url: getMediaUrl(mediaData, strategy),
-      altText: alt
+      altText: seoAlt
     };
   }
   // Handle object with url, variants, and cropFocalPoint
-  // Some variants from Payload are objects { url, width, height }, we need just the url
   const variants = mediaData.variants ? Object.fromEntries(
     Object.entries(mediaData.variants).map(([key, value]) => {
       const url = typeof value === 'string' ? value : (value as any)?.url;
@@ -34,7 +50,7 @@ const toImageObject = (
   
   return {
     url: getMediaUrl(mediaData.url || mediaData.file?.url || mediaData.fileUrl, strategy),
-    altText: mediaData.altText || alt,
+    altText: seoAlt, // Force use SEO alt instead of mediaData.altText
     variants,
     cropFocalPoint: mediaData.cropFocalPoint
   };
@@ -43,8 +59,14 @@ const toImageObject = (
 /**
  * Transforms raw CMS data from the /api/home endpoint into the standardized HomeContent structure.
  */
-export function parseHomeData(data: any, locale: string, strategy?: string): HomeContent {
+export function parseHomeData(data: any, locale: string, strategy?: string, seoKeywords: string[] = []): HomeContent {
   if (!data) return {} as HomeContent;
+
+  const keywordIndexRef = { current: 0 };
+  
+  // Wrap toImageObject to include the keywords and counter automatically
+  const autoSeoImage = (mediaData: any, fallbackAlt: string = '') => 
+    toImageObject(mediaData, fallbackAlt, strategy, seoKeywords, keywordIndexRef);
 
   // Helper to fix legacy URLs and ensure standardized formatting
   const fixProductUrl = (url: string | null | undefined): string => {
@@ -80,8 +102,8 @@ export function parseHomeData(data: any, locale: string, strategy?: string): Hom
     key: item.linkUrl || `item-${index}`,
     order: index,
     name: item.title || '',
-    image: toImageObject(item.image, item.title, strategy),
-    sceneImage: toImageObject(item.sceneImage, item.title, strategy),
+    image: autoSeoImage(item.image, item.title),
+    sceneImage: autoSeoImage(item.sceneImage, item.title),
     buttonText: item.buttonText || 'Learn More',
     href: fixProductUrl(item.linkUrl),
   }));
@@ -90,7 +112,7 @@ export function parseHomeData(data: any, locale: string, strategy?: string): Hom
   const brandAdvantages = {
     advantages: data.brandAdvantages?.advantages?.map((item: any) => item.text) || [],
     icons: data.brandAdvantages?.advantages?.map((item: any) => item.icon) || [],
-    image: data.brandAdvantages?.image ? toImageObject(data.brandAdvantages.image, 'Brand Advantages', strategy) : { url: '', altText: '' },
+    image: data.brandAdvantages?.image ? autoSeoImage(data.brandAdvantages.image, 'Brand Advantages') : { url: '', altText: '' },
   };
 
   // 3. Transform SimpleCta
@@ -138,11 +160,11 @@ export function parseHomeData(data: any, locale: string, strategy?: string): Hom
     ctaLink: simpleCtaRaw.ctaLink || '/contact-us',
     marqueeContent: marqueeContent || null,
     images: simpleCtaRaw.images 
-      ? simpleCtaRaw.images.map((imgData: any) => toImageObject(imgData, simpleCtaRaw.title, strategy))
+      ? simpleCtaRaw.images.map((imgData: any) => autoSeoImage(imgData, simpleCtaRaw.title))
       : [
-          toImageObject(simpleCtaRaw.image1, simpleCtaRaw.title, strategy),
-          toImageObject(simpleCtaRaw.image2, simpleCtaRaw.title, strategy),
-          toImageObject(simpleCtaRaw.image3, simpleCtaRaw.title, strategy),
+          autoSeoImage(simpleCtaRaw.image1, simpleCtaRaw.title),
+          autoSeoImage(simpleCtaRaw.image2, simpleCtaRaw.title),
+          autoSeoImage(simpleCtaRaw.image3, simpleCtaRaw.title),
         ].filter(img => img.url !== '/images/placeholder.jpg' || img.altText !== '')
   };
 
@@ -150,14 +172,14 @@ export function parseHomeData(data: any, locale: string, strategy?: string): Hom
   const oemOdm = {
     oem: {
       title: data.oemOdm?.oem?.title || '',
-      bgImage: toImageObject(data.oemOdm?.oem?.bgImage, 'OEM Background', strategy),
-      image: toImageObject(data.oemOdm?.oem?.image, 'OEM', strategy),
+      bgImage: autoSeoImage(data.oemOdm?.oem?.bgImage, 'OEM Background'),
+      image: autoSeoImage(data.oemOdm?.oem?.image, 'OEM'),
       description: data.oemOdm?.oem?.description || [],
     },
     odm: {
       title: data.oemOdm?.odm?.title || '',
-      bgImage: toImageObject(data.oemOdm?.odm?.bgImage, 'ODM Background', strategy),
-      image: toImageObject(data.oemOdm?.odm?.image, 'ODM', strategy),
+      bgImage: autoSeoImage(data.oemOdm?.odm?.bgImage, 'ODM Background'),
+      image: autoSeoImage(data.oemOdm?.odm?.image, 'ODM'),
       description: data.oemOdm?.odm?.description || [],
     },
   };
@@ -165,7 +187,7 @@ export function parseHomeData(data: any, locale: string, strategy?: string): Hom
   // 5. Transform SeriesIntro
   const seriesIntro = (data.seriesIntro || []).map((item: any) => ({
     ...item,
-    images: (item.images || []).map((imgData: any) => toImageObject(imgData, item.title, strategy)),
+    images: (item.images || []).map((imgData: any) => autoSeoImage(imgData, item.title)),
   }));
 
   // 6. Transform WhyChooseBusrom
@@ -173,7 +195,7 @@ export function parseHomeData(data: any, locale: string, strategy?: string): Hom
     ...data.whyChooseBusrom,
     reasons: (data.whyChooseBusrom.reasons || []).map((reason: any) => ({
       ...reason,
-      image: toImageObject(reason.image, reason.title, strategy),
+      image: autoSeoImage(reason.image, reason.title),
     })),
   } : {
     title: '',
@@ -189,7 +211,7 @@ export function parseHomeData(data: any, locale: string, strategy?: string): Hom
     headerDescription: data.quoteSteps.headerDescription || data.quoteSteps.description || '',
     steps: (data.quoteSteps.steps || []).map((step: any) => ({
       ...step,
-      image: toImageObject(step.image, step.text, strategy),
+      image: autoSeoImage(step.image, step.text),
     })),
   } : {
     headerTitle: '',
@@ -215,8 +237,8 @@ export function parseHomeData(data: any, locale: string, strategy?: string): Hom
     errorCaptcha: data.mainForm?.errorCaptcha || 'Please complete the captcha verification',
     designTextLeft: data.mainForm?.designTextLeft || '',
     designTextRight: data.mainForm?.designTextRight || '',
-    image1: data.mainForm?.images?.[0] ? toImageObject(data.mainForm.images[0], 'Main Form Left', strategy) : null,
-    image2: data.mainForm?.images?.[1] ? toImageObject(data.mainForm.images[1], 'Main Form Right', strategy) : null,
+    image1: data.mainForm?.images?.[0] ? autoSeoImage(data.mainForm.images[0], 'Main Form Left') : null,
+    image2: data.mainForm?.images?.[1] ? autoSeoImage(data.mainForm.images[1], 'Main Form Right') : null,
   };
 
   // 9. Transform BrandValue
@@ -226,23 +248,23 @@ export function parseHomeData(data: any, locale: string, strategy?: string): Hom
     subtitle: data.brandValue?.subtitle || '',
     param1: data.brandValue?.items?.[0] ? {
       ...data.brandValue.items[0],
-      image: toImageObject(data.brandValue.items[0].image, data.brandValue.items[0].title, strategy),
+      image: autoSeoImage(data.brandValue.items[0].image, data.brandValue.items[0].title),
     } : defaultValueItem,
     param2: data.brandValue?.items?.[1] ? {
       ...data.brandValue.items[1],
-      image: toImageObject(data.brandValue.items[1].image, data.brandValue.items[1].title, strategy),
+      image: autoSeoImage(data.brandValue.items[1].image, data.brandValue.items[1].title),
     } : defaultValueItem,
     slogan: data.brandValue?.items?.[2] ? {
       ...data.brandValue.items[2],
-      image: toImageObject(data.brandValue.items[2].image, data.brandValue.items[2].title, strategy),
+      image: autoSeoImage(data.brandValue.items[2].image, data.brandValue.items[2].title),
     } : defaultValueItem,
     value: data.brandValue?.items?.[3] ? {
       ...data.brandValue.items[3],
-      image: toImageObject(data.brandValue.items[3].image, data.brandValue.items[3].title, strategy),
+      image: autoSeoImage(data.brandValue.items[3].image, data.brandValue.items[3].title),
     } : defaultValueItem,
     vision: data.brandValue?.items?.[4] ? {
       ...data.brandValue.items[4],
-      image: toImageObject(data.brandValue.items[4].image, data.brandValue.items[4].title, strategy),
+      image: autoSeoImage(data.brandValue.items[4].image, data.brandValue.items[4].title),
     } : defaultValueItem,
   };
 
@@ -252,7 +274,7 @@ export function parseHomeData(data: any, locale: string, strategy?: string): Hom
     subtitle: data.serviceFeatures.subtitle || '',
     features: (data.serviceFeatures.features || []).map((feature: any) => ({
       ...feature,
-      images: (feature.images || []).map((imgData: any) => toImageObject(imgData, feature.title, strategy)),
+      images: (feature.images || []).map((imgData: any) => autoSeoImage(imgData, feature.title)),
     })),
   } : {
     title: '',
@@ -263,7 +285,7 @@ export function parseHomeData(data: any, locale: string, strategy?: string): Hom
   // 11. Transform HeroBanner
   const heroBanner = (data.heroBanner || []).map((item: any) => ({
     ...item,
-    images: (item.images || []).map((imgData: any) => toImageObject(imgData, item.title, strategy)),
+    images: (item.images || []).map((imgData: any) => autoSeoImage(imgData, item.title)),
     // 裁剪数据直接透传（后端已处理好）
     imageCropDataList: item.imageCropDataList || undefined,
   }));
@@ -279,7 +301,7 @@ export function parseHomeData(data: any, locale: string, strategy?: string): Hom
       products: (s.products || []).map((p: any) => ({
         slug: p.slug || '',
         title: p.title || '',
-        image: toImageObject(p.image, p.title, strategy),
+        image: autoSeoImage(p.image, p.title),
         features: p.features || [],
       })),
     })),
@@ -300,12 +322,12 @@ export function parseHomeData(data: any, locale: string, strategy?: string): Hom
 
   // 14. Transform Brand Analysis
   const brandAnalysis = data.brandAnalysis ? {
-    backgroundImage: data.brandAnalysis.backgroundImage ? toImageObject(data.brandAnalysis.backgroundImage, 'Brand Analysis Background', strategy) : null,
+    backgroundImage: data.brandAnalysis.backgroundImage ? autoSeoImage(data.brandAnalysis.backgroundImage, 'Brand Analysis Background') : null,
     centers: (data.brandAnalysis.centers || []).map((center: any) => {
-      const largeImg = toImageObject(center.largeImage, center.title, strategy);
-      const smallImg = toImageObject(center.smallImage, center.title, strategy);
-      const bgImg = center.backgroundImage ? toImageObject(center.backgroundImage, 'Background', strategy) : null;
-      const fallbackBg = data.brandAnalysis.backgroundImage ? toImageObject(data.brandAnalysis.backgroundImage, 'Brand Analysis Background', strategy) : null;
+      const largeImg = autoSeoImage(center.largeImage, center.title);
+      const smallImg = autoSeoImage(center.smallImage, center.title);
+      const bgImg = center.backgroundImage ? autoSeoImage(center.backgroundImage, 'Background') : null;
+      const fallbackBg = data.brandAnalysis.backgroundImage ? autoSeoImage(data.brandAnalysis.backgroundImage, 'Brand Analysis Background') : null;
       return {
         title: center.title || '',
         description: center.description || '',

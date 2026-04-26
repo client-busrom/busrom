@@ -745,44 +745,46 @@ const MarqueeLinksBlock = ({ node }: any) => {
   }, [links]);
 
   const contextMediaData = useMediaData();
+  const fetchingRef = React.useRef<Record<string, boolean>>({});
 
   // Fetch media data for icons that are media IDs
   React.useEffect(() => {
     if (!links || links.length === 0) return;
 
     const fetchMedia = async () => {
-      const cmsUrl = getCmsUrl();
       const newCache: Record<string, any> = {};
+      const linksToFetch = links.filter((link: any) => {
+        const iconId = typeof link.icon === "string" || typeof link.icon === "number" ? link.icon : link.icon?.id;
+        return iconId && !mediaCache[iconId] && !fetchingRef.current[iconId];
+      });
+
+      if (linksToFetch.length === 0) return;
 
       await Promise.all(
-        links.map(async (link: any) => {
-          const iconId =
-            typeof link.icon === "string" || typeof link.icon === "number"
-              ? link.icon
-              : link.icon?.id;
-
-          if (!iconId || mediaCache[iconId]) return;
-
-          // Check context first
-          const contextImage =
-            contextMediaData[iconId] ||
-            Object.values(contextMediaData).find(
-              (m: any) => String(m.id) === String(iconId),
-            );
+        linksToFetch.map(async (link: any) => {
+          const iconId = typeof link.icon === "string" || typeof link.icon === "number" ? link.icon : link.icon?.id;
+          
+          // Double check context first
+          const contextImage = contextMediaData[iconId] || 
+            Object.values(contextMediaData).find((m: any) => String(m.id) === String(iconId));
+          
           if (contextImage) {
             newCache[iconId] = contextImage;
             return;
           }
 
+          fetchingRef.current[iconId] = true;
           try {
-            const res = await fetch(`${cmsUrl}/api/media/${iconId}?depth=0`);
+            // Use local proxy to avoid CORS issues
+            const res = await fetch(`/api/payload/media/${iconId}?depth=0`);
             if (res.ok) {
               const data = await res.json();
               newCache[iconId] = data;
             }
           } catch (err) {
-            console.error(`Failed to fetch media ${iconId}:`, err);
+            console.error(`[LexicalRenderer] Failed to fetch media ${iconId}:`, err);
           }
+          // Note: we keep fetchingRef[iconId] true even on failure to avoid repeated retries
         }),
       );
 
@@ -792,7 +794,7 @@ const MarqueeLinksBlock = ({ node }: any) => {
     };
 
     fetchMedia();
-  }, [links, contextMediaData]);
+  }, [links, contextMediaData]); // links is already stable if passed from parent
 
   const speedDuration =
     {
@@ -1500,33 +1502,35 @@ export const customConverters: JSXConverters = {
   },
 };
 
+// Helper to filter out undefined values from converters
+const filterUndefined = (obj: any) => {
+  if (!obj) return {};
+  return Object.fromEntries(
+    Object.entries(obj).filter(([_, v]) => v !== undefined),
+  );
+};
+
+// Base converters defined outside to prevent recreation
+const baseConverters = {
+  ...filterUndefined(defaultJSXConverters),
+  ...filterUndefined(customConverters),
+  blocks: {
+    ...filterUndefined((defaultJSXConverters as any)?.blocks),
+    ...filterUndefined(customConverters.blocks),
+  },
+};
+
 /**
  * Main Lexical Renderer Component
- *
- * Uses Payload's official RichText component with our custom converters
  */
-export function LexicalRenderer({
+export const LexicalRenderer = React.memo(({
   content,
   className = "",
   mediaData = {},
-}: LexicalRendererProps) {
-  // Helper to filter out undefined values from converters
-  const filterUndefined = (obj: any) => {
-    if (!obj) return {};
-    return Object.fromEntries(
-      Object.entries(obj).filter(([_, v]) => v !== undefined),
-    );
-  };
+}: LexicalRendererProps) => {
 
-  // Build full converters including all custom blocks
-  const converters: any = {
-    ...filterUndefined(defaultJSXConverters),
-    ...filterUndefined(customConverters),
-    blocks: {
-      ...filterUndefined((defaultJSXConverters as any)?.blocks),
-      ...filterUndefined(customConverters.blocks),
-    },
-  };
+  // Use static baseConverters to prevent unnecessary RichText re-renders
+  const converters = baseConverters;
 
   // FINAL SAFETY CHECK: If RichText is undefined, we have a major import issue
   if (!RichText) {
@@ -1545,7 +1549,7 @@ export function LexicalRenderer({
       </div>
     </MediaContext.Provider>
   );
-}
+});
 
 /**
  * Nested Lexical Renderer

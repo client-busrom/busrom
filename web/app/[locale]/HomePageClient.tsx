@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { memo, useState, useEffect, useRef } from 'react';
 import useSWR from 'swr';
@@ -71,7 +71,7 @@ const Sphere3D = dynamic(() => import("@/components/home/sphere-3d"), {
 
 // 延迟渲染组件 - 只在接近视口时才开始加载 Three.js
 // 这样可以避免首屏加载时下载和执行大量 JS
-function DeferredSphere3D({ data }: { data: { title: string; description: string } | null }) {
+const MemoizedDeferredSphere3D = memo(function DeferredSphere3D({ data }: { data: { title: string; description: string } | null }) {
   const [shouldLoad, setShouldLoad] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -80,15 +80,12 @@ function DeferredSphere3D({ data }: { data: { title: string; description: string
     const element = containerRef.current;
     if (!element) return;
 
-    // 如果已经加载，不需要再创建 observer
     if (shouldLoad) return;
 
-    // 清理之前的 observer
     if (observerRef.current) {
       observerRef.current.disconnect();
     }
 
-    // 使用 Intersection Observer 检测是否接近视口
     observerRef.current = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -98,7 +95,7 @@ function DeferredSphere3D({ data }: { data: { title: string; description: string
         }
       },
       {
-        rootMargin: '500px 0px', // 提前 500px 开始加载，给 Globe 更多初始化时间
+        rootMargin: '500px 0px',
         threshold: 0,
       }
     );
@@ -118,7 +115,7 @@ function DeferredSphere3D({ data }: { data: { title: string; description: string
       {shouldLoad && <Sphere3D data={data} />}
     </div>
   );
-}
+});
 
 // 使用 memo 包装纯展示组件，避免父组件更新时不必要的重渲染
 // 注意：动态导入的组件已内置缓存，不需要额外 memo
@@ -186,9 +183,8 @@ export function HomePageClient({
 
       {/* 首屏之后的内容 - 延迟加载，z-0 确保在首屏下层 */}
       <DeferredContent threshold={200}>
-        {/* 模块 4: 3D球体 */}
         <div data-header-theme="transparent">
-          <DeferredSphere3D data={content.sphere3d} />
+          <MemoizedDeferredSphere3D data={content.sphere3d} />
         </div>
 
         {/* 模块 5: 简易表单跳转 */}

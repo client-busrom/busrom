@@ -41,54 +41,53 @@ interface ClientLayoutWrapperProps {
 
 type LoadingStage = "loading" | "imageWall" | "done";
 
+// 模块级变量，用于在 React 热更新或单页跳转时保持状态
+let globalPreloaderShown = false;
+
 export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutWrapperProps) {
   const pathname = usePathname();
 
-  // 初始状态：优先从 sessionStorage 恢复，避免重渲染导致的二次加载
-  const [loadingStage, setLoadingStage] = useState<LoadingStage>(() => {
-    // 只有在客户端且开启了配置时才尝试恢复
-    if (typeof window !== 'undefined' && preloaderConfig.enabled) {
-      try {
-        if (sessionStorage.getItem(PRELOADER_SHOWN_KEY) === 'true') {
-          return "done";
-        }
-      } catch (e) {}
-    }
-    return preloaderConfig.enabled ? "loading" : "done";
-  });
+  // 初始状态：优先从内存和 sessionStorage 恢复，彻底杜绝重复播放
+  const [loadingStage, setLoadingStage] = useState<LoadingStage>(preloaderConfig.enabled ? "loading" : "done");
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    console.log('[ClientLayoutWrapper] loadingStage changed to:', loadingStage);
+  }, [loadingStage]);
 
   // 客户端检查：非首页直接跳过、sessionStorage 已标记跳过、性能测试工具跳过
   // Preloader 使用 dynamic({ ssr: false })，在 useEffect 执行前不会渲染，
   // 所以即使 loadingStage 初始为 "loading"，也不会闪烁 preloader 动画
   useEffect(() => {
+    setIsMounted(true);
+    
     if (!preloaderConfig.enabled) return;
 
-    // 非首页 → 直接跳过，不播放 preloader
+    // 检查是否已经在内存或 session 中显示过
+    const sessionShown = typeof window !== 'undefined' && sessionStorage.getItem(PRELOADER_SHOWN_KEY) === 'true';
+    if (globalPreloaderShown || sessionShown) {
+      setLoadingStage("done");
+      return;
+    }
+
+    // 非首页 → 直接跳过
     if (!isHomePage(pathname)) {
       setLoadingStage("done");
       return;
     }
 
-    // 检测 Lighthouse / PageSpeed Insights (性能测试工具)
+    // 检测性能测试工具
     const ua = navigator.userAgent;
     const isPerformanceTest = /Lighthouse|Chrome-Lighthouse|PageSpeed|Speed Insights/i.test(ua);
     if (isPerformanceTest) {
       setLoadingStage("done");
       return;
     }
-
-    // 当前 session 内已经显示过 → 跳过（语言切换、F5刷新等场景）
-    try {
-      if (sessionStorage.getItem(PRELOADER_SHOWN_KEY) === 'true') {
-        setLoadingStage("done");
-      }
-    } catch (e) {
-      // sessionStorage 不可用，继续显示 preloader
-    }
   }, [preloaderConfig.enabled, pathname]);
 
-  // 标记 preloader 已显示（保存到 sessionStorage）
+  // 标记 preloader 已显示（保存到 sessionStorage 和全局变量）
   const markPreloaderShown = useCallback(() => {
+    globalPreloaderShown = true;
     try {
       sessionStorage.setItem(PRELOADER_SHOWN_KEY, 'true');
     } catch (e) {
@@ -136,10 +135,10 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
         <Preloader onLoadingComplete={handlePreloaderComplete} config={preloaderConfig} />
       )}
 
-      {/* ImageWall - 始终渲染但控制可见性，避免加载 JS 导致的白屏 */}
-      {preloaderConfig.imageWallEnabled && (
+      {/* ImageWall - 只在 imageWall 阶段渲染，完成后彻底卸载 */}
+      {preloaderConfig.imageWallEnabled && loadingStage === "imageWall" && (
         <ImageWall
-          isActive={loadingStage === "imageWall"}
+          isActive={true}
           onComplete={handleImageWallComplete}
           images={preloaderConfig.images}
           backgroundColor={preloaderConfig.backgroundColor}
@@ -149,7 +148,7 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
       )}
 
       {/* 主内容 - 加载完成后显示 */}
-      <div style={{ visibility: isLoading ? 'hidden' : 'visible' }}>
+      <div style={{ visibility: (isLoading || !isMounted) ? 'hidden' : 'visible' }}>
         {children}
       </div>
     </SWRConfig>

@@ -4,6 +4,7 @@ import React from "react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import Link from "next/link"
 import useEmblaCarousel from "embla-carousel-react"
+import { motion } from "framer-motion"
 
 interface MediaObject {
   id: string
@@ -95,17 +96,38 @@ export function SimpleCtaSection({
           </p>
 
           {/* Button */}
-          <Link
-            href={`/${locale}${buttonLink}`}
-            className="inline-flex items-center justify-center px-6 py-2.5 rounded-full transition-transform hover:scale-105"
-            style={{ backgroundColor: "#FFF7B3" }}
-          >
-            <span
-              className="font-anaheim font-semibold text-[14px]"
-              style={{ color: "#625D2F" }}
+          <Link href={`/${locale}${buttonLink}`} className="inline-block">
+            <motion.div
+              className="origin-center"
+              style={{ transformOrigin: "50% 50%" }}
+              initial={{ rotate: 0, scale: 1 }}
+              animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+              whileHover={{
+                rotate: 0,
+                scale: 1.08,
+                transition: { scale: { duration: 0.3, ease: "easeOut" } },
+              }}
+              transition={{
+                rotate: {
+                  duration: 0.5,
+                  repeat: Infinity,
+                  repeatDelay: 2,
+                  ease: "easeInOut",
+                },
+              }}
             >
-              {buttonText}
-            </span>
+              <div
+                className="inline-flex items-center justify-center px-6 py-2.5 rounded-full"
+                style={{ backgroundColor: "#FFF7B3" }}
+              >
+                <span
+                  className="font-anaheim font-semibold text-[14px]"
+                  style={{ color: "#625D2F" }}
+                >
+                  {buttonText}
+                </span>
+              </div>
+            </motion.div>
           </Link>
 
           {/* Images - Draggable carousel on mobile */}
@@ -230,28 +252,47 @@ export function SimpleCtaSection({
         </p>
 
         {/* Get Started Button */}
-        <Link
-          href={`/${locale}${buttonLink}`}
-          className="absolute flex items-center justify-center transition-transform hover:scale-105"
-          style={{
-            left: vw(305),
-            top: vw(576),
-            width: vw(325),
-            height: vw(67),
-            borderRadius: vw(33.5),
-            backgroundColor: "#FFF7B3",
-          }}
-        >
-          <span
-            className="font-anaheim font-semibold"
-            style={{
-              fontSize: fontVw(24),
-              lineHeight: fontVw(32),
-              color: "#625D2F",
+        <Link href={`/${locale}${buttonLink}`} className="absolute" style={{ left: vw(305), top: vw(576) }}>
+          <motion.div
+            className="origin-center"
+            style={{ transformOrigin: "50% 50%" }}
+            initial={{ rotate: 0, scale: 1 }}
+            animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+            whileHover={{
+              rotate: 0,
+              scale: 1.08,
+              transition: { scale: { duration: 0.3, ease: "easeOut" } },
+            }}
+            transition={{
+              rotate: {
+                duration: 0.5,
+                repeat: Infinity,
+                repeatDelay: 2,
+                ease: "easeInOut",
+              },
             }}
           >
-            {buttonText}
-          </span>
+            <div
+              className="flex items-center justify-center"
+              style={{
+                width: vw(325),
+                height: vw(67),
+                borderRadius: vw(33.5),
+                backgroundColor: "#FFF7B3",
+              }}
+            >
+              <span
+                className="font-anaheim font-semibold"
+                style={{
+                  fontSize: fontVw(24),
+                  lineHeight: fontVw(32),
+                  color: "#625D2F",
+                }}
+              >
+                {buttonText}
+              </span>
+            </div>
+          </motion.div>
         </Link>
 
         {/* Decorative Arrow SVG - points from CTA text to button with pulse animation */}

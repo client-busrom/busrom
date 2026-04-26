@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo, memo } from "react";
 import dynamic from "next/dynamic";
 
 // Dynamic import Globe component
@@ -191,10 +191,15 @@ const altitudeToZoom = (alt: number) => {
 const DEFAULT_TITLE = "GLOBAL NETWORK";
 const DEFAULT_DESCRIPTION = "Serving Customers Worldwide From Guangdong, China";
 
-export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
+export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DProps) {
   // 使用后端数据，fallback 到默认值
   const title = data?.title || DEFAULT_TITLE;
   const description = data?.description || DEFAULT_DESCRIPTION;
+  
+  useEffect(() => {
+    console.log(`[Sphere3D] Rendered/Mounted with title: ${title}`);
+  }, [title]);
+
   const globeRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
@@ -314,6 +319,7 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
           renderer.dispose();
           renderer.forceContextLoss();
         }
+        console.log("[Sphere3D] Cleanup/Unmounted");
         // 清理 scene
         const scene = globeRef.current.scene?.();
         if (scene) {
@@ -593,4 +599,4 @@ export default function Sphere3D({ locale = "en", data }: Sphere3DProps) {
       </div>
     </section>
   );
-}
+});

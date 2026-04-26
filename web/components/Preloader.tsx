@@ -44,6 +44,7 @@ interface PreloaderProps {
 
 export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
   const mountRef = useRef<HTMLDivElement>(null);
+  const completedRef = useRef(false);
 
   useEffect(() => {
     const mountNode = mountRef.current;
@@ -135,7 +136,7 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
 
     // --- 新增：硬超时机制 (Hard Timeout) ---
     // 为中国大陆等网络环境优化的“兜底”逻辑：如果 6 秒后还没加载完，强制解锁
-    const HARD_TIMEOUT = 6000; 
+    const HARD_TIMEOUT = 8000; 
     setTimeout(() => {
       if (!allImagesLoaded || !fontAndLogoReady) {
         console.warn("[Preloader] Hard timeout reached. Forcing site entry...");
@@ -166,18 +167,24 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
       scene.add(percentageText);
     };
 
+
     // 检查是否可以开始结束动画
     const checkAndStartEndAnimation = () => {
+      // 已经完成过则直接跳过
+      if (completedRef.current) return;
+
       // 需要满足三个条件：图片加载完成、字体和Logo准备好、最小时间已过
       if (allImagesLoaded && fontAndLogoReady && minTimeElapsed) {
+        completedRef.current = true; // 锁定状态
+        
         // 确保进度显示为 100%
         realProgress.value = 100;
         updatePercentageDisplay();
 
         // 开始结束动画
         setTimeout(() => {
-          endTimeline.play();
-        }, 300); // 短暂延迟让用户看到 100%
+          if (endTimeline) endTimeline.play();
+        }, 300); // 短待延迟让用户看到 100%
       }
     };
 
@@ -301,16 +308,22 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
       scene.traverse((object) => {
         if (object instanceof THREE.Mesh) {
           object.geometry.dispose();
-          const mat = object.material as THREE.ShaderMaterial | THREE.ShaderMaterial[] | THREE.MeshBasicMaterial;
-          if (Array.isArray(mat)) {
-            mat.forEach((m) => m.dispose());
-          } else if (mat) {
-            mat.dispose();
+          if (object.material) {
+            if (Array.isArray(object.material)) {
+              object.material.forEach((m) => m.dispose());
+            } else {
+              object.material.dispose();
+            }
           }
         }
       });
       renderer.dispose();
+      // Force release WebGL context
+      const extension = renderer.getContext().getExtension('WEBGL_lose_context');
+      if (extension) extension.loseContext();
+      renderer.forceContextLoss();
       gsap.killTweensOf("*");
+      console.log("[Preloader] Cleanup/Unmounted");
     };
   }, [onLoadingComplete, config]);
 
