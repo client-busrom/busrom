@@ -430,6 +430,7 @@ export function DesktopBottomSection({
                                     alt={`${item.title} ${imgIndex + 1}`}
                                     size={imgIndex === 1 ? "medium" : "small"}
                                     className="w-full h-full object-cover"
+                                    loading="eager"
                                   />
                                 </Link>
                               ) : (
@@ -438,6 +439,7 @@ export function DesktopBottomSection({
                                   alt={`${item.title} ${imgIndex + 1}`}
                                   size={imgIndex === 1 ? "medium" : "small"}
                                   className="w-full h-full object-cover"
+                                  loading="eager"
                                 />
                               )}
                             </div>

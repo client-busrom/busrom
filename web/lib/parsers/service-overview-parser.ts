@@ -53,7 +53,12 @@ export interface ParsedServiceOverviewData {
   contactForm: {
     backgroundImage: MediaObject | null;
     title: string | null;
+    subtitle: string | null;
     description: string | null;
+    email: string | null;
+    phone: string | null;
+    footerNote: string | null;
+    displayName: string | null;
     formConfig: any;
   };
   applications: {
@@ -216,21 +221,45 @@ const extractCTAAfterMarker = (children: any[], markerId: string): { text: strin
   return null;
 };
 
-const extractTextAfterMarker = (children: any[], markerId: string): string | null => {
-  const nodesAfterMarker = extractAfterMarker(children, markerId);
-  for (const node of nodesAfterMarker) {
-    if (node.type === "paragraph" && node.children?.[0]?.text) return node.children[0].text;
-  }
-  return null;
-};
-
 const extractListItemText = (children: any[]): string => {
   if (!children) return "";
   return children.map((child: any) => {
     if (child.type === "text") return child.text || "";
     if (child.type === "linebreak") return "\n";
+    if (child.type === "autolink" || child.type === "link") return extractListItemText(child.children);
     return "";
   }).join("");
+};
+
+const serializeNodeChildren = (node: any): string => {
+  if (!node || !node.children) return "";
+  return node.children.map((child: any) => {
+    if (child.type === "text") return child.text || "";
+    if (child.type === "linebreak") return "\n";
+    if (child.children) return serializeNodeChildren(child);
+    return "";
+  }).join("");
+};
+
+const extractTextAfterMarker = (children: any[], markerId: string): string | null => {
+  const nodesAfterMarker = extractAfterMarker(children, markerId);
+  for (const node of nodesAfterMarker) {
+    if (node.type === "paragraph" || node.type === "quote") {
+      const text = serializeNodeChildren(node);
+      if (text.trim()) return text;
+    }
+  }
+  return null;
+};
+
+const extractListTextAfterMarker = (children: any[], markerId: string): string[] => {
+  const nodesAfterMarker = extractAfterMarker(children, markerId);
+  for (const node of nodesAfterMarker) {
+    if (node.type === "list") {
+      return (node.children || []).map((item: any) => extractListItemText(item.children));
+    }
+  }
+  return [];
 };
 
 const extractItemImages = (children: any[], categoryIndex: number, itemIndex: number, mediaData: Record<string, any>): MediaObject[] => {
@@ -328,11 +357,24 @@ export const parseServiceOverviewData = (pageContent: any): ParsedServiceOvervie
   };
 
   // 3. Contact Form
+  const contactInfoList = extractListTextAfterMarker(contentChildren, "contact-form-info");
+  // Find items that look like actual info (email contains @, phone contains digits)
+  const emailInfo = contactInfoList.find(t => t.includes('@'));
+  const whatsappInfo = contactInfoList.find(t => t.match(/\+\d+/) || (t.match(/\d/) && t.length > 5));
+
+  const formBlockNode = extractAfterMarker(contentChildren, "contact-form-block").find(n => n.type === "formBlock");
+  const resolvedFormConfig = pageContent.formConfig || formBlockNode?.data?.formConfig || null;
+
   const contactForm = {
     backgroundImage: extractImageAfterMarker(contentChildren, "contact-form-bg-image", mediaData),
-    title: extractTextAfterMarker(contentChildren, "contact-form-title"),
-    description: extractTextAfterMarker(contentChildren, "contact-form-description"),
-    formConfig: pageContent.formConfig || (contentChildren.find((n: any) => n.type === "formBlock")?.data?.formConfig) || null,
+    title: extractTextAfterMarker(contentChildren, "contact-form-decorator"),
+    subtitle: extractTextAfterMarker(contentChildren, "contact-form-subtitle"),
+    description: resolvedFormConfig?.description || extractTextAfterMarker(contentChildren, "contact-form-description"),
+    email: emailInfo?.trim() || null,
+    phone: whatsappInfo?.trim() || null,
+    footerNote: extractTextAfterMarker(contentChildren, "contact-form-tips"),
+    displayName: resolvedFormConfig?.displayName || null,
+    formConfig: resolvedFormConfig,
   };
 
   // 4. Applications

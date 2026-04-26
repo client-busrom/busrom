@@ -56,6 +56,13 @@ export function ServiceOverviewTemplate({ locale, data }: ServiceOverviewTemplat
           formName="service-overview-form"
           formConfig={contactForm.formConfig}
           backgroundImage={contactForm.backgroundImage}
+          title={contactForm.title || undefined}
+          subtitle={contactForm.subtitle || undefined}
+          description={contactForm.description || undefined}
+          email={contactForm.email || undefined}
+          phone={contactForm.phone || undefined}
+          footerNote={contactForm.footerNote || undefined}
+          displayName={contactForm.displayName || undefined}
         />
       </div>
 

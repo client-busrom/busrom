@@ -103,7 +103,7 @@ export function DesktopTopSection({
               {/* Category button */}
               <button
                 onClick={() => setActiveCategoryIndex(index)}
-                className={`flex items-center justify-center transition-all duration-300 ${
+                className={`flex items-center justify-center transition-all duration-300 hover:scale-105 ${
                   isActive ? "bg-[#89834C]" : "bg-transparent border-2 border-[#B7B180]"
                 }`}
                 style={{
@@ -114,9 +114,10 @@ export function DesktopTopSection({
                 }}
               >
                 <span
-                  className={`font-anaheim text-[#FFF38E] ${isActive ? "font-bold" : "font-medium"}`}
+                  className={`font-anaheim text-[#FFF38E] transition-all duration-300 ${isActive ? "font-bold scale-110" : "font-medium scale-100"}`}
                   style={{
                     fontSize: vw(29),
+                    display: "inline-block",
                   }}
                 >
                   {category.title}
@@ -201,14 +202,15 @@ export function DesktopTopSection({
           boxShadow: `${vw(3)} ${vw(3)} ${vw(8)} rgba(0, 0, 0, 0.25)`, // 4/4/11.4 * 0.7
         }}
       >
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           <motion.div
             key={`top-${activeCategoryIndex}`}
-            initial={{ opacity: 0, scale: 1.1 }}
+            initial={{ opacity: 0, scale: 1.15 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="w-full h-full"
+            exit={{ opacity: 0, scale: 1.1 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="w-full h-full absolute inset-0 overflow-hidden"
+            style={{ borderRadius: vw(21) }}
           >
             {currentImages.top ? (
               currentImages.top.enableLink && currentImages.top.linkUrl ? (
@@ -218,6 +220,7 @@ export function DesktopTopSection({
                     alt={`${activeCategory?.title || 'Brand service'} - top`}
                     size="medium"
                     className="w-full h-full object-cover"
+                    priority={true}
                   />
                 </Link>
               ) : (
@@ -226,6 +229,7 @@ export function DesktopTopSection({
                   alt={`${activeCategory?.title || 'Brand service'} - top`}
                   size="medium"
                   className="w-full h-full object-cover"
+                  priority={true}
                 />
               )
             ) : (
@@ -247,14 +251,15 @@ export function DesktopTopSection({
           boxShadow: `${vw(3)} ${vw(3)} ${vw(7)} rgba(0, 0, 0, 0.25)`, // 4/4/9.3 * 0.7
         }}
       >
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           <motion.div
             key={`bottom-${activeCategoryIndex}`}
-            initial={{ opacity: 0, scale: 1.1 }}
+            initial={{ opacity: 0, scale: 1.15 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
-            className="w-full h-full"
+            exit={{ opacity: 0, scale: 1.1 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="w-full h-full absolute inset-0 overflow-hidden"
+            style={{ borderRadius: vw(21) }}
           >
             {currentImages.bottom ? (
               currentImages.bottom.enableLink && currentImages.bottom.linkUrl ? (
@@ -264,6 +269,7 @@ export function DesktopTopSection({
                     alt={`${activeCategory?.title || 'Brand service'} - bottom`}
                     size="medium"
                     className="w-full h-full object-cover"
+                    priority={true}
                   />
                 </Link>
               ) : (
@@ -272,6 +278,7 @@ export function DesktopTopSection({
                   alt={`${activeCategory?.title || 'Brand service'} - bottom`}
                   size="medium"
                   className="w-full h-full object-cover"
+                  priority={true}
                 />
               )
             ) : (

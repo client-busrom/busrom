@@ -868,8 +868,8 @@
 
 /* 自定义全站滚动条 - macOS 原生风格 (10px 宽度) */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   background-color: transparent;
 }
 
@@ -879,10 +879,7 @@
 
 ::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.2); /* 默认淡色 */
-  border-radius: 10px;
-  /* 利用透明边框和 background-clip 实现 macOS 风格的悬浮内缩效果 */
-  border: 2px solid transparent;
-  background-clip: content-box;
+  border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -899,22 +896,22 @@
 ::-webkit-scrollbar-button:vertical:end:increment {
   display: block;
   height: 14px;
-  width: 18px;
+  width: 14px; /* 宽度必须与 ::webkit-scrollbar 的 10px 一致，否则会出现白边或错位 */
   background-position: center;
   background-repeat: no-repeat;
-  background-size: 8px;
+  background-size: 10px;
   background-color: transparent;
   cursor: pointer;
 }
 
-/* 向上箭头图标 (颜色使用淡灰色以匹配 macOS 风格) */
+/* 向上箭头图标 (圆角钝角三角形 - 增加圆角感) */
 ::-webkit-scrollbar-button:vertical:start:decrement {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 8l-6 6h12z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 11.5L6 16h12z' stroke='%23999' stroke-width='5' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 /* 向下箭头图标 */
 ::-webkit-scrollbar-button:vertical:end:increment {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 16l-6-6h12z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 12.5L6 8h12z' stroke='%23999' stroke-width='5' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 /* 悬停时图标稍微加深 */
