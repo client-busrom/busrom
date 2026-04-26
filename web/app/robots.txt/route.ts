@@ -85,7 +85,7 @@ ${localeSitemaps}
 export async function GET() {
   try {
     // Get site URL from environment
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busrom.com'
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busromhouse.com'
 
     // Try to fetch robots.txt from CMS
     let robotsTxt = await getRobotsTxtFromCMS()
@@ -112,7 +112,7 @@ export async function GET() {
     console.error('Error generating robots.txt:', error)
 
     // Return default robots.txt as fallback
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busrom.com'
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busromhouse.com'
     return new NextResponse(getDefaultRobotsTxt(siteUrl), {
       status: 200,
       headers: {

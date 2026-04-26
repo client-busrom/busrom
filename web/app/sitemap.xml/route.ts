@@ -22,7 +22,7 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   try {
     // Get base URL from environment or default
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busrom.com'
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busromhouse.com'
 
     // Fetch all URLs
     const urls = await getAllSitemapUrls()

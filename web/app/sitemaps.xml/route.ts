@@ -20,7 +20,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busrom.com'
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busromhouse.com'
 
     // Generate sitemap index XML
     const xml = generateSitemapIndexXML(SITEMAP_LOCALES as unknown as string[], baseUrl)
