@@ -1,32 +1,35 @@
-import React from "react"
-import { ServiceValueSection } from "@/components/service/ServiceValueSection"
-import { BrandServicesSection } from "@/components/service/BrandServicesSection"
-import { ContactFormSection } from "@/components/service/ContactFormSection"
-import { ApplicationsSection } from "@/components/service/ApplicationsSection"
-import { SimpleCtaSection } from "@/components/service/SimpleCtaSection"
-import { AnimationSection } from "@/components/service/AnimationSection"
-import type { ParsedServiceOverviewData } from "@/lib/parsers/service-overview-parser"
+import React from "react";
+import { ServiceValueSection } from "@/components/service/ServiceValueSection";
+import { BrandServicesSection } from "@/components/service/BrandServicesSection";
+import { ContactFormSection } from "@/components/service/ContactFormSection";
+import { ApplicationsSection } from "@/components/service/ApplicationsSection";
+import { SimpleCtaSection } from "@/components/service/SimpleCtaSection";
+import { AnimationSection } from "@/components/service/AnimationSection";
+import type { ParsedServiceOverviewData } from "@/lib/parsers/service-overview-parser";
 
 interface ServiceOverviewTemplateProps {
-  locale: string
-  data: ParsedServiceOverviewData
+  locale: string;
+  data: ParsedServiceOverviewData;
 }
 
 /**
  * ServiceOverviewTemplate - Server Component
- * 
- * This template is now a pure functional component that receives 
+ *
+ * This template is now a pure functional component that receives
  * pre-parsed data from the server, satisfying SEO and performance requirements.
  */
-export function ServiceOverviewTemplate({ locale, data }: ServiceOverviewTemplateProps) {
-  const { 
-    serviceValue, 
-    brandServices, 
-    contactForm, 
-    applications, 
-    simpleCta, 
-    animation 
-  } = data
+export function ServiceOverviewTemplate({
+  locale,
+  data,
+}: ServiceOverviewTemplateProps) {
+  const {
+    serviceValue,
+    brandServices,
+    contactForm,
+    applications,
+    simpleCta,
+    animation,
+  } = data;
 
   return (
     <div className="min-h-screen bg-background" data-header-theme="dark">
@@ -59,10 +62,9 @@ export function ServiceOverviewTemplate({ locale, data }: ServiceOverviewTemplat
           title={contactForm.title || undefined}
           subtitle={contactForm.subtitle || undefined}
           description={contactForm.description || undefined}
-          email={contactForm.email || undefined}
-          phone={contactForm.phone || undefined}
           footerNote={contactForm.footerNote || undefined}
           displayName={contactForm.displayName || undefined}
+          info={contactForm.info}
         />
       </div>
 
@@ -73,7 +75,11 @@ export function ServiceOverviewTemplate({ locale, data }: ServiceOverviewTemplat
           titleLine1={applications.titleLine1}
           titleLine2={applications.titleLine2}
           highlightText={applications.highlightText}
-          viewMoreLink={applications.viewMoreLink.startsWith('/') ? `/${locale}${applications.viewMoreLink}` : applications.viewMoreLink}
+          viewMoreLink={
+            applications.viewMoreLink.startsWith("/")
+              ? `/${locale}${applications.viewMoreLink}`
+              : applications.viewMoreLink
+          }
           viewMoreText={applications.viewMoreText}
           applicationIds={applications.applicationIds}
         />
@@ -102,5 +108,5 @@ export function ServiceOverviewTemplate({ locale, data }: ServiceOverviewTemplat
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -242,8 +242,8 @@ export function ContactFormSection({
   const vw = (v: number) => `${(v / DESIGN_WIDTH) * 100}vw`
 
   // 获取表单字段配置
-  const configData = mergedConfig?.data || mergedConfig
-  const fields = configData?.fields?.[locale] || configData?.fields?.["en"] || (Array.isArray(configData?.fields) ? configData.fields : [])
+  const configData = mergedConfig?.data
+  const fields = (configData?.fields?.[locale] || configData?.fields?.["en"] || (Array.isArray(configData?.fields) ? configData.fields : [])) as FormField[]
   const sortedFields = [...fields].sort((a, b) => (a.order || 0) - (b.order || 0))
 
   const handleInputChange = (fieldName: string, value: string) => {
@@ -307,7 +307,7 @@ export function ContactFormSection({
       // 提交表单
       const submissionData = {
         formId: formId,
-        formName: mergedConfig?.name || configData?.name || "contact-form",
+        formName: configData?.name || "contact-form",
         data: {
           ...formData,
           ...(fileUrl ? { attachment: fileUrl } : {}),

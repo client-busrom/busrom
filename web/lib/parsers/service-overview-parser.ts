@@ -38,6 +38,11 @@ export interface ServiceCategory {
   items: ServiceItem[];
 }
 
+export interface RichText {
+  text: string;
+  hollow?: boolean;
+}
+
 export interface ParsedServiceOverviewData {
   serviceValue: {
     title: string;
@@ -52,13 +57,15 @@ export interface ParsedServiceOverviewData {
   };
   contactForm: {
     backgroundImage: MediaObject | null;
-    title: string | null;
+    title: RichText[];
     subtitle: string | null;
     description: string | null;
     email: string | null;
     phone: string | null;
     footerNote: string | null;
     displayName: string | null;
+    decorator: string | null;
+    info: string[];
     formConfig: any;
   };
   applications: {
@@ -87,7 +94,8 @@ const isMarkerNode = (node: any, markerId?: string): boolean => {
   if (node.type !== "paragraph" && node.type !== "quote") return false;
   const children = node.children || [];
   return children.some((child: any) => {
-    const isCode = child.format === 16 || child.textFormat === 16;
+    // 16 is basic code, 80 seems to be code+bold or other variations in your Lexical
+    const isCode = (child.format & 16) === 16 || (child.textFormat & 16) === 16;
     const text = (child.text || "").trim();
     return isCode && (markerId ? text === markerId : text.length > 0);
   });
@@ -241,9 +249,45 @@ const serializeNodeChildren = (node: any): string => {
   }).join("");
 };
 
+const serializeRichText = (node: any): RichText[] => {
+  if (!node || !node.children) return [];
+  const result: RichText[] = [];
+  node.children.forEach((child: any) => {
+    if (child.type === "text") {
+      result.push({
+        text: child.text || "",
+        // format: 1 usually means Bold in Lexical
+        hollow: (child.format & 1) === 1 || (child.textFormat & 1) === 1
+      });
+    } else if (child.type === "linebreak") {
+      result.push({ text: "\n", hollow: false });
+    } else if (child.children) {
+      result.push(...serializeRichText(child));
+    }
+  });
+  return result;
+};
+
+const extractRichTextAfterMarker = (children: any[], markerId: string): RichText[] => {
+  const nodesAfterMarker = extractAfterMarker(children, markerId);
+  for (const node of nodesAfterMarker) {
+    // Skip ANY marker node
+    if (isMarkerNode(node)) continue;
+    
+    if (node.type === "paragraph" || node.type === "quote") {
+      const richText = serializeRichText(node);
+      if (richText.length > 0) return richText;
+    }
+  }
+  return [];
+};
+
 const extractTextAfterMarker = (children: any[], markerId: string): string | null => {
   const nodesAfterMarker = extractAfterMarker(children, markerId);
   for (const node of nodesAfterMarker) {
+    // Skip ANY marker node
+    if (isMarkerNode(node)) continue;
+    
     if (node.type === "paragraph" || node.type === "quote") {
       const text = serializeNodeChildren(node);
       if (text.trim()) return text;
@@ -367,13 +411,13 @@ export const parseServiceOverviewData = (pageContent: any): ParsedServiceOvervie
 
   const contactForm = {
     backgroundImage: extractImageAfterMarker(contentChildren, "contact-form-bg-image", mediaData),
-    title: extractTextAfterMarker(contentChildren, "contact-form-decorator"),
+    // title: 大标题
+    title: extractRichTextAfterMarker(contentChildren, "contact-form-decorator"),
     subtitle: extractTextAfterMarker(contentChildren, "contact-form-subtitle"),
     description: resolvedFormConfig?.description || extractTextAfterMarker(contentChildren, "contact-form-description"),
-    email: emailInfo?.trim() || null,
-    phone: whatsappInfo?.trim() || null,
     footerNote: extractTextAfterMarker(contentChildren, "contact-form-tips"),
     displayName: resolvedFormConfig?.displayName || null,
+    info: contactInfoList,
     formConfig: resolvedFormConfig,
   };
 
