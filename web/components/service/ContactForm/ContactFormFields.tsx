@@ -482,15 +482,16 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              height: vw(90),
+              minHeight: vw(90),
+              padding: `${vw(12)} ${vw(20)}`,
               borderRadius: vw(15),
               cursor: "pointer",
             }}
             className="bg-[#211C0B]/50 border border-dashed border-white/30 transition-all duration-200 hover:bg-[#211C0B]/70 hover:border-white/60 hover:scale-[1.02]"
           >
             <span
-              className="font-anaheim font-semibold text-white/50"
-              style={{ fontSize: vw(20) }}
+              className="font-anaheim font-semibold text-white/50 text-center"
+              style={{ fontSize: vw(20), whiteSpace: "pre-wrap" }}
             >
               {uploadingFiles[field.fieldName]
                 ? "Uploading..."
@@ -840,9 +841,12 @@ export const MobileField: React.FC<MobileFieldProps> = ({
         <div className="space-y-[12px]">
           <label
             htmlFor={`mobile-${field.fieldName}`}
-            className="flex items-center justify-center h-[52px] rounded-[12px] bg-[#211C0B]/50 border border-dashed border-white/30 cursor-pointer transition-all hover:bg-[#211C0B]/70"
+            className="flex items-center justify-center min-h-[52px] h-auto py-[12px] px-[16px] rounded-[12px] bg-[#211C0B]/50 border border-dashed border-white/30 cursor-pointer transition-all hover:bg-[#211C0B]/70"
           >
-            <span className="font-anaheim font-semibold text-white/50 text-[14px]">
+            <span 
+              className="font-anaheim font-semibold text-white/50 text-[14px] text-center"
+              style={{ whiteSpace: "pre-wrap" }}
+            >
               {uploadingFiles[field.fieldName]
                 ? "Uploading..."
                 : uploadedAttachments.filter(
