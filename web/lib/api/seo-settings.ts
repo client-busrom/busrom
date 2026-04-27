@@ -6,6 +6,7 @@
  */
 
 import type { Metadata } from 'next'
+import { getAlternateLanguages } from '../seo-utils'
 
 // CMS URL for API calls
 const CMS_URL = process.env.CMS_GRAPHQL_URL
@@ -219,6 +220,13 @@ export function buildMetadata(
     metadata.alternates = {
       ...metadata.alternates,
       canonical: canonicalUrl,
+      languages: getAlternateLanguages(seoSetting.exactPath || '/'),
+    }
+  } else {
+    // Even if no canonical is set in CMS, we should still provide hreflang for the current path
+    metadata.alternates = {
+      ...metadata.alternates,
+      languages: getAlternateLanguages(seoSetting.exactPath || '/'),
     }
   }
 
