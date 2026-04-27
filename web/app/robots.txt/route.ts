@@ -71,6 +71,10 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 
+# Allow static assets for SEO and Favicons
+Allow: /_next/static/
+Allow: /favicon.ico
+
 # Disallow private routes
 Disallow: /_next/
 Disallow: /static/

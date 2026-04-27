@@ -285,7 +285,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const logoUrl = getMediaUrl(siteConfig.logo)
   const finalFaviconUrl = faviconUrl || '/favicon-gold-b.svg'
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.busromhouse.com'
+  
   return {
+    metadataBase: new URL(siteUrl),
     icons: {
       icon: [
         { url: '/favicon.ico', sizes: 'any' },
