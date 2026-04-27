@@ -109,8 +109,12 @@ export default function MainForm({ data, locale = "en" }: Props) {
 
   // 获取字段 label - 优先使用 formConfig 中的配置
   const getFieldLabel = (fieldName: string, fallbackLabel: string): string => {
-    if (formConfig?.fields) {
-      const field = formConfig.fields.find(f => f.fieldName === fieldName);
+    if (formConfig?.fields && Array.isArray(formConfig.fields)) {
+      // 兼容处理：某些配置可能把 whatsapp 叫成 phone，或者大小写不同
+      const searchNames = [fieldName.toLowerCase()];
+      if (fieldName.toLowerCase() === "whatsapp") searchNames.push("phone", "mobile");
+      
+      const field = formConfig.fields.find(f => searchNames.includes(f.fieldName?.toLowerCase()));
       if (field?.label) {
         return field.label;
       }
@@ -120,9 +124,23 @@ export default function MainForm({ data, locale = "en" }: Props) {
 
   // 获取字段 placeholder
   const getFieldPlaceholder = (fieldName: string, fallbackPlaceholder?: string): string | undefined => {
-    if (formConfig?.fields) {
-      const field = formConfig.fields.find(f => f.fieldName === fieldName);
-      if (field?.placeholder) {
+    if (formConfig?.fields && Array.isArray(formConfig.fields)) {
+      const searchNames = [fieldName.toLowerCase()];
+      if (fieldName.toLowerCase() === "whatsapp") searchNames.push("phone", "mobile", "tel");
+      if (fieldName.toLowerCase() === "name") searchNames.push("fullname", "contact");
+      
+      // 1. 精确/兼容名匹配
+      let field = formConfig.fields.find(f => searchNames.includes(f.fieldName?.toLowerCase()));
+      
+      // 2. 如果没找到，尝试包含匹配 (例如 "your_email" 匹配 "email")
+      if (!field) {
+        field = formConfig.fields.find(f => {
+          const fName = f.fieldName?.toLowerCase() || "";
+          return searchNames.some(s => fName.includes(s) || s.includes(fName));
+        });
+      }
+
+      if (field?.placeholder !== undefined && field?.placeholder !== null) {
         return field.placeholder;
       }
     }
@@ -205,6 +223,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
         if (formRes.ok) {
           const config = await formRes.json();
           setFormConfig(config);
+          console.log(`[MainForm] Loaded config for "${locale}":`, config);
         }
 
         if (turnstileRes.ok) {
