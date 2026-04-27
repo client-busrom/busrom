@@ -390,9 +390,9 @@ export default function MainForm({ data, locale = "en" }: Props) {
   // 固定的宽高比容器 (404x837)
   const imageCardContainerClass = `bg-transparent w-full aspect-[404/837] relative rounded-[3rem] shadow-[0_0_20px_rgba(255,255,255,0.3),0_0_60px_rgba(255,255,255,0.15),0_0_120px_rgba(255,255,255,0.1)]`;
 
-  // 滚动视差动画逻辑（优化版：直接操纵 DOM，避免触发整个表单的 React Re-render）
+  // 滚动视差动画逻辑（极致优化版）
   useEffect(() => {
-    if (!isDesktop) return;
+    if (!isDesktop || !isVisible) return; // 只有在桌面端且进入视口时才监听
 
     let ticking = false;
     const updateTransforms = () => {
@@ -402,20 +402,22 @@ export default function MainForm({ data, locale = "en" }: Props) {
       const rect = element.getBoundingClientRect();
       const windowHeight = window.innerHeight;
 
+      // 如果板块已经完全离开视口（上方或下方），停止计算
+      if (rect.bottom < 0 || rect.top > windowHeight) return;
+
       // progress: 0 = 板块刚进入视口底部, 1 = 板块顶部到达视口顶部
       const progress = Math.max(0, Math.min(1, (windowHeight - rect.top) / (windowHeight + rect.height)));
       const maxOffset = 500;
 
-      // 左侧：从上方进入，往下移动
+      // 使用 transform3d 触发 GPU 加速
       if (leftImageRef.current) {
         const offsetLeft = (1 - progress * 2) * maxOffset;
-        leftImageRef.current.style.transform = `translateY(${offsetLeft}px)`;
+        leftImageRef.current.style.transform = `translate3d(0, ${offsetLeft}px, 0)`;
       }
 
-      // 右侧：从下方进入，往上移动
       if (rightImageRef.current) {
         const offsetRight = (1 - progress * 2) * maxOffset;
-        rightImageRef.current.style.transform = `translateY(${-offsetRight}px)`;
+        rightImageRef.current.style.transform = `translate3d(0, ${-offsetRight}px, 0)`;
       }
     };
 
@@ -429,12 +431,11 @@ export default function MainForm({ data, locale = "en" }: Props) {
       }
     };
 
-    // 初始化执行一次
-    updateTransforms();
-
     window.addEventListener("scroll", handleScroll, { passive: true });
+    updateTransforms(); // 初始执行
+
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isDesktop]);
+  }, [isDesktop, isVisible]); // 增加 isVisible 依赖
 
   // ------------------------------------------------------------------
   // JSX 渲染
@@ -442,7 +443,7 @@ export default function MainForm({ data, locale = "en" }: Props) {
   return (
     <section
       ref={sectionRef}
-      className="py-32 md:py-40 bg-brand-secondary text-brand-text-inverse overflow-hidden duration-500"
+      className="py-32 md:py-40 bg-brand-secondary text-brand-text-inverse overflow-hidden"
       data-header-theme="transparent"
     >
       <div className="container mx-auto px-4">
