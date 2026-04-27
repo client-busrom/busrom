@@ -12,6 +12,7 @@
  */
 
 import type { CollectionConfig } from 'payload'
+import { pingSitemap } from '../hooks/pingSitemap'
 
 export const ProductSeries: CollectionConfig = {
   slug: 'product-series',
@@ -263,13 +264,6 @@ export const ProductSeries: CollectionConfig = {
     },
   ],
   hooks: {
-    afterChange: [
-      async ({ doc, operation }) => {
-        // IndexNow submission for SEO (to be implemented)
-        if (operation === 'create' || operation === 'update') {
-          // await submitToIndexNow(`/product-series/${doc.slug}`)
-        }
-      },
-    ],
+    afterChange: [pingSitemap],
   },
 }

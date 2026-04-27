@@ -3,6 +3,7 @@ import { ProductDetailClient } from "./ProductDetailClient"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import { getNonHomePageSeo, buildMetadata } from "@/lib/api/seo-settings"
+import { getAlternateLanguages } from "@/lib/seo-utils"
 import type { Metadata } from "next"
 
 const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
@@ -49,6 +50,9 @@ export async function generateMetadata({
   const defaultMetadata: Metadata = {
     title,
     ...(description ? { description } : {}),
+    alternates: {
+      languages: getAlternateLanguages(path),
+    },
   }
 
   // Merge with SeoSettings for robots/canonical/og only

@@ -17,7 +17,8 @@
 import { locales, defaultLocale } from '@/i18n.config'
 
 // Use the public CMS domain to avoid internal networking issues in Docker/ECS
-const CMS_URL = 'https://cms.busromhouse.com'
+// Use environment variable for CMS URL with a fallback
+const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.busromhouse.com'
 
 const GRAPHQL_ENDPOINT = `${CMS_URL}/api/graphql`
 
@@ -58,9 +59,11 @@ async function fetchProducts(): Promise<{ slug: string; updatedAt: string }[]> {
       body: JSON.stringify({
         query: `
           query GetProductsForSitemap {
-            products(where: { status: { equals: "published" } }) {
-              slug
-              updatedAt
+            Products(where: { status: { equals: "published" } }, limit: 1000) {
+              docs {
+                slug
+                updatedAt
+              }
             }
           }
         `,
@@ -69,7 +72,7 @@ async function fetchProducts(): Promise<{ slug: string; updatedAt: string }[]> {
     })
 
     const { data } = await response.json()
-    return data?.products || []
+    return data?.Products?.docs || []
   } catch (error) {
     console.error('Error fetching products for sitemap:', error)
     return []
@@ -87,9 +90,11 @@ async function fetchProductSeries(): Promise<{ slug: string; updatedAt: string }
       body: JSON.stringify({
         query: `
           query GetProductSeriesForSitemap {
-            productSeries(where: { status: { equals: "published" } }) {
-              slug
-              updatedAt
+            ProductSeries(where: { status: { equals: "published" } }, limit: 1000) {
+              docs {
+                slug
+                updatedAt
+              }
             }
           }
         `,
@@ -98,7 +103,7 @@ async function fetchProductSeries(): Promise<{ slug: string; updatedAt: string }
     })
 
     const { data } = await response.json()
-    return data?.productSeries || []
+    return data?.ProductSeries?.docs || []
   } catch (error) {
     console.error('Error fetching product series for sitemap:', error)
     return []
@@ -116,9 +121,11 @@ async function fetchBlogs(): Promise<{ slug: string; updatedAt: string }[]> {
       body: JSON.stringify({
         query: `
           query GetBlogsForSitemap {
-            blogs(where: { status: { equals: "published" } }) {
-              slug
-              updatedAt
+            Blogs(where: { status: { equals: "published" } }, limit: 1000) {
+              docs {
+                slug
+                updatedAt
+              }
             }
           }
         `,
@@ -127,7 +134,7 @@ async function fetchBlogs(): Promise<{ slug: string; updatedAt: string }[]> {
     })
 
     const { data } = await response.json()
-    return data?.blogs || []
+    return data?.Blogs?.docs || []
   } catch (error) {
     console.error('Error fetching blogs for sitemap:', error)
     return []
@@ -145,9 +152,11 @@ async function fetchApplications(): Promise<{ slug: string; updatedAt: string }[
       body: JSON.stringify({
         query: `
           query GetApplicationsForSitemap {
-            applications(where: { status: { equals: "published" } }) {
-              slug
-              updatedAt
+            Applications(where: { status: { equals: "published" } }, limit: 1000) {
+              docs {
+                slug
+                updatedAt
+              }
             }
           }
         `,
@@ -156,7 +165,7 @@ async function fetchApplications(): Promise<{ slug: string; updatedAt: string }[
     })
 
     const { data } = await response.json()
-    return data?.applications || []
+    return data?.Applications?.docs || []
   } catch (error) {
     console.error('Error fetching applications for sitemap:', error)
     return []
@@ -175,12 +184,14 @@ async function fetchPages(): Promise<{ slug: string; updatedAt: string }[]> {
       body: JSON.stringify({
         query: `
           query GetPagesForSitemap {
-            pages(where: {
+            Pages(where: {
               status: { equals: "published" }
               isSystem: { equals: false }
-            }) {
-              slug
-              updatedAt
+            }, limit: 1000) {
+              docs {
+                slug
+                updatedAt
+              }
             }
           }
         `,
@@ -189,7 +200,7 @@ async function fetchPages(): Promise<{ slug: string; updatedAt: string }[]> {
     })
 
     const { data } = await response.json()
-    return data?.pages || []
+    return data?.Pages?.docs || []
   } catch (error) {
     console.error('Error fetching pages for sitemap:', error)
     return []
@@ -214,8 +225,8 @@ function getStaticRoutes(): { path: string; changefreq: SitemapUrl['changefreq']
     // Blog list page
     { path: '/blog', changefreq: 'weekly', priority: 0.8 },
 
-    // Applications list page
-    { path: '/applications', changefreq: 'weekly', priority: 0.8 },
+    // Application list page
+    { path: '/application', changefreq: 'weekly', priority: 0.8 },
 
     // Service pages
     { path: '/service/overview', changefreq: 'monthly', priority: 0.7 },
@@ -348,19 +359,6 @@ export async function getSitemapUrlsForLocale(locale: string, baseUrl: string): 
       )
     }
 
-    // Add applications -> /applications/[slug]
-    for (const app of applications) {
-      urls.push(
-        generateUrlWithAlternates(
-          `/applications/${app.slug}`,
-          app.updatedAt,
-          'weekly',
-          0.7,
-          locale,
-          baseUrl
-        )
-      )
-    }
 
     // Add CMS pages -> /page/[slug]
     for (const page of pages) {

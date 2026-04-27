@@ -222,6 +222,20 @@ const nextConfig = {
   productionBrowserSourceMaps: true,
 
   /**
+   * Rewrites - Used for SEO and legacy URL handling
+   */
+  async rewrites() {
+    return [
+      // IndexNow verification key support
+      // Allows any /{key}.txt request to be handled by our API
+      {
+        source: '/:key.txt',
+        destination: '/api/indexnow/verify',
+      },
+    ]
+  },
+
+  /**
    * Security Headers
    *
    * - CSP: 防止 XSS 攻击

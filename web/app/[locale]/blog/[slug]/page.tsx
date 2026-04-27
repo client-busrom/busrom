@@ -4,6 +4,7 @@ import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import { getPageMetadata } from "@/lib/api/seo-settings"
 import { getBlogBySlug, getBlogSettings } from "@/lib/api/blog"
+import { getAlternateLanguages } from "@/lib/seo-utils"
 import type { Metadata } from "next"
 
 const CMS_URL = process.env.CMS_GRAPHQL_URL
@@ -28,6 +29,9 @@ export async function generateMetadata({
   const defaultMetadata: Metadata = {
     title: `${title} | Busrom Blog`,
     description: `Read ${title} on Busrom Blog - Industry insights and updates`,
+    alternates: {
+      languages: getAlternateLanguages(path),
+    },
   }
 
   // Merge with CMS SEO settings

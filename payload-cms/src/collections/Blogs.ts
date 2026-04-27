@@ -12,6 +12,7 @@
 
 import type { CollectionConfig } from 'payload'
 import { syncM2M, cleanupM2M } from '../hooks/syncM2M'
+import { pingSitemap } from '../hooks/pingSitemap'
 
 export const Blogs: CollectionConfig = {
   slug: 'blogs',
@@ -104,6 +105,7 @@ export const Blogs: CollectionConfig = {
     afterChange: [
       syncM2M('categories', 'blogPosts', 'categories'),
       syncM2M('blog-tags', 'blogs', 'tags'),
+      pingSitemap,
     ],
     afterDelete: [
       cleanupM2M('categories', 'blogPosts', 'categories'),

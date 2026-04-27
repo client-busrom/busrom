@@ -16,6 +16,7 @@ import type {
   CollectionAfterChangeHook, 
   CollectionAfterDeleteHook 
 } from 'payload'
+import { pingSitemap } from '../hooks/pingSitemap'
 
 // 内存锁：确保同一个分类的 shopProducts 更新是串行的，防止高并发覆盖
 const categoryUpdateQueue: Record<string, Promise<void>> = {}
@@ -563,7 +564,7 @@ export const Products: CollectionConfig = {
         return data
       },
     ],
-    afterChange: [afterChangeHook],
+    afterChange: [afterChangeHook, pingSitemap],
     afterDelete: [afterDeleteHook],
   },
 }

@@ -18,6 +18,7 @@ import { GlobalScripts } from "@/components/GlobalScripts";
 import { ScriptDebugger } from "@/components/ScriptDebugger";
 import { OrganizationSchema } from "@/components/seo/OrganizationSchema";
 import { getSiteConfig, getMediaUrl } from "@/lib/api/site-config";
+import { getAlternateLanguages } from "@/lib/seo-utils";
 import { getFooterData } from "@/lib/api/footer";
 
 // 延迟加载 LenisProvider（包含 GSAP），不阻塞首屏渲染
@@ -287,8 +288,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.busromhouse.com'
   
+  const alternates = getAlternateLanguages('/')
+
   return {
     metadataBase: new URL(siteUrl),
+    alternates: {
+      canonical: './',
+      languages: alternates,
+    },
     icons: {
       icon: [
         { url: '/favicon.ico', sizes: 'any' },
@@ -312,8 +319,12 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     other: {
       'msapplication-TileImage': finalFaviconUrl,
+      'google-site-verification': process.env.GOOGLE_SITE_VERIFICATION || '',
+      'yandex-verification': process.env.YANDEX_VERIFICATION || '',
+      'naver-site-verification': process.env.NAVER_SITE_VERIFICATION || '',
       'msapplication-TileColor': '#756F3F',
     },
+    manifest: '/manifest.json',
   }
 }
 

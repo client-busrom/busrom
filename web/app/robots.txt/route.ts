@@ -19,7 +19,7 @@ import { SITEMAP_LOCALES } from '@/lib/api/sitemap'
 export const dynamic = 'force-dynamic'
 
 // Use the public CMS domain to avoid internal networking issues in Docker/ECS
-const CMS_URL = 'https://cms.busromhouse.com'
+const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.busromhouse.com'
 
 const GRAPHQL_ENDPOINT = `${CMS_URL}/api/graphql`
 
