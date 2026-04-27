@@ -56,8 +56,8 @@ interface SeoSettingsResponse {
 }
 
 // Cache for SEO settings (revalidate every 5 minutes)
-let seoCache: SeoSetting[] | null = null
-let seoCacheTime = 0
+let seoCache: Record<string, SeoSetting[]> = {}
+let seoCacheTime: Record<string, number> = {}
 const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 
 /**
@@ -66,9 +66,9 @@ const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 export async function getAllSeoSettings(locale: string = 'en'): Promise<SeoSetting[]> {
   const now = Date.now()
 
-  // Return cached data if still valid
-  if (seoCache && now - seoCacheTime < CACHE_TTL) {
-    return seoCache
+  // Return cached data if still valid for this specific locale
+  if (seoCache[locale] && now - (seoCacheTime[locale] || 0) < CACHE_TTL) {
+    return seoCache[locale]
   }
 
   try {
@@ -85,13 +85,12 @@ export async function getAllSeoSettings(locale: string = 'en'): Promise<SeoSetti
     }
 
     const data: SeoSettingsResponse = await response.json()
-    seoCache = data.docs || []
-    seoCacheTime = now
-
-    return seoCache
+    seoCache[locale] = data.docs || []
+    seoCacheTime[locale] = now
+    return seoCache[locale]
   } catch (error) {
     console.error('[SeoSettings] Error fetching SEO settings:', error)
-    return seoCache || []
+    return seoCache[locale] || []
   }
 }
 
