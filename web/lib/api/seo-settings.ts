@@ -81,7 +81,7 @@ export async function getAllSeoSettings(locale: string = 'en'): Promise<SeoSetti
 
     if (!response.ok) {
       console.error('[SeoSettings] Failed to fetch:', response.status)
-      return seoCache || []
+      return seoCache[locale] || []
     }
 
     const data: SeoSettingsResponse = await response.json()
