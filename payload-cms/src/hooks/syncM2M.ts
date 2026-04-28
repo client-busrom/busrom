@@ -44,6 +44,11 @@ export const syncM2M = (
     const added = nextTargets.filter((id: any) => !prevTargets.map(String).includes(String(id)))
     const removed = prevTargets.filter((id: any) => !nextTargets.map(String).includes(String(id)))
 
+    // Get the default locale to avoid validation errors on target collections that might lack translations
+    const defaultLocale = (payload.config.localization && typeof payload.config.localization === 'object')
+      ? payload.config.localization.defaultLocale
+      : 'en'
+
     // Handle added targets
     for (const targetId of added) {
       try {
@@ -53,6 +58,7 @@ export const syncM2M = (
           collection: targetCollection as any,
           id: targetId,
           depth: 0,
+          locale: defaultLocale as any, // Force default locale to bypass target translation validation
           req, // Crucial for transaction visibility
         })
         
@@ -69,6 +75,7 @@ export const syncM2M = (
               context: { isSyncing: true },
               depth: 0,
               overrideAccess: true,
+              locale: defaultLocale as any, // Force default locale to bypass target translation validation
               req,
             })
           }
@@ -76,9 +83,6 @@ export const syncM2M = (
       } catch (e: any) {
         console.error(`[syncM2M] ❌ FAILED to link ${targetCollection}/${targetId}:`, e.message)
         if (e.data?.errors) console.error('Validation errors:', JSON.stringify(e.data.errors, null, 2))
-        // Re-throw to ensure transaction rollback if this is critical, 
-        // or keep catching if you want the main document to be saved anyway.
-        // Given the FK violation issue, we might want to know why it fails.
       }
     }
 
@@ -89,6 +93,7 @@ export const syncM2M = (
           collection: targetCollection as any,
           id: targetId,
           depth: 0,
+          locale: defaultLocale as any, // Force default locale
           req, // Crucial for transaction visibility
         })
         if (target) {
@@ -103,6 +108,7 @@ export const syncM2M = (
               context: { isSyncing: true },
               depth: 0,
               overrideAccess: true,
+              locale: defaultLocale as any, // Force default locale
               req,
             })
           }
@@ -133,12 +139,17 @@ export const cleanupM2M = (
     const sourceIdStr = String(sourceId)
     const targets = sanitizeIds(doc?.[sourceField] || [])
 
+    const defaultLocale = (payload.config.localization && typeof payload.config.localization === 'object')
+      ? payload.config.localization.defaultLocale
+      : 'en'
+
     for (const targetId of targets) {
       try {
         const target = await payload.findByID({
           collection: targetCollection as any,
           id: targetId,
           depth: 0,
+          locale: defaultLocale as any,
           req,
         })
         if (target) {
@@ -153,6 +164,7 @@ export const cleanupM2M = (
               context: { isSyncing: true },
               depth: 0,
               overrideAccess: true,
+              locale: defaultLocale as any,
               req,
             })
           }

@@ -148,9 +148,8 @@ export const Blogs: CollectionConfig = {
                 zh: '技术标识 (自动生成)',
               },
               hooks: {
-                beforeValidate: [formatSlug('title')],
+                beforeValidate: [formatSlug('adminLabel')],
               },
-              required: true,
               unique: true,
               admin: {
                 readOnly: true,
@@ -167,7 +166,6 @@ export const Blogs: CollectionConfig = {
                 en: 'Blog Title',
                 zh: '博客标题',
               },
-              required: true,
               localized: true,
             },
             {
@@ -193,7 +191,6 @@ export const Blogs: CollectionConfig = {
                 en: 'Author',
                 zh: '作者',
               },
-              required: true,
               admin: {
                 description: {
                   en: 'Select the writer for this post',
@@ -317,7 +314,6 @@ export const Blogs: CollectionConfig = {
                   zh: '选择在前端显示知识库文章时应该调用的具体开发模版。',
                 },
               },
-              required: true,
               defaultValue: 'template1',
               options: [
                 { label: { en: 'Template 1 (Standard Modern)', zh: '模版一 (标准现代多栏)' }, value: 'template1' },

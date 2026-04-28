@@ -859,8 +859,8 @@ export interface Blog {
   /**
    * This is automatically generated from Admin Identification and used for URLs.
    */
-  slug: string;
-  title: string;
+  slug?: string | null;
+  title?: string | null;
   /**
    * Short summary for previews
    */
@@ -868,7 +868,7 @@ export interface Blog {
   /**
    * Select the writer for this post
    */
-  author: number | Author;
+  author?: (number | null) | Author;
   /**
    * Rich text content - use language tabs above to switch locales
    */
@@ -899,7 +899,7 @@ export interface Blog {
   /**
    * Select how the frontend will structurally render this blog post.
    */
-  templateType: 'template1' | 'template2' | 'template3';
+  templateType?: ('template1' | 'template2' | 'template3') | null;
   status?: ('published' | 'draft' | 'archived') | null;
   publishedAt?: string | null;
   updatedAt: string;
