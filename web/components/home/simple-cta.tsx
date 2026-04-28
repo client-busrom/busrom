@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 
 import type { HomeContent } from "@/lib/content-data";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ type Props = {
 const LAYOUT_CONFIG = {
   // === 整体容器 ===
   section: {
-    paddingY: "py-8", // 上下内边距
+    paddingY: "py-12 lg:py-[60px]", // 上下内边距
     marginTop: "mt-8 lg:mt-12", // 内容区域顶部间距
   },
 
@@ -186,25 +187,30 @@ const LAYOUT_CONFIG = {
 const extractMarqueeLinks = (content: any) => {
   try {
     const nodes = content?.root?.children || [];
+    // 匹配后端传回的 Lexical 块结构
     const blockNode = nodes.find(
-      (n: any) => n.type === "block" && n.fields?.blockType === "marqueeLinks",
+      (n: any) => n.type === "marqueeLinks" || (n.type === "block" && n.fields?.blockType === "marqueeLinks")
     );
-    const links = blockNode?.fields?.links || [];
+    const links = blockNode?.data?.links || blockNode?.fields?.links || [];
 
     return links.map((link: any) => {
       const iconData = link.icon;
-      const iconUrl =
-        typeof iconData === "object"
-          ? iconData.url || iconData.variants?.thumbnail?.url
-          : null;
+      const iconId = typeof iconData === "object" ? iconData.id : (typeof iconData === "string" || typeof iconData === "number" ? iconData : null);
+      
+      const iconUrl = typeof iconData === "object" 
+        ? (iconData.url || iconData.sizes?.thumbnail?.url || iconData.sizes?.card?.url || iconData.variants?.thumbnail?.url) 
+        : null;
+        
       return {
         title: link.title,
         url: link.url,
         iconName: link.iconName,
         iconUrl: iconUrl,
+        iconId: iconId, // 保留 ID 用于后续解析
       };
     });
   } catch (e) {
+    console.error("Marquee data extraction failed:", e);
     return [];
   }
 };
@@ -214,53 +220,83 @@ const MarqueeText = ({
   direction = "left",
   textColor = "white",
   items = [],
+  mediaCache = {},
 }: {
   direction?: "left" | "right";
   textColor?: string;
   items?: any[];
+  mediaCache?: Record<string, any>;
 }) => {
-  const displayItems = items.length > 0 ? items : [{ title: "Busrom" }];
+  const displayItems = items.length > 0 ? items : [{ title: "Busrom", url: "#" }];
 
-  // 增加重复次数以确保无缝衔接 (至少 20 个元素)
-  const repeatCount = Math.max(2, Math.ceil(20 / displayItems.length));
+  // 增加重复次数以确保滚动流畅
+  const repeatCount = Math.max(4, Math.ceil(40 / displayItems.length));
   const fullItems = Array(repeatCount).fill(displayItems).flat();
 
-  const renderItem = (item: any, idx: string | number) => (
-    <div key={idx} className="flex items-center gap-3 lg:gap-4 shrink-0">
-      {item.iconName ? (
-        <IconifyIcon name={item.iconName} className="w-5 h-5 lg:w-6 lg:h-6" />
-      ) : item.iconUrl ? (
-        <img
-          src={item.iconUrl}
-          alt=""
-          className="w-5 h-5 lg:w-6 lg:h-6 object-contain"
-        />
-      ) : null}
-      <span className="font-anaheim font-semibold text-[16px] lg:text-[20px] uppercase">
-        {item.title}
-      </span>
-    </div>
-  );
+  const renderItem = (item: any, idx: string | number) => {
+    const mediaData = item.iconId ? mediaCache[item.iconId] : null;
+    const finalIconUrl = item.iconUrl || mediaData?.url || mediaData?.sizes?.thumbnail?.url || mediaData?.sizes?.card?.url;
+    
+    const content = (
+      <div className="flex items-center gap-4 lg:gap-6 shrink-0 px-6 lg:px-10 py-2 transition-transform hover:scale-105">
+        {item.iconName ? (
+          <IconifyIcon name={item.iconName} className="w-auto h-5 lg:h-6 min-w-[20px]" />
+        ) : finalIconUrl ? (
+          <img
+            src={finalIconUrl}
+            alt=""
+            className="h-5 lg:h-6 w-auto object-contain block"
+          />
+        ) : null}
+        <span className="font-anaheim font-semibold text-[16px] lg:text-[20px] uppercase whitespace-nowrap">
+          {item.title}
+        </span>
+      </div>
+    );
+
+    if (item.url) {
+      return (
+        <Link key={idx} href={item.url} className="hover:opacity-80 transition-opacity cursor-pointer">
+          {content}
+        </Link>
+      );
+    }
+
+    return <div key={idx}>{content}</div>;
+  };
+
+  const animationName = direction === "left" ? "marquee-left" : "marquee-right";
+  const uniqueId = React.useId().replace(/:/g, "");
+  const containerClass = `marquee-container-${uniqueId}`;
 
   return (
-    <div className="flex whitespace-nowrap overflow-hidden items-center w-full h-full">
-      <div
-        className={cn(
-          "flex items-center gap-[40px] lg:gap-[65px] animate-marquee pr-[40px] lg:pr-[65px]",
-          direction === "right" && "animate-marquee-reverse",
-        )}
-        style={{ color: textColor }}
-      >
-        {fullItems.map((item, i) => renderItem(item, i))}
-      </div>
-      <div
-        className={cn(
-          "flex items-center gap-[40px] lg:gap-[65px] animate-marquee pr-[40px] lg:pr-[65px]",
-          direction === "right" && "animate-marquee-reverse",
-        )}
-        style={{ color: textColor }}
-      >
-        {fullItems.map((item, i) => renderItem(item, `dup-${i}`))}
+    <div className="group flex whitespace-nowrap overflow-hidden items-center w-full h-full relative cursor-pointer">
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes marquee-left {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes marquee-right {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
+        }
+        .${containerClass} {
+          display: flex;
+          width: fit-content;
+          animation: ${animationName} 60s linear infinite;
+        }
+        .group:hover .${containerClass} {
+          animation-play-state: paused;
+        }
+      `}} />
+      
+      <div className={cn(containerClass, "flex items-center gap-20 lg:gap-32")} style={{ color: textColor }}>
+        <div className="flex items-center">
+          {fullItems.map((item, i) => renderItem(item, i))}
+        </div>
+        <div className="flex items-center">
+          {fullItems.map((item, i) => renderItem(item, `dup-${i}`))}
+        </div>
       </div>
     </div>
   );
@@ -303,11 +339,47 @@ const ImagePlaceholder = ({
 };
 
 export default function SimpleCta({ data, headerTheme, className }: Props) {
+  const [mediaCache, setMediaCache] = React.useState<Record<string, any>>({});
+  const cfg = LAYOUT_CONFIG;
+  const marqueeLinks = React.useMemo(() => extractMarqueeLinks(data?.marqueeContent), [data?.marqueeContent]);
+
+  // 解析只有 ID 的图标
+  React.useEffect(() => {
+    const idsToFetch = marqueeLinks
+      .filter((item: any) => item.iconId && !item.iconUrl && !mediaCache[item.iconId])
+      .map((item: any) => item.iconId);
+
+    if (idsToFetch.length === 0) return;
+
+    const fetchMedia = async () => {
+      const newCache: Record<string, any> = {};
+      await Promise.all(
+        idsToFetch.map(async (id: any) => {
+          try {
+            const res = await fetch(`/api/payload/media/${id}?depth=0`);
+            if (res.ok) {
+              const mediaData = await res.json();
+              console.log(`[SimpleCta] Resolved media ${id}:`, mediaData);
+              newCache[id] = mediaData;
+            } else {
+              console.error(`[SimpleCta] Failed to fetch media ${id}, status: ${res.status}`);
+            }
+          } catch (err) {
+            console.error(`Failed to fetch marquee icon ${id}:`, err);
+          }
+        })
+      );
+      if (Object.keys(newCache).length > 0) {
+        setMediaCache(prev => ({ ...prev, ...newCache }));
+      }
+    };
+
+    fetchMedia();
+  }, [marqueeLinks, mediaCache]);
+
   if (!data || !data.images) {
     return null;
   }
-
-  const cfg = LAYOUT_CONFIG;
 
   // 解析标题（支持 /n 或 \n 换行）
   const titleParts = data.title?.split(/\/n|\n/) || [];
@@ -318,11 +390,9 @@ export default function SimpleCta({ data, headerTheme, className }: Props) {
       .map((s) => s.trim())
       .join(" ") || "";
 
-  const marqueeLinks = extractMarqueeLinks(data.marqueeContent);
-
   return (
     <section
-      className={cn(cfg.section.paddingY, "bg-brand-main", className)}
+      className={cn("py-12 lg:py-[60px] bg-brand-main", className)}
       data-header-theme={headerTheme || "light"}
     >
       {/* --- 顶部装饰条（两条交叉的走马灯） --- */}
@@ -348,9 +418,10 @@ export default function SimpleCta({ data, headerTheme, className }: Props) {
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
           <MarqueeText
-            direction="right"
+            direction="left"
             textColor="#756F3F"
             items={marqueeLinks}
+            mediaCache={mediaCache}
           />
         </motion.div>
 
@@ -370,9 +441,10 @@ export default function SimpleCta({ data, headerTheme, className }: Props) {
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
         >
           <MarqueeText
-            direction="left"
+            direction="right"
             textColor="#FFFFFF"
             items={marqueeLinks}
+            mediaCache={mediaCache}
           />
         </motion.div>
       </motion.div>

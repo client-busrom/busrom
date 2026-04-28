@@ -249,7 +249,7 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
                 className={isLastLine ? "text-white" : "text-black"}
                 style={{
                   WebkitTextStroke: isLastLine
-                    ? `${rpx(6)} #000000`
+                    ? `${rpx(6)} #FDF6C2`
                     : `${rpx(6)} #FDF6C2`,
                   paintOrder: "stroke fill",
                   letterSpacing: "0.06em",

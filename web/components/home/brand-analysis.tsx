@@ -241,7 +241,7 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
           <button
             onClick={() => mobileApi?.scrollPrev()}
             disabled={!canScrollPrev}
-            className="w-12 h-12 rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
+            className="w-12 h-12 rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] active:bg-[#756f3f] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
             aria-label="Previous slide"
           >
             <ChevronLeft className="w-8 h-8 text-white" />
@@ -249,7 +249,7 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
           <button
             onClick={() => mobileApi?.scrollNext()}
             disabled={!canScrollNext}
-            className="w-12 h-12 rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
+            className="w-12 h-12 rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] active:bg-[#756f3f] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
             aria-label="Next slide"
           >
             <ChevronRight className="w-8 h-8 text-white" />
@@ -282,7 +282,7 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
           className="absolute"
           style={{
             left: `${(160 / DESIGN_WIDTH) * 100}%`,
-            top: `${(100 / 1150) * 100}%`,
+            top: `${(200 / 1150) * 100}%`,
             width: `${(TOP_WIDTH / DESIGN_WIDTH) * 100}%`,
             aspectRatio: `${TOP_WIDTH} / ${TOP_HEIGHT}`,
           }}
@@ -412,7 +412,7 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
             <button
               onClick={() => desktopApi?.scrollPrev()}
               disabled={!canScrollPrev}
-              className="rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
+              className="rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] active:bg-[#756f3f] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
               style={{
                 width: `${(88 / DESIGN_WIDTH) * 100}vw`,
                 height: `${(88 / DESIGN_WIDTH) * 100}vw`,
@@ -424,7 +424,7 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
             <button
               onClick={() => desktopApi?.scrollNext()}
               disabled={!canScrollNext}
-              className="rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
+              className="rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] active:bg-[#756f3f] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
               style={{
                 width: `${(88 / DESIGN_WIDTH) * 100}vw`,
                 height: `${(88 / DESIGN_WIDTH) * 100}vw`,
@@ -442,7 +442,7 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
           className="absolute flex justify-center"
           style={{
             left: `${(384 / DESIGN_WIDTH) * 100}%`,
-            top: `${(720 / 1150) * 100}%`,
+            top: `${(820 / 1150) * 100}%`,
             width: `${(BOTTOM_WIDTH / DESIGN_WIDTH) * 100}%`,
             aspectRatio: `${BOTTOM_WIDTH} / ${BOTTOM_HEIGHT}`,
             gap: `${(120 / DESIGN_WIDTH) * 100}vw`,

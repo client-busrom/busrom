@@ -288,7 +288,7 @@ export default function ProductSeriesCarousel({
 
   return (
     <section
-      className={cn("relative bg-[#756F3F] overflow-hidden", className)}
+      className={cn("relative bg-[#756F3F] overflow-hidden py-12 lg:py-[60px]", className)}
       data-header-theme={headerTheme}
       style={{ aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` }}
       onMouseLeave={() => setHoveredPosition(null)}

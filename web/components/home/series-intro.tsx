@@ -254,7 +254,7 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
   return (
     <section
       ref={sectionRef}
-      className={cn("py-6 lg:py-8 bg-brand-main", className)}
+      className={cn("py-12 lg:py-[60px] bg-brand-main", className)}
       data-header-theme={headerTheme}
       
       onMouseEnter={() => setIsHovering(true)}

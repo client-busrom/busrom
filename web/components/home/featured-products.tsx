@@ -508,7 +508,7 @@ export default function FeaturedProducts({ data, locale, headerTheme, className 
   return (
     <section 
       ref={sectionRef} 
-      className={cn("py-12 lg:py-0 bg-brand-main", className)}
+      className={cn("py-12 lg:py-[60px] bg-brand-main", className)}
       data-header-theme={headerTheme}
     >
       <div className="container mx-auto px-4 lg:px-0" style={{ maxWidth: '100%' }}>

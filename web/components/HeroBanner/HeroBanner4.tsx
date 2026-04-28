@@ -7,7 +7,8 @@ import { getCropStyles, getCropImageUrl, getObjectPosition } from "@/lib/utils";
 import { ServerImage } from "@/components/ui/ServerImage";
 
 // 处理换行符：支持 /n 和 \n
-const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
+const formatText = (text: string | undefined) =>
+  text?.replace(/\/n|\\n/g, "\n") || "";
 
 // --- BannerProps 定义 ---
 type BannerData = HomeContent["heroBanner"][number];
@@ -55,7 +56,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
     titleFontSize: 96,
     titleLineHeight: 99,
     // Feature 按钮配置 (平行四边形)
-    featureFontSize: 36,
+    featureFontSize: 30,
     featureHeight: 92,
     // Feature 宽度 (递减)
     feature1Width: 558,
@@ -90,9 +91,18 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
 
   // Feature 配置数组
   const featureConfigs = [
-    { width: TEXT_CONFIG.feature1Width, marginLeft: TEXT_CONFIG.feature1MarginLeft },
-    { width: TEXT_CONFIG.feature2Width, marginLeft: TEXT_CONFIG.feature2MarginLeft },
-    { width: TEXT_CONFIG.feature3Width, marginLeft: TEXT_CONFIG.feature3MarginLeft },
+    {
+      width: TEXT_CONFIG.feature1Width,
+      marginLeft: TEXT_CONFIG.feature1MarginLeft,
+    },
+    {
+      width: TEXT_CONFIG.feature2Width,
+      marginLeft: TEXT_CONFIG.feature2MarginLeft,
+    },
+    {
+      width: TEXT_CONFIG.feature3Width,
+      marginLeft: TEXT_CONFIG.feature3MarginLeft,
+    },
   ];
 
   return (
@@ -100,10 +110,18 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
       {/* --- SVG 定义 (隐藏在布局外) --- */}
       <svg width="0" height="0" style={{ position: "absolute" }}>
         <defs>
-          <clipPath id={clipPathId} clipPathUnits="objectBoundingBox" transform={svgTransform}>
+          <clipPath
+            id={clipPathId}
+            clipPathUnits="objectBoundingBox"
+            transform={svgTransform}
+          >
             <path d={svgPathData} />
           </clipPath>
-          <clipPath id={featureStackClipId} clipPathUnits="objectBoundingBox" transform={featureStackSvgTransform}>
+          <clipPath
+            id={featureStackClipId}
+            clipPathUnits="objectBoundingBox"
+            transform={featureStackSvgTransform}
+          >
             <path d={featureStackSvgPathData} />
           </clipPath>
         </defs>
@@ -111,27 +129,24 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
       {/* 背景颜色层 */}
       <div
         className="absolute inset-0 z-0"
-        style={{ backgroundColor: '#fff8e4' }}
+        style={{ backgroundColor: "#fff8e4" }}
       />
 
       {/* 右上装饰 SVG - 桌面端 */}
-      <div
-        className="absolute inset-0 z-[1] pointer-events-none hidden lg:block overflow-hidden"
-      >
+      <div className="absolute inset-0 z-[1] pointer-events-none hidden lg:block overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/hero-banner-4-1.svg"
           alt="decoration"
           className="absolute"
           style={{
-            width: '3732px',
-            height: '1622px',
-            right: '-14%',
-            bottom: '-10%',
+            width: "3732px",
+            height: "1622px",
+            right: "-14%",
+            bottom: "-10%",
           }}
         />
       </div>
-      
 
       {/* 左下装饰 SVG - 固定尺寸 */}
       <div className="absolute bottom-0 left-0 z-[1] pointer-events-none">
@@ -143,9 +158,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
         />
       </div>
       {/* 桌面端三个平行四边形图片 */}
-      <div
-        className="absolute inset-0 hidden lg:block z-20 pointer-events-none"
-      >
+      <div className="absolute inset-0 hidden lg:block z-20 pointer-events-none">
         {/* --- 图片 1 --- */}
         <div
           className="absolute overflow-hidden"
@@ -154,7 +167,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
             top: rpx(IMAGES_CONFIG.image1Top),
             width: rpx(IMAGES_CONFIG.imageWidth),
             height: rpx(IMAGES_CONFIG.imageHeight),
-            clipPath: `url(#${clipPathId})`
+            clipPath: `url(#${clipPathId})`,
           }}
         >
           <div
@@ -211,7 +224,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
             top: rpx(IMAGES_CONFIG.image2Top),
             width: rpx(IMAGES_CONFIG.imageWidth),
             height: rpx(IMAGES_CONFIG.imageHeight),
-            clipPath: `url(#${clipPathId})`
+            clipPath: `url(#${clipPathId})`,
           }}
         >
           <div
@@ -268,7 +281,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
             top: rpx(IMAGES_CONFIG.image3Top),
             width: rpx(IMAGES_CONFIG.imageWidth),
             height: rpx(IMAGES_CONFIG.imageHeight),
-            clipPath: `url(#${clipPathId})`
+            clipPath: `url(#${clipPathId})`,
           }}
         >
           <div
@@ -322,7 +335,7 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
         {/* 左侧文字内容 */}
         <div
           className="flex flex-col justify-center h-full text-left"
-          style={{ paddingLeft: rpx(114), width: '55%' }}
+          style={{ paddingLeft: rpx(114), width: "55%" }}
         >
           {/* Feature[1] - 副标题 (支持换行和缩进) */}
           <p
@@ -334,10 +347,10 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
               marginTop: rpx(5),
               lineHeight: `${rpx(66)}`,
               WebkitTextStroke: `${rpx(6)} #6B4E00`,
-              paintOrder: 'stroke fill',
+              paintOrder: "stroke fill",
             }}
           >
-            {formatText(data.features[1])?.replace(/\n/g, '\n          ')}
+            {formatText(data.features[1])?.replace(/\n/g, "\n          ")}
           </p>
           {/* Feature[0] - 主标题 */}
           <h1
@@ -349,29 +362,61 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
               marginLeft: rpx(30),
               marginTop: rpx(-20),
               WebkitTextStroke: `${rpx(6)} #FDF6C2`,
-              paintOrder: 'stroke fill',
+              paintOrder: "stroke fill",
             }}
           >
             <div className="text-[#FFB800]">{feature0FirstPart}</div>
-            {feature0SecondPart && <div className="text-[#000000]">{feature0SecondPart}</div>}
+            {feature0SecondPart && (
+              <div className="text-[#000000]">{feature0SecondPart}</div>
+            )}
           </h1>
           {/* Feature Stack (阶梯状平行四边形) */}
-          <div className="flex flex-col" style={{ gap: rpx(TEXT_CONFIG.featureGap), marginLeft: rpx(40), transform: `translateY(${rpx(70)})` }}>
-            {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
-              <div
-                key={index}
-                className="bg-[#FFD978] flex items-center justify-center font-montserrat font-bold text-[#000000]"
-                style={{
-                  width: rpx(featureConfigs[index].width),
-                  height: rpx(TEXT_CONFIG.featureHeight),
-                  marginLeft: rpx(featureConfigs[index].marginLeft),
-                  clipPath: `url(#${featureStackClipId})`,
-                  fontSize: rpx(TEXT_CONFIG.featureFontSize),
-                }}
-              >
-                {feature}
-              </div>
-            ))}
+          <div
+            className="flex flex-col"
+            style={{
+              gap: rpx(TEXT_CONFIG.featureGap),
+              marginLeft: rpx(40),
+              transform: `translateY(${rpx(70)})`,
+            }}
+          >
+            {[data.features[2], data.features[3], data.features[4]].map(
+              (feature, index) => (
+                <div
+                  key={index}
+                  className="flex items-center"
+                  style={{
+                    height: rpx(TEXT_CONFIG.featureHeight),
+                    marginLeft: rpx(featureConfigs[index].marginLeft),
+                  }}
+                >
+                  {/* 左侧拼图 */}
+                  <img
+                    src="/hero-banner-4-feature-1.svg"
+                    alt=""
+                    style={{ height: "100%", width: "auto", display: "block" }}
+                  />
+                  {/* 中间内容 */}
+                  <div
+                    className="bg-[#FFD978] h-full flex items-center justify-center font-montserrat font-bold text-[#000000] whitespace-nowrap"
+                    style={{
+                      paddingLeft: rpx(5),
+                      paddingRight: rpx(5),
+                      fontSize: rpx(TEXT_CONFIG.featureFontSize),
+                      marginLeft: "-1px",
+                      marginRight: "-1px",
+                    }}
+                  >
+                    {feature?.replace(/\n|\/n/g, " ")}
+                  </div>
+                  {/* 右侧拼图 */}
+                  <img
+                    src="/hero-banner-4-feature-2.svg"
+                    alt=""
+                    style={{ height: "100%", width: "auto", display: "block" }}
+                  />
+                </div>
+              ),
+            )}
           </div>
         </div>
       </div>
@@ -509,33 +554,56 @@ const HeroBanner4: FC<BannerProps> = ({ data, locale }) => {
         <div className="flex-1 flex flex-col justify-center items-start px-6 pb-8">
           {/* Feature[1] - 副标题 */}
           <p className="font-paytone-one font-regular text-3xl text-white text-stroke-custom-white mb-4 whitespace-pre-wrap text-left">
-            {formatText(data.features[1])?.replace(/\n/g, '\n        ')}
+            {formatText(data.features[1])?.replace(/\n/g, "\n        ")}
           </p>
           {/* Feature[0] - 主标题 */}
           <h1 className="font-paytone-one font-regular text-5xl sm:text-6xl mb-8 text-left">
-            <div className="text-[#FFB800] text-stroke-custom-light">{feature0FirstPart}</div>
-            {feature0SecondPart && <div className="text-[#000000] text-stroke-custom-light">{feature0SecondPart}</div>}
+            <div className="text-[#FFB800] text-stroke-custom-light">
+              {feature0FirstPart}
+            </div>
+            {feature0SecondPart && (
+              <div className="text-[#000000] text-stroke-custom-light">
+                {feature0SecondPart}
+              </div>
+            )}
           </h1>
           {/* Feature Stack (移动端平行四边形 - 阶梯递减效果) */}
           <div className="flex flex-col gap-3 w-full items-center">
-            {[data.features[2], data.features[3], data.features[4]].map((feature, index) => {
-              // 移动端宽度递减
-              const mobileWidths = ['300px', '240px', '200px'];
-              const mobileMarginLeft = [0, 24, 48];
-              return (
-                <div
-                  key={index}
-                  className="bg-[#FFD978] h-14 flex items-center justify-center font-montserrat font-bold text-lg text-[#000000]"
-                  style={{
-                    width: mobileWidths[index],
-                    marginLeft: `${mobileMarginLeft[index]}px`,
-                    clipPath: `url(#${featureStackClipId})`,
-                  }}
-                >
-                  {feature}
-                </div>
-              );
-            })}
+            {[data.features[2], data.features[3], data.features[4]].map(
+              (feature, index) => {
+                const mobileMarginLeft = [0, 24, 48];
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center"
+                    style={{
+                      height: "56px",
+                      marginLeft: `${mobileMarginLeft[index]}px`,
+                    }}
+                  >
+                    {/* 左侧拼图 */}
+                    <img
+                      src="/hero-banner-4-feature-1.svg"
+                      alt=""
+                      style={{ height: "100%", width: "auto", display: "block" }}
+                    />
+                    {/* 中间内容 */}
+                    <div
+                      className="bg-[#FFD978] h-full flex items-center justify-center font-montserrat font-bold text-lg text-[#000000] px-1 whitespace-nowrap"
+                      style={{ marginLeft: "-1px", marginRight: "-1px" }}
+                    >
+                      {feature?.replace(/\n|\/n/g, " ")}
+                    </div>
+                    {/* 右侧拼图 */}
+                    <img
+                      src="/hero-banner-4-feature-2.svg"
+                      alt=""
+                      style={{ height: "100%", width: "auto", display: "block" }}
+                    />
+                  </div>
+                );
+              },
+            )}
           </div>
         </div>
       </div>

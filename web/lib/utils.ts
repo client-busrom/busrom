@@ -52,7 +52,7 @@ export function getCropStyles(
   // 如果没有有效裁剪区域，返回 null
   if (!croppedAreaPixels.width || !croppedAreaPixels.height) return null
 
-  // 容器需要 overflow:hidden，显示裁剪框大小的区域
+  // 容器样式
   const container: React.CSSProperties = {
     overflow: 'hidden',
     position: 'relative',
@@ -60,19 +60,19 @@ export function getCropStyles(
     height: displayHeight ? `${displayHeight}px` : '100%',
   }
 
-  // 计算缩放：容器显示尺寸 / 裁剪区域像素尺寸
-  // 如果没有指定 displayWidth/displayHeight，就用 100% 并让 CSS 自适应
-  const scaleX = displayWidth ? displayWidth / croppedAreaPixels.width : 1
-  const scaleY = displayHeight ? displayHeight / croppedAreaPixels.height : 1
-  const scale = Math.max(scaleX, scaleY)
+  // 使用百分比进行定位和缩放，以实现完全的响应式支持
+  // 这样无论容器的实际像素尺寸是多少（由 CSS 或 var(--rpx) 决定），裁剪逻辑都保持正确
+  const widthPercent = (variantWidth / croppedAreaPixels.width) * 100
+  const heightPercent = (variantHeight / croppedAreaPixels.height) * 100
+  const leftPercent = (-croppedAreaPixels.x / croppedAreaPixels.width) * 100
+  const topPercent = (-croppedAreaPixels.y / croppedAreaPixels.height) * 100
 
-  // 图片定位：将裁剪区域的左上角对齐到容器左上角
   const image: React.CSSProperties = {
     position: 'absolute',
-    width: `${variantWidth * scale}px`,
-    height: `${variantHeight * scale}px`,
-    left: `${-croppedAreaPixels.x * scale}px`,
-    top: `${-croppedAreaPixels.y * scale}px`,
+    width: `${widthPercent}%`,
+    height: `${heightPercent}%`,
+    left: `${leftPercent}%`,
+    top: `${topPercent}%`,
     maxWidth: 'none',
   }
 

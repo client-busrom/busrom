@@ -49,20 +49,20 @@ const FeatureImageItem = ({
         <div
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
           style={{
+            ...cropStyles?.container,
             width: "calc(346 * var(--rpx))",
             height: "calc(400 * var(--rpx))",
             maskImage: `url(/service-features/feature-image-layout-4-image.svg)`,
             maskSize: "100% 100%",
             WebkitMaskImage: `url(/service-features/feature-image-layout-4-image.svg)`,
             WebkitMaskSize: "100% 100%",
-            ...cropStyles?.container,
           }}
         >
           <ServerImage
             image={image}
             alt={alt}
             size="medium"
-            className="object-cover w-full h-full"
+            className={cn("w-full h-full", !cropStyles && "object-cover")}
             style={{
               ...cropStyles?.image,
               objectPosition: getObjectPosition(image),
@@ -104,7 +104,10 @@ const FeatureImageItem = ({
           image={image}
           alt={alt}
           size="medium"
-          className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+          className={cn(
+            "w-full h-full transition-transform duration-500 group-hover:scale-105",
+            !cropStyles && "object-cover"
+          )}
           style={{
             ...cropStyles?.image,
             objectPosition: getObjectPosition(image),

@@ -219,7 +219,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
           </p>
           {/* Feature[0] - 主标题 */}
           <h1
-            className="font-poller-one font-extrabold text-[#332E0B] mb-8 antialiased whitespace-pre-line"
+            className="font-poller-one font-normal text-[#332E0B] mb-8 antialiased whitespace-pre-line"
             style={{
               fontSize: rpx(CONFIG.titleFontSize),
               lineHeight: 1.1,

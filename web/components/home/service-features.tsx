@@ -127,7 +127,7 @@ export default function ServiceFeatures({
   return (
     <section
       ref={sectionRef}
-      className={cn("py-16 lg:py-24 bg-brand-main", className)}
+      className={cn("py-12 lg:py-[60px] bg-brand-main", className)}
       data-header-theme={headerTheme}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
@@ -157,9 +157,9 @@ export default function ServiceFeatures({
             {/* === 左侧固定内容区域 === */}
             <div
               className={cn(
-                "flex flex-col justify-center",
+                "flex flex-col justify-center gap-4",
                 "px-6 py-8",
-                "lg:px-[calc(80*var(--rpx))] lg:py-0 lg:w-[calc(520*var(--rpx))] lg:flex-shrink-0",
+                "lg:px-[calc(80*var(--rpx))] lg:py-0 lg:w-[calc(520*var(--rpx))] lg:flex-shrink-0 lg:gap-[calc(76*var(--rpx))]",
               )}
             >
               {/* 主标题 */}
@@ -176,8 +176,8 @@ export default function ServiceFeatures({
               <p
                 className={cn(
                   "font-anaheim font-medium text-[#756F3F] whitespace-pre-wrap",
-                  "text-sm leading-relaxed mt-4",
-                  "lg:text-[calc(18*var(--rpx))] lg:leading-[calc(28*var(--rpx))] lg:mt-[calc(16*var(--rpx))]",
+                  "text-sm leading-relaxed",
+                  "lg:text-[calc(18*var(--rpx))] lg:leading-[calc(28*var(--rpx))]",
                   "max-w-[320px] lg:max-w-none",
                 )}
               >
@@ -231,7 +231,7 @@ export default function ServiceFeatures({
                             className={cn(
                               "font-anaheim font-extrabold text-black whitespace-pre-wrap",
                               "text-xl leading-tight mb-3",
-                              "lg:text-[calc(32*var(--rpx))] lg:leading-[calc(40*var(--rpx))] lg:mb-[calc(16*var(--rpx))]",
+                              "lg:text-[calc(32*var(--rpx))] lg:leading-[calc(40*var(--rpx))] lg:mb-[calc(40*var(--rpx))]",
                             )}
                           >
                             {activeFeature.title}

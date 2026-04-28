@@ -138,7 +138,7 @@ export default function QuoteSteps({ data, headerTheme, className }: Props) {
   return (
     <section
       ref={sectionRef}
-      className={cn("relative bg-brand-main overflow-hidden", className)}
+      className={cn("relative bg-brand-main overflow-hidden py-12 lg:py-[60px]", className)}
       data-header-theme={headerTheme}
       
     >

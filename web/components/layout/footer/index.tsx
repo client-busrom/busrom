@@ -124,7 +124,7 @@ export default function Footer({
             relative z-10 bg-brand-secondary
             w-[92%] sm:w-[88%] md:w-[90%] lg:w-[1000px] xl:w-[1200px] 2xl:w-[1400px]
             mx-auto
-            mt-[200px] sm:mt-[240px] md:mt-[300px] lg:mt-[150px] xl:mt-[80px] 2xl:mt-0
+            mt-[200px] sm:mt-[240px] md:mt-[300px] lg:mt-[150px] xl:mt-[80px] 2xl:mt-[80px]
             mb-8 md:mb-12 lg:mb-20
             p-6 sm:p-8 md:p-10 lg:py-16 lg:px-16 xl:py-20 xl:px-20
             rounded-[40px] sm:rounded-[50px] md:rounded-[60px] lg:rounded-[60px]

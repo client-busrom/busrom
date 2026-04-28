@@ -262,7 +262,7 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
               <ServerImage
                 image={data.images[0]}
                 alt="主图"
-                size="xlarge"
+                size="large"
                 fill
                 className="absolute inset-0 w-full h-full object-cover"
                 objectPosition={image1Position}
@@ -302,7 +302,7 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
 
         {/* 主标题第一行 - "Curated" 白色 + #443D05 描边 */}
         <h1
-          className="absolute font-poller-one font-extrabold text-white antialiased"
+          className="absolute font-poller-one font-regluar text-white antialiased"
           style={{
             left: rpxContent(CONTENT_CONFIG.left),
             top: rpxContent(CONTENT_CONFIG.title.line1Top),
@@ -317,7 +317,7 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
 
         {/* 主标题第二行 - "Details" #322E0B + #FDF6C2 描边 */}
         <h1
-          className="absolute font-poller-one font-extrabold text-[#322E0B] antialiased"
+          className="absolute font-poller-one font-regluar text-[#322E0B] antialiased"
           style={{
             left: rpxContent(CONTENT_CONFIG.left),
             top: rpxContent(CONTENT_CONFIG.title.line2Top),

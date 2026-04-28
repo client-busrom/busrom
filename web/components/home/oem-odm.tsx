@@ -256,12 +256,14 @@ export default function OemOdm({ data, headerTheme, className }: Props) {
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
           >
-            <p className="transition-opacity duration-300 group-hover:opacity-0">
-              {OEM.description[0]}
+            <p className="flex items-start justify-end transition-opacity duration-300 group-hover:opacity-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-white mt-[0.55em] mr-2 flex-shrink-0" />
+              <span>{OEM.description[0]}</span>
             </p>
             {OEM.description[1] && (
-              <p className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                {OEM.description[1]}
+              <p className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex items-start justify-end">
+                <span className="w-1.5 h-1.5 rounded-full bg-white mt-[0.55em] mr-2 flex-shrink-0" />
+                <span>{OEM.description[1]}</span>
               </p>
             )}
           </motion.div>
@@ -328,7 +330,7 @@ export default function OemOdm({ data, headerTheme, className }: Props) {
 
           {/* ODM 描述文字 */}
           <motion.div
-            className="absolute text-white text-left"
+            className="absolute text-white text-left space-y-2"
             style={{
               left: "69.2%",
               top: "79%",
@@ -341,7 +343,10 @@ export default function OemOdm({ data, headerTheme, className }: Props) {
             animate={isInView ? "visible" : "hidden"}
           >
             {ODM.description.map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
+              <p key={index} className="flex items-start">
+                <span className="w-1.5 h-1.5 rounded-full bg-white mt-[0.55em] mr-2 flex-shrink-0" />
+                <span>{paragraph}</span>
+              </p>
             ))}
           </motion.div>
         </div>
@@ -377,8 +382,16 @@ export default function OemOdm({ data, headerTheme, className }: Props) {
               {OEM.title}
             </h2>
             <div className="text-sm leading-relaxed mb-6 opacity-90 space-y-3">
-              <p>{OEM.description[0]}</p>
-              {OEM.description[1] && <p>{OEM.description[1]}</p>}
+              <p className="flex items-start">
+                <span className="w-1.5 h-1.5 rounded-full bg-white mt-[0.5em] mr-2 flex-shrink-0" />
+                <span>{OEM.description[0]}</span>
+              </p>
+              {OEM.description[1] && (
+                <p className="flex items-start">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white mt-[0.5em] mr-2 flex-shrink-0" />
+                  <span>{OEM.description[1]}</span>
+                </p>
+              )}
             </div>
             {/* OEM 产品图片 */}
             <div
@@ -428,7 +441,10 @@ export default function OemOdm({ data, headerTheme, className }: Props) {
               </h2>
               <div className="text-sm leading-relaxed opacity-90 space-y-3">
                 {ODM.description.map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
+                  <p key={index} className="flex items-start justify-end">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white mt-[0.5em] mr-2 flex-shrink-0" />
+                    <span>{paragraph}</span>
+                  </p>
                 ))}
               </div>
             </div>

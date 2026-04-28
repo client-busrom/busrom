@@ -15,7 +15,7 @@ interface Props {
 }
 
 const formInputClasses = `
-  mt-1 block w-full bg-transparent text-brand-form-input-text font-anaheim font-semibold
+  mt-1 block w-full bg-transparent text-white font-anaheim font-semibold
   placeholder:text-brand-text-inverse
   border-0 rounded-none border-b border-[#56511C]
   focus:outline-none focus:ring-0 focus:border-primary

@@ -272,10 +272,49 @@ export function parseHomeData(data: any, locale: string, strategy?: string, seoK
   const serviceFeatures = data.serviceFeatures ? {
     title: data.serviceFeatures.title || '',
     subtitle: data.serviceFeatures.subtitle || '',
-    features: (data.serviceFeatures.features || []).map((feature: any) => ({
-      ...feature,
-      images: (feature.images || []).map((imgData: any) => autoSeoImage(imgData, feature.title)),
-    })),
+    features: (() => {
+      const rawFeatures = data.serviceFeatures.features;
+      
+      // 如果后端已经是数组格式，按原逻辑处理并添加裁剪数据支持
+      if (Array.isArray(rawFeatures)) {
+        return rawFeatures.map((feature: any) => ({
+          ...feature,
+          images: (feature.images || []).map((imgData: any) => autoSeoImage(imgData, feature.title)),
+          imageCropDataList: feature.imageCropDataList || [],
+        }));
+      }
+      
+      // 兼容平铺格式 (feature01Image1, feature01Image1CropData 等)
+      const features = [];
+      for (let i = 1; i <= 5; i++) {
+        const prefix = `feature0${i}`;
+        const title = data.serviceFeatures[`${prefix}Title`];
+        if (!title) continue;
+
+        const featureImages = [];
+        const featureCrops = [];
+
+        // 处理该 Feature 下的多张图 (通常 1-2 张)
+        for (let j = 1; j <= 2; j++) {
+          const imgKey = `${prefix}Image${j}`;
+          const cropKey = `${prefix}Image${j}CropData`;
+          
+          if (data.serviceFeatures[imgKey]) {
+            featureImages.push(autoSeoImage(data.serviceFeatures[imgKey], title));
+            featureCrops.push(data.serviceFeatures[cropKey] || null);
+          }
+        }
+
+        features.push({
+          title,
+          shortTitle: data.serviceFeatures[`${prefix}ShortTitle`] || title,
+          description: data.serviceFeatures[`${prefix}Description`] || '',
+          images: featureImages,
+          imageCropDataList: featureCrops,
+        });
+      }
+      return features;
+    })(),
   } : {
     title: '',
     subtitle: '',

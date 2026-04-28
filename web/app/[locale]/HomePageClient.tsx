@@ -1,8 +1,8 @@
 "use client";
 
-import { memo, useState, useEffect, useRef } from 'react';
-import useSWR from 'swr';
-import dynamic from 'next/dynamic';
+import { memo, useState, useEffect, useRef } from "react";
+import useSWR from "swr";
+import dynamic from "next/dynamic";
 import type { Locale } from "@/i18n.config";
 // 1. 导入我们刚刚创建的 HomeContent 类型
 import type { HomeContent } from "@/lib/content-data";
@@ -17,50 +17,62 @@ import HeroBanner from "@/components/home/hero-banner";
 // 设置 loading 占位符避免闪白屏
 const ProductSeriesCarousel = dynamic(
   () => import("@/components/home/product-series-carousel"),
-  { loading: () => <div className="w-full min-h-[600px] bg-brand-main" /> }
+  { loading: () => <div className="w-full min-h-[600px] bg-brand-main" /> },
 );
 const ServiceFeatures = dynamic(
   () => import("@/components/home/service-features"),
-  { loading: () => <div className="w-full min-h-[800px] bg-brand-main" /> }
+  { loading: () => <div className="w-full min-h-[800px] bg-brand-main" /> },
 );
 
 // 非首屏组件动态导入，减少首屏 JS 体积
 // 设置 loading 占位符避免闪白屏 (Next.js 要求 options 必须是字面量)
 const SimpleCta = dynamic(() => import("@/components/home/simple-cta"), {
-  loading: () => <div className="w-full min-h-[400px] bg-brand-main" />
+  loading: () => <div className="w-full min-h-[400px] bg-brand-main" />,
 });
+const FeaturedProducts = dynamic(
+  () => import("@/components/home/featured-products"),
+  {
+    loading: () => <div className="w-full min-h-[400px] bg-brand-main" />,
+  },
+);
 const SeriesIntro = dynamic(() => import("@/components/home/series-intro"), {
-  loading: () => <div className="w-full min-h-[400px] bg-[#020408]" />
+  loading: () => <div className="w-full min-h-[400px] bg-[#020408]" />,
 });
-const FeaturedProducts = dynamic(() => import("@/components/home/featured-products"), {
-  loading: () => <div className="w-full min-h-[400px] bg-brand-main" />
-});
-const BrandAdvantages = dynamic(() => import("@/components/home/brand-advantages"), {
-  loading: () => <div className="w-full min-h-[400px] bg-[#020408]" />
-});
+const BrandAdvantages = dynamic(
+  () => import("@/components/home/brand-advantages"),
+  {
+    loading: () => <div className="w-full min-h-[400px] bg-[#020408]" />,
+  },
+);
 const OemOdm = dynamic(() => import("@/components/home/oem-odm"), {
-  loading: () => <div className="w-full min-h-[400px] bg-[#020408]" />
+  loading: () => <div className="w-full min-h-[400px] bg-[#020408]" />,
 });
 const QuoteSteps = dynamic(() => import("@/components/home/quote-steps"), {
-  loading: () => <div className="w-full min-h-[400px] bg-brand-main" />
+  loading: () => <div className="w-full min-h-[400px] bg-brand-main" />,
 });
 const MainForm = dynamic(() => import("@/components/home/main-form"), {
-  loading: () => <div className="w-full min-h-[400px] bg-[#020408]" />
+  loading: () => <div className="w-full min-h-[400px] bg-[#020408]" />,
 });
-const WhyChooseBusrom = dynamic(() => import("@/components/home/why-choose-busrom"), {
-  loading: () => <div className="w-full min-h-[400px] bg-brand-main" />
-});
+const WhyChooseBusrom = dynamic(
+  () => import("@/components/home/why-choose-busrom"),
+  {
+    loading: () => <div className="w-full min-h-[400px] bg-brand-main" />,
+  },
+);
 const CaseStudies = dynamic(() => import("@/components/home/case-studies"), {
-  loading: () => <div className="w-full min-h-[400px] bg-brand-main" />
+  loading: () => <div className="w-full min-h-[400px] bg-brand-main" />,
 });
-const BrandAnalysis = dynamic(() => import("@/components/home/brand-analysis"), {
-  loading: () => <div className="w-full min-h-[400px] bg-[#020408]" />
-});
+const BrandAnalysis = dynamic(
+  () => import("@/components/home/brand-analysis"),
+  {
+    loading: () => <div className="w-full min-h-[400px] bg-[#020408]" />,
+  },
+);
 const BrandValue = dynamic(() => import("@/components/home/brand-value"), {
-  loading: () => <div className="w-full min-h-[400px] bg-brand-main" />
+  loading: () => <div className="w-full min-h-[400px] bg-brand-main" />,
 });
 const Footer = dynamic(() => import("@/components/layout/footer"), {
-  loading: () => <div className="w-full min-h-[400px] bg-[#020408]" />
+  loading: () => <div className="w-full min-h-[400px] bg-[#020408]" />,
 });
 
 // Sphere3D 使用动态导入（因为包含 WebGL，需要 ssr: false）
@@ -71,7 +83,13 @@ const Sphere3D = dynamic(() => import("@/components/home/sphere-3d"), {
 
 // 延迟渲染组件 - 只在接近视口时才开始加载 Three.js
 // 这样可以避免首屏加载时下载和执行大量 JS
-const MemoizedDeferredSphere3D = memo(function DeferredSphere3D({ data, headerTheme }: { data: { title: string; description: string } | null; headerTheme?: string }) {
+const MemoizedDeferredSphere3D = memo(function DeferredSphere3D({
+  data,
+  headerTheme,
+}: {
+  data: { title: string; description: string } | null;
+  headerTheme?: string;
+}) {
   const [shouldLoad, setShouldLoad] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -95,9 +113,9 @@ const MemoizedDeferredSphere3D = memo(function DeferredSphere3D({ data, headerTh
         }
       },
       {
-        rootMargin: '500px 0px',
+        rootMargin: "500px 0px",
         threshold: 0,
-      }
+      },
     );
 
     observerRef.current.observe(element);
@@ -111,7 +129,11 @@ const MemoizedDeferredSphere3D = memo(function DeferredSphere3D({ data, headerTh
   }, [shouldLoad]);
 
   return (
-    <div ref={containerRef} className="w-full h-screen bg-[#020408]" data-header-theme={headerTheme}>
+    <div
+      ref={containerRef}
+      className="w-full h-screen bg-[#020408]"
+      data-header-theme={headerTheme}
+    >
       {shouldLoad && <Sphere3D data={data} headerTheme={headerTheme} />}
     </div>
   );
@@ -132,12 +154,11 @@ const MemoizedBrandValue = memo(BrandValue);
 // 接收从服务端传来的初始数据和语言
 export function HomePageClient({
   initialContent,
-  currentLanguage
+  currentLanguage,
 }: {
-  initialContent: HomeContent, // 3. 使用严格类型
-  currentLanguage: Locale
+  initialContent: HomeContent; // 3. 使用严格类型
+  currentLanguage: Locale;
 }) {
-
   // 4. SWR 逻辑 - 使用 initialContent 作为数据源，不再重复请求
   // 因为 SWR 直接获取的是原始 CMS 数据，没有经过 getHomeContent() 转换
   // 所以我们禁用 SWR 的自动刷新，只使用服务端渲染的数据
@@ -149,10 +170,8 @@ export function HomePageClient({
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       revalidateIfStale: false,
-    }
+    },
   );
-
-
 
   if (!content) {
     return (
@@ -165,36 +184,35 @@ export function HomePageClient({
   // 6. 渲染所有 15 个模块，并为每个模块添加 'data-header-theme'
   return (
     <main className="min-h-screen">
-
       {/* 模块 1: Hero Banner */}
-      <HeroBanner 
-        data={content.heroBanner} 
-        locale={currentLanguage} 
-        headerTheme="light" 
-        className="relative z-20 mt-[46px]" 
+      <HeroBanner
+        data={content.heroBanner}
+        locale={currentLanguage}
+        headerTheme="light"
+        className="relative z-20 mt-[46px]"
       />
 
       {/* 模块 2: 产品系列轮播 */}
-      <ProductSeriesCarousel 
-        data={content.productSeriesCarousel} 
-        locale={currentLanguage} 
+      <ProductSeriesCarousel
+        data={content.productSeriesCarousel}
+        locale={currentLanguage}
         headerTheme="transparent"
         className="relative z-10"
       />
 
       {/* 模块 3: 服务特色 */}
-      <ServiceFeatures 
-        data={content.serviceFeatures} 
+      <ServiceFeatures
+        data={content.serviceFeatures}
         headerTheme="light"
         className="relative z-10 bg-brand-main"
       />
 
       {/* 模块 4: 3D 地球 */}
-      <MemoizedDeferredSphere3D 
-        data={content.sphere3d} 
+      <MemoizedDeferredSphere3D
+        data={content.sphere3d}
         headerTheme="transparent"
       />
-      
+
       {/* 首屏之后的内容 - 延迟加载，z-0 确保在首屏下层 */}
       <DeferredContent>
         {/* 模块 5: 简易表单跳转 */}
@@ -204,7 +222,11 @@ export function HomePageClient({
 
         {/* 模块 6: 精选产品 */}
         {content.featuredProducts?.series?.length > 0 && (
-          <FeaturedProducts data={content.featuredProducts} locale={currentLanguage} headerTheme="light" />
+          <FeaturedProducts
+            data={content.featuredProducts}
+            locale={currentLanguage}
+            headerTheme="light"
+          />
         )}
 
         {/* 模块 7: 系列产品介绍 */}
@@ -213,9 +235,13 @@ export function HomePageClient({
         )}
 
         {/* 模块 8: 品牌优势 */}
-        {content.brandAdvantages?.advantages && content.brandAdvantages?.icons && (
-          <MemoizedBrandAdvantages data={content.brandAdvantages} headerTheme="transparent" />
-        )}
+        {content.brandAdvantages?.advantages &&
+          content.brandAdvantages?.icons && (
+            <MemoizedBrandAdvantages
+              data={content.brandAdvantages}
+              headerTheme="transparent"
+            />
+          )}
 
         {/* 模块 9: OEM / ODM合作 */}
         {content.oemOdm?.oem && content.oemOdm?.odm && (
@@ -229,12 +255,19 @@ export function HomePageClient({
 
         {/* 模块 11: 表单 */}
         {content.mainForm && (
-          <MainForm data={content.mainForm} locale={currentLanguage} headerTheme="transparent" />
+          <MainForm
+            data={content.mainForm}
+            locale={currentLanguage}
+            headerTheme="transparent"
+          />
         )}
 
         {/* 模块 12: 为什么选择Busrom */}
         {content.whyChooseBusrom?.reasons?.length > 0 && (
-          <MemoizedWhyChooseBusrom data={content.whyChooseBusrom} headerTheme="light" />
+          <MemoizedWhyChooseBusrom
+            data={content.whyChooseBusrom}
+            headerTheme="light"
+          />
         )}
 
         {/* 模块 13: 应用案例轮播 */}
@@ -244,7 +277,10 @@ export function HomePageClient({
 
         {/* 模块 14: 品牌价值植入 */}
         {content.brandAnalysis?.centers?.length > 0 && (
-          <MemoizedBrandAnalysis data={content.brandAnalysis} headerTheme="transparent" />
+          <MemoizedBrandAnalysis
+            data={content.brandAnalysis}
+            headerTheme="transparent"
+          />
         )}
 
         {/* 模块 15: 品牌价值体现 */}
@@ -253,9 +289,12 @@ export function HomePageClient({
         )}
 
         {/* Footer - 首页专用 */}
-        <Footer locale={currentLanguage} showForm={true} headerTheme="transparent" />
+        <Footer
+          locale={currentLanguage}
+          showForm={true}
+          headerTheme="transparent"
+        />
       </DeferredContent>
-
     </main>
-  )
+  );
 }

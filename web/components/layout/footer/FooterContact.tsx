@@ -81,9 +81,9 @@ export default function FooterContact({ footerData, content }: Props) {
       </ul>
 
       {/* 官方声明 */}
-      <div className="bg-brand-footer-emphasis-bg text-brand-footer-emphasis-text font-anaheim font-semibold px-6 py-4 md:px-8 md:py-5 lg:px-10 lg:py-6 xl:w-[90%] 2xl:w-[80%]">
+      <div className="bg-brand-footer-emphasis-bg text-brand-footer-emphasis-text font-anaheim font-semibold px-6 py-4 md:px-8 md:py-5 lg:px-6 lg:py-6 xl:w-[90%] 2xl:w-[80%]">
         <h4
-          className="font-bold text-base md:text-lg lg:text-xl mb-2"
+          className="font-bold text-base md:text-lg lg:text-xl mb-2 pl-3 md:pl-4"
           style={{ lineHeight: 1 }}
         >
           {footerData?.notice?.title || content.notice.title}
@@ -95,7 +95,7 @@ export default function FooterContact({ footerData, content }: Props) {
           {(footerData?.notice?.lines || content.notice.lines).map(
             (line: string, index: number) => (
               <li key={index} className="flex items-start">
-                <span className="rounded-full bg-current flex-shrink-0 w-1 h-1 md:w-1.5 md:h-1.5 -ml-3 md:-ml-4 mr-2 md:mr-2.5 mt-[0.6em]"></span>
+                <span className="rounded-full bg-current flex-shrink-0 w-1 h-1 md:w-1.5 md:h-1.5 mr-2 md:mr-2.5 mt-[0.65em]"></span>
                 <span>{line}</span>
               </li>
             ),

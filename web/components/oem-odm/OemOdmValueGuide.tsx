@@ -1,24 +1,25 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { motion, AnimatePresence } from "framer-motion"
-import { OptimizedImage } from "@/components/ui/OptimizedImage"
+import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // 设计稿基准尺寸
-const DESIGN_WIDTH = 1920
-const DESIGN_HEIGHT = 922
-const HEADER_HEIGHT = 46
+const DESIGN_WIDTH = 1920;
+const DESIGN_HEIGHT = 922;
+const HEADER_HEIGHT = 46;
 
 // 动画配置
-const INITIAL_DELAY = 0.3 // 初始延迟(秒)
-const DRAWER_ANIMATION_DURATION = 1.0 // 抽屉动画时长(秒)
-const MASK_FADE_DELAY = INITIAL_DELAY + DRAWER_ANIMATION_DURATION // 遮罩在抽屉动画完成后开始渐隐
-const MASK_FADE_DURATION = 0.6 // 遮罩渐隐时长(秒)
+const INITIAL_DELAY = 0.3; // 初始延迟(秒)
+const DRAWER_ANIMATION_DURATION = 1.0; // 抽屉动画时长(秒)
+const MASK_FADE_DELAY = INITIAL_DELAY + DRAWER_ANIMATION_DURATION; // 遮罩在抽屉动画完成后开始渐隐
+const MASK_FADE_DURATION = 0.6; // 遮罩渐隐时长(秒)
 
 // 响应式尺寸函数
-const rpx = (designValue: number) => `calc(var(--rpx-value-guide) * ${designValue})`
+const rpx = (designValue: number) =>
+  `calc(var(--rpx-value-guide) * ${designValue})`;
 
 // CSS 动画 keyframes
 const drawerAnimationStyles = `
@@ -52,42 +53,51 @@ const drawerAnimationStyles = `
     transform: translateY(-8px);
   }
 }
-`
+`;
 
 interface MediaObject {
-  id: string
-  url: string
-  alt?: string
+  id: string;
+  url: string;
+  alt?: string;
   variants?: {
-    thumbnail?: string
-    small?: string
-    medium?: string
-    large?: string
-    xlarge?: string
-  }
-  cropFocalPoint?: { x: number; y: number } | null
-  width?: number
-  height?: number
-  enableLink?: boolean
-  linkUrl?: string
-  openInNewTab?: boolean
+    thumbnail?: string;
+    small?: string;
+    medium?: string;
+    large?: string;
+    xlarge?: string;
+  };
+  cropFocalPoint?: { x: number; y: number } | null;
+  width?: number;
+  height?: number;
+  enableLink?: boolean;
+  linkUrl?: string;
+  openInNewTab?: boolean;
 }
 
 interface OemOdmValueGuideProps {
-  titleLines?: string[]
-  features?: string[]
-  leftDescription?: string
-  rightDescription?: string
-  leftImage?: MediaObject | null
-  rightImage?: MediaObject | null
+  titleLines?: string[];
+  features?: string[];
+  leftDescription?: string;
+  rightDescription?: string;
+  leftImage?: MediaObject | null;
+  rightImage?: MediaObject | null;
 }
 
 const defaultContent = {
-  titleLines: ["Customized", "Glass", "Hardware", "Solutions For", "Building", "Projects"],
+  titleLines: [
+    "Customized",
+    "Glass",
+    "Hardware",
+    "Solutions For",
+    "Building",
+    "Projects",
+  ],
   features: ["Professional", "Efficient", "Reliable"],
-  leftDescription: "We Are Committed To More Than Just Delivering Premium Glass Hardware Products—We Provide Comprehensive Support To Ensure A Smooth And Hassle-Free Experience. From Expert Guidance To Responsive After-Sales Assistance, Our Services Are Designed To Meet The Unique Needs Of Dealers, And Contractors Alike, Helping You Achieve The Best Results With Confidence.",
-  rightDescription: "For Dealers, Contractors Or Architect, We Provide Bulk Order Assistance, Product Training, And Technical Consultation. No Matter The Customer, Busrom Strives To Ensure Seamless Service And Long-Term Satisfaction With Our Indoor & Outdoor Solutions.",
-}
+  leftDescription:
+    "We Are Committed To More Than Just Delivering Premium Glass Hardware Products—We Provide Comprehensive Support To Ensure A Smooth And Hassle-Free Experience. From Expert Guidance To Responsive After-Sales Assistance, Our Services Are Designed To Meet The Unique Needs Of Dealers, And Contractors Alike, Helping You Achieve The Best Results With Confidence.",
+  rightDescription:
+    "For Dealers, Contractors Or Architect, We Provide Bulk Order Assistance, Product Training, And Technical Consultation. No Matter The Customer, Busrom Strives To Ensure Seamless Service And Long-Term Satisfaction With Our Indoor & Outdoor Solutions.",
+};
 
 export function OemOdmValueGuide({
   titleLines = defaultContent.titleLines,
@@ -97,11 +107,13 @@ export function OemOdmValueGuide({
   leftImage,
   rightImage,
 }: OemOdmValueGuideProps) {
-  const [isLeftImageHovered, setIsLeftImageHovered] = useState(false)
-  const [isRightTextExpanded, setIsRightTextExpanded] = useState(false)
+  const [isLeftImageHovered, setIsLeftImageHovered] = useState(false);
+  const [isRightTextExpanded, setIsRightTextExpanded] = useState(false);
 
   const getObjectPosition = (image?: MediaObject | null) =>
-    image?.cropFocalPoint ? `${image.cropFocalPoint.x}% ${image.cropFocalPoint.y}%` : "center"
+    image?.cropFocalPoint
+      ? `${image.cropFocalPoint.x}% ${image.cropFocalPoint.y}%`
+      : "center";
 
   return (
     <section
@@ -116,12 +128,34 @@ export function OemOdmValueGuide({
       {/* ================================================================
           PC 端布局 (md 以上显示) - 完全保留你提供的原始逻辑
           ================================================================ */}
-      <div className="hidden md:block relative w-full overflow-hidden" style={{ height: rpx(DESIGN_HEIGHT) }}>
+      <div
+        className="hidden md:block relative w-full overflow-hidden"
+        style={{ height: rpx(DESIGN_HEIGHT) }}
+      >
         {/* 背景层 */}
-        <div className="absolute left-0 top-0 bottom-0" style={{ width: rpx(683), backgroundColor: "#f0ebda" }} />
-        <div className="absolute right-0 top-0 bottom-0" style={{ left: rpx(683), backgroundColor: "rgba(186,179,123,0.67)", backdropFilter: "blur(12px)" }} />
+        <div
+          className="absolute left-0 top-0 bottom-0"
+          style={{ width: rpx(683), backgroundColor: "#f0ebda" }}
+        />
+        <div
+          className="absolute right-0 top-0 bottom-0"
+          style={{
+            left: rpx(683),
+            backgroundColor: "rgba(186,179,123,0.67)",
+            backdropFilter: "blur(12px)",
+          }}
+        />
         {/* 右侧椭圆装饰 - 模糊渐变效果 (z-index: 1，在背景上层，内容下层) */}
-        <div className="absolute overflow-hidden" style={{ left: rpx(683), top: 0, width: rpx(1237), height: rpx(922), zIndex: 1 }}>
+        <div
+          className="absolute overflow-hidden"
+          style={{
+            left: rpx(683),
+            top: 0,
+            width: rpx(1237),
+            height: rpx(922),
+            zIndex: 1,
+          }}
+        >
           <div
             className="absolute"
             style={{
@@ -129,7 +163,8 @@ export function OemOdmValueGuide({
               top: rpx(-212),
               width: rpx(1707),
               height: rpx(1457),
-              background: "radial-gradient(ellipse 50% 50% at 50% 50%, #756F3F 0%, rgba(117,111,63,0.91) 22.58%, rgba(117,111,63,0) 100%)",
+              background:
+                "radial-gradient(ellipse 50% 50% at 50% 50%, #756F3F 0%, rgba(117,111,63,0.91) 22.58%, rgba(117,111,63,0) 100%)",
               filter: "blur(63px)",
               borderRadius: "50%",
             }}
@@ -149,47 +184,127 @@ export function OemOdmValueGuide({
           }}
           initial={{ opacity: 0, x: "15vw" }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: DRAWER_ANIMATION_DURATION, delay: INITIAL_DELAY, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={{
+            duration: DRAWER_ANIMATION_DURATION,
+            delay: INITIAL_DELAY,
+            ease: [0.25, 0.1, 0.25, 1],
+          }}
           onMouseEnter={() => setIsLeftImageHovered(true)}
           onMouseLeave={() => setIsLeftImageHovered(false)}
         >
           {leftImage?.enableLink && leftImage.linkUrl ? (
             <Link
               href={leftImage.linkUrl}
-              target={leftImage.openInNewTab ? '_blank' : undefined}
-              rel={leftImage.openInNewTab ? 'noopener noreferrer' : undefined}
+              target={leftImage.openInNewTab ? "_blank" : undefined}
+              rel={leftImage.openInNewTab ? "noopener noreferrer" : undefined}
               className="block w-full h-full grayscale"
             >
-              <OptimizedImage image={leftImage as any} alt="OEM Service" size="large" className="w-full h-full object-cover" objectPosition={getObjectPosition(leftImage)} priority />
+              <OptimizedImage
+                image={leftImage as any}
+                alt="OEM Service"
+                size="large"
+                className="w-full h-full object-cover"
+                objectPosition={getObjectPosition(leftImage)}
+                priority
+              />
             </Link>
           ) : (
             <div className="w-full h-full grayscale">
               {leftImage ? (
-                <OptimizedImage image={leftImage as any} alt="OEM Service" size="large" className="w-full h-full object-cover" objectPosition={getObjectPosition(leftImage)} priority />
+                <OptimizedImage
+                  image={leftImage as any}
+                  alt="OEM Service"
+                  size="large"
+                  className="w-full h-full object-cover"
+                  objectPosition={getObjectPosition(leftImage)}
+                  priority
+                />
               ) : (
-                <div className="w-full h-full bg-gray-400"><Image src="/images/placeholder-person.jpg" alt="OEM Service" fill className="object-cover" priority /></div>
+                <div className="w-full h-full bg-gray-400">
+                  <Image
+                    src="/images/placeholder-person.jpg"
+                    alt="OEM Service"
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                </div>
               )}
             </div>
           )}
         </motion.div>
 
         {/* 主标题 */}
-        <div className="absolute flex flex-col items-center" style={{ left: rpx(600), top: rpx(178), width: rpx(603), zIndex: 20 }}>
+        <div
+          className="absolute flex flex-col items-center"
+          style={{
+            left: rpx(600),
+            top: "50%",
+            transform: "translateY(-50%)",
+            width: rpx(603),
+            zIndex: 20,
+          }}
+        >
           {titleLines.map((line, index) => (
             <div key={index} className="relative" style={{ height: rpx(70) }}>
-              <span className="absolute inset-0 font-anaheim font-extrabold uppercase text-center leading-none" style={{ fontSize: rpx(60), lineHeight: rpx(70), color: "rgba(0,0,0,0.4)", filter: "blur(19px)", transform: `translateY(${rpx(4)})` }}>{line}</span>
-              <motion.span className="relative font-anaheim font-extrabold uppercase text-center leading-none block" style={{ fontSize: rpx(60), lineHeight: rpx(70), backgroundImage: "linear-gradient(165deg, rgb(253, 255, 181) 12%, rgb(254, 210, 116) 45%, rgb(255, 240, 37) 86%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 + index * 0.08 }}>{line}</motion.span>
+              <span
+                className="absolute inset-0 font-anaheim font-extrabold uppercase text-center leading-none"
+                style={{
+                  fontSize: rpx(60),
+                  lineHeight: rpx(70),
+                  color: "rgba(0,0,0,0.4)",
+                  filter: "blur(19px)",
+                  transform: `translateY(${rpx(4)})`,
+                }}
+              >
+                {line}
+              </span>
+              <motion.span
+                className="relative font-anaheim font-extrabold uppercase text-center leading-none block"
+                style={{
+                  fontSize: rpx(60),
+                  lineHeight: rpx(70),
+                  backgroundImage:
+                    "linear-gradient(165deg, rgb(253, 255, 181) 12%, rgb(254, 210, 116) 45%, rgb(255, 240, 37) 86%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 + index * 0.08 }}
+              >
+                {line}
+              </motion.span>
             </div>
           ))}
         </div>
 
         {/* 右上角装饰 + 特性文字 */}
-        <motion.div className="absolute" style={{ right: rpx(210), top: rpx(210), zIndex: 20 }} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.4 }}>
-          <div className="absolute" style={{ left: rpx(-110), top: rpx(-50), width: rpx(142), height: rpx(141) }}>
+        <motion.div
+          className="absolute"
+          style={{ right: rpx(210), top: rpx(210), zIndex: 20 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          <div
+            className="absolute"
+            style={{
+              left: rpx(-110),
+              top: rpx(-50),
+              width: rpx(142),
+              height: rpx(141),
+            }}
+          >
             {/* 外圈虚线 - 旋转动画 */}
             <svg
               className="absolute inset-0 animate-spin-slow"
-              style={{ width: '100%', height: '100%', transformOrigin: 'center center' }}
+              style={{
+                width: "100%",
+                height: "100%",
+                transformOrigin: "center center",
+              }}
               viewBox="0 0 142 141"
               fill="none"
             >
@@ -207,7 +322,11 @@ export function OemOdmValueGuide({
             {/* 内部箭头 - 浮动动画 */}
             <svg
               className="absolute inset-0"
-              style={{ width: '100%', height: '100%', animation: 'floatUpDown 2s ease-in-out infinite' }}
+              style={{
+                width: "100%",
+                height: "100%",
+                animation: "floatUpDown 2s ease-in-out infinite",
+              }}
               viewBox="0 0 142 141"
               fill="none"
             >
@@ -219,9 +338,36 @@ export function OemOdmValueGuide({
           </div>
           <div className="flex flex-col items-center">
             {features.map((feature, index) => (
-              <div key={index} className="relative" style={{ marginBottom: rpx(8) }}>
-                <span className="absolute font-anaheim font-bold uppercase" style={{ fontSize: rpx(48), lineHeight: rpx(76), color: "#504911", left: rpx(2), top: rpx(4) }}>{feature}</span>
-                <motion.span className="relative font-anaheim font-bold uppercase" style={{ fontSize: rpx(48), lineHeight: rpx(76), color: "#fffeee" }} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.5 + index * 0.15 }}>{feature}</motion.span>
+              <div
+                key={index}
+                className="relative"
+                style={{ marginBottom: rpx(8) }}
+              >
+                <span
+                  className="absolute font-anaheim font-bold uppercase"
+                  style={{
+                    fontSize: rpx(48),
+                    lineHeight: rpx(76),
+                    color: "#504911",
+                    left: rpx(2),
+                    top: rpx(4),
+                  }}
+                >
+                  {feature}
+                </span>
+                <motion.span
+                  className="relative font-anaheim font-bold uppercase"
+                  style={{
+                    fontSize: rpx(48),
+                    lineHeight: rpx(76),
+                    color: "#fffeee",
+                  }}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.5 + index * 0.15 }}
+                >
+                  {feature}
+                </motion.span>
               </div>
             ))}
           </div>
@@ -240,45 +386,153 @@ export function OemOdmValueGuide({
           }}
           initial={{ opacity: 0, x: "-15vw" }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: DRAWER_ANIMATION_DURATION, delay: INITIAL_DELAY, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={{
+            duration: DRAWER_ANIMATION_DURATION,
+            delay: INITIAL_DELAY,
+            ease: [0.25, 0.1, 0.25, 1],
+          }}
         >
           {rightImage?.enableLink && rightImage.linkUrl ? (
             <Link
               href={rightImage.linkUrl}
-              target={rightImage.openInNewTab ? '_blank' : undefined}
-              rel={rightImage.openInNewTab ? 'noopener noreferrer' : undefined}
+              target={rightImage.openInNewTab ? "_blank" : undefined}
+              rel={rightImage.openInNewTab ? "noopener noreferrer" : undefined}
               className="block w-full h-full grayscale"
             >
-              <OptimizedImage image={rightImage as any} alt="Professional Service" size="large" className="w-full h-full object-cover" objectPosition={getObjectPosition(rightImage)} priority />
+              <OptimizedImage
+                image={rightImage as any}
+                alt="Professional Service"
+                size="large"
+                className="w-full h-full object-cover"
+                objectPosition={getObjectPosition(rightImage)}
+                priority
+              />
             </Link>
           ) : (
             <div className="w-full h-full grayscale">
               {rightImage ? (
-                <OptimizedImage image={rightImage as any} alt="Professional Service" size="large" className="w-full h-full object-cover" objectPosition={getObjectPosition(rightImage)} priority />
+                <OptimizedImage
+                  image={rightImage as any}
+                  alt="Professional Service"
+                  size="large"
+                  className="w-full h-full object-cover"
+                  objectPosition={getObjectPosition(rightImage)}
+                  priority
+                />
               ) : (
-                <div className="w-full h-full bg-gray-500"><Image src="/images/placeholder-work.jpg" alt="Professional Service" fill className="object-cover" priority /></div>
+                <div className="w-full h-full bg-gray-500">
+                  <Image
+                    src="/images/placeholder-work.jpg"
+                    alt="Professional Service"
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                </div>
               )}
             </div>
           )}
-          <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.85) 100%)" }} />
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.85) 100%)",
+            }}
+          />
         </motion.div>
 
         {/* 左下角悬停卡片 */}
         <AnimatePresence>
           {isLeftImageHovered && (
-            <motion.div className="absolute" style={{ left: rpx(76), top: rpx(486), width: rpx(453), height: rpx(435), backgroundColor: "rgba(60,54,9,0.5)", backdropFilter: "blur(6px)", borderTopRightRadius: rpx(128), zIndex: 15 }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ duration: 0.3 }} onMouseEnter={() => setIsLeftImageHovered(true)} onMouseLeave={() => setIsLeftImageHovered(false)}>
-              <p className="font-anaheim font-semibold text-white capitalize" style={{ padding: rpx(35), paddingTop: rpx(35), fontSize: rpx(24), lineHeight: rpx(32) }}>{leftDescription}</p>
+            <motion.div
+              className="absolute"
+              style={{
+                left: rpx(76),
+                bottom: 0,
+                maxWidth: rpx(453),
+                backgroundColor: "rgba(60,54,9,0.5)",
+                backdropFilter: "blur(6px)",
+                borderTopRightRadius: rpx(128),
+                zIndex: 15,
+              }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.3 }}
+              onMouseEnter={() => setIsLeftImageHovered(true)}
+              onMouseLeave={() => setIsLeftImageHovered(false)}
+            >
+              <p
+                className="font-anaheim font-semibold text-white capitalize"
+                style={{
+                  padding: rpx(35),
+                  paddingTop: rpx(35),
+                  fontSize: rpx(20),
+                  lineHeight: rpx(28),
+                  whiteSpace: "pre-line",
+                }}
+              >
+                {leftDescription}
+              </p>
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* 右下角控制 */}
-        <motion.div className="absolute flex flex-col items-center" style={{ right: rpx(200), bottom: rpx(80), width: rpx(418), zIndex: 15 }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.7 }}>
-          <motion.button className="mb-4 cursor-pointer" onClick={() => setIsRightTextExpanded(!isRightTextExpanded)} animate={{ y: isRightTextExpanded ? 0 : [0, 8, 0], rotate: isRightTextExpanded ? 180 : 0 }} transition={{ y: { duration: 2, repeat: isRightTextExpanded ? 0 : Infinity, ease: "easeInOut" }, rotate: { duration: 0.3 } }}>
-            <svg style={{ width: rpx(23), height: rpx(24) }} viewBox="0 0 23 24" fill="none"><path d="M11.5848 24L11.6059 24C11.8856 23.9967 12.1575 23.923 12.3852 23.7887L12.3984 23.7808L12.3946 23.7829C12.4848 23.7349 12.5692 23.6797 12.6465 23.6183L12.6682 23.6007L22.5163 15.4821C23.1612 14.9504 23.1612 14.0884 22.5163 13.5567L22.4968 13.541C21.8506 13.0253 20.8197 13.0305 20.1814 13.5567L12.9629 19.5075L12.9629 1.13601C12.9629 0.508592 12.346 1.73776e-06 11.5851 1.68103e-06L11.3921 1.66664e-06C10.6418 0.0102016 10.0371 0.514862 10.0371 1.13601L10.0371 19.5076L2.81867 13.5568C2.17388 13.0252 1.12853 13.0252 0.483701 13.5568C-0.161204 14.0884 -0.161239 14.9504 0.48363 15.4821L10.3325 23.6013L10.3534 23.6182C10.4237 23.6741 10.4998 23.7248 10.5808 23.7696L10.6015 23.7808L10.5977 23.7786C10.8344 23.9227 11.1209 24.0003 11.4151 24L11.5848 24Z" fill="white" /></svg>
+        <motion.div
+          className="absolute flex flex-col items-center"
+          style={{
+            right: rpx(200),
+            bottom: rpx(20),
+            width: rpx(418),
+            zIndex: 15,
+          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+        >
+          <motion.button
+            className="mb-4 cursor-pointer"
+            onClick={() => setIsRightTextExpanded(!isRightTextExpanded)}
+            animate={{
+              y: isRightTextExpanded ? 0 : [0, 8, 0],
+              rotate: isRightTextExpanded ? 180 : 0,
+            }}
+            transition={{
+              y: {
+                duration: 2,
+                repeat: isRightTextExpanded ? 0 : Infinity,
+                ease: "easeInOut",
+              },
+              rotate: { duration: 0.3 },
+            }}
+          >
+            <svg
+              style={{ width: rpx(23), height: rpx(24) }}
+              viewBox="0 0 23 24"
+              fill="none"
+            >
+              <path
+                d="M11.5848 24L11.6059 24C11.8856 23.9967 12.1575 23.923 12.3852 23.7887L12.3984 23.7808L12.3946 23.7829C12.4848 23.7349 12.5692 23.6797 12.6465 23.6183L12.6682 23.6007L22.5163 15.4821C23.1612 14.9504 23.1612 14.0884 22.5163 13.5567L22.4968 13.541C21.8506 13.0253 20.8197 13.0305 20.1814 13.5567L12.9629 19.5075L12.9629 1.13601C12.9629 0.508592 12.346 1.73776e-06 11.5851 1.68103e-06L11.3921 1.66664e-06C10.6418 0.0102016 10.0371 0.514862 10.0371 1.13601L10.0371 19.5076L2.81867 13.5568C2.17388 13.0252 1.12853 13.0252 0.483701 13.5568C-0.161204 14.0884 -0.161239 14.9504 0.48363 15.4821L10.3325 23.6013L10.3534 23.6182C10.4237 23.6741 10.4998 23.7248 10.5808 23.7696L10.6015 23.7808L10.5977 23.7786C10.8344 23.9227 11.1209 24.0003 11.4151 24L11.5848 24Z"
+                fill="white"
+              />
+            </svg>
           </motion.button>
           <div className="relative">
-            <p className="font-anaheim font-semibold text-white capitalize" style={{ fontSize: rpx(24), lineHeight: rpx(32), overflow: "hidden", display: "-webkit-box", WebkitLineClamp: isRightTextExpanded ? "unset" : 3, WebkitBoxOrient: "vertical" }}>{rightDescription}</p>
+            <p
+              className="font-anaheim font-semibold text-white capitalize"
+              style={{
+                fontSize: rpx(20),
+                lineHeight: rpx(28),
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitLineClamp: isRightTextExpanded ? "unset" : 3,
+                WebkitBoxOrient: "vertical",
+                whiteSpace: "pre-line",
+              }}
+            >
+              {rightDescription}
+            </p>
           </div>
         </motion.div>
 
@@ -293,7 +547,11 @@ export function OemOdmValueGuide({
           }}
           initial={{ opacity: 1 }}
           animate={{ opacity: 0 }}
-          transition={{ duration: MASK_FADE_DURATION, delay: MASK_FADE_DELAY, ease: "easeOut" }}
+          transition={{
+            duration: MASK_FADE_DURATION,
+            delay: MASK_FADE_DELAY,
+            ease: "easeOut",
+          }}
         />
       </div>
 
@@ -311,10 +569,11 @@ export function OemOdmValueGuide({
               transition={{ delay: index * 0.1 }}
               className="font-anaheim font-extrabold uppercase text-[10vw] leading-tight"
               style={{
-                backgroundImage: "linear-gradient(165deg, rgb(253, 255, 181) 12%, rgb(254, 210, 116) 45%, rgb(255, 240, 37) 86%)",
+                backgroundImage:
+                  "linear-gradient(165deg, rgb(253, 255, 181) 12%, rgb(254, 210, 116) 45%, rgb(255, 240, 37) 86%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
-                textShadow: "0px 4px 10px rgba(0,0,0,0.15)"
+                textShadow: "0px 4px 10px rgba(0,0,0,0.15)",
               }}
             >
               {line}
@@ -325,7 +584,10 @@ export function OemOdmValueGuide({
         {/* 移动端特性标签 - 胶囊状排列 */}
         <div className="flex flex-wrap justify-center gap-2 mb-10">
           {features.map((feature, i) => (
-            <span key={i} className="px-4 py-1.5 bg-[#756F3F] text-[#FFF3BD] rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg">
+            <span
+              key={i}
+              className="px-4 py-1.5 bg-[#756F3F] text-[#FFF3BD] rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg"
+            >
               {feature}
             </span>
           ))}
@@ -340,20 +602,33 @@ export function OemOdmValueGuide({
           {leftImage?.enableLink && leftImage.linkUrl ? (
             <Link
               href={leftImage.linkUrl}
-              target={leftImage.openInNewTab ? '_blank' : undefined}
-              rel={leftImage.openInNewTab ? 'noopener noreferrer' : undefined}
+              target={leftImage.openInNewTab ? "_blank" : undefined}
+              rel={leftImage.openInNewTab ? "noopener noreferrer" : undefined}
               className="block w-full h-full"
             >
-              <OptimizedImage image={leftImage as any} alt="OEM" className="w-full h-full object-cover" />
+              <OptimizedImage
+                image={leftImage as any}
+                alt="OEM"
+                className="w-full h-full object-cover"
+              />
             </Link>
           ) : leftImage ? (
-            <OptimizedImage image={leftImage as any} alt="OEM" className="w-full h-full object-cover" />
+            <OptimizedImage
+              image={leftImage as any}
+              alt="OEM"
+              className="w-full h-full object-cover"
+            />
           ) : (
             <div className="w-full h-full bg-gray-400" />
           )}
           {/* 文字直接浮盖 */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-6 flex items-end pointer-events-none">
-            <p className="text-white text-xs font-anaheim leading-relaxed">{leftDescription}</p>
+            <p
+              className="text-white text-xs font-anaheim leading-relaxed"
+              style={{ whiteSpace: "pre-line" }}
+            >
+              {leftDescription}
+            </p>
           </div>
         </motion.div>
 
@@ -366,14 +641,22 @@ export function OemOdmValueGuide({
           {rightImage?.enableLink && rightImage.linkUrl ? (
             <Link
               href={rightImage.linkUrl}
-              target={rightImage.openInNewTab ? '_blank' : undefined}
-              rel={rightImage.openInNewTab ? 'noopener noreferrer' : undefined}
+              target={rightImage.openInNewTab ? "_blank" : undefined}
+              rel={rightImage.openInNewTab ? "noopener noreferrer" : undefined}
               className="block w-full h-full"
             >
-              <OptimizedImage image={rightImage as any} alt="Pro" className="w-full h-full object-cover" />
+              <OptimizedImage
+                image={rightImage as any}
+                alt="Pro"
+                className="w-full h-full object-cover"
+              />
             </Link>
           ) : rightImage ? (
-            <OptimizedImage image={rightImage as any} alt="Pro" className="w-full h-full object-cover" />
+            <OptimizedImage
+              image={rightImage as any}
+              alt="Pro"
+              className="w-full h-full object-cover"
+            />
           ) : (
             <div className="w-full h-full bg-gray-500" />
           )}
@@ -382,13 +665,16 @@ export function OemOdmValueGuide({
         {/* 移动端底部描述 */}
         <div className="text-center px-4">
           <div className="w-12 h-1 bg-[#756F3F]/30 mx-auto mb-6 rounded-full" />
-          <p className="text-[#504911] font-anaheim font-semibold text-sm italic leading-relaxed">
+          <p
+            className="text-[#504911] font-anaheim font-semibold text-sm italic leading-relaxed"
+            style={{ whiteSpace: "pre-line" }}
+          >
             {rightDescription}
           </p>
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-export default OemOdmValueGuide
+export default OemOdmValueGuide;

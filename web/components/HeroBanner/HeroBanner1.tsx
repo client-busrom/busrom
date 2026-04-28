@@ -100,7 +100,7 @@ type BannerProps = {
 // --- HeroBanner1 组件 ---
 const HeroBanner1: FC<BannerProps> = ({ data, headerTheme }) => {
   return (
-    <section 
+    <section
       className="relative w-full h-full min-h-[700px] overflow-hidden font-sans flex items-center justify-center text-center"
       data-header-theme={headerTheme}
     >
@@ -663,7 +663,7 @@ const HeroBanner1: FC<BannerProps> = ({ data, headerTheme }) => {
               return (
                 <MagneticWrapper key={index} strength={0.3}>
                   <div
-                    className="flex items-center justify-center border border-white bg-[#756F3F]"
+                    className="flex items-center justify-center border border-white border-[3px] bg-[#756F3F]"
                     style={{
                       width: rpx(242),
                       height: rpx(150),
