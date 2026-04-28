@@ -40,9 +40,11 @@ export function ContactFormSection({
     error,
     uploadingFiles,
     uploadedAttachments,
+    pendingFiles,
     privacyAccepted,
     isGloballyAccepted,
     turnstileToken,
+    uploadProgress,
     shouldShowCaptcha,
     handlePrivacyToggle,
     handleTurnstileVerify,
@@ -53,40 +55,97 @@ export function ContactFormSection({
     handleFileUpload,
     handleSubmit,
     getFieldsByType,
-  } = useContactForm(initialFormConfig, formName || "service-inquiry");
+  } = useContactForm(initialFormConfig, formName || "service-inquiry", locale);
 
   const fields = getFieldsByType();
 
   // Custom styled input field for desktop
-  const renderField = (field: FormField | null | undefined) => (
-    <DesktopField
-      field={field}
-      vw={vw}
-      formData={formData}
-      handleChange={handleChange}
-      handleCheckboxChange={handleCheckboxChange}
-      handleFileUpload={handleFileUpload}
-      uploadingFiles={uploadingFiles}
-      uploadedAttachments={uploadedAttachments}
-      submitting={submitting}
-      locale={locale}
-    />
-  );
+  const renderField = (field: FormField | null | undefined) => {
+    return (
+      <DesktopField
+        field={field}
+        vw={vw}
+        formData={formData}
+        handleChange={handleChange}
+        handleCheckboxChange={handleCheckboxChange}
+        handleFileUpload={handleFileUpload}
+        uploadingFiles={uploadingFiles}
+        uploadProgress={uploadProgress}
+        uploadedAttachments={uploadedAttachments}
+        pendingFiles={pendingFiles}
+        submitting={submitting}
+        locale={locale}
+      />
+    );
+  };
 
-  // Custom styled input field for mobile
-  const renderMobileField = (field: FormField | null | undefined) => (
-    <MobileField
-      field={field}
-      formData={formData}
-      handleChange={handleChange}
-      handleCheckboxChange={handleCheckboxChange}
-      handleFileUpload={handleFileUpload}
-      uploadingFiles={uploadingFiles}
-      uploadedAttachments={uploadedAttachments}
-      submitting={submitting}
-      locale={locale}
-    />
-  );
+  const renderMobileField = (field: FormField | null | undefined) => {
+    return (
+      <MobileField
+        field={field}
+        formData={formData}
+        handleChange={handleChange}
+        handleCheckboxChange={handleCheckboxChange}
+        handleFileUpload={handleFileUpload}
+        uploadingFiles={uploadingFiles}
+        uploadProgress={uploadProgress}
+        uploadedAttachments={uploadedAttachments}
+        pendingFiles={pendingFiles}
+        submitting={submitting}
+        locale={locale}
+      />
+    );
+  };
+
+  const renderContactItem = (text: string) => {
+    // 检测邮箱
+    const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi;
+    const emailMatch = text.match(emailRegex);
+    if (emailMatch) {
+      const email = emailMatch[0];
+      const parts = text.split(email);
+      return (
+        <>
+          {parts[0]}
+          <a
+            href={`mailto:${email}`}
+            className="underline decoration-1 underline-offset-4 hover:text-[#FFEF72] transition-colors"
+          >
+            {email}
+          </a>
+          {parts[1]}
+        </>
+      );
+    }
+
+    // 检测电话 (匹配常见的电话格式)
+    const phoneRegex = /(\+?[0-9][0-9\s-]{6,15}[0-9])/g;
+    const phoneMatch = text.match(phoneRegex);
+    // 只有在明确包含电话关键词或加号时才作为电话处理，避免误伤
+    if (
+      phoneMatch &&
+      (text.toLowerCase().includes("tel") ||
+        text.toLowerCase().includes("phone") ||
+        text.includes("+"))
+    ) {
+      const phone = phoneMatch[0];
+      const parts = text.split(phone);
+      return (
+        <>
+          {parts[0]}
+          <a
+            href={`tel:${phone.replace(/\s/g, "")}`}
+            className="underline decoration-1 underline-offset-4 hover:text-[#FFEF72] transition-colors"
+          >
+            {phone}
+          </a>
+          {parts[1]}
+        </>
+      );
+    }
+
+    return text;
+  };
 
   return (
     <section
@@ -291,9 +350,9 @@ export function ContactFormSection({
                 {info.map((item, index) => (
                   <li
                     key={index}
-                    className="font-anaheim font-semibold text-[16px] text-white"
+                    className="font-anaheim font-semibold text-[18px] text-white"
                   >
-                    {item}
+                    {renderContactItem(item)}
                   </li>
                 ))}
               </ul>
@@ -454,7 +513,7 @@ export function ContactFormSection({
                         className="font-anaheim font-semibold text-white"
                         style={{ fontSize: vw(36) }}
                       >
-                        {item}
+                        {renderContactItem(item)}
                       </li>
                     ))}
                   </ul>
@@ -583,11 +642,7 @@ export function ContactFormSection({
 
                     <button
                       type="submit"
-                      disabled={
-                        submitting ||
-                        (shouldShowCaptcha && !turnstileToken) ||
-                        (!!formConfig?.privacyConsentText && !privacyAccepted)
-                      }
+                      disabled={submitting}
                       className={cn(
                         "w-full bg-[#B2A224] text-white font-anaheim font-bold hover:bg-[#9A8C1E] transition-all flex items-center justify-center text-center",
                         "disabled:opacity-50 disabled:cursor-not-allowed",

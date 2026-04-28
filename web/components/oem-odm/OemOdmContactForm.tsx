@@ -5,6 +5,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { Turnstile } from "@/components/ui/turnstile"
+import { uploadFileWithProgress } from "@/lib/upload"
 import type { Locale } from "@/i18n.config"
 import { PhoneInput } from "@/components/ui/PhoneInput"
 
@@ -145,6 +146,7 @@ export function OemOdmContactForm({
 
   // 文件上传
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
+  const [uploadProgress, setUploadProgress] = useState<number>(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Turnstile captcha
@@ -216,6 +218,22 @@ export function OemOdmContactForm({
   // 处理文件上传
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
+      // Pre-validation for required fields
+      const missingFields: string[] = []
+      sortedFields.forEach(field => {
+        if (field.required && field.fieldType !== "file") {
+          const value = formData[field.fieldName]
+          if (!value || (Array.isArray(value) && value.length === 0)) {
+            missingFields.push(field.label)
+          }
+        }
+      })
+
+      if (missingFields.length > 0) {
+        setError(`Please fill in required fields (${missingFields.join(", ")}) before selecting files.`)
+        return
+      }
+
       setUploadedFiles(Array.from(e.target.files))
     }
   }
@@ -252,23 +270,53 @@ export function OemOdmContactForm({
       }
 
       // 1. Upload files first if any
-      const fileIds: string[] = [];
+      const attachments: any[] = [];
       if (uploadedFiles.length > 0) {
-        const fileFormData = new FormData();
-        uploadedFiles.forEach(file => fileFormData.append('files', file));
+        setUploadProgress(0);
         
-        const uploadRes = await fetch('/api/form-file-upload', {
-          method: 'POST',
-          body: fileFormData,
+        const fileField = fields.find((f: FormField) => f.fieldType === 'file');
+        const fileFieldName = fileField?.fieldName || 'attachment';
+        
+        const uploadPromises = uploadedFiles.map(async (file, index) => {
+          return uploadFileWithProgress({
+            url: '/api/form-file-upload',
+            file: file,
+            fieldName: 'file', // API expects 'file'
+            additionalData: {
+              formConfigId: formConfig?.id || configData?.id || '',
+              fieldName: fileFieldName
+            },
+            onProgress: (event) => {
+              if (uploadedFiles.length === 1) {
+                setUploadProgress(event.percent);
+              } else {
+                setUploadProgress(prev => {
+                  return Math.max(prev, Math.round((index / uploadedFiles.length) * 100 + (event.percent / uploadedFiles.length)));
+                });
+              }
+            }
+          });
         });
         
-        if (uploadRes.ok) {
-          const uploadData = await uploadRes.json();
-          fileIds.push(...(uploadData.fileIds || []));
+        try {
+          const results = await Promise.all(uploadPromises);
+          attachments.push(...results.map((res, idx) => ({
+            fieldName: fileFieldName,
+            fileName: res.fileName,
+            fileUrl: res.fileUrl,
+            fileSize: res.fileSize,
+            fileType: res.fileType,
+            uploadedAt: res.uploadedAt
+          })));
+        } catch (uploadErr) {
+          console.error("Upload error:", uploadErr);
+          throw new Error("Failed to upload files. Please try again.");
+        } finally {
+          setUploadProgress(0);
         }
       }
 
-      // 2. Submit form with file IDs
+      // 2. Submit form with attachments
       const res = await fetch("/api/form-submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -276,7 +324,7 @@ export function OemOdmContactForm({
           formId: formConfig?.id || configData?.id,
           formName: configData?.name,
           data: formData,
-          fileIds,
+          attachments,
           locale,
           sourcePage: typeof window !== "undefined" ? window.location.href : "",
           userLocalTime: typeof window !== "undefined" ? new Date().toString() : "",
@@ -759,7 +807,7 @@ export function OemOdmContactForm({
                 className="font-anaheim font-semibold whitespace-nowrap"
                 style={{ fontSize: rpx(24), color: "#756F3F" }}
               >
-                {uploadedFiles.length > 0 ? `${uploadedFiles.length} file(s)` : "Upload File"}
+                {uploadedFiles.length > 0 ? `${uploadedFiles.length} file(s) selected` : "Upload File"}
               </span>
               <input
                 ref={fileInputRef}
@@ -942,14 +990,15 @@ export function OemOdmContactForm({
               </div>
             )}
 
-            {/* 错误提示 */}
             {error && (
               <div
-                className="absolute font-anaheim text-red-600 transition-all duration-500 ease-in-out"
+                className="absolute font-anaheim text-red-600 transition-all duration-500 ease-in-out text-center"
                 style={{
-                  left: rpx(400),
-                  top: rpx(captchaTop),
-                  fontSize: rpx(16),
+                  left: rpx(450),
+                  top: rpx(submitTop - 60),
+                  width: rpx(560),
+                  fontSize: rpx(18),
+                  zIndex: 10,
                 }}
               >
                 {error}
@@ -984,7 +1033,11 @@ export function OemOdmContactForm({
                   lineHeight: rpx(52),
                 }}
               >
-                {submitting ? "Submitting..." : (configData?.submitButtonText || "Send Inquiry")}
+                {submitting 
+                  ? (uploadProgress > 0 && uploadProgress < 100 
+                      ? `Uploading ${uploadProgress}%...` 
+                      : "Submitting...") 
+                  : (configData?.submitButtonText || "Send Inquiry")}
               </span>
             </motion.button>
           </form>
@@ -1192,7 +1245,11 @@ export function OemOdmContactForm({
               }`}
               style={{ backgroundColor: "#756F3F" }}
             >
-              {submitting ? "Submitting..." : (configData?.submitButtonText || "Send Inquiry")}
+              {submitting 
+                ? (uploadProgress > 0 && uploadProgress < 100 
+                    ? `Uploading ${uploadProgress}%...` 
+                    : "Submitting...") 
+                : (configData?.submitButtonText || "Send Inquiry")}
             </button>
           </form>
         </div>

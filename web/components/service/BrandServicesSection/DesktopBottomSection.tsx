@@ -120,7 +120,7 @@ export function DesktopBottomSection({
             {/* Up Button */}
             <button
               onClick={onPrevCategory}
-              className="rounded-full border-2 border-[#756F3F] bg-transparent flex items-center justify-center transition-all hover:bg-[#756F3F]/10"
+              className="group rounded-full border-2 border-[#756F3F] bg-transparent flex items-center justify-center transition-all hover:bg-[#756F3F]"
               style={{
                 width: vw(52),    // 74 * 0.7
                 height: vw(52),
@@ -128,7 +128,7 @@ export function DesktopBottomSection({
               }}
             >
               <ChevronUp
-                className="text-[#756F3F]"
+                className="text-[#756F3F] group-hover:text-white transition-colors"
                 strokeWidth={3}
                 style={{
                   width: vw(17),  // 24 * 0.7
@@ -140,14 +140,15 @@ export function DesktopBottomSection({
             {/* Down Button */}
             <button
               onClick={onNextCategory}
-              className="rounded-full bg-[#756F3F] flex items-center justify-center transition-all hover:bg-[#756F3F]/90"
+              className="group rounded-full border-2 border-[#756F3F] bg-transparent flex items-center justify-center transition-all hover:bg-[#756F3F]"
               style={{
                 width: vw(52),    // 74 * 0.7
                 height: vw(52),
+                boxShadow: `0px ${vw(3)} ${vw(3)} rgba(0, 0, 0, 0.25)`,
               }}
             >
               <ChevronDown
-                className="text-white"
+                className="text-[#756F3F] group-hover:text-white transition-colors"
                 strokeWidth={3}
                 style={{
                   width: vw(17),  // 24 * 0.7
@@ -462,10 +463,10 @@ export function DesktopBottomSection({
           {/* Left Navigation Button */}
           <button
             onClick={expandedItemIndex !== null ? onPrevItem : undefined}
-            className={`absolute z-20 rounded-full flex items-center justify-center transition-all ${
+            className={`group absolute z-20 rounded-full flex items-center justify-center transition-all border-2 ${
               expandedItemIndex !== null
-                ? "bg-[#756F3F] hover:bg-[#5F5A32] cursor-pointer"
-                : "bg-[#756F3F]/30 cursor-default"
+                ? "border-[#756F3F] bg-transparent hover:bg-[#756F3F] cursor-pointer"
+                : "border-[#756F3F]/30 bg-transparent cursor-default"
             }`}
             style={{
               width: vw(52),    // 74 * 0.7
@@ -473,11 +474,16 @@ export function DesktopBottomSection({
               left: vw(42),     // 60 * 0.7
               top: "50%",
               transform: "translateY(-50%)",
+              boxShadow: expandedItemIndex !== null ? `0px ${vw(3)} ${vw(3)} rgba(0, 0, 0, 0.25)` : "none",
             }}
             disabled={expandedItemIndex === null}
           >
             <ChevronLeft
-              className="text-white"
+              className={`transition-colors ${
+                expandedItemIndex !== null
+                  ? "text-[#756F3F] group-hover:text-white"
+                  : "text-[#756F3F]/30"
+              }`}
               strokeWidth={3}
               style={{ width: vw(17), height: vw(17) }}
             />
@@ -486,10 +492,10 @@ export function DesktopBottomSection({
           {/* Right Navigation Button */}
           <button
             onClick={expandedItemIndex !== null ? onNextItem : undefined}
-            className={`absolute z-20 rounded-full flex items-center justify-center transition-all ${
+            className={`group absolute z-20 rounded-full flex items-center justify-center transition-all border-2 ${
               expandedItemIndex !== null
-                ? "bg-[#756F3F] hover:bg-[#5F5A32] cursor-pointer"
-                : "bg-[#756F3F]/30 cursor-default"
+                ? "border-[#756F3F] bg-transparent hover:bg-[#756F3F] cursor-pointer"
+                : "border-[#756F3F]/30 bg-transparent cursor-default"
             }`}
             style={{
               width: vw(52),    // 74 * 0.7
@@ -497,11 +503,16 @@ export function DesktopBottomSection({
               right: vw(42),    // 60 * 0.7
               top: "50%",
               transform: "translateY(-50%)",
+              boxShadow: expandedItemIndex !== null ? `0px ${vw(3)} ${vw(3)} rgba(0, 0, 0, 0.25)` : "none",
             }}
             disabled={expandedItemIndex === null}
           >
             <ChevronRight
-              className="text-white"
+              className={`transition-colors ${
+                expandedItemIndex !== null
+                  ? "text-[#756F3F] group-hover:text-white"
+                  : "text-[#756F3F]/30"
+              }`}
               strokeWidth={3}
               style={{ width: vw(17), height: vw(17) }}
             />

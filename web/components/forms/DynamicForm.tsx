@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone'
 // @ts-ignore
 import 'react-international-phone/style.css'
+import { uploadFileWithProgress } from "@/lib/upload"
 
 interface FormField {
   fieldName: string
@@ -90,7 +91,9 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [uploadingFiles, setUploadingFiles] = useState<Record<string, boolean>>({})
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({})
   const [uploadedAttachments, setUploadedAttachments] = useState<any[]>([])
+  const [pendingFiles, setPendingFiles] = useState<Record<string, File[]>>({})
   const [showFileHelp, setShowFileHelp] = useState<string | null>(null)
   const fileHelpRef = useRef<HTMLDivElement>(null)
 
@@ -279,114 +282,64 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
     return null
   }
 
-  // Handle file upload
-  const handleFileUpload = async (fieldName: string, files: FileList | null, field: FormField) => {
+
+  // Handle file selection
+  const handleFileUpload = (fieldName: string, files: FileList | null, field: FormField) => {
     if (!files || files.length === 0) return
 
-    const maxFiles = field.validation?.multiple ? 3 : 1
-    if (files.length > maxFiles) {
-      setError(`Maximum ${maxFiles} file(s) allowed`)
+    // Pre-validation for required fields
+    const missingFields: string[] = []
+    formConfig?.fields.forEach((f) => {
+      if (f.required && f.fieldType !== "file") {
+        const value = formData[f.fieldName]
+        if (!value || (Array.isArray(value) && value.length === 0)) {
+          missingFields.push(f.label)
+        }
+      }
+    })
+
+    if (missingFields.length > 0) {
+      setError(`Please fill in required fields (${missingFields.join(", ")}) before selecting files.`)
       return
     }
 
-    // Check total file size limit (if configured)
-    if (formConfig?.maxTotalFileSize && formConfig.maxTotalFileSize > 0) {
-      // Calculate current total size of already uploaded files
-      const currentTotalSize = uploadedAttachments.reduce((sum, att) => sum + (att.fileSize || 0), 0)
+    // 1. Calculate current total size of all pending files
+    let currentTotalSize = 0
+    Object.values(pendingFiles).forEach(fileList => {
+      fileList.forEach(file => { currentTotalSize += file.size })
+    })
 
-      // Calculate new files total size
+    if (formConfig?.maxTotalFileSize) {
       const newFilesSize = Array.from(files).reduce((sum, file) => sum + file.size, 0)
-
-      // Check if adding new files would exceed limit
       const totalSizeBytes = currentTotalSize + newFilesSize
       const maxTotalSizeBytes = formConfig.maxTotalFileSize * 1024 * 1024
 
       if (totalSizeBytes > maxTotalSizeBytes) {
-        const currentMB = (currentTotalSize / 1024 / 1024).toFixed(2)
-        const newMB = (newFilesSize / 1024 / 1024).toFixed(2)
-        const maxMB = formConfig.maxTotalFileSize
-        setError(`Total file size limit exceeded. Current: ${currentMB}MB, Adding: ${newMB}MB, Maximum: ${maxMB}MB`)
+        setError(`Total file size limit exceeded. Limit: ${formConfig.maxTotalFileSize}MB`)
         return
       }
     }
 
-    setUploadingFiles(prev => ({ ...prev, [fieldName]: true }))
-    setError(null)
-
-    try {
-      const uploadedFiles: any[] = []
-
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i]
-
-        // Validate file
-        const validationError = validateFile(file, field)
-        if (validationError) {
-          setError(validationError)
-          setUploadingFiles(prev => ({ ...prev, [fieldName]: false }))
-          return
-        }
-
-        // Upload file
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('formConfigId', formConfig?.id || '')
-        formData.append('fieldName', fieldName)
-
-        const response = await fetch('/api/form-file-upload', {
-          method: 'POST',
-          body: formData,
-        })
-
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.error || 'Upload failed')
-        }
-
-        const result = await response.json()
-        uploadedFiles.push({
-          fieldName,
-          fileName: result.fileName,
-          fileUrl: result.fileUrl,
-          fileSize: result.fileSize,
-          fileType: result.fileType,
-          uploadedAt: result.uploadedAt,
-        })
+    // 2. Validate individual files
+    const validFiles: File[] = []
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      const validationError = validateFile(file, field)
+      if (validationError) {
+        setError(validationError)
+        return
       }
-
-      // Update form data with file URLs
-      setFormData(prev => {
-        if (field.validation?.multiple) {
-          // Multiple files: append new URLs to existing array
-          const existingUrls = Array.isArray(prev[fieldName]) ? prev[fieldName] : []
-          return {
-            ...prev,
-            [fieldName]: [...existingUrls, ...uploadedFiles.map(f => f.fileUrl)]
-          }
-        } else {
-          // Single file: replace with new URL
-          return {
-            ...prev,
-            [fieldName]: uploadedFiles[0]?.fileUrl || ''
-          }
-        }
-      })
-
-      // Store attachment metadata
-      setUploadedAttachments(prev => [...prev, ...uploadedFiles])
-
-      // Clear the file input to reset the "X files selected" message
-      const fileInput = document.getElementById(fieldName) as HTMLInputElement
-      if (fileInput) {
-        fileInput.value = ''
-      }
-
-    } catch (err) {
-      console.error('File upload error:', err)
-      setError(err instanceof Error ? err.message : 'Upload failed')
-    } finally {
-      setUploadingFiles(prev => ({ ...prev, [fieldName]: false }))
+      validFiles.push(file)
     }
+
+    // 3. Store files locally for later upload
+    setPendingFiles(prev => ({
+      ...prev,
+      [fieldName]: field.validation?.multiple 
+        ? [...(prev[fieldName] || []), ...validFiles]
+        : [validFiles[0]]
+    }))
+    setError(null)
   }
 
   // Handle form submission
@@ -420,6 +373,59 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
         return
       }
 
+      // 1. Upload pending files first
+      const currentAttachments = [...uploadedAttachments]
+      const allFilesToUpload: Array<{ fieldName: string, file: File }> = []
+      
+      Object.entries(pendingFiles).forEach(([fieldName, files]) => {
+        files.forEach(file => allFilesToUpload.push({ fieldName, file }))
+      })
+
+      if (allFilesToUpload.length > 0) {
+        // Mark all fields as uploading for UI feedback
+        const uniqueFieldNames = Array.from(new Set(allFilesToUpload.map(f => f.fieldName)))
+        setUploadingFiles(Object.fromEntries(uniqueFieldNames.map(name => [name, true])))
+
+        try {
+          const uploadPromises = allFilesToUpload.map(({ fieldName, file }, index) => {
+            return uploadFileWithProgress({
+              url: '/api/form-file-upload',
+              file: file,
+              fieldName: 'file',
+              additionalData: {
+                formConfigId: formConfig?.id || '',
+                fieldName: fieldName
+              },
+              onProgress: (event) => {
+                setUploadProgress(prev => ({
+                  ...prev,
+                  [`upload-${index}`]: event.percent
+                }))
+              }
+            })
+          })
+
+          const uploadResults = await Promise.all(uploadPromises)
+          currentAttachments.push(...uploadResults.map((res, idx) => ({
+            fieldName: allFilesToUpload[idx].fieldName,
+            fileName: res.fileName,
+            fileUrl: res.fileUrl,
+            fileSize: res.fileSize,
+            fileType: res.fileType,
+            uploadedAt: res.uploadedAt
+          })))
+        } catch (uploadErr) {
+          console.error('File upload during submission failed:', uploadErr)
+          setError('Failed to upload files. Please try again.')
+          setSubmitting(false)
+          setUploadingFiles({})
+          return
+        } finally {
+          setUploadingFiles({})
+          setUploadProgress({})
+        }
+      }
+
       // Submit form
       const res = await fetch("/api/form-submissions", {
         method: "POST",
@@ -430,7 +436,7 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
           formId: formConfig?.id,
           formName: formConfig?.name,
           data: formData,
-          attachments: uploadedAttachments,
+          attachments: currentAttachments,
           locale,
           sourcePage: window.location.href,
           // Include turnstile token if captcha is enabled
@@ -763,10 +769,27 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
               disabled={uploadingFiles[field.fieldName]}
               className={baseInputClass}
             />
+            {!uploadingFiles[field.fieldName] && (
+              <div className="mt-2 text-sm text-gray-500">
+                {((pendingFiles[field.fieldName]?.length || 0) + uploadedAttachments.filter(a => a.fieldName === field.fieldName).length) > 0 ? (
+                  <span className="text-green-600 font-medium">
+                    {(pendingFiles[field.fieldName]?.length || 0) + uploadedAttachments.filter(a => a.fieldName === field.fieldName).length} file(s) selected
+                  </span>
+                ) : (
+                  <span>No file selected</span>
+                )}
+              </div>
+            )}
             {uploadingFiles[field.fieldName] && (
               <div className="mt-2 text-sm text-blue-600 flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                Uploading...
+                {(() => {
+                  const fieldProgressKeys = Object.keys(uploadProgress).filter(k => k.startsWith(`${field.fieldName}-`));
+                  if (fieldProgressKeys.length === 0) return "Uploading...";
+                  const total = fieldProgressKeys.reduce((acc, k) => acc + uploadProgress[k], 0);
+                  const avg = Math.round(total / fieldProgressKeys.length);
+                  return `Uploading ${avg}%...`;
+                })()}
               </div>
             )}
             {/* Display uploaded files for this field */}

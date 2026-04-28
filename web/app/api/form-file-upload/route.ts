@@ -195,42 +195,46 @@ export async function POST(request: NextRequest) {
     // 4. Fetch form configuration to get file upload limits
     const cmsUrl = process.env.CMS_URL ||
       (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : (process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'https://cms.busromhouse.com'))
-    const formConfigResponse = await fetch(`${cmsUrl}/api/graphql`, {
-      method: 'POST',
+    
+    // Try to fetch by ID using REST API first
+    const formConfigResponse = await fetch(`${cmsUrl}/api/form-configs/${formConfigId}?locale=all`, {
+      method: 'GET',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: `
-          query GetFormConfig($id: ID!) {
-            formConfig(where: { id: $id }) {
-              id
-              name
-              fields
-              maxTotalFileSize
-              maxFilesPerSubmission
-              maxFileUploadsPerDay
-            }
-          }
-        `,
-        variables: { id: formConfigId }
-      })
     })
 
-    if (!formConfigResponse.ok) {
-      console.error('❌ Failed to fetch form config')
-      return NextResponse.json({ error: 'Invalid form configuration' }, { status: 400 })
+    let formConfig = await formConfigResponse.json()
+
+    // Fallback: if findByID fails or returns error, try searching by name (slug)
+    if (!formConfigResponse.ok || !formConfig || !formConfig.id) {
+      console.log(`[Upload API] ID fetch failed for ${formConfigId}, trying name search...`)
+      const nameSearchRes = await fetch(`${cmsUrl}/api/form-configs?where[name][equals]=${encodeURIComponent(formConfigId)}&where[status][equals]=published&locale=all`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (nameSearchRes.ok) {
+        const searchData = await nameSearchRes.json()
+        if (searchData.docs && searchData.docs.length > 0) {
+          formConfig = searchData.docs[0]
+        }
+      }
     }
 
-    const formConfigData = await formConfigResponse.json()
-    const formConfig = formConfigData.data?.formConfig
+    if (!formConfig || (!formConfig.id && !formConfig.docs)) {
+      console.error(`❌ Form configuration not found for ID: ${formConfigId}`)
+      return NextResponse.json({ error: `Form configuration not found (ID: ${formConfigId})` }, { status: 404 })
+    }
 
-    if (!formConfig) {
-      return NextResponse.json({ error: 'Form configuration not found' }, { status: 404 })
+    // Payload REST findByID returns the object, find returns { docs: [] }
+    const actualConfig = formConfig.docs ? formConfig.docs[0] : formConfig
+    
+    if (!actualConfig) {
+      return NextResponse.json({ error: 'Form configuration empty' }, { status: 404 })
     }
 
     // 5. Get field configuration for the specific field
-    // Fields are stored per language, use 'en' as base
-    const fieldsData = formConfig.fields || {}
-    const fields = fieldsData.en || []
+    // Payload might return fields directly or nested under a locale if using locale=all
+    const rawFields = actualConfig.fields || []
+    const fields = Array.isArray(rawFields) ? rawFields : (rawFields.en || [])
     const fieldConfig = fields.find((f: any) => f.fieldName === fieldName)
 
     if (!fieldConfig || fieldConfig.fieldType !== 'file') {

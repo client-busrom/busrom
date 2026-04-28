@@ -354,7 +354,7 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                 {/* 竖排标题 */}
                 <div className="flex-1 flex items-center justify-center">
                   <span
-                    className="text-xl font-anaheim text-brand-cream whitespace-nowrap"
+                    className="text-xl font-anaheim text-brand-cream whitespace-nowrap tracking-[0.2em]"
                     style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
                   >
                     {activeSeries?.title || "Series Title"}

@@ -7,6 +7,7 @@ import { Turnstile } from "@/components/ui/turnstile"
 import { cn } from "@/lib/utils"
 import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput"
 import { ChevronDown } from 'lucide-react'
+import { uploadFileWithProgress } from "@/lib/upload"
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920
@@ -140,6 +141,7 @@ export function ContactFormSection({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
   const [errorMessage, setErrorMessage] = useState("")
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isHoveringControl, setIsHoveringControl] = useState(false)
 
@@ -288,19 +290,26 @@ export function ContactFormSection({
       let fileUrl = ""
       const formId = mergedConfig?.id || configData?.id
       if (uploadedFile && formId) {
-        const fileFormData = new FormData()
-        fileFormData.append("file", uploadedFile)
-        fileFormData.append("formConfigId", formId)
-        fileFormData.append("fieldName", "attachment")
-
-        const uploadRes = await fetch("/api/form-file-upload", {
-          method: "POST",
-          body: fileFormData,
-        })
-
-        if (uploadRes.ok) {
-          const uploadResult = await uploadRes.json()
+        setUploadProgress(0)
+        try {
+          const uploadResult = await uploadFileWithProgress({
+            url: "/api/form-file-upload",
+            file: uploadedFile,
+            fieldName: "file",
+            additionalData: {
+              formConfigId: formId,
+              fieldName: "attachment"
+            },
+            onProgress: (event) => {
+              setUploadProgress(event.percent)
+            }
+          })
           fileUrl = uploadResult.fileUrl
+        } catch (uploadErr) {
+          console.error("Upload error:", uploadErr)
+          throw new Error("Failed to upload file. Please try again.")
+        } finally {
+          setUploadProgress(0)
         }
       }
 
@@ -762,7 +771,13 @@ export function ContactFormSection({
             marginTop: vw(10),
           }}
         >
-          {isSubmitting ? (formConfig?.submittingText || "Submitting...") : submitStatus === "success" ? (locale === 'zh' ? '已提交!' : 'Submitted!') : (effectiveSubmitText || "Submit Your Project")}
+          {isSubmitting 
+            ? (uploadProgress > 0 && uploadProgress < 100 
+                ? `Uploading ${uploadProgress}%...` 
+                : (mergedConfig?.submittingText || "Submitting...")) 
+            : submitStatus === "success" 
+              ? (locale === 'zh' ? '已提交!' : 'Submitted!') 
+              : (effectiveSubmitText || "Submit Your Project")}
         </button>
 
         {/* 错误提示 */}

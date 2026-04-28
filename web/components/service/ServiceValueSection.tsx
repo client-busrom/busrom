@@ -636,7 +636,7 @@ export function ServiceValueSection({
               width: vw(474),
               height: vw(284),
               borderRadius: vw(30),
-              backgroundColor: "#ded69880",
+              backgroundColor: "#ded698B3",
             }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

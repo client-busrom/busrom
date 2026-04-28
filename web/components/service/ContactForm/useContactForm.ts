@@ -15,7 +15,7 @@ export const incrementSubmissionCount = (formName: string): void => {
   sessionStorage.setItem(key, String(current + 1));
 };
 
-export const useContactForm = (initialFormConfig: FormConfig | undefined, formName: string) => {
+export const useContactForm = (initialFormConfig: FormConfig | undefined, formName: string, locale?: string) => {
   const [formConfig, setFormConfig] = useState<FormConfig | null>(initialFormConfig || null);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(!initialFormConfig);
@@ -24,6 +24,7 @@ export const useContactForm = (initialFormConfig: FormConfig | undefined, formNa
   const [error, setError] = useState<string | null>(null);
   const [uploadingFiles, setUploadingFiles] = useState<Record<string, boolean>>({});
   const [uploadedAttachments, setUploadedAttachments] = useState<any[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<Record<string, File[]>>({});
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [isGloballyAccepted, setIsGloballyAccepted] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -36,15 +37,47 @@ export const useContactForm = (initialFormConfig: FormConfig | undefined, formNa
   );
 
   useEffect(() => {
-    if (initialFormConfig) {
+    if (initialFormConfig && initialFormConfig.fields) {
       const initialData: Record<string, any> = {};
-      initialFormConfig.fields?.forEach((field: FormField) => {
+      initialFormConfig.fields.forEach((field: FormField) => {
         initialData[field.fieldName] = field.fieldType === "checkbox" ? [] : "";
       });
       setFormData(initialData);
       setSubmissionCount(getSubmissionCount(formName));
+      setFormConfig(initialFormConfig);
+      setLoading(false);
     }
   }, [initialFormConfig, formName]);
+
+  // Fetch form configuration if not provided or incomplete
+  useEffect(() => {
+    if (initialFormConfig?.id) return;
+
+    const fetchConfig = async () => {
+      if (!formName) return;
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/form-config/${formName}?locale=${locale}`);
+        if (res.ok) {
+          const config = await res.json();
+          setFormConfig(config);
+          
+          // Initialize data if not already set
+          const initialData: Record<string, any> = {};
+          config.fields.forEach((field: FormField) => {
+            initialData[field.fieldName] = field.fieldType === "checkbox" ? [] : "";
+          });
+          setFormData(prev => ({ ...initialData, ...prev }));
+        }
+      } catch (err) {
+        console.error("Error fetching form config:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchConfig();
+  }, [formName, locale, initialFormConfig?.id]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -105,49 +138,55 @@ export const useContactForm = (initialFormConfig: FormConfig | undefined, formNa
     });
   };
 
-  const handleFileUpload = async (fieldName: string, files: FileList | null, field: FormField) => {
-    if (!files || files.length === 0) return;
-    setUploadingFiles((prev) => ({ ...prev, [fieldName]: true }));
-    setError(null);
-    try {
-      const uploadedFiles: any[] = [];
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const formDataUpload = new FormData();
-        formDataUpload.append("file", file);
-        formDataUpload.append("formConfigId", formConfig?.id || "");
-        formDataUpload.append("fieldName", fieldName);
-        const response = await fetch("/api/form-file-upload", { method: "POST", body: formDataUpload });
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Upload failed");
-        }
-        const result = await response.json();
-        uploadedFiles.push({
-          fieldName,
-          fileName: result.fileName,
-          fileUrl: result.fileUrl,
-          fileSize: result.fileSize,
-          fileType: result.fileType,
-          uploadedAt: result.uploadedAt,
-        });
-      }
-      setFormData((prev) => {
-        if (field.validation?.multiple) {
-          const existingUrls = Array.isArray(prev[fieldName]) ? prev[fieldName] : [];
-          return { ...prev, [fieldName]: [...existingUrls, ...uploadedFiles.map((f) => f.fileUrl)] };
-        } else {
-          return { ...prev, [fieldName]: uploadedFiles[0]?.fileUrl || "" };
-        }
-      });
-      setUploadedAttachments((prev) => [...prev, ...uploadedFiles]);
-    } catch (err) {
-      console.error("File upload error:", err);
-      setError(err instanceof Error ? err.message : "Upload failed");
-    } finally {
-      setUploadingFiles((prev) => ({ ...prev, [fieldName]: false }));
-    }
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+
+  const validateFile = (file: File, field: FormField) => {
+    const maxSize = field.validation?.maxSize || 5 * 1024 * 1024; // Default 5MB
+    if (file.size > maxSize) return `File ${file.name} is too large. Max size is ${Math.round(maxSize / 1024 / 1024)}MB.`;
+    const allowedTypes = field.validation?.allowedTypes || [];
+    if (allowedTypes.length > 0 && !allowedTypes.includes(file.type)) return `File ${file.name} type is not supported.`;
+    return null;
   };
+
+  const handleFileUpload = (fieldName: string, files: FileList | null, field: FormField) => {
+    if (!files || files.length === 0) return;
+
+    // 提示用户：由于文件可能很大，我们会在您点击“提交”并验证通过后再进行上传
+    const missingFields: string[] = [];
+    formConfig?.fields.forEach((f) => {
+      if (f.required && f.fieldType !== "file") {
+        const value = formData[f.fieldName];
+        if (!value || (Array.isArray(value) && value.length === 0)) {
+          missingFields.push(f.label);
+        }
+      }
+    });
+
+    if (missingFields.length > 0) {
+      setError(`Please fill in required fields (${missingFields.join(", ")}) before selecting files.`);
+      return;
+    }
+    
+    // 仅做本地校验，不立即上传
+    const newFiles: File[] = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const validationError = validateFile(file, field);
+      if (validationError) {
+        setError(validationError);
+        return;
+      }
+      newFiles.push(file);
+    }
+
+    setPendingFiles(prev => ({
+      ...prev,
+      [fieldName]: newFiles
+    }));
+    setError(null);
+  };
+
+
 
   const handleSubmit = async (e: FormEvent, locale: string) => {
     e.preventDefault();
@@ -175,6 +214,71 @@ export const useContactForm = (initialFormConfig: FormConfig | undefined, formNa
         setError(formConfig?.errorCaptchaMessage || "Please complete the captcha verification");
         setSubmitting(false);
         return;
+      }
+
+      // 2. Upload pending files
+      const attachments = [...uploadedAttachments];
+      const formId = formConfig?.id || (initialFormConfig as any)?.id;
+      if (!formId) {
+        setError("Form configuration not loaded. Please refresh and try again.");
+        setSubmitting(false);
+        return;
+      }
+      
+      const allPendingFiles: Array<{ fieldName: string, file: File }> = [];
+      Object.entries(pendingFiles).forEach(([fieldName, files]) => {
+        files.forEach(file => allPendingFiles.push({ fieldName, file }));
+      });
+
+      if (allPendingFiles.length > 0) {
+        // Set uploading state for UI feedback
+        const uploadingStates = Object.fromEntries(
+          allPendingFiles.map(f => [f.fieldName, true])
+        );
+        setUploadingFiles(uploadingStates);
+
+        try {
+          const uploadPromises = allPendingFiles.map(({ fieldName, file }, index) => {
+          return new Promise<any>((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            const formDataUpload = new FormData();
+            formDataUpload.append("file", file);
+            formDataUpload.append("formConfigId", formId);
+            formDataUpload.append("fieldName", fieldName);
+
+            xhr.upload.onprogress = (event) => {
+              if (event.lengthComputable) {
+                const percent = Math.round((event.loaded / event.total) * 100);
+                setUploadProgress(prev => ({ ...prev, [`${fieldName}-${index}`]: percent }));
+              }
+            };
+
+            xhr.onload = () => {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                const result = JSON.parse(xhr.responseText);
+                resolve({ ...result, fieldName });
+              } else {
+                try {
+                  const errorData = JSON.parse(xhr.responseText);
+                  reject(new Error(errorData.error || `Upload failed with status ${xhr.status}`));
+                } catch {
+                  reject(new Error(`Upload failed with status ${xhr.status}`));
+                }
+              }
+            };
+            xhr.onerror = () => reject(new Error("Network error"));
+            xhr.open("POST", "/api/form-file-upload");
+            xhr.send(formDataUpload);
+          });
+        });
+
+          const results = await Promise.all(uploadPromises);
+          attachments.push(...results);
+        } finally {
+          setUploadingFiles({});
+          setUploadProgress({});
+          setPendingFiles({});
+        }
       }
 
       const processedData = { ...formData };
@@ -212,7 +316,7 @@ export const useContactForm = (initialFormConfig: FormConfig | undefined, formNa
           formId: formConfig?.id,
           formName: formConfig?.name,
           data: processedData,
-          attachments: uploadedAttachments,
+          attachments: attachments,
           locale,
           sourcePage: window.location.href,
           turnstileToken: shouldShowCaptcha ? turnstileToken : undefined,
@@ -269,6 +373,7 @@ export const useContactForm = (initialFormConfig: FormConfig | undefined, formNa
     error,
     uploadingFiles,
     uploadedAttachments,
+    pendingFiles,
     privacyAccepted,
     isGloballyAccepted,
     turnstileToken,
@@ -283,5 +388,6 @@ export const useContactForm = (initialFormConfig: FormConfig | undefined, formNa
     handleFileUpload,
     handleSubmit,
     getFieldsByType,
+    uploadProgress,
   };
 };

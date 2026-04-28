@@ -114,9 +114,9 @@ export function DesktopTopSection({
                 }}
               >
                 <span
-                  className={`font-anaheim text-[#FFF38E] transition-all duration-300 ${isActive ? "font-bold scale-110" : "font-medium scale-100"}`}
+                  className={`font-anaheim text-[#FFF38E] transition-all duration-300 ${isActive ? "font-bold" : "font-medium"}`}
                   style={{
-                    fontSize: vw(29),
+                    fontSize: isActive ? vw(32) : vw(29),
                     display: "inline-block",
                   }}
                 >
@@ -206,9 +206,14 @@ export function DesktopTopSection({
           <motion.div
             key={`top-${activeCategoryIndex}`}
             initial={{ opacity: 0, scale: 1.15 }}
-            animate={{ opacity: 1, scale: 1 }}
+            animate={{ opacity: 1, scale: 1.05 }}
             exit={{ opacity: 0, scale: 1.1 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            whileHover={{ scale: 1.12 }}
+            transition={{ 
+              duration: 0.25, 
+              ease: "easeOut",
+              scale: { type: "spring", stiffness: 400, damping: 15 }
+            }}
             className="w-full h-full absolute inset-0 overflow-hidden"
             style={{ borderRadius: vw(21) }}
           >
@@ -255,9 +260,14 @@ export function DesktopTopSection({
           <motion.div
             key={`bottom-${activeCategoryIndex}`}
             initial={{ opacity: 0, scale: 1.15 }}
-            animate={{ opacity: 1, scale: 1 }}
+            animate={{ opacity: 1, scale: 1.05 }}
             exit={{ opacity: 0, scale: 1.1 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            whileHover={{ scale: 1.12 }}
+            transition={{ 
+              duration: 0.25, 
+              ease: "easeOut",
+              scale: { type: "spring", stiffness: 400, damping: 15 }
+            }}
             className="w-full h-full absolute inset-0 overflow-hidden"
             style={{ borderRadius: vw(21) }}
           >

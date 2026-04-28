@@ -12,6 +12,7 @@ import {
   getObjectPosition,
   cn,
 } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Props = {
   data: HomeContent["productSeriesCarousel"];
@@ -82,6 +83,7 @@ export default function ProductSeriesCarousel({
   headerTheme,
   className,
 }: Props) {
+  const isMobile = useIsMobile();
   // currentIndex 表示当前在"屏内左"位置的 item 索引
   const [currentIndex, setCurrentIndex] = useState(0);
   const [hoveredPosition, setHoveredPosition] = useState<number | null>(null); // 1 或 2（屏内的两个位置）
@@ -278,7 +280,9 @@ export default function ProductSeriesCarousel({
       ? visibleItems[1]?.item
       : hoveredPosition === 2
         ? visibleItems[2]?.item
-        : null;
+        : isMobile
+          ? visibleItems[1]?.item
+          : null;
 
   // 弧线动画配置
   const arcTransition = {
@@ -288,9 +292,9 @@ export default function ProductSeriesCarousel({
 
   return (
     <section
-      className={cn("relative bg-[#756F3F] overflow-hidden py-12 lg:py-[60px]", className)}
+      className={cn("relative bg-[#756F3F] overflow-hidden lg:py-[60px]", className)}
       data-header-theme={headerTheme}
-      style={{ aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` }}
+      style={!isMobile ? { aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` } : { minHeight: '500px' }}
       onMouseLeave={() => setHoveredPosition(null)}
     >
       {/* 场景图背景 - 全屏显示需要 large 尺寸 */}
@@ -346,9 +350,9 @@ export default function ProductSeriesCarousel({
       )}
 
       {/* ==================== 移动端布局 ==================== */}
-      <div className="lg:hidden absolute inset-0 flex flex-col py-4">
+      <div className="lg:hidden relative w-full h-full flex flex-col py-12">
         {/* 图片区域 - 占据大部分空间 */}
-        <div className="flex-1 flex items-center justify-center gap-2 px-2">
+        <div className="flex-1 flex items-center justify-center gap-4 px-4 mb-8">
           {/* 左侧图片 + 标题 */}
           <div className="flex flex-col items-center w-[45%]">
             <Link

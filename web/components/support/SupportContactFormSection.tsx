@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput"
 import { ChevronDown } from 'lucide-react'
+import { uploadFileWithProgress } from "@/lib/upload"
 
 const DESIGN_WIDTH = 1920
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
@@ -44,6 +45,7 @@ export function SupportContactFormSection({
   const [formData, setFormData] = useState<Record<string, string>>({})
   const [fileName, setFileName] = useState<string>("")
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -127,23 +129,26 @@ export function SupportContactFormSection({
       // 1. Upload file if exists
       let fileUrl = ""
       if (uploadedFile) {
-        const fileFormData = new FormData()
-        fileFormData.append("file", uploadedFile)
-        fileFormData.append("formConfigId", formId)
-        fileFormData.append("fieldName", "attachment")
-
+        setUploadProgress(0)
         try {
-          const uploadRes = await fetch("/api/form-file-upload", {
-            method: "POST",
-            body: fileFormData,
+          const uploadResult = await uploadFileWithProgress({
+            url: "/api/form-file-upload",
+            file: uploadedFile,
+            fieldName: "file",
+            additionalData: {
+              formConfigId: formId,
+              fieldName: "attachment"
+            },
+            onProgress: (event) => {
+              setUploadProgress(event.percent)
+            }
           })
-
-          if (uploadRes.ok) {
-            const uploadResult = await uploadRes.json()
-            fileUrl = uploadResult.fileUrl
-          }
+          fileUrl = uploadResult.fileUrl
         } catch (e) {
           console.error("FileUpload error:", e)
+          throw new Error("Failed to upload file. Please try again.")
+        } finally {
+          setUploadProgress(0)
         }
       }
 
@@ -412,7 +417,11 @@ export function SupportContactFormSection({
                className="bg-[#564D03] text-white font-anaheim font-bold uppercase transition-all hover:bg-[#3d3602] disabled:opacity-50"
                style={{ height: vw(83), borderRadius: vw(63), fontSize: vw(32), marginTop: vw(10) }}
             >
-               {submitText}
+               {isSubmitting 
+                  ? (uploadProgress > 0 && uploadProgress < 100 
+                      ? `Uploading ${uploadProgress}%...` 
+                      : submitText) 
+                  : submitText}
             </button>
          </form>
       </div>

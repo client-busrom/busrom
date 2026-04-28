@@ -12,8 +12,10 @@ interface DesktopFieldProps {
   handleChange: (fieldName: string, value: any) => void;
   handleCheckboxChange: (fieldName: string, value: string, checked: boolean) => void;
   handleFileUpload: (fieldName: string, files: FileList | null, field: FormField) => void;
-  uploadingFiles: Record<string, boolean>;
   uploadedAttachments: any[];
+  pendingFiles: Record<string, File[]>;
+  uploadingFiles: Record<string, boolean>;
+  uploadProgress: Record<string, number>;
   submitting: boolean;
   locale: string;
 }
@@ -26,7 +28,9 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
   handleCheckboxChange,
   handleFileUpload,
   uploadingFiles,
+  uploadProgress,
   uploadedAttachments,
+  pendingFiles,
   submitting,
   locale,
 }) => {
@@ -495,10 +499,9 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
             >
               {uploadingFiles[field.fieldName]
                 ? "Uploading..."
-                : uploadedAttachments.filter(
-                      (a) => a.fieldName === field.fieldName,
-                    ).length > 0
-                  ? `${uploadedAttachments.filter((a) => a.fieldName === field.fieldName).length} file(s) uploaded`
+                : (Object.keys(pendingFiles).includes(field.fieldName) && pendingFiles[field.fieldName].length > 0) || 
+                  uploadedAttachments.filter(a => a.fieldName === field.fieldName).length > 0
+                  ? `${(pendingFiles[field.fieldName]?.length || 0) + uploadedAttachments.filter(a => a.fieldName === field.fieldName).length} file(s) selected`
                   : field.placeholder || "Upload File"}
             </span>
             <input
@@ -528,8 +531,10 @@ interface MobileFieldProps {
   handleChange: (fieldName: string, value: any) => void;
   handleCheckboxChange: (fieldName: string, value: string, checked: boolean) => void;
   handleFileUpload: (fieldName: string, files: FileList | null, field: FormField) => void;
-  uploadingFiles: Record<string, boolean>;
   uploadedAttachments: any[];
+  pendingFiles: Record<string, File[]>;
+  uploadingFiles: Record<string, boolean>;
+  uploadProgress: Record<string, number>;
   submitting: boolean;
   locale: string;
 }
@@ -541,7 +546,9 @@ export const MobileField: React.FC<MobileFieldProps> = ({
   handleCheckboxChange,
   handleFileUpload,
   uploadingFiles,
+  uploadProgress,
   uploadedAttachments,
+  pendingFiles,
   submitting,
   locale,
 }) => {
@@ -843,16 +850,12 @@ export const MobileField: React.FC<MobileFieldProps> = ({
             htmlFor={`mobile-${field.fieldName}`}
             className="flex items-center justify-center min-h-[52px] h-auto py-[12px] px-[16px] rounded-[12px] bg-[#211C0B]/50 border border-dashed border-white/30 cursor-pointer transition-all hover:bg-[#211C0B]/70"
           >
-            <span 
-              className="font-anaheim font-semibold text-white/50 text-[14px] text-center"
-              style={{ whiteSpace: "pre-wrap" }}
-            >
+            <span className="font-anaheim font-semibold text-white/50 text-center text-[14px]">
               {uploadingFiles[field.fieldName]
                 ? "Uploading..."
-                : uploadedAttachments.filter(
-                      (a) => a.fieldName === field.fieldName,
-                    ).length > 0
-                  ? `${uploadedAttachments.filter((a) => a.fieldName === field.fieldName).length} file(s) uploaded`
+                : (Object.keys(pendingFiles).includes(field.fieldName) && pendingFiles[field.fieldName].length > 0) || 
+                  uploadedAttachments.filter(a => a.fieldName === field.fieldName).length > 0
+                  ? `${(pendingFiles[field.fieldName]?.length || 0) + uploadedAttachments.filter(a => a.fieldName === field.fieldName).length} file(s) selected`
                   : field.placeholder || "Upload File"}
             </span>
             <input
