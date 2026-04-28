@@ -276,6 +276,30 @@ const bagelFatOne = localFont({
   preload: false,
 });
 
+const pollerOne = localFont({
+  src: "../../public/fonts/PollerOne-Regular.woff2",
+  weight: "400",
+  variable: "--font-poller-one",
+  display: "swap",
+  preload: false,
+});
+
+const pavanam = localFont({
+  src: "../../public/fonts/Pavanam-Regular.woff2",
+  weight: "400",
+  variable: "--font-pavanam",
+  display: "swap",
+  preload: false,
+});
+
+const phudu = localFont({
+  src: "../../public/fonts/Phudu-Variable.woff2",
+  weight: "400 900",
+  variable: "--font-phudu",
+  display: "swap",
+  preload: false,
+});
+
 export function generateStaticParams() {
   return locales.map(locale => ({ locale }));
 }
@@ -379,6 +403,9 @@ export default async function RootLayout({
         ${agbalumo.variable}
         ${tenorSans.variable}
         ${bagelFatOne.variable}
+        ${pollerOne.variable}
+        ${pavanam.variable}
+        ${phudu.variable}
         antialiased
       `}
     >

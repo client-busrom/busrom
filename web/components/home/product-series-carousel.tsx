@@ -92,15 +92,24 @@ export default function ProductSeriesCarousel({
   const [isHoveringContainer, setIsHoveringContainer] = useState(false);
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
-  const springConfig = { damping: 25, stiffness: 300, mass: 0.5 };
+  // 调紧弹簧配置：stiffness 加大，damping 减小，使其更跟手
+  const springConfig = { damping: 20, stiffness: 400, mass: 0.1 };
   const cursorXSpring = useSpring(cursorX, springConfig);
   const cursorYSpring = useSpring(cursorY, springConfig);
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
       const rect = e.currentTarget.getBoundingClientRect();
-      cursorX.set(e.clientX - rect.left);
-      cursorY.set(e.clientY - rect.top);
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      // 更新坐标 (MotionValue 是非响应式的，不会触发重绘)
+      cursorX.set(x);
+      cursorY.set(y);
+
+      // 只在跨越中线时更新状态，避免无效重绘
+      const newPos = x < rect.width / 2 ? 1 : 2;
+      setHoveredPosition(prev => prev === newPos ? prev : newPos);
     },
     [cursorX, cursorY],
   );
@@ -282,15 +291,6 @@ export default function ProductSeriesCarousel({
       className={cn("relative bg-[#756F3F] overflow-hidden", className)}
       data-header-theme={headerTheme}
       style={{ aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` }}
-      onMouseMove={(e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        if (x < rect.width / 2) {
-          setHoveredPosition(1);
-        } else {
-          setHoveredPosition(2);
-        }
-      }}
       onMouseLeave={() => setHoveredPosition(null)}
     >
       {/* 场景图背景 - 全屏显示需要 large 尺寸 */}
