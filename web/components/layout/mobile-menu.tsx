@@ -67,15 +67,17 @@ export function MobileMenu({ isOpen, onClose, navigationItems = [] }: MobileMenu
   const prevPathnameRef = useRef(pathname)
   const menuContentRef = useRef<HTMLDivElement>(null)
 
-  // 锁定 body 滚动
+  // 锁定 body 滚动 - 仅在移动端可见时锁定
   useEffect(() => {
-    if (isOpen) {
+    const isMobileView = () => window.innerWidth < 1024; // 1024 是 lg 的断点
+    
+    if (isOpen && isMobileView()) {
       document.body.style.overflow = "hidden"
     } else {
-      document.body.style.overflow = "auto"
+      document.body.style.overflow = "" // 使用空字符串让它恢复到 CSS 默认值，而不是强制 auto
     }
     return () => {
-      document.body.style.overflow = "auto"
+      document.body.style.overflow = ""
     }
   }, [isOpen])
 

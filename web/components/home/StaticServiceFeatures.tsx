@@ -25,7 +25,7 @@ export default function StaticServiceFeatures({ data }: Props) {
   const activeFeature = features[0]; // 静态版只显示第一个
 
   return (
-    <section className="py-16 lg:py-24 bg-brand-main" data-header-theme="light">
+    <section className="py-16 lg:py-24 bg-brand-main" >
       <div className="container mx-auto px-4">
         {/* 主容器：米色圆角背景 */}
         <div

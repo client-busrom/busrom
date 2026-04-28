@@ -2,7 +2,15 @@
 "use client";
 
 import * as React from "react";
-import { useState, useEffect, useRef, useCallback, lazy, Suspense, ComponentType } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  lazy,
+  Suspense,
+  ComponentType,
+} from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
 import { type CarouselApi } from "@/components/ui/carousel";
@@ -27,7 +35,10 @@ type BannerData = HomeContent["heroBanner"][number];
 type BannerComponentType = ComponentType<{ data: BannerData; locale: Locale }>;
 
 // 延迟加载的 Banner 组件（2-9 延迟加载）
-const lazyBanners: Record<number, () => Promise<{ default: BannerComponentType }>> = {
+const lazyBanners: Record<
+  number,
+  () => Promise<{ default: BannerComponentType }>
+> = {
   2: () => import("@/components/HeroBanner/HeroBanner2"),
   3: () => import("@/components/HeroBanner/HeroBanner3"),
   4: () => import("@/components/HeroBanner/HeroBanner4"),
@@ -47,7 +58,9 @@ const HEIGHT_CLASS = `h-[calc(100vh-46px)] ${MIN_HEIGHT}`;
 // 占位组件 - 用于 Banner 加载中
 function BannerPlaceholder() {
   return (
-    <div className={`w-full h-full ${MIN_HEIGHT} bg-gradient-to-br from-[#F6F4ED] to-[#E8E4D9]`} />
+    <div
+      className={`w-full h-full ${MIN_HEIGHT} bg-gradient-to-br from-[#F6F4ED] to-[#E8E4D9]`}
+    />
   );
 }
 
@@ -61,7 +74,9 @@ export default function HeroBanner({ data, locale }: Props) {
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // 已加载的 Banner 组件缓存（只有第1个直接可用）
-  const [loadedBanners, setLoadedBanners] = useState<Record<number, BannerComponentType>>({
+  const [loadedBanners, setLoadedBanners] = useState<
+    Record<number, BannerComponentType>
+  >({
     1: HeroBanner1,
   });
 
@@ -73,7 +88,7 @@ export default function HeroBanner({ data, locale }: Props) {
       delay: AUTOPLAY_DELAY,
       stopOnInteraction: false,
       stopOnMouseEnter: true,
-    })
+    }),
   );
 
   // 预加载 Banner（不依赖 state，避免无限循环）
@@ -134,7 +149,7 @@ export default function HeroBanner({ data, locale }: Props) {
 
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     observer.observe(section);
@@ -145,7 +160,7 @@ export default function HeroBanner({ data, locale }: Props) {
   useEffect(() => {
     if (!api || !data || data.length === 0) return;
     const autoplay = autoplayPlugin.current;
-    if (autoplay && typeof autoplay.play === 'function') {
+    if (autoplay && typeof autoplay.play === "function") {
       if (isVisible) {
         autoplay.play();
       } else {
@@ -229,7 +244,10 @@ export default function HeroBanner({ data, locale }: Props) {
               const BannerComponent = loadedBanners[bannerIndex];
 
               return (
-                <CarouselItem key={index} className={`h-full ${MIN_HEIGHT} p-0 basis-full flex`}>
+                <CarouselItem
+                  key={index}
+                  className={`h-full ${MIN_HEIGHT} p-0 basis-full flex`}
+                >
                   {BannerComponent ? (
                     <BannerComponent data={bannerData} locale={locale} />
                   ) : (
@@ -239,7 +257,9 @@ export default function HeroBanner({ data, locale }: Props) {
               );
             })
           ) : (
-            <CarouselItem className={`h-full ${MIN_HEIGHT} p-0 flex items-center justify-center bg-gray-700 text-white`}>
+            <CarouselItem
+              className={`h-full ${MIN_HEIGHT} p-0 flex items-center justify-center bg-gray-700 text-white`}
+            >
               No banner data available.
             </CarouselItem>
           )}
@@ -254,7 +274,7 @@ export default function HeroBanner({ data, locale }: Props) {
           {/* 底部进度条 - 从 left 15% 到 50% */}
           <div
             className="absolute bottom-7 z-10 h-[2px] bg-white/50"
-            style={{ left: '15%', width: '35%' }}
+            style={{ left: "15%", width: "35%" }}
           >
             <div
               className="h-full bg-white"
@@ -266,16 +286,16 @@ export default function HeroBanner({ data, locale }: Props) {
           <div
             className="absolute bottom-3 z-10 flex items-baseline text-white font-anaheim"
             style={{
-              right: '15%',
-              textShadow: '0 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.3)',
+              right: "15%",
+              textShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.3)",
             }}
           >
             <span className="text-2xl font-bold">
-              {String(currentSlide + 1).padStart(2, '0')}
+              {String(currentSlide + 1).padStart(2, "0")}
             </span>
             <span className="text-base text-white/80 mx-1">/</span>
             <span className="text-base text-white/80">
-              {String(scrollSnaps.length).padStart(2, '0')}
+              {String(scrollSnaps.length).padStart(2, "0")}
             </span>
           </div>
         </>

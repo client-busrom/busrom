@@ -10,8 +10,10 @@ import { cn } from "@/lib/utils";
 import type { MainFormData } from "@/lib/content-data";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { Turnstile } from "@/components/ui/turnstile";
-import { PhoneInput } from "@/components/ui/PhoneInput";
+import { LexicalRenderer } from "@/components/lexical/LexicalRenderer";
 import { HollowText } from "@/components/common/HollowText";
+import Magnetic from "@/components/common/Magnetic";
+import { PhoneInput } from "@/components/ui/PhoneInput";
 
 // lg 断点 (1024px) - 与 Tailwind 一致
 const LG_BREAKPOINT = 1024;
@@ -444,7 +446,6 @@ export default function MainForm({ data, locale = "en" }: Props) {
     <section
       ref={sectionRef}
       className="py-32 md:py-40 bg-brand-secondary text-brand-text-inverse overflow-hidden"
-      data-header-theme="transparent"
     >
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 max-w-6xl mx-auto lg:items-center items-center">
@@ -663,21 +664,23 @@ export default function MainForm({ data, locale = "en" }: Props) {
 
                   {/* Submit Button */}
                   <div style={{ marginTop: "clamp(10px, 1vw, 20px)" }}>
-                    <Button
-                      type="submit"
-                      disabled={submitting || (shouldShowCaptcha && !turnstileToken) || (!!formConfig?.privacyConsentText && !privacyAccepted)}
-                      className={cn(formButtonClasses, "disabled:opacity-50 disabled:cursor-not-allowed whitespace-pre-line")}
-                      style={{
-                        width: "clamp(165px, 17.2vw, 331px)",
-                        minHeight: "clamp(34px, 3.5vw, 68px)",
-                        padding: "8px 20px",
-                        fontSize: "clamp(14px, 1.45vw, 24px)", 
-                        lineHeight: "1.2",
-                        height: "auto",
-                      }}
-                    >
-                      {submitting ? (formConfig?.submittingText || "Submitting...") : (formConfig?.submitButtonText || data.buttonText || "Submit")}
-                    </Button>
+                    <Magnetic strength={0.15}>
+                      <Button
+                        type="submit"
+                        disabled={submitting || (shouldShowCaptcha && !turnstileToken) || (!!formConfig?.privacyConsentText && !privacyAccepted)}
+                        className={cn(formButtonClasses, "disabled:opacity-50 disabled:cursor-not-allowed whitespace-pre-line")}
+                        style={{
+                          width: "clamp(165px, 17.2vw, 331px)",
+                          minHeight: "clamp(34px, 3.5vw, 68px)",
+                          padding: "8px 20px",
+                          fontSize: "clamp(14px, 1.45vw, 24px)", 
+                          lineHeight: "1.2",
+                          height: "auto",
+                        }}
+                      >
+                        {submitting ? (formConfig?.submittingText || "Submitting...") : (formConfig?.submitButtonText || data.buttonText || "Submit")}
+                      </Button>
+                    </Magnetic>
                   </div>
                 </form>
               )}

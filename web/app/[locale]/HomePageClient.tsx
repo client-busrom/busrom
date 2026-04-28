@@ -171,7 +171,7 @@ export function HomePageClient({
         <HeroBanner data={content.heroBanner} locale={currentLanguage} />
       </div>
 
-      {/* 模块 2: 产品系列轮播 (浅色背景) - z-10 */}
+      {/* 模块 2: 产品系列轮播 - 设为 transparent (白色字) */}
       <div data-header-theme="transparent" className="relative z-10">
         <ProductSeriesCarousel data={content.productSeriesCarousel} locale={currentLanguage} />
       </div>
@@ -181,12 +181,13 @@ export function HomePageClient({
         <ServiceFeatures data={content.serviceFeatures} />
       </div>
 
+      {/* 模块 4: 3D 地球 - 移出延迟加载，让其内部的 IntersectionObserver 自行决定加载时机 */}
+      <div data-header-theme="transparent">
+        <MemoizedDeferredSphere3D data={content.sphere3d} />
+      </div>
+      
       {/* 首屏之后的内容 - 延迟加载，z-0 确保在首屏下层 */}
-      <DeferredContent threshold={200}>
-        <div data-header-theme="transparent">
-          <MemoizedDeferredSphere3D data={content.sphere3d} />
-        </div>
-
+      <DeferredContent>
         {/* 模块 5: 简易表单跳转 */}
         {content.simpleCta?.images && (
           <LazySection headerTheme="light">
@@ -265,7 +266,9 @@ export function HomePageClient({
         )}
 
         {/* Footer - 首页专用 */}
-        <Footer locale={currentLanguage} showForm={true} />
+        <div data-header-theme="transparent">
+          <Footer locale={currentLanguage} showForm={true} />
+        </div>
       </DeferredContent>
 
     </main>

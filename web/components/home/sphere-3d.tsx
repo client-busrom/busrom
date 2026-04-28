@@ -300,12 +300,27 @@ export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DPro
     return () => observer.disconnect();
   }, []);
 
-  // 当不在视口内时暂停自转
+  // 当不在视口内时暂停自转和渲染
   useEffect(() => {
     if (!isGlobeReady || !globeRef.current) return;
+    
     const controls = globeRef.current.controls();
+    const renderer = globeRef.current.renderer();
+    
     if (controls) {
       controls.autoRotate = isVisible;
+    }
+    
+    if (renderer) {
+      // 极致优化：根据视口状态开启/关闭渲染
+      if (!isVisible) {
+        // 停止动画循环
+        renderer.setAnimationLoop(null);
+      } else {
+        // 恢复动画循环 (react-globe.gl 内部会接管后续帧)
+        // 某些情况下可以通过强制一次重绘来唤醒
+        renderer.render(globeRef.current.scene(), globeRef.current.camera());
+      }
     }
   }, [isVisible, isGlobeReady]);
 
@@ -462,7 +477,7 @@ export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DPro
     <section
       ref={sectionRef}
       className="relative w-full overflow-hidden"
-      data-header-theme="transparent"
+      
       style={{ height: "100vh", minHeight: "600px", background: "radial-gradient(ellipse at center, #0a1628 0%, #020408 100%)" }}
     >
       <div ref={containerRef} className="absolute inset-0">

@@ -137,7 +137,7 @@ export default function QuoteSteps({ data }: Props) {
     <section
       ref={sectionRef}
       className="relative bg-brand-main overflow-hidden"
-      data-header-theme="light"
+      
     >
       {/* ==================== Desktop Layout (md+) ==================== */}
       <div

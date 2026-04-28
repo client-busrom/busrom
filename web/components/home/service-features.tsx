@@ -122,7 +122,7 @@ export default function ServiceFeatures({ data }: Props) {
     <section
       ref={sectionRef}
       className="py-16 lg:py-24 bg-brand-main"
-      data-header-theme="light"
+      
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >

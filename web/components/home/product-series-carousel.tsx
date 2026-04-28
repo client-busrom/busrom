@@ -254,7 +254,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
   return (
     <section
       className="relative bg-[#756F3F] overflow-hidden"
-      data-header-theme="transparent"
+      
       style={{ aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` }}
       onMouseMove={(e) => {
         const rect = e.currentTarget.getBoundingClientRect();

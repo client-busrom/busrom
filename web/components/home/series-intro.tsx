@@ -253,7 +253,7 @@ export default function SeriesIntro({ data }: Props) {
     <section
       ref={sectionRef}
       className="py-6 lg:py-8 bg-brand-main"
-      data-header-theme="transparent"
+      
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >

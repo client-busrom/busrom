@@ -146,7 +146,7 @@ export default function CaseStudies({ data }: Props) {
   return (
     <section
       className="relative bg-brand-main md:pb-24 py-12"
-      data-header-theme="light"
+      
     >
       {/* ==================== 移动端布局 ==================== */}
       <div className="md:hidden container mx-auto px-4">

@@ -181,7 +181,7 @@ export default function BrandAdvantages({ data }: Props) {
     <section
       ref={sectionRef}
       className="bg-gray-800 text-white relative"
-      data-header-theme="transparent"
+      
       style={{ minHeight: `${SECTION_HEIGHT}px` }}
     >
       {data.image?.url && (

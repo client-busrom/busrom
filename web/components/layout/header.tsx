@@ -42,129 +42,84 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
       fallbackData: initialNavigation,
       revalidateOnMount: !initialNavigation, // 有初始数据时不立即重新验证
       revalidateOnFocus: false, // 窗口获得焦点时不重新验证
-    }
+    },
   );
 
   // 5. 关键：IntersectionObserver + MutationObserver 逻辑
   // 支持 LazySection 动态渲染的场景
+  // 🚀 使用 GSAP ScrollTrigger 接管变色逻辑 (极致性能 & 稳定性)
   useEffect(() => {
-    let intersectionObserver: IntersectionObserver | null = null;
+    let ctx: any;
     let mutationObserver: MutationObserver | null = null;
-    let observedElements = new Set<Element>();
-    
-    // 缓存所有带有 data-header-theme 的元素，避免滚动时频繁查询 DOM
-    let cachedSections: HTMLElement[] = [];
 
-    const updateCachedSections = () => {
-      cachedSections = Array.from(document.querySelectorAll("[data-header-theme]")) as HTMLElement[];
-    };
+    const initScrollTrigger = async () => {
+      const [{ gsap }, { ScrollTrigger }] = await Promise.all([
+        import("gsap"),
+        import("gsap/ScrollTrigger"),
+      ]);
+      gsap.registerPlugin(ScrollTrigger);
 
-    // 计算当前应该激活的主题
-    const calculateActiveTheme = () => {
-      if (cachedSections.length === 0) {
-        setTheme("light");
-        return;
-      }
+      // 如果之前的 ScrollTrigger 还在，先全部清理掉，防止重复触发
+      ScrollTrigger.getAll().forEach((st: any) => st.kill());
 
-      const headerHeight = headerRef.current?.offsetHeight || 80;
-      const triggerPoint = headerHeight;
-      let activeSection: Element | null = null;
-      let minTop = Infinity;
-
-      cachedSections.forEach((section) => {
-        const rect = section.getBoundingClientRect();
-        // 元素的顶部已经到达或通过了 header 底部，且元素底部还在视口中
-        const hasPassedHeader = rect.top <= triggerPoint && rect.bottom > 0;
-
-        if (hasPassedHeader && rect.top < minTop) {
-          minTop = rect.top;
-          activeSection = section;
-        }
-      });
-
-      if (activeSection) {
-        const newTheme = (activeSection as HTMLElement).dataset.headerTheme as HeaderTheme;
-        setTheme(newTheme);
-      }
-    };
-
-    // 设置或更新 IntersectionObserver
-    const setupIntersectionObserver = () => {
-      updateCachedSections(); // 更新缓存
-
-      if (!intersectionObserver) {
-        intersectionObserver = new IntersectionObserver(
-          () => calculateActiveTheme(),
-          {
-            rootMargin: "0px 0px -90% 0px",
-            threshold: [0],
+      ctx = gsap.context(() => {
+        const sections = document.querySelectorAll("[data-header-theme]");
+        
+        // --- 立即检测逻辑：确保初始化时主题正确 ---
+        let detectedTheme: string | null = null;
+        sections.forEach((section) => {
+          const rect = section.getBoundingClientRect();
+          // 如果板块正在覆盖 Header 区域 (Header 高度约 46px)
+          if (rect.top <= 50 && rect.bottom >= 20) {
+            detectedTheme = section.getAttribute("data-header-theme");
           }
-        );
-      }
+        });
+        if (detectedTheme) setTheme(detectedTheme as any);
+        // ---------------------------------------
 
-      cachedSections.forEach((section) => {
-        if (!observedElements.has(section)) {
-          intersectionObserver!.observe(section);
-          observedElements.add(section);
-        }
-      });
+        sections.forEach((section) => {
+          const theme = section.getAttribute("data-header-theme");
+          if (!theme) return;
 
-      observedElements.forEach((element) => {
-        if (!document.body.contains(element)) {
-          intersectionObserver!.unobserve(element);
-          observedElements.delete(element);
-        }
-      });
-
-      calculateActiveTheme();
-    };
-
-    const timer = setTimeout(() => {
-      setupIntersectionObserver();
-
-      mutationObserver = new MutationObserver((mutations) => {
-        let needsUpdate = false;
-        mutations.forEach((mutation) => {
-          mutation.addedNodes.forEach((node) => {
-            if (node instanceof Element && (node.hasAttribute('data-header-theme') || node.querySelector('[data-header-theme]'))) {
-              needsUpdate = true;
-            }
-          });
-          mutation.removedNodes.forEach((node) => {
-            if (node instanceof Element && (node.hasAttribute('data-header-theme') || node.querySelector('[data-header-theme]'))) {
-              needsUpdate = true;
+          ScrollTrigger.create({
+            trigger: section,
+            start: "top 46px",    // 46px 是 header 的大致高度
+            end: "bottom 46px",
+            onEnter: () => setTheme(theme as any),
+            onEnterBack: () => setTheme(theme as any),
+            // 确保在刷新或初次加载时激活正确的主题
+            onRefresh: (self) => {
+              if (self.isActive) setTheme(theme as any);
             }
           });
         });
-
-        if (needsUpdate) {
-          requestAnimationFrame(setupIntersectionObserver);
-        }
       });
-
-      mutationObserver.observe(document.body, { childList: true, subtree: true });
-    }, 100);
-
-    // 滚动节流优化（Throttle）：限制计算频率，彻底解决滚动卡顿（Layout Thrashing）
-    let throttleTimer: NodeJS.Timeout | null = null;
-    const handleScroll = () => {
-      if (throttleTimer) return;
-      throttleTimer = setTimeout(() => {
-        calculateActiveTheme();
-        throttleTimer = null;
-      }, 50); // 每 50ms 计算一次，足够平滑且极大地降低了性能消耗
     };
-    
-    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // 1. 延迟初始化，给 LazySection 留出渲染时间
+    const timer = setTimeout(initScrollTrigger, 300);
+
+    // 2. 监听 DOM 结构变化 (如 DeferredContent 加载新板块)
+    mutationObserver = new MutationObserver((mutations) => {
+      const hasRelevantChanges = mutations.some(m => 
+        Array.from(m.addedNodes).some(n => n instanceof Element && (n.hasAttribute('data-header-theme') || n.querySelector('[data-header-theme]')))
+      );
+      if (hasRelevantChanges) {
+        initScrollTrigger(); // 重新扫描新加入的板块
+      }
+    });
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
 
     return () => {
       clearTimeout(timer);
-      if (throttleTimer) clearTimeout(throttleTimer);
-      window.removeEventListener('scroll', handleScroll);
-      if (intersectionObserver) intersectionObserver.disconnect();
       if (mutationObserver) mutationObserver.disconnect();
+      if (ctx) ctx.revert();
+      // 彻底清理
+      import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
+        ScrollTrigger.getAll().forEach((st: any) => st.kill());
+      });
     };
-  }, [pathname]); // 当路由变化时重新运行
+  }, [pathname]); // 路由切换时重新绑定
 
   const handleCloseMenu = () => {
     setIsMenuOpen(false);
@@ -172,19 +127,26 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
 
   // 6. 决定最终的样式 (来自你的 Demo 逻辑)
   // 如果菜单打开（移动端或桌面端下拉），强制为 'light' 主题
-  const activeTheme = (isMenuOpen || isDropdownOpen) ? "light" : theme;
+  const activeTheme = isMenuOpen || isDropdownOpen ? "light" : theme;
 
   // 动态计算文字和背景色
-  const headerBgColor = activeTheme === "transparent" ? "bg-transparent" : "bg-brand-main";
-  const headerTextColor = activeTheme === "transparent" ? "text-white" : "text-brand-text-main";
-  const headerHoverBg = activeTheme === "transparent" ? "hover:bg-white/10" : "hover:bg-black/10";
+  const headerBgColor =
+    activeTheme === "transparent" ? "bg-transparent" : "bg-brand-main";
+  const headerTextColor =
+    activeTheme === "transparent" ? "text-white" : "text-brand-text-main";
+  const headerHoverBg =
+    activeTheme === "transparent" ? "hover:bg-white/10" : "hover:bg-black/10";
   const headerShadow = isDropdownOpen ? "shadow-md" : "";
 
   return (
     <>
       <header
         ref={headerRef}
-        className={cn("fixed top-0 left-0 right-0 w-full z-[70] transition-all duration-300 ease-in-out", headerBgColor, headerShadow)}
+        className={cn(
+          "fixed top-0 left-0 right-0 w-full z-[70] transition-all duration-300 ease-in-out",
+          headerBgColor,
+          headerShadow,
+        )}
       >
         <div className="w-full px-4 lg:px-6 xl:px-10 py-2">
           {/* 移动端布局：三列，Logo居中 */}
@@ -198,15 +160,23 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
               className={cn(
                 "p-2 rounded-md transition-colors duration-200",
                 headerTextColor,
-                headerHoverBg
+                headerHoverBg,
               )}
             >
               <Menu className="w-5 h-5" />
             </button>
 
             {/* 中间：Logo 居中 */}
-            <Link href={`/${locale}`} className="absolute left-1/2 -translate-x-1/2">
-              <h1 className={cn("text-2xl tracking-wider font-paytone-one transition-colors duration-300", headerTextColor)}>
+            <Link
+              href={`/${locale}`}
+              className="absolute left-1/2 -translate-x-1/2"
+            >
+              <h1
+                className={cn(
+                  "text-2xl tracking-wider font-paytone-one transition-colors duration-300",
+                  headerTextColor,
+                )}
+              >
                 Busrom
               </h1>
             </Link>
@@ -220,7 +190,12 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
             {/* 左侧：Logo */}
             <div className="flex items-center">
               <Link href={`/${locale}`}>
-                <h1 className={cn("text-3xl tracking-wider font-paytone-one transition-colors duration-300", headerTextColor)}>
+                <h1
+                  className={cn(
+                    "text-3xl tracking-wider font-paytone-one transition-colors duration-300",
+                    headerTextColor,
+                  )}
+                >
                   Busrom
                 </h1>
               </Link>

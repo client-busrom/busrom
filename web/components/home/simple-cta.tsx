@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { motion } from "framer-motion";
 import { LexicalRenderer } from "@/components/lexical/LexicalRenderer";
+import Magnetic from "@/components/common/Magnetic";
 
 type Props = {
   data: HomeContent["simpleCta"];
@@ -245,7 +246,7 @@ export default function SimpleCta({ data }: Props) {
   return (
     <section
       className={cn(cfg.section.paddingY, "bg-brand-main")}
-      data-header-theme="light"
+      
     >
       {/* --- 跑马灯带 (Marquee Belt) --- */}
       <MarqueeBelt content={data.marqueeContent} />
@@ -509,37 +510,39 @@ export default function SimpleCta({ data }: Props) {
             {/* CTA 按钮 */}
             <div>
               <Link href={data.ctaLink || "/contact-us"}>
-                <motion.div
-                  className="origin-center inline-block"
-                  style={{ transformOrigin: "50% 50%" }}
-                  initial={{ rotate: 0, scale: 1 }}
-                  animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
-                  whileHover={{
-                    rotate: 0,
-                    scale: 1.08,
-                    transition: { scale: { duration: 0.3, ease: "easeOut" } },
-                  }}
-                  transition={{
-                    rotate: {
-                      duration: 0.5,
-                      repeat: Infinity,
-                      repeatDelay: 2,
-                      ease: "easeInOut",
-                    },
-                  }}
-                >
-                  <Button
-                    className={cn(
-                      "font-anaheim font-semibold flex items-center justify-center",
-                      cfg.button.desktop.borderRadius,
-                      cfg.button.desktop.fontSize,
-                      cfg.button.desktop.width,
-                      cfg.button.desktop.height,
-                    )}
+                <Magnetic strength={0.2}>
+                  <motion.div
+                    className="origin-center inline-block"
+                    style={{ transformOrigin: "50% 50%" }}
+                    initial={{ rotate: 0, scale: 1 }}
+                    animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+                    whileHover={{
+                      rotate: 0,
+                      scale: 1.08,
+                      transition: { scale: { duration: 0.3, ease: "easeOut" } },
+                    }}
+                    transition={{
+                      rotate: {
+                        duration: 0.5,
+                        repeat: Infinity,
+                        repeatDelay: 2,
+                        ease: "easeInOut",
+                      },
+                    }}
                   >
-                    {data.ctaText}
-                  </Button>
-                </motion.div>
+                    <Button
+                      className={cn(
+                        "font-anaheim font-semibold flex items-center justify-center",
+                        cfg.button.desktop.borderRadius,
+                        cfg.button.desktop.fontSize,
+                        cfg.button.desktop.width,
+                        cfg.button.desktop.height,
+                      )}
+                    >
+                      {data.ctaText}
+                    </Button>
+                  </motion.div>
+                </Magnetic>
               </Link>
             </div>
           </div>

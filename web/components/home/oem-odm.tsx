@@ -150,7 +150,7 @@ export default function OemOdm({ data }: Props) {
     <section
       ref={sectionRef}
       className="relative bg-[#000000] text-white overflow-hidden"
-      data-header-theme="light"
+      
     >
       {/* ==================== Desktop Layout (md+) ==================== */}
       <div

@@ -6,6 +6,7 @@ import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
 import { getObjectPosition, getCropStyles, getCropImageUrl } from "@/lib/utils";
 import { ServerImage } from "@/components/ui/ServerImage";
+import MagneticWrapper from "./MagneticWrapper";
 
 // 处理换行符：支持 /n 和 \n，并去除每行首尾空格
 const formatText = (text: string | undefined) => {
@@ -656,27 +657,28 @@ const HeroBanner1: FC<BannerProps> = ({ data }) => {
               const words = feature?.split(" ") || [];
               const textWithNewlines = words.join("\n");
               return (
-                <div
-                  key={index}
-                  className="flex items-center justify-center border border-white bg-[#756F3F]"
-                  style={{
-                    width: rpx(242),
-                    height: rpx(150),
-                    borderRadius: rpx(75),
-                  }}
-                >
-                  <p
-                    className="font-montserrat font-bold text-[#FDF6C2] text-center whitespace-pre-line"
+                <MagneticWrapper key={index} strength={0.3}>
+                  <div
+                    className="flex items-center justify-center border border-white bg-[#756F3F]"
                     style={{
-                      fontSize: rpx(28),
-                      lineHeight: 1.4,
-                      letterSpacing: "0.06em",
-                      textShadow: "0 4px 12px rgba(86, 80, 32, 1)",
+                      width: rpx(242),
+                      height: rpx(150),
+                      borderRadius: rpx(75),
                     }}
                   >
-                    {textWithNewlines}
-                  </p>
-                </div>
+                    <p
+                      className="font-montserrat font-bold text-[#FDF6C2] text-center whitespace-pre-line"
+                      style={{
+                        fontSize: rpx(28),
+                        lineHeight: 1.4,
+                        letterSpacing: "0.06em",
+                        textShadow: "0 4px 12px rgba(86, 80, 32, 1)",
+                      }}
+                    >
+                      {textWithNewlines}
+                    </p>
+                  </div>
+                </MagneticWrapper>
               );
             },
           )}

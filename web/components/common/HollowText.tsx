@@ -14,7 +14,7 @@ interface HollowTextProps {
   style?: React.CSSProperties
 }
 
-export function HollowText({ 
+export const HollowText = React.memo(function HollowText({ 
   children, 
   strokeColor = "white", 
   strokeWidth = 1.2, 
@@ -54,4 +54,4 @@ export function HollowText({
       </span>
     </>
   )
-}
+})

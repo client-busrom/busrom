@@ -128,7 +128,7 @@ export default function WhyChooseBusrom({ data }: Props) {
   }
 
   return (
-    <section ref={sectionRef} className="py-12 lg:py-0 bg-brand-main" data-header-theme="light">
+    <section ref={sectionRef} className="py-12 lg:py-0 bg-brand-main" >
       <style jsx>{`
         @keyframes custom-float {
           0%, 100% { transform: translateY(0); }

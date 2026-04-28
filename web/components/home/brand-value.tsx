@@ -41,7 +41,7 @@ export default function BrandValue({ data }: Props) {
   return (
     <section
       className="pt-20 pb-16 lg:pt-24 lg:pb-16 bg-brand-main"
-      data-header-theme="light"
+      
     >
       <div className="container mx-auto">
         {/* 移动端标题 */}

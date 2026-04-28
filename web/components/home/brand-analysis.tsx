@@ -104,7 +104,7 @@ export default function BrandAnalysis({ data }: Props) {
   return (
     <section
       className="relative bg-black overflow-hidden"
-      data-header-theme="transparent"
+      
     >
       {/* 背景图片 - 每个 center 独立背景，带淡入淡出切换 */}
       <div className="absolute inset-0">
