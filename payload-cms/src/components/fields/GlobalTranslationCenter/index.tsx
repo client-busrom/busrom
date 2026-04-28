@@ -465,10 +465,8 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
     let failCount = 0
 
     try {
-      // 只保存修改过的语言
-      const localesToSave = Array.from(modifiedLocales).filter(
-        localeCode => localeCode !== currentLocale.code
-      )
+      // 保存所有修改过的语言，包括当前语言
+      const localesToSave = Array.from(modifiedLocales)
 
       if (localesToSave.length === 0) {
         setStatusMessage({ type: 'warning', key: 'custom:translationCenter:noChanges' })

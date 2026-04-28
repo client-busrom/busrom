@@ -10,10 +10,8 @@ const format = (val: string): string =>
 
 export const formatSlug =
   (fallback: string): FieldHook =>
-  ({ operation, value, data }) => {
-    // We always regenerate the technical slug from the source field (e.g. question.en)
-    // to ensure it stays in sync and clean.
-    const fallbackData = data?.[fallback]
+  ({ operation, value, data, originalDoc }) => {
+    const fallbackData = data?.[fallback] || originalDoc?.[fallback]
     
     if (fallbackData) {
       // Priority: 1. fallback.en (localized) 2. raw string

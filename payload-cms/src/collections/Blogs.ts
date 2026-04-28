@@ -13,6 +13,7 @@
 import type { CollectionConfig } from 'payload'
 import { syncM2M, cleanupM2M } from '../hooks/syncM2M'
 import { pingSitemap } from '../hooks/pingSitemap'
+import { formatSlug } from '../hooks/formatSlug'
 
 export const Blogs: CollectionConfig = {
   slug: 'blogs',
@@ -27,8 +28,8 @@ export const Blogs: CollectionConfig = {
     },
   },
   admin: {
-    useAsTitle: 'slug',
-    defaultColumns: ['slug', 'status', 'author', 'publishedAt', 'updatedAt'],
+    useAsTitle: 'adminLabel',
+    defaultColumns: ['adminLabel', 'slug', 'status', 'author', 'publishedAt', 'updatedAt'],
     group: {
       en: 'Content',
       zh: '内容管理',
@@ -126,18 +127,36 @@ export const Blogs: CollectionConfig = {
           },
           fields: [
             {
+              name: 'adminLabel',
+              type: 'text',
+              label: {
+                en: 'Admin Identification (Internal Use)',
+                zh: '内部管理标识（不影响URL）',
+              },
+              admin: {
+                description: {
+                  en: 'This identifier is for internal management and can contain spaces/caps. (e.g. "Blog - Glass Installation")',
+                  zh: '仅用于后台管理区分，可以包含空格和大小写（例如："博客 - 玻璃安装教程"）',
+                },
+              },
+            },
+            {
               name: 'slug',
               type: 'text',
               label: {
-                en: 'Slug (URL ID)',
-                zh: 'Slug (URL标识)',
+                en: 'Technical Slug (URL Anchor)',
+                zh: '技术标识 (自动生成)',
+              },
+              hooks: {
+                beforeValidate: [formatSlug('title')],
               },
               required: true,
               unique: true,
               admin: {
+                readOnly: true,
                 description: {
-                  en: 'URL-friendly identifier (e.g., "how-to-install-glass-standoff")',
-                  zh: 'URL友好标识符（例如："how-to-install-glass-standoff"）',
+                  en: 'This is automatically generated from Admin Identification and used for URLs.',
+                  zh: '此字段自动由内部管理标识生成，用于前台URL，不可手动修改。',
                 },
               },
             },

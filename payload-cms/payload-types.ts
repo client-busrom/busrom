@@ -853,7 +853,11 @@ export interface Category {
 export interface Blog {
   id: number;
   /**
-   * URL-friendly identifier (e.g., "how-to-install-glass-standoff")
+   * This identifier is for internal management and can contain spaces/caps. (e.g. "Blog - Glass Installation")
+   */
+  adminLabel?: string | null;
+  /**
+   * This is automatically generated from Admin Identification and used for URLs.
    */
   slug: string;
   title: string;
@@ -2665,6 +2669,7 @@ export interface PagesSelect<T extends boolean = true> {
  * via the `definition` "blogs_select".
  */
 export interface BlogsSelect<T extends boolean = true> {
+  adminLabel?: T;
   slug?: T;
   title?: T;
   excerpt?: T;
