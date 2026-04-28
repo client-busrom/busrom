@@ -9,18 +9,29 @@ import FooterForm from "./FooterForm";
 import FooterSimple from "./FooterSimple";
 import FooterBottom from "./FooterBottom";
 import SuccessModal from "./SuccessModal";
+import { cn } from "@/lib/utils";
 
 type Props = {
   locale: Locale;
-  showForm?: boolean; 
+  showForm?: boolean;
   ssrData?: FooterApiData | null;
+  headerTheme?: string;
+  className?: string;
 };
 
-export default function Footer({ locale, showForm = true, ssrData }: Props) {
+export default function Footer({
+  locale,
+  showForm = true,
+  ssrData,
+  headerTheme,
+  className,
+}: Props) {
   const content = useMemo(() => getHomeContent(locale).footer, [locale]);
 
   // States initialized with SSR data if available
-  const [footerData, setFooterData] = useState<FooterApiData | null>(ssrData || null);
+  const [footerData, setFooterData] = useState<FooterApiData | null>(
+    ssrData || null,
+  );
   const [formConfig, setFormConfig] = useState<FormConfig | null>(null);
   const [siteLogoUrl, setSiteLogoUrl] = useState<string | null>(null);
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
@@ -31,7 +42,7 @@ export default function Footer({ locale, showForm = true, ssrData }: Props) {
   useEffect(() => {
     const fetchAllData = async () => {
       try {
-        let currentFormName = footerData?.formConfigName || 'footer-form';
+        let currentFormName = footerData?.formConfigName || "footer-form";
 
         // Only fetch if we don't have footerData from SSR
         if (!ssrData) {
@@ -47,8 +58,8 @@ export default function Footer({ locale, showForm = true, ssrData }: Props) {
 
         // 2. Fetch Form Config & Site Config in parallel
         const [siteRes, formRes] = await Promise.all([
-          fetch('/api/site-config'),
-          fetch(`/api/form-config/${currentFormName}?locale=${locale}`)
+          fetch("/api/site-config"),
+          fetch(`/api/form-config/${currentFormName}?locale=${locale}`),
         ]);
 
         if (siteRes.ok) {
@@ -62,7 +73,7 @@ export default function Footer({ locale, showForm = true, ssrData }: Props) {
           setFormConfig(data);
         }
       } catch (error) {
-        console.error('[Footer] Failed to fetch layout data:', error);
+        console.error("[Footer] Failed to fetch layout data:", error);
       }
     };
 
@@ -76,7 +87,13 @@ export default function Footer({ locale, showForm = true, ssrData }: Props) {
 
   // Loading state (Optional: could also render FooterSimple with placeholders)
   if (showForm === false && footerData) {
-    return <FooterSimple footerData={footerData} locale={locale} siteLogoUrl={siteLogoUrl} />;
+    return (
+      <FooterSimple
+        footerData={footerData}
+        locale={locale}
+        siteLogoUrl={siteLogoUrl}
+      />
+    );
   }
 
   // Handle Home Footer (with Form)
@@ -89,13 +106,16 @@ export default function Footer({ locale, showForm = true, ssrData }: Props) {
       />
 
       <footer
-        className="relative bg-gray-900 text-white flex flex-col justify-end"
-        style={{ minHeight: 'calc(var(--rpx) * 1000)' }}
-        data-header-theme="transparent"
+        className={cn(
+          "relative bg-gray-900 text-white flex flex-col justify-end",
+          className,
+        )}
+        style={{ minHeight: "calc(var(--rpx) * 1000)" }}
+        data-header-theme={headerTheme || "transparent"}
       >
         <div
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/BusromFooterBg.webp)' }}
+          style={{ backgroundImage: "url(/BusromFooterBg.webp)" }}
           aria-hidden="true"
         />
 
@@ -112,11 +132,11 @@ export default function Footer({ locale, showForm = true, ssrData }: Props) {
         >
           <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-between lg:gap-8 xl:gap-12">
             <FooterContact footerData={footerData} content={content} />
-            
+
             <div className="hidden lg:block w-px self-stretch bg-[#E3DEBB]"></div>
             <div className="lg:hidden w-full h-px bg-white/30 my-6"></div>
 
-            <FooterForm 
+            <FooterForm
               locale={locale}
               formConfig={formConfig}
               content={content}
@@ -126,7 +146,11 @@ export default function Footer({ locale, showForm = true, ssrData }: Props) {
           </div>
         </div>
 
-        <FooterBottom footerData={footerData} siteLogoUrl={siteLogoUrl} centered />
+        <FooterBottom
+          footerData={footerData}
+          siteLogoUrl={siteLogoUrl}
+          centered
+        />
       </footer>
     </>
   );

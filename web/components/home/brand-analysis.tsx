@@ -14,9 +14,12 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import Fade from "embla-carousel-fade";
+import { cn } from "@/lib/utils";
 
 type Props = {
   data: HomeContent["brandAnalysis"];
+  headerTheme?: string;
+  className?: string;
 };
 
 /**
@@ -48,7 +51,7 @@ const TOP_HEIGHT = 555;
 const BOTTOM_WIDTH = 1153;
 const BOTTOM_HEIGHT = 236;
 
-export default function BrandAnalysis({ data }: Props) {
+export default function BrandAnalysis({ data, headerTheme, className }: Props) {
   // 移动端 Carousel API
   const [mobileApi, setMobileApi] = React.useState<CarouselApi>();
   // 桌面端 Carousel API
@@ -103,8 +106,8 @@ export default function BrandAnalysis({ data }: Props) {
 
   return (
     <section
-      className="relative bg-black overflow-hidden"
-      
+      className={cn("relative bg-black overflow-hidden", className)}
+      data-header-theme={headerTheme}
     >
       {/* 背景图片 - 每个 center 独立背景，带淡入淡出切换 */}
       <div className="absolute inset-0">

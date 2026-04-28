@@ -1,51 +1,45 @@
 "use client";
 
-import { useEffect, useRef, useState, ReactNode } from "react";
+import React, { useEffect, useRef, useState, ReactNode } from "react";
 
 interface LazySectionProps {
   children: ReactNode;
-  /** 占位符高度，避免布局抖动 */
-  minHeight?: string;
-  /** 提前多少像素开始加载 (rootMargin) */
-  threshold?: number;
-  /** 占位符背景色 */
-  placeholderBg?: string;
   /** header 主题，用于滚动时正确显示 header 颜色 */
   headerTheme?: "light" | "dark" | "transparent";
 }
 
 /**
  * 懒加载区域包装器（单个模块用）
- * 不做懒加载，只保留 header theme 标记
+ * 优化：不再渲染包裹 div，而是通过 React.cloneElement 将 headerTheme 注入给子组件
+ * 从而实现 DOM 结构的扁平化
  */
 export function LazySection({
   children,
   headerTheme,
 }: LazySectionProps) {
   return (
-    <div data-header-theme={headerTheme}>
-      {children}
-    </div>
+    <>
+      {React.Children.map(children, child => {
+        if (React.isValidElement(child)) {
+          // @ts-ignore - 注入 headerTheme 属性
+          return React.cloneElement(child, { headerTheme });
+        }
+        return child;
+      })}
+    </>
   );
 }
 
 interface DeferredContentProps {
   children: ReactNode;
-  /** 提前多少像素开始加载 (rootMargin) */
-  threshold?: number;
-  /** 加载中显示的占位符 */
-  fallback?: ReactNode;
 }
 
 /**
  * 延迟加载容器（用于首屏之后的所有内容）
  * 用户开始滚动或首屏渲染 2 秒后加载剩余内容
- *
- * 优化：使用低 z-index 的占位层，避免加载时闪白屏
  */
 export function DeferredContent({
   children,
-  fallback = null,
 }: DeferredContentProps) {
   const [shouldRender, setShouldRender] = useState(false);
 
@@ -80,7 +74,6 @@ export function DeferredContent({
     };
   }, []);
 
-  // 未加载时：完全不渲染任何内容，避免闪白屏
   if (!shouldRender) {
     return null;
   }

@@ -9,12 +9,14 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage";
 // ---
 type Props = {
   data: BrandValueData;
+  headerTheme?: string;
+  className?: string;
 };
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920;
 
-export default function BrandValue({ data }: Props) {
+export default function BrandValue({ data, headerTheme, className }: Props) {
   // Guard: if no data, don't render
   if (
     !data ||
@@ -40,8 +42,8 @@ export default function BrandValue({ data }: Props) {
 
   return (
     <section
-      className="pt-20 pb-16 lg:pt-24 lg:pb-16 bg-brand-main"
-      
+      className={cn("pt-20 pb-16 lg:pt-24 lg:pb-16 bg-brand-main", className)}
+      data-header-theme={headerTheme}
     >
       <div className="container mx-auto">
         {/* 移动端标题 */}

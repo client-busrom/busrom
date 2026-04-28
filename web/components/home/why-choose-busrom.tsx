@@ -11,6 +11,8 @@ import { HollowText } from "@/components/common/HollowText";
 
 type Props = {
   data: HomeContent["whyChooseBusrom"];
+  headerTheme?: string;
+  className?: string;
 };
 
 // 设计稿基准尺寸
@@ -75,7 +77,7 @@ const iconMap: { [key: string]: LucideIcon } = {
 // 自动轮播间隔（毫秒）
 const CAROUSEL_INTERVAL_MS = 3000;
 
-export default function WhyChooseBusrom({ data }: Props) {
+export default function WhyChooseBusrom({ data, headerTheme, className }: Props) {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [isHovering, setIsHovering] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -128,7 +130,7 @@ export default function WhyChooseBusrom({ data }: Props) {
   }
 
   return (
-    <section ref={sectionRef} className="py-12 lg:py-0 bg-brand-main" >
+    <section ref={sectionRef} className={cn("py-12 lg:py-0 bg-brand-main", className)} data-header-theme={headerTheme}>
       <style jsx>{`
         @keyframes custom-float {
           0%, 100% { transform: translateY(0); }

@@ -94,12 +94,16 @@ type BannerData = HomeContent["heroBanner"][number];
 type BannerProps = {
   data: BannerData;
   locale: Locale;
+  headerTheme?: string;
 };
 
 // --- HeroBanner1 组件 ---
-const HeroBanner1: FC<BannerProps> = ({ data }) => {
+const HeroBanner1: FC<BannerProps> = ({ data, headerTheme }) => {
   return (
-    <section className="relative w-full h-full min-h-[700px] overflow-hidden font-sans flex items-center justify-center text-center">
+    <section 
+      className="relative w-full h-full min-h-[700px] overflow-hidden font-sans flex items-center justify-center text-center"
+      data-header-theme={headerTheme}
+    >
       {/* 背景容器 - 白色底 + 45%透明图片 + 11px模糊 */}
       <div
         className="absolute inset-0 z-0"

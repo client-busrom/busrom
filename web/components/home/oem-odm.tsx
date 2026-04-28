@@ -5,9 +5,12 @@ import Image from "next/image";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { cn } from "@/lib/utils";
 
 type Props = {
   data: HomeContent["oemOdm"];
+  headerTheme?: string;
+  className?: string;
 };
 
 /**
@@ -16,7 +19,7 @@ type Props = {
  * Desktop (md+): 左右分割布局，闪电标分割
  * Mobile: 上下堆叠布局，OEM 在上，ODM 在下，闪电标居中显示
  */
-export default function OemOdm({ data }: Props) {
+export default function OemOdm({ data, headerTheme, className }: Props) {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: false, amount: 0.2 });
 
@@ -149,8 +152,11 @@ export default function OemOdm({ data }: Props) {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-[#000000] text-white overflow-hidden"
-      
+      className={cn(
+        "relative bg-[#000000] text-white overflow-hidden",
+        className,
+      )}
+      data-header-theme={headerTheme}
     >
       {/* ==================== Desktop Layout (md+) ==================== */}
       <div

@@ -10,6 +10,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 type Props = {
   data: HomeContent["brandAdvantages"];
+  headerTheme?: string;
+  className?: string;
 };
 
 const SECTION_HEIGHT = 2000;
@@ -74,7 +76,7 @@ function isValidCmsIcon(icon: string | undefined): icon is string {
   return !!icon && icon !== "lucide:sparkles";
 }
 
-export default function BrandAdvantages({ data }: Props) {
+export default function BrandAdvantages({ data, headerTheme, className }: Props) {
   const isMobile = useIsMobile(); // ⬅️ 引入移动端判断
 
   const [isSticky, setIsSticky] = useState(false);
@@ -180,7 +182,8 @@ export default function BrandAdvantages({ data }: Props) {
   return (
     <section
       ref={sectionRef}
-      className="bg-gray-800 text-white relative"
+      className={cn("bg-gray-800 text-white relative", className)}
+      data-header-theme={headerTheme}
       
       style={{ minHeight: `${SECTION_HEIGHT}px` }}
     >

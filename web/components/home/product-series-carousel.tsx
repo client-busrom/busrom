@@ -6,11 +6,18 @@ import { Link } from "@/lib/navigation";
 import type { HomeContent } from "@/lib/content-data";
 import type { Locale } from "@/i18n.config";
 import { ServerImage } from "@/components/ui/ServerImage";
-import { getCropStyles, getCropImageUrl, getObjectPosition } from "@/lib/utils";
+import {
+  getCropStyles,
+  getCropImageUrl,
+  getObjectPosition,
+  cn,
+} from "@/lib/utils";
 
 type Props = {
   data: HomeContent["productSeriesCarousel"];
   locale: Locale;
+  headerTheme?: string;
+  className?: string;
 };
 
 // 设计稿基准
@@ -29,13 +36,16 @@ const IMG_SIZE_SHRINK = 480;
 // 位置 2: 屏内右
 // 位置 3: 屏外右（即将退出）
 // 位置 4: 更远的右侧屏外（隐藏）
-const POSITIONS: Record<number, { x: number; y: number; scale: number; opacity: number }> = {
-  [-1]: { x: -1400, y: 358, scale: 0.7, opacity: 0 },  // 更远左侧
-  [0]: { x: -700, y: 310, scale: 0.85, opacity: 0 },   // 屏外左
-  [1]: { x: 220, y: 262, scale: 1, opacity: 1 },       // 屏内左
-  [2]: { x: 1060, y: 262, scale: 1, opacity: 1 },      // 屏内右
-  [3]: { x: 1980, y: 310, scale: 0.85, opacity: 0 },   // 屏外右
-  [4]: { x: 2680, y: 358, scale: 0.7, opacity: 0 },    // 更远右侧
+const POSITIONS: Record<
+  number,
+  { x: number; y: number; scale: number; opacity: number }
+> = {
+  [-1]: { x: -1400, y: 358, scale: 0.7, opacity: 0 }, // 更远左侧
+  [0]: { x: -700, y: 310, scale: 0.85, opacity: 0 }, // 屏外左
+  [1]: { x: 220, y: 262, scale: 1, opacity: 1 }, // 屏内左
+  [2]: { x: 1060, y: 262, scale: 1, opacity: 1 }, // 屏内右
+  [3]: { x: 1980, y: 310, scale: 0.85, opacity: 0 }, // 屏外右
+  [4]: { x: 2680, y: 358, scale: 0.7, opacity: 0 }, // 更远右侧
 };
 
 // Hover 时的位置调整 (比例参考比亚迪: Active 1.15, Inactive 0.85; 锚点为底部)
@@ -67,7 +77,11 @@ const VIEW_BTN_H = 67;
 // 字体尺寸
 const TITLE_SIZE_DEFAULT = 64;
 
-export default function ProductSeriesCarousel({ data }: Props) {
+export default function ProductSeriesCarousel({
+  data,
+  headerTheme,
+  className,
+}: Props) {
   // currentIndex 表示当前在"屏内左"位置的 item 索引
   const [currentIndex, setCurrentIndex] = useState(0);
   const [hoveredPosition, setHoveredPosition] = useState<number | null>(null); // 1 或 2（屏内的两个位置）
@@ -82,11 +96,14 @@ export default function ProductSeriesCarousel({ data }: Props) {
   const cursorXSpring = useSpring(cursorX, springConfig);
   const cursorYSpring = useSpring(cursorY, springConfig);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    cursorX.set(e.clientX - rect.left);
-    cursorY.set(e.clientY - rect.top);
-  }, [cursorX, cursorY]);
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      cursorX.set(e.clientX - rect.left);
+      cursorY.set(e.clientY - rect.top);
+    },
+    [cursorX, cursorY],
+  );
 
   const seriesCount = data?.length || 0;
 
@@ -107,7 +124,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
       if (item.sceneImage) {
         // 使用大型变体作为预加载场景图
         const url = item.sceneImage.variants?.large || item.sceneImage.url;
-        if (url && !url.includes('placeholder')) {
+        if (url && !url.includes("placeholder")) {
           const img = new Image();
           img.src = url;
         }
@@ -115,35 +132,41 @@ export default function ProductSeriesCarousel({ data }: Props) {
     });
   }, [data]);
 
-  const paginate = useCallback((dir: number) => {
-    if (isAnimating) return; // 动画进行中，忽略点击
+  const paginate = useCallback(
+    (dir: number) => {
+      if (isAnimating) return; // 动画进行中，忽略点击
 
-    setIsAnimating(true);
-    setCurrentIndex((prev) => (prev + dir + seriesCount) % seriesCount);
-    setHoveredPosition(null);
+      setIsAnimating(true);
+      setCurrentIndex((prev) => (prev + dir + seriesCount) % seriesCount);
+      setHoveredPosition(null);
 
-    // 清理之前的 timeout
-    if (animationTimeoutRef.current) {
-      clearTimeout(animationTimeoutRef.current);
-    }
+      // 清理之前的 timeout
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
 
-    // 动画结束后解锁（与动画时长匹配）
-    animationTimeoutRef.current = setTimeout(() => {
-      setIsAnimating(false);
-    }, 350); // 与 arcTransition.duration 一致
-  }, [seriesCount, isAnimating]);
+      // 动画结束后解锁（与动画时长匹配）
+      animationTimeoutRef.current = setTimeout(() => {
+        setIsAnimating(false);
+      }, 350); // 与 arcTransition.duration 一致
+    },
+    [seriesCount, isAnimating],
+  );
 
   // 获取指定位置的 item 索引
-  const getItemIndex = useCallback((position: number) => {
-    // position: 0=屏外左, 1=屏内左, 2=屏内右, 3=屏外右
-    // currentIndex 是屏内左(position 1)的 item
-    const offset = position - 1;
-    return (currentIndex + offset + seriesCount) % seriesCount;
-  }, [currentIndex, seriesCount]);
+  const getItemIndex = useCallback(
+    (position: number) => {
+      // position: 0=屏外左, 1=屏内左, 2=屏内右, 3=屏外右
+      // currentIndex 是屏内左(position 1)的 item
+      const offset = position - 1;
+      return (currentIndex + offset + seriesCount) % seriesCount;
+    },
+    [currentIndex, seriesCount],
+  );
 
   // 获取 4 个位置的 item
   const visibleItems = useMemo(() => {
-    return [0, 1, 2, 3].map(pos => ({
+    return [0, 1, 2, 3].map((pos) => ({
       position: pos,
       index: getItemIndex(pos),
       item: data[getItemIndex(pos)],
@@ -199,51 +222,54 @@ export default function ProductSeriesCarousel({ data }: Props) {
     return baseStyle;
   };
 
-
   // 计算每个 item 当前应该在哪个位置
   // 返回 0-3 的位置，或者 -1/4（隐藏在更远的地方）
-  const getItemPosition = useCallback((itemIndex: number): number => {
-    // currentIndex 是在位置 1 (屏内左) 的 item
-    const diff = (itemIndex - currentIndex + seriesCount) % seriesCount;
+  const getItemPosition = useCallback(
+    (itemIndex: number): number => {
+      // currentIndex 是在位置 1 (屏内左) 的 item
+      const diff = (itemIndex - currentIndex + seriesCount) % seriesCount;
 
-    // diff: 0 -> 位置 1 (屏内左)
-    // diff: 1 -> 位置 2 (屏内右)
-    if (diff === 0) return 1;
-    if (diff === 1) return 2;
+      // diff: 0 -> 位置 1 (屏内左)
+      // diff: 1 -> 位置 2 (屏内右)
+      if (diff === 0) return 1;
+      if (diff === 1) return 2;
 
-    // 特殊处理：当只有 2 个 item 时，不需要其他位置
-    if (seriesCount === 2) return -1;
+      // 特殊处理：当只有 2 个 item 时，不需要其他位置
+      if (seriesCount === 2) return -1;
 
-    // 特殊处理：当只有 3 个 item 时
-    // diff = 2 同时是 "屏外右" 和 "屏外左"（seriesCount-1）
-    // 根据方向选择：让它从左边进入，从右边退出
-    if (seriesCount === 3) {
-      // diff = 2 既是下一个要进入的，也是刚退出的
-      // 让它显示在右边（位置 3），这样动画更自然
-      return 3;
-    }
+      // 特殊处理：当只有 3 个 item 时
+      // diff = 2 同时是 "屏外右" 和 "屏外左"（seriesCount-1）
+      // 根据方向选择：让它从左边进入，从右边退出
+      if (seriesCount === 3) {
+        // diff = 2 既是下一个要进入的，也是刚退出的
+        // 让它显示在右边（位置 3），这样动画更自然
+        return 3;
+      }
 
-    // 4 个及以上的 item
-    // diff: seriesCount-1 -> 位置 0 (屏外左，即将进入)
-    // diff: 2 -> 位置 3 (屏外右，刚退出)
-    if (diff === seriesCount - 1) return 0;
-    if (diff === 2) return 3;
+      // 4 个及以上的 item
+      // diff: seriesCount-1 -> 位置 0 (屏外左，即将进入)
+      // diff: 2 -> 位置 3 (屏外右，刚退出)
+      if (diff === seriesCount - 1) return 0;
+      if (diff === 2) return 3;
 
-    // 其他 item：根据距离决定放在哪个屏外位置
-    // diff 较小（3,4,5...）-> 右侧更远处 (位置 4)
-    // diff 较大 (seriesCount-2, seriesCount-3...) -> 左侧更远处 (位置 -1)
-    if (diff <= seriesCount / 2) {
-      return 4; // 右侧更远
-    } else {
-      return -1; // 左侧更远
-    }
-  }, [currentIndex, seriesCount]);
+      // 其他 item：根据距离决定放在哪个屏外位置
+      // diff 较小（3,4,5...）-> 右侧更远处 (位置 4)
+      // diff 较大 (seriesCount-2, seriesCount-3...) -> 左侧更远处 (位置 -1)
+      if (diff <= seriesCount / 2) {
+        return 4; // 右侧更远
+      } else {
+        return -1; // 左侧更远
+      }
+    },
+    [currentIndex, seriesCount],
+  );
 
-  const hoveredItem = hoveredPosition === 1
-    ? visibleItems[1]?.item
-    : hoveredPosition === 2
-      ? visibleItems[2]?.item
-      : null;
+  const hoveredItem =
+    hoveredPosition === 1
+      ? visibleItems[1]?.item
+      : hoveredPosition === 2
+        ? visibleItems[2]?.item
+        : null;
 
   // 弧线动画配置
   const arcTransition = {
@@ -253,8 +279,8 @@ export default function ProductSeriesCarousel({ data }: Props) {
 
   return (
     <section
-      className="relative bg-[#756F3F] overflow-hidden"
-      
+      className={cn("relative bg-[#756F3F] overflow-hidden", className)}
+      data-header-theme={headerTheme}
       style={{ aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` }}
       onMouseMove={(e) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -325,7 +351,10 @@ export default function ProductSeriesCarousel({ data }: Props) {
         <div className="flex-1 flex items-center justify-center gap-2 px-2">
           {/* 左侧图片 + 标题 */}
           <div className="flex flex-col items-center w-[45%]">
-            <Link href={visibleItems[1]?.item?.href || "#"} className="block w-full">
+            <Link
+              href={visibleItems[1]?.item?.href || "#"}
+              className="block w-full"
+            >
               {(() => {
                 const item = visibleItems[1]?.item;
                 if (!item) return null;
@@ -369,7 +398,10 @@ export default function ProductSeriesCarousel({ data }: Props) {
           </div>
           {/* 右侧图片 + 标题 */}
           <div className="flex flex-col items-center w-[45%]">
-            <Link href={visibleItems[2]?.item?.href || "#"} className="block w-full">
+            <Link
+              href={visibleItems[2]?.item?.href || "#"}
+              className="block w-full"
+            >
               {(() => {
                 const item = visibleItems[2]?.item;
                 if (!item) return null;
@@ -415,17 +447,35 @@ export default function ProductSeriesCarousel({ data }: Props) {
 
         {/* 按钮 */}
         <div className="flex justify-between px-6 pb-2">
-          <button onClick={() => paginate(-1)} aria-label="Previous" suppressHydrationWarning>
-            <img src="/btnLeft2.svg" alt="Previous" className="w-10 h-10" suppressHydrationWarning />
+          <button
+            onClick={() => paginate(-1)}
+            aria-label="Previous"
+            suppressHydrationWarning
+          >
+            <img
+              src="/btnLeft2.svg"
+              alt="Previous"
+              className="w-10 h-10"
+              suppressHydrationWarning
+            />
           </button>
-          <button onClick={() => paginate(1)} aria-label="Next" suppressHydrationWarning>
-            <img src="/btnRight2.svg" alt="Next" className="w-10 h-10" suppressHydrationWarning />
+          <button
+            onClick={() => paginate(1)}
+            aria-label="Next"
+            suppressHydrationWarning
+          >
+            <img
+              src="/btnRight2.svg"
+              alt="Next"
+              className="w-10 h-10"
+              suppressHydrationWarning
+            />
           </button>
         </div>
       </div>
 
       {/* ==================== 桌面端布局 - 旋转木马 ==================== */}
-      <div 
+      <div
         className="hidden lg:block absolute inset-0 cursor-none"
         onMouseMove={handleMouseMove}
         onMouseEnter={() => setIsHoveringContainer(true)}
@@ -446,7 +496,16 @@ export default function ProductSeriesCarousel({ data }: Props) {
             opacity: isHoveringContainer ? 1 : 0,
           }}
         >
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <line x1="7" y1="17" x2="17" y2="7"></line>
             <polyline points="7 7 17 7 17 17"></polyline>
           </svg>
@@ -472,8 +531,16 @@ export default function ProductSeriesCarousel({ data }: Props) {
               transition={{
                 ...arcTransition,
                 // 使用更舒缓的 tween 动画，匹配比亚迪那种缓慢、优雅的过渡感
-                scale: { type: "tween", duration: 0.75, ease: [0.25, 0.1, 0.25, 1] },
-                x: { type: "tween", duration: 0.75, ease: [0.25, 0.1, 0.25, 1] },
+                scale: {
+                  type: "tween",
+                  duration: 0.75,
+                  ease: [0.25, 0.1, 0.25, 1],
+                },
+                x: {
+                  type: "tween",
+                  duration: 0.75,
+                  ease: [0.25, 0.1, 0.25, 1],
+                },
               }}
               style={{
                 aspectRatio: "1",
@@ -485,7 +552,7 @@ export default function ProductSeriesCarousel({ data }: Props) {
               {/* 标题移入容器内部，利用 scale 属性实现真正的“共进退” */}
               <h3
                 className={`absolute font-anaheim font-extrabold text-white whitespace-nowrap z-20 transition-opacity duration-300 ${
-                  isOnScreen ? 'opacity-100' : 'opacity-0'
+                  isOnScreen ? "opacity-100" : "opacity-0"
                 }`}
                 style={{
                   top: `${(-62 / IMG_SIZE_DEFAULT) * 100}%`, // 距离顶部 62px
@@ -499,7 +566,10 @@ export default function ProductSeriesCarousel({ data }: Props) {
                 {item.name}
               </h3>
 
-              <Link href={item.href} className="block w-full h-full cursor-none">
+              <Link
+                href={item.href}
+                className="block w-full h-full cursor-none"
+              >
                 {(() => {
                   const cropData = item.imageCropDataList?.[0];
                   const cropStyles = getCropStyles(cropData);

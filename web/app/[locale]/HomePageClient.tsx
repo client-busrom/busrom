@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import type { Locale } from "@/i18n.config";
 // 1. 导入我们刚刚创建的 HomeContent 类型
 import type { HomeContent } from "@/lib/content-data";
-import { LazySection, DeferredContent } from "@/components/ui/LazySection";
+import { DeferredContent } from "@/components/ui/LazySection";
 
 // --- 2. 导入组件 ---
 // 首屏组件直接导入（首屏性能关键）- 只保留不使用 framer-motion 的组件
@@ -71,7 +71,7 @@ const Sphere3D = dynamic(() => import("@/components/home/sphere-3d"), {
 
 // 延迟渲染组件 - 只在接近视口时才开始加载 Three.js
 // 这样可以避免首屏加载时下载和执行大量 JS
-const MemoizedDeferredSphere3D = memo(function DeferredSphere3D({ data }: { data: { title: string; description: string } | null }) {
+const MemoizedDeferredSphere3D = memo(function DeferredSphere3D({ data, headerTheme }: { data: { title: string; description: string } | null; headerTheme?: string }) {
   const [shouldLoad, setShouldLoad] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -111,8 +111,8 @@ const MemoizedDeferredSphere3D = memo(function DeferredSphere3D({ data }: { data
   }, [shouldLoad]);
 
   return (
-    <div ref={containerRef} className="w-full h-screen bg-[#020408]">
-      {shouldLoad && <Sphere3D data={data} />}
+    <div ref={containerRef} className="w-full h-screen bg-[#020408]" data-header-theme={headerTheme}>
+      {shouldLoad && <Sphere3D data={data} headerTheme={headerTheme} />}
     </div>
   );
 });
@@ -166,109 +166,94 @@ export function HomePageClient({
   return (
     <main className="min-h-screen">
 
-      {/* 模块 1: Hero Banner (图片背景) - z-20 确保始终在懒加载内容上层 */}
-      <div data-header-theme="light" className="relative z-20 mt-[46px]">
-        <HeroBanner data={content.heroBanner} locale={currentLanguage} />
-      </div>
+      {/* 模块 1: Hero Banner */}
+      <HeroBanner 
+        data={content.heroBanner} 
+        locale={currentLanguage} 
+        headerTheme="light" 
+        className="relative z-20 mt-[46px]" 
+      />
 
-      {/* 模块 2: 产品系列轮播 - 设为 transparent (白色字) */}
-      <div data-header-theme="transparent" className="relative z-10">
-        <ProductSeriesCarousel data={content.productSeriesCarousel} locale={currentLanguage} />
-      </div>
+      {/* 模块 2: 产品系列轮播 */}
+      <ProductSeriesCarousel 
+        data={content.productSeriesCarousel} 
+        locale={currentLanguage} 
+        headerTheme="transparent"
+        className="relative z-10"
+      />
 
-      {/* 模块 3: 服务特色 (浅色背景) - z-10 */}
-      <div data-header-theme="light" className="relative z-10 bg-brand-main">
-        <ServiceFeatures data={content.serviceFeatures} />
-      </div>
+      {/* 模块 3: 服务特色 */}
+      <ServiceFeatures 
+        data={content.serviceFeatures} 
+        headerTheme="light"
+        className="relative z-10 bg-brand-main"
+      />
 
-      {/* 模块 4: 3D 地球 - 移出延迟加载，让其内部的 IntersectionObserver 自行决定加载时机 */}
-      <div data-header-theme="transparent">
-        <MemoizedDeferredSphere3D data={content.sphere3d} />
-      </div>
+      {/* 模块 4: 3D 地球 */}
+      <MemoizedDeferredSphere3D 
+        data={content.sphere3d} 
+        headerTheme="transparent"
+      />
       
       {/* 首屏之后的内容 - 延迟加载，z-0 确保在首屏下层 */}
       <DeferredContent>
         {/* 模块 5: 简易表单跳转 */}
         {content.simpleCta?.images && (
-          <LazySection headerTheme="light">
-            <MemoizedSimpleCta data={content.simpleCta} />
-          </LazySection>
+          <MemoizedSimpleCta data={content.simpleCta} headerTheme="light" />
         )}
 
         {/* 模块 6: 精选产品 */}
         {content.featuredProducts?.series?.length > 0 && (
-          <LazySection headerTheme="light">
-            <FeaturedProducts data={content.featuredProducts} locale={currentLanguage} />
-          </LazySection>
+          <FeaturedProducts data={content.featuredProducts} locale={currentLanguage} headerTheme="light" />
         )}
 
         {/* 模块 7: 系列产品介绍 */}
         {content.seriesIntro && (
-          <LazySection headerTheme="dark">
-            <MemoizedSeriesIntro data={content.seriesIntro} />
-          </LazySection>
+          <MemoizedSeriesIntro data={content.seriesIntro} headerTheme="dark" />
         )}
 
         {/* 模块 8: 品牌优势 */}
         {content.brandAdvantages?.advantages && content.brandAdvantages?.icons && (
-          <LazySection headerTheme="transparent">
-            <MemoizedBrandAdvantages data={content.brandAdvantages} />
-          </LazySection>
+          <MemoizedBrandAdvantages data={content.brandAdvantages} headerTheme="transparent" />
         )}
 
         {/* 模块 9: OEM / ODM合作 */}
         {content.oemOdm?.oem && content.oemOdm?.odm && (
-          <LazySection headerTheme="transparent">
-            <MemoizedOemOdm data={content.oemOdm} />
-          </LazySection>
+          <MemoizedOemOdm data={content.oemOdm} headerTheme="transparent" />
         )}
 
         {/* 模块 10: 获取报价五步曲 */}
         {content.quoteSteps?.steps?.length > 0 && (
-          <LazySection headerTheme="light">
-            <MemoizedQuoteSteps data={content.quoteSteps} />
-          </LazySection>
+          <MemoizedQuoteSteps data={content.quoteSteps} headerTheme="light" />
         )}
 
         {/* 模块 11: 表单 */}
         {content.mainForm && (
-          <LazySection headerTheme="transparent">
-            <MainForm data={content.mainForm} locale={currentLanguage} />
-          </LazySection>
+          <MainForm data={content.mainForm} locale={currentLanguage} headerTheme="transparent" />
         )}
 
         {/* 模块 12: 为什么选择Busrom */}
         {content.whyChooseBusrom?.reasons?.length > 0 && (
-          <LazySection headerTheme="light">
-            <MemoizedWhyChooseBusrom data={content.whyChooseBusrom} />
-          </LazySection>
+          <MemoizedWhyChooseBusrom data={content.whyChooseBusrom} headerTheme="light" />
         )}
 
         {/* 模块 13: 应用案例轮播 */}
         {content.caseStudies?.applications?.length > 0 && (
-          <LazySection headerTheme="light">
-            <MemoizedCaseStudies data={content.caseStudies} />
-          </LazySection>
+          <MemoizedCaseStudies data={content.caseStudies} headerTheme="light" />
         )}
 
         {/* 模块 14: 品牌价值植入 */}
         {content.brandAnalysis?.centers?.length > 0 && (
-          <LazySection headerTheme="transparent">
-            <MemoizedBrandAnalysis data={content.brandAnalysis} />
-          </LazySection>
+          <MemoizedBrandAnalysis data={content.brandAnalysis} headerTheme="transparent" />
         )}
 
         {/* 模块 15: 品牌价值体现 */}
         {content.brandValue?.param1 && content.brandValue?.slogan && (
-          <LazySection headerTheme="light">
-            <MemoizedBrandValue data={content.brandValue} />
-          </LazySection>
+          <MemoizedBrandValue data={content.brandValue} headerTheme="light" />
         )}
 
         {/* Footer - 首页专用 */}
-        <div data-header-theme="transparent">
-          <Footer locale={currentLanguage} showForm={true} />
-        </div>
+        <Footer locale={currentLanguage} showForm={true} headerTheme="transparent" />
       </DeferredContent>
 
     </main>

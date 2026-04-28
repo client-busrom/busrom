@@ -22,6 +22,8 @@ import Autoplay from "embla-carousel-autoplay";
 type Props = {
   data: HomeContent["featuredProducts"];
   locale: Locale;
+  headerTheme?: string;
+  className?: string;
 };
 
 type ProductCardProps = {
@@ -449,7 +451,7 @@ const MobileProductCarousel = ({
 };
 
 // --- 主组件 ---
-export default function FeaturedProducts({ data, locale }: Props) {
+export default function FeaturedProducts({ data, locale, headerTheme, className }: Props) {
   const isMobile = useIsMobile();
   const sectionRef = useRef<HTMLElement>(null);
   const [activeSeriesIndex, setActiveSeriesIndex] = useState(0);
@@ -504,7 +506,11 @@ export default function FeaturedProducts({ data, locale }: Props) {
   const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
 
   return (
-    <section ref={sectionRef} className="py-12 lg:py-0 bg-brand-main" >
+    <section 
+      ref={sectionRef} 
+      className={cn("py-12 lg:py-0 bg-brand-main", className)}
+      data-header-theme={headerTheme}
+    >
       <div className="container mx-auto px-4 lg:px-0" style={{ maxWidth: '100%' }}>
 
         {/* ==================== 移动端布局 ==================== */}

@@ -19,6 +19,8 @@ import type {
 
 type Props = {
   data: CaseStudiesData;
+  headerTheme?: string;
+  className?: string;
 };
 
 // 布局配置 - 基于 Figma JSON
@@ -65,7 +67,7 @@ const LAYOUT = {
   },
 };
 
-export default function CaseStudies({ data }: Props) {
+export default function CaseStudies({ data, headerTheme, className }: Props) {
   // 移动端 Carousel API
   const [mobileApi, setMobileApi] = React.useState<CarouselApi>();
   const [mobileCanScrollPrev, setMobileCanScrollPrev] = React.useState(false);
@@ -145,7 +147,8 @@ export default function CaseStudies({ data }: Props) {
 
   return (
     <section
-      className="relative bg-brand-main md:pb-24 py-12"
+      className={cn("relative bg-brand-main md:pb-24 py-12", className)}
+      data-header-theme={headerTheme}
       
     >
       {/* ==================== 移动端布局 ==================== */}

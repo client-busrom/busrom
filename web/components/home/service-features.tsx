@@ -8,12 +8,18 @@ import FeatureImageLayout from "./FeatureImageLayout";
 
 type Props = {
   data: HomeContent["serviceFeatures"];
+  headerTheme?: string;
+  className?: string;
 };
 
 const featureTransition = { duration: 0.5, ease: "easeInOut" };
 const CAROUSEL_DURATION = 5000; // 轮播间隔时间（毫秒）
 
-export default function ServiceFeatures({ data }: Props) {
+export default function ServiceFeatures({
+  data,
+  headerTheme,
+  className,
+}: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [progress, setProgress] = useState(0); // 进度 0-100
   const [isVisible, setIsVisible] = useState(false); // 是否在视口内
@@ -121,8 +127,8 @@ export default function ServiceFeatures({ data }: Props) {
   return (
     <section
       ref={sectionRef}
-      className="py-16 lg:py-24 bg-brand-main"
-      
+      className={cn("py-16 lg:py-24 bg-brand-main", className)}
+      data-header-theme={headerTheme}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >

@@ -1,7 +1,15 @@
 // @ts-nocheck
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback, useMemo, memo } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+  memo,
+} from "react";
+import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 
 // Dynamic import Globe component
@@ -13,8 +21,8 @@ const Globe = dynamic(
       <div className="w-full h-full flex items-center justify-center">
         <div className="text-cyan-400 text-sm">Loading Globe...</div>
       </div>
-    )
-  }
+    ),
+  },
 );
 
 // --- 多语言地点配置 ---
@@ -47,124 +55,607 @@ const ORIGIN: LocationData = {
 const DESTINATIONS: LocationData[] = [
   // ========== 北美 ==========
   // United States - 热门城市
-  { id: "new-york", lat: 40.7128, lng: -74.006, name: { en: "New York, USA", zh: "美国纽约", ar: "نيويورك، أمريكا" } },
-  { id: "los-angeles", lat: 34.0522, lng: -118.2437, name: { en: "Los Angeles, USA", zh: "美国洛杉矶", ar: "لوس أنجلوس، أمريكا" } },
-  { id: "chicago", lat: 41.8781, lng: -87.6298, name: { en: "Chicago, USA", zh: "美国芝加哥", ar: "شيكاغو، أمريكا" } },
-  { id: "miami", lat: 25.7617, lng: -80.1918, name: { en: "Miami, USA", zh: "美国迈阿密", ar: "ميامي، أمريكا" } },
-  { id: "houston", lat: 29.7604, lng: -95.3698, name: { en: "Houston, USA", zh: "美国休斯顿", ar: "هيوستن، أمريكا" } },
+  {
+    id: "new-york",
+    lat: 40.7128,
+    lng: -74.006,
+    name: { en: "New York, USA", zh: "美国纽约", ar: "نيويورك، أمريكا" },
+  },
+  {
+    id: "los-angeles",
+    lat: 34.0522,
+    lng: -118.2437,
+    name: {
+      en: "Los Angeles, USA",
+      zh: "美国洛杉矶",
+      ar: "لوس أنجلوس، أمريكا",
+    },
+  },
+  {
+    id: "chicago",
+    lat: 41.8781,
+    lng: -87.6298,
+    name: { en: "Chicago, USA", zh: "美国芝加哥", ar: "شيكاغو، أمريكا" },
+  },
+  {
+    id: "miami",
+    lat: 25.7617,
+    lng: -80.1918,
+    name: { en: "Miami, USA", zh: "美国迈阿密", ar: "ميامي، أمريكا" },
+  },
+  {
+    id: "houston",
+    lat: 29.7604,
+    lng: -95.3698,
+    name: { en: "Houston, USA", zh: "美国休斯顿", ar: "هيوستن، أمريكا" },
+  },
   // Canada - 热门城市
-  { id: "toronto", lat: 43.6532, lng: -79.3832, name: { en: "Toronto, Canada", zh: "加拿大多伦多", ar: "تورنتو، كندا" } },
-  { id: "vancouver", lat: 49.2827, lng: -123.1207, name: { en: "Vancouver, Canada", zh: "加拿大温哥华", ar: "فانكوفر، كندا" } },
+  {
+    id: "toronto",
+    lat: 43.6532,
+    lng: -79.3832,
+    name: { en: "Toronto, Canada", zh: "加拿大多伦多", ar: "تورنتو، كندا" },
+  },
+  {
+    id: "vancouver",
+    lat: 49.2827,
+    lng: -123.1207,
+    name: { en: "Vancouver, Canada", zh: "加拿大温哥华", ar: "فانكوفر، كندا" },
+  },
 
   // ========== 南美 ==========
-  { id: "mexico-city", lat: 19.4326, lng: -99.1332, name: { en: "Mexico City, Mexico", zh: "墨西哥城", ar: "مكسيكو سيتي، المكسيك" } },
-  { id: "brasilia", lat: -15.7975, lng: -47.8919, name: { en: "Brasília, Brazil", zh: "巴西利亚", ar: "برازيليا، البرازيل" } },
-  { id: "bogota", lat: 4.711, lng: -74.0721, name: { en: "Bogotá, Colombia", zh: "波哥大", ar: "بوغوتا، كولومبيا" } },
-  { id: "georgetown", lat: 6.8013, lng: -58.1551, name: { en: "Georgetown, Guyana", zh: "乔治敦", ar: "جورج تاون، غيانا" } },
-  { id: "nassau", lat: 25.0343, lng: -77.3963, name: { en: "Nassau, Bahamas", zh: "拿骚", ar: "ناسو، جزر البهاما" } },
-  { id: "panama-city", lat: 8.9824, lng: -79.5199, name: { en: "Panama City, Panama", zh: "巴拿马城", ar: "بنما سيتي، بنما" } },
-  { id: "montevideo", lat: -34.9011, lng: -56.1645, name: { en: "Montevideo, Uruguay", zh: "蒙得维的亚", ar: "مونتيفيديو، أوروغواي" } },
-  { id: "santiago", lat: -33.4489, lng: -70.6693, name: { en: "Santiago, Chile", zh: "圣地亚哥", ar: "سانتياغو، تشيلي" } },
-  { id: "san-jose", lat: 9.9281, lng: -84.0907, name: { en: "San José, Costa Rica", zh: "圣何塞", ar: "سان خوسيه، كوستاريكا" } },
-  { id: "buenos-aires", lat: -34.6037, lng: -58.3816, name: { en: "Buenos Aires, Argentina", zh: "布宜诺斯艾利斯", ar: "بوينس آيرس، الأرجنتين" } },
-  { id: "santo-domingo", lat: 18.4861, lng: -69.9312, name: { en: "Santo Domingo, Dominican Republic", zh: "圣多明各", ar: "سانتو دومينغو، جمهورية الدومينيكان" } },
-  { id: "port-of-spain", lat: 10.6596, lng: -61.5086, name: { en: "Port of Spain, Trinidad", zh: "西班牙港", ar: "بورت أوف سبين، ترينيداد" } },
+  {
+    id: "mexico-city",
+    lat: 19.4326,
+    lng: -99.1332,
+    name: {
+      en: "Mexico City, Mexico",
+      zh: "墨西哥城",
+      ar: "مكسيكو سيتي، المكسيك",
+    },
+  },
+  {
+    id: "brasilia",
+    lat: -15.7975,
+    lng: -47.8919,
+    name: { en: "Brasília, Brazil", zh: "巴西利亚", ar: "برازيليا، البرازيل" },
+  },
+  {
+    id: "bogota",
+    lat: 4.711,
+    lng: -74.0721,
+    name: { en: "Bogotá, Colombia", zh: "波哥大", ar: "بوغوتا، كولومبيا" },
+  },
+  {
+    id: "georgetown",
+    lat: 6.8013,
+    lng: -58.1551,
+    name: { en: "Georgetown, Guyana", zh: "乔治敦", ar: "جورج تاون، غيانا" },
+  },
+  {
+    id: "nassau",
+    lat: 25.0343,
+    lng: -77.3963,
+    name: { en: "Nassau, Bahamas", zh: "拿骚", ar: "ناسو، جزر البهاما" },
+  },
+  {
+    id: "panama-city",
+    lat: 8.9824,
+    lng: -79.5199,
+    name: { en: "Panama City, Panama", zh: "巴拿马城", ar: "بنما سيتي، بنما" },
+  },
+  {
+    id: "montevideo",
+    lat: -34.9011,
+    lng: -56.1645,
+    name: {
+      en: "Montevideo, Uruguay",
+      zh: "蒙得维的亚",
+      ar: "مونتيفيديو، أوروغواي",
+    },
+  },
+  {
+    id: "santiago",
+    lat: -33.4489,
+    lng: -70.6693,
+    name: { en: "Santiago, Chile", zh: "圣地亚哥", ar: "سانتياغو، تشيلي" },
+  },
+  {
+    id: "san-jose",
+    lat: 9.9281,
+    lng: -84.0907,
+    name: {
+      en: "San José, Costa Rica",
+      zh: "圣何塞",
+      ar: "سان خوسيه، كوستاريكا",
+    },
+  },
+  {
+    id: "buenos-aires",
+    lat: -34.6037,
+    lng: -58.3816,
+    name: {
+      en: "Buenos Aires, Argentina",
+      zh: "布宜诺斯艾利斯",
+      ar: "بوينس آيرس، الأرجنتين",
+    },
+  },
+  {
+    id: "santo-domingo",
+    lat: 18.4861,
+    lng: -69.9312,
+    name: {
+      en: "Santo Domingo, Dominican Republic",
+      zh: "圣多明各",
+      ar: "سانتو دومينغو، جمهورية الدومينيكان",
+    },
+  },
+  {
+    id: "port-of-spain",
+    lat: 10.6596,
+    lng: -61.5086,
+    name: {
+      en: "Port of Spain, Trinidad",
+      zh: "西班牙港",
+      ar: "بورت أوف سبين، ترينيداد",
+    },
+  },
 
   // ========== 欧洲 ==========
-  { id: "vienna", lat: 48.2082, lng: 16.3738, name: { en: "Vienna, Austria", zh: "维也纳", ar: "فيينا، النمسا" } },
-  { id: "brussels", lat: 50.8503, lng: 4.3517, name: { en: "Brussels, Belgium", zh: "布鲁塞尔", ar: "بروكسل، بلجيكا" } },
-  { id: "prague", lat: 50.0755, lng: 14.4378, name: { en: "Prague, Czech Republic", zh: "布拉格", ar: "براغ، التشيك" } },
-  { id: "copenhagen", lat: 55.6761, lng: 12.5683, name: { en: "Copenhagen, Denmark", zh: "哥本哈根", ar: "كوبنهاغن، الدنمارك" } },
-  { id: "berlin", lat: 52.52, lng: 13.405, name: { en: "Berlin, Germany", zh: "柏林", ar: "برلين، ألمانيا" } },
-  { id: "budapest", lat: 47.4979, lng: 19.0402, name: { en: "Budapest, Hungary", zh: "布达佩斯", ar: "بودابست، المجر" } },
-  { id: "dublin", lat: 53.3498, lng: -6.2603, name: { en: "Dublin, Ireland", zh: "都柏林", ar: "دبلن، أيرلندا" } },
-  { id: "reykjavik", lat: 64.1466, lng: -21.9426, name: { en: "Reykjavik, Iceland", zh: "雷克雅未克", ar: "ريكيافيك، آيسلندا" } },
-  { id: "rome", lat: 41.9028, lng: 12.4964, name: { en: "Rome, Italy", zh: "罗马", ar: "روما، إيطاليا" } },
-  { id: "luxembourg", lat: 49.6116, lng: 6.1319, name: { en: "Luxembourg", zh: "卢森堡", ar: "لوكسمبورغ" } },
-  { id: "amsterdam", lat: 52.3676, lng: 4.9041, name: { en: "Amsterdam, Netherlands", zh: "阿姆斯特丹", ar: "أمستردام، هولندا" } },
-  { id: "oslo", lat: 59.9139, lng: 10.7522, name: { en: "Oslo, Norway", zh: "奥斯陆", ar: "أوسلو، النرويج" } },
-  { id: "warsaw", lat: 52.2297, lng: 21.0122, name: { en: "Warsaw, Poland", zh: "华沙", ar: "وارسو، بولندا" } },
-  { id: "bratislava", lat: 48.1486, lng: 17.1077, name: { en: "Bratislava, Slovakia", zh: "布拉迪斯拉发", ar: "براتيسلافا، سلوفاكيا" } },
-  { id: "madrid", lat: 40.4168, lng: -3.7038, name: { en: "Madrid, Spain", zh: "马德里", ar: "مدريد، إسبانيا" } },
-  { id: "stockholm", lat: 59.3293, lng: 18.0686, name: { en: "Stockholm, Sweden", zh: "斯德哥尔摩", ar: "ستوكهولم، السويد" } },
-  { id: "bern", lat: 46.9481, lng: 7.4474, name: { en: "Bern, Switzerland", zh: "伯尔尼", ar: "برن، سويسرا" } },
-  { id: "london", lat: 51.5074, lng: -0.1278, name: { en: "London, UK", zh: "伦敦", ar: "لندن، المملكة المتحدة" } },
-  { id: "helsinki", lat: 60.1699, lng: 24.9384, name: { en: "Helsinki, Finland", zh: "赫尔辛基", ar: "هلسنكي، فنلندا" } },
+  {
+    id: "vienna",
+    lat: 48.2082,
+    lng: 16.3738,
+    name: { en: "Vienna, Austria", zh: "维也纳", ar: "فيينا، النمسا" },
+  },
+  {
+    id: "brussels",
+    lat: 50.8503,
+    lng: 4.3517,
+    name: { en: "Brussels, Belgium", zh: "布鲁塞尔", ar: "بروكسل، بلجيكا" },
+  },
+  {
+    id: "prague",
+    lat: 50.0755,
+    lng: 14.4378,
+    name: { en: "Prague, Czech Republic", zh: "布拉格", ar: "براغ، التشيك" },
+  },
+  {
+    id: "copenhagen",
+    lat: 55.6761,
+    lng: 12.5683,
+    name: {
+      en: "Copenhagen, Denmark",
+      zh: "哥本哈根",
+      ar: "كوبنهاغن، الدنمارك",
+    },
+  },
+  {
+    id: "berlin",
+    lat: 52.52,
+    lng: 13.405,
+    name: { en: "Berlin, Germany", zh: "柏林", ar: "برلين، ألمانيا" },
+  },
+  {
+    id: "budapest",
+    lat: 47.4979,
+    lng: 19.0402,
+    name: { en: "Budapest, Hungary", zh: "布达佩斯", ar: "بودابست، المجر" },
+  },
+  {
+    id: "dublin",
+    lat: 53.3498,
+    lng: -6.2603,
+    name: { en: "Dublin, Ireland", zh: "都柏林", ar: "دبلن، أيرلندا" },
+  },
+  {
+    id: "reykjavik",
+    lat: 64.1466,
+    lng: -21.9426,
+    name: {
+      en: "Reykjavik, Iceland",
+      zh: "雷克雅未克",
+      ar: "ريكيافيك، آيسلندا",
+    },
+  },
+  {
+    id: "rome",
+    lat: 41.9028,
+    lng: 12.4964,
+    name: { en: "Rome, Italy", zh: "罗马", ar: "روما، إيطاليا" },
+  },
+  {
+    id: "luxembourg",
+    lat: 49.6116,
+    lng: 6.1319,
+    name: { en: "Luxembourg", zh: "卢森堡", ar: "لوكسمبورغ" },
+  },
+  {
+    id: "amsterdam",
+    lat: 52.3676,
+    lng: 4.9041,
+    name: {
+      en: "Amsterdam, Netherlands",
+      zh: "阿姆斯特丹",
+      ar: "أمستردام، هولندا",
+    },
+  },
+  {
+    id: "oslo",
+    lat: 59.9139,
+    lng: 10.7522,
+    name: { en: "Oslo, Norway", zh: "奥斯陆", ar: "أوسلو، النرويج" },
+  },
+  {
+    id: "warsaw",
+    lat: 52.2297,
+    lng: 21.0122,
+    name: { en: "Warsaw, Poland", zh: "华沙", ar: "وارسو، بولندا" },
+  },
+  {
+    id: "bratislava",
+    lat: 48.1486,
+    lng: 17.1077,
+    name: {
+      en: "Bratislava, Slovakia",
+      zh: "布拉迪斯拉发",
+      ar: "براتيسلافا، سلوفاكيا",
+    },
+  },
+  {
+    id: "madrid",
+    lat: 40.4168,
+    lng: -3.7038,
+    name: { en: "Madrid, Spain", zh: "马德里", ar: "مدريد، إسبانيا" },
+  },
+  {
+    id: "stockholm",
+    lat: 59.3293,
+    lng: 18.0686,
+    name: { en: "Stockholm, Sweden", zh: "斯德哥尔摩", ar: "ستوكهولم، السويد" },
+  },
+  {
+    id: "bern",
+    lat: 46.9481,
+    lng: 7.4474,
+    name: { en: "Bern, Switzerland", zh: "伯尔尼", ar: "برن، سويسرا" },
+  },
+  {
+    id: "london",
+    lat: 51.5074,
+    lng: -0.1278,
+    name: { en: "London, UK", zh: "伦敦", ar: "لندن، المملكة المتحدة" },
+  },
+  {
+    id: "helsinki",
+    lat: 60.1699,
+    lng: 24.9384,
+    name: { en: "Helsinki, Finland", zh: "赫尔辛基", ar: "هلسنكي، فنلندا" },
+  },
 
   // ========== 非洲 ==========
-  { id: "victoria", lat: -4.6191, lng: 55.4513, name: { en: "Victoria, Seychelles", zh: "维多利亚", ar: "فيكتوريا، سيشل" } },
-  { id: "port-louis", lat: -20.1609, lng: 57.5012, name: { en: "Port Louis, Mauritius", zh: "路易港", ar: "بورت لويس، موريشيوس" } },
-  { id: "libreville", lat: 0.4162, lng: 9.4673, name: { en: "Libreville, Gabon", zh: "利伯维尔", ar: "ليبرفيل، الغابون" } },
-  { id: "malabo", lat: 3.7504, lng: 8.7371, name: { en: "Malabo, Equatorial Guinea", zh: "马拉博", ar: "مالابو، غينيا الاستوائية" } },
-  { id: "cairo", lat: 30.0444, lng: 31.2357, name: { en: "Cairo, Egypt", zh: "开罗", ar: "القاهرة، مصر" } },
-  { id: "gaborone", lat: -24.6282, lng: 25.9231, name: { en: "Gaborone, Botswana", zh: "哈博罗内", ar: "غابورون، بوتسوانا" } },
-  { id: "algiers", lat: 36.7538, lng: 3.0588, name: { en: "Algiers, Algeria", zh: "阿尔及尔", ar: "الجزائر العاصمة" } },
-  { id: "pretoria", lat: -25.7479, lng: 28.2293, name: { en: "Pretoria, South Africa", zh: "比勒陀利亚", ar: "بريتوريا، جنوب أفريقيا" } },
-  { id: "tripoli", lat: 32.8872, lng: 13.1913, name: { en: "Tripoli, Libya", zh: "的黎波里", ar: "طرابلس، ليبيا" } },
-  { id: "tunis", lat: 36.8065, lng: 10.1815, name: { en: "Tunis, Tunisia", zh: "突尼斯", ar: "تونس العاصمة" } },
-  { id: "mbabane", lat: -26.3054, lng: 31.1367, name: { en: "Mbabane, Eswatini", zh: "姆巴巴纳", ar: "مباباني، إيسواتيني" } },
-  { id: "windhoek", lat: -22.5609, lng: 17.0658, name: { en: "Windhoek, Namibia", zh: "温得和克", ar: "ويندهوك، ناميبيا" } },
-  { id: "praia", lat: 14.933, lng: -23.5133, name: { en: "Praia, Cabo Verde", zh: "普拉亚", ar: "برايا، الرأس الأخضر" } },
-  { id: "rabat", lat: 34.0209, lng: -6.8416, name: { en: "Rabat, Morocco", zh: "拉巴特", ar: "الرباط، المغرب" } },
-  { id: "luanda", lat: -8.839, lng: 13.2894, name: { en: "Luanda, Angola", zh: "罗安达", ar: "لواندا، أنغولا" } },
+  {
+    id: "victoria",
+    lat: -4.6191,
+    lng: 55.4513,
+    name: { en: "Victoria, Seychelles", zh: "维多利亚", ar: "فيكتوريا، سيشل" },
+  },
+  {
+    id: "port-louis",
+    lat: -20.1609,
+    lng: 57.5012,
+    name: {
+      en: "Port Louis, Mauritius",
+      zh: "路易港",
+      ar: "بورت لويس، موريشيوس",
+    },
+  },
+  {
+    id: "libreville",
+    lat: 0.4162,
+    lng: 9.4673,
+    name: { en: "Libreville, Gabon", zh: "利伯维尔", ar: "ليبرفيل، الغابون" },
+  },
+  {
+    id: "malabo",
+    lat: 3.7504,
+    lng: 8.7371,
+    name: {
+      en: "Malabo, Equatorial Guinea",
+      zh: "马拉博",
+      ar: "مالابو، غينيا الاستوائية",
+    },
+  },
+  {
+    id: "cairo",
+    lat: 30.0444,
+    lng: 31.2357,
+    name: { en: "Cairo, Egypt", zh: "开罗", ar: "القاهرة، مصر" },
+  },
+  {
+    id: "gaborone",
+    lat: -24.6282,
+    lng: 25.9231,
+    name: { en: "Gaborone, Botswana", zh: "哈博罗内", ar: "غابورون، بوتسوانا" },
+  },
+  {
+    id: "algiers",
+    lat: 36.7538,
+    lng: 3.0588,
+    name: { en: "Algiers, Algeria", zh: "阿尔及尔", ar: "الجزائر العاصمة" },
+  },
+  {
+    id: "pretoria",
+    lat: -25.7479,
+    lng: 28.2293,
+    name: {
+      en: "Pretoria, South Africa",
+      zh: "比勒陀利亚",
+      ar: "بريتوريا، جنوب أفريقيا",
+    },
+  },
+  {
+    id: "tripoli",
+    lat: 32.8872,
+    lng: 13.1913,
+    name: { en: "Tripoli, Libya", zh: "的黎波里", ar: "طرابلس، ليبيا" },
+  },
+  {
+    id: "tunis",
+    lat: 36.8065,
+    lng: 10.1815,
+    name: { en: "Tunis, Tunisia", zh: "突尼斯", ar: "تونس العاصمة" },
+  },
+  {
+    id: "mbabane",
+    lat: -26.3054,
+    lng: 31.1367,
+    name: { en: "Mbabane, Eswatini", zh: "姆巴巴纳", ar: "مباباني، إيسواتيني" },
+  },
+  {
+    id: "windhoek",
+    lat: -22.5609,
+    lng: 17.0658,
+    name: { en: "Windhoek, Namibia", zh: "温得和克", ar: "ويندهوك، ناميبيا" },
+  },
+  {
+    id: "praia",
+    lat: 14.933,
+    lng: -23.5133,
+    name: { en: "Praia, Cabo Verde", zh: "普拉亚", ar: "برايا، الرأس الأخضر" },
+  },
+  {
+    id: "rabat",
+    lat: 34.0209,
+    lng: -6.8416,
+    name: { en: "Rabat, Morocco", zh: "拉巴特", ar: "الرباط، المغرب" },
+  },
+  {
+    id: "luanda",
+    lat: -8.839,
+    lng: 13.2894,
+    name: { en: "Luanda, Angola", zh: "罗安达", ar: "لواندا، أنغولا" },
+  },
 
   // ========== 中东（首都） ==========
-  { id: "abu-dhabi", lat: 24.4539, lng: 54.3773, name: { en: "Abu Dhabi, UAE", zh: "阿布扎比", ar: "أبو ظبي، الإمارات" } },
-  { id: "riyadh", lat: 24.7136, lng: 46.6753, name: { en: "Riyadh, Saudi Arabia", zh: "利雅得", ar: "الرياض، السعودية" } },
-  { id: "doha", lat: 25.2854, lng: 51.531, name: { en: "Doha, Qatar", zh: "多哈", ar: "الدوحة، قطر" } },
-  { id: "manama", lat: 26.2285, lng: 50.5860, name: { en: "Manama, Bahrain", zh: "麦纳麦", ar: "المنامة، البحرين" } },
-  { id: "kuwait-city", lat: 29.3759, lng: 47.9774, name: { en: "Kuwait City, Kuwait", zh: "科威特城", ar: "مدينة الكويت" } },
-  { id: "jerusalem", lat: 31.7683, lng: 35.2137, name: { en: "Jerusalem, Israel", zh: "耶路撒冷", ar: "القدس، إسرائيل" } },
-  { id: "ankara", lat: 39.9334, lng: 32.8597, name: { en: "Ankara, Turkey", zh: "安卡拉", ar: "أنقرة، تركيا" } },
-  { id: "muscat", lat: 23.5880, lng: 58.3829, name: { en: "Muscat, Oman", zh: "马斯喀特", ar: "مسقط، عمان" } },
-  { id: "baku", lat: 40.4093, lng: 49.8671, name: { en: "Baku, Azerbaijan", zh: "巴库", ar: "باكو، أذربيجان" } },
-  { id: "beirut", lat: 33.8938, lng: 35.5018, name: { en: "Beirut, Lebanon", zh: "贝鲁特", ar: "بيروت، لبنان" } },
-  { id: "amman", lat: 31.9454, lng: 35.9284, name: { en: "Amman, Jordan", zh: "安曼", ar: "عمان، الأردن" } },
-  { id: "tehran", lat: 35.6892, lng: 51.3890, name: { en: "Tehran, Iran", zh: "德黑兰", ar: "طهران، إيران" } },
-  { id: "baghdad", lat: 33.3152, lng: 44.3661, name: { en: "Baghdad, Iraq", zh: "巴格达", ar: "بغداد، العراق" } },
+  {
+    id: "abu-dhabi",
+    lat: 24.4539,
+    lng: 54.3773,
+    name: { en: "Abu Dhabi, UAE", zh: "阿布扎比", ar: "أبو ظبي، الإمارات" },
+  },
+  {
+    id: "riyadh",
+    lat: 24.7136,
+    lng: 46.6753,
+    name: { en: "Riyadh, Saudi Arabia", zh: "利雅得", ar: "الرياض، السعودية" },
+  },
+  {
+    id: "doha",
+    lat: 25.2854,
+    lng: 51.531,
+    name: { en: "Doha, Qatar", zh: "多哈", ar: "الدوحة، قطر" },
+  },
+  {
+    id: "manama",
+    lat: 26.2285,
+    lng: 50.586,
+    name: { en: "Manama, Bahrain", zh: "麦纳麦", ar: "المنامة، البحرين" },
+  },
+  {
+    id: "kuwait-city",
+    lat: 29.3759,
+    lng: 47.9774,
+    name: { en: "Kuwait City, Kuwait", zh: "科威特城", ar: "مدينة الكويت" },
+  },
+  {
+    id: "jerusalem",
+    lat: 31.7683,
+    lng: 35.2137,
+    name: { en: "Jerusalem, Israel", zh: "耶路撒冷", ar: "القدس، إسرائيل" },
+  },
+  {
+    id: "ankara",
+    lat: 39.9334,
+    lng: 32.8597,
+    name: { en: "Ankara, Turkey", zh: "安卡拉", ar: "أنقرة، تركيا" },
+  },
+  {
+    id: "muscat",
+    lat: 23.588,
+    lng: 58.3829,
+    name: { en: "Muscat, Oman", zh: "马斯喀特", ar: "مسقط، عمان" },
+  },
+  {
+    id: "baku",
+    lat: 40.4093,
+    lng: 49.8671,
+    name: { en: "Baku, Azerbaijan", zh: "巴库", ar: "باكو، أذربيجان" },
+  },
+  {
+    id: "beirut",
+    lat: 33.8938,
+    lng: 35.5018,
+    name: { en: "Beirut, Lebanon", zh: "贝鲁特", ar: "بيروت، لبنان" },
+  },
+  {
+    id: "amman",
+    lat: 31.9454,
+    lng: 35.9284,
+    name: { en: "Amman, Jordan", zh: "安曼", ar: "عمان، الأردن" },
+  },
+  {
+    id: "tehran",
+    lat: 35.6892,
+    lng: 51.389,
+    name: { en: "Tehran, Iran", zh: "德黑兰", ar: "طهران، إيران" },
+  },
+  {
+    id: "baghdad",
+    lat: 33.3152,
+    lng: 44.3661,
+    name: { en: "Baghdad, Iraq", zh: "巴格达", ar: "بغداد، العراق" },
+  },
 
   // ========== 澳洲及太平洋 ==========
-  { id: "canberra", lat: -35.2809, lng: 149.1300, name: { en: "Canberra, Australia", zh: "堪培拉", ar: "كانبرا، أستراليا" } },
-  { id: "sydney", lat: -33.8688, lng: 151.2093, name: { en: "Sydney, Australia", zh: "悉尼", ar: "سيدني، أستراليا" } },
-  { id: "wellington", lat: -41.2865, lng: 174.7762, name: { en: "Wellington, New Zealand", zh: "惠灵顿", ar: "ولينغتون، نيوزيلندا" } },
-  { id: "ngerulmud", lat: 7.5006, lng: 134.6243, name: { en: "Ngerulmud, Palau", zh: "恩吉鲁穆德", ar: "نغيرولمود، بالاو" } },
-  { id: "yaren", lat: -0.5477, lng: 166.9209, name: { en: "Yaren, Nauru", zh: "亚伦", ar: "يارين، ناورو" } },
-  { id: "suva", lat: -18.1416, lng: 178.4419, name: { en: "Suva, Fiji", zh: "苏瓦", ar: "سوفا، فيجي" } },
-  { id: "funafuti", lat: -8.5211, lng: 179.1962, name: { en: "Funafuti, Tuvalu", zh: "富纳富提", ar: "فونافوتي، توفالو" } },
-  { id: "nukualofa", lat: -21.2114, lng: -175.1998, name: { en: "Nukuʻalofa, Tonga", zh: "努库阿洛法", ar: "نوكوالوفا، تونغا" } },
-  { id: "apia", lat: -13.8333, lng: -171.7500, name: { en: "Apia, Samoa", zh: "阿皮亚", ar: "آبيا، ساموا" } },
-  { id: "majuro", lat: 7.0897, lng: 171.3803, name: { en: "Majuro, Marshall Islands", zh: "马朱罗", ar: "ماجورو، جزر مارشال" } },
-  { id: "palikir", lat: 6.9248, lng: 158.1610, name: { en: "Palikir, Micronesia", zh: "帕利基尔", ar: "باليكير، ميكرونيزيا" } },
-  { id: "tarawa", lat: 1.3290, lng: 172.9790, name: { en: "Tarawa, Kiribati", zh: "塔拉瓦", ar: "تاراوا، كيريباتي" } },
-  { id: "port-vila", lat: -17.7338, lng: 168.3273, name: { en: "Port Vila, Vanuatu", zh: "维拉港", ar: "بورت فيلا، فانواتو" } },
-  { id: "port-moresby", lat: -9.4438, lng: 147.1803, name: { en: "Port Moresby, Papua New Guinea", zh: "莫尔兹比港", ar: "بورت مورسبي، بابوا غينيا الجديدة" } },
-  { id: "honiara", lat: -9.4456, lng: 159.9729, name: { en: "Honiara, Solomon Islands", zh: "霍尼亚拉", ar: "هونيارا، جزر سليمان" } },
+  {
+    id: "canberra",
+    lat: -35.2809,
+    lng: 149.13,
+    name: { en: "Canberra, Australia", zh: "堪培拉", ar: "كانبرا، أستراليا" },
+  },
+  {
+    id: "sydney",
+    lat: -33.8688,
+    lng: 151.2093,
+    name: { en: "Sydney, Australia", zh: "悉尼", ar: "سيدني، أستراليا" },
+  },
+  {
+    id: "wellington",
+    lat: -41.2865,
+    lng: 174.7762,
+    name: {
+      en: "Wellington, New Zealand",
+      zh: "惠灵顿",
+      ar: "ولينغتون، نيوزيلندا",
+    },
+  },
+  {
+    id: "ngerulmud",
+    lat: 7.5006,
+    lng: 134.6243,
+    name: { en: "Ngerulmud, Palau", zh: "恩吉鲁穆德", ar: "نغيرولمود، بالاو" },
+  },
+  {
+    id: "yaren",
+    lat: -0.5477,
+    lng: 166.9209,
+    name: { en: "Yaren, Nauru", zh: "亚伦", ar: "يارين، ناورو" },
+  },
+  {
+    id: "suva",
+    lat: -18.1416,
+    lng: 178.4419,
+    name: { en: "Suva, Fiji", zh: "苏瓦", ar: "سوفا، فيجي" },
+  },
+  {
+    id: "funafuti",
+    lat: -8.5211,
+    lng: 179.1962,
+    name: { en: "Funafuti, Tuvalu", zh: "富纳富提", ar: "فونافوتي، توفالو" },
+  },
+  {
+    id: "nukualofa",
+    lat: -21.2114,
+    lng: -175.1998,
+    name: { en: "Nukuʻalofa, Tonga", zh: "努库阿洛法", ar: "نوكوالوفا، تونغا" },
+  },
+  {
+    id: "apia",
+    lat: -13.8333,
+    lng: -171.75,
+    name: { en: "Apia, Samoa", zh: "阿皮亚", ar: "آبيا، ساموا" },
+  },
+  {
+    id: "majuro",
+    lat: 7.0897,
+    lng: 171.3803,
+    name: {
+      en: "Majuro, Marshall Islands",
+      zh: "马朱罗",
+      ar: "ماجورو، جزر مارشال",
+    },
+  },
+  {
+    id: "palikir",
+    lat: 6.9248,
+    lng: 158.161,
+    name: {
+      en: "Palikir, Micronesia",
+      zh: "帕利基尔",
+      ar: "باليكير، ميكرونيزيا",
+    },
+  },
+  {
+    id: "tarawa",
+    lat: 1.329,
+    lng: 172.979,
+    name: { en: "Tarawa, Kiribati", zh: "塔拉瓦", ar: "تاراوا، كيريباتي" },
+  },
+  {
+    id: "port-vila",
+    lat: -17.7338,
+    lng: 168.3273,
+    name: { en: "Port Vila, Vanuatu", zh: "维拉港", ar: "بورت فيلا، فانواتو" },
+  },
+  {
+    id: "port-moresby",
+    lat: -9.4438,
+    lng: 147.1803,
+    name: {
+      en: "Port Moresby, Papua New Guinea",
+      zh: "莫尔兹比港",
+      ar: "بورت مورسبي، بابوا غينيا الجديدة",
+    },
+  },
+  {
+    id: "honiara",
+    lat: -9.4456,
+    lng: 159.9729,
+    name: {
+      en: "Honiara, Solomon Islands",
+      zh: "霍尼亚拉",
+      ar: "هونيارا، جزر سليمان",
+    },
+  },
 ];
 
 // --- 样式配置 ---
 const CONFIG = {
   arc: {
     color: ["#00FFFF", "#0096FF"],
-    strokeWidth: 0.4,      // 更细的线条
-    dashLength: 0.02,      // 短线段
-    dashGap: 0.06,         // 小间隔
+    strokeWidth: 0.4, // 更细的线条
+    dashLength: 0.02, // 短线段
+    dashGap: 0.06, // 小间隔
     dashAnimateTime: 3000, // 快速流动
     altitude: 0.25,
   },
   point: {
     color: "#00FFFF",
-    radius: 0.8,           // 稍大一点，更容易点击
-    originRadius: 1.0,     // 起点稍大
+    radius: 0.8, // 稍大一点，更容易点击
+    originRadius: 1.0, // 起点稍大
     originColor: "#00FF88",
   },
   globe: {
     // 本地用 nginx 代理 MinIO，生产用 CloudFront
-    imageUrl: process.env.NODE_ENV === 'development'
-      ? "http://localhost:8080/media/globe/earth-blue-marble.webp"
-      : "https://cdn.busromhouse.com/media/globe/earth-blue-marble.webp",
-    backgroundUrl: process.env.NODE_ENV === 'development'
-      ? "http://localhost:8080/media/globe/night-sky.webp"
-      : "https://cdn.busromhouse.com/media/globe/night-sky.webp",
+    imageUrl:
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:8080/media/globe/earth-blue-marble.webp"
+        : "https://cdn.busromhouse.com/media/globe/earth-blue-marble.webp",
+    backgroundUrl:
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:8080/media/globe/night-sky.webp"
+        : "https://cdn.busromhouse.com/media/globe/night-sky.webp",
     atmosphereColor: "#87CEEB",
     atmosphereAltitude: 0.15,
   },
@@ -173,29 +664,37 @@ const CONFIG = {
   maxAltitude: 5,
 };
 
-// Props 类型
 interface Sphere3DProps {
   locale?: string;
   data?: {
     title: string;
     description: string;
   } | null;
+  headerTheme?: string;
+  className?: string;
 }
 
 // 计算 zoomLevel (0-1), 1 = 最近, 0 = 最远
 const altitudeToZoom = (alt: number) => {
-  return 1 - (alt - CONFIG.minAltitude) / (CONFIG.maxAltitude - CONFIG.minAltitude);
+  return (
+    1 - (alt - CONFIG.minAltitude) / (CONFIG.maxAltitude - CONFIG.minAltitude)
+  );
 };
 
 // 默认标题（fallback）
 const DEFAULT_TITLE = "GLOBAL NETWORK";
 const DEFAULT_DESCRIPTION = "Serving Customers Worldwide From Guangdong, China";
 
-export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DProps) {
+export default React.memo(function Sphere3D({
+  locale = "en",
+  data,
+  headerTheme,
+  className,
+}: Sphere3DProps) {
   // 使用后端数据，fallback 到默认值
   const title = data?.title || DEFAULT_TITLE;
   const description = data?.description || DEFAULT_DESCRIPTION;
-  
+
   useEffect(() => {
     console.log(`[Sphere3D] Rendered/Mounted with title: ${title}`);
   }, [title]);
@@ -205,17 +704,22 @@ export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DPro
   const sectionRef = useRef<HTMLElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [isMobile, setIsMobile] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(altitudeToZoom(CONFIG.initialView.altitude));
+  const [zoomLevel, setZoomLevel] = useState(
+    altitudeToZoom(CONFIG.initialView.altitude),
+  );
   const [isGlobeReady, setIsGlobeReady] = useState(false);
   const [selectedPoint, setSelectedPoint] = useState<string | null>(null);
   const [isInteractive, setIsInteractive] = useState(false);
   const [isVisible, setIsVisible] = useState(true); // 是否在视口内（默认 true，避免初始不渲染）
 
   // 根据 locale 获取地名
-  const getLocalizedName = useCallback((location: LocationData) => {
-    const lang = locale as keyof typeof location.name;
-    return location.name[lang] || location.name.en;
-  }, [locale]);
+  const getLocalizedName = useCallback(
+    (location: LocationData) => {
+      const lang = locale as keyof typeof location.name;
+      return location.name[lang] || location.name.en;
+    },
+    [locale],
+  );
 
   // 弧线数据 - 只在选中某个地点时显示从广东到该地点的连线
   const arcsData = useMemo(() => {
@@ -225,12 +729,14 @@ export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DPro
     const selectedDest = DESTINATIONS.find((d) => d.id === selectedPoint);
     if (!selectedDest) return [];
 
-    return [{
-      startLat: ORIGIN.lat,
-      startLng: ORIGIN.lng,
-      endLat: selectedDest.lat,
-      endLng: selectedDest.lng,
-    }];
+    return [
+      {
+        startLat: ORIGIN.lat,
+        startLng: ORIGIN.lng,
+        endLat: selectedDest.lat,
+        endLng: selectedDest.lng,
+      },
+    ];
   }, [selectedPoint]);
 
   // 生成点数据 (包含地名，用于悬停显示)
@@ -241,7 +747,6 @@ export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DPro
     ];
   }, [getLocalizedName]);
 
-
   // 监听窗口大小 - 使用 ResizeObserver 确保正确获取尺寸
   useEffect(() => {
     const container = containerRef.current;
@@ -251,7 +756,7 @@ export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DPro
       const width = container.offsetWidth;
       const height = container.offsetHeight;
       setIsMobile(window.innerWidth < 1024);
-      
+
       setSize((prev) => {
         // 如果宽度没变，高度变化小于 120px（通常是移动端浏览器地址栏隐藏/显示），则忽略，避免 Canvas 重绘导致的严重卡顿
         if (prev.width === width && Math.abs(prev.height - height) < 120) {
@@ -293,7 +798,7 @@ export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DPro
           setSelectedPoint(null);
         }
       },
-      { threshold: 0.1 } // 降低阈值，更早暂停
+      { threshold: 0.1 }, // 降低阈值，更早暂停
     );
 
     observer.observe(section);
@@ -303,14 +808,14 @@ export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DPro
   // 当不在视口内时暂停自转和渲染
   useEffect(() => {
     if (!isGlobeReady || !globeRef.current) return;
-    
+
     const controls = globeRef.current.controls();
     const renderer = globeRef.current.renderer();
-    
+
     if (controls) {
       controls.autoRotate = isVisible;
     }
-    
+
     if (renderer) {
       // 极致优化：根据视口状态开启/关闭渲染
       if (!isVisible) {
@@ -397,7 +902,10 @@ export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DPro
   const handleZoom = useCallback((delta: number) => {
     if (!globeRef.current) return;
     const pov = globeRef.current.pointOfView();
-    const newAlt = Math.max(CONFIG.minAltitude, Math.min(CONFIG.maxAltitude, pov.altitude + delta));
+    const newAlt = Math.max(
+      CONFIG.minAltitude,
+      Math.min(CONFIG.maxAltitude, pov.altitude + delta),
+    );
     globeRef.current.pointOfView({ ...pov, altitude: newAlt }, 300);
     setZoomLevel(altitudeToZoom(newAlt));
   }, []);
@@ -444,26 +952,38 @@ export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DPro
 
   // --- 将所有传递给 Globe 的回调函数使用 useCallback 缓存，避免由于组件 state 变化引发 WebGL 全量重绘 ---
   const getArcColor = useCallback(() => CONFIG.arc.color, []);
-  
+
   const getArcAltitude = useCallback((d: any) => {
-    const lat1 = d.startLat * Math.PI / 180;
-    const lat2 = d.endLat * Math.PI / 180;
-    const dLng = (d.endLng - d.startLng) * Math.PI / 180;
+    const lat1 = (d.startLat * Math.PI) / 180;
+    const lat2 = (d.endLat * Math.PI) / 180;
+    const dLng = ((d.endLng - d.startLng) * Math.PI) / 180;
     const dist = Math.acos(
       Math.sin(lat1) * Math.sin(lat2) +
-      Math.cos(lat1) * Math.cos(lat2) * Math.cos(dLng)
+        Math.cos(lat1) * Math.cos(lat2) * Math.cos(dLng),
     );
-    return Math.min(0.6, Math.max(0.2, dist / Math.PI * 0.8));
+    return Math.min(0.6, Math.max(0.2, (dist / Math.PI) * 0.8));
   }, []);
 
-  const getPointColor = useCallback((d: any) => d.isOrigin ? CONFIG.point.originColor : CONFIG.point.color, []);
-  const getPointRadius = useCallback((d: any) => d.isOrigin ? CONFIG.point.originRadius : CONFIG.point.radius, []);
-  const getPointLabel = useCallback((d: any) => `<div class="globe-label">${d.label}</div>`, []);
-  
-  const handlePointClick = useCallback((point: any) => {
-    if (!isInteractive && isMobile) return;
-    setSelectedPoint((prev) => (prev === point.id ? null : point.id));
-  }, [isInteractive, isMobile]);
+  const getPointColor = useCallback(
+    (d: any) => (d.isOrigin ? CONFIG.point.originColor : CONFIG.point.color),
+    [],
+  );
+  const getPointRadius = useCallback(
+    (d: any) => (d.isOrigin ? CONFIG.point.originRadius : CONFIG.point.radius),
+    [],
+  );
+  const getPointLabel = useCallback(
+    (d: any) => `<div class="globe-label">${d.label}</div>`,
+    [],
+  );
+
+  const handlePointClick = useCallback(
+    (point: any) => {
+      if (!isInteractive && isMobile) return;
+      setSelectedPoint((prev) => (prev === point.id ? null : point.id));
+    },
+    [isInteractive, isMobile],
+  );
 
   const renderHtmlElement = useCallback((d: any) => {
     const el = document.createElement("div");
@@ -476,9 +996,14 @@ export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DPro
   return (
     <section
       ref={sectionRef}
-      className="relative w-full overflow-hidden"
-      
-      style={{ height: "100vh", minHeight: "600px", background: "radial-gradient(ellipse at center, #0a1628 0%, #020408 100%)" }}
+      className={cn("relative w-full overflow-hidden bg-black", className)}
+      data-header-theme={headerTheme}
+      style={{
+        height: "100vh",
+        minHeight: "600px",
+        background:
+          "radial-gradient(ellipse at center, #0a1628 0%, #020408 100%)",
+      }}
     >
       <div ref={containerRef} className="absolute inset-0">
         {/* Loading 状态 */}
@@ -548,7 +1073,10 @@ export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DPro
             <div className="w-[2px] h-16 bg-cyan-500/30 rounded-full relative">
               <div
                 className="absolute left-1/2 -translate-x-1/2 w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_10px_rgba(0,255,255,0.8)] transition-all"
-                style={{ top: `${(1 - zoomLevel) * 100}%`, transform: 'translate(-50%, -50%)' }}
+                style={{
+                  top: `${(1 - zoomLevel) * 100}%`,
+                  transform: "translate(-50%, -50%)",
+                }}
               />
             </div>
 
@@ -579,8 +1107,18 @@ export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DPro
               onClick={enterInteractiveMode}
               className="px-6 py-3 bg-cyan-950/80 backdrop-blur-md border border-cyan-500/40 rounded-full text-cyan-400 text-sm font-medium flex items-center gap-2 active:scale-95 transition-all"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
+                />
               </svg>
               Explore Globe
             </button>
@@ -593,8 +1131,18 @@ export default React.memo(function Sphere3D({ locale = "en", data }: Sphere3DPro
                 onClick={exitInteractiveMode}
                 className="px-6 py-3 bg-cyan-950/80 backdrop-blur-md border border-cyan-500/40 rounded-full text-cyan-400 text-sm font-medium flex items-center gap-2 active:scale-95 transition-all"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
                 Exit Explore
               </button>

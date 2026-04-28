@@ -9,6 +9,8 @@ import { getCropStyles, getCropImageUrl, getObjectPosition } from "@/lib/utils";
 
 type Props = {
   data: HomeContent["seriesIntro"];
+  headerTheme?: string;
+  className?: string;
 };
 
 // --- 常量定义 ---
@@ -18,7 +20,7 @@ const VISIBLE_WINDOW_SIZE = 5;  // 显示5个标签
 const FOCUS_POSITION = 1;       // 焦点在第二个位置（索引1，从0开始）
 const SWIPE_THRESHOLD = 50; // 滑动阈值
 
-export default function SeriesIntro({ data }: Props) {
+export default function SeriesIntro({ data, headerTheme, className }: Props) {
   const seriesData = data || [];
   const totalSeries = seriesData.length;
 
@@ -252,7 +254,8 @@ export default function SeriesIntro({ data }: Props) {
   return (
     <section
       ref={sectionRef}
-      className="py-6 lg:py-8 bg-brand-main"
+      className={cn("py-6 lg:py-8 bg-brand-main", className)}
+      data-header-theme={headerTheme}
       
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}

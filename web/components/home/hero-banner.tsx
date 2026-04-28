@@ -25,10 +25,13 @@ import Autoplay from "embla-carousel-autoplay";
 
 // ⚡ 首屏 Banner 直接导入（只加载第1个）
 import HeroBanner1 from "@/components/HeroBanner/HeroBanner1";
+import { cn } from "@/lib/utils";
 
 type Props = {
   data: HomeContent["heroBanner"];
   locale: Locale;
+  headerTheme?: string;
+  className?: string;
 };
 
 type BannerData = HomeContent["heroBanner"][number];
@@ -64,7 +67,12 @@ function BannerPlaceholder() {
   );
 }
 
-export default function HeroBanner({ data, locale }: Props) {
+export default function HeroBanner({
+  data,
+  locale,
+  headerTheme,
+  className,
+}: Props) {
   const [api, setApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
@@ -230,7 +238,11 @@ export default function HeroBanner({ data, locale }: Props) {
 
   // ⚡ 关键：始终渲染完整结构，避免 hydration mismatch 导致的 CLS
   return (
-    <section ref={sectionRef} className={`relative w-full ${HEIGHT_CLASS}`}>
+    <section
+      ref={sectionRef}
+      className={cn("relative w-full", HEIGHT_CLASS, className)}
+      data-header-theme={headerTheme}
+    >
       <Carousel
         setApi={setApi}
         plugins={[autoplayPlugin.current]}

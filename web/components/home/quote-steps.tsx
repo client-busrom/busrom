@@ -8,6 +8,8 @@ import { StepNumber } from "./StepNumbers";
 
 type Props = {
   data: HomeContent["quoteSteps"];
+  headerTheme?: string;
+  className?: string;
 };
 
 // 数字弹跳动画组件
@@ -40,7 +42,7 @@ const ROTATION_DEGREES = -15; // 逆时针旋转 15 度
  * - 步骤序号: x=425 (22.14%)
  * - 步骤文字: x=735 (38.28%)
  */
-export default function QuoteSteps({ data }: Props) {
+export default function QuoteSteps({ data, headerTheme, className }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [hoveredIndex, setHoveredIndex] = useState(-1);
   const [isVisible, setIsVisible] = useState(false);
@@ -136,7 +138,8 @@ export default function QuoteSteps({ data }: Props) {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-brand-main overflow-hidden"
+      className={cn("relative bg-brand-main overflow-hidden", className)}
+      data-header-theme={headerTheme}
       
     >
       {/* ==================== Desktop Layout (md+) ==================== */}

@@ -37,6 +37,8 @@ const incrementSubmissionCount = (): void => {
 type Props = {
   data: MainFormData;
   locale?: string;
+  headerTheme?: string;
+  className?: string;
 };
 
 // ------------------------------------------------------------------
@@ -97,7 +99,7 @@ interface TurnstileConfig {
   threshold: number;
 }
 
-export default function MainForm({ data, locale = "en" }: Props) {
+export default function MainForm({ data, locale = "en", headerTheme, className }: Props) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const leftImageRef = useRef<HTMLDivElement>(null);
   const rightImageRef = useRef<HTMLDivElement>(null);
@@ -445,7 +447,8 @@ export default function MainForm({ data, locale = "en" }: Props) {
   return (
     <section
       ref={sectionRef}
-      className="py-32 md:py-40 bg-brand-secondary text-brand-text-inverse overflow-hidden"
+      className={cn("py-32 md:py-40 bg-brand-secondary text-brand-text-inverse overflow-hidden", className)}
+      data-header-theme={headerTheme}
     >
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 max-w-6xl mx-auto lg:items-center items-center">
