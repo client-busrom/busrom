@@ -311,11 +311,13 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || 'postgresql://busrom:busrom_dev_password@localhost:5432/busrom_payload',
       // For AWS RDS with self-signed certificates
+      /* 
       ...(process.env.NODE_ENV === 'production' && {
         ssl: {
           rejectUnauthorized: false,
         },
       }),
+      */
     },
     // Push schema disabled in production - schema is already synced
     // Only enable temporarily when deploying schema changes
