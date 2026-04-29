@@ -52,18 +52,14 @@ export async function POST(
           id,
           data: data as any,
           locale: localeCode as any,
-          // Context flags to skip heavy processing
           context: { 
             isTranslationSave: true,
-            isSyncing: true // Double protection against syncM2M
+            isSyncing: true
           },
-          // Skip validation and hooks for maximum performance, 
-          // similar to what raw SQL was trying to achieve
           disableHooks: true,
           overrideAccess: true,
-          // Ensure we don't depth-crawl relationships
           depth: 0,
-        })
+        } as any)
         
         results[localeCode] = { success: true }
       } catch (e: any) {
