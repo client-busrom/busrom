@@ -5,7 +5,11 @@ import type { PayloadHandler } from 'payload'
  * Adds missing columns and creates necessary array sub-tables.
  */
 export const fixBlogsSchemaHandler: PayloadHandler = async (req) => {
-  if (!req.user) {
+  const { searchParams } = new URL(req.url || '', `http://${req.headers.get('host')}`)
+  const secret = searchParams.get('secret')
+  const expectedSecret = process.env.REVALIDATE_SECRET || 'busrom_revalidate_2024'
+
+  if (!req.user && secret !== expectedSecret) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
