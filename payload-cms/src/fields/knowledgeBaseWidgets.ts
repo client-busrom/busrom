@@ -8,26 +8,43 @@ interface CreateWidgetOptions {
 }
 
 /**
- * Creates a three-state control field group for Knowledge Base widgets.
+ * Creates flattened fields for Knowledge Base widgets to ensure better persistence and translation support.
  */
 export const createKBWidgetField = ({
   name,
   label,
   isOverride = false,
   subFields = [],
-}: CreateWidgetOptions): Field => {
-  const baseFields: Field[] = []
+}: {
+  name: string
+  label: string | { en: string; zh: string }
+  isOverride?: boolean
+  subFields?: any[]
+}): Field[] => {
+  const prefix = `kb_${name}_`
+  const fields: Field[] = []
+
+  // Helper to handle localized labels
+  const getLocalizedLabel = (suffixEn: string, suffixZh: string) => {
+    if (typeof label === 'string') {
+      return `${label} - ${suffixZh}`
+    }
+    return {
+      en: `${label.en} - ${suffixEn}`,
+      zh: `${label.zh} - ${suffixZh}`,
+    }
+  }
 
   if (isOverride) {
-    baseFields.push({
-      name: 'mode',
+    fields.push({
+      name: `${prefix}mode`,
       type: 'radio',
-      label: '显示模式',
+      label: getLocalizedLabel('Display Mode', '显示模式'),
       defaultValue: 'inherit',
       options: [
-        { label: '继承全局 (Inherit)', value: 'inherit' },
-        { label: '个性化覆盖 (Override)', value: 'override' },
-        { label: '强制关闭 (Disable)', value: 'disable' },
+        { label: { en: 'Inherit Global', zh: '继承全局' }, value: 'inherit' },
+        { label: { en: 'Personalized Override', zh: '个性化覆盖' }, value: 'override' },
+        { label: { en: 'Force Disable', zh: '强制关闭' }, value: 'disable' },
       ],
       admin: {
         layout: 'horizontal',
@@ -35,26 +52,21 @@ export const createKBWidgetField = ({
     } as RadioField)
   }
 
-  baseFields.push({
-    name: 'config',
-    type: 'group',
-    label: '具体配置',
-    admin: {
-      condition: isOverride ? (_: any, siblingData: any) => siblingData?.mode === 'override' : undefined,
-      hideGutter: true,
-    },
-    fields: subFields as Field[],
-  } as GroupField)
+  // Flatten subfields with prefix and condition
+  const flattenedSubFields = subFields.map(field => {
+    return {
+      ...field,
+      name: `${prefix}${field.name}`,
+      admin: {
+        ...field.admin,
+        condition: isOverride ? (data: any) => data?.[`${prefix}mode`] === 'override' : undefined,
+      }
+    } as Field
+  })
 
-  return {
-    name,
-    label,
-    type: 'group',
-    fields: baseFields,
-    admin: {
-      hideGutter: isOverride,
-    }
-  } as GroupField
+  fields.push(...flattenedSubFields)
+
+  return fields
 }
 
 /**
@@ -81,11 +93,21 @@ export const KB_WIDGET_SUBFIELDS: Record<string, any> = {
       name: 'networks',
       type: 'array',
       label: '分享平台',
+      labels: {
+        singular: { en: 'Network', zh: '分享平台' },
+        plural: { en: 'Networks', zh: '分享平台' },
+      },
+      admin: {
+        initValues: {
+          icon: 'fab fa-twitter',
+        },
+      },
       fields: [
         {
           name: 'icon',
           type: 'text',
           label: '图标类名',
+          required: true,
           admin: { 
             components: { Field: '@/components/fields/IconPicker' },
             description: '例如: fab fa-twitter'
@@ -95,6 +117,7 @@ export const KB_WIDGET_SUBFIELDS: Record<string, any> = {
           name: 'url',
           type: 'text',
           label: '链接模板',
+          required: true,
           admin: {
             description: '使用 {{URL}} 和 {{TITLE}} 作为占位符。例如：https://twitter.com/intent/tweet?url={{URL}}&text={{TITLE}}'
           }
@@ -114,7 +137,7 @@ export const KB_WIDGET_SUBFIELDS: Record<string, any> = {
     {
       name: 'title',
       type: 'text',
-      label: '标题',
+      label: '列表标题',
       localized: true,
     },
     {
@@ -156,24 +179,34 @@ export const KB_WIDGET_SUBFIELDS: Record<string, any> = {
     {
       name: 'title',
       type: 'text',
-      label: '标题',
+      label: '模块标题',
       localized: true,
     },
     {
       name: 'socials',
       type: 'array',
       label: '社交链接',
+      labels: {
+        singular: { en: 'Social Link', zh: '社交链接' },
+        plural: { en: 'Social Links', zh: '社交链接' },
+      },
+      admin: {
+        initValues: {
+          icon: 'fab fa-linkedin',
+        }
+      },
       fields: [
         { 
           name: 'icon', 
           type: 'text', 
           label: '图标', 
+          required: true,
           admin: { 
             components: { Field: '@/components/fields/IconPicker' },
             description: '例如: fab fa-linkedin'
           } 
         },
-        { name: 'url', type: 'text', label: '链接' },
+        { name: 'url', type: 'text', label: '链接', required: true },
       ]
     }
   ],
@@ -217,5 +250,31 @@ export const KB_WIDGET_SUBFIELDS: Record<string, any> = {
       })
     }
     return fields
-  }
+  },
+  bottom_recommended: [
+    {
+      name: 'title',
+      type: 'text',
+      label: '模块标题',
+      localized: true,
+    },
+    {
+      name: 'posts',
+      type: 'relationship',
+      relationTo: 'blogs',
+      hasMany: true,
+      maxRows: 3,
+      label: '手动选择推荐文章 (最多3篇)',
+    },
+    {
+      name: 'logic',
+      type: 'select',
+      label: '自动推荐逻辑 (若未手动选择)',
+      options: [
+        { label: '同分类', value: 'category' },
+        { label: '最新发布', value: 'latest' },
+      ],
+      defaultValue: 'category',
+    }
+  ]
 }

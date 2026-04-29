@@ -11,6 +11,8 @@ import {
   EyoloScrollBadge,
 } from "@/components/blog/ReplicaAssets";
 
+import { resolveModuleConfig } from "@/lib/blog-config-utils";
+
 const getReadTime = (content: any): number => {
   if (!content?.root) return 3; // Default 3 min if empty
   
@@ -69,23 +71,22 @@ export function BlogTemplateOne({
     { clamp: true },
   );
 
-  const showToc =
-    config?.toc?.enabled && config?.toc?.templates?.includes("template1");
-  const showShare =
-    config?.shareConfig?.enabled &&
-    config?.shareConfig?.templates?.includes("template1");
-  const showSearch =
-    config?.searchBox?.enabled &&
-    config?.searchBox?.templates?.includes("template1");
-  const showCategoryList =
-    config?.categoryList?.enabled &&
-    config?.categoryList?.templates?.includes("template1");
-  const showRecommended =
-    config?.recommendedPosts?.enabled &&
-    config?.recommendedPosts?.templates?.includes("template1");
-  const showFollowUs =
-    config?.followUs?.enabled &&
-    config?.followUs?.templates?.includes("template1");
+  const toc = resolveModuleConfig(blog, config, "toc", "toc", "template1");
+  const share = resolveModuleConfig(blog, config, "share", "shareConfig", "template1");
+  const search = resolveModuleConfig(blog, config, "search_box", "searchBox", "template1");
+  const catList = resolveModuleConfig(blog, config, "category_list", "categoryList", "template1");
+  const recommended = resolveModuleConfig(blog, config, "recommended_posts", "recommendedPosts", "template1");
+  const follow = resolveModuleConfig(blog, config, "follow_us", "followUs", "template1");
+  const footerCats = resolveModuleConfig(blog, config, "bottom_categories", "bottomCategories", "template1");
+  const pagination = resolveModuleConfig(blog, config, "pagination", "pagination", "template1");
+  const footerRec = resolveModuleConfig(blog, config, "bottom_recommended", "bottomRecommended", "template1");
+
+  const showToc = toc.enabled;
+  const showShare = share.enabled;
+  const showSearch = search.enabled;
+  const showCategoryList = catList.enabled;
+  const showRecommended = recommended.enabled;
+  const showFollowUs = follow.enabled;
 
   const isSidebarEnabled =
     showToc ||
@@ -95,15 +96,9 @@ export function BlogTemplateOne({
     showRecommended ||
     showFollowUs;
 
-  const showFooterCategories =
-    config?.bottomCategories?.enabled &&
-    config?.bottomCategories?.templates?.includes("template1");
-  const showPagination =
-    config?.pagination?.enabled &&
-    config?.pagination?.templates?.includes("template1");
-  const showFooterRecommended =
-    config?.bottomRecommended?.enabled &&
-    config?.bottomRecommended?.templates?.includes("template1");
+  const showFooterCategories = footerCats.enabled;
+  const showPagination = pagination.enabled;
+  const showFooterRecommended = footerRec.enabled;
 
   const isFooterEnabled =
     showFooterCategories || showPagination || showFooterRecommended;
@@ -317,9 +312,9 @@ export function BlogTemplateOne({
                 <div className="mt-24 space-y-24">
                   {/* Category Dots */}
                   {showFooterCategories &&
-                    config.bottomCategories?.categories?.length > 0 && (
+                    footerCats.categories?.length > 0 && (
                       <div className="flex flex-wrap items-center justify-center gap-4 text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">
-                        {config.bottomCategories.categories.map(
+                        {footerCats.categories.map(
                           (cat: any, i: number) => (
                             <span
                               key={cat.id}
@@ -332,7 +327,7 @@ export function BlogTemplateOne({
                                 {cat.name}
                               </Link>
                               {i <
-                                config.bottomCategories.categories.length -
+                                footerCats.categories.length -
                                   1 && <span className="opacity-20">•</span>}
                             </span>
                           ),
@@ -341,54 +336,57 @@ export function BlogTemplateOne({
                     )}
 
                   {/* Pagination - Previous / Next Post */}
-                  {showPagination && (blog.prevPost || blog.nextPost) && (
+                  {showPagination && (
                     <div className="flex flex-col sm:flex-row items-stretch border-t border-[#F0EBE6] mt-24">
-                      {blog.prevPost ? (
-                        <Link
-                          href={`/${locale}/blog/${blog.prevPost.slug}`}
-                          className="flex-1 py-12 pr-10 flex flex-col gap-3 group border-b sm:border-b-0 sm:border-r border-[#F0EBE6] hover:bg-[#F5F2ED]/50 transition-colors"
-                        >
-                          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">
-                            Previous Post
-                          </span>
-                          <h5 className="text-[18px] font-prata text-[#060C14] group-hover:text-[#ff4848] transition-colors line-clamp-2 leading-snug">
-                            {blog.prevPost.title}
-                          </h5>
-                        </Link>
-                      ) : (
-                        <div className="flex-1 hidden sm:block border-r border-[#F0EBE6]" />
-                      )}
+                      {(() => {
+                        const prev = pagination.type === 'manual' ? pagination.prev_post : blog.prevPost;
+                        const next = pagination.type === 'manual' ? pagination.next_post : blog.nextPost;
+                        
+                        const renderLink = (item: any, label: string, align: 'left' | 'right') => {
+                          if (!item) return <div className={`flex-1 hidden sm:block ${align === 'left' ? 'border-r' : ''} border-[#F0EBE6]`} />;
+                          
+                          const title = item.title || (typeof item === 'string' ? "Post" : "");
+                          const slug = item.slug || (typeof item === 'string' ? item : "");
 
-                      {blog.nextPost ? (
-                        <Link
-                          href={`/${locale}/blog/${blog.nextPost.slug}`}
-                          className="flex-1 py-12 pl-10 flex flex-col gap-3 group text-right items-end hover:bg-[#F5F2ED]/50 transition-colors"
-                        >
-                          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">
-                            Next Post
-                          </span>
-                          <h5 className="text-[18px] font-prata text-[#060C14] group-hover:text-[#ff4848] transition-colors line-clamp-2 leading-snug">
-                            {blog.nextPost.title}
-                          </h5>
-                        </Link>
-                      ) : (
-                        <div className="flex-1" />
-                      )}
+                          if (!title && !slug) return <div className={`flex-1 hidden sm:block ${align === 'left' ? 'border-r' : ''} border-[#F0EBE6]`} />;
+
+                          return (
+                            <Link
+                              href={`/${locale}/blog/${slug}`}
+                              className={`flex-1 py-12 ${align === 'left' ? 'pr-10 border-r' : 'pl-10 text-right items-end'} flex flex-col gap-3 group border-[#F0EBE6] hover:bg-[#F5F2ED]/50 transition-colors`}
+                            >
+                              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">
+                                {label}
+                              </span>
+                              <h5 className="text-[18px] font-prata text-[#060C14] group-hover:text-[#ff4848] transition-colors line-clamp-2 leading-snug">
+                                {title || "Read Post"}
+                              </h5>
+                            </Link>
+                          );
+                        };
+
+                        return (
+                          <>
+                            {renderLink(prev, locale === 'zh' ? '上一篇' : 'Previous Post', 'left')}
+                            {renderLink(next, locale === 'zh' ? '下一篇' : 'Next Post', 'right')}
+                          </>
+                        );
+                      })()}
                     </div>
                   )}
 
                   {/* Recommendations */}
                   {showFooterRecommended &&
-                    config.bottomRecommended?.posts?.length > 0 && (
+                    footerRec.posts?.length > 0 && (
                       <div className="border-t border-[#F0EBE6] pt-16">
                         <div className="text-center mb-12">
                           <h4 className="text-[24px] font-prata text-[#060C14]">
-                            {config.bottomRecommended.title ||
+                            {footerRec.title ||
                               "Recommended Stories"}
                           </h4>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                          {config.bottomRecommended.posts.map((p: any) => (
+                          {footerRec.posts.map((p: any) => (
                             <div key={p.id} className="group">
                               <Link
                                 href={`/${locale}/blog/${p.slug}`}
@@ -422,10 +420,10 @@ export function BlogTemplateOne({
                 >
                   {showToc && tocItems.length > 0 && (
                     <div>
-                      <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#060C14] mb-10 pb-4 border-b border-[#F0EBE6] flex items-center gap-4">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#ff4848]" />
-                        In this story
-                      </h4>
+                        <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#060C14] mb-10 pb-4 border-b border-[#F0EBE6] flex items-center gap-4">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#ff4848]" />
+                          {toc.title || "In this story"}
+                        </h4>
                       <nav>
                         <ul className="space-y-8">
                           {tocItems.map((item: any) => (
@@ -449,66 +447,130 @@ export function BlogTemplateOne({
                     </div>
                   )}
 
-                  {/* Other Sidebar Widgets (Socials, Recommended, etc.) */}
-                  {showShare && (
-                    <div className="pt-8 border-t border-[#F0EBE6]">
-                      <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-gray-400">
-                        {config.shareConfig.title || "Share Post"}
-                      </h5>
-                      <div className="flex gap-4">
-                        {config.shareConfig.networks?.map(
-                          (net: any, i: number) => {
-                            const shareUrl = net.url
-                              ?.replace(
-                                "{{URL}}",
-                                encodeURIComponent(
-                                  typeof window !== "undefined"
-                                    ? window.location.href
-                                    : "",
-                                ),
-                              )
-                              ?.replace(
-                                "{{TITLE}}",
-                                encodeURIComponent(blog.title || ""),
-                              );
-
-                            return (
-                              <a
-                                key={i}
-                                href={shareUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-10 h-10 rounded-full border border-[#5d6b4a] flex items-center justify-center text-[#5d6b4a] hover:bg-[#060C14] hover:border-[#060C14] hover:text-white transition-all cursor-pointer group"
-                              >
-                                <IconifyIcon name={net.icon} size={18} />
-                              </a>
-                            );
-                          },
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {showRecommended &&
-                    config.recommendedPosts.posts?.length > 0 && (
+                    {/* Search Box Widget */}
+                    {showSearch && (
                       <div className="pt-8 border-t border-[#F0EBE6]">
                         <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-gray-400">
-                          {config.recommendedPosts.title || "Recommended"}
+                          Search
                         </h5>
-                        <div className="space-y-6">
-                          {config.recommendedPosts.posts
-                            .slice(0, 3)
-                            .map((rp: any) => (
+                        <div className="relative group">
+                          <input
+                            type="text"
+                            placeholder={search.placeholder || "Search..."}
+                            className="w-full bg-[#F5F2ED] border-0 rounded-xl px-5 py-4 text-xs focus:ring-1 focus:ring-[#ff4848] outline-none transition-all"
+                          />
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300">
+                            <IconifyIcon name="lucide:search" size={16} />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Share Post Widget */}
+                    {showShare && (
+                      <div className="pt-8 border-t border-[#F0EBE6]">
+                        <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-gray-400">
+                          {share.title || "Share Post"}
+                        </h5>
+                        <div className="flex gap-4">
+                          {share.networks?.map(
+                            (net: any, i: number) => {
+                              const shareUrl = net.url
+                                ?.replace(
+                                  "{{URL}}",
+                                  encodeURIComponent(
+                                    typeof window !== "undefined"
+                                      ? window.location.href
+                                      : "",
+                                  ),
+                                )
+                                ?.replace(
+                                  "{{TITLE}}",
+                                  encodeURIComponent(blog.title || ""),
+                                );
+
+                              return (
+                                <a
+                                  key={i}
+                                  href={shareUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="w-10 h-10 rounded-full border border-[#DCDBD0] flex items-center justify-center text-[#060C14] hover:bg-[#ff4848] hover:border-[#ff4848] hover:text-white transition-all cursor-pointer group"
+                                >
+                                  <IconifyIcon name={net.icon} size={18} />
+                                </a>
+                              );
+                            },
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Category List Widget */}
+                    {showCategoryList && catList.categories?.length > 0 && (
+                      <div className="pt-8 border-t border-[#F0EBE6]">
+                        <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-gray-400">
+                          {catList.title || "Categories"}
+                        </h5>
+                        <ul className="space-y-4">
+                          {catList.categories.map((cat: any) => (
+                            <li key={cat.id}>
                               <Link
-                                key={rp.id}
-                                href={`/${locale}/blog/${rp.slug}`}
-                                className="group block"
+                                href={`/${locale}/blog?category=${cat.slug || cat.id}`}
+                                className="text-[12px] font-bold uppercase tracking-widest hover:text-[#ff4848] transition-colors flex justify-between items-center"
                               >
-                                <h6 className="text-[13px] font-bold uppercase leading-relaxed text-[#060C14] group-hover:text-[#ff4848] transition-colors line-clamp-2">
-                                  {rp.title}
-                                </h6>
+                                {cat.name}
+                                <IconifyIcon name="lucide:chevron-right" size={12} className="opacity-20" />
                               </Link>
-                            ))}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Recommended Posts Widget */}
+                    {showRecommended &&
+                      recommended.posts?.length > 0 && (
+                        <div className="pt-8 border-t border-[#F0EBE6]">
+                          <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-gray-400">
+                            {recommended.title || "Recommended"}
+                          </h5>
+                          <div className="space-y-6">
+                            {recommended.posts
+                              .slice(0, 3)
+                              .map((rp: any) => (
+                                <Link
+                                  key={rp.id}
+                                  href={`/${locale}/blog/${rp.slug}`}
+                                  className="group block"
+                                >
+                                  <h6 className="text-[13px] font-bold uppercase leading-relaxed text-[#060C14] group-hover:text-[#ff4848] transition-colors line-clamp-2">
+                                    {rp.title}
+                                  </h6>
+                                </Link>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {/* Follow Us Widget */}
+                    {showFollowUs && follow.socials?.length > 0 && (
+                      <div className="pt-8 border-t border-[#F0EBE6]">
+                        <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-gray-400">
+                          {follow.title || "Follow Us"}
+                        </h5>
+                        <div className="flex flex-wrap gap-3">
+                          {follow.socials.map((social: any, idx: number) => (
+                            <a
+                              key={idx}
+                              href={social.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-10 h-10 rounded-full bg-[#060C14] flex items-center justify-center text-white hover:bg-[#ff4848] transition-all"
+                            >
+                              <IconifyIcon name={social.icon} size={18} />
+                            </a>
+                          ))}
                         </div>
                       </div>
                     )}

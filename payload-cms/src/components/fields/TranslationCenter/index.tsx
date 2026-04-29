@@ -47,52 +47,52 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'heroText', labelKey: 'custom:translationCenter:heroText', type: 'textarea' },
     { name: 'heroSubtitle', labelKey: 'custom:translationCenter:heroSubtitle', type: 'textarea' },
   ],
-  blogs: [
-    { name: 'title', labelKey: 'custom:fields:blogTitle', type: 'textarea' },
-    { name: 'excerpt', labelKey: 'custom:translationCenter:excerpt', type: 'textarea' },
-    { 
-      name: 'toc.config.title', 
-      labelKey: 'custom:fields:tocTitle', 
-      type: 'textarea',
-      condition: (doc: any) => doc?.useCustomOverrides === true
-    },
-    { 
-      name: 'share.config.title', 
-      labelKey: 'custom:fields:shareTitle', 
-      type: 'textarea',
-      condition: (doc: any) => doc?.useCustomOverrides === true
-    },
-    { 
-      name: 'search_box.config.placeholder', 
-      labelKey: 'custom:fields:placeholder', 
-      type: 'textarea',
-      condition: (doc: any) => doc?.useCustomOverrides === true
-    },
-    { 
-      name: 'category_list.config.title', 
-      labelKey: 'custom:fields:title', 
-      type: 'textarea',
-      condition: (doc: any) => doc?.useCustomOverrides === true
-    },
-    { 
-      name: 'recommended_posts.config.title', 
-      labelKey: 'custom:fields:title', 
-      type: 'textarea',
-      condition: (doc: any) => doc?.useCustomOverrides === true
-    },
-    { 
-      name: 'follow_us.config.title', 
-      labelKey: 'custom:fields:title', 
-      type: 'textarea',
-      condition: (doc: any) => doc?.useCustomOverrides === true
-    },
-    { 
-      name: 'bottom_recommended.config.title', 
-      labelKey: 'custom:fields:title', 
-      type: 'textarea',
-      condition: (doc: any) => doc?.useCustomOverrides === true
-    },
-  ],
+    blogs: [
+      { name: 'title', labelKey: 'custom:fields:blogTitle', type: 'textarea' },
+      { name: 'excerpt', labelKey: 'custom:translationCenter:excerpt', type: 'textarea' },
+      { 
+        name: 'kb_toc_title', 
+        labelKey: '__inline:目录标题 (TOC Title)', 
+        type: 'textarea',
+        condition: (doc: any) => doc?.useCustomOverrides === true
+      },
+      { 
+        name: 'kb_share_title', 
+        labelKey: '__inline:分享标题 (Share Title)', 
+        type: 'textarea',
+        condition: (doc: any) => doc?.useCustomOverrides === true
+      },
+      { 
+        name: 'kb_search_box_placeholder', 
+        labelKey: '__inline:搜索框占位符 (Search Placeholder)', 
+        type: 'textarea',
+        condition: (doc: any) => doc?.useCustomOverrides === true
+      },
+      { 
+        name: 'kb_category_list_title', 
+        labelKey: '__inline:分类列表标题 (Category List Title)', 
+        type: 'textarea',
+        condition: (doc: any) => doc?.useCustomOverrides === true
+      },
+      { 
+        name: 'kb_recommended_posts_title', 
+        labelKey: '__inline:侧边推荐标题 (Sidebar Recommended Title)', 
+        type: 'textarea',
+        condition: (doc: any) => doc?.useCustomOverrides === true
+      },
+      { 
+        name: 'kb_follow_us_title', 
+        labelKey: '__inline:关注我们标题 (Follow Us Title)', 
+        type: 'textarea',
+        condition: (doc: any) => doc?.useCustomOverrides === true
+      },
+      { 
+        name: 'kb_bottom_recommended_title', 
+        labelKey: '__inline:底部推荐标题 (Bottom Recommended Title)', 
+        type: 'textarea',
+        condition: (doc: any) => doc?.useCustomOverrides === true
+      },
+    ],
   'faq-items': [
     { name: 'question', labelKey: 'custom:fields:question', type: 'textarea' },
   ],
@@ -967,7 +967,9 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
                                   }
                                   return rest
                                 })()
-                              : t(field.config.labelKey as any)
+                              : field.config.labelKey.startsWith('__inline:')
+                                ? field.config.labelKey.slice('__inline:'.length)
+                                : t(field.config.labelKey as any)
                             }
                           </span>
                           <span className={`tc-field__status ${filled === total ? 'tc-field__status--complete' : ''}`}>

@@ -8,8 +8,7 @@ const PAYLOAD_URL = process.env.CMS_GRAPHQL_URL
 
 export async function getBlogSettings(locale: Locale) {
   try {
-    // Increased depth to 3 to ensure nested relationships (sections -> tags -> blogs -> images) are populated
-    const res = await fetch(`${PAYLOAD_URL}/api/globals/knowledge-base-settings?locale=${locale}&depth=3`, {
+    const res = await fetch(`${PAYLOAD_URL}/api/globals/knowledge-base-settings?locale=${locale}&depth=2`, {
       next: { revalidate: 60 }
     })
     if (!res.ok) return null
@@ -63,6 +62,7 @@ export async function getBlogBySlug(slug: string, locale: string) {
     }
 
     const transformedBlog: any = {
+      ...blog, // Preserve all raw fields first
       id: blog.id,
       slug: blog.slug,
       title: blog.title || '',

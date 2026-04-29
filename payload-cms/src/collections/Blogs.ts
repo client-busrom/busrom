@@ -60,46 +60,131 @@ export const Blogs: CollectionConfig = {
       async ({ doc, req, query }) => {
         // Use publishedAt, fall back to createdAt
         const referenceDate = doc.publishedAt || doc.createdAt;
-        if (!referenceDate || doc.status !== 'published') return doc;
-
         const { payload, locale } = req;
+
+        // 1. Fetch Basic Pagination (Prev/Next)
+        if (referenceDate && doc.status === 'published') {
+          try {
+            const [prev, next] = await Promise.all([
+              payload.find({
+                collection: 'blogs',
+                where: {
+                  and: [
+                    { publishedAt: { less_than: referenceDate } },
+                    { status: { equals: 'published' } }
+                  ]
+                },
+                sort: '-publishedAt',
+                limit: 1,
+                locale,
+                depth: 0,
+                select: { title: true, slug: true, coverImage: true }
+              }),
+              payload.find({
+                collection: 'blogs',
+                where: {
+                  and: [
+                    { publishedAt: { greater_than: referenceDate } },
+                    { status: { equals: 'published' } }
+                  ]
+                },
+                sort: 'publishedAt',
+                limit: 1,
+                locale,
+                depth: 0,
+                select: { title: true, slug: true, coverImage: true }
+              })
+            ]);
+
+            doc.prevPost = prev.docs[0] || null;
+            doc.nextPost = next.docs[0] || null;
+          } catch (error) {
+            console.error('Error fetching blog pagination:', error);
+          }
+        }
+
+        // 2. Resolve Recommendation Logic (Sidebar & Footer)
+        // This ensures the frontend 'posts' array is populated if empty and logic is set
+        const urlId = req?.routeParams?.id
+        const isMainDoc = urlId === String(doc.id) || urlId === doc.slug
         
-        try {
-          const [prev, next] = await Promise.all([
-            payload.find({
-              collection: 'blogs',
-              where: {
-                and: [
-                  { publishedAt: { less_than: referenceDate } },
-                  { status: { equals: 'published' } }
-                ]
-              },
-              sort: '-publishedAt',
-              limit: 1,
-              locale,
-              depth: 0,
-              select: { title: true, slug: true, coverImage: true }
-            }),
-            payload.find({
-              collection: 'blogs',
-              where: {
-                and: [
-                  { publishedAt: { greater_than: referenceDate } },
-                  { status: { equals: 'published' } }
-                ]
-              },
-              sort: 'publishedAt',
-              limit: 1,
-              locale,
-              depth: 0,
-              select: { title: true, slug: true, coverImage: true }
-            })
+        // Only resolve complex logic for the main document to save performance
+        if (isMainDoc) {
+          const resolveRecommendations = async (moduleName: string) => {
+            const mode = doc[`kb_${moduleName}_mode`];
+            
+            if (mode === 'override') {
+              const posts = doc[`kb_${moduleName}_posts`];
+              const logic = doc[`kb_${moduleName}_logic`];
+              
+              if ((!posts || posts.length === 0) && logic) {
+                try {
+                  const where: any = {
+                    id: { not_equals: doc.id },
+                    status: { equals: 'published' }
+                  };
+
+                  if (logic === 'category' && doc.categories?.length > 0) {
+                    const catIds = doc.categories.map((c: any) => typeof c === 'object' ? c.id : c);
+                    where.categories = { in: catIds };
+                  }
+
+                  const recommendedDocs = await payload.find({
+                    collection: 'blogs',
+                    where,
+                    sort: '-publishedAt',
+                    limit: moduleName === 'bottom_recommended' ? 3 : 5,
+                    locale,
+                    depth: 0,
+                    select: { title: true, slug: true, coverImage: true, publishedAt: true }
+                  });
+                  
+                  doc[`kb_${moduleName}_posts`] = recommendedDocs.docs;
+                } catch (e) {
+                  console.error(`Error resolving recommendations for ${moduleName}:`, e);
+                }
+              }
+            }
+          };
+
+          await Promise.all([
+            resolveRecommendations('recommended_posts'),
+            resolveRecommendations('bottom_recommended')
           ]);
 
-          doc.prevPost = prev.docs[0] || null;
-          doc.nextPost = next.docs[0] || null;
-        } catch (error) {
-          console.error('Error fetching blog pagination:', error);
+          // 3. Populate Manual Pagination (if selected)
+          if (doc.useCustomOverrides && doc.kb_pagination_mode === 'override' && doc.kb_pagination_type === 'manual') {
+            const populatePost = async (key: 'prev_post' | 'next_post') => {
+              const fieldName = `kb_pagination_${key}`;
+              const postId = doc[fieldName];
+              if (postId && (typeof postId === 'string' || typeof postId === 'number')) {
+                try {
+                  const post = await payload.findByID({
+                    collection: 'blogs',
+                    id: postId,
+                    locale,
+                    depth: 0,
+                    select: { title: true, slug: true, coverImage: true }
+                  });
+                  doc[fieldName] = post;
+                } catch (e) {
+                  console.error(`Error populating manual pagination ${key}:`, e);
+                }
+              }
+            };
+            await Promise.all([populatePost('prev_post'), populatePost('next_post')]);
+          }
+        }
+
+        // 4. "减肥" 逻辑：如果不是详情页的主文章，剔除重度数据以节省 API 带宽
+        // 重要：如果当前是后台管理人员（req.user 存在），或者是主文档请求，则不剔除数据
+        // 注意：isMainDoc 在上方第 109 行已经定义过，这里直接使用并增强
+        const finalIsMainDoc = isMainDoc || req?.query?.depth === '0'
+        
+        if (!req?.user && !finalIsMainDoc && !req?.query?.full) {
+          delete doc.content
+          // flattened fields (kb_*) are small enough to keep or we can delete them individually if needed
+          // but usually they are just strings/numbers/ids.
         }
 
         return doc;
@@ -325,10 +410,9 @@ export const Blogs: CollectionConfig = {
               },
               admin: {
                 layout: 'horizontal',
-                condition: (data) => !data?.useCustomOverrides,
                 description: {
-                  en: 'Select the template to use when "Custom Overrides" is disabled.',
-                  zh: '选择在未开启“个性化覆盖”时调用的具体开发模版。',
+                  en: 'Select the layout template for this blog post.',
+                  zh: '选择该博文使用的视觉排版模版。',
                 },
               },
               defaultValue: 'template1',
@@ -348,39 +432,39 @@ export const Blogs: CollectionConfig = {
                 condition: (data) => data?.useCustomOverrides === true,
               },
               fields: [
-                createKBWidgetField({
+                ...createKBWidgetField({
                   name: 'toc',
-                  label: '目录导航 (TOC)',
+                  label: { en: 'Table of Contents (TOC)', zh: '目录导航' },
                   isOverride: true,
                   subFields: KB_WIDGET_SUBFIELDS.toc,
                 }),
-                createKBWidgetField({
+                ...createKBWidgetField({
                   name: 'share',
-                  label: '社交分享 (Share)',
+                  label: { en: 'Social Share', zh: '社交分享' },
                   isOverride: true,
                   subFields: KB_WIDGET_SUBFIELDS.share,
                 }),
-                createKBWidgetField({
+                ...createKBWidgetField({
                   name: 'search_box',
-                  label: '搜索框 (Search Box)',
+                  label: { en: 'Search Box', zh: '搜索框' },
                   isOverride: true,
                   subFields: KB_WIDGET_SUBFIELDS.search_box,
                 }),
-                createKBWidgetField({
+                ...createKBWidgetField({
                   name: 'category_list',
-                  label: '博客分类展示 (Category List)',
+                  label: { en: 'Category List', zh: '博客分类展示' },
                   isOverride: true,
                   subFields: KB_WIDGET_SUBFIELDS.category_list,
                 }),
-                createKBWidgetField({
+                ...createKBWidgetField({
                   name: 'recommended_posts',
-                  label: '侧边栏推荐博文 (Recommended Blogs)',
+                  label: { en: 'Sidebar Recommended', zh: '侧边栏推荐博文' },
                   isOverride: true,
                   subFields: KB_WIDGET_SUBFIELDS.recommendations(),
                 }),
-                createKBWidgetField({
+                ...createKBWidgetField({
                   name: 'follow_us',
-                  label: '关注我们 (Follow Us)',
+                  label: { en: 'Follow Us', zh: '关注我们' },
                   isOverride: true,
                   subFields: KB_WIDGET_SUBFIELDS.follow_us,
                 }),
@@ -390,29 +474,29 @@ export const Blogs: CollectionConfig = {
               type: 'collapsible',
               label: {
                 en: 'Footer Widget Overrides',
-                zh: '详情页底部栏覆盖 (Footer Overrides)',
+                zh: '详情页底部栏覆盖',
               },
               admin: {
                 condition: (data) => data?.useCustomOverrides === true,
               },
               fields: [
-                createKBWidgetField({
+                ...createKBWidgetField({
                   name: 'bottom_categories',
-                  label: '底部分类展示 (Bottom Categories)',
+                  label: { en: 'Bottom Categories', zh: '底部分类展示' },
                   isOverride: true,
                   subFields: KB_WIDGET_SUBFIELDS.bottom_categories,
                 }),
-                createKBWidgetField({
+                ...createKBWidgetField({
                   name: 'pagination',
-                  label: '翻页跳转 (Pagination)',
+                  label: { en: 'Pagination', zh: '翻页跳转' },
                   isOverride: true,
                   subFields: KB_WIDGET_SUBFIELDS.pagination(true),
                 }),
-                createKBWidgetField({
+                ...createKBWidgetField({
                   name: 'bottom_recommended',
-                  label: '底部推荐博文 (Bottom Recommended)',
+                  label: { en: 'Bottom Recommended', zh: '底部推荐博文' },
                   isOverride: true,
-                  subFields: KB_WIDGET_SUBFIELDS.recommendations(3),
+                  subFields: KB_WIDGET_SUBFIELDS.bottom_recommended,
                 }),
               ],
             },

@@ -45,7 +45,7 @@ export function BlogListClient({
       const fetchData = async () => {
         try {
           const configRes = await fetch(
-            `/api/payload/globals/knowledge-base-settings?locale=${locale}&depth=3`,
+            `/api/payload/globals/knowledge-base-settings?locale=${locale}&depth=2`,
           );
           if (configRes.ok) {
             const activeConfig = await configRes.json();

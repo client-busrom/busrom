@@ -901,93 +901,57 @@ export interface Blog {
    */
   useCustomOverrides?: boolean | null;
   /**
-   * Select the template to use when "Custom Overrides" is disabled.
+   * Select the layout template for this blog post.
    */
   templateType?: ('template1' | 'template2' | 'template3') | null;
-  toc?: {
-    mode?: ('inherit' | 'override' | 'disable') | null;
-    config?: {
-      title?: string | null;
-    };
-  };
-  share?: {
-    mode?: ('inherit' | 'override' | 'disable') | null;
-    config?: {
-      title?: string | null;
-      networks?:
-        | {
-            /**
-             * 例如: fab fa-twitter
-             */
-            icon?: string | null;
-            /**
-             * 使用 {{URL}} 和 {{TITLE}} 作为占位符。例如：https://twitter.com/intent/tweet?url={{URL}}&text={{TITLE}}
-             */
-            url?: string | null;
-            id?: string | null;
-          }[]
-        | null;
-    };
-  };
-  search_box?: {
-    mode?: ('inherit' | 'override' | 'disable') | null;
-    config?: {
-      placeholder?: string | null;
-    };
-  };
-  category_list?: {
-    mode?: ('inherit' | 'override' | 'disable') | null;
-    config?: {
-      title?: string | null;
-      categories?: (number | Category)[] | null;
-    };
-  };
-  recommended_posts?: {
-    mode?: ('inherit' | 'override' | 'disable') | null;
-    config?: {
-      title?: string | null;
-      posts?: (number | Blog)[] | null;
-      logic?: ('category' | 'latest') | null;
-    };
-  };
-  follow_us?: {
-    mode?: ('inherit' | 'override' | 'disable') | null;
-    config?: {
-      title?: string | null;
-      socials?:
-        | {
-            /**
-             * 例如: fab fa-linkedin
-             */
-            icon?: string | null;
-            url?: string | null;
-            id?: string | null;
-          }[]
-        | null;
-    };
-  };
-  bottom_categories?: {
-    mode?: ('inherit' | 'override' | 'disable') | null;
-    config?: {
-      categories?: (number | Category)[] | null;
-    };
-  };
-  pagination?: {
-    mode?: ('inherit' | 'override' | 'disable') | null;
-    config?: {
-      type?: ('auto' | 'manual') | null;
-      prev_post?: (number | null) | Blog;
-      next_post?: (number | null) | Blog;
-    };
-  };
-  bottom_recommended?: {
-    mode?: ('inherit' | 'override' | 'disable') | null;
-    config?: {
-      title?: string | null;
-      posts?: (number | Blog)[] | null;
-      logic?: ('category' | 'latest') | null;
-    };
-  };
+  kb_toc_mode?: ('inherit' | 'override' | 'disable') | null;
+  kb_toc_title?: string | null;
+  kb_share_mode?: ('inherit' | 'override' | 'disable') | null;
+  kb_share_title?: string | null;
+  kb_share_networks?:
+    | {
+        /**
+         * 例如: fab fa-twitter
+         */
+        icon: string;
+        /**
+         * 使用 {{URL}} 和 {{TITLE}} 作为占位符。例如：https://twitter.com/intent/tweet?url={{URL}}&text={{TITLE}}
+         */
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  kb_search_box_mode?: ('inherit' | 'override' | 'disable') | null;
+  kb_search_box_placeholder?: string | null;
+  kb_category_list_mode?: ('inherit' | 'override' | 'disable') | null;
+  kb_category_list_title?: string | null;
+  kb_category_list_categories?: (number | Category)[] | null;
+  kb_recommended_posts_mode?: ('inherit' | 'override' | 'disable') | null;
+  kb_recommended_posts_title?: string | null;
+  kb_recommended_posts_posts?: (number | Blog)[] | null;
+  kb_recommended_posts_logic?: ('category' | 'latest') | null;
+  kb_follow_us_mode?: ('inherit' | 'override' | 'disable') | null;
+  kb_follow_us_title?: string | null;
+  kb_follow_us_socials?:
+    | {
+        /**
+         * 例如: fab fa-linkedin
+         */
+        icon: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  kb_bottom_categories_mode?: ('inherit' | 'override' | 'disable') | null;
+  kb_bottom_categories_categories?: (number | Category)[] | null;
+  kb_pagination_mode?: ('inherit' | 'override' | 'disable') | null;
+  kb_pagination_type?: ('auto' | 'manual') | null;
+  kb_pagination_prev_post?: (number | null) | Blog;
+  kb_pagination_next_post?: (number | null) | Blog;
+  kb_bottom_recommended_mode?: ('inherit' | 'override' | 'disable') | null;
+  kb_bottom_recommended_title?: string | null;
+  kb_bottom_recommended_posts?: (number | Blog)[] | null;
+  kb_bottom_recommended_logic?: ('category' | 'latest') | null;
   status?: ('published' | 'draft' | 'archived') | null;
   publishedAt?: string | null;
   updatedAt: string;
@@ -2768,117 +2732,45 @@ export interface BlogsSelect<T extends boolean = true> {
   tags?: T;
   useCustomOverrides?: T;
   templateType?: T;
-  toc?:
+  kb_toc_mode?: T;
+  kb_toc_title?: T;
+  kb_share_mode?: T;
+  kb_share_title?: T;
+  kb_share_networks?:
     | T
     | {
-        mode?: T;
-        config?:
-          | T
-          | {
-              title?: T;
-            };
+        icon?: T;
+        url?: T;
+        id?: T;
       };
-  share?:
+  kb_search_box_mode?: T;
+  kb_search_box_placeholder?: T;
+  kb_category_list_mode?: T;
+  kb_category_list_title?: T;
+  kb_category_list_categories?: T;
+  kb_recommended_posts_mode?: T;
+  kb_recommended_posts_title?: T;
+  kb_recommended_posts_posts?: T;
+  kb_recommended_posts_logic?: T;
+  kb_follow_us_mode?: T;
+  kb_follow_us_title?: T;
+  kb_follow_us_socials?:
     | T
     | {
-        mode?: T;
-        config?:
-          | T
-          | {
-              title?: T;
-              networks?:
-                | T
-                | {
-                    icon?: T;
-                    url?: T;
-                    id?: T;
-                  };
-            };
+        icon?: T;
+        url?: T;
+        id?: T;
       };
-  search_box?:
-    | T
-    | {
-        mode?: T;
-        config?:
-          | T
-          | {
-              placeholder?: T;
-            };
-      };
-  category_list?:
-    | T
-    | {
-        mode?: T;
-        config?:
-          | T
-          | {
-              title?: T;
-              categories?: T;
-            };
-      };
-  recommended_posts?:
-    | T
-    | {
-        mode?: T;
-        config?:
-          | T
-          | {
-              title?: T;
-              posts?: T;
-              logic?: T;
-            };
-      };
-  follow_us?:
-    | T
-    | {
-        mode?: T;
-        config?:
-          | T
-          | {
-              title?: T;
-              socials?:
-                | T
-                | {
-                    icon?: T;
-                    url?: T;
-                    id?: T;
-                  };
-            };
-      };
-  bottom_categories?:
-    | T
-    | {
-        mode?: T;
-        config?:
-          | T
-          | {
-              categories?: T;
-            };
-      };
-  pagination?:
-    | T
-    | {
-        mode?: T;
-        config?:
-          | T
-          | {
-              type?: T;
-              prev_post?: T;
-              next_post?: T;
-            };
-      };
-  bottom_recommended?:
-    | T
-    | {
-        mode?: T;
-        config?:
-          | T
-          | {
-              title?: T;
-              posts?: T;
-              logic?: T;
-            };
-      };
+  kb_bottom_categories_mode?: T;
+  kb_bottom_categories_categories?: T;
+  kb_pagination_mode?: T;
+  kb_pagination_type?: T;
+  kb_pagination_prev_post?: T;
+  kb_pagination_next_post?: T;
+  kb_bottom_recommended_mode?: T;
+  kb_bottom_recommended_title?: T;
+  kb_bottom_recommended_posts?: T;
+  kb_bottom_recommended_logic?: T;
   status?: T;
   publishedAt?: T;
   updatedAt?: T;
