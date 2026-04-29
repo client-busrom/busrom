@@ -182,8 +182,9 @@ export async function POST(request: NextRequest) {
     const formConfigId = formData.get('formConfigId') as string
     const fieldName = formData.get('fieldName') as string
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+    if (!file || typeof file === 'string') {
+      console.error('❌ No file object provided or file is a string')
+      return NextResponse.json({ error: 'No file provided or invalid file format' }, { status: 400 })
     }
 
     if (!formConfigId || !fieldName) {
@@ -202,10 +203,24 @@ export async function POST(request: NextRequest) {
       headers: { 'Content-Type': 'application/json' },
     })
 
-    let formConfig = await formConfigResponse.json()
+    let formConfig: any
+    try {
+      if (formConfigResponse.ok) {
+        const contentType = formConfigResponse.headers.get('content-type')
+        if (contentType && contentType.includes('application/json')) {
+          formConfig = await formConfigResponse.json()
+        } else {
+          console.error(`❌ CMS returned non-JSON response: ${contentType}`)
+        }
+      } else {
+        console.error(`❌ CMS returned error status: ${formConfigResponse.status} ${formConfigResponse.statusText}`)
+      }
+    } catch (parseError) {
+      console.error('❌ Failed to parse form configuration JSON:', parseError)
+    }
 
     // Fallback: if findByID fails or returns error, try searching by name (slug)
-    if (!formConfigResponse.ok || !formConfig || !formConfig.id) {
+    if (!formConfig || !formConfig.id) {
       console.log(`[Upload API] ID fetch failed for ${formConfigId}, trying name search...`)
       const nameSearchRes = await fetch(`${cmsUrl}/api/form-configs?where[name][equals]=${encodeURIComponent(formConfigId)}&where[status][equals]=published&locale=all`, {
         method: 'GET',
@@ -224,42 +239,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Form configuration not found (ID: ${formConfigId})` }, { status: 404 })
     }
 
-    // Payload REST findByID returns the object, find returns { docs: [] }
     const actualConfig = formConfig.docs ? formConfig.docs[0] : formConfig
     
     if (!actualConfig) {
       return NextResponse.json({ error: 'Form configuration empty' }, { status: 404 })
     }
 
-    // 5. Get field configuration for the specific field
-    // Payload might return fields directly or nested under a locale if using locale=all
+    // [CRITICAL] Use the official name (slug) from CMS for all subsequent operations
+    const officialFormName = actualConfig.name || formConfigId;
+
+    // 5. Get field configuration
     const rawFields = actualConfig.fields || []
     const fields = Array.isArray(rawFields) ? rawFields : (rawFields.en || [])
     const fieldConfig = fields.find((f: any) => f.fieldName === fieldName)
 
     if (!fieldConfig || fieldConfig.fieldType !== 'file') {
-      console.error(`❌ Invalid field configuration for field: ${fieldName}`)
-      return NextResponse.json({ error: 'Invalid field configuration' }, { status: 400 })
+      console.error(`❌ Field ${fieldName} not found or not a file field in config ${officialFormName}`)
+      return NextResponse.json({ error: `Invalid field: ${fieldName}` }, { status: 400 })
     }
 
-    // 6. Validate file size
-    const maxSize = fieldConfig.validation?.maxSize || 5 // Default 5MB
+    // 6. Validate file size and type
+    const buffer = await file.arrayBuffer()
+    const uint8Array = new Uint8Array(buffer)
+    const maxSize = fieldConfig.validation?.maxSize || 5
     const maxSizeBytes = maxSize * 1024 * 1024
 
     if (file.size > maxSizeBytes) {
-      console.warn(`⚠️ File too large: ${file.size} bytes (max: ${maxSizeBytes} bytes)`)
-      return NextResponse.json(
-        { error: `File too large. Maximum size: ${maxSize}MB` },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: `File too large. Maximum size: ${maxSize}MB` }, { status: 400 })
     }
 
-    // 7. Validate file type using magic numbers
-    const buffer = await file.arrayBuffer()
-    const uint8Array = new Uint8Array(buffer)
-
     const acceptTypes = parseAcceptTypes(fieldConfig.validation?.accept)
-
     if (acceptTypes.length > 0) {
       const validType = validateFileType(uint8Array, acceptTypes)
       if (!validType) {
@@ -271,7 +280,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 8. Generate secure filename
+    // 8. Generate secure filename and S3 path
     const fileHash = crypto
       .createHash('sha256')
       .update(uint8Array)
@@ -280,21 +289,33 @@ export async function POST(request: NextRequest) {
 
     const timestamp = Date.now()
     const ext = file.name.split('.').pop()?.toLowerCase() || 'bin'
-
-    // Sanitize extension (only alphanumeric)
     const safeExt = ext.replace(/[^a-z0-9]/gi, '')
 
-    const safeFileName = `form-attachments/${formConfigId}/${timestamp}-${fileHash}.${safeExt}`
+    // Directory structure: form-attachments/{form-name}/{timestamp}-{hash}.{ext}
+    const s3Key = `form-attachments/${officialFormName}/${timestamp}-${fileHash}.${safeExt}`
 
-    console.log(`💾 Uploading to S3: ${safeFileName}`)
+    console.log(`📤 File upload request from IP: ${ip}`)
+    console.log(`📎 Uploading file: ${file.name} (${file.size} bytes) for field: ${fieldName} in form: ${officialFormName}`)
+    console.log(`💾 Uploading to S3: ${s3Key}`)
 
     // 9. Upload to S3
+    const s3Region = process.env.S3_REGION || process.env.AWS_REGION || 'us-east-1'
+    const s3AccessKeyId = process.env.S3_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID
+    const s3SecretAccessKey = process.env.S3_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY
+    const s3Bucket = process.env.S3_BUCKET_NAME || process.env.AWS_S3_BUCKET || 'busrom-media'
+
+    // If credentials are provided in env, use them. Otherwise, let AWS SDK find them (IAM roles, etc.)
+    const credentials = s3AccessKeyId && s3SecretAccessKey 
+      ? { accessKeyId: s3AccessKeyId, secretAccessKey: s3SecretAccessKey }
+      : undefined
+
+    if (!credentials && process.env.NODE_ENV === 'development') {
+      console.warn('⚠️ S3 credentials missing in development. Upload may fail unless using MinIO.')
+    }
+
     const s3Client = new S3Client({
-      region: process.env.S3_REGION || 'us-east-1',
-      credentials: {
-        accessKeyId: process.env.S3_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
-      },
+      region: s3Region,
+      ...(credentials && { credentials }),
       ...(process.env.USE_MINIO === 'true' && {
         endpoint: process.env.S3_ENDPOINT || 'http://localhost:9000',
         forcePathStyle: true,
@@ -304,48 +325,51 @@ export async function POST(request: NextRequest) {
     // Encode original filename to Base64 for S3 metadata (supports Unicode/Chinese)
     const originalNameBase64 = Buffer.from(file.name, 'utf-8').toString('base64')
 
-    await s3Client.send(new PutObjectCommand({
-      Bucket: process.env.S3_BUCKET_NAME || 'busrom-media',
-      Key: safeFileName,
-      Body: Buffer.from(buffer),
-      ContentType: file.type,
-      Metadata: {
-        // Store original filename as Base64 to support Unicode characters
-        originalNameBase64: originalNameBase64,
-        uploadedBy: ip,
-        formConfigId: formConfigId,
-        formName: formConfig.name || 'unknown',
-        fieldName: fieldName,
-        uploadTimestamp: timestamp.toString(),
-      },
-      // Set object tags for lifecycle management
-      Tagging: 'Type=FormAttachment&AutoDelete=true',
-    }))
+    try {
+      await s3Client.send(new PutObjectCommand({
+        Bucket: s3Bucket,
+        Key: s3Key,
+        Body: uint8Array,
+        ContentType: file.type,
+        Metadata: {
+          originalNameBase64: originalNameBase64,
+          uploadedBy: ip,
+          formConfigId: String(officialFormName),
+          fieldName: fieldName,
+          uploadTimestamp: timestamp.toString(),
+        },
+        Tagging: 'Type=FormAttachment&AutoDelete=true',
+      }))
+    } catch (s3Error: any) {
+      console.error('❌ S3 Send Error:', {
+        message: s3Error.message,
+        code: s3Error.code,
+        region: s3Region,
+        bucket: s3Bucket,
+        key: s3Key
+      })
+      throw s3Error
+    }
 
     // 10. Generate file URL
     let fileUrl: string
 
     if (process.env.CDN_DOMAIN && process.env.CDN_DOMAIN !== 'NONE') {
       // Use CDN URL (CloudFront)
-      fileUrl = `https://${process.env.CDN_DOMAIN}/${safeFileName}`
+      fileUrl = `https://${process.env.CDN_DOMAIN}/${s3Key}`
     } else if (process.env.USE_MINIO === 'true') {
       // Use MinIO URL (local development)
       const endpoint = process.env.S3_ENDPOINT || 'http://localhost:9000'
-      const bucket = process.env.S3_BUCKET_NAME || 'busrom-media'
-      fileUrl = `${endpoint}/${bucket}/${safeFileName}`
+      fileUrl = `${endpoint}/${s3Bucket}/${s3Key}`
     } else {
       // Use S3 direct URL
-      const bucket = process.env.S3_BUCKET_NAME || 'busrom-media'
-      const region = process.env.S3_REGION || 'us-east-1'
-      fileUrl = `https://${bucket}.s3.${region}.amazonaws.com/${safeFileName}`
+      fileUrl = `https://${s3Bucket}.s3.${s3Region}.amazonaws.com/${s3Key}`
     }
 
     console.log(`✅ File uploaded successfully: ${fileUrl}`)
 
     // 11. Record upload in TempFileUpload table (for orphan file cleanup)
     try {
-      const cmsUrl = process.env.CMS_URL ||
-        (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : (process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'https://cms.busromhouse.com'))
       await fetch(`${cmsUrl}/api/graphql`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -381,7 +405,7 @@ export async function POST(request: NextRequest) {
             fileName: file.name,
             fileSize: file.size,
             fileType: file.type,
-            formConfigId: formConfigId,
+            formConfigId: String(officialFormName),
             fieldName: fieldName,
             ipAddress: ip,
           },
