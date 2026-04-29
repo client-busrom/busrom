@@ -20,7 +20,7 @@
  */
 
 import type { CollectionConfig } from 'payload'
-import { pingSitemap } from '../hooks/pingSitemap'
+
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -373,6 +373,6 @@ export const Pages: CollectionConfig = {
         return data
       },
     ],
-    afterChange: [pingSitemap],
+
   },
 }

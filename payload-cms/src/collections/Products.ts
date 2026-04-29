@@ -16,7 +16,7 @@ import type {
   CollectionAfterChangeHook, 
   CollectionAfterDeleteHook 
 } from 'payload'
-import { pingSitemap } from '../hooks/pingSitemap'
+
 
 
 // 内存锁：确保同一个分类的 shopProducts 更新是串行的，防止高并发覆盖
@@ -144,6 +144,7 @@ export const Products: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'sku',
+    listSearchableFields: ['sku', 'slug', 'name'],
     defaultColumns: ['sku', 'name', 'series', 'status', 'isFeatured'],
     group: {
       en: 'Products',
@@ -565,7 +566,7 @@ export const Products: CollectionConfig = {
         return data
       },
     ],
-    afterChange: [afterChangeHook, pingSitemap],
+    afterChange: [afterChangeHook],
     afterDelete: [afterDeleteHook],
   },
 }

@@ -22,8 +22,21 @@ export const syncM2M = (
   return async ({ doc, previousDoc, req, operation, context }) => {
     const { payload } = req
     
+    // Skip during translation-only saves (no relationship changes)
+    if (context?.isTranslationSave) return doc
+
     // Prevent infinite recursion during sync
     if (context?.isSyncing) return doc
+
+    // --- REFACTOR: Field-level trigger check ---
+    // Only proceed if the sourceField is actually present in the data being updated.
+    // This prevents title/excerpt updates from triggering relationship syncs.
+    const isUpdate = operation === 'update'
+    const data = (req as any).data || {}
+    
+    if (isUpdate && !(sourceField in data)) {
+      return doc
+    }
 
     const isCreate = operation === 'create'
     
@@ -44,6 +57,11 @@ export const syncM2M = (
     const added = nextTargets.filter((id: any) => !prevTargets.map(String).includes(String(id)))
     const removed = prevTargets.filter((id: any) => !nextTargets.map(String).includes(String(id)))
 
+    // --- OPTIMIZATION: Early return if no changes in relationships ---
+    if (added.length === 0 && removed.length === 0) {
+      return doc
+    }
+
     // Get the default locale to avoid validation errors on target collections that might lack translations
     const defaultLocale = (payload.config.localization && typeof payload.config.localization === 'object')
       ? payload.config.localization.defaultLocale
@@ -52,20 +70,19 @@ export const syncM2M = (
     // Handle added targets
     for (const targetId of added) {
       try {
-        console.log(`[syncM2M] Linking ${targetCollection}/${targetId} to ${sourceField}/${sourceIdStr}`)
+        console.log(`[syncM2M] Linking ${targetCollection}/${targetId} to source ${sourceIdStr}`)
         
         const target = await payload.findByID({
           collection: targetCollection as any,
           id: targetId,
           depth: 0,
-          locale: defaultLocale as any, // Force default locale to bypass target translation validation
+          locale: defaultLocale as any,
           req, // Crucial for transaction visibility
         })
         
         if (target) {
           const currentLinks = sanitizeIds(target[targetField] || [])
           if (!currentLinks.map(String).includes(sourceIdStr)) {
-            console.log(`[syncM2M] Updating ${targetCollection}/${targetId} with new link to ${sourceIdStr}`)
             await payload.update({
               collection: targetCollection as any,
               id: targetId,
@@ -75,25 +92,27 @@ export const syncM2M = (
               context: { isSyncing: true },
               depth: 0,
               overrideAccess: true,
-              locale: defaultLocale as any, // Force default locale to bypass target translation validation
+              locale: defaultLocale as any,
               req,
+              disableHooks: true, // --- OPTIMIZATION: Don't trigger target's hooks ---
             })
           }
         }
-      } catch (e: any) {
-        console.error(`[syncM2M] ❌ FAILED to link ${targetCollection}/${targetId}:`, e.message)
-        if (e.data?.errors) console.error('Validation errors:', JSON.stringify(e.data.errors, null, 2))
+      } catch (err: any) {
+        console.error(`[syncM2M] Failed to add link for ${targetId}:`, err.message)
       }
     }
 
     // Handle removed targets
     for (const targetId of removed) {
       try {
+        console.log(`[syncM2M] Unlinking ${targetCollection}/${targetId} from source ${sourceIdStr}`)
+        
         const target = await payload.findByID({
           collection: targetCollection as any,
           id: targetId,
           depth: 0,
-          locale: defaultLocale as any, // Force default locale
+          locale: defaultLocale as any,
           req, // Crucial for transaction visibility
         })
         if (target) {
@@ -103,18 +122,19 @@ export const syncM2M = (
               collection: targetCollection as any,
               id: targetId,
               data: {
-                [targetField]: currentLinks.filter((l: any) => String(l) !== sourceIdStr),
+                [targetField]: currentLinks.filter((id: any) => String(id) !== sourceIdStr),
               },
               context: { isSyncing: true },
               depth: 0,
               overrideAccess: true,
-              locale: defaultLocale as any, // Force default locale
+              locale: defaultLocale as any,
               req,
+              disableHooks: true, // --- OPTIMIZATION: Don't trigger target's hooks ---
             })
           }
         }
-      } catch (e: any) {
-        console.error(`[syncM2M] ❌ FAILED to unlink ${targetCollection}/${targetId}:`, e.message)
+      } catch (err: any) {
+        console.error(`[syncM2M] Failed to remove link for ${targetId}:`, err.message)
       }
     }
 

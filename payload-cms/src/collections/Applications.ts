@@ -9,7 +9,7 @@
  */
 
 import type { CollectionConfig } from 'payload'
-import { pingSitemap } from '../hooks/pingSitemap'
+
 
 export const Applications: CollectionConfig = {
   slug: 'applications',
@@ -217,6 +217,6 @@ export const Applications: CollectionConfig = {
   ],
   timestamps: true,
   hooks: {
-    afterChange: [pingSitemap],
+
   },
 }

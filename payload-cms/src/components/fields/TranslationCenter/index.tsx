@@ -518,7 +518,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
     if (!activeSlug || !fieldConfigs || (!isGlobal && !id)) return
 
     setIsSaving(true)
-    setProgress({ current: 0, total: 1 }) // Will be updated
+    setProgress({ current: 0, total: 1 })
     setStatusMessage(null)
 
     let successCount = 0
@@ -526,7 +526,6 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
     const docId = id ? String(id) : ''
 
     try {
-      // 保存所有修改过的语言，包括当前语言
       const localesToSave = Array.from(modifiedLocales)
 
       if (localesToSave.length === 0) {
@@ -536,36 +535,45 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
         return
       }
 
-      setProgress({ current: 0, total: localesToSave.length })
+      // Helper function to set nested field value using dot notation
+      const setNestedValue = (obj: Record<string, unknown>, path: string, value: string) => {
+        const keys = path.split('.')
+        let current = obj
+        for (let i = 0; i < keys.length - 1; i++) {
+          const key = keys[i]
+          if (!current[key] || typeof current[key] !== 'object') {
+            current[key] = {}
+          }
+          current = current[key] as Record<string, unknown>
+        }
+        current[keys[keys.length - 1]] = value
+      }
+
+      // Build per-locale data
+      const localesPayload: Record<string, Record<string, unknown>> = {}
+
+      // Fetch source data once (for array fields & required fields)
+      let sourceData: any = null
+      const hasArrayFields = fieldsData.some(f => f.config.name.match(/^(.+)\[(\d+)]\.(.+)$/))
+      if (hasArrayFields || collectionSlug === 'products') {
+        const dataUrl = isGlobal
+          ? `/api/globals/${activeSlug}?locale=${sourceLocale}&depth=0`
+          : `/api/${activeSlug}/${docId}?locale=${sourceLocale}&depth=0`
+        const sourceRes = await fetch(dataUrl)
+        sourceData = await sourceRes.json()
+      }
 
       for (const localeCode of localesToSave) {
         const locale = SUPPORTED_LOCALES.find(l => l.code === localeCode)
         if (!locale) continue
 
-        // Helper function to set nested field value using dot notation
-        const setNestedValue = (obj: Record<string, unknown>, path: string, value: string) => {
-          const keys = path.split('.')
-          let current = obj
-          for (let i = 0; i < keys.length - 1; i++) {
-            const key = keys[i]
-            if (!current[key] || typeof current[key] !== 'object') {
-              current[key] = {}
-            }
-            current = current[key] as Record<string, unknown>
-          }
-          current[keys[keys.length - 1]] = value
-        }
-
         const dataToSave: Record<string, unknown> = {}
-
-        // Collect array field updates: { arrayFieldName: { index: { subField: value } } }
         const arrayFieldUpdates: Record<string, Record<number, Record<string, string>>> = {}
 
         for (const field of fieldsData) {
           const value = field.values.find(v => v.locale === locale.code)?.value
           if (value === undefined) continue
 
-          // Check if this is an expanded array field entry (e.g. "sceneGallery[0].sceneName")
           const arrayMatch = field.config.name.match(/^(.+)\[(\d+)]\.(.+)$/)
           if (arrayMatch) {
             const [, arrName, idxStr, subField] = arrayMatch
@@ -578,57 +586,74 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
           }
         }
 
-        // 获取源语言数据用于填充必填字段 + array field base data
-        const dataUrl = isGlobal
-          ? `/api/globals/${activeSlug}?locale=${sourceLocale}&depth=0`
-          : `/api/${activeSlug}/${docId}?locale=${sourceLocale}&depth=0`
-        const sourceRes = await fetch(dataUrl)
-        const sourceData = await sourceRes.json()
+        // Merge array field updates
+        if (sourceData) {
+          for (const [arrName, indexUpdates] of Object.entries(arrayFieldUpdates)) {
+            const sourceArray = (sourceData[arrName] as Array<Record<string, unknown>>) || []
+            const mergedArray = sourceArray.map((item, idx) => {
+              const updates = indexUpdates[idx]
+              return updates ? { ...item, ...updates } : { ...item }
+            })
+            dataToSave[arrName] = mergedArray
+          }
 
-        // Merge array field updates: preserve all existing fields (images, id, etc.), only update translated sub-fields
-        for (const [arrName, indexUpdates] of Object.entries(arrayFieldUpdates)) {
-          const sourceArray = (sourceData[arrName] as Array<Record<string, unknown>>) || []
-          const mergedArray = sourceArray.map((item, idx) => {
-            const updates = indexUpdates[idx]
-            if (updates) {
-              return { ...item, ...updates }
-            }
-            return { ...item }
+          // Fill required fields for products
+          if (collectionSlug === 'products') {
+            if (!dataToSave.name && sourceData.name) dataToSave.name = sourceData.name
+            if (sourceData.slug) dataToSave.slug = sourceData.slug
+          }
+        }
+
+        localesPayload[localeCode] = dataToSave
+      }
+
+      if (isGlobal) {
+        // Globals: save one by one (no syncM2M issues)
+        setProgress({ current: 0, total: localesToSave.length })
+        for (const [localeCode, data] of Object.entries(localesPayload)) {
+          const saveUrl = `/api/globals/${activeSlug}?locale=${localeCode}`
+          const saveRes = await fetch(saveUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
           })
-          dataToSave[arrName] = mergedArray
-        }
-
-        // 填充必填字段
-        if (collectionSlug === 'products') {
-          if (!dataToSave.name && sourceData.name) {
-            dataToSave.name = sourceData.name
+          if (saveRes.ok) {
+            successCount++
+          } else {
+            failCount++
+            const errorBody = await saveRes.text().catch(() => '')
+            console.error(`[TranslationCenter] ❌ Global save failed locale=${localeCode}:`, errorBody)
           }
-          if (sourceData.slug) {
-            dataToSave.slug = sourceData.slug
-          }
+          setProgress(prev => prev ? { ...prev, current: successCount + failCount } : null)
         }
+      } else {
+        // Collections: use bulk save-translations endpoint (bypasses syncM2M hooks)
+        setProgress({ current: 0, total: 1 })
+        console.log(`[TranslationCenter] Bulk saving ${Object.keys(localesPayload).length} locales via save-translations endpoint`)
 
-        const saveUrl = isGlobal
-          ? `/api/globals/${activeSlug}?locale=${locale.code}`
-          : `/api/${activeSlug}/${docId}?locale=${locale.code}`
-        
-        const saveRes = await fetch(saveUrl, {
-          method: isGlobal ? 'POST' : 'PATCH',
+        const saveRes = await fetch(`/api/${activeSlug}/${docId}/save-translations`, {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(dataToSave),
+          body: JSON.stringify({ locales: localesPayload }),
         })
 
-        if (saveRes.ok) {
-          successCount++
+        const result = await saveRes.json()
+
+        if (saveRes.ok && result.results) {
+          for (const [locale, r] of Object.entries(result.results as Record<string, { success: boolean }>)) {
+            if (r.success) successCount++
+            else failCount++
+          }
         } else {
-          failCount++
+          failCount = localesToSave.length
+          console.error(`[TranslationCenter] ❌ Bulk save failed:`, result)
         }
-        setProgress(prev => prev ? { ...prev, current: successCount + failCount } : null)
+        setProgress({ current: 1, total: 1 })
       }
 
       if (failCount === 0) {
         setStatusMessage({ type: 'success', key: 'custom:translationCenter:saveSuccess', params: { count: successCount } })
-        setModifiedLocales(new Set()) // 保存成功后清空修改追踪
+        setModifiedLocales(new Set())
       } else {
         setStatusMessage({ type: 'warning', key: 'custom:translationCenter:partialSave', params: { success: successCount, fail: failCount } })
       }
@@ -691,7 +716,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
   // Check if button should be disabled
   const isTriggerDisabled = !activeSlug || !fieldConfigs || fieldConfigs.length === 0 || (!isGlobal && !id)
 
-  console.log('[TranslationCenter Debug]', { activeSlug, isGlobal, id, fieldConfigsCount: fieldConfigs?.length, isTriggerDisabled })
+  
 
   if (isTriggerDisabled) {
     return (

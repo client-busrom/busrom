@@ -12,7 +12,7 @@
 
 import type { CollectionConfig } from 'payload'
 import { syncM2M, cleanupM2M } from '../hooks/syncM2M'
-import { pingSitemap } from '../hooks/pingSitemap'
+
 import { formatSlug } from '../hooks/formatSlug'
 
 export const Blogs: CollectionConfig = {
@@ -29,6 +29,7 @@ export const Blogs: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'adminLabel',
+    listSearchableFields: ['adminLabel', 'slug', 'title'],
     defaultColumns: ['adminLabel', 'slug', 'status', 'author', 'publishedAt', 'updatedAt'],
     group: {
       en: 'Content',
@@ -106,7 +107,6 @@ export const Blogs: CollectionConfig = {
     afterChange: [
       syncM2M('categories', 'blogPosts', 'categories'),
       syncM2M('blog-tags', 'blogs', 'tags'),
-      pingSitemap,
     ],
     afterDelete: [
       cleanupM2M('categories', 'blogPosts', 'categories'),
@@ -114,6 +114,20 @@ export const Blogs: CollectionConfig = {
     ],
   },
   fields: [
+    {
+      name: 'adminLabel',
+      type: 'text',
+      label: {
+        en: 'Admin Identification (Internal Use)',
+        zh: '内部管理标识（不影响URL）',
+      },
+      admin: {
+        description: {
+          en: 'This identifier is for internal management and can contain spaces/caps. (e.g. "Blog - Glass Installation")',
+          zh: '仅用于后台管理区分，可以包含空格和大小写（例如："博客 - 玻璃安装教程"）',
+        },
+      },
+    },
     {
       type: 'tabs',
       tabs: [
@@ -126,20 +140,6 @@ export const Blogs: CollectionConfig = {
             zh: '基本信息',
           },
           fields: [
-            {
-              name: 'adminLabel',
-              type: 'text',
-              label: {
-                en: 'Admin Identification (Internal Use)',
-                zh: '内部管理标识（不影响URL）',
-              },
-              admin: {
-                description: {
-                  en: 'This identifier is for internal management and can contain spaces/caps. (e.g. "Blog - Glass Installation")',
-                  zh: '仅用于后台管理区分，可以包含空格和大小写（例如："博客 - 玻璃安装教程"）',
-                },
-              },
-            },
             {
               name: 'slug',
               type: 'text',
@@ -367,7 +367,7 @@ export const Blogs: CollectionConfig = {
       type: 'date',
       label: {
         en: 'Published At',
-        zh: '发布时间',
+        zh: '同步至网站前端可见的时间',
       },
       admin: {
         position: 'sidebar',

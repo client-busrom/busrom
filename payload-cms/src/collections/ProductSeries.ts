@@ -12,7 +12,7 @@
  */
 
 import type { CollectionConfig } from 'payload'
-import { pingSitemap } from '../hooks/pingSitemap'
+
 
 export const ProductSeries: CollectionConfig = {
   slug: 'product-series',
@@ -28,6 +28,7 @@ export const ProductSeries: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'name',
+    listSearchableFields: ['name', 'slug'],
     defaultColumns: ['name', 'slug', 'status', 'order'],
     group: {
       en: 'Product Center',
@@ -263,7 +264,5 @@ export const ProductSeries: CollectionConfig = {
       },
     },
   ],
-  hooks: {
-    afterChange: [pingSitemap],
-  },
+
 }

@@ -834,6 +834,8 @@ export default buildConfig({
       zh: {
         ...zh.translations,
         ...customTranslationsZh,
+        'general:createdAt': '创建该条目的时间',
+        'general:updatedAt': '更新修改保存的时间',
       },
     },
   },
