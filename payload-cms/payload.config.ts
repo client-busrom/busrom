@@ -127,7 +127,6 @@ import {
   regenerateBackupCodesHandler,
   get2FAStatusHandler,
 } from './src/endpoints/two-factor-auth'
-import { fixBlogsSchemaHandler } from './src/endpoints/fixBlogsSchema'
 import {
   authLoginHandler,
   authVerify2FAHandler,
@@ -798,12 +797,6 @@ export default buildConfig({
       path: '/auth/login',
       method: 'post',
       handler: authLoginHandler,
-    },
-    // Emergency Schema Fix
-    {
-      path: '/fix-db-schema',
-      method: 'get',
-      handler: fixBlogsSchemaHandler,
     },
     {
       path: '/auth/verify-2fa',
