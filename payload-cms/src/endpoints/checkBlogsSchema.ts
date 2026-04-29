@@ -37,7 +37,15 @@ export const checkBlogsSchemaHandler: PayloadHandler = async (req) => {
       ORDER BY column_name
     `)
 
-    // 3. Check if sub-tables exist
+    // 3. Check columns in 'blogs_rels'
+    const relsColumns = await drizzle.execute(`
+      SELECT column_name, data_type 
+      FROM information_schema.columns 
+      WHERE table_name = 'blogs_rels' 
+      ORDER BY column_name
+    `)
+
+    // 4. Check if sub-tables exist
     const subTables = await drizzle.execute(`
       SELECT table_name 
       FROM information_schema.tables 
@@ -47,6 +55,7 @@ export const checkBlogsSchemaHandler: PayloadHandler = async (req) => {
     return Response.json({
       blogsColumns: blogsColumns.rows || blogsColumns,
       localesColumns: localesColumns.rows || localesColumns,
+      relsColumns: relsColumns.rows || relsColumns,
       subTables: subTables.rows || subTables
     })
   } catch (e: any) {
