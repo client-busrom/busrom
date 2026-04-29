@@ -127,7 +127,6 @@ import {
   regenerateBackupCodesHandler,
   get2FAStatusHandler,
 } from './src/endpoints/two-factor-auth'
-import { checkBlogsSchemaHandler } from './src/endpoints/checkBlogsSchema'
 import {
   authLoginHandler,
   authVerify2FAHandler,
@@ -800,11 +799,6 @@ export default buildConfig({
       path: '/auth/login',
       method: 'post',
       handler: authLoginHandler,
-    },
-    {
-      path: '/check-db-schema',
-      method: 'get',
-      handler: checkBlogsSchemaHandler,
     },
     {
       path: '/auth/verify-2fa',
