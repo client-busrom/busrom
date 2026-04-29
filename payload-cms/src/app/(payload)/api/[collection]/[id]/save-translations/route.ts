@@ -7,18 +7,11 @@ export const dynamic = 'force-dynamic'
 /**
  * Bulk translation save endpoint
  * 
- * Saves localized field data for multiple locales in one request,
- * using the Local API with context flags to skip heavy afterChange hooks
- * (syncM2M) that cause transaction timeouts and data loss.
+ * Saves localized field data for multiple locales in one request.
+ * Uses the Payload Local API with context flags to skip heavy hooks (syncM2M)
+ * and bypasses the dangerous raw SQL that fails on complex schema structures.
  * 
  * POST /api/[collection]/[id]/save-translations
- * Body: {
- *   locales: {
- *     "zh": { "title": "...", "excerpt": "..." },
- *     "es": { "title": "...", "excerpt": "..." },
- *     ...
- *   }
- * }
  */
 export async function POST(
   request: NextRequest,
@@ -37,7 +30,7 @@ export async function POST(
       )
     }
 
-    // Authenticate: extract user from cookie/header
+    // Authenticate
     const { user } = await payload.auth({ headers: request.headers })
     if (!user) {
       return NextResponse.json(
@@ -48,58 +41,33 @@ export async function POST(
 
     const results: Record<string, { success: boolean; error?: string }> = {}
 
-    // Get the localized table name based on collection
-    const tableName = `${collection}_locales`
-
+    // Process each locale sequentially using Payload Local API
+    // This is safer than raw SQL as it handles field flattening, validation, and schema mapping.
     for (const [localeCode, data] of Object.entries(locales)) {
       try {
-        console.log(`[save-translations] SQL Mode: Writing ${localeCode} to ${tableName}`)
+        console.log(`[save-translations] Updating locale=${localeCode} for ${collection}/${id}`)
         
-        const updateData = data as Record<string, any>
-        const fields = Object.keys(updateData)
-        
-        if (fields.length === 0) {
-          results[localeCode] = { success: true }
-          continue
-        }
-
-        // Build UPSERT query for *_locales table
-        // We need to match _parent_id and _locale
-        const columns = ['_parent_id', '_locale', ...fields]
-        const values = [id, localeCode, ...fields.map(f => updateData[f])]
-        const placeholders = values.map((_, i) => `$${i + 1}`).join(', ')
-        const updates = fields.map((f, i) => `${f} = EXCLUDED.${f}`).join(', ')
-
-        const query = `
-          INSERT INTO ${tableName} (${columns.join(', ')})
-          VALUES (${placeholders})
-          ON CONFLICT (_parent_id, _locale)
-          DO UPDATE SET ${updates}
-          RETURNING id;
-        `
-
-        // Execute via payload.db (Postgres adapter)
-        // We use string replacement with careful escaping for the quick fix
-        const escapedQuery = query.replace(/\$\d+/g, (match) => {
-          const idx = parseInt(match.slice(1)) - 1
-          const val = values[idx]
-          
-          if (val === null || val === undefined) return 'NULL'
-          if (typeof val === 'number' || typeof val === 'boolean') return val.toString()
-          
-          // Handle objects (JSON fields)
-          const stringVal = typeof val === 'object' ? JSON.stringify(val) : val.toString()
-          return `'${stringVal.replace(/'/g, "''")}'`
+        await payload.update({
+          collection: collection as any,
+          id,
+          data: data as any,
+          locale: localeCode as any,
+          // Context flags to skip heavy processing
+          context: { 
+            isTranslationSave: true,
+            isSyncing: true // Double protection against syncM2M
+          },
+          // Skip validation and hooks for maximum performance, 
+          // similar to what raw SQL was trying to achieve
+          disableHooks: true,
+          overrideAccess: true,
+          // Ensure we don't depth-crawl relationships
+          depth: 0,
         })
-
-        await payload.db.drizzle.execute(
-          require('drizzle-orm').sql.raw(escapedQuery)
-        )
         
-        console.log(`[save-translations] SQL SUCCESS for locale=${localeCode}`)
         results[localeCode] = { success: true }
       } catch (e: any) {
-        console.error(`[save-translations] ❌ SQL FAILED for locale=${localeCode}:`, e.message)
+        console.error(`[save-translations] ❌ Failed to update locale=${localeCode}:`, e.message)
         results[localeCode] = { success: false, error: e.message }
       }
     }
@@ -112,7 +80,7 @@ export async function POST(
       results,
     })
   } catch (error) {
-    console.error('[save-translations] Error:', error)
+    console.error('[save-translations] Critical Error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to save translations' },
       { status: 500 }

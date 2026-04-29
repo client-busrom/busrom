@@ -50,6 +50,48 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
   blogs: [
     { name: 'title', labelKey: 'custom:fields:blogTitle', type: 'textarea' },
     { name: 'excerpt', labelKey: 'custom:translationCenter:excerpt', type: 'textarea' },
+    { 
+      name: 'toc.config.title', 
+      labelKey: 'custom:fields:tocTitle', 
+      type: 'textarea',
+      condition: (doc: any) => doc?.useCustomOverrides === true
+    },
+    { 
+      name: 'share.config.title', 
+      labelKey: 'custom:fields:shareTitle', 
+      type: 'textarea',
+      condition: (doc: any) => doc?.useCustomOverrides === true
+    },
+    { 
+      name: 'search_box.config.placeholder', 
+      labelKey: 'custom:fields:placeholder', 
+      type: 'textarea',
+      condition: (doc: any) => doc?.useCustomOverrides === true
+    },
+    { 
+      name: 'category_list.config.title', 
+      labelKey: 'custom:fields:title', 
+      type: 'textarea',
+      condition: (doc: any) => doc?.useCustomOverrides === true
+    },
+    { 
+      name: 'recommended_posts.config.title', 
+      labelKey: 'custom:fields:title', 
+      type: 'textarea',
+      condition: (doc: any) => doc?.useCustomOverrides === true
+    },
+    { 
+      name: 'follow_us.config.title', 
+      labelKey: 'custom:fields:title', 
+      type: 'textarea',
+      condition: (doc: any) => doc?.useCustomOverrides === true
+    },
+    { 
+      name: 'bottom_recommended.config.title', 
+      labelKey: 'custom:fields:title', 
+      type: 'textarea',
+      condition: (doc: any) => doc?.useCustomOverrides === true
+    },
   ],
   'faq-items': [
     { name: 'question', labelKey: 'custom:fields:question', type: 'textarea' },

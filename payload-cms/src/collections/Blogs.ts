@@ -12,6 +12,7 @@
 
 import type { CollectionConfig } from 'payload'
 import { syncM2M, cleanupM2M } from '../hooks/syncM2M'
+import { createKBWidgetField, KB_WIDGET_SUBFIELDS } from '../fields/knowledgeBaseWidgets'
 
 import { formatSlug } from '../hooks/formatSlug'
 
@@ -292,26 +293,42 @@ export const Blogs: CollectionConfig = {
           ],
         },
         // ==================================================================
-        // Tab 4: Template Configuration
+        // Tab 4: Layout & Overrides
         // ==================================================================
         {
           label: {
-            en: 'Template Output',
-            zh: '前台排版模板',
+            en: 'Layout & Overrides',
+            zh: '排版与覆盖设置',
           },
           fields: [
+            {
+              name: 'useCustomOverrides',
+              type: 'checkbox',
+              label: {
+                en: 'Enable Custom Overrides',
+                zh: '启用个性化覆盖设置',
+              },
+              defaultValue: false,
+              admin: {
+                description: {
+                  en: 'When enabled, this page will use individual widget settings below instead of the global template defaults.',
+                  zh: '勾选后，该页面将不再使用全局模板配置，而是使用下方定义的个性化设置。',
+                },
+              },
+            },
             {
               name: 'templateType',
               type: 'radio',
               label: {
-                en: 'Template Type',
-                zh: '使用模版类型',
+                en: 'Active Global Template',
+                zh: '使用的全局模版类型',
               },
               admin: {
                 layout: 'horizontal',
+                condition: (data) => !data?.useCustomOverrides,
                 description: {
-                  en: 'Select how the frontend will structurally render this blog post.',
-                  zh: '选择在前端显示知识库文章时应该调用的具体开发模版。',
+                  en: 'Select the template to use when "Custom Overrides" is disabled.',
+                  zh: '选择在未开启“个性化覆盖”时调用的具体开发模版。',
                 },
               },
               defaultValue: 'template1',
@@ -319,6 +336,84 @@ export const Blogs: CollectionConfig = {
                 { label: { en: 'Template 1 (Standard Modern)', zh: '模版一 (标准现代多栏)' }, value: 'template1' },
                 { label: { en: 'Template 2 (Minimal Review)', zh: '模版二 (极简测评风格)' }, value: 'template2' },
                 { label: { en: 'Template 3 (Corporate View)', zh: '模版三 (重型图文品牌风)' }, value: 'template3' },
+              ],
+            },
+            {
+              type: 'collapsible',
+              label: {
+                en: 'Sidebar Widget Overrides',
+                zh: '详情页侧边栏覆盖 (Sidebar Overrides)',
+              },
+              admin: {
+                condition: (data) => data?.useCustomOverrides === true,
+              },
+              fields: [
+                createKBWidgetField({
+                  name: 'toc',
+                  label: '目录导航 (TOC)',
+                  isOverride: true,
+                  subFields: KB_WIDGET_SUBFIELDS.toc,
+                }),
+                createKBWidgetField({
+                  name: 'share',
+                  label: '社交分享 (Share)',
+                  isOverride: true,
+                  subFields: KB_WIDGET_SUBFIELDS.share,
+                }),
+                createKBWidgetField({
+                  name: 'search_box',
+                  label: '搜索框 (Search Box)',
+                  isOverride: true,
+                  subFields: KB_WIDGET_SUBFIELDS.search_box,
+                }),
+                createKBWidgetField({
+                  name: 'category_list',
+                  label: '博客分类展示 (Category List)',
+                  isOverride: true,
+                  subFields: KB_WIDGET_SUBFIELDS.category_list,
+                }),
+                createKBWidgetField({
+                  name: 'recommended_posts',
+                  label: '侧边栏推荐博文 (Recommended Blogs)',
+                  isOverride: true,
+                  subFields: KB_WIDGET_SUBFIELDS.recommendations(),
+                }),
+                createKBWidgetField({
+                  name: 'follow_us',
+                  label: '关注我们 (Follow Us)',
+                  isOverride: true,
+                  subFields: KB_WIDGET_SUBFIELDS.follow_us,
+                }),
+              ],
+            },
+            {
+              type: 'collapsible',
+              label: {
+                en: 'Footer Widget Overrides',
+                zh: '详情页底部栏覆盖 (Footer Overrides)',
+              },
+              admin: {
+                condition: (data) => data?.useCustomOverrides === true,
+              },
+              fields: [
+                createKBWidgetField({
+                  name: 'bottom_categories',
+                  label: '底部分类展示 (Bottom Categories)',
+                  isOverride: true,
+                  subFields: KB_WIDGET_SUBFIELDS.bottom_categories,
+                }),
+                createKBWidgetField({
+                  name: 'pagination',
+                  label: '翻页跳转 (Pagination)',
+                  isOverride: true,
+                  subFields: KB_WIDGET_SUBFIELDS.pagination(true),
+                }),
+                createKBWidgetField({
+                  name: 'bottom_recommended',
+                  label: '底部推荐博文 (Bottom Recommended)',
+                  isOverride: true,
+                  subFields: KB_WIDGET_SUBFIELDS.recommendations(3),
+                }),
               ],
             },
           ],

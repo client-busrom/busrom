@@ -131,7 +131,7 @@ export function parseFraudNoticeData(locale: string, rawData: any): FraudNoticeD
   
   // Let's refine the parser to handle the block structure if needed, 
   // or just extract the twoColumns block directly.
-  const twoColumnsBlock = children.find(n => n.type === "block" && n.fields?.blockType === "twoColumns");
+  const twoColumnsBlock = children.find((n: any) => n.type === "block" && n.fields?.blockType === "twoColumns");
   
   let block = null;
   if (twoColumnsBlock) {
@@ -151,12 +151,12 @@ export function parseFraudNoticeData(locale: string, rawData: any): FraudNoticeD
   const contactTitleNodes = extractAfterMarker(children, "contact-form-title");
   const contactDescNodes = extractAfterMarker(children, "contact-form-description");
   const formMarkerNodes = extractAfterMarker(children, "contact-form-block");
-  const formNode = formMarkerNodes.find(n => n.type === "formBlock") || children.find(n => n.type === "formBlock");
+  const formNode = formMarkerNodes.find((n: any) => n.type === "formBlock") || children.find((n: any) => n.type === "formBlock");
   const formConfig = formNode?.data?.formConfig || formNode?.data || (rawData as any).formConfig || null;
 
   // 4. Quote Guide (Carousel)
   const quoteItemNodes = extractAfterMarker(children, "quote-guide-item");
-  const quoteNode = quoteItemNodes.find(n => n.type === "carousel") || children.find(n => n.type === "carousel");
+  const quoteNode = quoteItemNodes.find((n: any) => n.type === "carousel") || children.find((n: any) => n.type === "carousel");
   
   let quoteGuide = null;
   if (quoteNode?.data?.slides) {

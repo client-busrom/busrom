@@ -31,7 +31,8 @@ interface FormField {
 interface FormConfigData {
   id: string
   name: string
-  fields: Record<string, FormField[]>
+  description?: string | Record<string, string>
+  fields: Record<string, FormField[]> | FormField[]
 }
 
 interface StoryContactFormSectionProps {
@@ -184,7 +185,7 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
   }, [mergedConfig, locale]);
 
   const effectiveDescription = useMemo(() => {
-    const formConfigDesc = (mergedConfig?.data || mergedConfig)?.description || mergedConfig?.description;
+    const formConfigDesc = ((mergedConfig as any)?.data || mergedConfig)?.description || (mergedConfig as any)?.description;
     return getLocalizedString(formConfigDesc, locale || 'en') || description;
   }, [mergedConfig, locale, description]);
 
@@ -205,7 +206,7 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
     fetchSiteKey()
   }, [])
 
-  const configData = mergedConfig?.data || mergedConfig
+  const configData = (mergedConfig?.data || mergedConfig) as any
   const fields = configData?.fields?.[locale] || configData?.fields?.["en"] || (Array.isArray(configData?.fields) ? configData.fields : [])
   const sortedFields = [...fields].sort((a: FormField, b: FormField) => (a.order || 0) - (b.order || 0))
 
@@ -266,7 +267,7 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
 
       const submissionData = {
         formId: formId,
-        formName: mergedConfig?.name || configData?.name || "contact-form",
+        formName: (mergedConfig as any)?.name || configData?.name || "contact-form",
         data: {
           ...formData,
           ...(fileUrl ? { attachment: fileUrl } : {}),

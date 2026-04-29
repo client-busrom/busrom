@@ -94,8 +94,8 @@ export const syncM2M = (
               overrideAccess: true,
               locale: defaultLocale as any,
               req,
-              disableHooks: true, // --- OPTIMIZATION: Don't trigger target's hooks ---
-            })
+              disableHooks: true,
+            } as any)
           }
         }
       } catch (err: any) {
@@ -129,8 +129,8 @@ export const syncM2M = (
               overrideAccess: true,
               locale: defaultLocale as any,
               req,
-              disableHooks: true, // --- OPTIMIZATION: Don't trigger target's hooks ---
-            })
+              disableHooks: true,
+            } as any)
           }
         }
       } catch (err: any) {

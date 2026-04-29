@@ -897,9 +897,97 @@ export interface Blog {
    */
   tags?: (number | BlogTag)[] | null;
   /**
-   * Select how the frontend will structurally render this blog post.
+   * When enabled, this page will use individual widget settings below instead of the global template defaults.
+   */
+  useCustomOverrides?: boolean | null;
+  /**
+   * Select the template to use when "Custom Overrides" is disabled.
    */
   templateType?: ('template1' | 'template2' | 'template3') | null;
+  toc?: {
+    mode?: ('inherit' | 'override' | 'disable') | null;
+    config?: {
+      title?: string | null;
+    };
+  };
+  share?: {
+    mode?: ('inherit' | 'override' | 'disable') | null;
+    config?: {
+      title?: string | null;
+      networks?:
+        | {
+            /**
+             * 例如: fab fa-twitter
+             */
+            icon?: string | null;
+            /**
+             * 使用 {{URL}} 和 {{TITLE}} 作为占位符。例如：https://twitter.com/intent/tweet?url={{URL}}&text={{TITLE}}
+             */
+            url?: string | null;
+            id?: string | null;
+          }[]
+        | null;
+    };
+  };
+  search_box?: {
+    mode?: ('inherit' | 'override' | 'disable') | null;
+    config?: {
+      placeholder?: string | null;
+    };
+  };
+  category_list?: {
+    mode?: ('inherit' | 'override' | 'disable') | null;
+    config?: {
+      title?: string | null;
+      categories?: (number | Category)[] | null;
+    };
+  };
+  recommended_posts?: {
+    mode?: ('inherit' | 'override' | 'disable') | null;
+    config?: {
+      title?: string | null;
+      posts?: (number | Blog)[] | null;
+      logic?: ('category' | 'latest') | null;
+    };
+  };
+  follow_us?: {
+    mode?: ('inherit' | 'override' | 'disable') | null;
+    config?: {
+      title?: string | null;
+      socials?:
+        | {
+            /**
+             * 例如: fab fa-linkedin
+             */
+            icon?: string | null;
+            url?: string | null;
+            id?: string | null;
+          }[]
+        | null;
+    };
+  };
+  bottom_categories?: {
+    mode?: ('inherit' | 'override' | 'disable') | null;
+    config?: {
+      categories?: (number | Category)[] | null;
+    };
+  };
+  pagination?: {
+    mode?: ('inherit' | 'override' | 'disable') | null;
+    config?: {
+      type?: ('auto' | 'manual') | null;
+      prev_post?: (number | null) | Blog;
+      next_post?: (number | null) | Blog;
+    };
+  };
+  bottom_recommended?: {
+    mode?: ('inherit' | 'override' | 'disable') | null;
+    config?: {
+      title?: string | null;
+      posts?: (number | Blog)[] | null;
+      logic?: ('category' | 'latest') | null;
+    };
+  };
   status?: ('published' | 'draft' | 'archived') | null;
   publishedAt?: string | null;
   updatedAt: string;
@@ -2678,7 +2766,119 @@ export interface BlogsSelect<T extends boolean = true> {
   coverImage?: T;
   categories?: T;
   tags?: T;
+  useCustomOverrides?: T;
   templateType?: T;
+  toc?:
+    | T
+    | {
+        mode?: T;
+        config?:
+          | T
+          | {
+              title?: T;
+            };
+      };
+  share?:
+    | T
+    | {
+        mode?: T;
+        config?:
+          | T
+          | {
+              title?: T;
+              networks?:
+                | T
+                | {
+                    icon?: T;
+                    url?: T;
+                    id?: T;
+                  };
+            };
+      };
+  search_box?:
+    | T
+    | {
+        mode?: T;
+        config?:
+          | T
+          | {
+              placeholder?: T;
+            };
+      };
+  category_list?:
+    | T
+    | {
+        mode?: T;
+        config?:
+          | T
+          | {
+              title?: T;
+              categories?: T;
+            };
+      };
+  recommended_posts?:
+    | T
+    | {
+        mode?: T;
+        config?:
+          | T
+          | {
+              title?: T;
+              posts?: T;
+              logic?: T;
+            };
+      };
+  follow_us?:
+    | T
+    | {
+        mode?: T;
+        config?:
+          | T
+          | {
+              title?: T;
+              socials?:
+                | T
+                | {
+                    icon?: T;
+                    url?: T;
+                    id?: T;
+                  };
+            };
+      };
+  bottom_categories?:
+    | T
+    | {
+        mode?: T;
+        config?:
+          | T
+          | {
+              categories?: T;
+            };
+      };
+  pagination?:
+    | T
+    | {
+        mode?: T;
+        config?:
+          | T
+          | {
+              type?: T;
+              prev_post?: T;
+              next_post?: T;
+            };
+      };
+  bottom_recommended?:
+    | T
+    | {
+        mode?: T;
+        config?:
+          | T
+          | {
+              title?: T;
+              posts?: T;
+              logic?: T;
+            };
+      };
   status?: T;
   publishedAt?: T;
   updatedAt?: T;

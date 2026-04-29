@@ -39,6 +39,7 @@ export interface FormField {
     accept?: string;
     maxSize?: number;
     multiple?: boolean;
+    allowedTypes?: string[];
   };
 }
 
