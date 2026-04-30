@@ -66,8 +66,8 @@ interface OemOdmContactFormProps {
 }
 
 export function OemOdmContactForm({
-  title = "Get Your\nExclusive\nPlan",
-  description = "Please fill in the following information. Our OEM/ODM experts will provide you with professional solutions and quotations within 24 hours.",
+  title = "",
+  description = "",
   image,
   formConfig,
   locale = "en",
@@ -91,7 +91,7 @@ export function OemOdmContactForm({
   }
 
   const privacyText = getLocalizedString(configData?.privacyConsentText)
-  const submitText = getLocalizedString(configData?.submitButtonText || configData?.data?.submitButtonText) || "Submit Inquiry"
+  const submitText = getLocalizedString(configData?.submitButtonText || configData?.data?.submitButtonText) || ""
 
   // 表单数据状态
   const [formData, setFormData] = useState<Record<string, any>>({})
@@ -159,7 +159,12 @@ export function OemOdmContactForm({
     if (fields.length > 0) {
       const initialData: Record<string, any> = {}
       fields.forEach((field: FormField) => {
-        initialData[field.fieldName] = field.fieldType === 'checkbox' ? [] : ''
+        if (field.fieldType === 'select' && field.options && field.options.length > 0) {
+          // 下拉菜单默认选择第一项
+          initialData[field.fieldName] = field.options[0].value
+        } else {
+          initialData[field.fieldName] = field.fieldType === 'checkbox' ? [] : ''
+        }
       })
       setFormData(initialData)
     }
@@ -377,7 +382,7 @@ export function OemOdmContactForm({
       >
         <div className="hidden md:flex relative w-full items-center justify-center" style={{ height: rpx(1592) }}>
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-            <p className="text-yellow-700">Form configuration not available</p>
+            <p className="text-yellow-700"></p>
           </div>
         </div>
       </section>
@@ -396,8 +401,8 @@ export function OemOdmContactForm({
             <svg className="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3 className="text-xl font-anaheim font-bold text-green-700 mb-2">Success!</h3>
-            <p className="text-green-600">{configData?.successMessage || "Your inquiry has been submitted successfully!"}</p>
+            <h3 className="text-xl font-anaheim font-bold text-green-700 mb-2"></h3>
+            <p className="text-green-600">{configData?.successMessage || ""}</p>
           </div>
         </div>
         <div className="block md:hidden px-5 py-8">
@@ -405,8 +410,8 @@ export function OemOdmContactForm({
             <svg className="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3 className="text-xl font-anaheim font-bold text-green-700 mb-2">Success!</h3>
-            <p className="text-green-600">{configData?.successMessage || "Your inquiry has been submitted successfully!"}</p>
+            <h3 className="text-xl font-anaheim font-bold text-green-700 mb-2"></h3>
+            <p className="text-green-600">{configData?.successMessage || ""}</p>
           </div>
         </div>
       </section>
@@ -582,7 +587,7 @@ export function OemOdmContactForm({
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              {configData?.displayName || "OEM/ODM Requirements"}
+              {configData?.displayName || ""}
             </motion.h2>
 
             {/* 第一行输入框：Your Name + Your Company */}
@@ -609,7 +614,7 @@ export function OemOdmContactForm({
                   fontSize: rpx(24),
                   color: "#756F3F",
                 }}
-                placeholder={textFields[0]?.placeholder || textFields[0]?.label || "Your Name"}
+                placeholder={textFields[0]?.placeholder || textFields[0]?.label || ""}
                 disabled={submitting}
               />
             </div>
@@ -637,7 +642,7 @@ export function OemOdmContactForm({
                   fontSize: rpx(24),
                   color: "#756F3F",
                 }}
-                placeholder={textFields[1]?.placeholder || textFields[1]?.label || "Your Company / Your Team"}
+                placeholder={textFields[1]?.placeholder || textFields[1]?.label || ""}
                 disabled={submitting}
               />
             </div>
@@ -666,7 +671,7 @@ export function OemOdmContactForm({
                   fontSize: rpx(24),
                   color: "#756F3F",
                 }}
-                placeholder={textFields[2]?.placeholder || textFields[2]?.label || "Your Email"}
+                placeholder={textFields[2]?.placeholder || textFields[2]?.label || ""}
                 disabled={submitting}
               />
             </div>
@@ -688,7 +693,7 @@ export function OemOdmContactForm({
                 id={textFields[3]?.fieldName}
                 value={formData[textFields[3]?.fieldName] || ''}
                 onChange={(phone) => handleChange(textFields[3]?.fieldName, phone)}
-                placeholder={textFields[3]?.placeholder || textFields[3]?.label || "Your Whatsapp"}
+                placeholder={textFields[3]?.placeholder || textFields[3]?.label || ""}
                 disabled={submitting}
                 className="!bg-transparent !border-none !h-full !rounded-none"
                 buttonClassName="!bg-transparent !border-r-0 !text-[#756F3F] hover:!bg-black/5 !rounded-none !px-4 !h-full"
@@ -737,7 +742,6 @@ export function OemOdmContactForm({
                 }}
                 disabled={submitting}
               >
-                <option value="">{selectFields[0]?.placeholder || "Select..."}</option>
                 {selectFields[0]?.options?.map(option => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -777,7 +781,7 @@ export function OemOdmContactForm({
                   fontSize: rpx(24),
                   color: "#756F3F",
                 }}
-                placeholder={textareaFields[0]?.placeholder || textareaFields[0]?.label || "Specific Requirements / Project Description"}
+                placeholder={textareaFields[0]?.placeholder || textareaFields[0]?.label || ""}
                 disabled={submitting}
               />
             </div>
@@ -1037,7 +1041,7 @@ export function OemOdmContactForm({
                   ? (uploadProgress > 0 && uploadProgress < 100 
                       ? `Uploading ${uploadProgress}%...` 
                       : "Submitting...") 
-                  : (configData?.submitButtonText || "Send Inquiry")}
+                  : (configData?.submitButtonText || "")}
               </span>
             </motion.button>
           </form>
@@ -1079,7 +1083,7 @@ export function OemOdmContactForm({
         {/* 表单区域 */}
         <div className="rounded-2xl p-6" style={{ backgroundColor: "#FFFFFF", border: "1px solid #cfcaa2" }}>
           <h2 className="font-anaheim font-extrabold text-3xl mb-6" style={{ color: "#6F6200" }}>
-            {configData?.displayName || "OEM/ODM Requirements"}
+            {configData?.displayName || ""}
           </h2>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -1129,7 +1133,6 @@ export function OemOdmContactForm({
                 style={{ backgroundColor: "#F3F1EA", color: "#756F3F" }}
                 disabled={submitting}
               >
-                <option value="">{field.placeholder || field.label}</option>
                 {field.options?.map(option => (
                   <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
@@ -1249,7 +1252,7 @@ export function OemOdmContactForm({
                 ? (uploadProgress > 0 && uploadProgress < 100 
                     ? `Uploading ${uploadProgress}%...` 
                     : "Submitting...") 
-                : (configData?.submitButtonText || "Send Inquiry")}
+                : (configData?.submitButtonText || "")}
             </button>
           </form>
         </div>
