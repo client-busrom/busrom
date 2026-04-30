@@ -261,6 +261,30 @@ export function parseOemOdmData(pageContent: any, locale: string) {
     })
   };
 
+  // --- Helper: Quick Link extraction ---
+  const extractQuickLink = (markerId: string) => {
+    const nodes = extractNodesAfterMarker(contentChildren, markerId);
+    // Find either linkJump or a specialized quickLink node if it exists
+    const linkNode = nodes.find(n => n.type === 'linkJump' || n.type === 'quickLink');
+    if (linkNode) {
+      const data = linkNode.data || {};
+      // Handle icon resolution (can be string, object, or iconName)
+      const iconValue = data.iconName || data.icon;
+      const iconId = iconValue && typeof iconValue === 'object' ? iconValue.id : iconValue;
+      const resolvedIcon = (iconId && mediaData[iconId]) ? mediaData[iconId] : iconValue;
+      
+      return {
+        title: (data.title || data.description || "").trim(),
+        url: data.url || "",
+        icon: resolvedIcon || null,
+        newTab: !!(data.openInNewTab || data.newTab)
+      };
+    }
+    // Fallback to text if no node found
+    const text = extractText(markerId);
+    return text ? { title: text, url: "", icon: null, newTab: false } : null;
+  };
+
   // 6. Final Pack
   return {
     valueGuide,
@@ -297,7 +321,7 @@ export function parseOemOdmData(pageContent: any, locale: string) {
       return ids;
     })(),
     applicationsData: {
-      findOutMoreText: extractText("applications-find-out-more"),
+      findOutMore: extractQuickLink("applications-find-out-more"),
       nextText: extractText("applications-next"),
     },
     productGuide: {

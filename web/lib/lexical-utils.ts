@@ -62,8 +62,9 @@ export function extractNodesAfterMarker(children: any[], markerId: string): any[
       .trim()
       .toLowerCase();
     
-    // Check if this node is our marker
-    if (text === target && (node.type === "paragraph" || node.type === "quote" || node.type === "heading")) {
+    // Check if this node is our marker (support both "marker" and "[marker]")
+    const isMatch = text === target || text === `[${target}]`;
+    if (isMatch && (node.type === "paragraph" || node.type === "quote" || node.type === "heading")) {
       found = true;
       continue;
     }
