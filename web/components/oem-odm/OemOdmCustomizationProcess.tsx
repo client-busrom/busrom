@@ -30,28 +30,6 @@ interface OemOdmCustomizationProcessProps {
   steps?: ProcessStep[];
 }
 
-const defaultContent = {
-  title: "Customization\nprocess",
-  tips: "ENSURE\nYOUR\nEVERY STEP",
-  hint: "Hold and\n   slide to view",
-  steps: [
-    {
-      title: "Talking Over\nWith Customers",
-      lines: ["Talking Over", "With Customers"],
-    },
-    {
-      title: "Understand Customers' Demand",
-      lines: ["Understand", "Customers' Demand"],
-    },
-    { title: "Sign Sample Contract", lines: ["Sign Sample", "Contract"] },
-    { title: "Produce Sample", lines: ["Produce", "Sample"] },
-    { title: "Confirm Sample", lines: ["Confirm", "Sample"] },
-    { title: "Mass Production", lines: ["Mass", "Production"] },
-    { title: "Quality Check", lines: ["Quality", "Check"] },
-    { title: "Delivery", lines: ["Delivery"] },
-  ],
-};
-
 // 轮盘效果配置
 // 卡片在虚线椭圆左侧，通过摇杆拖拽实现轮盘滚动效果
 
@@ -91,10 +69,10 @@ function getCardRotation(angle: number) {
 }
 
 export function OemOdmCustomizationProcess({
-  title = defaultContent.title,
-  tips = defaultContent.tips,
-  hint = defaultContent.hint,
-  steps = defaultContent.steps,
+  title = "",
+  tips = "",
+  hint = "",
+  steps = [],
 }: OemOdmCustomizationProcessProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   // 轮盘旋转角度（度）
@@ -162,9 +140,10 @@ export function OemOdmCustomizationProcess({
     joystickX.set(clampedX);
     joystickY.set(clampedY);
 
-    // 摇杆头指向拖拽方向
-    const deg = (angle * 180) / Math.PI;
-    joystickAngle.set(deg + 90); // +90 修正 SVG 初始箭头指向
+    // 摇杆 icon 角度切换：圆点上方（y < 0）箭头向上，圆点下方（y > 0）箭头向下
+    // 根据原始 SVG 路径方向，向上为 180 度，向下为 0 度
+    const arrowDirection = info.offset.y < 0 ? 180 : 0;
+    joystickAngle.set(arrowDirection);
 
     // 进一步降低灵敏度系数，使滚动更慢更从容
     setVelocity(clampedY * 0.03);
@@ -185,11 +164,11 @@ export function OemOdmCustomizationProcess({
     const currentValue = wheelRotation.get();
     const snappedAngle = Math.round(currentValue / anglePerCard) * anglePerCard;
 
-    // 降低 stiffness 使吸附动画更平缓
+    // 提高速度，让单步滚动更清爽
     animate(wheelRotation, snappedAngle, {
       type: "spring",
-      stiffness: 80,
-      damping: 25,
+      stiffness: 250,
+      damping: 30,
     });
   };
 
@@ -208,8 +187,8 @@ export function OemOdmCustomizationProcess({
         Math.round((currentValue - anglePerCard) / anglePerCard) * anglePerCard;
       animate(wheelRotation, target, {
         type: "spring",
-        stiffness: 80,
-        damping: 25,
+        stiffness: 250,
+        damping: 30,
       });
     } else if (info.offset.y > threshold) {
       // 往下拖拽 -> 顺时针转动（步骤索引增加）
@@ -217,8 +196,8 @@ export function OemOdmCustomizationProcess({
         Math.round((currentValue + anglePerCard) / anglePerCard) * anglePerCard;
       animate(wheelRotation, target, {
         type: "spring",
-        stiffness: 80,
-        damping: 25,
+        stiffness: 250,
+        damping: 30,
       });
     }
   };
@@ -231,8 +210,8 @@ export function OemOdmCustomizationProcess({
 
     animate(wheelRotation, targetValue, {
       type: "spring",
-      stiffness: 80,
-      damping: 25,
+      stiffness: 250,
+      damping: 30,
     });
   };
 
@@ -240,6 +219,7 @@ export function OemOdmCustomizationProcess({
   // 固定显示5张卡片，中间那张对齐椭圆中心
   const getCardPositions = () => {
     const totalSteps = steps.length;
+    if (totalSteps === 0) return [];
     const visibleCount = 5; // 固定显示5张卡片
     const anglePerCard = 18; // 每个卡片间隔的角度
     const centerAngle = 180; // 中心位置角度（椭圆左侧水平位置）
@@ -250,8 +230,8 @@ export function OemOdmCustomizationProcess({
     const rotationOffset = currentRotation / anglePerCard;
     const centerIndex = Math.round(rotationOffset);
 
-    // 显示中心卡片及其上下各2张
-    for (let offset = -2; offset <= 2; offset++) {
+    // 显示中心卡片及其上下各3张（增加2个虚拟节点用于边缘过渡）
+    for (let offset = -3; offset <= 3; offset++) {
       // 计算实际的步骤索引（循环）
       let stepIndex = (centerIndex + offset) % totalSteps;
       if (stepIndex < 0) stepIndex += totalSteps;
@@ -260,50 +240,60 @@ export function OemOdmCustomizationProcess({
       if (!step) continue;
 
       // 计算卡片在弧线上的角度
-      // offset=0 表示中心卡片，应该在 centerAngle
-      // 加上当前旋转的小数部分实现平滑滚动
       const fractionalOffset = rotationOffset - centerIndex;
-      // 中间卡片与相邻卡片额外拉开间距
-      const extraGap = offset === 0 ? 0 : offset > 0 ? -6 : 6;
-      const angle =
-        centerAngle - (offset - fractionalOffset) * anglePerCard + extraGap;
+      const dist = offset - fractionalOffset;
+      const absDist = Math.abs(dist);
 
-      // 中间位置判断
-      const distanceFromCenter = Math.abs(offset - fractionalOffset);
-      const isCenter = distanceFromCenter < 0.5;
+      // 使用平滑偏移量代替固定的 extraGap，解决 centerIndex 切换时的突跳问题
+      const smoothPush =
+        dist > 0
+          ? -6 * Math.min(1, absDist)
+          : dist < 0
+            ? 6 * Math.min(1, absDist)
+            : 0;
 
-      // 确定卡片尺寸
-      const cardSize = isCenter ? CARD_LARGE : CARD_SMALL;
+      const angle = centerAngle - dist * anglePerCard + smoothPush;
 
-      // 计算位置（在虚线椭圆左侧）
-      const pos = getCardPosition(angle, cardSize.width);
+      // 全属性平滑化：尺寸、缩放、透明度、字号根据距离中心的位置进行线性插值
+      const width =
+        CARD_LARGE.width -
+        Math.min(1, absDist) * (CARD_LARGE.width - CARD_SMALL.width);
+      const height =
+        CARD_LARGE.height -
+        Math.min(1, absDist) * (CARD_LARGE.height - CARD_SMALL.height);
+      const fontSize =
+        CARD_LARGE.fontSize -
+        Math.min(1, absDist) * (CARD_LARGE.fontSize - CARD_SMALL.fontSize);
 
-      // 计算卡片旋转（沿切线方向）
+      // 缩放渐变
+      const scale = 1.0 - Math.min(1, absDist) * 0.15;
+      // 只有在最边缘（距离中心 > 2.2）时才开始渐隐，保证核心 5 个 Item 依然 100% 不透明
+      // 这样解决了第一个和第五个突然出现/消失的问题
+      const opacity = 1.0 - Math.max(0, Math.min(1, absDist - 2)) * 1.0;
+
+      // 计算位置与旋转
+      const pos = getCardPosition(angle, width);
       const cardRotation = getCardRotation(angle);
-
-      // 透明度（所有卡片不透明）
-      const opacity = 1;
-
-      // 缩放（中间大，边缘小）
-      const scale = isCenter ? 1 : Math.max(0.8, 1 - distanceFromCenter * 0.1);
 
       cards.push({
         index: stepIndex,
+        centerIndex,
         step,
         x: pos.x,
         y: pos.y,
         rotation: cardRotation,
         opacity,
         scale,
-        isCenter,
-        ...cardSize,
+        isCenter: absDist < 0.5,
+        width,
+        height,
+        fontSize,
         angle,
-        offset, // 用于排序
+        offset,
       });
     }
 
-    // 按offset排序，中间的在最上层
-    return cards.sort((a, b) => Math.abs(b.offset) - Math.abs(a.offset));
+    return cards;
   };
 
   const cardPositions = getCardPositions();
@@ -563,6 +553,7 @@ export function OemOdmCustomizationProcess({
                 fontSize: rpx(90),
                 lineHeight: rpx(90),
                 color: "#413B06",
+                letterSpacing: "0.12em",
               }}
             >
               {titleSolidLines.map((line, index) => (
@@ -623,34 +614,34 @@ export function OemOdmCustomizationProcess({
             style={{
               left: rpx(978),
               top: rpx(379),
-              width: rpx(220),
+              width: rpx(300),
             }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            {/* 底层描边 */}
-            <span
+            {/* 底层描边 - 使用 HollowText 组件 */}
+            <HollowText
+              strokeColor="#4F4705"
+              strokeWidth={0.7}
               className="absolute font-anaheim font-bold text-center whitespace-pre-line"
               style={{
                 fontSize: rpx(45),
                 lineHeight: rpx(39),
-                color: "transparent",
-                WebkitTextStroke: `0.7px #4F4705`,
+                width: "100%",
                 top: rpx(1),
                 left: rpx(2),
               }}
             >
               {tips}
-            </span>
+            </HollowText>
             {/* 上层渐变填充 */}
             <span
               className="relative font-anaheim font-bold text-center block whitespace-pre-line"
               style={{
                 fontSize: rpx(45),
                 lineHeight: rpx(39),
-                background:
-                  "linear-gradient(180deg, #756F3F 5.44%, #B3B08D 100%)",
+                background: "linear-gradient(135deg, #756F3F 6%, #B3B08D 80%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
@@ -664,8 +655,8 @@ export function OemOdmCustomizationProcess({
           <motion.div
             className="absolute"
             style={{
-              left: rpx(978),
-              top: rpx(736),
+              left: rpx(1020),
+              top: rpx(760),
               width: rpx(129),
             }}
             initial={{ opacity: 0 }}
@@ -673,14 +664,24 @@ export function OemOdmCustomizationProcess({
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             <p
-              className="font-anaheim font-semibold whitespace-pre-line"
+              className="font-anaheim font-semibold"
               style={{
                 fontSize: rpx(17),
                 lineHeight: rpx(22),
                 color: "#BAB379",
               }}
             >
-              {hint}
+              {hint?.split("\n").map((line, i) => (
+                <span
+                  key={i}
+                  className="block"
+                  style={{
+                    paddingLeft: i > 0 ? rpx(12) : 0,
+                  }}
+                >
+                  {line}
+                </span>
+              ))}
             </p>
           </motion.div>
 
@@ -689,7 +690,7 @@ export function OemOdmCustomizationProcess({
             className="absolute z-20"
             style={{
               left: rpx(990),
-              top: rpx(650),
+              top: rpx(680),
               width: rpx(80),
               height: rpx(80),
             }}
@@ -776,7 +777,7 @@ export function OemOdmCustomizationProcess({
 
               return (
                 <motion.div
-                  key={`card-${card.index}-${card.offset}`}
+                  key={`card-${card.index}`}
                   className="absolute"
                   style={{
                     // left/top 设置为弧线上的点
@@ -793,7 +794,7 @@ export function OemOdmCustomizationProcess({
                     rotate: rotation,
                     scale: card.scale,
                     opacity: card.opacity,
-                    zIndex: card.isCenter ? 15 : 10 + card.offset,
+                    zIndex: 20 - Math.abs(card.offset),
                     boxShadow: card.isCenter
                       ? "0px 10px 30px rgba(0,0,0,0.1)"
                       : "none",
@@ -804,10 +805,11 @@ export function OemOdmCustomizationProcess({
                   <div
                     className="absolute flex flex-col items-center justify-center"
                     style={{
-                      top: rpx(card.isCenter ? 28 : 21),
+                      top: 0,
                       left: "50%",
                       transform: "translateX(-50%)",
                       width: rpx(card.isCenter ? 247 : 180),
+                      height: "100%",
                     }}
                   >
                     <p

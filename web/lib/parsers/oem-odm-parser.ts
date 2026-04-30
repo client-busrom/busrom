@@ -251,7 +251,7 @@ export function parseOemOdmData(pageContent: any, locale: string) {
   const customizationProcess = {
     title: extractText("customization-process-title"),
     subtitle: extractText("customization-process-subtitle") || extractText("customization-process-tips"), // Try both
-    hint: extractText("customization-process-hint"),
+    hint: extractText("customization-process-button-text") || extractText("customization-process-hint"),
     steps: extractListItems("customization-process-item").map(item => {
       const lines = item.split("\n").filter(l => l.trim());
       return {
