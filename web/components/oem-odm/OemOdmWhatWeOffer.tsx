@@ -1,85 +1,86 @@
-"use client"
+"use client";
 
-import React, { useState, useRef, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { gsap } from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { OptimizedImage } from "@/components/ui/OptimizedImage"
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger)
+  gsap.registerPlugin(ScrollTrigger);
 }
 
 // 设计稿基准尺寸 (已按0.7缩放)
-const DESIGN_WIDTH = 1920
-const DESIGN_HEIGHT = 844 // 920 * 0.7 + 200
+const DESIGN_WIDTH = 1920;
+const DESIGN_HEIGHT = 844; // 920 * 0.7 + 200
 
 // 响应式尺寸函数
-const rpx = (designValue: number) => `calc(var(--rpx-what-we-offer) * ${designValue})`
+const rpx = (designValue: number) =>
+  `calc(var(--rpx-what-we-offer) * ${designValue})`;
 
 // ============ 可调整的位置参数 ============
-const CARD_HEIGHT = 550
-const CARD_WIDTH = 280
+const CARD_HEIGHT = 550;
+const CARD_WIDTH = 280;
 
 // 第一个卡片 (左侧 - 上圆下方)
-const CARD1_LEFT = 237
-const CARD1_TEXT_LEFT = 339
-const CARD1_TEXT_TOP = 294  // 844 - 550 = 294
-const CARD1_DESC_LEFT = 336
-const CARD1_DESC_TOP = 488  // 294 + 194
+const CARD1_LEFT = 237;
+const CARD1_TEXT_LEFT = 339;
+const CARD1_TEXT_TOP = 294; // 844 - 550 = 294
+const CARD1_DESC_LEFT = 336;
+const CARD1_DESC_TOP = 488; // 294 + 194
 
 // 第二个卡片 (中间 - 上方下圆) - 文字初始在底部，悬停时上移
-const CARD2_LEFT = 529
-const CARD2_TEXT_LEFT = 636
-const CARD2_TEXT_TOP_DEFAULT = 615  // 底部位置
-const CARD2_TEXT_TOP_HOVER = 421    // 悬停时上移位置
-const CARD2_DESC_LEFT = 631
-const CARD2_DESC_TOP = 615
+const CARD2_LEFT = 529;
+const CARD2_TEXT_LEFT = 636;
+const CARD2_TEXT_TOP_DEFAULT = 615; // 底部位置
+const CARD2_TEXT_TOP_HOVER = 421; // 悬停时上移位置
+const CARD2_DESC_LEFT = 631;
+const CARD2_DESC_TOP = 615;
 
 // 第三个卡片 (右侧 - 上圆下方)
-const CARD3_LEFT = 820
-const CARD3_TEXT_LEFT = 936
-const CARD3_TEXT_TOP = 294
-const CARD3_DESC_LEFT = 929
-const CARD3_DESC_TOP = 488
+const CARD3_LEFT = 820;
+const CARD3_TEXT_LEFT = 936;
+const CARD3_TEXT_TOP = 294;
+const CARD3_DESC_LEFT = 929;
+const CARD3_DESC_TOP = 488;
 // ==========================================
 
 // ============ 滑轨门动画参数 ============
-const HEADER_HEIGHT = 46
-const OPEN_SCROLL = 500   // 开门滚动距离
-const PAUSE_SCROLL = 200  // 停留滚动距离（门全开）
-const CLOSE_SCROLL = 500  // 关门滚动距离
-const TOTAL_SCROLL = OPEN_SCROLL + PAUSE_SCROLL + CLOSE_SCROLL
+const HEADER_HEIGHT = 46;
+const OPEN_SCROLL = 500; // 开门滚动距离
+const PAUSE_SCROLL = 200; // 停留滚动距离（门全开）
+const CLOSE_SCROLL = 500; // 关门滚动距离
+const TOTAL_SCROLL = OPEN_SCROLL + PAUSE_SCROLL + CLOSE_SCROLL;
 // ==========================================
 
 interface MediaObject {
-  id: string
-  url: string
-  alt?: string
+  id: string;
+  url: string;
+  alt?: string;
   variants?: {
-    thumbnail?: string
-    small?: string
-    medium?: string
-    large?: string
-    xlarge?: string
-  }
-  cropFocalPoint?: { x: number; y: number } | null
-  width?: number
-  height?: number
+    thumbnail?: string;
+    small?: string;
+    medium?: string;
+    large?: string;
+    xlarge?: string;
+  };
+  cropFocalPoint?: { x: number; y: number } | null;
+  width?: number;
+  height?: number;
 }
 
 interface OfferItem {
-  number: string
-  title: string
-  description: string
-  image?: MediaObject | null
+  number: string;
+  title: string;
+  description: string;
+  image?: MediaObject | null;
 }
 
 interface OemOdmWhatWeOfferProps {
   // 主标题
-  title?: string
+  title?: string;
   // 三个服务项
-  items?: OfferItem[]
+  items?: OfferItem[];
 }
 
 const defaultContent = {
@@ -88,51 +89,60 @@ const defaultContent = {
     {
       number: "01",
       title: "Product Development",
-      description: "We constantly develop new products based on market feedback and customer demand.",
+      description:
+        "We constantly develop new products based on market feedback and customer demand.",
     },
     {
       number: "02",
       title: "Experienced Experts",
-      description: "Our team of experienced experts provides professional guidance and support.",
+      description:
+        "Our team of experienced experts provides professional guidance and support.",
     },
     {
       number: "03",
       title: "Marketing Support",
-      description: "We offer comprehensive marketing support to help you succeed in the market.",
+      description:
+        "We offer comprehensive marketing support to help you succeed in the market.",
     },
   ],
-}
+};
 
 export function OemOdmWhatWeOffer({
   title = defaultContent.title,
   items = defaultContent.items,
 }: OemOdmWhatWeOfferProps) {
   // 当前悬停的卡片索引 (null表示没有悬停)
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null)
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
   // 滑轨门动画 refs
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const leftDoorRef = useRef<HTMLDivElement>(null)
-  const rightDoorRef = useRef<HTMLDivElement>(null)
-  const leftClipRef = useRef<HTMLDivElement>(null)
-  const rightClipRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const leftDoorRef = useRef<HTMLDivElement>(null);
+  const rightDoorRef = useRef<HTMLDivElement>(null);
+  const leftClipRef = useRef<HTMLDivElement>(null);
+  const rightClipRef = useRef<HTMLDivElement>(null);
 
   // GSAP ScrollTrigger — 滑轨门开关动画（仅 PC 端）
   useEffect(() => {
     // 仅在 PC 端且 DOM 就绪后初始化
-    if (typeof window === "undefined" || window.innerWidth < 768) return
+    if (typeof window === "undefined" || window.innerWidth < 768) return;
 
-    const section = sectionRef.current
-    const leftDoor = leftDoorRef.current
-    const rightDoor = rightDoorRef.current
-    const leftClip = leftClipRef.current
-    const rightClip = rightClipRef.current
-    if (!section || !leftDoor || !rightDoor || !leftClip || !rightClip) return
+    const section = sectionRef.current;
+    const leftDoor = leftDoorRef.current;
+    const rightDoor = rightDoorRef.current;
+    const leftClip = leftClipRef.current;
+    const rightClip = rightClipRef.current;
+    if (!section || !leftDoor || !rightDoor || !leftClip || !rightClip) return;
 
     // 延迟初始化确保 DOM 完全加载（与项目中其他 ScrollTrigger 用法一致）
     const timeoutId = setTimeout(() => {
-      if (!sectionRef.current || !leftDoorRef.current || !rightDoorRef.current
-        || !leftClipRef.current || !rightClipRef.current) return
+      if (
+        !sectionRef.current ||
+        !leftDoorRef.current ||
+        !rightDoorRef.current ||
+        !leftClipRef.current ||
+        !rightClipRef.current
+      )
+        return;
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -143,71 +153,61 @@ export function OemOdmWhatWeOffer({
           pinSpacing: true,
           scrub: 0.5,
           anticipatePin: 1,
-          // markers: true,  // 调试时取消注释可视化触发线
-        }
-      })
+        },
+      });
 
       // 阶段1：开门 (时间轴 0 → 0.417)
-      const openDuration = OPEN_SCROLL / TOTAL_SCROLL
-      // 左门 + 左滑轮 向左滑出
-      tl.to(leftDoorRef.current, {
-        x: "-100%",
-        duration: openDuration,
-        ease: "power2.inOut",
-      }, 0)
-      tl.to(leftClipRef.current, {
-        x: "-100%",
-        duration: openDuration,
-        ease: "power2.inOut",
-      }, 0)
-      // 右门 + 右滑轮 向右滑出
-      tl.to(rightDoorRef.current, {
-        x: "100%",
-        duration: openDuration,
-        ease: "power2.inOut",
-      }, 0)
-      tl.to(rightClipRef.current, {
-        x: "100%",
-        duration: openDuration,
-        ease: "power2.inOut",
-      }, 0)
-
-      // 阶段2：停留 (0.417 → 0.583) — 空段，门保持全开
+      const openDuration = OPEN_SCROLL / TOTAL_SCROLL;
+      tl.to(
+        [leftDoorRef.current, leftClipRef.current],
+        {
+          x: "-100%",
+          duration: openDuration,
+          ease: "power2.inOut",
+        },
+        0,
+      ).to(
+        [rightDoorRef.current, rightClipRef.current],
+        {
+          x: "100%",
+          duration: openDuration,
+          ease: "power2.inOut",
+        },
+        0,
+      );
 
       // 阶段3：关门 (0.583 → 1.0)
-      const closeStart = (OPEN_SCROLL + PAUSE_SCROLL) / TOTAL_SCROLL
-      const closeDuration = CLOSE_SCROLL / TOTAL_SCROLL
-      tl.to(leftDoorRef.current, {
-        x: "0%",
-        duration: closeDuration,
-        ease: "power2.inOut",
-      }, closeStart)
-      tl.to(leftClipRef.current, {
-        x: "0%",
-        duration: closeDuration,
-        ease: "power2.inOut",
-      }, closeStart)
-      tl.to(rightDoorRef.current, {
-        x: "0%",
-        duration: closeDuration,
-        ease: "power2.inOut",
-      }, closeStart)
-      tl.to(rightClipRef.current, {
-        x: "0%",
-        duration: closeDuration,
-        ease: "power2.inOut",
-      }, closeStart)
+      const closeStart = (OPEN_SCROLL + PAUSE_SCROLL) / TOTAL_SCROLL;
+      const closeDuration = CLOSE_SCROLL / TOTAL_SCROLL;
+      tl.to(
+        [leftDoorRef.current, leftClipRef.current],
+        {
+          x: "0%",
+          duration: closeDuration,
+          ease: "power2.inOut",
+        },
+        closeStart,
+      ).to(
+        [rightDoorRef.current, rightClipRef.current],
+        {
+          x: "0%",
+          duration: closeDuration,
+          ease: "power2.inOut",
+        },
+        closeStart,
+      );
 
-      ScrollTrigger.refresh()
-    }, 300)
+      ScrollTrigger.refresh();
+    }, 300);
 
     return () => {
-      clearTimeout(timeoutId)
-      ScrollTrigger.getAll().forEach(st => {
-        if (st.trigger === sectionRef.current) st.kill()
-      })
-    }
-  }, [])
+      clearTimeout(timeoutId);
+      // 清理当前页面的所有 ScrollTrigger
+      ScrollTrigger.getAll().forEach((st) => {
+        if (st.trigger === sectionRef.current) st.kill();
+      });
+    };
+  }, []);
 
   return (
     <section
@@ -218,7 +218,10 @@ export function OemOdmWhatWeOffer({
       }}
     >
       {/* ========== PC端布局 ========== */}
-      <div className="hidden md:block relative w-full overflow-hidden" style={{ height: rpx(DESIGN_HEIGHT) }}>
+      <div
+        className="hidden md:block relative w-full overflow-hidden"
+        style={{ height: rpx(DESIGN_HEIGHT) }}
+      >
         {/* z-0：背景层 - 全屏宽度背景图片 */}
         <div
           className="absolute inset-0"
@@ -318,7 +321,8 @@ export function OemOdmWhatWeOffer({
             <motion.div
               className="absolute inset-0"
               style={{
-                background: "linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.8) 100%)",
+                background:
+                  "linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.8) 100%)",
               }}
               animate={{ opacity: hoveredCard === 0 ? 0 : 1 }}
               transition={{ duration: 0.3 }}
@@ -418,7 +422,8 @@ export function OemOdmWhatWeOffer({
             <motion.div
               className="absolute inset-0"
               style={{
-                background: "linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.8) 100%)",
+                background:
+                  "linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.8) 100%)",
               }}
               animate={{ opacity: hoveredCard === 1 ? 0 : 1 }}
               transition={{ duration: 0.3 }}
@@ -433,7 +438,10 @@ export function OemOdmWhatWeOffer({
               zIndex: 20,
             }}
             animate={{
-              top: hoveredCard === 1 ? rpx(CARD2_TEXT_TOP_HOVER) : rpx(CARD2_TEXT_TOP_DEFAULT),
+              top:
+                hoveredCard === 1
+                  ? rpx(CARD2_TEXT_TOP_HOVER)
+                  : rpx(CARD2_TEXT_TOP_DEFAULT),
             }}
             transition={{ duration: 0.3 }}
           >
@@ -521,7 +529,8 @@ export function OemOdmWhatWeOffer({
             <motion.div
               className="absolute inset-0"
               style={{
-                background: "linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.8) 100%)",
+                background:
+                  "linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.8) 100%)",
               }}
               animate={{ opacity: hoveredCard === 2 ? 0 : 1 }}
               transition={{ duration: 0.3 }}
@@ -592,14 +601,14 @@ export function OemOdmWhatWeOffer({
         <img
           src="/images/oem-odm/sliding-door/rectangle-398.svg"
           alt=""
-          className="absolute top-0 left-0 pointer-events-none"
+          className="absolute top-0 left-0"
           style={{ width: rpx(440), height: rpx(845), zIndex: 25 }}
           aria-hidden="true"
         />
         <img
           src="/images/oem-odm/sliding-door/rectangle-399.svg"
           alt=""
-          className="absolute top-0 right-0 pointer-events-none"
+          className="absolute top-0 right-0"
           style={{ width: rpx(440), height: rpx(845), zIndex: 25 }}
           aria-hidden="true"
         />
@@ -609,7 +618,7 @@ export function OemOdmWhatWeOffer({
             右门：left:50% 左边缘对齐中心线 */}
         <div
           ref={leftDoorRef}
-          className="absolute top-0 pointer-events-none"
+          className="absolute top-0"
           style={{
             right: "50%",
             width: rpx(600),
@@ -618,16 +627,25 @@ export function OemOdmWhatWeOffer({
             willChange: "transform",
           }}
         >
+          {/* 磨砂玻璃遮罩 */}
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.05)",
+              backdropFilter: "blur(15px)",
+              WebkitBackdropFilter: "blur(15px)",
+            }}
+          />
           <img
             src="/images/oem-odm/sliding-door/left-door.svg"
             alt=""
-            className="w-full h-full"
+            className="w-full h-full relative z-10"
             aria-hidden="true"
           />
         </div>
         <div
           ref={rightDoorRef}
-          className="absolute top-0 pointer-events-none"
+          className="absolute top-0"
           style={{
             left: "50%",
             width: rpx(600),
@@ -636,10 +654,19 @@ export function OemOdmWhatWeOffer({
             willChange: "transform",
           }}
         >
+          {/* 磨砂玻璃遮罩 */}
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.05)",
+              backdropFilter: "blur(15px)",
+              WebkitBackdropFilter: "blur(15px)",
+            }}
+          />
           <img
             src="/images/oem-odm/sliding-door/right-door.svg"
             alt=""
-            className="w-full h-full"
+            className="w-full h-full relative z-10"
             aria-hidden="true"
           />
         </div>
@@ -648,8 +675,13 @@ export function OemOdmWhatWeOffer({
         <img
           src="/images/oem-odm/sliding-door/stick.svg"
           alt=""
-          className="absolute left-0 pointer-events-none"
-          style={{ top: rpx(20), width: rpx(1920), height: rpx(42), zIndex: 27 }}
+          className="absolute left-0"
+          style={{
+            top: rpx(50),
+            width: rpx(1920),
+            height: rpx(42),
+            zIndex: 27,
+          }}
           aria-hidden="true"
         />
 
@@ -740,7 +772,8 @@ export function OemOdmWhatWeOffer({
                 <div
                   className="absolute inset-0"
                   style={{
-                    background: "linear-gradient(to bottom, transparent 30%, rgba(32, 30, 14, 0.95) 100%)",
+                    background:
+                      "linear-gradient(to bottom, transparent 30%, rgba(32, 30, 14, 0.95) 100%)",
                   }}
                 />
                 {/* 内容 */}
@@ -763,7 +796,7 @@ export function OemOdmWhatWeOffer({
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-export default OemOdmWhatWeOffer
+export default OemOdmWhatWeOffer;

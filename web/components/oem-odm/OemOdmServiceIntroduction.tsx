@@ -302,13 +302,18 @@ export function OemOdmServiceIntroduction({
                 <span
                   key={index}
                   className="relative inline-block font-anaheim font-extrabold"
-                  style={{ fontSize: rpx(24), lineHeight: rpx(36) }}
+                  style={{
+                    fontSize: rpx(30),
+                    lineHeight: rpx(36),
+                    verticalAlign: "baseline",
+                    transform: `translateY(-${rpx(2)})`, // 向上微调以确保底对齐
+                  }}
                 >
                   {/* 下层 - 深色 + 外描边，向右下偏移2rpx */}
                   <span
                     className="absolute font-anaheim font-extrabold"
                     style={{
-                      fontSize: rpx(24),
+                      fontSize: rpx(30),
                       color: "#413A03",
                       left: rpx(3), // 4 * 0.7
                       top: rpx(3), // 4 * 0.7
@@ -330,7 +335,7 @@ export function OemOdmServiceIntroduction({
                   <span
                     className="relative font-anaheim font-extrabold"
                     style={{
-                      fontSize: rpx(24),
+                      fontSize: rpx(30),
                       color: "#FFFFFF",
                     }}
                   >
@@ -429,13 +434,18 @@ export function OemOdmServiceIntroduction({
                   <span
                     key={index}
                     className="relative inline-block font-anaheim font-extrabold"
-                    style={{ fontSize: rpx(24), lineHeight: rpx(39) }}
+                    style={{
+                      fontSize: rpx(30),
+                      lineHeight: rpx(39),
+                      verticalAlign: "baseline",
+                      transform: `translateY(-${rpx(2)})`, // 向上微调
+                    }}
                   >
                     {/* 下层 - 深色 + 外描边，向右下偏移 */}
                     <span
                       className="absolute font-anaheim font-extrabold"
                       style={{
-                        fontSize: rpx(24),
+                        fontSize: rpx(30),
                         color: "#413A03",
                         left: rpx(2),
                         top: rpx(2),
@@ -453,7 +463,7 @@ export function OemOdmServiceIntroduction({
                     <span
                       className="relative font-anaheim font-extrabold"
                       style={{
-                        fontSize: rpx(24),
+                        fontSize: rpx(30),
                         color: "#FFFFFF",
                       }}
                     >

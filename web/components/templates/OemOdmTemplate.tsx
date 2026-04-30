@@ -109,6 +109,8 @@ export function OemOdmTemplate({ locale, data }: OemOdmTemplateProps) {
           title={oemService.series.title || undefined}
           description={oemService.series.description || undefined}
           image={oemService.series.image}
+          viewMoreText={oemService.series.linkText || undefined}
+          viewMoreLink={oemService.series.linkUrl || undefined}
         />
 
         {/* OEM Partner Section */}
@@ -171,6 +173,8 @@ export function OemOdmTemplate({ locale, data }: OemOdmTemplateProps) {
           title={odmService.series.title || undefined}
           description={odmService.series.description || undefined}
           image={odmService.series.image}
+          viewMoreText={odmService.series.linkText || undefined}
+          viewMoreLink={odmService.series.linkUrl || undefined}
         />
 
         {/* ODM Partner Section */}

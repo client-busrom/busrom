@@ -303,13 +303,18 @@ export function OdmServiceIntroduction({
                 <span
                   key={index}
                   className="relative inline-block font-anaheim font-extrabold"
-                  style={{ fontSize: rpx(24), lineHeight: rpx(36) }}
+                  style={{
+                    fontSize: rpx(30),
+                    lineHeight: rpx(36),
+                    verticalAlign: "baseline",
+                    transform: `translateY(-${rpx(2)})`, // 向上微调以确保底对齐
+                  }}
                 >
                   {/* 下层 - #9E8C00 填充 + #FFF392 外描边，向右下偏移 */}
                   <span
                     className="absolute font-anaheim font-extrabold"
                     style={{
-                      fontSize: rpx(24),
+                      fontSize: rpx(30),
                       color: "#9E8C00",
                       left: rpx(3), // 4 * 0.7
                       top: rpx(3), // 4 * 0.7
@@ -327,7 +332,7 @@ export function OdmServiceIntroduction({
                   <span
                     className="relative font-anaheim font-extrabold"
                     style={{
-                      fontSize: rpx(24),
+                      fontSize: rpx(30),
                       color: "#59542A",
                     }}
                   >
@@ -426,13 +431,18 @@ export function OdmServiceIntroduction({
                   <span
                     key={index}
                     className="relative inline-block font-anaheim font-extrabold"
-                    style={{ fontSize: rpx(24), lineHeight: rpx(39) }}
+                    style={{
+                      fontSize: rpx(30),
+                      lineHeight: rpx(39),
+                      verticalAlign: "baseline",
+                      transform: `translateY(-${rpx(2)})`, // 向上微调
+                    }}
                   >
                     {/* 下层 - #9E8C00 填充 + #FFF392 外描边，向右下偏移 */}
                     <span
                       className="absolute font-anaheim font-extrabold"
                       style={{
-                        fontSize: rpx(24),
+                        fontSize: rpx(30),
                         color: "#9E8C00",
                         left: rpx(1), // 2 * 0.7
                         top: rpx(1), // 2 * 0.7
@@ -450,7 +460,7 @@ export function OdmServiceIntroduction({
                     <span
                       className="relative font-anaheim font-extrabold"
                       style={{
-                        fontSize: rpx(24),
+                        fontSize: rpx(30),
                         color: "#59542A",
                       }}
                     >

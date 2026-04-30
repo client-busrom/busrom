@@ -71,18 +71,13 @@ function BubbleText({ text, isActive }: { text: string; isActive: boolean }) {
       return
     }
 
-    // 每500ms生成一个新气泡
+    // 每 600ms 生成一个新气泡
     const interval = setInterval(() => {
-      const newId = bubbleIdRef.current++
-      setBubbles((prev) => [...prev, { id: newId, y: 0, opacity: 1 }])
+      const newId = bubbleIdRef.current++;
+      setBubbles((prev) => [...prev, { id: newId, y: 0, opacity: 1 }]);
+    }, 600);
 
-      // 3秒后移除气泡
-      setTimeout(() => {
-        setBubbles((prev) => prev.filter((b) => b.id !== newId))
-      }, 3000)
-    }, 500)
-
-    return () => clearInterval(interval)
+    return () => clearInterval(interval);
   }, [isActive])
 
   return (
@@ -105,8 +100,12 @@ function BubbleText({ text, isActive }: { text: string; isActive: boolean }) {
             WebkitTextFillColor: "transparent",
           }}
           initial={{ y: 0, opacity: 0.8 }}
-          animate={{ y: -30, opacity: 0 }}
+          animate={{ y: -40, opacity: 0 }}
           transition={{ duration: 2.5, ease: "easeOut" }}
+          onAnimationComplete={() => {
+            // 动画播放完成后，将气泡从数组中移除，避免内存泄漏
+            setBubbles((prev) => prev.filter((b) => b.id !== bubble.id));
+          }}
         >
           {text}
         </motion.span>
@@ -376,11 +375,10 @@ export function OdmAdvantages({
           {/* 上一个按钮 */}
           <button
             onClick={handlePrev}
-            className="flex items-center justify-center rounded-full transition-colors hover:bg-[#756F3F]/10"
+            className="flex items-center justify-center rounded-full border border-[#756F3F] bg-transparent text-[#756F3F] transition-colors hover:bg-[#756F3F] hover:text-white"
             style={{
               width: rpx(52), // 74 * 0.7
               height: rpx(52), // 74 * 0.7
-              border: "1px solid #756F3F",
             }}
           >
             <svg
@@ -390,7 +388,7 @@ export function OdmAdvantages({
             >
               <path
                 d="M15 2L3 14.5L15 27"
-                stroke="#756F3F"
+                stroke="currentColor"
                 strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -401,11 +399,10 @@ export function OdmAdvantages({
           {/* 下一个按钮 */}
           <button
             onClick={handleNext}
-            className="flex items-center justify-center rounded-full transition-colors hover:opacity-90"
+            className="flex items-center justify-center rounded-full border border-[#756F3F] bg-transparent text-[#756F3F] transition-colors hover:bg-[#756F3F] hover:text-white"
             style={{
               width: rpx(52), // 74 * 0.7
               height: rpx(52), // 74 * 0.7
-              backgroundColor: "#756F3F",
             }}
           >
             <svg
@@ -415,7 +412,7 @@ export function OdmAdvantages({
             >
               <path
                 d="M2 2L14 14.5L2 27"
-                stroke="white"
+                stroke="currentColor"
                 strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -560,13 +557,12 @@ export function OdmAdvantages({
         <div className="flex justify-center gap-4">
           <button
             onClick={handlePrev}
-            className="w-12 h-12 flex items-center justify-center rounded-full"
-            style={{ border: "1px solid #756F3F" }}
+            className="w-12 h-12 flex items-center justify-center rounded-full border border-[#756F3F] bg-transparent text-[#756F3F] transition-colors hover:bg-[#756F3F] hover:text-white"
           >
             <svg width="12" height="20" viewBox="0 0 17 29" fill="none">
               <path
                 d="M15 2L3 14.5L15 27"
-                stroke="#756F3F"
+                stroke="currentColor"
                 strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -575,13 +571,12 @@ export function OdmAdvantages({
           </button>
           <button
             onClick={handleNext}
-            className="w-12 h-12 flex items-center justify-center rounded-full"
-            style={{ backgroundColor: "#756F3F" }}
+            className="w-12 h-12 flex items-center justify-center rounded-full border border-[#756F3F] bg-transparent text-[#756F3F] transition-colors hover:bg-[#756F3F] hover:text-white"
           >
             <svg width="12" height="20" viewBox="0 0 17 29" fill="none">
               <path
                 d="M2 2L14 14.5L2 27"
-                stroke="white"
+                stroke="currentColor"
                 strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"

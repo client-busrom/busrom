@@ -143,8 +143,23 @@ export function parseOemOdmData(pageContent: any, locale: string) {
     images: resolveMediaFromNodes(extractNodesAfterMarker(contentChildren, "oem-odm-brand-advantage-tag-image"), mediaData),
   };
 
+  // --- Helper: Link extraction ---
+  const findLinkByMarker = (markerId: string) => {
+    const nodes = extractNodesAfterMarker(contentChildren, markerId);
+    const linkNode = nodes.find(n => n.type === 'linkJump');
+    if (linkNode) {
+      const title = (linkNode.data?.description || linkNode.data?.title || "").trim();
+      return { 
+        title, 
+        url: linkNode.data?.url || "" 
+      };
+    }
+    return null;
+  };
+
   // 3. OEM Service
   const parseServiceSection = (prefix: string) => {
+    const seriesLink = findLinkByMarker(`${prefix}-series-link`);
     return {
       title: extractText(`${prefix}-title`),
       subtitle: extractText(`${prefix}-subtitle`),
@@ -161,6 +176,8 @@ export function parseOemOdmData(pageContent: any, locale: string) {
         title: extractText(`${prefix}-series-title`),
         description: extractText(`${prefix}-series-description`),
         image: extractImage(`${prefix}-series-image`),
+        linkText: seriesLink?.title,
+        linkUrl: seriesLink?.url,
       },
       partner: {
         title: extractText(`${prefix}-partner-title`),

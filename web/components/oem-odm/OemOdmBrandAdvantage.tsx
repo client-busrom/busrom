@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
@@ -118,11 +118,25 @@ export function OemOdmBrandAdvantage({
   onOemClick,
   onOdmClick,
 }: OemOdmBrandAdvantageProps) {
-  // 悬停状态: 'oem' | 'odm' | null，默认显示 OEM
+  // 悬停状态: 'oem' | 'odm' | null
   const [hoveredCard, setHoveredCard] = useState<'oem' | 'odm' | null>(null)
+  // 自动轮播状态
+  const [currentCard, setCurrentCard] = useState<'oem' | 'odm'>('oem')
 
-  // 当前激活的卡片（默认 OEM）
-  const activeCard = hoveredCard || 'oem'
+  // 自动轮播逻辑
+  useEffect(() => {
+    // 如果用户手动悬停，暂停自动切换
+    if (hoveredCard) return
+
+    const timer = setInterval(() => {
+      setCurrentCard((prev) => (prev === "oem" ? "odm" : "oem"))
+    }, 3000)
+
+    return () => clearInterval(timer)
+  }, [hoveredCard])
+
+  // 当前激活的卡片（受自动轮播或手动悬停控制）
+  const activeCard = hoveredCard || currentCard
 
   // Calculate object position from focal point
   const getObjectPosition = (image?: MediaObject | null) =>
@@ -308,8 +322,8 @@ export function OemOdmBrandAdvantage({
             initial={{ opacity: 0 }}
             animate={{
               opacity: 1,
-              fontSize: activeCard === 'oem' ? rpx(60) : rpx(48),
-              lineHeight: activeCard === 'oem' ? rpx(60) : rpx(48),
+              fontSize: activeCard === 'oem' ? rpx(80) : rpx(48),
+              lineHeight: activeCard === 'oem' ? rpx(80) : rpx(48),
             }}
             transition={{ duration: 0.3 }}
           >
@@ -514,8 +528,8 @@ export function OemOdmBrandAdvantage({
             initial={{ opacity: 0 }}
             animate={{
               opacity: 1,
-              fontSize: activeCard === 'odm' ? rpx(60) : rpx(48),
-              lineHeight: activeCard === 'odm' ? rpx(60) : rpx(48),
+              fontSize: activeCard === 'odm' ? rpx(80) : rpx(48),
+              lineHeight: activeCard === 'odm' ? rpx(80) : rpx(48),
             }}
             transition={{ duration: 0.3 }}
           >
