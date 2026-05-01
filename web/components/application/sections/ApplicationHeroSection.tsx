@@ -436,7 +436,7 @@ export function ApplicationHeroSection({
                     fontSize: vw(128),
                     lineHeight: 0.9,
                     color: "#FFF17C",
-                    width: vw(800),
+                    width: vw(1000),
                     filter: "drop-shadow(0px 4px 12.6px rgba(86, 80, 32, 1))",
                     marginBottom: vw(90),
                   }}
