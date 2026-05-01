@@ -37,7 +37,7 @@ export interface ApplicationData {
   productNavigation: {
     ctaText: string;
     ctaHref: string;
-    carouselItems: any[];
+    navigationItems: any[];
   };
   engineerSaid: {
     title?: string;
@@ -178,7 +178,22 @@ export function parseApplicationData(locale: string, pageContent: any): Applicat
   // 2. Product Navigation
   const navCta = findLinkByMarker("product-navigation-cta");
   const navItemNodes = extractNodesAfterMarker(children, "product-navigation-item");
-  const prodCarouselNode = navItemNodes.find((n: any) => n.type === "productCarousel");
+  const prodCarouselNode = navItemNodes.find((n: any) => n.type === "carousel");
+
+  const navigationItems: any[] = [];
+  if (prodCarouselNode && prodCarouselNode.data?.slides) {
+    prodCarouselNode.data.slides.forEach((slide: any) => {
+      const mediaId = slide.image?.id;
+      const media = mediaId ? mediaData[mediaId] : null;
+      navigationItems.push({
+        name: slide.title || "",
+        showImage: media ? { url: media.url } : null,
+        slug: slide.buttonLink || "",
+        openInNewTab: !!slide.openInNewTab,
+        description: slide.description || "",
+      });
+    });
+  }
 
   // 3. Engineer Said
   const engImgNodes = extractNodesAfterMarker(children, "engineer-said-image");
@@ -272,7 +287,7 @@ export function parseApplicationData(locale: string, pageContent: any): Applicat
     productNavigation: {
       ctaText: navCta?.title || "VIEW MORE",
       ctaHref: navCta?.url || "",
-      carouselItems: prodCarouselNode?.data?.items || []
+      navigationItems
     },
     engineerSaid: {
       title: extractText("engineer-said-title") || "The Engineer\nSaid",

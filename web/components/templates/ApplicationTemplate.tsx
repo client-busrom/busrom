@@ -44,7 +44,7 @@ export function ApplicationTemplate({ locale, data, applications, moreApplicatio
         locale={locale}
       />
       <ApplicationProductNavigationSection
-        carouselItems={productNavigation.carouselItems}
+        navigationItems={productNavigation.navigationItems}
         ctaText={productNavigation.ctaText}
         ctaHref={productNavigation.ctaHref}
         locale={locale}
