@@ -146,6 +146,11 @@ export function parseApplicationData(locale: string, pageContent: any): Applicat
         if (child.type === "text") {
           if (child.format === 1) gradientTitle += child.text;
           else mainTitle += child.text;
+        } else if (child.type === "linebreak") {
+          // If we have a linebreak, we need to decide where to put it. 
+          // Usually it should go to mainTitle if it's not explicitly formatted,
+          // but for safety we can append it to whichever title is currently being built.
+          mainTitle += "\n";
         }
       }
 
@@ -153,7 +158,11 @@ export function parseApplicationData(locale: string, pageContent: any): Applicat
       if (subtitleItem) {
         const nestedList = subtitleItem.children?.find((c: any) => c.type === "list");
         const subNodes = nestedList ? (nestedList.children?.[0]?.children || []) : (subtitleItem.children || []);
-        subtitle = subNodes.filter((c: any) => c.type === "text").map((c: any) => c.text).join("");
+        subtitle = subNodes.map((c: any) => {
+          if (c.type === "text") return c.text;
+          if (c.type === "linebreak") return "\n";
+          return "";
+        }).join("");
       }
 
       slides.push({

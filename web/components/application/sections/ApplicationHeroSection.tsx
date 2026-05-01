@@ -205,7 +205,7 @@ export function ApplicationHeroSection({ title, topSubtitle, rightBoxText = "APP
                 </svg>
                 
                 {/* Gold main title */}
-                <h1 className="font-jomhuria" style={{
+                <h1 className="font-jomhuria whitespace-pre-line" style={{
                   fontSize: vw(128), lineHeight: 0.9, color: '#FFF17C',
                   width: vw(800),
                   filter: 'drop-shadow(0px 4px 12.6px rgba(86, 80, 32, 1))',
@@ -219,7 +219,7 @@ export function ApplicationHeroSection({ title, topSubtitle, rightBoxText = "APP
                     fontSize: vw(64), lineHeight: vw(48), width: vw(385), marginLeft: vw(38),
                     filter: 'drop-shadow(0px 4px 7.8px rgba(0,0,0,0.35))'
                   }}>
-                    <span className="whitespace-pre-wrap">{slide.subtitle.replace(/\n\s*\n/g, '\n').replace(/\n/g, '\n')}</span>
+                    <span className="whitespace-pre-line">{slide.subtitle}</span>
                   </p>
                 </div>
               </motion.div>
@@ -277,7 +277,7 @@ export function ApplicationHeroSection({ title, topSubtitle, rightBoxText = "APP
 
         <AnimatePresence mode="wait">
           <motion.h1 key={`mm-${activeSlide}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            className="font-jomhuria text-[#FFF17C] text-[52px] leading-[0.9] -mt-2 mb-4 w-[85%]">
+            className="font-jomhuria text-[#FFF17C] text-[52px] leading-[0.9] -mt-2 mb-4 w-[85%] whitespace-pre-line">
             {slide.mainTitle}
           </motion.h1>
         </AnimatePresence>
@@ -295,7 +295,7 @@ export function ApplicationHeroSection({ title, topSubtitle, rightBoxText = "APP
           <div className="w-[2px] self-stretch bg-[#E6E0AA] flex-shrink-0" />
           <AnimatePresence mode="wait">
             <motion.p key={`ms-${activeSlide}`} initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
-              className="font-jomhuria text-white text-[30px] uppercase leading-[1.1]">
+              className="font-jomhuria text-white text-[30px] uppercase leading-[1.1] whitespace-pre-line">
               {slide.subtitle}
             </motion.p>
           </AnimatePresence>
