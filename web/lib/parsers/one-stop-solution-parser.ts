@@ -32,6 +32,8 @@ export interface OneStopApplication {
 export interface OneStopSection {
   title: string;
   subtitle: string;
+  titleHtml?: string;
+  subtitleHtml?: string;
   items: any[];
   autoplay?: boolean;
   interval?: number;
@@ -44,8 +46,14 @@ export interface ParsedOneStopData {
   process: OneStopSection;
   showcase: OneStopSection & { viewMoreText: string; viewMoreLink: string; products: OneStopProduct[] };
   categories: { title: string; subtitle: string; products: OneStopProduct[] };
-  productSeries: { title: string; products: OneStopProduct[] };
-  brandHighlights: { titleLine1: string; titleLine2: string; items: any[] };
+  productSeries: { title: string; titleHtml?: string; products: OneStopProduct[] };
+  brandHighlights: { 
+    titleLine1: string; 
+    titleLine1Html?: string;
+    titleLine2: string; 
+    titleLine2Html?: string;
+    items: any[] 
+  };
   trust: { title: string; items: any[]; images: any[]; bgImage: MediaObject | null };
   cta: { title: string; description: string; image: MediaObject | null; formConfig: any };
   applications: { title: string; items: OneStopApplication[] };
@@ -140,12 +148,18 @@ const extractSectionRaw = (children: any[], markerId: string, mediaData: Record<
   const titleNodes = targetSection.filter(n => (n.type === "heading" || n.type === "paragraph") && !isMarkerNode(n, markerId) && !isAnyMarkerNode(n));
   let title = "";
   let subtitle = "";
+  let titleHtml = "";
+  let subtitleHtml = "";
   if (titleNodes.length > 0) {
-    title = getDeepText(titleNodes[0], true).trim();
-    if (titleNodes.length > 1) subtitle = getDeepText(titleNodes[1], true).trim();
+    title = getDeepText(titleNodes[0], false).trim();
+    titleHtml = getDeepText(titleNodes[0], true).trim();
+    if (titleNodes.length > 1) {
+      subtitle = getDeepText(titleNodes[1], false).trim();
+      subtitleHtml = getDeepText(titleNodes[1], true).trim();
+    }
   }
 
-  return { title, subtitle, items, autoplay, interval, titleNodes };
+  return { title, subtitle, titleHtml, subtitleHtml, items, autoplay, interval, titleNodes };
 };
 
 const mapProductsWithCarouselConfig = (products: any[], carouselItems: any[] = [], locale: string) => {
@@ -311,10 +325,29 @@ export const parseOneStopData = (pageContent: any, locale: string): ParsedOneSto
       problems: { ...problemsRaw },
       advantages: { title: advantagesRaw.title, subtitle: "", items: advantagesRaw.items },
       process: { title: processRaw.title, subtitle: "", items: processRaw.items },
-      showcase: { ...showcaseRaw, viewMoreText, viewMoreLink, products: showcaseProducts },
+      showcase: { 
+        title: showcaseRaw.title,
+        titleHtml: showcaseRaw.titleHtml,
+        subtitle: showcaseRaw.subtitle,
+        subtitleHtml: showcaseRaw.subtitleHtml,
+        items: showcaseRaw.items,
+        viewMoreText, 
+        viewMoreLink, 
+        products: showcaseProducts 
+      },
       categories: { title: categoriesRaw.title, subtitle: categoriesRaw.subtitle, products: categoriesProducts },
-      productSeries: { title: seriesRaw.title, products: seriesProducts },
-      brandHighlights: { titleLine1: brandHighlightsRaw.title, titleLine2: brandHighlightsRaw.subtitle, items: brandHighlightsRaw.items },
+      productSeries: { 
+        title: seriesRaw.title,
+        titleHtml: seriesRaw.titleHtml,
+        products: seriesProducts 
+      },
+      brandHighlights: { 
+        titleLine1: brandHighlightsRaw.title, 
+        titleLine1Html: brandHighlightsRaw.titleHtml,
+        titleLine2: brandHighlightsRaw.subtitle, 
+        titleLine2Html: brandHighlightsRaw.subtitleHtml,
+        items: brandHighlightsRaw.items 
+      },
       trust: { title: trustRaw.title, items: trustItems, images: trustRaw.items.filter((it: any) => it.sourceType === 'custom-image-gallery' || it.sourceType === 'carousel'), bgImage: trustBgImage },
       cta: { 
         title: ctaRaw.title || (typeof bestFormConfig === 'object' ? bestFormConfig?.displayName : undefined), 

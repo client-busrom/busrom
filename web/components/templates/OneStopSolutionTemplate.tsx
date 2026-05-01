@@ -80,6 +80,7 @@ export function OneStopSolutionTemplate({ locale, data }: OneStopSolutionTemplat
       {showcase.items.length > 0 && (
         <HighlightShowcaseSection 
           title={showcase.title} 
+          titleHtml={showcase.titleHtml}
           products={showcase.products as any} 
           locale={locale} 
           viewMoreText={showcase.viewMoreText} 
@@ -100,7 +101,9 @@ export function OneStopSolutionTemplate({ locale, data }: OneStopSolutionTemplat
       {brandHighlights.items.length > 0 && (
         <BrandHighlightsSection 
           titleLine1={brandHighlights.titleLine1} 
+          titleLine1Html={brandHighlights.titleLine1Html}
           titleLine2={brandHighlights.titleLine2} 
+          titleLine2Html={brandHighlights.titleLine2Html}
           items={brandHighlights.items} 
         />
       )}

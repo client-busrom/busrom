@@ -21,6 +21,7 @@ interface HighlightProduct {
 
 interface HighlightShowcaseSectionProps {
   title?: string
+  titleHtml?: string
   products: HighlightProduct[]
   locale: string
   viewMoreText?: string
@@ -32,8 +33,8 @@ interface HighlightShowcaseSectionProps {
  */
 const RichTitle = ({ title, defaultText, strokeColor = "#756F3F" }: { title?: string, defaultText: string, strokeColor?: string }) => {
   const html = title || defaultText;
-  // Split by <b>...</b> or <br /> tags
-  const parts = html.split(/(<b>.*?<\/b>|<br \/>)/g);
+  // Split by <b>...</b>, <br /> or \n
+  const parts = html.split(/(<b>.*?<\/b>|<br \/>|\n)/g);
   
   return (
     <>
@@ -42,14 +43,14 @@ const RichTitle = ({ title, defaultText, strokeColor = "#756F3F" }: { title?: st
           const content = part.replace(/<\/?b>/g, '');
           return <HollowText key={i} strokeColor={strokeColor} strokeWidth={1.5}>{content}</HollowText>;
         }
-        if (part === '<br />') return <br key={i} />;
+        if (part === '<br />' || part === '\n') return <br key={i} />;
         return <span key={i}>{part}</span>;
       })}
     </>
   );
 };
 
-export function HighlightShowcaseSection({ title, products, locale, viewMoreText, viewMoreLink }: HighlightShowcaseSectionProps) {
+export function HighlightShowcaseSection({ title, titleHtml, products, locale, viewMoreText, viewMoreLink }: HighlightShowcaseSectionProps) {
   // Use Embla for the slider effect as the width exceeds the 1860 container in JSON
   const [emblaRef] = useEmblaCarousel({
     align: "center",
@@ -63,8 +64,8 @@ export function HighlightShowcaseSection({ title, products, locale, viewMoreText
       {/* 1. MOBILE VIEW: Vertical List (Simple Display) - Visible below lg */}
       <div className="lg:hidden w-full px-6 flex flex-col gap-12">
         <div className="flex flex-col gap-4">
-          <h2 className="font-anaheim font-bold text-black text-3xl md:text-5xl tracking-wider">
-            <RichTitle title={title} defaultText="Highlight Showcase" />
+          <h2 className="font-anaheim font-bold text-[#756F3F] text-3xl md:text-5xl tracking-wider">
+            <RichTitle title={titleHtml || title} defaultText="Highlight Showcase" />
           </h2>
           <div className="h-1 w-20 bg-[#C7BB5D]" />
         </div>
@@ -137,7 +138,7 @@ export function HighlightShowcaseSection({ title, products, locale, viewMoreText
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center font-bold text-black"
+            className="text-center font-bold text-[#FFFED7]"
             style={{ 
               fontSize: vw(64),
               width: vw(1193),
@@ -145,7 +146,7 @@ export function HighlightShowcaseSection({ title, products, locale, viewMoreText
               lineHeight: vw(102),
             }}
           >
-            <RichTitle title={title} defaultText="You Might Be Looking For..." strokeColor="#FFFED7" />
+            <RichTitle title={titleHtml || title} defaultText="You Might Be Looking For..." strokeColor="#FFFED7" />
           </motion.h2>
         </div>
 
