@@ -238,7 +238,7 @@ const MarqueeText = ({
     const finalIconUrl = item.iconUrl || mediaData?.url || mediaData?.sizes?.thumbnail?.url || mediaData?.sizes?.card?.url;
     
     const content = (
-      <div className="flex items-center gap-4 lg:gap-6 shrink-0 px-6 lg:px-10 py-2 transition-transform hover:scale-105">
+      <div className="flex items-center gap-4 lg:gap-6 transition-transform hover:scale-105">
         {item.iconName ? (
           <IconifyIcon name={item.iconName} className="w-auto h-5 lg:h-6 min-w-[20px]" />
         ) : finalIconUrl ? (
@@ -248,21 +248,25 @@ const MarqueeText = ({
             className="h-5 lg:h-6 w-auto object-contain block"
           />
         ) : null}
-        <span className="font-anaheim font-semibold text-[16px] lg:text-[20px] uppercase whitespace-nowrap">
-          {item.title}
-        </span>
+        {item.title && (
+          <span className="font-anaheim font-semibold text-[16px] lg:text-[20px] uppercase whitespace-nowrap">
+            {item.title}
+          </span>
+        )}
       </div>
     );
 
+    const itemClass = "shrink-0 px-[10px] lg:px-[20px] py-2 block";
+
     if (item.url) {
       return (
-        <Link key={idx} href={item.url} className="hover:opacity-80 transition-opacity cursor-pointer">
+        <Link key={idx} href={item.url} className={cn(itemClass, "hover:opacity-80 transition-opacity cursor-pointer")}>
           {content}
         </Link>
       );
     }
 
-    return <div key={idx}>{content}</div>;
+    return <div key={idx} className={itemClass}>{content}</div>;
   };
 
   const animationName = direction === "left" ? "marquee-left" : "marquee-right";
@@ -290,13 +294,9 @@ const MarqueeText = ({
         }
       `}} />
       
-      <div className={cn(containerClass, "flex items-center gap-20 lg:gap-32")} style={{ color: textColor }}>
-        <div className="flex items-center">
-          {fullItems.map((item, i) => renderItem(item, i))}
-        </div>
-        <div className="flex items-center">
-          {fullItems.map((item, i) => renderItem(item, `dup-${i}`))}
-        </div>
+      <div className={cn(containerClass, "flex items-center")} style={{ color: textColor }}>
+        {fullItems.map((item, i) => renderItem(item, i))}
+        {fullItems.map((item, i) => renderItem(item, `dup-${i}`))}
       </div>
     </div>
   );

@@ -221,7 +221,8 @@ export function OemOdmTemplate({ locale, data }: OemOdmTemplateProps) {
 
       <OemOdmApplications
         applicationIds={applications}
-        findOutMoreText={data.applicationsData?.findOutMoreText}
+        locale={locale as any}
+        findOutMore={data.applicationsData?.findOutMore}
         nextText={data.applicationsData?.nextText}
       />
 

@@ -107,7 +107,7 @@ export default function Footer({
 
       <footer
         className={cn(
-          "relative bg-gray-900 text-white flex flex-col justify-end",
+          "relative bg-gray-900 text-white flex flex-col",
           className,
         )}
         style={{ minHeight: "calc(var(--rpx) * 1000)" }}
@@ -119,38 +119,40 @@ export default function Footer({
           aria-hidden="true"
         />
 
-        <div
-          className="
-            relative z-10 bg-brand-secondary
-            w-[92%] sm:w-[88%] md:w-[90%] lg:w-[1000px] xl:w-[1200px] 2xl:w-[1400px]
-            mx-auto
-            mt-[200px] sm:mt-[240px] md:mt-[300px] lg:mt-[150px] xl:mt-[80px] 2xl:mt-[80px]
-            mb-8 md:mb-12 lg:mb-20
-            p-6 sm:p-8 md:p-10 lg:py-16 lg:px-16 xl:py-20 xl:px-20
-            rounded-[40px] sm:rounded-[50px] md:rounded-[60px] lg:rounded-[60px]
-          "
-        >
-          <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-between lg:gap-8 xl:gap-12">
-            <FooterContact footerData={footerData} content={content} />
+        <div className="flex-1 flex flex-col justify-center relative z-10 py-12 md:py-20 lg:py-28 pb-24">
+          <div
+            className="
+              bg-brand-secondary
+              w-[92%] sm:w-[88%] md:w-[90%] lg:w-[1000px] xl:w-[1200px] 2xl:w-[1400px]
+              mx-auto
+              p-6 sm:p-8 md:p-10 lg:py-16 lg:px-16 xl:py-20 xl:px-20
+              rounded-[40px] sm:rounded-[50px] md:rounded-[60px] lg:rounded-[60px]
+            "
+          >
+            <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-between lg:gap-8 xl:gap-12">
+              <FooterContact footerData={footerData} content={content} />
 
-            <div className="hidden lg:block w-px self-stretch bg-[#E3DEBB]"></div>
-            <div className="lg:hidden w-full h-px bg-white/30 my-6"></div>
+              <div className="hidden lg:block w-px self-stretch bg-[#E3DEBB]"></div>
+              <div className="lg:hidden w-full h-px bg-white/30 my-6"></div>
 
-            <FooterForm
-              locale={locale}
-              formConfig={formConfig}
-              content={content}
-              turnstileSiteKey={turnstileSiteKey}
-              onSuccess={handleFormSuccess}
-            />
+              <FooterForm
+                locale={locale}
+                formConfig={formConfig}
+                content={content}
+                turnstileSiteKey={turnstileSiteKey}
+                onSuccess={handleFormSuccess}
+              />
+            </div>
           </div>
         </div>
 
-        <FooterBottom
-          footerData={footerData}
-          siteLogoUrl={siteLogoUrl}
-          centered
-        />
+        <div className="absolute bottom-0 left-0 right-0 z-20">
+          <FooterBottom
+            footerData={footerData}
+            siteLogoUrl={siteLogoUrl}
+            centered
+          />
+        </div>
       </footer>
     </>
   );

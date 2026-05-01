@@ -23,7 +23,7 @@ export default function FooterContact({ footerData, content }: Props) {
 
       {/* 联系信息 */}
       <ul
-        className="font-anaheim font-medium text-brand-text-inverse text-sm md:text-base lg:text-lg mb-6 md:mb-8"
+        className="font-anaheim font-medium text-brand-text-inverse text-sm md:text-base lg:text-lg"
         style={{ lineHeight: 1.8 }}
       >
         {(footerData?.contact?.email || content.contact.email) && (
@@ -81,7 +81,7 @@ export default function FooterContact({ footerData, content }: Props) {
       </ul>
 
       {/* 官方声明 */}
-      <div className="bg-brand-footer-emphasis-bg text-brand-footer-emphasis-text font-anaheim font-semibold px-6 py-4 md:px-8 md:py-5 lg:px-6 lg:py-6 xl:w-[90%] 2xl:w-[80%]">
+      <div className="bg-brand-footer-emphasis-bg text-brand-footer-emphasis-text font-anaheim font-semibold px-6 py-4 md:px-8 md:py-5 lg:px-6 lg:py-6 xl:w-[90%] 2xl:w-[80%] my-6 md:my-8 lg:my-10">
         <h4
           className="font-bold text-base md:text-lg lg:text-xl mb-2 pl-3 md:pl-4"
           style={{ lineHeight: 1 }}

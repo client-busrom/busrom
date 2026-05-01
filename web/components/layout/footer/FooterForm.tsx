@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -38,6 +38,28 @@ export default function FooterForm({ locale, formConfig, content, turnstileSiteK
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [turnstileKey, setTurnstileKey] = useState(0); 
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const STORAGE_KEY = 'busrom_privacy_consent';
+  const [isGloballyAccepted, setIsGloballyAccepted] = useState(false);
+
+  // 挂载时检查全局同意状态
+  useEffect(() => {
+    const accepted = localStorage.getItem(STORAGE_KEY) === 'true';
+    if (accepted) {
+      setPrivacyAccepted(true);
+      setIsGloballyAccepted(true);
+    }
+  }, []);
+
+  const handlePrivacyToggle = (val: boolean) => {
+    setPrivacyAccepted(val);
+    if (val) {
+      localStorage.setItem(STORAGE_KEY, 'true');
+      setIsGloballyAccepted(true);
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+      setIsGloballyAccepted(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,8 +176,8 @@ export default function FooterForm({ locale, formConfig, content, turnstileSiteK
         )}
 
         <div className="mt-4 flex flex-col gap-3">
-          {formConfig?.privacyConsentText && (
-            <div className="flex items-start gap-3 cursor-pointer group" onClick={() => setPrivacyAccepted(!privacyAccepted)}>
+          {formConfig?.privacyConsentText && !isGloballyAccepted && (
+            <div className="flex items-start gap-3 cursor-pointer group" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
               <div className={cn(
                 "mt-1 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center",
                 privacyAccepted ? "bg-brand-footer-button-bg border-brand-footer-button-bg" : "border-white/30 bg-transparent"

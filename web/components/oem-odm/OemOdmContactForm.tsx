@@ -423,7 +423,7 @@ export function OemOdmContactForm({
   return (
     <section className="w-full overflow-hidden py-10 md:py-20 font-anaheim">
       <div className="max-w-[1440px] mx-auto px-4 md:px-6">
-        <div className="bg-white rounded-[30px] border border-[#cfcaa2] overflow-hidden shadow-sm flex flex-col">
+        <div className="bg-white rounded-[30px] border-2 border-[#cfcaa2] overflow-hidden shadow-sm flex flex-col">
           {/* ========== Hero Header ========== */}
           <div className="relative min-h-[280px] h-auto md:h-[260px] overflow-hidden">
             {image ? (
