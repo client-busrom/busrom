@@ -311,7 +311,7 @@ export const parseOneStopData = (pageContent: any, locale: string): ParsedOneSto
   const oemRaw = extractSectionRaw(contentChildren, "oem-odm-guide", mediaData);
   let oemTitle = oemRaw.title || "READY TO\nJOIN IN BUSROM?";
   const oemTitleIdx = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("oem-odm-guide-title"));
-  if (oemTitleIdx !== -1 && oemTitleIdx + 1 < contentChildren.length) oemTitle = getDeepText(contentChildren[oemTitleIdx + 1], true);
+  if (oemTitleIdx !== -1 && oemTitleIdx + 1 < contentChildren.length) oemTitle = getDeepText(contentChildren[oemTitleIdx + 1], false);
   const oemBgIdx = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("oem-odm-guide-bg-image"));
   const oemBgImage = oemBgIdx !== -1 && oemBgIdx + 1 < contentChildren.length ? mediaData[contentChildren[oemBgIdx + 1].data?.image?.id || String(contentChildren[oemBgIdx + 1].value || "")] : (oemRaw.items[0]?.image || null);
 
