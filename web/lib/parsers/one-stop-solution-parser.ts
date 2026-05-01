@@ -61,12 +61,18 @@ function getRandomAppImage(app: any) {
   return randomImage || app.image || null;
 }
 
-const getDeepText = (node: any): string => {
+const getDeepText = (node: any, useHtml = false): string => {
   if (!node) return "";
   if (typeof node === "string") return node;
-  if (node.text !== undefined) return node.text;
+  if (node.text !== undefined) {
+    let text = node.text;
+    if (useHtml && node.format && (node.format & 1)) {
+        return `<b>${text}</b>`;
+    }
+    return text;
+  }
   if (node.children && Array.isArray(node.children)) {
-    return node.children.map((child: any) => child.type === "linebreak" ? "\n" : getDeepText(child)).join("");
+    return node.children.map((child: any) => child.type === "linebreak" ? (useHtml ? "<br />" : "\n") : getDeepText(child, useHtml)).join("");
   }
   return "";
 };
@@ -135,8 +141,8 @@ const extractSectionRaw = (children: any[], markerId: string, mediaData: Record<
   let title = "";
   let subtitle = "";
   if (titleNodes.length > 0) {
-    title = titleNodes[0].children?.map((c: any) => c.text || "").join("").trim() || "";
-    if (titleNodes.length > 1) subtitle = titleNodes[1].children?.map((c: any) => c.text || "").join("").trim() || "";
+    title = getDeepText(titleNodes[0], true).trim();
+    if (titleNodes.length > 1) subtitle = getDeepText(titleNodes[1], true).trim();
   }
 
   return { title, subtitle, items, autoplay, interval, titleNodes };
@@ -291,7 +297,7 @@ export const parseOneStopData = (pageContent: any, locale: string): ParsedOneSto
   const oemRaw = extractSectionRaw(contentChildren, "oem-odm-guide", mediaData);
   let oemTitle = oemRaw.title || "READY TO\nJOIN IN BUSROM?";
   const oemTitleIdx = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("oem-odm-guide-title"));
-  if (oemTitleIdx !== -1 && oemTitleIdx + 1 < contentChildren.length) oemTitle = getDeepText(contentChildren[oemTitleIdx + 1]);
+  if (oemTitleIdx !== -1 && oemTitleIdx + 1 < contentChildren.length) oemTitle = getDeepText(contentChildren[oemTitleIdx + 1], true);
   const oemBgIdx = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("oem-odm-guide-bg-image"));
   const oemBgImage = oemBgIdx !== -1 && oemBgIdx + 1 < contentChildren.length ? mediaData[contentChildren[oemBgIdx + 1].data?.image?.id || String(contentChildren[oemBgIdx + 1].value || "")] : (oemRaw.items[0]?.image || null);
 

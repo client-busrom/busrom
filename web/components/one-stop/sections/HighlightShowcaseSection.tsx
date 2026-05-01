@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
+import { HollowText } from "@/components/common/HollowText"
 import useEmblaCarousel from "embla-carousel-react"
 import { AnimatedLinkButton } from "@/components/ui/animated-link-button"
 
@@ -26,6 +27,28 @@ interface HighlightShowcaseSectionProps {
   viewMoreLink?: string
 }
 
+/**
+ * Helper component to render rich titles with selective HollowText for bold parts
+ */
+const RichTitle = ({ title, defaultText, strokeColor = "#756F3F" }: { title?: string, defaultText: string, strokeColor?: string }) => {
+  const html = title || defaultText;
+  // Split by <b>...</b> or <br /> tags
+  const parts = html.split(/(<b>.*?<\/b>|<br \/>)/g);
+  
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part.startsWith('<b>')) {
+          const content = part.replace(/<\/?b>/g, '');
+          return <HollowText key={i} strokeColor={strokeColor} strokeWidth={1.5}>{content}</HollowText>;
+        }
+        if (part === '<br />') return <br key={i} />;
+        return <span key={i}>{part}</span>;
+      })}
+    </>
+  );
+};
+
 export function HighlightShowcaseSection({ title, products, locale, viewMoreText, viewMoreLink }: HighlightShowcaseSectionProps) {
   // Use Embla for the slider effect as the width exceeds the 1860 container in JSON
   const [emblaRef] = useEmblaCarousel({
@@ -40,10 +63,9 @@ export function HighlightShowcaseSection({ title, products, locale, viewMoreText
       {/* 1. MOBILE VIEW: Vertical List (Simple Display) - Visible below lg */}
       <div className="lg:hidden w-full px-6 flex flex-col gap-12">
         <div className="flex flex-col gap-4">
-          <h2 
-            className="font-anaheim font-bold text-[#756F3F] text-3xl md:text-5xl tracking-wider"
-            dangerouslySetInnerHTML={{ __html: (title || "Highlight Showcase").replace(/\n/g, '<br />') }}
-          />
+          <h2 className="font-anaheim font-bold text-black text-3xl md:text-5xl tracking-wider">
+            <RichTitle title={title} defaultText="Highlight Showcase" />
+          </h2>
           <div className="h-1 w-20 bg-[#C7BB5D]" />
         </div>
 
@@ -115,18 +137,16 @@ export function HighlightShowcaseSection({ title, products, locale, viewMoreText
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center font-bold"
+            className="text-center font-bold text-black"
             style={{ 
               fontSize: vw(64),
               width: vw(1193),
               fontFamily: "var(--font-anaheim)", 
               lineHeight: vw(102),
-              color: "#FFFED7",
-              WebkitTextStroke: `${vw(1)} #FFFED7`,
-              paintOrder: "stroke fill"
             }}
-            dangerouslySetInnerHTML={{ __html: (title || "You Might Be Looking For...").replace(/\n/g, '<br />') }}
-          />
+          >
+            <RichTitle title={title} defaultText="You Might Be Looking For..." strokeColor="#FFFED7" />
+          </motion.h2>
         </div>
 
         {/* View More Button (Group 186) */}
