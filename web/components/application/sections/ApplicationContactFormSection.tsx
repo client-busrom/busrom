@@ -223,7 +223,7 @@ export function ApplicationContactFormSection({
       return (
         <span
           key={idx}
-          className="text-[#D6CD88] font-cherry-bomb not-italic text-[1.12em] tracking-tight inline"
+          className="text-[#D6CD88] font-cherry-bomb not-italic text-[1.12em] tracking-tight inline whitespace-pre-line"
           style={{
             textShadow:
               "2px 2px 0 #514a0d, -1px -1px 0 #514a0d, 1px -1px 0 #514a0d, -1px 1px 0 #514a0d",
@@ -234,7 +234,7 @@ export function ApplicationContactFormSection({
       );
     }
     return (
-      <span key={idx} className="font-cherry-bomb inline">
+      <span key={idx} className="font-cherry-bomb inline whitespace-pre-line">
         {segment.text}
       </span>
     );
@@ -393,8 +393,8 @@ export function ApplicationContactFormSection({
 
   return (
     <section
-      className="relative w-full flex items-center justify-center select-none z-20"
-      style={{ height: vw(1456), backgroundColor: "#000000" }}
+      className="relative w-full flex items-start justify-center select-none z-20"
+      style={{ height: vw(1080), backgroundColor: "#000000" }}
     >
       <div className="absolute inset-0">
         {bgImage ? (
@@ -418,7 +418,7 @@ export function ApplicationContactFormSection({
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        className="relative z-10 flex backdrop-blur-[15px]"
+        className="relative z-10 flex backdrop-blur-[15px] mt-[60px]"
         style={{
           width: vw(cardW),
           height: vw(cardH),
@@ -432,83 +432,24 @@ export function ApplicationContactFormSection({
         {/* LEFT COMPONENT */}
         <div className="flex flex-col h-full" style={{ width: vw(leftW) }}>
           <div
-            className="font-cherry-bomb italic font-black text-[#1D1A02] leading-[1.2] whitespace-pre-wrap block"
+            className="font-cherry-bomb italic font-black text-[#1D1A02] leading-[1.2] whitespace-pre-line block"
             style={{ fontSize: vw(34), width: vw(leftW) }}
           >
-            {richText && richText.some((s) => s.text && s.text.trim()) ? (
-              <div className="inline">
-                {richText.map((segment, i) => renderSegment(segment, i))}
-              </div>
-            ) : (
-              <div className="flex flex-col">
-                <div>
-                  Whether For{" "}
-                  <span
-                    className="text-[#D6CD88] font-cherry-bomb not-italic text-[1.12em]"
-                    style={{
-                      textShadow:
-                        "2px 2px 0 #514a0d, -1px -1px 0 #514a0d, 1px -1px 0 #514a0d, -1px 1px 0 #514a0d",
-                    }}
-                  >
-                    Residential
-                  </span>
-                  ,
-                </div>
-                <div>
-                  <span
-                    className="text-[#D6CD88] font-cherry-bomb not-italic text-[1.12em]"
-                    style={{
-                      textShadow:
-                        "2px 2px 0 #514a0d, -1px -1px 0 #514a0d, 1px -2px 0 #514a0d, -1px 1px 0 #514a0d",
-                    }}
-                  >
-                    Hotel
-                  </span>
-                  ,{" "}
-                  <span
-                    className="text-[#D6CD88] font-cherry-bomb not-italic text-[1.12em]"
-                    style={{
-                      textShadow:
-                        "2px 2px 0 #514a0d, -1px -1px 0 #514a0d, 1px -2px 0 #514a0d, -1px 1px 0 #514a0d",
-                    }}
-                  >
-                    Commercial Spaces
-                  </span>
-                  ,{" "}
-                </div>
-                <div>
-                  Or{" "}
-                  <span
-                    className="text-[#D6CD88] font-cherry-bomb not-italic text-[1.12em]"
-                    style={{
-                      textShadow:
-                        "2px 2px 0 #514a0d, -1px -1px 0 #514a0d, 1px -1px 0 #514a0d, -1px 1px 0 #514a0d",
-                    }}
-                  >
-                    Custom Projects
-                  </span>
-                  ,
-                </div>
-                <span className="whitespace-nowrap">
-                  Busrom&apos;s Engineering Team{" "}
+            {(() => {
+              // Filter out the marker text if it's accidentally included in segments
+              const displaySegments = (richText || []).filter(
+                (s) => s.text && s.text.trim().toLowerCase() !== "contact-form-title"
+              );
+
+              if (displaySegments.length > 0 && displaySegments.some((s) => s.text && s.text.trim())) {
+                return displaySegments.map((segment, i) => renderSegment(segment, i));
+              }
+              return (
+                <span>
+                  Whether For <span className="text-[#D6CD88] font-bold">Engineering Solutions</span> Or Innovative Customization.
                 </span>
-                <span className="whitespace-nowrap">
-                  Delivers Precisely Tailored{" "}
-                </span>
-                <div>
-                  <span
-                    className="text-[#D6CD88] font-cherry-bomb not-italic text-[1.12em]"
-                    style={{
-                      textShadow:
-                        "2px 2px 0 #514a0d, -1px -1px 0 #514a0d, 1px -2px 0 #514a0d, -1px 1px 0 #514a0d",
-                    }}
-                  >
-                    Hardware Solutions
-                  </span>{" "}
-                  .
-                </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
 
           <div

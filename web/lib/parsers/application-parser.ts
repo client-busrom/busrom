@@ -108,7 +108,7 @@ export function parseApplicationData(locale: string, pageContent: any): Applicat
   const findRichTextByMarker = (marker: string) => {
     const nodes = extractNodesAfterMarker(children, marker);
     return nodes.flatMap(n => n.children || []).map((c: any) => ({
-      text: c.text || "",
+      text: c.type === 'linebreak' ? "\n" : (c.text || ""),
       bold: typeof c.format === 'number' && (c.format & 1) !== 0,
       italic: typeof c.format === 'number' && (c.format & 2) !== 0,
       linebreak: c.type === 'linebreak'

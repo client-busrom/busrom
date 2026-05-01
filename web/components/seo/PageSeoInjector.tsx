@@ -26,14 +26,14 @@
  * ```
  */
 
-import { getHomePageSeo, getNonHomePageSeo } from '@/lib/api/seo-settings'
-import { SeoAttributeDistributor, SeoMetaInjector } from './SeoHiddenInjector'
+import { getHomePageSeo, getNonHomePageSeo } from "@/lib/api/seo-settings";
+import { SeoAttributeDistributor, SeoMetaInjector } from "./SeoHiddenInjector";
 
 interface PageSeoInjectorProps {
-  path: string
-  pageType?: string
-  locale?: string
-  isHomePage?: boolean
+  path: string;
+  pageType?: string;
+  locale?: string;
+  isHomePage?: boolean;
 }
 
 /**
@@ -45,17 +45,17 @@ interface PageSeoInjectorProps {
 export async function PageSeoInjector({
   path,
   pageType,
-  locale = 'en',
+  locale = "en",
   isHomePage = false,
 }: PageSeoInjectorProps) {
   // Use different logic for homepage vs other pages
   const { distributedKeywords } = isHomePage
     ? await getHomePageSeo(locale)
-    : await getNonHomePageSeo(path, pageType, locale)
+    : await getNonHomePageSeo(path, pageType, locale);
 
   // Skip rendering if no keywords
   if (distributedKeywords.totalKeywords === 0) {
-    return null
+    return null;
   }
 
   return (
@@ -65,7 +65,7 @@ export async function PageSeoInjector({
       {/* Client-side attribute distribution */}
       <SeoAttributeDistributor distribution={distributedKeywords} />
     </>
-  )
+  );
 }
 
-export default PageSeoInjector
+export default PageSeoInjector;
