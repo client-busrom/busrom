@@ -227,6 +227,86 @@ async function batchFetchMedia(ids: Set<string>): Promise<Map<string, any>> {
 }
 
 /**
+ * Extract all form config IDs from Lexical content
+ */
+function collectFormIds(node: any, ids: Set<string>): void {
+  if (!node || typeof node !== 'object') return
+
+  if (Array.isArray(node)) {
+    node.forEach(item => collectFormIds(item, ids))
+    return
+  }
+
+  // Check data fields for form config references
+  if (node.type === 'formBlock' && node.data?.formConfig) {
+    const fid = typeof node.data.formConfig === 'object' ? node.data.formConfig.id : node.data.formConfig
+    if (fid) ids.add(String(fid))
+  }
+
+  // Recursively process nested structures
+  if (node.root) collectFormIds(node.root, ids)
+  if (node.children) collectFormIds(node.children, ids)
+}
+
+/**
+ * Batch fetch all form configs by IDs in parallel
+ */
+async function batchFetchFormConfigs(ids: Set<string>, locale: string): Promise<Map<string, any>> {
+  const cache = new Map<string, any>()
+  if (ids.size === 0) return cache
+
+  const fetchPromises = Array.from(ids).map(async (id) => {
+    try {
+      const res = await fetch(`${CMS_URL}/api/form-configs/${id}?locale=${locale}&depth=2`)
+      if (res.ok) {
+        const data = await res.json()
+        return { id, data }
+      }
+    } catch (err) {
+      console.error(`[batchFetchFormConfigs] Failed to fetch form config ${id}:`, err)
+    }
+    return null
+  })
+
+  const results = await Promise.all(fetchPromises)
+  results.forEach(result => {
+    if (result) cache.set(result.id, result.data)
+  })
+
+  return cache
+}
+
+/**
+ * Populate form config references in Lexical content using pre-fetched cache
+ */
+function populateFormsFromCache(node: any, cache: Map<string, any>): any {
+  if (!node || typeof node !== 'object') return node
+
+  if (Array.isArray(node)) {
+    return node.map(item => populateFormsFromCache(item, cache))
+  }
+
+  const populated = { ...node }
+
+  if (populated.type === 'formBlock' && populated.data?.formConfig) {
+    const fid = String(typeof populated.data.formConfig === 'object' ? populated.data.formConfig.id : populated.data.formConfig)
+    if (cache.has(fid)) {
+      populated.data.formConfig = cache.get(fid)
+    }
+  }
+
+  // Recursively process nested structures
+  if (populated.root) {
+    populated.root = populateFormsFromCache(populated.root, cache)
+  }
+  if (populated.children) {
+    populated.children = populateFormsFromCache(populated.children, cache)
+  }
+
+  return populated
+}
+
+/**
  * Populate media references in Lexical content using pre-fetched cache
  */
 function populateMediaFromCache(node: any, cache: Map<string, any>): any {
@@ -456,14 +536,29 @@ export async function GET(
     // 1. Expand reusable blocks into a flat list of nodes
     const expandedContent = contentTranslationRaw ? await expandReusableBlocks(contentTranslationRaw, locale) : null
 
-    // 2. Extract and fetch media data from expanded content
+    // 2. Extract and fetch enrichment data (media and form configs)
     const mediaIds = new Set<string>()
+    const formIds = new Set<string>()
+    
     if (expandedContent) {
       collectMediaIds(expandedContent, mediaIds)
+      collectFormIds(expandedContent, formIds)
     }
-    const mediaMap = await batchFetchMedia(mediaIds)
+    
+    // Fetch all in parallel
+    const [mediaMap, formsMap] = await Promise.all([
+      batchFetchMedia(mediaIds),
+      batchFetchFormConfigs(formIds, locale)
+    ])
 
-    // Convert mediaMap to object for JSON serialization
+    // 3. Populate enrichment data back into content
+    let finalizedContent = expandedContent
+    if (expandedContent) {
+      // ONLY populate form configs, DO NOT populate media globally to preserve ID-based parsing for other sections
+      finalizedContent = populateFormsFromCache(expandedContent, formsMap)
+    }
+
+    // Convert maps to objects for JSON serialization
     const mediaData: Record<string, any> = {}
     mediaMap.forEach((data, id) => {
       mediaData[id] = data
@@ -479,7 +574,7 @@ export async function GET(
       order: series.order || 0,
       status: series.status,
       isFeatured: series.isFeatured || false,
-      contentTranslation: expandedContent,
+      contentTranslation: finalizedContent,
       mediaData, // Full Media objects including variants
       reusableBlocks: {}, // Already expanded at API level
       locale,

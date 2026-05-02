@@ -237,8 +237,8 @@ export function SimplifiedInquiryForm({
         </div>
       ))}
 
-      {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
-      {privacyText && !isGloballyAccepted && (
+      {/* Privacy Consent Checkbox - Always show if text is present */}
+      {privacyText && (
         <div className="flex items-start gap-2 my-2 cursor-pointer group" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
           <div className={cn(
             "mt-1 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",

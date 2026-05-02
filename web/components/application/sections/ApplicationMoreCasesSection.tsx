@@ -111,7 +111,7 @@ export function ApplicationMoreCasesSection({
             <div
               className="absolute pointer-events-auto"
               style={{
-                left: vw(1302),
+                left: vw(1452),
                 top: vw(205 * S),
                 width: vw(237 * S),
                 height: vw(327 * S),
@@ -128,7 +128,7 @@ export function ApplicationMoreCasesSection({
             <div
               className="absolute pointer-events-auto"
               style={{
-                left: vw(956),
+                left: vw(1106),
                 top: vw(406 * S),
                 width: vw(481 * S),
                 height: vw(519 * S),
@@ -145,7 +145,7 @@ export function ApplicationMoreCasesSection({
             <div
               className="absolute pointer-events-auto"
               style={{
-                left: vw(1274),
+                left: vw(1424),
                 top: vw(632 * S),
                 width: vw(304 * S),
                 height: vw(469 * S),
@@ -162,7 +162,7 @@ export function ApplicationMoreCasesSection({
             <div
               className="absolute pointer-events-auto"
               style={{
-                left: vw(836),
+                left: vw(986),
                 top: vw(708 * S),
                 width: vw(241 * S),
                 height: vw(354 * S),
@@ -195,7 +195,7 @@ export function ApplicationMoreCasesSection({
             src="/assets/images/application/BusromIcon.svg"
             className="absolute"
             style={{
-              left: vw(951),
+              left: vw(1101),
               top: vw(160),
               width: vw(574.9),
               height: vw(694.2),
@@ -210,7 +210,7 @@ export function ApplicationMoreCasesSection({
           <div
             className="absolute font-berkshire-swash text-[#756F3F] opacity-70 pointer-events-none"
             style={{
-              left: vw(828),
+              left: vw(978),
               top: vw(240),
               width: vw(182.3),
               height: vw(26.4),
@@ -241,7 +241,7 @@ export function ApplicationMoreCasesSection({
           <h2
             className="absolute font-berkshire-swash text-[#000000] select-none"
             style={{
-              left: vw(823),
+              left: vw(973),
               top: vw(451),
               fontSize: vw(128),
               lineHeight: 1.1,
@@ -253,7 +253,7 @@ export function ApplicationMoreCasesSection({
         </div>
 
         {/* Navigation Section (Top Right) - Unified Interactive Group */}
-        <div className="absolute z-60" style={{ left: vw(1255), top: vw(39) }}>
+        <div className="absolute z-60" style={{ right: vw(100), top: vw(39) }}>
           <a
             href={data?.ctaHref || "#"}
             className="flex items-center group cursor-pointer no-underline"

@@ -82,6 +82,8 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null)
   const [turnstileKey, setTurnstileKey] = useState(0)
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
+  const STORAGE_KEY = 'busrom_privacy_consent'
 
   // Form config messages from form-config API
   const [formMessages, setFormMessages] = useState<{
@@ -110,6 +112,38 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
       }
     }
     fetchSiteKey()
+  }, [])
+
+  // Check global consent status on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const consent = localStorage.getItem(STORAGE_KEY)
+      if (consent === 'true') {
+        setPrivacyAccepted(true)
+      }
+    }
+  }, [])
+
+  // Sync with global storage when accepted in this form
+  const handlePrivacyToggle = (checked: boolean) => {
+    setPrivacyAccepted(checked)
+    if (checked && typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, 'true')
+      // Trigger a storage event for other components to update
+      window.dispatchEvent(new Event('storage'))
+    }
+  }
+
+  // Listen for storage events from other components
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const consent = localStorage.getItem(STORAGE_KEY)
+      if (consent === 'true') {
+        setPrivacyAccepted(true)
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
   }, [])
 
   // Fetch form config messages (submitButtonText, privacyConsentText, etc.)
@@ -469,17 +503,28 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
 
       <button
         type="submit"
-        disabled={isSubmitting}
+        disabled={isSubmitting || (!!formMessages?.privacyConsentText && !privacyAccepted)}
         className="w-full py-3 px-6 bg-brand-secondary text-white font-bold rounded-lg hover:bg-brand-secondary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-pre-line"
       >
         {isSubmitting ? (formMessages?.submittingText || "Submitting...") : (formMessages?.submitButtonText || "Submit Inquiry")}
       </button>
 
-      {/* Privacy consent text */}
+      {/* Privacy Consent Checkbox - Always show if text is present */}
       {formMessages?.privacyConsentText && (
-        <p className="mt-3 text-xs text-gray-500 leading-relaxed whitespace-pre-line">
-          {formMessages.privacyConsentText}
-        </p>
+        <div className="flex items-start gap-3 mt-4 cursor-pointer group" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
+          <div className={`mt-1 flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all ${
+            privacyAccepted ? "bg-brand-secondary border-brand-secondary" : "border-gray-300 bg-transparent"
+          }`}>
+            {privacyAccepted && (
+              <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+          <p className="text-xs leading-relaxed text-gray-500 whitespace-pre-line select-none text-left">
+            {formMessages.privacyConsentText}
+          </p>
+        </div>
       )}
     </form>
   )

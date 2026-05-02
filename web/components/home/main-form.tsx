@@ -646,8 +646,8 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                     </div>
                   )}
 
-                  {/* 同意隐私勾选框 - 仅在本地没记号时展示 */}
-                  {formConfig?.privacyConsentText && !isGloballyAccepted && (
+                  {/* 同意隐私勾选框 - 只要配置了文案就常显 */}
+                  {formConfig?.privacyConsentText && (
                     <div className="flex items-start gap-2 mb-4 group cursor-pointer" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
                       <div className={cn(
                         "mt-1 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",

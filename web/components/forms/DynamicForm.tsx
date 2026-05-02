@@ -976,7 +976,7 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
       )}
 
       {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
-      {formConfig.privacyConsentText && !isGloballyAccepted && (
+      {formConfig.privacyConsentText && (
         <div className="flex items-start gap-2 my-4 group cursor-pointer" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
           <div className={cn(
             "mt-1 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",

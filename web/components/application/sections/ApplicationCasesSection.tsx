@@ -102,14 +102,14 @@ export function ApplicationCasesSection({
         id="applications-subtitle"
         className="absolute font-quicksand font-semibold select-none pointer-events-none"
         style={{
-          left: vw(250),
+          left: vw(440),
           top: vw(60),
           zIndex: 1,
           transform: "scaleY(1)",
           transformOrigin: "top",
         }}
       >
-        <svg width="100%" height={vw(120)} style={{ overflow: "visible" }}>
+        <svg width="100%" height={vw(80)} style={{ overflow: "visible" }}>
           <defs>
             <linearGradient
               id="strokeGradient"
@@ -126,7 +126,7 @@ export function ApplicationCasesSection({
             x="0"
             y={vw(90)}
             style={{
-              fontSize: vw(120),
+              fontSize: vw(80),
               fill: "#f6f4ed",
               stroke: "url(#strokeGradient)",
               strokeWidth: vw(3),
@@ -155,7 +155,7 @@ export function ApplicationCasesSection({
               alt={title || "Applications Title"}
               className="object-contain"
               style={{
-                width: vw(896.54),
+                width: vw(720),
                 height: "auto",
                 filter: `drop-shadow(0 ${vw(12)} ${vw(12)} rgba(84, 79, 37, 0.2))`,
               }}

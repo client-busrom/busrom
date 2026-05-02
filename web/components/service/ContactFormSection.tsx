@@ -605,7 +605,7 @@ export function ContactFormSection({
                       </div>
                     )}
 
-                    {formConfig?.privacyConsentText && !isGloballyAccepted && (
+                    {formConfig?.privacyConsentText && (
                       <div
                         className="flex items-start gap-3 my-2 cursor-pointer"
                         onClick={() => handlePrivacyToggle(!privacyAccepted)}
@@ -642,7 +642,7 @@ export function ContactFormSection({
 
                     <button
                       type="submit"
-                      disabled={submitting}
+                      disabled={submitting || (!!formConfig?.privacyConsentText && !privacyAccepted)}
                       className={cn(
                         "w-full bg-[#B2A224] text-white font-anaheim font-bold hover:bg-[#9A8C1E] transition-all flex items-center justify-center text-center",
                         "disabled:opacity-50 disabled:cursor-not-allowed",

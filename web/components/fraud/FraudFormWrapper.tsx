@@ -353,7 +353,7 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
              </button>
           </div>
 
-          {getLocalizedString(contactForm.formConfig?.privacyConsentText, locale) && !isGloballyAccepted && (
+          {getLocalizedString(contactForm.formConfig?.privacyConsentText, locale) && (
             <div className="flex items-start gap-3 mt-6 cursor-pointer group/privacy" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
               <div className={cn(
                 "mt-1 flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all",

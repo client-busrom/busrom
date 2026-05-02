@@ -42,6 +42,19 @@ interface Props {
   formConfig?: any;
 }
 
+// Precision CSS Values (Global Constants)
+const CARD_W = 1380;
+const CARD_H = 800;
+const LEFT_W = 490;
+const RIGHT_W = 730;
+const PADDING_L = 50;
+const PADDING_R = 50;
+const GAP_Y = 14;
+const GAP_X = 33;
+const INPUT_PX = 24;
+const MARGIN_TOP_L = 75;
+const MARGIN_TOP_R = 87;
+
 // Custom Dropdown for "Beautification"
 function CustomDropdown({
   field,
@@ -74,18 +87,19 @@ function CustomDropdown({
     <div ref={containerRef} className="relative w-full font-montserrat">
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between cursor-pointer rounded-[15px] font-semibold text-[#3D3708] transition-all hover:bg-[#C9BF99]"
+        className="w-full flex items-center justify-between cursor-pointer rounded-[15px] font-semibold text-[#5E552C] transition-all hover:bg-[#C9BF99]"
         style={{
           height: vw(51),
           backgroundColor: "#D4CBAF",
-          paddingLeft: vw(33),
-          paddingRight: vw(33),
+          paddingLeft: vw(INPUT_PX),
+          paddingRight: vw(INPUT_PX),
         }}
       >
         <span
           className={
             !value ? "text-[#9D9473]/70 truncate flex-1" : "truncate flex-1"
           }
+          style={{ fontSize: vw(16) }}
         >
           {selectedOption
             ? selectedOption.label
@@ -94,7 +108,7 @@ function CustomDropdown({
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
-          className="text-[#867C5A] flex-shrink-0"
+          className="text-[#5E552C] flex-shrink-0"
         >
           <ChevronDown size={(vw(18) as any) || 18} />
         </motion.div>
@@ -117,12 +131,12 @@ function CustomDropdown({
                     onChange(opt.value);
                     setIsOpen(false);
                   }}
-                  className="hover:bg-[#D4CBAF]/30 cursor-pointer text-[#3D3708] font-semibold transition-colors flex items-center justify-between"
+                  className="hover:bg-[#D4CBAF]/30 cursor-pointer text-[#5E552C] font-semibold transition-colors flex items-center justify-between"
                   style={{
                     height: vw(51),
-                    paddingLeft: vw(33),
-                    paddingRight: vw(33),
-                    fontSize: vw(18),
+                    paddingLeft: vw(INPUT_PX),
+                    paddingRight: vw(INPUT_PX),
+                    fontSize: vw(16),
                   }}
                 >
                   <span className="truncate">{opt.label}</span>
@@ -154,23 +168,21 @@ export function ApplicationContactFormSection({
     "idle" | "success" | "error"
   >("idle");
   const [fileName, setFileName] = useState("");
-
-  // Precision CSS Values
-  const cardW = 1290;
-  const cardH = 800;
-  const leftW = 493;
-  const rightW = 642;
-  const paddingL = 60;
-  const paddingR = 57;
-  const gapY = 14;
-  const gapX = 33;
-  const inputPX = 33;
-  const marginTopL = 75;
-  const marginTopR = 87;
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   const formConfig = useMemo(() => {
     return propFormConfig;
   }, [propFormConfig]);
+
+  const privacyText =
+    formConfig?.privacyText ||
+    formConfig?.data?.privacyText ||
+    formConfig?.privacyConsentText ||
+    formConfig?.data?.privacyConsentText;
+
+  const handlePrivacyToggle = (val: boolean) => {
+    setPrivacyAccepted(val);
+  };
 
   // Handle initial form data state from fields
   useEffect(() => {
@@ -244,8 +256,8 @@ export function ApplicationContactFormSection({
     const commonStyles: React.CSSProperties = {
       height: vw(51),
       backgroundColor: "#D4CBAF",
-      paddingLeft: vw(inputPX),
-      paddingRight: vw(inputPX),
+      paddingLeft: vw(INPUT_PX),
+      paddingRight: vw(INPUT_PX),
       borderRadius: vw(15),
     };
 
@@ -272,7 +284,9 @@ export function ApplicationContactFormSection({
             onChange={(val) => handleInputChange(field.fieldName, val)}
             placeholder={field.placeholder || field.label}
             className="!bg-[#D4CBAF] !rounded-[15px] !h-[51px] border-none"
-            inputClassName="!bg-transparent !text-[#3D3708] !font-montserrat !font-semibold !text-base !placeholder-[#9D9473]/60"
+            inputClassName="!bg-transparent !text-[#9D9473] !font-montserrat !font-semibold !text-base !placeholder-[#9D9473]/60"
+            dialCodeClassName="!text-[#9D9473] !font-montserrat !font-semibold"
+            chevronClassName="!text-[#9D9473]"
           />
         </div>
       );
@@ -285,19 +299,19 @@ export function ApplicationContactFormSection({
           className="flex flex-col font-montserrat"
           style={{ gap: vw(10) }}
         >
-          <span className="font-bold text-black" style={{ fontSize: vw(20) }}>
+          <span className="font-bold text-black" style={{ fontSize: vw(16) }}>
             {field.label}
           </span>
           <textarea
             placeholder={field.placeholder}
-            className="w-full font-semibold text-[#3D3708] placeholder:text-[#9D9473]/60 outline-none resize-none"
+            className="w-full font-semibold text-[#5E552C] placeholder:text-[#9D9473]/60 outline-none resize-none"
             style={{
               height: vw(130),
               backgroundColor: "#D4CBAF",
               borderRadius: vw(15),
-              fontSize: vw(18),
-              paddingLeft: vw(33),
-              paddingRight: vw(33),
+              fontSize: vw(16),
+              paddingLeft: vw(INPUT_PX),
+              paddingRight: vw(INPUT_PX),
               paddingTop: vw(18),
             }}
             value={formData[field.fieldName] || ""}
@@ -316,15 +330,15 @@ export function ApplicationContactFormSection({
         style={{ gap: isScope ? vw(10) : 0 }}
       >
         {isScope && (
-          <span className="font-bold text-black" style={{ fontSize: vw(20) }}>
+          <span className="font-bold text-black" style={{ fontSize: vw(16) }}>
             {field.label}
           </span>
         )}
         <input
           type={field.fieldType === "email" ? "email" : "text"}
           placeholder={field.placeholder || field.label}
-          className="w-full font-semibold text-[#3D3708] placeholder:text-[#9D9473]/60 outline-none"
-          style={{ ...commonStyles, fontSize: vw(18) }}
+          className="w-full font-semibold text-[#5E552C] placeholder:text-[#9D9473]/60 outline-none"
+          style={{ ...commonStyles, fontSize: vw(16) }}
           value={formData[field.fieldName] || ""}
           onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
         />
@@ -377,7 +391,7 @@ export function ApplicationContactFormSection({
           <div
             key={`row-${i}`}
             className="grid grid-cols-2"
-            style={{ gap: vw(gapX) }}
+            style={{ gap: vw(GAP_X) }}
           >
             {renderField(f)}
             {renderField(next)}
@@ -420,33 +434,44 @@ export function ApplicationContactFormSection({
         whileInView={{ opacity: 1, y: 0 }}
         className="relative z-10 flex backdrop-blur-[15px] mt-[60px]"
         style={{
-          width: vw(cardW),
-          height: vw(cardH),
+          width: vw(CARD_W),
+          height: vw(CARD_H),
           borderRadius: vw(59),
           backgroundColor: "rgba(255, 255, 255, 0.92)",
-          paddingLeft: vw(paddingL),
-          paddingRight: vw(paddingR),
-          paddingTop: vw(marginTopL),
+          paddingLeft: vw(PADDING_L),
+          paddingRight: vw(PADDING_R),
+          paddingTop: vw(MARGIN_TOP_L),
         }}
       >
         {/* LEFT COMPONENT */}
-        <div className="flex flex-col h-full" style={{ width: vw(leftW) }}>
+        <div className="flex flex-col h-full" style={{ width: vw(LEFT_W) }}>
           <div
             className="font-cherry-bomb italic font-black text-[#1D1A02] leading-[1.2] whitespace-pre-line block"
-            style={{ fontSize: vw(34), width: vw(leftW) }}
+            style={{ fontSize: vw(34), width: vw(LEFT_W) }}
           >
             {(() => {
               // Filter out the marker text if it's accidentally included in segments
               const displaySegments = (richText || []).filter(
-                (s) => s.text && s.text.trim().toLowerCase() !== "contact-form-title"
+                (s) =>
+                  s.text &&
+                  s.text.trim().toLowerCase() !== "contact-form-title",
               );
 
-              if (displaySegments.length > 0 && displaySegments.some((s) => s.text && s.text.trim())) {
-                return displaySegments.map((segment, i) => renderSegment(segment, i));
+              if (
+                displaySegments.length > 0 &&
+                displaySegments.some((s) => s.text && s.text.trim())
+              ) {
+                return displaySegments.map((segment, i) =>
+                  renderSegment(segment, i),
+                );
               }
               return (
                 <span>
-                  Whether For <span className="text-[#D6CD88] font-bold">Engineering Solutions</span> Or Innovative Customization.
+                  Whether For{" "}
+                  <span className="text-[#D6CD88] font-bold">
+                    Engineering Solutions
+                  </span>{" "}
+                  Or Innovative Customization.
                 </span>
               );
             })()}
@@ -454,7 +479,7 @@ export function ApplicationContactFormSection({
 
           <div
             className="mt-auto overflow-hidden rounded-[35px] border-4 border-[#F6F4ED]"
-            style={{ width: vw(493), height: vw(314), marginBottom: vw(60) }}
+            style={{ width: vw(LEFT_W), height: vw(314), marginBottom: vw(60) }}
           >
             {displayImage ? (
               <img
@@ -472,12 +497,15 @@ export function ApplicationContactFormSection({
 
         <div
           className="h-full flex flex-col"
-          style={{ width: vw(rightW), marginTop: vw(marginTopR - marginTopL) }}
+          style={{
+            width: vw(RIGHT_W),
+            marginTop: vw(MARGIN_TOP_R - MARGIN_TOP_L),
+          }}
         >
           <form
             onSubmit={handleSubmit}
             className="flex flex-col w-full font-montserrat"
-            style={{ gap: vw(gapY) }}
+            style={{ gap: vw(GAP_Y) }}
           >
             {renderRows()}
 
@@ -504,9 +532,44 @@ export function ApplicationContactFormSection({
               </label>
             </div>
 
+            {/* Privacy Consent */}
+            {privacyText && (
+              <div
+                className="flex items-start gap-3 mt-4 cursor-pointer group"
+                onClick={() => handlePrivacyToggle(!privacyAccepted)}
+              >
+                <div
+                  className={`mt-1 flex-shrink-0 w-6 h-6 rounded border flex items-center justify-center transition-all ${
+                    privacyAccepted
+                      ? "bg-[#756F3F] border-[#756F3F]"
+                      : "border-black/30 bg-transparent"
+                  }`}
+                >
+                  {privacyAccepted && (
+                    <svg
+                      className="w-4 h-4 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  )}
+                </div>
+                <p className="text-sm leading-relaxed text-black/60 select-none text-left whitespace-pre-line font-montserrat">
+                  {privacyText}
+                </p>
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || (!!privacyText && !privacyAccepted)}
               className="w-full bg-[#756F3F] text-white font-montserrat font-bold rounded-full hover:bg-[#464010] shadow-md disabled:opacity-50 transition-all active:scale-[0.98]"
               style={{ height: vw(66), fontSize: vw(34), marginTop: vw(10) }}
             >

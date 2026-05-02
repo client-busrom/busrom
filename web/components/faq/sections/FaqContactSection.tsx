@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useState, useEffect } from "react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { CustomDropdown } from "@/components/ui/CustomDropdown";
 import { Upload } from "lucide-react";
@@ -25,6 +25,48 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [uploading, setUploading] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [privacyText, setPrivacyText] = useState<string | null>(null);
+  const STORAGE_KEY = "busrom_privacy_consent";
+
+  // Fetch form config for privacy text and other messages
+  useEffect(() => {
+    if (!formConfig?.name) return;
+    const fetchConfig = async () => {
+      try {
+        const res = await fetch(
+          `/api/form-config/${formConfig.name}?locale=${locale}`,
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (data.privacyConsentText) {
+            setPrivacyText(data.privacyConsentText);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch form config:", error);
+      }
+    };
+    fetchConfig();
+  }, [formConfig?.name, locale]);
+
+  // Sync with global storage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const consent = localStorage.getItem(STORAGE_KEY);
+      if (consent === "true") {
+        setPrivacyAccepted(true);
+      }
+    }
+  }, []);
+
+  const handlePrivacyToggle = (checked: boolean) => {
+    setPrivacyAccepted(checked);
+    if (checked && typeof window !== "undefined") {
+      localStorage.setItem(STORAGE_KEY, "true");
+      window.dispatchEvent(new Event("storage"));
+    }
+  };
 
   const titleParts = (formConfig?.displayName || "").split("\n");
   const description = formConfig?.description || "";
@@ -124,89 +166,30 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
         background: "linear-gradient(103deg, #645c1d 0%, #fff587 100%)",
       }}
     >
-      <style jsx>{`
-        textarea::-webkit-scrollbar {
-          display: none;
-        }
-        textarea {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        ::placeholder {
-          color: rgba(255, 255, 255, 0.5) !important;
-          font-family: var(--font-anaheim), sans-serif !important;
-          font-weight: 600 !important;
-        }
-        .faq-input-el {
-          color: rgba(255, 255, 255, 0.5) !important;
-          font-family: var(--font-anaheim), sans-serif !important;
-          font-weight: 600 !important;
-          font-size: vw(20) !important;
-        }
-        .faq-submit-btn {
-          transition: all 0.3s ease;
-        }
-        .faq-submit-btn:hover:not(:disabled) {
-          background-color: white !important;
-          color: #d1be2e !important;
-        }
-        .faq-upload-btn {
-          transition: all 0.3s ease;
-        }
-        .faq-upload-btn :global(.upload-icon) {
-          color: rgba(255, 255, 255, 0.7);
-          transition: color 0.3s ease;
-        }
-        .faq-upload-btn .upload-text {
-          transition: color 0.3s ease;
-        }
-        .faq-upload-btn:hover {
-          background-color: white !important;
-          border-color: white !important;
-        }
-        .faq-upload-btn:hover :global(.upload-icon),
-        .faq-upload-btn:hover .upload-text {
-          color: #645c1d !important;
-        }
-        .faq-phone-wrapper,
-        .faq-dropdown-wrapper {
-          transition: all 0.3s ease !important;
-        }
-        .faq-phone-wrapper:hover :global(.faq-phone-inner),
-        .faq-dropdown-wrapper:hover :global(.faq-dropdown-inner) {
-          /* 移除变白逻辑，仅保持轻微提亮或不动 */
-          border-color: rgba(255, 255, 255, 0.5) !important;
-        }
-        /* 移除强制黑字的变量修改 */
-        .faq-phone-wrapper:hover,
-        .faq-dropdown-wrapper:hover {
-          --text-color: rgba(255, 255, 255, 0.5) !important;
-        }
-      `}</style>
-
       <div
         className="flex w-full min-h-full"
         style={{
           paddingLeft: vw(208),
           paddingRight: vw(208),
-          paddingTop: vw(38),
+          paddingTop: vw(16),
           gap: vw(73),
         }}
       >
         {/* Left Side: Content & Form */}
         <div className="flex flex-col relative z-10" style={{ width: vw(710) }}>
           {/* Titles */}
-          <div style={{ marginBottom: vw(40) }}>
+          <div style={{ marginBottom: vw(16) }}>
             {titleParts[0] && (
               <h2
-                className="font-black leading-tight bg-clip-text text-transparent"
+                className="font-black bg-clip-text text-transparent"
                 style={{
                   fontSize: vw(96),
+                  lineHeight: 1.05,
                   backgroundImage:
                     "linear-gradient(180deg, #cabc5a 0%, #736a2c 100%)",
                   fontFamily: "var(--font-anaheim), sans-serif",
                   filter: "drop-shadow(0 1px 1px rgba(255,255,255,0.5))",
-                  marginBottom: vw(10),
+                  marginBottom: vw(4),
                 }}
               >
                 {titleParts[0].trim()}
@@ -214,9 +197,10 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
             )}
             {titleParts[1] && (
               <h3
-                className="font-black text-[#fff28d] leading-tight"
+                className="font-black text-[#fff28d]"
                 style={{
                   fontSize: vw(60),
+                  lineHeight: 1.1,
                   fontFamily: "var(--font-anaheim), sans-serif",
                 }}
               >
@@ -230,9 +214,9 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
               className="text-white font-semibold"
               style={{
                 fontSize: vw(24),
-                lineHeight: 1.7,
+                lineHeight: 1.3,
                 fontFamily: "var(--font-anaheim), sans-serif",
-                marginBottom: vw(50),
+                marginBottom: vw(16),
               }}
             >
               {description}
@@ -244,7 +228,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
             onSubmit={handleSubmit}
             className="grid grid-cols-2 items-end"
             style={{
-              gap: vw(20),
+              gap: vw(12),
               width: vw(704),
             }}
           >
@@ -283,7 +267,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                       color: "rgba(255, 255, 255, 0.5)",
                       fontFamily: "var(--font-anaheim), sans-serif",
                       fontWeight: 600,
-                      fontSize: vw(20),
+                      fontSize: vw(16),
                     }}
                     placeholder={
                       (field.required ? "* " : "") + field.placeholder
@@ -310,8 +294,8 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                         background: "rgba(33, 28, 11, 0.20)",
                         color: "rgba(255, 255, 255, 0.5)",
                       }}
-                      buttonClassName="!px-[vw(16)] !font-anaheim !text-[vw(20)] !font-semibold"
-                      itemClassName="!px-[vw(16)] !py-[vw(12)] !font-anaheim !font-semibold !text-[vw(18)] !text-white/90"
+                      buttonClassName="!px-4 !font-anaheim !font-semibold faq-dropdown-btn-text"
+                      itemClassName="!px-4 !py-3 !font-anaheim !font-semibold text-white/90"
                       listClassName="!bg-[#4d4618] !border-white/20"
                     />
                   </div>
@@ -338,12 +322,18 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                       />
                       <Upload
                         className="upload-icon transition-colors"
-                        style={{ width: vw(20), height: vw(20) }}
+                        style={{
+                          width: vw(16),
+                          height: vw(16),
+                          color: fileName
+                            ? "rgba(255, 255, 255, 0.8)"
+                            : "rgba(255, 255, 255, 0.5)",
+                        }}
                       />
                       <span
                         className="font-semibold truncate upload-text transition-colors"
                         style={{
-                          fontSize: vw(20),
+                          fontSize: vw(16),
                           color: fileName
                             ? "rgba(255, 255, 255, 0.8)"
                             : "rgba(255, 255, 255, 0.5)",
@@ -379,9 +369,9 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                         background: "rgba(33, 28, 11, 0.20)",
                         color: "rgba(255, 255, 255, 0.5)",
                       }}
-                      inputClassName="!bg-transparent !text-white/50 !font-semibold !font-anaheim !text-[vw(20)] placeholder:!text-white/50"
-                      dialCodeClassName="!font-semibold !font-anaheim !text-[vw(20)] !border-none faq-phone-text"
-                      dropdownClassName="!bg-[#3d3713] !border-white/20 !rounded-[vw(15)]"
+                      inputClassName="!bg-transparent !text-white/50 !font-semibold !font-anaheim placeholder:!text-white/50"
+                      dialCodeClassName="!font-semibold !font-anaheim !border-none faq-phone-text"
+                      dropdownClassName={`!bg-[#3d3713] !border-white/20 !rounded-[${vw(15)}]`}
                       searchInputClassName="!bg-white/5 !border-white/20 !text-white/50"
                       countryItemClassName="!text-white/80"
                       buttonClassName="!border-none faq-phone-btn"
@@ -401,7 +391,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                       color: "rgba(255, 255, 255, 0.5)",
                       fontFamily: "var(--font-anaheim), sans-serif",
                       fontWeight: 600,
-                      fontSize: vw(20),
+                      fontSize: vw(16),
                     }}
                     placeholder={
                       (field.required ? "* " : "") + field.placeholder
@@ -419,9 +409,46 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
             ))}
 
             <div className="col-span-2">
+              {/* Privacy Consent */}
+              {privacyText && (
+                <div
+                  className="flex items-start gap-3 mb-3 cursor-pointer group"
+                  onClick={() => handlePrivacyToggle(!privacyAccepted)}
+                >
+                  <div
+                    className={`mt-1 flex-shrink-0 w-6 h-6 rounded border flex items-center justify-center transition-all ${
+                      privacyAccepted
+                        ? "bg-[#d1be2e] border-[#d1be2e]"
+                        : "border-white/30 bg-transparent"
+                    }`}
+                  >
+                    {privacyAccepted && (
+                      <svg
+                        className="w-4 h-4 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <p className="text-sm leading-relaxed text-white/70 select-none text-left whitespace-pre-line">
+                    {privacyText}
+                  </p>
+                </div>
+              )}
+
               <button
                 type="submit"
-                disabled={submitting || uploading}
+                disabled={
+                  submitting || uploading || (!!privacyText && !privacyAccepted)
+                }
                 className="faq-submit-btn"
                 style={{
                   width: "100%",
@@ -432,9 +459,20 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                   fontWeight: "black",
                   color: "white",
                   fontFamily: "var(--font-anaheim), sans-serif",
-                  marginTop: vw(20),
+                  marginTop: 0,
                   border: "none",
-                  cursor: submitting || uploading ? "not-allowed" : "pointer",
+                  cursor:
+                    submitting ||
+                    uploading ||
+                    (!!privacyText && !privacyAccepted)
+                      ? "not-allowed"
+                      : "pointer",
+                  opacity:
+                    submitting ||
+                    uploading ||
+                    (!!privacyText && !privacyAccepted)
+                      ? 0.6
+                      : 1,
                 }}
               >
                 {submitting
@@ -467,7 +505,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
           className="flex pointer-events-none relative"
           style={{
             zIndex: 0,
-            marginTop: vw(21),
+            marginTop: vw(50),
           }}
         >
           {/* Hidden SVG for defining the clip path */}
@@ -498,6 +536,56 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        textarea::-webkit-scrollbar {
+          display: none;
+        }
+        textarea {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        ::placeholder {
+          color: rgba(255, 255, 255, 0.5) !important;
+          font-family: var(--font-anaheim), sans-serif !important;
+          font-weight: 600 !important;
+        }
+        .faq-input-el {
+          color: rgba(255, 255, 255, 0.5) !important;
+          font-family: var(--font-anaheim), sans-serif !important;
+          font-weight: 600 !important;
+          font-size: ${vw(16)} !important;
+        }
+        .faq-submit-btn:hover:not(:disabled) {
+          background-color: white !important;
+          color: #d1be2e !important;
+        }
+        .faq-upload-btn:hover {
+          background-color: white !important;
+          border-color: white !important;
+        }
+        .faq-upload-btn:hover :global(.upload-icon),
+        .faq-upload-btn:hover .upload-text {
+          color: #645c1d !important;
+        }
+        .faq-phone-wrapper:hover :global(.faq-phone-inner),
+        .faq-dropdown-wrapper:hover :global(.faq-dropdown-inner) {
+          border-color: rgba(255, 255, 255, 0.5) !important;
+        }
+        .faq-phone-wrapper:hover,
+        .faq-dropdown-wrapper:hover {
+          --text-color: rgba(255, 255, 255, 0.5) !important;
+        }
+        :global(.faq-phone-inner input),
+        :global(.faq-phone-text),
+        :global(.faq-dropdown-inner button span) {
+          font-size: ${vw(16)} !important;
+        }
+        :global(.faq-dropdown-inner button svg) {
+          width: ${vw(16)} !important;
+          height: ${vw(16)} !important;
+        }
+      `}</style>
     </section>
   );
 }

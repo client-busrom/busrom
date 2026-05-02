@@ -142,14 +142,16 @@ export function CtaSection({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const mergedConfig = useMemo(() => {
-    return typeof formConfig === "string" ? { id: formConfig } : formConfig || {};
+    return typeof formConfig === "string"
+      ? { id: formConfig }
+      : formConfig || {};
   }, [formConfig]);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [isGloballyAccepted, setIsGloballyAccepted] = useState(false);
   const STORAGE_KEY = "busrom_privacy_consent";
 
-  const showPrivacy = mergedConfig?.privacyConsentText && !isGloballyAccepted;
-  const SECTION_HEIGHT = showPrivacy ? 1100 : 922;
+  const showPrivacy = !!mergedConfig?.privacyConsentText;
+  const SECTION_HEIGHT = showPrivacy ? 1050 : 922;
   const IMAGE_HEIGHT = SECTION_HEIGHT;
   const IMAGE_WIDTH = 689;
   const BG_TOP_OFFSET_SCALED = 120;
@@ -496,10 +498,32 @@ export function CtaSection({
             className="w-full h-36 bg-white/5 border border-white/20 rounded-[15px] p-5 text-white text-[18px] focus:border-[#FFF28E] resize-none placeholder:text-white/40"
           />
 
-          <div className="flex flex-col gap-6 mt-4">
-            {mergedConfig?.privacyConsentText && !isGloballyAccepted && (
+          <div className="flex flex-col gap-6 mt-4 items-center">
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-3 text-white hover:text-[#FFF28E] transition-all w-fit border border-white/20 rounded-full px-6 py-2.5 hover:bg-white/5"
+            >
+              <Upload className="w-5 h-5" />
+              <span
+                className="text-[18px] font-bold uppercase tracking-widest"
+                style={{ fontFamily: "var(--font-anaheim)" }}
+              >
+                {uploadedFile
+                  ? uploadedFile.name
+                  : getTranslation(getField("file")?.label)}
+              </span>
+            </button>
+
+            {mergedConfig?.privacyConsentText && (
               <div
-                className="flex items-start gap-3 cursor-pointer"
+                className="flex items-start gap-3 cursor-pointer w-full max-w-[320px]"
                 onClick={() => handlePrivacyToggle(!privacyAccepted)}
               >
                 <div
@@ -518,63 +542,39 @@ export function CtaSection({
               </div>
             )}
 
-            <div className="flex flex-col gap-6 items-center">
-              <input
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                onChange={handleFileChange}
-              />
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-3 text-white hover:text-[#FFF28E] transition-colors w-fit"
-              >
-                <Upload className="w-5 h-5" />
-                <span
-                  className="text-[18px] font-bold uppercase tracking-widest"
-                  style={{ fontFamily: "var(--font-anaheim)" }}
-                >
-                  {uploadedFile
-                    ? uploadedFile.name
-                    : getTranslation(getField("file")?.label)}
-                </span>
-              </button>
-
-              <motion.button
-                type="submit"
-                initial={{ scale: 1 }}
-                animate={{ scale: [1, 1.3, 1] }}
-                transition={{
-                  duration: 1,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                whileHover={{
-                  scale: 1.1,
-                  transition: { duration: 0.2 },
-                  boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
-                }}
-                whileTap={{ scale: 0.96, transition: { duration: 0.1 } }}
-                disabled={
-                  isSubmitting ||
+            <motion.button
+              type="submit"
+              initial={{ scale: 1 }}
+              animate={{ scale: [1, 1.3, 1] }}
+              transition={{
+                duration: 1,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              whileHover={{
+                scale: 1.1,
+                transition: { duration: 0.2 },
+                boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+              }}
+              whileTap={{ scale: 0.96, transition: { duration: 0.1 } }}
+              disabled={
+                isSubmitting ||
+                (!!mergedConfig?.privacyConsentText && !privacyAccepted)
+              }
+              className={cn(
+                "w-full max-w-[320px] bg-[#B2A224] text-white text-[24px] font-black rounded-full shadow-lg transition-colors duration-300",
+                "h-14 flex items-center justify-center",
+                isSubmitting ||
                   (!!mergedConfig?.privacyConsentText && !privacyAccepted)
-                }
-                className={cn(
-                  "w-full max-w-[320px] bg-[#B2A224] text-white text-[24px] font-black rounded-full shadow-lg transition-colors duration-300",
-                  "h-14 flex items-center justify-center",
-                  isSubmitting ||
-                    (!!mergedConfig?.privacyConsentText && !privacyAccepted)
-                    ? "grayscale opacity-80 cursor-not-allowed"
-                    : "hover:bg-white hover:text-[#B2A224]",
-                )}
-                style={{ fontFamily: "var(--font-anaheim)" }}
-              >
-                {isSubmitting
-                  ? getTranslation(mergedConfig?.submittingText)
-                  : getTranslation(mergedConfig?.submitButtonText)}
-              </motion.button>
-            </div>
+                  ? "grayscale opacity-80 cursor-not-allowed"
+                  : "hover:bg-white hover:text-[#B2A224]",
+              )}
+              style={{ fontFamily: "var(--font-anaheim)" }}
+            >
+              {isSubmitting
+                ? getTranslation(mergedConfig?.submittingText)
+                : getTranslation(mergedConfig?.submitButtonText)}
+            </motion.button>
           </div>
         </form>
       </div>
@@ -732,44 +732,8 @@ export function CtaSection({
               />
             </div>
 
-            <div className="mt-8 flex flex-col gap-6 w-[773px]">
-              {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
-              {mergedConfig?.privacyConsentText && !isGloballyAccepted && (
-                <div
-                  className="flex items-start gap-4 cursor-pointer group"
-                  onClick={() => handlePrivacyToggle(!privacyAccepted)}
-                >
-                  <div
-                    className={cn(
-                      "mt-1 flex-shrink-0 w-6 h-6 rounded border flex items-center justify-center transition-all",
-                      privacyAccepted
-                        ? "bg-[#B2A224] border-[#B2A224]"
-                        : "border-white/30 bg-black/30",
-                    )}
-                  >
-                    {privacyAccepted && (
-                      <svg
-                        className="w-4 h-4 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={4}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    )}
-                  </div>
-                  <p className="text-[18px] leading-relaxed text-white/70 max-w-[700px] whitespace-pre-line select-none text-left">
-                    {getTranslation(mergedConfig.privacyConsentText)}
-                  </p>
-                </div>
-              )}
-
-              <div className="flex flex-col gap-8 w-full">
+            <div className="flex flex-col gap-4 w-[773px]">
+              <div className="flex flex-col gap-4 w-full">
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -779,7 +743,7 @@ export function CtaSection({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-4 text-white hover:text-[#FFF28E] transition-colors w-fit"
+                  className="flex items-center gap-4 text-white hover:text-[#FFF28E] transition-all w-fit border border-white/20 rounded-full px-8 py-3.5 hover:bg-white/5"
                 >
                   <Upload className="w-8 h-8" />
                   <span
@@ -791,6 +755,42 @@ export function CtaSection({
                       : getTranslation(getField("file")?.label)}
                   </span>
                 </button>
+
+                {/* Privacy Consent Checkbox - Always show if text is present */}
+                {mergedConfig?.privacyConsentText && (
+                  <div
+                    className="flex items-start gap-4 cursor-pointer group"
+                    onClick={() => handlePrivacyToggle(!privacyAccepted)}
+                  >
+                    <div
+                      className={cn(
+                        "mt-1 flex-shrink-0 w-6 h-6 rounded border flex items-center justify-center transition-all",
+                        privacyAccepted
+                          ? "bg-[#B2A224] border-[#B2A224]"
+                          : "border-white/30 bg-black/30",
+                      )}
+                    >
+                      {privacyAccepted && (
+                        <svg
+                          className="w-4 h-4 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={4}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                    <p className="text-[18px] leading-relaxed text-white/70 max-w-[700px] whitespace-pre-line select-none text-left">
+                      {getTranslation(mergedConfig.privacyConsentText)}
+                    </p>
+                  </div>
+                )}
 
                 <motion.button
                   type="submit"

@@ -516,7 +516,7 @@ export function ContactFormSection({
                         borderRadius: vw(12),
                         paddingLeft: vw(24),
                         paddingRight: vw(40),
-                        fontSize: vw(18),
+                        fontSize: vw(16),
                       }}
                     >
                       <option value="" className="text-black">Select Country/Region...</option>
@@ -550,7 +550,7 @@ export function ContactFormSection({
                     backgroundColor: "#B4A25F",
                     border: "1px solid rgba(255, 255, 255, 0.34)",
                     paddingLeft: vw(24),
-                    fontSize: vw(18),
+                    fontSize: vw(16),
                     lineHeight: vw(36),
                     color: "white",
                   }}
@@ -578,7 +578,7 @@ export function ContactFormSection({
                   paddingLeft: vw(24),
                   paddingRight: vw(24),
                   paddingTop: vw(14),
-                  fontSize: vw(18),
+                  fontSize: vw(16),
                   lineHeight: vw(22),
                   color: "white",
                 }}
@@ -599,7 +599,7 @@ export function ContactFormSection({
               style={{
                 width: vw(486), height: vw(50), borderRadius: vw(12),
                 backgroundColor: "#B4A25F", border: "1px solid rgba(255, 255, 255, 0.34)",
-                paddingLeft: vw(24), fontSize: vw(18), lineHeight: vw(36), color: "white",
+                paddingLeft: vw(24), fontSize: vw(16), lineHeight: vw(36), color: "white",
               }}
               required
               disabled={isSubmitting}
@@ -613,7 +613,7 @@ export function ContactFormSection({
               style={{
                 width: vw(486), height: vw(50), borderRadius: vw(12),
                 backgroundColor: "#B4A25F", border: "1px solid rgba(255, 255, 255, 0.34)",
-                paddingLeft: vw(24), fontSize: vw(18), lineHeight: vw(36), color: "white",
+                paddingLeft: vw(24), fontSize: vw(16), lineHeight: vw(36), color: "white",
               }}
               required
               disabled={isSubmitting}
@@ -642,7 +642,7 @@ export function ContactFormSection({
                   borderRadius: vw(12),
                   paddingLeft: vw(24),
                   paddingRight: vw(40),
-                  fontSize: vw(18),
+                  fontSize: vw(16),
                 }}
               >
                 <option value="" className="text-black">Select Country/Region...</option>
@@ -668,7 +668,7 @@ export function ContactFormSection({
                 width: vw(486), minHeight: vw(100), maxHeight: vw(250), borderRadius: vw(12),
                 backgroundColor: "#B4A25F", border: "1px solid rgba(255, 255, 255, 0.34)",
                 paddingLeft: vw(24), paddingRight: vw(24), paddingTop: vw(14),
-                fontSize: vw(18), lineHeight: vw(22), color: "white",
+                fontSize: vw(16), lineHeight: vw(22), color: "white",
               }}
               disabled={isSubmitting}
             />
@@ -735,7 +735,7 @@ export function ContactFormSection({
         )}
 
         {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
-        {effectivePrivacyText && !isGloballyAccepted && (
+        {effectivePrivacyText && (
           <div className="flex items-start gap-2 my-2 group cursor-pointer" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
             <div className={cn(
               "mt-1 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",
@@ -756,7 +756,7 @@ export function ContactFormSection({
         {/* Submit 按钮 */}
         <button
           type="submit"
-          disabled={isSubmitting || (!!formConfig?.privacyConsentText && !privacyAccepted)}
+          disabled={isSubmitting || (!!effectivePrivacyText && !privacyAccepted)}
           className={cn(
             "font-anaheim font-semibold text-white transition-all duration-300 disabled:opacity-50 hover:bg-[#5A4800] hover:scale-[1.02] hover:shadow-lg",
             "h-auto whitespace-pre-line leading-tight px-6 py-4",

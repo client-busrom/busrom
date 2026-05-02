@@ -195,6 +195,8 @@ export interface ContactFormData {
   helperText: string      // "Share your needs..."
   productImages: any[]    // Tilted product images on the left
   privacyConsentText?: string // Global privacy consent text
+  formId?: string         // Dynamic form ID from contact-form-block marker
+  formConfig?: any        // Full form configuration object
 }
 
 export interface MoreSeriesItem {
@@ -905,136 +907,103 @@ function parseContactForm(
   let helperText = 'Share your needs, we will provide you with the best solution and quotation.'
   let privacyConsentText = ''
   const productImages: any[] = []
+  let formId = ''
+  let formConfig: any = null
 
   let currentField: string | null = null
 
   for (const node of nodes) {
-    // Check for field markers
+    // Check for field markers (code format paragraph)
     if (node.type === 'paragraph') {
       const text = extractText(node).trim()
-      if (text === 'contact-form-title' || text === 'contact-form-helper' ||
-          text === 'contact-form-images' || text === 'contact-form-image' || text === 'contact-form-bg-image' ||
-          text === 'contact-form-privacy-consent') {
+      if (text === 'contact-form-title' || text === 'contact-form-subtitle' ||
+          text === 'contact-form-description' || text === 'contact-form-image' || 
+          text === 'contact-form-bg-image' || text === 'contact-form-privacy-consent' ||
+          text === 'contact-form-block') {
         currentField = text
         continue
       }
     }
 
-    // Parse title area
-    if (currentField === 'contact-form-title') {
-      if (node.type === 'heading') {
-        title = extractText(node)
-      }
+    // Parse based on marker
+    if (currentField === 'contact-form-title' && (node.type === 'heading' || node.type === 'paragraph')) {
+      title = extractText(node)
+      currentField = null
     }
 
-    // Parse background image
+    if (currentField === 'contact-form-subtitle' && (node.type === 'heading' || node.type === 'paragraph')) {
+      helperTitle = extractText(node)
+      currentField = null
+    }
+
+    if (currentField === 'contact-form-description' && node.type === 'paragraph') {
+      helperText = extractText(node)
+      currentField = null
+    }
+
     if (currentField === 'contact-form-bg-image') {
-      // Support singleImage type
-      if (node.type === 'singleImage' && 'data' in node) {
-        const singleImg = node as { type: 'singleImage'; data: { image: { id: string } } }
+      if (node.type === 'upload' && 'value' in node) {
+        const uploadNode = node as any
+        const id = uploadNode.value?.id || uploadNode.value
+        if (id) {
+          backgroundImage = mediaMap.get(id) || `/api/media/${id}`
+          currentField = null
+        }
+      } else if (node.type === 'singleImage' && 'data' in node) {
+        const singleImg = node as any
         if (singleImg.data?.image?.id) {
           backgroundImage = mediaMap.get(singleImg.data.image.id) || `/api/media/${singleImg.data.image.id}`
+          currentField = null
         }
-      }
-      // Also support custom-image-gallery
-      if (node.type === 'custom-image-gallery') {
+      } else if (node.type === 'custom-image-gallery') {
         const gallery = node as LexicalImageGalleryNode
         if (gallery.data.images.length > 0) {
           const img = gallery.data.images[0]
           backgroundImage = mediaMap.get(img.image) || `/api/media/${img.image}`
+          currentField = null
         }
       }
     }
 
-    // Parse helper text area
-    if (currentField === 'contact-form-helper') {
-      if (node.type === 'heading') {
-        helperTitle = extractText(node)
-      }
-      if (node.type === 'paragraph') {
-        const text = extractText(node).trim()
-        if (text && text !== 'contact-form-helper') {
-          helperText = text
+    if (currentField === 'contact-form-image') {
+      if (node.type === 'upload' && 'value' in node) {
+        const uploadNode = node as any
+        const id = uploadNode.value?.id || uploadNode.value
+        if (id) {
+          productImages.push(mediaMap.get(id) || `/api/media/${id}`)
+          currentField = null
         }
-      }
-    }
-
-    // Parse privacy consent text area
-    if (currentField === 'contact-form-privacy-consent') {
-      if (node.type === 'paragraph') {
-        const text = extractText(node).trim()
-        if (text && text !== 'contact-form-privacy-consent') {
-          privacyConsentText = text
+      } else if (node.type === 'singleImage' && 'data' in node) {
+        const singleImg = node as any
+        if (singleImg.data?.image?.id) {
+          productImages.push(mediaMap.get(singleImg.data.image.id) || `/api/media/${singleImg.data.image.id}`)
+          currentField = null
         }
-      }
-    }
-
-    // Parse product images (tilted images on the left)
-    if (currentField === 'contact-form-images' || currentField === 'contact-form-image') {
-      if (node.type === 'custom-image-gallery') {
+      } else if (node.type === 'custom-image-gallery') {
         const gallery = node as LexicalImageGalleryNode
         for (const img of gallery.data.images) {
           const url = mediaMap.get(img.image) || `/api/media/${img.image}`
           productImages.push(url)
         }
-      }
-      if (node.type === 'carousel') {
-        const carousel = node as LexicalCarouselNode
-        for (const slide of carousel.data.slides) {
-          const imageUrl = mediaMap.get(slide.image.id) || `/api/media/${slide.image.id}`
-          productImages.push(imageUrl)
-        }
+        currentField = null
       }
     }
 
-    // Parse block nodes (sidebar layout) - extract title, helper text, and images from mainContent
-    if (node.type === 'block' && 'fields' in node) {
-      const blockNode = node as { type: 'block'; fields: { mainContent?: { root?: { children?: LexicalNode[] } } } }
-      const mainContentChildren = blockNode.fields?.mainContent?.root?.children || []
-      let blockField: string | null = null
-      for (const child of mainContentChildren) {
-        // Check for field markers inside the block
-        if (child.type === 'paragraph') {
-          const text = extractText(child).trim()
-          if (text === 'contact-form-title' || text === 'contact-form-helper' ||
-              text === 'contact-form-images' || text === 'contact-form-image' || text === 'contact-form-bg-image' || 
-              text === 'contact-form-privacy-consent') {
-            blockField = text
-            continue
-          }
-        }
+    if (currentField === 'contact-form-privacy-consent' && node.type === 'paragraph') {
+      privacyConsentText = extractText(node)
+      currentField = null
+    }
 
-        // Extract title from h1
-        if (child.type === 'heading' && (child as LexicalHeadingNode).tag === 'h1') {
-          title = extractText(child)
-        }
-        // Extract helper title from h2
-        if (child.type === 'heading' && (child as LexicalHeadingNode).tag === 'h2') {
-          helperTitle = extractText(child)
-        }
-        // Extract helper text from paragraph (only if not a marker and current field is helper)
-        if (child.type === 'paragraph') {
-          const text = extractText(child).trim()
-          // If we're in helper section or no section yet, and not a marker, treat as helper text
-          if (text && (!blockField || blockField === 'contact-form-helper')) {
-            helperText = text
-          }
-          if (text && blockField === 'contact-form-privacy-consent') {
-            privacyConsentText = text
-          }
-        }
-        // Extract product images
-        if (child.type === 'custom-image-gallery') {
-          // If a marker was used, only use this gallery if it's the images marker
-          if (blockField === 'contact-form-images' || blockField === 'contact-form-image' || !blockField) {
-            const gallery = child as LexicalImageGalleryNode
-            for (const img of gallery.data.images) {
-              const url = mediaMap.get(img.image) || `/api/media/${img.image}`
-              productImages.push(url)
-            }
-          }
-        }
+    if (currentField === 'contact-form-block' && node.type === 'formBlock') {
+      const formBlock = node as any;
+      const rawFormConfig = formBlock.data?.formConfig;
+      // Extract ID
+      formId = rawFormConfig?.id || (typeof rawFormConfig === 'string' ? rawFormConfig : '');
+      // Extract full config if available
+      if (rawFormConfig && typeof rawFormConfig === 'object' && rawFormConfig.fields) {
+        formConfig = rawFormConfig;
       }
+      currentField = null
     }
   }
 
@@ -1044,7 +1013,9 @@ function parseContactForm(
     helperTitle,
     helperText,
     productImages,
-    privacyConsentText
+    privacyConsentText,
+    formId,
+    formConfig
   }
 }
 

@@ -64,7 +64,7 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
 
       ctx = gsap.context(() => {
         const sections = document.querySelectorAll("[data-header-theme]");
-        
+
         // --- 立即检测逻辑：确保初始化时主题正确 ---
         let detectedTheme: string | null = null;
         sections.forEach((section) => {
@@ -83,14 +83,14 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
 
           ScrollTrigger.create({
             trigger: section,
-            start: "top 46px",    // 46px 是 header 的大致高度
+            start: "top 46px", // 46px 是 header 的大致高度
             end: "bottom 46px",
             onEnter: () => setTheme(theme as any),
             onEnterBack: () => setTheme(theme as any),
             // 确保在刷新或初次加载时激活正确的主题
             onRefresh: (self) => {
               if (self.isActive) setTheme(theme as any);
-            }
+            },
           });
         });
       });
@@ -101,8 +101,13 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
 
     // 2. 监听 DOM 结构变化 (如 DeferredContent 加载新板块)
     mutationObserver = new MutationObserver((mutations) => {
-      const hasRelevantChanges = mutations.some(m => 
-        Array.from(m.addedNodes).some(n => n instanceof Element && (n.hasAttribute('data-header-theme') || n.querySelector('[data-header-theme]')))
+      const hasRelevantChanges = mutations.some((m) =>
+        Array.from(m.addedNodes).some(
+          (n) =>
+            n instanceof Element &&
+            (n.hasAttribute("data-header-theme") ||
+              n.querySelector("[data-header-theme]")),
+        ),
       );
       if (hasRelevantChanges) {
         initScrollTrigger(); // 重新扫描新加入的板块
@@ -143,7 +148,7 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
       <header
         ref={headerRef}
         className={cn(
-          "fixed top-0 left-0 right-0 w-full z-[70] transition-all duration-300 ease-in-out",
+          "fixed top-0 left-0 right-0 w-full max-w-[1920px] z-[70] transition-all duration-300 ease-in-out",
           headerBgColor,
           headerShadow,
         )}

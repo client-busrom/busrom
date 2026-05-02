@@ -683,7 +683,7 @@ export function FullInquiryModal({
           )}
 
           {/* Privacy Consent Checkbox - Only show if not already globally accepted */}
-          {effectivePrivacyText && !isGloballyAccepted && (
+          {effectivePrivacyText && (
             <div className="flex items-start gap-2 group cursor-pointer" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
               <div className={cn(
                 "mt-0.5 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",

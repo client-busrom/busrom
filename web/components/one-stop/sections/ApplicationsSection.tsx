@@ -138,7 +138,7 @@ export function ApplicationsSection({
 
   return (
     <section
-      className={`relative w-full bg-[#F6F4ED] flex flex-col items-center overflow-hidden ${isMobile ? "py-10 h-[650px]" : "lg:py-0 lg:h-[1080px]"}`}
+      className={`relative w-full bg-[#F6F4ED] flex flex-col items-center overflow-hidden ${isMobile ? "py-10 h-[650px]" : "lg:py-0 lg:h-[880px]"}`}
     >
       <style jsx>{`
         .embla__viewport {
@@ -159,7 +159,7 @@ export function ApplicationsSection({
       `}</style>
 
       <div
-        className={`relative w-full max-w-[1920px] flex-shrink-0 z-10 ${isMobile ? "h-[650px]" : "h-[1080px]"}`}
+        className={`relative w-full max-w-[1920px] flex-shrink-0 z-10 ${isMobile ? "h-[650px]" : "h-[880px]"}`}
       >
         {/* Background Circles - Hidden on mobile */}
         {!isMobile && (

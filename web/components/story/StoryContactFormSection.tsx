@@ -117,6 +117,8 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [extraHeight, setExtraHeight] = useState(0)
+  const [privacyHeight, setPrivacyHeight] = useState(0)
+  const privacyRef = useRef<HTMLDivElement>(null)
 
   const getLocalizedString = (value: any, loc: string) => {
     if (!value) return null;
@@ -172,6 +174,7 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
     return () => observer.disconnect()
   }, [])
 
+
   const mergedConfig = useMemo(() => {
     return typeof formConfig === "string" ? { id: formConfig } : formConfig || {};
   }, [formConfig]);
@@ -179,6 +182,23 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
   const effectivePrivacyText = useMemo(() => {
     return getLocalizedString(mergedConfig?.privacyConsentText, locale || 'en');
   }, [mergedConfig, locale]);
+
+  useEffect(() => {
+    if (!effectivePrivacyText) {
+      setPrivacyHeight(0)
+      return
+    }
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        // mt-2 is roughly 8px, adding it to the tracked height
+        setPrivacyHeight(entry.contentRect.height + 8)
+      }
+    })
+    if (privacyRef.current) {
+      observer.observe(privacyRef.current)
+    }
+    return () => observer.disconnect()
+  }, [effectivePrivacyText])
 
   const effectiveSubmitText = useMemo(() => {
     return getLocalizedString(mergedConfig?.submitButtonText, locale || 'en');
@@ -313,7 +333,7 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
       id="contact-form"
       className="relative w-full overflow-hidden" 
       style={{ 
-        height: `calc(${vw(983)} + ${extraHeight}px)`,
+        height: `calc(${vw(983)} + ${extraHeight}px + ${privacyHeight}px)`,
         background: "linear-gradient(to bottom, #756f3f 0%, #dbd076 180%)"
       }}
     >
@@ -464,7 +484,7 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
                           width: vw(366), minHeight: vw(103), maxHeight: vw(250), borderRadius: vw(15),
                           backgroundColor: "#746d37", border: "1px solid rgba(255, 255, 255, 0.34)",
                           paddingLeft: vw(23), paddingRight: vw(23), paddingTop: vw(20),
-                          fontSize: vw(20), lineHeight: vw(24),
+                          fontSize: vw(16), lineHeight: vw(24),
                         }}
                         required={field.required}
                         disabled={isSubmitting}
@@ -506,7 +526,7 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
                           required={field.required}
                           className="font-anaheim font-semibold appearance-none bg-[#746d37] border border-white/34 text-white w-full placeholder:text-white/50 focus:outline-none focus:border-white transition-colors"
                           style={{
-                            height: vw(63), borderRadius: vw(15), paddingLeft: vw(23), paddingRight: vw(40), fontSize: vw(20),
+                            height: vw(63), borderRadius: vw(15), paddingLeft: vw(23), paddingRight: vw(40), fontSize: vw(16),
                           }}
                         >
                           <option value="" className="text-black">Select Country/Region...</option>
@@ -531,7 +551,7 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
                       className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none focus:border-white transition-colors"
                       style={{
                         width: vw(366), height: vw(63), borderRadius: vw(15), backgroundColor: "#746d37",
-                        border: "1px solid rgba(255, 255, 255, 0.34)", paddingLeft: vw(23), fontSize: vw(20),
+                        border: "1px solid rgba(255, 255, 255, 0.34)", paddingLeft: vw(23), fontSize: vw(16),
                       }}
                       required={field.required}
                       disabled={isSubmitting}
@@ -542,10 +562,10 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
             ) : (
               // Default Form Fields if backend form config is missing
               <>
-                <input type="text" placeholder="Your Name *" required value={formData.name || ""} onChange={(e) => handleInputChange("name", e.target.value)} className="w-[366px] h-[63px] bg-[#746d37] border border-white/34 rounded-[15px] px-[23px] text-white placeholder:text-white/50 outline-none" style={{ width: vw(366), height: vw(63), borderRadius: vw(15), paddingLeft: vw(23), fontSize: vw(20) }} />
-                <input type="email" placeholder="Your Email *" required value={formData.email || ""} onChange={(e) => handleInputChange("email", e.target.value)} className="w-[366px] h-[63px] bg-[#746d37] border border-white/34 rounded-[15px] px-[23px] text-white placeholder:text-white/50 outline-none" style={{ width: vw(366), height: vw(63), borderRadius: vw(15), paddingLeft: vw(23), fontSize: vw(20) }} />
-                <input type="text" placeholder="Your WhatsApp" value={formData.whatsapp || ""} onChange={(e) => handleInputChange("whatsapp", e.target.value)} className="w-[366px] h-[63px] bg-[#746d37] border border-white/34 rounded-[15px] px-[23px] text-white placeholder:text-white/50 outline-none" style={{ width: vw(366), height: vw(63), borderRadius: vw(15), paddingLeft: vw(23), fontSize: vw(20) }} />
-                <textarea placeholder="Message" rows={4} value={formData.message || ""} onChange={(e) => handleInputChange("message", e.target.value)} className="w-[366px] min-h-[103px] bg-[#746d37] border border-white/34 rounded-[15px] px-[23px] py-[20px] text-white placeholder:text-white/50 outline-none resize-y" style={{ width: vw(366), minHeight: vw(103), borderRadius: vw(15), paddingLeft: vw(23), paddingTop: vw(20), fontSize: vw(20) }} />
+                <input type="text" placeholder="Your Name *" required value={formData.name || ""} onChange={(e) => handleInputChange("name", e.target.value)} className="w-[366px] h-[63px] bg-[#746d37] border border-white/34 rounded-[15px] px-[23px] text-white placeholder:text-white/50 outline-none" style={{ width: vw(366), height: vw(63), borderRadius: vw(15), paddingLeft: vw(23), fontSize: vw(16) }} />
+                <input type="email" placeholder="Your Email *" required value={formData.email || ""} onChange={(e) => handleInputChange("email", e.target.value)} className="w-[366px] h-[63px] bg-[#746d37] border border-white/34 rounded-[15px] px-[23px] text-white placeholder:text-white/50 outline-none" style={{ width: vw(366), height: vw(63), borderRadius: vw(15), paddingLeft: vw(23), fontSize: vw(16) }} />
+                <input type="text" placeholder="Your WhatsApp" value={formData.whatsapp || ""} onChange={(e) => handleInputChange("whatsapp", e.target.value)} className="w-[366px] h-[63px] bg-[#746d37] border border-white/34 rounded-[15px] px-[23px] text-white placeholder:text-white/50 outline-none" style={{ width: vw(366), height: vw(63), borderRadius: vw(15), paddingLeft: vw(23), fontSize: vw(16) }} />
+                <textarea placeholder="Message" rows={4} value={formData.message || ""} onChange={(e) => handleInputChange("message", e.target.value)} className="w-[366px] min-h-[103px] bg-[#746d37] border border-white/34 rounded-[15px] px-[23px] py-[20px] text-white placeholder:text-white/50 outline-none resize-y" style={{ width: vw(366), minHeight: vw(103), borderRadius: vw(15), paddingLeft: vw(23), paddingTop: vw(20), fontSize: vw(16) }} />
               </>
             )}
 
@@ -566,8 +586,12 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
             )}
 
              {/* Privacy Checkbox */}
-             {effectivePrivacyText && !isGloballyAccepted && (
-              <div className="flex items-start gap-2 mt-2 cursor-pointer" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
+             {effectivePrivacyText && (
+              <div 
+                ref={privacyRef}
+                className="flex items-start gap-2 mt-2 cursor-pointer" 
+                onClick={() => handlePrivacyToggle(!privacyAccepted)}
+              >
                 <div className={cn(
                   "mt-1 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",
                   privacyAccepted ? "bg-[#564d03] border-[#564d03]" : "border-white/30 bg-transparent"
@@ -583,7 +607,7 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
             {/* Submit Button */}
             <button
                type="submit"
-               disabled={isSubmitting || (!!effectivePrivacyText && !isGloballyAccepted && !privacyAccepted)}
+               disabled={isSubmitting || (!!effectivePrivacyText && !privacyAccepted)}
                className="w-full bg-[#564d03] text-white font-anaheim font-semibold text-center uppercase transition-all duration-300 hover:bg-black disabled:opacity-50"
                style={{ 
                  marginTop: vw(23), // to push the button down exactly as in design 
