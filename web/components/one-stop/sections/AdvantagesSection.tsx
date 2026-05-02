@@ -61,20 +61,14 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
   useEffect(() => {
     const handleResize = () => {
       const w = window.innerWidth
-      if (w < 640) {
-        // Narrower cards on MB to see neighbors
-        setLayout({ type: 'mobile', width: w * 0.75, gap: 16, padding: 0, cardH: 400 })
-      } else if (w < 1024) {
-        setLayout({ type: 'tablet', width: w * 0.45, gap: 24, padding: 0, cardH: 450 })
+      if (w < 1024) {
+        if (w < 640) {
+          setLayout({ type: 'mobile', width: w * 0.75, gap: 16, padding: 0, cardH: 400 })
+        } else {
+          setLayout({ type: 'tablet', width: w * 0.45, gap: 24, padding: 0, cardH: 450 })
+        }
       } else {
-        // Desktop: Center focus with visible side cards
-        setLayout({ 
-          type: 'desktop', 
-          width: (500 / 1920) * w, 
-          gap: (40 / 1920) * w, 
-          padding: 0, 
-          cardH: (766 / 1920) * w
-        })
+        setLayout({ type: 'desktop', width: 0, gap: 0, padding: 0, cardH: 0 })
       }
       if (emblaApi) emblaApi.reInit()
     }
@@ -87,9 +81,9 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
  
   return (
     <section 
-      className="relative w-full bg-transparent select-none py-12 lg:py-0 lg:h-[48vw]"
+      className="relative w-full bg-[#F6F4ED] select-none py-12 lg:py-0 lg:h-[52vw] min-h-[700px] flex flex-col items-center"
     >
-      <div className="flex flex-col w-full h-full justify-center">
+      <div className="flex flex-col w-full max-w-[1920px] justify-start lg:pt-[4vw]">
         
         {/* 1. Animated Background Circle (Breathing effect) */}
         <motion.div 
@@ -113,10 +107,11 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
         />
  
         {/* 2. Section Title */}
-        <div className="relative z-20 pointer-events-none px-10 lg:pl-[140px] mb-8 lg:mb-[16px] w-full lg:w-[1000px] text-center lg:text-left">
+        <div className="relative z-20 pointer-events-none px-10 lg:pl-[140px] mb-8 lg:mb-[16px] w-full lg:w-[vw(1000)] text-center lg:text-left">
           <h2 
-            className="font-semibold leading-tight tracking-tight text-[#756F3F] text-[32px] lg:text-[60px]"
+            className="font-semibold leading-tight tracking-tight text-[#756F3F] text-[32px]"
             style={{ 
+              fontSize: layout.type === 'desktop' ? vw(60) : "32px",
               fontFamily: "var(--font-anaheim)",
               background: "linear-gradient(to right, #756F3F 0%, rgba(117, 111, 63, 0.5) 100%)",
               WebkitBackgroundClip: "text",
@@ -128,13 +123,13 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
  
         {/* 3. Carousel - Embla Implementation */}
         <div 
-          className="relative w-full h-auto pb-20 overflow-hidden lg:overflow-visible" 
+          className="relative w-full h-auto pb-20 lg:pb-0 overflow-hidden" 
           ref={emblaRef}
         >
             <div
-                className="flex relative items-stretch"
+                className="flex relative items-start"
                 style={{ 
-                    paddingLeft: layout.type === 'desktop' ? layout.padding : 0,
+                    paddingLeft: layout.type === 'desktop' ? "15vw" : 0,
                     paddingTop: layout.type === 'desktop' ? vw(50) : '20px',
                 }}
             >
@@ -152,14 +147,13 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
                         opacity: isActive ? 1 : 0.8
                     }}
                     transition={{ duration: 0.5 }}
-                    className="bg-white flex-shrink-0 relative overflow-hidden flex flex-col cursor-grab active:cursor-grabbing"
+                    className="bg-white flex-shrink-0 relative overflow-hidden flex flex-col cursor-grab active:cursor-grabbing shadow-lg"
                     style={{ 
-                        width: layout.width,
-                        minHeight: layout.cardH,
-                        height: 'auto',
-                        borderRadius: vw(21), 
-                        padding: layout.type === 'desktop' ? vw(30) : "24px",
-                        marginRight: layout.gap,     
+                        width: layout.type === 'desktop' ? vw(500) : layout.width,
+                        height: layout.type === 'desktop' ? vw(720) : layout.cardH,
+                        borderRadius: layout.type === 'desktop' ? vw(30) : "24px", 
+                        padding: layout.type === 'desktop' ? vw(35) : "24px",
+                        marginRight: layout.type === 'desktop' ? vw(40) : layout.gap,     
                     }}
                     onClick={() => scrollTo(idx)}
                     >
@@ -192,8 +186,8 @@ export function AdvantagesSection({ title, advantages }: AdvantagesSectionProps)
                         className="rounded-[20px] lg:rounded-[30px] shadow-[0_31px_38.4px_rgba(0,0,0,0.17)] overflow-hidden bg-gray-50 pointer-events-none"
                         style={{ 
                         width: "100%", 
-                        height: layout.type === 'desktop' ? vw(300) : "185px", 
-                        marginBottom: layout.type === 'desktop' ? vw(48) : "36px", 
+                        height: layout.type === 'desktop' ? vw(320) : "200px", 
+                        marginBottom: layout.type === 'desktop' ? vw(50) : "36px", 
                         }}
                     >
                         <OptimizedImage 

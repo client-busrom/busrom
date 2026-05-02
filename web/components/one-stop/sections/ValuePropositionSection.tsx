@@ -19,6 +19,9 @@ interface ValuePropositionProps {
   interval?: number
 }
 
+// Viewport width conversion utility based on 1920px design width
+const vw = (px: number) => `${(px / 1920) * 100}vw`
+
 /**
  * ValuePropositionSection - The Value of One-Stop Procurement
  */
@@ -48,11 +51,11 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
   if (data.length === 0) return null
 
   return (
-    <section className="relative w-full overflow-hidden bg-transparent flex justify-center items-center py-12 lg:py-0 lg:h-[922px]">
+    <section className="relative w-full overflow-hidden bg-transparent flex justify-center items-center py-12 lg:py-0 lg:h-[46vw] min-h-[600px]">
       
       {/* Unified Container */}
       <div 
-        className="relative w-full max-w-[1920px] h-auto lg:h-[850px] flex-shrink-0 flex flex-col lg:block"
+        className="relative w-full max-w-[1920px] h-auto lg:h-[42vw] flex-shrink-0 flex flex-col lg:block"
       >
         
         {/* === MOBILE ONLY CONTENT (< 1024px) === */}
@@ -96,13 +99,13 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
         {/* 1. Header Area */}
         <div 
            className="hidden lg:block absolute z-50 text-left"
-           style={{ left: "10vw", top: 0, width: "1000px" }}
+           style={{ left: "10vw", top: vw(40), width: vw(1000) }}
         >
           <h2 
             className="font-extrabold leading-[1.1] text-[#78713A] tracking-[0.05em]"
             style={{ 
               fontFamily: "var(--font-anaheim)",
-              fontSize: "64px"
+              fontSize: vw(64)
             }}
             dangerouslySetInnerHTML={{ __html: (title || "The Value Of One-Stop<br />Procurement").replace(/\n/g, '<br />') }}
           />
@@ -111,7 +114,7 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
         {/* 2. Sub-indicator Area */}
         <div 
           className="hidden lg:flex absolute flex-col items-end z-50 pointer-events-none"
-          style={{ right: "7.8vw", top: "40px" }}
+          style={{ right: "7.8vw", top: vw(60) }}
         >
            <div className="relative mb-2">
              <motion.div 
@@ -121,13 +124,13 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
                }}
                transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
                className="bg-[#EDEBD8] rounded-full absolute -top-4 right-[64px] -z-10 opacity-70" 
-               style={{ width: "80px", height: "80px" }}
+               style={{ width: vw(80), height: vw(80) }}
              />
              <h3 
                className="font-semibold leading-tight text-[#756F3F] text-right opacity-60"
                style={{ 
                  fontFamily: "var(--font-anaheim)",
-                 fontSize: "32px"
+                 fontSize: vw(32)
                }}
                dangerouslySetInnerHTML={{ __html: (subtitle || "Problems<br />To Be Solved").replace(/\n/g, '<br />') }}
              />
@@ -139,31 +142,31 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
           className="hidden lg:block absolute pointer-events-none" 
           style={{ 
             left: "15.6vw", 
-            top: "180px", 
-            width: "700px", 
-            height: "500px" 
+            top: vw(180), 
+            width: vw(700), 
+            height: vw(500) 
           }}
         >
           {/* Static Background Box - z-0 to stay behind scrolling images */}
           <div 
             className="absolute inset-0 shadow-[0_40px_35px_rgba(0,0,0,0.04)] bg-gradient-to-b from-[#F6F4ED] to-white z-0"
-            style={{ borderRadius: "30px" }}
+            style={{ borderRadius: vw(30) }}
           />
 
           {/* Navigation Controls - Bound to box coordinates, z-30 to be clickable above scrolling images */}
           <div 
              className="absolute flex justify-start z-30 pointer-events-auto"
              style={{ 
-               right: "20px", 
-               bottom: "80px" 
+               right: vw(20), 
+               bottom: vw(80) 
              }}
           >
             <button 
               onClick={handlePrev} 
               className="group flex items-center justify-center bg-transparent transition-colors"
-              style={{ width: "78px", height: "77px" }}
+              style={{ width: vw(78), height: vw(77) }}
             >
-              <svg width="42px" height="42px" viewBox="0 0 78 77" fill="none">
+              <svg width={vw(42)} height={vw(42)} viewBox="0 0 78 77" fill="none">
                 <path 
                   d="M30.4609 38.4697L45.6807 53.3662L47.8604 51.1514L35.0645 38.4697L47.8604 25.7881L45.6807 23.5732L30.4609 38.4697Z" 
                   className="fill-[#B0B0B0] group-hover:fill-[#756F3F] transition-colors duration-300"
@@ -173,9 +176,9 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
             <button 
               onClick={handleNext} 
               className="group flex items-center justify-center bg-transparent transition-colors"
-              style={{ width: "78px", height: "77px" }}
+              style={{ width: vw(78), height: vw(77) }}
             >
-              <svg width="42px" height="42px" viewBox="0 0 78 77" fill="none">
+              <svg width={vw(42)} height={vw(42)} viewBox="0 0 78 77" fill="none">
                 <path 
                   d="M47.5391 38.4697L32.3193 53.3662L30.1396 51.1514L42.9355 38.4697L30.1396 25.7881L32.3193 23.5732L47.5391 38.4697Z" 
                   className="fill-[#B0B0B0] group-hover:fill-[#756F3F] transition-colors duration-300"
@@ -189,8 +192,8 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
         <div className="hidden lg:block absolute inset-0 z-10">
           <motion.div 
             className="absolute flex"
-            style={{ top: "220px", left: "18.2vw" }}
-            animate={{ x: -(currentIndex * 420) }}
+            style={{ top: vw(220), left: "18.2vw" }}
+            animate={{ x: `-${currentIndex * (420 / 1920) * 100}vw` }} 
             transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
           >
             {data.map((item, idx) => (
@@ -198,10 +201,10 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
                 key={idx}
                 className="overflow-hidden shadow-lg flex-shrink-0 relative group cursor-pointer"
                 style={{ 
-                  width: "400px", 
-                  height: "260px", 
-                  marginRight: "20px",
-                  borderRadius: "30px" 
+                  width: vw(400), 
+                  height: vw(260), 
+                  marginRight: vw(20),
+                  borderRadius: vw(30) 
                 }}
                 onClick={() => setCurrentIndex(idx)}
               >
@@ -215,7 +218,7 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
                   <motion.div 
                     layoutId="active-border"
                     className="absolute inset-0 border-[#756F3F] z-10"
-                    style={{ borderWidth: "4px", borderRadius: "30px" }}
+                    style={{ borderWidth: vw(4), borderRadius: vw(30) }}
                   />
                 )}
               </div>
@@ -225,7 +228,7 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
           {/* 5. Active Text */}
           <div 
              className="absolute text-left"
-             style={{ left: "19.2vw", top: "520px", width: "450px" }}
+             style={{ left: "19.2vw", top: vw(520), width: vw(450) }}
           >
             <AnimatePresence mode="wait">
               <motion.p
@@ -237,7 +240,7 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
                 className="font-semibold leading-relaxed text-black"
                 style={{ 
                   fontFamily: "var(--font-anaheim)",
-                  fontSize: "20px"
+                  fontSize: vw(20)
                 }}
               >
                 {data[currentIndex].description}
@@ -282,21 +285,21 @@ export function ValuePropositionSection({ title, subtitle, problems, advantages,
                  className="block font-bold text-[#D7D1A8] leading-none"
                  style={{ 
                    fontFamily: "var(--font-anaheim)",
-                   fontSize: "100px"
+                   fontSize: vw(100)
                  }}
                >
                  0{currentIndex + 1}
                </motion.span>
              </AnimatePresence>
-
+ 
              {/* Decorative Slash - Positioned relative to the number */}
              <div 
                 className="absolute bg-[#D7D1A8] origin-bottom rotate-[44deg] z-10" 
                 style={{ 
-                  right: "150px", 
-                  bottom: "40px", 
-                  width: "3px", 
-                  height: "120px" 
+                  right: vw(150), 
+                  bottom: vw(40), 
+                  width: vw(3), 
+                  height: vw(120) 
                 }}
               />
           </div>
