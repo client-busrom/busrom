@@ -1,70 +1,79 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { OptimizedImage } from "@/components/ui/OptimizedImage"
+import React, { useState } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // 设计稿基准尺寸 (已按0.7缩放)
-const DESIGN_WIDTH = 1920
-const DESIGN_HEIGHT = 645 // 922 * 0.7
+const DESIGN_WIDTH = 1920;
+const DESIGN_HEIGHT = 645; // 922 * 0.7
 
 // 响应式尺寸函数
-const rpx = (designValue: number) => `calc(var(--rpx-service-intro) * ${designValue})`
+const rpx = (designValue: number) =>
+  `calc(var(--rpx-service-intro) * ${designValue})`;
 
 interface MediaObject {
-  id: string
-  url: string
-  alt?: string
+  id: string;
+  url: string;
+  alt?: string;
   variants?: {
-    thumbnail?: string
-    small?: string
-    medium?: string
-    large?: string
-    xlarge?: string
-  }
-  cropFocalPoint?: { x: number; y: number } | null
-  width?: number
-  height?: number
-  enableLink?: boolean
-  linkUrl?: string
-  openInNewTab?: boolean
+    thumbnail?: string;
+    small?: string;
+    medium?: string;
+    large?: string;
+    xlarge?: string;
+  };
+  cropFocalPoint?: { x: number; y: number } | null;
+  width?: number;
+  height?: number;
+  enableLink?: boolean;
+  linkUrl?: string;
+  openInNewTab?: boolean;
 }
 
 // 文本片段接口 - 支持格式化
 interface TextSegment {
-  text: string
-  bold?: boolean
-  underline?: boolean
+  text: string;
+  bold?: boolean;
+  underline?: boolean;
 }
 
 interface OemOdmServiceIntroductionProps {
   // 右侧图片
-  image?: MediaObject | null
+  image?: MediaObject | null;
   // 右上角格式化文本片段
-  topDescriptionSegments?: TextSegment[]
+  topDescriptionSegments?: TextSegment[];
   // 左下角格式化文本片段
-  leftDescriptionSegments?: TextSegment[]
+  leftDescriptionSegments?: TextSegment[];
   // OEM 标题文字
-  oemTitle?: string
+  oemTitle?: string;
   // Service 文字
-  serviceTitle?: string
+  serviceTitle?: string;
   // Introduction 文字
-  introductionTitle?: string
+  introductionTitle?: string;
 }
 
 const defaultContent = {
   topDescriptionSegments: [
-    { text: "Relying on years of industry accumulation and professional technical capabilities, we provide customers with comprehensive " },
+    {
+      text: "Relying on years of industry accumulation and professional technical capabilities, we provide customers with comprehensive ",
+    },
     { text: "OEM cooperation", bold: true },
-    { text: " services to help brands create differentiated high-quality products." },
+    {
+      text: " services to help brands create differentiated high-quality products.",
+    },
   ] as TextSegment[],
   leftDescriptionSegments: [
-    { text: "As a brand dedicated to high-end glass mechanical hardware manufacturing, " },
+    {
+      text: "As a brand dedicated to high-end glass mechanical hardware manufacturing, ",
+    },
     { text: "Busrom", underline: true },
-    { text: " deeply understands that in modern life, Spaces composed of glass are everywhere. They are not only functional Spaces but also private places for physical and mental relaxation." },
+    {
+      text: " deeply understands that in modern life, Spaces composed of glass are everywhere. They are not only functional Spaces but also private places for physical and mental relaxation.",
+    },
   ] as TextSegment[],
-}
+};
 
 export function OemOdmServiceIntroduction({
   image,
@@ -74,7 +83,7 @@ export function OemOdmServiceIntroduction({
   serviceTitle = "Service",
   introductionTitle = "Introduction",
 }: OemOdmServiceIntroductionProps) {
-  const [isArrowHovered, setIsArrowHovered] = useState(false)
+  const [isArrowHovered, setIsArrowHovered] = useState(false);
 
   return (
     <section
@@ -84,7 +93,10 @@ export function OemOdmServiceIntroduction({
       }}
     >
       {/* ========== PC端布局 ========== */}
-      <div className="hidden md:block relative w-full" style={{ height: rpx(DESIGN_HEIGHT) }}>
+      <div
+        className="hidden md:block relative w-full"
+        style={{ height: rpx(DESIGN_HEIGHT) }}
+      >
         {/* 居中内容容器 */}
         <div
           className="absolute left-1/2"
@@ -94,38 +106,38 @@ export function OemOdmServiceIntroduction({
             height: rpx(DESIGN_HEIGHT),
           }}
         >
-        {/* 背景矩形 - 渐变背景 */}
-        <div
-          className="absolute"
-          style={{
-            left: rpx(21), // 30 * 0.7
-            top: rpx(52), // 74 * 0.7
-            width: rpx(1302), // 1860 * 0.7
-            height: rpx(576), // 823 * 0.7
-            background: "linear-gradient(180deg, #756F3F 0%, #58522B 100%)",
-            borderRadius: rpx(21), // 30 * 0.7
-          }}
-        />
-
-        {/* 左上角 OEM 大标题 - text-shadow 模拟外描边 */}
-        <motion.div
-          className="absolute"
-          style={{
-            left: rpx(107), // 153 * 0.7
-            top: rpx(18), // 26 * 0.7
-            zIndex: 10,
-          }}
-          initial={{ opacity: 0, x: -30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <span
-            className="font-anaheim font-bold uppercase"
+          {/* 背景矩形 - 渐变背景 */}
+          <div
+            className="absolute"
             style={{
-              fontSize: rpx(120),
-              lineHeight: rpx(120), // 171 * 0.7
-              color: "#756F3F",
-              textShadow: `
+              left: rpx(21), // 30 * 0.7
+              top: rpx(52), // 74 * 0.7
+              width: rpx(1302), // 1860 * 0.7
+              height: rpx(576), // 823 * 0.7
+              background: "linear-gradient(180deg, #756F3F 0%, #58522B 100%)",
+              borderRadius: rpx(21), // 30 * 0.7
+            }}
+          />
+
+          {/* 左上角 OEM 大标题 - text-shadow 模拟外描边 */}
+          <motion.div
+            className="absolute"
+            style={{
+              left: rpx(107), // 153 * 0.7
+              top: rpx(18), // 26 * 0.7
+              zIndex: 10,
+            }}
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <span
+              className="font-anaheim font-bold uppercase"
+              style={{
+                fontSize: rpx(120),
+                lineHeight: rpx(120), // 171 * 0.7
+                color: "#756F3F",
+                textShadow: `
                 -2px -2px 0 #ffffff,
                 2px -2px 0 #ffffff,
                 -2px 2px 0 #ffffff,
@@ -139,185 +151,199 @@ export function OemOdmServiceIntroduction({
                 0px -3px 0 #ffffff,
                 0px 3px 0 #ffffff
               `,
-            }}
-          >
-            {oemTitle}
-          </span>
-        </motion.div>
+              }}
+            >
+              {oemTitle}
+            </span>
+          </motion.div>
 
-        {/* Service Introduction 标题 - 渐变文字 + 双层叠字 */}
-        <motion.div
-          className="absolute"
-          style={{
-            left: rpx(107), // 153 * 0.7
-            top: rpx(120), // 172 * 0.7
-            zIndex: 10,
-          }}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          <div
-            className="font-anaheim font-extrabold text-white"
+          {/* Service Introduction 标题 - 渐变文字 + 双层叠字 */}
+          <motion.div
+            className="absolute"
             style={{
-              fontSize: rpx(40),
-              lineHeight: rpx(53), // 75 * 0.7
+              left: rpx(107), // 153 * 0.7
+              top: rpx(120), // 172 * 0.7
+              zIndex: 10,
+            }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            <div
+              className="font-anaheim font-extrabold text-white"
+              style={{
+                fontSize: rpx(40),
+                lineHeight: rpx(53), // 75 * 0.7
+              }}
+            >
+              {serviceTitle}
+            </div>
+            {/* Introduction 双层叠字 */}
+            <div className="relative">
+              {/* 下层阴影 - 下移 */}
+              <div
+                className="absolute font-anaheim font-extrabold"
+                style={{
+                  fontSize: rpx(40),
+                  lineHeight: rpx(53), // 75 * 0.7
+                  backgroundImage:
+                    "linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0) 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  top: rpx(4),
+                  opacity: 0.3,
+                }}
+              >
+                {introductionTitle}
+              </div>
+              {/* 上层主文字 */}
+              <div
+                className="relative font-anaheim font-extrabold"
+                style={{
+                  fontSize: rpx(40),
+                  lineHeight: rpx(53), // 75 * 0.7
+                  backgroundImage:
+                    "linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0) 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                {introductionTitle}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* 装饰线条 - 渐变横线 */}
+          <div
+            className="absolute"
+            style={{
+              left: rpx(109), // 155 * 0.7
+              top: rpx(186), // 265 * 0.7
+              width: rpx(283), // 404 * 0.7
+              height: rpx(30), // 43 * 0.7
+              zIndex: 10,
             }}
           >
-            {serviceTitle}
-          </div>
-          {/* Introduction 双层叠字 */}
-          <div className="relative">
-            {/* 下层阴影 - 下移 */}
-            <div
-              className="absolute font-anaheim font-extrabold"
-              style={{
-                fontSize: rpx(40),
-                lineHeight: rpx(53), // 75 * 0.7
-                backgroundImage: "linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0) 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-                top: rpx(4),
-                opacity: 0.3,
-              }}
+            <svg
+              width="100%"
+              height="100%"
+              viewBox="0 0 283 30"
+              fill="none"
+              preserveAspectRatio="none"
             >
-              {introductionTitle}
-            </div>
-            {/* 上层主文字 */}
-            <div
-              className="relative font-anaheim font-extrabold"
-              style={{
-                fontSize: rpx(40),
-                lineHeight: rpx(53), // 75 * 0.7
-                backgroundImage: "linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0) 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              {introductionTitle}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* 装饰线条 - 渐变横线 */}
-        <div
-          className="absolute"
-          style={{
-            left: rpx(109), // 155 * 0.7
-            top: rpx(186), // 265 * 0.7
-            width: rpx(283), // 404 * 0.7
-            height: rpx(30), // 43 * 0.7
-            zIndex: 10,
-          }}
-        >
-          <svg width="100%" height="100%" viewBox="0 0 283 30" fill="none" preserveAspectRatio="none">
-            <path
-              d="M0 15H283"
-              stroke="url(#gradient-line)"
-              strokeWidth="2"
-              strokeOpacity="0.52"
-            />
-            <defs>
-              <linearGradient id="gradient-line" x1="0" y1="0" x2="283" y2="0">
-                <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
-                <stop offset="100%" stopColor="#ffffff" stopOpacity="1" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-
-        {/* 圆形装饰箭头 - 虚线圆圈 + 斜向右下箭头 (层级在Introduction下层) */}
-        <motion.div
-          className="absolute cursor-pointer"
-          style={{
-            left: rpx(321), // 458 * 0.7
-            top: rpx(183), // 262 * 0.7
-            width: rpx(90), // 128 * 0.7
-            height: rpx(90), // 128 * 0.7
-            zIndex: 5,
-          }}
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          onMouseEnter={() => setIsArrowHovered(true)}
-          onMouseLeave={() => setIsArrowHovered(false)}
-        >
-          <svg width="100%" height="100%" viewBox="0 0 128 128" fill="none">
-            {/* 旋转的虚线圆圈 */}
-            <circle
-              cx="64"
-              cy="64"
-              r="63"
-              stroke={isArrowHovered ? "#FFF3BD" : "#514B1A"}
-              strokeWidth="2"
-              strokeDasharray="9 9"
-              className="animate-spin-slow transition-colors duration-300"
-              style={{ transformOrigin: 'center' }}
-            />
-            {/* 静止的箭头 */}
-            <path
-              d="M84.9806 80.1714L85.0033 80.141C85.3002 79.7327 85.4653 79.2435 85.4766 78.7388L85.4771 78.7093L85.4765 78.7175C85.4901 78.5243 85.4849 78.3303 85.461 78.1381L85.4537 78.0836L81.9007 53.2242C81.6681 51.5963 80.1598 50.4667 78.5322 50.7013L78.4835 50.7088C76.8823 50.9662 75.7766 52.4618 76.0068 54.0731L78.6112 72.2946L46.4689 48.2213C45.3712 47.3992 43.8141 47.6237 42.9912 48.7224L42.7825 49.0011C41.9888 50.0981 42.2178 51.6325 43.3045 52.4464L75.4468 76.5197L57.2285 79.1458C55.601 79.3804 54.4705 80.8899 54.7031 82.5177C54.9357 84.1455 56.4439 85.2752 58.0715 85.0406L82.9287 81.4574L82.9809 81.4494C83.1546 81.4212 83.3255 81.3776 83.4916 81.3193L83.5337 81.3042L83.5256 81.3067C84.0338 81.1538 84.4795 80.8418 84.797 80.4165L84.9806 80.1714Z"
-              fill={isArrowHovered ? "#FFF3BD" : "#514B1A"}
-              className="transition-colors duration-300"
-            />
-          </svg>
-        </motion.div>
-
-        {/* 垂直分隔线 */}
-        <div
-          className="absolute"
-          style={{
-            left: rpx(558), // 797 * 0.7
-            top: rpx(52), // 74 * 0.7
-            width: rpx(1), // 2 * 0.7
-            height: rpx(111), // 158 * 0.7
-            backgroundColor: "rgba(255,255,255,0.27)",
-            borderRadius: rpx(19), // 27 * 0.7
-          }}
-        />
-
-        {/* 右上角描述文字 */}
-        <motion.p
-          className="absolute font-anaheim text-white"
-          style={{
-            left: rpx(580), // 828 * 0.7
-            top: rpx(60), // 85 * 0.7
-            width: rpx(725), // 1035 * 0.7
-            fontSize: rpx(20),
-            lineHeight: rpx(36), // 51 * 0.7
-            zIndex: 10,
-          }}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          {topDescriptionSegments.map((segment, index) => {
-            if (segment.text === "\n") {
-              return <br key={index} />
-            }
-            if (segment.underline) {
-              return (
-                <span
-                  key={index}
-                  className="relative inline-block font-anaheim font-extrabold"
-                  style={{
-                    fontSize: rpx(30),
-                    lineHeight: rpx(36),
-                    verticalAlign: "baseline",
-                    transform: `translateY(-${rpx(2)})`, // 向上微调以确保底对齐
-                  }}
+              <path
+                d="M0 15H283"
+                stroke="url(#gradient-line)"
+                strokeWidth="2"
+                strokeOpacity="0.52"
+              />
+              <defs>
+                <linearGradient
+                  id="gradient-line"
+                  x1="0"
+                  y1="0"
+                  x2="283"
+                  y2="0"
                 >
-                  {/* 下层 - 深色 + 外描边，向右下偏移2rpx */}
+                  <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+                  <stop offset="100%" stopColor="#ffffff" stopOpacity="1" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+
+          {/* 圆形装饰箭头 - 虚线圆圈 + 斜向右下箭头 (层级在Introduction下层) */}
+          <motion.div
+            className="absolute cursor-pointer"
+            style={{
+              left: rpx(321), // 458 * 0.7
+              top: rpx(183), // 262 * 0.7
+              width: rpx(90), // 128 * 0.7
+              height: rpx(90), // 128 * 0.7
+              zIndex: 5,
+            }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            onMouseEnter={() => setIsArrowHovered(true)}
+            onMouseLeave={() => setIsArrowHovered(false)}
+          >
+            <svg width="100%" height="100%" viewBox="0 0 128 128" fill="none">
+              {/* 旋转的虚线圆圈 */}
+              <circle
+                cx="64"
+                cy="64"
+                r="63"
+                stroke={isArrowHovered ? "#FFF3BD" : "#514B1A"}
+                strokeWidth="2"
+                strokeDasharray="9 9"
+                className="animate-spin-slow transition-colors duration-300"
+                style={{ transformOrigin: "center", animationDuration: "30s" }}
+              />
+              {/* 静止的箭头 */}
+              <path
+                d="M84.9806 80.1714L85.0033 80.141C85.3002 79.7327 85.4653 79.2435 85.4766 78.7388L85.4771 78.7093L85.4765 78.7175C85.4901 78.5243 85.4849 78.3303 85.461 78.1381L85.4537 78.0836L81.9007 53.2242C81.6681 51.5963 80.1598 50.4667 78.5322 50.7013L78.4835 50.7088C76.8823 50.9662 75.7766 52.4618 76.0068 54.0731L78.6112 72.2946L46.4689 48.2213C45.3712 47.3992 43.8141 47.6237 42.9912 48.7224L42.7825 49.0011C41.9888 50.0981 42.2178 51.6325 43.3045 52.4464L75.4468 76.5197L57.2285 79.1458C55.601 79.3804 54.4705 80.8899 54.7031 82.5177C54.9357 84.1455 56.4439 85.2752 58.0715 85.0406L82.9287 81.4574L82.9809 81.4494C83.1546 81.4212 83.3255 81.3776 83.4916 81.3193L83.5337 81.3042L83.5256 81.3067C84.0338 81.1538 84.4795 80.8418 84.797 80.4165L84.9806 80.1714Z"
+                fill={isArrowHovered ? "#FFF3BD" : "#514B1A"}
+                className="transition-colors duration-300"
+              />
+            </svg>
+          </motion.div>
+
+          {/* 垂直分隔线 */}
+          <div
+            className="absolute"
+            style={{
+              left: rpx(558), // 797 * 0.7
+              top: rpx(52), // 74 * 0.7
+              width: rpx(1), // 2 * 0.7
+              height: rpx(111), // 158 * 0.7
+              backgroundColor: "rgba(255,255,255,0.27)",
+              borderRadius: rpx(19), // 27 * 0.7
+            }}
+          />
+
+          {/* 右上角描述文字 */}
+          <motion.p
+            className="absolute font-anaheim text-white"
+            style={{
+              left: rpx(580), // 828 * 0.7
+              top: rpx(60), // 85 * 0.7
+              width: rpx(725), // 1035 * 0.7
+              fontSize: rpx(20),
+              lineHeight: rpx(36), // 51 * 0.7
+              zIndex: 10,
+            }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            {topDescriptionSegments.map((segment, index) => {
+              if (segment.text === "\n") {
+                return <br key={index} />;
+              }
+              if (segment.underline) {
+                return (
                   <span
-                    className="absolute font-anaheim font-extrabold"
+                    key={index}
+                    className="relative inline-block font-anaheim font-extrabold"
                     style={{
                       fontSize: rpx(30),
-                      color: "#413A03",
-                      left: rpx(3), // 4 * 0.7
-                      top: rpx(3), // 4 * 0.7
-                      textShadow: `
+                      lineHeight: rpx(36),
+                      verticalAlign: "baseline",
+                      transform: `translateY(-${rpx(2)})`, // 向上微调以确保底对齐
+                    }}
+                  >
+                    {/* 下层 - 深色 + 外描边，向右下偏移2rpx */}
+                    <span
+                      className="absolute font-anaheim font-extrabold"
+                      style={{
+                        fontSize: rpx(30),
+                        color: "#413A03",
+                        left: rpx(3), // 4 * 0.7
+                        top: rpx(3), // 4 * 0.7
+                        textShadow: `
                         -2px -2px 0 #FFF392,
                         2px -2px 0 #FFF392,
                         -2px 2px 0 #FFF392,
@@ -327,134 +353,6 @@ export function OemOdmServiceIntroduction({
                         -2px 0px 0 #FFF392,
                         2px 0px 0 #FFF392
                       `,
-                    }}
-                  >
-                    {segment.text}
-                  </span>
-                  {/* 上层 - 白色 */}
-                  <span
-                    className="relative font-anaheim font-extrabold"
-                    style={{
-                      fontSize: rpx(30),
-                      color: "#FFFFFF",
-                    }}
-                  >
-                    {segment.text}
-                  </span>
-                </span>
-              )
-            }
-            if (segment.bold) {
-              return (
-                <span
-                  key={index}
-                  className="font-anaheim font-bold"
-                  style={{
-                    fontSize: rpx(20),
-                    color: "#FFDB4B",
-                  }}
-                >
-                  {segment.text}
-                </span>
-              )
-            }
-            return (
-              <span key={index} className="text-white">
-                {segment.text}
-              </span>
-            )
-          })}
-        </motion.p>
-
-        {/* 右侧大图 */}
-        <motion.div
-          className="absolute overflow-hidden"
-          style={{
-            left: rpx(552), // 789 * 0.7
-            top: rpx(199), // 284 * 0.7
-            width: rpx(771), // 1101 * 0.7
-            height: rpx(391), // 559 * 0.7
-            zIndex: 5,
-            borderTopLeftRadius: rpx(32), // 46 * 0.7
-            borderBottomLeftRadius: rpx(32), // 46 * 0.7
-          }}
-          initial={{ opacity: 0, x: 50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-        >
-          {image && (
-            image.enableLink && image.linkUrl ? (
-              <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
-                <OptimizedImage
-                  image={image as any}
-                  alt="OEM Service"
-                  size="xlarge"
-                  className="w-full h-full object-cover"
-                />
-              </Link>
-            ) : (
-              <OptimizedImage
-                image={image as any}
-                alt="OEM Service"
-                size="xlarge"
-                className="w-full h-full object-cover"
-              />
-            )
-          )}
-        </motion.div>
-
-        {/* 左下角文字区域 - 支持格式化文本 */}
-        <motion.div
-          className="absolute"
-          style={{
-            left: rpx(111), // 159 * 0.7
-            top: rpx(306), // 437 * 0.7
-            width: rpx(392), // 560 * 0.7
-            zIndex: 10,
-          }}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <p
-            className="font-anaheim"
-            style={{
-              fontSize: rpx(20),
-              lineHeight: rpx(39), // 56 * 0.7
-            }}
-          >
-            {leftDescriptionSegments.map((segment, index) => {
-              // 换行
-              if (segment.text === "\n") {
-                return <br key={index} />
-              }
-              // 下划线文字 - 双层字体
-              if (segment.underline) {
-                return (
-                  <span
-                    key={index}
-                    className="relative inline-block font-anaheim font-extrabold"
-                    style={{
-                      fontSize: rpx(30),
-                      lineHeight: rpx(39),
-                      verticalAlign: "baseline",
-                      transform: `translateY(-${rpx(2)})`, // 向上微调
-                    }}
-                  >
-                    {/* 下层 - 深色 + 外描边，向右下偏移 */}
-                    <span
-                      className="absolute font-anaheim font-extrabold"
-                      style={{
-                        fontSize: rpx(30),
-                        color: "#413A03",
-                        left: rpx(2),
-                        top: rpx(2),
-                        textShadow: `
-                          -1px -1px 0 #FFF392,
-                          1px -1px 0 #FFF392,
-                          -1px 1px 0 #FFF392,
-                          1px 1px 0 #FFF392
-                        `,
                       }}
                     >
                       {segment.text}
@@ -470,9 +368,8 @@ export function OemOdmServiceIntroduction({
                       {segment.text}
                     </span>
                   </span>
-                )
+                );
               }
-              // 加粗文字
               if (segment.bold) {
                 return (
                   <span
@@ -485,20 +382,150 @@ export function OemOdmServiceIntroduction({
                   >
                     {segment.text}
                   </span>
-                )
+                );
               }
-              // 普通文字
               return (
-                <span
-                  key={index}
-                  className="text-white"
-                >
+                <span key={index} className="text-white">
                   {segment.text}
                 </span>
-              )
+              );
             })}
-          </p>
-        </motion.div>
+          </motion.p>
+
+          {/* 右侧大图 */}
+          <motion.div
+            className="absolute overflow-hidden"
+            style={{
+              left: rpx(552), // 789 * 0.7
+              top: rpx(199), // 284 * 0.7
+              width: rpx(771), // 1101 * 0.7
+              height: rpx(391), // 559 * 0.7
+              zIndex: 5,
+              borderTopLeftRadius: rpx(32), // 46 * 0.7
+              borderBottomLeftRadius: rpx(32), // 46 * 0.7
+            }}
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          >
+            {image &&
+              (image.enableLink && image.linkUrl ? (
+                <Link
+                  href={image.linkUrl}
+                  target={image.openInNewTab ? "_blank" : undefined}
+                  rel={image.openInNewTab ? "noopener noreferrer" : undefined}
+                  className="block w-full h-full"
+                >
+                  <OptimizedImage
+                    image={image as any}
+                    alt="OEM Service"
+                    size="xlarge"
+                    className="w-full h-full object-cover"
+                  />
+                </Link>
+              ) : (
+                <OptimizedImage
+                  image={image as any}
+                  alt="OEM Service"
+                  size="xlarge"
+                  className="w-full h-full object-cover"
+                />
+              ))}
+          </motion.div>
+
+          {/* 左下角文字区域 - 支持格式化文本 */}
+          <motion.div
+            className="absolute"
+            style={{
+              left: rpx(111), // 159 * 0.7
+              top: rpx(306), // 437 * 0.7
+              width: rpx(392), // 560 * 0.7
+              zIndex: 10,
+            }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <p
+              className="font-anaheim"
+              style={{
+                fontSize: rpx(20),
+                lineHeight: rpx(39), // 56 * 0.7
+              }}
+            >
+              {leftDescriptionSegments.map((segment, index) => {
+                // 换行
+                if (segment.text === "\n") {
+                  return <br key={index} />;
+                }
+                // 下划线文字 - 双层字体
+                if (segment.underline) {
+                  return (
+                    <span
+                      key={index}
+                      className="relative inline-block font-anaheim font-extrabold"
+                      style={{
+                        fontSize: rpx(30),
+                        lineHeight: rpx(39),
+                        verticalAlign: "baseline",
+                        transform: `translateY(-${rpx(2)})`, // 向上微调
+                      }}
+                    >
+                      {/* 下层 - 深色 + 外描边，向右下偏移 */}
+                      <span
+                        className="absolute font-anaheim font-extrabold"
+                        style={{
+                          fontSize: rpx(30),
+                          color: "#413A03",
+                          left: rpx(2),
+                          top: rpx(2),
+                          textShadow: `
+                          -1px -1px 0 #FFF392,
+                          1px -1px 0 #FFF392,
+                          -1px 1px 0 #FFF392,
+                          1px 1px 0 #FFF392
+                        `,
+                        }}
+                      >
+                        {segment.text}
+                      </span>
+                      {/* 上层 - 白色 */}
+                      <span
+                        className="relative font-anaheim font-extrabold"
+                        style={{
+                          fontSize: rpx(30),
+                          color: "#FFFFFF",
+                        }}
+                      >
+                        {segment.text}
+                      </span>
+                    </span>
+                  );
+                }
+                // 加粗文字
+                if (segment.bold) {
+                  return (
+                    <span
+                      key={index}
+                      className="font-anaheim font-bold"
+                      style={{
+                        fontSize: rpx(20),
+                        color: "#FFDB4B",
+                      }}
+                    >
+                      {segment.text}
+                    </span>
+                  );
+                }
+                // 普通文字
+                return (
+                  <span key={index} className="text-white">
+                    {segment.text}
+                  </span>
+                );
+              })}
+            </p>
+          </motion.div>
         </div>
       </div>
 
@@ -527,7 +554,8 @@ export function OemOdmServiceIntroduction({
           <div
             className="font-anaheim font-extrabold text-2xl mb-6"
             style={{
-              backgroundImage: "linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.3) 100%)",
+              backgroundImage:
+                "linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.3) 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}
@@ -541,7 +569,12 @@ export function OemOdmServiceIntroduction({
           {image && (
             <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-6">
               {image.enableLink && image.linkUrl ? (
-                <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                <Link
+                  href={image.linkUrl}
+                  target={image.openInNewTab ? "_blank" : undefined}
+                  rel={image.openInNewTab ? "noopener noreferrer" : undefined}
+                  className="block w-full h-full"
+                >
                   <OptimizedImage
                     image={image as any}
                     alt="OEM Service"
@@ -564,52 +597,52 @@ export function OemOdmServiceIntroduction({
           <p className="text-white text-sm leading-relaxed mb-4">
             {topDescriptionSegments.map((segment, index) => {
               if (segment.text === "\n") {
-                return <br key={index} />
+                return <br key={index} />;
               }
               if (segment.underline) {
                 return (
                   <span key={index} className="font-bold text-[#FFF392]">
                     {segment.text}
                   </span>
-                )
+                );
               }
               if (segment.bold) {
                 return (
                   <span key={index} className="font-bold text-[#FFDB4B]">
                     {segment.text}
                   </span>
-                )
+                );
               }
-              return <span key={index}>{segment.text}</span>
+              return <span key={index}>{segment.text}</span>;
             })}
           </p>
 
           <p className="text-white text-sm leading-relaxed">
             {leftDescriptionSegments.map((segment, index) => {
               if (segment.text === "\n") {
-                return <br key={index} />
+                return <br key={index} />;
               }
               if (segment.underline) {
                 return (
                   <span key={index} className="font-bold text-[#FFF392]">
                     {segment.text}
                   </span>
-                )
+                );
               }
               if (segment.bold) {
                 return (
                   <span key={index} className="font-bold text-[#FFDB4B]">
                     {segment.text}
                   </span>
-                )
+                );
               }
-              return <span key={index}>{segment.text}</span>
+              return <span key={index}>{segment.text}</span>;
             })}
           </p>
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-export default OemOdmServiceIntroduction
+export default OemOdmServiceIntroduction;

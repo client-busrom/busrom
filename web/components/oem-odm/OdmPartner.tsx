@@ -1,66 +1,76 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from "react"
-import Link from "next/link"
-import { motion, AnimatePresence } from "framer-motion"
-import { OptimizedImage } from "@/components/ui/OptimizedImage"
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // 设计稿基准尺寸
-const DESIGN_WIDTH = 1920
-const DESIGN_HEIGHT = 1360
+const DESIGN_WIDTH = 1920;
+const DESIGN_HEIGHT = 1360;
 
 // 响应式尺寸函数
-const rpx = (designValue: number) => `calc(var(--rpx-odm-partner) * ${designValue})`
+const rpx = (designValue: number) =>
+  `calc(var(--rpx-odm-partner) * ${designValue})`;
 
 interface MediaObject {
-  id: string
-  url: string
-  alt?: string
+  id: string;
+  url: string;
+  alt?: string;
   variants?: {
-    thumbnail?: string
-    small?: string
-    medium?: string
-    large?: string
-    xlarge?: string
-  }
-  cropFocalPoint?: { x: number; y: number } | null
-  width?: number
-  height?: number
-  enableLink?: boolean
-  linkUrl?: string
-  openInNewTab?: boolean
+    thumbnail?: string;
+    small?: string;
+    medium?: string;
+    large?: string;
+    xlarge?: string;
+  };
+  cropFocalPoint?: { x: number; y: number } | null;
+  width?: number;
+  height?: number;
+  enableLink?: boolean;
+  linkUrl?: string;
+  openInNewTab?: boolean;
 }
 
 interface PartnerItem {
-  title: string
+  title: string;
 }
 
 interface OdmPartnerProps {
   // 标题
-  title?: string
+  title?: string;
   // 合作理由列表
-  items?: PartnerItem[]
+  items?: PartnerItem[];
   // 右侧图片（3张堆叠）
-  images?: (MediaObject | null)[]
+  images?: (MediaObject | null)[];
 }
 
 const defaultContent = {
   title: "Why Partner with Busrom ODM?",
   items: [
-    { title: "Full Technical Support from Design to Production Provided by A Professional Team" },
+    {
+      title:
+        "Full Technical Support from Design to Production Provided by A Professional Team",
+    },
     { title: "A Mature and Efficient Product Development Process" },
-    { title: "Highly Flexible Customization Capabilities Enable Product Differentiation" },
-    { title: "Strict Quality Control Ensures That The Products Meet International Standards" },
+    {
+      title:
+        "Highly Flexible Customization Capabilities Enable Product Differentiation",
+    },
+    {
+      title:
+        "Strict Quality Control Ensures That The Products Meet International Standards",
+    },
     { title: "Green and Environmentally Friendly Manufacturing Concept" },
   ],
-}
+};
 
 // 图片卡片配置 - 3个位置的旋转角度和层级
 const cardConfigs = [
   { rotate: -2.4, top: 510, zIndex: 3, shadow: "0 4px 37px rgba(0,0,0,0.33)" }, // 最上层
-  { rotate: 5, top: 490, zIndex: 2, shadow: "0 4px 24px rgba(0,0,0,0.26)" },    // 中间层
-  { rotate: 11, top: 483, zIndex: 1, shadow: "0 4px 24px rgba(0,0,0,0.26)" },   // 最底层
-]
+  { rotate: 5, top: 490, zIndex: 2, shadow: "0 4px 24px rgba(0,0,0,0.26)" }, // 中间层
+  { rotate: 11, top: 483, zIndex: 1, shadow: "0 4px 24px rgba(0,0,0,0.26)" }, // 最底层
+];
 
 export function OdmPartner({
   title = defaultContent.title,
@@ -68,36 +78,36 @@ export function OdmPartner({
   images = [],
 }: OdmPartnerProps) {
   // 管理图片顺序 [0, 1, 2] 表示 images[0] 在最上层, images[1] 在中间, images[2] 在最底层
-  const [imageOrder, setImageOrder] = useState([0, 1, 2])
+  const [imageOrder, setImageOrder] = useState([0, 1, 2]);
   // 当前高亮的item索引
-  const [activeItemIndex, setActiveItemIndex] = useState(0)
+  const [activeItemIndex, setActiveItemIndex] = useState(0);
   // 是否暂停自动轮播（悬停时暂停）
-  const [isPaused, setIsPaused] = useState(false)
+  const [isPaused, setIsPaused] = useState(false);
 
   // 循环切牌效果 - 每3秒切换一次
   useEffect(() => {
-    if (images.length < 3) return
+    if (images.length < 3) return;
 
     const interval = setInterval(() => {
       setImageOrder((prev) => {
         // 最上层的牌移到最底层: [0,1,2] -> [1,2,0] -> [2,0,1] -> [0,1,2]
-        return [prev[1], prev[2], prev[0]]
-      })
-    }, 3000)
+        return [prev[1], prev[2], prev[0]];
+      });
+    }, 3000);
 
-    return () => clearInterval(interval)
-  }, [images.length])
+    return () => clearInterval(interval);
+  }, [images.length]);
 
   // 左侧item自动轮播 - 每2秒切换一次
   useEffect(() => {
-    if (isPaused || items.length === 0) return
+    if (isPaused || items.length === 0) return;
 
     const interval = setInterval(() => {
-      setActiveItemIndex((prev) => (prev + 1) % items.length)
-    }, 2000)
+      setActiveItemIndex((prev) => (prev + 1) % items.length);
+    }, 2000);
 
-    return () => clearInterval(interval)
-  }, [isPaused, items.length])
+    return () => clearInterval(interval);
+  }, [isPaused, items.length]);
 
   return (
     <section
@@ -107,7 +117,10 @@ export function OdmPartner({
       }}
     >
       {/* ========== PC端布局 ========== */}
-      <div className="hidden md:block relative w-full" style={{ height: rpx(DESIGN_HEIGHT) }}>
+      <div
+        className="hidden md:block relative w-full"
+        style={{ height: rpx(DESIGN_HEIGHT) }}
+      >
         {/* 左上角装饰 SVG - 连接上一个板块 */}
         <div
           className="absolute overflow-visible"
@@ -126,7 +139,7 @@ export function OdmPartner({
             height="100%"
             viewBox="0 0 600 600"
             fill="none"
-            style={{ transformOrigin: 'center center' }}
+            style={{ transformOrigin: "center center" }}
           >
             <circle
               cx="300"
@@ -136,6 +149,7 @@ export function OdmPartner({
               strokeWidth="8"
               strokeLinecap="round"
               strokeLinejoin="round"
+              pathLength="2000"
               strokeDasharray="40 40"
             />
           </svg>
@@ -176,7 +190,7 @@ export function OdmPartner({
 
         {/* 左侧列表项 - 整体缩放70%，自动轮播/悬停高亮 */}
         {items.map((item, index) => {
-          const isActive = index === activeItemIndex
+          const isActive = index === activeItemIndex;
 
           return (
             <motion.div
@@ -192,11 +206,11 @@ export function OdmPartner({
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               onMouseEnter={() => {
-                setIsPaused(true)
-                setActiveItemIndex(index)
+                setIsPaused(true);
+                setActiveItemIndex(index);
               }}
               onMouseLeave={() => {
-                setIsPaused(false)
+                setIsPaused(false);
               }}
             >
               {/* 背景条 */}
@@ -221,7 +235,9 @@ export function OdmPartner({
                   color: "#464009",
                 }}
                 animate={{
-                  fontSize: isActive ? `calc(var(--rpx-odm-partner) * 20)` : `calc(var(--rpx-odm-partner) * 18)`,
+                  fontSize: isActive
+                    ? `calc(var(--rpx-odm-partner) * 20)`
+                    : `calc(var(--rpx-odm-partner) * 18)`,
                   fontWeight: isActive ? 700 : 500,
                 }}
                 transition={{ duration: 0.3 }}
@@ -261,15 +277,15 @@ export function OdmPartner({
                 transition={{ duration: 0.3 }}
               />
             </motion.div>
-          )
+          );
         })}
 
         {/* 右侧堆叠图片 - 循环切牌效果 */}
         {/* imageOrder[0] = 最上层的图片索引, imageOrder[1] = 中间层, imageOrder[2] = 最底层 */}
         {imageOrder.map((imageIndex, position) => {
-          const image = images[imageIndex]
-          if (!image) return null
-          const config = cardConfigs[position]
+          const image = images[imageIndex];
+          if (!image) return null;
+          const config = cardConfigs[position];
 
           return (
             <motion.div
@@ -296,7 +312,12 @@ export function OdmPartner({
               }}
             >
               {image.enableLink && image.linkUrl ? (
-                <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                <Link
+                  href={image.linkUrl}
+                  target={image.openInNewTab ? "_blank" : undefined}
+                  rel={image.openInNewTab ? "noopener noreferrer" : undefined}
+                  className="block w-full h-full"
+                >
                   <OptimizedImage
                     image={image as any}
                     alt={`Partner Image ${imageIndex + 1}`}
@@ -313,7 +334,7 @@ export function OdmPartner({
                 />
               )}
             </motion.div>
-          )
+          );
         })}
       </div>
 
@@ -330,15 +351,33 @@ export function OdmPartner({
         {/* 图片堆叠 - 循环切牌效果 */}
         <div className="relative h-[300px] mb-8">
           {imageOrder.map((imageIndex, position) => {
-            const image = images[imageIndex]
-            if (!image) return null
+            const image = images[imageIndex];
+            if (!image) return null;
             // 移动端配置
             const mobileConfigs = [
-              { rotate: -2, right: "20%", top: "0%", zIndex: 3, shadow: "0 4px 20px rgba(0,0,0,0.33)" },
-              { rotate: 4, right: "15%", top: "5%", zIndex: 2, shadow: "0 4px 16px rgba(0,0,0,0.26)" },
-              { rotate: 8, right: "10%", top: "10%", zIndex: 1, shadow: "0 4px 16px rgba(0,0,0,0.26)" },
-            ]
-            const config = mobileConfigs[position]
+              {
+                rotate: -2,
+                right: "20%",
+                top: "0%",
+                zIndex: 3,
+                shadow: "0 4px 20px rgba(0,0,0,0.33)",
+              },
+              {
+                rotate: 4,
+                right: "15%",
+                top: "5%",
+                zIndex: 2,
+                shadow: "0 4px 16px rgba(0,0,0,0.26)",
+              },
+              {
+                rotate: 8,
+                right: "10%",
+                top: "10%",
+                zIndex: 1,
+                shadow: "0 4px 16px rgba(0,0,0,0.26)",
+              },
+            ];
+            const config = mobileConfigs[position];
 
             return (
               <motion.div
@@ -361,7 +400,12 @@ export function OdmPartner({
                 }}
               >
                 {image.enableLink && image.linkUrl ? (
-                  <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                  <Link
+                    href={image.linkUrl}
+                    target={image.openInNewTab ? "_blank" : undefined}
+                    rel={image.openInNewTab ? "noopener noreferrer" : undefined}
+                    className="block w-full h-full"
+                  >
                     <OptimizedImage
                       image={image as any}
                       alt={`Partner Image ${imageIndex + 1}`}
@@ -378,14 +422,14 @@ export function OdmPartner({
                   />
                 )}
               </motion.div>
-            )
+            );
           })}
         </div>
 
         {/* 列表项 - 自动轮播高亮 */}
         <div className="space-y-3">
           {items.map((item, index) => {
-            const isActive = index === activeItemIndex
+            const isActive = index === activeItemIndex;
 
             return (
               <motion.div
@@ -396,11 +440,11 @@ export function OdmPartner({
                 }}
                 transition={{ duration: 0.3 }}
                 onTouchStart={() => {
-                  setIsPaused(true)
-                  setActiveItemIndex(index)
+                  setIsPaused(true);
+                  setActiveItemIndex(index);
                 }}
                 onTouchEnd={() => {
-                  setIsPaused(false)
+                  setIsPaused(false);
                 }}
               >
                 <div className="flex items-center gap-3">
@@ -426,12 +470,12 @@ export function OdmPartner({
                   </motion.p>
                 </div>
               </motion.div>
-            )
+            );
           })}
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-export default OdmPartner
+export default OdmPartner;

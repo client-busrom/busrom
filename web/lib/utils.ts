@@ -97,7 +97,7 @@ export function getVariantUrl(
 ): string {
   if (!image) return '/images/placeholder.jpg'
 
-  const variants = image.variants as any || {}
+  const variants = (image?.variants || (image as any)?.sizes) as any || {}
   const getUrl = (val: any) => (typeof val === 'string' ? val : val?.url)
 
   // 尺寸映射表
@@ -127,8 +127,7 @@ export function getVariantUrl(
     const keys = mapping[s] || [s]
     for (const key of keys) {
       const url = getUrl(variants[key])
-      // 关键逻辑：如果是大中尺寸请求，且找到的 URL 跟缩略图一样，则跳过
-      if (url && (size === 'thumbnail' || url !== thumbUrl)) {
+      if (url) {
         return convertToCDNUrl(url, strategy)
       }
     }
@@ -136,6 +135,14 @@ export function getVariantUrl(
 
   // 最后后备：原始图 (xlarge/original) -> 原始 url/fileUrl -> 占位图
   const finalUrl = image.url || (image as any).fileUrl || (image as any).file?.url || getUrl(variants.xlarge)
+  
+  // 如果最终还是没拿到有效的 URL 且 variants 里有内容，尝试随便拿一个尺寸的 URL
+  if ((!finalUrl || finalUrl === '/images/placeholder.jpg') && Object.keys(variants).length > 0) {
+    const firstVariant = Object.values(variants)[0]
+    const fallbackUrl = getUrl(firstVariant)
+    if (fallbackUrl) return convertToCDNUrl(fallbackUrl, strategy)
+  }
+
   return finalUrl ? convertToCDNUrl(finalUrl, strategy) : '/images/placeholder.jpg'
 }
 

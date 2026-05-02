@@ -55,12 +55,23 @@ function normalizeImage(image: UniversalImage | string): MediaImage | null {
   }
 
   const imgObj = image as ImageObject
+  const sizes = (image as any).sizes
+  const variants = imgObj.variants || sizes
+
+  // If using Payload sizes, try to pick a webp source
+  if (sizes && !variants?.webp) {
+    const webpUrl = sizes.card?.url || sizes.tablet?.url || sizes.thumbnail?.url
+    if (webpUrl?.endsWith('.webp')) {
+      (variants as any).webp = webpUrl
+    }
+  }
+
   return {
     id: '',
     filename: '',
     file: imgObj.url ? { url: imgObj.url } : null,
     fileUrl: imgObj.url,
-    variants: imgObj.variants,
+    variants: variants,
     altText: imgObj.altText ? { en: imgObj.altText, zh: imgObj.altText } : null,
   }
 }

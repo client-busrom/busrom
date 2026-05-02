@@ -1,5 +1,6 @@
 import { NavigationMenuType, type NavItem } from '@/types/navigation';
 import { resolveInternalLink } from '../utils';
+import { convertToCDNUrl } from '../cdn-url';
 
 const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
 
@@ -51,7 +52,24 @@ async function getImageFromMediaTags(
       const hash = menuIdStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
       const index = hash % data.docs.length;
       const media = data.docs[index];
-      return { url: media.url, filename: media.filename };
+      // Transform sizes
+      const transformedSizes: any = {}
+      if (media.sizes) {
+        Object.entries(media.sizes).forEach(([key, value]: [string, any]) => {
+          if (value?.url) {
+            transformedSizes[key] = {
+              ...(value as any),
+              url: convertToCDNUrl((value as any).url)
+            }
+          }
+        })
+      }
+
+      return { 
+        url: convertToCDNUrl(media.url), 
+        filename: media.filename,
+        sizes: transformedSizes
+      };
     }
   } catch (error) {
     console.error('[getNavigation] Error fetching media:', error);

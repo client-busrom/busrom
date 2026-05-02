@@ -136,6 +136,7 @@ export function OemOdmPartner({
               strokeWidth="8"
               strokeLinecap="round"
               strokeLinejoin="round"
+              pathLength="2000"
               strokeDasharray="40 40"
             />
           </svg>
