@@ -98,8 +98,8 @@ export function AdvantagesSection({
   if (!advantages || advantages.length === 0) return null;
 
   return (
-    <section className="relative w-full bg-[#F6F4ED] select-none py-12 lg:py-0 lg:h-[52vw] min-h-[700px] flex flex-col items-center">
-      <div className="flex flex-col w-full max-w-[1920px] justify-start lg:pt-[4vw]">
+    <section className="relative w-full bg-[#F6F4ED] select-none pt-12 lg:pt-[60px] lg:h-auto min-h-[820px] flex flex-col items-center">
+      <div className="flex flex-col w-full max-w-[1920px] justify-start">
         {/* 1. Animated Background Circle (Breathing effect) */}
         <motion.div
           className="absolute rounded-full pointer-events-none opacity-40 lg:opacity-80"
@@ -123,7 +123,7 @@ export function AdvantagesSection({
         />
 
         {/* 2. Section Title */}
-        <div className="relative z-20 pointer-events-none px-10 lg:pl-[140px] mb-8 lg:mb-[16px] w-full lg:w-[vw(1000)] text-center lg:text-left">
+        <div className="relative z-20 pointer-events-none px-10 lg:pl-[140px] mb-8 lg:mb-0 w-full lg:w-[vw(1000)] text-center lg:text-left">
           <h2
             className="font-semibold leading-tight tracking-tight text-[#756F3F] text-[32px]"
             style={{
@@ -145,7 +145,7 @@ export function AdvantagesSection({
 
         {/* 3. Carousel - Embla Implementation */}
         <div
-          className="relative w-full h-auto pb-20 lg:pb-20 overflow-hidden"
+          className="relative w-full h-auto pb-16 lg:pb-16 overflow-hidden"
           ref={emblaRef}
         >
           <div

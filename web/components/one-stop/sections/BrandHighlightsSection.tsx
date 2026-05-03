@@ -82,7 +82,7 @@ export function BrandHighlightsSection({
   const previewItem = items[nextIndex];
 
   return (
-    <section className="relative w-full flex flex-col items-center justify-center pt-[120px] pb-[80px] md:h-[62.79vw] xl:h-[1205.7px]">
+    <section className="relative w-full flex flex-col items-center justify-center py-[120px] md:h-[62.79vw] xl:h-[1205.7px]">
       {/* Background Decorative Layer */}
       <div className="absolute inset-0 z-0 pointer-events-none hidden md:block">
         <motion.div

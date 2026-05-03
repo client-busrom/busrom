@@ -315,33 +315,15 @@ export async function GET(
     const product = productData.docs[0]
     console.log('[Product Detail API] Product found:', product.id)
 
-    // 0. Ensure we have the full product data and its associated templates/series
+    // 0. Ensure we have the full product data and its associated templates
     let contentToRender = product.contentTemplate?.content || null
     let templateSource = product.contentTemplate ? 'product' : null
 
-    // If no product-specific template, look for series-level template
-    if (!contentToRender) {
-      let series = product.series
-      if (typeof series === 'string' || typeof series === 'number') {
-        console.log('[Product Detail API] Fetching unpopulated series:', series)
-        const sRes = await fetch(`${CMS_URL}/api/product-series/${series}?locale=${locale}&depth=2`)
-        if (sRes.ok) {
-          const seriesData = await sRes.json()
-          product.series = seriesData // Update reference for later transformation
-          series = seriesData
-        }
-      }
-      
-      if (series && typeof series === 'object') {
-        contentToRender = series.seriesTemplate?.content || null
-        if (contentToRender) templateSource = 'series'
-      }
-    }
-
-    // Finally fallback to direct content if no template found
+    // Fallback to direct content if no template found
     if (!contentToRender) {
       contentToRender = product.contentTranslation || null
     }
+
 
     const originalContentRaw = product.contentTranslation || null
     console.log(`[Product Detail API] Content source selected: ${templateSource || 'direct'}`)

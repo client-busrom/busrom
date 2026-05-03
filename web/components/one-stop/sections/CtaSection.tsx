@@ -512,7 +512,7 @@ export function CtaSection({
             >
               <Upload className="w-5 h-5" />
               <span
-                className="text-[18px] font-bold uppercase tracking-widest"
+                className="text-[18px] font-bold tracking-widest"
                 style={{ fontFamily: "var(--font-anaheim)" }}
               >
                 {uploadedFile
@@ -597,7 +597,7 @@ export function CtaSection({
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -10 }}
                   className={cn(
-                    "mb-2 text-[24px] font-bold uppercase tracking-widest",
+                    "mb-2 text-[24px] font-bold tracking-widest",
                     submitStatus === "success"
                       ? "text-[#FFF28E]"
                       : "text-red-400",
@@ -747,7 +747,7 @@ export function CtaSection({
                 >
                   <Upload className="w-8 h-8" />
                   <span
-                    className="text-[24px] font-bold uppercase tracking-widest"
+                    className="text-[24px] font-bold tracking-widest"
                     style={{ fontFamily: "var(--font-anaheim)" }}
                   >
                     {uploadedFile
