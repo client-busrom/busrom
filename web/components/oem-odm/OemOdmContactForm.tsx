@@ -513,8 +513,8 @@ export function OemOdmContactForm({
                             disabled={submitting}
                             className="!bg-transparent !border-none !h-full !rounded-none"
                             buttonClassName="!bg-transparent !border-r-0 !text-[#756F3F] hover:!bg-black/5 !rounded-none !px-3 !h-full [&_img]:!w-6 [&_img]:!h-auto [&_svg]:!w-6 [&_svg]:!h-auto [&_svg]:!text-[#756F3F] [&_.PhoneInputCountrySelectArrow]:!border-t-[#756F3F] [&_.PhoneInputCountrySelectArrow]:!opacity-100"
-                            inputClassName="!bg-transparent !text-[#756F3F] !placeholder-[#756F3F]/50 !font-anaheim !font-semibold !text-lg md:text-xl !h-full !pl-0"
-                            dialCodeClassName="!text-[#756F3F] !text-lg"
+                            inputClassName="!bg-transparent !text-[#756F3F] !placeholder-[#756F3F]/50 !font-anaheim !font-semibold !text-lg md:text-xl !h-full !pl-0 [&:-webkit-autofill]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                            dialCodeClassName="!text-[#756F3F] !text-lg [&:-webkit-autofill]:[-webkit-text-fill-color:#756F3F!important]"
                             containerClassName="!h-full w-full"
                           />
                         ) : (
@@ -526,7 +526,7 @@ export function OemOdmContactForm({
                             onChange={(e) =>
                               handleChange(field.fieldName, e.target.value)
                             }
-                            className="w-full h-full px-6 bg-transparent outline-none font-semibold text-[#756F3F] text-lg md:text-xl placeholder-[#756F3F]/50"
+                            className="w-full h-full px-6 bg-transparent outline-none font-semibold text-[#756F3F] text-lg md:text-xl placeholder-[#756F3F]/50 [&:-webkit-autofill]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                             placeholder={field.placeholder || field.label}
                             disabled={submitting}
                           />
@@ -588,7 +588,7 @@ export function OemOdmContactForm({
                           e.target.value,
                         )
                       }
-                      className="w-full h-full bg-transparent outline-none font-semibold text-[#756F3F] text-xl md:text-2xl placeholder-[#756F3F]/50 resize-none"
+                      className="w-full h-full bg-transparent outline-none font-semibold text-[#756F3F] text-xl md:text-2xl placeholder-[#756F3F]/50 resize-none [&:-webkit-autofill]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                       placeholder={
                         textareaFields[0].placeholder || textareaFields[0].label
                       }
@@ -762,7 +762,7 @@ export function OemOdmContactForm({
                           onChange={(e) =>
                             handleChange("othersIndicate", e.target.value)
                           }
-                          className="w-full bg-[#F4EDD4] rounded-xl px-4 h-14 text-lg md:text-xl font-semibold text-[#6F6200] outline-none border border-transparent focus:border-[#6F6200]/20"
+                          className="w-full bg-[#F4EDD4] rounded-xl px-4 h-14 text-lg md:text-xl font-semibold text-[#6F6200] outline-none border border-transparent focus:border-[#6F6200]/20 [&:-webkit-autofill]:[-webkit-text-fill-color:#6F6200!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#6F6200!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#6F6200!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#6F6200!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                           placeholder="Please indicate here"
                         />
                       )}

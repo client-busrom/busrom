@@ -244,7 +244,7 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
                             containerClassName="!h-full !w-full"
                             className="!bg-[#746D37] !border-white/34 !rounded-2xl !h-full"
                             buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5 !px-6"
-                            inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-lg !px-6"
+                            inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-lg !px-6 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                             dialCodeClassName="!text-white !text-lg !font-anaheim"
                          />
                       </div>
@@ -289,7 +289,7 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
                       required={field.required}
                       value={formData[field.fieldName] || ""}
                       onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
-                      className="w-full bg-[#746D37] border border-white/34 rounded-2xl px-6 h-14 text-white focus:outline-none focus:border-white/30 transition-all font-anaheim font-semibold text-lg placeholder:text-white/50"
+                      className="w-full bg-[#746D37] border border-white/34 rounded-2xl px-6 h-14 text-white focus:outline-none focus:border-white/30 transition-all font-anaheim font-semibold text-lg placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                    />
                 </div>
              );
@@ -306,7 +306,7 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
                       required={field.required}
                       value={formData[field.fieldName] || ""}
                       onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
-                      className="w-full bg-[#746D37] border border-white/34 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-white/30 transition-all h-32 resize-none scrollbar-hide font-anaheim font-semibold text-lg placeholder:text-white/50"
+                      className="w-full bg-[#746D37] border border-white/34 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-white/30 transition-all h-32 resize-none scrollbar-hide font-anaheim font-semibold text-lg placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                       style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                    />
                 </div>

@@ -158,7 +158,7 @@ export function ProductSeriesShowcaseSection({
               </div>
               <Link
                 href={`/${locale}/shop/${activeProduct.slug}`}
-                className="flex items-center gap-[0.78vw] xl:gap-[12px] group/see transition-all duration-300 transform translate-x-[40px] translate-y-[50px]"
+                className="flex items-center self-end gap-3 group/see transition-all duration-300 transform translate-x-2 translate-y-2"
               >
                 <span className="text-xl font-bold text-[#756F3F] font-anaheim transition-colors group-hover/see:text-black">
                   {(activeProduct as any)._carouselItem?.buttonText ||

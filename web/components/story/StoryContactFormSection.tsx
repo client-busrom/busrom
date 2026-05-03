@@ -554,7 +554,7 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
                             placeholder={`${field.placeholder || field.label}${field.required ? " *" : ""}`}
                             value={formData[field.fieldName] || ""}
                             onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
-                            className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-y outline-none focus:border-white transition-colors"
+                            className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-y outline-none focus:border-white transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                             style={{
                               width: "100%", 
                               minHeight: isMobile ? mvw(120) : vw(103), 
@@ -593,7 +593,7 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
                                 borderRadius: isMobile ? mvw(12) : vw(15) 
                               }}
                               buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5"
-                              inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold"
+                              inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                               dialCodeClassName="!text-white !font-anaheim"
                             />
                           </div>

@@ -24,6 +24,14 @@ export function TrustSection({
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const toggleIndex = (index: number) => {
     setExpandedIndices((prev) =>
@@ -361,10 +369,10 @@ export function TrustSection({
               scale: { type: "spring", stiffness: 300 },
               x: { type: "spring", stiffness: 300 },
             }}
-            className="hidden lg:block absolute shadow-2xl rounded-[40px] lg:rounded-[54px] overflow-hidden z-20 cursor-pointer"
+            className="absolute shadow-2xl rounded-[40px] lg:rounded-[54px] overflow-hidden z-20 cursor-pointer"
             style={{
-              left: "50px",
-              top: "300px",
+              left: isMobile ? "calc(50% - 180px)" : "50px",
+              top: isMobile ? "480px" : "300px",
             }}
           >
             <div className="w-[229px] h-[258px]">
@@ -400,10 +408,10 @@ export function TrustSection({
               scale: { type: "spring", stiffness: 300 },
               x: { type: "spring", stiffness: 300 },
             }}
-            className="hidden lg:block absolute shadow-2xl rounded-[30px] lg:rounded-[54px] overflow-hidden z-10 cursor-pointer"
+            className="absolute shadow-2xl rounded-[30px] lg:rounded-[54px] overflow-hidden z-10 cursor-pointer"
             style={{
-              left: "268px",
-              top: "520px",
+              left: isMobile ? "calc(50% - 20px)" : "268px",
+              top: isMobile ? "560px" : "520px",
             }}
           >
             <div className="w-[245px] h-[234px]">

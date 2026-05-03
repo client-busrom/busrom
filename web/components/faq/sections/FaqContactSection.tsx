@@ -632,10 +632,17 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
         }
         
         /* Fix Chrome Autofill for PhoneInput specifically */
-        :global(.faq-phone-inner input:-webkit-autofill) {
-          -webkit-text-fill-color: rgba(255, 255, 255, 0.5) !important;
+        :global(.faq-phone-inner input:-webkit-autofill),
+        :global(.faq-phone-inner input:-webkit-autofill:hover),
+        :global(.faq-phone-inner input:-webkit-autofill:focus),
+        :global(.faq-phone-inner input:-webkit-autofill:active),
+        :global(.faq-input-el:-webkit-autofill),
+        :global(.faq-input-el:-webkit-autofill:hover),
+        :global(.faq-input-el:-webkit-autofill:focus),
+        :global(.faq-input-el:-webkit-autofill:active) {
+          -webkit-text-fill-color: white !important;
           -webkit-box-shadow: 0 0 0px 1000px rgba(33, 28, 11, 0.20) inset !important;
-          transition: background-color 5000s ease-in-out 0s;
+          transition: background-color 9999s ease-in-out 0s !important;
         }
 
         :global(.faq-dropdown-inner button svg) {

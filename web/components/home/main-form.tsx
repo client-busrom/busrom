@@ -45,18 +45,21 @@ type Props = {
 // ------------------------------------------------------------------
 // 表单样式常量 (基于 Figma 1920x1136 设计)
 // ------------------------------------------------------------------
-const formLabelClasses = "block font-anaheim font-bold text-brand-form-input-text";
+const formLabelClasses = "block font-anaheim font-bold text-white";
 
 const formInputClasses = `
-  mt-1 block w-full bg-transparent text-brand-form-input-text
+  mt-1 block w-full bg-transparent text-white
   placeholder:text-white/50 font-anaheim font-bold text-base
   !border-0 !border-b !border-white !rounded-none
   !outline-none !ring-0 !shadow-none
   focus:!outline-none focus:!ring-0 focus:!border-b focus:!border-white focus:!shadow-none
   focus-visible:!outline-none focus-visible:!ring-0 focus-visible:!ring-offset-0
-  autofill:bg-transparent autofill:text-brand-form-input-text
+  autofill:bg-transparent autofill:text-white
   [&:-webkit-autofill]:bg-transparent
-  [&:-webkit-autofill]:[-webkit-text-fill-color:inherit]
+  [&:-webkit-autofill]:[-webkit-text-fill-color:white!important]
+  [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important]
+  [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important]
+  [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important]
   [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]
 `;
 
@@ -580,10 +583,10 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       required={isFieldRequired("whatsapp")}
                       disabled={submitting}
                       className="!bg-transparent !border-0 !border-b !border-white !rounded-none !h-[45px]"
-                      buttonClassName="!bg-transparent !border-0 !border-r !border-white/20 !text-brand-form-input-text hover:!bg-white/5 !rounded-none !px-0 !mr-2"
-                      inputClassName="!bg-transparent !text-brand-form-input-text !placeholder-white/50 !font-anaheim !font-bold !text-base"
-                      dialCodeClassName="!text-brand-form-input-text !text-base"
-                      chevronClassName="!text-brand-form-input-text"
+                      buttonClassName="!bg-transparent !border-0 !border-r !border-white/20 !text-white hover:!bg-white/5 !rounded-none !px-0 !mr-2"
+                      inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-bold !text-base [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                      dialCodeClassName="!text-white !text-base"
+                      chevronClassName="!text-white"
                       containerClassName="mt-1"
                     />
                   </div>

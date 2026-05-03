@@ -567,7 +567,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
             placeholder={getFieldConfig('name')?.placeholder || (locale === 'zh' ? "您的姓名 / 公司名称" : "Your Name / Company Name")}
             value={formData.name}
             onChange={handleInputChange}
-            className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold"
+            className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{
               fontSize: isMobile ? mvw(16) : vw(20),
               paddingLeft: isMobile ? mvw(24) : vw(29),
@@ -585,7 +585,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
             placeholder={getFieldConfig('email')?.placeholder || (locale === 'zh' ? "您的邮箱" : "Your Email")}
             value={formData.email}
             onChange={handleInputChange}
-            className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold"
+            className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{
               fontSize: isMobile ? mvw(16) : vw(20),
               paddingLeft: isMobile ? mvw(24) : vw(29),
@@ -618,7 +618,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
               className="!bg-transparent !border-none !h-full"
               buttonClassName="!bg-transparent !border-r-0 !text-white hover:!bg-white/10 !px-4 !h-full"
               inputClassName={cn(
-                "!bg-transparent !text-white !placeholder-white/95 !font-anaheim !font-semibold !h-full",
+                "!bg-transparent !text-white !placeholder-white/95 !font-anaheim !font-semibold !h-full [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]",
                 isMobile ? "!pl-2" : "!text-[1.04vw]"
               )}
               inputStyle={{
@@ -674,7 +674,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
             placeholder={getFieldConfig('message')?.placeholder || (locale === 'zh' ? "留言" : "Message")}
             value={formData.message}
             onChange={handleInputChange}
-            className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold resize-y overflow-hidden"
+            className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold resize-y overflow-hidden [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{
               fontSize: isMobile ? mvw(16) : vw(20),
               paddingLeft: isMobile ? mvw(24) : vw(29),

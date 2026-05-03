@@ -406,7 +406,7 @@ export function CtaSection({
               setFormState({ ...formState, name: e.target.value })
             }
             placeholder={getTranslation(getField("name")?.placeholder)}
-            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40"
+            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             required
           />
           <input
@@ -416,7 +416,7 @@ export function CtaSection({
               setFormState({ ...formState, company: e.target.value })
             }
             placeholder={getTranslation(getField("company")?.placeholder)}
-            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40"
+            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
           />
           <input
             type="email"
@@ -425,7 +425,7 @@ export function CtaSection({
               setFormState({ ...formState, email: e.target.value })
             }
             placeholder={getTranslation(getField("email")?.placeholder)}
-            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40"
+            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             required
           />
           <div className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] overflow-hidden">
@@ -438,7 +438,7 @@ export function CtaSection({
               placeholder={getTranslation(getField("whatsapp")?.placeholder)}
               className="!h-full !bg-transparent !w-full"
               buttonClassName="!bg-transparent !border-none !text-white hover:!bg-white/10 !px-4"
-              inputClassName="!bg-transparent !text-white !placeholder-white/40 !text-[18px] !h-full !px-1"
+              inputClassName="!bg-transparent !text-white !placeholder-white/40 !text-[18px] !h-full !px-1 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
               dialCodeClassName="!text-white !text-base"
             />
           </div>
@@ -480,7 +480,7 @@ export function CtaSection({
             placeholder={getTranslation(
               getField("other-primary-requirement")?.placeholder,
             )}
-            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40"
+            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
           />
 
           <textarea
@@ -495,7 +495,7 @@ export function CtaSection({
               getField("specific-requirements-project-description")
                 ?.placeholder,
             )}
-            className="w-full h-36 bg-white/5 border border-white/20 rounded-[15px] p-5 text-white text-[18px] focus:border-[#FFF28E] resize-none placeholder:text-white/40"
+            className="w-full h-36 bg-white/5 border border-white/20 rounded-[15px] p-5 text-white text-[18px] focus:border-[#FFF28E] resize-none placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
           />
 
           <div className="flex flex-col gap-6 mt-4 items-center">
@@ -544,7 +544,6 @@ export function CtaSection({
 
             <motion.button
               type="submit"
-              style={{ transformOrigin: "center" }}
               initial={{ rotate: 0, scale: 1 }}
               animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
               whileHover={{
@@ -565,14 +564,16 @@ export function CtaSection({
                 (!!mergedConfig?.privacyConsentText && !privacyAccepted)
               }
               className={cn(
-                "w-full max-w-[320px] bg-[#B2A224] text-white text-[24px] font-black rounded-full shadow-lg transition-colors duration-300",
+                "w-full max-w-[320px] bg-[#B2A224] font-anaheim text-white text-[24px] font-black rounded-full shadow-lg transition-colors duration-300",
                 "h-14 flex items-center justify-center",
                 isSubmitting ||
                   (!!mergedConfig?.privacyConsentText && !privacyAccepted)
                   ? "grayscale opacity-80 cursor-not-allowed"
                   : "hover:bg-white hover:text-[#B2A224]",
               )}
-              style={{ fontFamily: "var(--font-anaheim)" }}
+              style={{
+                transformOrigin: "center",
+              }}
             >
               {isSubmitting
                 ? getTranslation(mergedConfig?.submittingText)
@@ -638,7 +639,7 @@ export function CtaSection({
                 setFormState({ ...formState, name: e.target.value })
               }
               placeholder={getTranslation(getField("name")?.placeholder)}
-              className="h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40"
+              className="h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
               required
             />
             <input
@@ -648,7 +649,7 @@ export function CtaSection({
                 setFormState({ ...formState, company: e.target.value })
               }
               placeholder={getTranslation(getField("company")?.placeholder)}
-              className="h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40"
+              className="h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             />
 
             <input
@@ -658,7 +659,7 @@ export function CtaSection({
                 setFormState({ ...formState, email: e.target.value })
               }
               placeholder={getTranslation(getField("email")?.placeholder)}
-              className="h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40"
+              className="h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
               required
             />
             <PhoneInput
@@ -670,7 +671,7 @@ export function CtaSection({
               placeholder={getTranslation(getField("whatsapp")?.placeholder)}
               className="!h-[63px] !bg-black/30 !border-white/20 !rounded-[15px] !w-full"
               buttonClassName="!bg-transparent !border-r-0 !text-white hover:!bg-white/10 !rounded-[15px] !px-4 !h-full"
-              inputClassName="!bg-transparent !text-white !placeholder-white/40 !font-medium !text-[22px] !h-full !px-2"
+              inputClassName="!bg-transparent !text-white !placeholder-white/40 !font-medium !text-[22px] !h-full !px-2 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
               dialCodeClassName="!text-white !text-[20px]"
               containerClassName="!h-[63px]"
             />
@@ -715,7 +716,7 @@ export function CtaSection({
               placeholder={getTranslation(
                 getField("other-primary-requirement")?.placeholder,
               )}
-              className="w-full h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40"
+              className="w-full h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             />
 
             <div className="col-span-2">
@@ -731,7 +732,7 @@ export function CtaSection({
                   getField("specific-requirements-project-description")
                     ?.placeholder,
                 )}
-                className="w-full h-[150px] bg-black/30 border border-white/20 rounded-[15px] p-6 text-white text-[20px] focus:border-[#FFF28E] resize-none placeholder:text-white/40"
+                className="w-full h-[150px] bg-black/30 border border-white/20 rounded-[15px] p-6 text-white text-[20px] focus:border-[#FFF28E] resize-none placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
               />
             </div>
 
@@ -818,14 +819,13 @@ export function CtaSection({
                     (!!mergedConfig?.privacyConsentText && !privacyAccepted)
                   }
                   className={cn(
-                    "w-[419px] bg-[#B2A224] text-white text-[40px] font-black rounded-[63px] shadow-2xl transition-colors duration-300 self-center",
+                    "w-[419px] bg-[#B2A224] text-white text-[40px] font-anaheim font-black rounded-[63px] shadow-2xl transition-colors duration-300 self-center",
                     "min-h-[83px] h-auto py-4 whitespace-pre-line leading-tight px-8",
                     isSubmitting ||
                       (!!mergedConfig?.privacyConsentText && !privacyAccepted)
                       ? "grayscale opacity-80 cursor-not-allowed"
                       : "hover:bg-white hover:text-[#B2A224]",
                   )}
-                  style={{ fontFamily: "var(--font-anaheim)" }}
                 >
                   {isSubmitting
                     ? getTranslation(mergedConfig?.submittingText)

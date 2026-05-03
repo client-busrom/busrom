@@ -115,7 +115,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
               disabled={submitting}
               className="!bg-[#211C1133] !border-white/30 !rounded-[15px] !h-[72px] md:!h-[3.75vw]"
               buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5"
-              inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-base"
+              inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-base [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
               dialCodeClassName="!text-white !text-base"
             />
           </div>
@@ -168,7 +168,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
           placeholder={field.placeholder || field.label}
           required={field.required}
           style={inputBaseStyle}
-          className="placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors"
+          className="placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
         />
       );
     }
@@ -192,7 +192,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
             placeholder={field.placeholder}
             required={field.required}
             style={textareaStyle}
-            className="placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors"
+            className="placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
           />
         </div>
       );
@@ -583,7 +583,7 @@ export const MobileField: React.FC<MobileFieldProps> = ({
               disabled={submitting}
               className="!bg-[#211C1133] !border-white/30 !rounded-[12px] !h-[52px]"
               buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5"
-              inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-base"
+              inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-base [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
               dialCodeClassName="!text-white !text-base"
             />
           </div>
@@ -628,7 +628,7 @@ export const MobileField: React.FC<MobileFieldProps> = ({
           onChange={(e) => handleChange(field.fieldName, e.target.value)}
           placeholder={field.placeholder || field.label}
           required={field.required}
-          className="w-full h-[52px] px-[16px] rounded-[12px] bg-[#211C0B]/20 border border-white/30 text-white font-anaheim font-semibold text-[16px] placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors"
+          className="w-full h-[52px] px-[16px] rounded-[12px] bg-[#211C0B]/20 border border-white/30 text-white font-anaheim font-semibold text-[16px] placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
         />
       );
     }
@@ -646,7 +646,7 @@ export const MobileField: React.FC<MobileFieldProps> = ({
             onChange={(e) => handleChange(field.fieldName, e.target.value)}
             placeholder={field.placeholder}
             required={field.required}
-            className="w-full h-[100px] px-[16px] py-[12px] rounded-[12px] bg-[#211C0B]/20 border border-white/30 text-white font-anaheim font-semibold text-[16px] placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors resize-none"
+            className="w-full h-[100px] px-[16px] py-[12px] rounded-[12px] bg-[#211C0B]/20 border border-white/30 text-white font-anaheim font-semibold text-[16px] placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors resize-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
           />
         </div>
       );

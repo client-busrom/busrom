@@ -165,7 +165,7 @@ function CustomDropdown({
                     paddingRight: isMobile ? mvw(16) : vw(INPUT_PX),
                   }}
                 >
-                  <span className="truncate">{opt.label}</span>
+                  <span className="truncate flex-1">{opt.label}</span>
                   {value === opt.value && (
                     <div className="w-2 h-2 rounded-full bg-[#756F3F]" />
                   )}
@@ -359,14 +359,14 @@ export function ApplicationContactFormSection({
               isMobile ? "!pl-[4.1vw] !pr-1" : `!pl-[${vw(INPUT_PX)}] !pr-2`,
             )}
             inputClassName={cn(
-              "!bg-transparent !text-[#9D9473] !font-montserrat !font-semibold !placeholder-[#9D9473]/60 !pl-2",
+              "!bg-transparent !text-[#5E552C] !font-montserrat !font-semibold !placeholder-[#9D9473]/60 !pl-2 [&:-webkit-autofill]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]",
               `![font-size:${isMobile ? mvw(15) : vw(16)}]`,
             )}
             dialCodeClassName={cn(
-              "!text-[#9D9473] !font-montserrat !font-semibold",
+              "!text-[#5E552C] !font-montserrat !font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:#5E552C!important]",
               `![font-size:${isMobile ? mvw(15) : vw(16)}]`,
             )}
-            chevronClassName="!text-[#9D9473]"
+            chevronClassName="!text-[#5E552C]"
           />
         </div>
       );
@@ -414,7 +414,7 @@ export function ApplicationContactFormSection({
           <input
             type={field.fieldType === "email" ? "email" : "text"}
             placeholder={field.placeholder || field.label}
-            className="w-full font-semibold text-[#5E552C] placeholder:text-[#9D9473]/60 outline-none !bg-transparent"
+            className="w-full font-semibold text-[#5E552C] placeholder:text-[#9D9473]/60 outline-none !bg-transparent [&:-webkit-autofill]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{ fontSize: isMobile ? mvw(15) : vw(16) }}
             value={formData[field.fieldName] || ""}
             onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
@@ -497,12 +497,14 @@ export function ApplicationContactFormSection({
         input:-webkit-autofill,
         input:-webkit-autofill:hover,
         input:-webkit-autofill:focus,
+        input:-webkit-autofill:active,
         textarea:-webkit-autofill,
         textarea:-webkit-autofill:hover,
-        textarea:-webkit-autofill:focus {
+        textarea:-webkit-autofill:focus,
+        textarea:-webkit-autofill:active {
           -webkit-text-fill-color: #5e552c !important;
           -webkit-box-shadow: 0 0 0px 1000px #d4cbaf inset !important;
-          transition: background-color 5000s ease-in-out 0s !important;
+          transition: background-color 9999s ease-in-out 0s !important;
         }
       `}</style>
       <div className="absolute inset-0">

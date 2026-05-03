@@ -24,6 +24,14 @@ interface HeroSectionProps {
 
 export function HeroSection({ slides, locale }: HeroSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Auto-play
   useEffect(() => {
@@ -151,12 +159,8 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                         className="relative md:ml-[-36px] flex flex-col justify-start w-full md:w-[958px] min-h-[220px] md:min-h-[285px] backdrop-blur-[10px]"
                         style={{
                           backgroundColor: textBoxColor,
-                          padding: "48px",
-                          paddingLeft:
-                            typeof window !== "undefined" &&
-                            window.innerWidth < 768
-                              ? "48px"
-                              : "140px",
+                          padding: isMobile ? "32px 20px" : "48px",
+                          paddingLeft: isMobile ? "20px" : "140px",
                         }}
                       >
                         <div className="mb-6 relative">
