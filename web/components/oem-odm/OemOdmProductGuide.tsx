@@ -426,19 +426,35 @@ export function OemOdmProductGuide({
             </motion.p>
 
             {/* View More 按钮 */}
-            <a
+            <motion.a
               href={buttonLink}
-              className="flex items-center justify-center font-anaheim font-semibold border-2 border-[#756F3F] text-[#756F3F] bg-transparent hover:bg-[#756F3F] hover:text-white transition-all duration-300"
               style={{
+                transformOrigin: "center",
                 marginTop: rpx(80),
                 width: rpx(407),
                 height: rpx(102),
                 borderRadius: rpx(63),
                 fontSize: rpx(48),
               }}
+              initial={{ rotate: 0, scale: 1 }}
+              animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+              whileHover={{
+                rotate: 0,
+                scale: 1.05,
+                transition: { scale: { duration: 0.3, ease: "easeOut" } },
+              }}
+              transition={{
+                rotate: {
+                  duration: 0.5,
+                  repeat: Infinity,
+                  repeatDelay: 2,
+                  ease: "linear",
+                },
+              }}
+              className="flex items-center justify-center font-anaheim font-semibold border-2 border-[#756F3F] text-[#756F3F] bg-transparent hover:bg-[#756F3F] hover:text-white transition-colors duration-300"
             >
               {buttonText}
-            </a>
+            </motion.a>
           </div>
         </div>
       </div>
@@ -507,12 +523,28 @@ export function OemOdmProductGuide({
         </p>
 
         {/* 按钮 */}
-        <a
+        <motion.a
           href={buttonLink}
-          className="inline-flex items-center justify-center font-anaheim font-semibold py-3 px-8 rounded-full text-xl border-2 border-[#756F3F] text-[#756F3F] bg-transparent hover:bg-[#756F3F] hover:text-white transition-all duration-300"
+          style={{ transformOrigin: "center" }}
+          initial={{ rotate: 0, scale: 1 }}
+          animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+          whileHover={{
+            rotate: 0,
+            scale: 1.05,
+            transition: { scale: { duration: 0.3, ease: "easeOut" } },
+          }}
+          transition={{
+            rotate: {
+              duration: 0.5,
+              repeat: Infinity,
+              repeatDelay: 2,
+              ease: "linear",
+            },
+          }}
+          className="inline-flex items-center justify-center font-anaheim font-semibold py-3 px-8 rounded-full text-xl border-2 border-[#756F3F] text-[#756F3F] bg-transparent hover:bg-[#756F3F] hover:text-white transition-colors duration-300"
         >
           {buttonText}
-        </a>
+        </motion.a>
       </div>
     </section>
   );

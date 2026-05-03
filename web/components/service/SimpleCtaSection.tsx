@@ -268,7 +268,7 @@ export function SimpleCtaSection({
                 duration: 0.5,
                 repeat: Infinity,
                 repeatDelay: 2,
-                ease: "easeInOut",
+                ease: "linear",
               },
             }}
           >

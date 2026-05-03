@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, FormEvent, useRef, useCallback } from "react"
+import { motion } from "framer-motion"
 import type { Locale } from "@/i18n.config"
 import { Info, ChevronDown } from "lucide-react"
 import { Turnstile } from "@/components/ui/turnstile"
@@ -995,8 +996,24 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
       )}
 
       {/* Submit button */}
-      <button
+      <motion.button
         type="submit"
+        style={{ transformOrigin: "center" }}
+        initial={{ rotate: 0, scale: 1 }}
+        animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+        whileHover={{
+          rotate: 0,
+          scale: 1.05,
+          transition: { scale: { duration: 0.3, ease: "easeOut" } },
+        }}
+        transition={{
+          rotate: {
+            duration: 0.5,
+            repeat: Infinity,
+            repeatDelay: 2,
+            ease: "linear",
+          },
+        }}
         disabled={submitting || (shouldShowCaptcha && !turnstileToken) || (!!formConfig.privacyConsentText && !privacyAccepted)}
         className={cn(
           "w-full py-4 px-6 bg-brand-text-black text-white font-anaheim font-bold uppercase tracking-wider hover:bg-brand-accent-gold hover:text-brand-text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-pre-line leading-tight h-auto",
@@ -1004,7 +1021,7 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
         )}
       >
         {submitting ? (formConfig.submittingText || "Sending...") : (formConfig.submitButtonText || "Submit")}
-      </button>
+      </motion.button>
     </form>
   )
 }

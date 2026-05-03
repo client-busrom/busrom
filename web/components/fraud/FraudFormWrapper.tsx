@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import { motion } from "framer-motion";
 import { RichText } from "@payloadcms/richtext-lexical/react";
 import { Upload, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -338,10 +339,26 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
           )}
 
           <div className="pt-6">
-             <button 
+             <motion.button 
+                style={{ transformOrigin: "center" }}
+                initial={{ rotate: 0, scale: 1 }}
+                animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+                whileHover={{
+                  rotate: 0,
+                  scale: 1.05,
+                  transition: { scale: { duration: 0.3, ease: "easeOut" } },
+                }}
+                transition={{
+                  rotate: {
+                    duration: 0.5,
+                    repeat: Infinity,
+                    repeatDelay: 2,
+                    ease: "linear",
+                  },
+                }}
                 type="submit" 
                 disabled={isSubmitting || (contactForm.formConfig?.captchaEnabled && !turnstileToken) || (!!getLocalizedString(contactForm.formConfig?.privacyConsentText, locale) && !privacyAccepted)}
-                className="group flex items-center justify-center gap-4 bg-[#564D03] text-white px-12 h-16 rounded-full font-black uppercase tracking-widest hover:bg-[#3d3602] transition-all disabled:opacity-50 disabled:cursor-not-allowed w-full"
+                className="group flex items-center justify-center gap-4 bg-[#564D03] text-white px-12 h-16 rounded-full font-black uppercase tracking-widest hover:bg-[#3d3602] disabled:opacity-50 disabled:cursor-not-allowed w-full"
              >
                 {isSubmitting 
                   ? (getLocalizedString(contactForm.formConfig?.submittingText, locale) || (locale === 'zh' ? '提交中...' : "Submitting...")) 
@@ -350,7 +367,7 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
                       : (getLocalizedString(contactForm.formConfig?.submitButtonText, locale) || (locale === 'zh' ? '提交报告' : "Submit Report"))
                     )
                 }
-             </button>
+             </motion.button>
           </div>
 
           {getLocalizedString(contactForm.formConfig?.privacyConsentText, locale) && (

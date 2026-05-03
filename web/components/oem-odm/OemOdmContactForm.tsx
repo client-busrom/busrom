@@ -680,10 +680,26 @@ export function OemOdmContactForm({
                     {error && <p className="text-red-600 font-bold">{error}</p>}
                     <motion.button
                       type="submit"
+                      style={{ transformOrigin: "center" }}
+                      initial={{ rotate: 0, scale: 1 }}
+                      animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+                      whileHover={{
+                        rotate: 0,
+                        scale: 1.05,
+                        transition: { scale: { duration: 0.3, ease: "easeOut" } },
+                      }}
+                      transition={{
+                        rotate: {
+                          duration: 0.5,
+                          repeat: Infinity,
+                          repeatDelay: 2,
+                          ease: "linear",
+                        },
+                      }}
                       disabled={
                         submitting || (!!privacyText && !privacyAccepted)
                       }
-                      className="w-full md:w-[400px] py-4 rounded-full bg-[#756F3F] text-white text-3xl font-extrabold flex items-center justify-center hover:bg-[#FBF6E4] hover:text-[#756F3F] border border-[#756F3F] transition-all disabled:opacity-50"
+                      className="w-full md:w-[400px] py-4 rounded-full bg-[#756F3F] text-white text-3xl font-extrabold flex items-center justify-center hover:bg-[#FBF6E4] hover:text-[#756F3F] border border-[#756F3F] transition-colors disabled:opacity-50"
                       whileTap={{ scale: 0.98 }}
                     >
                       {submitting

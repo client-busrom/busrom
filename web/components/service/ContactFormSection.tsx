@@ -5,6 +5,7 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { Turnstile } from "@/components/ui/turnstile";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 import {
   ContactFormSectionProps,
@@ -184,13 +185,10 @@ export function ContactFormSection({
                 className="w-full h-full object-cover opacity-50"
               />
             ))}
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
-        </div>
-
-        {/* Mobile Content */}
-        <div className="relative px-5 py-12">
+          {/* Mobile Content */}
+        <div className="relative px-5 py-12 flex flex-col items-center">
           {/* Header */}
-          <div className="mb-14">
+          <div className="mb-14 text-center max-w-[640px] w-full">
             <h2 className="font-anaheim font-extrabold text-[42px] leading-[1.1] text-white mb-4 whitespace-pre-line">
               {title.map((segment, idx) =>
                 segment.hollow ? (
@@ -223,150 +221,169 @@ export function ContactFormSection({
             )}
           </div>
 
-          {/* Form */}
-          {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : submitted ? (
-            <div className="bg-white/20 backdrop-blur-sm rounded-[12px] p-6 text-center">
-              <svg
-                className="w-12 h-12 text-[#FFF071] mx-auto mb-3"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <h3 className="font-anaheim font-bold text-[24px] text-white mb-2">
-                {locale === "zh" ? "提交成功！" : "Success!"}
-              </h3>
-              <p className="font-anaheim text-white/80 text-[16px]">
-                {formConfig?.successMessage ||
-                  (locale === "zh"
-                    ? "您的消息已成功发送！"
-                    : "Your message has been sent successfully!")}
-              </p>
-            </div>
-          ) : (
-            <form
-              onSubmit={(e) => handleSubmit(e, locale)}
-              className="space-y-[12px]"
-            >
-              {fields.nameEmail.slice(0, 2).map((field) => (
-                <div key={field.fieldName}>{renderMobileField(field)}</div>
-              ))}
-              {fields.serviceType && renderMobileField(fields.serviceType)}
-              {fields.description && renderMobileField(fields.description)}
-              {fields.file && renderMobileField(fields.file)}
-
-              {shouldShowCaptcha && formConfig?.captchaSiteKey && (
-                <div className="flex justify-center py-3">
-                  <Turnstile
-                    siteKey={formConfig.captchaSiteKey}
-                    onVerify={handleTurnstileVerify}
-                    onError={handleTurnstileError}
-                    onExpire={handleTurnstileExpire}
-                    theme={formConfig.captchaTheme}
-                    size="compact"
-                    language={locale === "zh" ? "zh-CN" : locale}
-                  />
-                </div>
-              )}
-
-              {error && (
-                <div className="bg-red-500/20 border border-red-500/50 rounded-[12px] p-3 text-red-200 text-sm">
-                  {error}
-                </div>
-              )}
-
-              {formConfig?.privacyConsentText && (
-                <div
-                  className="flex items-start gap-3 py-2 cursor-pointer"
-                  onClick={() => handlePrivacyToggle(!privacyAccepted)}
+          {/* Form wrapper for tablet width control */}
+          <div className="w-full max-w-[640px]">
+            {/* Form */}
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : submitted ? (
+              <div className="bg-white/20 backdrop-blur-sm rounded-[12px] p-6 text-center">
+                <svg
+                  className="w-12 h-12 text-[#FFF071] mx-auto mb-3"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <div
-                    className={cn(
-                      "mt-0.5 w-5 h-5 shrink-0 rounded border-2 border-white/30 flex items-center justify-center transition-all",
-                      privacyAccepted && "bg-[#B2A224] border-[#B2A224]",
-                    )}
-                  >
-                    {privacyAccepted && (
-                      <svg
-                        className="w-3.5 h-3.5 text-white"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={3}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    )}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <h3 className="font-anaheim font-bold text-[24px] text-white mb-2">
+                  {locale === "zh" ? "提交成功！" : "Success!"}
+                </h3>
+                <p className="font-anaheim text-white/80 text-[16px]">
+                  {formConfig?.successMessage ||
+                    (locale === "zh"
+                      ? "您的消息已成功发送！"
+                      : "Your message has been sent successfully!")}
+                </p>
+              </div>
+            ) : (
+              <form
+                onSubmit={(e) => handleSubmit(e, locale)}
+                className="space-y-[12px]"
+              >
+                {fields.nameEmail.slice(0, 2).map((field) => (
+                  <div key={field.fieldName}>{renderMobileField(field)}</div>
+                ))}
+                {fields.serviceType && renderMobileField(fields.serviceType)}
+                {fields.description && renderMobileField(fields.description)}
+                {fields.file && renderMobileField(fields.file)}
+
+                {shouldShowCaptcha && formConfig?.captchaSiteKey && (
+                  <div className="flex justify-center py-3">
+                    <Turnstile
+                      siteKey={formConfig.captchaSiteKey}
+                      onVerify={handleTurnstileVerify}
+                      onError={handleTurnstileError}
+                      onExpire={handleTurnstileExpire}
+                      theme={formConfig.captchaTheme}
+                      size="compact"
+                      language={locale === "zh" ? "zh-CN" : locale}
+                    />
                   </div>
-                  <p className="text-[13px] leading-relaxed text-white/80 select-none">
-                    {formConfig.privacyConsentText}
-                  </p>
-                </div>
+                )}
+
+                {error && (
+                  <div className="bg-red-500/20 border border-red-500/50 rounded-[12px] p-3 text-red-200 text-sm">
+                    {error}
+                  </div>
+                )}
+
+                {formConfig?.privacyConsentText && (
+                  <div
+                    className="flex items-center gap-3 py-2 cursor-pointer"
+                    onClick={() => handlePrivacyToggle(!privacyAccepted)}
+                  >
+                    <div
+                      className={cn(
+                        "w-5 h-5 shrink-0 rounded border-2 border-white/30 flex items-center justify-center transition-all",
+                        privacyAccepted && "bg-[#B2A224] border-[#B2A224]",
+                      )}
+                    >
+                      {privacyAccepted && (
+                        <svg
+                          className="w-3.5 h-3.5 text-white"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={3}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                    <p className="text-[13px] leading-relaxed text-white/80 select-none">
+                      {formConfig.privacyConsentText}
+                    </p>
+                  </div>
+                )}
+
+                <motion.button
+                  initial={{ rotate: 0, scale: 1 }}
+                  animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+                  whileHover={{
+                    rotate: 0,
+                    scale: 1.08,
+                    transition: { scale: { duration: 0.3, ease: "easeOut" } },
+                  }}
+                  transition={{
+                    rotate: {
+                      duration: 0.5,
+                      repeat: Infinity,
+                      repeatDelay: 2,
+                      ease: "easeInOut",
+                    },
+                  }}
+                  type="submit"
+                  disabled={
+                    submitting ||
+                    (shouldShowCaptcha && !turnstileToken) ||
+                    (!!formConfig?.privacyConsentText && !privacyAccepted)
+                  }
+                  className={cn(
+                    "w-full min-h-[52px] py-3 rounded-[100px] bg-[#B2A224] text-white font-anaheim font-semibold text-[16px] leading-tight hover:bg-[#9A8C1E] transition-all flex items-center justify-center text-center",
+                    "disabled:opacity-50 disabled:cursor-not-allowed",
+                    !!formConfig?.privacyConsentText &&
+                      !privacyAccepted &&
+                      "grayscale",
+                  )}
+                >
+                  {submitting
+                    ? formConfig?.submittingText ||
+                      (locale === "zh" ? "发送中..." : "Sending...")
+                    : formConfig?.submitButtonText ||
+                      (locale === "zh" ? "提交咨询" : "Send Inquiry")}
+                </motion.button>
+              </form>
+            )}
+
+            {/* Contact Info & Tips (Unordered Lists) */}
+            <div className="mt-6 pt-5 border-t border-white/20 space-y-6">
+              {/* contact-form-info */}
+              {info && info.length > 0 && (
+                <ul className="space-y-2">
+                  {info.map((item, index) => (
+                    <li
+                      key={index}
+                      className="font-anaheim font-semibold text-[18px] text-white"
+                    >
+                      {renderContactItem(item)}
+                    </li>
+                  ))}
+                </ul>
               )}
 
-              <button
-                type="submit"
-                disabled={
-                  submitting ||
-                  (shouldShowCaptcha && !turnstileToken) ||
-                  (!!formConfig?.privacyConsentText && !privacyAccepted)
-                }
-                className={cn(
-                  "w-full min-h-[52px] py-3 rounded-[100px] bg-[#B2A224] text-white font-anaheim font-semibold text-[16px] leading-tight hover:bg-[#9A8C1E] transition-all flex items-center justify-center text-center",
-                  "disabled:opacity-50 disabled:cursor-not-allowed",
-                  !!formConfig?.privacyConsentText &&
-                    !privacyAccepted &&
-                    "grayscale",
-                )}
-              >
-                {submitting
-                  ? formConfig?.submittingText ||
-                    (locale === "zh" ? "发送中..." : "Sending...")
-                  : formConfig?.submitButtonText ||
-                    (locale === "zh" ? "提交咨询" : "Send Inquiry")}
-              </button>
-            </form>
-          )}
-
-          {/* Contact Info & Tips (Unordered Lists) */}
-          <div className="mt-6 pt-5 border-t border-white/20 space-y-6">
-            {/* contact-form-info */}
-            {info && info.length > 0 && (
-              <ul className="space-y-2">
-                {info.map((item, index) => (
-                  <li
-                    key={index}
-                    className="font-anaheim font-semibold text-[18px] text-white"
-                  >
-                    {renderContactItem(item)}
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            {/* contact-form-tips */}
-            {footerNote && (
-              <p className="font-anaheim font-semibold text-[11px] leading-[18px] text-white/70 whitespace-pre-line">
-                {footerNote}
-              </p>
-            )}
+              {/* contact-form-tips */}
+              {footerNote && (
+                <p className="font-anaheim font-semibold text-[11px] leading-[18px] text-white/70 whitespace-pre-line">
+                  {footerNote}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>
+    </div>
 
       {/* ==================== Desktop Layout ==================== */}
       <div
@@ -607,12 +624,12 @@ export function ContactFormSection({
 
                     {formConfig?.privacyConsentText && (
                       <div
-                        className="flex items-start gap-3 my-2 cursor-pointer"
+                        className="flex items-center gap-3 my-2 cursor-pointer"
                         onClick={() => handlePrivacyToggle(!privacyAccepted)}
                       >
                         <div
                           className={cn(
-                            "mt-1 flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all",
+                            "flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all",
                             privacyAccepted
                               ? "bg-white border-white"
                               : "border-white/30",
@@ -640,11 +657,31 @@ export function ContactFormSection({
                       </div>
                     )}
 
-                    <button
+                    <motion.button
+                      initial={{ rotate: 0, scale: 1 }}
+                      animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+                      whileHover={{
+                        rotate: 0,
+                        scale: 1.08,
+                        transition: {
+                          scale: { duration: 0.3, ease: "easeOut" },
+                        },
+                      }}
+                      transition={{
+                        rotate: {
+                          duration: 0.5,
+                          repeat: Infinity,
+                          repeatDelay: 2,
+                          ease: "linear",
+                        },
+                      }}
                       type="submit"
-                      disabled={submitting || (!!formConfig?.privacyConsentText && !privacyAccepted)}
+                      disabled={
+                        submitting ||
+                        (!!formConfig?.privacyConsentText && !privacyAccepted)
+                      }
                       className={cn(
-                        "w-full bg-[#B2A224] text-white font-anaheim font-bold hover:bg-[#9A8C1E] transition-all flex items-center justify-center text-center",
+                        "w-full bg-[#B2A224] text-white font-anaheim font-bold hover:bg-[#9A8C1E] transition-colors flex items-center justify-center text-center",
                         "disabled:opacity-50 disabled:cursor-not-allowed",
                         !!formConfig?.privacyConsentText &&
                           !privacyAccepted &&
@@ -659,6 +696,7 @@ export function ContactFormSection({
                         paddingLeft: vw(40),
                         paddingRight: vw(40),
                         lineHeight: 1.2,
+                        transformOrigin: "center",
                       }}
                     >
                       {submitting
@@ -666,7 +704,7 @@ export function ContactFormSection({
                           (locale === "zh" ? "发送中..." : "Sending...")
                         : formConfig?.submitButtonText ||
                           (locale === "zh" ? "提交咨询" : "Send Inquiry")}
-                    </button>
+                    </motion.button>
                   </form>
                 )}
               </div>

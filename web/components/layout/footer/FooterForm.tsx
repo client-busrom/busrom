@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Turnstile } from "@/components/ui/turnstile";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { FormConfig } from "./types";
 
 interface Props {
@@ -262,7 +263,23 @@ export default function FooterForm({
             </div>
           )}
 
-          <Button
+          <motion.button
+            style={{ transformOrigin: "center" }}
+            initial={{ rotate: 0, scale: 1 }}
+            animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+            whileHover={{
+              rotate: 0,
+              scale: 1.05,
+              transition: { scale: { duration: 0.3, ease: "easeOut" } },
+            }}
+            transition={{
+              rotate: {
+                duration: 0.5,
+                repeat: Infinity,
+                repeatDelay: 2,
+                ease: "linear",
+              },
+            }}
             type="submit"
             className={cn(
               formButtonClasses,
@@ -279,7 +296,7 @@ export default function FooterForm({
             {isSubmitting
               ? formConfig?.submittingText || "..."
               : formConfig?.submitButtonText || content.form.buttonText}
-          </Button>
+          </motion.button>
         </div>
       </form>
     </div>

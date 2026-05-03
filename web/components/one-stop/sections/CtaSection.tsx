@@ -544,19 +544,22 @@ export function CtaSection({
 
             <motion.button
               type="submit"
-              initial={{ scale: 1 }}
-              animate={{ scale: [1, 1.3, 1] }}
-              transition={{
-                duration: 1,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
+              style={{ transformOrigin: "center" }}
+              initial={{ rotate: 0, scale: 1 }}
+              animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
               whileHover={{
-                scale: 1.1,
-                transition: { duration: 0.2 },
-                boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+                rotate: 0,
+                scale: 1.05,
+                transition: { scale: { duration: 0.3, ease: "easeOut" } },
               }}
-              whileTap={{ scale: 0.96, transition: { duration: 0.1 } }}
+              transition={{
+                rotate: {
+                  duration: 0.5,
+                  repeat: Infinity,
+                  repeatDelay: 2,
+                  ease: "linear",
+                },
+              }}
               disabled={
                 isSubmitting ||
                 (!!mergedConfig?.privacyConsentText && !privacyAccepted)
@@ -794,23 +797,21 @@ export function CtaSection({
 
                 <motion.button
                   type="submit"
-                  initial={{ scale: 1, rotate: 0 }}
-                  animate={{ scale: [1, 1.03, 1], rotate: 0 }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
+                  style={{ transformOrigin: "center" }}
+                  initial={{ rotate: 0, scale: 1 }}
+                  animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
                   whileHover={{
+                    rotate: 0,
                     scale: 1.05,
-                    rotate: 0,
-                    transition: { duration: 0.2 },
-                    boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
+                    transition: { scale: { duration: 0.3, ease: "easeOut" } },
                   }}
-                  whileTap={{
-                    scale: 0.96,
-                    rotate: 0,
-                    transition: { duration: 0.1 },
+                  transition={{
+                    rotate: {
+                      duration: 0.5,
+                      repeat: Infinity,
+                      repeatDelay: 2,
+                      ease: "linear",
+                    },
                   }}
                   disabled={
                     isSubmitting ||

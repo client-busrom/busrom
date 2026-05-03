@@ -10,8 +10,10 @@ import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput"
 import { HollowText } from "@/components/common/HollowText"
 
 const DESIGN_WIDTH = 1920
+const MOBILE_WIDTH = 390
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
-const DEFAULT_TEXTAREA_HEIGHT = 166 
+const mvw = (px: number) => `clamp(${px * 0.8}px, ${(px / MOBILE_WIDTH) * 100}vw, ${px * 1.5}px)`
+const DEFAULT_TEXTAREA_HEIGHT = 166
 
 interface MediaObject {
   id: string
@@ -58,6 +60,16 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
   const [formData, setFormData] = useState<Record<string, string>>({})
   const [fileName, setFileName] = useState<string>("")
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024)
+    }
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
   const [privacyAccepted, setPrivacyAccepted] = useState(false)
   const [isGloballyAccepted, setIsGloballyAccepted] = useState(false)
   const STORAGE_KEY = 'busrom_privacy_consent'
@@ -330,304 +342,424 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
 
   return (
     <section 
-      id="contact-form"
-      className="relative w-full overflow-hidden" 
-      style={{ 
-        height: `calc(${vw(983)} + ${extraHeight}px + ${privacyHeight}px)`,
-        background: "linear-gradient(to bottom, #756f3f 0%, #dbd076 180%)"
+      id="contact" 
+      className="relative w-full overflow-hidden flex flex-col items-center"
+      style={isMobile ? {
+        background: "linear-gradient(to bottom, #756f3f 0%, #dbd076 180%)",
+        paddingTop: mvw(40),
+        paddingBottom: mvw(80),
+      } : {
+        background: "linear-gradient(to bottom, #756f3f 0%, #dbd076 180%)",
+        height: vw(1180),
       }}
     >
-      <div className="relative z-10 w-full h-full max-w-[1920px] mx-auto">
-         {/* 1. Left Content */}
-         <div className="absolute" style={{ left: vw(153), top: vw(315) }}>
-            <h2 className="font-josefin-sans font-semibold uppercase flex flex-col" style={{ fontSize: vw(128), lineHeight: 0.99 }}>
-               {titleLines[0] && (
-                 <HollowText strokeColor="#ffffff" strokeWidth={2}>
-                   {titleLines[0]}
-                 </HollowText>
-               )}
-               {titleLines[1] && (
-                 <span className="text-white">
-                   {titleLines[1]}
-                 </span>
-               )}
-            </h2>
-         </div>
-
-         {/* Small contact form title */}
-         {subtitle && (
-           <div className="absolute" style={{ left: vw(412), top: vw(195) }}>
-             <h3 className="font-josefin-sans font-medium text-white" style={{ fontSize: vw(40), lineHeight: 1.775 }}>
-               {subtitle}
-             </h3>
-           </div>
-         )}
-
-         {/* Description */}
-         <p 
-           className="absolute font-josefin-sans font-medium" 
-           style={{ 
-             left: vw(155), top: vw(612), width: vw(444), 
-             fontSize: vw(20), lineHeight: 1.35, color: "#fff287" 
-           }}
-         >
-            {effectiveDescription}
-         </p>
-
-         {/* 2. Center Image Gallery (Group 259) */}
-         <div className="absolute flex items-center justify-center" style={{ left: vw(521), top: vw(167), width: vw(751), height: vw(643) }}>
-            {/* Ellipse 110 (Decoration circle on top) */}
+      <div 
+        className={cn(
+          "relative z-10 w-full mx-auto",
+          isMobile ? "flex flex-col" : "h-full max-w-[1920px]"
+        )}
+      >
+          {/* Hero Section: Layered Title and Image for Mobile */}
+          <div className={cn(
+            "relative w-full",
+            isMobile ? "flex flex-col items-center justify-center min-h-[80vw] mb-4" : "contents"
+          )}>
+            {/* 1. Image Gallery (The Layer Below) */}
             <div 
-              className="absolute rounded-full" 
-              style={{ 
-                left: 0, 
-                top: 0, 
-                width: vw(291), 
-                height: vw(291), 
-                backgroundColor: "#FFE85699",
-                mixBlendMode: "multiply",
-                zIndex: 2
-              }} 
-            />
-            {/* Main Image (Gallery Circle) */}
-            <div 
-              className="absolute rounded-full overflow-hidden" 
-              style={{ left: vw(108), top: 0, width: vw(643), height: vw(643), zIndex: 1 }}
+              className={cn(
+                "flex items-center justify-center",
+                isMobile ? "absolute inset-0 z-0 opacity-40" : "absolute"
+              )}
+              style={!isMobile ? { left: vw(521), top: vw(167), width: vw(751), height: vw(643) } : { width: "100%", height: "100%" }}
             >
-              <AnimatePresence initial={false} custom={direction}>
-                {validImages[currentImageIndex] && (
-                  <motion.div
-                    key={currentImageIndex}
-                    custom={direction}
-                    variants={sliderVariants}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                    transition={{
-                      x: { type: "spring", stiffness: 300, damping: 30 },
-                      opacity: { duration: 0.2 }
+               {!isMobile && (
+                 <div 
+                   className="absolute rounded-full" 
+                   style={{ 
+                     left: 0, top: 0, width: vw(291), height: vw(291), 
+                     backgroundColor: "#FFE85699", mixBlendMode: "multiply", zIndex: 2 
+                   }} 
+                 />
+               )}
+               
+               <div className="relative flex items-center justify-center w-full h-full">
+                  {/* Image Controls (Now inside the gallery container) */}
+                  {validImages.length > 1 && (
+                    <div className={cn(
+                      "absolute z-30 flex w-full pointer-events-none",
+                      isMobile ? "px-4" : "contents"
+                    )}>
+                      <button 
+                        onClick={handlePrevImage}
+                        className={cn(
+                          "hover:scale-110 transition-transform flex items-center justify-center cursor-pointer pointer-events-auto",
+                          !isMobile && "absolute"
+                        )}
+                        style={isMobile ? {
+                          width: mvw(50), height: mvw(50), transform: "rotate(-45deg)",
+                        } : { 
+                          left: vw(-190), top: vw(50), width: vw(76.56), height: vw(76.56), transform: "rotate(-45deg)",
+                        }}
+                        aria-label="Previous Image"
+                      >
+                        <svg width={isMobile ? "50%" : "100%"} height={isMobile ? "50%" : "100%"} viewBox="0 0 77 77" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path fill="#ffffff" d="M75.17835 76.56344c0.27404 0.00005 0.54193-0.08118 0.7698-0.23341 0.22787-0.15223 0.40548-0.36861 0.51035-0.62179 0.10487-0.25317 0.13231-0.53177 0.07884-0.80054-0.05347-0.26877-0.18546-0.51564-0.37925-0.7094l-71.42781-71.4275 10.50912 0c0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.61219 0.40577-0.97963 0-0.36743-0.14596-0.71981-0.40577-0.97963-0.25981-0.25981-0.6122-0.40577-0.97963-0.40577l-13.86223 0c-0.36458 0.00216-0.71362 0.14795-0.97142 0.40575-0.2578 0.2578-0.40359 0.60684-0.40575 0.97142l0 13.86223c0 0.36743 0.14596 0.71981 0.40577 0.97963 0.25981 0.25981 0.61219 0.40577 0.97963 0.40577 0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.6122 0.40577-0.97963l0-10.50956 71.42782 71.42794c0.12852 0.12883 0.28124 0.231 0.44937 0.30061 0.16814 0.06962 0.34838 0.10532 0.53036 0.10505z" />
+                        </svg>
+                      </button>
+                      <div className={isMobile ? "flex-grow" : ""} />
+                      <button 
+                        onClick={handleNextImage}
+                        className={cn(
+                          "hover:scale-110 transition-transform flex items-center justify-center cursor-pointer pointer-events-auto",
+                          !isMobile && "absolute"
+                        )}
+                        style={isMobile ? {
+                          width: mvw(50), height: mvw(50), transform: "rotate(135deg)",
+                        } : { 
+                          left: vw(716), top: vw(672), width: vw(76.56), height: vw(76.56), transform: "rotate(135deg)",
+                        }}
+                        aria-label="Next Image"
+                      >
+                        <svg width={isMobile ? "50%" : "100%"} height={isMobile ? "50%" : "100%"} viewBox="0 0 77 77" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path fill={isMobile ? "#ffffff" : "#d3c976"} d="M75.17835 76.56344c0.27404 0.00005 0.54193-0.08118 0.7698-0.23341 0.22787-0.15223 0.40548-0.36861 0.51035-0.62179 0.10487-0.25317 0.13231-0.53177 0.07884-0.80054-0.05347-0.26877-0.18546-0.51564-0.37925-0.7094l-71.42781-71.4275 10.50912 0c0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.61219 0.40577-0.97963 0-0.36743-0.14596-0.71981-0.40577-0.97963-0.25981-0.25981-0.6122-0.40577-0.97963-0.40577l-13.86223 0c-0.36458 0.00216-0.71362 0.14795-0.97142 0.40575-0.2578 0.2578-0.40359 0.60684-0.40575 0.97142l0 13.86223c0 0.36743 0.14596 0.71981 0.40577 0.97963 0.25981 0.25981 0.61219 0.40577 0.97963 0.40577 0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.6122 0.40577-0.97963l0-10.50956 71.42782 71.42794c0.12852 0.12883 0.28124 0.231 0.44937 0.30061 0.16814 0.06962 0.34838 0.10532 0.53036 0.10505z" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+
+                  <div 
+                    className="relative rounded-full overflow-hidden" 
+                    style={{ 
+                      width: isMobile ? mvw(340) : vw(643), 
+                      height: isMobile ? mvw(340) : vw(643), 
+                      zIndex: 1 
                     }}
-                    className="absolute w-full h-full"
                   >
-                    <OptimizedImage
-                      image={validImages[currentImageIndex].url}
-                      alt={validImages[currentImageIndex].alt || "Gallery Image"}
-                      containerClassName="w-full h-full"
-                      className="w-full h-full object-cover"
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    <AnimatePresence initial={false} custom={direction}>
+                      {validImages[currentImageIndex] && (
+                        <motion.div
+                          key={currentImageIndex}
+                          custom={direction}
+                          variants={sliderVariants}
+                          initial="enter"
+                          animate="center"
+                          exit="exit"
+                          transition={{
+                            x: { type: "spring", stiffness: 300, damping: 30 },
+                            opacity: { duration: 0.2 }
+                          }}
+                          className="absolute w-full h-full"
+                        >
+                          <OptimizedImage
+                            image={validImages[currentImageIndex].url}
+                            alt={validImages[currentImageIndex].alt || "Gallery Image"}
+                            containerClassName="w-full h-full"
+                            className="w-full h-full object-cover"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+               </div>
             </div>
 
-            {/* Pagination Controls */}
-            {validImages.length > 1 && (
-              <>
-                {/* Prev Btn (from pencil iJ7bU) */}
-                <button 
-                  onClick={handlePrevImage}
-                  className="absolute z-10 hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
-                  style={{ 
-                    left: vw(-190), 
-                    top: vw(50), 
-                    width: vw(76.56), 
-                    height: vw(76.56), 
-                    transform: "rotate(-45deg)",
-                  }}
-                  aria-label="Previous Image"
-                >
-                  <svg width="100%" height="100%" viewBox="0 0 77 77" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill="#ffffff" d="M75.17835 76.56344c0.27404 0.00005 0.54193-0.08118 0.7698-0.23341 0.22787-0.15223 0.40548-0.36861 0.51035-0.62179 0.10487-0.25317 0.13231-0.53177 0.07884-0.80054-0.05347-0.26877-0.18546-0.51564-0.37925-0.7094l-71.42781-71.4275 10.50912 0c0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.61219 0.40577-0.97963 0-0.36743-0.14596-0.71981-0.40577-0.97963-0.25981-0.25981-0.6122-0.40577-0.97963-0.40577l-13.86223 0c-0.36458 0.00216-0.71362 0.14795-0.97142 0.40575-0.2578 0.2578-0.40359 0.60684-0.40575 0.97142l0 13.86223c0 0.36743 0.14596 0.71981 0.40577 0.97963 0.25981 0.25981 0.61219 0.40577 0.97963 0.40577 0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.6122 0.40577-0.97963l0-10.50956 71.42782 71.42794c0.12852 0.12883 0.28124 0.231 0.44937 0.30061 0.16814 0.06962 0.34838 0.10532 0.53036 0.10505z" />
-                  </svg>
-                </button>
-                {/* Next Btn (from pencil OmRkm) */}
-                <button 
-                  onClick={handleNextImage}
-                  className="absolute z-10 hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
-                  style={{ 
-                    left: vw(716), 
-                    top: vw(672), 
-                    width: vw(76.56), 
-                    height: vw(76.56), 
-                    transform: "rotate(135deg)",
-                  }}
-                  aria-label="Next Image"
-                >
-                  <svg width="100%" height="100%" viewBox="0 0 77 77" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill="#d3c976" d="M75.17835 76.56344c0.27404 0.00005 0.54193-0.08118 0.7698-0.23341 0.22787-0.15223 0.40548-0.36861 0.51035-0.62179 0.10487-0.25317 0.13231-0.53177 0.07884-0.80054-0.05347-0.26877-0.18546-0.51564-0.37925-0.7094l-71.42781-71.4275 10.50912 0c0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.61219 0.40577-0.97963 0-0.36743-0.14596-0.71981-0.40577-0.97963-0.25981-0.25981-0.6122-0.40577-0.97963-0.40577l-13.86223 0c-0.36458 0.00216-0.71362 0.14795-0.97142 0.40575-0.2578 0.2578-0.40359 0.60684-0.40575 0.97142l0 13.86223c0 0.36743 0.14596 0.71981 0.40577 0.97963 0.25981 0.25981 0.61219 0.40577 0.97963 0.40577 0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.6122 0.40577-0.97963l0-10.50956 71.42782 71.42794c0.12852 0.12883 0.28124 0.231 0.44937 0.30061 0.16814 0.06962 0.34838 0.10532 0.53036 0.10505z" />
-                  </svg>
-                </button>
-              </>
+            {/* 2. Content Area (Title, Subtitle - The Layer Above) */}
+            <div 
+              className={cn(
+                isMobile ? "relative z-10 flex flex-col text-center px-4" : "absolute"
+              )}
+              style={!isMobile ? { left: vw(153), top: vw(315), zIndex: 10 } : { maxWidth: "640px", width: '100%' }}
+            >
+               {subtitle && (
+                 <div 
+                   className={cn(isMobile ? "mb-2" : "absolute")} 
+                   style={!isMobile ? { left: vw(259), top: vw(-120) } : {}}
+                 >
+                   <h3 
+                     className="font-josefin-sans font-medium text-white" 
+                     style={{ fontSize: isMobile ? mvw(24) : vw(40), lineHeight: 1.2 }}
+                   >
+                     {subtitle}
+                   </h3>
+                 </div>
+               )}
+
+               <h2 
+                 className={cn(
+                   "font-josefin-sans font-semibold uppercase flex flex-col",
+                   isMobile ? "" : ""
+                 )} 
+                 style={{ fontSize: isMobile ? mvw(64) : vw(128), lineHeight: 0.99 }}
+               >
+                  {titleLines[0] && (
+                    <HollowText strokeColor="#ffffff" strokeWidth={isMobile ? 1 : 2}>
+                      {titleLines[0]}
+                    </HollowText>
+                  )}
+                  {titleLines[1] && (
+                    <span className="text-white">
+                      {titleLines[1]}
+                    </span>
+                  )}
+               </h2>
+            </div>
+          </div>
+
+          {/* Description (Stays Below the Hero area on mobile) */}
+          {isMobile && effectiveDescription && (
+             <div className="w-full max-w-[640px] mx-auto text-center px-4 mb-8">
+               <p 
+                 className="font-josefin-sans font-medium" 
+                 style={{ fontSize: mvw(16), lineHeight: 1.4, color: "#fff287" }}
+               >
+                 {effectiveDescription}
+               </p>
+             </div>
+          )}
+
+
+          {!isMobile && (
+            <p 
+              className="absolute font-josefin-sans font-medium" 
+              style={{ 
+                left: vw(155), top: vw(612), width: vw(444), 
+                fontSize: vw(20), lineHeight: 1.35, color: "#fff287", zIndex: 10
+              }}
+            >
+               {effectiveDescription}
+            </p>
+          )}
+
+          {/* 3. Right Form Area */}
+          <div 
+            className={cn(
+              isMobile ? "w-full max-w-[640px] mx-auto" : "absolute"
             )}
-         </div>
+            style={!isMobile ? { left: vw(1359), top: vw(206), width: vw(366), zIndex: 20 } : {}}
+          >
+            <form 
+              onSubmit={handleSubmit}
+              className="flex flex-col"
+              style={{ gap: isMobile ? mvw(12) : vw(20) }}
+            >
+                {sortedFields.length > 0 ? (
+                  <>
+                    {sortedFields.map((field) => {
+                      const isTextarea = field.fieldType === "textarea" || field.fieldName === "message"
+                      if (isTextarea) {
+                        return (
+                          <textarea
+                            key={field.fieldName}
+                            ref={textareaRef}
+                            placeholder={`${field.placeholder || field.label}${field.required ? " *" : ""}`}
+                            value={formData[field.fieldName] || ""}
+                            onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
+                            className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-y outline-none focus:border-white transition-colors"
+                            style={{
+                              width: "100%", 
+                              minHeight: isMobile ? mvw(120) : vw(103), 
+                              maxHeight: isMobile ? mvw(300) : vw(250), 
+                              borderRadius: isMobile ? mvw(12) : vw(15),
+                              backgroundColor: "#746d37", border: "1px solid rgba(255, 255, 255, 0.34)",
+                              paddingLeft: isMobile ? mvw(16) : vw(23), 
+                              paddingRight: isMobile ? mvw(16) : vw(23), 
+                              paddingTop: isMobile ? mvw(16) : vw(20),
+                              fontSize: isMobile ? mvw(16) : vw(16), 
+                              lineHeight: 1.5,
+                            }}
+                            required={field.required}
+                            disabled={isSubmitting}
+                          />
+                        )
+                      }
 
-         {/* 3. Right Form Area */}
-         <form 
-           onSubmit={handleSubmit}
-           className="absolute flex flex-col"
-           style={{ left: vw(1359), top: vw(206), width: vw(366), gap: vw(20) }}
-         >
-            {sortedFields.length > 0 ? (
-              <>
-                {sortedFields.map((field) => {
-                  const isTextarea = field.fieldType === "textarea" || field.fieldName === "message"
-                  if (isTextarea) {
-                    return (
-                      <textarea
-                        key={field.fieldName}
-                        ref={textareaRef}
-                        placeholder={`${field.placeholder || field.label}${field.required ? " *" : ""}`}
-                        value={formData[field.fieldName] || ""}
-                        onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
-                        className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-y outline-none focus:border-white transition-colors"
-                        style={{
-                          width: vw(366), minHeight: vw(103), maxHeight: vw(250), borderRadius: vw(15),
-                          backgroundColor: "#746d37", border: "1px solid rgba(255, 255, 255, 0.34)",
-                          paddingLeft: vw(23), paddingRight: vw(23), paddingTop: vw(20),
-                          fontSize: vw(16), lineHeight: vw(24),
-                        }}
-                        required={field.required}
-                        disabled={isSubmitting}
-                      />
-                    )
-                  }
+                      const fieldTypeLower = field.fieldType?.toLowerCase()
+                      const fieldNameLower = field.fieldName?.toLowerCase()
+                      const isPhoneField = fieldTypeLower === 'phone' || fieldTypeLower === 'tel' || fieldNameLower?.includes('phone') || fieldNameLower?.includes('whatsapp')
+                      const isCountryField = fieldTypeLower === 'country' || fieldNameLower?.includes('country') || fieldNameLower?.includes('region')
 
-                  const fieldTypeLower = field.fieldType?.toLowerCase()
-                  const fieldNameLower = field.fieldName?.toLowerCase()
-                  const isPhoneField = fieldTypeLower === 'phone' || fieldTypeLower === 'tel' || fieldNameLower?.includes('phone') || fieldNameLower?.includes('whatsapp')
-                  const isCountryField = fieldTypeLower === 'country' || fieldNameLower?.includes('country') || fieldNameLower?.includes('region')
+                      if (isPhoneField) {
+                        return (
+                          <div key={field.fieldName} className="dynamic-phone-input w-full">
+                            <PhoneInput
+                              value={formData[field.fieldName] || ''}
+                              onChange={(phone) => handleInputChange(field.fieldName, phone)}
+                              placeholder={`${field.placeholder || field.label}${field.required ? " *" : ""}`}
+                              required={field.required}
+                              disabled={isSubmitting}
+                              className="!bg-[#746d37] !border-white/34"
+                              style={{ 
+                                height: isMobile ? mvw(50) : vw(63), 
+                                borderRadius: isMobile ? mvw(12) : vw(15) 
+                              }}
+                              buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5"
+                              inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold"
+                              dialCodeClassName="!text-white !font-anaheim"
+                            />
+                          </div>
+                        )
+                      }
 
-                  if (isPhoneField) {
-                    return (
-                      <div key={field.fieldName} className="dynamic-phone-input w-full">
-                        <PhoneInput
-                          value={formData[field.fieldName] || ''}
-                          onChange={(phone) => handleInputChange(field.fieldName, phone)}
+                      if (isCountryField) {
+                        return (
+                          <div key={field.fieldName} className="relative">
+                            <select
+                              id={field.fieldName}
+                              name={field.fieldName}
+                              value={formData[field.fieldName] || ''}
+                              onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
+                              required={field.required}
+                              className="font-anaheim font-semibold appearance-none bg-[#746d37] border border-white/34 text-white w-full placeholder:text-white/50 focus:outline-none focus:border-white transition-colors"
+                              style={{
+                                height: isMobile ? mvw(50) : vw(63), 
+                                borderRadius: isMobile ? mvw(12) : vw(15), 
+                                paddingLeft: isMobile ? mvw(16) : vw(23), 
+                                paddingRight: isMobile ? mvw(32) : vw(40), 
+                                fontSize: isMobile ? mvw(16) : vw(16),
+                              }}
+                            >
+                              <option value="" className="text-black">Select Country/Region...</option>
+                              {COUNTRIES.map(([name, iso2, dialCode]) => (
+                                <option key={iso2} value={name} className="text-black">{name} (+{dialCode})</option>
+                              ))}
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-white/50">
+                              <ChevronDown size={isMobile ? 18 : 20} />
+                            </div>
+                          </div>
+                        )
+                      }
+
+                      return (
+                        <input
+                          key={field.fieldName}
+                          type={field.fieldType === "email" ? "email" : "text"}
                           placeholder={`${field.placeholder || field.label}${field.required ? " *" : ""}`}
+                          value={formData[field.fieldName] || ""}
+                          onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
+                          className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none focus:border-white transition-colors"
+                          style={{
+                            width: "100%", 
+                            height: isMobile ? mvw(50) : vw(63), 
+                            borderRadius: isMobile ? mvw(12) : vw(15), 
+                            backgroundColor: "#746d37",
+                            border: "1px solid rgba(255, 255, 255, 0.34)", 
+                            paddingLeft: isMobile ? mvw(16) : vw(23), 
+                            fontSize: isMobile ? mvw(16) : vw(16),
+                          }}
                           required={field.required}
                           disabled={isSubmitting}
-                          className="!bg-[#746d37] !border-white/34 !rounded-[15px] !h-[63px] md:!h-[3.28vw]"
-                          buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5"
-                          inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-[16px] md:!text-[1.0416vw]"
-                          dialCodeClassName="!text-white !text-[16px] md:!text-[1.0416vw]"
                         />
-                      </div>
-                    )
-                  }
+                      )
+                    })}
+                  </>
+                ) : (
+                  <>
+                    <input type="text" placeholder="Your Name *" required value={formData.name || ""} onChange={(e) => handleInputChange("name", e.target.value)} className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none" style={{ width: "100%", height: isMobile ? mvw(50) : vw(63), borderRadius: isMobile ? mvw(12) : vw(15), backgroundColor: "#746d37", border: "1px solid rgba(255, 255, 255, 0.34)", paddingLeft: isMobile ? mvw(16) : vw(23), fontSize: isMobile ? mvw(16) : vw(16) }} />
+                    <input type="email" placeholder="Your Email *" required value={formData.email || ""} onChange={(e) => handleInputChange("email", e.target.value)} className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none" style={{ width: "100%", height: isMobile ? mvw(50) : vw(63), borderRadius: isMobile ? mvw(12) : vw(15), backgroundColor: "#746d37", border: "1px solid rgba(255, 255, 255, 0.34)", paddingLeft: isMobile ? mvw(16) : vw(23), fontSize: isMobile ? mvw(16) : vw(16) }} />
+                    <div className="dynamic-phone-input w-full">
+                      <PhoneInput
+                        value={formData.whatsapp || ""}
+                        onChange={(val) => handleInputChange("whatsapp", val)}
+                        placeholder="Your WhatsApp"
+                        className="!bg-[#746d37] !border-white/34"
+                        style={{ height: isMobile ? mvw(50) : vw(63), borderRadius: isMobile ? mvw(12) : vw(15) }}
+                        buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5"
+                        inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold"
+                        dialCodeClassName="!text-white !font-anaheim"
+                      />
+                    </div>
+                    <textarea placeholder="Message" rows={4} value={formData.message || ""} onChange={(e) => handleInputChange("message", e.target.value)} className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-y outline-none" style={{ width: "100%", minHeight: isMobile ? mvw(120) : vw(103), borderRadius: isMobile ? mvw(12) : vw(15), backgroundColor: "#746d37", border: "1px solid rgba(255, 255, 255, 0.34)", paddingLeft: isMobile ? mvw(16) : vw(23), paddingTop: isMobile ? mvw(16) : vw(20), fontSize: isMobile ? mvw(16) : vw(16) }} />
+                  </>
+                )}
 
-                  if (isCountryField) {
-                    return (
-                      <div key={field.fieldName} className="relative">
-                        <select
-                          id={field.fieldName}
-                          name={field.fieldName}
-                          value={formData[field.fieldName] || ''}
-                          onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
-                          required={field.required}
-                          className="font-anaheim font-semibold appearance-none bg-[#746d37] border border-white/34 text-white w-full placeholder:text-white/50 focus:outline-none focus:border-white transition-colors"
-                          style={{
-                            height: vw(63), borderRadius: vw(15), paddingLeft: vw(23), paddingRight: vw(40), fontSize: vw(16),
-                          }}
-                        >
-                          <option value="" className="text-black">Select Country/Region...</option>
-                          {COUNTRIES.map(([name, iso2, dialCode]) => (
-                            <option key={iso2} value={name} className="text-black">{name} (+{dialCode})</option>
-                          ))}
-                        </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-white/50">
-                          <ChevronDown size={20} />
-                        </div>
-                      </div>
-                    )
-                  }
-
-                  return (
-                    <input
-                      key={field.fieldName}
-                      type={field.fieldType === "email" ? "email" : "text"}
-                      placeholder={`${field.placeholder || field.label}${field.required ? " *" : ""}`}
-                      value={formData[field.fieldName] || ""}
-                      onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
-                      className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none focus:border-white transition-colors"
-                      style={{
-                        width: vw(366), height: vw(63), borderRadius: vw(15), backgroundColor: "#746d37",
-                        border: "1px solid rgba(255, 255, 255, 0.34)", paddingLeft: vw(23), fontSize: vw(16),
-                      }}
-                      required={field.required}
-                      disabled={isSubmitting}
+                {/* Turnstile */}
+                {turnstileSiteKey && (
+                  <div style={{ marginTop: isMobile ? mvw(8) : vw(5) }}>
+                    <Turnstile
+                      key={turnstileKey}
+                      siteKey={turnstileSiteKey}
+                      onVerify={handleTurnstileSuccess}
+                      onError={() => setTurnstileToken(null)}
+                      onExpire={() => setTurnstileToken(null)}
+                      theme="dark"
+                      size="compact"
+                      language={locale === "zh" ? "zh-CN" : locale}
                     />
-                  )
-                })}
-              </>
-            ) : (
-              // Default Form Fields if backend form config is missing
-              <>
-                <input type="text" placeholder="Your Name *" required value={formData.name || ""} onChange={(e) => handleInputChange("name", e.target.value)} className="w-[366px] h-[63px] bg-[#746d37] border border-white/34 rounded-[15px] px-[23px] text-white placeholder:text-white/50 outline-none" style={{ width: vw(366), height: vw(63), borderRadius: vw(15), paddingLeft: vw(23), fontSize: vw(16) }} />
-                <input type="email" placeholder="Your Email *" required value={formData.email || ""} onChange={(e) => handleInputChange("email", e.target.value)} className="w-[366px] h-[63px] bg-[#746d37] border border-white/34 rounded-[15px] px-[23px] text-white placeholder:text-white/50 outline-none" style={{ width: vw(366), height: vw(63), borderRadius: vw(15), paddingLeft: vw(23), fontSize: vw(16) }} />
-                <input type="text" placeholder="Your WhatsApp" value={formData.whatsapp || ""} onChange={(e) => handleInputChange("whatsapp", e.target.value)} className="w-[366px] h-[63px] bg-[#746d37] border border-white/34 rounded-[15px] px-[23px] text-white placeholder:text-white/50 outline-none" style={{ width: vw(366), height: vw(63), borderRadius: vw(15), paddingLeft: vw(23), fontSize: vw(16) }} />
-                <textarea placeholder="Message" rows={4} value={formData.message || ""} onChange={(e) => handleInputChange("message", e.target.value)} className="w-[366px] min-h-[103px] bg-[#746d37] border border-white/34 rounded-[15px] px-[23px] py-[20px] text-white placeholder:text-white/50 outline-none resize-y" style={{ width: vw(366), minHeight: vw(103), borderRadius: vw(15), paddingLeft: vw(23), paddingTop: vw(20), fontSize: vw(16) }} />
-              </>
-            )}
+                  </div>
+                )}
 
-            {/* Turnstile */}
-            {turnstileSiteKey && (
-              <div style={{ marginTop: vw(5) }}>
-                <Turnstile
-                  key={turnstileKey}
-                  siteKey={turnstileSiteKey}
-                  onVerify={handleTurnstileSuccess}
-                  onError={() => setTurnstileToken(null)}
-                  onExpire={() => setTurnstileToken(null)}
-                  theme="dark"
-                  size="compact"
-                  language={locale === "zh" ? "zh-CN" : locale}
-                />
-              </div>
-            )}
+                 {/* Privacy Checkbox */}
+                 {effectivePrivacyText && (
+                  <div 
+                    ref={privacyRef}
+                    className="flex items-start gap-2 mt-2 cursor-pointer" 
+                    onClick={() => handlePrivacyToggle(!privacyAccepted)}
+                  >
+                    <div className={cn(
+                      "mt-1 flex-shrink-0 rounded border flex items-center justify-center transition-all",
+                      privacyAccepted ? "bg-[#564d03] border-[#564d03]" : "border-white/30 bg-transparent"
+                    )}
+                    style={{ 
+                      width: isMobile ? mvw(16) : 16, 
+                      height: isMobile ? mvw(16) : 16 
+                    }}
+                    >
+                      {privacyAccepted && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                    </div>
+                    <p 
+                      className="leading-relaxed text-white/70 whitespace-pre-line select-none flex-1"
+                      style={{ fontSize: isMobile ? mvw(12) : "12px" }}
+                    >
+                      {effectivePrivacyText}
+                    </p>
+                  </div>
+                )}
 
-             {/* Privacy Checkbox */}
-             {effectivePrivacyText && (
-              <div 
-                ref={privacyRef}
-                className="flex items-start gap-2 mt-2 cursor-pointer" 
-                onClick={() => handlePrivacyToggle(!privacyAccepted)}
-              >
-                <div className={cn(
-                  "mt-1 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",
-                  privacyAccepted ? "bg-[#564d03] border-[#564d03]" : "border-white/30 bg-transparent"
-                )}>
-                  {privacyAccepted && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
-                </div>
-                <p className="text-[12px] leading-relaxed text-white/70 whitespace-pre-line select-none flex-1">
-                  {effectivePrivacyText}
-                </p>
-              </div>
-            )}
+                {/* Submit Button */}
+                <motion.button
+                  style={{
+                    transformOrigin: "center",
+                    marginTop: isMobile ? mvw(20) : vw(23),
+                    width: "100%",
+                    height: isMobile ? mvw(60) : vw(83),
+                    borderRadius: isMobile ? mvw(30) : vw(63),
+                    fontSize: isMobile ? mvw(20) : vw(32),
+                    lineHeight: 1.2,
+                  }}
+                  initial={{ rotate: 0, scale: 1 }}
+                  animate={isMobile ? {} : { rotate: [0, -3, 3, -3, 3, 0] }}
+                  whileHover={{
+                    rotate: 0,
+                    scale: 1.05,
+                    transition: { scale: { duration: 0.3, ease: "easeOut" } },
+                  }}
+                  transition={{
+                    rotate: {
+                      duration: 0.5,
+                      repeat: Infinity,
+                      repeatDelay: 2,
+                      ease: "linear",
+                    },
+                  }}
+                  type="submit"
+                  disabled={isSubmitting || (!!effectivePrivacyText && !privacyAccepted)}
+                  className="w-full bg-[#564d03] text-white font-anaheim font-semibold text-center uppercase transition-colors duration-300 hover:bg-black disabled:opacity-50"
+                >
+                  {isSubmitting ? (formConfig?.submittingText || "Submitting...") : submitStatus === "success" ? (locale === 'zh' ? '已提交!' : 'Submitted') : effectiveSubmitText}
+                </motion.button>
 
-            {/* Submit Button */}
-            <button
-               type="submit"
-               disabled={isSubmitting || (!!effectivePrivacyText && !privacyAccepted)}
-               className="w-full bg-[#564d03] text-white font-anaheim font-semibold text-center uppercase transition-all duration-300 hover:bg-black disabled:opacity-50"
-               style={{ 
-                 marginTop: vw(23), // to push the button down exactly as in design 
-                 width: vw(366), 
-                 height: vw(83), 
-                 borderRadius: vw(63), 
-                 fontSize: vw(32),
-                 lineHeight: vw(43)
-               }}
-            >
-               {isSubmitting ? (formConfig?.submittingText || "Submitting...") : submitStatus === "success" ? (locale === 'zh' ? '已提交!' : 'Submitted') : effectiveSubmitText}
-            </button>
-
-            {/* Error Status */}
-            {submitStatus === "error" && (
-              <div className="text-red-300 text-sm mt-2 font-anaheim">
-                {errorMessage}
-              </div>
-            )}
-         </form>
+                {/* Error Status */}
+                {submitStatus === "error" && (
+                  <div 
+                    className="text-red-300 text-center mt-2 font-anaheim"
+                    style={{ fontSize: isMobile ? mvw(12) : "14px" }}
+                  >
+                    {errorMessage}
+                  </div>
+                )}
+            </form>
+          </div>
       </div>
     </section>
   )

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
 import type { Locale } from "@/i18n.config"
 import { Turnstile } from "@/components/ui/turnstile"
 
@@ -501,13 +502,29 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
         </div>
       )}
 
-      <button
+      <motion.button
         type="submit"
+        style={{ transformOrigin: "center" }}
+        initial={{ rotate: 0, scale: 1 }}
+        animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+        whileHover={{
+          rotate: 0,
+          scale: 1.05,
+          transition: { scale: { duration: 0.3, ease: "easeOut" } },
+        }}
+        transition={{
+          rotate: {
+            duration: 0.5,
+            repeat: Infinity,
+            repeatDelay: 2,
+            ease: "linear",
+          },
+        }}
         disabled={isSubmitting || (!!formMessages?.privacyConsentText && !privacyAccepted)}
         className="w-full py-3 px-6 bg-brand-secondary text-white font-bold rounded-lg hover:bg-brand-secondary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-pre-line"
       >
         {isSubmitting ? (formMessages?.submittingText || "Submitting...") : (formMessages?.submitButtonText || "Submit Inquiry")}
-      </button>
+      </motion.button>
 
       {/* Privacy Consent Checkbox - Always show if text is present */}
       {formMessages?.privacyConsentText && (

@@ -120,6 +120,8 @@ interface PhoneInputProps {
   name?: string
   id?: string
   style?: React.CSSProperties
+  inputStyle?: React.CSSProperties
+  dialCodeStyle?: React.CSSProperties
 }
 
 export const PhoneInput: React.FC<PhoneInputProps> = ({
@@ -141,6 +143,8 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   name,
   id,
   style,
+  inputStyle,
+  dialCodeStyle,
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
@@ -255,22 +259,22 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
           onClick={() => !disabled && setIsOpen(!isOpen)}
           disabled={disabled}
           className={cn(
-            "h-full flex items-center px-3 transition-all",
+            "h-full flex items-center px-3 md:px-5 lg:px-[0.8333vw] transition-all",
             !buttonClassName?.includes('hover:') && "hover:bg-transparent",
             !className?.includes('border-') && "border-r",
             dialCodeClassName?.includes('border-') ? "" : "border-r-gray-200",
             buttonClassName
           )}
         >
-          <CountryFlag countryCode={selectedCountry[1]} className="w-[1.25vw] h-[0.94vw] rounded-sm flex-shrink-0" />
-          <span 
-            className={cn("ml-2 font-medium text-[vw(20)]", !dialCodeClassName?.includes('text-') && !style?.color && "text-white", dialCodeClassName)}
-            style={{ color: 'var(--text-color)' }}
-          >
+          <CountryFlag 
+            countryCode={selectedCountry[1]} 
+            className="w-6 h-4 md:w-9 md:h-6 lg:w-[1.458vw] lg:h-[0.9375vw] rounded-sm flex-shrink-0" 
+          />
+          <span className={cn("ml-2 md:ml-3 font-semibold text-base md:text-[24px] lg:text-[0.8333vw]", dialCodeClassName)} style={{ color: 'var(--text-color)', ...dialCodeStyle }}>
             +{selectedCountry[2]}
           </span>
           <ChevronDown 
-            className={cn("w-3.5 h-3.5 transition-transform ml-0.5", isOpen && "rotate-180", !chevronClassName?.includes('text-') && !style?.color && "text-white", chevronClassName)} 
+            className={cn("w-4 h-4 md:w-6 md:h-6 lg:w-[0.9375vw] lg:h-[0.9375vw] transition-transform ml-1", isOpen && "rotate-180", !chevronClassName?.includes('text-') && !style?.color && "text-white", chevronClassName)} 
             style={{ color: 'var(--text-color)' }}
           />
         </button>
@@ -286,7 +290,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
           onChange={handlePhoneChange}
           placeholder={placeholder}
           className={cn(
-            "flex-1 min-w-0 px-4 py-2.5 font-medium text-sm h-full",
+            "flex-1 min-w-0 px-4 md:px-6 lg:px-[0.8333vw] py-2.5 font-semibold text-base md:text-[24px] lg:text-[0.8333vw] h-full",
             !inputClassName?.includes('bg-') && "bg-white",
             !inputClassName?.includes('text-') && "text-brand-text-black",
             !inputClassName?.includes('placeholder:') && "placeholder:text-gray-400",
@@ -294,6 +298,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
             disabled && "cursor-not-allowed",
             inputClassName
           )}
+          style={inputStyle}
         />
       </div>
 

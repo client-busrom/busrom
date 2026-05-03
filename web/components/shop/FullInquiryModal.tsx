@@ -5,6 +5,7 @@ import type { Locale } from "@/i18n.config"
 import { Turnstile } from "@/components/ui/turnstile"
 import { PhoneInput } from "@/components/ui/PhoneInput"
 import { cn } from "@/lib/utils"
+import { motion } from "framer-motion"
 
 interface FormField {
   label: string
@@ -710,8 +711,24 @@ export function FullInquiryModal({
             >
               Cancel
             </button>
-            <button
+            <motion.button
               type="submit"
+              style={{ transformOrigin: "center" }}
+              initial={{ rotate: 0, scale: 1 }}
+              animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+              whileHover={{
+                rotate: 0,
+                scale: 1.05,
+                transition: { scale: { duration: 0.3, ease: "easeOut" } },
+              }}
+              transition={{
+                rotate: {
+                  duration: 0.5,
+                  repeat: Infinity,
+                  repeatDelay: 2,
+                  ease: "linear",
+                },
+              }}
               disabled={isSubmitting || (!!effectivePrivacyText && !privacyAccepted)}
               className={cn(
                 "flex-1 py-3 px-6 bg-brand-secondary text-white font-anaheim font-extrabold rounded-lg hover:bg-brand-secondary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg whitespace-pre-line h-auto leading-tight",
@@ -719,7 +736,7 @@ export function FullInquiryModal({
               )}
             >
               {isSubmitting ? (formMessages?.submittingText || "Submitting...") : effectiveSubmitText}
-            </button>
+            </motion.button>
           </div>
 
           {/* Removed passive text in favor of checkbox above */}

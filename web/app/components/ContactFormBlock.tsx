@@ -9,6 +9,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { Turnstile } from '@/components/ui/turnstile'
+import { motion } from 'framer-motion'
 
 interface FormField {
   fieldName: string
@@ -236,13 +237,28 @@ export function ContactFormBlock({
         )}
 
         <div className="pt-4">
-          <button
+          <motion.button
+            initial={{ rotate: 0, scale: 1 }}
+            animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+            whileHover={{
+              rotate: 0,
+              scale: 1.05,
+              transition: { scale: { duration: 0.3, ease: 'easeOut' } },
+            }}
+            transition={{
+              rotate: {
+                duration: 0.5,
+                repeat: Infinity,
+                repeatDelay: 2,
+                ease: 'easeInOut',
+              },
+            }}
             type="submit"
             disabled={isSubmitting}
             className="w-full px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 transition-colors"
           >
             {isSubmitting ? 'Submitting...' : 'Submit'}
-          </button>
+          </motion.button>
         </div>
       </form>
     </div>

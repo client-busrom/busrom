@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import type { Locale } from "@/i18n.config"
 import { PhoneInput } from "@/components/ui/PhoneInput"
+import { motion } from "framer-motion"
 
 interface FormField {
   label: string
@@ -199,6 +200,10 @@ export function SimplifiedInquiryForm({
               placeholder={field.placeholder}
               required={field.required}
               error={!!errors[field.fieldName]}
+              className="!border !border-gray-300 !rounded-lg !h-[42px]"
+              inputClassName="!text-brand-text-black !text-sm !pl-2"
+              dialCodeClassName="!text-brand-text-black !text-sm"
+              buttonClassName="!border-r !border-r-gray-300"
             />
           )
         }
@@ -256,8 +261,24 @@ export function SimplifiedInquiryForm({
         </div>
       )}
 
-      <button
+      <motion.button
         type="submit"
+        style={{ transformOrigin: "center" }}
+        initial={{ rotate: 0, scale: 1 }}
+        animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+        whileHover={{
+          rotate: 0,
+          scale: 1.05,
+          transition: { scale: { duration: 0.3, ease: "easeOut" } },
+        }}
+        transition={{
+          rotate: {
+            duration: 0.5,
+            repeat: Infinity,
+            repeatDelay: 2,
+            ease: "linear",
+          },
+        }}
         disabled={(!!privacyText && !privacyAccepted)}
         className={cn(
           "w-full py-3 px-6 bg-brand-secondary text-white font-bold rounded-lg hover:bg-brand-secondary/90 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:ring-offset-2",
@@ -266,7 +287,7 @@ export function SimplifiedInquiryForm({
         )}
       >
         {submitText}
-      </button>
+      </motion.button>
 
       <p className="text-xs text-gray-500 text-center">
         Click submit to complete your inquiry with additional details
