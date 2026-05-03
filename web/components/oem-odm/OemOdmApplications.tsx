@@ -193,7 +193,7 @@ export function OemOdmApplications({
       {/* ========== PC端布局 ========== */}
       <div
         className="hidden md:block relative w-full cursor-pointer overflow-hidden"
-        style={{ height: rpx(1086) }}
+        style={{ height: rpx(968) }}
         onClick={handleClick}
       >
         {/* 背景大图 - 当前应用 */}
@@ -244,9 +244,9 @@ export function OemOdmApplications({
         >
           {/* 圆形箭头图标 或 自定义图标 */}
           {findOutMore?.icon ? (
-            <motion.div 
-              style={{ width: rpx(110), height: rpx(110) }} 
-              className={`flex items-center justify-center ${typeof findOutMore.icon === 'string' ? 'border border-white rounded-full' : ''}`}
+            <motion.div
+              style={{ width: rpx(110), height: rpx(110) }}
+              className={`flex items-center justify-center ${typeof findOutMore.icon === "string" ? "border border-white rounded-full" : ""}`}
               animate={{
                 x: [0, 10, 0],
                 y: [0, -10, 0],
@@ -258,8 +258,12 @@ export function OemOdmApplications({
                 ease: "easeInOut",
               }}
             >
-              {typeof findOutMore.icon === 'string' ? (
-                <IconifyIcon name={findOutMore.icon} size={rpx(32)} color="white" />
+              {typeof findOutMore.icon === "string" ? (
+                <IconifyIcon
+                  name={findOutMore.icon}
+                  size={rpx(32)}
+                  color="white"
+                />
               ) : (
                 <OptimizedImage
                   image={findOutMore.icon}
@@ -454,9 +458,9 @@ export function OemOdmApplications({
               onClick={handleQuickLinkClick}
             >
               {findOutMore?.icon ? (
-                <motion.div 
-                  style={{ width: 30, height: 30 }} 
-                  className={`flex items-center justify-center ${typeof findOutMore.icon === 'string' ? 'border border-white rounded-full' : ''}`}
+                <motion.div
+                  style={{ width: 30, height: 30 }}
+                  className={`flex items-center justify-center ${typeof findOutMore.icon === "string" ? "border border-white rounded-full" : ""}`}
                   animate={{
                     scale: [1, 1.05, 1],
                   }}
@@ -466,8 +470,12 @@ export function OemOdmApplications({
                     ease: "easeInOut",
                   }}
                 >
-                  {typeof findOutMore.icon === 'string' ? (
-                    <IconifyIcon name={findOutMore.icon} size={24} color="white" />
+                  {typeof findOutMore.icon === "string" ? (
+                    <IconifyIcon
+                      name={findOutMore.icon}
+                      size={24}
+                      color="white"
+                    />
                   ) : (
                     <OptimizedImage
                       image={findOutMore.icon}

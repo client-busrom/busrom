@@ -7,7 +7,7 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920;
-const DESIGN_HEIGHT = 1360;
+const DESIGN_HEIGHT = 922;
 
 // 响应式尺寸函数
 const rpx = (designValue: number) =>
@@ -67,9 +67,9 @@ const defaultContent = {
 
 // 图片卡片配置 - 3个位置的旋转角度和层级
 const cardConfigs = [
-  { rotate: -2.4, top: 510, zIndex: 3, shadow: "0 4px 37px rgba(0,0,0,0.33)" }, // 最上层
-  { rotate: 5, top: 490, zIndex: 2, shadow: "0 4px 24px rgba(0,0,0,0.26)" }, // 中间层
-  { rotate: 11, top: 483, zIndex: 1, shadow: "0 4px 24px rgba(0,0,0,0.26)" }, // 最底层
+  { rotate: -2.4, top: 253, zIndex: 3, shadow: "0 4px 37px rgba(0,0,0,0.33)" }, // 最上层
+  { rotate: 5, top: 233, zIndex: 2, shadow: "0 4px 24px rgba(0,0,0,0.26)" }, // 中间层
+  { rotate: 11, top: 226, zIndex: 1, shadow: "0 4px 24px rgba(0,0,0,0.26)" }, // 最底层
 ];
 
 export function OdmPartner({
@@ -126,7 +126,7 @@ export function OdmPartner({
           className="absolute overflow-visible"
           style={{
             left: rpx(-100),
-            top: rpx(-200),
+            top: rpx(-280),
             width: rpx(600),
             height: rpx(600),
             opacity: 0.3,
@@ -176,7 +176,7 @@ export function OdmPartner({
           className="absolute font-anaheim font-bold text-center w-full"
           style={{
             left: 0,
-            top: rpx(342),
+            top: rpx(120),
             fontSize: rpx(60),
             lineHeight: rpx(71), // 101 * 0.7
             color: "#9C946D",
@@ -198,7 +198,7 @@ export function OdmPartner({
               className="absolute cursor-pointer"
               style={{
                 left: rpx(253),
-                top: rpx(540 + index * 109),
+                top: rpx(300 + index * 109),
                 width: rpx(800),
                 height: rpx(130 * 0.7),
               }}
@@ -339,7 +339,7 @@ export function OdmPartner({
       </div>
 
       {/* ========== 移动端布局 ========== */}
-      <div className="block md:hidden px-5 py-8">
+      <div className="block md:hidden px-5 pt-[120px] pb-16">
         {/* 标题 */}
         <h2
           className="font-anaheim font-bold text-2xl mb-6 text-right"
