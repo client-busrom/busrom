@@ -271,7 +271,7 @@ export const KnowledgeBaseSettings: GlobalConfig = {
                       label: { en: 'Enabled on Templates', zh: '在以下详情页模板生效' },
                     },
                     { name: 'title', type: 'textarea', localized: true, label: { en: 'Title', zh: '标题' } },
-                    { name: 'posts', type: 'relationship', relationTo: 'blogs', hasMany: true },
+                    { name: 'posts', type: 'relationship', relationTo: 'blogs', hasMany: true, localized: true },
                   ],
                 },
                 {
@@ -388,7 +388,7 @@ export const KnowledgeBaseSettings: GlobalConfig = {
                   label: { en: 'Enabled on Templates', zh: '在以下详情页模板生效' },
                 },
                 { name: 'title', type: 'textarea', localized: true, label: { en: 'Title', zh: '板块标题' } },
-                { name: 'posts', type: 'relationship', relationTo: 'blogs', hasMany: true, minRows: 0, maxRows: 3 },
+                { name: 'posts', type: 'relationship', relationTo: 'blogs', hasMany: true, minRows: 0, maxRows: 3, localized: true },
               ],
             },
           ],

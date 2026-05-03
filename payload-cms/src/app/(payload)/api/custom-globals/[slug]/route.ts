@@ -107,13 +107,44 @@ export async function PATCH(
           }
         }
 
-        const cleanedData = cleanInternalFields(mergedData)
+        /**
+         * Deduplicate arrays (especially relationship fields) to prevent validation errors
+         */
+        const deduplicateArrays = (obj: any): any => {
+          if (Array.isArray(obj)) {
+            // Deduplicate simple arrays (IDs, strings)
+            const seen = new Set()
+            return obj.filter(item => {
+              const val = typeof item === 'object' && item !== null ? JSON.stringify(item) : item
+              if (seen.has(val)) return false
+              seen.add(val)
+              return true
+            })
+          }
+          if (typeof obj === 'object' && obj !== null) {
+            const newObj: any = {}
+            for (const key in obj) {
+              newObj[key] = deduplicateArrays(obj[key])
+            }
+            return newObj
+          }
+          return obj
+        }
+
+        const cleanedData = cleanInternalFields(deduplicateArrays(mergedData))
         
         const result = await payload.updateGlobal({
           slug: slug as any,
           locale: loc as any,
           data: cleanedData,
-        })
+          depth: 0,
+          disableHooks: true,
+          overrideAccess: true,
+          context: {
+            isTranslationSave: true,
+            isSyncing: true
+          }
+        } as any)
         results.push(result)
       }
 
