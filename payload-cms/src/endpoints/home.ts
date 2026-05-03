@@ -292,13 +292,12 @@ export const homeContentHandler: PayloadHandler = async (req) => {
 
       // Hero Banner Items
       heroBanner: heroBannerItems.docs.map((item: any) => {
-        // 先配对 image 和 cropData，然后一起过滤，保证索引对齐
         const imagePairs = [
           { image: getMediaWithVariants(item.image1), cropData: item.image1CropData || null },
           { image: getMediaWithVariants(item.image2), cropData: item.image2CropData || null },
           { image: getMediaWithVariants(item.image3), cropData: item.image3CropData || null },
           { image: getMediaWithVariants(item.image4), cropData: item.image4CropData || null },
-        ].filter(pair => pair.image !== null)
+        ]
 
         return {
           id: item.id,
@@ -365,7 +364,7 @@ export const homeContentHandler: PayloadHandler = async (req) => {
               image: num === 3 ? getMediaWithVariants(serviceFeatures[`feature0${num}Image6`]) : null,
               cropData: num === 3 ? (serviceFeatures[`feature0${num}Image6CropData`] || null) : null
             },
-          ].filter(pair => pair.image !== null)
+          ]
 
           return {
             title: serviceFeatures[`feature0${num}Title`],

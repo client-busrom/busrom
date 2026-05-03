@@ -15,9 +15,9 @@ type Props = {
 
 // --- 常量定义 ---
 const SERIES_AUTO_SCROLL_INTERVAL = 30000; // 系列轮播: 30秒
-const IMAGE_AUTO_SCROLL_INTERVAL = 5000;   // 图片轮播: 5秒
-const VISIBLE_WINDOW_SIZE = 5;  // 显示5个标签
-const FOCUS_POSITION = 1;       // 焦点在第二个位置（索引1，从0开始）
+const IMAGE_AUTO_SCROLL_INTERVAL = 5000; // 图片轮播: 5秒
+const VISIBLE_WINDOW_SIZE = 5; // 显示5个标签
+const FOCUS_POSITION = 1; // 焦点在第二个位置（索引1，从0开始）
 const SWIPE_THRESHOLD = 50; // 滑动阈值
 
 export default function SeriesIntro({ data, headerTheme, className }: Props) {
@@ -42,7 +42,7 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     observer.observe(section);
@@ -59,7 +59,7 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
         if (imageObj) {
           // 使用中型或大型变体预加载
           const url = imageObj.variants?.medium || imageObj.url;
-          if (url && !url.includes('placeholder')) {
+          if (url && !url.includes("placeholder")) {
             const img = new Image();
             img.src = url;
           }
@@ -92,7 +92,9 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
   }, [totalSeries]);
 
   const handleSeriesPrev = useCallback(() => {
-    setActiveSeriesIndex((prevIndex) => (prevIndex - 1 + totalSeries) % totalSeries);
+    setActiveSeriesIndex(
+      (prevIndex) => (prevIndex - 1 + totalSeries) % totalSeries,
+    );
     setActiveImageIndex(0);
   }, [totalSeries]);
 
@@ -134,7 +136,10 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
   useEffect(() => {
     if (isDragging || !isVisible || isHovering) return;
 
-    seriesIntervalRef.current = setInterval(handleSeriesNext, SERIES_AUTO_SCROLL_INTERVAL);
+    seriesIntervalRef.current = setInterval(
+      handleSeriesNext,
+      SERIES_AUTO_SCROLL_INTERVAL,
+    );
     return () => {
       if (seriesIntervalRef.current) clearInterval(seriesIntervalRef.current);
     };
@@ -144,7 +149,10 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
   useEffect(() => {
     if (totalImages <= 1 || isDragging || !isVisible || isHovering) return;
 
-    imageIntervalRef.current = setInterval(handleImageNext, IMAGE_AUTO_SCROLL_INTERVAL);
+    imageIntervalRef.current = setInterval(
+      handleImageNext,
+      IMAGE_AUTO_SCROLL_INTERVAL,
+    );
     return () => {
       if (imageIntervalRef.current) clearInterval(imageIntervalRef.current);
     };
@@ -229,7 +237,8 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
 
     for (let i = 0; i < VISIBLE_WINDOW_SIZE; i++) {
       let currentIndex = startIndex + i;
-      const dataIndex = ((currentIndex % totalSeries) + totalSeries) % totalSeries;
+      const dataIndex =
+        ((currentIndex % totalSeries) + totalSeries) % totalSeries;
 
       const item = seriesData[dataIndex];
       if (item) {
@@ -256,20 +265,21 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
       ref={sectionRef}
       className={cn("py-12 lg:py-[60px] bg-brand-main", className)}
       data-header-theme={headerTheme}
-      
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
       <div className="container mx-auto px-4 lg:px-8">
         <div className="bg-brand-secondary rounded-2xl lg:rounded-3xl p-6 lg:py-20 lg:pl-20 lg:pr-0 overflow-hidden">
-
           {/* ===== 桌面端布局 (lg+) ===== */}
           <div className="hidden lg:block">
             {/* 上半部分: 标题+描述 | 系列列表 */}
             <div className="flex gap-12 mb-8">
               {/* 左侧: 标题+描述 */}
               <div className="flex-1">
-                <h2 className="text-5xl xl:text-6xl font-anaheim font-extrabold mb-6" style={{ color: '#FFFAD3' }}>
+                <h2
+                  className="text-5xl xl:text-6xl font-anaheim font-extrabold mb-6"
+                  style={{ color: "#FFFAD3" }}
+                >
                   Product Series Introduction
                 </h2>
                 {activeSeries && (
@@ -291,14 +301,18 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                             key={item.title}
                             layout
                             initial={{ opacity: 0 }}
-                            animate={{ 
+                            animate={{
                               opacity: getOpacity(item.distanceFromFocus),
                               scale: item.isCurrent ? 1.05 : 1,
                             }}
                             exit={{ opacity: 0 }}
                             transition={{
-                              layout: { type: "spring", stiffness: 300, damping: 30 },
-                              opacity: { duration: 0.2 }
+                              layout: {
+                                type: "spring",
+                                stiffness: 300,
+                                damping: 30,
+                              },
+                              opacity: { duration: 0.2 },
                             }}
                             className="w-full text-left py-4 pl-6 transition-colors duration-300 h-14 origin-left"
                             onClick={() => {
@@ -325,24 +339,69 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
 
                 {/* 上下切换按钮 - 切换系列 */}
                 <div className="flex flex-col gap-3 justify-center -translate-x-8">
-                  <button
+                  <motion.button
                     onClick={handleSeriesPrev}
-                    className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                    initial="initial"
+                    whileHover="hover"
+                    whileTap={{ scale: 1.1 }}
+                    variants={{
+                      initial: { backgroundColor: "rgba(255, 255, 255, 0.3)" },
+                      hover: { backgroundColor: "rgba(255, 255, 255, 1)" },
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className="w-12 h-12 rounded-full flex items-center justify-center"
                     aria-label="Previous series"
                   >
-                    <svg className="w-5 h-5 text-brand-cream" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                    </svg>
-                  </button>
-                  <button
+                    <motion.svg
+                      variants={{
+                        initial: { color: "#FFFAD3" },
+                        hover: { color: "#756F3F" },
+                      }}
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 15l7-7 7 7"
+                      />
+                    </motion.svg>
+                  </motion.button>
+
+                  <motion.button
                     onClick={handleSeriesNext}
-                    className="w-12 h-12 rounded-full bg-white flex items-center justify-center transition-colors hover:bg-white/90"
+                    initial="initial"
+                    whileHover="hover"
+                    whileTap={{ scale: 1.1 }}
+                    variants={{
+                      initial: { backgroundColor: "rgba(255, 255, 255, 0.3)" },
+                      hover: { backgroundColor: "rgba(255, 255, 255, 1)" },
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className="w-12 h-12 rounded-full flex items-center justify-center"
                     aria-label="Next series"
                   >
-                    <svg className="w-5 h-5 text-brand-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
+                    <motion.svg
+                      variants={{
+                        initial: { color: "#FFFAD3" },
+                        hover: { color: "#756F3F" },
+                      }}
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </motion.svg>
+                  </motion.button>
                 </div>
               </div>
             </div>
@@ -355,7 +414,10 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                 <div className="flex-1 flex items-center justify-center">
                   <span
                     className="text-xl font-anaheim text-brand-cream whitespace-nowrap tracking-[0.2em]"
-                    style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+                    style={{
+                      writingMode: "vertical-rl",
+                      transform: "rotate(180deg)",
+                    }}
                   >
                     {activeSeries?.title || "Series Title"}
                   </span>
@@ -363,24 +425,69 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
 
                 {/* 切换按钮 - 横向排列 - 切换图片 */}
                 <div className="flex gap-3 justify-center">
-                  <button
+                  <motion.button
                     onClick={handleImagePrev}
-                    className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                    initial="initial"
+                    whileHover="hover"
+                    whileTap={{ scale: 1.1 }}
+                    variants={{
+                      initial: { backgroundColor: "rgba(255, 255, 255, 0.3)" },
+                      hover: { backgroundColor: "rgba(255, 255, 255, 1)" },
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className="w-12 h-12 rounded-full flex items-center justify-center"
                     aria-label="Previous image"
                   >
-                    <svg className="w-5 h-5 text-brand-cream" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  <button
+                    <motion.svg
+                      variants={{
+                        initial: { color: "#FFFAD3" },
+                        hover: { color: "#756F3F" },
+                      }}
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 19l-7-7 7-7"
+                      />
+                    </motion.svg>
+                  </motion.button>
+
+                  <motion.button
                     onClick={handleImageNext}
-                    className="w-12 h-12 rounded-full bg-white flex items-center justify-center transition-colors hover:bg-white/90"
+                    initial="initial"
+                    whileHover="hover"
+                    whileTap={{ scale: 1.1 }}
+                    variants={{
+                      initial: { backgroundColor: "rgba(255, 255, 255, 0.3)" },
+                      hover: { backgroundColor: "rgba(255, 255, 255, 1)" },
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className="w-12 h-12 rounded-full flex items-center justify-center"
                     aria-label="Next image"
                   >
-                    <svg className="w-5 h-5 text-brand-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
+                    <motion.svg
+                      variants={{
+                        initial: { color: "#FFFAD3" },
+                        hover: { color: "#756F3F" },
+                      }}
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </motion.svg>
+                  </motion.button>
                 </div>
               </div>
 
@@ -399,7 +506,9 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                 <div
                   className={cn(
                     "flex gap-4 h-full transition-transform",
-                    (isDragging || isLooping) ? "duration-0" : "duration-500 ease-out"
+                    isDragging || isLooping
+                      ? "duration-0"
+                      : "duration-500 ease-out",
                   )}
                   style={{
                     // 78% = 75% 卡片宽度 + 3% gap
@@ -410,7 +519,10 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                     循环渲染: 在原图后面追加克隆图实现无缝循环
                     结构: [原图1, 原图2, ..., 原图N, 克隆1, 克隆2]
                   */}
-                  {[...currentImages, ...currentImages.slice(0, Math.min(2, totalImages))].map((imageObj, idx) => (
+                  {[
+                    ...currentImages,
+                    ...currentImages.slice(0, Math.min(2, totalImages)),
+                  ].map((imageObj, idx) => (
                     <div
                       key={`${activeSeries?.title}-img-${idx}`}
                       className="flex-shrink-0 w-[75%] aspect-[2/1] relative rounded-2xl overflow-hidden group cursor-pointer"
@@ -419,9 +531,14 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                       <div className="absolute inset-0 z-10 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none shadow-[inset_0_0_120px_rgba(0,0,0,0.5)]" />
                       {(() => {
                         const originalIdx = idx % totalImages;
-                        const cropData = activeSeries.imageCropDataList?.[originalIdx];
+                        const cropData =
+                          activeSeries.imageCropDataList?.[originalIdx];
                         const cropStyles = getCropStyles(cropData);
-                        if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                        if (
+                          cropStyles &&
+                          cropData &&
+                          cropData.croppedAreaPixels
+                        ) {
                           return (
                             <div
                               className="absolute inset-0 w-full h-full"
@@ -433,7 +550,10 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                             >
                               <img
                                 src={getCropImageUrl(imageObj, cropData)}
-                                alt={imageObj?.altText || `${activeSeries?.title} - Image ${originalIdx + 1}`}
+                                alt={
+                                  imageObj?.altText ||
+                                  `${activeSeries?.title} - Image ${originalIdx + 1}`
+                                }
                                 style={{
                                   ...cropStyles.image,
                                   width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
@@ -449,7 +569,10 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                         return (
                           <ServerImage
                             image={imageObj}
-                            alt={imageObj?.altText || `${activeSeries?.title} - Image ${idx % totalImages + 1}`}
+                            alt={
+                              imageObj?.altText ||
+                              `${activeSeries?.title} - Image ${(idx % totalImages) + 1}`
+                            }
                             size="large"
                             fill
                             priority={idx % totalImages === activeImageIndex}
@@ -468,7 +591,10 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
           {/* ===== 移动端布局 (<lg) ===== */}
           <div className="lg:hidden">
             {/* 标题 */}
-            <h2 className="text-2xl md:text-3xl font-anaheim font-extrabold mb-4" style={{ color: '#FFFAD3' }}>
+            <h2
+              className="text-2xl md:text-3xl font-anaheim font-extrabold mb-4"
+              style={{ color: "#FFFAD3" }}
+            >
               Product Series Introduction
             </h2>
 
@@ -493,7 +619,7 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
               <div
                 className={cn(
                   "flex gap-3 transition-transform",
-                  isDragging ? "duration-0" : "duration-500 ease-out"
+                  isDragging ? "duration-0" : "duration-500 ease-out",
                 )}
                 style={{
                   transform: `translateX(calc(-${activeImageIndex * 88}% + ${dragOffset}px))`,
@@ -509,7 +635,11 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                     {(() => {
                       const cropData = activeSeries.imageCropDataList?.[idx];
                       const cropStyles = getCropStyles(cropData);
-                      if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                      if (
+                        cropStyles &&
+                        cropData &&
+                        cropData.croppedAreaPixels
+                      ) {
                         return (
                           <div
                             className="absolute inset-0 w-full h-full"
@@ -521,7 +651,10 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                           >
                             <img
                               src={getCropImageUrl(imageObj, cropData)}
-                              alt={imageObj?.altText || `${activeSeries?.title} - Image ${idx + 1}`}
+                              alt={
+                                imageObj?.altText ||
+                                `${activeSeries?.title} - Image ${idx + 1}`
+                              }
                               style={{
                                 ...cropStyles.image,
                                 width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
@@ -537,7 +670,10 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                       return (
                         <ServerImage
                           image={imageObj}
-                          alt={imageObj?.altText || `${activeSeries?.title} - Image ${idx + 1}`}
+                          alt={
+                            imageObj?.altText ||
+                            `${activeSeries?.title} - Image ${idx + 1}`
+                          }
                           size="medium"
                           fill
                           className="w-full h-full object-cover"
@@ -558,7 +694,9 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                     key={idx}
                     className={cn(
                       "w-2 h-2 rounded-full transition-colors",
-                      idx === activeImageIndex ? "bg-brand-cream" : "bg-brand-cream/30"
+                      idx === activeImageIndex
+                        ? "bg-brand-cream"
+                        : "bg-brand-cream/30",
                     )}
                     onClick={() => setActiveImageIndex(idx)}
                   />
@@ -573,24 +711,69 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
 
             {/* 系列切换按钮 */}
             <div className="flex justify-center gap-6">
-              <button
+              <motion.button
                 onClick={handleSeriesPrev}
-                className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"
+                initial="initial"
+                whileHover="hover"
+                whileTap={{ scale: 1.1 }}
+                variants={{
+                  initial: { backgroundColor: "rgba(255, 255, 255, 0.3)" },
+                  hover: { backgroundColor: "rgba(255, 255, 255, 1)" },
+                }}
+                transition={{ duration: 0.3 }}
+                className="w-12 h-12 rounded-full flex items-center justify-center"
                 aria-label="Previous series"
               >
-                <svg className="w-5 h-5 text-brand-cream" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
+                <motion.svg
+                  variants={{
+                    initial: { color: "#FFFAD3" },
+                    hover: { color: "#756F3F" },
+                  }}
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </motion.svg>
+              </motion.button>
+
+              <motion.button
                 onClick={handleSeriesNext}
-                className="w-12 h-12 rounded-full bg-white flex items-center justify-center"
+                initial="initial"
+                whileHover="hover"
+                whileTap={{ scale: 1.1 }}
+                variants={{
+                  initial: { backgroundColor: "rgba(255, 255, 255, 0.3)" },
+                  hover: { backgroundColor: "rgba(255, 255, 255, 1)" },
+                }}
+                transition={{ duration: 0.3 }}
+                className="w-12 h-12 rounded-full flex items-center justify-center"
                 aria-label="Next series"
               >
-                <svg className="w-5 h-5 text-brand-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+                <motion.svg
+                  variants={{
+                    initial: { color: "#FFFAD3" },
+                    hover: { color: "#756F3F" },
+                  }}
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </motion.svg>
+              </motion.button>
             </div>
 
             {/* 系列指示器 */}
@@ -600,7 +783,9 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                   key={idx}
                   className={cn(
                     "w-1.5 h-1.5 rounded-full transition-colors",
-                    idx === activeSeriesIndex ? "bg-brand-cream" : "bg-brand-cream/30"
+                    idx === activeSeriesIndex
+                      ? "bg-brand-cream"
+                      : "bg-brand-cream/30",
                   )}
                   onClick={() => {
                     setActiveSeriesIndex(idx);
@@ -610,7 +795,6 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
               ))}
             </div>
           </div>
-
         </div>
       </div>
     </section>
