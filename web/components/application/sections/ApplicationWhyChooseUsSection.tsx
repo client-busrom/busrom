@@ -255,45 +255,41 @@ export function ApplicationWhyChooseUsSection({
               zIndex: 50,
             }}
           >
-            <button
-              onClick={handleNext}
-              className="rounded-full bg-white flex items-center justify-center hover:bg-white/90 transition-colors shadow-lg"
-              style={{ width: vw(50), height: vw(50) }}
-            >
-              <svg
-                viewBox="0 0 14 24"
-                fill="none"
-                style={{ width: vw(11), height: vw(19) }}
+            {[
+              { onClick: handleNext, rotate: false },
+              { onClick: handlePrev, rotate: true },
+            ].map((btn, idx) => (
+              <button
+                key={idx}
+                onClick={btn.onClick}
+                className={`
+                  group rounded-full flex items-center justify-center transition-all duration-300 shadow-sm
+                  bg-white/20 border border-white/60
+                  hover:bg-white hover:border-transparent hover:shadow-lg
+                  active:bg-[#756F3F] active:border-transparent
+                `}
+                style={{ width: vw(54), height: vw(54) }}
               >
-                <path
-                  d="M1 23L12 12L1 1"
-                  stroke="#A59E69"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-            <button
-              onClick={handlePrev}
-              className="rounded-full border border-white/60 flex items-center justify-center bg-white/20 hover:bg-white/40 transition-colors"
-              style={{ width: vw(50), height: vw(50) }}
-            >
-              <svg
-                viewBox="0 0 14 24"
-                fill="none"
-                className="rotate-180"
-                style={{ width: vw(11), height: vw(19) }}
-              >
-                <path
-                  d="M1 23L12 12L1 1"
-                  stroke="white"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
+                <svg
+                  viewBox="0 0 14 24"
+                  fill="none"
+                  className={`transition-colors duration-300 ${btn.rotate ? "rotate-180" : ""}`}
+                  style={{ width: vw(12), height: vw(20) }}
+                >
+                  <path
+                    d="M1 23L12 12L1 1"
+                    className="
+                      stroke-white 
+                      group-hover:stroke-[#A59E69] 
+                      group-active:stroke-white
+                    "
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            ))}
           </div>
         </div>
 

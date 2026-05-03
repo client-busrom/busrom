@@ -182,45 +182,70 @@ export function ApplicationProductNavigationSection({
         {/* ================== CTA TOP RIGHT ================== */}
         <div
           className="absolute"
-          style={{ left: vw(1486), top: vw(80), zIndex: 20 }}
+          style={{ left: vw(1420), top: vw(80), zIndex: 20 }}
         >
-          <Link href={ctaHref || "/cases"} className="flex items-center group">
-            <span
-              className="font-anaheim font-semibold text-black uppercase group-hover:opacity-80 transition-opacity"
-              style={{
-                fontSize: vw(32),
-                lineHeight: vw(30),
-                marginRight: vw(18),
-              }}
+          <Link href={ctaHref || "/cases"}>
+            <motion.div
+              className="relative flex items-center group cursor-pointer no-underline"
+              style={{ height: vw(66) }}
+              initial="initial"
+              whileHover="hover"
             >
-              {ctaText}
-            </span>
-            <div
-              className="relative flex items-center justify-center group-hover:opacity-80 transition-opacity"
-              style={{
-                width: vw(102),
-                height: vw(66),
-                backgroundColor: "#756F3F",
-                borderRadius: vw(33),
-              }}
-            >
-              <div style={{ width: vw(33), height: vw(18) }}>
-                <svg
-                  viewBox="0 0 33 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-full h-full"
+              {/* Animated Capsule Background */}
+              <motion.div
+                className="absolute right-0 bg-[#756F3F]"
+                variants={{
+                  initial: {
+                    width: vw(102),
+                    height: "100%",
+                    borderRadius: vw(33),
+                  },
+                  hover: {
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "#5D5732",
+                    borderRadius: vw(33),
+                  },
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              />
+
+              <div
+                className="relative z-10 flex items-center"
+                style={{ paddingLeft: vw(40), paddingRight: vw(40) }}
+              >
+                <motion.span
+                  className="font-anaheim font-semibold whitespace-nowrap"
+                  style={{
+                    fontSize: vw(32),
+                    lineHeight: vw(30),
+                    marginRight: vw(35),
+                  }}
+                  variants={{
+                    initial: { color: "#756F3F" },
+                    hover: { color: "#FFFFFF" },
+                  }}
                 >
-                  <path
-                    d="M24 1L31.5 8.5M31.5 8.5L24 16M31.5 8.5H1"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                  {ctaText}
+                </motion.span>
+                <div style={{ width: vw(33), height: vw(18) }}>
+                  <svg
+                    viewBox="0 0 33 18"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-full h-full"
+                  >
+                    <path
+                      d="M24 1L31.5 8.5M31.5 8.5L24 16M31.5 8.5H1"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
               </div>
-            </div>
+            </motion.div>
           </Link>
         </div>
 
@@ -236,47 +261,31 @@ export function ApplicationProductNavigationSection({
           {/* We make inner elements pointer-events-auto if they need to be interactive */}
           <div className="relative w-full h-full pointer-events-auto">
             {/* ================== BACKGROUND LETTERS ================== */}
-            <div
-              className="absolute pointer-events-none"
-              style={calcLetter(1100, 16, 116, 143)}
-            >
-              <Image src="/images/application/letters/r.svg" alt="R" fill />
-            </div>
-
-            <div
-              className="absolute pointer-events-none"
-              style={calcLetter(1453, 156, 127, 141, 15)}
-            >
-              <Image src="/images/application/letters/o.svg" alt="O" fill />
-            </div>
-
-            <div
-              className="absolute pointer-events-none"
-              style={calcLetter(1600, 430, 160, 144, 3)}
-            >
-              <Image src="/images/application/letters/m.svg" alt="M" fill />
-            </div>
-
-            <div
-              className="absolute pointer-events-none"
-              style={calcLetter(136, 640, 132, 191, 3)}
-            >
-              <Image src="/images/application/letters/b.svg" alt="B" fill />
-            </div>
-
-            <div
-              className="absolute pointer-events-none"
-              style={calcLetter(291, 1018, 108, 141, 15)}
-            >
-              <Image src="/images/application/letters/u.svg" alt="U" fill />
-            </div>
-
-            <div
-              className="absolute pointer-events-none"
-              style={calcLetter(620, 1124, 98, 142)}
-            >
-              <Image src="/images/application/letters/s.svg" alt="S" fill />
-            </div>
+            {[
+              { src: "/images/application/letters/r.svg", alt: "R", style: calcLetter(1100, 16, 116, 143), delay: 0 },
+              { src: "/images/application/letters/o.svg", alt: "O", style: calcLetter(1453, 156, 127, 141, 15), delay: 0.2 },
+              { src: "/images/application/letters/m.svg", alt: "M", style: calcLetter(1600, 430, 160, 144, 3), delay: 0.4 },
+              { src: "/images/application/letters/b.svg", alt: "B", style: calcLetter(136, 640, 132, 191, 3), delay: 0.6 },
+              { src: "/images/application/letters/u.svg", alt: "U", style: calcLetter(291, 1018, 108, 141, 15), delay: 0.8 },
+              { src: "/images/application/letters/s.svg", alt: "S", style: calcLetter(620, 1124, 98, 142), delay: 1.0 },
+            ].map((letter, idx) => (
+              <motion.div
+                key={idx}
+                className="absolute pointer-events-none"
+                style={letter.style}
+                animate={{
+                  y: [0, -20, 0],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: letter.delay,
+                }}
+              >
+                <Image src={letter.src} alt={letter.alt} fill />
+              </motion.div>
+            ))}
 
             {/* ================== CAROUSEL SLOTS ================== */}
             {indices.map((productIdx, slotIdx) => {
@@ -305,7 +314,9 @@ export function ApplicationProductNavigationSection({
                     if (!isCenter) {
                       handleManualSwap(slotIdx);
                     } else {
-                      const url = product.slug.startsWith("/") ? product.slug : `/${locale}/shop/${product.slug}`;
+                      const url = product.slug.startsWith("/")
+                        ? product.slug
+                        : `/${locale}/shop/${product.slug}`;
                       if (product.openInNewTab) {
                         window.open(url, "_blank");
                       } else {
