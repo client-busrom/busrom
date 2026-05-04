@@ -478,6 +478,7 @@ export function FullInquiryModal({
             placeholder={field.placeholder}
             required={field.required}
             rows={4}
+            spellCheck="false"
             className={`${commonClasses} ${errorClasses} ${preFilledClasses}`}
           />
         )
@@ -575,6 +576,7 @@ export function FullInquiryModal({
             onChange={(e) => handleChange(field.fieldName, e.target.value)}
             placeholder={field.placeholder}
             required={field.required}
+            spellCheck="false"
             className={`${commonClasses} ${errorClasses} ${preFilledClasses}`}
           />
         )

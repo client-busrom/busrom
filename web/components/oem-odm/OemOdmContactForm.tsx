@@ -526,6 +526,7 @@ export function OemOdmContactForm({
                             onChange={(e) =>
                               handleChange(field.fieldName, e.target.value)
                             }
+                            spellCheck="false"
                             className="w-full h-full px-6 bg-transparent outline-none font-semibold text-[#756F3F] text-lg md:text-xl placeholder-[#756F3F]/50 [&:-webkit-autofill]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                             placeholder={field.placeholder || field.label}
                             disabled={submitting}
@@ -588,6 +589,7 @@ export function OemOdmContactForm({
                           e.target.value,
                         )
                       }
+                      spellCheck="false"
                       className="w-full h-full bg-transparent outline-none font-semibold text-[#756F3F] text-xl md:text-2xl placeholder-[#756F3F]/50 resize-none [&:-webkit-autofill]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                       placeholder={
                         textareaFields[0].placeholder || textareaFields[0].label
@@ -759,6 +761,7 @@ export function OemOdmContactForm({
                         <input
                           type="text"
                           value={formData["othersIndicate"] || ""}
+                          spellCheck="false"
                           onChange={(e) =>
                             handleChange("othersIndicate", e.target.value)
                           }

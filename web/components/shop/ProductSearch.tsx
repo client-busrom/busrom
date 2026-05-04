@@ -27,6 +27,7 @@ export function ProductSearch({
           onChange={(e) => onSearchChange(e.target.value)}
           onFocus={() => setIsSearchFocused(true)}
           onBlur={() => setIsSearchFocused(false)}
+          spellCheck="false"
           className={cn(
             "w-full pl-10 pr-4 py-2 border-b bg-transparent",
             "focus:outline-none focus:ring-0 focus:border-brand-text-black transition-all",

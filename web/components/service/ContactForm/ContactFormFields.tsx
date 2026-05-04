@@ -164,6 +164,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
           id={field.fieldName}
           name={field.fieldName}
           value={formData[field.fieldName] || ""}
+          spellCheck="false"
           onChange={(e) => handleChange(field.fieldName, e.target.value)}
           placeholder={field.placeholder || field.label}
           required={field.required}
@@ -188,6 +189,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
             id={field.fieldName}
             name={field.fieldName}
             value={formData[field.fieldName] || ""}
+            spellCheck="false"
             onChange={(e) => handleChange(field.fieldName, e.target.value)}
             placeholder={field.placeholder}
             required={field.required}
@@ -284,6 +286,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
             <input
               type="text"
               value={formData[`${field.fieldName}_custom`] || ""}
+              spellCheck="false"
               onChange={(e) =>
                 handleChange(`${field.fieldName}_custom`, e.target.value)
               }
@@ -432,6 +435,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
                           `${field.fieldName}_custom_${option.value}`
                         ] || ""
                       }
+                      spellCheck="false"
                       onChange={(e) =>
                         handleChange(
                           `${field.fieldName}_custom_${option.value}`,
@@ -460,6 +464,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
               <input
                 type="text"
                 value={formData[`${field.fieldName}_custom`] || ""}
+                spellCheck="false"
                 onChange={(e) =>
                   handleChange(`${field.fieldName}_custom`, e.target.value)
                 }
@@ -625,6 +630,7 @@ export const MobileField: React.FC<MobileFieldProps> = ({
           id={`mobile-${field.fieldName}`}
           name={field.fieldName}
           value={formData[field.fieldName] || ""}
+          spellCheck="false"
           onChange={(e) => handleChange(field.fieldName, e.target.value)}
           placeholder={field.placeholder || field.label}
           required={field.required}
@@ -643,6 +649,7 @@ export const MobileField: React.FC<MobileFieldProps> = ({
             id={`mobile-${field.fieldName}`}
             name={field.fieldName}
             value={formData[field.fieldName] || ""}
+            spellCheck="false"
             onChange={(e) => handleChange(field.fieldName, e.target.value)}
             placeholder={field.placeholder}
             required={field.required}
@@ -706,6 +713,7 @@ export const MobileField: React.FC<MobileFieldProps> = ({
             <input
               type="text"
               value={formData[`${field.fieldName}_custom`] || ""}
+              spellCheck="false"
               onChange={(e) =>
                 handleChange(`${field.fieldName}_custom`, e.target.value)
               }

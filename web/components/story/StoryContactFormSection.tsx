@@ -554,6 +554,7 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
                             placeholder={`${field.placeholder || field.label}${field.required ? " *" : ""}`}
                             value={formData[field.fieldName] || ""}
                             onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
+                            spellCheck="false"
                             className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-y outline-none focus:border-white transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                             style={{
                               width: "100%", 
@@ -637,7 +638,8 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
                           placeholder={`${field.placeholder || field.label}${field.required ? " *" : ""}`}
                           value={formData[field.fieldName] || ""}
                           onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
-                          className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none focus:border-white transition-colors"
+                          spellCheck="false"
+                          className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none focus:border-white transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                           style={{
                             width: "100%", 
                             height: isMobile ? mvw(50) : vw(63), 
@@ -655,8 +657,8 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
                   </>
                 ) : (
                   <>
-                    <input type="text" placeholder="Your Name *" required value={formData.name || ""} onChange={(e) => handleInputChange("name", e.target.value)} className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none" style={{ width: "100%", height: isMobile ? mvw(50) : vw(63), borderRadius: isMobile ? mvw(12) : vw(15), backgroundColor: "#746d37", border: "1px solid rgba(255, 255, 255, 0.34)", paddingLeft: isMobile ? mvw(16) : vw(23), fontSize: isMobile ? mvw(16) : vw(16) }} />
-                    <input type="email" placeholder="Your Email *" required value={formData.email || ""} onChange={(e) => handleInputChange("email", e.target.value)} className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none" style={{ width: "100%", height: isMobile ? mvw(50) : vw(63), borderRadius: isMobile ? mvw(12) : vw(15), backgroundColor: "#746d37", border: "1px solid rgba(255, 255, 255, 0.34)", paddingLeft: isMobile ? mvw(16) : vw(23), fontSize: isMobile ? mvw(16) : vw(16) }} />
+                    <input type="text" placeholder="Your Name *" required value={formData.name || ""} onChange={(e) => handleInputChange("name", e.target.value)} spellCheck="false" className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]" style={{ width: "100%", height: isMobile ? mvw(50) : vw(63), borderRadius: isMobile ? mvw(12) : vw(15), backgroundColor: "#746d37", border: "1px solid rgba(255, 255, 255, 0.34)", paddingLeft: isMobile ? mvw(16) : vw(23), fontSize: isMobile ? mvw(16) : vw(16) }} />
+                    <input type="email" placeholder="Your Email *" required value={formData.email || ""} onChange={(e) => handleInputChange("email", e.target.value)} spellCheck="false" className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]" style={{ width: "100%", height: isMobile ? mvw(50) : vw(63), borderRadius: isMobile ? mvw(12) : vw(15), backgroundColor: "#746d37", border: "1px solid rgba(255, 255, 255, 0.34)", paddingLeft: isMobile ? mvw(16) : vw(23), fontSize: isMobile ? mvw(16) : vw(16) }} />
                     <div className="dynamic-phone-input w-full">
                       <PhoneInput
                         value={formData.whatsapp || ""}
@@ -669,7 +671,15 @@ export function StoryContactFormSection({ data }: StoryContactFormSectionProps) 
                         dialCodeClassName="!text-white !font-anaheim"
                       />
                     </div>
-                    <textarea placeholder="Message" rows={4} value={formData.message || ""} onChange={(e) => handleInputChange("message", e.target.value)} className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-y outline-none" style={{ width: "100%", minHeight: isMobile ? mvw(120) : vw(103), borderRadius: isMobile ? mvw(12) : vw(15), backgroundColor: "#746d37", border: "1px solid rgba(255, 255, 255, 0.34)", paddingLeft: isMobile ? mvw(16) : vw(23), paddingTop: isMobile ? mvw(16) : vw(20), fontSize: isMobile ? mvw(16) : vw(16) }} />
+                    <textarea 
+                      placeholder="Message" 
+                      rows={4} 
+                      value={formData.message || ""} 
+                      onChange={(e) => handleInputChange("message", e.target.value)} 
+                      spellCheck="false"
+                      className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-y outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]" 
+                      style={{ width: "100%", minHeight: isMobile ? mvw(120) : vw(103), borderRadius: isMobile ? mvw(12) : vw(15), backgroundColor: "#746d37", border: "1px solid rgba(255, 255, 255, 0.34)", paddingLeft: isMobile ? mvw(16) : vw(23), paddingTop: isMobile ? mvw(16) : vw(20), fontSize: isMobile ? mvw(16) : vw(16) }} 
+                    />
                   </>
                 )}
 

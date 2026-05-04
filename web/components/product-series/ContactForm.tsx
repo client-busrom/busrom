@@ -567,6 +567,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
             placeholder={getFieldConfig('name')?.placeholder || (locale === 'zh' ? "您的姓名 / 公司名称" : "Your Name / Company Name")}
             value={formData.name}
             onChange={handleInputChange}
+            spellCheck="false"
             className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{
               fontSize: isMobile ? mvw(16) : vw(20),
@@ -585,6 +586,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
             placeholder={getFieldConfig('email')?.placeholder || (locale === 'zh' ? "您的邮箱" : "Your Email")}
             value={formData.email}
             onChange={handleInputChange}
+            spellCheck="false"
             className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{
               fontSize: isMobile ? mvw(16) : vw(20),
@@ -674,6 +676,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
             placeholder={getFieldConfig('message')?.placeholder || (locale === 'zh' ? "留言" : "Message")}
             value={formData.message}
             onChange={handleInputChange}
+            spellCheck="false"
             className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold resize-y overflow-hidden [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{
               fontSize: isMobile ? mvw(16) : vw(20),

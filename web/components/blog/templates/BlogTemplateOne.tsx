@@ -457,6 +457,7 @@ export function BlogTemplateOne({
                           <input
                             type="text"
                             placeholder={search.placeholder || "Search..."}
+                            spellCheck="false"
                             className="w-full bg-[#F5F2ED] border-0 rounded-xl px-5 py-4 text-xs focus:ring-1 focus:ring-[#ff4848] outline-none transition-all"
                           />
                           <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300">

@@ -546,6 +546,7 @@ export function SupportContactFormSection({
                   key={field.fieldName}
                   type={field.fieldType === "email" ? "email" : "text"}
                   placeholder={`${field.label}${field.required ? " *" : ""}`}
+                  spellCheck="false"
                   className="w-full bg-[#746D37] border border-white/34 rounded-2xl px-6 h-14 text-white focus:outline-none focus:border-white/30 transition-all font-anaheim font-semibold text-lg placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                   style={{
                     height: isMobile ? mvw(50) : vw(63),
@@ -576,6 +577,7 @@ export function SupportContactFormSection({
                   onChange={(e) =>
                     handleInputChange(field.fieldName, e.target.value)
                   }
+                  spellCheck="false"
                   className="bg-[#746D37] border border-white/34 text-white font-[family-name:var(--font-anaheim)] font-semibold placeholder:text-white/50 resize-none focus:outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                   style={{
                     height: isMobile ? mvw(120) : vw(127),

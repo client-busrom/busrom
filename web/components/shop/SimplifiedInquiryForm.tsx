@@ -182,6 +182,7 @@ export function SimplifiedInquiryForm({
             placeholder={field.placeholder}
             required={field.required}
             rows={3}
+            spellCheck="false"
             className={`${commonClasses} ${errorClasses}`}
           />
         )
@@ -217,6 +218,7 @@ export function SimplifiedInquiryForm({
             onChange={(e) => handleChange(field.fieldName, e.target.value)}
             placeholder={field.placeholder}
             required={field.required}
+            spellCheck="false"
             className={`${commonClasses} ${errorClasses}`}
           />
         )

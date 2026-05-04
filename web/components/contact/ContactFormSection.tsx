@@ -729,6 +729,7 @@ export function ContactFormSection({
                     onChange={(e) =>
                       handleInputChange(field.fieldName, e.target.value)
                     }
+                    spellCheck="false"
                     className="font-anaheim font-semibold placeholder:text-white/95 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                     style={{
                       width: isMobile ? "100%" : vw(486),
@@ -761,6 +762,7 @@ export function ContactFormSection({
                     onChange={(e) =>
                       handleInputChange(field.fieldName, e.target.value)
                     }
+                    spellCheck="false"
                     className="font-anaheim font-semibold placeholder:text-white/95 resize-y [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                     style={{
                       width: isMobile ? "100%" : vw(486),
@@ -789,6 +791,7 @@ export function ContactFormSection({
                 placeholder="Your Name / Company Name *"
                 value={formData.name || ""}
                 onChange={(e) => handleInputChange("name", e.target.value)}
+                spellCheck="false"
                 className="font-anaheim font-semibold placeholder:text-white/95"
                 style={{
                   width: isMobile ? "100%" : vw(486),
@@ -809,6 +812,7 @@ export function ContactFormSection({
                 placeholder="Your Email *"
                 value={formData.email || ""}
                 onChange={(e) => handleInputChange("email", e.target.value)}
+                spellCheck="false"
                 className="font-anaheim font-semibold placeholder:text-white/95"
                 style={{
                   width: isMobile ? "100%" : vw(486),
@@ -878,6 +882,7 @@ export function ContactFormSection({
                 ref={textareaRef}
                 placeholder="Please Briefly Describe Your Project Requirements Or Customization Ideas."
                 value={formData.message || ""}
+                spellCheck="false"
                 onChange={(e) => handleInputChange("message", e.target.value)}
                 className="font-anaheim font-semibold placeholder:text-white/95 resize-y"
                 style={{

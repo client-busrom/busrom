@@ -331,6 +331,7 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
             onChange={(e) => handleChange(field.fieldName, e.target.value)}
             placeholder={field.placeholder}
             required={field.required}
+            spellCheck="false"
             rows={4}
             className={`${commonClasses} ${errorClasses}`}
           />
@@ -349,6 +350,7 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
                       name={field.fieldName}
                       value={option.value}
                       checked={isChecked}
+                      spellCheck="false"
                       onChange={(e) => handleCheckboxChange(field.fieldName, option.value, e.target.checked)}
                       className="w-4 h-4 text-brand-secondary border-gray-300 rounded focus:ring-brand-secondary"
                     />
@@ -360,6 +362,7 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
                       className={`${commonClasses} ml-6 !w-[calc(100%-1.5rem)]`}
                       placeholder={locale === 'zh' ? "请详细说明..." : "Please specify..."}
                       value={formData[`${field.fieldName}_custom_${option.value}`] || ""}
+                      spellCheck="false"
                       onChange={(e) => handleChange(`${field.fieldName}_custom_${option.value}`, e.target.value)}
                       required
                     />
@@ -395,6 +398,7 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
                 className={`${commonClasses}`}
                 placeholder={locale === 'zh' ? "请详细说明..." : "Please specify..."}
                 value={formData[`${field.fieldName}_custom`] || ""}
+                spellCheck="false"
                 onChange={(e) => handleChange(`${field.fieldName}_custom`, e.target.value)}
                 required
               />
@@ -416,6 +420,7 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
                       name={field.fieldName}
                       value={option.value}
                       checked={isChecked}
+                      spellCheck="false"
                       onChange={(e) => handleChange(field.fieldName, e.target.value)}
                       className="w-4 h-4 text-brand-secondary border-gray-300 focus:ring-brand-secondary"
                     />
@@ -427,6 +432,7 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
                       className={`${commonClasses} ml-6 !w-[calc(100%-1.5rem)]`}
                       placeholder={locale === 'zh' ? "请详细说明..." : "Please specify..."}
                       value={formData[`${field.fieldName}_custom`] || ""}
+                      spellCheck="false"
                       onChange={(e) => handleChange(`${field.fieldName}_custom`, e.target.value)}
                       required
                     />
@@ -444,6 +450,7 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
             id={field.fieldName}
             name={field.fieldName}
             value={formData[field.fieldName] || ""}
+            spellCheck="false"
             onChange={(e) => handleChange(field.fieldName, e.target.value)}
             placeholder={field.placeholder}
             required={field.required}

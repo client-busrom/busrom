@@ -143,6 +143,7 @@ export function FaqSearchSection({ data, locale }: FaqSearchSectionProps) {
               <input
                 type="text"
                 placeholder={placeholder}
+                spellCheck="false"
                 className="bg-transparent border-none outline-none flex-1 text-[#585858] font-anaheim placeholder:text-[#585858]/60"
                 style={{ fontSize: vw(20) }}
               />

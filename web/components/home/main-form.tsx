@@ -545,6 +545,7 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       placeholder={getFieldPlaceholder("name", data.placeholderName)}
                       className={formInputClasses}
                       required={isFieldRequired("name", true)}
+                      spellCheck="false"
                     />
                   </div>
                   {/* Email */}
@@ -564,6 +565,7 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       placeholder={getFieldPlaceholder("email", data.placeholderEmail)}
                       className={formInputClasses}
                       required={isFieldRequired("email", true)}
+                      spellCheck="false"
                     />
                   </div>
                   {/* WhatsApp */}
@@ -607,6 +609,7 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       placeholder={getFieldPlaceholder("company", data.placeholderCompany)}
                       className={formInputClasses}
                       required={isFieldRequired("company")}
+                      spellCheck="false"
                     />
                   </div>
                   {/* Message */}
@@ -625,6 +628,7 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       placeholder={getFieldPlaceholder("message", data.placeholderMessage)}
                       className={cn(formInputClasses, "min-h-[40px]")}
                       required={isFieldRequired("message")}
+                      spellCheck="false"
                     />
                   </div>
 

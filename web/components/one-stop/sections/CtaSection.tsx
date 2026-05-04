@@ -402,9 +402,10 @@ export function CtaSection({
           <input
             type="text"
             value={formState["name"]}
-            onChange={(e) =>
+            onChange={(e: any) =>
               setFormState({ ...formState, name: e.target.value })
             }
+            spellCheck="false"
             placeholder={getTranslation(getField("name")?.placeholder)}
             className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             required
@@ -415,6 +416,7 @@ export function CtaSection({
             onChange={(e) =>
               setFormState({ ...formState, company: e.target.value })
             }
+            spellCheck="false"
             placeholder={getTranslation(getField("company")?.placeholder)}
             className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
           />
@@ -424,6 +426,7 @@ export function CtaSection({
             onChange={(e) =>
               setFormState({ ...formState, email: e.target.value })
             }
+            spellCheck="false"
             placeholder={getTranslation(getField("email")?.placeholder)}
             className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[18px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             required
@@ -477,6 +480,7 @@ export function CtaSection({
                 "other-primary-requirement": e.target.value,
               })
             }
+            spellCheck="false"
             placeholder={getTranslation(
               getField("other-primary-requirement")?.placeholder,
             )}
@@ -491,6 +495,7 @@ export function CtaSection({
                 "specific-requirements-project-description": e.target.value,
               })
             }
+            spellCheck="false"
             placeholder={getTranslation(
               getField("specific-requirements-project-description")
                 ?.placeholder,
@@ -638,6 +643,7 @@ export function CtaSection({
               onChange={(e) =>
                 setFormState({ ...formState, name: e.target.value })
               }
+              spellCheck="false"
               placeholder={getTranslation(getField("name")?.placeholder)}
               className="h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
               required
@@ -648,6 +654,7 @@ export function CtaSection({
               onChange={(e) =>
                 setFormState({ ...formState, company: e.target.value })
               }
+              spellCheck="false"
               placeholder={getTranslation(getField("company")?.placeholder)}
               className="h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             />
@@ -658,6 +665,7 @@ export function CtaSection({
               onChange={(e) =>
                 setFormState({ ...formState, email: e.target.value })
               }
+              spellCheck="false"
               placeholder={getTranslation(getField("email")?.placeholder)}
               className="h-[63px] bg-black/30 border border-white/20 rounded-[15px] px-6 text-white text-[20px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
               required
@@ -713,6 +721,7 @@ export function CtaSection({
                   "other-primary-requirement": e.target.value,
                 })
               }
+              spellCheck="false"
               placeholder={getTranslation(
                 getField("other-primary-requirement")?.placeholder,
               )}
@@ -728,6 +737,7 @@ export function CtaSection({
                     "specific-requirements-project-description": e.target.value,
                   })
                 }
+                spellCheck="false"
                 placeholder={getTranslation(
                   getField("specific-requirements-project-description")
                     ?.placeholder,

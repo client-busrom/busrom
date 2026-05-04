@@ -140,6 +140,7 @@ export function BlogTemplateTwo({ blog, locale, formatDate, config }: BlogTempla
                   <input
                     type="text"
                     placeholder={search.placeholder || "Search..."}
+                    spellCheck="false"
                     className="w-full bg-white border border-[#474642]/10 rounded-lg px-4 py-3 text-[12px] focus:outline-none focus:border-[#B06E4E]/30 transition-all"
                   />
                 </div>

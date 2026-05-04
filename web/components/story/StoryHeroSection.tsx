@@ -157,7 +157,7 @@ export function StoryHeroSection({ data }: StoryHeroSectionProps) {
             zIndex: 10
           }}
         >
-          <div style={{ fontSize: vw(28), lineHeight: 1.5, fontWeight: 600, textShadow: `0 ${vw(4)} ${vw(11)} #565020` }}>
+          <div style={{ fontSize: vw(29), lineHeight: 1.5, fontWeight: 600, textShadow: `0 ${vw(4)} ${vw(11)} #565020` }}>
             {data.descriptionNodes ? data.descriptionNodes.map((node, idx) => {
               if (node.type === "linebreak") return <br key={idx} />;
               const isBold = node.format === 1;
@@ -179,7 +179,7 @@ export function StoryHeroSection({ data }: StoryHeroSectionProps) {
           style={{ 
             left: vw(842), 
             top: vw(518),
-            fontSize: vw(64),
+            fontSize: vw(60),
             lineHeight: 1.15,
             zIndex: 10
           }}
@@ -203,7 +203,7 @@ export function StoryHeroSection({ data }: StoryHeroSectionProps) {
           <p 
             className="text-white opacity-90 drop-shadow-md font-josefin-sans whitespace-pre-wrap"
             style={{ 
-               fontSize: vw(32),
+               fontSize: vw(24),
                lineHeight: 1.5
             }}
           >
@@ -291,19 +291,33 @@ function HeroFeatureItem({ text, delay, width, x, y, starX, starY }: { text: str
       }}
     >
       <span 
-        className="text-[#ffec51] font-normal leading-none font-josefin-sans"
-        style={{ fontSize: vw(48) }}
+        className="text-[#ffec51] font-normal font-josefin-sans flex items-center justify-center text-center"
+        style={{ 
+          fontSize: vw(40),
+          lineHeight: 1.2 // Better for vertical alignment than leading-none
+        }}
       >
         {text}
       </span>
       {/* Item Star (dXpCt) */}
-      <div 
+      <motion.div 
         className="absolute"
         style={{ 
           top: vw(starY), 
           left: vw(starX), 
           width: vw(28), 
           height: vw(28) 
+        }}
+        animate={{ 
+          opacity: [1, 0.3, 1],
+          scale: [1, 1.15, 1],
+          rotate: [0, 10, 0]
+        }}
+        transition={{
+          duration: 2 + Math.random(), 
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: delay * 2 // Use the existing delay to stagger the blinking
         }}
       >
         <svg width="100%" height="100%" viewBox="0 0 30 30" fill="none">
@@ -312,7 +326,7 @@ function HeroFeatureItem({ text, delay, width, x, y, starX, starY }: { text: str
              fill="#ffec51" 
            />
         </svg>
-      </div>
+      </motion.div>
     </motion.div>
   )
 }

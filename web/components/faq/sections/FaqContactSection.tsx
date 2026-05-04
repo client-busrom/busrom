@@ -292,6 +292,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                       (field.required ? "* " : "") + field.placeholder
                     }
                     required={field.required}
+                    spellCheck="false"
                     onChange={(e) => handleTextareaChange(e, field.fieldName)}
                   />
                 ) : field.fieldType === "select" ? (
@@ -417,6 +418,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                       (field.required ? "* " : "") + field.placeholder
                     }
                     required={field.required}
+                    spellCheck="false"
                     onChange={(e) =>
                       setFormData({
                         ...formData,

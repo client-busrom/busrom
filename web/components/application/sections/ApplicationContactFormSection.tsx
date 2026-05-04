@@ -388,6 +388,7 @@ export function ApplicationContactFormSection({
           <textarea
             placeholder={field.placeholder}
             className="w-full font-semibold text-[#5E552C] placeholder:text-[#9D9473]/60 outline-none resize-none"
+            spellCheck="false"
             style={{
               height: isMobile ? mvw(120) : vw(130),
               backgroundColor: "#D4CBAF",
@@ -414,6 +415,7 @@ export function ApplicationContactFormSection({
           <input
             type={field.fieldType === "email" ? "email" : "text"}
             placeholder={field.placeholder || field.label}
+            spellCheck="false"
             className="w-full font-semibold text-[#5E552C] placeholder:text-[#9D9473]/60 outline-none !bg-transparent [&:-webkit-autofill]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{ fontSize: isMobile ? mvw(15) : vw(16) }}
             value={formData[field.fieldName] || ""}

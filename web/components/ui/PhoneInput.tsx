@@ -289,6 +289,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
           value={phoneNumber}
           onChange={handlePhoneChange}
           placeholder={placeholder}
+          spellCheck="false"
           className={cn(
             "flex-1 min-w-0 px-4 md:px-6 lg:px-[0.8333vw] py-2.5 font-semibold text-base md:text-[24px] lg:text-[0.8333vw] h-full",
             !inputClassName?.includes('bg-') && "bg-white",
@@ -324,6 +325,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search country..."
+                spellCheck="false"
                 className={cn(
                   "w-full pl-8 pr-3 py-2 text-base rounded-md focus:outline-none",
                   !searchInputClassName?.includes('bg-') && "bg-white",

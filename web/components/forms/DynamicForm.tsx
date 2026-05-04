@@ -508,6 +508,7 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
               onChange={(e) => handleChange(field.fieldName, e.target.value)}
               placeholder={field.placeholder}
               required={field.required}
+              spellCheck="false"
               className={baseInputClass}
             />
           </div>
@@ -581,6 +582,7 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
               placeholder={field.placeholder}
               required={field.required}
               rows={4}
+              spellCheck="false"
               className={baseInputClass}
             />
           </div>
@@ -626,6 +628,7 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
                     checked={formData[field.fieldName] === option.value}
                     onChange={(e) => handleChange(field.fieldName, e.target.value)}
                     required={field.required}
+                    spellCheck="false"
                     className="w-4 h-4 text-brand-text-black border-brand-accent-border focus:ring-brand-text-black"
                   />
                   <span className="text-brand-accent-gold">{option.label}</span>
@@ -649,6 +652,7 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
                     value={option.value}
                     checked={(formData[field.fieldName] || []).includes(option.value)}
                     onChange={(e) => handleCheckboxChange(field.fieldName, option.value, e.target.checked)}
+                    spellCheck="false"
                     className="w-4 h-4 text-brand-text-black border-brand-accent-border rounded focus:ring-brand-text-black"
                   />
                   <span className="text-brand-accent-gold">{option.label}</span>
@@ -674,6 +678,7 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
               required={field.required}
               min={field.validation?.min}
               max={field.validation?.max}
+              spellCheck="false"
               className={baseInputClass}
             />
           </div>
@@ -694,6 +699,7 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
               required={field.required}
               min={field.validation?.minDate}
               max={field.validation?.maxDate}
+              spellCheck="false"
               className={baseInputClass}
             />
           </div>

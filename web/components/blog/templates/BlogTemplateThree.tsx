@@ -259,6 +259,7 @@ export function BlogTemplateThree({
                   <input
                     type="text"
                     placeholder={search.placeholder || "Search article..."}
+                    spellCheck="false"
                     className="w-full bg-white border-2 border-transparent focus:border-[#ff4848]/20 rounded-2xl px-6 py-5 text-sm focus:outline-none shadow-sm placeholder:text-gray-300 transition-all"
                   />
                   <div className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#ff4848] transition-colors">
