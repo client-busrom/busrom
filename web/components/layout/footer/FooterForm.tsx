@@ -183,7 +183,7 @@ export default function FooterForm({
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           className={cn(
             formInputClasses,
-            "text-base md:text-lg lg:text-xl xl:text-2xl",
+            "text-base",
           )}
           disabled={isSubmitting}
         />
@@ -194,7 +194,7 @@ export default function FooterForm({
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           className={cn(
             formInputClasses,
-            "text-base md:text-lg lg:text-xl xl:text-2xl",
+            "text-base",
           )}
           disabled={isSubmitting}
         />
@@ -206,7 +206,7 @@ export default function FooterForm({
           }
           className={cn(
             formInputClasses,
-            "min-h-[80px] text-base md:text-lg lg:text-xl xl:text-2xl",
+            "min-h-[80px] text-base",
           )}
           disabled={isSubmitting}
         />

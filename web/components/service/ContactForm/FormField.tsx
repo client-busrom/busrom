@@ -49,7 +49,7 @@ export const FormField: React.FC<FormFieldProps> = ({
     height: vw(90),
     borderRadius: vw(12),
     padding: `0 ${vw(28)}`,
-    fontSize: vw(22),
+    fontSize: vw(16 / 0.7),
     fontWeight: 600,
   };
 
@@ -114,6 +114,8 @@ export const FormField: React.FC<FormFieldProps> = ({
                 buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5"
                 inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                 dialCodeClassName="!text-white"
+                inputStyle={{ fontSize: vw(16 / 0.7) }}
+                dialCodeStyle={{ fontSize: vw(16 / 0.7) }}
               />
             </div>
           );

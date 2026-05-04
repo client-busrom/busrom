@@ -485,7 +485,7 @@ export function SupportContactFormSection({
                       )}
                       buttonClassName="!bg-transparent hover:!bg-white/10 !h-full !border-r !border-white/20"
                       dialCodeClassName="!text-white !font-anaheim !font-semibold"
-                      inputClassName="!bg-transparent !text-white placeholder:!text-white/50 !font-anaheim !font-semibold !text-lg !px-6 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                      inputClassName="!bg-transparent !text-white placeholder:!text-white/50 !font-anaheim !font-semibold !text-base !px-6 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                     />
                   </div>
                 );
@@ -514,7 +514,7 @@ export function SupportContactFormSection({
                       height: isMobile ? mvw(50) : vw(63),
                       borderRadius: isMobile ? mvw(12) : vw(15),
                       paddingLeft: isMobile ? mvw(16) : vw(24),
-                      fontSize: mvw(16),
+                      fontSize: isMobile ? mvw(16) : vw(16),
                     }}
                       >
                         <option value="" disabled className="bg-[#746D37]">
@@ -552,7 +552,7 @@ export function SupportContactFormSection({
                     height: isMobile ? mvw(50) : vw(63),
                     borderRadius: isMobile ? mvw(12) : vw(15),
                     paddingLeft: isMobile ? mvw(16) : vw(24),
-                    fontSize: mvw(16),
+                    fontSize: isMobile ? mvw(16) : vw(16),
                   }}
                   value={formData[field.fieldName] || ""}
                   onChange={(e) =>
@@ -584,7 +584,7 @@ export function SupportContactFormSection({
                     borderRadius: isMobile ? mvw(12) : vw(15),
                     paddingLeft: isMobile ? mvw(16) : vw(24),
                     paddingTop: isMobile ? mvw(12) : vw(14),
-                    fontSize: mvw(16),
+                    fontSize: isMobile ? mvw(16) : vw(16),
                   }}
                   required={field.required}
                 />

@@ -143,6 +143,14 @@ export function OemOdmContactForm({
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
   const [turnstileKey, setTurnstileKey] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // 初始化表单数据
   useEffect(() => {
@@ -500,7 +508,7 @@ export function OemOdmContactForm({
                     return (
                       <div
                         key={field.fieldName}
-                        className="bg-[#F3F1EA] rounded-2xl h-14 flex items-center"
+                        className="bg-[rgba(33,28,11,0.2)] rounded-[10px] h-[50px] flex items-center"
                       >
                         {isPhone ? (
                           <PhoneInput
@@ -509,12 +517,12 @@ export function OemOdmContactForm({
                             onChange={(phone) =>
                               handleChange(field.fieldName, phone)
                             }
-                            placeholder={field.placeholder || field.label}
+                            placeholder={field.placeholder?.trim() || field.label}
                             disabled={submitting}
-                            className="!bg-transparent !border-none !h-full !rounded-none"
-                            buttonClassName="!bg-transparent !border-r-0 !text-[#756F3F] hover:!bg-black/5 !rounded-none !px-3 !h-full [&_img]:!w-6 [&_img]:!h-auto [&_svg]:!w-6 [&_svg]:!h-auto [&_svg]:!text-[#756F3F] [&_.PhoneInputCountrySelectArrow]:!border-t-[#756F3F] [&_.PhoneInputCountrySelectArrow]:!opacity-100"
-                            inputClassName="!bg-transparent !text-[#756F3F] !placeholder-[#756F3F]/50 !font-anaheim !font-semibold !text-lg md:text-xl !h-full !pl-0 [&:-webkit-autofill]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-                            dialCodeClassName="!text-[#756F3F] !text-lg [&:-webkit-autofill]:[-webkit-text-fill-color:#756F3F!important]"
+                            className="!bg-transparent !border-none !h-full !rounded-[10px]"
+                            buttonClassName="!bg-transparent !border-r-0 !text-white hover:!bg-black/5 !rounded-none !px-3 !h-full [&_img]:!w-6 [&_img]:!h-auto [&_svg]:!w-6 [&_svg]:!h-auto [&_svg]:!text-white [&_.PhoneInputCountrySelectArrow]:!border-t-white [&_.PhoneInputCountrySelectArrow]:!opacity-100"
+                            inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-[16px] !h-full !pl-0 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                            dialCodeClassName="!text-white !text-[16px] [&:-webkit-autofill]:[-webkit-text-fill-color:white!important]"
                             containerClassName="!h-full w-full"
                           />
                         ) : (
@@ -527,8 +535,8 @@ export function OemOdmContactForm({
                               handleChange(field.fieldName, e.target.value)
                             }
                             spellCheck="false"
-                            className="w-full h-full px-6 bg-transparent outline-none font-semibold text-[#756F3F] text-lg md:text-xl placeholder-[#756F3F]/50 [&:-webkit-autofill]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-                            placeholder={field.placeholder || field.label}
+                            className="w-full h-full px-6 bg-transparent outline-none font-semibold text-white text-base placeholder-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                            placeholder={field.placeholder?.trim() || field.label}
                             disabled={submitting}
                           />
                         )}
@@ -543,7 +551,7 @@ export function OemOdmContactForm({
                     <label className="text-xl md:text-2xl font-semibold text-[#756F3F] block mt-4">
                       {selectFields[0].label}
                     </label>
-                    <div className="relative bg-[#F3F1EA] rounded-2xl h-14">
+                    <div className="relative bg-[rgba(33,28,11,0.2)] rounded-[10px] h-[50px]">
                       <select
                         value={formData[selectFields[0].fieldName] || ""}
                         onChange={(e) =>
@@ -552,11 +560,11 @@ export function OemOdmContactForm({
                             e.target.value,
                           )
                         }
-                        className="w-full h-full px-6 bg-transparent outline-none font-semibold text-[#756F3F] text-xl md:text-2xl appearance-none cursor-pointer"
+                        className="w-full h-full px-6 bg-transparent outline-none font-semibold text-white text-base appearance-none cursor-pointer"
                         disabled={submitting}
                       >
                         {selectFields[0].options?.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
+                          <option key={opt.value} value={opt.value} className="bg-[#34311c]">
                             {opt.label}
                           </option>
                         ))}
@@ -570,7 +578,7 @@ export function OemOdmContactForm({
                         >
                           <path
                             d="M15.5138 11.3538L2.24596 0.319738C1.73241 -0.106579 0.899394 -0.106579 0.385165 0.319738C-0.128388 0.747503 -0.128388 1.44023 0.385165 1.86788L14.4787 13.5871C14.5088 13.6191 14.542 13.6504 14.5774 13.6797C15.0917 14.1068 15.9246 14.1068 16.4382 13.6797L30.6144 1.89054C31.1285 1.4629 31.1285 0.770169 30.6144 0.343084C30.1015 -0.0839129 29.2686 -0.0839129 28.7543 0.343084L15.5138 11.3538Z"
-                            fill="#756F3F"
+                            fill="white"
                           />
                         </svg>
                       </div>
@@ -580,7 +588,7 @@ export function OemOdmContactForm({
 
                 {/* Textarea */}
                 {textareaFields[0] && (
-                  <div className="bg-[#F3F1EA] rounded-2xl p-5 min-h-[80px]">
+                  <div className="bg-[rgba(33,28,11,0.2)] rounded-[10px] p-5 min-h-[80px]">
                     <textarea
                       value={formData[textareaFields[0].fieldName] || ""}
                       onChange={(e) =>
@@ -590,9 +598,9 @@ export function OemOdmContactForm({
                         )
                       }
                       spellCheck="false"
-                      className="w-full h-full bg-transparent outline-none font-semibold text-[#756F3F] text-xl md:text-2xl placeholder-[#756F3F]/50 resize-none [&:-webkit-autofill]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#756F3F!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                      className="w-full h-full bg-transparent outline-none font-semibold text-white text-base placeholder-white/50 resize-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                       placeholder={
-                        textareaFields[0].placeholder || textareaFields[0].label
+                        textareaFields[0].placeholder?.trim() || textareaFields[0].label
                       }
                       disabled={submitting}
                       rows={2}
@@ -605,7 +613,7 @@ export function OemOdmContactForm({
                   <div className="flex flex-col md:flex-row items-center gap-8">
                     {/* Upload Button */}
                     <div
-                      className="flex items-center justify-center px-8 py-4 rounded-full border border-[#756F3F] text-[#756F3F] hover:bg-[#756F3F] hover:text-white transition-all cursor-pointer group gap-3 text-lg md:text-xl font-semibold whitespace-nowrap"
+                      className="flex items-center justify-center px-8 py-3 rounded-full border border-[#756F3F] text-[#756F3F] hover:bg-[#756F3F] hover:text-white transition-all cursor-pointer group gap-3 text-lg md:text-xl font-semibold whitespace-nowrap h-[50px]"
                       onClick={() => fileInputRef.current?.click()}
                     >
                       <svg
@@ -765,7 +773,7 @@ export function OemOdmContactForm({
                           onChange={(e) =>
                             handleChange("othersIndicate", e.target.value)
                           }
-                          className="w-full bg-[#F4EDD4] rounded-xl px-4 h-14 text-lg md:text-xl font-semibold text-[#6F6200] outline-none border border-transparent focus:border-[#6F6200]/20 [&:-webkit-autofill]:[-webkit-text-fill-color:#6F6200!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#6F6200!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#6F6200!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#6F6200!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                          className="w-full bg-[rgba(33,28,11,0.2)] rounded-[10px] px-4 h-[50px] text-base font-semibold text-white outline-none border border-transparent focus:border-white/20 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                           placeholder="Please indicate here"
                         />
                       )}

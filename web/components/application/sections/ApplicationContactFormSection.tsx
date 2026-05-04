@@ -6,8 +6,6 @@ import { ChevronDown, Upload } from "lucide-react";
 import { PhoneInput } from "@/components/ui/PhoneInput";
 import { cn } from "@/lib/utils";
 
-const vw = (px: number) => `${(px / 1920) * 100}vw`;
-const mvw = (px: number) => `${(px / 390) * 100}vw`;
 
 interface RichTextSegment {
   text: string;
@@ -99,22 +97,22 @@ function CustomDropdown({
     <div ref={containerRef} className="relative w-full font-montserrat">
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between cursor-pointer font-semibold text-[#5E552C] transition-all hover:bg-[#C9BF99]"
+        className="w-full flex items-center justify-between cursor-pointer font-semibold text-white transition-all hover:bg-black/10"
         style={{
-          height: isMobile ? mvw(48) : vw(51),
-          backgroundColor: "#D4CBAF",
-          paddingLeft: isMobile ? mvw(16) : vw(INPUT_PX),
-          paddingRight: isMobile ? mvw(16) : vw(INPUT_PX),
-          borderRadius: isMobile ? mvw(10) : vw(15),
+          height: isMobile ? "48px" : "50px",
+          backgroundColor: "rgba(33, 28, 11, 0.2)",
+          paddingLeft: isMobile ? "16px" : "17px",
+          paddingRight: isMobile ? "16px" : "17px",
+          borderRadius: "10px",
         }}
       >
         <span
           className={
             !value && !isScenario
-              ? "text-[#9D9473]/70 truncate flex-1"
-              : "truncate flex-1"
+              ? "text-white/50 truncate flex-1"
+              : "text-white truncate flex-1"
           }
-          style={{ fontSize: isMobile ? mvw(15) : vw(16) }}
+          style={{ fontSize: "16px" }}
         >
           {selectedOption
             ? selectedOption.label
@@ -125,9 +123,8 @@ function CustomDropdown({
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
-          className="text-[#5E552C] flex-shrink-0"
         >
-          <ChevronDown size={isMobile ? 16 : 20} />
+          <ChevronDown size={isMobile ? 16 : 20} className="text-white" />
         </motion.div>
       </div>
 
@@ -137,17 +134,17 @@ function CustomDropdown({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute left-0 w-full bg-[#D4CBAF] z-[100] shadow-xl overflow-hidden border border-black/5"
+            className="absolute left-0 w-full bg-[#34311c] z-[100] shadow-xl overflow-hidden border border-white/10"
             style={{
-              top: isMobile ? mvw(52) : vw(55),
-              borderRadius: isMobile ? mvw(10) : vw(15),
+              top: isMobile ? "52px" : "39px",
+              borderRadius: "10px",
             }}
           >
             <div
               className="max-h-[200px] overflow-y-auto"
               style={{
-                paddingTop: isMobile ? mvw(4) : vw(5),
-                paddingBottom: isMobile ? mvw(4) : vw(5),
+                paddingTop: isMobile ? "4px" : "4px",
+                paddingBottom: isMobile ? "4px" : "4px",
               }}
             >
               {field.options?.map((opt) => (
@@ -157,17 +154,17 @@ function CustomDropdown({
                     onChange(opt.value);
                     setIsOpen(false);
                   }}
-                  className="w-full flex items-center px-6 hover:bg-[#C9BF99] cursor-pointer text-[#5E552C] font-medium transition-colors"
+                  className="w-full flex items-center px-6 hover:bg-white/10 cursor-pointer text-white font-medium transition-colors"
                   style={{
-                    height: isMobile ? mvw(40) : vw(45),
-                    fontSize: isMobile ? mvw(14) : vw(15),
-                    paddingLeft: isMobile ? mvw(16) : vw(INPUT_PX),
-                    paddingRight: isMobile ? mvw(16) : vw(INPUT_PX),
+                    height: isMobile ? "40px" : "32px",
+                    fontSize: isMobile ? "14px" : "11px",
+                    paddingLeft: isMobile ? "16px" : "17px",
+                    paddingRight: isMobile ? "16px" : "17px",
                   }}
                 >
                   <span className="truncate flex-1">{opt.label}</span>
                   {value === opt.value && (
-                    <div className="w-2 h-2 rounded-full bg-[#756F3F]" />
+                    <div className="w-2 h-2 rounded-full bg-white" />
                   )}
                 </div>
               ))}
@@ -303,13 +300,14 @@ export function ApplicationContactFormSection({
 
   const renderField = (field: FormField) => {
     const commonStyles: React.CSSProperties = {
-      height: isMobile ? mvw(48) : vw(51),
-      backgroundColor: "#D4CBAF",
-      paddingLeft: isMobile ? mvw(16) : vw(INPUT_PX),
-      paddingRight: isMobile ? mvw(16) : vw(INPUT_PX),
-      borderRadius: isMobile ? mvw(10) : vw(15),
+      height: isMobile ? "48px" : "50px",
+      backgroundColor: "rgba(33, 28, 11, 0.2)",
+      paddingLeft: isMobile ? "16px" : "17px",
+      paddingRight: isMobile ? "16px" : "17px",
+      borderRadius: "10px",
       display: "flex",
       alignItems: "center",
+      color: "white",
     };
 
     if (field.fieldType === "select") {
@@ -320,12 +318,12 @@ export function ApplicationContactFormSection({
         <div
           key={field.fieldName}
           className="flex flex-col font-montserrat"
-          style={{ gap: isScenario ? (isMobile ? mvw(8) : vw(10)) : 0 }}
+          style={{ gap: isScenario ? (isMobile ? "8px" : "7px") : 0 }}
         >
           {isScenario && (
             <span
               className="font-bold text-black"
-              style={{ fontSize: isMobile ? mvw(15) : vw(16) }}
+              style={{ fontSize: "16px" }}
             >
               {field.label}
             </span>
@@ -349,24 +347,24 @@ export function ApplicationContactFormSection({
           <PhoneInput
             value={formData[field.fieldName] || ""}
             onChange={(val) => handleInputChange(field.fieldName, val)}
-            placeholder={field.placeholder || field.label}
+            placeholder={field.placeholder?.trim() || field.label}
             style={{
-              height: isMobile ? mvw(48) : vw(51),
-              borderRadius: isMobile ? mvw(10) : vw(15),
+              height: isMobile ? "48px" : "50px",
+              borderRadius: isMobile ? "10px" : "10px",
             }}
-            className="!bg-[#D4CBAF] border-none"
+            className="!bg-[rgba(33,28,11,0.2)] border-none"
             buttonClassName={cn(
-              isMobile ? "!pl-[4.1vw] !pr-1" : `!pl-[${vw(INPUT_PX)}] !pr-2`,
+              isMobile ? "!pl-[4.1vw] !pr-1" : "!pl-[17px] !pr-2",
             )}
             inputClassName={cn(
-              "!bg-transparent !text-[#5E552C] !font-montserrat !font-semibold !placeholder-[#9D9473]/60 !pl-2 [&:-webkit-autofill]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]",
-              `![font-size:${isMobile ? mvw(15) : vw(16)}]`,
+              "!bg-transparent !text-white !font-montserrat !font-semibold !placeholder-white/50 !pl-2 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]",
+              `![font-size:16px]`,
             )}
             dialCodeClassName={cn(
-              "!text-[#5E552C] !font-montserrat !font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:#5E552C!important]",
-              `![font-size:${isMobile ? mvw(15) : vw(16)}]`,
+              "!text-white !font-montserrat !font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important]",
+              `![font-size:16px]`,
             )}
-            chevronClassName="!text-[#5E552C]"
+            chevronClassName="!text-white"
           />
         </div>
       );
@@ -377,26 +375,26 @@ export function ApplicationContactFormSection({
         <div
           key={field.fieldName}
           className="flex flex-col font-montserrat"
-          style={{ gap: isMobile ? mvw(8) : vw(10) }}
+          style={{ gap: isMobile ? "8px" : "7px" }}
         >
           <span
             className="font-bold text-black"
-            style={{ fontSize: isMobile ? mvw(15) : vw(16) }}
+            style={{ fontSize: "16px" }}
           >
             {field.label}
           </span>
           <textarea
-            placeholder={field.placeholder}
-            className="w-full font-semibold text-[#5E552C] placeholder:text-[#9D9473]/60 outline-none resize-none"
+            placeholder={field.placeholder?.trim() || field.label}
+            className="w-full font-semibold text-white placeholder:text-white/50 outline-none resize-none"
             spellCheck="false"
             style={{
-              height: isMobile ? mvw(120) : vw(130),
-              backgroundColor: "#D4CBAF",
-              borderRadius: isMobile ? mvw(10) : vw(15),
-              fontSize: isMobile ? mvw(15) : vw(16),
-              paddingLeft: isMobile ? mvw(16) : vw(INPUT_PX),
-              paddingRight: isMobile ? mvw(16) : vw(INPUT_PX),
-              paddingTop: isMobile ? mvw(14) : vw(18),
+              height: isMobile ? "120px" : "91px",
+              backgroundColor: "rgba(33, 28, 11, 0.2)",
+              borderRadius: "10px",
+              fontSize: "16px",
+              paddingLeft: isMobile ? "16px" : "17px",
+              paddingRight: isMobile ? "16px" : "17px",
+              paddingTop: isMobile ? "14px" : "13px",
             }}
             value={formData[field.fieldName] || ""}
             onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
@@ -409,15 +407,15 @@ export function ApplicationContactFormSection({
       <div
         key={field.fieldName}
         className="flex flex-col font-montserrat"
-        style={{ gap: isMobile ? mvw(8) : vw(10) }}
+        style={{ gap: isMobile ? "8px" : "7px" }}
       >
         <div style={commonStyles}>
           <input
             type={field.fieldType === "email" ? "email" : "text"}
-            placeholder={field.placeholder || field.label}
+            placeholder={field.placeholder?.trim() || field.label}
             spellCheck="false"
-            className="w-full font-semibold text-[#5E552C] placeholder:text-[#9D9473]/60 outline-none !bg-transparent [&:-webkit-autofill]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#5E552C!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-            style={{ fontSize: isMobile ? mvw(15) : vw(16) }}
+            className="w-full font-semibold text-white placeholder:text-white/50 outline-none !bg-transparent [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            style={{ fontSize: "16px" }}
             value={formData[field.fieldName] || ""}
             onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
           />
@@ -489,10 +487,10 @@ export function ApplicationContactFormSection({
     <section
       className="relative w-full flex items-start justify-center select-none z-20"
       style={{
-        minHeight: vw(1080),
+        minHeight: "756px",
         height: "auto",
         backgroundColor: "#000000",
-        paddingBottom: vw(220),
+        paddingBottom: "154px",
       }}
     >
       <style jsx global>{`
@@ -504,8 +502,8 @@ export function ApplicationContactFormSection({
         textarea:-webkit-autofill:hover,
         textarea:-webkit-autofill:focus,
         textarea:-webkit-autofill:active {
-          -webkit-text-fill-color: #5e552c !important;
-          -webkit-box-shadow: 0 0 0px 1000px #d4cbaf inset !important;
+          -webkit-text-fill-color: white !important;
+          -webkit-box-shadow: 0 0 0px 1000px #34311c inset !important;
           transition: background-color 9999s ease-in-out 0s !important;
         }
       `}</style>
@@ -523,7 +521,7 @@ export function ApplicationContactFormSection({
       {logoImage && (
         <div
           className="absolute w-full flex justify-center z-[100] pointer-events-none"
-          style={{ bottom: vw(-160) }}
+          style={{ bottom: "-112px" }}
         >
           <img src={logoImage} alt="Logo" className="w-[96%] object-contain" />
         </div>
@@ -536,29 +534,29 @@ export function ApplicationContactFormSection({
           isMobile ? "flex-col mt-[40px]" : "flex-row items-stretch mt-[60px]",
         )}
         style={{
-          width: isMobile ? "92vw" : vw(CARD_W),
+          width: isMobile ? "92vw" : "1036px",
           maxWidth: isMobile ? "800px" : "none",
-          minHeight: isMobile ? "auto" : vw(CARD_H),
+          minHeight: isMobile ? "auto" : "560px",
           height: "auto",
-          borderRadius: isMobile ? mvw(30) : vw(59),
+          borderRadius: isMobile ? "30px" : "41px",
           backgroundColor: "rgba(255, 255, 255, 0.92)",
-          paddingLeft: isMobile ? mvw(20) : vw(PADDING_L),
-          paddingRight: isMobile ? mvw(20) : vw(PADDING_R),
-          paddingTop: isMobile ? mvw(30) : vw(MARGIN_TOP_L),
-          paddingBottom: isMobile ? mvw(30) : vw(50),
+          paddingLeft: isMobile ? "20px" : "35px",
+          paddingRight: isMobile ? "20px" : "35px",
+          paddingTop: isMobile ? "30px" : "53px",
+          paddingBottom: isMobile ? "30px" : "35px",
         }}
       >
         {/* LEFT COMPONENT */}
         <div
           className={cn("flex flex-col", isMobile ? "items-center text-center" : "")}
           style={{
-            width: isMobile ? "100%" : vw(LEFT_W),
-            marginBottom: isMobile ? mvw(30) : 0,
+            width: isMobile ? "100%" : "343px",
+            marginBottom: isMobile ? "30px" : 0,
           }}
         >
           <div
             className="font-cherry-bomb font-black text-[#1D1A02] leading-[1.4] whitespace-pre-line block"
-            style={{ fontSize: isMobile ? mvw(24) : vw(36), width: "100%" }}
+            style={{ fontSize: isMobile ? "24px" : "25px", width: "100%" }}
           >
             {(() => {
               // Filter out the marker text if it's accidentally included in segments
@@ -594,8 +592,8 @@ export function ApplicationContactFormSection({
               isMobile ? "mt-5" : "mt-auto",
             )}
             style={{
-              width: isMobile ? "100%" : vw(LEFT_W),
-              height: isMobile ? mvw(200) : vw(314),
+              width: isMobile ? "100%" : "343px",
+              height: isMobile ? "200px" : "220px",
               marginBottom: 0,
             }}
           >
@@ -615,8 +613,8 @@ export function ApplicationContactFormSection({
         <div
           className="flex flex-col"
           style={{
-            width: isMobile ? "100%" : vw(RIGHT_W),
-            marginLeft: isMobile ? 0 : vw(GAP_X),
+            width: isMobile ? "100%" : "600px",
+            marginLeft: isMobile ? 0 : "23px",
           }}
         >
           <form onSubmit={handleSubmit} className="flex flex-col h-full">
@@ -626,8 +624,8 @@ export function ApplicationContactFormSection({
                 isMobile ? "grid-cols-1" : "grid-cols-2"
               )}
               style={{
-                gap: isMobile ? mvw(12) : vw(GAP_Y),
-                columnGap: isMobile ? mvw(12) : vw(GAP_X),
+                gap: isMobile ? "12px" : "7px",
+                columnGap: isMobile ? "12px" : "16px",
               }}
             >
               {(sortedFields || []).map((field: FormField, index: number) => {
@@ -646,8 +644,8 @@ export function ApplicationContactFormSection({
             <div
               className="flex flex-col md:flex-row md:items-center"
               style={{
-                marginTop: isMobile ? mvw(16) : vw(24),
-                gap: isMobile ? mvw(12) : vw(32),
+                marginTop: isMobile ? "16px" : "12px",
+                gap: isMobile ? "12px" : "15px",
               }}
             >
               <div className="flex flex-col">
@@ -662,17 +660,17 @@ export function ApplicationContactFormSection({
                   htmlFor="file-upload"
                   className="flex items-center justify-center cursor-pointer transition-all border border-[#B2A224] text-[#B2A224] hover:bg-[#B2A224] hover:text-white group"
                   style={{
-                    height: isMobile ? mvw(44) : vw(48),
-                    paddingLeft: isMobile ? mvw(24) : vw(32),
-                    paddingRight: isMobile ? mvw(24) : vw(32),
+                    height: isMobile ? "44px" : "34px",
+                    paddingLeft: isMobile ? "24px" : "22px",
+                    paddingRight: isMobile ? "24px" : "22px",
                     borderRadius: "9999px",
-                    gap: isMobile ? mvw(8) : vw(10),
+                    gap: isMobile ? "8px" : "7px",
                     width: isMobile ? "100%" : "auto",
                   }}
                 >
                   <svg
-                    width={isMobile ? "18" : "20"}
-                    height={isMobile ? "18" : "20"}
+                    width={isMobile ? "18" : "14"}
+                    height={isMobile ? "18" : "14"}
                     viewBox="0 0 25 25"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -685,7 +683,7 @@ export function ApplicationContactFormSection({
                   </svg>
                   <span
                     className="font-bold whitespace-nowrap"
-                    style={{ fontSize: isMobile ? mvw(14) : vw(16) }}
+                    style={{ fontSize: isMobile ? "14px" : "11px" }}
                   >
                     {uploadLabel}
                   </span>
@@ -721,7 +719,7 @@ export function ApplicationContactFormSection({
                   </div>
                   <span
                     className="text-[#5E552C] opacity-70 group-hover:opacity-100 transition-opacity"
-                    style={{ fontSize: isMobile ? mvw(12) : vw(14) }}
+                    style={{ fontSize: isMobile ? "12px" : "10px" }}
                   >
                     {privacyText}
                   </span>
@@ -731,7 +729,7 @@ export function ApplicationContactFormSection({
 
             <div
               className="flex flex-col"
-              style={{ marginTop: isMobile ? mvw(24) : vw(32) }}
+              style={{ marginTop: isMobile ? "24px" : "22px" }}
             >
               <motion.button
                 type="submit"

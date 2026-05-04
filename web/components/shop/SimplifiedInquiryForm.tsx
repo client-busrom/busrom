@@ -168,7 +168,7 @@ export function SimplifiedInquiryForm({
 
   const renderField = (field: FormField) => {
     const commonClasses =
-      "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition-colors text-sm [&:-webkit-autofill]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+      "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition-colors text-base [&:-webkit-autofill]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
     const errorClasses = errors[field.fieldName] ? "border-red-500" : ""
 
     switch (field.fieldType) {
@@ -202,8 +202,8 @@ export function SimplifiedInquiryForm({
               required={field.required}
               error={!!errors[field.fieldName]}
               className="!border !border-gray-300 !rounded-lg !h-[42px]"
-              inputClassName="!text-brand-text-black !text-sm !pl-2 [&:-webkit-autofill]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-              dialCodeClassName="!text-brand-text-black !text-sm"
+              inputClassName="!text-brand-text-black !text-base !pl-2 [&:-webkit-autofill]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+              dialCodeClassName="!text-brand-text-black !text-base"
               buttonClassName="!border-r !border-r-gray-300"
             />
           )

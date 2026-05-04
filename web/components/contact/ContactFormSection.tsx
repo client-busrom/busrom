@@ -652,7 +652,7 @@ export function ContactFormSection({
                         onChange={(phone) =>
                           handleInputChange(field.fieldName, phone)
                         }
-                        placeholder={`${field.placeholder || field.label}${field.required ? " *" : ""}`}
+                        placeholder={`${field.placeholder?.trim() || field.label}${field.required ? " *" : ""}`}
                         required={field.required}
                         disabled={isSubmitting}
                         className="!bg-[#B4A25F] !border-white/34"
@@ -724,7 +724,7 @@ export function ContactFormSection({
                   <input
                     key={field.fieldName}
                     type={field.fieldType === "email" ? "email" : "text"}
-                    placeholder={`${field.placeholder || field.label}${field.required ? " *" : ""}`}
+                    placeholder={`${field.placeholder?.trim() || field.label}${field.required ? " *" : ""}`}
                     value={formData[field.fieldName] || ""}
                     onChange={(e) =>
                       handleInputChange(field.fieldName, e.target.value)
@@ -757,7 +757,7 @@ export function ContactFormSection({
                   <textarea
                     key={field.fieldName}
                     ref={textareaRef}
-                    placeholder={field.placeholder || field.label}
+                    placeholder={field.placeholder?.trim() || field.label}
                     value={formData[field.fieldName] || ""}
                     onChange={(e) =>
                       handleInputChange(field.fieldName, e.target.value)
@@ -842,10 +842,16 @@ export function ContactFormSection({
                   }}
                   buttonClassName="!bg-transparent !border-none hover:!bg-white/5"
                   inputClassName={cn(
-                    "!bg-transparent !text-white !placeholder-white/95 !font-anaheim !font-semibold",
+                    "!bg-transparent !text-white !placeholder-white/95 !font-anaheim !font-semibold !text-base",
                     isMobile ? "!pl-6" : "!pl-6",
                   )}
-                  dialCodeClassName="!text-white !font-anaheim"
+                  inputStyle={{
+                    fontSize: isMobile ? mvw(16) : vw(16),
+                  }}
+                  dialCodeClassName="!text-white !font-anaheim !text-base"
+                  dialCodeStyle={{
+                    fontSize: isMobile ? mvw(16) : vw(16),
+                  }}
                 />
               </div>
               <div className="relative">

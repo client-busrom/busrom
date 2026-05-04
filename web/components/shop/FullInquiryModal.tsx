@@ -463,7 +463,7 @@ export function FullInquiryModal({
 
   const renderField = (field: FormField) => {
     const commonClasses =
-      "w-full px-4 py-3 border-2 border-brand-accent-border rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-brand-secondary transition-colors bg-white font-medium text-brand-text-black placeholder:text-gray-400"
+      "w-full px-4 py-3 border-2 border-brand-accent-border rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-brand-secondary transition-colors bg-white font-medium text-brand-text-black placeholder:text-gray-400 text-base"
     const errorClasses = errors[field.fieldName] ? "border-red-500" : ""
     const preFilledClasses = initialData[field.fieldName] ? "bg-brand-cream/30" : ""
 
@@ -563,6 +563,10 @@ export function FullInquiryModal({
               required={field.required}
               error={!!errors[field.fieldName]}
               disabled={isSubmitting}
+              inputStyle={{ fontSize: "16px" }}
+              dialCodeStyle={{ fontSize: "16px" }}
+              inputClassName="!text-base"
+              dialCodeClassName="!text-base"
             />
           )
         }

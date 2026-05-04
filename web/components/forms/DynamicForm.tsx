@@ -488,7 +488,7 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
 
   // Render field based on type
   const renderField = (field: FormField) => {
-    const baseInputClass = "w-full px-4 py-3 border border-brand-accent-border rounded-none focus:outline-none focus:border-brand-text-black transition-colors font-anaheim"
+    const baseInputClass = "w-full px-4 py-3 border border-brand-accent-border rounded-none focus:outline-none focus:border-brand-text-black transition-colors font-anaheim text-base"
     const labelClass = "block text-sm font-anaheim font-bold text-brand-text-black mb-2"
 
     switch (field.fieldType) {

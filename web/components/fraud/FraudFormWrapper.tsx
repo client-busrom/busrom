@@ -24,6 +24,14 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
   const [turnstileKey, setTurnstileKey] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [isGloballyAccepted, setIsGloballyAccepted] = useState(false);
   const STORAGE_KEY = 'busrom_privacy_consent';
@@ -221,7 +229,7 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
 
        <form onSubmit={handleSubmit} className="flex flex-col" style={{ gap: "12px" }}>
           {fields.map((field: any) => {
-             const placeholder = `${getLocalizedString(field.placeholder || field.label, locale)}${field.required ? ' *' : ''}`;
+             const placeholder = `${getLocalizedString(field.placeholder, locale)?.trim() || getLocalizedString(field.label, locale)}${field.required ? ' *' : ''}`;
              const isTextarea = field.fieldType === 'textarea' || field.fieldName.toLowerCase().includes('message');
              const isFile = field.fieldType === 'file' || field.fieldName.toLowerCase().includes('file') || field.fieldName.toLowerCase().includes('attachment');
              
@@ -235,17 +243,19 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
                 return (
                    <div key={field.id || field.fieldName} className="space-y-2">
                       {labelText && <label className="block text-white/60 font-anaheim font-semibold text-lg ml-1">{labelText}</label>}
-                      <div className="dynamic-phone-input w-full h-14">
+                      <div className="dynamic-phone-input w-full h-[50px]">
                          <PhoneInput 
                             value={formData[field.fieldName] || ""}
                             onChange={(v) => handleInputChange(field.fieldName, v)}
                             placeholder={placeholder}
                             required={field.required}
                             containerClassName="!h-full !w-full"
-                            className="!bg-[#746D37] !border-white/34 !rounded-2xl !h-full"
-                            buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5 !px-6"
-                            inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-lg !px-6 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-                            dialCodeClassName="!text-white !text-lg !font-anaheim"
+                            className="!bg-[rgba(33,28,11,0.2)] !border-none !rounded-[10px] !h-full"
+                            buttonClassName="!bg-transparent !border-none !text-white hover:!bg-white/5 !px-6"
+                            inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-base !px-6 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                            inputStyle={{ fontSize: isMobile ? "18px" : "16px" }}
+                            dialCodeClassName="!text-white !text-base !font-anaheim"
+                            dialCodeStyle={{ fontSize: isMobile ? "18px" : "16px" }}
                          />
                       </div>
                    </div>
@@ -261,13 +271,14 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
                             required={field.required}
                             value={formData[field.fieldName] || ""}
                             onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
-                            className="w-full appearance-none bg-[#746D37] border border-white/34 rounded-2xl px-6 h-14 text-white focus:outline-none focus:border-white/30 transition-all font-anaheim font-semibold text-lg placeholder:text-white/50"
+                            className="w-full appearance-none bg-[rgba(33,28,11,0.2)] border-none rounded-[10px] px-6 h-[50px] text-white focus:outline-none focus:border-white/30 transition-all font-anaheim font-semibold text-base placeholder:text-white/50"
+                            style={{ fontSize: isMobile ? "18px" : "16px" }}
                          >
-                            <option value="" disabled className="bg-[#746D37]">
+                            <option value="" disabled className="bg-[#34311c]">
                                {placeholder}
                             </option>
                             {field.options?.map((opt: any) => (
-                               <option key={opt.value} value={opt.value} className="bg-[#746D37]">
+                               <option key={opt.value} value={opt.value} className="bg-[#34311c]">
                                   {getLocalizedString(opt.label, locale) || opt.label}
                                </option>
                             ))}
@@ -290,7 +301,8 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
                       value={formData[field.fieldName] || ""}
                       onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
                       spellCheck="false"
-                      className="w-full bg-[#746D37] border border-white/34 rounded-2xl px-6 h-14 text-white focus:outline-none focus:border-white/30 transition-all font-anaheim font-semibold text-lg placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                      className="w-full bg-[rgba(33,28,11,0.2)] border-none rounded-[10px] px-6 h-[50px] text-white focus:outline-none focus:border-white/30 transition-all font-anaheim font-semibold text-base placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                      style={{ fontSize: isMobile ? "18px" : "16px" }}
                    />
                 </div>
              );
@@ -308,8 +320,8 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
                       value={formData[field.fieldName] || ""}
                       onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
                       spellCheck="false"
-                      className="w-full bg-[#746D37] border border-white/34 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-white/30 transition-all h-32 resize-none scrollbar-hide font-anaheim font-semibold text-lg placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-                      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                      className="w-full bg-[rgba(33,28,11,0.2)] border-none rounded-[10px] px-6 py-4 text-white focus:outline-none focus:border-white/30 transition-all h-32 resize-none scrollbar-hide font-anaheim font-semibold text-base placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                      style={{ fontSize: isMobile ? "18px" : "16px", scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                    />
                 </div>
              );

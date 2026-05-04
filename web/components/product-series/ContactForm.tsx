@@ -570,7 +570,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
             spellCheck="false"
             className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{
-              fontSize: isMobile ? mvw(16) : vw(20),
+              fontSize: isMobile ? mvw(16) : vw(16),
               paddingLeft: isMobile ? mvw(24) : vw(29),
               height: isMobile ? mvw(50) : vw(63),
               backgroundColor: inputBg,
@@ -589,7 +589,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
             spellCheck="false"
             className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{
-              fontSize: isMobile ? mvw(16) : vw(20),
+              fontSize: isMobile ? mvw(16) : vw(16),
               paddingLeft: isMobile ? mvw(24) : vw(29),
               height: isMobile ? mvw(50) : vw(63),
               backgroundColor: inputBg,
@@ -621,17 +621,17 @@ export function ContactForm({ data, className }: ContactFormProps) {
               buttonClassName="!bg-transparent !border-r-0 !text-white hover:!bg-white/10 !px-4 !h-full"
               inputClassName={cn(
                 "!bg-transparent !text-white !placeholder-white/95 !font-anaheim !font-semibold !h-full [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]",
-                isMobile ? "!pl-2" : "!text-[1.04vw]"
+                isMobile ? "!pl-2" : "!text-[0.833vw]"
               )}
               inputStyle={{
-                fontSize: isMobile ? mvw(16) : vw(20),
+                fontSize: isMobile ? mvw(16) : vw(16),
               }}
               dialCodeClassName={cn(
                 "!text-white",
-                !isMobile && "!text-[1.04vw]"
+                !isMobile && "!text-[0.833vw]"
               )}
               dialCodeStyle={{
-                fontSize: isMobile ? mvw(16) : vw(20),
+                fontSize: isMobile ? mvw(16) : vw(16),
               }}
             />
           </div>
@@ -645,7 +645,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
               disabled={isSubmitting}
               className="w-full bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold appearance-none focus:outline-none transition-colors"
               style={{
-                fontSize: isMobile ? mvw(16) : vw(20),
+                fontSize: isMobile ? mvw(16) : vw(16),
                 paddingLeft: isMobile ? mvw(24) : vw(29),
                 paddingRight: isMobile ? mvw(40) : vw(40),
                 height: isMobile ? mvw(50) : vw(63),
@@ -679,7 +679,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
             spellCheck="false"
             className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold resize-y overflow-hidden [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{
-              fontSize: isMobile ? mvw(16) : vw(20),
+              fontSize: isMobile ? mvw(16) : vw(16),
               paddingLeft: isMobile ? mvw(24) : vw(29),
               paddingTop: isMobile ? mvw(12) : vw(16),
               paddingBottom: isMobile ? mvw(12) : vw(16),

@@ -7,7 +7,6 @@ import { serviceTypeIcons } from "./constants";
 
 interface DesktopFieldProps {
   field: FormField | null | undefined;
-  vw: (px: number) => string;
   formData: Record<string, any>;
   handleChange: (fieldName: string, value: any) => void;
   handleCheckboxChange: (fieldName: string, value: string, checked: boolean) => void;
@@ -22,7 +21,6 @@ interface DesktopFieldProps {
 
 export const DesktopField: React.FC<DesktopFieldProps> = ({
   field,
-  vw,
   formData,
   handleChange,
   handleCheckboxChange,
@@ -38,43 +36,43 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
 
   const inputBaseStyle: React.CSSProperties = {
     width: "100%",
-    height: vw(72),
-    paddingLeft: vw(20),
-    paddingRight: vw(20),
-    borderRadius: vw(15),
+    height: "50px",
+    paddingLeft: "16px",
+    paddingRight: "16px",
+    borderRadius: "10px",
     backgroundColor: "rgba(33, 28, 11, 0.2)",
     border: "1px solid rgba(255, 255, 255, 0.3)",
     color: "white",
     fontFamily: "var(--font-anaheim)",
     fontWeight: 600,
-    fontSize: vw(20),
+    fontSize: "16px",
   };
 
   const textareaStyle: React.CSSProperties = {
     width: "100%",
-    height: vw(135),
-    paddingLeft: vw(20),
-    paddingRight: vw(20),
-    paddingTop: vw(16),
-    paddingBottom: vw(16),
-    borderRadius: vw(15),
+    height: "100px",
+    paddingLeft: "16px",
+    paddingRight: "16px",
+    paddingTop: "12px",
+    paddingBottom: "12px",
+    borderRadius: "10px",
     backgroundColor: "rgba(33, 28, 11, 0.2)",
     border: "1px solid rgba(255, 255, 255, 0.3)",
     color: "white",
     fontFamily: "var(--font-anaheim)",
     fontWeight: 600,
-    fontSize: vw(20),
+    fontSize: "16px",
     resize: "none" as const,
   };
 
   const checkboxItemStyle: React.CSSProperties = {
     display: "flex",
     alignItems: "center",
-    gap: vw(16),
-    height: vw(72),
-    paddingLeft: vw(20),
-    paddingRight: vw(20),
-    borderRadius: vw(15),
+    gap: "12px",
+    height: "50px",
+    paddingLeft: "16px",
+    paddingRight: "16px",
+    borderRadius: "10px",
     backgroundColor: "rgba(33, 28, 11, 0.2)",
     border: "1px solid rgba(255, 255, 255, 0.3)",
     cursor: "pointer",
@@ -106,14 +104,14 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
 
       if (isPhoneField) {
         return (
-          <div className="dynamic-phone-input" style={{ width: "100vw" }}>
+          <div className="dynamic-phone-input" style={{ width: "100%" }}>
             <PhoneInput
               value={formData[field.fieldName] || ""}
               onChange={(phone) => handleChange(field.fieldName, phone)}
-              placeholder={field.placeholder || field.label}
+              placeholder={field.placeholder?.trim() || field.label}
               required={field.required}
               disabled={submitting}
-              className="!bg-[#211C1133] !border-white/30 !rounded-[15px] !h-[72px] md:!h-[3.75vw]"
+              className="!bg-[#211C1133] !border-white/30 !rounded-[10px] !h-[50px]"
               buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5"
               inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-base [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
               dialCodeClassName="!text-white !text-base"
@@ -124,7 +122,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
 
       if (isCountryField) {
         return (
-          <div className="relative" style={{ width: "100vw" }}>
+          <div className="relative" style={{ width: "100%" }}>
             <select
               id={field.fieldName}
               name={field.fieldName}
@@ -133,11 +131,11 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
               required={field.required}
               className="font-anaheim font-semibold appearance-none bg-[#211C1133] border border-white/30 text-white w-full placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors"
               style={{
-                height: vw(72),
-                borderRadius: vw(15),
-                paddingLeft: vw(20),
-                paddingRight: vw(40),
-                fontSize: vw(20),
+                height: "50px",
+                borderRadius: "10px",
+                paddingLeft: "16px",
+                paddingRight: "32px",
+                fontSize: "16px",
               }}
             >
               <option value="" className="text-black">
@@ -166,7 +164,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
           value={formData[field.fieldName] || ""}
           spellCheck="false"
           onChange={(e) => handleChange(field.fieldName, e.target.value)}
-          placeholder={field.placeholder || field.label}
+          placeholder={field.placeholder?.trim() || field.label}
           required={field.required}
           style={inputBaseStyle}
           className="placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
@@ -177,11 +175,11 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
     case "textarea":
       return (
         <div
-          style={{ display: "flex", flexDirection: "column", gap: vw(16) }}
+          style={{ display: "flex", flexDirection: "column", gap: "12px" }}
         >
           <label
             className="font-anaheim font-semibold text-white"
-            style={{ fontSize: vw(23) }}
+            style={{ fontSize: "16px" }}
           >
             {field.label}
           </label>
@@ -191,10 +189,10 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
             value={formData[field.fieldName] || ""}
             spellCheck="false"
             onChange={(e) => handleChange(field.fieldName, e.target.value)}
-            placeholder={field.placeholder}
+            placeholder={field.placeholder?.trim() || field.label}
             required={field.required}
             style={textareaStyle}
-            className="placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="placeholder:text-white/70 focus:outline-none focus:border-white/60 transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s] resize-none"
           />
         </div>
       );
@@ -202,11 +200,11 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
     case "radio":
       return (
         <div
-          style={{ display: "flex", flexDirection: "column", gap: vw(16) }}
+          style={{ display: "flex", flexDirection: "column", gap: "12px" }}
         >
           <label
             className="font-anaheim font-semibold text-white"
-            style={{ fontSize: vw(23) }}
+            style={{ fontSize: "16px" }}
           >
             {field.label}
           </label>
@@ -214,7 +212,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              gap: vw(14),
+              gap: "10px",
             }}
           >
             {field.options?.map((option: any) => {
@@ -229,8 +227,8 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
                 >
                   <div
                     style={{
-                      width: vw(34),
-                      height: vw(34),
+                      width: "24px",
+                      height: "24px",
                       borderRadius: "50%",
                       border: "2px solid",
                       borderColor: isSelected
@@ -246,8 +244,8 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
                     {isSelected && (
                       <div
                         style={{
-                          width: vw(16),
-                          height: vw(16),
+                          width: "12px",
+                          height: "12px",
                           borderRadius: "50%",
                           backgroundColor: "#6E6839",
                         }}
@@ -257,7 +255,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
                   <span
                     className="font-anaheim font-semibold"
                     style={{
-                      fontSize: vw(22),
+                      fontSize: "16px",
                       color: isSelected
                         ? "white"
                         : "rgba(255, 255, 255, 0.7)",
@@ -307,11 +305,11 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
 
       return (
         <div
-          style={{ display: "flex", flexDirection: "column", gap: vw(16) }}
+          style={{ display: "flex", flexDirection: "column", gap: "12px" }}
         >
           <label
             className="font-anaheim font-semibold text-white"
-            style={{ fontSize: vw(23) }}
+            style={{ fontSize: "16px" }}
           >
             {field.label}
           </label>
@@ -319,7 +317,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              gap: vw(14),
+              gap: "10px",
             }}
           >
             {field.options?.map((option: any) => {
@@ -341,8 +339,8 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
                     {/* Icon instead of checkbox/radio indicator */}
                     <div
                       style={{
-                        width: vw(36),
-                        height: vw(36),
+                        width: "25px",
+                        height: "25px",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -356,17 +354,17 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
                           width={28}
                           height={28}
                           style={{
-                            width: vw(28),
-                            height: vw(28),
+                            width: "20px",
+                            height: "20px",
                             opacity: isSelected ? 1 : 0.7,
                           }}
                         />
                       ) : (
                         <div
                           style={{
-                            width: vw(34),
-                            height: vw(34),
-                            borderRadius: isSingleSelect ? "50%" : vw(6),
+                             width: "24px",
+                             height: "24px",
+                             borderRadius: isSingleSelect ? "50%" : "6px",
                             border: "2px solid",
                             borderColor: isSelected
                               ? "white"
@@ -383,8 +381,8 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
                           {isSelected && isSingleSelect && (
                             <div
                               style={{
-                                width: vw(16),
-                                height: vw(16),
+                                 width: "12px",
+                                 height: "12px",
                                 borderRadius: "50%",
                                 backgroundColor: "#6E6839",
                               }}
@@ -396,7 +394,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
                     <span
                       className="font-anaheim font-semibold relative"
                       style={{
-                        fontSize: vw(22),
+                        fontSize: "16px",
                         color: isSelected
                           ? "white"
                           : "rgba(255, 255, 255, 0.7)",
@@ -447,7 +445,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
                           ? "请详细说明..."
                           : "Please specify..."
                       }
-                      style={{ ...inputBaseStyle, height: vw(60) }}
+                      style={{ ...inputBaseStyle, height: "42px" }}
                       className="placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors mt-2 ml-4 !w-[calc(100%-1rem)]"
                       required
                     />
@@ -483,7 +481,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
     case "file":
       return (
         <div
-          style={{ display: "flex", flexDirection: "column", gap: vw(16) }}
+          style={{ display: "flex", flexDirection: "column", gap: "12px" }}
         >
           <label
             htmlFor={field.fieldName}
@@ -491,16 +489,16 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              minHeight: vw(90),
-              padding: `${vw(12)} ${vw(20)}`,
-              borderRadius: vw(15),
+              minHeight: "63px",
+              padding: "10px 16px",
+              borderRadius: "10px",
               cursor: "pointer",
             }}
             className="bg-[#211C0B]/50 border border-dashed border-white/30 transition-all duration-200 hover:bg-[#211C0B]/70 hover:border-white/60 hover:scale-[1.02]"
           >
             <span
               className="font-anaheim font-semibold text-white/50 text-center"
-              style={{ fontSize: vw(20), whiteSpace: "pre-wrap" }}
+              style={{ fontSize: "16px", whiteSpace: "pre-wrap" }}
             >
               {uploadingFiles[field.fieldName]
                 ? "Uploading..."
@@ -583,7 +581,7 @@ export const MobileField: React.FC<MobileFieldProps> = ({
             <PhoneInput
               value={formData[field.fieldName] || ""}
               onChange={(phone) => handleChange(field.fieldName, phone)}
-              placeholder={field.placeholder || field.label}
+              placeholder={field.placeholder?.trim() || field.label}
               required={field.required}
               disabled={submitting}
               className="!bg-[#211C1133] !border-white/30 !rounded-[12px] !h-[52px]"
@@ -632,7 +630,7 @@ export const MobileField: React.FC<MobileFieldProps> = ({
           value={formData[field.fieldName] || ""}
           spellCheck="false"
           onChange={(e) => handleChange(field.fieldName, e.target.value)}
-          placeholder={field.placeholder || field.label}
+          placeholder={field.placeholder?.trim() || field.label}
           required={field.required}
           className="w-full h-[52px] px-[16px] rounded-[12px] bg-[#211C0B]/20 border border-white/30 text-white font-anaheim font-semibold text-[16px] placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
         />
@@ -651,9 +649,9 @@ export const MobileField: React.FC<MobileFieldProps> = ({
             value={formData[field.fieldName] || ""}
             spellCheck="false"
             onChange={(e) => handleChange(field.fieldName, e.target.value)}
-            placeholder={field.placeholder}
+            placeholder={field.placeholder || field.label}
             required={field.required}
-            className="w-full h-[100px] px-[16px] py-[12px] rounded-[12px] bg-[#211C0B]/20 border border-white/30 text-white font-anaheim font-semibold text-[16px] placeholder:text-white/50 focus:outline-none focus:border-white/60 transition-colors resize-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="w-full h-[100px] px-[16px] py-[12px] rounded-[12px] bg-[#211C0B]/20 border border-white/30 text-white font-anaheim font-semibold text-[16px] placeholder:text-white/70 focus:outline-none focus:border-white/60 transition-colors resize-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
           />
         </div>
       );

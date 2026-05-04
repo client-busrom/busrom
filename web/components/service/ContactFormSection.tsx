@@ -12,7 +12,6 @@ import {
   FormField,
   RichText,
 } from "./ContactForm/types";
-import { DESIGN_WIDTH, SCALE } from "./ContactForm/constants";
 import { useContactForm } from "./ContactForm/useContactForm";
 import { DesktopField, MobileField } from "./ContactForm/ContactFormFields";
 import { HollowText } from "@/components/common/HollowText";
@@ -29,9 +28,6 @@ export function ContactFormSection({
   subtitle = "",
   info = [] as string[],
 }: ContactFormSectionProps) {
-  const vw = (px: number) => `${((px * SCALE) / DESIGN_WIDTH) * 100}vw`;
-  const vwFull = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
-
   const {
     formConfig,
     formData,
@@ -64,8 +60,8 @@ export function ContactFormSection({
   const renderField = (field: FormField | null | undefined) => {
     return (
       <DesktopField
+        key={field?.fieldName}
         field={field}
-        vw={vw}
         formData={formData}
         handleChange={handleChange}
         handleCheckboxChange={handleCheckboxChange}
@@ -152,7 +148,7 @@ export function ContactFormSection({
     <section
       id="contact-form"
       className="relative w-full overflow-hidden"
-      style={{ minHeight: vwFull(922) }}
+      style={{ minHeight: "645px" }}
     >
       {/* ==================== Mobile Layout ==================== */}
       <div className="lg:hidden relative">
@@ -388,7 +384,7 @@ export function ContactFormSection({
       {/* ==================== Desktop Layout ==================== */}
       <div
         className="hidden lg:block relative w-full"
-        style={{ minHeight: vwFull(922) }}
+        style={{ minHeight: "645px" }}
       >
         {/* Background */}
         <div className="absolute inset-0 bg-[#6E6839]">
@@ -402,24 +398,24 @@ export function ContactFormSection({
           )}
           <div
             className="absolute inset-0"
-            style={{ backdropFilter: `blur(${vwFull(7.5)})` }}
+            style={{ backdropFilter: `blur(5px)` }}
           />
         </div>
 
         {/* Content Wrapper */}
         <div
-          className="relative z-10 mx-auto py-[60px]"
-          style={{ width: vw(1920) }}
+          className="relative z-10 mx-auto py-[42px]"
+          style={{ width: "1344px" }}
         >
           <div
             className="mx-auto flex overflow-hidden"
             style={{
-              width: vw(1600),
-              minHeight: vwFull(800),
-              borderRadius: vw(52),
-              backdropFilter: `blur(${vw(18.7)})`,
+              width: "1120px",
+              minHeight: "560px",
+              borderRadius: "36px",
+              backdropFilter: `blur(13px)`,
               background: "rgba(117, 111, 63, 0.36)",
-              padding: `${vwFull(55)} 0`,
+              padding: "39px 0",
               position: "relative",
             }}
           >
@@ -427,10 +423,10 @@ export function ContactFormSection({
             <svg
               className="absolute pointer-events-none"
               style={{
-                left: vw(-1018),
-                top: vw(260),
-                width: vw(2173),
-                height: vw(2257),
+                left: "-713px",
+                top: "182px",
+                width: "1521px",
+                height: "1580px",
               }}
               viewBox="0 0 2173 2257"
               fill="none"
@@ -460,14 +456,14 @@ export function ContactFormSection({
             <div className="relative w-full flex">
               {/* Left Column */}
               <div
-                style={{ width: vw(680), flexShrink: 0, paddingLeft: vw(96) }}
+                style={{ width: "476px", flexShrink: 0, paddingLeft: "67px" }}
               >
                 <h2
                   className="font-anaheim font-extrabold text-white whitespace-pre-line"
                   style={{
-                    fontSize: vw(80),
-                    lineHeight: vw(96),
-                    marginBottom: vw(10),
+                    fontSize: "56px",
+                    lineHeight: "67px",
+                    marginBottom: "7px",
                   }}
                 >
                   {title.map((segment, idx) =>
@@ -483,7 +479,7 @@ export function ContactFormSection({
                       <span
                         key={idx}
                         style={{
-                          WebkitTextStroke: `${vw(1.5)} #FFEF72`,
+                          WebkitTextStroke: "1.1px #FFEF72",
                           paintOrder: "stroke fill",
                         }}
                       >
@@ -497,9 +493,9 @@ export function ContactFormSection({
                   <p
                     className="font-anaheim font-extrabold"
                     style={{
-                      marginTop: vw(20),
-                      fontSize: vw(40),
-                      lineHeight: vw(54),
+                      marginTop: "14px",
+                      fontSize: "28px",
+                      lineHeight: "38px",
                       color: "#FFF071",
                     }}
                   >
@@ -511,10 +507,10 @@ export function ContactFormSection({
                   <p
                     className="font-anaheim font-normal text-white"
                     style={{
-                      marginTop: vw(45),
-                      width: vw(475),
-                      fontSize: vw(24),
-                      lineHeight: vw(36),
+                      marginTop: "32px",
+                      width: "333px",
+                      fontSize: "17px",
+                      lineHeight: "25px",
                     }}
                   >
                     {formConfig?.description || description}
@@ -523,12 +519,12 @@ export function ContactFormSection({
 
                 {/* contact-form-info List */}
                 {info && info.length > 0 && (
-                  <ul style={{ marginTop: vw(80) }} className="space-y-4">
+                  <ul style={{ marginTop: "56px" }} className="space-y-4">
                     {info.map((item, index) => (
                       <li
                         key={index}
                         className="font-anaheim font-semibold text-white"
-                        style={{ fontSize: vw(36) }}
+                        style={{ fontSize: "25px" }}
                       >
                         {renderContactItem(item)}
                       </li>
@@ -541,10 +537,10 @@ export function ContactFormSection({
                   <p
                     className="font-anaheim font-semibold text-white/70 whitespace-pre-line"
                     style={{
-                      marginTop: vw(80),
-                      width: vw(428),
-                      fontSize: vw(16),
-                      lineHeight: vw(26),
+                      marginTop: "56px",
+                      width: "300px",
+                      fontSize: "11px",
+                      lineHeight: "18px",
                     }}
                   >
                     {footerNote}
@@ -554,14 +550,14 @@ export function ContactFormSection({
 
               {/* Right Column */}
               <div
-                style={{ flex: 1, paddingRight: vw(96), paddingLeft: vw(50) }}
+                style={{ flex: 1, paddingRight: "67px", paddingLeft: "35px" }}
               >
                 <h3
                   className="font-anaheim font-semibold text-white"
                   style={{
-                    fontSize: vw(42),
-                    lineHeight: vw(61),
-                    marginBottom: vw(42),
+                    fontSize: "30px",
+                    lineHeight: "43px",
+                    marginBottom: "30px",
                   }}
                 >
                   {subtitle}
@@ -574,7 +570,7 @@ export function ContactFormSection({
                 ) : submitted ? (
                   <div
                     className="bg-white/20 backdrop-blur-sm p-12 text-center"
-                    style={{ borderRadius: vw(15) }}
+                    style={{ borderRadius: "11px" }}
                   >
                     <h3 className="text-2xl font-bold text-white mb-4">
                       {locale === "zh" ? "提交成功！" : "Success!"}
@@ -590,9 +586,9 @@ export function ContactFormSection({
                   <form
                     onSubmit={(e) => handleSubmit(e, locale)}
                     className="flex flex-col"
-                    style={{ gap: vw(20) }}
+                    style={{ gap: "14px" }}
                   >
-                    <div className="grid grid-cols-2" style={{ gap: vw(20) }}>
+                    <div className="grid grid-cols-2" style={{ gap: "14px" }}>
                       {fields.nameEmail.slice(0, 2).map((field) => (
                         <div key={field.fieldName}>{renderField(field)}</div>
                       ))}
@@ -688,13 +684,13 @@ export function ContactFormSection({
                           "grayscale",
                       )}
                       style={{
-                        borderRadius: vw(100),
-                        fontSize: vw(32),
-                        minHeight: vw(95),
-                        paddingTop: vw(20),
-                        paddingBottom: vw(20),
-                        paddingLeft: vw(40),
-                        paddingRight: vw(40),
+                        borderRadius: "70px",
+                        fontSize: "22px",
+                        minHeight: "67px",
+                        paddingTop: "14px",
+                        paddingBottom: "14px",
+                        paddingLeft: "28px",
+                        paddingRight: "28px",
                         lineHeight: 1.2,
                         transformOrigin: "center",
                       }}
