@@ -2,7 +2,6 @@
 
 import React from "react";
 import { getObjectPosition, getCropStyles, getCropImageUrl } from "@/lib/utils";
-import { ServerImage } from "@/components/ui/ServerImage";
 import MagneticWrapper from "./MagneticWrapper";
 
 // ========================================
@@ -72,6 +71,41 @@ const BANNER_1_ASSETS = {
 const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
   const formatText = (text: string) => text || "";
 
+  // 图片渲染辅助函数：支持精确裁剪 & 高清规格获取
+  const renderImage = (
+    image: any,
+    cropData: any,
+    alt: string,
+    className: string = "",
+  ) => {
+    if (!image) return null;
+
+    const cropStyles = getCropStyles(cropData);
+    const imageUrl = getCropImageUrl(image, cropData);
+
+    if (cropStyles) {
+      return (
+        <div style={cropStyles.container} className="w-full h-full">
+          <img
+            src={imageUrl}
+            alt={alt}
+            className={className}
+            style={cropStyles.image}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <img
+        src={imageUrl}
+        alt={alt}
+        className={`w-full h-full object-cover ${className}`}
+        style={{ objectPosition: getObjectPosition(image) }}
+      />
+    );
+  };
+
   return (
     <section className="relative w-full h-full overflow-hidden bg-white">
       {/* 1. 背景层 - 基础氛围 */}
@@ -81,40 +115,11 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
           className="absolute inset-0 opacity-40"
           style={{ filter: "blur(5px)" }}
         >
-          {(() => {
-            const cropData = data.imageCropDataList?.[0];
-            if (cropData) {
-              return (
-                <div
-                  className="absolute inset-0 w-full h-full"
-                  style={{
-                    overflow: "hidden",
-                    position: "relative",
-                  }}
-                >
-                  <img
-                    src={getCropImageUrl(data.images[0], cropData)}
-                    alt=""
-                    className="absolute max-w-none"
-                    style={{
-                      width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
-                      height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
-                      left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
-                      top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
-                    }}
-                  />
-                </div>
-              );
-            }
-            return (
-              <ServerImage
-                image={data.images[0]}
-                alt=""
-                fill
-                className="object-cover"
-              />
-            );
-          })()}
+          {renderImage(
+            data.images[0],
+            data.imageCropDataList?.[0],
+            "Background",
+          )}
         </div>
       </div>
 
@@ -123,7 +128,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
         <div className="relative w-full h-full max-w-[1920px] mx-auto">
           {/* --- 1. 右上装饰 (Decorator 1) --- */}
           <div
-            className="absolute origin-top-right transition-transform duration-500 scale-[0.4] lg:scale-100"
+            className="absolute origin-top-right transition-transform duration-500 scale-[0.4] md:scale-[0.6] xl:scale-100"
             style={{
               right: 0,
               top: 0,
@@ -141,7 +146,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
 
           {/* --- 2. 左下装饰 (Decorator 2) --- */}
           <div
-            className="absolute origin-bottom-left transition-transform duration-500 scale-[0.4] lg:scale-100"
+            className="absolute origin-bottom-left transition-transform duration-500 scale-[0.4] md:scale-[0.6] xl:scale-100"
             style={{
               left: 0,
               bottom: 0,
@@ -160,7 +165,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
           {/* --- 3. 左上框架 (Frame 1 + Image 1) --- */}
           {data.images[1] && (
             <div
-              className="absolute origin-top-left transition-transform duration-500 scale-[0.4] lg:scale-100"
+              className="absolute origin-top-left transition-transform duration-500 scale-[0.4] md:scale-[0.6] xl:scale-100"
               style={{
                 left: 0,
                 top: 0,
@@ -185,32 +190,11 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
                   WebkitMaskSize: "100% 100%",
                 }}
               >
-                {(() => {
-                  const cropData = data.imageCropDataList?.[1];
-                  if (cropData) {
-                    return (
-                      <img
-                        src={getCropImageUrl(data.images[1], cropData)}
-                        alt=""
-                        className="absolute max-w-none"
-                        style={{
-                          width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
-                          height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
-                          left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
-                          top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
-                        }}
-                      />
-                    );
-                  }
-                  return (
-                    <ServerImage
-                      image={data.images[1]}
-                      alt=""
-                      fill
-                      className="object-cover"
-                    />
-                  );
-                })()}
+                {renderImage(
+                  data.images[1],
+                  data.imageCropDataList?.[1],
+                  "Frame 1 Content",
+                )}
               </div>
             </div>
           )}
@@ -218,7 +202,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
           {/* --- 4. 右下框架 (Frame 2 + Image 2) --- */}
           {data.images[2] && (
             <div
-              className="absolute origin-bottom-right transition-transform duration-500 scale-[0.4] lg:scale-100"
+              className="absolute origin-bottom-right transition-transform duration-500 scale-[0.4] md:scale-[0.6] xl:scale-100"
               style={{
                 right: 0,
                 bottom: 0,
@@ -243,42 +227,22 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
                   WebkitMaskSize: "100% 100%",
                 }}
               >
-                {(() => {
-                  const cropData = data.imageCropDataList?.[2];
-                  if (cropData) {
-                    return (
-                      <img
-                        src={getCropImageUrl(data.images[2], cropData)}
-                        alt=""
-                        className="absolute max-w-none"
-                        style={{
-                          width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
-                          height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
-                          left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
-                          top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
-                        }}
-                      />
-                    );
-                  }
-                  return (
-                    <ServerImage
-                      image={data.images[2]}
-                      alt=""
-                      fill
-                      className="object-cover"
-                    />
-                  );
-                })()}
+                {renderImage(
+                  data.images[2],
+                  data.imageCropDataList?.[2],
+                  "Frame 2 Content",
+                )}
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* 3. 桌面端大屏内容层 (1024px 以上触发) */}
-      <div className="hidden lg:block absolute inset-0 z-30 pointer-events-none">
+      {/* 3. 桌面端大屏内容层 (1280px 以上触发) */}
+      <div className="hidden xl:block absolute inset-0 z-30 pointer-events-none">
         <div className="relative w-full h-full max-w-[1920px] mx-auto">
           <div className="absolute inset-0 flex flex-col justify-center items-center px-12">
+            {/* ... 文字内容层已包含 ... */}
             <p
               className="font-paytone-one text-[#FFBC5F] text-center whitespace-nowrap mb-[1vh]"
               style={{
@@ -345,13 +309,13 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
         </div>
       </div>
 
-      {/* 4. 移动端/小屏内容层 (1024px 以下触发) */}
-      <div className="flex lg:hidden absolute inset-0 z-20 flex-col items-center justify-center w-full h-full px-6 text-center">
+      {/* 4. 移动端/小屏内容层 (1280px 以下触发) */}
+      <div className="flex xl:hidden absolute inset-0 z-20 flex-col items-center justify-center w-full h-full px-6 text-center">
         {/* 副标题 */}
         <p
-          className="font-paytone-one text-[#FFBC5F] text-center mb-1"
+          className="font-paytone-one text-[#FFBC5F] text-center mb-2"
           style={{
-            fontSize: "clamp(1rem, 2vw, 1.5rem)", // 在手机和平板间平滑过渡
+            fontSize: "clamp(1.125rem, 2.5vw, 1.5rem)",
             WebkitTextStroke: "1px #75703F",
             paintOrder: "stroke fill",
           }}
@@ -370,8 +334,8 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
                 style={{
                   fontSize:
                     idx === 0
-                      ? "clamp(1.75rem, 4vw, 3rem)" // 手机28px -> 平板48px
-                      : "clamp(2.25rem, 5vw, 4rem)", // 手机36px -> 平板64px
+                      ? "clamp(2rem, 5vw, 3.5rem)"
+                      : "clamp(2.5rem, 7vw, 4.5rem)",
                   WebkitTextStroke: idx === 0 ? "2px #FDF6C2" : "3px #FDF6C2",
                   paintOrder: "stroke fill",
                   marginTop: idx === 0 ? 0 : "0.25rem",

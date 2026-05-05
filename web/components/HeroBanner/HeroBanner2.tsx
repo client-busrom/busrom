@@ -1,714 +1,396 @@
-// components/HeroBanner/HeroBanner2.tsx
-import type { FC } from "react";
-import Image from "next/image";
-import type { HomeContent } from "@/lib/content-data";
-import { getObjectPosition, getCropStyles, getCropImageUrl } from "@/lib/utils";
-import { ServerImage } from "@/components/ui/ServerImage";
+"use client";
 
-type BannerData = HomeContent["heroBanner"][number];
-type BannerProps = {
-  data: BannerData;
-};
+import React from "react";
+import { getObjectPosition, getCropStyles, getCropImageUrl } from "@/lib/utils";
+import MagneticWrapper from "./MagneticWrapper";
+
+interface HeroBanner2Props {
+  data: any;
+}
 
 // --- 响应式尺寸函数 ---
-// 使用 CSS 变量 --rpx-hero，在宽屏幕上按宽度缩放，在高屏幕上按高度缩放
-const rpx = (designValue: number) => `calc(var(--rpx-hero) * ${designValue})`;
+const rpx = (designValue: number) =>
+  `calc(var(--rpx-hero, 1) * ${designValue}px)`;
 
-// 处理换行符：支持 /n 和 \n
-const formatText = (text: string | undefined) => text?.replace(/\/n|\\n/g, '\n') || '';
+// 处理换行符
+const formatText = (text: string) => text || "";
 
-// 移动端缩放比例
-// md 及以上 (≥768px): 100% = 1024/1920 ≈ 0.533
-// md 以下 (<768px): 80% = 0.427
-const SCALE_MD = 1024 / 1920; // ≈ 0.533
-const SCALE_SM = SCALE_MD * 0.8; // ≈ 0.427
-const rpxMd = (designValue: number) => `${designValue * SCALE_MD}px`;
-const rpxSm = (designValue: number) => `${designValue * SCALE_SM}px`;
-
-
-// 背景图片配置
-const BACKGROUND_CONFIG = {
-  backgroundColor: '#756f3f',  // 背景颜色
-  imageOpacity: 0.59,          // 背景图片透明度
-  blurAmount: 5,               // 模糊程度 (px)
+// ========================================
+// 1920x922 设计稿参数配置
+// ========================================
+const BANNER_2_ASSETS = {
+  // 装饰物 - 巨大渐变背景
+  decorator1: {
+    width: 1115,
+    height: 1227,
+    x: 0,
+    y: 0,
+    zIndex: 5,
+    src: "/home/hero-banner/banner-2/hero-banner-2-decorator-1.svg",
+  },
+  // 边缘装饰条
+  edges: {
+    top: {
+      width: 850,
+      height: 75,
+      x: 535,
+      y: 1,
+      src: "/home/hero-banner/banner-2/top.svg",
+    },
+    bottom: {
+      width: 590,
+      height: 48,
+      x: 1330,
+      y: 874,
+      src: "/home/hero-banner/banner-2/bottom.svg",
+    },
+    left: {
+      width: 78,
+      height: 424,
+      x: 0,
+      y: 500,
+      src: "/home/hero-banner/banner-2/left.svg",
+    },
+    right: {
+      width: 75,
+      height: 200,
+      x: 1845,
+      y: 0,
+      src: "/home/hero-banner/banner-2/right.svg",
+    },
+  },
+  // 图片框架
+  image1: {
+    width: 559,
+    height: 510,
+    x: 1237,
+    y: 295,
+    zIndex: 20,
+    borderRadius: 34,
+    strokeWidth: 20,
+  },
+  image2: {
+    width: 327,
+    height: 299,
+    x: 1019,
+    y: 429,
+    zIndex: 25,
+    borderRadius: 34,
+    strokeWidth: 17,
+  },
+  // Feature 按钮 (长条状)
+  feature: {
+    width: 500,
+    height: 68,
+    x: 207,
+    y: 600,
+    gap: 32,
+  },
 };
 
-// SVG装饰元素配置 (左下角)
-const SVG_CONFIG = {
-  width: 1135,
-  zIndex: 5,
-};
+const HeroBanner2: React.FC<HeroBanner2Props> = ({ data }) => {
+  // 图片渲染辅助函数：支持精确裁剪 & 高清规格获取
+  const renderImage = (
+    image: any,
+    cropData: any,
+    alt: string,
+    className: string = "",
+  ) => {
+    if (!image) return null;
 
-// 左侧文字内容配置
-const LEFT_CONTENT_CONFIG = {
-  // 主标题位置 (基于 Figma: x=145, y=237)
-  titleLeft: 145,
-  titleTop: 237,
-  titleFontSize: 96,
-  titleLineHeight: 99,
-  titleMaxWidth: 868,
-  // Feature 平行四边形背景 (基于 Figma: x=159, y=624/737/850)
-  itemBgLeft: 159,
-  itemBgWidth: 596,
-  itemBgHeight: 83,
-  itemBgGap: 113, // 737-624 = 113
-  itemBgFirstTop: 624,
-  // Feature 文字位置 (基于 Figma: x=213, y=612)
-  itemTextLeft: 213,
-  itemTextFirstTop: 612,
-  itemFontSize: 40,
-  itemLineHeight: 111,
-};
+    const cropStyles = getCropStyles(cropData);
+    const imageUrl = getCropImageUrl(image, cropData);
 
-// 3个角落装饰元素配置 (只有一个角是圆角)
-// 颜色: rgba(255, 236, 130, 0.85) - #FFEC82 85%透明度
-const CORNER_COLOR = 'rgba(255, 236, 130, 0.85)';
-const CORNER_RADIUS = 34;
+    // 如果有裁剪数据，使用 overflow-hidden 容器 + transform 定位方案
+    if (cropStyles) {
+      return (
+        <div style={cropStyles.container} className="w-full h-full">
+          <img
+            src={imageUrl}
+            alt={alt}
+            className={className}
+            style={cropStyles.image}
+          />
+        </div>
+      );
+    }
 
-// 角落装饰配置
-const CORNER_TOP_RIGHT = { width: 60, height: 220 };
-const CORNER_BOTTOM_RIGHT = { width: 550, height: 60 };
-const CORNER_BOTTOM_LEFT = { width: 60, height: 460 };
-const CORNER_TOP_CENTER = { left: '25.5%', width: '49%', height: 70 }; // 百分比居中
-
-// 右侧内容配置 (基于 Figma)
-const RIGHT_CONTENT_CONFIG = {
-  // 标题位置 (x=1040, y=159)
-  titleTop: 159,
-  titleFontSize: 48,
-  titleLineHeight: 116,
-  titleWidth: 771,
-  titleRight: 109, // 1920-1040-771 = 109
-  // 小图 (Figma: x=960, y=462, 360x329) - 放大5%
-  smallImageLeft: 960,
-  smallImageTop: 462,
-  smallImageWidth: 378,
-  smallImageHeight: 345,
-  smallImageBorderWidth: 17,
-  // 大图 (Figma: x=1201, y=314, 616x563) - 放大5%
-  largeImageLeft: 1201,
-  largeImageTop: 314,
-  largeImageWidth: 647,
-  largeImageHeight: 591,
-  largeImageBorderWidth: 20,
-  // 共用
-  borderRadius: 44,  // Figma 34 + 边框补偿，视觉匹配
-};
-
-// --- HeroBanner2 Component ---
-const HeroBanner2: FC<BannerProps> = ({ data }) => {
-  const svgUrl: string = "/hero-banner-2-1.svg";
+    // 无裁剪数据，退回到 object-cover 模式，但使用高清 URL
+    return (
+      <img
+        src={imageUrl}
+        alt={alt}
+        className={`w-full h-full object-cover ${className}`}
+        style={{ objectPosition: getObjectPosition(image) }}
+      />
+    );
+  };
 
   return (
-    <section className="relative w-full h-full min-h-[700px] overflow-hidden font-sans">
-      {/* 背景颜色层 */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{ backgroundColor: BACKGROUND_CONFIG.backgroundColor }}
-      />
+    <section className="relative w-full h-full overflow-hidden bg-[#756F3F]">
+      {/* 1. 背景层 */}
+      <div className="absolute inset-0 z-0">
+        <div
+          className="absolute inset-0 opacity-60"
+          style={{ filter: "blur(5px)" }}
+        >
+          {renderImage(
+            data.images[0],
+            data.imageCropDataList?.[0],
+            "Background",
+          )}
+        </div>
+      </div>
 
-      {/* Background Image - 带透明度和模糊 */}
-      <div
-        className="absolute inset-0 z-[1]"
-        style={{
-          opacity: BACKGROUND_CONFIG.imageOpacity,
-          filter: `blur(${BACKGROUND_CONFIG.blurAmount}px)`,
-        }}
-      >
-        {(() => {
-          const cropData = data.imageCropDataList?.[0];
-          const cropStyles = getCropStyles(cropData);
-          if (cropStyles && cropData && cropData.croppedAreaPixels) {
-            return (
+      {/* 2. 装饰层 (SVG 装饰物) */}
+      <div className="absolute inset-0 z-10 pointer-events-none">
+        {/* 巨大渐变背景 - 锁定尺寸和定位，不裁剪 */}
+        <div
+          className="absolute transition-all duration-700 opacity-80 xl:left-0 xl:top-0 right-0 top-0"
+          style={{
+            width: rpx(BANNER_2_ASSETS.decorator1.width),
+            height: rpx(BANNER_2_ASSETS.decorator1.height),
+          }}
+        >
+          <img
+            src={BANNER_2_ASSETS.decorator1.src}
+            alt=""
+            className="w-full h-full object-contain xl:object-left-top object-right-top"
+          />
+        </div>
+
+        <div className="relative w-full h-full max-w-[1920px] mx-auto">
+          {/* 边缘装饰条 - 桌面模式可见 */}
+          <div className="hidden xl:block">
+            {Object.entries(BANNER_2_ASSETS.edges).map(([key, cfg]) => (
               <div
-                className="absolute inset-0 w-full h-full"
+                key={key}
+                className="absolute transition-all duration-500"
                 style={{
-                  ...cropStyles.container,
-                  width: "100%",
-                  height: "100%",
+                  left: rpx(cfg.x),
+                  top: rpx(cfg.y),
+                  width: rpx(cfg.width),
+                  height: rpx(cfg.height),
                 }}
               >
                 <img
-                  src={getCropImageUrl(data.images[0], cropData)}
-                  alt="Background"
-                  style={{
-                    ...cropStyles.image,
-                    width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
-                    height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
-                    left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
-                    top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
-                    maxWidth: "none",
-                  }}
+                  src={cfg.src}
+                  alt=""
+                  className="w-full h-full object-contain"
                 />
               </div>
-            );
-          }
-          return (
-            <ServerImage
-              image={data.images[0]}
-              alt="Background"
-              size="large"
-              fill
-              className="absolute inset-0 w-full h-full object-cover"
-              objectPosition={getObjectPosition(data.images[0])}
-              priority
-            />
-          );
-        })()}
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* SVG 装饰元素 - 桌面端 (z-5) */}
-      <div
-        className="hidden lg:block absolute"
-        style={{
-          left: 0,
-          bottom: 0,
-          width: rpx(SVG_CONFIG.width),
-          height: rpx(1080),
-          zIndex: SVG_CONFIG.zIndex,
-        }}
-      >
-        <Image
-          src={svgUrl}
-          alt="decoration"
-          fill
-          sizes={rpx(SVG_CONFIG.width)}
-          className="object-contain object-left-bottom"
-        />
-      </div>
-
-      {/* 左侧文字容器 - 桌面端 (z-8，在图片上层) */}
-      {/* 与 SVG 容器完全相同的尺寸和位置，让文字跟 SVG 同步缩放 */}
-      <div
-        className="hidden lg:block absolute pointer-events-none"
-        style={{
-          left: 0,
-          bottom: 0,
-          width: rpx(SVG_CONFIG.width),
-          height: rpx(1080),
-          zIndex: 8,
-        }}
-      >
-        {/* 左侧主标题 */}
-        <p
-          className="absolute font-paytone-one text-[#000000] pointer-events-auto"
-          style={{
-            left: rpx(LEFT_CONTENT_CONFIG.titleLeft),
-            top: rpx(LEFT_CONTENT_CONFIG.titleTop),
-            fontSize: rpx(LEFT_CONTENT_CONFIG.titleFontSize),
-            lineHeight: `${rpx(LEFT_CONTENT_CONFIG.titleLineHeight)}`,
-            maxWidth: rpx(LEFT_CONTENT_CONFIG.titleMaxWidth),
-            WebkitTextStroke: `${rpx(7)} #FDF6C2`,
-            paintOrder: 'stroke fill',
-            whiteSpace: 'pre-line',
-          }}
-        >
-          {formatText(data.features[0])}
-        </p>
-
-        {/* 左侧 Feature 列表 */}
-        {[data.features[2], data.features[3], data.features[4]].map((feature, index) => {
-          const bgTop = LEFT_CONTENT_CONFIG.itemBgFirstTop + index * LEFT_CONTENT_CONFIG.itemBgGap;
-          const textTop = LEFT_CONTENT_CONFIG.itemTextFirstTop + index * LEFT_CONTENT_CONFIG.itemLineHeight;
-          return (
-            <div key={index}>
-              {/* 平行四边形背景 */}
-              <div
-                className="absolute"
-                style={{
-                  left: rpx(LEFT_CONTENT_CONFIG.itemBgLeft),
-                  top: rpx(bgTop),
-                  width: rpx(LEFT_CONTENT_CONFIG.itemBgWidth),
-                  height: rpx(LEFT_CONTENT_CONFIG.itemBgHeight),
-                  background: 'linear-gradient(to right, rgba(90, 79, 14, 1) 0%, rgba(90, 79, 14, 1) 15%, rgba(140, 120, 20, 0.5) 55%, rgba(140, 120, 20, 0) 100%)',
-                  clipPath: 'polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%)',
-                }}
-              />
-              {/* 文字 */}
-              <p
-                className="absolute font-montserrat font-bold text-[#FFF5AD] whitespace-nowrap antialiased"
-                style={{
-                  left: rpx(LEFT_CONTENT_CONFIG.itemTextLeft),
-                  top: rpx(textTop),
-                  fontSize: rpx(LEFT_CONTENT_CONFIG.itemFontSize),
-                  lineHeight: `${rpx(LEFT_CONTENT_CONFIG.itemLineHeight)}`,
-                  letterSpacing: '0.06em',
-                  textShadow: `0 4px 12.6px rgba(86, 80, 32, 1)`,
-                }}
-              >
-                {feature}
-              </p>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* ============ 移动端 md-lg (768px-1024px) - 100% 尺寸 ============ */}
-      {/* SVG 装饰元素 */}
-      <div
-        className="hidden md:block lg:hidden absolute origin-bottom-left"
-        style={{
-          left: 0,
-          bottom: 0,
-          width: rpxMd(SVG_CONFIG.width),
-          height: rpxMd(1080),
-          zIndex: SVG_CONFIG.zIndex,
-        }}
-      >
-        <Image
-          src={svgUrl}
-          alt="decoration"
-          fill
-          sizes="85vw"
-          className="object-contain object-left-bottom"
-        />
-      </div>
-      {/* 左侧文字容器 */}
-      <div
-        className="hidden md:block lg:hidden absolute pointer-events-none origin-bottom-left"
-        style={{
-          left: 0,
-          bottom: 0,
-          width: rpxMd(SVG_CONFIG.width),
-          height: rpxMd(1080),
-          zIndex: 8,
-        }}
-      >
-        <p
-          className="absolute font-paytone-one text-[#000000] pointer-events-auto"
-          style={{
-            left: rpxMd(LEFT_CONTENT_CONFIG.titleLeft),
-            top: rpxMd(LEFT_CONTENT_CONFIG.titleTop),
-            fontSize: rpxMd(LEFT_CONTENT_CONFIG.titleFontSize),
-            lineHeight: rpxMd(LEFT_CONTENT_CONFIG.titleLineHeight),
-            maxWidth: rpxMd(LEFT_CONTENT_CONFIG.titleMaxWidth),
-            WebkitTextStroke: `${SCALE_MD * 7}px #FDF6C2`,
-            paintOrder: 'stroke fill',
-            whiteSpace: 'pre-line',
-          }}
-        >
-          {formatText(data.features[0])}
-        </p>
-        {[data.features[2], data.features[3], data.features[4]].map((feature, index) => {
-          const bgTop = LEFT_CONTENT_CONFIG.itemBgFirstTop + index * LEFT_CONTENT_CONFIG.itemBgGap;
-          const textTop = LEFT_CONTENT_CONFIG.itemTextFirstTop + index * LEFT_CONTENT_CONFIG.itemLineHeight;
-          return (
-            <div key={index}>
-              <div
-                className="absolute"
-                style={{
-                  left: rpxMd(LEFT_CONTENT_CONFIG.itemBgLeft),
-                  top: rpxMd(bgTop),
-                  width: rpxMd(LEFT_CONTENT_CONFIG.itemBgWidth),
-                  height: rpxMd(LEFT_CONTENT_CONFIG.itemBgHeight),
-                  background: 'linear-gradient(to right, rgba(90, 79, 14, 1) 0%, rgba(90, 79, 14, 1) 15%, rgba(140, 120, 20, 0.5) 55%, rgba(140, 120, 20, 0) 100%)',
-                  clipPath: 'polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%)',
-                }}
-              />
-              <p
-                className="absolute font-montserrat font-bold text-[#FFF5AD] whitespace-nowrap antialiased"
-                style={{
-                  left: rpxMd(LEFT_CONTENT_CONFIG.itemTextLeft),
-                  top: rpxMd(textTop),
-                  fontSize: rpxMd(LEFT_CONTENT_CONFIG.itemFontSize),
-                  lineHeight: rpxMd(LEFT_CONTENT_CONFIG.itemLineHeight),
-                  letterSpacing: '0.06em',
-                  textShadow: `0 4px 12.6px rgba(86, 80, 32, 1)`,
-                }}
-              >
-                {feature}
-              </p>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* ============ 移动端 <md (<768px) - 80% 尺寸 ============ */}
-      {/* SVG 装饰元素 */}
-      <div
-        className="md:hidden absolute origin-bottom-left"
-        style={{
-          left: 0,
-          bottom: 0,
-          width: rpxSm(SVG_CONFIG.width),
-          height: rpxSm(1080),
-          zIndex: SVG_CONFIG.zIndex,
-        }}
-      >
-        <Image
-          src={svgUrl}
-          alt="decoration"
-          fill
-          sizes="85vw"
-          className="object-contain object-left-bottom"
-        />
-      </div>
-      {/* 左侧文字容器 */}
-      <div
-        className="md:hidden absolute pointer-events-none origin-bottom-left"
-        style={{
-          left: 0,
-          bottom: 0,
-          width: rpxSm(SVG_CONFIG.width),
-          height: rpxSm(1080),
-          zIndex: 8,
-        }}
-      >
-        <p
-          className="absolute font-paytone-one text-[#000000] pointer-events-auto"
-          style={{
-            left: rpxSm(LEFT_CONTENT_CONFIG.titleLeft),
-            top: rpxSm(LEFT_CONTENT_CONFIG.titleTop),
-            fontSize: rpxSm(LEFT_CONTENT_CONFIG.titleFontSize),
-            lineHeight: rpxSm(LEFT_CONTENT_CONFIG.titleLineHeight),
-            maxWidth: rpxSm(LEFT_CONTENT_CONFIG.titleMaxWidth),
-            WebkitTextStroke: `${SCALE_SM * 7}px #FDF6C2`,
-            paintOrder: 'stroke fill',
-            whiteSpace: 'pre-line',
-          }}
-        >
-          {formatText(data.features[0])}
-        </p>
-        {[data.features[2], data.features[3], data.features[4]].map((feature, index) => {
-          const bgTop = LEFT_CONTENT_CONFIG.itemBgFirstTop + index * LEFT_CONTENT_CONFIG.itemBgGap;
-          const textTop = LEFT_CONTENT_CONFIG.itemTextFirstTop + index * LEFT_CONTENT_CONFIG.itemLineHeight;
-          return (
-            <div key={index}>
-              <div
-                className="absolute"
-                style={{
-                  left: rpxSm(LEFT_CONTENT_CONFIG.itemBgLeft),
-                  top: rpxSm(bgTop),
-                  width: rpxSm(LEFT_CONTENT_CONFIG.itemBgWidth),
-                  height: rpxSm(LEFT_CONTENT_CONFIG.itemBgHeight),
-                  background: 'linear-gradient(to right, rgba(90, 79, 14, 1) 0%, rgba(90, 79, 14, 1) 15%, rgba(140, 120, 20, 0.5) 55%, rgba(140, 120, 20, 0) 100%)',
-                  clipPath: 'polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%)',
-                }}
-              />
-              <p
-                className="absolute font-montserrat font-bold text-[#FFF5AD] whitespace-nowrap antialiased"
-                style={{
-                  left: rpxSm(LEFT_CONTENT_CONFIG.itemTextLeft),
-                  top: rpxSm(textTop),
-                  fontSize: rpxSm(LEFT_CONTENT_CONFIG.itemFontSize),
-                  lineHeight: rpxSm(LEFT_CONTENT_CONFIG.itemLineHeight),
-                  letterSpacing: '0.06em',
-                  textShadow: `0 4px 12.6px rgba(86, 80, 32, 1)`,
-                }}
-              >
-                {feature}
-              </p>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* 右上角装饰 - 桌面端 */}
-      <div
-        className="hidden lg:block absolute top-0 right-0 z-[4]"
-        style={{
-          width: rpx(CORNER_TOP_RIGHT.width),
-          height: rpx(CORNER_TOP_RIGHT.height),
-          backgroundColor: CORNER_COLOR,
-          borderRadius: `0 0 0 ${CORNER_RADIUS}px`,
-        }}
-      />
-      {/* 右上角装饰 - 移动端 */}
-      <div
-        className="lg:hidden absolute top-0 right-0 z-[4] w-8 h-24 sm:w-10 sm:h-32"
-        style={{
-          backgroundColor: CORNER_COLOR,
-          borderRadius: `0 0 0 ${CORNER_RADIUS}px`,
-        }}
-      />
-
-      {/* 右下角装饰 - 桌面端 */}
-      <div
-        className="hidden lg:block absolute bottom-0 right-0 z-[4]"
-        style={{
-          width: rpx(CORNER_BOTTOM_RIGHT.width),
-          height: rpx(CORNER_BOTTOM_RIGHT.height),
-          backgroundColor: CORNER_COLOR,
-          borderRadius: `${CORNER_RADIUS}px 0 0 0`,
-        }}
-      />
-      {/* 右下角装饰 - 移动端 */}
-      <div
-        className="lg:hidden absolute bottom-0 right-0 z-[4] w-32 h-6 sm:w-48 sm:h-8"
-        style={{
-          backgroundColor: CORNER_COLOR,
-          borderRadius: `${CORNER_RADIUS}px 0 0 0`,
-        }}
-      />
-
-      {/* 左下角装饰 - 桌面端 */}
-      <div
-        className="hidden lg:block absolute bottom-0 left-0 z-[4]"
-        style={{
-          width: rpx(CORNER_BOTTOM_LEFT.width),
-          height: rpx(CORNER_BOTTOM_LEFT.height),
-          backgroundColor: CORNER_COLOR,
-          borderRadius: `0 ${CORNER_RADIUS}px 0 0`,
-        }}
-      />
-      {/* 左下角装饰 - 移动端 */}
-      <div
-        className="lg:hidden absolute bottom-0 left-0 z-[4] w-6 h-32 sm:w-8 sm:h-48"
-        style={{
-          backgroundColor: CORNER_COLOR,
-          borderRadius: `0 ${CORNER_RADIUS}px 0 0`,
-        }}
-      />
-
-      {/* 顶部居中装饰 - 桌面端 */}
-      <div
-        className="hidden lg:block absolute top-0 z-[4]"
-        style={{
-          left: CORNER_TOP_CENTER.left,
-          width: CORNER_TOP_CENTER.width,
-          height: rpx(CORNER_TOP_CENTER.height),
-          backgroundColor: CORNER_COLOR,
-          borderRadius: `0 0 ${CORNER_RADIUS}px ${CORNER_RADIUS}px`,
-        }}
-      />
-      {/* 顶部居中装饰 - 移动端 */}
-      <div
-        className="lg:hidden absolute top-0 left-[20%] w-[60%] h-8 sm:h-10 z-[4]"
-        style={{
-          backgroundColor: CORNER_COLOR,
-          borderRadius: `0 0 ${CORNER_RADIUS}px ${CORNER_RADIUS}px`,
-        }}
-      />
-
-      {/* 大图 - 桌面端 (lg+) - 在左侧SVG之上，左侧文字之下 */}
-      {/* Figma: x=1201, y=314, 616x563 */}
-      {/* 大图右边距 = 1920 - 1201 - 616 = 103 */}
-      <div
-        className="hidden lg:block absolute overflow-hidden shadow-lg z-[6] box-border"
-        style={{
-          right: rpx(93),
-          top: rpx(RIGHT_CONTENT_CONFIG.largeImageTop - 10),
-          width: rpx(RIGHT_CONTENT_CONFIG.largeImageWidth),
-          height: rpx(RIGHT_CONTENT_CONFIG.largeImageHeight),
-          borderRadius: rpx(RIGHT_CONTENT_CONFIG.borderRadius),
-          border: `${rpx(RIGHT_CONTENT_CONFIG.largeImageBorderWidth)} solid white`,
-        }}
-      >
-        {(() => {
-          const cropData = data.imageCropDataList?.[2];
-          const cropStyles = getCropStyles(cropData);
-          if (cropStyles && cropData && cropData.croppedAreaPixels) {
-            return (
-              <div
-                className="absolute inset-0 w-full h-full"
-                style={{
-                  ...cropStyles.container,
-                  width: "100%",
-                  height: "100%",
-                }}
-              >
-                <img
-                  src={getCropImageUrl(data.images[2], cropData)}
-                  alt="Large feature image"
-                  style={{
-                    ...cropStyles.image,
-                    width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
-                    height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
-                    left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
-                    top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
-                    maxWidth: "none",
-                  }}
-                />
-              </div>
-            );
-          }
-          return (
-            <ServerImage
-              image={data.images[2]}
-              alt="Large feature image"
-              size="small"
-              fill
-              className="absolute inset-0 w-full h-full object-cover"
-              priority
-            />
-          );
-        })()}
-      </div>
-
-      {/* 小图 - 桌面端 (lg+) - 在大图之上，左侧文字之下 */}
-      {/* Figma: x=960, y=462, 360x329 */}
-      {/* 小图右边距 = 1920 - 960 - 360 = 600 */}
-      <div
-        className="hidden lg:block absolute overflow-hidden shadow-lg z-[7] box-border"
-        style={{
-          right: rpx(590),
-          top: rpx(RIGHT_CONTENT_CONFIG.smallImageTop - 10),
-          width: rpx(RIGHT_CONTENT_CONFIG.smallImageWidth),
-          height: rpx(RIGHT_CONTENT_CONFIG.smallImageHeight),
-          borderRadius: rpx(RIGHT_CONTENT_CONFIG.borderRadius),
-          border: `${rpx(RIGHT_CONTENT_CONFIG.smallImageBorderWidth)} solid white`,
-        }}
-      >
-        {(() => {
-          const cropData = data.imageCropDataList?.[1];
-          const cropStyles = getCropStyles(cropData);
-          if (cropStyles && cropData && cropData.croppedAreaPixels) {
-            return (
-              <div
-                className="absolute inset-0 w-full h-full"
-                style={{
-                  ...cropStyles.container,
-                  width: "100%",
-                  height: "100%",
-                }}
-              >
-                <img
-                  src={getCropImageUrl(data.images[1], cropData)}
-                  alt="Small feature image"
-                  style={{
-                    ...cropStyles.image,
-                    width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
-                    height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
-                    left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
-                    top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
-                    maxWidth: "none",
-                  }}
-                />
-              </div>
-            );
-          }
-          return (
-            <ServerImage
-              image={data.images[1]}
-              alt="Small feature image"
-              size="small"
-              fill
-              className="absolute inset-0 w-full h-full object-cover"
-              priority
-            />
-          );
-        })()}
-      </div>
-
-      {/* 右侧标题 - 桌面端 (lg+) - 最上层 z-30 */}
-      {/* 和大图右对齐, right=103 */}
-      <h1
-        className="hidden lg:block absolute font-paytone-one font-normal text-white text-left antialiased"
-        style={{
-          right: rpx(103),
-          top: rpx(RIGHT_CONTENT_CONFIG.titleTop),
-          fontSize: rpx(RIGHT_CONTENT_CONFIG.titleFontSize),
-          lineHeight: `${rpx(RIGHT_CONTENT_CONFIG.titleLineHeight)}`,
-          width: rpx(RIGHT_CONTENT_CONFIG.titleWidth),
-          WebkitTextStroke: `${rpx(1)} #75703F`,
-          paintOrder: 'stroke fill',
-          whiteSpace: 'pre-line',
-          zIndex: 30,
-        }}
-      >
-        {formatText(data.features[1])}
-      </h1>
-
-      {/* 右侧内容区域 - 移动端 (< lg) */}
-      <div className="lg:hidden absolute z-10 right-4 sm:right-6 md:right-8 top-20 sm:top-24 md:top-28 flex flex-col items-end">
-        {/* 右侧标题 */}
-        <h1 className="font-paytone-one font-regular text-white text-right text-xl sm:text-2xl md:text-3xl mb-4 sm:mb-5 whitespace-pre-line"
-          style={{ textShadow: '0 2px 4px rgba(117, 112, 63, 0.5)' }}
-        >
-          {formatText(data.features[1])}
-        </h1>
-
-        {/* 右侧图片组 - 移动端简化布局 */}
-        <div className="relative">
-          {/* 大图 */}
-          <div className="overflow-hidden shadow-lg bg-white p-2 sm:p-2.5 rounded-2xl w-44 h-40 sm:w-56 sm:h-52 md:w-72 md:h-64">
-            <div className="relative w-full h-full overflow-hidden rounded-xl">
-              {(() => {
-                const cropData = data.imageCropDataList?.[1];
-                const cropStyles = getCropStyles(cropData);
-                if (cropStyles && cropData && cropData.croppedAreaPixels) {
-                  return (
-                    <div
-                      className="absolute inset-0 w-full h-full"
-                      style={{
-                        ...cropStyles.container,
-                        width: "100%",
-                        height: "100%",
-                      }}
-                    >
-                      <img
-                        src={getCropImageUrl(data.images[1], cropData)}
-                        alt="Large feature image"
-                        style={{
-                          ...cropStyles.image,
-                          width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
-                          height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
-                          left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
-                          top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
-                          maxWidth: "none",
-                        }}
-                      />
-                    </div>
-                  );
-                }
-                return (
-                  <ServerImage
-                    image={data.images[1]}
-                    alt="Large feature image"
-                    size="thumbnail"
-                    fill
-                    className="absolute inset-0 w-full h-full object-cover"
-                    priority
-                  />
-                );
-              })()}
-            </div>
+      {/* 3. 桌面端布局 (1280px 以上) */}
+      <div className="hidden xl:block absolute inset-0 z-30 pointer-events-none">
+        <div className="relative w-full h-full max-w-[1920px] mx-auto">
+          {/* 右侧副标题 (白色) - 提升层级 */}
+          <div
+            className="absolute text-right z-50"
+            style={{
+              left: rpx(1243),
+              top: rpx(150),
+              width: rpx(600),
+            }}
+          >
+            <p
+              className="font-paytone-one text-white whitespace-pre-line leading-tight"
+              style={{ fontSize: "clamp(1.5rem, 2vw, 2.25rem)" }}
+            >
+              {formatText(data.features[1])}
+            </p>
           </div>
 
-          {/* 小图 - 移动端偏移较小 */}
-          <div className="absolute overflow-hidden shadow-lg bg-white z-20 p-1.5 sm:p-2 rounded-xl -left-20 sm:-left-28 md:-left-36 top-12 sm:top-16 md:top-20 w-32 h-28 sm:w-40 sm:h-36 md:w-48 md:h-44">
-            <div className="relative w-full h-full overflow-hidden rounded-lg">
-              {(() => {
-                const cropData = data.imageCropDataList?.[2];
-                const cropStyles = getCropStyles(cropData);
-                if (cropStyles && cropData && cropData.croppedAreaPixels) {
-                  return (
-                    <div
-                      className="absolute inset-0 w-full h-full"
+          {/* 左侧主标题 (黑色) - 提升层级 */}
+          <div
+            className="absolute text-left z-50"
+            style={{
+              left: rpx(207),
+              top: rpx(207),
+              width: rpx(900),
+            }}
+          >
+            <h1
+              className="font-paytone-one text-black whitespace-pre-line leading-none"
+              style={{
+                fontSize: "clamp(3.5rem, 5vw, 6rem)",
+                WebkitTextStroke: "3px #FDF6C2",
+                paintOrder: "stroke fill",
+              }}
+            >
+              {formatText(data.features[0])}
+            </h1>
+          </div>
+
+          {/* 左侧 Feature 按钮组 - 提升层级 */}
+          <div
+            className="absolute flex flex-col pointer-events-auto z-50"
+            style={{
+              left: rpx(207),
+              top: rpx(600),
+              gap: rpx(BANNER_2_ASSETS.feature.gap),
+            }}
+          >
+            {[data.features[2], data.features[3], data.features[4]].map(
+              (feature, index) => (
+                <MagneticWrapper key={index} strength={0.2}>
+                  <div
+                    className="relative flex items-center px-12 overflow-hidden shadow-lg group transition-all duration-300 hover:brightness-110"
+                    style={{
+                      width: rpx(BANNER_2_ASSETS.feature.width),
+                      height: rpx(BANNER_2_ASSETS.feature.height),
+                      background:
+                        "linear-gradient(90deg, #5A4F0E 0%, rgba(192, 169, 29, 0) 100%)",
+                      clipPath: "polygon(0 0, 95% 0, 100% 100%, 5% 100%)",
+                    }}
+                  >
+                    <p
+                      className="font-montserrat font-semibold text-[#FFF5AD] text-left whitespace-pre-line"
                       style={{
-                        ...cropStyles.container,
-                        width: "100%",
-                        height: "100%",
+                        fontSize: rpx(30),
+                        textShadow: "0 4px 11px rgba(86, 80, 32, 0.5)",
                       }}
                     >
-                      <img
-                        src={getCropImageUrl(data.images[2], cropData)}
-                        alt="Small feature image"
-                        style={{
-                          ...cropStyles.image,
-                          width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
-                          height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
-                          left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
-                          top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
-                          maxWidth: "none",
-                        }}
-                      />
-                    </div>
-                  );
-                }
-                return (
-                  <ServerImage
-                    image={data.images[2]}
-                    alt="Small feature image"
-                    size="thumbnail"
-                    fill
-                    className="absolute inset-0 w-full h-full object-cover"
-                    priority
-                  />
-                );
-              })()}
+                      {feature}
+                    </p>
+                  </div>
+                </MagneticWrapper>
+              ),
+            )}
+          </div>
+
+          {/* 右侧图片框架 - 大图 (降低层级) */}
+          <div
+            className="absolute overflow-hidden shadow-2xl transition-all duration-700"
+            style={{
+              left: rpx(BANNER_2_ASSETS.image1.x),
+              top: rpx(BANNER_2_ASSETS.image1.y),
+              width: rpx(BANNER_2_ASSETS.image1.width),
+              height: rpx(BANNER_2_ASSETS.image1.height),
+              borderRadius: rpx(BANNER_2_ASSETS.image1.borderRadius),
+              border: `${rpx(BANNER_2_ASSETS.image1.strokeWidth)} solid white`,
+              zIndex: 20,
+            }}
+          >
+            {renderImage(
+              data.images[1],
+              data.imageCropDataList?.[1],
+              "Feature Main",
+            )}
+          </div>
+
+          {/* 右侧图片框架 - 小图 (降低层级) */}
+          <div
+            className="absolute overflow-hidden shadow-2xl transition-all duration-700"
+            style={{
+              left: rpx(BANNER_2_ASSETS.image2.x),
+              top: rpx(BANNER_2_ASSETS.image2.y),
+              width: rpx(BANNER_2_ASSETS.image2.width),
+              height: rpx(BANNER_2_ASSETS.image2.height),
+              borderRadius: rpx(BANNER_2_ASSETS.image2.borderRadius),
+              border: `${rpx(BANNER_2_ASSETS.image2.strokeWidth)} solid white`,
+              zIndex: 25,
+            }}
+          >
+            {renderImage(
+              data.images[2],
+              data.imageCropDataList?.[2],
+              "Feature Sub",
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 4. 移动端/平板端布局 (1280px 以下) */}
+      <div className="flex xl:hidden absolute inset-0 z-30 overflow-y-auto w-full h-full">
+        <div className="flex flex-col items-center justify-center min-h-full w-full px-6 py-10 text-center gap-4 md:gap-10">
+        {/* 上方部分 (对应桌面右侧内容) */}
+        <div className="flex flex-col items-center w-full">
+          {/* 副标题 */}
+          <p
+            className="font-paytone-one text-white whitespace-pre-line mb-3 md:mb-6"
+            style={{
+              fontSize: "clamp(1rem, 2.5vw, 1.5rem)",
+            }}
+          >
+            {formatText(data.features[1])}
+          </p>
+
+          {/* 图片组 (响应式叠加) - 平板端大幅增强尺寸，手机端缩减以适配 SE */}
+          <div className="relative w-full max-w-[220px] md:max-w-[600px] h-[150px] md:h-[380px] mb-4 md:mb-8">
+            <div
+              className="absolute left-0 top-0 w-[75%] h-[85%] border-4 border-white shadow-lg overflow-hidden"
+              style={{ borderRadius: "16px" }}
+            >
+              {renderImage(
+                data.images[1],
+                data.imageCropDataList?.[1],
+                "Feature 1",
+              )}
+            </div>
+            <div
+              className="absolute right-0 bottom-0 w-[55%] h-[65%] border-4 border-white shadow-xl overflow-hidden z-10"
+              style={{
+                borderRadius: "12px",
+                transform: "translate(8px, 8px) md:translate(12px, 12px)",
+              }}
+            >
+              {renderImage(
+                data.images[2],
+                data.imageCropDataList?.[2],
+                "Feature 2",
+              )}
             </div>
           </div>
+        </div>
+
+        {/* 下方部分 (对应桌面左侧内容) */}
+        <div className="flex flex-col items-center w-full">
+          {/* 主标题 - 尊重换行，全员大字号 */}
+          <div className="flex flex-col items-center mb-6 md:mb-8">
+            {formatText(data.features[0])
+              ?.split("\n")
+              .map((line, idx) => (
+                <h1
+                  key={idx}
+                  className="font-paytone-one text-black text-center leading-[1.1]"
+                  style={{
+                    fontSize: "clamp(2.125rem, 5vw, 3.25rem)",
+                    WebkitTextStroke: "3px #FDF6C2",
+                    paintOrder: "stroke fill",
+                    marginTop: idx === 0 ? 0 : "0.5rem",
+                  }}
+                >
+                  {line}
+                </h1>
+              ))}
+          </div>
+
+          {/* Feature 按钮组 (移动端) - 像素级对标桌面端 */}
+          <div className="flex flex-col gap-3 md:gap-4 w-full max-w-[300px]">
+            {[data.features[2], data.features[3], data.features[4]].map(
+              (feature, index) => (
+                <div key={index} className="relative w-full">
+                  {/* 背景层 - 80% 不透明度 */}
+                  <div
+                    className="absolute inset-0 bg-gradient-to-r from-[#948421] to-[#40390F] opacity-80"
+                    style={{
+                      clipPath: "polygon(0 0, 95% 0, 100% 100%, 5% 100%)",
+                    }}
+                  />
+                  {/* 文字层 */}
+                  <div className="relative py-2 md:py-2.5 px-8 font-bold text-[#FDF6C2] text-base md:text-lg text-left">
+                    {feature}
+                  </div>
+                </div>
+              ),
+            )}
+          </div>
+        </div>
+        {/* 底部安全留白占位 */}
         </div>
       </div>
     </section>

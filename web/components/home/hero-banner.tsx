@@ -52,11 +52,11 @@ const lazyBanners: Record<
   9: () => import("@/components/HeroBanner/HeroBanner9"),
 };
 
-const AUTOPLAY_DELAY = 6000;
-const PRELOAD_BEFORE = 2000; // 提前 2 秒预加载下一个 Banner
+const AUTOPLAY_DELAY = 100000;
+const PRELOAD_BEFORE = 20000; // 提前 2 秒预加载下一个 Banner
 const MIN_HEIGHT = "min-h-[600px]";
-// 使用 calc(100vh - 46px) 减去 header 高度，留出 header 空间
-const HEIGHT_CLASS = `h-[calc(100vh-46px)] ${MIN_HEIGHT}`;
+// 方案二核心：移动端 80dvh，桌面端 (xl) 减去 46px header
+const HEIGHT_CLASS = `h-[80dvh] xl:h-[calc(100dvh-46px)] ${MIN_HEIGHT}`;
 
 // 占位组件 - 用于 Banner 加载中
 function BannerPlaceholder() {
@@ -80,6 +80,32 @@ export default function HeroBanner({
   const [progress, setProgress] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // --- 关键：动态计算 --rpx-hero 比例系数 (基于 1920x922) ---
+  useEffect(() => {
+    const updateScale = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      // 只有在桌面端 (xl: 1280px) 以上才应用流体缩放
+      if (vw >= 1280) {
+        const availableHeight = vh - 46; // 减去固定的 header 高度
+        // 计算缩放因子：取宽度比例和高度比例中较小的一个，确保设计内容完全可见
+        const scale = Math.min(vw / 1920, availableHeight / 922);
+        document.documentElement.style.setProperty(
+          "--rpx-hero",
+          scale.toString(),
+        );
+      } else {
+        // 移动端/平板竖屏：重置为 1 (或根据需要设为其他固定比例)
+        document.documentElement.style.setProperty("--rpx-hero", "1");
+      }
+    };
+
+    updateScale();
+    window.addEventListener("resize", updateScale);
+    return () => window.removeEventListener("resize", updateScale);
+  }, []);
 
   // 已加载的 Banner 组件缓存（只有第1个直接可用）
   const [loadedBanners, setLoadedBanners] = useState<
