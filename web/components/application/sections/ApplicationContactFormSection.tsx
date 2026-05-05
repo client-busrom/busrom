@@ -520,10 +520,17 @@ export function ApplicationContactFormSection({
       </div>
       {logoImage && (
         <div
-          className="absolute w-full flex justify-center z-[100] pointer-events-none"
-          style={{ bottom: "-112px" }}
+          className="absolute w-full flex justify-center z-0 pointer-events-none"
+          style={{ bottom: isMobile ? "-40px" : "-112px" }}
         >
-          <img src={logoImage} alt="Logo" className="w-[96%] object-contain" />
+          <img
+            src={logoImage}
+            alt="Logo"
+            className={cn(
+              "object-contain",
+              isMobile ? "w-[120%] max-w-none opacity-50" : "w-[96%]",
+            )}
+          />
         </div>
       )}
       <motion.div

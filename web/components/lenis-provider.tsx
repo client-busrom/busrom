@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useEffect, useRef } from "react"
 import { easings } from "./easings"
@@ -37,16 +37,13 @@ export function LenisProvider({ easingKey }: LenisProviderProps) {
       gsap.registerPlugin(ScrollTrigger)
 
       const selected = easings[easingKey]
-      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
 
       const lenis = new Lenis({
-        duration: 1,
+        duration: 1.2,
         easing: selected.fn,
-        lerp: 0.05,
-        syncTouch: true,
-        syncTouchLerp: isTouchDevice ? 0.15 : undefined,
-        touchMultiplier: isTouchDevice ? 1.5 : 1,
-        wheelMultiplier: 0.8,
+        lerp: 0.08, // 略微调高，平衡平滑度与响应速度
+        syncTouch: false, // 核心修复：禁用触屏同步。移动端原生滚动已非常平滑，开启此项会导致在缓慢滑动时产生严重的抖动（Feedback Loop）
+        wheelMultiplier: 1,
         smoothWheel: true,
       })
 

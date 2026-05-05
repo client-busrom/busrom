@@ -523,7 +523,7 @@ export function ApplicationHeroSection({
 
       {/* ============ MOBILE ============ */}
       <div className="block lg:hidden w-full px-6 pt-24 pb-16 bg-[#211C0B] min-h-screen">
-        <div className="flex items-center mb-4">
+        <div className="flex items-center mb-8">
           <span className="font-anaheim font-medium text-white text-sm tracking-widest">
             {title}
           </span>
@@ -542,7 +542,7 @@ export function ApplicationHeroSection({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             width="100%"
-            style={{ height: "80px", overflow: "visible" }}
+            style={{ height: "120px", overflow: "visible" }}
           >
             <defs>
               <linearGradient
@@ -558,7 +558,7 @@ export function ApplicationHeroSection({
             </defs>
             <text
               x="0"
-              y="0"
+              y="10"
               dominantBaseline="hanging"
               fill="transparent"
               stroke={`url(#grad-mob-${activeSlide})`}

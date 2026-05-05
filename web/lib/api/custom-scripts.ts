@@ -326,7 +326,7 @@ export async function getMatchingScripts(
   bodyStart: CustomScript[]
   footer: CustomScript[]
 }> {
-  const allScripts = await getAllCustomScripts()
+  const allScripts = await getValidatedScripts()
 
   // Normalize path (remove locale prefix if present)
   const normalizedPath = path.replace(/^\/(en|zh|de|fr|es|pt|it|nl|pl|ru|ja|ko|ar|th|vi|id|ms|tr|hi|bn)/, '') || '/'

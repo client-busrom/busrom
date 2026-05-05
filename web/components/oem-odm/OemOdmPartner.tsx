@@ -317,7 +317,7 @@ export function OemOdmPartner({
       </div>
 
       {/* ========== 移动端布局 ========== */}
-      <div className="block md:hidden px-5 pt-[120px] pb-16">
+      <div className="block md:hidden px-5 pt-[120px] pb-24">
         {/* 标题 */}
         <h2 className="font-anaheim font-bold text-white text-2xl mb-6 text-right">
           {title}
@@ -386,7 +386,7 @@ export function OemOdmPartner({
             return (
               <motion.div
                 key={index}
-                className="relative rounded-xl px-4 py-3"
+                className="relative rounded-xl px-4 py-4 flex items-center min-h-[84px]"
                 animate={{
                   backgroundColor: isActive ? "#6B6530" : "#544F24",
                 }}
@@ -399,9 +399,9 @@ export function OemOdmPartner({
                   setIsPaused(false)
                 }}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-3 w-full">
                   <motion.span
-                    className="font-anaheim font-bold text-2xl"
+                    className="font-anaheim font-bold text-2xl leading-none mt-0.5"
                     animate={{
                       color: isActive ? "#C4BC7A" : "#9B9359",
                     }}
@@ -410,10 +410,11 @@ export function OemOdmPartner({
                     {String(index + 1).padStart(2, "0")}
                   </motion.span>
                   <motion.p
-                    className="font-anaheim text-white flex-1"
+                    className="font-anaheim text-white flex-1 leading-tight"
                     animate={{
-                      fontSize: isActive ? "16px" : "14px",
+                      fontSize: "16px",
                       fontWeight: isActive ? 700 : 500,
+                      opacity: isActive ? 1 : 0.8,
                     }}
                     transition={{ duration: 0.3 }}
                   >

@@ -84,91 +84,176 @@ function getDebugTrackingCode(script: CustomScript, position: string): string {
 /**
  * Parse script content and determine how to render it
  */
+/**
+ * Parse script content and determine how to render it
+ * Now supports multiple <script> tags and <noscript> tags
+ */
 function ScriptRenderer({ script, position }: { script: CustomScript; position: string }) {
   // Use generatedContent for template scripts, otherwise use content
-  const content = (script.scriptType === 'template' ? script.generatedContent : script.content)?.trim() || ''
+  const rawContent = (script.scriptType === 'template' ? script.generatedContent : script.content)?.trim() || ''
 
-  if (!content) {
+  if (!rawContent) {
     return null
   }
 
   // Determine Next.js Script strategy based on position
-  const strategy = position === 'header' ? 'beforeInteractive' : 'afterInteractive'
+  // 'beforeInteractive' is only for scripts that MUST load before hydration
+  // 'afterInteractive' is better for most tracking scripts
+  const strategy = position === 'header' ? 'afterInteractive' : 'lazyOnload'
 
   // Add debug tracking
   const debugCode = getDebugTrackingCode(script, position)
 
-  // Check for external script with src attribute
-  const externalMatch = content.match(/<script[^>]+src=["']([^"']+)["'][^>]*>/i)
-  if (externalMatch) {
-    const src = externalMatch[1]
-    // Extract additional attributes
-    const asyncAttr = /\basync\b/i.test(content)
-    const deferAttr = /\bdefer\b/i.test(content)
+  // Regex to find all script tags
+  const scriptRegex = /<script([^>]*)>([\s\S]*?)<\/script>/gi
+  const blocks: React.ReactNode[] = []
+  let lastIndex = 0
+  let match
+  let scriptCount = 0
 
-    return (
-      <>
-        {/* Debug tracking script */}
+  while ((match = scriptRegex.exec(rawContent)) !== null) {
+    // 1. Process static content BEFORE this script tag
+    const staticBefore = rawContent.substring(lastIndex, match.index).trim()
+    if (staticBefore) {
+      // Check if it's a noscript tag
+      if (staticBefore.toLowerCase().includes('<noscript')) {
+        blocks.push(
+          <div
+            key={`noscript-${script.id}-${lastIndex}`}
+            dangerouslySetInnerHTML={{ __html: staticBefore }}
+            style={{ display: 'none' }}
+          />
+        )
+      } else if (position !== 'header') {
+        // Only render other static HTML outside header (to avoid invalid HTML in head)
+        blocks.push(
+          <div
+            key={`static-${script.id}-${lastIndex}`}
+            dangerouslySetInnerHTML={{ __html: staticBefore }}
+            style={{ display: 'none' }}
+          />
+        )
+      }
+    }
+
+    // 2. Process the script tag itself
+    const attrs = match[1]
+    const body = match[2].trim()
+    const srcMatch = attrs.match(/src=["']([^"']+)["']/i)
+
+    if (srcMatch) {
+      const src = srcMatch[1]
+      const asyncAttr = /\basync\b/i.test(attrs)
+      const deferAttr = /\bdefer\b/i.test(attrs)
+      blocks.push(
         <Script
-          id={`custom-script-debug-${script.id}`}
-          strategy={strategy as 'beforeInteractive' | 'afterInteractive'}
-          dangerouslySetInnerHTML={{ __html: debugCode }}
-        />
-        <Script
-          id={`custom-script-${script.id}`}
+          key={`script-${script.id}-${scriptCount++}`}
+          id={`custom-script-${script.id}-${scriptCount}`}
           src={src}
-          strategy={strategy as 'beforeInteractive' | 'afterInteractive'}
+          strategy={strategy as any}
           async={asyncAttr}
           defer={deferAttr}
         />
-      </>
-    )
+      )
+    } else if (body) {
+      blocks.push(
+        <Script
+          key={`script-${script.id}-${scriptCount++}`}
+          id={`custom-script-${script.id}-${scriptCount}`}
+          strategy={strategy as any}
+          dangerouslySetInnerHTML={{ __html: body }}
+        />
+      )
+    }
+
+    lastIndex = scriptRegex.lastIndex
   }
 
-  // Check for inline script
-  const inlineMatch = content.match(/<script[^>]*>([\s\S]*?)<\/script>/i)
-  if (inlineMatch) {
-    const inlineCode = inlineMatch[1].trim()
-    if (inlineCode) {
-      // Combine debug tracking with inline code
-      const combinedCode = debugCode + '\n' + inlineCode
-      return (
-        <Script
-          id={`custom-script-${script.id}`}
-          strategy={strategy as 'beforeInteractive' | 'afterInteractive'}
-          dangerouslySetInnerHTML={{ __html: combinedCode }}
+  // 3. Process remaining content AFTER last script tag
+  const staticAfter = rawContent.substring(lastIndex).trim()
+  if (staticAfter) {
+    if (staticAfter.toLowerCase().includes('<noscript')) {
+      blocks.push(
+        <div
+          key={`noscript-after-${script.id}`}
+          dangerouslySetInnerHTML={{ __html: staticAfter }}
+          style={{ display: 'none' }}
+        />
+      )
+    } else if (position !== 'header') {
+      blocks.push(
+        <div
+          key={`static-after-${script.id}`}
+          dangerouslySetInnerHTML={{ __html: staticAfter }}
+          style={{ display: 'none' }}
         />
       )
     }
   }
 
-  // For non-script content (noscript, img pixels, etc.), render as raw HTML
-  // This needs to be done differently based on position
-  if (!content.includes('<script')) {
-    return (
-      <>
-        <Script
-          id={`custom-script-debug-${script.id}`}
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{ __html: debugCode }}
-        />
-        <div
-          id={`custom-content-${script.id}`}
-          data-script-name={script.name}
-          dangerouslySetInnerHTML={{ __html: content }}
-          style={{ display: 'none' }}
-        />
-      </>
-    )
+  // If no scripts were found by regex, but there is content, fallback to raw injection
+  if (blocks.length === 0 && rawContent) {
+    if (position === 'header') {
+      // In header, if it's not a script, we only allow it if it looks like meta/link
+      if (rawContent.includes('<meta') || rawContent.includes('<link')) {
+        return (
+          <>
+             <Script
+              id={`custom-script-debug-${script.id}`}
+              strategy={strategy as any}
+              dangerouslySetInnerHTML={{ __html: debugCode }}
+            />
+            <div
+              style={{ display: 'none' }}
+              dangerouslySetInnerHTML={{ __html: rawContent }}
+            />
+          </>
+        )
+      }
+      // Fallback for header: try to treat whole thing as script body if it doesn't have tags
+      if (!rawContent.includes('<')) {
+        return (
+          <>
+            <Script
+              id={`custom-script-debug-${script.id}`}
+              strategy={strategy as any}
+              dangerouslySetInnerHTML={{ __html: debugCode }}
+            />
+            <Script
+              id={`custom-script-fallback-${script.id}`}
+              strategy={strategy as any}
+              dangerouslySetInnerHTML={{ __html: rawContent }}
+            />
+          </>
+        )
+      }
+    } else {
+      // Outside header, just inject in a div
+      return (
+        <>
+          <Script
+            id={`custom-script-debug-${script.id}`}
+            strategy={strategy as any}
+            dangerouslySetInnerHTML={{ __html: debugCode }}
+          />
+          <div
+            id={`custom-content-fallback-${script.id}`}
+            style={{ display: 'none' }}
+            dangerouslySetInnerHTML={{ __html: rawContent }}
+          />
+        </>
+      )
+    }
   }
 
-  // Fallback: treat as inline script code
-  const combinedCode = debugCode + '\n' + content
   return (
-    <Script
-      id={`custom-script-${script.id}`}
-      strategy={strategy as 'beforeInteractive' | 'afterInteractive'}
-      dangerouslySetInnerHTML={{ __html: combinedCode }}
-    />
+    <>
+      <Script
+        id={`custom-script-debug-${script.id}`}
+        strategy={strategy as any}
+        dangerouslySetInnerHTML={{ __html: debugCode }}
+      />
+      {blocks}
+    </>
   )
 }

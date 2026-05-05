@@ -148,7 +148,7 @@ export function ContactFormSection({
     <section
       id="contact-form"
       className="relative w-full overflow-hidden"
-      style={{ minHeight: "645px" }}
+      style={{ minHeight: "645px", height: "auto" }}
     >
       {/* ==================== Mobile Layout ==================== */}
       <div className="lg:hidden relative">
@@ -182,6 +182,7 @@ export function ContactFormSection({
               />
             ))}
           {/* Mobile Content */}
+        </div>
         <div className="relative px-5 py-12 flex flex-col items-center">
           {/* Header */}
           <div className="mb-14 text-center max-w-[640px] w-full">
@@ -379,7 +380,6 @@ export function ContactFormSection({
           </div>
         </div>
       </div>
-    </div>
 
       {/* ==================== Desktop Layout ==================== */}
       <div

@@ -63,7 +63,7 @@ function CustomDropdown({
   const selectedOption = options?.find((opt: any) => opt.value === value);
 
   return (
-    <div className={cn("space-y-2 relative", className)} ref={dropdownRef}>
+    <div className="space-y-2 relative" ref={dropdownRef}>
       {label && (
         <label className="text-white text-[16px] font-semibold">{label}</label>
       )}
@@ -74,6 +74,7 @@ function CustomDropdown({
           isOpen
             ? "border-[#FFF28E]/60 shadow-[0_0_15px_rgba(255,242,142,0.2)]"
             : "border-white/20",
+          className
         )}
       >
         <span
