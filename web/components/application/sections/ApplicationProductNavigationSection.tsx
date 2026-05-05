@@ -298,7 +298,6 @@ export function ApplicationProductNavigationSection({
 
               return (
                 <motion.div
-                  layout
                   key={`nav-product-${productIdx}`}
                   initial={false}
                   animate={{
@@ -325,6 +324,8 @@ export function ApplicationProductNavigationSection({
                     }
                   }}
                   className="absolute overflow-hidden group cursor-pointer"
+                  onMouseEnter={undefined}
+                  onMouseLeave={undefined}
                   style={{
                     borderRadius: vw(60 * SCALE),
                     border: slot.borderColor
@@ -347,14 +348,13 @@ export function ApplicationProductNavigationSection({
 
                     {!isCenter && slot.bgColor && (
                       <motion.div
-                        layout
                         className="absolute inset-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-80"
                         style={{ backgroundColor: slot.bgColor }}
                       />
                     )}
 
                     {isCenter && (
-                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none">
                         <div
                           className="absolute flex items-center justify-center rounded-full border border-white/50"
                           style={{
@@ -387,8 +387,11 @@ export function ApplicationProductNavigationSection({
                             height: svw(304),
                             backgroundColor: "rgba(117, 111, 63, 0.74)",
                             backdropFilter: "blur(20px)",
+                            WebkitBackdropFilter: "blur(20px)",
                             paddingLeft: svw(72),
                             paddingRight: svw(72),
+                            transform: "translateZ(0)",
+                            backfaceVisibility: "hidden",
                           }}
                         >
                           <h3
