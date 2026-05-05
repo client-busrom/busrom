@@ -91,6 +91,7 @@ export interface ImageCropData {
  */
 export interface HeroBannerItem {
   title: string
+  subtitle?: string
   features: string[]
   images: ImageObject[]
   /** 裁剪数据列表 — 与 images 数组索引一一对应，null 表示未设置裁剪 */

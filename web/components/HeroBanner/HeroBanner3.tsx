@@ -102,9 +102,9 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
   return (
     <section className="relative w-full h-full overflow-hidden bg-[#6E6941]">
       {/* 1. 背景装饰层 (对齐 HeroBanner2 模式) */}
-      <div className="absolute top-0 z-0 h-full pointer-events-none opacity-40 xl:opacity-100">
+      <div className="absolute top-0 z-0 h-full pointer-events-none opacity-40 md:landscape:opacity-100 xl:opacity-100">
         <div
-          className="relative left-0 xl:left-[calc(var(--rpx-hero,1)*96px)]"
+          className="relative left-0 md:landscape:left-[calc(var(--rpx-hero,1)*96px)] xl:left-[calc(var(--rpx-hero,1)*96px)]"
           style={{
             width: rpx(BANNER_3_ASSETS.decorator.width),
             height: rpx(BANNER_3_ASSETS.decorator.height),
@@ -119,7 +119,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
       </div>
 
       {/* 2. 桌面端布局 (xl: 1280px+) - 对齐 HeroBanner1/2 绝对定位模式 */}
-      <div className="hidden xl:block relative z-20 w-full h-full max-w-[1920px] mx-auto">
+      <div className="hidden md:landscape:block xl:block relative z-20 w-full h-full max-w-[1920px] mx-auto">
         {/* 文字内容区: 绝对定位锁定 */}
         <div
           className="absolute z-20 flex flex-col items-start text-left"
@@ -135,7 +135,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
 
           {/* 主标题 */}
           <h1
-            className="font-paytone-one text-black whitespace-pre-line leading-[1.1] mb-12"
+            className="font-poller-one font-regular text-black whitespace-pre-line leading-[1.1] mb-12"
             style={{
               fontSize: rpx(90),
               WebkitTextStroke: `${rpx(6)} #FDF6C2`,
@@ -223,7 +223,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
       </div>
 
       {/* 3. 移动端/平板端布局 (xl: <1280px) */}
-      <div className="flex xl:hidden absolute inset-0 z-30 overflow-y-auto w-full h-full">
+      <div className="flex md:landscape:hidden xl:hidden absolute inset-0 z-30 overflow-y-auto w-full h-full">
         <div className="flex flex-col items-center justify-center min-h-full w-full px-6 py-10 text-center gap-8 md:gap-14">
           {/* 上方部分 (文字内容) */}
           <div className="flex flex-col items-center w-full">

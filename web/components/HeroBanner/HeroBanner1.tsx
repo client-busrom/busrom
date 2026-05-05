@@ -239,7 +239,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
       </div>
 
       {/* 3. 桌面端大屏内容层 (1280px 以上触发) */}
-      <div className="hidden xl:block absolute inset-0 z-30 pointer-events-none">
+      <div className="hidden md:landscape:block xl:block absolute inset-0 z-30 pointer-events-none">
         <div className="relative w-full h-full max-w-[1920px] mx-auto">
           <div className="absolute inset-0 flex flex-col justify-center items-center px-12">
             {/* ... 文字内容层已包含 ... */}
@@ -310,7 +310,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
       </div>
 
       {/* 4. 移动端/小屏内容层 (1280px 以下触发) */}
-      <div className="flex xl:hidden absolute inset-0 z-20 flex-col items-center justify-center w-full h-full px-6 text-center">
+      <div className="flex md:landscape:hidden xl:hidden absolute inset-0 z-20 flex-col items-center justify-center w-full h-full px-6 text-center">
         {/* 副标题 */}
         <p
           className="font-paytone-one text-[#FFBC5F] text-center mb-2"

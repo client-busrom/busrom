@@ -61,6 +61,7 @@ interface ImageObject {
 
 interface HeroBannerItem {
   title: string;
+  subtitle?: string;
   features: string[];
   images: ImageObject[];
 }
@@ -377,10 +378,10 @@ export const homeContent_EN: HomeContentData = {
     {
       title: 'Glass Clip (Bathroom)',
       features: [
-        'Design-forward \n Waterproof Bathroom Glass Clip',
-        'Minimal Contact & Maximum Glass',
+        'Design-Forward \nWaterproof \nBathroom \nGlass Clip',
+        'Minimal Contact \n& Maximum Glass',
         'High Quality',
-        'Corrosion-resistant',
+        'Corrosion-Resistant',
         'Flexible Compatibility',
       ],
       images: [

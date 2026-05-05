@@ -86,18 +86,20 @@ export default function HeroBanner({
     const updateScale = () => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
+      const availableHeight = vh - 46;
 
-      // 只有在桌面端 (xl: 1280px) 以上才应用流体缩放
-      if (vw >= 1280) {
-        const availableHeight = vh - 46; // 减去固定的 header 高度
-        // 计算缩放因子：取宽度比例和高度比例中较小的一个，确保设计内容完全可见
-        const scale = Math.min(vw / 1920, availableHeight / 922);
+      // 1280px 以上必选桌面，768px-1280px 之间只要是横屏 (vw > vh) 就选桌面
+      const isDesktopLayout = vw >= 1280 || (vw >= 768 && vw > vh);
+
+      if (isDesktopLayout) {
+        // 计算缩放因子，将底线降低到 0.5，以完美适配 iPad (1024px) 等设备
+        const rawScale = Math.min(vw / 1920, availableHeight / 922);
+        const scale = Math.max(rawScale, 0.5);
         document.documentElement.style.setProperty(
           "--rpx-hero",
           scale.toString(),
         );
       } else {
-        // 移动端/平板竖屏：重置为 1 (或根据需要设为其他固定比例)
         document.documentElement.style.setProperty("--rpx-hero", "1");
       }
     };
