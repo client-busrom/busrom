@@ -219,7 +219,17 @@
       border: 1px solid var(--theme-elevation-300);
       border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+      transition: box-shadow 0.2s, border-color 0.2s;
+      position: relative;
+      touch-action: none; // Required for DnD touch support
+
+      &.dragging {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-color: var(--theme-success-400);
+        opacity: 0.8;
+        cursor: grabbing;
+      }
 
       .card-header {
         display: flex;
@@ -229,15 +239,61 @@
         background: var(--theme-elevation-100);
         border-bottom: 1px solid var(--theme-elevation-200);
 
-        h4 { margin: 0; font-size: 14px; font-weight: 700; }
-        
+        .header-left {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .drag-handle {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--theme-elevation-500);
+          cursor: grab;
+          padding: 4px;
+          border-radius: 4px;
+          transition: all 0.2s;
+
+          &:hover {
+            background: var(--theme-elevation-200);
+            color: var(--theme-elevation-800);
+          }
+
+          &:active {
+            cursor: grabbing;
+          }
+
+          svg {
+            display: block;
+          }
+        }
+
+        h4 {
+          margin: 0;
+          font-size: 14px;
+          font-weight: 700;
+        }
+
         .delete-btn {
           background: transparent;
           color: var(--theme-error-500);
           border: none;
           font-size: 20px;
+          line-height: 1;
           cursor: pointer;
-          &:hover { color: var(--theme-error-700); }
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 24px;
+          height: 24px;
+          border-radius: 4px;
+          transition: all 0.2s;
+
+          &:hover {
+            background: var(--theme-error-50);
+            color: var(--theme-error-700);
+          }
         }
       }
 
@@ -260,7 +316,8 @@
             letter-spacing: 0.05em;
           }
 
-          select, textarea {
+          select,
+          textarea {
             padding: 0.75rem;
             border: 1px solid var(--theme-elevation-400);
             border-radius: 6px;

@@ -2,6 +2,24 @@
 
 import React, { useCallback, useState } from 'react'
 import { useField, useTranslation } from '@payloadcms/ui'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+
 import { SUPPORTED_LOCALES, type LocaleCode } from '../../../lib/locales'
 import { LocaleFlag } from '../../ui/LocaleFlag'
 import { RelationshipPicker } from '../RelationshipPicker'
@@ -54,11 +72,127 @@ const TEMPLATE_OPTIONS = [
   { label: 'Template 4 (Wave/Interactive)', value: 'template4' },
 ]
 
+// --- Sortable Item Component ---
+interface SortableItemProps {
+  id: string
+  index: number
+  item: KnowledgeSection
+  activeLocale: LocaleCode
+  updateSection: (index: number, field: keyof KnowledgeSection, val: any) => void
+  removeSection: (index: number) => void
+  t: (obj: any) => string
+}
+
+const SortableSectionItem: React.FC<SortableItemProps> = ({
+  id,
+  index,
+  item,
+  activeLocale,
+  updateSection,
+  removeSection,
+  t,
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : 1,
+    opacity: isDragging ? 0.6 : 1,
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} className={`section-card ${isDragging ? 'dragging' : ''}`}>
+      <div className="card-header">
+        <div className="header-left">
+          <div className="drag-handle" {...attributes} {...listeners}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M5 4h2V2H5v2zm4 0h2V2H9v2zM5 9h2V7H5v2zm4 0h2V7H9v2zm-4 5h2v-2H5v2zm4 0h2v-2H9v2z" />
+            </svg>
+          </div>
+          <h4>
+            {t(i18n.section)} {index + 1}
+          </h4>
+        </div>
+        <button type="button" className="delete-btn" onClick={() => removeSection(index)}>
+          ×
+        </button>
+      </div>
+
+      <div className="card-body">
+        <div className="form-field">
+          <label>{t(i18n.template)}</label>
+          <select
+            value={item.template || 'template1'}
+            onChange={(e) => updateSection(index, 'template', e.target.value)}
+          >
+            {TEMPLATE_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-field">
+          <label>{t(i18n.tagTitle)}</label>
+          <textarea
+            rows={1}
+            value={item.tagTitle || ''}
+            onChange={(e) => updateSection(index, 'tagTitle', e.target.value)}
+          />
+        </div>
+
+        <div className="form-field">
+          <label>{t(i18n.introTitle)}</label>
+          <textarea
+            rows={1}
+            value={item.introTitle || ''}
+            onChange={(e) => updateSection(index, 'introTitle', e.target.value)}
+          />
+        </div>
+
+        <div className="form-field">
+          <label>{t(i18n.introDesc)}</label>
+          <textarea
+            rows={3}
+            value={item.introDesc || ''}
+            onChange={(e) => updateSection(index, 'introDesc', e.target.value)}
+          />
+        </div>
+
+        <div className="form-field">
+          <label>{t(i18n.buttonText)}</label>
+          <textarea
+            rows={1}
+            value={item.buttonText || ''}
+            onChange={(e) => updateSection(index, 'buttonText', e.target.value)}
+          />
+        </div>
+
+        <div className="form-field">
+          <RelationshipPicker
+            label={t(i18n.relatedTag)}
+            relationTo="blog-tags"
+            value={item.tag}
+            onChange={(val) => updateSection(index, 'tag', val)}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// --- Main Component ---
 export const MultilingualKnowledgeSections: React.FC<any> = ({ path }) => {
   const { value, setValue } = useField<MultilingualSections>({ path })
-  const { i18n: { language } } = useTranslation()
-  const t = (obj: { en: string; zh: string }) => language === 'zh' ? obj.zh : obj.en
-  
+  const {
+    i18n: { language },
+  } = useTranslation()
+  const t = (obj: { en: string; zh: string }) => (language === 'zh' ? obj.zh : obj.en)
+
   const [activeLocale, setActiveLocale] = useState<LocaleCode>('en')
   const [showTranslationPanel, setShowTranslationPanel] = useState(false)
   const [isTranslating, setIsTranslating] = useState(false)
@@ -68,7 +202,14 @@ export const MultilingualKnowledgeSections: React.FC<any> = ({ path }) => {
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
 
-  const localeCodes = SUPPORTED_LOCALES.map(l => l.code)
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  )
+
+  const localeCodes = SUPPORTED_LOCALES.map((l) => l.code)
   const items = (value?.[activeLocale] || []) as KnowledgeSection[]
 
   // Add a new section to all locales
@@ -89,48 +230,71 @@ export const MultilingualKnowledgeSections: React.FC<any> = ({ path }) => {
   }, [value, setValue, localeCodes])
 
   // Remove a section from all locales
-  const removeSection = useCallback((index: number) => {
-    if (!window.confirm('Delete this section from all languages?')) return
-    const newValue = { ...value }
-    localeCodes.forEach((locale) => {
-      if (newValue[locale]) {
-        newValue[locale] = newValue[locale].filter((_, i) => i !== index)
-      }
-    })
-    setValue(newValue)
-  }, [value, setValue, localeCodes])
-
-  // Update field value
-  const updateSection = useCallback((index: number, field: keyof KnowledgeSection, fieldValue: any) => {
-    const newValue = { ...value }
-    
-    // Template and Tag are synced across all languages
-    if (field === 'template' || field === 'tag') {
-      localeCodes.forEach(locale => {
-        if (!newValue[locale]) newValue[locale] = []
-        const localeItems = [...newValue[locale]]
-        if (localeItems[index]) {
-          localeItems[index] = { ...localeItems[index], [field]: fieldValue }
-          newValue[locale] = localeItems
+  const removeSection = useCallback(
+    (index: number) => {
+      if (!window.confirm('Delete this section from all languages?')) return
+      const newValue = { ...value }
+      localeCodes.forEach((locale) => {
+        if (newValue[locale]) {
+          newValue[locale] = newValue[locale].filter((_, i) => i !== index)
         }
       })
-    } else {
-      // Content fields are locale-specific
-      if (!newValue[activeLocale]) newValue[activeLocale] = []
-      const localeItems = [...newValue[activeLocale]]
-      if (localeItems[index]) {
-        localeItems[index] = { ...localeItems[index], [field]: fieldValue }
-        newValue[activeLocale] = localeItems
+      setValue(newValue)
+    },
+    [value, setValue, localeCodes],
+  )
+
+  // Update field value
+  const updateSection = useCallback(
+    (index: number, field: keyof KnowledgeSection, fieldValue: any) => {
+      const newValue = { ...value }
+
+      // Template and Tag are synced across all languages
+      if (field === 'template' || field === 'tag') {
+        localeCodes.forEach((locale) => {
+          if (!newValue[locale]) newValue[locale] = []
+          const localeItems = [...newValue[locale]]
+          if (localeItems[index]) {
+            localeItems[index] = { ...localeItems[index], [field]: fieldValue }
+            newValue[locale] = localeItems
+          }
+        })
+      } else {
+        // Content fields are locale-specific
+        if (!newValue[activeLocale]) newValue[activeLocale] = []
+        const localeItems = [...newValue[activeLocale]]
+        if (localeItems[index]) {
+          localeItems[index] = { ...localeItems[index], [field]: fieldValue }
+          newValue[activeLocale] = localeItems
+        }
       }
+
+      setValue(newValue)
+    },
+    [value, activeLocale, setValue, localeCodes],
+  )
+
+  // Sorting logic - applied to all locales to keep structure in sync
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (active.id !== over?.id) {
+      const newValue = { ...value }
+      const oldIndex = items.findIndex((_, i) => `section-${i}` === active.id)
+      const newIndex = items.findIndex((_, i) => `section-${i}` === over?.id)
+
+      localeCodes.forEach((locale) => {
+        if (newValue[locale]) {
+          newValue[locale] = arrayMove(newValue[locale], oldIndex, newIndex)
+        }
+      })
+      setValue(newValue)
     }
-    
-    setValue(newValue)
-  }, [value, activeLocale, setValue, localeCodes])
+  }
 
   // Translation Panel logic
   const toggleLanguage = (lang: LocaleCode) => {
-    setSelectedLanguages(prev =>
-      prev.includes(lang) ? prev.filter(l => l !== lang) : [...prev, lang]
+    setSelectedLanguages((prev) =>
+      prev.includes(lang) ? prev.filter((l) => l !== lang) : [...prev, lang],
     )
   }
 
@@ -164,24 +328,26 @@ export const MultilingualKnowledgeSections: React.FC<any> = ({ path }) => {
         if (item.buttonText?.trim()) uniqueTexts.set(item.buttonText, {})
       }
 
-      await Promise.all(Array.from(uniqueTexts.keys()).map(async (text) => {
-        const res = await fetch('/api/translate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...headers },
-          body: JSON.stringify({ text, sourceLang: sourceLanguage, targetLangs: selectedLanguages }),
-        })
-        if (res.ok) {
-          const data = await res.json()
-          uniqueTexts.set(text, data.translations || {})
-        }
-      }))
+      await Promise.all(
+        Array.from(uniqueTexts.keys()).map(async (text) => {
+          const res = await fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...headers },
+            body: JSON.stringify({ text, sourceLang: sourceLanguage, targetLangs: selectedLanguages }),
+          })
+          if (res.ok) {
+            const data = await res.json()
+            uniqueTexts.set(text, data.translations || {})
+          }
+        }),
+      )
 
       for (const lang of selectedLanguages) {
         if (!newValue[lang]) newValue[lang] = []
         newValue[lang] = sourceItems.map((sourceItem, idx) => {
           const existing = newValue[lang][idx] || {}
           if (!overwriteExisting && existing.tagTitle) return existing
-          
+
           return {
             ...sourceItem,
             tagTitle: uniqueTexts.get(sourceItem.tagTitle || '')?.[lang] || sourceItem.tagTitle,
@@ -218,8 +384,8 @@ export const MultilingualKnowledgeSections: React.FC<any> = ({ path }) => {
 
         <div className="locale-tabs">
           {SUPPORTED_LOCALES.map((locale) => {
-            const hasContent = value?.[locale.code]?.some(item => 
-              item.tagTitle?.trim() || item.introTitle?.trim()
+            const hasContent = value?.[locale.code]?.some(
+              (item) => item.tagTitle?.trim() || item.introTitle?.trim(),
             )
             return (
               <button
@@ -241,12 +407,23 @@ export const MultilingualKnowledgeSections: React.FC<any> = ({ path }) => {
             <div className="panel-row">
               <div className="panel-group">
                 <label>{t(i18n.sourceLanguage)}</label>
-                <select value={sourceLanguage} onChange={e => setSourceLanguage(e.target.value as LocaleCode)}>
-                  {SUPPORTED_LOCALES.map(l => (<option key={l.code} value={l.code}>{l.label}</option>))}
+                <select
+                  value={sourceLanguage}
+                  onChange={(e) => setSourceLanguage(e.target.value as LocaleCode)}
+                >
+                  {SUPPORTED_LOCALES.map((l) => (
+                    <option key={l.code} value={l.code}>
+                      {l.label}
+                    </option>
+                  ))}
                 </select>
               </div>
               <label className="checkbox-label">
-                <input type="checkbox" checked={overwriteExisting} onChange={e => setOverwriteExisting(e.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={overwriteExisting}
+                  onChange={(e) => setOverwriteExisting(e.target.checked)}
+                />
                 {t(i18n.overwriteExisting)}
               </label>
             </div>
@@ -254,9 +431,16 @@ export const MultilingualKnowledgeSections: React.FC<any> = ({ path }) => {
             <div className="target-selection">
               <label>{t(i18n.targetLanguages)}</label>
               <div className="target-grid">
-                {SUPPORTED_LOCALES.filter(l => l.code !== sourceLanguage).map(l => (
-                  <label key={l.code} className={`target-chip ${selectedLanguages.includes(l.code) ? 'selected' : ''}`}>
-                    <input type="checkbox" checked={selectedLanguages.includes(l.code)} onChange={() => toggleLanguage(l.code)} />
+                {SUPPORTED_LOCALES.filter((l) => l.code !== sourceLanguage).map((l) => (
+                  <label
+                    key={l.code}
+                    className={`target-chip ${selectedLanguages.includes(l.code) ? 'selected' : ''}`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedLanguages.includes(l.code)}
+                      onChange={() => toggleLanguage(l.code)}
+                    />
                     {l.code.toUpperCase()}
                   </label>
                 ))}
@@ -264,10 +448,10 @@ export const MultilingualKnowledgeSections: React.FC<any> = ({ path }) => {
             </div>
 
             <div className="panel-actions">
-              <button 
-                type="button" 
-                className="start-translate-btn" 
-                onClick={handleTranslate} 
+              <button
+                type="button"
+                className="start-translate-btn"
+                onClick={handleTranslate}
                 disabled={isTranslating || selectedLanguages.length === 0}
               >
                 {isTranslating ? t(i18n.translating) : t(i18n.translate)}
@@ -283,62 +467,36 @@ export const MultilingualKnowledgeSections: React.FC<any> = ({ path }) => {
         {items.length === 0 ? (
           <p className="empty-msg">{t(i18n.noSections)}</p>
         ) : (
-          items.map((item, index) => (
-            <div key={`section-${activeLocale}-${index}`} className="section-card">
-              <div className="card-header">
-                <h4>{t(i18n.section)} {index + 1}</h4>
-                <button type="button" className="delete-btn" onClick={() => removeSection(index)}>×</button>
-              </div>
-              
-              <div className="card-body">
-                <div className="form-field">
-                  <label>{t(i18n.template)}</label>
-                  <select
-                    value={item.template || 'template1'}
-                    onChange={e => updateSection(index, 'template', e.target.value)}
-                  >
-                    {TEMPLATE_OPTIONS.map(opt => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="form-field">
-                  <label>{t(i18n.tagTitle)}</label>
-                  <textarea rows={1} value={item.tagTitle || ''} onChange={e => updateSection(index, 'tagTitle', e.target.value)} />
-                </div>
-
-                <div className="form-field">
-                  <label>{t(i18n.introTitle)}</label>
-                  <textarea rows={1} value={item.introTitle || ''} onChange={e => updateSection(index, 'introTitle', e.target.value)} />
-                </div>
-
-                <div className="form-field">
-                  <label>{t(i18n.introDesc)}</label>
-                  <textarea rows={3} value={item.introDesc || ''} onChange={e => updateSection(index, 'introDesc', e.target.value)} />
-                </div>
-
-                <div className="form-field">
-                  <label>{t(i18n.buttonText)}</label>
-                  <textarea rows={1} value={item.buttonText || ''} onChange={e => updateSection(index, 'buttonText', e.target.value)} />
-                </div>
-
-                <div className="form-field">
-                  <RelationshipPicker
-                    label={t(i18n.relatedTag)}
-                    relationTo="blog-tags"
-                    value={item.tag}
-                    onChange={val => updateSection(index, 'tag', val)}
-                  />
-                </div>
-              </div>
-            </div>
-          ))
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={items.map((_, i) => `section-${i}`)}
+              strategy={verticalListSortingStrategy}
+            >
+              {items.map((item, index) => (
+                <SortableSectionItem
+                  key={`section-${activeLocale}-${index}`}
+                  id={`section-${index}`}
+                  index={index}
+                  item={item}
+                  activeLocale={activeLocale}
+                  updateSection={updateSection}
+                  removeSection={removeSection}
+                  t={t}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
         )}
       </div>
 
       <div className="footer-actions">
-        <button type="button" className="add-btn" onClick={addSection}>{t(i18n.addSection)}</button>
+        <button type="button" className="add-btn" onClick={addSection}>
+          {t(i18n.addSection)}
+        </button>
         <p className="hint">{t(i18n.hint)}</p>
       </div>
     </div>
@@ -346,3 +504,4 @@ export const MultilingualKnowledgeSections: React.FC<any> = ({ path }) => {
 }
 
 export default MultilingualKnowledgeSections
+
