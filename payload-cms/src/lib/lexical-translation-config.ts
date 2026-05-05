@@ -75,9 +75,14 @@ export const LEXICAL_TRANSLATION_CONFIG: Record<string, FieldPath[]> = {
   // Application Carousel - no translatable fields for now
   // (applications are fetched by ID, their content is already localized in the applications collection)
 
-  // FormBlock and ReusableBlock are references, no translation needed
-  // 'formBlock': [],
-  // 'reusableBlock': [],
+  // Icon List
+  'iconList': [
+    { path: 'items', isArray: true },
+  ],
+  // FAQ Selection
+  'faqSelection': [
+    { path: 'categories', isArray: true },
+  ],
 }
 
 /**
@@ -88,7 +93,8 @@ export const ARRAY_ITEM_FIELDS: Record<string, string[]> = {
   'links': ['title'], // marqueeLinks
   'images': ['caption'], // image-gallery
   'slides': ['title', 'description', 'buttonText', 'caption'], // carousel
-  'items': ['buttonText', 'customName'], // productCarousel - buttonText and customName are translatable per item
+  'items': ['buttonText', 'customName', 'title', 'subtitle'], // productCarousel & iconList
+  'categories': ['category', 'cta.label'], // faqSelection
 }
 
 /**
@@ -106,6 +112,23 @@ export function getTranslatableFields(type: string): FieldPath[] {
 }
 
 /**
+ * Get/Set nested property using dot notation
+ */
+function getNestedProp(obj: any, path: string): any {
+  return path.split('.').reduce((prev, curr) => prev?.[curr], obj)
+}
+
+function setNestedProp(obj: any, path: string, value: any): void {
+  const keys = path.split('.')
+  const lastKey = keys.pop()!
+  const target = keys.reduce((prev, curr) => {
+    if (!prev[curr]) prev[curr] = {}
+    return prev[curr]
+  }, obj)
+  target[lastKey] = value
+}
+
+/**
  * Extract all translatable text from a custom feature node
  */
 export function extractTranslatableTexts(nodeType: string, nodeData: any): string[] {
@@ -120,8 +143,9 @@ export function extractTranslatableTexts(nodeType: string, nodeData: any): strin
         const itemFields = ARRAY_ITEM_FIELDS[field.path] || []
         for (const item of arrayData) {
           for (const itemField of itemFields) {
-            if (item[itemField] && typeof item[itemField] === 'string') {
-              texts.push(item[itemField])
+            const val = getNestedProp(item, itemField)
+            if (val && typeof val === 'string' && val.trim()) {
+              texts.push(val)
             }
           }
         }
@@ -129,7 +153,7 @@ export function extractTranslatableTexts(nodeType: string, nodeData: any): strin
     } else {
       // Handle simple fields
       const value = nodeData[field.path]
-      if (value && typeof value === 'string') {
+      if (value && typeof value === 'string' && value.trim()) {
         texts.push(value)
       }
     }
@@ -158,9 +182,10 @@ export function replaceTranslatableTexts(
         const itemFields = ARRAY_ITEM_FIELDS[field.path] || []
         for (const item of arrayData) {
           for (const itemField of itemFields) {
-            if (item[itemField] && typeof item[itemField] === 'string') {
+            const val = getNestedProp(item, itemField)
+            if (val && typeof val === 'string' && val.trim()) {
               if (textIndex < translatedTexts.length) {
-                item[itemField] = translatedTexts[textIndex]
+                setNestedProp(item, itemField, translatedTexts[textIndex])
                 textIndex++
               }
             }
@@ -170,7 +195,7 @@ export function replaceTranslatableTexts(
     } else {
       // Handle simple fields
       const value = newData[field.path]
-      if (value && typeof value === 'string') {
+      if (value && typeof value === 'string' && value.trim()) {
         if (textIndex < translatedTexts.length) {
           newData[field.path] = translatedTexts[textIndex]
           textIndex++

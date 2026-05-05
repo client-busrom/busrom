@@ -56,7 +56,7 @@ const DESKTOP_CONFIG = {
     height: 402, // SVG 原始高度
     bottom: 0, // 底部定位
     left: 0, // 左侧定位
-    imageScale: 1.1, // 图片缩放比例
+    imageScale: 1, // 图片缩放比例
     imageOffsetX: 0, // 图片水平偏移
     imageOffsetY: 0, // 图片垂直偏移
   },

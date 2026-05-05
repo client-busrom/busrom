@@ -34,6 +34,40 @@ interface TranslateRequest {
 }
 
 /**
+ * Match the casing style of the source text to the target text.
+ * Especially useful for Title Case or ALL CAPS preservation.
+ */
+function matchTextCasing(source: string, target: string): string {
+  if (!source || !target) return target
+
+  // 1. Check for ALL CAPS (exclude numbers/special chars)
+  const isAllCaps = source === source.toUpperCase() && source !== source.toLowerCase()
+  if (isAllCaps) return target.toUpperCase()
+
+  // 2. Check for Title Case
+  // We consider it Title Case if at least 60% of words start with a capital letter
+  const sourceWords = source.trim().split(/\s+/).filter(w => w.length > 0)
+  if (sourceWords.length === 0) return target
+
+  const capitalizedWords = sourceWords.filter(w => /^\p{Lu}/u.test(w))
+  const capitalizationRatio = capitalizedWords.length / sourceWords.length
+
+  // If first word is capitalized and ratio is high, apply Title Case to target
+  if (capitalizationRatio >= 0.6 && /^\p{Lu}/u.test(sourceWords[0])) {
+    return target
+      .split(/\s+/)
+      .map(word => {
+        if (word.length === 0) return word
+        // Capitalize first letter, keep rest as is to avoid breaking technical terms like "iPhone"
+        return word.charAt(0).toUpperCase() + word.slice(1)
+      })
+      .join(' ')
+  }
+
+  return target
+}
+
+/**
  * Google Translate API
  */
 async function translateWithGoogle(
@@ -262,7 +296,9 @@ export const translateHandler: PayloadHandler = async (req) => {
             translatedText = sourceText
           }
 
-          translatedTexts.push(translatedText)
+          // Use casing preservation if it's not rich text or if it doesn't look like HTML
+          const shouldMatchCasing = !isRichText || !translatedText.includes('<')
+          translatedTexts.push(shouldMatchCasing ? matchTextCasing(sourceText, translatedText) : translatedText)
         } catch (error) {
           payload.logger.error(`Translation failed for text ${i}:`, error)
           errors.push(`Text ${i}: ${error instanceof Error ? error.message : 'Unknown error'}`)
@@ -303,7 +339,9 @@ export const translateHandler: PayloadHandler = async (req) => {
           translatedText = text
         }
 
-        translations[lang] = translatedText
+        // Use casing preservation if it's not rich text or if it doesn't look like HTML
+        const shouldMatchCasing = !isRichText || !translatedText.includes('<')
+        translations[lang] = shouldMatchCasing ? matchTextCasing(text, translatedText) : translatedText
       } catch (error) {
         payload.logger.error(`Translation failed for ${lang}:`, error)
         errors[lang] = error instanceof Error ? error.message : 'Unknown error'
