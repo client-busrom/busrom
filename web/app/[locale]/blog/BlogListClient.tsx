@@ -98,40 +98,44 @@ export function BlogListClient({
       config.sectionsData[locale] || config.sectionsData["en"] || [];
     if (Array.isArray(config.sectionsData)) rawSections = config.sectionsData;
 
-    return (rawSections as any[]).map((section, idx) => {
-      // 1. Resolve Template (Auto-fix for Template 1 if None)
-      let template = section.template;
-      if (
-        !template &&
-        (idx === 0 || section.tagTitle?.toLowerCase().includes("latest"))
-      ) {
-        template = "template1";
-      }
+    return (rawSections as any[])
+      .filter((s) => !!s) // Remove any null/undefined holes
+      .map((section, idx) => {
+        if (!section) return null;
+        // 1. Resolve Template (Auto-fix for Template 1 if None)
+        let template = section.template;
+        if (
+          !template &&
+          (idx === 0 || section.tagTitle?.toLowerCase().includes("latest"))
+        ) {
+          template = "template1";
+        }
 
-      // 2. Resolve Items (If items empty, filter from pool by tag ID)
-      let items = section.items || [];
-      if ((!items || items.length === 0) && section.tag) {
-        const tagId =
-          typeof section.tag === "object" ? section.tag.id : section.tag;
-        items = articlePool.filter((post: any) => {
-          return post.tags?.some(
-            (t: any) => (typeof t === "object" ? t.id : t) === tagId,
-          );
-        });
-      }
+        // 2. Resolve Items (If items empty, filter from pool by tag ID)
+        let items = section.items || [];
+        if ((!items || items.length === 0) && section.tag) {
+          const tagId =
+            typeof section.tag === "object" ? section.tag.id : section.tag;
+          items = articlePool.filter((post: any) => {
+            return post.tags?.some(
+              (t: any) => (typeof t === "object" ? t.id : t) === tagId,
+            );
+          });
+        }
 
-      // Also support direct template names like "Template 1"
-      if (template?.toLowerCase().includes("1")) template = "template1";
-      if (template?.toLowerCase().includes("2")) template = "template2";
-      if (template?.toLowerCase().includes("3")) template = "template3";
-      if (template?.toLowerCase().includes("4")) template = "template4";
+        // Also support direct template names like "Template 1"
+        if (template?.toLowerCase().includes("1")) template = "template1";
+        if (template?.toLowerCase().includes("2")) template = "template2";
+        if (template?.toLowerCase().includes("3")) template = "template3";
+        if (template?.toLowerCase().includes("4")) template = "template4";
 
-      return {
-        ...section,
-        template,
-        items: items.length > 0 ? items : blogs.slice(0, 4), // Fallback to latest blogs if still empty
-      };
-    });
+        return {
+          ...section,
+          template,
+          items: items.length > 0 ? items : blogs.slice(0, 4), // Fallback to latest blogs if still empty
+        };
+      })
+      .filter((s) => !!s); // Final safety filter
   }, [config?.sectionsData, locale, articlePool, blogs]);
 
   const hero = {

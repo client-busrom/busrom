@@ -282,9 +282,18 @@ export const MultilingualKnowledgeSections: React.FC<any> = ({ path }) => {
       const oldIndex = items.findIndex((_, i) => `section-${i}` === active.id)
       const newIndex = items.findIndex((_, i) => `section-${i}` === over?.id)
 
+      if (oldIndex === -1 || newIndex === -1) return
+
       localeCodes.forEach((locale) => {
-        if (newValue[locale]) {
-          newValue[locale] = arrayMove(newValue[locale], oldIndex, newIndex)
+        if (newValue[locale] && Array.isArray(newValue[locale])) {
+          const currentArray = [...newValue[locale]].filter(Boolean) // Cleanup any existing nulls
+          if (oldIndex < currentArray.length && newIndex < currentArray.length) {
+            newValue[locale] = arrayMove(currentArray, oldIndex, newIndex)
+          } else {
+            // If out of bounds, we might need a different strategy, 
+            // but for now let's just skip to prevent inserting undefined.
+            newValue[locale] = currentArray
+          }
         }
       })
       setValue(newValue)
