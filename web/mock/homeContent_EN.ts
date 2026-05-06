@@ -410,8 +410,8 @@ export const homeContent_EN: HomeContentData = {
     {
       title: 'Sliding Door Kit',
       features: [
-        'Silent Soft-\nClose Sliding Door Kit',
-        'For Silent Glide & Perfect Divide',
+        'Silent Soft-\nClose Sliding \nDoor Kit',
+        'For Silent Glide \n& Perfect Divide',
         'Space Saving',
         'Durable Pulley',
         'Silent Slide',
@@ -426,7 +426,7 @@ export const homeContent_EN: HomeContentData = {
     {
       title: 'Bathroom & Door Handle',
       features: [
-        'Opulent Simplicity Bathroom \n & Door Handle',
+        'Opulent \nSimplicity \nBathroom \n& Door Handle',
         'Turn Every Touch Into Elegance',
         'All-Weather Design',
         'High Strength & Hardness',
@@ -442,8 +442,8 @@ export const homeContent_EN: HomeContentData = {
     {
       title: 'Hidden Hook',
       features: [
-        'Elegant \n Streamlined \n Hidden Hook',
-        'Hidden Mounting & Strong Load-Bearing',
+        'Elegant \nStreamlined \nHidden Hook',
+        'Hidden Mounting \n& Strong Load-Bearing',
         'Removable Design',
         'Quick Setup',
         'Invisible Storage',

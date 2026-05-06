@@ -2,7 +2,6 @@
 import type { FC } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
-import { getCropStyles, getCropImageUrl, getObjectPosition } from "@/lib/utils";
 import { ServerImage } from "@/components/ui/ServerImage";
 
 // 处理换行符：支持 /n 和 \n
@@ -17,420 +16,285 @@ type BannerProps = {
 };
 
 // --- 响应式尺寸函数 ---
-// --rpx: 按宽度缩放（图片遮罩等需要精确对齐的元素）
-// --rpx-hero: 按 min(宽度, 高度) 缩放，有最小值防止过度缩小
 const rpx = (designValue: number) => `calc(var(--rpx) * ${designValue})`;
-const rpxHero = (designValue: number) =>
-  `calc(var(--rpx-hero) * ${designValue})`;
-// 用于内容元素，确保在小屏幕上不会重叠
-const rpxContent = rpxHero;
 
-// --- 遮罩和图片配置 (基于 Figma 设计稿 1920x1080) ---
-// 右侧主图遮罩 (hero-banner-6-1.svg)
-const MASK_1_CONFIG = {
-  width: 1094, // 遮罩宽度
-  height: 1289, // 遮罩高度 (SVG viewBox 高度)
-  left: 826, // 1920 - 1094 = 826，贴右边
-  top: 0, // 贴顶部
-  // 图片配置
-  imageScale: 1,
-  imagePositionX: 50,
-  imagePositionY: 50,
-  useCMSFocalPoint: true,
-};
-
-// 左侧模糊图遮罩 (hero-banner-6-2.svg)
-const MASK_2_CONFIG = {
-  width: 1162, // SVG 实际宽度
-  height: 2026, // SVG 实际高度
-  left: -5, // 贴左边
-  top: -10, // 贴顶部
-  // 图片配置
-  imageScale: 0.8,
-  imageOffsetX: 0, // 图片水平偏移 (px)
-  imageOffsetY: 0, // 图片垂直偏移 (px)
-  imagePositionX: 50,
-  imagePositionY: 50,
-  useCMSFocalPoint: true,
-  // 模糊效果 (CSS filter)
-  blur: 7, // 模糊程度 (px)
-  opacity: 0.85, // 透明度 (提高以减少黄色背景透出)
-};
-
-// 左上角小圆装饰
-const ELLIPSE_CONFIG = {
-  left: 29, // x 坐标
-  top: -33, // y 坐标 (负值表示超出顶部)
-  size: 85, // 直径
-  color: "#FFFAD3", // 颜色 rgb(1, 0.98, 0.83) ≈ #FFFAD3
-};
-
-// 左侧内容配置 (基于 Figma 设计稿)
-const CONTENT_CONFIG = {
-  // 整体容器
-  left: 118,
-  top: 86,
-  // 顶部标语胶囊 (渐变背景，左边方角右边圆角)
-  tagline: {
-    top: 84,
-    width: 700,
-    height: 122,
-    fontSize: 40,
-    borderRadius: 61, // 只有右边圆角
+// --- 资产配置 (基于 1920x922 画布，中心点 960, 461) ---
+const BANNER_6_ASSETS = {
+  bgColor: "#FFEECA",
+  // 左侧异形图 (6-1)
+  imageLeft: {
+    src: "/home/hero-banner/banner-6/hero-banner-6-1-image.svg",
+    width: 1253,
+    height: 922,
+    dx: 0,
+    dy: 0,
+    opacity: 0.85,
+    blur: 7,
   },
-  // 主标题
-  title: {
-    line1Top: 220, // "Curated"
-    line2Top: 340, // "Details"
-    line3Top: 450, // "Glass Hinge"
-    fontSize: 96,
-    lineHeight: 107,
+  // 右侧异形图 (6-2)
+  imageRight: {
+    src: "/home/hero-banner/banner-6/hero-banner-6-2-image.svg",
+    width: 957,
+    height: 1121,
+    dx: 0,
+    dy: 0,
   },
-  // 底部 Feature 条 (旋转后需要调整位置)
-  features: {
-    width: 740,
-    height: 107,
-    borderRadius: 71,
-    fontSize: 40,
-    rotation: -60, // 逆时针旋转60度
-    // 三个条的左边距 (旋转后的实际位置)
-    lefts: [-200, -23, 154],
-    // 三个条的底部距离 (旋转后需要更大的值才能在屏幕内)
-    bottoms: [100, 100, 100],
+  // 左上角装饰圆
+  decorator: {
+    width: 85,
+    height: 85,
+    dx: -888.5,
+    dy: -456.5,
+    color: "#FFFAD3",
+  },
+  // 副标题胶囊背景
+  subtitleBg: {
+    width: 704,
+    height: 120,
+    dx: -607,
+    dy: -318,
+  },
+  // 标题组位置
+  titleGroup: {
+    dx: -450,
+    dy: -50,
   },
 };
 
-// --- HeroBanner6 组件 ---
 const HeroBanner6: FC<BannerProps> = ({ data }) => {
-  // --- 拆分标题 (支持三行: Curated / Details Glass / Hinge) ---
-  // 使用 formatText 统一处理换行符
-  const fullFeatureTitle = formatText(data.features[0]);
-  const lines = fullFeatureTitle.split("\n");
-  const titleLine1 = lines[0] || ""; // "Curated"
-  const titleLine2 = lines[1] || ""; // "Details Glass"
-  const titleLine3 = lines[2] || ""; // "Hinge"
-
-  // --- 计算图片位置 ---
-  const image1Position =
-    MASK_1_CONFIG.useCMSFocalPoint && data.images[0]?.cropFocalPoint
-      ? `${data.images[0].cropFocalPoint.x}% ${data.images[0].cropFocalPoint.y}%`
-      : `${MASK_1_CONFIG.imagePositionX}% ${MASK_1_CONFIG.imagePositionY}%`;
-
-  const image2Position =
-    MASK_2_CONFIG.useCMSFocalPoint && data.images[1]?.cropFocalPoint
-      ? `${data.images[1].cropFocalPoint.x}% ${data.images[1].cropFocalPoint.y}%`
-      : `${MASK_2_CONFIG.imagePositionX}% ${MASK_2_CONFIG.imagePositionY}%`;
+  // 解析标题
+  const titleParts = formatText(data.features[0])
+    .split("\n")
+    .map((s) => s.trim())
+    .filter(Boolean);
 
   return (
-    <section className="relative w-full h-full min-h-[700px] overflow-hidden font-sans">
-      {/* z-0: 底色背景 */}
-      <div className="absolute inset-0 z-0 bg-[#FFEECA]" />
+    <section className="relative w-full h-full min-h-[600px] overflow-hidden bg-[#FFEECA] font-sans">
+      {/* 1. PC 端布局 (中心锚定引擎) */}
+      <div className="hidden lg:block absolute inset-0 pointer-events-none">
+        <div className="absolute left-1/2 top-1/2 w-full h-full -translate-x-1/2 -translate-y-1/2">
+          {/* 左上角装饰圆 */}
+          <div
+            className="absolute left-1/2 top-1/2 rounded-full z-10"
+            style={{
+              width: rpx(BANNER_6_ASSETS.decorator.width),
+              height: rpx(BANNER_6_ASSETS.decorator.height),
+              backgroundColor: BANNER_6_ASSETS.decorator.color,
+              transform: `translate(calc(-50% + ${rpx(BANNER_6_ASSETS.decorator.dx)}), calc(-50% + ${rpx(BANNER_6_ASSETS.decorator.dy)}))`,
+            }}
+          />
 
-      {/* z-[15]: 左上角小圆装饰 */}
-      <div
-        className="absolute rounded-full z-[15]"
-        style={{
-          left: rpx(ELLIPSE_CONFIG.left),
-          top: rpx(ELLIPSE_CONFIG.top),
-          width: rpx(ELLIPSE_CONFIG.size),
-          height: rpx(ELLIPSE_CONFIG.size),
-          backgroundColor: ELLIPSE_CONFIG.color,
-        }}
-      />
-
-      {/* z-5: 左侧模糊图 (hero-banner-6-2.svg) */}
-      <div
-        className="absolute z-[5]"
-        style={{
-          left: rpx(MASK_2_CONFIG.left),
-          top: rpx(MASK_2_CONFIG.top),
-          width: rpx(MASK_2_CONFIG.width),
-          height: rpx(MASK_2_CONFIG.height),
-          opacity: MASK_2_CONFIG.opacity,
-          maskImage: "url(/hero-banner-6-2.svg)",
-          WebkitMaskImage: "url(/hero-banner-6-2.svg)",
-          maskSize: "100% 100%",
-          WebkitMaskSize: "100% 100%",
-          maskRepeat: "no-repeat",
-          WebkitMaskRepeat: "no-repeat",
-        }}
-      >
-        {/* 白色底色 */}
-        <div className="absolute inset-0 bg-white" />
-        {/* 模糊图片 */}
-        <div
-          className="relative w-full h-full"
-          style={{
-            filter: `blur(${MASK_2_CONFIG.blur}px)`,
-            transform: `translate(${MASK_2_CONFIG.imageOffsetX}px, ${MASK_2_CONFIG.imageOffsetY}px)`,
-          }}
-        >
-          {(() => {
-            const cropData = data.imageCropDataList?.[1];
-            const cropStyles = getCropStyles(cropData);
-            if (cropStyles && cropData && cropData.croppedAreaPixels) {
-              return (
-                <div
-                  className="absolute inset-0 w-full h-full"
-                  style={{
-                    ...cropStyles.container,
-                    width: "100%",
-                    height: "100%",
-                  }}
-                >
-                  <img
-                    src={getCropImageUrl(data.images[1], cropData)}
-                    alt="模糊背景图"
-                    style={{
-                      ...cropStyles.image,
-                      width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
-                      height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
-                      left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
-                      top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
-                      maxWidth: "none",
-                    }}
-                  />
-                </div>
-              );
-            }
-            return (
+          {/* 左侧模糊背景异形图 (6-1) */}
+          <div
+            className="absolute left-0 top-0 z-0"
+            style={{
+              width: rpx(BANNER_6_ASSETS.imageLeft.width),
+              height: rpx(BANNER_6_ASSETS.imageLeft.height),
+              opacity: BANNER_6_ASSETS.imageLeft.opacity,
+              maskImage: `url(${BANNER_6_ASSETS.imageLeft.src})`,
+              WebkitMaskImage: `url(${BANNER_6_ASSETS.imageLeft.src})`,
+              maskSize: "100% 100%",
+              WebkitMaskSize: "100% 100%",
+              maskRepeat: "no-repeat",
+              WebkitMaskRepeat: "no-repeat",
+            }}
+          >
+            <div className="w-full h-full bg-white blur-[10px]">
               <ServerImage
-                image={data.images[1]}
-                alt="模糊背景图"
+                image={data.images[1] || data.images[0]}
+                alt=""
+                fill
                 size="medium"
-                fill
-                className="absolute inset-0 w-full h-full object-cover"
-                priority
+                className="object-cover opacity-60"
               />
-            );
-          })()}
-        </div>
-      </div>
+            </div>
+          </div>
 
-      {/* z-10: 右侧主图 (hero-banner-6-1.svg) */}
-      <div
-        className="absolute z-10"
-        style={{
-          left: rpx(MASK_1_CONFIG.left),
-          top: rpx(MASK_1_CONFIG.top),
-          width: rpx(MASK_1_CONFIG.width),
-          height: rpx(MASK_1_CONFIG.height),
-          maskImage: "url(/hero-banner-6-1.svg)",
-          WebkitMaskImage: "url(/hero-banner-6-1.svg)",
-          maskSize: "100% 100%",
-          WebkitMaskSize: "100% 100%",
-          maskRepeat: "no-repeat",
-          WebkitMaskRepeat: "no-repeat",
-        }}
-      >
-        <div
-          className="w-full h-full"
-          style={{
-            transform: `scale(${MASK_1_CONFIG.imageScale})`,
-            transformOrigin: image1Position,
-          }}
-        >
-          {(() => {
-            const cropData = data.imageCropDataList?.[0];
-            const cropStyles = getCropStyles(cropData);
-            if (cropStyles && cropData && cropData.croppedAreaPixels) {
-              return (
-                <div
-                  className="absolute inset-0 w-full h-full"
-                  style={{
-                    ...cropStyles.container,
-                    width: "100%",
-                    height: "100%",
-                  }}
-                >
-                  <img
-                    src={getCropImageUrl(data.images[0], cropData)}
-                    alt="主图"
-                    style={{
-                      ...cropStyles.image,
-                      width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
-                      height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
-                      left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
-                      top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
-                      maxWidth: "none",
-                    }}
-                  />
-                </div>
-              );
-            }
-            return (
-              <ServerImage
-                image={data.images[0]}
-                alt="主图"
-                size="large"
-                fill
-                className="absolute inset-0 w-full h-full object-cover"
-                objectPosition={image1Position}
-                priority
-              />
-            );
-          })()}
-        </div>
-      </div>
-
-      {/* z-20: 桌面端内容 (lg及以上) */}
-      <div className="hidden lg:block relative z-20 h-full">
-        {/* 顶部标语胶囊 - 渐变背景从白到橙，左边方角右边圆角 */}
-        <div
-          className="absolute flex items-start justify-end"
-          style={{
-            left: 0,
-            top: rpxContent(CONTENT_CONFIG.tagline.top),
-            width: rpxContent(CONTENT_CONFIG.tagline.width),
-            height: rpxContent(CONTENT_CONFIG.tagline.height),
-            paddingRight: rpxContent(40),
-            paddingTop: `calc(${rpxContent(CONTENT_CONFIG.tagline.height)} / 3)`,
-            background: "linear-gradient(to left, #FFFFFF, #FFDE95)",
-            borderRadius: `0 ${rpxContent(CONTENT_CONFIG.tagline.borderRadius)} ${rpxContent(CONTENT_CONFIG.tagline.borderRadius)} 0`,
-          }}
-        >
-          <p
-            className="font-arial font-bold italic text-[#754600] whitespace-pre-line"
+          {/* 右侧主展示异形图 (6-2) */}
+          <div
+            className="absolute right-0 top-0 z-20"
             style={{
-              fontSize: rpxContent(CONTENT_CONFIG.tagline.fontSize),
-              letterSpacing: "0.05em",
+              width: rpx(BANNER_6_ASSETS.imageRight.width),
+              height: rpx(BANNER_6_ASSETS.imageRight.height),
+              maskImage: `url(${BANNER_6_ASSETS.imageRight.src})`,
+              WebkitMaskImage: `url(${BANNER_6_ASSETS.imageRight.src})`,
+              maskSize: "100% 100%",
+              WebkitMaskSize: "100% 100%",
+              maskRepeat: "no-repeat",
+              WebkitMaskRepeat: "no-repeat",
             }}
           >
-            {formatText(data.features[1])}
-          </p>
-        </div>
+            <ServerImage
+              image={data.images[0]}
+              alt=""
+              fill
+              size="large"
+              className="object-cover"
+              priority
+            />
+          </div>
 
-        {/* 主标题第一行 - "Curated" 白色 + #443D05 描边 */}
-        <h1
-          className="absolute font-poller-one font-regluar text-white antialiased"
-          style={{
-            left: rpxContent(CONTENT_CONFIG.left),
-            top: rpxContent(CONTENT_CONFIG.title.line1Top),
-            fontSize: rpxContent(CONTENT_CONFIG.title.fontSize),
-            lineHeight: `${rpxContent(CONTENT_CONFIG.title.lineHeight)}`,
-            WebkitTextStroke: `${rpx(10)} #443D05`,
-            paintOrder: "stroke fill",
-          }}
-        >
-          {titleLine1}
-        </h1>
-
-        {/* 主标题第二行 - "Details" #322E0B + #FDF6C2 描边 */}
-        <h1
-          className="absolute font-poller-one font-regluar text-[#322E0B] antialiased"
-          style={{
-            left: rpxContent(CONTENT_CONFIG.left),
-            top: rpxContent(CONTENT_CONFIG.title.line2Top),
-            fontSize: rpxContent(CONTENT_CONFIG.title.fontSize),
-            lineHeight: `${rpxContent(CONTENT_CONFIG.title.lineHeight)}`,
-            WebkitTextStroke: `${rpx(6)} #FDF6C2`,
-            paintOrder: "stroke fill",
-          }}
-        >
-          {titleLine2}
-        </h1>
-
-        {/* 主标题第三行 - "Glass Hinge" #322E0B + #FDF6C2 描边 */}
-        {titleLine3 && (
-          <h1
-            className="absolute font-poller-one font-extrabold text-[#322E0B] antialiased"
+          {/* 副标题区域 (背景框 + 文字) */}
+          <div
+            className="absolute left-1/2 top-1/2 z-30 opacity-80"
             style={{
-              left: rpxContent(CONTENT_CONFIG.left),
-              top: rpxContent(CONTENT_CONFIG.title.line3Top),
-              fontSize: rpxContent(CONTENT_CONFIG.title.fontSize),
-              lineHeight: `${rpxContent(CONTENT_CONFIG.title.lineHeight)}`,
-              WebkitTextStroke: `${rpx(8)} #FDF6C2`,
-              paintOrder: "stroke fill",
+              width: rpx(BANNER_6_ASSETS.subtitleBg.width),
+              height: rpx(BANNER_6_ASSETS.subtitleBg.height),
+              background: "linear-gradient(270deg, #FFFFFF 0%, #FFDE95 100%)",
+              borderRadius: `0 ${rpx(61)} ${rpx(61)} 0`,
+              transform: `translate(calc(-50% + ${rpx(BANNER_6_ASSETS.subtitleBg.dx)}), calc(-50% + ${rpx(BANNER_6_ASSETS.subtitleBg.dy)}))`,
             }}
           >
-            {titleLine3}
-          </h1>
-        )}
-
-        {/* 底部三个旋转的 Feature 条 */}
-        {[data.features[2], data.features[3], data.features[4]].map(
-          (feature, index) => (
-            <div
-              key={index}
-              className="absolute flex items-center justify-end bg-[#756F3F]"
+            <p
+              className="absolute font-arial font-bold italic text-[#754600] whitespace-nowrap"
               style={{
-                left: rpxContent(CONTENT_CONFIG.features.lefts[index]),
-                bottom: rpxContent(CONTENT_CONFIG.features.bottoms[index]),
-                width: rpxContent(CONTENT_CONFIG.features.width),
-                height: rpxContent(CONTENT_CONFIG.features.height),
-                borderRadius: rpxContent(CONTENT_CONFIG.features.borderRadius),
-                transform: `rotate(${CONTENT_CONFIG.features.rotation}deg)`,
-                transformOrigin: "center center",
+                fontSize: rpx(36),
+                letterSpacing: "1.8px",
+                right: rpx(80), // 相对于背景框 x:1 的偏移
+                top: "50%",
+                lineHeight: 0.6,
               }}
             >
-              <span
-                className="font-montserrat font-bold text-[#FFF5AD]"
-                style={{
-                  fontSize: rpxContent(CONTENT_CONFIG.features.fontSize),
-                  paddingRight: rpxContent(40),
-                }}
-              >
-                {feature}
-              </span>
-            </div>
-          ),
-        )}
-      </div>
+              {formatText(data.features[1])}
+            </p>
+          </div>
 
-      {/* z-20: 移动端内容 (lg以下) */}
-      <div className="lg:hidden relative z-20 h-full flex flex-col justify-center px-6">
-        {/* 顶部标语胶囊 */}
-        <div
-          className="flex items-center justify-end rounded-full px-4 py-2 mb-4 self-start"
-          style={{ background: "linear-gradient(to left, #FFFFFF, #FFDE95)" }}
-        >
-          <p
-            className="font-arial font-bold italic text-[#754600] text-sm whitespace-pre-line"
-            style={{ letterSpacing: "0.05em" }}
-          >
-            {formatText(data.features[1])}
-          </p>
-        </div>
-
-        {/* 主标题 */}
-        <h1
-          className="font-poller-one text-white text-4xl sm:text-5xl mb-1 antialiased"
-          style={{ WebkitTextStroke: "2px #443D05", paintOrder: "stroke fill" }}
-        >
-          {titleLine1}
-        </h1>
-        <h1
-          className="font-poller-one text-[#322E0B] text-4xl sm:text-5xl mb-1 antialiased"
-          style={{ WebkitTextStroke: "2px #FDF6C2", paintOrder: "stroke fill" }}
-        >
-          {titleLine2}
-        </h1>
-        {titleLine3 && (
-          <h1
-            className="font-poller-one text-[#322E0B] text-4xl sm:text-5xl mb-8 antialiased"
+          {/* 主标题文字内容区域 */}
+          <div
+            className="absolute left-1/2 top-1/2 z-40 flex flex-col pointer-events-auto items-start"
             style={{
-              WebkitTextStroke: "2px #FDF6C2",
-              paintOrder: "stroke fill",
+              transform: `translate(calc(-50% + ${rpx(BANNER_6_ASSETS.titleGroup.dx)}), calc(-50% + ${rpx(BANNER_6_ASSETS.titleGroup.dy)}))`,
             }}
           >
-            {titleLine3}
-          </h1>
-        )}
+            {/* 主标题 (阶梯样式) */}
+            <div className="flex flex-col gap-4">
+              {titleParts.map((line, idx) => {
+                const isFirst = idx === 0;
 
-        {/* Feature 列表 - 移动端垂直排列，不旋转 */}
-        <div className="flex flex-col gap-3">
-          {[data.features[2], data.features[3], data.features[4]].map(
-            (feature, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-center bg-[#756F3F] rounded-full px-6 py-3"
-              >
-                <span className="font-pingfang font-semibold text-[#FFF5AD] text-sm">
-                  {feature}
-                </span>
-              </div>
-            ),
-          )}
+                // 默认配置 (后续行)
+                let fontSize = 96;
+                let textColor = "#332E0B";
+                let strokeColor = "#FDF6C2";
+                let strokeWidth = 3;
+
+                // 第一行特殊配置
+                if (isFirst) {
+                  fontSize = 96;
+                  textColor = "#FFFFFF";
+                  strokeColor = "#443D05";
+                  strokeWidth = 5;
+                }
+
+                return (
+                  <h1
+                    key={idx}
+                    className="font-poller-one leading-none"
+                    style={{
+                      fontSize: rpx(fontSize),
+                      color: textColor,
+                      WebkitTextStroke: `${rpx(strokeWidth)} ${strokeColor}`,
+                      paintOrder: "stroke fill",
+                    }}
+                  >
+                    {line}
+                  </h1>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 底部三个特性按钮 */}
+          <div
+            className="absolute left-[360px] bottom-0 z-50 pointer-events-auto"
+            style={{
+              transform: `translate(calc(-50% + ${rpx(-510)}), calc(-50% + ${rpx(280)}))`,
+            }}
+          >
+            <div className="relative">
+              {[data.features[2], data.features[3], data.features[4]].map(
+                (feature, index) => (
+                  <div
+                    key={index}
+                    className="absolute flex items-center justify-end bg-[#756F3F]"
+                    style={{
+                      left: rpx([0, 180, 360][index]),
+                      top: rpx([0, 0, 0][index]),
+                      width: rpx(740),
+                      height: rpx(100),
+                      borderRadius: rpx(71),
+                      transform: `rotate(-60deg)`,
+                      transformOrigin: "left center",
+                    }}
+                  >
+                    <span
+                      className="font-montserrat font-bold text-[#FFF5AD] pr-10"
+                      style={{ fontSize: rpx(24) }}
+                    >
+                      {feature}
+                    </span>
+                  </div>
+                ),
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. 移动端/平板端布局 */}
+      <div className="lg:hidden absolute inset-0 z-30 overflow-hidden flex flex-col pt-10">
+        <div className="relative w-full h-[40%]">
+          <ServerImage
+            image={data.images[0]}
+            alt=""
+            fill
+            className="object-contain"
+          />
+        </div>
+
+        <div className="flex-1 flex flex-col items-center justify-start px-6 text-center gap-6 mt-10">
+          <p className="font-arial font-bold italic text-[#754600] text-lg bg-white/80 px-6 py-2 rounded-full">
+            {formatText(data.features[1])}
+          </p>
+
+          <div className="flex flex-col items-center gap-2">
+            {titleParts.map((line, idx) => {
+              const isFirst = idx === 0;
+
+              // 移动端/平板端 样式配置
+              let fontSize = isFirst ? 36 : 48; // 第一行稍小，后续行稍大
+              let textColor = isFirst ? "#FFFFFF" : "#332E0B";
+              let strokeColor = isFirst ? "#443D05" : "#FDF6C2";
+              let strokeWidth = isFirst ? 2 : 1.5; // 移动端描边减薄
+
+              return (
+                <h1
+                  key={idx}
+                  className="font-poller-one text-center leading-tight"
+                  style={{
+                    fontSize: `${fontSize}px`,
+                    color: textColor,
+                    WebkitTextStroke: `${strokeWidth}px ${strokeColor}`,
+                    paintOrder: "stroke fill",
+                  }}
+                >
+                  {line}
+                </h1>
+              );
+            })}
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-2">
+            {[data.features[2], data.features[3], data.features[4]].map(
+              (f, i) => (
+                <div
+                  key={i}
+                  className="bg-[#756F3F] text-[#FFF5AD] px-4 py-2 rounded-full text-xs font-bold"
+                >
+                  {f}
+                </div>
+              ),
+            )}
+          </div>
         </div>
       </div>
     </section>
