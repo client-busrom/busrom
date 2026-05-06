@@ -493,20 +493,7 @@ export function ApplicationContactFormSection({
         paddingBottom: "154px",
       }}
     >
-      <style jsx global>{`
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        input:-webkit-autofill:active,
-        textarea:-webkit-autofill,
-        textarea:-webkit-autofill:hover,
-        textarea:-webkit-autofill:focus,
-        textarea:-webkit-autofill:active {
-          -webkit-text-fill-color: white !important;
-          -webkit-box-shadow: 0 0 0px 1000px #34311c inset !important;
-          transition: background-color 9999s ease-in-out 0s !important;
-        }
-      `}</style>
+
       <div className="absolute inset-0">
         {bgImage ? (
           <img
@@ -537,7 +524,7 @@ export function ApplicationContactFormSection({
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         className={cn(
-          "relative z-10 flex backdrop-blur-[15px] mx-auto",
+          "relative z-10 flex backdrop-blur-[15px] mx-auto autofill-muted",
           isMobile ? "flex-col mt-[40px]" : "flex-row items-stretch mt-[60px]",
         )}
         style={{

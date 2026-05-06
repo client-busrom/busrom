@@ -564,41 +564,12 @@
     }
 
     @keyframes label-pulse {
-
-      0%,
-      100% {
+      0%, 100% {
         box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 255, 255, 0.05);
       }
-
       50% {
         box-shadow: 0 0 25px rgba(0, 255, 255, 0.5), inset 0 0 15px rgba(0, 255, 255, 0.1);
       }
-    }
-
-    /* 走马灯动画 - 使用 CSS 动画更省电 */
-    @keyframes carousel-scroll {
-      0% {
-        transform: translateX(0);
-      }
-
-      100% {
-        transform: translateX(-50%);
-      }
-    }
-
-    /* 桌面端走马灯 */
-    .animate-carousel-desktop {
-      animation: carousel-scroll 25s linear infinite;
-    }
-
-    /* 移动端走马灯 */
-    .animate-carousel-mobile {
-      animation: carousel-scroll 20s linear infinite;
-    }
-
-    /* 移动端产品走马灯 */
-    .animate-carousel-products {
-      animation: carousel-scroll 30s linear infinite;
     }
 
     /* 当元素不在视口内时暂停动画 (配合 IntersectionObserver 使用) */
@@ -607,7 +578,7 @@
     }
 
     /* ========== 浏览器自动填充样式修复 ========== */
-    /* 修复深色背景表单的autofill样式 */
+    /* 彻底修复所有输入框的 Chrome 自动填充背景色问题 */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus,
@@ -620,15 +591,32 @@
     select:-webkit-autofill:hover,
     select:-webkit-autofill:focus,
     select:-webkit-autofill:active {
+      /* 对于透明或背景图表单，默认使用透明阴影并配合超长延时防止颜色反弹 */
       -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
       -webkit-text-fill-color: inherit !important;
-      transition: background-color 5000s ease-in-out 0s;
-      background-color: transparent !important;
+      transition: background-color 5000s ease-in-out 0s !important;
     }
 
-    /* 深色背景表单专用 autofill 样式 */
+    /* 针对品牌特定背景色的实色阴影遮盖 */
     .bg-brand-secondary input:-webkit-autofill,
-    .bg-brand-secondary textarea:-webkit-autofill,
+    .bg-brand-secondary textarea:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0 1000px #756F3F inset !important;
+      -webkit-text-fill-color: white !important;
+    }
+
+    .bg-brand-form-bg input:-webkit-autofill,
+    .bg-brand-form-bg textarea:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0 1000px #BFB672 inset !important;
+      -webkit-text-fill-color: white !important;
+    }
+
+    /* 针对带透明度深色背景的表单修复 (如 Application 页面) */
+    .autofill-muted input:-webkit-autofill,
+    .autofill-muted textarea:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0 1000px #CBC9C0 inset !important;
+      -webkit-text-fill-color: white !important;
+    }
+
     [data-theme="dark"] input:-webkit-autofill,
     [data-theme="dark"] textarea:-webkit-autofill {
       -webkit-box-shadow: 0 0 0 1000px hsl(var(--secondary)) inset !important;

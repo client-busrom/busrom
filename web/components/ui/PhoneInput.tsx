@@ -122,6 +122,10 @@ interface PhoneInputProps {
   style?: React.CSSProperties
   inputStyle?: React.CSSProperties
   dialCodeStyle?: React.CSSProperties
+  autoComplete?: string
+  autoCorrect?: string
+  autoCapitalize?: string
+  spellCheck?: string | boolean
 }
 
 export const PhoneInput: React.FC<PhoneInputProps> = ({
@@ -145,6 +149,10 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   style,
   inputStyle,
   dialCodeStyle,
+  autoComplete,
+  autoCorrect,
+  autoCapitalize,
+  spellCheck,
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
@@ -289,7 +297,10 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
           value={phoneNumber}
           onChange={handlePhoneChange}
           placeholder={placeholder}
-          spellCheck="false"
+          autoComplete={autoComplete}
+          autoCorrect={autoCorrect}
+          autoCapitalize={autoCapitalize}
+          spellCheck={spellCheck as any}
           className={cn(
             "flex-1 min-w-0 px-4 md:px-6 lg:px-[0.8333vw] py-2.5 font-semibold text-base md:text-[24px] lg:text-[0.8333vw] h-full",
             !inputClassName?.includes('bg-') && "bg-white",

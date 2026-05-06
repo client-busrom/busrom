@@ -792,7 +792,7 @@ export function ContactFormSection({
                 value={formData.name || ""}
                 onChange={(e) => handleInputChange("name", e.target.value)}
                 spellCheck="false"
-                className="font-anaheim font-semibold placeholder:text-white/95"
+                className="font-anaheim font-semibold placeholder:text-white/95 contact-form-input"
                 style={{
                   width: isMobile ? "100%" : vw(486),
                   height: isMobile ? mvw(50) : vw(50),
@@ -813,7 +813,7 @@ export function ContactFormSection({
                 value={formData.email || ""}
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 spellCheck="false"
-                className="font-anaheim font-semibold placeholder:text-white/95"
+                className="font-anaheim font-semibold placeholder:text-white/95 contact-form-input"
                 style={{
                   width: isMobile ? "100%" : vw(486),
                   height: isMobile ? mvw(50) : vw(50),
@@ -842,7 +842,7 @@ export function ContactFormSection({
                   }}
                   buttonClassName="!bg-transparent !border-none hover:!bg-white/5"
                   inputClassName={cn(
-                    "!bg-transparent !text-white !placeholder-white/95 !font-anaheim !font-semibold !text-base",
+                    "!bg-transparent !text-white !placeholder-white/95 !font-anaheim !font-semibold !text-base contact-form-input",
                     isMobile ? "!pl-6" : "!pl-6",
                   )}
                   inputStyle={{
@@ -890,7 +890,7 @@ export function ContactFormSection({
                 value={formData.message || ""}
                 spellCheck="false"
                 onChange={(e) => handleInputChange("message", e.target.value)}
-                className="font-anaheim font-semibold placeholder:text-white/95 resize-y"
+                className="font-anaheim font-semibold placeholder:text-white/95 resize-y contact-form-input"
                 style={{
                   width: isMobile ? "100%" : vw(486),
                   minHeight: isMobile ? mvw(100) : vw(100),
@@ -1298,7 +1298,20 @@ export function ContactFormSection({
         </>
       )}
       <style jsx global>{`
-        /* Ensure text sizes match */
+        /* Ensure autofill styles match the design */
+        input.contact-form-input:-webkit-autofill,
+        input.contact-form-input:-webkit-autofill:hover,
+        input.contact-form-input:-webkit-autofill:focus,
+        input.contact-form-input:-webkit-autofill:active,
+        textarea.contact-form-input:-webkit-autofill,
+        textarea.contact-form-input:-webkit-autofill:hover,
+        textarea.contact-form-input:-webkit-autofill:focus,
+        textarea.contact-form-input:-webkit-autofill:active {
+          -webkit-text-fill-color: white !important;
+          -webkit-box-shadow: 0 0 0px 1000px #B4A25F inset !important;
+          transition: background-color 9999s ease-in-out 0s !important;
+        }
+
         .contact-form-input::placeholder {
           color: rgba(255, 255, 255, 0.95) !important;
         }

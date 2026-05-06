@@ -57,10 +57,14 @@ const formInputClasses = `
   autofill:bg-transparent autofill:text-white
   [&:-webkit-autofill]:bg-transparent
   [&:-webkit-autofill]:[-webkit-text-fill-color:white!important]
+  [&:-webkit-autofill]:[box-shadow:0_0_0_1000px_#BFB672_inset!important]
+  [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s!important]
   [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important]
+  [&:-webkit-autofill:hover]:[box-shadow:0_0_0_1000px_#BFB672_inset!important]
   [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important]
+  [&:-webkit-autofill:focus]:[box-shadow:0_0_0_1000px_#BFB672_inset!important]
   [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important]
-  [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]
+  [&:-webkit-autofill:active]:[box-shadow:0_0_0_1000px_#BFB672_inset!important]
 `;
 
 const formButtonClasses = `
@@ -546,6 +550,9 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       className={formInputClasses}
                       required={isFieldRequired("name", true)}
                       spellCheck="false"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
                     />
                   </div>
                   {/* Email */}
@@ -566,6 +573,9 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       className={formInputClasses}
                       required={isFieldRequired("email", true)}
                       spellCheck="false"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
                     />
                   </div>
                   {/* WhatsApp */}
@@ -586,10 +596,14 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       disabled={submitting}
                       className="!bg-transparent !border-0 !border-b !border-white !rounded-none !h-[45px]"
                       buttonClassName="!bg-transparent !border-0 !border-r !border-white/20 !text-white hover:!bg-white/5 !rounded-none !px-0 !mr-2"
-                      inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-bold !text-base [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                      inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-bold !text-base [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0_1000px_#BFB672_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s!important]"
                       dialCodeClassName="!text-white !text-base"
                       chevronClassName="!text-white"
                       containerClassName="mt-1"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck="false"
                     />
                   </div>
                   {/* Company */}
@@ -610,6 +624,9 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       className={formInputClasses}
                       required={isFieldRequired("company")}
                       spellCheck="false"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
                     />
                   </div>
                   {/* Message */}
@@ -629,6 +646,9 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       className={cn(formInputClasses, "min-h-[40px]")}
                       required={isFieldRequired("message")}
                       spellCheck="false"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
                     />
                   </div>
 

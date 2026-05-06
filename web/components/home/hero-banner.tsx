@@ -52,8 +52,8 @@ const lazyBanners: Record<
   9: () => import("@/components/HeroBanner/HeroBanner9"),
 };
 
-const AUTOPLAY_DELAY = 100000;
-const PRELOAD_BEFORE = 20000; // 提前 2 秒预加载下一个 Banner
+const AUTOPLAY_DELAY = 6000;
+const PRELOAD_BEFORE = 2000; // 提前 2 秒预加载下一个 Banner
 const MIN_HEIGHT = "min-h-[600px]";
 // 方案二核心：移动端 80dvh，桌面端 (xl) 减去 46px header
 const HEIGHT_CLASS = `h-[80dvh] xl:h-[calc(100dvh-46px)] ${MIN_HEIGHT}`;
@@ -80,33 +80,37 @@ export default function HeroBanner({
   const [progress, setProgress] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isMounted = useRef(true);
 
   // --- 关键：动态计算 --rpx-hero 比例系数 (基于 1920x922) ---
   useEffect(() => {
+    isMounted.current = true;
     const updateScale = () => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const availableHeight = vh - 46;
+      const el = sectionRef.current;
+      if (!el) return;
 
       // 1280px 以上必选桌面，768px-1280px 之间只要是横屏 (vw > vh) 就选桌面
       const isDesktopLayout = vw >= 1280 || (vw >= 768 && vw > vh);
 
       if (isDesktopLayout) {
-        // 计算缩放因子，将底线降低到 0.5，以完美适配 iPad (1024px) 等设备
         const rawScale = Math.min(vw / 1920, availableHeight / 922);
         const scale = Math.max(rawScale, 0.5);
-        document.documentElement.style.setProperty(
-          "--rpx-hero",
-          scale.toString(),
-        );
+        // 局部化：只设置在当前组件容器上，防止污染全局
+        el.style.setProperty("--rpx-hero", scale.toString());
       } else {
-        document.documentElement.style.setProperty("--rpx-hero", "1");
+        el.style.setProperty("--rpx-hero", "1");
       }
     };
 
     updateScale();
     window.addEventListener("resize", updateScale);
-    return () => window.removeEventListener("resize", updateScale);
+    return () => {
+      isMounted.current = false;
+      window.removeEventListener("resize", updateScale);
+    };
   }, []);
 
   // 已加载的 Banner 组件缓存（只有第1个直接可用）
@@ -135,6 +139,7 @@ export default function HeroBanner({
     loadedRef.current.add(bannerIndex);
 
     lazyBanners[bannerIndex]().then((module) => {
+      if (!isMounted.current) return;
       setLoadedBanners((prev) => ({
         ...prev,
         [bannerIndex]: module.default,

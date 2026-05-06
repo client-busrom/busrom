@@ -2276,33 +2276,145 @@
         },
         {
           "type": "group",
-          "id": "BwwTV",
-          "x": 435.00022422939435,
+          "id": "r2hTX",
+          "x": 435.00021677881375,
           "y": -210,
           "name": "image-box",
           "children": [
             {
-              "type": "rectangle",
-              "cornerRadius": 97,
-              "id": "vvbm4",
-              "x": 292.74220741123065,
+              "type": "group",
+              "id": "PIEeP",
+              "x": 0,
               "y": 745.484375,
               "name": "hero-banner-7-4",
-              "rotation": -45,
-              "fill": "#99935fff",
-              "width": 414,
-              "height": 414,
-              "stroke": {
-                "align": "outside",
-                "thickness": 30,
-                "fill": "#99935fff"
-              }
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 97,
+                  "id": "K7YsJI",
+                  "x": 292.74220741123065,
+                  "y": 0,
+                  "name": "hero-banner-7-4",
+                  "rotation": -45,
+                  "fill": "#99935fff",
+                  "width": 414,
+                  "height": 414,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 30,
+                    "fill": "#99935fff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 97,
+                  "id": "wcPxX",
+                  "x": 292.74220741123065,
+                  "y": 0,
+                  "name": "hero-banner-7-4-image",
+                  "rotation": -45,
+                  "fill": "#ffffffff",
+                  "width": 414,
+                  "height": 414,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 11,
+                    "fill": "#756f3fff"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "JQNx5",
+              "x": 352.0000271305978,
+              "y": 466,
+              "name": "hero-banner-7-3",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 88,
+                  "id": "jcobN",
+                  "x": 205.06096654409873,
+                  "y": 0,
+                  "name": "hero-banner-7-3",
+                  "rotation": -45,
+                  "fill": "#99935fff",
+                  "width": 290,
+                  "height": 290,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 20,
+                    "fill": "#99935fff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 88,
+                  "id": "OAi0G",
+                  "x": 205.06096654409873,
+                  "y": 0,
+                  "name": "hero-banner-7-3-image",
+                  "rotation": -45,
+                  "fill": "#ffffffff",
+                  "width": 290,
+                  "height": 290,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 11,
+                    "fill": "#756f3fff"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "m3M4Bg",
+              "x": 25.000030159950256,
+              "y": 0,
+              "name": "hero-banner-7-2",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 97,
+                  "id": "aHIlE",
+                  "x": 292.74220741123065,
+                  "y": 0,
+                  "name": "hero-banner-7-2",
+                  "rotation": -45,
+                  "fill": "#99935fff",
+                  "width": 414,
+                  "height": 414,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 30,
+                    "fill": "#99935fff"
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 97,
+                  "id": "hmK47",
+                  "x": 292.74220741123065,
+                  "y": 0,
+                  "name": "hero-banner-7-2-image",
+                  "rotation": -45,
+                  "fill": "#ffffffff",
+                  "width": 414,
+                  "height": 414,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 11,
+                    "fill": "#756f3fff"
+                  }
+                }
+              ]
             },
             {
               "type": "rectangle",
               "cornerRadius": 97,
-              "id": "H9RQNT",
-              "x": 292.74220741123065,
+              "id": "C9Pi5m",
+              "x": 292.74222231239185,
               "y": 745.484375,
               "name": "hero-banner-7-4-image",
               "rotation": -45,
@@ -2311,32 +2423,14 @@
               "height": 414,
               "stroke": {
                 "align": "outside",
-                "thickness": 11,
-                "fill": "#756f3fff"
+                "thickness": 11
               }
             },
             {
               "type": "rectangle",
               "cornerRadius": 88,
-              "id": "Y7lvw",
-              "x": 557.0609940323244,
-              "y": 466,
-              "name": "hero-banner-7-3",
-              "rotation": -45,
-              "fill": "#99935fff",
-              "width": 290,
-              "height": 290,
-              "stroke": {
-                "align": "outside",
-                "thickness": 20,
-                "fill": "#99935fff"
-              }
-            },
-            {
-              "type": "rectangle",
-              "cornerRadius": 88,
-              "id": "DUKOe",
-              "x": 557.0609940323244,
+              "id": "JeDiD",
+              "x": 557.0610089334856,
               "y": 466,
               "name": "hero-banner-7-3-image",
               "rotation": -45,
@@ -2345,32 +2439,14 @@
               "height": 290,
               "stroke": {
                 "align": "outside",
-                "thickness": 11,
-                "fill": "#756f3fff"
+                "thickness": 11
               }
             },
             {
               "type": "rectangle",
               "cornerRadius": 97,
-              "id": "Z7zy0V",
-              "x": 317.74220741123065,
-              "y": 0,
-              "name": "hero-banner-7-2",
-              "rotation": -45,
-              "fill": "#99935fff",
-              "width": 414,
-              "height": 414,
-              "stroke": {
-                "align": "outside",
-                "thickness": 30,
-                "fill": "#99935fff"
-              }
-            },
-            {
-              "type": "rectangle",
-              "cornerRadius": 97,
-              "id": "mdlu6",
-              "x": 317.74220741123065,
+              "id": "G1C7r",
+              "x": 317.74222231239185,
               "y": 0,
               "name": "hero-banner-7-2-image",
               "rotation": -45,
@@ -2379,8 +2455,7 @@
               "height": 414,
               "stroke": {
                 "align": "outside",
-                "thickness": 11,
-                "fill": "#756f3fff"
+                "thickness": 11
               }
             }
           ]

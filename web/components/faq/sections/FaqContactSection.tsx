@@ -277,7 +277,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                     style={{
                       width: "100%",
                       height: isMobile ? mvw(100) : vw(120),
-                      background: "rgba(33, 28, 11, 0.18)",
+                      background: "#877f42",
                       border: "1px solid rgba(255, 255, 255, 0.3)",
                       borderRadius: isMobile ? mvw(12) : vw(15),
                       padding: isMobile ? mvw(12) : vw(16),
@@ -311,7 +311,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                       style={{
                         borderRadius: isMobile ? mvw(12) : vw(15),
                         border: "1px solid rgba(255, 255, 255, 0.3)",
-                        background: "rgba(33, 28, 11, 0.20)",
+                        background: "#877f42",
                         color: "rgba(255, 255, 255, 0.5)",
                       }}
                       buttonClassName="!px-4 !font-anaheim !font-semibold faq-dropdown-btn-text"
@@ -329,7 +329,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                         borderRadius: isMobile ? mvw(50) : vw(65),
                         border: "1px solid rgba(255, 255, 255, 0.3)",
                         padding: isMobile ? `0 ${mvw(20)}` : `0 ${vw(50)}`,
-                        background: "rgba(33, 28, 11, 0.18)",
+                        background: "#877f42",
                         gap: isMobile ? mvw(12) : vw(12),
                         justifyContent: isMobile ? "center" : "flex-start",
                       }}
@@ -387,7 +387,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                       style={{
                         borderRadius: isMobile ? mvw(12) : vw(15),
                         border: "1px solid rgba(255, 255, 255, 0.3)",
-                        background: "rgba(33, 28, 11, 0.20)",
+                        background: "#877f42",
                         color: "rgba(255, 255, 255, 0.5)",
                       }}
                       inputClassName="!bg-transparent !text-white/50 !font-semibold !font-anaheim placeholder:!text-white/50"
@@ -405,7 +405,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                     style={{
                       width: "100%",
                       height: isMobile ? mvw(50) : vw(60),
-                      background: "rgba(33, 28, 11, 0.18)",
+                      background: "#877f42",
                       border: "1px solid rgba(255, 255, 255, 0.3)",
                       borderRadius: isMobile ? mvw(12) : vw(15),
                       padding: isMobile ? `0 ${mvw(16)}` : `0 ${vw(16)}`,
@@ -600,8 +600,8 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
         .faq-input-el:-webkit-autofill,
         .faq-input-el:-webkit-autofill:hover,
         .faq-input-el:-webkit-autofill:focus {
-          -webkit-text-fill-color: rgba(255, 255, 255, 0.5) !important;
-          -webkit-box-shadow: 0 0 0px 1000px rgba(33, 28, 11, 0.18) inset !important;
+          -webkit-text-fill-color: white !important;
+          -webkit-box-shadow: 0 0 0px 1000px #877f42 inset !important;
           transition: background-color 5000s ease-in-out 0s;
           font-family: var(--font-anaheim), sans-serif !important;
           font-weight: 600 !important;
@@ -643,7 +643,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
         :global(.faq-input-el:-webkit-autofill:focus),
         :global(.faq-input-el:-webkit-autofill:active) {
           -webkit-text-fill-color: white !important;
-          -webkit-box-shadow: 0 0 0px 1000px rgba(33, 28, 11, 0.20) inset !important;
+          -webkit-box-shadow: 0 0 0px 1000px #877f42 inset !important;
           transition: background-color 9999s ease-in-out 0s !important;
         }
 
