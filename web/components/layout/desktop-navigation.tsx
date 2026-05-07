@@ -337,7 +337,7 @@ export function DesktopNavigation({
                     // SUBMENU 类型 - 带图标的菜单
                     if (activeItem.type === "SUBMENU") {
                       return (
-                        <div className="grid grid-cols-3 gap-x-8 gap-y-2 max-w-5xl mx-auto">
+                        <div className="grid grid-cols-4 gap-x-12 gap-y-4 max-w-7xl mx-auto">
                           {activeItem.childMenus.map((child) => (
                             <Link
                               key={child.id}
