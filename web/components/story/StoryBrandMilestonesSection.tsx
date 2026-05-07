@@ -198,7 +198,7 @@ export function StoryBrandMilestonesSection({
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.95 }}
             className="absolute cursor-pointer z-30"
-            style={{ left: vw(160), bottom: vw(-60) }}
+            style={{ left: vw(180), bottom: vw(-60) }}
             onClick={handlePrev}
           >
             <img
@@ -344,7 +344,10 @@ export function StoryBrandMilestonesSection({
               className="relative w-fit min-w-[33.9vw] h-full pointer-events-auto overflow-visible"
               style={{ height: vw(280) }}
             >
-              <div className="absolute inset-0 bg-[#FDF4D7] rounded-[30px] shadow-xl w-full" />
+              <div
+                className="absolute inset-0 bg-[#FDF4D7] shadow-xl w-full"
+                style={{ borderRadius: vw(30) }}
+              />
 
               {/* Year indicator from backend buttonText */}
               <div
@@ -364,20 +367,32 @@ export function StoryBrandMilestonesSection({
                 className="absolute bg-[#FFFCF0] w-full"
                 style={{
                   left: 0,
-                  top: vw(100),
-                  height: vw(180),
+                  top: vw(110),
+                  height: vw(170),
                   borderRadius: `0 0 ${vw(30)} ${vw(30)}`,
                 }}
               />
-              <div className="relative z-10 pt-8 px-6 h-full flex flex-col w-fit">
+              <div
+                className="relative z-10 h-full flex flex-col w-fit"
+                style={{
+                  paddingTop: vw(32),
+                  paddingLeft: vw(32),
+                  paddingRight: vw(32),
+                }}
+              >
                 <div
-                  className="flex flex-col gap-2 mb-2 w-fit"
-                  style={{ height: vw(85) }}
+                  className="flex flex-col w-fit"
+                  style={{
+                    gap: vw(8),
+                    marginBottom: vw(16),
+                    minHeight: vw(80),
+                  }}
                 >
                   {activeSlideInBox?.title.split("\n").map((line, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-4 whitespace-nowrap"
+                      className="flex items-center whitespace-nowrap"
+                      style={{ gap: vw(16) }}
                     >
                       <div className="relative" style={{ top: vw(-2) }}>
                         <TimelineIcon />
@@ -393,8 +408,13 @@ export function StoryBrandMilestonesSection({
                 </div>
                 <div className="relative flex-1">
                   <p
-                    className="font-josefin-sans pl-8 pr-6 font-medium text-[#323232] leading-snug"
-                    style={{ fontSize: vw(18), maxWidth: vw(536) }}
+                    className="font-josefin-sans font-medium text-[#323232] leading-snug"
+                    style={{
+                      fontSize: vw(18),
+                      maxWidth: vw(536),
+                      paddingLeft: vw(32),
+                      paddingRight: vw(24),
+                    }}
                   >
                     {activeSlideInBox?.description}
                   </p>
@@ -473,9 +493,7 @@ function SlideItem({
           ),
         }}
       >
-        <motion.div
-          className="w-full h-full rounded-full overflow-hidden relative"
-        >
+        <motion.div className="w-full h-full rounded-full overflow-hidden relative">
           <OptimizedImage
             image={item?.image || "/BusromFooterBg_original.webp"}
             alt=""
