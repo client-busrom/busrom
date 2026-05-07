@@ -60,6 +60,7 @@ import { default as default_8eace7ae1118053face74cf3167249d9 } from '@/component
 import { default as default_a3a3aa8bfebcaf82c7d4953fe2175cbd } from '@/components/fields/IconPicker'
 import { SmartLinkField as SmartLinkField_e635f1e069dfeac8bac1a8b34ec70fb8 } from '@/components/fields/SmartLinkField'
 import { default as default_f2f012c65168d1c448e59ecd59a1bae5 } from '@/components/admin/NavigationManagerLink'
+import { default as default_0de41d40d46c5fdc2f903e5479d41ed4 } from '@/components/fields/GoogleIndexingButton'
 import { CategoryBlogManager as CategoryBlogManager_13b42ba985a2797d1445c07d844b1c44 } from '@/components/fields/CategoryBlogManager'
 import { CategoryProductManager as CategoryProductManager_0f5a766bac8fcce623fd73b84d4fc7b6 } from '@/components/fields/CategoryProductManager'
 import { default as default_a3e549dccdd3ea0f10d6ba87c5f4df9b } from '@/components/fields/PathSelector'
@@ -148,6 +149,7 @@ export const importMap = {
   "@/components/fields/IconPicker#default": default_a3a3aa8bfebcaf82c7d4953fe2175cbd,
   "@/components/fields/SmartLinkField#SmartLinkField": SmartLinkField_e635f1e069dfeac8bac1a8b34ec70fb8,
   "@/components/admin/NavigationManagerLink#default": default_f2f012c65168d1c448e59ecd59a1bae5,
+  "@/components/fields/GoogleIndexingButton#default": default_0de41d40d46c5fdc2f903e5479d41ed4,
   "@/components/fields/CategoryBlogManager#CategoryBlogManager": CategoryBlogManager_13b42ba985a2797d1445c07d844b1c44,
   "@/components/fields/CategoryProductManager#CategoryProductManager": CategoryProductManager_0f5a766bac8fcce623fd73b84d4fc7b6,
   "@/components/fields/PathSelector#default": default_a3e549dccdd3ea0f10d6ba87c5f4df9b,

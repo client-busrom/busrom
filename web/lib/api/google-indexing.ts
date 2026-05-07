@@ -1,3 +1,5 @@
+import { google } from 'googleapis'
+
 /**
  * Google Indexing API Service
  * 
@@ -9,28 +11,48 @@
  */
 
 export async function notifyGoogleOfUpdate(url: string, type: 'URL_UPDATED' | 'URL_DELETED' = 'URL_UPDATED') {
-  const credentials = process.env.GOOGLE_INDEXING_CREDENTIALS
+  const credentialsJson = process.env.GOOGLE_INDEXING_CREDENTIALS
   
-  if (!credentials) {
+  if (!credentialsJson) {
     console.log('⚠️ [Google Indexing] Credentials not found. Skipping real-time indexing.')
     return { success: false, message: 'Credentials not configured' }
   }
 
   try {
-    // Note: To implement this fully without large libraries, 
-    // we recommend using the 'googleapis' package.
-    // This is a placeholder for the integration logic.
+    const credentials = JSON.parse(credentialsJson)
     
+    // 1. Initialize Auth
+    const auth = new google.auth.JWT(
+      credentials.client_email,
+      undefined,
+      credentials.private_key,
+      ['https://www.googleapis.com/auth/indexing']
+    )
+
+    // 2. Initialize Indexing client
+    const indexing = google.indexing({
+      version: 'v3',
+      auth,
+    })
+
     console.log(`🚀 [Google Indexing] Notifying Google of ${type}: ${url}`)
-    
-    // Logic:
-    // 1. Generate JWT from credentials
-    // 2. Fetch access token from https://oauth2.googleapis.com/token
-    // 3. Post to https://indexing.googleapis.com/v3/urlNotifications:publish
-    
-    return { success: true, message: 'Notification sent (Simulation)' }
+
+    // 3. Send Notification
+    const response = await indexing.urlNotifications.publish({
+      requestBody: {
+        url,
+        type,
+      },
+    })
+
+    return { 
+      success: true, 
+      message: 'Notification sent successfully',
+      data: response.data 
+    }
   } catch (error: any) {
     console.error('❌ [Google Indexing] Failed:', error.message)
+    // Handle specific errors like 403 (permission denied) or 429 (quota exceeded)
     return { success: false, message: error.message }
   }
 }

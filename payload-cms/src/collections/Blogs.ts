@@ -199,6 +199,54 @@ export const Blogs: CollectionConfig = {
       cleanupM2M('blog-tags', 'blogs', 'tags'),
     ],
   },
+  endpoints: [
+    {
+      path: '/:id/notify-google',
+      method: 'post',
+      handler: async (req) => {
+        const { payload, user, routeParams } = req
+        if (!user) return new Response('Unauthorized', { status: 401 })
+        
+        const id = routeParams?.id
+        if (!id) return new Response('Missing ID', { status: 400 })
+
+        try {
+          // 1. Fetch the doc to get slug
+          const doc = await payload.findByID({
+            collection: 'blogs',
+            id: id as string,
+            depth: 0,
+          })
+
+          if (!doc || doc.status !== 'published') {
+            return new Response(JSON.stringify({ error: 'Only published posts can be indexed.' }), { status: 400 })
+          }
+
+          // 2. Import the indexing service from web (if possible) or re-implement
+          // Since they share the same workspace, we can try to import or use a direct call
+          // Actually, let's call the indexing logic.
+          // Note: In a real deployment, web and cms might be on different servers, 
+          // but they usually share the same environment variables.
+          
+          const { notifyGoogleOfUpdate } = await import('../../../web/lib/api/google-indexing')
+          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.busromhouse.com'
+          
+          const results: any[] = []
+          const locales = ['en', 'zh', 'ar', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'pt', 'ru', 'vi', 'th', 'id', 'tr', 'nl', 'pl', 'sv', 'da', 'fi', 'no', 'cs', 'el', 'hu']
+          
+          for (const locale of locales) {
+            const url = `${siteUrl}/${locale}/blog/${doc.slug}`
+            const res = await notifyGoogleOfUpdate(url)
+            results.push({ locale, ...res })
+          }
+
+          return new Response(JSON.stringify({ success: true, results }), { status: 200 })
+        } catch (e: any) {
+          return new Response(JSON.stringify({ error: e.message }), { status: 500 })
+        }
+      },
+    },
+  ],
   fields: [
     {
       name: 'adminLabel',
@@ -521,6 +569,17 @@ export const Blogs: CollectionConfig = {
         // to restrict logic to specific fields. 
         // In the requirement context: "把seo插件移除，然后翻译中心去除无用字段，现在seo统一在seo settings里设置"
         // This is done by just skipping unnecessary hidden meta.
+      },
+    },
+    {
+      name: 'googleIndexing',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        disableListColumn: true,
+        components: {
+          Field: '@/components/fields/GoogleIndexingButton',
+        },
       },
     },
     {
