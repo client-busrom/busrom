@@ -52,8 +52,9 @@ const afterChangeHook: CollectionAfterChangeHook = async ({
   doc,
   previousDoc,
   operation,
-  req: { payload },
+  req,
 }) => {
+  const { payload } = req
   const getCatId = (c: any) => (c && typeof c === 'object' ? c.id : c)
   const newCatId = getCatId(doc.category)
   const oldCatId = getCatId(previousDoc?.category)
@@ -64,7 +65,13 @@ const afterChangeHook: CollectionAfterChangeHook = async ({
   if (oldCatId) {
     await runSequentially(oldCatId, async () => {
       try {
-        const oldCat: any = await payload.findByID({ collection: 'categories', id: oldCatId, depth: 0 })
+        const oldCat: any = await payload.findByID({ 
+          collection: 'categories', 
+          id: oldCatId, 
+          depth: 0,
+          req,
+          overrideAccess: true,
+        })
         if (oldCat) {
           const currentProducts = (oldCat.shopProducts || []).map((p: any) => getCatId(p))
           const updatedProducts = currentProducts.filter((id: any) => id !== doc.id)
@@ -73,6 +80,9 @@ const afterChangeHook: CollectionAfterChangeHook = async ({
               collection: 'categories',
               id: oldCatId,
               data: { shopProducts: updatedProducts } as any,
+              req,
+              context: { isSyncing: true },
+              overrideAccess: true,
             })
           }
         }
@@ -86,7 +96,13 @@ const afterChangeHook: CollectionAfterChangeHook = async ({
   if (newCatId) {
     await runSequentially(newCatId, async () => {
       try {
-        const newCat: any = await payload.findByID({ collection: 'categories', id: newCatId, depth: 0 })
+        const newCat: any = await payload.findByID({ 
+          collection: 'categories', 
+          id: newCatId, 
+          depth: 0,
+          req,
+          overrideAccess: true,
+        })
         if (newCat) {
           const currentProducts = (newCat.shopProducts || []).map((p: any) => getCatId(p))
           if (!currentProducts.includes(doc.id)) {
@@ -94,6 +110,9 @@ const afterChangeHook: CollectionAfterChangeHook = async ({
               collection: 'categories',
               id: newCatId,
               data: { shopProducts: [...currentProducts, doc.id] } as any,
+              req,
+              context: { isSyncing: true },
+              overrideAccess: true,
             })
           }
         }
@@ -104,14 +123,21 @@ const afterChangeHook: CollectionAfterChangeHook = async ({
   }
 }
 
-const afterDeleteHook: CollectionAfterDeleteHook = async ({ req: { payload }, id, doc }) => {
+const afterDeleteHook: CollectionAfterDeleteHook = async ({ req, id, doc }) => {
+  const { payload } = req
   const getCatId = (c: any) => (c && typeof c === 'object' ? c.id : c)
   const catId = getCatId(doc.category)
   if (!catId) return
 
   await runSequentially(catId, async () => {
     try {
-      const cat: any = await payload.findByID({ collection: 'categories', id: catId, depth: 0 })
+      const cat: any = await payload.findByID({ 
+        collection: 'categories', 
+        id: catId, 
+        depth: 0,
+        req,
+        overrideAccess: true,
+      })
       if (cat) {
         const currentProducts = (cat.shopProducts || []).map((p: any) => getCatId(p))
         const updatedProducts = currentProducts.filter((pId: any) => pId !== id)
@@ -120,6 +146,9 @@ const afterDeleteHook: CollectionAfterDeleteHook = async ({ req: { payload }, id
             collection: 'categories',
             id: catId,
             data: { shopProducts: updatedProducts } as any,
+            req,
+            context: { isSyncing: true },
+            overrideAccess: true,
           })
         }
       }
