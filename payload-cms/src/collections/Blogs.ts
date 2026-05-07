@@ -12,6 +12,8 @@
 
 import type { CollectionConfig } from 'payload'
 import { syncM2M, cleanupM2M } from '../hooks/syncM2M'
+import { autoIndexHook } from '../hooks/autoIndex'
+import { autoIndexDeleteHook } from '../hooks/autoIndexDelete'
 import { createKBWidgetField, KB_WIDGET_SUBFIELDS } from '../fields/knowledgeBaseWidgets'
 
 import { formatSlug } from '../hooks/formatSlug'
@@ -193,10 +195,12 @@ export const Blogs: CollectionConfig = {
     afterChange: [
       syncM2M('categories', 'blogPosts', 'categories'),
       syncM2M('blog-tags', 'blogs', 'tags'),
+      autoIndexHook,
     ],
     afterDelete: [
       cleanupM2M('categories', 'blogPosts', 'categories'),
       cleanupM2M('blog-tags', 'blogs', 'tags'),
+      autoIndexDeleteHook,
     ],
   },
   endpoints: [
