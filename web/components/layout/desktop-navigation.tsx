@@ -337,30 +337,30 @@ export function DesktopNavigation({
                     // SUBMENU 类型 - 带图标的菜单
                     if (activeItem.type === "SUBMENU") {
                       return (
-                        <div className="grid grid-cols-4 gap-x-12 gap-y-4 max-w-7xl mx-auto">
+                        <div className="grid grid-cols-4 gap-x-12 gap-y-8 max-w-7xl mx-auto">
                           {activeItem.childMenus.map((child) => (
                             <Link
                               key={child.id}
                               href={child.url}
-                              className="group flex items-center gap-4 p-4 rounded-lg transition-colors hover:bg-white/5"
+                              className="group flex flex-col items-center justify-center gap-4 p-6 rounded-lg transition-colors hover:bg-white/5"
                               onClick={() => setActiveMenuId(null)}
                             >
-                              <div className="flex-shrink-0 text-muted-foreground group-hover:text-brand-accent-gold transition-colors">
+                              <div className="text-muted-foreground group-hover:text-brand-accent-gold transition-colors">
                                 {child.icon ? (
                                   <IconifyIcon
                                     name={child.icon}
-                                    size={24}
+                                    size={28}
                                     color="currentColor"
                                   />
                                 ) : (
                                   <IconifyIcon
                                     name="lucide:arrow-right"
-                                    size={24}
+                                    size={28}
                                     color="currentColor"
                                   />
                                 )}
                               </div>
-                              <span className="text-lg font-montserrat font-bold text-muted-foreground group-hover:text-brand-accent-gold transition-colors truncate">
+                              <span className="text-lg font-montserrat font-bold text-muted-foreground group-hover:text-brand-accent-gold text-center transition-colors">
                                 {child.label}
                               </span>
                             </Link>

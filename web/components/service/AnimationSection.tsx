@@ -334,9 +334,11 @@ export function AnimationSection({
             rippleRef.current.destroy();
           }
 
-          // Create new ripple effect
-          rippleRef.current = new WaterRipple(canvas, image);
-          rippleRef.current.start();
+          // Create new ripple effect only if dimensions are valid
+          if (canvas.width > 0 && canvas.height > 0) {
+            rippleRef.current = new WaterRipple(canvas, image);
+            rippleRef.current.start();
+          }
         };
         image.src = blobUrl;
       })
@@ -354,8 +356,10 @@ export function AnimationSection({
           if (rippleRef.current) {
             rippleRef.current.destroy();
           }
-          rippleRef.current = new WaterRipple(canvas, image);
-          rippleRef.current.start();
+          if (canvas.width > 0 && canvas.height > 0) {
+            rippleRef.current = new WaterRipple(canvas, image);
+            rippleRef.current.start();
+          }
         }
       }, 200);
     };
