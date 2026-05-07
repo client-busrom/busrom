@@ -23,10 +23,13 @@ export const formatSlug =
       }
 
       if (typeof source === 'string' && source.length > 0) {
-        return format(source)
+        const formatted = format(source)
+        if (formatted) {
+          return formatted
+        }
       }
     }
 
-    // Fallback to existing value if no source found
+    // Fallback to existing value if no source found or formatted result is empty
     return value
   }

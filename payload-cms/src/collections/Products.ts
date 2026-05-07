@@ -73,7 +73,10 @@ const afterChangeHook: CollectionAfterChangeHook = async ({
           overrideAccess: true,
         })
         if (oldCat) {
-          const currentProducts = (oldCat.shopProducts || []).map((p: any) => getCatId(p))
+          const currentProducts = (oldCat.shopProducts || [])
+            .map((p: any) => getCatId(p))
+            .filter((id: any) => !!id)
+
           const updatedProducts = currentProducts.filter((id: any) => id !== doc.id)
           if (currentProducts.length !== updatedProducts.length) {
             await payload.update({
@@ -104,12 +107,17 @@ const afterChangeHook: CollectionAfterChangeHook = async ({
           overrideAccess: true,
         })
         if (newCat) {
-          const currentProducts = (newCat.shopProducts || []).map((p: any) => getCatId(p))
+          const currentProducts = (newCat.shopProducts || [])
+            .map((p: any) => getCatId(p))
+            .filter((id: any) => !!id)
+
           if (!currentProducts.includes(doc.id)) {
+            // Use Set to ensure uniqueness
+            const updatedProducts = Array.from(new Set([...currentProducts, doc.id]))
             await payload.update({
               collection: 'categories',
               id: newCatId,
-              data: { shopProducts: [...currentProducts, doc.id] } as any,
+              data: { shopProducts: updatedProducts } as any,
               req,
               context: { isSyncing: true },
               overrideAccess: true,
@@ -139,7 +147,10 @@ const afterDeleteHook: CollectionAfterDeleteHook = async ({ req, id, doc }) => {
         overrideAccess: true,
       })
       if (cat) {
-        const currentProducts = (cat.shopProducts || []).map((p: any) => getCatId(p))
+        const currentProducts = (cat.shopProducts || [])
+          .map((p: any) => getCatId(p))
+          .filter((pId: any) => !!pId)
+
         const updatedProducts = currentProducts.filter((pId: any) => pId !== id)
         if (currentProducts.length !== updatedProducts.length) {
           await payload.update({
