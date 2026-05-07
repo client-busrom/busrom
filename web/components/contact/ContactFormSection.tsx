@@ -450,6 +450,14 @@ export function ContactFormSection({
       }
 
       setSubmitStatus("success");
+      // Push success event to Google Tag Manager
+      if (typeof window !== "undefined" && (window as any).dataLayer) {
+        (window as any).dataLayer.push({
+          event: "form_submit_success",
+          form_id: configData?.name || "contact-form",
+          form_name: configData?.name || "contact-form",
+        });
+      }
       setFormData({});
       setFileName("");
       setUploadedFile(null);
@@ -618,6 +626,7 @@ export function ContactFormSection({
         }
       >
         <form
+          id={configData?.name || "contact-form"}
           onSubmit={handleSubmit}
           className="flex flex-col w-full"
           style={{
@@ -689,7 +698,7 @@ export function ContactFormSection({
                           handleInputChange(field.fieldName, e.target.value)
                         }
                         required={field.required}
-                        className="font-anaheim font-semibold appearance-none bg-[#B4A25F] border border-white/34 text-white w-full placeholder:text-white/95 focus:outline-none focus:border-white/60 transition-colors"
+                        className="font-anaheim font-semibold appearance-none bg-[#B4A25F] border border-white/34 text-white w-full placeholder:text-white/95 focus:outline-none focus:border-white/60 transition-colors contact-form-input"
                         style={{
                           height: isMobile ? mvw(50) : vw(50),
                           borderRadius: isMobile ? mvw(12) : vw(12),
@@ -860,7 +869,7 @@ export function ContactFormSection({
                   name="country"
                   value={formData.country || ""}
                   onChange={(e) => handleInputChange("country", e.target.value)}
-                  className="font-anaheim font-semibold appearance-none bg-[#B4A25F] border border-white/34 text-white w-full placeholder:text-white/95 focus:outline-none focus:border-white/60 transition-colors"
+                  className="font-anaheim font-semibold appearance-none bg-[#B4A25F] border border-white/34 text-white w-full placeholder:text-white/95 focus:outline-none focus:border-white/60 transition-colors contact-form-input"
                   style={{
                     height: isMobile ? mvw(50) : vw(50),
                     borderRadius: isMobile ? mvw(12) : vw(12),
@@ -1306,7 +1315,11 @@ export function ContactFormSection({
         textarea.contact-form-input:-webkit-autofill,
         textarea.contact-form-input:-webkit-autofill:hover,
         textarea.contact-form-input:-webkit-autofill:focus,
-        textarea.contact-form-input:-webkit-autofill:active {
+        textarea.contact-form-input:-webkit-autofill:active,
+        select.contact-form-input:-webkit-autofill,
+        select.contact-form-input:-webkit-autofill:hover,
+        select.contact-form-input:-webkit-autofill:focus,
+        select.contact-form-input:-webkit-autofill:active {
           -webkit-text-fill-color: white !important;
           -webkit-box-shadow: 0 0 0px 1000px #B4A25F inset !important;
           transition: background-color 9999s ease-in-out 0s !important;

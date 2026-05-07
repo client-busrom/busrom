@@ -252,6 +252,7 @@ export function ContactFormSection({
               </div>
             ) : (
               <form
+                id={formConfig?.name || formName || "service-form"}
                 onSubmit={(e) => handleSubmit(e, locale)}
                 className="space-y-[12px]"
               >
@@ -584,6 +585,7 @@ export function ContactFormSection({
                   </div>
                 ) : (
                   <form
+                    id={formConfig?.name || formName || "service-form"}
                     onSubmit={(e) => handleSubmit(e, locale)}
                     className="flex flex-col"
                     style={{ gap: "14px" }}

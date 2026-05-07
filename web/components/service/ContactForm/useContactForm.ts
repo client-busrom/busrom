@@ -327,6 +327,17 @@ export const useContactForm = (initialFormConfig: FormConfig | undefined, formNa
         setSubmitted(true);
         incrementSubmissionCount(formName);
         setSubmissionCount((prev) => prev + 1);
+
+        // Push success event to Google Tag Manager
+        if (typeof window !== "undefined") {
+          (window as any).dataLayer = (window as any).dataLayer || [];
+          (window as any).dataLayer.push({
+            event: "form_submit_success",
+            form_id: formConfig?.name || formName || "service-form",
+            form_name: formConfig?.name || formName || "Service Form",
+          });
+        }
+
         setTimeout(() => {
           setSubmitted(false);
           const resetData: Record<string, any> = {};

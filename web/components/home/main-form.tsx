@@ -315,6 +315,15 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
         incrementSubmissionCount();
         setSubmissionCount((prev) => prev + 1);
 
+        // Push success event to Google Tag Manager
+        if (typeof window !== "undefined" && (window as any).dataLayer) {
+          (window as any).dataLayer.push({
+            event: "form_submit_success",
+            form_id: formConfig?.name || "main-form",
+            form_name: formConfig?.name || "main-form",
+          });
+        }
+
         // 5秒后重置表单
         setTimeout(() => {
           setSubmitted(false);
@@ -528,6 +537,7 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                 </div>
               ) : (
                 <form
+                  id={formConfig?.name || "main-form"}
                   onSubmit={handleSubmit}
                   className="flex flex-col"
                   style={{ gap: "clamp(12px, 1.2vw, 24px)" }}

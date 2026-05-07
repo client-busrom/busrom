@@ -158,6 +158,14 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
       });
 
       if (res.ok) {
+        // GTM Tracking
+        if (typeof window !== 'undefined' && (window as any).dataLayer) {
+          (window as any).dataLayer.push({
+            event: 'form_submit_success',
+            form_id: formConfig?.name || "faq-contact-form",
+            form_name: formConfig?.name || "faq-contact-form"
+          });
+        }
         setSubmitted(true);
         setTimeout(() => setSubmitted(false), 5000);
       } else {
@@ -241,6 +249,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
 
           {/* Form */}
           <form
+            id={formConfig?.name || "faq-contact-form"}
             onSubmit={handleSubmit}
             className={cn(
               "grid items-end",

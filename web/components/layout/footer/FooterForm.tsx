@@ -139,6 +139,14 @@ export default function FooterForm({
 
       if (response.ok) {
         setFormData({ name: "", email: "", message: "" });
+        // Push success event to Google Tag Manager
+        if (typeof window !== "undefined" && (window as any).dataLayer) {
+          (window as any).dataLayer.push({
+            event: "form_submit_success",
+            form_id: formConfig?.name || "footer-form",
+            form_name: formConfig?.name || "footer-form",
+          });
+        }
         setTurnstileToken(null);
         setTurnstileKey((prev) => prev + 1);
         const successMsg =
@@ -176,7 +184,11 @@ export default function FooterForm({
         <span className="relative text-white">{content.form.title}</span>
       </h3>
 
-      <form className="flex flex-col gap-6 lg:gap-8" onSubmit={handleSubmit}>
+      <form
+        id={formConfig?.name || "footer-form"}
+        className="flex flex-col gap-6 lg:gap-8"
+        onSubmit={handleSubmit}
+      >
         <Input
           placeholder={`${content.form.placeholders.name} *`}
           value={formData.name}

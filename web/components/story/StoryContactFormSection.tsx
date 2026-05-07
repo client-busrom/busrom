@@ -354,6 +354,15 @@ export function StoryContactFormSection({
         throw new Error(error.message || "Failed to submit form");
       }
 
+      // GTM Tracking
+      if (typeof window !== 'undefined' && (window as any).dataLayer) {
+        (window as any).dataLayer.push({
+          event: 'form_submit_success',
+          form_id: (mergedConfig as any)?.name || configData?.name || "contact-form",
+          form_name: (mergedConfig as any)?.name || configData?.name || "contact-form"
+        });
+      }
+
       setSubmitStatus("success");
       setFormData({});
       setFileName("");
@@ -657,7 +666,7 @@ export function StoryContactFormSection({
               : {}
           }
         >
-          <form
+          <form id={(mergedConfig as any)?.name || configData?.name || "contact-form"}
             onSubmit={handleSubmit}
             className="flex flex-col"
             style={{ gap: isMobile ? mvw(12) : vw(20) }}

@@ -450,6 +450,14 @@ export function FullInquiryModal({
     const success = await submitFormData(false)
 
     if (success) {
+      // GTM Tracking
+      if (typeof window !== 'undefined' && (window as any).dataLayer) {
+        (window as any).dataLayer.push({
+          event: 'form_submit_success',
+          form_id: configData?.name || "full-inquiry-modal-form",
+          form_name: configData?.name || "full-inquiry-modal-form"
+        });
+      }
       setSubmitSuccess(true)
       setTimeout(() => {
         onClose()
@@ -639,7 +647,7 @@ export function FullInquiryModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form id={configData?.name || "full-inquiry-modal-form"} onSubmit={handleSubmit} className="p-6 space-y-6">
           {errors._form && (
             <div className="bg-red-50 border-2 border-red-300 rounded-lg p-4 text-red-700 text-sm font-medium">{errors._form}</div>
           )}

@@ -234,6 +234,16 @@ export function SupportContactFormSection({
 
       if (!response.ok) throw new Error("Submission failed");
 
+      // Push success event to Google Tag Manager
+      if (typeof window !== "undefined") {
+        (window as any).dataLayer = (window as any).dataLayer || [];
+        (window as any).dataLayer.push({
+          event: "form_submit_success",
+          form_id: mergedConfig?.name || formConfig?.name || "support-form",
+          form_name: mergedConfig?.name || formConfig?.name || "Support Contact Form",
+        });
+      }
+
       setSubmitStatus("success");
       setFormData({});
       setFileName("");
@@ -446,6 +456,7 @@ export function SupportContactFormSection({
           style={!isMobile ? { marginLeft: vw(1289), marginTop: vw(91), width: vw(486) } : {}}
         >
           <form
+            id={mergedConfig?.name || formConfig?.name || "support-form"}
             ref={formRef}
             onSubmit={handleSubmit}
             className="flex flex-col"

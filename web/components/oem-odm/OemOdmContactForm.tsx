@@ -336,6 +336,15 @@ export function OemOdmContactForm({
 
       if (res.ok) {
         setSubmitted(true);
+        // Push success event to Google Tag Manager
+        if (typeof window !== "undefined") {
+          (window as any).dataLayer = (window as any).dataLayer || [];
+          (window as any).dataLayer.push({
+            event: "form_submit_success",
+            form_id: configData?.name || "oem-odm-form",
+            form_name: configData?.name || "OEM/ODM Contact Form",
+          });
+        }
         setTurnstileToken(null);
         setTurnstileKey((prev) => prev + 1);
         setTimeout(() => {
@@ -483,6 +492,7 @@ export function OemOdmContactForm({
           {/* ========== Form Content ========== */}
           <div className="bg-white border-2 border-[#cfcaa2] rounded-[20px] rounded-t-none border-t-0 shadow-sm relative z-10">
             <form
+              id={configData?.name || "oem-odm-form"}
               onSubmit={handleSubmit}
               className="px-8 py-8 md:px-20 grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-16"
             >
@@ -508,7 +518,11 @@ export function OemOdmContactForm({
                     return (
                       <div
                         key={field.fieldName}
-                        className="bg-[rgba(33,28,11,0.2)] rounded-[10px] h-[50px] flex items-center"
+                        style={{
+                          backgroundColor: "#F3F1EA",
+                          border: "1px solid rgba(117, 111, 63, 0.1)",
+                        }}
+                        className="rounded-[10px] h-[50px] flex items-center overflow-hidden"
                       >
                         {isPhone ? (
                           <PhoneInput
@@ -517,12 +531,15 @@ export function OemOdmContactForm({
                             onChange={(phone) =>
                               handleChange(field.fieldName, phone)
                             }
-                            placeholder={field.placeholder?.trim() || field.label}
+                            placeholder={
+                              field.placeholder?.trim() || field.label
+                            }
                             disabled={submitting}
                             className="!bg-transparent !border-none !h-full !rounded-[10px]"
-                            buttonClassName="!bg-transparent !border-r-0 !text-white hover:!bg-black/5 !rounded-none !px-3 !h-full [&_img]:!w-6 [&_img]:!h-auto [&_svg]:!w-6 [&_svg]:!h-auto [&_svg]:!text-white [&_.PhoneInputCountrySelectArrow]:!border-t-white [&_.PhoneInputCountrySelectArrow]:!opacity-100"
-                            inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-[16px] !h-full !pl-0 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-                            dialCodeClassName="!text-white !text-[16px] [&:-webkit-autofill]:[-webkit-text-fill-color:white!important]"
+                            buttonClassName="!bg-transparent !border-r-0 hover:!bg-black/5 !rounded-none !px-3 !h-full [&_img]:!w-6 [&_img]:!h-auto [&_svg]:!w-6 [&_svg]:!h-auto [&_svg]:!text-[#756F3F] [&_.PhoneInputCountrySelectArrow]:!border-t-[#756F3F] [&_.PhoneInputCountrySelectArrow]:!opacity-70"
+                            style={{ color: "rgba(117, 111, 63, 0.7)" }}
+                            inputClassName="!bg-transparent !placeholder-[rgba(117,111,63,0.4)] !font-anaheim !font-semibold !text-[16px] !h-full !pl-0 [&:-webkit-autofill]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                            dialCodeClassName="!text-[rgba(117,111,63,0.7)] !text-[16px]"
                             containerClassName="!h-full w-full"
                           />
                         ) : (
@@ -535,8 +552,11 @@ export function OemOdmContactForm({
                               handleChange(field.fieldName, e.target.value)
                             }
                             spellCheck="false"
-                            className="w-full h-full px-6 bg-transparent outline-none font-semibold text-white text-base placeholder-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-                            placeholder={field.placeholder?.trim() || field.label}
+                            className="w-full h-full px-6 bg-transparent outline-none font-semibold text-base placeholder-[rgba(117,111,63,0.4)] [&:-webkit-autofill]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                            style={{ color: "rgba(117, 111, 63, 0.7)" }}
+                            placeholder={
+                              field.placeholder?.trim() || field.label
+                            }
                             disabled={submitting}
                           />
                         )}
@@ -551,7 +571,13 @@ export function OemOdmContactForm({
                     <label className="text-xl md:text-2xl font-semibold text-[#756F3F] block mt-4">
                       {selectFields[0].label}
                     </label>
-                    <div className="relative bg-[rgba(33,28,11,0.2)] rounded-[10px] h-[50px]">
+                    <div
+                      className="relative rounded-[10px] h-[50px]"
+                      style={{
+                        backgroundColor: "#F3F1EA",
+                        border: "1px solid rgba(117, 111, 63, 0.1)",
+                      }}
+                    >
                       <select
                         value={formData[selectFields[0].fieldName] || ""}
                         onChange={(e) =>
@@ -560,11 +586,19 @@ export function OemOdmContactForm({
                             e.target.value,
                           )
                         }
-                        className="w-full h-full px-6 bg-transparent outline-none font-semibold text-white text-base appearance-none cursor-pointer"
+                        className="w-full h-full px-6 bg-transparent outline-none font-semibold text-base appearance-none cursor-pointer"
+                        style={{ color: "rgba(117, 111, 63, 0.7)" }}
                         disabled={submitting}
                       >
                         {selectFields[0].options?.map((opt) => (
-                          <option key={opt.value} value={opt.value} className="bg-[#34311c]">
+                          <option
+                            key={opt.value}
+                            value={opt.value}
+                            style={{
+                              backgroundColor: "#F3F1EA",
+                              color: "#756F3F",
+                            }}
+                          >
                             {opt.label}
                           </option>
                         ))}
@@ -578,7 +612,8 @@ export function OemOdmContactForm({
                         >
                           <path
                             d="M15.5138 11.3538L2.24596 0.319738C1.73241 -0.106579 0.899394 -0.106579 0.385165 0.319738C-0.128388 0.747503 -0.128388 1.44023 0.385165 1.86788L14.4787 13.5871C14.5088 13.6191 14.542 13.6504 14.5774 13.6797C15.0917 14.1068 15.9246 14.1068 16.4382 13.6797L30.6144 1.89054C31.1285 1.4629 31.1285 0.770169 30.6144 0.343084C30.1015 -0.0839129 29.2686 -0.0839129 28.7543 0.343084L15.5138 11.3538Z"
-                            fill="white"
+                            fill="#756F3F"
+                            fillOpacity="0.7"
                           />
                         </svg>
                       </div>
@@ -588,7 +623,13 @@ export function OemOdmContactForm({
 
                 {/* Textarea */}
                 {textareaFields[0] && (
-                  <div className="bg-[rgba(33,28,11,0.2)] rounded-[10px] p-5 min-h-[80px]">
+                  <div
+                    className="rounded-[10px] p-5 min-h-[80px]"
+                    style={{
+                      backgroundColor: "#F3F1EA",
+                      border: "1px solid rgba(117, 111, 63, 0.1)",
+                    }}
+                  >
                     <textarea
                       value={formData[textareaFields[0].fieldName] || ""}
                       onChange={(e) =>
@@ -598,9 +639,11 @@ export function OemOdmContactForm({
                         )
                       }
                       spellCheck="false"
-                      className="w-full h-full bg-transparent outline-none font-semibold text-white text-base placeholder-white/50 resize-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                      className="w-full h-full bg-transparent outline-none font-semibold text-base placeholder-[rgba(117, 111, 63, 0.4)] resize-none [&:-webkit-autofill]:[-webkit-text-fill-color:rgba(117, 111, 63, 0.7)!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:rgba(117, 111, 63, 0.7)!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:rgba(117, 111, 63, 0.7)!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:rgba(117, 111, 63, 0.7)!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                      style={{ color: "rgba(117, 111, 63, 0.7)" }}
                       placeholder={
-                        textareaFields[0].placeholder?.trim() || textareaFields[0].label
+                        textareaFields[0].placeholder?.trim() ||
+                        textareaFields[0].label
                       }
                       disabled={submitting}
                       rows={2}
@@ -696,7 +739,9 @@ export function OemOdmContactForm({
                       whileHover={{
                         rotate: 0,
                         scale: 1.05,
-                        transition: { scale: { duration: 0.3, ease: "easeOut" } },
+                        transition: {
+                          scale: { duration: 0.3, ease: "easeOut" },
+                        },
                       }}
                       transition={{
                         rotate: {

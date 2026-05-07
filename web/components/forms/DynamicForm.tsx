@@ -449,6 +449,16 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
         setSubmitted(true)
         onSuccess?.()
 
+        // Push success event to Google Tag Manager
+        if (typeof window !== "undefined") {
+          (window as any).dataLayer = (window as any).dataLayer || [];
+          (window as any).dataLayer.push({
+            event: "form_submit_success",
+            form_id: formConfig?.name || formName || "dynamic-form",
+            form_name: formConfig?.name || formName || "Dynamic Form",
+          });
+        }
+
         // 提交成功后也强制记录同意（双重保障）
         if (formConfig?.privacyConsentText) {
           localStorage.setItem(STORAGE_KEY, 'true');
@@ -954,7 +964,11 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
   }
 
   return (
-    <form onSubmit={handleSubmit} className={className}>
+    <form
+      id={formConfig?.name || formName || "dynamic-form"}
+      onSubmit={handleSubmit}
+      className={className}
+    >
       {/* Render all fields */}
       {formConfig.fields
         .sort((a, b) => (a.order || 0) - (b.order || 0))

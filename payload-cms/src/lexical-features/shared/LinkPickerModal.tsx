@@ -29,6 +29,7 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
     { value: 'product-series', label: '产品详解页', pathPrefix: '/products' },
     { value: 'categories-product', label: 'shop列表页分类', pathPrefix: '/shop', categoryType: 'PRODUCT' },
     { value: 'categories-blog', label: '知识库列表页分类', pathPrefix: '/blog', categoryType: 'BLOG' },
+    { value: 'categories-application', label: '案例图集列表页分类', pathPrefix: '/application', categoryType: 'APPLICATION' },
     { value: 'pages', label: '其他子页', pathPrefix: '' },
     { value: 'blogs', label: '知识库', pathPrefix: '/blog' },
     { value: 'blog-tags', label: '知识库标签', pathPrefix: '/blog' },
@@ -229,8 +230,22 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
                       e.currentTarget.style.backgroundColor = 'transparent'
                     }}
                   >
-                    <div style={{ fontSize: '14px', fontWeight: 500, color: '#1f2937' }}>
-                      {item.title || item.name || item.slug}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 500, color: '#1f2937' }}>
+                        {item.title || item.name || item.slug}
+                      </div>
+                      {selectedCollection === 'categories' && item.type && (
+                        <span style={{ 
+                          padding: '2px 6px', 
+                          fontSize: '10px', 
+                          backgroundColor: '#f3f4f6', 
+                          borderRadius: '4px',
+                          color: '#6b7280',
+                          textTransform: 'uppercase'
+                        }}>
+                          {item.type}
+                        </span>
+                      )}
                     </div>
                     {item.slug && (
                       <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>

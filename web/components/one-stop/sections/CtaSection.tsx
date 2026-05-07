@@ -246,6 +246,15 @@ export function CtaSection({
 
       if (!response.ok) throw new Error("Submission failed");
 
+      // GTM Tracking
+      if (typeof window !== 'undefined' && (window as any).dataLayer) {
+        (window as any).dataLayer.push({
+          event: 'form_submit_success',
+          form_id: mergedConfig?.name || mergedConfig?.displayName || "one-stop-solution-contact",
+          form_name: mergedConfig?.name || mergedConfig?.displayName || "One-Stop Solution Contact"
+        });
+      }
+
       setSubmitStatus("success");
       setFormState({
         name: "",
@@ -414,6 +423,7 @@ export function CtaSection({
         </div>
 
         <form
+          id={mergedConfig?.name || mergedConfig?.displayName || "one-stop-solution-contact"}
           onSubmit={handleSubmit}
           className="w-full max-w-[540px] flex flex-col gap-4"
         >
@@ -655,6 +665,7 @@ export function CtaSection({
           </div>
 
           <form
+            id={mergedConfig?.name || mergedConfig?.displayName || "one-stop-solution-contact"}
             onSubmit={handleSubmit}
             className="grid grid-cols-2 gap-x-8 gap-y-3 w-[541px] relative"
           >

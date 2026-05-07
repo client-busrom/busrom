@@ -296,6 +296,14 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
       })
 
       if (response.ok) {
+        // GTM Tracking
+        if (typeof window !== 'undefined' && (window as any).dataLayer) {
+          (window as any).dataLayer.push({
+            event: 'form_submit_success',
+            form_id: configData.name || "shop-form-block",
+            form_name: configData.name || "shop-form-block"
+          });
+        }
         setSubmitSuccess(true)
         setFormData({})
         setTurnstileToken(null)
@@ -477,7 +485,7 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form id={configData.name || "shop-form-block"} onSubmit={handleSubmit} className="space-y-6">
       {errors._form && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-600 text-sm">{errors._form}</div>
       )}

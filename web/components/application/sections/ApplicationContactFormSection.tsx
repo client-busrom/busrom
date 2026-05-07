@@ -6,7 +6,6 @@ import { ChevronDown, Upload } from "lucide-react";
 import { PhoneInput } from "@/components/ui/PhoneInput";
 import { cn } from "@/lib/utils";
 
-
 interface RichTextSegment {
   text: string;
   bold?: boolean;
@@ -97,10 +96,10 @@ function CustomDropdown({
     <div ref={containerRef} className="relative w-full font-montserrat">
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between cursor-pointer font-semibold text-white transition-all hover:bg-black/10"
+        className="w-full flex items-center justify-between cursor-pointer font-semibold text-[#9E9474] transition-all hover:bg-black/5"
         style={{
           height: isMobile ? "48px" : "50px",
-          backgroundColor: "rgba(33, 28, 11, 0.2)",
+          backgroundColor: "#D4CBAF",
           paddingLeft: isMobile ? "16px" : "17px",
           paddingRight: isMobile ? "16px" : "17px",
           borderRadius: "10px",
@@ -109,8 +108,8 @@ function CustomDropdown({
         <span
           className={
             !value && !isScenario
-              ? "text-white/50 truncate flex-1"
-              : "text-white truncate flex-1"
+              ? "text-[#9E9474]/50 truncate flex-1"
+              : "text-[#9E9474] truncate flex-1"
           }
           style={{ fontSize: "16px" }}
         >
@@ -124,7 +123,7 @@ function CustomDropdown({
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <ChevronDown size={isMobile ? 16 : 20} className="text-white" />
+          <ChevronDown size={isMobile ? 16 : 20} className="text-[#9E9474]" />
         </motion.div>
       </div>
 
@@ -154,7 +153,7 @@ function CustomDropdown({
                     onChange(opt.value);
                     setIsOpen(false);
                   }}
-                  className="w-full flex items-center px-6 hover:bg-white/10 cursor-pointer text-white font-medium transition-colors"
+                  className="w-full flex items-center px-6 hover:bg-white/10 cursor-pointer text-[#9E9474] font-medium transition-colors"
                   style={{
                     height: isMobile ? "40px" : "32px",
                     fontSize: isMobile ? "14px" : "11px",
@@ -268,7 +267,18 @@ export function ApplicationContactFormSection({
           sourcePage: window.location.href,
         }),
       });
-      if (res.ok) setSubmitStatus("success");
+      if (res.ok) {
+        setSubmitStatus("success");
+        // Push success event to Google Tag Manager
+        if (typeof window !== "undefined") {
+          (window as any).dataLayer = (window as any).dataLayer || [];
+          (window as any).dataLayer.push({
+            event: "form_submit_success",
+            form_id: formConfig?.name || "app-form",
+            form_name: formConfig?.name || "Application Form",
+          });
+        }
+      }
     } catch (err) {
       setSubmitStatus("error");
     } finally {
@@ -301,13 +311,13 @@ export function ApplicationContactFormSection({
   const renderField = (field: FormField) => {
     const commonStyles: React.CSSProperties = {
       height: isMobile ? "48px" : "50px",
-      backgroundColor: "rgba(33, 28, 11, 0.2)",
+      backgroundColor: "#D4CBAF",
       paddingLeft: isMobile ? "16px" : "17px",
       paddingRight: isMobile ? "16px" : "17px",
       borderRadius: "10px",
       display: "flex",
       alignItems: "center",
-      color: "white",
+      color: "#9E9474",
     };
 
     if (field.fieldType === "select") {
@@ -321,10 +331,7 @@ export function ApplicationContactFormSection({
           style={{ gap: isScenario ? (isMobile ? "8px" : "7px") : 0 }}
         >
           {isScenario && (
-            <span
-              className="font-bold text-black"
-              style={{ fontSize: "16px" }}
-            >
+            <span className="font-bold text-black" style={{ fontSize: "16px" }}>
               {field.label}
             </span>
           )}
@@ -352,19 +359,19 @@ export function ApplicationContactFormSection({
               height: isMobile ? "48px" : "50px",
               borderRadius: isMobile ? "10px" : "10px",
             }}
-            className="!bg-[rgba(33,28,11,0.2)] border-none"
+            className="!bg-[#D4CBAF] border-none"
             buttonClassName={cn(
               isMobile ? "!pl-[4.1vw] !pr-1" : "!pl-[17px] !pr-2",
             )}
             inputClassName={cn(
-              "!bg-transparent !text-white !font-montserrat !font-semibold !placeholder-white/50 !pl-2 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]",
+              "!bg-transparent !text-[#9E9474] !font-montserrat !font-medium !placeholder-[#9E9474]/50 !pl-2 [&:-webkit-autofill]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]",
               `![font-size:16px]`,
             )}
             dialCodeClassName={cn(
-              "!text-white !font-montserrat !font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important]",
+              "!text-[#9E9474] !font-montserrat !font-medium [&:-webkit-autofill]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important]",
               `![font-size:16px]`,
             )}
-            chevronClassName="!text-white"
+            chevronClassName="!text-[#9E9474]"
           />
         </div>
       );
@@ -377,19 +384,16 @@ export function ApplicationContactFormSection({
           className="flex flex-col font-montserrat"
           style={{ gap: isMobile ? "8px" : "7px" }}
         >
-          <span
-            className="font-bold text-black"
-            style={{ fontSize: "16px" }}
-          >
+          <span className="font-bold text-black" style={{ fontSize: "16px" }}>
             {field.label}
           </span>
           <textarea
             placeholder={field.placeholder?.trim() || field.label}
-            className="w-full font-semibold text-white placeholder:text-white/50 outline-none resize-none"
+            className="w-full font-medium text-[#9E9474] placeholder:text-[#9E9474]/50 outline-none resize-none [&:-webkit-autofill]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             spellCheck="false"
             style={{
               height: isMobile ? "120px" : "91px",
-              backgroundColor: "rgba(33, 28, 11, 0.2)",
+              backgroundColor: "#D4CBAF",
               borderRadius: "10px",
               fontSize: "16px",
               paddingLeft: isMobile ? "16px" : "17px",
@@ -414,7 +418,7 @@ export function ApplicationContactFormSection({
             type={field.fieldType === "email" ? "email" : "text"}
             placeholder={field.placeholder?.trim() || field.label}
             spellCheck="false"
-            className="w-full font-semibold text-white placeholder:text-white/50 outline-none !bg-transparent [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="w-full font-medium text-[#9E9474] placeholder:text-[#9E9474]/50 outline-none !bg-transparent [&:-webkit-autofill]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{ fontSize: "16px" }}
             value={formData[field.fieldName] || ""}
             onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
@@ -481,7 +485,9 @@ export function ApplicationContactFormSection({
   const errorMessage =
     formConfig?.errorMessage ||
     formConfig?.data?.errorMessage ||
-    (locale === "zh" ? "提交失败，请重试。" : "Submission failed, please try again.");
+    (locale === "zh"
+      ? "提交失败，请重试。"
+      : "Submission failed, please try again.");
 
   return (
     <section
@@ -493,7 +499,6 @@ export function ApplicationContactFormSection({
         paddingBottom: "154px",
       }}
     >
-
       <div className="absolute inset-0">
         {bgImage ? (
           <img
@@ -524,7 +529,7 @@ export function ApplicationContactFormSection({
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         className={cn(
-          "relative z-10 flex backdrop-blur-[15px] mx-auto autofill-muted",
+          "relative z-10 flex backdrop-blur-[15px] mx-auto",
           isMobile ? "flex-col mt-[40px]" : "flex-row items-stretch mt-[60px]",
         )}
         style={{
@@ -542,7 +547,10 @@ export function ApplicationContactFormSection({
       >
         {/* LEFT COMPONENT */}
         <div
-          className={cn("flex flex-col", isMobile ? "items-center text-center" : "")}
+          className={cn(
+            "flex flex-col",
+            isMobile ? "items-center text-center" : "",
+          )}
           style={{
             width: isMobile ? "100%" : "343px",
             marginBottom: isMobile ? "30px" : 0,
@@ -611,11 +619,15 @@ export function ApplicationContactFormSection({
             marginLeft: isMobile ? 0 : "23px",
           }}
         >
-          <form onSubmit={handleSubmit} className="flex flex-col h-full">
+          <form
+            id={formConfig?.name || "app-form"}
+            onSubmit={handleSubmit}
+            className="flex flex-col h-full"
+          >
             <div
               className={cn(
                 "grid w-full",
-                isMobile ? "grid-cols-1" : "grid-cols-2"
+                isMobile ? "grid-cols-1" : "grid-cols-2",
               )}
               style={{
                 gap: isMobile ? "12px" : "7px",
@@ -623,11 +635,14 @@ export function ApplicationContactFormSection({
               }}
             >
               {(sortedFields || []).map((field: FormField, index: number) => {
-                const isFullWidth = index >= 4 || field.fieldType === "textarea";
+                const isFullWidth =
+                  index >= 4 || field.fieldType === "textarea";
                 return (
                   <div
                     key={field.fieldName}
-                    className={cn(isFullWidth && !isMobile ? "col-span-2" : "col-span-1")}
+                    className={cn(
+                      isFullWidth && !isMobile ? "col-span-2" : "col-span-1",
+                    )}
                   >
                     {renderField(field)}
                   </div>

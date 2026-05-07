@@ -234,7 +234,11 @@ export function SimplifiedInquiryForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      id={configData?.name || "simplified-inquiry-form"}
+      onSubmit={handleSubmit}
+      className="space-y-4"
+    >
       {requiredFields.map((field: FormField) => (
         <div key={field.fieldName}>
           {renderField(field)}

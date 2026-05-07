@@ -202,7 +202,52 @@ export const Categories: CollectionConfig = {
       hooks: {
         beforeValidate: [formatSlug('name')],
       },
-      unique: true,
+      // Removed global uniqueness to support same name across different types
+      // unique: true,
+      validate: async (val: string | any, { data, req, id }: any) => {
+        if (!val) return true
+        
+        let type = data?.type
+        // Fallback to existing doc if type is not in data (partial update)
+        if (!type && id) {
+          const existing = await req.payload.findByID({
+            collection: 'categories',
+            id,
+            depth: 0,
+            req,
+          })
+          type = existing?.type
+        }
+
+        if (!type) return true
+
+        try {
+          const results = await req.payload.find({
+            collection: 'categories',
+            where: {
+              and: [
+                { slug: { equals: val } },
+                { type: { equals: type } },
+                ...(id ? [{ id: { not_equals: id } }] : []),
+              ],
+            },
+            limit: 1,
+            depth: 0,
+            req,
+          })
+
+          if (results.docs.length > 0) {
+            return req.locale === 'zh' 
+              ? '该 URL 标识在当前分类类型下已存在' 
+              : 'Slug must be unique within the same category type'
+          }
+        } catch (e) {
+          // Fallback to true if query fails to avoid blocking saves
+          return true
+        }
+        
+        return true
+      },
       admin: {
         readOnly: true,
         description: {

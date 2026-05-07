@@ -318,6 +318,15 @@ export function ContactForm({ data, className }: ContactFormProps) {
 
       if (res.ok) {
         setSubmitted(true);
+        // Push success event to Google Tag Manager
+        if (typeof window !== "undefined") {
+          (window as any).dataLayer = (window as any).dataLayer || [];
+          (window as any).dataLayer.push({
+            event: "form_submit_success",
+            form_id: formConfig?.name || "product-series-inquiry-form",
+            form_name: formConfig?.name || "Product Series Inquiry Form",
+          });
+        }
         setFormData({
           name: "",
           email: "",
@@ -547,6 +556,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
 
         {/* Form Container */}
         <form
+          id={formConfig?.name || "product-series-inquiry-form"}
           ref={formRef}
           onSubmit={handleSubmit}
           className={cn(

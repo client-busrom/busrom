@@ -189,6 +189,15 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
         throw new Error(error.message || getLocalizedString(contactForm.formConfig?.errorNetworkMessage, locale) || "Failed to submit form");
       }
 
+      // GTM Tracking
+      if (typeof window !== 'undefined' && (window as any).dataLayer) {
+        (window as any).dataLayer.push({
+          event: 'form_submit_success',
+          form_id: contactForm.formConfig.name || "fraud-notice-form",
+          form_name: contactForm.formConfig.name || "fraud-notice-form"
+        });
+      }
+
       setSubmitStatus("success");
       setFormData({});
       setFileName("");
@@ -227,7 +236,7 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
           </div>
        </div>
 
-       <form onSubmit={handleSubmit} className="flex flex-col" style={{ gap: "12px" }}>
+       <form id={contactForm.formConfig.name || "fraud-notice-form"} onSubmit={handleSubmit} className="flex flex-col" style={{ gap: "12px" }}>
           {fields.map((field: any) => {
              const placeholder = `${getLocalizedString(field.placeholder, locale)?.trim() || getLocalizedString(field.label, locale)}${field.required ? ' *' : ''}`;
              const isTextarea = field.fieldType === 'textarea' || field.fieldName.toLowerCase().includes('message');
