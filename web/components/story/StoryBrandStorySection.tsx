@@ -37,12 +37,37 @@ interface StoryBrandStorySectionProps {
 }
 
 export function StoryBrandStorySection({ data }: StoryBrandStorySectionProps) {
+  const [windowWidth, setWindowWidth] = useState(0);
+
+  useEffect(() => {
+    setWindowWidth(window.innerWidth);
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Responsive Pixel Function with Guard
+  const rpx = useCallback(
+    (px: number) => {
+      if (windowWidth === 0) return `${px}px`;
+
+      let base = 1920;
+      if (windowWidth > 767 && windowWidth < 1440) {
+        // When on tablet/small desktop, use a smaller base to make items relatively larger
+        base = 1360;
+      }
+
+      const val = (px / base) * windowWidth;
+      return `${val}px`;
+    },
+    [windowWidth],
+  );
+
   const [orderedSlides, setOrderedSlides] = useState<BrandStoryItem[]>(
     data.items.slides || [],
   );
-  const [selectedIndex, setSelectedIndex] = useState(0);
 
-  // Embla setup with Infinite Scroll
+  // Embla setup for desktop/tablet
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
       loop: true,
@@ -61,6 +86,20 @@ export function StoryBrandStorySection({ data }: StoryBrandStorySectionProps) {
     ],
   );
 
+  // Separate Embla for mobile
+  const [mobileEmblaRef, mobileEmblaApi] = useEmblaCarousel(
+    { loop: true, align: "center" },
+    [AutoScroll({ speed: 1, stopOnInteraction: false })],
+  );
+
+  const [mobileActiveIndex, setMobileActiveIndex] = useState(0);
+  useEffect(() => {
+    if (!mobileEmblaApi) return;
+    mobileEmblaApi.on("select", () => {
+      setMobileActiveIndex(mobileEmblaApi.selectedScrollSnap());
+    });
+  }, [mobileEmblaApi]);
+
   const handleItemSwap = (clickedSIdx: number) => {
     const ACTIVE_SLIDE_IDX = 2;
     if (clickedSIdx === ACTIVE_SLIDE_IDX) return;
@@ -76,8 +115,6 @@ export function StoryBrandStorySection({ data }: StoryBrandStorySectionProps) {
     });
   };
 
-  // Exact Distances from the Design Layout to ensure tight and overlapping gaps
-  // Col Step is the distance from start of one column to start of the next
   const columns = useMemo(() => {
     const s = (idx: number) => orderedSlides[idx % orderedSlides.length];
 
@@ -148,10 +185,78 @@ export function StoryBrandStorySection({ data }: StoryBrandStorySectionProps) {
     ];
   }, [orderedSlides, data.subtitle, data.title]);
 
+  const isMobile = windowWidth > 0 && windowWidth <= 767;
+
+  if (isMobile) {
+    return (
+      <section className="relative w-full bg-[#464010] py-16 px-0 overflow-hidden min-h-[650px]">
+        {/* Mobile BG Text - Refined Scale */}
+        <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
+          <div className="absolute -top-10 -right-10">
+            <HollowText strokeColor="#ffffff" strokeWidth={1} className="text-7xl tracking-widest uppercase">
+              {data.bgTextTop}
+            </HollowText>
+          </div>
+          <div className="absolute -bottom-10 -left-10">
+            <HollowText strokeColor="#ffffff" strokeWidth={1} className="text-7xl tracking-widest uppercase">
+              {data.bgTextBottom}
+            </HollowText>
+          </div>
+        </div>
+
+        {/* Mobile Header */}
+        <div className="relative z-10 px-6 mb-10">
+          <h2 className="font-josefin-sans font-bold text-3xl text-[#ffeb4b] uppercase tracking-tighter leading-none">
+            {data.title}
+          </h2>
+          <div className="w-12 h-1 bg-[#92c741] my-4" />
+          <p className="font-josefin-sans text-[#92c741] text-base font-bold italic opacity-90">
+            {data.subtitle}
+          </p>
+        </div>
+
+        {/* Mobile Carousel - Improved Card UI */}
+        <div className="relative z-10 overflow-hidden px-4" ref={mobileEmblaRef}>
+          <div className="flex">
+            {data.items.slides.map((item, idx) => (
+              <div key={idx} className="flex-[0_0_82%] px-3 min-w-0">
+                <div className="flex flex-col bg-black/40 backdrop-blur-xl rounded-[32px] overflow-hidden border border-white/5 shadow-2xl">
+                  {/* Fixed Height Image */}
+                  <div className="w-full h-[240px] overflow-hidden relative">
+                    <OptimizedImage
+                      image={item.image}
+                      size="medium"
+                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  </div>
+                  
+                  {/* Content Area */}
+                  <div className="p-6">
+                    <h3 className="text-[#ffeb4b] font-josefin-sans font-bold text-lg mb-3 tracking-wide">
+                      {item.title}
+                    </h3>
+                    
+                    {/* Fixed Height Scrollable Description */}
+                    <div className="h-[90px] overflow-y-auto custom-scrollbar-none">
+                      <p className="text-white/80 font-josefin-sans text-[12px] leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section
       className="relative w-full overflow-hidden"
-      style={{ height: vw(922) }}
+      style={{ height: rpx(922) }}
     >
       {/* 1. Background Masking */}
       <div className="absolute inset-0 z-0">
@@ -197,14 +302,17 @@ export function StoryBrandStorySection({ data }: StoryBrandStorySectionProps) {
         </div>
       </div>
 
-      <div className="relative z-10 w-full h-full max-w-[1920px] mx-auto">
+      {/* Scaling Guard Wrapper for Tablet/Small Desktop */}
+      <div
+        className="relative z-10 w-full h-full max-w-[1920px] mx-auto"
+      >
         <div className="overflow-hidden h-full" ref={emblaRef}>
           <div className="flex h-full items-start">
             {columns.map((col, idx) => (
               <div
                 key={`${col.id}-${idx}`}
                 className="relative flex-shrink-0 h-full"
-                style={{ width: vw(col.step) }} // Distance to NEXT column: achieves the overlapping/tight look of the design
+                style={{ width: vw(col.step) }}
               >
                 {col.items.map((item: any, itemIdx) => (
                   <div
@@ -248,23 +356,24 @@ export function StoryBrandStorySection({ data }: StoryBrandStorySectionProps) {
                           <AnimatePresence>
                             {item.isActive && (
                               <motion.div
-                                className="absolute inset-0 flex flex-col items-center justify-center bg-black/70"
+                                className="absolute inset-0 flex flex-col items-center justify-start bg-black/80 backdrop-blur-md rounded-full overflow-hidden"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
+                                style={{ padding: "15% 10%" }}
                               >
-                                <div className="relative z-30 px-[15%] text-center text-white">
+                                <div className="w-full h-full overflow-y-auto custom-scrollbar-none flex flex-col items-center">
                                   <h4
-                                    className="font-josefin-sans font-bold mb-4"
-                                    style={{ fontSize: vw(34) }}
+                                    className="font-josefin-sans font-bold mb-4 text-white text-center leading-tight"
+                                    style={{ fontSize: "clamp(20px, 2.5vw, 32px)" }}
                                   >
                                     {item.data?.title}
                                   </h4>
                                   <p
-                                    className="font-josefin-sans font-normal opacity-90"
+                                    className="font-josefin-sans font-normal text-white/90 text-center"
                                     style={{
-                                      fontSize: vw(18),
-                                      lineHeight: 1.6,
+                                      fontSize: windowWidth > 1024 ? "16px" : "12px",
+                                      lineHeight: 1.5,
                                     }}
                                   >
                                     {item.data?.description}

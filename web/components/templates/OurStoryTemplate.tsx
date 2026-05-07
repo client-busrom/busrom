@@ -37,7 +37,7 @@ export function OurStoryTemplate({
   };
 
   return (
-    <div className="min-h-screen bg-black" data-header-theme="dark">
+    <div className="min-h-screen bg-[#f6f4ed]" data-header-theme="dark">
       <StoryHeroSection data={data.hero} />
       <StoryWhoWeAreSection data={data.whoWeAre} />
       <StoryBrandPositionSection data={data.brandPosition} />

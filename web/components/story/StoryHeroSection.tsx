@@ -1,11 +1,11 @@
-"use client"
-
-import React from "react"
+import React, { useState, useEffect } from "react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { motion } from "framer-motion"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 const DESIGN_WIDTH = 1920
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
+const mvw = (px: number) => `calc((${px} / 390) * 100vw)`
 
 interface LexicalTextNode {
   text: string
@@ -25,6 +25,126 @@ interface StoryHeroSectionProps {
 }
 
 export function StoryHeroSection({ data }: StoryHeroSectionProps) {
+  const isMobileHook = useIsMobile()
+  const [windowWidth, setWindowWidth] = useState(0)
+
+  useEffect(() => {
+    setWindowWidth(window.innerWidth)
+    const handleResize = () => setWindowWidth(window.innerWidth)
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  const isTabletOrMobile = windowWidth > 0 && windowWidth <= 1024
+
+  if (isTabletOrMobile) {
+    return (
+      <section className="relative w-full bg-[#57522a] pt-[120px] pb-[140px] px-6 sm:px-12 overflow-hidden">
+        {/* Background Decoration */}
+        <div className="absolute top-[-5%] left-[-5%] w-[400px] h-[400px] border border-white/5 rounded-full pointer-events-none" />
+
+        <div className="relative z-10 max-w-[1400px] mx-auto flex flex-col md:flex-row items-start md:items-end gap-12 md:gap-16 lg:gap-24">
+          
+          {/* Left Column: Core Identity */}
+          <div className="w-full md:w-[45%] lg:w-[42%] flex flex-col items-start pt-4 relative z-30">
+            {/* Big Title (Natural Wrapping with Overlap) */}
+            <motion.div 
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="font-joan font-bold text-6xl sm:text-7xl lg:text-8xl xl:text-[100px] text-white leading-[0.8] mb-12 drop-shadow-2xl flex flex-wrap gap-x-4"
+            >
+              {data.titleNodes?.map((node, i) => (
+                <span 
+                  key={i} 
+                  style={{ color: node.format === 1 ? "#ffa100" : "#fff07c" }}
+                >
+                  {node.text}
+                </span>
+              ))}
+            </motion.div>
+
+            {/* Main Content Paragraph */}
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="font-josefin-sans text-lg sm:text-xl text-white/90 leading-relaxed max-w-[500px]"
+            >
+              {data.content}
+            </motion.p>
+          </div>
+
+          {/* Right Column: Details & Visuals */}
+          <div className="w-full md:w-[55%] lg:w-[58%] relative flex flex-col items-start">
+            
+            {/* Description (Top Small Text) */}
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="font-josefin-sans font-semibold text-lg sm:text-xl text-[#F7FF5A] mb-4"
+            >
+              {data.descriptionNodes?.map((node, i) => node.text).join("")}
+            </motion.div>
+
+            {/* The Main Visual Group (Image + Overlapping Elements) */}
+            <div className="relative w-full">
+              {/* Hero Image */}
+              <motion.div 
+                initial={{ opacity: 0, scale: 1.02 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1 }}
+                className="relative w-full aspect-[16/9] md:aspect-[1.1] rounded-[40px] overflow-hidden shadow-2xl border border-[#d6cd88]"
+              >
+                <OptimizedImage
+                  image={data.heroImage}
+                  alt="Hero"
+                  size="large"
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+
+              {/* Overlapping Content Area */}
+              <div className="absolute left-[4%] sm:left-[6%] md:left-[8%] bottom-[-40px] md:bottom-[-20px] z-20 flex flex-col items-start gap-4 pointer-events-none">
+                {/* Subtitle (Overlapping) */}
+                <motion.h2 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="font-josefin-sans font-bold text-xl sm:text-3xl lg:text-4xl text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] pointer-events-auto"
+                >
+                  {data.subtitle}
+                </motion.h2>
+
+                {/* Feature Items (Stepped Vertical Stack Overlapping) */}
+                <div className="flex flex-col gap-3 w-fit pointer-events-none">
+                  {data.items.map((item, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4 + i * 0.1 }}
+                      style={{ marginLeft: `${i * 24}px` }}
+                      className="group relative px-6 py-2 rounded-full border border-[#ffec51]/30 bg-[#3a2000cc] backdrop-blur-sm text-[#ffec51] font-josefin-sans font-semibold text-xs sm:text-sm flex items-center justify-between gap-8 shadow-[0_4px_12px_rgba(0,0,0,0.3)] hover:border-[#ffec51] transition-all w-fit whitespace-nowrap pointer-events-auto"
+                    >
+                      <span>{item}</span>
+                      {/* Item Star */}
+                      <div className="w-3.5 h-3.5 text-[#ffec51] opacity-70 group-hover:opacity-100 group-hover:rotate-90 transition-all duration-500">
+                        <svg viewBox="0 0 30 30" fill="currentColor">
+                          <path d="M14.7165 0.92389c-0.42564-1.23186-1.10666-1.23186-1.53231 0l-2.35521 6.93806c-0.41145 1.23186-1.7735 2.57699-2.99366 3.00177l-6.90955 2.35044c-1.23436 0.42478-1.23436 1.10442 0 1.5292l6.86698 2.37876c1.23435 0.42478 2.58221 1.78407 3.00786 3.00177l2.39777 6.95221c0.42564 1.23186 1.10666 1.23186 1.5323 0l2.34102-6.90973c0.41145-1.23186 1.75931-2.57699 2.99367-3.00177l7.00887-2.39292c1.23436-0.42478 1.23436-1.10442 0-1.51504l-6.89537-2.32213c-1.23436-0.41062-2.58221-1.75575-3.00785-2.98761-0.04256-0.01416-2.45452-7.02301-2.45452-7.02301z" />
+                        </svg>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section 
       className="relative w-full overflow-hidden"

@@ -23,6 +23,108 @@ interface StoryWhoWeAreSectionProps {
 }
 
 export function StoryWhoWeAreSection({ data }: StoryWhoWeAreSectionProps) {
+  const [windowWidth, setWindowWidth] = React.useState(0);
+
+  React.useEffect(() => {
+    setWindowWidth(window.innerWidth);
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const isTabletOrMobile = windowWidth > 0 && windowWidth <= 1024;
+
+  if (isTabletOrMobile) {
+    return (
+      <section className="relative w-full bg-[#57522a] py-[80px] sm:py-[120px] px-6 sm:px-12 overflow-hidden">
+        {/* Background Image (Shared) */}
+        <div className="absolute inset-0 z-0">
+          <OptimizedImage
+            image={data.bgImage}
+            alt="Who We Are Background"
+            size="xlarge"
+            className="absolute inset-0 w-full h-full object-cover opacity-33 blur-[8px]"
+          />
+          <div className="absolute inset-0 bg-black/20" />
+        </div>
+
+        {/* SVG Filter for Bold Title Outline (Shared) */}
+        <svg width="0" height="0" className="absolute">
+          <defs>
+            <filter id="true-outline-mobile" x="-20%" y="-20%" width="140%" height="140%">
+              <feMorphology in="SourceAlpha" operator="dilate" radius="1.2" result="dilated" />
+              <feComposite in="dilated" in2="SourceAlpha" operator="out" result="outline" />
+              <feFlood floodColor="white" result="white" />
+              <feComposite in="white" in2="outline" operator="in" />
+            </filter>
+          </defs>
+        </svg>
+
+        <div className="relative z-10 max-w-[1400px] mx-auto flex flex-col md:flex-row items-start gap-12 md:gap-20">
+          
+          {/* Left Block: Title & Description Box */}
+          <div className="w-full md:w-[45%] flex flex-col gap-8">
+            {/* Title */}
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              className="flex flex-wrap items-baseline gap-4 font-josefin-sans"
+            >
+              {data.titleNodes?.map((node, idx) => {
+                const isBold = node.format === 1;
+                return (
+                  <span
+                    key={idx}
+                    className="font-semibold leading-none"
+                    style={{
+                      fontSize: isBold ? "min(12vw, 80px)" : "min(8vw, 60px)",
+                      color: "white",
+                      filter: isBold ? "url(#true-outline-mobile)" : "none",
+                      textShadow: !isBold ? "0 4px 10px rgba(0,0,0,0.3)" : "none",
+                    }}
+                  >
+                    {node.text}
+                  </span>
+                );
+              })}
+            </motion.div>
+
+            {/* Description Box (ehr0Q) */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              className="relative w-full p-8 sm:p-12 rounded-[40px] border border-[#ffec51] bg-[#3a20008c] shadow-[0_0_12px_#ffbf51]"
+            >
+              {/* Star Decoration */}
+              <div className="absolute top-[-20px] right-[-20px] w-12 h-12 text-[#ffec51]">
+                <svg viewBox="0 0 1000 1000" fill="currentColor">
+                  <path d="M531.07202 33.408c-15.35998-44.544-39.93603-44.544-55.29602 0l-84.992 250.87999c-14.848 44.54401-64 93.18403-108.03202 108.54401l-249.34398 84.99201c-44.544 15.35998-44.544 39.936 0 55.29599l247.808 86.01599c44.54401 15.35998 93.18399 64.51202 108.54398 108.544l86.52801 251.39203c15.35999 44.54398 39.93607 44.54398 55.29606 0l84.47998-249.85602c14.84802-44.544 63.48797-93.18402 108.03198-108.544l252.92804-86.52802c44.54405-15.35998 44.54405-39.936 0-54.78399l-248.83203-83.96799c-44.54401-14.84799-93.18402-63.48801-108.54401-108.03201-1.53601-0.512-88.57599-253.95199-88.57599-253.95199z" />
+                </svg>
+              </div>
+
+              {/* Description Text */}
+              <div className="font-josefin-sans font-medium text-xl sm:text-2xl text-[#ffec51] leading-relaxed text-shadow-sm">
+                {data.description}
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Right Block: Content */}
+          <div className="w-full md:w-[55%] pt-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="font-josefin-sans text-lg sm:text-xl text-white leading-relaxed text-shadow-sm"
+            >
+              {data.content}
+            </motion.div>
+          </div>
+
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section
       className="relative w-full overflow-hidden"

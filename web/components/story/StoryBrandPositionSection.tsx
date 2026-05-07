@@ -146,14 +146,45 @@ function CapsuleActiveIndicator() {
   );
 }
 
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
+
 export function StoryBrandPositionSection({
   data,
 }: StoryBrandPositionSectionProps) {
+  const [windowWidth, setWindowWidth] = useState(0);
+
+  useEffect(() => {
+    setWindowWidth(window.innerWidth);
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Auto-play Logic
+  // Embla setup for mobile
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { loop: true, align: "center", skipSnaps: false },
+    [
+      Autoplay({
+        delay: data.items.interval || 4000,
+        stopOnInteraction: false,
+      }),
+    ],
+  );
+
   useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on("select", () => {
+      setActiveIndex(emblaApi.selectedScrollSnap());
+    });
+  }, [emblaApi]);
+
+  // Desktop Auto-play Logic
+  useEffect(() => {
+    if (windowWidth <= 1024) return;
     const { autoplay, interval, slides } = data.items;
     if (!autoplay || isPaused || slides.length === 0) return;
 
@@ -162,7 +193,162 @@ export function StoryBrandPositionSection({
     }, interval);
 
     return () => clearInterval(timer);
-  }, [data.items, isPaused]);
+  }, [data.items, isPaused, windowWidth]);
+
+  const isMobile = windowWidth > 0 && windowWidth <= 767;
+
+  if (isMobile) {
+    return (
+      <section className="relative w-full bg-[#f2efd8] pb-20 px-6 sm:px-12">
+        {/* Title Area (Perfectly Bridging Sections - No-animation Positioning) */}
+        <div className="absolute left-6 sm:left-12 top-0 z-30 -translate-y-[28%]">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col items-start gap-1"
+          >
+            {data.title.split(" ").map((word, idx) => {
+              if (idx === 0) {
+                return (
+                  <div
+                    key={idx}
+                    className="relative inline-block font-josefin-sans font-bold leading-none"
+                    style={{ fontSize: "min(16vw, 100px)" }}
+                  >
+                    {/* Top Part (White) - Will be in the section above */}
+                    <div
+                      className="absolute text-white overflow-hidden whitespace-nowrap"
+                      style={{ height: "42%", width: "100%", top: 0 }}
+                    >
+                      {word}
+                    </div>
+                    {/* Bottom Part (Olive) - Will be in this section */}
+                    <div
+                      className="absolute text-[#756f3f] overflow-hidden whitespace-nowrap"
+                      style={{ height: "58%", bottom: 0, width: "100%" }}
+                    >
+                      <div style={{ transform: "translateY(-42%)" }}>
+                        {word}
+                      </div>
+                    </div>
+                    {/* Invisible Placeholder for spacing */}
+                    <div className="opacity-0 whitespace-nowrap">{word}</div>
+                  </div>
+                );
+              }
+              return (
+                <span
+                  key={idx}
+                  className="text-[#756f3f] font-josefin-sans font-bold tracking-widest uppercase"
+                  style={{ fontSize: "min(5vw, 20px)" }}
+                >
+                  {word}
+                </span>
+              );
+            })}
+          </motion.div>
+        </div>
+
+        {/* Carousel Spacer - to avoid title overlap */}
+        <div className="pt-24 sm:pt-32" />
+
+        {/* Mobile Embla Carousel */}
+        <div className="relative mb-20 overflow-hidden" ref={emblaRef}>
+          <div className="flex items-center">
+            {data.items.slides.map((item, i) => (
+              <div
+                key={i}
+                className="flex-[0_0_85%] sm:flex-[0_0_50%] md:flex-[0_0_40%] px-4 min-w-0"
+              >
+                <div className="flex flex-col items-center">
+                  {/* Oval Card */}
+                  <div
+                    className={`relative overflow-hidden bg-[#d9d9d9] border border-black/5 transition-all duration-500 rounded-full aspect-[2/3] w-full max-w-[280px] ${
+                      i === activeIndex ? "shadow-xl" : "opacity-40"
+                    }`}
+                  >
+                    <OptimizedImage
+                      image={item.image}
+                      size="medium"
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  </div>
+
+                  {/* Label */}
+                  <div
+                    className={`mt-8 font-bold font-josefin-sans text-center text-xl sm:text-2xl text-black transition-opacity duration-300 ${
+                      i === activeIndex ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    {item.title}
+                  </div>
+
+                  {/* Description */}
+                  {i === activeIndex && item.description && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="mt-4 font-josefin-sans text-center text-[#6b6744] text-sm sm:text-base max-w-[260px]"
+                    >
+                      {item.description}
+                    </motion.p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom Stack: Philosophy & Content */}
+        <div className="max-w-[1400px] mx-auto flex flex-col items-center gap-16">
+          {/* Philosophy Image */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            className="relative w-full max-w-[600px] aspect-[1.6] rounded-[200px] overflow-hidden border border-[#b1ac7f] p-4"
+          >
+            <div className="w-full h-full rounded-[180px] overflow-hidden">
+              <OptimizedImage
+                image={data.image}
+                alt="Philosophy"
+                size="large"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </motion.div>
+
+          {/* Subtitle & Description */}
+          <div className="flex flex-col items-center text-center gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="flex flex-col items-center"
+            >
+              <HollowText
+                strokeWidth={1}
+                strokeColor="#524d20"
+                className="text-6xl sm:text-8xl leading-none"
+              >
+                {data.subtitle.split(" ")[0]}
+              </HollowText>
+              <span className="text-6xl sm:text-8xl text-[#524d20] leading-none -mt-4">
+                {data.subtitle.split(" ").slice(1).join(" ")}
+              </span>
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="font-josefin-sans text-lg sm:text-xl text-[#6b6744] leading-relaxed max-w-[700px]"
+            >
+              {data.description}
+            </motion.p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -445,7 +631,7 @@ export function StoryBrandPositionSection({
 
         <motion.div
           initial={{ opacity: 0, x: 50 }}
-          whileInView={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
           className="absolute z-30 font-josefin-sans text-left whitespace-pre-line"
