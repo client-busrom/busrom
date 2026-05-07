@@ -403,7 +403,7 @@ export const Categories: CollectionConfig = {
       },
       filterOptions: {
         // Only allow products to be linked here
-        status: { equals: 'published' }
+        status: { in: ['published', 'draft'] }
       },
       admin: {
         condition: (data) => data?.type === 'PRODUCT',
