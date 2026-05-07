@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { motion, AnimatePresence } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const DESIGN_WIDTH = 1920;
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
+const mvw = (px: number) => `calc((${px} / 390) * 100vw)`;
 
 interface MediaObject {
   url: string;
@@ -28,8 +30,19 @@ interface StoryBrandHighlightsSectionProps {
 export function StoryBrandHighlightsSection({
   data,
 }: StoryBrandHighlightsSectionProps) {
+  const isMobileHook = useIsMobile();
   const [activeSlideIdx, setActiveSlideIdx] = useState(0);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
+  const [windowWidth, setWindowWidth] = useState(0);
+
+  useEffect(() => {
+    setWindowWidth(window.innerWidth);
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const isTabletOrMobile = windowWidth > 0 && windowWidth <= 1024;
 
   const slides = (data?.slides || []).slice(0, 4);
   const currentSlide = slides[activeSlideIdx];
@@ -57,6 +70,144 @@ export function StoryBrandHighlightsSection({
 
   if (!slides.length) return null;
 
+  // --- MOBILE / TABLET LAYOUT ---
+  if (isTabletOrMobile) {
+    return (
+      <section className="relative w-full py-10 px-5 bg-[#f6f4ed]">
+        <div className="text-center font-josefin-sans font-bold text-3xl mb-8 text-[#3b3b3b]">
+          {data?.title || "Brand Highlights"}
+        </div>
+
+        <div className="relative w-full max-w-[420px] md:max-w-[500px] mx-auto aspect-[350/560] rounded-[40px] overflow-hidden shadow-xl bg-white group">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeSlideIdx}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.4 }}
+              className="absolute inset-0 flex flex-col"
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              onDragEnd={(_, info) => {
+                if (info.offset.x < -50) handleNextSlide();
+                if (info.offset.x > 50) handlePrevSlide();
+              }}
+            >
+              {/* Background Layer: Image 2 + Blur */}
+              <div className="absolute inset-0 z-0">
+                {currentSlide?.images?.[1] ? (
+                  <OptimizedImage
+                    image={currentSlide.images[1]}
+                    alt=""
+                    className="object-cover w-full h-full blur-2xl scale-110 opacity-30"
+                  />
+                ) : (
+                  currentSlide?.images?.[0] && (
+                    <OptimizedImage
+                      image={currentSlide.images[0]}
+                      alt=""
+                      className="object-cover w-full h-full blur-2xl scale-110 opacity-20"
+                    />
+                  )
+                )}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/40 to-white" />
+              </div>
+
+              {/* Content Layer */}
+              <div className="relative z-10 h-full p-8 flex flex-col items-center">
+                {/* Index Indicator */}
+                <div className="w-full flex justify-end mb-4">
+                  <span className="font-josefin-sans font-bold text-2xl text-[#756f3f]/40 italic">
+                    {formatIndex(activeSlideIdx)}
+                  </span>
+                </div>
+
+                {/* Small Square Image: Image 1 */}
+                <div className="w-[200px] aspect-[200/280] rounded-[32px] overflow-hidden shadow-xl mb-8 bg-gray-100 border-4 border-white">
+                  {currentSlide?.images?.[0] && (
+                    <OptimizedImage
+                      image={currentSlide.images[0]}
+                      alt=""
+                      className="object-cover w-full h-full"
+                    />
+                  )}
+                </div>
+
+                {/* Text Content */}
+                <h3 className="font-josefin-sans font-bold text-2xl text-[#574f0e] text-center mb-4 leading-tight">
+                  {currentSlide?.title}
+                </h3>
+                <p className="font-josefin-sans font-semibold text-[#756f3f] text-center text-sm leading-relaxed px-2 overflow-y-auto max-h-[140px]">
+                  {currentSlide?.content}
+                </p>
+
+                {/* Bottom Navigation Buttons */}
+                <div className="mt-auto w-full flex justify-between items-center px-4 pb-4">
+                  <button
+                    onClick={handlePrevSlide}
+                    className="w-12 h-12 rounded-full border border-[#756f3f] flex items-center justify-center hover:bg-[#756f3f] group/btn transition-colors"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      className="rotate-180 group-hover/btn:stroke-white stroke-[#756f3f]"
+                    >
+                      <path
+                        d="M9 18l6-6-6-6"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        stroke="currentColor"
+                      />
+                    </svg>
+                  </button>
+
+                  <div className="flex gap-2">
+                    {slides.map((_, i) => (
+                      <div
+                        key={i}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          activeSlideIdx === i
+                            ? "bg-[#574f0e] w-4"
+                            : "bg-[#574f0e]/20"
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={handleNextSlide}
+                    className="w-12 h-12 rounded-full border border-[#756f3f] flex items-center justify-center hover:bg-[#756f3f] group/btn transition-colors"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      className="group-hover/btn:stroke-white stroke-[#756f3f]"
+                    >
+                      <path
+                        d="M9 18l6-6-6-6"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        stroke="currentColor"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </section>
+    );
+  }
+
+  // --- DESKTOP LAYOUT ---
   return (
     <section
       className="relative w-full max-w-[1920px] mx-auto overflow-hidden my-[60px]"
@@ -183,7 +334,13 @@ export function StoryBrandHighlightsSection({
                 fill="none"
                 className="rotate-180 group-hover:stroke-white stroke-black transition-all duration-300 group-hover:scale-125"
               >
-                <path d="M9 18l6-6-6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor" />
+                <path
+                  d="M9 18l6-6-6-6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  stroke="currentColor"
+                />
               </svg>
             </button>
 
@@ -199,7 +356,13 @@ export function StoryBrandHighlightsSection({
                 fill="none"
                 className="group-hover:stroke-white stroke-black transition-all duration-300 group-hover:scale-125"
               >
-                <path d="M9 18l6-6-6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor" />
+                <path
+                  d="M9 18l6-6-6-6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  stroke="currentColor"
+                />
               </svg>
             </button>
           </div>
@@ -222,7 +385,12 @@ export function StoryBrandHighlightsSection({
           {/* Index Counter */}
           <div
             className="absolute z-20 font-josefin-sans font-semibold text-white text-center"
-            style={{ left: vw(483), top: vw(687), fontSize: vw(36), lineHeight: 1 }}
+            style={{
+              left: vw(483),
+              top: vw(687),
+              fontSize: vw(36),
+              lineHeight: 1,
+            }}
           >
             <AnimatePresence mode="wait">
               <motion.div
@@ -287,7 +455,9 @@ export function StoryBrandHighlightsSection({
                 <div
                   onClick={() => !isActive && setActiveSlideIdx(index)}
                   className={`relative w-full flex flex-col items-center transition-all duration-300 ${
-                    isActive ? "opacity-0 pointer-events-none" : "cursor-pointer group"
+                    isActive
+                      ? "opacity-0 pointer-events-none"
+                      : "cursor-pointer group"
                   }`}
                 >
                   <div
