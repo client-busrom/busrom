@@ -353,35 +353,60 @@ export function StoryBrandStorySection({ data }: StoryBrandStorySectionProps) {
                             className="object-cove w-full h-full"
                           />
 
-                          <AnimatePresence>
-                            {item.isActive && (
-                              <motion.div
-                                className="absolute inset-0 flex flex-col items-center justify-start bg-black/80 backdrop-blur-md rounded-full overflow-hidden"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                style={{ padding: "15% 10%" }}
-                              >
-                                <div className="w-full h-full overflow-y-auto custom-scrollbar-none flex flex-col items-center">
-                                  <h4
-                                    className="font-josefin-sans font-bold mb-4 text-white text-center leading-tight"
-                                    style={{ fontSize: "clamp(20px, 2.5vw, 32px)" }}
-                                  >
-                                    {item.data?.title}
-                                  </h4>
-                                  <p
-                                    className="font-josefin-sans font-normal text-white/90 text-center"
-                                    style={{
-                                      fontSize: windowWidth > 1024 ? "16px" : "12px",
-                                      lineHeight: 1.5,
-                                    }}
-                                  >
-                                    {item.data?.description}
-                                  </p>
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
+                  <AnimatePresence>
+                    {item.isActive && (
+                      <motion.div
+                        className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md rounded-full overflow-hidden"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                      >
+                        <div 
+                          className="w-full h-full overflow-y-auto custom-scrollbar-none cursor-grab active:cursor-grabbing select-none"
+                          onPointerDown={(e) => e.stopPropagation()}
+                          onMouseDown={(e) => {
+                            const el = e.currentTarget;
+                            const startY = e.pageY - el.offsetTop;
+                            const scrollTop = el.scrollTop;
+                            
+                            const onMouseMove = (moveEvent: MouseEvent) => {
+                              const y = moveEvent.pageY - el.offsetTop;
+                              const walk = (y - startY) * 2; // Scroll speed
+                              el.scrollTop = scrollTop - walk;
+                            };
+                            
+                            const onMouseUp = () => {
+                              window.removeEventListener("mousemove", onMouseMove);
+                              window.removeEventListener("mouseup", onMouseUp);
+                            };
+                            
+                            window.addEventListener("mousemove", onMouseMove);
+                            window.addEventListener("mouseup", onMouseUp);
+                          }}
+                          data-lenis-prevent
+                          style={{ clipPath: "circle(50% at 50% 50%)" }}
+                        >
+                          <div className="min-h-full flex flex-col items-center justify-center py-[30%] px-[15%]">
+                            <h4
+                              className="font-josefin-sans font-bold mb-6 text-white text-center leading-tight"
+                              style={{ fontSize: rpx(48) }}
+                            >
+                              {item.data?.title}
+                            </h4>
+                            <p
+                              className="font-josefin-sans font-normal text-white/90 text-center"
+                              style={{
+                                fontSize: rpx(24),
+                                lineHeight: 1.6,
+                              }}
+                            >
+                              {item.data?.description}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                         </div>
 
                         {item.isActive && (

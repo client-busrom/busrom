@@ -681,10 +681,6 @@ const altitudeToZoom = (alt: number) => {
   );
 };
 
-// 默认标题（fallback）
-const DEFAULT_TITLE = "GLOBAL NETWORK";
-const DEFAULT_DESCRIPTION = "Serving Customers Worldwide From Guangdong, China";
-
 export default React.memo(function Sphere3D({
   locale = "en",
   data,
@@ -692,8 +688,8 @@ export default React.memo(function Sphere3D({
   className,
 }: Sphere3DProps) {
   // 使用后端数据，fallback 到默认值
-  const title = data?.title || DEFAULT_TITLE;
-  const description = data?.description || DEFAULT_DESCRIPTION;
+  const title = data?.title || "GLOBAL NETWORK";
+  const description = data?.description || "Serving Customers Worldwide From Guangdong, China";
 
   useEffect(() => {
     console.log(`[Sphere3D] Rendered/Mounted with title: ${title}`);
@@ -1045,7 +1041,7 @@ export default React.memo(function Sphere3D({
             pointColor={getPointColor}
             pointRadius={getPointRadius}
             pointAltitude={0.01}
-            pointResolution={12}
+            pointResolution={4}
             pointLabel={getPointLabel}
             onPointClick={handlePointClick}
             ringsData={[]}

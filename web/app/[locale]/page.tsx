@@ -9,6 +9,7 @@ import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import { HomePageClient } from "./HomePageClient"
 import { cookies } from "next/headers"
+import { getMessages } from "@/i18n.config"
 
 // Force dynamic rendering to ensure fresh content and cookie-based strategy support
 export const dynamic = 'force-dynamic'
@@ -81,6 +82,15 @@ async function HomeContentLoader({ locale }: { locale: Locale }) {
   // 3. Parse Data on Server with SEO Keywords
   const content = parseHomeData(rawData, locale, strategy, seoKeywords)
   const lcpImageUrls = getLCPImageUrls(content)
+
+  // 4. Get Globe Translations
+  const messages = await getMessages(locale)
+  if (!content.sphere3d) {
+    content.sphere3d = {
+      title: messages.Sphere3D?.title || "GLOBAL NETWORK",
+      description: messages.Sphere3D?.description || "Serving Customers Worldwide From Guangdong, China"
+    }
+  }
 
   return (
     <>

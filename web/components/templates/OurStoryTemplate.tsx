@@ -8,6 +8,7 @@ import { StoryBrandStorySection } from "@/components/story/StoryBrandStorySectio
 import { StoryBrandHighlightsSection } from "@/components/story/StoryBrandHighlightsSection";
 import { StoryBrandStrengthsSection } from "@/components/story/StoryBrandStrengthsSection";
 import { StoryBrandMilestonesSection } from "@/components/story/StoryBrandMilestonesSection";
+import Sphere3D from "@/components/home/sphere-3d";
 import { StoryBrandSustainabilitySection } from "@/components/story/StoryBrandSustainabilitySection";
 import { StoryBrandProspectSection } from "@/components/story/StoryBrandProspectSection";
 import { StoryContactFormSection } from "@/components/story/StoryContactFormSection";
@@ -19,12 +20,14 @@ interface OurStoryTemplateProps {
   locale: string;
   data: OurStoryData;
   applications: any[];
+  sphere3dData: { title: string; description: string };
 }
 
 export function OurStoryTemplate({
   locale,
   data,
   applications,
+  sphere3dData,
 }: OurStoryTemplateProps) {
   // Combine extracted data with resolved applications for the applications section
   const applicationsDataWithItems = {
@@ -45,6 +48,7 @@ export function OurStoryTemplate({
       <StoryBrandHighlightsSection data={data.brandHighlights} />
       <StoryBrandStrengthsSection data={data.brandStrengths} />
       <StoryBrandMilestonesSection data={data.brandTravel} />
+      <Sphere3D locale={locale} data={sphere3dData} />
       <StoryBrandSustainabilitySection data={data.sustainability} />
       <StoryBrandProspectSection data={data.prospect} />
       <StoryContactFormSection data={data.contactForm} />

@@ -8,6 +8,7 @@ import { parseOurStoryData } from "@/lib/parsers/our-story-parser"
 import { OurStoryTemplate } from "@/components/templates/OurStoryTemplate"
 import { notFound } from "next/navigation"
 import { PAGE_SLUGS } from "@/lib/constants"
+import { getMessages } from "@/i18n.config"
 
 export async function generateMetadata({
   params,
@@ -37,6 +38,11 @@ export default async function OurStoryPage({
   }
 
   const parsedData = parseOurStoryData(locale, rawData)
+  const messages = await getMessages(locale)
+  const sphere3dData = {
+    title: messages.Sphere3D?.title || "GLOBAL NETWORK",
+    description: messages.Sphere3D?.description || "Serving Customers Worldwide From Guangdong, China"
+  }
 
   // Resolve applications data for the story applications section
   const allApplications = rawData.applications || []
@@ -69,6 +75,7 @@ export default async function OurStoryPage({
         locale={locale} 
         data={parsedData} 
         applications={applications as any[]} 
+        sphere3dData={sphere3dData}
       />
       
       <PageScripts path="/about/story" pageType="our_story" position="footer" />

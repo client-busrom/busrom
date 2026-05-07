@@ -45,9 +45,19 @@ export function StoryBrandMilestonesSection({
   data,
 }: StoryBrandMilestonesSectionProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(0);
   const [focusSlideIndex, setFocusSlideIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [pathLength, setPathLength] = useState(0);
+
+  useEffect(() => {
+    setWindowWidth(window.innerWidth);
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const isMobile = windowWidth > 0 && windowWidth < 1024;
 
   const pathRef = useRef<SVGPathElement>(null);
   const [lut, setLut] = useState<{ x: number; y: number }[]>([]);
@@ -101,6 +111,7 @@ export function StoryBrandMilestonesSection({
     setFocusSlideIndex((prev) => prev - 1);
   };
 
+
   // Helper to interpolate between discrete slot values (ratios or sizes)
   const getInterpolatedValue = (
     slotFloat: number,
@@ -145,9 +156,131 @@ export function StoryBrandMilestonesSection({
 
   if (!isMounted) return null;
 
+  if (isMobile) {
+    const activeIndex =
+      ((focusSlideIndex % slides.length) + slides.length) % slides.length;
+    const activeSlide = slides[activeIndex];
+
+    return (
+      <section className="relative w-full overflow-hidden bg-[#f6f4ed] py-10 md:py-16">
+        <div className="px-6 md:px-12 mb-8 max-w-[1440px] mx-auto">
+          <h2 className="font-josefin-sans font-bold text-[#574f0e] text-[26px] md:text-[48px] leading-tight">
+            {data?.title}
+          </h2>
+        </div>
+
+        <div className="px-6 flex flex-col items-center w-full">
+          {/* iPad and Mobile Container with Width Limit */}
+          <div className="w-full max-w-[560px] relative">
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div
+                key={activeIndex}
+                custom={direction}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.8}
+                onDragEnd={(_, info) => {
+                  const swipeThreshold = 50;
+                  if (info.offset.x < -swipeThreshold) {
+                    handleNext();
+                  } else if (info.offset.x > swipeThreshold) {
+                    handlePrev();
+                  }
+                }}
+                initial={{ opacity: 0, x: direction * 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -direction * 40 }}
+                transition={{ duration: 0.4, ease: "easeInOut" }}
+                className="w-full cursor-grab active:cursor-grabbing"
+              >
+                {/* Fused Card Container */}
+                <div className="relative w-full rounded-[20px] overflow-hidden shadow-xl bg-[#FDF4D7]">
+                  {/* Top: Image Section */}
+                  <div className="relative w-full aspect-[16/9] overflow-hidden">
+                    <OptimizedImage
+                      image={activeSlide?.image || "/BusromFooterBg_original.webp"}
+                      alt=""
+                      size="medium"
+                      className="object-cover w-full h-full"
+                    />
+                    
+                    {/* Year Indicator Overlap inside Image area */}
+                    <div
+                      className="absolute right-4 top-4 font-josefin-sans font-bold text-[#E5DEB6] select-none pointer-events-none z-10"
+                      style={{
+                        fontSize: "clamp(36px, 8vw, 56px)",
+                        lineHeight: 1,
+                        textShadow: "0 2px 10px rgba(0,0,0,0.15)",
+                      }}
+                    >
+                      {activeSlide?.buttonText}
+                    </div>
+                  </div>
+
+                  {/* Bottom: Narrative Section */}
+                  <div className="relative w-full bg-[#FFFCF0] p-5 md:p-8 flex flex-col">
+                    <div className="flex flex-col gap-1 mb-4">
+                      {activeSlide?.title.split("\n").map((line, idx) => (
+                        <h3 
+                          key={idx} 
+                          className="font-josefin-sans font-bold text-black text-[16px] md:text-[20px] leading-tight"
+                        >
+                          {line}
+                        </h3>
+                      ))}
+                    </div>
+                    
+                    {/* Description with Internal Scroll for long content */}
+                    <div className="relative">
+                      <div 
+                        className="font-josefin-sans font-medium text-[#323232] text-[14px] md:text-[16px] leading-relaxed max-h-[160px] overflow-y-auto pr-2 custom-scrollbar"
+                      >
+                        {activeSlide?.description}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Mobile Navigation */}
+            <div className="flex justify-between items-center mt-8">
+              <div
+                className="w-10 h-10 flex items-center justify-center border border-[#756f3f] rounded-full active:bg-[#756f3f]/10 cursor-pointer"
+                onClick={handlePrev}
+              >
+                <svg className="w-5 h-5 rotate-180 text-[#756f3f]" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+
+              <div className="flex gap-2">
+                {slides.map((_, i) => (
+                  <div
+                    key={i}
+                    className={`w-1.5 h-1.5 rounded-full transition-all ${i === activeIndex ? "bg-[#756f3f] w-3" : "bg-[#756f3f]/30"}`}
+                  />
+                ))}
+              </div>
+
+              <div
+                className="w-10 h-10 flex items-center justify-center border border-[#756f3f] rounded-full active:bg-[#756f3f]/10 cursor-pointer"
+                onClick={handleNext}
+              >
+                <svg className="w-5 h-5 text-[#756f3f]" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   // Adjustable ratios for the directional arrows along the path
-  const arrow1Ratio = 0.76; // 调整这个比例让第一个箭头在线条上滑动
-  const arrow2Ratio = 0.48; // 调整这个比例让第二个箭头在线条上滑动
+  const arrow1Ratio = 0.76;
+  const arrow2Ratio = 0.48;
 
   const arrow1Pos = getPointAtRatio(arrow1Ratio);
   const arrow2Pos = getPointAtRatio(arrow2Ratio);

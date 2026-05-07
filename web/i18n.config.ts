@@ -42,8 +42,5 @@ export function isNonDefaultLocale(locale: string): boolean {
 // This is used for static UI translations via next-intl
 // 只有 en 和 zh 有完整的 UI 翻译，其他语言 fallback 到 en
 export const getMessages = async (locale: Locale) => {
-  // 只有这些语言有 UI 翻译文件
-  const supportedUILocales = ["en", "zh"]
-  const actualLocale = supportedUILocales.includes(locale) ? locale : "en"
-  return (await import(`./messages/${actualLocale}.json`)).default
+  return (await import(`./messages/${locale}.json`)).default
 }

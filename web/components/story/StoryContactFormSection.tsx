@@ -355,11 +355,13 @@ export function StoryContactFormSection({
       }
 
       // GTM Tracking
-      if (typeof window !== 'undefined' && (window as any).dataLayer) {
+      if (typeof window !== "undefined" && (window as any).dataLayer) {
         (window as any).dataLayer.push({
-          event: 'form_submit_success',
-          form_id: (mergedConfig as any)?.name || configData?.name || "contact-form",
-          form_name: (mergedConfig as any)?.name || configData?.name || "contact-form"
+          event: "form_submit_success",
+          form_id:
+            (mergedConfig as any)?.name || configData?.name || "contact-form",
+          form_name:
+            (mergedConfig as any)?.name || configData?.name || "contact-form",
         });
       }
 
@@ -582,7 +584,7 @@ export function StoryContactFormSection({
             )}
             style={
               !isMobile
-                ? { left: vw(153), top: vw(315), zIndex: 10 }
+                ? { left: vw(153), top: vw(315), zIndex: 10, width: "100%" }
                 : { maxWidth: "640px", width: "100%" }
             }
           >
@@ -605,7 +607,7 @@ export function StoryContactFormSection({
 
             <h2
               className={cn(
-                "font-josefin-sans font-semibold uppercase flex flex-col",
+                "font-josefin-sans font-semibold flex flex-col",
                 isMobile ? "" : "",
               )}
               style={{
@@ -666,7 +668,10 @@ export function StoryContactFormSection({
               : {}
           }
         >
-          <form id={(mergedConfig as any)?.name || configData?.name || "contact-form"}
+          <form
+            id={
+              (mergedConfig as any)?.name || configData?.name || "contact-form"
+            }
             onSubmit={handleSubmit}
             className="flex flex-col"
             style={{ gap: isMobile ? mvw(12) : vw(20) }}
@@ -983,7 +988,7 @@ export function StoryContactFormSection({
               disabled={
                 isSubmitting || (!!effectivePrivacyText && !privacyAccepted)
               }
-              className="w-full bg-[#564d03] text-white font-anaheim font-semibold text-center uppercase transition-colors duration-300 hover:bg-black disabled:opacity-50"
+              className="w-full bg-[#564d03] text-white font-anaheim font-semibold text-center transition-colors duration-300 hover:bg-black disabled:opacity-50"
             >
               {isSubmitting
                 ? formConfig?.submittingText || "Submitting..."

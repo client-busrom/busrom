@@ -39,5 +39,9 @@
   },
   "blog": {
     "all": "全部项目"
+  },
+  "Sphere3D": {
+    "title": "全球网络",
+    "description": "立足广东，服务全球客户"
   }
 }
