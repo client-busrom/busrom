@@ -12,6 +12,8 @@
  */
 
 import type { CollectionConfig } from 'payload'
+import { autoIndexHook } from '../hooks/autoIndex'
+import { autoIndexDeleteHook } from '../hooks/autoIndexDelete'
 
 
 export const ProductSeries: CollectionConfig = {
@@ -216,6 +218,17 @@ export const ProductSeries: CollectionConfig = {
       },
     },
     {
+      name: 'googleIndexing',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        disableListColumn: true,
+        components: {
+          Field: '@/components/fields/GoogleIndexingButton',
+        },
+      },
+    },
+    {
       name: 'status',
       type: 'select',
       defaultValue: 'draft',
@@ -264,5 +277,8 @@ export const ProductSeries: CollectionConfig = {
       },
     },
   ],
-
+  hooks: {
+    afterChange: [autoIndexHook('product-series')],
+    afterDelete: [autoIndexDeleteHook('product-series')],
+  },
 }

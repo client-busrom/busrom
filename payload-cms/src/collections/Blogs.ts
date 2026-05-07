@@ -195,12 +195,12 @@ export const Blogs: CollectionConfig = {
     afterChange: [
       syncM2M('categories', 'blogPosts', 'categories'),
       syncM2M('blog-tags', 'blogs', 'tags'),
-      autoIndexHook,
+      autoIndexHook('blogs'),
     ],
     afterDelete: [
       cleanupM2M('categories', 'blogPosts', 'categories'),
       cleanupM2M('blog-tags', 'blogs', 'tags'),
-      autoIndexDeleteHook,
+      autoIndexDeleteHook('blogs'),
     ],
   },
   endpoints: [

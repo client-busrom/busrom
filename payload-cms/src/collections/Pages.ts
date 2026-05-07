@@ -20,6 +20,8 @@
  */
 
 import type { CollectionConfig } from 'payload'
+import { autoIndexHook } from '../hooks/autoIndex'
+import { autoIndexDeleteHook } from '../hooks/autoIndexDelete'
 
 
 export const Pages: CollectionConfig = {
@@ -278,6 +280,17 @@ export const Pages: CollectionConfig = {
       },
     },
     {
+      name: 'googleIndexing',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        disableListColumn: true,
+        components: {
+          Field: '@/components/fields/GoogleIndexingButton',
+        },
+      },
+    },
+    {
       name: 'isSystem',
       type: 'checkbox',
       label: {
@@ -373,6 +386,7 @@ export const Pages: CollectionConfig = {
         return data
       },
     ],
-
+    afterChange: [autoIndexHook('pages')],
+    afterDelete: [autoIndexDeleteHook('pages')],
   },
 }

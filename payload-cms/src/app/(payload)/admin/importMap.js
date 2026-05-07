@@ -5,6 +5,7 @@ import { default as default_a8e2ac70c3f86fe45f78f09046549378 } from '@/component
 import { MultiLocaleTextareaField as MultiLocaleTextareaField_818f830b0ef41c7fd6298cda9b34bc80 } from '@/components/fields/MultiLocaleField'
 import { default as default_643116d2ab91f7b0d99236a7afb7c645 } from '@/components/fields/MediaPicker'
 import { default as default_394ddaf2fca725ee5ec4bf214e01a751 } from '@/components/fields/MediaThumbnailCell'
+import { default as default_0de41d40d46c5fdc2f903e5479d41ed4 } from '@/components/fields/GoogleIndexingButton'
 import { default as default_8ee29faa67a64494ccbe7f4a2ea41dbf } from '@/components/fields/AttributesTableField'
 import { default as default_1c5ae25fc75ab523bfe3f6b5ce843df4 } from '@/components/fields/ProductSpecificationsField'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -60,7 +61,6 @@ import { default as default_8eace7ae1118053face74cf3167249d9 } from '@/component
 import { default as default_a3a3aa8bfebcaf82c7d4953fe2175cbd } from '@/components/fields/IconPicker'
 import { SmartLinkField as SmartLinkField_e635f1e069dfeac8bac1a8b34ec70fb8 } from '@/components/fields/SmartLinkField'
 import { default as default_f2f012c65168d1c448e59ecd59a1bae5 } from '@/components/admin/NavigationManagerLink'
-import { default as default_0de41d40d46c5fdc2f903e5479d41ed4 } from '@/components/fields/GoogleIndexingButton'
 import { CategoryBlogManager as CategoryBlogManager_13b42ba985a2797d1445c07d844b1c44 } from '@/components/fields/CategoryBlogManager'
 import { CategoryProductManager as CategoryProductManager_0f5a766bac8fcce623fd73b84d4fc7b6 } from '@/components/fields/CategoryProductManager'
 import { default as default_a3e549dccdd3ea0f10d6ba87c5f4df9b } from '@/components/fields/PathSelector'
@@ -94,6 +94,7 @@ export const importMap = {
   "@/components/fields/MultiLocaleField#MultiLocaleTextareaField": MultiLocaleTextareaField_818f830b0ef41c7fd6298cda9b34bc80,
   "@/components/fields/MediaPicker#default": default_643116d2ab91f7b0d99236a7afb7c645,
   "@/components/fields/MediaThumbnailCell#default": default_394ddaf2fca725ee5ec4bf214e01a751,
+  "@/components/fields/GoogleIndexingButton#default": default_0de41d40d46c5fdc2f903e5479d41ed4,
   "@/components/fields/AttributesTableField#default": default_8ee29faa67a64494ccbe7f4a2ea41dbf,
   "@/components/fields/ProductSpecificationsField#default": default_1c5ae25fc75ab523bfe3f6b5ce843df4,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -149,7 +150,6 @@ export const importMap = {
   "@/components/fields/IconPicker#default": default_a3a3aa8bfebcaf82c7d4953fe2175cbd,
   "@/components/fields/SmartLinkField#SmartLinkField": SmartLinkField_e635f1e069dfeac8bac1a8b34ec70fb8,
   "@/components/admin/NavigationManagerLink#default": default_f2f012c65168d1c448e59ecd59a1bae5,
-  "@/components/fields/GoogleIndexingButton#default": default_0de41d40d46c5fdc2f903e5479d41ed4,
   "@/components/fields/CategoryBlogManager#CategoryBlogManager": CategoryBlogManager_13b42ba985a2797d1445c07d844b1c44,
   "@/components/fields/CategoryProductManager#CategoryProductManager": CategoryProductManager_0f5a766bac8fcce623fd73b84d4fc7b6,
   "@/components/fields/PathSelector#default": default_a3e549dccdd3ea0f10d6ba87c5f4df9b,
