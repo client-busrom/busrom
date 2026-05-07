@@ -1,269 +1,489 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react"
-import { OptimizedImage } from "@/components/ui/OptimizedImage"
-import { motion, AnimatePresence } from "framer-motion"
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useTransform,
+  animate,
+} from "framer-motion";
 
-const DESIGN_WIDTH = 1920
-const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
+const DESIGN_WIDTH = 1920;
+const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
 
-const PATH_D = "M77.45302 316.1879c22.76916-11.90189 89.73976-28.56458 175.46881 0 107.1613 35.70572 386.658-84.5661 501.96611-241.17006 115.3081-156.60396 518.88636-30.06797 595.34056 38.21136 61.1635 54.62346 44.1496 296.32305 18.6648 467.33458-67.0542-114.42529-226.3446-131.1998-462.97686-34.4812-295.79022 120.89825-149.1485 285.01923-488.80594 386.4986-339.65747 101.47932-534.55319-320.0987-339.65748-616.39328z"
+const PATH_D =
+  "M390.955 121.966C309.966 104.913 184.718 57.9922 122.606 81.9663C-107.634 258.857 74.3022 515.901 420.606 412.466C780.95 304.838 664.202 325.718 830.545 360.928C1056.28 408.71 1358.82 364.749 1488.11 235.466C1521.11 202.466 1516.11 177.637 1471.61 150.466C1404.84 109.703 978.052 -44.8697 844.22 48.6244C710.387 142.118 492.192 143.283 390.955 121.966Z";
 
 const TimelineIcon = () => (
-  <div className="flex-shrink-0 flex items-center justify-center" style={{ width: vw(20), height: vw(20) }}>
+  <div
+    className="flex-shrink-0 flex items-center justify-center"
+    style={{ width: vw(20), height: vw(20) }}
+  >
     <div className="w-full h-full rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center">
       <div className="w-[45%] h-[45%] rounded-full bg-[#C9B832]" />
     </div>
   </div>
-)
+);
 
 interface CarouselSlide {
-  title: string
-  description: string
-  image: any
+  title: string;
+  description: string;
+  image: any;
+  buttonText?: string;
 }
 
 interface StoryBrandMilestonesSectionProps {
   data: {
-    title: string 
-    image: any
-    items: CarouselSlide[]
-  }
+    title: string;
+    items: CarouselSlide[];
+  };
 }
 
-export function StoryBrandMilestonesSection({ data }: StoryBrandMilestonesSectionProps) {
-  const [isMounted, setIsMounted] = useState(false)
-  const [focusSlideIndex, setFocusSlideIndex] = useState(3)
-  const [direction, setDirection] = useState(0)
-  const [pathLength, setPathLength] = useState(0)
-  
-  const pathRef = useRef<SVGPathElement>(null)
-  const [lut, setLut] = useState<{ x: number; y: number }[]>([])
-  const slides = (data?.items || [])
+export function StoryBrandMilestonesSection({
+  data,
+}: StoryBrandMilestonesSectionProps) {
+  const [isMounted, setIsMounted] = useState(false);
+  const [focusSlideIndex, setFocusSlideIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+  const [pathLength, setPathLength] = useState(0);
 
-  const pathRatios = useMemo(() => [0, 0.12, 0.20, 0.96, 0.7, 0.56], [])
-  const slotSizes = useMemo(() => [410, 320, 190, 542, 425, 278], [])
+  const pathRef = useRef<SVGPathElement>(null);
+  const [lut, setLut] = useState<{ x: number; y: number }[]>([]);
+  const slides = data?.items || [];
+
+  const pathRatios = useMemo(() => [0.2, 0.08, 0.97, 0.84, 0.54, 0.4], []);
+  const slotSizes = useMemo(() => [320, 260, 240, 140, 210, 280], []);
 
   useEffect(() => {
-    setIsMounted(true)
+    setIsMounted(true);
     const timeout = setTimeout(() => {
       if (pathRef.current) {
-        const length = pathRef.current.getTotalLength()
-        setPathLength(length)
-        const points = []
-        const RESOLUTION = 300 
+        const length = pathRef.current.getTotalLength();
+        setPathLength(length);
+        const points = [];
+        const RESOLUTION = 300;
         for (let i = 0; i <= RESOLUTION; i++) {
-          const pt = pathRef.current.getPointAtLength((i / RESOLUTION) * length)
-          points.push({ x: pt.x, y: pt.y })
+          const pt = pathRef.current.getPointAtLength(
+            (i / RESOLUTION) * length,
+          );
+          points.push({ x: pt.x, y: pt.y });
         }
-        setLut(points)
+        setLut(points);
       }
-    }, 100)
-    return () => clearTimeout(timeout)
-  }, [])
+    }, 100);
+    return () => clearTimeout(timeout);
+  }, []);
 
   const getPointAtRatio = (ratio: number) => {
-    if (lut.length === 0) return { x: 0, y: 0 }
-    const r = ((ratio % 1) + 1) % 1
-    const idx = r * (lut.length - 1)
-    const base = Math.floor(idx)
-    const ceil = Math.min(base + 1, lut.length - 1)
-    const f = idx - base
-    const p1 = lut[base]
-    const p2 = lut[ceil]
+    if (lut.length === 0) return { x: 0, y: 0 };
+    const r = ((ratio % 1) + 1) % 1;
+    const idx = r * (lut.length - 1);
+    const base = Math.floor(idx);
+    const ceil = Math.min(base + 1, lut.length - 1);
+    const f = idx - base;
+    const p1 = lut[base];
+    const p2 = lut[ceil];
     return {
       x: p1.x + (p2.x - p1.x) * f,
-      y: p1.y + (p2.y - p1.y) * f
-    }
-  }
+      y: p1.y + (p2.y - p1.y) * f,
+    };
+  };
 
   const handleNext = () => {
-    setDirection(1)
-    setFocusSlideIndex(prev => (prev + 1) % (slides.length || 1))
-  }
+    setDirection(1);
+    setFocusSlideIndex((prev) => prev + 1);
+  };
 
   const handlePrev = () => {
-    setDirection(-1)
-    setFocusSlideIndex(prev => (prev - 1 + slides.length) % (slides.length || 1))
-  }
+    setDirection(-1);
+    setFocusSlideIndex((prev) => prev - 1);
+  };
 
-  const activeSlideInBox = slides[focusSlideIndex] || slides[0]
+  // Helper to interpolate between discrete slot values (ratios or sizes)
+  const getInterpolatedValue = (
+    slotFloat: number,
+    values: number[],
+    isRatio = false,
+  ) => {
+    const n = values.length;
+    if (n === 0) return 0;
 
-  if (!isMounted) return null
+    // Support full circularity: map any slotFloat (negative or large) to [0, n]
+    const modSlot = ((slotFloat % n) + n) % n;
+    const i = Math.floor(modSlot);
+    const f = modSlot - i;
 
-  // Path Arrow positions (User manual overrides)
-  const arrow1Pos = getPointAtRatio(0.24)
-  const arrow2Pos = getPointAtRatio(0.62)
+    const v1 = values[i];
+    const v2 = values[(i + 1) % n]; // Circularly wrap to first element
+
+    if (isRatio) {
+      let adjustedV2 = v2;
+      // Handle the 0.08 -> 0.97 wrap-around logic
+      if (v2 > v1 + 0.5) adjustedV2 -= 1;
+      if (v2 < v1 - 0.5) adjustedV2 += 1;
+      return v1 + (adjustedV2 - v1) * f;
+    }
+    return v1 + (v2 - v1) * f;
+  };
+
+  const focusProgress = useMotionValue(focusSlideIndex);
+
+  useEffect(() => {
+    animate(focusProgress, focusSlideIndex, {
+      type: "spring",
+      stiffness: 40,
+      damping: 20,
+      mass: 1,
+    });
+  }, [focusSlideIndex]);
+
+  const n = slides.length || 1;
+  const activeIndex = ((focusSlideIndex % n) + n) % n;
+  const activeSlideInBox = slides[activeIndex] || slides[0];
+
+  if (!isMounted) return null;
+
+  // Adjustable ratios for the directional arrows along the path
+  const arrow1Ratio = 0.76; // 调整这个比例让第一个箭头在线条上滑动
+  const arrow2Ratio = 0.48; // 调整这个比例让第二个箭头在线条上滑动
+
+  const arrow1Pos = getPointAtRatio(arrow1Ratio);
+  const arrow2Pos = getPointAtRatio(arrow2Ratio);
 
   return (
-    <section className="relative w-full bg-[#f6f4ed] overflow-hidden" style={{ height: vw(1690) }}>
+    <section
+      className="relative w-full bg-[#f6f4ed] overflow-hidden my-20"
+      style={{ height: vw(922) }}
+    >
       <div className="relative z-10 w-full h-full max-w-[1920px] mx-auto overflow-hidden">
-        
-        {/* Console Part (User manual overrides preserved) */}
-        <div className="absolute z-20" style={{ left: vw(147), top: vw(187) }}>
-          <div className="absolute" style={{ left: vw(0), top: vw(550) }}>
-            <h2 className="font-moul font-bold text-[#756f3f] origin-left -rotate-90 uppercase tracking-[0.2em] leading-none whitespace-nowrap" style={{ fontSize: vw(74) }}>
-              {data.title}
-            </h2>
+        {/* New Title Area using SVGs */}
+        <div className="absolute z-20" style={{ left: vw(230), top: vw(130) }}>
+          <div className="flex items-start gap-12">
+            <div style={{ width: vw(48), height: vw(332) }}>
+              <img
+                src="/assets/story/brand-travel-with.svg"
+                className="w-full h-full object-contain"
+                alt="With"
+              />
+            </div>
+            <div style={{ width: vw(183), height: vw(600) }}>
+              <img
+                src="/assets/story/brand-travel-busrom.svg"
+                className="w-full h-full object-contain"
+                alt="Busrom"
+              />
+            </div>
           </div>
-          <div className="absolute" style={{ left: vw(180), top: vw(0), width: vw(300), height: vw(1000) }}>
-             <OptimizedImage image={data.image} alt="" size="medium" className="object-cover" priority />
-          </div>
-          <div className="absolute" style={{ left: vw(250), top: vw(50), width: vw(300), height: vw(800) }}>
-             {/* DETACHED NAVIGATION ARROWS (User manual overrides) */}
-             <div className="absolute inset-x-0 top-0 -translate-y-full flex justify-center pb-12">
-                <motion.div whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.95 }} className="cursor-pointer" onClick={handleNext}>
-                  <img src="/assets/story/A8lvX.png" alt="" style={{ width: vw(85) }} />
-                </motion.div>
-             </div>
-             
-             <div className="absolute inset-x-0 bottom-0 translate-y-full flex justify-center pt-20">
-                <motion.div whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.95 }} className="cursor-pointer" onClick={handlePrev}>
-                  <img src="/assets/story/xlzAP.png" alt="" style={{ width: vw(85) }} />
-                </motion.div>
-             </div>
-          </div>
+
+          {/* Navigation Arrows - Repositioned */}
+          {/* Right Arrow (Next) above Busrom SVG */}
+          <motion.div
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.95 }}
+            className="absolute cursor-pointer z-30"
+            style={{ left: vw(200), top: vw(-60) }}
+            onClick={handleNext}
+          >
+            <img
+              src="/assets/story/A8lvX.png"
+              alt="Next"
+              style={{ width: vw(85) }}
+            />
+          </motion.div>
+
+          {/* Left Arrow (Prev) at the old right arrow position */}
+          <motion.div
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.95 }}
+            className="absolute cursor-pointer z-30"
+            style={{ left: vw(160), bottom: vw(-60) }}
+            onClick={handlePrev}
+          >
+            <img
+              src="/assets/story/xlzAP.png"
+              alt="Prev"
+              style={{ width: vw(85) }}
+            />
+          </motion.div>
         </div>
 
         {/* Path-Based Trajectory Area */}
-        <div className="absolute overflow-visible" style={{ left: vw(729), top: vw(50), width: vw(1392), height: vw(948) }}>
-           <svg width="100%" height="100%" viewBox="0 0 1392 948" className="absolute opacity-0 pointer-events-none">
-             <path ref={pathRef} d={PATH_D} />
-           </svg>
+        <div
+          className="absolute overflow-visible"
+          style={{
+            left: vw(576),
+            top: vw(100),
+            width: vw(1344),
+            height: vw(456),
+          }}
+        >
+          <svg
+            width="100%"
+            height="100%"
+            viewBox="0 0 1344 456"
+            className="absolute opacity-0 pointer-events-none"
+          >
+            <path ref={pathRef} d={PATH_D} />
+          </svg>
 
-           <div className="absolute inset-x-[-40px] top-[-40px] pointer-events-none">
-             <img src="/assets/story/brand-travel-line.svg" style={{ width: vw(1473), height: vw(1028) }} alt="" />
-           </div>
+          <div className="absolute inset-0 pointer-events-none">
+            <img
+              src="/assets/story/brand-travel-line.svg"
+              style={{ width: vw(1344), height: vw(456) }}
+              alt=""
+            />
+          </div>
 
-           {/* Kinetic Path Arrows (User manual overrides) */}
-           <motion.div 
-              className="absolute z-40" 
-              animate={{ left: vw(arrow1Pos.x), top: vw(arrow1Pos.y), rotate: direction * 180 }}
-              style={{ width: vw(120), height: vw(120), marginLeft: vw(-60), marginTop: vw(-70) }}
-           >
-              <img src="/assets/story/xwx2U.png" alt="" className="w-full h-full object-contain pointer-events-none" />
-           </motion.div>
+          {/* Path Arrows - Ratio-based Positioning */}
+          {lut.length > 0 && (
+            <>
+              <motion.div
+                className="absolute z-30 pointer-events-none"
+                animate={{
+                  rotate: direction === 1 ? 0 : 180,
+                }}
+                style={{
+                  left: vw(arrow1Pos.x),
+                  top: vw(arrow1Pos.y),
+                  width: vw(120),
+                  height: vw(120),
+                  marginLeft: vw(-60),
+                  marginTop: vw(-60),
+                }}
+              >
+                <img
+                  src="/assets/story/xwx2U.png"
+                  alt=""
+                  className="w-full h-full object-contain"
+                />
+              </motion.div>
 
-           <motion.div 
-              className="absolute z-40" 
-              animate={{ left: vw(arrow2Pos.x), top: vw(arrow2Pos.y), rotate: -direction * 180 }}
-              style={{ width: vw(120), height: vw(120), marginLeft: vw(-60), marginTop: vw(-70) }}
-           >
-              <img src="/assets/story/FHyxi.png" alt="" className="w-full h-full object-contain pointer-events-none" />
-           </motion.div>
+              <motion.div
+                className="absolute z-30 pointer-events-none"
+                animate={{
+                  rotate: direction === 1 ? 180 : 0,
+                }}
+                style={{
+                  left: vw(arrow2Pos.x),
+                  top: vw(arrow2Pos.y),
+                  width: vw(120),
+                  height: vw(120),
+                  marginLeft: vw(-60),
+                  marginTop: vw(-60),
+                }}
+              >
+                <img
+                  src="/assets/story/xwx2U.png"
+                  alt=""
+                  className="w-full h-full object-contain"
+                />
+              </motion.div>
+            </>
+          )}
 
-           {/* 6-Grid Matrix Glide */}
-           {[0, 1, 2, 3, 4, 5].map((slotIdx) => {
-              const n = slides.length || 1
-              const slideIdx = (focusSlideIndex + (slotIdx - 3) + n * 10) % n
-              const item = slides[slideIdx]
-              
-              const isActiveHighlight = (slotIdx === 3) // Slot 4 - Bottom-Left
-              const distance = Math.abs(slotIdx - 3)
-              const ratio = pathRatios[slotIdx]
-              const pos = getPointAtRatio(ratio)
-              const size = slotSizes[slotIdx]
+          {/* Connector SVG - Lower Layer (z-20) */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeIndex}
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity: 1,
+                transition: { delay: 0.8, duration: 0.3 },
+              }}
+              exit={{
+                opacity: 0,
+                transition: { duration: 0.2 },
+              }}
+              className="absolute z-20 pointer-events-none"
+              style={{
+                // Position relative to the line container (576, 100)
+                // Card is at (740, 620), adjust by connector offset (-130, 20)
+                left: vw(80),
+                top: vw(540),
+                width: vw(123),
+                height: vw(119),
+              }}
+            >
+              <img
+                src="/assets/story/Vector 7.svg"
+                alt=""
+                className="w-full h-full object-contain"
+              />
+            </motion.div>
+          </AnimatePresence>
 
-              return (
-                <motion.div
-                  key={`slot-${slotIdx}`}
-                  className="absolute"
-                  animate={{ 
-                    left: vw(pos.x), 
-                    top: vw(pos.y),
-                    scale: 1, 
-                    zIndex: isActiveHighlight ? 400 : 200 - distance,
-                  }}
-                  transition={{ type: "spring", stiffness: 45, damping: 22, mass: 0.8 }}
-                  style={{ 
-                    width: vw(size), 
-                    height: vw(size),
-                    // USER MANUAL MARGINS PRESERVED
-                    marginLeft: isActiveHighlight ? vw(-160) : vw(-size / 2),
-                    marginTop: isActiveHighlight ? vw(160) : vw(-size / 2),
-                  }}
-                >
-                   {/* Active Line Arrow (RP2gE) - exported from Pencil, shown only for active slot */}
-                   {isActiveHighlight && (
-                     <img
-                       src="/active-line-arrow.png"
-                       alt=""
-                       className="absolute pointer-events-none"
-                       style={{
-                         width: vw(120),
-                         right: '40%',
-                         top: '96%',
-                         zIndex: -1,
-                       }}
-                     />
-                   )}
-                   <div className={`w-full h-full rounded-full transition-all duration-700 flex items-center justify-center p-2 ${isActiveHighlight ? "bg-[#fff5a8] shadow-2xl" : "bg-white/10"}`}>
-                     <div className={`w-full h-full rounded-full overflow-hidden relative border-4 ${isActiveHighlight ? "border-white" : "border-[#756f3f]"}`}>
-                        <OptimizedImage image={item?.image || "/BusromFooterBg_original.webp"} alt="" size="medium" className="object-cover w-full h-full" />
-                     </div>
-                   </div>
-                </motion.div>
-              )
-           })}
+          {/* Kinetic Items Loop */}
+          {slides.map((item, index) => (
+            <SlideItem
+              key={index}
+              item={item}
+              index={index}
+              focusProgress={focusProgress}
+              pathRatios={pathRatios}
+              slotSizes={slotSizes}
+              getPointAtRatio={getPointAtRatio}
+              getInterpolatedValue={getInterpolatedValue}
+              totalItems={slides.length}
+            />
+          ))}
         </div>
 
-         {/* Information Narrative Box (0vzSH) - Dynamic Width (w-fit) */}
-         <div className="absolute z-[600] pointer-events-none" style={{ left: vw(930), top: vw(1227) }}>
-            <AnimatePresence mode="wait">
-              <motion.div 
-                key={focusSlideIndex} 
-                initial={{ opacity: 0, x: 30 }} 
-                animate={{ opacity: 1, x: 0 }} 
-                exit={{ opacity: 0, x: -30 }} 
-                className="relative w-fit min-w-[33.9vw] h-full pointer-events-auto overflow-visible"
-                style={{ height: vw(340) }}
+        {/* Narrative Box */}
+        <div
+          className="absolute z-[600] pointer-events-none"
+          style={{ left: vw(800), top: vw(610) }}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={focusSlideIndex}
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              className="relative w-fit min-w-[33.9vw] h-full pointer-events-auto overflow-visible"
+              style={{ height: vw(280) }}
+            >
+              <div className="absolute inset-0 bg-[#FDF4D7] rounded-[30px] shadow-xl w-full" />
+
+              {/* Year indicator from backend buttonText */}
+              <div
+                className="absolute font-josefin-sans font-bold text-[#E5DEB6] select-none pointer-events-none"
+                style={{
+                  right: vw(20),
+                  top: 0,
+                  fontSize: vw(84),
+                  lineHeight: 1,
+                  transform: "translateY(-42%)",
+                }}
               >
-                 {/* Main Yellow Background (Base 0vzSH) - Auto 100% Width */}
-                 <div className="absolute inset-0 bg-[#FDF4D7] rounded-[30px] shadow-2xl w-full" />
-                 
-                 {/* Rectangle 489 - White/Cream Section (qATxI) - Auto 100% Width */}
-                 <div 
-                   className="absolute bg-[#FFFCF0] w-full" 
-                   style={{ 
-                     left: 0, 
-                     top: vw(125), 
-                     height: vw(215), 
-                     borderRadius: `0 0 ${vw(30)} ${vw(30)}` 
-                   }} 
-                 />
+                {activeSlideInBox?.buttonText}
+              </div>
 
-                 <div className="relative z-10 pt-10 px-6 h-full flex flex-col w-fit">
-                    {/* Header: Title Area (on Yellow, 125px height area) */}
-                    <div className="flex flex-col gap-2 mb-2 w-fit" style={{ height: vw(105) }}>
-                       {activeSlideInBox?.title.split('\n').map((line, idx) => (
-                         <div key={idx} className="flex items-center gap-4 whitespace-nowrap">
-                            <TimelineIcon />
-                            <h3 className="font-josefin-sans font-bold text-black" style={{ fontSize: vw(26.5), lineHeight: 1.1 }}>
-                              {line}
-                            </h3>
-                         </div>
-                       ))}
+              <div
+                className="absolute bg-[#FFFCF0] w-full"
+                style={{
+                  left: 0,
+                  top: vw(100),
+                  height: vw(180),
+                  borderRadius: `0 0 ${vw(30)} ${vw(30)}`,
+                }}
+              />
+              <div className="relative z-10 pt-8 px-6 h-full flex flex-col w-fit">
+                <div
+                  className="flex flex-col gap-2 mb-2 w-fit"
+                  style={{ height: vw(85) }}
+                >
+                  {activeSlideInBox?.title.split("\n").map((line, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-4 whitespace-nowrap"
+                    >
+                      <div className="relative" style={{ top: vw(-2) }}>
+                        <TimelineIcon />
+                      </div>
+                      <h3
+                        className="font-josefin-sans font-bold text-black"
+                        style={{ fontSize: vw(22), lineHeight: 1.2 }}
+                      >
+                        {line}
+                      </h3>
                     </div>
-                    
-                    {/* Content: Description Area (on White) */}
-                    <div className="relative flex-1">
-                       <p className="font-josefin-sans font-medium text-[#323232] leading-snug" style={{ fontSize: vw(22), maxWidth: vw(536) }}>
-                         {activeSlideInBox?.description}
-                       </p>
-                    </div>
-
-                    {/* Milestone Year Marker */}
-                    <div className="absolute -top-12 -right-4 z-0">
-                       <span className="font-josefin-sans font-bold text-[#BBB47F] select-none" style={{ fontSize: vw(120), lineHeight: 1 }}>
-                          {2013 + (focusSlideIndex % 12)}
-                       </span>
-                    </div>
-                 </div>
-              </motion.div>
-            </AnimatePresence>
-         </div>
-
+                  ))}
+                </div>
+                <div className="relative flex-1">
+                  <p
+                    className="font-josefin-sans pl-8 pr-6 font-medium text-[#323232] leading-snug"
+                    style={{ fontSize: vw(18), maxWidth: vw(536) }}
+                  >
+                    {activeSlideInBox?.description}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </section>
-  )
+  );
+}
+
+// Sub-component for individual moving items
+function SlideItem({
+  item,
+  index,
+  focusProgress,
+  pathRatios,
+  slotSizes,
+  getPointAtRatio,
+  getInterpolatedValue,
+  totalItems,
+}: any) {
+  // Calculate relative slot position
+  // If focusProgress is 3, Item 3 should be at Slot 0
+  const slotFloat = useTransform(focusProgress, (f: number) => {
+    let diff = index - (f % totalItems);
+    // Shortest path wrapping logic for infinite circularity
+    if (diff > totalItems / 2) diff -= totalItems;
+    if (diff < -totalItems / 2) diff += totalItems;
+    return diff;
+  });
+
+  const ratio = useTransform(slotFloat, (f: number) =>
+    getInterpolatedValue(f, pathRatios, true),
+  );
+  const size = useTransform(slotFloat, (f: number) =>
+    getInterpolatedValue(f, slotSizes),
+  );
+
+  const x = useTransform(ratio, (r: number) => getPointAtRatio(r).x);
+  const y = useTransform(ratio, (r: number) => getPointAtRatio(r).y);
+
+  // High-fidelity active state based on proximity to Slot 0
+  const activeWeight = useTransform(slotFloat, [-0.5, 0, 0.5], [0, 1, 0]);
+  const zIndex = useTransform(slotFloat, (f: number) =>
+    Math.round(500 - Math.abs(f) * 100),
+  );
+
+  return (
+    <motion.div
+      className="absolute flex items-center justify-center p-2"
+      style={{
+        left: useTransform(x, (v) => vw(v)),
+        top: useTransform(y, (v) => vw(v)),
+        width: useTransform(size, (v) => vw(v)),
+        height: useTransform(size, (v) => vw(v)),
+        x: "-50%",
+        y: "-50%",
+        zIndex,
+      }}
+    >
+      <motion.div
+        className="w-full h-full rounded-full transition-all duration-300 flex items-center justify-center p-2"
+        style={{
+          backgroundColor: useTransform(
+            activeWeight,
+            [0, 1],
+            ["rgba(255,255,255,0.1)", "rgba(255,245,168,1)"],
+          ),
+          boxShadow: useTransform(
+            activeWeight,
+            [0, 1],
+            ["none", "0px 20px 40px rgba(0,0,0,0.2)"],
+          ),
+        }}
+      >
+        <motion.div
+          className="w-full h-full rounded-full overflow-hidden relative"
+        >
+          <OptimizedImage
+            image={item?.image || "/BusromFooterBg_original.webp"}
+            alt=""
+            size="medium"
+            className="object-cover w-full h-full"
+          />
+        </motion.div>
+      </motion.div>
+    </motion.div>
+  );
 }

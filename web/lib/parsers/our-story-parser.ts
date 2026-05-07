@@ -231,7 +231,8 @@ function extractCarouselAfterMarker(children: any[], markerId: string, mediaData
           title: slide.title || "",
           description: slide.description || slide.content || "",
           image: imageId && mediaData[imageId] ? mediaData[imageId] : null,
-          link: slide.link || slide.buttonLink || ""
+          link: slide.link || slide.buttonLink || "",
+          buttonText: slide.buttonText || ""
         };
       });
       return {
