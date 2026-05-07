@@ -6,6 +6,7 @@ import { X, ChevronDown } from "lucide-react"
 import Image from "next/image"
 import { Link, usePathname } from "@/lib/navigation"
 import type { NavItem } from "@/types/navigation"
+import { IconifyIcon } from "@/components/ui/IconifyIcon"
 
 interface MobileMenuProps {
   isOpen: boolean
@@ -222,6 +223,14 @@ export function MobileMenu({ isOpen, onClose, navigationItems = [] }: MobileMenu
                                             className="object-cover"
                                             unoptimized
                                             loading="lazy"
+                                          />
+                                        </div>
+                                      ) : child.icon ? (
+                                        <div className="w-10 h-10 flex-shrink-0 rounded bg-muted flex items-center justify-center text-muted-foreground">
+                                          <IconifyIcon
+                                            name={child.icon}
+                                            size={20}
+                                            color="currentColor"
                                           />
                                         </div>
                                       ) : (
