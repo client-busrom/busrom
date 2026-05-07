@@ -228,7 +228,7 @@ export const Blogs: CollectionConfig = {
           // Note: In a real deployment, web and cms might be on different servers, 
           // but they usually share the same environment variables.
           
-          const { notifyGoogleOfUpdate } = await import('../../../web/lib/api/google-indexing')
+          const { notifyGoogleOfUpdate } = await import('../lib/google-indexing')
           const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.busromhouse.com'
           
           const results: any[] = []

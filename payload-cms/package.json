@@ -44,6 +44,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "^17.2.3",
     "exceljs": "^4.4.0",
+    "googleapis": "^171.4.0",
     "graphql": "^16.8.1",
     "libphonenumber-js": "^1.12.40",
     "lucide-react": "^0.561.0",
