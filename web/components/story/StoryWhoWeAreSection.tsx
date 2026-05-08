@@ -3,6 +3,7 @@
 import React from "react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { motion } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const DESIGN_WIDTH = 1920;
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
@@ -32,7 +33,8 @@ export function StoryWhoWeAreSection({ data }: StoryWhoWeAreSectionProps) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const isTabletOrMobile = windowWidth > 0 && windowWidth <= 1024;
+  const isMobileHook = useIsMobile();
+  const isTabletOrMobile = isMobileHook || (windowWidth > 0 && windowWidth <= 1024);
 
   if (isTabletOrMobile) {
     return (

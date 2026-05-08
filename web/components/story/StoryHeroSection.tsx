@@ -35,7 +35,7 @@ export function StoryHeroSection({ data }: StoryHeroSectionProps) {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-  const isTabletOrMobile = windowWidth > 0 && windowWidth <= 1024
+  const isTabletOrMobile = isMobileHook || (windowWidth > 0 && windowWidth <= 1024)
 
   if (isTabletOrMobile) {
     return (
@@ -434,7 +434,7 @@ function HeroFeatureItem({ text, delay, width, x, y, starX, starY }: { text: str
           rotate: [0, 10, 0]
         }}
         transition={{
-          duration: 2 + Math.random(), 
+          duration: 2.5, 
           repeat: Infinity,
           ease: "easeInOut",
           delay: delay * 2 // Use the existing delay to stagger the blinking

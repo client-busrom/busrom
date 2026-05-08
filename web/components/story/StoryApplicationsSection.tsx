@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { motion, AnimatePresence } from "framer-motion";
 import { HollowText } from "@/components/common/HollowText";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const DESIGN_WIDTH = 1920;
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
@@ -158,7 +159,8 @@ export function StoryApplicationsSection({
     return () => clearInterval(interval);
   }, [data.items.autoplay, data.items.interval, totalSlides, activeIndex]);
 
-  const isMobile = windowWidth > 0 && windowWidth < 768;
+  const isMobileHook = useIsMobile();
+  const isMobile = isMobileHook || (windowWidth > 0 && windowWidth < 768);
 
   if (isMobile) {
     return (

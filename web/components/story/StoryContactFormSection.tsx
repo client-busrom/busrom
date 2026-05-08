@@ -10,6 +10,7 @@ import Link from "next/link";
 import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
 import { CountryFlag } from "@/components/ui/CountryFlag";
 import { HollowText } from "@/components/common/HollowText";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { COUNTRIES } from "@/components/ui/PhoneInput";
 
 const DESIGN_WIDTH = 1920;
@@ -73,6 +74,7 @@ export function StoryContactFormSection({
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [fileName, setFileName] = useState<string>("");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const isMobileHook = useIsMobile();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -83,6 +85,8 @@ export function StoryContactFormSection({
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  const effectiveIsMobile = isMobileHook || isMobile;
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [isGloballyAccepted, setIsGloballyAccepted] = useState(false);
   const STORAGE_KEY = "busrom_privacy_consent";
@@ -405,7 +409,7 @@ export function StoryContactFormSection({
       id="contact"
       className="relative w-full overflow-hidden flex flex-col items-center"
       style={
-        isMobile
+        effectiveIsMobile
           ? {
               background:
                 "linear-gradient(to bottom, #756f3f 0%, #dbd076 180%)",
@@ -422,14 +426,14 @@ export function StoryContactFormSection({
       <div
         className={cn(
           "relative z-10 w-full mx-auto",
-          isMobile ? "flex flex-col" : "h-full max-w-[1920px]",
+          effectiveIsMobile ? "flex flex-col" : "h-full max-w-[1920px]",
         )}
       >
         {/* Hero Section: Layered Title and Image for Mobile */}
         <div
           className={cn(
             "relative w-full",
-            isMobile
+            effectiveIsMobile
               ? "flex flex-col items-center justify-center min-h-[80vw] mb-4"
               : "contents",
           )}
@@ -438,10 +442,10 @@ export function StoryContactFormSection({
           <div
             className={cn(
               "flex items-center justify-center",
-              isMobile ? "absolute inset-0 z-0 opacity-40" : "absolute",
+              effectiveIsMobile ? "absolute inset-0 z-0 opacity-40" : "absolute",
             )}
             style={
-              !isMobile
+              !effectiveIsMobile
                 ? {
                     left: vw(521),
                     top: vw(167),
@@ -451,7 +455,7 @@ export function StoryContactFormSection({
                 : { width: "100%", height: "100%" }
             }
           >
-            {!isMobile && (
+            {!effectiveIsMobile && (
               <div
                 className="absolute rounded-full"
                 style={{
@@ -472,17 +476,17 @@ export function StoryContactFormSection({
                 <div
                   className={cn(
                     "absolute z-30 flex w-full pointer-events-none",
-                    isMobile ? "px-4" : "contents",
+                    effectiveIsMobile ? "px-4" : "contents",
                   )}
                 >
                   <button
                     onClick={handlePrevImage}
                     className={cn(
                       "hover:scale-110 transition-transform flex items-center justify-center cursor-pointer pointer-events-auto",
-                      !isMobile && "absolute",
+                      !effectiveIsMobile && "absolute",
                     )}
                     style={
-                      isMobile
+                      effectiveIsMobile
                         ? {
                             width: mvw(50),
                             height: mvw(50),
@@ -499,8 +503,8 @@ export function StoryContactFormSection({
                     aria-label="Previous Image"
                   >
                     <svg
-                      width={isMobile ? "50%" : "100%"}
-                      height={isMobile ? "50%" : "100%"}
+                      width={effectiveIsMobile ? "50%" : "100%"}
+                      height={effectiveIsMobile ? "50%" : "100%"}
                       viewBox="0 0 77 77"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -511,15 +515,15 @@ export function StoryContactFormSection({
                       />
                     </svg>
                   </button>
-                  <div className={isMobile ? "flex-grow" : ""} />
+                  <div className={effectiveIsMobile ? "flex-grow" : ""} />
                   <button
                     onClick={handleNextImage}
                     className={cn(
                       "hover:scale-110 transition-transform flex items-center justify-center cursor-pointer pointer-events-auto",
-                      !isMobile && "absolute",
+                      !effectiveIsMobile && "absolute",
                     )}
                     style={
-                      isMobile
+                      effectiveIsMobile
                         ? {
                             width: mvw(50),
                             height: mvw(50),
@@ -536,14 +540,14 @@ export function StoryContactFormSection({
                     aria-label="Next Image"
                   >
                     <svg
-                      width={isMobile ? "50%" : "100%"}
-                      height={isMobile ? "50%" : "100%"}
+                      width={effectiveIsMobile ? "50%" : "100%"}
+                      height={effectiveIsMobile ? "50%" : "100%"}
                       viewBox="0 0 77 77"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        fill={isMobile ? "#ffffff" : "#d3c976"}
+                        fill={effectiveIsMobile ? "#ffffff" : "#d3c976"}
                         d="M75.17835 76.56344c0.27404 0.00005 0.54193-0.08118 0.7698-0.23341 0.22787-0.15223 0.40548-0.36861 0.51035-0.62179 0.10487-0.25317 0.13231-0.53177 0.07884-0.80054-0.05347-0.26877-0.18546-0.51564-0.37925-0.7094l-71.42781-71.4275 10.50912 0c0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.61219 0.40577-0.97963 0-0.36743-0.14596-0.71981-0.40577-0.97963-0.25981-0.25981-0.6122-0.40577-0.97963-0.40577l-13.86223 0c-0.36458 0.00216-0.71362 0.14795-0.97142 0.40575-0.2578 0.2578-0.40359 0.60684-0.40575 0.97142l0 13.86223c0 0.36743 0.14596 0.71981 0.40577 0.97963 0.25981 0.25981 0.61219 0.40577 0.97963 0.40577 0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.6122 0.40577-0.97963l0-10.50956 71.42782 71.42794c0.12852 0.12883 0.28124 0.231 0.44937 0.30061 0.16814 0.06962 0.34838 0.10532 0.53036 0.10505z"
                       />
                     </svg>
@@ -554,8 +558,8 @@ export function StoryContactFormSection({
               <div
                 className="relative rounded-full overflow-hidden"
                 style={{
-                  width: isMobile ? mvw(340) : vw(643),
-                  height: isMobile ? mvw(340) : vw(643),
+                  width: effectiveIsMobile ? mvw(340) : vw(643),
+                  height: effectiveIsMobile ? mvw(340) : vw(643),
                   zIndex: 1,
                 }}
               >
@@ -592,25 +596,25 @@ export function StoryContactFormSection({
           {/* 2. Content Area (Title, Subtitle - The Layer Above) */}
           <div
             className={cn(
-              isMobile
+              effectiveIsMobile
                 ? "relative z-10 flex flex-col text-center px-4"
                 : "absolute",
             )}
             style={
-              !isMobile
+              !effectiveIsMobile
                 ? { left: vw(153), top: vw(315), zIndex: 10, width: "100%" }
                 : { maxWidth: "640px", width: "100%" }
             }
           >
             {subtitle && (
               <div
-                className={cn(isMobile ? "mb-2" : "absolute")}
-                style={!isMobile ? { left: vw(259), top: vw(-120) } : {}}
+                className={cn(effectiveIsMobile ? "mb-2" : "absolute")}
+                style={!effectiveIsMobile ? { left: vw(259), top: vw(-120) } : {}}
               >
                 <h3
                   className="font-josefin-sans font-medium text-white"
                   style={{
-                    fontSize: isMobile ? mvw(24) : vw(40),
+                    fontSize: effectiveIsMobile ? mvw(24) : vw(40),
                     lineHeight: 1.2,
                   }}
                 >
@@ -622,17 +626,17 @@ export function StoryContactFormSection({
             <h2
               className={cn(
                 "font-josefin-sans font-semibold flex flex-col",
-                isMobile ? "" : "",
+                effectiveIsMobile ? "" : "",
               )}
               style={{
-                fontSize: isMobile ? mvw(64) : vw(128),
+                fontSize: effectiveIsMobile ? mvw(64) : vw(128),
                 lineHeight: 0.99,
               }}
             >
               {titleLines[0] && (
                 <HollowText
                   strokeColor="#ffffff"
-                  strokeWidth={isMobile ? 1 : 2}
+                  strokeWidth={effectiveIsMobile ? 1 : 2}
                 >
                   {titleLines[0]}
                 </HollowText>
@@ -645,7 +649,7 @@ export function StoryContactFormSection({
         </div>
 
         {/* Description (Stays Below the Hero area on mobile) */}
-        {isMobile && effectiveDescription && (
+        {effectiveIsMobile && effectiveDescription && (
           <div className="w-full max-w-[640px] mx-auto text-center px-4 mb-8">
             <p
               className="font-josefin-sans font-medium"
@@ -656,7 +660,7 @@ export function StoryContactFormSection({
           </div>
         )}
 
-        {!isMobile && (
+        {!effectiveIsMobile && (
           <p
             className="absolute font-josefin-sans font-medium"
             style={{
@@ -675,9 +679,9 @@ export function StoryContactFormSection({
 
         {/* 3. Right Form Area */}
         <div
-          className={cn(isMobile ? "w-full max-w-[640px] mx-auto" : "absolute")}
+          className={cn(effectiveIsMobile ? "w-full max-w-[640px] mx-auto" : "absolute")}
           style={
-            !isMobile
+            !effectiveIsMobile
               ? { left: vw(1359), top: vw(206), width: vw(366), zIndex: 20 }
               : {}
           }
@@ -688,7 +692,7 @@ export function StoryContactFormSection({
             }
             onSubmit={handleSubmit}
             className="flex flex-col"
-            style={{ gap: isMobile ? mvw(12) : vw(20) }}
+            style={{ gap: effectiveIsMobile ? mvw(12) : vw(20) }}
           >
             {sortedFields.length > 0 ? (
               <>
@@ -710,15 +714,15 @@ export function StoryContactFormSection({
                           className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-none outline-none transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                         style={{
                           width: "100%",
-                          minHeight: isMobile ? mvw(120) : vw(103),
-                          maxHeight: isMobile ? mvw(300) : vw(250),
-                          borderRadius: isMobile ? mvw(12) : vw(15),
+                          minHeight: effectiveIsMobile ? mvw(120) : vw(103),
+                          maxHeight: effectiveIsMobile ? mvw(300) : vw(250),
+                          borderRadius: effectiveIsMobile ? mvw(12) : vw(15),
                           backgroundColor: "#746d37",
                           border: "1px solid rgba(255, 255, 255, 0.34)",
-                          paddingLeft: isMobile ? mvw(16) : vw(23),
-                          paddingRight: isMobile ? mvw(16) : vw(23),
-                          paddingTop: isMobile ? mvw(16) : vw(20),
-                          fontSize: isMobile ? mvw(16) : vw(16),
+                          paddingLeft: effectiveIsMobile ? mvw(16) : vw(23),
+                          paddingRight: effectiveIsMobile ? mvw(16) : vw(23),
+                          paddingTop: effectiveIsMobile ? mvw(16) : vw(20),
+                          fontSize: effectiveIsMobile ? mvw(16) : vw(16),
                           lineHeight: 1.5,
                         }}
                         required={field.required}
@@ -761,8 +765,8 @@ export function StoryContactFormSection({
                         <div
                           className="flex items-stretch overflow-visible w-full transition-colors"
                           style={{
-                            height: isMobile ? mvw(50) : vw(63),
-                            borderRadius: isMobile ? mvw(12) : vw(15),
+                            height: effectiveIsMobile ? mvw(50) : vw(63),
+                            borderRadius: effectiveIsMobile ? mvw(12) : vw(15),
                             backgroundColor: "#746d37",
                             border: "1px solid rgba(255, 255, 255, 0.34)",
                           }}
@@ -778,8 +782,8 @@ export function StoryContactFormSection({
                           >
                             <div
                               style={{
-                                width: isMobile ? mvw(24) : vw(32),
-                                height: isMobile ? mvw(16) : vw(20),
+                                width: effectiveIsMobile ? mvw(24) : vw(32),
+                                height: effectiveIsMobile ? mvw(16) : vw(20),
                               }}
                               className="flex-shrink-0"
                             >
@@ -790,14 +794,14 @@ export function StoryContactFormSection({
                             </div>
                             <span
                               className="text-white font-anaheim font-semibold"
-                              style={{ fontSize: isMobile ? mvw(16) : vw(16) }}
+                              style={{ fontSize: effectiveIsMobile ? mvw(16) : vw(16) }}
                             >
                               +{selectedCountry[2]}
                             </span>
                             <ChevronDown
                               className={cn(
                                 "text-white/50 transition-transform",
-                                isMobile ? "w-4 h-4" : "w-5 h-5",
+                                effectiveIsMobile ? "w-4 h-4" : "w-5 h-5",
                                 openCountrySelector && "rotate-180"
                               )}
                             />
@@ -811,7 +815,7 @@ export function StoryContactFormSection({
                             required={field.required}
                             disabled={isSubmitting}
                             className="flex-1 min-w-0 bg-transparent px-4 text-white placeholder:text-white/50 font-anaheim font-semibold outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#746d37_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-                            style={{ fontSize: isMobile ? mvw(16) : vw(16) }}
+                            style={{ fontSize: effectiveIsMobile ? mvw(16) : vw(16) }}
                           />
                         </div>
 
@@ -822,7 +826,7 @@ export function StoryContactFormSection({
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: 10 }}
                               className="absolute z-[100] left-0 mt-2"
-                              style={{ width: isMobile ? "280px" : "300px" }}
+                              style={{ width: effectiveIsMobile ? "280px" : "300px" }}
                             >
                               <CountrySelectorList
                                 onSelect={(country) => {
@@ -834,7 +838,7 @@ export function StoryContactFormSection({
                                 onClose={() => setOpenCountrySelector(false)}
                                 className={cn(
                                   "shadow-2xl",
-                                  isMobile ? "!rounded-xl" : "!rounded-[15px]"
+                                  effectiveIsMobile ? "!rounded-xl" : "!rounded-[15px]"
                                 )}
                               />
                             </motion.div>
@@ -857,12 +861,12 @@ export function StoryContactFormSection({
                           required={field.required}
                           className="font-anaheim font-semibold appearance-none bg-[#746d37] text-white w-full placeholder:text-white/50 focus:outline-none transition-colors"
                           style={{
-                            height: isMobile ? mvw(50) : vw(63),
-                            borderRadius: isMobile ? mvw(12) : vw(15),
+                            height: effectiveIsMobile ? mvw(50) : vw(63),
+                            borderRadius: effectiveIsMobile ? mvw(12) : vw(15),
                             border: "1px solid rgba(255, 255, 255, 0.34)",
-                            paddingLeft: isMobile ? mvw(16) : vw(23),
-                            paddingRight: isMobile ? mvw(32) : vw(40),
-                            fontSize: isMobile ? mvw(16) : vw(16),
+                            paddingLeft: effectiveIsMobile ? mvw(16) : vw(23),
+                            paddingRight: effectiveIsMobile ? mvw(32) : vw(40),
+                            fontSize: effectiveIsMobile ? mvw(16) : vw(16),
                           }}
                         >
                           <option value="" className="text-black">
@@ -879,7 +883,7 @@ export function StoryContactFormSection({
                           ))}
                         </select>
                         <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-white/50">
-                          <ChevronDown size={isMobile ? 18 : 20} />
+                          <ChevronDown size={effectiveIsMobile ? 18 : 20} />
                         </div>
                       </div>
                     );
@@ -898,12 +902,12 @@ export function StoryContactFormSection({
                       className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                       style={{
                         width: "100%",
-                        height: isMobile ? mvw(50) : vw(63),
-                        borderRadius: isMobile ? mvw(12) : vw(15),
+                        height: effectiveIsMobile ? mvw(50) : vw(63),
+                        borderRadius: effectiveIsMobile ? mvw(12) : vw(15),
                         backgroundColor: "#746d37",
                         border: "1px solid rgba(255, 255, 255, 0.34)",
-                        paddingLeft: isMobile ? mvw(16) : vw(23),
-                        fontSize: isMobile ? mvw(16) : vw(16),
+                        paddingLeft: effectiveIsMobile ? mvw(16) : vw(23),
+                        fontSize: effectiveIsMobile ? mvw(16) : vw(16),
                       }}
                       required={field.required}
                       disabled={isSubmitting}
@@ -923,12 +927,12 @@ export function StoryContactFormSection({
                   className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                   style={{
                     width: "100%",
-                    height: isMobile ? mvw(50) : vw(63),
-                    borderRadius: isMobile ? mvw(12) : vw(15),
+                    height: effectiveIsMobile ? mvw(50) : vw(63),
+                    borderRadius: effectiveIsMobile ? mvw(12) : vw(15),
                     backgroundColor: "#746d37",
                     border: "1px solid rgba(255, 255, 255, 0.34)",
-                    paddingLeft: isMobile ? mvw(16) : vw(23),
-                    fontSize: isMobile ? mvw(16) : vw(16),
+                    paddingLeft: effectiveIsMobile ? mvw(16) : vw(23),
+                    fontSize: effectiveIsMobile ? mvw(16) : vw(16),
                   }}
                 />
                 <input
@@ -941,20 +945,20 @@ export function StoryContactFormSection({
                   className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                   style={{
                     width: "100%",
-                    height: isMobile ? mvw(50) : vw(63),
-                    borderRadius: isMobile ? mvw(12) : vw(15),
+                    height: effectiveIsMobile ? mvw(50) : vw(63),
+                    borderRadius: effectiveIsMobile ? mvw(12) : vw(15),
                     backgroundColor: "#746d37",
                     border: "1px solid rgba(255, 255, 255, 0.34)",
-                    paddingLeft: isMobile ? mvw(16) : vw(23),
-                    fontSize: isMobile ? mvw(16) : vw(16),
+                    paddingLeft: effectiveIsMobile ? mvw(16) : vw(23),
+                    fontSize: effectiveIsMobile ? mvw(16) : vw(16),
                   }}
                 />
                 <div className="dynamic-phone-input w-full">
                   <div
                     className="flex items-stretch overflow-visible transition-colors"
                     style={{
-                      height: isMobile ? mvw(50) : vw(63),
-                      borderRadius: isMobile ? mvw(12) : vw(15),
+                      height: effectiveIsMobile ? mvw(50) : vw(63),
+                      borderRadius: effectiveIsMobile ? mvw(12) : vw(15),
                       backgroundColor: "#746d37",
                       border: "1px solid rgba(255, 255, 255, 0.34)",
                     }}
@@ -972,14 +976,14 @@ export function StoryContactFormSection({
                         disabled={isSubmitting}
                         className="h-full flex items-center justify-center border-r border-white/20 transition-all hover:bg-white/5"
                         style={{
-                          paddingLeft: isMobile ? mvw(12) : vw(16),
-                          paddingRight: isMobile ? mvw(6) : vw(8),
+                          paddingLeft: effectiveIsMobile ? mvw(12) : vw(16),
+                          paddingRight: effectiveIsMobile ? mvw(6) : vw(8),
                         }}
                       >
                         <div
                           style={{
-                            width: isMobile ? mvw(24) : vw(32),
-                            height: isMobile ? mvw(16) : vw(20),
+                            width: effectiveIsMobile ? mvw(24) : vw(32),
+                            height: effectiveIsMobile ? mvw(16) : vw(20),
                           }}
                           className="flex-shrink-0"
                         >
@@ -991,8 +995,8 @@ export function StoryContactFormSection({
                         <span
                           className="font-anaheim font-semibold text-white"
                           style={{
-                            fontSize: isMobile ? mvw(16) : vw(16),
-                            marginLeft: isMobile ? mvw(6) : vw(8),
+                            fontSize: effectiveIsMobile ? mvw(16) : vw(16),
+                            marginLeft: effectiveIsMobile ? mvw(6) : vw(8),
                           }}
                         >
                           +{selectedCountry[2]}
@@ -1000,10 +1004,10 @@ export function StoryContactFormSection({
                         <ChevronDown
                           className={cn(
                             "transition-transform text-white/50",
-                            isMobile ? "w-4 h-4" : "w-5 h-5",
+                            effectiveIsMobile ? "w-4 h-4" : "w-5 h-5",
                             openCountrySelector && "rotate-180",
                           )}
-                          style={{ marginLeft: isMobile ? mvw(4) : vw(4) }}
+                          style={{ marginLeft: effectiveIsMobile ? mvw(4) : vw(4) }}
                         />
                       </button>
                       <AnimatePresence>
@@ -1013,7 +1017,7 @@ export function StoryContactFormSection({
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 10 }}
                             className="absolute z-[100] left-0 mt-2"
-                            style={{ width: isMobile ? "280px" : "300px" }}
+                            style={{ width: effectiveIsMobile ? "280px" : "300px" }}
                           >
                             <CountrySelectorList
                               onSelect={(country) => {
@@ -1023,7 +1027,7 @@ export function StoryContactFormSection({
                               onClose={() => setOpenCountrySelector(false)}
                               className={cn(
                                 "shadow-2xl",
-                                isMobile ? "!rounded-xl" : "!rounded-[15px]"
+                                effectiveIsMobile ? "!rounded-xl" : "!rounded-[15px]"
                               )}
                             />
                           </motion.div>
@@ -1038,8 +1042,8 @@ export function StoryContactFormSection({
                       disabled={isSubmitting}
                       className="flex-1 min-w-0 bg-transparent outline-none font-anaheim font-semibold text-white placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#746d37_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                       style={{
-                        fontSize: isMobile ? mvw(16) : vw(16),
-                        paddingLeft: isMobile ? mvw(12) : vw(15),
+                        fontSize: effectiveIsMobile ? mvw(16) : vw(16),
+                        paddingLeft: effectiveIsMobile ? mvw(12) : vw(15),
                       }}
                     />
                   </div>
@@ -1053,13 +1057,13 @@ export function StoryContactFormSection({
                   className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-none outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                   style={{
                     width: "100%",
-                    minHeight: isMobile ? mvw(120) : vw(103),
-                    borderRadius: isMobile ? mvw(12) : vw(15),
+                    minHeight: effectiveIsMobile ? mvw(120) : vw(103),
+                    borderRadius: effectiveIsMobile ? mvw(12) : vw(15),
                     backgroundColor: "#746d37",
                     border: "1px solid rgba(255, 255, 255, 0.34)",
-                    paddingLeft: isMobile ? mvw(16) : vw(23),
-                    paddingTop: isMobile ? mvw(16) : vw(20),
-                    fontSize: isMobile ? mvw(16) : vw(16),
+                    paddingLeft: effectiveIsMobile ? mvw(16) : vw(23),
+                    paddingTop: effectiveIsMobile ? mvw(16) : vw(20),
+                    fontSize: effectiveIsMobile ? mvw(16) : vw(16),
                   }}
                 />
               </>
@@ -1067,7 +1071,7 @@ export function StoryContactFormSection({
 
             {/* Turnstile */}
             {turnstileSiteKey && (
-              <div style={{ marginTop: isMobile ? mvw(8) : vw(5) }}>
+              <div style={{ marginTop: effectiveIsMobile ? mvw(8) : vw(5) }}>
                 <Turnstile
                   key={turnstileKey}
                   siteKey={turnstileSiteKey}
@@ -1096,8 +1100,8 @@ export function StoryContactFormSection({
                       : "border-white/30 bg-transparent",
                   )}
                   style={{
-                    width: isMobile ? mvw(16) : 16,
-                    height: isMobile ? mvw(16) : 16,
+                    width: effectiveIsMobile ? mvw(16) : 16,
+                    height: effectiveIsMobile ? mvw(16) : 16,
                   }}
                 >
                   {privacyAccepted && (
@@ -1121,7 +1125,7 @@ export function StoryContactFormSection({
                     "leading-relaxed whitespace-pre-line select-none flex-1 transition-all duration-300",
                     privacyAccepted ? "text-white opacity-100" : "text-white/70"
                   )}
-                  style={{ fontSize: isMobile ? mvw(14) : "14px" }}
+                  style={{ fontSize: effectiveIsMobile ? mvw(14) : "14px" }}
                 >
                   {effectivePrivacyText}
                 </p>
@@ -1138,15 +1142,15 @@ export function StoryContactFormSection({
             <motion.button
               style={{
                 transformOrigin: "center",
-                marginTop: isMobile ? mvw(20) : vw(23),
+                marginTop: effectiveIsMobile ? mvw(20) : vw(23),
                 width: "100%",
-                height: isMobile ? mvw(60) : vw(83),
-                borderRadius: isMobile ? mvw(30) : vw(63),
-                fontSize: isMobile ? mvw(20) : vw(32),
+                height: effectiveIsMobile ? mvw(60) : vw(83),
+                borderRadius: effectiveIsMobile ? mvw(30) : vw(63),
+                fontSize: effectiveIsMobile ? mvw(20) : vw(32),
                 lineHeight: 1.2,
               }}
               initial={{ rotate: 0, scale: 1 }}
-              animate={isMobile ? {} : { rotate: [0, -3, 3, -3, 3, 0] }}
+              animate={effectiveIsMobile ? {} : { rotate: [0, -3, 3, -3, 3, 0] }}
               whileHover={{
                 rotate: 0,
                 scale: 1.05,
@@ -1175,7 +1179,7 @@ export function StoryContactFormSection({
             {submitStatus === "error" && (
               <div
                 className="text-red-300 text-center mt-2 font-anaheim"
-                style={{ fontSize: isMobile ? mvw(12) : "14px" }}
+                style={{ fontSize: effectiveIsMobile ? mvw(12) : "14px" }}
               >
                 {errorMessage}
               </div>

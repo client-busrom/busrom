@@ -8,7 +8,11 @@ import { StoryBrandStorySection } from "@/components/story/StoryBrandStorySectio
 import { StoryBrandHighlightsSection } from "@/components/story/StoryBrandHighlightsSection";
 import { StoryBrandStrengthsSection } from "@/components/story/StoryBrandStrengthsSection";
 import { StoryBrandMilestonesSection } from "@/components/story/StoryBrandMilestonesSection";
-import Sphere3D from "@/components/home/sphere-3d";
+import dynamic from "next/dynamic";
+const Sphere3D = dynamic(() => import("@/components/home/sphere-3d"), { 
+  ssr: false,
+  loading: () => <div className="h-[500px] w-full bg-[#020408] animate-pulse" />
+});
 import { StoryBrandSustainabilitySection } from "@/components/story/StoryBrandSustainabilitySection";
 import { StoryBrandProspectSection } from "@/components/story/StoryBrandProspectSection";
 import { StoryContactFormSection } from "@/components/story/StoryContactFormSection";
