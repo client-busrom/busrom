@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import type { Locale } from "@/i18n.config"
 import { COUNTRIES } from "@/components/ui/PhoneInput"
@@ -89,7 +89,7 @@ export function SimplifiedInquiryForm({
     COUNTRIES.find((c) => c[1] === "CN") || COUNTRIES[0],
   );
   const [openCountrySelector, setOpenCountrySelector] = useState(false);
-  const countrySelectorRef = React.useRef<HTMLDivElement>(null);
+  const countrySelectorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
