@@ -121,7 +121,12 @@ export function TemplateSwitcher({ locale, rawData }: TemplateSwitcherProps) {
         })
         .filter((app) => app !== null);
 
-      return <OurStoryTemplate locale={locale} data={parsedData} applications={applications as any[]} />;
+      const sphere3dData = {
+        title: "GLOBAL NETWORK",
+        description: "Serving Customers Worldwide From Guangdong, China",
+      };
+
+      return <OurStoryTemplate locale={locale} data={parsedData} applications={applications as any[]} sphere3dData={sphere3dData} />;
     }
 
     case PAGE_TEMPLATES.PRIVACY_POLICY: {

@@ -2,7 +2,8 @@
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check } from "lucide-react";
+import { CUSTOM_ICONS } from "@/lib/icons";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { cn } from "@/lib/utils";
 import { PhoneInput } from "@/components/ui/PhoneInput";
@@ -545,9 +546,17 @@ export function CtaSection({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-3 text-white hover:text-[#FFF28E] transition-all w-fit border border-white/20 rounded-full px-6 py-2.5 hover:bg-white/5"
+              className="flex items-center gap-3 text-white transition-all w-fit border border-white/20 rounded-full px-6 py-2.5 hover:bg-white hover:text-[#5E571F] hover:border-white"
             >
-              <Upload className="w-5 h-5" />
+              <svg
+                width="20"
+                height="20"
+                viewBox={CUSTOM_ICONS.upload.viewBox}
+                fill="none"
+                className="flex-shrink-0"
+              >
+                <path d={CUSTOM_ICONS.upload.path} fill="currentColor" />
+              </svg>
               <span
                 className="text-[16px] font-bold tracking-widest"
                 style={{ fontFamily: "var(--font-anaheim)" }}
@@ -573,7 +582,10 @@ export function CtaSection({
                 >
                   {privacyAccepted && <Check className="w-3 h-3 text-white" />}
                 </div>
-                <p className="text-[13px] md:text-[14px] leading-relaxed text-white/70 text-left select-none">
+                <p className={cn(
+                  "text-[13px] md:text-[14px] leading-relaxed text-left select-none transition-colors",
+                  privacyAccepted ? "text-white" : "text-white/70"
+                )}>
                   {getTranslation(mergedConfig.privacyConsentText)}
                 </p>
               </div>
@@ -797,9 +809,17 @@ export function CtaSection({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-3 text-white hover:text-[#FFF28E] transition-all w-fit border border-white/20 rounded-full px-6 py-2.5 hover:bg-white/5"
+                  className="flex items-center gap-3 text-white transition-all w-fit border border-white/20 rounded-full px-6 py-2.5 hover:bg-white hover:text-[#5E571F] hover:border-white"
                 >
-                  <Upload className="w-6 h-6" />
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox={CUSTOM_ICONS.upload.viewBox}
+                    fill="none"
+                    className="flex-shrink-0"
+                  >
+                    <path d={CUSTOM_ICONS.upload.path} fill="currentColor" />
+                  </svg>
                   <span
                     className="text-[16px] font-bold tracking-widest"
                     style={{ fontFamily: "var(--font-anaheim)" }}
@@ -840,7 +860,10 @@ export function CtaSection({
                         </svg>
                       )}
                     </div>
-                    <p className="text-[14px] leading-relaxed text-white/70 max-w-[700px] whitespace-pre-line select-none text-left">
+                    <p className={cn(
+                      "text-[14px] leading-relaxed max-w-[700px] whitespace-pre-line select-none text-left transition-colors",
+                      privacyAccepted ? "text-white" : "text-white/70"
+                    )}>
                       {getTranslation(mergedConfig.privacyConsentText)}
                     </p>
                   </div>

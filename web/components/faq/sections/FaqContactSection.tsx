@@ -632,7 +632,10 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                         </svg>
                       )}
                     </div>
-                    <p className="text-sm leading-relaxed text-white select-none text-left whitespace-pre-line">
+                    <p className={cn(
+                      "text-sm leading-relaxed select-none text-left whitespace-pre-line transition-colors",
+                      privacyAccepted ? "text-white" : "text-white/70"
+                    )}>
                       {privacyText}
                     </p>
                   </div>

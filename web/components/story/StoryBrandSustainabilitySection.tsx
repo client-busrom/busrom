@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 const DESIGN_WIDTH = 1920;
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
@@ -160,8 +161,8 @@ export function StoryBrandSustainabilitySection({
               BUS
             </div>
             <div className="w-[280px] h-[280px] rounded-full overflow-hidden border-2 border-black/5 shadow-xl relative z-10">
-              <img
-                src={images[0]?.url || "/placeholder.webp"}
+              <OptimizedImage
+                image={images[0]}
                 alt=""
                 className="w-full h-full object-cover"
               />
@@ -174,8 +175,8 @@ export function StoryBrandSustainabilitySection({
               ROM
             </div>
             <div className="w-[280px] h-[280px] rounded-full overflow-hidden border-2 border-black/5 shadow-xl relative z-10">
-              <img
-                src={images[1]?.url || "/placeholder.webp"}
+              <OptimizedImage
+                image={images[1]}
                 alt=""
                 className="w-full h-full object-cover"
               />
@@ -195,8 +196,8 @@ export function StoryBrandSustainabilitySection({
           {/* Item 3 */}
           <div className="relative flex flex-col items-center">
             <div className="w-[280px] h-[280px] rounded-full overflow-hidden border-2 border-black/5 shadow-xl relative z-10">
-              <img
-                src={images[2]?.url || "/placeholder.webp"}
+              <OptimizedImage
+                image={images[2]}
                 alt=""
                 className="w-full h-full object-cover"
               />
@@ -364,8 +365,8 @@ export function StoryBrandSustainabilitySection({
                   height: vw(600),
                 }}
               >
-                <img
-                  src={images[0]?.url || "/placeholder.webp"}
+                <OptimizedImage
+                  image={images[0]}
                   alt="Sustainability 1"
                   className="w-full h-full object-cover"
                 />
@@ -396,8 +397,8 @@ export function StoryBrandSustainabilitySection({
                   height: vw(600),
                 }}
               >
-                <img
-                  src={images[1]?.url || "/placeholder.webp"}
+                <OptimizedImage
+                  image={images[1]}
                   alt="Sustainability 2"
                   className="w-full h-full object-cover"
                 />
@@ -433,8 +434,8 @@ export function StoryBrandSustainabilitySection({
                   height: vw(600),
                 }}
               >
-                <img
-                  src={images[2]?.url || "/placeholder.webp"}
+                <OptimizedImage
+                  image={images[2]}
                   alt="Sustainability 3"
                   className="w-full h-full object-cover"
                 />

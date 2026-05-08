@@ -81,7 +81,7 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
 
   const checkboxItemActiveStyle: React.CSSProperties = {
     ...checkboxItemStyle,
-    backgroundColor: "rgba(33, 28, 11, 0.5)",
+    backgroundColor: "rgba(33, 28, 11, 0.8)",
   };
 
   switch (field.fieldType) {
@@ -707,7 +707,7 @@ export const MobileField: React.FC<MobileFieldProps> = ({
                   key={option.value}
                   className={`flex items-center gap-[12px] h-[52px] px-[16px] rounded-[12px] border cursor-pointer transition-all ${
                     isSelected
-                      ? "bg-[#211C0B]/50 border-white/30"
+                      ? "bg-[#211C0B]/80 border-white/30"
                       : "bg-[#211C0B]/20 border-white/30 hover:bg-[#211C0B]/30"
                   }`}
                 >
@@ -783,7 +783,7 @@ export const MobileField: React.FC<MobileFieldProps> = ({
                   <label
                     className={`flex items-center gap-[12px] h-[52px] px-[16px] rounded-[12px] border cursor-pointer transition-all ${
                       isSelected
-                        ? "bg-[#211C0B]/50 border-white/30"
+                        ? "bg-[#211C0B]/80 border-white/30"
                         : "bg-[#211C0B]/20 border-white/30 hover:bg-[#211C0B]/30"
                     }`}
                   >
