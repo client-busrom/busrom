@@ -191,7 +191,7 @@ export function CtaSection({
   // Sync with global storage when accepted in this form
   const handlePhoneChange = (value: string) => {
     const digits = value.replace(/\D/g, "");
-    setFormState((prev) => ({
+    setFormState((prev: any) => ({
       ...prev,
       whatsapp: digits ? `+${selectedCountry[2]}${digits}` : "",
     }));
@@ -301,7 +301,7 @@ export function CtaSection({
 
   const [isMobile, setIsMobile] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(
-    COUNTRIES.find((c) => c[1] === "CN") || COUNTRIES[0],
+    COUNTRIES.find((c) => c[1] === "US") || COUNTRIES[0],
   );
   const [openCountrySelector, setOpenCountrySelector] = useState(false);
   const [openCountrySelectorMobile, setOpenCountrySelectorMobile] = useState(false);

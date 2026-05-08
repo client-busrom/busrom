@@ -99,7 +99,7 @@ export function FullInquiryModal({
   const STORAGE_KEY = 'busrom_privacy_consent'
 
   const [selectedCountry, setSelectedCountry] = useState(
-    COUNTRIES.find((c) => c[1] === "CN") || COUNTRIES[0],
+    COUNTRIES.find((c) => c[1] === "US") || COUNTRIES[0],
   );
   const [openCountrySelector, setOpenCountrySelector] = useState(false);
   const countrySelectorRef = useRef<HTMLDivElement>(null);

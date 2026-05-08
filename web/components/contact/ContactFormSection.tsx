@@ -9,17 +9,13 @@ import React, {
 } from "react";
 import { CUSTOM_ICONS } from "@/lib/icons";
 import { motion } from "framer-motion";
-import {
-  CheckCircle,
-  Info,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { Turnstile } from "@/components/ui/turnstile";
 import { cn } from "@/lib/utils";
-import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput";
-import { ChevronDown } from "lucide-react";
+import { COUNTRIES } from "@/components/ui/PhoneInput";
+import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
+import { CountryFlag } from "@/components/ui/CountryFlag";
+import { ChevronDown, ChevronLeft, ChevronRight, CheckCircle, Info } from "lucide-react";
 import { uploadFileWithProgress } from "@/lib/upload";
 
 // 设计稿基准尺寸
@@ -109,12 +105,33 @@ export function ContactFormSection({
   const [isGloballyAccepted, setIsGloballyAccepted] = useState(false);
   const STORAGE_KEY = "busrom_privacy_consent";
   const [isMobile, setIsMobile] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(
+    COUNTRIES.find((c) => c[1] === "US") || COUNTRIES[0],
+  );
+  const [openCountrySelector, setOpenCountrySelector] = useState(false);
+  const countrySelectorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        countrySelectorRef.current &&
+        !countrySelectorRef.current.contains(event.target as Node)
+      ) {
+        setOpenCountrySelector(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   // Helper to handle localized strings
@@ -369,6 +386,17 @@ export function ContactFormSection({
 
   const handleInputChange = (fieldName: string, value: string) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }));
+  };
+
+  const handlePhoneChange = (fieldName: string, value: string) => {
+    const digits = value.replace(/\D/g, "");
+    setFormData((prev) => ({
+      ...prev,
+      [fieldName]: digits ? `+${selectedCountry[2]}${digits}` : "",
+    }));
+  };
+  
+  const handleStatusReset = () => {
     if (submitStatus === "error") {
       setSubmitStatus("idle");
     }
@@ -515,10 +543,59 @@ export function ContactFormSection({
         isMobile ? "flex flex-col py-16 px-5" : "",
       )}
       style={{
-        height: sectionHeight,
+        minHeight: sectionHeight,
+        height: "auto",
         background: "linear-gradient(180deg, #FFF9E8 0%, #F9E8A7 100%)",
       }}
     >
+      <style jsx>{`
+        .contact-input-el {
+          color: #FFFFFF !important;
+          opacity: 1 !important;
+          -webkit-text-fill-color: #FFFFFF !important;
+          caret-color: white !important;
+          font-family: var(--font-anaheim), sans-serif !important;
+          font-weight: 600 !important;
+        }
+        .contact-input-el::placeholder {
+          color: rgba(255, 255, 255, 0.95) !important;
+          opacity: 1 !important;
+          -webkit-text-fill-color: rgba(255, 255, 255, 0.95) !important;
+        }
+        .contact-input-el:-webkit-autofill,
+        .contact-input-el:-webkit-autofill:hover,
+        .contact-input-el:-webkit-autofill:focus,
+        .contact-input-el:-webkit-autofill:active {
+          -webkit-text-fill-color: #FFFFFF !important;
+          -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+          transition: background-color 5000s ease-in-out 0s;
+          caret-color: white !important;
+        }
+        .contact-input-el:focus {
+          outline: none !important;
+          box-shadow: none !important;
+        }
+        .contact-input-el option {
+          color: #000000 !important;
+          background-color: #FFFFFF !important;
+        }
+
+        .contact-submit-btn:hover:not(:disabled) {
+          background-color: #FFF8DC !important;
+          color: #7B6100 !important;
+          transform: scale(1.05);
+        }
+        .contact-upload-btn:hover {
+          background-color: #6B5500 !important;
+          color: white !important;
+          border-color: #6B5500 !important;
+        }
+        .contact-upload-btn:hover :global(.upload-icon),
+        .contact-upload-btn:hover .upload-text {
+          color: white !important;
+        }
+      `}</style>
+
       {/* 左侧深色渐变条 (PC Only) */}
       {!isMobile && (
         <div
@@ -613,13 +690,14 @@ export function ContactFormSection({
         className={cn(
           isMobile
             ? "relative w-full max-w-[640px] mx-auto mt-8 order-last"
-            : "absolute",
+            : "relative",
         )}
         style={
           !isMobile
             ? {
-                left: vw(1188),
-                top: vw(60),
+                marginLeft: vw(1188),
+                paddingTop: vw(60),
+                paddingBottom: vw(60), // 底部间距
                 width: vw(486),
               }
             : {}
@@ -655,34 +733,64 @@ export function ContactFormSection({
                   fieldNameLower?.includes("region");
                 if (isPhoneField) {
                   return (
-                    <div key={field.fieldName} style={{ width: "100%" }}>
-                      <PhoneInput
-                        value={formData[field.fieldName] || ""}
-                        onChange={(phone) =>
-                          handleInputChange(field.fieldName, phone)
+                    <div
+                      key={field.fieldName}
+                      className={cn(
+                        "flex items-stretch bg-[#B4A25F] border border-white/34 relative transition-all",
+                        openCountrySelector ? "z-20" : "z-0"
+                      )}
+                      ref={countrySelectorRef}
+                      style={{ 
+                        width: "100%", 
+                        height: isMobile ? mvw(50) : vw(50),
+                        borderRadius: isMobile ? mvw(12) : vw(12)
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setOpenCountrySelector(!openCountrySelector)}
+                        disabled={isSubmitting}
+                        className="flex items-center gap-2 px-4 hover:bg-white/10 transition-colors border-r border-white/20 flex-shrink-0"
+                      >
+                        <div className="w-6 h-4 md:w-8 md:h-5 flex-shrink-0">
+                          <CountryFlag
+                            countryCode={selectedCountry[1]}
+                            className="w-full h-full rounded-[2px] object-cover"
+                          />
+                        </div>
+                        <span className="text-white font-anaheim font-semibold text-base">
+                          +{selectedCountry[2]}
+                        </span>
+                      </button>
+
+                      <input
+                        type="tel"
+                        value={
+                          formData[field.fieldName]?.replace(
+                            `+${selectedCountry[2]}`,
+                            "",
+                          ) || ""
+                        }
+                        onChange={(e) =>
+                          handlePhoneChange(field.fieldName, e.target.value)
                         }
                         placeholder={`${field.placeholder?.trim() || field.label}${field.required ? " *" : ""}`}
-                        required={field.required}
                         disabled={isSubmitting}
-                        className="!bg-[#B4A25F] !border-white/34"
-                        style={{
-                          height: isMobile ? mvw(50) : vw(50),
-                          width: "100%",
-                          borderRadius: isMobile ? mvw(12) : vw(12),
-                        }}
-                        buttonClassName="!bg-transparent !border-none hover:!bg-white/5"
-                        inputClassName={cn(
-                          "!bg-transparent !text-white !placeholder-white/95 !font-anaheim !font-semibold !h-full [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]",
-                          isMobile ? "!pl-2" : "!pl-6",
-                        )}
-                        inputStyle={{
-                          fontSize: isMobile ? mvw(16) : vw(16),
-                        }}
-                        dialCodeClassName="!text-white"
-                        dialCodeStyle={{
-                          fontSize: isMobile ? mvw(16) : vw(16),
-                        }}
+                        className="contact-input-el flex-1 bg-transparent px-4 outline-none text-base"
                       />
+
+                      {openCountrySelector && (
+                        <div className="absolute left-0 top-full mt-2 z-[100]">
+                          <CountrySelectorList
+                            onSelect={(country) => {
+                              setSelectedCountry(country);
+                              setOpenCountrySelector(false);
+                            }}
+                            onClose={() => setOpenCountrySelector(false)}
+                            className="shadow-2xl"
+                          />
+                        </div>
+                      )}
                     </div>
                   );
                 }
@@ -698,7 +806,7 @@ export function ContactFormSection({
                           handleInputChange(field.fieldName, e.target.value)
                         }
                         required={field.required}
-                        className="font-anaheim font-semibold appearance-none bg-[#B4A25F] border border-white/34 text-white w-full placeholder:text-white/95 focus:outline-none focus:border-white/60 transition-colors contact-form-input"
+                        className="contact-input-el font-anaheim font-semibold appearance-none bg-[#B4A25F] border border-white/34 text-white w-full focus:outline-none focus:border-white/60 transition-colors"
                         style={{
                           height: isMobile ? mvw(50) : vw(50),
                           borderRadius: isMobile ? mvw(12) : vw(12),
@@ -707,7 +815,7 @@ export function ContactFormSection({
                           fontSize: isMobile ? mvw(18) : vw(16),
                         }}
                       >
-                        <option value="" className="text-black">
+                        <option value="">
                           Select Country/Region...
                         </option>
                         {COUNTRIES.map(([name, iso2, dialCode]) => {
@@ -739,7 +847,7 @@ export function ContactFormSection({
                       handleInputChange(field.fieldName, e.target.value)
                     }
                     spellCheck="false"
-                    className="font-anaheim font-semibold placeholder:text-white/95 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                    className="contact-input-el font-anaheim font-semibold"
                     style={{
                       width: isMobile ? "100%" : vw(486),
                       height: isMobile ? mvw(50) : vw(50),
@@ -749,7 +857,6 @@ export function ContactFormSection({
                       paddingLeft: isMobile ? mvw(24) : vw(24),
                       fontSize: isMobile ? mvw(18) : vw(16),
                       lineHeight: isMobile ? mvw(36) : vw(36),
-                      color: "white",
                     }}
                     required={field.required}
                     disabled={isSubmitting}
@@ -772,7 +879,7 @@ export function ContactFormSection({
                       handleInputChange(field.fieldName, e.target.value)
                     }
                     spellCheck="false"
-                    className="font-anaheim font-semibold placeholder:text-white/95 resize-y [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                    className="contact-input-el font-anaheim font-semibold resize-none overflow-y-auto"
                     style={{
                       width: isMobile ? "100%" : vw(486),
                       minHeight: isMobile ? mvw(100) : vw(100),
@@ -785,7 +892,6 @@ export function ContactFormSection({
                       paddingTop: isMobile ? mvw(14) : vw(14),
                       fontSize: isMobile ? mvw(18) : vw(16),
                       lineHeight: isMobile ? mvw(22) : vw(22),
-                      color: "white",
                     }}
                     required={field.required}
                     disabled={isSubmitting}
@@ -801,7 +907,7 @@ export function ContactFormSection({
                 value={formData.name || ""}
                 onChange={(e) => handleInputChange("name", e.target.value)}
                 spellCheck="false"
-                className="font-anaheim font-semibold placeholder:text-white/95 contact-form-input"
+                className="contact-input-el font-anaheim font-semibold"
                 style={{
                   width: isMobile ? "100%" : vw(486),
                   height: isMobile ? mvw(50) : vw(50),
@@ -811,18 +917,23 @@ export function ContactFormSection({
                   paddingLeft: isMobile ? mvw(24) : vw(24),
                   fontSize: isMobile ? mvw(18) : vw(16),
                   lineHeight: isMobile ? mvw(36) : vw(36),
-                  color: "white",
                 }}
+                id="name"
+                name="name"
+                autoComplete="name"
                 required
                 disabled={isSubmitting}
               />
               <input
+                id="email"
+                name="email"
+                autoComplete="email"
                 type="email"
                 placeholder="Your Email *"
                 value={formData.email || ""}
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 spellCheck="false"
-                className="font-anaheim font-semibold placeholder:text-white/95 contact-form-input"
+                className="contact-input-el font-anaheim font-semibold"
                 style={{
                   width: isMobile ? "100%" : vw(486),
                   height: isMobile ? mvw(50) : vw(50),
@@ -832,36 +943,71 @@ export function ContactFormSection({
                   paddingLeft: isMobile ? mvw(24) : vw(24),
                   fontSize: isMobile ? mvw(18) : vw(16),
                   lineHeight: isMobile ? mvw(36) : vw(36),
-                  color: "white",
                 }}
                 required
                 disabled={isSubmitting}
               />
-              <div style={{ width: "100%" }}>
-                <PhoneInput
-                  value={formData.whatsapp || ""}
-                  onChange={(phone) => handleInputChange("whatsapp", phone)}
-                  placeholder="Your WhatsApp / WeChat"
-                  disabled={isSubmitting}
-                  className="!bg-[#B4A25F] !border-white/34"
-                  style={{
-                    height: isMobile ? mvw(50) : vw(50),
-                    width: "100%",
-                    borderRadius: isMobile ? mvw(12) : vw(12),
-                  }}
-                  buttonClassName="!bg-transparent !border-none hover:!bg-white/5"
-                  inputClassName={cn(
-                    "!bg-transparent !text-white !placeholder-white/95 !font-anaheim !font-semibold !text-base contact-form-input",
-                    isMobile ? "!pl-6" : "!pl-6",
+              <div className="relative w-full" ref={countrySelectorRef}>
+                <div
+                  className={cn(
+                    "flex items-stretch bg-[#B4A25F] border border-white/34 overflow-hidden transition-all",
+                    openCountrySelector ? "z-20" : "z-0"
                   )}
-                  inputStyle={{
-                    fontSize: isMobile ? mvw(16) : vw(16),
+                  style={{ 
+                    width: "100%", 
+                    height: isMobile ? mvw(50) : vw(50),
+                    borderRadius: isMobile ? mvw(12) : vw(12)
                   }}
-                  dialCodeClassName="!text-white !font-anaheim !text-base"
-                  dialCodeStyle={{
-                    fontSize: isMobile ? mvw(16) : vw(16),
-                  }}
-                />
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenCountrySelector(!openCountrySelector)}
+                    disabled={isSubmitting}
+                    className="flex items-center gap-2 px-4 hover:bg-white/10 transition-colors border-r border-white/20 flex-shrink-0"
+                  >
+                    <div className="w-5 h-3 md:w-6 md:h-4 flex-shrink-0">
+                      <CountryFlag
+                        countryCode={selectedCountry[1]}
+                        className="w-full h-full rounded-[1px] object-cover"
+                      />
+                    </div>
+                    <span className="text-white font-anaheim font-semibold text-base">
+                      +{selectedCountry[2]}
+                    </span>
+                  </button>
+
+                  <input
+                    type="tel"
+                    id="whatsapp"
+                    name="whatsapp"
+                    autoComplete="tel"
+                    value={
+                      formData.whatsapp?.replace(
+                        `+${selectedCountry[2]}`,
+                        "",
+                      ) || ""
+                    }
+                    onChange={(e) =>
+                      handlePhoneChange("whatsapp", e.target.value)
+                    }
+                    placeholder="Your WhatsApp / WeChat"
+                    disabled={isSubmitting}
+                    className="contact-input-el flex-1 bg-transparent px-4 outline-none font-anaheim font-semibold text-base"
+                  />
+                </div>
+
+                {openCountrySelector && (
+                  <div className="absolute left-0 top-full mt-2 z-[100]">
+                    <CountrySelectorList
+                      onSelect={(country) => {
+                        setSelectedCountry(country);
+                        setOpenCountrySelector(false);
+                      }}
+                      onClose={() => setOpenCountrySelector(false)}
+                      className="shadow-2xl"
+                    />
+                  </div>
+                )}
               </div>
               <div className="relative">
                 <select
@@ -869,7 +1015,7 @@ export function ContactFormSection({
                   name="country"
                   value={formData.country || ""}
                   onChange={(e) => handleInputChange("country", e.target.value)}
-                  className="font-anaheim font-semibold appearance-none bg-[#B4A25F] border border-white/34 text-white w-full placeholder:text-white/95 focus:outline-none focus:border-white/60 transition-colors contact-form-input"
+                  className="contact-input-el font-anaheim font-semibold appearance-none bg-[#B4A25F] border border-white/34 w-full focus:outline-none focus:border-white/60 transition-colors"
                   style={{
                     height: isMobile ? mvw(50) : vw(50),
                     borderRadius: isMobile ? mvw(12) : vw(12),
@@ -878,12 +1024,12 @@ export function ContactFormSection({
                     fontSize: isMobile ? mvw(18) : vw(16),
                   }}
                 >
-                  <option value="" className="text-black">
+                  <option value="">
                     Select Country/Region...
                   </option>
                   {COUNTRIES.map(([name, iso2, dialCode]) => {
                     return (
-                      <option key={iso2} value={name} className="text-black">
+                      <option key={iso2} value={name}>
                         {name} (+{dialCode})
                       </option>
                     );
@@ -894,12 +1040,14 @@ export function ContactFormSection({
                 </div>
               </div>
               <textarea
+                id="message"
+                name="message"
                 ref={textareaRef}
                 placeholder="Please Briefly Describe Your Project Requirements Or Customization Ideas."
                 value={formData.message || ""}
                 spellCheck="false"
                 onChange={(e) => handleInputChange("message", e.target.value)}
-                className="font-anaheim font-semibold placeholder:text-white/95 resize-y contact-form-input"
+                className="contact-input-el font-anaheim font-semibold resize-none overflow-y-auto"
                 style={{
                   width: isMobile ? "100%" : vw(486),
                   minHeight: isMobile ? mvw(100) : vw(100),
@@ -912,7 +1060,6 @@ export function ContactFormSection({
                   paddingTop: isMobile ? mvw(14) : vw(14),
                   fontSize: isMobile ? mvw(18) : vw(16),
                   lineHeight: isMobile ? mvw(22) : vw(22),
-                  color: "white",
                 }}
                 disabled={isSubmitting}
               />
@@ -922,13 +1069,11 @@ export function ContactFormSection({
           {/* Upload File 按钮 - 在 textarea 下方右侧 */}
           <div className="flex justify-end" style={{ marginTop: vw(8) }}>
             <label
-              className="flex items-center justify-center gap-2 cursor-pointer group transition-colors duration-300 hover:bg-[#6B5500]"
+              className="contact-upload-btn group flex items-center justify-center gap-2 cursor-pointer transition-all border border-[#6B5500]"
               style={{
                 width: isMobile ? mvw(180) : vw(248),
                 height: isMobile ? mvw(45) : vw(59),
                 borderRadius: isMobile ? mvw(22.5) : vw(33.5),
-                border: "1px solid #6B5500",
-                backgroundColor: "transparent",
               }}
             >
               <input
@@ -941,11 +1086,10 @@ export function ContactFormSection({
                 viewBox={CUSTOM_ICONS.upload.viewBox}
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className="transition-colors duration-300 group-hover:text-white"
+                className="upload-icon transition-colors duration-300 text-[#6B5500] group-hover:text-white"
                 style={{
                   width: isMobile ? mvw(18) : vw(25),
                   height: isMobile ? mvw(18) : vw(25),
-                  color: "#6B5500",
                 }}
               >
                 <path
@@ -954,11 +1098,10 @@ export function ContactFormSection({
                 />
               </svg>
               <span
-                className="font-anaheim font-semibold truncate transition-colors duration-300 group-hover:text-white"
+                className="upload-text font-anaheim font-semibold truncate transition-colors duration-300 text-[#6B5500] group-hover:text-white"
                 style={{
                   fontSize: isMobile ? mvw(16) : vw(24),
                   lineHeight: isMobile ? mvw(22) : vw(40),
-                  color: "#6B5500",
                   maxWidth: isMobile ? mvw(120) : vw(150),
                 }}
               >
@@ -1013,7 +1156,12 @@ export function ContactFormSection({
                   </svg>
                 )}
               </div>
-              <p className="text-[12px] md:text-[14px] leading-relaxed text-[#4B3A02]/80 text-left whitespace-pre-line select-none">
+              <p 
+                className={cn(
+                  "text-[12px] md:text-[14px] leading-relaxed text-left whitespace-pre-line select-none transition-opacity duration-300",
+                  privacyAccepted ? "text-[#4B3A02] opacity-100" : "text-[#4B3A02] opacity-70"
+                )}
+              >
                 {effectivePrivacyText}
               </p>
             </div>
@@ -1021,42 +1169,27 @@ export function ContactFormSection({
 
           {/* Submit 按钮 */}
           <motion.button
+            className="contact-submit-btn font-anaheim font-semibold transition-colors duration-300 disabled:opacity-50"
             style={{
-              transformOrigin: "center",
               width: isMobile ? "100%" : vw(486),
               minHeight: isMobile ? mvw(60) : vw(83),
               borderRadius: isMobile ? mvw(30) : vw(63),
-              backgroundColor:
-                submitStatus === "success" ? "#4CAF50" : "#7B6100",
               fontSize: isMobile ? mvw(24) : vw(32),
               marginTop: isMobile ? mvw(10) : vw(10),
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-            initial={{ rotate: 0, scale: 1 }}
-            animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
-            whileHover={{
-              rotate: 0,
-              scale: 1.05,
-              transition: { scale: { duration: 0.3, ease: "easeOut" } },
-            }}
-            transition={{
-              rotate: {
-                duration: 0.5,
-                repeat: Infinity,
-                repeatDelay: 2,
-                ease: "linear",
-              },
+            initial={{ rotate: 0, scale: 1, backgroundColor: "#7B6100", color: "#FFFFFF" }}
+            animate={{ 
+              rotate: [0, -3, 3, -3, 3, 0],
+              backgroundColor: submitStatus === "success" ? "#4CAF50" : "#7B6100",
+              color: "#FFFFFF"
             }}
             type="submit"
             disabled={
               isSubmitting || (!!effectivePrivacyText && !privacyAccepted)
             }
-            className={cn(
-              "font-anaheim font-semibold text-white transition-colors duration-300 disabled:opacity-50 hover:bg-[#5A4800] hover:shadow-lg",
-              "h-auto whitespace-pre-line leading-tight px-6 py-4",
-              !!formConfig?.privacyConsentText &&
-                !privacyAccepted &&
-                "grayscale opacity-80",
-            )}
           >
             {isSubmitting
               ? uploadProgress > 0 && uploadProgress < 100
@@ -1330,6 +1463,14 @@ export function ContactFormSection({
           -webkit-text-fill-color: white !important;
           -webkit-box-shadow: 0 0 0px 1000px #B4A25F inset !important;
           transition: background-color 9999s ease-in-out 0s !important;
+        }
+
+        .contact-form-input:focus,
+        .contact-form-input:focus-visible,
+        .contact-form-input:active {
+          outline: none !important;
+          box-shadow: none !important;
+          border-color: rgba(255, 255, 255, 0.5) !important;
         }
 
         .contact-form-input::placeholder {

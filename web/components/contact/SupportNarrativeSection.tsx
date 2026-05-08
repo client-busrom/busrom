@@ -371,72 +371,6 @@ export function SupportNarrativeSection({
         ["--rpx-support" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
       }}
     >
-      {/* 背景漂浮圆形 - Ellipse 145 大正圆 左下 */}
-      <motion.div
-        className="absolute rounded-full pointer-events-none z-0"
-        style={{
-          width: vw(792),
-          height: vw(792),
-          left: vw(-207),
-          top: vw(398),
-          backgroundColor: "rgb(255 245 168 / 0.38)",
-          filter: `blur(${vw(104)})`,
-        }}
-        animate={{
-          x: [0, 200, 100, 0],
-          y: [0, -100, 50, 0],
-        }}
-        transition={{
-          duration: 12,
-          ease: "easeInOut",
-          repeat: Infinity,
-        }}
-      />
-
-      {/* 背景漂浮圆形 - Ellipse 149 小正圆 右下 */}
-      <motion.div
-        className="absolute rounded-full pointer-events-none z-0"
-        style={{
-          width: vw(150),
-          height: vw(148),
-          left: vw(1196),
-          top: vw(724),
-          backgroundColor: "rgb(255 245 168 / 0.54)",
-          filter: `blur(${vw(104)})`,
-        }}
-        animate={{
-          x: [0, -150, 80, 0],
-          y: [0, -120, 60, 0],
-        }}
-        transition={{
-          duration: 10,
-          ease: "easeInOut",
-          repeat: Infinity,
-        }}
-      />
-
-      {/* 背景漂浮圆形 - Ellipse 147 椭圆 右上 */}
-      <motion.div
-        className="absolute rounded-full pointer-events-none z-0"
-        style={{
-          width: vw(550),
-          height: vw(406),
-          left: vw(1450),
-          top: vw(0),
-          backgroundColor: "rgb(255 245 168 / 0.30)",
-          filter: `blur(${vw(104)})`,
-        }}
-        animate={{
-          x: [0, -200, 100, 0],
-          y: [0, 150, -80, 0],
-        }}
-        transition={{
-          duration: 14,
-          ease: "easeInOut",
-          repeat: Infinity,
-        }}
-      />
-
       {/* 标题区域 */}
       <div className="relative z-10" style={{ marginBottom: rpx(64) }}>
         {/* 问号装饰 - 贴在 Get 上，摇摆动效 */}
@@ -500,7 +434,7 @@ export function SupportNarrativeSection({
       {/* 卡片容器 - 居中 */}
       {cards.length > 0 && (
         <div
-          className="relative z-10 flex justify-center"
+          className="relative z-10 flex justify-center max-w-full"
           style={{
             gap: rpx(CARD_GAP),
             width: rpx(totalCardsWidth),

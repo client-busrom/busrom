@@ -12,6 +12,10 @@ import { ContactFormSection } from "@/components/contact/ContactFormSection"
 import { ProductShowSection, ProductShowItem } from "@/components/contact/ProductShowSection"
 import { QuoteImageSection } from "@/components/contact/QuoteImageSection"
 import { ContactUsData } from "@/lib/parsers/contact-us-parser"
+import { motion } from "framer-motion"
+
+const DESIGN_WIDTH = 1920
+const vw = (v: number) => `${(v / DESIGN_WIDTH) * 100}vw`
 
 interface ContactUsTemplateProps {
   locale: string
@@ -95,7 +99,8 @@ export function ContactUsTemplate({ locale, data, ssrData }: ContactUsTemplatePr
   const finalFormConfig = ssrData?.formConfig || data.contactForm.formConfig
 
   return (
-    <div className="min-h-screen bg-background" data-header-theme="dark">
+    <div className="min-h-screen bg-background relative" data-header-theme="dark">
+      <div className="relative z-10">
       {/* Hero Section */}
       <ContactHeroSection
         buttonText={data.hero.buttonText || "Get A Quote"}
@@ -104,20 +109,92 @@ export function ContactUsTemplate({ locale, data, ssrData }: ContactUsTemplatePr
         subtitle={data.hero.subtitle || undefined}
       />
 
-      {/* Support Narrative Section */}
-      <SupportNarrativeSection
-        title={data.supportNarrative.title || undefined}
-        cards={data.supportNarrative.cards}
-      />
+      {/* Narrative & Product Series Wrapper with Background Blobs */}
+      <div className="relative overflow-x-hidden">
+        {/* Background Blobs for this specific area */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          {/* 背景漂浮圆形 - Ellipse 145 大正圆 左下 */}
+          <motion.div
+            className="absolute rounded-full"
+            style={{
+              width: vw(792),
+              height: vw(792),
+              left: vw(-207),
+              top: vw(398), // 相对偏移量回归到原始设计
+              backgroundColor: "rgb(255 245 168 / 0.38)",
+              filter: `blur(${vw(104)})`,
+            }}
+            animate={{
+              x: [0, 200, 100, 0],
+              y: [0, -100, 50, 0],
+            }}
+            transition={{
+              duration: 12,
+              ease: "easeInOut",
+              repeat: Infinity,
+            }}
+          />
 
-      {/* Product Series Entry Section */}
-      <ProductSeriesEntrySection
-        titleLeft={data.productSeries.titleLeft || undefined}
-        titleLeftSuperscript={data.productSeries.titleLeftSuperscript || undefined}
-        titleRightBold={data.productSeries.titleRightBold || undefined}
-        titleRightNormal={data.productSeries.titleRightNormal || undefined}
-        products={data.productSeries.products}
-      />
+          {/* 背景漂浮圆形 - Ellipse 149 小正圆 右下 */}
+          <motion.div
+            className="absolute rounded-full"
+            style={{
+              width: vw(150),
+              height: vw(148),
+              left: vw(1196),
+              top: vw(724),
+              backgroundColor: "rgb(255 245 168 / 0.54)",
+              filter: `blur(${vw(104)})`,
+            }}
+            animate={{
+              x: [0, -150, 80, 0],
+              y: [0, -120, 60, 0],
+            }}
+            transition={{
+              duration: 10,
+              ease: "easeInOut",
+              repeat: Infinity,
+            }}
+          />
+
+          {/* 背景漂浮圆形 - Ellipse 147 椭圆 右上 */}
+          <motion.div
+            className="absolute rounded-full"
+            style={{
+              width: vw(550),
+              height: vw(406),
+              left: vw(1450),
+              top: vw(0),
+              backgroundColor: "rgb(255 245 168 / 0.30)",
+              filter: `blur(${vw(104)})`,
+            }}
+            animate={{
+              x: [0, -200, 100, 0],
+              y: [0, 150, -80, 0],
+            }}
+            transition={{
+              duration: 14,
+              ease: "easeInOut",
+              repeat: Infinity,
+            }}
+          />
+        </div>
+
+        {/* Support Narrative Section */}
+        <SupportNarrativeSection
+          title={data.supportNarrative.title || undefined}
+          cards={data.supportNarrative.cards}
+        />
+
+        {/* Product Series Entry Section */}
+        <ProductSeriesEntrySection
+          titleLeft={data.productSeries.titleLeft || undefined}
+          titleLeftSuperscript={data.productSeries.titleLeftSuperscript || undefined}
+          titleRightBold={data.productSeries.titleRightBold || undefined}
+          titleRightNormal={data.productSeries.titleRightNormal || undefined}
+          products={data.productSeries.products}
+        />
+      </div>
 
       {/* Gradient Background Area */}
       <div
@@ -180,6 +257,7 @@ export function ContactUsTemplate({ locale, data, ssrData }: ContactUsTemplatePr
         buttonText={data.quoteImage.buttonText || undefined}
         buttonLink={data.quoteImage.buttonLink || undefined}
       />
+      </div>
     </div>
   )
 }

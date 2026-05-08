@@ -67,7 +67,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
   const [isGloballyAccepted, setIsGloballyAccepted] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
   const [selectedCountry, setSelectedCountry] = React.useState(
-    COUNTRIES.find((c) => c[1] === "CN") || COUNTRIES[0],
+    COUNTRIES.find((c) => c[1] === "US") || COUNTRIES[0],
   );
   const [openCountrySelector, setOpenCountrySelector] = React.useState(false);
   const countrySelectorRef = React.useRef<HTMLDivElement>(null);
@@ -442,6 +442,48 @@ export function ContactForm({ data, className }: ContactFormProps) {
         paddingBottom: isMobile ? mvw(40) : 0,
       }}
     >
+      <style jsx>{`
+        .contact-input-el {
+          color: #FFFFFF !important;
+          opacity: 1 !important;
+          -webkit-text-fill-color: #FFFFFF !important;
+          caret-color: white !important;
+          font-family: var(--font-anaheim), sans-serif !important;
+          font-weight: 600 !important;
+        }
+        .contact-input-el::placeholder {
+          color: rgba(255, 255, 255, 0.95) !important;
+          opacity: 1 !important;
+          -webkit-text-fill-color: rgba(255, 255, 255, 0.95) !important;
+        }
+        .contact-input-el:-webkit-autofill,
+        .contact-input-el:-webkit-autofill:hover,
+        .contact-input-el:-webkit-autofill:focus,
+        .contact-input-el:-webkit-autofill:active {
+          -webkit-text-fill-color: #FFFFFF !important;
+          -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+          transition: background-color 5000s ease-in-out 0s;
+          caret-color: white !important;
+        }
+        .contact-input-el:focus {
+          outline: none !important;
+          box-shadow: none !important;
+        }
+
+        .contact-submit-btn:hover:not(:disabled) {
+          background-color: white !important;
+          color: #756F3F !important;
+          transform: scale(1.05);
+        }
+        .contact-upload-btn:hover {
+          background-color: white !important;
+          color: #756F3F !important;
+        }
+        .contact-upload-btn:hover :global(.upload-icon),
+        .contact-upload-btn:hover .upload-text {
+          color: #756F3F !important;
+        }
+      `}</style>
       {/* Background Image - Rectangle 395 */}
       {backgroundImage && (
         <div className="absolute inset-0 w-full h-full">
@@ -460,10 +502,9 @@ export function ContactForm({ data, className }: ContactFormProps) {
         className="absolute inset-0"
         style={{
           backgroundColor: "rgba(0, 0, 0, 0.09)",
-          backdropFilter: "blur(4px)",
-          WebkitBackdropFilter: "blur(4px)",
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)",
           borderRadius: isMobile ? mvw(20) : vw(30),
-          mixBlendMode: "darken",
         }}
       />
 
@@ -647,6 +688,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
           <input
             type="text"
             name="name"
+            autoComplete="name"
             placeholder={
               getFieldConfig("name")?.placeholder ||
               (locale === "zh"
@@ -656,7 +698,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
             value={formData.name}
             onChange={handleInputChange}
             spellCheck="false"
-            className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#756F3F_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="contact-input-el bg-transparent placeholder-white/95 outline-none font-anaheim font-semibold"
             style={{
               fontSize: isMobile ? mvw(16) : vw(16),
               paddingLeft: isMobile ? mvw(24) : vw(29),
@@ -671,6 +713,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
           <input
             type="email"
             name="email"
+            autoComplete="email"
             placeholder={
               getFieldConfig("email")?.placeholder ||
               (locale === "zh" ? "您的邮箱" : "Your Email")
@@ -678,7 +721,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
             value={formData.email}
             onChange={handleInputChange}
             spellCheck="false"
-            className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#756F3F_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="contact-input-el bg-transparent placeholder-white/95 outline-none font-anaheim font-semibold"
             style={{
               fontSize: isMobile ? mvw(16) : vw(16),
               paddingLeft: isMobile ? mvw(24) : vw(29),
@@ -690,57 +733,61 @@ export function ContactForm({ data, className }: ContactFormProps) {
           />
 
           {/* Input 3: WhatsApp */}
-          <div
-            className={cn(
-              "flex items-stretch bg-transparent relative transition-all",
-              openCountrySelector ? "z-20" : "z-0"
-            )}
-            ref={countrySelectorRef}
-            style={{
-              width: "100%",
-              height: isMobile ? mvw(50) : vw(63),
-              backgroundColor: inputBg,
-              border: inputBorder,
-              borderRadius: isMobile ? mvw(12) : vw(15),
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setOpenCountrySelector(!openCountrySelector)}
-              disabled={isSubmitting}
-              className="flex items-center gap-2 px-4 hover:bg-white/10 transition-colors border-r border-white/20 flex-shrink-0"
+          <div className="relative w-full" ref={countrySelectorRef}>
+            <div
+              className={cn(
+                "flex items-stretch relative transition-all overflow-hidden",
+                openCountrySelector ? "z-20" : "z-0"
+              )}
+              style={{
+                width: "100%",
+                height: isMobile ? mvw(50) : vw(63),
+                backgroundColor: inputBg,
+                border: inputBorder,
+                borderRadius: isMobile ? mvw(12) : vw(15),
+              }}
             >
-              <div className="w-6 h-4 md:w-8 md:h-5 flex-shrink-0">
-                <CountryFlag
-                  countryCode={selectedCountry[1]}
-                  className="w-full h-full rounded-[2px] object-cover"
-                />
-              </div>
-              <span className="text-white font-anaheim font-semibold text-base">
-                +{selectedCountry[2]}
-              </span>
-            </button>
+              <button
+                type="button"
+                onClick={() => setOpenCountrySelector(!openCountrySelector)}
+                disabled={isSubmitting}
+                className="flex items-center gap-2 px-4 hover:bg-white/10 transition-colors border-r border-white/20 flex-shrink-0"
+              >
+                <div className="w-6 h-4 md:w-8 md:h-5 flex-shrink-0">
+                  <CountryFlag
+                    countryCode={selectedCountry[1]}
+                    className="w-full h-full rounded-[2px] object-cover"
+                  />
+                </div>
+                <span className="text-white font-anaheim font-semibold text-base">
+                  +{selectedCountry[2]}
+                </span>
+              </button>
 
-            <input
-              type="tel"
-              value={
-                formData.whatsapp?.replace(
-                  `+${selectedCountry[2]}`,
-                  "",
-                ) || ""
-              }
-              onChange={(e) =>
-                handlePhoneChange("whatsapp", e.target.value)
-              }
-              placeholder={
-                getFieldConfig("whatsapp")?.placeholder ||
-                (locale === "zh"
-                  ? "您的 WhatsApp / 电话"
-                  : "Your WhatsApp / Phone")
-              }
-              disabled={isSubmitting}
-              className="flex-1 bg-transparent px-4 outline-none font-anaheim font-semibold text-base text-white placeholder:text-white/95 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#756F3F_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-            />
+              <input
+                type="tel"
+                id="whatsapp"
+                name="whatsapp"
+                autoComplete="tel"
+                value={
+                  formData.whatsapp?.replace(
+                    `+${selectedCountry[2]}`,
+                    "",
+                  ) || ""
+                }
+                onChange={(e) =>
+                  handlePhoneChange("whatsapp", e.target.value)
+                }
+                placeholder={
+                  getFieldConfig("whatsapp")?.placeholder ||
+                  (locale === "zh"
+                    ? "您的 WhatsApp / 电话"
+                    : "Your WhatsApp / Phone")
+                }
+                disabled={isSubmitting}
+                className="contact-input-el flex-1 bg-transparent px-4 outline-none font-anaheim font-semibold text-base"
+              />
+            </div>
 
             {openCountrySelector && (
               <div className="absolute left-0 top-full mt-2 z-[100]">
@@ -763,7 +810,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
               value={formData.country}
               onChange={handleInputChange}
               disabled={isSubmitting}
-              className="w-full bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold appearance-none focus:outline-none transition-colors"
+              className="contact-input-el w-full bg-transparent placeholder-white/95 outline-none font-anaheim font-semibold appearance-none focus:outline-none transition-colors"
               style={{
                 fontSize: isMobile ? mvw(16) : vw(16),
                 paddingLeft: isMobile ? mvw(24) : vw(29),
@@ -862,7 +909,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
                 )}
                 style={{
                   fontSize: isMobile ? mvw(12) : "14px",
-                  lineHeight: isMobile ? mvw(16) : vw(18),
+                  lineHeight: isMobile ? mvw(18) : vw(24),
                 }}
               >
                 {typeof privacyText === "object" ? (
@@ -874,56 +921,79 @@ export function ContactForm({ data, className }: ContactFormProps) {
             </div>
           )}
 
-          {/* Upload File Button */}
-          <label
-            className={cn(
-              "flex items-center justify-center gap-2 cursor-pointer transition-all duration-300 hover:opacity-100 hover:bg-white/20 hover:border-white",
-              isMobile ? "self-start w-full" : "self-end",
-            )}
-            style={{
-              width: isMobile ? "100%" : vw(256),
-              height: isMobile ? mvw(50) : vw(58),
-              border: "1px solid rgba(255, 255, 255, 0.46)",
-              borderRadius: isMobile ? mvw(25) : vw(33.5),
-              opacity: 0.61,
-            }}
-          >
-            <input
-              type="file"
-              onChange={handleFileChange}
-              className="hidden"
-              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-            />
-            <svg
-              viewBox={CUSTOM_ICONS.upload.viewBox}
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="text-white"
+          {/* Upload and Submit Section - Stacked Layout */}
+          <div className="flex flex-col gap-4 w-full">
+            {/* Upload Button - Top Right */}
+            <div className="flex justify-end w-full">
+              <label
+                className="contact-upload-btn group flex items-center justify-center gap-2 cursor-pointer transition-all border border-white/34"
+                style={{
+                  width: isMobile ? "100%" : vw(256),
+                  height: isMobile ? mvw(50) : vw(60),
+                  borderRadius: isMobile ? mvw(25) : vw(33.5),
+                }}
+              >
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                />
+                <svg
+                  viewBox={CUSTOM_ICONS.upload.viewBox}
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="upload-icon text-white group-hover:text-[#756F3F] transition-colors"
+                  style={{
+                    width: isMobile ? mvw(20) : vw(25),
+                    height: isMobile ? mvw(20) : vw(25),
+                  }}
+                >
+                  <path
+                    d={CUSTOM_ICONS.upload.path}
+                    fill="currentColor"
+                  />
+                </svg>
+                <span className="upload-text text-white font-anaheim font-semibold text-lg transition-colors">
+                  {file
+                    ? file.name.substring(0, 15) + "..."
+                    : getFieldConfig("attachment")?.placeholder ||
+                      (locale === "zh" ? "上传文件" : "Upload File")}
+                </span>
+              </label>
+            </div>
+
+            {/* Submit Button - Bottom Full Width */}
+            <button
+              type="submit"
+              disabled={isSubmitting || (!!privacyText && !privacyAccepted)}
+              className={cn(
+                "contact-submit-btn w-full flex items-center justify-center gap-2 font-anaheim font-bold text-white transition-all disabled:opacity-50",
+                !!privacyText && !privacyAccepted ? "grayscale opacity-80" : ""
+              )}
               style={{
-                width: isMobile ? mvw(20) : vw(25),
-                height: isMobile ? mvw(20) : vw(25),
+                width: "100%",
+                height: isMobile ? mvw(60) : vw(83),
+                backgroundColor: "#756F3F",
+                borderRadius: isMobile ? mvw(30) : vw(63),
+                fontSize: isMobile ? mvw(24) : vw(32),
               }}
             >
-              <path
-                d={CUSTOM_ICONS.upload.path}
-                fill="currentColor"
-              />
-            </svg>
-            <span
-              className="font-anaheim font-semibold text-white"
-              style={{ fontSize: isMobile ? mvw(18) : vw(24) }}
-            >
-              {file
-                ? file.name.substring(0, 15) + "..."
-                : getFieldConfig("file")?.label ||
-                  (locale === "zh" ? "上传文件" : "Upload File")}
-            </span>
-          </label>
+              {isSubmitting ? (
+                <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <span>
+                  {formConfig?.submitButtonText ||
+                    (locale === "zh" ? "提交咨询" : "Send Inquiry")}
+                </span>
+              )}
+            </button>
+          </div>
 
           {/* Status Messages */}
           {submitted && (
             <div
-              className="text-green-400 font-anaheim text-center w-full"
+              className="text-green-400 font-anaheim text-center w-full mt-4"
               style={{ fontSize: isMobile ? mvw(16) : vw(18) }}
             >
               {formConfig?.successMessage ||
@@ -934,54 +1004,12 @@ export function ContactForm({ data, className }: ContactFormProps) {
           )}
           {error && (
             <div
-              className="text-red-400 font-anaheim text-center w-full"
+              className="text-red-400 font-anaheim text-center w-full mt-4"
               style={{ fontSize: isMobile ? mvw(16) : vw(18) }}
             >
               {error}
             </div>
           )}
-
-          {/* Send Inquiry Button */}
-          <motion.button
-            style={{
-              transformOrigin: "center",
-              width: "100%",
-              minHeight: isMobile ? mvw(60) : vw(83),
-              height: "auto",
-              backgroundColor: "#9C9032",
-              borderRadius: isMobile ? mvw(30) : vw(63),
-              fontSize: isMobile ? mvw(24) : vw(32),
-              gap: isMobile ? mvw(16) : vw(20),
-              marginTop: 0,
-              boxShadow: "0 4px 15px rgba(0, 0, 0, 0.2)",
-            }}
-            initial={{ rotate: 0, scale: 1 }}
-            animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
-            whileHover={{
-              rotate: 0,
-              scale: 1.05,
-              transition: { scale: { duration: 0.3, ease: "easeOut" } },
-            }}
-            transition={{
-              rotate: {
-                duration: 0.5,
-                repeat: Infinity,
-                repeatDelay: 2,
-                ease: "linear",
-              },
-            }}
-            type="submit"
-            disabled={isSubmitting || (!!privacyText && !privacyAccepted)}
-            className={`flex items-center justify-center text-white font-anaheim font-semibold transition-colors duration-300 disabled:opacity-70 whitespace-pre-line leading-tight px-4 py-2 ${
-              !!privacyText && !privacyAccepted ? "grayscale opacity-80" : ""
-            }`}
-          >
-            {isSubmitting
-              ? formConfig?.submittingText ||
-                (locale === "zh" ? "发送中..." : "Sending...")
-              : formConfig?.submitButtonText ||
-                (locale === "zh" ? "发送询盘" : "Send Inquiry")}
-          </motion.button>
         </form>
       </div>
     </section>

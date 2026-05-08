@@ -21,6 +21,8 @@ const formInputClasses = `
   border-0 rounded-none border-b border-[#56511C]
   focus:outline-none focus:ring-0 focus:border-primary
   focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0
+  text-base md:text-lg lg:text-xl xl:text-2xl
+  footer-input-el
 `;
 
 const formButtonClasses = `
@@ -38,6 +40,10 @@ export default function FooterForm({
   turnstileSiteKey,
   onSuccess,
 }: Props) {
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 1024;
+  const vw = (px: number) => `calc(var(--rpx) * ${px})`;
+  const mvw = (px: number) => `calc(var(--mvw) * ${px})`;
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -184,6 +190,41 @@ export default function FooterForm({
         <span className="relative text-white">{content.form.title}</span>
       </h3>
 
+      <style jsx>{`
+        :global(.footer-input-el) {
+          caret-color: white !important;
+          outline: none !important;
+          box-shadow: none !important;
+        }
+        :global(.footer-input-el:focus),
+        :global(.footer-input-el:focus-visible),
+        :global(.footer-input-el:active) {
+          outline: none !important;
+          box-shadow: none !important;
+          border-top-width: 0 !important;
+          border-left-width: 0 !important;
+          border-right-width: 0 !important;
+          border-bottom-width: 1px !important;
+          border-bottom-color: #56511C !important;
+          --tw-ring-offset-shadow: 0 0 #0000 !important;
+          --tw-ring-shadow: 0 0 #0000 !important;
+          --tw-ring-color: transparent !important;
+        }
+        :global(.footer-input-el:-webkit-autofill),
+        :global(.footer-input-el:-webkit-autofill:hover),
+        :global(.footer-input-el:-webkit-autofill:focus),
+        :global(.footer-input-el:-webkit-autofill:active) {
+          -webkit-text-fill-color: white !important;
+          -webkit-box-shadow: 0 0 0px 1000px #756f3f inset !important;
+          transition: background-color 5000s ease-in-out 0s;
+          caret-color: white !important;
+        }
+        :global(.footer-input-el::placeholder) {
+          color: rgba(255, 255, 255, 1) !important;
+          -webkit-text-fill-color: rgba(255, 255, 255, 1) !important;
+        }
+      `}</style>
+
       <form
         id={formConfig?.name || "footer-form"}
         className="flex flex-col gap-6 lg:gap-8"
@@ -204,10 +245,7 @@ export default function FooterForm({
           placeholder={`${content.form.placeholders.email} *`}
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className={cn(
-            formInputClasses,
-            "text-base",
-          )}
+          className={cn(formInputClasses)}
           disabled={isSubmitting}
         />
         <Textarea
@@ -216,10 +254,7 @@ export default function FooterForm({
           onChange={(e) =>
             setFormData({ ...formData, message: e.target.value })
           }
-          className={cn(
-            formInputClasses,
-            "min-h-[80px] text-base",
-          )}
+          className={cn(formInputClasses, "min-h-[80px]")}
           disabled={isSubmitting}
         />
 
@@ -269,7 +304,12 @@ export default function FooterForm({
                   </svg>
                 )}
               </div>
-              <p className="text-[10px] sm:text-[11px] md:text-[14px] leading-relaxed text-white/60 max-w-[450px] select-none whitespace-pre-line">
+              <p
+                className={cn(
+                  "text-[10px] sm:text-[11px] md:text-[14px] leading-relaxed max-w-[450px] select-none whitespace-pre-line transition-colors duration-300",
+                  privacyAccepted ? "text-white" : "text-white/60",
+                )}
+              >
                 {formConfig.privacyConsentText}
               </p>
             </div>

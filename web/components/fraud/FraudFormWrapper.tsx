@@ -30,7 +30,7 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
   const [isMobile, setIsMobile] = useState(false);
 
   const [selectedCountry, setSelectedCountry] = useState(
-    COUNTRIES.find((c) => c[1] === "CN") || COUNTRIES[0],
+    COUNTRIES.find((c) => c[1] === "US") || COUNTRIES[0],
   );
   const [openCountrySelector, setOpenCountrySelector] = useState(false);
   const countrySelectorRef = React.useRef<HTMLDivElement>(null);
