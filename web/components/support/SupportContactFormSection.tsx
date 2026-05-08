@@ -512,7 +512,7 @@ export function SupportContactFormSection({
                   <div
                     key={field.fieldName}
                     className={cn(
-                      "flex items-stretch bg-[#746D37] border border-white/34 relative transition-all",
+                      "flex items-stretch bg-[#746D37] border border-white/34 relative",
                       openCountrySelector ? "z-20" : "z-0"
                     )}
                     ref={countrySelectorRef}
@@ -627,7 +627,7 @@ export function SupportContactFormSection({
                   type={field.fieldType === "email" ? "email" : "text"}
                   placeholder={`${field.label}${field.required ? " *" : ""}`}
                   spellCheck="false"
-                  className="w-full bg-[#746D37] border border-white/34 px-6 text-white focus:outline-none focus:border-white/30 transition-all font-anaheim font-semibold text-lg placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#746D37_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                  className="w-full bg-[#746D37] border border-white/34 px-6 text-white focus:outline-none font-anaheim font-semibold text-lg placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#746D37_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                   style={{
                     height: isMobile ? mvw(50) : vw(63),
                     borderRadius: isMobile ? mvw(12) : vw(15),
