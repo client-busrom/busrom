@@ -813,9 +813,15 @@ export function OemOdmContactForm({
 
                       {/* Others Input - Nested for consistent spacing */}
                       {(() => {
-                        const othersField = sortedFields.find(f => f.fieldName === "others-indicate");
-                        const isOtherSelected = (formData[checkboxFields[0].fieldName] || []).some(
-                          (v: string) => v.toLowerCase() === "others" || v.toLowerCase().includes("other")
+                        const othersField = sortedFields.find(
+                          (f) => f.fieldName === "others-indicate",
+                        );
+                        const isOtherSelected = (
+                          formData[checkboxFields[0].fieldName] || []
+                        ).some(
+                          (v: string) =>
+                            v.toLowerCase() === "others" ||
+                            v.toLowerCase().includes("other"),
                         );
 
                         if (isOtherSelected && othersField) {
@@ -826,8 +832,10 @@ export function OemOdmContactForm({
                               onChange={(e) =>
                                 handleChange("others-indicate", e.target.value)
                               }
-                              className="w-full bg-[#F3EDD4] border border-[rgba(117,111,63,0.1)] rounded-[10px] px-6 py-3 text-base font-semibold text-[rgba(117,111,63,0.7)] outline-none placeholder-[rgba(117,111,63,0.4)] resize-none min-h-[100px] [&:-webkit-autofill]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-                              placeholder={othersField.placeholder || othersField.label}
+                              className="w-full bg-[#F3EDD4] border border-[rgba(117,111,63,0.1)] rounded-[10px] px-6 py-3 text-base font-semibold text-[rgba(117,111,63,0.7)] outline-none placeholder-[rgba(117,111,63,0.4)] resize-none h-[53px] [&:-webkit-autofill]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                              placeholder={
+                                othersField.placeholder || othersField.label
+                              }
                             />
                           );
                         }
