@@ -13,7 +13,9 @@ import { Turnstile } from "@/components/ui/turnstile";
 import { LexicalRenderer } from "@/components/lexical/LexicalRenderer";
 import { HollowText } from "@/components/common/HollowText";
 import Magnetic from "@/components/common/Magnetic";
-import { PhoneInput } from "@/components/ui/PhoneInput";
+import { COUNTRIES } from "@/components/ui/PhoneInput";
+import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 import { motion } from "framer-motion";
 
 // lg 断点 (1024px) - 与 Tailwind 一致
@@ -223,6 +225,11 @@ export default function MainForm({
 
   const STORAGE_KEY = "busrom_privacy_consent";
   const [isGloballyAccepted, setIsGloballyAccepted] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(
+    COUNTRIES.find((c) => c[1] === "CN") || COUNTRIES[0],
+  );
+  const [openCountrySelector, setOpenCountrySelector] = useState(false);
+  const countrySelectorRef = useRef<HTMLDivElement>(null);
 
   // 挂载时检查全局同意状态
   useEffect(() => {
@@ -231,6 +238,19 @@ export default function MainForm({
       setPrivacyAccepted(true);
       setIsGloballyAccepted(true);
     }
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        countrySelectorRef.current &&
+        !countrySelectorRef.current.contains(event.target as Node)
+      ) {
+        setOpenCountrySelector(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const handlePrivacyToggle = (val: boolean) => {
@@ -311,6 +331,14 @@ export default function MainForm({
   // 表单输入处理
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handlePhoneChange = (field: string, value: string) => {
+    const digits = value.replace(/\D/g, "");
+    setFormData((prev) => ({
+      ...prev,
+      [field]: digits ? `+${selectedCountry[2]}${digits}` : "",
+    }));
   };
 
   // 表单提交
@@ -687,27 +715,67 @@ export default function MainForm({
                         <span className="text-red-400">*</span>
                       )}
                     </Label>
-                    <PhoneInput
-                      id="whatsapp"
-                      value={formData.whatsapp}
-                      onChange={(phone) => handleInputChange("whatsapp", phone)}
-                      placeholder={getFieldPlaceholder(
-                        "whatsapp",
-                        data.placeholderWhatsapp,
+                    <div
+                      className={cn(
+                        "flex items-stretch bg-transparent border-b border-white relative transition-all mt-1 h-[45px]",
+                        openCountrySelector ? "z-20" : "z-0"
                       )}
-                      required={isFieldRequired("whatsapp")}
-                      disabled={submitting}
-                      className="!bg-transparent !border-0 !border-b !border-white !rounded-none !h-[45px]"
-                      buttonClassName="!bg-transparent !border-0 !border-r !border-white/20 !text-white hover:!bg-white/5 !rounded-none !px-0 !mr-2"
-                      inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-bold !text-base [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0_1000px_#BFB672_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s!important]"
-                      dialCodeClassName="!text-white !text-base"
-                      chevronClassName="!text-white"
-                      containerClassName="mt-1"
-                      autoComplete="off"
-                      autoCorrect="off"
-                      autoCapitalize="off"
-                      spellCheck="false"
-                    />
+                      ref={countrySelectorRef}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setOpenCountrySelector(!openCountrySelector)}
+                        disabled={submitting}
+                        className="flex items-center gap-2 pr-2 hover:bg-white/5 transition-colors border-r border-white/20 flex-shrink-0"
+                      >
+                        <div className="w-5 h-3 md:w-6 md:h-4 flex-shrink-0">
+                          <CountryFlag
+                            countryCode={selectedCountry[1]}
+                            className="w-full h-full rounded-[1px] object-cover"
+                          />
+                        </div>
+                        <span className="text-white font-anaheim font-bold text-base">
+                          +{selectedCountry[2]}
+                        </span>
+                      </button>
+
+                      <input
+                        type="tel"
+                        id="whatsapp"
+                        value={
+                          formData.whatsapp?.replace(
+                            `+${selectedCountry[2]}`,
+                            "",
+                          ) || ""
+                        }
+                        onChange={(e) =>
+                          handlePhoneChange("whatsapp", e.target.value)
+                        }
+                        placeholder={getFieldPlaceholder(
+                          "whatsapp",
+                          data.placeholderWhatsapp,
+                        )}
+                        disabled={submitting}
+                        className="flex-1 bg-transparent px-3 outline-none font-anaheim font-bold text-base text-white placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#BFB672_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s!important]"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        spellCheck="false"
+                      />
+
+                      {openCountrySelector && (
+                        <div className="absolute left-0 top-full mt-2 z-[100]">
+                          <CountrySelectorList
+                            onSelect={(country) => {
+                              setSelectedCountry(country);
+                              setOpenCountrySelector(false);
+                            }}
+                            onClose={() => setOpenCountrySelector(false)}
+                            className="shadow-2xl"
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
                   {/* Company */}
                   <div>
@@ -762,7 +830,7 @@ export default function MainForm({
                         "message",
                         data.placeholderMessage,
                       )}
-                      className={cn(formInputClasses, "min-h-[40px]")}
+                      className={cn(formInputClasses, "min-h-[40px] resize-none overflow-y-auto")}
                       required={isFieldRequired("message")}
                       spellCheck="false"
                       autoComplete="off"
@@ -823,7 +891,12 @@ export default function MainForm({
                           </svg>
                         )}
                       </div>
-                      <p className="text-[10px] md:text-[14px] leading-tight text-white/70 text-left whitespace-pre-line select-none">
+                      <p 
+                        className={cn(
+                          "text-[12px] md:text-[14px] leading-tight text-left whitespace-pre-line select-none transition-opacity duration-300",
+                          privacyAccepted ? "text-white opacity-100" : "text-white opacity-70"
+                        )}
+                      >
                         {formConfig.privacyConsentText}
                       </p>
                     </div>
