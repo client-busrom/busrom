@@ -7,9 +7,9 @@ import React, {
   useRef,
   useMemo,
 } from "react";
+import { CUSTOM_ICONS } from "@/lib/icons";
 import { motion } from "framer-motion";
 import {
-  Upload,
   CheckCircle,
   Info,
   ChevronLeft,
@@ -937,15 +937,22 @@ export function ContactFormSection({
                 className="hidden"
                 disabled={isSubmitting}
               />
-              <Upload
+              <svg
+                viewBox={CUSTOM_ICONS.upload.viewBox}
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
                 className="transition-colors duration-300 group-hover:text-white"
                 style={{
                   width: isMobile ? mvw(18) : vw(25),
                   height: isMobile ? mvw(18) : vw(25),
                   color: "#6B5500",
                 }}
-                strokeWidth={2}
-              />
+              >
+                <path
+                  d={CUSTOM_ICONS.upload.path}
+                  fill="currentColor"
+                />
+              </svg>
               <span
                 className="font-anaheim font-semibold truncate transition-colors duration-300 group-hover:text-white"
                 style={{

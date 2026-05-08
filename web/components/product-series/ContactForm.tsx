@@ -1,9 +1,10 @@
 "use client";
 
 import * as React from "react";
+import { CUSTOM_ICONS } from "@/lib/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { RichText } from "@payloadcms/richtext-lexical/react";
-import { Upload, ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
@@ -837,13 +838,21 @@ export function ContactForm({ data, className }: ContactFormProps) {
               className="hidden"
               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
             />
-            <Upload
+            <svg
+              viewBox={CUSTOM_ICONS.upload.viewBox}
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
               className="text-white"
               style={{
                 width: isMobile ? mvw(20) : vw(25),
                 height: isMobile ? mvw(20) : vw(25),
               }}
-            />
+            >
+              <path
+                d={CUSTOM_ICONS.upload.path}
+                fill="currentColor"
+              />
+            </svg>
             <span
               className="font-anaheim font-semibold text-white"
               style={{ fontSize: isMobile ? mvw(18) : vw(24) }}

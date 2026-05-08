@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
+import { CUSTOM_ICONS } from "@/lib/icons";
 import { RichText } from "@payloadcms/richtext-lexical/react";
-import { Upload, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Turnstile } from "@/components/ui/turnstile";
 import { PhoneInput } from "@/components/ui/PhoneInput";
@@ -337,9 +338,21 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
           })}
 
           <div className="flex justify-end pr-4">
-             <label className="flex items-center gap-3 cursor-pointer border border-[#756F3F] rounded-full px-8 py-3 transition-colors hover:bg-black/10 h-14 group">
+              <label className="flex items-center gap-3 cursor-pointer border border-[#756F3F] rounded-full px-8 py-3 transition-colors hover:bg-black/10 h-14 group">
                 <input type="file" className="hidden" onChange={handleFileChange} />
-                <Upload className="text-[#756F3F]" size={20} />
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox={CUSTOM_ICONS.upload.viewBox}
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="text-[#756F3F]"
+                >
+                  <path
+                    d={CUSTOM_ICONS.upload.path}
+                    fill="currentColor"
+                  />
+                </svg>
                 <span className="text-[#756F3F] font-anaheim font-semibold transition-colors">
                    {fileName || (locale === 'zh' ? '上传文件' : 'Upload File')}
                 </span>

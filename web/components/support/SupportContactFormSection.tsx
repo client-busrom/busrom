@@ -7,8 +7,8 @@ import React, {
   useMemo,
   useRef,
 } from "react";
+import { CUSTOM_ICONS } from "@/lib/icons";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput";
@@ -617,8 +617,17 @@ export function SupportContactFormSection({
                   className="hidden"
                   onChange={handleFileChange}
                 />
-                <svg width={isMobile ? mvw(20) : vw(20)} height={isMobile ? mvw(20) : vw(20)} viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M22.9565 11.2384C21.8485 6.45279 17.5857 3.1 12.6316 3.1C8.61842 3.1 5.21053 5.30526 3.42105 8.71579C1.48684 10.7026 0 13.5237 0 16.6316C0 22.8211 5.04737 27.9 11.3158 27.9H22.1184C26.9737 27.9 31 23.9526 31 19.1842C31 14.7342 27.5316 11.5147 22.9565 11.2384ZM12.6316 23.1V16.6316H7.73684L14.2632 8.71579L20.7895 16.6316H15.8947V23.1H12.6316Z" fill="#756F3F" />
+                <svg
+                  width={isMobile ? mvw(20) : vw(20)}
+                  height={isMobile ? mvw(20) : vw(20)}
+                  viewBox={CUSTOM_ICONS.upload.viewBox}
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d={CUSTOM_ICONS.upload.path}
+                    fill="#756F3F"
+                  />
                 </svg>
                 <span
                   className="text-[#756F3F] font-anaheim font-semibold ml-2"
