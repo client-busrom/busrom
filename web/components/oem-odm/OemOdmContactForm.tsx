@@ -366,10 +366,12 @@ export function OemOdmContactForm({
   const textFields = sortedFields.filter(
     (f) =>
       ["text", "email", "tel", "phone"].includes(f.fieldType) &&
-      f.fieldName !== "othersIndicate",
+      f.fieldName !== "others-indicate",
   );
   const selectFields = sortedFields.filter((f) => f.fieldType === "select");
-  const textareaFields = sortedFields.filter((f) => f.fieldType === "textarea");
+  const textareaFields = sortedFields.filter(
+    (f) => f.fieldType === "textarea" && f.fieldName !== "others-indicate",
+  );
   const checkboxFields = sortedFields.filter((f) => f.fieldType === "checkbox");
 
   // 加载动画圆圈组件
@@ -810,24 +812,27 @@ export function OemOdmContactForm({
                       ))}
 
                       {/* Others Input - Nested for consistent spacing */}
-                      {(formData[checkboxFields[0].fieldName] || []).some(
-                        (v: string) => v.toLowerCase().includes("other"),
-                      ) && (
-                        <input
-                          type="text"
-                          value={formData["othersIndicate"] || ""}
-                          spellCheck="false"
-                          onChange={(e) =>
-                            handleChange("othersIndicate", e.target.value)
-                          }
-                          className="w-full bg-[#F3EDD4] border border-[rgba(117,111,63,0.1)] rounded-[10px] px-6 h-[50px] text-base font-semibold text-[rgba(117,111,63,0.7)] outline-none placeholder-[rgba(117,111,63,0.4)] [&:-webkit-autofill]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-                          placeholder={
-                            (sortedFields.find(f => f.fieldName === "othersIndicate")?.placeholder) || 
-                            checkboxFields[0].placeholder || 
-                            "Please indicate here"
-                          }
-                        />
-                      )}
+                      {(() => {
+                        const othersField = sortedFields.find(f => f.fieldName === "others-indicate");
+                        const isOtherSelected = (formData[checkboxFields[0].fieldName] || []).some(
+                          (v: string) => v.toLowerCase() === "others" || v.toLowerCase().includes("other")
+                        );
+
+                        if (isOtherSelected && othersField) {
+                          return (
+                            <textarea
+                              value={formData["others-indicate"] || ""}
+                              spellCheck="false"
+                              onChange={(e) =>
+                                handleChange("others-indicate", e.target.value)
+                              }
+                              className="w-full bg-[#F3EDD4] border border-[rgba(117,111,63,0.1)] rounded-[10px] px-6 py-3 text-base font-semibold text-[rgba(117,111,63,0.7)] outline-none placeholder-[rgba(117,111,63,0.4)] resize-none min-h-[100px] [&:-webkit-autofill]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                              placeholder={othersField.placeholder || othersField.label}
+                            />
+                          );
+                        }
+                        return null;
+                      })()}
                     </div>
                   </div>
                 )}
