@@ -3,12 +3,15 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { CUSTOM_ICONS } from "@/lib/icons";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { Turnstile } from "@/components/ui/turnstile";
 import { uploadFileWithProgress } from "@/lib/upload";
 import type { Locale } from "@/i18n.config";
-import { PhoneInput } from "@/components/ui/PhoneInput";
+import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
+import { CountryFlag } from "@/components/ui/CountryFlag";
+import { COUNTRIES } from "@/components/ui/PhoneInput";
 
 interface MediaObject {
   id: string;
@@ -145,6 +148,34 @@ export function OemOdmContactForm({
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
   const [turnstileKey, setTurnstileKey] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(
+    COUNTRIES.find((c) => c[1] === "CN") || COUNTRIES[0],
+  );
+  const [openCountrySelector, setOpenCountrySelector] = useState(false);
+  const countrySelectorRef = useRef<HTMLDivElement>(null);
+
+  // Click outside to close country selector
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        countrySelectorRef.current &&
+        !countrySelectorRef.current.contains(event.target as Node)
+      ) {
+        setOpenCountrySelector(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handlePhoneChange = (fieldName: string, value: string) => {
+    // Only keep digits
+    const digits = value.replace(/\D/g, "");
+    setFormData((prev) => ({
+      ...prev,
+      [fieldName]: digits ? `+${selectedCountry[2]}${digits}` : "",
+    }));
+  };
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 1024);
@@ -530,23 +561,68 @@ export function OemOdmContactForm({
                         className="rounded-[10px] h-[50px] flex items-center"
                       >
                         {isPhone ? (
-                          <PhoneInput
-                            id={field.fieldName}
-                            value={formData[field.fieldName] || ""}
-                            onChange={(phone) =>
-                              handleChange(field.fieldName, phone)
-                            }
-                            placeholder={
-                              field.placeholder?.trim() || field.label
-                            }
-                            disabled={submitting}
-                            className="!bg-transparent !border-none !h-full !rounded-[10px]"
-                            buttonClassName="!bg-transparent !border-r-0 hover:!bg-black/5 !rounded-none !px-3 !h-full [&_img]:!w-6 [&_img]:!h-auto [&_svg]:!w-6 [&_svg]:!h-auto [&_svg]:!text-[#756F3F] [&_.PhoneInputCountrySelectArrow]:!border-t-[#756F3F] [&_.PhoneInputCountrySelectArrow]:!opacity-70"
-                            style={{ color: "rgba(117, 111, 63, 0.7)" }}
-                            inputClassName="!bg-transparent !placeholder-[rgba(117,111,63,0.4)] !font-anaheim !font-semibold !text-[16px] !h-full !pl-0 [&:-webkit-autofill]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-                            dialCodeClassName="!text-[rgba(117,111,63,0.7)] !text-[16px]"
-                            containerClassName="!h-full w-full"
-                          />
+                          <div 
+                            className={cn(
+                              "flex-1 h-full flex items-stretch relative",
+                              openCountrySelector ? "z-20" : "z-0"
+                            )} 
+                            ref={countrySelectorRef}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => setOpenCountrySelector(!openCountrySelector)}
+                              disabled={submitting}
+                              className="flex items-center gap-2 px-4 hover:bg-black/5 transition-colors border-r border-[#756F3F]/10 flex-shrink-0"
+                            >
+                              <div className="w-6 h-4 md:w-8 md:h-5 flex-shrink-0">
+                                <CountryFlag
+                                  countryCode={selectedCountry[1]}
+                                  className="w-full h-full rounded-[2px] object-cover"
+                                />
+                              </div>
+                              <span
+                                className="font-anaheim font-semibold"
+                                style={{
+                                  fontSize: isMobile ? "14px" : "16px",
+                                  color: "rgba(117, 111, 63, 0.7)",
+                                }}
+                              >
+                                +{selectedCountry[2]}
+                              </span>
+                            </button>
+
+                            <input
+                              type="tel"
+                              value={
+                                formData[field.fieldName]?.replace(
+                                  `+${selectedCountry[2]}`,
+                                  "",
+                                ) || ""
+                              }
+                              onChange={(e) =>
+                                handlePhoneChange(field.fieldName, e.target.value)
+                              }
+                              placeholder={
+                                field.placeholder?.trim() || field.label
+                              }
+                              disabled={submitting}
+                              className="flex-1 bg-transparent px-4 outline-none font-anaheim font-semibold text-base placeholder-[rgba(117,111,63,0.4)] [&:-webkit-autofill]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#F3F1EA_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                              style={{ color: "rgba(117, 111, 63, 0.7)" }}
+                            />
+
+                            {openCountrySelector && (
+                              <div className="absolute left-0 top-full mt-2 z-[100]">
+                                <CountrySelectorList
+                                  onSelect={(country) => {
+                                    setSelectedCountry(country);
+                                    setOpenCountrySelector(false);
+                                  }}
+                                  onClose={() => setOpenCountrySelector(false)}
+                                  className="shadow-2xl"
+                                />
+                              </div>
+                            )}
+                          </div>
                         ) : (
                           <input
                             type={
@@ -715,7 +791,13 @@ export function OemOdmContactForm({
                             </svg>
                           )}
                         </div>
-                        <p className="text-sm text-[#756F3F] leading-snug">
+                        <p 
+                          className={cn(
+                            "text-[#756F3F] leading-snug transition-opacity duration-300",
+                            privacyAccepted ? "opacity-100" : "opacity-70"
+                          )}
+                          style={{ fontSize: isMobile ? "12px" : "14px" }}
+                        >
                           {privacyText}
                         </p>
                       </div>

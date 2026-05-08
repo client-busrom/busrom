@@ -6,8 +6,11 @@ import { ChevronDown } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { Turnstile } from "@/components/ui/turnstile";
 import { cn } from "@/lib/utils";
-import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput";
+import Link from "next/link";
+import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 import { HollowText } from "@/components/common/HollowText";
+import { COUNTRIES } from "@/components/ui/PhoneInput";
 
 const DESIGN_WIDTH = 1920;
 const MOBILE_WIDTH = 390;
@@ -145,6 +148,24 @@ export function StoryContactFormSection({
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
   const [turnstileKey, setTurnstileKey] = useState(0);
 
+  // Atomic Phone Input State
+  const [openCountrySelector, setOpenCountrySelector] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState<[string, string, string]>(
+    COUNTRIES.find(c => c[1].toLowerCase() === (locale === "zh" ? "cn" : "us")) || COUNTRIES[0]
+  );
+  const countrySelectorRef = useRef<HTMLDivElement>(null);
+
+  // Close selector when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (countrySelectorRef.current && !countrySelectorRef.current.contains(event.target as Node)) {
+        setOpenCountrySelector(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [extraHeight, setExtraHeight] = useState(0);
   const [privacyHeight, setPrivacyHeight] = useState(0);
@@ -205,15 +226,9 @@ export function StoryContactFormSection({
     return () => observer.disconnect();
   }, []);
 
-  const mergedConfig = useMemo(() => {
-    return typeof formConfig === "string"
-      ? { id: formConfig }
-      : formConfig || {};
-  }, [formConfig]);
+  const mergedConfig = typeof formConfig === "string" ? { id: formConfig } : formConfig || {};
 
-  const effectivePrivacyText = useMemo(() => {
-    return getLocalizedString(mergedConfig?.privacyConsentText, locale || "en");
-  }, [mergedConfig, locale]);
+  const effectivePrivacyText = getLocalizedString((mergedConfig as any)?.privacyConsentText || (mergedConfig as any)?.data?.privacyConsentText, locale || "en");
 
   useEffect(() => {
     if (!effectivePrivacyText) {
@@ -232,16 +247,15 @@ export function StoryContactFormSection({
     return () => observer.disconnect();
   }, [effectivePrivacyText]);
 
-  const effectiveSubmitText = useMemo(() => {
-    return getLocalizedString(mergedConfig?.submitButtonText, locale || "en");
-  }, [mergedConfig, locale]);
+  const effectiveDescription = getLocalizedString(((mergedConfig as any)?.data || mergedConfig)?.description || (mergedConfig as any)?.description, locale || "en") || description;
 
-  const effectiveDescription = useMemo(() => {
-    const formConfigDesc =
-      ((mergedConfig as any)?.data || mergedConfig)?.description ||
-      (mergedConfig as any)?.description;
-    return getLocalizedString(formConfigDesc, locale || "en") || description;
-  }, [mergedConfig, locale, description]);
+  const effectiveSubmitText = getLocalizedString((mergedConfig as any)?.submitButtonText || (mergedConfig as any)?.data?.submitButtonText, locale || "en") || (locale === "zh" ? "提交咨询" : "Send Inquiry");
+
+  const effectiveSubmittingText = getLocalizedString((mergedConfig as any)?.submittingText || (mergedConfig as any)?.data?.submittingText, locale || "en") || (locale === "zh" ? "发送中..." : "Sending...");
+
+  const effectiveSuccessMessage = getLocalizedString((mergedConfig as any)?.successMessage || (mergedConfig as any)?.data?.successMessage, locale || "en") || (locale === "zh" ? "提交成功，我们会尽快联系您！" : "Thank you for reaching out. We will get back to you soon!");
+
+  const effectiveErrorMessage = getLocalizedString((mergedConfig as any)?.errorNetworkMessage || (mergedConfig as any)?.data?.errorNetworkMessage, locale || "en") || (locale === "zh" ? "提交失败，请重试。" : "Failed to submit form. Please try again.");
 
   useEffect(() => {
     const fetchSiteKey = async () => {
@@ -351,7 +365,7 @@ export function StoryContactFormSection({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to submit form");
+        throw new Error(error.message || effectiveErrorMessage);
       }
 
       // GTM Tracking
@@ -375,7 +389,7 @@ export function StoryContactFormSection({
     } catch (error) {
       setSubmitStatus("error");
       setErrorMessage(
-        error instanceof Error ? error.message : "Failed to submit form.",
+        error instanceof Error ? error.message : effectiveErrorMessage,
       );
       setTurnstileToken(null);
       setTurnstileKey((prev) => prev + 1);
@@ -684,16 +698,16 @@ export function StoryContactFormSection({
                     field.fieldName === "message";
                   if (isTextarea) {
                     return (
-                      <textarea
-                        key={field.fieldName}
-                        ref={textareaRef}
-                        placeholder={`${field.placeholder?.trim() || field.label}${field.required ? " *" : ""}`}
-                        value={formData[field.fieldName] || ""}
-                        onChange={(e) =>
-                          handleInputChange(field.fieldName, e.target.value)
-                        }
-                        spellCheck="false"
-                        className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-y outline-none focus:border-white transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                        <textarea
+                          key={field.fieldName}
+                          ref={textareaRef}
+                          placeholder={`${field.placeholder?.trim() || field.label}${field.required ? " *" : ""}`}
+                          value={formData[field.fieldName] || ""}
+                          onChange={(e) =>
+                            handleInputChange(field.fieldName, e.target.value)
+                          }
+                          spellCheck="false"
+                          className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-none outline-none transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                         style={{
                           width: "100%",
                           minHeight: isMobile ? mvw(120) : vw(103),
@@ -726,32 +740,106 @@ export function StoryContactFormSection({
                     fieldNameLower?.includes("region");
 
                   if (isPhoneField) {
+                    const currentValue = formData[field.fieldName] || "";
+                    const dialCode = selectedCountry[2];
+                    const pureNumber = currentValue.startsWith(`+${dialCode}`)
+                      ? currentValue.slice(dialCode.length + 1)
+                      : currentValue;
+
+                    const handlePhoneChange = (newPureNumber: string) => {
+                      const digits = newPureNumber.replace(/[^\d]/g, "");
+                      const fullNumber = `+${selectedCountry[2]}${digits}`;
+                      handleInputChange(field.fieldName, fullNumber);
+                    };
+
                     return (
                       <div
                         key={field.fieldName}
-                        className="dynamic-phone-input w-full"
+                        className="relative w-full"
+                        ref={countrySelectorRef}
                       >
-                        <PhoneInput
-                          value={formData[field.fieldName] || ""}
-                          onChange={(phone) =>
-                            handleInputChange(field.fieldName, phone)
-                          }
-                          placeholder={`${field.placeholder?.trim() || field.label}${field.required ? " *" : ""}`}
-                          required={field.required}
-                          disabled={isSubmitting}
-                          className="!bg-[#746d37] !border-white/34"
+                        <div
+                          className="flex items-stretch overflow-visible w-full transition-colors"
                           style={{
                             height: isMobile ? mvw(50) : vw(63),
                             borderRadius: isMobile ? mvw(12) : vw(15),
+                            backgroundColor: "#746d37",
+                            border: "1px solid rgba(255, 255, 255, 0.34)",
                           }}
-                          buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5"
-                          inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-base [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-                          inputStyle={{ fontSize: isMobile ? mvw(16) : vw(16) }}
-                          dialCodeClassName="!text-white !font-anaheim !text-base"
-                          dialCodeStyle={{
-                            fontSize: isMobile ? mvw(16) : vw(16),
-                          }}
-                        />
+                        >
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenCountrySelector(!openCountrySelector);
+                            }}
+                            className="flex items-center gap-2 px-3 hover:bg-white/5 transition-colors border-r border-white/10 flex-shrink-0"
+                            disabled={isSubmitting}
+                          >
+                            <div
+                              style={{
+                                width: isMobile ? mvw(24) : vw(32),
+                                height: isMobile ? mvw(16) : vw(20),
+                              }}
+                              className="flex-shrink-0"
+                            >
+                              <CountryFlag
+                                countryCode={selectedCountry[1]}
+                                className="w-full h-full rounded-[2px] object-cover"
+                              />
+                            </div>
+                            <span
+                              className="text-white font-anaheim font-semibold"
+                              style={{ fontSize: isMobile ? mvw(16) : vw(16) }}
+                            >
+                              +{selectedCountry[2]}
+                            </span>
+                            <ChevronDown
+                              className={cn(
+                                "text-white/50 transition-transform",
+                                isMobile ? "w-4 h-4" : "w-5 h-5",
+                                openCountrySelector && "rotate-180"
+                              )}
+                            />
+                          </button>
+
+                          <input
+                            type="tel"
+                            placeholder={`${field.placeholder?.trim() || field.label}${field.required ? " *" : ""}`}
+                            value={pureNumber}
+                            onChange={(e) => handlePhoneChange(e.target.value)}
+                            required={field.required}
+                            disabled={isSubmitting}
+                            className="flex-1 min-w-0 bg-transparent px-4 text-white placeholder:text-white/50 font-anaheim font-semibold outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#746d37_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                            style={{ fontSize: isMobile ? mvw(16) : vw(16) }}
+                          />
+                        </div>
+
+                        <AnimatePresence>
+                          {openCountrySelector && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 10 }}
+                              className="absolute z-[100] left-0 mt-2"
+                              style={{ width: isMobile ? "280px" : "300px" }}
+                            >
+                              <CountrySelectorList
+                                onSelect={(country) => {
+                                  setSelectedCountry(country);
+                                  const newFullNumber = `+${country[2]}${pureNumber.replace(/[^\d]/g, "")}`;
+                                  handleInputChange(field.fieldName, newFullNumber);
+                                  setOpenCountrySelector(false);
+                                }}
+                                onClose={() => setOpenCountrySelector(false)}
+                                className={cn(
+                                  "shadow-2xl !bg-[#4b4724] border border-white/20",
+                                  isMobile ? "!rounded-xl" : "!rounded-[15px]"
+                                )}
+                              />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     );
                   }
@@ -767,10 +855,11 @@ export function StoryContactFormSection({
                             handleInputChange(field.fieldName, e.target.value)
                           }
                           required={field.required}
-                          className="font-anaheim font-semibold appearance-none bg-[#746d37] border border-white/34 text-white w-full placeholder:text-white/50 focus:outline-none focus:border-white transition-colors"
+                          className="font-anaheim font-semibold appearance-none bg-[#746d37] text-white w-full placeholder:text-white/50 focus:outline-none transition-colors"
                           style={{
                             height: isMobile ? mvw(50) : vw(63),
                             borderRadius: isMobile ? mvw(12) : vw(15),
+                            border: "1px solid rgba(255, 255, 255, 0.34)",
                             paddingLeft: isMobile ? mvw(16) : vw(23),
                             paddingRight: isMobile ? mvw(32) : vw(40),
                             fontSize: isMobile ? mvw(16) : vw(16),
@@ -799,14 +888,14 @@ export function StoryContactFormSection({
                   return (
                     <input
                       key={field.fieldName}
-                      type={field.fieldType === "email" ? "email" : "text"}
-                      placeholder={`${field.placeholder || field.label}${field.required ? " *" : ""}`}
+                      type={field.fieldType}
+                      placeholder={`${field.placeholder?.trim() || field.label}${field.required ? " *" : ""}`}
                       value={formData[field.fieldName] || ""}
                       onChange={(e) =>
                         handleInputChange(field.fieldName, e.target.value)
                       }
                       spellCheck="false"
-                      className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none focus:border-white transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                      className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                       style={{
                         width: "100%",
                         height: isMobile ? mvw(50) : vw(63),
@@ -831,7 +920,7 @@ export function StoryContactFormSection({
                   value={formData.name || ""}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                   spellCheck="false"
-                  className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                  className="font-anaheim font-semibold text-white placeholder:text-white/50 outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                   style={{
                     width: "100%",
                     height: isMobile ? mvw(50) : vw(63),
@@ -861,21 +950,99 @@ export function StoryContactFormSection({
                   }}
                 />
                 <div className="dynamic-phone-input w-full">
-                  <PhoneInput
-                    value={formData.whatsapp || ""}
-                    onChange={(val) => handleInputChange("whatsapp", val)}
-                    placeholder="Your WhatsApp"
-                    className="!bg-[#746d37] !border-white/34"
+                  <div
+                    className="flex items-stretch overflow-visible transition-colors"
                     style={{
                       height: isMobile ? mvw(50) : vw(63),
                       borderRadius: isMobile ? mvw(12) : vw(15),
+                      backgroundColor: "#746d37",
+                      border: "1px solid rgba(255, 255, 255, 0.34)",
                     }}
-                    buttonClassName="!bg-transparent !border-white/10 !text-white hover:!bg-white/5"
-                    inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-base"
-                    inputStyle={{ fontSize: isMobile ? mvw(16) : vw(16) }}
-                    dialCodeClassName="!text-white !font-anaheim !text-base"
-                    dialCodeStyle={{ fontSize: isMobile ? mvw(16) : vw(16) }}
-                  />
+                  >
+                    <div
+                      className="relative h-full flex-shrink-0"
+                      ref={countrySelectorRef}
+                    >
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenCountrySelector(!openCountrySelector);
+                        }}
+                        disabled={isSubmitting}
+                        className="h-full flex items-center justify-center border-r border-white/20 transition-all hover:bg-white/5"
+                        style={{
+                          paddingLeft: isMobile ? mvw(12) : vw(16),
+                          paddingRight: isMobile ? mvw(6) : vw(8),
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: isMobile ? mvw(24) : vw(32),
+                            height: isMobile ? mvw(16) : vw(20),
+                          }}
+                          className="flex-shrink-0"
+                        >
+                          <CountryFlag
+                            countryCode={selectedCountry[1]}
+                            className="w-full h-full rounded-[2px] object-cover"
+                          />
+                        </div>
+                        <span
+                          className="font-anaheim font-semibold text-white"
+                          style={{
+                            fontSize: isMobile ? mvw(16) : vw(16),
+                            marginLeft: isMobile ? mvw(6) : vw(8),
+                          }}
+                        >
+                          +{selectedCountry[2]}
+                        </span>
+                        <ChevronDown
+                          className={cn(
+                            "transition-transform text-white/50",
+                            isMobile ? "w-4 h-4" : "w-5 h-5",
+                            openCountrySelector && "rotate-180",
+                          )}
+                          style={{ marginLeft: isMobile ? mvw(4) : vw(4) }}
+                        />
+                      </button>
+                      <AnimatePresence>
+                        {openCountrySelector && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="absolute z-[100] left-0 mt-2"
+                            style={{ width: isMobile ? "280px" : "300px" }}
+                          >
+                            <CountrySelectorList
+                              onSelect={(country) => {
+                                setSelectedCountry(country);
+                                setOpenCountrySelector(false);
+                              }}
+                              onClose={() => setOpenCountrySelector(false)}
+                              className={cn(
+                                "shadow-2xl !bg-[#4b4724] border border-white/20",
+                                isMobile ? "!rounded-xl" : "!rounded-[15px]"
+                              )}
+                            />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                    <input
+                      type="tel"
+                      placeholder="Your WhatsApp"
+                      value={formData.whatsapp || ""}
+                      onChange={(e) => handleInputChange("whatsapp", e.target.value)}
+                      disabled={isSubmitting}
+                      className="flex-1 min-w-0 bg-transparent outline-none font-anaheim font-semibold text-white placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#746d37_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                      style={{
+                        fontSize: isMobile ? mvw(16) : vw(16),
+                        paddingLeft: isMobile ? mvw(12) : vw(15),
+                      }}
+                    />
+                  </div>
                 </div>
                 <textarea
                   placeholder="Message"
@@ -883,7 +1050,7 @@ export function StoryContactFormSection({
                   value={formData.message || ""}
                   onChange={(e) => handleInputChange("message", e.target.value)}
                   spellCheck="false"
-                  className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-y outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                  className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-none outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                   style={{
                     width: "100%",
                     minHeight: isMobile ? mvw(120) : vw(103),
@@ -950,12 +1117,21 @@ export function StoryContactFormSection({
                   )}
                 </div>
                 <p
-                  className="leading-relaxed text-white/70 whitespace-pre-line select-none flex-1"
-                  style={{ fontSize: isMobile ? mvw(12) : "14px" }}
+                  className={cn(
+                    "leading-relaxed whitespace-pre-line select-none flex-1 transition-all duration-300",
+                    privacyAccepted ? "text-white opacity-100" : "text-white/70"
+                  )}
+                  style={{ fontSize: isMobile ? mvw(14) : "14px" }}
                 >
                   {effectivePrivacyText}
                 </p>
               </div>
+            )}
+
+            {submitStatus === "success" && (
+              <p className="text-green-400 text-sm mt-2">
+                {effectiveSuccessMessage}
+              </p>
             )}
 
             {/* Submit Button */}
@@ -991,12 +1167,8 @@ export function StoryContactFormSection({
               className="w-full bg-[#564d03] text-white font-anaheim font-semibold text-center transition-colors duration-300 hover:bg-black disabled:opacity-50"
             >
               {isSubmitting
-                ? formConfig?.submittingText || "Submitting..."
-                : submitStatus === "success"
-                  ? locale === "zh"
-                    ? "已提交!"
-                    : "Submitted"
-                  : effectiveSubmitText}
+                ? effectiveSubmittingText
+                : effectiveSubmitText}
             </motion.button>
 
             {/* Error Status */}
