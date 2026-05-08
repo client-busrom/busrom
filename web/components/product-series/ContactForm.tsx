@@ -9,7 +9,9 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
 import type { ContactFormData } from "@/lib/content-parser";
-import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput";
+import { COUNTRIES } from "@/components/ui/PhoneInput";
+import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 
 /**
  * Contact Form Section
@@ -64,6 +66,11 @@ export function ContactForm({ data, className }: ContactFormProps) {
   const [privacyAccepted, setPrivacyAccepted] = React.useState(false);
   const [isGloballyAccepted, setIsGloballyAccepted] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
+  const [selectedCountry, setSelectedCountry] = React.useState(
+    COUNTRIES.find((c) => c[1] === "CN") || COUNTRIES[0],
+  );
+  const [openCountrySelector, setOpenCountrySelector] = React.useState(false);
+  const countrySelectorRef = React.useRef<HTMLDivElement>(null);
 
   // Responsive state
   React.useEffect(() => {
@@ -72,7 +79,21 @@ export function ContactForm({ data, className }: ContactFormProps) {
     };
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        countrySelectorRef.current &&
+        !countrySelectorRef.current.contains(event.target as Node)
+      ) {
+        setOpenCountrySelector(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const STORAGE_KEY = "busrom_privacy_consent";
@@ -265,6 +286,14 @@ export function ContactForm({ data, className }: ContactFormProps) {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePhoneChange = (name: string, value: string) => {
+    const digits = value.replace(/\D/g, "");
+    setFormData((prev) => ({
+      ...prev,
+      [name]: digits ? `+${selectedCountry[2]}${digits}` : "",
+    }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -627,7 +656,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
             value={formData.name}
             onChange={handleInputChange}
             spellCheck="false"
-            className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#756F3F_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{
               fontSize: isMobile ? mvw(16) : vw(16),
               paddingLeft: isMobile ? mvw(24) : vw(29),
@@ -649,7 +678,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
             value={formData.email}
             onChange={handleInputChange}
             spellCheck="false"
-            className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#756F3F_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{
               fontSize: isMobile ? mvw(16) : vw(16),
               paddingLeft: isMobile ? mvw(24) : vw(29),
@@ -662,20 +691,46 @@ export function ContactForm({ data, className }: ContactFormProps) {
 
           {/* Input 3: WhatsApp */}
           <div
-            className="relative"
+            className={cn(
+              "flex items-stretch bg-transparent relative transition-all",
+              openCountrySelector ? "z-20" : "z-0"
+            )}
+            ref={countrySelectorRef}
             style={{
               width: "100%",
               height: isMobile ? mvw(50) : vw(63),
               backgroundColor: inputBg,
               border: inputBorder,
               borderRadius: isMobile ? mvw(12) : vw(15),
-              overflow: "visible",
             }}
           >
-            <PhoneInput
-              value={formData.whatsapp || ""}
-              onChange={(phone) =>
-                setFormData((prev) => ({ ...prev, whatsapp: phone }))
+            <button
+              type="button"
+              onClick={() => setOpenCountrySelector(!openCountrySelector)}
+              disabled={isSubmitting}
+              className="flex items-center gap-2 px-4 hover:bg-white/10 transition-colors border-r border-white/20 flex-shrink-0"
+            >
+              <div className="w-6 h-4 md:w-8 md:h-5 flex-shrink-0">
+                <CountryFlag
+                  countryCode={selectedCountry[1]}
+                  className="w-full h-full rounded-[2px] object-cover"
+                />
+              </div>
+              <span className="text-white font-anaheim font-semibold text-base">
+                +{selectedCountry[2]}
+              </span>
+            </button>
+
+            <input
+              type="tel"
+              value={
+                formData.whatsapp?.replace(
+                  `+${selectedCountry[2]}`,
+                  "",
+                ) || ""
+              }
+              onChange={(e) =>
+                handlePhoneChange("whatsapp", e.target.value)
               }
               placeholder={
                 getFieldConfig("whatsapp")?.placeholder ||
@@ -684,23 +739,21 @@ export function ContactForm({ data, className }: ContactFormProps) {
                   : "Your WhatsApp / Phone")
               }
               disabled={isSubmitting}
-              className="!bg-transparent !border-none !h-full"
-              buttonClassName="!bg-transparent !border-r-0 !text-white hover:!bg-white/10 !px-4 !h-full"
-              inputClassName={cn(
-                "!bg-transparent !text-white !placeholder-white/95 !font-anaheim !font-semibold !h-full [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]",
-                isMobile ? "!pl-2" : "!text-[0.833vw]",
-              )}
-              inputStyle={{
-                fontSize: isMobile ? mvw(16) : vw(16),
-              }}
-              dialCodeClassName={cn(
-                "!text-white",
-                !isMobile && "!text-[0.833vw]",
-              )}
-              dialCodeStyle={{
-                fontSize: isMobile ? mvw(16) : vw(16),
-              }}
+              className="flex-1 bg-transparent px-4 outline-none font-anaheim font-semibold text-base text-white placeholder:text-white/95 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#756F3F_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             />
+
+            {openCountrySelector && (
+              <div className="absolute left-0 top-full mt-2 z-[100]">
+                <CountrySelectorList
+                  onSelect={(country) => {
+                    setSelectedCountry(country);
+                    setOpenCountrySelector(false);
+                  }}
+                  onClose={() => setOpenCountrySelector(false)}
+                  className="shadow-2xl"
+                />
+              </div>
+            )}
           </div>
 
           {/* Input: Country/Region */}
@@ -750,7 +803,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
             value={formData.message}
             onChange={handleInputChange}
             spellCheck="false"
-            className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold resize-y overflow-hidden [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="bg-transparent text-white/95 placeholder-white/95 outline-none font-anaheim font-semibold resize-none overflow-y-auto [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#756F3F_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{
               fontSize: isMobile ? mvw(16) : vw(16),
               paddingLeft: isMobile ? mvw(24) : vw(29),
@@ -803,10 +856,13 @@ export function ContactForm({ data, className }: ContactFormProps) {
                 )}
               </div>
               <div
-                className="font-anaheim text-left select-none text-white/90 whitespace-pre-line prose-none rich-text-privacy [&_p]:m-0"
+                className={cn(
+                  "font-anaheim text-left select-none whitespace-pre-line prose-none rich-text-privacy [&_p]:m-0 transition-opacity duration-300",
+                  privacyAccepted ? "text-white opacity-100" : "text-white opacity-70"
+                )}
                 style={{
-                  fontSize: isMobile ? mvw(14) : "14px",
-                  lineHeight: isMobile ? mvw(18) : vw(18),
+                  fontSize: isMobile ? mvw(12) : "14px",
+                  lineHeight: isMobile ? mvw(16) : vw(18),
                 }}
               >
                 {typeof privacyText === "object" ? (
