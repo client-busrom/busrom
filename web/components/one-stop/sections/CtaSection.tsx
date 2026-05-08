@@ -6,7 +6,9 @@ import { ChevronDown, Check } from "lucide-react";
 import { CUSTOM_ICONS } from "@/lib/icons";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { cn } from "@/lib/utils";
-import { PhoneInput } from "@/components/ui/PhoneInput";
+import { COUNTRIES } from "@/components/ui/PhoneInput";
+import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 
 interface CtaSectionProps {
   title?: string;
@@ -187,6 +189,14 @@ export function CtaSection({
   }, []);
 
   // Sync with global storage when accepted in this form
+  const handlePhoneChange = (value: string) => {
+    const digits = value.replace(/\D/g, "");
+    setFormState((prev) => ({
+      ...prev,
+      whatsapp: digits ? `+${selectedCountry[2]}${digits}` : "",
+    }));
+  };
+
   const handlePrivacyToggle = (checked: boolean) => {
     setPrivacyAccepted(checked);
     if (checked && typeof window !== "undefined") {
@@ -289,9 +299,48 @@ export function CtaSection({
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
+  const [isMobile, setIsMobile] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(
+    COUNTRIES.find((c) => c[1] === "CN") || COUNTRIES[0],
+  );
+  const [openCountrySelector, setOpenCountrySelector] = useState(false);
+  const [openCountrySelectorMobile, setOpenCountrySelectorMobile] = useState(false);
+  const countrySelectorRef = useRef<HTMLDivElement>(null);
+  const countrySelectorRefMobile = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        countrySelectorRef.current &&
+        !countrySelectorRef.current.contains(event.target as Node)
+      ) {
+        setOpenCountrySelector(false);
+      }
+      if (
+        countrySelectorRefMobile.current &&
+        !countrySelectorRefMobile.current.contains(event.target as Node)
+      ) {
+        setOpenCountrySelectorMobile(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const fields = mergedConfig?.fields || [];
   const getField = (name: string) =>
     fields.find((f: any) => f.fieldName === name);
+
 
   /**
    * Safe Translation Helper
@@ -449,7 +498,7 @@ export function CtaSection({
             placeholder={getTranslation(
               getField("company")?.placeholder,
             )?.trim()}
-            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
           />
           <input
             type="email"
@@ -459,24 +508,67 @@ export function CtaSection({
             }
             spellCheck="false"
             placeholder={getTranslation(getField("email")?.placeholder)?.trim()}
-            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             required
           />
-          <div className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] overflow-hidden">
-            <PhoneInput
-              id="whatsapp-mobile"
-              value={formState["whatsapp"] || ""}
-              onChange={(phone) =>
-                setFormState({ ...formState, whatsapp: phone })
+          <div
+            className={cn(
+              "flex items-stretch bg-white/5 border border-white/20 rounded-[15px] relative transition-all",
+              openCountrySelectorMobile ? "z-20" : "z-0"
+            )}
+            ref={countrySelectorRefMobile}
+            style={{ 
+              width: "100%", 
+              height: "68px"
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setOpenCountrySelectorMobile(!openCountrySelectorMobile)}
+              disabled={isSubmitting}
+              className="flex items-center gap-2 px-4 hover:bg-white/10 transition-colors border-r border-white/20 flex-shrink-0"
+            >
+              <div className="w-6 h-4 md:w-8 md:h-5 flex-shrink-0">
+                <CountryFlag
+                  countryCode={selectedCountry[1]}
+                  className="w-full h-full rounded-[2px] object-cover"
+                />
+              </div>
+              <span className="text-white font-anaheim font-semibold text-base">
+                +{selectedCountry[2]}
+              </span>
+            </button>
+
+            <input
+              type="tel"
+              value={
+                formState["whatsapp"]?.replace(
+                  `+${selectedCountry[2]}`,
+                  "",
+                ) || ""
+              }
+              onChange={(e) =>
+                handlePhoneChange(e.target.value)
               }
               placeholder={getTranslation(
                 getField("whatsapp")?.placeholder,
               )?.trim()}
-              className="!h-full !bg-transparent !w-full"
-              buttonClassName="!bg-transparent !border-none !text-white hover:!bg-white/10 !px-4"
-              inputClassName="!bg-transparent !text-white !placeholder-white/40 !text-[16px] !h-full !px-1 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-              dialCodeClassName="!text-white !text-base"
+              disabled={isSubmitting}
+              className="flex-1 bg-transparent px-4 outline-none font-anaheim font-semibold text-base text-white placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             />
+
+            {openCountrySelectorMobile && (
+              <div className="absolute left-0 top-full mt-2 z-[100]">
+                <CountrySelectorList
+                  onSelect={(country) => {
+                    setSelectedCountry(country);
+                    setOpenCountrySelectorMobile(false);
+                  }}
+                  onClose={() => setOpenCountrySelectorMobile(false)}
+                  className="shadow-2xl"
+                />
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-4">
@@ -517,7 +609,7 @@ export function CtaSection({
             placeholder={getTranslation(
               getField("other-primary-requirement")?.placeholder,
             )}
-            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
           />
 
           <textarea
@@ -533,7 +625,7 @@ export function CtaSection({
               getField("specific-requirements-project-description")
                 ?.placeholder,
             )}
-            className="w-full h-36 bg-white/5 border border-white/20 rounded-[15px] p-5 text-white text-[16px] focus:border-[#FFF28E] resize-none placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="w-full h-36 bg-white/5 border border-white/20 rounded-[15px] p-5 text-white text-[16px] focus:border-[#FFF28E] resize-none overflow-y-auto placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
           />
 
           <div className="flex flex-col gap-6 mt-4 items-center">
@@ -583,8 +675,8 @@ export function CtaSection({
                   {privacyAccepted && <Check className="w-3 h-3 text-white" />}
                 </div>
                 <p className={cn(
-                  "text-[13px] md:text-[14px] leading-relaxed text-left select-none transition-colors",
-                  privacyAccepted ? "text-white" : "text-white/70"
+                  "text-[12px] md:text-[14px] leading-relaxed text-left select-none transition-opacity duration-300",
+                  privacyAccepted ? "text-white opacity-100" : "text-white opacity-70"
                 )}>
                   {getTranslation(mergedConfig.privacyConsentText)}
                 </p>
@@ -704,7 +796,7 @@ export function CtaSection({
               placeholder={getTranslation(
                 getField("company")?.placeholder,
               )?.trim()}
-              className="h-[44px] bg-black/30 border border-white/20 rounded-[10px] px-4 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+              className="h-[44px] bg-black/30 border border-white/20 rounded-[10px] px-4 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             />
 
             <input
@@ -717,24 +809,68 @@ export function CtaSection({
               placeholder={getTranslation(
                 getField("email")?.placeholder,
               )?.trim()}
-              className="h-[44px] bg-black/30 border border-white/20 rounded-[10px] px-4 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+              className="h-[44px] bg-black/30 border border-white/20 rounded-[10px] px-4 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
               required
             />
-            <PhoneInput
-              id="whatsapp"
-              value={formState["whatsapp"] || ""}
-              onChange={(phone) =>
-                setFormState({ ...formState, whatsapp: phone })
-              }
-              placeholder={getTranslation(
-                getField("whatsapp")?.placeholder,
-              )?.trim()}
-              className="!h-[44px] !bg-black/30 !border !border-white/20 !rounded-[10px] !w-full"
-              buttonClassName="!bg-transparent !border-r-0 !text-white hover:!bg-white/10 !rounded-[10px] !px-4 !h-full"
-              inputClassName="!bg-transparent !text-white !placeholder-white/40 !font-medium !text-[16px] !h-full !px-2 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-              dialCodeClassName="!text-white !text-[16px]"
-              containerClassName="!h-[44px]"
-            />
+            <div
+              className={cn(
+                "flex items-stretch bg-black/30 border border-white/20 rounded-[10px] relative transition-all",
+                openCountrySelector ? "z-20" : "z-0"
+              )}
+              ref={countrySelectorRef}
+              style={{ 
+                width: "100%", 
+                height: "44px"
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setOpenCountrySelector(!openCountrySelector)}
+                disabled={isSubmitting}
+                className="flex items-center gap-2 px-4 hover:bg-white/10 transition-colors border-r border-white/20 flex-shrink-0"
+              >
+                <div className="w-5 h-3 md:w-6 md:h-4 flex-shrink-0">
+                  <CountryFlag
+                    countryCode={selectedCountry[1]}
+                    className="w-full h-full rounded-[1px] object-cover"
+                  />
+                </div>
+                <span className="text-white font-anaheim font-semibold text-base">
+                  +{selectedCountry[2]}
+                </span>
+              </button>
+
+              <input
+                type="tel"
+                value={
+                  formState["whatsapp"]?.replace(
+                    `+${selectedCountry[2]}`,
+                    "",
+                  ) || ""
+                }
+                onChange={(e) =>
+                  handlePhoneChange(e.target.value)
+                }
+                placeholder={getTranslation(
+                  getField("whatsapp")?.placeholder,
+                )?.trim()}
+                disabled={isSubmitting}
+                className="flex-1 bg-transparent px-4 outline-none font-anaheim font-semibold text-base text-white placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+              />
+
+              {openCountrySelector && (
+                <div className="absolute left-0 top-full mt-2 z-[100]">
+                  <CountrySelectorList
+                    onSelect={(country) => {
+                      setSelectedCountry(country);
+                      setOpenCountrySelector(false);
+                    }}
+                    onClose={() => setOpenCountrySelector(false)}
+                    className="shadow-2xl"
+                  />
+                </div>
+              )}
+            </div>
 
             <div className="relative z-[502]">
               <CustomDropdown
@@ -777,7 +913,7 @@ export function CtaSection({
               placeholder={getTranslation(
                 getField("other-primary-requirement")?.placeholder,
               )?.trim()}
-              className="w-full h-[44px] bg-black/30 border border-white/20 rounded-[10px] px-4 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+              className="w-full h-[44px] bg-black/30 border border-white/20 rounded-[10px] px-4 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             />
 
             <div className="col-span-2">
@@ -794,7 +930,7 @@ export function CtaSection({
                   getField("specific-requirements-project-description")
                     ?.placeholder,
                 )?.trim()}
-                className="w-full h-[105px] bg-black/30 border border-white/20 rounded-[10px] p-4 text-white text-[16px] focus:border-[#FFF28E] resize-none placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                className="w-full h-[105px] bg-black/30 border border-white/20 rounded-[10px] p-4 text-white text-[16px] focus:border-[#FFF28E] resize-none overflow-y-auto placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
               />
             </div>
 
