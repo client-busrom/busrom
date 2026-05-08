@@ -7,7 +7,9 @@ import { RichText } from "@payloadcms/richtext-lexical/react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Turnstile } from "@/components/ui/turnstile";
-import { PhoneInput } from "@/components/ui/PhoneInput";
+import { COUNTRIES } from "@/components/ui/PhoneInput";
+import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 
 interface FraudFormWrapperProps {
   contactForm: any;
@@ -27,11 +29,31 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
   const [turnstileKey, setTurnstileKey] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
+  const [selectedCountry, setSelectedCountry] = useState(
+    COUNTRIES.find((c) => c[1] === "CN") || COUNTRIES[0],
+  );
+  const [openCountrySelector, setOpenCountrySelector] = useState(false);
+  const countrySelectorRef = React.useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 1024);
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        countrySelectorRef.current &&
+        !countrySelectorRef.current.contains(event.target as Node)
+      ) {
+        setOpenCountrySelector(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [isGloballyAccepted, setIsGloballyAccepted] = useState(false);
@@ -106,6 +128,15 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
 
   const handleInputChange = (fieldName: string, value: string) => {
     setFormData(prev => ({ ...prev, [fieldName]: value }));
+    if (submitStatus === "error") setSubmitStatus("idle");
+  };
+
+  const handlePhoneChange = (fieldName: string, value: string) => {
+    const digits = value.replace(/\D/g, "");
+    setFormData(prev => ({
+      ...prev,
+      [fieldName]: digits ? `+${selectedCountry[2]}${digits}` : "",
+    }));
     if (submitStatus === "error") setSubmitStatus("idle");
   };
 
@@ -253,20 +284,62 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
                 return (
                    <div key={field.id || field.fieldName} className="space-y-2">
                       {labelText && <label className="block text-white/60 font-anaheim font-semibold text-lg ml-1">{labelText}</label>}
-                      <div className="dynamic-phone-input w-full h-[50px]">
-                         <PhoneInput 
-                            value={formData[field.fieldName] || ""}
-                            onChange={(v) => handleInputChange(field.fieldName, v)}
-                            placeholder={placeholder}
-                            required={field.required}
-                            containerClassName="!h-full !w-full"
-                            className="!bg-[rgba(33,28,11,0.2)] !border-none !rounded-[10px] !h-full"
-                            buttonClassName="!bg-transparent !border-none !text-white hover:!bg-white/5 !px-6"
-                            inputClassName="!bg-transparent !text-white !placeholder-white/50 !font-anaheim !font-semibold !text-base !px-6 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-                            inputStyle={{ fontSize: isMobile ? "18px" : "16px" }}
-                            dialCodeClassName="!text-white !text-base !font-anaheim"
-                            dialCodeStyle={{ fontSize: isMobile ? "18px" : "16px" }}
+                      <div 
+                         className={cn(
+                           "flex items-stretch bg-[rgba(33,28,11,0.2)] rounded-[10px] relative transition-all",
+                           openCountrySelector ? "z-20" : "z-0"
+                         )}
+                         ref={countrySelectorRef}
+                         style={{ 
+                            width: "100%", 
+                            height: "50px"
+                         }}
+                      >
+                         <button
+                           type="button"
+                           onClick={() => setOpenCountrySelector(!openCountrySelector)}
+                           disabled={isSubmitting}
+                           className="flex items-center gap-2 px-4 hover:bg-white/10 transition-colors border-r border-white/10 flex-shrink-0"
+                         >
+                           <div className="w-6 h-4 md:w-8 md:h-5 flex-shrink-0">
+                             <CountryFlag
+                               countryCode={selectedCountry[1]}
+                               className="w-full h-full rounded-[2px] object-cover"
+                             />
+                           </div>
+                           <span className="text-white font-anaheim font-semibold text-base">
+                             +{selectedCountry[2]}
+                           </span>
+                         </button>
+
+                         <input
+                           type="tel"
+                           value={
+                             formData[field.fieldName]?.replace(
+                               `+${selectedCountry[2]}`,
+                               "",
+                             ) || ""
+                           }
+                           onChange={(e) =>
+                             handlePhoneChange(field.fieldName, e.target.value)
+                           }
+                           placeholder={placeholder}
+                           disabled={isSubmitting}
+                           className="flex-1 bg-transparent px-4 outline-none font-anaheim font-semibold text-base text-white placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#211c0b_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                          />
+
+                         {openCountrySelector && (
+                           <div className="absolute left-0 top-full mt-2 z-[100]">
+                             <CountrySelectorList
+                               onSelect={(country) => {
+                                 setSelectedCountry(country);
+                                 setOpenCountrySelector(false);
+                               }}
+                               onClose={() => setOpenCountrySelector(false)}
+                               className="shadow-2xl"
+                             />
+                           </div>
+                         )}
                       </div>
                    </div>
                 );
@@ -281,7 +354,7 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
                             required={field.required}
                             value={formData[field.fieldName] || ""}
                             onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
-                            className="w-full appearance-none bg-[rgba(33,28,11,0.2)] border-none rounded-[10px] px-6 h-[50px] text-white focus:outline-none focus:border-white/30 transition-all font-anaheim font-semibold text-base placeholder:text-white/50"
+                            className="w-full appearance-none bg-[rgba(33,28,11,0.2)] border-none rounded-[10px] px-6 h-[50px] text-white focus:outline-none focus:border-white/30 transition-all font-anaheim font-semibold text-base placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#211c0b_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                             style={{ fontSize: isMobile ? "18px" : "16px" }}
                          >
                             <option value="" disabled className="bg-[#34311c]">
@@ -311,7 +384,7 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
                       value={formData[field.fieldName] || ""}
                       onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
                       spellCheck="false"
-                      className="w-full bg-[rgba(33,28,11,0.2)] border-none rounded-[10px] px-6 h-[50px] text-white focus:outline-none focus:border-white/30 transition-all font-anaheim font-semibold text-base placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                      className="w-full bg-[rgba(33,28,11,0.2)] border-none rounded-[10px] px-6 h-[50px] text-white focus:outline-none focus:border-white/30 transition-all font-anaheim font-semibold text-base placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#211c0b_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                       style={{ fontSize: isMobile ? "18px" : "16px" }}
                    />
                 </div>
@@ -330,7 +403,7 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
                       value={formData[field.fieldName] || ""}
                       onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
                       spellCheck="false"
-                      className="w-full bg-[rgba(33,28,11,0.2)] border-none rounded-[10px] px-6 py-4 text-white focus:outline-none focus:border-white/30 transition-all h-32 resize-none scrollbar-hide font-anaheim font-semibold text-base placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                      className="w-full bg-[rgba(33,28,11,0.2)] border-none rounded-[10px] px-6 py-4 text-white focus:outline-none focus:border-white/30 transition-all h-32 resize-none overflow-y-auto font-anaheim font-semibold text-base placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#211c0b_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                       style={{ fontSize: isMobile ? "18px" : "16px", scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                    />
                 </div>
@@ -418,7 +491,10 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
                   </svg>
                 )}
               </div>
-              <p className="text-[14px] leading-relaxed text-gray-400 select-none group-hover/privacy:text-gray-300 transition-colors">
+              <p className={cn(
+                "text-[14px] leading-relaxed select-none transition-opacity duration-300",
+                privacyAccepted ? "text-white opacity-100" : "text-white opacity-70"
+              )}>
                 {getLocalizedString(contactForm.formConfig?.privacyConsentText, locale)}
               </p>
             </div>
