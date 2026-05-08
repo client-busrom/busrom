@@ -523,7 +523,7 @@ export function OemOdmContactForm({
                       <div
                         key={field.fieldName}
                         style={{
-                          backgroundColor: "#F3EDD4",
+                          backgroundColor: "#F3F1EA",
                           border: "1px solid rgba(117, 111, 63, 0.1)",
                         }}
                         className="rounded-[10px] h-[50px] flex items-center"
