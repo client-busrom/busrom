@@ -540,6 +540,8 @@ export function SupportContactFormSection({
                     </button>
 
                     <input
+                      id={field.fieldName}
+                      name={field.fieldName}
                       type="tel"
                       value={
                         formData[field.fieldName]?.replace(
@@ -623,6 +625,8 @@ export function SupportContactFormSection({
 
               return (
                 <input
+                  id={field.fieldName}
+                  name={field.fieldName}
                   key={field.fieldName}
                   type={field.fieldType === "email" ? "email" : "text"}
                   placeholder={`${field.label}${field.required ? " *" : ""}`}
@@ -651,6 +655,8 @@ export function SupportContactFormSection({
               )
               .map((field) => (
                 <textarea
+                  id={field.fieldName}
+                  name={field.fieldName}
                   key={field.fieldName}
                   placeholder={`${field.label}${field.required ? " *" : ""}`}
                   value={formData[field.fieldName] || ""}
