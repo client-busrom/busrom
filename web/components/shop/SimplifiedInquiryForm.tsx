@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import type { Locale } from "@/i18n.config"
-import { PhoneInput } from "@/components/ui/PhoneInput"
+import { COUNTRIES } from "@/components/ui/PhoneInput"
+import { CountrySelectorList } from "@/components/ui/CountryCodePicker"
+import { CountryFlag } from "@/components/ui/CountryFlag"
 import { motion } from "framer-motion"
 
 interface FormField {
@@ -83,6 +85,27 @@ export function SimplifiedInquiryForm({
   const [isGloballyAccepted, setIsGloballyAccepted] = useState(false)
   const STORAGE_KEY = 'busrom_privacy_consent'
 
+  const [selectedCountry, setSelectedCountry] = useState(
+    COUNTRIES.find((c) => c[1] === "CN") || COUNTRIES[0],
+  );
+  const [openCountrySelector, setOpenCountrySelector] = useState(false);
+  const countrySelectorRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        countrySelectorRef.current &&
+        !countrySelectorRef.current.contains(event.target as Node)
+      ) {
+        setOpenCountrySelector(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   // Debug log for privacy consent
   useEffect(() => {
     if (privacyText) {
@@ -137,6 +160,21 @@ export function SimplifiedInquiryForm({
     }
   }
 
+  const handlePhoneChange = (fieldName: string, value: string) => {
+    const digits = value.replace(/\D/g, "");
+    setFormData((prev) => ({
+      ...prev,
+      [fieldName]: digits ? `+${selectedCountry[2]}${digits}` : "",
+    }))
+    if (errors[fieldName]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[fieldName]
+        return newErrors
+      })
+    }
+  }
+
   const validate = () => {
     const newErrors: Record<string, string> = {}
 
@@ -170,7 +208,7 @@ export function SimplifiedInquiryForm({
 
   const renderField = (field: FormField) => {
     const commonClasses =
-      "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition-colors text-base [&:-webkit-autofill]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+      "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition-colors text-base [&:-webkit-autofill]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_white_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
     const errorClasses = errors[field.fieldName] ? "border-red-500" : ""
 
     switch (field.fieldType) {
@@ -185,30 +223,72 @@ export function SimplifiedInquiryForm({
             required={field.required}
             rows={3}
             spellCheck="false"
-            className={`${commonClasses} ${errorClasses}`}
+            className={`${commonClasses} ${errorClasses} resize-none overflow-y-auto`}
           />
         )
 
       default:
         // Handle phone type by mapping it to tel
-        const isPhone = (field.fieldType as string) === 'phone' || (field.fieldType as string) === 'tel'
-        
+        const isPhone =
+          (field.fieldType as string) === "phone" ||
+          (field.fieldType as string) === "tel";
+
         if (isPhone) {
           return (
-            <PhoneInput
-              id={field.fieldName}
-              name={field.fieldName}
-              value={formData[field.fieldName] || ""}
-              onChange={(phone) => handleChange(field.fieldName, phone)}
-              placeholder={field.placeholder}
-              required={field.required}
-              error={!!errors[field.fieldName]}
-              className="!border !border-gray-300 !rounded-lg !h-[42px]"
-              inputClassName="!text-brand-text-black !text-base !pl-2 !font-normal [&:-webkit-autofill]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-              dialCodeClassName="!text-brand-text-black !text-base !font-normal"
-              buttonClassName="!border-r !border-r-gray-300"
-            />
-          )
+            <div
+              className={cn(
+                "flex items-stretch bg-white border rounded-lg relative transition-all",
+                errors[field.fieldName] ? "border-red-500" : "border-gray-300",
+                openCountrySelector ? "z-20" : "z-0",
+              )}
+              ref={countrySelectorRef}
+              style={{ width: "100%", height: "42px" }}
+            >
+              <button
+                type="button"
+                onClick={() => setOpenCountrySelector(!openCountrySelector)}
+                className="flex items-center gap-1.5 px-3 hover:bg-gray-50 transition-colors border-r border-gray-300 flex-shrink-0 rounded-l-lg"
+              >
+                <div className="w-5 h-3 flex-shrink-0">
+                  <CountryFlag
+                    countryCode={selectedCountry[1]}
+                    className="w-full h-full rounded-[1px] object-cover"
+                  />
+                </div>
+                <span className="text-brand-text-black font-normal text-base">
+                  +{selectedCountry[2]}
+                </span>
+              </button>
+
+              <input
+                type="tel"
+                value={
+                  formData[field.fieldName]?.replace(
+                    `+${selectedCountry[2]}`,
+                    "",
+                  ) || ""
+                }
+                onChange={(e) =>
+                  handlePhoneChange(field.fieldName, e.target.value)
+                }
+                placeholder={field.placeholder}
+                className="flex-1 bg-transparent px-3 outline-none font-normal text-brand-text-black placeholder:text-gray-400 text-base [&:-webkit-autofill]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_white_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+              />
+
+              {openCountrySelector && (
+                <div className="absolute left-0 top-full mt-2 z-[100]">
+                  <CountrySelectorList
+                    onSelect={(country) => {
+                      setSelectedCountry(country);
+                      setOpenCountrySelector(false);
+                    }}
+                    onClose={() => setOpenCountrySelector(false)}
+                    className="shadow-2xl scale-90 origin-top-left"
+                  />
+                </div>
+              )}
+            </div>
+          );
         }
 
         return (
@@ -223,7 +303,7 @@ export function SimplifiedInquiryForm({
             spellCheck="false"
             className={`${commonClasses} ${errorClasses}`}
           />
-        )
+        );
     }
   }
 
@@ -263,7 +343,10 @@ export function SimplifiedInquiryForm({
               </svg>
             )}
           </div>
-          <p className="text-sm leading-relaxed text-gray-500 whitespace-pre-line select-none">
+          <p className={cn(
+            "text-sm leading-relaxed whitespace-pre-line select-none transition-opacity duration-300",
+            privacyAccepted ? "text-gray-700 opacity-100" : "text-gray-500 opacity-70"
+          )}>
             {privacyText}
           </p>
         </div>
