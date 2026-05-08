@@ -11,7 +11,9 @@ import { CUSTOM_ICONS } from "@/lib/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
-import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput";
+import { COUNTRIES } from "@/components/ui/PhoneInput";
+import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 import { ChevronDown } from "lucide-react";
 import { uploadFileWithProgress } from "@/lib/upload";
 
@@ -66,6 +68,11 @@ export function SupportContactFormSection({
   const STORAGE_KEY = "busrom_privacy_consent";
 
   const [isMobile, setIsMobile] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(
+    COUNTRIES.find((c) => c[1] === "CN") || COUNTRIES[0],
+  );
+  const [openCountrySelector, setOpenCountrySelector] = useState(false);
+  const countrySelectorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -73,7 +80,21 @@ export function SupportContactFormSection({
     };
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        countrySelectorRef.current &&
+        !countrySelectorRef.current.contains(event.target as Node)
+      ) {
+        setOpenCountrySelector(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const [fetchedFormConfig, setFetchedFormConfig] = useState<any>(null);
@@ -163,6 +184,14 @@ export function SupportContactFormSection({
 
   const handleInputChange = (fieldName: string, value: string) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }));
+  };
+
+  const handlePhoneChange = (fieldName: string, value: string) => {
+    const digits = value.replace(/\D/g, "");
+    setFormData((prev) => ({
+      ...prev,
+      [fieldName]: digits ? `+${selectedCountry[2]}${digits}` : "",
+    }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -482,22 +511,62 @@ export function SupportContactFormSection({
                 return (
                   <div
                     key={field.fieldName}
-                    className="dynamic-phone-input"
-                    style={{ width: "100%", height: isMobile ? mvw(50) : vw(63) }}
+                    className={cn(
+                      "flex items-stretch bg-[#746D37] border border-white/34 relative transition-all",
+                      openCountrySelector ? "z-20" : "z-0"
+                    )}
+                    ref={countrySelectorRef}
+                    style={{ 
+                      width: "100%", 
+                      height: isMobile ? mvw(50) : vw(63),
+                      borderRadius: isMobile ? mvw(12) : vw(15)
+                    }}
                   >
-                    <PhoneInput
-                      value={formData[field.fieldName] || ""}
-                      onChange={(v) => handleInputChange(field.fieldName, v)}
+                    <button
+                      type="button"
+                      onClick={() => setOpenCountrySelector(!openCountrySelector)}
+                      disabled={isSubmitting}
+                      className="flex items-center gap-2 px-4 hover:bg-white/10 transition-colors border-r border-white/20 flex-shrink-0"
+                    >
+                      <div className="w-6 h-4 md:w-8 md:h-5 flex-shrink-0">
+                        <CountryFlag
+                          countryCode={selectedCountry[1]}
+                          className="w-full h-full rounded-[2px] object-cover"
+                        />
+                      </div>
+                      <span className="text-white font-anaheim font-semibold text-base">
+                        +{selectedCountry[2]}
+                      </span>
+                    </button>
+
+                    <input
+                      type="tel"
+                      value={
+                        formData[field.fieldName]?.replace(
+                          `+${selectedCountry[2]}`,
+                          "",
+                        ) || ""
+                      }
+                      onChange={(e) =>
+                        handlePhoneChange(field.fieldName, e.target.value)
+                      }
                       placeholder={`${field.label}${field.required ? " *" : ""}`}
-                      containerClassName="!h-full !w-full"
-                      style={{ height: "100%", borderRadius: isMobile ? mvw(12) : vw(15) }}
-                      className={cn(
-                        "!bg-[#746D37] border border-white/34 !h-full",
-                      )}
-                      buttonClassName="!bg-transparent hover:!bg-white/10 !h-full !border-r !border-white/20"
-                      dialCodeClassName="!text-white !font-anaheim !font-semibold"
-                      inputClassName="!bg-transparent !text-white placeholder:!text-white/50 !font-anaheim !font-semibold !text-base !px-6 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                      disabled={isSubmitting}
+                      className="flex-1 bg-transparent px-4 outline-none font-anaheim font-semibold text-base text-white placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#746D37_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                     />
+
+                    {openCountrySelector && (
+                      <div className="absolute left-0 top-full mt-2 z-[100]">
+                        <CountrySelectorList
+                          onSelect={(country) => {
+                            setSelectedCountry(country);
+                            setOpenCountrySelector(false);
+                          }}
+                          onClose={() => setOpenCountrySelector(false)}
+                          className="shadow-2xl"
+                        />
+                      </div>
+                    )}
                   </div>
                 );
               }
@@ -520,7 +589,7 @@ export function SupportContactFormSection({
                         onChange={(e) =>
                           handleInputChange(field.fieldName, e.target.value)
                         }
-                        className="w-full appearance-none bg-[#746D37] border border-white/34 text-white font-[family-name:var(--font-anaheim)] font-semibold placeholder:text-white/50 focus:outline-none"
+                        className="w-full appearance-none bg-[#746D37] border border-white/34 text-white font-[family-name:var(--font-anaheim)] font-semibold placeholder:text-white/50 focus:outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#746D37_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                     style={{
                       height: isMobile ? mvw(50) : vw(63),
                       borderRadius: isMobile ? mvw(12) : vw(15),
@@ -558,7 +627,7 @@ export function SupportContactFormSection({
                   type={field.fieldType === "email" ? "email" : "text"}
                   placeholder={`${field.label}${field.required ? " *" : ""}`}
                   spellCheck="false"
-                  className="w-full bg-[#746D37] border border-white/34 rounded-2xl px-6 h-14 text-white focus:outline-none focus:border-white/30 transition-all font-anaheim font-semibold text-lg placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                  className="w-full bg-[#746D37] border border-white/34 px-6 text-white focus:outline-none focus:border-white/30 transition-all font-anaheim font-semibold text-lg placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#746D37_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                   style={{
                     height: isMobile ? mvw(50) : vw(63),
                     borderRadius: isMobile ? mvw(12) : vw(15),
@@ -589,7 +658,7 @@ export function SupportContactFormSection({
                     handleInputChange(field.fieldName, e.target.value)
                   }
                   spellCheck="false"
-                  className="bg-[#746D37] border border-white/34 text-white font-[family-name:var(--font-anaheim)] font-semibold placeholder:text-white/50 resize-none focus:outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                  className="bg-[#746D37] border border-white/34 text-white font-[family-name:var(--font-anaheim)] font-semibold placeholder:text-white/50 resize-none focus:outline-none overflow-y-auto [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#746D37_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                   style={{
                     height: isMobile ? mvw(120) : vw(127),
                     borderRadius: isMobile ? mvw(12) : vw(15),
@@ -676,7 +745,10 @@ export function SupportContactFormSection({
                   )}
                 </div>
                 <p 
-                  className="leading-relaxed text-white/70 select-none text-left whitespace-pre-line"
+                  className={cn(
+                    "leading-relaxed transition-opacity duration-300 select-none text-left whitespace-pre-line",
+                    privacyAccepted ? "text-white opacity-100" : "text-white opacity-70"
+                  )}
                   style={{ fontSize: isMobile ? mvw(12) : "14px" }}
                 >
                   {getLocalizedString(mergedConfig.privacyConsentText, locale)}
