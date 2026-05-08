@@ -96,7 +96,7 @@ function CustomDropdown({
     <div ref={containerRef} className="relative w-full font-montserrat">
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between cursor-pointer font-semibold text-[#9E9474] transition-all hover:bg-black/5"
+        className="w-full flex items-center justify-between cursor-pointer font-semibold text-[#463B17] transition-all hover:bg-white/10"
         style={{
           height: isMobile ? "48px" : "53px",
           backgroundColor: "#D4CBAF",
@@ -108,8 +108,8 @@ function CustomDropdown({
         <span
           className={
             !value && !isScenario
-              ? "text-[#9E9474]/50 truncate flex-1"
-              : "text-[#9E9474] truncate flex-1"
+              ? "text-[#9E9474] truncate flex-1"
+              : "text-[#463B17] truncate flex-1"
           }
           style={{ fontSize: "16px" }}
         >
@@ -123,7 +123,7 @@ function CustomDropdown({
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <ChevronDown size={isMobile ? 16 : 20} className="text-[#9E9474]" />
+          <ChevronDown size={isMobile ? 16 : 20} className="text-[#463B17]" />
         </motion.div>
       </div>
 
@@ -133,7 +133,7 @@ function CustomDropdown({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute left-0 w-full bg-[#34311c] z-[100] shadow-xl overflow-hidden border border-white/10"
+            className="absolute left-0 w-full bg-[#D4CBAF] z-[100] shadow-xl overflow-hidden border border-white/10"
             style={{
               top: isMobile ? "52px" : "39px",
               borderRadius: "10px",
@@ -153,10 +153,10 @@ function CustomDropdown({
                     onChange(opt.value);
                     setIsOpen(false);
                   }}
-                  className="w-full flex items-center px-6 hover:bg-white/10 cursor-pointer text-[#9E9474] font-medium transition-colors"
+                  className="w-full flex items-center px-6 hover:bg-white/10 cursor-pointer text-[#463B17] font-medium transition-colors"
                   style={{
                     height: isMobile ? "40px" : "32px",
-                    fontSize: isMobile ? "14px" : "11px",
+                    fontSize: "16px",
                     paddingLeft: isMobile ? "16px" : "17px",
                     paddingRight: isMobile ? "16px" : "17px",
                   }}
@@ -174,6 +174,9 @@ function CustomDropdown({
     </div>
   );
 }
+
+const DESIGN_WIDTH = 1920;
+const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
 
 export function ApplicationContactFormSection({
   locale = "en",
@@ -317,7 +320,7 @@ export function ApplicationContactFormSection({
       borderRadius: "10px",
       display: "flex",
       alignItems: "center",
-      color: "#9E9474",
+      color: "#463B17",
     };
 
     if (field.fieldType === "select") {
@@ -364,14 +367,14 @@ export function ApplicationContactFormSection({
               isMobile ? "!pl-[4.1vw] !pr-1" : "!pl-[17px] !pr-2",
             )}
             inputClassName={cn(
-              "!bg-transparent !text-[#9E9474] !font-montserrat !font-medium !placeholder-[#9E9474]/50 !pl-2 [&:-webkit-autofill]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]",
+              "!bg-transparent !text-[#463B17] !font-montserrat !font-medium !placeholder-[#9E9474] !pl-2 [&:-webkit-autofill]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]",
               `![font-size:16px]`,
             )}
             dialCodeClassName={cn(
-              "!text-[#9E9474] !font-montserrat !font-medium [&:-webkit-autofill]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important]",
+              "!text-[#463B17] !font-montserrat !font-medium [&:-webkit-autofill]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important]",
               `![font-size:16px]`,
             )}
-            chevronClassName="!text-[#9E9474]"
+            chevronClassName="!text-[#463B17]"
           />
         </div>
       );
@@ -389,7 +392,7 @@ export function ApplicationContactFormSection({
           </span>
           <textarea
             placeholder={field.placeholder?.trim() || field.label}
-            className="w-full font-medium text-[#9E9474] placeholder:text-[#9E9474]/50 outline-none resize-none [&:-webkit-autofill]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="w-full font-medium text-[#463B17] placeholder:text-[#9E9474] outline-none resize-none [&:-webkit-autofill]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             spellCheck="false"
             style={{
               height: isMobile ? "120px" : "91px",
@@ -418,7 +421,7 @@ export function ApplicationContactFormSection({
             type={field.fieldType === "email" ? "email" : "text"}
             placeholder={field.placeholder?.trim() || field.label}
             spellCheck="false"
-            className="w-full font-medium text-[#9E9474] placeholder:text-[#9E9474]/50 outline-none !bg-transparent [&:-webkit-autofill]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#9E9474!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="w-full font-medium text-[#463B17] placeholder:text-[#9E9474] outline-none !bg-transparent [&:-webkit-autofill]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             style={{ fontSize: "16px" }}
             value={formData[field.fieldName] || ""}
             onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
@@ -496,7 +499,7 @@ export function ApplicationContactFormSection({
         minHeight: isMobile ? "auto" : "900px",
         height: "auto",
         backgroundColor: "#000000",
-        paddingBottom: isMobile ? "80px" : "280px",
+        paddingBottom: isMobile ? "80px" : "220px",
       }}
     >
       <div className="absolute inset-0">
@@ -512,15 +515,15 @@ export function ApplicationContactFormSection({
       </div>
       {logoImage && (
         <div
-          className="absolute w-full flex justify-center z-0 pointer-events-none"
-          style={{ bottom: isMobile ? "-40px" : "-112px" }}
+          className="absolute w-full flex justify-center z-0 pointer-events-none bottom-0 left-0"
+          style={{ transform: "translateY(50%)" }}
         >
           <img
             src={logoImage}
             alt="Logo"
             className={cn(
               "object-contain",
-              isMobile ? "w-[120%] max-w-none opacity-50" : "w-[96%]",
+              isMobile ? "w-[100%] max-w-none opacity-50" : "w-[96%]",
             )}
           />
         </div>
@@ -549,16 +552,17 @@ export function ApplicationContactFormSection({
         <div
           className={cn(
             "flex flex-col",
-            isMobile ? "items-center text-center" : "",
+            isMobile ? "items-center text-center mx-auto" : "",
           )}
           style={{
             width: isMobile ? "100%" : "343px",
+            maxWidth: isMobile ? "600px" : "none",
             marginBottom: isMobile ? "30px" : 0,
           }}
         >
           <div
             className="font-cherry-bomb font-black text-[#1D1A02] leading-[1.4] whitespace-pre-line block"
-            style={{ fontSize: isMobile ? "24px" : "25px", width: "100%" }}
+            style={{ fontSize: isMobile ? "20px" : "24px", width: "100%" }}
           >
             {(() => {
               // Filter out the marker text if it's accidentally included in segments
@@ -613,10 +617,15 @@ export function ApplicationContactFormSection({
 
         {/* RIGHT FORM */}
         <div
-          className="flex flex-col"
+          className={cn(
+            "flex flex-col",
+            isMobile ? "mx-auto" : ""
+          )}
           style={{
             width: isMobile ? "100%" : "600px",
-            marginLeft: isMobile ? 0 : "23px",
+            maxWidth: isMobile ? "600px" : "none",
+            marginLeft: isMobile ? "auto" : "23px",
+            marginRight: isMobile ? "auto" : 0,
           }}
         >
           <form
@@ -692,7 +701,7 @@ export function ApplicationContactFormSection({
                   </svg>
                   <span
                     className="font-bold whitespace-nowrap"
-                    style={{ fontSize: isMobile ? "14px" : "11px" }}
+                    style={{ fontSize: "16px" }}
                   >
                     {uploadLabel}
                   </span>
