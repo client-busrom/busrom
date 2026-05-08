@@ -3,7 +3,9 @@
 import { useState, useEffect, useRef, useMemo } from "react"
 import type { Locale } from "@/i18n.config"
 import { Turnstile } from "@/components/ui/turnstile"
-import { PhoneInput } from "@/components/ui/PhoneInput"
+import { COUNTRIES } from "@/components/ui/PhoneInput"
+import { CountrySelectorList } from "@/components/ui/CountryCodePicker"
+import { CountryFlag } from "@/components/ui/CountryFlag"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
 
@@ -95,6 +97,27 @@ export function FullInquiryModal({
   const [privacyAccepted, setPrivacyAccepted] = useState(false)
   const [isGloballyAccepted, setIsGloballyAccepted] = useState(false)
   const STORAGE_KEY = 'busrom_privacy_consent'
+
+  const [selectedCountry, setSelectedCountry] = useState(
+    COUNTRIES.find((c) => c[1] === "CN") || COUNTRIES[0],
+  );
+  const [openCountrySelector, setOpenCountrySelector] = useState(false);
+  const countrySelectorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        countrySelectorRef.current &&
+        !countrySelectorRef.current.contains(event.target as Node)
+      ) {
+        setOpenCountrySelector(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Check global consent status on mount
   useEffect(() => {
@@ -344,6 +367,23 @@ export function FullInquiryModal({
     }
   }
 
+  const handlePhoneChange = (fieldName: string, value: string) => {
+    const digits = value.replace(/\D/g, "");
+    setFormData((prev) => ({
+      ...prev,
+      [fieldName]: digits ? `+${selectedCountry[2]}${digits}` : "",
+    }))
+    resetActivityTimer()
+
+    if (errors[fieldName]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[fieldName]
+        return newErrors
+      })
+    }
+  }
+
   const handleCheckboxChange = (fieldName: string, value: string, checked: boolean, allowMultiple: boolean = true) => {
     setFormData((prev) => {
       if (!allowMultiple) {
@@ -471,7 +511,7 @@ export function FullInquiryModal({
 
   const renderField = (field: FormField) => {
     const commonClasses =
-      "w-full px-4 py-3 border-2 border-brand-accent-border rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-brand-secondary transition-colors bg-white font-medium text-brand-text-black placeholder:text-gray-400 text-base"
+      "w-full px-4 py-3 border-2 border-brand-accent-border rounded-lg focus:ring-2 focus:ring-brand-secondary focus:border-brand-secondary transition-colors bg-white font-medium text-brand-text-black placeholder:text-gray-400 text-base [&:-webkit-autofill]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_white_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
     const errorClasses = errors[field.fieldName] ? "border-red-500" : ""
     const preFilledClasses = initialData[field.fieldName] ? "bg-brand-cream/30" : ""
 
@@ -487,7 +527,7 @@ export function FullInquiryModal({
             required={field.required}
             rows={4}
             spellCheck="false"
-            className={`${commonClasses} ${errorClasses} ${preFilledClasses}`}
+            className={`${commonClasses} ${errorClasses} ${preFilledClasses} resize-none overflow-y-auto`}
           />
         )
 
@@ -558,25 +598,70 @@ export function FullInquiryModal({
         )
 
       default:
-        const isPhone = (field.fieldType as string) === 'phone' || (field.fieldType as string) === 'tel'
-        
+        const isPhone =
+          (field.fieldType as string) === "phone" ||
+          (field.fieldType as string) === "tel";
+
         if (isPhone) {
           return (
-            <PhoneInput
-              id={field.fieldName}
-              name={field.fieldName}
-              value={formData[field.fieldName] || ""}
-              onChange={(phone) => handleChange(field.fieldName, phone)}
-              placeholder={field.placeholder}
-              required={field.required}
-              error={!!errors[field.fieldName]}
-              disabled={isSubmitting}
-              inputStyle={{ fontSize: "16px" }}
-              dialCodeStyle={{ fontSize: "16px" }}
-              inputClassName="!text-base"
-              dialCodeClassName="!text-base"
-            />
-          )
+            <div
+              className={cn(
+                "flex items-stretch bg-white border-2 rounded-lg relative transition-all",
+                errors[field.fieldName]
+                  ? "border-red-500"
+                  : "border-brand-accent-border",
+                openCountrySelector ? "z-20" : "z-0",
+              )}
+              ref={countrySelectorRef}
+              style={{ width: "100%", height: "50px" }}
+            >
+              <button
+                type="button"
+                onClick={() => setOpenCountrySelector(!openCountrySelector)}
+                disabled={isSubmitting}
+                className="flex items-center gap-2 px-3 hover:bg-gray-50 transition-colors border-r border-brand-accent-border flex-shrink-0 rounded-l-lg"
+              >
+                <div className="w-5 h-3 md:w-6 md:h-4 flex-shrink-0">
+                  <CountryFlag
+                    countryCode={selectedCountry[1]}
+                    className="w-full h-full rounded-[1px] object-cover"
+                  />
+                </div>
+                <span className="text-brand-text-black font-semibold text-sm">
+                  +{selectedCountry[2]}
+                </span>
+              </button>
+
+              <input
+                type="tel"
+                value={
+                  formData[field.fieldName]?.replace(
+                    `+${selectedCountry[2]}`,
+                    "",
+                  ) || ""
+                }
+                onChange={(e) =>
+                  handlePhoneChange(field.fieldName, e.target.value)
+                }
+                placeholder={field.placeholder}
+                disabled={isSubmitting}
+                className="flex-1 bg-transparent px-4 outline-none font-medium text-brand-text-black placeholder:text-gray-400 text-base [&:-webkit-autofill]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_white_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+              />
+
+              {openCountrySelector && (
+                <div className="absolute left-0 top-full mt-2 z-[100]">
+                  <CountrySelectorList
+                    onSelect={(country) => {
+                      setSelectedCountry(country);
+                      setOpenCountrySelector(false);
+                    }}
+                    onClose={() => setOpenCountrySelector(false)}
+                    className="shadow-2xl"
+                  />
+                </div>
+              )}
+            </div>
+          );
         }
 
         return (
@@ -591,7 +676,7 @@ export function FullInquiryModal({
             spellCheck="false"
             className={`${commonClasses} ${errorClasses} ${preFilledClasses}`}
           />
-        )
+        );
     }
   }
 
@@ -710,7 +795,10 @@ export function FullInquiryModal({
                   </svg>
                 )}
               </div>
-              <p className="text-xs md:text-[14px] leading-relaxed text-gray-500 text-left whitespace-pre-line select-none">
+              <p className={cn(
+                "text-xs md:text-[14px] leading-relaxed text-left whitespace-pre-line select-none transition-opacity duration-300",
+                privacyAccepted ? "text-gray-700 opacity-100" : "text-gray-500 opacity-70"
+              )}>
                 {effectivePrivacyText}
               </p>
             </div>
