@@ -1,10 +1,11 @@
 "use client";
 
 import React, { FormEvent, useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { CUSTOM_ICONS } from "@/lib/icons";
+import { AnimatePresence, motion } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { CustomDropdown } from "@/components/ui/CustomDropdown";
-import { Upload, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput";
 import { CountryFlag } from "@/components/ui/CountryFlag";
 import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
@@ -107,6 +108,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
 
   const titleParts = (formConfig?.displayName || "").split("\n");
   const description = formConfig?.description || "";
+  const fileField = formConfig?.fields?.find((f: any) => f.fieldType === "file");
 
   const handleFileChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -214,12 +216,37 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
             }
           : {
               minHeight: vw(922),
-              background: "linear-gradient(103deg, #645c1d 0%, #fff587 100%)",
+              background: "linear-gradient(113deg, #645c1d 0%, #fff587 100%)",
               paddingTop: vw(80),
               paddingBottom: vw(80),
             }
       }
     >
+      <style jsx>{`
+        .faq-input-el {
+          color: #FFFFFF !important;
+          opacity: 1 !important;
+          -webkit-text-fill-color: #FFFFFF !important;
+        }
+        .faq-input-el::placeholder {
+          color: rgba(255, 255, 255, 0.5) !important;
+          opacity: 1 !important;
+          -webkit-text-fill-color: rgba(255, 255, 255, 0.5) !important;
+        }
+        .faq-input-el:-webkit-autofill,
+        .faq-input-el:-webkit-autofill:hover,
+        .faq-input-el:-webkit-autofill:focus {
+          -webkit-text-fill-color: #FFFFFF !important;
+          -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+          transition: background-color 5000s ease-in-out 0s;
+        }
+        /* 针对下拉菜单选定值后的样式 */
+        .faq-dropdown-inner[style*="color: white"] .faq-dropdown-btn-text,
+        .faq-dropdown-inner[style*="color: rgb(255, 255, 255)"] .faq-dropdown-btn-text {
+          color: #FFFFFF !important;
+          opacity: 1 !important;
+        }
+      `}</style>
       <div
         className={cn(
           "relative z-10 w-full mx-auto flex",
@@ -237,20 +264,35 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
           {/* Titles */}
           <div style={{ marginBottom: isMobile ? mvw(16) : vw(16) }}>
             {titleParts[0] && (
-              <h2
-                className="font-black bg-clip-text text-transparent"
-                style={{
-                  fontSize: isMobile ? mvw(64) : vw(96),
-                  lineHeight: 1.05,
-                  backgroundImage:
-                    "linear-gradient(180deg, #cabc5a 0%, #736a2c 100%)",
-                  fontFamily: "var(--font-anaheim), sans-serif",
-                  filter: "drop-shadow(0 1px 1px rgba(255,255,255,0.5))",
-                  marginBottom: isMobile ? mvw(4) : vw(4),
-                }}
-              >
-                {titleParts[0].trim()}
-              </h2>
+              <svg width="100%" height="100%" viewBox="0 0 1000 120" preserveAspectRatio="xMinYMid meet" className="overflow-visible">
+                <defs>
+                  <linearGradient id="fillGrad" x1="0" y1="0.2" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#736A2C" />
+                    <stop offset="100%" stopColor="#CABC5A" />
+                  </linearGradient>
+                  <linearGradient id="strokeGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#6B6329" />
+                    <stop offset="100%" stopColor="#FFFFFF" />
+                  </linearGradient>
+                </defs>
+                <text
+                  x={isMobile ? "50%" : "0"}
+                  y="90"
+                  textAnchor={isMobile ? "middle" : "start"}
+                  fill="url(#fillGrad)"
+                  stroke="url(#strokeGrad)"
+                  strokeWidth={isMobile ? "1" : "2"}
+                  strokeLinejoin="round"
+                  paintOrder="stroke fill"
+                  style={{
+                    fontSize: isMobile ? "64px" : "96px",
+                    fontWeight: 900,
+                    fontFamily: "var(--font-anaheim), sans-serif",
+                  }}
+                >
+                  {titleParts[0].trim()}
+                </text>
+              </svg>
             )}
             {titleParts[1] && (
               <h3
@@ -268,7 +310,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
 
           {description && (
             <p
-              className="text-white font-semibold"
+              className="text-white font-semibold whitespace-pre-line"
               style={{
                 fontSize: isMobile ? mvw(16) : vw(16),
                 lineHeight: 1.3,
@@ -293,7 +335,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
               width: !isMobile ? vw(704) : "100%",
             }}
           >
-            {formConfig?.fields?.map((field: any) => (
+            {formConfig?.fields?.filter((f: any) => f.fieldType !== "file").map((field: any) => (
               <div
                 key={field.fieldName}
                 className={
@@ -329,7 +371,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                       padding: isMobile ? mvw(12) : vw(16),
                       resize: "none",
                       overflow: "hidden",
-                      color: "rgba(255, 255, 255, 0.5)",
+                      color: "white",
                       fontFamily: "var(--font-anaheim), sans-serif",
                       fontWeight: 600,
                       fontSize: isMobile ? mvw(16) : vw(16),
@@ -358,65 +400,12 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                         borderRadius: isMobile ? mvw(12) : vw(15),
                         border: "1px solid #ffffff57",
                         background: "#211c0b2e",
-                        color: "rgba(255, 255, 255, 0.5)",
+                        color: formData[field.fieldName] ? "white" : "rgba(255, 255, 255, 0.5)",
                       }}
                       buttonClassName="!px-4 !font-anaheim !font-semibold faq-dropdown-btn-text"
                       itemClassName="!px-4 !py-3 !font-anaheim !font-semibold text-white/90"
                       listClassName="!bg-[#4d4618] !border-white/20"
                     />
-                  </div>
-                ) : field.fieldType === "file" ? (
-                  <div className="flex flex-col items-center">
-                    <label
-                      className="flex items-center cursor-pointer transition-all faq-upload-btn"
-                      style={{
-                        width: isMobile ? "100%" : "fit-content",
-                        height: isMobile ? mvw(50) : vw(60),
-                        borderRadius: isMobile ? mvw(50) : vw(65),
-                        border: "1px solid #ffffff57",
-                        padding: isMobile ? `0 ${mvw(20)}` : `0 ${vw(50)}`,
-                        background: "#211c0b2e",
-                        gap: isMobile ? mvw(12) : vw(12),
-                        justifyContent: isMobile ? "center" : "flex-start",
-                      }}
-                    >
-                      <input
-                        type="file"
-                        className="hidden"
-                        onChange={(e) =>
-                          handleFileChange(e, field.fieldName, field)
-                        }
-                      />
-                      <Upload
-                        className="upload-icon transition-colors"
-                        style={{
-                          width: isMobile ? mvw(16) : vw(16),
-                          height: isMobile ? mvw(16) : vw(16),
-                          color: fileName
-                            ? "rgba(255, 255, 255, 0.8)"
-                            : "rgba(255, 255, 255, 0.5)",
-                        }}
-                      />
-                      <span
-                        className="font-semibold truncate upload-text transition-colors"
-                        style={{
-                          fontSize: isMobile ? mvw(16) : vw(16),
-                          color: fileName
-                            ? "rgba(255, 255, 255, 0.8)"
-                            : "rgba(255, 255, 255, 0.5)",
-                          fontFamily: "var(--font-anaheim), sans-serif",
-                        }}
-                      >
-                        {uploading
-                          ? "..."
-                          : fileName ||
-                            (field.required ? "* " : "") +
-                              (field.label === "upload file" ||
-                              field.label === "Attach File"
-                                ? field.label
-                                : field.placeholder)}
-                      </span>
-                    </label>
                   </div>
                  ) : field.fieldName === "whatsapp" ||
                   field.fieldType === "tel" ? (
@@ -431,7 +420,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                         borderRadius: isMobile ? mvw(12) : vw(15),
                         border: "1px solid #ffffff57",
                         background: "#211c0b2e",
-                        color: "rgba(255, 255, 255, 0.5)",
+                        color: "white",
                       }}
                     >
                       <button
@@ -484,7 +473,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                         style={{
                           paddingLeft: isMobile ? mvw(12) : vw(16),
                           paddingRight: isMobile ? mvw(12) : vw(16),
-                          color: "rgba(255, 255, 255, 0.5)",
+                          color: "white",
                           fontSize: isMobile ? mvw(16) : vw(16),
                           fontFamily: "var(--font-anaheim), sans-serif",
                         }}
@@ -520,7 +509,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                       border: "1px solid #ffffff57",
                       borderRadius: isMobile ? mvw(12) : vw(15),
                       padding: isMobile ? `0 ${mvw(16)}` : `0 ${vw(16)}`,
-                      color: "rgba(255, 255, 255, 0.5)",
+                      color: "white",
                       fontFamily: "var(--font-anaheim), sans-serif",
                       fontWeight: 600,
                       fontSize: isMobile ? mvw(16) : vw(16),
@@ -542,41 +531,115 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
             ))}
 
             <div className="col-span-2">
-              {/* Privacy Consent */}
-              {privacyText && (
-                <div
-                  className="flex items-start gap-3 mb-3 cursor-pointer group"
-                  onClick={() => handlePrivacyToggle(!privacyAccepted)}
-                >
-                  <div
-                    className={`mt-1 flex-shrink-0 w-6 h-6 rounded border flex items-center justify-center transition-all ${
-                      privacyAccepted
-                        ? "bg-[#d1be2e] border-[#d1be2e]"
-                        : "border-white/30 bg-transparent"
-                    }`}
-                  >
-                    {privacyAccepted && (
+              <div
+                className={cn(
+                  "flex",
+                  isMobile
+                    ? "flex-col gap-4 mb-4"
+                    : "flex-row items-center gap-8 mb-6",
+                )}
+              >
+                {fileField && (
+                  <div className="flex-shrink-0">
+                    <label
+                      className="flex items-center cursor-pointer transition-all faq-upload-btn"
+                      style={{
+                        width: isMobile ? "100%" : "fit-content",
+                        height: isMobile ? mvw(50) : vw(60),
+                        borderRadius: isMobile ? mvw(50) : vw(65),
+                        border: "1px solid #ffffff57",
+                        padding: isMobile ? `0 ${mvw(20)}` : `0 ${vw(50)}`,
+                        background: "#211c0b2e",
+                        gap: isMobile ? mvw(12) : vw(12),
+                        justifyContent: isMobile ? "center" : "flex-start",
+                      }}
+                    >
+                      <input
+                        type="file"
+                        className="hidden"
+                        onChange={(e) =>
+                          handleFileChange(e, fileField.fieldName, fileField)
+                        }
+                      />
                       <svg
-                        className="w-4 h-4 text-white"
+                        width="25"
+                        height="25"
+                        viewBox={CUSTOM_ICONS.upload.viewBox}
                         fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                        className="upload-icon transition-colors flex-shrink-0"
+                        style={{
+                          width: isMobile ? mvw(16) : vw(16),
+                          height: isMobile ? mvw(16) : vw(16),
+                          color: fileName
+                            ? "rgba(255, 255, 255, 0.8)"
+                            : "rgba(255, 255, 255, 0.5)",
+                        }}
                       >
                         <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={3}
-                          d="M5 13l4 4L19 7"
+                          d={CUSTOM_ICONS.upload.path}
+                          fill="currentColor"
                         />
                       </svg>
-                    )}
+                      <span
+                        className="font-semibold truncate upload-text transition-colors"
+                        style={{
+                          fontSize: isMobile ? mvw(16) : vw(16),
+                          color: fileName
+                            ? "rgba(255, 255, 255, 0.8)"
+                            : "rgba(255, 255, 255, 0.5)",
+                          fontFamily: "var(--font-anaheim), sans-serif",
+                        }}
+                      >
+                        {uploading
+                          ? "..."
+                          : fileName ||
+                            (fileField.required ? "* " : "") +
+                              (fileField.label === "upload file" ||
+                              fileField.label === "Attach File"
+                                ? fileField.label
+                                : fileField.placeholder)}
+                      </span>
+                    </label>
                   </div>
-                  <p className="text-sm leading-relaxed text-white/70 select-none text-left whitespace-pre-line">
-                    {privacyText}
-                  </p>
-                </div>
-              )}
+                )}
+
+                {/* Privacy Consent */}
+                {privacyText && (
+                  <div
+                    className="flex items-start gap-3 cursor-pointer group"
+                    onClick={() => handlePrivacyToggle(!privacyAccepted)}
+                  >
+                    <div
+                      className={`mt-1 flex-shrink-0 w-6 h-6 rounded border flex items-center justify-center transition-all ${
+                        privacyAccepted
+                          ? "bg-[#d1be2e] border-[#d1be2e]"
+                          : "border-white/30 bg-transparent"
+                      }`}
+                    >
+                      {privacyAccepted && (
+                        <svg
+                          className="w-4 h-4 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={3}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                    <p className="text-sm leading-relaxed text-white select-none text-left whitespace-pre-line">
+                      {privacyText}
+                    </p>
+                  </div>
+                )}
+              </div>
               <motion.button
+                className="font-semibold"
                 style={{
                   transformOrigin: "center",
                   width: "100%",
@@ -701,7 +764,8 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
           font-weight: 600 !important;
         }
         .faq-input-el {
-          color: rgba(255, 255, 255, 0.5) !important;
+          color: #FFFFFF !important;
+          -webkit-text-fill-color: #FFFFFF !important;
           font-family: var(--font-anaheim), sans-serif !important;
           font-weight: 600 !important;
           font-size: ${isMobile ? mvw(16) : vw(16)} !important;
@@ -711,7 +775,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
         .faq-input-el:-webkit-autofill,
         .faq-input-el:-webkit-autofill:hover,
         .faq-input-el:-webkit-autofill:focus {
-          -webkit-text-fill-color: rgba(255, 255, 255, 0.5) !important;
+          -webkit-text-fill-color: #FFFFFF !important;
           transition: background-color 5000000s ease-in-out 0s !important;
           background-color: transparent !important;
           font-family: var(--font-anaheim), sans-serif !important;
@@ -753,7 +817,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
         :global(.faq-input-el:-webkit-autofill:hover),
         :global(.faq-input-el:-webkit-autofill:focus),
         :global(.faq-input-el:-webkit-autofill:active) {
-          -webkit-text-fill-color: rgba(255, 255, 255, 0.5) !important;
+          -webkit-text-fill-color: #FFFFFF !important;
           transition: background-color 5000000s ease-in-out 0s !important;
           background-color: transparent !important;
         }
