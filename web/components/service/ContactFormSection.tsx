@@ -310,7 +310,7 @@ export function ContactFormSection({
                         </svg>
                       )}
                     </div>
-                    <p className="text-[13px] leading-relaxed text-white/80 select-none">
+                    <p className="text-[13px] md:text-[16px] leading-relaxed text-white/80 select-none">
                       {formConfig.privacyConsentText}
                     </p>
                   </div>
@@ -649,7 +649,7 @@ export function ContactFormSection({
                             </svg>
                           )}
                         </div>
-                        <p className="text-[14px] leading-relaxed text-white/80 select-none">
+                        <p className="text-[14px] md:text-[16px] leading-relaxed text-white/80 select-none">
                           {formConfig.privacyConsentText}
                         </p>
                       </div>

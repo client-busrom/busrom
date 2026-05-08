@@ -21,7 +21,8 @@
     "searchProducts": "Ürün ara...",
     "applyFilter": "Filtre Uygula",
     "featuredOnly": "Sadece Öne Çıkanlar",
-    "sortBy": "Sırala"
+    "sortBy": "Sırala",
+    "inquiryFooterHint": "Ek Ayrıntılarla Talebinizi Tamamlamak İçin Gönder'e Tıklayın"
   },
   "ContactPage": {
     "title": "Bize Ulaşın",

@@ -21,7 +21,8 @@
     "searchProducts": "搜索产品...",
     "applyFilter": "筛选",
     "featuredOnly": "仅精选",
-    "sortBy": "排序"
+    "sortBy": "排序",
+    "inquiryFooterHint": "点击提交以完善您的询价详细信息"
   },
   "ContactPage": {
     "title": "联系我们",

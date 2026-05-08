@@ -21,7 +21,8 @@
     "searchProducts": "제품 검색...",
     "applyFilter": "필터 적용",
     "featuredOnly": "추천 제품만",
-    "sortBy": "정렬 기준"
+    "sortBy": "정렬 기준",
+    "inquiryFooterHint": "'제출'을 클릭하여 추가 세부 정보와 함께 문의를 완료하십시오"
   },
   "ContactPage": {
     "title": "문의하기",

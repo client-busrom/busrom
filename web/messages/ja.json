@@ -21,7 +21,8 @@
     "searchProducts": "製品を検索...",
     "applyFilter": "フィルターを適用",
     "featuredOnly": "おすすめのみ",
-    "sortBy": "並べ替え"
+    "sortBy": "並べ替え",
+    "inquiryFooterHint": "「送信」をクリックして、詳細情報を入力して問い合わせを完了してください"
   },
   "ContactPage": {
     "title": "お問い合わせ",

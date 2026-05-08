@@ -469,7 +469,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                       </svg>
                     )}
                   </div>
-                  <p className="text-sm leading-relaxed text-white/70 select-none text-left whitespace-pre-line">
+                  <p className="text-sm md:text-base leading-relaxed text-white/70 select-none text-left whitespace-pre-line">
                     {privacyText}
                   </p>
                 </div>

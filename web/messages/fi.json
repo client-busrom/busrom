@@ -21,7 +21,8 @@
     "searchProducts": "Hae tuotteita...",
     "applyFilter": "Käytä suodatinta",
     "featuredOnly": "Vain suositellut",
-    "sortBy": "Järjestä"
+    "sortBy": "Järjestä",
+    "inquiryFooterHint": "Napsauta Lähetä Viimeistelläksesi Kyselysi Lisätietojen Avulla"
   },
   "ContactPage": {
     "title": "Ota yhteyttä",

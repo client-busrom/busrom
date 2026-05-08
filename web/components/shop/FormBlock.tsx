@@ -553,7 +553,7 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
               </svg>
             )}
           </div>
-          <p className="text-xs leading-relaxed text-gray-500 whitespace-pre-line select-none text-left">
+          <p className="text-xs md:text-[16px] leading-relaxed text-gray-500 whitespace-pre-line select-none text-left">
             {formMessages.privacyConsentText}
           </p>
         </div>

@@ -73,13 +73,17 @@ export default async function ProductDetailPage({
 }) {
   const { locale, slug } = await params
   const path = `/shop/${slug}`
+  
+  // Load localized messages for SSR
+  const messages = (await import(`@/messages/${locale}.json`)).default
+  const footerHint = messages.shop?.inquiryFooterHint
 
   return (
     <>
       <PageScripts path={path} pageType="shop_detail" position="header" />
       <PageScripts path={path} pageType="shop_detail" position="body_start" />
       <PageSeoInjector path={path} pageType="shop_detail" locale={locale} />
-      <ProductDetailClient locale={locale} slug={slug} />
+      <ProductDetailClient locale={locale} slug={slug} footerHint={footerHint} />
       <PageScripts path={path} pageType="shop_detail" position="footer" />
     </>
   )

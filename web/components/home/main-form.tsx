@@ -80,9 +80,19 @@ interface FormField {
   fieldName: string;
   label: string;
   placeholder?: string;
-  fieldType: 'text' | 'email' | 'phone' | 'textarea' | 'select' | 'checkbox' | 'radio' | 'number' | 'date' | 'file';
+  fieldType:
+    | "text"
+    | "email"
+    | "phone"
+    | "textarea"
+    | "select"
+    | "checkbox"
+    | "radio"
+    | "number"
+    | "date"
+    | "file";
   required?: boolean;
-  width?: 'full' | 'half' | 'third';
+  width?: "full" | "half" | "third";
   order?: number;
   options?: { value: string; label: string }[];
 }
@@ -107,7 +117,12 @@ interface TurnstileConfig {
   threshold: number;
 }
 
-export default function MainForm({ data, locale = "en", headerTheme, className }: Props) {
+export default function MainForm({
+  data,
+  locale = "en",
+  headerTheme,
+  className,
+}: Props) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const leftImageRef = useRef<HTMLDivElement>(null);
   const rightImageRef = useRef<HTMLDivElement>(null);
@@ -116,17 +131,22 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
   const [isDesktop, setIsDesktop] = useState(false); // lg 及以上
   const [isVisible, setIsVisible] = useState(false); // 表单是否进入视口
 
-  // 表单配置 (从 FormConfig API 获取)
-  const [formConfig, setFormConfig] = useState<FormConfig | null>(null);
+  // 表单配置 - 优先使用 props 传过来的数据，没有再调接口
+  const [formConfig, setFormConfig] = useState<FormConfig | null>(
+    data.formConfig || null,
+  );
 
   // 获取字段 label - 优先使用 formConfig 中的配置
   const getFieldLabel = (fieldName: string, fallbackLabel: string): string => {
     if (formConfig?.fields && Array.isArray(formConfig.fields)) {
       // 兼容处理：某些配置可能把 whatsapp 叫成 phone，或者大小写不同
       const searchNames = [fieldName.toLowerCase()];
-      if (fieldName.toLowerCase() === "whatsapp") searchNames.push("phone", "mobile");
-      
-      const field = formConfig.fields.find(f => searchNames.includes(f.fieldName?.toLowerCase()));
+      if (fieldName.toLowerCase() === "whatsapp")
+        searchNames.push("phone", "mobile");
+
+      const field = formConfig.fields.find((f) =>
+        searchNames.includes(f.fieldName?.toLowerCase()),
+      );
       if (field?.label) {
         return field.label;
       }
@@ -135,20 +155,29 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
   };
 
   // 获取字段 placeholder
-  const getFieldPlaceholder = (fieldName: string, fallbackPlaceholder?: string): string | undefined => {
+  const getFieldPlaceholder = (
+    fieldName: string,
+    fallbackPlaceholder?: string,
+  ): string | undefined => {
     if (formConfig?.fields && Array.isArray(formConfig.fields)) {
       const searchNames = [fieldName.toLowerCase()];
-      if (fieldName.toLowerCase() === "whatsapp") searchNames.push("phone", "mobile", "tel");
-      if (fieldName.toLowerCase() === "name") searchNames.push("fullname", "contact");
-      
+      if (fieldName.toLowerCase() === "whatsapp")
+        searchNames.push("phone", "mobile", "tel");
+      if (fieldName.toLowerCase() === "name")
+        searchNames.push("fullname", "contact");
+
       // 1. 精确/兼容名匹配
-      let field = formConfig.fields.find(f => searchNames.includes(f.fieldName?.toLowerCase()));
-      
+      let field = formConfig.fields.find((f) =>
+        searchNames.includes(f.fieldName?.toLowerCase()),
+      );
+
       // 2. 如果没找到，尝试包含匹配 (例如 "your_email" 匹配 "email")
       if (!field) {
-        field = formConfig.fields.find(f => {
+        field = formConfig.fields.find((f) => {
           const fName = f.fieldName?.toLowerCase() || "";
-          return searchNames.some(s => fName.includes(s) || s.includes(fName));
+          return searchNames.some(
+            (s) => fName.includes(s) || s.includes(fName),
+          );
         });
       }
 
@@ -160,9 +189,12 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
   };
 
   // 检查字段是否必填
-  const isFieldRequired = (fieldName: string, defaultRequired: boolean = false): boolean => {
+  const isFieldRequired = (
+    fieldName: string,
+    defaultRequired: boolean = false,
+  ): boolean => {
     if (formConfig?.fields) {
-      const field = formConfig.fields.find(f => f.fieldName === fieldName);
+      const field = formConfig.fields.find((f) => f.fieldName === fieldName);
       if (field !== undefined) {
         return field.required ?? defaultRequired;
       }
@@ -170,7 +202,8 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
     return defaultRequired;
   };
   // Turnstile 配置 (从 SiteConfig 获取)
-  const [turnstileConfig, setTurnstileConfig] = useState<TurnstileConfig | null>(null);
+  const [turnstileConfig, setTurnstileConfig] =
+    useState<TurnstileConfig | null>(null);
 
   // 表单状态
   const [formData, setFormData] = useState({
@@ -188,12 +221,12 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
   // Turnstile 验证码状态
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
-  const STORAGE_KEY = 'busrom_privacy_consent';
+  const STORAGE_KEY = "busrom_privacy_consent";
   const [isGloballyAccepted, setIsGloballyAccepted] = useState(false);
 
   // 挂载时检查全局同意状态
   useEffect(() => {
-    const accepted = localStorage.getItem(STORAGE_KEY) === 'true';
+    const accepted = localStorage.getItem(STORAGE_KEY) === "true";
     if (accepted) {
       setPrivacyAccepted(true);
       setIsGloballyAccepted(true);
@@ -203,7 +236,7 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
   const handlePrivacyToggle = (val: boolean) => {
     setPrivacyAccepted(val);
     if (val) {
-      localStorage.setItem(STORAGE_KEY, 'true');
+      localStorage.setItem(STORAGE_KEY, "true");
       setIsGloballyAccepted(true);
     } else {
       localStorage.removeItem(STORAGE_KEY);
@@ -213,26 +246,30 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
   const [submissionCount, setSubmissionCount] = useState(0);
 
   // 是否需要显示验证码
-  const shouldShowCaptcha = !!(turnstileConfig?.enabled &&
+  const shouldShowCaptcha = !!(
+    turnstileConfig?.enabled &&
     turnstileConfig?.siteKey &&
-    submissionCount >= (turnstileConfig.threshold - 1));
+    submissionCount >= turnstileConfig.threshold - 1
+  );
 
   // 延迟加载配置 - 只在表单进入视口时才获取
   const [configLoaded, setConfigLoaded] = useState(false);
 
   // 获取表单配置和 Turnstile 配置 - 延迟到表单可见时
   useEffect(() => {
-    if (!isVisible || configLoaded) return;
+    if (!isVisible) return;
+    // 如果已经有配置了，就没必要重复加载
+    if (formConfig && configLoaded) return;
 
     const fetchConfigs = async () => {
       try {
         // 并行获取表单配置和 Turnstile 配置
         const [formRes, turnstileRes] = await Promise.all([
           fetch(`/api/form-config/main-form?locale=${locale}`),
-          fetch('/api/site-config/turnstile'),
+          fetch("/api/site-config/turnstile"),
         ]);
 
-        if (formRes.ok) {
+        if (formRes.ok && !formConfig) {
           const config = await formRes.json();
           setFormConfig(config);
           console.log(`[MainForm] Loaded config for "${locale}":`, config);
@@ -255,7 +292,6 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
   useEffect(() => {
     setSubmissionCount(getSubmissionCount());
   }, []);
-
 
   // Turnstile 回调
   const handleTurnstileVerify = useCallback((token: string) => {
@@ -285,14 +321,19 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
 
     // 验证必填字段
     if (!formData.name || !formData.email) {
-      setError(formConfig?.errorRequiredFields || "Please fill in name and email");
+      setError(
+        formConfig?.errorRequiredFields || "Please fill in name and email",
+      );
       setSubmitting(false);
       return;
     }
 
     // 检查验证码
     if (shouldShowCaptcha && !turnstileToken) {
-      setError(formConfig?.errorCaptchaMessage || "Please complete the captcha verification");
+      setError(
+        formConfig?.errorCaptchaMessage ||
+          "Please complete the captcha verification",
+      );
       setSubmitting(false);
       return;
     }
@@ -327,22 +368,33 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
         // 5秒后重置表单
         setTimeout(() => {
           setSubmitted(false);
-          setFormData({ name: "", email: "", whatsapp: "", company: "", message: "" });
+          setFormData({
+            name: "",
+            email: "",
+            whatsapp: "",
+            company: "",
+            message: "",
+          });
           setTurnstileToken(null);
         }, 5000);
       } else {
         const errorData = await res.json();
-        setError(errorData.error || formConfig?.errorNetworkMessage || "Submission failed");
+        setError(
+          errorData.error ||
+            formConfig?.errorNetworkMessage ||
+            "Submission failed",
+        );
         setTurnstileToken(null);
       }
     } catch (err) {
-      setError(formConfig?.errorNetworkMessage || "Network error, please try again");
+      setError(
+        formConfig?.errorNetworkMessage || "Network error, please try again",
+      );
       setTurnstileToken(null);
     } finally {
       setSubmitting(false);
     }
   };
-
 
   // 检测是否为桌面端 (lg 及以上)
   useEffect(() => {
@@ -367,7 +419,7 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
           observer.disconnect();
         }
       },
-      { rootMargin: "200px" } // 提前 200px 开始加载
+      { rootMargin: "200px" }, // 提前 200px 开始加载
     );
 
     observer.observe(section);
@@ -427,7 +479,10 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
       if (rect.bottom < 0 || rect.top > windowHeight) return;
 
       // progress: 0 = 板块刚进入视口底部, 1 = 板块顶部到达视口顶部
-      const progress = Math.max(0, Math.min(1, (windowHeight - rect.top) / (windowHeight + rect.height)));
+      const progress = Math.max(
+        0,
+        Math.min(1, (windowHeight - rect.top) / (windowHeight + rect.height)),
+      );
       const maxOffset = 500;
 
       // 使用 transform3d 触发 GPU 加速
@@ -464,7 +519,10 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
   return (
     <section
       ref={sectionRef}
-      className={cn("py-32 md:py-40 bg-brand-secondary text-brand-text-inverse overflow-hidden", className)}
+      className={cn(
+        "py-32 md:py-40 bg-brand-secondary text-brand-text-inverse overflow-hidden",
+        className,
+      )}
       data-header-theme={headerTheme}
     >
       <div className="container mx-auto px-4">
@@ -476,13 +534,18 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
               "lg:w-[30%] w-[60%] will-change-transform",
               // lg 以下 (手机/平板) 淡入效果
               !isDesktop && "transition-opacity duration-700 ease-out",
-              !isDesktop && (leftVisible ? "opacity-100" : "opacity-0")
+              !isDesktop && (leftVisible ? "opacity-100" : "opacity-0"),
             )}
-            style={isDesktop ? { transform: 'translateY(500px)' } : undefined}
+            style={isDesktop ? { transform: "translateY(500px)" } : undefined}
           >
             <div className={imageCardContainerClass}>
               {/* 1. 底层手机框 (z-10) */}
-              <Image src="/iPhoneFrame.svg" alt="iPhone Frame" fill className="object-cover z-10" />
+              <Image
+                src="/iPhoneFrame.svg"
+                alt="iPhone Frame"
+                fill
+                className="object-cover z-10"
+              />
 
               {/* 2. 顶层内容图片 (z-20) + SVG Mask */}
               <div
@@ -500,7 +563,12 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                   WebkitMaskRepeat: "no-repeat",
                 }}
               >
-                <OptimizedImage image={data.image1} alt={data.image1?.altText || data.designTextLeft} size="medium" className="object-cover w-full h-full absolute inset-0" />
+                <OptimizedImage
+                  image={data.image1}
+                  alt={data.image1?.altText || data.designTextLeft}
+                  size="medium"
+                  className="object-cover w-full h-full absolute inset-0"
+                />
               </div>
             </div>
             {/* 3. 文字遮罩 (z-30) */}
@@ -509,7 +577,9 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                 {/* 背景空心描边层 - 偏移 2px */}
                 <div className="absolute left-[2px] top-[2px] w-full pointer-events-none">
                   <HollowText strokeColor="#f6f4ed" strokeWidth={1}>
-                    <span className="text-base lg:text-xl font-anaheim font-bold block text-center leading-tight">{data.designTextLeft}</span>
+                    <span className="text-base lg:text-xl font-anaheim font-bold block text-center leading-tight">
+                      {data.designTextLeft}
+                    </span>
                   </HollowText>
                 </div>
                 {/* 原本的文字 */}
@@ -532,7 +602,8 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                 <div className="text-center py-12">
                   <div className="text-4xl mb-4 text-white">✓</div>
                   <p className="text-white text-lg font-anaheim whitespace-pre-line">
-                    {formConfig?.successMessage || "Your message has been sent successfully!"}
+                    {formConfig?.successMessage ||
+                      "Your message has been sent successfully!"}
                   </p>
                 </div>
               ) : (
@@ -549,14 +620,22 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       className={formLabelClasses}
                       style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
                     >
-                      {getFieldLabel("name", data.placeholderName)} {isFieldRequired("name", true) && <span className="text-red-400">*</span>}
+                      {getFieldLabel("name", data.placeholderName)}{" "}
+                      {isFieldRequired("name", true) && (
+                        <span className="text-red-400">*</span>
+                      )}
                     </Label>
                     <Input
                       type="text"
                       id="name"
                       value={formData.name}
-                      onChange={(e) => handleInputChange("name", e.target.value)}
-                      placeholder={getFieldPlaceholder("name", data.placeholderName)}
+                      onChange={(e) =>
+                        handleInputChange("name", e.target.value)
+                      }
+                      placeholder={getFieldPlaceholder(
+                        "name",
+                        data.placeholderName,
+                      )}
                       className={formInputClasses}
                       required={isFieldRequired("name", true)}
                       spellCheck="false"
@@ -572,14 +651,22 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       className={formLabelClasses}
                       style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
                     >
-                      {getFieldLabel("email", data.placeholderEmail)} {isFieldRequired("email", true) && <span className="text-red-400">*</span>}
+                      {getFieldLabel("email", data.placeholderEmail)}{" "}
+                      {isFieldRequired("email", true) && (
+                        <span className="text-red-400">*</span>
+                      )}
                     </Label>
                     <Input
                       type="email"
                       id="email"
                       value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
-                      placeholder={getFieldPlaceholder("email", data.placeholderEmail)}
+                      onChange={(e) =>
+                        handleInputChange("email", e.target.value)
+                      }
+                      placeholder={getFieldPlaceholder(
+                        "email",
+                        data.placeholderEmail,
+                      )}
                       className={formInputClasses}
                       required={isFieldRequired("email", true)}
                       spellCheck="false"
@@ -595,13 +682,19 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       className={formLabelClasses}
                       style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
                     >
-                      {getFieldLabel("whatsapp", data.placeholderWhatsapp)} {isFieldRequired("whatsapp") && <span className="text-red-400">*</span>}
+                      {getFieldLabel("whatsapp", data.placeholderWhatsapp)}{" "}
+                      {isFieldRequired("whatsapp") && (
+                        <span className="text-red-400">*</span>
+                      )}
                     </Label>
                     <PhoneInput
                       id="whatsapp"
                       value={formData.whatsapp}
                       onChange={(phone) => handleInputChange("whatsapp", phone)}
-                      placeholder={getFieldPlaceholder("whatsapp", data.placeholderWhatsapp)}
+                      placeholder={getFieldPlaceholder(
+                        "whatsapp",
+                        data.placeholderWhatsapp,
+                      )}
                       required={isFieldRequired("whatsapp")}
                       disabled={submitting}
                       className="!bg-transparent !border-0 !border-b !border-white !rounded-none !h-[45px]"
@@ -623,14 +716,22 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       className={formLabelClasses}
                       style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
                     >
-                      {getFieldLabel("company", data.placeholderCompany)} {isFieldRequired("company") && <span className="text-red-400">*</span>}
+                      {getFieldLabel("company", data.placeholderCompany)}{" "}
+                      {isFieldRequired("company") && (
+                        <span className="text-red-400">*</span>
+                      )}
                     </Label>
                     <Input
                       type="text"
                       id="company"
                       value={formData.company}
-                      onChange={(e) => handleInputChange("company", e.target.value)}
-                      placeholder={getFieldPlaceholder("company", data.placeholderCompany)}
+                      onChange={(e) =>
+                        handleInputChange("company", e.target.value)
+                      }
+                      placeholder={getFieldPlaceholder(
+                        "company",
+                        data.placeholderCompany,
+                      )}
                       className={formInputClasses}
                       required={isFieldRequired("company")}
                       spellCheck="false"
@@ -646,13 +747,21 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       className={formLabelClasses}
                       style={{ fontSize: "clamp(10px, 1.04vw, 20px)" }}
                     >
-                      {getFieldLabel("message", data.placeholderMessage)} {isFieldRequired("message") && <span className="text-red-400">*</span>}
+                      {getFieldLabel("message", data.placeholderMessage)}{" "}
+                      {isFieldRequired("message") && (
+                        <span className="text-red-400">*</span>
+                      )}
                     </Label>
                     <Textarea
                       id="message"
                       value={formData.message}
-                      onChange={(e) => handleInputChange("message", e.target.value)}
-                      placeholder={getFieldPlaceholder("message", data.placeholderMessage)}
+                      onChange={(e) =>
+                        handleInputChange("message", e.target.value)
+                      }
+                      placeholder={getFieldPlaceholder(
+                        "message",
+                        data.placeholderMessage,
+                      )}
                       className={cn(formInputClasses, "min-h-[40px]")}
                       required={isFieldRequired("message")}
                       spellCheck="false"
@@ -686,18 +795,35 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
 
                   {/* 同意隐私勾选框 - 只要配置了文案就常显 */}
                   {formConfig?.privacyConsentText && (
-                    <div className="flex items-start gap-2 mb-4 group cursor-pointer" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
-                      <div className={cn(
-                        "mt-1 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",
-                        privacyAccepted ? "bg-brand-form-button-bg border-brand-form-button-bg" : "border-white/50 bg-transparent"
-                      )}>
+                    <div
+                      className="flex items-start gap-2 group cursor-pointer"
+                      onClick={() => handlePrivacyToggle(!privacyAccepted)}
+                    >
+                      <div
+                        className={cn(
+                          "mt-1 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",
+                          privacyAccepted
+                            ? "bg-brand-form-button-bg border-brand-form-button-bg"
+                            : "border-white/50 bg-transparent",
+                        )}
+                      >
                         {privacyAccepted && (
-                          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          <svg
+                            className="w-3 h-3 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={3}
+                              d="M5 13l4 4L19 7"
+                            />
                           </svg>
                         )}
                       </div>
-                      <p className="text-[10px] leading-tight text-white/70 text-left whitespace-pre-line select-none">
+                      <p className="text-[10px] md:text-[16px] leading-tight text-white/70 text-left whitespace-pre-line select-none">
                         {formConfig.privacyConsentText}
                       </p>
                     </div>
@@ -712,7 +838,9 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                         whileHover={{
                           rotate: 0,
                           scale: 1.08,
-                          transition: { scale: { duration: 0.3, ease: "easeOut" } },
+                          transition: {
+                            scale: { duration: 0.3, ease: "easeOut" },
+                          },
                         }}
                         transition={{
                           rotate: {
@@ -725,18 +853,30 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                       >
                         <Button
                           type="submit"
-                          disabled={submitting || (shouldShowCaptcha && !turnstileToken) || (!!formConfig?.privacyConsentText && !privacyAccepted)}
-                          className={cn(formButtonClasses, "disabled:opacity-50 disabled:cursor-not-allowed whitespace-pre-line")}
+                          disabled={
+                            submitting ||
+                            (shouldShowCaptcha && !turnstileToken) ||
+                            (!!formConfig?.privacyConsentText &&
+                              !privacyAccepted)
+                          }
+                          className={cn(
+                            formButtonClasses,
+                            "disabled:opacity-50 disabled:cursor-not-allowed whitespace-pre-line",
+                          )}
                           style={{
                             width: "clamp(165px, 17.2vw, 331px)",
                             minHeight: "clamp(34px, 3.5vw, 68px)",
                             padding: "8px 20px",
-                            fontSize: "clamp(14px, 1.45vw, 24px)", 
+                            fontSize: "clamp(14px, 1.45vw, 24px)",
                             lineHeight: "1.2",
                             height: "auto",
                           }}
                         >
-                          {submitting ? (formConfig?.submittingText || "Submitting...") : (formConfig?.submitButtonText || data.buttonText || "Submit")}
+                          {submitting
+                            ? formConfig?.submittingText || "Submitting..."
+                            : formConfig?.submitButtonText ||
+                              data.buttonText ||
+                              "Submit"}
                         </Button>
                       </motion.div>
                     </Magnetic>
@@ -752,10 +892,11 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
             className={cn(
               "lg:w-[30%] w-[60%] will-change-transform",
               // lg 以下 (手机/平板) 淡入效果
-              !isDesktop && "transition-opacity duration-700 ease-out delay-150",
-              !isDesktop && (rightVisible ? "opacity-100" : "opacity-0")
+              !isDesktop &&
+                "transition-opacity duration-700 ease-out delay-150",
+              !isDesktop && (rightVisible ? "opacity-100" : "opacity-0"),
             )}
-            style={isDesktop ? { transform: 'translateY(-500px)' } : undefined}
+            style={isDesktop ? { transform: "translateY(-500px)" } : undefined}
           >
             {/* 3. 文字遮罩 (z-30) */}
             <div className="w-full p-4 lg:p-8 z-30 flex justify-center">
@@ -763,7 +904,9 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                 {/* 背景空心描边层 - 偏移 2px */}
                 <div className="absolute left-[2px] top-[2px] w-full pointer-events-none">
                   <HollowText strokeColor="#f6f4ed" strokeWidth={1}>
-                    <span className="text-base lg:text-xl font-anaheim font-bold block text-center leading-tight">{data.designTextRight}</span>
+                    <span className="text-base lg:text-xl font-anaheim font-bold block text-center leading-tight">
+                      {data.designTextRight}
+                    </span>
                   </HollowText>
                 </div>
                 {/* 原本的文字 */}
@@ -774,7 +917,12 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
             </div>
             <div className={imageCardContainerClass}>
               {/* 1. 底层手机框 (z-10) */}
-              <Image src="/iPhoneFrame.svg" alt="iPhone Frame" fill className="object-cover z-10" />
+              <Image
+                src="/iPhoneFrame.svg"
+                alt="iPhone Frame"
+                fill
+                className="object-cover z-10"
+              />
 
               {/* 2. 顶层内容图片 (z-20) + SVG Mask */}
               <div
@@ -792,7 +940,12 @@ export default function MainForm({ data, locale = "en", headerTheme, className }
                   WebkitMaskRepeat: "no-repeat",
                 }}
               >
-                <OptimizedImage image={data.image2} alt={data.image2?.altText || data.designTextRight} size="medium" className="object-cover w-full h-full absolute inset-0" />
+                <OptimizedImage
+                  image={data.image2}
+                  alt={data.image2?.altText || data.designTextRight}
+                  size="medium"
+                  className="object-cover w-full h-full absolute inset-0"
+                />
               </div>
             </div>
           </div>

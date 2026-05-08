@@ -239,6 +239,7 @@ export function parseHomeData(data: any, locale: string, strategy?: string, seoK
     designTextRight: data.mainForm?.designTextRight || '',
     image1: data.mainForm?.images?.[0] ? autoSeoImage(data.mainForm.images[0], 'Main Form Left') : null,
     image2: data.mainForm?.images?.[1] ? autoSeoImage(data.mainForm.images[1], 'Main Form Right') : null,
+    formConfig: data.mainForm?.formConfig || null,
   };
 
   // 9. Transform BrandValue

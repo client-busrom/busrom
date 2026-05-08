@@ -37,6 +37,7 @@ interface SimplifiedInquiryFormProps {
   formConfig: FormConfig
   locale: Locale
   productSeries?: string
+  footerHint?: string
   onOpenFullForm: (initialData: Record<string, any>) => void
 }
 
@@ -44,6 +45,7 @@ export function SimplifiedInquiryForm({
   formConfig,
   locale,
   productSeries,
+  footerHint,
   onOpenFullForm,
 }: SimplifiedInquiryFormProps) {
   type ConfigData = FormConfig['data'] & Partial<FormConfig>
@@ -202,8 +204,8 @@ export function SimplifiedInquiryForm({
               required={field.required}
               error={!!errors[field.fieldName]}
               className="!border !border-gray-300 !rounded-lg !h-[42px]"
-              inputClassName="!text-brand-text-black !text-base !pl-2 [&:-webkit-autofill]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-              dialCodeClassName="!text-brand-text-black !text-base"
+              inputClassName="!text-brand-text-black !text-base !pl-2 !font-normal [&:-webkit-autofill]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:black!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+              dialCodeClassName="!text-brand-text-black !text-base !font-normal"
               buttonClassName="!border-r !border-r-gray-300"
             />
           )
@@ -250,7 +252,7 @@ export function SimplifiedInquiryForm({
 
       {/* Privacy Consent Checkbox - Always show if text is present */}
       {privacyText && (
-        <div className="flex items-start gap-2 my-2 cursor-pointer group" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
+        <div className="flex items-start gap-2 cursor-pointer group" onClick={() => handlePrivacyToggle(!privacyAccepted)}>
           <div className={cn(
             "mt-1 flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all",
             privacyAccepted ? "bg-brand-secondary border-brand-secondary" : "border-gray-300 bg-transparent"
@@ -261,7 +263,7 @@ export function SimplifiedInquiryForm({
               </svg>
             )}
           </div>
-          <p className="text-xs leading-relaxed text-gray-500 whitespace-pre-line select-none">
+          <p className="text-base leading-relaxed text-gray-500 whitespace-pre-line select-none">
             {privacyText}
           </p>
         </div>
@@ -295,9 +297,11 @@ export function SimplifiedInquiryForm({
         {submitText}
       </motion.button>
 
-      <p className="text-xs text-gray-500 text-center">
-        Click submit to complete your inquiry with additional details
-      </p>
+      {footerHint && (
+        <p className="text-base text-gray-500 text-center">
+          {footerHint}
+        </p>
+      )}
     </form>
   )
 }

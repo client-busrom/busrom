@@ -1009,7 +1009,7 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
               </svg>
             )}
           </div>
-          <p className="text-[10px] leading-relaxed text-gray-500 text-left whitespace-pre-line select-none">
+          <p className="text-[10px] md:text-[16px] leading-relaxed text-gray-500 text-left whitespace-pre-line select-none">
             {formConfig.privacyConsentText}
           </p>
         </div>

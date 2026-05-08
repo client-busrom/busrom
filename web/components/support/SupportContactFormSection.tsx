@@ -668,7 +668,7 @@ export function SupportContactFormSection({
                 </div>
                 <p 
                   className="leading-relaxed text-white/70 select-none text-left whitespace-pre-line"
-                  style={{ fontSize: isMobile ? mvw(12) : "12px" }}
+                  style={{ fontSize: isMobile ? mvw(12) : "16px" }}
                 >
                   {getLocalizedString(mergedConfig.privacyConsentText, locale)}
                 </p>

@@ -728,7 +728,7 @@ export function ApplicationContactFormSection({
                   </div>
                   <span
                     className="text-[#5E552C] opacity-70 group-hover:opacity-100 transition-opacity"
-                    style={{ fontSize: isMobile ? "12px" : "10px" }}
+                    style={{ fontSize: isMobile ? "12px" : "16px" }}
                   >
                     {privacyText}
                   </span>

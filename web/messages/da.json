@@ -21,7 +21,8 @@
     "searchProducts": "Søg produkter...",
     "applyFilter": "Anvend filter",
     "featuredOnly": "Kun udvalgte",
-    "sortBy": "Sortér efter"
+    "sortBy": "Sortér efter",
+    "inquiryFooterHint": "Klik På Send For At Fuldføre Din Forespørgsel Med Yderligere Oplysninger"
   },
   "ContactPage": {
     "title": "Kontakt os",

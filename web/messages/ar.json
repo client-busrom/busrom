@@ -21,7 +21,8 @@
     "searchProducts": "البحث عن المنتجات...",
     "applyFilter": "تطبيق الفلتر",
     "featuredOnly": "المميزة فقط",
-    "sortBy": "ترتيب حسب"
+    "sortBy": "ترتيب حسب",
+    "inquiryFooterHint": "انقر فوق إرسال لإكمال استفسارك بمزيد من التفاصيل"
   },
   "ContactPage": {
     "title": "اتصل بنا",

@@ -63,9 +63,10 @@ function DescriptionWithExpand({ description }: { description: string | any }) {
 interface ProductDetailClientProps {
   locale: Locale
   slug: string
+  footerHint?: string
 }
 
-export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) {
+export function ProductDetailClient({ locale, slug, footerHint }: ProductDetailClientProps) {
   const [product, setProduct] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -331,12 +332,13 @@ export function ProductDetailClient({ locale, slug }: ProductDetailClientProps) 
                   <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
                     <h3 className="font-anaheim font-extrabold text-lg md:text-xl text-brand-text-black mb-2">{formDisplayName}</h3>
                     {formDescription && (
-                      <p className="text-sm text-gray-500 mb-4 whitespace-pre-line">{formDescription}</p>
+                      <p className="text-base text-gray-500 mb-4 whitespace-pre-line">{formDescription}</p>
                     )}
                     <SimplifiedInquiryForm
                       formConfig={formConfig}
                       locale={locale}
                       productSeries={product.series?.slug}
+                      footerHint={footerHint}
                       onOpenFullForm={(data) => {
                         setInitialFormData(data)
                         setIsFullFormOpen(true)

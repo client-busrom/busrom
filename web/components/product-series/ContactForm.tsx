@@ -1,14 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { Upload } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { RichText } from "@payloadcms/richtext-lexical/react";
+import { Upload, ChevronDown, Check } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
 import type { ContactFormData } from "@/lib/content-parser";
 import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput";
-import { ChevronDown } from "lucide-react";
-import { motion } from "framer-motion";
 
 /**
  * Contact Form Section
@@ -113,8 +113,8 @@ export function ContactForm({ data, className }: ContactFormProps) {
     }
   }, [formId, locale]);
 
-  // Form config: prioritize pre-populated config from API/Parser, fallback to local fetch
-  const formConfig = data.formConfig || fetchedFormConfig;
+  // Form config: prioritize full config from data, otherwise use fetched config
+  const formConfig = (data.formConfig && data.formConfig.fields) ? data.formConfig : (fetchedFormConfig || data.formConfig);
 
   const privacyText = React.useMemo(() => {
     return data.privacyConsentText || formConfig?.privacyConsentText || "";
@@ -233,23 +233,27 @@ export function ContactForm({ data, className }: ContactFormProps) {
       const formTop = (107 / DESIGN_WIDTH) * window.innerWidth;
       const bottomPadding = (50 / DESIGN_WIDTH) * window.innerWidth;
       const formHeight = formEl.getBoundingClientRect().height;
-      const minDesignHeight = (DESIGN_HEIGHT / DESIGN_WIDTH) * window.innerWidth;
-      
+      const minDesignHeight =
+        (DESIGN_HEIGHT / DESIGN_WIDTH) * window.innerWidth;
+
       // Calculate final height: must be at least minDesignHeight
-      const calculatedHeight = Math.max(minDesignHeight, formTop + formHeight + bottomPadding);
+      const calculatedHeight = Math.max(
+        minDesignHeight,
+        formTop + formHeight + bottomPadding,
+      );
       setSectionHeight(calculatedHeight);
     };
 
     const observer = new ResizeObserver(updateHeight);
     observer.observe(formEl);
-    
+
     // Immediate update after mount
     updateHeight();
 
-    window.addEventListener('resize', updateHeight);
+    window.addEventListener("resize", updateHeight);
     return () => {
       observer.disconnect();
-      window.removeEventListener('resize', updateHeight);
+      window.removeEventListener("resize", updateHeight);
     };
   }, []);
 
@@ -273,10 +277,20 @@ export function ContactForm({ data, className }: ContactFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Basic validation
-    if (!formData.name || !formData.email || !formData.message || !privacyAccepted) {
-      setError(formConfig?.errorRequiredFields || (locale === 'zh' ? "请填写必填字段" : "Please fill in required fields"));
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.message ||
+      !privacyAccepted
+    ) {
+      setError(
+        formConfig?.errorRequiredFields ||
+          (locale === "zh"
+            ? "请填写必填字段"
+            : "Please fill in required fields"),
+      );
       return;
     }
 
@@ -341,21 +355,36 @@ export function ContactForm({ data, className }: ContactFormProps) {
         }, 5000);
       } else {
         const errorData = await res.json();
-        setError(errorData.error || (formConfig?.errorNetworkMessage || (locale === 'zh' ? "提交失败，请重试" : "Failed to submit form. Please try again.")));
+        setError(
+          errorData.error ||
+            formConfig?.errorNetworkMessage ||
+            (locale === "zh"
+              ? "提交失败，请重试"
+              : "Failed to submit form. Please try again."),
+        );
       }
     } catch (err) {
       console.error("Submission error:", err);
-      setError(formConfig?.errorNetworkMessage || (locale === 'zh' ? "网络错误，请稍后重试" : "An unexpected error occurred. Please try again."));
+      setError(
+        formConfig?.errorNetworkMessage ||
+          (locale === "zh"
+            ? "网络错误，请稍后重试"
+            : "An unexpected error occurred. Please try again."),
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   // Helper to calculate position relative to design
-  const px = (value: number) => isMobile ? `${(value / MOBILE_DESIGN_WIDTH) * 100}%` : `${(value / DESIGN_WIDTH) * 100}%`;
+  const px = (value: number) =>
+    isMobile
+      ? `${(value / MOBILE_DESIGN_WIDTH) * 100}%`
+      : `${(value / DESIGN_WIDTH) * 100}%`;
   const vw = (value: number) => `${(value / DESIGN_WIDTH) * 100}vw`;
   // Use clamp to prevent items from becoming too large on iPad/Tablet
-  const mvw = (value: number) => `clamp(${value * 0.8}px, ${(value / MOBILE_DESIGN_WIDTH) * 100}vw, ${value * 1.15}px)`;
+  const mvw = (value: number) =>
+    `clamp(${value * 0.8}px, ${(value / MOBILE_DESIGN_WIDTH) * 100}vw, ${value * 1.15}px)`;
 
   // Input style constants
   const inputBg = "rgba(255, 250, 203, 0.25)";
@@ -366,13 +395,19 @@ export function ContactForm({ data, className }: ContactFormProps) {
       id="contact-form"
       className={cn(
         "relative w-full overflow-hidden flex flex-col lg:block",
-        className
+        className,
       )}
       style={{
-        height: isMobile ? "auto" : (sectionHeight > 0 ? `${sectionHeight}px` : vw(DESIGN_HEIGHT)),
+        height: isMobile
+          ? "auto"
+          : sectionHeight > 0
+            ? `${sectionHeight}px`
+            : vw(DESIGN_HEIGHT),
         marginLeft: isMobile ? mvw(20) : px(SECTION_X_OFFSET),
         marginRight: isMobile ? mvw(20) : px(SECTION_X_OFFSET),
-        width: isMobile ? `calc(100% - ${mvw(40)})` : `calc(100% - ${px(SECTION_X_OFFSET * 2)})`,
+        width: isMobile
+          ? `calc(100% - ${mvw(40)})`
+          : `calc(100% - ${px(SECTION_X_OFFSET * 2)})`,
         borderRadius: isMobile ? mvw(20) : vw(30),
         paddingBottom: isMobile ? mvw(40) : 0,
       }}
@@ -406,7 +441,9 @@ export function ContactForm({ data, className }: ContactFormProps) {
       <h2
         className={cn(
           "font-josefin-sans font-bold text-left",
-          isMobile ? "relative z-10 w-full whitespace-pre-wrap" : "absolute whitespace-pre"
+          isMobile
+            ? "relative z-10 w-full whitespace-pre-wrap"
+            : "absolute whitespace-pre",
         )}
         style={{
           left: isMobile ? 0 : px(153 - SECTION_X_OFFSET),
@@ -420,16 +457,16 @@ export function ContactForm({ data, className }: ContactFormProps) {
         <span
           className="absolute text-transparent"
           style={{
-            WebkitTextStroke: isMobile ? `1px rgba(255, 255, 255, 0.6)` : `2px rgba(255, 255, 255, 0.6)`,
+            WebkitTextStroke: isMobile
+              ? `1px rgba(255, 255, 255, 0.6)`
+              : `2px rgba(255, 255, 255, 0.6)`,
             top: isMobile ? mvw(41.5) : vw(4),
             left: isMobile ? mvw(25.5) : vw(4),
           }}
         >
           {title}
         </span>
-        <span className="relative text-shine">
-          {title}
-        </span>
+        <span className="relative text-shine">{title}</span>
       </h2>
 
       {/* Product Images - Hidden on Mobile to save space, or moved if needed */}
@@ -510,16 +547,20 @@ export function ContactForm({ data, className }: ContactFormProps) {
       )}
 
       {/* Main Content Area - Mobile Stack */}
-      <div 
+      <div
         className={cn(
-          isMobile ? "relative z-10 flex flex-col px-6 items-center lg:items-start" : "contents"
+          isMobile
+            ? "relative z-10 flex flex-col px-6 items-center lg:items-start"
+            : "contents",
         )}
       >
         {/* Helper Title */}
         <h3
           className={cn(
             "font-inter font-semibold animate-pulse-scale whitespace-pre-line",
-            isMobile ? "relative mb-2 w-full max-w-[600px] text-left" : "absolute"
+            isMobile
+              ? "relative mb-2 w-full max-w-[600px] text-left"
+              : "absolute",
           )}
           style={{
             left: isMobile ? 0 : px(800 - SECTION_X_OFFSET),
@@ -539,7 +580,9 @@ export function ContactForm({ data, className }: ContactFormProps) {
         <p
           className={cn(
             "font-inter whitespace-pre-line",
-            isMobile ? "relative mb-8 w-full max-w-[600px] text-left" : "absolute"
+            isMobile
+              ? "relative mb-8 w-full max-w-[600px] text-left"
+              : "absolute",
           )}
           style={{
             left: isMobile ? 0 : px(800 - SECTION_X_OFFSET),
@@ -561,7 +604,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
           onSubmit={handleSubmit}
           className={cn(
             "flex flex-col",
-            isMobile ? "relative w-full max-w-[600px]" : "absolute"
+            isMobile ? "relative w-full max-w-[600px]" : "absolute",
           )}
           style={{
             left: isMobile ? 0 : px(1251 - SECTION_X_OFFSET),
@@ -574,7 +617,12 @@ export function ContactForm({ data, className }: ContactFormProps) {
           <input
             type="text"
             name="name"
-            placeholder={getFieldConfig('name')?.placeholder || (locale === 'zh' ? "您的姓名 / 公司名称" : "Your Name / Company Name")}
+            placeholder={
+              getFieldConfig("name")?.placeholder ||
+              (locale === "zh"
+                ? "您的姓名 / 公司名称"
+                : "Your Name / Company Name")
+            }
             value={formData.name}
             onChange={handleInputChange}
             spellCheck="false"
@@ -593,7 +641,10 @@ export function ContactForm({ data, className }: ContactFormProps) {
           <input
             type="email"
             name="email"
-            placeholder={getFieldConfig('email')?.placeholder || (locale === 'zh' ? "您的邮箱" : "Your Email")}
+            placeholder={
+              getFieldConfig("email")?.placeholder ||
+              (locale === "zh" ? "您的邮箱" : "Your Email")
+            }
             value={formData.email}
             onChange={handleInputChange}
             spellCheck="false"
@@ -625,20 +676,25 @@ export function ContactForm({ data, className }: ContactFormProps) {
               onChange={(phone) =>
                 setFormData((prev) => ({ ...prev, whatsapp: phone }))
               }
-              placeholder={getFieldConfig('whatsapp')?.placeholder || (locale === 'zh' ? "您的 WhatsApp / 电话" : "Your WhatsApp / Phone")}
+              placeholder={
+                getFieldConfig("whatsapp")?.placeholder ||
+                (locale === "zh"
+                  ? "您的 WhatsApp / 电话"
+                  : "Your WhatsApp / Phone")
+              }
               disabled={isSubmitting}
               className="!bg-transparent !border-none !h-full"
               buttonClassName="!bg-transparent !border-r-0 !text-white hover:!bg-white/10 !px-4 !h-full"
               inputClassName={cn(
                 "!bg-transparent !text-white !placeholder-white/95 !font-anaheim !font-semibold !h-full [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]",
-                isMobile ? "!pl-2" : "!text-[0.833vw]"
+                isMobile ? "!pl-2" : "!text-[0.833vw]",
               )}
               inputStyle={{
                 fontSize: isMobile ? mvw(16) : vw(16),
               }}
               dialCodeClassName={cn(
                 "!text-white",
-                !isMobile && "!text-[0.833vw]"
+                !isMobile && "!text-[0.833vw]",
               )}
               dialCodeStyle={{
                 fontSize: isMobile ? mvw(16) : vw(16),
@@ -665,7 +721,10 @@ export function ContactForm({ data, className }: ContactFormProps) {
               }}
             >
               <option value="" className="text-black">
-                {getFieldConfig('country')?.placeholder || (locale === 'zh' ? "选择国家/地区..." : "Select Country/Region...")}
+                {getFieldConfig("country")?.placeholder ||
+                  (locale === "zh"
+                    ? "选择国家/地区..."
+                    : "Select Country/Region...")}
               </option>
               {COUNTRIES.map(([name, iso2, dialCode]) => {
                 return (
@@ -683,7 +742,10 @@ export function ContactForm({ data, className }: ContactFormProps) {
           {/* Input 4: Message (textarea) */}
           <textarea
             name="message"
-            placeholder={getFieldConfig('message')?.placeholder || (locale === 'zh' ? "留言" : "Message")}
+            placeholder={
+              getFieldConfig("message")?.placeholder ||
+              (locale === "zh" ? "留言" : "Message")
+            }
             value={formData.message}
             onChange={handleInputChange}
             spellCheck="false"
@@ -703,7 +765,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
           {/* Privacy Consent Checkbox */}
           {privacyText && (
             <div
-              className="flex items-start gap-3 mt-2 cursor-pointer group"
+              className="flex items-start gap-3 cursor-pointer group"
               onClick={() => handlePrivacyToggle(!privacyAccepted)}
             >
               <div
@@ -721,7 +783,10 @@ export function ContactForm({ data, className }: ContactFormProps) {
               >
                 {privacyAccepted && (
                   <svg
-                    style={{ width: isMobile ? mvw(14) : vw(14), height: isMobile ? mvw(14) : vw(14) }}
+                    style={{
+                      width: isMobile ? mvw(14) : vw(14),
+                      height: isMobile ? mvw(14) : vw(14),
+                    }}
                     className="text-white"
                     fill="none"
                     stroke="currentColor"
@@ -736,15 +801,19 @@ export function ContactForm({ data, className }: ContactFormProps) {
                   </svg>
                 )}
               </div>
-              <p
-                className="font-anaheim text-left select-none text-white/90 whitespace-pre-line"
+              <div
+                className="font-anaheim text-left select-none text-white/90 whitespace-pre-line prose-none rich-text-privacy [&_p]:m-0"
                 style={{
-                  fontSize: isMobile ? mvw(14) : vw(14),
+                  fontSize: isMobile ? mvw(14) : "16px",
                   lineHeight: isMobile ? mvw(18) : vw(18),
                 }}
               >
-                {privacyText}
-              </p>
+                {typeof privacyText === "object" ? (
+                  <RichText data={privacyText as any} />
+                ) : (
+                  privacyText
+                )}
+              </div>
             </div>
           )}
 
@@ -752,7 +821,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
           <label
             className={cn(
               "flex items-center justify-center gap-2 cursor-pointer transition-all duration-300 hover:opacity-100 hover:bg-white/20 hover:border-white",
-              isMobile ? "self-start w-full" : "self-end"
+              isMobile ? "self-start w-full" : "self-end",
             )}
             style={{
               width: isMobile ? "100%" : vw(256),
@@ -760,7 +829,6 @@ export function ContactForm({ data, className }: ContactFormProps) {
               border: "1px solid rgba(255, 255, 255, 0.46)",
               borderRadius: isMobile ? mvw(25) : vw(33.5),
               opacity: 0.61,
-              marginTop: isMobile ? mvw(8) : vw(10),
             }}
           >
             <input
@@ -780,22 +848,28 @@ export function ContactForm({ data, className }: ContactFormProps) {
               className="font-anaheim font-semibold text-white"
               style={{ fontSize: isMobile ? mvw(18) : vw(24) }}
             >
-              {file ? file.name.substring(0, 15) + "..." : (getFieldConfig('file')?.label || (locale === 'zh' ? "上传文件" : "Upload File"))}
+              {file
+                ? file.name.substring(0, 15) + "..."
+                : getFieldConfig("file")?.label ||
+                  (locale === "zh" ? "上传文件" : "Upload File")}
             </span>
           </label>
 
           {/* Status Messages */}
           {submitted && (
             <div
-              className="text-green-400 font-anaheim mt-4 text-center w-full"
+              className="text-green-400 font-anaheim text-center w-full"
               style={{ fontSize: isMobile ? mvw(16) : vw(18) }}
             >
-              {formConfig?.successMessage || (locale === 'zh' ? "询盘发送成功！我们将尽快联系您。" : "Inquiry sent successfully! We will contact you soon.")}
+              {formConfig?.successMessage ||
+                (locale === "zh"
+                  ? "询盘发送成功！我们将尽快联系您。"
+                  : "Inquiry sent successfully! We will contact you soon.")}
             </div>
           )}
           {error && (
             <div
-              className="text-red-400 font-anaheim mt-4 text-center w-full"
+              className="text-red-400 font-anaheim text-center w-full"
               style={{ fontSize: isMobile ? mvw(16) : vw(18) }}
             >
               {error}
@@ -812,7 +886,8 @@ export function ContactForm({ data, className }: ContactFormProps) {
               backgroundColor: "#9C9032",
               borderRadius: isMobile ? mvw(30) : vw(63),
               fontSize: isMobile ? mvw(24) : vw(32),
-              marginTop: isMobile ? mvw(10) : vw(10),
+              gap: isMobile ? mvw(16) : vw(20),
+              marginTop: 0,
               boxShadow: "0 4px 15px rgba(0, 0, 0, 0.2)",
             }}
             initial={{ rotate: 0, scale: 1 }}
@@ -836,9 +911,11 @@ export function ContactForm({ data, className }: ContactFormProps) {
               !!privacyText && !privacyAccepted ? "grayscale opacity-80" : ""
             }`}
           >
-              {isSubmitting 
-              ? (formConfig?.submittingText || (locale === 'zh' ? "发送中..." : "Sending...")) 
-              : (formConfig?.submitButtonText || (locale === 'zh' ? "发送询盘" : "Send Inquiry"))}
+            {isSubmitting
+              ? formConfig?.submittingText ||
+                (locale === "zh" ? "发送中..." : "Sending...")
+              : formConfig?.submitButtonText ||
+                (locale === "zh" ? "发送询盘" : "Send Inquiry")}
           </motion.button>
         </form>
       </div>

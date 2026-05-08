@@ -21,7 +21,8 @@
     "searchProducts": "Producten zoeken...",
     "applyFilter": "Filter toepassen",
     "featuredOnly": "Alleen uitgelicht",
-    "sortBy": "Sorteren op"
+    "sortBy": "Sorteren op",
+    "inquiryFooterHint": "Klik Op Verzenden Om Uw Aanvraag Met Aanvullende Details Te Voltooien"
   },
   "ContactPage": {
     "title": "Neem contact op",

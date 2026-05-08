@@ -246,6 +246,8 @@ export interface MainFormData {
   designTextRight: string
   image1: ImageObject | null
   image2: ImageObject | null
+  /** 嵌套的表单完整配置 (depth=2) */
+  formConfig?: any
 }
 
 /**

@@ -21,7 +21,8 @@
     "searchProducts": "Buscar productos...",
     "applyFilter": "Aplicar filtro",
     "featuredOnly": "Solo destacados",
-    "sortBy": "Ordenar por"
+    "sortBy": "Ordenar por",
+    "inquiryFooterHint": "Haga Clic En Enviar Para Completar Su Consulta Con Detalles Adicionales"
   },
   "ContactPage": {
     "title": "Contáctanos",
