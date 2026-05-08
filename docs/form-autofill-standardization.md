@@ -7,7 +7,8 @@ This document outlines the standardized approach for implementing form input sty
 ### Transparent/Gradient Theme (e.g., FAQ Section)
 - **Background**: `#211c0b2e` (18% Opacity Dark Olive)
 - **Border/Stroke**: `1px solid #ffffff57` (34% Opacity White)
-- **Text Color**: `rgba(255, 255, 255, 0.5)`
+- **Text Color**: `#FFFFFF` (100% Opacity - for user input and autofill)
+- **Placeholder Color**: `rgba(255, 255, 255, 0.5)`
 - **Font**: Anaheim (600 Weight)
 
 ### Opaque/Solid Theme (e.g., Application Section)
@@ -80,7 +81,7 @@ input:-webkit-autofill {
 .faq-input-el:-webkit-autofill,
 .faq-input-el:-webkit-autofill:hover,
 .faq-input-el:-webkit-autofill:focus {
-  -webkit-text-fill-color: rgba(255, 255, 255, 0.5) !important;
+  -webkit-text-fill-color: #FFFFFF !important;
   transition: background-color 5000000s ease-in-out 0s !important;
   background-color: transparent !important;
   font-family: var(--font-anaheim), sans-serif !important;
@@ -150,4 +151,6 @@ Across all contact forms, the privacy consent text (the text next to the checkbo
 ### Common Implementation Patterns
 - **Tailwind**: Use `text-sm` (instead of `text-base`) for the paragraph element on desktop.
 - **Style Object**: `style={{ fontSize: isMobile ? "12px" : "14px" }}`.
-- **Color**: Typically uses a lowered opacity (e.g., `text-white/70`, `text-gray-500`, or `text-[#4B3A02]/80`) to differentiate from primary form labels.
+- **Color**: 
+  - Standard: Typically uses a lowered opacity (e.g., `text-gray-500` or `text-[#4B3A02]/80`).
+  - **Premium (Transparent Theme)**: Uses `#FFFFFF` (100% opacity) for maximum readability against dark/gradient backgrounds.
