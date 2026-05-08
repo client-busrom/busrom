@@ -63,13 +63,13 @@ export function SupportContactFormSection({
   >("idle");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
-  const [formHeight, setFormHeight] = useState(0);
+
   const formRef = useRef<HTMLFormElement>(null);
   const STORAGE_KEY = "busrom_privacy_consent";
 
   const [isMobile, setIsMobile] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(
-    COUNTRIES.find((c) => c[1] === "CN") || COUNTRIES[0],
+    COUNTRIES.find((c) => c[1] === "US") || COUNTRIES[0],
   );
   const [openCountrySelector, setOpenCountrySelector] = useState(false);
   const countrySelectorRef = useRef<HTMLDivElement>(null);
@@ -170,17 +170,7 @@ export function SupportContactFormSection({
     return () => clearInterval(interval);
   }, [validImages.length]);
 
-  useEffect(() => {
-    const form = formRef.current;
-    if (!form) return;
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setFormHeight(entry.contentRect.height);
-      }
-    });
-    observer.observe(form);
-    return () => observer.disconnect();
-  }, []);
+
 
   const handleInputChange = (fieldName: string, value: string) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }));
@@ -320,13 +310,53 @@ export function SupportContactFormSection({
         background: "linear-gradient(118.81deg, #9A9357 0%, #373100 100%)",
       } : {
         minHeight: vw(922),
-        height: `calc(${vw(91)} + ${formHeight}px + ${vw(100)})`,
+        paddingTop: vw(100),
+        paddingBottom: vw(100),
         background: "linear-gradient(118.81deg, #9A9357 0%, #373100 100%)",
       }}
     >
+      <style jsx>{`
+        .support-input-el:-webkit-autofill,
+        .support-input-el:-webkit-autofill:hover,
+        .support-input-el:-webkit-autofill:focus,
+        .support-input-el:-webkit-autofill:active {
+          -webkit-text-fill-color: white !important;
+          -webkit-box-shadow: 0 0 0px 1000px #746D37 inset !important;
+          transition: background-color 5000s ease-in-out 0s;
+          font-family: var(--font-anaheim), sans-serif !important;
+          font-weight: 600 !important;
+          caret-color: white !important;
+          outline: none !important;
+        }
+        .support-input-el:focus {
+          outline: none !important;
+          box-shadow: none !important;
+        }
+        .support-input-el {
+          caret-color: white !important;
+          font-size: ${isMobile ? mvw(16) : vw(16)} !important;
+        }
+        .support-phone-prefix {
+          color: #FFFFFF !important;
+          font-size: ${isMobile ? mvw(16) : vw(16)} !important;
+        }
+        .support-input-el::placeholder {
+          color: rgba(255, 255, 255, 0.5) !important;
+          -webkit-text-fill-color: rgba(255, 255, 255, 0.5) !important;
+        }
+        /* Restore scrollbars as requested */
+        .support-upload-btn:hover {
+          background-color: #756F3F !important;
+        }
+        .support-upload-btn:hover .upload-text,
+        .support-upload-btn:hover .upload-icon {
+          color: white !important;
+          fill: white !important;
+        }
+      `}</style>
       <div className={cn(
         "relative w-full mx-auto",
-        isMobile ? "flex flex-col px-[5%]" : "max-w-[1920px] h-full"
+        isMobile ? "flex flex-col px-[5%]" : "max-w-[1920px]"
       )}>
         {/* Decorative / Text Area */}
         <div className={cn(
@@ -482,7 +512,7 @@ export function SupportContactFormSection({
         {/* Right Side: Form */}
         <div
           className={cn(isMobile ? "w-full max-w-[640px] mx-auto" : "relative z-20")}
-          style={!isMobile ? { marginLeft: vw(1289), marginTop: vw(91), width: vw(486) } : {}}
+          style={!isMobile ? { marginLeft: vw(1289), width: vw(486) } : {}}
         >
           <form
             id={mergedConfig?.name || formConfig?.name || "support-form"}
@@ -534,28 +564,29 @@ export function SupportContactFormSection({
                           className="w-full h-full rounded-[2px] object-cover"
                         />
                       </div>
-                      <span className="text-white font-anaheim font-semibold text-base">
+                      <span className="support-phone-prefix font-anaheim font-semibold">
                         +{selectedCountry[2]}
                       </span>
                     </button>
 
-                    <input
-                      id={field.fieldName}
-                      name={field.fieldName}
-                      type="tel"
-                      value={
-                        formData[field.fieldName]?.replace(
-                          `+${selectedCountry[2]}`,
-                          "",
-                        ) || ""
-                      }
-                      onChange={(e) =>
-                        handlePhoneChange(field.fieldName, e.target.value)
-                      }
-                      placeholder={`${field.label}${field.required ? " *" : ""}`}
-                      disabled={isSubmitting}
-                      className="flex-1 bg-transparent px-4 outline-none font-anaheim font-semibold text-base text-white placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#746D37_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-                    />
+                      <input
+                        id={field.fieldName}
+                        name={field.fieldName}
+                        type="tel"
+                        autoComplete="tel"
+                        value={
+                          formData[field.fieldName]?.replace(
+                            `+${selectedCountry[2]}`,
+                            "",
+                          ) || ""
+                        }
+                        onChange={(e) =>
+                          handlePhoneChange(field.fieldName, e.target.value)
+                        }
+                        placeholder={`${field.label}${field.required ? " *" : ""}`}
+                        disabled={isSubmitting}
+                        className="support-input-el flex-1 bg-transparent px-4 outline-none font-anaheim font-semibold text-white placeholder:text-white/50"
+                      />
 
                     {openCountrySelector && (
                       <div className="absolute left-0 top-full mt-2 z-[100]">
@@ -586,12 +617,14 @@ export function SupportContactFormSection({
                     )}
                     <div className="relative">
                       <select
+                        id={field.fieldName}
+                        name={field.fieldName}
                         required={field.required}
                         value={formData[field.fieldName] || ""}
                         onChange={(e) =>
                           handleInputChange(field.fieldName, e.target.value)
                         }
-                        className="w-full appearance-none bg-[#746D37] border border-white/34 text-white font-[family-name:var(--font-anaheim)] font-semibold placeholder:text-white/50 focus:outline-none [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#746D37_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                        className="support-input-el w-full appearance-none bg-[#746D37] border border-white/34 text-white font-[family-name:var(--font-anaheim)] font-semibold placeholder:text-white/50 focus:outline-none"
                     style={{
                       height: isMobile ? mvw(50) : vw(63),
                       borderRadius: isMobile ? mvw(12) : vw(15),
@@ -624,26 +657,27 @@ export function SupportContactFormSection({
               }
 
               return (
-                <input
-                  id={field.fieldName}
-                  name={field.fieldName}
-                  key={field.fieldName}
-                  type={field.fieldType === "email" ? "email" : "text"}
-                  placeholder={`${field.label}${field.required ? " *" : ""}`}
-                  spellCheck="false"
-                  className="w-full bg-[#746D37] border border-white/34 px-6 text-white focus:outline-none font-anaheim font-semibold text-lg placeholder:text-white/50 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#746D37_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-                  style={{
-                    height: isMobile ? mvw(50) : vw(63),
-                    borderRadius: isMobile ? mvw(12) : vw(15),
-                    paddingLeft: isMobile ? mvw(16) : vw(24),
-                    fontSize: isMobile ? mvw(16) : vw(16),
-                  }}
-                  value={formData[field.fieldName] || ""}
-                  onChange={(e) =>
-                    handleInputChange(field.fieldName, e.target.value)
-                  }
-                  required={field.required}
-                />
+                  <input
+                    id={field.fieldName}
+                    name={field.fieldName}
+                    key={field.fieldName}
+                    type={field.fieldType === "email" ? "email" : "text"}
+                    autoComplete={field.fieldType === "email" ? "email" : field.fieldName.toLowerCase().includes("name") ? "name" : "on"}
+                    placeholder={`${field.label}${field.required ? " *" : ""}`}
+                    spellCheck="false"
+                    className="support-input-el w-full bg-[#746D37] border border-white/34 px-6 text-white focus:outline-none font-anaheim font-semibold placeholder:text-white/50"
+                    style={{
+                      height: isMobile ? mvw(50) : vw(63),
+                      borderRadius: isMobile ? mvw(12) : vw(15),
+                      paddingLeft: isMobile ? mvw(16) : vw(24),
+                      fontSize: isMobile ? mvw(16) : vw(16),
+                    }}
+                    value={formData[field.fieldName] || ""}
+                    onChange={(e) =>
+                      handleInputChange(field.fieldName, e.target.value)
+                    }
+                    required={field.required}
+                  />
               );
             })}
 
@@ -664,7 +698,7 @@ export function SupportContactFormSection({
                     handleInputChange(field.fieldName, e.target.value)
                   }
                   spellCheck="false"
-                  className="bg-[#746D37] border border-white/34 text-white font-[family-name:var(--font-anaheim)] font-semibold placeholder:text-white/50 resize-none focus:outline-none overflow-y-auto [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#746D37_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                  className="support-input-el bg-[#746D37] border border-white/34 text-white font-[family-name:var(--font-anaheim)] font-semibold placeholder:text-white/50 resize-none focus:outline-none overflow-y-auto"
                   style={{
                     height: isMobile ? mvw(120) : vw(127),
                     borderRadius: isMobile ? mvw(12) : vw(15),
@@ -679,7 +713,7 @@ export function SupportContactFormSection({
             {/* Upload */}
             <div className={cn("flex pr-4", isMobile ? "justify-center" : "justify-end")}>
               <label
-                className="flex items-center cursor-pointer border border-[#756F3F] rounded-full transition-colors hover:bg-black/10"
+                className="support-upload-btn flex items-center cursor-pointer border border-[#756F3F] rounded-full transition-all duration-300"
                 style={{ 
                   height: isMobile ? mvw(50) : vw(59), 
                   borderRadius: isMobile ? mvw(25) : vw(33.5),
@@ -698,14 +732,15 @@ export function SupportContactFormSection({
                   viewBox={CUSTOM_ICONS.upload.viewBox}
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
+                  className="upload-icon transition-colors duration-300"
                 >
                   <path
                     d={CUSTOM_ICONS.upload.path}
-                    fill="#756F3F"
+                    fill="currentColor"
                   />
                 </svg>
                 <span
-                  className="text-[#756F3F] font-anaheim font-semibold ml-2"
+                  className="upload-text text-[#756F3F] font-anaheim font-semibold ml-2 transition-colors duration-300"
                   style={{ fontSize: isMobile ? mvw(18) : vw(24) }}
                 >
                   {fileName ||

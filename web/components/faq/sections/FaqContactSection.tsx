@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { CustomDropdown } from "@/components/ui/CustomDropdown";
 import { ChevronDown } from "lucide-react";
-import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput";
+import { COUNTRIES } from "@/components/ui/PhoneInput";
 import { CountryFlag } from "@/components/ui/CountryFlag";
 import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
 
@@ -227,24 +227,74 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
           color: #FFFFFF !important;
           opacity: 1 !important;
           -webkit-text-fill-color: #FFFFFF !important;
+          caret-color: white !important;
+          font-family: var(--font-anaheim), sans-serif !important;
+          font-weight: 600 !important;
+          font-size: ${isMobile ? mvw(16) : vw(16)} !important;
         }
         .faq-input-el::placeholder {
           color: rgba(255, 255, 255, 0.5) !important;
           opacity: 1 !important;
           -webkit-text-fill-color: rgba(255, 255, 255, 0.5) !important;
+          font-family: var(--font-anaheim), sans-serif !important;
+          font-weight: 600 !important;
         }
         .faq-input-el:-webkit-autofill,
         .faq-input-el:-webkit-autofill:hover,
-        .faq-input-el:-webkit-autofill:focus {
+        .faq-input-el:-webkit-autofill:focus,
+        .faq-input-el:-webkit-autofill:active {
           -webkit-text-fill-color: #FFFFFF !important;
           -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
           transition: background-color 5000s ease-in-out 0s;
+          caret-color: white !important;
+          font-family: var(--font-anaheim), sans-serif !important;
+          font-weight: 600 !important;
+          outline: none !important;
         }
-        /* 针对下拉菜单选定值后的样式 */
-        .faq-dropdown-inner[style*="color: white"] .faq-dropdown-btn-text,
-        .faq-dropdown-inner[style*="color: rgb(255, 255, 255)"] .faq-dropdown-btn-text {
-          color: #FFFFFF !important;
-          opacity: 1 !important;
+        .faq-input-el:focus {
+          outline: none !important;
+          box-shadow: none !important;
+        }
+
+        /* PhoneInput specific autofill */
+        :global(.faq-phone-inner input:-webkit-autofill),
+        :global(.faq-phone-inner input:-webkit-autofill:hover),
+        :global(.faq-phone-inner input:-webkit-autofill:focus),
+        :global(.faq-phone-inner input:-webkit-autofill:active) {
+          -webkit-text-fill-color: #FFFFFF !important;
+          transition: background-color 5000s ease-in-out 0s !important;
+          background-color: transparent !important;
+          caret-color: white !important;
+        }
+
+        .faq-submit-btn:hover:not(:disabled) {
+          background-color: white !important;
+          color: #d1be2e !important;
+        }
+        .faq-upload-btn:hover {
+          background-color: white !important;
+          border-color: white !important;
+        }
+        .faq-upload-btn:hover :global(.upload-icon),
+        .faq-upload-btn:hover .upload-text {
+          color: #645c1d !important;
+        }
+        .faq-phone-wrapper:hover :global(.faq-phone-inner),
+        .faq-dropdown-wrapper:hover :global(.faq-dropdown-inner) {
+          border-color: rgba(255, 255, 255, 0.5) !important;
+        }
+        .faq-phone-wrapper:hover,
+        .faq-dropdown-wrapper:hover {
+          --text-color: rgba(255, 255, 255, 0.5) !important;
+        }
+        :global(.faq-phone-inner input),
+        :global(.faq-phone-text),
+        :global(.faq-dropdown-inner button span) {
+          font-size: ${isMobile ? mvw(16) : vw(16)} !important;
+        }
+        :global(.faq-dropdown-inner button svg) {
+          width: ${isMobile ? mvw(16) : vw(16)} !important;
+          height: ${isMobile ? mvw(16) : vw(16)} !important;
         }
       `}</style>
       <div
@@ -753,83 +803,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
         </div>
       </div>
 
-      <style jsx>{`
-        textarea::-webkit-scrollbar {
-          display: none;
-        }
-        textarea {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        ::placeholder {
-          color: rgba(255, 255, 255, 0.5) !important;
-          font-family: var(--font-anaheim), sans-serif !important;
-          font-weight: 600 !important;
-        }
-        .faq-input-el {
-          color: #FFFFFF !important;
-          -webkit-text-fill-color: #FFFFFF !important;
-          font-family: var(--font-anaheim), sans-serif !important;
-          font-weight: 600 !important;
-          font-size: ${isMobile ? mvw(16) : vw(16)} !important;
-        }
 
-        /* Fix Chrome Autofill Styles */
-        .faq-input-el:-webkit-autofill,
-        .faq-input-el:-webkit-autofill:hover,
-        .faq-input-el:-webkit-autofill:focus {
-          -webkit-text-fill-color: #FFFFFF !important;
-          transition: background-color 5000000s ease-in-out 0s !important;
-          background-color: transparent !important;
-          font-family: var(--font-anaheim), sans-serif !important;
-          font-weight: 600 !important;
-        }
-
-        .faq-submit-btn:hover:not(:disabled) {
-          background-color: white !important;
-          color: #d1be2e !important;
-        }
-        .faq-upload-btn:hover {
-          background-color: white !important;
-          border-color: white !important;
-        }
-        .faq-upload-btn:hover :global(.upload-icon),
-        .faq-upload-btn:hover .upload-text {
-          color: #645c1d !important;
-        }
-        .faq-phone-wrapper:hover :global(.faq-phone-inner),
-        .faq-dropdown-wrapper:hover :global(.faq-dropdown-inner) {
-          border-color: rgba(255, 255, 255, 0.5) !important;
-        }
-        .faq-phone-wrapper:hover,
-        .faq-dropdown-wrapper:hover {
-          --text-color: rgba(255, 255, 255, 0.5) !important;
-        }
-        :global(.faq-phone-inner input),
-        :global(.faq-phone-text),
-        :global(.faq-dropdown-inner button span) {
-          font-size: ${isMobile ? mvw(16) : vw(16)} !important;
-        }
-
-        /* Fix Chrome Autofill for PhoneInput specifically */
-        :global(.faq-phone-inner input:-webkit-autofill),
-        :global(.faq-phone-inner input:-webkit-autofill:hover),
-        :global(.faq-phone-inner input:-webkit-autofill:focus),
-        :global(.faq-phone-inner input:-webkit-autofill:active),
-        :global(.faq-input-el:-webkit-autofill),
-        :global(.faq-input-el:-webkit-autofill:hover),
-        :global(.faq-input-el:-webkit-autofill:focus),
-        :global(.faq-input-el:-webkit-autofill:active) {
-          -webkit-text-fill-color: #FFFFFF !important;
-          transition: background-color 5000000s ease-in-out 0s !important;
-          background-color: transparent !important;
-        }
-
-        :global(.faq-dropdown-inner button svg) {
-          width: ${isMobile ? mvw(16) : vw(16)} !important;
-          height: ${isMobile ? mvw(16) : vw(16)} !important;
-        }
-      `}</style>
     </section>
   );
 }
