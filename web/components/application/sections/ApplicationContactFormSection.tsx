@@ -98,7 +98,7 @@ function CustomDropdown({
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between cursor-pointer font-semibold text-[#9E9474] transition-all hover:bg-black/5"
         style={{
-          height: isMobile ? "48px" : "50px",
+          height: isMobile ? "48px" : "53px",
           backgroundColor: "#D4CBAF",
           paddingLeft: isMobile ? "16px" : "17px",
           paddingRight: isMobile ? "16px" : "17px",
@@ -310,7 +310,7 @@ export function ApplicationContactFormSection({
 
   const renderField = (field: FormField) => {
     const commonStyles: React.CSSProperties = {
-      height: isMobile ? "48px" : "50px",
+      height: isMobile ? "48px" : "53px",
       backgroundColor: "#D4CBAF",
       paddingLeft: isMobile ? "16px" : "17px",
       paddingRight: isMobile ? "16px" : "17px",
@@ -356,7 +356,7 @@ export function ApplicationContactFormSection({
             onChange={(val) => handleInputChange(field.fieldName, val)}
             placeholder={field.placeholder?.trim() || field.label}
             style={{
-              height: isMobile ? "48px" : "50px",
+              height: isMobile ? "48px" : "53px",
               borderRadius: isMobile ? "10px" : "10px",
             }}
             className="!bg-[#D4CBAF] border-none"
@@ -493,10 +493,10 @@ export function ApplicationContactFormSection({
     <section
       className="relative w-full flex items-start justify-center select-none z-20"
       style={{
-        minHeight: "756px",
+        minHeight: isMobile ? "auto" : "900px",
         height: "auto",
         backgroundColor: "#000000",
-        paddingBottom: "154px",
+        paddingBottom: isMobile ? "80px" : "280px",
       }}
     >
       <div className="absolute inset-0">
