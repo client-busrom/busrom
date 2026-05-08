@@ -621,17 +621,15 @@ export function ContactFormSection({
                     )}
 
                     {formConfig?.privacyConsentText && (
-                      <div
-                        className="flex items-center gap-3 my-2 cursor-pointer"
-                        onClick={() => handlePrivacyToggle(!privacyAccepted)}
-                      >
+                      <div className="flex items-center gap-3 my-2">
                         <div
                           className={cn(
-                            "flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all",
+                            "flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer",
                             privacyAccepted
                               ? "bg-white border-white"
                               : "border-white/30",
                           )}
+                          onClick={() => handlePrivacyToggle(!privacyAccepted)}
                         >
                           {privacyAccepted && (
                             <svg
@@ -649,9 +647,16 @@ export function ContactFormSection({
                             </svg>
                           )}
                         </div>
-                        <p className="text-[14px] leading-relaxed text-white/80 select-none">
+                        <Link
+                          href="/privacy-policy"
+                          target="_blank"
+                          className={cn(
+                            "text-[14px] leading-relaxed select-none underline decoration-white/30 underline-offset-4 transition-colors hover:text-[#FFEF72] hover:decoration-[#FFEF72]",
+                            privacyAccepted ? "text-white" : "text-white/70",
+                          )}
+                        >
                           {formConfig.privacyConsentText}
-                        </p>
+                        </Link>
                       </div>
                     )}
 
