@@ -363,8 +363,10 @@ export function OemOdmContactForm({
   };
 
   // 分离字段
-  const textFields = sortedFields.filter((f) =>
-    ["text", "email", "tel", "phone"].includes(f.fieldType),
+  const textFields = sortedFields.filter(
+    (f) =>
+      ["text", "email", "tel", "phone"].includes(f.fieldType) &&
+      f.fieldName !== "othersIndicate",
   );
   const selectFields = sortedFields.filter((f) => f.fieldType === "select");
   const textareaFields = sortedFields.filter((f) => f.fieldType === "textarea");
@@ -519,10 +521,10 @@ export function OemOdmContactForm({
                       <div
                         key={field.fieldName}
                         style={{
-                          backgroundColor: "#F3F1EA",
+                          backgroundColor: "#F3EDD4",
                           border: "1px solid rgba(117, 111, 63, 0.1)",
                         }}
-                        className="rounded-[10px] h-[50px] flex items-center overflow-hidden"
+                        className="rounded-[10px] h-[50px] flex items-center"
                       >
                         {isPhone ? (
                           <PhoneInput
@@ -818,8 +820,12 @@ export function OemOdmContactForm({
                           onChange={(e) =>
                             handleChange("othersIndicate", e.target.value)
                           }
-                          className="w-full bg-[rgba(33,28,11,0.2)] rounded-[10px] px-4 h-[50px] text-base font-semibold text-white outline-none border border-transparent focus:border-white/20 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
-                          placeholder="Please indicate here"
+                          className="w-full bg-[#F3EDD4] border border-[rgba(117,111,63,0.1)] rounded-[10px] px-6 h-[50px] text-base font-semibold text-[rgba(117,111,63,0.7)] outline-none placeholder-[rgba(117,111,63,0.4)] [&:-webkit-autofill]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:rgba(117,111,63,0.7)!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                          placeholder={
+                            (sortedFields.find(f => f.fieldName === "othersIndicate")?.placeholder) || 
+                            checkboxFields[0].placeholder || 
+                            "Please indicate here"
+                          }
                         />
                       )}
                     </div>
