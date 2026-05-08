@@ -1,17 +1,20 @@
 "use client";
 
-import React, { FormEvent, useState, useEffect } from "react";
+import React, { FormEvent, useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { CustomDropdown } from "@/components/ui/CustomDropdown";
-import { Upload } from "lucide-react";
-import { PhoneInput } from "@/components/ui/PhoneInput";
+import { Upload, ChevronDown } from "lucide-react";
+import { PhoneInput, COUNTRIES } from "@/components/ui/PhoneInput";
+import { CountryFlag } from "@/components/ui/CountryFlag";
+import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
 
 import { cn } from "@/lib/utils";
 
 const DESIGN_WIDTH = 1920;
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
-const mvw = (px: number) => `clamp(${px * 0.6}px, ${(px / 390) * 100}vw, ${px}px)`;
+const mvw = (px: number) =>
+  `clamp(${px * 0.6}px, ${(px / 390) * 100}vw, ${px}px)`;
 
 interface FaqContactSectionProps {
   data: {
@@ -41,6 +44,26 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // WhatsApp / Phone Atomic State
+  const [selectedCountry, setSelectedCountry] = useState<
+    [string, string, string]
+  >(COUNTRIES[0]);
+  const [isCountrySelectorOpen, setIsCountrySelectorOpen] = useState(false);
+  const countrySelectorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        countrySelectorRef.current &&
+        !countrySelectorRef.current.contains(event.target as Node)
+      ) {
+        setIsCountrySelectorOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Fetch form config for privacy text and other messages
@@ -159,11 +182,11 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
 
       if (res.ok) {
         // GTM Tracking
-        if (typeof window !== 'undefined' && (window as any).dataLayer) {
+        if (typeof window !== "undefined" && (window as any).dataLayer) {
           (window as any).dataLayer.push({
-            event: 'form_submit_success',
+            event: "form_submit_success",
             form_id: formConfig?.name || "faq-contact-form",
-            form_name: formConfig?.name || "faq-contact-form"
+            form_name: formConfig?.name || "faq-contact-form",
           });
         }
         setSubmitted(true);
@@ -182,25 +205,35 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
   return (
     <section
       className="relative w-full overflow-hidden"
-      style={isMobile ? {
-        background: "linear-gradient(103deg, #645c1d 0%, #fff587 100%)",
-        paddingTop: mvw(80),
-        paddingBottom: mvw(100),
-      } : {
-        minHeight: vw(922),
-        background: "linear-gradient(103deg, #645c1d 0%, #fff587 100%)",
-        paddingTop: vw(80),
-        paddingBottom: vw(80),
-      }}
+      style={
+        isMobile
+          ? {
+              background: "linear-gradient(103deg, #645c1d 0%, #fff587 100%)",
+              paddingTop: mvw(80),
+              paddingBottom: mvw(100),
+            }
+          : {
+              minHeight: vw(922),
+              background: "linear-gradient(103deg, #645c1d 0%, #fff587 100%)",
+              paddingTop: vw(80),
+              paddingBottom: vw(80),
+            }
+      }
     >
       <div
         className={cn(
           "relative z-10 w-full mx-auto flex",
-          isMobile ? "flex-col px-[5%]" : "px-[10.8%] gap-[3.8%]"
+          isMobile ? "flex-col px-[5%]" : "px-[10.8%] gap-[3.8%] items-center",
         )}
       >
         {/* Left Side: Content & Form */}
-        <div className={cn("flex flex-col relative z-10", isMobile ? "w-full max-w-[640px] mx-auto text-center" : "")} style={!isMobile ? { width: vw(710) } : {}}>
+        <div
+          className={cn(
+            "flex flex-col relative z-10",
+            isMobile ? "w-full max-w-[640px] mx-auto text-center" : "",
+          )}
+          style={!isMobile ? { width: vw(710) } : {}}
+        >
           {/* Titles */}
           <div style={{ marginBottom: isMobile ? mvw(16) : vw(16) }}>
             {titleParts[0] && (
@@ -237,7 +270,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
             <p
               className="text-white font-semibold"
               style={{
-                fontSize: isMobile ? mvw(18) : vw(24),
+                fontSize: isMobile ? mvw(16) : vw(16),
                 lineHeight: 1.3,
                 fontFamily: "var(--font-anaheim), sans-serif",
                 marginBottom: isMobile ? mvw(24) : vw(16),
@@ -253,7 +286,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
             onSubmit={handleSubmit}
             className={cn(
               "grid items-end",
-              isMobile ? "grid-cols-1 w-full" : "grid-cols-2"
+              isMobile ? "grid-cols-1 w-full" : "grid-cols-2",
             )}
             style={{
               gap: isMobile ? mvw(12) : vw(12),
@@ -263,7 +296,11 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
             {formConfig?.fields?.map((field: any) => (
               <div
                 key={field.fieldName}
-                className={isMobile || field.width === "full" ? "col-span-2" : "col-span-1"}
+                className={
+                  isMobile || field.width === "full"
+                    ? "col-span-2"
+                    : "col-span-1"
+                }
               >
                 {field.fieldType === "select" && (
                   <label
@@ -286,8 +323,8 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                     style={{
                       width: "100%",
                       height: isMobile ? mvw(100) : vw(120),
-                      background: "#877f42",
-                      border: "1px solid rgba(255, 255, 255, 0.3)",
+                      background: "#211c0b2e",
+                      border: "1px solid #ffffff57",
                       borderRadius: isMobile ? mvw(12) : vw(15),
                       padding: isMobile ? mvw(12) : vw(16),
                       resize: "none",
@@ -319,8 +356,8 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                       className="border-none faq-dropdown-inner"
                       style={{
                         borderRadius: isMobile ? mvw(12) : vw(15),
-                        border: "1px solid rgba(255, 255, 255, 0.3)",
-                        background: "#877f42",
+                        border: "1px solid #ffffff57",
+                        background: "#211c0b2e",
                         color: "rgba(255, 255, 255, 0.5)",
                       }}
                       buttonClassName="!px-4 !font-anaheim !font-semibold faq-dropdown-btn-text"
@@ -336,9 +373,9 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                         width: isMobile ? "100%" : "fit-content",
                         height: isMobile ? mvw(50) : vw(60),
                         borderRadius: isMobile ? mvw(50) : vw(65),
-                        border: "1px solid rgba(255, 255, 255, 0.3)",
+                        border: "1px solid #ffffff57",
                         padding: isMobile ? `0 ${mvw(20)}` : `0 ${vw(50)}`,
-                        background: "#877f42",
+                        background: "#211c0b2e",
                         gap: isMobile ? mvw(12) : vw(12),
                         justifyContent: isMobile ? "center" : "flex-start",
                       }}
@@ -381,31 +418,96 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                       </span>
                     </label>
                   </div>
-                ) : field.fieldName === "whatsapp" ||
+                 ) : field.fieldName === "whatsapp" ||
                   field.fieldType === "tel" ? (
-                  <div className="faq-phone-wrapper" style={{ height: isMobile ? mvw(50) : vw(60) }}>
-                    <PhoneInput
-                      value={formData[field.fieldName] || ""}
-                      onChange={(phone) =>
-                        setFormData({ ...formData, [field.fieldName]: phone })
-                      }
-                      placeholder={
-                        (field.required ? "* " : "") + field.placeholder
-                      }
-                      className="border-none faq-phone-inner"
+                  <div
+                    className="faq-phone-wrapper relative"
+                    ref={countrySelectorRef}
+                    style={{ height: isMobile ? mvw(50) : vw(60) }}
+                  >
+                    <div
+                      className="flex items-stretch overflow-hidden h-full w-full"
                       style={{
                         borderRadius: isMobile ? mvw(12) : vw(15),
-                        border: "1px solid rgba(255, 255, 255, 0.3)",
-                        background: "#877f42",
+                        border: "1px solid #ffffff57",
+                        background: "#211c0b2e",
                         color: "rgba(255, 255, 255, 0.5)",
                       }}
-                      inputClassName="!bg-transparent !text-white/50 !font-semibold !font-anaheim placeholder:!text-white/50"
-                      dialCodeClassName="!font-semibold !font-anaheim !border-none faq-phone-text"
-                      dropdownClassName={`!bg-[#3d3713] !border-white/20 !rounded-[${isMobile ? mvw(12) : vw(15)}]`}
-                      searchInputClassName="!bg-white/5 !border-white/20 !text-white/50"
-                      countryItemClassName="!text-white/80"
-                      buttonClassName="!border-none faq-phone-btn"
-                    />
+                    >
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setIsCountrySelectorOpen(!isCountrySelectorOpen)
+                        }
+                        className="h-full flex items-center justify-center gap-2 border-r border-white/20 transition-all hover:bg-white/5"
+                        style={{
+                          paddingLeft: isMobile ? mvw(12) : vw(16),
+                          paddingRight: isMobile ? mvw(8) : vw(12),
+                        }}
+                      >
+                        <CountryFlag
+                          countryCode={selectedCountry[1]}
+                          className={isMobile ? "w-5 h-3" : "w-6 h-4"}
+                        />
+                        <span
+                          className="font-semibold"
+                          style={{
+                            fontSize: isMobile ? mvw(14) : vw(16),
+                            color: "white",
+                            fontFamily: "var(--font-anaheim), sans-serif",
+                          }}
+                        >
+                          +{selectedCountry[2]}
+                        </span>
+                        <ChevronDown
+                          className={cn(
+                            "transition-transform duration-200 text-white/50",
+                            isCountrySelectorOpen && "rotate-180",
+                          )}
+                          size={isMobile ? 14 : 16}
+                        />
+                      </button>
+
+                      <input
+                        type="tel"
+                        value={formData[field.fieldName] || ""}
+                        onChange={(e) => {
+                          setFormData({
+                            ...formData,
+                            [field.fieldName]: e.target.value,
+                          });
+                        }}
+                        placeholder={
+                          (field.required ? "* " : "") + field.placeholder
+                        }
+                        className="faq-input-el flex-1 min-w-0 bg-transparent border-none outline-none font-semibold"
+                        style={{
+                          paddingLeft: isMobile ? mvw(12) : vw(16),
+                          paddingRight: isMobile ? mvw(12) : vw(16),
+                          color: "rgba(255, 255, 255, 0.5)",
+                          fontSize: isMobile ? mvw(16) : vw(16),
+                          fontFamily: "var(--font-anaheim), sans-serif",
+                        }}
+                      />
+                    </div>
+
+                    {isCountrySelectorOpen && (
+                      <div
+                        className="absolute left-0 bottom-full mb-2 z-[100]"
+                        style={{
+                          width: isMobile ? "280px" : "320px",
+                        }}
+                      >
+                        <CountrySelectorList
+                          onSelect={(c) => {
+                            setSelectedCountry(c);
+                            setIsCountrySelectorOpen(false);
+                          }}
+                          onClose={() => setIsCountrySelectorOpen(false)}
+                          className="!bg-[#3d3713] !border-white/20 !text-white/80"
+                        />
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <input
@@ -414,8 +516,8 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                     style={{
                       width: "100%",
                       height: isMobile ? mvw(50) : vw(60),
-                      background: "#877f42",
-                      border: "1px solid rgba(255, 255, 255, 0.3)",
+                      background: "#211c0b2e",
+                      border: "1px solid #ffffff57",
                       borderRadius: isMobile ? mvw(12) : vw(15),
                       padding: isMobile ? `0 ${mvw(16)}` : `0 ${vw(16)}`,
                       color: "rgba(255, 255, 255, 0.5)",
@@ -469,12 +571,12 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                       </svg>
                     )}
                   </div>
-                  <p className="text-sm md:text-base leading-relaxed text-white/70 select-none text-left whitespace-pre-line">
+                  <p className="text-sm leading-relaxed text-white/70 select-none text-left whitespace-pre-line">
                     {privacyText}
                   </p>
                 </div>
               )}
-               <motion.button
+              <motion.button
                 style={{
                   transformOrigin: "center",
                   width: "100%",
@@ -549,7 +651,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
         <div
           className={cn(
             "flex pointer-events-none relative",
-            isMobile ? "w-full justify-center mt-12" : ""
+            isMobile ? "w-full justify-center mt-12" : "",
           )}
           style={{
             zIndex: 0,
@@ -604,14 +706,14 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
           font-weight: 600 !important;
           font-size: ${isMobile ? mvw(16) : vw(16)} !important;
         }
-        
+
         /* Fix Chrome Autofill Styles */
         .faq-input-el:-webkit-autofill,
         .faq-input-el:-webkit-autofill:hover,
         .faq-input-el:-webkit-autofill:focus {
-          -webkit-text-fill-color: white !important;
-          -webkit-box-shadow: 0 0 0px 1000px #877f42 inset !important;
-          transition: background-color 5000s ease-in-out 0s;
+          -webkit-text-fill-color: rgba(255, 255, 255, 0.5) !important;
+          transition: background-color 5000000s ease-in-out 0s !important;
+          background-color: transparent !important;
           font-family: var(--font-anaheim), sans-serif !important;
           font-weight: 600 !important;
         }
@@ -641,7 +743,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
         :global(.faq-dropdown-inner button span) {
           font-size: ${isMobile ? mvw(16) : vw(16)} !important;
         }
-        
+
         /* Fix Chrome Autofill for PhoneInput specifically */
         :global(.faq-phone-inner input:-webkit-autofill),
         :global(.faq-phone-inner input:-webkit-autofill:hover),
@@ -651,9 +753,9 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
         :global(.faq-input-el:-webkit-autofill:hover),
         :global(.faq-input-el:-webkit-autofill:focus),
         :global(.faq-input-el:-webkit-autofill:active) {
-          -webkit-text-fill-color: white !important;
-          -webkit-box-shadow: 0 0 0px 1000px #877f42 inset !important;
-          transition: background-color 9999s ease-in-out 0s !important;
+          -webkit-text-fill-color: rgba(255, 255, 255, 0.5) !important;
+          transition: background-color 5000000s ease-in-out 0s !important;
+          background-color: transparent !important;
         }
 
         :global(.faq-dropdown-inner button svg) {

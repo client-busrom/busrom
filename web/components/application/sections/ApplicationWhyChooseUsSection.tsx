@@ -1,46 +1,59 @@
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { HollowText } from "@/components/common/HollowText";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
-function vw(px: number) {
-  return `${(px / 1920) * 100}vw`;
-}
+const DESIGN_WIDTH = 1920;
+const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
 
-export interface WhyChooseUsItemPart {
-  text: string;
-  bold?: boolean;
-}
-
-export interface WhyChooseUsItem {
+interface WhyChooseUsItem {
   id: string;
   number: string;
   title: string;
   description: string;
-  descriptionParts?: WhyChooseUsItemPart[];
+  descriptionParts?: { text: string; bold?: boolean }[];
   imageLeft: string;
   imageRight: string;
-}
-
-interface ApplicationWhyChooseUsSectionProps {
-  decorate?: string;
-  title?: string;
-  items?: WhyChooseUsItem[];
 }
 
 const defaultItems: WhyChooseUsItem[] = [
   {
     id: "1",
     number: "01",
-    title: "Customized Engineering Solutions",
+    title: "Customized\nEngineering Solutions",
     description:
-      "Dimensions, Materials, And Surface Treatments Can Be Selected According To Project Requirements To Achieve A Customized Solution For Each Project.",
-    imageLeft: "/images/application/work.jpg",
-    imageRight: "/images/application/engineer.jpg",
+      "We provide tailor-made engineering designs and technical support for high-end applications, ensuring optimal performance and efficiency for your specific needs.",
+    imageLeft: "/images/application/why-1.png",
+    imageRight: "/images/application/why-2.png",
+  },
+  {
+    id: "2",
+    number: "02",
+    title: "Rigorous Quality\nControl Systems",
+    description:
+      "Our multi-stage testing and inspection processes guarantee that every product meets the highest international standards, providing reliability in the most demanding environments.",
+    imageLeft: "/images/application/why-3.png",
+    imageRight: "/images/application/why-4.png",
+  },
+  {
+    id: "3",
+    number: "03",
+    title: "Global Supply\nChain Excellence",
+    description:
+      "Leveraging our extensive network, we ensure stable material sourcing and efficient logistics, reducing lead times and costs for your large-scale global projects.",
+    imageLeft: "/images/application/why-5.png",
+    imageRight: "/images/application/why-6.png",
   },
 ];
+
+interface ApplicationWhyChooseUsSectionProps {
+  decorate?: string;
+  title?: string;
+  items?: WhyChooseUsItem[];
+}
 
 export function ApplicationWhyChooseUsSection({
   decorate = "Why",
@@ -59,17 +72,24 @@ export function ApplicationWhyChooseUsSection({
       className="relative w-full select-none"
       style={{ height: vw(922) }}
     >
+      {/* 
+        Main 1920 container with overflow-hidden to clip width overflow.
+        Shifted up to allow top text to be visible within its clipped boundary.
+      */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 h-full"
-        style={{ width: vw(1920) }}
+        className="absolute left-1/2 -translate-x-1/2 overflow-hidden"
+        style={{ 
+          width: vw(1920), 
+          top: vw(-150), 
+          height: vw(922 + 150) 
+        }}
       >
-        {/* Left Gradient Box & Clipped "Why" Title */}
-        {/* Rectangle 402: x=0, y=3, w=550, h=919 */}
+        {/* Left Gradient Box & Clipped "Why" Title (White Layer) */}
         <div
           className="absolute overflow-hidden"
           style={{
             left: 0,
-            top: vw(3),
+            top: vw(3 + 150),
             width: vw(550),
             height: vw(919),
             zIndex: 10,
@@ -83,14 +103,14 @@ export function ApplicationWhyChooseUsSection({
             }}
           />
 
-          {/* Why Title (White Hollow version - Clipped by this container) */}
+          {/* Layer 1: White Hollow Title (Clipped by box) */}
           <HollowText
             strokeColor="#FFFFFF"
             strokeWidth={1.5}
             className="absolute font-extrabold whitespace-nowrap"
             style={{
               left: vw(495.5),
-              top: vw(-103), // Compensate for vw(3) container offset to match global top: vw(-100)
+              top: vw(-103), // Relative to box top
               fontSize: vw(200),
               fontFamily: "var(--font-anaheim), sans-serif",
             }}
@@ -99,14 +119,14 @@ export function ApplicationWhyChooseUsSection({
           </HollowText>
         </div>
 
-        {/* Olive Hollow "Why" Title (Outside the box) */}
+        {/* Layer 2: Olive Hollow Title (Outside the box) */}
         <HollowText
           strokeColor="#756F3F"
           strokeWidth={1.5}
           className="absolute font-extrabold whitespace-nowrap"
           style={{
             left: vw(495.5),
-            top: vw(-100),
+            top: vw(-100 + 150), // Matches Layer 1 absolute position
             fontSize: vw(200),
             fontFamily: "var(--font-anaheim), sans-serif",
             zIndex: 6,
@@ -120,24 +140,24 @@ export function ApplicationWhyChooseUsSection({
           className="absolute font-extrabold"
           style={{
             left: vw(726),
-            top: vw(10),
-            fontSize: vw(96), // 96 * 0.8
+            top: vw(10 + 150),
+            fontSize: vw(96),
             lineHeight: vw(108),
             fontFamily: "var(--font-anaheim), sans-serif",
             color: "#756F3F",
             zIndex: 10,
+            maxWidth: vw(1920 - 726),
           }}
         >
           {title}
         </h4>
 
         {/* Carousel Content Area */}
-        {/* Rectangle 404: x=550, y=123, w=1370, h=799 */}
         <div
           className="absolute"
           style={{
             left: vw(550),
-            top: vw(123),
+            top: vw(123 + 150),
             width: vw(1370),
             height: vw(799),
             backgroundColor: "#A59E69",
@@ -153,13 +173,13 @@ export function ApplicationWhyChooseUsSection({
               transition={{ duration: 0.5 }}
               className="absolute inset-0"
             >
-              {/* Item Title (Black Han Sans with offset effect) */}
+              {/* Item Title */}
               <div
                 className="absolute"
                 style={{
                   left: vw(807 - 550),
                   top: vw(233 - 156),
-                  width: vw(1200), // Explicitly set width to prevent inconsistent wrapping
+                  width: vw(1920 - 807),
                 }}
               >
                 {/* Shadow layer */}
@@ -199,7 +219,7 @@ export function ApplicationWhyChooseUsSection({
               >
                 <span
                   style={{
-                    fontSize: vw(102), // 128 * 0.8
+                    fontSize: vw(102),
                     fontFamily: "var(--font-anaheim), sans-serif",
                     fontWeight: "bold",
                     color: "#544D0F",
@@ -293,7 +313,7 @@ export function ApplicationWhyChooseUsSection({
           </div>
         </div>
 
-        {/* Global Floating Images (Linked to current item) */}
+        {/* Global Floating Images */}
         <AnimatePresence mode="wait">
           <motion.div
             key={`imgs-${currentItem.id}`}
@@ -301,35 +321,35 @@ export function ApplicationWhyChooseUsSection({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.05 }}
             transition={{ duration: 0.5 }}
+            className="w-full h-full"
           >
-            {/* Rectangle 403 - Left Large Image (Leaf shape: TL and BR rounded) */}
+            {/* Rectangle 403 - Left Large Image */}
             <div
               className="absolute overflow-hidden"
               style={{
-                left: vw(176 + 55), // Shifted to look better with 100% box
-                top: vw(123),
-                width: vw(500), // 550 * 0.8
-                height: vw(700), // 793 * 0.8
+                left: vw(176 + 55),
+                top: vw(123 + 150),
+                width: vw(500),
+                height: vw(700),
                 borderRadius: `${vw(147)} 0 ${vw(147)} 0`,
                 boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
                 zIndex: 40,
               }}
             >
-              <Image
-                src={currentItem.imageLeft}
+              <OptimizedImage
+                image={currentItem.imageLeft}
                 alt="solution-left"
-                fill
-                className="object-cover"
-                unoptimized
+                className="w-full h-full object-cover"
+                size="medium"
               />
             </div>
 
-            {/* Rectangle 405 - Right Small Image (Rounded bottom-left) */}
+            {/* Rectangle 405 - Right Small Image */}
             <div
               className="absolute overflow-hidden"
               style={{
                 right: 0,
-                top: vw(740 - 156),
+                top: vw(740 - 156 + 150),
                 width: vw(650),
                 height: vw(240),
                 borderRadius: `0 0 0 ${vw(147)}`,
@@ -337,12 +357,11 @@ export function ApplicationWhyChooseUsSection({
                 zIndex: 40,
               }}
             >
-              <Image
-                src={currentItem.imageRight}
+              <OptimizedImage
+                image={currentItem.imageRight}
                 alt="solution-right"
-                fill
-                className="object-cover"
-                unoptimized
+                className="w-full h-full object-cover"
+                size="medium"
               />
             </div>
           </motion.div>

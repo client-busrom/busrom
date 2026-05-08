@@ -405,7 +405,7 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
                   </svg>
                 )}
               </div>
-              <p className="text-[14px] md:text-[16px] leading-relaxed text-gray-400 select-none group-hover/privacy:text-gray-300 transition-colors">
+              <p className="text-[14px] leading-relaxed text-gray-400 select-none group-hover/privacy:text-gray-300 transition-colors">
                 {getLocalizedString(contactForm.formConfig?.privacyConsentText, locale)}
               </p>
             </div>

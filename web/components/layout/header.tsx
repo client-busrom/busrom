@@ -148,7 +148,7 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
       <header
         ref={headerRef}
         className={cn(
-          "fixed top-0 left-0 right-0 w-full max-w-[1920px] z-[70] transition-all duration-300 ease-in-out",
+          "fixed top-0 left-0 right-0 w-full z-[70] transition-all duration-300 ease-in-out",
           headerBgColor,
           headerShadow,
         )}

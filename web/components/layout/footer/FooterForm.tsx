@@ -269,7 +269,7 @@ export default function FooterForm({
                   </svg>
                 )}
               </div>
-              <p className="text-[10px] sm:text-[11px] md:text-[16px] leading-relaxed text-white/60 max-w-[450px] select-none whitespace-pre-line">
+              <p className="text-[10px] sm:text-[11px] md:text-[14px] leading-relaxed text-white/60 max-w-[450px] select-none whitespace-pre-line">
                 {formConfig.privacyConsentText}
               </p>
             </div>

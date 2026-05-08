@@ -951,7 +951,7 @@ export function StoryContactFormSection({
                 </div>
                 <p
                   className="leading-relaxed text-white/70 whitespace-pre-line select-none flex-1"
-                  style={{ fontSize: isMobile ? mvw(12) : "16px" }}
+                  style={{ fontSize: isMobile ? mvw(12) : "14px" }}
                 >
                   {effectivePrivacyText}
                 </p>

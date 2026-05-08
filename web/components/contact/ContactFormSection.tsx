@@ -1006,7 +1006,7 @@ export function ContactFormSection({
                   </svg>
                 )}
               </div>
-              <p className="text-[12px] md:text-[16px] leading-relaxed text-[#4B3A02]/80 text-left whitespace-pre-line select-none">
+              <p className="text-[12px] md:text-[14px] leading-relaxed text-[#4B3A02]/80 text-left whitespace-pre-line select-none">
                 {effectivePrivacyText}
               </p>
             </div>

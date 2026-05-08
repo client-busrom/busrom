@@ -3,8 +3,10 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Upload } from "lucide-react";
-import { PhoneInput } from "@/components/ui/PhoneInput";
 import { cn } from "@/lib/utils";
+import { CountryFlag } from "@/components/ui/CountryFlag";
+import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
+import { COUNTRIES } from "@/components/ui/PhoneInput";
 
 interface RichTextSegment {
   text: string;
@@ -204,6 +206,24 @@ export function ApplicationContactFormSection({
   const [fileName, setFileName] = useState("");
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
+  // WhatsApp / Phone Atomic State
+  const [selectedCountry, setSelectedCountry] = useState<[string, string, string]>(COUNTRIES[0]);
+  const [isCountrySelectorOpen, setIsCountrySelectorOpen] = useState(false);
+  const countrySelectorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        countrySelectorRef.current &&
+        !countrySelectorRef.current.contains(event.target as Node)
+      ) {
+        setIsCountrySelectorOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const formConfig = useMemo(() => {
     return propFormConfig;
   }, [propFormConfig]);
@@ -352,30 +372,80 @@ export function ApplicationContactFormSection({
       field.fieldType === "tel" ||
       field.fieldType === "phone"
     ) {
+      const currentValue = formData[field.fieldName] || "";
+      // Strip dial code for the input field display
+      const dialCode = selectedCountry[2];
+      const pureNumber = currentValue.startsWith(`+${dialCode}`)
+        ? currentValue.slice(dialCode.length + 1)
+        : currentValue;
+
+      const handlePhoneChange = (newPureNumber: string) => {
+        const fullNumber = `+${selectedCountry[2]}${newPureNumber.replace(/[^\d]/g, "")}`;
+        handleInputChange(field.fieldName, fullNumber);
+      };
+
       return (
-        <div key={field.fieldName} className="font-montserrat">
-          <PhoneInput
-            value={formData[field.fieldName] || ""}
-            onChange={(val) => handleInputChange(field.fieldName, val)}
-            placeholder={field.placeholder?.trim() || field.label}
-            style={{
-              height: isMobile ? "48px" : "53px",
-              borderRadius: isMobile ? "10px" : "10px",
-            }}
-            className="!bg-[#D4CBAF] border-none"
-            buttonClassName={cn(
-              isMobile ? "!pl-[4.1vw] !pr-1" : "!pl-[17px] !pr-2",
-            )}
-            inputClassName={cn(
-              "!bg-transparent !text-[#463B17] !font-montserrat !font-medium !placeholder-[#9E9474] !pl-2 [&:-webkit-autofill]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]",
-              `![font-size:16px]`,
-            )}
-            dialCodeClassName={cn(
-              "!text-[#463B17] !font-montserrat !font-medium [&:-webkit-autofill]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important]",
-              `![font-size:16px]`,
-            )}
-            chevronClassName="!text-[#463B17]"
-          />
+        <div key={field.fieldName} className="font-montserrat relative">
+          <div
+            style={{ ...commonStyles, paddingLeft: 0 }}
+            className="flex items-stretch !px-0 overflow-visible"
+          >
+            <div
+              className="relative h-full flex-shrink-0"
+              ref={countrySelectorRef}
+            >
+              <button
+                type="button"
+                onClick={() => setIsCountrySelectorOpen(!isCountrySelectorOpen)}
+                className="h-full flex items-center justify-center border-r border-[#9E9474]/30 transition-all hover:bg-black/5"
+                style={{
+                  paddingLeft: isMobile ? "12px" : "16px",
+                  paddingRight: isMobile ? "6px" : "8px",
+                }}
+              >
+                <CountryFlag
+                  countryCode={selectedCountry[1]}
+                  className="w-6 h-4 rounded-[2px] flex-shrink-0"
+                />
+                <span
+                  className="font-semibold text-[#463B17]"
+                  style={{ fontSize: "16px" }}
+                >
+                  +{selectedCountry[2]}
+                </span>
+                <ChevronDown
+                  className={cn(
+                    "transition-transform text-[#463B17]/50",
+                    isMobile ? "w-4 h-4" : "w-5 h-5",
+                    isCountrySelectorOpen && "rotate-180",
+                  )}
+                />
+              </button>
+              {isCountrySelectorOpen && (
+                <CountrySelectorList
+                  onSelect={(country) => {
+                    setSelectedCountry(country);
+                    const newFullNumber = `+${country[2]}${pureNumber.replace(/[^\d]/g, "")}`;
+                    handleInputChange(field.fieldName, newFullNumber);
+                    setIsCountrySelectorOpen(false);
+                  }}
+                  onClose={() => setIsCountrySelectorOpen(false)}
+                  className="absolute left-0 top-full mt-2 w-[300px] z-[1002]"
+                />
+              )}
+            </div>
+            <input
+              type="tel"
+              placeholder={field.placeholder?.trim() || field.label}
+              value={pureNumber}
+              onChange={(e) => handlePhoneChange(e.target.value)}
+              className="flex-1 min-w-0 bg-transparent px-4 outline-none font-medium text-[#463B17] placeholder:text-[#9E9474] [&:-webkit-autofill]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+              style={{
+                fontSize: "16px",
+                paddingLeft: isMobile ? "12px" : "15px",
+              }}
+            />
+          </div>
         </div>
       );
     }
@@ -536,7 +606,7 @@ export function ApplicationContactFormSection({
           isMobile ? "flex-col mt-[40px]" : "flex-row items-stretch mt-[60px]",
         )}
         style={{
-          width: isMobile ? "92vw" : "1036px",
+          width: isMobile ? "92vw" : "1136px",
           maxWidth: isMobile ? "800px" : "none",
           minHeight: isMobile ? "auto" : "560px",
           height: "auto",
@@ -617,13 +687,10 @@ export function ApplicationContactFormSection({
 
         {/* RIGHT FORM */}
         <div
-          className={cn(
-            "flex flex-col",
-            isMobile ? "mx-auto" : ""
-          )}
+          className={cn("flex flex-col", isMobile ? "mx-auto" : "")}
           style={{
-            width: isMobile ? "100%" : "600px",
-            maxWidth: isMobile ? "600px" : "none",
+            width: isMobile ? "100%" : "700px",
+            maxWidth: isMobile ? "700px" : "none",
             marginLeft: isMobile ? "auto" : "23px",
             marginRight: isMobile ? "auto" : 0,
           }}
@@ -640,7 +707,7 @@ export function ApplicationContactFormSection({
               )}
               style={{
                 gap: isMobile ? "12px" : "7px",
-                columnGap: isMobile ? "12px" : "16px",
+                columnGap: isMobile ? "12px" : "30px",
               }}
             >
               {(sortedFields || []).map((field: FormField, index: number) => {
@@ -737,7 +804,7 @@ export function ApplicationContactFormSection({
                   </div>
                   <span
                     className="text-[#5E552C] opacity-70 group-hover:opacity-100 transition-opacity"
-                    style={{ fontSize: isMobile ? "12px" : "16px" }}
+                    style={{ fontSize: isMobile ? "12px" : "14px" }}
                   >
                     {privacyText}
                   </span>

@@ -804,7 +804,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
               <div
                 className="font-anaheim text-left select-none text-white/90 whitespace-pre-line prose-none rich-text-privacy [&_p]:m-0"
                 style={{
-                  fontSize: isMobile ? mvw(14) : "16px",
+                  fontSize: isMobile ? mvw(14) : "14px",
                   lineHeight: isMobile ? mvw(18) : vw(18),
                 }}
               >

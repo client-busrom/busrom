@@ -75,7 +75,7 @@ export function ApplicationMoreCasesSection({
       className="relative w-full overflow-hidden bg-[#FFFDF8] flex flex-col items-center select-none"
       style={{ height: vw(922) }}
     >
-      <div className="relative w-full h-full max-w-[1920px]">
+      <div className="relative w-full h-full">
         {/* Slot 0: Main Large Image */}
         <AnimatePresence mode="wait">
           {currentSeries && (

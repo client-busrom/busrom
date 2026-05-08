@@ -263,7 +263,7 @@ export function SimplifiedInquiryForm({
               </svg>
             )}
           </div>
-          <p className="text-base leading-relaxed text-gray-500 whitespace-pre-line select-none">
+          <p className="text-sm leading-relaxed text-gray-500 whitespace-pre-line select-none">
             {privacyText}
           </p>
         </div>
@@ -298,7 +298,7 @@ export function SimplifiedInquiryForm({
       </motion.button>
 
       {footerHint && (
-        <p className="text-base text-gray-500 text-center">
+        <p className="text-sm text-gray-500 text-center">
           {footerHint}
         </p>
       )}

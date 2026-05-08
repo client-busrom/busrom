@@ -714,7 +714,7 @@ export function OemOdmContactForm({
                             </svg>
                           )}
                         </div>
-                        <p className="text-sm md:text-base text-[#756F3F] leading-snug">
+                        <p className="text-sm text-[#756F3F] leading-snug">
                           {privacyText}
                         </p>
                       </div>

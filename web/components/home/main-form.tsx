@@ -823,7 +823,7 @@ export default function MainForm({
                           </svg>
                         )}
                       </div>
-                      <p className="text-[10px] md:text-[16px] leading-tight text-white/70 text-left whitespace-pre-line select-none">
+                      <p className="text-[10px] md:text-[14px] leading-tight text-white/70 text-left whitespace-pre-line select-none">
                         {formConfig.privacyConsentText}
                       </p>
                     </div>

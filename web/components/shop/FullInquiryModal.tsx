@@ -710,7 +710,7 @@ export function FullInquiryModal({
                   </svg>
                 )}
               </div>
-              <p className="text-xs md:text-[16px] leading-relaxed text-gray-500 text-left whitespace-pre-line select-none">
+              <p className="text-xs md:text-[14px] leading-relaxed text-gray-500 text-left whitespace-pre-line select-none">
                 {effectivePrivacyText}
               </p>
             </div>

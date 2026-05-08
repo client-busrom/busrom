@@ -573,7 +573,7 @@ export function CtaSection({
                 >
                   {privacyAccepted && <Check className="w-3 h-3 text-white" />}
                 </div>
-                <p className="text-[13px] md:text-[16px] leading-relaxed text-white/70 text-left select-none">
+                <p className="text-[13px] md:text-[14px] leading-relaxed text-white/70 text-left select-none">
                   {getTranslation(mergedConfig.privacyConsentText)}
                 </p>
               </div>
@@ -840,7 +840,7 @@ export function CtaSection({
                         </svg>
                       )}
                     </div>
-                    <p className="text-[16px] leading-relaxed text-white/70 max-w-[700px] whitespace-pre-line select-none text-left">
+                    <p className="text-[14px] leading-relaxed text-white/70 max-w-[700px] whitespace-pre-line select-none text-left">
                       {getTranslation(mergedConfig.privacyConsentText)}
                     </p>
                   </div>
