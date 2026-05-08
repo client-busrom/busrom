@@ -493,7 +493,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                             setIsCountrySelectorOpen(false);
                           }}
                           onClose={() => setIsCountrySelectorOpen(false)}
-                          className="!bg-[#3d3713] !border-white/20 !text-white/80"
+                          className="shadow-xl"
                         />
                       </div>
                     )}

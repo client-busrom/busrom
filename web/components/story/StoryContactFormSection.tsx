@@ -833,7 +833,7 @@ export function StoryContactFormSection({
                                 }}
                                 onClose={() => setOpenCountrySelector(false)}
                                 className={cn(
-                                  "shadow-2xl !bg-[#4b4724] border border-white/20",
+                                  "shadow-2xl",
                                   isMobile ? "!rounded-xl" : "!rounded-[15px]"
                                 )}
                               />
@@ -1022,7 +1022,7 @@ export function StoryContactFormSection({
                               }}
                               onClose={() => setOpenCountrySelector(false)}
                               className={cn(
-                                "shadow-2xl !bg-[#4b4724] border border-white/20",
+                                "shadow-2xl",
                                 isMobile ? "!rounded-xl" : "!rounded-[15px]"
                               )}
                             />
