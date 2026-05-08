@@ -761,10 +761,14 @@ export function SupportContactFormSection({
               type="submit"
               style={{ 
                 transformOrigin: "center",
-                height: isMobile ? mvw(60) : vw(83),
+                minHeight: isMobile ? mvw(60) : vw(83),
+                padding: isMobile ? `${mvw(10)} ${mvw(20)}` : `${vw(10)} ${vw(20)}`,
                 borderRadius: isMobile ? mvw(30) : vw(63),
                 fontSize: isMobile ? mvw(20) : vw(32),
-                marginTop: isMobile ? mvw(10) : 0
+                marginTop: isMobile ? mvw(10) : 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
               }}
               initial={{ rotate: 0, scale: 1 }}
               animate={isMobile ? {} : { rotate: [0, -3, 3, -3, 3, 0] }}
