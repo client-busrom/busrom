@@ -162,6 +162,17 @@ export function StoryApplicationsSection({
   const isMobileHook = useIsMobile();
   const isMobile = isMobileHook || (windowWidth > 0 && windowWidth < 768);
 
+  const visibleItems = useMemo(() => {
+    if (totalSlides === 0) return [];
+    const list = [];
+    // Show current index and surrounding
+    for (let i = -1; i <= 4; i++) {
+      const idx = (activeIndex + i + totalSlides) % totalSlides;
+      list.push({ originalIdx: idx, relativeIdx: i });
+    }
+    return list;
+  }, [activeIndex, totalSlides]);
+
   if (isMobile) {
     return (
       <section id="applications" className="relative w-full bg-[#f6f4ed] py-16 px-6 flex flex-col items-center">
@@ -247,16 +258,7 @@ export function StoryApplicationsSection({
     );
   }
 
-  const visibleItems = useMemo(() => {
-    if (totalSlides === 0) return [];
-    const list = [];
-    // Show current index and surrounding
-    for (let i = -1; i <= 4; i++) {
-      const idx = (activeIndex + i + totalSlides) % totalSlides;
-      list.push({ originalIdx: idx, relativeIdx: i });
-    }
-    return list;
-  }, [activeIndex, totalSlides]);
+
 
   return (
     <section

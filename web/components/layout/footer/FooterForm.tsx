@@ -40,7 +40,13 @@ export default function FooterForm({
   turnstileSiteKey,
   onSuccess,
 }: Props) {
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 1024;
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
   const vw = (px: number) => `calc(var(--rpx) * ${px})`;
   const mvw = (px: number) => `calc(var(--mvw) * ${px})`;
 

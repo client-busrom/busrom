@@ -281,68 +281,74 @@ const nextConfig = {
       ...(!isDev ? ["upgrade-insecure-requests"] : []),
     ].join('; ')
 
+    // Security headers shared between dev and prod
+    const commonHeaders = [
+      // Content Security Policy
+      {
+        key: 'Content-Security-Policy',
+        value: cspDirectives,
+      },
+      // Cross-Origin-Opener-Policy
+      {
+        key: 'Cross-Origin-Opener-Policy',
+        value: 'same-origin',
+      },
+      // Cross-Origin-Embedder-Policy (配合 COOP)
+      {
+        key: 'Cross-Origin-Embedder-Policy',
+        value: 'credentialless',
+      },
+      // Cross-Origin-Resource-Policy
+      {
+        key: 'Cross-Origin-Resource-Policy',
+        value: 'same-origin',
+      },
+      // X-Content-Type-Options
+      {
+        key: 'X-Content-Type-Options',
+        value: 'nosniff',
+      },
+      // X-Frame-Options (被 CSP frame-ancestors 替代，但保留兼容旧浏览器)
+      {
+        key: 'X-Frame-Options',
+        value: 'DENY',
+      },
+      // X-XSS-Protection (旧浏览器)
+      {
+        key: 'X-XSS-Protection',
+        value: '1; mode=block',
+      },
+      // Referrer-Policy
+      {
+        key: 'Referrer-Policy',
+        value: 'strict-origin-when-cross-origin',
+      },
+      // Permissions-Policy (限制浏览器功能)
+      {
+        key: 'Permissions-Policy',
+        value: 'camera=(), microphone=(), geolocation=()',
+      },
+      // Vary header - Critical for CDN to cache correctly based on Accept header
+      // Prevents RSC payload from being served to HTML requests
+      {
+        key: 'Vary',
+        value: 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch',
+      },
+    ]
+
+    // HSTS: 仅在生产环境启用，防止开发时 Chrome 缓存 HSTS 策略
+    // 导致 localhost HTTP 请求被强制升级为 HTTPS → ERR_SSL_PROTOCOL_ERROR
+    if (!isDev) {
+      commonHeaders.push({
+        key: 'Strict-Transport-Security',
+        value: 'max-age=31536000; includeSubDomains; preload',
+      })
+    }
+
     return [
       {
         source: '/:path*',
-        headers: [
-          // Content Security Policy
-          {
-            key: 'Content-Security-Policy',
-            value: cspDirectives,
-          },
-          // HTTP Strict Transport Security (HSTS)
-          // max-age=31536000 (1年), includeSubDomains, preload
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=31536000; includeSubDomains; preload',
-          },
-          // Cross-Origin-Opener-Policy
-          {
-            key: 'Cross-Origin-Opener-Policy',
-            value: 'same-origin',
-          },
-          // Cross-Origin-Embedder-Policy (配合 COOP)
-          {
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'credentialless',
-          },
-          // Cross-Origin-Resource-Policy
-          {
-            key: 'Cross-Origin-Resource-Policy',
-            value: 'same-origin',
-          },
-          // X-Content-Type-Options
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          // X-Frame-Options (被 CSP frame-ancestors 替代，但保留兼容旧浏览器)
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          // X-XSS-Protection (旧浏览器)
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
-          // Referrer-Policy
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
-          // Permissions-Policy (限制浏览器功能)
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
-          },
-          // Vary header - Critical for CDN to cache correctly based on Accept header
-          // Prevents RSC payload from being served to HTML requests
-          {
-            key: 'Vary',
-            value: 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch',
-          },
-        ],
+        headers: commonHeaders,
       },
       // Favicon: allow cross-origin access for search engines (Bing, Google etc.)
       // Must come AFTER /:path* so cross-origin overrides same-origin

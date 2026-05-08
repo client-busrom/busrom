@@ -232,10 +232,7 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
           className="absolute z-30 flex flex-col items-start text-left md:scale-[0.65] lg:scale-100 origin-top-right"
           style={{
             right: rpx(40),
-            top:
-              typeof window !== "undefined" && window.innerWidth < 1024
-                ? rpx(40)
-                : rpx(100),
+            top: rpx(100),
           }}
         >
           <div className="flex flex-col items-start mb-16 md:mb-8 lg:mb-16">

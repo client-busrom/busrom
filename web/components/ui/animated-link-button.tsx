@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 const DESIGN_WIDTH = 1920;
@@ -19,7 +20,13 @@ export function AnimatedLinkButton({
   ballColor: customBallColor,
   style: externalStyle
 }: AnimatedLinkButtonProps) {
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
   const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
   
   // Responsive defaults using clamp() or simple px for mobile
