@@ -37,29 +37,49 @@ interface TranslateRequest {
  * Match the casing style of the source text to the target text.
  * Especially useful for Title Case or ALL CAPS preservation.
  */
-function matchTextCasing(source: string, target: string): string {
+function matchTextCasing(source: string, target: string, targetLang?: string): string {
   if (!source || !target) return target
+
+  // Skip for languages without casing (Chinese, Japanese, Korean, Arabic, Thai, etc.)
+  const noCasingLangs = ['zh', 'ja', 'ko', 'ar', 'th', 'hi', 'bn']
+  if (targetLang && noCasingLangs.includes(targetLang)) return target
 
   // 1. Check for ALL CAPS (exclude numbers/special chars)
   const isAllCaps = source === source.toUpperCase() && source !== source.toLowerCase()
   if (isAllCaps) return target.toUpperCase()
 
   // 2. Check for Title Case
-  // We consider it Title Case if at least 60% of words start with a capital letter
   const sourceWords = source.trim().split(/\s+/).filter(w => w.length > 0)
   if (sourceWords.length === 0) return target
 
+  // Count words starting with uppercase
   const capitalizedWords = sourceWords.filter(w => /^\p{Lu}/u.test(w))
   const capitalizationRatio = capitalizedWords.length / sourceWords.length
 
-  // If first word is capitalized and ratio is high, apply Title Case to target
-  if (capitalizationRatio >= 0.6 && /^\p{Lu}/u.test(sourceWords[0])) {
+  // If source is Title Case (majority of words start with uppercase)
+  // or it's a short string starting with uppercase
+  const looksLikeTitle = (capitalizationRatio >= 0.5) || (sourceWords.length <= 3 && /^\p{Lu}/u.test(sourceWords[0]))
+
+  if (looksLikeTitle) {
     return target
       .split(/\s+/)
       .map(word => {
         if (word.length === 0) return word
-        // Capitalize first letter, keep rest as is to avoid breaking technical terms like "iPhone"
-        return word.charAt(0).toUpperCase() + word.slice(1)
+        
+        // Find the first alphabetic character to capitalize
+        // This handles cases like "(glass)" -> "(Glass)"
+        const firstLetterMatch = word.match(/\p{L}/u)
+        if (!firstLetterMatch) return word
+        
+        const firstLetterIndex = firstLetterMatch.index!
+        
+        // Capitalize the first letter found, and potentially lowercase the rest if it's all lowercase
+        // but we keep the rest as is to protect tech terms like "iPhone" or "LCD"
+        return (
+          word.slice(0, firstLetterIndex) +
+          word.charAt(firstLetterIndex).toUpperCase() +
+          word.slice(firstLetterIndex + 1)
+        )
       })
       .join(' ')
   }
@@ -298,7 +318,7 @@ export const translateHandler: PayloadHandler = async (req) => {
 
           // Use casing preservation if it's not rich text or if it doesn't look like HTML
           const shouldMatchCasing = !isRichText || !translatedText.includes('<')
-          translatedTexts.push(shouldMatchCasing ? matchTextCasing(sourceText, translatedText) : translatedText)
+          translatedTexts.push(shouldMatchCasing ? matchTextCasing(sourceText, translatedText, targetLang) : translatedText)
         } catch (error) {
           payload.logger.error(`Translation failed for text ${i}:`, error)
           errors.push(`Text ${i}: ${error instanceof Error ? error.message : 'Unknown error'}`)
@@ -341,7 +361,7 @@ export const translateHandler: PayloadHandler = async (req) => {
 
         // Use casing preservation if it's not rich text or if it doesn't look like HTML
         const shouldMatchCasing = !isRichText || !translatedText.includes('<')
-        translations[lang] = shouldMatchCasing ? matchTextCasing(text, translatedText) : translatedText
+        translations[lang] = shouldMatchCasing ? matchTextCasing(text, translatedText, lang) : translatedText
       } catch (error) {
         payload.logger.error(`Translation failed for ${lang}:`, error)
         errors[lang] = error instanceof Error ? error.message : 'Unknown error'

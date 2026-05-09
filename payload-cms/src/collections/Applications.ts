@@ -217,6 +217,19 @@ export const Applications: CollectionConfig = {
   ],
   timestamps: true,
   hooks: {
-
+    beforeChange: [
+      ({ req, data }) => {
+        // 快速保存优化：如果是翻译中心触发的保存，跳过所有额外逻辑
+        if (req?.context?.isTranslationSave) return data;
+        return data;
+      }
+    ],
+    afterRead: [
+      ({ req, doc }) => {
+        // 快速保存优化：如果是翻译中心触发的读取，跳过所有额外逻辑
+        if (req?.context?.isTranslationSave) return doc;
+        return doc;
+      }
+    ]
   },
 }
