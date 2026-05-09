@@ -162,6 +162,9 @@ import { BrandValue } from './src/globals/BrandValue'
 // Globals - CMS Settings
 import { TranslationConfig } from './src/globals/TranslationConfig'
 
+// Plugins
+import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
+
 // Seed functions
 import { seedPermissionsSystem } from './src/seed/seed-permissions-system'
 
@@ -463,6 +466,14 @@ export default buildConfig({
   // Plugins
   // ==================================================================
   plugins: [
+    nestedDocsPlugin({
+      collections: ['categories'],
+      generateLabel: (_, doc) => {
+        const name = typeof doc.name === 'object' ? doc.name?.en : doc.name
+        return (name as string) || (doc.title as string) || (doc.slug as string) || 'Untitled'
+      },
+      generateURL: (docs) => docs.reduce((url, doc) => `${url}/${doc.slug}`, ''),
+    }),
     // S3 Storage
     s3Storage({
       collections: {

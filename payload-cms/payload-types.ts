@@ -116,6 +116,13 @@ export interface Config {
     'product-series': {
       products: 'products';
     };
+    'blog-tags': {
+      blogs: 'blogs';
+    };
+    categories: {
+      shopProducts: 'products';
+      blogPosts: 'blogs';
+    };
     'template-categories': {
       templates: 'document-templates';
     };
@@ -753,6 +760,12 @@ export interface Product {
 export interface ProductSery {
   id: number;
   /**
+   * System pages cannot be deleted
+   */
+  isSystem?: boolean | null;
+  status?: ('published' | 'draft' | 'archived') | null;
+  publishedAt?: string | null;
+  /**
    * URL-friendly identifier (e.g., "elite-door-handle-series")
    */
   slug: string;
@@ -784,7 +797,6 @@ export interface ProductSery {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
-  status?: ('published' | 'draft' | 'archived') | null;
   /**
    * Lower number = higher priority
    */
@@ -800,31 +812,24 @@ export interface ProductSery {
 export interface Category {
   id: number;
   fullTitle?: string | null;
-  /**
-   * Bilingual category name
-   */
-  name: string;
+  name?: string | null;
   /**
    * Friendly name for internal management (not used in URLs)
    */
   adminLabel?: string | null;
   /**
-   * This is automatically generated from the English Name.
-   */
-  slug?: string | null;
-  type: 'PAGE' | 'PRODUCT' | 'BLOG' | 'APPLICATION' | 'FAQ';
-  /**
-   * Parent category for hierarchical structure (filtered by same type)
-   */
-  parent?: (number | null) | Category;
-  /**
-   * Select existing categories to be sub-categories of this category
-   */
-  children?: (number | Category)[] | null;
-  /**
    * Localized description of this category
    */
   description?: string | null;
+  type: 'PAGE' | 'PRODUCT' | 'BLOG' | 'APPLICATION' | 'FAQ';
+  /**
+   * Select a parent category to build the hierarchy. The breadcrumb title at the top will update automatically after saving.
+   */
+  parent?: (number | null) | Category;
+  /**
+   * This list is automatically managed. To change a category's parent, please edit that specific sub-category.
+   */
+  children?: (number | Category)[] | null;
   /**
    * Lower number = higher priority
    */
@@ -836,13 +841,36 @@ export interface Category {
    */
   shopTabOrder?: number | null;
   /**
-   * Manually manage and sort product links under this category for the Shop page. (Only products belonging to this category are shown)
+   * Read-only list of products belonging to this category. To sort them, edit the shopOrder on the products themselves.
    */
-  shopProducts?: (number | Product)[] | null;
+  shopProducts?: {
+    docs?: (number | Product)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   /**
-   * Manually manage and sort blog posts under this category. (Only blogs belonging to this category are shown)
+   * Read-only list of blog posts belonging to this category.
    */
-  blogPosts?: (number | Blog)[] | null;
+  blogPosts?: {
+    docs?: (number | Blog)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
+   * This is automatically generated from the English Name.
+   */
+  slug?: string | null;
+  /**
+   * This list is automatically managed by the system. Do not edit manually.
+   */
+  breadcrumbs?:
+    | {
+        doc?: (number | null) | Category;
+        url?: string | null;
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -856,10 +884,8 @@ export interface Blog {
    * This identifier is for internal management and can contain spaces/caps. (e.g. "Blog - Glass Installation")
    */
   adminLabel?: string | null;
-  /**
-   * This is automatically generated from Admin Identification and used for URLs.
-   */
-  slug?: string | null;
+  status?: ('published' | 'draft' | 'archived') | null;
+  publishedAt?: string | null;
   title?: string | null;
   /**
    * Short summary for previews
@@ -869,6 +895,10 @@ export interface Blog {
    * Select the writer for this post
    */
   author?: (number | null) | Author;
+  /**
+   * This is automatically generated from Admin Identification and used for URLs.
+   */
+  slug?: string | null;
   /**
    * Rich text content - use language tabs above to switch locales
    */
@@ -952,8 +982,6 @@ export interface Blog {
   kb_bottom_recommended_title?: string | null;
   kb_bottom_recommended_posts?: (number | Blog)[] | null;
   kb_bottom_recommended_logic?: ('category' | 'latest') | null;
-  status?: ('published' | 'draft' | 'archived') | null;
-  publishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -993,9 +1021,13 @@ export interface BlogTag {
    */
   slug: string;
   /**
-   * Assign blogs to this tag. This relationship is shared with the Blogs collection.
+   * Blogs associated with this tag. Assign tags to blogs from the Blogs collection.
    */
-  blogs?: (number | Blog)[] | null;
+  blogs?: {
+    docs?: (number | Blog)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -1005,6 +1037,12 @@ export interface BlogTag {
  */
 export interface SeriesTemplate {
   id: number;
+  /**
+   * System pages cannot be deleted
+   */
+  isSystem?: boolean | null;
+  status?: ('published' | 'draft' | 'archived') | null;
+  publishedAt?: string | null;
   name: string;
   category?: (number | null) | Category;
   content?: {
@@ -1085,15 +1123,21 @@ export interface ProductAttribute {
 export interface ProductTemplate {
   id: number;
   /**
-   * Internal name for this template (e.g., "Standard Glass Standoff Detail")
+   * System pages cannot be deleted
+   */
+  isSystem?: boolean | null;
+  status?: ('published' | 'draft' | 'archived') | null;
+  publishedAt?: string | null;
+  /**
+   * Internal name for this template
    */
   name: string;
   /**
-   * Associate this template with a product category for easier filtering
+   * Associate with a category
    */
   category?: (number | null) | Category;
   /**
-   * Rich text content for product details (Forms should be linked in the Integration Page now)
+   * Rich text content for product details
    */
   content?: {
     root: {
@@ -1459,6 +1503,12 @@ export interface NavigationMenu {
  */
 export interface Page {
   id: number;
+  status?: ('published' | 'draft' | 'archived') | null;
+  publishedAt?: string | null;
+  /**
+   * System pages cannot be deleted
+   */
+  isSystem?: boolean | null;
   /**
    * CMS internal identifier. e.g.: service-overview, faq, summer-promotion-2024
    */
@@ -1476,6 +1526,11 @@ export interface Page {
    */
   template?: string | null;
   title: string;
+  author?: (number | null) | User;
+  /**
+   * Lower number = higher priority
+   */
+  order?: number | null;
   /**
    * Rich text content - use language tabs above to switch locales
    */
@@ -1500,17 +1555,6 @@ export interface Page {
   heroMediaTags?: (number | MediaTag)[] | null;
   heroText?: string | null;
   heroSubtitle?: string | null;
-  /**
-   * System pages cannot be deleted
-   */
-  isSystem?: boolean | null;
-  status?: ('published' | 'draft' | 'archived') | null;
-  publishedAt?: string | null;
-  /**
-   * Lower number = higher priority
-   */
-  order?: number | null;
-  author?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -2535,6 +2579,9 @@ export interface ProductsSelect<T extends boolean = true> {
  * via the `definition` "product-series_select".
  */
 export interface ProductSeriesSelect<T extends boolean = true> {
+  isSystem?: T;
+  status?: T;
+  publishedAt?: T;
   slug?: T;
   name?: T;
   description?: T;
@@ -2542,7 +2589,6 @@ export interface ProductSeriesSelect<T extends boolean = true> {
   seriesTemplate?: T;
   featuredImage?: T;
   products?: T;
-  status?: T;
   order?: T;
   isFeatured?: T;
   updatedAt?: T;
@@ -2566,6 +2612,9 @@ export interface ProductAttributesSelect<T extends boolean = true> {
  * via the `definition` "product-templates_select".
  */
 export interface ProductTemplatesSelect<T extends boolean = true> {
+  isSystem?: T;
+  status?: T;
+  publishedAt?: T;
   name?: T;
   category?: T;
   content?: T;
@@ -2590,6 +2639,9 @@ export interface ProductReusableBlocksSelect<T extends boolean = true> {
  * via the `definition` "series-templates_select".
  */
 export interface SeriesTemplatesSelect<T extends boolean = true> {
+  isSystem?: T;
+  status?: T;
+  publishedAt?: T;
   name?: T;
   category?: T;
   content?: T;
@@ -2699,20 +2751,20 @@ export interface AuthorsSelect<T extends boolean = true> {
  * via the `definition` "pages_select".
  */
 export interface PagesSelect<T extends boolean = true> {
+  status?: T;
+  publishedAt?: T;
+  isSystem?: T;
   slug?: T;
   path?: T;
   pageType?: T;
   template?: T;
   title?: T;
+  author?: T;
+  order?: T;
   contentTranslation?: T;
   heroMediaTags?: T;
   heroText?: T;
   heroSubtitle?: T;
-  isSystem?: T;
-  status?: T;
-  publishedAt?: T;
-  order?: T;
-  author?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2722,10 +2774,12 @@ export interface PagesSelect<T extends boolean = true> {
  */
 export interface BlogsSelect<T extends boolean = true> {
   adminLabel?: T;
-  slug?: T;
+  status?: T;
+  publishedAt?: T;
   title?: T;
   excerpt?: T;
   author?: T;
+  slug?: T;
   contentTranslation?: T;
   coverImage?: T;
   categories?: T;
@@ -2771,8 +2825,6 @@ export interface BlogsSelect<T extends boolean = true> {
   kb_bottom_recommended_title?: T;
   kb_bottom_recommended_posts?: T;
   kb_bottom_recommended_logic?: T;
-  status?: T;
-  publishedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2816,17 +2868,25 @@ export interface CategoriesSelect<T extends boolean = true> {
   fullTitle?: T;
   name?: T;
   adminLabel?: T;
-  slug?: T;
+  description?: T;
   type?: T;
   parent?: T;
   children?: T;
-  description?: T;
   order?: T;
   status?: T;
   showInShop?: T;
   shopTabOrder?: T;
   shopProducts?: T;
   blogPosts?: T;
+  slug?: T;
+  breadcrumbs?:
+    | T
+    | {
+        doc?: T;
+        url?: T;
+        label?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

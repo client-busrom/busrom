@@ -1,16 +1,7 @@
 import type { CollectionConfig } from 'payload'
-import { syncM2M, cleanupM2M } from '../hooks/syncM2M'
 
 export const BlogTags: CollectionConfig = {
   slug: 'blog-tags',
-  hooks: {
-    afterChange: [
-      syncM2M('blogs', 'tags', 'blogs'),
-    ],
-    afterDelete: [
-      cleanupM2M('blogs', 'tags', 'blogs'),
-    ],
-  },
   labels: {
     singular: {
       en: 'Blog Tag',
@@ -64,29 +55,21 @@ export const BlogTags: CollectionConfig = {
     },
     {
       name: 'blogs',
-      type: 'relationship',
-      relationTo: 'blogs',
-      hasMany: true,
+      type: 'join',
+      collection: 'blogs',
+      on: 'tags',
       label: {
         en: 'Related Blogs',
         zh: '关联知识库文章',
       },
       admin: {
         description: {
-          en: 'Assign blogs to this tag. This relationship is shared with the Blogs collection.',
-          zh: '为此标签分配文章。此关联与知识库集合同步。',
+          en: 'Blogs associated with this tag. Assign tags to blogs from the Blogs collection.',
+          zh: '自动显示包含此标签的知识库文章。如需新增关联，请前往“知识库”集合编辑对应的文章。',
         },
       },
     },
-    {
-      name: 'blogsManager',
-      type: 'ui',
-      admin: {
-        components: {
-          Field: '@/components/fields/CategoryBlogManager#CategoryBlogManager',
-        },
-      },
-    },
+    // Removed obsolete custom blogsManager UI field
   ],
   timestamps: true,
 }

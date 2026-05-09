@@ -410,11 +410,25 @@ export const customTranslationsEn = {
       emailConfig: 'Email Config',
       translationConfig: 'Translation Config (Global)',
       myTranslationSettings: 'My Translation Settings',
-      shopPageConfig: 'Shop Page Management',
-      systemManagement: 'System Management',
-      systemNotifications: 'Notification Center',
       systemSettings: 'System Settings',
+      systemNotifications: 'Notification Center',
+      systemManagement: 'System Management',
     },
+  },
+  'nested-docs': {
+    breadcrumbs: 'Hierarchy Breadcrumbs',
+    url: 'URL Path',
+    label: 'Label',
+  },
+  'plugin-nested-docs': {
+    breadcrumbs: 'Hierarchy Breadcrumbs',
+    url: 'URL Path',
+    label: 'Label',
+  },
+  nestedDocs: {
+    breadcrumbs: 'Hierarchy Breadcrumbs',
+    url: 'URL Path',
+    label: 'Label',
   },
 }
 
@@ -820,6 +834,21 @@ export const customTranslationsZh = {
       systemNotifications: '系统通知中心',
       systemSettings: '系统全局配置',
     },
+  },
+  'nested-docs': {
+    breadcrumbs: '层级面包屑 (系统自动生成)',
+    url: 'URL 路径',
+    label: '标签名称',
+  },
+  'plugin-nested-docs': {
+    breadcrumbs: '层级面包屑 (系统自动生成)',
+    url: 'URL 路径',
+    label: '标签名称',
+  },
+  nestedDocs: {
+    breadcrumbs: '层级面包屑 (系统自动生成)',
+    url: 'URL 路径',
+    label: '标签名称',
   },
 }
 

@@ -31,7 +31,7 @@ export const Categories: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'fullTitle',
-    defaultColumns: ['fullTitle', 'type', 'order', 'status'],
+    defaultColumns: ['fullTitle', 'name', 'type', 'order', 'status'],
     group: {
       en: 'Content',
       zh: '内容管理',
@@ -47,7 +47,15 @@ export const Categories: CollectionConfig = {
     // 1. afterRead: Ensure 'children' relationship field is populated from existing 'parent' pointers
     // This handles legacy data and cases where children were added from the child side.
     afterRead: [
-      async ({ doc, req: { payload } }) => {
+      async ({ doc, req }) => {
+        // Optimization: Skip heavy children population during translation saves or syncs
+        if (req?.context?.isTranslationSave || req?.context?.isSyncing) {
+          return doc
+        }
+
+        const { payload } = req
+        if (!payload || !doc?.id) return doc
+
         try {
           const childrenResult = await payload.find({
             collection: 'categories',
@@ -64,32 +72,76 @@ export const Categories: CollectionConfig = {
         return doc
       },
     ],
-    // 2. beforeChange: Synchronize bi-directional relationships
+    // 2. beforeChange: generate fullTitle for admin UI
     beforeChange: [
-      async ({ data, req, originalDoc, context }) => {
-        // Prevent infinite recursion during sync
-        if (context.isSyncing) return data
-
+      async ({ data, req, originalDoc, operation }) => {
         const { payload } = req
 
-        // --- Part A: Handle fullTitle generation ---
-        const getName = (doc: any) => {
-          if (!doc) return ''
-          if (doc.name && typeof doc.name === 'object') {
-            return doc.name.en || doc.name.zh || doc.slug || 'Untitled'
+        // Optimization: fullTitle only uses 'en'. 
+        // Only re-calculate if English name, parent or slug is being changed.
+        const isNameChanging = 'name' in data
+        const isParentChanging = 'parent' in data
+        const isSlugChanging = 'slug' in data
+        const isCreate = operation === 'create'
+
+        // Determine if we should skip
+        let shouldSkip = !isNameChanging && !isParentChanging && !isSlugChanging && !isCreate
+
+        if (isNameChanging && !isCreate) {
+          const currentLocale = req.locale || 'en'
+          // If we are updating a specific locale that is NOT en, and parent/slug aren't changing, we can skip
+          if (currentLocale !== 'en' && !isParentChanging && !isSlugChanging) {
+            // However, if data.name is an object (all-locales update), we check if en is inside
+            if (typeof data.name === 'object' && data.name !== null) {
+              if (!('en' in data.name)) {
+                shouldSkip = true
+              }
+            } else {
+              // It's a single-locale update and it's not en
+              shouldSkip = true
+            }
           }
-          return doc.name || doc.slug || 'Untitled'
         }
 
-        const currentName = getName(data)
+        if (shouldSkip) {
+          return data
+        }
+
+        // For partial updates (like bulk edit or plugin updates), we need the full picture
+        const targetDoc = { ...originalDoc, ...data }
+
+        const getName = (doc: any) => {
+          if (!doc) return ''
+          const nameObj = doc.name || {}
+          
+          let name = 'Untitled'
+
+          // Force English name extraction
+          if (typeof nameObj === 'object' && nameObj !== null) {
+            name = nameObj.en || doc.slug || 'Untitled'
+          } else if (typeof nameObj === 'string') {
+            // If it's a string, we hope it's English, but we can't be sure unless we have the full object
+            // To be safe, when we fetch parent, we'll force locale: 'en'
+            name = nameObj || doc.slug || 'Untitled'
+          }
+          
+          return name
+        }
+
+        const currentName = getName(targetDoc)
         let fullTitle = currentName
 
-        if (data.parent) {
+        if (targetDoc.parent) {
           try {
             const parent = await payload.findByID({
               collection: 'categories',
-              id: typeof data.parent === 'object' ? data.parent.id : data.parent,
+              id: typeof targetDoc.parent === 'object' ? targetDoc.parent.id : targetDoc.parent,
               depth: 0,
+              locale: 'en', // FORCE English locale for parent lookup
+              select: {
+                fullTitle: true,
+                name: true,
+              },
             })
             if (parent) {
               const parentTitle = (parent as any).fullTitle || getName(parent)
@@ -100,54 +152,8 @@ export const Categories: CollectionConfig = {
           }
         }
         data.fullTitle = fullTitle
-
-        // --- Part B: Handle bi-directional sync (Child -> Parent) ---
-        // If parent field changed on this document, we don't need to do much here
-        // because the afterRead hook on the parent side will pick it up,
-        // but to keep DB data consistent if we're storing children array:
-        
-        // --- Part C: Handle bi-directional sync (Parent -> Child) ---
-        // If this document is being updated and 'children' array exists (from the UI)
-        if (originalDoc && data.children !== undefined) {
-          const newChildrenIds = (data.children || []).map((c: any) => typeof c === 'object' ? c.id : c)
-          const oldChildrenIds = (originalDoc.children || []).map((c: any) => typeof c === 'object' ? c.id : c)
-
-          // 1. Added children: Set their parent to this category
-          const added = newChildrenIds.filter((id: any) => !oldChildrenIds.includes(id))
-          for (const childId of added) {
-            await payload.update({
-              collection: 'categories',
-              id: childId,
-              data: { parent: originalDoc.id },
-              // Use context to prevent infinite loop
-              context: {
-                isSyncing: true
-              }
-            })
-          }
-
-          // 2. Removed children: Set their parent to null
-          const removed = oldChildrenIds.filter((id: any) => !newChildrenIds.includes(id))
-          for (const childId of removed) {
-            await payload.update({
-              collection: 'categories',
-              id: childId,
-              data: { parent: null },
-              context: {
-                isSyncing: true
-              }
-            })
-          }
-        }
-
         return data
       },
-    ],
-    afterChange: [
-      syncM2M('blogs', 'categories', 'blogPosts'),
-    ],
-    afterDelete: [
-      cleanupM2M('blogs', 'categories', 'blogPosts'),
     ],
   },
   fields: [
@@ -169,14 +175,13 @@ export const Categories: CollectionConfig = {
         en: 'Category Name',
         zh: '分类名称',
       },
-      required: true,
-      localized: true,
-      admin: {
-        description: {
-          en: 'Bilingual category name',
-          zh: '双语分类名称',
-        },
+      validate: (val, { operation }) => {
+        if (operation === 'create' && (!val || val.length === 0)) {
+          return 'Category Name is required'
+        }
+        return true
       },
+      localized: true,
     },
     {
       name: 'adminLabel',
@@ -192,67 +197,21 @@ export const Categories: CollectionConfig = {
         },
       },
     },
+    // ==================================================================
+    // Description
+    // ==================================================================
     {
-      name: 'slug',
-      type: 'text',
+      name: 'description',
+      type: 'textarea',
       label: {
-        en: 'Technical Slug',
-        zh: '技术标识 (自动生成)',
+        en: 'Description',
+        zh: '描述',
       },
-      hooks: {
-        beforeValidate: [formatSlug('name')],
-      },
-      // Removed global uniqueness to support same name across different types
-      // unique: true,
-      validate: async (val: string | any, { data, req, id }: any) => {
-        if (!val) return true
-        
-        let type = data?.type
-        // Fallback to existing doc if type is not in data (partial update)
-        if (!type && id) {
-          const existing = await req.payload.findByID({
-            collection: 'categories',
-            id,
-            depth: 0,
-            req,
-          })
-          type = existing?.type
-        }
-
-        if (!type) return true
-
-        try {
-          const results = await req.payload.find({
-            collection: 'categories',
-            where: {
-              and: [
-                { slug: { equals: val } },
-                { type: { equals: type } },
-                ...(id ? [{ id: { not_equals: id } }] : []),
-              ],
-            },
-            limit: 1,
-            depth: 0,
-            req,
-          })
-
-          if (results.docs.length > 0) {
-            return req.locale === 'zh' 
-              ? '该 URL 标识在当前分类类型下已存在' 
-              : 'Slug must be unique within the same category type'
-          }
-        } catch (e) {
-          // Fallback to true if query fails to avoid blocking saves
-          return true
-        }
-        
-        return true
-      },
+      localized: true,
       admin: {
-        readOnly: true,
         description: {
-          en: 'This is automatically generated from the English Name.',
-          zh: '此字段根据英文名称自动生成。',
+          en: 'Localized description of this category',
+          zh: '此分类的多语言描述',
         },
       },
     },
@@ -284,6 +243,10 @@ export const Categories: CollectionConfig = {
       name: 'parent',
       type: 'relationship',
       relationTo: 'categories',
+      label: {
+        en: 'Parent Category',
+        zh: '父分类',
+      },
       filterOptions: ({ data, id }) => {
         const filter: any = {}
         if (data?.type) {
@@ -296,8 +259,8 @@ export const Categories: CollectionConfig = {
       },
       admin: {
         description: {
-          en: 'Parent category for hierarchical structure (filtered by same type)',
-          zh: '用于层级结构的父分类（仅显示相同类型的分类）',
+          en: 'Select a parent category to build the hierarchy. The breadcrumb title at the top will update automatically after saving.',
+          zh: '选择父级分类以建立层级关系。保存后，顶部的面包屑标题会自动更新。',
         },
       },
     },
@@ -321,28 +284,10 @@ export const Categories: CollectionConfig = {
         return filter
       },
       admin: {
+        readOnly: true,
         description: {
-          en: 'Select existing categories to be sub-categories of this category',
-          zh: '直接从此处选择已有的分类作为该分类的子分类',
-        },
-      },
-    },
-
-    // ==================================================================
-    // Description
-    // ==================================================================
-    {
-      name: 'description',
-      type: 'textarea',
-      label: {
-        en: 'Description',
-        zh: '描述',
-      },
-      localized: true,
-      admin: {
-        description: {
-          en: 'Localized description of this category',
-          zh: '此分类的多语言描述',
+          en: 'This list is automatically managed. To change a category\'s parent, please edit that specific sub-category.',
+          zh: '此列表由系统自动维护。如需修改层级关系，请直接进入对应的子分类修改其【Parent/父分类】。',
         },
       },
     },
@@ -439,32 +384,18 @@ export const Categories: CollectionConfig = {
     // ==================================================================
     {
       name: 'shopProducts',
-      type: 'relationship',
-      relationTo: 'products',
-      hasMany: true,
+      type: 'join',
+      collection: 'products',
+      on: 'category',
       label: {
-        en: 'Product Links Management',
-        zh: '属下产品链接管理',
-      },
-      filterOptions: {
-        // Only allow products to be linked here
-        status: { in: ['published', 'draft'] }
+        en: 'Linked Products',
+        zh: '关联的产品',
       },
       admin: {
         condition: (data) => data?.type === 'PRODUCT',
         description: {
-          en: 'Manually manage and sort product links under this category for the Shop page. (Only products belonging to this category are shown)',
-          zh: '手动管理并排序该分类下的产品链接（仅限属于该分类的产品，用于在此界面直接控制展示顺序）',
-        },
-      },
-    },
-    {
-      name: 'shopProductsManager',
-      type: 'ui',
-      admin: {
-        condition: (data) => data?.type === 'PRODUCT',
-        components: {
-          Field: '@/components/fields/CategoryProductManager#CategoryProductManager',
+          en: 'Read-only list of products belonging to this category. To sort them, edit the shopOrder on the products themselves.',
+          zh: '属于此分类的产品列表（只读视图）。若要调整排序，请前往具体产品详情中修改其 shopOrder（排序权重）。',
         },
       },
     },
@@ -473,34 +404,131 @@ export const Categories: CollectionConfig = {
     // ==================================================================
     {
       name: 'blogPosts',
-      type: 'relationship',
-      relationTo: 'blogs',
-      hasMany: true,
+      type: 'join',
+      collection: 'blogs',
+      on: 'categories',
       label: {
-        en: 'Associated Blogs Management',
-        zh: '属下知识库管理',
-      },
-      filterOptions: {
-        // Only allow blogs to be linked here
-        status: { in: ['published', 'draft'] }
+        en: 'Linked Blogs',
+        zh: '关联的文章',
       },
       admin: {
         condition: (data) => data?.type === 'BLOG',
         description: {
-          en: 'Manually manage and sort blog posts under this category. (Only blogs belonging to this category are shown)',
-          zh: '手动管理并排序该分类下的文章（仅限属于该分类的文章，用于控制展示顺序）',
+          en: 'Read-only list of blog posts belonging to this category.',
+          zh: '属于此分类的文章列表（只读视图）。若要调整文章的排序规则或归属，请前往具体文章详情。',
         },
       },
     },
     {
-      name: 'blogPostsManager',
-      type: 'ui',
+      name: 'slug',
+      type: 'text',
+      label: {
+        en: 'Technical Slug',
+        zh: '技术标识 (自动生成)',
+      },
+      hooks: {
+        beforeValidate: [formatSlug('name')],
+      },
+      validate: async (val: string | any, { data, req, id }: any) => {
+        if (!val) return true
+        let type = data?.type
+        if (!type && id) {
+          const existing = await req.payload.findByID({
+            collection: 'categories',
+            id,
+            depth: 0,
+            req,
+          })
+          type = existing?.type
+        }
+        if (!type) return true
+        try {
+          const results = await req.payload.find({
+            collection: 'categories',
+            where: {
+              and: [
+                { slug: { equals: val } },
+                { type: { equals: type } },
+                ...(id ? [{ id: { not_equals: id } }] : []),
+              ],
+            },
+            limit: 1,
+            depth: 0,
+            req,
+          })
+          if (results.docs.length > 0) {
+            return req.locale === 'zh' 
+              ? '该 URL 标识在当前分类类型下已存在' 
+              : 'Slug must be unique within the same category type'
+          }
+        } catch (e) {
+          return true
+        }
+        return true
+      },
       admin: {
-        condition: (data) => data?.type === 'BLOG',
-        components: {
-          Field: '@/components/fields/CategoryBlogManager#CategoryBlogManager',
+        readOnly: true,
+        description: {
+          en: 'This is automatically generated from the English Name.',
+          zh: '此字段根据英文名称自动生成。',
         },
       },
+    },
+    // ==================================================================
+    // Breadcrumbs (Manual override for Nested Docs Plugin)
+    // ==================================================================
+    {
+      name: 'breadcrumbs',
+      type: 'array',
+      label: {
+        en: 'Hierarchy Breadcrumbs (Auto-generated)',
+        zh: '层级面包屑 (系统自动生成)',
+      },
+      localized: false,
+      admin: {
+        readOnly: true,
+        description: {
+          en: 'This list is automatically managed by the system. Do not edit manually.',
+          zh: '此列表由系统自动维护。请勿手动修改此处的数值。',
+        },
+      },
+      fields: [
+        {
+          name: 'doc',
+          type: 'relationship',
+          relationTo: 'categories',
+          admin: {
+            disabled: true,
+          },
+        },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'url',
+              type: 'text',
+              label: {
+                en: 'URL Path',
+                zh: 'URL 路径',
+              },
+              admin: {
+                width: '50%',
+              },
+            },
+            {
+              name: 'label',
+              type: 'text',
+              label: {
+                en: 'Label',
+                zh: '标签名称',
+              },
+              admin: {
+                width: '50%',
+              },
+            },
+          ],
+        },
+      ],
     },
   ],
   timestamps: true,

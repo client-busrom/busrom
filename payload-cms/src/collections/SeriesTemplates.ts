@@ -19,11 +19,65 @@ export const SeriesTemplates: CollectionConfig = {
   },
   fields: [
     {
+      type: 'row',
+      fields: [
+        {
+          name: 'translationCenter',
+          type: 'ui',
+          admin: {
+            width: '50%',
+            components: {
+              Field: '@/components/fields/TranslationCenter',
+            },
+          },
+        },
+        {
+          name: 'isSystem',
+          type: 'checkbox',
+          label: { en: 'System Page', zh: '系统页面' },
+          defaultValue: false,
+          admin: {
+            width: '50%',
+            description: { en: 'System pages cannot be deleted', zh: '系统页面无法删除' },
+          },
+        },
+      ],
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'status',
+          type: 'select',
+          label: { en: 'Status', zh: '状态' },
+          defaultValue: 'draft',
+          options: [
+            { label: { en: 'Published', zh: '已发布' }, value: 'published' },
+            { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
+            { label: { en: 'Archived', zh: '归档' }, value: 'archived' },
+          ],
+          admin: { width: '40%' },
+        },
+        {
+          name: 'publishedAt',
+          type: 'date',
+          label: { en: 'Published At', zh: '发布时间' },
+          admin: {
+            width: '60%',
+            date: { pickerAppearance: 'dayAndTime' },
+          },
+        },
+      ],
+    },
+    {
       name: 'name',
       type: 'text',
       required: true,
       localized: true,
       label: { en: 'Identifier Name', zh: '识别名称' },
+      admin: {
+        width: '100%',
+      },
     },
     {
       name: 'category',
@@ -32,6 +86,18 @@ export const SeriesTemplates: CollectionConfig = {
       label: { en: 'Category', zh: '所属分类' },
       filterOptions: {
         type: { equals: 'PRODUCT' },
+      },
+      admin: {
+        width: '100%',
+      },
+    },
+    {
+      name: 'googleIndexing',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: '@/components/fields/GoogleIndexingButton',
+        },
       },
     },
     {
@@ -42,17 +108,6 @@ export const SeriesTemplates: CollectionConfig = {
       admin: {
         components: {
           beforeInput: ['@/components/fields/MultiLocaleRichTextField'],
-        },
-      },
-    },
-    {
-      name: 'translationCenter',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
-        components: {
-          Field: '@/components/fields/TranslationCenter',
         },
       },
     },

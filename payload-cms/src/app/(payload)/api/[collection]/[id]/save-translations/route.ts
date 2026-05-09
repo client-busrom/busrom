@@ -52,11 +52,11 @@ export async function POST(
           id,
           data: data as any,
           locale: localeCode as any,
+          user, // Pass the authenticated user
           context: { 
             isTranslationSave: true,
             isSyncing: true
           },
-          disableHooks: true,
           overrideAccess: true,
           depth: 0,
         } as any)

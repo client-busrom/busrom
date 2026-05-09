@@ -17,35 +17,46 @@ export const KnowledgeBaseSettings: GlobalConfig = {
     update: ({ req: { user } }) => !!user,
   },
   fields: [
-    // ----------------------------------------------------------
-    // Sidebar Fields
-    // ----------------------------------------------------------
     {
-      name: 'translationCenter',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        components: {
-          Field: '@/components/fields/GlobalTranslationCenter',
+      type: 'row',
+      fields: [
+        {
+          name: 'spacer',
+          type: 'ui',
+          admin: {
+            components: {
+              Field: '@/components/ui/RowSpacer',
+            },
+          },
         },
-      },
-    },
-    {
-      name: 'status',
-      type: 'select',
-      label: {
-        en: 'Status',
-        zh: '发布状态',
-      },
-      defaultValue: 'draft',
-      options: [
-        { label: { en: 'Published', zh: '已发布' }, value: 'published' },
-        { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
+        {
+          name: 'status',
+          type: 'select',
+          label: {
+            en: 'Global Status',
+            zh: '全局发布状态',
+          },
+          defaultValue: 'draft',
+          options: [
+            { label: { en: 'Published', zh: '已发布' }, value: 'published' },
+            { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
+          ],
+          admin: {
+            width: '200px',
+          },
+        },
+        {
+          name: 'translationCenter',
+          type: 'ui',
+          admin: {
+            components: {
+              Field: '@/components/fields/GlobalTranslationCenter',
+            },
+          },
+        },
       ],
-      admin: {
-        position: 'sidebar',
-      },
     },
+
     // ----------------------------------------------------------
     // Main Content
     // ----------------------------------------------------------
@@ -77,7 +88,6 @@ export const KnowledgeBaseSettings: GlobalConfig = {
                   name: 'featuredPost',
                   type: 'relationship',
                   relationTo: 'blogs',
-                  localized: true,
                   label: { en: 'Featured Post', zh: '选择展示的首推文章' },
                   admin: {
                     description: {
@@ -102,7 +112,6 @@ export const KnowledgeBaseSettings: GlobalConfig = {
                 {
                   name: 'showAll',
                   type: 'checkbox',
-                  localized: true,
                   defaultValue: true,
                   label: { en: 'Show "All" Tab', zh: '显示“全部 (All)”标签' },
                 },
@@ -111,7 +120,6 @@ export const KnowledgeBaseSettings: GlobalConfig = {
                   type: 'relationship',
                   relationTo: 'categories',
                   hasMany: true,
-                  localized: true,
                   filterOptions: {
                     type: { equals: 'BLOG' },
                   },
@@ -271,7 +279,7 @@ export const KnowledgeBaseSettings: GlobalConfig = {
                       label: { en: 'Enabled on Templates', zh: '在以下详情页模板生效' },
                     },
                     { name: 'title', type: 'textarea', localized: true, label: { en: 'Title', zh: '标题' } },
-                    { name: 'posts', type: 'relationship', relationTo: 'blogs', hasMany: true, localized: true },
+                    { name: 'posts', type: 'relationship', relationTo: 'blogs', hasMany: true },
                   ],
                 },
                 {
@@ -388,7 +396,7 @@ export const KnowledgeBaseSettings: GlobalConfig = {
                   label: { en: 'Enabled on Templates', zh: '在以下详情页模板生效' },
                 },
                 { name: 'title', type: 'textarea', localized: true, label: { en: 'Title', zh: '板块标题' } },
-                { name: 'posts', type: 'relationship', relationTo: 'blogs', hasMany: true, minRows: 0, maxRows: 3, localized: true },
+                { name: 'posts', type: 'relationship', relationTo: 'blogs', hasMany: true, minRows: 0, maxRows: 3 },
               ],
             },
           ],

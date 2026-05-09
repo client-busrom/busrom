@@ -28,6 +28,59 @@ export const ProductTemplates: CollectionConfig = {
   },
   fields: [
     {
+      type: 'row',
+      fields: [
+        {
+          name: 'translationCenter',
+          type: 'ui',
+          admin: {
+            width: '50%',
+            components: {
+              Field: '@/components/fields/TranslationCenter',
+            },
+          },
+        },
+        {
+          name: 'isSystem',
+          type: 'checkbox',
+          label: { en: 'System Page', zh: '系统页面' },
+          defaultValue: false,
+          admin: {
+            width: '50%',
+            description: { en: 'System pages cannot be deleted', zh: '系统页面无法删除' },
+          },
+        },
+      ],
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'status',
+          type: 'select',
+          label: { en: 'Status', zh: '状态' },
+          defaultValue: 'draft',
+          options: [
+            { label: { en: 'Published', zh: '已发布' }, value: 'published' },
+            { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
+            { label: { en: 'Archived', zh: '归档' }, value: 'archived' },
+          ],
+          admin: {
+            width: '40%',
+          },
+        },
+        {
+          name: 'publishedAt',
+          type: 'date',
+          label: { en: 'Published At', zh: '发布时间' },
+          admin: {
+            width: '60%',
+            date: { pickerAppearance: 'dayAndTime' },
+          },
+        },
+      ],
+    },
+    {
       name: 'name',
       type: 'text',
       required: true,
@@ -37,9 +90,10 @@ export const ProductTemplates: CollectionConfig = {
         zh: '识别名称',
       },
       admin: {
+        width: '100%',
         description: {
-          en: 'Internal name for this template (e.g., "Standard Glass Standoff Detail")',
-          zh: '此模版的内部名称（例如："标准玻璃驳接件详情"）',
+          en: 'Internal name for this template',
+          zh: '此模版的内部名称',
         },
       },
     },
@@ -57,9 +111,19 @@ export const ProductTemplates: CollectionConfig = {
         },
       },
       admin: {
+        width: '100%',
         description: {
-          en: 'Associate this template with a product category for easier filtering',
-          zh: '将此模版页关联到产品分类，以便于筛选',
+          en: 'Associate with a category',
+          zh: '关联到产品分类',
+        },
+      },
+    },
+    {
+      name: 'googleIndexing',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: '@/components/fields/GoogleIndexingButton',
         },
       },
     },
@@ -73,22 +137,11 @@ export const ProductTemplates: CollectionConfig = {
       },
       admin: {
         description: {
-          en: 'Rich text content for product details (Forms should be linked in the Integration Page now)',
-          zh: '用于产品链接的富文本内容（表单请在整合页直接关联，不再建议在富文本中使用 form-block）',
+          en: 'Rich text content for product details',
+          zh: '用于产品链接的富文本内容',
         },
         components: {
           beforeInput: ['@/components/fields/MultiLocaleRichTextField'],
-        },
-      },
-    },
-    {
-      name: 'translationCenter',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
-        components: {
-          Field: '@/components/fields/TranslationCenter',
         },
       },
     },

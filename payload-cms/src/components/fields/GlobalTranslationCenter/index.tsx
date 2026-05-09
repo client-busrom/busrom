@@ -569,11 +569,11 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
 
   if (!globalSlug || !fieldConfigs || fieldConfigs.length === 0) {
     return (
-      <div className="tc-trigger tc-trigger--disabled">
+      <div className="gtc-trigger gtc-trigger--disabled">
         <button type="button" disabled>
           {t('custom:translationCenter:triggerButton' as any)}
         </button>
-        <span className="tc-trigger__hint">
+        <span className="gtc-trigger__hint">
           {t('custom:translationCenter:notAvailable' as any)}
         </span>
       </div>
@@ -583,29 +583,31 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
   return (
     <>
       {/* 触发按钮 */}
-      <div className="tc-trigger">
+      <div className="gtc-trigger">
         <button
           type="button"
-          className="tc-trigger__btn"
+          className="gtc-trigger__btn"
           onClick={handleOpenModal}
         >
           🌐 {t('custom:translationCenter:triggerButton' as any)}
         </button>
-        <span className="tc-trigger__hint">
-          {fieldConfigs.length} {t('custom:translationCenter:triggerHint' as any)}
-        </span>
+        <div className="gtc-trigger__info">
+          <span className="gtc-trigger__hint">
+            {fieldConfigs.length} {t('custom:translationCenter:triggerHint' as any)}
+          </span>
+        </div>
       </div>
 
       {/* 全屏弹窗 - 使用 Portal 渲染到 body */}
       {isModalOpen && typeof document !== 'undefined' && createPortal(
-        <div className="tc-modal-overlay">
-          <div className="tc-modal">
+        <div className="gtc-modal-overlay">
+          <div className="gtc-modal">
             {/* Header */}
-            <div className="tc-modal__header">
+            <div className="gtc-modal__header">
               <h2>{t('custom:translationCenter:triggerButton' as any)}</h2>
               <button
                 type="button"
-                className="tc-modal__close"
+                className="gtc-modal__close"
                 onClick={() => setIsModalOpen(false)}
                 title={t('custom:translationCenter:close' as any) as string}
               >
@@ -614,7 +616,7 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
             </div>
 
             {isLoading ? (
-              <div className="tc-modal__loading">{t('custom:translationCenter:loading' as any)}</div>
+              <div className="gtc-modal__loading">{t('custom:translationCenter:loading' as any)}</div>
             ) : (
               <>
                 {/* 控制面板 */}

@@ -193,13 +193,9 @@ export const Blogs: CollectionConfig = {
       }
     ],
     afterChange: [
-      syncM2M('categories', 'blogPosts', 'categories'),
-      syncM2M('blog-tags', 'blogs', 'tags'),
       autoIndexHook('blogs'),
     ],
     afterDelete: [
-      cleanupM2M('categories', 'blogPosts', 'categories'),
-      cleanupM2M('blog-tags', 'blogs', 'tags'),
       autoIndexDeleteHook('blogs'),
     ],
   },
@@ -253,6 +249,31 @@ export const Blogs: CollectionConfig = {
   ],
   fields: [
     {
+      type: 'row',
+      fields: [
+        {
+          name: 'translationCenter',
+          type: 'ui',
+          admin: {
+            width: '50%',
+            components: {
+              Field: '@/components/fields/TranslationCenter',
+            },
+          },
+        },
+        {
+          name: 'googleIndexing',
+          type: 'ui',
+          admin: {
+            width: '50%',
+            components: {
+              Field: '@/components/fields/GoogleIndexingButton',
+            },
+          },
+        },
+      ],
+    },
+    {
       name: 'adminLabel',
       type: 'text',
       label: {
@@ -267,6 +288,42 @@ export const Blogs: CollectionConfig = {
       },
     },
     {
+      type: 'row',
+      fields: [
+        {
+          name: 'status',
+          type: 'select',
+          label: {
+            en: 'Status',
+            zh: '状态',
+          },
+          defaultValue: 'draft',
+          options: [
+            { label: { en: 'Published', zh: '已发布' }, value: 'published' },
+            { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
+            { label: { en: 'Archived', zh: '归档' }, value: 'archived' },
+          ],
+          admin: {
+            width: '40%',
+          },
+        },
+        {
+          name: 'publishedAt',
+          type: 'date',
+          label: {
+            en: 'Published At',
+            zh: '同步至网站前端可见的时间',
+          },
+          admin: {
+            width: '60%',
+            date: {
+              pickerAppearance: 'dayAndTime',
+            },
+          },
+        },
+      ],
+    },
+    {
       type: 'tabs',
       tabs: [
         // ==================================================================
@@ -278,25 +335,6 @@ export const Blogs: CollectionConfig = {
             zh: '基本信息',
           },
           fields: [
-            {
-              name: 'slug',
-              type: 'text',
-              label: {
-                en: 'Technical Slug (URL Anchor)',
-                zh: '技术标识 (自动生成)',
-              },
-              hooks: {
-                beforeValidate: [formatSlug('adminLabel')],
-              },
-              unique: true,
-              admin: {
-                readOnly: true,
-                description: {
-                  en: 'This is automatically generated from Admin Identification and used for URLs.',
-                  zh: '此字段自动由内部管理标识生成，用于前台URL，不可手动修改。',
-                },
-              },
-            },
             {
               name: 'title',
               type: 'textarea',
@@ -333,6 +371,25 @@ export const Blogs: CollectionConfig = {
                 description: {
                   en: 'Select the writer for this post',
                   zh: '选择这篇文章的作者',
+                },
+              },
+            },
+            {
+              name: 'slug',
+              type: 'text',
+              label: {
+                en: 'Technical Slug (URL Anchor)',
+                zh: '技术标识 (自动生成)',
+              },
+              hooks: {
+                beforeValidate: [formatSlug('adminLabel')],
+              },
+              unique: true,
+              admin: {
+                readOnly: true,
+                description: {
+                  en: 'This is automatically generated from Admin Identification and used for URLs.',
+                  zh: '此字段自动由内部管理标识生成，用于前台URL，不可手动修改。',
                 },
               },
             },
@@ -429,6 +486,7 @@ export const Blogs: CollectionConfig = {
             },
           ],
         },
+
         // ==================================================================
         // Tab 4: Layout & Overrides
         // ==================================================================
@@ -555,69 +613,6 @@ export const Blogs: CollectionConfig = {
           ],
         },
       ],
-    },
-
-    // ==================================================================
-    // Sidebar Fields
-    // ==================================================================
-    {
-      name: 'translationCenter',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
-        components: {
-          Field: '@/components/fields/TranslationCenter',
-        },
-        // We can pass custom properties if the Translation Center supports it 
-        // to restrict logic to specific fields. 
-        // In the requirement context: "把seo插件移除，然后翻译中心去除无用字段，现在seo统一在seo settings里设置"
-        // This is done by just skipping unnecessary hidden meta.
-      },
-    },
-    {
-      name: 'googleIndexing',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
-        components: {
-          Field: '@/components/fields/GoogleIndexingButton',
-        },
-      },
-    },
-    {
-      name: 'status',
-      type: 'select',
-      label: {
-        en: 'Status',
-        zh: '状态',
-      },
-      defaultValue: 'draft',
-      options: [
-        { label: { en: 'Published', zh: '已发布' }, value: 'published' },
-        { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
-        { label: { en: 'Archived', zh: '归档' }, value: 'archived' },
-      ],
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
-      },
-    },
-    {
-      name: 'publishedAt',
-      type: 'date',
-      label: {
-        en: 'Published At',
-        zh: '同步至网站前端可见的时间',
-      },
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
-        date: {
-          pickerAppearance: 'dayAndTime',
-        },
-      },
     },
   ],
   timestamps: true,

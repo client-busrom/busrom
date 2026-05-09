@@ -61,8 +61,6 @@ import { default as default_8eace7ae1118053face74cf3167249d9 } from '@/component
 import { default as default_a3a3aa8bfebcaf82c7d4953fe2175cbd } from '@/components/fields/IconPicker'
 import { SmartLinkField as SmartLinkField_e635f1e069dfeac8bac1a8b34ec70fb8 } from '@/components/fields/SmartLinkField'
 import { default as default_f2f012c65168d1c448e59ecd59a1bae5 } from '@/components/admin/NavigationManagerLink'
-import { CategoryBlogManager as CategoryBlogManager_13b42ba985a2797d1445c07d844b1c44 } from '@/components/fields/CategoryBlogManager'
-import { CategoryProductManager as CategoryProductManager_0f5a766bac8fcce623fd73b84d4fc7b6 } from '@/components/fields/CategoryProductManager'
 import { default as default_a3e549dccdd3ea0f10d6ba87c5f4df9b } from '@/components/fields/PathSelector'
 import { default as default_27a145562c8e9424ddd39c471f5ea155 } from '@/components/fields/AutoDraft'
 import { default as default_542a7bec4aca3e00d6f3ee70f3087485 } from '@/components/fields/SeoConflictAnalysis'
@@ -76,6 +74,7 @@ import { InfoBox as InfoBox_b22e71a418305e9daff93fec26c20e4b } from '@/component
 import { default as default_8ac62ba4e71f0c3c16a780b7cf6afb1f } from '@/components/fields/MaintenancePanel'
 import { default as default_9a107ffbbe803e3cdf3dee39c142fca4 } from '@/components/fields/MediaArrayRowLabel'
 import { default as default_aef68a35a640877d18ec36dfae6830f7 } from '@/components/fields/SocialPlatformIcon'
+import { default as default_fd8deacc4a98ca16d56ee047a01252e2 } from '@/components/ui/RowSpacer'
 import { default as default_7ec45b627dc85426c7a5b3777a8024c0 } from '@/components/fields/MultilingualKnowledgeSections'
 import { default as default_eba90d60bdfe915607fa737bdb8554fb } from '@/components/fields/MultilingualCarouselItems'
 import { default as default_9870fd18da5f585b086dac7c5b924c68 } from '@/components/admin/CustomNav'
@@ -150,8 +149,6 @@ export const importMap = {
   "@/components/fields/IconPicker#default": default_a3a3aa8bfebcaf82c7d4953fe2175cbd,
   "@/components/fields/SmartLinkField#SmartLinkField": SmartLinkField_e635f1e069dfeac8bac1a8b34ec70fb8,
   "@/components/admin/NavigationManagerLink#default": default_f2f012c65168d1c448e59ecd59a1bae5,
-  "@/components/fields/CategoryBlogManager#CategoryBlogManager": CategoryBlogManager_13b42ba985a2797d1445c07d844b1c44,
-  "@/components/fields/CategoryProductManager#CategoryProductManager": CategoryProductManager_0f5a766bac8fcce623fd73b84d4fc7b6,
   "@/components/fields/PathSelector#default": default_a3e549dccdd3ea0f10d6ba87c5f4df9b,
   "@/components/fields/AutoDraft#default": default_27a145562c8e9424ddd39c471f5ea155,
   "@/components/fields/SeoConflictAnalysis#default": default_542a7bec4aca3e00d6f3ee70f3087485,
@@ -165,6 +162,7 @@ export const importMap = {
   "@/components/fields/MaintenancePanel#default": default_8ac62ba4e71f0c3c16a780b7cf6afb1f,
   "@/components/fields/MediaArrayRowLabel#default": default_9a107ffbbe803e3cdf3dee39c142fca4,
   "@/components/fields/SocialPlatformIcon#default": default_aef68a35a640877d18ec36dfae6830f7,
+  "@/components/ui/RowSpacer#default": default_fd8deacc4a98ca16d56ee047a01252e2,
   "@/components/fields/MultilingualKnowledgeSections#default": default_7ec45b627dc85426c7a5b3777a8024c0,
   "@/components/fields/MultilingualCarouselItems#default": default_eba90d60bdfe915607fa737bdb8554fb,
   "@/components/admin/CustomNav#default": default_9870fd18da5f585b086dac7c5b924c68,

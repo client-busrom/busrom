@@ -1,7 +1,9 @@
 .google-indexing-field {
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px solid var(--theme-elevation-150);
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 8px;
+  padding: 10px 40px;
+  text-align: center;
 
   .google-indexing-btn {
     width: 100%;

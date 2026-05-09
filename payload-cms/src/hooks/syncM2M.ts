@@ -70,14 +70,22 @@ export const syncM2M = (
     // Handle added targets
     for (const targetId of added) {
       try {
-        console.log(`[syncM2M] Linking ${targetCollection}/${targetId} to source ${sourceIdStr}`)
-        
+        if (!targetId) continue
+
+        // --- PRODUCTION FIX: Check if collection exists in registry ---
+        // This prevents the "operator 'in' ... '_rels' in undefined" error in Postgres adapter
+        if (!(targetCollection in payload.collections)) {
+          console.error(`[syncM2M] ❌ Target collection '${targetCollection}' not found in registry!`)
+          continue
+        }
+
         const target = await payload.findByID({
           collection: targetCollection as any,
           id: targetId,
           depth: 0,
           locale: defaultLocale as any,
-          req, // Crucial for transaction visibility
+          req,
+          disableErrors: true,
         })
         
         if (target) {
@@ -89,31 +97,48 @@ export const syncM2M = (
               data: {
                 [targetField]: [...currentLinks, sourceId],
               },
-              context: { isSyncing: true },
+              context: { 
+                isSyncing: true,
+                isM2MSync: true 
+              },
               depth: 0,
               overrideAccess: true,
               locale: defaultLocale as any,
               req,
               disableHooks: true,
             } as any)
+            console.log(`[syncM2M] ✅ Successfully linked ${targetCollection}/${targetId}`)
           }
+        } else {
+          console.warn(`[syncM2M] ⚠️ Target document ${targetCollection}/${targetId} not found. Skipping link.`)
         }
       } catch (err: any) {
-        console.error(`[syncM2M] Failed to add link for ${targetId}:`, err.message)
+        console.error(`[syncM2M] ❌ Failed to add link for ${targetCollection}/${targetId}:`, err.message)
+        // Check for the specific TypeError mentioned in production
+        if (err.message?.includes("operator 'in'")) {
+          console.error(`[syncM2M] Critical TypeError detected. This usually happens when a collection is missing from the DB adapter's registry. Target Collection: ${targetCollection}`)
+        }
       }
     }
 
     // Handle removed targets
     for (const targetId of removed) {
       try {
-        console.log(`[syncM2M] Unlinking ${targetCollection}/${targetId} from source ${sourceIdStr}`)
-        
+        if (!targetId) continue
+
+        // --- PRODUCTION FIX: Check if collection exists in registry ---
+        if (!(targetCollection in payload.collections)) {
+          console.error(`[syncM2M] ❌ Target collection '${targetCollection}' not found in registry!`)
+          continue
+        }
+
         const target = await payload.findByID({
           collection: targetCollection as any,
           id: targetId,
           depth: 0,
           locale: defaultLocale as any,
-          req, // Crucial for transaction visibility
+          req,
+          disableErrors: true,
         })
         if (target) {
           const currentLinks = sanitizeIds(target[targetField] || [])
@@ -124,17 +149,23 @@ export const syncM2M = (
               data: {
                 [targetField]: currentLinks.filter((id: any) => String(id) !== sourceIdStr),
               },
-              context: { isSyncing: true },
+              context: { 
+                isSyncing: true,
+                isM2MSync: true 
+              },
               depth: 0,
               overrideAccess: true,
               locale: defaultLocale as any,
               req,
               disableHooks: true,
             } as any)
+            console.log(`[syncM2M] ✅ Successfully unlinked ${targetCollection}/${targetId}`)
           }
+        } else {
+          console.warn(`[syncM2M] ⚠️ Target document ${targetCollection}/${targetId} not found. Skipping unlink.`)
         }
       } catch (err: any) {
-        console.error(`[syncM2M] Failed to remove link for ${targetId}:`, err.message)
+        console.error(`[syncM2M] ❌ Failed to remove link for ${targetCollection}/${targetId}:`, err.message)
       }
     }
 
@@ -165,12 +196,21 @@ export const cleanupM2M = (
 
     for (const targetId of targets) {
       try {
+        if (!targetId) continue
+
+        // --- PRODUCTION FIX: Check if collection exists in registry ---
+        if (!(targetCollection in payload.collections)) {
+          console.error(`[cleanupM2M] ❌ Target collection '${targetCollection}' not found in registry!`)
+          continue
+        }
+
         const target = await payload.findByID({
           collection: targetCollection as any,
           id: targetId,
           depth: 0,
           locale: defaultLocale as any,
           req,
+          disableErrors: true,
         })
         if (target) {
           const currentLinks = sanitizeIds(target[targetField] || [])
@@ -181,12 +221,16 @@ export const cleanupM2M = (
               data: {
                 [targetField]: currentLinks.filter((l: any) => String(l) !== sourceIdStr),
               },
-              context: { isSyncing: true },
+              context: { 
+                isSyncing: true,
+                isM2MSync: true 
+              },
               depth: 0,
               overrideAccess: true,
               locale: defaultLocale as any,
               req,
-            })
+              disableHooks: true,
+            } as any)
           }
         }
       } catch (e: any) {

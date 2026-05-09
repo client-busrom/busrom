@@ -89,6 +89,58 @@ export const Pages: CollectionConfig = {
           },
           fields: [
             {
+              type: 'row',
+              fields: [
+
+                {
+                  name: 'status',
+                  type: 'select',
+                  label: { en: 'Status', zh: '状态' },
+                  defaultValue: 'draft',
+                  options: [
+                    { label: { en: 'Published', zh: '已发布' }, value: 'published' },
+                    { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
+                    { label: { en: 'Archived', zh: '归档' }, value: 'archived' },
+                  ],
+                },
+                {
+                  name: 'publishedAt',
+                  type: 'date',
+                  label: { en: 'Published At', zh: '发布时间' },
+                  admin: {
+                    date: { pickerAppearance: 'dayAndTime' },
+                  },
+                },
+                {
+                  name: 'translationCenter',
+                  type: 'ui',
+                  admin: {
+                    components: {
+                      Field: '@/components/fields/TranslationCenter',
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              name: 'isSystem',
+              type: 'checkbox',
+              label: { en: 'System Page', zh: '系统页面' },
+              defaultValue: false,
+              admin: {
+                description: { en: 'System pages cannot be deleted', zh: '系统页面无法删除' },
+              },
+            },
+            {
+              name: 'googleIndexing',
+              type: 'ui',
+              admin: {
+                components: {
+                  Field: '@/components/fields/GoogleIndexingButton',
+                },
+              },
+            },
+            {
               name: 'slug',
               type: 'text',
               label: {
@@ -184,6 +236,30 @@ export const Pages: CollectionConfig = {
               required: true,
               localized: true,
             },
+            {
+              name: 'author',
+              type: 'relationship',
+              relationTo: 'users',
+              label: {
+                en: 'Author',
+                zh: '作者',
+              },
+            },
+            {
+              name: 'order',
+              type: 'number',
+              label: {
+                en: 'Display Order',
+                zh: '显示顺序',
+              },
+              defaultValue: 0,
+              admin: {
+                description: {
+                  en: 'Lower number = higher priority',
+                  zh: '数字越小优先级越高',
+                },
+              },
+            },
           ],
         },
 
@@ -263,112 +339,6 @@ export const Pages: CollectionConfig = {
           ],
         },
       ],
-    },
-
-    // ==================================================================
-    // System Settings
-    // ==================================================================
-    {
-      name: 'translationCenter',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
-        components: {
-          Field: '@/components/fields/TranslationCenter',
-        },
-      },
-    },
-    {
-      name: 'googleIndexing',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
-        components: {
-          Field: '@/components/fields/GoogleIndexingButton',
-        },
-      },
-    },
-    {
-      name: 'isSystem',
-      type: 'checkbox',
-      label: {
-        en: 'System Page',
-        zh: '系统页面',
-      },
-      defaultValue: false,
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
-        description: {
-          en: 'System pages cannot be deleted',
-          zh: '系统页面无法删除',
-        },
-      },
-    },
-    {
-      name: 'status',
-      type: 'select',
-      label: {
-        en: 'Status',
-        zh: '状态',
-      },
-      defaultValue: 'draft',
-      options: [
-        { label: { en: 'Published', zh: '已发布' }, value: 'published' },
-        { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
-        { label: { en: 'Archived', zh: '归档' }, value: 'archived' },
-      ],
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
-      },
-    },
-    {
-      name: 'publishedAt',
-      type: 'date',
-      label: {
-        en: 'Published At',
-        zh: '发布时间',
-      },
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
-        date: {
-          pickerAppearance: 'dayAndTime',
-        },
-      },
-    },
-    {
-      name: 'order',
-      type: 'number',
-      label: {
-        en: 'Display Order',
-        zh: '显示顺序',
-      },
-      defaultValue: 0,
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
-        description: {
-          en: 'Lower number = higher priority',
-          zh: '数字越小优先级越高',
-        },
-      },
-    },
-    {
-      name: 'author',
-      type: 'relationship',
-      relationTo: 'users',
-      label: {
-        en: 'Author',
-        zh: '作者',
-      },
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
-      },
     },
   ],
   timestamps: true,

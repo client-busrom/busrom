@@ -45,6 +45,59 @@ export const ProductSeries: CollectionConfig = {
   },
   fields: [
     {
+      type: 'row',
+      fields: [
+        {
+          name: 'translationCenter',
+          type: 'ui',
+          admin: {
+            width: '70%',
+            components: {
+              Field: '@/components/fields/TranslationCenter',
+            },
+          },
+        },
+        {
+          name: 'isSystem',
+          type: 'checkbox',
+          label: { en: 'System Page', zh: '系统页面' },
+          defaultValue: false,
+          admin: {
+            width: '30%',
+            description: { en: 'System pages cannot be deleted', zh: '系统页面无法删除' },
+          },
+        },
+      ],
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'status',
+          type: 'select',
+          label: { en: 'Status', zh: '状态' },
+          defaultValue: 'draft',
+          options: [
+            { label: { en: 'Published', zh: '已发布' }, value: 'published' },
+            { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
+            { label: { en: 'Archived', zh: '归档' }, value: 'archived' },
+          ],
+          admin: {
+            width: '40%',
+          },
+        },
+        {
+          name: 'publishedAt',
+          type: 'date',
+          label: { en: 'Published At', zh: '发布时间' },
+          admin: {
+            width: '60%',
+            date: { pickerAppearance: 'dayAndTime' },
+          },
+        },
+      ],
+    },
+    {
       type: 'tabs',
       tabs: [
         // ==================================================================
@@ -207,17 +260,6 @@ export const ProductSeries: CollectionConfig = {
     // Sidebar Fields
     // ==================================================================
     {
-      name: 'translationCenter',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
-        components: {
-          Field: '@/components/fields/TranslationCenter',
-        },
-      },
-    },
-    {
       name: 'googleIndexing',
       type: 'ui',
       admin: {
@@ -226,24 +268,6 @@ export const ProductSeries: CollectionConfig = {
         components: {
           Field: '@/components/fields/GoogleIndexingButton',
         },
-      },
-    },
-    {
-      name: 'status',
-      type: 'select',
-      defaultValue: 'draft',
-      options: [
-        { label: { en: 'Published', zh: '已发布' }, value: 'published' },
-        { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
-        { label: { en: 'Archived', zh: '已归档' }, value: 'archived' },
-      ],
-      label: {
-        en: 'Status',
-        zh: '状态',
-      },
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
       },
     },
     {
