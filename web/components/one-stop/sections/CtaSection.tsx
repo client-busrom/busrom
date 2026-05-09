@@ -368,6 +368,44 @@ export function CtaSection({
             height: ${SECTION_HEIGHT}px !important;
           }
         }
+        .cta-input-el {
+          color: #FFFFFF !important;
+          opacity: 1 !important;
+          -webkit-text-fill-color: #FFFFFF !important;
+          caret-color: white !important;
+          font-family: var(--font-anaheim), sans-serif !important;
+          font-weight: 600 !important;
+        }
+        .cta-input-el::placeholder {
+          color: rgba(255, 255, 255, 0.4) !important;
+          opacity: 1 !important;
+          -webkit-text-fill-color: rgba(255, 255, 255, 0.4) !important;
+          font-family: var(--font-anaheim), sans-serif !important;
+          font-weight: 600 !important;
+        }
+        .cta-input-el:-webkit-autofill,
+        .cta-input-el:-webkit-autofill:hover,
+        .cta-input-el:-webkit-autofill:focus,
+        .cta-input-el:-webkit-autofill:active {
+          -webkit-text-fill-color: #FFFFFF !important;
+          background-color: transparent !important;
+          -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+          transition: background-color 5000000s ease-in-out 0s !important;
+          caret-color: white !important;
+          font-family: var(--font-anaheim), sans-serif !important;
+          font-weight: 600 !important;
+          outline: none !important;
+        }
+        .cta-input-el:hover {
+          /* No custom hover styles */
+        }
+        .cta-input-el:focus,
+        .cta-input-el:active,
+        .cta-input-el:focus-visible {
+          outline: none !important;
+          box-shadow: none !important;
+          /* No custom focus styles */
+        }
       `}</style>
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
@@ -483,9 +521,11 @@ export function CtaSection({
             onChange={(e: any) =>
               setFormState({ ...formState, name: e.target.value })
             }
-            spellCheck="false"
+            spellCheck={false}
             placeholder={getTranslation(getField("name")?.placeholder)?.trim()}
-            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            name="name"
+            autoComplete="name"
+            className="cta-input-el w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-[16px]"
             required
           />
           <input
@@ -494,11 +534,13 @@ export function CtaSection({
             onChange={(e) =>
               setFormState({ ...formState, company: e.target.value })
             }
-            spellCheck="false"
+            spellCheck={false}
             placeholder={getTranslation(
               getField("company")?.placeholder,
             )?.trim()}
-            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            name="organization"
+            autoComplete="organization"
+            className="cta-input-el w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-[16px]"
           />
           <input
             type="email"
@@ -506,16 +548,18 @@ export function CtaSection({
             onChange={(e) =>
               setFormState({ ...formState, email: e.target.value })
             }
-            spellCheck="false"
+            spellCheck={false}
             placeholder={getTranslation(getField("email")?.placeholder)?.trim()}
-            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            name="email"
+            autoComplete="email"
+            className="cta-input-el w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-[16px]"
             required
           />
           <div
             className={cn(
-              "flex items-stretch bg-white/5 border border-white/20 rounded-[15px] relative transition-all",
-              openCountrySelectorMobile ? "z-20" : "z-0"
-            )}
+                "flex items-stretch bg-white/5 border border-white/20 rounded-[15px] relative",
+                openCountrySelectorMobile ? "z-[600]" : "z-0"
+              )}
             ref={countrySelectorRefMobile}
             style={{ 
               width: "100%", 
@@ -526,7 +570,7 @@ export function CtaSection({
               type="button"
               onClick={() => setOpenCountrySelectorMobile(!openCountrySelectorMobile)}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-4 hover:bg-white/10 transition-colors border-r border-white/20 flex-shrink-0"
+              className="flex items-center gap-2 px-4 border-r border-white/20 flex-shrink-0"
             >
               <div className="w-6 h-4 md:w-8 md:h-5 flex-shrink-0">
                 <CountryFlag
@@ -554,7 +598,9 @@ export function CtaSection({
                 getField("whatsapp")?.placeholder,
               )?.trim()}
               disabled={isSubmitting}
-              className="flex-1 bg-transparent px-4 outline-none font-anaheim font-semibold text-base text-white placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+              name="tel"
+              autoComplete="tel"
+              className="cta-input-el flex-1 bg-transparent px-4 border-none outline-none"
             />
 
             {openCountrySelectorMobile && (
@@ -605,11 +651,11 @@ export function CtaSection({
                 "other-primary-requirement": e.target.value,
               })
             }
-            spellCheck="false"
+            spellCheck={false}
             placeholder={getTranslation(
               getField("other-primary-requirement")?.placeholder,
             )}
-            className="w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="cta-input-el w-full h-[68px] bg-white/5 border border-white/20 rounded-[15px] px-5 text-[16px]"
           />
 
           <textarea
@@ -620,12 +666,12 @@ export function CtaSection({
                 "specific-requirements-project-description": e.target.value,
               })
             }
-            spellCheck="false"
+            spellCheck={false}
             placeholder={getTranslation(
               getField("specific-requirements-project-description")
                 ?.placeholder,
             )}
-            className="w-full h-36 bg-white/5 border border-white/20 rounded-[15px] p-5 text-white text-[16px] focus:border-[#FFF28E] resize-none overflow-y-auto placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            className="cta-input-el w-full h-36 bg-white/5 border border-white/20 rounded-[15px] p-5 text-[16px] resize-none overflow-y-auto"
           />
 
           <div className="flex flex-col gap-6 mt-4 items-center">
@@ -779,11 +825,13 @@ export function CtaSection({
               onChange={(e) =>
                 setFormState({ ...formState, name: e.target.value })
               }
-              spellCheck="false"
+              spellCheck={false}
               placeholder={getTranslation(
                 getField("name")?.placeholder,
               )?.trim()}
-              className="h-[44px] bg-black/30 border border-white/20 rounded-[10px] px-4 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+              name="name"
+              autoComplete="name"
+              className="cta-input-el h-[44px] bg-black/30 border border-white/20 rounded-[10px] px-4 text-[16px]"
               required
             />
             <input
@@ -792,11 +840,13 @@ export function CtaSection({
               onChange={(e) =>
                 setFormState({ ...formState, company: e.target.value })
               }
-              spellCheck="false"
+              spellCheck={false}
               placeholder={getTranslation(
                 getField("company")?.placeholder,
               )?.trim()}
-              className="h-[44px] bg-black/30 border border-white/20 rounded-[10px] px-4 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+              name="organization"
+              autoComplete="organization"
+              className="cta-input-el h-[44px] bg-black/30 border border-white/20 rounded-[10px] px-4 text-[16px]"
             />
 
             <input
@@ -805,17 +855,19 @@ export function CtaSection({
               onChange={(e) =>
                 setFormState({ ...formState, email: e.target.value })
               }
-              spellCheck="false"
+              spellCheck={false}
               placeholder={getTranslation(
                 getField("email")?.placeholder,
               )?.trim()}
-              className="h-[44px] bg-black/30 border border-white/20 rounded-[10px] px-4 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+              name="email"
+              autoComplete="email"
+              className="cta-input-el h-[44px] bg-black/30 border border-white/20 rounded-[10px] px-4 text-[16px]"
               required
             />
             <div
               className={cn(
-                "flex items-stretch bg-black/30 border border-white/20 rounded-[10px] relative transition-all",
-                openCountrySelector ? "z-20" : "z-0"
+                "flex items-stretch bg-black/30 border border-white/20 rounded-[10px] relative",
+                openCountrySelector ? "z-[600]" : "z-0"
               )}
               ref={countrySelectorRef}
               style={{ 
@@ -827,7 +879,7 @@ export function CtaSection({
                 type="button"
                 onClick={() => setOpenCountrySelector(!openCountrySelector)}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 px-4 hover:bg-white/10 transition-colors border-r border-white/20 flex-shrink-0"
+                className="flex items-center gap-2 px-4 border-r border-white/20 flex-shrink-0"
               >
                 <div className="w-5 h-3 md:w-6 md:h-4 flex-shrink-0">
                   <CountryFlag
@@ -855,7 +907,9 @@ export function CtaSection({
                   getField("whatsapp")?.placeholder,
                 )?.trim()}
                 disabled={isSubmitting}
-                className="flex-1 bg-transparent px-4 outline-none font-anaheim font-semibold text-base text-white placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                name="tel"
+                autoComplete="tel"
+                className="cta-input-el flex-1 bg-transparent px-4 border-none outline-none"
               />
 
               {openCountrySelector && (
@@ -909,11 +963,11 @@ export function CtaSection({
                   "other-primary-requirement": e.target.value,
                 })
               }
-              spellCheck="false"
+              spellCheck={false}
               placeholder={getTranslation(
                 getField("other-primary-requirement")?.placeholder,
               )?.trim()}
-              className="w-full h-[44px] bg-black/30 border border-white/20 rounded-[10px] px-4 text-white text-[16px] focus:border-[#FFF28E] transition-all placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+              className="cta-input-el w-full h-[44px] bg-black/30 border border-white/20 rounded-[10px] px-4 text-[16px]"
             />
 
             <div className="col-span-2">
@@ -925,12 +979,12 @@ export function CtaSection({
                     "specific-requirements-project-description": e.target.value,
                   })
                 }
-                spellCheck="false"
+                spellCheck={false}
                 placeholder={getTranslation(
                   getField("specific-requirements-project-description")
                     ?.placeholder,
                 )?.trim()}
-                className="w-full h-[105px] bg-black/30 border border-white/20 rounded-[10px] p-4 text-white text-[16px] focus:border-[#FFF28E] resize-none overflow-y-auto placeholder:text-white/40 [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#000000_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                className="cta-input-el w-full h-[105px] bg-black/30 border border-white/20 rounded-[10px] p-4 text-[16px] resize-none overflow-y-auto"
               />
             </div>
 
