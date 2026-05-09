@@ -469,7 +469,7 @@ export default buildConfig({
     nestedDocsPlugin({
       collections: ['categories'],
       generateLabel: (_, doc) => {
-        const name = typeof doc.name === 'object' ? doc.name?.en : doc.name
+        const name = typeof doc.name === 'object' ? (doc.name as any)?.en : doc.name
         return (name as string) || (doc.title as string) || (doc.slug as string) || 'Untitled'
       },
       generateURL: (docs) => docs.reduce((url, doc) => `${url}/${doc.slug}`, ''),
