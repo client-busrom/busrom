@@ -130,6 +130,14 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
 
   return (
     <SWRConfig value={{ fetcher }}>
+      {/* 遮罩层：防止 Preloader 和 ImageWall 切换时的瞬时白屏闪烁 */}
+      {(loadingStage === "loading" || loadingStage === "imageWall") && (
+        <div 
+          className="fixed inset-0 z-[30]" 
+          style={{ backgroundColor: preloaderConfig.backgroundColor }}
+        />
+      )}
+
       {/* Preloader - 加载阶段 */}
       {loadingStage === "loading" && preloaderConfig.enabled && (
         <Preloader onLoadingComplete={handlePreloaderComplete} config={preloaderConfig} />

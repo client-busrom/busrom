@@ -116,7 +116,7 @@ export function ImageWall({
         return (
           <div
             key={`${item.src}-${index}`}
-            className="image-item absolute overflow-hidden shadow-lg -translate-x-1/2 -translate-y-1/2"
+            className="image-item absolute overflow-hidden shadow-lg -translate-x-1/2 -translate-y-1/2 opacity-0 scale-0"
             style={{
               top: item.position.top,
               left: item.position.left,
