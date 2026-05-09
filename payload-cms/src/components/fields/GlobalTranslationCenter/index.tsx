@@ -333,100 +333,83 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
       return
     }
 
-    // 检查源语言内容是否为空，防止用空内容覆盖已有翻译
-    const emptySourceFields = fieldsToTranslate.filter(field => {
+    // 检查源语言内容是否为空
+    const validFieldsToTranslate = fieldsToTranslate.filter(field => {
       const sourceValue = field.values.find(v => v.locale === sourceLocale)?.value
-      return !sourceValue
+      return !!sourceValue && sourceValue.trim().length > 0
     })
 
-    if (emptySourceFields.length > 0) {
-      const sourceLabel = SUPPORTED_LOCALES.find(l => l.code === sourceLocale)?.label || sourceLocale
-      const fieldNames = emptySourceFields.map(f =>
-        (t(f.config.labelKey as any) as string) || f.config.name
-      ).join('\n')
-
-      // 如果全部选中字段为空，直接阻止
-      if (emptySourceFields.length === fieldsToTranslate.length) {
-        setStatusMessage({ type: 'error', key: 'custom:translationCenter:sourceEmpty' })
-        return
-      }
-
-      // 部分字段为空，二次确认
-      const isZh = i18n?.language === 'zh'
-      const confirmMsg = isZh
-        ? `源语言（${sourceLabel}）以下字段内容为空：\n\n${fieldNames}\n\n从空的源语言翻译将产生空结果，并可能覆盖已有的翻译内容。\n\n确定要继续吗？`
-        : `The source language (${sourceLabel}) has no content for the following fields:\n\n${fieldNames}\n\nTranslating from an empty source will produce empty results and may overwrite existing translations.\n\nAre you sure you want to continue?`
-
-      if (!window.confirm(confirmMsg)) {
-        return
-      }
+    if (validFieldsToTranslate.length === 0) {
+      setStatusMessage({ type: 'error', key: 'custom:translationCenter:sourceEmpty' })
+      return
     }
 
     setIsTranslating(true)
     setStatusMessage(null)
 
-    let translatedFieldCount = 0
-    const translatedLanguages = new Set<string>()
-
     try {
-      for (const field of fieldsToTranslate) {
-        const sourceValue = field.values.find(v => v.locale === sourceLocale)?.value
-        if (!sourceValue) continue
+      const { getTranslationHeaders } = await import('@/lib/translation-client')
+      const personalHeaders = getTranslationHeaders()
 
-        // 确定要翻译的目标语言
-        const localesToTranslate = targetLocales.filter(locale => {
-          if (overwriteExisting) return true
-          const existingValue = field.values.find(v => v.locale === locale)?.value
+      // 准备批量翻译的数据
+      const textsToTranslate = validFieldsToTranslate.map(field => 
+        field.values.find(v => v.locale === sourceLocale)?.value || ''
+      )
+
+      for (const targetLang of targetLocales) {
+        // 如果不覆盖且目标语言已有内容，则跳过
+        const shouldTranslate = overwriteExisting ? true : validFieldsToTranslate.some(field => {
+          const existingValue = field.values.find(v => v.locale === targetLang)?.value
           return !existingValue
         })
 
-        if (localesToTranslate.length === 0) continue
-
-        // Get user's personal translation settings
-        const { getTranslationHeaders } = await import('@/lib/translation-client')
-        const personalHeaders = getTranslationHeaders()
+        if (!shouldTranslate) continue
 
         const res = await fetch('/api/translate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...personalHeaders },
           body: JSON.stringify({
-            text: sourceValue,
+            texts: textsToTranslate,
             sourceLang: sourceLocale,
-            targetLangs: localesToTranslate,
+            targetLang: targetLang,
+            isRichText: false, // Global fields are mostly text/textarea
           }),
         })
+
+        if (!res.ok) throw new Error(`Translation to ${targetLang} failed`)
+        
         const data = await res.json()
+        const translations = data.translations as string[]
 
-        // 更新本地状态
-        setFieldsData(prev => prev.map(f => {
-          if (f.config.name === field.config.name) {
-            return {
-              ...f,
-              values: f.values.map(v => {
-                if (localesToTranslate.includes(v.locale) && data.translations[v.locale]) {
-                  return { ...v, value: data.translations[v.locale] }
-                }
-                return v
-              }),
+        if (translations && Array.isArray(translations)) {
+          // 更新本地状态
+          setFieldsData(prev => prev.map(f => {
+            const fieldIndex = validFieldsToTranslate.findIndex(vf => vf.config.name === f.config.name)
+            if (fieldIndex !== -1 && translations[fieldIndex]) {
+              return {
+                ...f,
+                values: f.values.map(v => 
+                  v.locale === targetLang ? { ...v, value: translations[fieldIndex] } : v
+                ),
+              }
             }
-          }
-          return f
-        }))
+            return f
+          }))
 
-        // 记录被翻译的语言
-        setModifiedLocales(prev => {
-          const newSet = new Set(prev)
-          localesToTranslate.forEach(locale => newSet.add(locale))
-          return newSet
-        })
-
-        translatedFieldCount++
-        localesToTranslate.forEach(l => translatedLanguages.add(l))
+          setModifiedLocales(prev => new Set(prev).add(targetLang))
+        }
       }
 
-      setStatusMessage({ type: 'success', key: 'custom:translationCenter:translateSuccess', params: { fields: translatedFieldCount, languages: translatedLanguages.size } })
+      setStatusMessage({ 
+        type: 'success', 
+        key: 'custom:translationCenter:translateSuccess', 
+        params: { 
+          fields: validFieldsToTranslate.length, 
+          languages: targetLocales.length 
+        } 
+      })
     } catch (error) {
-      console.error('[TranslationCenter] Translation error:', error)
+      console.error('[GlobalTranslationCenter] Translation error:', error)
       setStatusMessage({ type: 'error', key: 'custom:translationCenter:translateFailed' })
     } finally {
       setIsTranslating(false)

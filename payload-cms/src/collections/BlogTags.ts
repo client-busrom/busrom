@@ -28,6 +28,21 @@ export const BlogTags: CollectionConfig = {
   },
   fields: [
     {
+      type: 'row',
+      fields: [
+        {
+          name: 'translationCenter',
+          type: 'ui',
+          admin: {
+            width: '50%',
+            components: {
+              Field: '@/components/fields/TranslationCenter',
+            },
+          },
+        },
+      ],
+    },
+    {
       name: 'name',
       type: 'text',
       label: {

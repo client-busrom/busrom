@@ -91,12 +91,12 @@ function matchTextCasing(source: string, target: string, targetLang?: string): s
  * Google Translate API
  */
 async function translateWithGoogle(
-  text: string,
+  text: string | string[],
   sourceLang: string,
   targetLang: string,
   apiKey: string,
   isRichText: boolean = false
-): Promise<string> {
+): Promise<string | string[]> {
   const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`
 
   const response = await fetch(url, {
@@ -116,19 +116,20 @@ async function translateWithGoogle(
   }
 
   const data = await response.json()
-  return data.data?.translations?.[0]?.translatedText || text
+  const translations = data.data?.translations?.map((t: any) => t.translatedText) || []
+  return Array.isArray(text) ? translations : (translations[0] || text)
 }
 
 /**
  * DeepL API
  */
 async function translateWithDeepL(
-  text: string,
+  text: string | string[],
   sourceLang: string,
   targetLang: string,
   apiKey: string,
   isRichText: boolean = false
-): Promise<string> {
+): Promise<string | string[]> {
   const deeplLangMap: Record<string, string> = {
     en: 'EN', zh: 'ZH', es: 'ES', pt: 'PT', fr: 'FR', de: 'DE',
     it: 'IT', nl: 'NL', sv: 'SV', da: 'DA', fi: 'FI', pl: 'PL',
@@ -142,23 +143,25 @@ async function translateWithDeepL(
   }
 
   const url = 'https://api-free.deepl.com/v2/translate'
-
-  const params = new URLSearchParams({
-    auth_key: apiKey,
-    text: text,
-    target_lang: targetCode,
-  })
-
+  const params = new URLSearchParams()
+  params.append('auth_key', apiKey)
+  params.append('target_lang', targetCode)
+  
   if (sourceLang !== 'auto') {
     params.append('source_lang', deeplLangMap[sourceLang] || 'EN')
   }
-
   if (isRichText) {
     params.append('tag_handling', 'html')
   }
 
-  const response = await fetch(`${url}?${params.toString()}`, {
+  // Add all segments
+  const texts = Array.isArray(text) ? text : [text]
+  texts.forEach(t => params.append('text', t))
+
+  const response = await fetch(`${url}`, {
     method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params.toString(),
   })
 
   if (!response.ok) {
@@ -167,7 +170,8 @@ async function translateWithDeepL(
   }
 
   const data = await response.json()
-  return data.translations?.[0]?.text || text
+  const translations = data.translations?.map((t: any) => t.text) || []
+  return Array.isArray(text) ? translations : (translations[0] || text)
 }
 
 /**
@@ -283,54 +287,43 @@ export const translateHandler: PayloadHandler = async (req) => {
 
     const { text, texts, sourceLang = 'en', targetLang, targetLangs, isRichText } = body
 
-    // Mode 1: Multiple texts to single language
+    // Mode 1: Multiple texts to single language (Optimized for Batching)
     if (texts && Array.isArray(texts)) {
       if (!targetLang) {
-        return Response.json(
-          { error: 'targetLang is required when using texts array' },
-          { status: 400 }
-        )
+        return Response.json({ error: 'targetLang is required when using texts array' }, { status: 400 })
       }
 
-      const translatedTexts: string[] = []
-      const errors: string[] = []
-
-      for (let i = 0; i < texts.length; i++) {
-        const sourceText = texts[i]
-
-        if (!sourceText || !sourceText.trim()) {
-          translatedTexts.push(sourceText)
-          continue
+      try {
+        let results: string | string[]
+        if (service === 'google') {
+          results = await translateWithGoogle(texts, sourceLang, targetLang, apiKey, isRichText)
+        } else if (service === 'deepl') {
+          results = await translateWithDeepL(texts, sourceLang, targetLang, apiKey, isRichText)
+        } else if (service === 'azure') {
+          // Azure already supports array input in its core function
+          const promises = texts.map(t => translateWithAzure(t, sourceLang, targetLang, apiKey, isRichText, apiEndpoint))
+          results = await Promise.all(promises)
+        } else {
+          results = texts
         }
 
-        try {
-          let translatedText: string
+        const translatedTexts = Array.isArray(results) ? results : [results]
+        
+        // Final polish: match casing
+        const polishedTexts = translatedTexts.map((t, i) => {
+          const sourceText = texts[i]
+          const shouldMatchCasing = !isRichText || !t.includes('<')
+          return shouldMatchCasing ? matchTextCasing(sourceText, t, targetLang) : t
+        })
 
-          if (service === 'google') {
-            translatedText = await translateWithGoogle(sourceText, sourceLang, targetLang, apiKey, isRichText)
-          } else if (service === 'deepl') {
-            translatedText = await translateWithDeepL(sourceText, sourceLang, targetLang, apiKey, isRichText)
-          } else if (service === 'azure') {
-            translatedText = await translateWithAzure(sourceText, sourceLang, targetLang, apiKey, isRichText, apiEndpoint)
-          } else {
-            translatedText = sourceText
-          }
-
-          // Use casing preservation if it's not rich text or if it doesn't look like HTML
-          const shouldMatchCasing = !isRichText || !translatedText.includes('<')
-          translatedTexts.push(shouldMatchCasing ? matchTextCasing(sourceText, translatedText, targetLang) : translatedText)
-        } catch (error) {
-          payload.logger.error(`Translation failed for text ${i}:`, error)
-          errors.push(`Text ${i}: ${error instanceof Error ? error.message : 'Unknown error'}`)
-          translatedTexts.push(sourceText)
-        }
+        return Response.json({
+          success: true,
+          translations: polishedTexts,
+        })
+      } catch (error) {
+        payload.logger.error(`Batch translation failed:`, error)
+        return Response.json({ error: error instanceof Error ? error.message : 'Batch translation failed' }, { status: 500 })
       }
-
-      return Response.json({
-        success: errors.length === 0,
-        translations: translatedTexts,
-        errors: errors.length > 0 ? errors : undefined,
-      })
     }
 
     // Mode 2: Single text to multiple languages

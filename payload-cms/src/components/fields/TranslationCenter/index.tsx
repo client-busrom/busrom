@@ -11,7 +11,7 @@ import './styles.scss'
 interface TranslatableFieldConfig {
   name: string
   labelKey: string // 使用 i18n key
-  type: 'text' | 'textarea'
+  type: 'text' | 'textarea' | 'richText'
   // Array field support: field lives inside an array
   isArrayField?: boolean
   arrayFieldName?: string // e.g. 'sceneGallery'
@@ -95,6 +95,7 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     ],
   'faq-items': [
     { name: 'question', labelKey: 'custom:fields:question', type: 'textarea' },
+    { name: 'contentTranslation', labelKey: 'custom:fields:answer', type: 'richText' },
   ],
   'reusable-blocks': [
     { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
@@ -114,6 +115,9 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'feature4', labelKey: 'custom:translationCenter:feature4', type: 'textarea' },
     { name: 'feature5', labelKey: 'custom:translationCenter:feature5', type: 'textarea' },
     { name: 'ctaButton.text', labelKey: 'custom:translationCenter:ctaButtonText', type: 'textarea' },
+  ],
+  'blog-tags': [
+    { name: 'name', labelKey: 'custom:fields:tagName', type: 'textarea' },
   ],
   'series-intro-items': [
     { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
@@ -421,110 +425,93 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
       return
     }
 
-    // 检查源语言内容是否为空，防止用空内容覆盖已有翻译
-    const emptySourceFields = fieldsToTranslate.filter(field => {
+    // 检查源语言内容是否为空
+    const validFieldsToTranslate = fieldsToTranslate.filter(field => {
       const sourceValue = field.values.find(v => v.locale === sourceLocale)?.value
-      return !sourceValue
+      return !!sourceValue && (typeof sourceValue === 'string' ? sourceValue.trim().length > 0 : true)
     })
 
-    if (emptySourceFields.length > 0) {
-      const sourceLabel = SUPPORTED_LOCALES.find(l => l.code === sourceLocale)?.label || sourceLocale
-      const fieldNames = emptySourceFields.map(f => {
-        if (f.config.labelKey.startsWith('__array__:')) {
-          const rest = f.config.labelKey.slice('__array__:'.length)
-          const colonIdx = rest.indexOf(':custom:')
-          return colonIdx >= 0 ? rest.slice(0, colonIdx) + (t(rest.slice(colonIdx + 1) as any) || '') : rest
-        }
-        return t(f.config.labelKey as any) as string || f.config.name
-      }).join('\n')
-
-      // 如果全部选中字段为空，直接阻止
-      if (emptySourceFields.length === fieldsToTranslate.length) {
-        setStatusMessage({ type: 'error', key: 'custom:translationCenter:sourceEmpty' })
-        return
-      }
-
-      // 部分字段为空，二次确认
-      const isZh = i18n?.language === 'zh'
-      const confirmMsg = isZh
-        ? `源语言（${sourceLabel}）以下字段内容为空：\n\n${fieldNames}\n\n从空的源语言翻译将产生空结果，并可能覆盖已有的翻译内容。\n\n确定要继续吗？`
-        : `The source language (${sourceLabel}) has no content for the following fields:\n\n${fieldNames}\n\nTranslating from an empty source will produce empty results and may overwrite existing translations.\n\nAre you sure you want to continue?`
-
-      if (!window.confirm(confirmMsg)) {
-        return
-      }
+    if (validFieldsToTranslate.length === 0) {
+      setStatusMessage({ type: 'error', key: 'custom:translationCenter:sourceEmpty' })
+      return
     }
 
     setIsTranslating(true)
-    setProgress({ current: 0, total: fieldsToTranslate.length })
+    setProgress({ current: 0, total: targetLocales.length })
     setStatusMessage(null)
 
-    let translatedFieldCount = 0
-    const translatedLanguages = new Set<string>()
-
     try {
-      for (const field of fieldsToTranslate) {
-        const sourceValue = field.values.find(v => v.locale === sourceLocale)?.value
-        if (!sourceValue) continue
+      const { getTranslationHeaders } = await import('@/lib/translation-client')
+      const personalHeaders = getTranslationHeaders()
 
-        // 确定要翻译的目标语言
-        const localesToTranslate = targetLocales.filter(locale => {
-          if (overwriteExisting) return true
-          const existingValue = field.values.find(v => v.locale === locale)?.value
+      // 准备批量翻译的数据
+      const textsToTranslate = validFieldsToTranslate.map(field => {
+        const val = field.values.find(v => v.locale === sourceLocale)?.value
+        return typeof val === 'object' ? JSON.stringify(val) : (val || '')
+      })
+
+      let translatedCount = 0
+      for (const targetLang of targetLocales) {
+        // 如果不覆盖且目标语言已有内容，则跳过
+        const shouldTranslate = overwriteExisting ? true : validFieldsToTranslate.some(field => {
+          const existingValue = field.values.find(v => v.locale === targetLang)?.value
           return !existingValue
         })
 
-        if (localesToTranslate.length === 0) continue
-
-        // Get user's personal translation settings
-        const { getTranslationHeaders } = await import('@/lib/translation-client')
-        const personalHeaders = getTranslationHeaders()
+        if (!shouldTranslate) continue
 
         const res = await fetch('/api/translate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...personalHeaders },
           body: JSON.stringify({
-            text: sourceValue,
+            texts: textsToTranslate,
             sourceLang: sourceLocale,
-            targetLangs: localesToTranslate,
+            targetLang: targetLang,
+            isRichText: validFieldsToTranslate.some(f => f.config.type === 'richText' as any),
           }),
         })
+
+        if (!res.ok) throw new Error(`Translation to ${targetLang} failed`)
+        
         const data = await res.json()
+        const translations = data.translations as string[]
 
-        if (!res.ok || !data.translations) {
-          console.error('[TranslationCenter] Translation API error:', data.error || res.status)
-          throw new Error(data.error || `Translation API returned ${res.status}`)
-        }
-
-        // 更新本地状态
-        setFieldsData(prev => prev.map(f => {
-          if (f.config.name === field.config.name) {
-            return {
-              ...f,
-              values: f.values.map(v => {
-                if (localesToTranslate.includes(v.locale) && data.translations[v.locale]) {
-                  return { ...v, value: data.translations[v.locale] }
-                }
-                return v
-              }),
+        if (translations && Array.isArray(translations)) {
+          // 更新本地状态
+          setFieldsData(prev => prev.map(f => {
+            const fieldIndex = validFieldsToTranslate.findIndex(vf => vf.config.name === f.config.name)
+            if (fieldIndex !== -1 && translations[fieldIndex]) {
+              let nextValue: any = translations[fieldIndex]
+              // If it looks like JSON and field is richText, parse it
+              if (typeof nextValue === 'string' && nextValue.startsWith('{')) {
+                 try { nextValue = JSON.parse(nextValue) } catch(e) {}
+              }
+              
+              return {
+                ...f,
+                values: f.values.map(v => 
+                  v.locale === targetLang ? { ...v, value: nextValue } : v
+                ),
+              }
             }
-          }
-          return f
-        }))
+            return f
+          }))
 
-        // 记录被翻译的语言
-        setModifiedLocales(prev => {
-          const newSet = new Set(prev)
-          localesToTranslate.forEach(locale => newSet.add(locale))
-          return newSet
-        })
-
-        translatedFieldCount++
-        localesToTranslate.forEach(l => translatedLanguages.add(l))
-        setProgress(prev => prev ? { ...prev, current: translatedFieldCount } : null)
+          setModifiedLocales(prev => new Set(prev).add(targetLang))
+        }
+        
+        translatedCount++
+        setProgress({ current: translatedCount, total: targetLocales.length })
       }
 
-      setStatusMessage({ type: 'success', key: 'custom:translationCenter:translateSuccess', params: { fields: translatedFieldCount, languages: translatedLanguages.size } })
+      setStatusMessage({ 
+        type: 'success', 
+        key: 'custom:translationCenter:translateSuccess', 
+        params: { 
+          fields: validFieldsToTranslate.length, 
+          languages: targetLocales.length 
+        } 
+      })
     } catch (error) {
       console.error('[TranslationCenter] Translation error:', error)
       setStatusMessage({ type: 'error', key: 'custom:translationCenter:translateFailed' })
@@ -578,7 +565,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
       }
 
       // Helper function to set nested field value using dot notation
-      const setNestedValue = (obj: Record<string, unknown>, path: string, value: string) => {
+      const setNestedValue = (obj: Record<string, unknown>, path: string, value: any) => {
         const keys = path.split('.')
         let current = obj
         for (let i = 0; i < keys.length - 1; i++) {
@@ -994,11 +981,21 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
                                   <span className="tc-field__cell-code">{locale.code.toUpperCase()}</span>
                                   {isSource && <span className="tc-badge tc-badge--source">{t('custom:translationCenter:source' as any)}</span>}
                                 </div>
-                                {field.config.type === 'textarea' ? (
+                                {field.config.type === 'textarea' || field.config.type === 'richText' ? (
                                   <textarea
-                                    value={fieldValue}
-                                    onChange={(e) => handleFieldValueChange(field.config.name, locale.code as LocaleCode, e.target.value)}
-                                    rows={2}
+                                    value={typeof fieldValue === 'object' ? JSON.stringify(fieldValue, null, 2) : fieldValue}
+                                    onChange={(e) => {
+                                      let nextValue: any = e.target.value
+                                      if (field.config.type === 'richText') {
+                                        try {
+                                          nextValue = JSON.parse(e.target.value)
+                                        } catch (e) {
+                                          // Keep as string if not valid JSON
+                                        }
+                                      }
+                                      handleFieldValueChange(field.config.name, locale.code as LocaleCode, nextValue)
+                                    }}
+                                    rows={field.config.type === 'richText' ? 4 : 2}
                                     placeholder={isEmpty ? t('custom:translationCenter:empty' as any) as string : ''}
                                   />
                                 ) : (

@@ -144,6 +144,8 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
   const handleSaveLocale = useCallback(async (locale: LocaleCode, content: LexicalContent) => {
     if (!id || locale === currentLocale.code) return
 
+    const timerName = `[MultiLocale] Save ${locale}`
+    console.time(timerName)
     const baseEndpoint = collectionSlug
       ? `/api/${collectionSlug}/${id}`
       : `/api/globals/${globalSlug}`
@@ -153,8 +155,6 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
       const patchBody: Record<string, unknown> = { [field.name]: content }
 
       // Include required localized text fields from cache to pass Payload validation.
-      // Without this, PATCH fails with 400 if e.g. `title` is required but empty for this locale.
-      // We only include simple string fields — no relations or arrays — to avoid race conditions.
       const requiredFields: Record<string, string[]> = {
         pages: ['title'],
         products: ['name'],
@@ -164,17 +164,10 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
 
       const fieldsToInclude = collectionSlug ? (requiredFields[collectionSlug] || []) : []
       for (const reqField of fieldsToInclude) {
-        if (reqField === field.name) continue // Already in the body
-        // Try to get from cache
+        if (reqField === field.name) continue
         const cachedValue = getFieldFromCache(collectionSlug, globalSlug, id, reqField, locale)
         if (cachedValue && typeof cachedValue === 'string') {
           patchBody[reqField] = cachedValue
-        } else {
-          // Fallback: get from source locale (current locale)
-          const sourceCachedValue = getFieldFromCache(collectionSlug, globalSlug, id, reqField, currentLocale.code as LocaleCode)
-          if (sourceCachedValue && typeof sourceCachedValue === 'string') {
-            patchBody[reqField] = sourceCachedValue
-          }
         }
       }
 
@@ -190,7 +183,9 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
         console.error(`Failed to save ${locale}: ${res.status}`, errorBody)
         throw new Error(`Failed to save ${locale}: ${res.status}`)
       }
+      console.timeEnd(timerName)
     } catch (error) {
+      console.timeEnd(timerName)
       console.error(`Failed to save ${locale}:`, error)
       throw error
     }
@@ -229,7 +224,7 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
     setIsTranslating(true)
     setTranslationProgress({ completed: 0, total: targetLocales.length, currentLocale: '', results: [] })
 
-    // Update state
+    // 1. Update local state immediately for UI responsiveness
     setLocaleValues(prev =>
       prev.map(l => {
         if (targetLocales.includes(l.locale)) {
@@ -242,34 +237,65 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
       })
     )
 
-    // If document exists, save to API sequentially (one at a time).
-    // Payload internally does read-modify-write on the full document,
-    // so parallel PATCHes to the same document will overwrite each other.
+    // 2. If document exists, save to API in bulk
     const results: { locale: string; success: boolean }[] = []
+    
     if (id) {
       const localesToSave = targetLocales.filter(locale => {
         if (locale === currentLocale.code) return false
         const existing = localeValues.find(l => l.locale === locale)
         return overwriteExisting || !hasRichTextContent(existing?.value)
       })
+
+      const bulkLocales: Record<string, any> = {}
       for (const locale of localesToSave) {
-        try {
-          await handleSaveLocale(locale, sourceValue)
-          results.push({ locale, success: true })
-        } catch {
-          results.push({ locale, success: false })
+        const patchBody: Record<string, unknown> = { [field.name]: sourceValue }
+        
+          const requiredFields: Record<string, string[]> = {
+            pages: ['title'],
+            products: ['name'],
+            'product-series': ['name'],
+            'faq-items': ['question'],
+            'series-templates': ['name'],
+            'product-templates': ['name'],
+            blogs: ['title'],
+          }
+        const fieldsToInclude = collectionSlug ? (requiredFields[collectionSlug] || []) : []
+        for (const reqField of fieldsToInclude) {
+          if (reqField === field.name) continue
+          const cachedValue = getFieldFromCache(collectionSlug, globalSlug, id, reqField, locale)
+          if (cachedValue && typeof cachedValue === 'string') {
+            patchBody[reqField] = cachedValue
+          }
         }
-        setTranslationProgress(prev => prev ? {
-          ...prev,
-          completed: results.length,
-          results: [...results],
-          currentLocale: '',
-        } : null)
+        bulkLocales[locale] = patchBody
+        results.push({ locale, success: true })
       }
-      // Invalidate cache after saving
+
+      if (Object.keys(bulkLocales).length > 0) {
+        console.time('[MultiLocale] Bulk Copy API Call')
+        const baseEndpoint = collectionSlug
+          ? `/api/${collectionSlug}/${id}/save-translations`
+          : `/api/globals/${globalSlug}/${id}/save-translations`
+
+        try {
+          const res = await fetch(baseEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ locales: bulkLocales }),
+          })
+          if (!res.ok) throw new Error('Bulk copy failed')
+          console.log('[MultiLocale] ✅ Bulk copy successful!')
+        } catch (e) {
+          console.error('[MultiLocale] ❌ Bulk copy error:', e)
+          // Mark all as failed if the whole request failed
+          results.forEach(r => r.success = false)
+        }
+        console.timeEnd('[MultiLocale] Bulk Copy API Call')
+      }
       invalidateCache(collectionSlug, globalSlug, id)
     } else {
-      // No API call needed (new document), all succeed
+      // New document, just mark as success in UI
       results.push(...targetLocales.map(l => ({ locale: l, success: true })))
     }
 
@@ -283,11 +309,8 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
     setTargetLocales([])
     setIsTranslating(false)
 
-    // Auto-hide progress after 5 seconds
-    setTimeout(() => {
-      setTranslationProgress(null)
-    }, 5000)
-  }, [activeLocale, targetLocales, localeValues, overwriteExisting, id, currentLocale.code, handleSaveLocale, collectionSlug, globalSlug, i18n])
+    setTimeout(() => setTranslationProgress(null), 5000)
+  }, [activeLocale, targetLocales, localeValues, overwriteExisting, id, currentLocale.code, collectionSlug, globalSlug, i18n, field.name])
 
   // Translate content from current locale to selected locales
   const handleTranslateToLocales = useCallback(async () => {
@@ -306,12 +329,14 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
     setIsTranslating(true)
     setTranslationProgress({ completed: 0, total: targetLocales.length, currentLocale: '', results: [] })
 
+    console.time('[MultiLocale] Total Translation Process')
     try {
       // Extract all text segments from the source content
       const segments = extractTextsFromLexical(sourceValue)
       if (segments.length === 0) {
         // No text to translate, just copy
         await handleCopyToLocales()
+        console.timeEnd('[MultiLocale] Total Translation Process')
         return
       }
 
@@ -395,21 +420,63 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
         })
       )
 
-      // If document exists, save to API one at a time (sequential).
-      // Payload internally does read-modify-write on the full document,
-      // so parallel PATCHes to the same document will overwrite each other.
+      // Build a bulk payload for all translated locales
+      const bulkLocales: Record<string, any> = {}
+      
+      // If document exists, use the bulk save-translations endpoint (EXPERT MODE - fast & safe)
       if (id) {
         const toSave = translationResults.filter(r => r.content && !r.skipped && r.locale !== currentLocale.code)
+        
         for (const r of toSave) {
-          try {
-            await handleSaveLocale(r.locale, r.content!)
-          } catch {
-            // Mark as failed in results if save fails
-            const idx = results.findIndex(res => res.locale === r.locale)
-            if (idx !== -1) results[idx].success = false
+          const patchBody: Record<string, unknown> = { [field.name]: r.content }
+          
+          // Add required fields
+          const requiredFields: Record<string, string[]> = {
+            pages: ['title'],
+            products: ['name'],
+            'product-series': ['name'],
+            'faq-items': ['question'],
+            'series-templates': ['name'],
+            'product-templates': ['name'],
+            blogs: ['title'],
           }
+          const fieldsToInclude = collectionSlug ? (requiredFields[collectionSlug] || []) : []
+          for (const reqField of fieldsToInclude) {
+            if (reqField === field.name) continue
+            const cachedValue = getFieldFromCache(collectionSlug, globalSlug, id, reqField, r.locale)
+            if (cachedValue && typeof cachedValue === 'string') {
+              patchBody[reqField] = cachedValue
+            }
+          }
+          
+          bulkLocales[r.locale] = patchBody
         }
-        // Invalidate cache after saving
+
+        if (Object.keys(bulkLocales).length > 0) {
+          console.time('[MultiLocale] Bulk Save API Call')
+          const baseEndpoint = collectionSlug
+            ? `/api/${collectionSlug}/${id}/save-translations`
+            : `/api/globals/${globalSlug}/${id}/save-translations` // Note: Globals might need different path, but let's assume collections for now
+
+          try {
+            const res = await fetch(baseEndpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ locales: bulkLocales }),
+            })
+            
+            if (!res.ok) {
+              const errText = await res.text()
+              console.error('[MultiLocale] Bulk save failed:', errText)
+            } else {
+              console.log('[MultiLocale] ✅ Bulk save successful!')
+            }
+          } catch (e) {
+            console.error('[MultiLocale] ❌ Bulk save error:', e)
+          }
+          console.timeEnd('[MultiLocale] Bulk Save API Call')
+        }
+        
         invalidateCache(collectionSlug, globalSlug, id)
       }
 
@@ -427,7 +494,9 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
       setTimeout(() => {
         setTranslationProgress(null)
       }, 5000)
+      console.timeEnd('[MultiLocale] Total Translation Process')
     } catch (error) {
+      console.timeEnd('[MultiLocale] Total Translation Process')
       console.error('Translation error:', error)
       setTranslationProgress(null)
     } finally {

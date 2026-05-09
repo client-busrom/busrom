@@ -131,18 +131,18 @@ export const FaqItems: CollectionConfig = {
                 zh: '答案',
               },
               localized: true,
-              admin: {
-                description: {
-                  en: 'Rich text answer - use language tabs above to switch locales',
-                  zh: '富文本答案 - 使用上方语言标签切换语言',
-                },
-                components: {
-                  beforeInput: ['@/components/fields/MultiLocaleRichTextField'],
+                admin: {
+                  description: {
+                    en: 'Rich text answer - use language tabs above to switch locales',
+                    zh: '富文本答案 - 使用上方语言标签切换语言',
+                  },
+                  components: {
+                    beforeInput: ['@/components/fields/MultiLocaleRichTextField'],
+                  },
                 },
               },
-            },
-          ],
-        },
+            ],
+          },
 
         // ==================================================================
         // Tab 3: Organization
