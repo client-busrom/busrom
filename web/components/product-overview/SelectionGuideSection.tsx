@@ -76,7 +76,7 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
           <motion.div
             className="absolute opacity-90"
             animate={{ 
-              y: [0, 10, 0],
+              scale: [1, 1.1, 1],
             }}
             transition={{
               duration: 4,
@@ -322,9 +322,19 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
             {/* Header Area with Icon and Titles */}
             <div className="relative mb-10 pt-4 flex flex-col items-center">
               {/* Keep the icon centered near the title */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-24 opacity-20 pointer-events-none">
+              <motion.div 
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-24 opacity-20 pointer-events-none"
+                animate={{ 
+                  scale: [1, 1.1, 1],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
                 <CrossIcon />
-              </div>
+              </motion.div>
               <h2 
                 className="relative z-10 font-limelight text-white text-3xl leading-[1.3] whitespace-pre-wrap text-center"
               >

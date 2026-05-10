@@ -20,7 +20,7 @@ export function BrandTrustSection({ data }: BrandTrustSectionProps) {
       {/* ==================== 1. Desktop Layout (>= md) ==================== */}
       <div
         className="hidden md:block w-full"
-        style={{ paddingTop: vw(120)}}
+        style={{ paddingTop: vw(120), marginBottom: vw(120) }}
       >
         <div 
           className="mx-auto flex items-start relative" 
@@ -176,16 +176,24 @@ export function BrandTrustSection({ data }: BrandTrustSectionProps) {
                 </svg>
 
                 {/* Quote Icon - Rotated 90deg and positioned at the gap */}
-                <img 
+                <motion.img 
                   src="/product-overview/product-overview-quote-icon.svg" 
                   alt=""
                   className="absolute pointer-events-none"
+                  initial={{ rotate: 90, x: 0 }}
+                  animate={{ 
+                    x: [0, 15, 0],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
                   style={{
                     left: vw(-46),
                     top: vw(-20),
                     width: vw(83),
                     height: 'auto',
-                    transform: 'rotate(90deg)',
                     zIndex: 20
                   }}
                 />

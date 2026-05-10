@@ -67,35 +67,40 @@ export function QuoteSection({ data }: QuoteSectionProps) {
             {data.description}
           </motion.p>
 
-          {/* 3. CTA Button */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4 }}
+          {/* 3. CTA Button - No entrance animation, only hover breathing effect */}
+          <div
             className="absolute"
             style={{ left: vw(982), top: vw(376) }}
           >
             <Link
               href={data.cta.url}
               target={data.cta.openInNewTab ? "_blank" : undefined}
-              className="group/btn cursor-pointer transition-transform hover:scale-105 block"
+              className="group/btn cursor-pointer block"
             >
-              <div
-                className="relative flex gap-x-4 items-center justify-between bg-[#756f3f] rounded-full border border-white/10"
+              <motion.div
+                whileHover={{ 
+                  scale: [1, 1.05, 1],
+                  transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
+                }}
+                className="relative flex gap-x-4 items-center justify-between bg-[#756f3f] rounded-full border border-white/10 transition-colors duration-300 group-hover/btn:bg-white group-hover/btn:border-[#756f3f]"
                 style={{
                   height: vw(86),
-                  paddingLeft: vw(36),
+                  paddingLeft: vw(48),
                   paddingRight: vw(8),
                 }}
               >
                 <span
-                  className="text-white font-josefin-sans font-medium tracking-wider"
-                  style={{ fontSize: vw(24) }}
+                  className="text-white font-josefin-sans font-medium tracking-wider transition-colors duration-300 group-hover/btn:text-[#756f3f]"
+                  style={{
+                    fontSize: vw(24),
+                    paddingLeft: vw(8),
+                    paddingRight: vw(8),
+                  }}
                 >
                   {data.cta.title}
                 </span>
                 <div
-                  className="bg-white rounded-full flex items-center justify-center shrink-0"
+                  className="bg-white rounded-full flex items-center justify-center shrink-0 transition-colors duration-300 group-hover/btn:bg-[#756f3f]"
                   style={{ width: vw(70), height: vw(70) }}
                 >
                   <svg
@@ -110,18 +115,19 @@ export function QuoteSection({ data }: QuoteSectionProps) {
                       strokeWidth="2.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      className="transition-colors duration-300 group-hover/btn:stroke-white"
                     />
                   </svg>
                 </div>
-              </div>
+              </motion.div>
             </Link>
-          </motion.div>
+          </div>
 
           {/* 4. Capsule Image & Quote Icon */}
           <div
             className="absolute"
             style={{
-              right: vw(4),
+              right: vw(50),
               top: vw(1),
               width: vw(520),
               height: vw(715),
@@ -152,6 +158,14 @@ export function QuoteSection({ data }: QuoteSectionProps) {
             <motion.div
               initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
               whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+              animate={{ 
+                y: [0, -15, 0]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
               className="absolute z-10"
               style={{
                 left: vw(0),
@@ -176,7 +190,7 @@ export function QuoteSection({ data }: QuoteSectionProps) {
             className="absolute pointer-events-none"
             style={{
               left: vw(0),
-              top: vw(551),
+              bottom: vw(-10),
               width: vw(1688),
               height: vw(348),
             }}
@@ -214,6 +228,14 @@ export function QuoteSection({ data }: QuoteSectionProps) {
           <motion.div
             initial={{ opacity: 0, rotate: -30, scale: 0.5 }}
             whileInView={{ opacity: 1, rotate: 0, scale: 1 }}
+            animate={{ 
+              y: [0, -10, 0]
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
             className="absolute -left-6 -top-4 w-16 h-16 z-20"
           >
             <img
@@ -256,36 +278,32 @@ export function QuoteSection({ data }: QuoteSectionProps) {
           {data.description}
         </motion.p>
 
-        {/* Mobile CTA */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-        >
+        {/* Mobile CTA - No entrance animation, only breathing effect */}
+        <div className="relative">
           <Link
             href={data.cta.url}
             target={data.cta.openInNewTab ? "_blank" : undefined}
-            className="flex items-center gap-6 bg-[#756f3f] text-white rounded-full pl-8 pr-2 py-2 shadow-xl active:scale-95 transition-transform"
+            className="group/mob-btn flex items-center gap-6 bg-[#756f3f] text-white rounded-full pl-8 pr-2 py-2 shadow-xl active:scale-95 transition-colors duration-300 hover:bg-white border border-transparent hover:border-[#756f3f]"
           >
-            <span className="font-josefin-sans font-medium tracking-wider text-lg">
+            <span className="font-josefin-sans font-medium tracking-wider text-lg transition-colors duration-300 group-hover/mob-btn:text-[#756f3f]">
               {data.cta.title}
             </span>
-            <div className="bg-white w-12 h-12 rounded-full flex items-center justify-center">
+            <div className="bg-white w-12 h-12 rounded-full flex items-center justify-center transition-colors duration-300 group-hover/mob-btn:bg-[#756f3f]">
               <Icon
                 icon="lucide:arrow-up-right"
-                className="text-[#756f3f] text-2xl"
+                className="text-[#756f3f] text-2xl transition-colors duration-300 group-hover/mob-btn:text-white"
               />
             </div>
           </Link>
-        </motion.div>
+        </div>
 
-        {/* Mobile Decorative Logo */}
-        <div className="absolute left-0 bottom-0 w-[200%] h-[120px] opacity-20 pointer-events-none translate-x-[-10%]">
+        {/* Mobile Decorative Logo - Full width at bottom */}
+        <div className="absolute left-0 bottom-0 w-full h-[100px] opacity-20 pointer-events-none px-4">
           {data.logo && (
             <OptimizedImage
               image={data.logo}
               alt="Decorative Logo Mobile"
-              className="w-full h-full object-contain object-left-bottom"
+              className="w-full h-full object-contain object-bottom"
               size="large"
             />
           )}
