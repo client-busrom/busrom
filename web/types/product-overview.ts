@@ -87,9 +87,9 @@ export interface ProductOverviewData {
   };
   exclusiveSolutions?: {
     logoText: string;
-    title: string;
-    subtitle: string;
-    content: string;
+    title: any;
+    subtitle: any;
+    content: any;
     items: ExclusiveSolutionItem[];
   };
   selectionGuide?: SelectionGuide;

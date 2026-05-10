@@ -127,6 +127,45 @@ export function ExclusiveSolutionsSection({
   if (!data || !data.items || data.items.length === 0) return null;
 
   const { logoText, title, subtitle, content, items } = data;
+ 
+  // Helper to render RichText from Payload/Lexical JSON recursively
+  const renderRichText = (node: any): React.ReactNode => {
+    if (typeof node === "string") return node;
+    if (!node) return null;
+ 
+    // If it's the root or a block with children (like paragraph), render its children
+    if (node.root) return renderRichText(node.root);
+    if (node.children) {
+      return node.children.map((child: any, idx: number) => (
+        <React.Fragment key={idx}>{renderRichText(child)}</React.Fragment>
+      ));
+    }
+ 
+    // Handle leaf nodes
+    if (node.type === "linebreak") {
+      return <br />;
+    }
+ 
+    if (node.type === "text") {
+      // format 16 are markers/slugs (e.g. "exclusive-solutions-title"), skip them
+      if ((node.format & 16) === 16) return null;
+ 
+      // format: 1 is Bold in Lexical
+      const isBold = (node.format & 1) === 1;
+      return (
+        <span
+          style={{
+            color: isBold ? "#756F3F" : "inherit",
+            fontWeight: isBold ? "bold" : "normal",
+          }}
+        >
+          {node.text}
+        </span>
+      );
+    }
+ 
+    return null;
+  };
 
   return (
     <section
@@ -144,21 +183,33 @@ export function ExclusiveSolutionsSection({
           borderRadius: vw(80),
         }}
       >
-        <div className="mx-auto" style={{ width: vw(1604) }}>
+        <div className="mx-auto" style={{ width: vw(1524) }}>
           {/* Header Info */}
           <div
             className="relative"
-            style={{ marginBottom: vw(80), paddingLeft: vw(42) }}
+            style={{ marginBottom: vw(76) }}
           >
             <div className="flex">
               <motion.p
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
+                animate={{
+                  scale: [1, 1.05, 1],
+                }}
+                transition={{
+                  scale: {
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  },
+                  opacity: { duration: 0.5 },
+                  x: { duration: 0.5 },
+                }}
                 className="font-katibeh flex items-center justify-center bg-[#ffe484] text-black leading-none rounded-full relative"
                 style={{
-                  fontSize: vw(40),
+                  fontSize: vw(36),
                   padding: `${vw(15)} ${vw(60)} ${vw(0)} ${vw(60)}`,
-                  marginBottom: vw(40),
+                  marginBottom: vw(38),
                 }}
               >
                 {logoText}
@@ -169,14 +220,15 @@ export function ExclusiveSolutionsSection({
               className="flex justify-between items-start"
               style={{ gap: vw(40) }}
             >
-              <div className="flex flex-col" style={{ width: vw(800) }}>
+              {/* Left Column: 60% */}
+              <div className="flex flex-col" style={{ width: "auto" }}>
                 <motion.h2
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   className="font-katibeh leading-none text-black"
-                  style={{ fontSize: vw(110) }}
+                  style={{ fontSize: vw(96), marginTop: 0 }}
                 >
-                  {title}
+                  {renderRichText(title)}
                 </motion.h2>
 
                 <motion.p
@@ -184,31 +236,51 @@ export function ExclusiveSolutionsSection({
                   whileInView={{ opacity: 1, y: 0 }}
                   className="font-katibeh text-black whitespace-pre-line"
                   style={{
-                    fontSize: vw(42),
+                    fontSize: vw(32),
                     lineHeight: 1.3,
-                    marginTop: vw(30),
+                    marginTop: vw(0),
                   }}
                 >
-                  {subtitle}
+                  {renderRichText(subtitle)}
                 </motion.p>
               </div>
 
+              {/* Right Column: 40% */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
-                className="relative bg-[#FFBB3220] border-2 border-dashed border-[#E9D89E] backdrop-blur-sm self-start flex items-center flex-shrink-0"
+                className="relative bg-[#FFBB3220] backdrop-blur-sm self-start flex items-center flex-shrink-0"
                 style={{
-                  width: "fit-content",
-                  padding: `${vw(30)} ${vw(40)}`,
+                  width: "auto",
+                  padding: `${vw(28)} ${vw(38)}`,
                   borderRadius: vw(35),
-                  marginTop: vw(-20),
+                  marginTop: 0,
                 }}
               >
+                {/* Precise Dashed Border Layer */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <svg className="w-full h-full">
+                    <rect
+                      x="1"
+                      y="1"
+                      width="calc(100% - 2px)"
+                      height="calc(100% - 2px)"
+                      rx={vw(35)}
+                      ry={vw(35)}
+                      fill="none"
+                      stroke="#E9D89E"
+                      strokeWidth="2"
+                      strokeDasharray="8 8"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+ 
                 <p
-                  className="font-katibeh text-[#965200] whitespace-pre-line leading-relaxed"
-                  style={{ fontSize: vw(40) }}
+                  className="font-katibeh text-[#965200] whitespace-pre-line relative z-10"
+                  style={{ fontSize: vw(36), lineHeight: 1.15 }}
                 >
-                  {content}
+                  {renderRichText(content)}
                 </p>
               </motion.div>
             </div>
@@ -218,105 +290,96 @@ export function ExclusiveSolutionsSection({
           <div
             className="relative overflow-hidden w-full"
             style={{
-              height: vw(896),
+              height: vw(850),
               background:
                 "linear-gradient(180deg, #464010 0%, rgba(172, 157, 39, 0.55) 100%)",
               borderRadius: vw(60),
             }}
           >
-            <div
-              className="absolute z-30"
-              style={{ left: vw(42), top: vw(70) }}
-            >
-              <NavButton direction="prev" onClick={scrollPrevDesktop} />
+            {/* Desktop Navigation Buttons */}
+            <div className="absolute inset-x-0 top-0 z-30 flex justify-between items-center pointer-events-none" style={{ padding: `${vw(60)} ${vw(40)}` }}>
+              <div className="pointer-events-auto">
+                <NavButton direction="prev" onClick={scrollPrevDesktop} />
+              </div>
+              <div className="pointer-events-auto">
+                <NavButton direction="next" onClick={scrollNextDesktop} />
+              </div>
             </div>
-            <div
-              className="absolute z-30"
-              style={{ left: vw(1426), top: vw(64) }}
-            >
-              <NavButton direction="next" onClick={scrollNextDesktop} />
-            </div>
-
+ 
             <div className="overflow-hidden h-full" ref={desktopRef}>
               <div className="flex h-full">
                 {items.map((item: any, idx: number) => (
                   <div
                     key={idx}
-                    className="flex-shrink-0 w-full relative h-full"
+                    className="flex-shrink-0 w-full h-full flex items-end"
+                    style={{ padding: `${vw(157)} ${vw(40)} ${vw(58)} ${vw(40)}` }}
                   >
-                    {/* Left Text */}
-                    <div
-                      className="absolute z-20 flex flex-col justify-between"
-                      style={{
-                        left: vw(42),
-                        top: vw(165),
-                        width: vw(435),
-                        height: vw(668),
-                      }}
-                    >
+                    <div className="flex w-full h-full gap-[vw(18)] items-end">
+                      {/* Left Text Column */}
                       <div
-                        className="bg-[#5a5319] flex items-center shadow-lg"
-                        style={{ borderRadius: vw(60), padding: vw(40) }}
+                        className="flex flex-col justify-between h-full shrink-0"
+                        style={{ width: vw(550) }}
                       >
-                        <p
-                          className="font-josefin-sans text-white opacity-90 whitespace-pre-line"
-                          style={{ fontSize: vw(30), lineHeight: 1.4 }}
+                        <div
+                          className="bg-[#5a5319] flex items-center shadow-lg"
+                          style={{ borderRadius: vw(60), padding: vw(38), width: vw(413) }}
                         >
-                          {item.description}
-                        </p>
+                          <p
+                            className="font-josefin-sans text-white opacity-90 whitespace-pre-line"
+                            style={{ fontSize: vw(24), lineHeight: 1.4 }}
+                          >
+                            {item.description}
+                          </p>
+                        </div>
+                        <h3
+                          className="font-josefin-sans font-bold text-white uppercase tracking-tight whitespace-pre-line"
+                          style={{
+                            fontSize: vw(36),
+                            lineHeight: 1.1,
+                          }}
+                        >
+                          {item.title}
+                        </h3>
                       </div>
-                      <h3
-                        className="font-josefin-sans font-bold text-white uppercase tracking-tight whitespace-pre-line"
-                        style={{
-                          fontSize: vw(48),
-                          lineHeight: 1.1,
-                          width: vw(900),
-                        }}
-                      >
-                        {item.title}
-                      </h3>
-                    </div>
-
-                    {/* Middle Image */}
-                    <div
-                      className="absolute z-10 overflow-hidden shadow-xl"
-                      style={{
-                        left: vw(644),
-                        top: vw(165),
-                        width: vw(447),
-                        height: vw(668),
-                        borderRadius: vw(60),
-                      }}
-                    >
-                      {item.leftImage && (
-                        <OptimizedImage
-                          image={item.leftImage}
-                          alt="Solution Detail"
-                          className="w-full h-full object-cover"
-                          size="large"
-                        />
-                      )}
-                    </div>
-
-                    {/* Right Image */}
-                    <div
-                      className="absolute z-10 overflow-hidden shadow-xl"
-                      style={{
-                        left: vw(1111),
-                        top: vw(165),
-                        width: vw(447),
-                        height: vw(668),
-                        borderRadius: vw(60),
-                      }}
-                    >
-                      {item.rightImage && (
-                        <OptimizedImage
-                          image={item.rightImage}
-                          alt="Application Case"
-                          className="w-full h-full object-cover"
-                          size="large"
-                        />
-                      )}
+ 
+                      {/* Images Row */}
+                      <div className="flex flex-1 gap-[vw(18)] h-full justify-end">
+                        <div
+                          className="overflow-hidden shadow-xl shrink-0"
+                          style={{
+                            width: vw(425),
+                            height: "100%",
+                            borderRadius: vw(60),
+                          }}
+                        >
+                          {item.leftImage && (
+                            <OptimizedImage
+                              image={item.leftImage}
+                              alt="Solution Detail"
+                              className="w-full h-full object-cover"
+                              size="large"
+                            />
+                          )}
+                        </div>
+ 
+                        <div
+                          className="overflow-hidden shadow-xl shrink-0"
+                          style={{
+                            width: vw(425),
+                            height: "100%",
+                            borderRadius: vw(60),
+                          }}
+                        >
+                          {item.rightImage && (
+                            <OptimizedImage
+                              image={item.rightImage}
+                              alt="Application Case"
+                              className="w-full h-full object-cover"
+                              size="large"
+                            />
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -338,17 +401,17 @@ export function ExclusiveSolutionsSection({
         {/* Title & Subtitle Stack */}
         <div className="flex flex-col mb-6">
           <h2 className="font-katibeh text-5xl text-black leading-tight mb-3">
-            {title}
+            {renderRichText(title)}
           </h2>
           <p className="font-katibeh text-xl text-black/80 leading-snug">
-            {subtitle}
+            {renderRichText(subtitle)}
           </p>
         </div>
 
         {/* Content Box */}
         <div className="bg-[#FFBB3220] border-2 border-dashed border-[#E9D89E] rounded-[24px] p-5 mb-8">
           <p className="font-katibeh text-[#965200] text-xl leading-relaxed text-center sm:text-left">
-            {content}
+            {renderRichText(content)}
           </p>
         </div>
 

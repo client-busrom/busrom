@@ -26,8 +26,8 @@ function StackedSubtitle({ text }: { text: string }) {
       // Remove layer after animation
       setTimeout(() => {
         setLayers((prev) => prev.filter((l) => l.id !== newId));
-      }, 3000);
-    }, 700);
+      }, 4000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -41,14 +41,14 @@ function StackedSubtitle({ text }: { text: string }) {
             key={layer.id}
             className="absolute"
             initial={{ y: 0, opacity: 0.6 }}
-            animate={{ y: 30, opacity: 0 }}
+            animate={{ y: 60, opacity: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 2.8, ease: "easeOut" }}
+            transition={{ duration: 4, ease: "easeOut" }}
           >
             <HollowText
               strokeColor="#464010"
               strokeWidth={0.5}
-              className="font-josefin-sans font-extrabold select-none pointer-events-none text-[32px] md:text-[72px]"
+              className="font-josefin-sans font-extrabold select-none pointer-events-none text-[32px] md:text-[96px]"
               style={{ letterSpacing: "0.02em" }}
             >
               {text}
@@ -59,7 +59,7 @@ function StackedSubtitle({ text }: { text: string }) {
 
       {/* Main solid text with stroke layer */}
       <span
-        className="relative z-10 text-[#f6f4ed] font-josefin-sans font-extrabold text-[32px] md:text-[72px]"
+        className="relative z-10 text-[#f6f4ed] font-josefin-sans font-extrabold text-[32px] md:text-[96px]"
         style={{
           letterSpacing: "0.02em",
           WebkitTextStroke: `1px #464010`,
@@ -71,7 +71,7 @@ function StackedSubtitle({ text }: { text: string }) {
 
       {/* Subtle background layer for better baseline visibility */}
       <span
-        className="absolute font-josefin-sans font-extrabold text-[#464010] opacity-5 select-none pointer-events-none z-0 text-[32px] md:text-[72px]"
+        className="absolute font-josefin-sans font-extrabold text-[#464010] opacity-5 select-none pointer-events-none z-0 text-[32px] md:text-[96px]"
         style={{ letterSpacing: "0.02em" }}
       >
         {text}
@@ -146,16 +146,19 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
       {/* ==================== 1. Desktop Layout (>= md) ==================== */}
       <div
         className="hidden md:flex flex-col items-center w-full relative"
-        style={{ height: vw(1200), paddingTop: vw(300) }}
+        style={{ 
+          paddingTop: "clamp(240px, 18vw, 350px)", 
+          paddingBottom: "clamp(100px, 10vw, 200px)" 
+        }}
       >
         {/* Title */}
         <div
           className="relative z-[60] text-center"
-          style={{ height: vw(65), marginBottom: vw(240) }}
+          style={{ marginBottom: "clamp(40px, 4vw, 80px)" }}
         >
           <h2
-            className="font-josefin-sans font-bold text-black leading-none"
-            style={{ fontSize: vw(60) }}
+            className="font-josefin-sans font-bold text-black leading-tight"
+            style={{ fontSize: "clamp(32px, 3.125vw, 60px)" }}
           >
             {title}
           </h2>
@@ -164,7 +167,7 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
         {/* Carousel Container */}
         <div
           className="relative w-full flex items-center justify-center"
-          style={{ height: vw(550) }}
+          style={{ height: "clamp(400px, 28vw, 550px)" }}
         >
           {items.map((item, index) => {
             const newDist = circularDist(index, activeIndex, total);
@@ -285,8 +288,8 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
           {/* Navigation Buttons */}
           <button
             onClick={goPrev}
-            className="absolute left-[3vw] z-[110] group"
-            style={{ width: vw(82), height: vw(82), top: vw(-85) }}
+            className="absolute left-[10vw] z-[110] group"
+            style={{ width: vw(60), height: vw(60), top: vw(-65) }}
           >
             <div className="w-full h-full rounded-full border border-[#464010] flex items-center justify-center transition-all duration-300 group-hover:bg-[#464010]">
               <ChevronLeft
@@ -297,8 +300,8 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
           </button>
           <button
             onClick={goNext}
-            className="absolute right-[3vw] z-[110] group"
-            style={{ width: vw(82), height: vw(82), top: vw(-85) }}
+            className="absolute right-[10vw] z-[110] group"
+            style={{ width: vw(60), height: vw(60), top: vw(-65) }}
           >
             <div className="w-full h-full rounded-full border border-[#464010] flex items-center justify-center transition-all duration-300 group-hover:bg-[#464010]">
               <ChevronRight
@@ -310,20 +313,28 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
         </div>
 
         {/* Subtitle Stack */}
-        <div className="relative mt-8 text-center pb-20 overflow-visible">
+        <div className="relative mt-[vw(30)] text-center pb-20 overflow-visible">
           <StackedSubtitle text={subtitle} />
         </div>
       </div>
 
       {/* ==================== 2. Mobile Layout (< md) ==================== */}
-      <div className="md:hidden w-full flex flex-col items-center px-6 pt-16 pb-20 overflow-visible">
+      <div className="md:hidden w-full flex flex-col items-center px-6 pt-8 pb-12 overflow-visible">
         {/* Mobile Title */}
-        <h2 className="font-josefin-sans font-bold text-black text-3xl mb-12 text-center">
+        <h2 className="font-josefin-sans font-bold text-black text-2xl mb-4 text-center">
           {title}
         </h2>
 
         {/* Mobile Carousel - Focused on Active Item */}
-        <div className="relative w-full flex items-center justify-center h-[350px]">
+        <div className="relative w-full flex items-center justify-center h-[280px]">
+          {/* Left Button */}
+          <button
+            onClick={goPrev}
+            className="absolute left-0 z-20 w-10 h-10 rounded-full border border-[#464010] flex items-center justify-center bg-white/80 backdrop-blur-sm shadow-md active:scale-90 transition-transform"
+          >
+            <ChevronLeft size={20} className="text-[#464010]" />
+          </button>
+
           <AnimatePresence mode="wait">
             <motion.div
               key={activeIndex}
@@ -331,14 +342,14 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: -20, scale: 0.95 }}
               transition={{ duration: 0.5 }}
-              className="relative w-[300px] h-[300px] flex items-center justify-center"
+              className="relative w-[240px] h-[240px] flex items-center justify-center"
             >
               <Link
                 href={items[activeIndex].href}
                 className="relative w-full h-full flex items-center justify-center block"
               >
-                <div className="absolute inset-0 rounded-full bg-white border border-[#ffea44] shadow-2xl z-0" />
-                <div className="relative w-[240px] h-[240px] rounded-full overflow-hidden z-10">
+                <div className="absolute inset-0 rounded-full bg-white border border-[#ffea44] shadow-xl z-0" />
+                <div className="relative w-[190px] h-[190px] rounded-full overflow-hidden z-10">
                   <OptimizedImage
                     image={items[activeIndex].image}
                     alt={items[activeIndex].title}
@@ -350,37 +361,29 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
             </motion.div>
           </AnimatePresence>
 
-          {/* Navigation Controls - Simple pills on mobile */}
-          <div className="absolute -bottom-8 flex gap-8 z-20">
-            <button
-              onClick={goPrev}
-              className="w-12 h-12 rounded-full border border-[#464010] flex items-center justify-center bg-white shadow-md active:scale-90 transition-transform"
-            >
-              <ChevronLeft size={24} className="text-[#464010]" />
-            </button>
-            <button
-              onClick={goNext}
-              className="w-12 h-12 rounded-full border border-[#464010] flex items-center justify-center bg-white shadow-md active:scale-90 transition-transform"
-            >
-              <ChevronRight size={24} className="text-[#464010]" />
-            </button>
-          </div>
+          {/* Right Button */}
+          <button
+            onClick={goNext}
+            className="absolute right-0 z-20 w-10 h-10 rounded-full border border-[#464010] flex items-center justify-center bg-white/80 backdrop-blur-sm shadow-md active:scale-90 transition-transform"
+          >
+            <ChevronRight size={20} className="text-[#464010]" />
+          </button>
         </div>
 
         {/* Mobile Item Title */}
-        <div className="mt-16 text-center">
+        <div className="mt-4 text-center">
           <motion.p
             key={`title-${activeIndex}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-black font-inter font-bold text-xl"
+            className="text-black font-inter font-bold text-lg"
           >
             {items[activeIndex].title}
           </motion.p>
         </div>
 
         {/* Mobile Stacked Subtitle */}
-        <div className="mt-12 w-full">
+        <div className="mt-4 w-full">
           <StackedSubtitle text={subtitle} />
         </div>
       </div>

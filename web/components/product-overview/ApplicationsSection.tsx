@@ -96,44 +96,59 @@ export function ApplicationsSection({ data }: ApplicationsSectionProps) {
 
         {/* ─── CTA Button ─── */}
         <div className="absolute z-30" style={{ left: vw(156), top: vw(385) }}>
-          <Link
-            href={cta.url}
-            target={cta.openInNewTab ? "_blank" : undefined}
-            rel={cta.openInNewTab ? "noopener noreferrer" : undefined}
-            className="group relative flex gap-x-4 items-center justify-between bg-[#756f3f] rounded-full border border-white/10 transition-all duration-300 hover:scale-105"
-            style={{
-              height: vw(86),
-              paddingLeft: vw(36),
-              paddingRight: vw(8),
+          <motion.div
+            initial={{ rotate: 0, scale: 1 }}
+            animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+            whileHover={{ rotate: 0, scale: 1.05 }}
+            transition={{
+              rotate: {
+                duration: 0.5,
+                repeat: Infinity,
+                repeatDelay: 2,
+                ease: "easeInOut",
+              },
             }}
           >
-            <span
-              className="font-josefin-sans font-medium text-white tracking-wider"
-              style={{ fontSize: vw(24) }}
+            <Link
+              href={cta.url}
+              target={cta.openInNewTab ? "_blank" : undefined}
+              rel={cta.openInNewTab ? "noopener noreferrer" : undefined}
+              className="group relative flex gap-x-4 items-center justify-between bg-[#756f3f] rounded-full border border-transparent transition-all duration-300 hover:bg-white hover:border-[#756f3f]"
+              style={{
+                height: vw(86),
+                paddingLeft: vw(36),
+                paddingRight: vw(8),
+              }}
             >
-              {cta.title}
-            </span>
-
-            <div
-              className="bg-white rounded-full flex items-center justify-center shrink-0"
-              style={{ width: vw(70), height: vw(70) }}
-            >
-              <svg
-                style={{ width: vw(28), height: vw(28) }}
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+              <span
+                className="font-josefin-sans font-medium text-white tracking-wider transition-colors duration-300 group-hover:text-[#756f3f]"
+                style={{ fontSize: vw(24) }}
               >
-                <path
-                  d="M7 17L17 7M17 7H7M17 7V17"
-                  stroke="#756f3f"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-          </Link>
+                {cta.title}
+              </span>
+
+              <div
+                className="bg-white rounded-full flex items-center justify-center shrink-0 transition-colors duration-300 group-hover:bg-[#756f3f]"
+                style={{ width: vw(70), height: vw(70) }}
+              >
+                <svg
+                  style={{ width: vw(28), height: vw(28) }}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M7 17L17 7M17 7H7M17 7V17"
+                    stroke="#756f3f"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="transition-colors duration-300 group-hover:stroke-white"
+                  />
+                </svg>
+              </div>
+            </Link>
+          </motion.div>
         </div>
 
         {/* ─── Carousel (Asymmetrical Layout) ─── */}
@@ -270,11 +285,11 @@ export function ApplicationsSection({ data }: ApplicationsSectionProps) {
         </div>
       </div>
 
-      {/* ==================== 2. Mobile Layout (< md) ==================== */}
-        <div className="md:hidden w-full flex flex-col bg-[#f6f4ed] overflow-hidden pt-12 pb-16 px-6">
+      {/* ==================== 2      {/* ==================== 2. Mobile Layout (< md) ==================== */}
+        <div className="md:hidden w-full flex flex-col bg-[#f6f4ed] overflow-hidden pt-8 pb-8 px-6">
         <div className="w-full max-w-[480px] mx-auto">
           {/* Mobile Titles */}
-          <div className="flex flex-col mb-8 text-center sm:text-left">
+          <div className="flex flex-col mb-4 text-center sm:text-left">
             <h2 className="font-limelight text-[#464010] uppercase text-4xl tracking-wide leading-tight">
               {title}
             </h2>
@@ -282,23 +297,38 @@ export function ApplicationsSection({ data }: ApplicationsSectionProps) {
               {subtitle}
             </h2>
           </div>
-
+ 
           {/* Mobile Header Actions: CTA + Arrows */}
-          <div className="flex items-center justify-between mb-8 gap-4">
-            <Link
-              href={cta.url}
-              target={cta.openInNewTab ? "_blank" : undefined}
-              rel={cta.openInNewTab ? "noopener noreferrer" : undefined}
-              className="flex-1 max-w-[220px] h-12 pl-5 pr-1.5 flex items-center justify-between bg-[#756f3f] rounded-full transition-all active:scale-95"
+          <div className="flex items-center justify-between mb-4 gap-4">
+            <motion.div
+              className="flex-1 max-w-[220px]"
+              initial={{ rotate: 0, scale: 1 }}
+              animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
+              whileHover={{ rotate: 0, scale: 1.05 }}
+              transition={{
+                rotate: {
+                  duration: 0.5,
+                  repeat: Infinity,
+                  repeatDelay: 2,
+                  ease: "easeInOut",
+                },
+              }}
             >
-              <span className="font-josefin-sans font-medium text-white tracking-wider text-[13px]">
-                {cta.title}
-              </span>
-              <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center">
-                <ChevronRight size={18} className="text-[#756f3f]" />
-              </div>
-            </Link>
-
+              <Link
+                href={cta.url}
+                target={cta.openInNewTab ? "_blank" : undefined}
+                rel={cta.openInNewTab ? "noopener noreferrer" : undefined}
+                className="flex items-center justify-between w-full h-12 pl-5 pr-1.5 bg-[#756f3f] rounded-full transition-all active:bg-white active:scale-95 group/m-btn border border-transparent active:border-[#756f3f]"
+              >
+                <span className="font-josefin-sans font-medium text-white tracking-wider text-[13px] transition-colors group-active/m-btn:text-[#756f3f]">
+                  {cta.title}
+                </span>
+                <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center transition-colors group-active/m-btn:bg-[#756f3f]">
+                  <ChevronRight size={18} className="text-[#756f3f] transition-colors group-active/m-btn:text-white" />
+                </div>
+              </Link>
+            </motion.div>
+ 
             <div className="flex gap-2">
               <button
                 onClick={handlePrev}
@@ -314,9 +344,12 @@ export function ApplicationsSection({ data }: ApplicationsSectionProps) {
               </button>
             </div>
           </div>
-
+ 
           {/* Mobile Single Card Carousel */}
-          <div className="relative w-full aspect-[4/5] bg-[#D6D3C2]/20 rounded-[40px]">
+          <div 
+            className="relative w-full bg-[#D6D3C2]/20 rounded-[24px]"
+            style={{ aspectRatio: "1 / 1" }}
+          >
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={visibleItems[1].index}
@@ -324,7 +357,7 @@ export function ApplicationsSection({ data }: ApplicationsSectionProps) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
-                className="absolute inset-0 rounded-[40px] overflow-hidden shadow-2xl"
+                className="absolute inset-0 rounded-[24px] overflow-hidden shadow-2xl"
               >
                 <div className="relative w-full h-full bg-[#D6D3C2]">
                   <OptimizedImage

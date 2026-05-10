@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Icon } from "@iconify/react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import Link from "next/link";
 import Image from "next/image";
@@ -185,11 +186,9 @@ export function ProductOverviewHeroSection({
           animate={{ rotate: 360 }}
           transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
         >
-          <Image
+          <img
             src="/product-overview/icon-1.svg"
             alt=""
-            width={70}
-            height={70}
             className="w-full h-full"
           />
         </motion.div>
@@ -199,11 +198,9 @@ export function ProductOverviewHeroSection({
           animate={{ rotate: -360 }}
           transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
         >
-          <Image
+          <img
             src="/product-overview/icon-2.svg"
             alt=""
-            width={70}
-            height={70}
             className="w-full h-full"
           />
         </motion.div>
@@ -213,28 +210,25 @@ export function ProductOverviewHeroSection({
           animate={{ y: [0, -15, 0] }}
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         >
-          <Image
+          <img
             src="/product-overview/icon-3.svg"
             alt=""
-            width={70}
-            height={70}
             className="w-full h-full"
           />
         </motion.div>
-        <motion.div
-          className="absolute pointer-events-none"
+        <motion.button
+          onClick={handleCtaClick}
+          className="absolute group z-50 flex items-center justify-center rounded-full border border-[#756F3F] transition-all duration-300 hover:bg-[#756F3F]"
           style={{ top: vw(309), right: vw(300), width: vw(70), height: vw(70) }}
           animate={{ x: [0, -15, 0], y: [0, 15, 0] }}
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         >
-          <Image
-            src="/product-overview/icon-4.svg"
-            alt=""
-            width={70}
-            height={70}
-            className="w-full h-full"
+          <Icon
+            icon="maki:arrow"
+            className="transition-colors duration-300 rotate-[135deg] text-[#756F3F] group-hover:text-[#F6F4ED]"
+            style={{ width: vw(32), height: vw(32) }}
           />
-        </motion.div>
+        </motion.button>
 
         {/* Text Content Area - Desktop */}
         <div className="z-10 relative flex flex-col items-center">
@@ -291,7 +285,6 @@ export function ProductOverviewHeroSection({
             >
               <Link
                 href={data.cta.url}
-                onClick={handleCtaClick}
                 target={data.cta.openInNewTab ? "_blank" : undefined}
                 className="group relative inline-flex items-center transition-transform duration-500"
               >
@@ -357,19 +350,10 @@ export function ProductOverviewHeroSection({
       <div className="md:hidden w-full flex flex-col items-center px-6 pt-24 pb-20 overflow-hidden relative">
         {/* Floating Icons - Mobile version (simpler) */}
         <div className="absolute top-14 left-4 w-10 h-10 opacity-60">
-          <Image
+          <img
             src="/product-overview/icon-1.svg"
             alt=""
-            width={40}
-            height={40}
-          />
-        </div>
-        <div className="absolute top-40 right-4 w-10 h-10 opacity-60">
-          <Image
-            src="/product-overview/icon-3.svg"
-            alt=""
-            width={40}
-            height={40}
+            className="w-full h-full"
           />
         </div>
 
@@ -403,17 +387,31 @@ export function ProductOverviewHeroSection({
             animate={{ opacity: 1 }}
             className="font-amiri text-[#464010] text-lg leading-snug px-4"
           >
-            {cur.desc}1
+            {cur.desc}
           </motion.p>
 
-          <div className="mt-8">
+          <div className="mt-8 flex items-center gap-4">
             <Link
               href={data.cta.url}
-              onClick={handleCtaClick}
+              target={data.cta.openInNewTab ? "_blank" : undefined}
+              rel={data.cta.openInNewTab ? "noopener noreferrer" : undefined}
               className="inline-flex items-center justify-center px-8 py-4 bg-[#756F3F] text-white rounded-full font-josefin-sans text-xl font-medium tracking-wider shadow-lg active:scale-95 transition-transform"
             >
               {data.cta.title}
             </Link>
+
+            {/* Switcher Icon - Mobile (Next to CTA) */}
+            <motion.button
+              onClick={handleCtaClick}
+              className="flex items-center justify-center rounded-full border border-[#756F3F] transition-all duration-300 active:bg-[#756F3F] active:scale-90 flex-shrink-0"
+              style={{ width: 44, height: 44 }}
+            >
+              <Icon
+                icon="maki:arrow"
+                className="transition-colors duration-300 rotate-[135deg] text-[#756F3F] active:text-[#F6F4ED]"
+                style={{ width: 20, height: 20 }}
+              />
+            </motion.button>
           </div>
         </div>
 
@@ -435,9 +433,9 @@ export function ProductOverviewHeroSection({
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
-                  className="flex-shrink-0 w-[75vw] md:w-[400px] aspect-[4/5] relative snap-center"
+                  className="flex-shrink-0 w-[80vw] md:w-[400px] aspect-[4/5] relative snap-center"
                 >
-                  <div className="w-full h-full rounded-[40px] overflow-hidden shadow-2xl border-4 border-white">
+                  <div className="w-full h-full rounded-[40px] overflow-hidden shadow-lg border-4 border-white">
                     <OptimizedImage
                       image={resolved}
                       alt={item.title || "Product"}

@@ -96,6 +96,53 @@ function extractAfterMarker(children: any[], markerId: string): any[] {
   return result;
 }
 
+function extractLexicalNodesAfterMarker(children: any[], markerId: string): any {
+  const target = markerId.toLowerCase().trim();
+  let foundMarker = false;
+  const resultNodes: any[] = [];
+
+  for (const node of children) {
+    const rawText = getNodeTotalText(node);
+    const text = rawText.toLowerCase().trim();
+
+    if (!foundMarker && text.includes(target)) {
+      foundMarker = true;
+      // If content exists after marker in the same block, extract original children
+      if (node.children) {
+        let foundMarkerInChild = false;
+        const remaining: any[] = [];
+        for (const child of node.children) {
+          if (foundMarkerInChild) {
+            remaining.push(child);
+            continue;
+          }
+          if (getNodeTotalText(child).toLowerCase().includes(target)) {
+            foundMarkerInChild = true;
+          }
+        }
+        if (remaining.length > 0) {
+          resultNodes.push({ ...node, children: remaining });
+        }
+      }
+      continue;
+    }
+
+    if (foundMarker) {
+      const isNextMarker = text.length < 50 && text.includes("-") && 
+        (text.startsWith("title") || text.startsWith("image") || text.startsWith("item") || 
+         text.startsWith("cta") || text.startsWith("content") || text.startsWith("subtitle") || 
+         text.startsWith("logo") || text.startsWith("product-guide") || text.startsWith("brand-trust") ||
+         text.startsWith("quote") || text.startsWith("exclusive-solutions-"));
+          
+      if (isNextMarker) break;
+      resultNodes.push(node);
+    }
+  }
+  
+  if (resultNodes.length === 0) return null;
+  return { children: resultNodes };
+}
+
 function extractRichTextAfterMarker(children: any[], markerId: string): any[] {
   const nodes = extractAfterMarker(children, markerId);
   for (const node of nodes) {
@@ -170,9 +217,9 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
 
   // --- Exclusive Solutions Section ---
   const logoText = extractSingleTextAfterMarker(children, "exclusive-solutions-logo-text") || "Busrom";
-  const title = extractSingleTextAfterMarker(children, "exclusive-solutions-title") || "";
-  const subtitle = extractSingleTextAfterMarker(children, "exclusive-solutions-subtitle") || "";
-  const content = extractSingleTextAfterMarker(children, "exclusive-solutions-content") || "";
+  const title = extractLexicalNodesAfterMarker(children, "exclusive-solutions-title");
+  const subtitle = extractLexicalNodesAfterMarker(children, "exclusive-solutions-subtitle");
+  const content = extractLexicalNodesAfterMarker(children, "exclusive-solutions-content");
 
   let rawSlides: any[] = [];
   const escItemNodes = extractAfterMarker(children, "exclusive-solutions-item");
