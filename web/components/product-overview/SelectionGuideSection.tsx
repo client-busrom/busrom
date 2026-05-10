@@ -63,29 +63,97 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
       <div
         className="hidden md:block w-full"
         style={{
-          minHeight: vw(1000),
-          paddingTop: vw(100),
-          paddingBottom: vw(50),
+          minHeight: vw(922),
+          paddingTop: vw(40),
+          paddingBottom: vw(40),
         }}
       >
         <div
           className="mx-auto relative"
-          style={{ width: vw(1920), height: vw(1000) }}
+          style={{ width: vw(1500), height: vw(855) }}
         >
-          {/* Navigation Buttons */}
+          {/* Decorative "X" Icon */}
+          <motion.div
+            className="absolute opacity-90"
+            animate={{ 
+              y: [0, 10, 0],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            style={{
+              left: vw(285 - 210),
+              top: vw(89 - 40),
+              width: vw(144),
+              height: vw(141),
+            }}
+          >
+            <CrossIcon />
+          </motion.div>
+
+          {/* Titles - Precise Staggered Positioning */}
+          <h2
+            className="absolute font-limelight text-white leading-[1.33] z-40"
+            style={{ 
+              fontSize: vw(72), 
+              left: vw(294 - 210), 
+              top: vw(44 - 40),
+              whiteSpace: 'pre-wrap'
+            }}
+          >
+            {currentSlide.title1 + "\n     " + currentSlide.title2}
+          </h2>
+
+          {/* Highlight Box - Layered Sandwich Effect */}
+          {/* 1. Background Layer (Bottom) */}
+          <motion.div
+            className="absolute overflow-hidden z-10 flex flex-col justify-start"
+            style={{
+              left: vw(285 - 210),
+              top: vw(286 - 40),
+              width: vw(524),
+              height: vw(347),
+              borderRadius: `${vw(40)} ${vw(40)} 0 0`,
+              background:
+                "linear-gradient(180deg, rgba(255, 240, 122, 0.75) 0%, rgba(153, 141, 41, 0) 100%)",
+              backdropFilter: "blur(12px)",
+            }}
+          />
+
+          {/* 2. Text Layer (Top) */}
+          <div
+            className="absolute z-30 flex flex-col justify-start pointer-events-none"
+            style={{
+              left: vw(285 - 210),
+              top: vw(286 - 40),
+              width: vw(524),
+              height: vw(347),
+              padding: `${vw(30)} ${vw(30)}`,
+            }}
+          >
+            <p
+              className="font-josefin-sans font-semibold text-[#635700] text-left whitespace-pre-line"
+              style={{ fontSize: vw(36), lineHeight: 1.67 }}
+              dangerouslySetInnerHTML={{ __html: currentSlide.highlightText }}
+            />
+          </div>
+
+          {/* Navigation Buttons - Aligned with Pencil X: 298 and 1489 */}
           <button
             onClick={handlePrev}
             className="absolute z-[100] group cursor-pointer"
             style={{
-              left: vw(120),
-              top: vw(800),
-              width: vw(82),
-              height: vw(82),
+              left: vw(298 - 210),
+              top: vw(740),
+              width: vw(102),
+              height: vw(100),
             }}
           >
             <div className="w-full h-full rounded-full border border-[#464010] flex items-center justify-center transition-all duration-300 group-hover:bg-[#464010]">
               <ChevronLeft
-                style={{ width: vw(32), height: vw(32) }}
+                style={{ width: vw(40), height: vw(40) }}
                 className="text-[#464010] group-hover:text-white transition-colors"
               />
             </div>
@@ -95,15 +163,15 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
             onClick={handleNext}
             className="absolute z-[100] group cursor-pointer"
             style={{
-              left: vw(1700),
-              top: vw(800),
-              width: vw(82),
-              height: vw(82),
+              left: vw(1489 - 210),
+              top: vw(740),
+              width: vw(102),
+              height: vw(100),
             }}
           >
             <div className="w-full h-full rounded-full border border-[#464010] flex items-center justify-center transition-all duration-300 group-hover:bg-[#464010]">
               <ChevronRight
-                style={{ width: vw(32), height: vw(32) }}
+                style={{ width: vw(40), height: vw(40) }}
                 className="text-[#464010] group-hover:text-white transition-colors"
               />
             </div>
@@ -116,148 +184,120 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              className="absolute inset-0"
+              className="absolute inset-0 z-10"
             >
-              {/* Decorative "X" Icon */}
-              <div
-                className="absolute opacity-90"
-                style={{
-                  left: vw(138),
-                  top: vw(20),
-                  width: vw(185),
-                  height: vw(185),
-                }}
-              >
-                <CrossIcon />
-              </div>
-
-              {/* Titles: Corrected to 60px */}
-              <h2
-                className="absolute font-limelight text-white leading-[1.1] whitespace-nowrap z-40"
-                style={{ fontSize: vw(80), left: vw(149), top: vw(-12) }}
-              >
-                {currentSlide.title1}
-              </h2>
-              <h2
-                className="absolute font-limelight text-white leading-[1.1] whitespace-nowrap z-40"
-                style={{ fontSize: vw(80), left: vw(246), top: vw(118) }}
-              >
-                {currentSlide.title2}
-              </h2>
-
-              {/* Highlight Box: Text corrected to 29px */}
-              <motion.div
-                className="absolute rounded-[40px] overflow-hidden z-10 flex flex-col justify-start"
-                style={{
-                  left: vw(166),
-                  top: vw(301),
-                  minHeight: vw(342),
-                  padding: `${vw(60)} ${vw(50)} ${vw(100)}`,
-                  background:
-                    "linear-gradient(180deg, rgba(255, 240, 122, 0.75) 0%, rgba(153, 141, 41, 0) 100%)",
-                  backdropFilter: "blur(12px)",
-                }}
-              >
-                <p
-                  className="font-josefin-sans font-semibold text-[#635700] whitespace-pre-line text-left"
-                  style={{ fontSize: vw(29), lineHeight: 1.3 }}
-                >
-                  {currentSlide.highlightText}
-                </p>
-              </motion.div>
-
-              {/* Small Image */}
+              {/* Small Image (Arch) - Pencil Node c1X9Jb */}
               {currentSlide.images[1] && (
                 <motion.div
                   className="absolute shadow-xl overflow-hidden z-20"
                   style={{
-                    left: vw(605),
-                    top: vw(350),
-                    width: vw(517),
-                    height: vw(612),
+                    left: vw(640 - 210),
+                    top: vw(398),
+                    width: vw(417),
+                    height: vw(484),
                     borderRadius: `${vw(258.5)} ${vw(258.5)} 0 0`,
                     border: `${vw(1)} solid rgba(255, 255, 255, 0.1)`,
                   }}
                 >
-                  <OptimizedImage
-                    image={currentSlide.images[1]}
-                    alt="Guide 2"
-                    className="w-full h-full object-cover"
-                    size="large"
-                  />
+                  <motion.div
+                    className="w-full h-full"
+                    animate={{ 
+                      y: [0, -15, 0],
+                    }}
+                    transition={{
+                      duration: 5,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    <OptimizedImage
+                      image={currentSlide.images[1]}
+                      alt="Guide 2"
+                      className="w-full h-full object-cover scale-110" // Slightly scaled to avoid edge gaps during float
+                      size="large"
+                    />
+                  </motion.div>
                   <div
                     className="absolute inset-0 z-10"
                     style={{
                       background:
-                        "linear-gradient(180deg, rgba(0,0,0,0) 33.5%, rgba(0,0,0,0.8) 100%)",
+                        "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%)",
                     }}
                   />
                   <div
                     className="absolute z-30 flex flex-col justify-end"
                     style={{
-                      left: vw(665 - 605),
-                      bottom: vw(40),
-                      width: vw(413),
-                      minHeight: vw(229),
+                      left: vw(682 - 640),
+                      bottom: vw(50),
+                      width: vw(334),
                     }}
                   >
                     <p
-                      className="font-josefin-sans text-white leading-relaxed"
+                      className="font-josefin-sans text-white whitespace-pre-line"
                       style={{
-                        fontSize: vw(24),
-                        textShadow: "0 2px 4px rgba(0,0,0,0.5)",
+                        fontSize: vw(20),
+                        lineHeight: 1.8
                       }}
-                    >
-                      {currentSlide.content2}
-                    </p>
+                      dangerouslySetInnerHTML={{ __html: currentSlide.content2 }}
+                    />
                   </div>
                 </motion.div>
               )}
 
-              {/* Large Image */}
+              {/* Large Image (Capsule) - Pencil Node K4XSs */}
               {currentSlide.images[0] && (
                 <motion.div
                   className="absolute overflow-hidden z-20"
                   style={{
-                    left: vw(1193),
-                    top: vw(-50),
-                    width: vw(564),
-                    height: vw(933),
+                    left: vw(1173 - 210),
+                    top: vw(10),
+                    width: vw(462),
+                    height: vw(738),
                     borderRadius: vw(282),
                     border: `${vw(1)} solid rgba(255, 255, 255, 0.2)`,
                   }}
                 >
-                  <OptimizedImage
-                    image={currentSlide.images[0]}
-                    alt="Guide 1"
-                    className="w-full h-full object-cover"
-                    size="large"
-                  />
+                  <motion.div
+                    className="w-full h-full"
+                    animate={{ 
+                      y: [0, 20, 0],
+                    }}
+                    transition={{
+                      duration: 6,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    <OptimizedImage
+                      image={currentSlide.images[0]}
+                      alt="Guide 1"
+                      className="w-full h-full object-cover scale-110" // Slightly scaled to avoid edge gaps
+                      size="large"
+                    />
+                  </motion.div>
                   <div
                     className="absolute inset-0 z-10"
                     style={{
                       background:
-                        "linear-gradient(180deg, rgba(0,0,0,0) 26.5%, rgba(0,0,0,0.95) 100%)",
+                        "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%)",
                     }}
                   />
                   <div
                     className="absolute z-30 flex flex-col justify-end"
                     style={{
-                      left: vw(1266 - 1193),
-                      bottom: vw(100),
-                      width: vw(425),
-                      minHeight: vw(384),
+                      left: vw(1232 - 1173),
+                      bottom: vw(140),
+                      width: vw(343),
                     }}
                   >
                     <p
-                      className="font-josefin-sans text-white leading-relaxed"
+                      className="font-josefin-sans text-white whitespace-pre-line"
                       style={{
-                        fontSize: vw(24),
-                        textShadow: "0 2px 10px rgba(0,0,0,0.7)",
+                        fontSize: vw(20),
+                        lineHeight: 1.8
                       }}
-                    >
-                      {currentSlide.content1}
-                    </p>
+                      dangerouslySetInnerHTML={{ __html: currentSlide.content1 }}
+                    />
                   </div>
                 </motion.div>
               )}
@@ -267,7 +307,10 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
       </div>
 
       {/* ==================== 2. Mobile Layout (< md) ==================== */}
-      <div className="md:hidden w-full px-6 py-12 flex flex-col min-h-[600px] relative">
+      <div 
+        className="md:hidden w-full flex flex-col items-center py-16 px-6 relative overflow-hidden rounded-t-[32px]"
+        style={{ background: '#756f3f' }}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={activeIndex}
@@ -277,19 +320,16 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
             className="flex flex-col w-full"
           >
             {/* Header Area with Icon and Titles */}
-            <div className="relative mb-8 pt-4">
-              {/* Keep the icon near the title */}
-              <div className="absolute -top-4 -left-2 w-20 h-20 opacity-40 pointer-events-none">
+            <div className="relative mb-10 pt-4 flex flex-col items-center">
+              {/* Keep the icon centered near the title */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-24 opacity-20 pointer-events-none">
                 <CrossIcon />
               </div>
-              <div className="relative z-10">
-                <h2 className="font-limelight text-white text-4xl leading-tight">
-                  {currentSlide.title1}
-                </h2>
-                <h2 className="font-limelight text-white text-4xl leading-tight ml-6">
-                  {currentSlide.title2}
-                </h2>
-              </div>
+              <h2 
+                className="relative z-10 font-limelight text-white text-3xl leading-[1.3] whitespace-pre-wrap text-center"
+              >
+                {currentSlide.title1 + "\n" + currentSlide.title2}
+              </h2>
             </div>
 
             {/* Highlight Box */}
@@ -299,41 +339,41 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
               </p>
             </div>
 
-            {/* Content Cards in 2 Columns */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* Content Cards - Single Column Vertical Flow */}
+            <div className="flex flex-col gap-10">
               {/* Image 1 Card */}
               {currentSlide.images[0] && (
-                <div className="relative w-full aspect-[2/3] rounded-[24px] overflow-hidden shadow-lg border border-white/20">
-                  <OptimizedImage
-                    image={currentSlide.images[0]}
-                    alt="Guide Mobile 1"
-                    className="w-full h-full object-cover"
-                    size="large"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <p className="font-josefin-sans text-white text-xs leading-relaxed">
-                      {currentSlide.content1}
-                    </p>
+                <div className="flex flex-col">
+                  <div className="relative w-full aspect-video rounded-[24px] overflow-hidden shadow-lg border border-white/10 mb-4">
+                    <OptimizedImage
+                      image={currentSlide.images[0]}
+                      alt="Guide Mobile 1"
+                      className="w-full h-full object-cover"
+                      size="large"
+                    />
                   </div>
+                  <p 
+                    className="font-josefin-sans text-white/90 text-base leading-relaxed whitespace-pre-line px-1"
+                    dangerouslySetInnerHTML={{ __html: currentSlide.content1 }}
+                  />
                 </div>
               )}
 
               {/* Image 2 Card */}
               {currentSlide.images[1] && (
-                <div className="relative w-full aspect-[2/3] rounded-[24px] overflow-hidden shadow-lg border border-white/20">
-                  <OptimizedImage
-                    image={currentSlide.images[1]}
-                    alt="Guide Mobile 2"
-                    className="w-full h-full object-cover"
-                    size="large"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <p className="font-josefin-sans text-white text-xs leading-relaxed">
-                      {currentSlide.content2}
-                    </p>
+                <div className="flex flex-col">
+                  <div className="relative w-full aspect-video rounded-[24px] overflow-hidden shadow-lg border border-white/10 mb-4">
+                    <OptimizedImage
+                      image={currentSlide.images[1]}
+                      alt="Guide Mobile 2"
+                      className="w-full h-full object-cover"
+                      size="large"
+                    />
                   </div>
+                  <p 
+                    className="font-josefin-sans text-white/90 text-base leading-relaxed whitespace-pre-line px-1"
+                    dangerouslySetInnerHTML={{ __html: currentSlide.content2 }}
+                  />
                 </div>
               )}
             </div>

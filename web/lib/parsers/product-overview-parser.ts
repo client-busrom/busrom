@@ -21,6 +21,31 @@ function getNodeTotalText(node: any): string {
 }
 
 /**
+ * Extracts HTML string from Lexical nodes, preserving bold (format & 1) and linebreaks.
+ */
+function getNodeHtml(node: any): string {
+  if (!node) return "";
+  if (Array.isArray(node)) return node.map(getNodeHtml).join("");
+  if (typeof node === "string") return node;
+  
+  if (node.type === "linebreak") return "\n";
+  
+  if (node.text !== undefined) {
+    let text = node.text;
+    if (node.format & 1) { // 1 = Bold
+      text = `<strong>${text}</strong>`;
+    }
+    return text;
+  }
+  
+  if (node.children) {
+    return (node.children as any[]).map(getNodeHtml).join("");
+  }
+  
+  return "";
+}
+
+/**
  * Extracts rich text fragments for specific styling (e.g. bold color).
  */
 function getRichText(nodes: any[]): { text: string; bold: boolean; italic: boolean; linebreak?: boolean }[] {
@@ -163,12 +188,22 @@ function extractSingleTextAfterMarker(children: any[], markerId: string): string
   return "";
 }
 
+function extractHtmlAfterMarker(children: any[], markerId: string): string {
+  const nodes = extractAfterMarker(children, markerId);
+  for (const node of nodes) {
+    if (node.type === "paragraph" || node.type === "heading" || node.type === "quote") {
+        return getNodeHtml(node).trim();
+    }
+  }
+  return "";
+}
+
 function extractListAfterMarker(children: any[], markerId: string): string[] {
   const nodesAfterMarker = extractAfterMarker(children, markerId);
   for (const node of nodesAfterMarker) {
     if (node.type === "list") {
       return (node.children || []).map((li: any) => {
-        return (li.children || []).map((c: any) => getNodeTotalText(c)).join("").trim();
+        return (li.children || []).map((c: any) => getNodeHtml(c)).join("").trim();
       }).filter(Boolean);
     }
   }
@@ -376,8 +411,8 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
   }
 
   // --- Brand Trust Section ---
-  const brandTrustTitle = extractSingleTextAfterMarker(children, "brand-trust-title");
-  const brandTrustContent = extractSingleTextAfterMarker(children, "brand-trust-content");
+  const brandTrustTitle = extractHtmlAfterMarker(children, "brand-trust-title");
+  const brandTrustContent = extractHtmlAfterMarker(children, "brand-trust-content");
   let brandTrustImage = null;
   const brandTrustImageNodes = extractAfterMarker(children, "brand-trust-image");
   for (const node of brandTrustImageNodes) {

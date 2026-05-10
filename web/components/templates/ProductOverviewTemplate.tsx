@@ -47,10 +47,9 @@ export function ProductOverviewTemplate({ locale, data }: ProductOverviewTemplat
         >
           {/* Shared Background Box with Margins and Rounded Corners */}
           <div 
-            className="absolute z-0"
+            className="hidden md:block absolute z-0 left-1/2 -translate-x-1/2"
             style={{ 
-              left: vw(30), 
-              right: vw(30), 
+              width: vw(1500), 
               top: 0, 
               bottom: 0,
               background: 'linear-gradient(180deg, #756f3f 0%, #fffad3 100%)',
