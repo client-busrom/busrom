@@ -38,7 +38,7 @@ export const Products: CollectionConfig = {
   admin: {
     useAsTitle: 'sku',
     listSearchableFields: ['sku', 'slug', 'name'],
-    defaultColumns: ['sku', 'name', 'series', 'status', 'isFeatured'],
+    defaultColumns: ['shopOrder', 'order', 'sku', 'name', 'category', 'series', 'status'],
     group: {
       en: 'Products',
       zh: '产品管理',
@@ -358,7 +358,6 @@ export const Products: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
-        disableListColumn: true,
       },
     },
     {
@@ -371,24 +370,6 @@ export const Products: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
-        disableListColumn: true,
-      },
-    },
-    {
-      name: 'order',
-      type: 'number',
-      defaultValue: 0,
-      label: {
-        en: 'Global Display Order',
-        zh: '全局显示顺序',
-      },
-      admin: {
-        position: 'sidebar',
-        disableListColumn: true,
-        description: {
-          en: 'Generic order for this document in all lists',
-          zh: '该文档在所有列表中的通用顺序',
-        },
       },
     },
     {
@@ -399,7 +380,6 @@ export const Products: CollectionConfig = {
       type: 'collapsible',
       admin: {
         position: 'sidebar',
-        disableListColumn: true,
       },
       fields: [
         {
@@ -436,6 +416,21 @@ export const Products: CollectionConfig = {
           },
         },
         {
+          name: 'order',
+          type: 'number',
+          defaultValue: 0,
+          label: {
+            en: 'Global Display Order',
+            zh: '全局显示顺序',
+          },
+          admin: {
+            description: {
+              en: 'Generic order for this document in all lists. Used as a secondary fallback if Shop Sort Weight is identical.',
+              zh: '文档通用排序字段。当“Shop 排序权重”相同时，系统会参考此字段进行二次排序（数字越大越靠前）。',
+            },
+          },
+        },
+        {
           name: 'shopOrder',
           type: 'number',
           defaultValue: 0,
@@ -445,8 +440,8 @@ export const Products: CollectionConfig = {
           },
           admin: {
             description: {
-              en: 'Higher number = appears first in the shop list',
-              zh: '数字越大在列表页排名越靠前',
+              en: 'Primary sort key for Shop gallery. Higher number = appears first. Fallback order: Shop Weight > Global Order > Update Time.',
+              zh: 'Shop 列表页的主排序权重。数字越大排名越靠前。排序逻辑：Shop权重 > 全局显示顺序 > 更新时间。',
             },
           },
         },

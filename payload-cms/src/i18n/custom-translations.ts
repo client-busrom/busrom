@@ -450,7 +450,7 @@ export const customTranslationsZh = {
       targetLanguages: '目标语言',
       selectAll: '全选',
       selectEmpty: '选择空白',
-      clearSelection: '清除',
+      clearSelection: '全部取消',
       overwriteExisting: '覆盖已有内容',
 
       // Buttons

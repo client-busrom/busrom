@@ -35,7 +35,8 @@ const i18n = {
   overwriteExisting: { en: 'Overwrite existing translations', zh: '覆盖已有翻译' },
   targetLanguages: { en: 'Target Languages', zh: '目标语言' },
   selectAll: { en: 'Select All', zh: '全选' },
-  deselectAll: { en: 'Deselect All', zh: '取消全选' },
+  selectEmpty: { en: 'Select Empty', zh: '选择空白' },
+  deselectAll: { en: 'Cancel All', zh: '全部取消' },
   translating: { en: 'Translating...', zh: '翻译中...' },
   translate: { en: 'Start Translation', zh: '开始自动翻译' },
   noSections: { en: 'No sections configured.', zh: '尚未配置板块。' },
@@ -307,6 +308,24 @@ export const MultilingualKnowledgeSections: React.FC<any> = ({ path }) => {
     )
   }
 
+  const handleSelectAllTargets = () => {
+    const allTargets = SUPPORTED_LOCALES.filter((l) => l.code !== sourceLanguage).map(
+      (l) => l.code as LocaleCode,
+    )
+    setSelectedLanguages(allTargets)
+  }
+
+  const handleSelectEmptyTargets = () => {
+    const emptyTargets = SUPPORTED_LOCALES.filter((l) => {
+      if (l.code === sourceLanguage) return false
+      const hasContent = value?.[l.code]?.some(
+        (item) => item.tagTitle?.trim() || item.introTitle?.trim(),
+      )
+      return !hasContent
+    }).map((l) => l.code as LocaleCode)
+    setSelectedLanguages(emptyTargets)
+  }
+
   const handleTranslate = useCallback(async () => {
     const sourceItems = value?.[sourceLanguage]
     if (!sourceItems || sourceItems.length === 0) {
@@ -438,7 +457,20 @@ export const MultilingualKnowledgeSections: React.FC<any> = ({ path }) => {
             </div>
 
             <div className="target-selection">
-              <label>{t(i18n.targetLanguages)}</label>
+              <div className="target-header">
+                <label>{t(i18n.targetLanguages)}</label>
+                <div className="target-actions">
+                  <button type="button" onClick={handleSelectAllTargets}>
+                    {t(i18n.selectAll)}
+                  </button>
+                  <button type="button" onClick={handleSelectEmptyTargets}>
+                    {t(i18n.selectEmpty)}
+                  </button>
+                  <button type="button" onClick={() => setSelectedLanguages([])}>
+                    {t(i18n.deselectAll)}
+                  </button>
+                </div>
+              </div>
               <div className="target-grid">
                 {SUPPORTED_LOCALES.filter((l) => l.code !== sourceLanguage).map((l) => (
                   <label

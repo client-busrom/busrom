@@ -21,11 +21,11 @@ export const KnowledgeBaseSettings: GlobalConfig = {
       type: 'row',
       fields: [
         {
-          name: 'spacer',
+          name: 'translationCenter',
           type: 'ui',
           admin: {
             components: {
-              Field: '@/components/ui/RowSpacer',
+              Field: '@/components/fields/GlobalTranslationCenter',
             },
           },
         },
@@ -45,15 +45,7 @@ export const KnowledgeBaseSettings: GlobalConfig = {
             width: '200px',
           },
         },
-        {
-          name: 'translationCenter',
-          type: 'ui',
-          admin: {
-            components: {
-              Field: '@/components/fields/GlobalTranslationCenter',
-            },
-          },
-        },
+
       ],
     },
 

@@ -737,17 +737,17 @@ export interface Product {
   status?: ('published' | 'draft' | 'archived') | null;
   isFeatured?: boolean | null;
   /**
-   * Generic order for this document in all lists
-   */
-  order?: number | null;
-  /**
    * Toggle visibility of this product in the Shop gallery
    */
   shopVisibility?: boolean | null;
   isHot?: boolean | null;
   isNew?: boolean | null;
   /**
-   * Higher number = appears first in the shop list
+   * Generic order for this document in all lists. Used as a secondary fallback if Shop Sort Weight is identical.
+   */
+  order?: number | null;
+  /**
+   * Primary sort key for Shop gallery. Higher number = appears first. Fallback order: Shop Weight > Global Order > Update Time.
    */
   shopOrder?: number | null;
   updatedAt: string;
@@ -2566,10 +2566,10 @@ export interface ProductsSelect<T extends boolean = true> {
   mainImage?: T;
   status?: T;
   isFeatured?: T;
-  order?: T;
   shopVisibility?: T;
   isHot?: T;
   isNew?: T;
+  order?: T;
   shopOrder?: T;
   updatedAt?: T;
   createdAt?: T;
