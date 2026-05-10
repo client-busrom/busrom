@@ -312,21 +312,26 @@ export function ExclusiveSolutionsSection({
                   <div
                     key={idx}
                     className="flex-shrink-0 w-full h-full flex items-end"
-                    style={{ padding: `${vw(157)} ${vw(40)} ${vw(58)} ${vw(40)}` }}
+                    style={{ padding: `${vw(157)} ${vw(60)} ${vw(58)} ${vw(60)}` }}
                   >
-                    <div className="flex w-full h-full gap-[vw(18)] items-end">
+                    <div className="flex w-full h-full items-end" style={{ gap: vw(20) }}>
                       {/* Left Text Column */}
                       <div
                         className="flex flex-col justify-between h-full shrink-0"
-                        style={{ width: vw(550) }}
+                        style={{ width: "auto" }}
                       >
                         <div
                           className="bg-[#5a5319] flex items-center shadow-lg"
-                          style={{ borderRadius: vw(60), padding: vw(38), width: vw(413) }}
+                          style={{ 
+                            borderRadius: vw(60), 
+                            padding: vw(38), 
+                            width: "fit-content",
+                            maxWidth: vw(550)
+                          }}
                         >
                           <p
                             className="font-josefin-sans text-white opacity-90 whitespace-pre-line"
-                            style={{ fontSize: vw(24), lineHeight: 1.4 }}
+                            style={{ fontSize: vw(32), lineHeight: 1.4 }}
                           >
                             {item.description}
                           </p>
@@ -334,8 +339,8 @@ export function ExclusiveSolutionsSection({
                         <h3
                           className="font-josefin-sans font-bold text-white uppercase tracking-tight whitespace-pre-line"
                           style={{
-                            fontSize: vw(36),
-                            lineHeight: 1.1,
+                            fontSize: vw(40),
+                            lineHeight: 1.4,
                           }}
                         >
                           {item.title}
@@ -343,7 +348,7 @@ export function ExclusiveSolutionsSection({
                       </div>
  
                       {/* Images Row */}
-                      <div className="flex flex-1 gap-[vw(18)] h-full justify-end">
+                      <div className="flex flex-1 h-full justify-end" style={{ gap: vw(20) }}>
                         <div
                           className="overflow-hidden shadow-xl shrink-0"
                           style={{
@@ -393,24 +398,24 @@ export function ExclusiveSolutionsSection({
       <div className="md:hidden w-full pt-16 pb-12 px-6 flex flex-col bg-[#fff6d4]">
         {/* Header Badge */}
         <div className="flex mb-4">
-          <p className="font-katibeh px-6 py-1 bg-[#ffe484] text-black text-xl rounded-full">
+          <p className="font-katibeh flex items-center justify-center px-6 pt-3 pb-0 bg-[#ffe484] text-black text-xl rounded-full leading-none">
             {logoText}
           </p>
         </div>
 
         {/* Title & Subtitle Stack */}
-        <div className="flex flex-col mb-6">
-          <h2 className="font-katibeh text-5xl text-black leading-tight mb-3">
+        <div className="flex flex-col mb-4">
+          <h2 className="font-katibeh text-4xl text-black leading-tight mb-2">
             {renderRichText(title)}
           </h2>
-          <p className="font-katibeh text-xl text-black/80 leading-snug">
+          <p className="font-katibeh text-lg text-black/80 leading-snug">
             {renderRichText(subtitle)}
           </p>
         </div>
 
         {/* Content Box */}
-        <div className="bg-[#FFBB3220] border-2 border-dashed border-[#E9D89E] rounded-[24px] p-5 mb-8">
-          <p className="font-katibeh text-[#965200] text-xl leading-relaxed text-center sm:text-left">
+        <div className="bg-[#FFBB3220] border-2 border-dashed border-[#E9D89E] rounded-[24px] px-4 py-3 mb-8">
+          <p className="font-katibeh text-[#965200] text-lg leading-normal text-center sm:text-left">
             {renderRichText(content)}
           </p>
         </div>
@@ -477,19 +482,7 @@ export function ExclusiveSolutionsSection({
                   key={idx}
                   className="flex-shrink-0 w-full flex flex-col gap-5"
                 >
-                  {/* Mobile Text Block */}
-                  <div className="flex flex-col gap-3">
-                    <h3 className="font-josefin-sans font-bold text-white text-xl uppercase leading-tight">
-                      {item.title}
-                    </h3>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-[18px] p-4">
-                      <p className="font-josefin-sans text-white/90 text-[13px] leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Image Grid - 2 Columns */}
+                  {/* Image Grid - 2 Columns - Now on Top */}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="aspect-[4/5] rounded-[20px] overflow-hidden shadow-lg">
                       {item.leftImage && (
@@ -511,6 +504,18 @@ export function ExclusiveSolutionsSection({
                           className="w-full h-full object-cover"
                         />
                       )}
+                    </div>
+                  </div>
+
+                  {/* Mobile Text Block - Now on Bottom */}
+                  <div className="flex flex-col gap-3">
+                    <h3 className="font-josefin-sans font-bold text-white text-xl uppercase leading-tight">
+                      {item.title}
+                    </h3>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-[18px] p-4">
+                      <p className="font-josefin-sans text-white/90 text-[13px] leading-relaxed">
+                        {item.description}
+                      </p>
                     </div>
                   </div>
                 </div>
