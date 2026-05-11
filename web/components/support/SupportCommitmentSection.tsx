@@ -37,6 +37,7 @@ interface SupportCard {
   icon?: string | { url: string }
   title: string
   subtitle?: string
+  description?: string | any[]
 }
 
 interface GroupData {
@@ -51,7 +52,7 @@ interface SupportCommitmentSectionProps {
   marketing?: GroupData
 }
 
-function renderNodes(nodes: any[], context: "title" | "subtitle" = "title"): React.ReactNode {
+function renderNodes(nodes: any[], context: "title" | "subtitle" = "title", isDesktop: boolean = true): React.ReactNode {
   let globalIndex = 0
   const renderRecursive = (nodeList: any[]): React.ReactNode[] => {
     return nodeList.map((node) => {
@@ -63,12 +64,23 @@ function renderNodes(nodes: any[], context: "title" | "subtitle" = "title"): Rea
         const isUnderline = (node.format & 8) !== 0
         let style: React.CSSProperties = {}
         if (context === "title") {
-          style.fontSize = vw(40)
-          style.fontWeight = "normal"
-          if (isUnderline) {
-            style.color = "#817931"; style.fontWeight = "bold"; style.fontSize = vw(48)
-          } else if (isBold) {
-            style.color = "#5E5616"; style.fontWeight = "bold"; style.fontSize = vw(48)
+          if (isDesktop) {
+            style.fontSize = vw(40)
+            style.fontWeight = "normal"
+            if (isUnderline) {
+              style.color = "#817931"; style.fontWeight = "bold"; style.fontSize = vw(48)
+            } else if (isBold) {
+              style.color = "#5E5616"; style.fontWeight = "bold"; style.fontSize = vw(48)
+            }
+          } else {
+            // Mobile sizes
+            style.fontSize = "1.25rem"
+            style.fontWeight = "normal"
+            if (isUnderline) {
+              style.color = "#817931"; style.fontWeight = "bold"; style.fontSize = "1.5rem"
+            } else if (isBold) {
+              style.color = "#5E5616"; style.fontWeight = "bold"; style.fontSize = "1.5rem"
+            }
           }
         } else if (context === "subtitle") {
           style.color = "#181818"
@@ -88,10 +100,18 @@ export function SupportCommitmentSection({ title, subtitle, technical, marketing
   const [activeGroup, setActiveGroup] = useState<"technical" | "marketing">(hasTechnical ? "technical" : "marketing")
   const [activeIndex, setActiveIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(true)
 
   const currentGroupData = activeGroup === "technical" ? technical : marketing
   const items = currentGroupData?.items || []
   const groupTitle = currentGroupData?.title || ""
+
+  useEffect(() => {
+    const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024)
+    checkDesktop()
+    window.addEventListener('resize', checkDesktop)
+    return () => window.removeEventListener('resize', checkDesktop)
+  }, [])
 
   useEffect(() => { setActiveIndex(0) }, [activeGroup])
   useEffect(() => {
@@ -110,38 +130,151 @@ export function SupportCommitmentSection({ title, subtitle, technical, marketing
 
   const vwn = (px: number) => px * vwScale;
 
+  const [hoverTop, setHoverTop] = useState(false)
+  const [hoverBottom, setHoverBottom] = useState(false)
+
   const handleToggleGroup = () => { if (hasTechnical && hasMarketing) setActiveGroup(prev => prev === "technical" ? "marketing" : "technical") }
 
   if (!hasTechnical && !hasMarketing) return null
   const currentItem = items[activeIndex] || { title: "" }
 
+  if (!isDesktop) {
+    return (
+      <section className="relative bg-[#f6f4ed] py-20 px-6 overflow-hidden">
+        {/* Mobile Background Elements */}
+        <div className="absolute inset-0 pointer-events-none">
+          <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 3, repeat: Infinity }} className="absolute rounded-full opacity-30" style={{ left: '10%', top: '5%', width: '40px', height: '40px', background: "linear-gradient(180deg, #dbd076 0%, #756f3f 100%)" }} />
+          <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 4, repeat: Infinity }} className="absolute rounded-full opacity-30" style={{ right: '10%', top: '20%', width: '60px', height: '60px', backgroundColor: "#c8c07f" }} />
+        </div>
+
+        <div className="relative z-10 flex flex-col items-center">
+          {/* Header */}
+          <div className="text-center mb-24 w-full">
+            <h2 className="font-montserrat text-black mb-8" style={{ lineHeight: 1.5 }}>
+              {Array.isArray(title) ? renderNodes(title, "title", false) : title}
+            </h2>
+            <div className="inline-block bg-[#faf5cd] rounded-xl px-5 py-3 border-[1.5px] border-dashed border-[#574F0E]">
+              <p className="font-montserrat text-sm text-[#574F0E] leading-relaxed">
+                {Array.isArray(subtitle) ? renderNodes(subtitle, "subtitle", false) : subtitle}
+              </p>
+            </div>
+          </div>
+
+          {/* Interactive Area for Mobile */}
+          <div className="relative w-full max-w-[340px] aspect-square mb-12 mt-8 flex items-center justify-center">
+            {/* Center Sphere */}
+            <div className="w-[200px] h-[200px] rounded-full flex items-center justify-center text-center p-6 bg-gradient-to-b from-[#756f3f] to-[#dbd076] shadow-xl z-0 overflow-hidden">
+               <AnimatePresence mode="wait">
+                <motion.h3 
+                  key={activeIndex + activeGroup}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.1 }}
+                  className="font-montserrat font-medium text-white text-lg leading-snug"
+                >
+                  {currentItem.title?.split(/\\n|\n/).map((line, i, arr) => (
+                    <React.Fragment key={i}>{line}{i < arr.length - 1 && <br />}</React.Fragment>
+                  ))}
+                </motion.h3>
+              </AnimatePresence>
+            </div>
+
+            {/* Orbiting Icons */}
+            {items.map((item, idx) => {
+              const iconUrl = DEFAULT_ICONS[idx % DEFAULT_ICONS.length]
+              const angle = (idx / items.length) * 2 * Math.PI - Math.PI / 2
+              const radius = 125
+              const x = Math.cos(angle) * radius
+              const y = Math.sin(angle) * radius
+              const isActive = activeIndex === idx
+
+              return (
+                <button 
+                  key={idx} 
+                  onClick={() => setActiveIndex(idx)}
+                  className="absolute flex items-center justify-center transition-all duration-500 z-10"
+                  style={{ 
+                    left: `calc(50% + ${x}px)`, 
+                    top: `calc(50% + ${y}px)`, 
+                    width: isActive ? '74px' : '54px',
+                    height: isActive ? '58px' : '54px',
+                    transform: 'translate(-50%, -50%)',
+                    borderRadius: isActive ? '18px' : '50%',
+                    backgroundColor: isActive ? '#262203' : 'white',
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                    border: 'none'
+                  }}
+                >
+                  <div className="w-6 h-6 relative">
+                    <img src={iconUrl} alt="Icon" className="w-full h-full object-contain" style={{ filter: isActive ? "brightness(0) invert(1)" : "brightness(0)" }} />
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Description */}
+          <div className="w-full text-center px-4 mb-10 min-h-[80px]">
+             <AnimatePresence mode="wait">
+                <motion.p 
+                  key={activeIndex + activeGroup}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="font-montserrat text-[#1c1c1c] text-base leading-relaxed"
+                >
+                  {Array.isArray(currentItem.description) ? renderNodes(currentItem.description) : currentItem.description}
+                </motion.p>
+              </AnimatePresence>
+          </div>
+
+          {/* Toggle Buttons */}
+          <div className="flex gap-4 w-full justify-center">
+            <button 
+              onClick={() => { setActiveGroup("technical"); setActiveIndex(0); }}
+              className={`flex-1 max-w-[150px] py-4 rounded-full font-montserrat font-bold text-xs transition-all ${activeGroup === "technical" ? "bg-[#262203] text-white shadow-lg" : "bg-[#f2efd8] text-[#262203] border border-[#262203]"}`}
+            >
+              Technical
+            </button>
+            <button 
+              onClick={() => { setActiveGroup("marketing"); setActiveIndex(0); }}
+              className={`flex-1 max-w-[150px] py-4 rounded-full font-montserrat font-bold text-xs transition-all ${activeGroup === "marketing" ? "bg-[#262203] text-white shadow-lg" : "bg-[#f2efd8] text-[#262203] border border-[#262203]"}`}
+            >
+              Marketing
+            </button>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="relative w-full bg-[#f2efd8] overflow-hidden" style={{ height: vw(760) }}>
       <div className="relative z-10 w-full h-full max-w-[1920px] mx-auto">
-        <div className="absolute" style={{ left: vw(177), top: vw(123), width: vw(533), height: vw(471), zIndex: -1 }}>
+        <div className="absolute" style={{ left: vw(177), top: vw(103), width: vw(533), height: vw(471), zIndex: -1 }}>
           <motion.div animate={{ y: [0, -15, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute rounded-full" style={{ left: vw(0), top: vw(254), width: vw(59), height: vw(59), backgroundColor: "#5b5313" }} />
           <motion.div animate={{ y: [0, 12, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} className="absolute rounded-full opacity-66" style={{ left: vw(144), top: vw(95), width: vw(59), height: vw(59), background: "linear-gradient(180deg, #dbd076 0%, #756f3f 100%)" }} />
           <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1.2 }} className="absolute rounded-full" style={{ left: vw(332), top: vw(412), width: vw(59), height: vw(59), background: "linear-gradient(180deg, #dbd076 0%, #756f3f 100%)" }} />
           <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 }} className="absolute rounded-full" style={{ left: vw(474), top: vw(0), width: vw(59), height: vw(59), backgroundColor: "#c8c07f" }} />
         </div>
-        <div className="absolute" style={{ left: vw(153), top: vw(200), width: vw(900) }}>
+        <div className="absolute" style={{ left: vw(153), top: vw(220), width: vw(900) }}>
           <h2 className="font-montserrat text-black whitespace-pre-wrap" style={{ lineHeight: 1.4 }}>
             {Array.isArray(title) ? renderNodes(title) : title}
           </h2>
         </div>
         <div className="absolute bg-[#faf5cd]" style={{ 
           left: vw(660), 
-          top: vw(216), 
+          top: vw(236), 
           width: 'auto', 
           height: 'auto', 
           borderRadius: vw(20), 
           padding: `${vw(4)} ${vw(12)}`, 
           zIndex: 1,
-          backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='${vwn(20)}' ry='${vwn(20)}' stroke='%23574F0E' stroke-width='${vwn(1.5)}' stroke-dasharray='${vwn(8)}%2c ${vwn(8)}' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`,
+          backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='${vwn(20)}' ry='${vwn(20)}' stroke='%23574F0E' stroke-width='${vwn(1.5)}' stroke-dasharray='${vwn(4)}%2c ${vwn(4)}' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`,
           backgroundSize: '100% 100%',
           backgroundRepeat: 'no-repeat'
         }}>
-          <p className="font-anaheim text-[20px] leading-[1.5]" style={{ fontSize: vw(16) }}>{Array.isArray(subtitle) ? renderNodes(subtitle, "subtitle") : subtitle}</p>
+          <p className="font-montserrat text-[20px] leading-[1.5]" style={{ fontSize: vw(16) }}>{Array.isArray(subtitle) ? renderNodes(subtitle, "subtitle") : subtitle}</p>
         </div>
         <div className="absolute" style={{ left: vw(1062), top: vw(249), width: vw(700), height: vw(318) }}>
           <div className="absolute" style={{ left: 0, top: 0, width: vw(170), height: vw(350), zIndex: 10 }} onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
@@ -168,12 +301,38 @@ export function SupportCommitmentSection({ title, subtitle, technical, marketing
               </div>
               {hasTechnical && hasMarketing && (
                   <div className="absolute flex flex-col items-center justify-between z-[50]" style={{ right: vw(34), top: vw(60), height: vw(100) }}>
-                  <button onClick={handleToggleGroup} className="transition-transform hover:scale-105 active:scale-95 cursor-pointer relative z-50 pointer-events-auto" style={{ width: vw(40), height: vw(40) }}><SubtractIcon fill="#756f3f" /></button>
+                  <button 
+                    onClick={handleToggleGroup} 
+                    onMouseEnter={() => setHoverTop(true)}
+                    onMouseLeave={() => setHoverTop(false)}
+                    className="transition-all hover:scale-110 active:scale-95 cursor-pointer relative z-50 pointer-events-auto" 
+                    style={{ width: vw(40), height: vw(40) }}
+                  >
+                    <SubtractIcon 
+                      fill={hoverTop ? "#756f3f" : "#f2efd8"} 
+                      stroke={hoverTop ? "none" : "#b9b280"}
+                    />
+                  </button>
                   <div className="h-4" /> 
-                  <button onClick={handleToggleGroup} className="transition-transform hover:scale-105 active:scale-95 cursor-pointer relative z-50 pointer-events-auto" style={{ width: vw(40), height: vw(40) }}><SubtractIcon fill="#f2efd8" stroke="#b9b280" className="rotate-180" /></button>
+                  <button 
+                    onClick={handleToggleGroup} 
+                    onMouseEnter={() => setHoverBottom(true)}
+                    onMouseLeave={() => setHoverBottom(false)}
+                    className="transition-all hover:scale-110 active:scale-95 cursor-pointer relative z-50 pointer-events-auto" 
+                    style={{ width: vw(40), height: vw(40) }}
+                  >
+                    <SubtractIcon 
+                      fill={hoverBottom ? "#756f3f" : "#f2efd8"} 
+                      stroke={hoverBottom ? "none" : "#b9b280"}
+                      className="rotate-180" 
+                    />
+                  </button>
                 </div>
               )}
            </div>
+           <div className="absolute" style={{ left: vw(415), top: vw(16), width: vw(218) }}>
+            <p className="font-montserrat text-[#1c1c1c] leading-[1.36]" style={{ fontSize: vw(20) }}>{Array.isArray(currentItem.description) ? renderNodes(currentItem.description) : currentItem.description}</p>
+          </div>
         </div>
       </div>
     </section>

@@ -83,7 +83,7 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
   return (
     <section className="relative w-full bg-[#f6f4ed] z-30 min-h-screen md:h-[calc(1380*min(100vw,1920px)/1920)]">
       {/* --- DESKTOP & TABLET VIEW (md and above) --- */}
-      <div className="hidden md:block relative w-full h-full max-w-[1920px] mx-auto overflow-hidden">
+      <div className="hidden md:block relative w-full h-full max-w-[1920px] mx-auto ">
         {/* 1. Hero Title Triple Layer */}
         <div className="relative z-20 flex justify-center w-full select-none" style={{ paddingTop: vw(130) }}>
           <div className="relative" style={{ width: vw(1580), height: vw(348) }}>
@@ -151,11 +151,11 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
         </div>
 
         <div className="absolute z-20 w-full flex justify-center select-none" style={{ top: vw(503) }}>
-          <div className="relative flex items-center justify-center" style={{ width: vw(1180), height: vw(174) }}>
+          <div className="relative flex items-center justify-center" style={{ width: vw(1024), height: vw(174) }}>
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 977 174" preserveAspectRatio="none" fill="none">
               <path d="M977 50.5c0 27.89038-22.60962 50.5-50.5 50.5l-237 0c-20.15839 0-36.5 16.34161-36.5 36.5 0 20.15839-16.34161 36.5-36.5 36.5l-558.50001 0c-32.03252 0-57.99999-25.96748-57.99999-58l0-58c0-32.03252 25.96749-58 58-58l868.5 0c27.89038 0 50.5 22.60962 50.5 50.5z" fill="#ede8c2" />
             </svg>
-            <p className="relative z-10 font-kaushan-script text-[#464010] leading-[1.37] text-left whitespace-pre-wrap" style={{ fontSize: vw(46), marginLeft: vw(20), marginRight: vw(20) }}>
+            <p className="relative z-10 font-kaushan-script text-[#464010] leading-[1.37] text-left whitespace-pre-wrap" style={{ fontSize: vw(46) }}>
               {data.subtitle}
             </p>
           </div>
@@ -210,7 +210,7 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
       </div>
 
       {/* --- MOBILE VIEW (Below md) --- */}
-      <div className="md:hidden flex flex-col items-center text-center space-y-10" style={{ padding: `${vw(40)} ${vw(40)}` }}>
+      <div className="md:hidden flex flex-col items-center mt-12 text-center space-y-10" style={{ padding: `${vw(40)} ${vw(40)}` }}>
         {/* Mobile Title */}
         <h1 className="font-kaushan-script text-[#574f0e] text-4xl sm:text-5xl leading-tight">
           {data.title.map((node: any, i: number) => (

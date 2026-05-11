@@ -1,8 +1,8 @@
 "use client"
 
-import React, { useState, useRef, useMemo, Fragment } from "react"
-import Image from "next/image"
+import React, { useState, useRef, useMemo, Fragment, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 interface CustomizedItem {
   id: string
@@ -26,7 +26,7 @@ interface SupportCustomizedSectionProps {
   }
 }
 
-function renderNodes(nodes: any[], vw: (px: number) => string, context: "title" | "subtitle" = "title"): React.ReactNode {
+function renderNodes(nodes: any[], vw: (px: number) => string, context: "title" | "subtitle" = "title", isDesktop: boolean = true): React.ReactNode {
   let globalIndex = 0
   const renderRecursive = (nodeList: any[]): React.ReactNode[] => {
     if (!nodeList || !Array.isArray(nodeList)) return []
@@ -39,12 +39,22 @@ function renderNodes(nodes: any[], vw: (px: number) => string, context: "title" 
         const isUnderline = (node.format & 8) !== 0
         let style: React.CSSProperties = {}
         if (context === "title") {
-          style.fontSize = vw(40)
-          style.fontWeight = "normal"
-          if (isUnderline) {
-            style.color = "#817931"; style.fontWeight = "bold"; style.fontSize = vw(48)
-          } else if (isBoldValue) {
-            style.color = "#5E5616"; style.fontWeight = "bold"; style.fontSize = vw(48)
+          if (isDesktop) {
+            style.fontSize = vw(40)
+            style.fontWeight = "normal"
+            if (isUnderline) {
+              style.color = "#817931"; style.fontWeight = "bold"; style.fontSize = vw(54)
+            } else if (isBoldValue) {
+              style.color = "#5E5616"; style.fontWeight = "bold"; style.fontSize = vw(54)
+            }
+          } else {
+            style.fontSize = "1.5rem"
+            style.fontWeight = "normal"
+            if (isUnderline) {
+              style.color = "#817931"; style.fontWeight = "bold"; style.fontSize = "1.75rem"
+            } else if (isBoldValue) {
+              style.color = "#5E5616"; style.fontWeight = "bold"; style.fontSize = "1.75rem"
+            }
           }
         }
         return <span key={globalIndex} style={style}>{node.text}</span>
@@ -60,8 +70,17 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
   const activeData = activeGroup === "product" ? product : manufacturing
   const items = activeData.items
   const [activeIndex, setActiveIndex] = useState(0)
+  const [hoverToggle, setHoverToggle] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(true)
   
   const vw = (px: number) => `calc(${px} * min(100vw, 1920px) / 1920)`
+
+  useEffect(() => {
+    const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024)
+    checkDesktop()
+    window.addEventListener('resize', checkDesktop)
+    return () => window.removeEventListener('resize', checkDesktop)
+  }, [])
 
   const handleToggleGroup = () => {
     setActiveGroup(prev => prev === "product" ? "manufacturing" : "product")
@@ -77,20 +96,24 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
     ))
   }
 
-  const CustomToggleIcon = ({ direction = "right", fill = "#756f3f" }: { direction?: "left" | "right", fill?: string }) => (
-    <svg 
-      width="60" height="60" viewBox="0 0 60 60" fill="none" 
-      className="transition-transform duration-500"
-      style={{ transform: direction === "left" ? "rotate(180deg)" : "rotate(0deg)" }}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path 
-        fillRule="evenodd" clipRule="evenodd" 
-        d="M30 0c16.6208 0 30 13.0266 30 29 0 15.9734-13.3792 29-30 29-16.6208 0-30-13.0266-30-29 0-15.9734 13.3792-29 30-29z m-6.7451 19.7188l9.7406 9.6975-9.7406 9.6975 1.6602 1.6934 11.5852-11.4523-11.5859-11.4529-1.6595 1.6934z" 
-        fill={fill} 
-      />
-    </svg>
-  )
+  const CustomToggleIcon = ({ direction = "right", isHovered = false }: { direction?: "left" | "right", isHovered?: boolean }) => {
+    const mainColor = "#756f3f"
+    return (
+      <svg 
+        width="60" height="60" viewBox="0 0 60 60" fill="none" 
+        className="transition-transform duration-500"
+        style={{ transform: direction === "left" ? "rotate(180deg)" : "rotate(0deg)" }}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle cx="30" cy="30" r="28" fill={isHovered ? mainColor : "transparent"} stroke={mainColor} strokeWidth="1.5" className="transition-all duration-300" />
+        <path 
+          d="M23.2549 20.7188l9.7406 9.6975-9.7406 9.6975 1.6602 1.6934 11.5852-11.4523-11.5859-11.4529-1.6595 1.6934z" 
+          fill={isHovered ? "#ffffff" : mainColor} 
+          className="transition-colors duration-300"
+        />
+      </svg>
+    )
+  }
 
   const InactiveSubtractSVG = () => (
     <svg width="100%" height="100%" viewBox="0 0 298 386" fill="none" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -116,15 +139,88 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
 
   const containerRef = useRef<HTMLDivElement>(null)
 
+  if (!isDesktop) {
+    return (
+      <section className="relative bg-[#f6f4ed] py-20 px-6 overflow-hidden">
+        {/* Background Bubbles */}
+        <motion.div animate={{ y: [0, -40, 0] }} transition={{ duration: 3, repeat: Infinity }} className="absolute rounded-full blur-[10px] opacity-40" style={{ left: '-10%', top: '5%', width: '150px', height: '150px', backgroundColor: "#e9e19e75" }} />
+        <motion.div animate={{ y: [0, 30, 0] }} transition={{ duration: 4, repeat: Infinity }} className="absolute rounded-full blur-[10px] opacity-40" style={{ right: '-5%', top: '40%', width: '100px', height: '100px', backgroundColor: "#fff5a8c7" }} />
+
+        <div className="relative z-10">
+          {/* Header */}
+          <div className="flex flex-col gap-6 mb-12 text-center">
+            <h2 className="font-montserrat text-black" style={{ lineHeight: 1.5 }}>
+              {Array.isArray(title) ? renderNodes(title, vw, "title", false) : title}
+            </h2>
+            <div className="flex gap-4 w-full justify-center">
+              <button 
+                  onClick={() => { setActiveGroup("product"); setActiveIndex(0); }}
+                  className={`flex-1 max-w-[160px] py-4 rounded-full font-montserrat font-bold text-xs transition-all ${activeGroup === "product" ? "bg-[#262203] text-white shadow-lg" : "bg-white text-[#262203] border border-[#262203]"}`}
+              >
+                PRODUCT
+              </button>
+              <button 
+                  onClick={() => { setActiveGroup("manufacturing"); setActiveIndex(0); }}
+                  className={`flex-1 max-w-[160px] py-4 rounded-full font-montserrat font-bold text-xs transition-all ${activeGroup === "manufacturing" ? "bg-[#262203] text-white shadow-lg" : "bg-white text-[#262203] border border-[#262203]"}`}
+              >
+                MANUFACTURING
+              </button>
+            </div>
+          </div>
+
+          {/* Vertical Card List */}
+          <div className="flex flex-col gap-10">
+            {items.map((item) => (
+              <motion.div 
+                key={item.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="relative bg-white rounded-[30px] p-6 shadow-lg border border-[#26220308]"
+              >
+                <div className="flex flex-col gap-6">
+                  {/* Image */}
+                  <div className="w-full h-[220px] flex-shrink-0 overflow-hidden rounded-2xl relative shadow-inner">
+                    {item.image && (
+                      <OptimizedImage 
+                        image={item.image.url} 
+                        alt={item.image.alt || ""} 
+                        className="object-cover w-full h-full" 
+                        size="small"
+                      />
+                    )}
+                    {!item.image && <div className="w-full h-full bg-[#d9d9d9]" />}
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 px-2">
+                    <h4 className="font-montserrat font-bold text-[#262203] text-xl mb-3 leading-tight">
+                      {item.title}
+                    </h4>
+                    {item.description && (
+                      <p className="font-montserrat font-light text-[#4a4a4a] text-base leading-relaxed">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   return (
-    <section className="relative bg-[#f6f4ed]" style={{ height: vw(1380), paddingTop: vw(120) }}>
-      <motion.div animate={{ y: [0, -20, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="absolute rounded-full blur-[91px]" style={{ left: vw(96), top: vw(-237), width: vw(682), height: vw(682), backgroundColor: "#e9e19e75", zIndex: 1 }} />
-      <motion.div animate={{ y: [0, 15, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }} className="absolute rounded-full blur-[91px]" style={{ left: vw(1657), top: vw(95), width: vw(131), height: vw(131), backgroundColor: "#fff5a8c7", zIndex: 1 }} />
-      <motion.div animate={{ y: [0, -15, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} className="absolute rounded-full blur-[91px]" style={{ left: vw(1319), top: vw(258), width: vw(281), height: vw(281), backgroundColor: "#fff5a8c7", zIndex: 1 }} />
+    <section className="relative bg-[#f6f4ed]" style={{ height: vw(1220), paddingTop: vw(120) }}>
+      <motion.div animate={{ y: [0, -80, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} className="absolute rounded-full blur-[10px]" style={{ left: vw(96), top: vw(-237), width: vw(682), height: vw(682), backgroundColor: "#e9e19e75", zIndex: 1 }} />
+      <motion.div animate={{ y: [0, 60, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 1 }} className="absolute rounded-full blur-[10px]" style={{ left: vw(1657), top: vw(95), width: vw(131), height: vw(131), backgroundColor: "#fff5a8c7", zIndex: 1 }} />
+      <motion.div animate={{ y: [0, -60, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} className="absolute rounded-full blur-[10px]" style={{ left: vw(1319), top: vw(258), width: vw(281), height: vw(281), backgroundColor: "#fff5a8c7", zIndex: 1 }} />
 
       <div className="relative z-10 mx-auto w-full px-[10vw]">
         <h2 className="text-center font-montserrat text-[#000000] mx-auto whitespace-pre-wrap" style={{ fontSize: vw(48), lineHeight: 1.6, width: vw(1500) }}>
-          {renderNodes(title, vw)}
+          {renderNodes(title, vw, "title", true)}
         </h2>
       </div>
 
@@ -145,10 +241,12 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
             
             <button 
                 onClick={handleToggleGroup} 
-                className={`${activeGroup === "manufacturing" ? "mr-[1.8vw]" : "ml-[1.8vw]"} cursor-pointer transition-transform hover:scale-110 active:scale-95 flex-shrink-0`}
+                onMouseEnter={() => setHoverToggle(true)}
+                onMouseLeave={() => setHoverToggle(false)}
+                className={`${activeGroup === "manufacturing" ? "mr-[1.8vw]" : "ml-[1.8vw]"} cursor-pointer transition-transform hover:scale-125 active:scale-95 flex-shrink-0`}
                 style={{ width: vw(60), height: vw(60) }}
             >
-                <CustomToggleIcon direction={activeGroup === "product" ? "right" : "left"} />
+                <CustomToggleIcon direction={activeGroup === "product" ? "right" : "left"} isHovered={hoverToggle} />
             </button>
           </motion.div>
         </div>
@@ -161,17 +259,46 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
           {items.map((item, idx) => {
             const isActive = idx === activeIndex
             return (
-              <motion.div key={item.id} onClick={() => setActiveIndex(idx)} layout className="relative flex-shrink-0 cursor-pointer" style={{ width: isActive ? vw(723) : vw(413), height: vw(428) }}>
+              <motion.div 
+                key={item.id} 
+                onClick={() => setActiveIndex(idx)} 
+                layout 
+                animate={{ y: isActive ? -30 : 0 }}
+                className="relative flex-shrink-0 cursor-pointer" 
+                style={{ width: isActive ? vw(723) : vw(420), height: vw(428) }}
+              >
                 <motion.div layout className="z-[10] absolute left-0 top-0 overflow-hidden" style={{ width: vw(176), height: vw(426), borderRadius: vw(30) }}>
-                  {item.image && <Image src={item.image.url} alt={item.image.alt || ""} fill sizes="20vw" className={`object-cover transition-all duration-700 ${isActive ? "" : "grayscale"}`} />}
+                  {item.image && (
+                    <OptimizedImage 
+                      image={item.image.url} 
+                      alt={item.image.alt || ""} 
+                      className={`object-cover w-full h-full transition-all duration-700 ${isActive ? "" : "grayscale"}`} 
+                      size="large"
+                    />
+                  )}
                   {!item.image && <div className="w-full h-full bg-[#d9d9d9]" />}
                 </motion.div>
-                <motion.div layout className="absolute" style={{ left: vw(115), top: vw(42), width: isActive ? vw(608) : vw(298), height: vw(386) }}>
+                <motion.div layout className="absolute" style={{ left: vw(115), top: vw(42), width: isActive ? vw(608) : vw(310), height: vw(386) }}>
                   {isActive ? <ActiveSubtractSVG /> : <InactiveSubtractSVG />}
                 </motion.div>
                 <div className="absolute z-10 w-full h-full pointer-events-none">
-                  <motion.h4 layout="position" className="absolute font-montserrat font-bold overflow-hidden whitespace-pre-wrap" style={{ fontSize: isActive ? vw(29) : vw(24), color: isActive ? "#000000" : "transparent", left: isActive ? vw(243) : vw(229), top: isActive ? vw(81) : vw(121), width: isActive ? vw(400) : vw(150), lineHeight: isActive ? 1.28 : 1.91 }}>
-                    {!isActive ? <span className="block text-[#f8f6e5] font-montserrat font-bold whitespace-pre-wrap" style={{ WebkitTextStroke: "1.2px #000000", paintOrder: "stroke fill" }}>{item.title}</span> : item.title}
+                  <motion.h4 
+                    layout="position" 
+                    className="absolute font-montserrat font-bold overflow-hidden whitespace-pre-wrap" 
+                    style={{ 
+                      fontSize: isActive ? vw(29) : (item.title.length > 15 ? vw(20) : vw(24)), 
+                      color: isActive ? "#000000" : "transparent", 
+                      left: isActive ? vw(243) : vw(220), 
+                      top: isActive ? vw(81) : (item.title.length > 15 ? vw(100) : vw(121)), 
+                      width: isActive ? vw(400) : vw(200), 
+                      lineHeight: isActive ? 1.28 : 1.5 
+                    }}
+                  >
+                    {!isActive ? (
+                      <span className="block text-[#f8f6e5] font-montserrat font-bold whitespace-pre-wrap" style={{ WebkitTextStroke: "1px #000000", paintOrder: "stroke fill" }}>
+                        {item.title}
+                      </span>
+                    ) : item.title}
                   </motion.h4>
                   {isActive && item.description && (
                     <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="absolute font-montserrat font-light text-[#000000] whitespace-pre-wrap" style={{ fontSize: vw(20), lineHeight: 1.4, left: vw(243), top: vw(225), width: vw(450) }}>{item.description}</motion.p>
