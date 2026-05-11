@@ -20,25 +20,6 @@ export function getObjectPosition(image?: ImageObject | null): string {
 
 /**
  * 根据 ImageCropData 生成裁剪渲染所需的 CSS 样式
- * 
- * 使用方式：
- * ```tsx
- * const cropStyles = getCropStyles(cropData, containerWidth, containerHeight)
- * if (cropStyles) {
- *   // 有裁剪数据 — 用 overflow:hidden 容器 + transform 定位
- *   <div style={cropStyles.container}>
- *     <img style={cropStyles.image} src={...} />
- *   </div>
- * } else {
- *   // 无裁剪数据 — 用 object-fit:cover + objectPosition 的旧方式
- *   <img style={{ objectFit: 'cover', objectPosition: getObjectPosition(image) }} />
- * }
- * ```
- * 
- * @param cropData - 后台裁剪编辑器输出的数据
- * @param displayWidth - 实际渲染容器的宽度（px 或 CSS 值）
- * @param displayHeight - 实际渲染容器的高度（px 或 CSS 值）
- * @returns 容器和图片的 CSS 样式对象，或 null（无裁剪数据时）
  */
 export function getCropStyles(
   cropData?: ImageCropData | null,
@@ -49,10 +30,8 @@ export function getCropStyles(
 
   const { croppedAreaPixels, variantWidth, variantHeight } = cropData
 
-  // 如果没有有效裁剪区域，返回 null
   if (!croppedAreaPixels.width || !croppedAreaPixels.height) return null
 
-  // 容器样式
   const container: React.CSSProperties = {
     overflow: 'hidden',
     position: 'relative',
@@ -60,8 +39,6 @@ export function getCropStyles(
     height: displayHeight ? `${displayHeight}px` : '100%',
   }
 
-  // 使用百分比进行定位和缩放，以实现完全的响应式支持
-  // 这样无论容器的实际像素尺寸是多少（由 CSS 或 var(--rpx) 决定），裁剪逻辑都保持正确
   const widthPercent = (variantWidth / croppedAreaPixels.width) * 100
   const heightPercent = (variantHeight / croppedAreaPixels.height) * 100
   const leftPercent = (-croppedAreaPixels.x / croppedAreaPixels.width) * 100
@@ -83,12 +60,6 @@ import { convertToCDNUrl } from './cdn-url'
 
 /**
  * 统一的图片变体获取逻辑
- * 兼容 Home API (small/medium/large) 和 Product API (card/tablet/desktop) 格式
- * 
- * @param image - ImageObject 对象
- * @param size - 期望的尺寸级别
- * @param strategy - 可选的 CDN 策略 ('china' | 'global')
- * @returns 最终的图片 URL
  */
 export function getVariantUrl(
   image: ImageObject | null | undefined,
@@ -100,7 +71,6 @@ export function getVariantUrl(
   const variants = (image?.variants || (image as any)?.sizes) as any || {}
   const getUrl = (val: any) => (typeof val === 'string' ? val : val?.url)
 
-  // 尺寸映射表
   const mapping: Record<string, string[]> = {
     thumbnail: ['thumbnail'],
     small: ['small', 'card'],
@@ -109,7 +79,6 @@ export function getVariantUrl(
     xlarge: ['xlarge', 'original']
   }
 
-  // 定义后备查找顺序 (不包含 thumbnail，除非明确请求它)
   const getFallbackChain = (target: string): string[] => {
     switch (target) {
       case 'large': return ['large', 'medium', 'small']
@@ -121,7 +90,6 @@ export function getVariantUrl(
   }
 
   const chain = getFallbackChain(size)
-  const thumbUrl = getUrl(variants.thumbnail)
 
   for (const s of chain) {
     const keys = mapping[s] || [s]
@@ -133,10 +101,8 @@ export function getVariantUrl(
     }
   }
 
-  // 最后后备：原始图 (xlarge/original) -> 原始 url/fileUrl -> 占位图
   const finalUrl = image.url || (image as any).fileUrl || (image as any).file?.url || getUrl(variants.xlarge)
   
-  // 如果最终还是没拿到有效的 URL 且 variants 里有内容，尝试随便拿一个尺寸的 URL
   if ((!finalUrl || finalUrl === '/images/placeholder.jpg') && Object.keys(variants).length > 0) {
     const firstVariant = Object.values(variants)[0]
     const fallbackUrl = getUrl(firstVariant)
@@ -148,10 +114,6 @@ export function getVariantUrl(
 
 /**
  * 统一生成 srcset 的逻辑
- * 
- * @param image - ImageObject 对象
- * @param strategy - 可选的 CDN 策略
- * @returns srcset 字符串
  */
 export function getSrcSet(image: ImageObject | null | undefined, strategy?: string): string | undefined {
   if (!image || !image.variants) return undefined
@@ -165,10 +127,7 @@ export function getSrcSet(image: ImageObject | null | undefined, strategy?: stri
   const mediumUrl = getUrl(v.medium || v.tablet)
   const largeUrl = getUrl(v.large || v.desktop)
 
-  // 1. 缩略图总是可以作为 400w
   if (thumbUrl) srcsetParts.push(`${convertToCDNUrl(thumbUrl, strategy)} 400w`)
-
-  // 2. 其他尺寸只有在非回退（不等于缩略图）时才加入，防止浏览器误加载
   if (smallUrl && smallUrl !== thumbUrl) {
     srcsetParts.push(`${convertToCDNUrl(smallUrl, strategy)} 768w`)
   }
@@ -182,33 +141,15 @@ export function getSrcSet(image: ImageObject | null | undefined, strategy?: stri
   return srcsetParts.length > 0 ? srcsetParts.join(', ') : undefined
 }
 
-/**
- * 根据 cropData.variant 获取对应的图片变体 URL
- */
 export function getCropImageUrl(
   image: ImageObject | null | undefined,
   cropData: ImageCropData | null | undefined,
 ): string {
   if (!image) return ''
-  
-  // 如果是 original，映射到 xlarge (原始图)
-  // 否则根据 variant 映射，默认大图
   const size = cropData?.variant === 'original' ? 'xlarge' : (cropData?.variant || 'large')
-  
   return getVariantUrl(image, size)
 }
 
-/**
- * 获取本地化名称
- * 处理两种情况：
- * 1. 已本地化的字符串 (从 Payload API 获取时已经本地化)
- * 2. Record<string, string> 格式的多语言对象
- *
- * @param name - 名称（可以是字符串或多语言对象）
- * @param locale - 当前语言
- * @param fallback - 后备值
- * @returns 本地化后的字符串
- */
 export function getLocalizedName(
   name: string | Record<string, string> | undefined | null,
   locale: string,
@@ -220,50 +161,58 @@ export function getLocalizedName(
 }
 
 /**
- * 站内链接解析器 - 确保 CMS 与前端路由 100% 对齐
- * 
- * 规则：
- * 1. 详解页 (Series) -> /products/[slug]
- * 2. 产品售卖页 (Products) -> /shop/[slug]
- * 3. 自定义页面 (Pages) -> 使用其自带的 path 字段 (如 /about)
+ * 解析并规范化内部链接
+ * - 处理绝对路径/相对路径
+ * - 处理带有本站域名的完整 URL
+ * - 确保以 / 开头（除非是外部链接）
  */
-export function resolveInternalLink(url: string | null | undefined): string {
-  if (!url) return "#"
+export function resolveInternalLink(path: string | null | undefined): string {
+  if (!path) return '#'
   
-  let path = url.trim()
-  
-  // 处理外部链接
-  if (path.startsWith('http') || path.startsWith('mailto:') || path.startsWith('tel:')) {
-    return path
+  let urlStr = path.trim()
+
+  // 1. 处理以 http 开头的完整 URL
+  if (urlStr.startsWith('http')) {
+    try {
+      const url = new URL(urlStr)
+      // 检查是否是指向本站的域名（包含各种可能的端口，如 :3001）
+      const isInternalDomain = [
+        'busromhouse.com',
+        'www.busromhouse.com',
+        'localhost',
+        '127.0.0.1'
+      ].some(d => url.hostname === d || url.hostname.endsWith('.' + d))
+
+      if (isInternalDomain) {
+        // 转换为相对路径，从而彻底消除端口泄露风险
+        urlStr = (url.pathname + url.search + url.hash) || '/'
+      } else {
+        return urlStr // 真正的外部链接
+      }
+    } catch (e) {
+      return urlStr
+    }
   }
 
-  // 1. 修正详解页前缀: /product/xxx -> /products/xxx 或 /product -> /products
-  // (注意: 这里是单数变复数)
-  if (path === '/product' || path.startsWith('/product?') || path.startsWith('/product/')) {
-    path = path.replace(/^\/product/, '/products')
+  // 2. 处理 mailto 和 tel
+  if (urlStr.startsWith('mailto:') || urlStr.startsWith('tel:')) {
+    return urlStr
   }
 
-  // 2. 修正 One-Stop Solution 特定路径
-  if (path === '/service/one-stop' || path === '/service/one-stop-shop') {
-    path = '/service/one-stop-solution'
+  // 3. 修正旧版链接格式
+  if (urlStr === '/product' || urlStr.startsWith('/product?') || urlStr.startsWith('/product/')) {
+    urlStr = urlStr.replace(/^\/product/, '/products')
   }
 
-  // 3. 修正 FAQ 路径从 /service/faq 移动到 /faq
-  if (path === '/service/faq' || path.startsWith('/service/faq?')) {
-    path = path.replace(/^\/service\/faq/, '/faq')
+  if (urlStr === '/service/one-stop' || urlStr === '/service/one-stop-shop') {
+    urlStr = '/service/one-stop-solution'
   }
 
-  // 3. 修正旧版 series 参数
-  if (path.includes('/shop?series=')) {
-    path = path.replace('/shop?series=', '/shop?category=')
+  // 4. 清洗重复斜杠并确保以 / 开头
+  urlStr = urlStr.replace(/\/+/g, '/')
+  if (!urlStr.startsWith('/') && !urlStr.startsWith('#')) {
+    urlStr = '/' + urlStr
   }
 
-  // 4. 清洗重复斜杠
-  path = path.replace(/\/+/g, '/')
-  
-  if (!path.startsWith('/')) {
-    path = '/' + path
-  }
-
-  return path
+  return urlStr
 }

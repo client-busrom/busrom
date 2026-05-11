@@ -1,35 +1,12 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { locales, defaultLocale, nonDefaultLocales } from '@/i18n.config';
+import { locales, defaultLocale } from '@/i18n.config';
 
 /**
  * URL 路由策略:
  * - 英文(默认): busromhouse.com/  (无前缀)
  * - 其他语言: busromhouse.com/zh, busromhouse.com/fr 等
  */
-
-function getPreferredLocale(request: NextRequest): string {
-  const preferencesCookie = request.cookies.get('user-preferences')?.value;
-  if (preferencesCookie) {
-    try {
-      const parsed = JSON.parse(decodeURIComponent(preferencesCookie));
-      if (parsed.language && locales.includes(parsed.language)) {
-        return parsed.language;
-      }
-    } catch (e) { /* ignore */ }
-  }
-
-  const languages = request.headers.get('accept-language')?.split(',')?.map(lang => lang.split(';')[0]);
-  if (languages) {
-    for (const lang of languages) {
-      if (locales.includes(lang as any)) return lang;
-      const baseLang = lang.split('-')[0];
-      if (locales.includes(baseLang as any)) return baseLang;
-    }
-  }
-
-  return defaultLocale;
-}
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -42,14 +19,15 @@ export function middleware(request: NextRequest) {
   /**
    * 统一 URL 清理工具
    * @param targetPath 目标路径
-   * @param isRedirect 是否是重定向（true 则抹除端口，false 则保留内部路由所需端口）
+   * @param _isRedirect 是否是重定向 (保留参数名以兼容，但逻辑已简化)
    */
-  const getUrl = (targetPath: string, isRedirect: boolean) => {
+  const getUrl = (targetPath: string, _isRedirect: boolean) => {
     const url = request.nextUrl.clone();
     url.pathname = targetPath;
     
-    // 如果是线上环境重定向，强制抹除端口并统一协议
-    if (!isLocalhost && isRedirect) {
+    // 在生产环境中始终移除端口，防止内部重写触发非预期的外部重定向到 3001
+    // (Next.js 内部重写到绝对 URL 如果包含不同端口会触发浏览器 307 跳转)
+    if (!isLocalhost) {
       url.port = '';
       url.protocol = 'https';
     }
@@ -115,9 +93,10 @@ export function middleware(request: NextRequest) {
     (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)
   );
 
-  // 7. Internal Rewrite for default locale (Keep ports if localhost)
+  // 7. Internal Rewrite for default locale
   if (!hasLocale) {
     const rewriteUrl = getUrl(`/${defaultLocale}${pathname}`, false);
+    // 在生产环境，rewriteUrl.port 已被 getUrl 清空，确保是同源重写
     return setStrategyCookie(NextResponse.rewrite(rewriteUrl));
   }
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { NavigationMenuType, type NavItem } from '@/types/navigation';
+import { resolveInternalLink } from '@/lib/utils';
 
 // Payload CMS API 基础地址
 const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
@@ -103,7 +104,7 @@ async function transformNavigationItem(
   const result: NavItem = {
     id: item.id,
     label: item.name || 'Untitled',
-    url: item.link || '#',
+    url: resolveInternalLink(item.link),
     type: typeMap[item.type] || NavigationMenuType.STANDARD,
     icon: item.icon,
     openInNewTab: false,

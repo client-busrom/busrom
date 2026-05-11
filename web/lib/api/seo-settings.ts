@@ -693,7 +693,7 @@ export async function getNonHomePageSeo(
   const allSettings = await getAllSeoSettings(locale)
 
   // Normalize path
-  const normalizedPath = path.replace(/^\/(en|zh|de|fr|es|pt|it|nl|pl|ru|ja|ko|ar|th|vi|id|ms|tr|hi|bn)/, '') || '/'
+  const normalizedPath = path.replace(/^\/(en|zh|es|fr|de|it|pt|nl|pl|ru|ja|ko|ar|tr|pl|sv|da|no|fi)/, '') || '/'
 
   // Find all matching settings (excluding global)
   const matches: SeoSetting[] = []
