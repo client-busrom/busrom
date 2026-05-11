@@ -138,7 +138,7 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
                       className="absolute font-kavivanar" 
                       style={{ 
                         fontSize: vw(200), 
-                        lineHeight: 0.73,
+                        lineHeight: 1,
                         marginTop: vw(TITLE_CONFIG.ampersandTextMarginTop),
                         color: "transparent",
                         backgroundImage: "linear-gradient(120deg, rgba(255,255,255,0) 25%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 75%)",
@@ -148,7 +148,7 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
                         zIndex: 1
                       }}
                       animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
-                      transition={{ duration: 2.5, repeat: Infinity, ease: "linear", repeatDelay: 0.5 }}
+                      transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
                     >
                       {specialText}
                     </motion.span>

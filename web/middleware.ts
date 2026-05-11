@@ -6,14 +6,9 @@ import { locales, defaultLocale, nonDefaultLocales } from '@/i18n.config';
  * URL 路由策略:
  * - 英文(默认): busromhouse.com/  (无前缀)
  * - 其他语言: busromhouse.com/zh, busromhouse.com/fr 等
- *
- * SEO 301 重定向:
- * - /en -> /
- * - /en/about -> /about
  */
 
 function getPreferredLocale(request: NextRequest): string {
-  // 1. 优先从 user-preferences cookie 中获取语言
   const preferencesCookie = request.cookies.get('user-preferences')?.value;
   if (preferencesCookie) {
     try {
@@ -21,10 +16,9 @@ function getPreferredLocale(request: NextRequest): string {
       if (parsed.language && locales.includes(parsed.language)) {
         return parsed.language;
       }
-    } catch (e) { /* ignore malformed cookie */ }
+    } catch (e) { /* ignore */ }
   }
 
-  // 2. 如果没有 cookie，从 Accept-Language header 获取
   const languages = request.headers.get('accept-language')?.split(',')?.map(lang => lang.split(';')[0]);
   if (languages) {
     for (const lang of languages) {
@@ -34,7 +28,6 @@ function getPreferredLocale(request: NextRequest): string {
     }
   }
 
-  // 3. 回退到默认语言
   return defaultLocale;
 }
 
@@ -42,31 +35,50 @@ export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const host = request.headers.get('host');
   const searchParams = request.nextUrl.searchParams;
+  
+  // 核心判断：是否是本地开发环境
+  const isLocalhost = host?.includes('localhost') || host?.includes('127.0.0.1');
 
-  // Legacy URL Redirects (SEO Cleanup)
+  /**
+   * 统一 URL 清理工具
+   * @param targetPath 目标路径
+   * @param isRedirect 是否是重定向（true 则抹除端口，false 则保留内部路由所需端口）
+   */
+  const getUrl = (targetPath: string, isRedirect: boolean) => {
+    const url = request.nextUrl.clone();
+    url.pathname = targetPath;
+    
+    // 如果是线上环境重定向，强制抹除端口并统一协议
+    if (!isLocalhost && isRedirect) {
+      url.port = '';
+      url.protocol = 'https';
+    }
+    
+    // 特殊处理：如果是 www 重定向
+    if (!isLocalhost && host === 'busromhouse.com') {
+      url.hostname = 'www.busromhouse.com';
+    }
+    
+    return url;
+  };
+
+  // 1. Legacy URL Redirects (SEO)
   if (pathname.includes('/service/one-stop-shop')) {
     const newPath = pathname.replace('/service/one-stop-shop', '/service/one-stop-solution');
-    const url = new URL(newPath, request.url);
-    return NextResponse.redirect(url, 301);
+    return NextResponse.redirect(getUrl(newPath, true), 301);
   }
 
-  // 1. SEO Canonical Domain Redirect: non-www to www
-  // Only apply to production domains, skip localhost
+  // 2. Canonical Domain Redirect: non-www to www
   if (host === 'busromhouse.com') {
-    const url = new URL(request.url);
-    url.host = 'www.busromhouse.com';
-    return NextResponse.redirect(url, 301);
+    return NextResponse.redirect(getUrl(pathname, true), 301);
   }
 
-  // 2. Pre-determine CDN Strategy
+  // 3. CDN Strategy
   const cdnOverride = searchParams.get('cdn');
   const country = request.headers.get('cloudfront-viewer-country');
   const existingStrategy = request.cookies.get('cdn_strategy')?.value;
-  const isLocalhost = host?.includes('localhost') || host?.includes('127.0.0.1');
 
   let newStrategy: string | null = null;
-  
-  // Priority: Explicit parameter > Geo Location (non-local) > Status Quo
   if (cdnOverride === 'china' || cdnOverride === 'global' || cdnOverride === 'local') {
     newStrategy = cdnOverride;
   } else if (country && !isLocalhost) {
@@ -77,46 +89,41 @@ export function middleware(request: NextRequest) {
     if (newStrategy && existingStrategy !== newStrategy) {
       res.cookies.set('cdn_strategy', newStrategy, {
         path: '/',
-        maxAge: 60 * 60 * 24 * 30, // 30 days
+        maxAge: 60 * 60 * 24 * 30,
         sameSite: 'lax',
       });
     }
     res.headers.set('x-cdn-strategy-debug', newStrategy || existingStrategy || 'none');
     res.headers.set('x-viewer-country', country || 'unknown');
-    res.headers.set('x-is-localhost', String(isLocalhost));
     res.headers.set('Vary', 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, CloudFront-Viewer-Country, Cookie');
     return res;
   };
 
-  // 3. Special handling for API: skip locale logic
+  // 4. API skip
   if (pathname.startsWith('/api/')) {
     return setStrategyCookie(NextResponse.next());
   }
 
-  // 4. Default Locale Redirect (SEO Protection): /en -> /
+  // 5. Default Locale Redirect: /en -> /
   if (pathname === `/${defaultLocale}` || pathname.startsWith(`/${defaultLocale}/`)) {
     const newPath = pathname.replace(new RegExp(`^/${defaultLocale}/?`), '/') || '/';
-    const url = new URL(newPath, request.url);
-    url.search = request.nextUrl.search;
-    return setStrategyCookie(NextResponse.redirect(url, 301));
+    return setStrategyCookie(NextResponse.redirect(getUrl(newPath, true), 301));
   }
 
-  // 5. Check for non-default locale prefix
-  const hasNonDefaultLocale = nonDefaultLocales.some(
+  // 6. Locale Prefix Check
+  const hasLocale = locales.some(
     (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)
   );
 
-  // 6. Rewrite for default locale if no prefix
-  if (!hasNonDefaultLocale) {
-    const url = request.nextUrl.clone();
-    url.pathname = `/${defaultLocale}${pathname}`;
-    return setStrategyCookie(NextResponse.rewrite(url));
+  // 7. Internal Rewrite for default locale (Keep ports if localhost)
+  if (!hasLocale) {
+    const rewriteUrl = getUrl(`/${defaultLocale}${pathname}`, false);
+    return setStrategyCookie(NextResponse.rewrite(rewriteUrl));
   }
 
   return setStrategyCookie(NextResponse.next());
 }
 
 export const config = {
-  // 包含 api 路径，以便在 API 调用中也能实时检测并更新 cdn_strategy Cookie
   matcher: ['/((?!_next/static|_next/image|favicon.ico|sitemap|sitemaps\\.xml|robots\\.txt|feed|.*\\..*).*)'],
 };
