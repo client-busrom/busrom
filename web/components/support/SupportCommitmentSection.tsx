@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import Image from "next/image"
 
 const DESIGN_WIDTH = 1920
 const vw = (px: number) => `calc(${px} * min(100vw, 1920px) / 1920)`
@@ -64,12 +63,12 @@ function renderNodes(nodes: any[], context: "title" | "subtitle" = "title"): Rea
         const isUnderline = (node.format & 8) !== 0
         let style: React.CSSProperties = {}
         if (context === "title") {
-          style.fontSize = vw(36)
+          style.fontSize = vw(40)
           style.fontWeight = "normal"
           if (isUnderline) {
-            style.color = "#817931"; style.fontWeight = "bold"; style.fontSize = vw(54)
+            style.color = "#817931"; style.fontWeight = "bold"; style.fontSize = vw(48)
           } else if (isBold) {
-            style.color = "#5E5616"; style.fontWeight = "bold"; style.fontSize = vw(54)
+            style.color = "#5E5616"; style.fontWeight = "bold"; style.fontSize = vw(48)
           }
         } else if (context === "subtitle") {
           style.color = "#181818"
@@ -101,6 +100,16 @@ export function SupportCommitmentSection({ title, subtitle, technical, marketing
     return () => clearInterval(timer)
   }, [items.length, activeGroup, isPaused])
 
+  const [vwScale, setVwScale] = useState(1);
+  useEffect(() => {
+    const update = () => setVwScale(Math.min(window.innerWidth, 1920) / 1920);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  const vwn = (px: number) => px * vwScale;
+
   const handleToggleGroup = () => { if (hasTechnical && hasMarketing) setActiveGroup(prev => prev === "technical" ? "marketing" : "technical") }
 
   if (!hasTechnical && !hasMarketing) return null
@@ -120,7 +129,18 @@ export function SupportCommitmentSection({ title, subtitle, technical, marketing
             {Array.isArray(title) ? renderNodes(title) : title}
           </h2>
         </div>
-        <div className="absolute border border-dashed border-[#574f0e] bg-[#faf5cd]" style={{ left: vw(628), top: vw(219), width: 'auto', height: 'auto', borderRadius: vw(30), padding: `${vw(12)} ${vw(12)}`, zIndex: 1 }}>
+        <div className="absolute bg-[#faf5cd]" style={{ 
+          left: vw(660), 
+          top: vw(216), 
+          width: 'auto', 
+          height: 'auto', 
+          borderRadius: vw(20), 
+          padding: `${vw(4)} ${vw(12)}`, 
+          zIndex: 1,
+          backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='${vwn(20)}' ry='${vwn(20)}' stroke='%23574F0E' stroke-width='${vwn(1.5)}' stroke-dasharray='${vwn(8)}%2c ${vwn(8)}' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`,
+          backgroundSize: '100% 100%',
+          backgroundRepeat: 'no-repeat'
+        }}>
           <p className="font-anaheim text-[20px] leading-[1.5]" style={{ fontSize: vw(16) }}>{Array.isArray(subtitle) ? renderNodes(subtitle, "subtitle") : subtitle}</p>
         </div>
         <div className="absolute" style={{ left: vw(1062), top: vw(249), width: vw(700), height: vw(318) }}>
@@ -133,7 +153,7 @@ export function SupportCommitmentSection({ title, subtitle, technical, marketing
               return (
                 <button key={idx} onClick={() => setActiveIndex(idx)} className="absolute flex items-center justify-center transition-all duration-500" style={{ left: vw(pos.x), top: vw(pos.y), width: isActive ? vw(110) : vw(56), height: isActive ? vw(84) : vw(56), marginLeft: isActive ? vw(-27) : 0, marginTop: isActive ? vw(-14) : 0, borderRadius: isActive ? vw(42) : "50%", backgroundColor: isActive ? '#262203' : 'transparent', border: 'none', zIndex: 10 }}>
                   <div style={{ width: vw(34), height: vw(34), position: 'relative' }}>
-                    <Image src={iconUrl} alt={item.title || "Icon"} fill className="object-contain" style={{ filter: isActive ? "brightness(0) invert(1)" : "brightness(0)" }} />
+                    <img src={iconUrl} alt={item.title || "Icon"} className="w-full h-full object-contain" style={{ filter: isActive ? "brightness(0) invert(1)" : "brightness(0)" }} />
                   </div>
                 </button>
               )
