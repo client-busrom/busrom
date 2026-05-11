@@ -660,8 +660,14 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
             }
 
             // Fill required fields for products (if missing)
-            if (collectionSlug === 'products' && !dataToSave.name) {
-              dataToSave.name = sourceData.name
+            if (collectionSlug === 'products') {
+              if (!dataToSave.name && sourceData.name) dataToSave.name = sourceData.name
+              if (sourceData.slug) dataToSave.slug = sourceData.slug
+            }
+            
+            // Fill required fields for applications (if missing)
+            if (collectionSlug === 'applications') {
+              if (!dataToSave.name && sourceData.name) dataToSave.name = sourceData.name
             }
           }
 
@@ -701,12 +707,28 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
         const result = await saveRes.json()
 
         if (saveRes.ok && result.results) {
-          for (const [locale, r] of Object.entries(result.results as Record<string, { success: boolean }>)) {
-            if (r.success) successCount++
-            else failCount++
+          const errors: string[] = []
+          for (const [locale, r] of Object.entries(result.results as Record<string, { success: boolean, error?: string }>)) {
+            if (r.success) {
+              successCount++
+            } else {
+              failCount++
+              if (r.error) errors.push(`${locale}: ${r.error}`)
+            }
+          }
+          
+          if (failCount > 0) {
+            const firstError = errors[0] || 'Unknown error'
+            setStatusMessage({ 
+              type: 'error', 
+              key: '__inline:部分保存失败', 
+              params: { details: `${successCount} ✓ / ${failCount} ✗. 错误详情: ${firstError}` } 
+            })
           }
         } else {
           failCount = localesToSave.length
+          const errorMsg = result.error || 'Request failed'
+          setStatusMessage({ type: 'error', key: `__inline:保存失败: ${errorMsg}` })
           console.error(`[TranslationCenter] ❌ Bulk save failed:`, result)
         }
         setProgress({ current: 1, total: 1 })
@@ -715,8 +737,6 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
       if (failCount === 0) {
         setStatusMessage({ type: 'success', key: 'custom:translationCenter:saveSuccess', params: { count: successCount } })
         setModifiedLocales(new Set())
-      } else {
-        setStatusMessage({ type: 'warning', key: 'custom:translationCenter:partialSave', params: { success: successCount, fail: failCount } })
       }
 
       window.dispatchEvent(new Event('multilocale-refresh'))
