@@ -24,7 +24,7 @@ export async function GET(
 ) {
   try {
     const { locale } = await params
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busromhouse.com'
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.busromhouse.com'
 
     // Validate locale
     if (!SITEMAP_LOCALES.includes(locale as any)) {

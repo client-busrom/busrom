@@ -5,6 +5,7 @@ import { PageSeoInjector } from "@/components/seo"
 import { getPageMetadata } from "@/lib/api/seo-settings"
 import { getBlogBySlug, getBlogSettings } from "@/lib/api/blog"
 import { getAlternateLanguages } from "@/lib/seo-utils"
+import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 
 const CMS_URL = process.env.CMS_GRAPHQL_URL
@@ -48,6 +49,10 @@ export default async function BlogDetailPage({
 
   // 1. Fetch Blog Data server-side
   const blogData = await getBlogBySlug(slug, locale)
+  
+  if (!blogData) {
+    notFound()
+  }
 
   // 2. Fetch Settings Data server-side
   const configData = await getBlogSettings(locale)

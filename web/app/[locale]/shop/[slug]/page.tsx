@@ -4,14 +4,10 @@ import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import { getNonHomePageSeo, buildMetadata } from "@/lib/api/seo-settings"
 import { getAlternateLanguages } from "@/lib/seo-utils"
+import { getProductBySlug } from "@/lib/api/products"
+import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 
-const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-
-// Generate metadata for SEO
-// Strategy: seoPlugin's meta.title/meta.description as primary SEO (<title> + <meta description>)
-// SeoSettings provides robots/canonical/og; its title/description/keywords are distributed
-// as long-tail keywords via PageSeoInjector (same pattern as homepage)
 export async function generateMetadata({
   params,
 }: {
@@ -20,44 +16,25 @@ export async function generateMetadata({
   const { locale, slug } = await params
   const path = `/shop/${slug}`
 
-  // Fetch product's seoPlugin meta fields + name from CMS
-  let metaTitle: string | null = null
-  let metaDescription: string | null = null
-  let productName: string | null = null
+  const product = await getProductBySlug(slug, locale)
 
-  try {
-    const res = await fetch(
-      `${CMS_URL}/api/products?where[slug][equals]=${slug}&limit=1&locale=${locale}&depth=0`,
-      { next: { revalidate: 60 } }
-    )
-    if (res.ok) {
-      const data = await res.json()
-      const product = data.docs?.[0]
-      if (product) {
-        metaTitle = product.meta?.title || null
-        metaDescription = product.meta?.description || null
-        productName = product.name || null
-      }
+  if (!product) {
+    return {
+      title: 'Product Not Found | Busrom',
     }
-  } catch (error) {
-    console.error('[Product SEO] Failed to fetch product metadata:', error)
   }
 
-  // Primary SEO: seoPlugin meta > product name > slug
-  const title = metaTitle || productName || slug
-  const description = metaDescription || (productName ? `${productName} - Busrom` : undefined)
+  const metaTitle = product.meta?.title || product.name || slug
+  const metaDescription = product.meta?.description || (product.name ? `${product.name} - High-quality glass hardware from Busrom` : undefined)
 
   const defaultMetadata: Metadata = {
-    title,
-    ...(description ? { description } : {}),
+    title: metaTitle,
+    ...(metaDescription ? { description: metaDescription } : {}),
     alternates: {
       languages: getAlternateLanguages(path),
     },
   }
 
-  // Merge with SeoSettings for robots/canonical/og only
-  // Strip SeoSettings' title/description so they don't override product's own SEO
-  // (those values are distributed as long-tail keywords via PageSeoInjector instead)
   const { setting } = await getNonHomePageSeo(path, 'shop_detail', locale)
   if (setting) {
     setting.metaTitle = undefined
@@ -73,6 +50,12 @@ export default async function ProductDetailPage({
 }) {
   const { locale, slug } = await params
   const path = `/shop/${slug}`
+
+  const productData = await getProductBySlug(slug, locale)
+
+  if (!productData) {
+    notFound()
+  }
   
   // Load localized messages for SSR
   const messages = (await import(`@/messages/${locale}.json`)).default
@@ -83,7 +66,7 @@ export default async function ProductDetailPage({
       <PageScripts path={path} pageType="shop_detail" position="header" />
       <PageScripts path={path} pageType="shop_detail" position="body_start" />
       <PageSeoInjector path={path} pageType="shop_detail" locale={locale} />
-      <ProductDetailClient locale={locale} slug={slug} footerHint={footerHint} />
+      <ProductDetailClient locale={locale} slug={slug} initialData={productData} footerHint={footerHint} />
       <PageScripts path={path} pageType="shop_detail" position="footer" />
     </>
   )

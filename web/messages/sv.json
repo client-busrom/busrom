@@ -44,5 +44,14 @@
   "Sphere3D": {
     "title": "GLOBALT NÄTVERK",
     "description": "Betjänar kunder över hela världen från Guangdong, Kina"
+  },
+  "notFound": {
+    "title": "Sidan hittades inte",
+    "description": "Sidan du letar efter kan ha tagits bort, fått sitt namn ändrat eller är tillfälligt otillgänglig.",
+    "backHome": "Tillbaka till start",
+    "viewProducts": "Visa produkter",
+    "home": "Hem",
+    "about": "Om oss",
+    "contact": "Kontakt"
   }
 }

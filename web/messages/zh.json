@@ -44,5 +44,14 @@
   "Sphere3D": {
     "title": "全球网络",
     "description": "立足广东，服务全球客户"
+  },
+  "notFound": {
+    "title": "页面未找到",
+    "description": "您查找的页面可能已被删除、更名或暂时不可用。",
+    "backHome": "返回首页",
+    "viewProducts": "查看产品",
+    "home": "首页",
+    "about": "关于我们",
+    "contact": "联系我们"
   }
 }

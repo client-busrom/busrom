@@ -4,24 +4,26 @@ import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import type { Metadata } from "next"
 import { getAlternateLanguages } from "@/lib/seo-utils"
+import { getProductSeriesBySlug } from "@/lib/api/product-series"
+import { notFound } from "next/navigation"
 
-// This will be used for generating static params if needed
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: Locale; slug: string }>
 }): Promise<Metadata> {
-  const { slug } = await params
+  const { locale, slug } = await params
+  const series = await getProductSeriesBySlug(slug, locale)
 
-  // Format slug for display (e.g., "glass-standoff" -> "Glass Standoff")
-  const title = slug
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
+  if (!series) {
+    return {
+      title: 'Not Found | Busrom Products',
+    }
+  }
 
   return {
-    title: `${title} | Busrom Products`,
-    description: `Explore ${title} - High-quality glass hardware solutions from Busrom`,
+    title: `${series.name} | Busrom Products`,
+    description: series.description || `Explore ${series.name} - High-quality glass hardware solutions from Busrom`,
     alternates: {
       languages: getAlternateLanguages(`/products/${slug}`),
     },
@@ -36,12 +38,18 @@ export default async function ProductSeriesDetailPage({
   const { locale, slug } = await params
   const path = `/products/${slug}`
 
+  const seriesData = await getProductSeriesBySlug(slug, locale)
+
+  if (!seriesData) {
+    notFound()
+  }
+
   return (
     <>
       <PageScripts path={path} pageType="product_series_detail" position="header" />
       <PageScripts path={path} pageType="product_series_detail" position="body_start" />
       <PageSeoInjector path={path} pageType="product_series_detail" locale={locale} />
-      <ProductSeriesPage locale={locale} slug={slug} />
+      <ProductSeriesPage locale={locale} slug={slug} initialData={seriesData} />
       <PageScripts path={path} pageType="product_series_detail" position="footer" />
     </>
   )

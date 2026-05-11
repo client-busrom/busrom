@@ -44,5 +44,14 @@
   "Sphere3D": {
     "title": "RED GLOBAL",
     "description": "Sirviendo a clientes en todo el mundo desde Guangdong, China"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "description": "La página que busca puede haber sido eliminada, haber cambiado de nombre o no estar disponible temporalmente.",
+    "backHome": "Volver al inicio",
+    "viewProducts": "Ver productos",
+    "home": "Inicio",
+    "about": "Nosotros",
+    "contact": "Contacto"
   }
 }

@@ -273,20 +273,23 @@ function generateUrlWithAlternates(
   locale: string,
   baseUrl: string
 ): SitemapUrl {
-  // Generate alternate URLs for all locales (使用新的 URL 策略)
+  // Ensure path is relative and starts with /
+  const cleanPath = path.startsWith('http') ? new URL(path).pathname : (path.startsWith('/') ? path : `/${path}`)
+
+  // Generate alternate URLs for all locales
   const alternates: { locale: string; url: string }[] = SITEMAP_LOCALES.map((loc) => ({
     locale: loc as string,
-    url: `${baseUrl}${getLocalizedPath(path, loc)}`,
+    url: `${baseUrl}${getLocalizedPath(cleanPath, loc)}`,
   }))
 
-  // Add x-default (points to default locale - now without prefix)
+  // Add x-default (points to default locale)
   alternates.push({
     locale: 'x-default',
-    url: `${baseUrl}${getLocalizedPath(path, defaultLocale)}`,
+    url: `${baseUrl}${getLocalizedPath(cleanPath, defaultLocale)}`,
   })
 
   return {
-    url: getLocalizedPath(path, locale),
+    url: getLocalizedPath(cleanPath, locale),
     lastmod,
     changefreq,
     priority,
@@ -389,7 +392,7 @@ export async function getSitemapUrlsForLocale(locale: string, baseUrl: string): 
  */
 export async function getAllSitemapUrls(): Promise<SitemapUrl[]> {
   const now = new Date().toISOString()
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busromhouse.com'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.busromhouse.com'
 
   try {
     const [products, productSeries, blogs, pages, applications] = await Promise.all([
@@ -477,7 +480,7 @@ export async function getAllSitemapUrls(): Promise<SitemapUrl[]> {
 /**
  * Generate XML sitemap with hreflang support
  */
-export function generateSitemapXML(urls: SitemapUrl[], baseUrl: string = 'https://busromhouse.com'): string {
+export function generateSitemapXML(urls: SitemapUrl[], baseUrl: string = 'https://www.busromhouse.com'): string {
   const hasAlternates = urls.some((url) => url.alternates && url.alternates.length > 0)
 
   const xmlHeader = hasAlternates
@@ -516,7 +519,7 @@ ${alternateLinks}
 /**
  * Generate sitemap index XML
  */
-export function generateSitemapIndexXML(locales: string[], baseUrl: string = 'https://busromhouse.com'): string {
+export function generateSitemapIndexXML(locales: string[], baseUrl: string = 'https://www.busromhouse.com'): string {
   const now = new Date().toISOString()
 
   return `<?xml version="1.0" encoding="UTF-8"?>

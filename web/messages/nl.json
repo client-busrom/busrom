@@ -44,5 +44,14 @@
   "Sphere3D": {
     "title": "GLOBAAL NETWERK",
     "description": "Klanten over de hele wereld bedienen vanuit Guangdong, China"
+  },
+  "notFound": {
+    "title": "Pagina niet gevonden",
+    "description": "De pagina die u zoekt is mogelijk verwijderd, heeft een andere naam gekregen of is tijdelijk niet beschikbaar.",
+    "backHome": "Terug naar home",
+    "viewProducts": "Bekijk producten",
+    "home": "Home",
+    "about": "Over ons",
+    "contact": "Contact"
   }
 }

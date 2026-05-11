@@ -44,5 +44,14 @@
   "Sphere3D": {
     "title": "KÜRESEL AĞ",
     "description": "Guangdong, Çin'den dünya çapındaki müşterilere hizmet veriyoruz"
+  },
+  "notFound": {
+    "title": "Sayfa Bulunamadı",
+    "description": "Aradığınız sayfa kaldırılmış, adı değiştirilmiş veya geçici olarak kullanım dışı olabilir.",
+    "backHome": "Ana Sayfaya Dön",
+    "viewProducts": "Ürünleri Görüntüle",
+    "home": "Ana Sayfa",
+    "about": "Hakkımızda",
+    "contact": "İletişim"
   }
 }

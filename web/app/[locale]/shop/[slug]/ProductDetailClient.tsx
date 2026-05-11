@@ -64,11 +64,12 @@ interface ProductDetailClientProps {
   locale: Locale
   slug: string
   footerHint?: string
+  initialData?: any
 }
 
-export function ProductDetailClient({ locale, slug, footerHint }: ProductDetailClientProps) {
-  const [product, setProduct] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+export function ProductDetailClient({ locale, slug, footerHint, initialData }: ProductDetailClientProps) {
+  const [product, setProduct] = useState<any>(initialData || null)
+  const [loading, setLoading] = useState(!initialData)
   const [error, setError] = useState<string | null>(null)
   const [isFullFormOpen, setIsFullFormOpen] = useState(false)
   const [selectedSection, setSelectedSection] = useState<any>(null)
@@ -78,20 +79,34 @@ export function ProductDetailClient({ locale, slug, footerHint }: ProductDetailC
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`/api/products/${slug}?locale=${locale}`)
+        // If we have initialData, we still might need to fetch formConfig 
+        // but we can skip the main product fetch if we already have it.
+        // However, the useEffect logic also handles formConfig fetching.
+        // To keep it simple and robust, we skip the main fetch if initialData is there
+        // but we need to ensure formConfig logic still runs.
+        
+        let currentProduct = product
 
-        if (res.status === 404) {
-          setError("Product not found")
-          return
+        if (!initialData) {
+          const res = await fetch(`/api/products/${slug}?locale=${locale}`)
+
+          if (res.status === 404) {
+            setError("Product not found")
+            return
+          }
+
+          if (!res.ok) {
+            setError("Failed to load product")
+            return
+          }
+
+          currentProduct = await res.json()
+          setProduct(currentProduct)
         }
 
-        if (!res.ok) {
-          setError("Failed to load product")
-          return
-        }
+        if (!currentProduct) return
 
-        const data = await res.json()
-        setProduct(data)
+        const data = currentProduct
 
         // 1. Check for directly linked form (higher priority)
         let formConfigToUse = null

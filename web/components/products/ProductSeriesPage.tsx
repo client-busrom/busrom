@@ -20,22 +20,25 @@ interface ProductSeriesData {
   order: number
   status: string
   contentTranslation: any
-  mediaData: Record<string, any>
-  reusableBlocks: Record<string, any>
+  mediaData?: Record<string, any>
+  reusableBlocks?: Record<string, any>
   locale: string
 }
 
 interface ProductSeriesPageProps {
   locale: Locale
   slug: string
+  initialData?: ProductSeriesData | null
 }
 
-export function ProductSeriesPage({ locale, slug }: ProductSeriesPageProps) {
-  const [seriesData, setSeriesData] = useState<ProductSeriesData | null>(null)
-  const [loading, setLoading] = useState(true)
+export function ProductSeriesPage({ locale, slug, initialData }: ProductSeriesPageProps) {
+  const [seriesData, setSeriesData] = useState<ProductSeriesData | null>(initialData || null)
+  const [loading, setLoading] = useState(!initialData)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (initialData) return
+
     const fetchSeriesContent = async () => {
       try {
         setLoading(true)

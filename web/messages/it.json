@@ -44,5 +44,14 @@
   "Sphere3D": {
     "title": "RETE GLOBALE",
     "description": "Servizio clienti in tutto il mondo da Guangdong, Cina"
+  },
+  "notFound": {
+    "title": "Pagina non trovata",
+    "description": "La pagina che stai cercando potrebbe essere stata rimossa, aver cambiato nome o essere temporaneamente non disponibile.",
+    "backHome": "Torna alla home",
+    "viewProducts": "Visualizza prodotti",
+    "home": "Home",
+    "about": "Chi siamo",
+    "contact": "Contatti"
   }
 }

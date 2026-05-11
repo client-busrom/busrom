@@ -44,5 +44,14 @@
   "Sphere3D": {
     "title": "GLOBALES NETZWERK",
     "description": "Weltweiter Kundenservice von Guangdong, China aus"
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "description": "Die von Ihnen gesuchte Seite wurde möglicherweise entfernt, umbenannt oder ist vorübergehend nicht erreichbar.",
+    "backHome": "Zurück zur Startseite",
+    "viewProducts": "Produkte ansehen",
+    "home": "Startseite",
+    "about": "Über uns",
+    "contact": "Kontakt"
   }
 }

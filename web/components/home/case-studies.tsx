@@ -386,7 +386,12 @@ export default function CaseStudies({ data, headerTheme, className }: Props) {
                         >
                           <h3
                             className="text-white font-bold font-anaheim"
-                            style={{ fontSize: rpx(36) }}
+                            style={{
+                              fontSize: rpx(36),
+                              maxWidth: rpx(
+                                LAYOUT.images.smallX - LAYOUT.images.mainX - 64,
+                              ),
+                            }}
                           >
                             {application.name}
                           </h3>
@@ -396,6 +401,11 @@ export default function CaseStudies({ data, headerTheme, className }: Props) {
                               style={{
                                 fontSize: rpx(20),
                                 marginTop: rpx(8),
+                                maxWidth: rpx(
+                                  LAYOUT.images.smallX -
+                                    LAYOUT.images.mainX -
+                                    64,
+                                ),
                               }}
                             >
                               {application.category.name}

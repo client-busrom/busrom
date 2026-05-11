@@ -44,5 +44,14 @@
   "Sphere3D": {
     "title": "GLOBAALI VERKOSTO",
     "description": "Palvelemme asiakkaita ympäri maailmaa Guangdongista, Kiinasta"
+  },
+  "notFound": {
+    "title": "Sivua ei löytynyt",
+    "description": "Etsimäsi sivu on saatettu poistaa, sen nimeä on muutettu tai se on tilapäisesti poissa käytöstä.",
+    "backHome": "Takaisin etusivulle",
+    "viewProducts": "Näytä tuotteet",
+    "home": "Etusivu",
+    "about": "Tietoa meistä",
+    "contact": "Ota yhteyttä"
   }
 }

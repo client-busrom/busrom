@@ -15,6 +15,7 @@ const CMS_URL = process.env.CMS_GRAPHQL_URL
 
 // CDN URL for images
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL || 'https://cdn.busromhouse.com'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.busromhouse.com'
 
 export interface SeoSetting {
   id: string

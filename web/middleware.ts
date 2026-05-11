@@ -40,21 +40,36 @@ function getPreferredLocale(request: NextRequest): string {
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const host = request.headers.get('host');
+  const searchParams = request.nextUrl.searchParams;
 
-  // 1. 预先判定 CDN 策略
-  const urlParams = request.nextUrl.searchParams;
-  const cdnOverride = urlParams.get('cdn');
+  // Legacy URL Redirects (SEO Cleanup)
+  if (pathname.includes('/service/one-stop-shop')) {
+    const newPath = pathname.replace('/service/one-stop-shop', '/service/one-stop-solution');
+    const url = new URL(newPath, request.url);
+    return NextResponse.redirect(url, 301);
+  }
+
+  // 1. SEO Canonical Domain Redirect: non-www to www
+  // Only apply to production domains, skip localhost
+  if (host === 'busromhouse.com') {
+    const url = new URL(request.url);
+    url.host = 'www.busromhouse.com';
+    return NextResponse.redirect(url, 301);
+  }
+
+  // 2. Pre-determine CDN Strategy
+  const cdnOverride = searchParams.get('cdn');
   const country = request.headers.get('cloudfront-viewer-country');
   const existingStrategy = request.cookies.get('cdn_strategy')?.value;
-  const isLocalhost = request.headers.get('host')?.includes('localhost') || request.headers.get('host')?.includes('127.0.0.1');
+  const isLocalhost = host?.includes('localhost') || host?.includes('127.0.0.1');
 
   let newStrategy: string | null = null;
   
-  // 优先级: 显式参数 > 地理位置 (非本地) > 保持现状
+  // Priority: Explicit parameter > Geo Location (non-local) > Status Quo
   if (cdnOverride === 'china' || cdnOverride === 'global' || cdnOverride === 'local') {
     newStrategy = cdnOverride;
   } else if (country && !isLocalhost) {
-    // 只有在非本地环境下才根据国家自动设置 (避免在本地开发时干扰 Nginx 反代)
     newStrategy = country === 'CN' ? 'china' : 'global';
   }
 
@@ -62,11 +77,10 @@ export function middleware(request: NextRequest) {
     if (newStrategy && existingStrategy !== newStrategy) {
       res.cookies.set('cdn_strategy', newStrategy, {
         path: '/',
-        maxAge: 60 * 60 * 24 * 30, // 30 天
+        maxAge: 60 * 60 * 24 * 30, // 30 days
         sameSite: 'lax',
       });
     }
-    // 增加调试头和缓存隔离头
     res.headers.set('x-cdn-strategy-debug', newStrategy || existingStrategy || 'none');
     res.headers.set('x-viewer-country', country || 'unknown');
     res.headers.set('x-is-localhost', String(isLocalhost));
@@ -74,37 +88,32 @@ export function middleware(request: NextRequest) {
     return res;
   };
 
-  // 2. 对 API 路径特殊处理：跳过语言重定向/重写，直接进行 CDN 策略判定
+  // 3. Special handling for API: skip locale logic
   if (pathname.startsWith('/api/')) {
-    const res = NextResponse.next();
-    return setStrategyCookie(res);
+    return setStrategyCookie(NextResponse.next());
   }
 
-  // 3. 处理 /en 和 /en/* 的 301 重定向 (SEO 保护)
+  // 4. Default Locale Redirect (SEO Protection): /en -> /
   if (pathname === `/${defaultLocale}` || pathname.startsWith(`/${defaultLocale}/`)) {
     const newPath = pathname.replace(new RegExp(`^/${defaultLocale}/?`), '/') || '/';
     const url = new URL(newPath, request.url);
     url.search = request.nextUrl.search;
-    const res = NextResponse.redirect(url, 301);
-    return setStrategyCookie(res);
+    return setStrategyCookie(NextResponse.redirect(url, 301));
   }
 
-  // 3. 检查路径是否已经有非默认语言前缀 (如 /zh, /fr)
+  // 5. Check for non-default locale prefix
   const hasNonDefaultLocale = nonDefaultLocales.some(
     (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)
   );
 
-  // 4. 如果路径没有语言前缀，视为默认语言(英文)，执行 rewrite
+  // 6. Rewrite for default locale if no prefix
   if (!hasNonDefaultLocale) {
     const url = request.nextUrl.clone();
     url.pathname = `/${defaultLocale}${pathname}`;
-    const res = NextResponse.rewrite(url);
-    return setStrategyCookie(res);
+    return setStrategyCookie(NextResponse.rewrite(url));
   }
 
-  // 5. 正常通过路径
-  const res = NextResponse.next();
-  return setStrategyCookie(res);
+  return setStrategyCookie(NextResponse.next());
 }
 
 export const config = {
