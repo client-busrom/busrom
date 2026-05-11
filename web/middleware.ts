@@ -25,16 +25,12 @@ export function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = targetPath;
     
-    // 在生产环境中始终移除端口，防止内部重写触发非预期的外部重定向到 3001
-    // (Next.js 内部重写到绝对 URL 如果包含不同端口会触发浏览器 307 跳转)
-    if (!isLocalhost) {
+    // 在生产环境中，确保使用外部请求的 Host 域名，而不是内部服务器的 localhost
+    if (!isLocalhost && host) {
+      const cleanHost = host.split(':')[0];
+      url.hostname = cleanHost === 'busromhouse.com' ? 'www.busromhouse.com' : cleanHost;
       url.port = '';
       url.protocol = 'https';
-    }
-    
-    // 特殊处理：如果是 www 重定向
-    if (!isLocalhost && host === 'busromhouse.com') {
-      url.hostname = 'www.busromhouse.com';
     }
     
     return url;
