@@ -615,49 +615,58 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
         sourceData = await sourceRes.json()
       }
 
-      for (const localeCode of localesToSave) {
-        const locale = SUPPORTED_LOCALES.find(l => l.code === localeCode)
-        if (!locale) continue
+        for (const localeCode of localesToSave) {
+          const locale = SUPPORTED_LOCALES.find(l => l.code === localeCode)
+          if (!locale) continue
 
-        const dataToSave: Record<string, unknown> = {}
-        const arrayFieldUpdates: Record<string, Record<number, Record<string, string>>> = {}
+          const dataToSave: Record<string, unknown> = {}
+          const arrayFieldUpdates: Record<string, Record<number, Record<string, string>>> = {}
 
-        for (const field of fieldsData) {
-          const value = field.values.find(v => v.locale === locale.code)?.value
-          if (value === undefined) continue
+          for (const field of fieldsData) {
+            const value = field.values.find(v => v.locale === localeCode)?.value
+            if (value === undefined) continue
 
-          const arrayMatch = field.config.name.match(/^(.+)\[(\d+)]\.(.+)$/)
-          if (arrayMatch) {
-            const [, arrName, idxStr, subField] = arrayMatch
-            const idx = parseInt(idxStr, 10)
-            if (!arrayFieldUpdates[arrName]) arrayFieldUpdates[arrName] = {}
-            if (!arrayFieldUpdates[arrName][idx]) arrayFieldUpdates[arrName][idx] = {}
-            arrayFieldUpdates[arrName][idx][subField] = value
-          } else {
-            setNestedValue(dataToSave, field.config.name, value)
+            const arrayMatch = field.config.name.match(/^(.+)\[(\d+)]\.(.+)$/)
+            if (arrayMatch) {
+              const [, arrName, idxStr, subField] = arrayMatch
+              const idx = parseInt(idxStr, 10)
+              if (!arrayFieldUpdates[arrName]) arrayFieldUpdates[arrName] = {}
+              if (!arrayFieldUpdates[arrName][idx]) arrayFieldUpdates[arrName][idx] = {}
+              arrayFieldUpdates[arrName][idx][subField] = value
+            } else {
+              setNestedValue(dataToSave, field.config.name, value)
+            }
           }
+
+          // Merge array field updates
+          if (sourceData) {
+            for (const [arrName, indexUpdates] of Object.entries(arrayFieldUpdates)) {
+              const sourceArray = (sourceData[arrName] as Array<Record<string, unknown>>) || []
+              const mergedArray = sourceArray.map((item, idx) => {
+                const updates = indexUpdates[idx]
+                if (!updates) {
+                  // If no updates for this row, we still need to send the ID and keep it
+                  // But we should clean it to avoid _rels errors
+                  const cleanedItem: Record<string, any> = { id: item.id }
+                  return cleanedItem
+                }
+
+                // IMPORTANT: When updating a locale, only send the ID and the localized fields
+                // to avoid Payload getting confused with relationships (_rels) or non-localized data.
+                const cleanedItem: Record<string, any> = { id: item.id, ...updates }
+                return cleanedItem
+              })
+              dataToSave[arrName] = mergedArray
+            }
+
+            // Fill required fields for products (if missing)
+            if (collectionSlug === 'products' && !dataToSave.name) {
+              dataToSave.name = sourceData.name
+            }
+          }
+
+          localesPayload[localeCode] = dataToSave
         }
-
-        // Merge array field updates
-        if (sourceData) {
-          for (const [arrName, indexUpdates] of Object.entries(arrayFieldUpdates)) {
-            const sourceArray = (sourceData[arrName] as Array<Record<string, unknown>>) || []
-            const mergedArray = sourceArray.map((item, idx) => {
-              const updates = indexUpdates[idx]
-              return updates ? { ...item, ...updates } : { ...item }
-            })
-            dataToSave[arrName] = mergedArray
-          }
-
-          // Fill required fields for products
-          if (collectionSlug === 'products') {
-            if (!dataToSave.name && sourceData.name) dataToSave.name = sourceData.name
-            if (sourceData.slug) dataToSave.slug = sourceData.slug
-          }
-        }
-
-        localesPayload[localeCode] = dataToSave
-      }
 
       if (isGlobal) {
         // Globals: save one by one (no syncM2M issues)

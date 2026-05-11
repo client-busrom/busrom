@@ -42,17 +42,31 @@ export async function POST(
     const results: Record<string, { success: boolean; error?: string }> = {}
 
     // Process each locale sequentially using Payload Local API
-    // This is safer than raw SQL as it handles field flattening, validation, and schema mapping.
     for (const [localeCode, data] of Object.entries(locales)) {
       try {
         console.log(`[save-translations] Updating locale=${localeCode} for ${collection}/${id}`)
         
+        // Defensive cleaning: remove internal Payload fields that might crash relationship mapping
+        const cleanData = JSON.parse(JSON.stringify(data))
+        const stripInternalFields = (obj: any) => {
+          if (!obj || typeof obj !== 'object') return
+          if (Array.isArray(obj)) {
+            obj.forEach(stripInternalFields)
+            return
+          }
+          Object.keys(obj).forEach(key => {
+            if (key.startsWith('_') && key !== '_order') delete obj[key]
+            else stripInternalFields(obj[key])
+          })
+        }
+        stripInternalFields(cleanData)
+
         await payload.update({
           collection: collection as any,
           id,
-          data: data as any,
+          data: cleanData,
           locale: localeCode as any,
-          user, // Pass the authenticated user
+          user, 
           context: { 
             isTranslationSave: true,
             isSyncing: true
