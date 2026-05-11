@@ -64,12 +64,12 @@ function renderNodes(nodes: any[], context: "title" | "subtitle" = "title"): Rea
         const isUnderline = (node.format & 8) !== 0
         let style: React.CSSProperties = {}
         if (context === "title") {
-          style.fontSize = vw(48)
+          style.fontSize = vw(36)
           style.fontWeight = "normal"
           if (isUnderline) {
-            style.color = "#817931"; style.fontWeight = "bold"; style.fontSize = vw(60)
+            style.color = "#817931"; style.fontWeight = "bold"; style.fontSize = vw(54)
           } else if (isBold) {
-            style.color = "#5E5616"; style.fontWeight = "bold"; style.fontSize = vw(60)
+            style.color = "#5E5616"; style.fontWeight = "bold"; style.fontSize = vw(54)
           }
         } else if (context === "subtitle") {
           style.color = "#181818"
@@ -116,12 +116,12 @@ export function SupportCommitmentSection({ title, subtitle, technical, marketing
           <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 }} className="absolute rounded-full" style={{ left: vw(474), top: vw(0), width: vw(59), height: vw(59), backgroundColor: "#c8c07f" }} />
         </div>
         <div className="absolute" style={{ left: vw(153), top: vw(200), width: vw(900) }}>
-          <h2 className="font-anaheim text-black whitespace-pre-wrap" style={{ lineHeight: 1.52 }}>
+          <h2 className="font-montserrat text-black whitespace-pre-wrap" style={{ lineHeight: 1.4 }}>
             {Array.isArray(title) ? renderNodes(title) : title}
           </h2>
         </div>
-        <div className="absolute border border-dashed border-[#574f0e] bg-[#faf5cd]" style={{ left: vw(628), top: vw(219), width: vw(300), height: vw(145), borderRadius: vw(30), padding: `${vw(13)} ${vw(30)}`, zIndex: 1 }}>
-          <p className="font-anaheim text-[20px] leading-[1.5]" style={{ fontSize: vw(20) }}>{Array.isArray(subtitle) ? renderNodes(subtitle, "subtitle") : subtitle}</p>
+        <div className="absolute border border-dashed border-[#574f0e] bg-[#faf5cd]" style={{ left: vw(628), top: vw(219), width: 'auto', height: 'auto', borderRadius: vw(30), padding: `${vw(12)} ${vw(12)}`, zIndex: 1 }}>
+          <p className="font-anaheim text-[20px] leading-[1.5]" style={{ fontSize: vw(16) }}>{Array.isArray(subtitle) ? renderNodes(subtitle, "subtitle") : subtitle}</p>
         </div>
         <div className="absolute" style={{ left: vw(1062), top: vw(249), width: vw(700), height: vw(318) }}>
           <div className="absolute" style={{ left: 0, top: 0, width: vw(170), height: vw(350), zIndex: 10 }} onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>

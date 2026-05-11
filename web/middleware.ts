@@ -83,9 +83,15 @@ export function middleware(request: NextRequest) {
   }
 
   // 5. Default Locale Redirect: /en -> /
+  const isProductionOrigin = !isLocalhost && request.nextUrl.port === '3001';
+
   if (pathname === `/${defaultLocale}` || pathname.startsWith(`/${defaultLocale}/`)) {
-    const newPath = pathname.replace(new RegExp(`^/${defaultLocale}/?`), '/') || '/';
-    return setStrategyCookie(NextResponse.redirect(getUrl(newPath, true), 301));
+    // 关键修复：如果在生产环境的 Origin 服务器（3001）接收到带语言前缀的重写请求，
+    // 绝对不能再重定向回根路径，否则会与 Step 7 形成死循环。
+    if (!isProductionOrigin) {
+      const newPath = pathname.replace(new RegExp(`^/${defaultLocale}/?`), '/') || '/';
+      return setStrategyCookie(NextResponse.redirect(getUrl(newPath, true), 301));
+    }
   }
 
   // 6. Locale Prefix Check
