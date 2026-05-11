@@ -18,7 +18,7 @@ import { ChevronDown } from "lucide-react";
 import { uploadFileWithProgress } from "@/lib/upload";
 
 const DESIGN_WIDTH = 1920;
-const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
+const vw = (px: number) => `calc(${px} * min(100vw, 1920px) / 1920)`;
 const MOBILE_WIDTH = 390;
 const mvw = (px: number) => `clamp(${px * 0.8}px, ${(px / MOBILE_WIDTH) * 100}vw, ${px * 1.5}px)`;
 

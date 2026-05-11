@@ -61,7 +61,7 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
   const items = activeData.items
   const [activeIndex, setActiveIndex] = useState(0)
   
-  const vw = (px: number) => `${(px / 1920) * 100}vw`
+  const vw = (px: number) => `calc(${px} * min(100vw, 1920px) / 1920)`
 
   const handleToggleGroup = () => {
     setActiveGroup(prev => prev === "product" ? "manufacturing" : "product")

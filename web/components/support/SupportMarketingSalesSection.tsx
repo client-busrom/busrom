@@ -20,7 +20,7 @@ interface CarouselItem {
 }
 
 const DESIGN_WIDTH = 1920
-const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`
+const vw = (px: number) => `calc(${px} * min(100vw, 1920px) / 1920)`
 
 const Area1Component = ({ title, items }: { title: string; items: CarouselItem[] }) => {
   const [activeIndex, setActiveIndex] = useState(0)

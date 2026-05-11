@@ -22,7 +22,7 @@ interface SupportQuoteSectionProps {
   interval?: number
 }
 
-const vw = (px: number) => `${(px / 1920) * 100}vw`
+const vw = (px: number) => `calc(${px} * min(100vw, 1920px) / 1920)`
 
 // Animation constants (aligned with Product Series ContactForm)
 const FOLD_DURATION = 600
