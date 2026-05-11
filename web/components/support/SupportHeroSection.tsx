@@ -70,8 +70,15 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
       >
         {/* Special Character Box layer (Absolute) */}
         {specialText && (
-          <div 
-            className="absolute z-10 flex items-center justify-center transform -translate-x-1/2"
+          <motion.div 
+            className="absolute z-10 flex items-center justify-center"
+            initial={{ x: "-50%", y: 0 }}
+            animate={{ y: [0, -15, 0] }}
+            transition={{ 
+              duration: 4, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
             style={{ 
               left: `calc(50% + ${vw(TITLE_CONFIG.ampersandX)})`, 
               top: vw(TITLE_CONFIG.ampersandY),
@@ -86,18 +93,52 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
                 backgroundColor: color === "#ffffff" ? "rgba(255, 255, 255, 0.9)" : "#d3cc94"
               }} 
             />
-            <span 
-              className="absolute font-kavivanar" 
-              style={{ 
-                fontSize: vw(200), 
-                lineHeight: 0.73,
-                marginTop: vw(TITLE_CONFIG.ampersandTextMarginTop),
-                color: color === "#ffffff" ? "#ffffff" : "#000000"
-              }}
-            >
-              {specialText}
-            </span>
-          </div>
+            
+            {/* Shimmering Text Container */}
+            <div className="absolute inset-0 flex items-center justify-center overflow-hidden" style={{ borderRadius: vw(68) }}>
+              <motion.span 
+                className="absolute font-kavivanar" 
+                style={{ 
+                  fontSize: vw(200), 
+                  lineHeight: 0.73,
+                  marginTop: vw(TITLE_CONFIG.ampersandTextMarginTop),
+                  color: color === "#ffffff" ? "#ffffff" : "#000000",
+                  // Shimmer Effect via Background Clip
+                  backgroundImage: color === "#ffffff" 
+                    ? "linear-gradient(120deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 70%)"
+                    : "linear-gradient(120deg, rgba(0,0,0,0) 30%, rgba(255,255,255,0.6) 50%, rgba(0,0,0,0) 70%)",
+                  backgroundSize: "200% 100%",
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                }}
+                animate={{ 
+                  backgroundPosition: ["200% 0", "-200% 0"]
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity, 
+                  ease: "linear",
+                  repeatDelay: 1
+                }}
+              >
+                {specialText}
+              </motion.span>
+              
+              {/* Fallback base text (so text is still visible under the shimmer) */}
+              <span 
+                className="absolute font-kavivanar pointer-events-none" 
+                style={{ 
+                  fontSize: vw(200), 
+                  lineHeight: 0.73,
+                  marginTop: vw(TITLE_CONFIG.ampersandTextMarginTop),
+                  color: color === "#ffffff" ? "#ffffff" : "#000000",
+                  zIndex: -1
+                }}
+              >
+                {specialText}
+              </span>
+            </div>
+          </motion.div>
         )}
 
         {/* Inline Text Layer (Skipped bold nodes) */}
