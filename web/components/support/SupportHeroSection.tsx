@@ -68,83 +68,10 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
           whiteSpace: "pre-wrap" // Respect manual line breaks and spaces from CMS
         }}
       >
-        {/* Special Character Box layer (Absolute) */}
-        {specialText && (
-          <motion.div 
-            className="absolute z-10 flex items-center justify-center"
-            initial={{ x: "-50%", y: 0 }}
-            animate={{ y: [0, -15, 0] }}
-            transition={{ 
-              duration: 4, 
-              repeat: Infinity, 
-              ease: "easeInOut" 
-            }}
-            style={{ 
-              left: `calc(50% + ${vw(TITLE_CONFIG.ampersandX)})`, 
-              top: vw(TITLE_CONFIG.ampersandY),
-              width: vw(233), 
-              height: vw(277)
-            }}
-          >
-            <div 
-              className="w-full h-full" 
-              style={{ 
-                borderRadius: vw(68),
-                backgroundColor: color === "#ffffff" ? "rgba(255, 255, 255, 0.9)" : "#d3cc94"
-              }} 
-            />
-            
-            {/* Shimmering Text Container */}
-            <div className="absolute inset-0 flex items-center justify-center overflow-hidden" style={{ borderRadius: vw(68) }}>
-              <motion.span 
-                className="absolute font-kavivanar" 
-                style={{ 
-                  fontSize: vw(200), 
-                  lineHeight: 0.73,
-                  marginTop: vw(TITLE_CONFIG.ampersandTextMarginTop),
-                  color: color === "#ffffff" ? "#ffffff" : "#000000",
-                  // Shimmer Effect via Background Clip
-                  backgroundImage: color === "#ffffff" 
-                    ? "linear-gradient(120deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 70%)"
-                    : "linear-gradient(120deg, rgba(0,0,0,0) 30%, rgba(255,255,255,0.6) 50%, rgba(0,0,0,0) 70%)",
-                  backgroundSize: "200% 100%",
-                  WebkitBackgroundClip: "text",
-                  backgroundClip: "text",
-                }}
-                animate={{ 
-                  backgroundPosition: ["200% 0", "-200% 0"]
-                }}
-                transition={{ 
-                  duration: 3, 
-                  repeat: Infinity, 
-                  ease: "linear",
-                  repeatDelay: 1
-                }}
-              >
-                {specialText}
-              </motion.span>
-              
-              {/* Fallback base text (so text is still visible under the shimmer) */}
-              <span 
-                className="absolute font-kavivanar pointer-events-none" 
-                style={{ 
-                  fontSize: vw(200), 
-                  lineHeight: 0.73,
-                  marginTop: vw(TITLE_CONFIG.ampersandTextMarginTop),
-                  color: color === "#ffffff" ? "#ffffff" : "#000000",
-                  zIndex: -1
-                }}
-              >
-                {specialText}
-              </span>
-            </div>
-          </motion.div>
-        )}
-
         {/* Inline Text Layer (Skipped bold nodes) */}
         {data.title.map((node: any, i: number) => {
           if (node.type === "linebreak") return <br key={i} />
-          if (node.format === 1) return null // Handled in special character box
+          if (node.format === 1) return null // Handled in standalone special character box
           return <span key={i}>{node.text}</span>
         })}
       </div>
@@ -165,6 +92,71 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
         <div className="relative z-20 flex justify-center w-full select-none" style={{ paddingTop: vw(130) }}>
           <div className="relative" style={{ width: vw(1580), height: vw(348) }}>
             
+            {/* --- Special Character Box (Now as a standalone layer) --- */}
+            {(() => {
+              const specialNode = data.title.find((n: any) => n.format === 1)
+              const specialText = specialNode ? (specialNode.text || "").toString() : ""
+              if (!specialText) return null
+
+              return (
+                <motion.div 
+                  className="absolute z-30 flex items-center justify-center"
+                  initial={{ x: "-50%", y: 0 }}
+                  animate={{ y: [0, -15, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  style={{ 
+                    left: `calc(50% + ${vw(TITLE_CONFIG.ampersandX)})`, 
+                    top: vw(TITLE_CONFIG.ampersandY),
+                    width: vw(233), 
+                    height: vw(277)
+                  }}
+                >
+                  <div 
+                    className="w-full h-full" 
+                    style={{ 
+                      borderRadius: vw(68),
+                      backgroundColor: "#d3cc94", // Consistently gold-themed background
+                      boxShadow: `0 ${vw(10)} ${vw(30)} rgba(0,0,0,0.1)`
+                    }} 
+                  />
+                  
+                  <div className="absolute inset-0 flex items-center justify-center overflow-hidden" style={{ borderRadius: vw(68) }}>
+                    <span 
+                      className="absolute font-kavivanar pointer-events-none" 
+                      style={{ 
+                        fontSize: vw(200), 
+                        lineHeight: 0.73,
+                        marginTop: vw(TITLE_CONFIG.ampersandTextMarginTop),
+                        color: "rgba(0,0,0,0.1)",
+                        zIndex: 0
+                      }}
+                    >
+                      {specialText}
+                    </span>
+
+                    <motion.span 
+                      className="absolute font-kavivanar" 
+                      style={{ 
+                        fontSize: vw(200), 
+                        lineHeight: 0.73,
+                        marginTop: vw(TITLE_CONFIG.ampersandTextMarginTop),
+                        color: "transparent",
+                        backgroundImage: "linear-gradient(120deg, rgba(255,255,255,0) 25%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 75%)",
+                        backgroundSize: "200% 100%",
+                        WebkitBackgroundClip: "text",
+                        backgroundClip: "text",
+                        zIndex: 1
+                      }}
+                      animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
+                      transition={{ duration: 2.5, repeat: Infinity, ease: "linear", repeatDelay: 0.5 }}
+                    >
+                      {specialText}
+                    </motion.span>
+                  </div>
+                </motion.div>
+              )
+            })()}
+
             {/* Layer 1: Base Black Text */}
             <div className="absolute inset-0 z-0">
               {renderTitleContent("#000000")}
