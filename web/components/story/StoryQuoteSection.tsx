@@ -145,7 +145,7 @@ export function StoryQuoteSection({ data }: StoryQuoteSectionProps) {
       className="relative w-full bg-[#f2efd8] overflow-hidden"
       style={{ height: vw(922) }}
     >
-      <div className="relative z-10 w-full h-full max-w-[1920px] mx-auto flex items-center">
+      <div className="relative z-10 w-full h-full  flex items-center">
         <div
           className="w-[40%] flex flex-col justify-center"
           style={{ paddingLeft: vw(124) }}
@@ -167,7 +167,10 @@ export function StoryQuoteSection({ data }: StoryQuoteSectionProps) {
                     border: isActive ? "none" : `${vw(2)} solid #756f3f`,
                     marginLeft: isActive ? 0 : vw(40),
                     cursor: "pointer",
-                    padding: `0 ${vw(30)}`,
+                    paddingLeft: vw(30),
+                    paddingRight: vw(30),
+                    paddingTop: vw(10),
+                    paddingBottom: 0,
                   }}
                   initial={false}
                 >
@@ -178,8 +181,8 @@ export function StoryQuoteSection({ data }: StoryQuoteSectionProps) {
                       fontSize: isActive ? vw(48) : vw(32),
                       fontWeight: isActive ? 700 : 600,
                       color: isActive ? "#ffffff" : "#000000",
-                      textAlign: "center",
-                      lineHeight: 1.1,
+                      textAlign: 'center',
+                      lineHeight: 1.3,
                     }}
                   >
                     {slide.title}
@@ -256,7 +259,15 @@ export function StoryQuoteSection({ data }: StoryQuoteSectionProps) {
                   className="group/quote-btn block"
                 >
                   <motion.div
-                    whileHover={{ scale: 1.05 }}
+                    animate={{
+                      scale: [1, 1.03, 1],
+                    }}
+                    transition={{
+                      duration: 2.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                    whileHover={{ scale: 1.08 }}
                     whileTap={{ scale: 0.95 }}
                     className="relative flex items-center bg-transparent group-hover/quote-btn:bg-[#756f3f] border border-[#756f3f] transition-all duration-300"
                     style={{
@@ -277,7 +288,8 @@ export function StoryQuoteSection({ data }: StoryQuoteSectionProps) {
                       style={{
                         fontSize: vw(32),
                         fontWeight: 500,
-                        textAlign: "left",
+                        textAlign: 'left',
+                        lineHeight: 1.2,
                         flex: 1,
                       }}
                     >

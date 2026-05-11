@@ -11,7 +11,13 @@ import './styles.scss'
 interface TranslatableFieldConfig {
   name: string
   labelKey: string // 使用 i18n key
-  type: 'textarea' | 'textarea'
+  type: 'text' | 'textarea' | 'richText'
+  // Array field support
+  isArrayField?: boolean
+  arrayFieldName?: string
+  arraySubField?: string
+  itemLabel?: string // 自定义数组项标签，例如 "法律链接"
+  condition?: (doc: any) => boolean
 }
 
 // 每个 global 的可翻译字段配置
@@ -114,20 +120,29 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'description', labelKey: 'custom:translationCenter:description', type: 'textarea' },
   ],
   footer: [
-    { name: 'contactInfoGroup.contactTitle', labelKey: 'Contact Title', type: 'textarea' },
-    { name: 'contactInfoGroup.contactEmailLabel', labelKey: 'Contact Email Label', type: 'textarea' },
-    { name: 'contactInfoGroup.afterSalesLabel', labelKey: 'After Sales Label', type: 'textarea' },
-    { name: 'contactInfoGroup.whatsappLabel', labelKey: 'WhatsApp Label', type: 'textarea' },
-    { name: 'contactInfoGroup.addressLabel', labelKey: 'Address Label', type: 'textarea' },
-    { name: 'contactInfoGroup.address', labelKey: 'Address', type: 'textarea' },
-    { name: 'contactInfoGroup.workingHoursLabel', labelKey: 'Working Hours Label', type: 'textarea' },
-    { name: 'contactInfoGroup.workingHours', labelKey: 'Working Hours', type: 'textarea' },
-    { name: 'officialNoticeGroup.officialNoticeTitle', labelKey: 'Official Notice Title', type: 'textarea' },
-    { name: 'officialNoticeGroup.officialNoticeLine1', labelKey: 'Official Notice - Line 1', type: 'textarea' },
-    { name: 'officialNoticeGroup.officialNoticeLine2', labelKey: 'Official Notice - Line 2', type: 'textarea' },
-    { name: 'officialNoticeGroup.officialNoticeLine3', labelKey: 'Official Notice - Line 3', type: 'textarea' },
-    { name: 'officialNoticeGroup.officialNoticeLine4', labelKey: 'Official Notice - Line 4', type: 'textarea' },
-    { name: 'copyrightText', labelKey: 'Copyright Text', type: 'textarea' },
+    { name: 'contactInfoGroup.contactTitle', labelKey: 'custom:fields:title', type: 'textarea' },
+    { name: 'contactInfoGroup.contactEmailLabel', labelKey: '__inline:邮箱标签 (Email Label)', type: 'textarea' },
+    { name: 'contactInfoGroup.afterSalesLabel', labelKey: '__inline:售后标签 (After Sales Label)', type: 'textarea' },
+    { name: 'contactInfoGroup.whatsappLabel', labelKey: '__inline:WhatsApp 标签', type: 'textarea' },
+    { name: 'contactInfoGroup.addressLabel', labelKey: '__inline:地址标签 (Address Label)', type: 'textarea' },
+    { name: 'contactInfoGroup.address', labelKey: 'custom:fields:address', type: 'textarea' },
+    { name: 'contactInfoGroup.workingHoursLabel', labelKey: '__inline:工作时间标签', type: 'textarea' },
+    { name: 'contactInfoGroup.workingHours', labelKey: '__inline:工作时间 (Working Hours)', type: 'textarea' },
+    { name: 'officialNoticeGroup.officialNoticeTitle', labelKey: '__inline:官方声明标题 (Notice Title)', type: 'textarea' },
+    { name: 'officialNoticeGroup.officialNoticeLine1', labelKey: '__inline:声明第1行 (Notice Line 1)', type: 'textarea' },
+    { name: 'officialNoticeGroup.officialNoticeLine2', labelKey: '__inline:声明第2行 (Notice Line 2)', type: 'textarea' },
+    { name: 'officialNoticeGroup.officialNoticeLine3', labelKey: '__inline:声明第3行 (Notice Line 3)', type: 'textarea' },
+    { name: 'officialNoticeGroup.officialNoticeLine4', labelKey: '__inline:声明第4行 (Notice Line 4)', type: 'textarea' },
+    { name: 'copyrightText', labelKey: 'custom:fields:copyrightText', type: 'textarea' },
+    { 
+      name: 'legalLinks.label', 
+      labelKey: 'custom:fields:label', 
+      type: 'textarea', 
+      isArrayField: true, 
+      arrayFieldName: 'legalLinks', 
+      arraySubField: 'label',
+      itemLabel: '法律链接 (Legal Link)'
+    },
   ],
   'product-series-carousel': [
     { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
@@ -240,24 +255,55 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
       const doc = await res.json()
 
       // locale: 'all' 返回的格式是每个字段都是 { en: '...', zh: '...', ... }
-      const newFieldsData: FieldData[] = fieldConfigs.map(config => {
-        // Support nested fields like 'brandNameAnalysis.titlePart1'
-        const fieldPath = config.name.split('.')
-        let fieldData = doc
-        for (const key of fieldPath) {
-          fieldData = fieldData?.[key]
+      const newFieldsData: FieldData[] = []
+
+      for (const config of fieldConfigs) {
+        // Check condition if present
+        if (config.condition && !config.condition(doc)) {
+          continue
         }
 
-        return {
-          config,
-          values: SUPPORTED_LOCALES.map(locale => ({
-            locale: locale.code as LocaleCode,
-            value: typeof fieldData === 'object' && fieldData !== null
-              ? (fieldData[locale.code] || '')
-              : (fieldData || ''),
-          })),
+        if (config.isArrayField && config.arrayFieldName && config.arraySubField) {
+          // Array field: expand each array item into a separate FieldData entry
+          const arrayData = doc[config.arrayFieldName] as Array<Record<string, unknown>> | undefined
+          if (Array.isArray(arrayData)) {
+            const itemLabel = config.itemLabel || 'Item'
+            arrayData.forEach((item, index) => {
+              const fieldData = item[config.arraySubField!]
+              newFieldsData.push({
+                config: {
+                  ...config,
+                  name: `${config.arrayFieldName}[${index}].${config.arraySubField}`,
+                  labelKey: `__array__:${itemLabel} ${index + 1} - :${config.labelKey}`,
+                },
+                values: SUPPORTED_LOCALES.map(locale => ({
+                  locale: locale.code as LocaleCode,
+                  value: typeof fieldData === 'object' && fieldData !== null
+                    ? ((fieldData as Record<string, string>)[locale.code] || '')
+                    : (fieldData as string || ''),
+                })),
+              })
+            })
+          }
+        } else {
+          // Support nested fields like 'brandNameAnalysis.titlePart1'
+          const fieldPath = config.name.split('.')
+          let fieldData = doc
+          for (const key of fieldPath) {
+            fieldData = fieldData?.[key]
+          }
+
+          newFieldsData.push({
+            config,
+            values: SUPPORTED_LOCALES.map(locale => ({
+              locale: locale.code as LocaleCode,
+              value: typeof fieldData === 'object' && fieldData !== null
+                ? (fieldData[locale.code] || '')
+                : (fieldData || ''),
+            })),
+          })
         }
-      })
+      }
 
       setFieldsData(newFieldsData)
       setSelectedFields(new Set(newFieldsData.map(f => f.config.name)))
@@ -457,17 +503,33 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
         return
       }
 
-      // 准备批量更新数据
-      const bulkData: Record<string, any> = {
-        localesData: {}
+      // Build per-locale data
+      const localesPayload: Record<string, Record<string, any>> = {}
+
+      // Fetch source data once for array fields
+      let sourceData: any = null
+      const hasArrayFields = fieldsData.some(f => f.config.name.match(/^(.+)\[(\d+)]\.(.+)$/))
+      if (hasArrayFields) {
+        const sourceRes = await fetch(`/api/globals/${globalSlug}?locale=${sourceLocale}&depth=0`)
+        sourceData = await sourceRes.json()
       }
 
       for (const localeCode of localesToSave) {
         const dataToSave: Record<string, any> = {}
+        const arrayFieldUpdates: Record<string, Record<number, Record<string, string>>> = {}
+
         for (const field of fieldsData) {
           const value = field.values.find(v => v.locale === localeCode)?.value
-          if (value !== undefined) {
-             // Support nested fields
+          if (value === undefined) continue
+
+          const arrayMatch = field.config.name.match(/^(.+)\[(\d+)]\.(.+)$/)
+          if (arrayMatch) {
+            const [, arrName, idxStr, subField] = arrayMatch
+            const idx = parseInt(idxStr, 10)
+            if (!arrayFieldUpdates[arrName]) arrayFieldUpdates[arrName] = {}
+            if (!arrayFieldUpdates[arrName][idx]) arrayFieldUpdates[arrName][idx] = {}
+            arrayFieldUpdates[arrName][idx][subField] = value
+          } else {
             const fieldPath = field.config.name.split('.')
             if (fieldPath.length === 1) {
               dataToSave[field.config.name] = value
@@ -481,13 +543,31 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
             }
           }
         }
-        bulkData.localesData[localeCode] = dataToSave
+
+        // Merge array field updates back to dataToSave using sourceData to preserve other fields
+        if (sourceData) {
+          for (const [arrName, indexUpdates] of Object.entries(arrayFieldUpdates)) {
+            const sourceArray = (sourceData[arrName] as Array<Record<string, any>>) || []
+            const mergedArray = sourceArray.map((item, idx) => {
+              const updates = indexUpdates[idx]
+              return updates ? { ...item, ...updates } : { ...item }
+            })
+            dataToSave[arrName] = mergedArray
+          }
+        } else {
+          // If no sourceData, just use indexUpdates as is (fallback)
+          Object.keys(arrayFieldUpdates).forEach(arrName => {
+            dataToSave[arrName] = arrayFieldUpdates[arrName]
+          })
+        }
+
+        localesPayload[localeCode] = dataToSave
       }
 
       const saveRes = await fetch(`/api/custom-globals/${globalSlug}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bulkData),
+        body: JSON.stringify({ localesData: localesPayload }),
       })
 
       if (saveRes.ok) {
@@ -744,7 +824,23 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
                             />
                           </label>
                           <span className="tc-field__name">
-                            {t(field.config.labelKey as any)}
+                            {field.config.labelKey.startsWith('__array__:')
+                              ? (() => {
+                                  // Format: "__array__:Item 1 - :custom:fields:label"
+                                  const rest = field.config.labelKey.slice('__array__:'.length)
+                                  const parts = rest.split(':')
+                                  const prefix = parts[0]
+                                  const key = parts.slice(1).join(':')
+                                  return (
+                                    <>
+                                      <span style={{ opacity: 0.6, fontSize: '0.9em', marginRight: '4px' }}>{prefix}</span>
+                                      {t(key as any)}
+                                    </>
+                                  )
+                                })()
+                              : field.config.labelKey.startsWith('__inline:')
+                                ? field.config.labelKey.slice('__inline:'.length)
+                                : t(field.config.labelKey as any)}
                           </span>
                           <span className={`tc-field__status ${filled === total ? 'tc-field__status--complete' : ''}`}>
                             {filled}/{total}

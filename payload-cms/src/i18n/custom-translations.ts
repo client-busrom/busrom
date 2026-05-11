@@ -234,6 +234,12 @@ export const customTranslationsEn = {
       ogDescription: 'OG Description',
       altText: 'Alt Text',
       sceneName: 'Scene Name',
+      tagName: 'Tag Name',
+      title: 'Title',
+      answer: 'Answer',
+      label: 'Label',
+      address: 'Address',
+      copyrightText: 'Copyright Text',
     },
 
     // ========================================================================
@@ -653,6 +659,12 @@ export const customTranslationsZh = {
       ogDescription: 'OG 描述',
       altText: '替代文本',
       sceneName: '场景名称',
+      tagName: '标签名称',
+      title: '标题',
+      answer: '回答',
+      label: '标签',
+      address: '地址',
+      copyrightText: '版权文本',
     },
 
     // ========================================================================

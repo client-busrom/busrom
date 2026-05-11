@@ -24,11 +24,86 @@ interface StoryHeroSectionProps {
   }
 }
 
+/**
+ * HeroOrbit
+ * Memoized decorative orbit to prevent re-renders.
+ */
+const HeroOrbit = React.memo(() => {
+  const points = React.useMemo(() => {
+    const xPoints = [];
+    const yPoints = [];
+    const steps = 60;
+    const a = 204; // 408/2
+    const b = 84; // 168/2
+    const rot = -22.02 * (Math.PI / 180);
+
+    for (let i = 0; i <= steps; i++) {
+      const t = (i / 60) * 2 * Math.PI;
+      const x = a * Math.cos(t) * Math.cos(rot) - b * Math.sin(t) * Math.sin(rot);
+      const y = a * Math.cos(t) * Math.sin(rot) + b * Math.sin(t) * Math.cos(rot);
+      xPoints.push(vw(204 + x));
+      yPoints.push(vw(84 + y));
+    }
+    return { x: xPoints, y: yPoints };
+  }, []);
+
+  return (
+    <div 
+      className="absolute pointer-events-none"
+      style={{ 
+        left: vw(370), 
+        top: vw(440),
+        width: vw(408),
+        height: vw(168),
+        zIndex: 1
+      }}
+    >
+      <div 
+        className="absolute inset-0 border border-[#d6cd884a]" 
+        style={{ 
+          borderRadius: "50%",
+          transform: "rotate(-22.02deg)",
+        }}
+      />
+      <motion.div
+        className="absolute"
+        style={{ 
+          width: vw(38), 
+          height: vw(38),
+          marginLeft: vw(-19),
+          marginTop: vw(-19),
+          zIndex: 3
+        }}
+        animate={{ 
+          left: points.x,
+          top: points.y,
+          rotate: 360
+        }}
+        transition={{ 
+          duration: 8, 
+          ease: "linear", 
+          repeat: Infinity 
+        }}
+      >
+        <svg width="100%" height="100%" viewBox="0 0 1000 1000" fill="none">
+           <path 
+             d="M531.07202 33.408c-15.35998-44.544-39.93603-44.544-55.29602 0l-84.992 250.87999c-14.848 44.54401-64 93.18403-108.03202 108.54401l-249.34398 84.99201c-44.544 15.35998-44.544 39.936 0 55.29599l247.808 86.01599c44.54401 15.35998 93.18399 64.51202 108.54398 108.544l86.52801 251.39203c15.35999 44.54398 39.93607 44.54398 55.29606 0l84.47998-249.85602c14.84802-44.544 63.48797-93.18402 108.03198-108.544l252.92804-86.52802c44.54405-15.35998 44.54405-39.936 0-54.78399l-248.83203-83.96799c-44.54401-14.84799-93.18402-63.48801-108.54401-108.03201-1.53601-0.512-88.57599-253.95199-88.57599-253.95199z" 
+             fill="#9b9352" 
+           />
+        </svg>
+      </motion.div>
+    </div>
+  );
+});
+
 export function StoryHeroSection({ data }: StoryHeroSectionProps) {
   const isMobileHook = useIsMobile()
   const [windowWidth, setWindowWidth] = useState(0)
 
+  const [mounted, setMounted] = useState(false)
+
   useEffect(() => {
+    setMounted(true)
     setWindowWidth(window.innerWidth)
     const handleResize = () => setWindowWidth(window.innerWidth)
     window.addEventListener("resize", handleResize)
@@ -43,7 +118,7 @@ export function StoryHeroSection({ data }: StoryHeroSectionProps) {
         {/* Background Decoration */}
         <div className="absolute top-[-5%] left-[-5%] w-[400px] h-[400px] border border-white/5 rounded-full pointer-events-none" />
 
-        <div className="relative z-10 max-w-[1400px] mx-auto flex flex-col md:flex-row items-start md:items-end gap-12 md:gap-16 lg:gap-24">
+        <div className="relative z-10 w-full h-full flex flex-col md:flex-row items-start md:items-end gap-12 md:gap-16 lg:gap-24">
           
           {/* Left Column: Core Identity */}
           <div className="w-full md:w-[45%] lg:w-[42%] flex flex-col items-start pt-4 relative z-30">
@@ -154,71 +229,11 @@ export function StoryHeroSection({ data }: StoryHeroSectionProps) {
         paddingTop: vw(42)
       }}
     >
-      {/* Decorative Rotating/Orbiting Group (nGVh4 + dJZzU) */}
-      <div 
-        className="absolute pointer-events-none"
-        style={{ 
-          left: vw(370), 
-          top: vw(440),
-          width: vw(408),
-          height: vw(168),
-          zIndex: 1
-        }}
-      >
-        {/* The Ellipse Border */}
-        <div 
-          className="absolute inset-0 border border-[#d6cd884a]" 
-          style={{ 
-            borderRadius: "50%",
-            transform: "rotate(-22.02deg)",
-          }}
-        />
+      {/* Decorative Rotating/Orbiting Group */}
+      {mounted && <HeroOrbit />}
 
-        {/* Orbiting Star */}
-        <motion.div
-          className="absolute"
-          style={{ 
-            width: vw(38), 
-            height: vw(38),
-            marginLeft: vw(-19),
-            marginTop: vw(-19),
-            zIndex: 3
-          }}
-          animate={{ 
-            left: Array.from({ length: 61 }).map((_, i) => {
-              const t = (i / 60) * 2 * Math.PI
-              const a = 204 // 408/2
-              const b = 84 // 168/2
-              const rot = -22.02 * (Math.PI / 180)
-              const x = a * Math.cos(t) * Math.cos(rot) - b * Math.sin(t) * Math.sin(rot)
-              return vw(204 + x)
-            }),
-            top: Array.from({ length: 61 }).map((_, i) => {
-              const t = (i / 60) * 2 * Math.PI
-              const a = 204
-              const b = 84
-              const rot = -22.02 * (Math.PI / 180)
-              const y = a * Math.cos(t) * Math.sin(rot) + b * Math.sin(t) * Math.cos(rot)
-              return vw(84 + y)
-            }),
-            rotate: 360
-          }}
-          transition={{ 
-            duration: 8, 
-            ease: "linear", 
-            repeat: Infinity 
-          }}
-        >
-          <svg width="100%" height="100%" viewBox="0 0 1000 1000" fill="none">
-             <path 
-               d="M531.07202 33.408c-15.35998-44.544-39.93603-44.544-55.29602 0l-84.992 250.87999c-14.848 44.54401-64 93.18403-108.03202 108.54401l-249.34398 84.99201c-44.544 15.35998-44.544 39.936 0 55.29599l247.808 86.01599c44.54401 15.35998 93.18399 64.51202 108.54398 108.544l86.52801 251.39203c15.35999 44.54398 39.93607 44.54398 55.29606 0l84.47998-249.85602c14.84802-44.544 63.48797-93.18402 108.03198-108.544l252.92804-86.52802c44.54405-15.35998 44.54405-39.936 0-54.78399l-248.83203-83.96799c-44.54401-14.84799-93.18402-63.48801-108.54401-108.03201-1.53601-0.512-88.57599-253.95199-88.57599-253.95199z" 
-               fill="#9b9352" 
-             />
-          </svg>
-        </motion.div>
-      </div>
 
-      <div className="relative z-10 w-full h-full max-w-[1920px] mx-auto">
+      <div className="relative z-10 w-full h-full">
         
         {/* hero-section-title (sioIS styled text) */}
         <motion.div 

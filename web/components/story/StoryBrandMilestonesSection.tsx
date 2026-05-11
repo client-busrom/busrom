@@ -290,7 +290,7 @@ export function StoryBrandMilestonesSection({
       className="relative w-full bg-[#f6f4ed] overflow-hidden my-20"
       style={{ height: vw(922) }}
     >
-      <div className="relative z-10 w-full h-full max-w-[1920px] mx-auto overflow-hidden">
+      <div className="relative z-10 w-full h-full  overflow-hidden">
         {/* New Title Area using SVGs */}
         <div className="absolute z-20" style={{ left: vw(230), top: vw(130) }}>
           <div className="flex items-start gap-12">
@@ -525,7 +525,7 @@ export function StoryBrandMilestonesSection({
                     <div
                       key={idx}
                       className="flex items-center whitespace-nowrap"
-                      style={{ gap: vw(16) }}
+                      style={{ gap: vw(12) }}
                     >
                       <div className="relative" style={{ top: vw(-2) }}>
                         <TimelineIcon />

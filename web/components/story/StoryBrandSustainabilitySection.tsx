@@ -15,6 +15,8 @@ interface StoryBrandSustainabilitySectionProps {
     content1: string;
     content2: string;
     tips: string;
+    bgText1: string;
+    bgText2: string;
   };
 }
 
@@ -53,13 +55,93 @@ function StaggeredBalls() {
   );
 }
 
+/**
+ * SustainabilityOrbit
+ * Memoized decorative orbit to prevent re-renders.
+ */
+const SustainabilityOrbit = React.memo(({ isMobile }: { isMobile: boolean }) => {
+  const points = React.useMemo(() => {
+    const xPoints = [];
+    const yPoints = [];
+    const steps = 60;
+    
+    // Scale dimensions based on mobile/desktop
+    const a = isMobile ? 150 : 261; 
+    const b = isMobile ? 65 : 112;
+    const rot = -22.02 * (Math.PI / 180);
+    const centerX = isMobile ? 150 : 261;
+    const centerY = isMobile ? 65 : 112;
+
+    for (let i = 0; i <= steps; i++) {
+      const t = (i / steps) * 2 * Math.PI;
+      const x = a * Math.cos(t) * Math.cos(rot) - b * Math.sin(t) * Math.sin(rot);
+      const y = a * Math.cos(t) * Math.sin(rot) + b * Math.sin(t) * Math.cos(rot);
+      xPoints.push(isMobile ? (centerX + x) : vw(centerX + x));
+      yPoints.push(isMobile ? (centerY + y) : vw(centerY + y));
+    }
+    return { x: xPoints, y: yPoints };
+  }, [isMobile]);
+
+  return (
+    <div
+      className="absolute pointer-events-none"
+      style={{
+        right: isMobile ? -40 : "auto",
+        left: isMobile ? "auto" : vw(20),
+        top: isMobile ? -16 : vw(100),
+        width: isMobile ? "300px" : vw(522),
+        height: isMobile ? "130px" : vw(224),
+        zIndex: 1,
+        opacity: isMobile ? 0.6 : 1,
+      }}
+    >
+      <div
+        className="absolute inset-0 border border-[#C9C177]"
+        style={{
+          borderRadius: "50%",
+          transform: "rotate(-22.02deg)",
+        }}
+      />
+      <motion.div
+        className="absolute"
+        style={{
+          width: isMobile ? "24px" : vw(38),
+          height: isMobile ? "24px" : vw(38),
+          marginLeft: isMobile ? "-12px" : vw(-19),
+          marginTop: isMobile ? "-12px" : vw(-19),
+          zIndex: 3,
+        }}
+        animate={{
+          left: points.x,
+          top: points.y,
+          rotate: 360,
+        }}
+        transition={{
+          duration: 8,
+          ease: "linear",
+          repeat: Infinity,
+        }}
+      >
+        <svg width="100%" height="100%" viewBox="0 0 1000 1000" fill="none">
+          <path
+            d="M531.07202 33.408c-15.35998-44.544-39.93603-44.544-55.29602 0l-84.992 250.87999c-14.848 44.54401-64 93.18403-108.03202 108.54401l-249.34398 84.99201c-44.544 15.35998-44.544 39.936 0 55.29599l247.808 86.01599c44.54401 15.35998 93.18399 64.51202 108.54398 108.544l86.52801 251.39203c15.35999 44.54398 39.93607 44.54398 55.29606 0l84.47998-249.85602c14.84802-44.544 63.48797-93.18402 108.03198-108.544l252.92804-86.52802c44.54405-15.35998 44.54405-39.936 0-54.78399l-248.83203-83.96799c-44.54401-14.84799-93.18402-63.48801-108.54401-108.03201-1.53601-0.512-88.57599-253.95199-88.57599-253.95199z"
+            fill="#C9C177"
+          />
+        </svg>
+      </motion.div>
+    </div>
+  );
+});
+
 export function StoryBrandSustainabilitySection({
   data,
 }: StoryBrandSustainabilitySectionProps) {
   const [windowWidth, setWindowWidth] = React.useState(0);
   const images = data.images || [];
 
+  const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => {
+    setMounted(true);
     setWindowWidth(window.innerWidth);
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
@@ -84,101 +166,37 @@ export function StoryBrandSustainabilitySection({
           </p>
 
           {/* Animated Orbiting Star for Mobile Header */}
-          <div className="absolute -right-10 -top-4 pointer-events-none opacity-60 z-0">
-            <div
-              className="relative"
-              style={{ width: "300px", height: "130px" }}
-            >
-              {/* The Ellipse Border */}
-              <div
-                className="absolute inset-0 border border-[#C9C177]"
-                style={{
-                  borderRadius: "50%",
-                  transform: "rotate(-22.02deg)",
-                }}
-              />
-
-              {/* Orbiting Star */}
-              <motion.div
-                className="absolute"
-                style={{
-                  width: "24px",
-                  height: "24px",
-                  marginLeft: "-12px",
-                  marginTop: "-12px",
-                  zIndex: 3,
-                }}
-                animate={{
-                  left: Array.from({ length: 61 }).map((_, i) => {
-                    const t = (i / 60) * 2 * Math.PI;
-                    const a = 150; // 300/2
-                    const b = 65; // 130/2
-                    const rot = -22.02 * (Math.PI / 180);
-                    const x =
-                      a * Math.cos(t) * Math.cos(rot) -
-                      b * Math.sin(t) * Math.sin(rot);
-                    return 150 + x;
-                  }),
-                  top: Array.from({ length: 61 }).map((_, i) => {
-                    const t = (i / 60) * 2 * Math.PI;
-                    const a = 150;
-                    const b = 65;
-                    const rot = -22.02 * (Math.PI / 180);
-                    const y =
-                      a * Math.cos(t) * Math.sin(rot) +
-                      b * Math.sin(t) * Math.cos(rot);
-                    return 65 + y;
-                  }),
-                  rotate: 360,
-                }}
-                transition={{
-                  duration: 8,
-                  ease: "linear",
-                  repeat: Infinity,
-                }}
-              >
-                <svg
-                  width="100%"
-                  height="100%"
-                  viewBox="0 0 1000 1000"
-                  fill="none"
-                >
-                  <path
-                    d="M531.07202 33.408c-15.35998-44.544-39.93603-44.544-55.29602 0l-84.992 250.87999c-14.848 44.54401-64 93.18403-108.03202 108.54401l-249.34398 84.99201c-44.544 15.35998-44.544 39.936 0 55.29599l247.808 86.01599c44.54401 15.35998 93.18399 64.51202 108.54398 108.544l86.52801 251.39203c15.35999 44.54398 39.93607 44.54398 55.29606 0l84.47998-249.85602c14.84802-44.544 63.48797-93.18402 108.03198-108.544l252.92804-86.52802c44.54405-15.35998 44.54405-39.936 0-54.78399l-248.83203-83.96799c-44.54401-14.84799-93.18402-63.48801-108.54401-108.03201-1.53601-0.512-88.57599-253.95199-88.57599-253.95199z"
-                    fill="#C9C177"
-                  />
-                </svg>
-              </motion.div>
-            </div>
-          </div>
+          {mounted && <SustainabilityOrbit isMobile={true} />}
         </div>
 
         {/* Mobile Content Stack */}
         <div className="flex flex-col gap-16">
           {/* Item 1 */}
           <div className="relative flex flex-col items-center">
-            <div className="absolute -left-2 top-0 font-josefin-sans font-bold text-[#756f3f] opacity-10 text-[80px]">
-              BUS
+            <div className="absolute -left-2 top-0 font-josefin-sans font-bold text-[#A39F7A] opacity-100 text-[80px]">
+              {data.bgText1}
             </div>
             <div className="w-[280px] h-[280px] rounded-full overflow-hidden border-2 border-black/5 shadow-xl relative z-10">
               <OptimizedImage
                 image={images[0]}
                 alt=""
                 className="w-full h-full object-cover"
+                size="medium"
               />
             </div>
           </div>
 
           {/* Item 2 */}
           <div className="relative flex flex-col items-center">
-            <div className="absolute -right-2 top-0 font-josefin-sans font-bold text-[#756f3f] opacity-10 text-[80px]">
-              ROM
+            <div className="absolute -right-2 top-0 font-josefin-sans font-bold text-[#A39F7A] opacity-100 text-[80px]">
+              {data.bgText2}
             </div>
             <div className="w-[280px] h-[280px] rounded-full overflow-hidden border-2 border-black/5 shadow-xl relative z-10">
               <OptimizedImage
                 image={images[1]}
                 alt=""
                 className="w-full h-full object-cover"
+                size="medium"
               />
             </div>
             {data.content1 && (
@@ -200,6 +218,7 @@ export function StoryBrandSustainabilitySection({
                 image={images[2]}
                 alt=""
                 className="w-full h-full object-cover"
+                size="medium"
               />
             </div>
             {data.content2 && (
@@ -236,70 +255,8 @@ export function StoryBrandSustainabilitySection({
         {/* The Visual Content Box (From Title start at 120 to Label end at 1700) */}
         <div className="relative h-full" style={{ width: vw(1580) }}>
           {/* Decorative Rotating/Orbiting Group */}
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              left: vw(20),
-              top: vw(100),
-              width: vw(522),
-              height: vw(224),
-              zIndex: 1,
-            }}
-          >
-            <div
-              className="absolute inset-0 border border-[#C9C177]"
-              style={{
-                borderRadius: "50%",
-                transform: "rotate(-22.02deg)",
-              }}
-            />
-            <motion.div
-              className="absolute"
-              style={{
-                width: vw(38),
-                height: vw(38),
-                marginLeft: vw(-19),
-                marginTop: vw(-19),
-                zIndex: 3,
-              }}
-              animate={{
-                left: Array.from({ length: 61 }).map((_, i) => {
-                  const t = (i / 60) * 2 * Math.PI;
-                  const a = 261;
-                  const b = 112;
-                  const rot = -22.02 * (Math.PI / 180);
-                  const x =
-                    a * Math.cos(t) * Math.cos(rot) -
-                    b * Math.sin(t) * Math.sin(rot);
-                  return vw(261 + x);
-                }),
-                top: Array.from({ length: 61 }).map((_, i) => {
-                  const t = (i / 60) * 2 * Math.PI;
-                  const a = 261;
-                  const b = 112;
-                  const rot = -22.02 * (Math.PI / 180);
-                  const y =
-                    a * Math.cos(t) * Math.sin(rot) +
-                    b * Math.sin(t) * Math.cos(rot);
-                  return vw(112 + y);
-                }),
-                rotate: 360,
-              }}
-              transition={{ duration: 8, ease: "linear", repeat: Infinity }}
-            >
-              <svg
-                width="100%"
-                height="100%"
-                viewBox="0 0 1000 1000"
-                fill="none"
-              >
-                <path
-                  d="M531.07202 33.408c-15.35998-44.544-39.93603-44.544-55.29602 0l-84.992 250.87999c-14.848 44.54401-64 93.18403-108.03202 108.54401l-249.34398 84.99201c-44.544 15.35998-44.544 39.936 0 55.29599l247.808 86.01599c44.54401 15.35998 93.18399 64.51202 108.54398 108.544l86.52801 251.39203c15.35999 44.54398 39.93607 44.54398 55.29606 0l84.47998-249.85602c14.84802-44.544 63.48797-93.18402 108.03198-108.544l252.92804-86.52802c44.54405-15.35998 44.54405-39.936 0-54.78399l-248.83203-83.96799c-44.54401-14.84799-93.18402-63.48801-108.54401-108.03201-1.53601-0.512-88.57599-253.95199-88.57599-253.95199z"
-                  fill="#C9C177"
-                />
-              </svg>
-            </motion.div>
-          </div>
+          {mounted && <SustainabilityOrbit isMobile={false} />}
+
 
           {/* Left Side (Content) */}
           <div className="absolute h-full" style={{ left: 0, width: vw(607) }}>
@@ -346,7 +303,7 @@ export function StoryBrandSustainabilitySection({
               style={{ width: vw(391) }}
             >
               <div
-                className="absolute font-josefin-sans font-bold text-[#756f3f] opacity-20 select-none z-0"
+                className="absolute font-josefin-sans font-bold text-[#A39F7A] opacity-100 select-none z-0"
                 style={{
                   left: vw(60),
                   top: vw(110),
@@ -354,7 +311,7 @@ export function StoryBrandSustainabilitySection({
                   pointerEvents: "none",
                 }}
               >
-                BUS
+                {data.bgText1}
               </div>
               <div
                 className="absolute overflow-hidden rounded-full z-10"
@@ -369,6 +326,7 @@ export function StoryBrandSustainabilitySection({
                   image={images[0]}
                   alt="Sustainability 1"
                   className="w-full h-full object-cover"
+                  size="medium"
                 />
               </div>
             </div>
@@ -378,7 +336,7 @@ export function StoryBrandSustainabilitySection({
               style={{ width: vw(361) }}
             >
               <div
-                className="absolute font-josefin-sans font-bold text-[#756f3f] opacity-20 select-none z-0"
+                className="absolute font-josefin-sans font-bold text-[#A39F7A] opacity-100 select-none z-0"
                 style={{
                   left: vw(0),
                   top: vw(570),
@@ -386,7 +344,7 @@ export function StoryBrandSustainabilitySection({
                   pointerEvents: "none",
                 }}
               >
-                ROM
+                {data.bgText2}
               </div>
               <div
                 className="absolute overflow-hidden rounded-full z-10"
@@ -401,6 +359,7 @@ export function StoryBrandSustainabilitySection({
                   image={images[1]}
                   alt="Sustainability 2"
                   className="w-full h-full object-cover"
+                  size="medium"
                 />
               </div>
               {data.content1 && (
@@ -438,6 +397,7 @@ export function StoryBrandSustainabilitySection({
                   image={images[2]}
                   alt="Sustainability 3"
                   className="w-full h-full object-cover"
+                  size="medium"
                 />
               </div>
             </div>

@@ -15,8 +15,8 @@ interface MediaObject {
 }
 
 interface BrandHighlightItem {
-  title: string;
-  content: string;
+  title: any;
+  content: any;
   images: MediaObject[];
 }
 
@@ -41,6 +41,32 @@ export function StoryBrandHighlightsSection({
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const renderLexicalNodes = (nodes: any[]): React.ReactNode => {
+    if (!nodes || !Array.isArray(nodes)) return null;
+    return nodes.map((node, index) => {
+      if (node.type === "text") {
+        const text = node.text || "";
+        // format 1 is Bold in Lexical
+        if (node.format & 1) {
+          return (
+            <strong key={index} className="text-[1.15em] text-[#574f0e] font-bold">
+              {text}
+            </strong>
+          );
+        }
+        return <span key={index}>{text}</span>;
+      }
+      if (node.type === "linebreak") {
+        return <br key={index} />;
+      }
+      if (node.children) {
+        return <React.Fragment key={index}>{renderLexicalNodes(node.children)}</React.Fragment>;
+      }
+      return null;
+    });
+  };
+
 
   const isTabletOrMobile = windowWidth > 0 && windowWidth <= 1024;
 
@@ -135,12 +161,12 @@ export function StoryBrandHighlightsSection({
                 </div>
 
                 {/* Text Content */}
-                <h3 className="font-josefin-sans font-bold text-2xl text-[#574f0e] text-center mb-4 leading-tight">
-                  {currentSlide?.title}
-                </h3>
-                <p className="font-josefin-sans font-semibold text-[#756f3f] text-center text-sm leading-relaxed px-2 overflow-y-auto max-h-[140px]">
-                  {currentSlide?.content}
-                </p>
+                <div className="font-josefin-sans font-bold text-2xl text-[#574f0e] text-center mb-4 leading-tight">
+                  {renderLexicalNodes(currentSlide?.title)}
+                </div>
+                <div className="font-josefin-sans font-semibold text-[#756f3f] text-center text-sm leading-relaxed px-4 overflow-y-auto max-h-[180px]">
+                  {renderLexicalNodes(currentSlide?.content)}
+                </div>
 
                 {/* Bottom Navigation Buttons */}
                 <div className="mt-auto w-full flex justify-between items-center px-4 pb-4">
@@ -210,10 +236,10 @@ export function StoryBrandHighlightsSection({
   // --- DESKTOP LAYOUT ---
   return (
     <section
-      className="relative w-full max-w-[1920px] mx-auto overflow-hidden my-[60px]"
+      className="relative w-full mx-auto overflow-hidden my-[60px]"
       style={{ height: vw(922) }}
     >
-      <div className="relative z-10 w-full h-full max-w-[1920px] mx-auto">
+      <div className="relative z-10 w-full h-full mx-auto">
         {/* 1. Section Title: Precise Position (x:331, y:11) */}
         <div
           className="absolute font-josefin-sans font-bold text-[#3b3b3b] flex items-center justify-center text-center"
@@ -427,13 +453,13 @@ export function StoryBrandHighlightsSection({
                 className="font-josefin-sans font-bold text-[#574f0e] leading-[1.25] whitespace-pre-wrap"
                 style={{ fontSize: vw(48) }}
               >
-                {currentSlide?.title}
+                {renderLexicalNodes(currentSlide?.title)}
               </div>
               <div
-                className="font-josefin-sans font-semibold text-[#756f3f] whitespace-pre-wrap"
-                style={{ marginTop: vw(24), fontSize: vw(16), lineHeight: 1.4 }}
+                className="font-josefin-sans font-semibold text-[#756f3f] text-center"
+                style={{ marginTop: vw(12), fontSize: vw(16), lineHeight: 1.4 }}
               >
-                {currentSlide?.content}
+                {renderLexicalNodes(currentSlide?.content)}
               </div>
             </motion.div>
           </AnimatePresence>
@@ -477,7 +503,7 @@ export function StoryBrandHighlightsSection({
                     className="font-helvetica font-bold text-[#514a0d] text-center"
                     style={{ fontSize: vw(16), lineHeight: 1.1875 }}
                   >
-                    {item.title}
+                    {renderLexicalNodes(item.title)}
                   </div>
                 </div>
               </div>

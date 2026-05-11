@@ -266,7 +266,7 @@ export function StoryApplicationsSection({
       className="relative w-full bg-[#f6f4ed] my-20 overflow-hidden"
       style={{ height: vw(922) }}
     >
-      <div className="relative z-10 w-full h-full max-w-[1920px] mx-auto">
+      <div className="relative z-10 w-full h-full ">
         {/* 1. Title Area */}
         <div className="absolute" style={{ left: vw(200), top: vw(65) }}>
           <h2 className="relative" style={{ height: vw(140), width: vw(750) }}>

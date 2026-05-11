@@ -95,7 +95,6 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     ],
   'faq-items': [
     { name: 'question', labelKey: 'custom:fields:question', type: 'textarea' },
-    { name: 'contentTranslation', labelKey: 'custom:fields:answer', type: 'richText' },
   ],
   'reusable-blocks': [
     { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
@@ -180,6 +179,30 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'followUs.title', labelKey: 'custom:fields:title', type: 'textarea' },
     { name: 'bottomCategories.title', labelKey: 'custom:fields:title', type: 'textarea' },
     { name: 'bottomRecommended.title', labelKey: 'custom:fields:title', type: 'textarea' },
+  ],
+  footer: [
+    { name: 'contactInfoGroup.contactTitle', labelKey: 'custom:fields:title', type: 'textarea' },
+    { name: 'contactInfoGroup.contactEmailLabel', labelKey: '__inline:邮箱标签 (Email Label)', type: 'textarea' },
+    { name: 'contactInfoGroup.afterSalesLabel', labelKey: '__inline:售后标签 (After Sales Label)', type: 'textarea' },
+    { name: 'contactInfoGroup.whatsappLabel', labelKey: '__inline:WhatsApp 标签', type: 'textarea' },
+    { name: 'contactInfoGroup.addressLabel', labelKey: '__inline:地址标签 (Address Label)', type: 'textarea' },
+    { name: 'contactInfoGroup.address', labelKey: 'custom:fields:address', type: 'textarea' },
+    { name: 'contactInfoGroup.workingHoursLabel', labelKey: '__inline:工作时间标签', type: 'textarea' },
+    { name: 'contactInfoGroup.workingHours', labelKey: '__inline:工作时间 (Working Hours)', type: 'textarea' },
+    { name: 'officialNoticeGroup.officialNoticeTitle', labelKey: '__inline:官方声明标题 (Notice Title)', type: 'textarea' },
+    { name: 'officialNoticeGroup.officialNoticeLine1', labelKey: '__inline:声明第1行 (Notice Line 1)', type: 'textarea' },
+    { name: 'officialNoticeGroup.officialNoticeLine2', labelKey: '__inline:声明第2行 (Notice Line 2)', type: 'textarea' },
+    { name: 'officialNoticeGroup.officialNoticeLine3', labelKey: '__inline:声明第3行 (Notice Line 3)', type: 'textarea' },
+    { name: 'officialNoticeGroup.officialNoticeLine4', labelKey: '__inline:声明第4行 (Notice Line 4)', type: 'textarea' },
+    { name: 'copyrightText', labelKey: '__inline:版权文本 (Copyright Text)', type: 'textarea' },
+    { 
+      name: 'legalLinks.label', 
+      labelKey: 'custom:fields:label', 
+      type: 'textarea', 
+      isArrayField: true, 
+      arrayFieldName: 'legalLinks', 
+      arraySubField: 'label' 
+    },
   ],
 }
 

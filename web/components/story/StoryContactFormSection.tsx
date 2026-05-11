@@ -426,7 +426,7 @@ export function StoryContactFormSection({
       <div
         className={cn(
           "relative z-10 w-full mx-auto",
-          effectiveIsMobile ? "flex flex-col" : "h-full max-w-[1920px]",
+          effectiveIsMobile ? "flex flex-col" : "h-full",
         )}
       >
         {/* Hero Section: Layered Title and Image for Mobile */}
@@ -705,6 +705,7 @@ export function StoryContactFormSection({
                         <textarea
                           key={field.fieldName}
                           ref={textareaRef}
+                          data-lenis-prevent
                           placeholder={`${field.placeholder?.trim() || field.label}${field.required ? " *" : ""}`}
                           value={formData[field.fieldName] || ""}
                           onChange={(e) =>
@@ -1049,6 +1050,7 @@ export function StoryContactFormSection({
                   </div>
                 </div>
                 <textarea
+                  data-lenis-prevent
                   placeholder="Message"
                   rows={4}
                   value={formData.message || ""}

@@ -27,14 +27,92 @@ interface StoryBrandStrengthsSectionProps {
   };
 }
 
+/**
+ * StrengthOrbit
+ * Memoized decorative orbit to prevent re-renders.
+ */
+const StrengthOrbit = React.memo(({ isMobile }: { isMobile: boolean }) => {
+  const points = React.useMemo(() => {
+    const xPoints = [];
+    const yPoints = [];
+    const steps = 60;
+    
+    // Scale dimensions based on mobile/desktop
+    const a = isMobile ? 100 : 150; 
+    const b = isMobile ? 40 : 60;
+    const rot = -22.02 * (Math.PI / 180);
+    const centerX = isMobile ? 100 : 150;
+    const centerY = isMobile ? 40 : 60;
+
+    for (let i = 0; i <= steps; i++) {
+      const t = (i / steps) * 2 * Math.PI;
+      const x = a * Math.cos(t) * Math.cos(rot) - b * Math.sin(t) * Math.sin(rot);
+      const y = a * Math.cos(t) * Math.sin(rot) + b * Math.sin(t) * Math.cos(rot);
+      xPoints.push(isMobile ? (centerX + x) : vw(centerX + x));
+      yPoints.push(isMobile ? (centerY + y) : vw(centerY + y));
+    }
+    return { x: xPoints, y: yPoints };
+  }, [isMobile]);
+
+  return (
+    <div
+      className="absolute pointer-events-none"
+      style={{
+        right: isMobile ? -20 : vw(40),
+        top: isMobile ? -50 : vw(-40),
+        width: isMobile ? 200 : vw(300),
+        height: isMobile ? 80 : vw(120),
+        zIndex: 100,
+      }}
+    >
+      <div
+        className="absolute inset-0 border border-[#C9C177]"
+        style={{
+          borderRadius: "50%",
+          transform: "rotate(-22.02deg)",
+        }}
+      />
+      <motion.div
+        className="absolute"
+        style={{
+          width: isMobile ? 20 : vw(28),
+          height: isMobile ? 20 : vw(28),
+          marginLeft: isMobile ? -10 : vw(-14),
+          marginTop: isMobile ? -10 : vw(-14),
+          zIndex: 110,
+        }}
+        animate={{
+          left: points.x,
+          top: points.y,
+          rotate: 360,
+        }}
+        transition={{
+          duration: 8,
+          ease: "linear",
+          repeat: Infinity,
+        }}
+      >
+        <svg width="100%" height="100%" viewBox="0 0 1000 1000" fill="none">
+          <path
+            d="M531.07202 33.408c-15.35998-44.544-39.93603-44.544-55.29602 0l-84.992 250.87999c-14.848 44.54401-64 93.18403-108.03202 108.54401l-249.34398 84.99201c-44.544 15.35998-44.544 39.936 0 55.29599l247.808 86.01599c44.54401 15.35998 93.18399 64.51202 108.54398 108.544l86.52801 251.39203c15.35999 44.54398 39.93607 44.54398 55.29606 0l84.47998-249.85602c14.84802-44.544 63.48797-93.18402 108.03198-108.544l252.92804-86.52802c44.54405-15.35998 44.54405-39.936 0-54.78399l-248.83203-83.96799c-44.54401-14.84799-93.18402-63.48801-108.54401-108.03201-1.53601-0.512-88.57599-253.95199-88.57599-253.95199z"
+            fill="#C9C177"
+          />
+        </svg>
+      </motion.div>
+    </div>
+  );
+});
+
 export function StoryBrandStrengthsSection({
   data,
 }: StoryBrandStrengthsSectionProps) {
   const [windowWidth, setWindowWidth] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     setWindowWidth(window.innerWidth);
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
@@ -136,75 +214,8 @@ export function StoryBrandStrengthsSection({
                 </p>
 
                 {/* Orbiting Star Effect for Mobile */}
-                <div
-                  className="absolute pointer-events-none"
-                  style={{
-                    right: -20,
-                    top: -50, // Lowered to touch the title area
-                    width: 200,
-                    height: 80,
-                    zIndex: 100,
-                  }}
-                >
-                  <div
-                    className="absolute inset-0 border border-[#C9C177]"
-                    style={{
-                      borderRadius: "50%",
-                      transform: "rotate(-22.02deg)",
-                    }}
-                  />
+                {mounted && <StrengthOrbit isMobile={true} />}
 
-                  <motion.div
-                    className="absolute"
-                    style={{
-                      width: 20,
-                      height: 20,
-                      marginLeft: -10,
-                      marginTop: -10,
-                      zIndex: 110,
-                    }}
-                    animate={{
-                      left: Array.from({ length: 61 }).map((_, i) => {
-                        const t = (i / 60) * 2 * Math.PI;
-                        const a = 100; // 200/2
-                        const b = 40; // 80/2
-                        const rot = -22.02 * (Math.PI / 180);
-                        const x =
-                          a * Math.cos(t) * Math.cos(rot) -
-                          b * Math.sin(t) * Math.sin(rot);
-                        return 100 + x;
-                      }),
-                      top: Array.from({ length: 61 }).map((_, i) => {
-                        const t = (i / 60) * 2 * Math.PI;
-                        const a = 100;
-                        const b = 40;
-                        const rot = -22.02 * (Math.PI / 180);
-                        const y =
-                          a * Math.cos(t) * Math.sin(rot) +
-                          b * Math.sin(t) * Math.cos(rot);
-                        return 40 + y;
-                      }),
-                      rotate: 360,
-                    }}
-                    transition={{
-                      duration: 8,
-                      ease: "linear",
-                      repeat: Infinity,
-                    }}
-                  >
-                    <svg
-                      width="100%"
-                      height="100%"
-                      viewBox="0 0 1000 1000"
-                      fill="none"
-                    >
-                      <path
-                        d="M531.07202 33.408c-15.35998-44.544-39.93603-44.544-55.29602 0l-84.992 250.87999c-14.848 44.54401-64 93.18403-108.03202 108.54401l-249.34398 84.99201c-44.544 15.35998-44.544 39.936 0 55.29599l247.808 86.01599c44.54401 15.35998 93.18399 64.51202 108.54398 108.544l86.52801 251.39203c15.35999 44.54398 39.93607 44.54398 55.29606 0l84.47998-249.85602c14.84802-44.544 63.48797-93.18402 108.03198-108.544l252.92804-86.52802c44.54405-15.35998 44.54405-39.936 0-54.78399l-248.83203-83.96799c-44.54401-14.84799-93.18402-63.48801-108.54401-108.03201-1.53601-0.512-88.57599-253.95199-88.57599-253.95199z"
-                        fill="#C9C177"
-                      />
-                    </svg>
-                  </motion.div>
-                </div>
               </div>
             </motion.div>
           </AnimatePresence>
@@ -268,7 +279,7 @@ export function StoryBrandStrengthsSection({
       className="relative w-full overflow-hidden bg-[#f6f4ed] my-20"
       style={{ height: vw(922) }}
     >
-      <div className="relative z-10 w-full h-full max-w-[1920px] mx-auto text-black">
+      <div className="relative z-10 w-full h-full text-black">
         {/* 1. Header Title - Case Sensitive and Line-Break Persistent */}
         <div
           className="absolute z-20 pointer-events-none"
@@ -333,11 +344,11 @@ export function StoryBrandStrengthsSection({
         {/* 2. Navigation Buttons - Standardized Hollow-to-Filled Hover */}
         <div
           className="group absolute z-[100] flex items-center justify-center cursor-pointer border border-[#756f3f] bg-transparent rounded-full hover:bg-[#756f3f] hover:scale-105 active:scale-95 transition-all duration-300 shadow-sm hover:shadow-lg"
-          style={{ left: vw(380), top: vw(295), width: vw(80), height: vw(80) }}
+          style={{ left: vw(400), top: vw(295), width: vw(60), height: vw(60) }}
           onClick={handlePrev}
         >
           <svg
-            style={{ width: vw(32), height: vw(32) }}
+            style={{ width: vw(30), height: vw(30) }}
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -355,15 +366,15 @@ export function StoryBrandStrengthsSection({
         <div
           className="group absolute z-[100] flex items-center justify-center cursor-pointer border border-[#756f3f] bg-transparent rounded-full hover:bg-[#756f3f] hover:scale-105 active:scale-95 transition-all duration-300 shadow-sm hover:shadow-lg"
           style={{
-            right: vw(220),
+            right: vw(240),
             bottom: vw(84),
-            width: vw(80),
-            height: vw(80),
+            width: vw(60),
+            height: vw(60),
           }}
           onClick={handleNext}
         >
           <svg
-            style={{ width: vw(32), height: vw(32) }}
+            style={{ width: vw(30), height: vw(30) }}
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -622,78 +633,9 @@ export function StoryBrandStrengthsSection({
                     )}
                   </div>
 
-                  {/* Orbiting Star Effect inside Middle Item but z-parented correctly */}
-                  {isMiddle && (
-                    <div
-                      className="absolute pointer-events-none"
-                      style={{
-                        left: vw(740),
-                        top: vw(-30),
-                        width: vw(300),
-                        height: vw(120),
-                        zIndex: 100,
-                      }}
-                    >
-                      <div
-                        className="absolute inset-0 border border-[#C9C177]"
-                        style={{
-                          borderRadius: "50%",
-                          transform: "rotate(-22.02deg)",
-                        }}
-                      />
+                  {/* Orbiting Star Effect inside Middle Item */}
+                  {isMiddle && mounted && <StrengthOrbit isMobile={false} />}
 
-                      <motion.div
-                        className="absolute"
-                        style={{
-                          width: vw(28),
-                          height: vw(28),
-                          marginLeft: vw(-14),
-                          marginTop: vw(-14),
-                          zIndex: 110,
-                        }}
-                        animate={{
-                          left: Array.from({ length: 61 }).map((_, i) => {
-                            const t = (i / 60) * 2 * Math.PI;
-                            const a = 150; // 300/2
-                            const b = 60; // 120/2
-                            const rot = -22.02 * (Math.PI / 180);
-                            const x =
-                              a * Math.cos(t) * Math.cos(rot) -
-                              b * Math.sin(t) * Math.sin(rot);
-                            return vw(150 + x);
-                          }),
-                          top: Array.from({ length: 61 }).map((_, i) => {
-                            const t = (i / 60) * 2 * Math.PI;
-                            const a = 150;
-                            const b = 60;
-                            const rot = -22.02 * (Math.PI / 180);
-                            const y =
-                              a * Math.cos(t) * Math.sin(rot) +
-                              b * Math.sin(t) * Math.cos(rot);
-                            return vw(60 + y);
-                          }),
-                          rotate: 360,
-                        }}
-                        transition={{
-                          duration: 8,
-                          ease: "linear",
-                          repeat: Infinity,
-                        }}
-                      >
-                        <svg
-                          width="100%"
-                          height="100%"
-                          viewBox="0 0 1000 1000"
-                          fill="none"
-                        >
-                          <path
-                            d="M531.07202 33.408c-15.35998-44.544-39.93603-44.544-55.29602 0l-84.992 250.87999c-14.848 44.54401-64 93.18403-108.03202 108.54401l-249.34398 84.99201c-44.544 15.35998-44.544 39.936 0 55.29599l247.808 86.01599c44.54401 15.35998 93.18399 64.51202 108.54398 108.544l86.52801 251.39203c15.35999 44.54398 39.93607 44.54398 55.29606 0l84.47998-249.85602c14.84802-44.544 63.48797-93.18402 108.03198-108.544l252.92804-86.52802c44.54405-15.35998 44.54405-39.936 0-54.78399l-248.83203-83.96799c-44.54401-14.84799-93.18402-63.48801-108.54401-108.03201-1.53601-0.512-88.57599-253.95199-88.57599-253.95199z"
-                            fill="#C9C177"
-                          />
-                        </svg>
-                      </motion.div>
-                    </div>
-                  )}
                 </motion.div>
               );
             })}

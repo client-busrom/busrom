@@ -302,9 +302,9 @@ export function StoryBrandStorySection({ data }: StoryBrandStorySectionProps) {
         </div>
       </div>
 
-      {/* Scaling Guard Wrapper for Tablet/Small Desktop */}
+      {/* Scaling Guard Wrapper - Removed max-w to prevent clipping on large screens */}
       <div
-        className="relative z-10 w-full h-full max-w-[1920px] mx-auto"
+        className="relative z-10 w-full h-full"
       >
         <div className="overflow-hidden h-full" ref={emblaRef}>
           <div className="flex h-full items-start">

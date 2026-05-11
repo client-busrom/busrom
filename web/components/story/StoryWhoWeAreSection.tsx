@@ -17,10 +17,45 @@ interface LexicalTextNode {
 interface StoryWhoWeAreSectionProps {
   data: {
     titleNodes: LexicalTextNode[] | null;
+    title?: string; // Potential fallback from CMS
     content: string;
     description: string;
     bgImage: any;
   };
+}
+
+// Reusable Title Node Renderer to avoid duplication and hardcoding
+function TitleNodes({ nodes, isMobile }: { nodes: LexicalTextNode[] | null; isMobile: boolean }) {
+  if (!nodes || nodes.length === 0) return null;
+  
+  return (
+    <>
+      {nodes.map((node, idx) => {
+        if (node.type === "linebreak") return <br key={idx} />;
+        const isBold = node.format === 1;
+        const filterId = isMobile ? "url(#true-outline-mobile)" : "url(#true-outline)";
+        
+        return (
+          <span
+            key={idx}
+            className="leading-none transition-all duration-300 font-josefin-sans font-semibold"
+            style={{
+              fontSize: isMobile 
+                ? (isBold ? "min(12vw, 80px)" : "min(8vw, 60px)")
+                : (isBold ? vw(110) : vw(80)),
+              color: "white",
+              filter: isBold ? filterId : "none",
+              textShadow: !isBold
+                ? (isMobile ? "0 4px 10px rgba(0,0,0,0.3)" : `0 ${vw(4)} ${vw(11)} #565020`)
+                : "none",
+            }}
+          >
+            {node.text}
+          </span>
+        );
+      })}
+    </>
+  );
 }
 
 export function StoryWhoWeAreSection({ data }: StoryWhoWeAreSectionProps) {
@@ -72,23 +107,7 @@ export function StoryWhoWeAreSection({ data }: StoryWhoWeAreSectionProps) {
               whileInView={{ opacity: 1, x: 0 }}
               className="flex flex-wrap items-baseline gap-4 font-josefin-sans"
             >
-              {data.titleNodes?.map((node, idx) => {
-                const isBold = node.format === 1;
-                return (
-                  <span
-                    key={idx}
-                    className="font-semibold leading-none"
-                    style={{
-                      fontSize: isBold ? "min(12vw, 80px)" : "min(8vw, 60px)",
-                      color: "white",
-                      filter: isBold ? "url(#true-outline-mobile)" : "none",
-                      textShadow: !isBold ? "0 4px 10px rgba(0,0,0,0.3)" : "none",
-                    }}
-                  >
-                    {node.text}
-                  </span>
-                );
-              })}
+              <TitleNodes nodes={data.titleNodes} isMobile={true} />
             </motion.div>
 
             {/* Description Box (ehr0Q) */}
@@ -97,12 +116,24 @@ export function StoryWhoWeAreSection({ data }: StoryWhoWeAreSectionProps) {
               whileInView={{ opacity: 1, scale: 1 }}
               className="relative w-full p-8 sm:p-12 rounded-[40px] border border-[#ffec51] bg-[#3a20008c] shadow-[0_0_12px_#ffbf51]"
             >
-              {/* Star Decoration */}
-              <div className="absolute top-[-20px] right-[-20px] w-12 h-12 text-[#ffec51]">
+              {/* Star Decoration with Animation */}
+              <motion.div 
+                className="absolute top-[-20px] right-[-20px] w-12 h-12 text-[#ffec51]"
+                animate={{ 
+                  scale: [1, 1.2, 1],
+                  rotate: [0, 10, -10, 0],
+                  opacity: [0.8, 1, 0.8]
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
                 <svg viewBox="0 0 1000 1000" fill="currentColor">
                   <path d="M531.07202 33.408c-15.35998-44.544-39.93603-44.544-55.29602 0l-84.992 250.87999c-14.848 44.54401-64 93.18403-108.03202 108.54401l-249.34398 84.99201c-44.544 15.35998-44.544 39.936 0 55.29599l247.808 86.01599c44.54401 15.35998 93.18399 64.51202 108.54398 108.544l86.52801 251.39203c15.35999 44.54398 39.93607 44.54398 55.29606 0l84.47998-249.85602c14.84802-44.544 63.48797-93.18402 108.03198-108.544l252.92804-86.52802c44.54405-15.35998 44.54405-39.936 0-54.78399l-248.83203-83.96799c-44.54401-14.84799-93.18402-63.48801-108.54401-108.03201-1.53601-0.512-88.57599-253.95199-88.57599-253.95199z" />
                 </svg>
-              </div>
+              </motion.div>
 
               {/* Description Text */}
               <div className="font-josefin-sans font-medium text-xl sm:text-2xl text-[#ffec51] leading-relaxed text-shadow-sm">
@@ -147,7 +178,7 @@ export function StoryWhoWeAreSection({ data }: StoryWhoWeAreSectionProps) {
         <div className="absolute inset-0 bg-black/20" />
       </div>
 
-      <div className="relative z-10 w-full h-full max-w-[1920px] mx-auto">
+      <div className="relative z-10 w-full h-full">
         {/* SVG Filter for True Outside Stroke */}
         <svg width="0" height="0" className="absolute">
           <defs>
@@ -188,34 +219,7 @@ export function StoryWhoWeAreSection({ data }: StoryWhoWeAreSectionProps) {
             gap: vw(16),
           }}
         >
-          {data.titleNodes ? (
-            data.titleNodes.map((node, idx) => {
-              if (node.type === "linebreak") return <br key={idx} />;
-              const isBold = node.format === 1;
-
-              return (
-                <span
-                  key={idx}
-                  className="leading-none transition-all duration-300"
-                  style={{
-                    fontSize: isBold ? vw(110) : vw(80),
-                    fontWeight: 600,
-                    color: isBold ? "white" : "#ffffff", // Filter will make bold parts transparent
-                    filter: isBold ? "url(#true-outline)" : "none",
-                    textShadow: !isBold
-                      ? `0 ${vw(4)} ${vw(11)} #565020`
-                      : "none",
-                  }}
-                >
-                  {node.text}
-                </span>
-              );
-            })
-          ) : (
-            <span className="text-white text-[80px] font-semibold">
-              Who We Are?
-            </span>
-          )}
+          <TitleNodes nodes={data.titleNodes} isMobile={false} />
         </motion.div>
 
         {/* 3. Description Box (ehr0Q) and Text (iAWyA) */}
@@ -235,14 +239,24 @@ export function StoryWhoWeAreSection({ data }: StoryWhoWeAreSectionProps) {
           {/* Rectangle 446 (ehr0Q) */}
           <div className="absolute inset-0 rounded-[49px] border border-[#ffec51] bg-[#3a20008c] shadow-[0_0_12px_#ffbf51]" />
 
-          {/* Star Top-Right (ROlZ0) */}
-          <div
+          {/* Star Top-Right (ROlZ0) with Animation */}
+          <motion.div
             className="absolute"
             style={{
               top: vw(-16),
               right: vw(-16),
               width: vw(59),
               height: vw(59),
+            }}
+            animate={{ 
+              scale: [1, 1.15, 1],
+              rotate: [0, 8, -8, 0],
+              opacity: [0.8, 1, 0.8]
+            }}
+            transition={{
+              duration: 3.5,
+              repeat: Infinity,
+              ease: "easeInOut"
             }}
           >
             <svg width="100%" height="100%" viewBox="0 0 1000 1000" fill="none">
@@ -251,7 +265,7 @@ export function StoryWhoWeAreSection({ data }: StoryWhoWeAreSectionProps) {
                 fill="#ffec51"
               />
             </svg>
-          </div>
+          </motion.div>
 
           {/* Description Text (iAWyA) */}
           <div

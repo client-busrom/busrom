@@ -30,6 +30,15 @@ export const KnowledgeBaseSettings: GlobalConfig = {
           },
         },
         {
+          name: 'spacer',
+          type: 'ui',
+          admin: {
+            components: {
+              Field: '@/components/ui/RowSpacer',
+            },
+          },
+        },
+        {
           name: 'status',
           type: 'select',
           label: {

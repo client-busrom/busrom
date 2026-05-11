@@ -240,7 +240,7 @@ export function StoryBrandProspectSection({
         }}
       />
 
-      <div className="relative z-10 w-full h-full max-w-[1920px] mx-auto">
+      <div className="relative z-10 w-full h-full ">
         {/* 1. Future Prospect Title (VU2Hn) */}
         <div
           className="absolute"
@@ -255,9 +255,9 @@ export function StoryBrandProspectSection({
         </div>
 
         {/* 2. Side Tips (BpxUN) */}
-        <div className="absolute" style={{ left: vw(152), bottom: vw(145) }}>
+        <div className="absolute" style={{ left: vw(180), bottom: vw(140) }}>
           <div
-            className="font-josefin-sans font-bold text-[#574f0e] origin-left -rotate-90 tracking-[4px] whitespace-nowrap"
+            className="font-josefin-sans font-extrabold text-[#574f0e] origin-left -rotate-90 tracking-[4px] whitespace-nowrap"
             style={{ fontSize: vw(28) }}
           >
             {data.tips || "Our Vision"}
@@ -271,7 +271,7 @@ export function StoryBrandProspectSection({
           <div
             className="absolute flex flex-col items-center"
             style={{
-              left: vw(314),
+              left: vw(300),
               top: vw(97),
               width: vw(689),
               backgroundColor: "rgba(233, 223, 187, 0.38)", // #e9dfbb at ~38% opacity
@@ -332,9 +332,9 @@ export function StoryBrandProspectSection({
           <div
             className="absolute"
             style={{
-              right: vw(180) /* 1920 - 1079 - 661 ~= 180 */,
+              right: vw(160) /* 1920 - 1079 - 661 ~= 180, adjusted to 160 to move right */,
               top: vw(600),
-              width: vw(664),
+              width: vw(650),
             }}
           >
             {/* Floated Image within text block */}
@@ -344,7 +344,6 @@ export function StoryBrandProspectSection({
                 width: vw(277),
                 height: vw(287),
                 marginLeft: vw(24),
-                marginBottom: vw(24), // Buffer to ensure text flows nicely under it
                 borderRadius: vw(30),
                 overflow: "hidden",
               }}
@@ -363,7 +362,7 @@ export function StoryBrandProspectSection({
                 fontSize: vw(24),
                 letterSpacing: vw(-0.48),
                 lineHeight: 1.25,
-                paddingTop: vw(110), // Text starts 110px below the top of the image
+                paddingTop: vw(120), // Text starts 110px below the top of the image
               }}
             >
               {formatQuotedText(slides[1].description, isMobile)}
@@ -410,9 +409,11 @@ export function StoryBrandProspectSection({
         {/* 4. Bottom Logo Image */}
         {logoImage && (
           <div
-            className="absolute"
+            className="absolute overflow-hidden"
             style={{
               bottom: vw(0),
+              left: '50%',
+              transform: 'translateX(-50%)',
               width: vw(2166),
               height: vw(338),
               zIndex: 10,
@@ -421,7 +422,7 @@ export function StoryBrandProspectSection({
             <OptimizedImage
               image={logoImage}
               className="object-contain w-full h-full"
-              size="small"
+              size="xlarge"
             />
           </div>
         )}

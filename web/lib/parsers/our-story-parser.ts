@@ -90,6 +90,8 @@ export interface OurStoryData {
     content1: string;
     content2: string;
     tips: string;
+    bgText1: string;
+    bgText2: string;
   };
   prospect: {
     title: string;
@@ -253,8 +255,9 @@ function extractPairedListAfterMarker(children: any[], markerId: string) {
       const pairs = [];
       for (let i = 0; i < listItems.length; i += 2) {
         if (listItems[i]) {
-          const title = extractListItemText(listItems[i].children || []);
-          const content = listItems[i+1] ? extractListItemText(listItems[i+1].children || []) : "";
+          // Keep raw children for both title and content to preserve formatting like bold, linebreak
+          const title = listItems[i].children || [];
+          const content = listItems[i+1] ? (listItems[i+1].children || []) : [];
           pairs.push({ title, content });
         }
       }
@@ -411,6 +414,8 @@ export function parseOurStoryData(locale: string, rawData: any): OurStoryData {
     content1: extractTextAfterMarker(children, `${sectionPrefixSus}-content-1`) || "",
     content2: extractTextAfterMarker(children, `${sectionPrefixSus}-content-2`) || "",
     tips: extractTextAfterMarker(children, `${sectionPrefixSus}-tips`) || "ABOUT BUSROM",
+    bgText1: extractTextAfterMarker(children, `${sectionPrefixSus}-bg-text-1`) || "BUS",
+    bgText2: extractTextAfterMarker(children, `${sectionPrefixSus}-bg-text-2`) || "ROM",
     images: extractImagesFromBlocks(findBlocksInSection(sectionPrefixSus, ["custom-image-gallery", "block"]))
   };
 
