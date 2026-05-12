@@ -3,7 +3,7 @@
 import React from "react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { Turnstile } from "@/components/ui/turnstile";
-import Link from "next/link";
+import { Link } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 

@@ -11,6 +11,8 @@ import { ContactForm } from "@/components/product-series/ContactForm"
 import { MoreSeries } from "@/components/product-series/MoreSeries"
 import { Quote } from "@/components/product-series/Quote"
 
+import { Link } from "@/lib/navigation"
+
 interface ProductSeriesData {
   id: string
   slug: string
@@ -110,12 +112,12 @@ export function ProductSeriesPage({ locale, slug, initialData }: ProductSeriesPa
             <p className="text-brand-accent-gold text-base mb-6">
               {error || "The product series you're looking for doesn't exist."}
             </p>
-            <a
+            <Link
               href="/products"
               className="inline-block px-8 py-3 bg-brand-text-black text-white font-anaheim font-bold text-sm uppercase tracking-wider hover:bg-brand-accent-gold transition-colors"
             >
               View All Products
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -144,12 +146,12 @@ export function ProductSeriesPage({ locale, slug, initialData }: ProductSeriesPa
             <p className="text-brand-accent-gold text-base mb-6">
               Content is being prepared. Please check back later.
             </p>
-            <a
+            <Link
               href="/products"
               className="inline-block px-8 py-3 bg-brand-text-black text-white font-anaheim font-bold text-sm uppercase tracking-wider hover:bg-brand-accent-gold transition-colors"
             >
               View All Products
-            </a>
+            </Link>
           </div>
         </div>
       </div>

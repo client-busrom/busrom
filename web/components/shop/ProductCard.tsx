@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/lib/navigation"
 import { cn, getLocalizedName } from "@/lib/utils"
 import { useTranslations } from "@/lib/translations"
 import type { Product } from "@/lib/types/product"
@@ -117,7 +117,7 @@ export function ProductCard({ product, locale, priority, index = 0 }: ProductCar
         className="relative w-[250px] h-[250px] bg-white overflow-hidden mb-3 block cursor-pointer group/image"
       >
         <Link
-          href={`/${locale}/shop/${product.slug}`}
+          href={`/shop/${product.slug}`}
           className="absolute inset-0 z-10"
           target="_blank"
           rel="noopener noreferrer"
@@ -184,7 +184,7 @@ export function ProductCard({ product, locale, priority, index = 0 }: ProductCar
           )}>
             {/* View Details Button */}
             <Link
-              href={`/${locale}/shop/${product.slug}`}
+              href={`/shop/${product.slug}`}
               target="_blank"
               rel="noopener noreferrer"
               onMouseEnter={() => setHoveredButton("details")}
@@ -201,9 +201,7 @@ export function ProductCard({ product, locale, priority, index = 0 }: ProductCar
 
             {/* Send Inquiry Button */}
             <Link
-              href={`/${locale}/shop/${product.slug}#inquiry`}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={`/shop/${product.slug}#inquiry`}
               onMouseEnter={() => setHoveredButton("inquiry")}
               onMouseLeave={() => setHoveredButton(null)}
               className={cn(
@@ -223,7 +221,7 @@ export function ProductCard({ product, locale, priority, index = 0 }: ProductCar
       <div className="flex flex-col space-y-1 w-[250px]">
         {/* Product Name */}
         <Link
-          href={`/${locale}/shop/${product.slug}`}
+          href={`/shop/${product.slug}`}
           target="_blank"
           rel="noopener noreferrer"
           className="font-anaheim font-bold text-sm text-brand-text-black line-clamp-2 hover:text-brand-secondary transition-colors leading-tight uppercase text-left"

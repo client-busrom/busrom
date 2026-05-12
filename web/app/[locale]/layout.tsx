@@ -300,6 +300,14 @@ const phudu = localFont({
   preload: false,
 });
 
+const meaCulpa = localFont({
+  src: "../../public/fonts/MeaCulpa-Regular.ttf",
+  weight: "400",
+  variable: "--font-mea-culpa",
+  display: "swap",
+  preload: false,
+});
+
 export function generateStaticParams() {
   return locales.map(locale => ({ locale }));
 }
@@ -406,6 +414,7 @@ export default async function RootLayout({
         ${pollerOne.variable}
         ${pavanam.variable}
         ${phudu.variable}
+        ${meaCulpa.variable}
         antialiased
       `}
     >

@@ -25,14 +25,7 @@ export function SupportRequestProcessSection({
   subtitleNodes = [],
   items = []
 }: SupportRequestProcessSectionProps) {
-  const [activeIndex, setActiveIndex] = useState(1) // Item 2 active by default
-
-  console.log("Process Section Props:", { 
-    titleCount: titleNodes.length, 
-    subtitleCount: subtitleNodes.length,
-    itemsCount: items.length,
-    subtitleContent: subtitleNodes.map(n => n.text).join(" ") 
-  })
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
   const renderNodes = (nodes: any[]): React.ReactNode => {
     if (!nodes || nodes.length === 0) return null
@@ -70,173 +63,229 @@ export function SupportRequestProcessSection({
   }
 
   const bounceTransition = {
-    y: {
-      duration: 1.2,
-      repeat: Infinity,
-      repeatType: "reverse",
-      ease: "easeInOut"
-    }
-  }
+    duration: 1.5,
+    repeat: Infinity,
+    repeatType: "reverse",
+    ease: "easeInOut"
+  } as const
 
   const itemPositions = [
-    { x: 180, y: 330 },
+    { x: 170, y: 310 },
     { x: 580, y: 450 },
-    { x: 986, y: 330 },
-    { x: 1386, y: 450 }
+    { x: 990, y: 310 },
+    { x: 1400, y: 450 }
   ]
 
   return (
-    <section className="relative w-full bg-[#f6f4ed]" style={{ height: vw(969) }}>
-      {/* 1. Background Decorator */}
-      <div 
-        className="absolute z-0 opacity-100" 
-        style={{ left: vw(314), top: vw(0), width: vw(185), height: vw(191) }}
-      >
-        <svg viewBox="0 0 185 191" className="w-full h-full">
-            <path 
-                d="M92.5 0 L185 47.75 L185 143.25 L92.5 191 L0 143.25 L0 47.75 Z" 
-                fill="#ecead8" 
-                fillOpacity="0.71"
-            />
-        </svg>
-      </div>
+    <section className="relative w-full bg-[#f6f4ed] overflow-hidden">
+      {/* --- DESKTOP HEIGHT SETTER --- */}
+      <div className="hidden md:block" style={{ height: vw(1000) }} />
 
-      <div className="relative z-10" style={{ paddingLeft: vw(154), paddingTop: vw(67) }}>
-        <h3 
-            className="font-josefin-sans font-bold text-[#756f3f]" 
-            style={{ fontSize: vw(60), lineHeight: 1.01 }}
+      {/* --- DESKTOP CONTENT (md and above) --- */}
+      <div className="hidden md:block absolute inset-0 w-full h-full">
+        {/* 1. Background Decorator */}
+        <motion.div 
+          className="absolute z-0 opacity-100 flex items-center justify-center" 
+          style={{ 
+              left: vw(314), 
+              top: vw(0), 
+              width: vw(191), 
+              height: vw(191)
+          }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         >
-            {renderNodes(titleNodes)}
-        </h3>
-        {subtitleNodes.length > 0 && (
-          <div style={{ marginTop: vw(-76), marginLeft: vw(258) }}>
-              <h2 
-                  className="font-josefin-sans font-bold text-[#494106]" 
-                  style={{ 
-                      fontSize: vw(96), 
-                      lineHeight: 0.96,
-                      textShadow: "0px 1px 1px #464010"
-                  }}
-              >
-                  {renderNodes(subtitleNodes)}
-              </h2>
-          </div>
-        )}
-      </div>
+          <svg 
+              width="100%" 
+              height="100%" 
+              viewBox="0 0 169 183" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+              className="overflow-visible"
+          >
+              <path d="M71.1468 3.49792C79.3936 -1.16571 89.4814 -1.1657 97.7282 3.49793L155.166 35.9792C163.637 40.77 168.875 49.7492 168.875 59.4815V123.482C168.875 133.215 163.637 142.194 155.166 146.985L97.7282 179.466C89.4814 184.13 79.3936 184.13 71.1468 179.466L13.7093 146.985C5.23771 142.194 -7.62939e-06 133.215 -7.62939e-06 123.482V59.4815C-7.62939e-06 49.7492 5.23772 40.77 13.7093 35.9792L71.1468 3.49792Z" fill="#ECEAD8" fill-opacity="0.71"/>
+          </svg>
+        </motion.div>
 
-      {/* 3. Items Rail */}
-      <div className="absolute w-full h-full" style={{ top: 0, left: 0 }}>
-        {/* Connector Line - Placed Behind */}
-        <div 
-            className="absolute z-0" 
-            style={{ 
-                left: vw(130), 
-                top: vw(252), 
-                width: vw(1660), 
-                height: vw(686),
-                padding: vw(10) // Safety margin
-            }}
-        >
-            <SupportProcessLineSvg />
-        </div>
-
-        {/* 4 Items */}
-        {items.slice(0, 4).map((item, idx) => {
-            const isActive = activeIndex === idx
-            const pos = itemPositions[idx]
-            const isTopText = idx === 1 || idx === 3 // Item 2 and 4
-            const HEX_H = 404
-            const HEX_W = HEX_H * 0.866 // Regular hexagon width across sides
-            const VIEW_W = 350 // Viewbox width for regular hexagon
-            
-            return (
-                <motion.div
-                    key={item.id}
-                    onMouseEnter={() => setActiveIndex(idx)}
-                    className="absolute cursor-pointer flex flex-col items-center"
+        {/* Title Area */}
+        <div className="relative z-10" style={{ paddingLeft: vw(154), paddingTop: vw(67) }}>
+          <h3 
+              className="font-josefin-sans font-bold text-[#756f3f]" 
+              style={{ fontSize: vw(60), lineHeight: 1 }}
+          >
+              {renderNodes(titleNodes)}
+          </h3>
+          {subtitleNodes.length > 0 && (
+            <div style={{ marginTop: vw(-76), marginLeft: vw(240) }}>
+                <h2 
+                    className="font-josefin-sans font-bold text-[#494106]" 
                     style={{ 
-                        left: vw(pos.x), 
-                        top: vw(pos.y),
-                        width: vw(VIEW_W),
-                        zIndex: isActive ? 30 : 10
+                        fontSize: vw(96), 
+                        lineHeight: 0.96,
+                        textShadow: "0px 1px 1px #464010"
                     }}
                 >
-                    {/* Background Container (STATIC REGULAR HEXAGON) */}
-                    <div className="relative" style={{ width: vw(VIEW_W), height: vw(HEX_H) }}>
-                         <svg viewBox={`0 0 ${VIEW_W} ${HEX_H}`} className="w-full h-full overflow-visible">
-                            <motion.path
-                                d={`M${VIEW_W/2} 0 L${VIEW_W} ${HEX_H/4} L${VIEW_W} ${3*HEX_H/4} L${VIEW_W/2} ${HEX_H} L0 ${3*HEX_H/4} L0 ${HEX_H/4} Z`}
-                                animate={{
-                                    stroke: isActive ? "#aba368" : "transparent",
-                                    strokeWidth: isActive ? 4 : 0,
-                                    scale: isActive ? 1.02 : 1
-                                }}
+                    {renderNodes(subtitleNodes)}
+                </h2>
+            </div>
+          )}
+        </div>
+
+        {/* Items Rail */}
+        <div className="absolute w-full h-full" style={{ top: 0, left: 0 }}>
+          {/* Connector Line - Placed Behind */}
+          <div 
+              className="absolute z-0" 
+              style={{ 
+                  left: vw(130), 
+                  top: vw(220), 
+                  width: vw(1660), 
+                  height: vw(686),
+                  padding: vw(10) // Safety margin
+              }}
+          >
+              <SupportProcessLineSvg />
+          </div>
+
+          {/* 4 Items */}
+          {items.slice(0, 4).map((item, idx) => {
+              const isActive = activeIndex === idx
+              const pos = itemPositions[idx]
+              const isTopText = idx === 1 || idx === 3 // Item 2 and 4
+              const HEX_H = 404
+              const VIEW_W = 350 // Viewbox width for regular hexagon
+              
+              return (
+                  <motion.div
+                      key={item.id}
+                      onMouseEnter={() => setActiveIndex(idx)}
+                      onMouseLeave={() => setActiveIndex(null)}
+                      onClick={() => setActiveIndex(idx)}
+                      initial={{ y: 0 }}
+                      animate={{ y: -20 }}
+                      transition={bounceTransition}
+                      className={`absolute cursor-pointer flex flex-col items-center ${isActive ? "drop-shadow-2xl" : ""}`}
+                      style={{ 
+                          left: vw(pos.x), 
+                          top: vw(pos.y),
+                          width: vw(VIEW_W),
+                          zIndex: isActive ? 30 : 10
+                      }}
+                  >
+                      {/* Background Container (STATIC REGULAR HEXAGON) */}
+                      <div className="relative" style={{ width: vw(VIEW_W), height: vw(HEX_H) }}>
+                           <svg viewBox={`0 0 ${VIEW_W} ${HEX_H}`} className="w-full h-full overflow-visible">
+                              <motion.path
+                                  d={`M${VIEW_W/2} 0 L${VIEW_W} ${HEX_H/4} L${VIEW_W} ${3*HEX_H/4} L${VIEW_W/2} ${HEX_H} L0 ${3*HEX_H/4} L0 ${HEX_H/4} Z`}
+                                  animate={{
+                                      stroke: isActive ? "#aba368" : "transparent",
+                                      strokeWidth: isActive ? 4 : 0,
+                                      scale: isActive ? 1.02 : 1
+                                  }}
+                                  fill={idx % 2 === 0 ? "#e3deb3" : "#e9deb6"}
+                                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                              />
+                           </svg>
+
+                          {/* Icon Overlay (STATIC) */}
+                           <div 
+                              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                              style={{ paddingTop: vw(10) }}
+                           >
+                              <svg 
+                                  viewBox="0 0 180 180" 
+                                  className="w-[40%] h-[40%]"
+                              >
+                                  <motion.path 
+                                      animate={{
+                                          fill: isActive ? "#756f3f" : "#998f6a"
+                                      }}
+                                      d={ITEM_ICONS[idx]} 
+                                  />
+                              </svg>
+                           </div>
+                      </div>
+
+                      {/* Description / Content - Conditional Positioning */}
+                      <div 
+                          className="absolute w-full pointer-events-none flex justify-center"
+                          style={{ 
+                              left: 0,
+                              top: isTopText ? vw(-120) : vw(450),
+                              width: vw(VIEW_W)
+                          }}
+                      >
+                          <AnimatePresence mode="wait">
+                              {isActive && (
+                                  <motion.div
+                                      key="active-desc"
+                                      initial={{ opacity: 0, y: isTopText ? 20 : -20 }}
+                                      animate={{ 
+                                          opacity: 1, 
+                                          y: isTopText ? [-5, 5, -5] : [5, -5, 5] 
+                                      }}
+                                      exit={{ opacity: 0, y: isTopText ? 20 : -20 }}
+                                      transition={{
+                                          opacity: { duration: 0.3 },
+                                          y: {
+                                              duration: 1.5,
+                                              repeat: Infinity,
+                                              repeatType: "reverse",
+                                              ease: "easeInOut"
+                                          }
+                                      }}
+                                      className="font-lobster text-[#fda900] text-center drop-shadow-sm px-4"
+                                      style={{ fontSize: vw(36), lineHeight: 1.1, width: vw(350) }}
+                                  >
+                                      {renderNodes(item.content)}
+                                  </motion.div>
+                              )}
+                          </AnimatePresence>
+                      </div>
+                  </motion.div>
+              )
+          })}
+        </div>
+      </div>
+
+      {/* --- MOBILE VIEW (Below md) --- */}
+      <div className="md:hidden flex flex-col items-center py-16 px-6 space-y-12 bg-[#f6f4ed]">
+        {/* Mobile Header */}
+        <div className="text-center space-y-4">
+            <h3 className="font-josefin-sans font-bold text-[#756f3f] text-2xl">
+                {renderNodes(titleNodes)}
+            </h3>
+            <h2 className="font-josefin-sans font-bold text-[#494106] text-5xl leading-tight">
+                {renderNodes(subtitleNodes)}
+            </h2>
+        </div>
+
+        {/* Mobile Vertical Items */}
+        <div className="w-full max-w-sm space-y-10">
+            {items.slice(0, 4).map((item, idx) => (
+                <div key={item.id} className="flex items-center space-x-6">
+                    {/* Mini Hexagon Icon */}
+                    <div className="relative flex-shrink-0 w-24 h-28 flex items-center justify-center drop-shadow-lg">
+                        <svg viewBox="0 0 100 115.47" className="absolute inset-0 w-full h-full">
+                            <path 
+                                d="M50 0 L100 28.87 L100 86.6 L50 115.47 L0 86.6 L0 28.87 Z" 
                                 fill={idx % 2 === 0 ? "#e3deb3" : "#e9deb6"}
-                                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                style={{ 
-                                    filter: isActive ? "drop-shadow(0px 7px 17px rgba(0,0,0,0.2))" : "none"
-                                }}
                             />
-                         </svg>
-
-                        {/* Icon Overlay (STATIC) */}
-                         <div 
-                            className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                            style={{ paddingTop: vw(10) }}
-                         >
-                            <svg 
-                                viewBox="0 0 180 180" 
-                                className="w-[40%] h-[40%]"
-                            >
-                                <motion.path 
-                                    animate={{
-                                        fill: isActive ? "#756f3f" : "#998f6a"
-                                    }}
-                                    d={ITEM_ICONS[idx]} 
-                                />
-                            </svg>
-                         </div>
+                        </svg>
+                        <svg viewBox="0 0 180 180" className="relative z-10 w-10 h-10">
+                            <path fill="#756f3f" d={ITEM_ICONS[idx]} />
+                        </svg>
                     </div>
 
-                    {/* Description / Content - Conditional Positioning */}
-                    <div 
-                        className="absolute w-full pointer-events-none flex justify-center"
-                        style={{ 
-                            left: 0,
-                            top: isTopText ? vw(-120) : vw(410),
-                            width: vw(VIEW_W)
-                        }}
-                    >
-                        <AnimatePresence mode="wait">
-                            {isActive && (
-                                <motion.div
-                                    key="active-desc"
-                                    initial={{ opacity: 0, y: isTopText ? 20 : -20 }}
-                                    animate={{ 
-                                        opacity: 1, 
-                                        y: isTopText ? [-5, 5, -5] : [5, -5, 5] 
-                                    }}
-                                    exit={{ opacity: 0, y: isTopText ? 20 : -20 }}
-                                    transition={{
-                                        opacity: { duration: 0.3 },
-                                        y: {
-                                            duration: 1.5,
-                                            repeat: Infinity,
-                                            repeatType: "reverse",
-                                            ease: "easeInOut"
-                                        }
-                                    }}
-                                    className="font-lobster text-[#fda900] text-center drop-shadow-sm px-4"
-                                    style={{ fontSize: vw(36), lineHeight: 1.1, width: vw(350) }}
-                                >
-                                    {renderNodes(item.content)}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                    {/* Content */}
+                    <div className="flex-1">
+                        <div className="font-lobster text-[#fda900] text-2xl leading-tight">
+                            {renderNodes(item.content)}
+                        </div>
                     </div>
-                </motion.div>
-            )
-        })}
+                </div>
+            ))}
+        </div>
       </div>
     </section>
   )

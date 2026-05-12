@@ -732,7 +732,7 @@ export function SupportContactFormSection({
                   viewBox={CUSTOM_ICONS.upload.viewBox}
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  className="upload-icon transition-colors duration-300"
+                  className="upload-icon text-[#756F3F] transition-colors duration-300"
                 >
                   <path
                     d={CUSTOM_ICONS.upload.path}

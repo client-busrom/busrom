@@ -111,7 +111,7 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
                       <path d="M116.5 277c64.341 0 116.5-52.159 116.5-116.5V58C233 25.967 207.033 0 175 0H58C25.967 0 0 25.967 0 58v161c0 32.033 25.967 58 58 58h58.5z" fill="#ede8c2" />
                     </svg>
                     <motion.span 
-                      className="relative font-bold select-none italic font-kaushan-script" 
+                      className="relative font-bold select-none font-kavivanar" 
                       style={{ 
                         fontSize: vw(200), 
                         lineHeight: 1,

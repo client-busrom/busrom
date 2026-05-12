@@ -141,36 +141,6 @@ async function fetchBlogs(): Promise<{ slug: string; updatedAt: string }[]> {
   }
 }
 
-/**
- * Fetch all applications (case studies) for sitemap
- */
-async function fetchApplications(): Promise<{ slug: string; updatedAt: string }[]> {
-  try {
-    const response = await fetch(GRAPHQL_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: `
-          query GetApplicationsForSitemap {
-            Applications(where: { status: { equals: "published" } }, limit: 1000) {
-              docs {
-                slug
-                updatedAt
-              }
-            }
-          }
-        `,
-      }),
-      cache: 'no-store',
-    })
-
-    const { data } = await response.json()
-    return data?.Applications?.docs || []
-  } catch (error) {
-    console.error('Error fetching applications for sitemap:', error)
-    return []
-  }
-}
 
 /**
  * Fetch all CMS pages for sitemap
@@ -305,12 +275,11 @@ export async function getSitemapUrlsForLocale(locale: string, baseUrl: string): 
 
   try {
     // Fetch all dynamic routes
-    const [products, productSeries, blogs, pages, applications] = await Promise.all([
+    const [products, productSeries, blogs, pages] = await Promise.all([
       fetchProducts(),
       fetchProductSeries(),
       fetchBlogs(),
       fetchPages(),
-      fetchApplications(),
     ])
 
     const urls: SitemapUrl[] = []
@@ -377,6 +346,7 @@ export async function getSitemapUrlsForLocale(locale: string, baseUrl: string): 
       )
     }
 
+
     return urls
   } catch (error) {
     console.error('Error generating sitemap URLs:', error)
@@ -395,12 +365,11 @@ export async function getAllSitemapUrls(): Promise<SitemapUrl[]> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.busromhouse.com'
 
   try {
-    const [products, productSeries, blogs, pages, applications] = await Promise.all([
+    const [products, productSeries, blogs, pages] = await Promise.all([
       fetchProducts(),
       fetchProductSeries(),
       fetchBlogs(),
       fetchPages(),
-      fetchApplications(),
     ])
 
     const urls: SitemapUrl[] = []
@@ -445,15 +414,6 @@ export async function getAllSitemapUrls(): Promise<SitemapUrl[]> {
       })
     }
 
-    // Add applications -> /applications/[slug]
-    for (const app of applications) {
-      urls.push({
-        url: `/applications/${app.slug}`,
-        lastmod: app.updatedAt,
-        changefreq: 'weekly',
-        priority: 0.7,
-      })
-    }
 
     // Add CMS pages -> /page/[slug]
     for (const page of pages) {

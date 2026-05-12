@@ -18,33 +18,47 @@ export function middleware(request: NextRequest) {
 
   /**
    * 统一 URL 清理工具
-   * @param targetPath 目标路径
-   * @param _isRedirect 是否是重定向 (保留参数名以兼容，但逻辑已简化)
+   * 确保生产环境下始终返回标准 HTTPS URL，绝不暴露内部端口
    */
-  const getUrl = (targetPath: string, _isRedirect: boolean) => {
-    const url = request.nextUrl.clone();
-    url.pathname = targetPath;
+  const getUrl = (targetPath: string) => {
+    // 基础对象使用 request.url 构建，确保 searchParams 等信息保留
+    const url = new URL(targetPath, 'https://www.busromhouse.com');
     
-    // 在生产环境中，确保使用外部请求的 Host 域名，而不是内部服务器的 localhost
-    if (!isLocalhost && host) {
-      const cleanHost = host.split(':')[0];
-      url.hostname = cleanHost === 'busromhouse.com' ? 'www.busromhouse.com' : cleanHost;
-      url.port = '';
-      url.protocol = 'https';
+    // 保留原始请求的查询参数
+    request.nextUrl.searchParams.forEach((value, key) => {
+      url.searchParams.set(key, value);
+    });
+
+    if (isLocalhost) {
+      // 本地环境下，可以保留端口，但路径要对
+      const localUrl = request.nextUrl.clone();
+      localUrl.pathname = targetPath;
+      return localUrl;
     }
+
+    // 生产环境：强制标准域名、HTTPS、无端口
+    url.protocol = 'https:';
+    url.port = '';
+    
+    // 始终强制使用 www.busromhouse.com
+    url.hostname = 'www.busromhouse.com';
     
     return url;
   };
 
+  // 0. 内部重写标识检查 (防止死循环)
+  const isInternalRewrite = searchParams.get('x-intl-rewrite') === 'true';
+
   // 1. Legacy URL Redirects (SEO)
   if (pathname.includes('/service/one-stop-shop')) {
     const newPath = pathname.replace('/service/one-stop-shop', '/service/one-stop-solution');
-    return NextResponse.redirect(getUrl(newPath, true), 301);
+    return NextResponse.redirect(getUrl(newPath), 301);
   }
 
-  // 2. Canonical Domain Redirect: non-www to www
-  if (host === 'busromhouse.com') {
-    return NextResponse.redirect(getUrl(pathname, true), 301);
+  // 2. Canonical Domain Redirect: non-www to www or plain IP/Host to canonical domain
+  if (!isLocalhost && (host === 'busromhouse.com' || host?.includes(':3001') || !host?.includes('busromhouse.com'))) {
+    // 如果是通过非标准 Host 进入的，强制重定向到标准域名
+    return NextResponse.redirect(getUrl(pathname), 301);
   }
 
   // 3. CDN Strategy
@@ -69,6 +83,8 @@ export function middleware(request: NextRequest) {
     }
     res.headers.set('x-cdn-strategy-debug', newStrategy || existingStrategy || 'none');
     res.headers.set('x-viewer-country', country || 'unknown');
+    // 重要：标记请求已被中间件处理过
+    res.headers.set('x-middleware-processed', 'true');
     res.headers.set('Vary', 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, CloudFront-Viewer-Country, Cookie');
     return res;
   };
@@ -79,15 +95,10 @@ export function middleware(request: NextRequest) {
   }
 
   // 5. Default Locale Redirect: /en -> /
-  const isProductionOrigin = !isLocalhost && request.nextUrl.port === '3001';
-
-  if (pathname === `/${defaultLocale}` || pathname.startsWith(`/${defaultLocale}/`)) {
-    // 关键修复：如果在生产环境的 Origin 服务器（3001）接收到带语言前缀的重写请求，
-    // 绝对不能再重定向回根路径，否则会与 Step 7 形成死循环。
-    if (!isProductionOrigin) {
-      const newPath = pathname.replace(new RegExp(`^/${defaultLocale}/?`), '/') || '/';
-      return setStrategyCookie(NextResponse.redirect(getUrl(newPath, true), 301));
-    }
+  // 关键修复：如果是内部重写 pass，绝对不能重定向，否则会死循环
+  if (!isInternalRewrite && (pathname === `/${defaultLocale}` || pathname.startsWith(`/${defaultLocale}/`))) {
+    const newPath = pathname.replace(new RegExp(`^/${defaultLocale}/?`), '/') || '/';
+    return setStrategyCookie(NextResponse.redirect(getUrl(newPath), 301));
   }
 
   // 6. Locale Prefix Check
@@ -95,10 +106,17 @@ export function middleware(request: NextRequest) {
     (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)
   );
 
-  // 7. Internal Rewrite for default locale
+  // 7. Internal Rewrite for default locale (en)
   if (!hasLocale) {
-    const rewriteUrl = getUrl(`/${defaultLocale}${pathname}`, false);
-    // 在生产环境，rewriteUrl.port 已被 getUrl 清空，确保是同源重写
+    const rewriteUrl = getUrl(`/${defaultLocale}${pathname}`);
+    // 添加内部重写标记，防止 Step 5 拦截并重定向
+    rewriteUrl.searchParams.set('x-intl-rewrite', 'true');
+    
+    // 强制清除端口，防止重写时暴露内部端口
+    if (!isLocalhost) {
+      rewriteUrl.port = '';
+    }
+    
     return setStrategyCookie(NextResponse.rewrite(rewriteUrl));
   }
 

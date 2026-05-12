@@ -27,7 +27,7 @@ export function SupportDecoratorSection({
   return (
     <section 
       className="relative w-full overflow-hidden flex items-center justify-center bg-[#f6f4ed]" 
-      style={{ height: vw(720) }}
+      style={{ height: vw(600) }}
     >
         {/* 1. Background Image Border Wrapper (handles centering) */}
         <div 

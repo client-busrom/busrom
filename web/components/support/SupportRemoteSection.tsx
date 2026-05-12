@@ -26,16 +26,19 @@ export function SupportRemoteSection({
   cta = { title: "24H Response", description: "Lightning-Fast Resolution", url: "/support" },
   image 
 }: SupportRemoteSectionProps) {
-  const [hasTriggered, setHasTriggered] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
 
   const handleMouseEnter = () => {
-    if (!hasTriggered) setHasTriggered(true)
     setIsHovering(true)
   }
 
   const handleMouseLeave = () => {
     setIsHovering(false)
+  }
+
+  const toggleVisibility = () => {
+    setIsVisible(!isVisible)
   }
 
   const renderNodes = (nodes: any[]): React.ReactNode => {
@@ -88,10 +91,8 @@ export function SupportRemoteSection({
   }
 
   return (
-    <section 
-      className="relative w-full overflow-hidden flex bg-[#f6f4ed]" 
-      style={{ height: vw(780), paddingLeft: vw(153) }}
-    >
+    <section className="relative w-full bg-[#f6f4ed] overflow-hidden">
+      {/* Shared SVG Clips */}
       <svg width="0" height="0" className="absolute">
         <defs>
           <clipPath id="hexagon-pure-rounded" clipPathUnits="objectBoundingBox">
@@ -100,114 +101,194 @@ export function SupportRemoteSection({
         </defs>
       </svg>
 
-      {/* 1. Left Content Area */}
-      <div className="relative z-50 flex flex-col" style={{ paddingTop: vw(132), width: vw(849) }}>
-        <div className="h-[550px]" style={{ height: vw(550) }}>
-           <AnimatePresence mode="wait">
-            {hasTriggered && (
-                <motion.div
-                    key="content-root"
-                    initial={{ opacity: 0, y: 120 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ 
-                        type: "spring", 
-                        stiffness: 120, 
-                        damping: 8, 
-                        mass: 0.8,
-                        duration: 1.2
-                    }}
-                >
-                  <motion.h2 
-                    animate={isHovering ? { y: [-15, 0] } : { y: 0 }}
-                    transition={isHovering ? loopTransition : springSettings}
-                    className="font-josefin-sans font-bold text-[#494106]"
-                    style={{ fontSize: vw(80), lineHeight: 0.91 }}
-                  >
-                    {titleContent || "Remote Support Installation"}
-                  </motion.h2>
+      {/* --- DESKTOP VIEW (md and above) --- */}
+      <div 
+        className="hidden md:flex relative w-full overflow-hidden" 
+        style={{ height: vw(780), paddingLeft: vw(153) }}
+      >
+        {/* 1. Left Content Area */}
+        <div className="relative z-50 flex flex-col" style={{ paddingTop: vw(132), width: vw(849) }}>
+          <div className="h-[550px]" style={{ height: vw(550) }}>
+             <AnimatePresence mode="wait">
+                  {isVisible && (
+                      <motion.div
+                          key="content-root"
+                          initial={{ opacity: 0, y: 120 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 120 }}
+                          transition={{ 
+                              type: "spring", 
+                              stiffness: 120, 
+                              damping: 8, 
+                              mass: 0.8,
+                              duration: 1.2
+                          }}
+                      >
+                          <motion.div
+                              animate={isHovering ? { y: [-15, 0] } : { y: 0 }}
+                              transition={isHovering ? loopTransition : springSettings}
+                          >
+                              <h2 
+                                  className="font-josefin-sans font-bold text-[#494106]"
+                                  style={{ fontSize: vw(80), lineHeight: 0.91 }}
+                              >
+                                  {titleContent || "Remote Support Installation"}
+                              </h2>
 
-                  <div style={{ marginTop: vw(81) }}>
-                    <motion.div
-                        animate={isHovering ? { y: [-10, 0] } : { y: 0 }}
-                        transition={isHovering ? { ...loopTransition, delay: 0.1 } : springSettings}
-                    >
-                        <p 
-                            className="font-josefin-sans font-semibold text-[#756f3f]"
-                            style={{ fontSize: vw(36), lineHeight: 1.33, maxWidth: vw(706) }}
-                        >
-                            {descContent || "Professional technical support available at your fingertips."}
-                        </p>
-                    </motion.div>
-                  </div>
-                </motion.div>
-            )}
-           </AnimatePresence>
-        </div>
-      </div>
-
-      {/* 2. Right Visual Area */}
-      <div className="absolute right-0 top-0 h-full flex items-center z-10" style={{ width: vw(1000) }}>
-        <div 
-          className="absolute bg-[#e3deb3] overflow-hidden"
-          style={{ 
-            width: vw(mainWidth), 
-            height: vw(mainHeight),
-            right: vw(-100),
-            top: vw(0),
-            clipPath: "url(#hexagon-pure-rounded)"
-          }}
-        >
-            <OptimizedImage 
-                image={image} 
-                size="large"
-                className="w-full h-full object-cover"
-            />
+                              <div style={{ marginTop: vw(81) }}>
+                                  <p 
+                                      className="font-josefin-sans font-semibold text-[#756f3f]"
+                                      style={{ fontSize: vw(36), lineHeight: 1.33, maxWidth: vw(706) }}
+                                  >
+                                      {descContent || "Professional technical support available at your fingertips."}
+                                  </p>
+                              </div>
+                          </motion.div>
+                      </motion.div>
+                  )}
+             </AnimatePresence>
+          </div>
         </div>
 
-        <div 
-          className="absolute z-20 flex flex-col items-center justify-center bg-[#fae5ac]"
-          style={{ 
-            width: vw(ctaWidth), 
-            height: vw(ctaHeight),
-            right: vw(460),
-            top: vw(50),
-            clipPath: "url(#hexagon-pure-rounded)"
-          }}
-        >
-            <span className="font-josefin-sans font-bold text-[#383417] text-center" style={{ fontSize: vw(60), lineHeight: 0.85 }}>
-                {cta.title.split("\n").map((t, i) => <Fragment key={i}>{t}<br/></Fragment>)}
-            </span>
-            <span className="font-josefin-sans font-semibold text-[#756f3f] text-center mt-[18px]" style={{ fontSize: vw(40), lineHeight: 1.15, marginTop: vw(18), maxWidth: vw(280) }}>
-                {cta.description.split("\n").map((t, i) => <Fragment key={i}>{t}<br/></Fragment>)}
-            </span>
-        </div>
-
-        <div
-          className="absolute z-30 cursor-pointer"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          style={{ 
-            width: vw(btnWidth), 
-            height: vw(btnHeight),
-            right: vw(610),
-            top: vw(585)
-          }}
-        >
-          <motion.div 
-            whileHover={{ scale: 1.1 }}
-            className="w-full h-full flex items-center justify-center bg-[#EEE7AD]"
+        {/* 2. Right Visual Area */}
+        <div className="absolute right-0 top-0 h-full flex items-center z-10" style={{ width: vw(1000) }}>
+          <div 
+            className="absolute bg-[#e3deb3] overflow-hidden"
             style={{ 
+              width: vw(mainWidth), 
+              height: vw(mainHeight),
+              right: vw(-100),
+              top: vw(0),
               clipPath: "url(#hexagon-pure-rounded)"
             }}
           >
-             <svg 
-               viewBox="0 0 620 650" 
-               className="w-1/3 h-1/3" 
-               style={{ transform: "rotate(45deg)" }}
-             >
-               <path d={arrowPath} fill="#fffdeaff" />
-             </svg>
-          </motion.div>
+              <OptimizedImage 
+                  image={image} 
+                  size="large"
+                  className="w-full h-full object-cover"
+              />
+          </div>
+
+          <div 
+            className="absolute z-20 flex flex-col items-center justify-center"
+            style={{ 
+              width: vw(ctaWidth), 
+              height: vw(ctaHeight),
+              right: vw(460),
+              top: vw(50)
+            }}
+          >
+              {/* Rotating Hexagon Background */}
+              <motion.div 
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0 bg-[#fae5ac]"
+                style={{ 
+                  clipPath: "url(#hexagon-pure-rounded)"
+                }}
+              />
+
+              {/* Static Text Content */}
+              <div className="relative z-10 flex flex-col items-center justify-center">
+                  <span className="font-josefin-sans font-bold text-[#383417] text-center" style={{ fontSize: vw(60), lineHeight: 0.85 }}>
+                      {cta.title.split("\n").map((t, i) => <Fragment key={i}>{t}<br/></Fragment>)}
+                  </span>
+                  <span className="font-josefin-sans font-semibold text-[#756f3f] text-center mt-[18px]" style={{ fontSize: vw(40), lineHeight: 1.15, marginTop: vw(18), maxWidth: vw(280) }}>
+                      {cta.description.split("\n").map((t, i) => <Fragment key={i}>{t}<br/></Fragment>)}
+                  </span>
+              </div>
+          </div>
+
+          <div
+            className="absolute z-30 cursor-pointer"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            onClick={toggleVisibility}
+            style={{ 
+              width: vw(btnWidth), 
+              height: vw(btnHeight),
+              right: vw(520),
+              top: vw(580)
+            }}
+          >
+            <motion.div 
+              whileHover={{ scale: 1.1 }}
+              animate={{ 
+                rotate: isVisible ? 0 : 180,
+                backgroundColor: isHovering ? "#756f3f" : "#EEE7AD"
+              }}
+              transition={{ duration: 0.3 }}
+              className="w-full h-full flex items-center justify-center"
+              style={{ 
+                clipPath: "url(#hexagon-pure-rounded)"
+              }}
+            >
+               <svg 
+                 viewBox="0 0 620 650" 
+                 className="w-1/3 h-1/3" 
+                 style={{ transform: "rotate(45deg)" }}
+               >
+                 <motion.path 
+                   d={arrowPath} 
+                   animate={{ fill: isHovering ? "#EEE7AD" : "#fffdeaff" }}
+                   transition={{ duration: 0.3 }}
+                 />
+               </svg>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* --- MOBILE VIEW (Below md) --- */}
+      <div className="md:hidden flex flex-col items-center py-16 px-6 space-y-12">
+        {/* Mobile Header (Top) */}
+        <div className="text-center space-y-6">
+            <h2 className="font-josefin-sans font-bold text-[#494106] text-4xl leading-tight">
+                {titleContent || "Remote Support Installation"}
+            </h2>
+            <p className="font-josefin-sans font-semibold text-[#756f3f] text-lg leading-relaxed max-w-md mx-auto">
+                {descContent || "Professional technical support available at your fingertips."}
+            </p>
+        </div>
+
+        {/* Mobile Visual (Bottom) */}
+        <div className="relative w-full flex flex-col items-center space-y-8">
+            {/* Main Hexagon Image */}
+            <div 
+              className="relative bg-[#e3deb3] overflow-hidden shadow-xl"
+              style={{ 
+                  width: '277px', 
+                  height: '320px',
+                  clipPath: "url(#hexagon-pure-rounded)" 
+              }}
+            >
+                <OptimizedImage 
+                    image={image} 
+                    size="large"
+                    className="w-full h-full object-cover"
+                />
+            </div>
+
+            {/* CTA Ornament */}
+            <div 
+                className="relative flex items-center justify-center"
+                style={{ width: '208px', height: '240px' }}
+            >
+                <motion.div 
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-0 bg-[#fae5ac]"
+                    style={{ clipPath: "url(#hexagon-pure-rounded)" }}
+                />
+                <div className="relative z-10 flex flex-col items-center justify-center text-center px-4">
+                    <span className="font-josefin-sans font-bold text-[#383417] text-2xl leading-none">
+                        {cta.title}
+                    </span>
+                    <span className="font-josefin-sans font-semibold text-[#756f3f] text-[10px] mt-1 leading-tight uppercase tracking-wider">
+                        {cta.description}
+                    </span>
+                </div>
+            </div>
         </div>
       </div>
     </section>
