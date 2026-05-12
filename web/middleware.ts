@@ -25,8 +25,10 @@ export function middleware(request: NextRequest) {
   );
 
   if (!hasLocale) {
-    // Only rewrite to default locale, no redirects, no complex port handling
-    return NextResponse.rewrite(new URL(`/${defaultLocale}${pathname}${request.nextUrl.search}`, request.url));
+    // Only rewrite to default locale, using a relative path to avoid Next.js 15 URL leakage
+    const url = request.nextUrl.clone();
+    url.pathname = `/${defaultLocale}${pathname}`;
+    return NextResponse.rewrite(url);
   }
 
   return NextResponse.next();
