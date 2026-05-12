@@ -247,16 +247,34 @@ export function parseFaqData(locale: string, rawData: any): FaqData {
       title: popularTitle,
       subtitle: popularSubtitle,
       carousel: {
-        slides: (popularCarouselNode?.data?.items || []).map((item: any, i: number) => {
-          const s = item.faq || {};
-          const allItems = popularCarouselNode?.data?.items || [];
+        slides: (popularCarouselNode?.data?.items || popularCarouselNode?.data?.slides || []).map((item: any, i: number) => {
+          // Aggressively look for an ID (can be item.faq, item.faq.id, or item.id)
+          let faqId = item.faq;
+          if (faqId && typeof faqId === "object") faqId = faqId.id;
+          
+          const allItems = popularCarouselNode?.data?.items || popularCarouselNode?.data?.slides || [];
+          
+          // If we found a valid ID, prioritize hydration
+          if (faqId && (typeof faqId === "string" || typeof faqId === "number") && !String(faqId).startsWith('pop-')) {
+            return {
+              faq: faqId,
+              image: item.image,
+              id: `pop-${i}`,
+              image1: resolveMedia(item.image),
+              image2: resolveMedia(allItems[(i + 1) % allItems.length]?.image),
+              image3: resolveMedia(allItems[(i + 2) % allItems.length]?.image),
+            };
+          }
+
+          // Fallback to legacy object data
+          const s = item.faq || item;
           return {
             id: s.id || `pop-${i}`,
-            question: { root: { children: [{ type: 'paragraph', children: [{ type: 'text', text: s.question || "" }] }] } },
-            answer: s.contentTranslation || { root: { children: [] } },
-            image1: resolveMedia(item.image),
-            image2: resolveMedia(allItems[(i + 1) % allItems.length]?.image),
-            image3: resolveMedia(allItems[(i + 2) % allItems.length]?.image),
+            question: s.question ? { root: { children: [{ type: 'paragraph', children: [{ type: 'text', text: s.question }] }] } } : null,
+            answer: s.contentTranslation || s.answer || { root: { children: [] } },
+            image1: resolveMedia(item.image || item.image1),
+            image2: resolveMedia(allItems[(i + 1) % allItems.length]?.image || allItems[(i + 1) % allItems.length]?.image1),
+            image3: resolveMedia(allItems[(i + 2) % allItems.length]?.image || allItems[(i + 2) % allItems.length]?.image1),
           };
         })
       }

@@ -4,9 +4,11 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { HollowText } from "@/components/common/HollowText";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const DESIGN_WIDTH = 1920;
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
+const mvw = (px: number) => `${(px / 375) * 100}vw`;
 
 interface FaqGuideSectionProps {
   data: {
@@ -29,6 +31,7 @@ const STRIPS_CONFIG = [
 
 export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionProps) {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const isMobile = useIsMobile();
 
   const getNodesText = (nodes: any[] | undefined | null): string => {
     if (!nodes || !Array.isArray(nodes)) return "";
@@ -45,25 +48,43 @@ export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionPro
   const subtitleText = getNodesText(data.subtitle) || "NAVIGATION";
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ height: vw(922) }}>
+    <section 
+      className="relative w-full overflow-hidden" 
+      style={{ 
+        height: isMobile ? "auto" : vw(922),
+        paddingBottom: isMobile ? mvw(80) : 0 
+      }}
+    >
       {/* Header Area */}
-      <div className="relative w-full" style={{ marginTop: vw(80), marginBottom: vw(60) }}>
-        <div className="absolute pointer-events-none select-none right-0 top-0" style={{ marginTop: vw(-110) }}>
+      <div 
+        className="relative w-full" 
+        style={{ 
+          marginTop: isMobile ? mvw(60) : vw(80), 
+          marginBottom: isMobile ? mvw(40) : vw(60) 
+        }}
+      >
+        <div 
+          className="absolute pointer-events-none select-none right-0 top-0" 
+          style={{ 
+            marginTop: isMobile ? mvw(-30) : vw(-110),
+            opacity: isMobile ? 0.2 : 1 
+          }}
+        >
           <HollowText
             strokeColor="#c6c091"
-            strokeWidth={2}
+            strokeWidth={isMobile ? 0.5 : 2}
             className="font-bold uppercase z-0"
             style={{
               fontFamily: "var(--font-anaheim), sans-serif",
-              fontSize: vw(180),
-              letterSpacing: vw(22),
+              fontSize: isMobile ? mvw(60) : vw(180),
+              letterSpacing: isMobile ? mvw(4) : vw(22),
             }}
           >
             {subtitleText}
           </HollowText>
         </div>
 
-        <div className="relative flex justify-center z-10">
+        <div className="relative flex justify-center z-10 px-10">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -71,11 +92,11 @@ export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionPro
             className="font-extrabold text-center"
             style={{
               fontFamily: "var(--font-anaheim), sans-serif",
-              fontSize: vw(96),
+              fontSize: isMobile ? mvw(32) : vw(96),
               color: "#756f3f",
-              width: vw(1009),
-              letterSpacing: vw(1.92),
-              lineHeight: 1.1,
+              width: isMobile ? "100%" : vw(1009),
+              letterSpacing: isMobile ? mvw(0.5) : vw(1.92),
+              lineHeight: 1.2,
             }}
           >
             {getNodesText(data.title)}
@@ -83,130 +104,175 @@ export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionPro
         </div>
       </div>
 
-      {/* The Striped Container */}
-      <div className="relative flex justify-center w-full" style={{ marginTop: vw(20) }}>
-        <div className="flex bg-transparent">
-          {STRIPS_CONFIG.map((config, index) => {
-            const item = data.items?.[index];
-            if (!item) return null;
-
-            return (
-              <React.Fragment key={item.id || index}>
-                <div
-                  className="relative overflow-hidden cursor-pointer group"
-                  style={{ width: vw(config.w), height: vw(670) }}
-                  onMouseEnter={() => setHoverIndex(index)}
-                  onMouseLeave={() => setHoverIndex(null)}
-                  onClick={() => {
-                    if (index === 5) onNavigate?.("contact");
-                    else {
-                      // Extract slug from "/faq#faq-collaboration-consultation"
-                      const link = item.buttonLink || "";
-                      const slug = link.includes("#faq-") ? link.split("#faq-")[1] : item.id;
-                      onNavigate?.("category", slug);
-                    }
-                  }}
-                >
-                  {/* Giant Letter */}
-                  <motion.span
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1, y: [0, -8, 0] }}
-                    transition={{
-                      opacity: { duration: 0.8 },
-                      scale: { duration: 0.8 },
-                      y: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 },
-                    }}
-                    viewport={{ once: true }}
-                    className="absolute select-none pointer-events-none leading-none z-0"
+      {/* Main Content Area */}
+      <div 
+        className={`relative w-full ${isMobile ? "flex flex-col gap-10 px-12" : "flex justify-center"}`} 
+        style={{ marginTop: isMobile ? mvw(30) : vw(20) }}
+      >
+        {isMobile ? (
+          /* Mobile: Simple Vertical Stack */
+          data.items?.map((item: any, index: number) => (
+            <div 
+              key={item.id || index}
+              className="flex flex-col"
+              onClick={() => {
+                if (index === 5) onNavigate?.("contact");
+                else {
+                  const link = item.buttonLink || "";
+                  const slug = link.includes("#faq-") ? link.split("#faq-")[1] : item.id;
+                  onNavigate?.("category", slug);
+                }
+              }}
+            >
+              {/* Image Container with Text Overlay */}
+              <div className="relative aspect-[21/9] w-full rounded-xl overflow-hidden shadow-md">
+                <OptimizedImage
+                  image={item.image}
+                  alt={item.title}
+                  className="w-full h-full object-cover"
+                />
+                
+                {/* Dark Overlay with Description Text */}
+                <div className="absolute inset-0 bg-black/45 flex items-center justify-center p-4 text-center">
+                  <p
+                    className="text-white font-medium"
                     style={{
-                      fontFamily: "var(--font-abhaya-libre), serif",
-                      fontSize: vw(260),
-                      color: "#000000",
-                      left: vw(config.charX),
-                      top: vw(config.charY),
-                      width: vw(config.charW),
-                      whiteSpace: "nowrap",
-                      opacity: 0.8,
+                      fontSize: mvw(19),
+                      lineHeight: 1.3,
+                      fontFamily: "var(--font-academy-engraved), sans-serif",
+                      width: "92%",
                     }}
                   >
-                    {item.title}
-                  </motion.span>
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          /* Desktop: Original Striped Layout */
+          <div className="flex bg-transparent">
+            {STRIPS_CONFIG.map((config, index) => {
+              const item = data.items?.[index];
+              if (!item) return null;
 
-                  {/* Giant Circle Image */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 0 }}
-                    whileInView={{ opacity: 1, y: [0, -15, 0] }}
-                    transition={{
-                      opacity: { duration: 1 },
-                      y: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: index * 0.3 },
-                    }}
-                    viewport={{ once: true }}
-                    className="absolute rounded-full overflow-hidden shadow-2xl transition-transform duration-1000 group-hover:scale-105 z-10"
-                    style={{
-                      width: vw(config.imgW),
-                      height: vw(config.imgH),
-                      left: vw(config.imgX),
-                      top: vw(config.imgY),
+              return (
+                <React.Fragment key={item.id || index}>
+                  <div
+                    className="relative overflow-hidden cursor-pointer group"
+                    style={{ width: vw(config.w), height: vw(670) }}
+                    onMouseEnter={() => setHoverIndex(index)}
+                    onMouseLeave={() => setHoverIndex(null)}
+                    onClick={() => {
+                      if (index === 5) onNavigate?.("contact");
+                      else {
+                        const link = item.buttonLink || "";
+                        const slug = link.includes("#faq-") ? link.split("#faq-")[1] : item.id;
+                        onNavigate?.("category", slug);
+                      }
                     }}
                   >
-                    <OptimizedImage
-                      image={item.image}
-                      alt={item.title}
-                      className="w-full h-full object-cover grayscale-[0.2]"
-                      size="medium"
-                    />
+                    {/* Giant Letter */}
+                    <motion.span
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      whileInView={{ opacity: 1, scale: 1, y: [0, -8, 0] }}
+                      transition={{
+                        opacity: { duration: 0.8 },
+                        scale: { duration: 0.8 },
+                        y: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 },
+                      }}
+                      viewport={{ once: true }}
+                      className="absolute select-none pointer-events-none leading-none z-0"
+                      style={{
+                        fontFamily: "var(--font-abhaya-libre), serif",
+                        fontSize: vw(260),
+                        color: "#000000",
+                        left: vw(config.charX),
+                        top: vw(config.charY),
+                        width: vw(config.charW),
+                        whiteSpace: "nowrap",
+                        opacity: 0.8,
+                      }}
+                    >
+                      {item.title}
+                    </motion.span>
 
-                    {/* Hover Overlay */}
-                    <AnimatePresence>
-                      {hoverIndex === index && (
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="absolute inset-0 bg-black/70 backdrop-blur-[4px] flex items-center justify-center rounded-full pointer-events-none"
-                        >
-                          <div
-                            className="absolute flex items-center justify-center text-center"
-                            style={{
-                              width: vw(config.w),
-                              left: vw(-config.imgX),
-                              padding: vw(20),
-                            }}
+                    {/* Giant Circle Image */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 0 }}
+                      whileInView={{ opacity: 1, y: [0, -15, 0] }}
+                      transition={{
+                        opacity: { duration: 1 },
+                        y: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: index * 0.3 },
+                      }}
+                      viewport={{ once: true }}
+                      className="absolute rounded-full overflow-hidden shadow-2xl transition-transform duration-1000 group-hover:scale-105 z-10"
+                      style={{
+                        width: vw(config.imgW),
+                        height: vw(config.imgH),
+                        left: vw(config.imgX),
+                        top: vw(config.imgY),
+                      }}
+                    >
+                      <OptimizedImage
+                        image={item.image}
+                        alt={item.title}
+                        className="w-full h-full object-cover grayscale-[0.2]"
+                        size="medium"
+                      />
+
+                      {/* Hover Overlay */}
+                      <AnimatePresence>
+                        {hoverIndex === index && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/70 backdrop-blur-[4px] flex items-center justify-center rounded-full pointer-events-none"
                           >
-                            <p
-                              className="text-white font-medium break-words whitespace-normal"
+                            <div
+                              className="absolute flex items-center justify-center text-center"
                               style={{
-                                fontSize: vw(24),
-                                lineHeight: 1.2,
-                                fontFamily: "var(--font-academy-engraved), sans-serif",
-                                width: vw(220),
+                                width: vw(config.w),
+                                left: vw(-config.imgX),
+                                padding: vw(20),
                               }}
                             >
-                              {item.description}
-                            </p>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                </div>
+                              <p
+                                className="text-white font-medium break-words whitespace-normal"
+                                style={{
+                                  fontSize: vw(24),
+                                  lineHeight: 1.2,
+                                  fontFamily: "var(--font-academy-engraved), sans-serif",
+                                  width: vw(220),
+                                }}
+                              >
+                                {item.description}
+                              </p>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  </div>
 
-                {/* Vertical Stripe Line */}
-                {index < data.items.length - 1 && index < 5 && (
-                  <div
-                    className="z-20"
-                    style={{
-                      width: vw(2),
-                      height: vw(595),
-                      backgroundColor: "#383417",
-                      marginTop: vw(32),
-                    }}
-                  />
-                )}
-              </React.Fragment>
-            );
-          })}
-        </div>
+                  {/* Vertical Stripe Line */}
+                  {index < data.items.length - 1 && index < 5 && (
+                    <div
+                      className="z-20"
+                      style={{
+                        width: vw(2),
+                        height: vw(595),
+                        backgroundColor: "#383417",
+                        marginTop: vw(32),
+                      }}
+                    />
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );
