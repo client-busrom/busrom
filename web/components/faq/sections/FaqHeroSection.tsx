@@ -6,6 +6,8 @@ import Link from "next/link";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { HollowText } from "@/components/common/HollowText";
 
+import { useScroll, useTransform } from "framer-motion";
+
 const DESIGN_WIDTH = 1920;
 const DESIGN_HEIGHT = 968;
 
@@ -27,7 +29,21 @@ interface FaqHeroSectionProps {
 export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isBgVisible, setIsBgVisible] = useState(true);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const items = data.items || [];
+
+  // 视差滚动 (Scroll Parallax)
+  const { scrollY } = useScroll();
+  const parallaxBg = useTransform(scrollY, [0, 1000], [0, 200]);
+  const parallaxMid = useTransform(scrollY, [0, 1000], [0, 100]);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
 
   const handleNext = () => {
     if (items.length <= 1) return;
@@ -51,11 +67,11 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
       vIndex: activeIndex - 1,
       pos: "L",
       style: {
-        left: vw(320),
+        left: vw(270),
         top: vw(98.8),
         width: vw(325.84),
         height: vw(407.76),
-        opacity: 0.8,
+        opacity: 1,
         zIndex: 10,
       },
     },
@@ -75,11 +91,11 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
       vIndex: activeIndex + 1,
       pos: "R",
       style: {
-        left: vw(1334.5),
+        left: vw(1384.5),
         top: vw(368.2),
         width: vw(325.84),
         height: vw(407.76),
-        opacity: 0.8,
+        opacity: 1,
         zIndex: 10,
       },
     },
@@ -93,21 +109,22 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
         const text = node.text || "";
         if (isBold && !isTitleLayer) {
           return (
-            <span key={i} className="relative inline-flex font-bold">
-              <HollowText
-                strokeColor="#FFEB6B"
-                strokeWidth={0.5}
-                className="relative z-0"
-                style={{ top: vw(3) }}
-              >
-                {text}
-              </HollowText>
-              <span
-                className="absolute inset-0 z-10 text-[#FFB039]"
-                aria-hidden="true"
-              >
-                {text}
-              </span>
+            <span 
+              key={i} 
+              className="relative inline-block font-bold text-[#FFB039]"
+              style={{
+                // 3D 挤压厚度阴影
+                textShadow: `
+                  ${vw(1)} ${vw(1)} 0 #FFEB6B,
+                  ${vw(2)} ${vw(2)} 0 #FFEB6B,
+                  ${vw(3)} ${vw(3)} ${vw(4)} rgba(0,0,0,0.3)
+                `,
+                // 利用轻微描边增加体积感
+                WebkitTextStroke: `${vw(0.5)} #FFEB6B`,
+                paintOrder: "stroke fill"
+              }}
+            >
+              {text}
             </span>
           );
         }
@@ -130,7 +147,7 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
       <Link
         href={cta.url || "#"}
         className="absolute flex items-center group"
-        style={{ left: vw(1150), top: vw(632), zIndex: 30 }}
+        style={{ left: vw(1120), top: vw(632), zIndex: 30 }}
       >
         <div
           className="relative border-white transition-all duration-500 ease-out group-hover:opacity-0"
@@ -165,7 +182,7 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
             height: vw(circleSize),
             borderRadius: vw(circleSize / 2),
             border: `${vw(2)} solid white`,
-            paddingLeft: vw(circleSize + dotGap),
+            paddingLeft: vw(circleSize / 2),
             paddingRight: vw(circleSize / 2),
           }}
         >
@@ -182,67 +199,124 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
 
   return (
     <section
-      className="relative w-full overflow-hidden bg-[#252108]"
+      onMouseMove={handleMouseMove}
+      className="relative w-full overflow-hidden bg-[#0a0a05]"
       style={{ height: vw(DESIGN_HEIGHT) }}
     >
-      <div className="absolute inset-0 overflow-hidden">
-        {data.bgImage ? (
-          <div className="relative w-full h-full">
+      {/* --- Premium Background Layers (Enhanced Light, Reduced Blur) --- */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* 1. Base Metallic Gradient Layer (滚动视差) */}
+        <motion.div 
+          style={{ 
+            y: parallaxBg,
+            background: `
+              linear-gradient(135deg, #0f0f05 0%, #252108 50%, #0f0f05 100%),
+              radial-gradient(circle at 50% 50%, rgba(255, 244, 153, 0.1) 0%, transparent 70%)
+            `,
+            backgroundBlendMode: "screen"
+          }}
+          className="absolute inset-0 opacity-60"
+        />
+
+        {/* 2. Soft Ripples Effect (柔和波纹) */}
+        {[...Array(3)].map((_, i) => (
+          <motion.div
+            key={`ripple-${i}`}
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ 
+              scale: [1, 2.8], 
+              opacity: [0, 0.15, 0] 
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              delay: i * 2.6,
+              ease: "easeOut"
+            }}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/30"
+            style={{ width: "60vw", height: "60vw" }}
+          />
+        ))}
+
+        {/* 3. Mouse Follow Light Flare (极速响应，消除滞后) */}
+        <motion.div
+          animate={{
+            x: mousePos.x - 400,
+            y: mousePos.y - 400,
+          }}
+          transition={{ type: "spring", damping: 25, stiffness: 200, restDelta: 0.001 }}
+          className="absolute w-[800px] h-[800px] rounded-full pointer-events-none z-10"
+          style={{
+            background: "radial-gradient(circle, rgba(255, 244, 153, 0.2) 0%, rgba(255, 244, 153, 0.05) 40%, transparent 70%)",
+            mixBlendMode: "screen"
+          }}
+        />
+
+        {/* 4. Metallic Sweep (大幅增强扫光强度) */}
+        <motion.div
+          animate={{ x: ["-100%", "200%"] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+          className="absolute top-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-[-25deg] blur-3xl"
+          style={{ mixBlendMode: "screen" }}
+        />
+
+        {/* 6. Parallax Background Image (还原 63% 透明度与 5px 模糊) */}
+        <motion.div 
+          className="relative w-full h-full"
+          style={{ y: parallaxBg }}
+        >
+          {data.bgImage && (
             <OptimizedImage
               image={data.bgImage}
               alt="FAQ Background"
               className="w-full h-full object-cover"
               size="xlarge"
             />
-            <div className="absolute inset-0 z-10 pointer-events-none">
-              <div
-                className="absolute inset-0 opacity-[0.03]"
-                style={{
-                  backgroundImage: `radial-gradient(circle at ${vw(2)} ${vw(2)}, white ${vw(1)}, transparent 0)`,
-                  backgroundSize: `${vw(24)} ${vw(24)}`,
-                }}
-              />
-              {[...Array(6)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{
-                    opacity: [0, 0.4, 0],
-                    scale: [0.8, 1.2, 0.8],
-                    x: [vw(Math.random() * 1920), vw(Math.random() * 1920)],
-                    y: [vw(Math.random() * 968), vw(Math.random() * 968)],
-                  }}
-                  transition={{
-                    duration: 3 + Math.random() * 4,
-                    repeat: Infinity,
-                    repeatDelay: Math.random() * 2,
-                    ease: "easeInOut",
-                  }}
-                  className="absolute bg-white/10 blur-[80px] rounded-full"
-                  style={{ width: vw(300), height: vw(300) }}
-                />
-              ))}
-              <motion.div
-                animate={{ left: ["-100%", "200%"], opacity: [0, 0.2, 0] }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  repeatDelay: 5,
-                  ease: "linear",
-                }}
-                className="absolute top-0 bg-white/5 skew-x-[-35deg] blur-3xl"
-                style={{ width: vw(100), height: "100%" }}
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="w-full h-full bg-[#252108]" />
-        )}
-        <div className="absolute inset-0 bg-[#252108]/60 backdrop-blur-[2px]" />
+          )}
+          {/* 精准还原遮罩颜色与磨砂强度 */}
+          <div 
+            className="absolute inset-0 backdrop-blur-[3px]" 
+            style={{ backgroundColor: "rgba(37, 33, 8, 0.63)" }} 
+          />
+        </motion.div>
       </div>
 
       <div className="relative z-10 w-full h-full overflow-hidden">
         <div className="absolute inset-0 pointer-events-none z-20">
+          {/* Item Connections */}
+          <motion.div 
+            className="absolute" 
+            animate={{ opacity: isBgVisible ? 1 : 0 }}
+            transition={{ duration: 0.3 }}
+            style={{ left: vw(520), top: vw(220), width: vw(377), height: vw(362), zIndex: 5 }}
+          >
+            <svg width="100%" height="100%" viewBox="0 0 377 362" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1.38403 1.44382L375.384 359.944" stroke="url(#paint0_linear_1_1348)" strokeWidth="4"/>
+              <defs>
+                <linearGradient id="paint0_linear_1_1348" x1="-17.5527" y1="1.44383" x2="452.027" y2="143.547" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="white"/>
+                  <stop offset="0.748601" stopColor="#999999" stopOpacity="0"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </motion.div>
+          <motion.div 
+            className="absolute" 
+            animate={{ opacity: isBgVisible ? 1 : 0 }}
+            transition={{ duration: 0.3 }}
+            style={{ left: vw(1022), top: vw(360), width: vw(398), height: vw(211), zIndex: 5 }}
+          >
+            <svg width="100%" height="100%" viewBox="0 0 398 211" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0.346191 4.14404C82.8462 -10.3557 291.346 47.6442 395.346 209.644" stroke="url(#paint0_linear_1_1347)" strokeWidth="4"/>
+              <defs>
+                <linearGradient id="paint0_linear_1_1347" x1="-19.6538" y1="1.99964" x2="395.346" y2="231" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="white"/>
+                  <stop offset="1" stopColor="#999999" stopOpacity="0"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </motion.div>
+
           <AnimatePresence initial={false}>
             {displayItems.map(({ vIndex, pos, style }) => {
               const itemIndex =
@@ -286,13 +360,26 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
                       borderRadius: vw(300),
                     }}
                   >
-                    <div
-                      className={`absolute inset-0 z-10`}
-                      style={{
-                        borderRadius: vw(300),
-                        border: `${vw(2)} #ffffff dashed`,
-                      }}
-                    />
+                    <svg
+                      className="absolute inset-0 z-10"
+                      width="100%"
+                      height="100%"
+                      viewBox="0 0 687 887"
+                      fill="none"
+                      preserveAspectRatio="none"
+                    >
+                      <rect
+                        x="1"
+                        y="1"
+                        width="685"
+                        height="885"
+                        rx="342.5"
+                        stroke="white"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeDasharray="6 10"
+                      />
+                    </svg>
                     <div
                       className="absolute inset-0 overflow-hidden"
                       style={{
@@ -347,29 +434,30 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
         {data.text[0] && (
           <motion.div
             className="absolute"
-            style={{ left: vw(410), top: vw(757), width: vw(1101) }}
+            style={{ left: vw(410), top: vw(757), width: 'auto' }}
             animate={{ y: [0, vw(-15) as any, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           >
             <div
               className="relative font-paytone-one font-bold text-center leading-[1.25]"
-              style={{ fontSize: vw(60), color: "#fff499" }}
+              style={{ 
+                fontSize: vw(64),
+                color: "#fff499",
+                // 使用暗色进行多层堆叠，营造出实心的厚度感
+                textShadow: `
+                  ${vw(1)} ${vw(1)} 0 #0f0e03,
+                  ${vw(2)} ${vw(2)} 0 #0f0e03,
+                  ${vw(3)} ${vw(3)} 0 #0f0e03,
+                  ${vw(4)} ${vw(4)} 0 #0f0e03,
+                  ${vw(5)} ${vw(5)} 0 #0f0e03,
+                  ${vw(6)} ${vw(6)} 0 #0f0e03,
+                  ${vw(8)} ${vw(8)} ${vw(12)} #FF911B
+                `,
+                WebkitTextStroke: `${vw(1.5)} #FF911B`,
+                paintOrder: "stroke fill"
+              }}
             >
-              <div
-                className="absolute inset-0 select-none"
-                style={{
-                  color: "#0f0e03",
-                  transform: `translate(${vw(3)}, ${vw(8)})`,
-                  zIndex: -1,
-                  WebkitTextStroke: `${vw(2)} #FF911B`,
-                  paintOrder: "stroke fill",
-                }}
-              >
-                {renderRichText(data.text[0], true)}
-              </div>
-              <div className="relative">
-                {renderRichText(data.text[0], true)}
-              </div>
+              {renderRichText(data.text[0], true)}
             </div>
           </motion.div>
         )}
