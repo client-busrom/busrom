@@ -4,11 +4,11 @@ import configPromise from '@payload-config'
 
 export async function POST(
   req: Request,
-  { params }: { params: { collection: string; id: string } },
+  { params }: { params: Promise<{ collection: string; id: string }> },
 ) {
   try {
     const payload = await getPayload({ config: configPromise })
-    const { collection, id } = params
+    const { collection, id } = await params
     const body = await req.json()
     const { locales, user } = body
 
