@@ -130,7 +130,9 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
     // Series Fetch
     if (seriesIds.length > 0 || slug === 'product-overview') {
       const sIdsSet = Array.from(new Set(seriesIds));
-      let seriesUrl = `${cmsUrl}/api/product-series?locale=${locale}&limit=1000&depth=3`;
+      // Only select necessary fields for list/overview, exclude heavy contentTemplate
+      const seriesSelect = 'name,slug,category,featuredImage,order,isFeatured,description';
+      let seriesUrl = `${cmsUrl}/api/product-series?locale=${locale}&limit=100&depth=1&select=${seriesSelect}`;
       if (sIdsSet.length > 0 && slug !== 'product-overview') seriesUrl += `&where[id][in]=${sIdsSet.join(',')}`;
       fetchPromises.push(fetch(seriesUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json() : null));
     } else {
@@ -141,7 +143,9 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
     const mIdsSet = Array.from(new Set(manualIds));
     const sIdsSetForProds = Array.from(new Set(seriesIds));
     if (mIdsSet.length > 0 || sIdsSetForProds.length > 0) {
-      let productUrl = `${cmsUrl}/api/products?locale=${locale}&limit=1000&depth=3`;
+      // CRITICAL: Exclude heavy contentTemplate (rich text) and linkedForm for performance
+      const productSelect = 'name,slug,sku,showImage,series,category,attributePage,shortDescription';
+      let productUrl = `${cmsUrl}/api/products?locale=${locale}&limit=100&depth=1&select=${productSelect}`;
       if (mIdsSet.length > 0 && sIdsSetForProds.length > 0) {
         productUrl += `&where[or][0][id][in]=${mIdsSet.join(',')}&where[or][1][series][in]=${sIdsSetForProds.join(',')}`;
       } else if (mIdsSet.length > 0) {
@@ -157,7 +161,7 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
     // Applications Fetch
     const aIdsSet = Array.from(new Set(appIds));
     if (aIdsSet.length > 0) {
-      const appUrl = `${cmsUrl}/api/applications?locale=${locale}&where[id][in]=${aIdsSet.join(',')}&depth=2`;
+      const appUrl = `${cmsUrl}/api/applications?locale=${locale}&where[id][in]=${aIdsSet.join(',')}&depth=1`;
       fetchPromises.push(fetch(appUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json() : null));
     } else {
       fetchPromises.push(Promise.resolve(null));

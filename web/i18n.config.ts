@@ -39,7 +39,7 @@ export function isNonDefaultLocale(locale: string): boolean {
   return locale !== defaultLocale && isValidLocale(locale)
 }
 
-// This is used for static UI translations via next-intl
+// This is used for static UI translations
 // Only en and zh have complete UI translations, other languages fallback to en
 export const getMessages = async (locale: Locale) => {
   try {

@@ -51,7 +51,7 @@ const nextConfig = {
   /**
    * Internationalization (i18n)
    *
-   * Handled by next-intl with dynamic [locale] routes
+   * Handled by dynamic [locale] routes
    * See: app/[locale]/layout.tsx
    */
 
@@ -176,14 +176,7 @@ const nextConfig = {
             priority: 40,
             enforce: true,
           },
-          // 将 next-intl 提取到独立 chunk
-          'intl': {
-            name: 'intl',
-            test: /[\\/]node_modules[\\/](next-intl|intl-messageformat|@formatjs)[\\/]/,
-            chunks: 'all',
-            priority: 40,
-            enforce: true,
-          },
+
           // 将 Lenis 提取到独立 chunk
           'lenis': {
             name: 'lenis',

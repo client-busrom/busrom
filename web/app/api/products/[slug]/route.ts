@@ -288,7 +288,7 @@ export async function GET(
     // 从 Payload CMS 获取单个产品
     // TODO: Re-enable status filter after setting product status to 'published' in Payload CMS
     // const productUrl = `${CMS_URL}/api/products?where[slug][equals]=${slug}&where[status][equals]=published&limit=1&locale=${locale}&depth=3`
-    const productUrl = `${CMS_URL}/api/products?where[slug][equals]=${slug}&limit=1&locale=${locale}&depth=3`
+    const productUrl = `${CMS_URL}/api/products?where[slug][equals]=${slug}&limit=1&locale=${locale}&depth=2`
     console.log('[Product Detail API] Request URL:', productUrl)
 
     const productResponse = await fetch(productUrl, {
