@@ -56,8 +56,11 @@ export function middleware(request: NextRequest) {
   }
 
   // 2. Canonical Domain Redirect: non-www to www or plain IP/Host to canonical domain
-  if (!isLocalhost && (host === 'busromhouse.com' || host?.includes(':3001') || !host?.includes('busromhouse.com'))) {
-    // 如果是通过非标准 Host 进入的，强制重定向到标准域名
+  const userAgent = request.headers.get('user-agent') || '';
+  const isHealthCheck = userAgent.includes('ELB-HealthChecker') || pathname === '/api/health';
+
+  if (!isLocalhost && !isHealthCheck && (host === 'busromhouse.com' || host?.includes(':3001') || !host?.includes('busromhouse.com'))) {
+    // 如果是通过非标准 Host 进入的且不是健康检查，强制重定向到标准域名
     return NextResponse.redirect(getUrl(pathname), 301);
   }
 
