@@ -17,6 +17,15 @@ export async function generateMetadata({
   const path = `/shop/${slug}`
 
   const product = await getProductBySlug(slug, locale)
+  
+  // SEO Protection: If not translated in current locale, set to noindex
+  let robots: any = undefined
+  if (locale !== 'en') {
+    const checkProduct = await getProductBySlug(slug, locale, true)
+    if (!checkProduct || !checkProduct.name) {
+      robots = { index: false, follow: true }
+    }
+  }
 
   if (!product) {
     return {
@@ -33,6 +42,7 @@ export async function generateMetadata({
     alternates: {
       languages: getAlternateLanguages(path),
     },
+    ...(robots ? { robots } : {})
   }
 
   const { setting } = await getNonHomePageSeo(path, 'shop_detail', locale)

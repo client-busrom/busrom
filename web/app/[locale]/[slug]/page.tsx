@@ -22,6 +22,16 @@ export async function generateMetadata({
   // Try to fetch page data to get title/SEO info
   const pageData = await fetchPageData(slug, locale)
   
+  // SEO Protection: If not translated, set to noindex
+  let robots: any = undefined
+  if (locale !== 'en') {
+    const checkPage = await fetchPageData(slug, locale, true)
+    // Pages usually use 'title' field for translation
+    if (!checkPage || (!checkPage.title && !checkPage.name)) {
+      robots = { index: false, follow: true }
+    }
+  }
+  
   if (!pageData) {
     return {
       title: "Page Not Found | Busrom",
@@ -31,6 +41,7 @@ export async function generateMetadata({
   const defaultMetadata: Metadata = {
     title: `${pageData.title || pageData.name} | Busrom`,
     description: "Busrom Industrial Glass Hardware Solutions",
+    ...(robots ? { robots } : {})
   }
 
   return getPageMetadata(`/${slug}`, slug, locale, defaultMetadata)

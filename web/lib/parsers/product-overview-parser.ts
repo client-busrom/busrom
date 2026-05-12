@@ -314,7 +314,9 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
           const seriesId = typeof item.productSeries === 'object' ? item.productSeries.id : item.productSeries;
           product = products.find((p: any) => String(p.series?.id || p.series) === String(seriesId));
         }
-        if (!product) return null;
+        if (!product) {
+          return null;
+        }
 
         const seriesIdField = typeof item.productSeries === 'object' ? item.productSeries.id : item.productSeries;
         const seriesObj = allSeries.find((s: any) => String(s.id) === String(seriesIdField || product.series?.id || product.series));
@@ -345,15 +347,35 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
     if (node.type === "productCarousel" && node.data?.items) {
       seriesConfig = { autoplay: node.data.autoplay !== false, interval: node.data.interval || 5, itemsPerView: node.data.itemsPerView || 5 };
       seriesItems = node.data.items.map((item: any) => {
-        const seriesId = typeof item.productSeries === 'object' ? item.productSeries.id : item.productSeries;
-        const seriesObj = allSeries.find((s: any) => String(s.id) === String(seriesId));
-        const repProduct = products.find((p: any) => String(p.series?.id || p.series) === String(seriesId));
+        const getTargetId = (val: any) => (typeof val === 'object' && val !== null ? val.id : val);
+        let product = null;
+        if (item.selectionMode === 'manual') {
+          const prodId = getTargetId(item.product);
+          product = products.find((p: any) => String(p.id) === String(prodId));
+        } else {
+          const seriesId = getTargetId(item.productSeries);
+          product = products.find((p: any) => {
+            const pSeriesId = typeof p.series === 'object' && p.series !== null ? p.series.id : p.series;
+            return String(pSeriesId) === String(seriesId);
+          });
+        }
+        if (!product) return null;
+
+        const seriesIdField = getTargetId(item.productSeries);
+        const seriesObj = allSeries.find((s: any) => String(s.id) === String(seriesIdField || (typeof product.series === 'object' ? product.series.id : product.series)));
+        const seriesId = seriesIdField || (typeof product.series === 'object' ? product.series.id : product.series);
         const targetPath = resolveTargetLink(seriesObj?.category?.name || "", seriesObj?.slug || seriesId);
+        
         if (!seriesObj) return null;
+        
+        const categoryName = seriesObj.category?.name || "";
+        const seriesName = seriesObj.name || seriesObj.title || "";
+        const title = item.customName?.trim() || ((item.showCategory === true || item.showName === false) ? categoryName : seriesName);
+        
         return { 
           id: seriesId, 
-          title: item.customName || seriesObj.name || seriesObj.title || "", 
-          image: resolveMedia(repProduct?.showImage || repProduct?.image || repProduct?.featuredImage), 
+          title: title || seriesName || categoryName || "", 
+          image: resolveMedia(product?.showImage || product?.image || product?.featuredImage), 
           href: `/${locale}${targetPath}` 
         };
       }).filter(Boolean);

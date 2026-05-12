@@ -20,11 +20,11 @@ interface FaqGuideSectionProps {
 
 const STRIPS_CONFIG = [
   { id: 1, w: 267, charX: 156, charY: 52, imgW: 320, imgH: 320, imgX: -1, imgY: 266, charW: 153 },
-  { id: 2, w: 265, charX: 14, charY: 397, imgW: 341, imgH: 341, imgX: -33, imgY: 99, charW: 153 },
-  { id: 3, w: 265, charX: 95, charY: 73, imgW: 355, imgH: 355, imgX: -44, imgY: 216, charW: 153 },
-  { id: 4, w: 265, charX: 20, charY: 440, imgW: 418, imgH: 417, imgX: -86, imgY: 60, charW: 153 },
+  { id: 2, w: 265, charX: 14, charY: 360, imgW: 341, imgH: 341, imgX: -33, imgY: 99, charW: 153 },
+  { id: 3, w: 265, charX: 95, charY: 48, imgW: 355, imgH: 355, imgX: -44, imgY: 216, charW: 153 },
+  { id: 4, w: 265, charX: 20, charY: 400, imgW: 418, imgH: 417, imgX: -86, imgY: 60, charW: 153 },
   { id: 5, w: 265, charX: -32, charY: 56, imgW: 414, imgH: 414, imgX: -47, imgY: 154, charW: 153 },
-  { id: 6, w: 288, charX: 59, charY: 161, imgW: 364, imgH: 364, imgX: -76, imgY: 239, charW: 218 },
+  { id: 6, w: 288, charX: 59, charY: 156, imgW: 364, imgH: 364, imgX: -76, imgY: 239, charW: 218 },
 ];
 
 export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionProps) {
@@ -47,16 +47,16 @@ export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionPro
   return (
     <section className="relative w-full overflow-hidden" style={{ height: vw(922) }}>
       {/* Header Area */}
-      <div className="relative w-full" style={{ marginTop: vw(65), marginBottom: vw(60) }}>
-        <div className="absolute pointer-events-none select-none right-0 top-0" style={{ marginTop: vw(-60) }}>
+      <div className="relative w-full" style={{ marginTop: vw(80), marginBottom: vw(60) }}>
+        <div className="absolute pointer-events-none select-none right-0 top-0" style={{ marginTop: vw(-110) }}>
           <HollowText
             strokeColor="#c6c091"
             strokeWidth={2}
             className="font-bold uppercase z-0"
             style={{
               fontFamily: "var(--font-anaheim), sans-serif",
-              fontSize: vw(130),
-              letterSpacing: vw(15),
+              fontSize: vw(180),
+              letterSpacing: vw(22),
             }}
           >
             {subtitleText}
@@ -75,7 +75,7 @@ export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionPro
               color: "#756f3f",
               width: vw(1009),
               letterSpacing: vw(1.92),
-              lineHeight: 1.07,
+              lineHeight: 1.1,
             }}
           >
             {getNodesText(data.title)}
@@ -174,11 +174,11 @@ export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionPro
                             }}
                           >
                             <p
-                              className="text-white font-medium italic break-words whitespace-normal"
+                              className="text-white font-medium break-words whitespace-normal"
                               style={{
                                 fontSize: vw(24),
                                 lineHeight: 1.2,
-                                fontFamily: "var(--font-lexend-deca), sans-serif",
+                                fontFamily: "var(--font-academy-engraved), sans-serif",
                                 width: vw(220),
                               }}
                             >

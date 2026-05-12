@@ -308,6 +308,14 @@ const meaCulpa = localFont({
   preload: false,
 });
 
+const academyEngraved = localFont({
+  src: "../../public/fonts/AcademyEngravedLetPlain.ttf",
+  weight: "400",
+  variable: "--font-academy-engraved",
+  display: "swap",
+  preload: false,
+});
+
 export function generateStaticParams() {
   return locales.map(locale => ({ locale }));
 }
@@ -415,6 +423,7 @@ export default async function RootLayout({
         ${pavanam.variable}
         ${phudu.variable}
         ${meaCulpa.variable}
+        ${academyEngraved.variable}
         antialiased
       `}
     >

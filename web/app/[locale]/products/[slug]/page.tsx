@@ -14,6 +14,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale, slug } = await params
   const series = await getProductSeriesBySlug(slug, locale)
+  
+  // SEO Protection: If not translated, set to noindex
+  let robots: any = undefined
+  if (locale !== 'en') {
+    const checkSeries = await getProductSeriesBySlug(slug, locale, true)
+    if (!checkSeries || !checkSeries.name) {
+      robots = { index: false, follow: true }
+    }
+  }
 
   if (!series) {
     return {
@@ -27,6 +36,7 @@ export async function generateMetadata({
     alternates: {
       languages: getAlternateLanguages(`/products/${slug}`),
     },
+    ...(robots ? { robots } : {})
   }
 }
 

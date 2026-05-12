@@ -91,7 +91,7 @@ export function extractBasicSectionData(content: LexicalContent) {
 
 // Parse Main Content Strength Section (badges below gallery)
 // Strictly uses JSON array (jsonItems) from Attribute Page as per user requirement
-export function parseMainContentStrengthData(content: LexicalContent, jsonItems?: any[]) {
+export function parseMainContentStrengthData(content: LexicalContent, jsonItems?: any[], reusableBlocks: Record<string, any> = {}) {
   const strengthItems: { icon?: string; image?: any; title: string; subtitle?: string }[] = []
 
   if (jsonItems && Array.isArray(jsonItems)) {
@@ -902,14 +902,40 @@ export function parseProductHeroData(content: LexicalContent, defaultName: strin
   }
 }
 
+// Helper: Recursively flatten reusable blocks into the main node stream for parsing
+export function flattenReusableBlocksIntoNodes(nodes: any[], reusableBlocks: Record<string, any> = {}): any[] {
+  const result: any[] = []
+  
+  for (const node of nodes) {
+    if (node.type === 'productReusableBlock' || node.type === 'seriesReusableBlock' || node.type === 'reusableBlock' || node.type === 'reusable-block') {
+      const data = node.data || node.fields || {}
+      const block = data.productReusableBlock || data.seriesReusableBlock || data.reusableBlock
+      const id = typeof block === 'object' ? block.id : block
+      const blockData = reusableBlocks[id]
+      
+      if (blockData?.contentTranslation?.root?.children) {
+        // Recursively flatten children of the reusable block
+        result.push(...flattenReusableBlocksIntoNodes(blockData.contentTranslation.root.children, reusableBlocks))
+      } else {
+        // Fallback if data is not yet available or missing
+        result.push(node)
+      }
+    } else {
+      result.push(node)
+    }
+  }
+  return result
+}
+
 // Parse Lexical content into pre-form (modal) and post-form (page) sections
-export function parseLexicalSections(lexicalContent: any) {
+export function parseLexicalSections(lexicalContent: any, reusableBlocks: Record<string, any> = {}) {
   let preFormSections: ParsedSection[] = []
   let formBlock: any = null
   let postFormSections: ParsedSection[] = []
 
   if (lexicalContent?.root?.children) {
-    const nodes = lexicalContent.root.children
+    // PRE-PROCESSING: Flatten any reusable blocks so their markers are visible to the parser
+    const nodes = flattenReusableBlocksIntoNodes(lexicalContent.root.children, reusableBlocks)
     let currentSection: ParsedSection | null = null
     let isCurrentSectionPageStyle = false // true if it should be rendered on page (postFormSections)
     let foundFormMarker = false

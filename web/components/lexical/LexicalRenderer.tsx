@@ -35,13 +35,18 @@ interface LexicalRendererProps {
   content: SerializedEditorState;
   className?: string;
   mediaData?: Record<string, any>;
+  reusableBlocks?: Record<string, any>;
 }
 
 /**
- * Media Context for sharing pre-fetched media across blocks
+ * Media & Block Context for sharing pre-fetched data
  */
-const MediaContext = React.createContext<Record<string, any>>({});
-const useMediaData = () => React.useContext(MediaContext);
+const MediaContext = React.createContext<{
+  media?: Record<string, any>;
+  reusableBlocks?: Record<string, any>;
+}>({ media: {}, reusableBlocks: {} });
+
+const useContentData = () => React.useContext(MediaContext);
 
 /**
  * Block Component Definitions
@@ -67,7 +72,7 @@ const ImageGalleryBlock = ({ node }: any) => {
   const [mediaCache, setMediaCache] = React.useState<Record<string, any>>({});
   const [loading, setLoading] = React.useState(true);
 
-  const contextMediaData = useMediaData();
+  const { media: contextMediaData = {} } = useContentData();
 
   // Fetch media data for image IDs
   React.useEffect(() => {
@@ -234,7 +239,7 @@ const SingleImageBlock = ({ node }: any) => {
   const [mediaData, setMediaData] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
 
-  const contextMediaData = useMediaData();
+  const { media: contextMediaData = {} } = useContentData();
 
   // Fetch media data if image is an ID
   React.useEffect(() => {
@@ -473,7 +478,7 @@ const CarouselBlock = ({ node }: any) => {
   const [mediaCache, setMediaCache] = React.useState<Record<string, any>>({});
   const [loading, setLoading] = React.useState(true);
 
-  const contextMediaData = useMediaData();
+  const { media: contextMediaData = {} } = useContentData();
 
   // Fetch media data for slide images
   React.useEffect(() => {
@@ -684,6 +689,27 @@ const CarouselBlock = ({ node }: any) => {
   );
 };
 
+const ReusableBlock = ({ node }: any) => {
+  const data = node.data || node.fields || {};
+  const block = data.reusableBlock || data.productReusableBlock || data.productDetailReusableBlock || data.seriesReusableBlock;
+  const { reusableBlocks = {} } = useContentData();
+
+  if (!block) return null;
+
+  const blockId = typeof block === 'object' ? block.id : block;
+  const blockData = reusableBlocks[blockId];
+
+  if (!blockData || !blockData.contentTranslation) {
+    return null;
+  }
+
+  return (
+    <div className="reusable-block-wrapper my-8">
+      <LexicalRenderer content={blockData.contentTranslation} />
+    </div>
+  );
+};
+
 const HeroBlock = ({ node }: any) => {
   const { title, subtitle, backgroundImage, ctaText, ctaUrl } =
     node.data || node.fields || {};
@@ -744,7 +770,7 @@ const MarqueeLinksBlock = ({ node }: any) => {
     setRepeatCount(Math.max(neededRepeats, 5)); // At least 5 repeats
   }, [links]);
 
-  const contextMediaData = useMediaData();
+  const { media: contextMediaData = {} } = useContentData();
   const fetchingRef = React.useRef<Record<string, boolean>>({});
 
   // Fetch media data for icons that are media IDs
@@ -1433,7 +1459,12 @@ export const customConverters: JSXConverters = {
   },
   upload: ({ node }: any) => {
     const { value, relationTo } = node;
-    const imageUrl = value?.url || value?.sizes?.large?.url || "";
+    const { media = {} } = useContentData();
+
+    // Support both pre-hydrated object and ID-based lookup from context
+    const mediaObj = typeof value === "object" ? value : media[value];
+    const imageUrl = mediaObj?.url || mediaObj?.sizes?.large?.url || "";
+
     if (!imageUrl || relationTo !== "media") return null;
 
     return (
@@ -1441,7 +1472,7 @@ export const customConverters: JSXConverters = {
         <div className="relative w-full rounded-3xl overflow-hidden shadow-sm">
           <img
             src={imageUrl}
-            alt={value?.alt || ""}
+            alt={mediaObj?.alt || ""}
             className="w-full h-auto object-contain"
           />
         </div>
@@ -1469,9 +1500,23 @@ export const customConverters: JSXConverters = {
   hero: HeroBlock,
   notice: NoticeBlock,
 
+  reusableBlock: ReusableBlock,
+  "reusable-block": ReusableBlock,
+  productReusableBlock: ReusableBlock,
+  "productReusableBlock": ReusableBlock,
+  productDetailReusableBlock: ReusableBlock,
+  "productDetailReusableBlock": ReusableBlock,
+  seriesReusableBlock: ReusableBlock,
+  "seriesReusableBlock": ReusableBlock,
+
   // Blocks (type: "block" nodes with blockType)
   // Maintaining full backward compatibility for older pages
   blocks: {
+    reusableBlock: ReusableBlock,
+    "reusable-block": ReusableBlock,
+    productReusableBlock: ReusableBlock,
+    productDetailReusableBlock: ReusableBlock,
+    seriesReusableBlock: ReusableBlock,
     fluidLayout: FluidLayoutBlock,
     twoColumns: TwoColumnsBlock,
     threeColumns: (props: any) => (
@@ -1523,11 +1568,12 @@ const baseConverters = {
 /**
  * Main Lexical Renderer Component
  */
-export const LexicalRenderer = React.memo(({
+export const LexicalRenderer = React.memo(function LexicalRenderer({
   content,
   className = "",
   mediaData = {},
-}: LexicalRendererProps) => {
+  reusableBlocks = {},
+}: LexicalRendererProps) {
 
   // Use static baseConverters to prevent unnecessary RichText re-renders
   const converters = baseConverters;
@@ -1543,7 +1589,7 @@ export const LexicalRenderer = React.memo(({
   }
 
   return (
-    <MediaContext.Provider value={mediaData}>
+    <MediaContext.Provider value={{ media: mediaData, reusableBlocks }}>
       <div className={`lexical-content ${className}`}>
         <RichText data={content} converters={converters} />
       </div>

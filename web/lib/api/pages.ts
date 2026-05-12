@@ -14,9 +14,10 @@ const getCmsUrl = () => {
  * Server-side utility to fetch page content and resolve media.
  * Optimized with Parallel Fetching to reduce TTFB.
  */
-export async function fetchPageData(slug: string, locale: string = 'en') {
+export async function fetchPageData(slug: string, locale: string, noFallback = false) {
   const cmsUrl = getCmsUrl();
   const strategy = undefined; 
+  const fallbackParam = noFallback ? '' : '&fallback-locale=en';
 
   const normalize = (url: string) => {
     if (!url) return '';
@@ -46,8 +47,8 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
   try {
     // 1. Fetch initial Page Data and Navigation Menus in Parallel
     const [pageRes, navRes] = await Promise.all([
-      fetch(`${cmsUrl}/api/pages?where[slug][equals]=${slug}&locale=${locale}&depth=2`, { next: { revalidate: 3600 } }),
-      fetch(`${cmsUrl}/api/navigation-menus?locale=${locale}&limit=1000&depth=2`, { next: { revalidate: 3600 } })
+      fetch(`${cmsUrl}/api/pages?where[slug][equals]=${slug}&locale=${locale}${fallbackParam}&depth=2`, { next: { revalidate: 3600 } }),
+      fetch(`${cmsUrl}/api/navigation-menus?locale=${locale}${fallbackParam}&limit=1000&depth=2`, { next: { revalidate: 3600 } })
     ]);
 
     if (!pageRes.ok) return null;
@@ -69,7 +70,6 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
     let formConfig: any = null;
 
     let contentChildren = page.content?.root?.children || page.contentTranslation?.root?.children || [];
-    contentChildren = flattenLexicalChildren(contentChildren);
 
     // Extract all potential IDs for Parallel Fetching
     const manualIds: string[] = [];
@@ -132,7 +132,13 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
       const sIdsSet = Array.from(new Set(seriesIds));
       // Only select necessary fields for list/overview, exclude heavy contentTemplate
       const seriesSelect = 'name,slug,category,featuredImage,order,isFeatured,description';
-      let seriesUrl = `${cmsUrl}/api/product-series?locale=${locale}&limit=100&depth=1&select=${seriesSelect}`;
+      let seriesUrl = `${cmsUrl}/api/product-series?locale=${locale}${fallbackParam}&limit=100&depth=2`;
+      if (seriesSelect) {
+        const fields = seriesSelect.split(',');
+        fields.forEach(field => {
+          seriesUrl += `&select[${field.trim()}]=true`;
+        });
+      }
       if (sIdsSet.length > 0 && slug !== 'product-overview') seriesUrl += `&where[id][in]=${sIdsSet.join(',')}`;
       fetchPromises.push(fetch(seriesUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json() : null));
     } else {
@@ -144,8 +150,14 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
     const sIdsSetForProds = Array.from(new Set(seriesIds));
     if (mIdsSet.length > 0 || sIdsSetForProds.length > 0) {
       // CRITICAL: Exclude heavy contentTemplate (rich text) and linkedForm for performance
-      const productSelect = 'name,slug,sku,showImage,series,category,attributePage,shortDescription';
-      let productUrl = `${cmsUrl}/api/products?locale=${locale}&limit=100&depth=1&select=${productSelect}`;
+      const productSelect = 'name,title,slug,sku,showImage,mainImage,series,category,attributePage,shortDescription,productAttributes';
+      let productUrl = `${cmsUrl}/api/products?locale=${locale}${fallbackParam}&limit=100&depth=2`;
+      if (productSelect) {
+        const fields = productSelect.split(',');
+        fields.forEach(field => {
+          productUrl += `&select[${field.trim()}]=true`;
+        });
+      }
       if (mIdsSet.length > 0 && sIdsSetForProds.length > 0) {
         productUrl += `&where[or][0][id][in]=${mIdsSet.join(',')}&where[or][1][series][in]=${sIdsSetForProds.join(',')}`;
       } else if (mIdsSet.length > 0) {
@@ -161,7 +173,7 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
     // Applications Fetch
     const aIdsSet = Array.from(new Set(appIds));
     if (aIdsSet.length > 0) {
-      const appUrl = `${cmsUrl}/api/applications?locale=${locale}&where[id][in]=${aIdsSet.join(',')}&depth=1`;
+      const appUrl = `${cmsUrl}/api/applications?locale=${locale}${fallbackParam}&where[id][in]=${aIdsSet.join(',')}&depth=1`;
       fetchPromises.push(fetch(appUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json() : null));
     } else {
       fetchPromises.push(Promise.resolve(null));
@@ -201,8 +213,53 @@ export async function fetchPageData(slug: string, locale: string = 'en') {
       if (res?.mediaData) Object.assign(mediaData, res.mediaData);
     });
 
-    // 5. Finalize Lexical Tree with FormConfigs
+    // CRITICAL: Hydrate the enriched data with the resolved media
+    const { hydrateContent } = await import("../media-resolver");
+    if (products.length > 0) products = products.map(p => hydrateContent(p, mediaData));
+    if (series.length > 0) series = series.map(s => hydrateContent(s, mediaData));
+    if (applications.length > 0) applications = applications.map(a => hydrateContent(a, mediaData));
+
+    // 5. Finalize Lexical Tree with Enriched Data (Hydration)
+    const productMap = new Map(products.map(p => [String(p.id), p]));
+    const seriesMap = new Map(series.map(s => [String(s.id), s]));
+    const appsMap = new Map(applications.map(a => [String(a.id), a]));
+
     contentChildren.forEach((node: any, idx: number) => {
+      // Hydrate Product Carousels
+      if (node.type === 'productCarousel') {
+        (node.data?.items || []).forEach((it: any) => {
+          if (it.selectionMode === 'manual' && it.product) {
+            const id = typeof it.product === 'object' ? it.product.id : it.product;
+            if (id && productMap.has(String(id))) {
+              it.product = productMap.get(String(id));
+            }
+          }
+          if (it.selectionMode === 'auto' && it.productSeries) {
+            const id = typeof it.productSeries === 'object' ? it.productSeries.id : it.productSeries;
+            if (id && seriesMap.has(String(id))) {
+              it.productSeries = seriesMap.get(String(id));
+            }
+          }
+        });
+      }
+
+      // Hydrate Application Carousels
+      if (node.type === 'applicationCarousel') {
+        if (node.data?.applicationIds) {
+          node.data.applicationIds = node.data.applicationIds.map((id: any) => {
+            const appId = typeof id === 'object' ? id.id : id;
+            return appsMap.get(String(appId)) || id;
+          });
+        }
+        if (node.data?.applications) {
+          node.data.applications = node.data.applications.map((id: any) => {
+            const appId = typeof id === 'object' ? id.id : id;
+            return appsMap.get(String(appId)) || id;
+          });
+        }
+      }
+
+      // Hydrate Form Blocks
       if (isFormMarker(node)) {
         for (let i = idx + 1; i < Math.min(idx + 5, contentChildren.length); i++) {
           if (contentChildren[i].type === 'formBlock') {

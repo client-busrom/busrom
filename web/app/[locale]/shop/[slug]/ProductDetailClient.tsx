@@ -186,10 +186,10 @@ export function ProductDetailClient({ locale, slug, footerHint, initialData }: P
   const displayName = product.localizedName || product.sku
 
   // Parse Lexical content structure using extracted function
-  const { preFormSections, formBlock, postFormSections } = parseLexicalSections(product.content)
+  const { preFormSections, formBlock, postFormSections } = parseLexicalSections(product.content, product.reusableBlocks)
 
   // Use ONLY Attribute Page data for core strengths (badges below gallery)
-  const strengthData = parseMainContentStrengthData(product.content, product.productAttributes)
+  const strengthData = parseMainContentStrengthData(product.content, product.productAttributes, product.reusableBlocks)
 
   // Get the first main image for the hero section
   const heroImage = images.length > 0 ? images[0] : null
@@ -402,6 +402,8 @@ export function ProductDetailClient({ locale, slug, footerHint, initialData }: P
             sectionIndex={sectionIndex}
             locale={locale}
             productName={displayName}
+            mediaData={product.mediaData}
+            reusableBlocks={product.reusableBlocks}
           />
         )
       })}
@@ -444,7 +446,11 @@ export function ProductDetailClient({ locale, slug, footerHint, initialData }: P
             {/* Modal Content */}
             <div className="px-6 py-6">
               <div className="text-brand-text-main prose prose-sm md:prose-base max-w-none space-y-3">
-                <LexicalRenderer content={selectedSection.content} />
+                <LexicalRenderer 
+                  content={selectedSection.content} 
+                  mediaData={product.mediaData} 
+                  reusableBlocks={product.reusableBlocks} 
+                />
               </div>
             </div>
           </div>

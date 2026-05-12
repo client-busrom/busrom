@@ -32,35 +32,99 @@ export function ContactUsTemplate({ locale, data, ssrData }: ContactUsTemplatePr
   const [productShowItems, setProductShowItems] = useState<ProductShowItem[]>([])
 
   useEffect(() => {
+    // 1. Prefer items already hydrated in data.productShow.rawCarouselItems (from fetchPageData)
+    const rawItems = data.productShow.rawCarouselItems || [];
+    const hasFullData = rawItems.length > 0 && rawItems.every(it => it.product && typeof it.product === 'object');
+
+    if (hasFullData) {
+      const items: ProductShowItem[] = rawItems.map((it: any, index: number) => {
+        const product = it.product;
+        const getName = (obj: any) => {
+          if (!obj) return "";
+          if (typeof obj === "string") return obj;
+          if (typeof obj === "object") {
+            return obj[locale] || obj.en || obj.zh || "";
+          }
+          return "";
+        };
+
+        const title = getName(product.name) || getName(product.title) || "";
+        const category = product.category;
+        const categoryName = typeof category === 'object' && category ? (getName(category.name) || getName(category.title)) : "";
+        
+        // Handle various image structures
+        let image = product.showImage || product.mainImage;
+        if (Array.isArray(image)) image = image[0];
+
+        return {
+          id: product.id || index,
+          sku: product.sku || "",
+          title: title,
+          categoryName: categoryName,
+          image: image,
+          link: product.slug ? `/shop/${product.slug}` : undefined,
+          buttonText: it.buttonText || "View More",
+          showName: it.showName !== false,
+          showCategory: !!it.showCategory,
+          showButton: it.showButton !== false,
+          showHighlights: !!it.showHighlights,
+          highlightsCount: it.highlightsCount || 3,
+          productAttributes: product.productAttributes || null,
+        };
+      });
+      setProductShowItems(items);
+      return;
+    }
+
+    // 2. Legacy fallback: Use SSR products if available
     if (ssrData?.products && ssrData.products.length > 0) {
-      const items: ProductShowItem[] = ssrData.products.map((product: any, index: number) => ({
-        id: product.id || index,
-        sku: product.sku || "",
-        title: product.name || "",
-        categoryName: product.category?.name || "",
-        image: product.showImage || null,
-        link: product.slug ? `/shop/${product.slug}` : undefined,
-        buttonText: product._carouselItem?.buttonText || "View More",
-        showName: product._carouselItem?.showName !== false,
-        showCategory: !!product._carouselItem?.showCategory,
-        showButton: product._carouselItem?.showButton !== false,
-        showHighlights: !!product._carouselItem?.showHighlights,
-        highlightsCount: product._carouselItem?.highlightsCount || 3,
-        productAttributes: product.productAttributes || null,
-      }))
+      const getName = (obj: any) => {
+        if (!obj) return ""
+        if (typeof obj === "string") return obj
+        if (typeof obj === "object") {
+          return obj[locale] || obj.en || obj.zh || ""
+        }
+        return ""
+      }
+
+      const items: ProductShowItem[] = ssrData.products.map((product: any, index: number) => {
+        const title = getName(product.name) || getName(product.title) || ""
+        const category = product.category;
+        const categoryName = typeof category === 'object' && category ? (getName(category.name) || getName(category.title)) : "";
+        
+        let image = product.showImage || product.mainImage;
+        if (Array.isArray(image)) image = image[0];
+        
+        return {
+          id: product.id || index,
+          sku: product.sku || "",
+          title: title,
+          categoryName: categoryName,
+          image: image,
+          link: product.slug ? `/shop/${product.slug}` : undefined,
+          buttonText: product._carouselItem?.buttonText || "View More",
+          showName: product._carouselItem?.showName !== false,
+          showCategory: !!product._carouselItem?.showCategory,
+          showButton: product._carouselItem?.showButton !== false,
+          showHighlights: !!product._carouselItem?.showHighlights,
+          highlightsCount: product._carouselItem?.highlightsCount || 3,
+          productAttributes: product.productAttributes || null,
+        }
+      })
       setProductShowItems(items)
       return
     }
 
+    // 3. Last resort: Client-side fetch
     const fetchProductData = async () => {
-      if (!data.productShow.rawCarouselItems || data.productShow.rawCarouselItems.length === 0) return
+      if (rawItems.length === 0) return
 
       try {
         const response = await fetch("/api/products/carousel", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            items: data.productShow.rawCarouselItems,
+            items: rawItems,
             locale,
           }),
         })

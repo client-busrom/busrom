@@ -165,18 +165,26 @@ const extractSectionRaw = (children: any[], markerId: string, mediaData: Record<
 const mapProductsWithCarouselConfig = (products: any[], carouselItems: any[] = [], locale: string) => {
   const usedProductIds = new Set<string>();
   return carouselItems.map((item: any) => {
+    const getTargetId = (val: any) => (typeof val === 'object' && val !== null ? val.id : val);
+    
     let product = null;
     if (item.selectionMode === 'manual') {
-      const targetId = typeof item.product === 'object' ? item.product.id : item.product;
+      const targetId = getTargetId(item.product);
       product = products.find(p => String(p.id) === String(targetId));
     } else {
-      const targetSeriesId = typeof item.productSeries === 'object' ? item.productSeries.id : item.productSeries;
+      const targetSeriesId = getTargetId(item.productSeries);
       // Try to find a unique product in this series
-      product = products.find(p => String(p.series?.id || p.series) === String(targetSeriesId) && !usedProductIds.has(p.id));
+      product = products.find(p => {
+        const pSeriesId = typeof p.series === 'object' && p.series !== null ? p.series.id : p.series;
+        return String(pSeriesId) === String(targetSeriesId) && !usedProductIds.has(p.id);
+      });
       
       // Fallback: If no more unique products, but we need more for the carousel, reuse products from the same series
       if (!product && targetSeriesId) {
-        product = products.find(p => String(p.series?.id || p.series) === String(targetSeriesId));
+        product = products.find(p => {
+          const pSeriesId = typeof p.series === 'object' && p.series !== null ? p.series.id : p.series;
+          return String(pSeriesId) === String(targetSeriesId);
+        });
       }
     }
     

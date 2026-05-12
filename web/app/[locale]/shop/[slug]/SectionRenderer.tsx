@@ -41,6 +41,8 @@ interface SectionRendererProps {
   sectionIndex: number
   locale: Locale
   productName: string
+  mediaData?: Record<string, any>
+  reusableBlocks?: Record<string, any>
 }
 
 export function SectionRenderer({
@@ -48,6 +50,8 @@ export function SectionRenderer({
   sectionIndex,
   locale,
   productName,
+  mediaData,
+  reusableBlocks,
 }: SectionRendererProps) {
   // Product Hero Section
   if (section.id === 'hero-section') {
@@ -239,7 +243,7 @@ export function SectionRenderer({
   if (section.id === 'scrolling-link') {
     return (
       <div key={sectionIndex} className="w-full">
-        <LexicalRenderer content={section.content} />
+        <LexicalRenderer content={section.content} mediaData={mediaData} reusableBlocks={reusableBlocks} />
       </div>
     )
   }
@@ -253,7 +257,7 @@ export function SectionRenderer({
             {section.id}
           </h2>
         )}
-        <LexicalRenderer content={section.content} />
+        <LexicalRenderer content={section.content} mediaData={mediaData} reusableBlocks={reusableBlocks} />
       </div>
     </div>
   )

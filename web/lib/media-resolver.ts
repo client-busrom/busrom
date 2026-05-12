@@ -179,3 +179,41 @@ export const resolveAllMedia = async (content: any, cmsUrl: string, normalize: (
 
   return { content, mediaData, products: Array.isArray(content) ? content : undefined };
 };
+
+/**
+ * 递归将内容树中的媒体 ID 替换为 mediaData 中的完整对象
+ */
+export const hydrateContent = (node: any, mediaData: Record<string, any>) => {
+  if (!node || typeof node !== 'object') return node;
+
+  if (Array.isArray(node)) {
+    return node.map(item => hydrateContent(item, mediaData));
+  }
+
+  const newNode = { ...node };
+  const mediaFields = ['image', 'icon', 'media', 'backgroundImage', 'mainImage', 'showImage', 'featuredImage', 'bgImage', 'logo', 'avatar'];
+
+  mediaFields.forEach(f => {
+    const val = newNode[f];
+    if (val) {
+      const id = typeof val === 'object' ? val.id : val;
+      if (id && mediaData[id]) {
+        newNode[f] = mediaData[id];
+      }
+    }
+  });
+
+  // Handle data/fields objects common in Lexical blocks
+  if (newNode.data) newNode.data = hydrateContent(newNode.data, mediaData);
+  if (newNode.fields) newNode.fields = hydrateContent(newNode.fields, mediaData);
+
+  // Recursively handle all other object properties
+  Object.keys(newNode).forEach(key => {
+    if (['data', 'fields', 'image', 'icon', 'media', 'backgroundImage', 'mainImage', 'showImage', 'featuredImage', 'bgImage', 'logo', 'avatar', 'parent'].includes(key)) return;
+    if (typeof newNode[key] === 'object' && newNode[key] !== null) {
+      newNode[key] = hydrateContent(newNode[key], mediaData);
+    }
+  });
+
+  return newNode;
+};

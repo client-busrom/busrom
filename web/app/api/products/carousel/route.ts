@@ -113,7 +113,8 @@ function transformProduct(product: any, locale: string = 'en') {
     if (!obj) return ''
     if (typeof obj === 'string') return obj
     if (typeof obj === 'object') {
-      return obj.en || obj.zh || obj.zh_CN || obj.zh_HK || Object.values(obj).find(v => typeof v === 'string') || ''
+      // If Payload already applied locale, it might be a string but let's check keys
+      return obj[locale] || obj.en || obj.zh || obj.zh_CN || obj.zh_HK || Object.values(obj).find(v => typeof v === 'string') || ''
     }
     return ''
   }
@@ -121,29 +122,35 @@ function transformProduct(product: any, locale: string = 'en') {
   const categoryName = product.category ? getName(product.category.name || product.category.fullTitle || product.category.title) : ''
   const productName = getName(product.name)
 
+  // Fallback image: if showImage is missing, try first mainImage
+  let rawImage = product.showImage
+  if (!rawImage && Array.isArray(product.mainImage) && product.mainImage.length > 0) {
+    rawImage = product.mainImage[0]
+  }
+
   return {
     id: product.id,
     sku: product.sku,
     slug: product.slug,
     name: productName,
     shortDescription: getName(product.shortDescription || product.description),
-    showImage: product.showImage
+    showImage: rawImage && typeof rawImage === 'object'
       ? {
-          id: product.showImage.id,
-          url: normalizeToCDN(product.showImage.url),
-          altText: product.showImage.alt || '',
-          cropFocalPoint: getCropFocalPoint(product.showImage),
-          variants: transformImageVariants(product.showImage.sizes),
+          id: rawImage.id,
+          url: normalizeToCDN(rawImage.url),
+          altText: rawImage.alt || '',
+          cropFocalPoint: getCropFocalPoint(rawImage),
+          variants: transformImageVariants(rawImage.sizes),
         }
       : null,
     mainImage: Array.isArray(product.mainImage)
-      ? product.mainImage.map((img: any) => ({
+      ? product.mainImage.map((img: any) => (img && typeof img === 'object' ? {
           id: img.id,
           url: normalizeToCDN(img.url),
           altText: img.alt || '',
           cropFocalPoint: getCropFocalPoint(img),
           variants: transformImageVariants(img.sizes),
-        }))
+        } : null)).filter(Boolean)
       : [],
     series: product.series
       ? {
@@ -160,11 +167,9 @@ function transformProduct(product: any, locale: string = 'en') {
         }
       : null,
     productAttributes: (() => {
-      // 这里的 attributePage 可能是被深层 populated 后的对象也可能是个 ID
       const page = product.attributePage
       if (!page || typeof page !== 'object') return []
       
-      // JSON 字段可能因为配置了 localized: true 而变成了 { en: [], zh: [] } 格式
       let sourceArray = page.productAttributes
       if (sourceArray && !Array.isArray(sourceArray) && typeof sourceArray === 'object') {
         sourceArray = sourceArray[locale] || sourceArray['en'] || []
@@ -251,6 +256,7 @@ export async function POST(request: NextRequest) {
     if (manualProductIds.length > 0) {
       const params = new URLSearchParams()
       params.append('locale', locale)
+      params.append('fallback-locale', 'en')
       params.append('depth', '2')
       params.append('limit', manualProductIds.length.toString())
       manualProductIds.forEach((id, index) => {
@@ -258,9 +264,11 @@ export async function POST(request: NextRequest) {
       })
 
       const url = `${CMS_URL}/api/products?${params.toString()}`
+      console.log(`[Carousel API] Fetching manual products from: ${url}`)
+      
       const response = await fetch(url, {
         headers: { 'Content-Type': 'application/json' },
-        next: { revalidate: 60 },
+        next: { revalidate: 3600 }
       })
 
       if (response.ok) {
@@ -268,6 +276,8 @@ export async function POST(request: NextRequest) {
         for (const product of data.docs || []) {
           manualProducts.set(product.id, product)
         }
+      } else {
+        console.error(`[Carousel API] Failed to fetch manual products: ${response.status} ${response.statusText}`)
       }
     }
 
@@ -284,6 +294,7 @@ export async function POST(request: NextRequest) {
     for (const seriesId of seriesIds) {
       const params = new URLSearchParams()
       params.append('locale', locale)
+      params.append('fallback-locale', 'en')
       params.append('depth', '2')
       params.append('limit', '100') // Get enough products for random selection
       params.append('where[series][equals]', seriesId)
@@ -292,13 +303,14 @@ export async function POST(request: NextRequest) {
       const url = `${CMS_URL}/api/products?${params.toString()}`
       const response = await fetch(url, {
         headers: { 'Content-Type': 'application/json' },
-        next: { revalidate: 60 },
+        next: { revalidate: 3600 }
       })
 
       if (response.ok) {
         const data = await response.json()
         seriesProducts.set(seriesId, data.docs || [])
       } else {
+        console.error(`[Carousel API] Failed to fetch series products: ${response.status} ${response.statusText}`)
         seriesProducts.set(seriesId, [])
       }
     }
