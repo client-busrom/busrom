@@ -34,6 +34,8 @@ interface FaqDetailSectionProps {
   locale: string;
   activeId: string | null;
   setActiveId: (id: string) => void;
+  activeFaqId?: string | null;
+  setActiveFaqId?: (id: string | null) => void;
 }
 
 export function FaqDetailSection({
@@ -41,6 +43,8 @@ export function FaqDetailSection({
   locale,
   activeId,
   setActiveId,
+  activeFaqId,
+  setActiveFaqId,
 }: FaqDetailSectionProps) {
   const categories: CategoryData[] = (data.items || []).map((cat, idx) => {
     // Generate slug from title since the 'slug' field is missing after parsing
@@ -78,6 +82,29 @@ export function FaqDetailSection({
 
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+
+  // 处理搜索结果的跳转和展开
+  React.useEffect(() => {
+    if (activeFaqId && activeCategory) {
+      // 1. 展开该问题
+      setOpenFaqs((prev) => ({ ...prev, [activeFaqId]: true }));
+
+      // 2. 内部滚动定位
+      setTimeout(() => {
+        const element = document.getElementById(`faq-item-${activeFaqId}`);
+        if (element && scrollRef.current) {
+          const container = scrollRef.current;
+          const elementTop = element.offsetTop;
+          container.scrollTo({
+            top: elementTop - 20, // 稍微留一点间距
+            behavior: "smooth",
+          });
+        }
+        // 完成后清空状态，避免重复触发
+        setActiveFaqId?.(null);
+      }, 300); // 等待分类切换和渲染完成
+    }
+  }, [activeFaqId, activeCategory, setActiveFaqId]);
 
   const handleScroll = () => {
     if (scrollRef.current) {
@@ -247,6 +274,7 @@ export function FaqDetailSection({
               return (
                 <div
                   key={faq.id}
+                  id={`faq-item-${faq.id}`}
                   className="w-full border-t border-[#c7c3a5] first:border-t-2"
                 >
                   <div

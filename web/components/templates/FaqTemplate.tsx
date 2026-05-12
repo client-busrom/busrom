@@ -20,6 +20,7 @@ export function FaqTemplate({ locale, data }: FaqTemplateProps) {
   const [activeCategoryId, setActiveCategoryId] = React.useState<string | null>(
     null,
   );
+  const [activeFaqId, setActiveFaqId] = React.useState<string | null>(null);
   const detailRef = React.useRef<HTMLDivElement>(null);
   const contactRef = React.useRef<HTMLDivElement>(null);
 
@@ -51,6 +52,15 @@ export function FaqTemplate({ locale, data }: FaqTemplateProps) {
     } else if (type === "contact") {
       contactRef.current?.scrollIntoView({ behavior: "smooth" });
     }
+  };
+
+  const handleSearchSelect = (categoryId: string, faqId: string) => {
+    setActiveCategoryId(categoryId);
+    setActiveFaqId(faqId);
+    // 给一点时间让分类切换完成，然后滚动
+    setTimeout(() => {
+      detailRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
   };
 
   // Global Hash Listener to sync Active Category
@@ -97,7 +107,14 @@ export function FaqTemplate({ locale, data }: FaqTemplateProps) {
       {hero && <FaqHeroSection data={hero} locale={locale} />}
 
       {/* Search Section */}
-      {search && <FaqSearchSection data={search} locale={locale} />}
+      {search && (
+        <FaqSearchSection
+          data={search}
+          locale={locale}
+          detailData={detail}
+          onSearchSelect={handleSearchSelect}
+        />
+      )}
 
       {/* Guide Section */}
       {guide && (
@@ -119,6 +136,8 @@ export function FaqTemplate({ locale, data }: FaqTemplateProps) {
             locale={locale}
             activeId={activeCategoryId}
             setActiveId={setActiveCategoryId}
+            activeFaqId={activeFaqId}
+            setActiveFaqId={setActiveFaqId}
           />
         </div>
       )}

@@ -1,12 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring as useFramerSpring } from "framer-motion";
 import Link from "next/link";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { HollowText } from "@/components/common/HollowText";
-
-import { useScroll, useTransform } from "framer-motion";
 
 const DESIGN_WIDTH = 1920;
 const DESIGN_HEIGHT = 968;
@@ -29,20 +27,23 @@ interface FaqHeroSectionProps {
 export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isBgVisible, setIsBgVisible] = useState(true);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const items = data.items || [];
+
+  // --- 性能优化：使用 MotionValue 避免鼠标移动触发组件重渲染 ---
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  // 使用平滑弹簧，不触发重渲染
+  const smoothMouseX = useFramerSpring(mouseX, { damping: 30, stiffness: 200 });
+  const smoothMouseY = useFramerSpring(mouseY, { damping: 30, stiffness: 200 });
 
   // 视差滚动 (Scroll Parallax)
   const { scrollY } = useScroll();
   const parallaxBg = useTransform(scrollY, [0, 1000], [0, 200]);
-  const parallaxMid = useTransform(scrollY, [0, 1000], [0, 100]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
+    mouseX.set(e.clientX - rect.left);
+    mouseY.set(e.clientY - rect.top);
   };
 
   const handleNext = () => {
@@ -113,13 +114,11 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
               key={i} 
               className="relative inline-block font-bold text-[#FFB039]"
               style={{
-                // 3D 挤压厚度阴影
                 textShadow: `
                   ${vw(1)} ${vw(1)} 0 #FFEB6B,
                   ${vw(2)} ${vw(2)} 0 #FFEB6B,
                   ${vw(3)} ${vw(3)} ${vw(4)} rgba(0,0,0,0.3)
                 `,
-                // 利用轻微描边增加体积感
                 WebkitTextStroke: `${vw(0.5)} #FFEB6B`,
                 paintOrder: "stroke fill"
               }}
@@ -203,67 +202,54 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
       className="relative w-full overflow-hidden bg-[#0a0a05]"
       style={{ height: vw(DESIGN_HEIGHT) }}
     >
-      {/* --- Premium Background Layers (Enhanced Light, Reduced Blur) --- */}
+      {/* --- Premium Background Layers (Performance Optimized) --- */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* 1. Base Metallic Gradient Layer (滚动视差) */}
+        {/* 1. Base Metallic Layer - 开启 GPU 加速 */}
         <motion.div 
           style={{ 
             y: parallaxBg,
-            background: `
-              linear-gradient(135deg, #0f0f05 0%, #252108 50%, #0f0f05 100%),
-              radial-gradient(circle at 50% 50%, rgba(255, 244, 153, 0.1) 0%, transparent 70%)
-            `,
-            backgroundBlendMode: "screen"
+            background: `linear-gradient(135deg, #0f0f05 0%, #252108 50%, #0f0f05 100%)`,
+            willChange: "transform"
           }}
           className="absolute inset-0 opacity-60"
         />
 
-        {/* 2. Soft Ripples Effect (柔和波纹) */}
-        {[...Array(3)].map((_, i) => (
+        {/* 2. Soft Ripples - 优化性能，减少模糊计算 */}
+        {[...Array(2)].map((_, i) => (
           <motion.div
             key={`ripple-${i}`}
             initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ 
-              scale: [1, 2.8], 
-              opacity: [0, 0.15, 0] 
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              delay: i * 2.6,
-              ease: "easeOut"
-            }}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/30"
-            style={{ width: "60vw", height: "60vw" }}
+            animate={{ scale: [1, 2.5], opacity: [0, 0.1, 0] }}
+            transition={{ duration: 12, repeat: Infinity, delay: i * 6, ease: "linear" }}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10"
+            style={{ width: "60vw", height: "60vw", willChange: "transform, opacity" }}
           />
         ))}
 
-        {/* 3. Mouse Follow Light Flare (极速响应，消除滞后) */}
+        {/* 3. Mouse Follow Light Flare - 使用 MotionValue，零重渲染压力 */}
         <motion.div
-          animate={{
-            x: mousePos.x - 400,
-            y: mousePos.y - 400,
-          }}
-          transition={{ type: "spring", damping: 25, stiffness: 200, restDelta: 0.001 }}
-          className="absolute w-[800px] h-[800px] rounded-full pointer-events-none z-10"
           style={{
-            background: "radial-gradient(circle, rgba(255, 244, 153, 0.2) 0%, rgba(255, 244, 153, 0.05) 40%, transparent 70%)",
-            mixBlendMode: "screen"
+            x: useTransform(smoothMouseX, (v) => v - 400),
+            y: useTransform(smoothMouseY, (v) => v - 400),
+            background: "radial-gradient(circle, rgba(255, 244, 153, 0.15) 0%, transparent 70%)",
+            mixBlendMode: "screen",
+            willChange: "transform"
           }}
+          className="absolute w-[800px] h-[800px] rounded-full z-10"
         />
 
-        {/* 4. Metallic Sweep (大幅增强扫光强度) */}
+        {/* 4. Metallic Sweep - 优化模糊半径 */}
         <motion.div
           animate={{ x: ["-100%", "200%"] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-          className="absolute top-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-[-25deg] blur-3xl"
-          style={{ mixBlendMode: "screen" }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          className="absolute top-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-[-25deg] blur-2xl"
+          style={{ mixBlendMode: "screen", willChange: "transform" }}
         />
 
-        {/* 6. Parallax Background Image (还原 63% 透明度与 5px 模糊) */}
+        {/* 5. Parallax Background Image */}
         <motion.div 
           className="relative w-full h-full"
-          style={{ y: parallaxBg }}
+          style={{ y: parallaxBg, willChange: "transform" }}
         >
           {data.bgImage && (
             <OptimizedImage
@@ -273,7 +259,6 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
               size="xlarge"
             />
           )}
-          {/* 精准还原遮罩颜色与磨砂强度 */}
           <div 
             className="absolute inset-0 backdrop-blur-[3px]" 
             style={{ backgroundColor: "rgba(37, 33, 8, 0.63)" }} 
