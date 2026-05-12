@@ -40,7 +40,13 @@ export function isNonDefaultLocale(locale: string): boolean {
 }
 
 // This is used for static UI translations via next-intl
-// 只有 en 和 zh 有完整的 UI 翻译，其他语言 fallback 到 en
+// Only en and zh have complete UI translations, other languages fallback to en
 export const getMessages = async (locale: Locale) => {
-  return (await import(`./messages/${locale}.json`)).default
+  try {
+    return (await import(`./messages/${locale}.json`)).default
+  } catch (error) {
+    // Fallback to default locale if message file is missing
+    console.warn(`[i18n] Message file for locale "${locale}" not found, falling back to "${defaultLocale}"`);
+    return (await import(`./messages/${defaultLocale}.json`)).default
+  }
 }
