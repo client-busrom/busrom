@@ -64,7 +64,51 @@ import { FaqSelectionFeatureDefinition } from './src/lexical-features/faq-select
 import { FaqCarouselFeature } from './src/lexical-features/faq-carousel'
 import { s3Storage } from '@payloadcms/storage-s3'
 
-import { auditorPlugin } from 'payload-auditor'
+import { auditorPlugin } from './src/plugins/auditor'
+
+/**
+ * Helper to add audit fields (User, Operation) to tracked collections
+ * to avoid "Invalid field: User" errors from the auditor plugin.
+ */
+const augmentTrackedCollections = (collections: CollectionConfig[]): CollectionConfig[] => {
+  // List of slugs from payload.config.ts auditorPlugin trackCollections
+  const trackedSlugs = [
+    'media', 'media-categories', 'media-tags', 
+    'products', 'product-series', 'product-attributes', 'product-templates', 'product-reusable-blocks',
+    'series-templates', 'series-reusable-blocks',
+    'hero-banner-items', 'series-intro-items',
+    'navigation-menus',
+    'pages', 'blogs', 'blog-tags', 'applications', 'categories', 'faq-items', 'reusable-blocks', 'document-templates'
+  ]
+
+  return collections.map(col => {
+    if (trackedSlugs.includes(col.slug)) {
+      const existingFieldNames = col.fields.map(f => 'name' in f ? f.name : '')
+      const newFields = [...col.fields]
+      
+      if (!existingFieldNames.includes('User')) {
+        newFields.push({
+          name: 'User',
+          type: 'relationship',
+          relationTo: 'users',
+          admin: { hidden: true },
+        })
+      }
+      
+      if (!existingFieldNames.includes('Operation')) {
+        newFields.push({
+          name: 'Operation',
+          type: 'text',
+          admin: { hidden: true },
+        })
+      }
+      
+      return { ...col, fields: newFields }
+    }
+    return col
+  })
+}
+
 import path from 'path'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
@@ -96,6 +140,7 @@ import { NavigationMenus } from './src/collections/NavigationMenus'
 import { Roles } from './src/collections/Roles'
 import { Permissions } from './src/collections/Permissions'
 // Content Collections
+import { auditorPlugin } from './src/plugins/auditor'
 import { Pages } from './src/collections/Pages'
 import { Blogs } from './src/collections/Blogs'
 import { BlogTags } from './src/collections/BlogTags'
@@ -112,6 +157,51 @@ import { SeoSettings } from './src/collections/SeoSettings'
 import { FormConfigs } from './src/collections/FormConfigs'
 import { FormSubmissions } from './src/collections/FormSubmissions'
 import { SmtpConfigs } from './src/collections/SmtpConfigs'
+
+import type { CollectionConfig } from 'payload'
+
+/**
+ * Helper to add audit fields (User, Operation) to tracked collections
+ * to avoid "Invalid field: User" errors from the auditor plugin.
+ */
+const augmentTrackedCollections = (collections: CollectionConfig[]): CollectionConfig[] => {
+  const trackedSlugs = [
+    'media', 'media-categories', 'media-tags', 
+    'products', 'product-series', 'product-attributes', 'product-templates', 'product-reusable-blocks',
+    'series-templates', 'series-reusable-blocks',
+    'hero-banner-items', 'series-intro-items',
+    'navigation-menus',
+    'pages', 'blogs', 'blog-tags', 'applications', 'categories', 'faq-items', 'reusable-blocks', 'document-templates'
+  ]
+
+  return collections.map(col => {
+    if (trackedSlugs.includes(col.slug)) {
+      const existingFieldNames = col.fields.map(f => 'name' in f ? f.name : '')
+      const newFields = [...col.fields]
+      
+      if (!existingFieldNames.includes('User')) {
+        newFields.push({
+          name: 'User',
+          type: 'relationship',
+          relationTo: 'users',
+          admin: { hidden: true },
+        })
+      }
+      
+      if (!existingFieldNames.includes('Operation')) {
+        newFields.push({
+          name: 'Operation',
+          type: 'text',
+          admin: { hidden: true },
+        })
+      }
+      
+      return { ...col, fields: newFields }
+    }
+    return col
+  })
+}
+
 
 // Content Blocks for Lexical Editor
 import { contentBlocks } from './src/blocks'
@@ -234,7 +324,7 @@ export default buildConfig({
   // ==================================================================
   // Collections
   // ==================================================================
-  collections: [
+  collections: augmentTrackedCollections([
     // Core
     Users,
     Media,
@@ -273,7 +363,7 @@ export default buildConfig({
     FormConfigs,
     FormSubmissions,
     SmtpConfigs,
-  ],
+  ]),
 
   // ==================================================================
   // Globals (Singleton configs)
