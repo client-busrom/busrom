@@ -66,7 +66,8 @@ export async function POST(
           id,
           data: cleanData,
           locale: localeCode as any,
-          user, 
+          user: null, 
+          overrideAccess: true,
           context: { 
             isTranslationSave: true,
             isSyncing: true
