@@ -51,8 +51,8 @@ export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionPro
     <section 
       className="relative w-full overflow-hidden" 
       style={{ 
-        height: isMobile ? "auto" : vw(922),
-        paddingBottom: isMobile ? mvw(80) : 0 
+        height: isMobile ? "auto" : vw(1080),
+        paddingBottom: isMobile ? mvw(80) : vw(80)
       }}
     >
       {/* Header Area */}

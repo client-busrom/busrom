@@ -215,10 +215,10 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
               paddingBottom: mvw(100),
             }
           : {
-              minHeight: vw(922),
+              minHeight: vw(968),
               background: "linear-gradient(113deg, #645c1d 0%, #fff587 100%)",
-              paddingTop: vw(80),
-              paddingBottom: vw(80),
+              paddingTop: vw(120),
+              paddingBottom: vw(120),
             }
       }
     >
@@ -353,7 +353,28 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                   fontFamily: "var(--font-anaheim), sans-serif",
                 }}
               >
-                {titleParts[1].trim()}
+                {titleParts[1].trim().split("").map((char: string, i: any) =>
+                  char === "?" ? (
+                    <motion.span
+                      key={i}
+                      className="inline-block"
+                      animate={{
+                        rotate: [0, -15, 15, -15, 15, 0],
+                        x: [0, -1, 1, -1, 1, 0],
+                      }}
+                      transition={{
+                        duration: 0.5,
+                        repeat: Infinity,
+                        repeatDelay: 2.5,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      {char}
+                    </motion.span>
+                  ) : (
+                    char
+                  )
+                )}
               </h3>
             )}
           </div>

@@ -135,7 +135,8 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
 
   // Get active locale's data
   const activeData = localeData.find(l => l.locale === activeLocale)
-  const currentSpecs = activeData?.specifications || []
+  const rawSpecs = activeData?.specifications
+  const currentSpecs = Array.isArray(rawSpecs) ? rawSpecs : []
 
   // Update specifications for a locale
   const updateLocaleSpecs = useCallback((locale: LocaleCode, newSpecs: SpecificationGroup[]) => {
@@ -560,7 +561,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                 </div>
 
                 <div className="spec-group__items">
-                  {group.items.length === 0 ? (
+                  {!Array.isArray(group.items) || group.items.length === 0 ? (
                     <div className="items-empty">
                       No items in this group. Click "Add Item" below.
                     </div>

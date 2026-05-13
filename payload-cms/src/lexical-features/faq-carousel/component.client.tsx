@@ -178,6 +178,7 @@ export const FaqCarouselComponent: React.FC<FaqCarouselComponentProps> = ({ node
   const [showMediaPicker, setShowMediaPicker] = useState<number | null>(null)
   const [showAppPicker, setShowAppPicker] = useState<number | null>(null)
   const [mediaCache, setMediaCache] = useState<Record<string, any>>({})
+  const [faqCache, setFaqCache] = useState<Record<string, any>>({})
 
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
 
@@ -214,8 +215,42 @@ export const FaqCarouselComponent: React.FC<FaqCarouselComponentProps> = ({ node
     fetchMedia()
   }, [localData.items])
 
+  // Handle FAQ caching for previews
+  useEffect(() => {
+    const fetchFaqs = async () => {
+      const idsToFetch = localData.items
+        .map(it => typeof it.faq === 'object' ? it.faq?.id : it.faq)
+        .filter(id => id && !faqCache[id])
+      
+      if (idsToFetch.length === 0) return
+      
+      const newFaqCache = { ...faqCache }
+      let hasNew = false
+
+      for (const id of idsToFetch) {
+        try {
+          const res = await fetch(`/api/faq-items/${id}?depth=0`)
+          if (res.ok) {
+            const data = await res.json()
+            newFaqCache[id] = data
+            hasNew = true
+          }
+        } catch (e) {}
+      }
+      
+      if (hasNew) setFaqCache(newFaqCache)
+    }
+    fetchFaqs()
+  }, [localData.items])
+
   const handleAddItem = (faqs: any[]) => {
-    const newItems = faqs.map(f => ({ faq: f, image: null }))
+    const newItems = faqs.map(f => ({ faq: f.id, image: null }))
+    
+    // Add to cache for immediate preview
+    const newCache = { ...faqCache }
+    faqs.forEach(f => { newCache[f.id] = f })
+    setFaqCache(newCache)
+
     const updated = { ...localData, items: [...(localData.items || []), ...newItems] }
     setLocalData(updated)
     updateNode(updated)
@@ -293,7 +328,10 @@ export const FaqCarouselComponent: React.FC<FaqCarouselComponentProps> = ({ node
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
         {localData.items?.map((item, idx) => {
-          const faqTitle = getLocalizedString(item.faq?.question || item.faq?.name || item.faq?.title, i18n?.language) || (item.faq?.id ? `FAQ #${item.faq.id.slice(0,6)}` : 'Select FAQ Item')
+          const faqId = typeof item.faq === 'object' ? item.faq?.id : item.faq
+          const faqData = faqCache[faqId] || (typeof item.faq === 'object' ? item.faq : null)
+          
+          const faqTitle = getLocalizedString(faqData?.question || faqData?.name || faqData?.title, i18n?.language) || (faqId ? `FAQ #${String(faqId).slice(0,6)}` : 'Select FAQ Item')
           const imageObj = mediaCache[item.image?.id || item.image]
           const thumbUrl = imageObj?.thumbnailURL || imageObj?.url || imageObj?.coverImage?.url
           const isDragging = draggedIndex === idx
