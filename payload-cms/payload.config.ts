@@ -541,8 +541,11 @@ export default buildConfig({
             beforeChange: [
               ...(defaults.hooks?.beforeChange || []),
               ({ data, req, operation }) => {
-                // 如果是翻译中心正在保存，或者是同步操作，直接跳过审计日志的创建
-                if (req.context?.isTranslationSave || req.context?.isSyncing) {
+                // 核心修复：增加 req 的空值保护，防止报错导致拦截失效
+                const isTranslation = req?.context?.isTranslationSave || req?.context?.isSyncing;
+                
+                if (isTranslation) {
+                  // console.log('🛡️ [Auditor] Intercepted translation save, skipping log creation.');
                   return null as any 
                 }
 
@@ -551,11 +554,11 @@ export default buildConfig({
                 const docId = data.documentId;
 
                 if (!collectionSlug || !docId) {
-                  console.log(`⚠️ [Auditor] ABORT: Missing collectionSlug or docId. Op: ${operation}`);
                   return null as any
                 }
 
-                console.log(`✅ [Auditor] Recorded ${operation} on ${collectionSlug} (ID: ${docId}) by ${req.user?.email || 'Admin'}`)
+                // 只有在非翻译状态下才记录日志
+                console.log(`✅ [Auditor] Recorded ${operation} on ${collectionSlug} (ID: ${docId}) by ${req?.user?.email || 'Admin'}`)
                 return data
               }
             ]

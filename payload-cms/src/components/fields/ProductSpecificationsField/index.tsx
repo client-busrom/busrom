@@ -263,7 +263,6 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
 
     try {
       // Collect all texts to translate (group names and item texts)
-      // Format: [group1.text, group1.item1.text, group1.item2.text, group2.text, ...]
       const allTexts: string[] = []
       const structure: { groupIndex: number; itemIndex: number | null }[] = []
 
@@ -278,64 +277,78 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
         }
       }
 
-      // Translate to all target languages in parallel
-      const translationPromises = targetLocales
-        .filter(targetLang => {
-          const targetData = localeData.find(l => l.locale === targetLang)
-          return overwriteExisting || !targetData?.specifications || targetData.specifications.length === 0
+      const { getTranslationHeaders } = await import('@/lib/translation-client')
+      const personalHeaders = getTranslationHeaders()
+
+      // 用于批量打包的对象
+      const localesToSave: Record<string, any> = {}
+
+      for (const targetLang of targetLocales) {
+        const targetData = localeData.find(l => l.locale === targetLang)
+        if (!overwriteExisting && targetData && targetData.specifications && targetData.specifications.length > 0) continue
+
+        console.log(`[ProductSpecificationsField] Translating to ${targetLang}...`)
+        const res = await fetch('/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...personalHeaders },
+          body: JSON.stringify({
+            texts: allTexts,
+            sourceLang: sourceLocale,
+            targetLang: targetLang,
+          }),
         })
-        .map(async (targetLang) => {
-          // Get user's personal translation settings
-          const { getTranslationHeaders } = await import('@/lib/translation-client')
-          const personalHeaders = getTranslationHeaders()
 
-          // Single batch request for all texts
-          const res = await fetch('/api/translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...personalHeaders },
-            body: JSON.stringify({
-              texts: allTexts,
-              sourceLang: sourceLocale,
-              targetLang: targetLang,
-            }),
-          })
+        const data = await res.json()
+        const translations = data.translations || allTexts
 
-          const data = await res.json()
-          const translations = data.translations || allTexts
+        // Reconstruct specifications from translated texts
+        const translatedSpecs: SpecificationGroup[] = sourceSpecs.map(group => ({
+          text: '',
+          items: group.items.map(item => ({ ...item, text: '' })),
+        }))
 
-          // Reconstruct specifications from translated texts
-          const translatedSpecs: SpecificationGroup[] = sourceSpecs.map(group => ({
-            text: '',
-            items: group.items.map(item => ({ ...item, text: '' })),
-          }))
+        for (let i = 0; i < structure.length; i++) {
+          const { groupIndex, itemIndex } = structure[i]
+          const translatedText = translations[i] || allTexts[i]
 
-          for (let i = 0; i < structure.length; i++) {
-            const { groupIndex, itemIndex } = structure[i]
-            const translatedText = translations[i] || allTexts[i]
-
-            if (itemIndex === null) {
-              translatedSpecs[groupIndex].text = translatedText
-            } else {
-              translatedSpecs[groupIndex].items[itemIndex].text = translatedText
-            }
+          if (itemIndex === null) {
+            translatedSpecs[groupIndex].text = translatedText
+          } else {
+            translatedSpecs[groupIndex].items[itemIndex].text = translatedText
           }
+        }
 
-          return { targetLang, translatedSpecs }
+        // 更新 UI 状态
+        updateLocaleSpecs(targetLang, translatedSpecs)
+        
+        // 打包数据
+        localesToSave[targetLang] = {
+          [field.name]: translatedSpecs
+        }
+      }
+
+      // --- 终极优化：一次性批量保存 ---
+      if (Object.keys(localesToSave).length > 0) {
+        console.log(`📡 [ProductSpecificationsField] Bulk saving ${Object.keys(localesToSave).length} languages...`)
+        const saveRes = await fetch(`/api/${collectionSlug}/${id}/save-translations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ locales: localesToSave })
         })
 
-      const results = await Promise.all(translationPromises)
-
-      // Update all locales and save
-      for (const { targetLang, translatedSpecs } of results) {
-        updateLocaleSpecs(targetLang, translatedSpecs)
-        await saveToLocale(targetLang, translatedSpecs)
+        if (!saveRes.ok) {
+          throw new Error(`Bulk save failed: ${saveRes.statusText}`)
+        }
+        console.log('✅ [ProductSpecificationsField] Bulk save successful')
       }
+
+      setShowTranslatePanel(false)
     } catch (error) {
       console.error('Translation failed:', error)
     } finally {
       setIsTranslating(false)
     }
-  }, [localeData, sourceLocale, targetLocales, overwriteExisting, updateLocaleSpecs, saveToLocale])
+  }, [localeData, sourceLocale, targetLocales, overwriteExisting, updateLocaleSpecs, collectionSlug, id, field.name])
 
   // Select helpers
   const handleSelectAllTargets = useCallback(() => {

@@ -198,10 +198,14 @@ export const AttributesTableField: React.FC<AttributesTableFieldProps> = ({ path
       const { getTranslationHeaders } = await import('@/lib/translation-client')
       const headers = getTranslationHeaders()
 
+      // 用于一次性打包所有翻译结果的对象
+      const localesToSave: Record<string, any> = {}
+
       for (const targetLang of targetLocales) {
         const targetData = localeData.find(l => l.locale === targetLang)
         if (!overwriteExisting && targetData && targetData.items.length > 0) continue
 
+        console.log(`[AttributesTableField] Translating to ${targetLang}...`)
         const res = await fetch('/api/translate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...headers },
@@ -217,10 +221,34 @@ export const AttributesTableField: React.FC<AttributesTableFieldProps> = ({ path
           value: translatedTexts[idx * 2 + 1] || item.value
         }))
 
+        // 更新本地 UI 状态（让用户看到打勾）
         updateLocaleItems(targetLang, translatedItems)
-        await saveToLocale(targetLang, translatedItems)
+        
+        // 打包到待保存对象中
+        localesToSave[targetLang] = {
+          [field.name]: translatedItems
+        }
       }
+
+      // --- 关键优化：一次性批量保存 ---
+      if (Object.keys(localesToSave).length > 0) {
+        console.log(`📡 [AttributesTableField] Bulk saving ${Object.keys(localesToSave).length} languages...`)
+        const saveRes = await fetch(`/api/${collectionSlug}/${id}/save-translations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ locales: localesToSave })
+        })
+
+        if (!saveRes.ok) {
+          throw new Error(`Bulk save failed: ${saveRes.statusText}`)
+        }
+        console.log('✅ [AttributesTableField] Bulk save successful')
+      }
+
       setShowTranslatePanel(false)
+    } catch (error) {
+      console.error('Translation or Save failed:', error)
+      alert(isZh ? '翻译或保存失败，请检查网络日志' : 'Translation or Save failed, please check logs')
     } finally {
       setIsTranslating(false)
     }
