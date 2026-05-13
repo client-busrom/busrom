@@ -134,11 +134,10 @@ const FaqItemRow = React.memo(({
               }}
             >
               <div
-                className="flex-1 text-[#605b37] [&_p:first-child]:mt-0 [&_p]:leading-[inherit] [&_p]:tracking-[inherit]"
+                className="flex-1 text-[#605b37] font-anaheim font-medium [&_p:first-child]:mt-0 [&_p]:leading-[inherit] [&_p]:tracking-[inherit]"
                 style={{
                   fontSize: vw(24),
                   lineHeight: 1.4,
-                  fontFamily: "var(--font-anaheim), sans-serif",
                   letterSpacing: "0.02em",
                 }}
               >
