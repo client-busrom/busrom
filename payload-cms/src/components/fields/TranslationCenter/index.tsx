@@ -656,14 +656,32 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
           }
         }
 
-        // Defensive cleaning: remove system fields or injected fields that would fail validation
-        // Matching the backend fix in save-translations route
-        const cleanData = { ...dataToSave }
-        const illegalFields = ['User', 'user', 'id', 'createdAt', 'updatedAt', '__v']
-        illegalFields.forEach(f => {
-          if (f in cleanData) delete cleanData[f]
-        })
+        // Recursive cleaning to remove illegal fields from all levels
+        const cleanPayload = (obj: any): any => {
+          if (!obj || typeof obj !== 'object' || obj === null) return obj
+          if (Array.isArray(obj)) return obj.map(cleanPayload)
 
+          const illegalFields = [
+            'user', 'id', 'createdat', 'updatedat', '__v', 
+            '_locale', '_parent_id', 'prevpost', 'nextpost', 
+            'kb_recommended_posts_posts', 'kb_bottom_recommended_posts'
+          ]
+          const newObj: any = {}
+          for (const [key, value] of Object.entries(obj)) {
+            const lowerKey = key.toLowerCase()
+            if (
+              illegalFields.includes(lowerKey) || 
+              (key.startsWith('_') && !['_id', 'id'].includes(key)) ||
+              (lowerKey.startsWith('kb_') && (lowerKey.endsWith('_posts') || lowerKey.endsWith('_post')))
+            ) {
+              continue
+            }
+            newObj[key] = cleanPayload(value)
+          }
+          return newObj
+        }
+
+        const cleanData = cleanPayload(dataToSave)
         localesPayload[localeCode] = cleanData
       }
 

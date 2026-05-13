@@ -23,13 +23,43 @@ export async function POST(
       try {
         console.log(`[save-translations] Updating locale=${localeCode} for ${collection}/${id}`)
         
-        // Defensive cleaning: remove system fields or injected fields that would fail validation
-        // Especially 'User' which seems to be injected by plugins/hooks
-        const cleanData = { ...(data as any) }
-        const illegalFields = ['User', 'user', 'id', 'createdAt', 'updatedAt', '__v']
-        illegalFields.forEach(f => {
-          if (f in cleanData) delete cleanData[f]
-        })
+        // Deep recursive cleaning to remove illegal fields from all levels
+        const cleanPayload = (obj: any): any => {
+          if (!obj || typeof obj !== 'object' || obj === null) return obj
+          if (Array.isArray(obj)) return obj.map(cleanPayload)
+
+          // Added more fields that might be injected by hooks: prevPost, nextPost, etc.
+          const illegalFields = [
+            'user', 'id', 'createdat', 'updatedat', '__v', 
+            '_locale', '_parent_id', 'prevpost', 'nextpost', 
+            'kb_recommended_posts_posts', 'kb_bottom_recommended_posts'
+          ]
+          const newObj: any = {}
+          for (const [key, value] of Object.entries(obj)) {
+            const lowerKey = key.toLowerCase()
+            // Skip illegal fields (case-insensitive), internal payload fields starting with underscore, 
+            // and any recommendation logic fields that are injected at runtime
+            if (
+              illegalFields.includes(lowerKey) || 
+              (key.startsWith('_') && !['_id', 'id'].includes(key)) ||
+              (lowerKey.startsWith('kb_') && (lowerKey.endsWith('_posts') || lowerKey.endsWith('_post')))
+            ) {
+              continue
+            }
+            newObj[key] = cleanPayload(value)
+          }
+          return newObj
+        }
+
+        const cleanData = cleanPayload(data)
+        const preservedKeys = Object.keys(cleanData)
+        console.log(`[save-translations] Locale=${localeCode}, Preserved keys: ${preservedKeys.join(', ')}`)
+        
+        // Final sanity check: explicitly ensure _locale is gone from top level
+        if ('_locale' in cleanData) delete cleanData['_locale']
+        if ('_parent_id' in cleanData) delete cleanData['_parent_id']
+        if ('User' in cleanData) delete cleanData['User']
+        if ('user' in cleanData) delete cleanData['user']
 
         await payload.update({
           collection: collection as any,
