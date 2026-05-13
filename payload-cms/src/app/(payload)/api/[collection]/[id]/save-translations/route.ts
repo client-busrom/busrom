@@ -9,80 +9,87 @@ export async function POST(
   try {
     const payload = await getPayload({ config: configPromise })
     const { collection, id } = await params
+    
     const body = await req.json()
-    const { locales, user } = body
+    const { locales } = body
+    console.log(`📡 [save-translations] Incoming request for ${collection}/${id}. Locales count: ${Object.keys(locales || {}).length}`)
+    console.log(`📡 [save-translations] Body keys: ${Object.keys(body).join(', ')}`)
 
     if (!locales || typeof locales !== 'object') {
       return NextResponse.json({ error: 'Invalid locales data' }, { status: 400 })
     }
 
-    const results: Record<string, { success: boolean; error?: string }> = {}
+    // 2. 初始化请求上下文并获取身份
+    const i18nReq: any = req
+    i18nReq.payload = payload
+    i18nReq.context = i18nReq.context || {}
+    
+    // 尝试获取当前登录用户
+    const { user } = await payload.auth(i18nReq)
+    i18nReq.user = user
 
-    // Process each locale sequentially using Payload Local API
+    // 先获取当前文档的状态，防止被重置为草稿
+    const currentDoc = await payload.findByID({
+      collection: collection as any,
+      id,
+      depth: 0,
+      showHiddenFields: true,
+      req: i18nReq,
+    })
+
+    const results = []
+    const systemFields = ['id', 'createdAt', 'updatedAt', 'status', 'publishedAt', 'User', 'Operation', 'author', 'adminLabel', 'slug']
+
+    // 使用串行保存，确保数据库稳定性
     for (const [localeCode, data] of Object.entries(locales)) {
       try {
-        console.log(`[save-translations] Updating locale=${localeCode} for ${collection}/${id}`)
+        console.log(`[save-translations] ⏳ Saving locale=${localeCode}... Data keys: ${Object.keys(data as any).join(', ')}`)
         
-        // Deep recursive cleaning to remove illegal fields from all levels
-        const cleanPayload = (obj: any): any => {
-          if (!obj || typeof obj !== 'object' || obj === null) return obj
-          if (Array.isArray(obj)) return obj.map(cleanPayload)
-
-          // Added more fields that might be injected by hooks: prevPost, nextPost, etc.
-          const illegalFields = [
-            'user', 'id', 'createdat', 'updatedat', '__v', 
-            '_locale', '_parent_id', 'prevpost', 'nextpost', 
-            'kb_recommended_posts_posts', 'kb_bottom_recommended_posts'
-          ]
-          const newObj: any = {}
-          for (const [key, value] of Object.entries(obj)) {
-            const lowerKey = key.toLowerCase()
-            // Skip illegal fields (case-insensitive), internal payload fields starting with underscore, 
-            // and any recommendation logic fields that are injected at runtime
-            if (
-              illegalFields.includes(lowerKey) || 
-              (key.startsWith('_') && !['_id', 'id'].includes(key)) ||
-              (lowerKey.startsWith('kb_') && (lowerKey.endsWith('_posts') || lowerKey.endsWith('_post')))
-            ) {
-              continue
-            }
-            newObj[key] = cleanPayload(value)
-          }
-          return newObj
+        // 清理数据
+        const cleanedData: any = {
+          status: currentDoc.status, // 强制带上当前状态
+          publishedAt: currentDoc.publishedAt, // 强制带上发布时间
         }
+        Object.entries(data as any).forEach(([key, value]) => {
+          if (systemFields.includes(key)) return
+          if (key.startsWith('_') && key !== '_id') return
+          cleanedData[key] = value
+        })
 
-        const cleanData = cleanPayload(data)
-        const preservedKeys = Object.keys(cleanData)
-        console.log(`[save-translations] Locale=${localeCode}, Preserved keys: ${preservedKeys.join(', ')}`)
+        // 在请求上下文中注入标记，确保审计插件能够识别并跳过
+        i18nReq.context.isTranslationSave = true
+        i18nReq.context.isSyncing = true
+
+        console.log(`📡 [save-translations] ⏳ Updating locale=${localeCode} for ${collection}/${id}. User: ${i18nReq.user?.email || 'Admin'}`)
         
-        // Final sanity check: explicitly ensure _locale is gone from top level
-        if ('_locale' in cleanData) delete cleanData['_locale']
-        if ('_parent_id' in cleanData) delete cleanData['_parent_id']
-        if ('User' in cleanData) delete cleanData['User']
-        if ('user' in cleanData) delete cleanData['user']
-
-        await payload.update({
+        const updatedDoc = await payload.update({
           collection: collection as any,
           id,
-          data: cleanData,
+          data: cleanedData,
           locale: localeCode as any,
-          user: null, 
-          overrideAccess: true,
-          context: { 
-            isTranslationSave: true,
-            isSyncing: true
+          disableHooks: true,
+          req: i18nReq,
+        } as any)
+
+        // [SQL FORCE] 物理层确保状态不丢失 (针对 Blog 集合)
+        if (collection === 'blogs' && currentDoc.status === 'published') {
+          const db = (payload.db as any).drizzle
+          if (db) {
+            const { sql } = await import('drizzle-orm')
+            await db.execute(sql`UPDATE "blogs" SET "status" = 'published' WHERE "id" = ${id}`)
           }
-        })
-        results[localeCode] = { success: true }
+        }
+
+        results.push({ locale: localeCode, success: true, id: (updatedDoc as any).id })
       } catch (err: any) {
-        console.error(`[save-translations] ❌ Failed locale=${localeCode}:`, err.message)
-        results[localeCode] = { success: false, error: err.message }
+        console.error(`[save-translations] ❌ Error in ${localeCode}:`, err.message)
+        results.push({ locale: localeCode, success: false, error: err.message })
       }
     }
 
-    return NextResponse.json({ results })
+    return NextResponse.json({ success: true, results })
   } catch (error: any) {
-    console.error('[save-translations] Global error:', error.message)
+    console.error('[save-translations] Global Error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

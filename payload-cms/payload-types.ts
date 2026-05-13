@@ -98,7 +98,7 @@ export interface Config {
     'form-configs': FormConfig;
     'form-submissions': FormSubmission;
     'smtp-configs': SmtpConfig;
-    'Audit-log': AuditLog;
+    audit_logs: AuditLog;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -159,7 +159,7 @@ export interface Config {
     'form-configs': FormConfigsSelect<false> | FormConfigsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     'smtp-configs': SmtpConfigsSelect<false> | SmtpConfigsSelect<true>;
-    'Audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
+    audit_logs: AuditLogsSelect<false> | AuditLogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -578,8 +578,6 @@ export interface Media {
    */
   status?: ('active' | 'archived') | null;
   usageCount?: number | null;
-  User?: (number | null) | User;
-  Operation?: string | null;
   prefix?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -657,8 +655,6 @@ export interface MediaCategory {
    * Display order in lists
    */
   order?: number | null;
-  User?: (number | null) | User;
-  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -682,8 +678,6 @@ export interface MediaTag {
    * Color code for UI display
    */
   color?: string | null;
-  User?: (number | null) | User;
-  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1620,8 +1614,6 @@ export interface Application {
       }[]
     | null;
   status?: ('published' | 'draft' | 'archived') | null;
-  User?: (number | null) | User;
-  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1860,6 +1852,8 @@ export interface CustomScript {
   previewUrl?: string | null;
   lastTestedAt?: string | null;
   testStatus?: ('not_tested' | 'passed' | 'failed') | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1946,6 +1940,8 @@ export interface SeoSetting {
    * How often this page is likely to change
    */
   sitemapChangefreq?: ('always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never') | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2114,7 +2110,7 @@ export interface SmtpConfig {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Audit-log".
+ * via the `definition` "audit_logs".
  */
 export interface AuditLog {
   id: number;
@@ -2377,7 +2373,7 @@ export interface PayloadLockedDocument {
         value: number | SmtpConfig;
       } | null)
     | ({
-        relationTo: 'Audit-log';
+        relationTo: 'audit_logs';
         value: number | AuditLog;
       } | null);
   globalSlug?: string | null;
@@ -2472,8 +2468,6 @@ export interface MediaSelect<T extends boolean = true> {
       };
   status?: T;
   usageCount?: T;
-  User?: T;
-  Operation?: T;
   prefix?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2542,8 +2536,6 @@ export interface MediaCategoriesSelect<T extends boolean = true> {
   icon?: T;
   color?: T;
   order?: T;
-  User?: T;
-  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2557,8 +2549,6 @@ export interface MediaTagsSelect<T extends boolean = true> {
   category?: T;
   description?: T;
   color?: T;
-  User?: T;
-  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2931,8 +2921,6 @@ export interface ApplicationsSelect<T extends boolean = true> {
         id?: T;
       };
   status?: T;
-  User?: T;
-  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3055,6 +3043,8 @@ export interface CustomScriptsSelect<T extends boolean = true> {
   previewUrl?: T;
   lastTestedAt?: T;
   testStatus?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3082,6 +3072,8 @@ export interface SeoSettingsSelect<T extends boolean = true> {
   includeInSitemap?: T;
   sitemapPriority?: T;
   sitemapChangefreq?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3189,9 +3181,9 @@ export interface SmtpConfigsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Audit-log_select".
+ * via the `definition` "audit_logs_select".
  */
-export interface AuditLogSelect<T extends boolean = true> {
+export interface AuditLogsSelect<T extends boolean = true> {
   operation?: T;
   onCollection?: T;
   documentId?: T;

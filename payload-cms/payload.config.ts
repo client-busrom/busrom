@@ -71,14 +71,15 @@ import { auditorPlugin } from 'payload-auditor'
  * to avoid "Invalid field: User" errors from the auditor plugin.
  */
 const augmentTrackedCollections = (collections: CollectionConfig[]): CollectionConfig[] => {
-  // List of slugs from payload.config.ts auditorPlugin trackCollections
+  // Only add audit fields to collections we explicitly want to track
+  // to avoid "Invalid field: User" errors.
   const trackedSlugs = [
-    'media', 'media-categories', 'media-tags', 
+    'blogs', 'blog-tags', 'pages', 
     'products', 'product-series', 'product-attributes', 'product-templates', 'product-reusable-blocks',
     'series-templates', 'series-reusable-blocks',
-    'hero-banner-items', 'series-intro-items',
-    'navigation-menus',
-    'pages', 'blogs', 'blog-tags', 'applications', 'categories', 'faq-items', 'reusable-blocks', 'document-templates'
+    'categories', 'faq-items', 'navigation-menus',
+    'hero-banner-items', 'series-intro-items', 'reusable-blocks',
+    'document-templates', 'seo-settings', 'custom-scripts'
   ]
 
   return collections.map(col => {
@@ -86,6 +87,7 @@ const augmentTrackedCollections = (collections: CollectionConfig[]): CollectionC
       const existingFieldNames = col.fields.map(f => 'name' in f ? f.name : '')
       const newFields = [...col.fields]
       
+      // Revert to uppercase as the plugin seems to expect it strictly
       if (!existingFieldNames.includes('User')) {
         newFields.push({
           name: 'User',
@@ -103,7 +105,10 @@ const augmentTrackedCollections = (collections: CollectionConfig[]): CollectionC
         })
       }
       
-      return { ...col, fields: newFields }
+      return {
+        ...col,
+        fields: newFields
+      }
     }
     return col
   })
@@ -513,6 +518,69 @@ export default buildConfig({
   // Plugins
   // ==================================================================
   plugins: [
+    // Auditor Plugin - 操作审计日志
+    // 注意：不追踪 users/roles/permissions，会导致 User 字段验证错误
+    // 注意：插件使用 payload.create() 不带 overrideAccess，所以 access.create 需要为 true
+    // 这是通过修改 node_modules 或等待插件修复来解决
+    auditorPlugin({
+      collection: {
+        // 使用插件标准的配置钩子
+        configureRootCollection: (defaults) => ({
+          ...defaults,
+          slug: 'audit_logs', // 改为复数，避开 Drizzle 的约束命名冲突
+          labels: {
+            singular: 'Audit Log',
+            plural: 'Audit Logs',
+          },
+          access: {
+            ...defaults.access,
+            read: ({ req }) => req.user?.isAdmin === true,
+          },
+          hooks: {
+            ...defaults.hooks,
+            beforeChange: [
+              ...(defaults.hooks?.beforeChange || []),
+              ({ data, req, operation }) => {
+                // 如果是翻译中心正在保存，或者是同步操作，直接跳过审计日志的创建
+                if (req.context?.isTranslationSave || req.context?.isSyncing) {
+                  return null as any 
+                }
+
+                // 兼容性处理：尝试获取 collection 标识
+                const collectionSlug = data.onCollection || data.collection;
+                const docId = data.documentId;
+
+                if (!collectionSlug || !docId) {
+                  console.log(`⚠️ [Auditor] ABORT: Missing collectionSlug or docId. Op: ${operation}`);
+                  return null as any
+                }
+
+                console.log(`✅ [Auditor] Recorded ${operation} on ${collectionSlug} (ID: ${docId}) by ${req.user?.email || 'Admin'}`)
+                return data
+              }
+            ]
+          }
+        }),
+        // 终极合规配置：为所有核心集合显式开启审计钩子
+        trackCollections: [
+          'blogs', 'blog-tags', 'pages', 
+          'products', 'product-series', 'product-attributes', 'product-templates', 'product-reusable-blocks',
+          'series-templates', 'series-reusable-blocks',
+          'categories', 'faq-items', 'navigation-menus',
+          'hero-banner-items', 'series-intro-items', 'reusable-blocks',
+          'document-templates', 'seo-settings', 'custom-scripts'
+        ].map(slug => ({
+          slug,
+          hooks: {
+            afterChange: { enabled: true },
+            afterDelete: { enabled: true },
+          }
+        })),
+        buffer: {
+          flushStrategy: 'realtime',
+        },
+      },
+    }),
     nestedDocsPlugin({
       collections: ['categories'],
       generateLabel: (_, doc) => {
@@ -555,221 +623,6 @@ export default buildConfig({
       },
       bucket: s3Config.bucket,
       config: s3Config.config,
-    }),
-
-
-
-    // Auditor Plugin - 操作审计日志
-    // 注意：不追踪 users/roles/permissions，会导致 User 字段验证错误
-    // 注意：插件使用 payload.create() 不带 overrideAccess，所以 access.create 需要为 true
-    // 这是通过修改 node_modules 或等待插件修复来解决
-    auditorPlugin({
-      collection: {
-        // 自定义访问控制 - 使用 isAdmin 字段
-        Accessibility: {
-          customAccess: {
-            read: ({ req }) => req.user?.isAdmin === true,
-          },
-        },
-        trackCollections: [
-          // ==================== 媒体库 ====================
-          {
-            slug: 'media',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'media-categories',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'media-tags',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          // ==================== 产品 ====================
-          {
-            slug: 'products',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'product-series',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'product-attributes',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'product-templates',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'product-reusable-blocks',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'series-templates',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'series-reusable-blocks',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          // ==================== 首页内容 ====================
-          {
-            slug: 'hero-banner-items',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'series-intro-items',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          // ==================== 导航 ====================
-          {
-            slug: 'navigation-menus',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          // ==================== 内容管理 ====================
-          {
-            slug: 'pages',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'blogs',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'blog-tags',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'applications',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'categories',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'faq-items',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'reusable-blocks',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'document-templates',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'template-categories',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          // ==================== 表单 ====================
-          {
-            slug: 'form-configs',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'form-submissions',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'smtp-configs',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          // ==================== 系统设置 ====================
-          {
-            slug: 'custom-scripts',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-          {
-            slug: 'seo-settings',
-            hooks: {
-              afterChange: { update: { enabled: true }, create: { enabled: true } },
-              afterDelete: { enabled: true },
-            },
-          },
-        ],
-      },
     }),
   ],
 

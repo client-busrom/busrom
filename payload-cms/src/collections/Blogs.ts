@@ -47,19 +47,40 @@ export const Blogs: CollectionConfig = {
   },
   hooks: {
     beforeChange: [
-      ({ data, originalDoc }) => {
-        // If status is becoming 'published' and there's no publishedAt date set yet, set it to now
-        if (data.status === 'published' && !data.publishedAt && (!originalDoc || !originalDoc.publishedAt)) {
-          return {
-            ...data,
-            publishedAt: new Date().toISOString(),
-          }
+      async ({ data, originalDoc, operation, req }) => {
+        const isTranslation = req.context?.isTranslationSave || req.context?.isSyncing
+        
+        // [DEBUG] Check context and user
+        console.log(`🕵️ [Blogs Hook] Op: ${operation}, User: ${req.user?.email || 'N/A'}, IsTranslation: ${isTranslation}`)
+
+        // [AUTO-PRESERVE STATUS] If status is missing from the update (e.g. background patches),
+        // explicitly set it to the current value to prevent database resets.
+        if (operation === 'update' && !data.status && originalDoc?.status) {
+          data.status = originalDoc.status
+        }
+
+        const status = data.status;
+        const prevStatus = originalDoc?.status;
+        
+        if (status === 'published' && !data.publishedAt && prevStatus !== 'published') {
+          console.log('📡 [Blogs] Publishing: setting publishedAt')
+          data.publishedAt = new Date().toISOString()
+        } else if (!data.publishedAt && originalDoc?.publishedAt) {
+          // Also preserve publishedAt if missing
+          data.publishedAt = originalDoc.publishedAt
         }
         return data;
       }
     ],
     afterRead: [
       async ({ doc, req, query }) => {
+        // Optimization: Skip heavy relational lookups during translation saves, syncs, or depth=0 queries
+        const currentDepth = req?.query?.depth ?? query?.depth;
+        
+        if (req?.context?.isTranslationSave || req?.context?.isSyncing || String(currentDepth) === '0') {
+          return doc
+        }
+
         // Use publishedAt, fall back to createdAt
         const referenceDate = doc.publishedAt || doc.createdAt;
         const { payload, locale } = req;
@@ -193,7 +214,22 @@ export const Blogs: CollectionConfig = {
       }
     ],
     afterChange: [
-      autoIndexHook('blogs'),
+      async ({ doc, previousDoc, operation, req }) => {
+        const start = Date.now()
+        // [SQL FORCE] Persistent status stabilization
+        if (doc.status === 'published' && operation === 'update' && doc.id) {
+          try {
+            const db = (req.payload.db as any).drizzle
+            if (db) {
+              const { sql } = await import('drizzle-orm')
+              await db.execute(sql`UPDATE "blogs" SET "status" = 'published' WHERE "id" = ${doc.id}`)
+              console.log(`🛡️ [Blogs] SQL Force SUCCESS for ${doc.id} (${Date.now() - start}ms)`)
+            }
+          } catch (e: any) {
+            console.error(`❌ [Blogs] SQL Force failed:`, e.message)
+          }
+        }
+      },
     ],
     afterDelete: [
       autoIndexDeleteHook('blogs'),
@@ -293,18 +329,15 @@ export const Blogs: CollectionConfig = {
         {
           name: 'status',
           type: 'select',
-          label: {
-            en: 'Status',
-            zh: '状态',
-          },
-          defaultValue: 'draft',
+          // localized: true, // REVERTED
           options: [
             { label: { en: 'Published', zh: '已发布' }, value: 'published' },
             { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
-            { label: { en: 'Archived', zh: '归档' }, value: 'archived' },
+            { label: { en: 'Archived', zh: '已存档' }, value: 'archived' },
           ],
           admin: {
             width: '40%',
+            position: 'sidebar',
           },
         },
         {

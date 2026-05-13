@@ -335,7 +335,7 @@ export const CustomNav: React.FC = () => {
             <NavItem href="/admin/collections/users" labelKey="users" />
             <NavItem href="/admin/collections/roles" labelKey="roles" />
             <NavItem href="/admin/collections/permissions" labelKey="permissions" />
-            <NavItem href="/admin/collections/Audit-log" labelKey="auditLog" />
+            <NavItem href="/admin/collections/audit_logs" labelKey="auditLog" />
           </CollapsibleGroup>
         )}
 

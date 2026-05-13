@@ -18,6 +18,11 @@ export const autoIndexHook = (collectionSlug: string): CollectionAfterChangeHook
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.busromhouse.com'
     const locales = ['en', 'zh', 'ar', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'pt', 'ru', 'vi', 'th', 'id', 'tr', 'nl', 'pl', 'sv', 'da', 'fi', 'no', 'cs', 'el', 'hu']
 
+    // 0. Skip if in bulk sync/translation mode
+    if (req.context?.isTranslationSave || req.context?.isSyncing) {
+      return doc
+    }
+
     // Helper to generate URLs based on collection
     const getUrls = (document: any, collection: string) => {
       return locales.map(locale => {
@@ -49,9 +54,14 @@ export const autoIndexHook = (collectionSlug: string): CollectionAfterChangeHook
       const urls = getUrls(doc, collectionSlug)
       console.log(`📡 [AutoIndex] ${collectionSlug} published: ${doc.slug}. Notifying updates...`)
       
-      Promise.all(urls.map(url => notifyGoogleOfUpdate(url, 'URL_UPDATED'))).catch(e => {
-        console.error('[AutoIndex] Google Update error:', e.message)
-      })
+      // Check credentials once to avoid 24 identical warnings
+      if (!process.env.GOOGLE_INDEXING_CREDENTIALS) {
+        console.log('⚠️ [Google Indexing] Credentials not found. Skipping.')
+      } else {
+        Promise.all(urls.map(url => notifyGoogleOfUpdate(url, 'URL_UPDATED'))).catch(e => {
+          console.error('[AutoIndex] Google Update error:', e.message)
+        })
+      }
       
       notifyIndexNow(urls).catch(e => {
         console.error('[AutoIndex] IndexNow Update error:', e.message)
@@ -63,9 +73,13 @@ export const autoIndexHook = (collectionSlug: string): CollectionAfterChangeHook
       const urls = getUrls(doc, collectionSlug)
       console.log(`📡 [AutoIndex] ${collectionSlug} unpublished: ${doc.slug}. Notifying deletions...`)
       
-      Promise.all(urls.map(url => notifyGoogleOfUpdate(url, 'URL_DELETED'))).catch(e => {
-        console.error('[AutoIndex] Google Delete error:', e.message)
-      })
+      if (!process.env.GOOGLE_INDEXING_CREDENTIALS) {
+        console.log('⚠️ [Google Indexing] Credentials not found. Skipping.')
+      } else {
+        Promise.all(urls.map(url => notifyGoogleOfUpdate(url, 'URL_DELETED'))).catch(e => {
+          console.error('[AutoIndex] Google Delete error:', e.message)
+        })
+      }
       
       notifyIndexNow(urls).catch(e => {
         console.error('[AutoIndex] IndexNow Delete error:', e.message)
