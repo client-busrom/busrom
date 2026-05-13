@@ -254,7 +254,17 @@ export function ContactHeroSection({
         }}
         initial={{ rotate: 1.51 }}
         animate={{ rotate: 1.51 }}
-        whileHover={{ scale: 1.02 }}
+        whileHover={{
+          scale: 1.02,
+          x: [0, -2, 2, -2, 2, 0],
+          transition: {
+            x: {
+              repeat: Infinity,
+              duration: 0.4,
+              ease: "easeInOut",
+            },
+          },
+        }}
         whileTap={{ scale: 0.98 }}
       >
         {/* White base layer */}

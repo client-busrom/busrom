@@ -578,6 +578,8 @@ export interface Media {
    */
   status?: ('active' | 'archived') | null;
   usageCount?: number | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   prefix?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -655,6 +657,8 @@ export interface MediaCategory {
    * Display order in lists
    */
   order?: number | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -678,6 +682,8 @@ export interface MediaTag {
    * Color code for UI display
    */
   color?: string | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -750,6 +756,8 @@ export interface Product {
    * Primary sort key for Shop gallery. Higher number = appears first. Fallback order: Shop Weight > Global Order > Update Time.
    */
   shopOrder?: number | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -802,6 +810,8 @@ export interface ProductSery {
    */
   order?: number | null;
   isFeatured?: boolean | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -871,6 +881,8 @@ export interface Category {
         id?: string | null;
       }[]
     | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -880,8 +892,6 @@ export interface Category {
  */
 export interface Blog {
   id: number;
-  User?: (number | null) | User;
-  Operation?: string | null;
   /**
    * This identifier is for internal management and can contain spaces/caps. (e.g. "Blog - Glass Installation")
    */
@@ -984,6 +994,8 @@ export interface Blog {
   kb_bottom_recommended_title?: string | null;
   kb_bottom_recommended_posts?: (number | Blog)[] | null;
   kb_bottom_recommended_logic?: ('category' | 'latest') | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1030,6 +1042,8 @@ export interface BlogTag {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1062,6 +1076,8 @@ export interface SeriesTemplate {
     };
     [k: string]: unknown;
   } | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1115,6 +1131,8 @@ export interface ProductAttribute {
     | number
     | boolean
     | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1156,6 +1174,8 @@ export interface ProductTemplate {
     };
     [k: string]: unknown;
   } | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1310,6 +1330,8 @@ export interface ProductReusableBlock {
     [k: string]: unknown;
   } | null;
   status?: ('published' | 'draft' | 'archived') | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1338,6 +1360,8 @@ export interface SeriesReusableBlock {
     [k: string]: unknown;
   } | null;
   status?: ('published' | 'draft' | 'archived') | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1409,6 +1433,8 @@ export interface HeroBannerItem {
   };
   order?: number | null;
   status?: ('published' | 'draft') | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1450,6 +1476,8 @@ export interface SeriesIntroItem {
     | boolean
     | null;
   status?: ('published' | 'draft') | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1494,6 +1522,8 @@ export interface NavigationMenu {
    */
   isSystem?: boolean | null;
   visible?: boolean | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1557,6 +1587,8 @@ export interface Page {
   heroMediaTags?: (number | MediaTag)[] | null;
   heroText?: string | null;
   heroSubtitle?: string | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1588,6 +1620,8 @@ export interface Application {
       }[]
     | null;
   status?: ('published' | 'draft' | 'archived') | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1637,6 +1671,8 @@ export interface FaqItem {
    */
   order?: number | null;
   status?: ('published' | 'draft' | 'archived') | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1672,6 +1708,8 @@ export interface ReusableBlock {
     [k: string]: unknown;
   } | null;
   status?: ('published' | 'draft' | 'archived') | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1720,6 +1758,8 @@ export interface DocumentTemplate {
    * Only ACTIVE templates appear in the template selector
    */
   status?: ('active' | 'draft' | 'archived') | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2432,6 +2472,8 @@ export interface MediaSelect<T extends boolean = true> {
       };
   status?: T;
   usageCount?: T;
+  User?: T;
+  Operation?: T;
   prefix?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2500,6 +2542,8 @@ export interface MediaCategoriesSelect<T extends boolean = true> {
   icon?: T;
   color?: T;
   order?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2513,6 +2557,8 @@ export interface MediaTagsSelect<T extends boolean = true> {
   category?: T;
   description?: T;
   color?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2573,6 +2619,8 @@ export interface ProductsSelect<T extends boolean = true> {
   isNew?: T;
   order?: T;
   shopOrder?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2593,6 +2641,8 @@ export interface ProductSeriesSelect<T extends boolean = true> {
   products?: T;
   order?: T;
   isFeatured?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2606,6 +2656,8 @@ export interface ProductAttributesSelect<T extends boolean = true> {
   productAttributes?: T;
   specifications?: T;
   customAttributes?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2620,6 +2672,8 @@ export interface ProductTemplatesSelect<T extends boolean = true> {
   name?: T;
   category?: T;
   content?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2633,6 +2687,8 @@ export interface ProductReusableBlocksSelect<T extends boolean = true> {
   title?: T;
   contentTranslation?: T;
   status?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2647,6 +2703,8 @@ export interface SeriesTemplatesSelect<T extends boolean = true> {
   name?: T;
   category?: T;
   content?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2660,6 +2718,8 @@ export interface SeriesReusableBlocksSelect<T extends boolean = true> {
   title?: T;
   contentTranslation?: T;
   status?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2691,6 +2751,8 @@ export interface HeroBannerItemsSelect<T extends boolean = true> {
       };
   order?: T;
   status?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2706,6 +2768,8 @@ export interface SeriesIntroItemsSelect<T extends boolean = true> {
   images?: T;
   imageCropDataList?: T;
   status?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2725,6 +2789,8 @@ export interface NavigationMenusSelect<T extends boolean = true> {
   order?: T;
   isSystem?: T;
   visible?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2767,6 +2833,8 @@ export interface PagesSelect<T extends boolean = true> {
   heroMediaTags?: T;
   heroText?: T;
   heroSubtitle?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2775,8 +2843,6 @@ export interface PagesSelect<T extends boolean = true> {
  * via the `definition` "blogs_select".
  */
 export interface BlogsSelect<T extends boolean = true> {
-  User?: T;
-  Operation?: T;
   adminLabel?: T;
   status?: T;
   publishedAt?: T;
@@ -2829,6 +2895,8 @@ export interface BlogsSelect<T extends boolean = true> {
   kb_bottom_recommended_title?: T;
   kb_bottom_recommended_posts?: T;
   kb_bottom_recommended_logic?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2840,6 +2908,8 @@ export interface BlogTagsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   blogs?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2861,6 +2931,8 @@ export interface ApplicationsSelect<T extends boolean = true> {
         id?: T;
       };
   status?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2891,6 +2963,8 @@ export interface CategoriesSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2907,6 +2981,8 @@ export interface FaqItemsSelect<T extends boolean = true> {
   relatedFaqs?: T;
   order?: T;
   status?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2921,6 +2997,8 @@ export interface ReusableBlocksSelect<T extends boolean = true> {
   subtitle?: T;
   contentTranslation?: T;
   status?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2937,6 +3015,8 @@ export interface DocumentTemplatesSelect<T extends boolean = true> {
   tags?: T;
   usageCount?: T;
   status?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }

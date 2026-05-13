@@ -64,7 +64,7 @@ import { FaqSelectionFeatureDefinition } from './src/lexical-features/faq-select
 import { FaqCarouselFeature } from './src/lexical-features/faq-carousel'
 import { s3Storage } from '@payloadcms/storage-s3'
 
-import { auditorPlugin } from './src/plugins/auditor'
+import { auditorPlugin } from 'payload-auditor'
 
 /**
  * Helper to add audit fields (User, Operation) to tracked collections
