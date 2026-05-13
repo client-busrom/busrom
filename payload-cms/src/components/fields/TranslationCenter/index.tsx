@@ -656,7 +656,15 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
           }
         }
 
-        localesPayload[localeCode] = dataToSave
+        // Defensive cleaning: remove system fields or injected fields that would fail validation
+        // Matching the backend fix in save-translations route
+        const cleanData = { ...dataToSave }
+        const illegalFields = ['User', 'user', 'id', 'createdAt', 'updatedAt', '__v']
+        illegalFields.forEach(f => {
+          if (f in cleanData) delete cleanData[f]
+        })
+
+        localesPayload[localeCode] = cleanData
       }
 
       if (isGlobal) {
