@@ -249,17 +249,6 @@ export const Blogs: CollectionConfig = {
   ],
   fields: [
     {
-      name: 'User',
-      type: 'relationship',
-      relationTo: 'users',
-      admin: { hidden: true },
-    },
-    {
-      name: 'Operation',
-      type: 'text',
-      admin: { hidden: true },
-    },
-    {
       type: 'row',
       fields: [
         {
