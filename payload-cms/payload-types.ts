@@ -880,6 +880,8 @@ export interface Category {
  */
 export interface Blog {
   id: number;
+  User?: (number | null) | User;
+  Operation?: string | null;
   /**
    * This identifier is for internal management and can contain spaces/caps. (e.g. "Blog - Glass Installation")
    */
@@ -2773,6 +2775,8 @@ export interface PagesSelect<T extends boolean = true> {
  * via the `definition` "blogs_select".
  */
 export interface BlogsSelect<T extends boolean = true> {
+  User?: T;
+  Operation?: T;
   adminLabel?: T;
   status?: T;
   publishedAt?: T;
