@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { IconifyIcon } from "@/components/ui/IconifyIcon";
 import { LexicalRenderer } from "@/components/lexical/LexicalRenderer";
@@ -26,6 +26,134 @@ interface CategoryData {
   faqs: FaqItem[];
 }
 
+const FaqItemRow = React.memo(({ 
+  faq, 
+  fIdx, 
+  isOpen, 
+  toggleFaq, 
+  vw 
+}: { 
+  faq: FaqItem; 
+  fIdx: number; 
+  isOpen: boolean; 
+  toggleFaq: (id: string) => void;
+  vw: (px: number) => string;
+}) => {
+  const numStr = (fIdx + 1).toString().padStart(2, "0") + ".";
+  
+  return (
+    <div
+      id={`faq-item-${faq.id}`}
+      className="w-full border-t border-[#c7c3a5] last:border-b"
+    >
+      <div
+        className="group cursor-pointer flex items-start relative"
+        style={{
+          paddingTop: vw(40),
+          paddingBottom: isOpen ? vw(5) : vw(40),
+        }}
+        onClick={() => toggleFaq(faq.id)}
+      >
+        <span
+          className="text-[#756f3f] font-medium leading-none"
+          style={{
+            fontSize: vw(36),
+            fontFamily: "var(--font-anaheim), sans-serif",
+            marginTop: vw(6),
+            width: vw(60),
+          }}
+        >
+          {numStr}
+        </span>
+
+        <h1
+          className="text-black font-bold flex-1 leading-[1.2] m-0"
+          style={{
+            fontSize: vw(40),
+            fontFamily: "var(--font-anaheim), sans-serif",
+            paddingRight: isOpen && faq.image ? vw(200) : vw(66),
+          }}
+        >
+          {faq.question}
+        </h1>
+
+        <div
+          className="absolute right-0 flex items-center justify-end"
+          style={{ width: vw(240), top: isOpen ? vw(50) : vw(40) }}
+        >
+          <AnimatePresence mode="wait">
+            {!isOpen ? (
+              <motion.div
+                key="arrow"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="flex items-center justify-center rounded-full bg-[#ece6d0]"
+                style={{
+                  width: vw(60),
+                  height: vw(60),
+                }}
+              >
+                <svg width={vw(24)} height={vw(24)} viewBox="0 0 24 24" fill="none">
+                  <path d="M9 5L16 12L9 19" stroke="#676767" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </motion.div>
+            ) : (
+              faq.image && (
+                <motion.div
+                  key="image"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className="overflow-hidden border border-white/10"
+                  style={{ width: vw(236), height: vw(236), borderRadius: vw(20) }}
+                >
+                  <OptimizedImage image={faq.image} className="w-full h-full object-cover" />
+                </motion.div>
+              )
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div
+              className="flex"
+              style={{
+                paddingTop: vw(10),
+                paddingBottom: vw(10),
+                paddingLeft: vw(62),
+                paddingRight: vw(260),
+              }}
+            >
+              <div
+                className="flex-1 text-[#605b37] [&_p:first-child]:mt-0 [&_p]:leading-[inherit] [&_p]:tracking-[inherit]"
+                style={{
+                  fontSize: vw(24),
+                  lineHeight: 1.4,
+                  fontFamily: "var(--font-anaheim), sans-serif",
+                  letterSpacing: "0.02em",
+                }}
+              >
+                <LexicalRenderer content={faq.answer} />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+});
+
+FaqItemRow.displayName = "FaqItemRow";
+
 interface FaqDetailSectionProps {
   data: {
     items: any[];
@@ -46,25 +174,26 @@ export function FaqDetailSection({
   activeFaqId,
   setActiveFaqId,
 }: FaqDetailSectionProps) {
-  const categories: CategoryData[] = (data.items || []).map((cat, idx) => {
-    // Generate slug from title since the 'slug' field is missing after parsing
-    const generatedSlug = (cat.title || "")
-      .toLowerCase()
-      .trim()
-      .replace(/[&\s]+/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/[^\w-]/g, "");
+  const categories: CategoryData[] = React.useMemo(() => {
+    return (data.items || []).map((cat, idx) => {
+      const generatedSlug = (cat.title || "")
+        .toLowerCase()
+        .trim()
+        .replace(/[&\s]+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/[^\w-]/g, "");
 
-    return {
-      id: cat.id || `cat-${idx}`,
-      slug: generatedSlug, // Use the generated slug
-      title: cat.title || "",
-      artText: cat.artText || "",
-      image: cat.image,
-      faqs: cat.faqs || [],
-      icon: cat.icon || "lucide:message-circle",
-    };
-  });
+      return {
+        id: cat.id || `cat-${idx}`,
+        slug: generatedSlug,
+        title: cat.title || "",
+        artText: cat.artText || "",
+        image: cat.image,
+        faqs: cat.faqs || [],
+        icon: cat.icon || "lucide:message-circle",
+      };
+    });
+  }, [data.items]);
 
   React.useEffect(() => {
     if (!activeId && categories.length > 0) {
@@ -81,7 +210,10 @@ export function FaqDetailSection({
   };
 
   const scrollRef = React.useRef<HTMLDivElement>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const { scrollYProgress } = useScroll({
+    container: scrollRef,
+  });
+  const scrollBarTop = useTransform(scrollYProgress, [0, 1], ["0%", "80%"]);
 
   // 处理搜索结果的跳转和展开
   React.useEffect(() => {
@@ -106,13 +238,7 @@ export function FaqDetailSection({
     }
   }, [activeFaqId, activeCategory, setActiveFaqId]);
 
-  const handleScroll = () => {
-    if (scrollRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-      const progress = scrollTop / (scrollHeight - clientHeight);
-      setScrollProgress(progress);
-    }
-  };
+  // Remove handleScroll to prevent re-renders
 
   const constraintsRef = React.useRef<HTMLDivElement>(null);
 
@@ -121,15 +247,15 @@ export function FaqDetailSection({
   return (
     <section
       className="relative w-full bg-[#f6f4ed] overflow-hidden"
-      style={{ height: vw(922) }}
+      style={{ height: vw(1080) }}
     >
       {/* 1. Category Tabs */}
       <div
         className="relative w-full flex justify-center z-50"
         ref={constraintsRef}
         style={{
-          paddingTop: vw(50),
-          marginBottom: vw(60),
+          paddingTop: vw(60),
+          marginBottom: vw(80),
           paddingLeft: vw(100),
           paddingRight: vw(100),
         }}
@@ -150,11 +276,12 @@ export function FaqDetailSection({
                 id={slug ? `faq-${slug}` : undefined}
                 onClick={() => setActiveId(cat.id)}
                 className={`flex items-center transition-all duration-500 relative shrink-0 ${
-                  isActive ? "opacity-100" : "opacity-80 hover:opacity-100"
+                  isActive ? "scale-105 z-20" : "opacity-80 hover:opacity-100 z-10"
                 }`}
               >
+                {/* 1. Icon Circle (Always dark olive) */}
                 <div
-                  className="z-10 flex items-center justify-center rounded-full bg-[#756f3f] shadow-[0_4px_20px_rgba(0,0,0,0.15)]"
+                  className="z-10 flex items-center justify-center rounded-full bg-[#756f3f] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
                   style={{ width: vw(72), height: vw(72) }}
                 >
                   <div style={{ width: vw(32), height: vw(32) }}>
@@ -166,8 +293,11 @@ export function FaqDetailSection({
                   </div>
                 </div>
 
+                {/* 2. Pill Background: Color Inversion for Active State */}
                 <div
-                  className="bg-[#dbd5ab] rounded-full border border-[#a0974d] flex flex-col justify-center"
+                  className={`rounded-full border transition-all duration-500 flex flex-col justify-center ${
+                    isActive ? "bg-[#756f3f] border-[#756f3f] shadow-lg" : "bg-[#dbd5ab] border-[#a0974d]"
+                  }`}
                   style={{
                     height: vw(72),
                     minWidth: vw(180),
@@ -177,7 +307,9 @@ export function FaqDetailSection({
                   }}
                 >
                   <span
-                    className="font-bold text-[#645c1d] tracking-widest text-left"
+                    className={`font-bold tracking-widest text-left transition-colors duration-500 ${
+                      isActive ? "text-white" : "text-[#645c1d]"
+                    }`}
                     style={{
                       fontSize: vw(20),
                       fontFamily: "var(--font-anaheim), sans-serif",
@@ -193,6 +325,15 @@ export function FaqDetailSection({
                     ))}
                   </span>
                 </div>
+
+                {/* 3. Layout Underline: Sliding Indicator */}
+                {isActive && (
+                  <motion.div
+                    layoutId="pill-underline"
+                    className="absolute -bottom-2 left-4 right-0 h-[3px] bg-[#756f3f] rounded-full"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
               </button>
             );
           })}
@@ -207,7 +348,7 @@ export function FaqDetailSection({
         <div className="flex flex-col relative" style={{ width: vw(520) }}>
           <div
             className="absolute z-0 pointer-events-none select-none"
-            style={{ left: vw(-140), top: vw(-240) }}
+            style={{ left: vw(-140), top: vw(-210) }}
           >
             <motion.div
               key={`amp-decor-${activeId}`}
@@ -262,139 +403,20 @@ export function FaqDetailSection({
         <div className="flex-1 relative" style={{ paddingTop: vw(10) }}>
           <div
             ref={scrollRef}
-            onScroll={handleScroll}
             className="overflow-y-auto custom-scrollbar"
             style={{ height: vw(580), paddingRight: vw(60) }}
             data-lenis-prevent
           >
-            {activeCategory.faqs.map((faq, fIdx) => {
-              const isOpen = !!openFaqs[faq.id];
-              const numStr = (fIdx + 1).toString().padStart(2, "0") + ".";
-
-              return (
-                <div
-                  key={faq.id}
-                  id={`faq-item-${faq.id}`}
-                  className="w-full border-t border-[#c7c3a5] first:border-t-2"
-                >
-                  <div
-                    className="group cursor-pointer flex items-start"
-                    style={{
-                      paddingTop: vw(35),
-                      paddingBottom: vw(35),
-                      gap: vw(30),
-                    }}
-                    onClick={() => toggleFaq(faq.id)}
-                  >
-                    <span
-                      className="text-[#756f3f] font-medium leading-none"
-                      style={{
-                        fontSize: vw(36),
-                        fontFamily: "var(--font-anaheim), sans-serif",
-                        marginTop: vw(8),
-                      }}
-                    >
-                      {numStr}
-                    </span>
-
-                    <h1
-                      className="text-black font-bold flex-1 leading-[1.2]"
-                      style={{
-                        fontSize: vw(38),
-                        fontFamily: "var(--font-anaheim), sans-serif",
-                      }}
-                    >
-                      {faq.question}
-                    </h1>
-
-                    {/* Action Slot: Shows Arrow when closed, Image when open */}
-                    <div
-                      className="relative shrink-0"
-                      style={{ width: vw(180), height: vw(60) }}
-                    >
-                      <AnimatePresence mode="wait">
-                        {!isOpen ? (
-                          <motion.div
-                            key="arrow"
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.8 }}
-                            className="flex items-center justify-center rounded-full bg-[#ece6d0] absolute right-0"
-                            style={{
-                              width: vw(60),
-                              height: vw(60),
-                              marginTop: vw(4),
-                            }}
-                          >
-                            <svg
-                              width={vw(24)}
-                              height={vw(24)}
-                              viewBox="0 0 24 24"
-                              fill="none"
-                            >
-                              <path
-                                d="M9 5L16 12L9 19"
-                                stroke="#676767"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </motion.div>
-                        ) : (
-                          faq.image && (
-                            <motion.div
-                              key="image"
-                              initial={{ opacity: 0, x: 20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              exit={{ opacity: 0, x: 20 }}
-                              className="rounded-[20px] overflow-hidden border border-white/10 absolute right-0 top-0"
-                              style={{ width: vw(180), height: vw(180) }}
-                            >
-                              <OptimizedImage
-                                image={faq.image}
-                                className="w-full h-full object-cover"
-                              />
-                            </motion.div>
-                          )
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </div>
-
-                  <AnimatePresence>
-                    {isOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden"
-                      >
-                        <div
-                          className="flex"
-                          style={{
-                            paddingBottom: vw(40),
-                            paddingLeft: vw(88),
-                            paddingRight: vw(220),
-                          }}
-                        >
-                          <div
-                            className="flex-1 text-[#605b37]"
-                            style={{
-                              fontSize: vw(22),
-                              lineHeight: 1.4,
-                              fontFamily: "var(--font-anaheim), sans-serif",
-                            }}
-                          >
-                            <LexicalRenderer content={faq.answer} />
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              );
-            })}
+            {activeCategory.faqs.map((faq, fIdx) => (
+              <FaqItemRow 
+                key={faq.id}
+                faq={faq}
+                fIdx={fIdx}
+                isOpen={!!openFaqs[faq.id]}
+                toggleFaq={toggleFaq}
+                vw={vw}
+              />
+            ))}
           </div>
 
           {/* Scrollbar */}
@@ -411,7 +433,7 @@ export function FaqDetailSection({
               className="w-full bg-[#756f3f] rounded-full"
               style={{
                 height: "20%",
-                top: `${scrollProgress * 80}%`,
+                top: scrollBarTop,
                 position: "absolute",
               }}
             />
@@ -422,7 +444,7 @@ export function FaqDetailSection({
       {/* 4. Action Button */}
       <div
         className="absolute z-[100]"
-        style={{ right: vw(240), bottom: vw(40) }}
+        style={{ right: vw(240), bottom: vw(160) }}
       >
         <a
           href={data.selection?.viewButtonLink || "#"}
@@ -432,17 +454,16 @@ export function FaqDetailSection({
             whileHover={{ scale: 1.05 }}
             className="flex items-center justify-between bg-[#756f3f] rounded-full shadow-2xl"
             style={{
-              width: vw(320),
+              width: 'auto',
               height: vw(76),
               paddingLeft: vw(26),
               paddingRight: vw(9),
             }}
           >
             <span
-              className="text-white font-bold tracking-widest"
+              className="text-white font-medium font-anaheim mx-3"
               style={{
                 fontSize: vw(20),
-                fontFamily: "var(--font-lexend-deca), sans-serif",
               }}
             >
               {data.selection?.viewButtonText || "VIEW MORE"}

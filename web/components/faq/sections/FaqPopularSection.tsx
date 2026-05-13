@@ -54,16 +54,20 @@ const getNodesText = (nodes: any, locale?: string): string => {
 const truncateLexicalContent = (content: any) => {
   if (!content || !content.root || !content.root.children) return content;
 
-  const newContent = JSON.parse(JSON.stringify(content));
-  const hrIndex = newContent.root.children.findIndex(
+  const hrIndex = content.root.children.findIndex(
     (node: any) => node.type === "horizontalrule"
   );
 
-  if (hrIndex !== -1) {
-    newContent.root.children = newContent.root.children.slice(0, hrIndex);
-  }
+  if (hrIndex === -1) return content;
 
-  return newContent;
+  // Use shallow copy for the outer structure to be efficient
+  return {
+    ...content,
+    root: {
+      ...content.root,
+      children: content.root.children.slice(0, hrIndex)
+    }
+  };
 };
 
 /**
@@ -100,12 +104,18 @@ const faqConverters: JSXConverters = {
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 
+import { useIsMobile } from "@/hooks/use-mobile";
+
 export function FaqPopularSection({ data, locale = "en" }: FaqPopularSectionProps) {
+  const isMobile = useIsMobile();
+  const mvw = (px: number) => `${(px / 375) * 100}vw`;
+  
   const [activeIndex, setActiveIndex] = useState(0);
   const [totalIndex, setTotalIndex] = useState(0);
   const [direction, setDirection] = useState(1); // 1 for next, -1 for prev
   const [faqDataCache, setFaqDataCache] = useState<Record<string, any>>({});
   const [mediaCache, setMediaCache] = useState<Record<string, any>>({});
+  const fetchingIdsRef = useRef<Set<string>>(new Set());
   const lastClickTimeRef = useRef(0);
   
   // Support both direct items and nested carousel.slides
@@ -126,23 +136,32 @@ export function FaqPopularSection({ data, locale = "en" }: FaqPopularSectionProp
     slides.forEach((slide: any) => {
       // Hydrate FAQ
       const faqId = slide.faq;
-      if (faqId && typeof faqId !== "object" && !faqDataCache[faqId]) {
+      if (faqId && typeof faqId !== "object" && !faqDataCache[faqId] && !fetchingIdsRef.current.has(faqId)) {
+        fetchingIdsRef.current.add(faqId);
         fetch(`/api/payload/faq-items/${faqId}?depth=0`)
           .then(res => res.json())
           .then(d => setFaqDataCache(prev => ({ ...prev, [faqId]: d })))
-          .catch(err => console.error("FAQ Fetch Error:", err));
+          .catch(err => {
+            console.error("FAQ Fetch Error:", err);
+            fetchingIdsRef.current.delete(faqId);
+          });
       }
 
       // Hydrate Media
       const imageId = slide.image || slide.image1;
-      if (imageId && typeof imageId !== "object" && !mediaCache[imageId]) {
+      const idStr = String(imageId);
+      if (imageId && typeof imageId !== "object" && !mediaCache[idStr] && !fetchingIdsRef.current.has(idStr)) {
+        fetchingIdsRef.current.add(idStr);
         fetch(`/api/payload/media/${imageId}?depth=0`)
           .then(res => res.json())
-          .then(d => setMediaCache(prev => ({ ...prev, [imageId]: d })))
-          .catch(err => console.error("Media Fetch Error:", err));
+          .then(d => setMediaCache(prev => ({ ...prev, [idStr]: d })))
+          .catch(err => {
+            console.error("Media Fetch Error:", err);
+            fetchingIdsRef.current.delete(idStr);
+          });
       }
     });
-  }, [slides, faqDataCache, mediaCache]);
+  }, [slides]); // Only run when slides change
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -199,8 +218,123 @@ export function FaqPopularSection({ data, locale = "en" }: FaqPopularSectionProp
   }, [handleNext, slides.length, activeIndex]);
 
   if (!currentSlide || slides.length === 0) return null;
-  
-  // Removed global isLoading return to keep timers and UI structure stable
+
+  if (isMobile) {
+    return (
+      <section className="relative w-full py-12 bg-[#f6f4ed] overflow-hidden">
+        {/* Background Section (Decorative only) */}
+        <div 
+          className="absolute pointer-events-none select-none right-0 top-0 opacity-10" 
+          style={{ marginTop: mvw(-20) }}
+        >
+          <HollowText
+            strokeColor="#c6c091"
+            strokeWidth={0.5}
+            className="font-bold uppercase z-0"
+            style={{
+              fontFamily: "var(--font-anaheim), sans-serif",
+              fontSize: mvw(80),
+              letterSpacing: mvw(5),
+            }}
+          >
+            {getNodesText(data.subtitle) || "POPULAR"}
+          </HollowText>
+        </div>
+
+        <div className="px-8 mb-8 relative z-10 flex flex-col gap-1">
+          {data.subtitle && (
+            <p
+              className="font-bold uppercase text-[#756f3f]/60"
+              style={{
+                fontFamily: "var(--font-anaheim), sans-serif",
+                fontSize: mvw(14),
+                letterSpacing: mvw(2),
+              }}
+            >
+              {getNodesText(data.subtitle)}
+            </p>
+          )}
+          <h2
+            className="font-extrabold text-[#756f3f]"
+            style={{
+              fontFamily: "var(--font-anaheim), sans-serif",
+              fontSize: mvw(32),
+              lineHeight: 1.2,
+            }}
+          >
+            {getNodesText(data.title)}
+          </h2>
+        </div>
+
+        {/* Mobile Card Carousel */}
+        <div className="overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
+          <div className="flex">
+            {slides.map((slide: any, index: number) => {
+              const slideFaqData = slide.faq && typeof slide.faq !== "object" 
+                ? faqDataCache[slide.faq] 
+                : (slide.faq || slide);
+              
+              const slideMediaData = slide.image1 && typeof slide.image1 !== "object"
+                ? mediaCache[slide.image1]
+                : slide.image1;
+
+              return (
+                <div 
+                  key={slide.id || index} 
+                  className="flex-[0_0_88%] min-w-0 pl-6 last:pr-6"
+                >
+                  <div 
+                    className="rounded-[28px] overflow-hidden flex flex-col h-full"
+                    style={{ background: "linear-gradient(180deg, #756f3f 0%, #c0b985 100%)" }}
+                  >
+                    {/* Image Unit - Fixed Aspect Ratio */}
+                    <div className="aspect-[16/10] w-full overflow-hidden">
+                      <OptimizedImage
+                        image={slideMediaData}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    
+                    {/* Content Unit - Light Text on Dark Background */}
+                    <div className="p-7 flex flex-col gap-4">
+                      <div className="font-anaheim font-bold text-white leading-tight" style={{ fontSize: mvw(22) }}>
+                        {typeof slideFaqData?.question === 'string' ? (
+                          slideFaqData.question
+                        ) : (
+                          <RichText 
+                            data={truncateLexicalContent(slideFaqData?.question)} 
+                            converters={faqConverters} 
+                          />
+                        )}
+                      </div>
+                      <div className="font-anaheim font-medium text-white/80 leading-relaxed" style={{ fontSize: mvw(15) }}>
+                        <RichText 
+                          data={truncateLexicalContent(slideFaqData?.contentTranslation || slideFaqData?.answer)} 
+                          converters={faqConverters} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Pagination Dots */}
+        <div className="flex justify-center gap-2.5 mt-10">
+          {slides.map((_: any, idx: number) => (
+            <div
+              key={idx}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                activeIndex % slides.length === idx ? "w-8 bg-[#756f3f]" : "w-1.5 bg-[#756f3f]/20"
+              }`}
+            />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -209,7 +343,7 @@ export function FaqPopularSection({ data, locale = "en" }: FaqPopularSectionProp
     >
       {/* Background Main Card (Embla Viewport) */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 rounded-[30px] shadow-2xl overflow-hidden cursor-grab active:cursor-grabbing"
+        className="absolute left-1/2 -translate-x-1/2 rounded-[30px] shadow-xl overflow-hidden cursor-grab active:cursor-grabbing"
         ref={emblaRef}
         style={{
           width: vw(1460),
@@ -510,7 +644,8 @@ export function FaqPopularSection({ data, locale = "en" }: FaqPopularSectionProp
                       duration: isLeavingActive ? 0.3 : 0.5,
                     },
                   }}
-                  className="absolute rounded-[30px] overflow-hidden shadow-2xl -translate-x-1/2"
+                  className="absolute overflow-hidden shadow-2xl -translate-x-1/2"
+                  style={{ borderRadius: vw(30) }}
                 >
                   <OptimizedImage
                     image={item.image1}
@@ -558,7 +693,7 @@ export function FaqPopularSection({ data, locale = "en" }: FaqPopularSectionProp
             </div>
             <div
               className="font-semibold text-[#3c3607] font-anaheim [&_p]:m-0"
-              style={{ fontSize: vw(20), lineHeight: 1.5 }}
+              style={{ fontSize: vw(24), lineHeight: 1.5 }}
             >
               <RichText 
                 data={truncateLexicalContent(activeFaqData?.contentTranslation || activeFaqData?.answer)} 
