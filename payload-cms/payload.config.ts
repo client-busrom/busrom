@@ -140,7 +140,6 @@ import { NavigationMenus } from './src/collections/NavigationMenus'
 import { Roles } from './src/collections/Roles'
 import { Permissions } from './src/collections/Permissions'
 // Content Collections
-import { auditorPlugin } from './src/plugins/auditor'
 import { Pages } from './src/collections/Pages'
 import { Blogs } from './src/collections/Blogs'
 import { BlogTags } from './src/collections/BlogTags'
