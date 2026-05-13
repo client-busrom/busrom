@@ -159,48 +159,6 @@ import { SmtpConfigs } from './src/collections/SmtpConfigs'
 
 import type { CollectionConfig } from 'payload'
 
-/**
- * Helper to add audit fields (User, Operation) to tracked collections
- * to avoid "Invalid field: User" errors from the auditor plugin.
- */
-const augmentTrackedCollections = (collections: CollectionConfig[]): CollectionConfig[] => {
-  const trackedSlugs = [
-    'media', 'media-categories', 'media-tags', 
-    'products', 'product-series', 'product-attributes', 'product-templates', 'product-reusable-blocks',
-    'series-templates', 'series-reusable-blocks',
-    'hero-banner-items', 'series-intro-items',
-    'navigation-menus',
-    'pages', 'blogs', 'blog-tags', 'applications', 'categories', 'faq-items', 'reusable-blocks', 'document-templates'
-  ]
-
-  return collections.map(col => {
-    if (trackedSlugs.includes(col.slug)) {
-      const existingFieldNames = col.fields.map(f => 'name' in f ? f.name : '')
-      const newFields = [...col.fields]
-      
-      if (!existingFieldNames.includes('User')) {
-        newFields.push({
-          name: 'User',
-          type: 'relationship',
-          relationTo: 'users',
-          admin: { hidden: true },
-        })
-      }
-      
-      if (!existingFieldNames.includes('Operation')) {
-        newFields.push({
-          name: 'Operation',
-          type: 'text',
-          admin: { hidden: true },
-        })
-      }
-      
-      return { ...col, fields: newFields }
-    }
-    return col
-  })
-}
-
 
 // Content Blocks for Lexical Editor
 import { contentBlocks } from './src/blocks'
