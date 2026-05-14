@@ -51,6 +51,8 @@ const i18n = {
   hint: { en: 'Sections are shared across languages, but content is unique per locale.', zh: '板块结构在所有语言间共享，但每个语言的内容可独立配置。' },
   translationCompleted: { en: 'Translation completed!', zh: '翻译完成！' },
   translationFailed: { en: 'Translation failed', zh: '翻译失败' },
+  noChanges: { en: 'No changes to save', zh: '没有修改需要保存' },
+  selectLanguages: { en: 'Please select target languages', zh: '请选择目标语言' },
 }
 
 interface KnowledgeSection {
@@ -329,18 +331,18 @@ export const MultilingualKnowledgeSections: React.FC<any> = ({ path }) => {
   const handleTranslate = useCallback(async () => {
     const sourceItems = value?.[sourceLanguage]
     if (!sourceItems || sourceItems.length === 0) {
-      setError(`Source content (${sourceLanguage.toUpperCase()}) is empty.`)
+      setError(t(i18n.sourceLanguage) + " " + (activeLocale === 'zh' ? '内容为空' : 'content is empty'))
       return
     }
 
     if (selectedLanguages.length === 0) {
-      setError(t(i18n.translate))
+      setError(t(i18n.selectLanguages))
       return
     }
 
     setIsTranslating(true)
     setError('')
-    setStatus('Translating...')
+    setStatus(t(i18n.translating))
 
     try {
       const { getTranslationHeaders } = await import('@/lib/translation-client')

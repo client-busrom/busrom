@@ -600,10 +600,12 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
 
     // 使用简单的消息映射，避免 t() 的参数替换问题
     const messages: Record<string, string> = {
-      'custom:translationCenter:selectTargetLanguages': t('custom:translationCenter:selectTargetLanguages' as any) as string,
-      'custom:translationCenter:translateFailed': t('custom:translationCenter:translateFailed' as any) as string,
-      'custom:translationCenter:saveFailed': t('custom:translationCenter:saveFailed' as any) as string,
-      'custom:translationCenter:loadFailed': t('custom:translationCenter:loadFailed' as any) as string,
+      'custom:translationCenter:selectTargetLanguages': t('custom:translationCenter:selectTargetLanguages' as any) === 'custom:translationCenter:selectTargetLanguages' ? (i18n.language === 'zh' ? '请选择目标语言' : 'Please select target languages') : t('custom:translationCenter:selectTargetLanguages' as any) as string,
+      'custom:translationCenter:translateFailed': t('custom:translationCenter:translateFailed' as any) === 'custom:translationCenter:translateFailed' ? (i18n.language === 'zh' ? '翻译失败' : 'Translation failed') : t('custom:translationCenter:translateFailed' as any) as string,
+      'custom:translationCenter:saveFailed': t('custom:translationCenter:saveFailed' as any) === 'custom:translationCenter:saveFailed' ? (i18n.language === 'zh' ? '保存失败' : 'Save failed') : t('custom:translationCenter:saveFailed' as any) as string,
+      'custom:translationCenter:loadFailed': t('custom:translationCenter:loadFailed' as any) === 'custom:translationCenter:loadFailed' ? (i18n.language === 'zh' ? '加载数据失败' : 'Load failed') : t('custom:translationCenter:loadFailed' as any) as string,
+      'custom:translationCenter:noChanges': t('custom:translationCenter:noChanges' as any) === 'custom:translationCenter:noChanges' ? (i18n.language === 'zh' ? '没有修改需要保存' : 'No changes to save') : t('custom:translationCenter:noChanges' as any) as string,
+      'custom:translationCenter:sourceEmpty': t('custom:translationCenter:sourceEmpty' as any) === 'custom:translationCenter:sourceEmpty' ? (i18n.language === 'zh' ? '源语言内容为空' : 'The source language content is empty') : t('custom:translationCenter:sourceEmpty' as any) as string,
     }
 
     // 对于带参数的消息，手动构建

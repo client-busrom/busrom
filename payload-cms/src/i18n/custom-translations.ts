@@ -14,6 +14,12 @@
  */
 
 export const customTranslationsEn = {
+  general: {
+    status: 'Status',
+    published: 'Published',
+    draft: 'Draft',
+    archived: 'Archived',
+  },
   custom: {
     // ========================================================================
     // Translation Center Component
@@ -106,6 +112,7 @@ export const customTranslationsEn = {
       success: 'success',
       failed: 'failed',
       loadFailed: 'Failed to load form fields data',
+      noChanges: 'No changes to save',
     },
     knowledgeSectionsTranslation: {
       title: 'Knowledge Sections Translation',
@@ -114,6 +121,7 @@ export const customTranslationsEn = {
       saveAll: 'Save All Section Translations',
       noFields: 'No translatable fields found in sections. Please save sections first.',
       batchTranslate: 'Batch Translate Content',
+      noChanges: 'No changes to save',
     },
 
     // ========================================================================
@@ -531,6 +539,7 @@ export const customTranslationsZh = {
       success: '成功',
       failed: '失败',
       loadFailed: '加载表单字段数据失败',
+      noChanges: '没有修改需要保存',
     },
     knowledgeSectionsTranslation: {
       title: '页面拼板块翻译',
@@ -539,6 +548,7 @@ export const customTranslationsZh = {
       saveAll: '保存所有板块翻译',
       noFields: '未在板块中找到可翻译字段，请先保存板块。',
       batchTranslate: '批量翻译内容',
+      noChanges: '没有修改需要保存',
     },
 
     // ========================================================================

@@ -15,6 +15,7 @@ import { syncM2M, cleanupM2M } from '../hooks/syncM2M'
 import { autoIndexHook } from '../hooks/autoIndex'
 import { autoIndexDeleteHook } from '../hooks/autoIndexDelete'
 import { createKBWidgetField, KB_WIDGET_SUBFIELDS } from '../fields/knowledgeBaseWidgets'
+import { LABELS, OPTIONS } from '../i18n/admin-labels'
 
 import { formatSlug } from '../hooks/formatSlug'
 
@@ -292,6 +293,7 @@ export const Blogs: CollectionConfig = {
           type: 'ui',
           admin: {
             width: '50%',
+            disableListColumn: true,
             components: {
               Field: '@/components/fields/TranslationCenter',
             },
@@ -302,6 +304,7 @@ export const Blogs: CollectionConfig = {
           type: 'ui',
           admin: {
             width: '50%',
+            disableListColumn: true,
             components: {
               Field: '@/components/fields/GoogleIndexingButton',
             },
@@ -329,12 +332,9 @@ export const Blogs: CollectionConfig = {
         {
           name: 'status',
           type: 'select',
+          label: LABELS.status,
           // localized: true, // REVERTED
-          options: [
-            { label: { en: 'Published', zh: '已发布' }, value: 'published' },
-            { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
-            { label: { en: 'Archived', zh: '已存档' }, value: 'archived' },
-          ],
+          options: [...OPTIONS.status],
           admin: {
             width: '40%',
             position: 'sidebar',

@@ -160,6 +160,10 @@ export const Categories: CollectionConfig = {
     {
       name: 'fullTitle',
       type: 'text',
+      label:{
+        en: 'Full Title',
+        zh: '完整标题',
+      },
       admin: {
         hidden: true,
       },

@@ -82,9 +82,75 @@ const augmentTrackedCollections = (collections: CollectionConfig[]): CollectionC
     'document-templates', 'seo-settings', 'custom-scripts'
   ]
 
-  return collections.map(col => {
-    if (trackedSlugs.includes(col.slug)) {
-      const existingFieldNames = col.fields.map(f => 'name' in f ? f.name : '')
+  const augmentFields = (fields: any[], shouldLocalizeStatus: boolean): any[] => {
+    return fields.map((field: any) => {
+      if ('name' in field && field.name) {
+        // Hide UI translation/indexing components from list view
+        if (
+          ['translationCenter', 'googleIndexing', 'formFieldsTranslationCenter'].includes(
+            field.name,
+          )
+        ) {
+          return {
+            ...field,
+            admin: {
+              ...(field.admin || {}),
+              disableListColumn: true,
+              disableListFilter: true,
+            },
+          }
+        }
+
+        // Localize status select field - ONLY label, NEVER touch values/options to avoid DB errors
+        if (shouldLocalizeStatus && field.name === 'status' && 'type' in field && field.type === 'select') {
+          return {
+            ...field,
+            label: LABELS.status,
+            // Only update labels of options if they match our standard keys, preserve everything else
+            options: (field.options || []).map((opt: any) => {
+              const val = typeof opt === 'string' ? opt : opt.value
+              const label = typeof opt === 'string' ? opt : opt.label
+              
+              // Map standard values to localized labels
+              if (val === 'published') return { label: { en: 'Published', zh: '已发布' }, value: val }
+              if (val === 'draft') return { label: { en: 'Draft', zh: '草稿' }, value: val }
+              if (val === 'archived') return { label: { en: 'Archived', zh: '已存档' }, value: val }
+              
+              return opt // Preserve non-standard options like 'active', 'enabled' etc.
+            }),
+          }
+        }
+      }
+
+      // Recursively handle nested fields in layouts (row, group, collapsible, etc.)
+      if ('fields' in field && Array.isArray(field.fields)) {
+        return {
+          ...field,
+          fields: augmentFields(field.fields, shouldLocalizeStatus),
+        }
+      }
+
+      // Recursively handle tabs
+      if ('tabs' in field && Array.isArray(field.tabs)) {
+        return {
+          ...field,
+          tabs: field.tabs.map((tab: any) => ({
+            ...tab,
+            fields: augmentFields(tab.fields, shouldLocalizeStatus),
+          })),
+        }
+      }
+
+      return field
+    })
+  }
+
+  return collections.map((col: any) => {
+    const isTracked = trackedSlugs.includes(col.slug)
+    col.fields = augmentFields(col.fields, isTracked)
+
+    if (isTracked) {
+      const existingFieldNames = col.fields.map((f: any) => ('name' in f ? f.name : ''))
       const newFields = [...col.fields]
       
       // Revert to uppercase as the plugin seems to expect it strictly
@@ -93,7 +159,11 @@ const augmentTrackedCollections = (collections: CollectionConfig[]): CollectionC
           name: 'User',
           type: 'relationship',
           relationTo: 'users',
-          admin: { hidden: true },
+          admin: { 
+            hidden: true,
+            disableListColumn: true,
+            disableListFilter: true,
+          },
         })
       }
       
@@ -101,7 +171,11 @@ const augmentTrackedCollections = (collections: CollectionConfig[]): CollectionC
         newFields.push({
           name: 'Operation',
           type: 'text',
-          admin: { hidden: true },
+          admin: { 
+            hidden: true,
+            disableListColumn: true,
+            disableListFilter: true,
+          },
         })
       }
       
@@ -125,6 +199,8 @@ import { regenerateImageSizesTask } from './src/jobs/regenerateImageSizes'
 import { en } from '@payloadcms/translations/languages/en'
 import { zh } from '@payloadcms/translations/languages/zh'
 import { customTranslationsEn, customTranslationsZh } from './src/i18n/custom-translations'
+import { zhTranslations } from './src/i18n/zh'
+import { LABELS, OPTIONS } from './src/i18n/admin-labels'
 
 // Collections
 import { Users } from './src/collections/Users'
@@ -746,10 +822,19 @@ export default buildConfig({
       en: {
         ...en.translations,
         ...customTranslationsEn,
+        'general:status': 'Status',
+        'general:published': 'Published',
+        'general:draft': 'Draft',
+        'general:archived': 'Archived',
       },
       zh: {
         ...zh.translations,
         ...customTranslationsZh,
+        ...zhTranslations,
+        'general:status': zhTranslations.general.status,
+        'general:published': zhTranslations.general.published,
+        'general:draft': zhTranslations.general.draft,
+        'general:archived': zhTranslations.general.archived,
         'general:createdAt': '创建该条目的时间',
         'general:updatedAt': '更新修改保存的时间',
       },

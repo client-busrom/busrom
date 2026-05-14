@@ -182,6 +182,22 @@ export const AttributesTableField: React.FC<AttributesTableFieldProps> = ({ path
     updateLocaleItems(activeLocale, newItems)
   }, [items, activeLocale, updateLocaleItems])
 
+  // --- Selection Helpers ---
+  const handleSelectAllTargets = useCallback(() => {
+    setTargetLocales(SUPPORTED_LOCALES.filter(l => l.code !== sourceLocale).map(l => l.code as LocaleCode))
+  }, [sourceLocale])
+
+  const handleSelectEmptyTargets = useCallback(() => {
+    const emptyLocales = localeData
+      .filter(l => l.locale !== sourceLocale && (!l.items || l.items.length === 0))
+      .map(l => l.locale)
+    setTargetLocales(emptyLocales)
+  }, [sourceLocale, localeData])
+
+  const handleCancelAllTargets = useCallback(() => {
+    setTargetLocales([])
+  }, [])
+
   const handleTranslate = async () => {
     const sourceData = localeData.find(l => l.locale === sourceLocale)
     const sourceItems = sourceData?.items || []
@@ -365,7 +381,9 @@ export const AttributesTableField: React.FC<AttributesTableFieldProps> = ({ path
               <div className="target-header">
                 <label>{isZh ? `目标语言 (${targetLocales.length})` : `Targets (${targetLocales.length})`}</label>
                 <div className="target-actions">
-                  <button type="button" onClick={() => setTargetLocales(SUPPORTED_LOCALES.filter(l => l.code !== sourceLocale).map(l => l.code as LocaleCode))}>All</button>
+                  <button type="button" onClick={handleSelectAllTargets} disabled={isTranslating}>{isZh ? '全选' : 'All'}</button>
+                  <button type="button" onClick={handleSelectEmptyTargets} disabled={isTranslating}>{isZh ? '选空' : 'Empty'}</button>
+                  <button type="button" onClick={handleCancelAllTargets} disabled={isTranslating}>{isZh ? '取消' : 'Cancel'}</button>
                 </div>
               </div>
               <div className="target-locales">

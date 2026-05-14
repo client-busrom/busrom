@@ -365,6 +365,10 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
     setTargetLocales(emptyLocales)
   }, [sourceLocale, localeData])
 
+  const handleCancelAllTargets = useCallback(() => {
+    setTargetLocales([])
+  }, [])
+
   // Calculate completion stats
   const completedCount = localeData.filter(l => l.specifications && l.specifications.length > 0).length
   const completionPercentage = Math.round((completedCount / SUPPORTED_LOCALES.length) * 100)
@@ -440,6 +444,9 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                   </button>
                   <button type="button" onClick={handleSelectEmptyTargets} disabled={isTranslating}>
                     {isZh ? '选空' : 'Select Empty'}
+                  </button>
+                  <button type="button" onClick={handleCancelAllTargets} disabled={isTranslating}>
+                    {isZh ? '取消' : 'Cancel All'}
                   </button>
                 </div>
               </div>
