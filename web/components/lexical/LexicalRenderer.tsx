@@ -1291,7 +1291,6 @@ export const customConverters: JSXConverters = {
     return (
       <Tag
         id={id}
-        className={`${Tag === "h2" ? "text-[26px] mt-20 mb-10" : "text-[22px] mt-12 mb-6"} font-montserrat font-extrabold text-[#060C14] !leading-[1.4] block`}
       >
         {nodesToJSX({ nodes: node.children })}
       </Tag>
@@ -1308,7 +1307,7 @@ export const customConverters: JSXConverters = {
     return (
       <h1
         id={id}
-        className="text-4xl font-montserrat font-extrabold text-[#060C14] mb-6 mt-16"
+        className="text-3xl font-montserrat font-bold mb-6 mt-12"
       >
         {nodesToJSX({ nodes: node.children })}
       </h1>
@@ -1325,7 +1324,7 @@ export const customConverters: JSXConverters = {
     return (
       <h2
         id={id}
-        className="text-[26px] font-montserrat font-extrabold text-[#060C14] mt-20 mb-10 !leading-[1.4] block"
+        className="text-2xl font-montserrat font-bold mt-16 mb-8"
       >
         {nodesToJSX({ nodes: node.children })}
       </h2>
@@ -1342,7 +1341,7 @@ export const customConverters: JSXConverters = {
     return (
       <h3
         id={id}
-        className="text-[22px] font-montserrat font-extrabold text-[#060C14] mt-12 mb-6 !leading-tight block"
+        className="text-xl font-montserrat font-bold mt-10 mb-4"
       >
         {nodesToJSX({ nodes: node.children })}
       </h3>
@@ -1352,7 +1351,7 @@ export const customConverters: JSXConverters = {
     const Tag = node.listType === "number" ? "ol" : "ul";
     return (
       <Tag
-        className={`my-6 ml-6 ${node.listType === "number" ? "list-decimal" : "list-disc"} space-y-2 text-[#474642]/90`}
+        className={`mb-4 pl-8 ${node.listType === "number" ? "list-decimal" : "list-disc"} space-y-1`}
       >
         {nodesToJSX({ nodes: node.children })}
       </Tag>
@@ -1360,7 +1359,7 @@ export const customConverters: JSXConverters = {
   },
   listitem: ({ node, nodesToJSX }: any) => {
     return (
-      <li className="leading-relaxed pl-1">
+      <li className="leading-normal">
         {nodesToJSX({ nodes: node.children })}
       </li>
     );
@@ -1435,7 +1434,7 @@ export const customConverters: JSXConverters = {
   },
   paragraph: ({ node, nodesToJSX }: any) => {
     return (
-      <p className="my-5 leading-[1.8] text-[#474642]/90">
+      <p className="mb-4 leading-relaxed text-inherit">
         {nodesToJSX({ nodes: node.children })}
       </p>
     );
@@ -1590,7 +1589,7 @@ export const LexicalRenderer = React.memo(function LexicalRenderer({
 
   return (
     <MediaContext.Provider value={{ media: mediaData, reusableBlocks }}>
-      <div className={`lexical-content ${className}`}>
+      <div className={`lexical-content prose prose-stone max-w-none ${className}`}>
         <RichText data={content} converters={converters} />
       </div>
     </MediaContext.Provider>

@@ -62,7 +62,7 @@ export function BlogDetailClient({ locale, slug, blog, config }: BlogDetailClien
     return (
       <div className="min-h-screen bg-[#F4F1ED] pt-32 pb-20">
         <div className="container mx-auto px-6 text-center">
-          <h1 className="text-3xl font-serif text-[#474642] mb-4">
+          <h1 className="text-3xl font-montserrat text-[#000000] mb-4">
             {locale === "zh" ? "文章未找到" : "Blog Post Not Found"}
           </h1>
           <p className="text-gray-500 mb-8">{error}</p>

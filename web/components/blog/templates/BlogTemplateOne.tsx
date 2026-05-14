@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import type { Locale } from "@/i18n.config";
-import { LexicalRenderer } from "@/components/lexical/LexicalRenderer";
+import { BlogLexicalRenderer } from "@/components/blog/BlogLexicalRenderer";
 import Link from "next/link";
 import { IconifyIcon } from "@/components/ui/IconifyIcon";
 import {
@@ -176,7 +176,7 @@ export function BlogTemplateOne({
 
   return (
     <article
-      className="min-h-screen bg-white font-lexend-deca antialiased selection:bg-[#ff4848] selection:text-white"
+      className="min-h-screen bg-white font-montserrat antialiased selection:bg-[#ff4848] selection:text-white"
       data-header-theme="light"
     >
       {/* 1. Post Header Info */}
@@ -191,16 +191,16 @@ export function BlogTemplateOne({
                 {blog.categories?.[0]?.name || "self-care"}
               </Link>
               <span className="font-extralight opacity-40">—</span>
-              <p className="text-gray-500 text-xs font-medium">
+              <p className="text-[#000000] text-xs font-medium">
                 {formatDate(blog.publishedAt)}
               </p>
             </div>
 
-            <h1 className="text-[40px] sm:text-[60px] font-prata !leading-[1.1] mb-10 text-[#060C14]">
+            <h1 className="text-[43.2px] font-montserrat font-bold !leading-tight mb-4 text-[#000000]">
               {blog.title}
             </h1>
 
-            <ul className="flex flex-wrap items-center justify-center lg:justify-start gap-4 gap-y-2 uppercase text-[10px] font-bold tracking-[0.2em] text-[#060C14] mb-12">
+            <ul className="flex flex-wrap items-center justify-center lg:justify-start gap-4 gap-y-2 uppercase text-[10px] font-bold tracking-[0.2em] text-[#000000] mb-12">
               <li className="flex items-center gap-3">
                 <img
                   src={
@@ -217,7 +217,7 @@ export function BlogTemplateOne({
                   {blog.author?.name || "Kathryn Jackson"}
                 </Link>
               </li>
-              <li className="text-gray-300 opacity-40">•</li>
+              <li className="text-[#000000] opacity-40">•</li>
               <li>{getReadTime(blog.content)} MIN TO READ</li>
             </ul>
           </div>
@@ -259,23 +259,15 @@ export function BlogTemplateOne({
             >
               <div
                 id="post-content"
-                className="prose prose-lg max-w-none font-montserrat
-                prose-headings:font-montserrat prose-headings:font-extrabold prose-headings:text-[#060C14] prose-headings:!leading-[1.2]
-                prose-h2:text-[48px] prose-h2:mt-24 prose-h2:mb-10
-                prose-h3:text-[36px] prose-h3:mt-16 prose-h3:mb-8
-                prose-p:text-[20px] prose-p:font-medium prose-p:text-gray-600 prose-p:leading-[1.8] prose-p:mb-8
-                prose-li:text-[20px] prose-li:font-medium prose-li:text-gray-600 prose-li:mb-2
-                prose-strong:text-[24px] prose-strong:text-[#060C14] prose-strong:font-bold
-                prose-blockquote:border-0 prose-blockquote:p-0 prose-blockquote:my-20 
-                prose-blockquote:text-[29px] prose-blockquote:leading-[1.4] prose-blockquote:text-[#ff4848] prose-blockquote:text-center prose-blockquote:mx-auto prose-blockquote:max-w-4xl"
+                className="max-w-none"
               >
                 {blog.content ? (
-                  <LexicalRenderer
+                  <BlogLexicalRenderer
                     content={blog.content}
                     mediaData={blog.mediaData}
                   />
                 ) : (
-                  <p className="italic text-gray-400">
+                  <p className="italic text-[#000000]">
                     Content loading or empty...
                   </p>
                 )}
@@ -294,13 +286,13 @@ export function BlogTemplateOne({
                   />
                 </div>
                 <div>
-                  <h4 className="text-[24px] font-prata mb-2 text-[#060C14]">
+                  <h4 className="text-[24px] font-montserrat font-bold mb-2 text-[#000000]">
                     {blog.author?.name || "Kathryn Jackson"}
                   </h4>
                   <p className="text-[#ff4848] text-[10px] font-bold uppercase tracking-[0.3em] mb-6">
                     {blog.author?.title || "Editorial Team"}
                   </p>
-                  <p className="text-gray-500 text-[16px] leading-relaxed mb-10 max-w-xl italic">
+                  <p className="text-[#000000] text-[16px] leading-tight mb-4 max-w-xl italic">
                     {blog.author?.bio ||
                       "Passionate about structural beauty and engineering innovation."}
                   </p>
@@ -313,7 +305,7 @@ export function BlogTemplateOne({
                   {/* Category Dots */}
                   {showFooterCategories &&
                     footerCats.categories?.length > 0 && (
-                      <div className="flex flex-wrap items-center justify-center gap-4 text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">
+                      <div className="flex flex-wrap items-center justify-center gap-4 text-[10px] font-bold uppercase tracking-[0.4em] text-[#000000]">
                         {footerCats.categories.map(
                           (cat: any, i: number) => (
                             <span
@@ -355,10 +347,10 @@ export function BlogTemplateOne({
                               href={`/${locale}/blog/${slug}`}
                               className={`flex-1 py-12 ${align === 'left' ? 'pr-10 border-r' : 'pl-10 text-right items-end'} flex flex-col gap-3 group border-[#F0EBE6] hover:bg-[#F5F2ED]/50 transition-colors`}
                             >
-                              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">
+                              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#000000]">
                                 {label}
                               </span>
-                              <h5 className="text-[18px] font-prata text-[#060C14] group-hover:text-[#ff4848] transition-colors line-clamp-2 leading-snug">
+                              <h5 className="text-[18px] font-montserrat text-[#000000] group-hover:text-[#ff4848] transition-colors line-clamp-2 leading-tight">
                                 {title || "Read Post"}
                               </h5>
                             </Link>
@@ -380,7 +372,7 @@ export function BlogTemplateOne({
                     footerRec.posts?.length > 0 && (
                       <div className="border-t border-[#F0EBE6] pt-16">
                         <div className="text-center mb-12">
-                          <h4 className="text-[24px] font-prata text-[#060C14]">
+                          <h4 className="text-[24px] font-montserrat text-[#000000]">
                             {footerRec.title ||
                               "Recommended Stories"}
                           </h4>
@@ -398,7 +390,7 @@ export function BlogTemplateOne({
                                   alt={p.title}
                                 />
                               </Link>
-                              <h5 className="text-lg font-prata hover:text-[#ff4848] transition-colors line-clamp-2">
+                              <h5 className="text-lg font-montserrat hover:text-[#ff4848] transition-colors line-clamp-2">
                                 {p.title}
                               </h5>
                             </div>
@@ -420,7 +412,7 @@ export function BlogTemplateOne({
                 >
                   {showToc && tocItems.length > 0 && (
                     <div>
-                        <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#060C14] mb-10 pb-4 border-b border-[#F0EBE6] flex items-center gap-4">
+                        <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#000000] mb-4 pb-4 border-b border-[#F0EBE6] flex items-center gap-4">
                           <span className="w-1.5 h-1.5 rounded-full bg-[#ff4848]" />
                           {toc.title || "In this story"}
                         </h4>
@@ -436,7 +428,7 @@ export function BlogTemplateOne({
                               />
                               <Link
                                 href={`#${item.id}`}
-                                className={`text-[11px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${activeSection === item.id ? "text-[#ff4848] translate-x-1" : "text-gray-400 hover:text-[#ff4848]"}`}
+                                className={`text-[11px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${activeSection === item.id ? "text-[#ff4848] translate-x-1" : "text-[#000000] hover:text-[#ff4848]"}`}
                               >
                                 {item.title}
                               </Link>
@@ -450,7 +442,7 @@ export function BlogTemplateOne({
                     {/* Search Box Widget */}
                     {showSearch && (
                       <div className="pt-8 border-t border-[#F0EBE6]">
-                        <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-gray-400">
+                        <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-[#000000]">
                           Search
                         </h5>
                         <div className="relative group">
@@ -460,7 +452,7 @@ export function BlogTemplateOne({
                             spellCheck="false"
                             className="w-full bg-[#F5F2ED] border-0 rounded-xl px-5 py-4 text-xs focus:ring-1 focus:ring-[#ff4848] outline-none transition-all"
                           />
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300">
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#000000]">
                             <IconifyIcon name="lucide:search" size={16} />
                           </div>
                         </div>
@@ -470,7 +462,7 @@ export function BlogTemplateOne({
                     {/* Share Post Widget */}
                     {showShare && (
                       <div className="pt-8 border-t border-[#F0EBE6]">
-                        <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-gray-400">
+                        <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-[#000000]">
                           {share.title || "Share Post"}
                         </h5>
                         <div className="flex gap-4">
@@ -496,7 +488,7 @@ export function BlogTemplateOne({
                                   href={shareUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="w-10 h-10 rounded-full border border-[#DCDBD0] flex items-center justify-center text-[#060C14] hover:bg-[#ff4848] hover:border-[#ff4848] hover:text-white transition-all cursor-pointer group"
+                                  className="w-10 h-10 rounded-full border border-[#DCDBD0] flex items-center justify-center text-[#000000] hover:bg-[#ff4848] hover:border-[#ff4848] hover:text-white transition-all cursor-pointer group"
                                 >
                                   <IconifyIcon name={net.icon} size={18} />
                                 </a>
@@ -510,7 +502,7 @@ export function BlogTemplateOne({
                     {/* Category List Widget */}
                     {showCategoryList && catList.categories?.length > 0 && (
                       <div className="pt-8 border-t border-[#F0EBE6]">
-                        <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-gray-400">
+                        <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-[#000000]">
                           {catList.title || "Categories"}
                         </h5>
                         <ul className="space-y-4">
@@ -533,7 +525,7 @@ export function BlogTemplateOne({
                     {showRecommended &&
                       recommended.posts?.length > 0 && (
                         <div className="pt-8 border-t border-[#F0EBE6]">
-                          <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-gray-400">
+                          <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-[#000000]">
                             {recommended.title || "Recommended"}
                           </h5>
                           <div className="space-y-6">
@@ -545,7 +537,7 @@ export function BlogTemplateOne({
                                   href={`/${locale}/blog/${rp.slug}`}
                                   className="group block"
                                 >
-                                  <h6 className="text-[13px] font-bold uppercase leading-relaxed text-[#060C14] group-hover:text-[#ff4848] transition-colors line-clamp-2">
+                                  <h6 className="text-[13px] font-bold uppercase leading-tight text-[#000000] group-hover:text-[#ff4848] transition-colors line-clamp-2">
                                     {rp.title}
                                   </h6>
                                 </Link>
@@ -557,7 +549,7 @@ export function BlogTemplateOne({
                     {/* Follow Us Widget */}
                     {showFollowUs && follow.socials?.length > 0 && (
                       <div className="pt-8 border-t border-[#F0EBE6]">
-                        <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-gray-400">
+                        <h5 className="text-[10px] uppercase tracking-widest font-bold mb-6 text-[#000000]">
                           {follow.title || "Follow Us"}
                         </h5>
                         <div className="flex flex-wrap gap-3">
@@ -567,7 +559,7 @@ export function BlogTemplateOne({
                               href={social.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="w-10 h-10 rounded-full bg-[#060C14] flex items-center justify-center text-white hover:bg-[#ff4848] transition-all"
+                              className="w-10 h-10 rounded-full bg-[#000000] flex items-center justify-center text-white hover:bg-[#ff4848] transition-all"
                             >
                               <IconifyIcon name={social.icon} size={18} />
                             </a>
