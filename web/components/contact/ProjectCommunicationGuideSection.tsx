@@ -101,8 +101,10 @@ export function ProjectCommunicationGuideSection({
   const descriptionParts = useMemo(() => parseTextWithBold(description), [description])
 
   return (
-    <section
-      className="relative w-full overflow-hidden"
+    <>
+      {/* 桌面端版本 - 保持原有绝对定位逻辑 */}
+      <section
+        className="hidden md:block relative w-full overflow-hidden"
       style={{
         height: vw(SECTION_HEIGHT),
         willChange: "transform",
@@ -332,6 +334,92 @@ export function ProjectCommunicationGuideSection({
           })}
         </p>
       </div>
-    </section>
+      </section>
+
+      {/* 移动端版本 - 流式布局 */}
+      <section className="block md:hidden relative w-full pt-12 pb-16 px-6 overflow-hidden">
+        {/* Title Area */}
+        <div className="flex flex-col items-center text-center">
+          <h2 className="font-josefin-sans font-bold text-black text-[32px] leading-tight">
+            {title.split('\n').join(' ')}
+          </h2>
+          {/* Logo 居中显示 */}
+          <div className="w-[200px] h-auto mb-8">
+            <img
+              src="/contact-support/busrom-logo.svg"
+              alt="Busrom"
+              className="w-full h-full object-contain"
+            />
+          </div>
+          {/* Subtitle */}
+          <p className="mb-4 font-josefin-sans font-semibold text-black text-[18px] leading-snug px-2">
+            {subtitleParts.map((part, index) => {
+              if (part.isLineBreak) return <br key={index} />
+              return (
+                <span
+                  key={index}
+                  className={part.isBold ? "font-bold text-brand-accent-orange" : ""}
+                >
+                  {part.text}
+                </span>
+              )
+            })}
+          </p>
+        </div>
+
+        {/* Image Area - 响应式 SVG 遮罩 */}
+        {image && (
+          <div className="relative w-full flex justify-center">
+            <svg
+              className="w-full h-auto max-w-[450px] overflow-hidden"
+              viewBox="0 0 1088 1080"
+              preserveAspectRatio="xMidYMid slice"
+            >
+              <defs>
+                <clipPath id="image-clip-mobile">
+                  <path d="M454 0C464.502 94.7206 453.461 295.765 319.051 471.838C260.215 548.911 236.855 597.318 233.355 627.838C232.381 636.338 234.355 645.838 241.423 649.611C251.045 654.749 272.221 652.752 304.842 631.961C345.634 605.961 389.697 554.353 415.181 481.456C470.018 324.588 530.832 211.341 604.799 140.49C687.006 61.7462 781.017 39.9102 873.227 59.2998C909.938 67.0195 943.71 85.318 969.892 114.304C995.102 142.215 1008.25 174.386 1014.72 203.326C1027.05 258.488 1018.75 317.214 1005.38 367.137C980.96 458.338 928.374 561.109 859.229 651.528C873.665 644.702 889.521 637.495 906.51 630.438C1017.19 584.467 1171.66 547.001 1370.64 611.61L1296.22 840.831C1167.2 798.941 1073.66 821.975 998.953 853.003C979.26 861.183 960.695 870.022 941.869 879.225C924.382 887.773 903.408 898.291 884.596 906.562C866.095 914.695 840.998 924.682 813.434 929.338C784.319 934.256 744.372 934.56 704.103 913.507C618.509 868.757 585.263 787.105 583.374 715.458C583.083 704.403 582.215 679.183 588 655.941C579.571 669.941 493.916 809.346 436.5 845.941C346.067 903.58 220.969 919.57 110.935 853.549C26.4259 802.843 -5.84353 708.621 0.855469 616.54C7.49248 525.312 50.8247 426.03 127.488 325.604C209.877 217.677 219.834 61.6129 213.003 0H454Z" fill="white" />
+                </clipPath>
+              </defs>
+              <foreignObject x="0" y="0" width="1088" height="1080" clipPath="url(#image-clip-mobile)">
+                <OptimizedImage
+                  image={image as any}
+                  alt="Project communication"
+                  size="xlarge"
+                  className="w-full h-full object-cover"
+                />
+              </foreignObject>
+            </svg>
+          </div>
+        )}
+
+        {/* Description Box Area */}
+        <div
+          className="relative -mt-24 p-4 bg-brand-overlay-olive-60 overflow-hidden"
+          style={{
+            borderRadius: "24px",
+            backdropFilter: "blur(40px)",
+            WebkitBackdropFilter: "blur(40px)",
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.15)",
+          }}
+        >
+          <p className="font-josefin-sans font-medium text-white text-[16px] leading-relaxed">
+            {descriptionParts.map((part, index) => {
+              if (part.isLineBreak) return " "
+              return (
+                <span key={index}>
+                  {part.isBold ? (
+                    <span className="font-bold text-brand-yellow">
+                      {part.text}
+                    </span>
+                  ) : (
+                    part.text
+                  )}
+                </span>
+              )
+            })}
+          </p>
+        </div>
+      </section>
+    </>
   )
 }

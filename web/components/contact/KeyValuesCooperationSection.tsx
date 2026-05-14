@@ -1,29 +1,17 @@
 "use client"
 
 import React, { useState, useCallback } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920
-const SECTION_HEIGHT = 920
+import { MediaObject as BaseMediaObject } from "@/lib/lexical-utils"
+import { HollowText } from "@/components/common/HollowText"
 
-// 内容缩放比例
-const CONTENT_SCALE = 0.8
+// 移除 CONTENT_SCALE，直接使用实际 x0.8 后的数值
 
-interface MediaObject {
-  id: string
-  url: string
-  alt?: string
-  variants?: {
-    thumbnail?: string
-    small?: string
-    medium?: string
-    large?: string
-    xlarge?: string
-  }
-  cropFocalPoint?: { x: number; y: number } | null
+interface MediaObject extends BaseMediaObject {
   enableLink?: boolean
   linkUrl?: string
   openInNewTab?: boolean
@@ -64,61 +52,55 @@ export function KeyValuesCooperationSection({
     setActiveIndex((prev) => (prev < items.length - 1 ? prev + 1 : 0))
   }, [items.length])
 
-  // 缩放后的板块高度
-  const scaledHeight = SECTION_HEIGHT * CONTENT_SCALE
+  // 移除缩放相关的派生变量
 
   return (
-    <section
-      className="relative w-full"
-      style={{
-        minHeight: vw(scaledHeight),
-        marginTop: vw(40),
-        marginBottom: vw(40),
-      }}
-    >
-      {/* 内容容器 - 整体缩小到80%并居中 */}
-      <div
-        className="absolute left-0 w-full"
+    <>
+      {/* 桌面端版本 - 保持原有复杂的绝对定位和 vw 缩放逻辑 */}
+      <section
+        className="hidden md:block relative w-full overflow-hidden"
         style={{
-          minHeight: vw(SECTION_HEIGHT),
-          top: `calc(50% - ${vw(SECTION_HEIGHT * CONTENT_SCALE / 2)})`,
-          transform: `scale(${CONTENT_SCALE})`,
-          transformOrigin: "top center",
+          height: vw(736), // 920 * 0.8
+          marginTop: vw(96), // 120 * 0.8
         }}
       >
-      {/* 背景大号描边 "Value" 文字 - 字符跳动效果 */}
-      <div
-        className="absolute font-josefin-sans font-bold pointer-events-none w-full text-center flex justify-center"
-        style={{
-          top: vw(100),
-          fontSize: vw(540),
-          lineHeight: vw(509),
-          letterSpacing: vw(40),
-          color: "#fffbe4",
-          textShadow: `-1px -1px 0 rgba(70, 64, 16, 0.3), 1px -1px 0 rgba(70, 64, 16, 0.3), -1px 1px 0 rgba(70, 64, 16, 0.3), 1px 1px 0 rgba(70, 64, 16, 0.3)`,
-        }}
-      >
-        {label.split("").map((char, index) => (
-          <span
-            key={index}
-            className="inline-block animate-char-bounce"
+        {/* 核心容器：在宽屏下通过 mx-auto 居中 */}
+        <div 
+          className="relative h-full mx-auto"
+          style={{ width: vw(1920) }}
+        >
+          {/* 背景大号描边 "Value" 文字 - 使用 HollowText 实现透明镂空效果 */}
+          <HollowText
+            strokeColor="rgba(70, 64, 16, 0.3)"
+            strokeWidth={1}
+            className="absolute font-josefin-sans font-bold pointer-events-none w-full text-center flex justify-center"
             style={{
-              animationDelay: `${index * 0.15}s`,
+              top: vw(80), // 100 * 0.8
+              fontSize: vw(432), // 540 * 0.8
+              lineHeight: vw(407.2), // 509 * 0.8
+              letterSpacing: vw(32), // 40 * 0.8
             }}
           >
-            {char}
-          </span>
-        ))}
-      </div>
+            {label.split("").map((char, index) => (
+              <span
+                key={index}
+                className="inline-block animate-char-bounce"
+                style={{
+                  animationDelay: `${index * 0.15}s`,
+                }}
+              >
+                {char}
+              </span>
+            ))}
+          </HollowText>
 
       {/* 上方韦恩图区域 */}
       <div
-        className="absolute"
+        className="absolute left-1/2 -translate-x-1/2"
         style={{
-          left: vw(366),
           top: vw(0),
-          width: vw(1173),
-          height: vw(552),
+          width: vw(938.4),
+          height: vw(441.6),
         }}
       >
         {/* 左边橄榄色月牙形 - 固定装饰，稍微加宽以消除缝隙 */}
@@ -127,14 +109,13 @@ export function KeyValuesCooperationSection({
           style={{
             left: 0,
             top: 0,
-            width: vw(420),  // 从415增加到420，消除与中间图片的缝隙
-            height: vw(552),
+            width: vw(336), // 420 * 0.8
+            height: vw(441.6), // 552 * 0.8
           }}
         >
-          <Image
+          <img
             src="/contact-support/key-values-left-crescent.svg"
             alt=""
-            fill
             className="object-contain"
           />
         </div>
@@ -143,10 +124,10 @@ export function KeyValuesCooperationSection({
         <div
           className="absolute overflow-hidden"
           style={{
-            left: vw(312),
+            left: vw(249.6), // 312 * 0.8
             top: 0,
-            width: vw(416),
-            height: vw(552),
+            width: vw(332.8), // 416 * 0.8
+            height: vw(441.6), // 552 * 0.8
           }}
         >
           {/* SVG clipPath 定义 */}
@@ -161,55 +142,57 @@ export function KeyValuesCooperationSection({
             </defs>
           </svg>
           {/* 图片 - 黑色背景 + 85%透明度图片 */}
-          {currentItem?.images[0] && (
+          {items.map((item, idx) => (
             <div
-              key={`img0-${activeIndex}`}
-              className="w-full h-full animate-fade-in group/img1 cursor-pointer bg-black"
+              key={`img0-${idx}`}
+              className={`w-full h-full animate-fade-in group/img1 cursor-pointer bg-black ${idx === activeIndex ? "block" : "hidden"}`}
               style={{
                 clipPath: "url(#middle-crescent-clip)",
               }}
             >
               <div className="w-full h-full opacity-85">
-                {currentItem.images[0]?.enableLink && currentItem.images[0]?.linkUrl ? (
-                  <Link href={currentItem.images[0].linkUrl} target={currentItem.images[0].openInNewTab ? "_blank" : undefined} rel={currentItem.images[0].openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                {item.images[0]?.enableLink && item.images[0]?.linkUrl ? (
+                  <Link href={item.images[0].linkUrl} target={item.images[0].openInNewTab ? "_blank" : undefined} rel={item.images[0].openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
                     <OptimizedImage
-                      image={currentItem.images[0] as any}
-                      alt={currentItem.title}
-                      size="xlarge"
+                      image={item.images[0] as any}
+                      alt={item.title}
+                      size="medium"
+                      priority={true}
                       className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img1:scale-110"
                       objectPosition={
-                        currentItem.images[0]?.cropFocalPoint
-                          ? `${currentItem.images[0].cropFocalPoint.x}% ${currentItem.images[0].cropFocalPoint.y}%`
+                        item.images[0]?.cropFocalPoint
+                          ? `${item.images[0].cropFocalPoint.x}% ${item.images[0].cropFocalPoint.y}%`
                           : "center"
                       }
                     />
                   </Link>
                 ) : (
                   <OptimizedImage
-                    image={currentItem.images[0] as any}
-                    alt={currentItem.title}
-                    size="xlarge"
+                    image={item.images[0] as any}
+                    alt={item.title}
+                    size="medium"
+                    priority={true}
                     className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img1:scale-110"
                     objectPosition={
-                      currentItem.images[0]?.cropFocalPoint
-                        ? `${currentItem.images[0].cropFocalPoint.x}% ${currentItem.images[0].cropFocalPoint.y}%`
+                      item.images[0]?.cropFocalPoint
+                        ? `${item.images[0].cropFocalPoint.x}% ${item.images[0].cropFocalPoint.y}%`
                         : "center"
                     }
                   />
                 )}
               </div>
             </div>
-          )}
+          ))}
         </div>
 
         {/* 右边圆形 - 用clipPath裁剪第二张图片 */}
         <div
           className="absolute overflow-hidden"
           style={{
-            left: vw(621),
+            left: vw(496.8), // 621 * 0.8
             top: 0,
-            width: vw(552),
-            height: vw(552),
+            width: vw(441.6), // 552 * 0.8
+            height: vw(441.6), // 552 * 0.8
           }}
         >
           {/* SVG clipPath 定义 */}
@@ -221,56 +204,58 @@ export function KeyValuesCooperationSection({
             </defs>
           </svg>
           {/* 图片 - 黑色背景 + 85%透明度图片 */}
-          {currentItem?.images[1] && (
+          {items.map((item, idx) => (
             <div
-              key={`img1-${activeIndex}`}
-              className="w-full h-full animate-fade-in group/img2 cursor-pointer bg-black"
+              key={`img1-${idx}`}
+              className={`w-full h-full animate-fade-in group/img2 cursor-pointer bg-black ${idx === activeIndex ? "block" : "hidden"}`}
               style={{
                 clipPath: "url(#right-circle-clip)",
               }}
             >
               <div className="w-full h-full opacity-85">
-                {currentItem.images[1]?.enableLink && currentItem.images[1]?.linkUrl ? (
-                  <Link href={currentItem.images[1].linkUrl} target={currentItem.images[1].openInNewTab ? "_blank" : undefined} rel={currentItem.images[1].openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+                {item.images[1]?.enableLink && item.images[1]?.linkUrl ? (
+                  <Link href={item.images[1].linkUrl} target={item.images[1].openInNewTab ? "_blank" : undefined} rel={item.images[1].openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
                     <OptimizedImage
-                      image={currentItem.images[1] as any}
-                      alt={currentItem.title}
-                      size="xlarge"
+                      image={item.images[1] as any}
+                      alt={item.title}
+                      size="medium"
+                      priority={true}
                       className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img2:scale-110"
                       objectPosition={
-                        currentItem.images[1]?.cropFocalPoint
-                          ? `${currentItem.images[1].cropFocalPoint.x}% ${currentItem.images[1].cropFocalPoint.y}%`
+                        item.images[1]?.cropFocalPoint
+                          ? `${item.images[1].cropFocalPoint.x}% ${item.images[1].cropFocalPoint.y}%`
                           : "center"
                       }
                     />
                   </Link>
                 ) : (
                   <OptimizedImage
-                    image={currentItem.images[1] as any}
-                    alt={currentItem.title}
-                    size="xlarge"
+                    image={item.images[1] as any}
+                    alt={item.title}
+                    size="medium"
+                    priority={true}
                     className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img2:scale-110"
                     objectPosition={
-                      currentItem.images[1]?.cropFocalPoint
-                        ? `${currentItem.images[1].cropFocalPoint.x}% ${currentItem.images[1].cropFocalPoint.y}%`
+                      item.images[1]?.cropFocalPoint
+                        ? `${item.images[1].cropFocalPoint.x}% ${item.images[1].cropFocalPoint.y}%`
                         : "center"
                     }
                   />
                 )}
               </div>
             </div>
-          )}
+          ))}
         </div>
 
         {/* 中间 "Value" 标签 - 字符跳动效果 */}
         <div
           className="absolute font-josefin-sans font-bold text-white text-center flex justify-center"
           style={{
-            left: vw(396),
-            top: vw(227),
-            width: vw(397),
-            fontSize: vw(150),
-            lineHeight: vw(134),
+            left: vw(316.8), // 396 * 0.8
+            top: vw(181.6), // 227 * 0.8
+            width: vw(317.6), // 397 * 0.8
+            fontSize: vw(120), // 150 * 0.8
+            lineHeight: vw(107.2), // 134 * 0.8
           }}
         >
           {label.split("").map((char, index) => (
@@ -287,58 +272,57 @@ export function KeyValuesCooperationSection({
         </div>
 
         {/* 标题 + 箭头链接 */}
-        {currentItem && (
+        {items.map((item, idx) => (
           <div
-            key={`title-${activeIndex}`}
-            className="absolute animate-fade-in group/title"
+            key={`title-${idx}`}
+            className={`absolute animate-fade-in group/title ${idx === activeIndex ? "block" : "hidden"}`}
             style={{
-              left: vw(38),
-              top: vw(250),
+              left: vw(30.4),
+              top: vw(200),
             }}
           >
             {/* 箭头装饰 - 可点击跳转 */}
             <Link
-              href={currentItem.link || "#"}
+              href={item.link || "#"}
               className="absolute arrow-link"
               style={{
-                left: vw(30),
-                top: vw(-77),
-                width: vw(35),
-                height: vw(32),
+                left: vw(24),
+                top: vw(-61.6),
+                width: vw(28),
+                height: vw(25.6),
               }}
             >
-              <Image
+              <img
                 src="/contact-support/key-values-arrow.svg"
                 alt=""
-                fill
                 className="object-contain"
               />
             </Link>
             {/* 标题文字 */}
             <Link
-              href={currentItem.link || "#"}
+              href={item.link || "#"}
               className="font-josefin-sans font-bold text-white block transition-all duration-300 group-hover/title:text-brand-yellow-bright"
               style={{
-                width: vw(224),
-                fontSize: vw(32),
-                lineHeight: vw(44),
+                width: vw(179.2),
+                fontSize: vw(25.6),
+                lineHeight: vw(35.2),
               }}
             >
-              {currentItem.title}
+              {item.title}
             </Link>
           </div>
-        )}
+        ))}
       </div>
 
       {/* 左箭头 */}
       <button
         onClick={handlePrev}
-        className="absolute cursor-pointer group z-10"
+        className="absolute left-1/2 cursor-pointer group z-10"
         style={{
-          left: vw(151),
-          top: vw(235),
-          width: vw(83),
-          height: vw(82),
+          top: vw(220.8), // 韦恩图的中心线
+          transform: `translate(calc(-50% - ${vw(716.8)}), -50%)`,
+          width: vw(66.4),
+          height: vw(65.6),
         }}
       >
         {/* 默认状态 - 空心圆 */}
@@ -370,12 +354,12 @@ export function KeyValuesCooperationSection({
       {/* 右箭头 */}
       <button
         onClick={handleNext}
-        className="absolute cursor-pointer group z-10"
+        className="absolute left-1/2 cursor-pointer group z-10"
         style={{
-          left: vw(1624),
-          top: vw(235),
-          width: vw(83),
-          height: vw(82),
+          top: vw(220.8), // 韦恩图的中心线
+          transform: `translate(calc(-50% + ${vw(716.8)}), -50%)`,
+          width: vw(66.4),
+          height: vw(65.6),
         }}
       >
         {/* 默认状态 - 空心圆 */}
@@ -410,10 +394,10 @@ export function KeyValuesCooperationSection({
           key={`cards-${activeIndex}`}
           className="absolute flex justify-center animate-fade-in w-full"
           style={{
-            top: vw(633),
-            gap: vw(41),
-            paddingLeft: vw(153),
-            paddingRight: vw(153),
+            top: vw(506.4), // 633 * 0.8
+            gap: vw(32.8), // 41 * 0.8
+            paddingLeft: vw(122.4), // 153 * 0.8
+            paddingRight: vw(122.4), // 153 * 0.8
           }}
         >
           {currentItem.points.map((point, index) => (
@@ -422,9 +406,9 @@ export function KeyValuesCooperationSection({
               className="flex flex-col bg-brand-cream-light border border-brand-cream-border"
               style={{
                 flex: 1,
-                minHeight: vw(185),
-                borderRadius: vw(30),
-                padding: `${vw(40)} ${vw(40)}`,
+                minHeight: vw(148), // 185 * 0.8
+                borderRadius: vw(24), // 30 * 0.8
+                padding: `${vw(32)} ${vw(32)}`, // 40 * 0.8
                 animationDelay: `${index * 0.1}s`,
               }}
             >
@@ -432,18 +416,18 @@ export function KeyValuesCooperationSection({
               <div
                 className="bg-brand-secondary shrink-0"
                 style={{
-                  width: vw(49),
-                  height: vw(8),
-                  borderRadius: vw(19),
-                  marginBottom: vw(15), // 计算得出: 63 - 40 - 8 = 15
+                  width: vw(39.2), // 49 * 0.8
+                  height: vw(6.4), // 8 * 0.8
+                  borderRadius: vw(15.2), // 19 * 0.8
+                  marginBottom: vw(12), // 15 * 0.8
                 }}
               />
               {/* 要点文字 */}
               <p
                 className="font-acme font-semibold text-left text-brand-orange"
                 style={{
-                  fontSize: vw(32),
-                  lineHeight: vw(44),
+                  fontSize: vw(25.6), // 32 * 0.8
+                  lineHeight: vw(35.2), // 44 * 0.8
                   width: "100%",
                 }}
               >
@@ -453,7 +437,131 @@ export function KeyValuesCooperationSection({
           ))}
         </div>
       )}
-      </div>
-    </section>
+        </div>
+      </section>
+
+      {/* 移动端版本 - 流式响应式布局 */}
+      <section className="block md:hidden relative w-full pt-4 pb-10 px-4 overflow-hidden">
+        {/* 背景装饰文字 "Value" */}
+        <div className="text-center mb-4 overflow-hidden">
+          <h2 className="font-josefin-sans font-bold text-brand-cream-border/30 text-4xl leading-none uppercase tracking-tighter whitespace-nowrap">
+            {label}
+          </h2>
+        </div>
+
+        {/* 核心内容区 - 轮播切换 */}
+        <div className="relative flex flex-col items-center">
+          {/* 简化版韦恩图视觉 - 两个重叠的圆形 */}
+          <div className="relative w-full aspect-[4/3] max-w-[260px] mb-6">
+            {items.map((item, idx) => (
+              <React.Fragment key={`mobile-circles-${idx}`}>
+                {/* 左侧圆形图片 */}
+                <div 
+                  className={`absolute left-0 top-0 w-[140px] h-[140px] rounded-full overflow-hidden border-4 border-white shadow-xl z-10 transition-opacity duration-300 ${idx === activeIndex ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                >
+                  {item.images[0] && (
+                    <OptimizedImage
+                      image={item.images[0] as any}
+                      alt={item.title}
+                      size="medium"
+                      priority={true}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+                {/* 右侧圆形图片 */}
+                <div 
+                  className={`absolute right-0 bottom-0 w-[140px] h-[140px] rounded-full overflow-hidden border-4 border-white shadow-xl z-20 transition-opacity duration-300 ${idx === activeIndex ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                >
+                  {item.images[1] && (
+                    <OptimizedImage
+                      image={item.images[1] as any}
+                      alt={item.title}
+                      size="medium"
+                      priority={true}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+              </React.Fragment>
+            ))}
+            {/* 中间文字标识 */}
+            <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
+              <span className="font-josefin-sans font-bold text-brand-secondary/40 text-4xl opacity-50">
+                {label}
+              </span>
+            </div>
+          </div>
+
+          {/* 标题与导航控制 */}
+          <div className="w-full flex items-center justify-between mb-6 px-1 gap-2">
+            <button
+              onClick={handlePrev}
+              className="w-12 h-12 shrink-0 flex items-center justify-center rounded-full border border-brand-secondary/50 text-brand-secondary active:bg-brand-secondary/10"
+            >
+              <svg className="w-7 h-7 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+            
+            <div className="flex-1 relative h-16 overflow-hidden">
+              {items.map((item, idx) => (
+                <Link 
+                  key={`mobile-title-${idx}`}
+                  href={item.link || "#"}
+                  className={`absolute inset-0 cursor-pointer transition-all duration-300 flex items-center justify-center gap-1.5 ${idx === activeIndex ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}
+                >
+                  <h3 className="font-josefin-sans font-bold text-brand-secondary text-xl text-center leading-tight underline underline-offset-4 decoration-brand-secondary/30">
+                    {item.title}
+                  </h3>
+                  <svg 
+                    className="w-4 h-4 text-brand-secondary" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="3" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  >
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              ))}
+            </div>
+
+            <button
+              onClick={handleNext}
+              className="w-12 h-12 shrink-0 flex items-center justify-center rounded-full border border-brand-secondary/50 text-brand-secondary active:bg-brand-secondary/10"
+            >
+              <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          </div>
+
+          {/* 三个要点 - 垂直堆叠卡片 */}
+          <div className="w-full relative min-h-[300px]">
+            {items.map((item, idx) => (
+              <div 
+                key={`mobile-points-${idx}`}
+                className={`absolute inset-0 flex flex-col gap-3 transition-opacity duration-300 ${idx === activeIndex ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+              >
+                {item.points.map((point, pIdx) => (
+                  <div
+                    key={pIdx}
+                    className="w-full p-4 bg-brand-cream-light border border-brand-cream-border rounded-[20px] flex flex-col gap-2 shadow-sm"
+                  >
+                    <div className="w-8 h-1 bg-brand-secondary rounded-full" />
+                    <p className="font-acme font-semibold text-brand-orange text-base leading-snug">
+                      {point}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
   )
 }

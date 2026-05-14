@@ -163,7 +163,7 @@ export function ContactUsTemplate({ locale, data, ssrData }: ContactUsTemplatePr
   const finalFormConfig = ssrData?.formConfig || data.contactForm.formConfig
 
   return (
-    <div className="min-h-screen bg-background relative" data-header-theme="dark">
+    <div className="min-h-screen bg-background relative overflow-x-hidden" data-header-theme="dark">
       <div className="relative z-10">
       {/* Hero Section */}
       <ContactHeroSection
@@ -174,7 +174,7 @@ export function ContactUsTemplate({ locale, data, ssrData }: ContactUsTemplatePr
       />
 
       {/* Narrative & Product Series Wrapper with Background Blobs */}
-      <div className="relative overflow-x-hidden">
+      <div className="relative">
         {/* Background Blobs for this specific area */}
         <div className="absolute inset-0 pointer-events-none z-0">
           {/* 背景漂浮圆形 - Ellipse 145 大正圆 左下 */}
@@ -264,7 +264,7 @@ export function ContactUsTemplate({ locale, data, ssrData }: ContactUsTemplatePr
       <div
         className="relative"
         style={{
-          background: "linear-gradient(180deg, #FFF7DC 10%, #FFFDE8 30%)",
+          background: "linear-gradient(180deg, #FFF7DC 0%, #FFFDE8 30%)",
         }}
       >
         {/* Project Communication Guide Section */}

@@ -299,7 +299,7 @@ export function ProductSeriesEntrySection({
         <div className="relative px-2">
           {/* Embla 轮播 */}
           <div
-            className="overflow-hidden"
+            className="overflow-hidden py-4"
             ref={mobileEmblaRef}
           >
             <div

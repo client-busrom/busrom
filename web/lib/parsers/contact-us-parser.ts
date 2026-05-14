@@ -309,52 +309,45 @@ export function parseContactUsData(content: any, mediaData: Record<string, Media
   const nodesAfterItemMarker = extractAfterMarker(children, "key-values-cooperation-item");
   const nodesAfterImageMarker = extractAfterMarker(children, "key-values-cooperation-image");
 
-  const kvImages: (MediaObject | null)[] = [];
-  for (const node of nodesAfterImageMarker) {
-    if (node.type === "singleImage" && node.data?.image) {
-      const imageId = typeof node.data.image === "object" ? node.data.image.id : String(node.data.image || "");
-      if (imageId && mediaData[imageId]) kvImages.push(mediaData[imageId]);
-    }
-    if (node.type === "custom-image-gallery" && node.data?.images) {
-      for (const galleryItem of node.data.images) {
-        const imageId = typeof galleryItem?.image === "object" ? galleryItem.image.id : String(galleryItem?.image || "");
-        if (imageId && mediaData[imageId]) kvImages.push(mediaData[imageId]);
-      }
+  console.log("[Parser] key-values nodes found:", {
+    label,
+    itemsNodesCount: nodesAfterItemMarker.length,
+    imageNodesCount: nodesAfterImageMarker.length
+  });
+
+  // 提取补充图片库
+  const supplementaryImages: (MediaObject | null)[] = [];
+  const galleryNode = nodesAfterImageMarker.find(n => n.type === "custom-image-gallery");
+  if (galleryNode?.data?.images) {
+    for (const galleryItem of galleryNode.data.images) {
+      const imageId = typeof galleryItem?.image === "object" ? galleryItem.image.id : String(galleryItem?.image || "");
+      if (imageId && mediaData[imageId]) supplementaryImages.push(mediaData[imageId]);
+      else supplementaryImages.push(null);
     }
   }
 
   const kvItems: KeyValuesCooperationItem[] = [];
-  for (const node of nodesAfterItemMarker) {
-    if (node.type === "list" && node.children) {
-      let currentItem: any = null;
-      for (const listItem of node.children) {
-        if (listItem.type === "listitem" && listItem.children) {
-          const firstChild = listItem.children[0];
-          if (firstChild?.type === "link") {
-            if (currentItem) {
-              const itemIndex = kvItems.length;
-              const slice = kvImages.slice(itemIndex * 2, itemIndex * 2 + 2);
-              kvItems.push({ ...currentItem, id: kvItems.length + 1, images: [slice[0] || null, slice[1] || null] });
-            }
-            let title = getNodeTotalText(firstChild).trim();
-            let link = firstChild.fields?.url || firstChild.fields?.doc?.value?.path || "";
-            currentItem = { title, link, points: [] };
-          } else if (firstChild?.type === "list" && currentItem) {
-            for (const nestedItem of firstChild.children || []) {
-              if (nestedItem.type === "listitem") {
-                currentItem.points.push(getNodeTotalText(nestedItem).trim());
-              }
-            }
-          }
-        }
-      }
-      if (currentItem) {
-        const itemIndex = kvItems.length;
-        const slice = kvImages.slice(itemIndex * 2, itemIndex * 2 + 2);
-        kvItems.push({ ...currentItem, id: kvItems.length + 1, images: [slice[0] || null, slice[1] || null] });
-      }
-    }
+  const carouselNode = nodesAfterItemMarker.find(n => n.type === "carousel");
+  
+  console.log("[Parser] Carousel node found:", !!carouselNode);
+
+  if (carouselNode?.data?.slides) {
+    carouselNode.data.slides.forEach((slide: any, index: number) => {
+      const imageId = typeof slide.image === "object" ? slide.image?.id : String(slide.image || "");
+      const primaryImage = (imageId && mediaData[imageId]) ? mediaData[imageId] : null;
+      const secondaryImage = supplementaryImages[index] || null;
+
+      kvItems.push({
+        id: index + 1,
+        title: slide.title || "",
+        link: slide.buttonLink || slide.link || "",
+        images: [primaryImage, secondaryImage],
+        points: (slide.description || "").split("\n").map((p: string) => p.trim()).filter(Boolean)
+      });
+    });
   }
+
+  console.log("[Parser] Final kvItems count:", kvItems.length);
   const keyValues = { label, items: kvItems };
 
   // 6. Typical Collaboration

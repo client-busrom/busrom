@@ -141,15 +141,12 @@ export function ContactHeroSection({
 
   return (
     <section
-      className="relative w-full overflow-hidden mt-[46px]"
+      className="relative w-full overflow-hidden mt-[46px] h-auto md:h-[var(--section-height)]"
       style={{
-        height: rpx(DESIGN_HEIGHT),
-        // 定义 CSS 变量，类似 HeroBanner 的 --rpx-hero
-        // 按宽度或高度缩放，保证不超出屏幕
+        ["--section-height" as string]: rpx(DESIGN_HEIGHT),
         ["--rpx-contact" as string]: `min(calc(100vw / ${DESIGN_WIDTH}), max(calc(500px / ${DESIGN_HEIGHT}), calc((100vh - 46px) / ${DESIGN_HEIGHT})))`,
       }}
     >
-      {/* Background gradient */}
       <div
         className="absolute inset-0"
         style={{
@@ -157,7 +154,8 @@ export function ContactHeroSection({
         }}
       />
 
-      {/* Subtitle with background */}
+      {/* --- Desktop Layout --- */}
+      <div className="hidden md:block relative w-full h-full">
       <motion.div
         className="absolute"
         style={{
@@ -352,6 +350,101 @@ export function ContactHeroSection({
           )}
         </div>
 
+      </motion.div>
+    </div>
+
+
+      {/* --- Mobile Layout --- */}
+      <div className="block md:hidden relative w-full px-6 pt-12 pb-16 flex flex-col items-center">
+        {/* Subtitle */}
+        <motion.div
+          className="w-full bg-[#B8AD52] rounded-xl p-5 mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <p className="font-josefin-sans text-white text-lg leading-relaxed text-center">
+            {subtitle}
+          </p>
+        </motion.div>
+
+        {/* Title Images Group */}
+        <div className="relative w-full max-w-[340px] aspect-[1000/500] mb-6">
+          {/* 
+            Title Group Bounding Box (Approx):
+            Min X: 189, Max X+W: 1095 (Total Width ~906)
+            Min Y: 186, Max Y+H: 665 (Total Height ~479)
+            We use a 1000x500 virtual canvas for mapping
+          */}
+          {titleWords.map((word) => (
+            <motion.div
+              key={`mobile-${word.alt}`}
+              className="absolute"
+              style={{
+                // 映射逻辑：(x - 偏移量) / 容器参考宽度
+                left: `${((word.x - 150) / 950) * 100}%`,
+                top: `${((word.y - 180) / 480) * 100}%`,
+                width: `${(word.width / 950) * 100}%`,
+                height: `${(word.height / 480) * 100}%`,
+              }}
+              animate={{
+                rotate: [
+                  word.rotation - word.amplitude,
+                  word.rotation + word.amplitude,
+                  word.rotation - word.amplitude
+                ],
+              }}
+              transition={{
+                duration: word.duration,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: word.delay,
+              }}
+            >
+              <Image
+                src={word.src}
+                alt={word.alt}
+                fill
+                className="object-contain"
+              />
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Button */}
+        <motion.a
+          href={buttonLink}
+          onClick={handleScrollToForm}
+          className="relative w-full max-w-[280px] h-[64px] mb-12 flex items-center justify-center bg-white rounded-full shadow-lg overflow-hidden"
+          whileTap={{ scale: 0.95 }}
+        >
+          <div className="absolute inset-0 bg-[#FCE638] blur-xl opacity-60" />
+          <span className="relative z-10 font-anaheim font-bold text-2xl text-[#3D3708]">
+            {buttonText}
+          </span>
+        </motion.a>
+
+        {/* Hero Image */}
+        <div className="w-full aspect-[340/360] max-w-[340px] relative">
+          <div
+            className="w-full h-full"
+            style={{ clipPath: "url(#contact-hero-clip)" }}
+          >
+            {heroImage ? (
+              <OptimizedImage
+                image={heroImage as any}
+                alt="Contact hero"
+                size="medium"
+                className="w-full h-full object-cover"
+                objectPosition={objectPosition}
+                priority
+              />
+            ) : (
+              <div className="w-full h-full bg-[#D9D9D9]" />
+            )}
+          </div>
+        </div>
+      </div>
         {/* Hidden SVG for clip-path definition */}
         <svg className="absolute w-0 h-0" aria-hidden="true">
           <defs>
@@ -363,7 +456,6 @@ export function ContactHeroSection({
             </clipPath>
           </defs>
         </svg>
-      </motion.div>
-    </section>
+      </section>
   )
 }
