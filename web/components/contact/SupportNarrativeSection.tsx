@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from "react"
-import Image from "next/image"
 import { motion } from "framer-motion"
 import {
   FileText,
@@ -30,7 +29,7 @@ const TRACK_TOP_CENTER_Y = 96     // 120 * 0.8
 const TRACK_BOTTOM_CENTER_Y = 186 // 233 * 0.8
 
 // 卡片间距 (80%缩放)
-const CARD_GAP = 22  // 27 * 0.8
+const CARD_GAP = 48  // 从 22 增加到 48，适应更大的缩放
 
 // 星星轨道运动一周的时间 (秒)
 const STAR_ORBIT_DURATION = 4
@@ -129,21 +128,33 @@ function SupportCard({ card, index, isActive, onHover }: SupportCardProps) {
       initial="inactive"
     >
       {/* 整体放大容器 */}
-      <motion.div
-        className="relative w-full h-full"
-        style={{ transformOrigin: "center center" }}
-        variants={{
-          inactive: { scale: 1 },
-          active: { scale: 1.15 },
-        }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-      >
+        <motion.div
+          className="relative w-full h-full"
+          style={{ transformOrigin: "center center" }}
+          variants={{
+            inactive: { scale: 1 },
+            active: { scale: 1.3 },
+          }}
+          transition={{ duration: 0.4, type: "spring", stiffness: 300, damping: 20 }}
+        >
+          {/* 外部发光阴影层 - 采用分层结构避免污染内部元素 */}
+          <motion.div
+            className="absolute inset-0 rounded-full -z-10"
+            variants={{
+              inactive: { opacity: 0, scale: 0.8, filter: "blur(0px)" },
+              active: { 
+                opacity: 1, 
+                scale: 1.1, 
+                filter: "blur(25px)",
+                boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.4)" 
+              },
+            }}
+          />
         {/* 椭圆边框 SVG */}
-        <Image
+        <img
           src="/contact-support/rectangle-line.svg"
           alt=""
-          fill
-          className="object-contain"
+          className="absolute inset-0 w-full h-full object-contain"
         />
 
         {/* 大星星 */}
@@ -172,11 +183,10 @@ function SupportCard({ card, index, isActive, onHover }: SupportCardProps) {
             duration: 0.3,
           }}
         >
-          <Image
+          <img
             src="/contact-support/large-star.svg"
             alt=""
-            fill
-            className="object-contain"
+            className="w-full h-full object-contain"
           />
         </motion.div>
 
@@ -206,23 +216,26 @@ function SupportCard({ card, index, isActive, onHover }: SupportCardProps) {
             duration: 0.3,
           }}
         >
-          <Image
+          <img
             src="/contact-support/little-star.svg"
             alt=""
-            fill
-            className="object-contain"
+            className="w-full h-full object-contain"
           />
         </motion.div>
 
         {/* 图标 - 在边框中央 */}
-        <div
+        <motion.div
           className="absolute flex items-center justify-center"
           style={{
             left: "50%",
             top: "40%",
-            transform: "translate(-50%, -50%)",
             width: rpx(48),  // 60 * 0.8
             height: rpx(48),
+          }}
+          initial={{ x: "-50%", y: "-50%" }}
+          variants={{
+            inactive: { scale: 1, x: "-50%", y: "-50%" },
+            active: { scale: 1.25, x: "-50%", y: "-50%" },
           }}
         >
           <Icon
@@ -231,13 +244,13 @@ function SupportCard({ card, index, isActive, onHover }: SupportCardProps) {
               width: rpx(48),  // 60 * 0.8
               height: rpx(48),
             }}
-            strokeWidth={1.5}
+            strokeWidth={isActive ? 2 : 1.5}
           />
-        </div>
+        </motion.div>
 
         {/* 标题 - 下方区域顶部对齐，支持换行 */}
         <div
-          className="absolute font-anaheim font-semibold text-black text-center"
+          className={`absolute font-anaheim text-black text-center transition-all duration-300 ${isActive ? 'font-bold' : 'font-semibold'}`}
           style={{
             left: "50%",
             top: rpx(176),  // 220 * 0.8
@@ -273,7 +286,7 @@ export function SupportNarrativeSection({
   const totalCardsWidth = FRAME_WIDTH * cardCount + CARD_GAP * (cardCount - 1)
 
   // vw 尺寸计算
-  const vw = (v: number) => `${(v / DESIGN_WIDTH) * 100}vw`
+  const vw = (px: number) => `calc(${px} * min(100vw, 1920px) / 1920)`
 
   const [activeIndex, setActiveIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
@@ -336,25 +349,25 @@ export function SupportNarrativeSection({
       </div>
 
       {/* 卡片网格 - 2列3行 */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-6">
         {cards.map((card, index) => {
           const Icon = card.icon ? iconMap[card.icon] || defaultIcons[index] : defaultIcons[index]
           const isActive = index === activeIndex
           return (
             <div
               key={card.id}
-              className={`relative bg-brand-main border-2 rounded-3xl p-4 flex flex-col items-center justify-center min-h-[140px] transition-all duration-300 ${isActive ? 'border-[#756F3F] shadow-lg scale-105' : 'border-[#E3DEB8]'}`}
+              className={`relative bg-brand-main border-2 rounded-3xl p-4 flex flex-col items-center justify-center min-h-[140px] transition-all duration-500 ${isActive ? 'border-[#756F3F] shadow-xl scale-110' : 'border-[#E3DEB8]'}`}
               onClick={() => handleHover(index)}
             >
               {/* 图标 */}
-              <div className="relative w-12 h-12 mb-3 flex items-center justify-center">
+              <div className={`relative w-12 h-12 mb-3 flex items-center justify-center transition-transform duration-500 ${isActive ? 'scale-125' : 'scale-100'}`}>
                 <Icon
                   className="text-brand-light-olive w-10 h-10"
-                  strokeWidth={1.5}
+                  strokeWidth={isActive ? 2 : 1.5}
                 />
               </div>
               {/* 标题 */}
-              <p className="font-anaheim font-semibold text-sm text-center text-black leading-tight">
+              <p className={`font-anaheim text-sm text-center text-black leading-tight transition-all duration-300 ${isActive ? 'font-bold' : 'font-semibold'}`}>
                 {card.title.split("\n").join(" ")}
               </p>
             </div>
@@ -393,11 +406,10 @@ export function SupportNarrativeSection({
             repeatType: "reverse",
           }}
         >
-          <Image
+          <img
             src="/contact-support/？.svg"
             alt=""
-            fill
-            className="object-contain"
+            className="w-full h-full object-contain"
           />
         </motion.div>
 

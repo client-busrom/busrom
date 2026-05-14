@@ -1,13 +1,13 @@
 "use client"
 
-import React, { useMemo } from "react"
-import Image from "next/image"
-import Link from "next/link"
+import React, { useMemo, useCallback } from "react"
+import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
+import Link from "next/link"
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920
-const SECTION_HEIGHT = 981
+const SECTION_HEIGHT = 1080
 
 interface MediaObject {
   id: string
@@ -91,8 +91,8 @@ export function ProjectCommunicationGuideSection({
   description = "Busrom Provides **Global Distributors** , **Channel Partners** , And **Engineering Projects** With Stable Supply, Customized Production, Technical Solutions, And Stringent Quality Control To Help You Efficiently Advance Project Implementation.",
   image,
 }: ProjectCommunicationGuideSectionProps) {
-  // vw 尺寸计算
-  const vw = (v: number) => `${(v / DESIGN_WIDTH) * 100}vw`
+  // vw 尺寸计算 - 采用全局统一的 1920px 封顶算法
+  const vw = (px: number) => `calc(${px} * min(100vw, 1920px) / 1920)`
 
   // 解析 subtitle 文本（加粗部分显示橙色）
   const subtitleParts = useMemo(() => parseTextWithBold(subtitle), [subtitle])
@@ -104,165 +104,191 @@ export function ProjectCommunicationGuideSection({
     <section
       className="relative w-full overflow-hidden"
       style={{
-        aspectRatio: `${DESIGN_WIDTH} / ${SECTION_HEIGHT}`,
+        height: vw(SECTION_HEIGHT),
+        willChange: "transform",
       }}
     >
-      {/* 左上 Title + Busrom Logo */}
+      {/* 左侧 Title + Subtitle 流式布局区域 */}
       <div
-        className="absolute"
+        className="absolute flex flex-col"
         style={{
           left: vw(159),
-          top: vw(121),
+          top: vw(290),
         }}
       >
-        {/* Title 文字 */}
         <h2
           className="font-josefin-sans font-bold text-black"
           style={{
             fontSize: vw(82),
           }}
         >
-          {title.split('\n').map((line, i, arr) => (
-            <span
-              key={i}
-              style={{
-                display: 'block',
-                lineHeight: i === arr.length - 1 ? vw(160) : vw(90),
-              }}
-            >
-              {/* 最后一行（With）和 Busrom Logo 同一行，基线对齐 */}
-              {i === arr.length - 1 ? (
-                <>
-                  <span>{line}</span>
-                  {/* Busrom Logo */}
-                  <span
-                    className="relative inline-block"
+          {title.split('\n').map((line, i, arr) => {
+            const isLast = i === arr.length - 1
+            if (isLast) {
+              return (
+                <div
+                  key={i}
+                  className="flex items-end"
+                  style={{
+                    height: vw(120),
+                    marginTop: 0,
+                  }}
+                >
+                  <span style={{ lineHeight: 1 }}>{line}</span>
+                  {/* Busrom Logo - 紧跟文字，底部对齐 */}
+                  <div
+                    className="relative"
                     style={{
-                      width: vw(450),
-                      height: vw(112),
-                      marginLeft: vw(15),
-                      marginBottom: vw(-10),
-                      verticalAlign: 'baseline',
+                      width: vw(390),
+                      height: vw(115),
+                      marginLeft: vw(30),
                     }}
                   >
-                    <Image
+                    <img
                       src="/contact-support/busrom-logo.svg"
                       alt="Busrom"
-                      fill
-                      className="object-contain object-bottom object-left"
+                      className="object-contain object-bottom object-left w-full h-full"
                     />
-                  </span>
-                </>
-              ) : (
-                line
-              )}
-            </span>
-          ))}
+                  </div>
+                </div>
+              )
+            }
+            return (
+              <span
+                key={i}
+                style={{
+                  display: 'block',
+                  lineHeight: vw(95),
+                }}
+              >
+                {line}
+              </span>
+            )
+          })}
         </h2>
-      </div>
 
-      {/* 左下 Subtitle */}
-      <p
-        className="absolute font-josefin-sans font-semibold text-black"
-        style={{
-          left: vw(171),
-          top: vw(585),
-          width: vw(550),
-          fontSize: vw(32),
-          lineHeight: vw(42),
-        }}
-      >
-        {subtitleParts.map((part, index) => {
-          // 换行标记
-          if (part.isLineBreak) {
-            return <br key={index} />
-          }
+        {/* 间隔区域 */}
+        <div style={{ height: vw(116) }} />
 
-          return (
-            <span
-              key={index}
-              className={part.isBold ? "font-bold text-brand-accent-orange" : ""}
-            >
-              {part.text}
-            </span>
-          )
-        })}
-      </p>
-
-      {/* 右侧图片区域 - 使用 SVG mask 实现沿轨迹擦出效果 */}
-      {image && (
-        <div
-          className="absolute overflow-hidden"
+        {/* 左下 Subtitle - 现在是流式布局 */}
+        <p
+          className="font-josefin-sans font-semibold text-black"
           style={{
-            right: vw(0),
-            top: vw(-50),
-            width: vw(1045),
-            height: vw(959),
+            marginLeft: vw(12),
+            width: vw(680),
+            fontSize: vw(40),
+            lineHeight: vw(52),
           }}
         >
-          {/* SVG clipPath 定义 */}
-          <svg width="0" height="0" style={{ position: 'absolute' }}>
-            <defs>
-              <clipPath id="image-clip" clipPathUnits="objectBoundingBox">
-                <path
-                  transform="scale(0.000957, 0.001043)"
-                  d="M452.535 0C463.037 94.7206 453.461 322.323 319.051 498.396C260.215 575.47 236.855 623.877 233.355 654.396C232.381 662.896 234.355 672.396 241.423 676.17C251.045 681.308 272.221 679.311 304.842 658.52C345.634 632.52 389.697 580.912 415.181 508.015C470.018 351.147 530.832 237.899 604.799 167.049C687.006 88.3047 781.017 66.4688 873.227 85.8584C909.938 93.5781 943.71 111.877 969.892 140.862C995.102 168.773 1008.25 200.944 1014.72 229.885C1027.05 285.046 1018.76 343.772 1005.38 393.695C980.96 484.896 928.374 587.668 859.229 678.087C873.665 671.261 889.521 664.053 906.51 656.997C1017.19 611.026 1171.66 573.559 1370.64 638.169L1296.22 867.39C1167.2 825.499 1073.66 848.533 998.953 879.562C979.26 887.741 960.695 896.581 941.869 905.783C924.382 914.332 903.408 924.849 884.596 933.12C866.095 941.254 840.998 951.24 813.434 955.896C784.319 960.815 744.372 961.119 704.103 940.065C618.509 895.316 585.263 813.664 583.374 742.017C583.073 730.596 583.524 719.148 584.684 707.769C544.109 771.772 492.414 824.756 434.374 861.749C343.941 919.388 220.969 946.128 110.935 880.107C26.4259 829.402 -5.84353 735.18 0.855469 643.099C7.49248 551.871 50.8247 452.589 127.488 352.162C209.877 244.236 219.834 88.1715 213.003 26.5586L452.535 0Z"
-                />
-              </clipPath>
-            </defs>
-          </svg>
-          {/* 图片容器 */}
-          <div
-            className="absolute inset-0 w-full h-full"
-            style={{
-              clipPath: "url(#image-clip)",
-            }}
-          >
-            {image.enableLink && image.linkUrl ? (
-              <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} rel={image.openInNewTab ? "noopener noreferrer" : undefined} className="block w-full h-full">
+          {subtitleParts.map((part, index) => {
+            if (part.isLineBreak) {
+              return <br key={index} />
+            }
+
+            return (
+              <span
+                key={index}
+                className={part.isBold ? "font-bold text-brand-accent-orange" : ""}
+              >
+                {part.text}
+              </span>
+            )
+          })}
+        </p>
+      </div>
+
+      {/* 右侧图片区域 - 使用带 viewBox 的 SVG 确保 clipPath 完美缩放 */}
+      {image && (
+        <svg
+          className="absolute overflow-hidden"
+          viewBox="0 0 1088 1080"
+          preserveAspectRatio="xMidYMid slice"
+          style={{
+            right: vw(0),
+            top: vw(0),
+            width: vw(1088),
+            height: vw(1080),
+          }}
+        >
+          <defs>
+            <clipPath id="image-clip">
+              <path d="M454 0C464.502 94.7206 453.461 295.765 319.051 471.838C260.215 548.911 236.855 597.318 233.355 627.838C232.381 636.338 234.355 645.838 241.423 649.611C251.045 654.749 272.221 652.752 304.842 631.961C345.634 605.961 389.697 554.353 415.181 481.456C470.018 324.588 530.832 211.341 604.799 140.49C687.006 61.7462 781.017 39.9102 873.227 59.2998C909.938 67.0195 943.71 85.318 969.892 114.304C995.102 142.215 1008.25 174.386 1014.72 203.326C1027.05 258.488 1018.75 317.214 1005.38 367.137C980.96 458.338 928.374 561.109 859.229 651.528C873.665 644.702 889.521 637.495 906.51 630.438C1017.19 584.467 1171.66 547.001 1370.64 611.61L1296.22 840.831C1167.2 798.941 1073.66 821.975 998.953 853.003C979.26 861.183 960.695 870.022 941.869 879.225C924.382 887.773 903.408 898.291 884.596 906.562C866.095 914.695 840.998 924.682 813.434 929.338C784.319 934.256 744.372 934.56 704.103 913.507C618.509 868.757 585.263 787.105 583.374 715.458C583.083 704.403 582.215 679.183 588 655.941C579.571 669.941 493.916 809.346 436.5 845.941C346.067 903.58 220.969 919.57 110.935 853.549C26.4259 802.843 -5.84353 708.621 0.855469 616.54C7.49248 525.312 50.8247 426.03 127.488 325.604C209.877 217.677 219.834 61.6129 213.003 0H454Z" fill="white" />
+            </clipPath>
+          </defs>
+
+          <foreignObject x="0" y="0" width="1088" height="1080" clipPath="url(#image-clip)">
+            <motion.div
+              initial={{ "--reveal-progress": "0%", opacity: 0 } as any}
+              whileInView={{ "--reveal-progress": "120%", opacity: 1 } as any}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1.8, ease: [0.43, 0.13, 0.23, 0.96] }}
+              className="w-full h-full relative"
+              style={{
+                WebkitMaskImage: `linear-gradient(110deg, #000 var(--reveal-progress), transparent calc(var(--reveal-progress) + 15%))`,
+                maskImage: `linear-gradient(110deg, #000 var(--reveal-progress), transparent calc(var(--reveal-progress) + 15%))`,
+                willChange: "mask-image, opacity",
+              }}
+            >
+              {image.enableLink && image.linkUrl ? (
+                <Link
+                  href={image.linkUrl}
+                  target={image.openInNewTab ? "_blank" : undefined}
+                  rel={image.openInNewTab ? "noopener noreferrer" : undefined}
+                  className="block w-full h-full"
+                >
+                  <OptimizedImage
+                    image={image as any}
+                    alt="Project communication"
+                    size="xlarge"
+                    className="w-full h-full object-cover"
+                  />
+                </Link>
+              ) : (
                 <OptimizedImage
                   image={image as any}
                   alt="Project communication"
                   size="xlarge"
                   className="w-full h-full object-cover"
-                  objectPosition={
-                    image.cropFocalPoint
-                      ? `${image.cropFocalPoint.x}% ${image.cropFocalPoint.y}%`
-                      : "center"
-                  }
                 />
-              </Link>
-            ) : (
-              <OptimizedImage
-                image={image as any}
-                alt="Project communication"
-                size="xlarge"
-                className="w-full h-full object-cover"
-                objectPosition={
-                  image.cropFocalPoint
-                    ? `${image.cropFocalPoint.x}% ${image.cropFocalPoint.y}%`
-                    : "center"
-                }
+              )}
+
+              {/* 扫过的光影轨迹 - 持续循环增强质感 */}
+              <motion.div
+                initial={{ x: "-150%", skewX: -20 }}
+                animate={{ x: "350%", skewX: -20 }}
+                transition={{ 
+                  duration: 2.5, 
+                  ease: "easeInOut", 
+                  repeat: Infinity, 
+                  repeatDelay: 4
+                }}
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: "linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent)",
+                  width: "40%",
+                  zIndex: 1,
+                }}
               />
-            )}
-          </div>
-        </div>
+            </motion.div>
+          </foreignObject>
+        </svg>
       )}
 
-      {/* 右侧卡片 */}
+      {/* Description Box Area */}
       <div
         className="absolute bg-brand-overlay-olive-60"
         style={{
           left: vw(1087),
-          top: vw(566),
+          top: vw(735),
           width: vw(597),
           height: vw(321),
           borderRadius: vw(30),
           backdropFilter: `blur(${vw(79)})`,
+          WebkitBackdropFilter: `blur(${vw(79)})`,
+          willChange: "backdrop-filter, transform",
           boxShadow: `0 4px ${vw(23)} rgba(0, 0, 0, 0.25)`,
         }}
       >
-        {/* 卡片内文字 */}
         <p
           className="absolute font-josefin-sans font-medium text-white"
           style={{

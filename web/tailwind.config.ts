@@ -183,6 +183,7 @@ const config: Config = {
         'limelight': ['var(--font-limelight)', 'cursive'],
         'katibeh': ['var(--font-katibeh)', 'cursive'],
         'kavivanar': ['Kavivanar', 'cursive'],
+        'acme': ['var(--font-acme)', 'sans-serif'],
 
         // --- 系统字体 (直接使用名字) ---
         'arial':       ['Arial', 'sans-serif'],

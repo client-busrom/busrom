@@ -264,7 +264,7 @@ export function ContactUsTemplate({ locale, data, ssrData }: ContactUsTemplatePr
       <div
         className="relative"
         style={{
-          background: "linear-gradient(180deg, #FFFDE9 0%, #FFF8DC 100%)",
+          background: "linear-gradient(180deg, #FFF7DC 10%, #FFFDE8 30%)",
         }}
       >
         {/* Project Communication Guide Section */}

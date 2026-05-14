@@ -316,6 +316,14 @@ const academyEngraved = localFont({
   preload: false,
 });
 
+const acme = localFont({
+  src: "../../public/fonts/Acme-Regular.ttf",
+  weight: "400",
+  variable: "--font-acme",
+  display: "swap",
+  preload: false,
+});
+
 export function generateStaticParams() {
   return locales.map(locale => ({ locale }));
 }
@@ -424,6 +432,7 @@ export default async function RootLayout({
         ${phudu.variable}
         ${meaCulpa.variable}
         ${academyEngraved.variable}
+        ${acme.variable}
         antialiased
       `}
     >

@@ -1,7 +1,8 @@
 "use client"
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from "react"
-import Image from "next/image"
+import { motion } from "framer-motion"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import Link from "next/link"
 import useEmblaCarousel from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
@@ -20,8 +21,8 @@ const CARD_HEIGHT = 252
 const CARD_GAP = 12
 
 // 放大后的尺寸 - 桌面端
-const EXPANDED_WIDTH = 400
-const EXPANDED_HEIGHT = 500
+const EXPANDED_WIDTH = 404
+const EXPANDED_HEIGHT = 504
 
 // 卡片尺寸 - 移动端（固定尺寸，不放大）
 const MOBILE_CARD_WIDTH = 140
@@ -29,7 +30,7 @@ const MOBILE_CARD_HEIGHT = 180
 const MOBILE_CARD_GAP = 12
 
 // 图片大小（百分比）
-const IMAGE_SIZE = "80%"
+const IMAGE_SIZE = "100%"
 
 // 自动轮播间隔 (ms)
 const AUTO_PLAY_INTERVAL = 4000
@@ -108,10 +109,10 @@ export function ProductSeriesEntrySection({
   )
 
   // vw 尺寸计算 - 桌面端
-  const vw = (v: number) => `${(v / DESIGN_WIDTH) * 100}vw`
+  const vw = (px: number) => `calc(${px} * min(100vw, 1920px) / 1920)`
 
   // vw 尺寸计算 - 移动端
-  const mvw = (v: number) => `${(v / MOBILE_DESIGN_WIDTH) * 100}vw`
+  const mvw = useCallback((v: number) => `${(v / MOBILE_DESIGN_WIDTH) * 100}vw`, [])
 
   // 点击卡片切换放大状态
   const handleCardClick = useCallback((index: number) => {
@@ -246,6 +247,10 @@ export function ProductSeriesEntrySection({
     return mobileEmblaApi?.plugins()?.autoScroll
   }, [mobileEmblaApi])
 
+  // 预计算标题字符，避免每次渲染都 split
+  const boldChars = useMemo(() => titleRightBold.split(""), [titleRightBold])
+  const normalChars = useMemo(() => titleRightNormal.split(""), [titleRightNormal])
+
   // 移动端导航
   const mobileGoToPrev = useCallback(() => {
     if (!mobileEmblaApi) return
@@ -334,11 +339,12 @@ export function ProductSeriesEntrySection({
                           height: "60%",
                         }}
                       >
-                        <Image
-                          src={product.image.variants?.medium || product.image.url}
+                        <OptimizedImage
+                          image={product.image}
                           alt={product.image.alt || product.title}
-                          fill
-                          className="object-contain"
+                          size="medium"
+                          objectFit="contain"
+                          className="w-full h-full"
                         />
                       </div>
                     )}
@@ -387,9 +393,10 @@ export function ProductSeriesEntrySection({
   // 桌面端布局
   return (
     <section
-      className="relative w-full overflow-x-clip"
+      className="relative w-full overflow-hidden bg-brand-light-olive-bg"
       style={{
-        aspectRatio: `${DESIGN_WIDTH} / ${SECTION_HEIGHT}`,
+        height: vw(SECTION_HEIGHT),
+        willChange: "transform",
       }}
     >
       {/* 标题区域 - 左侧 WHICH PRODUCTS */}
@@ -470,15 +477,80 @@ export function ProductSeriesEntrySection({
           lineHeight: vw(86),
         }}
       >
-        {/* Are You - 四向描边效果，类似 text-stroke-black */}
-        <span className="text-brand-main text-stroke-dark-olive">
-          {titleRightBold}
-        </span>
-        <br />
-        {/* Looking For? - 实心填充 */}
-        <span className="text-black">
-          {titleRightNormal}
-        </span>
+        {/* Are You - 字符跳动效果 */}
+        <div className="flex">
+          {boldChars.map((char, index) => (
+            <motion.span
+              key={`bold-${index}`}
+              className="inline-block text-brand-main text-stroke-dark-olive"
+              style={{ 
+                marginRight: char === " " ? vw(16) : 0,
+                willChange: "transform"
+              }}
+              animate={{ y: [0, -8, 0] }}
+              transition={{
+                duration: 0.6,
+                ease: "easeInOut",
+                repeat: Infinity,
+                repeatDelay: 4,
+                delay: index * 0.05,
+              }}
+            >
+              {char === " " ? "\u00A0" : char}
+            </motion.span>
+          ))}
+        </div>
+
+        {/* Looking For? - 实心填充 + 问号特殊动效 */}
+        <div className="flex">
+          {normalChars.map((char, index) => {
+            if (char === "?") {
+              return (
+                <motion.span
+                  key="question-mark"
+                  className="inline-block text-black"
+                  style={{ 
+                    originX: 0.5, 
+                    originY: 0.5,
+                    willChange: "transform"
+                  }}
+                  animate={{
+                    y: [0, -12, 0],
+                    rotate: [-18, -10, -18],
+                  }}
+                  transition={{
+                    duration: 2,
+                    ease: "easeInOut",
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                  }}
+                >
+                  {char}
+                </motion.span>
+              )
+            }
+            return (
+              <motion.span
+                key={`normal-${index}`}
+                className="inline-block text-black"
+                style={{ 
+                  marginRight: char === " " ? vw(16) : 0,
+                  willChange: "transform"
+                }}
+                animate={{ y: [0, -8, 0] }}
+                transition={{
+                  duration: 0.6,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                  repeatDelay: 4,
+                  delay: (boldChars.length + index) * 0.05,
+                }}
+              >
+                {char === " " ? "\u00A0" : char}
+              </motion.span>
+            )
+          })}
+        </div>
       </div>
 
       {/* 左箭头 */}
@@ -566,12 +638,14 @@ export function ProductSeriesEntrySection({
             const isLast = index === products.length - 1
 
             return (
-              <div
+              <motion.div
                 key={product.id}
-                className="relative flex-shrink-0 cursor-pointer transition-all duration-500 ease-out overflow-visible"
+                className="embla__slide relative flex-shrink-0 cursor-pointer"
                 style={{
                   width: isActive ? vw(EXPANDED_WIDTH) : vw(CARD_WIDTH),
                   height: isActive ? vw(EXPANDED_HEIGHT) : vw(CARD_HEIGHT),
+                  transition: "width 0.5s ease, height 0.5s ease",
+                  willChange: "width, height",
                   borderRadius: vw(30),
                   boxShadow: isActive
                     ? "0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 12px 24px -8px rgba(0, 0, 0, 0.4)"
@@ -600,11 +674,12 @@ export function ProductSeriesEntrySection({
                         height: IMAGE_SIZE,
                       }}
                     >
-                      <Image
-                        src={product.image.variants?.large || product.image.url}
+                      <OptimizedImage
+                        image={product.image}
                         alt={product.image.alt || product.title}
-                        fill
-                        className="object-contain"
+                        size="medium"
+                        objectFit="contain"
+                        className="w-full h-full"
                       />
                     </div>
                   )}
@@ -614,41 +689,55 @@ export function ProductSeriesEntrySection({
                 {isActive && (
                   <Link
                     href={product.link || viewMoreLink}
-                    className="absolute transition-all duration-300"
+                    className="absolute transition-opacity duration-300"
                     style={{
                       left: `calc(100% + ${vw(10)})`,
-                      top: 0,
+                      top: `calc(${vw(10)})`,
                     }}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    {/* 箭头装饰 - 用 span + background-image */}
-                    <span
-                      style={{
-                        display: "block",
-                        width: vw(80),
-                        height: vw(80),
-                        backgroundImage: "url(/contact-support/arrow-corner.svg)",
-                        backgroundSize: "contain",
-                        backgroundRepeat: "no-repeat",
+                    <motion.div
+                      style={{ willChange: "transform" }}
+                      animate={{
+                        x: [vw(-8), vw(8)],
+                        y: [vw(8), vw(-8)],
                       }}
-                    />
-                    {/* buttonText 文字 - 在箭头下方 */}
-                    {product.buttonText && (
+                      transition={{
+                        duration: 1.2,
+                        repeat: Infinity,
+                        repeatType: "reverse",
+                        ease: "easeInOut",
+                      }}
+                    >
+                      {/* 箭头装饰 */}
                       <span
-                        className="absolute font-josefin-sans font-bold text-black whitespace-nowrap"
                         style={{
-                          left: vw(0),
-                          top: vw(85),
-                          fontSize: vw(14),
-                          lineHeight: vw(18),
+                          display: "block",
+                          width: vw(100),
+                          height: vw(100),
+                          backgroundImage: "url(/contact-support/arrow-corner.svg)",
+                          backgroundSize: "contain",
+                          backgroundRepeat: "no-repeat",
                         }}
-                      >
-                        {product.buttonText}
-                      </span>
-                    )}
+                      />
+                      {/* buttonText 文字 - 在箭头下方 */}
+                      {product.buttonText && (
+                        <span
+                          className="absolute font-josefin-sans font-bold text-black whitespace-nowrap"
+                          style={{
+                            left: vw(0),
+                            top: vw(110),
+                            fontSize: vw(14),
+                            lineHeight: vw(18),
+                          }}
+                        >
+                          {product.buttonText}
+                        </span>
+                      )}
+                    </motion.div>
                   </Link>
                 )}
-              </div>
+              </motion.div>
             )
           })}
         </div>

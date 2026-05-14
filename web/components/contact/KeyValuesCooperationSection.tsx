@@ -7,7 +7,7 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920
-const SECTION_HEIGHT = 818
+const SECTION_HEIGHT = 920
 
 // 内容缩放比例
 const CONTENT_SCALE = 0.8
@@ -49,7 +49,7 @@ export function KeyValuesCooperationSection({
   const [activeIndex, setActiveIndex] = useState(0)
 
   // vw 尺寸计算
-  const vw = (v: number) => `${(v / DESIGN_WIDTH) * 100}vw`
+  const vw = (px: number) => `calc(${px} * min(100vw, 1920px) / 1920)`
 
   // 当前显示的item
   const currentItem = items[activeIndex] || null
@@ -69,9 +69,9 @@ export function KeyValuesCooperationSection({
 
   return (
     <section
-      className="relative w-full overflow-hidden"
+      className="relative w-full"
       style={{
-        height: vw(scaledHeight),
+        minHeight: vw(scaledHeight),
         marginTop: vw(40),
         marginBottom: vw(40),
       }}
@@ -80,7 +80,7 @@ export function KeyValuesCooperationSection({
       <div
         className="absolute left-0 w-full"
         style={{
-          height: vw(SECTION_HEIGHT),
+          minHeight: vw(SECTION_HEIGHT),
           top: `calc(50% - ${vw(SECTION_HEIGHT * CONTENT_SCALE / 2)})`,
           transform: `scale(${CONTENT_SCALE})`,
           transformOrigin: "top center",
@@ -404,48 +404,47 @@ export function KeyValuesCooperationSection({
         </svg>
       </button>
 
-      {/* 下方三个要点卡片 */}
+      {/* 下方三个要点卡片 - 改为 Flex 布局并支持高度自撑 */}
       {currentItem && (
         <div
           key={`cards-${activeIndex}`}
-          className="absolute flex animate-fade-in"
+          className="absolute flex justify-center animate-fade-in w-full"
           style={{
-            left: vw(153),
             top: vw(633),
             gap: vw(41),
+            paddingLeft: vw(153),
+            paddingRight: vw(153),
           }}
         >
           {currentItem.points.map((point, index) => (
             <div
               key={index}
-              className="relative bg-brand-cream-light border border-brand-cream-border"
+              className="flex flex-col bg-brand-cream-light border border-brand-cream-border"
               style={{
-                width: vw(507),
-                height: vw(185),
+                flex: 1,
+                minHeight: vw(185),
                 borderRadius: vw(30),
+                padding: `${vw(40)} ${vw(40)}`,
                 animationDelay: `${index * 0.1}s`,
               }}
             >
               {/* 顶部橄榄色小条 */}
               <div
-                className="absolute bg-brand-secondary"
+                className="bg-brand-secondary shrink-0"
                 style={{
-                  left: vw(40),
-                  top: vw(40),
                   width: vw(49),
                   height: vw(8),
                   borderRadius: vw(19),
+                  marginBottom: vw(15), // 计算得出: 63 - 40 - 8 = 15
                 }}
               />
               {/* 要点文字 */}
               <p
-                className="absolute font-montserrat font-semibold text-left text-brand-orange"
+                className="font-acme font-semibold text-left text-brand-orange"
                 style={{
-                  left: vw(40),
-                  top: vw(63),
-                  width: vw(428),
                   fontSize: vw(32),
                   lineHeight: vw(44),
+                  width: "100%",
                 }}
               >
                 {point}
