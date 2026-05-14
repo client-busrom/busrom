@@ -8,7 +8,7 @@ import React, {
   useMemo,
 } from "react";
 import { CUSTOM_ICONS } from "@/lib/icons";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { Turnstile } from "@/components/ui/turnstile";
 import { cn } from "@/lib/utils";
@@ -184,6 +184,7 @@ export function ContactFormSection({
   const [errorMessage, setErrorMessage] = useState("");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
   const [isHoveringControl, setIsHoveringControl] = useState(false);
 
   // Textarea 高度追踪
@@ -255,12 +256,14 @@ export function ContactFormSection({
   useEffect(() => {
     if (validImagesForEffect.length <= 1) return;
     const interval = setInterval(() => {
+      setDirection(1);
       setCurrentImageIndex((prev) => (prev + 1) % validImagesForEffect.length);
     }, 4000);
     return () => clearInterval(interval);
   }, [validImagesForEffect.length, autoPlayKey]);
 
   const handlePrevImage = () => {
+    setDirection(-1);
     setCurrentImageIndex((prev) =>
       prev > 0 ? prev - 1 : validImagesForEffect.length - 1,
     );
@@ -268,6 +271,7 @@ export function ContactFormSection({
   };
 
   const handleNextImage = () => {
+    setDirection(1);
     setCurrentImageIndex((prev) =>
       prev < validImagesForEffect.length - 1 ? prev + 1 : 0,
     );
@@ -287,7 +291,7 @@ export function ContactFormSection({
       ? {
           width: "100%",
           height: mvw(220),
-          borderRadius: mvw(110),
+          borderRadius: mvw(40),
           backgroundColor: "#D9D9D9",
           marginTop: mvw(20),
           marginBottom: mvw(20),
@@ -314,42 +318,57 @@ export function ContactFormSection({
             : "relative mx-auto overflow-hidden max-w-[640px]"
         }
       >
-        {/* 轮播图 */}
-        {validImages[currentImageIndex] && (
-          <OptimizedImage
-            image={validImages[currentImageIndex] as any}
-            alt="Contact form image"
-            size="xlarge"
-            className="w-full h-full object-cover transition-opacity duration-500"
-            objectPosition={
-              validImages[currentImageIndex]?.cropFocalPoint
-                ? `${validImages[currentImageIndex].cropFocalPoint!.x}% ${validImages[currentImageIndex].cropFocalPoint!.y}%`
-                : "center"
-            }
-          />
-        )}
+        {/* 隐藏的预加载层 - 确保所有图片都被浏览器提前缓存 */}
+        <div className="hidden" aria-hidden="true">
+          {validImages.map((img, idx) => (
+            <OptimizedImage key={`preload-${idx}`} image={img as any} size="medium" priority={true} />
+          ))}
+        </div>
 
-        {/* 圆环装饰 - 在图片内部 */}
-        <div
-          className="absolute rounded-full border-2"
-          style={
-            mobile
-              ? {
-                  left: mvw(120),
-                  top: mvw(160),
-                  width: mvw(60),
-                  height: mvw(60),
-                  borderColor: "white",
+        {/* 幻灯片横切动画容器 */}
+        <div className="absolute inset-0">
+          <AnimatePresence initial={false} mode="popLayout" custom={direction}>
+            <motion.div
+              key={currentImageIndex}
+              custom={direction}
+              variants={{
+                enter: (direction: number) => ({
+                  x: direction > 0 ? "100%" : "-100%",
+                  opacity: 0
+                }),
+                center: {
+                  x: 0,
+                  opacity: 1
+                },
+                exit: (direction: number) => ({
+                  x: direction < 0 ? "100%" : "-100%",
+                  opacity: 0
+                })
+              }}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{
+                x: { type: "spring", stiffness: 300, damping: 30 },
+                opacity: { duration: 0.2 }
+              }}
+              className="absolute inset-0"
+            >
+              <OptimizedImage
+                image={validImagesForEffect[currentImageIndex] as any}
+                alt="Contact form image"
+                size="medium"
+                priority={true}
+                className="w-full h-full object-cover"
+                objectPosition={
+                  validImages[currentImageIndex]?.cropFocalPoint
+                    ? `${validImages[currentImageIndex].cropFocalPoint.x}% ${validImages[currentImageIndex].cropFocalPoint.y}%`
+                    : "center"
                 }
-              : {
-                  left: vw(420),
-                  top: vw(290),
-                  width: vw(140),
-                  height: vw(140),
-                  borderColor: "white",
-                }
-          }
-        />
+              />
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
         {/* 移动端切换按钮 */}
         {mobile && validImages.length > 1 && (
@@ -510,17 +529,20 @@ export function ContactFormSection({
     return subtitle.map((segment, index) => {
       if (segment.bold) {
         return (
-          <span key={index} className="relative inline-block">
-            <span style={{ color: "#FFA600" }}>{segment.text}</span>
-            <span
-              className="absolute inset-0"
-              style={{
-                color: "transparent",
-                WebkitTextStroke: isMobile ? "0.5px #825500" : "1px #825500",
-              }}
-            >
-              {segment.text}
-            </span>
+          <span
+            key={index}
+            className="relative inline-block font-bold text-[#FFA600]"
+            style={{
+              textShadow: `
+                ${vw(1)} ${vw(1)} 0 #FFEB6B,
+                ${vw(2)} ${vw(2)} 0 #FFEB6B,
+                ${vw(3)} ${vw(3)} ${vw(4)} rgba(0,0,0,0.3)
+              `,
+              WebkitTextStroke: isMobile ? "0.5px #FFEB6B" : "1px #FFEB6B",
+              paintOrder: "stroke fill"
+            }}
+          >
+            {segment.text}
           </span>
         );
       }

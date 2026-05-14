@@ -129,39 +129,70 @@ export function FaqPopularSection({ data, locale = "en" }: FaqPopularSectionProp
   const currentSlide =
     slides[((activeIndex % slides.length) + slides.length) % slides.length];
 
-  // Hydrate ALL FAQ and Media data from slides
+  // Hydrate ALL FAQ and Media data from slides using Batch Fetch to avoid N+1 problem
   useEffect(() => {
     if (!slides || slides.length === 0) return;
 
+    const faqIdsToFetch = new Set<string>();
+    const mediaIdsToFetch = new Set<string>();
+
     slides.forEach((slide: any) => {
-      // Hydrate FAQ
       const faqId = slide.faq;
       if (faqId && typeof faqId !== "object" && !faqDataCache[faqId] && !fetchingIdsRef.current.has(faqId)) {
+        faqIdsToFetch.add(faqId);
         fetchingIdsRef.current.add(faqId);
-        fetch(`/api/payload/faq-items/${faqId}?depth=0`)
-          .then(res => res.json())
-          .then(d => setFaqDataCache(prev => ({ ...prev, [faqId]: d })))
-          .catch(err => {
-            console.error("FAQ Fetch Error:", err);
-            fetchingIdsRef.current.delete(faqId);
-          });
       }
 
-      // Hydrate Media
       const imageId = slide.image || slide.image1;
-      const idStr = String(imageId);
-      if (imageId && typeof imageId !== "object" && !mediaCache[idStr] && !fetchingIdsRef.current.has(idStr)) {
-        fetchingIdsRef.current.add(idStr);
-        fetch(`/api/payload/media/${imageId}?depth=0`)
-          .then(res => res.json())
-          .then(d => setMediaCache(prev => ({ ...prev, [idStr]: d })))
-          .catch(err => {
-            console.error("Media Fetch Error:", err);
-            fetchingIdsRef.current.delete(idStr);
-          });
+      if (imageId && typeof imageId !== "object") {
+        const idStr = String(imageId);
+        if (!mediaCache[idStr] && !fetchingIdsRef.current.has(idStr)) {
+          mediaIdsToFetch.add(idStr);
+          fetchingIdsRef.current.add(idStr);
+        }
       }
     });
-  }, [slides]); // Only run when slides change
+
+    // Batch Fetch FAQ Items
+    if (faqIdsToFetch.size > 0) {
+      const query = Array.from(faqIdsToFetch)
+        .map((id, index) => `where[id][in][${index}]=${id}`)
+        .join("&");
+      fetch(`/api/payload/faq-items?${query}&depth=0&limit=100`)
+        .then(res => res.json())
+        .then(data => {
+          const newItems = (data.docs || []).reduce((acc: any, doc: any) => {
+            acc[doc.id] = doc;
+            return acc;
+          }, {});
+          setFaqDataCache(prev => ({ ...prev, ...newItems }));
+        })
+        .catch(err => {
+          console.error("Batch FAQ Fetch Error:", err);
+          faqIdsToFetch.forEach(id => fetchingIdsRef.current.delete(id));
+        });
+    }
+
+    // Batch Fetch Media Items
+    if (mediaIdsToFetch.size > 0) {
+      const query = Array.from(mediaIdsToFetch)
+        .map((id, index) => `where[id][in][${index}]=${id}`)
+        .join("&");
+      fetch(`/api/payload/media?${query}&depth=0&limit=100`)
+        .then(res => res.json())
+        .then(data => {
+          const newMedia = (data.docs || []).reduce((acc: any, doc: any) => {
+            acc[doc.id] = doc;
+            return acc;
+          }, {});
+          setMediaCache(prev => ({ ...prev, ...newMedia }));
+        })
+        .catch(err => {
+          console.error("Batch Media Fetch Error:", err);
+          mediaIdsToFetch.forEach(id => fetchingIdsRef.current.delete(id));
+        });
+    }
+  }, [slides, faqDataCache, mediaCache]); // Run when slides or cache status changes
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
