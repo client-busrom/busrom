@@ -75,7 +75,7 @@ function collectMediaIds(node: any, ids: Set<string>): void {
   }
 
   // 1. Check known single image fields at any level
-  const knownFields = ['image', 'media', 'mediaIcon', 'backgroundImage', 'mediaMobile']
+  const knownFields = ['image', 'media', 'mediaIcon', 'backgroundImage', 'mediaMobile', 'icon']
   knownFields.forEach(field => {
     const id = extractMediaId(node[field])
     if (id) ids.add(id)
@@ -146,7 +146,7 @@ function populateMediaFromCache(node: any, cache: Map<string, any>): any {
   const populated = { ...node }
 
   // 1. Check known single image fields
-  const knownFields = ['image', 'media', 'mediaIcon', 'backgroundImage', 'mediaMobile']
+  const knownFields = ['image', 'media', 'mediaIcon', 'backgroundImage', 'mediaMobile', 'icon']
   knownFields.forEach(field => {
     const id = extractMediaId(populated[field])
     if (id && cache.has(id)) {

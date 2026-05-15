@@ -17,6 +17,7 @@ interface SpecificationItem {
 
 interface SpecificationGroup {
   text: string
+  description?: string
   items: SpecificationItem[]
 }
 
@@ -166,7 +167,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
 
   // Add group
   const addGroup = useCallback(() => {
-    const newSpecs = [...currentSpecs, { text: '', items: [] }]
+    const newSpecs = [...currentSpecs, { text: '', description: '', items: [] }]
     updateLocaleSpecs(activeLocale, newSpecs)
   }, [currentSpecs, activeLocale, updateLocaleSpecs])
 
@@ -180,6 +181,14 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
   const updateGroupText = useCallback((groupIdx: number, text: string) => {
     const newSpecs = currentSpecs.map((group, i) =>
       i === groupIdx ? { ...group, text } : group
+    )
+    updateLocaleSpecs(activeLocale, newSpecs)
+  }, [currentSpecs, activeLocale, updateLocaleSpecs])
+
+  // Update group description
+  const updateGroupDescription = useCallback((groupIdx: number, description: string) => {
+    const newSpecs = currentSpecs.map((group, i) =>
+      i === groupIdx ? { ...group, description } : group
     )
     updateLocaleSpecs(activeLocale, newSpecs)
   }, [currentSpecs, activeLocale, updateLocaleSpecs])
@@ -264,16 +273,24 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
     try {
       // Collect all texts to translate (group names and item texts)
       const allTexts: string[] = []
-      const structure: { groupIndex: number; itemIndex: number | null }[] = []
+      const structure: { groupIndex: number; itemIndex: number | null; type: 'name' | 'desc' | 'item' }[] = []
 
       for (let gi = 0; gi < sourceSpecs.length; gi++) {
         const group = sourceSpecs[gi]
+        
+        // Group Name
         allTexts.push(group.text)
-        structure.push({ groupIndex: gi, itemIndex: null })
+        structure.push({ groupIndex: gi, itemIndex: null, type: 'name' })
+
+        // Group Description
+        if (group.description) {
+          allTexts.push(group.description)
+          structure.push({ groupIndex: gi, itemIndex: null, type: 'desc' })
+        }
 
         for (let ii = 0; ii < group.items.length; ii++) {
           allTexts.push(group.items[ii].text)
-          structure.push({ groupIndex: gi, itemIndex: ii })
+          structure.push({ groupIndex: gi, itemIndex: ii, type: 'item' })
         }
       }
 
@@ -304,17 +321,20 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
         // Reconstruct specifications from translated texts
         const translatedSpecs: SpecificationGroup[] = sourceSpecs.map(group => ({
           text: '',
+          description: '',
           items: group.items.map(item => ({ ...item, text: '' })),
         }))
 
         for (let i = 0; i < structure.length; i++) {
-          const { groupIndex, itemIndex } = structure[i]
+          const { groupIndex, itemIndex, type } = structure[i]
           const translatedText = translations[i] || allTexts[i]
 
-          if (itemIndex === null) {
+          if (type === 'name') {
             translatedSpecs[groupIndex].text = translatedText
+          } else if (type === 'desc') {
+            translatedSpecs[groupIndex].description = translatedText
           } else {
-            translatedSpecs[groupIndex].items[itemIndex].text = translatedText
+            translatedSpecs[groupIndex].items[itemIndex!].text = translatedText
           }
         }
 
@@ -556,12 +576,22 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                     >▼</button>
                   </div>
                   <div className="spec-group__name">
-                    <label>Group Name (e.g., Color, Size)</label>
+                    <label>{isZh ? '规格组名称 (如: 颜色, 尺寸)' : 'Group Name (e.g., Color, Size)'}</label>
                     <textarea
                       value={group.text}
                       onChange={(e) => updateGroupText(groupIdx, e.target.value)}
                       onBlur={handleBlur}
-                      placeholder="e.g., Color"
+                      placeholder={isZh ? '例如: 颜色' : 'e.g., Color'}
+                      rows={1}
+                    />
+                  </div>
+                  <div className="spec-group__desc">
+                    <label>{isZh ? '规格组描述 (可选)' : 'Group Description (Optional)'}</label>
+                    <textarea
+                      value={group.description || ''}
+                      onChange={(e) => updateGroupDescription(groupIdx, e.target.value)}
+                      onBlur={handleBlur}
+                      placeholder={isZh ? '请输入对此规格组的补充说明...' : 'Enter supplementary description for this group...'}
                       rows={1}
                     />
                   </div>
@@ -754,7 +784,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
           onClick={() => {
             addGroup()
             if (activeLocale !== currentLocale.code) {
-              const newSpecs = [...currentSpecs, { text: '', items: [] }]
+              const newSpecs = [...currentSpecs, { text: '', description: '', items: [] }]
               setTimeout(() => saveToLocale(activeLocale, newSpecs), 0)
             }
           }}

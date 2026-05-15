@@ -3,7 +3,6 @@
  * Extracts structured data from Lexical content nodes
  */
 
-import type { Locale } from "@/i18n.config"
 
 // Type definitions
 export interface LexicalNode {
@@ -90,23 +89,53 @@ export function extractBasicSectionData(content: LexicalContent) {
 }
 
 // Parse Main Content Strength Section (badges below gallery)
-// Strictly uses JSON array (jsonItems) from Attribute Page as per user requirement
-export function parseMainContentStrengthData(content: LexicalContent, jsonItems?: any[], reusableBlocks: Record<string, any> = {}) {
-  const strengthItems: { icon?: string; image?: any; title: string; subtitle?: string }[] = []
+// Dynamically mixes standard product attributes and custom attributes
+export function parseMainContentStrengthData(
+  stdJsonItems?: any[], 
+  customJsonItems?: any[],
+  reusableBlocks: Record<string, any> = {}
+) {
+  const stdItems = parseJsonAttributeItems(stdJsonItems) || []
+  const customItems = parseJsonAttributeItems(customJsonItems) || []
+  
+  const totalAvailable = stdItems.length + customItems.length
+  if (totalAvailable === 0) return { items: undefined }
 
-  if (jsonItems && Array.isArray(jsonItems)) {
-    const rawItems = parseJsonAttributeItems(jsonItems)
-    if (rawItems) {
-      rawItems.forEach(item => {
-        strengthItems.push({
-          icon: item.icon,
-          image: item.image,
-          title: item.value || item.key || '',
-          subtitle: item.key || '',
-        })
-      })
+  let finalItems: any[] = []
+
+  if (totalAvailable <= 8) {
+    // Strategy: Pick 4 items total (Deterministic for SSR consistency)
+    // 1. Take first 2 from std
+    const pickedStd = stdItems.slice(0, 2)
+    const remainingStd = stdItems.slice(2)
+    
+    // 2. Fill with custom
+    const neededFromCustom = 4 - pickedStd.length
+    const pickedCustom = customItems.slice(0, neededFromCustom)
+    const remainingCustom = customItems.slice(neededFromCustom)
+    
+    finalItems = [...pickedStd, ...pickedCustom]
+    
+    // 3. If still less than 4, fill more from std, then custom
+    if (finalItems.length < 4) {
+      const extraStd = remainingStd.slice(0, 4 - finalItems.length)
+      finalItems = [...finalItems, ...extraStd]
     }
+    if (finalItems.length < 4) {
+      const extraCustom = remainingCustom.slice(0, 4 - finalItems.length)
+      finalItems = [...finalItems, ...extraCustom]
+    }
+  } else {
+    // Strategy: Pick 8 items total (4 std + 4 custom)
+    finalItems = [...stdItems.slice(0, 4), ...customItems.slice(0, 4)]
   }
+
+  const strengthItems = finalItems.map(item => ({
+    icon: item.icon,
+    image: item.image,
+    title: item.value || item.key || '',
+    subtitle: item.key || '',
+  }))
 
   return { items: strengthItems.length > 0 ? strengthItems : undefined }
 }
@@ -929,35 +958,27 @@ export function flattenReusableBlocksIntoNodes(nodes: any[], reusableBlocks: Rec
 
 // Parse Lexical content into pre-form (modal) and post-form (page) sections
 export function parseLexicalSections(lexicalContent: any, reusableBlocks: Record<string, any> = {}) {
-  let preFormSections: ParsedSection[] = []
-  let formBlock: any = null
-  let postFormSections: ParsedSection[] = []
+  let parsedSection: ParsedSection[] = []
 
   if (lexicalContent?.root?.children) {
     // PRE-PROCESSING: Flatten any reusable blocks so their markers are visible to the parser
     const nodes = flattenReusableBlocksIntoNodes(lexicalContent.root.children, reusableBlocks)
     let currentSection: ParsedSection | null = null
-    let isCurrentSectionPageStyle = false // true if it should be rendered on page (postFormSections)
-    let foundFormMarker = false
+    let isCurrentSectionPageStyle = false // true if it should be rendered on page (parsedSection)
 
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i]
 
-      // 1. Check for form block marker
-      const isActualFormBlock = node.type === 'formBlock' || (node.type === 'block' && node.fields?.blockType === 'form-block')
       const isQuoteMarker = node.type === 'quote' && (
         node.children?.[0]?.text === 'form-block' || 
         node.children?.[0]?.children?.[0]?.text === 'form-block'
       )
 
-      if (!foundFormMarker && (isActualFormBlock || isQuoteMarker)) {
+      if (isQuoteMarker) {
         if (currentSection) {
-          if (isCurrentSectionPageStyle) postFormSections.push(currentSection)
-          else preFormSections.push(currentSection)
+          if (isCurrentSectionPageStyle) parsedSection.push(currentSection)
           currentSection = null
         }
-        formBlock = node
-        foundFormMarker = true
         continue
       }
 
@@ -977,17 +998,16 @@ export function parseLexicalSections(lexicalContent: any, reusableBlocks: Record
           if (cleanId) {
             // Close the previous section if it exists
             if (currentSection) {
-              if (isCurrentSectionPageStyle) postFormSections.push(currentSection)
-              else preFormSections.push(currentSection)
+              if (isCurrentSectionPageStyle) parsedSection.push(currentSection)
             }
 
             const isTechnical = TECHNICAL_SECTION_IDS.includes(cleanId)
             
             // Logic: 
-            // - Technical IDs (scrolling-link, etc.) ALWAYS go to page sections (postFormSections)
+            // - Technical IDs (scrolling-link, etc.) ALWAYS go to page sections (parsedSection)
             // - After form is found, ALL new quote sections go to page sections
             // - Before form, non-technical quotes go to modal sections (preFormSections)
-            isCurrentSectionPageStyle = isTechnical || foundFormMarker
+            isCurrentSectionPageStyle = isTechnical
 
             currentSection = {
               id: isTechnical ? cleanId : (isCurrentSectionPageStyle ? cleanId : undefined),
@@ -1018,10 +1038,9 @@ export function parseLexicalSections(lexicalContent: any, reusableBlocks: Record
 
     // Add the final section
     if (currentSection) {
-      if (isCurrentSectionPageStyle) postFormSections.push(currentSection)
-      else preFormSections.push(currentSection)
+      if (isCurrentSectionPageStyle) parsedSection.push(currentSection)
     }
   }
 
-  return { preFormSections, formBlock, postFormSections }
+  return { parsedSection }
 }

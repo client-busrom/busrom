@@ -43,8 +43,8 @@ interface QuoteImageSectionProps {
 
 export function QuoteImageSection({
   image,
-  titleLine1 = "Need A Quote Or",
-  titleLine2 = "Technical Support",
+  titleLine1 = "NEED A QUOTE OR",
+  titleLine2 = "TECHNICAL SUPPORT",
   subtitle = "Let Us Provide You With A Professional Solution.",
   buttonText = "Get A Solution",
   buttonLink = "#contact-form",

@@ -50,7 +50,7 @@ export const resolveAllMedia = async (content: any, cmsUrl: string, normalize: (
     }
 
     // 提取媒体 ID
-    const mediaFields = ['image', 'icon', 'media', 'backgroundImage', 'mainImage', 'showImage', 'featuredImage', 'bgImage', 'logo', 'avatar'];
+    const mediaFields = ['image', 'icon', 'media', 'backgroundImage', 'mainImage', 'showImage', 'featuredImage', 'bgImage', 'logo', 'avatar', 'thumbnail', 'pic', 'photo'];
     mediaFields.forEach(f => {
       const id = extractId(node[f]);
       if (id) mediaIds.add(id);
@@ -79,10 +79,10 @@ export const resolveAllMedia = async (content: any, cmsUrl: string, normalize: (
     // 递归处理数组和对象
     Object.keys(node).forEach(key => {
       const val = node[key];
-      if (key === 'url' || key === 'mediaData') return;
+      if (key === 'url' || key === 'mediaData' || key === 'parent') return;
       if (Array.isArray(val)) {
         val.forEach(item => scanAndNormalize(item));
-      } else if (typeof val === 'object' && val !== null && key !== 'parent') {
+      } else if (typeof val === 'object' && val !== null) {
         scanAndNormalize(val);
       }
     });
@@ -183,7 +183,7 @@ export const resolveAllMedia = async (content: any, cmsUrl: string, normalize: (
 /**
  * 递归将内容树中的媒体 ID 替换为 mediaData 中的完整对象
  */
-export const hydrateContent = (node: any, mediaData: Record<string, any>) => {
+export const hydrateContent = (node: any, mediaData: Record<string, any>): any => {
   if (!node || typeof node !== 'object') return node;
 
   if (Array.isArray(node)) {
@@ -191,7 +191,7 @@ export const hydrateContent = (node: any, mediaData: Record<string, any>) => {
   }
 
   const newNode = { ...node };
-  const mediaFields = ['image', 'icon', 'media', 'backgroundImage', 'mainImage', 'showImage', 'featuredImage', 'bgImage', 'logo', 'avatar'];
+  const mediaFields = ['image', 'icon', 'media', 'backgroundImage', 'mainImage', 'showImage', 'featuredImage', 'bgImage', 'logo', 'avatar', 'thumbnail', 'pic', 'photo'];
 
   mediaFields.forEach(f => {
     const val = newNode[f];
@@ -209,7 +209,7 @@ export const hydrateContent = (node: any, mediaData: Record<string, any>) => {
 
   // Recursively handle all other object properties
   Object.keys(newNode).forEach(key => {
-    if (['data', 'fields', 'image', 'icon', 'media', 'backgroundImage', 'mainImage', 'showImage', 'featuredImage', 'bgImage', 'logo', 'avatar', 'parent'].includes(key)) return;
+    if ([...mediaFields, 'data', 'fields', 'parent'].includes(key)) return;
     if (typeof newNode[key] === 'object' && newNode[key] !== null) {
       newNode[key] = hydrateContent(newNode[key], mediaData);
     }

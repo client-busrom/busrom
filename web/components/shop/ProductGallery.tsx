@@ -147,10 +147,10 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="flex flex-col gap-6">
         {/* Main Image Carousel */}
         <div className="relative group">
-          <div className="overflow-hidden rounded-lg" ref={emblaRef}>
+          <div className="overflow-hidden md:rounded-[2rem]" ref={emblaRef}>
             <div className="flex">
               {images.map((image, index) => {
                 const imgUrl = image?.variants?.desktop?.url || image?.variants?.tablet?.url || image?.url
@@ -162,7 +162,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                     className="flex-[0_0_100%] min-w-0"
                   >
                     <div
-                      className="relative w-full h-[400px] md:h-[500px] lg:h-[550px] bg-gray-100 cursor-pointer"
+                      className="relative w-full aspect-[1312/1000] bg-brand-cream-light cursor-pointer overflow-hidden"
                       onClick={() => openModal(index)}
                     >
                       <Image
@@ -184,90 +184,72 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             </div>
           </div>
 
-          {/* Expand Icon */}
-          <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-full p-2 z-10">
-            <svg
-              className="w-5 h-5 text-gray-700"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-              />
-            </svg>
-          </div>
-
-          {/* Navigation arrows (visible on hover) */}
+          {/* Navigation arrows (minimalist style) */}
           {images.length > 1 && (
             <>
               <button
                 onClick={goToPrevious}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-3 transition-all opacity-0 hover:opacity-100 group-hover:opacity-100 z-10"
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-brand-text-black rounded-full w-10 h-10 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10 shadow-sm"
                 aria-label="Previous image"
               >
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
               <button
                 onClick={goToNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-3 transition-all opacity-0 hover:opacity-100 group-hover:opacity-100 z-10"
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-brand-text-black rounded-full w-10 h-10 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10 shadow-sm"
                 aria-label="Next image"
               >
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
             </>
           )}
 
-          {/* Image counter */}
+          {/* Image counter (Mobile only) */}
           {images.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm rounded-full px-3 py-1 text-white text-sm z-10">
+            <div className="md:hidden absolute top-4 right-4 bg-black/50 backdrop-blur-md rounded px-2 py-1 text-white text-[10px] font-bold z-10">
               {selectedIndex + 1} / {images.length}
             </div>
           )}
         </div>
 
-      {/* Thumbnail Navigation */}
+      {/* Thumbnail Navigation (1:1 Square matching competitor) */}
       {images.length > 1 && (
-        <div className="relative">
-          <div className="flex items-center gap-2">
+        <div className="flex justify-center">
+          <div className="flex items-center gap-4 max-w-full">
             {/* Previous Button */}
             <button
               onClick={goToPrevious}
-              className="flex-shrink-0 p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="hidden md:flex flex-shrink-0 w-8 h-8 items-center justify-center rounded-full bg-white border border-gray-100 hover:border-brand-accent-gold transition-colors disabled:opacity-30"
               disabled={images.length <= 1}
-              aria-label="Previous thumbnail"
             >
-              <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg className="w-4 h-4 text-brand-text-main rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
 
-            {/* Thumbnails with Embla */}
-            <div className="flex-1 overflow-hidden" ref={emblaThumbnailRef}>
-              <div className="flex gap-2">
+            {/* Thumbnails */}
+            <div className="overflow-hidden" ref={emblaThumbnailRef}>
+              <div className="flex gap-2 p-1">
                 {images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => onThumbnailClick(index)}
                     className={cn(
-                      "relative flex-shrink-0 w-[120px] h-[80px] rounded-lg overflow-hidden border-2 transition-all",
+                      "relative flex-shrink-0 w-[50px] h-[50px] rounded-md overflow-hidden transition-all duration-300",
                       selectedIndex === index
-                        ? "border-brand-secondary"
-                        : "border-gray-200 hover:border-gray-300"
+                        ? "ring-2 ring-brand-accent-gold ring-offset-2 scale-105"
+                        : "opacity-60 hover:opacity-100 border border-transparent"
                     )}
                   >
                     <Image
                       src={image.variants?.thumbnail?.url || image.variants?.card?.url || image.url}
-                      alt={image.altText || `${productName} ${index + 1}`}
+                      alt={`${productName} thumbnail ${index + 1}`}
                       fill
-                      sizes="120px"
+                      sizes="50px"
                       className="object-cover"
                       unoptimized
                     />
@@ -279,17 +261,17 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             {/* Next Button */}
             <button
               onClick={goToNext}
-              className="flex-shrink-0 p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="hidden md:flex flex-shrink-0 w-8 h-8 items-center justify-center rounded-full bg-white border border-gray-100 hover:border-brand-accent-gold transition-colors disabled:opacity-30"
               disabled={images.length <= 1}
-              aria-label="Next thumbnail"
             >
-              <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-brand-text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
           </div>
         </div>
       )}
+
     </div>
 
     {/* Full-Screen Modal */}

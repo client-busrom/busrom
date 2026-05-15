@@ -341,7 +341,7 @@
 
     &__header {
       display: flex;
-      align-items: flex-end;
+      align-items: flex-start;
       gap: 0.75rem;
       margin-bottom: 1rem;
       padding-bottom: 0.75rem;
@@ -352,6 +352,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
+      margin-top: 1.25rem;
 
       button {
         width: 28px;
@@ -375,8 +376,8 @@
     }
 
     &__name {
-      flex: 1;
-      max-width: 400px;
+      width: 240px;
+      flex-shrink: 0;
 
       label {
         display: block;
@@ -393,6 +394,34 @@
         border-radius: 4px;
         font-size: 0.9rem;
         font-weight: 500;
+        resize: vertical;
+        font-family: inherit;
+
+        &:focus {
+          outline: none;
+          border-color: var(--theme-elevation-400);
+        }
+      }
+    }
+
+    &__desc {
+      flex: 1;
+      min-width: 200px;
+
+      label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--theme-elevation-500);
+        margin-bottom: 0.25rem;
+      }
+
+      textarea {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--theme-elevation-200);
+        border-radius: 4px;
+        font-size: 0.85rem;
         resize: vertical;
         font-family: inherit;
 
@@ -732,6 +761,11 @@
 
     &:hover {
       background: var(--theme-error-600);
+    }
+
+    // When inside a spec-group header, align with the textarea
+    .spec-group__header & {
+      margin-top: 1.25rem;
     }
   }
 
