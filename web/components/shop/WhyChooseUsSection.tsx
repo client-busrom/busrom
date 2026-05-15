@@ -170,7 +170,7 @@ export function WhyChooseUsSection({
 
     {/* Desktop Layout - 固定尺寸，居中显示 */}
     <section
-      className="relative w-full bg-brand-main overflow-hidden hidden md:flex justify-center py-20"
+      className="relative w-full bg-brand-main overflow-hidden hidden md:flex justify-center pt-20"
     >
       {/* 固定宽度的内容容器，水平居中 */}
       <div

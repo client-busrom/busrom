@@ -161,7 +161,9 @@ export function ProductCustomizationFlowSection({
               <span className="font-montserrat font-bold text-2xl text-black">
                 {index + 1}
               </span>
-              <span className="font-josefin-sans font-semibold text-base text-black">
+              <span
+                className={`font-josefin-sans text-black transition-all duration-300 ${isActive ? 'text-xl font-bold' : 'text-base font-semibold'}`}
+              >
                 {step.title}
               </span>
             </motion.div>
@@ -217,8 +219,8 @@ export function ProductCustomizationFlowSection({
             className="font-josefin-sans font-semibold"
             style={{
               marginLeft: rpx(24),
-              fontSize: rpx(20),
-              lineHeight: rpx(30),
+              fontSize: rpx(26),
+              lineHeight: rpx(34),
               color: "#625C2C",
             }}
           >
@@ -287,11 +289,12 @@ export function ProductCustomizationFlowSection({
 
             {/* 标题 */}
             <motion.span
-              className="font-josefin-sans font-semibold text-black"
+              className="font-josefin-sans text-black"
               style={{
                 marginLeft: rpx(20),
                 marginBottom: rpx(22),
-                fontSize: isActive ? rpx(22) : rpx(20),
+                fontSize: isActive ? rpx(26) : rpx(20),
+                fontWeight: isActive ? 700 : 600,
                 lineHeight: 1,
               }}
               animate={{

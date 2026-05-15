@@ -286,7 +286,7 @@ export function ProductAttributesSection({
         <div
           className="relative flex items-center justify-between"
           style={{
-            paddingLeft: rpx(145),
+            paddingLeft: rpx(90),
             paddingRight: rpx(263),
             paddingTop: rpx(23),
           }}

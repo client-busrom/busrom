@@ -113,7 +113,7 @@ export function WhyChooseUsReasonSection({
       <section className="md:hidden bg-brand-main px-5 py-10">
         {/* Title */}
         <h2
-          className="font-josefin-sans font-bold text-black text-2xl leading-tight mb-6 animate-float-up"
+          className="font-josefin-sans font-bold text-black text-2xl leading-tight mb-6 animate-float-up whitespace-pre-line"
           key={`mobile-title-${currentIndex}`}
         >
           {currentItem.title}
@@ -152,7 +152,7 @@ export function WhyChooseUsReasonSection({
                 <OptimizedImage
                   image={nextItem.image as any}
                   alt={nextItem.title}
-                  size="thumbnail"
+                  size="small"
                   className="w-full h-full object-cover"
                   key={`mobile-next-img-${nextIndex}`}
                 />
@@ -170,24 +170,24 @@ export function WhyChooseUsReasonSection({
           {/* Prev Button */}
           <button
             onClick={goToPrev}
-            className="w-16 h-10 rounded-full border border-[#bab489] flex items-center justify-center"
+            className="group w-16 h-10 rounded-full border border-[#bab489] flex items-center justify-center transition-all duration-300 hover:bg-brand-secondary hover:border-transparent hover:scale-110 active:scale-95"
             aria-label="Previous slide"
           >
-            <svg width="40" height="10" viewBox="0 0 76 14" fill="none">
-              <path d="M76 7H7" stroke="#756F3F" strokeWidth="2" />
-              <path d="M14 13L1 7L14 1" stroke="#756F3F" strokeWidth="2" fill="none" />
+            <svg width="40" height="10" viewBox="0 0 76 14" fill="none" className="transition-colors duration-300">
+              <path d="M76 7H7" stroke="currentColor" strokeWidth="2" className="text-[#756F3F] group-hover:text-white transition-colors duration-300" />
+              <path d="M14 13L1 7L14 1" stroke="currentColor" strokeWidth="2" fill="none" className="text-[#756F3F] group-hover:text-white transition-colors duration-300" />
             </svg>
           </button>
 
           {/* Next Button */}
           <button
             onClick={goToNext}
-            className="w-16 h-10 rounded-full bg-brand-secondary flex items-center justify-center"
+            className="group w-16 h-10 rounded-full border border-[#bab489] bg-transparent flex items-center justify-center transition-all duration-300 hover:bg-brand-secondary hover:border-transparent hover:scale-110 active:scale-95"
             aria-label="Next slide"
           >
-            <svg width="40" height="10" viewBox="0 0 76 14" fill="none">
-              <path d="M0 7H69" stroke="white" strokeWidth="2" />
-              <path d="M62 1L75 7L62 13" stroke="white" strokeWidth="2" fill="none" />
+            <svg width="40" height="10" viewBox="0 0 76 14" fill="none" className="transition-colors duration-300">
+              <path d="M0 7H69" stroke="currentColor" strokeWidth="2" className="text-[#756F3F] group-hover:text-white transition-colors duration-300" />
+              <path d="M62 1L75 7L62 13" stroke="currentColor" strokeWidth="2" fill="none" className="text-[#756F3F] group-hover:text-white transition-colors duration-300" />
             </svg>
           </button>
         </div>
@@ -228,7 +228,7 @@ export function WhyChooseUsReasonSection({
           >
             {/* Title - max 3 lines with float-up animation (NOT scaled) */}
             <h2
-              className="font-josefin-sans font-bold text-black animate-float-up"
+              className="font-josefin-sans font-bold text-black animate-float-up whitespace-pre-line"
               style={{
                 fontSize: rpx(60),
                 lineHeight: rpx(68),
@@ -242,7 +242,7 @@ export function WhyChooseUsReasonSection({
           {/* Next Arrow Button (Right arrow) - same row as description start, offset to the right */}
           <button
             onClick={goToNext}
-            className="absolute group cursor-pointer"
+            className="absolute group cursor-pointer transition-transform duration-300 hover:scale-110 active:scale-95"
             style={{
               left: rpx(150),
               top: rpx(420),
@@ -252,7 +252,7 @@ export function WhyChooseUsReasonSection({
             aria-label="Next slide"
           >
             <div
-              className="w-full h-full flex items-center justify-center transition-colors duration-300 bg-brand-secondary group-hover:bg-brand-dark-olive"
+              className="w-full h-full flex items-center justify-center transition-all duration-300 border border-[#bab489] bg-transparent group-hover:bg-brand-secondary group-hover:border-transparent"
               style={{ borderRadius: srpx(45) }}
             >
               {/* Right Arrow Icon */}
@@ -266,14 +266,16 @@ export function WhyChooseUsReasonSection({
               >
                 <path
                   d="M0 7H69"
-                  stroke="white"
+                  stroke="currentColor"
                   strokeWidth="2"
+                  className="text-[#756F3F] group-hover:text-white transition-colors duration-300"
                 />
                 <path
                   d="M62 1L75 7L62 13"
-                  stroke="white"
+                  stroke="currentColor"
                   strokeWidth="2"
                   fill="none"
+                  className="text-[#756F3F] group-hover:text-white transition-colors duration-300"
                 />
               </svg>
             </div>
@@ -305,7 +307,7 @@ export function WhyChooseUsReasonSection({
           {/* Prev Arrow Button (Left arrow) - below next button */}
           <button
             onClick={goToPrev}
-            className="absolute group cursor-pointer"
+            className="absolute group cursor-pointer transition-transform duration-300 hover:scale-110 active:scale-95"
             style={{
               left: 0,
               top: rpx(500),
@@ -315,7 +317,7 @@ export function WhyChooseUsReasonSection({
             aria-label="Previous slide"
           >
             <div
-              className="w-full h-full flex items-center justify-center transition-colors duration-300 border border-[#bab489] group-hover:bg-brand-secondary/10"
+              className="w-full h-full flex items-center justify-center transition-all duration-300 border border-[#bab489] bg-transparent group-hover:bg-brand-secondary group-hover:border-transparent"
               style={{ borderRadius: srpx(29.5) }}
             >
               {/* Left Arrow Icon */}
@@ -329,14 +331,16 @@ export function WhyChooseUsReasonSection({
               >
                 <path
                   d="M76 7H7"
-                  stroke="#756F3F"
+                  stroke="currentColor"
                   strokeWidth="2"
+                  className="text-[#756F3F] group-hover:text-white transition-colors duration-300"
                 />
                 <path
                   d="M14 13L1 7L14 1"
-                  stroke="#756F3F"
+                  stroke="currentColor"
                   strokeWidth="2"
                   fill="none"
+                  className="text-[#756F3F] group-hover:text-white transition-colors duration-300"
                 />
               </svg>
             </div>
@@ -359,7 +363,7 @@ export function WhyChooseUsReasonSection({
               <OptimizedImage
                 image={currentItem.image as any}
                 alt={currentItem.title}
-                size="large"
+                size="medium"
                 className="w-full h-full object-cover"
                 key={`main-img-${currentIndex}`}
               />

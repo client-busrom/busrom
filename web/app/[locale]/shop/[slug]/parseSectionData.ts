@@ -900,12 +900,21 @@ const TECHNICAL_SECTION_IDS = [
 // Parse Product Hero Section
 export function parseProductHeroData(content: LexicalContent, defaultName: string) {
   const nodes = content?.root?.children || []
+  let title = ''
   let description = ''
   let image = null
 
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i]
     const nodeText = node.children?.[0]?.text || ''
+
+    // Title marker
+    if (node.type === 'paragraph' && nodeText === 'hero-section-title') {
+      const nextNode = nodes[i + 1]
+      if (nextNode?.type === 'paragraph' || nextNode?.type === 'heading') {
+        title = extractTextWithLinebreaks(nextNode.children)
+      }
+    }
 
     // Description marker
     if (node.type === 'paragraph' && nodeText === 'hero-section-description') {
@@ -925,7 +934,7 @@ export function parseProductHeroData(content: LexicalContent, defaultName: strin
   }
 
   return {
-    productName: defaultName,
+    productName: title || defaultName,
     description: description || undefined,
     heroImage: image,
   }

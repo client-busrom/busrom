@@ -79,12 +79,12 @@ export const ProductMainContent: React.FC<ProductMainContentProps> = ({
   setIsFullFormOpen
 }) => {
   return (
-    <div className="max-w-[1440px] mx-auto px-6 md:px-[152px] pt-[84px] pb-12" data-header-theme="light">
-      {/* Main Product Section - Using items-start for sticky to work correctly */}
-      <div className="flex flex-col md:flex-row items-start gap-[48px]">
+    <div className="max-w-[1440px] mx-auto px-6 md:px-10 lg:px-20 xl:px-[152px] pt-[84px] pb-12" data-header-theme="dark">
+      {/* Main Product Section - Left fluid, Right fixed 348px */}
+      <div className="flex flex-col md:flex-row items-start gap-8 lg:gap-12 xl:gap-[48px]">
         
-        {/* Left Column - Gallery + Sections (Native CSS Sticky) */}
-        <div className="flex-1 min-w-0 md:sticky md:top-[calc(var(--header-height,46px)+3rem)] md:h-fit">
+        {/* Left Column - Gallery + Sections (Fluidly shrinks) */}
+        <div className="w-full flex-1 min-w-0 md:sticky md:top-[calc(var(--header-height,46px)+3rem)] md:h-fit">
           {/* Gallery */}
           <div className="mb-8">
             <ProductGallery images={images} productName={displayName} />
@@ -97,25 +97,13 @@ export const ProductMainContent: React.FC<ProductMainContentProps> = ({
 
         </div>
 
-        {/* Right Column - Product Info (Fixed Width Matching Competitor) */}
+        {/* Right Column - Product Info (Fixed Width: 348px) */}
         <div className="w-full md:w-[348px] md:flex-shrink-0 flex flex-col gap-y-6" data-right-column>
           {/* Header Area */}
           <div className="flex flex-col gap-2 pt-1.5">
-            <h1 className="text-2xl lg:text-3xl font-semibold text-brand-text-black opacity-80 leading-tight tracking-tight">
+            <h1 className="text-2xl lg:text-[32px] font-semibold text-brand-text-black opacity-80 leading-tight tracking-tight">
               {displayName}
             </h1>
-            
-            {/* Review Area (gap-xs equivalent) */}
-            <div className="flex items-center gap-1.5 mt-1">
-              <div className="flex gap-0.5">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <svg key={i} className="w-3.5 h-3.5 text-[#ffc107] fill-current" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <span className="text-[13px] font-medium text-brand-text-main opacity-60 underline underline-offset-2 cursor-pointer">1,098 reviews</span>
-            </div>
 
             {/* Description Area */}
             {product.localizedDescription && (

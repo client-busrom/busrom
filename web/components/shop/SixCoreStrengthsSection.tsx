@@ -139,15 +139,16 @@ export function SixCoreStrengthsSection({
           }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
         >
-          <span
-            className="font-inter font-semibold text-white whitespace-pre-line text-left"
-            style={{
-              fontSize: rpx(20),
-              lineHeight: rpx(26),
+          <motion.span
+            className="font-inter text-white whitespace-pre-line text-left"
+            animate={{
+              fontSize: isHovered ? rpx(26) : rpx(20),
+              fontWeight: isHovered ? 700 : 600,
+              lineHeight: isHovered ? rpx(32) : rpx(26),
             }}
           >
             {item.title}
-          </span>
+          </motion.span>
         </motion.div>
       </motion.div>
     )
@@ -240,8 +241,8 @@ export function SixCoreStrengthsSection({
             <p
               className="font-josefin-sans self-end"
               style={{
-                fontSize: rpx(29),
-                lineHeight: rpx(36),
+                fontSize: rpx(36),
+                lineHeight: rpx(42),
                 color: "#AB9F63",
                 marginBottom: rpx(10),
               }}

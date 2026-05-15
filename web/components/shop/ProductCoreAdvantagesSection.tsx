@@ -2,7 +2,6 @@
 
 import React, { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import Image from "next/image"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 // Design reference dimensions (from Figma 1920)
@@ -152,8 +151,8 @@ export function ProductCoreAdvantagesSection({
       <div
         className="relative mx-auto"
         style={{
-          marginLeft: rpx(285),
-          marginRight: rpx(285),
+          marginLeft: rpx(260),
+          marginRight: rpx(260),
         }}
       >
         <AnimatePresence mode="wait">
@@ -169,26 +168,25 @@ export function ProductCoreAdvantagesSection({
               style={{ height: rpx(489) }}
             >
               {/* Background SVG */}
-              <Image
+              <img
                 src="/product-core-advantages/background-collapsed.svg"
                 alt=""
-                fill
-                className="object-contain object-top"
+                className="absolute inset-0 w-full h-full object-contain object-top"
                 style={{ objectPosition: "center top" }}
-                priority
               />
 
               {/* Content */}
               <div className="relative z-10 h-full flex">
                 {/* Left: Title */}
                 <div
-                  className="flex items-end"
+                  className="flex items-start"
                   style={{
-                    paddingLeft: rpx(50),
-                    paddingBottom: rpx(100),
+                    paddingLeft: rpx(64),
+                    paddingTop: rpx(120),
                   }}
                 >
-                  <h2
+                  <motion.h2
+                    layoutId="advantage-title"
                     className="font-josefin-sans font-bold text-white whitespace-pre-line"
                     style={{
                       fontSize: rpx(72),
@@ -197,74 +195,41 @@ export function ProductCoreAdvantagesSection({
                     }}
                   >
                     {title}
-                  </h2>
+                  </motion.h2>
                 </div>
 
-                {/* Right: 3 Images - 与展开状态比例一致 */}
+                {/* Right: 3 Images */}
                 <div
                   className="flex items-start ml-auto"
                   style={{
-                    gap: rpx(5),
-                    paddingTop: rpx(30),
-                    paddingRight: rpx(32),
+                    gap: rpx(12),
+                    paddingTop: rpx(40),
+                    paddingRight: rpx(40),
                   }}
                 >
-                  {/* Image 1 - tall */}
-                  {image1 && (
-                    <div
-                      className="overflow-hidden flex-shrink-0"
-                      style={{
-                        width: rpx(188),
-                        height: rpx(376),
-                        borderRadius: rpx(53),
-                      }}
-                    >
-                      <OptimizedImage
-                        image={image1 as any}
-                        alt={image1.altText || image1.alt || ""}
-                        size="medium"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-
-                  {/* Image 2 - short */}
-                  {image2 && (
-                    <div
-                      className="overflow-hidden flex-shrink-0"
-                      style={{
-                        width: rpx(188),
-                        height: rpx(305),
-                        borderRadius: rpx(53),
-                      }}
-                    >
-                      <OptimizedImage
-                        image={image2 as any}
-                        alt={image2.altText || image2.alt || ""}
-                        size="medium"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-
-                  {/* Image 3 - tall */}
-                  {image3 && (
-                    <div
-                      className="overflow-hidden flex-shrink-0"
-                      style={{
-                        width: rpx(188),
-                        height: rpx(376),
-                        borderRadius: rpx(53),
-                      }}
-                    >
-                      <OptimizedImage
-                        image={image3 as any}
-                        alt={image3.altText || image3.alt || ""}
-                        size="medium"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
+                  {[image1, image2, image3].map((img, idx) => {
+                    if (!img) return null
+                    const isShort = idx === 1
+                    return (
+                      <motion.div
+                        key={`collapsed-img-${idx}`}
+                        layoutId={`advantage-img-${idx}`}
+                        className="overflow-hidden flex-shrink-0"
+                        style={{
+                          width: rpx(175),
+                          height: rpx(isShort ? 284 : 350),
+                          borderRadius: rpx(53),
+                        }}
+                      >
+                        <OptimizedImage
+                          image={img as any}
+                          alt={img.altText || img.alt || ""}
+                          size="medium"
+                          className="w-full h-full object-cover"
+                        />
+                      </motion.div>
+                    )
+                  })}
                 </div>
               </div>
 
@@ -289,11 +254,10 @@ export function ProductCoreAdvantagesSection({
                       background: "radial-gradient(circle, rgba(255, 238, 99, 0.4) 0%, transparent 70%)",
                     }}
                   />
-                  <Image
+                  <img
                     src="/product-core-advantages/arrow-expand.svg"
                     alt="Expand"
-                    fill
-                    className="group-hover:brightness-110"
+                    className="absolute inset-0 w-full h-full group-hover:brightness-110"
                   />
                 </button>
               </div>
@@ -314,16 +278,17 @@ export function ProductCoreAdvantagesSection({
             >
               {/* Content */}
               <div className="relative z-10 h-full">
-                {/* Top Section: Title and Images - 缩小0.755倍，字体保持 */}
-                <div className="flex">
-                  {/* Left: Title - 字体缩小，width保持让文字两行 */}
+                {/* Top Section: Title and Images - 展开态下齐 */}
+                <div className="flex items-end">
+                  {/* Left: Title - 字体缩小，下对齐 */}
                   <div
+                    className="flex items-end"
                     style={{
-                      paddingLeft: rpx(50),
-                      paddingTop: rpx(120),
+                      paddingLeft: rpx(64),
                     }}
                   >
-                    <h2
+                    <motion.h2
+                      layoutId="advantage-title"
                       className="font-josefin-sans font-bold text-white whitespace-pre-line"
                       style={{
                         fontSize: rpx(60),
@@ -332,75 +297,41 @@ export function ProductCoreAdvantagesSection({
                       }}
                     >
                       {title}
-                    </h2>
+                    </motion.h2>
                   </div>
 
-                  {/* Right: 3 Images - 加大100px高度，等比例加宽 */}
+                  {/* Right: 3 Images - 展开态下齐 */}
                   <div
-                    className="flex items-start ml-auto"
+                    className="flex items-end ml-auto"
                     style={{
-                      gap: rpx(4),
+                      gap: rpx(12),
                       paddingTop: rpx(22),
-                      paddingRight: rpx(24),
+                      paddingRight: rpx(40),
                     }}
                   >
-                    {/* Image 1 - tall */}
-                    {image1 && (
-                      <div
-                        className="overflow-hidden flex-shrink-0"
-                        style={{
-                          width: rpx(188),
-                          height: rpx(376),
-                          borderRadius: rpx(53),
-                        }}
-                      >
-                        <OptimizedImage
-                          image={image1 as any}
-                          alt={image1.altText || image1.alt || ""}
-                          size="medium"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-
-                    {/* Image 2 - short */}
-                    {image2 && (
-                      <div
-                        className="overflow-hidden flex-shrink-0"
-                        style={{
-                          width: rpx(188),
-                          height: rpx(305),
-                          marginTop: rpx(71),
-                          borderRadius: rpx(53),
-                        }}
-                      >
-                        <OptimizedImage
-                          image={image2 as any}
-                          alt={image2.altText || image2.alt || ""}
-                          size="medium"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-
-                    {/* Image 3 - tall */}
-                    {image3 && (
-                      <div
-                        className="overflow-hidden flex-shrink-0"
-                        style={{
-                          width: rpx(188),
-                          height: rpx(376),
-                          borderRadius: rpx(53),
-                        }}
-                      >
-                        <OptimizedImage
-                          image={image3 as any}
-                          alt={image3.altText || image3.alt || ""}
-                          size="medium"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
+                    {[image1, image2, image3].map((img, idx) => {
+                      if (!img) return null
+                      const isShort = idx === 1
+                      return (
+                        <motion.div
+                          key={`expanded-img-${idx}`}
+                          layoutId={`advantage-img-${idx}`}
+                          className="overflow-hidden flex-shrink-0"
+                          style={{
+                            width: rpx(175),
+                            height: rpx(isShort ? 284 : 350),
+                            borderRadius: rpx(53),
+                          }}
+                        >
+                          <OptimizedImage
+                            image={img as any}
+                            alt={img.altText || img.alt || ""}
+                            size="medium"
+                            className="w-full h-full object-cover"
+                          />
+                        </motion.div>
+                      )
+                    })}
                   </div>
                 </div>
 
@@ -410,8 +341,8 @@ export function ProductCoreAdvantagesSection({
                   style={{
                     paddingLeft: rpx(66),
                     paddingRight: rpx(66),
-                    paddingTop: rpx(30),
-                    paddingBottom: rpx(45),
+                    paddingTop: rpx(50),
+                    paddingBottom: rpx(0),
                     gap: rpx(17),
                   }}
                 >

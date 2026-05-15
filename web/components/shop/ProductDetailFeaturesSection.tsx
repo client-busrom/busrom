@@ -142,7 +142,7 @@ export function ProductDetailFeaturesSection({
     >
       {/* Desktop Content */}
       <div
-        className="hidden md:flex items-center h-full"
+        className="hidden md:flex items-start h-full"
         style={{ gap: rpx(37) }}
       >
         {/* Left Image */}
@@ -150,6 +150,7 @@ export function ProductDetailFeaturesSection({
           className="flex-shrink-0 overflow-hidden"
           style={{
             width: rpx(520),
+            height: rpx(500),
             borderTopRightRadius: rpx(30),
             borderBottomRightRadius: rpx(30),
           }}
@@ -180,14 +181,14 @@ export function ProductDetailFeaturesSection({
               />
             )
           ) : (
-            <div className="w-full h-full bg-gray-300" style={{ minHeight: rpx(800) }} />
+            <div className="w-full h-full bg-gray-300" />
           )}
         </div>
 
         {/* Center Cards - 810x250 from Figma */}
         <div
           className="flex flex-col"
-          style={{ gap: rpx(25), paddingTop: rpx(10) }}
+          style={{ gap: rpx(25) }}
         >
           {items.slice(0, 3).map((item, index) => {
             const style = CARD_STYLES[index] || CARD_STYLES[0]
@@ -195,23 +196,31 @@ export function ProductDetailFeaturesSection({
               <motion.div
                 key={index}
                 className={`${style.bg} flex flex-col justify-between`}
+                initial={{ opacity: 0, x: -80 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ 
+                  duration: 0.5, 
+                  delay: index * 0.1,
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 15
+                }}
+                whileHover={{
+                  scale: 1.02,
+                  x: 15,
+                  transition: { type: "spring", stiffness: 400, damping: 25 }
+                }}
+                whileTap={{ scale: 0.98 }}
                 style={{
                   width: rpx(600),
                   height: rpx(150),
                   borderRadius: rpx(24),
                   padding: rpx(20),
                   paddingBottom: rpx(14),
+                  willChange: "transform, opacity",
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
                 }}
-                initial={{ opacity: 0, x: -80 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                whileHover={{
-                  scale: 1.05,
-                  x: 25,
-                  boxShadow: "0 15px 40px rgba(70, 64, 31, 0.3)",
-                }}
-                whileTap={{ scale: 0.98 }}
               >
                 {/* Title */}
                 <h3
@@ -253,59 +262,65 @@ export function ProductDetailFeaturesSection({
 
         {/* Right Column - Title and Circle */}
         <div
-          className="flex-1 relative flex items-start justify-center"
-          style={{ alignSelf: "center", height: `calc(${rpx(150)} * 3 + ${rpx(25)} * 2)` }}
+          className="flex-1 flex items-start justify-center"
+          style={{ alignSelf: "center", height: rpx(500) }}
         >
-          {/* Decorative circle */}
-          <motion.div
-            className="absolute rounded-full bg-[#EAE5BD]"
-            style={{
-              bottom: rpx(20),
-              right: rpx(60),
-              width: rpx(190),
-              height: rpx(190),
-            }}
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.6, 1, 0.6],
-              y: [0, -15, 0],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
+          {/* Shared Container for Title and Circle */}
+          <div className="relative">
+            {/* Decorative circle - centered on the text line */}
+            <motion.div
+              className="absolute rounded-full bg-[#EAE5BD] z-0"
+              style={{
+                // Center of the 190px circle should align with the text line
+                // Text width is roughly the line-height (56px)
+                left: "110%",
+                top: "80%",
+                width: rpx(190),
+                height: rpx(190),
+                marginLeft: rpx(-95), // Half of width to center it
+              }}
+              animate={{
+                scale: [1, 1.1, 1],
+                opacity: [0.6, 0.9, 0.6],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
 
-          {/* Vertical Title with stroke effect */}
-          <div className="relative z-10">
-            {/* Stroke layer (behind) */}
-            <h2
-              className="font-josefin-sans font-bold whitespace-pre-line text-transparent"
-              style={{
-                fontSize: rpx(60),
-                lineHeight: rpx(56),
-                WebkitTextStroke: `2px #464010`,
-                writingMode: "vertical-rl",
-                textOrientation: "mixed",
-              }}
-            >
-              {title}
-            </h2>
-            {/* Fill layer (front) */}
-            <h2
-              className="absolute font-josefin-sans font-bold whitespace-pre-line text-[#46401F]"
-              style={{
-                fontSize: rpx(60),
-                lineHeight: rpx(56),
-                writingMode: "vertical-rl",
-                textOrientation: "mixed",
-                bottom: 3,
-                left: 3,
-              }}
-            >
-              {title}
-            </h2>
+            {/* Vertical Title with stroke effect */}
+            <div className="relative z-10">
+              {/* Stroke layer (behind) */}
+              <h2
+                className="font-josefin-sans font-bold whitespace-pre-line text-transparent"
+                style={{
+                  fontSize: rpx(60),
+                  lineHeight: rpx(56),
+                  WebkitTextStroke: `2px #464010`,
+                  writingMode: "vertical-rl",
+                  textOrientation: "mixed",
+                }}
+              >
+                {title}
+              </h2>
+              {/* Fill layer (front) */}
+              <h2
+                className="absolute font-josefin-sans font-bold whitespace-pre-line text-[#46401F]"
+                style={{
+                  fontSize: rpx(60),
+                  lineHeight: rpx(56),
+                  writingMode: "vertical-rl",
+                  textOrientation: "mixed",
+                  top: 0,
+                  left: 0,
+                  transform: `translate(${rpx(3)}, ${rpx(3)})`,
+                }}
+              >
+                {title}
+              </h2>
+            </div>
           </div>
         </div>
       </div>

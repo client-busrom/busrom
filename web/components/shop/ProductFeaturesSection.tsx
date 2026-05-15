@@ -83,71 +83,77 @@ const TwinklingStar = ({
   )
 }
 
-// Feature item component with hover effects
 const FeatureItem = ({
   title,
-  x,
-  y,
-  width,
   dotX,
   dotY,
   align,
 }: {
   title: string
-  x: number
-  y: number
-  width: number
   dotX: number
   dotY: number
   align: "left" | "right"
-}) => (
-  <motion.div
-    className="absolute cursor-pointer group"
-    style={{
-      left: rpx(Math.min(x, dotX) - 10),
-      top: rpx(Math.min(y, dotY) - 10),
-      width: rpx(Math.abs(dotX - x) + width + 40),
-      height: rpx(60),
-    }}
-    whileHover="hover"
-    initial="idle"
-  >
-    {/* Dot - behind text */}
+}) => {
+  const dotRadius = 15
+  const textWidth = 180
+  const lineHeight = 28
+  const overlap = -3 // Text overlaps into dot center by 5px
+
+  return (
     <motion.div
-      className="absolute rounded-full z-0"
+      className="absolute cursor-pointer group"
       style={{
-        left: rpx(dotX - Math.min(x, dotX) + 10),
-        top: rpx(dotY - Math.min(y, dotY) + 10),
-        width: rpx(30),
-        height: rpx(30),
-        backgroundColor: "#EDE8D9",
+        left: rpx(dotX),
+        top: rpx(dotY),
+        width: 0,
+        height: 0,
+        zIndex: 10,
       }}
-      variants={{
-        idle: { scale: 1, backgroundColor: "#EDE8D9" },
-        hover: { scale: 1.5, backgroundColor: "#A59D60" },
-      }}
-      transition={{ type: "spring", stiffness: 400, damping: 20 }}
-    />
-    {/* Text - above dot */}
-    <motion.p
-      className={`absolute font-josefin-sans font-semibold z-10 whitespace-pre ${align === "right" ? "text-right" : "text-left"}`}
-      style={{
-        left: rpx(x - Math.min(x, dotX) + 10),
-        top: rpx(y - Math.min(y, dotY) + 10),
-        fontSize: rpx(20),
-        lineHeight: rpx(26),
-        color: "#46401F",
-      }}
-      variants={{
-        idle: { x: 0 },
-        hover: { x: align === "right" ? -8 : 8 },
-      }}
-      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      whileHover="hover"
+      initial="idle"
     >
-      {title}
-    </motion.p>
-  </motion.div>
-)
+      {/* Dot - centered on anchor */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          left: rpx(-dotRadius),
+          top: rpx(-dotRadius),
+          width: rpx(dotRadius * 2),
+          height: rpx(dotRadius * 2),
+          backgroundColor: "#EDE8D9",
+        }}
+        variants={{
+          idle: { scale: 1, backgroundColor: "#EDE8D9" },
+          hover: { scale: 1.5, backgroundColor: "#A59D60" },
+        }}
+        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      />
+      
+      {/* Text - positioned relative to anchor */}
+      <motion.p
+        className={`absolute font-josefin-sans font-semibold whitespace-pre-wrap ${
+          align === "right" ? "text-right" : "text-left"
+        }`}
+        style={{
+          // For align="right", text ends at overlap. For align="left", text starts at -overlap.
+          left: align === "right" ? rpx(overlap - textWidth) : rpx(-overlap),
+          top: rpx(-lineHeight / 2 - overlap * 2),
+          width: rpx(textWidth),
+          fontSize: rpx(24),
+          lineHeight: rpx(lineHeight),
+          color: "#46401F",
+        }}
+        variants={{
+          idle: { x: 0 },
+          hover: { x: align === "right" ? -8 : 8 },
+        }}
+        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      >
+        {title}
+      </motion.p>
+    </motion.div>
+  )
+}
 
 // Moon component (gradient circle) - orbits along image mask edge using SVG animateMotion
 const Moon = () => (
@@ -204,23 +210,23 @@ const Moon = () => (
 // Feature positions from Figma (relative to section top at y=2957)
 // Left features are right-aligned, so x + width should end near the dot
 const LEFT_FEATURES = [
-  { title: "Strong & Stable", x: 194, y: 3385 - 2957, width: 255, dotX: 435, dotY: 3380 - 2957 },
-  { title: "Moisture & Rust Resistant", x: 131, y: 3520 - 2957, width: 255, dotX: 372, dotY: 3513 - 2957 },
-  { title: "Minimalist Aesthetic", x: 259, y: 3652 - 2957, width: 175, dotX: 418, dotY: 3644 - 2957 },
+  { dotX: 435, dotY: 423 },
+  { dotX: 372, dotY: 556 },
+  { dotX: 418, dotY: 687 },
 ]
 
 const RIGHT_FEATURES = [
-  { title: "Universal Compatibility", x: 1446, y: 3290 - 2957, width: 255, dotX: 1429, dotY: 3281 - 2957 },
-  { title: "Hidden Load-Bearing", x: 1507, y: 3463 - 2957, width: 217, dotX: 1490, dotY: 3453 - 2957 },
-  { title: "Quick & Easy Installation", x: 1470, y: 3623 - 2957, width: 222, dotX: 1456, dotY: 3613 - 2957 },
+  { dotX: 1429, dotY: 324 },
+  { dotX: 1490, dotY: 496 },
+  { dotX: 1456, dotY: 656 },
 ]
 
 // Star positions from Figma
 const STARS = [
-  { x: 414, y: 3183 - 2957, size: 90 }, // Large star
-  { x: 488, y: 3229 - 2957, size: 44 }, // Medium star near large
-  { x: 1344, y: 3140 - 2957, size: 63 }, // Medium star right side
-  { x: 1392, y: 3140 - 2957, size: 30 }, // Small star right side
+  { x: 414, y: 226, size: 90 }, // Large star
+  { x: 488, y: 272, size: 44 }, // Medium star near large
+  { x: 1344, y: 183, size: 63 }, // Medium star right side
+  { x: 1392, y: 183, size: 30 }, // Small star right side
 ]
 
 export function ProductFeaturesSection({
@@ -393,17 +399,13 @@ export function ProductFeaturesSection({
 
         {/* Left Features */}
         {leftItems.map((item, index) => {
-          const position = LEFT_FEATURES[index]
-          if (!position) return null
+          const pos = LEFT_FEATURES[index]
+          if (!pos) return null
           return (
             <FeatureItem
               key={`left-${index}`}
               title={item.title}
-              x={position.x}
-              y={position.y}
-              width={position.width}
-              dotX={position.dotX}
-              dotY={position.dotY}
+              {...pos}
               align="right"
             />
           )
@@ -411,17 +413,13 @@ export function ProductFeaturesSection({
 
         {/* Right Features */}
         {rightItems.map((item, index) => {
-          const position = RIGHT_FEATURES[index]
-          if (!position) return null
+          const pos = RIGHT_FEATURES[index]
+          if (!pos) return null
           return (
             <FeatureItem
               key={`right-${index}`}
               title={item.title}
-              x={position.x}
-              y={position.y}
-              width={position.width}
-              dotX={position.dotX}
-              dotY={position.dotY}
+              {...pos}
               align="left"
             />
           )

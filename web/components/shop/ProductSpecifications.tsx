@@ -91,12 +91,12 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
                     const isSelected = selectedOptions[idx] === itemIdx
 
                     if (hasVisualsInGroup) {
-                      // Visual Card Style (166x122)
+                      // Visual Card Style (Fluid width, fixed height)
                       return (
                         <div
                           key={itemIdx}
                           onClick={() => handleSelect(idx, itemIdx)}
-                          className={`relative w-full max-w-[166px] h-[122px] p-4 rounded-xl border-2 transition-all cursor-pointer group flex flex-col items-center justify-center text-center gap-2 ${
+                          className={`relative w-full h-[122px] p-4 rounded-xl border-2 transition-all cursor-pointer group flex flex-col items-center justify-center text-center gap-2 ${
                             isSelected 
                               ? "bg-white border-brand-accent-gold shadow-sm" 
                               : "bg-white border-brand-accent-border/30 hover:border-brand-accent-gold/50"
@@ -138,18 +138,18 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
                       )
                     }
 
-                    // Text-Only Tag Style (105.48x52)
+                    // Text-Only Tag Style (Fluid width, fixed height)
                     return (
                       <div
                         key={itemIdx}
                         onClick={() => handleSelect(idx, itemIdx)}
-                        className={`relative w-full h-[52px] px-[24px] py-[16px] rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center text-center ${
+                        className={`relative w-full h-[52px] px-4 py-2 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center text-center ${
                           isSelected 
                             ? "bg-white border-brand-accent-gold shadow-sm" 
                             : "bg-white border-brand-accent-border/30 hover:border-brand-accent-gold/50"
                         }`}
                       >
-                        <span className={`text-xs font-bold whitespace-nowrap transition-colors ${
+                        <span className={`text-xs font-bold transition-colors line-clamp-1 ${
                           isSelected ? 'text-brand-accent-gold' : 'text-brand-text-main/80 group-hover:text-brand-text-main'
                         }`}>
                           {itemText}

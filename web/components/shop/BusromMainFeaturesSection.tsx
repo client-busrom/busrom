@@ -206,15 +206,21 @@ function FeatureCard({ card, index, isActive, onHover }: FeatureCardProps) {
         </motion.div>
 
         {/* 图标 */}
-        <div
+        <motion.div
           className="absolute flex items-center justify-center"
           style={{
             left: "50%",
             top: "40%",
-            transform: "translate(-50%, -50%)",
+            x: "-50%",
+            y: "-50%",
             width: rpx(64),  // 80 * 0.8
             height: rpx(64),
           }}
+          variants={{
+            inactive: { scale: 1 },
+            active: { scale: 1.25 },
+          }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
         >
           <Image
             src={iconSrc}
@@ -222,23 +228,28 @@ function FeatureCard({ card, index, isActive, onHover }: FeatureCardProps) {
             fill
             className="object-contain"
           />
-        </div>
+        </motion.div>
 
         {/* 标题 */}
-        <div
-          className="absolute font-josefin-sans font-medium text-center whitespace-pre-line"
+        <motion.div
+          className="absolute font-josefin-sans text-center whitespace-pre-line"
           style={{
             left: "50%",
             top: rpx(176),  // 220 * 0.8
-            transform: "translateX(-50%)",
+            x: "-50%",
             width: rpx(160), // 200 * 0.8
             fontSize: rpx(24),
             lineHeight: rpx(30),
             color: "#3B360B",
           }}
+          variants={{
+            inactive: { fontWeight: 500 },
+            active: { fontWeight: 700 },
+          }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
         >
           {card.title}
-        </div>
+        </motion.div>
       </motion.div>
     </motion.div>
   )
@@ -251,8 +262,8 @@ interface BusromMainFeaturesSectionProps {
 }
 
 export function BusromMainFeaturesSection({
-  title = "Busrom Main Features",
-  subtitle = "Increase New-Style To Your Life",
+  title,
+  subtitle,
   cards = defaultCards,
 }: BusromMainFeaturesSectionProps) {
   const cardCount = cards.length || 6
@@ -334,7 +345,7 @@ export function BusromMainFeaturesSection({
               onClick={() => handleHover(index)}
             >
               {/* 图标 */}
-              <div className="relative w-12 h-12 mb-3">
+              <div className={`relative w-12 h-12 mb-3 transition-transform duration-300 ${isActive ? 'scale-125' : 'scale-100'}`}>
                 <Image
                   src={iconSrc}
                   alt=""
@@ -343,7 +354,7 @@ export function BusromMainFeaturesSection({
                 />
               </div>
               {/* 标题 */}
-              <p className="font-josefin-sans font-medium text-sm text-center text-[#3B360B] leading-tight">
+              <p className={`font-josefin-sans text-sm text-center text-[#3B360B] leading-tight transition-all duration-300 ${isActive ? 'font-bold' : 'font-medium'}`}>
                 {card.title}
               </p>
             </div>
@@ -365,13 +376,13 @@ export function BusromMainFeaturesSection({
         style={{
           width: vw(792),
           height: vw(792),
-          left: vw(-207),
+          left: vw(100), // Moved right from -207
           top: vw(398),
           backgroundColor: "rgb(255 245 168 / 0.38)",
-          filter: `blur(${vw(104)})`,
+          filter: `blur(${vw(60)})`,
         }}
         animate={{
-          x: [0, 200, 100, 0],
+          x: [0, 100, 50, 0], // Limited X movement
           y: [0, -100, 50, 0],
         }}
         transition={{
@@ -393,7 +404,7 @@ export function BusromMainFeaturesSection({
           filter: `blur(${vw(104)})`,
         }}
         animate={{
-          x: [0, -150, 80, 0],
+          x: [0, -150, 50, 0], // Limited X movement to avoid right edge
           y: [0, -120, 60, 0],
         }}
         transition={{
@@ -409,13 +420,13 @@ export function BusromMainFeaturesSection({
         style={{
           width: vw(550),
           height: vw(406),
-          left: vw(1450),
+          left: vw(1200), // Moved left from 1450 to stay within 1920
           top: vw(0),
           backgroundColor: "rgb(255 245 168 / 0.30)",
-          filter: `blur(${vw(104)})`,
+          filter: `blur(${vw(60)})`,
         }}
         animate={{
-          x: [0, -200, 100, 0],
+          x: [0, -100, 50, 0], // Limited X movement
           y: [0, 150, -80, 0],
         }}
         transition={{
@@ -429,7 +440,7 @@ export function BusromMainFeaturesSection({
       <div className="relative z-10 text-center" style={{ marginBottom: rpx(64) }}>
         {/* 主标题 */}
         <h2
-          className="font-josefin-sans font-bold text-center whitespace-pre-line"
+          className="font-josefin-sans font-bold text-center whitespace-pre-line mb-4"
           style={{
             fontSize: rpx(60),
             lineHeight: rpx(56),
