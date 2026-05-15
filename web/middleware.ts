@@ -18,7 +18,6 @@ export function middleware(request: NextRequest) {
   ) {
     return NextResponse.next();
   }
-
   // 2. Simple Locale Prefixing logic
   const hasLocale = locales.some(
     (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)

@@ -171,7 +171,8 @@ export async function getMatchingSeoSetting(
 export function buildMetadata(
   seoSetting: SeoSetting | null,
   baseMetadata: Metadata = {},
-  baseUrl: string = 'https://www.busromhouse.com'
+  baseUrl: string = 'https://www.busromhouse.com',
+  actualPath?: string
 ): Metadata {
   if (!seoSetting) return baseMetadata
 
@@ -220,13 +221,13 @@ export function buildMetadata(
     metadata.alternates = {
       ...metadata.alternates,
       canonical: canonicalUrl,
-      languages: getAlternateLanguages(seoSetting.exactPath || '/'),
+      languages: getAlternateLanguages(actualPath || seoSetting.exactPath || '/'),
     }
   } else {
     // Even if no canonical is set in CMS, we should still provide hreflang for the current path
     metadata.alternates = {
       ...metadata.alternates,
-      languages: getAlternateLanguages(seoSetting.exactPath || '/'),
+      languages: getAlternateLanguages(actualPath || seoSetting.exactPath || '/'),
     }
   }
 
@@ -298,7 +299,7 @@ export async function getPageMetadata(
   pageMetadata: Metadata = {}
 ): Promise<Metadata> {
   const seoSetting = await getMatchingSeoSetting(path, pageType, locale)
-  return buildMetadata(seoSetting, pageMetadata)
+  return buildMetadata(seoSetting, pageMetadata, 'https://www.busromhouse.com', path)
 }
 
 /**

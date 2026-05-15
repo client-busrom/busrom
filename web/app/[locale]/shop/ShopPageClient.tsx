@@ -19,13 +19,6 @@ import type {
 // SWR fetcher
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
-// Helper to extract URL from variant
-function getVariantUrl(variant: string | { url?: string } | undefined): string | undefined {
-  if (!variant) return undefined
-  if (typeof variant === 'string') return variant
-  return variant.url
-}
-
 interface ShopPageClientProps {
   locale: Locale
   searchParams: { [key: string]: string | string[] | undefined }

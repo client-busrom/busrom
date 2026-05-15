@@ -144,9 +144,9 @@ async function fetchBlogs(): Promise<{ slug: string; updatedAt: string }[]> {
 
 /**
  * Fetch all CMS pages for sitemap
- * These are custom pages created by operators -> /page/[slug]
+ * These are custom pages created by operators
  */
-async function fetchPages(): Promise<{ slug: string; updatedAt: string }[]> {
+async function fetchPages(): Promise<{ path: string; updatedAt: string; isSystem: boolean }[]> {
   try {
     const response = await fetch(GRAPHQL_ENDPOINT, {
       method: 'POST',
@@ -156,10 +156,10 @@ async function fetchPages(): Promise<{ slug: string; updatedAt: string }[]> {
           query GetPagesForSitemap {
             Pages(where: {
               status: { equals: "published" }
-              isSystem: { equals: false }
             }, limit: 1000) {
               docs {
-                slug
+                path
+                isSystem
                 updatedAt
               }
             }
@@ -332,11 +332,14 @@ export async function getSitemapUrlsForLocale(locale: string, baseUrl: string): 
     }
 
 
-    // Add CMS pages -> /page/[slug]
+    // Add CMS pages -> uses actual path field
+    // Filter out system pages as they are already included in getStaticRoutes()
     for (const page of pages) {
+      if (page.isSystem) continue;
+      
       urls.push(
         generateUrlWithAlternates(
-          `/page/${page.slug}`,
+          page.path,
           page.updatedAt,
           'monthly',
           0.6,
@@ -415,10 +418,12 @@ export async function getAllSitemapUrls(): Promise<SitemapUrl[]> {
     }
 
 
-    // Add CMS pages -> /page/[slug]
+    // Add CMS pages -> uses actual path field
     for (const page of pages) {
+      if (page.isSystem) continue;
+      
       urls.push({
-        url: `/page/${page.slug}`,
+        url: page.path,
         lastmod: page.updatedAt,
         changefreq: 'monthly',
         priority: 0.6,

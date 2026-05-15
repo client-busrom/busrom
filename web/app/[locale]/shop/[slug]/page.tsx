@@ -50,7 +50,7 @@ export async function generateMetadata({
     setting.metaTitle = undefined
     setting.metaDescription = undefined
   }
-  return buildMetadata(setting, defaultMetadata)
+  return buildMetadata(setting, defaultMetadata, 'https://www.busromhouse.com', path)
 }
 
 export default async function ProductDetailPage({
