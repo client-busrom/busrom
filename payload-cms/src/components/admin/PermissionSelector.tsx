@@ -147,6 +147,7 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({
     new Set(),
   );
   const [loadingRoles, setLoadingRoles] = useState(false);
+  const [isMasterExpanded, setIsMasterExpanded] = useState(false);
   const {
     i18n: { language },
   } = useTranslation();
@@ -592,47 +593,67 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({
           )}
         </span>
 
-        {/* Only show buttons if there are permissions to toggle */}
-        {(!isUserCollection || additionalAvailable > 0) && (
-          <div style={{ display: "flex", gap: "8px" }}>
-            <button
-              type="button"
-              onClick={selectAll}
-              style={{
-                padding: "6px 12px",
-                background: "var(--theme-elevation-100)",
-                border: "1px solid var(--theme-elevation-200)",
-                borderRadius: "4px",
-                cursor: "pointer",
-                fontSize: "13px",
-              }}
-            >
-              {isUserCollection
-                ? t(messages.selectAllExtra)
-                : t(messages.selectAll)}
-            </button>
-            <button
-              type="button"
-              onClick={deselectAll}
-              style={{
-                padding: "6px 12px",
-                background: "var(--theme-elevation-100)",
-                border: "1px solid var(--theme-elevation-200)",
-                borderRadius: "4px",
-                cursor: "pointer",
-                fontSize: "13px",
-              }}
-            >
-              {isUserCollection
-                ? t(messages.clearExtra)
-                : t(messages.deselectAll)}
-            </button>
-          </div>
-        )}
+        {/* Master expand/collapse and select buttons */}
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <button
+            type="button"
+            onClick={() => setIsMasterExpanded(!isMasterExpanded)}
+            style={{
+              padding: "6px 12px",
+              background: isMasterExpanded ? "var(--theme-elevation-200)" : "var(--theme-info-500, #1890ff)",
+              color: isMasterExpanded ? "inherit" : "#fff",
+              border: "1px solid var(--theme-elevation-200)",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontSize: "13px",
+              fontWeight: 500,
+            }}
+          >
+            {isMasterExpanded 
+              ? (language === 'zh' ? '收起详细配置 ▲' : 'Collapse Details ▲') 
+              : (language === 'zh' ? '展开详细配置 ▼' : 'Expand Details ▼')}
+          </button>
+          {isMasterExpanded && (!isUserCollection || additionalAvailable > 0) && (
+            <>
+              <button
+                type="button"
+                onClick={selectAll}
+                style={{
+                  padding: "6px 12px",
+                  background: "var(--theme-elevation-100)",
+                  border: "1px solid var(--theme-elevation-200)",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "13px",
+                }}
+              >
+                {isUserCollection
+                  ? t(messages.selectAllExtra)
+                  : t(messages.selectAll)}
+              </button>
+              <button
+                type="button"
+                onClick={deselectAll}
+                style={{
+                  padding: "6px 12px",
+                  background: "var(--theme-elevation-100)",
+                  border: "1px solid var(--theme-elevation-200)",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "13px",
+                }}
+              >
+                {isUserCollection
+                  ? t(messages.clearExtra)
+                  : t(messages.deselectAll)}
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Categories */}
-      {sortedCategories.map((category) => {
+      {isMasterExpanded && sortedCategories.map((category) => {
         const categoryPerms = permissionsByCategory[category];
         const isExpanded = expandedCategories.has(category);
         const isFullySelected = isCategoryFullySelected(category);

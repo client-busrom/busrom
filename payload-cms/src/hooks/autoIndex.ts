@@ -49,6 +49,25 @@ export const autoIndexHook = (collectionSlug: string): CollectionAfterChangeHook
       })
     }
 
+    // Log function
+    const logToDb = async (url: string, engine: 'google' | 'indexnow', action: 'update' | 'delete', result: any) => {
+      try {
+        await req.payload.create({
+          collection: 'indexing-logs',
+          data: {
+            targetUrl: url,
+            engine,
+            action,
+            status: result?.success ? 'success' : (result?.message?.includes('Credentials') || result?.message?.includes('Key') ? 'failed_keys' : 'failed_network'),
+            triggerUser: req.user?.id || null,
+            rawResponse: result,
+          }
+        })
+      } catch(e) {
+        console.error('Failed to write SEO log:', e)
+      }
+    }
+
     // 1. Trigger: Status change to Published (New or Updated from Draft)
     if (isPublished && (operation === 'create' || !wasPublished)) {
       const urls = getUrls(doc, collectionSlug)
@@ -58,14 +77,17 @@ export const autoIndexHook = (collectionSlug: string): CollectionAfterChangeHook
       if (!process.env.GOOGLE_INDEXING_CREDENTIALS) {
         console.log('⚠️ [Google Indexing] Credentials not found. Skipping.')
       } else {
-        Promise.all(urls.map(url => notifyGoogleOfUpdate(url, 'URL_UPDATED'))).catch(e => {
-          console.error('[AutoIndex] Google Update error:', e.message)
+        urls.forEach(url => {
+          notifyGoogleOfUpdate(url, 'URL_UPDATED')
+            .then(res => logToDb(url, 'google', 'update', res))
+            .catch(e => logToDb(url, 'google', 'update', { success: false, message: e.message }))
         })
       }
       
-      notifyIndexNow(urls).catch(e => {
-        console.error('[AutoIndex] IndexNow Update error:', e.message)
-      })
+      const indexNowTarget = urls.length > 1 ? `${urls.length} URLs (e.g. ${urls[0]})` : urls[0]
+      notifyIndexNow(urls)
+        .then(res => logToDb(indexNowTarget, 'indexnow', 'update', res))
+        .catch(e => logToDb(indexNowTarget, 'indexnow', 'update', { success: false, message: e.message }))
     }
 
     // 2. Trigger: Status change from Published to NOT Published (Unpublished, Archived)
@@ -76,14 +98,17 @@ export const autoIndexHook = (collectionSlug: string): CollectionAfterChangeHook
       if (!process.env.GOOGLE_INDEXING_CREDENTIALS) {
         console.log('⚠️ [Google Indexing] Credentials not found. Skipping.')
       } else {
-        Promise.all(urls.map(url => notifyGoogleOfUpdate(url, 'URL_DELETED'))).catch(e => {
-          console.error('[AutoIndex] Google Delete error:', e.message)
+        urls.forEach(url => {
+          notifyGoogleOfUpdate(url, 'URL_DELETED')
+            .then(res => logToDb(url, 'google', 'delete', res))
+            .catch(e => logToDb(url, 'google', 'delete', { success: false, message: e.message }))
         })
       }
       
-      notifyIndexNow(urls).catch(e => {
-        console.error('[AutoIndex] IndexNow Delete error:', e.message)
-      })
+      const indexNowTarget = urls.length > 1 ? `${urls.length} URLs (e.g. ${urls[0]})` : urls[0]
+      notifyIndexNow(urls)
+        .then(res => logToDb(indexNowTarget, 'indexnow', 'delete', res))
+        .catch(e => logToDb(indexNowTarget, 'indexnow', 'delete', { success: false, message: e.message }))
     }
 
     return doc

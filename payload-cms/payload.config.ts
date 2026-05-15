@@ -237,6 +237,7 @@ import { SeoSettings } from './src/collections/SeoSettings'
 import { FormConfigs } from './src/collections/FormConfigs'
 import { FormSubmissions } from './src/collections/FormSubmissions'
 import { SmtpConfigs } from './src/collections/SmtpConfigs'
+import { IndexingLogs } from './src/collections/IndexingLogs'
 
 import type { CollectionConfig } from 'payload'
 
@@ -289,6 +290,7 @@ import { BrandAnalysis } from './src/globals/BrandAnalysis'
 import { BrandValue } from './src/globals/BrandValue'
 // Globals - CMS Settings
 import { TranslationConfig } from './src/globals/TranslationConfig'
+import { SystemSettings } from './src/globals/SystemSettings'
 
 // Plugins
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
@@ -354,6 +356,11 @@ export default buildConfig({
         '@/components/admin/AdminStylesProvider',
         '@/components/uploads/CompressedUploadField#CompressedUploadProvider',
       ],
+      views: {
+        dashboard: {
+          Component: '@/components/admin/CustomDashboard',
+        },
+      },
     },
     // Admin UI localization
     dateFormat: 'yyyy-MM-dd HH:mm:ss',
@@ -401,6 +408,7 @@ export default buildConfig({
     FormConfigs,
     FormSubmissions,
     SmtpConfigs,
+    IndexingLogs,
   ]),
 
   // ==================================================================
@@ -432,7 +440,9 @@ export default buildConfig({
     BrandValue,             // 15
     // CMS Settings (CMS系统配置)
     TranslationConfig,
+    SystemSettings,
   ],
+
 
   // ==================================================================
   // Database (PostgreSQL via Drizzle)

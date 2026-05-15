@@ -36,3 +36,5 @@ export { BrandValue } from './BrandValue'                        // 15
 // export { SocialConfig } from './SocialConfig'
 // export { EmailConfig } from './EmailConfig'
 // export { SeoConfig } from './SeoConfig'
+export { SystemSettings } from './SystemSettings'
+

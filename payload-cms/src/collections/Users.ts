@@ -156,6 +156,96 @@ export const Users: CollectionConfig = {
     },
 
     // ==================================================================
+    // 🚀 Personalized Quick Actions (User Dashboard)
+    // ==================================================================
+    {
+      name: 'quickActions',
+      type: 'array',
+      label: {
+        en: 'My Quick Actions (Dashboard)',
+        zh: '我的专属快捷工作台入口',
+      },
+      admin: {
+        description: {
+          en: 'Customize the quick action buttons displayed on your personal dashboard.',
+          zh: '在此自由定制您个人后台首页显示的快捷工作台按钮。',
+        },
+        condition: () => {
+          if (typeof window !== 'undefined') {
+            return window.location.pathname.includes('/admin/account')
+          }
+          return true
+        },
+      },
+      access: {
+        read: () => true,
+        update: ({ req: { user }, id }) => user?.isAdmin === true || String(user?.id) === String(id),
+      },
+      fields: [
+        {
+          name: 'route',
+          type: 'select',
+          required: true,
+          label: { en: 'Select Action / Route', zh: '选择功能模块' },
+          options: [
+            // Products
+            { label: { en: '📦 Add New Product', zh: '📦 发布新产品' }, value: '/admin/collections/products/create' },
+            { label: { en: '📦 Product List', zh: '📦 产品列表管理' }, value: '/admin/collections/products' },
+            { label: { en: '🏷️ Product Series', zh: '🏷️ 产品系列管理' }, value: '/admin/collections/product-series' },
+            { label: { en: '⚙️ Product Attributes', zh: '⚙️ 产品规格属性' }, value: '/admin/collections/product-attributes' },
+            // Content
+            { label: { en: '✍️ Write Knowledge Base', zh: '✍️ 撰写知识库文章' }, value: '/admin/collections/blogs/create' },
+            { label: { en: '📚 Knowledge Base List', zh: '📚 知识库列表管理' }, value: '/admin/collections/blogs' },
+            { label: { en: '📂 Categories', zh: '📂 分类目录管理' }, value: '/admin/collections/categories' },
+            { label: { en: '❓ FAQ Management', zh: '❓ 常见问题管理' }, value: '/admin/collections/faq-items' },
+            { label: { en: '📑 Document Templates', zh: '📑 资料下载模板' }, value: '/admin/collections/document-templates' },
+            // Media
+            { label: { en: '🖼️ Media Library', zh: '🖼️ 素材库管理' }, value: '/admin/collections/media' },
+            { label: { en: '🗂️ Media Categories', zh: '🗂️ 素材分类' }, value: '/admin/collections/media-categories' },
+            { label: { en: '📱 Applications', zh: '📱 应用领域素材' }, value: '/admin/collections/applications' },
+            // Forms & Inquiries
+            { label: { en: '💬 Customer Inquiries', zh: '💬 客户留言与表单询盘' }, value: '/admin/collections/form-submissions' },
+            { label: { en: '📋 Form Configurations', zh: '📋 表单字段配置' }, value: '/admin/collections/form-configs' },
+            { label: { en: '📧 SMTP Settings', zh: '📧 邮件发件服务器' }, value: '/admin/collections/smtp-configs' },
+            // Website Pages
+            { label: { en: '🏠 Homepage Content', zh: '🏠 首页轮播与板块设置' }, value: '/admin/collections/hero-banner-items' },
+            { label: { en: '📄 Subpages Management', zh: '📄 网站独立页面管理' }, value: '/admin/collections/pages' },
+            { label: { en: '🛍️ Shop Page Config', zh: '🛍️ 选型中心配置' }, value: '/admin/globals/shop-page-config' },
+            { label: { en: '🧭 Navigation Menus', zh: '🧭 网站菜单导航' }, value: '/admin/collections/navigation-menus' },
+            // Settings
+            { label: { en: '🔍 SEO Global Settings', zh: '🔍 SEO 抓取与收录配置' }, value: '/admin/globals/seo-setting' },
+            { label: { en: '⚡ Indexing Logs', zh: '⚡ 搜索引擎提交日志' }, value: '/admin/collections/indexing-logs' },
+            { label: { en: '🌐 Site Config', zh: '🌐 网站全局基础设置' }, value: '/admin/globals/site-config' },
+            { label: { en: '🏢 Footer Config', zh: '🏢 页脚与联系方式' }, value: '/admin/globals/footer' },
+            { label: { en: '🌍 Translation Config', zh: '🌍 国际化与翻译配置' }, value: '/admin/globals/translation-config' },
+            { label: { en: '👥 Users & Access', zh: '👥 后台账号与权限管理' }, value: '/admin/collections/users' },
+          ],
+        },
+        {
+          name: 'customLabel',
+          type: 'text',
+          label: { en: 'Custom Title (Optional)', zh: '自定义显示标题 (选填)' },
+          admin: {
+            description: { en: 'Leave empty to use default module name', zh: '留空则默认使用上方选择的功能模块名称' }
+          }
+        },
+        {
+          name: 'colorPreset',
+          type: 'select',
+          defaultValue: 'success',
+          label: { en: 'Color Theme Preset', zh: '卡片配色预设' },
+          options: [
+            { label: { en: 'Green (Success)', zh: '绿色预设' }, value: 'success' },
+            { label: { en: 'Blue (Info)', zh: '蓝色预设' }, value: 'info' },
+            { label: { en: 'Yellow (Warning)', zh: '黄色预设' }, value: 'warning' },
+            { label: { en: 'Red (Error)', zh: '红色预设' }, value: 'error' },
+            { label: { en: 'Gray (Default)', zh: '灰色常规' }, value: 'default' },
+          ],
+        },
+      ],
+    },
+
+    // ==================================================================
     // 📊 Status & Activity (hidden on create-first-user)
     // ==================================================================
     {

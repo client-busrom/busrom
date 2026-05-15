@@ -417,6 +417,7 @@ export const CustomNav: React.FC = () => {
         <CollapsibleGroup labelKey="advanced" defaultOpen={false}>
           <NavItem href="/admin/collections/custom-scripts" labelKey="customScripts" />
           <NavItem href="/admin/collections/seo-settings" labelKey="seoSettings" />
+          <NavItem href="/admin/collections/indexing-logs" labelKey="indexingLogs" />
         </CollapsibleGroup>
 
         {/* Website Settings - 网站设置 */}

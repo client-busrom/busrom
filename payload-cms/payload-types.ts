@@ -98,6 +98,7 @@ export interface Config {
     'form-configs': FormConfig;
     'form-submissions': FormSubmission;
     'smtp-configs': SmtpConfig;
+    'indexing-logs': IndexingLog;
     audit_logs: AuditLog;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -159,6 +160,7 @@ export interface Config {
     'form-configs': FormConfigsSelect<false> | FormConfigsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     'smtp-configs': SmtpConfigsSelect<false> | SmtpConfigsSelect<true>;
+    'indexing-logs': IndexingLogsSelect<false> | IndexingLogsSelect<true>;
     audit_logs: AuditLogsSelect<false> | AuditLogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -247,6 +249,7 @@ export interface Config {
     'brand-analysis': BrandAnalysis;
     'brand-value': BrandValue;
     'translation-config': TranslationConfig;
+    'system-settings': SystemSetting;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
@@ -271,6 +274,7 @@ export interface Config {
     'brand-analysis': BrandAnalysisSelect<false> | BrandAnalysisSelect<true>;
     'brand-value': BrandValueSelect<false> | BrandValueSelect<true>;
     'translation-config': TranslationConfigSelect<false> | TranslationConfigSelect<true>;
+    'system-settings': SystemSettingsSelect<false> | SystemSettingsSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale:
@@ -350,6 +354,45 @@ export interface User {
    * Super admin has full access to all system features
    */
   isAdmin?: boolean | null;
+  /**
+   * Customize the quick action buttons displayed on your personal dashboard.
+   */
+  quickActions?:
+    | {
+        route:
+          | '/admin/collections/products/create'
+          | '/admin/collections/products'
+          | '/admin/collections/product-series'
+          | '/admin/collections/product-attributes'
+          | '/admin/collections/blogs/create'
+          | '/admin/collections/blogs'
+          | '/admin/collections/categories'
+          | '/admin/collections/faq-items'
+          | '/admin/collections/document-templates'
+          | '/admin/collections/media'
+          | '/admin/collections/media-categories'
+          | '/admin/collections/applications'
+          | '/admin/collections/form-submissions'
+          | '/admin/collections/form-configs'
+          | '/admin/collections/smtp-configs'
+          | '/admin/collections/hero-banner-items'
+          | '/admin/collections/pages'
+          | '/admin/globals/shop-page-config'
+          | '/admin/collections/navigation-menus'
+          | '/admin/globals/seo-setting'
+          | '/admin/collections/indexing-logs'
+          | '/admin/globals/site-config'
+          | '/admin/globals/footer'
+          | '/admin/globals/translation-config'
+          | '/admin/collections/users';
+        /**
+         * Leave empty to use default module name
+         */
+        customLabel?: string | null;
+        colorPreset?: ('success' | 'info' | 'warning' | 'error' | 'default') | null;
+        id?: string | null;
+      }[]
+    | null;
   status?: ('active' | 'inactive' | 'suspended') | null;
   lastLogin?: string | null;
   twoFactorEnabled?: boolean | null;
@@ -2110,6 +2153,29 @@ export interface SmtpConfig {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "indexing-logs".
+ */
+export interface IndexingLog {
+  id: number;
+  targetUrl: string;
+  engine: 'google' | 'indexnow';
+  action: 'update' | 'delete';
+  status: 'success' | 'failed_keys' | 'failed_network';
+  triggerUser?: (number | null) | User;
+  rawResponse?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "audit_logs".
  */
 export interface AuditLog {
@@ -2373,6 +2439,10 @@ export interface PayloadLockedDocument {
         value: number | SmtpConfig;
       } | null)
     | ({
+        relationTo: 'indexing-logs';
+        value: number | IndexingLog;
+      } | null)
+    | ({
         relationTo: 'audit_logs';
         value: number | AuditLog;
       } | null);
@@ -2427,6 +2497,14 @@ export interface UsersSelect<T extends boolean = true> {
   roles?: T;
   directPermissions?: T;
   isAdmin?: T;
+  quickActions?:
+    | T
+    | {
+        route?: T;
+        customLabel?: T;
+        colorPreset?: T;
+        id?: T;
+      };
   status?: T;
   lastLogin?: T;
   twoFactorEnabled?: T;
@@ -3176,6 +3254,20 @@ export interface SmtpConfigsSelect<T extends boolean = true> {
   autoReplySubject?: T;
   autoReplyTemplate?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "indexing-logs_select".
+ */
+export interface IndexingLogsSelect<T extends boolean = true> {
+  targetUrl?: T;
+  engine?: T;
+  action?: T;
+  status?: T;
+  triggerUser?: T;
+  rawResponse?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -4229,6 +4321,21 @@ export interface TranslationConfig {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "system-settings".
+ */
+export interface SystemSetting {
+  id: number;
+  /**
+   * This text will appear at the very top of the admin panel for all users.
+   */
+  adminBannerText?: string | null;
+  adminBannerType?: ('info' | 'warning' | 'success' | 'error') | null;
+  showBanner?: boolean | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
 export interface PayloadJobsStat {
@@ -4809,6 +4916,18 @@ export interface TranslationConfigSelect<T extends boolean = true> {
   isEnabled?: T;
   lastTestedAt?: T;
   lastTestResult?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "system-settings_select".
+ */
+export interface SystemSettingsSelect<T extends boolean = true> {
+  adminBannerText?: T;
+  adminBannerType?: T;
+  showBanner?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

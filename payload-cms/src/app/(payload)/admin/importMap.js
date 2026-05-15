@@ -83,6 +83,7 @@ import { default as default_a44df17d0fc3dcd873dae43dc3bf66bd } from '@/component
 import { default as default_9021c207f82628325087705959e6035c } from '@/components/admin/AdminStylesProvider'
 import { CompressedUploadProvider as CompressedUploadProvider_a68292e254915ee6cbe52aba2db04d5b } from '@/components/uploads/CompressedUploadField'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
+import { default as default_c72149161cf6fec538030bf0afce1a49 } from '@/components/admin/CustomDashboard'
 import { CollectionCards as CollectionCards_ab83ff7e88da8d3530831f296ec4756a } from '@payloadcms/ui/rsc'
 
 export const importMap = {
@@ -171,5 +172,6 @@ export const importMap = {
   "@/components/admin/AdminStylesProvider#default": default_9021c207f82628325087705959e6035c,
   "@/components/uploads/CompressedUploadField#CompressedUploadProvider": CompressedUploadProvider_a68292e254915ee6cbe52aba2db04d5b,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
+  "@/components/admin/CustomDashboard#default": default_c72149161cf6fec538030bf0afce1a49,
   "@payloadcms/ui/rsc#CollectionCards": CollectionCards_ab83ff7e88da8d3530831f296ec4756a
 }
