@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
@@ -22,6 +22,7 @@ interface MediaObject {
 
 interface FeatureItem {
   title: string
+  description?: string
 }
 
 interface ImageLinkData {
@@ -88,14 +89,22 @@ const FeatureItem = ({
   dotX,
   dotY,
   align,
+  isSelected,
+  onHoverStart,
+  onHoverEnd,
+  onClick,
 }: {
   title: string
   dotX: number
   dotY: number
   align: "left" | "right"
+  isSelected: boolean
+  onHoverStart: () => void
+  onHoverEnd: () => void
+  onClick: (e: React.MouseEvent) => void
 }) => {
   const dotRadius = 15
-  const textWidth = 180
+  const maxWidth = 320
   const lineHeight = 28
   const overlap = -3 // Text overlaps into dot center by 5px
 
@@ -110,7 +119,11 @@ const FeatureItem = ({
         zIndex: 10,
       }}
       whileHover="hover"
+      animate={isSelected ? "hover" : "idle"}
       initial="idle"
+      onHoverStart={onHoverStart}
+      onHoverEnd={onHoverEnd}
+      onClick={onClick}
     >
       {/* Dot - centered on anchor */}
       <motion.div
@@ -135,10 +148,10 @@ const FeatureItem = ({
           align === "right" ? "text-right" : "text-left"
         }`}
         style={{
-          // For align="right", text ends at overlap. For align="left", text starts at -overlap.
-          left: align === "right" ? rpx(overlap - textWidth) : rpx(-overlap),
+          ...(align === "right" ? { right: rpx(-overlap) } : { left: rpx(-overlap) }),
           top: rpx(-lineHeight / 2 - overlap * 2),
-          width: rpx(textWidth),
+          width: "max-content",
+          maxWidth: rpx(maxWidth),
           fontSize: rpx(24),
           lineHeight: rpx(lineHeight),
           color: "#46401F",
@@ -149,7 +162,7 @@ const FeatureItem = ({
         }}
         transition={{ type: "spring", stiffness: 400, damping: 20 }}
       >
-        {title}
+        <span className="block font-bold">{title}</span>
       </motion.p>
     </motion.div>
   )
@@ -207,19 +220,8 @@ const Moon = () => (
   </div>
 )
 
-// Feature positions from Figma (relative to section top at y=2957)
-// Left features are right-aligned, so x + width should end near the dot
-const LEFT_FEATURES = [
-  { dotX: 435, dotY: 423 },
-  { dotX: 372, dotY: 556 },
-  { dotX: 418, dotY: 687 },
-]
-
-const RIGHT_FEATURES = [
-  { dotX: 1429, dotY: 324 },
-  { dotX: 1490, dotY: 496 },
-  { dotX: 1456, dotY: 656 },
-]
+// We now calculate feature positions dynamically in the component to support 5-8 items
+// keeping the original curved layout around the moon.
 
 // Star positions from Figma
 const STARS = [
@@ -235,9 +237,35 @@ export function ProductFeaturesSection({
   image,
   imageLink,
 }: ProductFeaturesSectionProps) {
-  // Use provided items or fallback to defaults
-  const leftItems = items.slice(0, 3)
-  const rightItems = items.slice(3, 6)
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+
+  // Distribute items roughly evenly, left gets slightly more if odd
+  const midPoint = Math.ceil(items.length / 2)
+  const leftItems = items.slice(0, midPoint)
+  const rightItems = items.slice(midPoint)
+
+  // Calculate dynamic positions for any number of items to follow the moon's curve
+  const getDynamicPositions = (count: number, side: "left" | "right") => {
+    const positions = []
+    const startY = 320
+    const endY = 700
+    const step = count > 1 ? (endY - startY) / (count - 1) : 0
+    
+    for (let i = 0; i < count; i++) {
+      const dotY = count === 1 ? (startY + endY) / 2 : startY + step * i
+      // Center of the moon vertically is roughly 510
+      const offsetFromCenter = Math.abs(dotY - 510)
+      // Bulge is max (~60px) at the center, tapering to 0 at the edges
+      const bulge = Math.max(0, 60 - (offsetFromCenter * offsetFromCenter) / 600)
+      
+      const dotX = side === "left" ? 430 - bulge : 1450 + bulge
+      positions.push({ dotX, dotY })
+    }
+    return positions
+  }
+
+  const leftPositions = getDynamicPositions(leftItems.length, "left")
+  const rightPositions = getDynamicPositions(rightItems.length, "right")
 
   // Calculate object position from focal point
   const objectPosition = image?.cropFocalPoint
@@ -288,16 +316,17 @@ export function ProductFeaturesSection({
         {items.map((item, index) => (
           <div
             key={index}
-            className="flex items-center gap-3 p-4 rounded-2xl min-h-[60px]"
+            className="flex flex-col p-4 rounded-2xl min-h-[60px]"
             style={{ backgroundColor: "rgba(237, 232, 217, 0.6)" }}
           >
-            <div
-              className="w-4 h-4 rounded-full flex-shrink-0"
-              style={{ backgroundColor: "#756F3F" }}
-            />
-            <span className="font-josefin-sans font-semibold text-sm text-[#46401F] leading-tight">
+            <h3 className="font-inter font-bold text-lg text-[#46401F] mb-1">
               {item.title}
-            </span>
+            </h3>
+            {item.description && (
+              <p className="font-inter text-sm text-[#46401F] opacity-80 leading-snug">
+                {item.description}
+              </p>
+            )}
           </div>
         ))}
       </div>
@@ -310,6 +339,7 @@ export function ProductFeaturesSection({
         ["--rpx-features" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
         minHeight: rpx(922),
       }}
+      onClick={() => setHoveredIndex(null)}
     >
       <div className="relative" style={{ minHeight: rpx(922) }}>
         {/* Title */}
@@ -358,7 +388,7 @@ export function ProductFeaturesSection({
           </svg>
 
           <div
-            className="w-full h-full overflow-hidden"
+            className="w-full h-full overflow-hidden relative"
             style={{
               clipPath: "url(#features-image-mask)",
             }}
@@ -391,6 +421,18 @@ export function ProductFeaturesSection({
             ) : (
               <div className="w-full h-full bg-gray-300" />
             )}
+
+            {/* Hover Overlay */}
+            <motion.div
+              className="absolute inset-0 bg-black/60 flex items-center justify-center p-12 text-center pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: hoveredIndex !== null && items[hoveredIndex]?.description ? 1 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <p className="text-white font-inter text-xl md:text-2xl leading-relaxed whitespace-pre-wrap">
+                {hoveredIndex !== null ? items[hoveredIndex]?.description : ""}
+              </p>
+            </motion.div>
           </div>
         </div>
 
@@ -399,28 +441,45 @@ export function ProductFeaturesSection({
 
         {/* Left Features */}
         {leftItems.map((item, index) => {
-          const pos = LEFT_FEATURES[index]
+          const pos = leftPositions[index]
           if (!pos) return null
           return (
             <FeatureItem
               key={`left-${index}`}
               title={item.title}
-              {...pos}
+              dotX={pos.dotX}
+              dotY={pos.dotY}
               align="right"
+              isSelected={hoveredIndex === index}
+              onHoverStart={() => setHoveredIndex(index)}
+              onHoverEnd={() => setHoveredIndex(null)}
+              onClick={(e) => {
+                e.stopPropagation()
+                setHoveredIndex(hoveredIndex === index ? null : index)
+              }}
             />
           )
         })}
 
         {/* Right Features */}
         {rightItems.map((item, index) => {
-          const pos = RIGHT_FEATURES[index]
+          const pos = rightPositions[index]
           if (!pos) return null
+          const targetIndex = midPoint + index
           return (
             <FeatureItem
               key={`right-${index}`}
               title={item.title}
-              {...pos}
+              dotX={pos.dotX}
+              dotY={pos.dotY}
               align="left"
+              isSelected={hoveredIndex === targetIndex}
+              onHoverStart={() => setHoveredIndex(targetIndex)}
+              onHoverEnd={() => setHoveredIndex(null)}
+              onClick={(e) => {
+                e.stopPropagation()
+                setHoveredIndex(hoveredIndex === targetIndex ? null : targetIndex)
+              }}
             />
           )
         })}

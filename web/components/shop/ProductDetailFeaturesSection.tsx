@@ -1,9 +1,10 @@
 "use client"
 
-import React from "react"
-import { motion } from "framer-motion"
+import React, { useRef, useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
+import { ArrowDown } from "lucide-react"
 
 // Design reference dimensions (from Figma 1920x922)
 const DESIGN_WIDTH = 1920
@@ -66,6 +67,43 @@ export function ProductDetailFeaturesSection({
   image,
   imageLink,
 }: ProductDetailFeaturesSectionProps) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [startY, setStartY] = useState(0)
+  const [scrollTop, setScrollTop] = useState(0)
+  const [showScrollHint, setShowScrollHint] = useState(items.length > 3)
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget
+    if (scrollHeight - scrollTop - clientHeight < 10) {
+      setShowScrollHint(false)
+    } else {
+      setShowScrollHint(true)
+    }
+  }
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollContainerRef.current) return
+    setIsDragging(true)
+    setStartY(e.clientY)
+    setScrollTop(scrollContainerRef.current.scrollTop)
+  }
+
+  const handleMouseLeave = () => {
+    setIsDragging(false)
+  }
+
+  const handleMouseUp = () => {
+    setIsDragging(false)
+  }
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollContainerRef.current) return
+    e.preventDefault()
+    const walk = (e.clientY - startY) * 1.5
+    scrollContainerRef.current.scrollTop = scrollTop - walk
+  }
+
   // Calculate object position from focal point
   const objectPosition = image?.cropFocalPoint
     ? `${image.cropFocalPoint.x}% ${image.cropFocalPoint.y}%`
@@ -112,8 +150,8 @@ export function ProductDetailFeaturesSection({
 
       {/* Cards */}
       <div className="space-y-4">
-        {items.slice(0, 3).map((item, index) => {
-          const style = CARD_STYLES[index] || CARD_STYLES[0]
+        {items.map((item, index) => {
+          const style = CARD_STYLES[index % CARD_STYLES.length]
           return (
             <div
               key={index}
@@ -185,17 +223,36 @@ export function ProductDetailFeaturesSection({
           )}
         </div>
 
-        {/* Center Cards - 810x250 from Figma */}
-        <div
-          className="flex flex-col"
-          style={{ gap: rpx(25) }}
+        {/* Center Cards - Scrollable window of height 500 */}
+        <div className="relative" style={{ height: rpx(500) }}>
+          <div
+            ref={scrollContainerRef}
+            className="flex flex-col overflow-y-auto [&::-webkit-scrollbar]:hidden"
+            data-lenis-prevent="true"
+            onScroll={handleScroll}
+            onMouseDown={handleMouseDown}
+            onMouseLeave={handleMouseLeave}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+            style={{ 
+              height: "100%",
+            gap: rpx(25),
+            padding: rpx(10), // Give room for shadows and slight transforms
+            margin: rpx(-10), // Negate padding so layout spacing stays exactly the same
+            paddingRight: rpx(30), // Extra right padding for the 15px hover transform
+            marginRight: rpx(-30),
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            cursor: isDragging ? "grabbing" : "grab",
+            userSelect: isDragging ? "none" : "auto",
+          }}
         >
-          {items.slice(0, 3).map((item, index) => {
-            const style = CARD_STYLES[index] || CARD_STYLES[0]
+          {items.map((item, index) => {
+            const style = CARD_STYLES[index % CARD_STYLES.length]
             return (
               <motion.div
                 key={index}
-                className={`${style.bg} flex flex-col justify-between`}
+                className={`${style.bg} flex flex-col justify-between flex-shrink-0`}
                 initial={{ opacity: 0, x: -80 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -258,6 +315,26 @@ export function ProductDetailFeaturesSection({
               </motion.div>
             )
           })}
+          </div>
+
+          {/* Scroll Indicator Hint */}
+          <AnimatePresence>
+            {showScrollHint && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, x: "-50%" }}
+                animate={{ opacity: 1, y: 0, x: "-50%" }}
+                exit={{ opacity: 0, y: 10, x: "-50%" }}
+                className="absolute -bottom-5 left-1/2 pointer-events-none flex items-center justify-center bg-[#FAF8F2]/95 backdrop-blur-sm p-2.5 rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.15)] border border-[#EAE5BD]"
+              >
+                <motion.div
+                  animate={{ y: [0, 4, 0] }}
+                  transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                >
+                  <ArrowDown size={16} color="#46401F" strokeWidth={2.5} />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Right Column - Title and Circle */}

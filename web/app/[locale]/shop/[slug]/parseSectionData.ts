@@ -241,22 +241,45 @@ export function parseSixCoreStrengthsData(content: LexicalContent) {
 export function parseProductFeaturesData(content: LexicalContent) {
   const { title, image, imageLink } = extractBasicSectionData(content)
   const nodes = content?.root?.children || []
-  const featureItems: { title: string }[] = []
+  const featureItems: { title: string; description?: string }[] = []
+
+  let titles: string[] = []
+  let descriptions: string[] = []
 
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i]
     if (node.type === 'paragraph' && node.children?.[0]?.text === 'product-features-item') {
       const nextNode = nodes[i + 1]
       if (nextNode?.type === 'list' && nextNode.children) {
-        for (let j = 0; j < Math.min(6, nextNode.children.length); j++) {
+        for (let j = 0; j < nextNode.children.length; j++) {
           const listItem = nextNode.children[j]
-          const itemText = listItem?.children?.[0]?.text?.trim()
+          const itemText = extractTextWithLinebreaks(listItem?.children)?.trim()
           if (itemText) {
-            featureItems.push({ title: itemText })
+            titles.push(itemText)
           }
         }
       }
     }
+    
+    if (node.type === 'paragraph' && node.children?.[0]?.text === 'product-features-item-description') {
+      const nextNode = nodes[i + 1]
+      if (nextNode?.type === 'list' && nextNode.children) {
+        for (let j = 0; j < nextNode.children.length; j++) {
+          const listItem = nextNode.children[j]
+          let descText = extractTextWithLinebreaks(listItem?.children)?.trim() || ''
+          if (descText === '#') descText = ''
+          descriptions.push(descText)
+        }
+      }
+    }
+  }
+
+  // Merge titles and descriptions
+  for (let i = 0; i < titles.length; i++) {
+    featureItems.push({
+      title: titles[i],
+      description: descriptions[i] || undefined
+    })
   }
 
   return { title, image, imageLink, items: featureItems }

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
@@ -50,6 +50,33 @@ export function ProductCoreAdvantagesSection({
   items,
 }: ProductCoreAdvantagesSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [startX, setStartX] = useState(0)
+  const [scrollLeft, setScrollLeft] = useState(0)
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollContainerRef.current) return
+    setIsDragging(true)
+    setStartX(e.pageX - scrollContainerRef.current.offsetLeft)
+    setScrollLeft(scrollContainerRef.current.scrollLeft)
+  }
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollContainerRef.current) return
+    e.preventDefault()
+    const x = e.pageX - scrollContainerRef.current.offsetLeft
+    const walk = (x - startX) * 1.5
+    scrollContainerRef.current.scrollLeft = scrollLeft - walk
+  }
+
+  const handleMouseUpOrLeave = () => {
+    setIsDragging(false)
+  }
+
+  const itemsWithIndex = items.map((item, idx) => ({ ...item, originalIndex: idx }))
+  const row1Items = itemsWithIndex.filter((_, i) => i % 2 === 0)
+  const row2Items = itemsWithIndex.filter((_, i) => i % 2 === 1)
 
   // Get the 3 images
   const image1 = images[0]
@@ -103,11 +130,11 @@ export function ProductCoreAdvantagesSection({
 
       {/* Advantage Cards - 2 columns */}
       <div className="grid grid-cols-2 gap-3">
-        {items.slice(0, 6).map((item, index) => {
-          const style = CARD_STYLES[index] || CARD_STYLES[0]
+        {itemsWithIndex.map((item) => {
+          const style = CARD_STYLES[item.originalIndex % CARD_STYLES.length]
           return (
             <div
-              key={index}
+              key={item.originalIndex}
               className="rounded-2xl overflow-hidden"
               style={{ backgroundColor: style.bg }}
             >
@@ -337,23 +364,31 @@ export function ProductCoreAdvantagesSection({
 
                 {/* Bottom Section: Advantage Cards - 3 columns, 2 rows - 保持原尺寸 */}
                 <div
-                  className="flex flex-col"
+                  ref={scrollContainerRef}
+                  className="flex flex-col overflow-x-auto [&::-webkit-scrollbar]:hidden"
+                  data-lenis-prevent="true"
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUpOrLeave}
+                  onMouseLeave={handleMouseUpOrLeave}
                   style={{
                     paddingLeft: rpx(66),
                     paddingRight: rpx(66),
                     paddingTop: rpx(50),
-                    paddingBottom: rpx(0),
+                    paddingBottom: rpx(30),
                     gap: rpx(17),
+                    cursor: isDragging ? "grabbing" : "grab",
+                    userSelect: isDragging ? "none" : "auto",
                   }}
                 >
                   {/* Row 1 */}
-                  <div className="flex" style={{ gap: rpx(17) }}>
-                    {items.slice(0, 3).map((item, index) => {
-                      const style = CARD_STYLES[index] || CARD_STYLES[0]
+                  <div className="flex flex-row flex-nowrap" style={{ gap: rpx(17), width: "max-content" }}>
+                    {row1Items.map((item) => {
+                      const style = CARD_STYLES[item.originalIndex % CARD_STYLES.length]
                       return (
                         <motion.div
-                          key={index}
-                          className="flex flex-col overflow-hidden"
+                          key={item.originalIndex}
+                          className="flex flex-col overflow-hidden flex-shrink-0"
                           style={{
                             width: rpx(356),
                             height: rpx(200),
@@ -362,7 +397,7 @@ export function ProductCoreAdvantagesSection({
                           }}
                           initial={{ opacity: 0, y: 30 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
+                          transition={{ duration: 0.4, delay: 0.2 + item.originalIndex * 0.05 }}
                         >
                           {/* Title - top half, text aligned to bottom */}
                           <div
@@ -371,6 +406,7 @@ export function ProductCoreAdvantagesSection({
                               height: rpx(100),
                               paddingLeft: rpx(23),
                               paddingBottom: rpx(8),
+                              paddingRight: rpx(23),
                             }}
                           >
                             <h3
@@ -387,7 +423,9 @@ export function ProductCoreAdvantagesSection({
 
                           {/* Description with gradient background - bottom half, bottom corners rounded */}
                           <div
-                            className="flex items-start"
+                            className="flex items-start overflow-y-auto [&::-webkit-scrollbar]:hidden"
+                            data-lenis-prevent="true"
+                            onMouseDown={(e) => e.stopPropagation()}
                             style={{
                               width: rpx(356),
                               height: rpx(100),
@@ -400,7 +438,7 @@ export function ProductCoreAdvantagesSection({
                           >
                             {item.description && (
                               <p
-                                className="font-inter whitespace-pre-line"
+                                className="font-inter whitespace-pre-line w-full"
                                 style={{
                                   fontSize: rpx(16),
                                   lineHeight: rpx(23),
@@ -417,13 +455,13 @@ export function ProductCoreAdvantagesSection({
                   </div>
 
                   {/* Row 2 - offset to the right */}
-                  <div className="flex" style={{ gap: rpx(17), marginLeft: rpx(77) }}>
-                    {items.slice(3, 6).map((item, index) => {
-                      const style = CARD_STYLES[index + 3] || CARD_STYLES[0]
+                  <div className="flex flex-row flex-nowrap" style={{ gap: rpx(17), marginLeft: rpx(77), width: "max-content" }}>
+                    {row2Items.map((item) => {
+                      const style = CARD_STYLES[item.originalIndex % CARD_STYLES.length]
                       return (
                         <motion.div
-                          key={index + 3}
-                          className="flex flex-col overflow-hidden"
+                          key={item.originalIndex}
+                          className="flex flex-col overflow-hidden flex-shrink-0"
                           style={{
                             width: rpx(356),
                             height: rpx(200),
@@ -432,7 +470,7 @@ export function ProductCoreAdvantagesSection({
                           }}
                           initial={{ opacity: 0, y: 30 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.4, delay: 0.2 + (index + 3) * 0.1 }}
+                          transition={{ duration: 0.4, delay: 0.2 + item.originalIndex * 0.05 }}
                         >
                           {/* Title - top half, text aligned to bottom */}
                           <div
@@ -441,6 +479,7 @@ export function ProductCoreAdvantagesSection({
                               height: rpx(100),
                               paddingLeft: rpx(23),
                               paddingBottom: rpx(8),
+                              paddingRight: rpx(23),
                             }}
                           >
                             <h3
@@ -457,7 +496,9 @@ export function ProductCoreAdvantagesSection({
 
                           {/* Description with gradient background - bottom half, bottom corners rounded */}
                           <div
-                            className="flex items-start"
+                            className="flex items-start overflow-y-auto [&::-webkit-scrollbar]:hidden"
+                            data-lenis-prevent="true"
+                            onMouseDown={(e) => e.stopPropagation()}
                             style={{
                               width: rpx(356),
                               height: rpx(100),
@@ -470,7 +511,7 @@ export function ProductCoreAdvantagesSection({
                           >
                             {item.description && (
                               <p
-                                className="font-inter whitespace-pre-line"
+                                className="font-inter whitespace-pre-line w-full"
                                 style={{
                                   fontSize: rpx(16),
                                   lineHeight: rpx(23),
