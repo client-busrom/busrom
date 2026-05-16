@@ -75,7 +75,7 @@ export const QuickActionsWidget: React.FC = () => {
     '/admin/collections/users': { title: { en: 'Users & Access', zh: '后台账号与权限管理' }, description: { en: 'Manage admin accounts, roles and permissions', zh: '管理后台登录账号、角色与操作权限' }, icon: '👥' },
   }
 
-  const defaultActions = [
+  const defaultActions: UserQuickAction[] = [
     { route: '/admin/collections/products/create', colorPreset: 'success' },
     { route: '/admin/collections/blogs/create', colorPreset: 'info' },
     { route: '/admin/collections/media', colorPreset: 'warning' },
