@@ -141,7 +141,8 @@ const ProductCard = ({ product, index, isMobile = false, locale }: ProductCardPr
       <div
         className={cn(isMobile ? "px-1" : "")}
         style={!isMobile ? {
-          paddingLeft: vw(12),  // 优化文本左边距，使其与上方图片容器左侧对齐更均衡
+          paddingLeft: vw(30),  // 还原设计稿左边距 246 - 199 = 47
+          paddingRight: vw(30), // 增加对称的右边距限制，防止文本过长向右偏移
           marginTop: vw(LAYOUT.cards.titleMarginTop),
         } : undefined}
       >
