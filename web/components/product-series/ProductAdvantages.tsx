@@ -6,15 +6,123 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
 import type { ProductAdvantagesData } from "@/lib/content-parser"
 
+// ============================================================================
+// 甲方提供的系列渐变色与主题色配置表 (Series Color Chart)
+// ============================================================================
+export interface SeriesColorConfig {
+  name: string
+  rgb: string       // 用于顶部纯色起点
+  rgba: string      // 用于渐变过渡点
+  rgbaTransparent: string // 用于渐变终点
+  dark: string      // 用于文字、图标、按钮的主题暗色
+  lightBg: string   // 用于卡片底色
+}
+
+export const SERIES_COLORS: Record<string, SeriesColorConfig> = {
+  'glass standoff': {
+    name: '焦糖棕',
+    rgb: 'rgb(173, 145, 110)',
+    rgba: 'rgba(173, 145, 110, 0.35)',
+    rgbaTransparent: 'rgba(173, 145, 110, 0)',
+    dark: '#6E5A44',
+    lightBg: '#FAF6F0',
+  },
+  'glass connected fitting': {
+    name: '橄榄绿',
+    rgb: 'rgb(142, 158, 139)',
+    rgba: 'rgba(142, 158, 139, 0.35)',
+    rgbaTransparent: 'rgba(142, 158, 139, 0)',
+    dark: '#586555',
+    lightBg: '#F5F7F5',
+  },
+  'glass fence spigot': {
+    name: '藕粉',
+    rgb: 'rgb(191, 136, 146)',
+    rgba: 'rgba(191, 136, 146, 0.35)',
+    rgbaTransparent: 'rgba(191, 136, 146, 0)',
+    dark: '#7A525A',
+    lightBg: '#FAF5F6',
+  },
+  'guardrail glass clip': {
+    name: '蜡尾紫',
+    rgb: 'rgb(144, 123, 185)',
+    rgba: 'rgba(144, 123, 185, 0.35)',
+    rgbaTransparent: 'rgba(144, 123, 185, 0)',
+    dark: '#5B4B7A',
+    lightBg: '#F6F4FA',
+  },
+  'bathroom glass clip': {
+    name: '姜黄',
+    rgb: 'rgb(188, 157, 79)',
+    rgba: 'rgba(188, 157, 79, 0.35)',
+    rgbaTransparent: 'rgba(188, 157, 79, 0)',
+    dark: '#756F3F',
+    lightBg: '#FFFDE9',
+  },
+  'glass hinge': {
+    name: '陶土橙',
+    rgb: 'rgb(200, 112, 76)',
+    rgba: 'rgba(200, 112, 76, 0.35)',
+    rgbaTransparent: 'rgba(200, 112, 76, 0)',
+    dark: '#80442D',
+    lightBg: '#FAF2EE',
+  },
+  'sliding door kit': {
+    name: '干枯玫瑰红',
+    rgb: 'rgb(196, 112, 123)',
+    rgba: 'rgba(196, 112, 123, 0.35)',
+    rgbaTransparent: 'rgba(196, 112, 123, 0)',
+    dark: '#7D434B',
+    lightBg: '#FAF2F3',
+  },
+  'bathroom & door handle': {
+    name: '灰青绿',
+    rgb: 'rgb(106, 133, 129)',
+    rgba: 'rgba(106, 133, 129, 0.35)',
+    rgbaTransparent: 'rgba(106, 133, 129, 0)',
+    dark: '#415451',
+    lightBg: '#F2F5F5',
+  },
+  'hidden hook': {
+    name: '奶橙',
+    rgb: 'rgb(213, 160, 126)',
+    rgba: 'rgba(213, 160, 126, 0.35)',
+    rgbaTransparent: 'rgba(213, 160, 126, 0)',
+    dark: '#87624A',
+    lightBg: '#FAF5F2',
+  },
+}
+
+export function getSeriesColorConfig(seriesNameOrSlug?: string): SeriesColorConfig {
+  const defaultCfg = SERIES_COLORS['bathroom glass clip']
+  if (!seriesNameOrSlug) return defaultCfg
+
+  const normalized = seriesNameOrSlug.toLowerCase().replace(/-/g, ' ').trim()
+
+  if (SERIES_COLORS[normalized]) {
+    return SERIES_COLORS[normalized]
+  }
+
+  for (const key of Object.keys(SERIES_COLORS)) {
+    if (normalized.includes(key) || key.includes(normalized)) {
+      return SERIES_COLORS[key]
+    }
+  }
+
+  return defaultCfg
+}
+
 const DESIGN_WIDTH = 1920
 const DESIGN_HEIGHT = 922
 
 interface ProductAdvantagesProps {
   data: ProductAdvantagesData
+  seriesName?: string
+  currentSlug?: string
   className?: string
 }
 
-export function ProductAdvantages({ data, className }: ProductAdvantagesProps) {
+export function ProductAdvantages({ data, seriesName, currentSlug, className }: ProductAdvantagesProps) {
   if (!data) return null
 
   const {
@@ -25,6 +133,8 @@ export function ProductAdvantages({ data, className }: ProductAdvantagesProps) {
 
   const [currentCategory, setCurrentCategory] = React.useState(0)
   const [expandedCardIndex, setExpandedCardIndex] = React.useState(0)
+
+  const colorCfg = getSeriesColorConfig(seriesName || currentSlug)
 
   // Drag and Wheel Scroll Refs
   const listRef = React.useRef<HTMLDivElement>(null)
@@ -71,7 +181,7 @@ export function ProductAdvantages({ data, className }: ProductAdvantagesProps) {
   }
 
   return (
-    <div className={cn("w-full", className)}>
+    <div className={cn("w-full", className)} style={{ '--series-dark': colorCfg.dark, '--series-light-bg': colorCfg.lightBg } as React.CSSProperties}>
       {/* ===== DESKTOP LAYOUT (lg and above, pristine absolute positioning + scrollable right side) ===== */}
       <div className="hidden lg:block w-full">
         <section
@@ -82,19 +192,20 @@ export function ProductAdvantages({ data, className }: ProductAdvantagesProps) {
           <div
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(180deg, rgba(255, 227, 0, 0.3) 0%, rgba(255, 227, 0, 0) 100%)',
+              background: `linear-gradient(180deg, ${colorCfg.rgba} 0%, ${colorCfg.rgbaTransparent} 100%)`,
             }}
           />
 
           {/* Advantages Title (behind image) */}
           <motion.h3
-            className="absolute font-josefin-sans font-bold text-[#464010]"
+            className="absolute font-josefin-sans font-bold"
             style={{
               left: `${(153 / DESIGN_WIDTH) * 100}%`,
               top: `${(221 / DESIGN_HEIGHT) * 100}%`,
               width: `${(717 / DESIGN_WIDTH) * 100}%`,
               fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
               lineHeight: `${101 / 96}`,
+              color: colorCfg.dark,
             }}
             initial={{ y: 0 }}
             animate={{ y: [0, -15, 0] }}
@@ -161,15 +272,15 @@ export function ProductAdvantages({ data, className }: ProductAdvantagesProps) {
                     viewBox="0 0 148 61"
                     fill="none"
                   >
-                    <path d="M43.6943 28.2695H126.695V32.75:59H43.6943V37.2422L21.2627 30.5127L43.6943 23.7832V28.2695Z" fill="#BAB489"/>
-                    <rect x="1" y="1" width="146" height="59" rx="29.5" stroke="#BAB489" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 6"/>
+                    <path d="M43.6943 28.2695H126.695V32.7559H43.6943V37.2422L21.2627 30.5127L43.6943 23.7832V28.2695Z" fill={colorCfg.dark}/>
+                    <rect x="1" y="1" width="146" height="59" rx="29.5" stroke={colorCfg.dark} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 6"/>
                   </svg>
                   <svg
                     className="absolute inset-0 w-full h-full transition-opacity duration-300 opacity-0 group-hover:opacity-100"
                     viewBox="0 0 146 58"
                     fill="none"
                   >
-                    <path d="M29 0C12.9837 1.35295e-06 0 12.9837 0 29C0 45.0163 12.9837 58 29 58H117C133.016 58 146 45.0163 146 29C146 12.9837 133.016 1.77172e-07 117 0H29ZM42.422 27.2812H125.423V31.7676H42.422V36.2539L19.99 29.5244L42.422 22.7949V27.2812Z" fill="#F1DC35"/>
+                    <path d="M29 0C12.9837 1.35295e-06 0 12.9837 0 29C0 45.0163 12.9837 58 29 58H117C133.016 58 146 45.0163 146 29C146 12.9837 133.016 1.77172e-07 117 0H29ZM42.422 27.2812H125.423V31.7676H42.422V36.2539L19.99 29.5244L42.422 22.7949V27.2812Z" fill={colorCfg.dark}/>
                   </svg>
                 </button>
 
@@ -188,15 +299,15 @@ export function ProductAdvantages({ data, className }: ProductAdvantagesProps) {
                     viewBox="0 0 148 61"
                     fill="none"
                   >
-                    <path d="M104.306 28.2695H21.3047V32.7559H104.306V37.2422L126.737 30.5127L104.306 23.7832V28.2695Z" fill="#BAB489"/>
-                    <rect x="1" y="1" width="146" height="59" rx="29.5" stroke="#BAB489" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 6"/>
+                    <path d="M104.306 28.2695H21.3047V32.7559H104.306V37.2422L126.737 30.5127L104.306 23.7832V28.2695Z" fill={colorCfg.dark}/>
+                    <rect x="1" y="1" width="146" height="59" rx="29.5" stroke={colorCfg.dark} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 6"/>
                   </svg>
                   <svg
                     className="absolute inset-0 w-full h-full transition-opacity duration-300 opacity-0 group-hover:opacity-100"
                     viewBox="0 0 146 58"
                     fill="none"
                   >
-                    <path d="M117 0C133.016 1.35295e-06 146 12.9837 146 29C146 45.0163 133.016 58 117 58H29C12.9837 58 0 45.0163 0 29C0 12.9837 12.9837 1.77172e-07 29 0H117ZM103.578 27.2812H20.5771V31.7676H103.578V36.2539L126.01 29.5244L103.578 22.7949V27.2812Z" fill="#F1DC35"/>
+                    <path d="M117 0C133.016 1.35295e-06 146 12.9837 146 29C146 45.0163 133.016 58 117 58H29C12.9837 58 0 45.0163 0 29C0 12.9837 12.9837 1.77172e-07 29 0H117ZM103.578 27.2812H20.5771V31.7676H103.578V36.2539L126.01 29.5244L103.578 22.7949V27.2812Z" fill={colorCfg.dark}/>
                   </svg>
                 </button>
               </>
@@ -215,10 +326,11 @@ export function ProductAdvantages({ data, className }: ProductAdvantagesProps) {
           >
             {/* Category Title (Elegant automatic wrapping) */}
             <h4
-              className="font-jomhuria text-black font-bold break-words mb-6 animate-pulse-scale"
+              className="font-jomhuria font-bold break-words mb-6 animate-pulse-scale"
               style={{
                 fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
                 lineHeight: 0.95,
+                color: colorCfg.dark,
               }}
             >
               {currentCategoryData.title}
@@ -245,22 +357,24 @@ export function ProductAdvantages({ data, className }: ProductAdvantagesProps) {
                   <div
                     key={`desktop-card-${currentCategory}-${index}`}
                     className={cn(
-                      "w-full cursor-pointer border-2 border-[#756F3F] transition-all duration-500 ease-out flex flex-col justify-center px-8 relative flex-shrink-0",
-                      isExpanded ? "bg-[#F5EB99]" : "bg-transparent hover:bg-[#F5EB99]/30"
+                      "w-full cursor-pointer transition-all duration-500 ease-out flex flex-col justify-center px-8 relative flex-shrink-0",
                     )}
                     style={{
                       minHeight: isExpanded ? `${(208 / DESIGN_WIDTH) * 100}vw` : `${(105 / DESIGN_WIDTH) * 100}vw`,
                       borderRadius: `${(38 / DESIGN_WIDTH) * 100}vw`,
                       paddingTop: `${(24 / DESIGN_WIDTH) * 100}vw`,
                       paddingBottom: `${(24 / DESIGN_WIDTH) * 100}vw`,
+                      border: `2px solid ${colorCfg.dark}`,
+                      backgroundColor: isExpanded ? colorCfg.lightBg : 'transparent',
                     }}
                     onClick={() => setExpandedCardIndex(index)}
                   >
                     <div className="flex items-center justify-between gap-4 w-full">
                       <span
-                        className="font-inter font-bold text-[#464010] flex-1 leading-snug"
+                        className="font-inter font-bold flex-1 leading-snug"
                         style={{
                           fontSize: `${(28 / DESIGN_WIDTH) * 100}vw`,
+                          color: colorCfg.dark,
                         }}
                       >
                         {card.title}
@@ -274,16 +388,18 @@ export function ProductAdvantages({ data, className }: ProductAdvantagesProps) {
                         }}
                       >
                         <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
-                          <path d="M32 16C32 7.16344 24.8366 3.13124e-07 16 6.99382e-07C7.16344 1.08564e-06 -1.08564e-06 7.16345 -6.99382e-07 16C-3.13124e-07 24.8366 7.16344 32 16 32C24.8366 32 32 24.8366 32 16ZM21.4863 19L16.2041 13.75L10.9229 19L10 18.1055L16.2041 11.8613L22.4082 18.1055L21.4863 19Z" fill="#756F3F"/>
+                          <path d="M32 16C32 7.16344 24.8366 3.13124e-07 16 6.99382e-07C7.16344 1.08564e-06 -1.08564e-06 7.16345 -6.99382e-07 16C-3.13124e-07 24.8366 7.16344 32 16 32C24.8366 32 32 24.8366 32 16ZM21.4863 19L16.2041 13.75L10.9229 19L10 18.1055L16.2041 11.8613L22.4082 18.1055L21.4863 19Z" fill={colorCfg.dark}/>
                         </svg>
                       </div>
                     </div>
 
                     {isExpanded && card.content && (
                       <div
-                        className="font-inter text-[#928E66] mt-4 border-t border-[#756F3F]/20 pt-4 leading-relaxed animate-fadeIn"
+                        className="font-inter mt-4 border-t pt-4 leading-relaxed animate-fadeIn"
                         style={{
                           fontSize: `${(20 / DESIGN_WIDTH) * 100}vw`,
+                          color: colorCfg.dark,
+                          borderTopColor: `${colorCfg.dark}33`,
                         }}
                       >
                         {card.content}
@@ -298,9 +414,12 @@ export function ProductAdvantages({ data, className }: ProductAdvantagesProps) {
       </div>
 
       {/* ===== MOBILE LAYOUT (below lg, premium flowing flex layout) ===== */}
-      <div className="block lg:hidden w-full relative overflow-hidden py-12 px-4" style={{ background: 'linear-gradient(180deg, rgba(255, 227, 0, 0.3) 0%, rgba(255, 227, 0, 0) 100%)' }}>
+      <div 
+        className="block lg:hidden w-full relative overflow-hidden py-12 px-4" 
+        style={{ background: `linear-gradient(180deg, ${colorCfg.rgba} 0%, ${colorCfg.rgbaTransparent} 100%)` }}
+      >
         {/* Mobile Main Title */}
-        <h3 className="font-josefin-sans font-bold text-[#464010] text-center text-3xl sm:text-4xl mb-8">
+        <h3 className="font-josefin-sans font-bold text-center text-3xl sm:text-4xl mb-8" style={{ color: colorCfg.dark }}>
           {advantagesTitle}
         </h3>
 
@@ -317,9 +436,13 @@ export function ProductAdvantages({ data, className }: ProductAdvantagesProps) {
         )}
 
         {/* Mobile Category Navigation Bar */}
-        <div className="w-full max-w-xl mx-auto my-8 bg-[#FFFDE9] border-2 border-[#756F3F] rounded-[2rem] p-2 flex items-center justify-between gap-3 shadow-lg">
+        <div 
+          className="w-full max-w-xl mx-auto my-8 border-2 rounded-[2rem] p-2 flex items-center justify-between gap-3 shadow-lg"
+          style={{ borderColor: colorCfg.dark, backgroundColor: colorCfg.lightBg }}
+        >
           <button
-            className="w-12 h-12 rounded-full bg-[#BAB489] text-white flex items-center justify-center hover:bg-[#756F3F] active:scale-95 transition-all shadow-md flex-shrink-0"
+            className="w-12 h-12 rounded-full text-white flex items-center justify-center active:scale-95 transition-all shadow-md flex-shrink-0"
+            style={{ backgroundColor: colorCfg.dark }}
             onClick={goToPrevCategory}
             aria-label="Previous Category"
           >
@@ -333,7 +456,8 @@ export function ProductAdvantages({ data, className }: ProductAdvantagesProps) {
           </h4>
 
           <button
-            className="w-12 h-12 rounded-full bg-[#BAB489] text-white flex items-center justify-center hover:bg-[#756F3F] active:scale-95 transition-all shadow-md flex-shrink-0"
+            className="w-12 h-12 rounded-full text-white flex items-center justify-center active:scale-95 transition-all shadow-md flex-shrink-0"
+            style={{ backgroundColor: colorCfg.dark }}
             onClick={goToNextCategory}
             aria-label="Next Category"
           >
@@ -352,20 +476,24 @@ export function ProductAdvantages({ data, className }: ProductAdvantagesProps) {
               <div
                 key={`mobile-card-${currentCategory}-${index}`}
                 className={cn(
-                  "w-full cursor-pointer border-2 border-[#756F3F] rounded-3xl p-5 sm:p-6 transition-all duration-300 shadow-md",
-                  isExpanded ? "bg-[#F5EB99]" : "bg-white/80 hover:bg-white"
+                  "w-full cursor-pointer border-2 rounded-3xl p-5 sm:p-6 transition-all duration-300 shadow-md",
                 )}
+                style={{
+                  borderColor: colorCfg.dark,
+                  backgroundColor: isExpanded ? colorCfg.lightBg : 'rgba(255, 255, 255, 0.8)',
+                }}
                 onClick={() => setExpandedCardIndex(index)}
               >
                 <div className="flex items-center justify-between gap-4">
-                  <span className="font-inter font-bold text-[#464010] text-lg sm:text-xl flex-1 leading-snug">
+                  <span className="font-inter font-bold text-lg sm:text-xl flex-1 leading-snug" style={{ color: colorCfg.dark }}>
                     {card.title}
                   </span>
                   <div
                     className={cn(
-                      "w-8 h-8 rounded-full bg-[#756F3F] flex items-center justify-center text-white transition-transform duration-300 flex-shrink-0",
+                      "w-8 h-8 rounded-full flex items-center justify-center text-white transition-transform duration-300 flex-shrink-0",
                       isExpanded ? "rotate-180" : "rotate-0"
                     )}
+                    style={{ backgroundColor: colorCfg.dark }}
                   >
                     <svg className="w-5 h-5" viewBox="0 0 32 32" fill="none">
                       <path d="M21.4863 19L16.2041 13.75L10.9229 19L10 18.1055L16.2041 11.8613L22.4082 18.1055L21.4863 19Z" fill="white"/>
@@ -374,7 +502,7 @@ export function ProductAdvantages({ data, className }: ProductAdvantagesProps) {
                 </div>
 
                 {isExpanded && card.content && (
-                  <div className="mt-4 pt-4 border-t border-[#756F3F]/20 font-inter text-[#756F3F] text-sm sm:text-base leading-relaxed animate-fadeIn">
+                  <div className="mt-4 pt-4 border-t font-inter text-sm sm:text-base leading-relaxed animate-fadeIn" style={{ borderTopColor: `${colorCfg.dark}33`, color: colorCfg.dark }}>
                     {card.content}
                   </div>
                 )}

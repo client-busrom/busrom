@@ -176,12 +176,12 @@ export function ProductSeriesDetailClient({ locale, slug, initialData }: Product
 
       {/* Product Tech Specs Section (First Screen) */}
       {parsedContent.productTechSpecs && (
-        <ProductTechSpecs data={parsedContent.productTechSpecs} />
+        <ProductTechSpecs data={parsedContent.productTechSpecs} seriesName={seriesData.name} currentSlug={slug} />
       )}
 
       {/* Product Advantages Section (Second Screen) */}
       {parsedContent.productAdvantages && (
-        <ProductAdvantages data={parsedContent.productAdvantages} />
+        <ProductAdvantages data={parsedContent.productAdvantages} seriesName={seriesData.name} currentSlug={slug} />
       )}
 
       {/* Applications Section */}

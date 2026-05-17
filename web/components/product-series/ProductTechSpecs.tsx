@@ -7,15 +7,123 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
 import type { ProductTechSpecsData } from "@/lib/content-parser"
 
+// ============================================================================
+// 甲方提供的系列渐变色与主题色配置表 (Series Color Chart)
+// ============================================================================
+export interface SeriesColorConfig {
+  name: string
+  rgb: string       // 用于顶部纯色起点
+  rgba: string      // 用于渐变过渡点
+  rgbaTransparent: string // 用于渐变终点
+  dark: string      // 用于文字、图标、按钮的主题暗色
+  lightBg: string   // 用于卡片底色
+}
+
+export const SERIES_COLORS: Record<string, SeriesColorConfig> = {
+  'glass standoff': {
+    name: '焦糖棕',
+    rgb: 'rgb(173, 145, 110)',
+    rgba: 'rgba(173, 145, 110, 0.35)',
+    rgbaTransparent: 'rgba(173, 145, 110, 0)',
+    dark: '#6E5A44',
+    lightBg: '#FAF6F0',
+  },
+  'glass connected fitting': {
+    name: '橄榄绿',
+    rgb: 'rgb(142, 158, 139)',
+    rgba: 'rgba(142, 158, 139, 0.35)',
+    rgbaTransparent: 'rgba(142, 158, 139, 0)',
+    dark: '#586555',
+    lightBg: '#F5F7F5',
+  },
+  'glass fence spigot': {
+    name: '藕粉',
+    rgb: 'rgb(191, 136, 146)',
+    rgba: 'rgba(191, 136, 146, 0.35)',
+    rgbaTransparent: 'rgba(191, 136, 146, 0)',
+    dark: '#7A525A',
+    lightBg: '#FAF5F6',
+  },
+  'guardrail glass clip': {
+    name: '蜡尾紫',
+    rgb: 'rgb(144, 123, 185)',
+    rgba: 'rgba(144, 123, 185, 0.35)',
+    rgbaTransparent: 'rgba(144, 123, 185, 0)',
+    dark: '#5B4B7A',
+    lightBg: '#F6F4FA',
+  },
+  'bathroom glass clip': {
+    name: '姜黄',
+    rgb: 'rgb(188, 157, 79)',
+    rgba: 'rgba(188, 157, 79, 0.35)',
+    rgbaTransparent: 'rgba(188, 157, 79, 0)',
+    dark: '#756F3F',
+    lightBg: '#FFFDE9',
+  },
+  'glass hinge': {
+    name: '陶土橙',
+    rgb: 'rgb(200, 112, 76)',
+    rgba: 'rgba(200, 112, 76, 0.35)',
+    rgbaTransparent: 'rgba(200, 112, 76, 0)',
+    dark: '#80442D',
+    lightBg: '#FAF2EE',
+  },
+  'sliding door kit': {
+    name: '干枯玫瑰红',
+    rgb: 'rgb(196, 112, 123)',
+    rgba: 'rgba(196, 112, 123, 0.35)',
+    rgbaTransparent: 'rgba(196, 112, 123, 0)',
+    dark: '#7D434B',
+    lightBg: '#FAF2F3',
+  },
+  'bathroom & door handle': {
+    name: '灰青绿',
+    rgb: 'rgb(106, 133, 129)',
+    rgba: 'rgba(106, 133, 129, 0.35)',
+    rgbaTransparent: 'rgba(106, 133, 129, 0)',
+    dark: '#415451',
+    lightBg: '#F2F5F5',
+  },
+  'hidden hook': {
+    name: '奶橙',
+    rgb: 'rgb(213, 160, 126)',
+    rgba: 'rgba(213, 160, 126, 0.35)',
+    rgbaTransparent: 'rgba(213, 160, 126, 0)',
+    dark: '#87624A',
+    lightBg: '#FAF5F2',
+  },
+}
+
+export function getSeriesColorConfig(seriesNameOrSlug?: string): SeriesColorConfig {
+  const defaultCfg = SERIES_COLORS['bathroom glass clip']
+  if (!seriesNameOrSlug) return defaultCfg
+
+  const normalized = seriesNameOrSlug.toLowerCase().replace(/-/g, ' ').trim()
+
+  if (SERIES_COLORS[normalized]) {
+    return SERIES_COLORS[normalized]
+  }
+
+  for (const key of Object.keys(SERIES_COLORS)) {
+    if (normalized.includes(key) || key.includes(normalized)) {
+      return SERIES_COLORS[key]
+    }
+  }
+
+  return defaultCfg
+}
+
 const DESIGN_WIDTH = 1920
 const DESIGN_HEIGHT = 922
 
 interface ProductTechSpecsProps {
   data: ProductTechSpecsData
+  seriesName?: string
+  currentSlug?: string
   className?: string
 }
 
-export function ProductTechSpecs({ data, className }: ProductTechSpecsProps) {
+export function ProductTechSpecs({ data, seriesName, currentSlug, className }: ProductTechSpecsProps) {
   if (!data) return null
 
   const {
@@ -25,6 +133,8 @@ export function ProductTechSpecs({ data, className }: ProductTechSpecsProps) {
     techSpecTitle = '',
     techSpecItems = [],
   } = data
+
+  const colorCfg = getSeriesColorConfig(seriesName || currentSlug)
 
   // State for tech spec image swap (0 = first image big, 1 = second image big)
   const [techSpecMainIndex, setTechSpecMainIndex] = React.useState(0)
@@ -71,7 +181,13 @@ export function ProductTechSpecs({ data, className }: ProductTechSpecsProps) {
   const titleLines = title.split(/\/n|\\n|\n/).map(line => line.trim()).filter(Boolean)
 
   return (
-    <div className={cn("w-full", className)}>
+    <div 
+      className={cn("w-full", className)}
+      style={{
+        '--series-dark': colorCfg.dark,
+        '--series-light-bg': colorCfg.lightBg,
+      } as React.CSSProperties}
+    >
       {/* ===== DESKTOP LAYOUT (lg and above, 100% pristine absolute positioning) ===== */}
       <div className="hidden lg:block w-full">
         <section
@@ -82,7 +198,7 @@ export function ProductTechSpecs({ data, className }: ProductTechSpecsProps) {
           <div
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(180deg, #756F3F 0%, rgba(255, 227, 0, 0.3) 100%)',
+              background: `linear-gradient(180deg, ${colorCfg.rgb} 0%, ${colorCfg.rgba} 100%)`,
             }}
           />
 
@@ -146,7 +262,7 @@ export function ProductTechSpecs({ data, className }: ProductTechSpecsProps) {
               top: `${(400 / DESIGN_HEIGHT) * 100}%`,
               width: `${(1100 / DESIGN_WIDTH) * 100}vw`,
               minHeight: `${(480 / DESIGN_WIDTH) * 100}vw`,
-              backgroundColor: '#FFFDE9',
+              backgroundColor: colorCfg.lightBg,
               borderTopLeftRadius: `${(20 / DESIGN_WIDTH) * 100}vw`,
               borderBottomLeftRadius: `${(20 / DESIGN_WIDTH) * 100}vw`,
             }}
@@ -159,11 +275,12 @@ export function ProductTechSpecs({ data, className }: ProductTechSpecsProps) {
               }}
             >
               <h3
-                className="font-lilita-one gradient-text-shine-olive"
+                className="font-lilita-one"
                 style={{
                   fontSize: `${(48 / DESIGN_WIDTH) * 100}vw`,
                   lineHeight: 1,
                   marginBottom: `${(30 / DESIGN_WIDTH) * 100}vw`,
+                  color: colorCfg.dark,
                 }}
               >
                 {techSpecTitle}
@@ -194,11 +311,12 @@ export function ProductTechSpecs({ data, className }: ProductTechSpecsProps) {
                         }}
                       >
                         <span
-                          className="font-inter font-semibold text-[#756f3f] flex-shrink-0"
+                          className="font-inter font-semibold flex-shrink-0"
                           style={{
                             width: `${(280 / DESIGN_WIDTH) * 100}vw`,
                             fontSize: `${(20 / DESIGN_WIDTH) * 100}vw`,
                             lineHeight: 1.5,
+                            color: colorCfg.dark,
                           }}
                         >
                           {item.key}
@@ -216,7 +334,7 @@ export function ProductTechSpecs({ data, className }: ProductTechSpecsProps) {
                       </div>
 
                       {index < techSpecItems.length - 1 && (
-                        <div className="w-full h-px bg-[#DFD8B8]" />
+                        <div className="w-full h-px" style={{ backgroundColor: `${colorCfg.dark}33` }} />
                       )}
                     </div>
                   ))}
@@ -282,7 +400,7 @@ export function ProductTechSpecs({ data, className }: ProductTechSpecsProps) {
                   />
                   <path
                     d="M58.047 41.8215L58.0462 41.7988C58.0309 41.4968 57.9237 41.2067 57.739 40.9672L57.7281 40.9533L57.7309 40.9573C57.6645 40.8621 57.5891 40.7737 57.5056 40.6931L57.4817 40.6705L46.4688 30.4222C45.7476 29.751 44.6195 29.7923 43.9493 30.5143L43.9294 30.5361C43.2801 31.2588 43.3277 32.372 44.0415 33.0363L52.1138 40.548L28.0729 41.4272C27.2519 41.4572 26.6107 42.1479 26.6407 42.9697L26.6484 43.1781C26.6913 43.9881 27.3756 44.617 28.1885 44.5873L52.2294 43.7082L44.7273 51.7895C44.0571 52.5114 44.0984 53.6404 44.8195 54.3114C45.5406 54.9826 46.6687 54.9413 47.339 54.2194L57.5748 43.1932L57.5961 43.1699C57.6665 43.0913 57.7297 43.0067 57.7852 42.917L57.7991 42.8941L57.796 42.8983C57.9756 42.6358 58.0658 42.3226 58.0538 42.0049L58.047 41.8215Z"
-                    className="fill-white group-hover:fill-[#756F3F] transition-all duration-300"
+                    className="fill-white group-hover:fill-[var(--series-dark)] transition-all duration-300"
                   />
                 </svg>
               </button>
@@ -292,7 +410,10 @@ export function ProductTechSpecs({ data, className }: ProductTechSpecsProps) {
       </div>
 
       {/* ===== MOBILE LAYOUT (below lg, premium flowing flex layout) ===== */}
-      <div className="block lg:hidden w-full relative overflow-hidden py-12 px-4" style={{ background: 'linear-gradient(180deg, #756F3F 0%, rgba(255, 227, 0, 0.3) 100%)' }}>
+      <div 
+        className="block lg:hidden w-full relative overflow-hidden py-12 px-4" 
+        style={{ background: `linear-gradient(180deg, ${colorCfg.rgb} 0%, ${colorCfg.rgba} 100%)` }}
+      >
         {/* Mobile Main Title */}
         <h2 className="font-anaheim font-extrabold gradient-text-shine-white text-center text-3xl sm:text-4xl mb-8 leading-tight">
           {titleLines.map((line, index) => (
@@ -326,7 +447,8 @@ export function ProductTechSpecs({ data, className }: ProductTechSpecsProps) {
 
             {techSpecImages.length >= 2 && (
               <button
-                className="absolute -bottom-6 cursor-pointer bg-[#756F3F] text-white p-4 rounded-full shadow-2xl flex items-center justify-center hover:bg-[#5A5530] active:scale-95 transition-all duration-300 border-2 border-white group"
+                className="absolute -bottom-6 cursor-pointer text-white p-4 rounded-full shadow-2xl flex items-center justify-center active:scale-95 transition-all duration-300 border-2 border-white group"
+                style={{ backgroundColor: colorCfg.dark }}
                 onClick={swapTechSpecImages}
                 aria-label="Swap Image View"
               >
@@ -340,15 +462,21 @@ export function ProductTechSpecs({ data, className }: ProductTechSpecsProps) {
         )}
 
         {/* Mobile Tech Specs Flowing Card */}
-        <div className="w-full bg-[#FFFDE9] rounded-3xl p-6 sm:p-8 shadow-xl mt-6">
-          <h3 className="font-lilita-one gradient-text-shine-olive text-2xl sm:text-3xl mb-6 text-center">
+        <div 
+          className="w-full rounded-3xl p-6 sm:p-8 shadow-xl mt-6"
+          style={{ backgroundColor: colorCfg.lightBg }}
+        >
+          <h3 
+            className="font-lilita-one text-2xl sm:text-3xl mb-6 text-center"
+            style={{ color: colorCfg.dark }}
+          >
             {techSpecTitle}
           </h3>
 
-          <div className="flex flex-col divide-y divide-[#DFD8B8]">
+          <div className="flex flex-col divide-y" style={{ borderColor: `${colorCfg.dark}33` }}>
             {techSpecItems.map((item, index) => (
               <div key={`mobile-spec-${index}`} className="py-4 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4">
-                <span className="font-inter font-semibold text-[#756f3f] text-base sm:text-lg sm:w-1/3">
+                <span className="font-inter font-semibold text-base sm:text-lg sm:w-1/3" style={{ color: colorCfg.dark }}>
                   {item.key}
                 </span>
                 <span className="font-inter text-black text-sm sm:text-base flex-1 whitespace-pre-line leading-relaxed">
@@ -364,3 +492,4 @@ export function ProductTechSpecs({ data, className }: ProductTechSpecsProps) {
 }
 
 export default ProductTechSpecs
+
