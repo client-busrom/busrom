@@ -32,6 +32,9 @@ const CARD_IMAGE_TOP = '25%'
 // Image size - width/height as percentage of card (e.g., '80%' = 80% of card size)
 const CARD_IMAGE_SIZE = '75%'
 
+// 极其优雅、完美的桌面端等比缩放辅助函数
+const vw = (px: number) => `calc(${px} * min(100vw, 1920px) / 1920)`
+
 interface MoreSeriesProps {
   data: MoreSeriesData
   currentSlug?: string  // Current product series slug to exclude
@@ -60,8 +63,8 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
     [
       AutoScroll({
         speed: 1,
-        stopOnInteraction: false,
-        stopOnMouseEnter: true,
+        stopOnInteraction: true, // 极其重要：设为 true，用户拖拽或点击时立刻无条件停止自动滚动，赋予拖拽最高优先级
+        stopOnMouseEnter: true,  // 鼠标悬停时停止
         stopOnFocusIn: true,
       }),
     ]
@@ -74,21 +77,40 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
     setSelectedIndex(emblaApi.selectedScrollSnap())
   }, [emblaApi])
 
+  // 获取 AutoScroll 插件实例
+  const autoScrollPlugin = React.useMemo(() => {
+    return emblaApi?.plugins()?.autoScroll
+  }, [emblaApi])
+
   React.useEffect(() => {
     if (!emblaApi) return
     onSelect()
     emblaApi.on("select", onSelect)
     emblaApi.on("reInit", onSelect)
+
+    // 极其健壮的拖拽与触控交互恢复机制
+    const onPointerDown = () => {
+      autoScrollPlugin?.stop()
+    }
+    const onPointerUp = () => {
+      // 拖拽释放后，延迟 2 秒极其丝滑地尝试恢复播放（如果鼠标已不在容器内）
+      setTimeout(() => {
+        if (autoScrollPlugin && !autoScrollPlugin.isPlaying()) {
+          autoScrollPlugin.play()
+        }
+      }, 2000)
+    }
+
+    emblaApi.on("pointerDown", onPointerDown)
+    emblaApi.on("pointerUp", onPointerUp)
+
     return () => {
       emblaApi.off("select", onSelect)
       emblaApi.off("reInit", onSelect)
+      emblaApi.off("pointerDown", onPointerDown)
+      emblaApi.off("pointerUp", onPointerUp)
     }
-  }, [emblaApi, onSelect])
-
-  // 获取 AutoScroll 插件实例
-  const autoScrollPlugin = React.useMemo(() => {
-    return emblaApi?.plugins()?.autoScroll
-  }, [emblaApi])
+  }, [emblaApi, onSelect, autoScrollPlugin])
 
   // 导航 - 点击时先停止自动滚动，滚动完成后恢复
   const goToPrev = React.useCallback(() => {
@@ -114,25 +136,19 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
     return null
   }
 
-  // Size calculations in vw
-  const cardWidthVw = (CARD_WIDTH / DESIGN_WIDTH) * 100
-  const cardHeightVw = (CARD_HEIGHT / DESIGN_WIDTH) * 100
-  const cardGapVw = (CARD_GAP / DESIGN_WIDTH) * 100
-
   return (
     <section
-      className={cn("relative w-full overflow-hidden bg-[#F6F4ED]", className)}
-      style={{ aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` }}
+      className={cn("relative w-full h-auto md:h-full overflow-hidden bg-[#F6F4ED]  md:aspect-[1920/884] max-md:py-12", className)}
     >
       {/* Title - "More series" */}
       <h2
-        className="absolute font-josefin-sans font-bold text-center"
+        className="absolute font-josefin-sans font-bold text-center max-md:!static max-md:!w-full max-md:!text-4xl max-md:!line-clamp-none max-md:!leading-tight max-md:px-4 max-md:mb-8"
         style={{
-          left: `${(602 / DESIGN_WIDTH) * 100}%`,
-          top: `${(140 / DESIGN_WIDTH) * 100}vw`,  // 40 -> 140, 增加100px顶部留白
-          width: `${(717 / DESIGN_WIDTH) * 100}%`,
-          fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
-          lineHeight: `${(101 / DESIGN_WIDTH) * 100}vw`,
+          left: vw(602),
+          top: vw(140),  // 40 -> 140, 增加100px顶部留白
+          width: vw(717),
+          fontSize: vw(96),
+          lineHeight: vw(101),
           color: "#46401F",
         }}
       >
@@ -141,34 +157,31 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
 
       {/* Embla Viewport */}
       <div
-        className="absolute overflow-x-clip overflow-y-visible"
+        className="absolute overflow-x-clip overflow-y-visible max-md:!static max-md:!h-auto max-md:!w-full max-md:mb-8"
         ref={emblaRef}
         style={{
-          left: `${(100 / DESIGN_WIDTH) * 100}%`,
-          right: `${(100 / DESIGN_WIDTH) * 100}%`,
-          top: `${(260 / DESIGN_WIDTH) * 100}vw`,  // 160 -> 260, 增加100px顶部留白
-          height: `${((CARD_HEIGHT + 120) / DESIGN_WIDTH) * 100}vw`,
+          left: 0,
+          right: 0,
+          top: vw(260),  // 160 -> 260, 增加100px顶部留白
+          height: vw(CARD_HEIGHT + 120),
         }}
       >
         {/* Embla Container */}
         <div
-          className="flex h-full items-start"
+          className="flex h-full items-start max-md:!pt-0 max-md:px-4"
           style={{
-            gap: `${cardGapVw}vw`,
-            paddingTop: `${(20 / DESIGN_WIDTH) * 100}vw`,
+            paddingTop: vw(20),
           }}
         >
           {series.map((item, index) => {
-            const isLast = index === series.length - 1
-
             return (
               <div
                 key={`slide-${index}`}
-                className="relative flex-shrink-0"
+                className="relative flex-shrink-0 max-md:!w-[360px] max-md:!h-[320px] max-md:!mr-4"
                 style={{
-                  width: `${cardWidthVw}vw`,
-                  height: `${cardHeightVw}vw`,
-                  marginRight: isLast ? `${cardGapVw}vw` : undefined,
+                  width: vw(CARD_WIDTH),
+                  height: vw(CARD_HEIGHT),
+                  marginRight: vw(CARD_GAP), // 极其重要：Embla 的 loop 克隆算法完美测量 marginRight，彻底取代 flex gap 避免首尾重叠异常！
                 }}
               >
                 <Link
@@ -242,13 +255,13 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
 
                       {/* Card title */}
                       <span
-                        className="absolute font-anaheim font-bold group-hover:font-extrabold text-black transition-all duration-300"
+                        className="absolute font-anaheim font-bold group-hover:font-extrabold text-black transition-all duration-300 max-md:!left-6 max-md:!top-6 max-md:!text-2xl max-md:!max-w-[60vw]"
                         style={{
-                          left: `${(44 / DESIGN_WIDTH) * 100}vw`,
-                          top: `${(31 / DESIGN_WIDTH) * 100}vw`,
-                          fontSize: `${(32 / DESIGN_WIDTH) * 100}vw`,
-                          lineHeight: `${(36 / DESIGN_WIDTH) * 100}vw`,
-                          maxWidth: `${(260 / DESIGN_WIDTH) * 100}vw`,
+                          left: vw(44),
+                          top: vw(31),
+                          fontSize: vw(32),
+                          lineHeight: vw(36),
+                          maxWidth: vw(260),
                         }}
                       >
                         {item.name}
@@ -258,7 +271,7 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
                     {/* Arrow button - white circle with arrow, variants driven by motion */}
                     {/* 独立于卡片背景放大容器，整个圆形按钮（包含背景和内部图标）作为一个整体，在悬停时产生像“反复往右上角戳”一样的极其灵动循环弹跳动效 */}
                     <motion.div
-                      className="absolute rounded-full overflow-hidden flex items-center justify-center"
+                      className="absolute rounded-full overflow-hidden flex items-center justify-center max-md:!w-10 max-md:!h-10 max-md:!right-4 max-md:!top-4"
                       variants={{
                         rest: { 
                           backgroundColor: "#FFFFFF",
@@ -277,21 +290,26 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
                         }
                       }}
                       style={{
-                        right: `${(0 / DESIGN_WIDTH) * 100}vw`,
-                        top: `${(0 / DESIGN_WIDTH) * 100}vw`,
-                        width: `${(50 / DESIGN_WIDTH) * 100}vw`,
-                        height: `${(50 / DESIGN_WIDTH) * 100}vw`,
+                        right: vw(0),
+                        top: vw(0),
+                        width: vw(50),
+                        height: vw(50),
                       }}
                     >
                       {/* 内部箭头图标：跟随外层一起运动，自身仅做极其丝滑的颜色渐变 */}
                       <motion.div
+                        className="max-md:!w-5 max-md:!h-5 flex items-center justify-center"
                         variants={{
                           rest: { color: "#5E571F" },
                           hover: { color: "#FFFFFF" }
                         }}
                         transition={{ duration: 0.3 }}
+                        style={{
+                          width: vw(24),
+                          height: vw(24),
+                        }}
                       >
-                        <Icon icon="lucide:arrow-up-right" className="w-6 h-6" />
+                        <Icon icon="lucide:arrow-up-right" className="w-full h-full" />
                       </motion.div>
                     </motion.div>
                   </motion.div>
@@ -304,12 +322,12 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
 
       {/* Left Navigation Button */}
       <button
-        className="absolute cursor-pointer group z-10"
+        className="absolute cursor-pointer group z-10 max-md:hidden"
         style={{
-          left: `${(508 / DESIGN_WIDTH) * 100}%`,
-          top: `${(720 / DESIGN_WIDTH) * 100}vw`,
-          width: `${(83 / DESIGN_WIDTH) * 100}vw`,
-          height: `${(82 / DESIGN_WIDTH) * 100}vw`,
+          left: vw(508),
+          top: vw(720),
+          width: vw(83),
+          height: vw(82),
         }}
         onClick={goToPrev}
         aria-label="Previous"
@@ -336,12 +354,12 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
 
       {/* Right Navigation Button */}
       <button
-        className="absolute cursor-pointer group z-10"
+        className="absolute cursor-pointer group z-10 max-md:hidden"
         style={{
-          left: `${(1338 / DESIGN_WIDTH) * 100}%`,
-          top: `${(720 / DESIGN_WIDTH) * 100}vw`,
-          width: `${(83 / DESIGN_WIDTH) * 100}vw`,
-          height: `${(82 / DESIGN_WIDTH) * 100}vw`,
+          left: vw(1338),
+          top: vw(720),
+          width: vw(83),
+          height: vw(82),
         }}
         onClick={goToNext}
         aria-label="Next"
@@ -368,12 +386,12 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
 
       {/* Progress Bar */}
       <div
-        className="absolute rounded-full overflow-hidden"
+        className="absolute rounded-full overflow-hidden max-md:!static max-md:!w-[60vw] max-md:!h-1.5 max-md:mx-auto max-md:mt-4"
         style={{
-          left: `${(630 / DESIGN_WIDTH) * 100}%`,
-          top: `${(760 / DESIGN_WIDTH) * 100}vw`,  // 660 -> 760, 下移100px
-          width: `${(669 / DESIGN_WIDTH) * 100}vw`,
-          height: `${(6 / DESIGN_WIDTH) * 100}vw`,
+          left: vw(630),
+          top: vw(760),  // 660 -> 760, 下移100px
+          width: vw(669),
+          height: vw(6),
           backgroundColor: "rgba(209, 209, 209, 0.52)",
         }}
       >
