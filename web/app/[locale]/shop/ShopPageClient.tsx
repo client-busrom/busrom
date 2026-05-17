@@ -106,18 +106,63 @@ export function ShopPageClient({ locale }: ShopPageClientProps) {
   const filteredProducts = useMemo(() => {
     if (!searchQuery.trim()) return categoryFilteredProducts
     const query = searchQuery.toLowerCase()
-    return categoryFilteredProducts.filter((product) => {
-      const name = (product as any).localizedName?.toLowerCase() || (product.name as any)?.[locale]?.toLowerCase() || product.sku.toLowerCase()
-      return name.includes(query) || product.sku.toLowerCase().includes(query)
+    return categoryFilteredProducts.filter((product: any) => {
+      const name = product?.localizedName || product?.name?.[locale] || product?.name || ""
+      const sku = product?.sku || ""
+      return name.toLowerCase().includes(query) || sku.toLowerCase().includes(query)
     })
   }, [categoryFilteredProducts, searchQuery, locale])
 
+  const sortedProducts = useMemo(() => {
+    const list = [...filteredProducts]
+    list.sort((a: any, b: any) => {
+      if (sortBy === 'shopOrder') {
+        // 1. 置顶逻辑：isHot 或 isNew 的产品优先置顶
+        const aPinned = a.isHot || a.isNew ? 1 : 0
+        const bPinned = b.isHot || b.isNew ? 1 : 0
+        if (aPinned !== bPinned) {
+          return bPinned - aPinned // 1 在前，0 在后
+        }
+
+        // 2. 内部按照 shopOrder > order > updatedAt 排序
+        const aShop = a.shopOrder || 0
+        const bShop = b.shopOrder || 0
+        if (aShop !== bShop) {
+          return sortDirection === 'DESC' ? bShop - aShop : aShop - bShop
+        }
+        const aOrder = a.order || 0
+        const bOrder = b.order || 0
+        if (aOrder !== bOrder) {
+          return sortDirection === 'DESC' ? bOrder - aOrder : aOrder - bOrder
+        }
+        const aTime = a.updatedAt ? new Date(a.updatedAt).getTime() : 0
+        const bTime = b.updatedAt ? new Date(b.updatedAt).getTime() : 0
+        return sortDirection === 'DESC' ? bTime - aTime : aTime - bTime
+      } else if (sortBy === 'order') {
+        const aOrder = a.order || 0
+        const bOrder = b.order || 0
+        if (aOrder !== bOrder) {
+          return sortDirection === 'DESC' ? bOrder - aOrder : aOrder - bOrder
+        }
+        const aTime = a.updatedAt ? new Date(a.updatedAt).getTime() : 0
+        const bTime = b.updatedAt ? new Date(b.updatedAt).getTime() : 0
+        return sortDirection === 'DESC' ? bTime - aTime : aTime - bTime
+      } else {
+        const prop = sortBy === 'createdAt' ? 'createdAt' : sortBy === 'updatedAt' ? 'updatedAt' : 'createdAt'
+        const aTime = a[prop] ? new Date(a[prop]).getTime() : 0
+        const bTime = b[prop] ? new Date(b[prop]).getTime() : 0
+        return sortDirection === 'DESC' ? bTime - aTime : aTime - bTime
+      }
+    })
+    return list
+  }, [filteredProducts, sortBy, sortDirection])
+
   const pageSize = configData?.pageSize || 24
-  const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1
+  const totalPages = Math.ceil(sortedProducts.length / pageSize) || 1
   const paginatedProducts = useMemo(() => {
     const start = (currentPage - 1) * pageSize
-    return filteredProducts.slice(start, start + pageSize)
-  }, [filteredProducts, currentPage, pageSize])
+    return sortedProducts.slice(start, start + pageSize)
+  }, [sortedProducts, currentPage, pageSize])
 
   // ============================================================
   // Navigation helpers — ALL URL updates go through one function
@@ -214,7 +259,7 @@ export function ShopPageClient({ locale }: ShopPageClientProps) {
     <div className="min-h-screen bg-[#F6F4ED]" data-header-theme="light">
       {/* Series Title */}
       <div className="container mx-auto px-4 lg:px-8 pt-[78px] lg:pt-[130px] overflow-hidden">
-        <div className="relative h-[52px] lg:h-[68px] flex items-center justify-center">
+        <div className="relative min-h-[52px] lg:min-h-[68px] flex items-center justify-center">
           <AnimatePresence mode="wait">
             <motion.h1
               key={displayTitle}
@@ -222,7 +267,7 @@ export function ShopPageClient({ locale }: ShopPageClientProps) {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -40, opacity: 0 }}
               transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-              className="font-orbitron font-medium text-4xl lg:text-6xl text-brand-text-black uppercase tracking-wide text-center absolute"
+              className="font-orbitron font-medium text-4xl lg:text-6xl text-brand-text-black uppercase tracking-wide text-center"
             >
               {displayTitle}
             </motion.h1>
@@ -401,7 +446,7 @@ export function ShopPageClient({ locale }: ShopPageClientProps) {
             ) : (
               <motion.div
                 // Key changes whenever the visible product set changes — this is the correct trigger
-                key={`${selectedCategory}-${sortBy}-${sortDirection}-${featuredOnly}-${currentPage}`}
+                key={`${selectedCategory}-${sortBy}-${sortDirection}-${featuredOnly}-${currentPage}-${searchQuery}`}
                 className="flex flex-wrap justify-center gap-4 lg:gap-6 max-w-[1072px] mx-auto"
                 variants={containerVariants}
                 initial="hidden"

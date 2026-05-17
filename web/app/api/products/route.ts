@@ -184,10 +184,16 @@ export async function GET(request: NextRequest) {
     }
 
     // Sorting
-    const sortField = sortBy === 'createdAt' ? 'createdAt' : 
-                     sortBy === 'updatedAt' ? 'updatedAt' : 
-                     sortBy === 'shopOrder' ? 'shopOrder' : 'order'
-    params.append('sort', sortDir === 'desc' ? `-${sortField}` : sortField)
+    if (sortBy === 'shopOrder') {
+      // 按照 CMS 定义的规则及置顶需求：isHot/isNew 置顶 > Shop权重 > 全局显示顺序 > 更新时间
+      params.append('sort', sortDir === 'desc' ? '-isHot,-isNew,-shopOrder,-order,-updatedAt' : 'isHot,isNew,shopOrder,order,updatedAt')
+    } else if (sortBy === 'order') {
+      params.append('sort', sortDir === 'desc' ? '-order,-updatedAt' : 'order,updatedAt')
+    } else {
+      const sortField = sortBy === 'createdAt' ? 'createdAt' : 
+                       sortBy === 'updatedAt' ? 'updatedAt' : 'order'
+      params.append('sort', sortDir === 'desc' ? `-${sortField}` : sortField)
+    }
 
     const url = `${CMS_URL}/api/products?${params.toString()}`
     console.log('[Products API] Request URL:', url)
