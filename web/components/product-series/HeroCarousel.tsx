@@ -535,17 +535,17 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
       </div>
 
       {/* 2. 移动端专属视图 (block lg:hidden) - 针对 < 1024px 精心设计的流动式单列响应排版 */}
-      <div className="relative z-10 w-full flex flex-col px-6 py-12 block lg:hidden select-none">
-        {/* 主标题区 */}
-        <div className="text-center mb-8">
+      <div className="relative z-10 w-full flex flex-col px-6 pt-16 pb-8 block lg:hidden select-none">
+        {/* 主标题区 - 设定固定高度 h-24 (96px) 配合 flex 居中与紧凑字号，完美容纳3行标题且绝不截断、绝不跳动！ */}
+        <div className="h-24 flex flex-col justify-center items-center text-center mb-3 overflow-hidden px-2">
           {currentData.title.map((line, lineIndex) => (
             <h1
               key={lineIndex}
               className={cn(
-                "font-josefin-sans text-white leading-tight",
+                "font-josefin-sans text-white leading-none tracking-tight",
                 lineIndex === 0
-                  ? "text-3xl sm:text-4xl font-medium mb-1"
-                  : "text-4xl sm:text-5xl font-bold bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent"
+                  ? "text-xl sm:text-2xl font-medium mb-1.5"
+                  : "text-2xl sm:text-3xl font-bold bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent mb-1"
               )}
             >
               {line}
@@ -555,7 +555,7 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
 
         {/* 中央大图展示区 (支持原生手势左右滑动切换) */}
         <div 
-          className="w-full aspect-[4/3] sm:aspect-[16/9] rounded-3xl overflow-hidden shadow-2xl relative mb-6 bg-gray-800/50 border border-white/10"
+          className="w-full aspect-[16/9] sm:aspect-[16/9] rounded-2xl overflow-hidden shadow-2xl relative mb-3 bg-gray-800/50 border border-white/10"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleDragEnd}
@@ -568,51 +568,18 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
           />
         </div>
 
-        {/* 缩略图选择队列 */}
-        {(() => {
-          const allProductImages = slides.map((slide, idx) => ({
-            url: slide.productImages[0] || '',
-            slideIndex: idx,
-          })).filter(img => img.url)
-
-          if (allProductImages.length <= 1) return null
-
-          return (
-            <div className="flex gap-3 overflow-x-auto pb-4 pt-1 mb-6 scrollbar-hide justify-center">
-              {allProductImages.map((img) => {
-                const isSelected = img.slideIndex === currentSlide
-                return (
-                  <button
-                    key={img.slideIndex}
-                    onClick={() => goToSlide(img.slideIndex)}
-                    className={cn(
-                      "relative w-20 h-16 sm:w-24 sm:h-20 rounded-xl overflow-hidden flex-shrink-0 transition-all duration-300",
-                      isSelected ? "border-2 border-[#B6AB57] scale-105 shadow-md" : "opacity-60 hover:opacity-100 border border-white/20"
-                    )}
-                  >
-                    <OptimizedImage
-                      image={img.url}
-                      alt=""
-                      size="small"
-                      className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-                    />
-                  </button>
-                )
-              })}
-            </div>
-          )
-        })()}
-
-        {/* 描述文字 */}
-        <p className="font-josefin-sans text-base sm:text-lg text-white/90 text-center px-4 mb-8 leading-relaxed">
-          {currentData.description}
-        </p>
+        {/* 描述文字 - 设定固定高度 h-20 (80px) 配合 flex 居中与紧凑字号，完美容纳3行描述且绝不截断、绝不跳动！ */}
+        <div className="h-20 flex items-center justify-center px-2 mb-4 overflow-hidden">
+          <p className="font-josefin-sans text-xs sm:text-sm text-white/90 text-center leading-normal line-clamp-3">
+            {currentData.description}
+          </p>
+        </div>
 
         {/* CTA View More 按钮 (继承顶级呼吸漂浮与展开动效) */}
-        <div className="flex justify-center mb-10">
+        <div className="flex justify-center mb-6">
           <motion.div
             className="inline-block"
-            animate={{ translateY: [0, -8, 0] }}
+            animate={{ translateY: [0, -6, 0] }}
             transition={{
               duration: 3,
               ease: "easeInOut",
@@ -622,13 +589,13 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
           >
             <Link
               href={currentData.buttonLink}
-              className="group relative inline-flex items-center justify-center font-josefin-sans font-medium text-white border border-white overflow-hidden w-64 h-16 rounded-full text-xl shadow-lg"
+              className="group relative inline-flex items-center justify-center font-josefin-sans font-medium text-white border border-white overflow-hidden w-56 h-12 rounded-full text-base shadow-lg"
             >
               {/* 底层：背景放大圆圈 */}
-              <span className="absolute right-1 top-1/2 -translate-y-1/2 w-14 h-14 bg-[#B6AB57] rounded-full transition-all duration-500 ease-out scale-0 group-hover:scale-[10]" />
+              <span className="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#B6AB57] rounded-full transition-all duration-500 ease-out scale-0 group-hover:scale-[10]" />
 
               {/* 顶层右侧：圆形箭头图标 */}
-              <div className="absolute right-1 top-1/2 -translate-y-1/2 w-14 h-14 flex items-center justify-center pointer-events-none transition-opacity duration-300 group-hover:opacity-0">
+              <div className="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center pointer-events-none transition-opacity duration-300 group-hover:opacity-0">
                 <img src="/icon-arrow-circle.svg" alt="" className="w-full h-full" />
               </div>
 
@@ -644,7 +611,7 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
         <div className="flex items-center justify-between gap-4 px-2 sm:px-6">
           <button
             onClick={goToPrev}
-            className="w-12 h-12 rounded-full border border-white/50 flex items-center justify-center text-white active:bg-white active:text-black transition-colors"
+            className="w-10 h-10 rounded-full border border-white/50 flex items-center justify-center text-white active:bg-white active:text-black transition-colors"
             aria-label="Previous slide"
           >
             <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -662,7 +629,7 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
 
           <button
             onClick={goToNext}
-            className="w-12 h-12 rounded-full border border-white/50 flex items-center justify-center text-white active:bg-white active:text-black transition-colors"
+            className="w-10 h-10 rounded-full border border-white/50 flex items-center justify-center text-white active:bg-white active:text-black transition-colors"
             aria-label="Next slide"
           >
             <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
