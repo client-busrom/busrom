@@ -27,13 +27,13 @@ interface ProductSeriesData {
   locale: string
 }
 
-interface ProductSeriesPageProps {
+interface ProductSeriesDetailClientProps {
   locale: Locale
   slug: string
   initialData?: ProductSeriesData | null
 }
 
-export function ProductSeriesPage({ locale, slug, initialData }: ProductSeriesPageProps) {
+export function ProductSeriesDetailClient({ locale, slug, initialData }: ProductSeriesDetailClientProps) {
   const [seriesData, setSeriesData] = useState<ProductSeriesData | null>(initialData || null)
   const [loading, setLoading] = useState(!initialData)
   const [error, setError] = useState<string | null>(null)

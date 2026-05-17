@@ -1259,6 +1259,801 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "cmgiw",
+      "x": 4475,
+      "y": 0,
+      "name": "page3",
+      "clip": true,
+      "width": 1920,
+      "height": 2000,
+      "fill": "#FFFFFF",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "IGUI0",
+          "x": 0,
+          "y": 0,
+          "name": "hero-carousel",
+          "clip": true,
+          "width": 1920,
+          "height": 968,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "p5J0aY",
+              "x": -1.4210854715202004e-14,
+              "y": 0,
+              "name": "hero-carousel-backgroud-image",
+              "fill": [
+                {
+                  "type": "image",
+                  "enabled": true,
+                  "url": "",
+                  "mode": "fill"
+                },
+                "#0000003b"
+              ],
+              "width": 1920,
+              "height": 968,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "frame",
+              "id": "WlnJy",
+              "x": 1725,
+              "y": 890,
+              "name": "next-button",
+              "rotation": -9.826939576278036e-14,
+              "width": 60,
+              "height": 60,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "path",
+                  "id": "rqTxz",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Subtract",
+                  "geometry": "M30 0c16.56854 0 30 13.43146 30 30 0 16.56854-13.43146 30-30 30-16.56854 0-30-13.43146-30-30 0-16.56854 13.43146-30 30-30z m-6.81543 20.13867l9.84277 9.90332-9.84277 9.90332 1.67676 1.72852 11.70801-11.63184-11.70801-11.63281-1.67676 1.72949z",
+                  "fill": "#ffffffff",
+                  "width": 60,
+                  "height": 60
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "yCou5",
+              "x": 1005,
+              "y": 889.9999999999999,
+              "name": "prev-button",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "qr0Pp",
+                  "x": 60,
+                  "y": 0,
+                  "name": "Ellipse 3",
+                  "rotation": 1.359393268620022e-13,
+                  "flipX": true,
+                  "sweepAngle": -360.00001001791264,
+                  "width": 60,
+                  "height": 60,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#ffffffff"
+                  }
+                },
+                {
+                  "type": "path",
+                  "id": "Cq9gv",
+                  "x": 23.43115234375,
+                  "y": 18.40915679931652,
+                  "name": "Vector",
+                  "rotation": 9.946780014292844e-14,
+                  "geometry": "M591.21997 76.388l-74.07996-76.388-517.14001 513.84003 517.13696 513.83407 74.08405-76.38406-434.79802-437.45105 434.79698-437.45099z",
+                  "fill": "#ffffffff",
+                  "width": 13.384350776672363,
+                  "height": 23.264989852905273,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 0.1953125
+                  }
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "etPKC",
+              "x": 463,
+              "y": 139,
+              "name": "hero-carousel-title-line-1",
+              "fill": "#ffffffff",
+              "content": "The Minimalist Beauty Of",
+              "textAlign": "center",
+              "fontFamily": "Josefin Sans",
+              "fontSize": 84,
+              "fontWeight": "500"
+            },
+            {
+              "type": "text",
+              "id": "bqO1o",
+              "x": 541,
+              "y": 223,
+              "name": "hero-carousel-title-line-2",
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": -180,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#ffffffff",
+                    "position": 0
+                  },
+                  {
+                    "color": "#999999ff",
+                    "position": 1
+                  }
+                ],
+                "center": {
+                  "x": 0.5000000000000004
+                }
+              },
+              "content": "Modern Bathroom",
+              "textAlign": "center",
+              "fontFamily": "Josefin Sans",
+              "fontSize": 96,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "DYDMl",
+              "x": 189,
+              "y": 446,
+              "name": "hero-carousel-description",
+              "fill": "#ffffffff",
+              "textGrowth": "fixed-width",
+              "width": 532,
+              "content": "Solid Yet Elegant, Busrom Glass Clamps Ensure Seamless Integration At Every Connection.",
+              "lineHeight": 1.5199999809265137,
+              "fontFamily": "Josefin Sans",
+              "fontSize": 36,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "group",
+              "id": "vniZE",
+              "x": 189,
+              "y": 651.9876596663634,
+              "name": "view-more-button",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 62.5,
+                  "id": "ZWVX6",
+                  "x": 0,
+                  "y": 19.012340333636644,
+                  "name": "Rectangle 347",
+                  "width": 284,
+                  "height": 92,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#ffffffff"
+                  }
+                },
+                {
+                  "type": "text",
+                  "id": "oFE0N",
+                  "x": 23,
+                  "y": 54.012340333636644,
+                  "name": "view more",
+                  "fill": "#ffffffff",
+                  "textGrowth": "fixed-width-height",
+                  "width": 162,
+                  "height": 41,
+                  "content": "view more",
+                  "lineHeight": 0.9375,
+                  "fontFamily": "Josefin Sans",
+                  "fontSize": 32,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "group",
+                  "id": "a1wP4",
+                  "x": 193.1551651179326,
+                  "y": 3.131427123166759,
+                  "name": "Group 222",
+                  "rotation": -12.836755365134099,
+                  "children": [
+                    {
+                      "type": "group",
+                      "id": "Li3eg",
+                      "x": 3.131413656496534,
+                      "y": -3.9252495034195363,
+                      "name": "Subtract",
+                      "rotation": -2.32240195242753e-15,
+                      "children": [
+                        {
+                          "type": "ellipse",
+                          "id": "amhjl",
+                          "x": 1.1368683772161603e-13,
+                          "y": 54.22084569604067,
+                          "name": "Ellipse 65",
+                          "rotation": 45,
+                          "sweepAngle": -360.00001001791264,
+                          "fill": "#756f3fff",
+                          "width": 76.67985534667969,
+                          "height": 76.67985534667969
+                        },
+                        {
+                          "type": "path",
+                          "id": "rYVWP",
+                          "x": 54.03415870666504,
+                          "y": 34.256019112178365,
+                          "name": "Vector",
+                          "rotation": -36.83169366320465,
+                          "geometry": "M314.06024 0.00004l-0.578 0c-7.69757 0.10974-15.17822 2.56654-21.44199 7.042l-0.36401 0.263 0.10501-0.067c-2.48227 1.59986-4.80316 3.43716-6.92999 5.486l-0.59803 0.587-270.94598 270.61999c-17.743 17.72101-17.743 46.45599 0 64.17801l0.536 0.526c17.78 17.19 46.142 17.01498 63.705-0.526l198.59698-198.36 0 612.38402c0 20.914 16.97403 37.867 37.90802 37.867l5.30899 0c20.64499-0.34003 37.28003-17.16199 37.28003-37.867l0-612.38503 198.59796 198.36c17.73999 17.72 46.5 17.72 64.24103 0 17.74298-17.72 17.74396-46.45501 0.00196-64.177l-270.96796-270.64199-0.57501-0.564c-1.93302-1.86265-4.02686-3.55088-6.25702-5.045l-0.56897-0.375 0.104 0.076c-6.51166-4.80527-14.39425-7.3926-22.487-7.381l-4.67102 0z",
+                          "fill": "#464010ff",
+                          "width": 24.858564376831055,
+                          "height": 31.427297592163086
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 30,
+              "id": "zvu4e",
+              "x": 960,
+              "y": 420,
+              "name": "hero-carousel-image-1",
+              "fill": [
+                "#d9d9d9ff",
+                {
+                  "type": "image",
+                  "enabled": true,
+                  "url": "",
+                  "mode": "fill"
+                }
+              ],
+              "width": 371,
+              "height": 369,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 30,
+              "id": "bdh1v",
+              "x": 1340,
+              "y": 505,
+              "name": "hero-carousel-image-2",
+              "fill": [
+                "#d9d9d9ff",
+                {
+                  "type": "image",
+                  "enabled": true,
+                  "url": "",
+                  "mode": "fill"
+                }
+              ],
+              "width": 210,
+              "height": 364,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 30,
+              "id": "tlGs4",
+              "x": 1559,
+              "y": 505,
+              "name": "hero-carousel-image-3",
+              "fill": [
+                "#d9d9d9ff",
+                {
+                  "type": "image",
+                  "enabled": true,
+                  "url": "",
+                  "mode": "fill"
+                }
+              ],
+              "width": 210,
+              "height": 364,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 30,
+              "id": "MaivB",
+              "x": 1778,
+              "y": 505,
+              "name": "hero-carousel-image-4",
+              "fill": [
+                "#d9d9d9ff",
+                {
+                  "type": "image",
+                  "enabled": true,
+                  "url": "",
+                  "mode": "fill"
+                }
+              ],
+              "width": 210,
+              "height": 364,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 24,
+              "id": "poTJ8",
+              "x": 1106,
+              "y": 917,
+              "name": "bar-bg",
+              "fill": "#ffffff85",
+              "width": 568,
+              "height": 6,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 24,
+              "id": "ScObY",
+              "x": 1106,
+              "y": 917,
+              "name": "bar",
+              "fill": "#ffffffff",
+              "width": 205,
+              "height": 6,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "BJ4si",
+          "x": 0,
+          "y": 968,
+          "name": "product-series-overview",
+          "clip": true,
+          "width": 1920,
+          "height": 922,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "ellipse",
+              "id": "gMkks",
+              "x": 544,
+              "y": 312,
+              "name": "background Ellipse",
+              "sweepAngle": -360.00001001791264,
+              "fill": "#f7f1dbff",
+              "width": 177,
+              "height": 177,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              }
+            },
+            {
+              "type": "group",
+              "id": "WI05X",
+              "x": 180,
+              "y": 134,
+              "name": "Text",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "biOgi",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Stainless Steel Glass Clip",
+                  "fill": "#706934ff",
+                  "textGrowth": "fixed-width-height",
+                  "width": 697,
+                  "height": 166,
+                  "content": "Stainless Steel Glass Clip\n",
+                  "lineHeight": 1.0520833333333333,
+                  "fontFamily": "Josefin Sans",
+                  "fontSize": 96,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "S3xUfm",
+                  "x": 0,
+                  "y": 215,
+                  "name": "For Modern Bathrooms And Partitions",
+                  "fill": "#000000ff",
+                  "textGrowth": "fixed-width-height",
+                  "width": 590,
+                  "height": 159,
+                  "content": "For Modern Bathrooms And Partitions",
+                  "lineHeight": 1.1875,
+                  "fontFamily": "Josefin Sans",
+                  "fontSize": 48,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "v52sSA",
+                  "x": 0,
+                  "y": 392,
+                  "name": "Busrom Bathroom Glass Clip Series",
+                  "fill": "#ffaa2bff",
+                  "textGrowth": "fixed-width",
+                  "width": 581,
+                  "content": "Busrom Bathroom Glass Clip Series\n",
+                  "lineHeight": 1,
+                  "fontFamily": "Joan",
+                  "fontSize": 32,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "BveSz",
+                  "x": 0,
+                  "y": 428,
+                  "name": "Is Specifically Designed For Shower Enclosures, Bathroom Partitions, And Restroom Glass Installations, Offering A Secure, Stable, And Damage-Free Aesthetic Mounting Solution. Crafted With Precision Engineering, It Combines The Minimalist Aesthetics Of Modern Bathrooms With A Premium Quality Experience.",
+                  "fill": "#000000ff",
+                  "textGrowth": "fixed-width",
+                  "width": 581,
+                  "content": " Is Specifically Designed For Shower Enclosures, Bathroom Partitions, And Restroom Glass Installations, Offering A Secure, Stable, And Damage-Free Aesthetic Mounting Solution. Crafted With Precision Engineering, It Combines The Minimalist Aesthetics Of Modern Bathrooms With A Premium Quality Experience.",
+                  "lineHeight": 1.3333333333333333,
+                  "fontFamily": "Josefin Sans",
+                  "fontSize": 24,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "I1iPu",
+              "x": 1529,
+              "y": 120,
+              "name": "button",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "l5MLfH",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Ellipse 71",
+                  "sweepAngle": -360.00001001791264,
+                  "width": 70,
+                  "height": 70,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 2,
+                    "fill": "#756f3fff"
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "Qy1Me",
+                  "x": 29,
+                  "y": 29,
+                  "name": "Ellipse 72",
+                  "sweepAngle": -360.00001001791264,
+                  "fill": "#ffcc4aff",
+                  "width": 12,
+                  "height": 12,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "text",
+                  "id": "MrYnJ",
+                  "x": 44,
+                  "y": 10,
+                  "name": "Get A Solution",
+                  "fill": "#756f3fff",
+                  "content": "Get A Solution",
+                  "lineHeight": 2.0416666666666665,
+                  "fontFamily": "Anaheim",
+                  "fontSize": 24,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "b8aez",
+              "x": 1742.5543212890625,
+              "y": 65.99999999999977,
+              "name": "layer5",
+              "effect": {
+                "type": "blur",
+                "radius": 3.5
+              },
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 30,
+                  "id": "qGDpP",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Rectangle 697",
+                  "fill": "#ffffffff",
+                  "width": 204.9232635498047,
+                  "height": 244,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "DiCiw",
+                  "x": 10.3843994140625,
+                  "y": 19.409143447876204,
+                  "name": "Ellipse 176",
+                  "sweepAngle": -360.00001001791264,
+                  "fill": [
+                    "#ffffffff",
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "",
+                      "mode": "stretch"
+                    }
+                  ],
+                  "width": 205.61558532714844,
+                  "height": 205.87501525878906,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "UVhTg",
+              "x": 1083.2979736328125,
+              "y": 131.9256591796875,
+              "name": "layer4",
+              "effect": {
+                "type": "blur",
+                "radius": 3.5
+              },
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 30,
+                  "id": "gOgCx",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Rectangle 696",
+                  "fill": "#ffffffb0",
+                  "width": 420,
+                  "height": 380,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "iCVvs",
+                  "x": 35.199951171875,
+                  "y": 14.430334091186523,
+                  "name": "Ellipse 177",
+                  "sweepAngle": -360.00001001791264,
+                  "fill": {
+                    "type": "image",
+                    "opacity": 0.6399999856948853,
+                    "enabled": true,
+                    "url": "",
+                    "mode": "fill"
+                  },
+                  "width": 350.39996337890625,
+                  "height": 351.1392517089844,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "un5lZ",
+              "x": 1240.8760986328125,
+              "y": 214.734619140625,
+              "name": "layer3",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 30,
+                  "id": "iX6Dz",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Rectangle 694",
+                  "fill": "#ffffffff",
+                  "width": 460,
+                  "height": 480,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "E1HhmU",
+                  "x": 42.697021484375,
+                  "y": 49.60009765625,
+                  "name": "Ellipse 174",
+                  "sweepAngle": -360.00001001791264,
+                  "fill": [
+                    "#ffffffff",
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "",
+                      "mode": "stretch"
+                    }
+                  ],
+                  "width": 401.99652099609375,
+                  "height": 399.20001220703125,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "QlF8R",
+              "x": 1023.0000000000001,
+              "y": 486.47705078125,
+              "name": "layer2",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 30,
+                  "id": "Wuhtq",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Rectangle 695",
+                  "fill": "#ffffffff",
+                  "width": 272,
+                  "height": 268,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "s8CCeo",
+                  "x": 270.3953857421874,
+                  "y": 0,
+                  "name": "Ellipse 178",
+                  "flipX": true,
+                  "sweepAngle": -360.00001001791264,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "width": 267.98822021484375,
+                  "height": 268,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  }
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "id": "sTMGi",
+              "x": 1399.2584228515625,
+              "y": 366.6851806640625,
+              "name": "layer1",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 30,
+                  "id": "JbR9R",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Rectangle 693",
+                  "fill": "#ffffffff",
+                  "width": 420,
+                  "height": 434,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000040",
+                    "offset": {
+                      "x": 0,
+                      "y": 4
+                    },
+                    "blur": 60.549997329711914
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "npvo0",
+                  "x": 16.8642578125,
+                  "y": 34.559322357177734,
+                  "name": "Ellipse 182",
+                  "sweepAngle": -360.00001001791264,
+                  "fill": [
+                    "#ffffffff",
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "",
+                      "mode": "stretch"
+                    }
+                  ],
+                  "width": 379.0439758300781,
+                  "height": 379.34814453125,
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 2
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }

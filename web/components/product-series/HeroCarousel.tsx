@@ -2,25 +2,70 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
 import type { HeroCarouselData } from "@/lib/content-parser"
 
 /**
- * Figma Design Specs (1920x922):
- * 浏览器窗口 1920x968，header 46px，内容区域 1920x922
- *
- * Original design was 1920x1347, scaled by 922/1347 ≈ 0.684
+ * Pencil Design Specs (1920x968):
+ * 浏览器窗口 1920x968
  *
  * Background: Full width with 23% black overlay
  */
 
-// Design constants (based on 1920px width, 922px height)
+// Design constants (based on 1920px width, 968px height)
 const DESIGN_WIDTH = 1920
-const DESIGN_HEIGHT = 922
+const DESIGN_HEIGHT = 968
 
-// 缩放比例 (从原始 1347 到新的 922)
-const SCALE = DESIGN_HEIGHT / 1347  // ≈ 0.684
+// 位置配置: 0=大图, 1-3=小图, -1=左侧出场位置, 4=右侧入场位置
+const POSITIONS: Record<number, { left: number; top: number; width: number; height: number; opacity: number; zIndex: number }> = {
+  [-1]: { left: 710, top: 420, width: 371, height: 369, opacity: 0, zIndex: 0 },  // 左侧出场
+  [0]: { left: 960, top: 420, width: 371, height: 369, opacity: 1, zIndex: 10 },   // 大图
+  [1]: { left: 1340, top: 505, width: 210, height: 364, opacity: 1, zIndex: 5 },  // 小图1
+  [2]: { left: 1559, top: 505, width: 210, height: 364, opacity: 1, zIndex: 4 },  // 小图2
+  [3]: { left: 1778, top: 505, width: 210, height: 364, opacity: 1, zIndex: 3 },  // 小图3
+  [4]: { left: 1998, top: 505, width: 210, height: 364, opacity: 0, zIndex: 0 },  // 右侧入场
+}
+
+// 独立的虚拟影子卡片组件 (Ghost Card) - 用于承载平滑的离场与入场过渡，彻底消除跨屏飞行的残影
+function GhostCard({ url, fromPos, toPos }: { url: string; fromPos: number; toPos: number }) {
+  const [pos, setPos] = React.useState(fromPos)
+
+  React.useEffect(() => {
+    const timer = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setPos(toPos)
+      })
+    })
+    return () => cancelAnimationFrame(timer)
+  }, [toPos])
+
+  const currentPos = POSITIONS[pos] || POSITIONS[fromPos]
+
+  return (
+    <div
+      className="absolute overflow-hidden bg-gray-300 shadow-lg pointer-events-none"
+      style={{
+        left: `${(currentPos.left / DESIGN_WIDTH) * 100}%`,
+        top: `${(currentPos.top / DESIGN_HEIGHT) * 100}%`,
+        width: `${(currentPos.width / DESIGN_WIDTH) * 100}vw`,
+        height: `${(currentPos.height / DESIGN_WIDTH) * 100}vw`,
+        borderRadius: `${(30 / DESIGN_WIDTH) * 100}vw`,
+        opacity: currentPos.opacity,
+        zIndex: currentPos.zIndex,
+        transition: "all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)",
+      }}
+    >
+      <OptimizedImage
+        image={url}
+        alt=""
+        size="medium"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+    </div>
+  )
+}
 
 interface HeroCarouselProps {
   data: HeroCarouselData
@@ -29,72 +74,85 @@ interface HeroCarouselProps {
 
 export function HeroCarousel({ data, className }: HeroCarouselProps) {
   const [currentSlide, setCurrentSlide] = React.useState(0)
-  const [prevSlide, setPrevSlide] = React.useState<number | null>(null)
-  const [isTransitioning, setIsTransitioning] = React.useState(false)
-  // 出场动画阶段: 'exit'=左侧出场, 'teleport'=瞬移到右侧(无动画), 'enter'=从右侧滑入
-  const [exitPhase, setExitPhase] = React.useState<'exit' | 'teleport' | 'enter' | null>(null)
   const autoplayRef = React.useRef<NodeJS.Timeout | null>(null)
+
+  // 虚拟影子节点队列
+  const [ghosts, setGhosts] = React.useState<Array<{ id: string; url: string; fromPos: number; toPos: number }>>([])
+
+  // 记录正在隐藏的真实 DOM 节点（避免它们在瞬移重置时产生残影）
+  const [hiddenRealSlides, setHiddenRealSlides] = React.useState<Record<number, boolean>>({})
+
+  // 拖拽手势状态
+  const [dragStartX, setDragStartX] = React.useState<number | null>(null)
+  const [dragOffset, setDragOffset] = React.useState(0)
 
   const slides = data?.slides || []
   const slideCount = slides.length
 
-  // Early return if no slides
-  if (slideCount === 0) return null
+  // 添加 Ghost 节点助手函数
+  const addGhost = React.useCallback((url: string, fromPos: number, toPos: number) => {
+    const id = `${Date.now()}-${Math.random()}`
+    setGhosts((prev) => [...prev, { id, url, fromPos, toPos }])
 
-  // 执行切换动画 - 两阶段动画
-  const doTransition = React.useCallback((newSlide: number) => {
-    if (isTransitioning || newSlide === currentSlide) return
+    // 将 Ghost 存活时间延长至 680ms，为真实 DOM 卡片留出 180ms 的重叠交接缓冲期！
+    setTimeout(() => {
+      setGhosts((prev) => prev.filter((g) => g.id !== id))
+    }, 680)
+  }, [])
 
-    setPrevSlide(currentSlide)
-    setIsTransitioning(true)
-    setExitPhase('exit')  // 第一阶段：左侧出场
+  // 执行切换动画
+  const doTransition = React.useCallback((newSlide: number, direction: 'next' | 'prev') => {
+    if (newSlide === currentSlide) return
+
+    const currentData = slides[currentSlide]
+    const nextData = slides[newSlide]
+    if (!currentData || !nextData) return
+
+    if (direction === 'next') {
+      // 向左滚动 (Next): 大图 [0] 需要向左离场到 [-1]
+      addGhost(currentData.productImages[0] || '', 0, -1)
+      // 真实大图瞬间移动到 [4]，在此期间隐藏它避免飞行残影
+      setHiddenRealSlides((prev) => ({ ...prev, [currentSlide]: true }))
+      // 提前在 500ms 恢复真实卡片显示（此时真实卡片已在 [4] 就位，和 ghost 形成 180ms 完美重叠缓冲）
+      setTimeout(() => {
+        setHiddenRealSlides((prev) => ({ ...prev, [currentSlide]: false }))
+      }, 500)
+    } else {
+      // 向右滚动 (Prev): 右侧末尾小图 [3] 需要向右离场到 [4]
+      const lastSlideIndex = (currentSlide + 3) % slideCount
+      const lastData = slides[lastSlideIndex]
+      if (lastData) {
+        addGhost(lastData.productImages[0] || '', 3, 4)
+      }
+
+      // 新的大图 (newSlide) 需要从左侧 [-1] 进场到 [0]
+      addGhost(nextData.productImages[0] || '', -1, 0)
+      // 真实大图在此期间隐藏，由 ghost 承载进场动画
+      setHiddenRealSlides((prev) => ({ ...prev, [newSlide]: true }))
+      // 提前在 500ms 恢复真实卡片显示，和存活 680ms 的 ghost 形成 180ms 的完美接力缓冲，彻底消灭卸载闪烁！
+      setTimeout(() => {
+        setHiddenRealSlides((prev) => ({ ...prev, [newSlide]: false }))
+      }, 500)
+    }
+
     setCurrentSlide(newSlide)
-
-    // 第一阶段完成后（300ms），瞬移到右侧
-    setTimeout(() => {
-      setExitPhase('teleport')
-      // 等待一帧让 transition: none 生效，然后开始入场动画
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setExitPhase('enter')
-        })
-      })
-    }, 300)
-
-    // 第二阶段完成后（600ms），重置状态
-    setTimeout(() => {
-      setPrevSlide(null)
-      setIsTransitioning(false)
-      setExitPhase(null)
-    }, 650)
-  }, [currentSlide, isTransitioning])
+  }, [currentSlide, slides, slideCount, addGhost])
 
   // 自动播放的切换函数
   const autoTransition = React.useCallback(() => {
     setCurrentSlide((prev) => {
       const next = (prev + 1) % slideCount
-      setPrevSlide(prev)
-      setIsTransitioning(true)
-      setExitPhase('exit')
-
-      setTimeout(() => {
-        setExitPhase('teleport')
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            setExitPhase('enter')
-          })
-        })
-      }, 300)
-
-      setTimeout(() => {
-        setPrevSlide(null)
-        setIsTransitioning(false)
-        setExitPhase(null)
-      }, 650)
-
+      const currentData = slides[prev]
+      if (currentData) {
+        addGhost(currentData.productImages[0] || '', 0, -1)
+        setHiddenRealSlides((old) => ({ ...old, [prev]: true }))
+        setTimeout(() => {
+          setHiddenRealSlides((old) => ({ ...old, [prev]: false }))
+        }, 500)
+      }
       return next
     })
-  }, [slideCount])
+  }, [slideCount, slides, addGhost])
 
   // Auto-advance slides
   React.useEffect(() => {
@@ -115,28 +173,66 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
   }, [autoTransition])
 
   const goToSlide = (index: number) => {
-    doTransition(index)
+    // 判断方向
+    const diff = (index - currentSlide + slideCount) % slideCount
+    const direction = diff > slideCount / 2 ? 'prev' : 'next'
+    doTransition(index, direction)
     resetAutoplay()
   }
 
   const goToPrev = () => {
     const newSlide = (currentSlide - 1 + slideCount) % slideCount
-    doTransition(newSlide)
+    doTransition(newSlide, 'prev')
     resetAutoplay()
   }
 
   const goToNext = () => {
     const newSlide = (currentSlide + 1) % slideCount
-    doTransition(newSlide)
+    doTransition(newSlide, 'next')
     resetAutoplay()
   }
+
+  // 拖拽事件处理
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setDragStartX(e.clientX)
+  }
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setDragStartX(e.touches[0].clientX)
+  }
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (dragStartX === null) return
+    const offset = e.clientX - dragStartX
+    setDragOffset(offset)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (dragStartX === null) return
+    const offset = e.touches[0].clientX - dragStartX
+    setDragOffset(offset)
+  }
+
+  const handleDragEnd = () => {
+    if (dragStartX === null) return
+    if (dragOffset < -50) {
+      goToNext()
+    } else if (dragOffset > 50) {
+      goToPrev()
+    }
+    setDragStartX(null)
+    setDragOffset(0)
+  }
+
+  // Early return if no slides
+  if (slideCount === 0) return null
 
   const currentData = slides[currentSlide]
   if (!currentData) return null
 
   return (
     <section
-      className={cn("relative w-full overflow-hidden bg-black mt-[46px]", className)}
+      className={cn("relative w-full overflow-hidden bg-black", className)}
       style={{ aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` }}
       data-header-theme="light"
     >
@@ -146,7 +242,7 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
           key={index}
           className={cn(
             "absolute inset-0 transition-opacity duration-500",
-            index === currentSlide ? "opacity-100" : "opacity-0"
+            index === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
           )}
         >
           {slide.backgroundImage && (
@@ -167,12 +263,11 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
       <div className="relative z-10 h-full w-full">
         {/* Title Section (centered) */}
         <div
-          className="absolute left-0 right-0 text-center"
+          className="absolute left-0 right-0 text-center z-30 pointer-events-none"
           style={{
-            top: `${(180 / DESIGN_HEIGHT) * 100}%`,
+            top: `${(139 / DESIGN_HEIGHT) * 100}%`,
           }}
         >
-          {/* Title Lines */}
           {currentData.title.map((line, lineIndex) => (
             <h1
               key={lineIndex}
@@ -184,9 +279,9 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
               )}
               style={{
                 fontSize: lineIndex === 0
-                  ? `${(96 / DESIGN_WIDTH) * 100}vw`
-                  : `${(110 / DESIGN_WIDTH) * 100}vw`,
-                lineHeight: 1.1,
+                  ? `${(84 / DESIGN_WIDTH) * 100}vw`
+                  : `${(96 / DESIGN_WIDTH) * 100}vw`,
+                lineHeight: 1,
               }}
             >
               {line}
@@ -196,12 +291,12 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
 
         {/* Left Content - Description + Button (flex layout) */}
         <div
-          className="absolute flex flex-col"
+          className="absolute flex flex-col z-30 pointer-events-auto"
           style={{
-            left: `${(153 / DESIGN_WIDTH) * 100}%`,
-            top: `${(480 / DESIGN_HEIGHT) * 100}%`,
+            left: `${(189 / DESIGN_WIDTH) * 100}%`,
+            top: `${(446 / DESIGN_HEIGHT) * 100}%`,
             width: `${(532 / DESIGN_WIDTH) * 100}%`,
-            gap: `${(40 / DESIGN_WIDTH) * 100}vw`,
+            gap: `${(61 / DESIGN_WIDTH) * 100}vw`,
           }}
         >
           <p
@@ -213,44 +308,65 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
           >
             {currentData.description}
           </p>
-          <Link
-            href={currentData.buttonLink}
-            className="group relative inline-flex items-center justify-between font-josefin-sans font-medium text-white border border-white overflow-hidden"
-            style={{
-              width: `${(284 / DESIGN_WIDTH) * 100}vw`,
-              height: `${(92 / DESIGN_WIDTH) * 100}vw`,
-              borderRadius: `${(62.5 / DESIGN_WIDTH) * 100}vw`,
-              fontSize: `${(32 / DESIGN_WIDTH) * 100}vw`,
-              paddingLeft: `${(24 / DESIGN_WIDTH) * 100}vw`,
-              paddingRight: `${(8 / DESIGN_WIDTH) * 100}vw`,
+          <motion.div
+            className="inline-block"
+            animate={{ translateY: [0, -10, 0] }}
+            transition={{
+              duration: 3,
+              ease: "easeInOut",
+              repeat: Infinity,
             }}
+            whileHover={{ translateY: 0, transition: { duration: 0.3 } }}
           >
-            <span
-              className="absolute right-0 top-1/2 -translate-y-1/2 bg-[#B6AB57] rounded-full transition-all duration-500 ease-out scale-0 group-hover:scale-[10]"
+            <Link
+              href={currentData.buttonLink}
+              className="group relative inline-flex items-center font-josefin-sans font-medium text-white border border-white overflow-hidden"
               style={{
-                width: `${(77 / DESIGN_WIDTH) * 100}vw`,
-                height: `${(77 / DESIGN_WIDTH) * 100}vw`,
-                marginRight: `${(8 / DESIGN_WIDTH) * 100}vw`,
+                width: `${(284 / DESIGN_WIDTH) * 100}vw`,
+                height: `${(92 / DESIGN_WIDTH) * 100}vw`,
+                borderRadius: `${(62.5 / DESIGN_WIDTH) * 100}vw`,
+                fontSize: `${(32 / DESIGN_WIDTH) * 100}vw`,
               }}
-            />
-            <span className="relative z-10 transition-colors duration-300 group-hover:text-black flex items-center leading-none">
-              {currentData.buttonText}
-            </span>
-            <img
-              src="/icon-arrow-circle.svg"
-              alt=""
-              className="relative z-10 transition-opacity duration-300 group-hover:opacity-0"
-              style={{
-                width: `${(77 / DESIGN_WIDTH) * 100}vw`,
-                height: `${(77 / DESIGN_WIDTH) * 100}vw`,
-              }}
-            />
-          </Link>
+            >
+              {/* 1. 底层：背景放大圆圈 */}
+              <span
+                className="absolute right-0 top-1/2 -translate-y-1/2 bg-[#B6AB57] rounded-full transition-all duration-500 ease-out scale-0 group-hover:scale-[10]"
+                style={{
+                  width: `${(77 / DESIGN_WIDTH) * 100}vw`,
+                  height: `${(77 / DESIGN_WIDTH) * 100}vw`,
+                  marginRight: `${(8 / DESIGN_WIDTH) * 100}vw`,
+                }}
+              />
+
+              {/* 2. 顶层右侧：圆形箭头图标 (默认显示，hover时淡出) */}
+              <div
+                className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center justify-end pointer-events-none transition-opacity duration-300 group-hover:opacity-0"
+                style={{
+                  paddingRight: `${(8 / DESIGN_WIDTH) * 100}vw`,
+                }}
+              >
+                <img
+                  src="/icon-arrow-circle.svg"
+                  alt=""
+                  style={{
+                    width: `${(77 / DESIGN_WIDTH) * 100}vw`,
+                    height: `${(77 / DESIGN_WIDTH) * 100}vw`,
+                  }}
+                />
+              </div>
+
+              {/* 3. 核心层：文字自适应平滑居中层 */}
+              <span
+                className="absolute top-1/2 left-[1.25vw] -translate-y-1/2 z-10 transition-all duration-500 ease-out group-hover:text-black flex items-center leading-none group-hover:left-1/2 group-hover:-translate-x-1/2 whitespace-nowrap"
+              >
+                {currentData.buttonText}
+              </span>
+            </Link>
+          </motion.div>
         </div>
 
-        {/* Product Images (right side) - 队列式滚动动画 */}
+        {/* Product Images (right side) - 队列式滚动动画 + 虚拟影子过渡 + 拖拽手势支持 */}
         {(() => {
-          // 获取所有产品图片
           const allProductImages = slides.map((slide, idx) => ({
             url: slide.productImages[0] || '',
             slideIndex: idx,
@@ -258,17 +374,6 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
 
           const total = allProductImages.length
           if (total === 0) return null
-
-          // 位置配置: 0=大图, 1-3=小图, -1=左侧出场位置, 4=右侧入场位置
-          // 新设计：1920x922，图片区域放在右侧
-          const positions: Record<number, { left: number; top: number; width: number; height: number; opacity: number; zIndex: number }> = {
-            [-1]: { left: 575, top: 445, width: 424, height: 290, opacity: 0, zIndex: 0 },  // 左侧出场
-            [0]: { left: 825, top: 445, width: 424, height: 290, opacity: 1, zIndex: 10 },   // 大图
-            [1]: { left: 1259, top: 510, width: 240, height: 285, opacity: 1, zIndex: 5 },  // 小图1
-            [2]: { left: 1509, top: 510, width: 240, height: 285, opacity: 1, zIndex: 4 },  // 小图2
-            [3]: { left: 1759, top: 510, width: 240, height: 285, opacity: 1, zIndex: 3 },  // 小图3
-            [4]: { left: 1999, top: 510, width: 240, height: 285, opacity: 0, zIndex: 0 },  // 右侧入场
-          }
 
           // 计算每个图片的队列位置
           const getQueuePosition = (imageIndex: number): number => {
@@ -278,58 +383,82 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
             return pos
           }
 
-          // 判断图片是否正在从队首移出（prevSlide 对应的图片）
-          const isExiting = (imageIndex: number): boolean => {
-            if (prevSlide === null) return false
-            return imageIndex === prevSlide
-          }
+          return (
+            <div
+              className="absolute inset-0 z-20 select-none overflow-hidden"
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleDragEnd}
+              onMouseLeave={handleDragEnd}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleDragEnd}
+            >
+              {/* 1. 渲染真实的卡片队列 */}
+              {allProductImages.map((img) => {
+                const queuePos = getQueuePosition(img.slideIndex)
+                const isHidden = hiddenRealSlides[img.slideIndex]
+                const pos = POSITIONS[queuePos] || POSITIONS[4]
 
-          return allProductImages.map((img) => {
-            const queuePos = getQueuePosition(img.slideIndex)
-            const exiting = isExiting(img.slideIndex)
+                return (
+                  <div
+                    key={img.slideIndex}
+                    className={cn(
+                      "absolute overflow-hidden bg-gray-300 shadow-lg",
+                      queuePos === 0 ? "cursor-default" : "cursor-pointer"
+                    )}
+                    style={{
+                      left: `${(pos.left / DESIGN_WIDTH) * 100}%`,
+                      top: `${(pos.top / DESIGN_HEIGHT) * 100}%`,
+                      width: `${(pos.width / DESIGN_WIDTH) * 100}vw`,
+                      height: `${(pos.height / DESIGN_WIDTH) * 100}vw`,
+                      borderRadius: `${(30 / DESIGN_WIDTH) * 100}vw`,
+                      opacity: isHidden ? 0 : pos.opacity,
+                      zIndex: pos.zIndex,
+                      transform: dragStartX !== null ? `translateX(${dragOffset * 0.5}px)` : "translateX(0px)",
+                      // 当卡片处于视口外入场位 [4] 或被隐藏重置时，取消 transition 实现无缝瞬移归位
+                      // 保留 all 0.6s 确保位置与 z-index 完美过渡，同时单点覆盖 opacity 0s 实现 0ms 瞬间显示托底！
+                      transition: (dragStartX !== null || queuePos === 4 || isHidden) 
+                        ? "none" 
+                        : "all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0s",
+                    }}
+                    onClick={(e) => {
+                      if (Math.abs(dragOffset) > 10) return
+                      if (queuePos !== 0 && !isHidden) goToSlide(img.slideIndex)
+                    }}
+                  >
+                    <OptimizedImage
+                      image={img.url}
+                      alt=""
+                      size="medium"
+                      className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                    />
+                  </div>
+                )
+              })}
 
-            // 如果正在出场，使用左侧出场位置
-            const pos = exiting ? positions[-1] : (positions[queuePos] || positions[4])
-
-            return (
-              <div
-                key={img.slideIndex}
-                className={cn(
-                  "absolute overflow-hidden bg-gray-300",
-                  queuePos === 0 && !exiting ? "cursor-default" : "cursor-pointer"
-                )}
-                style={{
-                  left: `${(pos.left / DESIGN_WIDTH) * 100}%`,
-                  top: `${(pos.top / DESIGN_HEIGHT) * 100}%`,
-                  width: `${(pos.width / DESIGN_WIDTH) * 100}vw`,
-                  height: `${(pos.height / DESIGN_WIDTH) * 100}vw`,
-                  borderRadius: `${(30 / DESIGN_WIDTH) * 100}vw`,
-                  opacity: pos.opacity,
-                  zIndex: pos.zIndex,
-                  transition: "all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)",
-                }}
-                onClick={() => queuePos !== 0 && !exiting && goToSlide(img.slideIndex)}
-              >
-                <OptimizedImage
-                  image={img.url}
-                  alt=""
-                  size="medium"
-                  className="absolute inset-0 w-full h-full object-cover"
+              {/* 2. 渲染独立的虚拟影子卡片 (Ghost Cards) */}
+              {ghosts.map((ghost) => (
+                <GhostCard
+                  key={ghost.id}
+                  url={ghost.url}
+                  fromPos={ghost.fromPos}
+                  toPos={ghost.toPos}
                 />
-              </div>
-            )
-          })
+              ))}
+            </div>
+          )
         })()}
 
         {/* Navigation Buttons */}
         <button
           onClick={goToPrev}
-          className="absolute cursor-pointer group"
+          className="absolute cursor-pointer group z-30"
           style={{
-            left: `${(844 / DESIGN_WIDTH) * 100}%`,
-            top: `${(830 / DESIGN_HEIGHT) * 100}%`,
-            width: `${(83 / DESIGN_WIDTH) * 100}vw`,
-            height: `${(82 / DESIGN_WIDTH) * 100}vw`,
+            left: `${(1005 / DESIGN_WIDTH) * 100}%`,
+            top: `${(890 / DESIGN_HEIGHT) * 100}%`,
+            width: `${(60 / DESIGN_WIDTH) * 100}vw`,
+            height: `${(60 / DESIGN_WIDTH) * 100}vw`,
           }}
           aria-label="Previous slide"
         >
@@ -355,12 +484,12 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
 
         <button
           onClick={goToNext}
-          className="absolute cursor-pointer group"
+          className="absolute cursor-pointer group z-30"
           style={{
-            left: `${(1674 / DESIGN_WIDTH) * 100}%`,
-            top: `${(830 / DESIGN_HEIGHT) * 100}%`,
-            width: `${(83 / DESIGN_WIDTH) * 100}vw`,
-            height: `${(82 / DESIGN_WIDTH) * 100}vw`,
+            left: `${(1725 / DESIGN_WIDTH) * 100}%`,
+            top: `${(890 / DESIGN_HEIGHT) * 100}%`,
+            width: `${(60 / DESIGN_WIDTH) * 100}vw`,
+            height: `${(60 / DESIGN_WIDTH) * 100}vw`,
           }}
           aria-label="Next slide"
         >
@@ -386,10 +515,10 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
 
         {/* Progress Bar */}
         <div
-          className="absolute overflow-hidden"
+          className="absolute overflow-hidden z-30"
           style={{
-            left: `${(1016 / DESIGN_WIDTH) * 100}%`,
-            top: `${(1253 * SCALE / DESIGN_HEIGHT) * 100}%`,
+            left: `${(1106 / DESIGN_WIDTH) * 100}%`,
+            top: `${(917 / DESIGN_HEIGHT) * 100}%`,
             width: `${(568 / DESIGN_WIDTH) * 100}vw`,
             height: `${(6 / DESIGN_WIDTH) * 100}vw`,
             borderRadius: `${(24 / DESIGN_WIDTH) * 100}vw`,

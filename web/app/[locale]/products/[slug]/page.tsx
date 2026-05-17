@@ -1,5 +1,5 @@
 import type { Locale } from "@/i18n.config"
-import { ProductSeriesPage } from "@/components/products/ProductSeriesPage"
+import { ProductSeriesDetailClient } from "./ProductSeriesDetailClient"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import type { Metadata } from "next"
@@ -18,7 +18,7 @@ export async function generateMetadata({
   // SEO Protection: If not translated, set to noindex
   let robots: any = undefined
   if (locale !== 'en') {
-    const checkSeries = await getProductSeriesBySlug(slug, locale, true)
+    const checkSeries = await getProductSeriesBySlug(slug, locale)
     if (!checkSeries || !checkSeries.name) {
       robots = { index: false, follow: true }
     }
@@ -59,7 +59,7 @@ export default async function ProductSeriesDetailPage({
       <PageScripts path={path} pageType="product_series_detail" position="header" />
       <PageScripts path={path} pageType="product_series_detail" position="body_start" />
       <PageSeoInjector path={path} pageType="product_series_detail" locale={locale} />
-      <ProductSeriesPage locale={locale} slug={slug} initialData={seriesData} />
+      <ProductSeriesDetailClient locale={locale} slug={slug} initialData={seriesData} />
       <PageScripts path={path} pageType="product_series_detail" position="footer" />
     </>
   )
