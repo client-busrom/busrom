@@ -33,7 +33,7 @@ import type { ProductOverviewData } from "@/lib/content-parser"
 
 // Design constants
 const DESIGN_WIDTH = 1920
-const DESIGN_HEIGHT = 1159
+const DESIGN_HEIGHT = 922
 
 // Mobile breakpoint
 const MOBILE_BREAKPOINT = 768
@@ -43,16 +43,17 @@ interface ProductOverviewProps {
   className?: string
 }
 
-// Image position configurations with z-index based on Figma layer order
+// Image position configurations with z-index based on Figma layer order (demo-1.pen specs)
+// Coordinates are absolute relative to DESIGN_WIDTH (1920) and DESIGN_HEIGHT (922)
 const IMAGE_POSITIONS = {
-  // Main position (white card with circle image) - z-index 3
-  main: { x: 1322 - 820, y: 442, w: 523, h: 540, isMain: true, zIndex: 3 },
+  // Main position (layer1, white card with circle image) - z-index 5
+  main: { x: 1399, y: 367, w: 420, h: 434, isMain: true, zIndex: 5, innerW: 379, innerH: 379 },
   // Background positions with their z-index from Figma
   bg: [
-    { x: 929 - 820, y: 150, w: 525, h: 474, zIndex: 1 },   // Bottom layer
-    { x: 1125 - 820, y: 253, w: 571, h: 600, zIndex: 2 },  // Above first
-    { x: 854 - 820, y: 591, w: 339, h: 334, zIndex: 4 },   // Above main card
-    { x: 1749 - 820, y: 68, w: 271, h: 306, zIndex: 5 },   // Top layer
+    { x: 1023, y: 486, w: 272, h: 268, zIndex: 4, innerW: 268, innerH: 268 },  // layer2
+    { x: 1241, y: 215, w: 460, h: 480, zIndex: 3, innerW: 402, innerH: 399 },  // layer3
+    { x: 1083, y: 132, w: 420, h: 380, zIndex: 2, innerW: 350, innerH: 351, opacity: 0.8 }, // layer4
+    { x: 1743, y: 66, w: 205, h: 244, zIndex: 1, innerW: 206, innerH: 206 },   // layer5
   ],
 }
 
@@ -83,7 +84,7 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
   }
 
   // Get position style for each image based on its current position index
-  const getPositionStyle = (positionIndex: number): { x: number; y: number; w: number; h: number; zIndex: number; isMain?: boolean } => {
+  const getPositionStyle = (positionIndex: number): { x: number; y: number; w: number; h: number; zIndex: number; innerW: number; innerH: number; opacity?: number; isMain?: boolean } => {
     if (positionIndex === 0) {
       return IMAGE_POSITIONS.main
     }
@@ -184,12 +185,12 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
       />
 
       {/* Left Content - using absolute positioning for each element */}
-      {/* Main Title (96px, olive green) - y:1547 relative to section */}
+      {/* Main Title (96px, olive green) - y:134 relative to section */}
       <h2
         className="absolute font-josefin-sans font-bold text-[#706933]"
         style={{
-          left: `${(157 / DESIGN_WIDTH) * 100}%`,
-          top: `${(200 / DESIGN_HEIGHT) * 100}%`,
+          left: `${(180 / DESIGN_WIDTH) * 100}%`,
+          top: `${(134 / DESIGN_HEIGHT) * 100}%`,
           fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
           lineHeight: `${101 / 96}`,
         }}
@@ -202,12 +203,12 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
         ))}
       </h2>
 
-      {/* Subtitle (48px, black) - y:1762, gap from title = 49px */}
+      {/* Subtitle (48px, black) - y:349 relative to section */}
       <h3
         className="absolute font-josefin-sans font-semibold text-black"
         style={{
-          left: `${(157 / DESIGN_WIDTH) * 100}%`,
-          top: `${(415 / DESIGN_HEIGHT) * 100}%`,
+          left: `${(180 / DESIGN_WIDTH) * 100}%`,
+          top: `${(349 / DESIGN_HEIGHT) * 100}%`,
           fontSize: `${(48 / DESIGN_WIDTH) * 100}vw`,
           lineHeight: `${57 / 48}`,
         }}
@@ -220,12 +221,12 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
         ))}
       </h3>
 
-      {/* Description - y:1970, brand name (32px orange) + description (24px black) */}
+      {/* Description - y:526 relative to section */}
       <div
         className="absolute"
         style={{
-          left: `${(157 / DESIGN_WIDTH) * 100}%`,
-          top: `${(623 / DESIGN_HEIGHT) * 100}%`,
+          left: `${(180 / DESIGN_WIDTH) * 100}%`,
+          top: `${(526 / DESIGN_HEIGHT) * 100}%`,
           width: `${(581 / DESIGN_WIDTH) * 100}vw`,
         }}
       >
@@ -256,7 +257,7 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
       </div>
 
       {/* Right Side - Stacked Images */}
-      <div className="absolute right-0 top-0 h-full" style={{ width: `${(1100 / DESIGN_WIDTH) * 100}%` }}>
+      <div className="absolute inset-0 w-full h-full pointer-events-none">
         {/* All images - each tracks its own position and animates between positions */}
         {images.slice(0, 5).map((img, imageIndex) => {
           if (!img) return null
@@ -269,50 +270,67 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
           const pos = getPositionStyle(positionIndex)
 
           if (isMain) {
-            // Render as main card with white background
+            // Render as main card with white background and inner circle image
             return (
               <div
                 key={`img-${imageIndex}`}
-                className="absolute bg-white rounded-[30px] shadow-2xl transition-all duration-700 ease-in-out overflow-hidden"
+                className="absolute bg-white rounded-[30px] shadow-2xl transition-all duration-700 ease-in-out pointer-events-auto flex items-center justify-center overflow-hidden"
                 style={{
-                  left: `${(pos.x / 1100) * 100}%`,
+                  left: `${(pos.x / DESIGN_WIDTH) * 100}%`,
                   top: `${(pos.y / DESIGN_HEIGHT) * 100}%`,
                   width: `${(pos.w / DESIGN_WIDTH) * 100}vw`,
                   height: `${(pos.h / DESIGN_WIDTH) * 100}vw`,
-                  boxShadow: '0 4px 69px rgba(0, 0, 0, 0.25)',
+                  boxShadow: '0 4px 60px rgba(0, 0, 0, 0.25)',
                   zIndex: pos.zIndex,
+                }}
+              >
+                <div 
+                  className="relative rounded-full overflow-hidden border-2 border-white shadow-inner"
+                  style={{
+                    width: `${(pos.innerW / DESIGN_WIDTH) * 100}vw`,
+                    height: `${(pos.innerH / DESIGN_WIDTH) * 100}vw`,
+                  }}
+                >
+                  <OptimizedImage
+                    image={img}
+                    alt=""
+                    size="medium"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            )
+          }
+
+          // Render as background image card with white background and inner circle image
+          return (
+            <div
+              key={`img-${imageIndex}`}
+              className="absolute bg-white/90 rounded-[30px] cursor-pointer transition-all duration-700 ease-in-out hover:scale-105 pointer-events-auto flex items-center justify-center shadow-lg overflow-hidden"
+              style={{
+                left: `${(pos.x / DESIGN_WIDTH) * 100}%`,
+                top: `${(pos.y / DESIGN_HEIGHT) * 100}%`,
+                width: `${(pos.w / DESIGN_WIDTH) * 100}vw`,
+                height: `${(pos.h / DESIGN_WIDTH) * 100}vw`,
+                zIndex: pos.zIndex,
+                opacity: pos.opacity || 1,
+              }}
+              onClick={() => handleImageClick(positionIndex)}
+            >
+              <div 
+                className="relative rounded-full overflow-hidden shadow-md"
+                style={{
+                  width: `${(pos.innerW / DESIGN_WIDTH) * 100}vw`,
+                  height: `${(pos.innerH / DESIGN_WIDTH) * 100}vw`,
                 }}
               >
                 <OptimizedImage
                   image={img}
                   alt=""
-                  size="medium"
+                  size="small"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
-            )
-          }
-
-          // Render as background image
-          return (
-            <div
-              key={`img-${imageIndex}`}
-              className="absolute overflow-hidden rounded-2xl cursor-pointer transition-all duration-700 ease-in-out hover:scale-105"
-              style={{
-                left: `${(pos.x / 1100) * 100}%`,
-                top: `${(pos.y / DESIGN_HEIGHT) * 100}%`,
-                width: `${(pos.w / DESIGN_WIDTH) * 100}vw`,
-                height: `${(pos.h / DESIGN_WIDTH) * 100}vw`,
-                zIndex: pos.zIndex,
-              }}
-              onClick={() => handleImageClick(positionIndex)}
-            >
-              <OptimizedImage
-                image={img}
-                alt=""
-                size="small"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
             </div>
           )
         })}
@@ -320,9 +338,9 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
 
       {/* CTA Button - Get A Solution */}
       {ctaButton && (() => {
-        const circleSize = (104 / DESIGN_WIDTH) * 100
+        const circleSize = (70 / DESIGN_WIDTH) * 100
         const dotSize = (12 / DESIGN_WIDTH) * 100
-        const fontSize = (32 / DESIGN_WIDTH) * 100
+        const fontSize = (24 / DESIGN_WIDTH) * 100
         const dotGap = (8 / DESIGN_WIDTH) * 100 // 文字距离黄点的间距
         // 文字起始位置 = 圆心位置 + 黄点半径 + 间距 = circleSize/2 + dotSize/2 + dotGap
         const textMarginLeft = circleSize / 2 + dotSize / 2 + dotGap
@@ -330,10 +348,10 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
         return (
           <Link
             href={ctaButton.url}
-            className="absolute flex items-center group"
+            className="absolute flex items-center group pointer-events-auto"
             style={{
-              left: `${(1464 / DESIGN_WIDTH) * 100}%`,
-              top: `${(150 / DESIGN_HEIGHT) * 100}%`,
+              left: `${(1529 / DESIGN_WIDTH) * 100}%`,
+              top: `${(120 / DESIGN_HEIGHT) * 100}%`,
               zIndex: 20,
             }}
           >
@@ -405,6 +423,7 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
           </Link>
         )
       })()}
+
       </section>
     </>
   )
