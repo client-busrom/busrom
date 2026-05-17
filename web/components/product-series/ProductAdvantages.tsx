@@ -97,15 +97,20 @@ export function getSeriesColorConfig(seriesNameOrSlug?: string): SeriesColorConf
   const defaultCfg = SERIES_COLORS['bathroom glass clip']
   if (!seriesNameOrSlug) return defaultCfg
 
-  const normalized = seriesNameOrSlug.toLowerCase().replace(/-/g, ' ').trim()
+  // 终极匹配算法：剔除所有空格、连字符、下划线及 & 符号，只保留纯字母数字进行无缝比对
+  const cleanInput = seriesNameOrSlug.toLowerCase().replace(/[\s-_&]/g, '')
 
-  if (SERIES_COLORS[normalized]) {
-    return SERIES_COLORS[normalized]
+  for (const [key, config] of Object.entries(SERIES_COLORS)) {
+    const cleanKey = key.toLowerCase().replace(/[\s-_&]/g, '')
+    if (cleanInput === cleanKey) {
+      return config
+    }
   }
 
-  for (const key of Object.keys(SERIES_COLORS)) {
-    if (normalized.includes(key) || key.includes(normalized)) {
-      return SERIES_COLORS[key]
+  for (const [key, config] of Object.entries(SERIES_COLORS)) {
+    const cleanKey = key.toLowerCase().replace(/[\s-_&]/g, '')
+    if (cleanInput.includes(cleanKey) || cleanKey.includes(cleanInput)) {
+      return config
     }
   }
 
