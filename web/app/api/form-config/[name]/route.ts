@@ -26,15 +26,27 @@ export async function GET(
     // e.g. "main-form" (local) vs "home-page-main-inquiry-form" (production)
     let formConfig: any = null
 
-    // Pass 1: Exact match
-    const exactRes = await fetch(
-      `${CMS_URL}/api/form-configs?where[name][equals]=${encodeURIComponent(formName)}&where[status][equals]=published&locale=${locale}&depth=1`,
-      { next: { revalidate: 60 } }
-    )
-    if (exactRes.ok) {
-      const exactData = await exactRes.json()
-      if (exactData?.docs?.length > 0) {
-        formConfig = exactData.docs[0]
+    // Check if formName is a direct ID (mongo 24 hex, UUID, or numeric ID like "4")
+    const isId = /^[0-9a-fA-F]{24}$/.test(formName) || 
+                 /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(formName) ||
+                 /^\d+$/.test(formName);
+
+    if (isId) {
+      const idRes = await fetch(`${CMS_URL}/api/form-configs/${formName}?locale=${locale}&depth=1`, { next: { revalidate: 60 } });
+      if (idRes.ok) {
+        formConfig = await idRes.json();
+      }
+    } else {
+      // Pass 1: Exact match
+      const exactRes = await fetch(
+        `${CMS_URL}/api/form-configs?where[name][equals]=${encodeURIComponent(formName)}&where[status][equals]=published&locale=${locale}&depth=1`,
+        { next: { revalidate: 60 } }
+      )
+      if (exactRes.ok) {
+        const exactData = await exactRes.json()
+        if (exactData?.docs?.length > 0) {
+          formConfig = exactData.docs[0]
+        }
       }
     }
 

@@ -16,9 +16,10 @@ export async function GET(
     const locale = searchParams.get('locale') || 'en'
     const queryString = searchParams.toString()
 
-    // 1. Check if identifier is a mongo-like ID (24 hex chars) or UUID
+    // 1. Check if identifier is a mongo-like ID (24 hex chars), UUID, or numeric ID (e.g. "4")
     const isId = /^[0-9a-fA-F]{24}$/.test(identifier) || 
-                 /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(identifier);
+                 /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(identifier) ||
+                 /^\d+$/.test(identifier);
 
     let url = ''
     if (isId) {

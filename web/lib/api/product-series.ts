@@ -92,8 +92,83 @@ export async function getProductSeriesBySlug(slug: string, locale: string) {
         await Promise.all(blockPromises)
       }
 
-      // 3. Resolve all media (main content + reusable blocks)
+      // 3. Scan for formConfig IDs across main content and reusable blocks
+      const formConfigIds = new Set<string>()
+      const isFormMarker = (node: any) => {
+        if (node.type !== 'paragraph') return false;
+        const text = node.children?.map((c: any) => c.text).join('').trim().toLowerCase();
+        return text === 'contact-form-block';
+      };
+
+      const scanForForms = (nodes: any[]) => {
+        if (!nodes || !Array.isArray(nodes)) return;
+        nodes.forEach((node, idx) => {
+          if (isFormMarker(node)) {
+            for (let i = idx + 1; i < Math.min(idx + 5, nodes.length); i++) {
+              if (nodes[i].type === 'formBlock') {
+                const fid = nodes[i].data?.formConfig?.id || nodes[i].data?.formConfig;
+                if (fid) formConfigIds.add(String(fid));
+                break;
+              }
+            }
+          }
+          if (node.type === 'formBlock') {
+            const fid = node.data?.formConfig?.id || node.data?.formConfig;
+            if (fid) formConfigIds.add(String(fid));
+          }
+          if (node.children) scanForForms(node.children);
+        });
+      };
+
       const allContentToScan = [transformedSeries.contentTranslation, ...Object.values(reusableBlocks)]
+      allContentToScan.forEach(content => {
+        const rootNodes = content?.root?.children || content?.children || [];
+        scanForForms(rootNodes);
+      });
+
+      // 4. Fetch form configs in parallel
+      const formConfigsMap: Record<string, any> = {};
+      if (formConfigIds.size > 0) {
+        const formPromises = Array.from(formConfigIds).map(async (id) => {
+          try {
+            const res = await fetch(`${PAYLOAD_URL}/api/form-configs/${id}?depth=2&draft=false&locale=${locale}&trash=false`, { next: { revalidate: 3600 } });
+            if (res.ok) {
+              formConfigsMap[id] = await res.json();
+            }
+          } catch (e) {
+            console.error(`[ProductSeries API] Error fetching form config ${id}:`, e);
+          }
+        });
+        await Promise.all(formPromises);
+      }
+
+      // 5. Hydrate form configs in-place across all AST trees
+      const hydrateForms = (nodes: any[]) => {
+        if (!nodes || !Array.isArray(nodes)) return;
+        nodes.forEach((node, idx) => {
+          if (isFormMarker(node)) {
+            for (let i = idx + 1; i < Math.min(idx + 5, nodes.length); i++) {
+              if (nodes[i].type === 'formBlock') {
+                const fid = nodes[i].data?.formConfig?.id || nodes[i].data?.formConfig;
+                if (fid && formConfigsMap[fid]) nodes[i].data.formConfig = formConfigsMap[fid];
+                break;
+              }
+            }
+          }
+          if (node.type === 'formBlock') {
+            const fid = node.data?.formConfig?.id || node.data?.formConfig;
+            if (fid && formConfigsMap[fid]) node.data.formConfig = formConfigsMap[fid];
+          }
+          if (node.children) hydrateForms(node.children);
+        });
+      };
+
+      allContentToScan.forEach(content => {
+        const rootNodes = content?.root?.children || content?.children || [];
+        hydrateForms(rootNodes);
+      });
+
+      // 6. Resolve all media (main content + reusable blocks)
       const { mediaData } = await resolveAllMedia(allContentToScan, PAYLOAD_URL, normalize)
       
       return { ...transformedSeries, mediaData, reusableBlocks }

@@ -184,6 +184,20 @@ export interface CoreSellingPointsData {
   advantagesCategories: AdvantageCategory[]  // 4 categories with expandable cards
 }
 
+export interface ProductTechSpecsData {
+  title: string
+  titleImages: any[]
+  techSpecImages: any[]
+  techSpecTitle: string
+  techSpecItems: TechSpecItem[]
+}
+
+export interface ProductAdvantagesData {
+  advantagesTitle: string
+  advantagesImages: any[]
+  advantagesCategories: AdvantageCategory[]
+}
+
 export interface ApplicationsData {
   images: any[]  // Array of application images for carousel
 }
@@ -223,6 +237,8 @@ export interface ParsedProductSeriesContent {
   heroCarousel?: HeroCarouselData
   productOverview?: ProductOverviewData
   coreSellingPoints?: CoreSellingPointsData
+  productTechSpecs?: ProductTechSpecsData
+  productAdvantages?: ProductAdvantagesData
   applications?: ApplicationsData
   contactForm?: ContactFormData
   moreSeries?: MoreSeriesData
@@ -369,63 +385,140 @@ function parseProductOverview(
   const images: any[] = []
   let ctaButton: { text: string; url: string } | undefined
 
-  for (const node of nodes) {
-    // Parse heading (h1) - contains title with /n separator
-    // Format: "Line1/n Line2/n Line3/n Line4"
-    // First 2 lines = title (96px, olive green)
-    // Last 2 lines = subtitle (48px, black)
-    if (node.type === 'heading' && 'tag' in node && node.tag === 'h1') {
-      const fullTitle = extractText(node)
-      const allLines = fullTitle.split(/\n|\/n/).map(p => p.trim()).filter(Boolean)
+  let currentField: string | null = null
 
-      if (allLines.length >= 4) {
-        // 4+ lines: first 2 are title, rest are subtitle
-        titleLines = allLines.slice(0, 2)
-        subtitleLines = allLines.slice(2)
-      } else if (allLines.length === 3) {
-        // 3 lines: first 2 are title, last 1 is subtitle
-        titleLines = allLines.slice(0, 2)
-        subtitleLines = allLines.slice(2)
-      } else if (allLines.length === 2) {
-        // 2 lines: first is title, second is subtitle
-        titleLines = [allLines[0]]
-        subtitleLines = [allLines[1]]
-      } else {
-        // 1 line: all title
-        titleLines = allLines
+  for (const node of nodes) {
+    // 1. 检查显式标记 (Marker)
+    if (node.type === 'paragraph') {
+      const text = extractText(node).trim()
+      if (text === 'product-series-overview-title' ||
+          text === 'product-series-overview-description' ||
+          text === 'product-series-overview-image' ||
+          text === 'product-series-overview-cta') {
+        currentField = text
+        continue
       }
     }
 
-    // Parse paragraph - contains brand name (bold) and description
-    if (node.type === 'paragraph' && 'children' in node && Array.isArray(node.children)) {
-      for (const child of node.children) {
-        if (child.type === 'text') {
-          const textNode = child as LexicalTextNode
-          // format 1 = bold
-          if (textNode.format === 1) {
-            brandName = textNode.text
-          } else if (textNode.format === 0 && textNode.text.trim()) {
-            description = textNode.text
+    // 2. 根据 currentField 处理新版显式数据结构
+    if (currentField === 'product-series-overview-title') {
+      if (node.type === 'paragraph' || node.type === 'heading') {
+        const fullTitle = extractText(node)
+        const allLines = fullTitle.split(/\n|\/n/).map(p => p.trim()).filter(Boolean)
+
+        if (allLines.length >= 4) {
+          titleLines = allLines.slice(0, 2)
+          subtitleLines = allLines.slice(2)
+        } else if (allLines.length === 3) {
+          titleLines = allLines.slice(0, 2)
+          subtitleLines = allLines.slice(2)
+        } else if (allLines.length === 2) {
+          titleLines = [allLines[0]]
+          subtitleLines = [allLines[1]]
+        } else {
+          titleLines = allLines
+        }
+        currentField = null
+        continue
+      }
+    }
+
+    if (currentField === 'product-series-overview-description') {
+      if (node.type === 'paragraph' && 'children' in node && Array.isArray(node.children)) {
+        let descText = ''
+        for (const child of node.children) {
+          if (child.type === 'text') {
+            const textNode = child as LexicalTextNode
+            if (textNode.format === 1 && !brandName) {
+              brandName = textNode.text.trim()
+            } else {
+              descText += textNode.text
+            }
+          } else if (child.type === 'linebreak') {
+            descText += '\n'
           }
         }
+        description = descText.trim()
+        currentField = null
+        continue
       }
     }
 
-    // Parse image gallery
-    if (node.type === 'custom-image-gallery') {
-      const gallery = node as LexicalImageGalleryNode
-      for (const img of gallery.data.images) {
-        const url = mediaMap.get(img.image) || `/api/media/${img.image}`
-        images.push(url)
+    if (currentField === 'product-series-overview-image') {
+      if (node.type === 'custom-image-gallery') {
+        const gallery = node as LexicalImageGalleryNode
+        for (const img of gallery.data.images) {
+          const url = mediaMap.get(img.image) || `/api/media/${img.image}`
+          images.push(url)
+        }
+        currentField = null
+        continue
       }
     }
 
-    // Parse CTA button
-    if (node.type === 'ctaButton') {
-      const btn = node as LexicalCtaButtonNode
-      ctaButton = {
-        text: btn.data.text || 'Get A Solution',
-        url: btn.data.url || '#',
+    if (currentField === 'product-series-overview-cta') {
+      if (node.type === 'ctaButton') {
+        const btn = node as LexicalCtaButtonNode
+        ctaButton = {
+          text: btn.data.text || 'Get A Solution',
+          url: btn.data.url || '#',
+        }
+        currentField = null
+        continue
+      }
+    }
+
+    // 3. 极其强壮的向下兼容逻辑 (Fallback for Legacy Data Structure)
+    if (!currentField) {
+      if (node.type === 'heading' && 'tag' in node && node.tag === 'h1' && !titleLines.length) {
+        const fullTitle = extractText(node)
+        const allLines = fullTitle.split(/\n|\/n/).map(p => p.trim()).filter(Boolean)
+
+        if (allLines.length >= 4) {
+          titleLines = allLines.slice(0, 2)
+          subtitleLines = allLines.slice(2)
+        } else if (allLines.length === 3) {
+          titleLines = allLines.slice(0, 2)
+          subtitleLines = allLines.slice(2)
+        } else if (allLines.length === 2) {
+          titleLines = [allLines[0]]
+          subtitleLines = [allLines[1]]
+        } else {
+          titleLines = allLines
+        }
+      }
+
+      if (node.type === 'paragraph' && !brandName && !description && 'children' in node && Array.isArray(node.children)) {
+        let descText = ''
+        for (const child of node.children) {
+          if (child.type === 'text') {
+            const textNode = child as LexicalTextNode
+            if (textNode.format === 1 && !brandName) {
+              brandName = textNode.text.trim()
+            } else {
+              descText += textNode.text
+            }
+          } else if (child.type === 'linebreak') {
+            descText += '\n'
+          }
+        }
+        description = descText.trim()
+      }
+
+      if (node.type === 'custom-image-gallery' && !images.length) {
+        const gallery = node as LexicalImageGalleryNode
+        for (const img of gallery.data.images) {
+          const url = mediaMap.get(img.image) || `/api/media/${img.image}`
+          images.push(url)
+        }
+      }
+
+      if (node.type === 'ctaButton' && !ctaButton) {
+        const btn = node as LexicalCtaButtonNode
+        ctaButton = {
+          text: btn.data.text || 'Get A Solution',
+          url: btn.data.url || '#',
+        }
       }
     }
   }
@@ -507,7 +600,39 @@ export function parseContentTranslation(
   // Parse core-selling-points section
   const coreSellingPointsNodes = sections.get('core-selling-points')
   if (coreSellingPointsNodes) {
-    result.coreSellingPoints = parseCoreSellingPoints(coreSellingPointsNodes, mediaMap)
+    const parsed = parseCoreSellingPoints(coreSellingPointsNodes, mediaMap)
+    if (parsed) {
+      result.coreSellingPoints = parsed
+      if (parsed.title || parsed.titleImages.length || parsed.techSpecItems.length) {
+        result.productTechSpecs = {
+          title: parsed.title,
+          titleImages: parsed.titleImages,
+          techSpecImages: parsed.techSpecImages,
+          techSpecTitle: parsed.techSpecTitle,
+          techSpecItems: parsed.techSpecItems,
+        }
+      }
+      if (parsed.advantagesTitle || parsed.advantagesImages.length || parsed.advantagesCategories.length) {
+        result.productAdvantages = {
+          advantagesTitle: parsed.advantagesTitle,
+          advantagesImages: parsed.advantagesImages,
+          advantagesCategories: parsed.advantagesCategories,
+        }
+      }
+    }
+  }
+
+  // Parse product-advantages section (decoupled CMS structure)
+  const productAdvantagesNodes = sections.get('product-advantages')
+  if (productAdvantagesNodes) {
+    const parsed = parseCoreSellingPoints(productAdvantagesNodes, mediaMap)
+    if (parsed && (parsed.advantagesTitle || parsed.advantagesImages.length || parsed.advantagesCategories.length)) {
+      result.productAdvantages = {
+        advantagesTitle: parsed.advantagesTitle,
+        advantagesImages: parsed.advantagesImages,
+        advantagesCategories: parsed.advantagesCategories,
+      }
+    }
   }
 
   // Parse applications section
@@ -538,6 +663,35 @@ export function parseContentTranslation(
 }
 
 /**
+ * Helper to resolve image URL from gallery item supporting both direct media and application case studies
+ */
+function resolveGalleryImageUrl(img: any, mediaMap: Map<string, any>): string {
+  if (!img) return ''
+
+  // 1. Handle Application Source (Case Studies)
+  if (img.sourceType === 'application' && img.application) {
+    const appId = String(typeof img.application === 'object' ? img.application.id : img.application)
+    const mediaObj = mediaMap.get(appId)
+    if (mediaObj) {
+      if (typeof mediaObj === 'string') return mediaObj
+      if (typeof mediaObj === 'object' && mediaObj.url) return mediaObj.url
+    }
+  }
+
+  // 2. Handle Direct Image Source
+  const image = img.image || img.value
+  if (!image) return ''
+  const imageId = String(typeof image === 'object' ? image.id : image)
+  const mediaObj = mediaMap.get(imageId)
+  if (mediaObj) {
+    if (typeof mediaObj === 'string') return mediaObj
+    if (typeof mediaObj === 'object' && mediaObj.url) return mediaObj.url
+  }
+
+  return `/api/media/${imageId}`
+}
+
+/**
  * Parse core-selling-points section from content nodes
  */
 function parseCoreSellingPoints(
@@ -550,46 +704,79 @@ function parseCoreSellingPoints(
   let techSpecTitle = ''
   const techSpecKeys: string[] = []
   const techSpecValues: string[] = []
+  const techSpecItems: TechSpecItem[] = []
   let advantagesTitle = ''
   const advantagesImages: any[] = []
   const advantagesCategories: AdvantageCategory[] = []
 
   let currentField: string | null = null
+  let pendingSpecKey: string | null = null
 
   for (const node of nodes) {
-    // Check for field markers (code format text in paragraph)
-    if (node.type === 'paragraph') {
+    // Check for field markers (code format text in paragraph or quote)
+    if (node.type === 'paragraph' || node.type === 'quote') {
       const text = extractText(node).trim()
       if (text === 'title' || text === 'tech-spec-type' || text === 'product-advantages-and-features' ||
-          text === 'tech-spec-type-key' || text === 'tech-spec-type-value') {
+          text === 'tech-spec-type-key' || text === 'tech-spec-type-value' ||
+          text === 'core-selling-points-title' || text === 'core-selling-points-item' ||
+          text === 'core-selling-points-image' || text === 'core-selling-points-subtitle' ||
+          text === 'core-selling-points-spec' || text === 'product-advantages-title' ||
+          text === 'product-advantages-image' || text === 'product-advantages-item') {
         currentField = text
         continue
       }
     }
 
-    // Parse title area
-    if (currentField === 'title') {
-      // Parse heading for title text
-      if (node.type === 'heading') {
-        title = extractText(node)
+    // Parse title area (supports legacy 'title' and new 'core-selling-points-title')
+    if (currentField === 'title' || currentField === 'core-selling-points-title') {
+      if (node.type === 'heading' || node.type === 'paragraph') {
+        const text = extractText(node)
+        if (text.trim() && text.trim() !== currentField) {
+          title = text
+        }
       }
-      // Parse image gallery for draggable images
       if (node.type === 'custom-image-gallery') {
         const gallery = node as LexicalImageGalleryNode
         for (const img of gallery.data.images) {
-          const url = mediaMap.get(img.image) || `/api/media/${img.image}`
-          titleImages.push(url)
+          const url = resolveGalleryImageUrl(img, mediaMap)
+          if (url) titleImages.push(url)
         }
       }
     }
 
-    // Parse tech-spec-type area
+    // Parse draggable gallery item in new structure
+    if (currentField === 'core-selling-points-item' && node.type === 'custom-image-gallery') {
+      const gallery = node as LexicalImageGalleryNode
+      for (const img of gallery.data.images) {
+        const url = resolveGalleryImageUrl(img, mediaMap)
+        if (url) titleImages.push(url)
+      }
+    }
+
+    // Parse tech spec left side images in new structure
+    if (currentField === 'core-selling-points-image' && node.type === 'custom-image-gallery') {
+      const gallery = node as LexicalImageGalleryNode
+      for (const img of gallery.data.images) {
+        const url = resolveGalleryImageUrl(img, mediaMap)
+        if (url) techSpecImages.push(url)
+      }
+    }
+
+    // Parse tech spec title in new structure
+    if (currentField === 'core-selling-points-subtitle') {
+      if (node.type === 'paragraph' || node.type === 'heading') {
+        const text = extractText(node).trim()
+        if (text && text !== currentField) {
+          techSpecTitle = text
+        }
+      }
+    }
+
+    // Parse tech spec area (legacy)
     if (currentField === 'tech-spec-type') {
-      // Parse heading for tech spec title (e.g., "bathroom glass clip")
       if (node.type === 'heading') {
         techSpecTitle = extractText(node)
       }
-      // Parse image gallery for left side images
       if (node.type === 'custom-image-gallery') {
         const gallery = node as LexicalImageGalleryNode
         for (const img of gallery.data.images) {
@@ -599,144 +786,169 @@ function parseCoreSellingPoints(
       }
     }
 
-    // Parse tech-spec-type-key (ordered list of keys)
+    // Parse tech spec keys/values (legacy)
     if (currentField === 'tech-spec-type-key' && node.type === 'list') {
       const listNode = node as LexicalListNode
       techSpecKeys.push(...extractListItems(listNode))
     }
-
-    // Parse tech-spec-type-value (ordered list of values)
     if (currentField === 'tech-spec-type-value' && node.type === 'list') {
       const listNode = node as LexicalListNode
       techSpecValues.push(...extractListItems(listNode))
     }
 
-    // Parse product-advantages-and-features area
-    if (currentField === 'product-advantages-and-features') {
-      // Parse heading for advantages title
-      if (node.type === 'heading') {
-        advantagesTitle = extractText(node)
-      }
-      // Parse image gallery for category images
-      if (node.type === 'custom-image-gallery') {
-        const gallery = node as LexicalImageGalleryNode
-        for (const img of gallery.data.images) {
-          const url = mediaMap.get(img.image) || `/api/media/${img.image}`
-          advantagesImages.push(url)
-        }
-      }
-      // Parse list for categories - supports both ordered (ol) and unordered (ul) lists
-      //
-      // Structure 1: Ordered list with separate title and cards items
-      //   ol
-      //     1. Materials & Processes (category title - direct text, no nested ul)
-      //     2. (empty text, but contains ul with cards)
-      //     3. Safety Performance (category title)
-      //     4. (contains ul with cards)
-      //
-      // Structure 2: Nested list (ol or ul) where each item is a category with nested cards
-      //   ul/ol
-      //     - Materials & Processes (category title + nested ul with cards)
-      //         - Card Title 1
-      //           - Card Content 1
-      //         - Card Title 2
-      //           - Card Content 2
-      //     - Safety Performance (category title + nested ul with cards)
-      //         - Card Title
-      //           - Card Content
-      if (node.type === 'list') {
-        const listNode = node as LexicalListNode
+    // Parse tech spec list in new structure (nested ol list)
+    if (currentField === 'core-selling-points-spec' && node.type === 'list') {
+      const listNode = node as LexicalListNode
+      for (const listItem of listNode.children) {
+        if (listItem.type === 'listitem') {
+          const itemText = extractDirectText(listItem)
 
-        // Detect structure type by checking first few items
-        // Structure 1: alternating title/cards items (title has no nested list, next item has nested list)
-        // Structure 2: each item has both title text AND nested list
-        let isStructure2 = false
-        for (const listItem of listNode.children) {
-          if (listItem.type === 'listitem') {
-            const hasText = extractDirectText(listItem).length > 0
-            let hasNestedList = false
-            for (const child of listItem.children) {
-              if (child.type === 'list') {
-                hasNestedList = true
-                break
-              }
-            }
-            // If an item has BOTH text AND nested list, it's Structure 2
-            if (hasText && hasNestedList) {
-              isStructure2 = true
+          let nestedList: LexicalListNode | null = null
+          for (const child of listItem.children) {
+            if (child.type === 'list') {
+              nestedList = child as LexicalListNode
               break
             }
           }
+
+          if (itemText && !nestedList) {
+            if (pendingSpecKey) {
+              techSpecItems.push({ key: pendingSpecKey.replace(/[:：]$/, ''), value: '' })
+            }
+            pendingSpecKey = itemText
+          } else if (!itemText && nestedList) {
+            const valueItems = extractListItems(nestedList)
+            if (pendingSpecKey) {
+              techSpecItems.push({ key: pendingSpecKey.replace(/[:：]$/, ''), value: valueItems.join(' ') })
+              pendingSpecKey = null
+            }
+          } else if (itemText && nestedList) {
+            if (pendingSpecKey) {
+              techSpecItems.push({ key: pendingSpecKey.replace(/[:：]$/, ''), value: '' })
+            }
+            const valueItems = extractListItems(nestedList)
+            techSpecItems.push({ key: itemText.replace(/[:：]$/, ''), value: valueItems.join(' ') })
+            pendingSpecKey = null
+          }
         }
+      }
+      if (pendingSpecKey) {
+        techSpecItems.push({ key: pendingSpecKey.replace(/[:：]$/, ''), value: '' })
+        pendingSpecKey = null
+      }
+    }
 
-        if (isStructure2) {
-          // Structure 2: Each listitem is a category (title + nested cards)
-          for (const listItem of listNode.children) {
-            if (listItem.type === 'listitem') {
-              const categoryTitle = extractDirectText(listItem)
-              const category: AdvantageCategory = { title: categoryTitle, cards: [] }
+    // Parse advantages title in new structure
+    if (currentField === 'product-advantages-title') {
+      if (node.type === 'paragraph' || node.type === 'heading') {
+        const text = extractText(node)
+        if (text.trim() && text.trim() !== currentField) {
+          advantagesTitle = text
+        }
+      }
+    }
 
-              // Find nested list containing cards
-              for (const child of listItem.children) {
-                if (child.type === 'list') {
-                  const cards = parseCardsFromList(child as LexicalListNode)
-                  category.cards.push(...cards)
-                  break
-                }
-              }
+    // Parse advantages category images in new structure
+    if (currentField === 'product-advantages-image' && node.type === 'custom-image-gallery') {
+      const gallery = node as LexicalImageGalleryNode
+      for (const img of gallery.data.images) {
+        const url = resolveGalleryImageUrl(img, mediaMap)
+        if (url) advantagesImages.push(url)
+      }
+    }
 
-              if (categoryTitle) {
-                advantagesCategories.push(category)
-              }
+    // Parse advantages area (legacy)
+    if (currentField === 'product-advantages-and-features') {
+      if (node.type === 'heading') {
+        advantagesTitle = extractText(node)
+      }
+      if (node.type === 'custom-image-gallery') {
+        const gallery = node as LexicalImageGalleryNode
+        for (const img of gallery.data.images) {
+          const url = resolveGalleryImageUrl(img, mediaMap)
+          if (url) advantagesImages.push(url)
+        }
+      }
+    }
+
+    // Parse advantages categories list (supports legacy and new 'product-advantages-item')
+    if ((currentField === 'product-advantages-and-features' || currentField === 'product-advantages-item') && node.type === 'list') {
+      const listNode = node as LexicalListNode
+
+      let isStructure2 = false
+      for (const listItem of listNode.children) {
+        if (listItem.type === 'listitem') {
+          const hasText = extractDirectText(listItem).length > 0
+          let hasNestedList = false
+          for (const child of listItem.children) {
+            if (child.type === 'list') {
+              hasNestedList = true
+              break
             }
           }
-        } else {
-          // Structure 1: Alternating title/cards items
-          let currentCategory: AdvantageCategory | null = null
-
-          for (const listItem of listNode.children) {
-            if (listItem.type === 'listitem') {
-              const itemTitle = extractDirectText(listItem)
-
-              // Check if this item has a nested bullet list (contains cards)
-              let nestedList: LexicalListNode | null = null
-              for (const child of listItem.children) {
-                if (child.type === 'list') {
-                  nestedList = child as LexicalListNode
-                  break
-                }
-              }
-
-              if (nestedList) {
-                // This listitem contains cards in a nested list
-                const cards = parseCardsFromList(nestedList)
-                if (currentCategory) {
-                  currentCategory.cards.push(...cards)
-                }
-              } else if (itemTitle) {
-                // This is a category title (has text, no nested list)
-                // Save previous category if exists
-                if (currentCategory) {
-                  advantagesCategories.push(currentCategory)
-                }
-                // Start new category
-                currentCategory = { title: itemTitle, cards: [] }
-              }
-            }
-          }
-
-          // Don't forget to save the last category
-          if (currentCategory) {
-            advantagesCategories.push(currentCategory)
+          if (hasText && hasNestedList) {
+            isStructure2 = true
+            break
           }
         }
       }
 
+      if (isStructure2) {
+        for (const listItem of listNode.children) {
+          if (listItem.type === 'listitem') {
+            const categoryTitle = extractDirectText(listItem)
+            const category: AdvantageCategory = { title: categoryTitle, cards: [] }
+
+            for (const child of listItem.children) {
+              if (child.type === 'list') {
+                const cards = parseCardsFromList(child as LexicalListNode)
+                category.cards.push(...cards)
+                break
+              }
+            }
+
+            if (categoryTitle) {
+              advantagesCategories.push(category)
+            }
+          }
+        }
+      } else {
+        let currentCategory: AdvantageCategory | null = null
+
+        for (const listItem of listNode.children) {
+          if (listItem.type === 'listitem') {
+            const itemTitle = extractDirectText(listItem)
+
+            let nestedList: LexicalListNode | null = null
+            for (const child of listItem.children) {
+              if (child.type === 'list') {
+                nestedList = child as LexicalListNode
+                break
+              }
+            }
+
+            if (nestedList) {
+              const cards = parseCardsFromList(nestedList)
+              if (currentCategory) {
+                currentCategory.cards.push(...cards)
+              }
+            } else if (itemTitle) {
+              if (currentCategory) {
+                advantagesCategories.push(currentCategory)
+              }
+              currentCategory = { title: itemTitle, cards: [] }
+            }
+          }
+        }
+
+        if (currentCategory) {
+          advantagesCategories.push(currentCategory)
+        }
+      }
     }
   }
 
-  // Build tech spec items from keys and values
-  const techSpecItems: TechSpecItem[] = []
+  // Build legacy tech spec items if present
   for (let i = 0; i < Math.max(techSpecKeys.length, techSpecValues.length); i++) {
     techSpecItems.push({
       key: techSpecKeys[i] || '',
@@ -744,7 +956,7 @@ function parseCoreSellingPoints(
     })
   }
 
-  if (!title && !titleImages.length && !techSpecItems.length) return undefined
+  if (!title && !titleImages.length && !techSpecItems.length && !advantagesCategories.length) return undefined
 
   return {
     title,

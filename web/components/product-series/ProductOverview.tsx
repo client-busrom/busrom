@@ -193,9 +193,9 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
           </h3>
 
           {/* Description */}
-          <p className="font-josefin-sans text-base leading-relaxed mb-8">
-            <span className="text-[#FFAA2B] font-bold text-lg">{brandName}</span>
-            <span className="text-black">{description}</span>
+          <p className="font-josefin-sans text-base leading-relaxed mb-8 max-w-xl">
+            <span className="text-[#FFAA2B] font-bold text-lg mr-1">{brandName}</span>
+            <span className="text-black whitespace-pre-line">{description}</span>
           </p>
 
           {/* CTA Button - Mobile */}
@@ -272,6 +272,8 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
           left: `${(180 / DESIGN_WIDTH) * 100}%`,
           top: `${(526 / DESIGN_HEIGHT) * 100}%`,
           width: `${(581 / DESIGN_WIDTH) * 100}vw`,
+          maxWidth: '581px',
+          minWidth: '460px',
         }}
       >
         <p
@@ -281,7 +283,7 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
           }}
         >
           <span
-            className="text-[#FFAA2B] font-bold"
+            className="text-[#FFAA2B] font-bold mr-2"
             style={{
               fontSize: `${(32 / DESIGN_WIDTH) * 100}vw`,
               lineHeight: `${32 / 32}`,
@@ -290,7 +292,7 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
             {brandName}
           </span>
           <span
-            className="text-black font-normal"
+            className="text-black font-normal whitespace-pre-line"
             style={{
               fontSize: `${(24 / DESIGN_WIDTH) * 100}vw`,
             }}

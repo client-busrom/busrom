@@ -5,7 +5,8 @@ import type { Locale } from "@/i18n.config"
 import { parseContentTranslation, type ParsedProductSeriesContent } from "@/lib/content-parser"
 import { HeroCarousel } from "@/components/product-series/HeroCarousel"
 import { ProductOverview } from "@/components/product-series/ProductOverview"
-import { CoreSellingPoints } from "@/components/product-series/CoreSellingPoints"
+import { ProductTechSpecs } from "@/components/product-series/ProductTechSpecs"
+import { ProductAdvantages } from "@/components/product-series/ProductAdvantages"
 import { Applications } from "@/components/product-series/Applications"
 import { ContactForm } from "@/components/product-series/ContactForm"
 import { MoreSeries } from "@/components/product-series/MoreSeries"
@@ -128,6 +129,8 @@ export function ProductSeriesDetailClient({ locale, slug, initialData }: Product
   const hasContent = parsedContent.heroCarousel ||
     parsedContent.productOverview ||
     parsedContent.coreSellingPoints ||
+    parsedContent.productTechSpecs ||
+    parsedContent.productAdvantages ||
     parsedContent.applications ||
     parsedContent.contactForm ||
     parsedContent.moreSeries ||
@@ -171,9 +174,14 @@ export function ProductSeriesDetailClient({ locale, slug, initialData }: Product
         <ProductOverview data={parsedContent.productOverview} />
       )}
 
-      {/* Core Selling Points Section */}
-      {parsedContent.coreSellingPoints && (
-        <CoreSellingPoints data={parsedContent.coreSellingPoints} />
+      {/* Product Tech Specs Section (First Screen) */}
+      {parsedContent.productTechSpecs && (
+        <ProductTechSpecs data={parsedContent.productTechSpecs} />
+      )}
+
+      {/* Product Advantages Section (Second Screen) */}
+      {parsedContent.productAdvantages && (
+        <ProductAdvantages data={parsedContent.productAdvantages} />
       )}
 
       {/* Applications Section */}

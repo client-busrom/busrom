@@ -119,7 +119,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
     if (formId && !data.formConfig) {
       const fetchFormConfig = async () => {
         try {
-          // Use formId directly for the request
+          // Use form-config API directly for the request to support slug lookup properly
           const res = await fetch(
             `/api/form-configs/${formId}?locale=${locale}`,
           );
@@ -138,9 +138,23 @@ export function ContactForm({ data, className }: ContactFormProps) {
   // Form config: prioritize full config from data, otherwise use fetched config
   const formConfig = (data.formConfig && data.formConfig.fields) ? data.formConfig : (fetchedFormConfig || data.formConfig);
 
+  // Safely extract localized string or valid Lexical AST from multilingual map or raw text
+  const getLocalizedString = React.useCallback((val: any) => {
+    if (!val) return "";
+    if (typeof val === "string") return val;
+    if (typeof val === "object") {
+      // Check if it's a Lexical rich text object (has root property)
+      if (val.root) return val;
+      // Otherwise it's a multilingual map { en: '...', zh: '...' }
+      return val[locale] || val["en"] || "";
+    }
+    return "";
+  }, [locale]);
+
   const privacyText = React.useMemo(() => {
-    return data.privacyConsentText || formConfig?.privacyConsentText || "";
-  }, [data.privacyConsentText, formConfig?.privacyConsentText]);
+    const rawPrivacy = data.privacyConsentText || formConfig?.privacyConsentText || formConfig?.data?.privacyConsentText || "";
+    return getLocalizedString(rawPrivacy);
+  }, [data.privacyConsentText, formConfig, getLocalizedString]);
 
   const getFieldConfig = (fieldName: string) => {
     return formConfig?.fields?.find((f: any) => f.fieldName === fieldName);
@@ -490,7 +504,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
           <OptimizedImage
             image={backgroundImage}
             alt=""
-            size="xlarge"
+            size="large"
             className="w-full h-full object-cover"
             containerClassName="w-full h-full"
           />
@@ -540,7 +554,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
         <span className="relative text-shine">{title}</span>
       </h2>
 
-      {/* Product Images - Hidden on Mobile to save space, or moved if needed */}
+      {/* Product Images - Hidden on Mobile to save space, perfectly aligned and downward adjusted on Desktop */}
       {!isMobile && (
         <>
           {/* Left Tilted Product Image 1 */}
@@ -548,12 +562,12 @@ export function ContactForm({ data, className }: ContactFormProps) {
             <div
               className="absolute overflow-hidden"
               style={{
-                left: px(147 - SECTION_X_OFFSET),
-                top: vw(232.5),
+                left: vw(147 - SECTION_X_OFFSET), // Use vw() to match translate/width units perfectly
+                top: vw(275), // Adjusted downward by 42.5px
                 width: vw(306),
-                height: vw(399),
+                height: vw(405), // Standardized height for perfect fold stacking
                 transform: isFolded
-                  ? `translate(${(131.5 / DESIGN_WIDTH) * 100}vw, ${(-18 / DESIGN_WIDTH) * 100}vw) rotate(6deg)`
+                  ? `translate(${vw(131.5)}, ${vw(-21.5)}) rotate(6deg)`
                   : "translate(0, 0) rotate(-3.23deg)",
                 transformOrigin: "center center",
                 borderRadius: vw(30),
@@ -564,7 +578,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
               <OptimizedImage
                 image={currentImages[0]}
                 alt=""
-                size="thumbnail"
+                size="large" // Upgraded clarity
                 className="absolute inset-0 w-full h-full object-cover"
               />
               <div
@@ -584,12 +598,12 @@ export function ContactForm({ data, className }: ContactFormProps) {
             <div
               className="absolute overflow-hidden"
               style={{
-                left: px(410 - SECTION_X_OFFSET),
-                top: vw(190.2),
+                left: vw(410 - SECTION_X_OFFSET), // Use vw() to match translate/width units perfectly
+                top: vw(232), // Adjusted downward by 41.8px
                 width: vw(306),
-                height: vw(411),
+                height: vw(405), // Standardized height for perfect fold stacking
                 transform: isFolded
-                  ? `translate(${(-131.5 / DESIGN_WIDTH) * 100}vw, ${(18 / DESIGN_WIDTH) * 100}vw) rotate(6deg)`
+                  ? `translate(${vw(-131.5)}, ${vw(21.5)}) rotate(6deg)`
                   : "translate(0, 0) rotate(15.15deg)",
                 transformOrigin: "center center",
                 borderRadius: vw(30),
@@ -600,7 +614,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
               <OptimizedImage
                 image={currentImages[1]}
                 alt=""
-                size="thumbnail"
+                size="large" // Upgraded clarity
                 className="absolute inset-0 w-full h-full object-cover"
               />
               <div
