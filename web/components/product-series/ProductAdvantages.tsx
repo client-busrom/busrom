@@ -211,10 +211,13 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
               fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
               lineHeight: `${101 / 96}`,
               color: colorCfg.dark,
+              willChange: "transform",
+              WebkitBackfaceVisibility: "hidden",
+              backfaceVisibility: "hidden",
             }}
-            initial={{ y: 0 }}
-            animate={{ y: [0, -15, 0] }}
-            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            initial={{ y: 0, z: 0 }}
+            animate={{ y: [0, -15, 0], z: 0 }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           >
             {advantagesTitle}
           </motion.h3>
@@ -222,28 +225,35 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
           {/* Advantages Main Image (overlaps title) */}
           {currentImage && (
             <motion.div
-              className="absolute overflow-hidden"
+              className="absolute overflow-hidden shadow-2xl"
               style={{
                 left: `${(468 / DESIGN_WIDTH) * 100}%`,
                 top: `${(150 / DESIGN_HEIGHT) * 100}%`,
                 width: `${(518 / DESIGN_WIDTH) * 100}vw`,
                 height: `${(605 / DESIGN_WIDTH) * 100}vw`,
                 borderRadius: `${(60 / DESIGN_WIDTH) * 100}vw`,
+                willChange: "transform",
+                WebkitBackfaceVisibility: "hidden",
+                backfaceVisibility: "hidden",
+                WebkitTransformStyle: "preserve-3d",
+                transformStyle: "preserve-3d",
               }}
-              initial={{ y: 0 }}
-              animate={{ y: [0, -15, 0] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              initial={{ y: 0, z: 0 }}
+              animate={{ y: [0, -15, 0], z: 0 }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             >
               <OptimizedImage image={currentImage} alt="" size="medium" className="absolute inset-0 w-full h-full object-cover" />
               {/* White title overlay on image */}
               <div
-                className="absolute font-josefin-sans font-bold text-white"
+                className="absolute font-josefin-sans font-bold text-white pointer-events-none"
                 style={{
                   left: `${((153 - 468) / 518) * 100}%`,
                   top: `${((221 - 150) / 605) * 100}%`,
                   width: `${(717 / 518) * 100}%`,
                   fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
                   lineHeight: `${101 / 96}`,
+                  WebkitBackfaceVisibility: "hidden",
+                  backfaceVisibility: "hidden",
                 }}
               >
                 {advantagesTitle}

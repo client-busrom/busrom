@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n.config"
 import { parseContentTranslation, type ParsedProductSeriesContent } from "@/lib/content-parser"
 import { HeroCarousel } from "@/components/product-series/HeroCarousel"
 import { ProductOverview } from "@/components/product-series/ProductOverview"
-import { ProductTechSpecs } from "@/components/product-series/ProductTechSpecs"
+import { ProductTechSpecs, SERIES_COLORS, getSeriesColorConfig } from "@/components/product-series/ProductTechSpecs"
 import { ProductAdvantages } from "@/components/product-series/ProductAdvantages"
 import { Applications } from "@/components/product-series/Applications"
 import { ContactForm } from "@/components/product-series/ContactForm"
@@ -38,6 +38,23 @@ export function ProductSeriesDetailClient({ locale, slug, initialData }: Product
   const [seriesData, setSeriesData] = useState<ProductSeriesData | null>(initialData || null)
   const [loading, setLoading] = useState(!initialData)
   const [error, setError] = useState<string | null>(null)
+
+  // Manage active color key for demo/testing toggle
+  const [activeColorKey, setActiveColorKey] = useState<string>("")
+
+  // Get current active color config for displaying on the button
+  const currentColorConfig = useMemo(() => {
+    return getSeriesColorConfig(activeColorKey || seriesData?.name || slug)
+  }, [activeColorKey, seriesData?.name, slug])
+
+  // Handler to cycle through all available series colors
+  const toggleSeriesColor = () => {
+    const keys = Object.keys(SERIES_COLORS)
+    const matchEntry = Object.entries(SERIES_COLORS).find(([k, v]) => v.name === currentColorConfig.name)
+    const currentIndex = matchEntry ? keys.indexOf(matchEntry[0]) : 0
+    const nextIndex = (currentIndex + 1) % keys.length
+    setActiveColorKey(keys[nextIndex])
+  }
 
   useEffect(() => {
     if (initialData) return
@@ -176,12 +193,12 @@ export function ProductSeriesDetailClient({ locale, slug, initialData }: Product
 
       {/* Product Tech Specs Section (First Screen) */}
       {parsedContent.productTechSpecs && (
-        <ProductTechSpecs data={parsedContent.productTechSpecs} seriesName={seriesData.name} currentSlug={slug} />
+        <ProductTechSpecs data={parsedContent.productTechSpecs} seriesName={activeColorKey || seriesData.name} currentSlug={slug} />
       )}
 
       {/* Product Advantages Section (Second Screen) */}
       {parsedContent.productAdvantages && (
-        <ProductAdvantages data={parsedContent.productAdvantages} seriesName={seriesData.name} currentSlug={slug} />
+        <ProductAdvantages data={parsedContent.productAdvantages} seriesName={activeColorKey || seriesData.name} currentSlug={slug} />
       )}
 
       {/* Applications Section */}
@@ -203,6 +220,19 @@ export function ProductSeriesDetailClient({ locale, slug, initialData }: Product
       {parsedContent.quote && (
         <Quote data={parsedContent.quote} />
       )}
+
+      {/* Premium Floating Color Toggle Button */}
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-white/90 backdrop-blur-md p-2 rounded-full shadow-2xl border border-black/10 transition-all duration-300 hover:scale-105">
+        <button
+          onClick={toggleSeriesColor}
+          className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-inter font-bold transition-all duration-300 text-white shadow-md active:scale-95"
+          style={{ backgroundColor: currentColorConfig.rgb }}
+          title="点击切换系列渐变主题色"
+        >
+          <span className="flex w-4 h-4 rounded-full border border-white/50 shadow-inner" style={{ backgroundColor: currentColorConfig.dark }} />
+          <span>🎨 配色切换: {currentColorConfig.name} ({currentColorConfig.rgb.toUpperCase()})</span>
+        </button>
+      </div>
 
     </div>
   )

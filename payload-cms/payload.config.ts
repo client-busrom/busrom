@@ -643,6 +643,26 @@ export default buildConfig({
                   return null as any
                 }
 
+                // 🔧 关键修复：验证 user 字段的合法性
+                // 审计日志集合的 user 字段是 relationship（relationTo: 'users', required: true）
+                // 在 Payload 的 duplicate 操作中，req.user 可能结构异常，导致审计插件
+                // 将 user 设置为 'anonymous' 字符串。'anonymous' 无法通过 relationship
+                // 字段验证 → payload.create() 失败 → 整个事务回滚 → 文档"未找到"
+                const userId = data.user;
+                if (!userId || userId === 'anonymous' || (typeof userId === 'string' && isNaN(Number(userId)))) {
+                  // 尝试从 req.user 中恢复有效的用户 ID
+                  const fallbackUserId = req?.user?.id;
+                  if (fallbackUserId && typeof fallbackUserId === 'number') {
+                    data.user = fallbackUserId;
+                  } else if (fallbackUserId && !isNaN(Number(fallbackUserId))) {
+                    data.user = Number(fallbackUserId);
+                  } else {
+                    // 无法获取有效用户 ID，跳过此条审计日志以防止事务回滚
+                    console.warn(`⚠️ [Auditor] Skipping log for ${operation} on ${collectionSlug} (ID: ${docId}) - no valid user ID available`);
+                    return null as any;
+                  }
+                }
+
                 // 只有在非翻译状态下才记录日志
                 console.log(`✅ [Auditor] Recorded ${operation} on ${collectionSlug} (ID: ${docId}) by ${req?.user?.email || 'Admin'}`)
                 return data

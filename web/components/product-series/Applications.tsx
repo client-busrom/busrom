@@ -195,7 +195,7 @@ export function Applications({ data, className }: ApplicationsProps) {
                 return (
                   <div
                     key={`desktop-slide-${index}`}
-                    className="relative flex-shrink-0 overflow-hidden bg-[#D9D9D9] group transition-all duration-300 hover:shadow-lg hover:shadow-black/40"
+                    className="relative flex-shrink-0 overflow-hidden bg-[#D9D9D9] group transition-shadow duration-300 hover:shadow-lg hover:shadow-black/40"
                     style={{
                       width: `${cardWidthVw}vw`,
                       height: `${(style.height / DESIGN_WIDTH) * 100}vw`,
