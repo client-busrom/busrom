@@ -29,6 +29,10 @@ export interface FooterApiData {
     url: string;
   }>;
   copyrightText?: string;
+  legalLinks?: Array<{
+    label: string;
+    url: string;
+  }>;
 }
 
 export interface FormConfig {

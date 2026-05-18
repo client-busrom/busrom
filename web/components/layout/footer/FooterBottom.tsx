@@ -1,3 +1,4 @@
+import React from "react";
 import Image from "next/image";
 import SocialIcon from "./SocialIcon";
 import { FooterApiData } from "./types";
@@ -14,53 +15,51 @@ export default function FooterBottom({ footerData, siteLogoUrl, centered = false
   if (centered) {
     // 首页版本：垂直居中结构
     return (
-      <div className="relative text-center text-white/80 text-sm mb-8 pt-8">
-        © {currentYear} Busrom. All rights reserved.
+      <div className="relative text-center text-white/80 text-sm mb-8 pt-8 font-anaheim flex flex-wrap justify-center items-center gap-x-3 leading-[1.8]">
+        <span>{footerData?.copyrightText ? footerData.copyrightText : `© ${currentYear} Busrom. All rights reserved.`}</span>
+        {footerData?.legalLinks && footerData.legalLinks.length > 0 && (
+          <>
+            <span className="text-white/40">•</span>
+            {footerData.legalLinks.map((link: any, idx: number) => (
+              <React.Fragment key={idx}>
+                {idx > 0 && <span className="text-white/40">•</span>}
+                <a href={link.url} target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-brand-primary transition-colors">
+                  {link.label}
+                </a>
+              </React.Fragment>
+            ))}
+          </>
+        )}
       </div>
     );
   }
 
-  // 普通页版本：Logo + 版权（居中） | 社交媒体链接（右侧）
+  // 普通页版本：Logo + 版权（上下结构，居中）
   return (
-    <div className="pt-16 flex flex-col md:flex-row justify-between items-center gap-4">
-      {/* 左侧占位 - 保持社交链接右对齐 */}
-      <div className="hidden md:block md:flex-1"></div>
-
-      {/* 中间：Logo + 版权（上下结构，居中） */}
-      <div className="flex flex-col items-center gap-[20px]">
-        <Image
-          src={siteLogoUrl || "/Busrom1.svg"}
-          alt="Busrom Logo"
-          width={60}
-          height={18}
-          className="object-contain"
-          style={{ width: "auto", height: "auto" }}
-          unoptimized={!!siteLogoUrl}
-        />
-        {footerData?.copyrightText && (
-          <span className="text-brand-text-inverse/60 text-sm font-anaheim">
-            {footerData.copyrightText}
-          </span>
-        )}
-      </div>
-
-      {/* 右侧：社交媒体链接 */}
-      <div className="md:flex-1 flex justify-end">
-        {footerData?.socialLinks && footerData.socialLinks.length > 0 && (
-          <div className="flex items-center gap-4">
-            {footerData.socialLinks.map((social, index) => (
-              <a
-                key={index}
-                href={social.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-brand-text-inverse/70 hover:text-brand-primary transition-colors"
-                title={social.platform}
-              >
-                <SocialIcon platform={social.platform} />
-              </a>
+    <div className="pt-16 flex flex-col items-center gap-[20px]">
+      <Image
+        src={siteLogoUrl || "/Busrom1.svg"}
+        alt="Busrom Logo"
+        width={60}
+        height={18}
+        className="object-contain"
+        style={{ width: "auto", height: "auto" }}
+        unoptimized={!!siteLogoUrl}
+      />
+      <div className="text-brand-text-inverse/60 text-sm font-anaheim flex flex-wrap justify-center items-center gap-x-3 leading-[1.8]">
+        {footerData?.copyrightText && <span>{footerData.copyrightText}</span>}
+        {footerData?.legalLinks && footerData.legalLinks.length > 0 && (
+          <>
+            {footerData?.copyrightText && <span className="text-brand-text-inverse/40">•</span>}
+            {footerData.legalLinks.map((link: any, idx: number) => (
+              <React.Fragment key={idx}>
+                {idx > 0 && <span className="text-brand-text-inverse/40">•</span>}
+                <a href={link.url} target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-brand-primary transition-colors">
+                  {link.label}
+                </a>
+              </React.Fragment>
             ))}
-          </div>
+          </>
         )}
       </div>
     </div>

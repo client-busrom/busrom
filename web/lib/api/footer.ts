@@ -11,18 +11,24 @@ const getCmsUrl = () => {
 export async function getFooterData(locale: string = 'en') {
   const CMS_URL = getCmsUrl();
   try {
-    const response = await fetch(
-      `${CMS_URL}/api/globals/footer?locale=${locale}&depth=2`,
-      {
+    const [footerRes, socialRes] = await Promise.all([
+      fetch(`${CMS_URL}/api/globals/footer?locale=${locale}&depth=2`, {
         headers: {
           'Content-Type': 'application/json',
         },
         next: { revalidate: 3600 },
-      }
-    );
+      }),
+      fetch(`${CMS_URL}/api/globals/social-config?locale=${locale}&depth=2`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        next: { revalidate: 3600 },
+      }),
+    ]);
 
-    if (!response.ok) return null;
-    const data = await response.json();
+    if (!footerRes.ok) return null;
+    const data = await footerRes.json();
+    const socialData = socialRes.ok ? await socialRes.json() : { socialLinks: [] };
 
     return {
       formConfigName: data.formConfig?.name || 'footer-form',
@@ -57,11 +63,15 @@ export async function getFooterData(locale: string = 'en') {
           link: link,
         };
       }),
-      socialLinks: (data.socialLinks || []).map((social: any) => ({
+      socialLinks: (socialData.socialLinks || []).map((social: any) => ({
         platform: social.platform,
         url: social.url,
       })),
       copyrightText: data.copyrightText,
+      legalLinks: (data.legalLinks || []).map((link: any) => ({
+        label: link.label,
+        url: link.url,
+      })),
     };
   } catch (error) {
     console.error('[Footer API Helper] Error:', error);

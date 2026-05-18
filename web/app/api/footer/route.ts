@@ -7,23 +7,29 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const locale = searchParams.get('locale') || 'en';
 
-    // 从 Payload CMS 获取 footer global
-    const response = await fetch(
-      `${CMS_URL}/api/globals/footer?locale=${locale}&depth=2`,
-      {
+    // 从 Payload CMS 获取 footer global 和 social-config global
+    const [footerRes, socialRes] = await Promise.all([
+      fetch(`${CMS_URL}/api/globals/footer?locale=${locale}&depth=2`, {
         headers: {
           'Content-Type': 'application/json',
         },
         next: { revalidate: 60 },
-      }
-    );
+      }),
+      fetch(`${CMS_URL}/api/globals/social-config?locale=${locale}&depth=2`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        next: { revalidate: 60 },
+      }),
+    ]);
 
-    if (!response.ok) {
-      console.error('[Footer API] CMS error:', response.status);
-      return NextResponse.json({ error: 'Failed to fetch footer data' }, { status: response.status });
+    if (!footerRes.ok) {
+      console.error('[Footer API] CMS error:', footerRes.status);
+      return NextResponse.json({ error: 'Failed to fetch footer data' }, { status: footerRes.status });
     }
 
-    const data = await response.json();
+    const data = await footerRes.json();
+    const socialData = socialRes.ok ? await socialRes.json() : { socialLinks: [] };
 
     // 转换数据格式
     const footerData = {
@@ -61,11 +67,15 @@ export async function GET(request: NextRequest) {
           link: link,
         }
       }),
-      socialLinks: (data.socialLinks || []).map((social: any) => ({
+      socialLinks: (socialData.socialLinks || []).map((social: any) => ({
         platform: social.platform,
         url: social.url,
       })),
       copyrightText: data.copyrightText,
+      legalLinks: (data.legalLinks || []).map((link: any) => ({
+        label: link.label,
+        url: link.url,
+      })),
     };
 
     return NextResponse.json(footerData);

@@ -17,7 +17,7 @@ export default function FooterSimple({
 }: Props) {
   return (
     <footer
-      className="relative bg-brand-secondary text-brand-text-inverse pt-12 pb-[40px]"
+      className="relative bg-brand-secondary text-brand-text-inverse pt-12 pb-[1vw]"
       data-header-theme="dark"
     >
       <div className="container mx-auto px-8">
@@ -34,7 +34,7 @@ export default function FooterSimple({
                 style={{ height: "auto" }}
               />
             </div>
-            <ul className="space-y-2 text-sm font-anaheim">
+            <ul className="text-sm font-anaheim space-y-0" style={{ lineHeight: 1.8 }}>
               {footerData.contact.email && (
                 <li>
                   {footerData.contact.emailLabel && (
@@ -90,18 +90,28 @@ export default function FooterSimple({
                   {footerData.contact.address}
                 </li>
               )}
+              {footerData.contact.workingHours && (
+                <li>
+                  {footerData.contact.workingHoursLabel && (
+                    <span className="font-semibold">
+                      {footerData.contact.workingHoursLabel}{" "}
+                    </span>
+                  )}
+                  {footerData.contact.workingHours}
+                </li>
+              )}
             </ul>
           </div>
 
           {/* 右侧：Official Notice */}
           <div className="pl-4">
-            <h4 className="font-bold text-lg leading-loose font-anaheim">
+            <h4 className="font-bold text-lg leading-none font-anaheim pl-3 md:pl-4 pt-1 mb-4">
               {footerData.notice.title}
             </h4>
-            <ul className="text-sm leading-loose space-y-0 font-anaheim">
+            <ul className="text-sm font-anaheim space-y-0" style={{ lineHeight: 1.8 }}>
               {footerData.notice.lines.map((line, index) => (
                 <li key={index} className="flex items-start">
-                  <span className="rounded-full bg-current flex-shrink-0 w-1 h-1 -ml-4 mr-2.5 mt-[0.75em]"></span>
+                  <span className="rounded-full bg-current flex-shrink-0 w-1 h-1 md:w-1.5 md:h-1.5 mr-2 md:mr-2.5 mt-[0.7em]"></span>
                   <span>{line}</span>
                 </li>
               ))}
@@ -111,9 +121,9 @@ export default function FooterSimple({
 
         <div className="h-px bg-brand-text-inverse/30 my-6"></div>
 
-        {/* 第二行：Navigation */}
-        {footerData.navigationMenus?.length > 0 && (
-          <div className="pb-6">
+        {/* 第二行：Navigation + Social */}
+        <div className="pb-6 flex flex-col md:flex-row justify-between items-center gap-6">
+          {footerData.navigationMenus?.length > 0 ? (
             <nav className="flex flex-wrap gap-6 md:gap-10">
               {footerData.navigationMenus.map((menu) => (
                 <Link
@@ -125,10 +135,30 @@ export default function FooterSimple({
                 </Link>
               ))}
             </nav>
-          </div>
-        )}
+          ) : (
+            <div></div>
+          )}
 
-        {/* 第三行：Logo + Social */}
+          {/* 右侧：社交媒体链接 */}
+          {footerData.socialLinks && footerData.socialLinks.length > 0 && (
+            <div className="flex items-center gap-4">
+              {footerData.socialLinks.map((social: any, index: number) => (
+                <a
+                  key={index}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand-text-inverse/70 hover:text-brand-primary transition-colors"
+                  title={social.platform}
+                >
+                  <SocialIcon platform={social.platform} />
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* 第三行：Logo + Copyright */}
         <FooterBottom footerData={footerData} siteLogoUrl={siteLogoUrl} />
       </div>
     </footer>
