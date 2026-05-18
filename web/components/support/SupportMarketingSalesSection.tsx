@@ -262,8 +262,8 @@ const Area2Component = ({ title, items }: { title: string; items: CarouselItem[]
           </div>
 
           {/* Title */}
-          <h4 className="text-white font-bold leading-tight font-josefin-sans uppercase text-left w-full"
-              style={{ fontSize: vw(29), lineHeight: 1.285, marginBottom: vw(24) }}>
+          <h4 className="text-white font-bold leading-tight font-josefin-sans text-left w-full"
+              style={{ fontSize: vw(42), lineHeight: 1.285, marginBottom: vw(24) }}>
               {activeItem.title}
           </h4>
       </div>
@@ -285,7 +285,7 @@ export const SupportMarketingSalesSection = ({ data }: { data: any }) => {
       />
 
       {/* --- DESKTOP VIEW (md and above) --- */}
-      <div className="hidden md:block relative w-full" style={{ minHeight: vw(1800) }}>
+      <div className="hidden md:block relative w-full" style={{ minHeight: vw(1720) }}>
         <div className="relative mx-auto"
              style={{ maxWidth: vw(1920), paddingTop: vw(120) }}>
           {/* Header */}
@@ -318,7 +318,7 @@ export const SupportMarketingSalesSection = ({ data }: { data: any }) => {
                  items={data.area1?.items || []} 
                />
              </div>
-             <div style={{ width: vw(1860), marginTop: vw(-166.8), transform: "scale(0.8)", transformOrigin: "top center" }}>
+             <div style={{ width: vw(1860), marginTop: vw(-166.8), marginBottom: vw(-174), transform: "scale(0.8)", transformOrigin: "top center" }}>
                <Area2Component 
                  title={data.area2?.title || "Sales Enablement & Channel Support"} 
                  items={data.area2?.items || []} 

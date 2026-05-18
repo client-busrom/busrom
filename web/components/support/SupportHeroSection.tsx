@@ -108,7 +108,7 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
                 >
                   <div className="relative w-full h-full flex items-center justify-center">
                     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 233 277" fill="none">
-                      <path d="M116.5 277c64.341 0 116.5-52.159 116.5-116.5V58C233 25.967 207.033 0 175 0H58C25.967 0 0 25.967 0 58v161c0 32.033 25.967 58 58 58h58.5z" fill="#ede8c2" />
+                      <rect x="0" y="0" width="233" height="277" rx="58" ry="58" fill="#ede8c2" />
                     </svg>
                     <motion.span 
                       className="relative font-bold select-none font-kavivanar" 
@@ -166,9 +166,14 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
           const imageMaskSvg = `<svg xmlns='http://www.w3.org/2000/svg' width='700' height='450' viewBox='0 0 700 450'><path d='${imageClipPath}' fill='black'/></svg>`
           const imgMaskUrl = `url("data:image/svg+xml,${encodeURIComponent(imageMaskSvg)}")`
           return (
-            <div className="absolute z-10 overflow-hidden" style={{ left: vw(159), top: vw(822), width: vw(700), height: vw(450), WebkitMaskImage: imgMaskUrl, maskImage: imgMaskUrl, WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat", WebkitMaskSize: "100% 100%", maskSize: "100% 100%", backgroundColor: "#ede8c2" }}>
+            <motion.div 
+              className="absolute z-10 overflow-hidden" 
+              animate={{ y: [0, -15, 0] }} 
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+              style={{ left: vw(159), top: vw(822), width: vw(700), height: vw(450), WebkitMaskImage: imgMaskUrl, maskImage: imgMaskUrl, WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat", WebkitMaskSize: "100% 100%", maskSize: "100% 100%", backgroundColor: "#ede8c2" }}
+            >
               <OptimizedImage image={data.image || "/BusromFooterBg_original.webp"} alt="Support Hero" className="object-cover w-full h-full" size="large" priority />
-            </div>
+            </motion.div>
           )
         })()}
 
@@ -181,7 +186,7 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
         >
           <div className="relative flex flex-col h-full flex-1">
             <h2 className="font-montserrat font-bold text-black" style={{ fontSize: vw(46), lineHeight: 1.24, marginBottom: vw(16) }}>{data.cta.title}</h2>
-            <motion.div style={{ fontSize: vw(24), lineHeight: 1.5 }} animate={{ height: isExpanded ? 'auto' : vw(80) }} transition={{ duration: 0.5, ease: "easeInOut" }} className={`font-montserrat text-[#756f3f] mt-2 overflow-hidden ${!isExpanded ? 'line-clamp-2' : ''}`}>
+            <motion.div style={{ fontSize: vw(24), lineHeight: 1.5 }} animate={{ height: isExpanded ? 'auto' : vw(80) }} transition={{ duration: 0.5, ease: "easeInOut" }} className={`font-montserrat text-[#756f3f] font-semibold mt-2 overflow-hidden ${!isExpanded ? 'line-clamp-2' : ''}`}>
               {data.cta.content}
             </motion.div>
             <div className="mt-0 flex-1" />

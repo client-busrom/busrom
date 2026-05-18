@@ -65,6 +65,74 @@ function renderNodes(nodes: any[], vw: (px: number) => string, context: "title" 
   return renderRecursive(nodes)
 }
 
+function CollapsedTitleCard({ title, vw }: { title: string, vw: (px: number) => string }) {
+  const [measuredWidth, setMeasuredWidth] = useState<number | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+
+    const wordSpans = Array.from(containerRef.current.querySelectorAll('.word-measure')) as HTMLSpanElement[]
+    if (wordSpans.length === 0) return
+
+    // Collect all rendered client rects (handles words split across lines by word-break)
+    const allRects: DOMRect[] = []
+    wordSpans.forEach(span => {
+      const rects = Array.from(span.getClientRects())
+      allRects.push(...rects)
+    })
+
+    if (allRects.length === 0) return
+
+    // Group rects by visual line using vertical position (rounded to nearest 5px)
+    const lines: { [key: number]: DOMRect[] } = {}
+    allRects.forEach(rect => {
+      const lineKey = Math.round(rect.top / 5) * 5
+      if (!lines[lineKey]) lines[lineKey] = []
+      lines[lineKey].push(rect)
+    })
+
+    let maxLineWidth = 0
+    Object.values(lines).forEach(rects => {
+      if (rects.length === 0) return
+      const left = Math.min(...rects.map(r => r.left))
+      const right = Math.max(...rects.map(r => r.right))
+      const lineWidth = right - left
+      if (lineWidth > maxLineWidth) {
+        maxLineWidth = lineWidth
+      }
+    })
+
+    const viewportWidth = Math.min(window.innerWidth, 1920)
+    const currentVwWidth = (maxLineWidth / viewportWidth) * 1920
+    
+    const clampedWidth = Math.max(154, Math.min(200, currentVwWidth))
+    setMeasuredWidth(clampedWidth)
+  }, [title])
+
+  return (
+    <div 
+      ref={containerRef} 
+      className="text-[#f8f6e5] font-montserrat font-bold whitespace-pre-wrap text-left" 
+      style={{ 
+        width: measuredWidth ? vw(measuredWidth) : vw(200), 
+        minWidth: vw(154),
+        maxWidth: vw(200),
+        wordBreak: "break-word", 
+        WebkitTextStroke: "1px #000000", 
+        paintOrder: "stroke fill",
+      }}
+    >
+      {title.split(/\s+/).map((word, i) => (
+        <React.Fragment key={i}>
+          <span className="word-measure">{word}</span>
+          {" "}
+        </React.Fragment>
+      ))}
+    </div>
+  )
+}
+
 export function SupportCustomizedSection({ title, product, manufacturing }: SupportCustomizedSectionProps) {
   const [activeGroup, setActiveGroup] = useState<"product" | "manufacturing">("product")
   const activeData = activeGroup === "product" ? product : manufacturing
@@ -234,7 +302,7 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
             <motion.h3 
                 key={activeGroup}
                 className={`font-josefin-sans font-bold text-[#524d20] ${activeGroup === "manufacturing" ? "text-right" : "text-left"}`}
-                style={{ fontSize: vw(60), lineHeight: 0.97, width: "fit-content", maxWidth: vw(900) }}
+                style={{ fontSize: vw(60), lineHeight: 1.1, paddingTop: vw(10), width: "fit-content", maxWidth: vw(900) }}
             >
                 {renderFormattedText(activeData.title)}
             </motion.h3>
@@ -258,6 +326,7 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
         >
           {items.map((item, idx) => {
             const isActive = idx === activeIndex
+
             return (
               <motion.div 
                 key={item.id} 
@@ -284,20 +353,20 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
                 <div className="absolute z-10 w-full h-full pointer-events-none">
                   <motion.h4 
                     layout="position" 
-                    className="absolute font-montserrat font-bold overflow-hidden whitespace-pre-wrap" 
+                    className="absolute font-montserrat font-bold overflow-hidden whitespace-pre-wrap flex" 
                     style={{ 
-                      fontSize: isActive ? vw(29) : (item.title.length > 15 ? vw(20) : vw(24)), 
+                      fontSize: isActive ? vw(29) : vw(24), 
                       color: isActive ? "#000000" : "transparent", 
-                      left: isActive ? vw(243) : vw(220), 
+                      left: isActive ? vw(243) : vw(204), 
                       top: isActive ? vw(81) : (item.title.length > 15 ? vw(100) : vw(121)), 
-                      width: isActive ? vw(400) : vw(200), 
-                      lineHeight: isActive ? 1.28 : 1.5 
+                      width: isActive ? vw(400) : vw(221), 
+                      justifyContent: isActive ? "flex-start" : "center",
+                      textAlign: "left",
+                      lineHeight: isActive ? 1.28 : vw(46) 
                     }}
                   >
                     {!isActive ? (
-                      <span className="block text-[#f8f6e5] font-montserrat font-bold whitespace-pre-wrap" style={{ WebkitTextStroke: "1px #000000", paintOrder: "stroke fill" }}>
-                        {item.title}
-                      </span>
+                      <CollapsedTitleCard title={item.title} vw={vw} />
                     ) : item.title}
                   </motion.h4>
                   {isActive && item.description && (

@@ -62,6 +62,7 @@ export function SupportQualityControlSection({ title, items }: SupportQualityCon
   const [expandedIndices, setExpandedIndices] = useState<number[]>([0])
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [isDesktop, setIsDesktop] = useState(true)
+  const isDraggingRef = useRef(false)
   
   const vw = (px: number) => `calc(${px} * min(100vw, 1920px) / 1920)`
   const vwn = (px: number) => px * (typeof window !== 'undefined' ? Math.min(window.innerWidth, 1920) / 1920 : 1)
@@ -162,7 +163,15 @@ export function SupportQualityControlSection({ title, items }: SupportQualityCon
               drag="x"
               dragConstraints={{ left: -trackInfo.totalWidth + vwn(600), right: 0 }}
               dragElastic={0.2}
-              onDragEnd={onDragEnd}
+              onDragStart={() => {
+                isDraggingRef.current = true
+              }}
+              onDragEnd={(event, info) => {
+                onDragEnd(event, info)
+                setTimeout(() => {
+                  isDraggingRef.current = false
+                }, 150)
+              }}
               className="flex items-start cursor-grab active:cursor-grabbing"
               style={{ paddingLeft: vw(150), gap: vw(32), x }}
             >
@@ -175,14 +184,18 @@ export function SupportQualityControlSection({ title, items }: SupportQualityCon
                           key={item.id}
                           onMouseEnter={() => setHoveredIndex(idx)}
                           onMouseLeave={() => setHoveredIndex(null)}
-                          onClick={() => toggleExpand(idx)}
+                          onClick={() => {
+                            if (!isDraggingRef.current) {
+                              toggleExpand(idx)
+                            }
+                          }}
                           className="relative flex-shrink-0 overflow-hidden"
                           animate={{ width: isExpanded ? vw(849) : vw(457) }}
                           transition={{ type: "spring", stiffness: 100, damping: 20 }}
                           style={{ height: vw(465), borderRadius: vw(50), backgroundColor: "#f6ebc5" }}
                         >
                             <motion.div className="absolute inset-0 flex flex-col pointer-events-none" animate={{ opacity: isExpanded ? 0 : 1 }}>
-                                <div className="p-[2vw] pl-[3.1vw] pt-[2vw]">
+                                <div className="relative z-20 p-[2vw] pl-[3.1vw] pt-[2vw]">
                                     <h4 className="font-montserrat font-bold whitespace-pre-wrap" 
                                         style={{ 
                                             fontSize: vw(29), 
@@ -196,7 +209,7 @@ export function SupportQualityControlSection({ title, items }: SupportQualityCon
                                         {item.title}
                                     </h4>
                                 </div>
-                                <div className="mt-auto relative w-full" style={{ height: vw(224) }}>
+                                <div className="mt-auto relative w-full z-0" style={{ height: vw(224) }}>
                                     {/* Decorative Circles */}
                                     <div className="absolute" style={{ left: vw(-60), bottom: vw(-60), width: vw(400), height: vw(400) }}>
                                         {/* Rotating Wrapper for Small Circle - Desynchronized by idx */}

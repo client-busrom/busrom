@@ -300,10 +300,10 @@ const phudu = localFont({
   preload: false,
 });
 
-const meaCulpa = localFont({
-  src: "../../public/fonts/MeaCulpa-Regular.ttf",
-  weight: "400",
-  variable: "--font-mea-culpa",
+const gwendolyn = localFont({
+  src: "../../public/fonts/Gwendolyn-Bold.ttf",
+  weight: "700",
+  variable: "--font-gwendolyn",
   display: "swap",
   preload: false,
 });
@@ -430,7 +430,7 @@ export default async function RootLayout({
         ${pollerOne.variable}
         ${pavanam.variable}
         ${phudu.variable}
-        ${meaCulpa.variable}
+        ${gwendolyn.variable}
         ${academyEngraved.variable}
         ${acme.variable}
         antialiased

@@ -136,7 +136,7 @@ export const SupportQuoteSection: React.FC<SupportQuoteSectionProps> = ({
                 style={{ 
                   fontSize: vw(96), 
                   color: "#756F3F",
-                  fontFamily: "var(--font-mea-culpa)",
+                  fontFamily: "var(--font-gwendolyn)",
                   lineHeight: 0.625
                 }}
               >
@@ -190,7 +190,7 @@ export const SupportQuoteSection: React.FC<SupportQuoteSectionProps> = ({
                 transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
                 className="font-semibold leading-[1.5] text-[#756F3F] font-inter opacity-80"
                 style={{ 
-                  fontSize: vw(30),
+                  fontSize: vw(24),
                 }}
               >
                 {(currentSlide.description || "").split('\n').map((line, i, arr) => (
@@ -340,7 +340,7 @@ export const SupportQuoteSection: React.FC<SupportQuoteSectionProps> = ({
                 style={{ 
                   fontSize: vwm(48), 
                   color: "#756F3F",
-                  fontFamily: "var(--font-mea-culpa)",
+                  fontFamily: "var(--font-gwendolyn)",
                   lineHeight: 0.625
                 }}
               >
