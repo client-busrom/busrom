@@ -56,7 +56,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
       </div>
 
       {/* --- 桌面端布局 --- */}
-      <div className="hidden md:landscape:block xl:block relative z-20 w-full h-full max-w-[1920px] mx-auto">
+      <div className="hidden md:landscape:block xl:block relative z-20 w-full h-full">
         <div className="absolute z-20 flex flex-col items-start text-left" style={{ left: rpx(186), top: rpx(140) }}>
           <p className="font-montserrat font-normal text-black whitespace-pre-line mb-2" style={{ fontSize: rpx(36) }}>{renderHighlightedText(subtitle)}</p>
           <h1 className="font-poller-one font-regular text-black whitespace-pre-line leading-[1.1] mb-12" style={{ fontSize: rpx(90), WebkitTextStroke: `${rpx(6)} #FDF6C2`, paintOrder: "stroke fill" }}>{formatText(data.features[0])}</h1>

@@ -129,7 +129,7 @@ const HeroBanner5: FC<HeroBanner5Props> = ({ data, locale }) => {
       </svg>
 
       {/* 2. 桌面端布局 */}
-      <div className="hidden md:landscape:block xl:block relative z-20 w-full h-full max-w-[1920px] mx-auto">
+      <div className="hidden md:landscape:block xl:block relative z-20 w-full h-full">
         {/* 背景装饰物 - 使用 translate(-50%, -50%) 确保中心对齐 */}
         <div
           className="absolute z-1 pointer-events-none"
@@ -223,21 +223,27 @@ const HeroBanner5: FC<HeroBanner5Props> = ({ data, locale }) => {
 
         {/* Feature 按钮 */}
         <div
-          className="absolute z-30 flex flex-col gap-4"
-          style={{ left: rpx(99), top: rpx(629) }}
+          className="absolute z-30 flex flex-col"
+          style={{ left: rpx(99), top: rpx(629), gap: rpx(16) }}
         >
           {[data.features[2], data.features[3], data.features[4]].map(
             (feature, index) => (
               <MagneticWrapper key={index} strength={0.15}>
                 <div
-                  className="h-[64px] flex items-center px-10 relative group cursor-pointer"
+                  className="flex items-center relative group cursor-pointer"
                   style={{
                     width: rpx(BANNER_5_ASSETS.features[index].width),
+                    height: rpx(64),
+                    paddingLeft: rpx(40),
+                    paddingRight: rpx(40),
                     background:
                       "linear-gradient(90deg, rgba(164, 148, 12, 0.6) 0%, rgba(132, 123, 44, 0) 100%)",
                   }}
                 >
-                  <span className="font-montserrat font-bold text-black text-[30px] whitespace-nowrap tracking-wider relative z-10">
+                  <span
+                    className="font-montserrat font-bold text-black whitespace-nowrap tracking-wider relative z-10"
+                    style={{ fontSize: rpx(30) }}
+                  >
                     {formatText(feature).replace(/\n/g, " ")}
                   </span>
                 </div>

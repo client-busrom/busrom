@@ -83,8 +83,8 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
 
           ScrollTrigger.create({
             trigger: section,
-            start: "top 46px", // 46px 是 header 的大致高度
-            end: "bottom 46px",
+            start: "top 2.4vw", // 桌面端 2.4vw (对应 1920 下 46px)
+            end: "bottom 2.4vw",
             onEnter: () => setTheme(theme as any),
             onEnterBack: () => setTheme(theme as any),
             // 确保在刷新或初次加载时激活正确的主题
@@ -148,14 +148,14 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
       <header
         ref={headerRef}
         className={cn(
-          "fixed top-0 left-0 right-0 w-full z-[70] transition-all duration-300 ease-in-out",
+          "fixed top-0 left-0 right-0 w-full z-[70] lg:h-[2.4vw] transition-all duration-300 ease-in-out",
           headerBgColor,
           headerShadow,
         )}
       >
-        <div className="w-full px-4 lg:px-6 xl:px-10 py-2">
-          {/* 移动端布局：三列，Logo居中 */}
-          <div className="flex lg:hidden items-center justify-between relative">
+        <div className="w-full h-full px-4 lg:px-6 xl:px-10 flex items-center justify-between">
+          {/* 移动端布局：三列，Logo居中 (保持原有移动端尺寸设定 py-2) */}
+          <div className="flex lg:hidden items-center justify-between w-full relative py-2">
             {/* 左侧：汉堡菜单按钮 */}
             <button
               onClick={(event) => {
@@ -190,14 +190,14 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
             <LocaleSwitcher activeTheme={activeTheme} />
           </div>
 
-          {/* 桌面端布局 */}
-          <div className="hidden lg:flex items-center justify-between">
+          {/* 桌面端布局：完全采用 dvw 比例流派 */}
+          <div className="hidden lg:flex items-center justify-between w-full h-full">
             {/* 左侧：Logo */}
-            <div className="flex items-center">
+            <div className="flex items-center h-full">
               <Link href={`/${locale}`}>
                 <h1
                   className={cn(
-                    "text-3xl tracking-wider font-paytone-one transition-colors duration-300",
+                    "text-[1.56vw] leading-[1.88vw] tracking-wider font-paytone-one transition-colors duration-300",
                     headerTextColor,
                   )}
                 >
@@ -207,7 +207,7 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
             </div>
 
             {/* 中间：桌面端导航 */}
-            <div className="flex flex-1 justify-center">
+            <div className="flex flex-1 justify-center h-full items-center">
               <DesktopNavigation
                 navigationItems={navigationItems || []}
                 theme={activeTheme}
@@ -216,7 +216,7 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
             </div>
 
             {/* 右侧：语言选择 */}
-            <div className="flex items-center">
+            <div className="flex items-center h-full">
               <LocaleSwitcher activeTheme={activeTheme} />
             </div>
           </div>

@@ -94,30 +94,46 @@ const HeroBanner2: FC<HeroBanner2Props> = ({ data, locale }) => {
             src="/home/hero-banner/banner-2/left.svg"
             alt=""
             className="absolute"
-            style={{ left: rpx(0), top: rpx(500) }}
+            style={{
+              left: 0,
+              top: rpx(BANNER_2_ASSETS.borderLeft.y),
+              width: rpx(BANNER_2_ASSETS.borderLeft.width),
+            }}
           />
           <img
             src="/home/hero-banner/banner-2/right.svg"
             alt=""
             className="absolute"
-            style={{ right: 0, top: rpx(0) }}
+            style={{
+              right: 0,
+              top: 0,
+              width: rpx(BANNER_2_ASSETS.borderRight.width),
+            }}
           />
           <img
             src="/home/hero-banner/banner-2/top.svg"
             alt=""
             className="absolute"
-            style={{ left: rpx(535), top: rpx(1) }}
+            style={{
+              left: rpx(BANNER_2_ASSETS.borderTop.x),
+              top: 0,
+              width: rpx(BANNER_2_ASSETS.borderTop.width),
+            }}
           />
           <img
             src="/home/hero-banner/banner-2/bottom.svg"
             alt=""
             className="absolute"
-            style={{ left: rpx(1330), bottom: 0 }}
+            style={{
+              right: 0,
+              bottom: 0,
+              width: rpx(BANNER_2_ASSETS.borderBottom.width),
+            }}
           />
         </div>
       </div>
 
-      <div className="hidden md:landscape:block xl:block relative z-40 w-full h-full max-w-[1920px] mx-auto">
+      <div className="hidden md:landscape:block xl:block relative z-40 w-full h-full">
         <div
           className="absolute z-30 flex flex-col items-start text-left"
           style={{ left: rpx(207), top: rpx(207) }}

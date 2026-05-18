@@ -189,7 +189,7 @@ export function HomePageClient({
         data={content.heroBanner}
         locale={currentLanguage}
         headerTheme="light"
-        className="relative z-20 mt-[46px]"
+        className="relative z-20 mt-[46px] lg:mt-[2.4vw]"
       />
 
       {/* 模块 2: 产品系列轮播 */}

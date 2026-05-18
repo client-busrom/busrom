@@ -104,11 +104,10 @@ const TitleLine: FC<{ text: string; index: number; isMobile?: boolean }> = ({
 
   return (
     <div
-      className="relative last:mb-0"
+      className="relative"
       style={{
         width: rpx(block.w),
         height: rpx(block.h),
-        marginBottom: rpx(50), // 大幅拉开桌面端间距
       }}
     >
       <img
@@ -142,7 +141,7 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
   return (
     <section className="relative w-full h-full bg-[#99935F]">
       {/* 1. 桌面端 & 平板端 */}
-      <div className="hidden md:block relative w-full h-full max-w-[1920px] mx-auto overflow-hidden">
+      <div className="hidden md:block relative w-full h-full overflow-hidden">
         <div className="absolute top-0 right-0 z-0 pointer-events-none opacity-30 lg:opacity-100">
           <img
             src={BANNER_9_ASSETS.decoratorTop}
@@ -231,11 +230,11 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
         <div
           className="absolute z-30 flex flex-col items-start text-left md:scale-[0.65] lg:scale-100 origin-top-right"
           style={{
-            right: rpx(40),
-            top: rpx(100),
+            right: rpx(35),
+            top: rpx(130),
           }}
         >
-          <div className="flex flex-col items-start mb-16 md:mb-8 lg:mb-16">
+          <div className="flex flex-col items-start" style={{ marginBottom: rpx(83.5) }}>
             {feature0Lines.map((line, idx) => (
               <TitleLine key={idx} text={line} index={idx} />
             ))}
@@ -244,6 +243,8 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
             className="font-paytone-one text-white whitespace-pre-line leading-tight text-left md:text-[28px] lg:text-[calc(var(--rpx-hero)*60px)]"
             style={{
               fontSize: rpx(60),
+              width: rpx(697),
+              marginLeft: rpx(104),
               WebkitTextStroke: `${rpx(7)} #6B4E00`,
               paintOrder: "stroke fill",
             }}

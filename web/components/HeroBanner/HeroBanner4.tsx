@@ -121,7 +121,7 @@ const HeroBanner4: FC<HeroBanner4Props> = ({ data, locale }) => {
       </svg>
 
       {/* 2. 桌面端布局 (1280px 以上 & 1024px+横屏) */}
-      <div className="hidden md:landscape:block xl:block relative z-20 w-full h-full max-w-[1920px] mx-auto">
+      <div className="hidden md:landscape:block xl:block relative z-20 w-full h-full">
         {/* 背景装饰物 - 桌面端锚点优化 */}
         {/* 右上大装饰 */}
         <div

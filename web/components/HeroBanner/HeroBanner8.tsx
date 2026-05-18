@@ -38,7 +38,7 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
       
       {/* --- PC 端布局 --- */}
       <div className="hidden lg:block absolute inset-0 z-10 pointer-events-none">
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full" style={{ maxWidth: "1920px", maxHeight: "922px" }}>
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" style={{ width: rpx(1920), height: rpx(922) }}>
           <div className="absolute inset-0 z-0 opacity-60"><img src={BANNER_8_ASSETS.decorator.src} className="w-full h-full object-cover" alt="" /></div>
           <div className="absolute right-0 top-0 h-full z-10" style={{ width: rpx(BANNER_8_ASSETS.bgFrame.width) }}><img src={BANNER_8_ASSETS.bgFrame.src} className="w-full h-full object-fill" alt="" /></div>
           <div className="absolute right-0 top-0 h-full z-20" style={{ width: rpx(BANNER_8_ASSETS.mainImage.width), maskImage: `url(${BANNER_8_ASSETS.mainImage.mask})`, WebkitMaskImage: `url(${BANNER_8_ASSETS.mainImage.mask})`, maskSize: "100% 100%", maskRepeat: "no-repeat" }}><ServerImage image={data.images[0]} alt="" fill className="object-cover" priority /></div>

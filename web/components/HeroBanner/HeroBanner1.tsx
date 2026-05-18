@@ -125,7 +125,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
 
       {/* 2. 精准装饰层 (始终渲染，自动缩放) */}
       <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
-        <div className="relative w-full h-full max-w-[1920px] mx-auto">
+        <div className="relative w-full h-full">
           {/* --- 1. 右上装饰 (Decorator 1) --- */}
           <div
             className="absolute origin-top-right transition-transform duration-500 scale-[0.4] md:scale-[0.6] xl:scale-100"
@@ -240,13 +240,14 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
 
       {/* 3. 桌面端大屏内容层 (1280px 以上触发) */}
       <div className="hidden md:landscape:block xl:block absolute inset-0 z-30 pointer-events-none">
-        <div className="relative w-full h-full max-w-[1920px] mx-auto">
+        <div className="relative w-full h-full">
           <div className="absolute inset-0 flex flex-col justify-center items-center px-12">
-            {/* ... 文字内容层已包含 ... */}
+            {/* 副标题 */}
             <p
-              className="font-paytone-one text-[#FFBC5F] text-center whitespace-nowrap mb-[1vh]"
+              className="font-paytone-one text-[#FFBC5F] text-center whitespace-nowrap"
               style={{
-                fontSize: "clamp(1.5rem, 2vw, 2.25rem)",
+                fontSize: rpx(36),
+                marginBottom: rpx(16),
                 WebkitTextStroke: `${rpx(2.5)} #75703F`,
                 paintOrder: "stroke fill",
               }}
@@ -257,7 +258,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
             <h2
               className="font-paytone-one text-black text-center whitespace-nowrap leading-none"
               style={{
-                fontSize: "clamp(2.5rem, 4vw, 4.5rem)",
+                fontSize: rpx(72),
                 WebkitTextStroke: `${rpx(6)} #FDF6C2`,
                 paintOrder: "stroke fill",
               }}
@@ -266,9 +267,10 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
             </h2>
 
             <h1
-              className="font-paytone-one text-black text-center whitespace-nowrap mt-[1vh] leading-none"
+              className="font-paytone-one text-black text-center whitespace-nowrap leading-none"
               style={{
-                fontSize: "clamp(3.5rem, 5.5vw, 6rem)",
+                fontSize: rpx(96),
+                marginTop: rpx(16),
                 WebkitTextStroke: `${rpx(8)} #FDF6C2`,
                 paintOrder: "stroke fill",
               }}
@@ -277,8 +279,8 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
             </h1>
 
             <div
-              className="flex pointer-events-auto mt-[5vh]"
-              style={{ gap: rpx(24) }} // 匹配 200x124 尺寸的紧凑间距
+              className="flex pointer-events-auto"
+              style={{ gap: rpx(24), marginTop: rpx(50) }} // 匹配 200x124 尺寸的紧凑间距
             >
               {[data.features[2], data.features[3], data.features[4]].map(
                 (feature, index) => (

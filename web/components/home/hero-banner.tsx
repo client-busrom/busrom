@@ -55,8 +55,8 @@ const lazyBanners: Record<
 const AUTOPLAY_DELAY = 6000;
 const PRELOAD_BEFORE = 2000; // 提前 2 秒预加载下一个 Banner
 const MIN_HEIGHT = "min-h-[600px]";
-// 方案二核心：移动端 80dvh，桌面端 (xl) 减去 46px header
-const HEIGHT_CLASS = `h-[80dvh] xl:h-[calc(100dvh-46px)] ${MIN_HEIGHT}`;
+// 方案二核心：移动端 80dvh，桌面端 (xl) 采用 1920x922 的完美设计比例 48vw
+const HEIGHT_CLASS = `h-[80dvh] xl:h-[48vw] ${MIN_HEIGHT}`;
 
 // 占位组件 - 用于 Banner 加载中
 function BannerPlaceholder() {
@@ -77,8 +77,8 @@ export default function HeroBanner({
   const [currentSlide, setCurrentSlide] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
   const [isVisible, setIsVisible] = useState(true);
-  const [progress, setProgress] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isMounted = useRef(true);
 
@@ -88,7 +88,6 @@ export default function HeroBanner({
     const updateScale = () => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const availableHeight = vh - 46;
       const el = sectionRef.current;
       if (!el) return;
 
@@ -96,7 +95,7 @@ export default function HeroBanner({
       const isDesktopLayout = vw >= 1280 || (vw >= 768 && vw > vh);
 
       if (isDesktopLayout) {
-        const rawScale = Math.min(vw / 1920, availableHeight / 922);
+        const rawScale = vw / 1920;
         const scale = Math.max(rawScale, 0.5);
         // 局部化：只设置在当前组件容器上，防止污染全局
         el.style.setProperty("--rpx-hero", scale.toString());
@@ -223,8 +222,16 @@ export default function HeroBanner({
     const onSelect = () => {
       if (!api) return;
       setCurrentSlide(api.selectedScrollSnap());
-      // 切换时重置进度条
-      setProgress(0);
+      // 切换时重置进度条 DOM 样式
+      if (progressBarRef.current) {
+        progressBarRef.current.style.width = "0%";
+      }
+
+      // 重置 Embla Autoplay 内部计时器，防止手动点击切换后计时器未归零导致过快轮播
+      const autoplay = autoplayPlugin.current;
+      if (autoplay && typeof autoplay.reset === "function") {
+        autoplay.reset();
+      }
     };
 
     api.on("reInit", onInitOrReinit);
@@ -239,26 +246,30 @@ export default function HeroBanner({
     };
   }, [api]);
 
-  // 进度条动画 - 每个 banner 从 0% 到 100%
+  // 进度条动画 - 使用 direct DOM 操作避免 React state 频繁重渲染引发卡顿
   useEffect(() => {
     if (!isVisible || !data || data.length <= 1) {
-      setProgress(0);
+      if (progressBarRef.current) progressBarRef.current.style.width = "0%";
       return;
     }
 
-    // 清除之前的 interval
     if (progressIntervalRef.current) {
       clearInterval(progressIntervalRef.current);
     }
 
-    // 每 60ms 更新一次进度（6000ms / 100 = 60ms per 1%）
-    const updateInterval = AUTOPLAY_DELAY / 100;
+    if (progressBarRef.current) {
+      progressBarRef.current.style.width = "0%";
+    }
+
+    const startTime = Date.now();
     progressIntervalRef.current = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) return 0;
-        return prev + 1;
-      });
-    }, updateInterval);
+      const elapsed = Date.now() - startTime;
+      let percentage = (elapsed / AUTOPLAY_DELAY) * 100;
+      if (percentage >= 100) percentage = 100;
+      if (progressBarRef.current) {
+        progressBarRef.current.style.width = `${percentage}%`;
+      }
+    }, 60);
 
     return () => {
       if (progressIntervalRef.current) {
@@ -291,7 +302,8 @@ export default function HeroBanner({
               return (
                 <CarouselItem
                   key={index}
-                  className={`h-full ${MIN_HEIGHT} p-0 basis-full flex`}
+                  className={`h-full ${MIN_HEIGHT} p-0 basis-full flex transform-gpu select-none`}
+                  style={{ transform: "translateZ(0)", willChange: "transform" }}
                 >
                   {BannerComponent ? (
                     <BannerComponent data={bannerData} locale={locale} />
@@ -310,36 +322,37 @@ export default function HeroBanner({
           )}
         </CarouselContent>
 
-        <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-10 hidden md:inline-flex" />
-        <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10 hidden md:inline-flex" />
+        <CarouselPrevious className="absolute left-4 xl:left-[0.83vw] top-1/2 -translate-y-1/2 z-10 hidden md:inline-flex xl:w-[1.67vw] xl:h-[1.67vw] xl:[&>svg]:w-[1vw] xl:[&>svg]:h-[1vw]" />
+        <CarouselNext className="absolute right-4 xl:right-[0.83vw] top-1/2 -translate-y-1/2 z-10 hidden md:inline-flex xl:w-[1.67vw] xl:h-[1.67vw] xl:[&>svg]:w-[1vw] xl:[&>svg]:h-[1vw]" />
       </Carousel>
 
       {scrollSnaps.length > 0 && (
         <>
           {/* 底部进度条 - 从 left 15% 到 50% */}
           <div
-            className="absolute bottom-7 z-10 h-[2px] bg-white/50"
+            className="absolute bottom-7 xl:bottom-[1.46vw] z-10 h-[2px] xl:h-[0.1vw] bg-white/50"
             style={{ left: "15%", width: "35%" }}
           >
             <div
-              className="h-full bg-white"
-              style={{ width: `${progress}%` }}
+              ref={progressBarRef}
+              className="h-full bg-white transition-all duration-75 ease-linear"
+              style={{ width: "0%" }}
             />
           </div>
 
           {/* 页码指示器 - right 15% */}
           <div
-            className="absolute bottom-3 z-10 flex items-baseline text-white font-anaheim"
+            className="absolute bottom-3 xl:bottom-[0.63vw] z-10 flex items-baseline text-white font-anaheim"
             style={{
               right: "15%",
               textShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.3)",
             }}
           >
-            <span className="text-2xl font-bold">
+            <span className="text-2xl xl:text-[1.25vw] font-bold">
               {String(currentSlide + 1).padStart(2, "0")}
             </span>
-            <span className="text-base text-white/80 mx-1">/</span>
-            <span className="text-base text-white/80">
+            <span className="text-base xl:text-[0.83vw] text-white/80 mx-1 xl:mx-[0.2vw]">/</span>
+            <span className="text-base xl:text-[0.83vw] text-white/80">
               {String(scrollSnaps.length).padStart(2, "0")}
             </span>
           </div>

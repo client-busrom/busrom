@@ -198,7 +198,7 @@ export function DesktopNavigation({
                 href={item.url}
                 onClick={(e) => handleMenuClick(item, e)}
                 className={cn(
-                  "relative flex items-center gap-1 text-sm font-montserrat font-bold transition-colors py-2",
+                  "relative flex items-center gap-1 text-[0.73vw] leading-[1.04vw] font-montserrat font-bold transition-colors py-2",
                   textColor,
                   hoverColor,
                   isActive && "text-brand-secondary",
@@ -243,7 +243,7 @@ export function DesktopNavigation({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
                 className="fixed inset-0 z-40 bg-black/30"
-                style={{ top: "46px" }}
+                style={{ top: "2.4vw" }}
                 onClick={() => setActiveMenuId(null)}
               />
 
@@ -257,7 +257,7 @@ export function DesktopNavigation({
                 transition={{ duration: 0.2, ease: "circOut" }}
                 className="fixed left-0 right-0 z-[55] bg-brand-main shadow-lg"
                 style={{
-                  top: "46px",
+                  top: "2.4vw",
                   boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                 }}
                 onWheel={(e) => e.stopPropagation()}

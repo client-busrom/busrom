@@ -96,7 +96,7 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
             className="absolute left-1/2 top-1/2 z-40 flex flex-col pointer-events-auto items-start"
             style={{ transform: `translate(calc(-50% + ${rpx(BANNER_6_ASSETS.titleGroup.dx)}), calc(-50% + ${rpx(BANNER_6_ASSETS.titleGroup.dy)}))` }}
           >
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col" style={{ gap: rpx(16) }}>
               {titleParts.map((line, idx) => {
                 const isFirst = idx === 0;
                 let fontSize = 96;
@@ -112,13 +112,16 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
             </div>
           </div>
           <div
-            className="absolute left-[360px] bottom-0 z-50 pointer-events-auto"
-            style={{ transform: `translate(calc(-50% + ${rpx(-510)}), calc(-50% + ${rpx(280)}))` }}
+            className="absolute bottom-0 z-50 pointer-events-auto"
+            style={{
+              left: rpx(360),
+              transform: `translate(calc(-50% + ${rpx(-510)}), calc(-50% + ${rpx(280)}))`,
+            }}
           >
             <div className="relative">
               {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
                   <div key={index} className="absolute flex items-center justify-end bg-[#756F3F]" style={{ left: rpx([0, 180, 360][index]), top: rpx([0, 0, 0][index]), width: rpx(740), height: rpx(100), borderRadius: rpx(71), transform: `rotate(-60deg)`, transformOrigin: "left center" }}>
-                    <span className="font-montserrat font-bold text-[#FFF5AD] pr-10" style={{ fontSize: rpx(24) }}>{feature}</span>
+                    <span className="font-montserrat font-bold text-[#FFF5AD]" style={{ fontSize: rpx(24), paddingRight: rpx(40) }}>{feature}</span>
                   </div>
                 ),
               )}
