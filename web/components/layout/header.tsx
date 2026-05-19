@@ -27,7 +27,7 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // 3. 状态：用于滚动时的主题
-  const [theme, setTheme] = useState<HeaderTheme>("transparent");
+  const [theme, setTheme] = useState<HeaderTheme>("light");
   const headerRef = useRef<HTMLElement>(null);
 
   // 监听路由变化

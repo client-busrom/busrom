@@ -531,7 +531,7 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
               {field.label} {field.required && <span className="text-red-500">*</span>}
             </label>
             <PhoneInput
-              defaultCountry="cn"
+              defaultCountry="us"
               value={formData[field.fieldName] || ''}
               onChange={(phone) => handleChange(field.fieldName, phone)}
               placeholder={field.placeholder}

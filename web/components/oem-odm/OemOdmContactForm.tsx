@@ -150,7 +150,7 @@ export function OemOdmContactForm({
   const [turnstileKey, setTurnstileKey] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(
-    COUNTRIES.find((c) => c[1] === "CN") || COUNTRIES[0],
+    COUNTRIES.find((c) => c[1] === "US") || COUNTRIES[0],
   );
   const [openCountrySelector, setOpenCountrySelector] = useState(false);
   const countrySelectorRef = useRef<HTMLDivElement>(null);
@@ -592,10 +592,10 @@ export function OemOdmContactForm({
                               </span>
                               <ChevronDown
                                 className={cn(
-                                  "transition-transform",
-                                  isMobile ? "w-3.5 h-3.5" : "w-4 h-4",
+                                  "transition-transform flex-shrink-0",
                                   openCountrySelector && "rotate-180"
                                 )}
+                                size={isMobile ? 14 : 16}
                                 style={{ color: "rgba(117, 111, 63, 0.5)" }}
                               />
                             </button>

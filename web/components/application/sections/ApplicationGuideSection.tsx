@@ -2,6 +2,7 @@
 
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 
 interface RichTextSegment {
   text: string;
@@ -185,7 +186,7 @@ export function ApplicationGuideSection({
             style={{
               top: "50%",
               right: titleConfig.right,
-              transform: `translateY(-50%) translateX(${vw(titleConfig.translateX)})`,
+              transform: `translateY(-42%) translateX(${vw(titleConfig.translateX)})`,
               width: vw(titleConfig.width),
             }}
           >
@@ -207,7 +208,7 @@ export function ApplicationGuideSection({
               width: vw(arrowConfig.width),
               height: vw(arrowConfig.height),
               left: "50%",
-              top: "50%",
+              top: "58%",
               marginLeft: vw(arrowConfig.marginLeft),
               marginTop: vw(arrowConfig.marginTop),
             }}
@@ -225,13 +226,14 @@ export function ApplicationGuideSection({
               height: vw(562),
               left: "50%",
               top: "50%",
-              transform: "translate(-50%, -50%)",
+              transform: "translate(-50%, -42%)",
             }}
           >
             {image ? (
-              <img
-                src={image}
+              <OptimizedImage
+                image={image}
                 alt="Guide"
+                sizes="meidum"
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -277,7 +279,7 @@ export function ApplicationGuideSection({
                   width: vw(arrowConfig.width),
                   height: vw(arrowConfig.height),
                   left: "50%",
-                  top: "50%",
+                  top: "55.6%",
                   marginLeft: vw(arrowConfig.marginLeft),
                   marginTop: vw(arrowConfig.marginTop),
                 }}
@@ -297,7 +299,7 @@ export function ApplicationGuideSection({
               height: vw(562),
               left: "55%",
               top: "50%",
-              transform: `translate(${vw(90)}, -50%)`,
+              transform: `translate(${vw(90)}, -42%)`,
               backgroundColor: "rgba(146, 137, 62, 0.58)",
               padding: vw(45),
               gap: vw(36),

@@ -12,15 +12,18 @@ interface Props {
 export default function FooterBottom({ footerData, siteLogoUrl, centered = false }: Props) {
   const currentYear = new Date().getFullYear();
 
+  // 过滤出有效的法律链接（同时有 label 和 url）
+  const validLegalLinks = footerData?.legalLinks?.filter((link: any) => link && link.label && link.url) || [];
+
   if (centered) {
     // 首页版本：垂直居中结构
     return (
       <div className="relative text-center text-white/80 text-sm mb-8 pt-8 font-anaheim flex flex-wrap justify-center items-center gap-x-3 leading-[1.8]">
         <span>{footerData?.copyrightText ? footerData.copyrightText : `© ${currentYear} Busrom. All rights reserved.`}</span>
-        {footerData?.legalLinks && footerData.legalLinks.length > 0 && (
+        {validLegalLinks.length > 0 && (
           <>
             <span className="text-white/40">•</span>
-            {footerData.legalLinks.map((link: any, idx: number) => (
+            {validLegalLinks.map((link: any, idx: number) => (
               <React.Fragment key={idx}>
                 {idx > 0 && <span className="text-white/40">•</span>}
                 <a href={link.url} target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-brand-primary transition-colors">
@@ -47,11 +50,11 @@ export default function FooterBottom({ footerData, siteLogoUrl, centered = false
         unoptimized={!!siteLogoUrl}
       />
       <div className="text-brand-text-inverse/60 text-sm font-anaheim flex flex-wrap justify-center items-center gap-x-3 leading-[1.8]">
-        {footerData?.copyrightText && <span>{footerData.copyrightText}</span>}
-        {footerData?.legalLinks && footerData.legalLinks.length > 0 && (
+        <span>{footerData?.copyrightText ? footerData.copyrightText : `© ${currentYear} Busrom. All rights reserved.`}</span>
+        {validLegalLinks.length > 0 && (
           <>
-            {footerData?.copyrightText && <span className="text-brand-text-inverse/40">•</span>}
-            {footerData.legalLinks.map((link: any, idx: number) => (
+            <span className="text-brand-text-inverse/40">•</span>
+            {validLegalLinks.map((link: any, idx: number) => (
               <React.Fragment key={idx}>
                 {idx > 0 && <span className="text-brand-text-inverse/40">•</span>}
                 <a href={link.url} target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-brand-primary transition-colors">

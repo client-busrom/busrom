@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { getOptimizedImageUrl } from "@/lib/image-utils";
 
 // 设计稿基准尺寸 (已按0.7缩放)
 const DESIGN_WIDTH = 1920;
@@ -154,6 +155,22 @@ export function OemAdvantages({
     return () => clearInterval(interval);
   }, [isAutoPlaying, items.length]);
 
+  // 预加载所有图片的不同尺寸，避免切换延迟导致大图小图同步问题
+  useEffect(() => {
+    if (typeof window === "undefined" || !items || items.length === 0) return;
+    items.forEach((item) => {
+      if (item?.image) {
+        ["large", "medium", "small"].forEach((size) => {
+          const url = getOptimizedImageUrl(item.image as any, size as any);
+          if (url) {
+            const img = new window.Image();
+            img.src = url;
+          }
+        });
+      }
+    });
+  }, [items]);
+
   const handlePrev = () => {
     setIsAutoPlaying(false);
     setCurrentIndex((prev) => (prev - 1 + items.length) % items.length);
@@ -264,6 +281,7 @@ export function OemAdvantages({
                         alt={currentItem?.title || "Advantage Image"}
                         size="large"
                         className="w-full h-full object-cover"
+                        priority
                       />
                     </Link>
                   ) : (
@@ -272,6 +290,7 @@ export function OemAdvantages({
                       alt={currentItem?.title || "Advantage Image"}
                       size="large"
                       className="w-full h-full object-cover"
+                      priority
                     />
                   )
                 ) : (
@@ -318,6 +337,7 @@ export function OemAdvantages({
                         alt={nextItem?.title || "Next Advantage Image"}
                         size="medium"
                         className="w-full h-full object-cover"
+                        priority
                       />
                     </Link>
                   ) : (
@@ -326,6 +346,7 @@ export function OemAdvantages({
                       alt={nextItem?.title || "Next Advantage Image"}
                       size="medium"
                       className="w-full h-full object-cover"
+                      priority
                     />
                   )
                 ) : (
@@ -501,6 +522,7 @@ export function OemAdvantages({
                         alt={currentItem?.title || "Advantage Image"}
                         size="medium"
                         className="w-full h-full object-cover"
+                        priority
                       />
                     </Link>
                   ) : (
@@ -509,6 +531,7 @@ export function OemAdvantages({
                       alt={currentItem?.title || "Advantage Image"}
                       size="medium"
                       className="w-full h-full object-cover"
+                      priority
                     />
                   )
                 ) : (
@@ -545,6 +568,7 @@ export function OemAdvantages({
                         alt={nextItem?.title || "Next Advantage Image"}
                         size="small"
                         className="w-full h-full object-cover"
+                        priority
                       />
                     </Link>
                   ) : (
@@ -553,6 +577,7 @@ export function OemAdvantages({
                       alt={nextItem?.title || "Next Advantage Image"}
                       size="small"
                       className="w-full h-full object-cover"
+                      priority
                     />
                   )
                 ) : (

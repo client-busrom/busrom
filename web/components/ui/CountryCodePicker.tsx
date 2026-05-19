@@ -48,22 +48,23 @@ export const CountrySelectorList: React.FC<CountrySelectorListProps> = ({
     <div
       className={cn(
         "flex flex-col shadow-2xl overflow-hidden",
-        "bg-white border border-gray-200 rounded-[0.8vw]",
+        "bg-white border border-gray-200 rounded-[12px] md:rounded-[0.8vw]",
+        "w-[280px] md:w-[320px] lg:w-[18vw]",
         className
       )}
       data-lenis-prevent
     >
       {/* Search Area */}
-      <div className="p-[0.6vw] border-b border-gray-100">
+      <div className="p-3 md:p-[0.6vw] border-b border-gray-100">
         <div className="relative">
-          <Search className="absolute left-[0.6vw] top-1/2 -translate-y-1/2 w-[0.9vw] h-[0.9vw] text-gray-400" />
+          <Search className="absolute left-3 md:left-[0.6vw] top-1/2 -translate-y-1/2 w-4 h-4 md:w-[0.9vw] md:h-[0.9vw] text-gray-400" />
           <input
             ref={searchInputRef}
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search country..."
-            className="w-full pl-[2vw] pr-[0.8vw] py-[0.5vw] text-[0.9vw] bg-gray-50 border border-gray-100 rounded-[0.4vw] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-200"
+            className="w-full pl-9 md:pl-[2vw] pr-3 md:pr-[0.8vw] py-2 md:py-[0.5vw] text-sm md:text-[0.9vw] bg-gray-50 border border-gray-100 rounded-[6px] md:rounded-[0.4vw] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-200"
           />
         </div>
       </div>
@@ -71,10 +72,10 @@ export const CountrySelectorList: React.FC<CountrySelectorListProps> = ({
       {/* List Area */}
       <div
         ref={listRef}
-        className="overflow-y-auto max-h-[15vw] no-scrollbar"
+        className="overflow-y-auto max-h-[250px] md:max-h-[15vw] no-scrollbar"
       >
         {filteredCountries.length === 0 ? (
-          <div className="px-[1vw] py-[1.5vw] text-[0.8vw] text-gray-400 text-center">
+          <div className="px-4 md:px-[1vw] py-6 md:py-[1.5vw] text-sm md:text-[0.8vw] text-gray-400 text-center">
             No results found
           </div>
         ) : (
@@ -86,13 +87,13 @@ export const CountrySelectorList: React.FC<CountrySelectorListProps> = ({
                 onSelect(country)
                 onClose()
               }}
-              className="w-full flex items-center gap-[0.8vw] px-[1vw] py-[0.8vw] text-left transition-all hover:bg-gray-50"
+              className="w-full flex items-center gap-3 md:gap-[0.8vw] px-4 md:px-[1vw] py-3 md:py-[0.8vw] text-left transition-all hover:bg-gray-50"
             >
-              <CountryFlag countryCode={country[1]} className="w-[1.4vw] h-[1vw] rounded-[0.1vw] flex-shrink-0" />
-              <span className="text-[0.8vw] font-medium text-gray-900 truncate flex-1">
+              <CountryFlag countryCode={country[1]} className="w-6 h-4 md:w-[1.4vw] md:h-[1vw] rounded-[2px] md:rounded-[0.1vw] flex-shrink-0" />
+              <span className="text-sm md:text-[0.8vw] font-medium text-gray-900 truncate flex-1">
                 {country[0]}
               </span>
-              <span className="text-[0.7vw] text-gray-500 font-mono">
+              <span className="text-xs md:text-[0.7vw] text-gray-500 font-mono">
                 +{country[2]}
               </span>
             </button>

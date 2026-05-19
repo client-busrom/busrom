@@ -21,19 +21,19 @@ interface ApplicationEngineerSaidSectionProps {
 }
 
 export function ApplicationEngineerSaidSection({
-  title = "The Engineer\nSaid",
-  mainQuote = "For Busrom, design is never mere fantasy, but a precise balance of mechanics and aesthetics.",
-  leftQuote = "Through a rigorous manufacturing system, Busrom transforms abstract concepts into tangible works of art.",
-  rightQuote = "Every adjustment in craftsmanship and every dimension controlled embodies our pursuit of ultimate reliability.",
-  ctaText = "Explore\nMore",
-  ctaHref = "/about",
+  title = "",
+  mainQuote = "",
+  leftQuote = "",
+  rightQuote = "",
+  ctaText = "",
+  ctaHref = "",
   engineerImage = "/images/application/engineer.jpg",
   workImage = "/images/application/work.jpg",
 }: ApplicationEngineerSaidSectionProps) {
   return (
     <section
       className="relative w-full select-none"
-      style={{ height: vw(922) }}
+      style={{ height: vw(922), marginBottom: vw(80) }}
     >
       {/* 1920 Container for absolute positioning */}
       <div

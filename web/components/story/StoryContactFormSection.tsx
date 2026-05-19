@@ -155,7 +155,7 @@ export function StoryContactFormSection({
   // Atomic Phone Input State
   const [openCountrySelector, setOpenCountrySelector] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<[string, string, string]>(
-    COUNTRIES.find(c => c[1].toLowerCase() === (locale === "zh" ? "cn" : "us")) || COUNTRIES[0]
+    COUNTRIES.find(c => c[1] === "US") || COUNTRIES[0]
   );
   const countrySelectorRef = useRef<HTMLDivElement>(null);
 
