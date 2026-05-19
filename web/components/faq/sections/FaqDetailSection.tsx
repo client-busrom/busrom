@@ -67,11 +67,10 @@ const FaqItemRow = React.memo(({
         </span>
 
         <h1
-          className="text-black font-bold flex-1 leading-[1.2] m-0"
+          className="text-black font-bold font-anaheim flex-1 leading-[1.2] m-0"
           style={{
-            fontSize: vw(40),
-            fontFamily: "var(--font-anaheim), sans-serif",
-            paddingRight: isOpen && faq.image ? vw(200) : vw(66),
+            fontSize: vw(36),
+            paddingRight: isOpen && faq.image ? vw(260) : vw(66),
           }}
         >
           {faq.question}
@@ -136,7 +135,7 @@ const FaqItemRow = React.memo(({
               <div
                 className="flex-1 text-[#605b37] font-anaheim font-medium [&_p:first-child]:mt-0 [&_p]:leading-[inherit] [&_p]:tracking-[inherit]"
                 style={{
-                  fontSize: vw(24),
+                  fontSize: vw(22),
                   lineHeight: 1.4,
                   letterSpacing: "0.02em",
                 }}
@@ -239,6 +238,34 @@ export function FaqDetailSection({
 
   // Remove handleScroll to prevent re-renders
 
+  const handleScrollbarPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const track = e.currentTarget;
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const scroll = (clientY: number) => {
+      const rect = track.getBoundingClientRect();
+      const clickY = clientY - rect.top;
+      const ratio = Math.max(0, Math.min(1, clickY / rect.height));
+      const maxScroll = container.scrollHeight - container.clientHeight;
+      container.scrollTop = ratio * maxScroll;
+    };
+
+    scroll(e.clientY);
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      scroll(moveEvent.clientY);
+    };
+
+    const handlePointerUp = () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+  };
+
   const constraintsRef = React.useRef<HTMLDivElement>(null);
 
   if (!activeCategory) return null;
@@ -254,7 +281,7 @@ export function FaqDetailSection({
         ref={constraintsRef}
         style={{
           paddingTop: vw(60),
-          marginBottom: vw(80),
+          marginBottom: vw(60),
           paddingLeft: vw(100),
           paddingRight: vw(100),
         }}
@@ -351,9 +378,19 @@ export function FaqDetailSection({
           >
             <motion.div
               key={`amp-decor-${activeId}`}
-              initial={{ opacity: 0, rotate: -15, scale: 0.8 }}
-              animate={{ opacity: 0.7, rotate: -25, scale: 1.2 }}
-              transition={{ duration: 1.5, ease: "easeOut" }}
+              initial={{ opacity: 0, rotate: -15, scale: 0.8, y: 0 }}
+              animate={{ 
+                opacity: 0.7, 
+                rotate: -25, 
+                scale: 1.2,
+                y: [0, vw(-20) as any, 0]
+              }}
+              transition={{ 
+                opacity: { duration: 1.5, ease: "easeOut" },
+                rotate: { duration: 1.5, ease: "easeOut" },
+                scale: { duration: 1.5, ease: "easeOut" },
+                y: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+              }}
               className="font-paytone-one leading-none select-none"
               style={{
                 fontSize: vw(320),
@@ -375,7 +412,8 @@ export function FaqDetailSection({
             style={{
               fontSize: vw(60),
               fontFamily: "var(--font-fredericka), serif",
-              lineHeight: 1.1,
+              lineHeight: 1.5,
+              letterSpacing: "-0.03em",
               whiteSpace: "pre-line",
               marginBottom: vw(35),
             }}
@@ -403,7 +441,7 @@ export function FaqDetailSection({
           <div
             ref={scrollRef}
             className="overflow-y-auto custom-scrollbar"
-            style={{ height: vw(580), paddingRight: vw(60) }}
+            style={{ height: vw(580), paddingRight: vw(60), overscrollBehaviorY: "contain" }}
             data-lenis-prevent
           >
             {activeCategory.faqs.map((faq, fIdx) => (
@@ -420,20 +458,36 @@ export function FaqDetailSection({
 
           {/* Scrollbar */}
           <div
-            className="absolute bg-[#e0dbbc] rounded-full"
+            className="absolute rounded-full cursor-pointer select-none"
+            onPointerDown={handleScrollbarPointerDown}
             style={{
-              width: vw(6),
+              width: vw(16),
               height: vw(580),
               right: vw(10),
               top: vw(10),
+              backgroundColor: "transparent",
             }}
           >
-            <motion.div
-              className="w-full bg-[#756f3f] rounded-full"
+            {/* Visual Track */}
+            <div 
+              className="absolute bg-[#e0dbbc] rounded-full pointer-events-none"
               style={{
+                width: vw(6),
+                height: "100%",
+                left: "50%",
+                transform: "translateX(-50%)",
+              }}
+            />
+            {/* Draggable/Animated Thumb */}
+            <motion.div
+              className="bg-[#756f3f] rounded-full pointer-events-none"
+              style={{
+                width: vw(6),
                 height: "20%",
                 top: scrollBarTop,
                 position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)",
               }}
             />
           </div>
@@ -451,7 +505,7 @@ export function FaqDetailSection({
         >
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="flex items-center justify-between bg-[#756f3f] rounded-full shadow-2xl"
+            className="flex items-center justify-between bg-[#756f3f] border border-[#756f3f] group-hover/btn:bg-white rounded-full shadow-2xl transition-all duration-300"
             style={{
               width: 'auto',
               height: vw(76),
@@ -460,7 +514,7 @@ export function FaqDetailSection({
             }}
           >
             <span
-              className="text-white font-medium font-anaheim mx-3"
+              className="text-white group-hover/btn:text-[#756f3f] font-medium font-anaheim mx-3 transition-colors duration-300"
               style={{
                 fontSize: vw(20),
               }}
@@ -468,13 +522,13 @@ export function FaqDetailSection({
               {data.selection?.viewButtonText || "VIEW MORE"}
             </span>
             <div
-              className="bg-white rounded-full flex items-center justify-center shrink-0"
+              className="bg-white border border-transparent group-hover/btn:bg-[#756f3f] group-hover/btn:border-[#756f3f] rounded-full flex items-center justify-center shrink-0 transition-all duration-300"
               style={{ width: vw(58), height: vw(58) }}
             >
               <div style={{ width: vw(24), height: vw(24) }}>
                 <IconifyIcon
                   name="lucide:arrow-up-right"
-                  color="#756f3f"
+                  className="text-[#756f3f] group-hover/btn:text-white transition-colors duration-300"
                   size="100%"
                 />
               </div>

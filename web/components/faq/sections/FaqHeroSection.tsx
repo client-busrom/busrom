@@ -115,9 +115,10 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
               className="relative inline-block font-bold text-[#FFB039]"
               style={{
                 textShadow: `
-                  ${vw(1)} ${vw(1)} 0 #FFEB6B,
-                  ${vw(2)} ${vw(2)} 0 #FFEB6B,
-                  ${vw(3)} ${vw(3)} ${vw(4)} rgba(0,0,0,0.3)
+                  ${vw(1)} ${vw(1)} 0 #0f0e03,
+                  ${vw(2)} ${vw(2)} 0 #0f0e03,
+                  ${vw(3)} ${vw(3)} 0 #0f0e03,
+                  ${vw(4)} ${vw(4)} ${vw(8)} #FF911B
                 `,
                 WebkitTextStroke: `${vw(0.5)} #FFEB6B`,
                 paintOrder: "stroke fill"

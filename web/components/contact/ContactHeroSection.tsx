@@ -123,6 +123,8 @@ export function ContactHeroSection({
   heroImage,
   subtitle = "Contact Busrom For Technical Consultation, Product Selection, Custom Solutions And Quotations.",
 }: ContactHeroSectionProps) {
+  const [isHovered, setIsHovered] = React.useState(false)
+
   const handleScrollToForm = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (buttonLink.startsWith("#")) {
       e.preventDefault()
@@ -242,6 +244,10 @@ export function ContactHeroSection({
       <motion.a
         href={buttonLink}
         onClick={handleScrollToForm}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onPointerUp={() => setIsHovered(false)}
+        onPointerCancel={() => setIsHovered(false)}
         className="absolute group cursor-pointer"
         style={{
           left: rpx(273),
@@ -251,17 +257,16 @@ export function ContactHeroSection({
           transformOrigin: "center center",
         }}
         initial={{ rotate: 1.51 }}
-        animate={{ rotate: 1.51 }}
-        whileHover={{
-          scale: 1.02,
-          x: [0, -2, 2, -2, 2, 0],
-          transition: {
-            x: {
-              repeat: Infinity,
-              duration: 0.4,
-              ease: "easeInOut",
-            },
-          },
+        animate={{
+          rotate: 1.51,
+          scale: isHovered ? 1.02 : 1,
+          x: isHovered ? [0, -2, 2, -2, 2, 0] : 0,
+        }}
+        transition={{
+          scale: { duration: 0.2 },
+          x: isHovered
+            ? { repeat: Infinity, duration: 0.4, ease: "easeInOut" }
+            : { duration: 0.2 },
         }}
         whileTap={{ scale: 0.98 }}
       >

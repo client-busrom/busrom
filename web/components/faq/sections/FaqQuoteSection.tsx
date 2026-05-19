@@ -300,7 +300,7 @@ export function FaqQuoteSection({ data, locale }: FaqQuoteSectionProps) {
             viewport={{ once: true }}
             className={`text-[#363105] ${isMobile ? "whitespace-normal" : "whitespace-pre-line"}`}
             style={{
-              fontSize: isMobile ? mvw(32) : vw(78),
+              fontSize: isMobile ? mvw(32) : vw(64),
               lineHeight: 1.2,
               fontFamily: "var(--font-agbalumo), cursive",
               marginBottom: isMobile ? mvw(10) : vw(30),
