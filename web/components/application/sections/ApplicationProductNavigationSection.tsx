@@ -170,10 +170,12 @@ export function ApplicationProductNavigationSection({
   if (products.length === 0) return null;
 
   return (
-    <section
-      className="relative w-full overflow-hidden select-none bg-transparent"
-      style={{ height: vw(922) }}
-    >
+    <>
+      {/* Desktop view */}
+      <section
+        className="hidden lg:block relative w-full overflow-hidden select-none bg-transparent"
+        style={{ height: vw(922) }}
+      >
       {/* 1920 container to host exact coordinates */}
       <div
         className="absolute left-1/2 -translate-x-1/2 h-full"
@@ -494,5 +496,207 @@ export function ApplicationProductNavigationSection({
         </div>
       </div>
     </section>
-  );
+
+    {/* Mobile and Tablet view */}
+    <section className="lg:hidden w-full bg-transparent py-12 px-4 select-none flex flex-col items-center overflow-hidden">
+      {/* Title */}
+      <div className="w-full max-w-sm flex flex-col items-center mb-8">
+        <h4
+          className="text-3xl font-extrabold uppercase text-[#756F3F] text-center tracking-wide"
+          style={{ fontFamily: "var(--font-anaheim), sans-serif" }}
+        >
+          {locale === "zh" ? "产品分类" : "PRODUCT CATEGORIES"}
+        </h4>
+        <span
+          className="text-xs font-semibold tracking-[0.2em] text-black/30 mt-2 uppercase font-quicksand"
+        >
+          BUSROM
+        </span>
+      </div>
+
+      {/* Carousel Card Container */}
+      <div className="relative w-full max-w-sm md:max-w-md flex flex-col items-center">
+        {/* Card */}
+        <div
+          onClick={() => {
+            const product = products[activeIndex];
+            const url = product.slug.startsWith("/")
+              ? product.slug
+              : `/${locale}/shop/${product.slug}`;
+            if (product.openInNewTab) {
+              window.open(url, "_blank");
+            } else {
+              window.location.href = url;
+            }
+          }}
+          className="relative w-full aspect-[4/5] overflow-hidden rounded-[2.5rem] shadow-xl bg-stone-200 cursor-pointer group"
+        >
+          <AnimatePresence initial={false} mode="wait">
+            <motion.div
+              key={activeIndex}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              transition={{ duration: 0.4 }}
+              className="w-full h-full relative"
+            >
+              {/* Product Image */}
+              {products[activeIndex]?.showImage?.url ? (
+                <Image
+                  src={products[activeIndex].showImage.url}
+                  alt={products[activeIndex].name || "Product"}
+                  fill
+                  unoptimized
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-stone-200" />
+              )}
+
+              {/* Top Right Arrow Icon */}
+              <div
+                className="absolute right-6 top-6 w-12 h-12 rounded-full border border-white/50 bg-[#756F3F] flex items-center justify-center text-white shadow-md"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-6 h-6"
+                >
+                  <path
+                    d="M7 17L17 7M17 7H7M17 7V17"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+
+              {/* Info Overlay at the bottom */}
+              <div
+                className="absolute bottom-0 w-full flex flex-col justify-center p-6 pt-8"
+                style={{
+                  backgroundColor: "rgba(117, 111, 63, 0.8)",
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                }}
+              >
+                <h3
+                  className="font-anaheim font-bold text-white text-2xl truncate mb-3"
+                >
+                  {products[activeIndex]?.name}
+                </h3>
+
+                {products[activeIndex]?.description && (
+                  <div className="flex flex-col gap-2">
+                    {products[activeIndex].description
+                      .split("\n")
+                      .filter((line: string) => line.trim())
+                      .map((line: string, idx: number) => (
+                        <div key={idx} className="flex items-center">
+                          {/* Dot Indicator */}
+                          <div className="relative w-3.5 h-3.5 flex items-center justify-center flex-shrink-0 mr-3">
+                            <div className="w-3 h-3 rounded-full border border-[#E4DDA9]" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#FFE866] absolute" />
+                          </div>
+                          <span
+                            className="font-anaheim font-semibold text-white text-sm line-clamp-1"
+                          >
+                            {line}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Navigation Controls (Prev/Next buttons & dots) */}
+        <div className="flex items-center gap-6 mt-6">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              prevSlide();
+            }}
+            className="w-10 h-10 rounded-full border border-black/10 flex items-center justify-center bg-black/5 hover:bg-black/10 active:scale-95 transition-all text-[#756F3F]"
+          >
+            <svg viewBox="0 0 14 24" fill="none" className="w-2.5 h-4 rotate-180">
+              <path
+                d="M1 23L12 12L1 1"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+
+          {/* Dots */}
+          <div className="flex gap-1.5">
+            {products.map((item, idx) => (
+              <button
+                key={idx}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveIndex(idx);
+                }}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  activeIndex === idx ? "bg-[#756F3F] w-4" : "bg-black/20"
+                }`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              nextSlide();
+            }}
+            className="w-10 h-10 rounded-full border border-black/10 flex items-center justify-center bg-black/5 hover:bg-black/10 active:scale-95 transition-all text-[#756F3F]"
+          >
+            <svg viewBox="0 0 14 24" fill="none" className="w-2.5 h-4">
+              <path
+                d="M1 23L12 12L1 1"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* View More Button at the bottom */}
+      {ctaHref && (
+        <div className="mt-8">
+          <Link href={ctaHref}>
+            <div
+              className="flex items-center justify-center bg-[#756F3F] hover:bg-[#5D5732] text-white px-8 py-3 rounded-full font-anaheim font-bold shadow-md transition-all active:scale-95 cursor-pointer"
+            >
+              <span className="text-sm tracking-widest mr-2">{ctaText}</span>
+              <svg
+                viewBox="0 0 33 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-3"
+              >
+                <path
+                  d="M24 1L31.5 8.5M31.5 8.5L24 16M31.5 8.5H1"
+                  stroke="white"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          </Link>
+        </div>
+      )}
+    </section>
+  </>
+);
 }

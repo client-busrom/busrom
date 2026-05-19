@@ -36,7 +36,7 @@ export default function StaticHeroBanner({ data, locale }: Props) {
     <section className={`relative w-full ${HEIGHT_CLASS}`}>
       {/* 只渲染第一个 Banner - LCP 关键内容 */}
       <div className={`w-full ${HEIGHT_CLASS}`}>
-        <HeroBanner1 data={firstBanner} locale={locale} />
+        <HeroBanner1 data={firstBanner} />
       </div>
 
       {/* 静态进度条 - 显示 1/N */}

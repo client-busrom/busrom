@@ -168,157 +168,257 @@ export function ApplicationGuideSection({
   // --------------------------------------------------------------------------
 
   return (
-    <section
-      ref={containerRef}
-      className="relative w-full bg-[#F9F9F5] select-none"
-      style={{ height: vw(960) }}
-    >
-      {/* Central Integrated Composition */}
-      <div className="relative w-full h-full flex justify-center items-center">
-        {/* The Entire Group Wrapper centered on page 50% */}
-        <div
-          className="relative h-full flex items-center justify-center"
-          style={{ width: vw(1170) }}
-        >
-          {/* 1. LAYER: LEFT TITLE (Outside - Black) */}
+    <>
+      {/* Desktop view */}
+      <section
+        ref={containerRef}
+        className="hidden lg:block relative w-full bg-[#F9F9F5] select-none"
+        style={{ height: vw(960) }}
+      >
+        {/* Central Integrated Composition */}
+        <div className="relative w-full h-full flex justify-center items-center">
+          {/* The Entire Group Wrapper centered on page 50% */}
           <div
-            className="absolute text-black flex flex-col items-start z-10 pointer-events-none"
-            style={{
-              top: "50%",
-              right: titleConfig.right,
-              transform: `translateY(-42%) translateX(${vw(titleConfig.translateX)})`,
-              width: vw(titleConfig.width),
-            }}
+            className="relative h-full flex items-center justify-center"
+            style={{ width: vw(1170) }}
           >
-            <h2
-              className="font-amarante whitespace-pre-line break-keep"
+            {/* 1. LAYER: LEFT TITLE (Outside - Black) */}
+            <div
+              className="absolute text-black flex flex-col items-start z-10 pointer-events-none"
               style={{
-                fontSize: vw(99),
-                lineHeight: vw(titleConfig.lineHeight),
+                top: "50%",
+                right: titleConfig.right,
+                transform: `translateY(-42%) translateX(${vw(titleConfig.translateX)})`,
+                width: vw(titleConfig.width),
               }}
             >
+              <h2
+                className="font-amarante whitespace-pre-line break-keep"
+                style={{
+                  fontSize: vw(99),
+                  lineHeight: vw(titleConfig.lineHeight),
+                }}
+              >
+                {renderSegments(title)}
+              </h2>
+            </div>
+
+            {/* 1b. INDEPENDENT CAPSULE BUTTON (Outside - Black) */}
+            <div
+              className="absolute flex items-center justify-center border border-black rounded-full z-10 pointer-events-none"
+              style={{
+                width: vw(arrowConfig.width),
+                height: vw(arrowConfig.height),
+                left: "50%",
+                top: "58%",
+                marginLeft: vw(arrowConfig.marginLeft),
+                marginTop: vw(arrowConfig.marginTop),
+              }}
+            >
+              <CircleArrow
+                style={{ width: vw(41), height: vw(19), color: "#000" }}
+              />
+            </div>
+
+            {/* 2. LAYER: MIDDLE IMAGE (Middle Layer) */}
+            <div
+              className="absolute overflow-hidden rounded-full z-20 shadow-2xl"
+              style={{
+                width: vw(562),
+                height: vw(562),
+                left: "50%",
+                top: "50%",
+                transform: "translate(-50%, -42%)",
+              }}
+            >
+              {image ? (
+                <OptimizedImage
+                  image={image}
+                  alt="Guide"
+                  sizes="meidum"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200" />
+              )}
+
+              {/* White Content Overlay (Clipped to Circle) */}
+              <div
+                className="absolute text-white pointer-events-none"
+                style={{
+                  top: "50%",
+                  left: vw(-304),
+                  width: vw(1170),
+                  height: "100%",
+                  transform: "translateY(-50%)",
+                }}
+              >
+                {/* Replicated Title for Inversion */}
+                <div
+                  className="absolute flex flex-col items-start text-white"
+                  style={{
+                    top: "50%",
+                    right: titleConfig.right,
+                    transform: `translateY(-50%) translateX(${vw(titleConfig.translateX)})`,
+                    width: vw(titleConfig.width),
+                  }}
+                >
+                  <h2
+                    className="font-amarante whitespace-pre-line break-keep !text-white"
+                    style={{
+                      fontSize: vw(99),
+                      lineHeight: vw(titleConfig.lineHeight),
+                    }}
+                  >
+                    {renderSegments(title)}
+                  </h2>
+                </div>
+
+                {/* Replicated Button for Inversion */}
+                <div
+                  className="absolute flex items-center justify-center border border-white rounded-full"
+                  style={{
+                    width: vw(arrowConfig.width),
+                    height: vw(arrowConfig.height),
+                    left: "50%",
+                    top: "55.6%",
+                    marginLeft: vw(arrowConfig.marginLeft),
+                    marginTop: vw(arrowConfig.marginTop),
+                  }}
+                >
+                  <CircleArrow
+                    style={{ width: vw(41), height: vw(19), color: "#fff" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 3. LAYER: RIGHT GREEN CIRCLE (Top Layer) */}
+            <div
+              className="absolute rounded-full flex flex-col justify-center items-center shadow-xl backdrop-blur-sm z-30"
+              style={{
+                width: vw(562),
+                height: vw(562),
+                left: "55%",
+                top: "50%",
+                transform: `translate(${vw(90)}, -42%)`,
+                backgroundColor: "rgba(146, 137, 62, 0.58)",
+                padding: vw(45),
+                gap: vw(36),
+              }}
+            >
+              <p
+                className="text-white font-montserrat text-center leading-relaxed whitespace-pre-line"
+                style={{ fontSize: vw(22) }}
+              >
+                {renderSegments(description)}
+              </p>
+
+              <div className="flex flex-col gap-4" style={{ gap: vw(18) }}>
+                <GuideButton text={serviceCta.title} url={serviceCta.url} />
+                <GuideButton text={oemCta.title} url={oemCta.url} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mobile and Tablet view */}
+      <section className="lg:hidden w-full bg-[#F9F9F5] py-16 px-6 select-none flex flex-col items-center overflow-hidden">
+        <div className="w-full max-w-md flex flex-col items-center gap-8">
+          {/* Title */}
+          <div className="w-full text-center">
+            <h2 className="font-amarante text-3xl font-extrabold text-black leading-tight">
               {renderSegments(title)}
             </h2>
           </div>
 
-          {/* 1b. INDEPENDENT CAPSULE BUTTON (Outside - Black) */}
-          <div
-            className="absolute flex items-center justify-center border border-black rounded-full z-10 pointer-events-none"
-            style={{
-              width: vw(arrowConfig.width),
-              height: vw(arrowConfig.height),
-              left: "50%",
-              top: "58%",
-              marginLeft: vw(arrowConfig.marginLeft),
-              marginTop: vw(arrowConfig.marginTop),
-            }}
-          >
-            <CircleArrow
-              style={{ width: vw(41), height: vw(19), color: "#000" }}
-            />
-          </div>
-
-          {/* 2. LAYER: MIDDLE IMAGE (Middle Layer) */}
-          <div
-            className="absolute overflow-hidden rounded-full z-20 shadow-2xl"
-            style={{
-              width: vw(562),
-              height: vw(562),
-              left: "50%",
-              top: "50%",
-              transform: "translate(-50%, -42%)",
-            }}
-          >
+          {/* Image Container */}
+          <div className="w-56 h-56 rounded-full overflow-hidden shadow-xl border-4 border-white bg-[#D6D3C2]">
             {image ? (
               <OptimizedImage
                 image={image}
                 alt="Guide"
-                sizes="meidum"
+                sizes="medium"
                 className="w-full h-full object-cover"
               />
             ) : (
               <div className="w-full h-full bg-gray-200" />
             )}
-
-            {/* White Content Overlay (Clipped to Circle) */}
-            <div
-              className="absolute text-white pointer-events-none"
-              style={{
-                top: "50%",
-                left: vw(-304),
-                width: vw(1170),
-                height: "100%",
-                transform: "translateY(-50%)",
-              }}
-            >
-              {/* Replicated Title for Inversion */}
-              <div
-                className="absolute flex flex-col items-start text-white"
-                style={{
-                  top: "50%",
-                  right: titleConfig.right,
-                  transform: `translateY(-50%) translateX(${vw(titleConfig.translateX)})`,
-                  width: vw(titleConfig.width),
-                }}
-              >
-                <h2
-                  className="font-amarante whitespace-pre-line break-keep !text-white"
-                  style={{
-                    fontSize: vw(99),
-                    lineHeight: vw(titleConfig.lineHeight),
-                  }}
-                >
-                  {renderSegments(title)}
-                </h2>
-              </div>
-
-              {/* Replicated Button for Inversion */}
-              <div
-                className="absolute flex items-center justify-center border border-white rounded-full"
-                style={{
-                  width: vw(arrowConfig.width),
-                  height: vw(arrowConfig.height),
-                  left: "50%",
-                  top: "55.6%",
-                  marginLeft: vw(arrowConfig.marginLeft),
-                  marginTop: vw(arrowConfig.marginTop),
-                }}
-              >
-                <CircleArrow
-                  style={{ width: vw(41), height: vw(19), color: "#fff" }}
-                />
-              </div>
-            </div>
           </div>
 
-          {/* 3. LAYER: RIGHT GREEN CIRCLE (Top Layer) */}
+          {/* Description & CTAs Container */}
           <div
-            className="absolute rounded-full flex flex-col justify-center items-center shadow-xl backdrop-blur-sm z-30"
-            style={{
-              width: vw(562),
-              height: vw(562),
-              left: "55%",
-              top: "50%",
-              transform: `translate(${vw(90)}, -42%)`,
-              backgroundColor: "rgba(146, 137, 62, 0.58)",
-              padding: vw(45),
-              gap: vw(36),
-            }}
+            className="w-full rounded-[2rem] p-6 shadow-lg text-center flex flex-col items-center gap-6"
+            style={{ backgroundColor: "rgba(146, 137, 62, 0.9)" }}
           >
-            <p
-              className="text-white font-montserrat text-center leading-relaxed whitespace-pre-line"
-              style={{ fontSize: vw(22) }}
-            >
+            <p className="text-white font-montserrat text-sm leading-relaxed whitespace-pre-line">
               {renderSegments(description)}
             </p>
 
-            <div className="flex flex-col gap-4" style={{ gap: vw(18) }}>
-              <GuideButton text={serviceCta.title} url={serviceCta.url} />
-              <GuideButton text={oemCta.title} url={oemCta.url} />
+            {/* CTA Buttons */}
+            <div className="w-full flex flex-col gap-3 items-center">
+              <a
+                href={serviceCta.url}
+                className="w-full py-4 rounded-full bg-white text-[#756F3F] font-bold font-montserrat text-center text-sm shadow-sm active:bg-gray-100 transition-all flex items-center justify-between px-6"
+              >
+                <span>{serviceCta.title}</span>
+                <div className="w-8 h-8 rounded-full bg-[#756F3F] text-white flex items-center justify-center shrink-0">
+                  <svg
+                    viewBox="0 0 46 21"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-4 h-2"
+                  >
+                    <path
+                      d="M36 2L44 10.5L36 19"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M1 10.5H44"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+              </a>
+
+              <a
+                href={oemCta.url}
+                className="w-full py-4 rounded-full border border-white text-white font-bold font-montserrat text-center text-sm shadow-sm active:bg-white/10 transition-all flex items-center justify-between px-6"
+              >
+                <span>{oemCta.title}</span>
+                <div className="w-8 h-8 rounded-full bg-white text-[#756F3F] flex items-center justify-center shrink-0">
+                  <svg
+                    viewBox="0 0 46 21"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-4 h-2"
+                  >
+                    <path
+                      d="M36 2L44 10.5L36 19"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M1 10.5H44"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+              </a>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

@@ -145,12 +145,14 @@ export function OemOdmBrandAdvantage({
       : "center"
 
   return (
-    <section
-      className="relative w-full overflow-hidden"
-      style={{
-        ["--rpx-brand-adv" as string]: `min(calc(100vw / ${DESIGN_WIDTH}), max(calc(600px / ${DESIGN_HEIGHT}), calc(100vh / ${DESIGN_HEIGHT})))`,
-      }}
-    >
+    <>
+      {/* Desktop view */}
+      <section
+        className="hidden lg:block relative w-full overflow-hidden"
+        style={{
+          ["--rpx-brand-adv" as string]: `min(calc(100vw / ${DESIGN_WIDTH}), max(calc(600px / ${DESIGN_HEIGHT}), calc(100vh / ${DESIGN_HEIGHT})))`,
+        }}
+      >
       {/* 内部容器 */}
       <div
         className="relative w-full overflow-hidden"
@@ -570,7 +572,111 @@ export function OemOdmBrandAdvantage({
         </svg>
       </div>
     </section>
-  )
+
+    {/* Mobile and Tablet view */}
+    <section className="lg:hidden w-full bg-[#FFFDF8] py-16 px-6 select-none flex flex-col items-center overflow-hidden">
+      {/* Title */}
+      <div className="w-full text-center mb-8">
+        <span className="text-xs font-bold tracking-[0.2em] text-[#756F3F]/60 uppercase block mb-2 font-quicksand">
+          BUSROM
+        </span>
+        <h2
+          className="text-3xl font-bold tracking-wider text-[#756F3F] font-anaheim"
+        >
+          {title}
+        </h2>
+      </div>
+
+      {/* Brand Advantages Capsule Card */}
+      <motion.div
+        className="w-full max-w-sm bg-[#756F3F] text-white px-8 py-10 rounded-[3rem] shadow-xl flex flex-col items-center mb-8 relative"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="flex flex-col items-center gap-5 w-full">
+          {brandAdvantages.map((item, index) => (
+            <span
+              key={index}
+              className="font-anaheim font-semibold text-lg text-white capitalize tracking-wide text-center"
+            >
+              {item}
+            </span>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* OEM & ODM Services Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-sm sm:max-w-2xl mx-auto">
+        {/* OEM Card */}
+        <motion.div
+          onClick={onOemClick}
+          className="w-full aspect-[4/3] rounded-[2.5rem] overflow-hidden relative shadow-lg cursor-pointer transition-transform active:scale-[0.98] duration-300"
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          {leftImage ? (
+            <OptimizedImage
+              image={leftImage as any}
+              alt="OEM Service"
+              size="large"
+              className="w-full h-full object-cover"
+              objectPosition={getObjectPosition(leftImage)}
+            />
+          ) : (
+            <div className="w-full h-full bg-stone-200" />
+          )}
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+          {/* Label and Hint */}
+          <div className="absolute inset-x-0 bottom-6 flex flex-col items-center text-center px-4">
+            <span className="font-anaheim font-bold text-white text-3xl">
+              {oemLabel}
+            </span>
+            <span className="text-[#FFF38E] font-anaheim font-semibold text-xs tracking-widest uppercase mt-1">
+              {clickToKnowMore}
+            </span>
+          </div>
+        </motion.div>
+
+        {/* ODM Card */}
+        <motion.div
+          onClick={onOdmClick}
+          className="w-full aspect-[4/3] rounded-[2.5rem] overflow-hidden relative shadow-lg cursor-pointer transition-transform active:scale-[0.98] duration-300"
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          {rightImage ? (
+            <OptimizedImage
+              image={rightImage as any}
+              alt="ODM Service"
+              size="large"
+              className="w-full h-full object-cover"
+              objectPosition={getObjectPosition(rightImage)}
+            />
+          ) : (
+            <div className="w-full h-full bg-stone-200" />
+          )}
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+          {/* Label and Hint */}
+          <div className="absolute inset-x-0 bottom-6 flex flex-col items-center text-center px-4">
+            <span className="font-anaheim font-bold text-white text-3xl">
+              {odmLabel}
+            </span>
+            <span className="text-[#FFF38E] font-anaheim font-semibold text-xs tracking-widest uppercase mt-1">
+              {clickToKnowMore}
+            </span>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  </>
+)
 }
 
 export default OemOdmBrandAdvantage

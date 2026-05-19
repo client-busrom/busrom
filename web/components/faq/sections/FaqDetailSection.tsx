@@ -221,14 +221,20 @@ export function FaqDetailSection({
 
       // 2. 内部滚动定位
       setTimeout(() => {
-        const element = document.getElementById(`faq-item-${activeFaqId}`);
-        if (element && scrollRef.current) {
-          const container = scrollRef.current;
-          const elementTop = element.offsetTop;
-          container.scrollTo({
-            top: elementTop - 20, // 稍微留一点间距
-            behavior: "smooth",
-          });
+        const element = 
+          document.getElementById(`faq-item-${activeFaqId}`) || 
+          document.getElementById(`faq-item-mobile-${activeFaqId}`);
+        if (element) {
+          if (scrollRef.current && window.innerWidth >= 1024) {
+            const container = scrollRef.current;
+            const elementTop = element.offsetTop;
+            container.scrollTo({
+              top: elementTop - 20, // 稍微留一点间距
+              behavior: "smooth",
+            });
+          } else {
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
         }
         // 完成后清空状态，避免重复触发
         setActiveFaqId?.(null);
@@ -271,10 +277,12 @@ export function FaqDetailSection({
   if (!activeCategory) return null;
 
   return (
-    <section
-      className="relative w-full bg-[#f6f4ed] overflow-hidden"
-      style={{ height: vw(1080) }}
-    >
+    <>
+      {/* Desktop view */}
+      <section
+        className="hidden lg:block relative w-full bg-[#f6f4ed] overflow-hidden"
+        style={{ height: vw(1080) }}
+      >
       {/* 1. Category Tabs */}
       <div
         className="relative w-full flex justify-center z-50"
@@ -547,6 +555,141 @@ export function FaqDetailSection({
         }
       `}</style>
     </section>
+
+    {/* Mobile and Tablet view */}
+    <section className="lg:hidden w-full bg-[#f6f4ed] py-12 px-6 flex flex-col items-center">
+      {/* 1. Category Tabs */}
+      <div className="w-full overflow-x-auto scrollbar-none flex gap-4 py-2 mb-6 select-none justify-start sm:justify-center">
+        {categories.map((cat) => {
+          const isActive = cat.id === activeId;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => setActiveId(cat.id)}
+              className={`flex items-center shrink-0 gap-2 px-4 py-2 rounded-full border transition-all duration-300 ${
+                isActive
+                  ? "bg-[#756f3f] border-[#756f3f] text-white shadow-md scale-105"
+                  : "bg-[#dbd5ab] border-[#a0974d] text-[#645c1d] opacity-80"
+              }`}
+            >
+              {cat.icon && (
+                <div className="w-4 h-4 shrink-0">
+                  <IconifyIcon
+                    name={cat.icon}
+                    color={isActive ? "white" : "#645c1d"}
+                    size="100%"
+                  />
+                </div>
+              )}
+              <span className="font-bold text-sm tracking-wider font-anaheim whitespace-nowrap">
+                {cat.title}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 2. Title & Image Block */}
+      <div className="w-full max-w-md mx-auto flex flex-col items-center mb-6">
+        <h3 className="text-[#635B15] font-regular uppercase text-3xl font-serif text-center leading-tight mb-4">
+          {activeCategory.title}
+        </h3>
+        <div className="rounded-[24px] overflow-hidden shadow-lg aspect-square w-full">
+          <OptimizedImage
+            image={activeCategory.image}
+            className="w-full h-full object-cover"
+            size="large"
+          />
+        </div>
+      </div>
+
+      {/* 3. Accordion FAQ List */}
+      <div className="w-full max-w-md mx-auto flex flex-col gap-2">
+        {activeCategory.faqs.map((faq, fIdx) => {
+          const isOpen = !!openFaqs[faq.id];
+          const numStr = (fIdx + 1).toString().padStart(2, "0") + ".";
+          return (
+            <div
+              key={faq.id}
+              id={`faq-item-mobile-${faq.id}`}
+              className="w-full border-b border-[#c7c3a5] pb-4"
+            >
+              <div
+                className="flex items-start justify-between gap-4 cursor-pointer py-3"
+                onClick={() => toggleFaq(faq.id)}
+              >
+                <div className="flex items-start gap-3 flex-1">
+                  <span className="text-[#756f3f] font-semibold text-lg font-anaheim shrink-0 mt-0.5">
+                    {numStr}
+                  </span>
+                  <h4 className="text-black font-bold font-anaheim text-lg leading-[1.3] m-0">
+                    {faq.question}
+                  </h4>
+                </div>
+                <div className="shrink-0 mt-1">
+                  <motion.div
+                    animate={{ rotate: isOpen ? 90 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex items-center justify-center rounded-full bg-[#ece6d0] w-7 h-7"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M9 5L16 12L9 19"
+                        stroke="#676767"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </motion.div>
+                </div>
+              </div>
+
+              <AnimatePresence>
+                {isOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pl-8 pr-2 pt-2 text-[#605b37] font-anaheim font-medium text-sm leading-[1.5] tracking-wide flex flex-col gap-4">
+                      <LexicalRenderer content={faq.answer} />
+                      {faq.image && (
+                        <div className="w-full max-w-xs mt-3 rounded-xl overflow-hidden border border-black/5 shadow-sm">
+                          <OptimizedImage
+                            image={faq.image}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 4. Action Button */}
+      {data.selection?.viewButtonText && (
+        <div className="w-full px-6 mt-8 flex justify-center">
+          <a
+            href={data.selection?.viewButtonLink || "#"}
+            className="w-full max-w-xs"
+          >
+            <button className="w-full py-4 rounded-full bg-[#756f3f] text-white font-bold font-anaheim uppercase tracking-wider flex items-center justify-center gap-2 active:scale-98 transition-transform shadow-md">
+              <span>{data.selection?.viewButtonText}</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="stroke-white stroke-[2.5] stroke-linecap-round stroke-linejoin-round">
+                <path d="M7 17L17 7M17 7H7M17 7V17" />
+              </svg>
+            </button>
+          </a>
+        </div>
+      )}
+    </section>
+  </>
   );
 }
 

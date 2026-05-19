@@ -135,6 +135,38 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
     });
   };
 
+  const renderRichTextMobile = (nodes: any[], isTitleLayer: boolean = false) => {
+    if (!nodes) return null;
+    return nodes.map((node: any, i: number) => {
+      if (node.type === "text") {
+        const isBold = node.format & 1;
+        const text = node.text || "";
+        if (isBold && !isTitleLayer) {
+          return (
+            <span 
+              key={i} 
+              className="relative inline-block font-bold text-[#FFB039]"
+              style={{
+                textShadow: `
+                  1px 1px 0 #0f0e03,
+                  2px 2px 0 #0f0e03,
+                  3px 3px 6px #FF911B
+                `,
+                WebkitTextStroke: "0.5px #FFEB6B",
+                paintOrder: "stroke fill"
+              }}
+            >
+              {text}
+            </span>
+          );
+        }
+        return <span key={i}>{text}</span>;
+      }
+      if (node.type === "linebreak") return <br key={i} />;
+      return null;
+    });
+  };
+
   const renderCta = () => {
     const cta = data.linkJump;
     if (!cta) return null;
@@ -198,11 +230,13 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
   };
 
   return (
-    <section
-      onMouseMove={handleMouseMove}
-      className="relative w-full overflow-hidden bg-[#0a0a05]"
-      style={{ height: vw(DESIGN_HEIGHT) }}
-    >
+    <>
+      {/* Desktop view */}
+      <section
+        onMouseMove={handleMouseMove}
+        className="hidden lg:block relative w-full overflow-hidden bg-[#0a0a05]"
+        style={{ height: vw(DESIGN_HEIGHT) }}
+      >
       {/* --- Premium Background Layers (Performance Optimized) --- */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* 1. Base Metallic Layer - 开启 GPU 加速 */}
@@ -534,5 +568,118 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
         }
       `}</style>
     </section>
+
+    {/* Mobile and Tablet view */}
+    <section className="lg:hidden w-full relative overflow-hidden bg-[#0a0a05] py-16 px-6 select-none flex flex-col items-center">
+      {/* Background with Blur & Dim */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        {data.bgImage && (
+          <OptimizedImage
+            image={data.bgImage}
+            alt="FAQ Background"
+            className="w-full h-full object-cover opacity-20"
+            size="large"
+          />
+        )}
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-[3px]" />
+      </div>
+
+      {/* Content Container */}
+      <div className="relative z-10 w-full max-w-md mx-auto flex flex-col items-center gap-6">
+        {/* Top Text/Category */}
+        {data.text[2] && (
+          <div className="text-white/85 font-anaheim text-base tracking-wider text-center max-w-sm">
+            {renderRichTextMobile(data.text[2])}
+          </div>
+        )}
+
+        {/* Floating/Bouncing Title */}
+        {data.text[0] && (
+          <motion.div
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="text-center"
+          >
+            <h1
+              className="font-paytone-one font-bold text-4xl sm:text-5xl leading-[1.2] text-[#fff499]"
+              style={{
+                textShadow: `
+                  1px 1px 0 #0f0e03,
+                  2px 2px 0 #0f0e03,
+                  3px 3px 0 #0f0e03,
+                  4px 4px 6px #FF911B
+                `,
+                WebkitTextStroke: "1px #FF911B",
+                paintOrder: "stroke fill"
+              }}
+            >
+              {renderRichTextMobile(data.text[0], true)}
+            </h1>
+          </motion.div>
+        )}
+
+        {/* Subtitle/Subtext */}
+        {data.text[1] && (
+          <div className="text-white font-anaheim text-base sm:text-lg font-semibold tracking-wide text-center max-w-sm leading-[1.4]">
+            {renderRichTextMobile(data.text[1])}
+          </div>
+        )}
+
+        {/* Center Pill Image Showcase */}
+        {items.length > 0 && (
+          <div className="my-4 relative w-56 sm:w-64 aspect-[3/4] rounded-[6rem] border-2 border-white/20 overflow-hidden shadow-2xl">
+            <OptimizedImage
+              image={items[activeIndex % items.length].image}
+              alt="FAQ Showcase Mobile"
+              className="w-full h-full object-cover"
+              size="large"
+            />
+          </div>
+        )}
+
+        {/* Navigation Circle Button */}
+        <button
+          onClick={handleNext}
+          className="flex items-center justify-center w-24 h-24 rounded-full bg-[#433e13] border-8 border-[#fffbd7] relative active:scale-95 transition-transform shadow-lg cursor-pointer pointer-events-auto"
+        >
+          <div className="absolute inset-0 animate-spin-slow">
+            <svg viewBox="0 0 127 127" className="w-full h-full overflow-visible">
+              <path
+                id="innerCurveMobile"
+                d="M 63.5, 63.5 m -43, 0 a 43,43 0 1,0 86,0 a 43,43 0 1,0 -86,0"
+                fill="transparent"
+              />
+              <text
+                className="font-anaheim fill-white tracking-[0.4em] font-bold"
+                style={{ fontSize: "14px" }}
+              >
+                <textPath href="#innerCurveMobile" startOffset="0%">
+                  {data.btnText || "CLICK TO VIEW"}
+                </textPath>
+              </text>
+            </svg>
+          </div>
+          {/* Central indicator */}
+          <div className="relative z-10 border border-white/60 rounded-full w-6 h-10 flex items-start justify-center p-1">
+            <motion.div
+              animate={{ y: [0, 6, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="bg-white rounded-full w-1 h-2"
+            />
+          </div>
+        </button>
+
+        {/* CTA Link Jump */}
+        {data.linkJump && (
+          <Link
+            href={data.linkJump.url || "#"}
+            className="mt-2 px-8 py-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/30 text-white font-anaheim text-base font-semibold tracking-wider transition-all shadow-md active:scale-98"
+          >
+            {data.linkJump.title}
+          </Link>
+        )}
+      </div>
+    </section>
+  </>
   );
 }
