@@ -206,39 +206,39 @@ export function ApplicationHeroSection({
             const config =
               slotIdx === 0
                 ? {
-                    left: vw(671),
-                    top: vw(156),
-                    width: vw(716),
-                    height: vw(651),
-                    borderRadius: vw(60),
-                    zIndex: 5,
-                  }
+                  left: vw(671),
+                  top: vw(156),
+                  width: vw(716),
+                  height: vw(651),
+                  borderRadius: vw(60),
+                  zIndex: 5,
+                }
                 : slotIdx === 1
                   ? {
-                      left: vw(1453),
-                      top: vw(311),
-                      width: vw(392),
-                      height: vw(288),
-                      borderRadius: vw(39),
-                      zIndex: 5,
-                    }
+                    left: vw(1453),
+                    top: vw(311),
+                    width: vw(392),
+                    height: vw(288),
+                    borderRadius: vw(39),
+                    zIndex: 5,
+                  }
                   : slotIdx === 2
                     ? {
-                        left: vw(1001),
-                        top: vw(1004),
-                        width: vw(761),
-                        height: vw(517),
-                        borderRadius: vw(60),
-                        zIndex: 5,
-                      }
+                      left: vw(1001),
+                      top: vw(1004),
+                      width: vw(761),
+                      height: vw(517),
+                      borderRadius: vw(60),
+                      zIndex: 5,
+                    }
                     : /* slotIdx===3 */ {
-                        left: vw(69),
-                        top: vw(848),
-                        width: vw(569),
-                        height: vw(517),
-                        borderRadius: vw(60),
-                        zIndex: 5,
-                      };
+                      left: vw(69),
+                      top: vw(848),
+                      width: vw(569),
+                      height: vw(517),
+                      borderRadius: vw(60),
+                      zIndex: 5,
+                    };
 
             return (
               <motion.div
@@ -475,37 +475,87 @@ export function ApplicationHeroSection({
           </div>
 
           {/* SEE ALL BUTTON - Dynamically populated from CMS, with perfect alignment to Group 237.svg */}
-          <Link
-            href={seeAllHref}
-            className="group absolute"
-            style={{ left: vw(1586), top: vw(106), zIndex: 7 }}
-          >
-            <div className="flex items-center">
-              <div
-                style={{
-                  position: "relative",
-                  width: vw(104),
-                  height: vw(104),
-                }}
+          {(() => {
+            const circleSize = 104;
+            const dotSize = 12;
+            const fontSize = 32;
+            const dotGap = 8;
+            const textMarginLeft = circleSize / 2 + dotSize / 2 + dotGap;
+
+            return (
+              <Link
+                href={seeAllHref}
+                className="group absolute flex items-center"
+                style={{ left: vw(1586), top: vw(106), zIndex: 7 }}
               >
-                <div className="absolute inset-0 rounded-full border border-white group-hover:scale-110 group-hover:border-[#FFCC4A] transition-all" />
+                {/* Circle border - visible in default state, hidden on hover */}
                 <div
-                  className="absolute bg-[#FFCC4A] rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                  style={{ width: vw(12), height: vw(12) }}
-                />
-              </div>
-              <span
-                className="font-anaheim text-white group-hover:text-[#FFCC4A] transition-colors"
-                style={{
-                  fontSize: vw(32),
-                  marginLeft: vw(-32),
-                  letterSpacing: "0.05em",
-                }}
-              >
-                {seeAllText}
-              </span>
-            </div>
-          </Link>
+                  className="relative border-2 border-white transition-all duration-500 ease-out group-hover:opacity-0"
+                  style={{
+                    width: vw(circleSize),
+                    height: vw(circleSize),
+                    borderRadius: vw(circleSize / 2),
+                  }}
+                >
+                  {/* Orbit container - rotates around center */}
+                  <div
+                    className="absolute inset-0 flex items-center justify-center"
+                    style={{
+                      animation: "orbitSpin 4s linear infinite",
+                    }}
+                  >
+                    {/* Radius container - moves dot from center to edge */}
+                    <div
+                      style={{
+                        animation: "orbitRadius 4s ease-in-out infinite",
+                      }}
+                    >
+                      {/* Yellow dot */}
+                      <div
+                        className="rounded-full bg-[#FFCC4A]"
+                        style={{
+                          width: vw(dotSize),
+                          height: vw(dotSize),
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Text - positioned 8px right of the yellow dot (at center), breathing effect */}
+                <span
+                  className="absolute font-anaheim font-medium text-white whitespace-nowrap transition-all duration-500 group-hover:opacity-0 cta-text-breathe"
+                  style={{
+                    fontSize: vw(fontSize),
+                    left: vw(textMarginLeft),
+                    animation: "breathe 2s ease-in-out infinite",
+                  }}
+                >
+                  {seeAllText}
+                </span>
+
+                {/* Hover state: expanding capsule from left edge */}
+                <div
+                  className="absolute left-0 top-0 border-2 border-white bg-white transition-all duration-500 ease-out pointer-events-none opacity-0 group-hover:opacity-100 flex items-center cta-capsule-breathe"
+                  style={{
+                    height: vw(circleSize),
+                    borderRadius: vw(circleSize / 2),
+                    paddingLeft: vw(textMarginLeft),
+                    paddingRight: vw(circleSize / 2),
+                  }}
+                >
+                  <span
+                    className="font-anaheim font-medium text-[#756F3F] whitespace-nowrap"
+                    style={{
+                      fontSize: vw(fontSize),
+                    }}
+                  >
+                    {seeAllText}
+                  </span>
+                </div>
+              </Link>
+            );
+          })()}
 
           {/* VIEW MORE pill SVG */}
           <div
