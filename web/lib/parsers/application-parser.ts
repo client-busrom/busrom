@@ -253,11 +253,12 @@ export function parseApplicationData(locale: string, pageContent: any): Applicat
   const moreAppNodes = extractNodesAfterMarker(children, "more-applications");
   
   const findSubContent = (nodes: any[], marker: string) => {
-    const idx = nodes.findIndex(n => (n.children || []).map((c: any) => c.text || "").join("").trim() === marker);
+    const target = marker.trim().toLowerCase();
+    const idx = nodes.findIndex(n => (n.children || []).map((c: any) => c.text || "").join("").trim().toLowerCase() === target);
     if (idx === -1) return [];
     const result: any[] = [];
     for (let i = idx + 1; i < nodes.length; i++) {
-       const text = (nodes[i].children || []).map((c: any) => c.text || "").join("").trim();
+       const text = (nodes[i].children || []).map((c: any) => c.text || "").join("").trim().toLowerCase();
        if (text.startsWith("more-applications-")) break;
        result.push(nodes[i]);
     }

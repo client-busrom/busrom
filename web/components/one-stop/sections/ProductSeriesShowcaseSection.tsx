@@ -40,10 +40,9 @@ export function ProductSeriesShowcaseSection({
     const showImgNode = (activeProduct as any).showImage;
 
     if (mainImages.length > 0) {
-      const shuffled = [...mainImages].sort(() => 0.5 - Math.random());
-      const img1 = shuffled[0];
+      const img1 = mainImages[0];
       const img2 =
-        shuffled.length > 1 ? shuffled[1] : showImgNode || shuffled[0];
+        mainImages.length > 1 ? mainImages[1] : showImgNode || mainImages[0];
       return [img1, img2];
     }
     return [showImgNode, showImgNode];

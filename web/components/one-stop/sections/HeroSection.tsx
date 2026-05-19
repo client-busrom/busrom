@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { HollowText } from "@/components/common/HollowText";
@@ -22,15 +22,43 @@ interface HeroSectionProps {
   locale: string;
 }
 
+// Response size helper
+const rpx = (designValue: number) =>
+  `calc(var(--rpx-hero, 1) * ${designValue}px)`;
+
 export function HeroSection({ slides, locale }: HeroSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [strokeWidth, setStrokeWidth] = useState(1.2);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    const handleResize = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      setIsMobile(vw < 768);
+      const isDesktopLayout = vw >= 1280 || (vw >= 768 && vw > vh);
+      setIsDesktop(isDesktopLayout);
+
+      const el = sectionRef.current;
+      if (!el) return;
+
+      if (isDesktopLayout) {
+        const rawScale = vw / 1920;
+        const baseScale = Math.max(rawScale, 0.5);
+        // Multiply by 0.7 scale factor to match the design's desktop layout proportions
+        el.style.setProperty("--rpx-hero", (baseScale * 0.7).toString());
+        setStrokeWidth(1.2 * baseScale);
+      } else {
+        el.style.setProperty("--rpx-hero", "1");
+        setStrokeWidth(1.2);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Auto-play
@@ -57,13 +85,17 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
     return slides[(currentIndex + offset) % slides.length];
   };
 
-  const adjustedTitleSize = Math.round(70 * (0.6 / 0.7)); // ~60px
-  const adjustedDescSize = Math.round(38 * (0.6 / 0.7)); // ~33px
-
   return (
-    <section className="relative w-full overflow-hidden bg-[#352F03] flex justify-center items-center pt-[20px] md:pt-[46px] h-screen max-h-[968px] min-h-[600px]">
+    <section
+      ref={sectionRef}
+      className="relative w-full overflow-hidden bg-[#352F03] flex justify-center items-center h-[80dvh] lg:h-[48vw] lg:min-h-[600px] mt-[2.4vw] lg:mt-[2.4vw]"
+      style={{
+        paddingTop: isDesktop ? rpx(46) : "46px",
+      }}
+      data-header-theme="light"
+    >
       {/* 1. Global Background Image - Large Optimized Variant */}
-      <div className="absolute inset-0 z-0 w-full h-full max-w-[1920px] mx-auto">
+      <div className="absolute inset-0 z-0 w-full h-full">
         <AnimatePresence mode="wait">
           <motion.div
             key={getSlideInStack(0).image?.id || currentIndex}
@@ -90,8 +122,14 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
       />
 
       {/* 3. Stacked Items Container - Scaled on Desktop */}
-      <div className="relative z-20 w-full max-w-[1920px] h-full flex items-center justify-center pointer-events-none px-4 md:px-0">
-        <div className="relative w-full md:w-[1429px] h-auto min-h-[500px] md:min-h-[720px] origin-center transition-all duration-500 scale-[0.85] md:scale-[0.7]">
+      <div className="relative z-20 w-full h-full flex items-center justify-center pointer-events-none px-4 md:px-0">
+        <div
+          className="relative w-full h-auto origin-center transition-all duration-500"
+          style={{
+            width: isDesktop ? rpx(1429) : "100%",
+            minHeight: isDesktop ? rpx(720) : "450px",
+          }}
+        >
           {/* Back Cards - Hide on mobile if too cluttered */}
           <AnimatePresence>
             {[3, 2, 1].map((offset) => {
@@ -105,8 +143,11 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                   animate={{ opacity: 0.5, rotate: rotation }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.8 }}
-                  className="absolute inset-0 rounded-[100px] md:rounded-[267px] overflow-hidden border border-white/10 hidden md:block"
-                  style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+                  className="absolute inset-0 overflow-hidden border border-white/10 hidden md:block"
+                  style={{
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    borderRadius: isDesktop ? rpx(267) : "100px",
+                  }}
                 >
                   {slide.image && (
                     <OptimizedImage
@@ -131,7 +172,11 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                     animate={{ opacity: 1, y: 0, rotate: 0 }}
                     exit={{ opacity: 0, y: -100, rotate: 2 }}
                     transition={{ duration: 0.9, ease: [0.23, 1, 0.32, 1] }}
-                    className="relative w-full min-h-[550px] md:min-h-[720px] h-auto rounded-[60px] md:rounded-[267px] border-[2px] border-[#FDF6C2] shadow-[18px_33px_17.4px_rgba(0,0,0,0.48)] overflow-hidden pointer-events-auto bg-[#272302]"
+                    className="relative w-full h-auto border-[2px] border-[#FDF6C2] shadow-[18px_33px_17.4px_rgba(0,0,0,0.48)] overflow-hidden pointer-events-auto bg-[#272302]"
+                    style={{
+                      minHeight: isDesktop ? rpx(720) : "450px",
+                      borderRadius: isDesktop ? rpx(267) : "60px",
+                    }}
                   >
                     {/* Card Image and Gradient */}
                     <div className="absolute inset-0 z-0">
@@ -152,30 +197,47 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                     </div>
 
                     {/* Content */}
-                    <div className="relative z-10 w-full h-full pt-[180px] md:pt-[297px] pb-[60px] px-6 md:px-0">
+                    <div
+                      className="relative z-10 w-full h-full px-6 md:px-0"
+                      style={{
+                        paddingTop: isDesktop ? rpx(297) : "100px",
+                        paddingBottom: isDesktop ? rpx(60) : "50px",
+                      }}
+                    >
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="relative md:ml-[-36px] flex flex-col justify-start w-full md:w-[958px] min-h-[220px] md:min-h-[285px] backdrop-blur-[10px]"
+                        className="relative flex flex-col justify-start w-full backdrop-blur-[10px]"
                         style={{
                           backgroundColor: textBoxColor,
-                          padding: isMobile ? "32px 20px" : "48px",
-                          paddingLeft: isMobile ? "20px" : "140px",
+                          width: isDesktop ? rpx(958) : "100%",
+                          minHeight: isDesktop ? rpx(285) : "180px",
+                          marginLeft: isDesktop ? rpx(-36) : "0px",
+                          padding: isMobile
+                            ? "20px 16px"
+                            : isDesktop
+                            ? `${rpx(48)} ${rpx(48)} ${rpx(48)} ${rpx(140)}`
+                            : "48px 48px 48px 140px",
                         }}
                       >
-                        <div className="mb-6 relative">
+                        <div
+                          className="relative"
+                          style={{
+                            marginBottom: isDesktop ? rpx(24) : "16px",
+                          }}
+                        >
                           {/* 1. Behind Layer (HollowText Stroke) - 2px Offset */}
                           <div
-                            className="absolute font-normal leading-tight text-center md:text-left"
+                            className="absolute w-full font-normal leading-tight text-center md:text-left"
                             style={{
-                              left: "2px",
-                              top: "2px",
-                              fontSize: "clamp(32px, 8vw, 60px)",
+                              left: isDesktop ? rpx(2) : "2px",
+                              top: isDesktop ? rpx(2) : "2px",
+                              fontSize: isDesktop ? rpx(60) : "clamp(24px, 6vw, 36px)",
                               fontFamily: "var(--font-paytone-one)",
                               zIndex: 0,
                             }}
                           >
-                            <HollowText strokeColor="#FFF499" strokeWidth={1.2}>
+                            <HollowText strokeColor="#FFF499" strokeWidth={strokeWidth}>
                               {slide.title}
                             </HollowText>
                           </div>
@@ -184,7 +246,7 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                           <h1
                             className="relative font-normal leading-tight text-center md:text-left"
                             style={{
-                              fontSize: "clamp(32px, 8vw, 60px)",
+                              fontSize: isDesktop ? rpx(60) : "clamp(24px, 6vw, 36px)",
                               fontFamily: "var(--font-paytone-one)",
                               color: titleColor,
                               textShadow: `0 4px 12.6px ${titleShadowColor}`,
@@ -199,7 +261,7 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                           <p
                             className="text-white font-semibold leading-normal tracking-tight"
                             style={{
-                              fontSize: "clamp(16px, 4vw, 33px)",
+                              fontSize: isDesktop ? rpx(33) : "clamp(13px, 3.5vw, 18px)",
                               fontFamily: "var(--font-anaheim)",
                               textShadow: "0 4px 7.8px rgba(0,0,0,0.71)",
                             }}
@@ -221,7 +283,15 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
       </div>
 
       {/* Pagination Controls */}
-      <div className="absolute bottom-12 z-30 flex items-center gap-6 bg-black/20 backdrop-blur-md px-6 py-4 rounded-full border border-white/10 scale-90">
+      <div
+        className="absolute z-30 flex items-center bg-black/20 backdrop-blur-md rounded-full border border-white/10"
+        style={{
+          bottom: isDesktop ? rpx(48) : "24px",
+          gap: isDesktop ? rpx(24) : "24px",
+          padding: isDesktop ? `${rpx(16)} ${rpx(24)}` : "16px 24px",
+          transform: isDesktop ? undefined : "scale(0.9)",
+        }}
+      >
         <button
           onClick={() =>
             setCurrentIndex(
@@ -231,24 +301,33 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
           className="text-white/60 hover:text-white transition-colors flex items-center justify-center"
         >
           <svg
-            width="24"
-            height="24"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
+            style={{
+              width: isDesktop ? rpx(24) : "24px",
+              height: isDesktop ? rpx(24) : "24px",
+            }}
           >
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>
-        <div className="flex gap-2">
+        <div
+          className="flex"
+          style={{ gap: isDesktop ? rpx(8) : "8px" }}
+        >
           {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrentIndex(i)}
-              className={`h-1 transition-all duration-500 rounded-full ${i === currentIndex ? "w-8 bg-[#FFF499]" : "w-2 bg-white/20"}`}
+              className={`transition-all duration-500 rounded-full ${i === currentIndex ? "bg-[#FFF499]" : "bg-white/20"}`}
+              style={{
+                height: isDesktop ? rpx(4) : "4px",
+                width: i === currentIndex ? (isDesktop ? rpx(32) : "32px") : (isDesktop ? rpx(8) : "8px"),
+              }}
             />
           ))}
         </div>
@@ -257,14 +336,16 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
           className="text-white/60 hover:text-white transition-colors flex items-center justify-center"
         >
           <svg
-            width="24"
-            height="24"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
+            style={{
+              width: isDesktop ? rpx(24) : "24px",
+              height: isDesktop ? rpx(24) : "24px",
+            }}
           >
             <path d="M9 18l6-6-6-6" />
           </svg>

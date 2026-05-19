@@ -98,8 +98,14 @@ export function AdvantagesSection({
   if (!advantages || advantages.length === 0) return null;
 
   return (
-    <section className="relative w-full bg-[#F6F4ED] select-none pt-12 lg:pt-[60px] lg:h-auto min-h-[820px] flex flex-col items-center">
-      <div className="flex flex-col w-full max-w-[1920px] justify-start">
+    <section
+      className="relative w-full bg-[#F6F4ED] select-none flex flex-col items-center"
+      style={{
+        paddingTop: layout.type === "desktop" ? vw(60) : "48px",
+        minHeight: layout.type === "desktop" ? vw(820) : "820px",
+      }}
+    >
+      <div className="flex flex-col w-full justify-start relative">
         {/* 1. Animated Background Circle (Breathing effect) */}
         <motion.div
           className="absolute rounded-full pointer-events-none opacity-40 lg:opacity-80"
@@ -123,7 +129,13 @@ export function AdvantagesSection({
         />
 
         {/* 2. Section Title */}
-        <div className="relative z-20 pointer-events-none px-10 lg:pl-[140px] mb-8 lg:mb-0 w-full lg:w-[vw(1000)] text-center lg:text-left">
+        <div
+          className="relative z-20 pointer-events-none px-10 mb-8 lg:mb-0 w-full text-center lg:text-left"
+          style={{
+            paddingLeft: layout.type === "desktop" ? vw(140) : undefined,
+            width: layout.type === "desktop" ? vw(1000) : "100%",
+          }}
+        >
           <h2
             className="font-semibold leading-tight tracking-tight text-[#756F3F] text-[32px]"
             style={{
@@ -145,13 +157,16 @@ export function AdvantagesSection({
 
         {/* 3. Carousel - Embla Implementation */}
         <div
-          className="relative w-full h-auto pb-16 lg:pb-16 overflow-hidden"
+          className="relative w-full h-auto overflow-hidden"
+          style={{
+            paddingBottom: layout.type === "desktop" ? vw(64) : "64px",
+          }}
           ref={emblaRef}
         >
           <div
             className="flex relative items-start"
             style={{
-              paddingLeft: layout.type === "desktop" ? "15vw" : 0,
+              paddingLeft: layout.type === "desktop" ? vw(288) : 0,
               paddingTop: layout.type === "desktop" ? vw(50) : "20px",
             }}
           >
@@ -185,7 +200,7 @@ export function AdvantagesSection({
                     className="relative pointer-events-none"
                     style={{
                       height: layout.type === "desktop" ? vw(105) : "80px",
-                      marginBottom: vw(5),
+                      marginBottom: layout.type === "desktop" ? vw(5) : "8px",
                     }}
                   >
                     <motion.div
@@ -224,11 +239,12 @@ export function AdvantagesSection({
 
                   {/* Card Image */}
                   <div
-                    className="rounded-[20px] lg:rounded-[30px] shadow-[0_10px_10px_rgba(0,0,0,0.17)] overflow-hidden bg-gray-50 pointer-events-none"
+                    className="shadow-[0_10px_10px_rgba(0,0,0,0.17)] overflow-hidden bg-gray-50 pointer-events-none"
                     style={{
                       width: "100%",
                       height: layout.type === "desktop" ? vw(320) : "200px",
                       marginBottom: layout.type === "desktop" ? vw(50) : "36px",
+                      borderRadius: layout.type === "desktop" ? vw(30) : "20px",
                     }}
                   >
                     <OptimizedImage

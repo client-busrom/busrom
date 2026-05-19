@@ -15,14 +15,23 @@ interface PurchaseProcessSectionProps {
   slides: SectionSlide[];
 }
 
-const DESIGN_WIDTH = 1920;
-const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
+const vw = (px: number) => `${(px / 1920) * 100}vw`;
 
 export function PurchaseProcessSection({
   title,
   slides,
 }: PurchaseProcessSectionProps) {
   const [index, setIndex] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Auto-play interval
   useEffect(() => {
@@ -70,8 +79,19 @@ export function PurchaseProcessSection({
   const visibleSteps = getVisibleSteps();
 
   return (
-    <section className="relative w-full overflow-hidden bg-transparent flex justify-center items-center py-12 lg:py-[60px] lg:h-[48vw]">
-      <div className="relative w-full lg:w-[75.2vw] h-auto lg:h-[35vw] flex flex-col lg:block items-center px-10 lg:px-0 mx-auto">
+    <section
+      className="relative w-full overflow-hidden bg-transparent flex justify-center items-center py-12 lg:py-0"
+      style={{
+        height: isDesktop ? vw(922) : "auto",
+      }}
+    >
+      <div
+        className="relative w-full flex flex-col lg:block items-center px-10 lg:px-0 mx-auto"
+        style={{
+          width: isDesktop ? vw(1444) : "100%",
+          height: isDesktop ? vw(672) : "auto",
+        }}
+      >
         {/* Decorative Dashed Curves - Bottom Layer - PROPORTIONAL */}
         <div
           className="hidden lg:block absolute pointer-events-none z-0"
@@ -200,7 +220,7 @@ export function PurchaseProcessSection({
           style={{ left: vw(60), top: vw(-50) }}
         >
           <h2
-            className="font-semibold tracking-wide text-[32px] lg:text-[2.5vw] lg:leading-[1.2]"
+            className="font-semibold tracking-wide text-[32px]"
             style={{
               fontFamily: "var(--font-anaheim)",
               background:
@@ -208,6 +228,8 @@ export function PurchaseProcessSection({
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
+              fontSize: isDesktop ? vw(48) : "32px",
+              lineHeight: isDesktop ? 1.2 : undefined,
             }}
             dangerouslySetInnerHTML={{
               __html: (
@@ -256,11 +278,12 @@ export function PurchaseProcessSection({
 
         {/* 3. Circular Flow Diagram - DESKTOP ONLY */}
         <div
-          className="hidden lg:block absolute w-[596px] h-[31.1vw]"
+          className="hidden lg:block absolute"
           style={{
             left: vw(709),
             top: vw(48),
             width: vw(596),
+            height: vw(596),
           }}
         >
           {/* SOLID OUTER RING */}
@@ -351,24 +374,32 @@ export function PurchaseProcessSection({
                         </svg>
                       </motion.div>
 
-                      <div className="flex items-center gap-4 mb-2 pl-[1.7vw]">
+                      <div
+                        className="flex items-center gap-4 mb-2"
+                        style={{ paddingLeft: isDesktop ? vw(32) : undefined }}
+                      >
                         <span
-                          className="font-bold text-[#141414] tracking-widest lg:text-[1.46vw]"
-                          style={{ fontFamily: "var(--font-anaheim)" }}
+                          className="font-bold text-[#141414] tracking-widest"
+                          style={{
+                            fontFamily: "var(--font-anaheim)",
+                            fontSize: isDesktop ? vw(28) : "18px",
+                          }}
                         >
                           {step.id}. {step.data.title}
                         </span>
                       </div>
-                      <div className="pl-[1.7vw]">
+                      <div style={{ paddingLeft: isDesktop ? vw(32) : undefined }}>
                         <AnimatePresence mode="wait">
                           <motion.p
                             key={index}
                             initial={{ opacity: 0, x: -7 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className="font-medium text-[#7A7A7A] leading-[1.6] text-left max-w-[16.6vw]"
+                            className="font-medium text-[#7A7A7A] leading-[1.6] text-left"
+
                             style={{
                               fontSize: vw(16),
                               fontFamily: "var(--font-anaheim)",
+                              maxWidth: isDesktop ? vw(320) : undefined,
                             }}
                           >
                             {step.data.description}
@@ -407,8 +438,12 @@ export function PurchaseProcessSection({
                         </svg>
                       </div>
                       <span
-                        className="font-bold text-[#141414] tracking-widest uppercase transition-colors duration-300 group-hover:text-[#756F3F] text-[1.15vw]"
-                        style={{ fontFamily: "var(--font-anaheim)" }}
+                        className="font-bold text-[#141414] tracking-widest uppercase transition-colors duration-300 group-hover:text-[#756F3F]"
+
+                        style={{
+                          fontFamily: "var(--font-anaheim)",
+                          fontSize: isDesktop ? vw(22) : "15px",
+                        }}
                       >
                         {step.id}. {step.data.title}
                       </span>

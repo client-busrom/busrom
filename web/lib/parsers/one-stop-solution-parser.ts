@@ -1,10 +1,9 @@
 import { convertToCDNUrl } from "../cdn-url";
-
-export interface MediaObject {
-  id: string;
-  url: string;
-  alt?: string;
-}
+import {
+  extractNodesAfterMarker,
+  resolveMediaFromNodes,
+  MediaObject
+} from "../lexical-utils";
 
 export interface OneStopProduct {
   id: string;
@@ -73,6 +72,9 @@ const getDeepText = (node: any, useHtml = false): string => {
   if (!node) return "";
   if (typeof node === "string") return node;
   if (node.text !== undefined) {
+    const isCode = (node.format & 16) === 16 || (node.textFormat & 16) === 16;
+    if (isCode) return "";
+
     let text = node.text;
     if (useHtml && node.format && (node.format & 1)) {
         return `<b>${text}</b>`;
@@ -87,14 +89,35 @@ const getDeepText = (node: any, useHtml = false): string => {
 
 const isMarkerNode = (node: any, markerId: string) => {
   if (!node) return false;
-  const text = node.children?.[0]?.text || "";
-  const isLexicalMarker = node.format === 16 || node.children?.some((c: any) => c.format === 16);
-  return isLexicalMarker && text === markerId;
+  if (node.type !== "paragraph" && node.type !== "quote") return false;
+
+  const nodeIsCode = (node.format & 16) === 16 || (node.textFormat & 16) === 16;
+  if (nodeIsCode) {
+    const text = (node.children || [])
+      .map((c: any) => c.text || "")
+      .join("")
+      .trim()
+      .toLowerCase();
+    return text === markerId.toLowerCase();
+  }
+
+  const children = node.children || [];
+  return children.some((child: any) => {
+    const isCode = (child.format & 16) === 16 || (child.textFormat & 16) === 16;
+    const text = (child.text || "").trim().toLowerCase();
+    return isCode && text === markerId.toLowerCase();
+  });
 };
 
 const isAnyMarkerNode = (node: any) => {
   if (!node) return false;
-  return node.format === 16 || node.children?.some((c: any) => c.format === 16);
+  if ((node.format & 16) === 16 || (node.textFormat & 16) === 16) return true;
+
+  const textChildren = (node.children || []).filter((c: any) => c.type === "text" && (c.text || "").trim().length > 0);
+  if (textChildren.length > 0 && textChildren.every((c: any) => (c.format & 16) === 16 || (c.textFormat & 16) === 16)) {
+    return true;
+  }
+  return false;
 };
 
 const extractSectionRaw = (children: any[], markerId: string, mediaData: Record<string, any>) => {
@@ -110,7 +133,7 @@ const extractSectionRaw = (children: any[], markerId: string, mediaData: Record<
   }
   if (currentSection.length > 0) sections.push(currentSection);
 
-  const targetSection = sections.find(sec => JSON.stringify(sec).includes(markerId));
+  const targetSection = sections.find(sec => sec.some(node => isMarkerNode(node, markerId)));
   if (!targetSection) return { title: "", subtitle: "", items: [], autoplay: false, interval: 5, titleNodes: [] };
 
   const carouselNode = targetSection.find(n => n.type === "carousel");
@@ -145,7 +168,7 @@ const extractSectionRaw = (children: any[], markerId: string, mediaData: Record<
     }
   });
 
-  const titleNodes = targetSection.filter(n => (n.type === "heading" || n.type === "paragraph") && !isMarkerNode(n, markerId) && !isAnyMarkerNode(n));
+  const titleNodes = targetSection.filter(n => (n.type === "heading" || n.type === "paragraph") && !isAnyMarkerNode(n));
   let title = "";
   let subtitle = "";
   let titleHtml = "";
@@ -245,13 +268,11 @@ export const parseOneStopData = (pageContent: any, locale: string): ParsedOneSto
   const showcaseProducts = [...showcaseMapped, ...showcaseOtherItems];
 
   let viewMoreText = "VIEW MORE", viewMoreLink = `/${locale}/shop`;
-  const btnMarkerIndex = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("product-show-btn"));
-  if (btnMarkerIndex !== -1 && btnMarkerIndex + 1 < contentChildren.length) {
-    const btnNode = contentChildren[btnMarkerIndex + 1];
-    if (btnNode.type === "linkJump" && btnNode.data) {
-      viewMoreText = (btnNode.data.title || btnNode.data.description || "VIEW MORE").toUpperCase();
-      if (btnNode.data.url) viewMoreLink = `/${locale}${btnNode.data.url.replace('/pages/', '/').replace(/^\/(en|cn|ja|de|...)\//, '/')}`;
-    }
+  const btnNodes = extractNodesAfterMarker(contentChildren, "product-show-btn");
+  const btnNode = btnNodes.find((n: any) => n.type === "linkJump");
+  if (btnNode && btnNode.data) {
+    viewMoreText = (btnNode.data.title || btnNode.data.description || "VIEW MORE").toUpperCase();
+    if (btnNode.data.url) viewMoreLink = `/${locale}${btnNode.data.url.replace('/pages/', '/').replace(/^\/(en|cn|ja|de|...)\//, '/')}`;
   }
 
   // Categories Grid
@@ -282,15 +303,13 @@ export const parseOneStopData = (pageContent: any, locale: string): ParsedOneSto
 
   // Trust
   const trustRaw = extractSectionRaw(contentChildren, "why-contractors-trust-us-item", mediaData);
-  const trustNodes = contentChildren.slice(contentChildren.findIndex((n: any) => isMarkerNode(n, "why-contractors-trust-us-item")) + 1);
-  const trustList = trustNodes.find((n: any) => n.type === "list")?.children || [];
+  const trustListNodes = extractNodesAfterMarker(contentChildren, "why-contractors-trust-us-item");
+  const trustList = trustListNodes.find((n: any) => n.type === "list")?.children || [];
   const trustItems = [];
   for (let i = 0; i < trustList.length; i += 2) {
     if (trustList[i]) trustItems.push({ title: getDeepText(trustList[i]).trim(), description: trustList[i + 1] ? getDeepText(trustList[i + 1]).trim() : "" });
   }
-  const trustBgMarker = "why-contractors-trust-us-bg-image";
-  const trustBgIdx = contentChildren.findIndex((n: any) => JSON.stringify(n).includes(trustBgMarker));
-  const trustBgImage = trustBgIdx !== -1 && trustBgIdx + 1 < contentChildren.length ? mediaData[contentChildren[trustBgIdx + 1].data?.image?.id || contentChildren[trustBgIdx + 1].value?.id || String(contentChildren[trustBgIdx + 1].value || "")] : null;
+  const trustBgImage = resolveMediaFromNodes(extractNodesAfterMarker(contentChildren, "why-contractors-trust-us-bg-image"), mediaData)[0] || null;
 
   // Applications
   const appsSectionRaw = extractSectionRaw(contentChildren, "applications-item", mediaData);
@@ -310,23 +329,21 @@ export const parseOneStopData = (pageContent: any, locale: string): ParsedOneSto
 
   // CTA
   const ctaRaw = extractSectionRaw(contentChildren, "contact-form", mediaData);
-  const ctaImgMarker = "contact-form-image";
-  const ctaImgIdx = contentChildren.findIndex((n: any) => JSON.stringify(n).includes(ctaImgMarker));
-  const ctaImage = ctaImgIdx !== -1 && ctaImgIdx + 1 < contentChildren.length ? mediaData[contentChildren[ctaImgIdx + 1].data?.image?.id || String(contentChildren[ctaImgIdx + 1].data?.image || "")] : null;
+  const ctaImage = resolveMediaFromNodes(extractNodesAfterMarker(contentChildren, "contact-form-image"), mediaData)[0] || null;
   const formNode = contentChildren.find((n: any) => n.type === "formBlock");
 
   // OEM ODM Guide
   const oemRaw = extractSectionRaw(contentChildren, "oem-odm-guide", mediaData);
   let oemTitle = oemRaw.title || "READY TO\nJOIN IN BUSROM?";
-  const oemTitleIdx = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("oem-odm-guide-title"));
-  if (oemTitleIdx !== -1 && oemTitleIdx + 1 < contentChildren.length) oemTitle = getDeepText(contentChildren[oemTitleIdx + 1], false);
-  const oemBgIdx = contentChildren.findIndex((n: any) => JSON.stringify(n).includes("oem-odm-guide-bg-image"));
-  const oemBgImage = oemBgIdx !== -1 && oemBgIdx + 1 < contentChildren.length ? mediaData[contentChildren[oemBgIdx + 1].data?.image?.id || String(contentChildren[oemBgIdx + 1].value || "")] : (oemRaw.items[0]?.image || null);
+  const oemTitleNodes = extractNodesAfterMarker(contentChildren, "oem-odm-guide-title");
+  if (oemTitleNodes.length > 0) oemTitle = getDeepText(oemTitleNodes[0], false);
+  const oemBgImage = resolveMediaFromNodes(extractNodesAfterMarker(contentChildren, "oem-odm-guide-bg-image"), mediaData)[0] || (oemRaw.items[0]?.image || null);
 
-    const blockConfig = formNode?.data?.formConfig;
-    const pageConfig = pageContent.formConfig;
-    // Prefer populated object with fields, fallback to whatever is available
-    const bestFormConfig = (blockConfig?.fields ? blockConfig : (pageConfig?.fields ? pageConfig : (blockConfig || pageConfig)));
+  const blockConfig = formNode?.data?.formConfig;
+  const pageConfig = pageContent.formConfig;
+  // Prefer populated object with fields, fallback to whatever is available
+  const bestFormConfig = (blockConfig?.fields ? blockConfig : (pageConfig?.fields ? pageConfig : (blockConfig || pageConfig)));
+
 
     return { 
       hero: { ...heroRaw },

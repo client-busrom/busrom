@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
@@ -35,6 +35,17 @@ export function CategoriesGridSection({
   locale,
   loading,
 }: CategoriesGridSectionProps) {
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   if (loading) return null;
 
   return (
@@ -42,11 +53,16 @@ export function CategoriesGridSection({
       className="relative w-full overflow-hidden flex flex-col items-center"
       style={{
         background: "linear-gradient(180deg, #EDE9C7 0%, #F6F4ED 100%)",
-        paddingTop: "clamp(48px, 4.73vw, 91px)",
-        paddingBottom: "clamp(48px, 4.73vw, 91px)",
+        paddingTop: isDesktop ? vw(120) : "48px",
+        paddingBottom: isDesktop ? vw(120) : "48px",
       }}
     >
-      <div className="w-full max-w-[1300px] px-6 mx-auto flex flex-col items-center">
+      <div
+        className="w-full px-6 mx-auto flex flex-col items-center"
+        style={{
+          maxWidth: isDesktop ? vw(1300) : "1300px",
+        }}
+      >
         {/* Titles */}
         <div className="text-center mb-10 lg:mb-[3.64vw]">
           <h2

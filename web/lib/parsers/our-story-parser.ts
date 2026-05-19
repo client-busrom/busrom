@@ -140,13 +140,14 @@ function getNodeTotalText(node: any): string {
 function extractAfterMarker(children: any[], markerId: string): any[] {
   let foundMarker = false;
   const result: any[] = [];
+  const target = markerId.trim().toLowerCase();
 
   for (const node of children) {
-    const totalText = getNodeTotalText(node);
+    const totalText = getNodeTotalText(node).trim().toLowerCase();
     
     const isMarkerBlock = 
       (node.type === "paragraph" || node.type === "quote" || node.type === "code") &&
-      totalText.includes(markerId);
+      totalText.includes(target);
 
     if (isMarkerBlock) {
       if (foundMarker) break; 
@@ -155,7 +156,7 @@ function extractAfterMarker(children: any[], markerId: string): any[] {
     }
 
     if (foundMarker && (node.children?.[0]?.format === 16 || node.type === "code") && totalText.includes("-")) {
-       if (!totalText.startsWith(markerId + "-")) {
+       if (!totalText.startsWith(target + "-")) {
           break;
        }
     }
@@ -444,7 +445,7 @@ export function parseOurStoryData(locale: string, rawData: any): OurStoryData {
 
   // Applications Raw
   let appIds: string[] = [];
-  const markerIdxApp = children.findIndex((n: any) => getNodeTotalText(n) === "applications-item");
+  const markerIdxApp = children.findIndex((n: any) => getNodeTotalText(n).trim().toLowerCase() === "applications-item");
   if (markerIdxApp !== -1) {
     for (let i = markerIdxApp + 1; i < children.length; i++) {
       const node = children[i];
@@ -460,7 +461,7 @@ export function parseOurStoryData(locale: string, rawData: any): OurStoryData {
   let viewButtonText = "View Cases Gallery Now";
   let viewButtonLink = "";
   let viewButtonNewTab = false;
-  const btnMarkerIdx = children.findIndex((n: any) => getNodeTotalText(n) === "applications-btn");
+  const btnMarkerIdx = children.findIndex((n: any) => getNodeTotalText(n).trim().toLowerCase() === "applications-btn");
   if (btnMarkerIdx !== -1 && btnMarkerIdx + 1 < children.length) {
     const btnNode = children[btnMarkerIdx + 1];
     if (btnNode?.type === "linkJump" && btnNode.data) {
@@ -475,7 +476,7 @@ export function parseOurStoryData(locale: string, rawData: any): OurStoryData {
   let quoteAutoplay = true;
   let quoteInterval = 5;
 
-  const markerIdxQuote = children.findIndex((n: any) => getNodeTotalText(n) === "quote-item");
+  const markerIdxQuote = children.findIndex((n: any) => getNodeTotalText(n).trim().toLowerCase() === "quote-item");
 
   if (markerIdxQuote !== -1) {
     for (let i = markerIdxQuote + 1; i < children.length; i++) {

@@ -12,6 +12,7 @@ import type { Locale } from "@/i18n.config";
 import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
 import { CountryFlag } from "@/components/ui/CountryFlag";
 import { COUNTRIES } from "@/components/ui/PhoneInput";
+import { ChevronDown } from "lucide-react";
 
 interface MediaObject {
   id: string;
@@ -572,7 +573,7 @@ export function OemOdmContactForm({
                               type="button"
                               onClick={() => setOpenCountrySelector(!openCountrySelector)}
                               disabled={submitting}
-                              className="flex items-center gap-2 px-4 hover:bg-black/5 transition-colors border-r border-[#756F3F]/10 flex-shrink-0"
+                              className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 hover:bg-black/5 transition-colors border-r border-[#756F3F]/10 flex-shrink-0"
                             >
                               <div className="w-6 h-4 md:w-8 md:h-5 flex-shrink-0">
                                 <CountryFlag
@@ -589,6 +590,14 @@ export function OemOdmContactForm({
                               >
                                 +{selectedCountry[2]}
                               </span>
+                              <ChevronDown
+                                className={cn(
+                                  "transition-transform",
+                                  isMobile ? "w-3.5 h-3.5" : "w-4 h-4",
+                                  openCountrySelector && "rotate-180"
+                                )}
+                                style={{ color: "rgba(117, 111, 63, 0.5)" }}
+                              />
                             </button>
 
                             <input

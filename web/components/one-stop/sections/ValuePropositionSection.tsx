@@ -19,7 +19,7 @@ interface ValuePropositionProps {
   interval?: number;
 }
 
-// Viewport width conversion utility based on 1920px design width
+// Viewport width conversion utility based on 1920px design width (scaled by 0.7 to fix oversized design draft values)
 const vw = (px: number) => `${(px / 1920) * 100}vw`;
 
 /**
@@ -34,6 +34,16 @@ export function ValuePropositionSection({
   interval = 5,
 }: ValuePropositionProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const data = problems.length > 0 ? problems : advantages;
   const handleNext = React.useCallback(() => {
@@ -61,9 +71,20 @@ export function ValuePropositionSection({
   if (data.length === 0) return null;
 
   return (
-    <section className="relative w-full overflow-hidden bg-transparent flex justify-center items-center py-12 lg:h-[46vw] min-h-[600px]">
+    <section
+      className="relative w-full overflow-hidden bg-transparent flex justify-center items-center py-12 lg:py-0"
+      style={{
+        height: isDesktop ? vw(883.2) : "auto",
+        minHeight: isDesktop ? vw(600) : "600px",
+      }}
+    >
       {/* Unified Container */}
-      <div className="relative w-full max-w-[1920px] h-auto lg:h-[42vw] flex-shrink-0 flex flex-col lg:block">
+      <div
+        className="relative w-full h-auto flex-shrink-0 flex flex-col lg:block"
+        style={{
+          height: isDesktop ? vw(806.4) : "auto",
+        }}
+      >
         {/* === MOBILE ONLY CONTENT (< 1024px) === */}
         <div className="flex lg:hidden flex-col w-full px-6 gap-12">
           {/* ... Mobile list remains the same with its own px values ... */}
@@ -118,7 +139,7 @@ export function ValuePropositionSection({
         {/* 1. Header Area */}
         <div
           className="hidden lg:block absolute z-50 text-left"
-          style={{ left: "10vw", top: vw(120), width: vw(1000) }}
+          style={{ left: vw(192), top: vw(120), width: vw(1000) }}
         >
           <h2
             className="font-extrabold leading-[1.1] text-[#78713A] tracking-[0.05em]"
@@ -137,7 +158,7 @@ export function ValuePropositionSection({
         {/* 2. Sub-indicator Area */}
         <div
           className="hidden lg:flex absolute flex-col items-end z-50 pointer-events-none"
-          style={{ right: "7.8vw", top: vw(140) }}
+          style={{ right: vw(150), top: vw(140) }}
         >
           <div className="relative mb-2">
             <motion.div
@@ -169,7 +190,7 @@ export function ValuePropositionSection({
         <div
           className="hidden lg:block absolute pointer-events-none"
           style={{
-            left: "15.6vw",
+            left: vw(300),
             top: vw(260),
             width: vw(700),
             height: vw(500),
@@ -230,8 +251,8 @@ export function ValuePropositionSection({
         <div className="hidden lg:block absolute inset-0 z-10">
           <motion.div
             className="absolute flex"
-            style={{ top: vw(300), left: "18.2vw" }}
-            animate={{ x: `-${currentIndex * (420 / 1920) * 100}vw` }}
+            style={{ top: vw(300), left: vw(350) }}
+            animate={{ x: isDesktop ? `-${currentIndex * parseFloat(vw(420))}vw` : 0 }}
             transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
           >
             {data.map((item, idx) => (
@@ -266,7 +287,7 @@ export function ValuePropositionSection({
           {/* 5. Active Text */}
           <div
             className="absolute text-left"
-            style={{ left: "19.2vw", top: vw(600), width: vw(450) }}
+            style={{ left: vw(369), top: vw(600), width: vw(450) }}
           >
             <AnimatePresence mode="wait">
               <motion.p
@@ -290,7 +311,7 @@ export function ValuePropositionSection({
         {/* 7. Footer Decorative Elements */}
         <div
           className="hidden lg:flex absolute py-4 gap-1 opacity-50 z-20"
-          style={{ left: "7.3vw", bottom: "6%" }}
+          style={{ left: vw(140), bottom: isDesktop ? vw(30) : "6%" }}
         >
           {Array.from({ length: 11 }).map((_, i) => (
             <motion.svg
@@ -321,7 +342,7 @@ export function ValuePropositionSection({
         {/* 8. Slide Number & Decorative Slash - Grouped for Locked Position */}
         <div
           className="hidden lg:block absolute z-20 pointer-events-none"
-          style={{ right: "7.3vw", bottom: "10%" }}
+          style={{ right: vw(140), bottom: isDesktop ? vw(50) : "10%" }}
         >
           <div className="relative">
             {/* Slide Number */}
