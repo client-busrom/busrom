@@ -169,8 +169,10 @@ export default function FeatureImageLayout({
             className="feature-img-container relative flex justify-center items-center w-full"
             style={{
               aspectRatio: `${nativeW} / ${nativeH}`,
+              width: "100%",
+              height: "auto",
+              maxHeight: "100%",
               maxWidth: `calc(${nativeW} * var(--rpx))`,
-              maxHeight: `calc(${nativeH} * var(--rpx))`,
               containerType: "inline-size",
               ["--rpx" as any]: `calc(100cqw / ${nativeW})`,
             }}

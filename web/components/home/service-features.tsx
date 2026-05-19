@@ -206,7 +206,7 @@ export default function ServiceFeatures({
                 <div className="item-bg absolute inset-0 pointer-events-none z-0" />
 
                 {/* 卡片内容区域 */}
-                <div className="relative z-10 flex-1 flex flex-col md:flex-row p-4 md:p-8 lg:p-0">
+                <div className="relative z-10 flex-1 min-h-0 flex flex-col md:flex-row p-4 md:p-8 lg:p-0">
                   {/* 文字内容区 */}
                   <div
                     className={cn(
@@ -258,7 +258,7 @@ export default function ServiceFeatures({
                   {/* 图片区域 - 顶部与左侧装饰线对齐 */}
                   <div
                     className={cn(
-                      "flex-1 flex items-start justify-center",
+                      "flex-1 min-h-0 flex items-start justify-center",
                       "mt-4 md:mt-0 lg:mt-0",
                       "lg:pt-[calc(70*var(--rpx))] lg:pb-[calc(12*var(--rpx))]",
                     )}

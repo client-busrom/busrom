@@ -79,7 +79,7 @@ const TitleLine: FC<{ text: string; index: number; isMobile?: boolean }> = ({
   if (isMobile) {
     return (
       <div
-        className="relative mb-2 last:mb-0"
+        className="relative mb-2"
         style={{ width: "280px", aspectRatio: `${block.w}/${block.h}` }}
       >
         <img
@@ -87,13 +87,12 @@ const TitleLine: FC<{ text: string; index: number; isMobile?: boolean }> = ({
           alt=""
           className="absolute inset-0 w-full h-full object-contain pointer-events-none"
         />
-        <div className="absolute inset-0 flex items-center justify-center px-4">
+        <div className="absolute inset-0 flex items-center justify-start px-8">
           <h1
-            className="font-paytone-one text-[#3C3712] text-[28px] leading-none text-center"
+            className="font-paytone-one text-[#3C3712] text-[24px] leading-none text-left"
             style={{
-              transform: `rotate(${rotation}deg) translateY(-2px)`,
-              WebkitTextStroke: "1px #FFFFFF",
-              paintOrder: "stroke fill",
+              transform: `rotate(${rotation}deg)`,
+              WebkitTextStroke: "0.5px #FFFFFF",
             }}
           >
             {text}
@@ -275,7 +274,7 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
 
         {/* Layer 1: 裁切主图 */}
         <div
-          className="absolute top-0 left-0 w-full aspect-[1349/922] z-20"
+          className="absolute top-0 -left-[8px] w-full aspect-[1349/922] z-20"
           style={{
             maskImage: `url(${BANNER_9_ASSETS.mask1})`,
             WebkitMaskImage: `url(${BANNER_9_ASSETS.mask1})`,
@@ -292,13 +291,13 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
         </div>
 
         {/* Layer 2: 叠放标题块 - 大幅拉开间距 */}
-        <div className="absolute bottom-[23%] left-1/2 -translate-x-1/2 w-full flex flex-col items-center z-30 scale-[0.95]">
+        <div className="absolute bottom-1/3 ml-4 w-full flex flex-col items-start z-30 scale-[1]">
           {feature0Lines.map((line, idx) => (
             <TitleLine key={idx} text={line} index={idx} isMobile />
           ))}
           {/* 副标题与装饰块 */}
           <p
-            className="font-paytone-one text-white text-[19px] text-center whitespace-pre-line leading-tight mt-3"
+            className="font-paytone-one text-white text-[18px] px-8 text-left whitespace-pre-line leading-tight"
             style={{ WebkitTextStroke: "1px #6B4E00", letterSpacing: "0.03em" }}
           >
             {formatText(data.features[1])}
@@ -328,12 +327,12 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
               className="object-cover"
             />
           </div>
-          <div className="absolute top-0 right-[4%] w-[42%] h-full flex flex-col justify-center items-center gap-1">
+          <div className="absolute top-[4%] right-[8%] w-[42%] h-full flex flex-col justify-center items-center gap-1">
             {[data.features[2], data.features[3], data.features[4]].map(
               (f, i) => (
                 <h2
                   key={i}
-                  className="font-montserrat font-bold text-[#FFA836] text-[9px] whitespace-nowrap text-center"
+                  className="font-montserrat font-bold text-[#FFA836] text-[12px] whitespace-nowrap text-center"
                   style={{
                     letterSpacing: "0.01em",
                     WebkitTextStroke: "0.6px #6B4E00",
