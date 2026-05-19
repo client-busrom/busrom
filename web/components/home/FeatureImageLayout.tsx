@@ -173,10 +173,15 @@ export default function FeatureImageLayout({
               height: "auto",
               maxHeight: "100%",
               maxWidth: `calc(${nativeW} * var(--rpx))`,
-              containerType: "inline-size",
-              ["--rpx" as any]: `calc(100cqw / ${nativeW})`,
             }}
           >
+            <div
+              className="w-full h-full relative"
+              style={{
+                containerType: "inline-size",
+                ["--rpx" as any]: `calc(100cqw / ${nativeW})`,
+              }}
+            >
             {/* Layout 0: 四张图 (1-1 ~ 1-4) */}
             {layoutType === 0 && (
               <div
@@ -289,6 +294,7 @@ export default function FeatureImageLayout({
                 />
               </div>
             )}
+            </div>
           </div>
         </motion.div>
       </AnimatePresence>
