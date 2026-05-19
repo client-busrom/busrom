@@ -502,40 +502,10 @@ export function ProductSeriesEntrySection({
         </div>
 
         {/* Looking For? - 实心填充 + 问号特殊动效 */}
-        <div className="flex">
-          {normalChars.map((char, index) => {
-            if (char === "?") {
-              return (
-                <motion.div
-                  key="question-mark"
-                  className="inline-block relative"
-                  style={{ 
-                    width: vw(70),
-                    height: vw(106),
-                    transformOrigin: "center bottom",
-                    willChange: "transform",
-                    alignSelf: "flex-end",
-                    marginLeft: vw(4),
-                  }}
-                  animate={{
-                    rotate: [-18, -10, -18],
-                  }}
-                  transition={{
-                    duration: 2,
-                    ease: "easeInOut",
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                  }}
-                >
-                  <img
-                    src="/contact-support/?.svg"
-                    alt=""
-                    className="w-full h-full object-contain"
-                  />
-                </motion.div>
-              )
-            }
-            return (
+        <div className="flex items-end">
+          {normalChars
+            .filter((char) => char !== "?")
+            .map((char, index) => (
               <motion.span
                 key={`normal-${index}`}
                 className="inline-block text-black"
@@ -554,8 +524,35 @@ export function ProductSeriesEntrySection({
               >
                 {char === " " ? "\u00A0" : char}
               </motion.span>
-            )
-          })}
+            ))}
+
+          {/* 问号特殊动效 - 始终默认展示 */}
+          <motion.div
+            key="question-mark"
+            className="inline-block relative"
+            style={{ 
+              width: vw(70),
+              height: vw(106),
+              transformOrigin: "center bottom",
+              willChange: "transform",
+              marginLeft: vw(4),
+            }}
+            animate={{
+              rotate: [-18, -10, -18],
+            }}
+            transition={{
+              duration: 2,
+              ease: "easeInOut",
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+          >
+            <img
+              src="/contact-support/why.svg"
+              alt=""
+              className="w-full h-full object-contain"
+            />
+          </motion.div>
         </div>
       </div>
 
