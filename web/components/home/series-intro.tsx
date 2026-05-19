@@ -705,9 +705,15 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
             )}
 
             {/* 描述 */}
-            <p className="text-sm text-white leading-relaxed mb-6">
-              {activeSeries?.description}
-            </p>
+            <div
+              className="series-desc-scroll h-[96px] overflow-y-auto pr-2 mb-6 text-sm text-white leading-relaxed text-left"
+              style={{
+                scrollbarWidth: "thin",
+                scrollbarColor: "rgba(255, 255, 255, 0.25) transparent",
+              }}
+            >
+              <p className="whitespace-pre-line">{activeSeries?.description}</p>
+            </div>
 
             {/* 系列切换按钮 */}
             <div className="flex justify-center gap-6">
@@ -797,6 +803,18 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
           </div>
         </div>
       </div>
+      <style jsx>{`
+        .series-desc-scroll::-webkit-scrollbar {
+          width: 4px;
+        }
+        .series-desc-scroll::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .series-desc-scroll::-webkit-scrollbar-thumb {
+          background-color: rgba(255, 255, 255, 0.25);
+          border-radius: 4px;
+        }
+      `}</style>
     </section>
   );
 }
