@@ -607,8 +607,8 @@ export default function MainForm({
             {/* 3. 文字遮罩 (z-30) */}
             <div className="w-full p-4 lg:p-8 z-30 flex justify-center">
               <div className="relative inline-block">
-                {/* 背景空心描边层 - 偏移 2px */}
-                <div className="absolute left-[2px] top-[2px] w-full pointer-events-none">
+                {/* 背景空心描边层 - 偏移 2px (移动端 1px) */}
+                <div className="absolute left-[1px] top-[1px] lg:left-[2px] lg:top-[2px] w-full pointer-events-none">
                   <HollowText strokeColor="#f6f4ed" strokeWidth={1}>
                     <span className="text-base lg:text-xl font-anaheim font-bold block text-center leading-tight">
                       {data.designTextLeft}
@@ -979,8 +979,8 @@ export default function MainForm({
             {/* 3. 文字遮罩 (z-30) */}
             <div className="w-full p-4 lg:p-8 z-30 flex justify-center">
               <div className="relative inline-block">
-                {/* 背景空心描边层 - 偏移 2px */}
-                <div className="absolute left-[2px] top-[2px] w-full pointer-events-none">
+                {/* 背景空心描边层 - 偏移 2px (移动端 1px) */}
+                <div className="absolute left-[1px] top-[1px] lg:left-[2px] lg:top-[2px] w-full pointer-events-none">
                   <HollowText strokeColor="#f6f4ed" strokeWidth={1}>
                     <span className="text-base lg:text-xl font-anaheim font-bold block text-center leading-tight">
                       {data.designTextRight}
