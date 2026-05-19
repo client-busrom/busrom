@@ -226,6 +226,46 @@ const mapProductsWithCarouselConfig = (products: any[], carouselItems: any[] = [
     const categoryName = product.category?.name || "";
     const title = item?.customName?.trim() || ((item?.showCategory === true || item?.showName === false) ? categoryName : product.name);
     
+    // Hydrate Product Attributes + Custom Attributes (first 4 deterministically)
+    let resolvedAttrs: string[] = [];
+    const attributePage = product.attributePage;
+    if (attributePage && typeof attributePage === 'object') {
+      const getArray = (val: any) => {
+        if (!val) return [];
+        if (Array.isArray(val)) return val;
+        if (typeof val === 'object') {
+          return val[locale] || val['en'] || val['zh'] || val['cn'] || [];
+        }
+        return [];
+      };
+
+      const prodAttrs = getArray(attributePage.productAttributes);
+      const custAttrs = getArray(attributePage.customAttributes);
+
+      // Merge and extract 'value' property
+      const merged = [...prodAttrs, ...custAttrs];
+      resolvedAttrs = merged
+        .map((attr: any) => {
+          if (!attr) return '';
+          if (typeof attr === 'string') return attr;
+          return attr.value || '';
+        })
+        .filter((val: string) => val.trim().length > 0);
+    }
+
+    if (resolvedAttrs.length === 0 && product.productAttributes) {
+      if (Array.isArray(product.productAttributes)) {
+        resolvedAttrs = product.productAttributes.map((attr: any) => {
+          if (typeof attr === 'string') return attr;
+          return attr.value || '';
+        }).filter(Boolean);
+      } else if (typeof product.productAttributes === 'string') {
+        resolvedAttrs = product.productAttributes.split('\n').filter((line: string) => line.trim());
+      }
+    }
+
+    const finalProductAttributes = resolvedAttrs.slice(0, 4);
+
     return {
       ...product,
       title,
@@ -234,7 +274,18 @@ const mapProductsWithCarouselConfig = (products: any[], carouselItems: any[] = [
       link: `/${locale}/product/${product.slug}`,
       showName: item.showName !== false,
       showCategory: !!item.showCategory,
-      categoryName
+      categoryName,
+      productAttributes: finalProductAttributes,
+      _carouselItem: {
+        showName: item.showName,
+        showCategory: item.showCategory,
+        showDescription: item.showDescription,
+        showButton: item.showButton,
+        showHighlights: item.showHighlights,
+        highlightsCount: item.highlightsCount,
+        buttonText: item.buttonText,
+        openInNewTab: item.openInNewTab,
+      }
     };
   }).filter(Boolean);
 };
