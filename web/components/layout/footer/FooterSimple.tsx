@@ -142,20 +142,20 @@ export default function FooterSimple({
 
           {/* 右侧：社交媒体链接 */}
           {footerData.socialLinks && footerData.socialLinks.length > 0 && (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {footerData.socialLinks.map((social: any, index: number) => {
-                // 原生品牌默认颜色映射
-                const brandColors: Record<string, string> = {
-                  facebook: "text-[#1877F2]",
-                  instagram: "text-[#E4405F]",
-                  twitter: "text-[#1DA1F2]",
-                  linkedin: "text-[#0A66C2]",
-                  youtube: "text-[#FF0000]",
-                  tiktok: "text-white",
-                  wechat: "text-[#07C160]",
-                  whatsapp: "text-[#25D366]",
+                // 原生品牌背景与文字颜色映射（圆形徽章）
+                const brandStyles: Record<string, string> = {
+                  facebook: "bg-[#3B5998] text-white",
+                  instagram: "bg-[#E4405F] text-white",
+                  twitter: "bg-black text-white",
+                  linkedin: "bg-[#0077B5] text-white",
+                  youtube: "bg-[#FF0000] text-white",
+                  tiktok: "bg-black text-white",
+                  wechat: "bg-[#07C160] text-white",
+                  whatsapp: "bg-[#25D366] text-white",
                 };
-                const colorClass = brandColors[social.platform.toLowerCase()] || "text-brand-text-inverse/70";
+                const styleClass = brandStyles[social.platform.toLowerCase()] || "bg-brand-text-inverse/10 text-white";
 
                 return (
                   <a
@@ -164,8 +164,8 @@ export default function FooterSimple({
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(
-                      "transition-all duration-300 hover:opacity-80 hover:scale-110",
-                      colorClass
+                      "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 hover:opacity-85 hover:scale-110 shadow-sm",
+                      styleClass
                     )}
                     title={social.platform}
                   >
