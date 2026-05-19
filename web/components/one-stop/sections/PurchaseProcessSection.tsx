@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import useEmblaCarousel from "embla-carousel-react";
 
 interface SectionSlide {
   title: string;
@@ -23,24 +24,82 @@ export function PurchaseProcessSection({
 }: PurchaseProcessSectionProps) {
   const [index, setIndex] = useState(0);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [layout, setLayout] = useState({
+    type: "mobile",
+    width: 0,
+    gap: 16,
+    padding: 0,
+    cardH: 330,
+  });
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: "center",
+    skipSnaps: false,
+    dragFree: false,
+    containScroll: false,
+  });
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+  }, [emblaApi, onSelect]);
+
+  const scrollTo = useCallback(
+    (idx: number) => {
+      if (emblaApi) emblaApi.scrollTo(idx);
+    },
+    [emblaApi],
+  );
 
   useEffect(() => {
     const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 1024);
+      const w = window.innerWidth;
+      const desktop = w >= 1024;
+      setIsDesktop(desktop);
+      if (!desktop) {
+        if (w < 640) {
+          setLayout({
+            type: "mobile",
+            width: w * 0.75,
+            gap: 16,
+            padding: 0,
+            cardH: 330,
+          });
+        } else {
+          setLayout({
+            type: "tablet",
+            width: w * 0.45,
+            gap: 24,
+            padding: 0,
+            cardH: 360,
+          });
+        }
+      } else {
+        setLayout({ type: "desktop", width: 0, gap: 0, padding: 0, cardH: 0 });
+      }
+      if (emblaApi) emblaApi.reInit();
     };
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [emblaApi]);
 
-  // Auto-play interval
+  // Auto-play interval (Desktop only)
   useEffect(() => {
-    if (!slides || slides.length <= 1) return;
+    if (!isDesktop || !slides || slides.length <= 1) return;
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % slides.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, [slides]);
+  }, [slides, isDesktop]);
 
   if (!slides || slides.length === 0) return null;
 
@@ -86,7 +145,7 @@ export function PurchaseProcessSection({
       }}
     >
       <div
-        className="relative w-full flex flex-col lg:block items-center px-10 lg:px-0 mx-auto"
+        className="relative w-full flex flex-col lg:block items-center px-0 lg:px-0 mx-auto"
         style={{
           width: isDesktop ? vw(1444) : "100%",
           height: isDesktop ? vw(672) : "auto",
@@ -151,11 +210,11 @@ export function PurchaseProcessSection({
         </div>
 
         {/* === MOBILE ONLY CONTENT (< 1024px) === */}
-        <div className="flex lg:hidden flex-col w-full px-6 gap-12">
+        <div className="flex lg:hidden flex-col w-full px-0 gap-6">
           {/* Header */}
-          <div className="w-full text-center">
+          <div className="w-full text-center px-6">
             <h2
-              className="text-[32px] font-extrabold leading-tight text-[#78713A] tracking-[0.05em] mb-4"
+              className="text-[32px] font-extrabold leading-tight text-[#78713A] tracking-[0.05em] mb-3"
               style={{
                 fontFamily: "var(--font-anaheim)",
                 background:
@@ -169,47 +228,120 @@ export function PurchaseProcessSection({
                 ).replace(/\n/g, "<br />"),
               }}
             />
-            <div className="w-16 h-1 bg-[#756F3F] mx-auto rounded-full opacity-60" />
+            <div className="w-16 h-1 bg-[#756F3F] mx-auto rounded-full opacity-60 mb-4" />
           </div>
 
-          {/* Steps Grid - Direct List */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-12">
-            {slides.map((step, idx) => (
-              <div key={idx} className="flex flex-col gap-5 group">
-                {/* Step Image */}
-                <div className="w-full h-[220px] sm:h-[180px] rounded-[30px] overflow-hidden shadow-lg border-2 border-transparent group-hover:border-[#756F3F]/20 transition-all">
-                  <OptimizedImage
-                    image={step.image}
-                    size="large"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    alt={`Step ${idx + 1}`}
-                  />
-                </div>
+          {/* Carousel - Embla Implementation */}
+          <div
+            className="relative w-full h-auto"
+            ref={emblaRef}
+          >
+            <div className="flex relative items-stretch">
+              {slides.map((step, idx) => {
+                const isActive = idx === index;
 
-                {/* Step Info */}
-                <div className="flex flex-col gap-2 px-2">
-                  <div className="flex items-center gap-3">
-                    <span
-                      className="text-[18px] font-bold text-[#756F3F]/40"
-                      style={{ fontFamily: "var(--font-anaheim)" }}
-                    >
-                      0{idx + 1}
-                    </span>
-                    <h4
-                      className="text-[20px] font-bold text-[#141414] tracking-wider"
-                      style={{ fontFamily: "var(--font-anaheim)" }}
-                    >
-                      {step.title}
-                    </h4>
-                  </div>
-                  <p
-                    className="text-[15px] font-medium text-[#7A7A7A] leading-relaxed text-left"
-                    style={{ fontFamily: "var(--font-anaheim)" }}
+                return (
+                  <motion.div
+                    key={idx}
+                    animate={{
+                      boxShadow: isActive
+                        ? "0px 15px 15px rgba(0, 0, 0, 0.12)"
+                        : "0px 4px 15px rgba(0, 0, 0, 0.04)",
+                      scale: isActive ? 1 : 0.96,
+                      opacity: isActive ? 1 : 0.85,
+                    }}
+                    transition={{ duration: 0.4 }}
+                    className="bg-white flex-shrink-0 relative flex flex-col cursor-grab active:cursor-grabbing shadow-md border border-black/5"
+                    style={{
+                      width: layout.width,
+                      height: "auto",
+                      borderRadius: "20px",
+                      padding: "16px",
+                      marginRight: layout.gap,
+                    }}
+                    onClick={() => scrollTo(idx)}
                   >
-                    {step.description}
-                  </p>
-                </div>
-              </div>
+                    {/* Card Header */}
+                    <div
+                      className="relative pointer-events-none"
+                      style={{
+                        height: "36px",
+                        marginBottom: "12px",
+                      }}
+                    >
+                      <div
+                        className="absolute left-0 top-0 bg-[#BCB158] rounded-full shrink-0 z-0 flex items-center justify-center text-white font-extrabold text-[13px]"
+                        style={{
+                          width: "32px",
+                          height: "32px",
+                          fontFamily: "var(--font-anaheim)",
+                        }}
+                      >
+                        0{idx + 1}
+                      </div>
+                      <h3
+                        className={`relative z-10 leading-snug transition-all duration-300 ${isActive ? "font-bold text-black" : "font-medium text-[#4A4A4A]"}`}
+                        style={{
+                          fontSize: "16px",
+                          fontFamily: "var(--font-anaheim)",
+                          paddingTop: "4px",
+                          paddingLeft: "42px",
+                        }}
+                      >
+                        {step.title}
+                      </h3>
+                    </div>
+
+                    {/* Card Image */}
+                    <div
+                      className="shadow-[0_6px_6px_rgba(0,0,0,0.1)] overflow-hidden bg-gray-50 pointer-events-none shrink-0"
+                      style={{
+                        width: "100%",
+                        height: "120px",
+                        marginBottom: "12px",
+                        borderRadius: "14px",
+                      }}
+                    >
+                      <OptimizedImage
+                        image={step.image}
+                        size="medium"
+                        priority={idx < 2}
+                        loading={idx < 2 ? "eager" : "lazy"}
+                        className="w-full h-full object-cover"
+                        alt={step.title}
+                      />
+                    </div>
+
+                    {/* Description Text */}
+                    <div className="w-full flex-1 select-text">
+                      <p
+                        className="font-medium leading-relaxed text-[#7A7A7A] text-justify"
+                        style={{
+                          fontSize: "13.5px",
+                          fontFamily: "var(--font-anaheim)",
+                        }}
+                      >
+                        {step.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Pagination Dots */}
+          <div className="flex justify-center gap-2 mt-2">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => scrollTo(i)}
+                className="transition-all duration-300 rounded-full h-1.5"
+                style={{
+                  width: i === index ? "18px" : "6px",
+                  backgroundColor: i === index ? "#756F3F" : "#D4CFA5",
+                }}
+              />
             ))}
           </div>
         </div>

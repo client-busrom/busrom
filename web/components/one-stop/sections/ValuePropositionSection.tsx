@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import useEmblaCarousel from "embla-carousel-react";
 
 interface SectionSlide {
   title: string;
@@ -35,15 +36,73 @@ export function ValuePropositionSection({
 }: ValuePropositionProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [layout, setLayout] = useState({
+    type: "mobile",
+    width: 0,
+    gap: 16,
+    padding: 0,
+    cardH: 300,
+  });
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: "center",
+    skipSnaps: false,
+    dragFree: false,
+    containScroll: false,
+  });
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setCurrentIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+  }, [emblaApi, onSelect]);
+
+  const scrollTo = useCallback(
+    (idx: number) => {
+      if (emblaApi) emblaApi.scrollTo(idx);
+    },
+    [emblaApi],
+  );
 
   useEffect(() => {
     const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 1024);
+      const w = window.innerWidth;
+      const desktop = w >= 1024;
+      setIsDesktop(desktop);
+      if (!desktop) {
+        if (w < 640) {
+          setLayout({
+            type: "mobile",
+            width: w * 0.75,
+            gap: 16,
+            padding: 0,
+            cardH: 300,
+          });
+        } else {
+          setLayout({
+            type: "tablet",
+            width: w * 0.45,
+            gap: 24,
+            padding: 0,
+            cardH: 330,
+          });
+        }
+      } else {
+        setLayout({ type: "desktop", width: 0, gap: 0, padding: 0, cardH: 0 });
+      }
+      if (emblaApi) emblaApi.reInit();
     };
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [emblaApi]);
 
   const data = problems.length > 0 ? problems : advantages;
   const handleNext = React.useCallback(() => {
@@ -54,9 +113,9 @@ export function ValuePropositionSection({
     setCurrentIndex((prev) => (prev - 1 + data.length) % data.length);
   };
 
-  // Autoplay Effect
+  // Autoplay Effect (Desktop only)
   useEffect(() => {
-    if (!autoplay || data.length <= 1) return;
+    if (!isDesktop || !autoplay || data.length <= 1) return;
 
     const timer = setInterval(
       () => {
@@ -66,7 +125,7 @@ export function ValuePropositionSection({
     );
 
     return () => clearInterval(timer);
-  }, [autoplay, interval, data.length, handleNext]);
+  }, [isDesktop, autoplay, interval, data.length, handleNext]);
 
   if (data.length === 0) return null;
 
@@ -86,12 +145,15 @@ export function ValuePropositionSection({
         }}
       >
         {/* === MOBILE ONLY CONTENT (< 1024px) === */}
-        <div className="flex lg:hidden flex-col w-full px-6 gap-12">
-          {/* ... Mobile list remains the same with its own px values ... */}
-          <div className="w-full text-center">
+        <div className="flex lg:hidden flex-col w-full px-0 gap-6">
+          {/* Header */}
+          <div className="w-full text-center px-6">
             <h2
-              className="text-[32px] font-extrabold leading-tight text-[#78713A] tracking-[0.05em] mb-4"
-              style={{ fontFamily: "var(--font-anaheim)" }}
+              className="font-extrabold leading-tight text-[#78713A] tracking-[0.05em] mb-3"
+              style={{
+                fontFamily: "var(--font-anaheim)",
+                fontSize: "clamp(24px, 7.46vw, 32px)",
+              }}
               dangerouslySetInnerHTML={{
                 __html: (title || "The Value Of One-Stop Procurement").replace(
                   /\n/g,
@@ -100,8 +162,11 @@ export function ValuePropositionSection({
               }}
             />
             <h3
-              className="text-[18px] font-semibold leading-tight text-[#756F3F] opacity-60"
-              style={{ fontFamily: "var(--font-anaheim)" }}
+              className="font-semibold leading-tight text-[#756F3F] opacity-60 mb-4"
+              style={{
+                fontFamily: "var(--font-anaheim)",
+                fontSize: "clamp(16px, 4.8vw, 20px)",
+              }}
               dangerouslySetInnerHTML={{
                 __html: (subtitle || "Problems To Be Solved").replace(
                   /\n/g,
@@ -111,25 +176,91 @@ export function ValuePropositionSection({
             />
           </div>
 
-          {/* List Wrapper - Responsive Grid (1 col on mobile, 2 cols on tablet) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-12">
-            {data.map((item, idx) => (
-              <div key={idx} className="flex flex-col gap-4">
-                <div className="w-full h-[200px] sm:h-[180px] lg:h-[220px] rounded-[24px] overflow-hidden shadow-md">
-                  <OptimizedImage
-                    image={item.image}
-                    size="large"
-                    className="w-full h-full object-cover"
-                    alt={`Slide ${idx}`}
-                  />
-                </div>
-                <p
-                  className="text-[17px] font-semibold leading-relaxed text-black text-left px-1"
-                  style={{ fontFamily: "var(--font-anaheim)" }}
-                >
-                  {item.description}
-                </p>
-              </div>
+          {/* Carousel - Embla Implementation */}
+          <div
+            className="relative w-full h-auto"
+            ref={emblaRef}
+          >
+            <div className="flex relative items-stretch">
+              {data.map((item, idx) => {
+                const isActive = idx === currentIndex;
+
+                return (
+                  <motion.div
+                    key={idx}
+                    animate={{
+                      boxShadow: isActive
+                        ? "0px 15px 15px rgba(0, 0, 0, 0.12)"
+                        : "0px 4px 15px rgba(0, 0, 0, 0.04)",
+                      scale: isActive ? 1 : 0.96,
+                      opacity: isActive ? 1 : 0.85,
+                    }}
+                    transition={{ duration: 0.4 }}
+                    className="bg-white flex-shrink-0 relative flex flex-col cursor-grab active:cursor-grabbing shadow-md border border-black/5"
+                    style={{
+                      width: layout.width,
+                      height: layout.cardH,
+                      borderRadius: "20px",
+                      padding: "16px",
+                      marginRight: layout.gap,
+                    }}
+                    onClick={() => scrollTo(idx)}
+                  >
+                    {/* Card Image */}
+                    <div
+                      className="shadow-[0_6px_6px_rgba(0,0,0,0.1)] overflow-hidden bg-gray-50 pointer-events-none shrink-0"
+                      style={{
+                        width: "100%",
+                        height: "120px",
+                        marginBottom: "12px",
+                        borderRadius: "14px",
+                      }}
+                    >
+                      <OptimizedImage
+                        image={item.image}
+                        size="medium"
+                        priority={idx < 2}
+                        loading={idx < 2 ? "eager" : "lazy"}
+                        className="w-full h-full object-cover"
+                        alt={`Slide ${idx}`}
+                      />
+                    </div>
+
+                    {/* Description Text */}
+                    <div
+                      className="w-full flex-1 overflow-y-auto pointer-events-auto pr-1 select-text"
+                      style={{
+                        WebkitOverflowScrolling: "touch",
+                      }}
+                    >
+                      <p
+                        className="font-semibold leading-relaxed text-[#7A7A7A] text-justify"
+                        style={{
+                          fontSize: "13.5px",
+                          fontFamily: "var(--font-anaheim)",
+                        }}
+                      >
+                        {item.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Pagination Dots */}
+          <div className="flex justify-center gap-2 mt-2">
+            {data.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => scrollTo(i)}
+                className="transition-all duration-300 rounded-full h-1.5"
+                style={{
+                  width: i === currentIndex ? "18px" : "6px",
+                  backgroundColor: i === currentIndex ? "#756F3F" : "#D4CFA5",
+                }}
+              />
             ))}
           </div>
         </div>

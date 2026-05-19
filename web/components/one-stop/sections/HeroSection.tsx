@@ -88,7 +88,7 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full overflow-hidden bg-[#352F03] flex justify-center items-center h-[80dvh] lg:h-[48vw] lg:min-h-[600px] mt-[2.4vw] lg:mt-[2.4vw]"
+      className="relative w-full overflow-hidden bg-[#352F03] flex justify-center items-center h-[80dvh] lg:h-[48vw] lg:min-h-[720px] mt-[2.4vw] lg:mt-[2.4vw]"
       style={{
         paddingTop: isDesktop ? rpx(46) : "46px",
       }}
@@ -122,11 +122,12 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
       />
 
       {/* 3. Stacked Items Container - Scaled on Desktop */}
-      <div className="relative z-20 w-full h-full flex items-center justify-center pointer-events-none px-4 md:px-0">
+      <div className="relative z-20 w-full h-full flex items-center justify-center pointer-events-none px-4 md:px-8">
         <div
           className="relative w-full h-auto origin-center transition-all duration-500"
           style={{
             width: isDesktop ? rpx(1429) : "100%",
+            maxWidth: isDesktop ? undefined : "680px",
             minHeight: isDesktop ? rpx(720) : "450px",
           }}
         >

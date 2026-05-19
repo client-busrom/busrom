@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { HollowText } from "@/components/common/HollowText";
+import useEmblaCarousel from "embla-carousel-react";
 
 interface Product {
   id: string;
@@ -13,6 +14,7 @@ interface Product {
   productAttributes?: string | string[];
   mainImage?: any[];
   showImage?: any;
+  _carouselItem?: any;
 }
 
 interface ProductSeriesShowcaseSectionProps {
@@ -27,6 +29,62 @@ export function ProductSeriesShowcaseSection({
   locale,
 }: ProductSeriesShowcaseSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const [layout, setLayout] = useState({
+    type: "mobile",
+    width: 320,
+    gap: 16,
+    cardH: 380,
+  });
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: "center",
+    skipSnaps: false,
+    dragFree: false,
+    containScroll: false,
+  });
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setCurrentIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+  }, [emblaApi, onSelect]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const w = window.innerWidth;
+      if (w < 1024) {
+        if (w < 640) {
+          setLayout({
+            type: "mobile",
+            width: w * 0.85,
+            gap: 16,
+            cardH: 420,
+          });
+        } else {
+          setLayout({
+            type: "tablet",
+            width: w * 0.6,
+            gap: 24,
+            cardH: 440,
+          });
+        }
+      } else {
+        setLayout({ type: "desktop", width: 0, gap: 0, cardH: 0 });
+      }
+      if (emblaApi) emblaApi.reInit();
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [emblaApi]);
 
   const validProducts = useMemo(() => {
     return products.filter((p) => p.name && p.slug);
@@ -71,22 +129,33 @@ export function ProductSeriesShowcaseSection({
     ];
   }, [activeProduct]);
 
-  const nextProduct = () =>
-    setCurrentIndex((prev) => (prev + 1) % (validProducts.length || 1));
-  const prevProduct = () =>
-    setCurrentIndex(
-      (prev) =>
-        (prev - 1 + (validProducts.length || 1)) % (validProducts.length || 1),
-    );
+  const nextProduct = () => {
+    if (emblaApi) {
+      emblaApi.scrollNext();
+    } else {
+      setCurrentIndex((prev) => (prev + 1) % (validProducts.length || 1));
+    }
+  };
 
-  const getDisplayName = () => {
-    if (!activeProduct) return "";
-    const item = (activeProduct as any)._carouselItem;
+  const prevProduct = () => {
+    if (emblaApi) {
+      emblaApi.scrollPrev();
+    } else {
+      setCurrentIndex(
+        (prev) =>
+          (prev - 1 + (validProducts.length || 1)) % (validProducts.length || 1),
+      );
+    }
+  };
+
+  const getDisplayName = (product: Product = activeProduct) => {
+    if (!product) return "";
+    const item = (product as any)._carouselItem;
     const categoryName =
-      (activeProduct as any).category?.name ||
-      (activeProduct as any).categoryName ||
+      (product as any).category?.name ||
+      (product as any).categoryName ||
       "Category";
-    const productName = activeProduct.name || "";
+    const productName = product.name || "";
 
     if (item) {
       if (item.customName && item.customName.trim() !== "")
@@ -95,7 +164,7 @@ export function ProductSeriesShowcaseSection({
         return categoryName;
       if (item.showName === true) return productName;
     }
-    return (activeProduct as any).title || productName;
+    return (product as any).title || productName;
   };
 
   if (validProducts.length === 0) return null;
@@ -103,141 +172,187 @@ export function ProductSeriesShowcaseSection({
   return (
     <section className="relative w-full bg-transparent flex flex-col items-center py-8 lg:py-[120px] lg:h-[700px]">
       {/* 1. MOBILE VIEW */}
-      <div className="lg:hidden w-full flex flex-col items-center px-6 gap-8">
-        <div className="w-full text-center">
+      <div className="lg:hidden w-full flex flex-col items-center gap-6">
+        {/* Title */}
+        <div className="w-full text-center px-6">
           <HollowText
             strokeColor="#846500"
-            strokeWidth={1}
-            className="block text-5xl font-[900] leading-none pointer-events-none"
+            strokeWidth={1.5}
+            className="block text-3xl sm:text-4xl md:text-5xl font-[900] leading-none pointer-events-none"
             style={{
               fontFamily: "var(--font-anaheim)",
-              whiteSpace: "pre-line",
             }}
           >
-            {title || "PRODUCT SERIES"}
+            {(title || "PRODUCT SERIES").replace(/\n/g, " ")}
           </HollowText>
         </div>
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeProduct.id}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="w-full flex flex-col gap-6"
-          >
-            <div className="w-full bg-[#F1E8CA] rounded-[24px] p-8 shadow-xl flex flex-col gap-6">
-              <h3 className="text-4xl font-extrabold text-[#6D5400] font-anaheim leading-tight">
-                {getDisplayName()}
-              </h3>
-              <div className="flex flex-col gap-4">
-                {attributes.slice(0, 4).map((attr, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <div className="w-8 h-8 rounded-full bg-[#A5A075] flex items-center justify-center shrink-0">
-                      <svg
-                        width="14"
-                        height="12"
-                        viewBox="0 0 18 14"
-                        fill="none"
-                      >
-                        <path
-                          d="M1.5 7L6.5 12L16.5 2"
-                          stroke="white"
-                          strokeWidth="3"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
+        {/* Carousel - Embla Implementation */}
+        <div
+          className="relative w-full py-4"
+          ref={emblaRef}
+        >
+          <div className="flex relative items-stretch">
+            {validProducts.map((item, idx) => {
+              const isActive = idx === currentIndex;
+              
+              // Get display name
+              const displayName = getDisplayName(item);
+              
+              // Get images
+              const mainImages = (item as any).mainImage || [];
+              const showImgNode = (item as any).showImage;
+              let img1 = showImgNode;
+              let img2 = showImgNode;
+              if (mainImages.length > 0) {
+                img1 = mainImages[0];
+                img2 = mainImages.length > 1 ? mainImages[1] : showImgNode || mainImages[0];
+              }
+
+              // Get attributes
+              const config = (item as any)._carouselItem;
+              let itemAttributes: string[] = [];
+              if (!(config && config.showHighlights === false)) {
+                if (Array.isArray(item.productAttributes) && item.productAttributes.length > 0) {
+                  itemAttributes = item.productAttributes;
+                } else if (typeof item.productAttributes === "string") {
+                  itemAttributes = (item.productAttributes as string)
+                    .split("\n")
+                    .filter((line) => line.trim());
+                } else {
+                  itemAttributes = [
+                    "Robust and stable",
+                    "Resistant to moisture",
+                    "Minimalist aesthetics",
+                    "Versatile and adaptable",
+                  ];
+                }
+              }
+
+              return (
+                <motion.div
+                  key={`${item.id}-${idx}`}
+                  animate={{
+                    scale: isActive ? 1 : 0.95,
+                    opacity: isActive ? 1 : 0.6,
+                  }}
+                  transition={{ duration: 0.4 }}
+                  className="bg-[#F1E8CA] flex-shrink-0 relative overflow-hidden flex flex-col rounded-[24px] p-6 shadow-xl"
+                  style={{
+                    width: layout.width,
+                    height: layout.cardH,
+                    marginRight: layout.gap,
+                  }}
+                >
+                  {/* Two Images Side by Side */}
+                  <div className="grid grid-cols-2 gap-3 w-full aspect-[16/10] rounded-[16px] overflow-hidden shrink-0 bg-[#F6F4ED]/50">
+                    <div className="w-full h-full relative">
+                      <OptimizedImage
+                        image={img1}
+                        alt="Feature 1"
+                        className="w-full h-full object-cover"
+                        size="medium"
+                      />
                     </div>
-                    <p className="text-lg font-bold text-black font-anaheim leading-none">
-                      {attr}
-                    </p>
+                    <div className="w-full h-full relative">
+                      <OptimizedImage
+                        image={img2}
+                        alt="Feature 2"
+                        className="w-full h-full object-cover"
+                        size="medium"
+                      />
+                    </div>
                   </div>
-                ))}
-              </div>
-              <Link
-                href={`/${locale}/shop/${activeProduct.slug}`}
-                className="flex items-center self-end gap-3 group/see transition-all duration-300 transform translate-x-2 translate-y-2"
-              >
-                <span className="text-xl font-bold text-[#756F3F] font-anaheim transition-colors group-hover/see:text-black">
-                  {(activeProduct as any)._carouselItem?.buttonText ||
-                    "SEE ALL"}
-                </span>
-                <div className="w-12 h-12 rounded-full border border-[#756F3F] flex items-center justify-center text-[#756F3F] group-hover/see:bg-[#756F3F] group-hover/see:text-white transition-all">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M5 12H19M19 12L12 5M19 12L12 19"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-              </Link>
-            </div>
 
-            <div className="grid grid-cols-2 gap-4 w-full">
-              <div className="aspect-[3/4] rounded-[20px] overflow-hidden shadow-lg border-none">
-                <OptimizedImage
-                  image={displayedImages[0]}
-                  alt="Feature 1"
-                  className="w-full h-full object-cover"
-                  size="large"
-                />
-              </div>
-              <div className="aspect-[3/4] rounded-[20px] overflow-hidden shadow-lg border-none">
-                <OptimizedImage
-                  image={displayedImages[1]}
-                  alt="Feature 2"
-                  className="w-full h-full object-cover"
-                  size="large"
-                />
-              </div>
-            </div>
+                  {/* Title */}
+                  <h3 className="text-[20px] sm:text-[22px] font-extrabold text-[#6D5400] font-anaheim leading-tight mt-4 mb-3">
+                    {displayName}
+                  </h3>
 
-            <div className="flex justify-center gap-10 mt-4">
-              <button
-                onClick={prevProduct}
-                className="nav-btn-standard w-14 h-14 rounded-full border-2 border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] hover:bg-[#756F3F] hover:text-white active:scale-95 transition-all"
-              >
-                <svg
-                  width="12"
-                  height="20"
-                  viewBox="0 0 17 29"
-                  fill="none"
-                  className="transition-colors"
-                >
-                  <path
-                    d="M15.5 2L3 14.5L15.5 27"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
-              <button
-                onClick={nextProduct}
-                className="nav-btn-standard w-14 h-14 rounded-full border-2 border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] hover:bg-[#756F3F] hover:text-white active:scale-95 transition-all"
-              >
-                <svg
-                  width="12"
-                  height="20"
-                  viewBox="0 0 17 29"
-                  fill="none"
-                  className="transition-colors"
-                >
-                  <path
-                    d="M1.5 2L14 14.5L1.5 27"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+                  {/* Highlights (Compact lists) */}
+                  <div className="flex flex-col gap-2 shrink-0">
+                    {itemAttributes.slice(0, 3).map((attr, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <div className="w-5 h-5 rounded-full bg-[#A5A075] flex items-center justify-center shrink-0">
+                          <svg
+                            width="10"
+                            height="8"
+                            viewBox="0 0 18 14"
+                            fill="none"
+                          >
+                            <path
+                              d="M1.5 7L6.5 12L16.5 2"
+                              stroke="white"
+                              strokeWidth="3.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+                        <p className="text-[14px] sm:text-[15px] font-bold text-black font-anaheim leading-none truncate">
+                          {attr}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Link Button */}
+                  <div className="mt-auto self-end">
+                    <Link
+                      href={`/${locale}/shop/${item.slug}`}
+                      className="flex items-center gap-2 group/see"
+                    >
+                      <span className="text-[15px] font-bold text-[#756F3F] font-anaheim">
+                        {item._carouselItem?.buttonText || "SEE ALL"}
+                      </span>
+                      <div className="w-8 h-8 rounded-full border border-[#756F3F] flex items-center justify-center text-[#756F3F] group-hover/see:bg-[#756F3F] group-hover/see:text-white transition-all">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                          <path
+                            d="M5 12H19M19 12L12 5M19 12L12 19"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                    </Link>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Nav Arrows */}
+        <div className="flex justify-center gap-10 mt-2">
+          <button
+            onClick={prevProduct}
+            className="nav-btn-standard w-12 h-12 rounded-full border-2 border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] hover:bg-[#756F3F] hover:text-white active:scale-95 transition-all"
+          >
+            <svg width="10" height="16" viewBox="0 0 17 29" fill="none">
+              <path
+                d="M15.5 2L3 14.5L15.5 27"
+                stroke="currentColor"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+          <button
+            onClick={nextProduct}
+            className="nav-btn-standard w-12 h-12 rounded-full border-2 border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] hover:bg-[#756F3F] hover:text-white active:scale-95 transition-all"
+          >
+            <svg width="10" height="16" viewBox="0 0 17 29" fill="none">
+              <path
+                d="M1.5 2L14 14.5L1.5 27"
+                stroke="currentColor"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* 2. DESKTOP VIEW */}

@@ -264,8 +264,8 @@ export function TrustSection({
           </div>
         </div>
 
-        {/* Right Column: Scatter Images */}
-        <div className="relative w-full lg:w-auto h-[450px] lg:h-full lg:flex-grow flex items-center justify-center lg:block min-h-[750px] lg:min-h-[900px]">
+        {/* Right Column: Scatter Images (Desktop View) */}
+        <div className="hidden lg:block relative lg:w-auto lg:h-full lg:flex-grow lg:min-h-[900px]">
           {/* Image 1 - top scatter (Pencil: image1) */}
           <motion.div
             initial={{ rotate: 2.19, x: 0 }}
@@ -284,13 +284,13 @@ export function TrustSection({
               scale: { type: "spring", stiffness: 300 },
               x: { type: "spring", stiffness: 300 },
             }}
-            className="absolute shadow-2xl rounded-[30px] lg:rounded-[54px] overflow-hidden z-30 lg:left-[135px] lg:top-[20px] cursor-pointer"
+            className="absolute shadow-2xl rounded-[54px] overflow-hidden z-30 lg:left-[135px] lg:top-[20px] cursor-pointer"
             style={{
               left: "calc(50% - 200px)",
               top: "10px",
             }}
           >
-            <div className="w-[180px] h-[124px] lg:w-[235px] lg:h-[162px]">
+            <div className="w-[235px] h-[162px]">
               {getImage(0) ? (
                 <OptimizedImage
                   image={getImage(0)}
@@ -330,13 +330,13 @@ export function TrustSection({
               scale: { type: "spring", stiffness: 300 },
               x: { type: "spring", stiffness: 300 },
             }}
-            className="absolute shadow-2xl rounded-[30px] lg:rounded-[54px] overflow-hidden z-0 lg:left-[333px] lg:top-[122px] cursor-pointer"
+            className="absolute shadow-2xl rounded-[54px] overflow-hidden z-0 lg:left-[333px] lg:top-[122px] cursor-pointer"
             style={{
               left: "calc(50% - 60px)",
               top: "160px",
             }}
           >
-            <div className="w-[220px] h-[280px] lg:w-[331px] lg:h-[425px]">
+            <div className="w-[331px] h-[425px]">
               {getImage(1) ? (
                 <OptimizedImage
                   image={getImage(1)}
@@ -369,10 +369,10 @@ export function TrustSection({
               scale: { type: "spring", stiffness: 300 },
               x: { type: "spring", stiffness: 300 },
             }}
-            className="absolute shadow-2xl rounded-[40px] lg:rounded-[54px] overflow-hidden z-20 cursor-pointer"
+            className="absolute shadow-2xl rounded-[54px] overflow-hidden z-20 cursor-pointer"
             style={{
-              left: isMobile ? "calc(50% - 180px)" : "50px",
-              top: isMobile ? "480px" : "300px",
+              left: "50px",
+              top: "300px",
             }}
           >
             <div className="w-[229px] h-[258px]">
@@ -408,10 +408,10 @@ export function TrustSection({
               scale: { type: "spring", stiffness: 300 },
               x: { type: "spring", stiffness: 300 },
             }}
-            className="absolute shadow-2xl rounded-[30px] lg:rounded-[54px] overflow-hidden z-10 cursor-pointer"
+            className="absolute shadow-2xl rounded-[54px] overflow-hidden z-10 cursor-pointer"
             style={{
-              left: isMobile ? "calc(50% - 20px)" : "268px",
-              top: isMobile ? "560px" : "520px",
+              left: "268px",
+              top: "520px",
             }}
           >
             <div className="w-[245px] h-[234px]">
@@ -427,6 +427,31 @@ export function TrustSection({
               )}
             </div>
           </motion.div>
+        </div>
+
+        {/* Right Column: Mobile/Tablet View (2x2 Grid / 四宫格) */}
+        <div className="lg:hidden w-full max-w-[540px] mx-auto grid grid-cols-2 gap-4 pb-8 shrink-0">
+          {[0, 1, 2, 3].map((idx) => {
+            const img = getImage(idx);
+            if (!img) return null;
+            return (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                className="aspect-[4/3] w-full rounded-[16px] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.3)] border border-white/10 relative cursor-pointer"
+              >
+                <OptimizedImage
+                  image={img}
+                  alt={`trust-image-${idx}`}
+                  className="w-full h-full object-cover"
+                  size="medium"
+                />
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>

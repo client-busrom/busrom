@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
@@ -77,12 +77,65 @@ export function HighlightShowcaseSection({
     dragFree: true,
   });
 
+  const [mobileIndex, setMobileIndex] = useState(0);
+  const [layout, setLayout] = useState({
+    width: 300,
+    gap: 16,
+    cardH: 200,
+  });
+
+  const [mobileEmblaRef, mobileEmblaApi] = useEmblaCarousel({
+    loop: false,
+    align: "center",
+    skipSnaps: false,
+    dragFree: false,
+    containScroll: false,
+  });
+
+  const onSelect = useCallback(() => {
+    if (!mobileEmblaApi) return;
+    setMobileIndex(mobileEmblaApi.selectedScrollSnap());
+  }, [mobileEmblaApi]);
+
+  useEffect(() => {
+    if (!mobileEmblaApi) return;
+    onSelect();
+    mobileEmblaApi.on("select", onSelect);
+    mobileEmblaApi.on("reInit", onSelect);
+  }, [mobileEmblaApi, onSelect]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const w = window.innerWidth;
+      if (w < 1024) {
+        if (w < 640) {
+          setLayout({
+            width: w * 0.82,
+            gap: 16,
+            cardH: (w * 0.82) * 0.625, // 16:10 ratio
+          });
+        } else {
+          setLayout({
+            width: w * 0.55,
+            gap: 24,
+            cardH: (w * 0.55) * 0.625,
+          });
+        }
+      }
+      if (mobileEmblaApi) mobileEmblaApi.reInit();
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [mobileEmblaApi]);
+
   return (
     <section className="relative w-full bg-transparent py-20 lg:py-0 lg:h-[vw(1120)] overflow-hidden flex flex-col items-center justify-center">
-      {/* 1. MOBILE VIEW: Vertical List (Simple Display) - Visible below lg */}
-      <div className="lg:hidden w-full px-6 flex flex-col gap-12">
-        <div className="flex flex-col gap-4">
-          <h2 className="font-anaheim font-bold text-[#756F3F] text-3xl md:text-5xl tracking-wider">
+      {/* 1. MOBILE VIEW: Horizontal Card Carousel - Visible below lg */}
+      <div className="lg:hidden w-full flex flex-col gap-8">
+        {/* Header Title */}
+        <div className="flex flex-col gap-4 px-6">
+          <h2 className="font-anaheim font-bold text-[#756F3F] text-xl md:text-5xl tracking-wider">
             <RichTitle
               title={titleHtml || title}
               defaultText="Highlight Showcase"
@@ -91,62 +144,94 @@ export function HighlightShowcaseSection({
           <div className="h-1 w-20 bg-[#C7BB5D]" />
         </div>
 
-        <div className="flex flex-col gap-10">
-          {products.map((item, index) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="w-full bg-white rounded-[20px] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.05)] border border-black/5 group"
-            >
-              <Link href={item.link || "#"} className="flex flex-col">
-                <div className="relative aspect-video w-full">
-                  <OptimizedImage
-                    image={item.image}
-                    alt={item.title || ""}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    size="large"
-                  />
-                </div>
-                <div className="p-6 flex justify-between items-center bg-[#EEEACB]/10">
-                  <h4 className="text-[#333] font-bold text-xl md:text-2xl font-anaheim uppercase">
-                    {item.title}
-                  </h4>
-                  <div className="w-10 h-10 rounded-full bg-[#756F3F]/10 flex items-center justify-center transition-colors group-hover:bg-[#C7BB5D]">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#756F3F"
-                      strokeWidth="2.5"
-                    >
-                      <path d="M5 12h14m-7-7l7 7-7 7" />
-                    </svg>
-                  </div>
-                </div>
-              </Link>
-            </motion.div>
+        {/* Embla Carousel Viewport */}
+        <div className="relative w-full py-4" ref={mobileEmblaRef}>
+          <div className="flex relative items-stretch">
+            {products.map((item, index) => {
+              const isActive = index === mobileIndex;
+              return (
+                <motion.div
+                  key={`${item.id}-${index}`}
+                  animate={{
+                    scale: isActive ? 1 : 0.95,
+                    opacity: isActive ? 1 : 0.6,
+                  }}
+                  transition={{ duration: 0.4 }}
+                  className="flex-shrink-0 relative rounded-[20px] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.1)] border border-black/5"
+                  style={{
+                    width: layout.width,
+                    height: layout.cardH,
+                    marginRight: layout.gap,
+                  }}
+                >
+                  <Link href={item.link || "#"} className="relative w-full h-full block group">
+                    {/* The Image */}
+                    <div className="absolute inset-0 w-full h-full">
+                      <OptimizedImage
+                        image={item.image}
+                        alt={item.title || ""}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        size="large"
+                      />
+                    </div>
+                    
+                    {/* Dark Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent z-10" />
+
+                    {/* Overlay Content */}
+                    <div className="absolute bottom-0 inset-x-0 p-5 z-20 flex justify-between items-end">
+                      <h4 className="text-white font-extrabold text-[16px] sm:text-[18px] font-anaheim uppercase max-w-[75%] drop-shadow-md leading-snug">
+                        {item.title}
+                      </h4>
+                      <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 transition-all group-hover:bg-[#C7BB5D] group-hover:border-transparent group-hover:scale-105 active:scale-95 shrink-0">
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          className="text-white"
+                          strokeWidth="2.5"
+                        >
+                          <path d="M5 12h14m-7-7l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Pagination Indicator Dots */}
+        <div className="flex justify-center gap-2 mt-1">
+          {products.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => mobileEmblaApi && mobileEmblaApi.scrollTo(idx)}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                idx === mobileIndex ? "w-6 bg-[#C7BB5D]" : "w-2 bg-[#756F3F]/30"
+              }`}
+            />
           ))}
         </div>
 
         {/* Mobile View More */}
-        <div className="mt-8 flex justify-center">
+        <div className="mt-4 flex justify-center">
           <Link
             href={viewMoreLink || `/${locale}/shop`}
             className="flex items-center gap-4"
           >
             <AnimatedLinkButton
-              variant="dark"
-              className="text-white"
-              ballColor="#C7BB5D"
+              variant="light"
+              className="text-[#756F3F]"
+              ballColor="#ECE8D8"
               style={{
-                fontSize: "20px",
-                height: "50px",
-                paddingLeft: "30px",
-                paddingRight: "20px",
+                fontSize: "16px",
+                height: "44px",
+                paddingLeft: "24px",
+                paddingRight: "16px",
               }}
             >
               {viewMoreText || "VIEW MORE"}

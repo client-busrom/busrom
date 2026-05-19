@@ -51,18 +51,21 @@ export function OneStopSolutionTemplate({ locale, data }: OneStopSolutionTemplat
       {/* Hero Section */}
       <HeroSection slides={hero.items} locale={locale} />
 
-      {/* Value Proposition Section */}
-      <ValuePropositionSection 
-        title={problems.title} 
-        subtitle={problems.subtitle} 
-        problems={problems.items} 
-        advantages={[]} 
-        autoplay={problems.autoplay} 
-        interval={problems.interval}
-      />
+      {/* Wrapper to contain the transition background ball and prevent layout overflow */}
+      <div className="relative overflow-hidden w-full">
+        {/* Value Proposition Section */}
+        <ValuePropositionSection 
+          title={problems.title} 
+          subtitle={problems.subtitle} 
+          problems={problems.items} 
+          advantages={[]} 
+          autoplay={problems.autoplay} 
+          interval={problems.interval}
+        />
 
-      {/* Advantages Section */}
-      <AdvantagesSection title={advantages.title} advantages={advantages.items} />
+        {/* Advantages Section */}
+        <AdvantagesSection title={advantages.title} advantages={advantages.items} />
+      </div>
 
       {/* Purchase Process Section */}
       <PurchaseProcessSection title={process.title} slides={process.items} />
@@ -88,25 +91,28 @@ export function OneStopSolutionTemplate({ locale, data }: OneStopSolutionTemplat
         />
       )}
 
-      {/* Product Series Showcase Section */}
-      {productSeries.products.length > 0 && (
-        <ProductSeriesShowcaseSection 
-          title={productSeries.title} 
-          products={productSeries.products as any} 
-          locale={locale} 
-        />
-      )}
+      {/* Wrapper to contain the transition background ball and prevent layout overflow */}
+      <div className="relative overflow-hidden w-full">
+        {/* Product Series Showcase Section */}
+        {productSeries.products.length > 0 && (
+          <ProductSeriesShowcaseSection 
+            title={productSeries.title} 
+            products={productSeries.products as any} 
+            locale={locale} 
+          />
+        )}
 
-      {/* Brand Highlights Section */}
-      {brandHighlights.items.length > 0 && (
-        <BrandHighlightsSection 
-          titleLine1={brandHighlights.titleLine1} 
-          titleLine1Html={brandHighlights.titleLine1Html}
-          titleLine2={brandHighlights.titleLine2} 
-          titleLine2Html={brandHighlights.titleLine2Html}
-          items={brandHighlights.items} 
-        />
-      )}
+        {/* Brand Highlights Section */}
+        {brandHighlights.items.length > 0 && (
+          <BrandHighlightsSection 
+            titleLine1={brandHighlights.titleLine1} 
+            titleLine1Html={brandHighlights.titleLine1Html}
+            titleLine2={brandHighlights.titleLine2} 
+            titleLine2Html={brandHighlights.titleLine2Html}
+            items={brandHighlights.items} 
+          />
+        )}
+      </div>
 
       {/* Trust Section */}
       <TrustSection 
