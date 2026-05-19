@@ -278,7 +278,7 @@ interface SupportNarrativeSectionProps {
 }
 
 export function SupportNarrativeSection({
-  title = "What Support You Can Get",
+  title = "",
   cards = [],
 }: SupportNarrativeSectionProps) {
   // 计算卡片总宽度
@@ -407,7 +407,7 @@ export function SupportNarrativeSection({
           }}
         >
           <img
-            src="/contact-support/？.svg"
+            src="/contact-support/?.svg"
             alt=""
             className="w-full h-full object-contain"
           />
@@ -437,7 +437,7 @@ export function SupportNarrativeSection({
                 delay: index * 0.05,
               }}
             >
-              {char === " " ? "\u00A0" : char}
+              {char}
             </motion.span>
           ))}
         </h2>
