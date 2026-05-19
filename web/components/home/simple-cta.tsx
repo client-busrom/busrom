@@ -450,7 +450,7 @@ export default function SimpleCta({ data, headerTheme, className }: Props) {
       </motion.div>
 
       {/* ==================== 移动端布局 ==================== */}
-      <div className={cn("lg:hidden px-4", cfg.section.marginTop)}>
+      <div className={cn("lg:hidden px-6 sm:px-10 md:max-w-[568px] mx-auto", cfg.section.marginTop)}>
         <div className="flex flex-col items-center gap-8">
           {/* 移动端图片区域 */}
           <div
@@ -518,7 +518,7 @@ export default function SimpleCta({ data, headerTheme, className }: Props) {
           </div>
 
           {/* 移动端文本区域 */}
-          <div className="w-full text-left space-y-4">
+          <div className="w-full text-left space-y-4 px-2 sm:px-4">
             {firstLine && (
               <h3 className="font-anaheim font-bold text-3xl text-brand-text-black leading-tight">
                 {firstLine}
