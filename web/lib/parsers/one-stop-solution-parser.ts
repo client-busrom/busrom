@@ -185,9 +185,18 @@ const extractSectionRaw = (children: any[], markerId: string, mediaData: Record<
   return { title, subtitle, titleHtml, subtitleHtml, items, autoplay, interval, titleNodes };
 };
 
+const getDeterministicIndex = (str: string, max: number) => {
+  if (max <= 1) return 0;
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return Math.abs(hash) % max;
+};
+
 const mapProductsWithCarouselConfig = (products: any[], carouselItems: any[] = [], locale: string) => {
   const usedProductIds = new Set<string>();
-  return carouselItems.map((item: any) => {
+  return carouselItems.map((item: any, idx: number) => {
     const getTargetId = (val: any) => (typeof val === 'object' && val !== null ? val.id : val);
     
     let product = null;
@@ -196,18 +205,26 @@ const mapProductsWithCarouselConfig = (products: any[], carouselItems: any[] = [
       product = products.find(p => String(p.id) === String(targetId));
     } else {
       const targetSeriesId = getTargetId(item.productSeries);
-      // Try to find a unique product in this series
-      product = products.find(p => {
-        const pSeriesId = typeof p.series === 'object' && p.series !== null ? p.series.id : p.series;
-        return String(pSeriesId) === String(targetSeriesId) && !usedProductIds.has(p.id);
-      });
       
-      // Fallback: If no more unique products, but we need more for the carousel, reuse products from the same series
-      if (!product && targetSeriesId) {
-        product = products.find(p => {
-          const pSeriesId = typeof p.series === 'object' && p.series !== null ? p.series.id : p.series;
-          return String(pSeriesId) === String(targetSeriesId);
-        });
+      // Find all products belonging to this series
+      const seriesProducts = products.filter(p => {
+        const pSeriesId = typeof p.series === 'object' && p.series !== null ? p.series.id : p.series;
+        return String(pSeriesId) === String(targetSeriesId);
+      });
+
+      // Filter to unused products
+      const unusedProducts = seriesProducts.filter(p => !usedProductIds.has(p.id));
+
+      if (unusedProducts.length > 0) {
+        // Deterministically pick one based on seed
+        const seed = `${item.id || ''}-${targetSeriesId || ''}-${idx}`;
+        const pickIdx = getDeterministicIndex(seed, unusedProducts.length);
+        product = unusedProducts[pickIdx];
+      } else if (seriesProducts.length > 0) {
+        // Fallback: reuse products from same series
+        const seed = `${item.id || ''}-${targetSeriesId || ''}-${idx}`;
+        const pickIdx = getDeterministicIndex(seed, seriesProducts.length);
+        product = seriesProducts[pickIdx];
       }
     }
     
