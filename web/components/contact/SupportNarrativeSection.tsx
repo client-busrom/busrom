@@ -407,7 +407,7 @@ export function SupportNarrativeSection({
           }}
         >
           <img
-            src="/contact-support/?.svg"
+            src="/contact-support/why.svg"
             alt=""
             className="w-full h-full object-contain"
           />
