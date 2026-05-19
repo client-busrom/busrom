@@ -31,7 +31,7 @@ export function AdvantagesSection({
     width: 0,
     gap: 16,
     padding: 24,
-    cardH: 450,
+    cardH: 440,
   });
 
   // 1. Embla Carousel Setup
@@ -74,7 +74,7 @@ export function AdvantagesSection({
             width: w * 0.75,
             gap: 16,
             padding: 0,
-            cardH: 400,
+            cardH: 440,
           });
         } else {
           setLayout({
@@ -82,7 +82,7 @@ export function AdvantagesSection({
             width: w * 0.45,
             gap: 24,
             padding: 0,
-            cardH: 450,
+            cardH: 480,
           });
         }
       } else {
@@ -239,11 +239,11 @@ export function AdvantagesSection({
 
                   {/* Card Image */}
                   <div
-                    className="shadow-[0_10px_10px_rgba(0,0,0,0.17)] overflow-hidden bg-gray-50 pointer-events-none"
+                    className="shadow-[0_10px_10px_rgba(0,0,0,0.17)] overflow-hidden bg-gray-50 pointer-events-none shrink-0"
                     style={{
                       width: "100%",
-                      height: layout.type === "desktop" ? vw(320) : "200px",
-                      marginBottom: layout.type === "desktop" ? vw(50) : "36px",
+                      height: layout.type === "desktop" ? vw(320) : "150px",
+                      marginBottom: layout.type === "desktop" ? vw(50) : "16px",
                       borderRadius: layout.type === "desktop" ? vw(30) : "20px",
                     }}
                   >
@@ -258,11 +258,16 @@ export function AdvantagesSection({
                   </div>
 
                   {/* Description Text */}
-                  <div className="w-full pointer-events-none">
+                  <div 
+                    className="w-full flex-1 overflow-y-auto pointer-events-auto pr-1 select-text"
+                    style={{
+                      WebkitOverflowScrolling: "touch",
+                    }}
+                  >
                     <p
                       className="font-medium leading-normal text-black text-justify"
                       style={{
-                        fontSize: layout.type === "desktop" ? vw(20) : "15px",
+                        fontSize: layout.type === "desktop" ? vw(20) : "14px",
                         fontFamily: "var(--font-anaheim)",
                       }}
                     >
