@@ -3,6 +3,7 @@ import Link from "next/link";
 import { FooterApiData } from "./types";
 import SocialIcon from "./SocialIcon";
 import FooterBottom from "./FooterBottom";
+import { cn } from "@/lib/utils";
 
 interface Props {
   footerData: FooterApiData;
@@ -142,18 +143,36 @@ export default function FooterSimple({
           {/* 右侧：社交媒体链接 */}
           {footerData.socialLinks && footerData.socialLinks.length > 0 && (
             <div className="flex items-center gap-4">
-              {footerData.socialLinks.map((social: any, index: number) => (
-                <a
-                  key={index}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-brand-text-inverse/70 hover:text-brand-primary transition-colors"
-                  title={social.platform}
-                >
-                  <SocialIcon platform={social.platform} />
-                </a>
-              ))}
+              {footerData.socialLinks.map((social: any, index: number) => {
+                // 原生品牌默认颜色映射
+                const brandColors: Record<string, string> = {
+                  facebook: "text-[#1877F2]",
+                  instagram: "text-[#E4405F]",
+                  twitter: "text-[#1DA1F2]",
+                  linkedin: "text-[#0A66C2]",
+                  youtube: "text-[#FF0000]",
+                  tiktok: "text-white",
+                  wechat: "text-[#07C160]",
+                  whatsapp: "text-[#25D366]",
+                };
+                const colorClass = brandColors[social.platform.toLowerCase()] || "text-brand-text-inverse/70";
+
+                return (
+                  <a
+                    key={index}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      "transition-all duration-300 hover:opacity-80 hover:scale-110",
+                      colorClass
+                    )}
+                    title={social.platform}
+                  >
+                    <SocialIcon platform={social.platform} />
+                  </a>
+                );
+              })}
             </div>
           )}
         </div>

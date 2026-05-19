@@ -1,5 +1,5 @@
 export default function SocialIcon({ platform }: { platform: string }) {
-  const iconClass = "w-5 h-5";
+  const iconClass = "w-5 h-5 transition-colors duration-300";
 
   switch (platform) {
     case 'facebook':
