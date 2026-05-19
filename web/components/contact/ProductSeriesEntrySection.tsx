@@ -73,10 +73,10 @@ interface ProductSeriesEntrySectionProps {
 }
 
 export function ProductSeriesEntrySection({
-  titleLeft = "WHICH\n    PRODUCTS",
-  titleLeftSuperscript = "SERIES",
-  titleRightBold = "Are You",
-  titleRightNormal = "Looking For?",
+  titleLeft = "",
+  titleLeftSuperscript = "",
+  titleRightBold = "",
+  titleRightNormal = "",
   products = [],
   viewMoreText = "view more",
   viewMoreLink = "/products",
@@ -506,16 +506,18 @@ export function ProductSeriesEntrySection({
           {normalChars.map((char, index) => {
             if (char === "?") {
               return (
-                <motion.span
+                <motion.div
                   key="question-mark"
-                  className="inline-block text-black"
+                  className="inline-block relative"
                   style={{ 
-                    originX: 0.5, 
-                    originY: 0.5,
-                    willChange: "transform"
+                    width: vw(70),
+                    height: vw(106),
+                    transformOrigin: "center bottom",
+                    willChange: "transform",
+                    alignSelf: "flex-end",
+                    marginLeft: vw(4),
                   }}
                   animate={{
-                    y: [0, -12, 0],
                     rotate: [-18, -10, -18],
                   }}
                   transition={{
@@ -525,8 +527,12 @@ export function ProductSeriesEntrySection({
                     repeatType: "reverse",
                   }}
                 >
-                  {char}
-                </motion.span>
+                  <img
+                    src="/contact-support/?.svg"
+                    alt=""
+                    className="w-full h-full object-contain"
+                  />
+                </motion.div>
               )
             }
             return (
