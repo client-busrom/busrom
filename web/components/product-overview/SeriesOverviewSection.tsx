@@ -16,9 +16,20 @@ const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
 function StackedSubtitle({ text }: { text: string }) {
   const [layers, setLayers] = useState<{ id: number }[]>([]);
   const layerIdRef = useRef(0);
+  const [yOffset, setYOffset] = useState(60);
 
   useEffect(() => {
-    // Generate a new 'stack' layer every 700ms
+    const updateOffset = () => {
+      if (window.innerWidth >= 768) {
+        setYOffset((60 / 1920) * window.innerWidth);
+      } else {
+        setYOffset(60);
+      }
+    };
+    updateOffset();
+    window.addEventListener("resize", updateOffset);
+
+    // Generate a new 'stack' layer every 700ms (1000ms in interval to matches design spacing)
     const interval = setInterval(() => {
       const newId = layerIdRef.current++;
       setLayers((prev) => [...prev, { id: newId }]);
@@ -29,11 +40,14 @@ function StackedSubtitle({ text }: { text: string }) {
       }, 4000);
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("resize", updateOffset);
+    };
   }, []);
 
   return (
-    <div className="relative flex justify-center items-center h-[100px] md:h-[180px]">
+    <div className="relative flex justify-center items-center h-[100px] md:h-[9.375vw]">
       {/* Dynamic layers animating downwards */}
       <AnimatePresence>
         {layers.map((layer) => (
@@ -41,14 +55,14 @@ function StackedSubtitle({ text }: { text: string }) {
             key={layer.id}
             className="absolute"
             initial={{ y: 0, opacity: 0.6 }}
-            animate={{ y: 60, opacity: 0 }}
+            animate={{ y: yOffset, opacity: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 4, ease: "easeOut" }}
           >
             <HollowText
               strokeColor="#464010"
               strokeWidth={0.5}
-              className="font-josefin-sans font-extrabold select-none pointer-events-none text-[32px] md:text-[96px]"
+              className="font-josefin-sans font-extrabold select-none pointer-events-none text-[32px] md:text-[5vw]"
               style={{ letterSpacing: "0.02em" }}
             >
               {text}
@@ -59,7 +73,7 @@ function StackedSubtitle({ text }: { text: string }) {
 
       {/* Main solid text with stroke layer */}
       <span
-        className="relative z-10 text-[#f6f4ed] font-josefin-sans font-extrabold text-[32px] md:text-[96px]"
+        className="relative z-10 text-[#f6f4ed] font-josefin-sans font-extrabold text-[32px] md:text-[5vw]"
         style={{
           letterSpacing: "0.02em",
           WebkitTextStroke: `1px #464010`,
@@ -71,7 +85,7 @@ function StackedSubtitle({ text }: { text: string }) {
 
       {/* Subtle background layer for better baseline visibility */}
       <span
-        className="absolute font-josefin-sans font-extrabold text-[#464010] opacity-5 select-none pointer-events-none z-0 text-[32px] md:text-[96px]"
+        className="absolute font-josefin-sans font-extrabold text-[#464010] opacity-5 select-none pointer-events-none z-0 text-[32px] md:text-[5vw]"
         style={{ letterSpacing: "0.02em" }}
       >
         {text}
@@ -147,18 +161,18 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
       <div
         className="hidden md:flex flex-col items-center w-full relative"
         style={{ 
-          paddingTop: "clamp(240px, 18vw, 350px)", 
-          paddingBottom: "clamp(100px, 10vw, 200px)" 
+          paddingTop: vw(346), 
+          paddingBottom: vw(40) 
         }}
       >
         {/* Title */}
         <div
           className="relative z-[60] text-center"
-          style={{ marginBottom: "clamp(40px, 4vw, 80px)" }}
+          style={{ marginBottom: vw(80) }}
         >
           <h2
             className="font-josefin-sans font-bold text-black leading-tight"
-            style={{ fontSize: "clamp(32px, 3.125vw, 60px)" }}
+            style={{ fontSize: vw(60) }}
           >
             {title}
           </h2>
@@ -167,7 +181,7 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
         {/* Carousel Container */}
         <div
           className="relative w-full flex items-center justify-center"
-          style={{ height: "clamp(400px, 28vw, 550px)" }}
+          style={{ height: vw(538) }}
         >
           {items.map((item, index) => {
             const newDist = circularDist(index, activeIndex, total);

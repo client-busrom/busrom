@@ -482,7 +482,7 @@ export function StoryContactFormSection({
                   <button
                     onClick={handlePrevImage}
                     className={cn(
-                      "hover:scale-110 transition-transform flex items-center justify-center cursor-pointer pointer-events-auto",
+                      "transform hover:scale-120 transition-all duration-300 flex items-center justify-center cursor-pointer pointer-events-auto text-[#d3c976] hover:text-white z-50",
                       !effectiveIsMobile && "absolute",
                     )}
                     style={
@@ -490,14 +490,12 @@ export function StoryContactFormSection({
                         ? {
                             width: mvw(50),
                             height: mvw(50),
-                            transform: "rotate(-45deg)",
                           }
                         : {
                             left: vw(-190),
                             top: vw(50),
                             width: vw(76.56),
                             height: vw(76.56),
-                            transform: "rotate(-45deg)",
                           }
                     }
                     aria-label="Previous Image"
@@ -508,9 +506,10 @@ export function StoryContactFormSection({
                       viewBox="0 0 77 77"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
+                      style={{ transform: "rotate(-45deg)" }}
                     >
                       <path
-                        fill="#ffffff"
+                        fill={effectiveIsMobile ? "#ffffff" : "currentColor"}
                         d="M75.17835 76.56344c0.27404 0.00005 0.54193-0.08118 0.7698-0.23341 0.22787-0.15223 0.40548-0.36861 0.51035-0.62179 0.10487-0.25317 0.13231-0.53177 0.07884-0.80054-0.05347-0.26877-0.18546-0.51564-0.37925-0.7094l-71.42781-71.4275 10.50912 0c0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.61219 0.40577-0.97963 0-0.36743-0.14596-0.71981-0.40577-0.97963-0.25981-0.25981-0.6122-0.40577-0.97963-0.40577l-13.86223 0c-0.36458 0.00216-0.71362 0.14795-0.97142 0.40575-0.2578 0.2578-0.40359 0.60684-0.40575 0.97142l0 13.86223c0 0.36743 0.14596 0.71981 0.40577 0.97963 0.25981 0.25981 0.61219 0.40577 0.97963 0.40577 0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.6122 0.40577-0.97963l0-10.50956 71.42782 71.42794c0.12852 0.12883 0.28124 0.231 0.44937 0.30061 0.16814 0.06962 0.34838 0.10532 0.53036 0.10505z"
                       />
                     </svg>
@@ -519,7 +518,7 @@ export function StoryContactFormSection({
                   <button
                     onClick={handleNextImage}
                     className={cn(
-                      "hover:scale-110 transition-transform flex items-center justify-center cursor-pointer pointer-events-auto",
+                      "transform hover:scale-120 transition-all duration-300 flex items-center justify-center cursor-pointer pointer-events-auto text-[#d3c976] hover:text-white z-50",
                       !effectiveIsMobile && "absolute",
                     )}
                     style={
@@ -527,14 +526,12 @@ export function StoryContactFormSection({
                         ? {
                             width: mvw(50),
                             height: mvw(50),
-                            transform: "rotate(135deg)",
                           }
                         : {
                             left: vw(716),
                             top: vw(672),
                             width: vw(76.56),
                             height: vw(76.56),
-                            transform: "rotate(135deg)",
                           }
                     }
                     aria-label="Next Image"
@@ -545,9 +542,10 @@ export function StoryContactFormSection({
                       viewBox="0 0 77 77"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
+                      style={{ transform: "rotate(135deg)" }}
                     >
                       <path
-                        fill={effectiveIsMobile ? "#ffffff" : "#d3c976"}
+                        fill={effectiveIsMobile ? "#ffffff" : "currentColor"}
                         d="M75.17835 76.56344c0.27404 0.00005 0.54193-0.08118 0.7698-0.23341 0.22787-0.15223 0.40548-0.36861 0.51035-0.62179 0.10487-0.25317 0.13231-0.53177 0.07884-0.80054-0.05347-0.26877-0.18546-0.51564-0.37925-0.7094l-71.42781-71.4275 10.50912 0c0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.61219 0.40577-0.97963 0-0.36743-0.14596-0.71981-0.40577-0.97963-0.25981-0.25981-0.6122-0.40577-0.97963-0.40577l-13.86223 0c-0.36458 0.00216-0.71362 0.14795-0.97142 0.40575-0.2578 0.2578-0.40359 0.60684-0.40575 0.97142l0 13.86223c0 0.36743 0.14596 0.71981 0.40577 0.97963 0.25981 0.25981 0.61219 0.40577 0.97963 0.40577 0.36743 0 0.71981-0.14596 0.97963-0.40577 0.25981-0.25981 0.40577-0.6122 0.40577-0.97963l0-10.50956 71.42782 71.42794c0.12852 0.12883 0.28124 0.231 0.44937 0.30061 0.16814 0.06962 0.34838 0.10532 0.53036 0.10505z"
                       />
                     </svg>

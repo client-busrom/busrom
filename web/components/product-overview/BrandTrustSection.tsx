@@ -15,6 +15,60 @@ interface BrandTrustSectionProps {
 export function BrandTrustSection({ data }: BrandTrustSectionProps) {
   if (!data) return null;
 
+  const renderTitle = (titleStr: string, isMobile = false) => {
+    if (!titleStr) return null;
+    const parts = titleStr.split(/(<strong>.*?<\/strong>)/gi);
+    return parts.map((part, index) => {
+      if (
+        part.toLowerCase().startsWith("<strong>") &&
+        part.toLowerCase().endsWith("</strong>")
+      ) {
+        const innerText = part.slice(8, -9);
+        return (
+          <motion.strong
+            key={index}
+            className="inline-block font-limelight"
+            style={
+              isMobile
+                ? {
+                    fontSize: "1.15em",
+                    color: "#776D1F",
+                    fontWeight: "normal",
+                    display: "inline-block",
+                    marginLeft: "4px",
+                    marginRight: "4px",
+                  }
+                : {
+                    fontSize: vw(96),
+                    color: "#776D1F",
+                    fontWeight: "normal",
+                    display: "inline-block",
+                    marginLeft: vw(8),
+                    marginRight: vw(8),
+                  }
+            }
+            animate={{
+              y: [0, isMobile ? -5 : -10, 0],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: index * 0.15,
+            }}
+            dangerouslySetInnerHTML={{ __html: innerText }}
+          />
+        );
+      }
+      return (
+        <span
+          key={index}
+          dangerouslySetInnerHTML={{ __html: part }}
+        />
+      );
+    });
+  };
+
   return (
     <section className="relative w-full" id="brand-trust">
       {/* ==================== 1. Desktop Layout (>= md) ==================== */}
@@ -119,23 +173,13 @@ export function BrandTrustSection({ data }: BrandTrustSectionProps) {
             <motion.h2
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
-              className="font-limelight text-[#000000] leading-[1.1] z-0"
+              className="font-limelight text-[#000000] leading-[1.1] z-0 whitespace-pre-line"
               style={{
                 fontSize: vw(72),
                 width: vw(869.4),
               }}
             >
-              <style dangerouslySetInnerHTML={{ __html: `
-                .brand-trust-title strong {
-                  font-size: ${vw(96)};
-                  color: #776D1F;
-                  font-weight: normal;
-                }
-              `}} />
-              <span 
-                className="brand-trust-title whitespace-pre-line"
-                dangerouslySetInnerHTML={{ __html: data.title }} 
-              />
+              {renderTitle(data.title, false)}
             </motion.h2>
 
             <div
@@ -224,9 +268,10 @@ export function BrandTrustSection({ data }: BrandTrustSectionProps) {
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className="font-limelight text-[#000000] text-4xl leading-tight mb-10 text-center"
-          dangerouslySetInnerHTML={{ __html: data.title }}
-        />
+          className="font-limelight text-[#000000] text-4xl leading-tight mb-10 text-center whitespace-pre-line"
+        >
+          {renderTitle(data.title, true)}
+        </motion.h2>
 
         {/* Dynamic Rotation + Hero Image Area */}
         <div className="relative w-full aspect-square max-w-[340px] mb-12 flex items-center justify-center">

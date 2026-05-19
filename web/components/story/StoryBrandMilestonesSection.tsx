@@ -101,12 +101,21 @@ export function StoryBrandMilestonesSection({
     };
   };
 
+  const lastClickTime = useRef(0);
+  const CLICK_THRESHOLD = 450; // ms
+
   const handleNext = () => {
+    const now = Date.now();
+    if (now - lastClickTime.current < CLICK_THRESHOLD) return;
+    lastClickTime.current = now;
     setDirection(1);
     setFocusSlideIndex((prev) => prev + 1);
   };
 
   const handlePrev = () => {
+    const now = Date.now();
+    if (now - lastClickTime.current < CLICK_THRESHOLD) return;
+    lastClickTime.current = now;
     setDirection(-1);
     setFocusSlideIndex((prev) => prev - 1);
   };

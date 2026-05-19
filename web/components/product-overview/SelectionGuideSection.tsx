@@ -65,7 +65,7 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
         style={{
           minHeight: vw(922),
           paddingTop: vw(40),
-          paddingBottom: vw(40),
+          paddingBottom: vw(0),
         }}
       >
         <div
@@ -111,9 +111,9 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
           <motion.div
             className="absolute overflow-hidden z-10 flex flex-col justify-start"
             style={{
-              left: vw(285 - 210),
+              left: vw(115),
               top: vw(286 - 40),
-              width: vw(524),
+              width: vw(440),
               height: vw(347),
               borderRadius: `${vw(40)} ${vw(40)} 0 0`,
               background:
@@ -126,16 +126,16 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
           <div
             className="absolute z-30 flex flex-col justify-start pointer-events-none"
             style={{
-              left: vw(285 - 210),
+              left: vw(115),
               top: vw(286 - 40),
-              width: vw(524),
+              width: vw(440),
               height: vw(347),
               padding: `${vw(30)} ${vw(30)}`,
             }}
           >
             <p
               className="font-josefin-sans font-semibold text-[#635700] text-left whitespace-pre-line"
-              style={{ fontSize: vw(36), lineHeight: 1.67 }}
+              style={{ fontSize: vw(32), lineHeight: 1.67 }}
               dangerouslySetInnerHTML={{ __html: currentSlide.highlightText }}
             />
           </div>
@@ -194,7 +194,7 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
                     left: vw(640 - 210),
                     top: vw(398),
                     width: vw(417),
-                    height: vw(484),
+                    height: vw(440),
                     borderRadius: `${vw(258.5)} ${vw(258.5)} 0 0`,
                     border: `${vw(1)} solid rgba(255, 255, 255, 0.1)`,
                   }}
@@ -235,8 +235,8 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
                     <p
                       className="font-josefin-sans text-white whitespace-pre-line"
                       style={{
-                        fontSize: vw(20),
-                        lineHeight: 1.8
+                        fontSize: vw(24),
+                        lineHeight: 1.28
                       }}
                       dangerouslySetInnerHTML={{ __html: currentSlide.content2 }}
                     />
@@ -251,8 +251,8 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
                   style={{
                     left: vw(1173 - 210),
                     top: vw(10),
-                    width: vw(462),
-                    height: vw(738),
+                    width: vw(450),
+                    height: vw(700),
                     borderRadius: vw(282),
                     border: `${vw(1)} solid rgba(255, 255, 255, 0.2)`,
                   }}
@@ -285,16 +285,16 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
                   <div
                     className="absolute z-30 flex flex-col justify-end"
                     style={{
-                      left: vw(1232 - 1173),
+                      left: vw(1220 - 1173),
                       bottom: vw(140),
-                      width: vw(343),
+                      width: vw(360),
                     }}
                   >
                     <p
                       className="font-josefin-sans text-white whitespace-pre-line"
                       style={{
-                        fontSize: vw(20),
-                        lineHeight: 1.8
+                        fontSize: vw(24),
+                        lineHeight: 1.28
                       }}
                       dangerouslySetInnerHTML={{ __html: currentSlide.content1 }}
                     />

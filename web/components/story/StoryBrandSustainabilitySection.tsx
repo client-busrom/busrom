@@ -91,7 +91,7 @@ const SustainabilityOrbit = React.memo(({ isMobile }: { isMobile: boolean }) => 
         top: isMobile ? -16 : vw(100),
         width: isMobile ? "300px" : vw(522),
         height: isMobile ? "130px" : vw(224),
-        zIndex: 1,
+        zIndex: 5,
         opacity: isMobile ? 0.6 : 1,
       }}
     >
@@ -110,10 +110,12 @@ const SustainabilityOrbit = React.memo(({ isMobile }: { isMobile: boolean }) => 
           marginLeft: isMobile ? "-12px" : vw(-19),
           marginTop: isMobile ? "-12px" : vw(-19),
           zIndex: 3,
+          left: 0,
+          top: 0,
         }}
         animate={{
-          left: points.x,
-          top: points.y,
+          x: points.x,
+          y: points.y,
           rotate: 360,
         }}
         transition={{
@@ -204,7 +206,7 @@ export function StoryBrandSustainabilitySection({
                 <div className="flex justify-center mb-2">
                   <StaggeredBalls />
                 </div>
-                <p className="font-josefin-sans font-bold text-[#ff7c03] text-[18px] leading-tight">
+                <p className="font-josefin-sans font-bold text-[#FF7B04] text-[18px] leading-tight">
                   {data.content1}
                 </p>
               </div>
@@ -226,7 +228,7 @@ export function StoryBrandSustainabilitySection({
                 <div className="flex justify-center mb-2">
                   <StaggeredBalls />
                 </div>
-                <p className="font-josefin-sans font-bold text-[#ff7c03] text-[18px] leading-tight">
+                <p className="font-josefin-sans font-bold text-[#FF7B04] text-[18px] leading-tight">
                   {data.content2}
                 </p>
               </div>
@@ -265,9 +267,23 @@ export function StoryBrandSustainabilitySection({
               className="absolute"
               style={{ left: 0, top: vw(148), width: vw(481) }}
             >
+              {/* Bottom Layer: Underneath Orbit */}
               <h2
                 className="font-josefin-sans font-bold text-black tracking-widest whitespace-pre-line"
-                style={{ fontSize: vw(72), lineHeight: 1.1 }}
+                style={{ fontSize: vw(72), lineHeight: 1.1, position: "relative", zIndex: 2 }}
+              >
+                {data.title}
+              </h2>
+              {/* Top Layer: Above Orbit, clipped to left 50% */}
+              <h2
+                className="absolute inset-0 font-josefin-sans font-bold text-black tracking-widest whitespace-pre-line"
+                style={{
+                  fontSize: vw(72),
+                  lineHeight: 1.1,
+                  zIndex: 8,
+                  clipPath: "polygon(0 0, 50% 0, 50% 100%, 0 100%)",
+                  pointerEvents: "none",
+                }}
               >
                 {data.title}
               </h2>
@@ -371,7 +387,7 @@ export function StoryBrandSustainabilitySection({
                     <StaggeredBalls />
                   </div>
                   <p
-                    className="font-josefin-sans font-bold text-[#ff7c03] tracking-wide whitespace-pre-line"
+                    className="font-josefin-sans font-bold text-[#FF7B04] tracking-wide whitespace-pre-line"
                     style={{ fontSize: vw(24), lineHeight: 1.2 }}
                   >
                     {data.content1}
@@ -411,7 +427,7 @@ export function StoryBrandSustainabilitySection({
                   <StaggeredBalls />
                 </div>
                 <p
-                  className="font-josefin-sans font-bold text-[#ff7c03] tracking-wide whitespace-pre-line"
+                  className="font-josefin-sans font-bold text-[#FF7B04] tracking-wide whitespace-pre-line"
                   style={{ fontSize: vw(24), lineHeight: 1.2 }}
                 >
                   {data.content2}

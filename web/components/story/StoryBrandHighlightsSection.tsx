@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { motion, AnimatePresence } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -34,12 +34,27 @@ export function StoryBrandHighlightsSection({
   const [activeSlideIdx, setActiveSlideIdx] = useState(0);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [windowWidth, setWindowWidth] = useState(0);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(false);
 
   useEffect(() => {
     setWindowWidth(window.innerWidth);
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   const renderLexicalNodes = (nodes: any[]): React.ReactNode => {
@@ -87,10 +102,20 @@ export function StoryBrandHighlightsSection({
     setActiveImageIdx(0);
   }, [slides.length]);
 
-  const toggleImage = () => {
+  useEffect(() => {
+    if (!isInView || imageCount <= 1) return;
+
+    const interval = setInterval(() => {
+      setActiveImageIdx((prev) => (prev + 1) % imageCount);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [isInView, imageCount, activeImageIdx, activeSlideIdx]);
+
+  const toggleImage = useCallback(() => {
     if (imageCount <= 1) return;
-    setActiveImageIdx((prev) => (prev === 0 ? 1 : 0));
-  };
+    setActiveImageIdx((prev) => (prev + 1) % imageCount);
+  }, [imageCount]);
 
   const formatIndex = (idx: number) => (idx + 1).toString().padStart(2, "0");
 
@@ -99,7 +124,7 @@ export function StoryBrandHighlightsSection({
   // --- MOBILE / TABLET LAYOUT ---
   if (isTabletOrMobile) {
     return (
-      <section className="relative w-full py-10 px-5 bg-[#f6f4ed]">
+      <section ref={sectionRef} className="relative w-full py-10 px-5 bg-[#f6f4ed]">
         <div className="text-center font-josefin-sans font-bold text-3xl mb-8 text-[#3b3b3b]">
           {data?.title || "Brand Highlights"}
         </div>
@@ -236,6 +261,7 @@ export function StoryBrandHighlightsSection({
   // --- DESKTOP LAYOUT ---
   return (
     <section
+      ref={sectionRef}
       className="relative w-full mx-auto overflow-hidden my-[60px]"
       style={{ height: vw(922) }}
     >
@@ -401,7 +427,7 @@ export function StoryBrandHighlightsSection({
             {images.map((_, i) => (
               <div
                 key={i}
-                onClick={toggleImage}
+                onClick={() => setActiveImageIdx(i)}
                 className={`cursor-pointer transition-all duration-300 ${activeImageIdx === i ? "bg-white" : "bg-white/30"}`}
                 style={{ width: vw(12), height: vw(12), borderRadius: "50%" }}
               />

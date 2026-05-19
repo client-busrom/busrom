@@ -205,10 +205,11 @@ export function ExclusiveSolutionsSection({
                   opacity: { duration: 0.5 },
                   x: { duration: 0.5 },
                 }}
-                className="font-katibeh flex items-center justify-center bg-[#ffe484] text-black leading-none rounded-full relative"
+                className="font-katibeh flex items-center justify-center bg-[#ffe484] text-black rounded-full relative"
                 style={{
                   fontSize: vw(36),
-                  padding: `${vw(15)} ${vw(60)} ${vw(0)} ${vw(60)}`,
+                  padding: `${vw(8)} ${vw(60)}`,
+                  lineHeight: 1.2,
                   marginBottom: vw(38),
                 }}
               >
@@ -220,13 +221,13 @@ export function ExclusiveSolutionsSection({
               className="flex justify-between items-start"
               style={{ gap: vw(40) }}
             >
-              {/* Left Column: 60% */}
-              <div className="flex flex-col" style={{ width: "auto" }}>
+              {/* Left Column */}
+              <div className="flex flex-col" style={{ width: vw(804) }}>
                 <motion.h2
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  className="font-katibeh leading-none text-black"
-                  style={{ fontSize: vw(96), marginTop: 0 }}
+                  className="font-katibeh text-black"
+                  style={{ fontSize: vw(96), lineHeight: 1.15, marginTop: 0 }}
                 >
                   {renderRichText(title)}
                 </motion.h2>
@@ -238,20 +239,20 @@ export function ExclusiveSolutionsSection({
                   style={{
                     fontSize: vw(32),
                     lineHeight: 1.3,
-                    marginTop: vw(0),
+                    marginTop: vw(24),
                   }}
                 >
                   {renderRichText(subtitle)}
                 </motion.p>
               </div>
 
-              {/* Right Column: 40% */}
+              {/* Right Column */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 className="relative bg-[#FFBB3220] backdrop-blur-sm self-start flex items-center flex-shrink-0"
                 style={{
-                  width: "auto",
+                  width: vw(680),
                   padding: `${vw(28)} ${vw(38)}`,
                   borderRadius: vw(35),
                   marginTop: 0,
@@ -398,7 +399,10 @@ export function ExclusiveSolutionsSection({
       <div className="md:hidden w-full pt-16 pb-12 px-6 flex flex-col bg-[#fff6d4]">
         {/* Header Badge */}
         <div className="flex mb-4">
-          <p className="font-katibeh flex items-center justify-center px-6 pt-3 pb-0 bg-[#ffe484] text-black text-xl rounded-full leading-none">
+          <p
+            className="font-katibeh flex items-center justify-center px-6 py-1.5 bg-[#ffe484] text-black text-xl rounded-full"
+            style={{ lineHeight: 1.2 }}
+          >
             {logoText}
           </p>
         </div>

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   OptimizedImage,
   OptimizedBackgroundImage,
 } from "@/components/ui/OptimizedImage";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 import { HollowText } from "@/components/common/HollowText";
 
 const DESIGN_WIDTH = 1920;
@@ -90,13 +90,15 @@ const OrbitDecoration = React.memo(() => {
         style={{
           width: vw(38),
           height: vw(38),
+          left: 0,
+          top: 0,
           marginLeft: vw(-19),
           marginTop: vw(-19),
           zIndex: 3,
         }}
         animate={{
-          left: points.x,
-          top: points.y,
+          x: points.x,
+          y: points.y,
           rotate: 360,
         }}
         transition={{
@@ -184,12 +186,14 @@ function CapsuleActiveIndicator() {
         style={{
           width: vw(13),
           height: vw(13),
+          left: 0,
+          top: 0,
           marginLeft: vw(-6.5),
           marginTop: vw(-6.5),
         }}
         animate={{
-          left: p1.x,
-          top: p1.y,
+          x: p1.x,
+          y: p1.y,
         }}
         transition={{ duration: 4, ease: "linear", repeat: Infinity }}
       />
@@ -200,12 +204,14 @@ function CapsuleActiveIndicator() {
         style={{
           width: vw(21),
           height: vw(21),
+          left: 0,
+          top: 0,
           marginLeft: vw(-10.5),
           marginTop: vw(-10.5),
         }}
         animate={{
-          left: p2.x,
-          top: p2.y,
+          x: p2.x,
+          y: p2.y,
         }}
         transition={{ duration: 4, ease: "linear", repeat: Infinity }}
       />
@@ -219,6 +225,8 @@ import Autoplay from "embla-carousel-autoplay";
 export function StoryBrandPositionSection({
   data,
 }: StoryBrandPositionSectionProps) {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { once: false, amount: 0.05 });
   const [windowWidth, setWindowWidth] = useState(0);
   const [mounted, setMounted] = useState(false);
 
@@ -268,7 +276,7 @@ export function StoryBrandPositionSection({
 
   if (isMobile) {
     return (
-      <section className="relative w-full bg-[#f2efd8] pb-20 px-6 sm:px-12">
+      <section ref={sectionRef} className="relative w-full bg-[#f2efd8] pb-20 px-6 sm:px-12">
         {/* Title Area (Perfectly Bridging Sections - No-animation Positioning) */}
         <div className="absolute left-6 sm:left-12 top-0 z-30 -translate-y-[28%]">
           <motion.div
@@ -421,6 +429,7 @@ export function StoryBrandPositionSection({
 
   return (
     <section
+      ref={sectionRef}
       className="relative w-full"
       style={{
         height: vw(1160),
@@ -428,7 +437,7 @@ export function StoryBrandPositionSection({
       }}
     >
       <div className="relative z-10 w-full h-full overflow-visible">
-        {mounted && <OrbitDecoration />}
+        {mounted && isInView && <OrbitDecoration />}
 
 
         {/* 1. Split-Color Title */}
@@ -510,7 +519,7 @@ export function StoryBrandPositionSection({
                         className="absolute z-0"
                         style={{ top: "40%", transform: "translateY(-50%)" }}
                       >
-                        {mounted && <CapsuleActiveIndicator />}
+                        {mounted && isInView && <CapsuleActiveIndicator />}
                       </motion.div>
                     )}
                   </AnimatePresence>

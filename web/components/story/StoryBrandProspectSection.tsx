@@ -64,7 +64,7 @@ function formatQuotedText(text: string, isMobile: boolean = false) {
       return (
         <span
           key={`quoted-${index}`}
-          className="font-bold text-[#ff7c02] inline-block"
+          className="font-bold text-[#FF7B04] inline-block"
           style={{
             fontSize: isMobile ? "20px" : vw(32),
             whiteSpace: "pre-wrap",

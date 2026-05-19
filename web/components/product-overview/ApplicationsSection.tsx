@@ -66,7 +66,7 @@ export function ApplicationsSection({ data }: ApplicationsSectionProps) {
       {/* ==================== 1. Desktop Layout (>= md) ==================== */}
       <div
         className="hidden md:block w-full relative"
-        style={{ height: vw(922) }}
+        style={{ height: vw(1050) }}
       >
         {/* ─── Titles (Limelight Staggered) ─── */}
         <div className="absolute left-0 top-0 w-full z-20 pointer-events-none">

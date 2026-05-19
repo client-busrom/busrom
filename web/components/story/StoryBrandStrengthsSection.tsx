@@ -62,7 +62,7 @@ const StrengthOrbit = React.memo(({ isMobile }: { isMobile: boolean }) => {
         top: isMobile ? -50 : vw(-40),
         width: isMobile ? 200 : vw(300),
         height: isMobile ? 80 : vw(120),
-        zIndex: 100,
+        zIndex: 5,
       }}
     >
       <div
@@ -77,13 +77,15 @@ const StrengthOrbit = React.memo(({ isMobile }: { isMobile: boolean }) => {
         style={{
           width: isMobile ? 20 : vw(28),
           height: isMobile ? 20 : vw(28),
+          left: 0,
+          top: 0,
           marginLeft: isMobile ? -10 : vw(-14),
           marginTop: isMobile ? -10 : vw(-14),
-          zIndex: 110,
+          zIndex: 8,
         }}
         animate={{
-          left: points.x,
-          top: points.y,
+          x: points.x,
+          y: points.y,
           rotate: 360,
         }}
         transition={{
@@ -443,7 +445,7 @@ export function StoryBrandStrengthsSection({
                   className="absolute pointer-events-auto cursor-pointer"
                 >
                   <div
-                    className={`absolute inset-0 shadow-xl overflow-hidden ${isLeft ? "" : "bg-white"}`}
+                    className={`absolute inset-0 shadow-xl ${isMiddle ? "" : "overflow-hidden"} ${isLeft ? "" : "bg-white"}`}
                     style={{
                       borderRadius: vw(60),
                       backgroundColor: isLeft
@@ -524,7 +526,11 @@ export function StoryBrandStrengthsSection({
                     ) : (
                       <div className="flex w-full h-full">
                         <motion.div
-                          className="relative h-full flex-shrink-0 bg-[#d9d9d9]"
+                          className="relative h-full flex-shrink-0 bg-[#d9d9d9] overflow-hidden"
+                          style={{
+                            borderTopLeftRadius: vw(60),
+                            borderBottomLeftRadius: vw(60),
+                          }}
                           animate={{ width: vw(imageWidth) }}
                           transition={{
                             type: "spring",
@@ -586,7 +592,11 @@ export function StoryBrandStrengthsSection({
                               stiffness: 100,
                               damping: 20,
                             }}
-                            className="h-full flex flex-col justify-start bg-white relative overflow-hidden"
+                            className="h-full flex flex-col justify-start bg-transparent relative z-20 overflow-hidden"
+                            style={{
+                              borderTopRightRadius: vw(60),
+                              borderBottomRightRadius: vw(60),
+                            }}
                           >
                             <div
                               style={{
@@ -631,10 +641,10 @@ export function StoryBrandStrengthsSection({
                         )}
                       </div>
                     )}
-                  </div>
 
-                  {/* Orbiting Star Effect inside Middle Item */}
-                  {isMiddle && mounted && <StrengthOrbit isMobile={false} />}
+                    {/* Orbiting Star Effect inside Middle Item (behind text, but above white card bg) */}
+                    {isMiddle && mounted && <StrengthOrbit isMobile={false} />}
+                  </div>
 
                 </motion.div>
               );

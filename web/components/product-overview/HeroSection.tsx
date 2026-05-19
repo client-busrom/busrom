@@ -165,7 +165,7 @@ export function ProductOverviewHeroSection({
 
   return (
     <section
-      className="relative w-full bg-[#FFFCE2] flex flex-col items-center overflow-visible select-none"
+      className="relative w-full bg-[#FFFCE2] flex flex-col items-center overflow-visible select-none z-[20]"
       style={{
         height: "auto",
         minHeight: "auto",
