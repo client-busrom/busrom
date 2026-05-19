@@ -121,59 +121,85 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
           >
             <div className="relative">
               {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
-                  <div key={index} className="absolute flex items-center justify-end bg-[#756F3F]" style={{ left: rpx([0, 180, 360][index]), top: rpx([0, 0, 0][index]), width: rpx(740), height: rpx(100), borderRadius: rpx(71), transform: `rotate(-60deg)`, transformOrigin: "left center" }}>
-                    <span className="font-montserrat font-bold text-[#FFF5AD]" style={{ fontSize: rpx(24), paddingRight: rpx(40) }}>{feature}</span>
-                  </div>
-                ),
+                <div key={index} className="absolute flex items-center justify-end bg-[#756F3F]" style={{ left: rpx([0, 180, 360][index]), top: rpx([0, 0, 0][index]), width: rpx(740), height: rpx(100), borderRadius: rpx(71), transform: `rotate(-60deg)`, transformOrigin: "left center" }}>
+                  <span className="font-montserrat font-bold text-[#FFF5AD]" style={{ fontSize: rpx(24), paddingRight: rpx(40) }}>{feature}</span>
+                </div>
+              ),
               )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* --- Mobile / Tablet 端布局 (瘦身版) --- */}
+      {/* --- Mobile / Tablet 端布局 (精致定制版) --- */}
       <div className="md:hidden absolute inset-0 z-30 overflow-y-auto">
-        <div className="flex flex-col items-center justify-center min-h-full py-4 px-6 gap-4">
-          
-          <div className="relative w-full max-w-[500px] h-[200px] md:h-[320px] shrink-0 z-10">
-            <ServerImage
-              image={data.images[0]}
-              alt=""
-              fill
-              size="large"
-              className="object-contain"
-              priority
-            />
-          </div>
+        <div className="flex flex-col items-center justify-center min-h-full py-6 px-4 gap-5 z-10 relative">
 
-          <div className="flex flex-col items-center justify-start text-center gap-4 shrink-0 z-20">
-            <p className="font-arial font-bold italic text-[#754600] text-lg md:text-2xl bg-white/80 px-6 py-1.5 rounded-full shadow-sm">
+          {/* 左侧延展的渐变副标题条 (贴紧左侧边缘) */}
+          <div className="w-full flex justify-start shrink-0 -ml-8 z-20">
+            <div
+              className="bg-gradient-to-r from-white to-[#FFDE95] text-[#754600] font-bold italic rounded-r-full shadow-sm"
+              style={{
+                paddingTop: "6px",
+                paddingBottom: "6px",
+                paddingLeft: "24px",
+                paddingRight: "32px",
+                fontSize: "13px",
+                letterSpacing: "1px",
+              }}
+            >
               {formatText(data.features[1])}
-            </p>
-
-            <div className="flex flex-col items-center gap-1.5">
-              {titleParts.map((line, idx) => {
-                const isFirst = idx === 0;
-                let textColor = isFirst ? "#FFFFFF" : "#332E0B";
-                let strokeColor = isFirst ? "#443D05" : "#FDF6C2";
-                let strokeWidth = isFirst ? 2 : 1.5;
-                return (
-                  <h1 key={idx} className="font-poller-one text-center leading-tight text-3xl md:text-5xl" style={{ color: textColor, WebkitTextStroke: `${strokeWidth}px ${strokeColor}`, paintOrder: "stroke fill" }}>
-                    {line}
-                  </h1>
-                );
-              })}
-            </div>
-
-            <div className="flex flex-wrap justify-center gap-2 md:gap-4 pb-12">
-              {[data.features[2], data.features[3], data.features[4]].map((f, i) => (
-                  <div key={i} className="bg-[#756F3F] text-[#FFF5AD] px-4 py-1.5 md:px-8 md:py-3 rounded-full text-xs md:text-lg font-bold shadow-sm">
-                    {f}
-                  </div>
-                ),
-              )}
             </div>
           </div>
+
+          {/* 双色描边标题 */}
+          <div className="w-full flex flex-col items-start text-left pl-6 gap-1 shrink-0 z-20">
+            {titleParts.map((line, idx) => {
+              const isFirst = idx === 0;
+              let textColor = isFirst ? "#FFFFFF" : "#332E0B";
+              let strokeColor = isFirst ? "#443D05" : "#FDF6C2";
+              let strokeWidth = isFirst ? 2.5 : 1.5;
+              return (
+                <h1
+                  key={idx}
+                  className="font-poller-one leading-none text-3xl sm:text-4xl"
+                  style={{
+                    color: textColor,
+                    WebkitTextStroke: `${strokeWidth}px ${strokeColor}`,
+                    paintOrder: "stroke fill",
+                    letterSpacing: "0.02em"
+                  }}
+                >
+                  {line}
+                </h1>
+              );
+            })}
+          </div>
+
+          {/* 特征标签 (保持7的样式：圆角胶囊与阴影，颜色使用6的) */}
+          <div className="w-full flex flex-col items-start gap-2 pl-6 shrink-0 z-20">
+            {[data.features[2], data.features[3], data.features[4]].map((feature, idx) => (
+              <div
+                key={idx}
+                className="bg-[#756F3F] px-5 py-2 rounded-full text-[#FFF5AD] shadow-md border border-[#FFF5AD]/10 flex items-center justify-center"
+              >
+                <span className="font-montserrat font-bold text-[10px] sm:text-xs tracking-wider block text-left uppercase">
+                  {feature}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* 图像区域 (直接渲染在文字下方，不带SVG蒙版，左右对称圆角) */}
+          <div className="flex gap-4 justify-center w-full px-6 z-10 mt-2 pb-4 shrink-0">
+            <div className="relative w-[48%] aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border-2 border-white bg-white/20">
+              <ServerImage image={data.images[0]} alt="" fill size="medium" className="object-cover" />
+            </div>
+            <div className="relative w-[48%] aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border-2 border-white bg-white/20">
+              <ServerImage image={data.images[1] || data.images[0]} alt="" fill size="medium" className="object-cover" />
+            </div>
+          </div>
+
         </div>
       </div>
     </section>

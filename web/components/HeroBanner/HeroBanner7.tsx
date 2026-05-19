@@ -145,82 +145,57 @@ const HeroBanner7: FC<BannerProps> = ({ data }) => {
         </div>
       </div>
 
-      {/* --- Mobile 端布局 --- */}
+      {/* --- Mobile 端布局 (十字拼图版) --- */}
       <div className="md:hidden absolute inset-0 z-30 overflow-y-auto">
         <div className="flex flex-col items-center justify-center min-h-full py-6 px-6 gap-5">
-          {/* 完美的非对称式重叠主图与菱形群 (完美复刻桌面端风格) */}
-          <div className="relative w-full max-w-[340px] aspect-[1200/922] shrink-0 z-10 mx-auto">
-            {/* 左侧带蒙版的主图 */}
-            <div className="absolute left-0 top-[10%] w-[58%] h-[80%] z-10" style={{ maskImage: `url(${BANNER_7_ASSETS.imageMain.mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.imageMain.mask})`, maskSize: "100% 100%" }}>
-              <ServerImage image={data.images[0]} alt="" fill className="object-cover" />
-            </div>
-
-            {/* 顶部的菱形小图 */}
-            <div className="absolute left-[38%] top-[5%] w-[42%] h-[32%] z-20">
-              <img src={BANNER_7_ASSETS.imageBox.diamonds[0].frame} className="absolute inset-0 w-full h-full object-contain z-0" />
-              <div className="absolute inset-0 z-10 left-1/2 -translate-x-1/2 w-[86%] h-[89%] top-[5%]" style={{ maskImage: `url(${BANNER_7_ASSETS.imageBox.diamonds[0].mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.imageBox.diamonds[0].mask})`, maskSize: "100% 100%" }}>
-                <ServerImage image={data.images[1]} alt="" fill className="object-cover" />
-              </div>
-            </div>
-
-            {/* 中间的菱形小图 */}
-            <div className="absolute left-[58%] top-[30%] w-[34%] h-[34%] z-[21]">
-              <img src={BANNER_7_ASSETS.imageBox.diamonds[1].frame} className="absolute inset-0 w-full h-full object-contain z-0" />
-              <div className="absolute inset-0 z-10 left-1/2 -translate-x-1/2 w-[82%] h-[82%] top-[9%]" style={{ maskImage: `url(${BANNER_7_ASSETS.imageBox.diamonds[1].mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.imageBox.diamonds[1].mask})`, maskSize: "100% 100%" }}>
-                <ServerImage image={data.images[2]} alt="" fill className="object-cover" />
-              </div>
-            </div>
-
-            {/* 底部的菱形小图 */}
-            <div className="absolute left-[38%] top-[58%] w-[42%] h-[33%] z-[22]">
-              <img src={BANNER_7_ASSETS.imageBox.diamonds[2].frame} className="absolute inset-0 w-full h-full object-contain z-0" />
-              <div className="absolute inset-0 z-10 left-1/2 -translate-x-1/2 w-[86%] h-[89%] bottom-[5%]" style={{ maskImage: `url(${BANNER_7_ASSETS.imageBox.diamonds[2].mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.imageBox.diamonds[2].mask})`, maskSize: "100% 100%" }}>
-                <ServerImage image={data.images[3]} alt="" fill className="object-cover" />
-              </div>
-            </div>
-          </div>
-
-          {/* 描边特效标题 */}
+          <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" style={{ background: "radial-gradient(circle at 50% 50%, #FFED5B, transparent)" }} />
+          
+          {/* 1. 标题 */}
           <div className="relative z-30 flex flex-col items-center shrink-0">
             {titleParts.map((line, idx) => (
-              <h1 
-                key={idx} 
-                className="font-paytone-one leading-[1.1] text-center text-3xl sm:text-4xl" 
-                style={{ 
-                  color: idx === 0 ? "#FFFFFF" : "#433E12", 
-                  WebkitTextStroke: "1.5px #000000", 
-                  paintOrder: "stroke fill" 
-                }}
-              >
-                {idx === 0 
-                  ? line.split(/(-)/g).map((part, pIdx) => (
-                      <span key={pIdx} className={part === '-' ? 'text-[#433E12]' : ''}>
-                        {part}
-                      </span>
-                    )) 
-                  : line
-                }
+              <h1 key={idx} className="font-paytone-one leading-[1.0] text-center text-3xl sm:text-4xl" 
+                  style={{ color: idx === 0 ? "#FFFFFF" : "#433E12", WebkitTextStroke: "1.5px #000000", paintOrder: "stroke fill" }}>
+                {idx === 0 ? line.split(/(-)/g).map((part, pIdx) => <span key={pIdx} className={part === '-' ? 'text-[#433E12]' : ''}>{part}</span>) : line}
               </h1>
             ))}
           </div>
 
-          {/* 精致的金色特征标签 */}
-          <div className="relative z-40 flex flex-wrap justify-center gap-2 w-full shrink-0">
+          {/* 2. 十字拼图图片群 */}
+          <div className="relative z-10 w-full flex justify-center shrink-0">
+            <div className="relative" style={{ width: "min(75vw, 260px)", height: "min(75vw, 260px)" }}>
+                {/* 上 */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2" style={{ width: BANNER_7_ASSETS.mobile.diamondSize, height: BANNER_7_ASSETS.mobile.diamondSize, maskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, maskSize: "100% 100%" }}>
+                  <ServerImage image={data.images[0]} alt="" fill className="object-cover" />
+                </div>
+                {/* 下 */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2" style={{ width: BANNER_7_ASSETS.mobile.diamondSize, height: BANNER_7_ASSETS.mobile.diamondSize, maskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, maskSize: "100% 100%" }}>
+                  <ServerImage image={data.images[1]} alt="" fill className="object-cover" />
+                </div>
+                {/* 左 */}
+                <div className="absolute top-1/2 left-0 -translate-y-1/2" style={{ width: BANNER_7_ASSETS.mobile.diamondSize, height: BANNER_7_ASSETS.mobile.diamondSize, maskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, maskSize: "100% 100%" }}>
+                  <ServerImage image={data.images[2]} alt="" fill className="object-cover" />
+                </div>
+                {/* 右 */}
+                <div className="absolute top-1/2 right-0 -translate-y-1/2" style={{ width: BANNER_7_ASSETS.mobile.diamondSize, height: BANNER_7_ASSETS.mobile.diamondSize, maskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, maskSize: "100% 100%" }}>
+                  <ServerImage image={data.images[3]} alt="" fill className="object-cover" />
+                </div>
+            </div>
+          </div>
+
+          {/* 3. 特性胶囊组 */}
+          <div className="relative z-40 flex flex-col items-center gap-2 w-full shrink-0">
             {featuresList.map((feature, idx) => (
-              <div 
-                key={idx} 
-                className="bg-[#E9E2A0] px-5 py-1.5 rounded-full text-black shadow-md border border-[#433E12]/10"
-              >
-                <span className="font-montserrat font-bold text-[11px] tracking-wider block text-center min-w-[110px]">
+              <div key={idx} className="bg-[#E9E2A0] px-6 py-2 rounded-full text-black shadow-md border border-[#433E12]/20 flex items-center justify-center">
+                <span className="font-montserrat font-bold text-xs tracking-wider block text-center min-w-[120px] uppercase">
                   {feature}
                 </span>
               </div>
             ))}
           </div>
 
-          {/* 副标题 */}
+          {/* 4. 副标题 */}
           <div className="relative z-30 text-center px-4 pb-8 shrink-0">
-            <p className="font-paytone-one text-white text-base sm:text-lg opacity-90 leading-tight">
+            <p className="font-paytone-one text-white text-sm sm:text-base opacity-95 leading-snug tracking-wide">
               {subtitleParts.join(" ")}
             </p>
           </div>
