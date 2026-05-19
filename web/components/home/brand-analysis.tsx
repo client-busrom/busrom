@@ -58,8 +58,10 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
   const [desktopApi, setDesktopApi] = React.useState<CarouselApi>();
 
   const [currentSlide, setCurrentSlide] = React.useState(0);
-  const [canScrollPrev, setCanScrollPrev] = React.useState(false);
-  const [canScrollNext, setCanScrollNext] = React.useState(true);
+  const [canScrollPrevMobile, setCanScrollPrevMobile] = React.useState(false);
+  const [canScrollNextMobile, setCanScrollNextMobile] = React.useState(true);
+  const [canScrollPrevDesktop, setCanScrollPrevDesktop] = React.useState(false);
+  const [canScrollNextDesktop, setCanScrollNextDesktop] = React.useState(true);
 
   const fadePluginMobile = React.useRef(Fade({}));
   const fadePluginDesktop = React.useRef(Fade({}));
@@ -69,8 +71,8 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
     if (!mobileApi) return;
     const onSelect = () => {
       setCurrentSlide(mobileApi.selectedScrollSnap());
-      setCanScrollPrev(mobileApi.canScrollPrev());
-      setCanScrollNext(mobileApi.canScrollNext());
+      setCanScrollPrevMobile(mobileApi.canScrollPrev());
+      setCanScrollNextMobile(mobileApi.canScrollNext());
     };
     mobileApi.on("select", onSelect);
     mobileApi.on("reInit", onSelect);
@@ -86,8 +88,8 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
     if (!desktopApi) return;
     const onSelect = () => {
       setCurrentSlide(desktopApi.selectedScrollSnap());
-      setCanScrollPrev(desktopApi.canScrollPrev());
-      setCanScrollNext(desktopApi.canScrollNext());
+      setCanScrollPrevDesktop(desktopApi.canScrollPrev());
+      setCanScrollNextDesktop(desktopApi.canScrollNext());
     };
     desktopApi.on("select", onSelect);
     desktopApi.on("reInit", onSelect);
@@ -240,7 +242,7 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
         <div className="flex gap-4 justify-center mb-12">
           <button
             onClick={() => mobileApi?.scrollPrev()}
-            disabled={!canScrollPrev}
+            disabled={!canScrollPrevMobile}
             className="w-12 h-12 rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] active:bg-[#756f3f] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
             aria-label="Previous slide"
           >
@@ -248,7 +250,7 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
           </button>
           <button
             onClick={() => mobileApi?.scrollNext()}
-            disabled={!canScrollNext}
+            disabled={!canScrollNextMobile}
             className="w-12 h-12 rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] active:bg-[#756f3f] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
             aria-label="Next slide"
           >
@@ -411,7 +413,7 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
           >
             <button
               onClick={() => desktopApi?.scrollPrev()}
-              disabled={!canScrollPrev}
+              disabled={!canScrollPrevDesktop}
               className="rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] active:bg-[#756f3f] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
               style={{
                 width: `${(88 / DESIGN_WIDTH) * 100}vw`,
@@ -423,7 +425,7 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
             </button>
             <button
               onClick={() => desktopApi?.scrollNext()}
-              disabled={!canScrollNext}
+              disabled={!canScrollNextDesktop}
               className="rounded-full flex items-center justify-center bg-white/[0.23] hover:bg-white/[0.54] active:bg-[#756f3f] transition-colors disabled:opacity-30 disabled:hover:bg-white/[0.23]"
               style={{
                 width: `${(88 / DESIGN_WIDTH) * 100}vw`,
