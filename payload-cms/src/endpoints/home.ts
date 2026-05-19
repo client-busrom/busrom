@@ -446,22 +446,50 @@ export const homeContentHandler: PayloadHandler = async (req) => {
                 title: product.name || product.localizedName || '',
                 image: getMediaWithVariants(product.showImage),
                 features: (() => {
+                  let resolvedAttrs: string[] = [];
                   const attrPage = product.attributePage as any;
-                  if (!attrPage || !attrPage.productAttributes) return [];
-                  
-                  const attrs = attrPage.productAttributes;
-                  let attrList: any[] = [];
-                  
-                  if (Array.isArray(attrs)) {
-                    attrList = attrs;
-                  } else if (typeof attrs === 'object') {
-                    attrList = attrs[locale] || attrs['en'] || attrs['zh'] || [];
+                  if (attrPage && typeof attrPage === 'object') {
+                    const getArray = (val: any) => {
+                      if (!val) return [];
+                      if (Array.isArray(val)) return val;
+                      if (typeof val === 'object') {
+                        return val[locale] || val['en'] || val['zh'] || val['cn'] || [];
+                      }
+                      return [];
+                    };
+
+                    const prodAttrs = getArray(attrPage.productAttributes);
+                    const custAttrs = getArray(attrPage.customAttributes);
+
+                    const merged = [...prodAttrs, ...custAttrs];
+                    resolvedAttrs = merged
+                      .filter((attr: any) => !attr || attr.showOnFrontEnd !== false)
+                      .map((attr: any) => {
+                        if (!attr) return '';
+                        if (typeof attr === 'string') return attr;
+                        return attr.value || '';
+                      })
+                      .filter((val: string) => val.trim().length > 0);
                   }
-                  
-                  return attrList
-                    .filter((attr: any) => attr.showOnFrontEnd !== false)
-                    .slice(0, 3)
-                    .map((attr: any) => attr.value);
+
+                  if (resolvedAttrs.length === 0 && product.productAttributes) {
+                    if (Array.isArray(product.productAttributes)) {
+                      resolvedAttrs = product.productAttributes
+                        .filter((attr: any) => !attr || attr.showOnFrontEnd !== false)
+                        .map((attr: any) => {
+                          if (typeof attr === 'string') return attr;
+                          return attr.value || '';
+                        })
+                        .filter(Boolean);
+                    } else if (typeof product.productAttributes === 'string') {
+                      resolvedAttrs = product.productAttributes.split('\n').filter((line: string) => line.trim());
+                    }
+                  }
+
+                  const n = resolvedAttrs.length;
+                  const offset = n > 0 ? Number(product.id) % n : 0;
+                  return n === 0 ? [] :
+                    Array.from({ length: Math.min(3, n) }, (_, i) => resolvedAttrs[(offset + i) % n]);
                 })(),
               })),
             }
