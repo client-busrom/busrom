@@ -123,8 +123,6 @@ export function ContactHeroSection({
   heroImage,
   subtitle = "Contact Busrom For Technical Consultation, Product Selection, Custom Solutions And Quotations.",
 }: ContactHeroSectionProps) {
-  const [isHovered, setIsHovered] = React.useState(false)
-
   const handleScrollToForm = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (buttonLink.startsWith("#")) {
       e.preventDefault()
@@ -244,10 +242,6 @@ export function ContactHeroSection({
       <motion.a
         href={buttonLink}
         onClick={handleScrollToForm}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onPointerUp={() => setIsHovered(false)}
-        onPointerCancel={() => setIsHovered(false)}
         className="absolute group cursor-pointer"
         style={{
           left: rpx(273),
@@ -257,50 +251,50 @@ export function ContactHeroSection({
           transformOrigin: "center center",
         }}
         initial={{ rotate: 1.51 }}
-        animate={{
-          rotate: 1.51,
-          scale: isHovered ? 1.02 : 1,
-          x: isHovered ? [0, -2, 2, -2, 2, 0] : 0,
-        }}
-        transition={{
-          scale: { duration: 0.2 },
-          x: isHovered
-            ? { repeat: Infinity, duration: 0.4, ease: "easeInOut" }
-            : { duration: 0.2 },
-        }}
+        animate={{ rotate: 1.51 }}
         whileTap={{ scale: 0.98 }}
       >
-        {/* White base layer */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundColor: "#FFFFFF",
-            borderRadius: rpx(63),
-          }}
-        />
-        {/* Yellow blur layer on top */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundColor: "#FCE638",
-            borderRadius: rpx(63),
-            filter: "blur(17.9px)",
-          }}
-        />
-        {/* Button text */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span
-            className="font-anaheim font-bold group-hover:scale-105 transition-transform"
+        <div className="w-full h-full relative transition-transform duration-200 hover:scale-[1.02] hover:animate-[css-shake_0.4s_ease-in-out_infinite]">
+          {/* White base layer */}
+          <div
+            className="absolute inset-0"
             style={{
-              fontSize: rpx(60),
-              lineHeight: rpx(40),
-              color: "#3D3708",
+              backgroundColor: "#FFFFFF",
+              borderRadius: rpx(63),
             }}
-          >
-            {buttonText}
-          </span>
+          />
+          {/* Yellow blur layer on top */}
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundColor: "#FCE638",
+              borderRadius: rpx(63),
+              filter: "blur(17.9px)",
+            }}
+          />
+          {/* Button text */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span
+              className="font-anaheim font-bold group-hover:scale-105 transition-transform"
+              style={{
+                fontSize: rpx(60),
+                lineHeight: rpx(40),
+                color: "#3D3708",
+              }}
+            >
+              {buttonText}
+            </span>
+          </div>
         </div>
       </motion.a>
+
+      <style>{`
+        @keyframes css-shake {
+          0%, 100% { transform: translateX(0); }
+          20%, 60% { transform: translateX(-2px); }
+          40%, 80% { transform: translateX(2px); }
+        }
+      `}</style>
 
       {/* Right side - Hero image with mask */}
       <motion.div
