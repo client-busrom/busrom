@@ -7,7 +7,7 @@ import Link from "next/link"
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920
-const SECTION_HEIGHT = 1080
+const SECTION_HEIGHT = 1000
 
 interface MediaObject {
   id: string
@@ -115,7 +115,7 @@ export function ProjectCommunicationGuideSection({
         className="absolute flex flex-col"
         style={{
           left: vw(159),
-          top: vw(290),
+          top: vw(220),
         }}
       >
         <h2
@@ -178,8 +178,8 @@ export function ProjectCommunicationGuideSection({
           style={{
             marginLeft: vw(12),
             width: vw(680),
-            fontSize: vw(40),
-            lineHeight: vw(52),
+            fontSize: vw(36),
+            lineHeight: vw(48),
           }}
         >
           {subtitleParts.map((part, index) => {
@@ -280,8 +280,8 @@ export function ProjectCommunicationGuideSection({
       <div
         className="absolute bg-brand-overlay-olive-60"
         style={{
-          left: vw(1087),
-          top: vw(735),
+          left: vw(1020),
+          top: vw(600),
           width: vw(597),
           height: vw(321),
           borderRadius: vw(30),

@@ -426,8 +426,8 @@ export function KeyValuesCooperationSection({
               <p
                 className="font-acme font-semibold text-left text-brand-orange"
                 style={{
-                  fontSize: vw(25.6), // 32 * 0.8
-                  lineHeight: vw(35.2), // 44 * 0.8
+                  fontSize: vw(32), // 32 * 0.8
+                  lineHeight: vw(44), // 44 * 0.8
                   width: "100%",
                 }}
               >
