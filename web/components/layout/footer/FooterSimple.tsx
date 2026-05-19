@@ -152,10 +152,23 @@ export default function FooterSimple({
                   linkedin: "bg-[#0077B5] text-white",
                   youtube: "bg-[#FF0000] text-white",
                   tiktok: "bg-black text-white",
-                  wechat: "bg-[#07C160] text-white",
+                  pinterest: "bg-[#BD081C] text-white",
                   whatsapp: "bg-[#25D366] text-white",
+                  telegram: "bg-[#0088CC] text-white",
+                  discord: "bg-[#5865F2] text-white",
+                  wechat: "bg-[#07C160] text-white",
+                  weibo: "bg-[#E6162D] text-white",
+                  douyin: "bg-black text-white",
+                  xiaohongshu: "bg-[#FF2442] text-white",
+                  bilibili: "bg-[#00A1D6] text-white",
+                  custom: "bg-brand-text-inverse/10 text-white",
                 };
                 const styleClass = brandStyles[social.platform.toLowerCase()] || "bg-brand-text-inverse/10 text-white";
+                
+                // 获取自定义上传图标的 URL
+                const customIconUrl = social.icon
+                  ? (typeof social.icon === "object" ? social.icon.url : social.icon)
+                  : null;
 
                 return (
                   <a
@@ -167,9 +180,17 @@ export default function FooterSimple({
                       "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 hover:opacity-85 hover:scale-110 shadow-sm",
                       styleClass
                     )}
-                    title={social.platform}
+                    title={social.customName || social.platform}
                   >
-                    <SocialIcon platform={social.platform} />
+                    {customIconUrl ? (
+                      <img 
+                        src={customIconUrl} 
+                        alt={social.customName || social.platform} 
+                        className="w-[18px] h-[18px] object-contain invert brightness-0" 
+                      />
+                    ) : (
+                      <SocialIcon platform={social.platform} />
+                    )}
                   </a>
                 );
               })}

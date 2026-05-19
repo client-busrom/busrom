@@ -5,7 +5,7 @@ interface Props {
 }
 
 export default function SocialIcon({ platform }: Props) {
-  // Mapping platform names to Iconify Icon names
+  // Complete mapping of all backend platforms to Iconify Icon names
   const iconMap: Record<string, string> = {
     facebook: "ri:facebook-fill",
     instagram: "ri:instagram-line",
@@ -13,8 +13,15 @@ export default function SocialIcon({ platform }: Props) {
     linkedin: "ri:linkedin-fill",
     youtube: "ri:youtube-fill",
     tiktok: "ri:tiktok-fill",
-    wechat: "ri:wechat-fill",
+    pinterest: "ri:pinterest-fill",
     whatsapp: "ri:whatsapp-fill",
+    telegram: "ri:telegram-fill",
+    discord: "ri:discord-fill",
+    wechat: "ri:wechat-fill",
+    weibo: "ri:weibo-fill",
+    douyin: "tabler:brand-douyin",
+    xiaohongshu: "simple-icons:xiaohongshu",
+    bilibili: "ri:bilibili-fill",
   };
 
   const iconName = iconMap[platform.toLowerCase()] || "ri:global-line";
