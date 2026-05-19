@@ -138,11 +138,10 @@ export function ApplicationsSection({
 
   return (
     <section
-      className={`relative w-full bg-[#F6F4ED] flex flex-col items-center overflow-hidden ${isMobile ? "py-10 h-[650px]" : "lg:py-0 lg:h-[880px]"}`}
+      className={`relative w-full bg-[#F6F4ED] flex flex-col items-center overflow-hidden ${isMobile ? "py-10 h-[650px]" : ""}`}
     >
       <style jsx>{`
         .embla__viewport {
-          overflow: hidden;
           width: 100%;
         }
         .embla__container {
@@ -159,139 +158,106 @@ export function ApplicationsSection({
       `}</style>
 
       <div
-        className={`relative w-full max-w-[1920px] flex-shrink-0 z-10 ${isMobile ? "h-[650px]" : "h-[880px]"}`}
+        className={`relative w-full flex-shrink-0 z-10 ${isMobile ? "h-[650px]" : ""}`}
+        style={isMobile ? {} : { marginTop: vw(120), marginBottom: vw(120) }}
       >
-        {/* Background Circles - Hidden on mobile */}
-        {!isMobile && (
-          <div className="absolute inset-x-0 top-[100px] flex flex-col items-center pointer-events-none">
-            <div className="relative w-full h-0 flex justify-center">
+
+        <div className="relative text-center select-none">
+
+          {/* 把小球放进标题容器里！锚定在标题的顶部正中心 */}
+          {!isMobile && (
+            // 去掉 inset-x-0，直接用 left-[50%] 找准标题中线
+            <div className="absolute top-0 left-[50%] w-0 h-0 pointer-events-none overflow-visible z-[-1]">
+
+              {/* 1. 标题左侧偏下方 (Figma 397) */}
               <motion.div
                 animate={{ y: [0, -15, 0], x: [0, 10, 0] }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute bg-[#ECE8D8] rounded-full"
-                style={{
-                  left: vw(397),
-                  top: vw(36),
-                  width: vw(71),
-                  height: vw(71),
-                }}
+                style={{ left: vw(397 - 660), top: vw(36), width: vw(71), height: vw(71) }}
               />
+
+              {/* 2. 标题右下方 (Figma 815) */}
               <motion.div
                 animate={{ y: [0, 20, 0], x: [0, -5, 0] }}
-                transition={{
-                  duration: 5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 0.5,
-                }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
                 className="absolute bg-[#ECE8D8] rounded-full"
-                style={{
-                  left: vw(815),
-                  top: vw(147),
-                  width: vw(36),
-                  height: vw(36),
-                }}
+                style={{ left: vw(815 - 660), top: vw(147), width: vw(36), height: vw(36) }}
               />
+
+              {/* 3. 标题右侧偏上 (Figma 833) */}
               <motion.div
                 animate={{ y: [0, -10, 0], x: [0, -15, 0] }}
-                transition={{
-                  duration: 6,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 1,
-                }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
                 className="absolute bg-[#ECE8D8] rounded-full"
-                style={{
-                  left: vw(833),
-                  top: vw(-7),
-                  width: vw(57),
-                  height: vw(57),
-                }}
+                style={{ left: vw(833 - 660), top: vw(-7), width: vw(57), height: vw(57) }}
               />
+
+              {/* 4. 标题左上方 (Figma 545) */}
               <motion.div
                 animate={{ y: [0, 12, 0], x: [0, 8, 0] }}
-                transition={{
-                  duration: 4.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 0.2,
-                }}
+                transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
                 className="absolute bg-[#ECE8D8] rounded-full"
-                style={{
-                  left: vw(545),
-                  top: vw(-53),
-                  width: vw(20),
-                  height: vw(20),
-                }}
+                style={{ left: vw(545 - 660), top: vw(-53), width: vw(20), height: vw(20) }}
               />
             </div>
-          </div>
-        )}
+          )}
 
-        <div
-          className={`absolute inset-x-0 flex flex-col items-center ${isMobile ? "top-5" : "top-[100px]"}`}
-        >
-          <div className="relative text-center select-none">
-            {/* 1. Underlying Stroke Layer */}
-            <h2
-              className="absolute inset-x-0 whitespace-pre-line font-extrabold tracking-tight"
-              style={{
-                fontFamily: "var(--font-anaheim)",
-                fontSize: isMobile ? "32px" : vw(67),
-                lineHeight: isMobile ? "38px" : vw(74),
-                color: "transparent",
-                WebkitTextStroke: isMobile ? "1px #756F3F" : `${vw(3)} #756F3F`,
-                transform: `translateY(${isMobile ? "2px" : vw(3)})`,
-                zIndex: 0,
-                top: 0,
-              }}
-            >
-              {title || "Application\nscenarios"}
-            </h2>
+          {/* 1. Underlying Stroke Layer */}
+          <h2
+            className="absolute inset-x-0 whitespace-pre-line font-extrabold tracking-tight"
+            style={{
+              fontFamily: "var(--font-anaheim)",
+              fontSize: isMobile ? "32px" : vw(67),
+              lineHeight: isMobile ? "38px" : vw(74),
+              color: "transparent",
+              WebkitTextStroke: isMobile ? "1px #756F3F" : `${vw(3)} #756F3F`,
+              transform: `translateY(${isMobile ? "2px" : vw(3)})`,
+              zIndex: 0,
+              top: 0,
+            }}
+          >
+            {title || "Application\nscenarios"}
+          </h2>
 
-            {/* 2. Middle Offset Fill Layer */}
-            <h2
-              className="absolute inset-x-0 whitespace-pre-line font-extrabold tracking-tight"
-              style={{
-                fontFamily: "var(--font-anaheim)",
-                fontSize: isMobile ? "32px" : vw(67),
-                lineHeight: isMobile ? "38px" : vw(74),
-                color: "#F6F4ED",
-                transform: `translateY(${isMobile ? "2px" : vw(3)})`,
-                zIndex: 1,
-                top: 0,
-              }}
-            >
-              {title || "Application\nscenarios"}
-            </h2>
+          {/* 2. Middle Offset Fill Layer */}
+          <h2
+            className="absolute inset-x-0 whitespace-pre-line font-extrabold tracking-tight"
+            style={{
+              fontFamily: "var(--font-anaheim)",
+              fontSize: isMobile ? "32px" : vw(67),
+              lineHeight: isMobile ? "38px" : vw(74),
+              color: "#F6F4ED",
+              transform: `translateY(${isMobile ? "2px" : vw(3)})`,
+              zIndex: 1,
+              top: 0,
+            }}
+          >
+            {title || "Application\nscenarios"}
+          </h2>
 
-            {/* 3. Foreground Main Layer */}
-            <h2
-              className="relative whitespace-pre-line font-extrabold tracking-tight"
-              style={{
-                fontFamily: "var(--font-anaheim)",
-                fontSize: isMobile ? "32px" : vw(67),
-                lineHeight: isMobile ? "38px" : vw(74),
-                color: "#645C1F",
-                zIndex: 2,
-              }}
-            >
-              {title || "Application\nscenarios"}
-            </h2>
-          </div>
+          {/* 3. Foreground Main Layer */}
+          <h2
+            className="relative whitespace-pre-line font-extrabold tracking-tight"
+            style={{
+              fontFamily: "var(--font-anaheim)",
+              fontSize: isMobile ? "32px" : vw(67),
+              lineHeight: isMobile ? "38px" : vw(74),
+              color: "#645C1F",
+              zIndex: 2,
+            }}
+          >
+            {title || "Application\nscenarios"}
+          </h2>
         </div>
 
         {/* Carousel */}
         <div
-          className="absolute inset-x-0 embla__viewport"
-          style={{
-            top: isMobile ? "160px" : "200px",
-            height: isMobile ? "400px" : vw(700),
-          }}
+          className={`${isMobile ? "absolute inset-x-0" : "relative w-full"} embla__viewport`}
+          style={isMobile
+            ? { top: "160px", height: "400px" }
+            : { height: vw(654) }
+          }
           ref={emblaRef}
         >
           <div className="embla__container">
@@ -342,15 +308,15 @@ export function ApplicationsSection({
           <>
             <button
               onClick={scrollPrev}
-              className="absolute left-[5vw] top-[141px] flex items-center justify-center hover:bg-[#756f3f] hover:text-white transition-all z-50 bg-white/10 text-[#756f3f] rounded-full border-2 border-[#756f3f]"
-              style={{ width: vw(57), height: vw(57) }}
+              className="absolute left-[5vw] flex items-center justify-center hover:bg-[#756f3f] hover:text-white transition-all z-50 bg-white/10 text-[#756f3f] rounded-full border-2 border-[#756f3f]"
+              style={{ width: vw(57), height: vw(57), top: vw(60) }}
             >
               <ChevronLeft style={{ width: vw(28), height: vw(28) }} />
             </button>
             <button
               onClick={scrollNext}
-              className="absolute right-[5vw] top-[141px] flex items-center justify-center hover:bg-[#756f3f] hover:text-white transition-all z-50 bg-white/10 text-[#756f3f] rounded-full border-2 border-[#756f3f]"
-              style={{ width: vw(57), height: vw(57) }}
+              className="absolute right-[5vw] flex items-center justify-center hover:bg-[#756f3f] hover:text-white transition-all z-50 bg-white/10 text-[#756f3f] rounded-full border-2 border-[#756f3f]"
+              style={{ width: vw(57), height: vw(57), top: vw(60) }}
             >
               <ChevronRight style={{ width: vw(28), height: vw(28) }} />
             </button>

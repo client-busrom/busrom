@@ -243,7 +243,7 @@ const mapProductsWithCarouselConfig = (products: any[], carouselItems: any[] = [
     const categoryName = product.category?.name || "";
     const title = item?.customName?.trim() || ((item?.showCategory === true || item?.showName === false) ? categoryName : product.name);
     
-    // Hydrate Product Attributes + Custom Attributes (first 4 deterministically)
+    // Hydrate Product Attributes + Custom Attributes — deterministically shuffle by product ID, pick 4
     let resolvedAttrs: string[] = [];
     const attributePage = product.attributePage;
     if (attributePage && typeof attributePage === 'object') {
@@ -281,7 +281,11 @@ const mapProductsWithCarouselConfig = (products: any[], carouselItems: any[] = [
       }
     }
 
-    const finalProductAttributes = resolvedAttrs.slice(0, 4);
+    // 用 product.id 取模算起始偏移，O(1)，不同产品自动取到不同的 4 条属性
+    const n = resolvedAttrs.length;
+    const offset = n > 0 ? Number(product.id) % n : 0;
+    const finalProductAttributes = n === 0 ? [] :
+      Array.from({ length: Math.min(4, n) }, (_, i) => resolvedAttrs[(offset + i) % n]);
 
     return {
       ...product,

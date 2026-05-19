@@ -176,7 +176,6 @@ export function CtaSection({
   const IMAGE_HEIGHT = SECTION_HEIGHT;
   const IMAGE_WIDTH = 689;
   const BG_TOP_OFFSET_SCALED = 120;
-  console.log('title,mergedConfig?.displayName', title, mergedConfig?.displayName)
 
   // Check global consent status on mount
   useEffect(() => {

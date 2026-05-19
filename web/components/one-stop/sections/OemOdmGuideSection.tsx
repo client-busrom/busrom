@@ -27,10 +27,10 @@ export function OemOdmGuideSection({
   const SECTION_HEIGHT = 875;
 
   // Base scaling calculation helper
-  const vw = (px: number) => `${((px * 0.7) / DESIGN_WIDTH) * 100}vw`;
+  const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
 
   return (
-    <section className="relative w-full overflow-hidden bg-transparent pt-8 pb-16 md:pt-12 md:pb-32">
+    <section className="relative w-full overflow-hidden bg-transparent pt-8 pb-16 md:pb-12">
       <div className="max-w-[1920px] mx-auto w-full flex flex-col items-center">
         {/* 1. Large "BUSROM" SVG Masked Image Area - Proportional Scaling */}
         <div className="relative w-full max-w-[1920px] aspect-[1920/389] flex items-center justify-center">

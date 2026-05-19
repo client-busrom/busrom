@@ -29,6 +29,15 @@ export function ProductSeriesShowcaseSection({
   locale,
 }: ProductSeriesShowcaseSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [shouldPreload, setShouldPreload] = useState(false);
+
+  useEffect(() => {
+    // Delay preloading by 2s to not compete with critical initial page resources
+    const timer = setTimeout(() => {
+      setShouldPreload(true);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const [layout, setLayout] = useState({
     type: "mobile",
@@ -71,9 +80,9 @@ export function ProductSeriesShowcaseSection({
         } else {
           setLayout({
             type: "tablet",
-            width: w * 0.6,
+            width: w * 0.65,
             gap: 24,
-            cardH: 440,
+            cardH: 560,
           });
         }
       } else {
@@ -170,7 +179,7 @@ export function ProductSeriesShowcaseSection({
   if (validProducts.length === 0) return null;
 
   return (
-    <section className="relative w-full bg-transparent flex flex-col items-center py-8 lg:py-[120px] lg:h-[700px]">
+    <section className="relative w-full bg-transparent flex flex-col items-center py-8 lg:py-[120px] lg:h-[36.4vw]">
       {/* 1. MOBILE VIEW */}
       <div className="lg:hidden w-full flex flex-col items-center gap-6">
         {/* Title */}
@@ -221,10 +230,10 @@ export function ProductSeriesShowcaseSection({
                     .filter((line) => line.trim());
                 } else {
                   itemAttributes = [
-                    "Robust and stable",
-                    "Resistant to moisture",
-                    "Minimalist aesthetics",
-                    "Versatile and adaptable",
+                    "Robust And Stable",
+                    "Resistant To Moisture",
+                    "Minimalist Aesthetics",
+                    "Versatile And Adaptable",
                   ];
                 }
               }
@@ -245,7 +254,7 @@ export function ProductSeriesShowcaseSection({
                   }}
                 >
                   {/* Two Images Side by Side */}
-                  <div className="grid grid-cols-2 gap-3 w-full aspect-[16/10] rounded-[16px] overflow-hidden shrink-0 bg-[#F6F4ED]/50">
+                  <div className="grid grid-cols-2 gap-3 w-full aspect-[16/10] md:aspect-[16/8] rounded-[16px] overflow-hidden shrink-0 bg-[#F6F4ED]/50">
                     <div className="w-full h-full relative">
                       <OptimizedImage
                         image={img1}
@@ -270,8 +279,8 @@ export function ProductSeriesShowcaseSection({
                   </h3>
 
                   {/* Highlights (Compact lists) */}
-                  <div className="flex flex-col gap-2 shrink-0">
-                    {itemAttributes.slice(0, 3).map((attr, i) => (
+                  <div className="flex flex-col gap-1.5 md:gap-2 shrink-0">
+                    {itemAttributes.slice(0, 4).map((attr, i) => (
                       <div key={i} className="flex items-center gap-2">
                         <div className="w-5 h-5 rounded-full bg-[#A5A075] flex items-center justify-center shrink-0">
                           <svg
@@ -356,14 +365,14 @@ export function ProductSeriesShowcaseSection({
       </div>
 
       {/* 2. DESKTOP VIEW */}
-      <div className="hidden lg:flex flex-col relative w-full max-w-[1600px] mx-auto z-30 px-[5%]">
+      <div className="hidden lg:flex flex-col relative w-full max-w-[83vw] mx-auto z-30 px-[5%]">
         {/* Header Row: Title + Nav Arrows */}
-        <div className="flex justify-between items-end -mb-8 relative z-10 pointer-events-none">
+        <div className="flex justify-between items-end -mb-[1.6vw] relative z-10 pointer-events-none">
           <div className="flex-1">
             <HollowText
               strokeColor="#846500"
               strokeWidth={1.5}
-              className="font-anaheim block font-extrabold text-[6.25vw] xl:text-[96px] leading-none"
+              className="font-anaheim block font-extrabold text-[6.25vw] xl:text-[5vw] leading-none"
               style={{
                 width: "50vw",
                 whiteSpace: "pre-line",
@@ -377,7 +386,7 @@ export function ProductSeriesShowcaseSection({
           <div className="flex gap-16 pb-24 pointer-events-auto">
             <button
               onClick={prevProduct}
-              className="w-[3.85vw] h-[3.85vw] xl:w-[59px] xl:h-[59px] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95"
+              className="w-[3.85vw] h-[3.85vw] xl:w-[3vw] xl:h-[3vw] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95"
             >
               <svg width="23%" height="40%" viewBox="0 0 17 29" fill="none">
                 <path
@@ -390,7 +399,7 @@ export function ProductSeriesShowcaseSection({
             </button>
             <button
               onClick={nextProduct}
-              className="w-[3.85vw] h-[3.85vw] xl:w-[59px] xl:h-[59px] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95"
+              className="w-[3.85vw] h-[3.85vw] xl:w-[3vw] xl:h-[3vw] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95"
             >
               <svg width="23%" height="40%" viewBox="0 0 17 29" fill="none">
                 <path
@@ -412,18 +421,18 @@ export function ProductSeriesShowcaseSection({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="flex justify-center items-stretch gap-8 z-0"
+            className="flex justify-center items-stretch gap-[1.667vw] z-0"
           >
             {/* Left Beige Card */}
-            <div className="w-[40%] rounded-[1.56vw] xl:rounded-[22.8px] bg-[#F1E8CA] p-[4.68%] flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[450px]">
+            <div className="w-[40%] rounded-[1.56vw] xl:rounded-[22.8px] bg-[#F1E8CA] p-[4.68%] flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[23.4vw]">
               <div className="relative z-10">
-                <h3 className="text-[3.33vw] xl:text-[48px] font-[800] text-[#6D5400] leading-tight mb-9 font-anaheim">
+                <h3 className="text-[3.33vw] xl:text-[2.5vw] font-[800] text-[#6D5400] leading-tight mb-9 font-anaheim">
                   {getDisplayName()}
                 </h3>
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-[0.83vw]">
                   {attributes.slice(0, 4).map((attr, i) => (
-                    <div key={i} className="flex items-center gap-4">
-                      <div className="w-[1.87vw] h-[2vw] xl:w-[28.8px] xl:h-[28.8px] rounded-full bg-[#BCB263] flex items-center justify-center shrink-0">
+                    <div key={i} className="flex items-center gap-[0.83vw]">
+                      <div className="w-[1.87vw] h-[2vw] xl:w-[1.5vw] xl:h-[1.5vw] rounded-full bg-[#BCB263] flex items-center justify-center shrink-0">
                         <svg
                           width="50%"
                           height="50%"
@@ -439,7 +448,7 @@ export function ProductSeriesShowcaseSection({
                           />
                         </svg>
                       </div>
-                      <p className="text-[1.25vw] xl:text-[20px] font-semibold text-black font-anaheim leading-none truncate">
+                      <p className="text-[1.25vw] xl:text-[1.04vw] font-semibold text-black font-anaheim leading-none truncate">
                         {attr}
                       </p>
                     </div>
@@ -450,13 +459,13 @@ export function ProductSeriesShowcaseSection({
               <div className="self-end relative z-10">
                 <Link
                   href={`/${locale}/shop/${activeProduct.slug}`}
-                  className="flex items-center gap-[0.78vw] xl:gap-[12px] group/see transition-all duration-300 transform translate-x-[40px] translate-y-[30px]"
+                  className="flex items-center gap-[0.78vw] xl:gap-[0.625vw] group/see transition-all duration-300 transform translate-x-[2.08vw] translate-y-[1.56vw]"
                 >
-                  <span className="text-[1.14vw] xl:text-[17.6px] font-bold text-[#756F3F] transition-colors group-hover/see:text-black font-anaheim">
+                  <span className="text-[1.14vw] xl:text-[1vw] font-bold text-[#756F3F] transition-colors group-hover/see:text-black font-anaheim">
                     {(activeProduct as any)._carouselItem?.buttonText ||
                       "SEE ALL"}
                   </span>
-                  <div className="w-[2.97vw] h-[2.97vw] xl:w-[45.6px] xl:h-[45.6px] rounded-full border border-[#756F3F] flex items-center justify-center text-[#756F3F] group-hover/see:bg-[#756F3F] group-hover/see:text-white transition-all">
+                  <div className="w-[2.97vw] h-[2.97vw] xl:w-[2.375vw] xl:h-[2.375vw] rounded-full border border-[#756F3F] flex items-center justify-center text-[#756F3F] group-hover/see:bg-[#756F3F] group-hover/see:text-white transition-all">
                     <svg
                       width="42%"
                       height="42%"
@@ -498,6 +507,46 @@ export function ProductSeriesShowcaseSection({
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* Client-side dynamic preloader for next and previous slides */}
+      {shouldPreload && validProducts.length > 1 && (
+        <div className="hidden" aria-hidden="true">
+          {(() => {
+            const nextIdx = (currentIndex + 1) % validProducts.length;
+            const prevIdx = (currentIndex - 1 + validProducts.length) % validProducts.length;
+            const preloadIndices = Array.from(new Set([nextIdx, prevIdx]));
+            
+            return preloadIndices.map((idx) => {
+              const prod = validProducts[idx];
+              if (!prod) return null;
+              
+              const mainImages = (prod as any).mainImage || [];
+              const showImgNode = (prod as any).showImage;
+              let img1 = showImgNode;
+              let img2 = showImgNode;
+              if (mainImages.length > 0) {
+                img1 = mainImages[0];
+                img2 = mainImages.length > 1 ? mainImages[1] : showImgNode || mainImages[0];
+              }
+              
+              return (
+                <React.Fragment key={`preload-${prod.id}-${idx}`}>
+                  <OptimizedImage
+                    image={img1}
+                    size="large"
+                    priority={true}
+                  />
+                  <OptimizedImage
+                    image={img2}
+                    size="large"
+                    priority={true}
+                  />
+                </React.Fragment>
+              );
+            });
+          })()}
+        </div>
+      )}
     </section>
   );
 }

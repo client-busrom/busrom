@@ -82,7 +82,7 @@ export function BrandHighlightsSection({
   const previewItem = items[nextIndex];
 
   return (
-    <section className="relative w-full flex flex-col items-center justify-center py-[120px] md:h-[62.79vw] xl:h-[1205.7px]">
+    <section className="relative w-full flex flex-col items-center justify-center py-[120px] md:h-[62.79vw] xl:h-auto">
       {/* Background Decorative Layer */}
       <div className="absolute inset-0 z-0 pointer-events-none hidden md:block">
         <motion.div
@@ -111,14 +111,11 @@ export function BrandHighlightsSection({
       </div>
 
       {/* 1. DESKTOP/TABLET CONTENT (Visible on MD and above) */}
-      <div className="hidden md:block relative w-full max-w-[1536px] mx-auto aspect-[1344/845] h-[55vw] xl:h-[1050px] shrink-0 z-10">
+      <div className="hidden md:block relative w-full max-w-[80vw] mx-auto aspect-[1344/845] h-[55vw] xl:h-auto shrink-0 z-10">
         {/* 1. Section Title */}
         <div className="absolute left-[5.96%] top-[9.45%] flex flex-col">
           <h2
-            className="text-[6.66vw] xl:text-[102.4px] font-[800] leading-none text-black"
-            style={{
-              fontFamily: "var(--font-anaheim)",
-            }}
+            className="text-[6.66vw] xl:text-[5vw] font-extrabold font-anaheim leading-none text-black"
           >
             <RichTitle
               title={titleLine1Html || titleLine1}
@@ -127,8 +124,7 @@ export function BrandHighlightsSection({
           </h2>
           {titleLine2 && (
             <h2
-              className="text-[5vw] xl:text-[76.8px] font-[800] leading-tight text-black"
-              style={{ fontFamily: "var(--font-anaheim)" }}
+              className="text-[5vw] xl:text-[4vw] font-extrabold font-anaheim leading-tight text-black"
             >
               <RichTitle
                 title={titleLine2Html || titleLine2}
@@ -139,7 +135,7 @@ export function BrandHighlightsSection({
         </div>
 
         {/* 2. Main Description */}
-        <div className="absolute left-[5.96%] top-[36%] w-[42.6%] min-h-[25%] lg:min-h-[240px]">
+        <div className="absolute left-[5.96%] top-[36%] w-[42.6%] min-h-[25%] lg:min-h-[12.4vw]">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={index}
@@ -150,8 +146,7 @@ export function BrandHighlightsSection({
               className="w-full"
             >
               <p
-                className="text-[1.25vw] xl:text-[19.2px] font-[600] leading-[1.6] text-black"
-                style={{ fontFamily: "var(--font-anaheim)" }}
+                className="text-[1.25vw] xl:text-[1vw] font-anaheim font-semibold leading-[1.6] text-black"
               >
                 {currentItem.description}
               </p>
@@ -160,11 +155,11 @@ export function BrandHighlightsSection({
         </div>
 
         {/* 3. Navigation Buttons */}
-        <div className="absolute left-[45%] top-[85%] flex gap-8 z-30">
+        <div className="absolute left-[45%] top-[85%] flex gap-[0.5vw] z-30">
           {/* Prev */}
           <button
             onClick={handlePrev}
-            className="w-[3.78vw] h-[3.78vw] xl:w-[58px] xl:h-[58px] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95 group"
+            className="w-[3.78vw] h-[3.78vw] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95 group"
           >
             <svg width="40%" height="40%" viewBox="0 0 23 40" fill="none">
               <path
@@ -179,7 +174,7 @@ export function BrandHighlightsSection({
           {/* Next */}
           <button
             onClick={handleNext}
-            className="w-[3.78vw] h-[3.78vw] xl:w-[58px] xl:h-[58px] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95 group"
+            className="w-[3.78vw] h-[3.78vw] rounded-full border-[1.5px] border-[#756F3F] flex items-center justify-center bg-white text-[#756F3F] shadow-lg hover:bg-[#756F3F] hover:text-white transition-all active:scale-95 group"
           >
             <svg width="40%" height="40%" viewBox="0 0 23 40" fill="none">
               <path
@@ -249,7 +244,7 @@ export function BrandHighlightsSection({
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: direction === 1 ? -20 : 20 }}
                 transition={{ duration: 0.4 }}
-                className="max-w-[92%] text-[1vw] xl:text-[15.2px] font-[600] leading-[1.3] text-[#626262] line-clamp-2 text-center"
+                className="max-w-[92%] text-[1vw] font-[600] leading-[1.3] text-[#626262] line-clamp-2 text-center"
                 style={{ fontFamily: "var(--font-anaheim)" }}
               >
                 {items[nextIndex].title || items[nextIndex].description}
