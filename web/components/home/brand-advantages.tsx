@@ -86,9 +86,50 @@ export default function BrandAdvantages({ data, headerTheme, className }: Props)
   const sectionRef = useRef<HTMLElement>(null);
   const imageWrapperRef = useRef<HTMLDivElement>(null);
 
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
+
+  const handleScrollAreaScroll = () => {
+    if (!scrollRef.current) return;
+    const container = scrollRef.current;
+    const containerCenter = container.scrollLeft + container.clientWidth / 2;
+    
+    let closestIndex = 0;
+    let minDistance = Infinity;
+    
+    Array.from(container.children).forEach((child, idx) => {
+      const card = child as HTMLElement;
+      const cardCenter = card.offsetLeft + card.clientWidth / 2;
+      const distance = Math.abs(containerCenter - cardCenter);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = idx;
+      }
+    });
+    
+    setActiveCardIndex(closestIndex);
+  };
+
+  const scrollToCard = (index: number) => {
+    if (!scrollRef.current) return;
+    const container = scrollRef.current;
+    const card = container.children[index] as HTMLElement;
+    if (card) {
+      const containerWidth = container.clientWidth;
+      const cardWidth = card.clientWidth;
+      const scrollLeft = card.offsetLeft - (containerWidth - cardWidth) / 2;
+      container.scrollTo({
+        left: scrollLeft,
+        behavior: "smooth"
+      });
+      setActiveCardIndex(index);
+    }
+  };
+
   const svgSrc = isMobile ? "BusromBandMobile.svg" : "BusromBand.svg";
 
   const handleScroll = useCallback(() => {
+    if (typeof window !== "undefined" && window.innerWidth <= 1024) return;
     if (!sectionRef.current || !imageWrapperRef.current) return;
 
     const sectionEl = sectionRef.current;
@@ -182,10 +223,8 @@ export default function BrandAdvantages({ data, headerTheme, className }: Props)
   return (
     <section
       ref={sectionRef}
-      className={cn("bg-gray-800 text-white relative", className)}
+      className={cn("bg-gray-800 text-white relative section-brand-adv", className)}
       data-header-theme={headerTheme}
-      
-      style={{ minHeight: `${SECTION_HEIGHT}px` }}
     >
       {data.image?.url && (
         <OptimizedBackgroundImage
@@ -199,7 +238,7 @@ export default function BrandAdvantages({ data, headerTheme, className }: Props)
         {/* 1. 磁吸图片容器 */}
         <div
           ref={imageWrapperRef}
-          className={cn("w-full h-[100vh] z-30", {
+          className={cn("w-full h-[100vh] z-30 hidden lg:block", {
             relative: !isSticky && !isHidden,
             fixed: isSticky,
             "top-0": isSticky,
@@ -219,96 +258,87 @@ export default function BrandAdvantages({ data, headerTheme, className }: Props)
 
         {/* 2. 下方内容区域 (揭示文字) */}
         <div
-          className="absolute bottom-0 w-full z-10 h-[100vh]"
+          className="content-container relative lg:absolute lg:bottom-0 w-full z-10 py-16 lg:py-0 lg:h-[100vh]"
           style={{
-            bottom: `0px`,
-            opacity: contentOpacity,
-            transition: "opacity 0.5s",
+            ["--content-opacity" as any]: contentOpacity,
           }}
         >
-          {/* ==================== 移动端布局 - 树状分支 ==================== */}
-          <div className="lg:hidden h-full flex flex-col items-center pt-6 pb-4 overflow-visible">
-            {/* 顶部标题区 - 不受 max-w 限制 */}
-            <div className="flex flex-col items-center w-full mb-0 px-4 relative z-10">
-              {/* Brand Advantage 标题 */}
-              <div className="font-anaheim font-extrabold text-white text-xl text-center leading-tight mb-2">
-                <span>Brand Advantage</span>
+          {/* ==================== 移动端布局 - 横滑卡片流 ==================== */}
+          <div className="lg:hidden w-full flex flex-col items-center">
+            {/* 顶部标题区 */}
+            <div className="flex flex-col items-center w-full mb-6 px-4 relative z-10">
+              <div className="font-anaheim font-extrabold text-white text-lg tracking-widest text-center leading-tight mb-1">
+                <span>BRAND ADVANTAGE</span>
               </div>
-              {/* Busrom */}
               <h1
-                className="font-pingfang font-semibold text-white"
-                style={{ fontSize: "18vw" }}
+                className="font-pingfang font-bold text-brand-cream"
+                style={{ fontSize: "15vw" }}
               >
                 Busrom
               </h1>
             </div>
 
-            {/* 树状分支结构 - 限制最大宽度 */}
-            <div className="relative flex-1 w-full max-w-md mx-auto px-4">
-              {/* 中央主干线 - 向上延伸连接 Busrom */}
-              <div className="absolute left-1/2 -top-4 bottom-0 w-0.5 bg-white/30 -translate-x-1/2" />
-
-              {/* 分支节点 */}
-              <div className="relative h-full flex flex-col justify-evenly py-2">
+            {/* 横滑卡片流 */}
+            <div className="relative w-full overflow-hidden">
+              <div
+                ref={scrollRef}
+                onScroll={handleScrollAreaScroll}
+                className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-none px-6 pb-6 w-full"
+                style={{ scrollSnapType: "x mandatory" }}
+              >
                 {data.advantages.map((advantage, index) => {
                   const iconIndex = index + 1;
-                  const isLeft = index % 2 === 0;
-
                   return (
                     <div
                       key={advantage}
-                      className={cn(
-                        "relative flex items-center gap-2",
-                        isLeft
-                          ? "flex-row pr-[52%]"
-                          : "flex-row-reverse pl-[52%]",
-                      )}
+                      className="flex-shrink-0 w-[78vw] sm:w-[300px] snap-center bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col items-center text-center justify-between min-h-[220px]"
                     >
-                      {/* 横向分支线 */}
-                      <div
-                        className={cn(
-                          "absolute top-1/2 h-0.5 bg-white/30 -translate-y-1/2",
-                          isLeft ? "right-[48%] w-[8%]" : "left-[48%] w-[8%]",
-                        )}
-                      />
-
-                      {/* 图标 - CMS有值则用Iconify并加圆圈描边，否则用默认SVG */}
-                      <div
-                        className={cn(
-                          "w-8 h-8 flex-shrink-0 relative z-10 flex items-center justify-center",
-                          isValidCmsIcon(data.icons[index]) &&
-                            "rounded-full border border-white/40",
-                        )}
-                      >
-                        {isValidCmsIcon(data.icons[index]) ? (
-                          <IconifyIcon
-                            name={data.icons[index]}
-                            size={18}
-                            className="text-white"
-                          />
-                        ) : (
-                          <Image
-                            src={`/brand-adv-${iconIndex}.svg`}
-                            alt={`Advantage ${iconIndex}`}
-                            width={32}
-                            height={32}
-                            className="w-full h-full"
-                          />
-                        )}
+                      <div className="flex flex-col items-center gap-4 w-full">
+                        <div
+                          className="w-14 h-14 rounded-full flex items-center justify-center bg-brand-secondary/20 border border-brand-cream/30 shadow-inner"
+                        >
+                          {isValidCmsIcon(data.icons[index]) ? (
+                            <IconifyIcon
+                              name={data.icons[index]}
+                              size={28}
+                              className="text-brand-cream"
+                            />
+                          ) : (
+                            <Image
+                              src={`/brand-adv-${iconIndex}.svg`}
+                              alt={`Advantage ${iconIndex}`}
+                              width={40}
+                              height={40}
+                              className="w-8 h-8 object-contain filter brightness-110"
+                            />
+                          )}
+                        </div>
+                        <p className="font-anaheim text-white text-sm sm:text-base leading-relaxed whitespace-pre-line px-2 font-medium">
+                          {advantage.replace(/\\n|\/n/g, "\n")}
+                        </p>
                       </div>
-
-                      {/* 文字 */}
-                      <span
-                        className={cn(
-                          "font-anaheim text-white text-xs leading-tight whitespace-pre-line",
-                          isLeft ? "text-right" : "text-left",
-                        )}
-                      >
-                        {advantage.replace(/\\n|\/n/g, "\n")}
+                      <span className="text-[10px] tracking-widest text-brand-cream/40 font-mono mt-4">
+                        {String(iconIndex).padStart(2, "0")} / {String(data.advantages.length).padStart(2, "0")}
                       </span>
                     </div>
                   );
                 })}
+              </div>
+
+              {/* 指示点 */}
+              <div className="flex justify-center gap-1.5 mt-2">
+                {data.advantages.map((_, idx) => (
+                  <button
+                    key={idx}
+                    className={cn(
+                      "w-1.5 h-1.5 rounded-full transition-all duration-300",
+                      idx === activeCardIndex
+                        ? "bg-brand-cream w-3"
+                        : "bg-brand-cream/30"
+                    )}
+                    onClick={() => scrollToCard(idx)}
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -407,6 +437,22 @@ export default function BrandAdvantages({ data, headerTheme, className }: Props)
           </div>
         </div>
       </div>
+      <style jsx>{`
+        @media (min-width: 1025px) {
+          .section-brand-adv {
+            min-height: 2000px;
+          }
+        }
+        .content-container {
+          opacity: var(--content-opacity);
+          transition: opacity 0.5s;
+        }
+        @media (max-width: 1024px) {
+          .content-container {
+            opacity: 1 !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
