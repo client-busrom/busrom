@@ -86,6 +86,7 @@ export function ProductSeriesEntrySection({
   const [isMobile, setIsMobile] = useState(false)
   const resumeTimerRef = useRef<NodeJS.Timeout | null>(null)
   const autoPlayTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const prevActiveRef = useRef<number>(0)
 
   // 检测是否移动端
   useEffect(() => {
@@ -155,39 +156,46 @@ export function ProductSeriesEntrySection({
     }
   }, [])
 
-  // 检查卡片是否在两个箭头按钮之间（仅桌面端）
-  const isCardInVisibleArea = useCallback((index: number) => {
-    if (!emblaApi || isMobile) return true
-
-    const slideNodes = emblaApi.slideNodes()
-    if (!slideNodes || !slideNodes[index]) return true
-
-    const slideNode = slideNodes[index]
-    const slideRect = slideNode.getBoundingClientRect()
-
-    // 计算缩放比例
-    const scale = window.innerWidth / DESIGN_WIDTH
-
-    // 两个箭头之间的可视区域（实际像素）
-    const leftBoundary = LEFT_ARROW_RIGHT * scale
-    const rightBoundary = RIGHT_ARROW_LEFT * scale
-
-    // 检查卡片是否完全在可视区域内（考虑放大后的宽度）
-    const expandedWidth = EXPANDED_WIDTH * scale
-    const cardLeft = slideRect.left
-    const cardRight = cardLeft + expandedWidth
-
-    return cardLeft >= leftBoundary && cardRight <= rightBoundary
-  }, [emblaApi, isMobile])
-
-  // 当 activeIndex 变化时，检查是否需要滚动
+  // 当 activeIndex 变化时，检查并执行最小跨度滚动（仅桌面端）
   useEffect(() => {
-    if (!emblaApi || activeIndex === null) return
+    if (!emblaApi || activeIndex === null || isMobile) return
 
-    // 检查卡片放大后是否在两个箭头之间
-    if (!isCardInVisibleArea(activeIndex)) {
-      emblaApi.scrollTo(activeIndex)
+    // 1. 设计稿尺寸基准
+    const leftBoundary = LEFT_ARROW_RIGHT - 100 // 156px (左侧箭头位置)
+    const rightBoundary = RIGHT_ARROW_LEFT - 100 // 1546px (右侧箭头位置)
+    const cardLeft = 200 + activeIndex * 214 // 200 + index * (CARD_WIDTH + CARD_GAP)
+    const cardRight = cardLeft + EXPANDED_WIDTH // 展开后的右边界
+
+    // 2. 获取当前对齐到最左侧的卡片索引 k
+    const currentK = emblaApi.selectedScrollSnap()
+
+    // 3. 计算当前卡片在视口中的左右边界
+    const currentViewportLeft = cardLeft - currentK * 214
+    const currentViewportRight = cardRight - currentK * 214
+
+    // 4. 精准判定并执行最小跨度滚动（点一个跳一个，仅当遮挡时平移最少卡片数）
+    if (currentViewportRight > rightBoundary) {
+      // 挡住右侧箭头，向左平移（增加 k）
+      const targetK = Math.min(
+        products.length - 1,
+        Math.max(currentK, Math.ceil((cardRight - rightBoundary) / 214))
+      )
+      if (targetK !== currentK) {
+        emblaApi.scrollTo(targetK)
+      }
+    } else if (currentViewportLeft < leftBoundary) {
+      // 挡住左侧箭头，向右平移（减少 k）
+      const targetK = Math.max(
+        0,
+        Math.min(currentK, Math.floor((cardLeft - leftBoundary) / 214))
+      )
+      if (targetK !== currentK) {
+        emblaApi.scrollTo(targetK)
+      }
     }
+
+    // 更新上一次的 activeIndex
+    prevActiveRef.current = activeIndex
 
     // 等卡片尺寸动画完成后（500ms），重新计算 Embla 的尺寸
     const timer = setTimeout(() => {
@@ -195,7 +203,7 @@ export function ProductSeriesEntrySection({
     }, 550)
 
     return () => clearTimeout(timer)
-  }, [activeIndex, emblaApi, isCardInVisibleArea])
+  }, [activeIndex, emblaApi, isMobile, products.length])
 
   // 左箭头点击 - 切换到上一个 item
   const handlePrev = useCallback(() => {
