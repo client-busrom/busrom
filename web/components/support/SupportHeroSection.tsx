@@ -186,7 +186,7 @@ export function SupportHeroSection({ data }: SupportHeroSectionProps) {
         >
           <div className="relative flex flex-col h-full flex-1">
             <h2 className="font-montserrat font-bold text-black" style={{ fontSize: vw(46), lineHeight: 1.24, marginBottom: vw(16) }}>{data.cta.title}</h2>
-            <motion.div style={{ fontSize: vw(24), lineHeight: 1.5 }} animate={{ height: isExpanded ? 'auto' : vw(80) }} transition={{ duration: 0.5, ease: "easeInOut" }} className={`font-montserrat text-[#756f3f] font-semibold mt-2 overflow-hidden ${!isExpanded ? 'line-clamp-2' : ''}`}>
+            <motion.div style={{ fontSize: vw(24), lineHeight: 1.5 }} animate={{ height: isExpanded ? 'auto' : vw(80) }} transition={{ duration: 0.5, ease: "easeInOut" }} className={`font-montserrat text-[#756f3f] font-medium mt-2 text-justify overflow-hidden ${!isExpanded ? 'line-clamp-2' : ''}`}>
               {data.cta.content}
             </motion.div>
             <div className="mt-0 flex-1" />

@@ -22,7 +22,7 @@ export function SupportDecoratorSection({
   // Border circle is 572px wide. Radius is 286px.
   // Gap 50px from the border circle.
   // Total distance from center: 286 + 50 = 336px.
-  const distance = vw(336)
+  const distance = vw(300)
 
   return (
     <section 

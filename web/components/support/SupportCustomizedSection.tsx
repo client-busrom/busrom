@@ -225,13 +225,13 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
                   onClick={() => { setActiveGroup("product"); setActiveIndex(0); }}
                   className={`flex-1 max-w-[160px] py-4 rounded-full font-montserrat font-bold text-xs transition-all ${activeGroup === "product" ? "bg-[#262203] text-white shadow-lg" : "bg-white text-[#262203] border border-[#262203]"}`}
               >
-                PRODUCT
+                {product.title}
               </button>
               <button 
                   onClick={() => { setActiveGroup("manufacturing"); setActiveIndex(0); }}
                   className={`flex-1 max-w-[160px] py-4 rounded-full font-montserrat font-bold text-xs transition-all ${activeGroup === "manufacturing" ? "bg-[#262203] text-white shadow-lg" : "bg-white text-[#262203] border border-[#262203]"}`}
               >
-                MANUFACTURING
+                {manufacturing.title}
               </button>
             </div>
           </div>
