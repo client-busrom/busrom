@@ -173,12 +173,92 @@ export function QuoteImageSection({
           <h2 className="absolute font-josefin-sans font-bold text-center pointer-events-none" style={{ left: vw(title2Left - IMAGE_LEFT), top: vw(title2Top - IMAGE_TOP), width: vw(title2Width), fontSize: vw(150), lineHeight: vw(167), color: "#F6F4ED" }}>{titleLine2}</h2>
           <p className="absolute font-josefin-sans font-medium text-white pointer-events-none" style={{ left: vw(995 - IMAGE_LEFT), top: vw(489 - IMAGE_TOP), width: vw(412), fontSize: vw(36), lineHeight: vw(47) }}>{subtitle}</p>
 
-          <Link href={buttonLink} className="absolute group transition-opacity hover:opacity-80" style={{ left: vw(1436 - IMAGE_LEFT), top: vw(478 - IMAGE_TOP), cursor: "none" }}>
-            <div className="absolute rounded-full border transition-colors group-hover:bg-white/10" style={{ width: vw(104), height: vw(104), borderColor: "white" }}>
-              <div className="absolute rounded-full" style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: vw(12), height: vw(12), backgroundColor: "#FFCC4A" }} />
-            </div>
-            <span className="absolute font-anaheim font-medium text-white whitespace-nowrap" style={{ left: vw(70), top: vw(27), fontSize: vw(32), lineHeight: vw(49) }}>{buttonText}</span>
-          </Link>
+          {(() => {
+            const circleSize = 104
+            const dotSize = 12
+            const fontSize = 32
+            const dotGap = 8 // 文字距离黄点的间距
+            // 文字起始位置 = 圆心位置 + 黄点半径 + 间距 = circleSize/2 + dotSize/2 + dotGap
+            const textMarginLeft = circleSize / 2 + dotSize / 2 + dotGap
+
+            return (
+              <Link
+                href={buttonLink}
+                className="absolute flex items-center group pointer-events-auto"
+                style={{
+                  left: vw(1436 - IMAGE_LEFT),
+                  top: vw(478 - IMAGE_TOP),
+                  cursor: "none",
+                }}
+              >
+                {/* Circle border - visible in default state, hidden on hover */}
+                <div
+                  className="relative border-2 border-white transition-all duration-500 ease-out group-hover:opacity-0"
+                  style={{
+                    width: vw(circleSize),
+                    height: vw(circleSize),
+                    borderRadius: vw(circleSize / 2),
+                  }}
+                >
+                  {/* Orbit container - rotates around center */}
+                  <div
+                    className="absolute inset-0 flex items-center justify-center"
+                    style={{
+                      animation: 'orbitSpin 4s linear infinite',
+                    }}
+                  >
+                    {/* Radius container - moves dot from center to edge */}
+                    <div
+                      style={{
+                        animation: 'orbitRadius 4s ease-in-out infinite',
+                      }}
+                    >
+                      {/* Yellow dot */}
+                      <div
+                        className="rounded-full bg-[#FFCC4A]"
+                        style={{
+                          width: vw(dotSize),
+                          height: vw(dotSize),
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Text - positioned 8px right of the yellow dot (at center), breathing effect */}
+                <span
+                  className="absolute font-anaheim font-medium text-white whitespace-nowrap transition-all duration-500 group-hover:opacity-0 cta-text-breathe"
+                  style={{
+                    fontSize: vw(fontSize),
+                    left: vw(textMarginLeft),
+                    animation: 'breathe 2s ease-in-out infinite',
+                  }}
+                >
+                  {buttonText}
+                </span>
+
+                {/* Hover state: expanding capsule from left edge */}
+                <div
+                  className="absolute left-0 top-0 border-2 border-white bg-white transition-all duration-500 ease-out pointer-events-none opacity-0 group-hover:opacity-100 flex items-center cta-capsule-breathe"
+                  style={{
+                    height: vw(circleSize),
+                    borderRadius: vw(circleSize / 2),
+                    paddingLeft: vw(textMarginLeft),
+                    paddingRight: vw(circleSize / 2),
+                  }}
+                >
+                  <span
+                    className="font-anaheim font-medium text-[#756F3F] whitespace-nowrap"
+                    style={{
+                      fontSize: vw(fontSize),
+                    }}
+                  >
+                    {buttonText}
+                  </span>
+                </div>
+              </Link>
+            )
+          })()}
 
           <div
             ref={cursorRef}
