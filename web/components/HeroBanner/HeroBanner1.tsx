@@ -128,7 +128,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
         <div className="relative w-full h-full">
           {/* --- 1. 右上装饰 (Decorator 1) --- */}
           <div
-            className="absolute origin-top-right transition-transform duration-500 scale-[0.4] md:scale-[0.6] xl:scale-100"
+            className="absolute origin-top-right transition-transform duration-500 scale-[0.4] md:scale-100"
             style={{
               right: 0,
               top: 0,
@@ -146,7 +146,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
 
           {/* --- 2. 左下装饰 (Decorator 2) --- */}
           <div
-            className="absolute origin-bottom-left transition-transform duration-500 scale-[0.4] md:scale-[0.6] xl:scale-100"
+            className="absolute origin-bottom-left transition-transform duration-500 scale-[0.4] md:scale-100"
             style={{
               left: 0,
               bottom: 0,
@@ -165,7 +165,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
           {/* --- 3. 左上框架 (Frame 1 + Image 1) --- */}
           {data.images[1] && (
             <div
-              className="absolute origin-top-left transition-transform duration-500 scale-[0.4] md:scale-[0.6] xl:scale-100"
+              className="absolute origin-top-left transition-transform duration-500 scale-[0.4] md:scale-100"
               style={{
                 left: 0,
                 top: 0,
@@ -202,7 +202,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
           {/* --- 4. 右下框架 (Frame 2 + Image 2) --- */}
           {data.images[2] && (
             <div
-              className="absolute origin-bottom-right transition-transform duration-500 scale-[0.4] md:scale-[0.6] xl:scale-100"
+              className="absolute origin-bottom-right transition-transform duration-500 scale-[0.4] md:scale-100"
               style={{
                 right: 0,
                 bottom: 0,
@@ -238,8 +238,8 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
         </div>
       </div>
 
-      {/* 3. 桌面端大屏内容层 (1280px 以上触发) */}
-      <div className="hidden md:landscape:block xl:block absolute inset-0 z-30 pointer-events-none">
+      {/* 3. 桌面端大屏内容层 (768px 以上触发) */}
+      <div className="hidden md:block absolute inset-0 z-30 pointer-events-none">
         <div className="relative w-full h-full">
           <div className="absolute inset-0 flex flex-col justify-center items-center px-12">
             {/* 副标题 */}
@@ -311,8 +311,8 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
         </div>
       </div>
 
-      {/* 4. 移动端/小屏内容层 (1280px 以下触发) */}
-      <div className="flex md:landscape:hidden xl:hidden absolute inset-0 z-20 flex-col items-center justify-center w-full h-full px-6 text-center">
+      {/* 4. 移动端/小屏内容层 (768px 以下触发) */}
+      <div className="flex md:hidden absolute inset-0 z-20 flex-col items-center justify-center w-full h-full px-6 text-center">
         {/* 副标题 */}
         <p
           className="font-paytone-one text-[#FFBC5F] text-center mb-2"

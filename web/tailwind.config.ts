@@ -22,6 +22,9 @@ const config: Config = {
       },
     },
     extend: {
+      screens: {
+        lg: "1025px",
+      },
       colors: {
         // --- 1. shadcn/ui 语义化颜色 (由 globals.css 驱动) ---
         // 这些保持不变，它们会神奇地自动引用你的新 CSS 变量

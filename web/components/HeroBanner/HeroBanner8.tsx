@@ -7,7 +7,8 @@ import { ServerImage } from "@/components/ui/ServerImage";
 const formatText = (text: string | undefined) =>
   text?.replace(/\/n|\\n/g, "\n") || "";
 
-const rpx = (designValue: number) => `calc(var(--rpx) * ${designValue})`;
+const rpx = (designValue: number) =>
+  `calc(var(--rpx-hero, 1) * ${designValue}px)`;
 
 type BannerData = HomeContent["heroBanner"][number];
 type BannerProps = {
@@ -34,10 +35,10 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
   const featureCapsules = data.features.slice(2, 5).filter(f => f && f.trim());
 
   return (
-    <section className="relative w-full h-full lg:aspect-[1920/922] overflow-hidden" style={{ backgroundColor: BANNER_8_ASSETS.bgColor }}>
+    <section className="relative w-full h-full md:aspect-[1920/922] overflow-hidden" style={{ backgroundColor: BANNER_8_ASSETS.bgColor }}>
       
-      {/* --- PC 端布局 --- */}
-      <div className="hidden lg:block absolute inset-0 z-10 pointer-events-none">
+      {/* --- PC/Tablet 端布局 --- */}
+      <div className="hidden md:block absolute inset-0 z-10 pointer-events-none">
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" style={{ width: rpx(1920), height: rpx(922) }}>
           <div className="absolute inset-0 z-0 opacity-60"><img src={BANNER_8_ASSETS.decorator.src} className="w-full h-full object-cover" alt="" /></div>
           <div className="absolute right-0 top-0 h-full z-10" style={{ width: rpx(BANNER_8_ASSETS.bgFrame.width) }}><img src={BANNER_8_ASSETS.bgFrame.src} className="w-full h-full object-fill" alt="" /></div>
@@ -51,7 +52,7 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
           </div>
           <div className="absolute right-0 z-40 bg-[#665F1F] text-[#FEFFD8] rounded-l-full flex items-center justify-center pointer-events-auto" style={{ top: rpx(BANNER_8_ASSETS.content.subtitle.y), padding: `${rpx(30)} ${rpx(60)}` }}><span className="font-paytone-one" style={{ fontSize: rpx(BANNER_8_ASSETS.content.subtitle.fontSize) }}>{subtitle}</span></div>
           <div className="absolute z-40 flex flex-col pointer-events-auto" style={{ left: rpx(BANNER_8_ASSETS.content.features.x), top: rpx(BANNER_8_ASSETS.content.features.y), gap: rpx(BANNER_8_ASSETS.content.features.gap) }}>
-             {featureCapsules.map((f, i) => (<div key={i} className="bg-[#FFFB1B]/10 border border-[#CFBC37] rounded-[24px] flex items-center px-8 py-2 backdrop-blur-sm"><span className="font-montserrat font-bold text-[#CFBC37] uppercase tracking-widest" style={{ fontSize: rpx(BANNER_8_ASSETS.content.features.fontSize), textShadow: "0 4px 12px rgba(0,0,0,0.5)" }}>{f}</span></div>))}
+             {featureCapsules.map((f, i) => (<div key={i} className="bg-[#FFFB1B]/10 border border-[#CFBC37] flex items-center backdrop-blur-sm" style={{ borderRadius: rpx(24), paddingLeft: rpx(32), paddingRight: rpx(32), paddingTop: rpx(8), paddingBottom: rpx(8) }}><span className="font-montserrat font-bold text-[#CFBC37] uppercase tracking-widest" style={{ fontSize: rpx(BANNER_8_ASSETS.content.features.fontSize), textShadow: "0 4px 12px rgba(0,0,0,0.5)" }}>{f}</span></div>))}
           </div>
           <div className="absolute z-40 flex items-end pointer-events-auto" style={{ left: rpx(BANNER_8_ASSETS.bottomImages.x), top: rpx(BANNER_8_ASSETS.bottomImages.y), gap: rpx(BANNER_8_ASSETS.bottomImages.gap) }}>
              {data.images.slice(1, 4).map((img, i) => (<div key={i} className="relative overflow-hidden bg-white shadow-xl" style={{ width: rpx(BANNER_8_ASSETS.bottomImages.width), height: rpx(BANNER_8_ASSETS.bottomImages.height), borderRadius: rpx(34), border: `${rpx(BANNER_8_ASSETS.bottomImages.borderWidth)} solid white` }}><ServerImage image={img} alt="" fill className="object-cover" /></div>))}
@@ -60,7 +61,7 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
       </div>
 
       {/* --- Mobile & Tablet 端 (压缩垂直空间) --- */}
-      <div className="lg:hidden absolute inset-0 z-20 flex flex-col items-center justify-center w-full h-full">
+      <div className="md:hidden absolute inset-0 z-20 flex flex-col items-center justify-center w-full h-full">
         <div className="absolute inset-0 z-0">
            <div className="absolute inset-0 z-0 scale-110 opacity-40 blur-[10px] brightness-[0.6]">
               <ServerImage image={data.images[0]} alt="" fill className="object-cover" />

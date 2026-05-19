@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
 import { Link } from "@/lib/navigation";
 import type { HomeContent } from "@/lib/content-data";
 import type { Locale } from "@/i18n.config";
@@ -9,10 +9,10 @@ import { ServerImage } from "@/components/ui/ServerImage";
 import {
   getCropStyles,
   getCropImageUrl,
+  getVariantUrl,
   getObjectPosition,
   cn,
 } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 type Props = {
   data: HomeContent["productSeriesCarousel"];
@@ -49,20 +49,20 @@ const POSITIONS: Record<
   [4]: { x: 2680, y: 358, scale: 0.7, opacity: 0 }, // 更远右侧
 };
 
-// Hover 时的位置调整 (比例参考比亚迪: Active 1.15, Inactive 0.85; 锚点为底部)
-// Base y: 262, Base size: 640 => Bottom: 902
-const POS1_HOVER_X = 268;
-const POS1_HOVER_Y = 214;
-const POS1_SHRINK_X = 172;
-const POS1_SHRINK_Y = 310;
-
-const POS2_HOVER_X = 1012;
-const POS2_HOVER_Y = 214;
-const POS2_SHRINK_X = 1108;
-const POS2_SHRINK_Y = 310;
-
-// 标题基准相对位置 (距离图片顶部)
-const TITLE_Y = 155;
+const slideVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? "100%" : direction < 0 ? "-100%" : 0,
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => ({
+    x: direction < 0 ? "100%" : direction > 0 ? "-100%" : 0,
+    opacity: 0,
+  }),
+};
 
 // 按钮位置
 const NAV_BTN_Y = 550;
@@ -83,11 +83,11 @@ export default function ProductSeriesCarousel({
   headerTheme,
   className,
 }: Props) {
-  const isMobile = useIsMobile();
   // currentIndex 表示当前在"屏内左"位置的 item 索引
   const [currentIndex, setCurrentIndex] = useState(0);
   const [hoveredPosition, setHoveredPosition] = useState<number | null>(null); // 1 或 2（屏内的两个位置）
   const [isAnimating, setIsAnimating] = useState(false); // 动画锁
+  const [direction, setDirection] = useState(0); // 轮播方向：1=向右, -1=向左
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // 专属自定义光标状态
@@ -104,7 +104,7 @@ export default function ProductSeriesCarousel({
       const rect = e.currentTarget.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      
+
       // 更新坐标 (MotionValue 是非响应式的，不会触发重绘)
       cursorX.set(x);
       cursorY.set(y);
@@ -127,17 +127,29 @@ export default function ProductSeriesCarousel({
     };
   }, []);
 
-  // 预加载所有场景图 (sceneImage) - 悬停时需要秒出
+  // 预加载所有图片（产品封面图 + 悬停场景图）- 确保轮播切换与悬停切换秒出
   useEffect(() => {
     if (!data || data.length === 0) return;
 
     data.forEach((item) => {
-      if (item.sceneImage) {
-        // 使用大型变体作为预加载场景图
-        const url = item.sceneImage.variants?.large || item.sceneImage.url;
-        if (url && !url.includes("placeholder")) {
+      // 1. 预加载产品封面图 (item.image)
+      if (item.image) {
+        const cropData = item.imageCropDataList?.[0];
+        const imageUrl = cropData
+          ? getCropImageUrl(item.image, cropData)
+          : getVariantUrl(item.image, "medium");
+        if (imageUrl && !imageUrl.includes("placeholder")) {
           const img = new Image();
-          img.src = url;
+          img.src = imageUrl;
+        }
+      }
+
+      // 2. 预加载悬停场景背景图 (item.sceneImage)
+      if (item.sceneImage) {
+        const sceneUrl = getVariantUrl(item.sceneImage, "large");
+        if (sceneUrl && !sceneUrl.includes("placeholder")) {
+          const img = new Image();
+          img.src = sceneUrl;
         }
       }
     });
@@ -148,6 +160,7 @@ export default function ProductSeriesCarousel({
       if (isAnimating) return; // 动画进行中，忽略点击
 
       setIsAnimating(true);
+      setDirection(dir);
       setCurrentIndex((prev) => (prev + dir + seriesCount) % seriesCount);
       setHoveredPosition(null);
 
@@ -275,14 +288,16 @@ export default function ProductSeriesCarousel({
     [currentIndex, seriesCount],
   );
 
-  const hoveredItem =
-    hoveredPosition === 1
-      ? visibleItems[1]?.item
-      : hoveredPosition === 2
-        ? visibleItems[2]?.item
-        : isMobile
-          ? visibleItems[1]?.item
-          : null;
+  const hoveredItem = useMemo(() => {
+    // 移动端/平板端 (宽度小于 1025px)：始终显示当前项的背景图
+    if (typeof window !== "undefined" && window.innerWidth < 1025) {
+      return data[currentIndex];
+    }
+    // 桌面端：显示悬停项的背景图
+    if (hoveredPosition === 1) return visibleItems[1]?.item;
+    if (hoveredPosition === 2) return visibleItems[2]?.item;
+    return null;
+  }, [hoveredPosition, visibleItems, data, currentIndex]);
 
   // 弧线动画配置
   const arcTransition = {
@@ -292,9 +307,11 @@ export default function ProductSeriesCarousel({
 
   return (
     <section
-      className={cn("relative bg-[#756F3F] overflow-hidden lg:py-[60px]", className)}
+      className={cn(
+        "relative bg-[#756F3F] overflow-hidden max-lg:min-h-[580px] lg:aspect-[1920/1080] lg:py-[60px]",
+        className
+      )}
       data-header-theme={headerTheme}
-      style={!isMobile ? { aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` } : { minHeight: '500px' }}
       onMouseLeave={() => setHoveredPosition(null)}
     >
       {/* 场景图背景 - 全屏显示需要 large 尺寸 */}
@@ -349,131 +366,147 @@ export default function ProductSeriesCarousel({
         </motion.div>
       )}
 
-      {/* ==================== 移动端布局 ==================== */}
-      <div className="lg:hidden relative w-full h-full flex flex-col py-12">
-        {/* 图片区域 - 占据大部分空间 */}
-        <div className="flex-1 flex items-center justify-center gap-4 px-4 mb-8">
-          {/* 左侧图片 + 标题 */}
-          <div className="flex flex-col items-center w-[45%]">
-            <Link
-              href={visibleItems[1]?.item?.href || "#"}
-              className="block w-full"
-            >
-              {(() => {
-                const item = visibleItems[1]?.item;
-                if (!item) return null;
-                const cropData = item.imageCropDataList?.[0];
-                const cropStyles = getCropStyles(cropData);
-                if (cropStyles && cropData && cropData.croppedAreaPixels) {
-                  return (
-                    <div
-                      className="relative w-full aspect-square overflow-hidden"
-                      style={cropStyles.container}
-                    >
-                      <img
-                        src={getCropImageUrl(item.image, cropData)}
-                        alt={item.image?.altText || item.name || ""}
-                        style={{
-                          ...cropStyles.image,
-                          width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
-                          height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
-                          left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
-                          top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
-                          maxWidth: "none",
-                        }}
-                      />
-                    </div>
-                  );
+      {/* ==================== 移动端/平板端布局 ==================== */}
+      <div className="lg:hidden relative w-full h-[580px] flex flex-col py-8 items-center justify-between select-none overflow-hidden">
+        {/* 产品系列展示区 */}
+        <div className="w-full flex-1 flex items-center justify-center px-6 relative">
+          <AnimatePresence initial={false} custom={direction}>
+            <motion.div
+              key={`mobile-carousel-${currentIndex}`}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{
+                x: { type: "spring", stiffness: 300, damping: 30 },
+                opacity: { duration: 0.2 },
+              }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.6}
+              onDragEnd={(e, { offset }) => {
+                const swipeThreshold = 50;
+                if (offset.x < -swipeThreshold) {
+                  paginate(1);
+                } else if (offset.x > swipeThreshold) {
+                  paginate(-1);
                 }
-                return (
-                  <ServerImage
-                    image={item.image}
-                    alt={item.image?.altText || item.name || ""}
-                    size="small"
-                    className="w-full h-auto"
-                    objectPosition={getObjectPosition(item.image)}
-                  />
-                );
-              })()}
-            </Link>
-            <span className="font-anaheim font-extrabold text-white text-xs mt-2 text-center">
-              {visibleItems[1]?.item?.name}
-            </span>
-          </div>
-          {/* 右侧图片 + 标题 */}
-          <div className="flex flex-col items-center w-[45%]">
-            <Link
-              href={visibleItems[2]?.item?.href || "#"}
-              className="block w-full"
+              }}
+              className="absolute w-full max-w-[320px] flex flex-col items-center justify-center cursor-grab active:cursor-grabbing"
             >
-              {(() => {
-                const item = visibleItems[2]?.item;
-                if (!item) return null;
-                const cropData = item.imageCropDataList?.[0];
-                const cropStyles = getCropStyles(cropData);
-                if (cropStyles && cropData && cropData.croppedAreaPixels) {
+              {/* 产品名称 */}
+              <h3 className="font-anaheim font-extrabold text-white text-xl mb-4 tracking-wide text-center">
+                {data[currentIndex]?.name}
+              </h3>
+
+              {/* 封面图片 */}
+              <Link
+                href={data[currentIndex]?.href || "#"}
+                className="block w-full aspect-square rounded-2xl overflow-hidden shadow-2xl border border-white/10"
+              >
+                {(() => {
+                  const item = data[currentIndex];
+                  if (!item) return null;
+                  const cropData = item.imageCropDataList?.[0];
+                  const cropStyles = getCropStyles(cropData);
+                  if (cropStyles && cropData && cropData.croppedAreaPixels) {
+                    return (
+                      <div
+                        className="relative w-full h-full overflow-hidden"
+                        style={cropStyles.container}
+                      >
+                        <img
+                          src={getCropImageUrl(item.image, cropData)}
+                          alt={item.image?.altText || item.name || ""}
+                          style={{
+                            ...cropStyles.image,
+                            width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
+                            height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
+                            left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
+                            top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
+                            maxWidth: "none",
+                          }}
+                        />
+                      </div>
+                    );
+                  }
                   return (
-                    <div
-                      className="relative w-full aspect-square overflow-hidden"
-                      style={cropStyles.container}
-                    >
-                      <img
-                        src={getCropImageUrl(item.image, cropData)}
-                        alt={item.image?.altText || item.name || ""}
-                        style={{
-                          ...cropStyles.image,
-                          width: `${(cropData.variantWidth / cropData.croppedAreaPixels.width) * 100}%`,
-                          height: `${(cropData.variantHeight / cropData.croppedAreaPixels.height) * 100}%`,
-                          left: `${(-cropData.croppedAreaPixels.x / cropData.croppedAreaPixels.width) * 100}%`,
-                          top: `${(-cropData.croppedAreaPixels.y / cropData.croppedAreaPixels.height) * 100}%`,
-                          maxWidth: "none",
-                        }}
-                      />
-                    </div>
+                    <ServerImage
+                      image={item.image}
+                      alt={item.image?.altText || item.name || ""}
+                      size="medium"
+                      className="object-cover w-full h-full"
+                      objectPosition={getObjectPosition(item.image)}
+                    />
                   );
-                }
-                return (
-                  <ServerImage
-                    image={item.image}
-                    alt={item.image?.altText || item.name || ""}
-                    size="small"
-                    className="w-full h-auto"
-                    objectPosition={getObjectPosition(item.image)}
-                  />
-                );
-              })()}
-            </Link>
-            <span className="font-anaheim font-extrabold text-white text-xs mt-2 text-center">
-              {visibleItems[2]?.item?.name}
-            </span>
-          </div>
+                })()}
+              </Link>
+
+              {/* CTA 按钮 */}
+              <Link
+                href={data[currentIndex]?.href || "#"}
+                className="mt-6 px-6 py-2 bg-[#d4cc8e] text-[#625d2f] hover:bg-[#625d2f] hover:text-[#d4cc8e] rounded-full font-anaheim font-bold text-xs tracking-wide shadow-md active:scale-95 transition-all"
+              >
+                {data[currentIndex]?.buttonText || `View More`}
+              </Link>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        {/* 按钮 */}
-        <div className="flex justify-between px-6 pb-2">
+        {/* 底部导航区域 */}
+        <div className="w-full flex items-center justify-between px-10 mt-4 z-10">
           <button
             onClick={() => paginate(-1)}
             aria-label="Previous"
-            suppressHydrationWarning
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 active:scale-90 transition-all"
           >
-            <img
-              src="/btnLeft2.svg"
-              alt="Previous"
-              className="w-10 h-10"
-              suppressHydrationWarning
-            />
+            <svg
+              className="w-5 h-5 text-white/70"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
           </button>
+
+          {/* 分页指示器 (Dots) */}
+          <div className="flex items-center gap-1.5">
+            {data.map((_, idx) => (
+              <div
+                key={`dot-${idx}`}
+                className={cn(
+                  "h-1.5 rounded-full transition-all duration-300",
+                  idx === currentIndex ? "w-4 bg-[#d4cc8e]" : "w-1.5 bg-white/30"
+                )}
+              />
+            ))}
+          </div>
+
           <button
             onClick={() => paginate(1)}
             aria-label="Next"
-            suppressHydrationWarning
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 active:scale-90 transition-all"
           >
-            <img
-              src="/btnRight2.svg"
-              alt="Next"
-              className="w-10 h-10"
-              suppressHydrationWarning
-            />
+            <svg
+              className="w-5 h-5 text-white/70"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
           </button>
         </div>
       </div>
@@ -555,9 +588,8 @@ export default function ProductSeriesCarousel({
             >
               {/* 标题移入容器内部，利用 scale 属性实现真正的“共进退” */}
               <h3
-                className={`absolute font-anaheim font-extrabold text-white whitespace-nowrap z-20 transition-opacity duration-300 ${
-                  isOnScreen ? "opacity-100" : "opacity-0"
-                }`}
+                className={`absolute font-anaheim font-extrabold text-white whitespace-nowrap z-20 transition-opacity duration-300 ${isOnScreen ? "opacity-100" : "opacity-0"
+                  }`}
                 style={{
                   top: `${(-62 / IMG_SIZE_DEFAULT) * 100}%`, // 距离顶部 62px
                   left: "50%",

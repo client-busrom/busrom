@@ -54,15 +54,15 @@ const lazyBanners: Record<
 
 const AUTOPLAY_DELAY = 6000;
 const PRELOAD_BEFORE = 2000; // 提前 2 秒预加载下一个 Banner
-const MIN_HEIGHT = "min-h-[600px]";
-// 方案二核心：移动端 80dvh，桌面端 (xl) 采用 1920x922 的完美设计比例 48vw
-const HEIGHT_CLASS = `h-[80dvh] xl:h-[48vw] ${MIN_HEIGHT}`;
+const MIN_HEIGHT = "min-h-[600px] md:min-h-0";
+// 方案二核心：移动端 80dvh 且最小 600px，md（平板/桌面端）及以上采用 1920x922 完美设计比例 48vw
+const HEIGHT_CLASS = `h-[80dvh] md:h-[48vw] ${MIN_HEIGHT}`;
 
 // 占位组件 - 用于 Banner 加载中
 function BannerPlaceholder() {
   return (
     <div
-      className={`w-full h-full ${MIN_HEIGHT} bg-gradient-to-br from-[#F6F4ED] to-[#E8E4D9]`}
+      className="w-full h-full bg-gradient-to-br from-[#F6F4ED] to-[#E8E4D9]"
     />
   );
 }
@@ -91,12 +91,12 @@ export default function HeroBanner({
       const el = sectionRef.current;
       if (!el) return;
 
-      // 1280px 以上必选桌面，768px-1280px 之间只要是横屏 (vw > vh) 就选桌面
-      const isDesktopLayout = vw >= 1280 || (vw >= 768 && vw > vh);
+      // md (768px) 及以上均采用桌面端布局与比例缩放
+      const isDesktopLayout = vw >= 768;
 
       if (isDesktopLayout) {
         const rawScale = vw / 1920;
-        const scale = Math.max(rawScale, 0.5);
+        const scale = rawScale;
         // 局部化：只设置在当前组件容器上，防止污染全局
         el.style.setProperty("--rpx-hero", scale.toString());
       } else {

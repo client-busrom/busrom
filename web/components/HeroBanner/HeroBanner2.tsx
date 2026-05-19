@@ -89,7 +89,7 @@ const HeroBanner2: FC<HeroBanner2Props> = ({ data, locale }) => {
 
       {/* 3. 其余装饰与内容逻辑保持不变 */}
       <div className="absolute inset-0 z-30 pointer-events-none overflow-hidden">
-        <div className="hidden xl:block absolute inset-0">
+        <div className="hidden md:block absolute inset-0">
           <img
             src="/home/hero-banner/banner-2/left.svg"
             alt=""
@@ -133,12 +133,12 @@ const HeroBanner2: FC<HeroBanner2Props> = ({ data, locale }) => {
         </div>
       </div>
 
-      <div className="hidden md:landscape:block xl:block relative z-40 w-full h-full">
+      <div className="hidden md:block relative z-40 w-full h-full">
         <div
           className="absolute z-30 flex flex-col items-start text-left"
           style={{ left: rpx(207), top: rpx(207) }}
         >
-          <div className="flex flex-col mb-12">
+          <div className="flex flex-col" style={{ marginBottom: rpx(48) }}>
             {formatText(data.features[0])
               ?.split("\n")
               .map((line, idx) => (
@@ -156,7 +156,7 @@ const HeroBanner2: FC<HeroBanner2Props> = ({ data, locale }) => {
                 </h1>
               ))}
           </div>
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col" style={{ gap: rpx(24) }}>
             {[data.features[2], data.features[3], data.features[4]].map(
               (feature, index) => (
                 <MagneticWrapper key={index} strength={0.2}>
@@ -168,8 +168,14 @@ const HeroBanner2: FC<HeroBanner2Props> = ({ data, locale }) => {
                       }}
                     />
                     <div
-                      className="relative py-4 px-12 font-bold text-[#FDF6C2] whitespace-nowrap"
-                      style={{ fontSize: rpx(30) }}
+                      className="relative font-bold text-[#FDF6C2] whitespace-nowrap"
+                      style={{
+                        fontSize: rpx(30),
+                        paddingTop: rpx(16),
+                        paddingBottom: rpx(16),
+                        paddingLeft: rpx(48),
+                        paddingRight: rpx(48),
+                      }}
                     >
                       {formatText(feature).replace(/\n/g, " ")}
                     </div>
@@ -230,7 +236,7 @@ const HeroBanner2: FC<HeroBanner2Props> = ({ data, locale }) => {
         </div>
       </div>
 
-      <div className="flex md:landscape:hidden xl:hidden absolute inset-0 z-50 w-full h-full bg-[#756F3F]/20 backdrop-blur-sm">
+      <div className="flex md:hidden absolute inset-0 z-50 w-full h-full bg-[#756F3F]/20 backdrop-blur-sm">
         <div className="flex flex-col items-center justify-center min-h-full w-full px-6 py-8 text-center gap-4 md:gap-6">
           <div className="flex flex-col items-center w-full">
             <p

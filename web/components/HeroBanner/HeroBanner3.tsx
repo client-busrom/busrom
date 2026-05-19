@@ -48,19 +48,19 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
     <section className="relative w-full h-full overflow-hidden bg-[#6E6941]">
       
       {/* --- 桌面端装饰层 --- */}
-      <div className="absolute top-0 z-0 h-full pointer-events-none opacity-40 md:landscape:opacity-100 xl:opacity-100">
-        <div className="relative left-0 md:landscape:left-[calc(var(--rpx-hero,1)*96px)] xl:left-[calc(var(--rpx-hero,1)*96px)]"
+      <div className="absolute top-0 z-0 h-full pointer-events-none opacity-40 md:opacity-100">
+        <div className="relative left-0 md:left-[calc(var(--rpx-hero,1)*96px)]"
              style={{ width: rpx(BANNER_3_ASSETS.decorator.width), height: rpx(BANNER_3_ASSETS.decorator.height) }}>
           <img src={BANNER_3_ASSETS.decorator.src} alt="" className="w-full h-full object-contain object-left-top" />
         </div>
       </div>
 
       {/* --- 桌面端布局 --- */}
-      <div className="hidden md:landscape:block xl:block relative z-20 w-full h-full">
+      <div className="hidden md:block relative z-20 w-full h-full">
         <div className="absolute z-20 flex flex-col items-start text-left" style={{ left: rpx(186), top: rpx(140) }}>
-          <p className="font-montserrat font-normal text-black whitespace-pre-line mb-2" style={{ fontSize: rpx(36) }}>{renderHighlightedText(subtitle)}</p>
-          <h1 className="font-poller-one font-regular text-black whitespace-pre-line leading-[1.1] mb-12" style={{ fontSize: rpx(90), WebkitTextStroke: `${rpx(6)} #FDF6C2`, paintOrder: "stroke fill" }}>{formatText(data.features[0])}</h1>
-          <div className="flex flex-col ml-12" style={{ gap: rpx(24) }}>
+          <p className="font-montserrat font-normal text-black whitespace-pre-line" style={{ fontSize: rpx(36), marginBottom: rpx(8) }}>{renderHighlightedText(subtitle)}</p>
+          <h1 className="font-poller-one font-regular text-black whitespace-pre-line leading-[1.1]" style={{ fontSize: rpx(90), WebkitTextStroke: `${rpx(6)} #FDF6C2`, paintOrder: "stroke fill", marginBottom: rpx(48) }}>{formatText(data.features[0])}</h1>
+          <div className="flex flex-col" style={{ gap: rpx(24), marginLeft: rpx(48) }}>
             {featureCapsules.map((feature, index) => (
                 <div key={index} className="relative flex items-center justify-center overflow-hidden shadow-lg" style={{ width: rpx(500), height: rpx(80), background: index % 2 === 0 ? "linear-gradient(90deg, rgba(249, 133, 56) 0%, rgba(249, 133, 56) 100%)" : "linear-gradient(90deg, rgba(73, 69, 38) 0%, rgba(73, 69, 38) 100%)", borderRadius: rpx(40) }}>
                   <p className="font-montserrat font-bold text-[#FFF5AD]" style={{ fontSize: rpx(30), letterSpacing: "0.05em" }}>{feature}</p>
@@ -78,7 +78,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
       </div>
 
       {/* --- 移动端/平板端布局 (移除内部滚动) --- */}
-      <div className="lg:hidden absolute inset-0 z-30 flex flex-col items-center justify-center w-full h-full">
+      <div className="md:hidden absolute inset-0 z-30 flex flex-col items-center justify-center w-full h-full">
         <div className="absolute inset-0 z-0">
            <div className="absolute inset-0 z-0 scale-110 opacity-40 blur-[10px] brightness-[0.6]">
               <ServerImage image={data.images[0]} alt="" fill className="object-cover" />

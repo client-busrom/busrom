@@ -7,7 +7,8 @@ import { ServerImage } from "@/components/ui/ServerImage";
 const formatText = (text: string | undefined) =>
   text?.replace(/\/n|\\n/g, "\n") || "";
 
-const rpx = (designValue: number) => `calc(var(--rpx) * ${designValue})`;
+const rpx = (designValue: number) =>
+  `calc(var(--rpx-hero, 1) * ${designValue}px)`;
 
 type BannerData = HomeContent["heroBanner"][number];
 type BannerProps = {
@@ -76,9 +77,9 @@ const HeroBanner7: FC<BannerProps> = ({ data }) => {
   const featuresList = data.features.slice(2, 5).filter((f) => f && f.trim());
 
   return (
-    <section className="relative w-full h-full lg:aspect-[1920/922] overflow-hidden" style={{ backgroundColor: BANNER_7_ASSETS.bgColor }}>
-      {/* --- PC 端布局 --- */}
-      <div className="hidden lg:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" style={{ width: rpx(1920), height: rpx(922) }}>
+    <section className="relative w-full h-full md:aspect-[1920/922] overflow-hidden" style={{ backgroundColor: BANNER_7_ASSETS.bgColor }}>
+      {/* --- PC/Tablet 端布局 --- */}
+      <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" style={{ width: rpx(1920), height: rpx(922) }}>
         
         {/* 光束层 */}
         {BANNER_7_ASSETS.lightBeams.map((beam, index) => (
@@ -120,7 +121,7 @@ const HeroBanner7: FC<BannerProps> = ({ data }) => {
           ))}
         </div>
 
-        {/* 其他文字内容保持不变 */}
+        {/* 文字内容 */}
         <div className="absolute z-40 flex flex-col items-start pointer-events-auto" style={{ left: rpx(BANNER_7_ASSETS.content.titleGroup.x), top: rpx(BANNER_7_ASSETS.content.titleGroup.y) }}>
            <div className="flex flex-col">
             {titleParts.map((line, idx) => (
@@ -131,7 +132,7 @@ const HeroBanner7: FC<BannerProps> = ({ data }) => {
           </div>
         </div>
 
-        <div className="absolute z-40 flex flex-col gap-6 pointer-events-auto" style={{ left: rpx(BANNER_7_ASSETS.content.featureGroup.x), top: rpx(BANNER_7_ASSETS.content.featureGroup.y) }}>
+        <div className="absolute z-40 flex flex-col pointer-events-auto" style={{ left: rpx(BANNER_7_ASSETS.content.featureGroup.x), top: rpx(BANNER_7_ASSETS.content.featureGroup.y), gap: rpx(24) }}>
           {data.features.slice(2, 5).map((feature, idx) => (
             <div key={idx} className="flex items-center justify-center bg-[#E9E2A0] rounded-full" style={{ width: rpx(455), height: rpx(100) }}>
               <span className="font-montserrat font-bold text-black" style={{ fontSize: rpx(30), letterSpacing: '0.06em' }}>{feature}</span>
@@ -144,45 +145,84 @@ const HeroBanner7: FC<BannerProps> = ({ data }) => {
         </div>
       </div>
 
-      {/* --- Mobile --- */}
-      <div className="lg:hidden absolute inset-0 z-30 overflow-y-auto">
-        <div className="flex flex-col items-center justify-center min-h-full py-4 px-6 gap-3">
-          <div className="relative z-10 w-full flex justify-center shrink-0">
-            <div className="relative" style={{ width: "min(65vw, 220px)", height: "min(65vw, 220px)" }}>
-                {[
-                  { pos: "top-0 left-1/2 -translate-x-1/2", idx: 0 },
-                  { pos: "bottom-0 left-1/2 -translate-x-1/2", idx: 1 },
-                  { pos: "top-1/2 left-0 -translate-y-1/2", idx: 2 },
-                  { pos: "top-1/2 right-0 -translate-y-1/2", idx: 3 },
-                ].map((d, i) => (
-                  <div key={i} className={`absolute ${d.pos}`} style={{ width: BANNER_7_ASSETS.mobile.diamondSize, height: BANNER_7_ASSETS.mobile.diamondSize }}>
-                    <img src={BANNER_7_ASSETS.mobile.frame} className="absolute inset-0 w-full h-full object-contain z-0" />
-                    <div className="absolute inset-0 z-10 flex items-center justify-center">
-                        <div className="relative" style={{ width: BANNER_7_ASSETS.mobile.innerScale, height: BANNER_7_ASSETS.mobile.innerScale }}>
-                           <div className="absolute inset-0" style={{ maskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, maskSize: "100% 100%", maskRepeat: "no-repeat" }}>
-                            <ServerImage image={data.images[d.idx]} alt="" fill className="object-cover" />
-                           </div>
-                        </div>
-                    </div>
-                  </div>
-                ))}
+      {/* --- Mobile 端布局 --- */}
+      <div className="md:hidden absolute inset-0 z-30 overflow-y-auto">
+        <div className="flex flex-col items-center justify-center min-h-full py-6 px-6 gap-5">
+          {/* 完美的非对称式重叠主图与菱形群 (完美复刻桌面端风格) */}
+          <div className="relative w-full max-w-[340px] aspect-[1200/922] shrink-0 z-10 mx-auto">
+            {/* 左侧带蒙版的主图 */}
+            <div className="absolute left-0 top-[10%] w-[58%] h-[80%] z-10" style={{ maskImage: `url(${BANNER_7_ASSETS.imageMain.mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.imageMain.mask})`, maskSize: "100% 100%" }}>
+              <ServerImage image={data.images[0]} alt="" fill className="object-cover" />
+            </div>
+
+            {/* 顶部的菱形小图 */}
+            <div className="absolute left-[38%] top-[5%] w-[42%] h-[32%] z-20">
+              <img src={BANNER_7_ASSETS.imageBox.diamonds[0].frame} className="absolute inset-0 w-full h-full object-contain z-0" />
+              <div className="absolute inset-0 z-10 left-1/2 -translate-x-1/2 w-[86%] h-[89%] top-[5%]" style={{ maskImage: `url(${BANNER_7_ASSETS.imageBox.diamonds[0].mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.imageBox.diamonds[0].mask})`, maskSize: "100% 100%" }}>
+                <ServerImage image={data.images[1]} alt="" fill className="object-cover" />
+              </div>
+            </div>
+
+            {/* 中间的菱形小图 */}
+            <div className="absolute left-[58%] top-[30%] w-[34%] h-[34%] z-[21]">
+              <img src={BANNER_7_ASSETS.imageBox.diamonds[1].frame} className="absolute inset-0 w-full h-full object-contain z-0" />
+              <div className="absolute inset-0 z-10 left-1/2 -translate-x-1/2 w-[82%] h-[82%] top-[9%]" style={{ maskImage: `url(${BANNER_7_ASSETS.imageBox.diamonds[1].mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.imageBox.diamonds[1].mask})`, maskSize: "100% 100%" }}>
+                <ServerImage image={data.images[2]} alt="" fill className="object-cover" />
+              </div>
+            </div>
+
+            {/* 底部的菱形小图 */}
+            <div className="absolute left-[38%] top-[58%] w-[42%] h-[33%] z-[22]">
+              <img src={BANNER_7_ASSETS.imageBox.diamonds[2].frame} className="absolute inset-0 w-full h-full object-contain z-0" />
+              <div className="absolute inset-0 z-10 left-1/2 -translate-x-1/2 w-[86%] h-[89%] bottom-[5%]" style={{ maskImage: `url(${BANNER_7_ASSETS.imageBox.diamonds[2].mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.imageBox.diamonds[2].mask})`, maskSize: "100% 100%" }}>
+                <ServerImage image={data.images[3]} alt="" fill className="object-cover" />
+              </div>
             </div>
           </div>
-          {/* 其他文字... */}
+
+          {/* 描边特效标题 */}
           <div className="relative z-30 flex flex-col items-center shrink-0">
             {titleParts.map((line, idx) => (
-              <h1 key={idx} className="font-paytone-one leading-[1.0] text-center text-3xl md:text-5xl" style={{ color: idx === 0 ? "#FFFFFF" : "#433E12", WebkitTextStroke: "1px #000000", paintOrder: "stroke fill" }}>{line}</h1>
+              <h1 
+                key={idx} 
+                className="font-paytone-one leading-[1.1] text-center text-3xl sm:text-4xl" 
+                style={{ 
+                  color: idx === 0 ? "#FFFFFF" : "#433E12", 
+                  WebkitTextStroke: "1.5px #000000", 
+                  paintOrder: "stroke fill" 
+                }}
+              >
+                {idx === 0 
+                  ? line.split(/(-)/g).map((part, pIdx) => (
+                      <span key={pIdx} className={part === '-' ? 'text-[#433E12]' : ''}>
+                        {part}
+                      </span>
+                    )) 
+                  : line
+                }
+              </h1>
             ))}
           </div>
-          <div className="relative z-40 flex flex-col items-center gap-1.5 w-full shrink-0">
+
+          {/* 精致的金色特征标签 */}
+          <div className="relative z-40 flex flex-wrap justify-center gap-2 w-full shrink-0">
             {featuresList.map((feature, idx) => (
-              <div key={idx} className="bg-[#E9E2A0] px-6 py-1.5 md:px-8 md:py-2.5 rounded-full text-black shadow-sm border border-black/5">
-                <span className="font-montserrat font-bold text-[10px] md:text-lg tracking-wider block text-center min-w-[100px] md:min-w-[150px]">{feature}</span>
+              <div 
+                key={idx} 
+                className="bg-[#E9E2A0] px-5 py-1.5 rounded-full text-black shadow-md border border-[#433E12]/10"
+              >
+                <span className="font-montserrat font-bold text-[11px] tracking-wider block text-center min-w-[110px]">
+                  {feature}
+                </span>
               </div>
             ))}
           </div>
-          <div className="relative z-30 text-center px-4 pb-12 shrink-0">
-            <p className="font-paytone-one text-white text-lg md:text-2xl opacity-90 leading-tight">{subtitleParts.join(" ")}</p>
+
+          {/* 副标题 */}
+          <div className="relative z-30 text-center px-4 pb-8 shrink-0">
+            <p className="font-paytone-one text-white text-base sm:text-lg opacity-90 leading-tight">
+              {subtitleParts.join(" ")}
+            </p>
           </div>
         </div>
       </div>

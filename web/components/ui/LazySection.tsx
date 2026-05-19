@@ -78,5 +78,5 @@ export function DeferredContent({
     return null;
   }
 
-  return <>{children}</>;
+  return <section className="overflow-hidden">{children}</section>;
 }

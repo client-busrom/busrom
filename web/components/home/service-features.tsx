@@ -178,7 +178,7 @@ export default function ServiceFeatures({
                   "font-anaheim font-medium text-[#756F3F] whitespace-pre-wrap",
                   "text-sm leading-relaxed",
                   "lg:text-[calc(18*var(--rpx))] lg:leading-[calc(28*var(--rpx))]",
-                  "max-w-[320px] lg:max-w-none",
+                  "max-w-[320px] md:max-w-xl lg:max-w-none",
                 )}
               >
                 {data.subtitle}
@@ -206,11 +206,11 @@ export default function ServiceFeatures({
                 <div className="item-bg absolute inset-0 pointer-events-none z-0" />
 
                 {/* 卡片内容区域 */}
-                <div className="relative z-10 flex-1 flex flex-col lg:flex-row p-4 lg:p-0">
+                <div className="relative z-10 flex-1 flex flex-col md:flex-row p-4 md:p-8 lg:p-0">
                   {/* 文字内容区 */}
                   <div
                     className={cn(
-                      "flex flex-col justify-start flex-shrink-0",
+                      "flex flex-col justify-start flex-shrink-0 w-full md:w-[42%] md:pr-4",
                       "lg:w-[calc(401*var(--rpx))] lg:pt-[calc(80*var(--rpx))] lg:pl-[calc(40*var(--rpx))] lg:pr-[calc(10*var(--rpx))]",
                     )}
                   >
@@ -259,7 +259,7 @@ export default function ServiceFeatures({
                   <div
                     className={cn(
                       "flex-1 flex items-start justify-center",
-                      "mt-4 lg:mt-0",
+                      "mt-4 md:mt-0 lg:mt-0",
                       "lg:pt-[calc(70*var(--rpx))] lg:pb-[calc(12*var(--rpx))]",
                     )}
                   >

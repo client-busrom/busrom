@@ -75,7 +75,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
   // Responsive state
   React.useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024); // Tablet and mobile
+      setIsMobile(window.innerWidth < 1025); // Tablet and mobile
     };
     checkMobile();
     window.addEventListener("resize", checkMobile);

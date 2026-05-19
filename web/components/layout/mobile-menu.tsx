@@ -70,7 +70,7 @@ export function MobileMenu({ isOpen, onClose, navigationItems = [] }: MobileMenu
 
   // 锁定 body 滚动 - 仅在移动端可见时锁定
   useEffect(() => {
-    const isMobileView = () => window.innerWidth < 1024; // 1024 是 lg 的断点
+    const isMobileView = () => window.innerWidth < 1025; // 1024 是 lg 的断点
     
     if (isOpen && isMobileView()) {
       document.body.style.overflow = "hidden"

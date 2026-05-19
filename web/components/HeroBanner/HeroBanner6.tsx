@@ -14,7 +14,8 @@ type BannerProps = {
   locale: Locale;
 };
 
-const rpx = (designValue: number) => `calc(var(--rpx) * ${designValue})`;
+const rpx = (designValue: number) =>
+  `calc(var(--rpx-hero, 1) * ${designValue}px)`;
 
 const BANNER_6_ASSETS = {
   bgColor: "#FFEECA",
@@ -38,10 +39,10 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
     .filter(Boolean);
 
   return (
-    <section className="relative w-full h-full min-h-[600px] overflow-hidden bg-[#FFEECA] font-sans">
-      {/* 1. PC 端布局 */}
-      <div className="hidden lg:block absolute inset-0 pointer-events-none">
-        <div className="absolute left-1/2 top-1/2 w-full h-full -translate-x-1/2 -translate-y-1/2">
+    <section className="relative w-full h-full min-h-[600px] md:min-h-0 md:aspect-[1920/922] overflow-hidden bg-[#FFEECA] font-sans">
+      {/* 1. PC/Tablet 端布局 */}
+      <div className="hidden md:block absolute inset-0 pointer-events-none">
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" style={{ width: rpx(1920), height: rpx(922) }}>
           <div
             className="absolute left-1/2 top-1/2 rounded-full z-10"
             style={{
@@ -131,7 +132,7 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
       </div>
 
       {/* --- Mobile / Tablet 端布局 (瘦身版) --- */}
-      <div className="lg:hidden absolute inset-0 z-30 overflow-y-auto">
+      <div className="md:hidden absolute inset-0 z-30 overflow-y-auto">
         <div className="flex flex-col items-center justify-center min-h-full py-4 px-6 gap-4">
           
           <div className="relative w-full max-w-[500px] h-[200px] md:h-[320px] shrink-0 z-10">

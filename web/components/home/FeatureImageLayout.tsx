@@ -166,12 +166,13 @@ export default function FeatureImageLayout({
             限制 maxWidth 和 maxHeight 使用 var(--rpx) 进行等比缩放。
           */}
           <div
-            className="relative flex justify-center items-center"
+            className="feature-img-container relative flex justify-center items-center w-full"
             style={{
               aspectRatio: `${nativeW} / ${nativeH}`,
-              width: "100%",
               maxWidth: `calc(${nativeW} * var(--rpx))`,
               maxHeight: `calc(${nativeH} * var(--rpx))`,
+              containerType: "inline-size",
+              ["--rpx" as any]: `calc(100cqw / ${nativeW})`,
             }}
           >
             {/* Layout 0: 四张图 (1-1 ~ 1-4) */}
@@ -289,6 +290,14 @@ export default function FeatureImageLayout({
           </div>
         </motion.div>
       </AnimatePresence>
+      <style jsx>{`
+        @media (max-width: 1024px) {
+          :global(.feature-img-container) {
+            max-width: 100% !important;
+            max-height: 100% !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

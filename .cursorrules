@@ -1,0 +1,8 @@
+# AI Agent Workspace Rules
+
+## Git & Version Control
+- **DO NOT Automatically Commit or Stage Changes**: Never run `git add`, `git commit`, or `git push` unless the user explicitly requests it (e.g., using words like "暂存提交", "commit", or "stage"). Always wait for explicit user instruction before making git commits.
+
+## Code Quality & Testing
+- Always run type checking (`npm run type-check --workspace=web`) to verify that TSX/TS files compile cleanly after making edits.
+- Maintain existing code styles and comments unless asked to clean them up.

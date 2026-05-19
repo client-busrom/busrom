@@ -120,8 +120,8 @@ const HeroBanner4: FC<HeroBanner4Props> = ({ data, locale }) => {
         </defs>
       </svg>
 
-      {/* 2. 桌面端布局 (1280px 以上 & 1024px+横屏) */}
-      <div className="hidden md:landscape:block xl:block relative z-20 w-full h-full">
+      {/* 2. 桌面端布局 (768px 以上) */}
+      <div className="hidden md:block relative z-20 w-full h-full">
         {/* 背景装饰物 - 桌面端锚点优化 */}
         {/* 右上大装饰 */}
         <div
@@ -258,7 +258,7 @@ const HeroBanner4: FC<HeroBanner4Props> = ({ data, locale }) => {
       </div>
 
       {/* 3. 移动端/平板端布局 (竖屏) */}
-      <div className="flex md:landscape:hidden xl:hidden absolute inset-0 z-30 overflow-y-auto w-full h-full">
+      <div className="flex md:hidden absolute inset-0 z-30 overflow-y-auto w-full h-full">
         {/* 移动端装饰物 - 边缘锚点 */}
         <div className="absolute right-0 top-0 z-0 w-[60%] h-auto opacity-50">
           <img src={BANNER_4_ASSETS.decoratorLarge.src} alt="" className="w-full h-auto" />

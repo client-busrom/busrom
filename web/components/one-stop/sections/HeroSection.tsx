@@ -46,7 +46,7 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
 
       if (isDesktopLayout) {
         const rawScale = vw / 1920;
-        const baseScale = Math.max(rawScale, 0.5);
+        const baseScale = rawScale;
         // Multiply by 0.7 scale factor to match the design's desktop layout proportions
         el.style.setProperty("--rpx-hero", (baseScale * 0.7).toString());
         setStrokeWidth(1.2 * baseScale);

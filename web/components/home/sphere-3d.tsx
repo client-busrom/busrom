@@ -751,7 +751,7 @@ export default React.memo(function Sphere3D({
     const updateSize = () => {
       const width = container.offsetWidth;
       const height = container.offsetHeight;
-      setIsMobile(window.innerWidth < 1024);
+      setIsMobile(window.innerWidth < 1025);
 
       setSize((prev) => {
         // 如果宽度没变，高度变化小于 120px（通常是移动端浏览器地址栏隐藏/显示），则忽略，避免 Canvas 重绘导致的严重卡顿
@@ -1001,7 +1001,13 @@ export default React.memo(function Sphere3D({
           "radial-gradient(ellipse at center, #0a1628 0%, #020408 100%)",
       }}
     >
-      <div ref={containerRef} className="absolute inset-0">
+      <div
+        ref={containerRef}
+        className={cn(
+          "absolute inset-0",
+          isMobile && !isInteractive && "pointer-events-none"
+        )}
+      >
         {/* Loading 状态 */}
         {(size.width === 0 || size.height === 0 || !isGlobeReady) && (
           <div className="absolute inset-0 flex items-center justify-center">

@@ -113,7 +113,7 @@ export function ContactFormSection({
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
+      setIsMobile(window.innerWidth < 1025);
     };
     checkMobile();
     window.addEventListener("resize", checkMobile);

@@ -129,7 +129,7 @@ const HeroBanner5: FC<HeroBanner5Props> = ({ data, locale }) => {
       </svg>
 
       {/* 2. 桌面端布局 */}
-      <div className="hidden md:landscape:block xl:block relative z-20 w-full h-full">
+      <div className="hidden md:block relative z-20 w-full h-full">
         {/* 背景装饰物 - 使用 translate(-50%, -50%) 确保中心对齐 */}
         <div
           className="absolute z-1 pointer-events-none"
@@ -346,7 +346,7 @@ const HeroBanner5: FC<HeroBanner5Props> = ({ data, locale }) => {
       </div>
 
       {/* 3. 移动端/平板端布局 */}
-      <div className="flex md:landscape:hidden xl:hidden absolute inset-0 z-30 overflow-y-auto w-full h-full">
+      <div className="flex md:hidden absolute inset-0 z-30 overflow-y-auto w-full h-full">
         {/* 移动端装饰物 - 边缘锚点 */}
         <div className="absolute right-0 top-0 z-0 w-[60%] h-auto opacity-30">
           <img

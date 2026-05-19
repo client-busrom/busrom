@@ -120,7 +120,7 @@ const TitleLine: FC<{ text: string; index: number; isMobile?: boolean }> = ({
         style={{ paddingLeft: rpx(40) }}
       >
         <h1
-          className="font-paytone-one text-[#3C3712] whitespace-nowrap leading-none lg:text-[calc(var(--rpx-hero)*96px)] md:text-[24px]"
+          className="font-paytone-one text-[#3C3712] whitespace-nowrap leading-none md:text-[calc(var(--rpx-hero)*96px)]"
           style={{
             fontSize: rpx(96),
             transform: `rotate(${rotation}deg) translateY(${index === 0 ? rpx(-10) : "0"})`,
@@ -142,7 +142,7 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
     <section className="relative w-full h-full bg-[#99935F]">
       {/* 1. 桌面端 & 平板端 */}
       <div className="hidden md:block relative w-full h-full overflow-hidden">
-        <div className="absolute top-0 right-0 z-0 pointer-events-none opacity-30 lg:opacity-100">
+        <div className="absolute top-0 right-0 z-0 pointer-events-none opacity-30 md:opacity-100">
           <img
             src={BANNER_9_ASSETS.decoratorTop}
             alt=""
@@ -177,7 +177,7 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
           />
         </div>
         <div
-          className="absolute bottom-0 left-0 z-20 md:scale-[0.65] lg:scale-100 origin-bottom-left"
+          className="absolute bottom-0 left-0 z-20 md:scale-100 origin-bottom-left"
           style={{ width: rpx(824), height: rpx(411) }}
         >
           <img
@@ -213,7 +213,7 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
               (f, i) => (
                 <h2
                   key={i}
-                  className="font-montserrat font-bold text-[#FFA836] whitespace-nowrap md:text-[18px] lg:text-[calc(var(--rpx-hero)*30px)]"
+                  className="font-montserrat font-bold text-[#FFA836] whitespace-nowrap md:text-[calc(var(--rpx-hero)*30px)]"
                   style={{
                     fontSize: rpx(30),
                     letterSpacing: "0.03em",
@@ -228,7 +228,7 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
           </div>
         </div>
         <div
-          className="absolute z-30 flex flex-col items-start text-left md:scale-[0.65] lg:scale-100 origin-top-right"
+          className="absolute z-30 flex flex-col items-start text-left md:scale-100 origin-top-right"
           style={{
             right: rpx(35),
             top: rpx(130),
@@ -240,7 +240,7 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
             ))}
           </div>
           <h1
-            className="font-paytone-one text-white whitespace-pre-line leading-tight text-left md:text-[28px] lg:text-[calc(var(--rpx-hero)*60px)]"
+            className="font-paytone-one text-white whitespace-pre-line leading-tight text-left md:text-[calc(var(--rpx-hero)*60px)]"
             style={{
               fontSize: rpx(60),
               width: rpx(697),

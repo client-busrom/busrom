@@ -36,7 +36,7 @@ export function FraudFormWrapper({ contactForm, locale, fraudConverters }: Fraud
   const countrySelectorRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    const checkMobile = () => setIsMobile(window.innerWidth < 1025);
     checkMobile();
     window.addEventListener("resize", checkMobile);
 
