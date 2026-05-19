@@ -87,12 +87,13 @@ const TitleLine: FC<{ text: string; index: number; isMobile?: boolean }> = ({
           alt=""
           className="absolute inset-0 w-full h-full object-contain pointer-events-none"
         />
-        <div className="absolute inset-0 flex items-center justify-start px-8">
+        <div className="absolute inset-0 flex items-center justify-center px-4">
           <h1
-            className="font-paytone-one text-[#3C3712] text-[22px] leading-none text-left"
+            className="font-paytone-one text-[#3C3712] text-[28px] leading-none text-center"
             style={{
-              transform: `rotate(${rotation}deg)`,
-              WebkitTextStroke: "0.5px #FFFFFF",
+              transform: `rotate(${rotation}deg) translateY(-2px)`,
+              WebkitTextStroke: "1px #FFFFFF",
+              paintOrder: "stroke fill",
             }}
           >
             {text}
@@ -291,13 +292,13 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
         </div>
 
         {/* Layer 2: 叠放标题块 - 大幅拉开间距 */}
-        <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-full flex flex-col items-center z-30 scale-[0.85]">
+        <div className="absolute bottom-[23%] left-1/2 -translate-x-1/2 w-full flex flex-col items-center z-30 scale-[0.95]">
           {feature0Lines.map((line, idx) => (
             <TitleLine key={idx} text={line} index={idx} isMobile />
           ))}
           {/* 副标题与装饰块 */}
           <p
-            className="font-paytone-one text-white text-[19px] text-center whitespace-pre-line leading-tight"
+            className="font-paytone-one text-white text-[19px] text-center whitespace-pre-line leading-tight mt-3"
             style={{ WebkitTextStroke: "1px #6B4E00", letterSpacing: "0.03em" }}
           >
             {formatText(data.features[1])}
