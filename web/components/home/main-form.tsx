@@ -616,7 +616,7 @@ export default function MainForm({
                   </HollowText>
                 </div>
                 {/* 原本的文字 */}
-                <p className="text-white text-center text-base lg:text-xl text-stroke-black font-anaheim font-bold relative z-10">
+                <p className="text-white text-center text-base lg:text-xl text-stroke-black font-anaheim font-bold relative z-10 leading-tight">
                   {data.designTextLeft}
                 </p>
               </div>
@@ -988,7 +988,7 @@ export default function MainForm({
                   </HollowText>
                 </div>
                 {/* 原本的文字 */}
-                <p className="text-white text-center text-base lg:text-xl text-stroke-black font-anaheim font-bold relative z-10">
+                <p className="text-white text-center text-base lg:text-xl text-stroke-black font-anaheim font-bold relative z-10 leading-tight">
                   {data.designTextRight}
                 </p>
               </div>
