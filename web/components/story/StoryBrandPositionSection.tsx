@@ -636,7 +636,7 @@ export function StoryBrandPositionSection({
 
         <motion.div
           initial={{ opacity: 0, x: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
           className="absolute z-30 font-josefin-sans text-left whitespace-pre-line"
