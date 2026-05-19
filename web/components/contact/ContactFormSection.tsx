@@ -783,6 +783,7 @@ export function ContactFormSection({
                         <span className="text-white font-anaheim font-semibold text-base">
                           +{selectedCountry[2]}
                         </span>
+                        <ChevronDown className="w-4 h-4 text-white/70 ml-1 flex-shrink-0" />
                       </button>
 
                       <input
@@ -996,6 +997,7 @@ export function ContactFormSection({
                     <span className="text-white font-anaheim font-semibold text-base">
                       +{selectedCountry[2]}
                     </span>
+                    <ChevronDown className="w-4 h-4 text-white/70 ml-1 flex-shrink-0" />
                   </button>
 
                   <input
