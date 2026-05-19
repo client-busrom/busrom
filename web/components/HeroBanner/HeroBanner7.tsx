@@ -186,7 +186,7 @@ const HeroBanner7: FC<BannerProps> = ({ data }) => {
           <div className="relative z-40 flex flex-col items-center gap-2 w-full shrink-0">
             {featuresList.map((feature, idx) => (
               <div key={idx} className="bg-[#E9E2A0] px-6 py-2 rounded-full text-black shadow-md border border-[#433E12]/20 flex items-center justify-center">
-                <span className="font-montserrat font-bold text-xs tracking-wider block text-center min-w-[120px] uppercase">
+                <span className="font-montserrat font-bold text-xs tracking-wider block text-center min-w-[120px]">
                   {feature}
                 </span>
               </div>

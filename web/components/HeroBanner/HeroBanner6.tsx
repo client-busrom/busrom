@@ -183,7 +183,7 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
                 key={idx}
                 className="bg-[#756F3F] px-5 py-2 rounded-full text-[#FFF5AD] shadow-md border border-[#FFF5AD]/10 flex items-center justify-center"
               >
-                <span className="font-montserrat font-bold text-[10px] sm:text-xs tracking-wider block text-left uppercase">
+                <span className="font-montserrat font-bold text-[10px] sm:text-xs tracking-wider block text-left">
                   {feature}
                 </span>
               </div>
