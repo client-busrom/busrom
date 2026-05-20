@@ -262,11 +262,11 @@ export function ProductFeaturesSection({
       // Bulge is max (~60px) at the center, tapering to 0 at the edges
       const bulge = Math.max(0, 60 - (offsetFromCenter * offsetFromCenter) / 600)
       
-      // Shift inwards at the bottom to follow the tapering image mask (closer to center)
+      // Shift outwards at the bottom (left side moves left/outwards, right side moves right/outwards)
       const bottomShift = dotY > 510 ? ((dotY - 510) / (endY - 510)) * 45 : 0
       const dotX = side === "left" 
-        ? 430 - bulge + bottomShift 
-        : 1450 + bulge - bottomShift
+        ? 430 - bulge - bottomShift 
+        : 1450 + bulge + bottomShift
       
       positions.push({ dotX, dotY })
     }
