@@ -232,7 +232,13 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             </button>
 
             {/* Thumbnails */}
-            <div className="overflow-hidden" ref={emblaThumbnailRef}>
+            <div 
+              className="overflow-hidden" 
+              ref={emblaThumbnailRef}
+              style={{
+                width: `${Math.min(images.length, 5) * 50 + (Math.min(images.length, 5) - 1) * 8 + 8}px`
+              }}
+            >
               <div className="flex gap-2 p-1">
                 {images.map((image, index) => (
                   <button
