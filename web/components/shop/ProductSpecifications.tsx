@@ -82,8 +82,24 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
               const items = spec.items || spec.options || []
               const hasVisualsInGroup = items.some((i: any) => !!i.image || (i.color && i.color.trim() !== ''))
               
+              // Calculate column class based on max text length for text-only groups
+              let gridClass = "grid grid-cols-3 gap-2.5"
+              if (!hasVisualsInGroup) {
+                const maxTextLength = items.reduce((max: number, item: any) => {
+                  const itemText = item.text || item.value?.[locale] || item.value?.en || ""
+                  return Math.max(max, itemText.length)
+                }, 0)
+                if (maxTextLength > 16) {
+                  gridClass = "grid grid-cols-1 gap-2.5"
+                } else if (maxTextLength > 8) {
+                  gridClass = "grid grid-cols-2 gap-2.5"
+                }
+              } else {
+                gridClass = "grid grid-cols-2 gap-4"
+              }
+              
               return (
-                <div className={hasVisualsInGroup ? "grid grid-cols-2 gap-4" : "grid grid-cols-3 gap-2.5"}>
+                <div className={gridClass}>
                   {items.map((item: any, itemIdx: number) => {
                     const hasColor = !!(item.color && item.color.trim() !== '')
                     const hasImage = !!item.image
@@ -91,12 +107,12 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
                     const isSelected = selectedOptions[idx] === itemIdx
 
                     if (hasVisualsInGroup) {
-                      // Visual Card Style (Fluid width, fixed height)
+                      // Visual Card Style (Fluid width, dynamic auto height)
                       return (
                         <div
                           key={itemIdx}
                           onClick={() => handleSelect(idx, itemIdx)}
-                          className={`relative w-full h-[122px] p-4 rounded-xl border-2 transition-all cursor-pointer group flex flex-col items-center justify-center text-center gap-2 ${
+                          className={`relative w-full min-h-[122px] p-4 rounded-xl border-2 transition-all cursor-pointer group flex flex-col items-center justify-center text-center gap-2 ${
                             isSelected 
                               ? "bg-white border-brand-accent-gold shadow-sm" 
                               : "bg-white border-brand-accent-border/30 hover:border-brand-accent-gold/50"
@@ -117,12 +133,13 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
                                   width={82}
                                   height={62}
                                   objectFit="contain"
+                                  className="w-full h-full object-contain"
                                   size="small"
                                 />
                               )}
                             </div>
                           )}
-                          <span className={`text-xs font-bold leading-tight transition-colors line-clamp-2 ${
+                          <span className={`text-xs font-bold leading-tight transition-colors whitespace-normal break-words ${
                             isSelected ? 'text-brand-accent-gold' : 'text-brand-text-main/80 group-hover:text-brand-text-main'
                           }`}>
                             {itemText}
@@ -138,25 +155,25 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
                       )
                     }
 
-                    // Text-Only Tag Style (Fluid width, fixed height)
+                    // Text-Only Tag Style (Fluid width, dynamic auto height)
                     return (
                       <div
                         key={itemIdx}
                         onClick={() => handleSelect(idx, itemIdx)}
-                        className={`relative w-full h-[52px] px-4 py-2 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center text-center ${
+                        className={`relative w-full min-h-[52px] px-4 py-2.5 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center text-center ${
                           isSelected 
                             ? "bg-white border-brand-accent-gold shadow-sm" 
                             : "bg-white border-brand-accent-border/30 hover:border-brand-accent-gold/50"
                         }`}
                       >
-                        <span className={`text-xs font-bold transition-colors line-clamp-1 ${
+                        <span className={`text-xs font-bold transition-colors whitespace-normal break-words leading-tight ${
                           isSelected ? 'text-brand-accent-gold' : 'text-brand-text-main/80 group-hover:text-brand-text-main'
                         }`}>
                           {itemText}
                         </span>
                         {isSelected && (
                           <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-brand-accent-gold rounded-full flex items-center justify-center">
-                            <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
+                            <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
                           </div>
