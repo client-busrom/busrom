@@ -411,32 +411,35 @@ export function StoryContactFormSection({
       style={
         effectiveIsMobile
           ? {
-              background:
-                "linear-gradient(to bottom, #756f3f 0%, #dbd076 180%)",
-              paddingTop: mvw(40),
-              paddingBottom: mvw(80),
-            }
+            background:
+              "linear-gradient(to bottom, #756f3f 0%, #dbd076 180%)",
+            paddingTop: mvw(40),
+            paddingBottom: mvw(80),
+          }
           : {
-              background:
-                "linear-gradient(to bottom, #756f3f 0%, #dbd076 180%)",
-              height: vw(1180),
-            }
+            background:
+              "linear-gradient(to bottom, #756f3f 0%, #dbd076 180%)",
+            paddingTop: vw(120),
+            paddingBottom: vw(120),
+          }
       }
     >
       <div
         className={cn(
           "relative z-10 w-full mx-auto",
-          effectiveIsMobile ? "flex flex-col" : "h-full",
+          effectiveIsMobile ? "flex flex-col" : "flex flex-row items-center",
         )}
+        style={!effectiveIsMobile ? { paddingLeft: vw(153), paddingRight: vw(153), gap: vw(80) } : {}}
       >
         {/* Hero Section: Layered Title and Image for Mobile */}
         <div
           className={cn(
-            "relative w-full",
+            "relative",
             effectiveIsMobile
-              ? "flex flex-col items-center justify-center min-h-[80vw] mb-4"
-              : "contents",
+              ? "w-full flex flex-col items-center justify-center min-h-[80vw] mb-4"
+              : "flex-shrink-0",
           )}
+          style={!effectiveIsMobile ? { width: vw(1100), height: vw(643) } : {}}
         >
           {/* 1. Image Gallery (The Layer Below) */}
           <div
@@ -447,11 +450,11 @@ export function StoryContactFormSection({
             style={
               !effectiveIsMobile
                 ? {
-                    left: vw(521),
-                    top: vw(167),
-                    width: vw(751),
-                    height: vw(643),
-                  }
+                  left: vw(521 - 153),
+                  top: 0,
+                  width: vw(751),
+                  height: vw(643),
+                }
                 : { width: "100%", height: "100%" }
             }
           >
@@ -488,15 +491,15 @@ export function StoryContactFormSection({
                     style={
                       effectiveIsMobile
                         ? {
-                            width: mvw(50),
-                            height: mvw(50),
-                          }
+                          width: mvw(50),
+                          height: mvw(50),
+                        }
                         : {
-                            left: vw(-190),
-                            top: vw(50),
-                            width: vw(76.56),
-                            height: vw(76.56),
-                          }
+                          left: vw(-190),
+                          top: vw(50),
+                          width: vw(76.56),
+                          height: vw(76.56),
+                        }
                     }
                     aria-label="Previous Image"
                   >
@@ -524,15 +527,15 @@ export function StoryContactFormSection({
                     style={
                       effectiveIsMobile
                         ? {
-                            width: mvw(50),
-                            height: mvw(50),
-                          }
+                          width: mvw(50),
+                          height: mvw(50),
+                        }
                         : {
-                            left: vw(716),
-                            top: vw(672),
-                            width: vw(76.56),
-                            height: vw(76.56),
-                          }
+                          left: vw(716),
+                          top: vw(672),
+                          width: vw(76.56),
+                          height: vw(76.56),
+                        }
                     }
                     aria-label="Next Image"
                   >
@@ -581,6 +584,7 @@ export function StoryContactFormSection({
                         alt={
                           validImages[currentImageIndex].alt || "Gallery Image"
                         }
+                        size="medium"
                         containerClassName="w-full h-full"
                         className="w-full h-full object-cover"
                       />
@@ -600,14 +604,14 @@ export function StoryContactFormSection({
             )}
             style={
               !effectiveIsMobile
-                ? { left: vw(153), top: vw(315), zIndex: 10, width: "100%" }
+                ? { left: 0, top: vw(148), zIndex: 10, width: "100%" }
                 : { maxWidth: "640px", width: "100%" }
             }
           >
             {subtitle && (
               <div
                 className={cn(effectiveIsMobile ? "mb-2" : "absolute")}
-                style={!effectiveIsMobile ? { left: vw(259), top: vw(-120) } : {}}
+                style={!effectiveIsMobile ? { left: vw(259 - 153), top: vw(-120) } : {}}
               >
                 <h3
                   className="font-josefin-sans font-medium text-white"
@@ -662,8 +666,8 @@ export function StoryContactFormSection({
           <p
             className="absolute font-josefin-sans font-medium"
             style={{
-              left: vw(155),
-              top: vw(612),
+              left: 0,
+              top: vw(445),
               width: vw(444),
               fontSize: vw(20),
               lineHeight: 1.35,
@@ -677,10 +681,10 @@ export function StoryContactFormSection({
 
         {/* 3. Right Form Area */}
         <div
-          className={cn(effectiveIsMobile ? "w-full max-w-[640px] mx-auto" : "absolute")}
+          className={cn(effectiveIsMobile ? "w-full max-w-[640px] mx-auto" : "flex-1 min-w-0")}
           style={
             !effectiveIsMobile
-              ? { left: vw(1359), top: vw(206), width: vw(366), zIndex: 20 }
+              ? { width: vw(366), zIndex: 20 }
               : {}
           }
         >
@@ -700,17 +704,17 @@ export function StoryContactFormSection({
                     field.fieldName === "message";
                   if (isTextarea) {
                     return (
-                        <textarea
-                          key={field.fieldName}
-                          ref={textareaRef}
-                          data-lenis-prevent
-                          placeholder={`${field.placeholder?.trim() || field.label}${field.required ? " *" : ""}`}
-                          value={formData[field.fieldName] || ""}
-                          onChange={(e) =>
-                            handleInputChange(field.fieldName, e.target.value)
-                          }
-                          spellCheck="false"
-                          className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-none outline-none transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+                      <textarea
+                        key={field.fieldName}
+                        ref={textareaRef}
+                        data-lenis-prevent
+                        placeholder={`${field.placeholder?.trim() || field.label}${field.required ? " *" : ""}`}
+                        value={formData[field.fieldName] || ""}
+                        onChange={(e) =>
+                          handleInputChange(field.fieldName, e.target.value)
+                        }
+                        spellCheck="false"
+                        className="font-anaheim font-semibold text-white placeholder:text-white/50 resize-none outline-none transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
                         style={{
                           width: "100%",
                           minHeight: effectiveIsMobile ? mvw(120) : vw(103),
