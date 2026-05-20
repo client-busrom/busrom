@@ -74,34 +74,32 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
                 </span>
               )}
             </div>
-            
+
             <div className="mt-0"> {/* Empty placeholder to maintain spacing logic if needed */}
             </div>
-            
+
             {(() => {
               const items = spec.items || spec.options || []
               const hasVisualsInGroup = items.some((i: any) => !!i.image || (i.color && i.color.trim() !== ''))
-              
+
               // Calculate column class based on max text length for text-only groups
-              let isFlexLayout = false
-              let layoutClass = "grid grid-cols-3 gap-2.5"
-              
+              let gridClass = "grid grid-cols-3 gap-2.5"
               if (!hasVisualsInGroup) {
                 const maxTextLength = items.reduce((max: number, item: any) => {
                   const itemText = item.text || item.value?.[locale] || item.value?.en || ""
                   return Math.max(max, itemText.length)
                 }, 0)
-                
-                if (maxTextLength > 8) {
-                  layoutClass = "flex flex-wrap gap-2.5"
-                  isFlexLayout = true
+                if (maxTextLength > 16) {
+                  gridClass = "grid grid-cols-1 gap-2.5"
+                } else if (maxTextLength > 8) {
+                  gridClass = "grid grid-cols-2 gap-2.5"
                 }
               } else {
-                layoutClass = "grid grid-cols-2 gap-4"
+                gridClass = "grid grid-cols-2 gap-4"
               }
-              
+
               return (
-                <div className={layoutClass}>
+                <div className={gridClass}>
                   {items.map((item: any, itemIdx: number) => {
                     const hasColor = !!(item.color && item.color.trim() !== '')
                     const hasImage = !!item.image
@@ -114,18 +112,16 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
                         <div
                           key={itemIdx}
                           onClick={() => handleSelect(idx, itemIdx)}
-                          className={`relative w-full min-h-[122px] p-4 rounded-xl border-2 transition-all cursor-pointer group flex flex-col items-center justify-center text-center gap-2 ${
-                            isSelected 
-                              ? "bg-white border-brand-accent-gold shadow-sm" 
+                          className={`relative w-full min-h-[122px] p-4 rounded-xl border-2 transition-all cursor-pointer group flex flex-col items-center justify-center text-center gap-2 ${isSelected
+                              ? "bg-white border-brand-accent-gold shadow-sm"
                               : "bg-white border-brand-accent-border/30 hover:border-brand-accent-gold/50"
-                          }`}
+                            }`}
                         >
                           {(hasColor || hasImage) && (
-                            <div className={`relative flex items-center justify-center shrink-0 ${
-                              hasColor 
-                                ? 'w-10 h-10 rounded-full overflow-hidden border shadow-sm' 
+                            <div className={`relative flex items-center justify-center shrink-0 ${hasColor
+                                ? 'w-10 h-10 rounded-full overflow-hidden border shadow-sm'
                                 : 'w-[82px] h-[62px]'
-                            }`}>
+                              }`}>
                               {hasColor ? (
                                 <div className="w-full h-full" style={{ backgroundColor: item.color }} />
                               ) : (
@@ -141,9 +137,8 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
                               )}
                             </div>
                           )}
-                          <span className={`text-xs font-bold leading-tight transition-colors whitespace-normal break-words ${
-                            isSelected ? 'text-brand-accent-gold' : 'text-brand-text-main/80 group-hover:text-brand-text-main'
-                          }`}>
+                          <span className={`text-xs font-bold leading-tight transition-colors whitespace-normal break-words ${isSelected ? 'text-brand-accent-gold' : 'text-brand-text-main/80 group-hover:text-brand-text-main'
+                            }`}>
                             {itemText}
                           </span>
                           {isSelected && (
@@ -157,20 +152,18 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
                       )
                     }
 
-                    // Text-Only Tag Style (Fluid width/fit-content, dynamic auto height)
+                    // Text-Only Tag Style (Fluid width, dynamic auto height)
                     return (
                       <div
                         key={itemIdx}
                         onClick={() => handleSelect(idx, itemIdx)}
-                        className={`relative min-h-[52px] px-4 py-2.5 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center text-center ${
-                          isSelected 
-                            ? "bg-white border-brand-accent-gold shadow-sm" 
+                        className={`relative w-full min-h-[52px] px-4 py-2.5 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center text-center ${isSelected
+                            ? "bg-white border-brand-accent-gold shadow-sm"
                             : "bg-white border-brand-accent-border/30 hover:border-brand-accent-gold/50"
-                        } ${isFlexLayout ? 'w-fit max-w-full min-w-[80px]' : 'w-full'}`}
+                          }`}
                       >
-                        <span className={`text-xs font-bold transition-colors whitespace-normal break-words leading-tight ${
-                          isSelected ? 'text-brand-accent-gold' : 'text-brand-text-main/80 group-hover:text-brand-text-main'
-                        }`}>
+                        <span className={`text-xs font-bold transition-colors whitespace-normal break-words leading-tight ${isSelected ? 'text-brand-accent-gold' : 'text-brand-text-main/80 group-hover:text-brand-text-main'
+                          }`}>
                           {itemText}
                         </span>
                         {isSelected && (
