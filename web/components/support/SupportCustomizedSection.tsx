@@ -105,21 +105,21 @@ function CollapsedTitleCard({ title, vw }: { title: string, vw: (px: number) => 
 
     const viewportWidth = Math.min(window.innerWidth, 1920)
     const currentVwWidth = (maxLineWidth / viewportWidth) * 1920
-    
+
     const clampedWidth = Math.max(154, Math.min(200, currentVwWidth))
     setMeasuredWidth(clampedWidth)
   }, [title])
 
   return (
-    <div 
-      ref={containerRef} 
-      className="text-[#f8f6e5] font-montserrat font-bold whitespace-pre-wrap text-left" 
-      style={{ 
-        width: measuredWidth ? vw(measuredWidth) : vw(200), 
+    <div
+      ref={containerRef}
+      className="text-[#f8f6e5] font-montserrat font-bold whitespace-pre-wrap text-left"
+      style={{
+        width: measuredWidth ? vw(measuredWidth) : vw(200),
         minWidth: vw(154),
         maxWidth: vw(200),
-        wordBreak: "break-word", 
-        WebkitTextStroke: "1px #000000", 
+        wordBreak: "break-word",
+        WebkitTextStroke: "1px #000000",
         paintOrder: "stroke fill",
       }}
     >
@@ -140,7 +140,7 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
   const [activeIndex, setActiveIndex] = useState(0)
   const [hoverToggle, setHoverToggle] = useState(false)
   const [isDesktop, setIsDesktop] = useState(true)
-  
+
   const vw = (px: number) => `calc(${px} * min(100vw, 1920px) / 1920)`
 
   useEffect(() => {
@@ -155,6 +155,27 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
     setActiveIndex(0)
   }
 
+  const renderPreloadImages = () => (
+    <div className="hidden" aria-hidden="true" style={{ display: "none" }}>
+      {product.items.map((item) => (
+        item.image && (
+          <React.Fragment key={`preload-p-${item.id}`}>
+            <OptimizedImage image={item.image.url} size="medium" priority />
+            <OptimizedImage image={item.image.url} size="small" priority />
+          </React.Fragment>
+        )
+      ))}
+      {manufacturing.items.map((item) => (
+        item.image && (
+          <React.Fragment key={`preload-m-${item.id}`}>
+            <OptimizedImage image={item.image.url} size="medium" priority />
+            <OptimizedImage image={item.image.url} size="small" priority />
+          </React.Fragment>
+        )
+      ))}
+    </div>
+  )
+
   const renderFormattedText = (text: string) => {
     return text.split("\n").map((line, i) => (
       <Fragment key={i}>
@@ -167,16 +188,16 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
   const CustomToggleIcon = ({ direction = "right", isHovered = false }: { direction?: "left" | "right", isHovered?: boolean }) => {
     const mainColor = "#756f3f"
     return (
-      <svg 
-        width="60" height="60" viewBox="0 0 60 60" fill="none" 
+      <svg
+        width="60" height="60" viewBox="0 0 60 60" fill="none"
         className="transition-transform duration-500"
         style={{ transform: direction === "left" ? "rotate(180deg)" : "rotate(0deg)" }}
         xmlns="http://www.w3.org/2000/svg"
       >
         <circle cx="30" cy="30" r="28" fill={isHovered ? mainColor : "transparent"} stroke={mainColor} strokeWidth="1.5" className="transition-all duration-300" />
-        <path 
-          d="M23.2549 20.7188l9.7406 9.6975-9.7406 9.6975 1.6602 1.6934 11.5852-11.4523-11.5859-11.4529-1.6595 1.6934z" 
-          fill={isHovered ? "#ffffff" : mainColor} 
+        <path
+          d="M23.2549 20.7188l9.7406 9.6975-9.7406 9.6975 1.6602 1.6934 11.5852-11.4523-11.5859-11.4529-1.6595 1.6934z"
+          fill={isHovered ? "#ffffff" : mainColor}
           className="transition-colors duration-300"
         />
       </svg>
@@ -185,14 +206,14 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
 
   const InactiveSubtractSVG = () => (
     <svg width="100%" height="100%" viewBox="0 0 298 386" fill="none" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M59 178c0 7.1797 5.8203 13 13 13 7.1797 0 13-5.8203 13-13l0-148c0-16.56854 13.43146-30 30-30l153 0c16.56854 0 30 13.43146 30 30l0 326c0 16.56854-13.43146 30-30 30l-153 0c-16.56854 0-30-13.43146-30-30l0-138c0-7.1797-5.8203-13-13-13-7.1797 0-13 5.8203-13 13l0 138.5c0 16.29239-13.2076 29.5-29.5 29.5-16.2924 0-29.5-13.20761-29.5-29.5l0-326.99999c0-16.2924 13.2076-29.50001 29.5-29.50001 16.2924 0 29.5 13.2076 29.5 29.5l0 148.5z" fill="#EBE5B4"/>
+      <path d="M59 178c0 7.1797 5.8203 13 13 13 7.1797 0 13-5.8203 13-13l0-148c0-16.56854 13.43146-30 30-30l153 0c16.56854 0 30 13.43146 30 30l0 326c0 16.56854-13.43146 30-30 30l-153 0c-16.56854 0-30-13.43146-30-30l0-138c0-7.1797-5.8203-13-13-13-7.1797 0-13 5.8203-13 13l0 138.5c0 16.29239-13.2076 29.5-29.5 29.5-16.2924 0-29.5-13.20761-29.5-29.5l0-326.99999c0-16.2924 13.2076-29.50001 29.5-29.50001 16.2924 0 29.5 13.2076 29.5 29.5l0 148.5z" fill="#EBE5B4" />
     </svg>
   )
 
   const ActiveSubtractSVG = () => (
     <svg width="100%" height="100%" viewBox="0 0 608 386" fill="none" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
       <defs><linearGradient id="activeGradient" x1="304" y1="0" x2="304" y2="386" gradientUnits="userSpaceOnUse"><stop offset="0%" stopColor="#F1ECC8" /><stop offset="100%" stopColor="#F9DC7A" /></linearGradient></defs>
-      <path d="M59 252c0 7.17972 5.8203 13 13 13 7.1797 0 13-5.82031 13-13l0-222.00001c0-16.56854 13.43146-29.99999 30-29.99999l463 0c16.56854 0 30 13.43146 30 30l0 326c0 16.56854-13.43146 30-30 30l-463.00001 0c-16.56854 0-29.99999-13.43146-29.99999-30l0-60c0-7.17969-5.8203-13-13-13-7.1797 0-13 5.82031-13 13l0 60.5c0 16.29239-13.2076 29.5-29.5 29.5-16.2924 0-29.5-13.20761-29.5-29.5l0-326.99999c0-16.2924 13.2076-29.50001 29.5-29.50001 16.2924 0 29.5 13.2076 29.5 29.5l0 222.5z" fill="url(#activeGradient)"/>
+      <path d="M59 252c0 7.17972 5.8203 13 13 13 7.1797 0 13-5.82031 13-13l0-222.00001c0-16.56854 13.43146-29.99999 30-29.99999l463 0c16.56854 0 30 13.43146 30 30l0 326c0 16.56854-13.43146 30-30 30l-463.00001 0c-16.56854 0-29.99999-13.43146-29.99999-30l0-60c0-7.17969-5.8203-13-13-13-7.1797 0-13 5.82031-13 13l0 60.5c0 16.29239-13.2076 29.5-29.5 29.5-16.2924 0-29.5-13.20761-29.5-29.5l0-326.99999c0-16.2924 13.2076-29.50001 29.5-29.50001 16.2924 0 29.5 13.2076 29.5 29.5l0 222.5z" fill="url(#activeGradient)" />
     </svg>
   )
 
@@ -221,15 +242,15 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
               {Array.isArray(title) ? renderNodes(title, vw, "title", false) : title}
             </h2>
             <div className="flex gap-4 w-full justify-center">
-              <button 
-                  onClick={() => { setActiveGroup("product"); setActiveIndex(0); }}
-                  className={`flex-1 max-w-[160px] py-4 rounded-full font-montserrat font-bold text-xs transition-all ${activeGroup === "product" ? "bg-[#262203] text-white shadow-lg" : "bg-white text-[#262203] border border-[#262203]"}`}
+              <button
+                onClick={() => { setActiveGroup("product"); setActiveIndex(0); }}
+                className={`flex-1 max-w-[160px] py-4 rounded-full font-montserrat font-bold text-xs transition-all ${activeGroup === "product" ? "bg-[#262203] text-white shadow-lg" : "bg-white text-[#262203] border border-[#262203]"}`}
               >
                 {product.title}
               </button>
-              <button 
-                  onClick={() => { setActiveGroup("manufacturing"); setActiveIndex(0); }}
-                  className={`flex-1 max-w-[160px] py-4 rounded-full font-montserrat font-bold text-xs transition-all ${activeGroup === "manufacturing" ? "bg-[#262203] text-white shadow-lg" : "bg-white text-[#262203] border border-[#262203]"}`}
+              <button
+                onClick={() => { setActiveGroup("manufacturing"); setActiveIndex(0); }}
+                className={`flex-1 max-w-[160px] py-4 rounded-full font-montserrat font-bold text-xs transition-all ${activeGroup === "manufacturing" ? "bg-[#262203] text-white shadow-lg" : "bg-white text-[#262203] border border-[#262203]"}`}
               >
                 {manufacturing.title}
               </button>
@@ -239,7 +260,7 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
           {/* Vertical Card List */}
           <div className="flex flex-col gap-10">
             {items.map((item) => (
-              <motion.div 
+              <motion.div
                 key={item.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -250,10 +271,10 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
                   {/* Image */}
                   <div className="w-full h-[220px] flex-shrink-0 overflow-hidden rounded-2xl relative shadow-inner">
                     {item.image && (
-                      <OptimizedImage 
-                        image={item.image.url} 
-                        alt={item.image.alt || ""} 
-                        className="object-cover w-full h-full" 
+                      <OptimizedImage
+                        image={item.image.url}
+                        alt={item.image.alt || ""}
+                        className="object-cover w-full h-full"
                         size="small"
                       />
                     )}
@@ -276,6 +297,7 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
             ))}
           </div>
         </div>
+        {renderPreloadImages()}
       </section>
     )
   }
@@ -295,31 +317,31 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
       <div className="relative mt-[8vw] z-10 w-full overflow-hidden">
         {/* Full-width dynamic mirrored bar */}
         <div className="w-full relative flex" style={{ paddingLeft: vw(131), paddingRight: vw(131), marginBottom: vw(84) }}>
-          <motion.div 
+          <motion.div
             layout
             className={`flex items-center w-full ${activeGroup === "manufacturing" ? "flex-row-reverse justify-start" : "flex-row justify-start"}`}
           >
-            <motion.h3 
-                key={activeGroup}
-                className={`font-josefin-sans font-bold text-[#524d20] ${activeGroup === "manufacturing" ? "text-right" : "text-left"}`}
-                style={{ fontSize: vw(60), lineHeight: 1.1, paddingTop: vw(10), width: "fit-content", maxWidth: vw(900) }}
+            <motion.h3
+              key={activeGroup}
+              className={`font-josefin-sans font-bold text-[#524d20] ${activeGroup === "manufacturing" ? "text-right" : "text-left"}`}
+              style={{ fontSize: vw(60), lineHeight: 1.1, paddingTop: vw(10), width: "fit-content", maxWidth: vw(900) }}
             >
-                {renderFormattedText(activeData.title)}
+              {renderFormattedText(activeData.title)}
             </motion.h3>
-            
-            <button 
-                onClick={handleToggleGroup} 
-                onMouseEnter={() => setHoverToggle(true)}
-                onMouseLeave={() => setHoverToggle(false)}
-                className={`${activeGroup === "manufacturing" ? "mr-[1.8vw]" : "ml-[1.8vw]"} cursor-pointer transition-transform hover:scale-125 active:scale-95 flex-shrink-0`}
-                style={{ width: vw(60), height: vw(60) }}
+
+            <button
+              onClick={handleToggleGroup}
+              onMouseEnter={() => setHoverToggle(true)}
+              onMouseLeave={() => setHoverToggle(false)}
+              className={`${activeGroup === "manufacturing" ? "mr-[1.8vw]" : "ml-[1.8vw]"} cursor-pointer transition-transform hover:scale-125 active:scale-95 flex-shrink-0`}
+              style={{ width: vw(60), height: vw(60) }}
             >
-                <CustomToggleIcon direction={activeGroup === "product" ? "right" : "left"} isHovered={hoverToggle} />
+              <CustomToggleIcon direction={activeGroup === "product" ? "right" : "left"} isHovered={hoverToggle} />
             </button>
           </motion.div>
         </div>
 
-        <div 
+        <div
           ref={containerRef}
           className="flex transition-transform duration-500 ease-out pb-[5vw]"
           style={{ paddingLeft: vw(150), gap: vw(32), transform: `translateX(-${scrollTranslateX}vw)` }}
@@ -328,21 +350,21 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
             const isActive = idx === activeIndex
 
             return (
-              <motion.div 
-                key={item.id} 
-                onClick={() => setActiveIndex(idx)} 
-                layout 
+              <motion.div
+                key={item.id}
+                onClick={() => setActiveIndex(idx)}
+                layout
                 animate={{ y: isActive ? -30 : 0 }}
-                className="relative flex-shrink-0 cursor-pointer" 
+                className="relative flex-shrink-0 cursor-pointer"
                 style={{ width: isActive ? vw(723) : vw(420), height: vw(428) }}
               >
                 <motion.div layout className="z-[10] absolute left-0 top-0 overflow-hidden" style={{ width: vw(176), height: vw(426), borderRadius: vw(30) }}>
                   {item.image && (
-                    <OptimizedImage 
-                      image={item.image.url} 
-                      alt={item.image.alt || ""} 
-                      className={`object-cover w-full h-full transition-all duration-700 ${isActive ? "" : "grayscale"}`} 
-                      size="large"
+                    <OptimizedImage
+                      image={item.image.url}
+                      alt={item.image.alt || ""}
+                      className={`object-cover w-full h-full transition-all duration-700 ${isActive ? "" : "grayscale"}`}
+                      size="medium"
                     />
                   )}
                   {!item.image && <div className="w-full h-full bg-[#d9d9d9]" />}
@@ -351,18 +373,18 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
                   {isActive ? <ActiveSubtractSVG /> : <InactiveSubtractSVG />}
                 </motion.div>
                 <div className="absolute z-10 w-full h-full pointer-events-none">
-                  <motion.h4 
-                    layout="position" 
-                    className="absolute font-montserrat font-bold overflow-hidden whitespace-pre-wrap flex" 
-                    style={{ 
-                      fontSize: isActive ? vw(29) : vw(24), 
-                      color: isActive ? "#000000" : "transparent", 
-                      left: isActive ? vw(243) : vw(204), 
-                      top: isActive ? vw(81) : (item.title.length > 15 ? vw(100) : vw(121)), 
-                      width: isActive ? vw(400) : vw(221), 
+                  <motion.h4
+                    layout="position"
+                    className="absolute font-montserrat font-bold overflow-hidden whitespace-pre-wrap flex"
+                    style={{
+                      fontSize: isActive ? vw(29) : vw(24),
+                      color: isActive ? "#000000" : "transparent",
+                      left: isActive ? vw(243) : vw(204),
+                      top: isActive ? vw(81) : (item.title.length > 15 ? vw(100) : vw(121)),
+                      width: isActive ? vw(400) : vw(221),
                       justifyContent: isActive ? "flex-start" : "center",
                       textAlign: "left",
-                      lineHeight: isActive ? 1.28 : vw(46) 
+                      lineHeight: isActive ? 1.28 : vw(46)
                     }}
                   >
                     {!isActive ? (
@@ -378,6 +400,7 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
           })}
         </div>
       </div>
+      {renderPreloadImages()}
     </section>
   )
 }

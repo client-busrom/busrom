@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { FooterApiData } from "./types";
+import SocialIcon from "./SocialIcon";
+import { cn } from "@/lib/utils";
 
 interface Props {
   footerData: FooterApiData | null;
@@ -79,6 +81,61 @@ export default function FooterContact({ footerData, content }: Props) {
           </li>
         )}
       </ul>
+
+      {/* 社交媒体链接 */}
+      {footerData?.socialLinks && footerData.socialLinks.length > 0 && (
+        <div className="flex items-center gap-3 mt-6 mb-2">
+          {footerData.socialLinks.map((social: any, index: number) => {
+            const brandStyles: Record<string, string> = {
+              facebook: "bg-[#3B5998] text-white",
+              instagram: "bg-[#E4405F] text-white",
+              twitter: "bg-black text-white",
+              linkedin: "bg-[#0077B5] text-white",
+              youtube: "bg-[#FF0000] text-white",
+              tiktok: "bg-black text-white",
+              pinterest: "bg-[#BD081C] text-white",
+              whatsapp: "bg-[#25D366] text-white",
+              telegram: "bg-[#0088CC] text-white",
+              discord: "bg-[#5865F2] text-white",
+              wechat: "bg-[#07C160] text-white",
+              weibo: "bg-[#E6162D] text-white",
+              douyin: "bg-black text-white",
+              xiaohongshu: "bg-[#FF2442] text-white",
+              bilibili: "bg-[#00A1D6] text-white",
+              custom: "bg-brand-text-inverse/10 text-white",
+            };
+            const styleClass = brandStyles[social.platform.toLowerCase()] || "bg-brand-text-inverse/10 text-white";
+            
+            const customIconUrl = social.icon
+              ? (typeof social.icon === "object" ? social.icon.url : social.icon)
+              : null;
+
+            return (
+              <a
+                key={index}
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 hover:opacity-85 hover:scale-110 shadow-sm",
+                  styleClass
+                )}
+                title={social.customName || social.platform}
+              >
+                {customIconUrl ? (
+                  <img 
+                    src={customIconUrl} 
+                    alt={social.customName || social.platform} 
+                    className="w-[18px] h-[18px] object-contain invert brightness-0" 
+                  />
+                ) : (
+                  <SocialIcon platform={social.platform} />
+                )}
+              </a>
+            );
+          })}
+        </div>
+      )}
 
       {/* 官方声明 */}
       <div className="bg-brand-footer-emphasis-bg text-brand-footer-emphasis-text font-anaheim font-semibold px-6 py-4 md:px-8 md:py-5 lg:px-6 lg:py-6 xl:w-[90%] 2xl:w-[80%] my-6 md:my-8 lg:my-10">

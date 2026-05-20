@@ -249,26 +249,56 @@ export function ProductFeaturesSection({
     const positions = []
     const startY = 320
     const endY = 700
-    const count = side === "left" ? leftCount : rightCount
     
-    // Base step size on maxCount so both sides are aligned from top to bottom
-    const maxCount = Math.max(leftCount, rightCount)
-    const step = maxCount > 1 ? (endY - startY) / (maxCount - 1) : 0
-    
-    for (let i = 0; i < count; i++) {
-      const dotY = maxCount === 1 ? (startY + endY) / 2 : startY + step * i
-      // Center of the moon vertically is roughly 510
-      const offsetFromCenter = Math.abs(dotY - 510)
-      // Bulge is max (~60px) at the center, tapering to 0 at the edges
-      const bulge = Math.max(0, 60 - (offsetFromCenter * offsetFromCenter) / 600)
+    if (leftCount === rightCount) {
+      // Even number of total items (or 0), symmetrical distribution on both sides
+      const count = side === "left" ? leftCount : rightCount
+      const step = count > 1 ? (endY - startY) / (count - 1) : 0
       
-      // Shift outwards at the bottom (left side moves left/outwards, right side moves right/outwards)
-      const bottomShift = dotY > 510 ? ((dotY - 510) / (endY - 510)) * 45 : 0
-      const dotX = side === "left" 
-        ? 430 - bulge - bottomShift 
-        : 1450 + bulge + bottomShift
+      for (let i = 0; i < count; i++) {
+        const dotY = count === 1 ? (startY + endY) / 2 : startY + step * i
+        
+        // Curve calculation (offset, bulge, bottomShift, dotX)
+        const offsetFromCenter = Math.abs(dotY - 510)
+        const bulge = Math.max(0, 60 - (offsetFromCenter * offsetFromCenter) / 600)
+        const bottomShift = dotY > 510 ? ((dotY - 510) / (endY - 510)) * 45 : 0
+        const dotX = side === "left" 
+          ? 430 - bulge - bottomShift 
+          : 1450 + bulge + bottomShift
+        
+        positions.push({ dotX, dotY })
+      }
+    } else {
+      // Odd number of total items, right side has one less than left side (since leftCount = rightCount + 1)
+      // Left side uses normal even distribution
+      // Right side staggers to sit at the midpoints of the left side's distribution slots
+      const stepLeft = leftCount > 1 ? (endY - startY) / (leftCount - 1) : 0
       
-      positions.push({ dotX, dotY })
+      if (side === "left") {
+        for (let i = 0; i < leftCount; i++) {
+          const dotY = leftCount === 1 ? (startY + endY) / 2 : startY + stepLeft * i
+          
+          const offsetFromCenter = Math.abs(dotY - 510)
+          const bulge = Math.max(0, 60 - (offsetFromCenter * offsetFromCenter) / 600)
+          const bottomShift = dotY > 510 ? ((dotY - 510) / (endY - 510)) * 45 : 0
+          const dotX = 430 - bulge - bottomShift
+          
+          positions.push({ dotX, dotY })
+        }
+      } else {
+        // Right side (staggered)
+        for (let i = 0; i < rightCount; i++) {
+          // Sit exactly at the midpoint of left side slots
+          const dotY = startY + stepLeft * (i + 0.5)
+          
+          const offsetFromCenter = Math.abs(dotY - 510)
+          const bulge = Math.max(0, 60 - (offsetFromCenter * offsetFromCenter) / 600)
+          const bottomShift = dotY > 510 ? ((dotY - 510) / (endY - 510)) * 45 : 0
+          const dotX = 1450 + bulge + bottomShift
+          
+          positions.push({ dotX, dotY })
+        }
+      }
     }
     return positions
   }

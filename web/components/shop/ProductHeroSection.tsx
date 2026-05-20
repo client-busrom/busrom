@@ -76,19 +76,19 @@ export function ProductHeroSection({
 
     const adjustFontSize = () => {
       if (!titleRef.current) return
-      
+
       const isMobile = window.innerWidth < 768
       const base = isMobile ? 390 : DESIGN_WIDTH
-      
+
       // Target sizes: 96px for desktop, around 48px for mobile
       let size = isMobile ? 48 : 96
-      
+
       // Line height is roughly 1.1x of font size
       const lineH = size * 1.1
       const maxHeight = (lineH * 3 / base) * window.innerWidth
-      
+
       titleRef.current.style.fontSize = `${(size / base) * 100}vw`
-      
+
       // Gradually shrink if height exceeds 3 lines
       while (titleRef.current.offsetHeight > maxHeight && size > (isMobile ? 24 : 40)) {
         size -= 2
@@ -136,9 +136,11 @@ export function ProductHeroSection({
         </div>
 
         {/* Content - Full Centering */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div 
-            className="w-full flex flex-col items-center text-center px-12"
+        {/* Content - Full Centering */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+
+          <div
+            className="w-full flex justify-center text-center px-12"
             style={{ maxWidth: rpx(1200) }}
           >
             <motion.h1
@@ -154,7 +156,12 @@ export function ProductHeroSection({
             >
               {productName}
             </motion.h1>
+          </div>
 
+          <div
+            className="w-full flex justify-center text-center"
+            style={{ maxWidth: rpx(1300) }}
+          >
             {description && (
               <motion.p
                 className="font-josefin-sans font-bold mt-8 opacity-90 pointer-events-auto"
@@ -172,6 +179,7 @@ export function ProductHeroSection({
               </motion.p>
             )}
           </div>
+
         </div>
 
         {/* Scroll Down Arrow Container - 用于居中定位 */}

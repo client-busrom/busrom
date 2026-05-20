@@ -341,9 +341,8 @@ export function StoryBrandPositionSection({
                 <div className="flex flex-col items-center">
                   {/* Oval Card */}
                   <div
-                    className={`relative overflow-hidden bg-[#d9d9d9] border border-black/5 transition-all duration-500 rounded-full aspect-[2/3] w-full max-w-[280px] ${
-                      i === activeIndex ? "shadow-xl" : "opacity-40"
-                    }`}
+                    className={`relative overflow-hidden bg-[#d9d9d9] border border-black/5 transition-all duration-500 rounded-full aspect-[2/3] w-full max-w-[280px] ${i === activeIndex ? "shadow-xl" : "opacity-40"
+                      }`}
                   >
                     <OptimizedImage
                       image={item.image}
@@ -354,9 +353,8 @@ export function StoryBrandPositionSection({
 
                   {/* Label */}
                   <div
-                    className={`mt-8 font-bold font-josefin-sans text-center text-xl sm:text-2xl text-black transition-opacity duration-300 ${
-                      i === activeIndex ? "opacity-100" : "opacity-0"
-                    }`}
+                    className={`mt-8 font-bold font-josefin-sans text-center text-xl sm:text-2xl text-black transition-opacity duration-300 ${i === activeIndex ? "opacity-100" : "opacity-0"
+                      }`}
                   >
                     {item.title}
                   </div>
@@ -633,7 +631,7 @@ export function StoryBrandPositionSection({
               {data.subtitle.split(" ")[0]}
             </HollowText>
           </div>
-          <div className="absolute z-0" style={{ left: vw(193), top: vw(54) }}>
+          <div className="absolute z-30" style={{ left: vw(193), top: vw(54) }}>
             <span
               className="leading-none text-[#524d20] whitespace-pre-line"
               style={{ fontSize: vw(128) }}
@@ -650,7 +648,7 @@ export function StoryBrandPositionSection({
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
           className="absolute z-30 font-josefin-sans text-left whitespace-pre-line"
           style={{
-            left: vw(966),
+            left: vw(811 + 193),
             top: vw(910),
             width: vw(664),
             fontSize: vw(32),

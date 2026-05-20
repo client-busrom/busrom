@@ -305,7 +305,7 @@ export function StoryBrandHighlightsSection({
               {(images || []).map((img, i) => (
                 <div
                   key={`bg-${activeSlideIdx}-${i}`}
-                  className="relative flex-shrink-0 w-full h-full"
+                  className="relative flex-shrink-0 w-full h-full overflow-hidden"
                 >
                   <div className="absolute inset-0 z-0">
                     <OptimizedImage
@@ -351,7 +351,7 @@ export function StoryBrandHighlightsSection({
               {(images || []).map((img, i) => (
                 <div
                   key={`fg-${activeSlideIdx}-${i}`}
-                  className="relative flex-shrink-0 w-full h-full"
+                  className="relative flex-shrink-0 w-full h-full overflow-hidden"
                 >
                   <OptimizedImage
                     image={img}

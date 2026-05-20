@@ -75,10 +75,14 @@ const MaskedImage = ({
       style={{
         WebkitMaskImage: `url(${maskUrl})`,
         maskImage: `url(${maskUrl})`,
-        WebkitMaskSize: "100% 100%",
-        maskSize: "100% 100%",
+        WebkitMaskSize: "calc(100% + 2px) calc(100% + 2px)",
+        maskSize: "calc(100% + 2px) calc(100% + 2px)",
+        WebkitMaskPosition: "center",
+        maskPosition: "center",
         WebkitMaskRepeat: "no-repeat",
         maskRepeat: "no-repeat",
+        transform: "translate3d(0, 0, 0)",
+        WebkitTransform: "translate3d(0, 0, 0)",
       }}
     >
       <OptimizedImage

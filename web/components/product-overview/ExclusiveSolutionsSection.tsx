@@ -110,7 +110,7 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
                   fontSize: vw(36),
                   paddingLeft: `${vw(60)}`,
                   paddingRight: `${vw(60)}`,
-                  paddingTop: `${vw(2)}`,    // 锁定 Windows 的完美数据
+                  paddingTop: `${isAppleOS ? vw(8) : vw(2)}`,    // 锁定 Windows 的完美数据
                   paddingBottom: `${vw(10)}`, // 锁定 Windows 的完美数据
                   lineHeight: 1,
                   marginBottom: isAppleOS ? vw(38) : vw(10),

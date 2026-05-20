@@ -32,9 +32,10 @@ interface StoryBrandStrengthsSectionProps {
  * Memoized decorative orbit to prevent re-renders.
  */
 const StrengthOrbit = React.memo(({ isMobile }: { isMobile: boolean }) => {
-  const points = React.useMemo(() => {
-    const xPoints = [];
-    const yPoints = [];
+  const uniqueId = React.useId().replace(/:/g, "");
+  const animationName = `orbit-${uniqueId}`;
+
+  const keyframesCSS = React.useMemo(() => {
     const steps = 60;
     
     // Scale dimensions based on mobile/desktop
@@ -44,15 +45,21 @@ const StrengthOrbit = React.memo(({ isMobile }: { isMobile: boolean }) => {
     const centerX = isMobile ? 100 : 150;
     const centerY = isMobile ? 40 : 60;
 
+    let css = `@keyframes ${animationName} {\n`;
     for (let i = 0; i <= steps; i++) {
+      const pct = ((i / steps) * 100).toFixed(2);
       const t = (i / steps) * 2 * Math.PI;
       const x = a * Math.cos(t) * Math.cos(rot) - b * Math.sin(t) * Math.sin(rot);
       const y = a * Math.cos(t) * Math.sin(rot) + b * Math.sin(t) * Math.cos(rot);
-      xPoints.push(isMobile ? (centerX + x) : vw(centerX + x));
-      yPoints.push(isMobile ? (centerY + y) : vw(centerY + y));
+      const xVal = isMobile ? `${centerX + x}px` : vw(centerX + x);
+      const yVal = isMobile ? `${centerY + y}px` : vw(centerY + y);
+      const rotation = ((i / steps) * 360).toFixed(1);
+      
+      css += `  ${pct}% { transform: translate3d(${xVal}, ${yVal}, 0) rotate(${rotation}deg); }\n`;
     }
-    return { x: xPoints, y: yPoints };
-  }, [isMobile]);
+    css += "}";
+    return css;
+  }, [isMobile, animationName]);
 
   return (
     <div
@@ -65,6 +72,7 @@ const StrengthOrbit = React.memo(({ isMobile }: { isMobile: boolean }) => {
         zIndex: 5,
       }}
     >
+      <style>{keyframesCSS}</style>
       <div
         className="absolute inset-0 border border-[#C9C177]"
         style={{
@@ -72,7 +80,7 @@ const StrengthOrbit = React.memo(({ isMobile }: { isMobile: boolean }) => {
           transform: "rotate(-22.02deg)",
         }}
       />
-      <motion.div
+      <div
         className="absolute"
         style={{
           width: isMobile ? 20 : vw(28),
@@ -82,16 +90,7 @@ const StrengthOrbit = React.memo(({ isMobile }: { isMobile: boolean }) => {
           marginLeft: isMobile ? -10 : vw(-14),
           marginTop: isMobile ? -10 : vw(-14),
           zIndex: 8,
-        }}
-        animate={{
-          x: points.x,
-          y: points.y,
-          rotate: 360,
-        }}
-        transition={{
-          duration: 8,
-          ease: "linear",
-          repeat: Infinity,
+          animation: `${animationName} 8s linear infinite`,
         }}
       >
         <svg width="100%" height="100%" viewBox="0 0 1000 1000" fill="none">
@@ -100,7 +99,7 @@ const StrengthOrbit = React.memo(({ isMobile }: { isMobile: boolean }) => {
             fill="#C9C177"
           />
         </svg>
-      </motion.div>
+      </div>
     </div>
   );
 });

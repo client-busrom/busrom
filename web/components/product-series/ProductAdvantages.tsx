@@ -21,11 +21,11 @@ export interface SeriesColorConfig {
 export const SERIES_COLORS: Record<string, SeriesColorConfig> = {
   'glass standoff': {
     name: '焦糖棕',
-    rgb: 'rgb(173, 145, 110)',
-    rgba: 'rgba(173, 145, 110, 0.35)',
-    rgbaTransparent: 'rgba(173, 145, 110, 0)',
-    dark: '#6E5A44',
-    lightBg: '#FAF6F0',
+    rgb: 'rgb(117, 111, 63)',
+    rgba: 'rgba(255, 227, 0, 0.35)',
+    rgbaTransparent: 'rgba(255, 227, 0, 0)',
+    dark: '#756F3F',
+    lightBg: '#FFFDE9',
   },
   'glass connected fitting': {
     name: '橄榄绿',
@@ -44,12 +44,12 @@ export const SERIES_COLORS: Record<string, SeriesColorConfig> = {
     lightBg: '#FAF5F6',
   },
   'guardrail glass clip': {
-    name: '蜡尾紫',
-    rgb: 'rgb(144, 123, 185)',
-    rgba: 'rgba(144, 123, 185, 0.35)',
-    rgbaTransparent: 'rgba(144, 123, 185, 0)',
-    dark: '#5B4B7A',
-    lightBg: '#F6F4FA',
+    name: '海盐蓝',
+    rgb: 'rgb(134, 157, 187)',
+    rgba: 'rgba(134, 157, 187, 0.35)',
+    rgbaTransparent: 'rgba(134, 157, 187, 0)',
+    dark: '#55647C',
+    lightBg: '#F4F6F9',
   },
   'bathroom glass clip': {
     name: '姜黄',

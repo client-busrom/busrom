@@ -321,16 +321,14 @@ export function ProductAttributesSection({
                 height: rpx(61),
               }}
             >
-              <Image
+              <img
                 src="/product-sections/arrow-left-normal.svg"
                 alt="Previous"
-                fill
                 className="object-contain group-hover:hidden group-active:hidden"
               />
-              <Image
+              <img
                 src="/product-sections/arrow-left-active.svg"
                 alt="Previous"
-                fill
                 className="object-contain hidden group-hover:block group-active:block"
               />
             </button>
@@ -346,16 +344,14 @@ export function ProductAttributesSection({
                 marginBottom: rpx(61),
               }}
             >
-              <Image
+              <img
                 src="/product-sections/arrow-right-normal.svg"
                 alt="Next"
-                fill
                 className="object-contain group-hover:hidden group-active:hidden"
               />
-              <Image
+              <img
                 src="/product-sections/arrow-right-active.svg"
                 alt="Next"
-                fill
                 className="object-contain hidden group-hover:block group-active:block"
               />
             </button>
@@ -459,9 +455,8 @@ export function ProductAttributesSection({
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    index === currentIndex ? "bg-[#756F3F]" : "bg-[#BAB489]"
-                  }`}
+                  className={`w-2 h-2 rounded-full transition-colors ${index === currentIndex ? "bg-[#756F3F]" : "bg-[#BAB489]"
+                    }`}
                 />
               ))}
             </div>

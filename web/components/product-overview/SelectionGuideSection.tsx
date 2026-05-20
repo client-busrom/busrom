@@ -75,7 +75,7 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
           {/* Decorative "X" Icon */}
           <motion.div
             className="absolute opacity-90"
-            animate={{ 
+            animate={{
               scale: [1, 1.1, 1],
             }}
             transition={{
@@ -96,9 +96,9 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
           {/* Titles - Precise Staggered Positioning */}
           <h2
             className="absolute font-limelight text-white leading-[1.33] z-40"
-            style={{ 
-              fontSize: vw(72), 
-              left: vw(294 - 210), 
+            style={{
+              fontSize: vw(72),
+              left: vw(294 - 210),
               top: vw(44 - 40),
               whiteSpace: 'pre-wrap'
             }}
@@ -147,8 +147,8 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
             style={{
               left: vw(298 - 210),
               top: vw(740),
-              width: vw(102),
-              height: vw(100),
+              width: vw(80),
+              height: vw(80),
             }}
           >
             <div className="w-full h-full rounded-full border border-[#464010] flex items-center justify-center transition-all duration-300 group-hover:bg-[#464010]">
@@ -165,8 +165,8 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
             style={{
               left: vw(1489 - 210),
               top: vw(740),
-              width: vw(102),
-              height: vw(100),
+              width: vw(80),
+              height: vw(80),
             }}
           >
             <div className="w-full h-full rounded-full border border-[#464010] flex items-center justify-center transition-all duration-300 group-hover:bg-[#464010]">
@@ -201,7 +201,7 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
                 >
                   <motion.div
                     className="w-full h-full"
-                    animate={{ 
+                    animate={{
                       y: [0, -15, 0],
                     }}
                     transition={{
@@ -259,7 +259,7 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
                 >
                   <motion.div
                     className="w-full h-full"
-                    animate={{ 
+                    animate={{
                       y: [0, 20, 0],
                     }}
                     transition={{
@@ -307,7 +307,7 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
       </div>
 
       {/* ==================== 2. Mobile Layout (< md) ==================== */}
-      <div 
+      <div
         className="md:hidden w-full flex flex-col items-center py-16 px-6 relative overflow-hidden rounded-t-[32px]"
         style={{ background: '#756f3f' }}
       >
@@ -322,9 +322,9 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
             {/* Header Area with Icon and Titles */}
             <div className="relative mb-10 pt-4 flex flex-col items-center">
               {/* Keep the icon centered near the title */}
-              <motion.div 
+              <motion.div
                 className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-24 opacity-20 pointer-events-none"
-                animate={{ 
+                animate={{
                   scale: [1, 1.1, 1],
                 }}
                 transition={{
@@ -335,7 +335,7 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
               >
                 <CrossIcon />
               </motion.div>
-              <h2 
+              <h2
                 className="relative z-10 font-limelight text-white text-3xl leading-[1.3] whitespace-pre-wrap text-center"
               >
                 {currentSlide.title1 + "\n" + currentSlide.title2}
@@ -362,7 +362,7 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
                       size="large"
                     />
                   </div>
-                  <p 
+                  <p
                     className="font-josefin-sans text-white/90 text-base leading-relaxed whitespace-pre-line px-1"
                     dangerouslySetInnerHTML={{ __html: currentSlide.content1 }}
                   />
@@ -380,7 +380,7 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
                       size="large"
                     />
                   </div>
-                  <p 
+                  <p
                     className="font-josefin-sans text-white/90 text-base leading-relaxed whitespace-pre-line px-1"
                     dangerouslySetInnerHTML={{ __html: currentSlide.content2 }}
                   />
