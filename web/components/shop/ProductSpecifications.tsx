@@ -83,23 +83,25 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
               const hasVisualsInGroup = items.some((i: any) => !!i.image || (i.color && i.color.trim() !== ''))
               
               // Calculate column class based on max text length for text-only groups
-              let gridClass = "grid grid-cols-3 gap-2.5"
+              let isFlexLayout = false
+              let layoutClass = "grid grid-cols-3 gap-2.5"
+              
               if (!hasVisualsInGroup) {
                 const maxTextLength = items.reduce((max: number, item: any) => {
                   const itemText = item.text || item.value?.[locale] || item.value?.en || ""
                   return Math.max(max, itemText.length)
                 }, 0)
-                if (maxTextLength > 16) {
-                  gridClass = "grid grid-cols-1 gap-2.5"
-                } else if (maxTextLength > 8) {
-                  gridClass = "grid grid-cols-2 gap-2.5"
+                
+                if (maxTextLength > 8) {
+                  layoutClass = "flex flex-wrap gap-2.5"
+                  isFlexLayout = true
                 }
               } else {
-                gridClass = "grid grid-cols-2 gap-4"
+                layoutClass = "grid grid-cols-2 gap-4"
               }
               
               return (
-                <div className={gridClass}>
+                <div className={layoutClass}>
                   {items.map((item: any, itemIdx: number) => {
                     const hasColor = !!(item.color && item.color.trim() !== '')
                     const hasImage = !!item.image
@@ -155,16 +157,16 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
                       )
                     }
 
-                    // Text-Only Tag Style (Fluid width, dynamic auto height)
+                    // Text-Only Tag Style (Fluid width/fit-content, dynamic auto height)
                     return (
                       <div
                         key={itemIdx}
                         onClick={() => handleSelect(idx, itemIdx)}
-                        className={`relative w-full min-h-[52px] px-4 py-2.5 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center text-center ${
+                        className={`relative min-h-[52px] px-4 py-2.5 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center text-center ${
                           isSelected 
                             ? "bg-white border-brand-accent-gold shadow-sm" 
                             : "bg-white border-brand-accent-border/30 hover:border-brand-accent-gold/50"
-                        }`}
+                        } ${isFlexLayout ? 'w-fit max-w-full min-w-[80px]' : 'w-full'}`}
                       >
                         <span className={`text-xs font-bold transition-colors whitespace-normal break-words leading-tight ${
                           isSelected ? 'text-brand-accent-gold' : 'text-brand-text-main/80 group-hover:text-brand-text-main'
