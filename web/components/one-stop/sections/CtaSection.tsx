@@ -570,7 +570,7 @@ export function CtaSection({
               type="button"
               onClick={() => setOpenCountrySelectorMobile(!openCountrySelectorMobile)}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-4 border-r border-white/20 flex-shrink-0"
+              className="flex items-center gap-1.5 pl-3 pr-2 border-r border-white/20 flex-shrink-0"
             >
               <div className="w-6 h-4 md:w-8 md:h-5 flex-shrink-0">
                 <CountryFlag
@@ -581,6 +581,22 @@ export function CtaSection({
               <span className="text-white font-anaheim font-semibold text-base">
                 +{selectedCountry[2]}
               </span>
+              <svg
+                className={cn(
+                  "w-3 h-3 text-white/60 transition-transform duration-300 flex-shrink-0",
+                  openCountrySelectorMobile && "rotate-180"
+                )}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2.5"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
             </button>
 
             <input
@@ -879,7 +895,7 @@ export function CtaSection({
                 type="button"
                 onClick={() => setOpenCountrySelector(!openCountrySelector)}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 px-4 border-r border-white/20 flex-shrink-0"
+                className="flex items-center gap-1.5 pl-3 pr-2 border-r border-white/20 flex-shrink-0"
               >
                 <div className="w-5 h-3 md:w-6 md:h-4 flex-shrink-0">
                   <CountryFlag
@@ -890,6 +906,22 @@ export function CtaSection({
                 <span className="text-white font-anaheim font-semibold text-base">
                   +{selectedCountry[2]}
                 </span>
+                <svg
+                  className={cn(
+                    "w-3 h-3 text-white/60 transition-transform duration-300 flex-shrink-0",
+                    openCountrySelector && "rotate-180"
+                  )}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2.5"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
               </button>
 
               <input

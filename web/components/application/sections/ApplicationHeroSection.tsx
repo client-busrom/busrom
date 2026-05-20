@@ -118,7 +118,7 @@ const ViewMoreButton = ({
           cy="42.7332"
           r="30.2169"
           transform="rotate(-135 42.7332 42.7332)"
-          className="fill-white group-hover:fill-[#756F3F] transition-colors duration-300"
+          className="fill-white group-hover:fill-[#FFF2A3] transition-colors duration-300"
         />
         <motion.path
           animate={{
@@ -131,7 +131,7 @@ const ViewMoreButton = ({
             ease: "easeInOut",
           }}
           d="M34.8323 36.5812L34.8237 36.5927C34.7118 36.7466 34.6495 36.9311 34.645 37.1214L34.645 37.1325L34.6453 37.1295C34.6401 37.2023 34.6421 37.2755 34.6511 37.3479L34.6539 37.3685L35.9936 46.7422C36.0813 47.356 36.65 47.7819 37.2638 47.6935L37.2821 47.6907C37.8859 47.5936 38.3028 47.0297 38.216 46.4221L37.234 39.5513L49.3538 48.6286C49.7677 48.9386 50.3549 48.8539 50.6652 48.4396L50.7438 48.3346C51.0431 47.9209 50.9568 47.3424 50.547 47.0354L38.4271 37.9582L45.2967 36.9679C45.9104 36.8795 46.3367 36.3103 46.249 35.6965C46.1613 35.0827 45.5926 34.6568 44.9788 34.7452L35.606 36.0963L35.5863 36.0993C35.5208 36.11 35.4563 36.1264 35.3937 36.1484L35.3779 36.1541L35.3809 36.1532C35.1893 36.2108 35.0212 36.3285 34.9015 36.4888L34.8323 36.5812Z"
-          className="fill-[#756F3F] group-hover:fill-white transition-colors duration-300"
+          className="fill-[#756F3F] transition-colors duration-300"
         />
       </svg>
       {/* Absolute text over SVG */}
@@ -148,9 +148,9 @@ const ViewMoreButton = ({
 export function ApplicationHeroSection({
   title,
   topSubtitle,
-  rightBoxText = "APPLICATION CASES",
-  bottomBoxText = "VIEW MORE",
-  seeAllText = "SEE ALL",
+  rightBoxText,
+  bottomBoxText,
+  seeAllText,
   slides,
   images,
   locale = "en",
@@ -564,7 +564,7 @@ export function ApplicationHeroSection({
             {/* Make this button swap with image2 and next slide, similar logic to the box */}
             <ViewMoreButton
               onClick={() => swapAndNext(2)}
-              text={bottomBoxText}
+              text={bottomBoxText ?? ''}
             />
           </div>
         </div>
@@ -710,12 +710,12 @@ export function ApplicationHeroSection({
               {bottomBoxText}
             </span>
           </button>
-          <Link href={seeAllHref} className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full border border-white flex-shrink-0 relative">
+          <Link href={seeAllHref} className="group flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full border border-white flex-shrink-0 relative transition-colors group-hover:bg-[#FFF2A3]">
               <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#FFCC4A] rounded-full" />
             </div>
             <span className="font-anaheim text-white text-lg">
-              {locale === "zh" ? "查看全部" : "SEE ALL"}
+              {seeAllText}
             </span>
           </Link>
         </div>

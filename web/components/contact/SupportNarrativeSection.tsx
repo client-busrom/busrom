@@ -13,7 +13,7 @@ import {
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920
-const SECTION_HEIGHT = 922 // 调整为与 BusromMainFeaturesSection 一致
+const SECTION_HEIGHT = 800 // 调整为与 BusromMainFeaturesSection 一致
 
 // 响应式尺寸函数
 const rpx = (designValue: number) => `calc(var(--rpx-support) * ${designValue})`
@@ -128,28 +128,28 @@ function SupportCard({ card, index, isActive, onHover }: SupportCardProps) {
       initial="inactive"
     >
       {/* 整体放大容器 */}
+      <motion.div
+        className="relative w-full h-full"
+        style={{ transformOrigin: "center center" }}
+        variants={{
+          inactive: { scale: 1 },
+          active: { scale: 1.3 },
+        }}
+        transition={{ duration: 0.4, type: "spring", stiffness: 300, damping: 20 }}
+      >
+        {/* 外部发光阴影层 - 采用分层结构避免污染内部元素 */}
         <motion.div
-          className="relative w-full h-full"
-          style={{ transformOrigin: "center center" }}
+          className="absolute inset-0 rounded-full -z-10"
           variants={{
-            inactive: { scale: 1 },
-            active: { scale: 1.3 },
+            inactive: { opacity: 0, scale: 0.8, filter: "blur(0px)" },
+            active: {
+              opacity: 1,
+              scale: 1.1,
+              filter: "blur(25px)",
+              boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.4)"
+            },
           }}
-          transition={{ duration: 0.4, type: "spring", stiffness: 300, damping: 20 }}
-        >
-          {/* 外部发光阴影层 - 采用分层结构避免污染内部元素 */}
-          <motion.div
-            className="absolute inset-0 rounded-full -z-10"
-            variants={{
-              inactive: { opacity: 0, scale: 0.8, filter: "blur(0px)" },
-              active: { 
-                opacity: 1, 
-                scale: 1.1, 
-                filter: "blur(25px)",
-                boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.4)" 
-              },
-            }}
-          />
+        />
         {/* 椭圆边框 SVG */}
         <img
           src="/contact-support/rectangle-line.svg"
@@ -339,131 +339,131 @@ export function SupportNarrativeSection({
 
   return (
     <>
-    {/* Mobile Layout */}
-    <section className="md:hidden bg-brand-main px-4 py-8">
-      {/* 标题区域 */}
-      <div className="text-center mb-8">
-        <h2 className="font-josefin-sans font-bold text-2xl text-black mb-2">
-          {title}
-        </h2>
-      </div>
-
-      {/* 卡片网格 - 2列3行 */}
-      <div className="grid grid-cols-2 gap-6">
-        {cards.map((card, index) => {
-          const Icon = card.icon ? iconMap[card.icon] || defaultIcons[index] : defaultIcons[index]
-          const isActive = index === activeIndex
-          return (
-            <div
-              key={card.id}
-              className={`relative bg-brand-main border-2 rounded-3xl p-4 flex flex-col items-center justify-center min-h-[140px] transition-all duration-500 ${isActive ? 'border-[#756F3F] shadow-xl scale-110' : 'border-[#E3DEB8]'}`}
-              onClick={() => handleHover(index)}
-            >
-              {/* 图标 */}
-              <div className={`relative w-12 h-12 mb-3 flex items-center justify-center transition-transform duration-500 ${isActive ? 'scale-125' : 'scale-100'}`}>
-                <Icon
-                  className="text-brand-light-olive w-10 h-10"
-                  strokeWidth={isActive ? 2 : 1.5}
-                />
-              </div>
-              {/* 标题 */}
-              <p className={`font-anaheim text-sm text-center text-black leading-tight transition-all duration-300 ${isActive ? 'font-bold' : 'font-semibold'}`}>
-                {card.title.split("\n").join(" ")}
-              </p>
-            </div>
-          )
-        })}
-      </div>
-    </section>
-
-    {/* Desktop Layout */}
-    <section
-      className="relative w-full flex-col items-center justify-center hidden md:flex"
-      style={{
-        height: rpx(SECTION_HEIGHT),
-        ["--rpx-support" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
-      }}
-    >
-      {/* 标题区域 */}
-      <div className="relative z-10" style={{ marginBottom: rpx(64) }}>
-        {/* 问号装饰 - 贴在 Get 上，摇摆动效 */}
-        <motion.div
-          className="absolute"
-          style={{
-            right: rpx(-80),  // -100 * 0.8
-            top: rpx(-64),    // -80 * 0.8
-            width: rpx(88),   // 110 * 0.8
-            height: rpx(134), // 167 * 0.8
-            transformOrigin: "center bottom",
-          }}
-          animate={{
-            rotate: [-18, -10, -18],
-          }}
-          transition={{
-            duration: 2,
-            ease: "easeInOut",
-            repeat: Infinity,
-            repeatType: "reverse",
-          }}
-        >
-          <img
-            src="/contact-support/why.svg"
-            alt=""
-            className="w-full h-full object-contain"
-          />
-        </motion.div>
-
-        {/* 标题 - 字符跳动效果 */}
-        <h2
-          className="relative z-10 font-josefin-sans font-bold text-black text-center flex justify-center"
-          style={{
-            fontSize: rpx(62),  // 77 * 0.8
-            lineHeight: rpx(64), // 80 * 0.8
-          }}
-        >
-          {title.split("").map((char, index) => (
-            <motion.span
-              key={index}
-              className="inline-block"
-              style={{ marginRight: char === " " ? rpx(16) : 0 }}
-              animate={{
-                y: [0, -8, 0],
-              }}
-              transition={{
-                duration: 0.6,
-                ease: "easeInOut",
-                repeat: Infinity,
-                repeatDelay: 3,
-                delay: index * 0.05,
-              }}
-            >
-              {char}
-            </motion.span>
-          ))}
-        </h2>
-      </div>
-
-      {/* 卡片容器 - 居中 */}
-      {cards.length > 0 && (
-        <div
-          className="relative z-10 flex justify-center max-w-full"
-          style={{
-            gap: rpx(CARD_GAP),
-            width: rpx(totalCardsWidth),
-          }}
-        >
-          {cards.map((card, index) => (
-            <SupportCard
-              key={card.id}
-              card={card}
-              index={index}
-              isActive={index === activeIndex}
-              onHover={() => handleHover(index)}
-            />
-          ))}
+      {/* Mobile Layout */}
+      <section className="md:hidden bg-brand-main px-4 py-8">
+        {/* 标题区域 */}
+        <div className="text-center mb-8">
+          <h2 className="font-josefin-sans font-bold text-2xl text-black mb-2">
+            {title}
+          </h2>
         </div>
-      )}
-    </section>
+
+        {/* 卡片网格 - 2列3行 */}
+        <div className="grid grid-cols-2 gap-6">
+          {cards.map((card, index) => {
+            const Icon = card.icon ? iconMap[card.icon] || defaultIcons[index] : defaultIcons[index]
+            const isActive = index === activeIndex
+            return (
+              <div
+                key={card.id}
+                className={`relative bg-brand-main border-2 rounded-3xl p-4 flex flex-col items-center justify-center min-h-[140px] transition-all duration-500 ${isActive ? 'border-[#756F3F] shadow-xl scale-110' : 'border-[#E3DEB8]'}`}
+                onClick={() => handleHover(index)}
+              >
+                {/* 图标 */}
+                <div className={`relative w-12 h-12 mb-3 flex items-center justify-center transition-transform duration-500 ${isActive ? 'scale-125' : 'scale-100'}`}>
+                  <Icon
+                    className="text-brand-light-olive w-10 h-10"
+                    strokeWidth={isActive ? 2 : 1.5}
+                  />
+                </div>
+                {/* 标题 */}
+                <p className={`font-anaheim text-sm text-center text-black leading-tight transition-all duration-300 ${isActive ? 'font-bold' : 'font-semibold'}`}>
+                  {card.title.split("\n").join(" ")}
+                </p>
+              </div>
+            )
+          })}
+        </div>
+      </section>
+
+      {/* Desktop Layout */}
+      <section
+        className="relative w-full flex-col items-center justify-center hidden md:flex"
+        style={{
+          height: rpx(SECTION_HEIGHT),
+          ["--rpx-support" as string]: `calc(100vw / ${DESIGN_WIDTH})`,
+        }}
+      >
+        {/* 标题区域 */}
+        <div className="relative z-10" style={{ marginBottom: rpx(64) }}>
+          {/* 问号装饰 - 贴在 Get 上，摇摆动效 */}
+          <motion.div
+            className="absolute"
+            style={{
+              right: rpx(-80),  // -100 * 0.8
+              top: rpx(-64),    // -80 * 0.8
+              width: rpx(88),   // 110 * 0.8
+              height: rpx(134), // 167 * 0.8
+              transformOrigin: "center bottom",
+            }}
+            animate={{
+              rotate: [-18, -10, -18],
+            }}
+            transition={{
+              duration: 2,
+              ease: "easeInOut",
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+          >
+            <img
+              src="/contact-support/why.svg"
+              alt=""
+              className="w-full h-full object-contain"
+            />
+          </motion.div>
+
+          {/* 标题 - 字符跳动效果 */}
+          <h2
+            className="relative z-10 font-josefin-sans font-bold text-black text-center flex justify-center"
+            style={{
+              fontSize: rpx(62),  // 77 * 0.8
+              lineHeight: rpx(64), // 80 * 0.8
+            }}
+          >
+            {title.split("").map((char, index) => (
+              <motion.span
+                key={index}
+                className="inline-block"
+                style={{ marginRight: char === " " ? rpx(16) : 0 }}
+                animate={{
+                  y: [0, -8, 0],
+                }}
+                transition={{
+                  duration: 0.6,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                  repeatDelay: 3,
+                  delay: index * 0.05,
+                }}
+              >
+                {char}
+              </motion.span>
+            ))}
+          </h2>
+        </div>
+
+        {/* 卡片容器 - 居中 */}
+        {cards.length > 0 && (
+          <div
+            className="relative z-10 flex justify-center max-w-full"
+            style={{
+              gap: rpx(CARD_GAP),
+              width: rpx(totalCardsWidth),
+            }}
+          >
+            {cards.map((card, index) => (
+              <SupportCard
+                key={card.id}
+                card={card}
+                index={index}
+                isActive={index === activeIndex}
+                onHover={() => handleHover(index)}
+              />
+            ))}
+          </div>
+        )}
+      </section>
     </>
   )
 }

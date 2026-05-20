@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { getOptimizedImageUrl } from "@/lib/image-utils";
+import useEmblaCarousel from "embla-carousel-react";
 
 // 设计稿基准尺寸 (已按0.7缩放)
 const DESIGN_WIDTH = 1920;
@@ -144,23 +145,84 @@ export function OemAdvantages({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-  // 自动轮播
+  // Embla Carousels
+  const [desktopEmblaRef, desktopEmblaApi] = useEmblaCarousel({
+    loop: true,
+    align: "start",
+    containScroll: false,
+    watchDrag: false,
+  });
+
+  const [mobileEmblaRef, mobileEmblaApi] = useEmblaCarousel({
+    loop: true,
+    align: "start",
+    containScroll: false,
+    watchDrag: true,
+  });
+
+  // Sync index and handle autoplay
   useEffect(() => {
     if (!isAutoPlaying || items.length === 0) return;
 
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % items.length);
+      if (window.innerWidth >= 768 && desktopEmblaApi) {
+        desktopEmblaApi.scrollNext();
+      } else if (mobileEmblaApi) {
+        mobileEmblaApi.scrollNext();
+      }
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying, items.length]);
+  }, [isAutoPlaying, items.length, desktopEmblaApi, mobileEmblaApi]);
 
-  // 预加载所有图片的不同尺寸，避免切换延迟导致大图小图同步问题
+  // Sync Desktop Embla to state and Mobile
+  useEffect(() => {
+    if (!desktopEmblaApi) return;
+    const onSelect = () => {
+      const index = desktopEmblaApi.selectedScrollSnap();
+      setCurrentIndex(index);
+      if (mobileEmblaApi && mobileEmblaApi.selectedScrollSnap() !== index) {
+        mobileEmblaApi.scrollTo(index, true);
+      }
+    };
+    desktopEmblaApi.on("select", onSelect);
+    return () => {
+      desktopEmblaApi.off("select", onSelect);
+    };
+  }, [desktopEmblaApi, mobileEmblaApi]);
+
+  // Sync Mobile Embla to state and Desktop
+  useEffect(() => {
+    if (!mobileEmblaApi) return;
+    const onSelect = () => {
+      const index = mobileEmblaApi.selectedScrollSnap();
+      setCurrentIndex(index);
+      if (desktopEmblaApi && desktopEmblaApi.selectedScrollSnap() !== index) {
+        desktopEmblaApi.scrollTo(index, true);
+      }
+    };
+    mobileEmblaApi.on("select", onSelect);
+    return () => {
+      mobileEmblaApi.off("select", onSelect);
+    };
+  }, [mobileEmblaApi, desktopEmblaApi]);
+
+  // Re-init Embla on item size changes to update snap points
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (desktopEmblaApi) desktopEmblaApi.reInit();
+      if (mobileEmblaApi) mobileEmblaApi.reInit();
+    }, 550);
+    return () => clearTimeout(timer);
+  }, [currentIndex, desktopEmblaApi, mobileEmblaApi]);
+
+  // Preload only sizes relevant to screen width
   useEffect(() => {
     if (typeof window === "undefined" || !items || items.length === 0) return;
     items.forEach((item) => {
       if (item?.image) {
-        ["large", "medium", "small"].forEach((size) => {
+        const sizesToPreload = window.innerWidth >= 768 ? ["medium"] : ["small"];
+        sizesToPreload.forEach((size) => {
           const url = getOptimizedImageUrl(item.image as any, size as any);
           if (url) {
             const img = new window.Image();
@@ -173,15 +235,24 @@ export function OemAdvantages({
 
   const handlePrev = () => {
     setIsAutoPlaying(false);
-    setCurrentIndex((prev) => (prev - 1 + items.length) % items.length);
+    if (window.innerWidth >= 768 && desktopEmblaApi) {
+      desktopEmblaApi.scrollPrev();
+    } else if (mobileEmblaApi) {
+      mobileEmblaApi.scrollPrev();
+    }
   };
 
   const handleNext = () => {
     setIsAutoPlaying(false);
-    setCurrentIndex((prev) => (prev + 1) % items.length);
+    if (window.innerWidth >= 768 && desktopEmblaApi) {
+      desktopEmblaApi.scrollNext();
+    } else if (mobileEmblaApi) {
+      mobileEmblaApi.scrollNext();
+    }
   };
 
   const currentItem = items[currentIndex];
+
   const nextIndex = (currentIndex + 1) % items.length;
   const nextItem = items[nextIndex];
 
@@ -244,116 +315,95 @@ export function OemAdvantages({
             {title}
           </motion.h2>
 
-          {/* 左侧大图片 - 当前item的图片 */}
+          {/* 优势图片轮播区域 - 包含可见的当前（大）和下一个（小）图片 */}
           <div
             className="absolute overflow-hidden"
+            ref={desktopEmblaRef}
             style={{
-              left: rpx(107), // 153 * 0.7
+              left: rpx(107),
               top: rpx(0),
-              width: rpx(387), // 553 * 0.7
-              height: rpx(573), // 819 * 0.7
-              borderRadius: rpx(21), // 30 * 0.7
+              width: rpx(665), // 387 (active) + 26 (gap) + 252 (next) = 665
+              height: rpx(573),
             }}
           >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentIndex}
-                className="w-full h-full"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                {leftImage ? (
-                  leftImage.enableLink && leftImage.linkUrl ? (
-                    <Link
-                      href={leftImage.linkUrl}
-                      target={leftImage.openInNewTab ? "_blank" : undefined}
-                      rel={
-                        leftImage.openInNewTab
-                          ? "noopener noreferrer"
-                          : undefined
-                      }
-                      className="block w-full h-full"
-                    >
-                      <OptimizedImage
-                        image={leftImage as any}
-                        alt={currentItem?.title || "Advantage Image"}
-                        size="large"
-                        className="w-full h-full object-cover"
-                        priority
-                      />
-                    </Link>
-                  ) : (
-                    <OptimizedImage
-                      image={leftImage as any}
-                      alt={currentItem?.title || "Advantage Image"}
-                      size="large"
-                      className="w-full h-full object-cover"
-                      priority
-                    />
-                  )
-                ) : (
-                  <div className="w-full h-full bg-[#D9D9D9]" />
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
+            <div
+              className="flex items-end h-full !overflow-visible"
+            >
+              {items.map((item, index) => {
+                const isActive = currentIndex === index;
+                const isNext = (currentIndex + 1) % items.length === index;
+                const isVisible = isActive || isNext;
 
-          {/* 中间小图片 - 下一个item的图片 */}
-          <div
-            className="absolute overflow-hidden"
-            style={{
-              left: rpx(520), // 743 * 0.7
-              top: rpx(204), // 291 * 0.7
-              width: rpx(252), // 360 * 0.7
-              height: rpx(334), // 477 * 0.7
-              borderRadius: rpx(21), // 30 * 0.7
-            }}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={nextIndex}
-                className="w-full h-full"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                {middleImage ? (
-                  middleImage.enableLink && middleImage.linkUrl ? (
-                    <Link
-                      href={middleImage.linkUrl}
-                      target={middleImage.openInNewTab ? "_blank" : undefined}
-                      rel={
-                        middleImage.openInNewTab
-                          ? "noopener noreferrer"
-                          : undefined
-                      }
-                      className="block w-full h-full"
+                return (
+                  <div
+                    key={index}
+                    className="embla__slide relative flex-shrink-0"
+                    style={{
+                      width: rpx(387),
+                      height: rpx(573),
+                      marginRight: rpx(26),
+                    }}
+                  >
+                    <div
+                      className="overflow-hidden bg-[#D9D9D9]"
+                      style={{
+                        width: isActive ? rpx(387) : rpx(252),
+                        height: isActive ? rpx(573) : rpx(334),
+                        marginTop: isActive ? 0 : rpx(204),
+                        borderRadius: rpx(21),
+                        opacity: isVisible ? 1 : 0,
+                        transition: "all 700ms cubic-bezier(0.25, 1, 0.5, 1)",
+                      }}
                     >
-                      <OptimizedImage
-                        image={middleImage as any}
-                        alt={nextItem?.title || "Next Advantage Image"}
-                        size="medium"
-                        className="w-full h-full object-cover"
-                        priority
-                      />
-                    </Link>
-                  ) : (
-                    <OptimizedImage
-                      image={middleImage as any}
-                      alt={nextItem?.title || "Next Advantage Image"}
-                      size="medium"
-                      className="w-full h-full object-cover"
-                      priority
-                    />
-                  )
-                ) : (
-                  <div className="w-full h-full bg-[#D9D9D9]" />
-                )}
-              </motion.div>
-            </AnimatePresence>
+                      {item.image ? (
+                        item.image.enableLink && item.image.linkUrl ? (
+                          <Link
+                            href={item.image.linkUrl}
+                            target={item.image.openInNewTab ? "_blank" : undefined}
+                            rel={item.image.openInNewTab ? "noopener noreferrer" : undefined}
+                            className="block w-full h-full"
+                          >
+                            <div
+                              className="w-full h-full"
+                              style={{
+                                transform: isActive ? "scale(1)" : "scale(1.08)",
+                                transition: "transform 700ms cubic-bezier(0.25, 1, 0.5, 1)",
+                              }}
+                            >
+                              <OptimizedImage
+                                image={item.image as any}
+                                alt={item.title || "Advantage Image"}
+                                size="medium"
+                                className="w-full h-full object-cover"
+                                priority={isActive}
+                              />
+                            </div>
+                          </Link>
+                        ) : (
+                          <div
+                            className="w-full h-full"
+                            style={{
+                              transform: isActive ? "scale(1)" : "scale(1.08)",
+                              transition: "transform 700ms cubic-bezier(0.25, 1, 0.5, 1)",
+                            }}
+                          >
+                            <OptimizedImage
+                              image={item.image as any}
+                              alt={item.title || "Advantage Image"}
+                              size="medium"
+                              className="w-full h-full object-cover"
+                              priority={isActive}
+                            />
+                          </div>
+                        )
+                      ) : (
+                        <div className="w-full h-full bg-[#D9D9D9]" />
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* 右侧内容区域 */}
@@ -492,99 +542,90 @@ export function OemAdvantages({
           {title}
         </h2>
 
-        {/* 图片区域 */}
-        <div className="flex gap-3 mb-6">
-          {/* 左侧大图 - 当前item */}
-          <div className="flex-1 aspect-[553/819] rounded-2xl overflow-hidden">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentIndex}
-                className="w-full h-full"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                {leftImage ? (
-                  leftImage.enableLink && leftImage.linkUrl ? (
-                    <Link
-                      href={leftImage.linkUrl}
-                      target={leftImage.openInNewTab ? "_blank" : undefined}
-                      rel={
-                        leftImage.openInNewTab
-                          ? "noopener noreferrer"
-                          : undefined
-                      }
-                      className="block w-full h-full"
-                    >
-                      <OptimizedImage
-                        image={leftImage as any}
-                        alt={currentItem?.title || "Advantage Image"}
-                        size="medium"
-                        className="w-full h-full object-cover"
-                        priority
-                      />
-                    </Link>
-                  ) : (
-                    <OptimizedImage
-                      image={leftImage as any}
-                      alt={currentItem?.title || "Advantage Image"}
-                      size="medium"
-                      className="w-full h-full object-cover"
-                      priority
-                    />
-                  )
-                ) : (
-                  <div className="w-full h-full bg-[#D9D9D9]" />
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-          {/* 中间小图 - 下一个item */}
-          <div className="w-1/3 aspect-[360/477] rounded-2xl overflow-hidden self-end">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={nextIndex}
-                className="w-full h-full"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                {middleImage ? (
-                  middleImage.enableLink && middleImage.linkUrl ? (
-                    <Link
-                      href={middleImage.linkUrl}
-                      target={middleImage.openInNewTab ? "_blank" : undefined}
-                      rel={
-                        middleImage.openInNewTab
-                          ? "noopener noreferrer"
-                          : undefined
-                      }
-                      className="block w-full h-full"
-                    >
-                      <OptimizedImage
-                        image={middleImage as any}
-                        alt={nextItem?.title || "Next Advantage Image"}
-                        size="small"
-                        className="w-full h-full object-cover"
-                        priority
-                      />
-                    </Link>
-                  ) : (
-                    <OptimizedImage
-                      image={middleImage as any}
-                      alt={nextItem?.title || "Next Advantage Image"}
-                      size="small"
-                      className="w-full h-full object-cover"
-                      priority
-                    />
-                  )
-                ) : (
-                  <div className="w-full h-full bg-[#D9D9D9]" />
-                )}
-              </motion.div>
-            </AnimatePresence>
+        {/* 优势图片轮播区域 */}
+        <div
+          className="w-full overflow-hidden mb-6"
+          ref={mobileEmblaRef}
+          style={{
+            height: "calc((100vw - 40px) * 0.62 * (819 / 553))",
+          }}
+        >
+          <div
+            className="flex items-end h-full !overflow-visible"
+          >
+            {items.map((item, index) => {
+              const isActive = currentIndex === index;
+              const isNext = (currentIndex + 1) % items.length === index;
+              const isVisible = isActive || isNext;
+
+              return (
+                <div
+                  key={index}
+                  className="embla__slide relative flex-shrink-0 h-full"
+                  style={{
+                    width: "62%",
+                    marginRight: "12px",
+                  }}
+                >
+                  <div
+                    className="overflow-hidden bg-[#D9D9D9]"
+                    style={{
+                      width: isActive ? "100%" : "51.6%",
+                      height: isActive ? "100%" : "46.2%",
+                      marginTop: isActive ? 0 : "53.8%",
+                      borderRadius: "16px",
+                      opacity: isVisible ? 1 : 0,
+                      transition: "all 700ms cubic-bezier(0.25, 1, 0.5, 1)",
+                    }}
+                  >
+                    {item.image ? (
+                      item.image.enableLink && item.image.linkUrl ? (
+                        <Link
+                          href={item.image.linkUrl}
+                          target={item.image.openInNewTab ? "_blank" : undefined}
+                          rel={item.image.openInNewTab ? "noopener noreferrer" : undefined}
+                          className="block w-full h-full"
+                        >
+                          <div
+                            className="w-full h-full"
+                            style={{
+                              transform: isActive ? "scale(1)" : "scale(1.08)",
+                              transition: "transform 700ms cubic-bezier(0.25, 1, 0.5, 1)",
+                            }}
+                          >
+                            <OptimizedImage
+                              image={item.image as any}
+                              alt={item.title || "Advantage Image"}
+                              size="small"
+                              className="w-full h-full object-cover"
+                              priority={isActive}
+                            />
+                          </div>
+                        </Link>
+                      ) : (
+                        <div
+                          className="w-full h-full"
+                          style={{
+                            transform: isActive ? "scale(1)" : "scale(1.08)",
+                            transition: "transform 700ms cubic-bezier(0.25, 1, 0.5, 1)",
+                          }}
+                        >
+                          <OptimizedImage
+                            image={item.image as any}
+                            alt={item.title || "Advantage Image"}
+                            size="small"
+                            className="w-full h-full object-cover"
+                            priority={isActive}
+                          />
+                        </div>
+                      )
+                    ) : (
+                      <div className="w-full h-full bg-[#D9D9D9]" />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -667,7 +708,11 @@ export function OemAdvantages({
               key={index}
               onClick={() => {
                 setIsAutoPlaying(false);
-                setCurrentIndex(index);
+                if (window.innerWidth >= 768 && desktopEmblaApi) {
+                  desktopEmblaApi.scrollTo(index);
+                } else if (mobileEmblaApi) {
+                  mobileEmblaApi.scrollTo(index);
+                }
               }}
               className={`w-2 h-2 rounded-full transition-colors ${
                 index === currentIndex ? "bg-[#FFFB7D]" : "bg-white/30"

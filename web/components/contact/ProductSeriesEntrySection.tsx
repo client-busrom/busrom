@@ -10,7 +10,7 @@ import AutoScroll from "embla-carousel-auto-scroll"
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920
-const SECTION_HEIGHT = 850
+const SECTION_HEIGHT = 968
 
 // 移动端设计稿基准尺寸
 const MOBILE_DESIGN_WIDTH = 375
@@ -317,58 +317,59 @@ export function ProductSeriesEntrySection({
               {products.map((product, index) => {
                 const isLast = index === products.length - 1
                 return (
-                <Link
-                  key={product.id}
-                  href={product.link || viewMoreLink}
-                  className="relative flex-shrink-0 group"
-                  style={{
-                    width: `${MOBILE_CARD_WIDTH}px`,
-                    height: `${MOBILE_CARD_HEIGHT}px`,
-                    marginRight: isLast ? `${MOBILE_CARD_GAP}px` : undefined,
-                  }}
-                >
-                  {/* 卡片容器 */}
-                  <div
-                    className="absolute inset-0 overflow-hidden bg-white transition-shadow duration-300 group-active:shadow-lg"
+                  <Link
+                    key={product.id}
+                    href={product.link || viewMoreLink}
+                    className="relative flex-shrink-0 group"
                     style={{
-                      borderRadius: "16px",
-                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                      width: `${MOBILE_CARD_WIDTH}px`,
+                      height: `${MOBILE_CARD_HEIGHT}px`,
+                      marginRight: isLast ? `${MOBILE_CARD_GAP}px` : undefined,
                     }}
                   >
-                    {/* 图片 */}
-                    {product.image && (
-                      <div
-                        className="absolute"
-                        style={{
-                          top: "10%",
-                          left: "50%",
-                          transform: "translateX(-50%)",
-                          width: "75%",
-                          height: "60%",
-                        }}
-                      >
-                        <OptimizedImage
-                          image={product.image}
-                          alt={product.image.alt || product.title}
-                          size="medium"
-                          objectFit="contain"
-                          className="w-full h-full"
-                        />
-                      </div>
-                    )}
-
-                    {/* View More - 常显 */}
+                    {/* 卡片容器 */}
                     <div
-                      className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-1 text-xs font-josefin-sans font-bold text-brand-olive-dark"
+                      className="absolute inset-0 overflow-hidden bg-white transition-shadow duration-300 group-active:shadow-lg"
+                      style={{
+                        borderRadius: "16px",
+                        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                      }}
                     >
-                      <span>{product.buttonText || viewMoreText}</span>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
+                      {/* 图片 */}
+                      {product.image && (
+                        <div
+                          className="absolute"
+                          style={{
+                            top: "10%",
+                            left: "50%",
+                            transform: "translateX(-50%)",
+                            width: "75%",
+                            height: "60%",
+                          }}
+                        >
+                          <OptimizedImage
+                            image={product.image}
+                            alt={product.image.alt || product.title}
+                            size="medium"
+                            objectFit="contain"
+                            className="w-full h-full"
+                          />
+                        </div>
+                      )}
+
+                      {/* View More - 常显 */}
+                      <div
+                        className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-1 text-xs font-josefin-sans font-bold text-brand-olive-dark"
+                      >
+                        <span>{product.buttonText || viewMoreText}</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              )})}
+                  </Link>
+                )
+              })}
             </div>
           </div>
 
@@ -379,8 +380,8 @@ export function ProductSeriesEntrySection({
               className="w-10 h-10 flex items-center justify-center"
             >
               <svg viewBox="0 0 83 82" fill="none" className="w-full h-full">
-                <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="white"/>
-                <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="#464010"/>
+                <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="white" />
+                <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="#464010" />
               </svg>
             </button>
             <button
@@ -388,8 +389,8 @@ export function ProductSeriesEntrySection({
               className="w-10 h-10 flex items-center justify-center"
             >
               <svg viewBox="0 0 83 82" fill="none" className="w-full h-full">
-                <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="white"/>
-                <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="#464010"/>
+                <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="white" />
+                <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="#464010" />
               </svg>
             </button>
           </div>
@@ -491,7 +492,7 @@ export function ProductSeriesEntrySection({
             <motion.span
               key={`bold-${index}`}
               className="inline-block text-brand-main text-stroke-dark-olive"
-              style={{ 
+              style={{
                 marginRight: char === " " ? vw(16) : 0,
                 willChange: "transform"
               }}
@@ -517,7 +518,7 @@ export function ProductSeriesEntrySection({
               <motion.span
                 key={`normal-${index}`}
                 className="inline-block text-black"
-                style={{ 
+                style={{
                   marginRight: char === " " ? vw(16) : 0,
                   willChange: "transform"
                 }}
@@ -538,7 +539,7 @@ export function ProductSeriesEntrySection({
           <motion.div
             key="question-mark"
             className="inline-block relative"
-            style={{ 
+            style={{
               width: vw(70),
               height: vw(106),
               transformOrigin: "center bottom",
@@ -569,7 +570,7 @@ export function ProductSeriesEntrySection({
         onClick={handlePrev}
         className="absolute cursor-pointer group z-10"
         style={{
-          left: vw(153),
+          left: vw(150),
           top: vw(400),
           width: vw(83),
           height: vw(82),
@@ -581,8 +582,8 @@ export function ProductSeriesEntrySection({
           viewBox="0 0 83 82"
           fill="none"
         >
-          <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="none"/>
-          <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="#464010"/>
+          <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="none" />
+          <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="#464010" />
         </svg>
         {/* 悬停状态 - 实心圆 */}
         <svg
@@ -590,8 +591,8 @@ export function ProductSeriesEntrySection({
           viewBox="0 0 83 82"
           fill="none"
         >
-          <ellipse cx="41.5" cy="41" rx="41.5" ry="41" fill="#756F3F"/>
-          <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="white"/>
+          <ellipse cx="41.5" cy="41" rx="41.5" ry="41" fill="#756F3F" />
+          <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="white" />
         </svg>
       </button>
 
@@ -600,7 +601,7 @@ export function ProductSeriesEntrySection({
         onClick={handleNext}
         className="absolute cursor-pointer group z-10"
         style={{
-          left: vw(1666),
+          right: vw(150),
           top: vw(400),
           width: vw(83),
           height: vw(82),
@@ -612,8 +613,8 @@ export function ProductSeriesEntrySection({
           viewBox="0 0 83 82"
           fill="none"
         >
-          <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="none"/>
-          <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="#464010"/>
+          <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="none" />
+          <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="#464010" />
         </svg>
         {/* 悬停状态 - 实心圆 */}
         <svg
@@ -621,8 +622,8 @@ export function ProductSeriesEntrySection({
           viewBox="0 0 83 82"
           fill="none"
         >
-          <ellipse cx="41.5" cy="41" rx="41.5" ry="41" fill="#756F3F"/>
-          <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="white"/>
+          <ellipse cx="41.5" cy="41" rx="41.5" ry="41" fill="#756F3F" />
+          <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="white" />
         </svg>
       </button>
 
@@ -633,7 +634,7 @@ export function ProductSeriesEntrySection({
         style={{
           left: vw(100),
           right: vw(0),
-          bottom: vw(80),
+          bottom: vw(166),
           height: vw(EXPANDED_HEIGHT + 100),
         }}
       >
@@ -662,7 +663,7 @@ export function ProductSeriesEntrySection({
                     ? "0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 12px 24px -8px rgba(0, 0, 0, 0.4)"
                     : "0 4px 12px rgba(0, 0, 0, 0.1)",
                   marginLeft: isFirst ? vw(200) : undefined,
-                  marginRight: isLast ? vw(300) : undefined,
+                  marginRight: isLast ? (isActive ? vw(550) : vw(350)) : undefined,
                 }}
                 onClick={() => handleCardClick(index)}
               >
