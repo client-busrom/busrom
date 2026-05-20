@@ -74,3 +74,16 @@ MEDIA_REIMPORT_PLAN.md
 .gemini/
 .github/skills/
 actions-runner/
+
+# Local debug/maintenance scripts (often contain hardcoded DB credentials)
+# CRITICAL: These .mjs scripts have been leaking production database passwords!
+payload-cms/*.mjs
+!payload-cms/next.config.mjs
+!payload-cms/css-loader.mjs
+!payload-cms/css-loader-hooks.mjs
+payload-cms/scripts/*.mjs
+payload-cms/scratch/
+payload-cms/src/scripts/*.mjs
+
+# Payload auto-generated schema (contains DB structure details)
+payload-cms/src/payload-generated-schema.ts
