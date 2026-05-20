@@ -245,27 +245,36 @@ export function ProductFeaturesSection({
   const rightItems = items.slice(midPoint)
 
   // Calculate dynamic positions for any number of items to follow the moon's curve
-  const getDynamicPositions = (count: number, side: "left" | "right") => {
+  const getDynamicPositions = (leftCount: number, rightCount: number, side: "left" | "right") => {
     const positions = []
     const startY = 320
     const endY = 700
-    const step = count > 1 ? (endY - startY) / (count - 1) : 0
+    const count = side === "left" ? leftCount : rightCount
+    
+    // Base step size on maxCount so both sides are aligned from top to bottom
+    const maxCount = Math.max(leftCount, rightCount)
+    const step = maxCount > 1 ? (endY - startY) / (maxCount - 1) : 0
     
     for (let i = 0; i < count; i++) {
-      const dotY = count === 1 ? (startY + endY) / 2 : startY + step * i
+      const dotY = maxCount === 1 ? (startY + endY) / 2 : startY + step * i
       // Center of the moon vertically is roughly 510
       const offsetFromCenter = Math.abs(dotY - 510)
       // Bulge is max (~60px) at the center, tapering to 0 at the edges
       const bulge = Math.max(0, 60 - (offsetFromCenter * offsetFromCenter) / 600)
       
-      const dotX = side === "left" ? 430 - bulge : 1450 + bulge
+      // Shift inwards at the bottom to follow the tapering image mask (closer to center)
+      const bottomShift = dotY > 510 ? ((dotY - 510) / (endY - 510)) * 45 : 0
+      const dotX = side === "left" 
+        ? 430 - bulge + bottomShift 
+        : 1450 + bulge - bottomShift
+      
       positions.push({ dotX, dotY })
     }
     return positions
   }
 
-  const leftPositions = getDynamicPositions(leftItems.length, "left")
-  const rightPositions = getDynamicPositions(rightItems.length, "right")
+  const leftPositions = getDynamicPositions(leftItems.length, rightItems.length, "left")
+  const rightPositions = getDynamicPositions(leftItems.length, rightItems.length, "right")
 
   // Calculate object position from focal point
   const objectPosition = image?.cropFocalPoint

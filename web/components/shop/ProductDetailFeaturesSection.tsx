@@ -153,13 +153,13 @@ export function ProductDetailFeaturesSection({
       const trackHeight = scrollContainerRef.current.clientHeight
       const sHeight = scrollContainerRef.current.scrollHeight
       const cHeight = scrollContainerRef.current.clientHeight
-      
+
       if (sHeight <= cHeight) return
-      
+
       const thumbHeight = (cHeight / sHeight) * trackHeight
       const maxThumbOffset = trackHeight - thumbHeight
       const maxScrollTop = sHeight - cHeight
-      
+
       const scale = maxScrollTop / maxThumbOffset
       scrollContainerRef.current.scrollTop = dragStartScrollTop.current + deltaY * scale
     }
@@ -414,19 +414,19 @@ export function ProductDetailFeaturesSection({
 
             {/* Custom Scrollbar */}
             {hasScrollbar && (
-              <div 
+              <div
                 className="absolute top-0 w-1.5 bg-[#46401F]/10 rounded-full"
-                style={{ 
-                  right: rpx(-24),
+                style={{
+                  right: rpx(-48),
                   height: "100%",
                   zIndex: 20,
                 }}
               >
-                <div 
+                <div
                   onMouseDown={handleThumbMouseDown}
                   className="w-full bg-[#46401F] rounded-full transition-colors duration-200 hover:bg-[#908741] active:bg-[#908741]"
-                  style={{ 
-                    height: `${thumbHeight}px`, 
+                  style={{
+                    height: `${thumbHeight}px`,
                     transform: `translateY(${thumbOffset}px)`,
                     cursor: isDraggingThumb ? "grabbing" : "grab",
                   }}
