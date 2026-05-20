@@ -425,6 +425,7 @@ export function ProductCoreAdvantagesSection({
                             <div
                               className="flex items-start overflow-y-auto [&::-webkit-scrollbar]:hidden"
                               data-lenis-prevent="true"
+                              onMouseDown={(e) => e.stopPropagation()}
                               style={{
                                 width: rpx(356),
                                 height: rpx(100),
@@ -498,6 +499,7 @@ export function ProductCoreAdvantagesSection({
                             <div
                               className="flex items-start overflow-y-auto [&::-webkit-scrollbar]:hidden"
                               data-lenis-prevent="true"
+                              onMouseDown={(e) => e.stopPropagation()}
                               style={{
                                 width: rpx(356),
                                 height: rpx(100),

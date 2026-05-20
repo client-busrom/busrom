@@ -73,9 +73,40 @@ export function ProductDetailFeaturesSection({
   const [scrollTop, setScrollTop] = useState(0)
   const [showScrollHint, setShowScrollHint] = useState(items.length > 3)
 
+  const [currentScrollTop, setCurrentScrollTop] = useState(0)
+  const [scrollHeight, setScrollHeight] = useState(0)
+  const [clientHeight, setClientHeight] = useState(0)
+  const [isDraggingThumb, setIsDraggingThumb] = useState(false)
+
+  const dragStartMouseY = useRef(0)
+  const dragStartScrollTop = useRef(0)
+
+  // Track initial dimensions and items changes
+  React.useEffect(() => {
+    if (scrollContainerRef.current) {
+      setScrollHeight(scrollContainerRef.current.scrollHeight)
+      setClientHeight(scrollContainerRef.current.clientHeight)
+      setCurrentScrollTop(scrollContainerRef.current.scrollTop)
+    }
+  }, [items])
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (scrollContainerRef.current) {
+        setScrollHeight(scrollContainerRef.current.scrollHeight)
+      }
+    }
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget
-    if (scrollHeight - scrollTop - clientHeight < 10) {
+    const { scrollTop: sTop, scrollHeight: sHeight, clientHeight: cHeight } = e.currentTarget
+    setCurrentScrollTop(sTop)
+    setScrollHeight(sHeight)
+    setClientHeight(cHeight)
+
+    if (sHeight - sTop - cHeight < 10) {
       setShowScrollHint(false)
     } else {
       setShowScrollHint(true)
@@ -103,6 +134,51 @@ export function ProductDetailFeaturesSection({
     const walk = (e.clientY - startY) * 1.5
     scrollContainerRef.current.scrollTop = scrollTop - walk
   }
+
+  const handleThumbMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!scrollContainerRef.current) return
+    setIsDraggingThumb(true)
+    dragStartMouseY.current = e.clientY
+    dragStartScrollTop.current = scrollContainerRef.current.scrollTop
+  }
+
+  React.useEffect(() => {
+    if (!isDraggingThumb) return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!scrollContainerRef.current) return
+      const deltaY = e.clientY - dragStartMouseY.current
+      const trackHeight = scrollContainerRef.current.clientHeight
+      const sHeight = scrollContainerRef.current.scrollHeight
+      const cHeight = scrollContainerRef.current.clientHeight
+      
+      if (sHeight <= cHeight) return
+      
+      const thumbHeight = (cHeight / sHeight) * trackHeight
+      const maxThumbOffset = trackHeight - thumbHeight
+      const maxScrollTop = sHeight - cHeight
+      
+      const scale = maxScrollTop / maxThumbOffset
+      scrollContainerRef.current.scrollTop = dragStartScrollTop.current + deltaY * scale
+    }
+
+    const handleMouseUp = () => {
+      setIsDraggingThumb(false)
+    }
+
+    window.addEventListener("mousemove", handleMouseMove)
+    window.addEventListener("mouseup", handleMouseUp)
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("mouseup", handleMouseUp)
+    }
+  }, [isDraggingThumb])
+
+  const hasScrollbar = scrollHeight > clientHeight
+  const thumbHeight = hasScrollbar ? Math.max((clientHeight / scrollHeight) * clientHeight, 40) : 0
+  const thumbOffset = hasScrollbar ? (currentScrollTop / (scrollHeight - clientHeight)) * (clientHeight - thumbHeight) : 0
 
   // Calculate object position from focal point
   const objectPosition = image?.cropFocalPoint
@@ -276,6 +352,7 @@ export function ProductDetailFeaturesSection({
                       padding: rpx(20),
                       paddingBottom: rpx(14),
                       willChange: "transform, opacity",
+                      overscrollBehavior: "contain",
                     }}
                   >
                     {/* Title */}
@@ -334,6 +411,28 @@ export function ProductDetailFeaturesSection({
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Custom Scrollbar */}
+            {hasScrollbar && (
+              <div 
+                className="absolute top-0 w-1.5 bg-[#46401F]/10 rounded-full"
+                style={{ 
+                  right: rpx(-24),
+                  height: "100%",
+                  zIndex: 20,
+                }}
+              >
+                <div 
+                  onMouseDown={handleThumbMouseDown}
+                  className="w-full bg-[#46401F] rounded-full transition-colors duration-200 hover:bg-[#908741] active:bg-[#908741]"
+                  style={{ 
+                    height: `${thumbHeight}px`, 
+                    transform: `translateY(${thumbOffset}px)`,
+                    cursor: isDraggingThumb ? "grabbing" : "grab",
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           {/* Right Column - Title and Circle */}
