@@ -236,7 +236,7 @@
 
 // Override react-easy-crop styles for dashed border
 .crop-editor__crop-area {
-  border: 2px dashed rgba(255, 255, 255, 0.8) !important;
+  border: 2px dashed rgba(255, 0, 0, 0.9) !important;
   box-shadow: none !important;
 
   &::before,

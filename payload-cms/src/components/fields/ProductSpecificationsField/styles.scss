@@ -646,10 +646,18 @@
               display: none;
             }
 
-            .media-picker__remove {
+            .media-picker__selected-actions {
               position: absolute;
               top: -6px;
               right: -6px;
+              display: flex;
+              flex-direction: row;
+              gap: 4px;
+            }
+
+            .media-picker__crop,
+            .media-picker__remove {
+              position: static;
               width: 18px;
               height: 18px;
               font-size: 10px;

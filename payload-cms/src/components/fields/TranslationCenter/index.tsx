@@ -666,13 +666,16 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
             '_locale', '_parent_id', 'prevpost', 'nextpost', 
             'kb_recommended_posts_posts', 'kb_bottom_recommended_posts'
           ]
+          // Also filter out any field ending with 'CropData' (image crop metadata)
+          // These are internal technical fields that should never be translated
           const newObj: any = {}
           for (const [key, value] of Object.entries(obj)) {
             const lowerKey = key.toLowerCase()
             if (
               illegalFields.includes(lowerKey) || 
               (key.startsWith('_') && !['_id', 'id'].includes(key)) ||
-              (lowerKey.startsWith('kb_') && (lowerKey.endsWith('_posts') || lowerKey.endsWith('_post')))
+              (lowerKey.startsWith('kb_') && (lowerKey.endsWith('_posts') || lowerKey.endsWith('_post'))) ||
+              key.endsWith('CropData')
             ) {
               continue
             }

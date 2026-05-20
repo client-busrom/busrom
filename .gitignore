@@ -81,6 +81,7 @@ payload-cms/*.mjs
 !payload-cms/next.config.mjs
 !payload-cms/css-loader.mjs
 !payload-cms/css-loader-hooks.mjs
+!payload-cms/clear-dev-migrations.mjs
 payload-cms/scripts/*.mjs
 payload-cms/scratch/
 payload-cms/src/scripts/*.mjs

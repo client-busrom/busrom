@@ -2,12 +2,15 @@
 
 import React, { useState, useEffect } from 'react'
 import { OptimizedImage } from '@/components/ui/OptimizedImage'
+import { getCropStyles, getCropImageUrl } from '@/lib/utils'
+import type { ImageCropData } from '@/lib/content-data'
 
 interface SpecificationItem {
   text?: string
   value?: Record<string, string>
   color?: string
   image?: any
+  imageCropData?: ImageCropData | null
 }
 
 interface SpecificationGroup {
@@ -125,15 +128,35 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
                               {hasColor ? (
                                 <div className="w-full h-full" style={{ backgroundColor: item.color }} />
                               ) : (
-                                <OptimizedImage
-                                  image={item.image}
-                                  alt={itemText}
-                                  width={82}
-                                  height={62}
-                                  objectFit="contain"
-                                  className="w-full h-full object-contain"
-                                  size="small"
-                                />
+                                (() => {
+                                  if (item.imageCropData) {
+                                    const cropStyles = getCropStyles(item.imageCropData, 82, 62)
+                                    const cropUrl = getCropImageUrl(item.image, item.imageCropData)
+                                    if (cropStyles) {
+                                      return (
+                                        <div style={cropStyles.container} className="w-full h-full">
+                                          <img
+                                            src={cropUrl}
+                                            alt={itemText}
+                                            style={cropStyles.image}
+                                            className="max-w-none"
+                                          />
+                                        </div>
+                                      )
+                                    }
+                                  }
+                                  return (
+                                    <OptimizedImage
+                                      image={item.image}
+                                      alt={itemText}
+                                      width={82}
+                                      height={62}
+                                      objectFit="contain"
+                                      className="w-full h-full object-contain"
+                                      size="small"
+                                    />
+                                  )
+                                })()
                               )}
                             </div>
                           )}

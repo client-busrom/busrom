@@ -286,15 +286,97 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
     }
   }
 
-  // --- 预设尺寸 ---
-  const presets = [
-    { label: 'Banner', w: 1920, h: 600 },
-    { label: '16:9', w: 1920, h: 1080 },
-    { label: '4:3', w: 1024, h: 768 },
-    { label: '1:1', w: 800, h: 800 },
-    { label: 'Card', w: 768, h: 512 },
-    { label: 'Mobile', w: 375, h: 200 },
+  // --- 预设尺寸分组 ---
+  const presetGroups = [
+    {
+      label: '通用',
+      options: [
+        { label: 'Banner (1920×600)', w: 1920, h: 600 },
+        { label: '16:9 (1920×1080)', w: 1920, h: 1080 },
+        { label: '4:3 (1024×768)', w: 1024, h: 768 },
+        { label: '1:1 (800×800)', w: 800, h: 800 },
+        { label: 'Card (768×512)', w: 768, h: 512 },
+        { label: 'Mobile (375×200)', w: 375, h: 200 },
+      ],
+    },
+    {
+      label: 'HeroBanner1',
+      options: [
+        { label: 'Frame1 (666×627)', w: 666, h: 627 },
+        { label: 'Frame2 (583×691)', w: 583, h: 691 },
+      ],
+    },
+    {
+      label: 'HeroBanner2',
+      options: [
+        { label: '大图 (559×510)', w: 559, h: 510 },
+        { label: '小图 (327×299)', w: 327, h: 299 },
+      ],
+    },
+    {
+      label: 'HeroBanner3',
+      options: [
+        { label: '列图 (240×880)', w: 240, h: 880 },
+      ],
+    },
+    {
+      label: 'HeroBanner6',
+      options: [
+        { label: '左侧 (1253×922)', w: 1253, h: 922 },
+        { label: '右侧 (957×1121)', w: 957, h: 1121 },
+      ],
+    },
+    {
+      label: 'HeroBanner7',
+      options: [
+        { label: '主图 (952×922)', w: 952, h: 922 },
+        { label: '菱形Top (506×336)', w: 506, h: 336 },
+        { label: '菱形Mid (338×338)', w: 338, h: 338 },
+        { label: '菱形Bot (506×347)', w: 506, h: 347 },
+      ],
+    },
+    {
+      label: 'HeroBanner8',
+      options: [
+        { label: '主图 (1134×922)', w: 1134, h: 922 },
+        { label: '小图 (318×291)', w: 318, h: 291 },
+      ],
+    },
+    {
+      label: 'HeroBanner9',
+      options: [
+        { label: '主背景 (1292×922)', w: 1292, h: 922 },
+        { label: '左下角 (433×400)', w: 433, h: 400 },
+      ],
+    },
+    {
+      label: 'FeatureImageLayout',
+      options: [
+        { label: 'L0-图1 (243×170)', w: 243, h: 170 },
+        { label: 'L0-图2 (332×170)', w: 332, h: 170 },
+        { label: 'L0-图3 (382×232)', w: 382, h: 232 },
+        { label: 'L0-图4 (192×232)', w: 192, h: 232 },
+        { label: 'L1-图 (298×416)', w: 298, h: 416 },
+        { label: 'L2-图 (188×203)', w: 188, h: 203 },
+        { label: 'L3-图 (346×400)', w: 346, h: 400 },
+      ],
+    },
+    {
+      label: 'ProductSeries',
+      options: [
+        { label: '封面 (640×640)', w: 640, h: 640 },
+        { label: '场景 (1920×1080)', w: 1920, h: 1080 },
+        { label: '静态 (480×480)', w: 480, h: 480 },
+      ],
+    },
   ]
+
+  const allPresets = presetGroups.flatMap(g => g.options)
+
+  const getCurrentPresetLabel = () => {
+    const matched = allPresets.find(p => p.w === cropWidth && p.h === cropHeight)
+    return matched ? matched.label : '自定义'
+  }
 
   const applyPreset = (w: number, h: number) => {
     setCropWidth(w)
@@ -434,18 +516,26 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
           {/* 预设尺寸 */}
           <div className="crop-editor__toolbar-group">
             <label className="crop-editor__toolbar-label">预设</label>
-            <div className="crop-editor__presets">
-              {presets.map((p) => (
-                <button
-                  key={p.label}
-                  type="button"
-                  className={`crop-editor__preset-btn ${cropWidth === p.w && cropHeight === p.h ? 'active' : ''}`}
-                  onClick={() => applyPreset(p.w, p.h)}
-                >
-                  {p.label}
-                </button>
+            <select
+              value={`${cropWidth}×${cropHeight}`}
+              onChange={(e) => {
+                const [w, h] = e.target.value.split('×').map(Number)
+                applyPreset(w, h)
+              }}
+              className="crop-editor__select"
+              style={{ minWidth: '160px' }}
+            >
+              <option value={`${cropWidth}×${cropHeight}`}>{getCurrentPresetLabel()}</option>
+              {presetGroups.map((group) => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.options.map((p) => (
+                    <option key={p.label} value={`${p.w}×${p.h}`}>
+                      {p.label}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
-            </div>
+            </select>
           </div>
 
           {/* 分隔线 */}
@@ -453,7 +543,7 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
 
           {/* 缩放控制 */}
           <div className="crop-editor__toolbar-group">
-            <label className="crop-editor__toolbar-label">缩放 {Math.round(zoom * 100)}%</label>
+            <label className="crop-editor__toolbar-label">缩放</label>
             <input
               type="range"
               min={0.1}
@@ -463,13 +553,34 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
               onChange={(e) => setZoom(Number(e.target.value))}
               className="crop-editor__zoom-slider"
             />
+            <input
+              type="number"
+              value={(zoom * 100).toFixed(1)}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value)
+                if (!isNaN(val) && val >= 10 && val <= 500) {
+                  setZoom(val / 100)
+                }
+              }}
+              onBlur={(e) => {
+                const val = parseFloat(e.target.value)
+                if (isNaN(val) || val < 10) setZoom(0.1)
+                else if (val > 500) setZoom(5)
+              }}
+              min={10}
+              max={500}
+              step={0.1}
+              className="crop-editor__size-input"
+              style={{ width: '56px', textAlign: 'center' }}
+            />
+            <span className="crop-editor__size-label" style={{ width: 'auto', marginLeft: '-2px' }}>%</span>
             <button
               type="button"
               className="crop-editor__preset-btn"
               onClick={() => setZoom(1)}
               title="重置为 100%"
             >
-              100%
+              重置
             </button>
           </div>
         </div>
@@ -497,7 +608,7 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
                 background: 'repeating-conic-gradient(#e0e0e0 0% 25%, transparent 0% 50%) 50% / 20px 20px',
               },
               cropAreaStyle: {
-                border: '2px dashed rgba(255, 255, 255, 0.8)',
+                border: '2px dashed rgba(255, 0, 0, 0.9)',
                 color: 'rgba(0, 0, 0, 0.5)',
               },
             }}

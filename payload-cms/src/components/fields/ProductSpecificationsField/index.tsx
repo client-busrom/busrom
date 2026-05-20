@@ -5,6 +5,7 @@ import { useField, useDocumentInfo, useLocale, useTranslation } from '@payloadcm
 import { SUPPORTED_LOCALES, type LocaleCode } from '../../../lib/locales'
 import { fetchAllLocaleData, getFieldFromCache } from '../localeDataCache'
 import { MediaPicker } from '../MediaPicker'
+import type { ImageCropData } from '../ImageCropEditor'
 import { LocaleFlag } from '../../ui/LocaleFlag'
 import './styles.scss'
 
@@ -12,6 +13,7 @@ interface SpecificationItem {
   text: string
   url?: string
   image?: string
+  imageCropData?: ImageCropData | null
   color?: string
 }
 
@@ -197,7 +199,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
   const addItem = useCallback((groupIdx: number) => {
     const newSpecs = currentSpecs.map((group, i) =>
       i === groupIdx
-        ? { ...group, items: [...group.items, { text: '', url: '', image: '', color: '' }] }
+        ? { ...group, items: [...group.items, { text: '', url: '', image: '', imageCropData: null, color: '' }] }
         : group
     )
     updateLocaleSpecs(activeLocale, newSpecs)
@@ -319,10 +321,17 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
         const translations = data.translations || allTexts
 
         // Reconstruct specifications from translated texts
+        // Preserve non-translatable fields (image, imageCropData, color, url)
         const translatedSpecs: SpecificationGroup[] = sourceSpecs.map(group => ({
           text: '',
-          description: '',
-          items: group.items.map(item => ({ ...item, text: '' })),
+          description: group.description || '',
+          items: group.items.map(item => ({
+            text: '',
+            url: item.url || '',
+            image: item.image || '',
+            imageCropData: item.imageCropData || null,
+            color: item.color || '',
+          })),
         }))
 
         for (let i = 0; i < structure.length; i++) {
@@ -545,18 +554,18 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
           <span className="editor-header__locale">
             <LocaleFlag localeCode={activeLocale} className="editor-header__flag" />{' '}
             {SUPPORTED_LOCALES.find(l => l.code === activeLocale)?.label}
-            {activeLocale === currentLocale.code && <span className="current-badge">Current Locale</span>}
+            {activeLocale === currentLocale.code && <span className="current-badge">{isZh ? '当前语言' : 'Current Locale'}</span>}
           </span>
           <span className="editor-header__count">
-            {currentSpecs.length} group{currentSpecs.length !== 1 ? 's' : ''}
+            {currentSpecs.length} {isZh ? '个组' : `group${currentSpecs.length !== 1 ? 's' : ''}`}
           </span>
         </div>
 
         {activeData?.isLoading ? (
-          <div className="editor-loading">Loading...</div>
+          <div className="editor-loading">{isZh ? '加载中...' : 'Loading...'}</div>
         ) : currentSpecs.length === 0 ? (
           <div className="editor-empty">
-            No specifications for this language. Click "Add Specification Group" to start.
+            {isZh ? '该语言暂无规格。点击"添加规格组"开始。' : 'No specifications for this language. Click "Add Specification Group" to start.'}
           </div>
         ) : (
           <div className="editor-list">
@@ -606,14 +615,14 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                       }
                     }}
                   >
-                    Delete Group
+                    {isZh ? '删除组' : 'Delete Group'}
                   </button>
                 </div>
 
                 <div className="spec-group__items">
                   {!Array.isArray(group.items) || group.items.length === 0 ? (
                     <div className="items-empty">
-                      No items in this group. Click "Add Item" below.
+                      {isZh ? '该组暂无项目。点击下方"添加项目"。' : 'No items in this group. Click "Add Item" below.'}
                     </div>
                   ) : (
                     group.items.map((item, itemIdx) => (
@@ -634,17 +643,17 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                           {/* Item Name + 3D URL on the left */}
                           <div className="spec-item__col spec-item__col--info">
                             <div className="spec-item__field">
-                              <label>Item Name</label>
+                              <label>{isZh ? '项目名称' : 'Item Name'}</label>
                               <textarea
                                 value={item.text}
                                 onChange={(e) => updateItem(groupIdx, itemIdx, { text: e.target.value })}
                                 onBlur={handleBlur}
-                                placeholder="e.g., Red"
+                                placeholder={isZh ? '例如: 红色' : 'e.g., Red'}
                                 rows={1}
                               />
                             </div>
                             <div className="spec-item__field">
-                              <label>3D URL (Optional)</label>
+                              <label>{isZh ? '3D URL (可选)' : '3D URL (Optional)'}</label>
                               <input
                                 type="text"
                                 value={item.url || ''}
@@ -658,7 +667,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                           {/* Image in the middle */}
                           <div className="spec-item__col spec-item__col--media">
                             <div className="spec-item__field spec-item__field--media">
-                              <label>Image (Optional)</label>
+                              <label>{isZh ? '图片 (可选)' : 'Image (Optional)'}</label>
                               <MediaPicker
                                 field={{
                                   name: `spec-image-${groupIdx}-${itemIdx}`,
@@ -667,14 +676,45 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                                 }}
                                 value={item.image ? Number(item.image) : null}
                                 onChange={(newValue) => {
-                                  updateItem(groupIdx, itemIdx, { image: newValue ? String(newValue) : '' })
+                                  const updates: Partial<SpecificationItem> = {
+                                    image: newValue ? String(newValue) : '',
+                                  }
+                                  // Clear cropData when image is removed or changed
+                                  if (!newValue) {
+                                    updates.imageCropData = null
+                                  }
+                                  updateItem(groupIdx, itemIdx, updates)
                                   if (activeLocale !== currentLocale.code) {
                                     const newSpecs = currentSpecs.map((g, i) =>
                                       i === groupIdx
                                         ? {
                                             ...g,
                                             items: g.items.map((it, j) =>
-                                              j === itemIdx ? { ...it, image: newValue ? String(newValue) : '' } : it
+                                              j === itemIdx
+                                                ? {
+                                                    ...it,
+                                                    image: newValue ? String(newValue) : '',
+                                                    imageCropData: !newValue ? null : it.imageCropData,
+                                                  }
+                                                : it
+                                            ),
+                                          }
+                                        : g
+                                    )
+                                    setTimeout(() => saveToLocale(activeLocale, newSpecs), 0)
+                                  }
+                                }}
+                                showCropButton={true}
+                                cropData={item.imageCropData || null}
+                                onCropDataChange={(cropData) => {
+                                  updateItem(groupIdx, itemIdx, { imageCropData: cropData })
+                                  if (activeLocale !== currentLocale.code) {
+                                    const newSpecs = currentSpecs.map((g, i) =>
+                                      i === groupIdx
+                                        ? {
+                                            ...g,
+                                            items: g.items.map((it, j) =>
+                                              j === itemIdx ? { ...it, imageCropData: cropData } : it
                                             ),
                                           }
                                         : g
@@ -689,7 +729,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                           {/* Color Swatch on the right */}
                           <div className="spec-item__col spec-item__col--swatch">
                             <div className="spec-item__field">
-                              <label>Swatch (Optional)</label>
+                              <label>{isZh ? '色板 (可选)' : 'Swatch (Optional)'}</label>
                               <div className="spec-item__color-picker-wrap">
                                 <div className="spec-item__color-preview-trigger">
                                   <div 
@@ -717,7 +757,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                                       type="button"
                                       className="spec-item__color-clear-btn"
                                       onClick={() => updateItem(groupIdx, itemIdx, { color: '' })}
-                                      title="Clear color"
+                                      title={isZh ? '清除颜色' : 'Clear color'}
                                     >
                                       &times;
                                     </button>
@@ -770,7 +810,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
                       }
                     }}
                   >
-                    + Add Item
+                    {isZh ? '+ 添加项目' : '+ Add Item'}
                   </button>
                 </div>
               </div>
@@ -789,7 +829,7 @@ export const ProductSpecificationsField: React.FC<ProductSpecificationsFieldProp
             }
           }}
         >
-          + Add Specification Group
+          {isZh ? '+ 添加规格组' : '+ Add Specification Group'}
         </button>
       </div>
     </div>
