@@ -258,8 +258,7 @@ export function ProductDetailFeaturesSection({
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{
-                      duration: 0.5,
-                      delay: index * 0.1,
+                      duration: 0.3,
                       type: "spring",
                       stiffness: 100,
                       damping: 15
@@ -277,7 +276,6 @@ export function ProductDetailFeaturesSection({
                       padding: rpx(20),
                       paddingBottom: rpx(14),
                       willChange: "transform, opacity",
-                      boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
                     }}
                   >
                     {/* Title */}

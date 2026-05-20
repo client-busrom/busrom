@@ -450,7 +450,7 @@ export function StoryContactFormSection({
             style={
               !effectiveIsMobile
                 ? {
-                  left: vw(521 - 153),
+                  left: vw(521 - 120),
                   top: 0,
                   width: vw(751),
                   height: vw(643),
@@ -495,7 +495,7 @@ export function StoryContactFormSection({
                           height: mvw(50),
                         }
                         : {
-                          left: vw(-190),
+                          left: vw(-220),
                           top: vw(50),
                           width: vw(76.56),
                           height: vw(76.56),
@@ -531,8 +531,8 @@ export function StoryContactFormSection({
                           height: mvw(50),
                         }
                         : {
-                          left: vw(716),
-                          top: vw(672),
+                          left: vw(600),
+                          top: vw(630),
                           width: vw(76.56),
                           height: vw(76.56),
                         }
@@ -611,7 +611,7 @@ export function StoryContactFormSection({
             {subtitle && (
               <div
                 className={cn(effectiveIsMobile ? "mb-2" : "absolute")}
-                style={!effectiveIsMobile ? { left: vw(259 - 153), top: vw(-120) } : {}}
+                style={!effectiveIsMobile ? { left: vw(259), top: vw(-120) } : {}}
               >
                 <h3
                   className="font-josefin-sans font-medium text-white"
@@ -666,8 +666,8 @@ export function StoryContactFormSection({
           <p
             className="absolute font-josefin-sans font-medium"
             style={{
-              left: 0,
-              top: vw(445),
+              left: vw(153),
+              top: vw(480),
               width: vw(444),
               fontSize: vw(20),
               lineHeight: 1.35,
