@@ -270,6 +270,7 @@ import { invalidateCdnHandler, revalidateFrontendHandler } from './src/endpoints
 import { HomeContent } from './src/globals/HomeContent'
 import { Footer } from './src/globals/Footer'
 import { SiteConfig } from './src/globals/SiteConfig'
+import { ContactPopup } from './src/globals/ContactPopup'
 import { PreloaderConfig } from './src/globals/PreloaderConfig'
 import { SocialConfig } from './src/globals/SocialConfig'
 import { ShopPageConfig } from './src/globals/ShopPageConfig'
@@ -419,6 +420,7 @@ export default buildConfig({
     HomeContent,
     Footer,
     SiteConfig,
+    ContactPopup,
     PreloaderConfig,
     SocialConfig,
     ShopPageConfig,

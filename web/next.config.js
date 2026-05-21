@@ -246,22 +246,22 @@ const nextConfig = {
       "default-src 'self'",
       // Scripts: unsafe-inline 是 Next.js 必需的，通过限制其他来源来保护安全
       isDev
-        ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://www.googletagmanager.com"
-        : "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.googletagmanager.com",
-      // Styles: self + inline (Tailwind/styled-jsx 需要) + Google Fonts
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://www.googletagmanager.com https://embed.tawk.to https://cdn.jsdelivr.net"
+        : "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.googletagmanager.com https://embed.tawk.to https://cdn.jsdelivr.net",
+      // Styles: self + inline (Tailwind/styled-jsx 需要) + Google Fonts + Tawk.to
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tawk.to",
       // Images: self + data + blob + CDN + unpkg (Globe textures) + Iconify API
-      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com https://unpkg.com https://api.iconify.design http://localhost:* http://127.0.0.1:* https://www.google-analytics.com https://www.googletagmanager.com",
-      // Fonts: self + CDN + Google Fonts
-      "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com",
+      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com https://unpkg.com https://api.iconify.design http://localhost:* http://127.0.0.1:* https://www.google-analytics.com https://www.googletagmanager.com https://*.tawk.to",
+      // Fonts: self + CDN + Google Fonts + Tawk.to
+      "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com https://*.tawk.to",
       // Connect: self + API + CDN + Cloudflare Turnstile + jsdelivr (Three.js fonts) + WebSocket (HMR)
       isDev
-        ? "connect-src 'self' ws://localhost:* http://localhost:* http://127.0.0.1:* https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design https://www.google-analytics.com https://www.googletagmanager.com"
-        : "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design https://www.google-analytics.com https://www.googletagmanager.com",
+        ? "connect-src 'self' ws://localhost:* http://localhost:* http://127.0.0.1:* https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design https://www.google-analytics.com https://www.googletagmanager.com https://*.tawk.to wss://*.tawk.to https://va.tawk.to"
+        : "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design https://www.google-analytics.com https://www.googletagmanager.com https://*.tawk.to wss://*.tawk.to https://va.tawk.to",
       // Media: self + CDN
       "media-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com http://localhost:* http://127.0.0.1:*",
-      // Frame: Cloudflare Turnstile
-      "frame-src 'self' https://challenges.cloudflare.com",
+      // Frame: Cloudflare Turnstile + Tawk.to
+      "frame-src 'self' https://challenges.cloudflare.com https://*.tawk.to",
       // Object: none - 防止 Flash/Java 等插件攻击
       "object-src 'none'",
       // Base URI: self - 防止 base tag 注入

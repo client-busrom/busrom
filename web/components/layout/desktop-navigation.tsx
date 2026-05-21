@@ -14,6 +14,7 @@ interface DesktopNavigationProps {
   navigationItems: NavItem[];
   theme: "transparent" | "light" | "dark";
   onMenuOpen?: (isOpen: boolean) => void;
+  onContactClick?: () => void;
 }
 
 // 从 URL 中提取产品 slug
@@ -32,6 +33,7 @@ export function DesktopNavigation({
   navigationItems,
   theme,
   onMenuOpen,
+  onContactClick,
 }: DesktopNavigationProps) {
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
@@ -194,39 +196,57 @@ export function DesktopNavigation({
               className="relative"
               onMouseEnter={() => handleMouseEnter(item)}
             >
-              <Link
-                href={item.url}
-                onClick={(e) => handleMenuClick(item, e)}
-                className={cn(
-                  "relative flex items-center gap-1 text-[0.73vw] leading-[1.04vw] font-montserrat font-bold transition-colors py-2",
-                  textColor,
-                  hoverColor,
-                  isActive && "text-brand-secondary",
-                )}
-              >
-                {item.label}
-                {/* 箭头图标（有子菜单时显示） */}
-                {hasChildren && (
-                  <ChevronDown
-                    className={cn(
-                      "w-4 h-4 transition-transform duration-200",
-                      isActive && "rotate-180",
-                    )}
-                  />
-                )}
-                {/* 下划线指示器（有子菜单且激活时显示） */}
-                {hasChildren && (
-                  <span
-                    className={cn(
-                      "absolute bottom-0 left-0 w-full h-0.5 bg-current transition-transform duration-200 origin-left",
-                      isActive ? "scale-x-100" : "scale-x-0",
-                    )}
-                  />
-                )}
-              </Link>
+              {item.url === '#contact-popup' ? (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onContactClick?.();
+                  }}
+                  className={cn(
+                    "relative flex items-center gap-1 text-[0.73vw] leading-[1.04vw] font-montserrat font-bold transition-colors py-2",
+                    textColor,
+                    hoverColor,
+                  )}
+                >
+                  {item.label}
+                </button>
+              ) : (
+                <Link
+                  href={item.url}
+                  onClick={(e) => handleMenuClick(item, e)}
+                  className={cn(
+                    "relative flex items-center gap-1 text-[0.73vw] leading-[1.04vw] font-montserrat font-bold transition-colors py-2",
+                    textColor,
+                    hoverColor,
+                    isActive && "text-brand-secondary",
+                  )}
+                >
+                  {item.label}
+                  {/* 箭头图标（有子菜单时显示） */}
+                  {hasChildren && (
+                    <ChevronDown
+                      className={cn(
+                        "w-4 h-4 transition-transform duration-200",
+                        isActive && "rotate-180",
+                      )}
+                    />
+                  )}
+                  {/* 下划线指示器（有子菜单且激活时显示） */}
+                  {hasChildren && (
+                    <span
+                      className={cn(
+                        "absolute bottom-0 left-0 w-full h-0.5 bg-current transition-transform duration-200 origin-left",
+                        isActive ? "scale-x-100" : "scale-x-0",
+                      )}
+                    />
+                  )}
+                </Link>
+              )}
             </div>
           );
         })}
+
       </div>
 
       {/* 二级菜单下拉 - 全屏宽度 */}

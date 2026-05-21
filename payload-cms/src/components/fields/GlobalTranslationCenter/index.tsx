@@ -177,6 +177,27 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'followUs.title', labelKey: 'custom:translationCenter:followUsTitle', type: 'textarea' },
     { name: 'bottomRecommended.title', labelKey: 'custom:translationCenter:bottomRecommendedTitle', type: 'textarea' },
   ],
+  'contact-popup': [
+    { name: 'title', labelKey: 'custom:translationCenter:fieldTitle', type: 'textarea' },
+    {
+      name: 'options.title',
+      labelKey: 'custom:translationCenter:fieldTitle',
+      type: 'textarea',
+      isArrayField: true,
+      arrayFieldName: 'options',
+      arraySubField: 'title',
+      itemLabel: 'Option',
+    },
+    {
+      name: 'options.description',
+      labelKey: 'custom:translationCenter:description',
+      type: 'textarea',
+      isArrayField: true,
+      arrayFieldName: 'options',
+      arraySubField: 'description',
+      itemLabel: 'Option',
+    },
+  ],
 }
 
 interface FieldValue {
@@ -506,14 +527,6 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
       // Build per-locale data
       const localesPayload: Record<string, Record<string, any>> = {}
 
-      // Fetch source data once for array fields
-      let sourceData: any = null
-      const hasArrayFields = fieldsData.some(f => f.config.name.match(/^(.+)\[(\d+)]\.(.+)$/))
-      if (hasArrayFields) {
-        const sourceRes = await fetch(`/api/globals/${globalSlug}?locale=${sourceLocale}&depth=0`)
-        sourceData = await sourceRes.json()
-      }
-
       for (const localeCode of localesToSave) {
         const dataToSave: Record<string, any> = {}
         const arrayFieldUpdates: Record<string, Record<number, Record<string, string>>> = {}
@@ -544,21 +557,40 @@ export const GlobalTranslationCenter: React.FC<GlobalTranslationCenterProps> = (
           }
         }
 
-        // Merge array field updates back to dataToSave using sourceData to preserve other fields
-        if (sourceData) {
+        // Fetch existing data for THIS locale to merge array fields correctly
+        let localeData: any = null
+        const hasArrayFields = Object.keys(arrayFieldUpdates).length > 0
+        if (hasArrayFields) {
+          try {
+            const localeRes = await fetch(`/api/globals/${globalSlug}?locale=${localeCode}&depth=0`)
+            if (localeRes.ok) {
+              localeData = await localeRes.json()
+            }
+          } catch (e) {
+            console.warn(`[GlobalTranslationCenter] Failed to fetch data for locale ${localeCode}`, e)
+          }
+        }
+
+        // Merge array field updates back to dataToSave using locale-specific data
+        if (localeData) {
           for (const [arrName, indexUpdates] of Object.entries(arrayFieldUpdates)) {
-            const sourceArray = (sourceData[arrName] as Array<Record<string, any>>) || []
-            const mergedArray = sourceArray.map((item, idx) => {
+            const existingArray = (localeData[arrName] as Array<Record<string, any>>) || []
+            const mergedArray = existingArray.map((item, idx) => {
               const updates = indexUpdates[idx]
               return updates ? { ...item, ...updates } : { ...item }
             })
             dataToSave[arrName] = mergedArray
           }
-        } else {
-          // If no sourceData, just use indexUpdates as is (fallback)
-          Object.keys(arrayFieldUpdates).forEach(arrName => {
-            dataToSave[arrName] = arrayFieldUpdates[arrName]
-          })
+        } else if (hasArrayFields) {
+          // Fallback: build array from updates only (may lose non-translatable fields)
+          const maxIdx = Math.max(...Object.values(arrayFieldUpdates).flatMap(u => Object.keys(u).map(Number)))
+          for (const [arrName, indexUpdates] of Object.entries(arrayFieldUpdates)) {
+            const fallbackArray: Record<string, any>[] = []
+            for (let i = 0; i <= maxIdx; i++) {
+              fallbackArray.push(indexUpdates[i] || {})
+            }
+            dataToSave[arrName] = fallbackArray
+          }
         }
 
         localesPayload[localeCode] = dataToSave

@@ -31,7 +31,7 @@ const BANNER_6_ASSETS = {
   },
   decorator: { width: 85, height: 85, dx: -888.5, dy: -456.5, color: "#FFFAD3" },
   subtitleBg: { width: 704, height: 120, dx: -607, dy: -318 },
-  titleGroup: { dx: -450, dy: -50 },
+  titleGroup: { dx: -200, dy: -50 },
 };
 
 const HeroBanner6: FC<BannerProps> = ({ data }) => {
@@ -96,23 +96,21 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
             </p>
           </div>
           <div
-            className="absolute left-1/2 top-1/2 z-40 flex flex-col pointer-events-auto items-start"
-            style={{ transform: `translate(calc(-50% + ${rpx(BANNER_6_ASSETS.titleGroup.dx)}), calc(-50% + ${rpx(BANNER_6_ASSETS.titleGroup.dy)}))` }}
+            className="absolute z-40 flex flex-col pointer-events-auto items-start"
+            style={{ left: rpx(120), top: rpx(240), gap: rpx(16) }}
           >
-            <div className="flex flex-col" style={{ gap: rpx(16) }}>
-              {titleParts.map((line, idx) => {
-                const isFirst = idx === 0;
-                let fontSize = 96;
-                let textColor = isFirst ? "#FFFFFF" : "#332E0B";
-                let strokeColor = isFirst ? "#443D05" : "#FDF6C2";
-                let strokeWidth = isFirst ? 5 : 3;
-                return (
-                  <h1 key={idx} className="font-poller-one leading-none" style={{ fontSize: rpx(fontSize), color: textColor, WebkitTextStroke: `${rpx(strokeWidth)} ${strokeColor}`, paintOrder: "stroke fill" }}>
-                    {line}
-                  </h1>
-                );
-              })}
-            </div>
+            {titleParts.map((line, idx) => {
+              const isFirst = idx === 0;
+              let fontSize = 96;
+              let textColor = isFirst ? "#FFFFFF" : "#332E0B";
+              let strokeColor = isFirst ? "#443D05" : "#FDF6C2";
+              let strokeWidth = isFirst ? 5 : 3;
+              return (
+                <h1 key={idx} className="font-poller-one leading-none whitespace-nowrap" style={{ fontSize: rpx(fontSize), color: textColor, WebkitTextStroke: `${rpx(strokeWidth)} ${strokeColor}`, paintOrder: "stroke fill" }}>
+                  <AutoScaleText minScale={0.5}>{line}</AutoScaleText>
+                </h1>
+              );
+            })}
           </div>
           <div
             className="absolute bottom-0 z-50 pointer-events-auto"

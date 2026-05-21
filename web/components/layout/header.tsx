@@ -8,7 +8,11 @@ import { Link } from "@/lib/navigation";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { MobileMenu } from "./mobile-menu";
 import { DesktopNavigation } from "./desktop-navigation";
+import { ContactPopup } from "./contact-popup";
+import { TawkChat, useTawkChat } from "./tawk-chat";
+import { FloatingContactButtons } from "./floating-contact-buttons";
 import type { NavItem } from "@/types/navigation";
+import type { ContactPopupData } from "@/lib/api/contact-popup";
 import useSWR from "swr";
 
 // 1. 定义 Header 的主题类型
@@ -17,14 +21,21 @@ type HeaderTheme = "transparent" | "light" | "dark";
 interface HeaderProps {
   locale: string;
   initialNavigation?: NavItem[]; // SSR 预取的导航数据
+  contactPopupData?: ContactPopupData | null;
 }
 
-export default function Header({ locale, initialNavigation }: HeaderProps) {
+export default function Header({ locale, initialNavigation, contactPopupData }: HeaderProps) {
   // 2. 状态：用于移动端菜单
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // 状态：桌面端下拉菜单是否展开
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // 状态：Contact Popup 是否打开
+  const [isContactPopupOpen, setIsContactPopupOpen] = useState(false);
+
+  // Tawk Chat 控制
+  const { openChat } = useTawkChat();
 
   // 3. 状态：用于滚动时的主题
   const [theme, setTheme] = useState<HeaderTheme>("light");
@@ -212,6 +223,10 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
                 navigationItems={navigationItems || []}
                 theme={activeTheme}
                 onMenuOpen={setIsDropdownOpen}
+                onContactClick={() => {
+                  setIsContactPopupOpen(true);
+                  setIsDropdownOpen(false);
+                }}
               />
             </div>
 
@@ -228,6 +243,27 @@ export default function Header({ locale, initialNavigation }: HeaderProps) {
         isOpen={isMenuOpen}
         onClose={handleCloseMenu}
         navigationItems={navigationItems || []}
+        onContactClick={() => setIsContactPopupOpen(true)}
+      />
+
+      {/* Contact Popup */}
+      <ContactPopup
+        data={contactPopupData || null}
+        isOpen={isContactPopupOpen}
+        onClose={() => setIsContactPopupOpen(false)}
+        onChatClick={() => {
+          setIsContactPopupOpen(false);
+          openChat();
+        }}
+      />
+
+      {/* Floating Contact Buttons (WhatsApp + Email) */}
+      <FloatingContactButtons data={contactPopupData || null} />
+
+      {/* Tawk.to Chat Widget */}
+      <TawkChat
+        propertyId={process.env.NEXT_PUBLIC_TAWK_PROPERTY_ID}
+        widgetId={process.env.NEXT_PUBLIC_TAWK_WIDGET_ID}
       />
     </>
   );

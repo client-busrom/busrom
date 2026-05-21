@@ -424,6 +424,7 @@ export const CustomNav: React.FC = () => {
         <CollapsibleGroup labelKey="websiteSettings" defaultOpen={false}>
           <NavItem href="/admin/globals/footer" labelKey="footer" />
           <NavItem href="/admin/globals/site-config" labelKey="siteConfigItem" />
+          <NavItem href="/admin/globals/contact-popup" labelKey="contactPopup" />
           <NavItem href="/admin/globals/preloader-config" labelKey="preloaderConfig" />
           <NavItem href="/admin/globals/social-config" labelKey="socialConfig" />
         </CollapsibleGroup>

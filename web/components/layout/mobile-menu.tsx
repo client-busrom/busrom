@@ -12,6 +12,7 @@ interface MobileMenuProps {
   isOpen: boolean
   onClose: () => void
   navigationItems: NavItem[]
+  onContactClick?: () => void
 }
 
 // 产品图片映射（临时占位图）
@@ -62,7 +63,7 @@ const subMenuVariants = {
   visible: { opacity: 1, height: "auto", transition: { duration: 0.3 } },
 }
 
-export function MobileMenu({ isOpen, onClose, navigationItems = [] }: MobileMenuProps) {
+export function MobileMenu({ isOpen, onClose, navigationItems = [], onContactClick }: MobileMenuProps) {
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null)
   const pathname = usePathname()
   const prevPathnameRef = useRef(pathname)
@@ -157,12 +158,25 @@ export function MobileMenu({ isOpen, onClose, navigationItems = [] }: MobileMenu
                     <div key={item.id}>
                       {/* 没有子菜单的项 */}
                       {(!item.childMenus || item.childMenus.length === 0) && (
-                        <Link
-                          href={item.url}
-                          className="block px-4 py-3 text-base font-medium text-foreground hover:bg-accent rounded-lg transition-colors"
-                        >
-                          {item.label}
-                        </Link>
+                        item.url === '#contact-popup' ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              onContactClick?.()
+                              onClose()
+                            }}
+                            className="block w-full text-left px-4 py-3 text-base font-medium text-foreground hover:bg-accent rounded-lg transition-colors"
+                          >
+                            {item.label}
+                          </button>
+                        ) : (
+                          <Link
+                            href={item.url}
+                            className="block px-4 py-3 text-base font-medium text-foreground hover:bg-accent rounded-lg transition-colors"
+                          >
+                            {item.label}
+                          </Link>
+                        )
                       )}
 
                       {/* 有子菜单的项 */}
@@ -249,6 +263,7 @@ export function MobileMenu({ isOpen, onClose, navigationItems = [] }: MobileMenu
                       )}
                     </div>
                   ))}
+
                 </div>
               </div>
             </div>

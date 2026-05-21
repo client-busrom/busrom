@@ -11,6 +11,7 @@
 export { HomeContent } from './HomeContent'
 export { Footer } from './Footer'
 export { SiteConfig } from './SiteConfig'
+export { ContactPopup } from './ContactPopup'
 export { ShopPageConfig } from './ShopPageConfig'
 export { KnowledgeBaseSettings } from './KnowledgeBaseSettings'
 export { PreloaderConfig } from './PreloaderConfig'

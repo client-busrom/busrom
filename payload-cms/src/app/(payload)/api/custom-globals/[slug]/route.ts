@@ -37,29 +37,23 @@ export async function GET(
  */
 function cleanInternalFields(data: any): any {
   if (data === null || data === undefined) return data
-  
+
   if (Array.isArray(data)) {
     return data.map(item => cleanInternalFields(item))
   }
-  
+
   if (typeof data === 'object') {
     const newObj: any = {}
     for (const key in data) {
       if (key.startsWith('_')) {
-        // console.log(`[cleanInternalFields] Stripping: ${key}`)
         continue
       }
-      if (key === 'id') {
-        // Keep IDs for array items/blocks ONLY if they are strings or numbers
-        // Payload sometimes needs them for reconciliation, but let's try stripping them too
-        // since the error mentioned _locale and _parent_id specifically
-        continue
-      }
+      // Keep 'id' for array items - Payload needs it to match array items during updates
       newObj[key] = cleanInternalFields(data[key])
     }
     return newObj
   }
-  
+
   return data
 }
 

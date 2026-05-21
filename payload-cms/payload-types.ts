@@ -231,6 +231,7 @@ export interface Config {
     'home-content': HomeContent;
     footer: Footer;
     'site-config': SiteConfig;
+    'contact-popup': ContactPopup;
     'preloader-config': PreloaderConfig;
     'social-config': SocialConfig;
     'shop-page-config': ShopPageConfig;
@@ -256,6 +257,7 @@ export interface Config {
     'home-content': HomeContentSelect<false> | HomeContentSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     'site-config': SiteConfigSelect<false> | SiteConfigSelect<true>;
+    'contact-popup': ContactPopupSelect<false> | ContactPopupSelect<true>;
     'preloader-config': PreloaderConfigSelect<false> | PreloaderConfigSelect<true>;
     'social-config': SocialConfigSelect<false> | SocialConfigSelect<true>;
     'shop-page-config': ShopPageConfigSelect<false> | ShopPageConfigSelect<true>;
@@ -3502,6 +3504,43 @@ export interface SiteConfig {
   createdAt?: string | null;
 }
 /**
+ * Configure the contact popup that appears when clicking "Contact Us" in the navigation
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-popup".
+ */
+export interface ContactPopup {
+  id: number;
+  status?: ('published' | 'draft') | null;
+  title?: string | null;
+  /**
+   * Add contact options that will be displayed in the popup (e.g., Phone, Chat, Schedule Appointment)
+   */
+  options?:
+    | {
+        /**
+         * Square icon image (recommended 176x176px)
+         */
+        icon?: (number | null) | Media;
+        title: string;
+        /**
+         * Support hours or brief description
+         */
+        description?: string | null;
+        linkType?: ('url' | 'phone' | 'email' | 'chat') | null;
+        linkUrl?: string | null;
+        openInNewTab?: boolean | null;
+        /**
+         * Lower numbers appear first
+         */
+        sortOrder?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "preloader-config".
  */
@@ -4428,6 +4467,29 @@ export interface SiteConfigSelect<T extends boolean = true> {
   cloudfrontDistributionId?: T;
   frontendUrl?: T;
   revalidateSecret?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-popup_select".
+ */
+export interface ContactPopupSelect<T extends boolean = true> {
+  status?: T;
+  title?: T;
+  options?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        description?: T;
+        linkType?: T;
+        linkUrl?: T;
+        openInNewTab?: T;
+        sortOrder?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

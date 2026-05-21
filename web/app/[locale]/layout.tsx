@@ -20,6 +20,7 @@ import { OrganizationSchema } from "@/components/seo/OrganizationSchema";
 import { getSiteConfig, getMediaUrl } from "@/lib/api/site-config";
 import { getAlternateLanguages } from "@/lib/seo-utils";
 import { getFooterData } from "@/lib/api/footer";
+import { getContactPopup } from "@/lib/api/contact-popup";
 
 // 延迟加载 LenisProvider（包含 GSAP），不阻塞首屏渲染
 const LenisProvider = dynamic(
@@ -385,10 +386,11 @@ export default async function RootLayout({
 }) {
   const { locale } = await params;
   const validLocale = isValidLocale(locale) ? locale : defaultLocale;
-  const [preloaderConfig, initialNavigation, footerData] = await Promise.all([
+  const [preloaderConfig, initialNavigation, footerData, contactPopupData] = await Promise.all([
     getPreloaderConfig(),
     getNavigation(validLocale),
     getFooterData(validLocale),
+    getContactPopup(validLocale),
   ]);
 
   return (
@@ -456,7 +458,7 @@ export default async function RootLayout({
           <NextTopLoader color="#D58A00" showSpinner={false} height={3} shadow="0 0 10px #D58A00,0 0 5px #D58A00" />
           <LenisProvider easingKey={"easeOutQuad"} />
           <div className="flex flex-col min-h-screen">
-            <Header locale={validLocale} initialNavigation={initialNavigation} />
+            <Header locale={validLocale} initialNavigation={initialNavigation} contactPopupData={contactPopupData} />
             {children}
             <Suspense fallback={null}>
               <ScrollToTopOnRouteChange />
