@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { useField, useLocale, useTranslation } from '@payloadcms/ui'
+import { useField, useLocale, useTranslation, useFormFields } from '@payloadcms/ui'
 import { fetchMediaCategories, fetchMediaTags } from '../../../lib/media-filters-cache'
 import { fetchMediaItems } from '../../../lib/media-cache'
 import { ImageCropEditor, type ImageCropData, type MediaSizes } from '../ImageCropEditor'
@@ -65,6 +65,8 @@ interface MediaPickerProps {
   cropDataList?: (ImageCropData | null)[]
   /** 裁剪数据变更回调 (多图模式) */
   onCropDataListChange?: (list: (ImageCropData | null)[]) => void
+  /** 裁剪预设上下文（如 'HeroBanner1'），用于智能选择默认预设 */
+  contextPreset?: string
 }
 
 // Format file size
@@ -76,7 +78,7 @@ const formatFileSize = (bytes?: number): string => {
 }
 
 export const MediaPicker: React.FC<MediaPickerProps> = (props) => {
-  const { path, field, value: controlledValue, onChange, showCropButton, cropData, onCropDataChange, cropDataList, onCropDataListChange } = props;
+  const { path, field, value: controlledValue, onChange, showCropButton, cropData, onCropDataChange, cropDataList, onCropDataListChange, contextPreset } = props;
   // Use controlled mode if value/onChange provided, otherwise use useField
   const fieldHook = useField<number | number[] | null>({ path: path || field.name })
   const value = controlledValue !== undefined ? controlledValue : fieldHook.value
@@ -423,6 +425,7 @@ export const MediaPicker: React.FC<MediaPickerProps> = (props) => {
           imageHeight={cropEditorMediaItem.height}
           sizes={cropEditorMediaItem.sizes}
           initialCropData={hasMany ? (cropDataList?.[cropEditorItemIndex ?? -1] || null) : (cropData || null)}
+          defaultPreset={contextPreset}
           onConfirm={(data) => {
             if (hasMany && onCropDataListChange && cropEditorItemIndex !== null) {
               const newList = [...(cropDataList || [])]

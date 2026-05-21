@@ -64,7 +64,7 @@ async function HomeContentLoader({ locale }: { locale: Locale }) {
   const cookieStore = await cookies()
   const strategy = cookieStore.get('cdn_strategy')?.value
   
-  // 1. Fetch Raw Data
+  // 1. Fetch Raw Data (current locale)
   const rawData = await getHomeRawData(locale)
   
   if (!rawData) {
@@ -75,12 +75,15 @@ async function HomeContentLoader({ locale }: { locale: Locale }) {
     )
   }
 
+  // 1b. Fetch EN data for line-break reference (non-EN locales only)
+  const enRawData = locale !== 'en' ? await getHomeRawData('en') : null
+
   // 2. Fetch SEO Keywords for SSR distribution
   const { distributedKeywords } = await getHomePageSeo(locale)
   const seoKeywords = distributedKeywords.imgAlts || []
 
-  // 3. Parse Data on Server with SEO Keywords
-  const content = parseHomeData(rawData, locale, strategy, seoKeywords)
+  // 3. Parse Data on Server with SEO Keywords + EN reference for auto line-breaking
+  const content = parseHomeData(rawData, locale, strategy, seoKeywords, enRawData)
   const lcpImageUrls = getLCPImageUrls(content)
 
   // 4. Get Globe Translations

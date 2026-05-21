@@ -220,7 +220,7 @@ export function OemOdmProductGuide({
                       <OptimizedImage
                         image={image as any}
                         alt="Product"
-                        size="medium"
+                        size="small"
                         className="w-full h-full object-cover"
                       />
                     </Link>
@@ -228,7 +228,7 @@ export function OemOdmProductGuide({
                     <OptimizedImage
                       image={image as any}
                       alt="Product"
-                      size="medium"
+                      size="small"
                       className="w-full h-full object-cover"
                     />
                   )}
@@ -490,7 +490,7 @@ export function OemOdmProductGuide({
                   <OptimizedImage
                     image={selectedImages[0] as any}
                     alt="Product"
-                    size="medium"
+                    size="small"
                     className="w-full h-full object-cover"
                   />
                 </Link>
@@ -498,7 +498,7 @@ export function OemOdmProductGuide({
                 <OptimizedImage
                   image={selectedImages[0] as any}
                   alt="Product"
-                  size="medium"
+                  size="small"
                   className="w-full h-full object-cover"
                 />
               )}

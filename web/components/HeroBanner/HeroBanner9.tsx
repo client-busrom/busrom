@@ -5,6 +5,7 @@ import MagneticWrapper from "./MagneticWrapper";
 import { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
 import { ServerImage } from "@/components/ui/ServerImage";
+import { AutoScaleText } from "@/components/ui/AutoScaleText";
 
 interface HeroBanner9Props {
   data: HomeContent["heroBanner"][number];
@@ -88,15 +89,11 @@ const TitleLine: FC<{ text: string; index: number; isMobile?: boolean }> = ({
           className="absolute inset-0 w-full h-full object-contain pointer-events-none"
         />
         <div className="absolute inset-0 flex items-center justify-start px-8">
-          <h1
-            className="font-paytone-one text-[#3C3712] text-[24px] leading-none text-left"
-            style={{
-              transform: `rotate(${rotation}deg)`,
-              WebkitTextStroke: "0.5px #FFFFFF",
-            }}
-          >
-            {text}
-          </h1>
+          <div style={{ transform: `rotate(${rotation}deg)`, transformOrigin: "left center" }}>
+            <AutoScaleText minScale={0.5} className="font-paytone-one text-[#3C3712] text-[24px] leading-none text-left" style={{ WebkitTextStroke: "0.5px #FFFFFF" }}>
+              {text}
+            </AutoScaleText>
+          </div>
         </div>
       </div>
     );
@@ -116,20 +113,18 @@ const TitleLine: FC<{ text: string; index: number; isMobile?: boolean }> = ({
         className="absolute inset-0 w-full h-full object-contain pointer-events-none"
       />
       <div
-        className="absolute inset-0 flex items-center justify-start overflow-visible"
+        className="absolute inset-0 flex items-center justify-start overflow-hidden"
         style={{ paddingLeft: rpx(40) }}
       >
-        <h1
-          className="font-paytone-one text-[#3C3712] whitespace-nowrap leading-none md:text-[calc(var(--rpx-hero)*96px)]"
-          style={{
-            fontSize: rpx(96),
-            transform: `rotate(${rotation}deg) translateY(${index === 0 ? rpx(-10) : "0"})`,
-            WebkitTextStroke: `${rpx(6)} #FFFFFF`,
-            paintOrder: "stroke fill",
-          }}
-        >
-          {text}
-        </h1>
+        <div style={{ transform: `rotate(${rotation}deg) translateY(${index === 0 ? rpx(-10) : "0"})`, transformOrigin: "left center", maxWidth: rpx(block.w - 40) }}>
+          <AutoScaleText
+            minScale={0.5}
+            className="font-paytone-one text-[#3C3712] leading-none"
+            style={{ fontSize: rpx(96), WebkitTextStroke: `${rpx(6)} #FFFFFF`, paintOrder: "stroke fill" }}
+          >
+            {text}
+          </AutoScaleText>
+        </div>
       </div>
     </div>
   );
@@ -211,18 +206,20 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
           >
             {[data.features[2], data.features[3], data.features[4]].map(
               (f, i) => (
-                <h2
-                  key={i}
-                  className="font-montserrat font-bold text-[#FFA836] whitespace-nowrap md:text-[calc(var(--rpx-hero)*30px)]"
-                  style={{
-                    fontSize: rpx(30),
-                    letterSpacing: "0.03em",
-                    WebkitTextStroke: `${rpx(4)} #6B4E00`,
-                    paintOrder: "stroke fill",
-                  }}
-                >
-                  {f}
-                </h2>
+                <div key={i} className="overflow-hidden w-full">
+                  <AutoScaleText
+                    minScale={0.5}
+                    className="font-montserrat font-bold text-[#FFA836]"
+                    style={{
+                      fontSize: rpx(30),
+                      letterSpacing: "0.03em",
+                      WebkitTextStroke: `${rpx(4)} #6B4E00`,
+                      paintOrder: "stroke fill",
+                    }}
+                  >
+                    {f}
+                  </AutoScaleText>
+                </div>
               ),
             )}
           </div>
@@ -240,7 +237,7 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
             ))}
           </div>
           <h1
-            className="font-paytone-one text-white whitespace-pre-line leading-tight text-left md:text-[calc(var(--rpx-hero)*60px)]"
+            className="font-paytone-one text-white leading-tight text-left md:text-[calc(var(--rpx-hero)*60px)]"
             style={{
               fontSize: rpx(60),
               width: rpx(697),
@@ -249,7 +246,11 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
               paintOrder: "stroke fill",
             }}
           >
-            {formatText(data.features[1])}
+            {formatText(data.features[1]).split("\n").map((line, i) => (
+              <div key={i} className="overflow-hidden w-full">
+                <AutoScaleText minScale={0.5}>{line}</AutoScaleText>
+              </div>
+            ))}
           </h1>
         </div>
       </div>

@@ -56,7 +56,7 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { TextStateFeatureClient as TextStateFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { default as default_1b0cad300e9d837c9be64413930f499e } from '@/components/fields/MultiLocaleRichTextField'
-import { default as default_eb82d7385b20d8d41002bf481e15f40f } from '@/components/fields/MediaPickerWithCrop'
+import { default as default_c8ec1c7585e363507ef58cd083dcaa59 } from '@/components/fields/HeroBannerImagePicker'
 import { default as default_8eace7ae1118053face74cf3167249d9 } from '@/components/fields/TagBasedRandomImages'
 import { default as default_a3a3aa8bfebcaf82c7d4953fe2175cbd } from '@/components/fields/IconPicker'
 import { SmartLinkField as SmartLinkField_e635f1e069dfeac8bac1a8b34ec70fb8 } from '@/components/fields/SmartLinkField'
@@ -77,6 +77,7 @@ import { default as default_aef68a35a640877d18ec36dfae6830f7 } from '@/component
 import { default as default_fd8deacc4a98ca16d56ee047a01252e2 } from '@/components/ui/RowSpacer'
 import { default as default_7ec45b627dc85426c7a5b3777a8024c0 } from '@/components/fields/MultilingualKnowledgeSections'
 import { default as default_eba90d60bdfe915607fa737bdb8554fb } from '@/components/fields/MultilingualCarouselItems'
+import { default as default_eb82d7385b20d8d41002bf481e15f40f } from '@/components/fields/MediaPickerWithCrop'
 import { default as default_9870fd18da5f585b086dac7c5b924c68 } from '@/components/admin/CustomNav'
 import { Icon as Icon_a44df17d0fc3dcd873dae43dc3bf66bd } from '@/components/admin/Logo'
 import { default as default_a44df17d0fc3dcd873dae43dc3bf66bd } from '@/components/admin/Logo'
@@ -145,7 +146,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#TextStateFeatureClient": TextStateFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/components/fields/MultiLocaleRichTextField#default": default_1b0cad300e9d837c9be64413930f499e,
-  "@/components/fields/MediaPickerWithCrop#default": default_eb82d7385b20d8d41002bf481e15f40f,
+  "@/components/fields/HeroBannerImagePicker#default": default_c8ec1c7585e363507ef58cd083dcaa59,
   "@/components/fields/TagBasedRandomImages#default": default_8eace7ae1118053face74cf3167249d9,
   "@/components/fields/IconPicker#default": default_a3a3aa8bfebcaf82c7d4953fe2175cbd,
   "@/components/fields/SmartLinkField#SmartLinkField": SmartLinkField_e635f1e069dfeac8bac1a8b34ec70fb8,
@@ -166,6 +167,7 @@ export const importMap = {
   "@/components/ui/RowSpacer#default": default_fd8deacc4a98ca16d56ee047a01252e2,
   "@/components/fields/MultilingualKnowledgeSections#default": default_7ec45b627dc85426c7a5b3777a8024c0,
   "@/components/fields/MultilingualCarouselItems#default": default_eba90d60bdfe915607fa737bdb8554fb,
+  "@/components/fields/MediaPickerWithCrop#default": default_eb82d7385b20d8d41002bf481e15f40f,
   "@/components/admin/CustomNav#default": default_9870fd18da5f585b086dac7c5b924c68,
   "@/components/admin/Logo#Icon": Icon_a44df17d0fc3dcd873dae43dc3bf66bd,
   "@/components/admin/Logo#default": default_a44df17d0fc3dcd873dae43dc3bf66bd,

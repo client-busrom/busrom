@@ -50,6 +50,8 @@ interface ImageCropEditorProps {
   sizes?: MediaSizes
   /** 已有的裁剪数据（用于恢复编辑状态） */
   initialCropData?: ImageCropData | null
+  /** 默认预设尺寸（从调用方传入，如 'HeroBanner1'） */
+  defaultPreset?: string
   /** 确认回调 */
   onConfirm: (cropData: ImageCropData) => void
   /** 取消/关闭回调 */
@@ -83,6 +85,7 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
   imageHeight,
   sizes,
   initialCropData,
+  defaultPreset,
   onConfirm,
   onClose,
 }) => {
@@ -153,6 +156,8 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
   const initialCropAppliedRef = React.useRef(false)
   const [zoom, setZoom] = useState<number>(initialCropData?.scale || 1)
+  // 缩放百分比输入框的临时编辑值（允许用户自由输入，失焦/回车后才应用）
+  const [zoomInputValue, setZoomInputValue] = useState<string>((initialCropData?.scale ? initialCropData.scale * 100 : 100).toFixed(1))
   const [croppedArea, setCroppedArea] = useState<Area>({ x: 0, y: 0, width: 100, height: 100 })
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area>({ x: 0, y: 0, width: 0, height: 0 })
   const [mediaSize, setMediaSize] = useState<MediaSize | null>(null)
@@ -226,23 +231,39 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
     })
   }, [displayScale, canvasSize, initialCropData])
 
+  // --- 首次打开时：无 initialCropData 且有 defaultPreset，自动应用预设 ---
+  const presetAppliedRef = React.useRef(false)
+  useEffect(() => {
+    if (presetAppliedRef.current) return
+    presetAppliedRef.current = true
+
+    // 已有裁剪数据时不覆盖
+    if (initialCropData?.cropWidth && initialCropData?.cropHeight) return
+
+    // 有 defaultPreset 时，应用匹配组的第一个预设
+    if (defaultPreset && sortedPresetGroups.length > 0) {
+      const firstGroup = sortedPresetGroups[0]
+      if (firstGroup.label === defaultPreset && firstGroup.options.length > 0) {
+        const firstOption = firstGroup.options[0]
+        setCropWidth(firstOption.w)
+        setCropHeight(firstOption.h)
+        setWidthInput(String(firstOption.w))
+        setHeightInput(String(firstOption.h))
+        setAspectRatio(firstOption.w / firstOption.h)
+      }
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // --- 变体切换时重置状态 ---
   useEffect(() => {
     // 不要在初始化时覆盖 initialCropData 的值
     if (initialCropData && variant === initialCropData.variant) return
 
+    // 变体切换只重置 crop 位置和 zoom，保持用户设定的裁剪尺寸
     setCrop({ x: 0, y: 0 })
     setZoom(1)
-    if (currentVariant) {
-      const w = Math.min(currentVariant.width, MAX_CROP_WIDTH)
-      const h = Math.min(currentVariant.height, MAX_CROP_HEIGHT)
-      setCropWidth(w)
-      setCropHeight(h)
-      setWidthInput(String(w))
-      setHeightInput(String(h))
-      setAspectRatio(w / h)
-    }
-  }, [variant, currentVariant]) // eslint-disable-line react-hooks/exhaustive-deps
+    setZoomInputValue('100.0')
+  }, [variant]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // --- 裁剪完成回调 ---
   const onCropComplete = useCallback((_croppedArea: Area, _croppedAreaPixels: Area) => {
@@ -371,7 +392,18 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
     },
   ]
 
-  const allPresets = presetGroups.flatMap(g => g.options)
+  // 根据 defaultPreset 重排序：匹配的组放到第一位
+  const sortedPresetGroups = useMemo(() => {
+    if (!defaultPreset) return presetGroups
+    const matchedIndex = presetGroups.findIndex(g => g.label === defaultPreset)
+    if (matchedIndex === -1) return presetGroups
+    const reordered = [...presetGroups]
+    const [matched] = reordered.splice(matchedIndex, 1)
+    reordered.unshift(matched)
+    return reordered
+  }, [defaultPreset])
+
+  const allPresets = sortedPresetGroups.flatMap(g => g.options)
 
   const getCurrentPresetLabel = () => {
     const matched = allPresets.find(p => p.w === cropWidth && p.h === cropHeight)
@@ -526,7 +558,7 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
               style={{ minWidth: '160px' }}
             >
               <option value={`${cropWidth}×${cropHeight}`}>{getCurrentPresetLabel()}</option>
-              {presetGroups.map((group) => (
+              {sortedPresetGroups.map((group) => (
                 <optgroup key={group.label} label={group.label}>
                   {group.options.map((p) => (
                     <option key={p.label} value={`${p.w}×${p.h}`}>
@@ -555,19 +587,41 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
             />
             <input
               type="number"
-              value={(zoom * 100).toFixed(1)}
+              value={zoomInputValue}
               onChange={(e) => {
-                const val = parseFloat(e.target.value)
-                if (!isNaN(val) && val >= 10 && val <= 500) {
+                // 允许自由输入任何内容（包括空字符串）
+                setZoomInputValue(e.target.value)
+              }}
+              onBlur={() => {
+                const val = parseFloat(zoomInputValue)
+                if (isNaN(val) || val < 1) {
+                  setZoom(0.01)
+                  setZoomInputValue('1.0')
+                } else if (val > 500) {
+                  setZoom(5)
+                  setZoomInputValue('500.0')
+                } else {
                   setZoom(val / 100)
+                  setZoomInputValue(val.toFixed(1))
                 }
               }}
-              onBlur={(e) => {
-                const val = parseFloat(e.target.value)
-                if (isNaN(val) || val < 10) setZoom(0.1)
-                else if (val > 500) setZoom(5)
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const val = parseFloat(zoomInputValue)
+                  if (isNaN(val) || val < 1) {
+                    setZoom(0.01)
+                    setZoomInputValue('1.0')
+                  } else if (val > 500) {
+                    setZoom(5)
+                    setZoomInputValue('500.0')
+                  } else {
+                    setZoom(val / 100)
+                    setZoomInputValue(val.toFixed(1))
+                  }
+                  ;(e.target as HTMLInputElement).blur()
+                }
               }}
-              min={10}
+              min={1}
               max={500}
               step={0.1}
               className="crop-editor__size-input"
@@ -577,7 +631,10 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
             <button
               type="button"
               className="crop-editor__preset-btn"
-              onClick={() => setZoom(1)}
+              onClick={() => {
+                setZoom(1)
+                setZoomInputValue('100.0')
+              }}
               title="重置为 100%"
             >
               重置

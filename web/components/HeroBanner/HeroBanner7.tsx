@@ -3,6 +3,7 @@ import type { FC } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
 import { ServerImage } from "@/components/ui/ServerImage";
+import { AutoScaleText } from "@/components/ui/AutoScaleText";
 
 const formatText = (text: string | undefined) =>
   text?.replace(/\/n|\\n/g, "\n") || "";
@@ -122,11 +123,13 @@ const HeroBanner7: FC<BannerProps> = ({ data }) => {
         </div>
 
         {/* 文字内容 */}
-        <div className="absolute z-40 flex flex-col items-start pointer-events-auto" style={{ left: rpx(BANNER_7_ASSETS.content.titleGroup.x), top: rpx(BANNER_7_ASSETS.content.titleGroup.y) }}>
-           <div className="flex flex-col">
+        <div className="absolute z-40 flex flex-col items-start pointer-events-auto" style={{ left: rpx(BANNER_7_ASSETS.content.titleGroup.x), top: rpx(BANNER_7_ASSETS.content.titleGroup.y), maxWidth: rpx(680) }}>
+           <div className="flex flex-col w-full">
             {titleParts.map((line, idx) => (
-              <h1 key={idx} className="font-paytone-one leading-[1.1] whitespace-nowrap" style={{ fontSize: rpx(96), color: idx === 0 ? "#FFFFFF" : "#433E12", WebkitTextStroke: `${rpx(4)} #000000`, paintOrder: "stroke fill" }}>
-                {idx === 0 ? line.split(/(-)/g).map((part, pIdx) => <span key={pIdx} className={part === '-' ? 'text-[#433E12]' : ''}>{part}</span>) : line}
+              <h1 key={idx} className="font-paytone-one leading-[1.1]" style={{ fontSize: rpx(96), color: idx === 0 ? "#FFFFFF" : "#433E12", WebkitTextStroke: `${rpx(4)} #000000`, paintOrder: "stroke fill" }}>
+                <AutoScaleText minScale={0.5}>
+                  {idx === 0 ? line.split(/(-)/g).map((part, pIdx) => <span key={pIdx} className={part === '-' ? 'text-[#433E12]' : ''}>{part}</span>) : line}
+                </AutoScaleText>
               </h1>
             ))}
           </div>

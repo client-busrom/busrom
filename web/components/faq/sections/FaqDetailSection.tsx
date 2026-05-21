@@ -70,7 +70,7 @@ const FaqItemRow = React.memo(({
           className="text-black font-bold font-anaheim flex-1 leading-[1.2] m-0"
           style={{
             fontSize: vw(36),
-            paddingRight: isOpen && faq.image ? vw(260) : vw(66),
+            paddingRight: isOpen ? (faq.image ? vw(260) : vw(20)) : vw(66),
           }}
         >
           {faq.question}

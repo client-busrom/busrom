@@ -570,7 +570,7 @@ export function CtaSection({
               type="button"
               onClick={() => setOpenCountrySelectorMobile(!openCountrySelectorMobile)}
               disabled={isSubmitting}
-              className="flex items-center gap-1.5 pl-3 pr-2 border-r border-white/20 flex-shrink-0"
+              className="flex items-center gap-1 pl-2 pr-1.5 border-r border-white/20 flex-shrink-0"
             >
               <div className="w-6 h-4 md:w-8 md:h-5 flex-shrink-0">
                 <CountryFlag
@@ -578,7 +578,7 @@ export function CtaSection({
                   className="w-full h-full rounded-[2px] object-cover"
                 />
               </div>
-              <span className="text-white font-anaheim font-semibold text-base">
+              <span className="text-white font-anaheim font-semibold text-sm">
                 +{selectedCountry[2]}
               </span>
               <svg
@@ -616,7 +616,7 @@ export function CtaSection({
               disabled={isSubmitting}
               name="tel"
               autoComplete="tel"
-              className="cta-input-el flex-1 bg-transparent px-4 border-none outline-none"
+              className="cta-input-el flex-1 bg-transparent pl-2 pr-3 border-none outline-none"
             />
 
             {openCountrySelectorMobile && (
@@ -895,7 +895,7 @@ export function CtaSection({
                 type="button"
                 onClick={() => setOpenCountrySelector(!openCountrySelector)}
                 disabled={isSubmitting}
-                className="flex items-center gap-1.5 pl-3 pr-2 border-r border-white/20 flex-shrink-0"
+                className="flex items-center gap-1 pl-2 pr-1.5 border-r border-white/20 flex-shrink-0"
               >
                 <div className="w-5 h-3 md:w-6 md:h-4 flex-shrink-0">
                   <CountryFlag
@@ -903,7 +903,7 @@ export function CtaSection({
                     className="w-full h-full rounded-[1px] object-cover"
                   />
                 </div>
-                <span className="text-white font-anaheim font-semibold text-base">
+                <span className="text-white font-anaheim font-semibold text-sm">
                   +{selectedCountry[2]}
                 </span>
                 <svg
@@ -941,7 +941,7 @@ export function CtaSection({
                 disabled={isSubmitting}
                 name="tel"
                 autoComplete="tel"
-                className="cta-input-el flex-1 bg-transparent px-4 border-none outline-none"
+                className="cta-input-el flex-1 bg-transparent pl-2 pr-3 border-none outline-none"
               />
 
               {openCountrySelector && (

@@ -13,6 +13,7 @@ import {
 } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
+import { autoBreakLines } from "@/lib/text-utils";
 import { type CarouselApi } from "@/components/ui/carousel";
 import {
   Carousel,
@@ -299,6 +300,16 @@ export default function HeroBanner({
               const bannerIndex = index + 1; // Banner 索引从 1 开始
               const BannerComponent = loadedBanners[bannerIndex];
 
+              // 自动为无换行的翻译文本插入换行（基于 en 版本的目标行数）
+              // Banner 9 标题(feature1) 使用 "first-word-first" 策略，其他用默认 "even"
+              const breakStrategy = bannerIndex === 9 ? "first-word-first" : "even"
+              const processedBannerData = {
+                ...bannerData,
+                features: bannerData.features.map((f, i) =>
+                  autoBreakLines(f, bannerData._targetLines?.[i] || 1, i === 0 ? breakStrategy : "even")
+                ),
+              };
+
               return (
                 <CarouselItem
                   key={index}
@@ -306,7 +317,7 @@ export default function HeroBanner({
                   style={{ transform: "translateZ(0)", willChange: "transform" }}
                 >
                   {BannerComponent ? (
-                    <BannerComponent data={bannerData} locale={locale} />
+                    <BannerComponent data={processedBannerData} locale={locale} />
                   ) : (
                     <BannerPlaceholder />
                   )}

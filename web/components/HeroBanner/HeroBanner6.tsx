@@ -3,6 +3,8 @@ import type { FC } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
 import { ServerImage } from "@/components/ui/ServerImage";
+import { AutoScaleText } from "@/components/ui/AutoScaleText";
+import { AutoScrollText } from "@/components/ui/AutoScrollText";
 
 // 处理换行符
 const formatText = (text: string | undefined) =>
@@ -121,8 +123,10 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
           >
             <div className="relative">
               {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
-                <div key={index} className="absolute flex items-center justify-end bg-[#756F3F]" style={{ left: rpx([0, 180, 360][index]), top: rpx([0, 0, 0][index]), width: rpx(740), height: rpx(100), borderRadius: rpx(71), transform: `rotate(-60deg)`, transformOrigin: "left center" }}>
-                  <span className="font-montserrat font-bold text-[#FFF5AD]" style={{ fontSize: rpx(24), paddingRight: rpx(40) }}>{feature}</span>
+                <div key={index} className="absolute flex items-center justify-end bg-[#756F3F] overflow-hidden" style={{ left: rpx([0, 180, 360][index]), top: rpx([0, 0, 0][index]), width: rpx(740), height: rpx(100), borderRadius: rpx(71), transform: `rotate(-60deg)`, transformOrigin: "left center", paddingRight: rpx(40) }}>
+                  <div className="overflow-hidden" style={{ maxWidth: rpx(300) }}>
+                    <AutoScrollText text={feature} className="font-montserrat font-bold text-[#FFF5AD]" style={{ fontSize: rpx(24) }} />
+                  </div>
                 </div>
               ),
               )}

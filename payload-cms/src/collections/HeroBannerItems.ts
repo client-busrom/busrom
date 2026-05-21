@@ -173,7 +173,7 @@ export const HeroBannerItems: CollectionConfig = {
           zh: '用于 Banner 1,2,6,7,8,9 的背景图',
         },
         components: {
-          Field: '@/components/fields/MediaPickerWithCrop',
+          Field: '@/components/fields/HeroBannerImagePicker',
         },
         // 显示条件: order 为 1,2,6,7,8,9 时显示
         condition: (data) => {
@@ -211,7 +211,7 @@ export const HeroBannerItems: CollectionConfig = {
           zh: '所有 Banner 都使用的装饰图',
         },
         components: {
-          Field: '@/components/fields/MediaPickerWithCrop',
+          Field: '@/components/fields/HeroBannerImagePicker',
         },
         // 所有 banner 都使用 image2，无需条件
       },
@@ -237,7 +237,7 @@ export const HeroBannerItems: CollectionConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPickerWithCrop',
+          Field: '@/components/fields/HeroBannerImagePicker',
         },
         // 显示条件: order 为 1,2,3,4,5,7,8 时显示 (排除 6,9)
         condition: (data) => {
@@ -271,7 +271,7 @@ export const HeroBannerItems: CollectionConfig = {
       },
       admin: {
         components: {
-          Field: '@/components/fields/MediaPickerWithCrop',
+          Field: '@/components/fields/HeroBannerImagePicker',
         },
         // 显示条件: order 为 3,4,5,7,8 时显示
         condition: (data) => {

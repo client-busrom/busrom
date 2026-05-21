@@ -3,6 +3,7 @@ import type { FC } from "react";
 import type { HomeContent } from "@/lib/content-data";
 import { Locale } from "@/i18n.config";
 import { ServerImage } from "@/components/ui/ServerImage";
+import { AutoScaleText } from "@/components/ui/AutoScaleText";
 
 const formatText = (text: string | undefined) =>
   text?.replace(/\/n|\\n/g, "\n") || "";
@@ -43,14 +44,22 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
           <div className="absolute inset-0 z-0 opacity-60"><img src={BANNER_8_ASSETS.decorator.src} className="w-full h-full object-cover" alt="" /></div>
           <div className="absolute right-0 top-0 h-full z-10" style={{ width: rpx(BANNER_8_ASSETS.bgFrame.width) }}><img src={BANNER_8_ASSETS.bgFrame.src} className="w-full h-full object-fill" alt="" /></div>
           <div className="absolute right-0 top-0 h-full z-20" style={{ width: rpx(BANNER_8_ASSETS.mainImage.width), maskImage: `url(${BANNER_8_ASSETS.mainImage.mask})`, WebkitMaskImage: `url(${BANNER_8_ASSETS.mainImage.mask})`, maskSize: "100% 100%", maskRepeat: "no-repeat" }}><ServerImage image={data.images[0]} alt="" fill className="object-cover" priority /></div>
-          <div className="absolute z-30" style={{ left: rpx(BANNER_8_ASSETS.content.title.x), top: rpx(BANNER_8_ASSETS.content.title.y) }}>
+          <div className="absolute z-30" style={{ left: rpx(BANNER_8_ASSETS.content.title.x), top: rpx(BANNER_8_ASSETS.content.title.y), maxWidth: rpx(800) }}>
             <h1 className="font-paytone-one leading-[1.1] pointer-events-auto" style={{ fontSize: rpx(BANNER_8_ASSETS.content.title.fontSize) }}>
               {titleLines.map((line, idx) => (
-                <div key={idx} className={idx === titleLines.length - 1 ? "text-white" : "text-black"} style={{ WebkitTextStroke: `${rpx(6)} #FDF6C2`, paintOrder: "stroke fill", letterSpacing: "0.06em" }}>{line}</div>
+                <div key={idx} className={idx === titleLines.length - 1 ? "text-white" : "text-black"} style={{ WebkitTextStroke: `${rpx(6)} #FDF6C2`, paintOrder: "stroke fill", letterSpacing: "0.06em" }}>
+                  <AutoScaleText minScale={0.5}>{line}</AutoScaleText>
+                </div>
               ))}
             </h1>
           </div>
-          <div className="absolute right-0 z-40 bg-[#665F1F] text-[#FEFFD8] rounded-l-full flex items-center justify-center pointer-events-auto" style={{ top: rpx(BANNER_8_ASSETS.content.subtitle.y), padding: `${rpx(30)} ${rpx(60)}` }}><span className="font-paytone-one" style={{ fontSize: rpx(BANNER_8_ASSETS.content.subtitle.fontSize) }}>{subtitle}</span></div>
+          <div className="absolute right-0 z-40 bg-[#665F1F] text-[#FEFFD8] rounded-l-full flex items-center justify-center pointer-events-auto" style={{ top: rpx(BANNER_8_ASSETS.content.subtitle.y), padding: `${rpx(30)} ${rpx(60)}`, minWidth: rpx(300) }}>
+            <div style={{ width: rpx(740), overflow: "hidden" }}>
+              <AutoScaleText minScale={0.4} className="font-paytone-one" style={{ fontSize: rpx(BANNER_8_ASSETS.content.subtitle.fontSize) }}>
+                {subtitle}
+              </AutoScaleText>
+            </div>
+          </div>
           <div className="absolute z-40 flex flex-col pointer-events-auto" style={{ left: rpx(BANNER_8_ASSETS.content.features.x), top: rpx(BANNER_8_ASSETS.content.features.y), gap: rpx(BANNER_8_ASSETS.content.features.gap) }}>
              {featureCapsules.map((f, i) => (<div key={i} className="bg-[#FFFB1B]/10 border border-[#CFBC37] flex items-center backdrop-blur-sm" style={{ borderRadius: rpx(24), paddingLeft: rpx(32), paddingRight: rpx(32), paddingTop: rpx(8), paddingBottom: rpx(8) }}><span className="font-montserrat font-bold text-[#CFBC37] uppercase tracking-widest" style={{ fontSize: rpx(BANNER_8_ASSETS.content.features.fontSize), textShadow: "0 4px 12px rgba(0,0,0,0.5)" }}>{f}</span></div>))}
           </div>

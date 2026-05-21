@@ -29,6 +29,8 @@ interface MediaPickerWithCropProps {
     relationTo?: string
     required?: boolean
   }
+  /** 裁剪预设上下文（如 'HeroBanner1'），用于智能选择默认预设 */
+  contextPreset?: string
 }
 
 export const MediaPickerWithCrop: React.FC<MediaPickerWithCropProps> = (props) => {
@@ -51,6 +53,7 @@ export const MediaPickerWithCrop: React.FC<MediaPickerWithCropProps> = (props) =
       showCropButton={true}
       cropData={cropDataField.value}
       onCropDataChange={handleCropDataChange}
+      contextPreset={props.contextPreset}
     />
   )
 }

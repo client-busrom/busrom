@@ -155,26 +155,22 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
     setActiveIndex(0)
   }
 
-  const renderPreloadImages = () => (
-    <div className="hidden" aria-hidden="true" style={{ display: "none" }}>
-      {product.items.map((item) => (
-        item.image && (
-          <React.Fragment key={`preload-p-${item.id}`}>
-            <OptimizedImage image={item.image.url} size="medium" priority />
-            <OptimizedImage image={item.image.url} size="small" priority />
-          </React.Fragment>
-        )
-      ))}
-      {manufacturing.items.map((item) => (
-        item.image && (
-          <React.Fragment key={`preload-m-${item.id}`}>
-            <OptimizedImage image={item.image.url} size="medium" priority />
-            <OptimizedImage image={item.image.url} size="small" priority />
-          </React.Fragment>
-        )
-      ))}
-    </div>
-  )
+  // 使用原生 img 预加载，避免 display:none 导致浏览器跳过加载
+  const renderPreloadImages = () => {
+    const allImages = [
+      ...product.items.map(item => item.image?.url).filter(Boolean),
+      ...manufacturing.items.map(item => item.image?.url).filter(Boolean),
+    ] as string[]
+    // 去重
+    const uniqueUrls = Array.from(new Set(allImages))
+    return (
+      <div aria-hidden="true" style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}>
+        {uniqueUrls.map((url, i) => (
+          <img key={`preload-${i}`} src={url} alt="" loading="eager" style={{ position: 'absolute', width: 1, height: 1, opacity: 0 }} />
+        ))}
+      </div>
+    )
+  }
 
   const renderFormattedText = (text: string) => {
     return text.split("\n").map((line, i) => (
@@ -365,6 +361,7 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
                       alt={item.image.alt || ""}
                       className={`object-cover w-full h-full transition-all duration-700 ${isActive ? "" : "grayscale"}`}
                       size="medium"
+                      loading="eager"
                     />
                   )}
                   {!item.image && <div className="w-full h-full bg-[#d9d9d9]" />}

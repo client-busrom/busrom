@@ -58,8 +58,9 @@ const toImageObject = (
 
 /**
  * Transforms raw CMS data from the /api/home endpoint into the standardized HomeContent structure.
+ * @param enData - Optional EN locale raw data for inferring target line counts (used for auto line-breaking in translated content)
  */
-export function parseHomeData(data: any, locale: string, strategy?: string, seoKeywords: string[] = []): HomeContent {
+export function parseHomeData(data: any, locale: string, strategy?: string, seoKeywords: string[] = [], enData?: any): HomeContent {
   if (!data) return {} as HomeContent;
 
   const keywordIndexRef = { current: 0 };
@@ -323,12 +324,25 @@ export function parseHomeData(data: any, locale: string, strategy?: string, seoK
   };
 
   // 11. Transform HeroBanner
-  const heroBanner = (data.heroBanner || []).map((item: any) => ({
-    ...item,
-    images: (item.images || []).map((imgData: any) => autoSeoImage(imgData, item.title)),
-    // 裁剪数据直接透传（后端已处理好）
-    imageCropDataList: item.imageCropDataList || undefined,
-  }));
+  const enHeroBanner = enData?.heroBanner || [];
+  const heroBanner = (data.heroBanner || []).map((item: any, index: number) => {
+    const enItem = enHeroBanner[index];
+    // 计算每个 feature 的目标行数：优先用当前文本自己的换行，否则参考 en 版本
+    const targetLines = (item.features || []).map((f: string | undefined, fi: number) => {
+      if (f?.includes('\n')) return f.split('\n').length;
+      const enText = enItem?.features?.[fi];
+      if (enText?.includes('\n')) return enText.split('\n').length;
+      return 1;
+    });
+
+    return {
+      ...item,
+      images: (item.images || []).map((imgData: any) => autoSeoImage(imgData, item.title)),
+      // 裁剪数据直接透传（后端已处理好）
+      imageCropDataList: item.imageCropDataList || undefined,
+      _targetLines: targetLines,
+    };
+  });
 
   // 12. Transform FeaturedProducts
   const featuredProducts = data.featuredProducts ? {

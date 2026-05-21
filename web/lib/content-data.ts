@@ -96,6 +96,8 @@ export interface HeroBannerItem {
   images: ImageObject[]
   /** 裁剪数据列表 — 与 images 数组索引一一对应，null 表示未设置裁剪 */
   imageCropDataList?: (ImageCropData | null)[]
+  /** 各 feature 字段的目标行数（从 en 版推断，用于其他语言自动分行） */
+  _targetLines?: number[]
 }
 
 /**
