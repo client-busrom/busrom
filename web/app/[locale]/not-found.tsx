@@ -1,125 +1,139 @@
-"use client"
+"use client";
 
-import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { usePathname } from 'next/navigation'
-import { defaultLocale, locales } from '@/i18n.config'
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { defaultLocale, locales } from "@/i18n.config";
 
 export default function NotFound() {
-  const pathname = usePathname()
-  
+  const pathname = usePathname();
+
   // Simple locale detection from pathname
-  const segments = pathname.split('/')
-  const pathLocale = segments[1]
-  const locale = locales.includes(pathLocale as any) ? pathLocale : defaultLocale
+  const segments = pathname.split("/");
+  const pathLocale = segments[1];
+  const locale = locales.includes(pathLocale as any)
+    ? pathLocale
+    : defaultLocale;
 
-  // Fallback translations since we can't easily use the async getMessages in a synchronous render
-  // and we want the 404 page to be extremely robust.
-  const translations: Record<string, any> = {
-    en: {
-      title: "Page Not Found",
-      description: "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
-      backHome: "Back to Home",
-      viewProducts: "View Products",
-      home: "Home",
-      about: "About Us",
-      contact: "Contact"
-    },
-    zh: {
-      title: "页面未找到",
-      description: "您查找的页面可能已被删除、更名或暂时不可用。",
-      backHome: "返回首页",
-      viewProducts: "查看产品",
-      home: "首页",
-      about: "关于我们",
-      contact: "联系我们"
-    }
-  }
-
-  const t = translations[locale] || translations[defaultLocale]
-  
-  // Dynamic message loading state
-  const [messages, setMessages] = useState<any>(null)
-
-  useEffect(() => {
-    const loadMessages = async () => {
-      try {
-        // Dynamic import of localized messages
-        const msg = (await import(`@/messages/${locale}.json`)).default
-        setMessages(msg?.notFound)
-      } catch (error) {
-        console.error('Failed to load messages for 404 page:', error)
-      }
-    }
-    loadMessages()
-  }, [locale])
-
-  // Get translated strings with safe fallbacks
-  const title = messages?.title || t.title
-  const description = messages?.description || t.description
-  const backHome = messages?.backHome || t.backHome
-  const viewProducts = messages?.viewProducts || t.viewProducts
-  const homeLabel = messages?.home || t.home
-  const aboutLabel = messages?.about || t.about
-  const contactLabel = messages?.contact || t.contact
+  const currentYear = new Date().getFullYear();
 
   return (
-    <div className="min-h-screen bg-brand-main flex items-center justify-center px-6 pt-20 pb-12 overflow-hidden relative" data-header-theme="dark">
-      {/* Decorative background elements */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-accent-gold/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-1/4 -left-20 w-[300px] h-[300px] bg-brand-secondary/10 rounded-full blur-[80px] pointer-events-none" />
-      
-      <div className="max-w-3xl w-full text-center relative z-10">
-        {/* Large 404 Text */}
-        <div className="mb-8">
-          <h1 className="text-[120px] md:text-[180px] font-anaheim font-black leading-none text-transparent bg-clip-text bg-gradient-to-b from-brand-accent-gold to-brand-accent-gold/40 opacity-20 select-none">
-            404
+    <div className="min-h-screen bg-[#FAF9F5] flex flex-col justify-between relative overflow-hidden font-sans">
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col lg:flex-row w-full max-w-[1400px] mx-auto px-8 md:px-16 pt-24 lg:pt-0 relative z-10">
+        {/* Left Side: Text Content */}
+        <div className="w-full lg:w-3/5 flex flex-col justify-center items-start lg:pr-12 xl:pr-24 h-full pt-10 lg:pt-0 pb-20 lg:pb-0">
+          <h1
+            className="text-4xl md:text-5xl lg:text-[64px] text-[#2D2D2D] uppercase leading-[1.2] mb-12"
+            style={{
+              fontFamily: '"Playfair Display", "Times New Roman", Times, serif',
+            }}
+          >
+            THE PAGE YOU ARE LOOKING
+            <br />
+            FOR MIGHT HAVE BEEN
+            <br />
+            REMOVED OR TEMPORARILY
+            <br />
+            UNAVAILABLE
           </h1>
-          <div className="h-1 w-20 bg-brand-accent-gold mx-auto -mt-6 md:-mt-10 mb-8" />
-        </div>
 
-        {/* Content */}
-        <h2 className="text-3xl md:text-5xl font-anaheim font-extrabold text-brand-text-black mb-6 uppercase tracking-tighter">
-          {title}
-        </h2>
-        
-        <p className="text-brand-text-main text-lg md:text-xl max-w-xl mx-auto mb-12 leading-relaxed">
-          {description}
-        </p>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
           <Link
             href={`/${locale}`}
-            className="w-full sm:w-auto px-10 py-4 bg-brand-text-black text-white font-anaheim font-bold text-sm uppercase tracking-wider hover:bg-brand-accent-gold transition-all duration-300 transform hover:scale-105 shadow-xl"
+            className="px-10 py-4 bg-[#BFA273] text-white font-sans font-bold text-sm tracking-[0.1em] rounded-md hover:bg-[#A88A5C] transition-colors duration-300"
           >
-            {backHome}
-          </Link>
-          
-          <Link
-            href={`/${locale}/products`}
-            className="w-full sm:w-auto px-10 py-4 bg-transparent border-2 border-brand-text-black text-brand-text-black font-anaheim font-bold text-sm uppercase tracking-wider hover:bg-brand-text-black hover:text-white transition-all duration-300 transform hover:scale-105"
-          >
-            {viewProducts}
+            BACK TO HOME
           </Link>
         </div>
 
+        {/* Right Side: Building Illustration */}
+        <div className="w-full lg:w-2/5 flex items-end justify-end opacity-90 lg:h-screen lg:absolute lg:right-0 lg:bottom-0 pointer-events-none">
+          <BuildingGraphic />
+        </div>
       </div>
 
-      {/* Aesthetic Accents */}
-      <div className="absolute bottom-10 left-10 hidden lg:block opacity-20">
-        <div className="w-px h-20 bg-brand-accent-gold mb-4" />
-        <span className="text-[10px] uppercase tracking-[0.3em] text-brand-accent-gold [writing-mode:vertical-rl]">
-          Premium Quality
-        </span>
-      </div>
-      
-      <div className="absolute top-10 right-10 hidden lg:block opacity-20">
-        <span className="text-[10px] uppercase tracking-[0.3em] text-brand-accent-gold [writing-mode:vertical-rl] mb-4">
-          Stainless Steel Hardware
-        </span>
-        <div className="w-px h-20 bg-brand-accent-gold" />
+      {/* Footer */}
+      <div className="w-full max-w-[1400px] mx-auto px-8 md:px-16 pb-8 z-10 relative">
+        <p className="text-[#888888] text-xs font-sans tracking-wide">
+          Copyright &copy; Busrom {currentYear}. All Rights Reserved
+        </p>
       </div>
     </div>
-  )
+  );
+}
+
+function BuildingGraphic() {
+  // Generates abstract isometric buildings matching the design aesthetic
+  return (
+    <svg
+      viewBox="0 0 600 800"
+      className="w-full max-w-[600px] h-auto object-cover transform translate-x-12 translate-y-12 lg:translate-x-0 lg:translate-y-0"
+      preserveAspectRatio="xMaxYMax meet"
+    >
+      <g fill="#BFA273" transform="translate(300, 150) scale(1.1)">
+        {/* Building 1 (Far Left) */}
+        {generateBuilding(-250, 400, 4, 18, 12, 20, 4)}
+        {/* Building 2 */}
+        {generateBuilding(-150, 300, 5, 25, 12, 20, 4)}
+        {/* Building 3 (Tallest Center) */}
+        {generateBuilding(-20, 100, 6, 35, 12, 20, 4)}
+        {/* Building 4 */}
+        {generateBuilding(110, 250, 4, 22, 12, 20, 4)}
+        {/* Building 5 (Far Right) */}
+        {generateBuilding(200, 350, 3, 15, 12, 20, 4)}
+      </g>
+    </svg>
+  );
+}
+
+function generateBuilding(
+  startX: number,
+  startY: number,
+  cols: number,
+  rows: number,
+  w: number,
+  h: number,
+  gap: number,
+) {
+  const elements = [];
+
+  // Isometric skew angles
+  const skewY = 30; // degrees
+  const angleRad = (skewY * Math.PI) / 180;
+
+  for (let c = 0; c < cols; c++) {
+    // Top steps
+    const offsetRows = Math.abs(c - Math.floor(cols / 2)) * 2;
+
+    for (let r = offsetRows; r < rows; r++) {
+      const x = startX + c * (w + gap);
+
+      // Calculate isometric y displacement
+      const isoYOffset = x * Math.tan(angleRad);
+      const y = startY + r * (h + gap) + isoYOffset;
+
+      // A diamond / slanted rectangle representing a window
+      const points = `${x},${y} ${x + w},${y + w * Math.tan(angleRad)} ${x + w},${y + h + w * Math.tan(angleRad)} ${x},${y + h}`;
+
+      // Introduce randomness at the bottom to create the dissolving effect
+      let opacity = 1;
+      let shouldRender = true;
+
+      if (r > rows - 8) {
+        const dropProb = (r - (rows - 8)) * 0.15;
+        if (Math.random() < dropProb) shouldRender = false;
+        opacity = 1 - (r - (rows - 8)) * 0.1;
+      }
+
+      if (shouldRender) {
+        elements.push(
+          <polygon
+            key={`${c}-${r}`}
+            points={points}
+            opacity={Math.max(0.1, opacity)}
+          />,
+        );
+      }
+    }
+  }
+  return elements;
 }
