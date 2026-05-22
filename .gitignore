@@ -25,6 +25,10 @@ dist/
 # Database
 *.db
 *.sqlite
+
+# Claude
+.claude/
+
 # Ignore sensitive deployment guides
 AWS_DEPLOYMENT_GUIDE.md
 docs/PRODUCTION_DB_MAINTENANCE.md
