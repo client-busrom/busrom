@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import { useSearchParams } from "next/navigation"
 import type { Locale } from "@/i18n.config"
 import { parseContentTranslation, type ParsedProductSeriesContent } from "@/lib/content-parser"
 import { HeroCarousel } from "@/components/product-series/HeroCarousel"
@@ -38,6 +39,10 @@ export function ProductSeriesDetailClient({ locale, slug, initialData }: Product
   const [seriesData, setSeriesData] = useState<ProductSeriesData | null>(initialData || null)
   const [loading, setLoading] = useState(!initialData)
   const [error, setError] = useState<string | null>(null)
+
+  // Check for debug query param to show color toggle
+  const searchParams = useSearchParams()
+  const isDebugMode = searchParams.get("debug-color") !== null
 
   // Manage active color key for demo/testing toggle
   const [activeColorKey, setActiveColorKey] = useState<string>("")
@@ -221,18 +226,20 @@ export function ProductSeriesDetailClient({ locale, slug, initialData }: Product
         <Quote data={parsedContent.quote} />
       )}
 
-      {/* Premium Floating Color Toggle Button */}
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-white/90 backdrop-blur-md p-2 rounded-full shadow-2xl border border-black/10 transition-all duration-300 hover:scale-105">
-        <button
-          onClick={toggleSeriesColor}
-          className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-inter font-bold transition-all duration-300 text-white shadow-md active:scale-95"
-          style={{ backgroundColor: currentColorConfig.rgb }}
-          title="点击切换系列渐变主题色"
-        >
-          <span className="flex w-4 h-4 rounded-full border border-white/50 shadow-inner" style={{ backgroundColor: currentColorConfig.dark }} />
-          <span>🎨 配色切换: {currentColorConfig.name} ({currentColorConfig.rgb.toUpperCase()})</span>
-        </button>
-      </div>
+      {/* Premium Floating Color Toggle Button — debug mode only */}
+      {isDebugMode && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-white/90 backdrop-blur-md p-2 rounded-full shadow-2xl border border-black/10 transition-all duration-300 hover:scale-105">
+          <button
+            onClick={toggleSeriesColor}
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-inter font-bold transition-all duration-300 text-white shadow-md active:scale-95"
+            style={{ backgroundColor: currentColorConfig.rgb }}
+            title="点击切换系列渐变主题色"
+          >
+            <span className="flex w-4 h-4 rounded-full border border-white/50 shadow-inner" style={{ backgroundColor: currentColorConfig.dark }} />
+            <span>🎨 配色切换: {currentColorConfig.name} ({currentColorConfig.rgb.toUpperCase()})</span>
+          </button>
+        </div>
+      )}
 
     </div>
   )

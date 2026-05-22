@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
 import type { HeroCarouselData } from "@/lib/content-parser"
+import { IconifyIcon } from "../ui/IconifyIcon"
 
 /**
  * Pencil Design Specs (1920x968):
@@ -319,47 +320,35 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
           >
             <Link
               href={currentData.buttonLink}
-              className="group relative inline-flex items-center font-josefin-sans font-medium text-white border border-white overflow-hidden"
+              className="group relative inline-flex items-center justify-center font-josefin-sans font-medium text-white border border-white transition-colors duration-300 hover:bg-[#B6AB57] hover:border-[#B6AB57]"
               style={{
-                width: `${(284 / DESIGN_WIDTH) * 100}vw`,
                 height: `${(92 / DESIGN_WIDTH) * 100}vw`,
                 borderRadius: `${(62.5 / DESIGN_WIDTH) * 100}vw`,
                 fontSize: `${(32 / DESIGN_WIDTH) * 100}vw`,
+                paddingLeft: `${(32 / DESIGN_WIDTH) * 100}vw`,
+                paddingRight: `${(8 / DESIGN_WIDTH) * 100}vw`,
+                gap: `${(12 / DESIGN_WIDTH) * 100}vw`,
               }}
             >
-              {/* 1. 底层：背景放大圆圈 */}
-              <span
-                className="absolute right-0 top-1/2 -translate-y-1/2 bg-[#B6AB57] rounded-full transition-all duration-500 ease-out scale-0 group-hover:scale-[10]"
-                style={{
-                  width: `${(77 / DESIGN_WIDTH) * 100}vw`,
-                  height: `${(77 / DESIGN_WIDTH) * 100}vw`,
-                  marginRight: `${(8 / DESIGN_WIDTH) * 100}vw`,
-                }}
-              />
-
-              {/* 2. 顶层右侧：圆形箭头图标 (默认显示，hover时淡出) */}
-              <div
-                className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center justify-end pointer-events-none transition-opacity duration-300 group-hover:opacity-0"
-                style={{
-                  paddingRight: `${(8 / DESIGN_WIDTH) * 100}vw`,
-                }}
-              >
-                <img
-                  src="/icon-arrow-circle.svg"
-                  alt=""
-                  style={{
-                    width: `${(77 / DESIGN_WIDTH) * 100}vw`,
-                    height: `${(77 / DESIGN_WIDTH) * 100}vw`,
-                  }}
-                />
-              </div>
-
-              {/* 3. 核心层：文字自适应平滑居中层 */}
-              <span
-                className="absolute top-1/2 left-[1.25vw] -translate-y-1/2 z-10 transition-all duration-500 ease-out group-hover:text-black flex items-center leading-none group-hover:left-1/2 group-hover:-translate-x-1/2 whitespace-nowrap"
-              >
+              {/* 文字 */}
+              <span className="whitespace-nowrap transition-colors duration-300">
                 {currentData.buttonText}
               </span>
+
+              {/* 圆形箭头图标 */}
+              <div
+                className="flex-shrink-0 flex items-center justify-center rounded-full transition-colors duration-300 bg-white/20 group-hover:bg-white"
+                style={{
+                  width: `${(72 / DESIGN_WIDTH) * 100}vw`,
+                  height: `${(72 / DESIGN_WIDTH) * 100}vw`,
+                }}
+              >
+                <IconifyIcon
+                  name="lucide:arrow-up-right"
+                  size={36}
+                  className="text-white transition-colors duration-300 group-hover:text-[#756F3F]"
+                />
+              </div>
             </Link>
           </motion.div>
         </div>
