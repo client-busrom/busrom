@@ -4,17 +4,27 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
-export function ErrorImageWall() {
+interface ErrorImageWallProps {
+  customImages?: string[];
+}
+
+export function ErrorImageWall({ customImages }: ErrorImageWallProps = {}) {
   const [positions, setPositions] = useState<number[]>([0, 1, 2, 3, 4]);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  const images = [
+  const defaultImages = [
     "/homeProductSeries/glass_clip_washroom.png",
     "/homeProductSeries/hidden_hook.png",
     "/homeProductSeries/bathroom_&_door_handle.png",
     "/homeProductSeries/glass_connected_fitting.png",
     "/homeProductSeries/glass_standoff.png",
   ];
+
+  // Use custom images if provided, padding with default images to ensure we always have 5
+  const images =
+    customImages && customImages.length > 0
+      ? Array.from({ length: 5 }, (_, i) => customImages[i % customImages.length])
+      : defaultImages;
 
   const DESIGN_SIZE = 800;
 

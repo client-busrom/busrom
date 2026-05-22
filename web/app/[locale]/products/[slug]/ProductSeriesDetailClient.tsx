@@ -184,6 +184,17 @@ export function ProductSeriesDetailClient({
     parsedContent.moreSeries ||
     parsedContent.quote;
 
+  // Extract custom images for the Image Wall if available
+  const seriesImages = useMemo(() => {
+    if (!seriesData?.mediaData) return undefined;
+    const urls: string[] = [];
+    Object.values(seriesData.mediaData).forEach((media: any) => {
+      const url = media?.sizes?.card?.url || media?.sizes?.tablet?.url || media?.sizes?.thumbnail?.url || media?.url;
+      if (url) urls.push(url);
+    });
+    return urls.length > 0 ? urls : undefined;
+  }, [seriesData]);
+
   // Empty content state
   if (!hasContent) {
     return (
@@ -219,7 +230,7 @@ export function ProductSeriesDetailClient({
 
           {/* Right Side: Building Illustration */}
           <div className="w-full lg:w-2/5 flex items-end justify-end opacity-90 lg:absolute lg:right-0 lg:bottom-0 lg:h-full pointer-events-none z-10">
-            <ErrorImageWall />
+            <ErrorImageWall customImages={seriesImages} />
           </div>
         </div>
 
