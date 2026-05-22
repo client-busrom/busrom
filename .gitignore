@@ -25,6 +25,17 @@ dist/
 # Database
 *.db
 *.sqlite
+# Ignore sensitive deployment guides
+AWS_DEPLOYMENT_GUIDE.md
+docs/PRODUCTION_DB_MAINTENANCE.md
+
+# Ignore sensitive fix scripts
+payload-cms/run-migration.cjs
+payload-cms/scripts/fix-keystone-media-urls-standalone.ts
+payload-cms/scripts/fix-keystone-media-urls-v2.ts
+scripts/fix-media-metadata-production-fill.js
+scripts/fix-media-metadata-production.js
+scripts/update-combination-metadata.js
 
 # Logs
 *.log
