@@ -69,10 +69,10 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
         return (
           <div key={idx} className="flex flex-col gap-2">
             {/* Header Area */}
-            <div className="text-base font-bold text-brand-text-black">
+            <div className="text-xl font-bold text-brand-text-black">
               {specName}
               {spec.description && (
-                <span className="text-brand-text-main opacity-50 font-medium text-sm ml-1">
+                <span className="text-brand-text-main opacity-50 font-medium text-xl ml-1">
                   : {spec.description}
                 </span>
               )}
@@ -160,7 +160,7 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
                               )}
                             </div>
                           )}
-                          <span className={`text-xs font-bold leading-tight transition-colors whitespace-normal break-words ${isSelected ? 'text-brand-accent-gold' : 'text-brand-text-main/80 group-hover:text-brand-text-main'
+                          <span className={`text-sm font-bold leading-tight transition-colors whitespace-normal break-words ${isSelected ? 'text-brand-accent-gold' : 'text-brand-text-main/80 group-hover:text-brand-text-main'
                             }`}>
                             {itemText}
                           </span>
@@ -185,7 +185,7 @@ export const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
                             : "bg-white border-brand-accent-border/30 hover:border-brand-accent-gold/50"
                           }`}
                       >
-                        <span className={`text-xs font-bold transition-colors whitespace-normal break-words leading-tight ${isSelected ? 'text-brand-accent-gold' : 'text-brand-text-main/80 group-hover:text-brand-text-main'
+                        <span className={`text-sm font-bold transition-colors whitespace-normal break-words leading-tight ${isSelected ? 'text-brand-accent-gold' : 'text-brand-text-main/80 group-hover:text-brand-text-main'
                           }`}>
                           {itemText}
                         </span>

@@ -1,4 +1,5 @@
 import { convertToCDNUrl } from "../cdn-url";
+import { extractNodesAfterMarker, resolveMediaFromNodes } from "../lexical-utils";
 
 interface MediaObject {
   id: string;
@@ -30,10 +31,12 @@ export interface FraudNoticeData {
     } | null;
   } | null;
   contactForm: {
-    title: any[];
-    description: any[];
-    formConfig: any;
-  } | null;
+    bgImage?: string;
+    displayImage?: string;
+    richText: { text: string; bold?: boolean }[];
+    formId?: string;
+    formConfig?: any;
+  };
   quoteGuide: {
     slides: any[];
     autoplay: boolean;
@@ -98,6 +101,23 @@ export function parseFraudNoticeData(locale: string, rawData: any): FraudNoticeD
     return mediaData[mediaId] || null;
   };
 
+  const findImgUrlByMarker = (marker: string) => {
+    const nodes = extractNodesAfterMarker(children, marker);
+    const mediaNodes = resolveMediaFromNodes(nodes, mediaData);
+    return mediaNodes[0]?.url;
+  };
+
+  const findRichTextByMarker = (marker: string) => {
+    const nodes = extractNodesAfterMarker(children, marker);
+    return nodes.flatMap(n => n.children || []).map((c: any) => ({
+      text: c.type === 'linebreak' ? "\n" : (c.text || ""),
+      bold: typeof c.format === 'number' && (c.format & 1) !== 0,
+      italic: typeof c.format === 'number' && (c.format & 2) !== 0,
+      linebreak: c.type === 'linebreak'
+    }));
+  };
+  
+
   // 1. Hero Section
   const heroTitleNodes = extractAfterMarker(children, "hero-section-title");
   const heroDescNodes = extractAfterMarker(children, "hero-section-description");
@@ -148,11 +168,9 @@ export function parseFraudNoticeData(locale: string, rawData: any): FraudNoticeD
   }
 
   // 3. Contact Form
-  const contactTitleNodes = extractAfterMarker(children, "contact-form-title");
-  const contactDescNodes = extractAfterMarker(children, "contact-form-description");
-  const formMarkerNodes = extractAfterMarker(children, "contact-form-block");
-  const formNode = formMarkerNodes.find((n: any) => n.type === "formBlock") || children.find((n: any) => n.type === "formBlock");
-  const formConfig = formNode?.data?.formConfig || formNode?.data || (rawData as any).formConfig || null;
+  const contactFormNodes = extractNodesAfterMarker(children, "contact-form-block");
+  const formNode = contactFormNodes.find(n => n.type === 'formBlock');
+
 
   // 4. Quote Guide (Carousel)
   const quoteItemNodes = extractAfterMarker(children, "quote-guide-item");
@@ -177,9 +195,10 @@ export function parseFraudNoticeData(locale: string, rawData: any): FraudNoticeD
       block
     },
     contactForm: {
-      title: contactTitleNodes,
-      description: contactDescNodes,
-      formConfig
+      bgImage: findImgUrlByMarker("contact-form-bg-image"),
+      displayImage: findImgUrlByMarker("contact-form-image") || findImgUrlByMarker("contact-form-display-image"),
+      richText: findRichTextByMarker("contact-form-title"),
+      formConfig: formNode?.data?.formConfig
     },
     quoteGuide
   };

@@ -101,9 +101,8 @@ export const WhyChooseBusrom: GlobalConfig = {
         zh: '查看更多按钮链接',
       },
       admin: {
-        description: {
-          en: 'e.g.: "/about-us" or "https://example.com/about"',
-          zh: '例如: "/about-us" 或 "https://example.com/about"',
+        components: {
+          Field: '@/components/fields/SmartLinkField',
         },
       },
     },

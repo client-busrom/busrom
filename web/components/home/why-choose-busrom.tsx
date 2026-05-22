@@ -239,8 +239,8 @@ export default function WhyChooseBusrom({ data, headerTheme, className }: Props)
             </h2>
 
             {/* 右侧 VIEW MORE */}
-            <AnimatedLinkButton>
-              VIEW MORE INFORMATION
+            <AnimatedLinkButton href={data.viewMoreButtonUrl || '#'}>
+              {data.viewMoreButtonText || 'VIEW MORE INFORMATION'}
               <span className="ml-2 inline-block transition-transform duration-300 group-hover:translate-x-1">
                 »
               </span>

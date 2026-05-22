@@ -96,8 +96,8 @@ const ProductCard = ({ product, index, isMobile = false, locale }: ProductCardPr
   const stepOffset = LAYOUT.cards.stepOffsets[index % 3];
   const [isHovered, setIsHovered] = useState(false);
 
-  // 产品详情页链接
-  const productHref = `/${locale}/shop/${product.slug}`;
+  // 产品详情页链接（默认语言不带前缀）
+  const productHref = `/shop/${product.slug}`;
 
   // vw 转换函数
   const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
@@ -542,13 +542,15 @@ export default function FeaturedProducts({ data, locale, headerTheme, className 
 
           {/* View More 按钮 */}
           <div className="text-center mt-4">
-            <Button
-              variant="outline"
-              className="text-brand-secondary border-brand-secondary/30 text-sm flex items-center gap-1 mx-auto"
-            >
-              {data.viewAllButton || "View All Products"}
-              <span>»</span>
-            </Button>
+            <Link href={data.viewAllButtonUrl || `/${locale}/shop`}>
+              <Button
+                variant="outline"
+                className="text-brand-secondary border-brand-secondary/30 text-sm flex items-center gap-1 mx-auto"
+              >
+                {data.viewAllButton || "View All Products"}
+                <span>»</span>
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -592,7 +594,7 @@ export default function FeaturedProducts({ data, locale, headerTheme, className 
             </div>
 
             {/* 右侧 VIEW MORE */}
-            <AnimatedLinkButton>
+            <AnimatedLinkButton href={data.viewAllButtonUrl || `/${locale}/shop`}>
               {data.viewAllButton || "VIEW MORE INFORMATION"}
               <span className="ml-2 inline-block transition-transform duration-300 group-hover:translate-x-1">»</span>
             </AnimatedLinkButton>

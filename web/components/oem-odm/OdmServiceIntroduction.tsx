@@ -305,16 +305,20 @@ export function OdmServiceIntroduction({
           />
 
           {/* 右上角描述文字 */}
-          <motion.p
-            className="absolute font-anaheim"
+          <motion.div
+            className="absolute font-anaheim overflow-y-auto"
             style={{
               left: rpx(580), // 828 * 0.7
               top: rpx(60), // 85 * 0.7
               width: rpx(725), // 1035 * 0.7
+              maxHeight: rpx(110),
               fontSize: rpx(20),
               lineHeight: rpx(36), // 51 * 0.7
               color: "#59542A",
               zIndex: 10,
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'rgba(89,84,42,0.3) transparent',
+              overscrollBehavior: 'contain',
             }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -387,7 +391,7 @@ export function OdmServiceIntroduction({
                 </span>
               );
             })}
-          </motion.p>
+          </motion.div>
 
           {/* 右侧大图 */}
           <motion.div
@@ -432,12 +436,16 @@ export function OdmServiceIntroduction({
 
           {/* 左下角文字区域 - 支持格式化文本 */}
           <motion.div
-            className="absolute"
+            className="absolute overflow-y-auto"
             style={{
               left: rpx(111), // 159 * 0.7
               top: rpx(306), // 437 * 0.7
               width: rpx(392), // 560 * 0.7
+              maxHeight: rpx(280),
               zIndex: 10,
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'rgba(89,84,42,0.3) transparent',
+              overscrollBehavior: 'contain',
             }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

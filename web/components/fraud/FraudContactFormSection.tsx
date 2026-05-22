@@ -1,0 +1,837 @@
+"use client";
+
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { CUSTOM_ICONS } from "@/lib/icons";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { CountryFlag } from "@/components/ui/CountryFlag";
+import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
+import { COUNTRIES } from "@/components/ui/PhoneInput";
+
+interface RichTextSegment {
+  text: string;
+  bold?: boolean;
+}
+
+interface FormField {
+  fieldName: string;
+  fieldType: string;
+  label: string;
+  placeholder?: string;
+  required?: boolean;
+  options?: Array<{ value: string; label: string }>;
+  order?: number;
+}
+
+interface FormConfig {
+  id: string;
+  name: string;
+  fields: any; // Change to any to handle nested/localized structures
+  submitButtonText?: string;
+  successMessage?: string;
+  errorMessage?: string;
+  data?: { fields: any };
+}
+
+interface Props {
+  locale?: string;
+  bgImage?: string;
+  displayImage?: string;
+  logoImage?: string;
+  richText?: RichTextSegment[];
+  formId?: string;
+  formConfig?: any;
+}
+
+// Custom Dropdown for "Beautification"
+function CustomDropdown({
+  field,
+  value,
+  onChange,
+}: {
+  field: FormField;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1025);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedOption = field.options?.find((opt) => opt.value === value);
+  const isScenario =
+    field.fieldName.includes("scenario") || field.label?.includes("Scenario");
+
+  return (
+    <div ref={containerRef} className="relative w-full font-montserrat">
+      <div
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between cursor-pointer font-semibold text-[#463B17] transition-all hover:bg-white/10"
+        style={{
+          height: isMobile ? "48px" : "53px",
+          backgroundColor: "#D4CBAF",
+          paddingLeft: isMobile ? "16px" : "17px",
+          paddingRight: isMobile ? "16px" : "17px",
+          borderRadius: "10px",
+        }}
+      >
+        <span
+          className={
+            !value && !isScenario
+              ? "text-[#9E9474] truncate flex-1"
+              : "text-[#463B17] truncate flex-1"
+          }
+          style={{ fontSize: "16px" }}
+        >
+          {selectedOption
+            ? selectedOption.label
+            : isScenario && field.options?.[0]
+              ? field.options[0].label
+              : field.label || field.placeholder}
+        </span>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronDown size={isMobile ? 16 : 20} className="text-[#463B17]" />
+        </motion.div>
+      </div>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute left-0 w-full bg-[#D4CBAF] z-[100] shadow-xl overflow-hidden border border-white/10"
+            style={{
+              top: isMobile ? "52px" : "39px",
+              borderRadius: "10px",
+            }}
+          >
+            <div
+              className="max-h-[200px] overflow-y-auto"
+              style={{
+                paddingTop: isMobile ? "4px" : "4px",
+                paddingBottom: isMobile ? "4px" : "4px",
+              }}
+            >
+              {field.options?.map((opt) => (
+                <div
+                  key={opt.value}
+                  onClick={() => {
+                    onChange(opt.value);
+                    setIsOpen(false);
+                  }}
+                  className="w-full flex items-center px-6 hover:bg-white/10 cursor-pointer text-[#463B17] font-medium transition-colors"
+                  style={{
+                    height: isMobile ? "40px" : "32px",
+                    fontSize: "16px",
+                    paddingLeft: isMobile ? "16px" : "17px",
+                    paddingRight: isMobile ? "16px" : "17px",
+                  }}
+                >
+                  <span className="truncate flex-1">{opt.label}</span>
+                  {value === opt.value && (
+                    <div className="w-2 h-2 rounded-full bg-white" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+const DESIGN_WIDTH = 1920;
+const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
+
+export function FraudContactFormSection({
+  locale = "en",
+  bgImage,
+  displayImage,
+  richText,
+  formId,
+  formConfig: propFormConfig,
+}: Props) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1025);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
+  const [fileName, setFileName] = useState("");
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+
+  // WhatsApp / Phone Atomic State
+  const [selectedCountry, setSelectedCountry] = useState<[string, string, string]>(COUNTRIES[0]);
+  const [isCountrySelectorOpen, setIsCountrySelectorOpen] = useState(false);
+  const countrySelectorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        countrySelectorRef.current &&
+        !countrySelectorRef.current.contains(event.target as Node)
+      ) {
+        setIsCountrySelectorOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const formConfig = useMemo(() => {
+    return propFormConfig;
+  }, [propFormConfig]);
+
+  const privacyText =
+    formConfig?.privacyText ||
+    formConfig?.data?.privacyText ||
+    formConfig?.privacyConsentText ||
+    formConfig?.data?.privacyConsentText;
+
+  const handlePrivacyToggle = (val: boolean) => {
+    setPrivacyAccepted(val);
+  };
+
+  // Handle initial form data state from fields
+  useEffect(() => {
+    if (formConfig) {
+      const rawFields = formConfig?.fields || formConfig?.data?.fields;
+      if (rawFields) {
+        const fieldsArr = Array.isArray(rawFields)
+          ? rawFields
+          : rawFields[locale] || rawFields["en"] || [];
+        const initialData: Record<string, any> = {};
+        if (Array.isArray(fieldsArr)) {
+          fieldsArr.forEach((f: FormField) => {
+            const isScenario =
+              f.fieldName.includes("scenario") || f.label?.includes("Scenario");
+            if (isScenario && f.options?.[0]) {
+              initialData[f.fieldName] = f.options[0].value;
+            } else {
+              initialData[f.fieldName] = "";
+            }
+          });
+          setFormData(initialData);
+        }
+      }
+    }
+  }, [formConfig, locale]);
+
+  const handleInputChange = (fieldName: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [fieldName]: value }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFileName(file.name);
+      setFormData((prev) => ({ ...prev, upload: file }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/form-submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          formId,
+          formName: formConfig?.name || "app-form",
+          data: formData,
+          locale,
+          sourcePage: window.location.href,
+        }),
+      });
+      if (res.ok) {
+        setSubmitStatus("success");
+        // Push success event to Google Tag Manager
+        if (typeof window !== "undefined") {
+          (window as any).dataLayer = (window as any).dataLayer || [];
+          (window as any).dataLayer.push({
+            event: "form_submit_success",
+            form_id: formConfig?.name || "app-form",
+            form_name: formConfig?.name || "Application Form",
+          });
+        }
+      }
+    } catch (err) {
+      setSubmitStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const renderSegment = (segment: RichTextSegment, idx: number) => {
+    if (segment.bold) {
+      return (
+        <span
+          key={idx}
+          className="text-[#D6CD88] font-cherry-bomb not-italic text-[1.12em] tracking-tight inline whitespace-pre-line"
+          style={{
+            WebkitTextStroke: `1.5px #514a0d`,
+            paintOrder: "stroke fill",
+          }}
+        >
+          {segment.text}
+        </span>
+      );
+    }
+    return (
+      <span key={idx} className="font-cherry-bomb inline whitespace-pre-line">
+        {segment.text}
+      </span>
+    );
+  };
+
+  const renderField = (field: FormField) => {
+    const commonStyles: React.CSSProperties = {
+      height: isMobile ? "48px" : "53px",
+      backgroundColor: "#D4CBAF",
+      paddingLeft: isMobile ? "16px" : "17px",
+      paddingRight: isMobile ? "16px" : "17px",
+      borderRadius: "10px",
+      display: "flex",
+      alignItems: "center",
+      color: "#463B17",
+    };
+
+    if (field.fieldType === "select") {
+      const isScenario =
+        field.fieldName.includes("scenario") ||
+        field.label?.includes("Scenario");
+      return (
+        <div
+          key={field.fieldName}
+          className="flex flex-col font-montserrat"
+          style={{ gap: isScenario ? (isMobile ? "8px" : "7px") : 0 }}
+        >
+          {isScenario && (
+            <span className="font-bold text-black" style={{ fontSize: "16px" }}>
+              {field.label}
+            </span>
+          )}
+          <CustomDropdown
+            field={field}
+            value={formData[field.fieldName] || ""}
+            onChange={(v) => handleInputChange(field.fieldName, v)}
+          />
+        </div>
+      );
+    }
+
+    if (
+      field.fieldName.includes("phone") ||
+      field.fieldType === "tel" ||
+      field.fieldType === "phone"
+    ) {
+      const currentValue = formData[field.fieldName] || "";
+      // Strip dial code for the input field display
+      const dialCode = selectedCountry[2];
+      const pureNumber = currentValue.startsWith(`+${dialCode}`)
+        ? currentValue.slice(dialCode.length + 1)
+        : currentValue;
+
+      const handlePhoneChange = (newPureNumber: string) => {
+        const fullNumber = `+${selectedCountry[2]}${newPureNumber.replace(/[^\d]/g, "")}`;
+        handleInputChange(field.fieldName, fullNumber);
+      };
+
+      return (
+        <div key={field.fieldName} className="font-montserrat relative">
+          <div
+            style={{ ...commonStyles, paddingLeft: 0 }}
+            className="flex items-stretch !px-0 overflow-visible"
+          >
+            <div
+              className="relative h-full flex-shrink-0"
+              ref={countrySelectorRef}
+            >
+              <button
+                type="button"
+                onClick={() => setIsCountrySelectorOpen(!isCountrySelectorOpen)}
+                className="h-full flex items-center justify-center border-r border-[#9E9474]/30 transition-all hover:bg-black/5"
+                style={{
+                  paddingLeft: isMobile ? "12px" : "16px",
+                  paddingRight: isMobile ? "6px" : "8px",
+                }}
+              >
+                <CountryFlag
+                  countryCode={selectedCountry[1]}
+                  className="w-6 h-4 rounded-[2px] flex-shrink-0"
+                />
+                <span
+                  className="font-semibold text-[#463B17]"
+                  style={{ fontSize: "16px" }}
+                >
+                  +{selectedCountry[2]}
+                </span>
+                <ChevronDown
+                  className={cn(
+                    "transition-transform text-[#463B17]/50",
+                    isMobile ? "w-4 h-4" : "w-5 h-5",
+                    isCountrySelectorOpen && "rotate-180",
+                  )}
+                />
+              </button>
+              {isCountrySelectorOpen && (
+                <CountrySelectorList
+                  onSelect={(country) => {
+                    setSelectedCountry(country);
+                    const newFullNumber = `+${country[2]}${pureNumber.replace(/[^\d]/g, "")}`;
+                    handleInputChange(field.fieldName, newFullNumber);
+                    setIsCountrySelectorOpen(false);
+                  }}
+                  onClose={() => setIsCountrySelectorOpen(false)}
+                  className="absolute left-0 top-full mt-2 w-[300px] z-[1002]"
+                />
+              )}
+            </div>
+            <input
+              type="tel"
+              placeholder={field.placeholder?.trim() || field.label}
+              value={pureNumber}
+              onChange={(e) => handlePhoneChange(e.target.value)}
+              className="flex-1 min-w-0 bg-transparent px-4 outline-none font-medium text-[#463B17] placeholder:text-[#9E9474] [&:-webkit-autofill]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+              style={{
+                fontSize: "16px",
+                paddingLeft: isMobile ? "12px" : "15px",
+              }}
+            />
+          </div>
+        </div>
+      );
+    }
+
+    if (field.fieldType === "textarea") {
+      return (
+        <div
+          key={field.fieldName}
+          className="flex flex-col font-montserrat"
+          style={{ gap: isMobile ? "8px" : "7px" }}
+        >
+          <span className="font-bold text-black" style={{ fontSize: "16px" }}>
+            {field.label}
+          </span>
+          <textarea
+            placeholder={field.placeholder?.trim() || field.label}
+            className="w-full font-medium text-[#463B17] placeholder:text-[#9E9474] outline-none resize-none [&:-webkit-autofill]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            spellCheck="false"
+            style={{
+              height: isMobile ? "120px" : "91px",
+              backgroundColor: "#D4CBAF",
+              borderRadius: "10px",
+              fontSize: "16px",
+              paddingLeft: isMobile ? "16px" : "17px",
+              paddingRight: isMobile ? "16px" : "17px",
+              paddingTop: isMobile ? "14px" : "13px",
+            }}
+            value={formData[field.fieldName] || ""}
+            onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div
+        key={field.fieldName}
+        className="flex flex-col font-montserrat"
+        style={{ gap: isMobile ? "8px" : "7px" }}
+      >
+        <div style={commonStyles}>
+          <input
+            type={field.fieldType === "email" ? "email" : "text"}
+            placeholder={field.placeholder?.trim() || field.label}
+            spellCheck="false"
+            className="w-full font-medium text-[#463B17] placeholder:text-[#9E9474] outline-none !bg-transparent [&:-webkit-autofill]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
+            style={{ fontSize: "16px" }}
+            value={formData[field.fieldName] || ""}
+            onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const sortedFields = useMemo(() => {
+    const rawFields = formConfig?.fields || formConfig?.data?.fields;
+    if (!rawFields) return [];
+
+    const fieldsArr = Array.isArray(rawFields)
+      ? rawFields
+      : rawFields[locale] || rawFields["en"] || [];
+
+    if (!Array.isArray(fieldsArr)) return [];
+
+    return [...fieldsArr]
+      .filter(
+        (f) =>
+          !f.fieldName?.toLowerCase().includes("upload") &&
+          !f.label?.toLowerCase().includes("upload"),
+      )
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+  }, [formConfig, locale]);
+
+  const uploadField = useMemo(() => {
+    const rawFields = formConfig?.fields || formConfig?.data?.fields;
+    if (!rawFields) return null;
+    const fieldsArr = Array.isArray(rawFields)
+      ? rawFields
+      : rawFields[locale] || rawFields["en"] || [];
+    return fieldsArr.find(
+      (f: any) =>
+        f.fieldType === "file" ||
+        f.fieldName?.toLowerCase().includes("upload") ||
+        f.label?.toLowerCase().includes("upload"),
+    );
+  }, [formConfig, locale]);
+
+  const submitButtonText =
+    formConfig?.submitButtonText ||
+    formConfig?.data?.submitButtonText ||
+    (locale === "zh" ? "提交申请" : "Submit Application");
+
+  const submittingText =
+    formConfig?.submittingText ||
+    formConfig?.data?.submittingText ||
+    (locale === "zh" ? "发送中..." : "Sending...");
+
+  const uploadLabel =
+    fileName ||
+    uploadField?.label ||
+    uploadField?.placeholder ||
+    (locale === "zh" ? "上传文件" : "Upload File");
+
+  const successMessage =
+    formConfig?.successMessage ||
+    formConfig?.data?.successMessage ||
+    (locale === "zh" ? "提交成功！" : "Submitted successfully!");
+
+  const errorMessage =
+    formConfig?.errorMessage ||
+    formConfig?.data?.errorMessage ||
+    (locale === "zh"
+      ? "提交失败，请重试。"
+      : "Submission failed, please try again.");
+
+  return (
+    <section
+      className="relative w-full flex items-center justify-center select-none z-20"
+      style={{
+        minHeight: isMobile ? "auto" : "auto",
+        height: "auto",
+        backgroundColor: "#000000",
+        paddingTop: isMobile ? "80px" : "120px",
+        paddingBottom: isMobile ? "80px" : "120px",
+      }}
+    >
+      <div className="absolute inset-0">
+        {bgImage ? (
+          <img
+            src={bgImage}
+            alt="Bg"
+            className="w-full h-full object-cover blur-[8px]"
+          />
+        ) : (
+          <div className="w-full h-full bg-[#756F3F]" />
+        )}
+      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        className={cn(
+          "relative z-10 flex backdrop-blur-[15px] mx-auto",
+          isMobile ? "flex-col mt-[40px]" : "flex-row items-stretch",
+        )}
+        style={{
+          width: isMobile ? "92vw" : "1024px",
+          maxWidth: isMobile ? "800px" : "none",
+          minHeight: isMobile ? "auto" : "560px",
+          height: "auto",
+          borderRadius: isMobile ? "30px" : "41px",
+          backgroundColor: "rgba(255, 255, 255, 0.92)",
+          paddingLeft: isMobile ? "20px" : "35px",
+          paddingRight: isMobile ? "20px" : "35px",
+          paddingTop: isMobile ? "30px" : "53px",
+          paddingBottom: isMobile ? "30px" : "35px",
+        }}
+      >
+        {/* LEFT COMPONENT */}
+        <div
+          className={cn(
+            "flex flex-col",
+            isMobile ? "items-center text-center mx-auto" : "",
+          )}
+          style={{
+            width: isMobile ? "100%" : "343px",
+            maxWidth: isMobile ? "600px" : "none",
+            marginBottom: isMobile ? "30px" : 0,
+          }}
+        >
+          <div
+            className="font-cherry-bomb font-black text-[#1D1A02] leading-[1.4] whitespace-pre-line block"
+            style={{ fontSize: isMobile ? "20px" : "24px", width: "100%" }}
+          >
+            {(() => {
+              // Filter out the marker text if it's accidentally included in segments
+              const displaySegments = (richText || []).filter(
+                (s) =>
+                  s.text &&
+                  s.text.trim().toLowerCase() !== "contact-form-title",
+              );
+
+              if (
+                displaySegments.length > 0 &&
+                displaySegments.some((s) => s.text && s.text.trim())
+              ) {
+                return displaySegments.map((segment, i) =>
+                  renderSegment(segment, i),
+                );
+              }
+              return (
+                <span>
+                  Whether For{" "}
+                  <span className="text-[#D6CD88] font-bold">
+                    Engineering Solutions
+                  </span>{" "}
+                  Or Innovative Customization.
+                </span>
+              );
+            })()}
+          </div>
+
+          <div
+            className={cn(
+              "overflow-hidden rounded-[35px] border-4 border-[#F6F4ED]",
+              isMobile ? "mt-5" : "mt-auto",
+            )}
+            style={{
+              width: isMobile ? "100%" : "343px",
+              height: isMobile ? "200px" : "220px",
+              marginBottom: 0,
+            }}
+          >
+            {displayImage ? (
+              <img
+                src={displayImage}
+                alt="Form"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-[#E5E7EB]" />
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT FORM */}
+        <div
+          className={cn("flex flex-col", isMobile ? "mx-auto" : "")}
+          style={{
+            width: isMobile ? "100%" : "700px",
+            maxWidth: isMobile ? "700px" : "none",
+            marginLeft: isMobile ? "auto" : "23px",
+            marginRight: isMobile ? "auto" : 0,
+          }}
+        >
+          <form
+            id={formConfig?.name || "app-form"}
+            onSubmit={handleSubmit}
+            className="flex flex-col h-full"
+          >
+            <div
+              className={cn(
+                "grid w-full",
+                isMobile ? "grid-cols-1" : "grid-cols-2",
+              )}
+              style={{
+                gap: isMobile ? "12px" : "7px",
+                columnGap: isMobile ? "12px" : "30px",
+              }}
+            >
+              {(sortedFields || []).map((field: FormField, index: number) => {
+                const isFullWidth =
+                  index >= 4 || field.fieldType === "textarea";
+                return (
+                  <div
+                    key={field.fieldName}
+                    className={cn(
+                      isFullWidth && !isMobile ? "col-span-2" : "col-span-1",
+                    )}
+                  >
+                    {renderField(field)}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div
+              className="flex flex-col md:flex-row md:items-center"
+              style={{
+                marginTop: isMobile ? "16px" : "12px",
+                gap: isMobile ? "12px" : "15px",
+              }}
+            >
+              <div className="flex flex-col">
+                <input
+                  type="file"
+                  id="file-upload"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  accept=".pdf,.doc,.docx,.jpg,.png"
+                />
+                <label
+                  htmlFor="file-upload"
+                  className="flex items-center justify-center cursor-pointer transition-all border border-[#B2A224] text-[#B2A224] hover:bg-[#B2A224] hover:text-white group"
+                  style={{
+                    height: isMobile ? "44px" : "34px",
+                    paddingLeft: isMobile ? "24px" : "22px",
+                    paddingRight: isMobile ? "24px" : "22px",
+                    borderRadius: "9999px",
+                    gap: isMobile ? "8px" : "7px",
+                    width: isMobile ? "100%" : "auto",
+                  }}
+                >
+                  <svg
+                    width={isMobile ? "18" : "14"}
+                    height={isMobile ? "18" : "14"}
+                    viewBox={CUSTOM_ICONS.upload.viewBox}
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="currentColor flex-shrink-0"
+                  >
+                    <path
+                      d={CUSTOM_ICONS.upload.path}
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <span
+                    className="font-bold whitespace-nowrap"
+                    style={{ fontSize: "16px" }}
+                  >
+                    {uploadLabel}
+                  </span>
+                </label>
+              </div>
+
+              {privacyText && (
+                <label className="flex items-start gap-2 cursor-pointer group">
+                  <div className="relative mt-0.5">
+                    <input
+                      type="checkbox"
+                      className="peer sr-only"
+                      checked={privacyAccepted}
+                      onChange={(e) => setPrivacyAccepted(e.target.checked)}
+                    />
+                    <div className="w-4 h-4 border-2 border-[#B2A224] rounded flex items-center justify-center transition-colors peer-checked:bg-[#B2A224]">
+                      {privacyAccepted && (
+                        <svg
+                          className="w-3 h-3 text-white"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={3}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                  <span
+                    className={cn(
+                      "text-[#5E552C] transition-opacity",
+                      privacyAccepted ? "opacity-100" : "opacity-70 group-hover:opacity-100"
+                    )}
+                    style={{ fontSize: isMobile ? "12px" : "14px" }}
+                  >
+                    {privacyText}
+                  </span>
+                </label>
+              )}
+            </div>
+
+            <div
+              className="flex flex-col"
+              style={{ marginTop: isMobile ? "24px" : "22px" }}
+            >
+              <motion.button
+                type="submit"
+                animate={
+                  !isSubmitting
+                    ? { rotate: [0, -3, 3, -3, 3, 0] }
+                    : { rotate: 0 }
+                }
+                whileHover={{ scale: 1.02, rotate: 0 }}
+                style={{ transformOrigin: "center" }}
+                transition={{
+                  rotate: {
+                    duration: 0.5,
+                    repeat: Infinity,
+                    repeatDelay: 2,
+                    ease: "linear",
+                  },
+                }}
+                disabled={isSubmitting || (!!privacyText && !privacyAccepted)}
+                className={cn(
+                  "w-full bg-[#B2A224] text-white py-4 rounded-full font-anaheim font-bold hover:bg-[#9A8C1E] transition-colors flex items-center justify-center disabled:opacity-50",
+                  isMobile ? "text-[18px]" : "text-[20px]",
+                  !!privacyText && !privacyAccepted && "grayscale opacity-80",
+                )}
+              >
+                {isSubmitting ? submittingText : submitButtonText}
+              </motion.button>
+              {submitStatus === "success" && (
+                <p className="text-green-700 text-center font-bold mt-2">
+                  {successMessage}
+                </p>
+              )}
+              {submitStatus === "error" && (
+                <p className="text-red-700 text-center font-bold mt-2">
+                  {errorMessage}
+                </p>
+              )}
+            </div>
+          </form>
+        </div>
+      </motion.div>
+    </section>
+  );
+}

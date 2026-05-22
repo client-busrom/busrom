@@ -568,12 +568,14 @@ export function ProductSeriesEntrySection({
       {/* 左箭头 */}
       <button
         onClick={handlePrev}
-        className="absolute cursor-pointer group z-10"
+        disabled={activeIndex <= 0}
+        className="absolute cursor-pointer group z-10 disabled:cursor-not-allowed"
         style={{
           left: vw(150),
           top: vw(400),
           width: vw(83),
           height: vw(82),
+          opacity: activeIndex <= 0 ? 0.3 : 1,
         }}
       >
         {/* 默认状态 - 空心圆 */}
@@ -599,12 +601,14 @@ export function ProductSeriesEntrySection({
       {/* 右箭头 */}
       <button
         onClick={handleNext}
-        className="absolute cursor-pointer group z-10"
+        disabled={activeIndex >= products.length - 1}
+        className="absolute cursor-pointer group z-10 disabled:cursor-not-allowed"
         style={{
           right: vw(150),
           top: vw(400),
           width: vw(83),
           height: vw(82),
+          opacity: activeIndex >= products.length - 1 ? 0.3 : 1,
         }}
       >
         {/* 默认状态 - 空心圆 */}

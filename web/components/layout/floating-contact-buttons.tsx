@@ -24,7 +24,7 @@ export function FloatingContactButtons({ data }: FloatingContactButtonsProps) {
   if (!whatsapp && !email) return null
 
   return (
-    <div className="fixed right-4 top-1/2 -translate-y-1/2 z-[60] flex flex-col gap-3">
+    <div className="fixed right-6 bottom-32 z-[60] flex flex-col gap-3">
       {whatsapp?.linkUrl && (
         <a
           href={`https://wa.me/${whatsapp.linkUrl.replace(/\D/g, '')}`}

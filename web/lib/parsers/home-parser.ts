@@ -193,7 +193,10 @@ export function parseHomeData(data: any, locale: string, strategy?: string, seoK
 
   // 6. Transform WhyChooseBusrom
   const whyChooseBusrom = data.whyChooseBusrom ? {
-    ...data.whyChooseBusrom,
+    title: data.whyChooseBusrom.title || '',
+    title2: data.whyChooseBusrom.title2 || '',
+    viewMoreButtonText: data.whyChooseBusrom.viewMoreButtonText || '',
+    viewMoreButtonUrl: data.whyChooseBusrom.viewMoreButtonUrl || '',
     reasons: (data.whyChooseBusrom.reasons || []).map((reason: any) => ({
       ...reason,
       image: autoSeoImage(reason.image, reason.title),
@@ -201,6 +204,8 @@ export function parseHomeData(data: any, locale: string, strategy?: string, seoK
   } : {
     title: '',
     title2: '',
+    viewMoreButtonText: '',
+    viewMoreButtonUrl: '',
     reasons: []
   };
 

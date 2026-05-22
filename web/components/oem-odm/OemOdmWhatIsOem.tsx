@@ -5,6 +5,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
+
 // 设计稿基准尺寸 (已按0.7缩放)
 const DESIGN_WIDTH = 1920
 const DESIGN_HEIGHT = 490 // 700 * 0.7
@@ -62,6 +63,7 @@ export function OemOdmWhatIsOem({
   descriptionSegments = defaultContent.descriptionSegments,
   title = "What Is OEM",
 }: OemOdmWhatIsOemProps) {
+
   return (
     <section
       className="relative w-full overflow-hidden"
@@ -188,9 +190,9 @@ export function OemOdmWhatIsOem({
         <motion.p
           className="absolute font-anaheim font-semibold text-white text-right"
           style={{
-            left: rpx(890), // 1271 * 0.7
+            left: rpx(630), // 1271 * 0.7
             top: rpx(171), // 244 * 0.7
-            width: rpx(340), // 486 * 0.7
+            width: rpx(600), // 486 * 0.7
             fontSize: rpx(28), // 40 * 0.7
             lineHeight: rpx(39), // 56 * 0.7
           }}
@@ -221,14 +223,20 @@ export function OemOdmWhatIsOem({
         >
           {/* 描述文字 */}
           <p
-            className="absolute font-anaheim text-white"
+            className="absolute font-anaheim text-white overflow-y-auto"
             style={{
-              left: rpx(39), // 56 * 0.7
+              left: rpx(29), // 56 * 0.7
               top: rpx(25), // 36 * 0.7
-              width: rpx(647), // 924 * 0.7
+              width: rpx(667), // 924 * 0.7
+              maxHeight: rpx(120),
               fontSize: rpx(17), // 24 * 0.7
               lineHeight: rpx(23), // 33 * 0.7
               textAlign: "justify",
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'rgba(255,255,255,0.3) transparent',
+              overscrollBehavior: 'contain',
+              paddingRight: rpx(10), // 给滚动条留出空间
+              paddingLeft: rpx(10), // 内边距，避免文字贴边
             }}
           >
             {descriptionSegments.map((segment, index) => {

@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import { motion } from "framer-motion"
 import {
   FileText,
   MessageSquare,
@@ -226,8 +227,26 @@ export function CooperationProcessSection({
         >
           <div className="absolute rounded-full" style={{ left: 0, top: 0, width: vw(66), height: vw(66), backgroundColor: "#CEC47B" }} />
           <div className="absolute rounded-full" style={{ left: vw(44), top: 0, width: vw(66), height: vw(66), backgroundColor: "rgba(205, 196, 123, 0.59)" }} />
-          <span className="relative font-medium flex items-center" style={{ left: vw(25), height: vw(66), fontSize: vw(40), color: "#56502F", fontFamily: "var(--font-anaheim), sans-serif" }}>
-            {buttonText}
+          <span className="relative font-medium flex items-center" style={{ left: vw(25), height: vw(66), fontSize: vw(32), color: "#56502F", fontFamily: "var(--font-anaheim), sans-serif" }}>
+            {buttonText.split("").map((char, index) => (
+              <motion.span
+                key={index}
+                className="inline-block"
+                style={{ marginRight: char === " " ? vw(8) : 0 }}
+                animate={{
+                  y: [0, -4, 0],
+                }}
+                transition={{
+                  duration: 0.6,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                  repeatDelay: 3,
+                  delay: index * 0.05,
+                }}
+              >
+                {char}
+              </motion.span>
+            ))}
           </span>
         </button>
       </section>

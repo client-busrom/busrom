@@ -341,9 +341,9 @@ export function ProductApplicationsSection({
                     <span className="text-muted-foreground">{app.title}</span>
                   </div>
                 )}
-                {/* Title overlay */}
+                {/* Title overlay - 悬停才显示 */}
                 <div
-                  className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent"
+                  className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent transition-opacity duration-300 opacity-0 group-hover:opacity-100"
                   style={{ padding: rpx(16) }}
                 >
                   <h3

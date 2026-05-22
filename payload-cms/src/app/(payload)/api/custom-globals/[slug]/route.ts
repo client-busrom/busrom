@@ -91,13 +91,22 @@ export async function PATCH(
           ...data,
         }
         
-        // Deep merge groups to preserve non-translatable fields
+        // Deep merge groups and arrays to preserve non-translatable fields
         for (const key in data) {
           if (typeof data[key] === 'object' && data[key] !== null && !Array.isArray(data[key])) {
+            // Group fields: deep merge
             mergedData[key] = {
               ...(existingLocaleDoc[key] || {}),
               ...data[key]
             }
+          } else if (Array.isArray(data[key]) && Array.isArray(existingLocaleDoc[key])) {
+            // Array fields: merge each item to preserve non-localized sub-fields (e.g. url)
+            const existingArray = existingLocaleDoc[key] as Array<Record<string, any>>
+            const newArray = data[key] as Array<Record<string, any>>
+            mergedData[key] = newArray.map((newItem, idx) => {
+              const existingItem = existingArray[idx] || {}
+              return { ...existingItem, ...newItem }
+            })
           }
         }
 

@@ -219,15 +219,21 @@ export function OdmWhatIsOdm({
         >
           {/* 描述文字 */}
           <p
-            className="absolute font-anaheim"
+            className="absolute font-anaheim overflow-y-auto"
             style={{
               left: rpx(31), // 44 * 0.7
               top: rpx(21), // 30 * 0.7
               width: rpx(665), // 950 * 0.7
+              maxHeight: rpx(120),
               fontSize: rpx(17), // 24 * 0.7
               lineHeight: rpx(27), // 38 * 0.7
               textAlign: "justify",
               color: "#3B3529",
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'rgba(255,255,255,0.3) transparent',
+              overscrollBehavior: 'contain',
+              paddingRight: rpx(10), // 给滚动条留出空间
+              paddingLeft: rpx(10), // 内边距，避免文字贴边
             }}
           >
             {descriptionSegments.map((segment, index) => {

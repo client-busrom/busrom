@@ -34,7 +34,7 @@ export function FraudHero({ hero, fraudConverters }: FraudHeroProps) {
               converters={{
                 ...fraudConverters,
                 paragraph: ({ nodesToJSX, node }: any) => (
-                  <h1 className="font-montserrat font-bold text-white text-5xl md:text-8xl tracking-tighter uppercase m-0 drop-shadow-2xl">
+                  <h1 className="font-montserrat font-regular text-[#f6f4ed] text-3xl md:text-7xl tracking-tighter uppercase m-0 drop-shadow-2xl">
                     {nodesToJSX({ nodes: node.children })}
                   </h1>
                 ),
@@ -47,7 +47,7 @@ export function FraudHero({ hero, fraudConverters }: FraudHeroProps) {
               converters={{
                 ...fraudConverters,
                 paragraph: ({ nodesToJSX, node }: any) => (
-                  <p className="font-montserrat text-white/90 m-0 text-xl md:text-[28px] font-bold leading-relaxed drop-shadow-lg">
+                  <p className="font-montserrat text-white/90 m-0 text-xl md:text-[28px] font-normal leading-relaxed drop-shadow-lg">
                     {nodesToJSX({ nodes: node.children })}
                   </p>
                 ),

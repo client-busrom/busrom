@@ -48,24 +48,25 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
   const pathname = usePathname();
 
   // 初始状态：优先从内存和 sessionStorage 恢复，彻底杜绝重复播放
-  const [loadingStage, setLoadingStage] = useState<LoadingStage>(preloaderConfig.enabled ? "loading" : "done");
+  const [loadingStage, setLoadingStage] = useState<LoadingStage>(() => {
+    // 服务端渲染时直接返回 done
+    if (typeof window === 'undefined') return preloaderConfig.enabled ? "loading" : "done";
+    // 客户端初始化时立即检查 sessionStorage
+    if (!preloaderConfig.enabled) return "done";
+    if (globalPreloaderShown || sessionStorage.getItem(PRELOADER_SHOWN_KEY) === 'true') return "done";
+    if (!isHomePage(pathname)) return "done";
+    return "loading";
+  });
   const [isMounted, setIsMounted] = useState(false);
 
-  useEffect(() => {
-    console.log('[ClientLayoutWrapper] loadingStage changed to:', loadingStage);
-  }, [loadingStage]);
-
   // 客户端检查：非首页直接跳过、sessionStorage 已标记跳过、性能测试工具跳过
-  // Preloader 使用 dynamic({ ssr: false })，在 useEffect 执行前不会渲染，
-  // 所以即使 loadingStage 初始为 "loading"，也不会闪烁 preloader 动画
   useEffect(() => {
     setIsMounted(true);
-    
+
     if (!preloaderConfig.enabled) return;
 
     // 检查是否已经在内存或 session 中显示过
-    const sessionShown = typeof window !== 'undefined' && sessionStorage.getItem(PRELOADER_SHOWN_KEY) === 'true';
-    if (globalPreloaderShown || sessionShown) {
+    if (globalPreloaderShown || sessionStorage.getItem(PRELOADER_SHOWN_KEY) === 'true') {
       setLoadingStage("done");
       return;
     }

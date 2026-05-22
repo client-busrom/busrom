@@ -6,7 +6,7 @@ import { defaultJSXConverters } from "@payloadcms/richtext-lexical/react";
 import type { FraudNoticeData } from "@/lib/parsers/fraud-notice-parser";
 import { FraudHero } from "@/components/fraud/FraudHero";
 import { FraudNoticeContent } from "@/components/fraud/FraudNoticeContent";
-import { FraudFormWrapper } from "@/components/fraud/FraudFormWrapper";
+import { FraudContactFormSection } from "../fraud/FraudContactFormSection";
 import { FraudQuoteGuide } from "@/components/fraud/FraudQuoteGuide";
 
 interface FraudNoticeTemplateProps {
@@ -86,13 +86,14 @@ export function FraudNoticeTemplate({ locale, data }: FraudNoticeTemplateProps) 
 
       {/* 3. Contact Form Section */}
       {contactForm?.formConfig && (
-        <section className="py-24 text-white" style={{ background: "linear-gradient(118.81deg, #9A9357 0%, #373100 100%)" }}>
-          <div className="container mx-auto px-6">
-             <div className="max-w-6xl mx-auto">
-                <FraudFormWrapper contactForm={contactForm} locale={locale} fraudConverters={fraudConverters} />
-             </div>
-          </div>
-        </section>
+        <FraudContactFormSection  
+          locale={locale} 
+          bgImage={contactForm.bgImage}
+          displayImage={contactForm.displayImage}
+          richText={contactForm.richText}
+          formId={contactForm.formId}
+          formConfig={contactForm.formConfig}
+        />
       )}
 
       {/* 4. Quote Guide / Accordion */}

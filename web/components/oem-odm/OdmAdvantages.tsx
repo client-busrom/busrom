@@ -407,7 +407,7 @@ export function OdmAdvantages({
 
           {/* 描述文字背景框 - 左侧两个直角与图片右侧连接 */}
           <motion.div
-            className="absolute flex items-center"
+            className="absolute flex items-center overflow-hidden"
             style={{
               left: rpx(-26), // -37 * 0.7
               top: rpx(112), // 160 * 0.7
@@ -429,12 +429,15 @@ export function OdmAdvantages({
             <AnimatePresence mode="wait">
               <motion.p
                 key={currentIndex}
-                className="font-anaheim font-semibold"
+                className="font-anaheim font-semibold overflow-y-auto w-full"
                 style={{
-                  width: rpx(408), // 583 * 0.7
+                  maxHeight: rpx(100),
                   fontSize: rpx(20), // 28 * 0.7
                   lineHeight: rpx(26), // 37 * 0.7
                   color: "#5D5727",
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'rgba(93,87,39,0.3) transparent',
+                  overscrollBehavior: 'contain',
                 }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

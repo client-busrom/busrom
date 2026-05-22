@@ -38,12 +38,12 @@ export function PrivacyPolicyTemplate({ data, locale }: PrivacyPolicyTemplatePro
         <Tag
           id={id}
           className={`${
-            isH1 
-              ? "text-4xl md:text-5xl text-white font-normal text-balance leading-tight capitalize relative z-10 mix-blend-difference mb-10 mt-0" 
+            isH1
+              ? "text-[43.2px] text-white font-normal text-balance leading-tight capitalize relative z-10 mix-blend-difference mb-10 mt-0"
               : Tag === "h2"
                 ? "text-2xl mt-10 mb-5"
                 : "text-xl mt-5 mb-5"
-          } heading ${alignmentClass} font-montserrat font-extrabold text-[#060C14] !leading-[1.4] block`}
+          } heading ${alignmentClass} font-montserrat font-extrabold text-[#000000] !leading-[1.4] block`}
         >
           {isH1 && <span className="inline-block bg-white w-6 md:w-10 h-px align-middle mr-4 md:mr-6"></span>}
           {nodesToJSX({ nodes: node.children })}
@@ -71,7 +71,7 @@ export function PrivacyPolicyTemplate({ data, locale }: PrivacyPolicyTemplatePro
 
       return (
         <p 
-          className={`leading-[1.8] text-[#374151] text-base ${alignment} my-5 ${
+          className={`leading-[1.8] text-[#000000] text-justify text-[16px] ${alignment} my-5 ${
             isEmpty ? 'min-h-[1.5em]' : ''
           }`}
         >
@@ -83,7 +83,7 @@ export function PrivacyPolicyTemplate({ data, locale }: PrivacyPolicyTemplatePro
       const Tag = node.listType === "number" ? "ol" : "ul";
       return (
         <Tag
-          className={`my-5 ml-6 ${node.listType === "number" ? "list-decimal" : "list-disc"} space-y-2 text-[#374151]`}
+          className={`my-5 ml-6 ${node.listType === "number" ? "list-decimal" : "list-disc"} space-y-2 text-[#000000]`}
         >
           {nodesToJSX({ nodes: node.children })}
         </Tag>

@@ -184,6 +184,7 @@ export interface FeaturedProductsData {
   title: string
   description: string
   viewAllButton: string
+  viewAllButtonUrl: string
   categories: string
   series: FeaturedProductSeries[]
 }

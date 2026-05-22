@@ -86,6 +86,19 @@ export const FeaturedProducts: GlobalConfig = {
       },
       localized: true,
     },
+    {
+      name: 'viewAllButtonUrl',
+      type: 'text',
+      label: {
+        en: 'View All Button URL',
+        zh: '"查看全部"按钮链接',
+      },
+      admin: {
+        components: {
+          Field: '@/components/fields/SmartLinkField',
+        },
+      },
+    },
 
     // ==================================================================
     // 📊 Product Series Categories (Sortable)

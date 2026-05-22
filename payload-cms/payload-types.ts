@@ -4060,6 +4060,7 @@ export interface FeaturedProduct {
   title?: string | null;
   description?: string | null;
   viewAllButtonText?: string | null;
+  viewAllButtonUrl?: string | null;
   /**
    * Select and order product series. API will automatically return 3 random products per series.
    */
@@ -4216,9 +4217,6 @@ export interface WhyChooseBusrom {
    * e.g.: "VIEW MORE INFORMATION"
    */
   viewMoreButtonText?: string | null;
-  /**
-   * e.g.: "/about-us" or "https://example.com/about"
-   */
   viewMoreButtonUrl?: string | null;
   reason01Title?: string | null;
   reason01Description?: string | null;
@@ -4760,6 +4758,7 @@ export interface FeaturedProductsSelect<T extends boolean = true> {
   title?: T;
   description?: T;
   viewAllButtonText?: T;
+  viewAllButtonUrl?: T;
   categories?: T;
   updatedAt?: T;
   createdAt?: T;

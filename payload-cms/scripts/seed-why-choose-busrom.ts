@@ -17,6 +17,13 @@ const whyChooseBusromData = {
     zh: '为什么选择 Busrom',
   },
 
+  // View More Button
+  viewMoreButtonText: {
+    en: 'VIEW MORE INFORMATION',
+    zh: '查看更多',
+  },
+  viewMoreButtonUrl: '/about-us',
+
   // ==================================================================
   // Reason 01: Original & Proprietary Design
   // ==================================================================

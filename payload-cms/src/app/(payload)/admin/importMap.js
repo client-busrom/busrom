@@ -79,6 +79,7 @@ import { default as default_fd8deacc4a98ca16d56ee047a01252e2 } from '@/component
 import { default as default_7ec45b627dc85426c7a5b3777a8024c0 } from '@/components/fields/MultilingualKnowledgeSections'
 import { default as default_eba90d60bdfe915607fa737bdb8554fb } from '@/components/fields/MultilingualCarouselItems'
 import { default as default_eb82d7385b20d8d41002bf481e15f40f } from '@/components/fields/MediaPickerWithCrop'
+import { default as default_e635f1e069dfeac8bac1a8b34ec70fb8 } from '@/components/fields/SmartLinkField'
 import { default as default_9870fd18da5f585b086dac7c5b924c68 } from '@/components/admin/CustomNav'
 import { Icon as Icon_a44df17d0fc3dcd873dae43dc3bf66bd } from '@/components/admin/Logo'
 import { default as default_a44df17d0fc3dcd873dae43dc3bf66bd } from '@/components/admin/Logo'
@@ -170,6 +171,7 @@ export const importMap = {
   "@/components/fields/MultilingualKnowledgeSections#default": default_7ec45b627dc85426c7a5b3777a8024c0,
   "@/components/fields/MultilingualCarouselItems#default": default_eba90d60bdfe915607fa737bdb8554fb,
   "@/components/fields/MediaPickerWithCrop#default": default_eb82d7385b20d8d41002bf481e15f40f,
+  "@/components/fields/SmartLinkField#default": default_e635f1e069dfeac8bac1a8b34ec70fb8,
   "@/components/admin/CustomNav#default": default_9870fd18da5f585b086dac7c5b924c68,
   "@/components/admin/Logo#Icon": Icon_a44df17d0fc3dcd873dae43dc3bf66bd,
   "@/components/admin/Logo#default": default_a44df17d0fc3dcd873dae43dc3bf66bd,
