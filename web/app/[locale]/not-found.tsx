@@ -54,7 +54,7 @@ export default function NotFound() {
 
         {/* Right Side: Building Illustration */}
         <div className="w-full lg:w-2/5 flex items-end justify-end opacity-90 lg:absolute lg:right-0 lg:bottom-0 lg:h-full pointer-events-none z-10">
-          <BuildingGraphic />
+          <ErrorImageWall />
         </div>
       </div>
 
