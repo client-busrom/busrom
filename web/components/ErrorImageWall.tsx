@@ -24,9 +24,9 @@ export function ErrorImageWall({ customImages }: ErrorImageWallProps = {}) {
   const images =
     customImages && customImages.length > 0
       ? Array.from(
-          { length: 5 },
-          (_, i) => customImages[i % customImages.length],
-        )
+        { length: 5 },
+        (_, i) => customImages[i % customImages.length],
+      )
       : defaultImages;
 
   const DESIGN_SIZE = 800;
@@ -122,7 +122,7 @@ export function ErrorImageWall({ customImages }: ErrorImageWallProps = {}) {
         return (
           <motion.div
             key={`img-${imageIndex}`}
-            className="absolute bg-white rounded-[20px] lg:rounded-[30px] shadow-2xl pointer-events-auto flex items-center justify-center overflow-hidden cursor-pointer p-2 lg:p-4"
+            className="absolute bg-white rounded-[20px] lg:rounded-[30px] shadow-2xl pointer-events-auto flex items-center justify-center overflow-hidden cursor-pointer"
             animate={animateProps}
             transition={springTransition}
             onHoverStart={() => setHoveredIndex(positionIndex)}
@@ -133,6 +133,7 @@ export function ErrorImageWall({ customImages }: ErrorImageWallProps = {}) {
               <OptimizedImage
                 image={img}
                 alt="Product Preview"
+                size="small"
                 className="absolute inset-0 w-full h-full object-cover"
               />
             </div>

@@ -23,7 +23,7 @@ export function NotFoundClient({ preloaderImages }: NotFoundClientProps) {
 
   return (
     <div
-      className="min-h-[calc(100vh-80px)] bg-[#FAF9F5] flex flex-col justify-between relative overflow-hidden font-sans pt-24"
+      className="min-h-[calc(100vh-80px)] bg-[#FAF9F5] flex flex-col justify-between relative overflow-hidden font-sans pt-32"
       data-header-theme="light"
     >
       {/* Main Content Area */}
@@ -57,13 +57,6 @@ export function NotFoundClient({ preloaderImages }: NotFoundClientProps) {
         <div className="w-full lg:w-2/5 flex items-end justify-end opacity-90 lg:absolute lg:right-0 lg:bottom-0 lg:h-full pointer-events-none z-10">
           <ErrorImageWall customImages={preloaderImages} />
         </div>
-      </div>
-
-      {/* Footer */}
-      <div className="w-full max-w-[1920px] mx-auto px-8 md:px-16 lg:px-24 xl:px-32 pb-8 z-20 relative">
-        <p className="text-[#888888] text-xs font-sans tracking-wide">
-          Copyright &copy; Busrom {currentYear}. All Rights Reserved
-        </p>
       </div>
     </div>
   );
