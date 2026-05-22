@@ -368,23 +368,23 @@ export function StoryBrandStorySection({ data }: StoryBrandStorySectionProps) {
                             const el = e.currentTarget;
                             const startY = e.pageY - el.offsetTop;
                             const scrollTop = el.scrollTop;
-                            
+
                             const onMouseMove = (moveEvent: MouseEvent) => {
                               const y = moveEvent.pageY - el.offsetTop;
                               const walk = (y - startY) * 2; // Scroll speed
                               el.scrollTop = scrollTop - walk;
                             };
-                            
+
                             const onMouseUp = () => {
                               window.removeEventListener("mousemove", onMouseMove);
                               window.removeEventListener("mouseup", onMouseUp);
                             };
-                            
+
                             window.addEventListener("mousemove", onMouseMove);
                             window.addEventListener("mouseup", onMouseUp);
                           }}
                           data-lenis-prevent
-                          style={{ clipPath: "circle(50% at 50% 50%)" }}
+                          style={{ clipPath: "circle(50% at 50% 50%)", overscrollBehavior: "contain" }}
                         >
                           <div className="min-h-full flex flex-col items-center justify-center py-[30%] px-[15%]">
                             <h4

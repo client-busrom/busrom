@@ -638,15 +638,20 @@ export function SupportContactFormSection({
                             locale,
                           ) || "Select..."}
                         </option>
-                        {field.options?.map((opt: any) => (
-                          <option
-                            key={opt.value}
-                            value={opt.value}
-                            className="bg-[#746D37]"
-                          >
-                            {getLocalizedString(opt.label, locale) || opt.label}
-                          </option>
-                        ))}
+                        {field.options
+                          ?.filter((opt: any) => {
+                            const label = getLocalizedString(opt.label, locale) || opt.label;
+                            return label && String(label).trim() !== "";
+                          })
+                          .map((opt: any) => (
+                            <option
+                              key={opt.value}
+                              value={opt.value}
+                              className="bg-[#746D37]"
+                            >
+                              {getLocalizedString(opt.label, locale) || opt.label}
+                            </option>
+                          ))}
                       </select>
                       <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
                         <ChevronDown className="text-white/50" size={20} />

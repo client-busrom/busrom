@@ -268,7 +268,7 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
                   <div className="w-full h-[220px] flex-shrink-0 overflow-hidden rounded-2xl relative shadow-inner">
                     {item.image && (
                       <OptimizedImage
-                        image={item.image.url}
+                        image={item.image}
                         alt={item.image.alt || ""}
                         className="object-cover w-full h-full"
                         size="small"
@@ -357,10 +357,10 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
                 <motion.div layout className="z-[10] absolute left-0 top-0 overflow-hidden" style={{ width: vw(176), height: vw(426), borderRadius: vw(30) }}>
                   {item.image && (
                     <OptimizedImage
-                      image={item.image.url}
+                      image={item.image}
                       alt={item.image.alt || ""}
                       className={`object-cover w-full h-full transition-all duration-700 ${isActive ? "" : "grayscale"}`}
-                      size="medium"
+                      size="small"
                       loading="eager"
                     />
                   )}

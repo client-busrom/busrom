@@ -80,7 +80,7 @@ const GenericPickerModal: React.FC<GenericPickerModalProps> = ({
       setLoading(false)
     }
     fetchItems()
-  }, [searchTerm, page, collection])
+  }, [searchTerm, page, collection, filter])
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 10001, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}>
@@ -130,7 +130,7 @@ const GenericPickerModal: React.FC<GenericPickerModalProps> = ({
                   >
                     <div style={{ width: '12px', height: '12px', borderRadius: '50%', border: isSel ? '4px solid #111827' : '1.5px solid #d1d5db' }} />
                     <span style={{ flex: 1, fontSize: '14px', fontWeight: isSel || alreadyGlobal ? 800 : 500 }}>
-                      {getLocalizedString(item.question || item.name || item.title, i18n?.language)}
+                      {item.adminLabel || getLocalizedString(item.question || item.name || item.title, i18n?.language)}
                     </span>
                     {alreadyGlobal && <span style={{ fontSize: '11px', color: '#6b7280', fontWeight: 800 }}>{isZh ? '已添加' : 'ADDED'}</span>}
                   </div>

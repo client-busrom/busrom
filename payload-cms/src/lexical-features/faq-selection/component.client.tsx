@@ -444,7 +444,7 @@ export const FaqSelectionComponent: React.FC<{ nodeKey: string; data: FaqSelecti
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                        {(cat.questions || []).map((q, qIdx) => {
-                          const qName = typeof q.faqItem === 'object' ? getLocalizedString(q.faqItem.question, i18n?.language) : 'Untitled Question'
+                          const qName = typeof q.faqItem === 'object' ? (q.faqItem.adminLabel || getLocalizedString(q.faqItem.question, 'en')) : 'Untitled Question'
                           const isFaqExpanded = expandedFaq?.catIdx === idx && expandedFaq?.faqIdx === qIdx
                           
                           return (
@@ -611,7 +611,7 @@ const GenericPickerModal = ({ title, collection, isZh, onClose, onSelect, select
         depth: '0',
         locale: i18n?.language?.split('-')[0] || 'zh'
       })
-      
+
       // Add filters
       Object.entries(filter).forEach(([key, val]: any) => {
         Object.entries(val).forEach(([op, opVal]: any) => {
@@ -635,7 +635,7 @@ const GenericPickerModal = ({ title, collection, isZh, onClose, onSelect, select
       setLoading(false)
     }
     fetchItems()
-  }, [searchTerm, page, collection])
+  }, [searchTerm, page, collection, filter])
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}>
@@ -685,7 +685,7 @@ const GenericPickerModal = ({ title, collection, isZh, onClose, onSelect, select
                   >
                     <div style={{ width: '12px', height: '12px', borderRadius: '50%', border: isSel ? '4px solid #A08745' : '1.5px solid #d1d5db' }} />
                     <span style={{ flex: 1, fontSize: '14px', fontWeight: isSel || alreadyGlobal ? 800 : 500, color: alreadyGlobal ? '#9ca3af' : '#111827' }}>
-                      {getLocalizedString(item.name || item.question || item.displayName || item.title, i18n?.language)}
+                      {item.adminLabel || getLocalizedString(item.name || item.question || item.displayName || item.title, i18n?.language)}
                     </span>
                     {alreadyGlobal && <span style={{ fontSize: '11px', color: '#A08745', fontWeight: 800 }}>{isZh ? '已添加' : 'ADDED'}</span>}
                   </div>

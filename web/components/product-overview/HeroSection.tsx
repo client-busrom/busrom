@@ -3,13 +3,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
-import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import Link from "next/link";
-import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { cn } from "@/lib/utils";
 import { ProductOverviewData } from "@/types/product-overview";
+import OptimizedImage from "../ui/OptimizedImage";
 
 interface ProductOverviewHeroSectionProps {
   data: ProductOverviewData["hero"];
@@ -53,6 +52,47 @@ function resolveProductImage(item: any) {
   return item.featuredImage || item.image || null;
 }
 
+// SVG viewBox dimensions and clipPath data for each mask
+const SVG_MASKS = [
+  {
+    w: 408, h: 500,
+    paths: [
+      "M378 270C394.569 270 408 283.431 408 300V470C408 486.569 394.569 500 378 500H90C40.2944 500 0 459.706 0 410V300C3.54365e-06 283.431 13.4315 270 30 270H378Z",
+      "M170 69C186.569 69 200 82.4315 200 99V230C200 246.569 186.569 260 170 260H90C40.2944 260 3.06063e-07 219.706 0 170V99C1.12752e-06 82.4315 13.4315 69 30 69H170Z",
+      "M378 0C394.569 0 408 13.4315 408 30V230C408 246.569 394.569 260 378 260H298C248.294 260 208 219.706 208 170V30C208 13.4315 221.431 6.44261e-07 238 0H378Z",
+    ]
+  },
+  {
+    w: 357, h: 439,
+    paths: [
+      "M327 224C343.569 224 357 237.431 357 254V409C357 425.569 343.569 439 327 439H30C13.4315 439 8.05374e-07 425.569 0 409V254C8.05374e-07 237.431 13.4315 224 30 224H327Z",
+      "M327 0C343.569 0 357 13.4315 357 30V185C357 201.569 343.569 215 327 215H30C13.4315 215 8.05374e-07 201.569 0 185V30C8.05374e-07 13.4315 13.4315 4.71115e-07 30 0H327Z",
+    ]
+  },
+  {
+    w: 373, h: 370,
+    paths: [
+      "M343 187C359.569 187 373 200.431 373 217V340C373 356.569 359.569 370 343 370H30C13.4315 370 0 356.569 0 340V217C0 200.431 13.4315 187 30 187H343Z",
+      "M343 0C359.569 7.08687e-07 373 13.4315 373 30V148C373 164.569 359.569 178 343 178H30C13.4315 178 4.34902e-07 164.569 0 148V30C1.86847e-06 13.4315 13.4315 7.08687e-07 30 0H343Z",
+    ]
+  },
+  {
+    w: 476, h: 478,
+    paths: [
+      "M446 295C462.569 295 476 308.431 476 325V448C476 464.569 462.569 478 446 478H30C13.4315 478 0 464.569 0 448V325C0 308.431 13.4315 295 30 295H446Z",
+      "M238 0C254.569 3.73671e-06 268 13.4315 268 30V257C268 273.569 254.569 287 238 287H30C13.4315 287 3.8658e-07 273.569 0 257V30C3.8658e-07 13.4315 13.4315 0 30 0H238Z",
+      "M446 55C462.569 55 476 68.4315 476 85V257C476 273.569 462.569 287 446 287H310C293.431 287 280 273.569 280 257V85C280 68.4315 293.431 55 310 55H446Z",
+    ]
+  },
+  {
+    w: 260, h: 503,
+    paths: [
+      "M230 328C246.569 328 260 341.431 260 358V443C260 476.137 233.137 503 200 503H30C13.4315 503 0 489.569 0 473V358C4.42956e-07 341.431 13.4315 328 30 328H230Z",
+      "M230 0C246.569 8.05326e-08 260 13.4315 260 30V260C260 293.137 233.137 320 200 320H30C13.4315 320 0 306.569 0 290V30C0 13.4315 13.4315 3.2213e-06 30 0H230Z",
+    ]
+  },
+];
+
 const MaskedImage = ({
   item,
   index,
@@ -63,35 +103,43 @@ const MaskedImage = ({
   isCarousel?: boolean;
 }) => {
   const resolvedImage = useMemo(() => resolveProductImage(item), [item]);
-  // 形状遮罩按照 idx % 5 取余选择
   const maskIdx = (index % 5) + 1;
-  const maskUrl = `/product-overview/product-overview-svg-${maskIdx}.svg`;
+  const mask = SVG_MASKS[index % 5];
 
   if (!resolvedImage) return null;
 
   const Content = (
-    <div
-      className="relative w-full h-full overflow-hidden"
-      style={{
-        WebkitMaskImage: `url(${maskUrl})`,
-        maskImage: `url(${maskUrl})`,
-        WebkitMaskSize: "calc(100% + 2px) calc(100% + 2px)",
-        maskSize: "calc(100% + 2px) calc(100% + 2px)",
-        WebkitMaskPosition: "center",
-        maskPosition: "center",
-        WebkitMaskRepeat: "no-repeat",
-        maskRepeat: "no-repeat",
-        transform: "translate3d(0, 0, 0)",
-        WebkitTransform: "translate3d(0, 0, 0)",
-      }}
-    >
-      <OptimizedImage
-        image={resolvedImage}
-        alt={item.title || "Product"}
-        size="large"
-        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-      />
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
+    <div className="relative w-full h-full overflow-hidden">
+      <svg
+        width="100%"
+        height="100%"
+        viewBox={`0 0 ${mask.w} ${mask.h}`}
+        preserveAspectRatio="none"
+        className="absolute inset-0"
+      >
+        <defs>
+          <clipPath id={`po-clip-${maskIdx}`}>
+            {mask.paths.map((d, i) => (
+              <path key={i} d={d} />
+            ))}
+          </clipPath>
+        </defs>
+        <foreignObject
+          x="0" y="0"
+          width={mask.w}
+          height={mask.h}
+          clipPath={`url(#po-clip-${maskIdx})`}
+        >
+          <div className="w-full h-full relative">
+            <OptimizedImage
+              image={resolvedImage}
+              alt={item.title || "Product"}
+              size="large"
+              className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+            />
+          </div>
+        </foreignObject>
+      </svg>
     </div>
   );
 
@@ -444,7 +492,7 @@ export function ProductOverviewHeroSection({
                       image={resolved}
                       alt={item.title || "Product"}
                       className="w-full h-full object-cover"
-                      size="large"
+                      size="medium"
                     />
                   </div>
                 </motion.div>

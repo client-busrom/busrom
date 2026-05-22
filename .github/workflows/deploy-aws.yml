@@ -167,6 +167,8 @@ jobs:
           platforms: linux/amd64
           build-args: |
             NEXT_PUBLIC_CMS_URL=${{ needs.setup.outputs.environment == 'production' && secrets.NEXT_PUBLIC_CMS_URL_PRODUCTION || secrets.NEXT_PUBLIC_CMS_URL_STAGING }}
+            NEXT_PUBLIC_TAWK_PROPERTY_ID=${{ secrets.NEXT_PUBLIC_TAWK_PROPERTY_ID }}
+            NEXT_PUBLIC_TAWK_WIDGET_ID=${{ secrets.NEXT_PUBLIC_TAWK_WIDGET_ID }}
 
       - name: Verify image push
         run: |
