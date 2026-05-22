@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 interface ErrorImageWallProps {
   customImages?: string[];
@@ -23,7 +23,10 @@ export function ErrorImageWall({ customImages }: ErrorImageWallProps = {}) {
   // Use custom images if provided, padding with default images to ensure we always have 5
   const images =
     customImages && customImages.length > 0
-      ? Array.from({ length: 5 }, (_, i) => customImages[i % customImages.length])
+      ? Array.from(
+          { length: 5 },
+          (_, i) => customImages[i % customImages.length],
+        )
       : defaultImages;
 
   const DESIGN_SIZE = 800;
@@ -127,12 +130,10 @@ export function ErrorImageWall({ customImages }: ErrorImageWallProps = {}) {
             onClick={() => handleImageClick(positionIndex)}
           >
             <div className="relative w-full h-full rounded-[10px] lg:rounded-[20px] overflow-hidden bg-brand-main">
-              <Image
-                src={img}
+              <OptimizedImage
+                image={img}
                 alt="Product Preview"
-                fill
-                sizes="(max-width: 1024px) 40vw, 20vw"
-                className="object-cover"
+                className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
           </motion.div>
