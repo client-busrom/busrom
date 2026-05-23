@@ -231,6 +231,7 @@ export function OemOdmTemplate({ locale, data }: OemOdmTemplateProps) {
         description={productGuide.description || undefined}
         buttonText={productGuide.buttonText || undefined}
         buttonLink={productGuide.buttonLink || undefined}
+        buttonNewTab={productGuide.buttonNewTab || undefined}
         exploreText={productGuide.exploreText || undefined}
       />
     </main>

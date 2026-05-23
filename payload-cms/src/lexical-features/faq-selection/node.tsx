@@ -68,6 +68,8 @@ export class FaqSelectionNode extends DecoratorNode<React.JSX.Element> {
   createDOM(config: EditorConfig): HTMLElement {
     const div = document.createElement('div')
     div.style.display = 'block'
+    div.style.width = '80%'
+    div.style.maxWidth = '80%'
     return div
   }
 

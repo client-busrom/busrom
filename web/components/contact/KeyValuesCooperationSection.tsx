@@ -122,7 +122,7 @@ export function KeyValuesCooperationSection({
 
             {/* 中间月牙形 - 用clipPath裁剪第一张图片 */}
             <div
-              className="absolute overflow-hidden"
+              className="absolute"
               style={{
                 left: vw(249.6), // 312 * 0.8
                 top: 0,
@@ -187,7 +187,7 @@ export function KeyValuesCooperationSection({
 
             {/* 右边圆形 - 用clipPath裁剪第二张图片 */}
             <div
-              className="absolute overflow-hidden"
+              className="absolute"
               style={{
                 left: vw(496.8), // 621 * 0.8
                 top: 0,
@@ -457,7 +457,7 @@ export function KeyValuesCooperationSection({
               <React.Fragment key={`mobile-circles-${idx}`}>
                 {/* 左侧圆形图片 */}
                 <div
-                  className={`absolute left-0 top-0 w-[140px] h-[140px] rounded-full overflow-hidden border-4 border-white shadow-xl z-10 transition-opacity duration-300 ${idx === activeIndex ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                  className={`absolute left-0 top-0 w-[140px] h-[140px] rounded-full border-4 border-white shadow-xl z-10 transition-opacity duration-300 ${idx === activeIndex ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                 >
                   {item.images[0] && (
                     <OptimizedImage

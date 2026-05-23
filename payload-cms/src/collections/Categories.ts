@@ -30,8 +30,8 @@ export const Categories: CollectionConfig = {
     },
   },
   admin: {
-    useAsTitle: 'fullTitle',
-    defaultColumns: ['fullTitle', 'name', 'type', 'order', 'status'],
+    useAsTitle: 'adminLabel',
+    defaultColumns: ['adminLabel', 'name', 'type', 'order', 'status'],
     group: {
       en: 'Content',
       zh: '内容管理',

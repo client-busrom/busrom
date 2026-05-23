@@ -43,7 +43,7 @@ export const FaqSelectionPreview: React.FC<any> = (props) => {
   const hasData = data && data.categories && data.categories.length > 0
 
   return (
-    <div style={{ padding: '4px 0' }}>
+    <div style={{ padding: '4px 0', width: '100%' }}>
       {/* 
          核心技巧：pointerEvents: 'none'
          这使得点击会直接穿透到 Lexical 节点，从而触发 Payload 官方的侧边栏抽屉。
@@ -91,9 +91,11 @@ export const FaqSelectionPreview: React.FC<any> = (props) => {
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '16px' }}>
                 {data.categories.map((cat: any, idx: number) => {
-                  const catName = typeof cat.category?.name === 'object' 
-                    ? (isZh ? cat.category.name.zh : cat.category.name.en)
-                    : (cat.category?.name || (isZh ? '未命名' : 'Untitled'))
+                  const catName = cat.category?.adminLabel
+                    || (typeof cat.category?.name === 'object'
+                      ? (isZh ? cat.category.name.zh : cat.category.name.en)
+                      : cat.category?.name)
+                    || (isZh ? '未命名' : 'Untitled')
 
                   const normalizedIcon = cat.icon ? normalizeIconName(cat.icon) : ''
 

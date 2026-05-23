@@ -149,9 +149,10 @@ export function parseOemOdmData(pageContent: any, locale: string) {
     const linkNode = nodes.find(n => n.type === 'linkJump');
     if (linkNode) {
       const title = (linkNode.data?.description || linkNode.data?.title || "").trim();
-      return { 
-        title, 
-        url: linkNode.data?.url || "" 
+      return {
+        title,
+        url: linkNode.data?.url || "",
+        openInNewTab: !!(linkNode.data?.openInNewTab),
       };
     }
     return null;
@@ -324,12 +325,16 @@ export function parseOemOdmData(pageContent: any, locale: string) {
       findOutMore: extractQuickLink("applications-find-out-more"),
       nextText: extractText("applications-next"),
     },
-    productGuide: {
+    productGuide: (() => {
+      const productGuideCta = findLinkByMarker("product-guide-cta");
+      return {
       title: extractText("product-guide-title"),
       description: extractText("product-guide-description"),
-      buttonText: extractText("product-guide-button"),
-      buttonLink: extractText("product-guide-link"),
-      exploreText: extractText("product-guide-explore"),
-    }
+      buttonText: productGuideCta?.title || extractText("product-guide-button"),
+      buttonLink: productGuideCta?.url || extractText("product-guide-link"),
+      buttonNewTab: !!(productGuideCta?.openInNewTab),
+        exploreText: extractText("product-guide-explore"),
+      };
+    })(),
   };
 }

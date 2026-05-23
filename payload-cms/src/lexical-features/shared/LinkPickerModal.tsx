@@ -7,7 +7,7 @@
 
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { X, Search } from 'lucide-react'
 
 interface LinkPickerModalProps {
@@ -33,6 +33,9 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const collections: CollectionConfig[] = [
     { value: 'products', label: '产品链接页', pathPrefix: '/shop', searchFields: ['name', 'slug', 'sku'], apiCollection: 'products' },
@@ -50,21 +53,15 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
     ? collections
     : collections.filter(c => c.value === selectedCollection)
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchItems()
-    }
-  }, [isOpen, selectedCollection, searchQuery, currentPage])
-
-  const buildSearchParams = (config: CollectionConfig) => {
+  const buildSearchParams = React.useCallback((config: CollectionConfig) => {
     const params = new URLSearchParams({
       limit: '10',
       page: currentPage.toString(),
     })
 
-    if (searchQuery) {
+    if (debouncedSearchQuery) {
       config.searchFields.forEach((field, index) => {
-        params.append(`where[or][${index}][${field}][contains]`, searchQuery)
+        params.append(`where[or][${index}][${field}][contains]`, debouncedSearchQuery)
       })
     }
 
@@ -73,34 +70,43 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
     }
 
     return params
-  }
+  }, [debouncedSearchQuery, currentPage])
 
-  const fetchItems = async () => {
+  const fetchItems = React.useCallback(async () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    abortControllerRef.current = new AbortController()
+    const { signal } = abortControllerRef.current
+
     setIsLoading(true)
     try {
-      const allResults: any[] = []
+      const results = await Promise.all(
+        activeCollections.map(async (config) => {
+          const params = buildSearchParams(config)
+          const response = await fetch(`/api/${config.apiCollection}?${params}`, { signal })
+          const data = await response.json()
+          return (data.docs || []).map((doc: any) => ({
+            ...doc,
+            _collectionValue: config.value,
+            _collectionLabel: config.label,
+            _pathPrefix: config.pathPrefix,
+            _isFaq: config.isFaq,
+            _categoryType: config.categoryType,
+          }))
+        })
+      )
 
-      for (const config of activeCollections) {
-        const params = buildSearchParams(config)
-        const response = await fetch(`/api/${config.apiCollection}?${params}`)
-        const data = await response.json()
-        const docs = (data.docs || []).map((doc: any) => ({
-          ...doc,
-          _collectionValue: config.value,
-          _collectionLabel: config.label,
-          _pathPrefix: config.pathPrefix,
-          _isFaq: config.isFaq,
-          _categoryType: config.categoryType,
-        }))
-        allResults.push(...docs)
-      }
+      if (signal.aborted) return
+
+      const allResults = results.flat()
 
       // Sort by relevance: items matching search query in name/title/adminLabel first
-      if (searchQuery) {
+      if (debouncedSearchQuery) {
         allResults.sort((a, b) => {
           const aName = (a.adminLabel || a.title || a.name || '').toLowerCase()
           const bName = (b.adminLabel || b.title || b.name || '').toLowerCase()
-          const query = searchQuery.toLowerCase()
+          const query = debouncedSearchQuery.toLowerCase()
           const aExact = aName === query ? 2 : aName.startsWith(query) ? 1 : 0
           const bExact = bName === query ? 2 : bName.startsWith(query) ? 1 : 0
           return bExact - aExact
@@ -110,11 +116,38 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
       setItems(allResults)
       setTotalPages(1) // Simplified for multi-collection search
     } catch (error) {
+      if ((error as Error).name === 'AbortError') return
       console.error('Failed to fetch items:', error)
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [activeCollections, debouncedSearchQuery, currentPage, buildSearchParams])
+
+  // Debounce search query
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery)
+    }, 300)
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current)
+      }
+    }
+  }, [searchQuery])
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchItems()
+    }
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
+  }, [isOpen, fetchItems])
 
   const handleSelect = (item: any) => {
     const config = collections.find((c) => c.value === item._collectionValue)
@@ -185,7 +218,7 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
           backgroundColor: 'white',
           borderRadius: '16px',
           padding: '24px',
-          maxWidth: '640px',
+          maxWidth: '1024px',
           width: '90%',
           maxHeight: '80vh',
           overflow: 'auto',
@@ -239,6 +272,8 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
             onChange={(e) => {
               setSelectedCollection(e.target.value)
               setCurrentPage(1)
+              setSearchQuery('')
+              setDebouncedSearchQuery('')
             }}
             style={{
               padding: '10px 14px',
@@ -289,11 +324,11 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
                       <div style={{ fontSize: '14px', fontWeight: 600, color: '#111827' }}>
-                        {item.adminLabel || item.title || item.name || item.slug}
+                        {item.adminLabel || item.title || (typeof item.name === 'object' ? item.name?.en || item.name?.zh : item.name) || item.slug}
                       </div>
                       <span style={{
-                        padding: '2px 8px',
-                        fontSize: '11px',
+                        padding: '4px 10px',
+                        fontSize: '13px',
                         fontWeight: 700,
                         backgroundColor: '#f3f4f6',
                         borderRadius: '6px',

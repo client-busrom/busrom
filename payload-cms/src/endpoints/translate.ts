@@ -89,6 +89,7 @@ function matchTextCasing(source: string, target: string, targetLang?: string): s
 
 /**
  * Google Translate API
+ * Supports batching: Google limits to 128 text segments per request
  */
 async function translateWithGoogle(
   text: string | string[],
@@ -98,30 +99,42 @@ async function translateWithGoogle(
   isRichText: boolean = false
 ): Promise<string | string[]> {
   const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`
+  const texts = Array.isArray(text) ? text : [text]
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      q: text,
-      source: sourceLang === 'auto' ? undefined : LANG_MAP[sourceLang],
-      target: LANG_MAP[targetLang],
-      format: isRichText ? 'html' : 'text',
-    }),
-  })
+  // Google Translate API limit: 128 text segments per request
+  const BATCH_SIZE = 128
+  const allTranslations: string[] = []
 
-  if (!response.ok) {
-    const error = await response.text()
-    throw new Error(`Google Translate API error: ${error}`)
+  for (let i = 0; i < texts.length; i += BATCH_SIZE) {
+    const batch = texts.slice(i, i + BATCH_SIZE)
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        q: batch,
+        source: sourceLang === 'auto' ? undefined : LANG_MAP[sourceLang],
+        target: LANG_MAP[targetLang],
+        format: isRichText ? 'html' : 'text',
+      }),
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(`Google Translate API error: ${error}`)
+    }
+
+    const data = await response.json()
+    const batchTranslations = data.data?.translations?.map((t: any) => t.translatedText) || []
+    allTranslations.push(...batchTranslations)
   }
 
-  const data = await response.json()
-  const translations = data.data?.translations?.map((t: any) => t.translatedText) || []
-  return Array.isArray(text) ? translations : (translations[0] || text)
+  return Array.isArray(text) ? allTranslations : (allTranslations[0] || text)
 }
 
 /**
  * DeepL API
+ * Free tier limit: 50 text segments per request
  */
 async function translateWithDeepL(
   text: string | string[],
@@ -143,35 +156,44 @@ async function translateWithDeepL(
   }
 
   const url = 'https://api-free.deepl.com/v2/translate'
-  const params = new URLSearchParams()
-  params.append('auth_key', apiKey)
-  params.append('target_lang', targetCode)
-  
-  if (sourceLang !== 'auto') {
-    params.append('source_lang', deeplLangMap[sourceLang] || 'EN')
-  }
-  if (isRichText) {
-    params.append('tag_handling', 'html')
-  }
-
-  // Add all segments
   const texts = Array.isArray(text) ? text : [text]
-  texts.forEach(t => params.append('text', t))
 
-  const response = await fetch(`${url}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: params.toString(),
-  })
+  // DeepL free tier limit: 50 text segments per request
+  const BATCH_SIZE = 50
+  const allTranslations: string[] = []
 
-  if (!response.ok) {
-    const error = await response.text()
-    throw new Error(`DeepL API error: ${error}`)
+  for (let i = 0; i < texts.length; i += BATCH_SIZE) {
+    const batch = texts.slice(i, i + BATCH_SIZE)
+    const params = new URLSearchParams()
+    params.append('auth_key', apiKey)
+    params.append('target_lang', targetCode)
+
+    if (sourceLang !== 'auto') {
+      params.append('source_lang', deeplLangMap[sourceLang] || 'EN')
+    }
+    if (isRichText) {
+      params.append('tag_handling', 'html')
+    }
+
+    batch.forEach(t => params.append('text', t))
+
+    const response = await fetch(`${url}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString(),
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(`DeepL API error: ${error}`)
+    }
+
+    const data = await response.json()
+    const batchTranslations = data.translations?.map((t: any) => t.text) || []
+    allTranslations.push(...batchTranslations)
   }
 
-  const data = await response.json()
-  const translations = data.translations?.map((t: any) => t.text) || []
-  return Array.isArray(text) ? translations : (translations[0] || text)
+  return Array.isArray(text) ? allTranslations : (allTranslations[0] || text)
 }
 
 /**

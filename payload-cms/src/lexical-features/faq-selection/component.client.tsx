@@ -160,7 +160,7 @@ export const FaqSelectionComponent: React.FC<{ nodeKey: string; data: FaqSelecti
   const [editor] = useLexicalComposerContext()
   const { t, i18n } = useTranslation()
   const isZh = i18n?.language === 'zh'
-  
+
   const [isEditing, setIsEditing] = useState(false)
   const [localData, setLocalData] = useState<FaqSelectionData>({
     categories: data.categories || []
@@ -316,7 +316,7 @@ export const FaqSelectionComponent: React.FC<{ nodeKey: string; data: FaqSelecti
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               {localData.categories.map((c, i) => (
                 <div key={i} style={{ padding: '8px 16px', backgroundColor: '#f9fafb', borderRadius: '10px', fontSize: '13px', fontWeight: 700, border: '1px solid #f3f4f6' }}>
-                  {typeof c.category === 'object' ? getLocalizedString(c.category.name, i18n?.language) : 'Category'}
+                  {typeof c.category === 'object' ? (c.category.adminLabel || getLocalizedString(c.category.name, i18n?.language)) : 'Category'}
                 </div>
               ))}
             </div>
@@ -330,7 +330,7 @@ export const FaqSelectionComponent: React.FC<{ nodeKey: string; data: FaqSelecti
   }
 
   return (
-    <div className="faq-selection-wrapper" style={{ margin: '20px 0', border: '2px solid #A08745', borderRadius: '20px', overflow: 'hidden', backgroundColor: 'white', boxShadow: '0 20px 50px rgba(160, 135, 69, 0.1)' }}>
+    <div className="faq-selection-wrapper" style={{ margin: '20px 0', width: '100%', minWidth: '100%', display: 'block', border: '2px solid #A08745', borderRadius: '20px', overflow: 'hidden', backgroundColor: 'white', boxShadow: '0 20px 50px rgba(160, 135, 69, 0.1)' }}>
       {/* Admin Header */}
       <div style={{ backgroundColor: '#111827', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'white' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -357,7 +357,9 @@ export const FaqSelectionComponent: React.FC<{ nodeKey: string; data: FaqSelecti
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
           {localData.categories.map((cat, idx) => {
             const isExpanded = expandedCategory === idx
-            const catName = typeof cat.category === 'object' ? getLocalizedString(cat.category.name, i18n?.language) : 'Category'
+            const catName = typeof cat.category === 'object'
+              ? (cat.category.adminLabel || getLocalizedString(cat.category.name, i18n?.language))
+              : 'Category'
             
             return (
               <div key={idx} style={{ border: isExpanded ? '2px solid #A08745' : '1px solid #f3f4f6', borderRadius: '18px', overflow: 'hidden', transition: 'all 0.3s' }}>
@@ -608,7 +610,7 @@ const GenericPickerModal = ({ title, collection, isZh, onClose, onSelect, select
         limit: '15',
         page: String(page),
         sort: '-createdAt',
-        depth: '0',
+        depth: '1',
         locale: i18n?.language?.split('-')[0] || 'zh'
       })
 
@@ -666,7 +668,7 @@ const GenericPickerModal = ({ title, collection, isZh, onClose, onSelect, select
                 const isSel = localSelected.some(s => s.id === item.id)
                 const alreadyGlobal = selectedIds.includes(item.id)
                 return (
-                  <div 
+                  <div
                     key={item.id}
                     onClick={() => {
                       if (alreadyGlobal) return
@@ -676,7 +678,7 @@ const GenericPickerModal = ({ title, collection, isZh, onClose, onSelect, select
                         setLocalSelected([item])
                       }
                     }}
-                    style={{ 
+                    style={{
                       padding: '16px 20px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '14px', cursor: alreadyGlobal ? 'not-allowed' : 'pointer',
                       backgroundColor: isSel ? '#fffcf5' : (alreadyGlobal ? '#f9fafb' : 'white'),
                       border: isSel ? '2px solid #A08745' : '1px solid #f3f4f6',

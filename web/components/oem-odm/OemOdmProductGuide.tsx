@@ -48,6 +48,7 @@ interface OemOdmProductGuideProps {
   description?: string;
   buttonText?: string;
   buttonLink?: string;
+  buttonNewTab?: boolean;
   exploreText?: string;
   locale?: Locale;
 }
@@ -57,6 +58,7 @@ export function OemOdmProductGuide({
   description = "In addition to OEM/ODM services, Busrom also offers you a full range of finished glass hardware and architectural accessories to choose from. Welcome to visit our product center to discover more innovative designs and mature solutions.",
   buttonText = "View More",
   buttonLink = "/products",
+  buttonNewTab = false,
   exploreText = "EXPLORE",
   locale = "en",
 }: OemOdmProductGuideProps) {
@@ -426,8 +428,7 @@ export function OemOdmProductGuide({
             </motion.p>
 
             {/* View More 按钮 */}
-            <motion.a
-              href={buttonLink}
+            <motion.div
               style={{
                 transformOrigin: "center",
                 marginTop: rpx(80),
@@ -453,8 +454,15 @@ export function OemOdmProductGuide({
               }}
               className="flex items-center justify-center font-anaheim font-semibold border-2 border-[#756F3F] text-[#756F3F] bg-transparent hover:bg-[#756F3F] hover:text-white transition-colors duration-300"
             >
-              {buttonText}
-            </motion.a>
+              <Link
+                href={buttonLink}
+                target={buttonNewTab ? "_blank" : undefined}
+                rel={buttonNewTab ? "noopener noreferrer" : undefined}
+                className="flex items-center justify-center w-full h-full"
+              >
+                {buttonText}
+              </Link>
+            </motion.div>
           </div>
         </div>
       </div>
@@ -523,9 +531,8 @@ export function OemOdmProductGuide({
         </p>
 
         {/* 按钮 */}
-        <motion.a
-          href={buttonLink}
-          style={{ transformOrigin: "center" }}
+        <motion.div
+          style={{ transformOrigin: "center", display: "inline-flex" }}
           initial={{ rotate: 0, scale: 1 }}
           animate={{ rotate: [0, -3, 3, -3, 3, 0] }}
           whileHover={{
@@ -541,10 +548,17 @@ export function OemOdmProductGuide({
               ease: "linear",
             },
           }}
-          className="inline-flex items-center justify-center font-anaheim font-semibold py-3 px-8 rounded-full text-xl border-2 border-[#756F3F] text-[#756F3F] bg-transparent hover:bg-[#756F3F] hover:text-white transition-colors duration-300"
+          className="items-center justify-center font-anaheim font-semibold py-3 px-8 rounded-full text-xl border-2 border-[#756F3F] text-[#756F3F] bg-transparent hover:bg-[#756F3F] hover:text-white transition-colors duration-300"
         >
-          {buttonText}
-        </motion.a>
+          <Link
+            href={buttonLink}
+            target={buttonNewTab ? "_blank" : undefined}
+            rel={buttonNewTab ? "noopener noreferrer" : undefined}
+            className="flex items-center justify-center"
+          >
+            {buttonText}
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

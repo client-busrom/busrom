@@ -30,8 +30,12 @@ export const FaqSelectionFields: Field[] = [
             filterOptions: {
               type: { equals: 'FAQ' },
             },
+            maxDepth: 1,
             admin: {
-              width: '50%',
+              width: '100%',
+              components: {
+                Field: '@/components/fields/CategoryRelationshipPicker#CategoryRelationshipPicker',
+              },
             },
           },
           {
